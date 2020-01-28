@@ -1,0 +1,4 @@
+/.vscode/*
+*.ipynp
+*.ipynb_checkpoints
+.pytest_cache/*

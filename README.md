@@ -1,4 +1,15 @@
 # Mitiq
-*Mitiq* is an open source toolkit for implementing error mitigation techniques on most current intermediate-scale quantum computers.
+A Python toolkit for implementing error mitigation on quantum computers.
 
-## Content
+## Features
+
+## Contents
+
+## Installation
+
+## Usage
+
+## Authors
+
+## Licence
+
