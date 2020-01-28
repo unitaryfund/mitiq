@@ -1,5 +1,7 @@
 """Zero noise extrapolation sub-module."""
 
+import numpy as np
+
 # used in Mitigator.extrapolate()
 def get_gammas(c):
     """Returns the linear combination coefficients "gammas" for Richardson's extrapolation.
