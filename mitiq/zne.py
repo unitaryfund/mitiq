@@ -56,9 +56,9 @@ class Mitigator:
     
     def load(self, circuit):
         """Loads the circuit into the mitigator object."""
-        return self.circuit
+        self.circuit = circuit
     
-    def comp(self, circuit):
+    def comp(self):
         """Compiles the circuit for error mitigation purposes."""
         # if the user is able to control the noise, do nothing.
         pass
