@@ -16,14 +16,6 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Pull quilc image and qvm image
-      run: |
-        docker pull rigetti/quilc
-        docker pull rigetti/qvm
-    - name: Run qvm and quilc
-      run: |
-        docker run -itd -p 5555:5555 rigetti/quilc -R
-        docker run -itd -p 5000:5000 rigetti/qvm -S
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
@@ -38,4 +30,4 @@ jobs:
     - name: Test with pytest
       run: |
         pip install pytest
-        pytest
+        pytest mitiq/tests/test_zne_qiskit.py
