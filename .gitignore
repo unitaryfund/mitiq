@@ -3,3 +3,4 @@
 *.ipynp
 *.ipynb_checkpoints
 __pycache__/
+mitiq.egg-info/
