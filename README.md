@@ -6,7 +6,7 @@ A Python toolkit for implementing error mitigation on quantum computers.
 ## Contents
 
 ## Installation
-To install locally for use:
+To install locally use:
 ```bash
 pip install -e .
 ```
@@ -28,4 +28,3 @@ you can run tests with `pytest`.
 ## Authors
 
 ## Licence
-
