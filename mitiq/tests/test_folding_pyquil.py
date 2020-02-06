@@ -7,7 +7,7 @@ from mitiq.folding_pyquil import local_folding, unitary_folding
 
 def random_circuit(depth):
     """Returns a single-qubit random circuit based on Pauli gates."""
-    prog = Program()  
+    prog = Program()
     for _ in range(depth):
         prog += random.choice([X(0), Y(0), Z(0)])
     return prog
@@ -22,10 +22,10 @@ for c in strech_vals:
     out = unitary_folding(circ, c)
     actual_c = len(out) / len(circ)
     print("Input stretch: {:}    Real stretch: {}".format(c, actual_c))
-    assert np.isclose(c, actual_c, atol=1.e-1)
+    assert np.isclose(c, actual_c, atol=1.0e-1)
     # Uncomment to print input and output circuits
-    #print("input \n", circ)
-    #print("output \n", out)
+    # print("input \n", circ)
+    # print("output \n", out)
 
 # Test local_folding
 print("Testing local folding...")
@@ -34,7 +34,7 @@ for c in strech_vals:
     out = local_folding(circ, c)
     actual_c = len(out) / len(circ)
     print("Input stretch: {:}    Real stretch: {}".format(c, actual_c))
-    assert np.isclose(c, actual_c, atol=1.e-1)
+    assert np.isclose(c, actual_c, atol=1.0e-1)
     # Uncomment to print input and output circuits
-    #print("input \n", circ)
-    #print("output \n", out)
+    # print("input \n", circ)
+    # print("output \n", out)
