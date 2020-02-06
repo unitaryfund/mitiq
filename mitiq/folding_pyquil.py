@@ -10,7 +10,7 @@ def local_folding(prog, stretch, sampling=False):
     Returns a circuit of depth approximately equal to stretch*len(prog).
     The stretch factor can be any real number >= 1."""
     
-    if not (stretch > 1):
+    if not (stretch >= 1):
         raise ValueError("The stretch factor must be a real number >= 1.")
     
     out = Program()
@@ -45,7 +45,7 @@ def unitary_folding(prog, stretch):
     Returns a circuit of depth approximately equal to stretch*len(prog).
     The stretch factor can be any real number >= 1."""
     
-    if not (stretch > 1):
+    if not (stretch >= 1):
         raise ValueError("The stretch factor must be a real number >= 1.")
     
     d, r = divmod(stretch - 1, 2)
