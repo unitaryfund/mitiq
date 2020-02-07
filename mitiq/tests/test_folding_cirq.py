@@ -1,18 +1,19 @@
 import numpy as np
 import random
-from pyquil import Program
-from pyquil.gates import X, Y, Z
-from mitiq.folding_pyquil import local_folding, unitary_folding
+import cirq
+from mitiq.folding_cirq import local_folding, unitary_folding
 
 def random_circuit(depth):
     """Returns a single-qubit random circuit based on Pauli gates."""
-    prog = Program()
+    # defines qubit
+    q = cirq.GridQubit(0, 0)
+    circuit = cirq.Circuit()
     for _ in range(depth):
-        prog += random.choice([X(0), Y(0), Z(0)])
-    return prog
+        circuit += random.choice([cirq.X(q), cirq.Y(q), cirq.Z(q)])
+    return circuit
 
 strech_vals = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.5, 4.5, 5.0]
-depth = 10
+depth = 100
 
 def test_unitary_folding():
     print("Testing unitary folding...")

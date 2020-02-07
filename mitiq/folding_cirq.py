@@ -1,5 +1,5 @@
 import random
-from pyquil import Program
+import cirq
 
 def local_folding(circuit, stretch, sampling=False):
     """Applies the map G -> G G^dag G to ((stretch-1)*len(circuit)//2) to a subset of gates 
@@ -10,7 +10,7 @@ def local_folding(circuit, stretch, sampling=False):
     if not (stretch >= 1):
         raise ValueError("The stretch factor must be a real number >= 1.")
 
-    out = Program()
+    out = cirq.Circuit()
 
     if stretch <= 3:
         # select a fraction of subindices
@@ -27,7 +27,7 @@ def local_folding(circuit, stretch, sampling=False):
         for j, gate in enumerate(circuit):
             out += gate
             if j in sub_indices:
-                out += circuit[j : j + 1].dagger()  # this trick avoids affecting the gate
+                out += cirq.inverse(gate)
                 out += gate
 
         return out
@@ -49,13 +49,13 @@ def unitary_folding(circuit, stretch):
     d, r = divmod(stretch - 1, 2)
 
     # global folding
-    eye = Program()
+    eye = cirq.Circuit()
     for j in range(int(d)):
-        eye += circuit.dagger() + circuit
+        eye += cirq.inverse(circuit) + circuit
 
     # partial folding
     partial = int(len(circuit) * r / 2)
     if partial != 0:
-        eye += circuit[-partial:].dagger() + circuit[-partial:]
+        eye += cirq.inverse(circuit[-partial:]) + circuit[-partial:]
 
     return circuit + eye
