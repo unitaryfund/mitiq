@@ -2,7 +2,7 @@ import numpy as np
 import random
 from pyquil import Program
 from pyquil.gates import X, Y, Z
-from mitiq.folding_pyquil import local_folding, unitary_folding
+from mitiq.folding_mitiq import local_folding, unitary_folding
 
 def random_circuit(depth):
     """Returns a single-qubit random circuit based on Pauli gates."""

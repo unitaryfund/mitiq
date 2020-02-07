@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import cirq
-from mitiq.folding_cirq import local_folding, unitary_folding
+from mitiq.folding_mitiq import local_folding, unitary_folding
 
 def random_circuit(depth):
     """Returns a single-qubit random circuit based on Pauli gates."""
