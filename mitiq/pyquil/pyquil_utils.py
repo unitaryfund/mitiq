@@ -5,6 +5,8 @@ from pyquil import get_qc
 from pyquil.noise import append_kraus_to_gate
 from pyquil.gates import X, Y, Z, MEASURE
 
+from mitiq.matrices import npI, npZ, npX, npY
+
 QVM = get_qc('1q-qvm')
 
 # Set the random seeds for testing
@@ -77,6 +79,35 @@ def run_with_noise(circuit, noise, shots):
     results = QVM.run(circuit)
     expval = (results == [0]).sum() / shots
     return expval
+
+
+def run_program(pq: Program, shots: int = 100) -> float:
+    pq.wrap_in_numshots_loop(shots)
+    results = QVM.run(pq)
+    expval = (results == [0]).sum() / shots
+    return expval
+
+
+def add_depolarizing_noise(pq: Program, noise: float) -> Program:
+    pq = pq.copy()
+    # apply depolarizing noise to all gates
+    kraus_ops = [np.sqrt(1 - noise) * npI,
+                 np.sqrt(noise / 3) * npX,
+                 np.sqrt(noise / 3) * npY,
+                 np.sqrt(noise / 3) * npZ]
+    pq.define_noisy_gate("X", [0], append_kraus_to_gate(kraus_ops, npX))
+    pq.define_noisy_gate("Y", [0], append_kraus_to_gate(kraus_ops, npY))
+    pq.define_noisy_gate("Z", [0], append_kraus_to_gate(kraus_ops, npZ))
+    return pq
+
+
+NATIVE_NOISE = 0.007
+
+
+def scale_noise(pq: Program, param: float) -> Program:
+    noise = param * NATIVE_NOISE
+    assert noise <= 1.0, "Noise scaled to {} is out of bounds (<=1.0) for depolarizing channel.".format(noise)
+    return add_depolarizing_noise(pq, noise)
 
 
 def measure(circuit, qid):
