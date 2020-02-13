@@ -11,10 +11,9 @@ class Generator(object):
     scale parameters and previously calculated expectation values. Noise scaling parameters are stored on the `in_stack`
     and the running list of expectation values are stored on the `out_stack`.
     """
-    def __init__(self, scale_noise, instack: List[float], outstack: List[float]):
+    def __init__(self, instack: List[float], outstack: List[float]):
         self.instack = instack
         self.outstack = outstack
-        self.scale_noise = scale_noise
 
     def step(self, instack: List[float], outstack: List[float]):
         raise NotImplementedError
@@ -24,7 +23,7 @@ class Generator(object):
 
 
 class BatchedGenerator(Generator):
-    def __init__(self, scalars: List[float], scale_noise, instack: List[float] = None, outstack: List[float] = None):
+    def __init__(self, scalars: List[float], instack: List[float] = None, outstack: List[float] = None):
         """
         Runs a series of scalar noise parameters serially.
         :param scalars: List of scalar noise values to be executed.
@@ -35,7 +34,7 @@ class BatchedGenerator(Generator):
             instack = []
         if outstack is None:
             outstack = []
-        super(self.__class__, self).__init__(scale_noise, instack, outstack)
+        super(self.__class__, self).__init__(instack, outstack)
         self.scalars = scalars
 
     def step(self, instack: List[float], outstack: List[float]):
@@ -56,7 +55,7 @@ class Mitigator(object):
         self.gen = gen
         self.run_program = run_program
 
-    def mitigate(self, pq: Program) -> Tuple[List[float], List[float]]:
+    def mitigate(self, pq: Program, scale_noise) -> Tuple[List[float], List[float]]:
         """
         Runs the generator until convergence and return the full list of noise values and expectations that have been
         calculated.
@@ -67,10 +66,10 @@ class Mitigator(object):
             return gen.instack, gen.outstack
         else:
             next_param = gen.step(gen.instack, gen.outstack)
-            scaled_pq = gen.scale_noise(pq, next_param)
+            scaled_pq = scale_noise(pq, next_param)
             yy = self.run_program(scaled_pq)
             gen.outstack.append(yy)
-            return self.mitigate(pq)
+            return self.mitigate(pq, scale_noise)
 
 
 def reduce(expectations: List[float]) -> float:
@@ -84,11 +83,11 @@ def zne(run_program, gen=None, scale_noise=None):
         scale_noise = pq_utils.scale_noise
 
     if gen is None:
-        gen = BatchedGenerator([1.0, 2.0, 3.0], scale_noise)
+        gen = BatchedGenerator([1.0, 2.0, 3.0])
 
     def zne_run(pq):
         mitigator = Mitigator(gen, run_program)
-        params, expects = mitigator.mitigate(pq)
+        params, expects = mitigator.mitigate(pq, scale_noise)
         return reduce(expects)
 
     return zne_run
