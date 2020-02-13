@@ -1,7 +1,7 @@
 # test_adaptive_zne.py
 import numpy as np
 
-from mitiq.adaptive_zne import BatchedGenerator, Mitigator, reduce, zne, zne_factory
+from mitiq.adaptive_zne import BatchedGenerator, Mitigator, reduce
 import mitiq.qiskit.qiskit_utils as qs
 
 

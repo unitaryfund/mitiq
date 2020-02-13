@@ -2,7 +2,7 @@ from pyquil import Program
 from typing import List, Tuple
 
 from mitiq.zne import richardson_extr
-import mitiq.pyquil.pyquil_utils as pq_utils
+import mitiq.qiskit.qiskit_utils as qs_utils
 
 
 class Generator(object):
@@ -79,8 +79,8 @@ def reduce(expectations: List[float]) -> float:
 
 def zne(run_program, gen=None, scale_noise=None):
     if scale_noise is None:
-        # TODO this assumes is pyQuil
-        scale_noise = pq_utils.scale_noise
+        # TODO this assumes is qiskit
+        scale_noise = qs_utils.scale_noise
 
     if gen is None:
         gen = BatchedGenerator([1.0, 2.0, 3.0])
