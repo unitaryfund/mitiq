@@ -7,6 +7,7 @@ from pyquil import Program
 # Gate level folding
 # ==================================================
 
+
 def sampling_stretcher(circuit: Program, stretch: float) -> Program:
     """Applies the map G -> G G^dag G to a random subset of gates 
     of the input circuit.
@@ -44,12 +45,12 @@ def fold_gates(circuit: Program, sub_indices: List[int]) -> Program:
     for j, gate in enumerate(circuit):
         out += gate
         if j in sub_indices:
-            out += circuit[j : j + 1].dagger() # trick to avoid mutating the gate
+            out += circuit[j : j + 1].dagger()  # trick to avoid mutating the gate
             out += gate
     return out
 
 
-def local_folding(circuit: Program, stretch: float, stretcher: Callable=left_stretcher) -> Program:
+def local_folding(circuit: Program, stretch: float, stretcher: Callable = left_stretcher) -> Program:
     """Applies the map G -> G G^dag G to a subset of gates of the input circuit.
     Returns a circuit of depth approximately equal to stretch*len(circuit).
     The stretch factor can be any real number >= 1."""
@@ -68,6 +69,7 @@ def local_folding(circuit: Program, stretch: float, stretcher: Callable=left_str
 # ==================================================
 # Circuit level folding
 # ==================================================
+
 
 def unitary_folding(circuit: Program, stretch: float) -> Program:
     """Applies global unitary folding and a final partial folding of the input circuit.

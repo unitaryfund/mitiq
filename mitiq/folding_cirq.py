@@ -7,6 +7,7 @@ from cirq import Circuit, inverse
 # Gate level folding
 # ==================================================
 
+
 def sampling_stretcher(circuit: Circuit, stretch: float) -> Circuit:
     """Applies the map G -> G G^dag G to a random subset of gates 
     of the input circuit.
@@ -68,6 +69,7 @@ def local_folding(circuit: Circuit, stretch: float, stretcher: Callable=left_str
 # ==================================================
 # Circuit level folding
 # ==================================================
+
 
 def unitary_folding(circuit: Circuit, stretch: float) -> Circuit:
     """Applies global unitary folding and a final partial folding of the input circuit.
