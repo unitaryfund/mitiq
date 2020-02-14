@@ -2,7 +2,7 @@ import numpy as np
 import random
 from pyquil import Program
 from pyquil.gates import X, Y, Z
-from mitiq.folding_pyquil import local_folding, unitary_folding
+from mitiq.folding_pyquil import local_folding, unitary_folding, sampling_stretcher, left_stretcher
 
 def random_circuit(depth):
     """Returns a single-qubit random circuit based on Pauli gates."""
@@ -27,7 +27,7 @@ def test_local_folding_nosamp():
     print("Testing local folding (no sampling)...")
     for c in strech_vals:
         circ = random_circuit(depth)
-        out = local_folding(circ, c, sampling=False)
+        out = local_folding(circ, c, stretcher = sampling_stretcher)
         actual_c = len(out) / len(circ)
         print("Input stretch: {:}    Real stretch: {}".format(c, actual_c))
         assert np.isclose(c, actual_c, atol=1.0e-1)
@@ -36,7 +36,7 @@ def test_local_folding_withsamp():
     print("Testing local folding (random sampling)...")
     for c in strech_vals:
         circ = random_circuit(depth)
-        out = local_folding(circ, c, sampling=True)
+        out = local_folding(circ, c, stretcher = left_stretcher)
         actual_c = len(out) / len(circ)
         print("Input stretch: {:}    Real stretch: {}".format(c, actual_c))
         assert np.isclose(c, actual_c, atol=1.0e-1)

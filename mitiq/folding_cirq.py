@@ -1,5 +1,5 @@
-import random
 from typing import List, Callable
+import random
 from cirq import Circuit, inverse
 
 
