@@ -1,42 +1,68 @@
 import random
 import cirq
 
-def local_folding(circuit, stretch, sampling=False):
-    """Applies the map G -> G G^dag G to ((stretch-1)*len(circuit)//2) to a subset of gates 
-    of the input circuit. For large stretch factors the function is recursively repeated. 
+# ==================================================
+# Gate level folding
+# ==================================================
+
+def sampling_stretcher(circuit, stretch):
+    """Applies the map G -> G G^dag G to a random subset of gates 
+    of the input circuit.
+    Returns a circuit of depth approximately equal to stretch*len(circuit).
+    The stretch factor can be any real number within 1 and 3."""
+    
+    if not ((stretch >= 1) and (stretch <= 3)):
+        raise ValueError("The stretch factor must be a real number within 1 and 3.")
+    
+    depth = len(circuit)
+    reduced_depth = int(depth * (stretch - 1) / 2)
+    sub_indices = random.sample(range(depth), reduced_depth)
+    return fold_gates(circuit, sub_indices)
+
+def start_stretcher(circuit, stretch):
+    """Applies the map G -> G G^dag G to a subset of gates of the input circuit (sequentially
+    starting from the beginning).
+    Returns a circuit of depth approximately equal to stretch*len(circuit).
+    The stretch factor can be any real number within 1 and 3."""
+    
+    if not ((stretch >= 1) and (stretch <= 3)):
+        raise ValueError("The stretch factor must be a real number within 1 and 3.")
+    
+    depth = len(circuit)
+    reduced_depth = int(depth * (stretch - 1) / 2)
+    sub_indices = list(range(reduced_depth))
+    return fold_gates(circuit, sub_indices)
+
+def fold_gates(circuit, sub_indices):
+    out = cirq.Circuit()
+    # sequentially append gates to out, folding only if j is in sub_indices
+    for j, gate in enumerate(circuit):
+        out += gate
+        if j in sub_indices:
+            out += cirq.inverse(gate)
+            out += gate
+    return out
+
+def local_folding(circuit, stretch, stretcher = start_stretcher):
+    """Applies the map G -> G G^dag G to a subset of gates of the input circuit.
     Returns a circuit of depth approximately equal to stretch*len(circuit).
     The stretch factor can be any real number >= 1."""
 
     if not (stretch >= 1):
         raise ValueError("The stretch factor must be a real number >= 1.")
 
-    out = cirq.Circuit()
-
     if stretch <= 3:
-        # select a fraction of subindices
-        depth = len(circuit)
-        fractiona_depth = int(depth * (stretch - 1) / 2)
-        if sampling == True:
-            # indices of f random gates
-            sub_indices = random.sample(range(depth), fractiona_depth)
-        else:
-            # indices of the first f gates
-            sub_indices = list(range(fractiona_depth))
-
-        # sequentially append gates to out, folding only if j is in sub_indices
-        for j, gate in enumerate(circuit):
-            out += gate
-            if j in sub_indices:
-                out += cirq.inverse(gate)
-                out += gate
-
-        return out
+        return stretcher(circuit, stretch)
     else:
-        # recursive application for large stretching
-        _ = local_folding(circuit, 3, sampling)
+        # recursive iterations for stretch > 3
+        _ = local_folding(circuit, 3, stretcher)
 
-        return local_folding(_, stretch / 3, sampling)
+        return local_folding(_, stretch / 3, stretcher)
 
+
+# ==================================================
+# Circuit level folding
+# ==================================================
 
 def unitary_folding(circuit, stretch):
     """Applies global unitary folding and a final partial folding of the input circuit.
