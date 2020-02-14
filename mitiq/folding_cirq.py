@@ -1,12 +1,13 @@
 import random
-import cirq
+from typing import List, Callable
+from cirq import Circuit, inverse
+
 
 # ==================================================
 # Gate level folding
 # ==================================================
 
-
-def sampling_stretcher(circuit, stretch):
+def sampling_stretcher(circuit: Circuit, stretch: float) -> Circuit:
     """Applies the map G -> G G^dag G to a random subset of gates 
     of the input circuit.
     Returns a circuit of depth approximately equal to stretch*len(circuit).
@@ -21,7 +22,7 @@ def sampling_stretcher(circuit, stretch):
     return fold_gates(circuit, sub_indices)
 
 
-def left_stretcher(circuit, stretch):
+def left_stretcher(circuit: Circuit, stretch: float) -> Circuit:
     """Applies the map G -> G G^dag G to a subset of gates of the input circuit (first part of it).
     Returns a circuit of depth approximately equal to stretch*len(circuit).
     The stretch factor can be any real number within 1 and 3."""
@@ -35,20 +36,20 @@ def left_stretcher(circuit, stretch):
     return fold_gates(circuit, sub_indices)
 
 
-def fold_gates(circuit, sub_indices):
+def fold_gates(circuit: Circuit, sub_indices: List[int]) -> Circuit:
     """Applies the map G -> G G^dag G to a subset of gates of the input circuit
     determined by sub_indices."""
 
-    out = cirq.Circuit()
+    out = Circuit()
     for j, gate in enumerate(circuit):
         out += gate
         if j in sub_indices:
-            out += cirq.inverse(gate)
+            out += inverse(gate)
             out += gate
     return out
 
 
-def local_folding(circuit, stretch, stretcher=left_stretcher):
+def local_folding(circuit: Circuit, stretch: float, stretcher: Callable=left_stretcher) -> Circuit:
     """Applies the map G -> G G^dag G to a subset of gates of the input circuit.
     Returns a circuit of depth approximately equal to stretch*len(circuit).
     The stretch factor can be any real number >= 1."""
@@ -68,8 +69,7 @@ def local_folding(circuit, stretch, stretcher=left_stretcher):
 # Circuit level folding
 # ==================================================
 
-
-def unitary_folding(circuit, stretch):
+def unitary_folding(circuit: Circuit, stretch: float) -> Circuit:
     """Applies global unitary folding and a final partial folding of the input circuit.
     Returns a circuit of depth approximately equal to stretch*len(circuit).
     The stretch factor can be any real number >= 1."""
@@ -81,14 +81,14 @@ def unitary_folding(circuit, stretch):
     num_foldings, fractional_stretch = divmod(stretch - 1, 2)
 
     # integer circuit folding
-    eye = cirq.Circuit()
+    eye = Circuit()
     for _ in range(int(num_foldings)):
-        eye += cirq.inverse(circuit) + circuit
+        eye += inverse(circuit) + circuit
 
     # partial circuit folding.
     depth = len(circuit)
     fractional_depth = int(depth * fractional_stretch / 2)
     if fractional_depth != 0:
-        eye += cirq.inverse(circuit[-fractional_depth:]) + circuit[-fractional_depth:]
+        eye += inverse(circuit[-fractional_depth:]) + circuit[-fractional_depth:]
 
     return circuit + eye
