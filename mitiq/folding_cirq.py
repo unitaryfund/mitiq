@@ -21,9 +21,8 @@ def sampling_stretcher(circuit, stretch):
     return fold_gates(circuit, sub_indices)
 
 
-def start_stretcher(circuit, stretch):
-    """Applies the map G -> G G^dag G to a subset of gates of the input circuit (sequentially
-    starting from the beginning).
+def left_stretcher(circuit, stretch):
+    """Applies the map G -> G G^dag G to a subset of gates of the input circuit (first part of it).
     Returns a circuit of depth approximately equal to stretch*len(circuit).
     The stretch factor can be any real number within 1 and 3."""
 
@@ -49,7 +48,7 @@ def fold_gates(circuit, sub_indices):
     return out
 
 
-def local_folding(circuit, stretch, stretcher=start_stretcher):
+def local_folding(circuit, stretch, stretcher=left_stretcher):
     """Applies the map G -> G G^dag G to a subset of gates of the input circuit.
     Returns a circuit of depth approximately equal to stretch*len(circuit).
     The stretch factor can be any real number >= 1."""
