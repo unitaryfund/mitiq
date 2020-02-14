@@ -94,3 +94,4 @@ def unitary_folding(circuit: Circuit, stretch: float) -> Circuit:
         eye += inverse(circuit[-fractional_depth:]) + circuit[-fractional_depth:]
 
     return circuit + eye
+   

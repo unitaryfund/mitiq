@@ -94,3 +94,4 @@ def unitary_folding(circuit: Program, stretch: float) -> Program:
         eye += circuit[-fractional_depth:].dagger() + circuit[-fractional_depth:]
 
     return circuit + eye
+
