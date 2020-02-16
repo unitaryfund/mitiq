@@ -1,43 +1,414 @@
-import numpy as np
+"""Unit tests for folding Cirq circuits."""
+
 import random
-from cirq import Circuit, GridQubit, X, Y, Z
-from mitiq.folding_cirq import local_folding, unitary_folding
 
+import numpy as np
+import pytest
+from cirq import (Circuit, GridQubit, LineQubit, ops)
 
-def random_circuit(depth: int):
-    """Returns a single-qubit random circuit based on Pauli gates."""
-    # defines qubit
-    q = GridQubit(0, 0)
-    circuit = Circuit()
-    for _ in range(depth):
-        circuit += random.choice([X(q), Y(q), Z(q)])
-    return circuit
+from mitiq.folding_cirq import (fold_gate_at_index_in_moment,
+                                fold_gates_in_moment,
+                                fold_gates,
+                                fold_moments,
+                                fold_gates_from_left,
+                                fold_gates_at_random,
+                                fold_local,
+                                unitary_folding)
 
 
 STRETCH_VALS = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.5, 4.5, 5.0]
 DEPTH = 100
 
 
+# TODO: We will likely need to generate random circuits for testing other modules.
+#  We may want to make a (testing) utility to create random circuits.
+def random_circuit(depth: int, **kwargs):
+    """Returns a single-qubit random circuit with on Pauli gates."""
+    if "seed" in kwargs.keys():
+        np.random.seed(kwargs.get("seed"))
+    qubit = GridQubit(0, 0)
+    circuit = Circuit()
+    for _ in range(depth):
+        circuit += random.choice([ops.X(qubit), ops.Y(qubit), ops.Z(qubit)])
+    return circuit
+
+
+def _equal(circuit_one: Circuit, circuit_two: Circuit) -> bool:
+    """Returns True if circuits are equal, meaning:
+        (1) They have the same number of operations.
+        (2) The set of operations is equal.
+
+    Args:
+        circuit_one: Input circuit to compare to circuit_two.
+        circuit_two: Input circuit to compare to circuit_one.
+    """
+    return (
+        len(list(circuit_one.all_operations())) == len(list(circuit_two.all_operations())) and
+        set(circuit_one.all_operations()) == set(circuit_two.all_operations())
+    )
+
+def test_fold_gate_at_index_in_moment_one_qubit():
+    """Tests local folding with a moment, index for a one qubit circuit."""
+    # Test circuit
+    qbit = LineQubit(0)
+    circ = Circuit(
+        [ops.H.on(qbit), ops.X.on(qbit), ops.Z.on(qbit)]
+    )
+    # Fold the zeroth operation in the zeroth moment
+    folded = fold_gate_at_index_in_moment(circ, moment_index=0, gate_index=0)
+    assert folded == Circuit(
+        [ops.H.on(qbit)] * 3 + [ops.X.on(qbit)] + [ops.Z.on(qbit)]
+    )
+    # Fold the zeroth operation in the first moment
+    folded = fold_gate_at_index_in_moment(circ, moment_index=1, gate_index=0)
+    assert folded == Circuit(
+        [ops.H.on(qbit)] + [ops.X.on(qbit)] * 3 + [ops.Z.on(qbit)]
+    )
+    # Fold the zeroth operation in the second moment
+    folded = fold_gate_at_index_in_moment(circ, moment_index=2, gate_index=0)
+    assert folded == Circuit(
+        [ops.H.on(qbit)] + [ops.X.on(qbit)] + [ops.Z.on(qbit)] * 3
+    )
+    # Make sure the original circuit wasn't modified
+    assert circ == Circuit(
+        [ops.H.on(qbit), ops.X.on(qbit), ops.Z.on(qbit)]
+    )
+
+
+def test_fold_gate_at_index_in_moment_two_qubits():
+    """Tests local folding with a moment, index for a two qubit circuit with single qubit gates."""
+    # Test circuit
+    qreg = LineQubit.range(2)
+    circ = Circuit(
+        [ops.H.on_each(*qreg), ops.T.on_each(*qreg)]
+    )
+
+    # Fold the zeroth operation in the zeroth moment
+    folded = fold_gate_at_index_in_moment(circ, moment_index=0, gate_index=0)
+    correct = Circuit(
+        [ops.H.on(qreg[0])**-1, ops.H.on(qreg[0])] + list(circ.all_operations())
+    )
+    assert _equal(folded, correct)
+
+    # Fold the first operation in the zeroth moment
+    folded = fold_gate_at_index_in_moment(circ, moment_index=0, gate_index=1)
+    correct = Circuit(
+        [ops.H.on(qreg[1]) ** -1, ops.H.on(qreg[1])] + list(circ.all_operations())
+    )
+    assert _equal(folded, correct)
+
+    # Fold the zeroth operation in the first moment
+    folded = fold_gate_at_index_in_moment(circ, moment_index=1, gate_index=0)
+    correct = Circuit(
+        [ops.T.on(qreg[0]) ** -1, ops.T.on(qreg[0])] + list(circ.all_operations())
+    )
+    assert _equal(folded, correct)
+
+    # Fold the first operation in the first moment
+    folded = fold_gate_at_index_in_moment(circ, moment_index=1, gate_index=1)
+    correct = Circuit(
+        [ops.T.on(qreg[1]) ** -1, ops.T.on(qreg[1])] + list(circ.all_operations())
+    )
+    assert _equal(folded, correct)
+
+    # Make sure the original circuit wasn't modified
+    assert Circuit(
+        [ops.H.on_each(*qreg), ops.T.on_each(*qreg)]
+    )
+
+
+def test_fold_gate_at_index_in_moment_two_qubit_gates():
+    """Tests local folding with a moment, index for a two qubit circuit with two qubit gates."""
+    # Test circuit
+    qreg = LineQubit.range(2)
+    circ = Circuit(
+        [ops.H.on(qreg[0]), ops.CNOT.on(*qreg)]
+    )
+
+    # Fold the zeroth operation in the zeroth moment
+    folded = fold_gate_at_index_in_moment(circ, moment_index=0, gate_index=0)
+    correct = Circuit(
+        [ops.H.on(qreg[0])**-1, ops.H.on(qreg[0])] + list(circ.all_operations())
+    )
+    assert _equal(folded, correct)
+
+    # Fold the zeroth operation in the first moment
+    folded = fold_gate_at_index_in_moment(circ, moment_index=1, gate_index=0)
+    correct = Circuit(
+        list(circ.all_operations()) + [ops.CNOT.on(*qreg)] * 2
+    )
+    assert _equal(folded, correct)
+
+    # Make sure the original circuit wasn't modified
+    assert Circuit(
+        [ops.H.on_each(*qreg), ops.T.on_each(*qreg)]
+    )
+
+
+def test_fold_gate_at_index_in_moment_empty_circuit():
+    """Tests local folding with a moment, index with an empty circuit."""
+    # Test circuit
+    circ = Circuit()
+
+    # Fold the zeroth operation in the zeroth moment
+    with pytest.raises(IndexError):
+        fold_gate_at_index_in_moment(circ, moment_index=0, gate_index=0)
+
+
+def test_fold_gate_at_index_in_moment_bad_moment():
+    """Tests local folding with a moment index not in the input circuit."""
+    qreg = [GridQubit(x, y) for x in range(2) for y in range(2)]
+    circ = Circuit(
+        [ops.H.on_each(*qreg)]
+    )
+    with pytest.raises(IndexError):
+        fold_gate_at_index_in_moment(circ, 1, 0)
+
+
+def test_fold_gates_in_moment_single_qubit_gates():
+    """Tests folding gates at given indices within a moment."""
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg), ops.T.on_each(*qreg)]
+    )
+
+    # Fold all gates in the zeroth moment
+    folded = fold_gates_in_moment(circ, moment_index=0, gate_indices=[0, 1, 2])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3 + [ops.T.on_each(*qreg)]
+    )
+    assert _equal(folded, correct)
+
+    # Fold a subset of gates in the first moment
+    folded = fold_gates_in_moment(circ, moment_index=1, gate_indices=[0, 2])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.T.on(qreg[0])**-1, ops.T.on(qreg[0])],
+        [ops.T.on(qreg[2])**-1, ops.T.on(qreg[2])],
+        [ops.T.on_each(*qreg)]
+    )
+    assert _equal(folded, correct)
+
+
+def test_fold_gates_in_moment_multi_qubit_gates():
+    """Tests folding gates at given indices within a moment."""
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg), ops.CNOT.on(qreg[0], qreg[1]), ops.T.on(qreg[2]), ops.TOFFOLI.on(*qreg)]
+    )
+
+    # Fold the CNOT gate in the first moment
+    folded = fold_gates_in_moment(circ, moment_index=1, gate_indices=[0])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+        [ops.T.on(qreg[2]), ops.TOFFOLI.on(*qreg)]
+    )
+    assert _equal(folded, correct)
+
+    # Fold the T gate in the first moment
+    folded = fold_gates_in_moment(circ, moment_index=1, gate_indices=[0, 1])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+        [ops.T.on(qreg[2]), ops.T.on(qreg[2])**-1, ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)]
+    )
+    assert _equal(folded, correct)
+
+    # Fold the Toffoli gate in the second moment
+    folded = fold_gates_in_moment(circ, moment_index=2, gate_indices=[0])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] +
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3
+    )
+    assert _equal(folded, correct)
+
+
+def test_fold_gates():
+    """Test folding gates at specified indices within specified moments."""
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg), ops.CNOT.on(qreg[0], qreg[1]), ops.T.on(qreg[2]), ops.TOFFOLI.on(*qreg)]
+    )
+    folded = fold_gates(circ, moment_indices=[0, 1], gate_indices=[[0, 1, 2], [1]])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2]), ops.T.on(qreg[2]) ** -1, ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)]
+    )
+    assert _equal(folded, correct)
+
+
+def test_fold_moments():
+    """Tests folding moments in a circuit."""
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg), ops.CNOT.on(qreg[0], qreg[1]), ops.T.on(qreg[2]), ops.TOFFOLI.on(*qreg)]
+    )
+
+    # Fold a single moment
+    folded = fold_moments(circ, moment_indices=[0])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 2,
+        list(circ.all_operations())
+    )
+    assert _equal(folded, correct)
+
+    # Fold another single moment
+    folded = fold_moments(circ, moment_indices=[2])
+    correct = Circuit(
+        list(circ.all_operations()),
+        [ops.TOFFOLI.on(*qreg)] * 2
+    )
+    assert _equal(folded, correct)
+
+    # Fold two moments moment
+    folded = fold_moments(circ, moment_indices=[0, 2])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 2,
+        list(circ.all_operations()),
+        [ops.TOFFOLI.on(*qreg)] * 2
+    )
+    assert _equal(folded, correct)
+
+    # Fold three moments
+    folded = fold_moments(circ, moment_indices=[0, 1, 2])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+        [ops.T.on(qreg[2]), ops.T.on(qreg[2]) ** -1, ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3
+    )
+    assert _equal(folded, correct)
+
+
+def test_fold_from_left_two_qubits():
+    qreg = LineQubit.range(2)
+    circ = Circuit(
+        [ops.H.on_each(*qreg), ops.CNOT.on(qreg[0], qreg[1]), ops.T.on(qreg[1])]
+    )
+
+    # Intermediate stretch factor
+    folded = fold_gates_from_left(circ, stretch=2.5)
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(*qreg)] * 3,
+        [ops.T.on(qreg[1])]
+    )
+    assert _equal(folded, correct)
+
+    # Full stretch factor
+    folded = fold_gates_from_left(circ, stretch=3)
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(*qreg)] * 3,
+        [ops.T.on(qreg[1]), ops.T.on(qreg[1])**-1, ops.T.on(qreg[1])]
+    )
+    assert _equal(folded, correct)
+
+
+def test_fold_from_left_three_qubits():
+    """Unit test for folding gates from left to stretch a circuit."""
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg), ops.CNOT.on(qreg[0], qreg[1]), ops.T.on(qreg[2]), ops.TOFFOLI.on(*qreg)]
+    )
+
+    folded = fold_gates_from_left(circ, stretch=2)
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 2,
+        list(circ.all_operations())
+    )
+    assert _equal(folded, correct)
+
+
+def test_fold_from_left_no_stretch():
+    """Unit test for folding gates from left for a stretch factor of one."""
+    circuit = random_circuit(depth=100)
+    folded = fold_gates_from_left(circuit, stretch=1)
+    assert _equal(folded, circuit)
+    assert not (folded is circuit)
+
+
+def test_fold_from_left_bad_stretch():
+    """Tests that a ValueError is raised for an invalid stretch factor."""
+    circuit = random_circuit(100)
+    with pytest.raises(ValueError):
+        fold_gates_from_left(circuit, stretch=10)
+
+
+def test_fold_gates_at_random_no_stretch():
+    """Tests folded circuit is identical for a stretch factor of one."""
+    circuit = random_circuit(10)
+    folded = fold_gates_at_random(circuit, stretch=1)
+    assert _equal(folded, circuit)
+
+
+def test_fold_gates_at_random_seed_one_qubit():
+    """Test for folding gates at random on a one qubit circuit with a seed for repeated behavior."""
+    qubit = LineQubit(0)
+    circuit = Circuit(
+        [ops.X.on(qubit), ops.Y.on(qubit), ops.Z.on(qubit)]
+    )
+    folded = fold_gates_at_random(circuit, stretch=2, seed=1)
+    correct = Circuit(
+        [ops.X.on(qubit)],
+        [ops.Y.on(qubit)] * 3,
+        [ops.Z.on(qubit)]
+    )
+    assert _equal(folded, correct)
+
+
+def test_fold_local_small_stretch_from_left():
+    """Test for local folding with stretch < 3."""
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg), ops.CNOT.on(qreg[0], qreg[1]), ops.T.on(qreg[2]), ops.TOFFOLI.on(*qreg)]
+    )
+
+    folded = fold_local(circ, stretch=2, fold_method=fold_gates_from_left)
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 2,
+        list(circ.all_operations())
+    )
+    assert _equal(folded, correct)
+
+
+def test_fold_local_stretch_three_from_left():
+    """Test for local folding with stretch > 3."""
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg), ops.CNOT.on(qreg[0], qreg[1]), ops.T.on(qreg[2]), ops.TOFFOLI.on(*qreg)]
+    )
+    folded = fold_local(circ, stretch=3, fold_method=fold_gates_from_left)
+    assert _equal(folded, fold_gates_from_left(circ, stretch=3))
+
+
+def test_fold_local_big_stretch_from_left():
+    """Test for local folding with stretch > 3."""
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg), ops.CNOT.on(qreg[0], qreg[1]), ops.T.on(qreg[2]), ops.TOFFOLI.on(*qreg)]
+    )
+    folded = fold_local(circ, stretch=4, fold_method=fold_gates_from_left)
+    correct = Circuit(
+        [ops.H.on(qreg[0])] * 4,
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+        [ops.T.on(qreg[2]), ops.T.on(qreg[2]) ** -1, ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3
+    )
+    assert _equal(folded, correct)
+
+
 def test_unitary_folding():
     for c in STRETCH_VALS:
         circ = random_circuit(DEPTH)
         out = unitary_folding(circ, c)
-        actual_c = len(out) / len(circ)
-        assert np.isclose(c, actual_c, atol=1.0e-1)
-
-
-def test_local_folding_nosamp():
-    for c in STRETCH_VALS:
-        circ = random_circuit(DEPTH)
-        out = local_folding(circ, c)
-        actual_c = len(out) / len(circ)
-        assert np.isclose(c, actual_c, atol=1.0e-1)
-
-
-def test_local_folding_withsamp():
-    for c in STRETCH_VALS:
-        circ = random_circuit(DEPTH)
-        out = local_folding(circ, c)
         actual_c = len(out) / len(circ)
         assert np.isclose(c, actual_c, atol=1.0e-1)
 
