@@ -41,7 +41,7 @@ def fold_gates(circuit: Program, sub_indices: List[int]) -> Program:
     """Applies the map G -> G G^dag G to a subset of gates of the input circuit
     determined by sub_indices."""
 
-    out = Program()
+    out = circuit.copy_everything_except_instructions()
     for j, gate in enumerate(circuit):
         out += gate
         if j in sub_indices:
@@ -83,7 +83,7 @@ def unitary_folding(circuit: Program, stretch: float) -> Program:
     num_foldings, fractional_stretch = divmod(stretch - 1, 2)
 
     # integer circuit folding
-    eye = Program()
+    eye = circuit.copy_everything_except_instructions()
     for _ in range(int(num_foldings)):
         eye += circuit.dagger() + circuit
 
