@@ -3,7 +3,12 @@ import random
 from pyquil import Program
 from pyquil.gates import X, Y, Z, CNOT
 from pyquil.unitary_tools import program_unitary
-from mitiq.folding_pyquil import local_folding, unitary_folding, sampling_stretcher, left_stretcher
+from mitiq.folding_pyquil import (
+    local_folding,
+    unitary_folding,
+    sampling_stretcher,
+    left_stretcher,
+)
 from copy import deepcopy
 
 
@@ -11,7 +16,7 @@ STRETCH_VALS = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
 DEPTH = 50
 
 # NUM_SHOTS must be 1 in order to pass the next tests.
-# This is due to the fact that num_shots are not retained by 
+# This is due to the fact that num_shots are not retained by
 # some methods of the Program class (bug?)
 NUM_SHOTS = 1
 
@@ -19,7 +24,7 @@ NUM_SHOTS = 1
 def random_circuit(depth: int):
     """Returns a 2-qubit random circuit based on a simple gate set."""
     prog = Program()
-    gate_set = [X(0), Y(0), Z(0), X(1), Y(1), Z(1), CNOT(0, 1),  CNOT(1, 0)]
+    gate_set = [X(0), Y(0), Z(0), X(1), Y(1), Z(1), CNOT(0, 1), CNOT(1, 0)]
     for _ in range(depth):
         prog += random.choice(gate_set)
     prog.num_shots = NUM_SHOTS
@@ -79,6 +84,7 @@ def test_local_folding_nosamp():
         vars_b.pop("_instructions")
         assert vars_a == vars_b
 
+
 def test_local_folding_withsamp():
     for c in STRETCH_VALS:
         circ = random_circuit(DEPTH)
@@ -91,7 +97,7 @@ def test_local_folding_withsamp():
         u_in = program_unitary(circ, 2)
         u_out = program_unitary(out, 2)
         assert (u_in == u_out).all
-         # test input is not mutated up to "_synthesized_instructions"
+        # test input is not mutated up to "_synthesized_instructions"
         vars_a = vars(circ_copy)
         vars_b = vars(circ)
         vars_a.pop("_synthesized_instructions")
