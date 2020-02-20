@@ -1,13 +1,10 @@
 """Functions to fold gates in Cirq circuits."""
 from copy import deepcopy
-from typing import (Callable, Iterable, List)
+from typing import (Any, Callable, Iterable, List, Optional, Tuple)
 
 import numpy as np
 
 from cirq import (Circuit, InsertStrategy, inverse)
-
-
-MAX_STRETCH_FACTOR = 100
 
 
 # Gate level folding
@@ -149,7 +146,7 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
                 return folded
 
 
-def fold_gates_at_random(circuit: Circuit, stretch: float, **kwargs) -> Circuit:
+def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int]) -> Circuit:
     """Returns a folded circuit by applying the map G -> G G^dag G to a random subset of gates in the input circuit.
 
     The folded circuit has a number of gates approximately equal to stretch * n where n is the number of gates in
@@ -158,6 +155,7 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, **kwargs) -> Circuit:
     Args:
         circuit: Circuit to fold.
         stretch: Factor to stretch the circuit by. Any real number in the interval [1, 3].
+        seed: [Optional] Integer seed for random number generator.
 
     Note:
         Folding a single gate adds two gates to the circuit, hence the maximum stretch factor is 3.
@@ -170,8 +168,8 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, **kwargs) -> Circuit:
     if not 1 < stretch <= 3:
         raise ValueError("The stretch factor must be a real number between 1 and 3.")
 
-    if "seed" in kwargs.keys():
-        np.random.seed(kwargs.get("seed"))
+    if seed:
+        np.random.seed(seed)
 
     ngates = len(list(folded.all_operations()))
     num_to_fold = int(ngates * (stretch - 1.0) / 2.0)
@@ -190,8 +188,8 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, **kwargs) -> Circuit:
 
 def fold_local(
         circuit: Circuit, stretch: float,
-        fold_method: Callable[[Callable, float], Circuit] = fold_gates_from_left,
-        **kwargs) -> Circuit:
+        fold_method: Callable[[Callable, float, Tuple[Any]], Circuit] = fold_gates_from_left,
+        fold_method_args: Tuple[Any] = ()) -> Circuit:
     """Returns a folded circuit by folding gates according to the input fold method.
 
     Args:
@@ -206,19 +204,26 @@ def fold_local(
                         ...
 
                     and return a circuit.
+        fold_method_args: Any additional input arguments for the fold_method.
+                          The method is called with fold_method(circuit, stretch, *fold_method_args).
+            Example:
+                fold_method = fold_gates_at_random
+                fold_method_args = (1,)
+
+                > Uses a seed of one for the fold_gates_at_random method.
     """
     folded = deepcopy(circuit)
 
     if np.isclose(stretch, 1.0, atol=1e-2):
         return folded
 
-    if not 1 < stretch <= MAX_STRETCH_FACTOR:
-        raise ValueError(f"The stretch factor must be a real number between 1 and {MAX_STRETCH_FACTOR}.")
+    if not 1 < stretch:
+        raise ValueError(f"The stretch factor must be a real number greater than 1.")
 
     while stretch > 1.:
         this_stretch = 3. if stretch > 3. else stretch
         # TODO: This also allows folding gates that have already been folded. Should this be allowed?
-        folded = fold_method(folded, this_stretch, **kwargs)
+        folded = fold_method(folded, this_stretch, *fold_method_args)
         stretch /= 3.
     return folded
 

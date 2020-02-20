@@ -347,7 +347,7 @@ def test_fold_from_left_bad_stretch():
 def test_fold_gates_at_random_no_stretch():
     """Tests folded circuit is identical for a stretch factor of one."""
     circuit = random_circuit(10)
-    folded = fold_gates_at_random(circuit, stretch=1)
+    folded = fold_gates_at_random(circuit, stretch=1, seed=None)
     assert _equal(folded, circuit)
 
 
