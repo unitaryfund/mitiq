@@ -4,7 +4,7 @@ import random
 
 import numpy as np
 import pytest
-from cirq import (Circuit, GridQubit, LineQubit, ops)
+from cirq import (Circuit, GridQubit, LineQubit, ops, CircuitDag)
 
 from mitiq.folding_cirq import (fold_gate_at_index_in_moment,
                                 fold_gates_in_moment,
@@ -34,18 +34,14 @@ def random_circuit(depth: int, **kwargs):
 
 
 def _equal(circuit_one: Circuit, circuit_two: Circuit) -> bool:
-    """Returns True if circuits are equal, meaning:
-        (1) They have the same number of operations.
-        (2) The set of operations is equal.
+    """Returns True if circuits are equal.
 
     Args:
         circuit_one: Input circuit to compare to circuit_two.
         circuit_two: Input circuit to compare to circuit_one.
     """
-    return (
-        len(list(circuit_one.all_operations())) == len(list(circuit_two.all_operations())) and
-        set(circuit_one.all_operations()) == set(circuit_two.all_operations())
-    )
+    return CircuitDag.from_circuit(circuit_one) == CircuitDag.from_circuit(circuit_two)
+
 
 def test_fold_gate_at_index_in_moment_one_qubit():
     """Tests local folding with a moment, index for a one qubit circuit."""
@@ -78,6 +74,9 @@ def test_fold_gate_at_index_in_moment_one_qubit():
 def test_fold_gate_at_index_in_moment_two_qubits():
     """Tests local folding with a moment, index for a two qubit circuit with single qubit gates."""
     # Test circuit
+    # 0: ───H───T───
+    #
+    # 1: ───H───T───
     qreg = LineQubit.range(2)
     circ = Circuit(
         [ops.H.on_each(*qreg), ops.T.on_each(*qreg)]
@@ -86,28 +85,32 @@ def test_fold_gate_at_index_in_moment_two_qubits():
     # Fold the zeroth operation in the zeroth moment
     folded = fold_gate_at_index_in_moment(circ, moment_index=0, gate_index=0)
     correct = Circuit(
-        [ops.H.on(qreg[0])**-1, ops.H.on(qreg[0])] + list(circ.all_operations())
+        [ops.H.on(qreg[0]), ops.H.on(qreg[0])**-1] + list(circ.all_operations())
     )
     assert _equal(folded, correct)
 
     # Fold the first operation in the zeroth moment
     folded = fold_gate_at_index_in_moment(circ, moment_index=0, gate_index=1)
     correct = Circuit(
-        [ops.H.on(qreg[1]) ** -1, ops.H.on(qreg[1])] + list(circ.all_operations())
+        [ops.H.on(qreg[1]), ops.H.on(qreg[1])**-1] + list(circ.all_operations())
     )
     assert _equal(folded, correct)
 
     # Fold the zeroth operation in the first moment
     folded = fold_gate_at_index_in_moment(circ, moment_index=1, gate_index=0)
     correct = Circuit(
-        [ops.T.on(qreg[0]) ** -1, ops.T.on(qreg[0])] + list(circ.all_operations())
+        [ops.H.on_each(*qreg)],
+        [ops.T.on(qreg[0]), ops.T.on(qreg[0])**-1, ops.T.on(qreg[0])],
+        [ops.T.on(qreg[1])]
     )
     assert _equal(folded, correct)
 
     # Fold the first operation in the first moment
     folded = fold_gate_at_index_in_moment(circ, moment_index=1, gate_index=1)
     correct = Circuit(
-        [ops.T.on(qreg[1]) ** -1, ops.T.on(qreg[1])] + list(circ.all_operations())
+        [ops.H.on_each(*qreg)],
+        [ops.T.on(qreg[1]), ops.T.on(qreg[1]) ** -1, ops.T.on(qreg[1])],
+        [ops.T.on(qreg[0])]
     )
     assert _equal(folded, correct)
 
@@ -183,8 +186,8 @@ def test_fold_gates_in_moment_single_qubit_gates():
     folded = fold_gates_in_moment(circ, moment_index=1, gate_indices=[0, 2])
     correct = Circuit(
         [ops.H.on_each(*qreg)],
-        [ops.T.on(qreg[0])**-1, ops.T.on(qreg[0])],
-        [ops.T.on(qreg[2])**-1, ops.T.on(qreg[2])],
+        [ops.T.on(qreg[0]), ops.T.on(qreg[0])**-1],
+        [ops.T.on(qreg[2]), ops.T.on(qreg[2])**-1],
         [ops.T.on_each(*qreg)]
     )
     assert _equal(folded, correct)

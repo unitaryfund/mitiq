@@ -11,6 +11,21 @@ MAX_STRETCH_FACTOR = 100
 
 
 # Gate level folding
+def _fold_gate_at_index_in_moment(circuit: Circuit, moment_index: int, gate_index: int) -> None:
+    """Modifies the input circuit by replacing the gate G in (moment, index) is replaced by G G^dagger G.
+
+    Args:
+        circuit: Circuit to fold.
+        moment_index: Moment in which the gate sits in the circuit.
+        gate_index: Index of the gate within the specified moment.
+
+    Returns:
+        None
+    """
+    op = circuit[moment_index].operations[gate_index]
+    circuit.insert(moment_index, [op, inverse(op)], strategy=InsertStrategy.NEW)
+
+
 def fold_gate_at_index_in_moment(circuit: Circuit, moment_index: int, gate_index: int) -> Circuit:
     """Returns a new circuit where the gate G in (moment, index) is replaced by G G^dagger G.
 
@@ -20,9 +35,24 @@ def fold_gate_at_index_in_moment(circuit: Circuit, moment_index: int, gate_index
         gate_index: Index of the gate within the specified moment.
     """
     folded = deepcopy(circuit)
-    op = folded[moment_index].operations[gate_index]
-    folded.insert(moment_index, [inverse(op), op], strategy=InsertStrategy.NEW)
+    _fold_gate_at_index_in_moment(folded, moment_index, gate_index)
     return folded
+
+
+def _fold_gates_in_moment(circuit: Circuit, moment_index: int, gate_indices: Iterable[int]) -> None:
+    """Modifies the input circuit by applying the map G -> G G^dag G to all gates specified by
+     the input moment index and gate indices.
+
+     Args:
+         circuit: Circuit to fold.
+         moment_index: Index of moment to fold gates in.
+         gate_indices: Indices of gates within the moments to fold.
+
+     Returns:
+         None
+     """
+    for (i, gate_index) in enumerate(gate_indices):
+        _fold_gate_at_index_in_moment(circuit, moment_index + 2 * i, gate_index)  # Each fold adds two moments
 
 
 def fold_gates_in_moment(circuit: Circuit, moment_index: int, gate_indices: Iterable[int]) -> Circuit:
@@ -35,8 +65,7 @@ def fold_gates_in_moment(circuit: Circuit, moment_index: int, gate_indices: Iter
          gate_indices: Indices of gates within the moments to fold.
      """
     folded = deepcopy(circuit)
-    for (i, gate_index) in enumerate(gate_indices):
-        folded = fold_gate_at_index_in_moment(folded, moment_index + 2 * i, gate_index)  # Each fold adds two moments
+    _fold_gates_in_moment(folded, moment_index, gate_indices)
     return folded
 
 
@@ -78,7 +107,7 @@ def fold_moments(circuit: Circuit, moment_indices: List[int]) -> Circuit:
     folded = deepcopy(circuit)
     shift = 0
     for i in moment_indices:
-        folded.insert(i + shift, [inverse(circuit[i]), circuit[i]])
+        folded.insert(i + shift, [circuit[i], inverse(circuit[i])])
         shift += 2
     return folded
 
