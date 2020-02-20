@@ -188,7 +188,10 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, **kwargs) -> Circuit:
     return folded
 
 
-def fold_local(circuit: Circuit, stretch: float, fold_method: Callable = fold_gates_from_left, **kwargs) -> Circuit:
+def fold_local(
+        circuit: Circuit, stretch: float,
+        fold_method: Callable[[Callable, float], Circuit] = fold_gates_from_left,
+        **kwargs) -> Circuit:
     """Returns a folded circuit by folding gates according to the input fold method.
 
     Args:
