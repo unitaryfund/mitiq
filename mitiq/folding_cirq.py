@@ -98,7 +98,7 @@ def fold_moments(circuit: Circuit, moment_indices: List[int]) -> Circuit:
 
 def _fold_all_gates_locally(circuit: Circuit) -> Circuit:
     """Replaces every gate G with G G^dag G by modifying the circuit in place."""
-    _fold_moments(circuit, list(range(len(circuit))))
+    return _fold_moments(circuit, list(range(len(circuit))))
 
 
 def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
