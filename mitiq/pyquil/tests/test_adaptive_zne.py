@@ -1,7 +1,7 @@
 # test_adaptive_zne.py
 import numpy as np
 
-from mitiq.adaptive_zne import BatchedGenerator, Mitigator, zne, zne_factory
+from mitiq.adaptive_zne import BatchedGenerator, mitigate, zne, zne_factory
 from mitiq.pyquil.pyquil_utils import random_identity_circuit, measure, run_program, scale_noise, Program, QVM
 
 
@@ -35,7 +35,7 @@ def test_adaptive_zne_pyquil():
     pq = measure(rand_circ, qid=0)
 
     gen = BatchedGenerator([1.0, 2.0, 3.0])
-    mitigator = Mitigator(gen, run_program)
-    params, expects = mitigator.mitigate(pq, scale_noise)
-    xx = mitigator.gen.reduce(expects)
+    params, expects = mitigate(pq, gen, scale_noise, run_program)
+    xx = gen.reduce(expects)
+    
     assert np.isclose(xx, 1.0, atol=1.e-1)

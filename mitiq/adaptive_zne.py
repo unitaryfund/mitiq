@@ -55,30 +55,24 @@ class BatchedGenerator(Generator):
         return len(instack) == len(self.scalars)
 
 
-class Mitigator(object):
+def mitigate(pq: Program, gen: Generator, scale_noise: Callable, run_program: Callable) -> \
+        Tuple[List[float], List[float]]:
     """
-    This object matches a Generator against a backend interface by including a 'run_program' function that maps quantum
-    circuits / programs to expectation values.
+    Runs the generator until convergence and return the full list of noise values and expectations that have been
+    calculated.
+    :param pq: Program to mitigate.
     """
-    def __init__(self, gen: Generator, run_program) -> None:
-        self.gen = gen
-        self.run_program = run_program
+    if not gen.is_converged(gen.instack, gen.outstack):
+        next_param = gen.step(gen.instack, gen.outstack)
 
-    def mitigate(self, pq: Program, scale_noise) -> Tuple[List[float], List[float]]:
-        """
-        Runs the generator until convergence and return the full list of noise values and expectations that have been
-        calculated.
-        :param pq: Program to mitigate.
-        """
-        gen = self.gen
-        if not gen.is_converged(gen.instack, gen.outstack):
-            next_param = gen.step(gen.instack, gen.outstack)
-            scaled_pq = scale_noise(pq, next_param)
-            next_result = self.run_program(scaled_pq)
-            gen.outstack.append(next_result)
-            return self.mitigate(pq, scale_noise)
+        scaled_pq = scale_noise(pq, next_param)
 
-        return gen.instack, gen.outstack
+        next_result = run_program(scaled_pq)
+        gen.outstack.append(next_result)
+
+        return mitigate(pq, gen, scale_noise, run_program)
+
+    return gen.instack, gen.outstack
 
 
 def zne(run_program: Callable[[QPROGRAM, int], float], gen: Generator = None,
@@ -91,9 +85,8 @@ def zne(run_program: Callable[[QPROGRAM, int], float], gen: Generator = None,
         gen = BatchedGenerator([1.0, 2.0, 3.0])
 
     def zne_run(pq: QPROGRAM) -> float:
-        mitigator = Mitigator(gen, run_program)
-        params, expects = mitigator.mitigate(pq, scale_noise)
-        return mitigator.gen.reduce(expects)
+        params, expects = mitigate(pq, gen, scale_noise, run_program)
+        return gen.reduce(expects)
 
     return zne_run
 
