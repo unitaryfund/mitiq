@@ -20,15 +20,16 @@ import numpy as np
 class RichardsonExtr(BatchedGenerator):
     """Generator object implementing the Richardson's extrapolation algorithm."""
 
-    def reduce(self, x: List[float], y: List[float]) -> float:
+    @staticmethod
+    def reduce(x: List[float], y: List[float]) -> float:
         """ Given two lists of x and y values associated to an unknwn function y=f(x), returns 
         the extrapolation of the function to the x=0 limit, i.e., an estimate of f(0).
         The algorithm is based on the Richardson's extrapolation method.
         """
 
         # This function is placed here in order to make the algorithm fully self-contained.
-        # Don't know if this is good or bad.
-        # Alternatively, uncomment the line "from mitiq.zne import get_gammas" above.
+        # I don't know if this is good or bad.
+        # Alternatively, we can uncomment the line "from mitiq.zne import get_gammas" above.
         def get_gammas(c: float) -> List[float]:
             """Returns the linear combination coefficients "gammas" for Richardson's extrapolation.
             The input is a list of the noise stretch factors.
