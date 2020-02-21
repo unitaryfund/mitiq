@@ -37,7 +37,7 @@ def test_unitary_folding():
         circ_copy = deepcopy(circ)
         out = unitary_folding(circ, c)
         actual_c = len(out) / len(circ)
-        # test lenght scaling
+        # test length scaling
         assert np.isclose(c, actual_c, atol=1.0e-1)
         # test unitaries are equal
         u_in = program_unitary(circ, 2)
