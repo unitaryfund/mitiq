@@ -64,7 +64,7 @@ def test_local_folding_nosamp():
         circ_copy = deepcopy(circ)
         out = local_folding(circ, c, stretcher=sampling_stretcher)
         actual_c = len(out) / len(circ)
-        # test lenght scaling
+        # test length scaling
         assert np.isclose(c, actual_c, atol=1.0e-1)
         # test unitaries are equal
         u_in = program_unitary(circ, 2)
