@@ -1,8 +1,9 @@
 from pyquil import Program
-from typing import List, Tuple
+from typing import List, Tuple, Callable
 
 from mitiq.zne import richardson_extr
 import mitiq.qiskit.qiskit_utils as qs_utils
+from mitiq import QPROGRAM
 
 
 class Generator(object):
@@ -11,14 +12,14 @@ class Generator(object):
     scale parameters and previously calculated expectation values. Noise scaling parameters are stored on the `in_stack`
     and the running list of expectation values are stored on the `out_stack`.
     """
-    def __init__(self, instack: List[float], outstack: List[float]):
+    def __init__(self, instack: List[float], outstack: List[float]) -> None:
         self.instack = instack
         self.outstack = outstack
 
-    def step(self, instack: List[float], outstack: List[float]):
+    def step(self, instack: List[float], outstack: List[float]) -> None:
         raise NotImplementedError
 
-    def is_converged(self, instack: List[float], outstack: List[float]):
+    def is_converged(self, instack: List[float], outstack: List[float]) -> None:
         raise NotImplementedError
 
     def reduce(self, expectations: List[float]) -> float:
@@ -27,7 +28,7 @@ class Generator(object):
 
 
 class BatchedGenerator(Generator):
-    def __init__(self, scalars: List[float], instack: List[float] = None, outstack: List[float] = None):
+    def __init__(self, scalars: List[float], instack: List[float] = None, outstack: List[float] = None) -> None:
         """
         Runs a series of scalar noise parameters serially.
         :param scalars: List of scalar noise values to be executed.
@@ -41,12 +42,16 @@ class BatchedGenerator(Generator):
         super(self.__class__, self).__init__(instack, outstack)
         self.scalars = scalars
 
-    def step(self, instack: List[float], outstack: List[float]):
-        next_param = self.scalars[len(outstack)]
+    def step(self, instack: List[float], outstack: List[float]) -> float:
+        try:
+            next_param = self.scalars[len(outstack)]
+        except IndexError:
+            raise IndexError(f"BatchedGenerator cannot take another step. Number of batched scalars ({len(instack)}) "
+                             f"exceeded.")
         self.instack.append(next_param)
         return next_param
 
-    def is_converged(self, instack: List[float], outstack: List[float]):
+    def is_converged(self, instack: List[float], outstack: List[float]) -> bool:
         return len(instack) == len(self.scalars)
 
 
@@ -55,7 +60,7 @@ class Mitigator(object):
     This object matches a Generator against a backend interface by including a 'run_program' function that maps quantum
     circuits / programs to expectation values.
     """
-    def __init__(self, gen: Generator, run_program):
+    def __init__(self, gen: Generator, run_program) -> None:
         self.gen = gen
         self.run_program = run_program
 
@@ -66,17 +71,18 @@ class Mitigator(object):
         :param pq: Program to mitigate.
         """
         gen = self.gen
-        if gen.is_converged(gen.instack, gen.outstack):
-            return gen.instack, gen.outstack
-        else:
+        if not gen.is_converged(gen.instack, gen.outstack):
             next_param = gen.step(gen.instack, gen.outstack)
             scaled_pq = scale_noise(pq, next_param)
-            yy = self.run_program(scaled_pq)
-            gen.outstack.append(yy)
+            next_result = self.run_program(scaled_pq)
+            gen.outstack.append(next_result)
             return self.mitigate(pq, scale_noise)
 
+        return gen.instack, gen.outstack
 
-def zne(run_program, gen=None, scale_noise=None):
+
+def zne(run_program: Callable[[QPROGRAM, int], float], gen: Generator = None,
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None) -> Callable[[QPROGRAM], float]:
     if scale_noise is None:
         # TODO this assumes is qiskit
         scale_noise = qs_utils.scale_noise
@@ -84,7 +90,7 @@ def zne(run_program, gen=None, scale_noise=None):
     if gen is None:
         gen = BatchedGenerator([1.0, 2.0, 3.0])
 
-    def zne_run(pq):
+    def zne_run(pq: QPROGRAM) -> float:
         mitigator = Mitigator(gen, run_program)
         params, expects = mitigator.mitigate(pq, scale_noise)
         return mitigator.gen.reduce(expects)
@@ -92,7 +98,7 @@ def zne(run_program, gen=None, scale_noise=None):
     return zne_run
 
 
-def zne_factory(gen=None, scale_noise=None):
+def zne_factory(gen: Generator = None, scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None) -> Callable:
     # more precisely, this is a wrap function which is necessary to pass parameters to the decorator
     # formally, the function below is the actual decorator
     def decorator(fun):
