@@ -66,3 +66,18 @@ class LinearExtr(BatchedGenerator):
         # linear least squared fit
         m, q = np.polyfit(x, y, deg=1)
         return q
+
+
+class PolyExtr(BatchedGenerator):
+    """Generator object implementing a zero-noise extrapolation algotrithm based on a linear fit."""
+
+    @staticmethod
+    def reduce(x: List[float], y: List[float], order: float) -> float:
+        """ Given two lists of x and y values associated to an unknwn function y=f(x), returns 
+        the extrapolation of the function to the x=0 limit, i.e., an estimate of f(0).
+        The algorithm determines with a least squared method, the polynomial of degree='order' 
+        which optimally fits the input points. The value of the polynomial at x=0 is returned. 
+        """
+        # polynomial least squared fit
+        coefficients = np.polyfit(x, y, deg=order)
+        return coefficients[-1]

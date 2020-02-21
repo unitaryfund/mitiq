@@ -1,6 +1,6 @@
 # test_algorithms.py
 import numpy as np
-from mitiq.algorithms import RichardsonExtr, LinearExtr
+from mitiq.algorithms import RichardsonExtr, LinearExtr, PolyExtr
 
 
 
@@ -36,3 +36,10 @@ def test_linear_extr():
     y_vals = [f_lin(x) for x in X_VALS]
     f_of_zero = LinearExtr.reduce(X_VALS, y_vals)
     assert np.isclose(f_of_zero, A, atol=1.e-7)
+
+def test_poly_extr():
+    """Test the Richardson's extrapolator with different functions."""
+    for f in [f_lin, f_non_lin]:
+        y_vals = [f(x) for x in X_VALS]
+        f_of_zero = PolyExtr.reduce(X_VALS, y_vals, order=2)
+        assert np.isclose(f_of_zero, A, atol=1.e-7)
