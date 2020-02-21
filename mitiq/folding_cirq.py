@@ -90,6 +90,23 @@ def fold_gates(circuit: Circuit, moment_indices: Iterable[int], gate_indices: Li
     return folded
 
 
+def _fold_moments(circuit: Circuit, moment_indices: List[int]) -> Circuit:
+    """Folds specified moments in the circuit in place.
+
+    Args:
+        circuit: Circuit to fold.
+        moment_indices: Indices of moments to fold in the circuit.
+
+    Returns:
+        None
+    """
+    shift = 0
+    for i in moment_indices:
+        circuit.insert(i + shift, [circuit[i + shift], inverse(circuit[i + shift])])
+        shift += 2
+    return circuit
+
+
 def fold_moments(circuit: Circuit, moment_indices: List[int]) -> Circuit:
     """Returns a new circuit with moments folded by mapping
 
@@ -102,11 +119,13 @@ def fold_moments(circuit: Circuit, moment_indices: List[int]) -> Circuit:
         moment_indices: List of integers that specify moments to fold.
     """
     folded = deepcopy(circuit)
-    shift = 0
-    for i in moment_indices:
-        folded.insert(i + shift, [circuit[i], inverse(circuit[i])])
-        shift += 2
+    _fold_moments(folded, moment_indices)
     return folded
+
+
+def _fold_all_gates_locally(circuit: Circuit) -> Circuit:
+    """Replaces every gate G with G G^dag G in the circuit."""
+
 
 
 def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:

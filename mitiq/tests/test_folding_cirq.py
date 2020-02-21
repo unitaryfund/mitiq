@@ -248,6 +248,12 @@ def test_fold_gates():
 
 def test_fold_moments():
     """Tests folding moments in a circuit."""
+    # Test circuit
+    # 0: ───H───@───@───
+    #           │   │
+    # 1: ───H───X───@───
+    #               │
+    # 2: ───H───T───X───
     qreg = LineQubit.range(3)
     circ = Circuit(
         [ops.H.on_each(*qreg), ops.CNOT.on(qreg[0], qreg[1]), ops.T.on(qreg[2]), ops.TOFFOLI.on(*qreg)]
@@ -269,7 +275,7 @@ def test_fold_moments():
     )
     assert _equal(folded, correct)
 
-    # Fold two moments moment
+    # Fold two moments
     folded = fold_moments(circ, moment_indices=[0, 2])
     correct = Circuit(
         [ops.H.on_each(*qreg)] * 2,
