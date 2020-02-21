@@ -23,19 +23,6 @@ def _fold_gate_at_index_in_moment(circuit: Circuit, moment_index: int, gate_inde
     circuit.insert(moment_index, [op, inverse(op)], strategy=InsertStrategy.NEW)
 
 
-def fold_gate_at_index_in_moment(circuit: Circuit, moment_index: int, gate_index: int) -> Circuit:
-    """Returns a new circuit where the gate G in (moment, index) is replaced by G G^dagger G.
-
-    Args:
-        circuit: Circuit to fold.
-        moment_index: Moment in which the gate sits in the circuit.
-        gate_index: Index of the gate within the specified moment.
-    """
-    folded = deepcopy(circuit)
-    _fold_gate_at_index_in_moment(folded, moment_index, gate_index)
-    return folded
-
-
 def _fold_gates_in_moment(circuit: Circuit, moment_index: int, gate_indices: Iterable[int]) -> None:
     """Modifies the input circuit by applying the map G -> G G^dag G to all gates specified by
      the input moment index and gate indices.
@@ -50,20 +37,6 @@ def _fold_gates_in_moment(circuit: Circuit, moment_index: int, gate_indices: Ite
      """
     for (i, gate_index) in enumerate(gate_indices):
         _fold_gate_at_index_in_moment(circuit, moment_index + 2 * i, gate_index)  # Each fold adds two moments
-
-
-def fold_gates_in_moment(circuit: Circuit, moment_index: int, gate_indices: Iterable[int]) -> Circuit:
-    """Returns a new circuit which applies the map G -> G G^dag G to all gates specified by
-     the input moment index and gate indices.
-
-     Args:
-         circuit: Circuit to fold.
-         moment_index: Index of moment to fold gates in.
-         gate_indices: Indices of gates within the moments to fold.
-     """
-    folded = deepcopy(circuit)
-    _fold_gates_in_moment(folded, moment_index, gate_indices)
-    return folded
 
 
 def fold_gates(circuit: Circuit, moment_indices: Iterable[int], gate_indices: List[Iterable[int]]) -> Circuit:
@@ -85,7 +58,7 @@ def fold_gates(circuit: Circuit, moment_indices: Iterable[int], gate_indices: Li
     folded = deepcopy(circuit)
     moment_index_shift = 0
     for (i, moment_index) in enumerate(moment_indices):
-        folded = fold_gates_in_moment(folded, moment_index + moment_index_shift, gate_indices[i])
+        _fold_gates_in_moment(folded, moment_index + moment_index_shift, gate_indices[i])
         moment_index_shift += 2 * len(gate_indices[i])  # Folding gates adds moments
     return folded
 
@@ -125,14 +98,7 @@ def fold_moments(circuit: Circuit, moment_indices: List[int]) -> Circuit:
 
 def _fold_all_gates_locally(circuit: Circuit) -> Circuit:
     """Replaces every gate G with G G^dag G by modifying the circuit in place."""
-    _fold_moments(circuit, range(len(circuit)))
-
-
-def fold_all_gates_locally(circuit: Circuit) -> Circuit:
-    """Returns a new circuit with every gate G replaced by G G^dag G."""
-    folded = deepcopy(circuit)
-    _fold_all_gates_locally(folded)
-    return folded
+    _fold_moments(circuit, list(range(len(circuit))))
 
 
 def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
@@ -170,6 +136,34 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
                 return folded
 
 
+def _update_moment_indices(moment_indices: dict, moment_index_where_gate_was_folded: int) -> dict:
+    """Updates moment indices to keep track of an original circuit throughout folding.
+
+    Args:
+        moment_indices: A dictionary in the format
+                        {index of moment in original circuit: index of moment in folded circuit}
+
+                        For example, moment_indices should start out as
+                        {0: 0, 1: 1, ..., M - 1: M - 1}
+                        where M is the number of moments in the original circuit.
+
+                        As the circuit is folded, moment indices change. For example, if a gate in the last moment
+                        is folded, moment_indices gets updates to
+                        {0: 0, 1: 1, ..., M - 1:, M + 1}
+                        since two moments are created in the process of folding the gate in the last moment.
+
+                        TODO: If another gate from the last moment is folded, we could put it in the same moment as
+                         the previous folded gate.
+
+        moment_index_where_gate_was_folded: Index of the moment in which a gate was folded.
+    """
+    if moment_index_where_gate_was_folded not in moment_indices.keys():
+        raise ValueError(f"Moment index {moment_index_where_gate_was_folded} not in moment indices")
+    for i in moment_indices.keys():
+        moment_indices[i] += 2 * int(i >= moment_index_where_gate_was_folded)
+    return moment_indices
+
+
 def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int]) -> Circuit:
     """Returns a folded circuit by applying the map G -> G G^dag G to a random subset of gates in the input circuit.
 
@@ -186,7 +180,11 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int]) 
     """
     folded = deepcopy(circuit)
 
-    if np.isclose(stretch, 1.0, atol=1e-2):
+    if np.isclose(stretch, 1.0, atol=1e-3):
+        return folded
+
+    if np.isclose(stretch, 3.0, atol=1e-3):
+        _fold_all_gates_locally(folded)
         return folded
 
     if not 1 < stretch <= 3:
@@ -199,8 +197,7 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int]) 
     num_to_fold = int(ngates * (stretch - 1.0) / 2.0)
 
     for _ in range(num_to_fold):
-        # TODO: This allows for gates to be folded more than once, and folded gates to be folded.
-        #  Should this be allowed?
+        # TODO: Update gate choices properly using tracked moment indices.
         moment_index = np.random.choice(len(folded))
         gate_index = np.random.choice(len(folded[moment_index]))
         _fold_gate_at_index_in_moment(folded, moment_index, gate_index)
@@ -209,7 +206,8 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int]) 
 
 
 def fold_local(
-        circuit: Circuit, stretch: float,
+        circuit: Circuit,
+        stretch: float,
         fold_method: Callable[[Callable, float, Tuple[Any]], Circuit] = fold_gates_from_left,
         fold_method_args: Tuple[Any] = ()) -> Circuit:
     """Returns a folded circuit by folding gates according to the input fold method.
