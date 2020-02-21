@@ -124,8 +124,15 @@ def fold_moments(circuit: Circuit, moment_indices: List[int]) -> Circuit:
 
 
 def _fold_all_gates_locally(circuit: Circuit) -> Circuit:
-    """Replaces every gate G with G G^dag G in the circuit."""
+    """Replaces every gate G with G G^dag G by modifying the circuit in place."""
+    _fold_moments(circuit, range(len(circuit)))
 
+
+def fold_all_gates_locally(circuit: Circuit) -> Circuit:
+    """Returns a new circuit with every gate G replaced by G G^dag G."""
+    folded = deepcopy(circuit)
+    _fold_all_gates_locally(folded)
+    return folded
 
 
 def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:

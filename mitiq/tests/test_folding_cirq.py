@@ -10,6 +10,7 @@ from mitiq.folding_cirq import (fold_gate_at_index_in_moment,
                                 fold_gates_in_moment,
                                 fold_gates,
                                 fold_moments,
+                                fold_all_gates_locally,
                                 fold_gates_from_left,
                                 fold_gates_at_random,
                                 fold_local,
@@ -293,6 +294,61 @@ def test_fold_moments():
         [ops.TOFFOLI.on(*qreg)] * 3
     )
     assert _equal(folded, correct)
+
+
+def test_fold_all_gates_locally():
+    qreg = LineQubit.range(2)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])]
+    )
+    folded = fold_all_gates_locally(circ)
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+    )
+    assert _equal(folded, correct)
+
+    # Make sure the original circuit wasn't modified
+    old = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])]
+    )
+    assert _equal(circ, old)
+
+
+def test_fold_all_gates_locally_three_qubits():
+    # Test circuit
+    # 0: ───H───@───@───
+    #           │   │
+    # 1: ───H───X───@───
+    #               │
+    # 2: ───H───T───X───
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)]
+    )
+
+    folded = fold_all_gates_locally(circ)
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+        [ops.T.on(qreg[2]), ops.T.on(qreg[2])**-1, ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3
+    )
+    assert _equal(folded, correct)
+
+    # Make sure the original circuit wasn't modified
+    old = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)]
+    )
+    assert _equal(circ, old)
 
 
 def test_fold_from_left_two_qubits():
