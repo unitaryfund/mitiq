@@ -137,9 +137,7 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
 
     for (moment_index, moment) in enumerate(circuit):
         for gate_index in range(len(moment)):
-            # TODO: It could be expensive to call fold_gate...(...) which makes a deepcopy of the circuit each call.
-            #  ==> Possible fix: Have fold_gate_at_index_in_moment(...) modify the circuit in place.
-            folded = fold_gate_at_index_in_moment(folded, moment_index + moment_shift, gate_index)
+            _fold_gate_at_index_in_moment(folded, moment_index + moment_shift, gate_index)
             moment_shift += 2
             num_folded += 1
             if num_folded == num_to_fold:
@@ -179,9 +177,7 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int]) 
         #  Should this be allowed?
         moment_index = np.random.choice(len(folded))
         gate_index = np.random.choice(len(folded[moment_index]))
-        # TODO: It could be expensive to call fold_gate...(...) which makes a deepcopy of the circuit each call.
-        #  ==> Possible fix: Have fold_gate_at_index_in_moment(...) modify the circuit in place.
-        folded = fold_gate_at_index_in_moment(folded, moment_index, gate_index)
+        _fold_gate_at_index_in_moment(folded, moment_index, gate_index)
 
     return folded
 
@@ -222,7 +218,6 @@ def fold_local(
 
     while stretch > 1.:
         this_stretch = 3. if stretch > 3. else stretch
-        # TODO: This also allows folding gates that have already been folded. Should this be allowed?
         folded = fold_method(folded, this_stretch, *fold_method_args)
         stretch /= 3.
     return folded
