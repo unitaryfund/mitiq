@@ -21,6 +21,10 @@ class Generator(object):
     def is_converged(self, instack: List[float], outstack: List[float]):
         raise NotImplementedError
 
+    def reduce(self, expectations: List[float]) -> float:
+        expt = richardson_extr(expectations, circuit=None, order=len(expectations)-1, c=None)
+        return expt
+
 
 class BatchedGenerator(Generator):
     def __init__(self, scalars: List[float], instack: List[float] = None, outstack: List[float] = None):
@@ -72,11 +76,6 @@ class Mitigator(object):
             return self.mitigate(pq, scale_noise)
 
 
-def reduce(expectations: List[float]) -> float:
-    expt = richardson_extr(expectations, circuit=None, order=len(expectations)-1, c=None)
-    return expt
-
-
 def zne(run_program, gen=None, scale_noise=None):
     if scale_noise is None:
         # TODO this assumes is qiskit
@@ -88,7 +87,7 @@ def zne(run_program, gen=None, scale_noise=None):
     def zne_run(pq):
         mitigator = Mitigator(gen, run_program)
         params, expects = mitigator.mitigate(pq, scale_noise)
-        return reduce(expects)
+        return mitigator.gen.reduce(expects)
 
     return zne_run
 
