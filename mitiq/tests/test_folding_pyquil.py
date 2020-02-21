@@ -12,7 +12,7 @@ from mitiq.folding_pyquil import (
 from copy import deepcopy
 
 
-STRETCH_VALS = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
+STRETCH_VALS = [1.0, 1.3, 2.0, 2.6, 3.0, 3.5, 4.0]
 DEPTH = 50
 
 # NUM_SHOTS must be 1 in order to pass the next tests.
