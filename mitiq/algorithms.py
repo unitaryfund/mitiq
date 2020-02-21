@@ -46,7 +46,6 @@ class RichardsonExtr(BatchedGenerator):
         # check arguments are valid
         assert len(y) > 0
         assert len(x) == len(y)
-
         # Richardson's extrapolation
         gammas = get_gammas(x)
         return np.dot(gammas, y)
@@ -56,12 +55,14 @@ class RichardsonExtr(BatchedGenerator):
 class LinearExtr(BatchedGenerator):
     """Generator object implementing a zero-noise extrapolation algotrithm based on a linear fit."""
 
-    def reduce(self, x: List[float], y: List[float]) -> float:
+    @staticmethod
+    def reduce(x: List[float], y: List[float]) -> float:
         """ Given two lists of x and y values associated to an unknwn function y=f(x), returns 
         the extrapolation of the function to the x=0 limit, i.e., an estimate of f(0).
         The algorithm determines, with a standard least squared method, the parameters 
         (a, b) such that the line g(x) = q + m*x optimally fits the input points.
         Returns g(0) = q.
         """
-        
-        raise NotImplementedError
+        # linear least squared fit
+        m, q = np.polyfit(x, y, deg=1)
+        return q
