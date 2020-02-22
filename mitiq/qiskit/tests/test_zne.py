@@ -2,7 +2,7 @@ import numpy as np
 
 # Error mitigation package
 from mitiq import class_mitigator
-import mitiq.tests.qiskit_utils as qiskit_utils
+import mitiq.qiskit.qiskit_utils as qiskit_utils
 
 
 @class_mitigator(order=2)
@@ -11,7 +11,7 @@ def magic_run_qiskit(circuit=None, stretch=1):
     the final measurement."""
     true_noise = 0.007  # real value of the noise
     noise = true_noise * stretch
-    expval = qiskit_utils.run_with_noise(circuit, noise, shots=10**5)
+    expval = qiskit_utils.run_with_noise(circuit, noise, shots=10 ** 5)
     return expval
 
 
