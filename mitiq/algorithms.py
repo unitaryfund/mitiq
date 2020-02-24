@@ -51,7 +51,6 @@ class RichardsonExtr(BatchedGenerator):
         return np.dot(gammas, y)
 
 
-
 class LinearExtr(BatchedGenerator):
     """Generator object implementing a zero-noise extrapolation algotrithm based on a linear fit."""
 
@@ -72,7 +71,7 @@ class PolyExtr(BatchedGenerator):
     """Generator object implementing a zero-noise extrapolation algotrithm based on a linear fit."""
 
     @staticmethod
-    def reduce(x: List[float], y: List[float], order: float) -> float:
+    def reduce(x: List[float], y: List[float], order: int) -> float:
         """ Given two lists of x and y values associated to an unknwn function y=f(x), returns 
         the extrapolation of the function to the x=0 limit, i.e., an estimate of f(0).
         The algorithm determines with a least squared method, the polynomial of degree='order' 

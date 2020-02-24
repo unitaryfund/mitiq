@@ -23,7 +23,6 @@ def f_non_lin(x: float) -> float:
     return A + B*x + C*x**2
         
 
-
 def test_richardson_extr():
     """Test the Richardson's extrapolator with different functions."""
     for f in [f_lin, f_non_lin]:
