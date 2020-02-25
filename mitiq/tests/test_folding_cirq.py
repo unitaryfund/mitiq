@@ -345,6 +345,12 @@ def test_fold_moments():
     )
     assert _equal(folded, correct)
 
+    # Make sure the original circuit wasn't modified
+    old = Circuit(
+        [ops.H.on_each(*qreg), ops.CNOT.on(qreg[0], qreg[1]), ops.T.on(qreg[2]), ops.TOFFOLI.on(*qreg)]
+    )
+    assert _equal(circ, old)
+
 
 def test_fold_all_gates_locally():
     # Test circuit:
@@ -387,7 +393,6 @@ def test_fold_all_gates_locally_three_qubits():
         [ops.TOFFOLI.on(*qreg)] * 3
     )
     assert _equal(circ, correct)
-
 
 
 def test_fold_from_left_two_qubits():

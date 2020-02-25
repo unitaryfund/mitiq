@@ -63,7 +63,7 @@ def fold_gates(circuit: Circuit, moment_indices: Iterable[int], gate_indices: Li
     return folded
 
 
-def _fold_moments(circuit: Circuit, moment_indices: List[int]) -> Circuit:
+def _fold_moments(circuit: Circuit, moment_indices: List[int]) -> None:
     """Folds specified moments in the circuit in place.
 
     Args:
@@ -77,7 +77,6 @@ def _fold_moments(circuit: Circuit, moment_indices: List[int]) -> Circuit:
     for i in moment_indices:
         circuit.insert(i + shift, [circuit[i + shift], inverse(circuit[i + shift])])
         shift += 2
-    return circuit
 
 
 def fold_moments(circuit: Circuit, moment_indices: List[int]) -> Circuit:
