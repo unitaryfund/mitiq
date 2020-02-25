@@ -2,7 +2,7 @@ import numpy as np
 
 # Error mitigation package
 from mitiq import class_mitigator
-from mitiq.tests.pyquil_utils import random_identity_circuit, run_with_noise, measure
+from mitiq.pyquil.pyquil_utils import random_identity_circuit, run_with_noise, measure
 
 
 @class_mitigator(order=2)
@@ -22,4 +22,4 @@ def test_rand_circ_pyquil():
 
     # execution with automatic error mitigation
     xx = magic_run_pyquil(rand_circ)
-    assert np.isclose(xx, 1.0, atol=1.e-2)
+    assert np.isclose(xx, 1.0, atol=1.e-1)
