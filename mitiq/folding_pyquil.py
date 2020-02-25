@@ -71,7 +71,7 @@ def fold_gates(circuit: Program, sub_indices: List[int]) -> Program:
 def fold_local(
         circuit: Program,
         stretch: float,
-        fold_method: Callable = fold_gates_from_left,
+        fold_method: Callable[[Program, float, Tuple[Any]], Program] = fold_gates_from_left,
         fold_method_args: Tuple[Any] = ()
         ) -> Program:
     """Returns a folded circuit by folding gates according to the input fold method.
