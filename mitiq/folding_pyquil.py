@@ -29,7 +29,7 @@ def fold_gates_at_random(circuit: Program, stretch: float, seed: Optional[int] =
 
     ngates = len(circuit)
     num_to_fold = int(ngates * (stretch - 1) / 2)
-    sub_indices = np.random.choice(range(ngates), num_to_fold, replace = False)
+    sub_indices = np.random.choice(range(ngates), num_to_fold, replace=False)
     return fold_gates(circuit, sub_indices)
 
 def fold_gates_from_left(circuit: Program, stretch: float) -> Program:
@@ -130,4 +130,3 @@ def unitary_folding(circuit: Program, stretch: float) -> Program:
         out += circuit[-num_to_fold:].dagger() + circuit[-num_to_fold:]
 
     return out
-
