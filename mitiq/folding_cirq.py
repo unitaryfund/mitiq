@@ -164,7 +164,7 @@ def _update_moment_indices(moment_indices: dict, moment_index_where_gate_was_fol
     return moment_indices
 
 
-def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int]) -> Circuit:
+def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int] = None) -> Circuit:
     """Returns a folded circuit by applying the map G -> G G^dag G to a random subset of gates in the input circuit.
 
     The folded circuit has a number of gates approximately equal to stretch * n where n is the number of gates in
@@ -196,11 +196,28 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int]) 
     ngates = len(list(folded.all_operations()))
     num_to_fold = int(ngates * (stretch - 1.0) / 2.0)
 
+    # Keep track of where moments are in the folded circuit
+    moment_indices = {i: i for i in range(len(circuit))}
+
+    # Keep track of which gates we can fold in each moment
+    remaining_gate_indices = {moment: list(range(len(circuit[moment]))) for moment in range(len(circuit))}
+
     for _ in range(num_to_fold):
-        # TODO: Update gate choices properly using tracked moment indices.
-        moment_index = np.random.choice(len(folded))
-        gate_index = np.random.choice(len(folded[moment_index]))
-        _fold_gate_at_index_in_moment(folded, moment_index, gate_index)
+        # Any moment with at least one gate is fair game
+        remaining_moment_indices = [i for i in remaining_gate_indices.keys() if remaining_gate_indices[i]]
+
+        # Get a moment index and gate index from the remaining set
+        moment_index = np.random.choice(remaining_moment_indices)
+        gate_index = np.random.choice(remaining_gate_indices[moment_index])
+
+        # Do the fold
+        _fold_gate_at_index_in_moment(folded, moment_indices[moment_index], gate_index)
+
+        # Update the moment indices for the folded circuit
+        _update_moment_indices(moment_indices, moment_index)
+
+        # Remove the gate we folded from the remaining set of gates to fold
+        remaining_gate_indices[moment_index].remove(gate_index)
 
     return folded
 
