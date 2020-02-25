@@ -26,7 +26,6 @@ def random_circuit(depth: int):
     gate_set = [X(0), Y(0), Z(0), X(1), Y(1), Z(1), CNOT(0, 1), CNOT(1, 0)]
     for _ in range(depth):
         prog += random.choice(gate_set)
-
     # we add arbitrary metadata to the program since we want to test that
     # properties are correctly retained by the output of folding functions.
     prog.wrap_in_numshots_loop(NUM_SHOTS)
