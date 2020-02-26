@@ -543,25 +543,24 @@ def test_fold_random_no_repeats():
     """Tests folding at random to ensure that no gates are folded twice and folded gates
     are not folded again.
     """
-    # Test circuit
-    # 0: ───H───@───@───
-    #           │   │
-    # 1: ───H───X───@───
-    #               │
-    # 2: ───H───T───X───
-    qreg = LineQubit.range(3)
+    # Test circuit:
+    # 0: ───H───@───Y───@───
+    #           │       │
+    # 1: ───────X───X───@───
+    # Note that each gate only occurs once and is self-inverse.
+    # This allows us to check that no gates are folded more than once
+    qreg = LineQubit.range(2)
     circ = Circuit(
-        [ops.H.on_each(*qreg)],
-        [ops.CNOT.on(qreg[0], qreg[1])],
-        [ops.T.on(qreg[2])],
-        [ops.TOFFOLI.on(*qreg)]
+        [ops.H.on_each(qreg[0])],
+        [ops.CNOT.on(*qreg)],
+        [ops.X.on(qreg[1])],
+        [ops.Y.on(qreg[0])],
+        [ops.CZ.on(*qreg)]
     )
 
     for stretch in np.linspace(1., 3., 10):
         folded = fold_gates_at_random(circ, stretch=stretch, seed=1)
-        print(folded, "\n\n")
-
-    # TODO: Right now this is just a visual test. Add checks.
+        assert len(set(folded.all_operations())) == len(set(circ.all_operations()))
 
 
 def test_fold_local_small_stretch_from_left():
