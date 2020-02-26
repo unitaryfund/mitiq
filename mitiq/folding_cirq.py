@@ -202,10 +202,10 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int] =
     # Keep track of which gates we can fold in each moment
     remaining_gate_indices = {moment: list(range(len(circuit[moment]))) for moment in range(len(circuit))}
 
-    for _ in range(num_to_fold):
-        # Any moment with at least one gate is fair game
-        remaining_moment_indices = [i for i in remaining_gate_indices.keys() if remaining_gate_indices[i]]
+    # Any moment with at least one gate is fair game
+    remaining_moment_indices = [i for i in remaining_gate_indices.keys() if remaining_gate_indices[i]]
 
+    for _ in range(num_to_fold):
         # Get a moment index and gate index from the remaining set
         moment_index = np.random.choice(remaining_moment_indices)
         gate_index = np.random.choice(remaining_gate_indices[moment_index])
@@ -219,13 +219,17 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int] =
         # Remove the gate we folded from the remaining set of gates to fold
         remaining_gate_indices[moment_index].remove(gate_index)
 
+        # If there are no gates left in the moment, remove the moment index from the remaining set
+        if not remaining_gate_indices[moment_index]:
+            remaining_moment_indices.remove(moment_index)
+
     return folded
 
 
 def fold_local(
         circuit: Circuit,
         stretch: float,
-        fold_method: Callable[[Callable, float, Tuple[Any]], Circuit] = fold_gates_from_left,
+        fold_method: Callable[[Circuit, float, Tuple[Any]], Circuit] = fold_gates_from_left,
         fold_method_args: Tuple[Any] = ()) -> Circuit:
     """Returns a folded circuit by folding gates according to the input fold method.
 
