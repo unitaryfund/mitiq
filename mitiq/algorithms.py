@@ -1,7 +1,7 @@
 """List of zero-noise extrapolation algorithms. Each algorithm is given in the form of a Generator object."""
 
 from typing import List, Tuple
-from mitiq.adaptive_zne import BatchedGenerator
+from mitiq.adaptive_zne import BatchedFactory
 # from mitiq.zne import get_gammas
 import numpy as np
 
@@ -17,7 +17,7 @@ import numpy as np
 # etc... 
 
 
-class RichardsonExtr(BatchedGenerator):
+class RichardsonExtr(BatchedFactory):
     """Generator object implementing the Richardson's extrapolation algorithm."""
 
     @staticmethod
@@ -51,7 +51,7 @@ class RichardsonExtr(BatchedGenerator):
         return np.dot(gammas, y)
 
 
-class LinearExtr(BatchedGenerator):
+class LinearExtr(BatchedFactory):
     """Generator object implementing a zero-noise extrapolation algotrithm based on a linear fit."""
 
     @staticmethod
@@ -67,7 +67,7 @@ class LinearExtr(BatchedGenerator):
         return q
 
 
-class PolyExtr(BatchedGenerator):
+class PolyExtr(BatchedFactory):
     """Generator object implementing a zero-noise extrapolation algotrithm based on a linear fit."""
 
     @staticmethod
