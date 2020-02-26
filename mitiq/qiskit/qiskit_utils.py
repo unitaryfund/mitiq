@@ -7,7 +7,6 @@ from qiskit import QuantumCircuit
 from qiskit.providers.aer.noise import NoiseModel
 from qiskit.providers.aer.noise.errors.standard_errors import depolarizing_error
 
-
 BACKEND = qiskit.Aer.get_backend('qasm_simulator')
 # Set the random seeds for testing
 QISKIT_SEED = 1337
@@ -113,4 +112,8 @@ def run_program(pq, shots: int = 100) -> float:
     results = job.result()
     counts = results.get_counts()
     expval = counts['0'] / shots
+<<<<<<< HEAD:mitiq/qiskit/qiskit_utils.py
     return expval
+=======
+    return expval
+>>>>>>> origin/master:mitiq/qiskit/qiskit_utils.py
