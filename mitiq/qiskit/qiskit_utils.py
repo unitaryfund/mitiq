@@ -112,8 +112,4 @@ def run_program(pq, shots: int = 100) -> float:
     results = job.result()
     counts = results.get_counts()
     expval = counts['0'] / shots
-<<<<<<< HEAD:mitiq/qiskit/qiskit_utils.py
     return expval
-=======
-    return expval
->>>>>>> origin/master:mitiq/qiskit/qiskit_utils.py
