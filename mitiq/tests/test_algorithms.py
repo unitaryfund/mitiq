@@ -1,5 +1,7 @@
 # test_algorithms.py
 import numpy as np
+from typing import Callable
+from mitiq.adaptive_zne import Factory
 from mitiq.algorithms import RichardsonExtr, LinearExtr, PolyExtr
 
 
@@ -23,22 +25,36 @@ def f_non_lin(x: float) -> float:
     return A + B*x + C*x**2
         
 
+def apply_algorithm(algorithm_class: Factory, f: Callable[[float], float], order: float = None) -> float:
+    """Applies a generc extrapolation factory for extrapolating a classical function f(x).
+    Returns an estimate of f(0).
+    """
+    y_vals = [f(x) for x in X_VALS]
+    algorithm_object = algorithm_class(X_VALS, X_VALS, y_vals)
+    if order is None:
+        return algorithm_object.reduce(X_VALS, y_vals)
+    else:
+        return algorithm_object.reduce(X_VALS, y_vals, order)
+
+
 def test_richardson_extr():
-    """Test the Richardson's extrapolator with different functions."""
+    """Tests the Richardson's extrapolator."""
     for f in [f_lin, f_non_lin]:
-        y_vals = [f(x) for x in X_VALS]
-        f_of_zero = RichardsonExtr.reduce(X_VALS, y_vals)
-        assert np.isclose(f_of_zero, A, atol=1.e-7)
+        f_of_zero = apply_algorithm(RichardsonExtr, f)
+        assert np.isclose(f_of_zero, f(0), atol=1.e-7)
 
 def test_linear_extr():
-    """Test the Richardson's extrapolator with different functions."""
-    y_vals = [f_lin(x) for x in X_VALS]
-    f_of_zero = LinearExtr.reduce(X_VALS, y_vals)
-    assert np.isclose(f_of_zero, A, atol=1.e-7)
+    """Tests the linear extrapolator."""
+    f_of_zero = apply_algorithm(LinearExtr, f_lin)
+    assert np.isclose(f_of_zero, f_lin(0), atol=1.e-7)
 
 def test_poly_extr():
-    """Test the Richardson's extrapolator with different functions."""
-    for f in [f_lin, f_non_lin]:
-        y_vals = [f(x) for x in X_VALS]
-        f_of_zero = PolyExtr.reduce(X_VALS, y_vals, order=2)
-        assert np.isclose(f_of_zero, A, atol=1.e-7)
+    """Tests the polinomial extrapolator."""
+    f_of_zero = apply_algorithm(PolyExtr, f_lin, 1)
+    assert np.isclose(f_of_zero, f_lin(0), atol=1.e-7)
+    # test that order=1 is not good for non-linear function
+    f_of_zero = apply_algorithm(PolyExtr, f_non_lin, 1)
+    assert not np.isclose(f_of_zero, f_non_lin(0), atol=1)
+    # test that order=2 is better
+    f_of_zero = apply_algorithm(PolyExtr, f_non_lin, 2)
+    assert np.isclose(f_of_zero, f_non_lin(0), atol=1.e-7)

@@ -39,7 +39,7 @@ class BatchedFactory(Factory):
             instack = []
         if outstack is None:
             outstack = []
-        super(self.__class__, self).__init__(instack, outstack)
+        super(BatchedFactory, self).__init__(instack, outstack)
         self.scalars = scalars
 
     def step(self, instack: List[float], outstack: List[float]) -> float:
