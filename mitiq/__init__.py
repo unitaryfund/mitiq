@@ -6,8 +6,6 @@ Mitiq can be directly imported.
 import os
 from typing import Union
 
-from .zne import Mitigator, class_mitigator, run_mitigation, fun_mitigator
-
 from pyquil import Program
 from qiskit import QuantumCircuit
 
