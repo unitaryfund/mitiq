@@ -14,6 +14,7 @@ from mitiq.folding_cirq import (_update_moment_indices,
                                 fold_moments,
                                 _fold_all_gates_locally,
                                 fold_gates_from_left,
+                                fold_gates_from_right,
                                 fold_gates_at_random,
                                 fold_local,
                                 unitary_folding)
@@ -389,7 +390,6 @@ def test_fold_all_gates_locally_three_qubits():
     assert _equal(circ, correct)
 
 
-
 def test_fold_from_left_two_qubits():
     qreg = LineQubit.range(2)
     circ = Circuit(
@@ -443,6 +443,60 @@ def test_fold_from_left_bad_stretch():
     circuit = random_circuit(100)
     with pytest.raises(ValueError):
         fold_gates_from_left(circuit, stretch=10)
+
+
+def test_fold_from_right_basic():
+    """Tests folding gates from the right for a two-qubit circuit."""
+    # Test circuit:
+    # 0: ───H───@───────
+    #           │
+    # 1: ───H───X───T───
+    qreg = LineQubit.range(2)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[1])]
+    )
+
+    # Small stretch factor
+    folded = fold_gates_from_right(circ, stretch=1.5)
+    correct = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(*qreg)],
+        [ops.T.on(qreg[1]), ops.T.on(qreg[1])**-1, ops.T.on(qreg[1])]
+    )
+    assert _equal(folded, correct)
+
+    # Intermediate stretch factor
+    folded = fold_gates_from_right(circ, stretch=2.5)
+    correct = Circuit(
+        [ops.H.on(qreg[0])] * 3,
+        [ops.H.on(qreg[1])],
+        [ops.CNOT.on(*qreg)] * 3,
+        [ops.T.on(qreg[1]), ops.T.on(qreg[1])**-1, ops.T.on(qreg[1])]
+    )
+    assert _equal(folded, correct)
+
+
+def test_fold_from_right_max_stretch():
+    """Tests that folding from right = folding from left with maximum stretch."""
+    # Test circuit
+    # 0: ───H───@───@───
+    #           │   │
+    # 1: ───H───X───@───
+    #               │
+    # 2: ───H───T───X───
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)]
+    )
+
+    left_folded = fold_gates_from_left(circ, stretch=3.)
+    right_folded = fold_gates_from_right(circ, stretch=3.)
+    assert _equal(left_folded, right_folded)
 
 
 def test_fold_gates_at_random_no_stretch():
