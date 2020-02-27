@@ -101,7 +101,8 @@ def _fold_all_gates_locally(circuit: Circuit) -> Circuit:
 
 
 def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
-    """Returns a new folded circuit by applying the map G -> G G^dag G to a subset of gates  of the input circuit.
+    """Returns a new folded circuit by applying the map G -> G G^dag G to a subset of gates of the input circuit,
+    starting with gates at the left (beginning) of the circuit.
 
     The folded circuit has a number of gates approximately equal to stretch * n where n is the number of gates in
     the input circuit.
@@ -133,6 +134,25 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
             num_folded += 1
             if num_folded == num_to_fold:
                 return folded
+
+
+def fold_gates_from_right(circuit: Circuit, stretch: float) -> Circuit:
+    """Returns a new folded circuit by applying the map G -> G G^dag G to a subset of gates of the input circuit,
+    starting with gates at the right (end) of the circuit.
+
+    The folded circuit has a number of gates approximately equal to stretch * n where n is the number of gates in
+    the input circuit.
+
+    Args:
+        circuit: Circuit to fold.
+        stretch: Factor to stretch the circuit by. Any real number in the interval [1, 3].
+
+    Note:
+        Folding a single gate adds two gates to the circuit, hence the maximum stretch factor is 3.
+    """
+    reversed_circuit = Circuit(reversed(circuit))
+    reversed_folded_circuit = fold_gates_from_left(reversed_circuit, stretch)
+    return Circuit(reversed(reversed_folded_circuit))
 
 
 def _update_moment_indices(moment_indices: dict, moment_index_where_gate_was_folded: int) -> dict:
