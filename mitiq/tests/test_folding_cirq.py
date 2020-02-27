@@ -557,10 +557,13 @@ def test_fold_random_no_repeats():
         [ops.Y.on(qreg[0])],
         [ops.CZ.on(*qreg)]
     )
+    circuit_ops = set(circ.all_operations())
 
-    for stretch in np.linspace(1., 3., 10):
+    for stretch in np.linspace(1., 3., 5):
         folded = fold_gates_at_random(circ, stretch=stretch, seed=1)
-        assert len(set(folded.all_operations())) == len(set(circ.all_operations()))
+        gates = list(folded.all_operations())
+        counts = {gate: gates.count(gate) for gate in circuit_ops}
+        assert all(count <= 3 for count in counts.values())
 
 
 def test_fold_local_small_stretch_from_left():
