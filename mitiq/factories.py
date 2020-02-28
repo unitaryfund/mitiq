@@ -20,7 +20,7 @@ class Factory(object):
     def is_converged(self, instack: List[float], outstack: List[float]) -> None:
         raise NotImplementedError
 
-    def reduce(self, expectations: List[float]) -> float:
+    def reduce(self) -> float:
         raise NotImplementedError
 
 
@@ -70,30 +70,31 @@ class BatchedFactory(Factory):
 class RichardsonFactory(BatchedFactory):
     """Factory object implementing the Richardson's extrapolation algorithm."""
 
+    @staticmethod
+    def get_gammas(c: float) -> List[float]:
+        """Returns the linear combination coefficients "gammas" for Richardson's extrapolation.
+        The input is a list of the noise stretch factors.
+        """
+        order = len(c) - 1
+        np_c = np.asarray(c)
+        A = np.zeros((order + 1, order + 1))
+        for k in range(order + 1):
+            A[k] = np_c ** k
+        b = np.zeros(order + 1)
+        b[0] = 1
+        return np.linalg.solve(A, b)
+
     def reduce(self, x: List[float], y: List[float]) -> float:
         """ Given two lists of x and y values associated to an unknwn function y=f(x), returns 
         the extrapolation of the function to the x=0 limit, i.e., an estimate of f(0).
         The algorithm is based on the Richardson's extrapolation method.
         """
 
-        def get_gammas(c: float) -> List[float]:
-            """Returns the linear combination coefficients "gammas" for Richardson's extrapolation.
-            The input is a list of the noise stretch factors.
-            """
-            order = len(c) - 1
-            np_c = np.asarray(c)
-            A = np.zeros((order + 1, order + 1))
-            for k in range(order + 1):
-                A[k] = np_c ** k
-            b = np.zeros(order + 1)
-            b[0] = 1
-            return np.linalg.solve(A, b)
-        
         # check arguments are valid
         assert len(y) > 0
         assert len(x) == len(y)
         # Richardson's extrapolation
-        gammas = get_gammas(x)
+        gammas = self.get_gammas(x)
         return np.dot(gammas, y)
 
 

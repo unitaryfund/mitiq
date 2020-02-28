@@ -1,8 +1,8 @@
 # test_algorithms.py
-import numpy as np
-from typing import Callable
-from mitiq.factories import Factory, RichardsonFactory, LinearFactory, PolyFactory
 
+from typing import Callable
+import numpy as np
+from mitiq.factories import Factory, RichardsonFactory, LinearFactory, PolyFactory
 
 
 # Constant parameters for test functions:
@@ -10,11 +10,9 @@ A = 1.2
 B = 1.5
 C = 1.7
 D = 0.9
-
 X_VALS = [1, 1.4, 1.9]
 
-# Some classical functions which are used to test extrapolation methods
-
+# two test functions (f_lin and f_non_lin):
 def f_lin(x: float) -> float:
     """Linear function."""
     return A + B*x
@@ -22,19 +20,22 @@ def f_lin(x: float) -> float:
 def f_non_lin(x: float) -> float:
     """Non-linear function."""
     return A + B*x + C*x**2
-        
 
-def apply_algorithm(algorithm_class: Factory, f: Callable[[float], float], order: float = None) -> float:
-    """Applies a generc extrapolation factory for extrapolating a classical function f(x).
+
+def apply_algorithm(algo_class: Factory, f: Callable[[float], float], order: float = None) -> float:
+    """Applies a generc algorithm for extrapolating a given test function f(x).
     Returns an estimate of f(0).
+
+    Args:
+        algo_class: class of type Factory corresponding to a specific extrapolation method.
+        f: test function to be extrapolated.
+        order: (optional) extrapolation order.
     """
     y_vals = [f(x) for x in X_VALS]
-    algorithm_object = algorithm_class(X_VALS, X_VALS, y_vals)
+    algo_object = algo_class(X_VALS, X_VALS, y_vals)
     if order is None:
-        return algorithm_object.reduce(X_VALS, y_vals)
-    else:
-        return algorithm_object.reduce(X_VALS, y_vals, order)
-
+        return algo_object.reduce(X_VALS, y_vals)
+    return algo_object.reduce(X_VALS, y_vals, order)
 
 def test_richardson_extr():
     """Tests the Richardson's extrapolator."""
