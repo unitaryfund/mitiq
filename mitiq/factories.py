@@ -23,13 +23,13 @@ class Factory(object):
 
 
 class BatchedFactory(Factory):
+    """
+    Runs a series of scalar noise parameters serially.
+    :param scalars: List of scalar noise values to be executed.
+    :param instack: Running stack of noise values run so far.
+    :param outstack: Expectations calculated thus far.
+    """
     def __init__(self, scalars: Iterable[float], instack: List[float] = None, outstack: List[float] = None) -> None:
-        """
-        Runs a series of scalar noise parameters serially.
-        :param scalars: List of scalar noise values to be executed.
-        :param instack: Running stack of noise values run so far.
-        :param outstack: Expectations calculated thus far.
-        """
         if instack is None:
             instack = []
         if outstack is None:
@@ -52,10 +52,9 @@ class BatchedFactory(Factory):
 
 class RichardsonFactory(BatchedFactory):
     """Factory object implementing Richardson's extrapolation."""
-
+    
     def reduce(self, x: List[float], y: List[float]) -> float:
-        """Returns the Richardson's extrapolation to the x=0 limit.
-        """
+        """Returns the Richardson's extrapolation to the x=0 limit."""
         # Richardson's extrapolation is a particular case of a polynomial fit
         # with order equal to the number of data points minus 1.
         order = len(x) - 1
@@ -63,9 +62,10 @@ class RichardsonFactory(BatchedFactory):
 
 class LinearFactory(BatchedFactory):
     """Factory object implementing a zero-noise extrapolation algotrithm based on a linear fit."""
-
+    
     def reduce(self, x: List[float], y: List[float]) -> float:
-        """Determines, with a least squared method, the line of best fit
+        """
+        Determines, with a least squared method, the line of best fit
         associated to the data points. The intercept is returned.
         """
         # Richardson's extrapolation is a particular case of a polynomial fit
@@ -74,14 +74,14 @@ class LinearFactory(BatchedFactory):
 
 
 class PolyFactory(BatchedFactory):
-    """Factory object implementing a zero-noise extrapolation algotrithm based on a polynomial fit.
-       
-       Note: RichardsonFactory and LinearFactory are special cases of PolyFactory.
     """
-
+    Factory object implementing a zero-noise extrapolation algotrithm based on a polynomial fit.     
+    Note: RichardsonFactory and LinearFactory are special cases of PolyFactory.
+    """
     @staticmethod
     def static_reduce(x: List[float], y: List[float], order: int) -> float:
-        """Static method equivalent to the reduce instance method of PolyFactory.
+        """
+        Static method equivalent to the reduce instance method of PolyFactory.
         This method is also called by other factories, e.g., LinearFactory and RichardsonFactory.
         """
 
@@ -101,9 +101,9 @@ class PolyFactory(BatchedFactory):
         # c_0, i.e., p(x=0), is returned
         return coefficients[-1]
 
-
     def reduce(self, x: List[float], y: List[float], order: int) -> float:
-        """Determines with a least squared method, the polynomial of degree equal to 'order' 
+        """
+        Determines with a least squared method, the polynomial of degree equal to 'order' 
         which optimally fits the input data. The value of the polynomial at x=0 is returned.
         """
         return PolyFactory.static_reduce(x, y, order)
