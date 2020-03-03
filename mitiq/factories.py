@@ -1,4 +1,4 @@
-from typing import List, Tuple, Callable
+from typing import List, Iterable
 import numpy as np
 
 
@@ -23,7 +23,7 @@ class Factory(object):
 
 
 class BatchedFactory(Factory):
-    def __init__(self, scalars: List[float], instack: List[float] = None, outstack: List[float] = None) -> None:
+    def __init__(self, scalars: Iterable[float], instack: List[float] = None, outstack: List[float] = None) -> None:
         """
         Runs a series of scalar noise parameters serially.
         :param scalars: List of scalar noise values to be executed.
