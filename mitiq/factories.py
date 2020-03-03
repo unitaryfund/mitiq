@@ -53,8 +53,8 @@ class BatchedFactory(Factory):
 class RichardsonFactory(BatchedFactory):
     """Factory object implementing Richardson's extrapolation."""
     
-    def reduce(self, x: List[float], y: List[float]) -> float:
-        """Returns the Richardson's extrapolation to the x=0 limit."""
+    def reduce(self, instack: List[float], outstack: List[float]) -> float:
+        """Returns the Richardson's extrapolation to the zero-noise limit."""
         # Richardson's extrapolation is a particular case of a polynomial fit
         # with order equal to the number of data points minus 1.
         order = len(x) - 1
@@ -63,7 +63,7 @@ class RichardsonFactory(BatchedFactory):
 class LinearFactory(BatchedFactory):
     """Factory object implementing a zero-noise extrapolation algotrithm based on a linear fit."""
     
-    def reduce(self, x: List[float], y: List[float]) -> float:
+    def reduce(self, instack: List[float], outstack: List[float]) -> float:
         """
         Determines, with a least squared method, the line of best fit
         associated to the data points. The intercept is returned.
@@ -101,9 +101,9 @@ class PolyFactory(BatchedFactory):
         # c_0, i.e., p(x=0), is returned
         return coefficients[-1]
 
-    def reduce(self, x: List[float], y: List[float], order: int) -> float:
+    def reduce(self, instack: List[float], outstack: List[float], order: int) -> float:
         """
         Determines with a least squared method, the polynomial of degree equal to 'order' 
-        which optimally fits the input data. The value of the polynomial at x=0 is returned.
+        which optimally fits the input data. The zero-noise limit is returned.
         """
         return PolyFactory.static_reduce(x, y, order)
