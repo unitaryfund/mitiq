@@ -23,7 +23,7 @@ def f_non_lin(x: float) -> float:
 
 
 def apply_algorithm(algo_class: Factory, f: Callable[[float], float], order: float = None) -> float:
-    """Applies a generc algorithm for extrapolating a given test function f(x).
+    """Applies a generc algorithm for extrapolating a given (classical) test function f(x).
     Returns an estimate of f(0).
 
     Args:
@@ -48,14 +48,3 @@ def test_linear_extr():
     f_of_zero = apply_algorithm(LinearFactory, f_lin)
     assert np.isclose(f_of_zero, f_lin(0), atol=1.e-7)
 
-def test_poly_extr():
-    """Tests the polinomial extrapolator."""
-    # test linear extrapolation (order=1)
-    f_of_zero = apply_algorithm(PolyFactory, f_lin, 1)
-    assert np.isclose(f_of_zero, f_lin(0), atol=1.e-7)
-    # test that, for some non-linear functions,
-    # order=1 is bad while ored=2 is better.
-    f_of_zero = apply_algorithm(PolyFactory, f_non_lin, 1)
-    assert not np.isclose(f_of_zero, f_non_lin(0), atol=1)
-    f_of_zero = apply_algorithm(PolyFactory, f_non_lin, 2)
-    assert np.isclose(f_of_zero, f_non_lin(0), atol=1.e-7)

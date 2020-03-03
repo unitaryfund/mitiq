@@ -1,8 +1,6 @@
-from pyquil import Program
 from typing import List, Tuple, Callable
-
-import mitiq.qiskit.qiskit_utils as qs_utils
 import numpy as np
+
 
 class Factory(object):
     """
@@ -51,80 +49,61 @@ class BatchedFactory(Factory):
     def is_converged(self, instack: List[float], outstack: List[float]) -> bool:
         return len(instack) == len(self.scalars)
 
-# Specific extrapolation algorithms are given below.
-# They are implemented as child classes of Factory or BatchedFactory.
-
-# TODO list:
-# [x] Richardson's extrapolation
-# [x] Linear fit
-# [x] Polynomial fit
-# Log-Richardson's extrapolation
-# Log-Polynomial fit
-# Adaptive Linear fit
-# Adaptive Log-polinomial fit
-# Adaptive max-likelihood
-# Adaptive Bayesian
-# etc... 
-
 
 class RichardsonFactory(BatchedFactory):
-    """Factory object implementing the Richardson's extrapolation algorithm."""
-
-    @staticmethod
-    def get_gammas(c: float) -> List[float]:
-        """Returns the linear combination coefficients "gammas" for Richardson's extrapolation.
-        The input is a list of the noise stretch factors.
-        """
-        order = len(c) - 1
-        np_c = np.asarray(c)
-        A = np.zeros((order + 1, order + 1))
-        for k in range(order + 1):
-            A[k] = np_c ** k
-        b = np.zeros(order + 1)
-        b[0] = 1
-        return np.linalg.solve(A, b)
+    """Factory object implementing Richardson's extrapolation."""
 
     def reduce(self, x: List[float], y: List[float]) -> float:
-        """ Given two lists of x and y values associated to an unknwn function y=f(x), returns 
-        the extrapolation of the function to the x=0 limit, i.e., an estimate of f(0).
-        The algorithm is based on the Richardson's extrapolation method.
+        """Returns the Richardson's extrapolation to the x=0 limit.
         """
-
-        # check arguments are valid
-        assert len(y) > 0
-        assert len(x) == len(y)
-        # Richardson's extrapolation
-        gammas = self.get_gammas(x)
-        return np.dot(gammas, y)
-
+        # Richardson's extrapolation is a particular case of a polynomial fit
+        # with order equal to the number of data points minus 1.
+        order = len(x) - 1
+        return  PolyFactory.static_reduce(x, y, order=order)
 
 class LinearFactory(BatchedFactory):
     """Factory object implementing a zero-noise extrapolation algotrithm based on a linear fit."""
 
     def reduce(self, x: List[float], y: List[float]) -> float:
-        """ Given two lists of x and y values associated to an unknwn function y=f(x), returns 
-        the extrapolation of the function to the x=0 limit, i.e., an estimate of f(0).
-        The algorithm determines, with a standard least squared method, the parameters 
-        (q, m) such that the line g(x) = q + m*x optimally fits the input points.
-        Returns g(0) = q.
+        """Determines, with a least squared method, the line of best fit
+        associated to the data points. The intercept is returned.
         """
-        # linear least squared fit
-        _ , q = np.polyfit(x, y, deg=1)
-        return q
+        # Richardson's extrapolation is a particular case of a polynomial fit
+        # with order equal to 1.
+        return PolyFactory.static_reduce(x, y, order=1)
 
 
 class PolyFactory(BatchedFactory):
-    """Factory object implementing a zero-noise extrapolation algotrithm based on a polynomial fit."""
+    """Factory object implementing a zero-noise extrapolation algotrithm based on a polynomial fit.
+       
+       Note: RichardsonFactory and LinearFactory are special cases of PolyFactory.
+    """
+
+    @staticmethod
+    def static_reduce(x: List[float], y: List[float], order: int) -> float:
+        """Static method equivalent to the reduce instance method of PolyFactory.
+        This method is also called by other factories, e.g., LinearFactory and RichardsonFactory.
+        """
+
+        # check arguments
+        error_str = "Data is not enough: at least two data points are necessary."
+        if (x is None) or (y is None):
+            raise ValueError(error_str) 
+        if (len(x) != len(y)) or (len(x)<2):
+            raise ValueError(error_str) 
+        if order > len(x) - 1:
+            raise ValueError(
+                "Extrapolation order is too high. The order cannot exceed the number of data points minus 1."
+            )
+        
+        # get coefficients c_j of p(x)= c_0 + c_1*x + c_2*x**2... which best fits the data
+        coefficients = np.polyfit(x, y, deg=order)
+        # c_0, i.e., p(x=0), is returned
+        return coefficients[-1]
+
 
     def reduce(self, x: List[float], y: List[float], order: int) -> float:
-        """ Given two lists of x and y values associated to an unknwn function y=f(x), returns 
-        the extrapolation of the function to the x=0 limit, i.e., an estimate of f(0).
-        The algorithm determines with a least squared method, the polynomial of degree='order' 
-        which optimally fits the input points. The value of the polynomial at x=0 is returned.
-
-            Note: order=1 corresponds to a standard linear least square fitting. 
-                  In this case (q, m) are determined such that g(x) = q + m*x optimally fits 
-                  data and g(0) = q is returned.
+        """Determines with a least squared method, the polynomial of degree equal to 'order' 
+        which optimally fits the input data. The value of the polynomial at x=0 is returned.
         """
-        coefficients = np.polyfit(x, y, deg=order)
-        return coefficients[-1]
+        return PolyFactory.static_reduce(x, y, order)
