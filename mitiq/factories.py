@@ -57,8 +57,8 @@ class RichardsonFactory(BatchedFactory):
         """Returns the Richardson's extrapolation to the zero-noise limit."""
         # Richardson's extrapolation is a particular case of a polynomial fit
         # with order equal to the number of data points minus 1.
-        order = len(x) - 1
-        return  PolyFactory.static_reduce(x, y, order=order)
+        order = len(instack) - 1
+        return  PolyFactory.static_reduce(instack, outstack, order=order)
 
 class LinearFactory(BatchedFactory):
     """Factory object implementing a zero-noise extrapolation algotrithm based on a linear fit."""
@@ -70,7 +70,7 @@ class LinearFactory(BatchedFactory):
         """
         # Richardson's extrapolation is a particular case of a polynomial fit
         # with order equal to 1.
-        return PolyFactory.static_reduce(x, y, order=1)
+        return PolyFactory.static_reduce(instack, outstack, order=1)
 
 
 class PolyFactory(BatchedFactory):
@@ -106,4 +106,4 @@ class PolyFactory(BatchedFactory):
         Determines with a least squared method, the polynomial of degree equal to 'order' 
         which optimally fits the input data. The zero-noise limit is returned.
         """
-        return PolyFactory.static_reduce(x, y, order)
+        return PolyFactory.static_reduce(instack, outstack, order)
