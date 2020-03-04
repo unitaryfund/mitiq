@@ -23,43 +23,48 @@ def f_non_lin(x: float) -> float:
     return A + B * x + C * x ** 2
 
 
-def apply_algorithm(algo_class: Factory, f: Callable[[float], float], order: float = None) -> float:
+def apply_algorithm(algo_object: Factory, f: Callable[[float], float]) -> float:
     """Applies a generc algorithm for extrapolating a given (classical) test function f(x).
     Returns an estimate of f(0).
 
     Args:
-        algo_class: class of type Factory corresponding to a specific extrapolation method.
+        factory object: instance of a Factory corresponding to a specific extrapolation method.
         f: test function to be extrapolated.
-        order: (optional) extrapolation order.
     """
     y_vals = [f(x) for x in X_VALS]
-    algo_object = algo_class(X_VALS, X_VALS, y_vals)
-    if order is None:
-        return algo_object.reduce(X_VALS, y_vals)
-    return algo_object.reduce(X_VALS, y_vals, order)
+    algo_object.instack = X_VALS
+    algo_object.outstack = y_vals
+    return algo_object.reduce()
 
 
 def test_richardson_extr():
     """Test of the Richardson's extrapolator."""
     for f in [f_lin, f_non_lin]:
-        f_of_zero = apply_algorithm(RichardsonFactory, f)
+        algo_object = RichardsonFactory(X_VALS)
+        f_of_zero = apply_algorithm(algo_object, f)
         assert np.isclose(f_of_zero, f(0), atol=1.0e-7)
 
 
 def test_linear_extr():
     """Test of linear extrapolator."""
-    f_of_zero = apply_algorithm(LinearFactory, f_lin)
+    algo_object = LinearFactory(X_VALS)
+    f_of_zero = apply_algorithm(algo_object, f_lin)
     assert np.isclose(f_of_zero, f_lin(0), atol=1.0e-7)
 
 
 def test_poly_extr():
     """Test of polynomial extrapolator."""
-    # test linear extrapolation (order=1)
-    f_of_zero = apply_algorithm(PolyFactory, f_lin, 1)
+    # test (order=1)
+    algo_object = PolyFactory(X_VALS, 1)
+    f_of_zero = apply_algorithm(algo_object, f_lin)
     assert np.isclose(f_of_zero, f_lin(0), atol=1.0e-7)
+    
     # test that, for some non-linear functions,
     # order=1 is bad while ored=2 is better.
-    f_of_zero = apply_algorithm(PolyFactory, f_non_lin, 1)
-    assert not np.isclose(f_of_zero, f_non_lin(0), atol=1)
-    f_of_zero = apply_algorithm(PolyFactory, f_non_lin, 2)
+    algo_object = PolyFactory(X_VALS, 1)
+    f_of_zero = apply_algorithm(algo_object, f_non_lin)
+    assert not np.isclose(f_of_zero, f_non_lin(0), atol=1) 
+    
+    algo_object = PolyFactory(X_VALS, 2)
+    f_of_zero = apply_algorithm(algo_object, f_non_lin)
     assert np.isclose(f_of_zero, f_non_lin(0), atol=1.0e-7)
