@@ -1,4 +1,6 @@
-from typing import List, Tuple, Callable
+"""Zero-noise extrapolation tools."""
+
+from typing import Callable
 import mitiq.qiskit.qiskit_utils as qs_utils
 from mitiq import QPROGRAM
 from mitiq.factories import Factory, LinearFactory
@@ -13,7 +15,7 @@ def run_factory(fac: Factory, noise_to_expval: Callable[[float], float]) -> None
         noise_to_expval: Function mapping noise scale values to expectation vales.
     """
     if not fac.is_converged():
-        next_param = fac.step()
+        next_param = fac.next()
         next_result = noise_to_expval(next_param)
         fac.push(next_param, next_result)
 
@@ -31,20 +33,22 @@ def qrun_factory(fac: Factory, qp: QPROGRAM, executor: Callable[[QPROGRAM], floa
         fac: Factory object to run until convergence.
         qp: Circuit to mitigate.
         executor: Function which executes a circuit and returns an expectation value.
-        scale_noise: Function which rescales the noise level of a quantum circuit.
+        scale_noise: Function which scales the noise level of a quantum circuit.
     """
 
     def _noise_to_expval(noise_param: float) -> float:
-        """Quantum evaluation of the expectation value for a given noise_param"""
+        """Evaluates the quantum expectation value for a given noise_param"""
         scaled_qp = scale_noise(qp, noise_param)
-        
+
         return executor(scaled_qp)
 
     run_factory(fac, _noise_to_expval)
 
 
-def execute_with_zne(qp: QPROGRAM, executor: Callable[[QPROGRAM, int], float], fac: Factory = None, \
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None) -> Callable[[QPROGRAM], float]:
+def execute_with_zne(
+        qp: QPROGRAM, executor: Callable[[QPROGRAM], float], fac: Factory = None,
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
+    ) -> Callable[[QPROGRAM], float]:
     """
     Takes as input a quantum circuit and returns the associated expectation value
     evaluated with error mitigation.
@@ -53,10 +57,10 @@ def execute_with_zne(qp: QPROGRAM, executor: Callable[[QPROGRAM, int], float], f
         qp: Quantum circuit to execute with error mitigation.
         executor: Function executing a circuit and producing an expectation value
                   (without error mitigation).
-        fac: Factory object determining the zero-noise extrapolation algorithm. 
-             If not specified, LinearFactory([1.0, 2.0]) is used.
-        scale_noise: Function for scaling the noise of a quantum circuit. 
-                     If not specified, a default method is used.
+        fac: Factory object determining the zero-noise extrapolation algorithm.
+             If not specified, LinearFactory([1.0, 2.0]) will be used.
+        scale_noise: Function for scaling the noise of a quantum circuit.
+                     If not specified, a default method will be used.
     """
     if scale_noise is None:
         # TODO this assumes is qiskit
@@ -66,49 +70,53 @@ def execute_with_zne(qp: QPROGRAM, executor: Callable[[QPROGRAM, int], float], f
     qrun_factory(fac, qp, executor, scale_noise)
 
     return fac.reduce()
-   
+
 
 # Similar to the old "zne".
-def mitigate_executor(executor: Callable[[QPROGRAM, int], float], fac: Factory = None, \
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None) -> Callable[[QPROGRAM], float]:
+def mitigate_executor(
+        executor: Callable[[QPROGRAM], float], fac: Factory = None,
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
+    ) -> Callable[[QPROGRAM], float]:
     """
-    Takes as input a generic function ("executor"), difined by the user, which executes a circuit 
-    with an arbitrary backend and produces an expectation value. 
-    
-    Returns an error mitigated version of the input "executor", having the same signature but 
+    Takes as input a generic function ("executor"), difined by the user, which executes a circuit
+    with an arbitrary backend and produces an expectation value.
+
+    Returns an error-mitigated version of the input "executor", having the same signature and
     automatically performing zero-noise extrapolation at each call.
 
     Args:
-        executor: Function (to be mitigated) executing a circuit and producing an expectation value.
-        fac: Factory object determining the zero-noise extrapolation algorithm. 
+        executor: Function (to be mitigated) executing a circuit and returning an expectation value.
+        fac: Factory object determining the zero-noise extrapolation algorithm.
              If not specified, LinearFactory([1.0, 2.0]) is used.
-        scale_noise: Function for scaling the noise of a quantum circuit. 
+        scale_noise: Function for scaling the noise of a quantum circuit.
                      If not specified, a default method is used.
     """
-    
+
     def new_executor(qp: QPROGRAM) -> float:
         return execute_with_zne(qp, executor, fac, scale_noise)
 
     return new_executor
 
 
-def zne_decorator(fac: Factory = None, scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None) -> Callable:
+def zne_decorator(
+        fac: Factory = None, scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
+    ) -> Callable[[QPROGRAM], float]:
     """
-    Decorator which automatically implements error mitigation to any circuit-executor function 
+    Decorator which automatically adds error mitigation to any circuit-executor function
     defined by the user.
 
-    It is supposed to be applied to any function which executes a quantum circuit 
+    It is supposed to be applied to any function which executes a quantum circuit
     with an arbitrary backend and produces an expectation value.
 
     Args:
-        fac: Factory object determining the zero-noise extrapolation algorithm. 
-             If not specified, LinearFactory([1.0, 2.0]) is used.
-        scale_noise: Function for scaling the noise of a quantum circuit. 
-                     If not specified, a default method is used.
+        fac: Factory object determining the zero-noise extrapolation algorithm.
+             If not specified, LinearFactory([1.0, 2.0]) will be used.
+        scale_noise: Function for scaling the noise of a quantum circuit.
+                     If not specified, a default method will be used.
     """
-    # Formally, the function below is the actual decorator.
+    # Formally, the function below is the actual decorator, while the function
     # "zne_decorator" is necessary to give additional arguments to "decorator".
-    def decorator(executor):
+    def decorator(executor: Callable[[QPROGRAM], float]) -> Callable[[QPROGRAM], float]:
         return mitigate_executor(executor, fac, scale_noise)
 
     return decorator

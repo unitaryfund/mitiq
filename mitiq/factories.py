@@ -1,24 +1,27 @@
+"""Contains all the main classes corresponding to different zero-noise extrapolation methods."""
+
 from typing import List, Iterable
 import numpy as np
 
 
-class Factory(object):
+class Factory():
     """
-    Abstract class designed to adaptively produce a new noise scaling parameter based on a historical 
-    stack of previous noise scale parameters ("self.instack") and previously estimated expectation 
+    Abstract class designed to adaptively produce a new noise scaling parameter based on a historical
+    stack of previous noise scale parameters ("self.instack") and previously estimated expectation
     values ("self.outstack").
 
     Specific zero-noise extrapolation algorithms, adaptive or non-adaptive, are derived from this class.
-    A Factory object is not supposed to directly perform any quantum computation, only the classical 
-    results of quantum experiments are processed by it. 
+    A Factory object is not supposed to directly perform any quantum computation, only the classical
+    results of quantum experiments are processed by it.
     """
+
     def __init__(self) -> None:
         """
-        Initialization arguments (e.g. noise scale factors) depend on the particular extrapolation 
+        Initialization arguments (e.g. noise scale factors) depend on the particular extrapolation
         algorithm and can be added to the "__init__" method of the associated derived class.
         """
-        self.instack = [ ]
-        self.outstack = [ ]
+        self.instack = []
+        self.outstack = []
 
     def push(self, instack_val: float, outstack_val: float) -> None:
         """
@@ -28,7 +31,7 @@ class Factory(object):
         """
         self.instack.append(instack_val)
         self.outstack.append(outstack_val)
-    
+
     def next(self) -> float:
         """Returns the next noise level to execute a circuit at."""
         raise NotImplementedError
@@ -40,6 +43,7 @@ class Factory(object):
     def reduce(self) -> float:
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
+
 
 class BatchedFactory(Factory):
     """
@@ -59,30 +63,36 @@ class BatchedFactory(Factory):
         Args:
             scalars: Iterable of noise scale factors at which expectation values should be measured.
         """
-        if len(scalars)==0:
-            raise ValueError("The argument 'scalars' should contain at least one element."
-                             "At least 2 elements are necessary for a non-trivial extrapolation.")
+        if len(scalars) == 0:
+            raise ValueError(
+                "The argument 'scalars' should contain at least one element."
+                "At least 2 elements are necessary for a non-trivial extrapolation."
+            )
         self.scalars = scalars
         super(BatchedFactory, self).__init__()
 
-    def step(self) -> float:
+    def next(self) -> float:
         try:
             next_param = self.scalars[len(self.outstack)]
         except IndexError:
-            raise IndexError(f"BatchedFactory cannot take another step. Number of batched scalars ({len(self.scalars)}) "
-                             f"exceeded.")
+            raise IndexError(
+                f"BatchedFactory cannot take another step. Number of batched scalars ({len(self.scalars)}) "
+                "exceeded."
+            )
         return next_param
 
     def is_converged(self) -> bool:
         if len(self.outstack) != len(self.instack):
-            raise IndexError(f"The length of 'self.instack' ({len(self.instack)}) and 'self.outstack' ({len(self.outstack)}) "
-                             f"must be equal.")
+            raise IndexError(
+                f"The length of 'self.instack' ({len(self.instack)}) "
+                f"and 'self.outstack' ({len(self.outstack)}) must be equal."
+            )
         return len(self.outstack) == len(self.scalars)
 
 
 class PolyFactory(BatchedFactory):
     """
-    Factory object implementing a zero-noise extrapolation algotrithm based on a polynomial fit.     
+    Factory object implementing a zero-noise extrapolation algotrithm based on a polynomial fit.
     Note: RichardsonFactory and LinearFactory are special cases of PolyFactory.
     """
 
@@ -98,33 +108,33 @@ class PolyFactory(BatchedFactory):
         super(PolyFactory, self).__init__(scalars)
 
     @staticmethod
-    def static_reduce(x: List[float], y: List[float], order: int) -> float:
+    def static_reduce(instack: List[float], outstack: List[float], order: int) -> float:
         """
-        Determines with a least squared method, the polynomial of degree equal to 'order' 
+        Determines with a least squared method, the polynomial of degree equal to 'order'
         which optimally fits the input data. The zero-noise limit is returned.
-   
+
         This static method is equivalent to the "self.reduce" method of PolyFactory, but
-        can be called also by other factories which are particular cases of PolyFactory, 
+        can be called also by other factories which are particular cases of PolyFactory,
         e.g., LinearFactory and RichardsonFactory.
         """
         # check arguments
         error_str = "Data is not enough: at least two data points are necessary."
-        if x is None or y is None:
-            raise ValueError(error_str) 
-        if len(x) != len(y) or len(x)<2:
-            raise ValueError(error_str) 
-        if order > len(x) - 1:
+        if instack is None or outstack is None:
+            raise ValueError(error_str)
+        if len(instack) != len(outstack) or len(instack) < 2:
+            raise ValueError(error_str)
+        if order > len(instack) - 1:
             raise ValueError(
                 "Extrapolation order is too high. The order cannot exceed the number of data points minus 1."
             )
         # get coefficients {c_j} of p(x)= c_0 + c_1*x + c_2*x**2... which best fits the data
-        coefficients = np.polyfit(x, y, deg=order)
+        coefficients = np.polyfit(instack, outstack, deg=order)
         # c_0, i.e., the value of p(x) at x=0, is returned
         return coefficients[-1]
 
     def reduce(self) -> float:
         """
-        Determines with a least squared method, the polynomial of degree equal to "self.order" 
+        Determines with a least squared method, the polynomial of degree equal to "self.order"
         which optimally fits the input data. The zero-noise limit is returned.
         """
         return PolyFactory.static_reduce(self.instack, self.outstack, self.order)
@@ -132,17 +142,18 @@ class PolyFactory(BatchedFactory):
 
 class RichardsonFactory(BatchedFactory):
     """Factory object implementing Richardson's extrapolation."""
-    
+
     def reduce(self) -> float:
         """Returns the Richardson's extrapolation to the zero-noise limit."""
         # Richardson's extrapolation is a particular case of a polynomial fit
         # with order equal to the number of data points minus 1.
         order = len(self.instack) - 1
-        return  PolyFactory.static_reduce(self.instack, self.outstack, order=order)
+        return PolyFactory.static_reduce(self.instack, self.outstack, order=order)
+
 
 class LinearFactory(BatchedFactory):
     """Factory object implementing a zero-noise extrapolation algotrithm based on a linear fit."""
-    
+
     def reduce(self) -> float:
         """
         Determines, with a least squared method, the line of best fit

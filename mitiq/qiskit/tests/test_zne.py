@@ -6,7 +6,7 @@ from mitiq.zne import qrun_factory
 import mitiq.qiskit.qiskit_utils as qs
 
 
-def test_adaptive_zne_qiskit():
+def test_qrun_factory_qiskit():
     rand_circ = qs.random_identity_circuit(depth=30)
     rand_circ.measure(0, 0)
     fac = LinearFactory([1.0, 1.5, 2.0])
