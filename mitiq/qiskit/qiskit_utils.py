@@ -84,11 +84,12 @@ def run_with_noise(circuit, noise, shots):
 # this means we need a stateful record of the scaled noise.
 # Note this is NOT A GOOD SOLUTION IN THE LONG TERM AS HIDDEN STATE IS BAD
 # Mainly this is qiskit's fault...
-NATIVE_NOISE = 0.007
-CURRENT_NOISE = NoiseModel().add_all_qubit_quantum_error(depolarizing_error(NATIVE_NOISE, 1), ['u1', 'u2', 'u3'])
+NATIVE_NOISE = 0.009
+CURRENT_NOISE = None
 
 
 def scale_noise(pq, param: float):
+    global CURRENT_NOISE
     noise = param * NATIVE_NOISE
     assert noise <= 1.0, "Noise scaled to {} is out of bounds (<=1.0) for depolarizing channel.".format(noise)
 
@@ -113,3 +114,8 @@ def run_program(pq, shots: int = 100) -> float:
     counts = results.get_counts()
     expval = counts['0'] / shots
     return expval
+
+def measure(circuit, qid):
+    circuit.measure(0, qid)
+    return circuit
+

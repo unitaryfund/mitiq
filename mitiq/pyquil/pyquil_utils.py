@@ -81,7 +81,7 @@ def run_with_noise(circuit, noise, shots):
     return expval
 
 
-def run_program(pq: Program, shots: int = 100) -> float:
+def run_program(pq: Program, shots: int = 500) -> float:
     pq.wrap_in_numshots_loop(shots)
     results = QVM.run(pq)
     expval = (results == [0]).sum() / shots
