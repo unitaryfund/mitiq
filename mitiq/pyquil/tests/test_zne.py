@@ -1,8 +1,7 @@
-"""Tests for zne.py with Qiskit backend."""
+"""Tests for zne.py with PyQuil backend."""
 
-from mitiq import QPROGRAM
 import numpy as np
-
+from mitiq import QPROGRAM
 from mitiq.factories import RichardsonFactory
 from mitiq.zne import (
     qrun_factory, 
@@ -10,7 +9,7 @@ from mitiq.zne import (
     mitigate_executor, 
     zne_decorator,
 )
-from mitiq.qiskit.qiskit_utils import (
+from mitiq.pyquil.pyquil_utils import (
     random_identity_circuit,
     measure,
     run_program,
@@ -25,8 +24,8 @@ def basic_executor(qp: QPROGRAM, shots: int = 500) -> float:
 
 
 def test_qrun_factory():
-    qp = random_identity_circuit(depth=TEST_DEPTH)
-    qp= measure(qp, 0)
+    rand_circ = random_identity_circuit(depth=TEST_DEPTH)
+    qp = measure(rand_circ, qid=0)
     fac = RichardsonFactory([1.0, 2.0, 3.0])
     qrun_factory(fac, qp, basic_executor, scale_noise)
     result = fac.reduce()
