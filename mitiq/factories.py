@@ -4,7 +4,7 @@ from typing import List, Iterable
 import numpy as np
 
 
-class Factory():
+class Factory:
     """
     Abstract class designed to adaptively produce a new noise scaling parameter based on a historical
     stack of previous noise scale parameters ("self.instack") and previously estimated expectation
