@@ -6,20 +6,29 @@ from mitiq import QPROGRAM
 from mitiq.factories import Factory, LinearFactory
 
 
-def run_factory(fac: Factory, noise_to_expval: Callable[[float], float]) -> None:
+def run_factory(
+        fac: Factory, noise_to_expval: Callable[[float], float], max_iterations: int = 100,
+    ) -> None:
     """
-    Runs a factory until convergence and returns the final zero-noise extrapolation.
+    Runs a factory until convergence (or until the number of iterations reach "max_iterations").
 
     Args:
         fac: Instance of Factory object to be run.
         noise_to_expval: Function mapping noise scale values to expectation vales.
+        max_iterations: Maximum number of iterations (optional). Default value is 100.
     """
-    if not fac.is_converged():
+    counter = 0
+    while not fac.is_converged() and counter < max_iterations:
         next_param = fac.next()
         next_result = noise_to_expval(next_param)
         fac.push(next_param, next_result)
+        counter += 1
 
-        return run_factory(fac, noise_to_expval)
+    if counter == max_iterations:
+        raise Warning(
+            "Factory iteration loop stopped before convergence. "
+            f"Maximum number of iterations ({max_iterations}) was reached."
+        )
 
     return None
 
