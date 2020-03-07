@@ -6,13 +6,14 @@ import numpy as np
 
 class Factory:
     """
-    Abstract class designed to adaptively produce a new noise scaling parameter based on a historical
-    stack of previous noise scale parameters ("self.instack") and previously estimated expectation
-    values ("self.outstack").
+    Abstract class designed to adaptively produce a new noise scaling parameter
+    based on a historical stack of previous noise scale parameters ("self.instack")
+    and previously estimated expectation values ("self.outstack").
 
-    Specific zero-noise extrapolation algorithms, adaptive or non-adaptive, are derived from this class.
-    A Factory object is not supposed to directly perform any quantum computation, only the classical
-    results of quantum experiments are processed by it.
+    Specific zero-noise extrapolation algorithms, adaptive or non-adaptive,
+    are derived from this class.
+    A Factory object is not supposed to directly perform any quantum computation,
+    only the classical results of quantum experiments are processed by it.
     """
 
     def __init__(self) -> None:
@@ -76,8 +77,8 @@ class BatchedFactory(Factory):
             next_param = self.scalars[len(self.outstack)]
         except IndexError:
             raise IndexError(
-                f"BatchedFactory cannot take another step. Number of batched scalars ({len(self.scalars)}) "
-                "exceeded."
+                "BatchedFactory cannot take another step. "
+                f"Number of batched scalars ({len(self.scalars)}) exceeded."
             )
         return next_param
 
@@ -125,7 +126,8 @@ class PolyFactory(BatchedFactory):
             raise ValueError(error_str)
         if order > len(instack) - 1:
             raise ValueError(
-                "Extrapolation order is too high. The order cannot exceed the number of data points minus 1."
+                "Extrapolation order is too high. "
+                "The order cannot exceed the number of data points minus 1."
             )
         # get coefficients {c_j} of p(x)= c_0 + c_1*x + c_2*x**2... which best fits the data
         coefficients = np.polyfit(instack, outstack, deg=order)
@@ -162,3 +164,96 @@ class LinearFactory(BatchedFactory):
         # Richardson's extrapolation is a particular case of a polynomial fit
         # with order equal to 1.
         return PolyFactory.static_reduce(self.instack, self.outstack, order=1)
+
+class DecayFactory(BatchedFactory):
+    """
+    Factory object implementing a zero-noise extrapolation algotrithm assuming an
+    exponential decay ansatz y(x) = a + b * exp(-c * x), with c > 0.
+
+    If the asymptotic value (y(x->inf) = a) is known, a linear fit with respect
+    to z(x) := log(y(x) - a) is used.
+    Otherwise, a non-linear fit of y(x) is perfomed.
+    """
+
+    def __init__(self, scalars: Iterable[float], asymptote: float = None) -> None:
+        """
+        Args:
+            scalars: Iterable of noise scale factors at which expectation values should be measured.
+            asymptote: Infinite-noise limit (optional argument).
+        """
+        super(DecayFactory, self).__init__(scalars)
+        if not isinstance(asymptote, (float, None)):
+            raise ValueError("The argument 'asymptote' must be either a float or None")
+        self.asymptote = asymptote
+
+    def reduce(self) -> float:
+        """Returns the zero-noise limit, assuming an exponential decay ansatz:
+        y(x) = a + b * exp(-c * x), with c > 0.
+
+        If self.asymptote is None, the ansatz y(x) is non-linearly fitted.
+        Otherwise a linear fit of z(x) := log(y(x) - self.asymptote) is performed.
+        """
+        return PolyDecayFactory.static_reduce(
+            self.instack, self.outstack, self.asymptote, order=1,
+        )
+
+
+class PolyDecayFactory(BatchedFactory):
+    """
+    Factory object implementing a zero-noise extrapolation algotrithm assuming an
+    (almost) exponential decay ansatz with a non linear exponent, i.e.:
+
+    y(x) = a + exp(z(x)), where z(x) is a polynomial of a given order.
+
+    If the asymptotic value (y(x->inf) = a) is known, a linear fit with respect
+    to z(x) := log(y(x) - a) is used.
+    Otherwise, a non-linear fit of y(x) is perfomed.
+    """
+
+    def __init__(self, scalars: Iterable[float], order: int, asymptote: float = None) -> None:
+        """
+        Args:
+            scalars: Iterable of noise scale factors at which expectation values should be measured.
+            order: Polynomial extrapolation order. It cannot exceed len(scalars) - 1.
+                   If asymptote is None, order cannot exceed len(scalars) - 2.
+            asymptote: Infinite-noise limit (optional argument).
+        """
+        super(PolyDecayFactory, self).__init__(scalars)
+        if not isinstance(asymptote, (float, None)):
+            raise ValueError("The argument 'asymptote' must be either a float or None")
+        self.order = order
+        self.asymptote = asymptote
+
+    @staticmethod
+    def static_reduce(instack: List[float], outstack: List[float], \
+                      asymptote: float, order: int) -> float:
+        """
+        Determines the zero-noise limit, assuming an exponential decay ansatz:
+        y(x) = a + exp(z(x)), where z(x) is a polynomial of a given order.
+
+        If self.asymptote is None, the ansatz y(x) is non-linearly fitted.
+        Otherwise, a linear fit of z(x) := log(y(x) - self.asymptote) is performed.
+
+        This static method is equivalent to the "self.reduce" method of PolyDecayFactory,
+        but can be called also by other factories which are particular cases of PolyDecayFactory,
+        e.g., DecayFactory.
+        """
+        if asymptote is None:
+            raise NotImplementedError("ZNE without asymptote not yet implemented.")
+
+        # if asymptote is given, poly fit z(x) instead of y(x)
+        zstack = [np.log(y - asymptote) for y in outstack]
+        z_of_zero = PolyFactory.static_reduce(instack, zstack, order)
+        return np.exp(z_of_zero) + asymptote
+
+    def reduce(self) -> float:
+        """Returns the zero-noise limit, assuming an exponential decay ansatz:
+        y(x) = a + b * exp(-c * x), with c > 0.
+
+        If self.asymptote is None, the ansatz y(x) is non-linearly fitted.
+        Otherwise a linear fit of z(x) := log(y(x) - self.asymptote) is performed.
+        """
+
+        return self.static_reduce(
+            self.instack, self.outstack, self.asymptote, self.order,
+        )
