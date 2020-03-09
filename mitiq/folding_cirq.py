@@ -19,6 +19,8 @@ def _fold_gate_at_index_in_moment(circuit: Circuit, moment_index: int, gate_inde
     Returns:
         None
     """
+    if not circuit.are_all_measurements_terminal():
+        raise ValueError("Circuit contains intermediate measurements and cannot be folded.")
     op = circuit[moment_index].operations[gate_index]
     circuit.insert(moment_index, [op, inverse(op)], strategy=InsertStrategy.NEW)
 
@@ -73,6 +75,8 @@ def _fold_moments(circuit: Circuit, moment_indices: List[int]) -> None:
     Returns:
         None
     """
+    if not circuit.are_all_measurements_terminal():
+        raise ValueError("Circuit contains intermediate measurements and cannot be folded.")
     shift = 0
     for i in moment_indices:
         circuit.insert(i + shift, [circuit[i + shift], inverse(circuit[i + shift])])

@@ -199,6 +199,33 @@ def test_fold_gate_at_index_in_moment_bad_moment():
         _fold_gate_at_index_in_moment(circ, 1, 0)
 
 
+def test_fold_gate_at_index_in_moment_with_intermediate_measurements():
+    """Checks that an error is raised when trying to fold any gates in a circuit
+    that has intermediate measurements.
+    """
+    qreg = [GridQubit(x, y) for x in range(2) for y in range(2)]
+    circ = Circuit(ops.H.on_each(*qreg))
+    circ.append(ops.measure_each(*qreg))
+    circ.append(ops.H.on_each(*qreg))
+    with pytest.raises(ValueError):
+        _fold_gate_at_index_in_moment(circ, moment_index=0, gate_index=0)
+
+
+def test_fold_gate_at_index_in_moment_with_terminal_measurements():
+    """Checks that gates are folded as expected in a circuit with terminal measurements."""
+    qreg = [GridQubit(x, y) for x in range(2) for y in range(2)]
+    circ = Circuit(ops.H.on_each(*qreg))
+    circ.append(ops.measure_each(*qreg))
+    _fold_gate_at_index_in_moment(circ, moment_index=0, gate_index=0)
+
+    correct = Circuit(
+        [ops.H.on(qreg[0])] * 2,
+        [ops.H.on_each(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+    assert _equal(circ, correct)
+
+
 def test_fold_gates_in_moment_single_qubit_gates():
     """Tests folding gates at given indices within a moment."""
     # Test circuit:
@@ -299,6 +326,71 @@ def test_fold_gates():
     assert _equal(folded, correct)
 
 
+def test_fold_gates_with_terminal_measurements():
+    """Test folding gates at specified indices within specified moments
+    in a circuit that has terminal measurements.
+    """
+    # Test circuit with terminal measurements on all qubits
+    # 0: ───H───@───@───M───
+    #           │   │
+    # 1: ───H───X───@───M───
+    #               │
+    # 2: ───H───T───X───M───
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg), ops.CNOT.on(qreg[0], qreg[1]),
+         ops.T.on(qreg[2]), ops.TOFFOLI.on(*qreg), ops.measure_each(*qreg)]
+    )
+    folded = fold_gates(circ, moment_indices=[0, 1], gate_indices=[[0, 1, 2], [1]])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2]), ops.T.on(qreg[2]) ** -1, ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+    assert _equal(folded, correct)
+
+    # Test circuit with terminal measurements on some qubits
+    # 0: ───H───@───@───M───
+    #           │   │
+    # 1: ───H───X───@───────
+    #               │
+    # 2: ───H───T───X───────
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg), ops.CNOT.on(qreg[0], qreg[1]),
+         ops.T.on(qreg[2]), ops.TOFFOLI.on(*qreg), ops.measure(qreg[0])]
+    )
+    folded = fold_gates(circ, moment_indices=[0, 1], gate_indices=[[0, 1, 2], [1]])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2]), ops.T.on(qreg[2]) ** -1, ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure(qreg[0])]
+    )
+    assert _equal(folded, correct)
+
+
+def test_fold_gates_with_intermediate_measurements():
+    """Tests that an error is raised when attempting to fold gates in a circuit with intermediate measurements."""
+    # Test circuit with terminal measurements on all qubits
+    # 0: ───H───@───@───M───H
+    #           │   │
+    # 1: ───H───X───@───M───H
+    #               │
+    # 2: ───H───T───X───M───H
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg), ops.CNOT.on(qreg[0], qreg[1]),
+         ops.T.on(qreg[2]), ops.TOFFOLI.on(*qreg),
+         ops.measure_each(*qreg), ops.H.on_each(*qreg)]
+    )
+    with pytest.raises(ValueError):
+        fold_gates(circ, moment_indices=[0, 1], gate_indices=[[0, 1, 2], [1]])
+
+
 def test_fold_moments():
     """Tests folding moments in a circuit."""
     # Test circuit
@@ -352,6 +444,100 @@ def test_fold_moments():
         [ops.H.on_each(*qreg), ops.CNOT.on(qreg[0], qreg[1]), ops.T.on(qreg[2]), ops.TOFFOLI.on(*qreg)]
     )
     assert _equal(circ, old)
+
+
+def test_fold_moments_terminal_measurements():
+    """Tests folding moments in a circuit that has terminal measurements"""
+    # Test circuit
+    # 0: ───H───@───@───M───
+    #           │   │
+    # 1: ───H───X───@───M───
+    #               │
+    # 2: ───H───T───X───M───
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+
+    # Fold a single moment
+    folded = fold_moments(circ, moment_indices=[0])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 2,
+        list(circ.all_operations())
+    )
+    assert _equal(folded, correct)
+
+    # Fold another single moment
+    folded = fold_moments(circ, moment_indices=[2])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3,
+        [ops.measure_each(*qreg)]
+    )
+    assert _equal(folded, correct)
+
+    # Fold two moments
+    folded = fold_moments(circ, moment_indices=[0, 2])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3,
+        [ops.measure_each(*qreg)]
+    )
+    assert _equal(folded, correct)
+
+    # Fold three moments
+    folded = fold_moments(circ, moment_indices=[0, 1, 2])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+        [ops.T.on(qreg[2]), ops.T.on(qreg[2])**-1, ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3,
+        [ops.measure_each(*qreg)]
+    )
+    assert _equal(folded, correct)
+
+    # Make sure the original circuit wasn't modified
+    old = Circuit(
+        [ops.H.on_each(*qreg), ops.CNOT.on(qreg[0], qreg[1]),
+         ops.T.on(qreg[2]), ops.TOFFOLI.on(*qreg), ops.measure_each(*qreg)]
+    )
+    assert _equal(circ, old)
+
+
+def test_fold_moment_that_has_measurement():
+    """Tests an error is raised when trying to fold a moment that has a measurement in it."""
+    # Test circuit
+    # 0: ───H───M───
+    #
+    # 1: ───H───T───
+    #
+    # 2: ───H───────
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.T.on(qreg[1])],
+        [ops.measure(qreg[0])]
+    )
+
+    # Fold the first moment
+    folded = fold_moments(circ, moment_indices=[0])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 2,
+        list(circ.all_operations())
+    )
+    assert _equal(folded, correct)
+
+    # Fold the second moment
+    with pytest.raises(TypeError):
+        fold_moments(circ, moment_indices=[1])
 
 
 def test_fold_all_gates_locally():
