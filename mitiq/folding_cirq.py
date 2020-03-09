@@ -123,7 +123,9 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
         raise ValueError("The stretch factor must be a real number between 1 and 3.")
 
     ngates = len(list(folded.all_operations()))
-    num_to_fold = int(ngates * (stretch - 1.0) / 2.0)
+    num_to_fold = round(ngates * (stretch - 1.0) / 2.0)
+    if num_to_fold == 0:
+        return folded
     num_folded = 0
     moment_shift = 0
 
