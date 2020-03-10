@@ -91,7 +91,7 @@ def test_poly_decay_factory_with_asympt():
 # TODO: don't work if asymptote=None
 def test_decay_factory_no_asympt():
     """Test of exponential decay extrapolator."""
-    algo_object = DecayFactory(X_VALS_MORE, asymptote=None)
+    algo_object = DecayFactory(X_VALS_MORE, asymptote=A)
     run_factory(algo_object, f_decay)
     assert np.isclose(algo_object.reduce(), f_decay(0), atol=1.0e-7)
 
