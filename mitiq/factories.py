@@ -256,19 +256,21 @@ class PolyDecayFactory(BatchedFactory):
         # CASE 1: asymptote is None.
         # TODO: there must be better way of doing this. *args does not work with curve_fit.
         # For the moment only orders up to 3 are suppoerted.
-        def ansatz_zero(x:float, asympt, z_zero) -> float:
+        def ansatz_zero(x:float, asympt:float, z_zero:float) -> float:
             """Ansatz function of order 0"""
             return asympt + np.exp(z_zero)
-        def ansatz_one(x:float, asympt, z_zero, z_one) -> float:
+        def ansatz_one(x:float, asympt:float, z_zero:float, z_one:float) -> float:
             """Ansatz function of order 1"""
             return asympt + np.exp(z_zero + z_one * x)
-        def ansatz_two(x:float, asympt, z_zero, z_one, z_two) -> float:
+        def ansatz_two(x:float, asympt:float, z_zero:float, z_one:float, z_two:float) -> float:
             """Ansatz function of order 2."""
             return asympt + np.exp(z_zero + z_one * x + z_two * x ** 2)
-        def ansatz_three(x:float, asympt, z_zero, z_one, z_two, z_three) -> float:
+        def ansatz_three(
+                x:float, asympt:float, z_zero:float, z_one:float, z_two:float, z_three:float
+            ) -> float:
             """Ansatz function of order 3."""
             return asympt + np.exp(z_zero + z_one * x + z_two * x ** 2 + z_three * x ** 3)
-            
+
         ansatzes = (ansatz_zero, ansatz_one, ansatz_two, ansatz_three)
         
         if asymptote is None:

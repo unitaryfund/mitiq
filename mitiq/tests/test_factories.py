@@ -18,7 +18,7 @@ B = 1.5
 C = 1.7
 D = 0.9
 X_VALS = [1, 1.4, 1.9]
-X_VALS_MORE = [1, 1.2, 1.4, 1.6]
+X_VALS_MORE = [1, 1.4, 1.9, 2.3]
 
 # Classical test functions:
 def f_lin(x: float) -> float:
@@ -91,7 +91,7 @@ def test_poly_decay_factory_with_asympt():
 # TODO: don't work if asymptote=None
 def test_decay_factory_no_asympt():
     """Test of exponential decay extrapolator."""
-    algo_object = DecayFactory(X_VALS_MORE, asymptote=A)
+    algo_object = DecayFactory(X_VALS_MORE, asymptote=None)
     run_factory(algo_object, f_decay)
     assert np.isclose(algo_object.reduce(), f_decay(0), atol=1.0e-7)
 
