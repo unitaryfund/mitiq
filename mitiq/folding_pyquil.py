@@ -2,7 +2,7 @@ from typing import List, Callable, Optional, Tuple, Any
 import numpy as np
 from pyquil import Program
 
-
+from mitiq.folding_cirq import _get_num_to_fold
 
 
 # Gate level folding
@@ -28,7 +28,7 @@ def fold_gates_at_random(circuit: Program, stretch: float, seed: Optional[int] =
         np.random.seed(seed)
 
     ngates = len(circuit)
-    num_to_fold = int(ngates * (stretch - 1) / 2)
+    num_to_fold = _get_num_to_fold(stretch, ngates)
     sub_indices = np.random.choice(range(ngates), num_to_fold, replace=False)
     return fold_gates(circuit, sub_indices)
 
@@ -51,7 +51,7 @@ def fold_gates_from_left(circuit: Program, stretch: float) -> Program:
         raise ValueError("The stretch factor must be a real number within 1 and 3.")
 
     ngates = len(circuit)
-    num_to_fold = int(ngates * (stretch - 1) / 2)
+    num_to_fold = _get_num_to_fold(stretch, ngates)
     sub_indices = list(range(num_to_fold))
     return fold_gates(circuit, sub_indices)
 
@@ -125,7 +125,7 @@ def unitary_folding(circuit: Program, stretch: float) -> Program:
 
     # partial circuit folding.
     ngates = len(circuit)
-    num_to_fold = int(ngates * fractional_stretch / 2)
+    num_to_fold = _get_num_to_fold(stretch, ngates)
     if num_to_fold != 0:
         out += circuit[-num_to_fold:].dagger() + circuit[-num_to_fold:]
 
