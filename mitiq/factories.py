@@ -1,8 +1,8 @@
 """Contains all the main classes corresponding to different zero-noise extrapolation methods."""
 
-from typing import List, Iterable
+from typing import List, Iterable, Union
 import numpy as np
-
+from scipy.optimize import curve_fit
 
 class Factory:
     """
@@ -118,7 +118,7 @@ class PolyFactory(BatchedFactory):
         can be called also by other factories which are particular cases of PolyFactory,
         e.g., LinearFactory and RichardsonFactory.
         """
-        # check arguments
+        # Check arguments
         error_str = "Data is not enough: at least two data points are necessary."
         if instack is None or outstack is None:
             raise ValueError(error_str)
@@ -129,7 +129,7 @@ class PolyFactory(BatchedFactory):
                 "Extrapolation order is too high. "
                 "The order cannot exceed the number of data points minus 1."
             )
-        # get coefficients {c_j} of p(x)= c_0 + c_1*x + c_2*x**2... which best fits the data
+        # Get coefficients {c_j} of p(x)= c_0 + c_1*x + c_2*x**2... which best fits the data
         coefficients = np.polyfit(instack, outstack, deg=order)
         # c_0, i.e., the value of p(x) at x=0, is returned
         return coefficients[-1]
@@ -175,14 +175,14 @@ class DecayFactory(BatchedFactory):
     Otherwise, a non-linear fit of y(x) is perfomed.
     """
 
-    def __init__(self, scalars: Iterable[float], asymptote: float = None) -> None:
+    def __init__(self, scalars: Iterable[float], asymptote: Union[float, None] = None) -> None:
         """
         Args:
             scalars: Iterable of noise scale factors at which expectation values should be measured.
             asymptote: Infinite-noise limit (optional argument).
         """
         super(DecayFactory, self).__init__(scalars)
-        if not isinstance(asymptote, (float, None)):
+        if not (asymptote is None or isinstance(asymptote, float)):
             raise ValueError("The argument 'asymptote' must be either a float or None")
         self.asymptote = asymptote
 
@@ -210,7 +210,7 @@ class PolyDecayFactory(BatchedFactory):
     Otherwise, a non-linear fit of y(x) is perfomed.
     """
 
-    def __init__(self, scalars: Iterable[float], order: int, asymptote: float = None) -> None:
+    def __init__(self, scalars: Iterable[float], order: int, asymptote: Union[float, None] = None) -> None:
         """
         Args:
             scalars: Iterable of noise scale factors at which expectation values should be measured.
@@ -219,14 +219,14 @@ class PolyDecayFactory(BatchedFactory):
             asymptote: Infinite-noise limit (optional argument).
         """
         super(PolyDecayFactory, self).__init__(scalars)
-        if not isinstance(asymptote, (float, None)):
+        if not (asymptote is None or isinstance(asymptote, float)):
             raise ValueError("The argument 'asymptote' must be either a float or None")
         self.order = order
         self.asymptote = asymptote
 
     @staticmethod
     def static_reduce(instack: List[float], outstack: List[float], \
-                      asymptote: float, order: int) -> float:
+                      asymptote: Union[float, None], order: int) -> float:
         """
         Determines the zero-noise limit, assuming an exponential decay ansatz:
         y(x) = a + exp(z(x)), where z(x) is a polynomial of a given order.
@@ -238,13 +238,52 @@ class PolyDecayFactory(BatchedFactory):
         but can be called also by other factories which are particular cases of PolyDecayFactory,
         e.g., DecayFactory.
         """
-        if asymptote is None:
-            raise NotImplementedError("ZNE without asymptote not yet implemented.")
+        # Shift is 0 if asymptote is given, 1 if asymptote is not given
+        shift = int(asymptote is None)
 
-        # if asymptote is given, poly fit z(x) instead of y(x)
+        # Check arguments
+        error_str = "Data is not enough: at least two data points are necessary."
+        if instack is None or outstack is None:
+            raise ValueError(error_str)
+        if len(instack) != len(outstack) or len(instack) < 2:
+            raise ValueError(error_str)
+        if order > len(instack) - 1:
+            raise ValueError(
+                "Extrapolation order is too high. "
+                f"The order cannot exceed the number of data points minus {1 + shift}."
+            )
+
+        # CASE 1: asymptote is None.
+        # TODO: there must be better way of doing this. *args does not work with curve_fit.
+        # For the moment only orders up to 3 are suppoerted.
+        def ansatz_zero(x:float, asympt, z_zero) -> float:
+            """Ansatz function of order 0"""
+            return asympt + np.exp(z_zero)
+        def ansatz_one(x:float, asympt, z_zero, z_one) -> float:
+            """Ansatz function of order 1"""
+            return asympt + np.exp(z_zero + z_one * x)
+        def ansatz_two(x:float, asympt, z_zero, z_one, z_two) -> float:
+            """Ansatz function of order 2."""
+            return asympt + np.exp(z_zero + z_one * x + z_two * x ** 2)
+        def ansatz_three(x:float, asympt, z_zero, z_one, z_two, z_three) -> float:
+            """Ansatz function of order 3."""
+            return asympt + np.exp(z_zero + z_one * x + z_two * x ** 2 + z_three * x ** 3)
+            
+        ansatzes = (ansatz_zero, ansatz_one, ansatz_two, ansatz_three)
+        
+        if asymptote is None:
+            opt_params, _ = curve_fit(ansatzes[order], instack, outstack)
+            # Return ansatx(0)
+            return opt_params[0] + np.exp(opt_params[1])
+
+        # CASE 2: asymptote is given.
+        # Plynomialc fit of z(x).
         zstack = [np.log(y - asymptote) for y in outstack]
-        z_of_zero = PolyFactory.static_reduce(instack, zstack, order)
-        return np.exp(z_of_zero) + asymptote
+        # Get coefficients {z_j} of z(x)= z_0 + z_1*x + z_2*x**2...
+        # Note: coefficients are ordered from high powers of x to low powers x. 
+        z_coefficients = np.polyfit(instack, zstack, deg=order)
+        # return f(x=0)
+        return asymptote + np.exp(z_coefficients[-1])
 
     def reduce(self) -> float:
         """Returns the zero-noise limit, assuming an exponential decay ansatz:
