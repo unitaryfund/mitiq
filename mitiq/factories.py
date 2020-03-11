@@ -210,7 +210,8 @@ class PolyDecayFactory(BatchedFactory):
     Otherwise, a non-linear fit of y(x) is perfomed.
     """
 
-    def __init__(self, scalars: Iterable[float], order: int, asymptote: Union[float, None] = None) -> None:
+    def __init__(self, scalars: Iterable[float], order: int, \
+                 asymptote: Union[float, None] = None) -> None:
         """
         Args:
             scalars: Iterable of noise scale factors at which expectation values should be measured.
@@ -226,17 +227,25 @@ class PolyDecayFactory(BatchedFactory):
 
     @staticmethod
     def static_reduce(instack: List[float], outstack: List[float], \
-                      asymptote: Union[float, None], order: int) -> float:
+                      asymptote: Union[float, None], order: int, eps: float = 1.0e-9) -> float:
         """
         Determines the zero-noise limit, assuming an exponential decay ansatz:
         y(x) = a + exp(z(x)), where z(x) is a polynomial of a given order.
+        We assume that z(x->inf)=-inf, such that y(x->inf) is finite.
 
-        If self.asymptote is None, the ansatz y(x) is non-linearly fitted.
+        If self.asymptote is None, the ansatz y(x) is fitted with a non-linear optimization.
         Otherwise, a linear fit of z(x) := log(y(x) - self.asymptote) is performed.
 
         This static method is equivalent to the "self.reduce" method of PolyDecayFactory,
         but can be called also by other factories which are particular cases of PolyDecayFactory,
         e.g., DecayFactory.
+
+        Args:
+            instack: x data values.
+            outstack: y data values.
+            asymptote: y(x->inf).
+            order: extrapolation order.
+            eps: epsilon to regularize log(y - asymptote) when y <= asymptote.
         """
         # Shift is 0 if asymptote is given, 1 if asymptote is not given
         shift = int(asymptote is None)
@@ -254,35 +263,37 @@ class PolyDecayFactory(BatchedFactory):
             )
 
         # CASE 1: asymptote is None.
-        # TODO: there must be better way of doing this. *args does not work with curve_fit.
+
+        # TODO: there must be better way of doing this. *args does not seem to work with curve_fit.
         # For the moment only orders up to 3 are suppoerted.
-        def ansatz_zero(x:float, asympt:float, z_zero:float) -> float:
+        def ansatz_zero(x: float, asympt: float, z_zero: float) -> float:
             """Ansatz function of order 0"""
             return asympt + np.exp(z_zero)
-        def ansatz_one(x:float, asympt:float, z_zero:float, z_one:float) -> float:
+        def ansatz_one(x: float, asympt: float, z_zero: float, z_one: float) -> float:
             """Ansatz function of order 1"""
-            return asympt + np.exp(z_zero + z_one * x)
-        def ansatz_two(x:float, asympt:float, z_zero:float, z_one:float, z_two:float) -> float:
+            return asympt + np.exp(z_zero - z_one * x)
+        def ansatz_two(x: float, asympt: float, z_zero: float, z_one: float, z_two: float) -> float:
             """Ansatz function of order 2."""
-            return asympt + np.exp(z_zero + z_one * x + z_two * x ** 2)
+            return asympt + np.exp(z_zero - z_one * x - z_two * x ** 2)
         def ansatz_three(
-                x:float, asympt:float, z_zero:float, z_one:float, z_two:float, z_three:float
+                x: float, asympt: float, z_zero: float, z_one: float, z_two: float, z_three: float
             ) -> float:
             """Ansatz function of order 3."""
-            return asympt + np.exp(z_zero + z_one * x + z_two * x ** 2 + z_three * x ** 3)
+            return asympt + np.exp(z_zero - z_one * x - z_two * x ** 2 - z_three * x ** 3)
 
         ansatzes = (ansatz_zero, ansatz_one, ansatz_two, ansatz_three)
-        
+
         if asymptote is None:
             opt_params, _ = curve_fit(ansatzes[order], instack, outstack)
             # Return ansatx(0)
             return opt_params[0] + np.exp(opt_params[1])
 
         # CASE 2: asymptote is given.
-        # Plynomialc fit of z(x).
-        zstack = [np.log(y - asymptote) for y in outstack]
+        # Plynomial fit of z(x).
+        zstack = [np.log(max(y - asymptote, eps)) for y in outstack]
+        print("zstack", zstack)
         # Get coefficients {z_j} of z(x)= z_0 + z_1*x + z_2*x**2...
-        # Note: coefficients are ordered from high powers of x to low powers x. 
+        # Note: coefficients are ordered from high powers of x to low powers x.
         z_coefficients = np.polyfit(instack, zstack, deg=order)
         # return f(x=0)
         return asymptote + np.exp(z_coefficients[-1])
