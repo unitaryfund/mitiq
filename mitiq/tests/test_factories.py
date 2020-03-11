@@ -83,7 +83,7 @@ def test_decay_factory_with_asympt():
 def test_poly_decay_factory_with_asympt():
     """Test of (almost) exponential decay extrapolator."""
     # test that, for a decay with a non-linear exponent,
-    # order=1 is bad while ored=2 is better.
+    # order=1 is bad while order=2 is better.
     algo_object = PolyDecayFactory(X_VALS, order=1, asymptote=A)
     run_factory(algo_object, f_poly_decay)
     assert not np.isclose(algo_object.reduce(), f_poly_decay(0, err=0), atol=NOT_CLOSE_TOL)
