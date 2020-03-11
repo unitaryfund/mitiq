@@ -289,7 +289,7 @@ class PolyDecayFactory(BatchedFactory):
             return opt_params[0] + np.exp(opt_params[1])
 
         # CASE 2: asymptote is given.
-        # Plynomial fit of z(x).
+        # Polynomial fit of z(x).
         zstack = [np.log(max(y - asymptote, eps)) for y in outstack]
         # Get coefficients {z_j} of z(x)= z_0 + z_1*x + z_2*x**2...
         # Note: coefficients are ordered from high powers of x to low powers x.
