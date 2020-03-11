@@ -285,7 +285,7 @@ class PolyDecayFactory(BatchedFactory):
 
         if asymptote is None:
             opt_params, _ = curve_fit(ansatzes[order], instack, outstack)
-            # Return ansatx(0)
+            # Return ansatz(0)
             return opt_params[0] + np.exp(opt_params[1])
 
         # CASE 2: asymptote is given.
