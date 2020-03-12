@@ -256,7 +256,7 @@ class PolyDecayFactory(BatchedFactory):
             raise ValueError(error_str)
         if len(instack) != len(outstack) or len(instack) < 2:
             raise ValueError(error_str)
-        if order > len(instack) - 1:
+        if order > len(instack) - (1 + shift):
             raise ValueError(
                 "Extrapolation order is too high. "
                 f"The order cannot exceed the number of data points minus {1 + shift}."
