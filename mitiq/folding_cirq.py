@@ -100,6 +100,16 @@ def _fold_all_gates_locally(circuit: Circuit) -> Circuit:
     _fold_moments(circuit, list(range(len(circuit))))
 
 
+def _get_num_to_fold(stretch: float, ngates: int) -> int:
+    """Returns the number of gates to fold to acheive the desired (approximate) stretch factor.
+
+    Args:
+        stretch: Floating point value to stretch the circuit by. Between 1 and 3.
+        ngates: Number of gates in the circuit to stretch.
+    """
+    return round(ngates * (stretch - 1.0) / 2.0)
+
+
 def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
     """Returns a new folded circuit by applying the map G -> G G^dag G to a subset of gates of the input circuit,
     starting with gates at the left (beginning) of the circuit.
@@ -123,7 +133,9 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
         raise ValueError("The stretch factor must be a real number between 1 and 3.")
 
     ngates = len(list(folded.all_operations()))
-    num_to_fold = int(ngates * (stretch - 1.0) / 2.0)
+    num_to_fold = _get_num_to_fold(stretch, ngates)
+    if num_to_fold == 0:
+        return folded
     num_folded = 0
     moment_shift = 0
 
@@ -213,7 +225,7 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int] =
         np.random.seed(seed)
 
     ngates = len(list(folded.all_operations()))
-    num_to_fold = int(ngates * (stretch - 1.0) / 2.0)
+    num_to_fold = _get_num_to_fold(stretch, ngates)
 
     # Keep track of where moments are in the folded circuit
     moment_indices = {i: i for i in range(len(circuit))}
