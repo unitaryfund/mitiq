@@ -105,8 +105,8 @@ def test_poly_exp_factory_with_asympt():
 
 
 def test_exp_factory_no_asympt():
+    """Test of exponential extrapolator."""
     for f in [f_exp_down, f_exp_up]:
-        """Test of exponential extrapolator."""
         algo_object = ExpFactory(X_VALS, asymptote=None)
         run_factory(algo_object, f)
         assert np.isclose(algo_object.reduce(), f(0, err=0), atol=CLOSE_TOL)

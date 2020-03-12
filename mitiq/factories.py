@@ -203,7 +203,7 @@ class PolyExpFactory(BatchedFactory):
     y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
 
     The parameter "s" is a sign variable which can be either 1 or -1, corresponding to
-    decreasing and increasing exponentials, respectively. The parameter "s" is 
+    decreasing and increasing exponentials, respectively. The parameter "s" is
     automatically deduced from the data.
 
     If the asymptotic value (y(x->inf) = a) is known, a linear fit with respect
@@ -235,13 +235,13 @@ class PolyExpFactory(BatchedFactory):
         y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
 
         The parameter "s" is a sign variable which can be either 1 or -1, corresponding to
-        decreasing and increasing exponentials, respectively. The parameter "s" is 
+        decreasing and increasing exponentials, respectively. The parameter "s" is
         automatically deduced from the data.
 
         It is also assumed that z(x-->inf)=-inf, such that y(x-->inf)-->a.
 
         If asymptote is None, the ansatz y(x) is fitted with a non-linear optimization.
-        Otherwise, a linear fit with respect to z(x) := log(sign * (y(x) - asymptote)) 
+        Otherwise, a linear fit with respect to z(x) := log(sign * (y(x) - asymptote))
         is performed.
 
         This static method is equivalent to the "self.reduce" method of PolyExpFactory,
@@ -253,7 +253,7 @@ class PolyExpFactory(BatchedFactory):
             outstack: y data values.
             asymptote: y(x->inf).
             order: extrapolation order.
-            eps: epsilon to regularize log(sign (instack - asymptote)) when 
+            eps: epsilon to regularize log(sign (instack - asymptote)) when
                  the argument is to close to zero or negative.
         """
         # Shift is 0 if asymptote is given, 1 if asymptote is not given
@@ -271,7 +271,7 @@ class PolyExpFactory(BatchedFactory):
             )
 
         # CASE 1: asymptote is None.
-        # TODO: it works, but there must be better way of doing this. 
+        # TODO: it works, but there must be better way of doing this.
         # Note: *args does not seem to work with curve_fit.
         # For the moment only orders up to 3 are suppoerted.
         def ansatz_zero(x: float, asympt: float, b: float) -> float:
@@ -296,7 +296,7 @@ class PolyExpFactory(BatchedFactory):
             # Return ansatz(0)= asympt + b
             return opt_params[0] + opt_params[1]
 
-        # CASE 2: asymptote is given.  
+        # CASE 2: asymptote is given.
         # deduce if the exponential is a decay or a growth
         mean_y = sum(outstack) / len(outstack)
         sign = np.sign(mean_y - asymptote)
@@ -312,7 +312,7 @@ class PolyExpFactory(BatchedFactory):
         """Returns the zero-noise limit, assuming an exponential ansatz:
         y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
         The parameter "s" is a sign variable which can be either 1 or -1, corresponding to
-        decreasing and increasing exponentials, respectively. The parameter "s" is 
+        decreasing and increasing exponentials, respectively. The parameter "s" is
         automatically deduced from the data.
         It is also assumed that z(x-->inf)=-inf, such that y(x-->inf)-->a.
         """
