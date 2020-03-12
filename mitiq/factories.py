@@ -165,13 +165,13 @@ class LinearFactory(BatchedFactory):
         # with order equal to 1.
         return PolyFactory.static_reduce(self.instack, self.outstack, order=1)
 
-class DecayFactory(BatchedFactory):
+class ExpFactory(BatchedFactory):
     """
     Factory object implementing a zero-noise extrapolation algotrithm assuming an
-    exponential decay ansatz y(x) = a + b * exp(-c * x), with c > 0.
+    exponential ansatz y(x) = a + b * exp(-c * x), with c > 0.
 
     If the asymptotic value (y(x->inf) = a) is known, a linear fit with respect
-    to z(x) := log(y(x) - a) is used.
+    to z(x) := log[sing(b) (y(x) - a)] is used.
     Otherwise, a non-linear fit of y(x) is perfomed.
     """
 
@@ -181,32 +181,33 @@ class DecayFactory(BatchedFactory):
             scalars: Iterable of noise scale factors at which expectation values should be measured.
             asymptote: Infinite-noise limit (optional argument).
         """
-        super(DecayFactory, self).__init__(scalars)
+        super(ExpFactory, self).__init__(scalars)
         if not (asymptote is None or isinstance(asymptote, float)):
             raise ValueError("The argument 'asymptote' must be either a float or None")
         self.asymptote = asymptote
 
     def reduce(self) -> float:
-        """Returns the zero-noise limit, assuming an exponential decay ansatz:
+        """Returns the zero-noise limit, assuming an exponential ansatz:
         y(x) = a + b * exp(-c * x), with c > 0.
-
-        If self.asymptote is None, the ansatz y(x) is non-linearly fitted.
-        Otherwise a linear fit of z(x) := log(y(x) - self.asymptote) is performed.
         """
-        return PolyDecayFactory.static_reduce(
+        return PolyExpFactory.static_reduce(
             self.instack, self.outstack, self.asymptote, order=1,
         )
 
 
-class PolyDecayFactory(BatchedFactory):
+class PolyExpFactory(BatchedFactory):
     """
     Factory object implementing a zero-noise extrapolation algotrithm assuming an
-    (almost) exponential decay ansatz with a non linear exponent, i.e.:
+    (almost) exponential ansatz with a non linear exponent, i.e.:
 
-    y(x) = a + exp(z(x)), where z(x) is a polynomial of a given order.
+    y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
+
+    The parameter "s" is a sign variable which can be either 1 or -1, corresponding to
+    decreasing and increasing exponentials, respectively. The parameter "s" is 
+    automatically deduced from the data.
 
     If the asymptotic value (y(x->inf) = a) is known, a linear fit with respect
-    to z(x) := log(y(x) - a) is used.
+    to z(x) := log[s(y(x) - a)] is used.
     Otherwise, a non-linear fit of y(x) is perfomed.
     """
 
@@ -219,37 +220,44 @@ class PolyDecayFactory(BatchedFactory):
                    If asymptote is None, order cannot exceed len(scalars) - 2.
             asymptote: Infinite-noise limit (optional argument).
         """
-        super(PolyDecayFactory, self).__init__(scalars)
+        super(PolyExpFactory, self).__init__(scalars)
         if not (asymptote is None or isinstance(asymptote, float)):
             raise ValueError("The argument 'asymptote' must be either a float or None")
         self.order = order
         self.asymptote = asymptote
+        self.sign = None
 
     @staticmethod
-    def static_reduce(instack: List[float], outstack: List[float], \
-                      asymptote: Union[float, None], order: int, eps: float = 1.0e-9) -> float:
+    def static_reduce(instack: List[float], outstack: List[float], asymptote: Union[float, None], \
+                      order: int, eps: float = 1.0e-9) -> float:
         """
-        Determines the zero-noise limit, assuming an exponential decay ansatz:
-        y(x) = a + exp(z(x)), where z(x) is a polynomial of a given order.
-        We assume that z(x->inf)=-inf, such that y(x->inf) is finite.
+        Determines the zero-noise limit, assuming an exponential ansatz:
+        y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
 
-        If self.asymptote is None, the ansatz y(x) is fitted with a non-linear optimization.
-        Otherwise, a linear fit of z(x) := log(y(x) - self.asymptote) is performed.
+        The parameter "s" is a sign variable which can be either 1 or -1, corresponding to
+        decreasing and increasing exponentials, respectively. The parameter "s" is 
+        automatically deduced from the data.
 
-        This static method is equivalent to the "self.reduce" method of PolyDecayFactory,
-        but can be called also by other factories which are particular cases of PolyDecayFactory,
-        e.g., DecayFactory.
+        It is also assumed that z(x-->inf)=-inf, such that y(x-->inf)-->a.
+
+        If asymptote is None, the ansatz y(x) is fitted with a non-linear optimization.
+        Otherwise, a linear fit with respect to z(x) := log(sign * (y(x) - asymptote)) 
+        is performed.
+
+        This static method is equivalent to the "self.reduce" method of PolyExpFactory,
+        but can be called also by other factories which are particular cases of PolyExpFactory,
+        e.g., ExpFactory.
 
         Args:
             instack: x data values.
             outstack: y data values.
             asymptote: y(x->inf).
             order: extrapolation order.
-            eps: epsilon to regularize log(y - asymptote) when y <= asymptote.
+            eps: epsilon to regularize log(sign (instack - asymptote)) when 
+                 the argument is to close to zero or negative.
         """
         # Shift is 0 if asymptote is given, 1 if asymptote is not given
         shift = int(asymptote is None)
-
         # Check arguments
         error_str = "Data is not enough: at least two data points are necessary."
         if instack is None or outstack is None:
@@ -263,46 +271,50 @@ class PolyDecayFactory(BatchedFactory):
             )
 
         # CASE 1: asymptote is None.
-
-        # TODO: there must be better way of doing this. *args does not seem to work with curve_fit.
+        # TODO: it works, but there must be better way of doing this. 
+        # Note: *args does not seem to work with curve_fit.
         # For the moment only orders up to 3 are suppoerted.
-        def ansatz_zero(x: float, asympt: float, z_zero: float) -> float:
+        def ansatz_zero(x: float, asympt: float, b: float) -> float:
             """Ansatz function of order 0"""
-            return asympt + np.exp(z_zero)
-        def ansatz_one(x: float, asympt: float, z_zero: float, z_one: float) -> float:
+            return asympt + b
+        def ansatz_one(x: float, asympt: float, b: float, z_one: float) -> float:
             """Ansatz function of order 1"""
-            return asympt + np.exp(z_zero - z_one * x)
-        def ansatz_two(x: float, asympt: float, z_zero: float, z_one: float, z_two: float) -> float:
+            return asympt + b * np.exp(-z_one * x)
+        def ansatz_two(x: float, asympt: float, b: float, z_one: float, z_two: float) -> float:
             """Ansatz function of order 2."""
-            return asympt + np.exp(z_zero - z_one * x - z_two * x ** 2)
+            return asympt + b * np.exp(-z_one * x - z_two * x ** 2)
         def ansatz_three(
-                x: float, asympt: float, z_zero: float, z_one: float, z_two: float, z_three: float
+                x: float, asympt: float, b: float, z_one: float, z_two: float, z_three: float
             ) -> float:
             """Ansatz function of order 3."""
-            return asympt + np.exp(z_zero - z_one * x - z_two * x ** 2 - z_three * x ** 3)
+            return asympt + b * np.exp(-z_one * x - z_two * x ** 2 - z_three * x ** 3)
 
         ansatzes = (ansatz_zero, ansatz_one, ansatz_two, ansatz_three)
 
         if asymptote is None:
             opt_params, _ = curve_fit(ansatzes[order], instack, outstack)
-            # Return ansatz(0)
-            return opt_params[0] + np.exp(opt_params[1])
+            # Return ansatz(0)= asympt + b
+            return opt_params[0] + opt_params[1]
 
-        # CASE 2: asymptote is given.
+        # CASE 2: asymptote is given.  
+        # deduce if the exponential is a decay or a growth
+        mean_y = sum(outstack) / len(outstack)
+        sign = np.sign(mean_y - asymptote)
         # Polynomial fit of z(x).
-        zstack = [np.log(max(y - asymptote, eps)) for y in outstack]
+        zstack = [np.log(max(sign * (y - asymptote), eps)) for y in outstack]
         # Get coefficients {z_j} of z(x)= z_0 + z_1*x + z_2*x**2...
         # Note: coefficients are ordered from high powers of x to low powers x.
         z_coefficients = np.polyfit(instack, zstack, deg=order)
         # return f(x=0)
-        return asymptote + np.exp(z_coefficients[-1])
+        return asymptote + sign * np.exp(z_coefficients[-1])
 
     def reduce(self) -> float:
-        """Returns the zero-noise limit, assuming an exponential decay ansatz:
-        y(x) = a + b * exp(-c * x), with c > 0.
-
-        If self.asymptote is None, the ansatz y(x) is non-linearly fitted.
-        Otherwise a linear fit of z(x) := log(y(x) - self.asymptote) is performed.
+        """Returns the zero-noise limit, assuming an exponential ansatz:
+        y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
+        The parameter "s" is a sign variable which can be either 1 or -1, corresponding to
+        decreasing and increasing exponentials, respectively. The parameter "s" is 
+        automatically deduced from the data.
+        It is also assumed that z(x-->inf)=-inf, such that y(x-->inf)-->a.
         """
 
         return self.static_reduce(

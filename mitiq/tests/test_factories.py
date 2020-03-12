@@ -5,8 +5,8 @@ from mitiq.factories import (
     RichardsonFactory,
     LinearFactory,
     PolyFactory,
-    DecayFactory,
-    PolyDecayFactory,
+    ExpFactory,
+    PolyExpFactory,
 )
 from mitiq.zne import run_factory
 
@@ -32,14 +32,24 @@ def f_non_lin(x: float, err: float = STAT_NOISE) -> float:
     return A + B * x + C * x ** 2 + np.random.normal(scale=err)
 
 
-def f_decay(x: float, err: float = STAT_NOISE) -> float:
-    """Exponential decay function."""
+def f_exp_down(x: float, err: float = STAT_NOISE) -> float:
+    """Exponential decay."""
     return A + B * np.exp(-C * x) + np.random.normal(scale=err)
 
 
-def f_poly_decay(x: float, err: float = STAT_NOISE) -> float:
-    """Polynomial decay function."""
+def f_exp_up(x: float, err: float = STAT_NOISE) -> float:
+    """Exponential growth."""
+    return A - B * np.exp(-C * x) + np.random.normal(scale=err)
+
+
+def f_poly_exp_down(x: float, err: float = STAT_NOISE) -> float:
+    """Poly-exponential decay."""
     return A + B * np.exp(-C * x - D * x ** 2) + np.random.normal(scale=err)
+
+
+def f_poly_exp_up(x: float, err: float = STAT_NOISE) -> float:
+    """Poly-exponential growth."""
+    return A - B * np.exp(-C * x - D * x ** 2) + np.random.normal(scale=err)
 
 
 def test_richardson_extr():
@@ -73,39 +83,43 @@ def test_poly_extr():
     assert np.isclose(algo_object.reduce(), f_non_lin(0, err=0), atol=CLOSE_TOL)
 
 
-def test_decay_factory_with_asympt():
-    """Test of exponential decay extrapolator."""
-    algo_object = DecayFactory(X_VALS, asymptote=A)
-    run_factory(algo_object, f_decay)
-    assert np.isclose(algo_object.reduce(), f_decay(0, err=0), atol=CLOSE_TOL)
+def test_exp_factory_with_asympt():
+    """Test of exponential extrapolator."""
+    for f in [f_exp_down, f_exp_up]:
+        algo_object = ExpFactory(X_VALS, asymptote=A)
+        run_factory(algo_object, f)
+        assert np.isclose(algo_object.reduce(), f(0, err=0), atol=CLOSE_TOL)
 
 
-def test_poly_decay_factory_with_asympt():
-    """Test of (almost) exponential decay extrapolator."""
-    # test that, for a decay with a non-linear exponent,
-    # order=1 is bad while order=2 is better.
-    algo_object = PolyDecayFactory(X_VALS, order=1, asymptote=A)
-    run_factory(algo_object, f_poly_decay)
-    assert not np.isclose(algo_object.reduce(), f_poly_decay(0, err=0), atol=NOT_CLOSE_TOL)
-    algo_object = PolyDecayFactory(X_VALS, order=2, asymptote=A)
-    run_factory(algo_object, f_poly_decay)
-    assert np.isclose(algo_object.reduce(), f_poly_decay(0, err=0), atol=CLOSE_TOL)
+def test_poly_exp_factory_with_asympt():
+    """Test of (almost) exponential extrapolator."""
+    for f in [f_poly_exp_down, f_poly_exp_up]:
+        # test that, for a non-linear exponent,
+        # order=1 is bad while order=2 is better.
+        algo_object = PolyExpFactory(X_VALS, order=1, asymptote=A)
+        run_factory(algo_object, f)
+        assert not np.isclose(algo_object.reduce(), f(0, err=0), atol=NOT_CLOSE_TOL)
+        algo_object = PolyExpFactory(X_VALS, order=2, asymptote=A)
+        run_factory(algo_object, f)
+        assert np.isclose(algo_object.reduce(), f(0, err=0), atol=CLOSE_TOL)
 
 
-def test_decay_factory_no_asympt():
-    """Test of exponential decay extrapolator."""
-    algo_object = DecayFactory(X_VALS, asymptote=None)
-    run_factory(algo_object, f_decay)
-    assert np.isclose(algo_object.reduce(), f_decay(0, err=0), atol=CLOSE_TOL)
+def test_exp_factory_no_asympt():
+    for f in [f_exp_down, f_exp_up]:
+        """Test of exponential extrapolator."""
+        algo_object = ExpFactory(X_VALS, asymptote=None)
+        run_factory(algo_object, f)
+        assert np.isclose(algo_object.reduce(), f(0, err=0), atol=CLOSE_TOL)
 
 
-def test_poly_decay_factory_no_asympt():
-    """Test of (almost) exponential decay extrapolator."""
-    # test that, for a decay with a non-linear exponent,
-    # order=1 is bad while order=2 is better.
-    algo_object = PolyDecayFactory(X_VALS, order=1, asymptote=None)
-    run_factory(algo_object, f_poly_decay)
-    assert not np.isclose(algo_object.reduce(), f_poly_decay(0, err=0), atol=NOT_CLOSE_TOL)
-    algo_object = PolyDecayFactory(X_VALS, order=2, asymptote=None)
-    run_factory(algo_object, f_poly_decay)
-    assert np.isclose(algo_object.reduce(), f_poly_decay(0, err=0), atol=CLOSE_TOL)
+def test_poly_exp_factory_no_asympt():
+    """Test of (almost) exponential extrapolator."""
+    for f in [f_poly_exp_down, f_poly_exp_up]:
+        # test that, for a non-linear exponent,
+        # order=1 is bad while order=2 is better.
+        algo_object = PolyExpFactory(X_VALS, order=1, asymptote=None)
+        run_factory(algo_object, f)
+        assert not np.isclose(algo_object.reduce(), f(0, err=0), atol=NOT_CLOSE_TOL)
+        algo_object = PolyExpFactory(X_VALS, order=2, asymptote=None)
+        run_factory(algo_object, f)
+        assert np.isclose(algo_object.reduce(), f(0, err=0), atol=CLOSE_TOL)
