@@ -7,7 +7,10 @@ import numpy as np
 import pytest
 from cirq import (Circuit, GridQubit, LineQubit, ops, CircuitDag)
 
-from mitiq.folding_cirq import (_update_moment_indices,
+from mitiq.folding_cirq import (_is_measurement,
+                                _pop_measurements,
+                                _append_measurements,
+                                _update_moment_indices,
                                 _fold_gate_at_index_in_moment,
                                 _fold_gates_in_moment,
                                 fold_gates,
@@ -45,6 +48,49 @@ def _equal(circuit_one: Circuit, circuit_two: Circuit) -> bool:
         circuit_two: Input circuit to compare to circuit_one.
     """
     return CircuitDag.from_circuit(circuit_one) == CircuitDag.from_circuit(circuit_two)
+
+
+def test_is_measurement():
+    """Tests for checking if operations are measurements."""
+    # Test circuit:
+    # 0: ───H───X───Z───
+    qbit = LineQubit(0)
+    circ = Circuit(
+        [ops.H.on(qbit), ops.X.on(qbit), ops.Z.on(qbit), ops.measure(qbit)]
+    )
+    for (i, op) in enumerate(circ.all_operations()):
+        if i == 3:
+            assert _is_measurement(op)
+        else:
+            assert not _is_measurement(op)
+
+
+def test_pop_measurements_and_add_measurements():
+    """Tests popping measurements from a circuit.."""
+    # Test circuit:
+    # 0: ───H───T───@───M───
+    #               │   │
+    # 1: ───H───M───┼───┼───
+    #               │   │
+    # 2: ───H───────X───M───
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(qreg)],
+        [ops.T.on(qreg[0])],
+        [ops.measure(qreg[1])],
+        [ops.CNOT.on(qreg[0], qreg[2])],
+        [ops.measure(qreg[0], qreg[2])]
+    )
+    copy = deepcopy(circ)
+    measurements = _pop_measurements(copy)
+    correct = Circuit(
+        [ops.H.on_each(qreg)],
+        [ops.T.on(qreg[0])],
+        [ops.CNOT.on(qreg[0], qreg[2])],
+    )
+    assert _equal(copy, correct)
+    _append_measurements(copy, measurements)
+    assert _equal(copy, circ)
 
 
 def test_update_moment_indices():
@@ -452,6 +498,78 @@ def test_fold_from_left_bad_stretch():
         fold_gates_from_left(circuit, stretch=10)
 
 
+def test_fold_from_left_with_terminal_measurements_min_stretch():
+    """Tests folding from left with terminal measurements."""
+    # Test circuit
+    # 0: ───H───@───@───M
+    #           │   │
+    # 1: ───H───X───@───M
+    #               │
+    # 2: ───H───T───X───M
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+    folded = fold_gates_from_left(circ, stretch=1.)
+    correct = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+    assert _equal(folded, correct)
+
+
+def test_fold_from_left_with_terminal_measurements_max_stretch():
+    """Tests folding from left with terminal measurements."""
+    # Test circuit
+    # 0: ───H───@───@───M
+    #           │   │
+    # 1: ───H───X───@───M
+    #               │
+    # 2: ───H───T───X───M
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+    folded = fold_gates_from_left(circ, stretch=3.)
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+        [ops.T.on(qreg[2]), ops.T.on(qreg[2])**-1, ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3,
+        [ops.measure_each(*qreg)]
+    )
+    assert _equal(folded, correct)
+
+
+@pytest.mark.parametrize(["fold_method"],
+                         [[fold_gates_from_left],
+                          [fold_gates_from_right],
+                          [fold_gates_at_random]])
+def test_fold_with_intermediate_measurements_raises_error(fold_method):
+    """Tests folding from left with intermediate measurements."""
+    # Test circuit
+    #
+    qbit = LineQubit(0)
+    circ = Circuit(
+        [ops.H.on(qbit)],
+        [ops.measure(qbit)],
+        [ops.T.on(qbit)]
+    )
+    with pytest.raises(ValueError):
+        fold_method(circ, stretch=2.)
+
+
 def test_fold_from_right_basic():
     """Tests folding gates from the right for a two-qubit circuit."""
     # Test circuit:
@@ -506,6 +624,60 @@ def test_fold_from_right_max_stretch():
     assert _equal(left_folded, right_folded)
 
 
+def test_fold_from_right_with_terminal_measurements_min_stretch():
+    """Tests folding from left with terminal measurements."""
+    # Test circuit
+    # 0: ───H───@───@───M
+    #           │   │
+    # 1: ───H───X───@───M
+    #               │
+    # 2: ───H───T───X───M
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+    folded = fold_gates_from_right(circ, stretch=1.)
+    correct = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+    assert _equal(folded, correct)
+
+
+def test_fold_from_right_with_terminal_measurements_max_stretch():
+    """Tests folding from left with terminal measurements."""
+    # Test circuit
+    # 0: ───H───@───@───M
+    #           │   │
+    # 1: ───H───X───@───M
+    #               │
+    # 2: ───H───T───X───M
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+    folded = fold_gates_from_right(circ, stretch=3.)
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+        [ops.T.on(qreg[2]), ops.T.on(qreg[2])**-1, ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3,
+        [ops.measure_each(*qreg)]
+    )
+    assert _equal(folded, correct)
+
+
 def test_fold_gates_at_random_no_stretch():
     """Tests folded circuit is identical for a stretch factor of one."""
     circuit = random_circuit(10)
@@ -519,8 +691,8 @@ def test_fold_gates_at_random_seed_one_qubit():
     circuit = Circuit(
         [ops.X.on(qubit), ops.Y.on(qubit), ops.Z.on(qubit)]
     )
-    # Small stretch, fold one gate
-    folded = fold_gates_at_random(circuit, stretch=2, seed=1)
+    # Small stretch
+    folded = fold_gates_at_random(circuit, stretch=1.4, seed=1)
     correct = Circuit(
         [ops.X.on(qubit)],
         [ops.Y.on(qubit)] * 3,
@@ -531,7 +703,7 @@ def test_fold_gates_at_random_seed_one_qubit():
     # Medium stretch, fold two gates
     folded = fold_gates_at_random(circuit, stretch=2.5, seed=1)
     correct = Circuit(
-        [ops.X.on(qubit)] ,
+        [ops.X.on(qubit)],
         [ops.Y.on(qubit)] * 3,
         [ops.Z.on(qubit)] * 3,
     )
@@ -627,6 +799,60 @@ def test_fold_random_no_repeats():
         assert all(count <= 3 for count in counts.values())
 
 
+def test_fold_random_with_terminal_measurements_min_stretch():
+    """Tests folding from left with terminal measurements."""
+    # Test circuit
+    # 0: ───H───@───@───M
+    #           │   │
+    # 1: ───H───X───@───M
+    #               │
+    # 2: ───H───T───X───M
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+    folded = fold_gates_at_random(circ, stretch=1.)
+    correct = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+    assert _equal(folded, correct)
+
+
+def test_fold_random_with_terminal_measurements_max_stretch():
+    """Tests folding from left with terminal measurements."""
+    # Test circuit
+    # 0: ───H───@───@───M
+    #           │   │
+    # 1: ───H───X───@───M
+    #               │
+    # 2: ───H───T───X───M
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+    folded = fold_gates_at_random(circ, stretch=3.)
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+        [ops.T.on(qreg[2]), ops.T.on(qreg[2])**-1, ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3,
+        [ops.measure_each(*qreg)]
+    )
+    assert _equal(folded, correct)
+
+
 def test_fold_local_small_stretch_from_left():
     """Test for local folding with stretch < 3."""
     qreg = LineQubit.range(3)
@@ -660,8 +886,9 @@ def test_fold_local_big_stretch_from_left():
     )
     folded = fold_local(circ, stretch=4, fold_method=fold_gates_from_left)
     correct = Circuit(
-        [ops.H.on(qreg[0])] * 4,
-        [ops.H.on_each(*qreg)] * 3,
+        [ops.H.on(qreg[0])] * 7,
+        [ops.H.on(qreg[1])] * 5,
+        [ops.H.on(qreg[2])] * 3,
         [ops.CNOT.on(qreg[0], qreg[1])] * 3,
         [ops.T.on(qreg[2]), ops.T.on(qreg[2]) ** -1, ops.T.on(qreg[2])],
         [ops.TOFFOLI.on(*qreg)] * 3
