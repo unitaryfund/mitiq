@@ -21,7 +21,7 @@ def _pop_measurements(circuit: Circuit):
     """Removes all measurements from a circuit."""
     measurements_generator = circuit.findall_operations(_is_measurement)
     # Make measurements a list of lists so moment indices can be updated after gates are folded
-    measurements = []
+    measurements = [list(m) for m in measurements_generator]
     for m in measurements_generator:
         measurements.append(list(m))
     circuit.batch_remove(measurements)
