@@ -1,6 +1,6 @@
 """Functions to fold gates in Cirq circuits."""
 from copy import deepcopy
-from typing import (Any, Callable, Iterable, List, Optional, Sequence, Tuple)
+from typing import (Any, Callable, Iterable, List, Optional, Tuple, Union)
 
 import numpy as np
 
@@ -17,19 +17,17 @@ def _is_measurement(op: ops.Operation) -> bool:
     return isinstance(op.gate, ops.measurement_gate.MeasurementGate)
 
 
-def _pop_measurements(circuit: Circuit):
+def _pop_measurements(circuit: Circuit) -> List[List[Union[int, ops.Operation]]]:
     """Removes all measurements from a circuit."""
-    measurements_generator = circuit.findall_operations(_is_measurement)
-    # Make measurements a list of lists so moment indices can be updated after gates are folded
-    measurements = [list(m) for m in measurements_generator]
-    for m in measurements_generator:
-        measurements.append(list(m))
+    measurements = [list(m) for m in circuit.findall_operations(_is_measurement)]
     circuit.batch_remove(measurements)
     return measurements
 
 
-def _add_measurements(circuit: Circuit, measurements: Iterable[Tuple[int, ops.Operation]]) -> None:
-    """Adds all measurements into the circuit."""
+def _append_measurements(circuit: Circuit, measurements: List[Union[int, ops.Operation]]) -> None:
+    """Appends all measurements into the final moment of the circuit."""
+    for i in range(len(measurements)):
+        measurements[i][0] = -1  # Make sure the moment to insert into is the last in the circuit
     circuit.batch_insert(measurements)
 
 
@@ -161,15 +159,13 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
     add = False
     if folded.has_measurements():
         measurements = _pop_measurements(folded)
-        for i in range(len(measurements)):
-            measurements[i][0] = -1  # Make sure the moment to insert into is the last in the circuit
         add = True
 
     ngates = len(list(folded.all_operations()))
     num_to_fold = _get_num_to_fold(stretch, ngates)
     if num_to_fold == 0:
         if add:
-            _add_measurements(folded, measurements)
+            _append_measurements(folded, measurements)
         return folded
     num_folded = 0
     moment_shift = 0
@@ -181,7 +177,7 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
             num_folded += 1
             if num_folded == num_to_fold:
                 if add:
-                    _add_measurements(folded, measurements)
+                    _append_measurements(folded, measurements)
                 return folded
 
 
@@ -205,15 +201,13 @@ def fold_gates_from_right(circuit: Circuit, stretch: float) -> Circuit:
     add = False
     if circuit.has_measurements():
         measurements = _pop_measurements(circuit)
-        for i in range(len(measurements)):
-            measurements[i][0] = -1  # Make sure the moment to insert into is the last in the circuit
         add = True
 
     reversed_circuit = Circuit(reversed(circuit))
     reversed_folded_circuit = fold_gates_from_left(reversed_circuit, stretch)
     folded = Circuit(reversed(reversed_folded_circuit))
     if add:
-        _add_measurements(folded, measurements)
+        _append_measurements(folded, measurements)
     return folded
 
 
@@ -270,14 +264,12 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int] =
     add = False
     if folded.has_measurements():
         measurements = _pop_measurements(folded)
-        for i in range(len(measurements)):
-            measurements[i][0] = -1  # Make sure the moment to insert into is the last in the circuit
         add = True
 
     if np.isclose(stretch, 3.0, atol=1e-3):
         _fold_all_gates_locally(folded)
         if add:
-            _add_measurements(folded, measurements)
+            _append_measurements(folded, measurements)
         return folded
 
     if seed:
@@ -314,7 +306,7 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int] =
             remaining_moment_indices.remove(moment_index)
 
     if add:
-        _add_measurements(folded, measurements)
+        _append_measurements(folded, measurements)
     return folded
 
 

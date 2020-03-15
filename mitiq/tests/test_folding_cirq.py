@@ -9,7 +9,7 @@ from cirq import (Circuit, GridQubit, LineQubit, ops, CircuitDag)
 
 from mitiq.folding_cirq import (_is_measurement,
                                 _pop_measurements,
-                                _add_measurements,
+                                _append_measurements,
                                 _update_moment_indices,
                                 _fold_gate_at_index_in_moment,
                                 _fold_gates_in_moment,
@@ -89,7 +89,7 @@ def test_pop_measurements_and_add_measurements():
         [ops.CNOT.on(qreg[0], qreg[2])],
     )
     assert _equal(copy, correct)
-    _add_measurements(copy, measurements)
+    _append_measurements(copy, measurements)
     assert _equal(copy, circ)
 
 
