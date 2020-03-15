@@ -156,16 +156,12 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
 
     folded = deepcopy(circuit)
 
-    add = False
-    if folded.has_measurements():
-        measurements = _pop_measurements(folded)
-        add = True
+    measurements = _pop_measurements(folded)
 
     ngates = len(list(folded.all_operations()))
     num_to_fold = _get_num_to_fold(stretch, ngates)
     if num_to_fold == 0:
-        if add:
-            _append_measurements(folded, measurements)
+        _append_measurements(folded, measurements)
         return folded
     num_folded = 0
     moment_shift = 0
@@ -176,8 +172,7 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
             moment_shift += 2
             num_folded += 1
             if num_folded == num_to_fold:
-                if add:
-                    _append_measurements(folded, measurements)
+                _append_measurements(folded, measurements)
                 return folded
 
 
@@ -198,16 +193,12 @@ def fold_gates_from_right(circuit: Circuit, stretch: float) -> Circuit:
     if not circuit.are_all_measurements_terminal():
         raise ValueError(f"Input circuit contains intermediate measurements and cannot be folded.")
 
-    add = False
-    if circuit.has_measurements():
-        measurements = _pop_measurements(circuit)
-        add = True
+    measurements = _pop_measurements(circuit)
 
     reversed_circuit = Circuit(reversed(circuit))
     reversed_folded_circuit = fold_gates_from_left(reversed_circuit, stretch)
     folded = Circuit(reversed(reversed_folded_circuit))
-    if add:
-        _append_measurements(folded, measurements)
+    _append_measurements(folded, measurements)
     return folded
 
 
@@ -261,15 +252,11 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int] =
 
     folded = deepcopy(circuit)
 
-    add = False
-    if folded.has_measurements():
-        measurements = _pop_measurements(folded)
-        add = True
+    measurements = _pop_measurements(folded)
 
     if np.isclose(stretch, 3.0, atol=1e-3):
         _fold_all_gates_locally(folded)
-        if add:
-            _append_measurements(folded, measurements)
+        _append_measurements(folded, measurements)
         return folded
 
     if seed:
@@ -305,8 +292,7 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int] =
         if not remaining_gate_indices[moment_index]:
             remaining_moment_indices.remove(moment_index)
 
-    if add:
-        _append_measurements(folded, measurements)
+    _append_measurements(folded, measurements)
     return folded
 
 
