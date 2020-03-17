@@ -13,7 +13,11 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-
+sys.path.insert(0, os.path.abspath('.'))
+#sys.path.append(os.path.abspath('../mitiq/'))
+sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../../'))
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
@@ -24,7 +28,8 @@ author = 'Tech Team @ Unitary Fund'
 # The full version, including alpha/beta/rc tags
 release = '0.1.0'
 
-
+import sys, os
+sys.path.append(os.path.abspath('sphinxext'))
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -38,12 +43,10 @@ extensions = ['sphinx.ext.mathjax',
               'sphinx.ext.todo',
               'sphinx.ext.doctest',
               'sphinx.ext.autosummary',
-              'numpydoc',
               'sphinx.ext.extlinks',
               'sphinx.ext.viewcode',
               'sphinx.ext.ifconfig',
               'sphinx.ext.napoleon',
-              'sphinx_gallery.gen_gallery'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
