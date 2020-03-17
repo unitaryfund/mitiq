@@ -7,6 +7,7 @@ from mitiq.factories import (
     PolyFactory,
     ExpFactory,
     PolyExpFactory,
+    AdaExpFactory,
 )
 from mitiq.zne import run_factory
 
@@ -121,5 +122,33 @@ def test_poly_exp_factory_no_asympt():
         run_factory(algo_object, f)
         assert not np.isclose(algo_object.reduce(), f(0, err=0), atol=NOT_CLOSE_TOL)
         algo_object = PolyExpFactory(X_VALS, order=2, asymptote=None)
+        run_factory(algo_object, f)
+        assert np.isclose(algo_object.reduce(), f(0, err=0), atol=CLOSE_TOL)
+
+def test_ada_exp_factory_with_asympt():
+    """Test of the adaptive exponential extrapolator."""
+    for f in [f_exp_down, f_exp_up]:
+        algo_object = AdaExpFactory(steps=3, scalar=2.0, asymptote=A)
+        run_factory(algo_object, f)
+        assert np.isclose(algo_object.reduce(), f(0, err=0), atol=CLOSE_TOL)
+
+def test_ada_exp_factory_with_asympt_more_steps():
+    """Test of the adaptive exponential extrapolator."""
+    for f in [f_exp_down, f_exp_up]:
+        algo_object = AdaExpFactory(steps=6, scalar=2.0, asymptote=A)
+        run_factory(algo_object, f)
+        assert np.isclose(algo_object.reduce(), f(0, err=0), atol=CLOSE_TOL)
+
+def test_ada_exp_factory_no_asympt():
+    """Test of the adaptive exponential extrapolator."""
+    for f in [f_exp_down, f_exp_up]:
+        algo_object = AdaExpFactory(steps=4, scalar=2.0, asymptote=None)
+        run_factory(algo_object, f)
+        assert np.isclose(algo_object.reduce(), f(0, err=0), atol=CLOSE_TOL)
+
+def test_ada_exp_factory_no_asympt_more_steps():
+    """Test of the adaptive exponential extrapolator."""
+    for f in [f_exp_down, f_exp_up]:
+        algo_object = AdaExpFactory(steps=8, scalar=2.0, asymptote=None)
         run_factory(algo_object, f)
         assert np.isclose(algo_object.reduce(), f(0, err=0), atol=CLOSE_TOL)
