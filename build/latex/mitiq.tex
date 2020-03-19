@@ -75,7 +75,7 @@
 
 
 \title{mitiq}
-\date{Mar 17, 2020}
+\date{Mar 19, 2020}
 \release{0.1.0}
 \author{Tech Team @ Unitary Fund}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -95,6 +95,43 @@
 \pagestyle{normal}
 \phantomsection\label{\detokenize{index::doc}}
 
+
+
+\chapter{Change Log}
+\label{\detokenize{changelog:change-log}}\label{\detokenize{changelog:changelog}}\label{\detokenize{changelog::doc}}
+
+\section{Version 0.1.0 (Date)}
+\label{\detokenize{changelog:version-0-1-0-date}}\begin{itemize}
+\item {} 
+\sphinxstylestrong{Initial release.}
+
+\end{itemize}
+
+
+\chapter{Users Guide}
+\label{\detokenize{guide/guide:users-guide}}\label{\detokenize{guide/guide:guide}}\label{\detokenize{guide/guide::doc}}
+
+\section{Overview of mitiq}
+\label{\detokenize{guide/guide-overview:overview-of-mitiq}}\label{\detokenize{guide/guide-overview::doc}}
+Welcome to \sphinxtitleref{mitiq} Users Guide. The library allows to postprocess results from quantum circuits with both analog and digital techniques, interfacing with a variety of quantum circuit libraries.
+
+
+\section{Zero Noise Extrapolation}
+\label{\detokenize{guide/guide-zne:zero-noise-extrapolation}}\label{\detokenize{guide/guide-zne::doc}}
+
+\subsection{Introduction}
+\label{\detokenize{guide/guide-zne:introduction}}
+Zero noise extrapolation (ZNE) was introduced concurrently in Ref. {[}1{]} and {[}2{]}.
+With \sphinxtitleref{mitiq.zne} module it is possible to extrapolate what the expected value would be without noise. This is done by first setting up one of the key objects in \sphinxtitleref{mitiq}, which is a \sphinxcode{\sphinxupquote{mitiq.Factory}} object.
+
+
+\subsection{Importing Quantum Circuits}
+\label{\detokenize{guide/guide-zne:importing-quantum-circuits}}
+\sphinxtitleref{mitiq} allows one to flexibly import and export quantum circuits from other libraries. Here is an example:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{k+kn}{from} \PYG{n+nn}{mitiq} \PYG{k+kn}{import} \PYG{n}{Factory}
+\end{sphinxVerbatim}
 
 
 \chapter{Indices and tables}

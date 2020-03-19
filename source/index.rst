@@ -10,10 +10,8 @@ Welcome to mitiq's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   :maxdepth: 1
-
    changelog.rst
-   guide.rst
+   guide/guide.rst
 
 Indices and tables
 ==================
