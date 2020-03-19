@@ -384,7 +384,7 @@ class AdaExpFactory(Factory):
         if len(self.instack) == 1:
             return self.scalar
         # If asymptote is None we use 2 * scalar as third noise parameter
-        if len(self.instack) == 2:
+        if (len(self.instack) == 2) and (self.asymptote is None):
             return 2 * self.scalar
         # Call self.reduce() in order to update self.history
         self.reduce()
