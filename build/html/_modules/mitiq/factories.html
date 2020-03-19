@@ -1,0 +1,426 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="Python">
+  <head>
+    <meta charset="utf-8" />
+    <title>mitiq.factories &#8212; mitiq 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for mitiq.factories</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Contains all the main classes corresponding to different zero-noise extrapolation methods.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">curve_fit</span>
+
+<div class="viewcode-block" id="Factory"><a class="viewcode-back" href="../../index.html#mitiq.factories.Factory">[docs]</a><span class="k">class</span> <span class="nc">Factory</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstract class designed to adaptively produce a new noise scaling parameter</span>
+<span class="sd">    based on a historical stack of previous noise scale parameters (&quot;self.instack&quot;)</span>
+<span class="sd">    and previously estimated expectation values (&quot;self.outstack&quot;).</span>
+
+<span class="sd">    Specific zero-noise extrapolation algorithms, adaptive or non-adaptive,</span>
+<span class="sd">    are derived from this class.</span>
+<span class="sd">    A Factory object is not supposed to directly perform any quantum computation,</span>
+<span class="sd">    only the classical results of quantum experiments are processed by it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization arguments (e.g. noise scale factors) depend on the particular extrapolation</span>
+<span class="sd">        algorithm and can be added to the &quot;__init__&quot; method of the associated derived class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instack</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outstack</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="Factory.push"><a class="viewcode-back" href="../../index.html#mitiq.factories.Factory.push">[docs]</a>    <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instack_val</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">outstack_val</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Appends &quot;instack_val&quot; to &quot;self.instack&quot; and &quot;outstack_val&quot; to &quot;self.outstack&quot;.</span>
+<span class="sd">        Each time a new expectation value is computed this method should be used</span>
+<span class="sd">        to update the internal state of the Factory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instack_val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outstack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">outstack_val</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Factory.next"><a class="viewcode-back" href="../../index.html#mitiq.factories.Factory.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the next noise level to execute a circuit at.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="Factory.is_converged"><a class="viewcode-back" href="../../index.html#mitiq.factories.Factory.is_converged">[docs]</a>    <span class="k">def</span> <span class="nf">is_converged</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns True if all needed expectation values have been computed, else False.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="Factory.reduce"><a class="viewcode-back" href="../../index.html#mitiq.factories.Factory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the extrapolation to the zero-noise limit.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+
+
+<div class="viewcode-block" id="BatchedFactory"><a class="viewcode-back" href="../../index.html#mitiq.factories.BatchedFactory">[docs]</a><span class="k">class</span> <span class="nc">BatchedFactory</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstract class of a non-adaptive Factory.</span>
+
+<span class="sd">    This is initialized with a given batch of scaling factors (&quot;scalars&quot;).</span>
+<span class="sd">    The &quot;self.next&quot; method trivially iterates over the elements of &quot;scalars&quot;</span>
+<span class="sd">    in a non-adaptive way.</span>
+<span class="sd">    Convergence is achieved when all the correpsonding expectation values have been measured.</span>
+
+<span class="sd">    Specific (non-adaptive) zero-noise extrapolation algorithms can be derived from this class by</span>
+<span class="sd">    overriding the &quot;self.reduce&quot; and (if necessary) the &quot;__init__&quot; method.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalars</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            scalars: Iterable of noise scale factors at which expectation values should be measured.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scalars</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The argument &#39;scalars&#39; should contain at least one element.&quot;</span>
+                <span class="s2">&quot;At least 2 elements are necessary for a non-trivial extrapolation.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span> <span class="o">=</span> <span class="n">scalars</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="BatchedFactory.next"><a class="viewcode-back" href="../../index.html#mitiq.factories.BatchedFactory.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">next_param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outstack</span><span class="p">)]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span>
+                <span class="s2">&quot;BatchedFactory cannot take another step. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Number of batched scalars ({len(self.scalars)}) exceeded.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">next_param</span></div>
+
+<div class="viewcode-block" id="BatchedFactory.is_converged"><a class="viewcode-back" href="../../index.html#mitiq.factories.BatchedFactory.is_converged">[docs]</a>    <span class="k">def</span> <span class="nf">is_converged</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outstack</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instack</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The length of &#39;self.instack&#39; ({len(self.instack)}) &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;and &#39;self.outstack&#39; ({len(self.outstack)}) must be equal.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outstack</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="PolyFactory"><a class="viewcode-back" href="../../index.html#mitiq.factories.PolyFactory">[docs]</a><span class="k">class</span> <span class="nc">PolyFactory</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Factory object implementing a zero-noise extrapolation algotrithm based on a polynomial fit.</span>
+<span class="sd">    Note: RichardsonFactory and LinearFactory are special cases of PolyFactory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalars</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">order</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            scalars: Iterable of noise scale factors at which expectation values should be measured.</span>
+<span class="sd">            order: Polynomial extrapolation order. It cannot exceed len(scalars) - 1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">scalars</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The extrapolation order cannot exceed len(scalars) - 1.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PolyFactory</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">scalars</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PolyFactory.static_reduce"><a class="viewcode-back" href="../../index.html#mitiq.factories.PolyFactory.static_reduce">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">static_reduce</span><span class="p">(</span><span class="n">instack</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">outstack</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">order</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines with a least squared method, the polynomial of degree equal to &#39;order&#39;</span>
+<span class="sd">        which optimally fits the input data. The zero-noise limit is returned.</span>
+
+<span class="sd">        This static method is equivalent to the &quot;self.reduce&quot; method of PolyFactory, but</span>
+<span class="sd">        can be called also by other factories which are particular cases of PolyFactory,</span>
+<span class="sd">        e.g., LinearFactory and RichardsonFactory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check arguments</span>
+        <span class="n">error_str</span> <span class="o">=</span> <span class="s2">&quot;Data is not enough: at least two data points are necessary.&quot;</span>
+        <span class="k">if</span> <span class="n">instack</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">outstack</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">instack</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">outstack</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">instack</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">instack</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Extrapolation order is too high. &quot;</span>
+                <span class="s2">&quot;The order cannot exceed the number of data points minus 1.&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># Get coefficients {c_j} of p(x)= c_0 + c_1*x + c_2*x**2... which best fits the data</span>
+        <span class="n">coefficients</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">instack</span><span class="p">,</span> <span class="n">outstack</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+        <span class="c1"># c_0, i.e., the value of p(x) at x=0, is returned</span>
+        <span class="k">return</span> <span class="n">coefficients</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="PolyFactory.reduce"><a class="viewcode-back" href="../../index.html#mitiq.factories.PolyFactory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines with a least squared method, the polynomial of degree equal to &quot;self.order&quot;</span>
+<span class="sd">        which optimally fits the input data. The zero-noise limit is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">PolyFactory</span><span class="o">.</span><span class="n">static_reduce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instack</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outstack</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="RichardsonFactory"><a class="viewcode-back" href="../../index.html#mitiq.factories.RichardsonFactory">[docs]</a><span class="k">class</span> <span class="nc">RichardsonFactory</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Factory object implementing Richardson&#39;s extrapolation.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RichardsonFactory.reduce"><a class="viewcode-back" href="../../index.html#mitiq.factories.RichardsonFactory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the Richardson&#39;s extrapolation to the zero-noise limit.&quot;&quot;&quot;</span>
+        <span class="c1"># Richardson&#39;s extrapolation is a particular case of a polynomial fit</span>
+        <span class="c1"># with order equal to the number of data points minus 1.</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instack</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">PolyFactory</span><span class="o">.</span><span class="n">static_reduce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instack</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outstack</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="LinearFactory"><a class="viewcode-back" href="../../index.html#mitiq.factories.LinearFactory">[docs]</a><span class="k">class</span> <span class="nc">LinearFactory</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Factory object implementing a zero-noise extrapolation algotrithm based on a linear fit.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LinearFactory.reduce"><a class="viewcode-back" href="../../index.html#mitiq.factories.LinearFactory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines, with a least squared method, the line of best fit</span>
+<span class="sd">        associated to the data points. The intercept is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Richardson&#39;s extrapolation is a particular case of a polynomial fit</span>
+        <span class="c1"># with order equal to 1.</span>
+        <span class="k">return</span> <span class="n">PolyFactory</span><span class="o">.</span><span class="n">static_reduce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instack</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outstack</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="ExpFactory"><a class="viewcode-back" href="../../index.html#mitiq.factories.ExpFactory">[docs]</a><span class="k">class</span> <span class="nc">ExpFactory</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Factory object implementing a zero-noise extrapolation algotrithm assuming an</span>
+<span class="sd">    exponential ansatz y(x) = a + b * exp(-c * x), with c &gt; 0.</span>
+
+<span class="sd">    If the asymptotic value (y(x-&gt;inf) = a) is known, a linear fit with respect</span>
+<span class="sd">    to z(x) := log[sing(b) (y(x) - a)] is used.</span>
+<span class="sd">    Otherwise, a non-linear fit of y(x) is perfomed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalars</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">asymptote</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            scalars: Iterable of noise scale factors at which expectation values should be measured.</span>
+<span class="sd">            asymptote: Infinite-noise limit (optional argument).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ExpFactory</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">scalars</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">asymptote</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">asymptote</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The argument &#39;asymptote&#39; must be either a float or None&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asymptote</span> <span class="o">=</span> <span class="n">asymptote</span>
+
+<div class="viewcode-block" id="ExpFactory.reduce"><a class="viewcode-back" href="../../index.html#mitiq.factories.ExpFactory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the zero-noise limit, assuming an exponential ansatz:</span>
+<span class="sd">        y(x) = a + b * exp(-c * x), with c &gt; 0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">PolyExpFactory</span><span class="o">.</span><span class="n">static_reduce</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instack</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outstack</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">asymptote</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="PolyExpFactory"><a class="viewcode-back" href="../../index.html#mitiq.factories.PolyExpFactory">[docs]</a><span class="k">class</span> <span class="nc">PolyExpFactory</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Factory object implementing a zero-noise extrapolation algotrithm assuming an</span>
+<span class="sd">    (almost) exponential ansatz with a non linear exponent, i.e.:</span>
+
+<span class="sd">    y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.</span>
+
+<span class="sd">    The parameter &quot;s&quot; is a sign variable which can be either 1 or -1, corresponding to</span>
+<span class="sd">    decreasing and increasing exponentials, respectively. The parameter &quot;s&quot; is</span>
+<span class="sd">    automatically deduced from the data.</span>
+
+<span class="sd">    If the asymptotic value (y(x-&gt;inf) = a) is known, a linear fit with respect</span>
+<span class="sd">    to z(x) := log[s(y(x) - a)] is used.</span>
+<span class="sd">    Otherwise, a non-linear fit of y(x) is perfomed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalars</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">order</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> \
+                 <span class="n">asymptote</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            scalars: Iterable of noise scale factors at which expectation values should be measured.</span>
+<span class="sd">            order: Polynomial extrapolation order. It cannot exceed len(scalars) - 1.</span>
+<span class="sd">                   If asymptote is None, order cannot exceed len(scalars) - 2.</span>
+<span class="sd">            asymptote: Infinite-noise limit (optional argument).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PolyExpFactory</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">scalars</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">asymptote</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">asymptote</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The argument &#39;asymptote&#39; must be either a float or None&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asymptote</span> <span class="o">=</span> <span class="n">asymptote</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sign</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="PolyExpFactory.static_reduce"><a class="viewcode-back" href="../../index.html#mitiq.factories.PolyExpFactory.static_reduce">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">static_reduce</span><span class="p">(</span><span class="n">instack</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">outstack</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">asymptote</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> \
+                      <span class="n">order</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0e-9</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines the zero-noise limit, assuming an exponential ansatz:</span>
+<span class="sd">        y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.</span>
+
+<span class="sd">        The parameter &quot;s&quot; is a sign variable which can be either 1 or -1, corresponding to</span>
+<span class="sd">        decreasing and increasing exponentials, respectively. The parameter &quot;s&quot; is</span>
+<span class="sd">        automatically deduced from the data.</span>
+
+<span class="sd">        It is also assumed that z(x--&gt;inf)=-inf, such that y(x--&gt;inf)--&gt;a.</span>
+
+<span class="sd">        If asymptote is None, the ansatz y(x) is fitted with a non-linear optimization.</span>
+<span class="sd">        Otherwise, a linear fit with respect to z(x) := log(sign * (y(x) - asymptote))</span>
+<span class="sd">        is performed.</span>
+
+<span class="sd">        This static method is equivalent to the &quot;self.reduce&quot; method of PolyExpFactory,</span>
+<span class="sd">        but can be called also by other factories which are particular cases of PolyExpFactory,</span>
+<span class="sd">        e.g., ExpFactory.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            instack: x data values.</span>
+<span class="sd">            outstack: y data values.</span>
+<span class="sd">            asymptote: y(x-&gt;inf).</span>
+<span class="sd">            order: extrapolation order.</span>
+<span class="sd">            eps: epsilon to regularize log(sign (instack - asymptote)) when</span>
+<span class="sd">                 the argument is to close to zero or negative.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Shift is 0 if asymptote is given, 1 if asymptote is not given</span>
+        <span class="n">shift</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">asymptote</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># Check arguments</span>
+        <span class="n">error_str</span> <span class="o">=</span> <span class="s2">&quot;Data is not enough: at least two data points are necessary.&quot;</span>
+        <span class="k">if</span> <span class="n">instack</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">outstack</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">instack</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">outstack</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">instack</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">instack</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">shift</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Extrapolation order is too high. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;The order cannot exceed the number of data points minus {1 + shift}.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># CASE 1: asymptote is None.</span>
+        <span class="c1"># TODO: it works, but there must be better way of doing this.</span>
+        <span class="c1"># Note: *args does not seem to work with curve_fit.</span>
+        <span class="c1"># For the moment only orders up to 3 are suppoerted.</span>
+        <span class="k">def</span> <span class="nf">ansatz_zero</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">asympt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;Ansatz function of order 0&quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="n">asympt</span> <span class="o">+</span> <span class="n">b</span>
+        <span class="k">def</span> <span class="nf">ansatz_one</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">asympt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z_one</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;Ansatz function of order 1&quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="n">asympt</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z_one</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">ansatz_two</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">asympt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z_one</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z_two</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;Ansatz function of order 2.&quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="n">asympt</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z_one</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="n">z_two</span> <span class="o">*</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">ansatz_three</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">asympt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z_one</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z_two</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z_three</span><span class="p">:</span> <span class="nb">float</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;Ansatz function of order 3.&quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="n">asympt</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z_one</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="n">z_two</span> <span class="o">*</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">z_three</span> <span class="o">*</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="n">ansatzes</span> <span class="o">=</span> <span class="p">(</span><span class="n">ansatz_zero</span><span class="p">,</span> <span class="n">ansatz_one</span><span class="p">,</span> <span class="n">ansatz_two</span><span class="p">,</span> <span class="n">ansatz_three</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">asymptote</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">opt_params</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">ansatzes</span><span class="p">[</span><span class="n">order</span><span class="p">],</span> <span class="n">instack</span><span class="p">,</span> <span class="n">outstack</span><span class="p">)</span>
+            <span class="c1"># Return ansatz(0)= asympt + b</span>
+            <span class="k">return</span> <span class="n">opt_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">opt_params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># CASE 2: asymptote is given.</span>
+        <span class="c1"># deduce if the exponential is a decay or a growth</span>
+        <span class="n">mean_y</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">outstack</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">outstack</span><span class="p">)</span>
+        <span class="n">sign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">mean_y</span> <span class="o">-</span> <span class="n">asymptote</span><span class="p">)</span>
+        <span class="c1"># Polynomial fit of z(x).</span>
+        <span class="n">zstack</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">sign</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">asymptote</span><span class="p">),</span> <span class="n">eps</span><span class="p">))</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">outstack</span><span class="p">]</span>
+        <span class="c1"># Get coefficients {z_j} of z(x)= z_0 + z_1*x + z_2*x**2...</span>
+        <span class="c1"># Note: coefficients are ordered from high powers of x to low powers x.</span>
+        <span class="n">z_coefficients</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">instack</span><span class="p">,</span> <span class="n">zstack</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+        <span class="c1"># return f(x=0)</span>
+        <span class="k">return</span> <span class="n">asymptote</span> <span class="o">+</span> <span class="n">sign</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z_coefficients</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="PolyExpFactory.reduce"><a class="viewcode-back" href="../../index.html#mitiq.factories.PolyExpFactory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the zero-noise limit, assuming an exponential ansatz:</span>
+<span class="sd">        y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.</span>
+<span class="sd">        The parameter &quot;s&quot; is a sign variable which can be either 1 or -1, corresponding to</span>
+<span class="sd">        decreasing and increasing exponentials, respectively. The parameter &quot;s&quot; is</span>
+<span class="sd">        automatically deduced from the data.</span>
+<span class="sd">        It is also assumed that z(x--&gt;inf)=-inf, such that y(x--&gt;inf)--&gt;a.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_reduce</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instack</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outstack</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">asymptote</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">mitiq</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guide/guide.html">Users Guide</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  <li><a href="../mitiq.html">mitiq</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Tech Team @ Unitary Fund.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

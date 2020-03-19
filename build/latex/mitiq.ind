@@ -1,0 +1,64 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter B
+  \item \spxentry{BatchedFactory}\spxextra{class in mitiq.factories}, \hyperpage{3}
+
+  \indexspace
+  \bigletter E
+  \item \spxentry{ExpFactory}\spxextra{class in mitiq.factories}, \hyperpage{4}
+
+  \indexspace
+  \bigletter F
+  \item \spxentry{Factory}\spxextra{class in mitiq.factories}, \hyperpage{4}
+
+  \indexspace
+  \bigletter I
+  \item \spxentry{is\_converged()}\spxextra{mitiq.factories.BatchedFactory method}, \hyperpage{4}
+  \item \spxentry{is\_converged()}\spxextra{mitiq.factories.Factory method}, \hyperpage{4}
+
+  \indexspace
+  \bigletter L
+  \item \spxentry{LinearFactory}\spxextra{class in mitiq.factories}, \hyperpage{4}
+
+  \indexspace
+  \bigletter M
+  \item \spxentry{mitiq}\spxextra{module}, \hyperpage{3}
+  \item \spxentry{mitiq.factories}\spxextra{module}, \hyperpage{3}
+
+  \indexspace
+  \bigletter N
+  \item \spxentry{next()}\spxextra{mitiq.factories.BatchedFactory method}, \hyperpage{4}
+  \item \spxentry{next()}\spxextra{mitiq.factories.Factory method}, \hyperpage{4}
+
+  \indexspace
+  \bigletter P
+  \item \spxentry{PolyExpFactory}\spxextra{class in mitiq.factories}, \hyperpage{4}
+  \item \spxentry{PolyFactory}\spxextra{class in mitiq.factories}, \hyperpage{5}
+  \item \spxentry{push()}\spxextra{mitiq.factories.Factory method}, \hyperpage{4}
+
+  \indexspace
+  \bigletter R
+  \item \spxentry{reduce()}\spxextra{mitiq.factories.ExpFactory method}, \hyperpage{4}
+  \item \spxentry{reduce()}\spxextra{mitiq.factories.Factory method}, \hyperpage{4}
+  \item \spxentry{reduce()}\spxextra{mitiq.factories.LinearFactory method}, \hyperpage{4}
+  \item \spxentry{reduce()}\spxextra{mitiq.factories.PolyExpFactory method}, \hyperpage{5}
+  \item \spxentry{reduce()}\spxextra{mitiq.factories.PolyFactory method}, \hyperpage{5}
+  \item \spxentry{reduce()}\spxextra{mitiq.factories.RichardsonFactory method}, \hyperpage{5}
+  \item \spxentry{RichardsonFactory}\spxextra{class in mitiq.factories}, \hyperpage{5}
+
+  \indexspace
+  \bigletter S
+  \item \spxentry{static\_reduce()}\spxextra{mitiq.factories.PolyExpFactory static method}, 
+		\hyperpage{5}
+  \item \spxentry{static\_reduce()}\spxextra{mitiq.factories.PolyFactory static method}, 
+		\hyperpage{5}
+
+  \indexspace
+  \bigletter V
+  \item \spxentry{version()}\spxextra{in module mitiq}, \hyperpage{3}
+
+\end{sphinxtheindex}

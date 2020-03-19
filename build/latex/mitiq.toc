@@ -6,4 +6,6 @@
 \contentsline {section}{\numberline {2.2}Zero Noise Extrapolation}{3}{section.2.2}
 \contentsline {subsection}{\numberline {2.2.1}Introduction}{3}{subsection.2.2.1}
 \contentsline {subsection}{\numberline {2.2.2}Importing Quantum Circuits}{3}{subsection.2.2.2}
-\contentsline {chapter}{\numberline {3}Indices and tables}{5}{chapter.3}
+\contentsline {chapter}{\numberline {3}Indices and tables}{7}{chapter.3}
+\contentsline {chapter}{Python Module Index}{9}{section*.26}
+\contentsline {chapter}{Index}{11}{section*.27}

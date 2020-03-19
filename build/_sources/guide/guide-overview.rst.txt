@@ -5,5 +5,9 @@
 
 Overview of mitiq
 =================
+Welcome to `mitiq` Users Guide.
 
-Welcome to `mitiq` Users Guide. The library allows to postprocess results from quantum circuits with both analog and digital techniques, interfacing with a variety of quantum circuit libraries.
+
+Mitiq is an open source toolkit for implementing error mitigation techniques on most current intermediate-scale quantum computers.
+
+The library allows to postprocess results from quantum circuits with both analog and digital techniques, interfacing with a variety of quantum circuit libraries.

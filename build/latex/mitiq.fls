@@ -277,6 +277,7 @@ INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/times/ptmr8t.tfm
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrr8t.tfm
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrr8t.tfm
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrb8t.tfm
+INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrb8t.tfm
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/vf/adobe/times/ptmri8t.vf
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/times/ptmri8r.tfm
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/vf/adobe/courier/pcrr8t.vf
@@ -285,12 +286,15 @@ INPUT /usr/local/texlive/2017/texmf-dist/fonts/vf/adobe/courier/pcrb8t.vf
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrb8r.tfm
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/vf/adobe/courier/pcrr8t.vf
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrr8r.tfm
+INPUT /usr/local/texlive/2017/texmf-dist/fonts/vf/adobe/courier/pcrb8t.vf
+INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrb8r.tfm
 INPUT mitiq.ind
 INPUT mitiq.ind
 INPUT mitiq.aux
 INPUT ./mitiq.out
 INPUT ./mitiq.out
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/enc/dvips/base/8r.enc
+INPUT /usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/type1/urw/courier/ucrb8a.pfb
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb

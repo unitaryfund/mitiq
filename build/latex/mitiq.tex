@@ -113,7 +113,11 @@
 
 \section{Overview of mitiq}
 \label{\detokenize{guide/guide-overview:overview-of-mitiq}}\label{\detokenize{guide/guide-overview::doc}}
-Welcome to \sphinxtitleref{mitiq} Users Guide. The library allows to postprocess results from quantum circuits with both analog and digital techniques, interfacing with a variety of quantum circuit libraries.
+Welcome to \sphinxtitleref{mitiq} Users Guide.
+
+Mitiq is an open source toolkit for implementing error mitigation techniques on most current intermediate\sphinxhyphen{}scale quantum computers.
+
+The library allows to postprocess results from quantum circuits with both analog and digital techniques, interfacing with a variety of quantum circuit libraries.
 
 
 \section{Zero Noise Extrapolation}
@@ -132,6 +136,262 @@ With \sphinxtitleref{mitiq.zne} module it is possible to extrapolate what the ex
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{k+kn}{from} \PYG{n+nn}{mitiq} \PYG{k+kn}{import} \PYG{n}{Factory}
 \end{sphinxVerbatim}
+\phantomsection\label{\detokenize{index:module-mitiq}}\index{mitiq (module)@\spxentry{mitiq}\spxextra{module}}
+This is the top level module from which functions and classes of
+Mitiq can be directly imported.
+\index{version() (in module mitiq)@\spxentry{version()}\spxextra{in module mitiq}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.version}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.}}\sphinxbfcode{\sphinxupquote{version}}}{}{}
+Returns the Mitiq version number.
+
+\end{fulllineitems}
+
+\phantomsection\label{\detokenize{index:module-mitiq.factories}}\index{mitiq.factories (module)@\spxentry{mitiq.factories}\spxextra{module}}
+Contains all the main classes corresponding to different zero\sphinxhyphen{}noise extrapolation methods.
+\index{BatchedFactory (class in mitiq.factories)@\spxentry{BatchedFactory}\spxextra{class in mitiq.factories}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.BatchedFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{BatchedFactory}}}{\emph{scalars: Iterable{[}float{]}}}{}
+Abstract class of a non\sphinxhyphen{}adaptive Factory.
+
+This is initialized with a given batch of scaling factors ("scalars").
+The "self.next" method trivially iterates over the elements of "scalars"
+in a non\sphinxhyphen{}adaptive way.
+Convergence is achieved when all the correpsonding expectation values have been measured.
+
+Specific (non\sphinxhyphen{}adaptive) zero\sphinxhyphen{}noise extrapolation algorithms can be derived from this class by
+overriding the "self.reduce" and (if necessary) the "\_\_init\_\_" method.
+\index{is\_converged() (mitiq.factories.BatchedFactory method)@\spxentry{is\_converged()}\spxextra{mitiq.factories.BatchedFactory method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.BatchedFactory.is_converged}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{is\_converged}}}{}{{ $\rightarrow$ bool}}
+Returns True if all needed expectation values have been computed, else False.
+
+\end{fulllineitems}
+
+\index{next() (mitiq.factories.BatchedFactory method)@\spxentry{next()}\spxextra{mitiq.factories.BatchedFactory method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.BatchedFactory.next}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{next}}}{}{{ $\rightarrow$ float}}
+Returns the next noise level to execute a circuit at.
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{ExpFactory (class in mitiq.factories)@\spxentry{ExpFactory}\spxextra{class in mitiq.factories}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.ExpFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{ExpFactory}}}{\emph{scalars: Iterable{[}float{]}, asymptote: Optional{[}float{]} = None}}{}
+Factory object implementing a zero\sphinxhyphen{}noise extrapolation algotrithm assuming an
+exponential ansatz y(x) = a + b * exp(\sphinxhyphen{}c * x), with c \textgreater{} 0.
+
+If the asymptotic value (y(x\sphinxhyphen{}\textgreater{}inf) = a) is known, a linear fit with respect
+to z(x) := log{[}sing(b) (y(x) \sphinxhyphen{} a){]} is used.
+Otherwise, a non\sphinxhyphen{}linear fit of y(x) is perfomed.
+\index{reduce() (mitiq.factories.ExpFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.ExpFactory method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.ExpFactory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
+Returns the zero\sphinxhyphen{}noise limit, assuming an exponential ansatz:
+y(x) = a + b * exp(\sphinxhyphen{}c * x), with c \textgreater{} 0.
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{Factory (class in mitiq.factories)@\spxentry{Factory}\spxextra{class in mitiq.factories}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.Factory}}\pysigline{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{Factory}}}
+Abstract class designed to adaptively produce a new noise scaling parameter
+based on a historical stack of previous noise scale parameters ("self.instack")
+and previously estimated expectation values ("self.outstack").
+
+Specific zero\sphinxhyphen{}noise extrapolation algorithms, adaptive or non\sphinxhyphen{}adaptive,
+are derived from this class.
+A Factory object is not supposed to directly perform any quantum computation,
+only the classical results of quantum experiments are processed by it.
+\index{is\_converged() (mitiq.factories.Factory method)@\spxentry{is\_converged()}\spxextra{mitiq.factories.Factory method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.Factory.is_converged}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{is\_converged}}}{}{{ $\rightarrow$ bool}}
+Returns True if all needed expectation values have been computed, else False.
+
+\end{fulllineitems}
+
+\index{next() (mitiq.factories.Factory method)@\spxentry{next()}\spxextra{mitiq.factories.Factory method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.Factory.next}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{next}}}{}{{ $\rightarrow$ float}}
+Returns the next noise level to execute a circuit at.
+
+\end{fulllineitems}
+
+\index{push() (mitiq.factories.Factory method)@\spxentry{push()}\spxextra{mitiq.factories.Factory method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.Factory.push}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{push}}}{\emph{instack\_val: float}, \emph{outstack\_val: float}}{{ $\rightarrow$ None}}
+Appends "instack\_val" to "self.instack" and "outstack\_val" to "self.outstack".
+Each time a new expectation value is computed this method should be used
+to update the internal state of the Factory.
+
+\end{fulllineitems}
+
+\index{reduce() (mitiq.factories.Factory method)@\spxentry{reduce()}\spxextra{mitiq.factories.Factory method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.Factory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
+Returns the extrapolation to the zero\sphinxhyphen{}noise limit.
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{LinearFactory (class in mitiq.factories)@\spxentry{LinearFactory}\spxextra{class in mitiq.factories}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.LinearFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{LinearFactory}}}{\emph{scalars: Iterable{[}float{]}}}{}
+Factory object implementing a zero\sphinxhyphen{}noise extrapolation algotrithm based on a linear fit.
+\index{reduce() (mitiq.factories.LinearFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.LinearFactory method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.LinearFactory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
+Determines, with a least squared method, the line of best fit
+associated to the data points. The intercept is returned.
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{PolyExpFactory (class in mitiq.factories)@\spxentry{PolyExpFactory}\spxextra{class in mitiq.factories}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.PolyExpFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{PolyExpFactory}}}{\emph{scalars: Iterable{[}float{]}, order: int, asymptote: Optional{[}float{]} = None}}{}
+Factory object implementing a zero\sphinxhyphen{}noise extrapolation algotrithm assuming an
+(almost) exponential ansatz with a non linear exponent, i.e.:
+
+y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
+
+The parameter "s" is a sign variable which can be either 1 or \sphinxhyphen{}1, corresponding to
+decreasing and increasing exponentials, respectively. The parameter "s" is
+automatically deduced from the data.
+
+If the asymptotic value (y(x\sphinxhyphen{}\textgreater{}inf) = a) is known, a linear fit with respect
+to z(x) := log{[}s(y(x) \sphinxhyphen{} a){]} is used.
+Otherwise, a non\sphinxhyphen{}linear fit of y(x) is perfomed.
+\index{reduce() (mitiq.factories.PolyExpFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.PolyExpFactory method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.PolyExpFactory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
+Returns the zero\sphinxhyphen{}noise limit, assuming an exponential ansatz:
+y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
+The parameter "s" is a sign variable which can be either 1 or \sphinxhyphen{}1, corresponding to
+decreasing and increasing exponentials, respectively. The parameter "s" is
+automatically deduced from the data.
+It is also assumed that z(x\sphinxhyphen{}\sphinxhyphen{}\textgreater{}inf)=\sphinxhyphen{}inf, such that y(x\sphinxhyphen{}\sphinxhyphen{}\textgreater{}inf)\sphinxhyphen{}\sphinxhyphen{}\textgreater{}a.
+
+\end{fulllineitems}
+
+\index{static\_reduce() (mitiq.factories.PolyExpFactory static method)@\spxentry{static\_reduce()}\spxextra{mitiq.factories.PolyExpFactory static method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.PolyExpFactory.static_reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{static }}\sphinxbfcode{\sphinxupquote{static\_reduce}}}{\emph{instack: List{[}float{]}, outstack: List{[}float{]}, asymptote: Optional{[}float{]}, order: int, eps: float = 1e\sphinxhyphen{}09}}{{ $\rightarrow$ float}}
+Determines the zero\sphinxhyphen{}noise limit, assuming an exponential ansatz:
+y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
+
+The parameter "s" is a sign variable which can be either 1 or \sphinxhyphen{}1, corresponding to
+decreasing and increasing exponentials, respectively. The parameter "s" is
+automatically deduced from the data.
+
+It is also assumed that z(x\sphinxhyphen{}\sphinxhyphen{}\textgreater{}inf)=\sphinxhyphen{}inf, such that y(x\sphinxhyphen{}\sphinxhyphen{}\textgreater{}inf)\sphinxhyphen{}\sphinxhyphen{}\textgreater{}a.
+
+If asymptote is None, the ansatz y(x) is fitted with a non\sphinxhyphen{}linear optimization.
+Otherwise, a linear fit with respect to z(x) := log(sign * (y(x) \sphinxhyphen{} asymptote))
+is performed.
+
+This static method is equivalent to the "self.reduce" method of PolyExpFactory,
+but can be called also by other factories which are particular cases of PolyExpFactory,
+e.g., ExpFactory.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{instack}} \sphinxhyphen{}\sphinxhyphen{} x data values.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{outstack}} \sphinxhyphen{}\sphinxhyphen{} y data values.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{asymptote}} \sphinxhyphen{}\sphinxhyphen{} y(x\sphinxhyphen{}\textgreater{}inf).
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{order}} \sphinxhyphen{}\sphinxhyphen{} extrapolation order.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{eps}} \sphinxhyphen{}\sphinxhyphen{} epsilon to regularize log(sign (instack \sphinxhyphen{} asymptote)) when
+the argument is to close to zero or negative.
+
+\end{itemize}
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{PolyFactory (class in mitiq.factories)@\spxentry{PolyFactory}\spxextra{class in mitiq.factories}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.PolyFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{PolyFactory}}}{\emph{scalars: Iterable{[}float{]}, order: int}}{}
+Factory object implementing a zero\sphinxhyphen{}noise extrapolation algotrithm based on a polynomial fit.
+Note: RichardsonFactory and LinearFactory are special cases of PolyFactory.
+\index{reduce() (mitiq.factories.PolyFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.PolyFactory method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.PolyFactory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
+Determines with a least squared method, the polynomial of degree equal to "self.order"
+which optimally fits the input data. The zero\sphinxhyphen{}noise limit is returned.
+
+\end{fulllineitems}
+
+\index{static\_reduce() (mitiq.factories.PolyFactory static method)@\spxentry{static\_reduce()}\spxextra{mitiq.factories.PolyFactory static method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.PolyFactory.static_reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{static }}\sphinxbfcode{\sphinxupquote{static\_reduce}}}{\emph{instack: List{[}float{]}, outstack: List{[}float{]}, order: int}}{{ $\rightarrow$ float}}
+Determines with a least squared method, the polynomial of degree equal to \textquotesingle{}order\textquotesingle{}
+which optimally fits the input data. The zero\sphinxhyphen{}noise limit is returned.
+
+This static method is equivalent to the "self.reduce" method of PolyFactory, but
+can be called also by other factories which are particular cases of PolyFactory,
+e.g., LinearFactory and RichardsonFactory.
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{RichardsonFactory (class in mitiq.factories)@\spxentry{RichardsonFactory}\spxextra{class in mitiq.factories}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.RichardsonFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{RichardsonFactory}}}{\emph{scalars: Iterable{[}float{]}}}{}
+Factory object implementing Richardson\textquotesingle{}s extrapolation.
+\index{reduce() (mitiq.factories.RichardsonFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.RichardsonFactory method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.factories.RichardsonFactory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
+Returns the Richardson\textquotesingle{}s extrapolation to the zero\sphinxhyphen{}noise limit.
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
 
 
 \chapter{Indices and tables}
@@ -148,6 +408,13 @@ With \sphinxtitleref{mitiq.zne} module it is possible to extrapolate what the ex
 \end{itemize}
 
 
+\renewcommand{\indexname}{Python Module Index}
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\bigletter{m}
+\item\relax\sphinxstyleindexentry{mitiq}\sphinxstyleindexpageref{index:\detokenize{module-mitiq}}
+\item\relax\sphinxstyleindexentry{mitiq.factories}\sphinxstyleindexpageref{index:\detokenize{module-mitiq.factories}}
+\end{sphinxtheindex}
 
 \renewcommand{\indexname}{Index}
 \printindex

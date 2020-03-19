@@ -13,6 +13,13 @@ Welcome to mitiq's documentation!
    changelog.rst
    guide/guide.rst
 
+
+.. automodule:: mitiq
+   :members:
+
+.. automodule:: mitiq.factories
+   :members:
+
 Indices and tables
 ==================
 
