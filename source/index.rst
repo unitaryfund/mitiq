@@ -13,7 +13,7 @@ Welcome to mitiq's documentation!
    :maxdepth: 1
 
    changelog.rst
-
+   guide.rst
 
 Indices and tables
 ==================
