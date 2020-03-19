@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.12.16)  19 MAR 2020 16:48
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.12.16)  19 MAR 2020 19:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1169,53 +1169,188 @@ File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
 LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <9> not available
 (Font)              Font shape `T1/pcr/b/n' tried instead on input line 137.
-LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <10> not available
-(Font)              Font shape `T1/pcr/b/n' tried instead on input line 145.
- [3] [4] [5]
-[6
+ [3] [4
 
 ]
 Chapter 3.
-[7] [8
+LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <10> not available
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 148.
+[5] [6]
+Underfull \hbox (badness 10000) in paragraph at lines 409--409
+[]\T1/ptm/m/it/10 qp: Union[qiskit.circuit.quantumcircuit.QuantumCircuit,
+ []
 
-] [9
+
+Overfull \hbox (101.44044pt too wide) in paragraph at lines 409--409
+\T1/ptm/m/it/10 pyquil.quil.Program], ex-ecu-tor: Callable[[Union[qiskit.circui
+t.quantumcircuit.QuantumCircuit,
+ []
 
 
-] (./mitiq.ind [10
+Underfull \hbox (badness 10000) in paragraph at lines 409--409
+\T1/ptm/m/it/10 pyquil.quil.Program]], float], fac: mi-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 409--409
+\T1/ptm/m/it/10 tiq.factories.Factory = None, scale_noise:
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 409--409
+\T1/ptm/m/it/10 Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit,
+ []
+
+
+Overfull \hbox (45.04138pt too wide) in paragraph at lines 409--409
+\T1/ptm/m/it/10 pyquil.quil.Program], float], Union[qiskit.circuit.quantumcircu
+it.QuantumCircuit,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 409--409
+\T1/ptm/m/it/10 pyquil.quil.Program]] = None\T1/pcr/m/n/10 ) $\OMS/cmsy/m/n/10 
+!$
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 409--409
+\T1/ptm/m/n/10 Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit,
+ []
+
+
+Overfull \hbox (18.06114pt too wide) in paragraph at lines 438--438
+[]\T1/ptm/m/it/10 executor: Callable[[Union[qiskit.circuit.quantumcircuit.Quant
+umCircuit,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 438--438
+\T1/ptm/m/it/10 pyquil.quil.Program]], float], fac: mi-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 438--438
+\T1/ptm/m/it/10 tiq.factories.Factory = None, scale_noise:
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 438--438
+\T1/ptm/m/it/10 Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit,
+ []
+
+
+Overfull \hbox (51.04138pt too wide) in paragraph at lines 438--438
+\T1/ptm/m/it/10 pyquil.quil.Program], float], Union[qiskit.circuit.quantumcircu
+it.QuantumCircuit,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 438--438
+\T1/ptm/m/it/10 pyquil.quil.Program]] = None\T1/pcr/m/n/10 ) $\OMS/cmsy/m/n/10 
+!$
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 438--438
+\T1/ptm/m/n/10 Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit,
+ []
+
+[7]
+Overfull \hbox (35.39073pt too wide) in paragraph at lines 466--466
+[]\T1/ptm/m/it/10 fac: mi-tiq.factories.Factory, qp: Union[qiskit.circuit.quant
+umcircuit.QuantumCircuit,
+ []
+
+
+Overfull \hbox (77.44044pt too wide) in paragraph at lines 466--466
+\T1/ptm/m/it/10 pyquil.quil.Program], ex-ecu-tor: Callable[[Union[qiskit.circui
+t.quantumcircuit.QuantumCircuit,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 466--466
+\T1/ptm/m/it/10 pyquil.quil.Program]], float], scale_noise:
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 466--466
+\T1/ptm/m/it/10 Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit,
+ []
+
+
+Overfull \hbox (21.04138pt too wide) in paragraph at lines 466--466
+\T1/ptm/m/it/10 pyquil.quil.Program], float], Union[qiskit.circuit.quantumcircu
+it.QuantumCircuit,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 513--513
+[]\T1/ptm/m/it/10 fac: mi-tiq.factories.Factory = None, scale_noise:
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 513--513
+\T1/ptm/m/it/10 Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit,
+ []
+
+
+Overfull \hbox (27.04138pt too wide) in paragraph at lines 513--513
+\T1/ptm/m/it/10 pyquil.quil.Program], float], Union[qiskit.circuit.quantumcircu
+it.QuantumCircuit,
+ []
+
+
+Overfull \hbox (91.10083pt too wide) in paragraph at lines 513--513
+\T1/ptm/m/it/10 pyquil.quil.Program]] = None\T1/pcr/m/n/10 ) $\OMS/cmsy/m/n/10 
+!$ \T1/ptm/m/n/10 Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit,
+
+ []
+
+[8] [9] [10
+
+]
+Chapter 4.
+[11] [12
+
+] [13
+
+
+] (./mitiq.ind [14
 
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 20--21
+Underfull \hbox (badness 10000) in paragraph at lines 21--22
 []\T1/pcr/m/n/10 is_converged() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 mi-tiq.factorie
 s.BatchedFactory
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 55--57
+Underfull \hbox (badness 10000) in paragraph at lines 63--65
 []\T1/pcr/m/n/10 static_reduce() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 mi-tiq.factori
 es.PolyExpFactory
  []
 
-[11
+[15
 
 ])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 421.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 421.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 562.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 562.
  (./mitiq.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 421.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 421.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 562.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 562.
 Package rerunfilecheck Info: File `mitiq.out' has not changed.
-(rerunfilecheck)             Checksum: BDFEFD7DABE9704B6AAAF7866CFDC285;1043.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 421.
+(rerunfilecheck)             Checksum: 6F9EB906C24A29DC8E391EE38B9DE7D9;1402.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 562.
  ) 
 Here is how much of TeX's memory you used:
- 13686 strings out of 492995
- 190605 string characters out of 6132703
- 281840 words of memory out of 5000000
- 16882 multiletter control sequences out of 15000+600000
+ 13708 strings out of 492995
+ 190981 string characters out of 6132703
+ 282823 words of memory out of 5000000
+ 16894 multiletter control sequences out of 15000+600000
  53072 words of font info for 73 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 37i,11n,45p,400b,446s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 37i,11n,45p,796b,649s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2017/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
 exlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/te
 xlive/2017/texmf-dist/fonts/type1/urw/courier/ucrb8a.pfb></usr/local/texlive/20
@@ -1226,10 +1361,10 @@ ype1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/ur
 w/times/utmb8a.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/urw/times/ut
 mr8a.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
 
-Output written on mitiq.pdf (15 pages, 116776 bytes).
+Output written on mitiq.pdf (19 pages, 124982 bytes).
 PDF statistics:
- 217 PDF objects out of 1000 (max. 8388607)
- 184 compressed objects within 2 object streams
- 49 named destinations out of 1000 (max. 500000)
- 85 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 261 PDF objects out of 1000 (max. 8388607)
+ 223 compressed objects within 3 object streams
+ 59 named destinations out of 1000 (max. 500000)
+ 109 words of extra memory for PDF output out of 10000 (max. 10000000)
 

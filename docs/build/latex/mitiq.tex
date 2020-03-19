@@ -136,7 +136,10 @@ With \sphinxtitleref{mitiq.zne} module it is possible to extrapolate what the ex
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{k+kn}{from} \PYG{n+nn}{mitiq} \PYG{k+kn}{import} \PYG{n}{Factory}
 \end{sphinxVerbatim}
-\phantomsection\label{\detokenize{index:module-mitiq}}\index{mitiq (module)@\spxentry{mitiq}\spxextra{module}}
+
+
+\chapter{API\sphinxhyphen{}doc}
+\label{\detokenize{index:module-mitiq}}\label{\detokenize{index:api-doc}}\index{mitiq (module)@\spxentry{mitiq}\spxextra{module}}
 This is the top level module from which functions and classes of
 Mitiq can be directly imported.
 \index{version() (in module mitiq)@\spxentry{version()}\spxextra{in module mitiq}}
@@ -147,7 +150,10 @@ Returns the Mitiq version number.
 
 \end{fulllineitems}
 
-\phantomsection\label{\detokenize{index:module-mitiq.factories}}\index{mitiq.factories (module)@\spxentry{mitiq.factories}\spxextra{module}}
+
+
+\section{Factories}
+\label{\detokenize{index:module-mitiq.factories}}\label{\detokenize{index:factories}}\index{mitiq.factories (module)@\spxentry{mitiq.factories}\spxextra{module}}
 Contains all the main classes corresponding to different zero\sphinxhyphen{}noise extrapolation methods.
 \index{BatchedFactory (class in mitiq.factories)@\spxentry{BatchedFactory}\spxextra{class in mitiq.factories}}
 
@@ -394,6 +400,140 @@ Returns the Richardson\textquotesingle{}s extrapolation to the zero\sphinxhyphen
 
 
 
+\section{Zero Noise Extrapolation}
+\label{\detokenize{index:module-mitiq.zne}}\label{\detokenize{index:zero-noise-extrapolation}}\index{mitiq.zne (module)@\spxentry{mitiq.zne}\spxextra{module}}
+Zero\sphinxhyphen{}noise extrapolation tools.
+\index{execute\_with\_zne() (in module mitiq.zne)@\spxentry{execute\_with\_zne()}\spxextra{in module mitiq.zne}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.zne.execute_with_zne}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.zne.}}\sphinxbfcode{\sphinxupquote{execute\_with\_zne}}}{\emph{qp: Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, executor: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}, fac: mitiq.factories.Factory = None, scale\_noise: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, float{]}, Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]} = None}}{{ $\rightarrow$ Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}}}
+Takes as input a quantum circuit and returns the associated expectation value
+evaluated with error mitigation.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{qp}} \sphinxhyphen{}\sphinxhyphen{} Quantum circuit to execute with error mitigation.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{executor}} \sphinxhyphen{}\sphinxhyphen{} Function executing a circuit and producing an expectation value
+(without error mitigation).
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{fac}} \sphinxhyphen{}\sphinxhyphen{} Factory object determining the zero\sphinxhyphen{}noise extrapolation algorithm.
+If not specified, LinearFactory({[}1.0, 2.0{]}) will be used.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{scale\_noise}} \sphinxhyphen{}\sphinxhyphen{} Function for scaling the noise of a quantum circuit.
+If not specified, a default method will be used.
+
+\end{itemize}
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{mitigate\_executor() (in module mitiq.zne)@\spxentry{mitigate\_executor()}\spxextra{in module mitiq.zne}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.zne.mitigate_executor}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.zne.}}\sphinxbfcode{\sphinxupquote{mitigate\_executor}}}{\emph{executor: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}, fac: mitiq.factories.Factory = None, scale\_noise: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, float{]}, Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]} = None}}{{ $\rightarrow$ Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}}}
+Takes as input a generic function ("executor"), difined by the user, which executes a circuit
+with an arbitrary backend and produces an expectation value.
+
+Returns an error\sphinxhyphen{}mitigated version of the input "executor", having the same signature and
+automatically performing zero\sphinxhyphen{}noise extrapolation at each call.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{executor}} \sphinxhyphen{}\sphinxhyphen{} Function (to be mitigated) executing a circuit and returning an expectation value.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{fac}} \sphinxhyphen{}\sphinxhyphen{} Factory object determining the zero\sphinxhyphen{}noise extrapolation algorithm.
+If not specified, LinearFactory({[}1.0, 2.0{]}) is used.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{scale\_noise}} \sphinxhyphen{}\sphinxhyphen{} Function for scaling the noise of a quantum circuit.
+If not specified, a default method is used.
+
+\end{itemize}
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{qrun\_factory() (in module mitiq.zne)@\spxentry{qrun\_factory()}\spxextra{in module mitiq.zne}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.zne.qrun_factory}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.zne.}}\sphinxbfcode{\sphinxupquote{qrun\_factory}}}{\emph{fac: mitiq.factories.Factory, qp: Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, executor: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}, scale\_noise: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, float{]}, Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}}}{{ $\rightarrow$ None}}
+Runs the factory until convergence executing quantum circuits with different noise levels.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{fac}} \sphinxhyphen{}\sphinxhyphen{} Factory object to run until convergence.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{qp}} \sphinxhyphen{}\sphinxhyphen{} Circuit to mitigate.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{executor}} \sphinxhyphen{}\sphinxhyphen{} Function which executes a circuit and returns an expectation value.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{scale\_noise}} \sphinxhyphen{}\sphinxhyphen{} Function which scales the noise level of a quantum circuit.
+
+\end{itemize}
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{run\_factory() (in module mitiq.zne)@\spxentry{run\_factory()}\spxextra{in module mitiq.zne}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.zne.run_factory}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.zne.}}\sphinxbfcode{\sphinxupquote{run\_factory}}}{\emph{fac: mitiq.factories.Factory, noise\_to\_expval: Callable{[}{[}float{]}, float{]}, max\_iterations: int = 100}}{{ $\rightarrow$ None}}
+Runs a factory until convergence (or until the number of iterations reach "max\_iterations").
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{fac}} \sphinxhyphen{}\sphinxhyphen{} Instance of Factory object to be run.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{noise\_to\_expval}} \sphinxhyphen{}\sphinxhyphen{} Function mapping noise scale values to expectation vales.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{max\_iterations}} \sphinxhyphen{}\sphinxhyphen{} Maximum number of iterations (optional). Default value is 100.
+
+\end{itemize}
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{zne\_decorator() (in module mitiq.zne)@\spxentry{zne\_decorator()}\spxextra{in module mitiq.zne}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.zne.zne_decorator}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.zne.}}\sphinxbfcode{\sphinxupquote{zne\_decorator}}}{\emph{fac: mitiq.factories.Factory = None, scale\_noise: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, float{]}, Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]} = None}}{{ $\rightarrow$ Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}}}
+Decorator which automatically adds error mitigation to any circuit\sphinxhyphen{}executor function
+defined by the user.
+
+It is supposed to be applied to any function which executes a quantum circuit
+with an arbitrary backend and produces an expectation value.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{fac}} \sphinxhyphen{}\sphinxhyphen{} Factory object determining the zero\sphinxhyphen{}noise extrapolation algorithm.
+If not specified, LinearFactory({[}1.0, 2.0{]}) will be used.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{scale\_noise}} \sphinxhyphen{}\sphinxhyphen{} Function for scaling the noise of a quantum circuit.
+If not specified, a default method will be used.
+
+\end{itemize}
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+
+
 \chapter{Indices and tables}
 \label{\detokenize{index:indices-and-tables}}\begin{itemize}
 \item {} 
@@ -414,6 +554,7 @@ Returns the Richardson\textquotesingle{}s extrapolation to the zero\sphinxhyphen
 \bigletter{m}
 \item\relax\sphinxstyleindexentry{mitiq}\sphinxstyleindexpageref{index:\detokenize{module-mitiq}}
 \item\relax\sphinxstyleindexentry{mitiq.factories}\sphinxstyleindexpageref{index:\detokenize{module-mitiq.factories}}
+\item\relax\sphinxstyleindexentry{mitiq.zne}\sphinxstyleindexpageref{index:\detokenize{module-mitiq.zne}}
 \end{sphinxtheindex}
 
 \renewcommand{\indexname}{Index}

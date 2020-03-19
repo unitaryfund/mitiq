@@ -1,23 +1,29 @@
-\indexentry{mitiq (module)@\spxentry{mitiq}\spxextra{module}|hyperpage}{3}
-\indexentry{version() (in module mitiq)@\spxentry{version()}\spxextra{in module mitiq}|hyperpage}{3}
-\indexentry{mitiq.factories (module)@\spxentry{mitiq.factories}\spxextra{module}|hyperpage}{3}
-\indexentry{BatchedFactory (class in mitiq.factories)@\spxentry{BatchedFactory}\spxextra{class in mitiq.factories}|hyperpage}{3}
-\indexentry{is\_converged() (mitiq.factories.BatchedFactory method)@\spxentry{is\_converged()}\spxextra{mitiq.factories.BatchedFactory method}|hyperpage}{4}
-\indexentry{next() (mitiq.factories.BatchedFactory method)@\spxentry{next()}\spxextra{mitiq.factories.BatchedFactory method}|hyperpage}{4}
-\indexentry{ExpFactory (class in mitiq.factories)@\spxentry{ExpFactory}\spxextra{class in mitiq.factories}|hyperpage}{4}
-\indexentry{reduce() (mitiq.factories.ExpFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.ExpFactory method}|hyperpage}{4}
-\indexentry{Factory (class in mitiq.factories)@\spxentry{Factory}\spxextra{class in mitiq.factories}|hyperpage}{4}
-\indexentry{is\_converged() (mitiq.factories.Factory method)@\spxentry{is\_converged()}\spxextra{mitiq.factories.Factory method}|hyperpage}{4}
-\indexentry{next() (mitiq.factories.Factory method)@\spxentry{next()}\spxextra{mitiq.factories.Factory method}|hyperpage}{4}
-\indexentry{push() (mitiq.factories.Factory method)@\spxentry{push()}\spxextra{mitiq.factories.Factory method}|hyperpage}{4}
-\indexentry{reduce() (mitiq.factories.Factory method)@\spxentry{reduce()}\spxextra{mitiq.factories.Factory method}|hyperpage}{4}
-\indexentry{LinearFactory (class in mitiq.factories)@\spxentry{LinearFactory}\spxextra{class in mitiq.factories}|hyperpage}{4}
-\indexentry{reduce() (mitiq.factories.LinearFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.LinearFactory method}|hyperpage}{4}
-\indexentry{PolyExpFactory (class in mitiq.factories)@\spxentry{PolyExpFactory}\spxextra{class in mitiq.factories}|hyperpage}{4}
-\indexentry{reduce() (mitiq.factories.PolyExpFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.PolyExpFactory method}|hyperpage}{5}
-\indexentry{static\_reduce() (mitiq.factories.PolyExpFactory static method)@\spxentry{static\_reduce()}\spxextra{mitiq.factories.PolyExpFactory static method}|hyperpage}{5}
-\indexentry{PolyFactory (class in mitiq.factories)@\spxentry{PolyFactory}\spxextra{class in mitiq.factories}|hyperpage}{5}
-\indexentry{reduce() (mitiq.factories.PolyFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.PolyFactory method}|hyperpage}{5}
-\indexentry{static\_reduce() (mitiq.factories.PolyFactory static method)@\spxentry{static\_reduce()}\spxextra{mitiq.factories.PolyFactory static method}|hyperpage}{5}
-\indexentry{RichardsonFactory (class in mitiq.factories)@\spxentry{RichardsonFactory}\spxextra{class in mitiq.factories}|hyperpage}{5}
-\indexentry{reduce() (mitiq.factories.RichardsonFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.RichardsonFactory method}|hyperpage}{5}
+\indexentry{mitiq (module)@\spxentry{mitiq}\spxextra{module}|hyperpage}{5}
+\indexentry{version() (in module mitiq)@\spxentry{version()}\spxextra{in module mitiq}|hyperpage}{5}
+\indexentry{mitiq.factories (module)@\spxentry{mitiq.factories}\spxextra{module}|hyperpage}{5}
+\indexentry{BatchedFactory (class in mitiq.factories)@\spxentry{BatchedFactory}\spxextra{class in mitiq.factories}|hyperpage}{5}
+\indexentry{is\_converged() (mitiq.factories.BatchedFactory method)@\spxentry{is\_converged()}\spxextra{mitiq.factories.BatchedFactory method}|hyperpage}{5}
+\indexentry{next() (mitiq.factories.BatchedFactory method)@\spxentry{next()}\spxextra{mitiq.factories.BatchedFactory method}|hyperpage}{5}
+\indexentry{ExpFactory (class in mitiq.factories)@\spxentry{ExpFactory}\spxextra{class in mitiq.factories}|hyperpage}{5}
+\indexentry{reduce() (mitiq.factories.ExpFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.ExpFactory method}|hyperpage}{5}
+\indexentry{Factory (class in mitiq.factories)@\spxentry{Factory}\spxextra{class in mitiq.factories}|hyperpage}{5}
+\indexentry{is\_converged() (mitiq.factories.Factory method)@\spxentry{is\_converged()}\spxextra{mitiq.factories.Factory method}|hyperpage}{6}
+\indexentry{next() (mitiq.factories.Factory method)@\spxentry{next()}\spxextra{mitiq.factories.Factory method}|hyperpage}{6}
+\indexentry{push() (mitiq.factories.Factory method)@\spxentry{push()}\spxextra{mitiq.factories.Factory method}|hyperpage}{6}
+\indexentry{reduce() (mitiq.factories.Factory method)@\spxentry{reduce()}\spxextra{mitiq.factories.Factory method}|hyperpage}{6}
+\indexentry{LinearFactory (class in mitiq.factories)@\spxentry{LinearFactory}\spxextra{class in mitiq.factories}|hyperpage}{6}
+\indexentry{reduce() (mitiq.factories.LinearFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.LinearFactory method}|hyperpage}{6}
+\indexentry{PolyExpFactory (class in mitiq.factories)@\spxentry{PolyExpFactory}\spxextra{class in mitiq.factories}|hyperpage}{6}
+\indexentry{reduce() (mitiq.factories.PolyExpFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.PolyExpFactory method}|hyperpage}{6}
+\indexentry{static\_reduce() (mitiq.factories.PolyExpFactory static method)@\spxentry{static\_reduce()}\spxextra{mitiq.factories.PolyExpFactory static method}|hyperpage}{6}
+\indexentry{PolyFactory (class in mitiq.factories)@\spxentry{PolyFactory}\spxextra{class in mitiq.factories}|hyperpage}{7}
+\indexentry{reduce() (mitiq.factories.PolyFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.PolyFactory method}|hyperpage}{7}
+\indexentry{static\_reduce() (mitiq.factories.PolyFactory static method)@\spxentry{static\_reduce()}\spxextra{mitiq.factories.PolyFactory static method}|hyperpage}{7}
+\indexentry{RichardsonFactory (class in mitiq.factories)@\spxentry{RichardsonFactory}\spxextra{class in mitiq.factories}|hyperpage}{7}
+\indexentry{reduce() (mitiq.factories.RichardsonFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.RichardsonFactory method}|hyperpage}{7}
+\indexentry{mitiq.zne (module)@\spxentry{mitiq.zne}\spxextra{module}|hyperpage}{7}
+\indexentry{execute\_with\_zne() (in module mitiq.zne)@\spxentry{execute\_with\_zne()}\spxextra{in module mitiq.zne}|hyperpage}{7}
+\indexentry{mitigate\_executor() (in module mitiq.zne)@\spxentry{mitigate\_executor()}\spxextra{in module mitiq.zne}|hyperpage}{7}
+\indexentry{qrun\_factory() (in module mitiq.zne)@\spxentry{qrun\_factory()}\spxextra{in module mitiq.zne}|hyperpage}{8}
+\indexentry{run\_factory() (in module mitiq.zne)@\spxentry{run\_factory()}\spxextra{in module mitiq.zne}|hyperpage}{8}
+\indexentry{zne\_decorator() (in module mitiq.zne)@\spxentry{zne\_decorator()}\spxextra{in module mitiq.zne}|hyperpage}{8}

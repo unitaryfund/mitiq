@@ -13,11 +13,21 @@ Welcome to mitiq's documentation!
    changelog.rst
    guide/guide.rst
 
+API-doc
+=================================
 
 .. automodule:: mitiq
    :members:
 
+
+Factories
+---------
 .. automodule:: mitiq.factories
+   :members:
+
+Zero Noise Extrapolation
+------------------------
+.. automodule:: mitiq.zne
    :members:
 
 Indices and tables

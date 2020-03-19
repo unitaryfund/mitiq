@@ -5,60 +5,72 @@
 \let\spxextra \sphinxstyleindexextra
 
   \bigletter B
-  \item \spxentry{BatchedFactory}\spxextra{class in mitiq.factories}, \hyperpage{3}
+  \item \spxentry{BatchedFactory}\spxextra{class in mitiq.factories}, \hyperpage{5}
 
   \indexspace
   \bigletter E
-  \item \spxentry{ExpFactory}\spxextra{class in mitiq.factories}, \hyperpage{4}
+  \item \spxentry{execute\_with\_zne()}\spxextra{in module mitiq.zne}, \hyperpage{7}
+  \item \spxentry{ExpFactory}\spxextra{class in mitiq.factories}, \hyperpage{5}
 
   \indexspace
   \bigletter F
-  \item \spxentry{Factory}\spxextra{class in mitiq.factories}, \hyperpage{4}
+  \item \spxentry{Factory}\spxextra{class in mitiq.factories}, \hyperpage{5}
 
   \indexspace
   \bigletter I
-  \item \spxentry{is\_converged()}\spxextra{mitiq.factories.BatchedFactory method}, \hyperpage{4}
-  \item \spxentry{is\_converged()}\spxextra{mitiq.factories.Factory method}, \hyperpage{4}
+  \item \spxentry{is\_converged()}\spxextra{mitiq.factories.BatchedFactory method}, \hyperpage{5}
+  \item \spxentry{is\_converged()}\spxextra{mitiq.factories.Factory method}, \hyperpage{6}
 
   \indexspace
   \bigletter L
-  \item \spxentry{LinearFactory}\spxextra{class in mitiq.factories}, \hyperpage{4}
+  \item \spxentry{LinearFactory}\spxextra{class in mitiq.factories}, \hyperpage{6}
 
   \indexspace
   \bigletter M
-  \item \spxentry{mitiq}\spxextra{module}, \hyperpage{3}
-  \item \spxentry{mitiq.factories}\spxextra{module}, \hyperpage{3}
+  \item \spxentry{mitigate\_executor()}\spxextra{in module mitiq.zne}, \hyperpage{7}
+  \item \spxentry{mitiq}\spxextra{module}, \hyperpage{5}
+  \item \spxentry{mitiq.factories}\spxextra{module}, \hyperpage{5}
+  \item \spxentry{mitiq.zne}\spxextra{module}, \hyperpage{7}
 
   \indexspace
   \bigletter N
-  \item \spxentry{next()}\spxextra{mitiq.factories.BatchedFactory method}, \hyperpage{4}
-  \item \spxentry{next()}\spxextra{mitiq.factories.Factory method}, \hyperpage{4}
+  \item \spxentry{next()}\spxextra{mitiq.factories.BatchedFactory method}, \hyperpage{5}
+  \item \spxentry{next()}\spxextra{mitiq.factories.Factory method}, \hyperpage{6}
 
   \indexspace
   \bigletter P
-  \item \spxentry{PolyExpFactory}\spxextra{class in mitiq.factories}, \hyperpage{4}
-  \item \spxentry{PolyFactory}\spxextra{class in mitiq.factories}, \hyperpage{5}
-  \item \spxentry{push()}\spxextra{mitiq.factories.Factory method}, \hyperpage{4}
+  \item \spxentry{PolyExpFactory}\spxextra{class in mitiq.factories}, \hyperpage{6}
+  \item \spxentry{PolyFactory}\spxextra{class in mitiq.factories}, \hyperpage{7}
+  \item \spxentry{push()}\spxextra{mitiq.factories.Factory method}, \hyperpage{6}
+
+  \indexspace
+  \bigletter Q
+  \item \spxentry{qrun\_factory()}\spxextra{in module mitiq.zne}, \hyperpage{8}
 
   \indexspace
   \bigletter R
-  \item \spxentry{reduce()}\spxextra{mitiq.factories.ExpFactory method}, \hyperpage{4}
-  \item \spxentry{reduce()}\spxextra{mitiq.factories.Factory method}, \hyperpage{4}
-  \item \spxentry{reduce()}\spxextra{mitiq.factories.LinearFactory method}, \hyperpage{4}
-  \item \spxentry{reduce()}\spxextra{mitiq.factories.PolyExpFactory method}, \hyperpage{5}
-  \item \spxentry{reduce()}\spxextra{mitiq.factories.PolyFactory method}, \hyperpage{5}
-  \item \spxentry{reduce()}\spxextra{mitiq.factories.RichardsonFactory method}, \hyperpage{5}
-  \item \spxentry{RichardsonFactory}\spxextra{class in mitiq.factories}, \hyperpage{5}
+  \item \spxentry{reduce()}\spxextra{mitiq.factories.ExpFactory method}, \hyperpage{5}
+  \item \spxentry{reduce()}\spxextra{mitiq.factories.Factory method}, \hyperpage{6}
+  \item \spxentry{reduce()}\spxextra{mitiq.factories.LinearFactory method}, \hyperpage{6}
+  \item \spxentry{reduce()}\spxextra{mitiq.factories.PolyExpFactory method}, \hyperpage{6}
+  \item \spxentry{reduce()}\spxextra{mitiq.factories.PolyFactory method}, \hyperpage{7}
+  \item \spxentry{reduce()}\spxextra{mitiq.factories.RichardsonFactory method}, \hyperpage{7}
+  \item \spxentry{RichardsonFactory}\spxextra{class in mitiq.factories}, \hyperpage{7}
+  \item \spxentry{run\_factory()}\spxextra{in module mitiq.zne}, \hyperpage{8}
 
   \indexspace
   \bigletter S
   \item \spxentry{static\_reduce()}\spxextra{mitiq.factories.PolyExpFactory static method}, 
-		\hyperpage{5}
+		\hyperpage{6}
   \item \spxentry{static\_reduce()}\spxextra{mitiq.factories.PolyFactory static method}, 
-		\hyperpage{5}
+		\hyperpage{7}
 
   \indexspace
   \bigletter V
-  \item \spxentry{version()}\spxextra{in module mitiq}, \hyperpage{3}
+  \item \spxentry{version()}\spxextra{in module mitiq}, \hyperpage{5}
+
+  \indexspace
+  \bigletter Z
+  \item \spxentry{zne\_decorator()}\spxextra{in module mitiq.zne}, \hyperpage{8}
 
 \end{sphinxtheindex}

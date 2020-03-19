@@ -47,7 +47,10 @@
 </li>
 </ul>
 </div>
-<span class="target" id="module-mitiq"></span><p>This is the top level module from which functions and classes of
+</div>
+<div class="section" id="module-mitiq">
+<span id="api-doc"></span><h1>API-doc<a class="headerlink" href="#module-mitiq" title="Permalink to this headline">¶</a></h1>
+<p>This is the top level module from which functions and classes of
 Mitiq can be directly imported.</p>
 <dl class="function">
 <dt id="mitiq.version">
@@ -55,7 +58,9 @@ Mitiq can be directly imported.</p>
 <dd><p>Returns the Mitiq version number.</p>
 </dd></dl>
 
-<span class="target" id="module-mitiq.factories"></span><p>Contains all the main classes corresponding to different zero-noise extrapolation methods.</p>
+<div class="section" id="module-mitiq.factories">
+<span id="factories"></span><h2>Factories<a class="headerlink" href="#module-mitiq.factories" title="Permalink to this headline">¶</a></h2>
+<p>Contains all the main classes corresponding to different zero-noise extrapolation methods.</p>
 <dl class="class">
 <dt id="mitiq.factories.BatchedFactory">
 <em class="property">class </em><code class="sig-prename descclassname">mitiq.factories.</code><code class="sig-name descname">BatchedFactory</code><span class="sig-paren">(</span><em class="sig-param">scalars: Iterable[float]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mitiq/factories.html#BatchedFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mitiq.factories.BatchedFactory" title="Permalink to this definition">¶</a></dt>
@@ -238,6 +243,101 @@ e.g., LinearFactory and RichardsonFactory.</p>
 
 </dd></dl>
 
+</div>
+<div class="section" id="module-mitiq.zne">
+<span id="zero-noise-extrapolation"></span><h2>Zero Noise Extrapolation<a class="headerlink" href="#module-mitiq.zne" title="Permalink to this headline">¶</a></h2>
+<p>Zero-noise extrapolation tools.</p>
+<dl class="function">
+<dt id="mitiq.zne.execute_with_zne">
+<code class="sig-prename descclassname">mitiq.zne.</code><code class="sig-name descname">execute_with_zne</code><span class="sig-paren">(</span><em class="sig-param">qp: Union[qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program], executor: Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program]], float], fac: mitiq.factories.Factory = None, scale_noise: Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program], float], Union[qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program]] = None</em><span class="sig-paren">)</span> &#x2192; Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program]], float]<a class="reference internal" href="_modules/mitiq/zne.html#execute_with_zne"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mitiq.zne.execute_with_zne" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes as input a quantum circuit and returns the associated expectation value
+evaluated with error mitigation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qp</strong> -- Quantum circuit to execute with error mitigation.</p></li>
+<li><p><strong>executor</strong> -- Function executing a circuit and producing an expectation value
+(without error mitigation).</p></li>
+<li><p><strong>fac</strong> -- Factory object determining the zero-noise extrapolation algorithm.
+If not specified, LinearFactory([1.0, 2.0]) will be used.</p></li>
+<li><p><strong>scale_noise</strong> -- Function for scaling the noise of a quantum circuit.
+If not specified, a default method will be used.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mitiq.zne.mitigate_executor">
+<code class="sig-prename descclassname">mitiq.zne.</code><code class="sig-name descname">mitigate_executor</code><span class="sig-paren">(</span><em class="sig-param">executor: Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program]], float], fac: mitiq.factories.Factory = None, scale_noise: Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program], float], Union[qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program]] = None</em><span class="sig-paren">)</span> &#x2192; Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program]], float]<a class="reference internal" href="_modules/mitiq/zne.html#mitigate_executor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mitiq.zne.mitigate_executor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes as input a generic function (&quot;executor&quot;), difined by the user, which executes a circuit
+with an arbitrary backend and produces an expectation value.</p>
+<p>Returns an error-mitigated version of the input &quot;executor&quot;, having the same signature and
+automatically performing zero-noise extrapolation at each call.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>executor</strong> -- Function (to be mitigated) executing a circuit and returning an expectation value.</p></li>
+<li><p><strong>fac</strong> -- Factory object determining the zero-noise extrapolation algorithm.
+If not specified, LinearFactory([1.0, 2.0]) is used.</p></li>
+<li><p><strong>scale_noise</strong> -- Function for scaling the noise of a quantum circuit.
+If not specified, a default method is used.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mitiq.zne.qrun_factory">
+<code class="sig-prename descclassname">mitiq.zne.</code><code class="sig-name descname">qrun_factory</code><span class="sig-paren">(</span><em class="sig-param">fac: mitiq.factories.Factory, qp: Union[qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program], executor: Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program]], float], scale_noise: Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program], float], Union[qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program]]</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/mitiq/zne.html#qrun_factory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mitiq.zne.qrun_factory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the factory until convergence executing quantum circuits with different noise levels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fac</strong> -- Factory object to run until convergence.</p></li>
+<li><p><strong>qp</strong> -- Circuit to mitigate.</p></li>
+<li><p><strong>executor</strong> -- Function which executes a circuit and returns an expectation value.</p></li>
+<li><p><strong>scale_noise</strong> -- Function which scales the noise level of a quantum circuit.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mitiq.zne.run_factory">
+<code class="sig-prename descclassname">mitiq.zne.</code><code class="sig-name descname">run_factory</code><span class="sig-paren">(</span><em class="sig-param">fac: mitiq.factories.Factory, noise_to_expval: Callable[[float], float], max_iterations: int = 100</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="_modules/mitiq/zne.html#run_factory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mitiq.zne.run_factory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs a factory until convergence (or until the number of iterations reach &quot;max_iterations&quot;).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fac</strong> -- Instance of Factory object to be run.</p></li>
+<li><p><strong>noise_to_expval</strong> -- Function mapping noise scale values to expectation vales.</p></li>
+<li><p><strong>max_iterations</strong> -- Maximum number of iterations (optional). Default value is 100.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mitiq.zne.zne_decorator">
+<code class="sig-prename descclassname">mitiq.zne.</code><code class="sig-name descname">zne_decorator</code><span class="sig-paren">(</span><em class="sig-param">fac: mitiq.factories.Factory = None, scale_noise: Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program], float], Union[qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program]] = None</em><span class="sig-paren">)</span> &#x2192; Callable[[Union[qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program]], float]<a class="reference internal" href="_modules/mitiq/zne.html#zne_decorator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mitiq.zne.zne_decorator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator which automatically adds error mitigation to any circuit-executor function
+defined by the user.</p>
+<p>It is supposed to be applied to any function which executes a quantum circuit
+with an arbitrary backend and produces an expectation value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fac</strong> -- Factory object determining the zero-noise extrapolation algorithm.
+If not specified, LinearFactory([1.0, 2.0]) will be used.</p></li>
+<li><p><strong>scale_noise</strong> -- Function for scaling the noise of a quantum circuit.
+If not specified, a default method will be used.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>

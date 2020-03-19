@@ -1,10 +1,10 @@
 # Fdb version 3
-["makeindex mitiq.idx"] 1584632887 "mitiq.idx" "mitiq.ind" "mitiq" 1584643118
-  "mitiq.idx" 1584632888 3013 738d841fd634f81da6297bcfed3d4084 ""
+["makeindex mitiq.idx"] 1584643400 "mitiq.idx" "mitiq.ind" "mitiq" 1584644001
+  "mitiq.idx" 1584643401 3721 88b5a76e42e24da6568db87f039673c5 ""
   (generated)
-  "mitiq.ind"
   "mitiq.ilg"
-["pdflatex"] 1584632887 "mitiq.tex" "mitiq.pdf" "mitiq" 1584643118
+  "mitiq.ind"
+["pdflatex"] 1584643401 "mitiq.tex" "mitiq.pdf" "mitiq" 1584644001
   "/usr/local/texlive/2017/texmf-dist/fonts/enc/dvips/base/8r.enc" 1480098666 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2017/texmf-dist/fonts/map/fontname/texfonts.map" 1480098670 3287 e6b82fe08f5336d4d5ebc73fb1152e87 ""
   "/usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrb8r.tfm" 1480098688 1292 3059476c50a24578715759f22652f3d0 ""
@@ -149,20 +149,20 @@
   "/usr/local/texlive/2017/texmf-var/web2c/pdftex/pdflatex.fmt" 1513350891 4129593 1b82c64fa80cd29a17cb773fb0c3d717 ""
   "/usr/local/texlive/2017/texmf.cnf" 1495593465 577 2b71d4d888f9e5560b2e99985915a9fa ""
   "footnotehyper-sphinx.sty" 1581352711 8888 1bbd7bdeae8c8bed1d10d551bddb1cc9 ""
-  "mitiq.aux" 1584632888 5489 8046027349991a2893dffc167cfc7349 ""
-  "mitiq.ind" 1584632887 2479 d4db136633a55bc1f44d3ed3710aefc4 "makeindex mitiq.idx"
-  "mitiq.out" 1584632888 1043 bdfefd7dabe9704b6aaaf7866cfdc285 ""
-  "mitiq.tex" 1584632886 19727 5ce4c06a54c660c8649d23ea496b449a ""
-  "mitiq.toc" 1584632888 754 e2c40dd522edf03bf2a501a4d7596bd0 ""
+  "mitiq.aux" 1584643401 6208 6c7b94dda3f72ebb29bde9cad912b101 ""
+  "mitiq.ind" 1584643401 3010 bc1aefb9c8e84a5782af1f61f268498f "makeindex mitiq.idx"
+  "mitiq.out" 1584643401 1402 6f9eb906c24a29dc8e391ee38b9de7d9 ""
+  "mitiq.tex" 1584643399 28134 50a25d271da85a66934e772cf8c3b0eb ""
+  "mitiq.toc" 1584643401 984 f2c417995a29724dc947ff8e34d2c915 ""
   "sphinx.sty" 1581352711 81878 44d14f90f8cb22a202794c148df60b64 ""
-  "sphinxhighlight.sty" 1584643117 8137 38a433148fcb7611515a989ff1750dd5 ""
+  "sphinxhighlight.sty" 1584644001 8137 38a433148fcb7611515a989ff1750dd5 ""
   "sphinxmanual.cls" 1581352711 4236 124cd90deb92742b5d3922bfc2cd70c0 ""
-  "sphinxmessages.sty" 1584643117 745 3f5fcd6cdd7964ed608767954a8ced6f ""
+  "sphinxmessages.sty" 1584644001 745 3f5fcd6cdd7964ed608767954a8ced6f ""
   "sphinxmulticell.sty" 1581352711 14606 0b6edc2b1a83546ed92026d1f6a311b5 ""
   (generated)
   "mitiq.aux"
-  "mitiq.pdf"
-  "mitiq.out"
+  "mitiq.log"
   "mitiq.idx"
   "mitiq.toc"
-  "mitiq.log"
+  "mitiq.pdf"
+  "mitiq.out"
