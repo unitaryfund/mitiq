@@ -30,4 +30,5 @@ jobs:
     - name: Test with pytest
       run: |
         pip install pytest
+        pytest mitiq/tests
         pytest mitiq/qiskit/tests
