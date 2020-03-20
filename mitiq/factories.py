@@ -370,10 +370,8 @@ class AdaExpFactory(Factory):
         self.steps = steps
         self.scalar = scalar
         self.asymptote = asymptote
-        # The variable self.history is a log of the optimization process.
-        # It is a list of tuples (instack, outstack, params, zero_limit).
-        # One tuple for each fitting step.
-        self.history = []
+        # Keep a log of the optimization process storing noise value(s), expectation value(s), parameters, and zero limit
+        self.history = []  # type: List[Tuple[float...]]
 
     def next(self) -> float:
         """Returns the next noise level to execute a circuit at."""
