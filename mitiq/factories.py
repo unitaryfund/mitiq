@@ -276,30 +276,16 @@ class PolyExpFactory(BatchedFactory):
             )
 
         # CASE 1: asymptote is None.
-        # TODO: it works, but there must be a better way of doing this.
-        # Note: *args does not seem to work with curve_fit.
-        # For the moment only orders up to 3 are suppoerted.
-        def ansatz_zero(_x: float, asympt: float, b: float) -> float:
-            """Ansatz function of order 0"""
-            return asympt + b
-        def ansatz_one(x: float, asympt: float, b: float, z_one: float) -> float:
-            """Ansatz function of order 1"""
-            return asympt + b * np.exp(z_one * x)
-        def ansatz_two(x: float, asympt: float, b: float, z_one: float, z_two: float) -> float:
-            """Ansatz function of order 2."""
-            return asympt + b * np.exp(z_one * x + z_two * x ** 2)
-        def ansatz_three(
-                x: float, asympt: float, b: float, z_one: float, z_two: float, z_three: float
-            ) -> float:
-            """Ansatz function of order 3."""
-            return asympt + b * np.exp(z_one * x + z_two * x ** 2 + z_three * x ** 3)
-
-        ansatzes = (ansatz_zero, ansatz_one, ansatz_two, ansatz_three)
+        def ansatz(x: float, *coeffs: float):
+            """Ansatz function of generic order."""
+            # Coefficients of the polynomial to be exponentiated
+            z_coeffs = coeffs[2:][::-1]
+            return coeffs[0] + coeffs[1] * np.exp(x * np.polyval(z_coeffs, x))
 
         if asymptote is None:
             # Initial values for the parameters
             p_zero = [-j / (j + 1.0) for j in range(order + 2)]
-            opt_params, _ = curve_fit(ansatzes[order], instack, outstack, p0=p_zero)
+            opt_params, _ = curve_fit(ansatz, instack, outstack, p0=p_zero)
             # The zero limit is ansatz(0)= asympt + b
             zero_limit = opt_params[0] + opt_params[1]
             return (zero_limit, opt_params)
