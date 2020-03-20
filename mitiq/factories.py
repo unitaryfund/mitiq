@@ -344,7 +344,7 @@ class AdaExpFactory(Factory):
     Otherwise, a non-linear fit of y(x) is performed.
     """
 
-    SHIFT_FACTOR = 1.27846
+    _SHIFT_FACTOR = 1.27846
 
     def __init__(self, steps: int, scalar: float = 2, asymptote: Union[float, None] = None) -> None:
         """Instantiate a new object of this Factory class.
@@ -370,8 +370,9 @@ class AdaExpFactory(Factory):
         self.steps = steps
         self.scalar = scalar
         self.asymptote = asymptote
-        # Keep a log of the optimization process storing noise value(s), expectation value(s), parameters, and zero limit
-        self.history = []  # type: List[Tuple[float...]]
+        # Keep a log of the optimization process storing: 
+        # noise value(s), expectation value(s), parameters, and zero limit
+        self.history = []  # type: List[Tuple[List[float], List[float], List[float], float]]
 
     def next(self) -> float:
         """Returns the next noise level to execute a circuit at."""
@@ -392,7 +393,7 @@ class AdaExpFactory(Factory):
         exponent = params[2]
         # Further noise scale factors are determined with
         # an adaptive rule which depends on self.exponent
-        return 1.0 + self.SHIFT_FACTOR / np.abs(exponent)
+        return 1.0 + self._SHIFT_FACTOR / np.abs(exponent)
 
     def is_converged(self) -> bool:
         """Returns True if all the needed expectation values have been computed, else False."""
