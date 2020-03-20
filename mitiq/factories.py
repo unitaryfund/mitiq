@@ -370,7 +370,7 @@ class AdaExpFactory(Factory):
         self.steps = steps
         self.scalar = scalar
         self.asymptote = asymptote
-        # Keep a log of the optimization process storing: 
+        # Keep a log of the optimization process storing:
         # noise value(s), expectation value(s), parameters, and zero limit
         self.history = []  # type: List[Tuple[List[float], List[float], List[float], float]]
 
