@@ -1,2 +1,2 @@
 numpy
-cirq>=0.7.0
+git+git://github.com/quantumlib/Cirq@36f3262#egg=cirq
