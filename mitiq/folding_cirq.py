@@ -128,10 +128,10 @@ def _get_num_to_fold(stretch: float, ngates: int) -> int:
     """Returns the number of gates to fold to acheive the desired (approximate) stretch factor.
 
     Args:
-        stretch: Floating point value to stretch the circuit by. Between 1 and 3.
+        stretch: Floating point value to stretch the circuit by.
         ngates: Number of gates in the circuit to stretch.
     """
-    return int(round(ngates * (stretch - 1.0) / 2.0))
+    return int(max(round(ngates * (stretch - 1.0) / 2.0), 0))
 
 
 def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
@@ -374,16 +374,16 @@ def fold_global(circuit: Circuit,
     # Determine the number of global folds and the final fractional stretch
     num_global_folds = int(stretch // 3)
     fractional_stretch = stretch % 3
-    num_to_fold_locally = _get_num_to_fold(fractional_stretch, len(list(circuit.all_operations())))
-
+    ngates = len(list(circuit.all_operations()))
     # Do the global folds
     for _ in range(num_global_folds):
         folded += Circuit(inverse(base_circuit), base_circuit)
 
     # Do the local folds
     # Adjust the stretch to account for the fact that there are now more gates in the circuit
-    adjusted_stretch = 2. * num_to_fold_locally / len(list(circuit.all_operations())) + 1.
-    folded = fold_local(folded, adjusted_stretch, finish_fold_method, finish_fold_method_args)
-
+    folded_ngates = len(list(folded.all_operations()))
+    adjusted_stretch = 1. + ngates / folded_ngates * (fractional_stretch - 1)
+    if adjusted_stretch > 1:
+        folded = fold_local(folded, adjusted_stretch, finish_fold_method, finish_fold_method_args)
     _append_measurements(folded, measurements)
     return folded
