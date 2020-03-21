@@ -5,7 +5,7 @@ import random
 
 import numpy as np
 import pytest
-from cirq import (Circuit, GridQubit, LineQubit, ops, CircuitDag)
+from cirq import (Circuit, GridQubit, LineQubit, ops, CircuitDag, inverse)
 
 from mitiq.folding_cirq import (_is_measurement,
                                 _pop_measurements,
@@ -20,7 +20,7 @@ from mitiq.folding_cirq import (_is_measurement,
                                 fold_gates_from_right,
                                 fold_gates_at_random,
                                 fold_local,
-                                unitary_folding)
+                                fold_global)
 
 
 STRETCH_VALS = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.5, 4.5, 5.0]
@@ -501,11 +501,11 @@ def test_fold_from_left_bad_stretch():
 def test_fold_from_left_with_terminal_measurements_min_stretch():
     """Tests folding from left with terminal measurements."""
     # Test circuit
-    # 0: ───H───@───@───M
+    # 0: ───H───@───@───M───
     #           │   │
-    # 1: ───H───X───@───M
+    # 1: ───H───X───@───M───
     #               │
-    # 2: ───H───T───X───M
+    # 2: ───H───T───X───M───
     qreg = LineQubit.range(3)
     circ = Circuit(
         [ops.H.on_each(*qreg)],
@@ -528,11 +528,11 @@ def test_fold_from_left_with_terminal_measurements_min_stretch():
 def test_fold_from_left_with_terminal_measurements_max_stretch():
     """Tests folding from left with terminal measurements."""
     # Test circuit
-    # 0: ───H───@───@───M
+    # 0: ───H───@───@───M───
     #           │   │
-    # 1: ───H───X───@───M
+    # 1: ───H───X───@───M───
     #               │
-    # 2: ───H───T───X───M
+    # 2: ───H───T───X───M───
     qreg = LineQubit.range(3)
     circ = Circuit(
         [ops.H.on_each(*qreg)],
@@ -627,11 +627,11 @@ def test_fold_from_right_max_stretch():
 def test_fold_from_right_with_terminal_measurements_min_stretch():
     """Tests folding from left with terminal measurements."""
     # Test circuit
-    # 0: ───H───@───@───M
+    # 0: ───H───@───@───M───
     #           │   │
-    # 1: ───H───X───@───M
+    # 1: ───H───X───@───M───
     #               │
-    # 2: ───H───T───X───M
+    # 2: ───H───T───X───M───
     qreg = LineQubit.range(3)
     circ = Circuit(
         [ops.H.on_each(*qreg)],
@@ -654,11 +654,11 @@ def test_fold_from_right_with_terminal_measurements_min_stretch():
 def test_fold_from_right_with_terminal_measurements_max_stretch():
     """Tests folding from left with terminal measurements."""
     # Test circuit
-    # 0: ───H───@───@───M
+    # 0: ───H───@───@───M───
     #           │   │
-    # 1: ───H───X───@───M
+    # 1: ───H───X───@───M───
     #               │
-    # 2: ───H───T───X───M
+    # 2: ───H───T───X───M───
     qreg = LineQubit.range(3)
     circ = Circuit(
         [ops.H.on_each(*qreg)],
@@ -802,11 +802,11 @@ def test_fold_random_no_repeats():
 def test_fold_random_with_terminal_measurements_min_stretch():
     """Tests folding from left with terminal measurements."""
     # Test circuit
-    # 0: ───H───@───@───M
+    # 0: ───H───@───@───M───
     #           │   │
-    # 1: ───H───X───@───M
+    # 1: ───H───X───@───M───
     #               │
-    # 2: ───H───T───X───M
+    # 2: ───H───T───X───M───
     qreg = LineQubit.range(3)
     circ = Circuit(
         [ops.H.on_each(*qreg)],
@@ -829,11 +829,11 @@ def test_fold_random_with_terminal_measurements_min_stretch():
 def test_fold_random_with_terminal_measurements_max_stretch():
     """Tests folding from left with terminal measurements."""
     # Test circuit
-    # 0: ───H───@───@───M
+    # 0: ───H───@───@───M───
     #           │   │
-    # 1: ───H───X───@───M
+    # 1: ───H───X───@───M───
     #               │
-    # 2: ───H───T───X───M
+    # 2: ───H───T───X───M───
     qreg = LineQubit.range(3)
     circ = Circuit(
         [ops.H.on_each(*qreg)],
@@ -896,9 +896,160 @@ def test_fold_local_big_stretch_from_left():
     assert _equal(folded, correct)
 
 
-def test_unitary_folding():
-    for c in STRETCH_VALS:
-        circ = random_circuit(DEPTH)
-        out = unitary_folding(circ, c)
-        actual_c = len(out) / len(circ)
-        assert np.isclose(c, actual_c, atol=1.0e-1)
+def test_global_fold_min_stretch():
+    """Tests that global fold with stretch = 1 is the same circuit."""
+    # Test circuit
+    # 0: ───H───@───@───
+    #           │   │
+    # 1: ───H───X───@───
+    #               │
+    # 2: ───H───T───X───
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)]
+    )
+
+    folded = fold_global(circ, 1.)
+    assert _equal(folded, circ)
+    assert folded is not circ
+
+
+def test_global_fold_min_stretch_with_terminal_measurements():
+    """Tests that global fold with stretch = 1 is the same circuit."""
+    # Test circuit
+    # 0: ───H───@───@───M───
+    #           │   │
+    # 1: ───H───X───@───M───
+    #               │
+    # 2: ───H───T───X───M───
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+    folded = fold_global(circ, stretch=1.)
+    assert _equal(folded, circ)
+    assert folded is not circ
+
+
+def test_global_fold_stretch_factor_of_three():
+    """Tests global folding with the stretch as a factor of 3."""
+    # Test circuit
+    # 0: ───H───@───@───
+    #           │   │
+    # 1: ───H───X───@───
+    #               │
+    # 2: ───H───T───X───
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)]
+    )
+    folded = fold_global(circ, stretch=3.)
+    correct = Circuit(circ, inverse(circ), circ)
+    assert _equal(folded, correct)
+
+
+def test_global_fold_stretch_factor_of_three_with_terminal_measurements():
+    """Tests global folding with the stretch as a factor of 3 for a circuit with terminal measurements."""
+    # Test circuit
+    # 0: ───H───@───@───M───
+    #           │   │
+    # 1: ───H───X───@───M───
+    #               │
+    # 2: ───H───T───X───M───
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+    )
+    meas = Circuit([ops.measure_each(*qreg)])
+    folded = fold_global(circ + meas, stretch=3.)
+    correct = Circuit(circ, inverse(circ), circ, meas)
+    assert _equal(folded, correct)
+
+
+def test_global_fold_stretch_factor_multiple_of_three_with_terminal_measurements():
+    """Tests global folding with the stretch as a factor of 9 for a circuit with terminal measurements."""
+    # Test circuit
+    # 0: ───H───@───@───M───
+    #           │   │
+    # 1: ───H───X───@───M───
+    #               │
+    # 2: ───H───T───X───M───
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+    )
+    meas = Circuit([ops.measure_each(*qreg)])
+    folded = fold_global(circ + meas, stretch=9.)
+    correct = Circuit([circ, inverse(circ)] * 3, [circ], [meas])
+    assert _equal(folded, correct)
+
+
+def test_global_fold_stretch_non_factor_of_three_finish_fold_left():
+    """Tests global folding with a stretch factor not a multiple of three so that local folding is also called."""
+    # Test circuit
+    # 0: ───H───@───@───M───
+    #           │   │
+    # 1: ───H───X───@───M───
+    #               │
+    # 2: ───H───T───X───M───
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+    )
+    meas = Circuit(ops.measure_each(*qreg))
+    folded = fold_global(circ + meas, stretch=4.6)
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 2,
+        circ,
+        inverse(circ),
+        circ,
+        meas
+    )
+    assert _equal(folded, correct)
+
+
+def test_global_fold_stretch_non_factor_of_three_finish_fold_right():
+    """Tests global folding with a stretch factor not a multiple of three so that local folding is also called."""
+    # Test circuit
+    # 0: ───H───@───@───M───
+    #           │   │
+    # 1: ───H───X───@───M───
+    #               │
+    # 2: ───H───T───X───M───
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+    )
+    meas = Circuit(ops.measure_each(*qreg))
+    folded = fold_global(circ + meas, stretch=4.2, finish_fold_method=fold_gates_from_right)
+    correct = Circuit(
+        circ,
+        inverse(circ),
+        circ,
+        [ops.TOFFOLI.on(*qreg)] * 2,
+        meas
+    )
+    assert _equal(folded, correct)
+
