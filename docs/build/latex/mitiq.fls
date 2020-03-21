@@ -294,7 +294,9 @@ INPUT mitiq.aux
 INPUT ./mitiq.out
 INPUT ./mitiq.out
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/enc/dvips/base/8r.enc
+INPUT /usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb
+INPUT /usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/type1/urw/courier/ucrb8a.pfb
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb

@@ -534,6 +534,219 @@ If not specified, a default method will be used.
 
 
 
+\section{Folding}
+\label{\detokenize{index:module-mitiq.folding_cirq}}\label{\detokenize{index:folding}}\index{mitiq.folding\_cirq (module)@\spxentry{mitiq.folding\_cirq}\spxextra{module}}
+Functions to fold gates in Cirq circuits.
+\index{fold\_gates() (in module mitiq.folding\_cirq)@\spxentry{fold\_gates()}\spxextra{in module mitiq.folding\_cirq}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.folding_cirq.fold_gates}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_gates}}}{\emph{circuit: cirq.circuits.circuit.Circuit, moment\_indices: Iterable{[}int{]}, gate\_indices: List{[}Iterable{[}int{]}{]}}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
+Returns a new circuit with specified gates folded.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{circuit}} \sphinxhyphen{}\sphinxhyphen{} Circuit to fold.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{moment\_indices}} \sphinxhyphen{}\sphinxhyphen{} Indices of moments with gates to be folded.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{gate\_indices}} \sphinxhyphen{}\sphinxhyphen{} Specifies which gates within each moment to fold.
+
+\end{itemize}
+
+\end{description}\end{quote}
+\subsubsection*{Examples}
+
+(1) Folds the first three gates in moment two.
+\textgreater{}\textgreater{}\textgreater{} fold\_gates(circuit, moment\_indices={[}1{]}, gate\_indices={[}(0, 1, 2){]})
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{(}{)}%
+\setcounter{enumi}{1}
+\item {} 
+Folds gates with indices 1, 4, and 5 in moment 0,
+and gates with indices 0, 1, and 2 in moment 1.
+
+\end{enumerate}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{fold\PYGZus{}gates}\PYG{p}{(}\PYG{n}{circuit}\PYG{p}{,} \PYG{n}{moment\PYGZus{}indices}\PYG{o}{=}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{]}\PYG{p}{,} \PYG{n}{gate\PYGZus{}indices}\PYG{o}{=}\PYG{p}{[}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{4}\PYG{p}{,} \PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{,} \PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{)}\PYG{p}{]}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\end{fulllineitems}
+
+\index{fold\_gates\_at\_random() (in module mitiq.folding\_cirq)@\spxentry{fold\_gates\_at\_random()}\spxextra{in module mitiq.folding\_cirq}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.folding_cirq.fold_gates_at_random}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_gates\_at\_random}}}{\emph{circuit: cirq.circuits.circuit.Circuit}, \emph{stretch: float}, \emph{seed: Optional{[}int{]} = None}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
+Returns a folded circuit by applying the map G \sphinxhyphen{}\textgreater{} G G\textasciicircum{}dag G to a random subset of gates in the input circuit.
+
+The folded circuit has a number of gates approximately equal to stretch * n where n is the number of gates in
+the input circuit.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{circuit}} \sphinxhyphen{}\sphinxhyphen{} Circuit to fold.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{stretch}} \sphinxhyphen{}\sphinxhyphen{} Factor to stretch the circuit by. Any real number in the interval {[}1, 3{]}.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{seed}} \sphinxhyphen{}\sphinxhyphen{} {[}Optional{]} Integer seed for random number generator.
+
+\end{itemize}
+
+\end{description}\end{quote}
+
+\begin{sphinxadmonition}{note}{Note:}
+Folding a single gate adds two gates to the circuit, hence the maximum stretch factor is 3.
+\end{sphinxadmonition}
+
+\end{fulllineitems}
+
+\index{fold\_gates\_from\_left() (in module mitiq.folding\_cirq)@\spxentry{fold\_gates\_from\_left()}\spxextra{in module mitiq.folding\_cirq}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.folding_cirq.fold_gates_from_left}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_gates\_from\_left}}}{\emph{circuit: cirq.circuits.circuit.Circuit}, \emph{stretch: float}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
+Returns a new folded circuit by applying the map G \sphinxhyphen{}\textgreater{} G G\textasciicircum{}dag G to a subset of gates of the input circuit,
+starting with gates at the left (beginning) of the circuit.
+
+The folded circuit has a number of gates approximately equal to stretch * n where n is the number of gates in
+the input circuit.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{circuit}} \sphinxhyphen{}\sphinxhyphen{} Circuit to fold.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{stretch}} \sphinxhyphen{}\sphinxhyphen{} Factor to stretch the circuit by. Any real number in the interval {[}1, 3{]}.
+
+\end{itemize}
+
+\end{description}\end{quote}
+
+\begin{sphinxadmonition}{note}{Note:}
+Folding a single gate adds two gates to the circuit, hence the maximum stretch factor is 3.
+\end{sphinxadmonition}
+
+\end{fulllineitems}
+
+\index{fold\_gates\_from\_right() (in module mitiq.folding\_cirq)@\spxentry{fold\_gates\_from\_right()}\spxextra{in module mitiq.folding\_cirq}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.folding_cirq.fold_gates_from_right}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_gates\_from\_right}}}{\emph{circuit: cirq.circuits.circuit.Circuit}, \emph{stretch: float}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
+Returns a new folded circuit by applying the map G \sphinxhyphen{}\textgreater{} G G\textasciicircum{}dag G to a subset of gates of the input circuit,
+starting with gates at the right (end) of the circuit.
+
+The folded circuit has a number of gates approximately equal to stretch * n where n is the number of gates in
+the input circuit.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{circuit}} \sphinxhyphen{}\sphinxhyphen{} Circuit to fold.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{stretch}} \sphinxhyphen{}\sphinxhyphen{} Factor to stretch the circuit by. Any real number in the interval {[}1, 3{]}.
+
+\end{itemize}
+
+\end{description}\end{quote}
+
+\begin{sphinxadmonition}{note}{Note:}
+Folding a single gate adds two gates to the circuit, hence the maximum stretch factor is 3.
+\end{sphinxadmonition}
+
+\end{fulllineitems}
+
+\index{fold\_local() (in module mitiq.folding\_cirq)@\spxentry{fold\_local()}\spxextra{in module mitiq.folding\_cirq}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.folding_cirq.fold_local}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_local}}}{\emph{circuit: cirq.circuits.circuit.Circuit, stretch: float, fold\_method: Callable{[}{[}cirq.circuits.circuit.Circuit, float, Tuple{[}Any{]}{]}, cirq.circuits.circuit.Circuit{]} = \textless{}function fold\_gates\_from\_left\textgreater{}, fold\_method\_args: Tuple{[}Any{]} = ()}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
+Returns a folded circuit by folding gates according to the input fold method.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{circuit}} \sphinxhyphen{}\sphinxhyphen{} Circuit to fold.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{stretch}} \sphinxhyphen{}\sphinxhyphen{} Factor to stretch the circuit by.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{fold\_method}} \sphinxhyphen{}\sphinxhyphen{} 
+Function which defines the method for folding gates.
+(e.g., Randomly selects gates to fold, folds gates starting from left of circuit, etc.)
+
+Must have signature
+\begin{description}
+\item[{def fold\_method(circuit: Circuit, stretch: float, {\color{red}\bfseries{}**}kwargs):}] \leavevmode
+...
+
+\end{description}
+
+and return a circuit.
+
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{fold\_method\_args}} \sphinxhyphen{}\sphinxhyphen{} \begin{description}
+\item[{Any additional input arguments for the fold\_method.}] \leavevmode
+The method is called with fold\_method(circuit, stretch, {\color{red}\bfseries{}*}fold\_method\_args).
+
+\end{description}
+\subsubsection*{Example}
+
+fold\_method = fold\_gates\_at\_random
+fold\_method\_args = (1,)
+
+\textgreater{} Uses a seed of one for the fold\_gates\_at\_random method.
+
+
+\end{itemize}
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{fold\_moments() (in module mitiq.folding\_cirq)@\spxentry{fold\_moments()}\spxextra{in module mitiq.folding\_cirq}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.folding_cirq.fold_moments}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_moments}}}{\emph{circuit: cirq.circuits.circuit.Circuit, moment\_indices: List{[}int{]}}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
+Returns a new circuit with moments folded by mapping
+
+M\_i \sphinxhyphen{}\textgreater{} M\_i M\_i\textasciicircum{}dag M\_i
+
+where M\_i is a moment specified by an integer in moment\_indices.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{circuit}} \sphinxhyphen{}\sphinxhyphen{} Circuit to apply folding operation to.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{moment\_indices}} \sphinxhyphen{}\sphinxhyphen{} List of integers that specify moments to fold.
+
+\end{itemize}
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{unitary\_folding() (in module mitiq.folding\_cirq)@\spxentry{unitary\_folding()}\spxextra{in module mitiq.folding\_cirq}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{index:mitiq.folding_cirq.unitary_folding}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{unitary\_folding}}}{\emph{circuit: cirq.circuits.circuit.Circuit}, \emph{stretch: float}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
+Applies global unitary folding and a final partial folding of the input circuit.
+Returns a circuit of depth approximately equal to stretch*len(circuit).
+The stretch factor can be any real number \textgreater{}= 1.
+
+\end{fulllineitems}
+
+
+
+\section{Matrices}
+\label{\detokenize{index:module-mitiq.matrices}}\label{\detokenize{index:matrices}}\index{mitiq.matrices (module)@\spxentry{mitiq.matrices}\spxextra{module}}
+
+\section{Qiskit Utils}
+\label{\detokenize{index:qiskit-utils}}
+
 \chapter{Indices and tables}
 \label{\detokenize{index:indices-and-tables}}\begin{itemize}
 \item {} 
@@ -554,6 +767,8 @@ If not specified, a default method will be used.
 \bigletter{m}
 \item\relax\sphinxstyleindexentry{mitiq}\sphinxstyleindexpageref{index:\detokenize{module-mitiq}}
 \item\relax\sphinxstyleindexentry{mitiq.factories}\sphinxstyleindexpageref{index:\detokenize{module-mitiq.factories}}
+\item\relax\sphinxstyleindexentry{mitiq.folding\_cirq}\sphinxstyleindexpageref{index:\detokenize{module-mitiq.folding_cirq}}
+\item\relax\sphinxstyleindexentry{mitiq.matrices}\sphinxstyleindexpageref{index:\detokenize{module-mitiq.matrices}}
 \item\relax\sphinxstyleindexentry{mitiq.zne}\sphinxstyleindexpageref{index:\detokenize{module-mitiq.zne}}
 \end{sphinxtheindex}
 

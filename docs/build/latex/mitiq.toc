@@ -9,6 +9,9 @@
 \contentsline {chapter}{\numberline {3}API\sphinxhyphen {}doc}{5}{chapter.3}
 \contentsline {section}{\numberline {3.1}Factories}{5}{section.3.1}
 \contentsline {section}{\numberline {3.2}Zero Noise Extrapolation}{7}{section.3.2}
-\contentsline {chapter}{\numberline {4}Indices and tables}{11}{chapter.4}
-\contentsline {chapter}{Python Module Index}{13}{section*.29}
-\contentsline {chapter}{Index}{15}{section*.30}
+\contentsline {section}{\numberline {3.3}Folding}{9}{section.3.3}
+\contentsline {section}{\numberline {3.4}Matrices}{11}{section.3.4}
+\contentsline {section}{\numberline {3.5}Qiskit Utils}{11}{section.3.5}
+\contentsline {chapter}{\numberline {4}Indices and tables}{13}{chapter.4}
+\contentsline {chapter}{Python Module Index}{15}{section*.36}
+\contentsline {chapter}{Index}{17}{section*.37}

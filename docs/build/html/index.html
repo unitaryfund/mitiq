@@ -338,6 +338,160 @@ If not specified, a default method will be used.</p></li>
 </dd></dl>
 
 </div>
+<div class="section" id="module-mitiq.folding_cirq">
+<span id="folding"></span><h2>Folding<a class="headerlink" href="#module-mitiq.folding_cirq" title="Permalink to this headline">¶</a></h2>
+<p>Functions to fold gates in Cirq circuits.</p>
+<dl class="function">
+<dt id="mitiq.folding_cirq.fold_gates">
+<code class="sig-prename descclassname">mitiq.folding_cirq.</code><code class="sig-name descname">fold_gates</code><span class="sig-paren">(</span><em class="sig-param">circuit: cirq.circuits.circuit.Circuit, moment_indices: Iterable[int], gate_indices: List[Iterable[int]]</em><span class="sig-paren">)</span> &#x2192; cirq.circuits.circuit.Circuit<a class="reference internal" href="_modules/mitiq/folding_cirq.html#fold_gates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mitiq.folding_cirq.fold_gates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new circuit with specified gates folded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> -- Circuit to fold.</p></li>
+<li><p><strong>moment_indices</strong> -- Indices of moments with gates to be folded.</p></li>
+<li><p><strong>gate_indices</strong> -- Specifies which gates within each moment to fold.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>(1) Folds the first three gates in moment two.
+&gt;&gt;&gt; fold_gates(circuit, moment_indices=[1], gate_indices=[(0, 1, 2)])</p>
+<ol class="arabic simple" start="2">
+<li><p>Folds gates with indices 1, 4, and 5 in moment 0,
+and gates with indices 0, 1, and 2 in moment 1.</p></li>
+</ol>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fold_gates</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">moment_indices</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">gate_indices</span><span class="o">=</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="mitiq.folding_cirq.fold_gates_at_random">
+<code class="sig-prename descclassname">mitiq.folding_cirq.</code><code class="sig-name descname">fold_gates_at_random</code><span class="sig-paren">(</span><em class="sig-param">circuit: cirq.circuits.circuit.Circuit</em>, <em class="sig-param">stretch: float</em>, <em class="sig-param">seed: Optional[int] = None</em><span class="sig-paren">)</span> &#x2192; cirq.circuits.circuit.Circuit<a class="reference internal" href="_modules/mitiq/folding_cirq.html#fold_gates_at_random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mitiq.folding_cirq.fold_gates_at_random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a folded circuit by applying the map G -&gt; G G^dag G to a random subset of gates in the input circuit.</p>
+<p>The folded circuit has a number of gates approximately equal to stretch * n where n is the number of gates in
+the input circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> -- Circuit to fold.</p></li>
+<li><p><strong>stretch</strong> -- Factor to stretch the circuit by. Any real number in the interval [1, 3].</p></li>
+<li><p><strong>seed</strong> -- [Optional] Integer seed for random number generator.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Folding a single gate adds two gates to the circuit, hence the maximum stretch factor is 3.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="mitiq.folding_cirq.fold_gates_from_left">
+<code class="sig-prename descclassname">mitiq.folding_cirq.</code><code class="sig-name descname">fold_gates_from_left</code><span class="sig-paren">(</span><em class="sig-param">circuit: cirq.circuits.circuit.Circuit</em>, <em class="sig-param">stretch: float</em><span class="sig-paren">)</span> &#x2192; cirq.circuits.circuit.Circuit<a class="reference internal" href="_modules/mitiq/folding_cirq.html#fold_gates_from_left"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mitiq.folding_cirq.fold_gates_from_left" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new folded circuit by applying the map G -&gt; G G^dag G to a subset of gates of the input circuit,
+starting with gates at the left (beginning) of the circuit.</p>
+<p>The folded circuit has a number of gates approximately equal to stretch * n where n is the number of gates in
+the input circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> -- Circuit to fold.</p></li>
+<li><p><strong>stretch</strong> -- Factor to stretch the circuit by. Any real number in the interval [1, 3].</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Folding a single gate adds two gates to the circuit, hence the maximum stretch factor is 3.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="mitiq.folding_cirq.fold_gates_from_right">
+<code class="sig-prename descclassname">mitiq.folding_cirq.</code><code class="sig-name descname">fold_gates_from_right</code><span class="sig-paren">(</span><em class="sig-param">circuit: cirq.circuits.circuit.Circuit</em>, <em class="sig-param">stretch: float</em><span class="sig-paren">)</span> &#x2192; cirq.circuits.circuit.Circuit<a class="reference internal" href="_modules/mitiq/folding_cirq.html#fold_gates_from_right"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mitiq.folding_cirq.fold_gates_from_right" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new folded circuit by applying the map G -&gt; G G^dag G to a subset of gates of the input circuit,
+starting with gates at the right (end) of the circuit.</p>
+<p>The folded circuit has a number of gates approximately equal to stretch * n where n is the number of gates in
+the input circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> -- Circuit to fold.</p></li>
+<li><p><strong>stretch</strong> -- Factor to stretch the circuit by. Any real number in the interval [1, 3].</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Folding a single gate adds two gates to the circuit, hence the maximum stretch factor is 3.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="mitiq.folding_cirq.fold_local">
+<code class="sig-prename descclassname">mitiq.folding_cirq.</code><code class="sig-name descname">fold_local</code><span class="sig-paren">(</span><em class="sig-param">circuit: cirq.circuits.circuit.Circuit, stretch: float, fold_method: Callable[[cirq.circuits.circuit.Circuit, float, Tuple[Any]], cirq.circuits.circuit.Circuit] = &lt;function fold_gates_from_left&gt;, fold_method_args: Tuple[Any] = ()</em><span class="sig-paren">)</span> &#x2192; cirq.circuits.circuit.Circuit<a class="reference internal" href="_modules/mitiq/folding_cirq.html#fold_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mitiq.folding_cirq.fold_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a folded circuit by folding gates according to the input fold method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> -- Circuit to fold.</p></li>
+<li><p><strong>stretch</strong> -- Factor to stretch the circuit by.</p></li>
+<li><p><strong>fold_method</strong> -- <p>Function which defines the method for folding gates.
+(e.g., Randomly selects gates to fold, folds gates starting from left of circuit, etc.)</p>
+<p>Must have signature</p>
+<dl class="simple">
+<dt>def fold_method(circuit: Circuit, stretch: float, <a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs):</dt><dd><p>...</p>
+</dd>
+</dl>
+<p>and return a circuit.</p>
+</p></li>
+<li><p><strong>fold_method_args</strong> -- <dl class="simple">
+<dt>Any additional input arguments for the fold_method.</dt><dd><p>The method is called with fold_method(circuit, stretch, <a href="#id3"><span class="problematic" id="id4">*</span></a>fold_method_args).</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>fold_method = fold_gates_at_random
+fold_method_args = (1,)</p>
+<p>&gt; Uses a seed of one for the fold_gates_at_random method.</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mitiq.folding_cirq.fold_moments">
+<code class="sig-prename descclassname">mitiq.folding_cirq.</code><code class="sig-name descname">fold_moments</code><span class="sig-paren">(</span><em class="sig-param">circuit: cirq.circuits.circuit.Circuit, moment_indices: List[int]</em><span class="sig-paren">)</span> &#x2192; cirq.circuits.circuit.Circuit<a class="reference internal" href="_modules/mitiq/folding_cirq.html#fold_moments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mitiq.folding_cirq.fold_moments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new circuit with moments folded by mapping</p>
+<p>M_i -&gt; M_i M_i^dag M_i</p>
+<p>where M_i is a moment specified by an integer in moment_indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> -- Circuit to apply folding operation to.</p></li>
+<li><p><strong>moment_indices</strong> -- List of integers that specify moments to fold.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mitiq.folding_cirq.unitary_folding">
+<code class="sig-prename descclassname">mitiq.folding_cirq.</code><code class="sig-name descname">unitary_folding</code><span class="sig-paren">(</span><em class="sig-param">circuit: cirq.circuits.circuit.Circuit</em>, <em class="sig-param">stretch: float</em><span class="sig-paren">)</span> &#x2192; cirq.circuits.circuit.Circuit<a class="reference internal" href="_modules/mitiq/folding_cirq.html#unitary_folding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mitiq.folding_cirq.unitary_folding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies global unitary folding and a final partial folding of the input circuit.
+Returns a circuit of depth approximately equal to stretch*len(circuit).
+The stretch factor can be any real number &gt;= 1.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-mitiq.matrices">
+<span id="matrices"></span><h2>Matrices<a class="headerlink" href="#module-mitiq.matrices" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="qiskit-utils">
+<h2>Qiskit Utils<a class="headerlink" href="#qiskit-utils" title="Permalink to this headline">¶</a></h2>
+</div>
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>

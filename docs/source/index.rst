@@ -42,7 +42,7 @@ Matrices
 
 Qiskit Utils
 ------------
-.. automodule:: mitiq.qiskit_utils
+.. automodule:: mitiq.qiskit.qiskit_utils
    :members:
 
 Indices and tables

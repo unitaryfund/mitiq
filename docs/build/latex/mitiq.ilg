@@ -1,7 +1,7 @@
 This is makeindex, version 2.15 [TeX Live 2017] (kpathsea + Thai support).
 Scanning style file ./python.ist.......done (7 attributes redefined, 0 ignored).
-Scanning input file mitiq.idx....done (29 entries accepted, 0 rejected).
-Sorting entries....done (139 comparisons).
-Generating output file mitiq.ind....done (76 lines written, 0 warnings).
+Scanning input file mitiq.idx....done (38 entries accepted, 0 rejected).
+Sorting entries....done (196 comparisons).
+Generating output file mitiq.ind....done (89 lines written, 0 warnings).
 Output written in mitiq.ind.
 Transcript written in mitiq.ilg.

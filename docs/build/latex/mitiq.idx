@@ -27,3 +27,12 @@
 \indexentry{qrun\_factory() (in module mitiq.zne)@\spxentry{qrun\_factory()}\spxextra{in module mitiq.zne}|hyperpage}{8}
 \indexentry{run\_factory() (in module mitiq.zne)@\spxentry{run\_factory()}\spxextra{in module mitiq.zne}|hyperpage}{8}
 \indexentry{zne\_decorator() (in module mitiq.zne)@\spxentry{zne\_decorator()}\spxextra{in module mitiq.zne}|hyperpage}{8}
+\indexentry{mitiq.folding\_cirq (module)@\spxentry{mitiq.folding\_cirq}\spxextra{module}|hyperpage}{9}
+\indexentry{fold\_gates() (in module mitiq.folding\_cirq)@\spxentry{fold\_gates()}\spxextra{in module mitiq.folding\_cirq}|hyperpage}{9}
+\indexentry{fold\_gates\_at\_random() (in module mitiq.folding\_cirq)@\spxentry{fold\_gates\_at\_random()}\spxextra{in module mitiq.folding\_cirq}|hyperpage}{9}
+\indexentry{fold\_gates\_from\_left() (in module mitiq.folding\_cirq)@\spxentry{fold\_gates\_from\_left()}\spxextra{in module mitiq.folding\_cirq}|hyperpage}{9}
+\indexentry{fold\_gates\_from\_right() (in module mitiq.folding\_cirq)@\spxentry{fold\_gates\_from\_right()}\spxextra{in module mitiq.folding\_cirq}|hyperpage}{10}
+\indexentry{fold\_local() (in module mitiq.folding\_cirq)@\spxentry{fold\_local()}\spxextra{in module mitiq.folding\_cirq}|hyperpage}{10}
+\indexentry{fold\_moments() (in module mitiq.folding\_cirq)@\spxentry{fold\_moments()}\spxextra{in module mitiq.folding\_cirq}|hyperpage}{11}
+\indexentry{unitary\_folding() (in module mitiq.folding\_cirq)@\spxentry{unitary\_folding()}\spxextra{in module mitiq.folding\_cirq}|hyperpage}{11}
+\indexentry{mitiq.matrices (module)@\spxentry{mitiq.matrices}\spxextra{module}|hyperpage}{11}

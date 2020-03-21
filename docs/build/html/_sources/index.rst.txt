@@ -30,6 +30,21 @@ Zero Noise Extrapolation
 .. automodule:: mitiq.zne
    :members:
 
+Folding
+-------
+.. automodule:: mitiq.folding_cirq
+   :members:
+
+Matrices
+--------
+.. automodule:: mitiq.matrices
+   :members:
+
+Qiskit Utils
+------------
+.. automodule:: mitiq.qiskit_utils
+   :members:
+
 Indices and tables
 ==================
 
