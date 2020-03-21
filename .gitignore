@@ -6,5 +6,6 @@
 *.ipynb_checkpoints
 _build
 __pycache__/
+docs/build/
 mitiq.egg-info/
 
