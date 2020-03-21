@@ -1,6 +1,6 @@
 """Utility functions."""
 
-import numpy as np
+import random
 
 import cirq
 
@@ -8,11 +8,11 @@ import cirq
 def random_circuit(depth: int, **kwargs) -> cirq.Circuit:
     """Returns a random single-qubit circuit with Pauli gates."""
     if "seed" in kwargs.keys():
-        np.random.seed(kwargs.get("seed"))
+        random.seed(kwargs.get("seed"))
 
     qubit = cirq.GridQubit(0, 0)
-    gates = [cirq.ops.X(qubit), cirq.ops.Y(qubit), cirq.ops.Z(qubit)]
-    circuit = cirq.Circuit([np.random.choice(gates).on(qubit) for _ in range(depth)])
+    gates = [cirq.ops.X, cirq.ops.Y, cirq.ops.Z]
+    circuit = cirq.Circuit([random.choice(gates).on(qubit) for _ in range(depth)])
 
     return circuit
 

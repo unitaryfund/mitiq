@@ -1,11 +1,10 @@
 """Unit tests for folding Cirq circuits."""
 
 from copy import deepcopy
-import random
 
 import numpy as np
 import pytest
-from cirq import (Circuit, GridQubit, LineQubit, ops, CircuitDag, inverse)
+from cirq import (Circuit, GridQubit, LineQubit, ops, inverse)
 
 from mitiq.utils import (_equal, random_circuit)
 from mitiq.folding_cirq import (_is_measurement,
