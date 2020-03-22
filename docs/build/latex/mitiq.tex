@@ -758,13 +758,13 @@ Returns a single\sphinxhyphen{}qubit identity circuit based on Pauli gates.
 
 
 \chapter{Mitiq Documentation}
-\label{\detokenize{README-docs:mitiq-documentation}}\label{\detokenize{README-docs::doc}}
+\label{\detokenize{toc-README-docs:mitiq-documentation}}\label{\detokenize{toc-README-docs::doc}}
 This is the documentation of Mitiq, a Python toolkit for
 implementing error mitigation on quantum computers.
 
 
 \section{Requirements}
-\label{\detokenize{README-docs:requirements}}
+\label{\detokenize{toc-README-docs:requirements}}
 The documentation is generated with
 \sphinxhref{https://www.sphinx-doc.org/en/master/usage/installation.html}{Sphinx}.
 
@@ -772,9 +772,15 @@ The documentation is generated with
 pip install \PYGZhy{}U sphinx
 \end{sphinxVerbatim}
 
+We are also including an \sphinxcode{\sphinxupquote{.md}} file, so this tool is necessary
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+pip install \PYGZhy{}\PYGZhy{}upgrade recommonmark
+\end{sphinxVerbatim}
+
 
 \subsection{Check your Sphinx installation}
-\label{\detokenize{README-docs:check-your-sphinx-installation}}
+\label{\detokenize{toc-README-docs:check-your-sphinx-installation}}
 To check that Sphinx is installed you can run
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
@@ -783,10 +789,10 @@ sphinx\PYGZhy{}build \PYGZhy{}\PYGZhy{}version
 
 
 \section{How to Update the Documentation}
-\label{\detokenize{README-docs:how-to-update-the-documentation}}
+\label{\detokenize{toc-README-docs:how-to-update-the-documentation}}
 
 \subsection{Work in an environment}
-\label{\detokenize{README-docs:work-in-an-environment}}\begin{itemize}
+\label{\detokenize{toc-README-docs:work-in-an-environment}}\begin{itemize}
 \item {} 
 Create a conda environment for the documentation
 
@@ -799,7 +805,7 @@ conda activate mitiqenv
 
 
 \subsection{Create a new branch}
-\label{\detokenize{README-docs:create-a-new-branch}}\begin{itemize}
+\label{\detokenize{toc-README-docs:create-a-new-branch}}\begin{itemize}
 \item {} 
 Create a branch in \sphinxcode{\sphinxupquote{git}} for the documentation with the release number up to
 minor (e.g., 0.0.2\sphinxhyphen{}\sphinxhyphen{}\sphinxhyphen{}\textgreater{}00X)
@@ -811,12 +817,13 @@ minor (e.g., 0.0.2\sphinxhyphen{}\sphinxhyphen{}\sphinxhyphen{}\textgreater{}00X
 \end{sphinxVerbatim}
 
 
-\subsection{Create a new branch}
-\label{\detokenize{README-docs:id1}}\begin{itemize}
+\subsection{The configuration file}
+\label{\detokenize{toc-README-docs:the-configuration-file}}\begin{itemize}
 \item {} 
-Since the documentation is already created, you need not to generate it
-from scratch. If you had to generate it from scratch, the first step would
-involve creating the \sphinxcode{\sphinxupquote{conf.py}} file. This can be generated with a wizard
+Since the documentation is already created, you need not to generate a
+configuration file from scratch. If you had to generate the documentation
+from scratch, the first step would have involved creating the \sphinxcode{\sphinxupquote{conf.py}} file.
+This can be generated with a wizard from bash
 
 \end{itemize}
 
@@ -829,7 +836,7 @@ in the \sphinxcode{\sphinxupquote{conf.py}} file.
 
 
 \subsection{Build the documentation locally}
-\label{\detokenize{README-docs:build-the-documentation-locally}}\begin{itemize}
+\label{\detokenize{toc-README-docs:build-the-documentation-locally}}\begin{itemize}
 \item {} 
 To build the documentation, from \sphinxcode{\sphinxupquote{bash}}, move to the \sphinxcode{\sphinxupquote{docs}} folder and run
 
@@ -849,7 +856,7 @@ The \sphinxcode{\sphinxupquote{html}} and \sphinxcode{\sphinxupquote{latex}}  an
 
 
 \subsection{Create the html}
-\label{\detokenize{README-docs:create-the-html}}\begin{itemize}
+\label{\detokenize{toc-README-docs:create-the-html}}\begin{itemize}
 \item {} 
 To create the html structure,
 
@@ -861,7 +868,7 @@ make html
 
 
 \subsection{Create the pdf}
-\label{\detokenize{README-docs:create-the-pdf}}\begin{itemize}
+\label{\detokenize{toc-README-docs:create-the-pdf}}\begin{itemize}
 \item {} 
 To create the latex files and output a pdf,
 
@@ -872,8 +879,22 @@ make latexpdf
 \end{sphinxVerbatim}
 
 
-\subsection{Add information in the guide with a tree of text files}
-\label{\detokenize{README-docs:add-information-in-the-guide-with-a-tree-of-text-files}}
+\subsection{Add features in the conf.py file}
+\label{\detokenize{toc-README-docs:add-features-in-the-conf-py-file}}\begin{itemize}
+\item {} 
+To add specific feature to the documentation, extensions can be include.
+For example to add classes and functions to the API doc, make sure that autodoc
+extension is enabled in the \sphinxcode{\sphinxupquote{conf.py}} file,
+
+\end{itemize}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{extensions} \PYG{o}{=} \PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{sphinx.ext.autodoc}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}
+\end{sphinxVerbatim}
+
+
+\subsection{Update the guide with a tree of restructured text files}
+\label{\detokenize{toc-README-docs:update-the-guide-with-a-tree-of-restructured-text-files}}
 The documentation is divided into a guide, whose content needs to be written
 from scratch, and an API doc part, which can be partly automatically generated.
 \begin{itemize}
@@ -896,22 +917,22 @@ Make sure they are included in the table of contents
 \end{sphinxVerbatim}
 
 
-\subsection{Add features in the conf.py file}
-\label{\detokenize{README-docs:add-features-in-the-conf-py-file}}\begin{itemize}
+\subsection{If you want to include in the guide markdown files}
+\label{\detokenize{toc-README-docs:if-you-want-to-include-in-the-guide-markdown-files}}\begin{itemize}
 \item {} 
-To add specific feature to the documentation, extensions can be include.
-For example to add classes and functions to the API doc, make sure that autodoc
-extension is enabled in the \sphinxcode{\sphinxupquote{conf.py}} file,
+Information to the guide can also be added from markdown (\sphinxcode{\sphinxupquote{.md}}) files.
+This requires \sphinxcode{\sphinxupquote{recommonmark}} (\sphinxcode{\sphinxupquote{pip install \sphinxhyphen{}\sphinxhyphen{}upgrade recommonmark}}) and
+we added to the \sphinxcode{\sphinxupquote{conf.py}} file
 
 \end{itemize}
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{extensions} \PYG{o}{=} \PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{sphinx.ext.autodoc}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}
+\PYG{n}{extensions} \PYG{o}{=} \PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{recommonmark}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}
 \end{sphinxVerbatim}
 
 
 \subsection{Automatically add information to the API doc}
-\label{\detokenize{README-docs:automatically-add-information-to-the-api-doc}}\begin{itemize}
+\label{\detokenize{toc-README-docs:automatically-add-information-to-the-api-doc}}\begin{itemize}
 \item {} 
 New modules, classes and functions can be added by listing them
 in the appropriate \sphinxcode{\sphinxupquote{.rst}} file (such as \sphinxcode{\sphinxupquote{autodoc.rst}} or a child), e.g.,
@@ -930,14 +951,14 @@ classes and functions to add, to comment them, as well as exclude them.
 
 
 \subsection{Save the pdf file in the \sphinxstyleliteralintitle{\sphinxupquote{docs/pdf}} folder}
-\label{\detokenize{README-docs:save-the-pdf-file-in-the-docs-pdf-folder}}
+\label{\detokenize{toc-README-docs:save-the-pdf-file-in-the-docs-pdf-folder}}
 Since the \sphinxcode{\sphinxupquote{docs/build}} folder is not kept track of, copy the pdf file
 with the documentation from \sphinxcode{\sphinxupquote{docs/build/latex}} to the \sphinxcode{\sphinxupquote{docs/pdf}} folder,
 naming it according to the release version with major and minor.
 
 
 \section{Additional information}
-\label{\detokenize{README-docs:additional-information}}
+\label{\detokenize{toc-README-docs:additional-information}}
 \sphinxhref{https://github.com/nathanshammah/scikit-project/blob/master/5-docs}{Here}
 are some notes on how to build docs.
 

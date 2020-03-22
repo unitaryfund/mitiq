@@ -293,8 +293,8 @@ INPUT /Users/nathanshammah/github/mitiq/docs/build/doctrees/images/d0e7ddd334f5c
 INPUT /usr/local/texlive/2017/texmf-dist/tex/latex/psnfss/ts1pcr.fd
 INPUT /usr/local/texlive/2017/texmf-dist/tex/latex/psnfss/ts1pcr.fd
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrr8c.tfm
-INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrb8t.tfm
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/vf/adobe/courier/pcrr8c.vf
+INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrb8t.tfm
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/vf/adobe/courier/pcrb8t.vf
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrb8r.tfm
 INPUT mitiq.ind

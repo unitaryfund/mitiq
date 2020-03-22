@@ -1,11 +1,11 @@
 # Fdb version 3
-["makeindex mitiq.idx"] 1584893966 "mitiq.idx" "mitiq.ind" "mitiq" 1584894404
-  "mitiq.idx" 1584893967 5267 15fd6facfadaa85495f1ff60cea7d3c1 ""
+["makeindex mitiq.idx"] 1584893966 "mitiq.idx" "mitiq.ind" "mitiq" 1584895412
+  "mitiq.idx" 1584895336 5267 15fd6facfadaa85495f1ff60cea7d3c1 ""
   (generated)
-  "mitiq.ind"
   "mitiq.ilg"
-["pdflatex"] 1584894404 "mitiq.tex" "mitiq.pdf" "mitiq" 1584894404
-  "/Users/nathanshammah/github/mitiq/docs/build/doctrees/images/d0e7ddd334f5cd5d1e2ff83269e13074662dde9a/badge.svg" 1584894403 2216 ccc335d793e2062c63a1a0efd0b7339f ""
+  "mitiq.ind"
+["pdflatex"] 1584895412 "mitiq.tex" "mitiq.pdf" "mitiq" 1584895412
+  "/Users/nathanshammah/github/mitiq/docs/build/doctrees/images/d0e7ddd334f5cd5d1e2ff83269e13074662dde9a/badge.svg" 1584895411 2216 ccc335d793e2062c63a1a0efd0b7339f ""
   "/usr/local/texlive/2017/texmf-dist/fonts/enc/dvips/base/8r.enc" 1480098666 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2017/texmf-dist/fonts/map/fontname/texfonts.map" 1480098670 3287 e6b82fe08f5336d4d5ebc73fb1152e87 ""
   "/usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrb8r.tfm" 1480098688 1292 3059476c50a24578715759f22652f3d0 ""
@@ -155,20 +155,20 @@
   "/usr/local/texlive/2017/texmf-var/web2c/pdftex/pdflatex.fmt" 1513350891 4129593 1b82c64fa80cd29a17cb773fb0c3d717 ""
   "/usr/local/texlive/2017/texmf.cnf" 1495593465 577 2b71d4d888f9e5560b2e99985915a9fa ""
   "footnotehyper-sphinx.sty" 1584791547 8888 1bbd7bdeae8c8bed1d10d551bddb1cc9 ""
-  "mitiq.aux" 1584893967 7731 fc86211b4bae41f149b20b5647db5e55 ""
+  "mitiq.aux" 1584895336 7962 4504334c5a87068700f54400050fccfd ""
   "mitiq.ind" 1584893966 4037 b69f0a4d3be436a999b2e55aba174629 "makeindex mitiq.idx"
-  "mitiq.out" 1584893967 1705 ab97262cd1fbdcbcd8cf6b1573e08028 ""
-  "mitiq.tex" 1584894403 47241 f5de1cfbbf816dfb77c6f015a5eb6b10 ""
-  "mitiq.toc" 1584893967 1190 642b9466ff5d7c5d7146b148de39166e ""
+  "mitiq.out" 1584895336 1845 83883a8dc68db68c43470ee069be2c4a ""
+  "mitiq.tex" 1584895412 48281 63192e05ecbc9d9d89c318704b8594dc ""
+  "mitiq.toc" 1584895336 1264 c639eff387e76d9bede4b98cb764b401 ""
   "sphinx.sty" 1584791547 81878 44d14f90f8cb22a202794c148df60b64 ""
-  "sphinxhighlight.sty" 1584894403 8137 38a433148fcb7611515a989ff1750dd5 ""
+  "sphinxhighlight.sty" 1584895411 8137 38a433148fcb7611515a989ff1750dd5 ""
   "sphinxmanual.cls" 1584791547 4236 124cd90deb92742b5d3922bfc2cd70c0 ""
-  "sphinxmessages.sty" 1584894403 745 3f5fcd6cdd7964ed608767954a8ced6f ""
+  "sphinxmessages.sty" 1584895412 745 3f5fcd6cdd7964ed608767954a8ced6f ""
   "sphinxmulticell.sty" 1584791547 14606 0b6edc2b1a83546ed92026d1f6a311b5 ""
   (generated)
+  "mitiq.toc"
   "mitiq.out"
   "mitiq.idx"
   "mitiq.pdf"
-  "mitiq.toc"
   "mitiq.log"
   "mitiq.aux"

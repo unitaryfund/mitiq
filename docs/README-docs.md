@@ -1,8 +1,8 @@
 ![Python Build](https://github.com/unitaryfund/mitiq/workflows/Python%20Build/badge.svg?branch=master)
 
-# Mitiq Documentation
-This is the documentation of Mitiq, a Python toolkit for
-implementing error mitigation on quantum computers.
+# Mitiq Documentation Contributors Guide
+This is the Ccntributors guide for the documentation of Mitiq,
+a Python toolkit for implementing error mitigation on quantum computers.
 
 ## Requirements
 The documentation is generated with

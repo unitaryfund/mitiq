@@ -13,7 +13,8 @@ Welcome to mitiq's documentation!
    changelog.rst
    guide/guide.rst
    apidoc.rst
-   README-docs.md
+   toc-README-docs.md
+
 
 Indices and tables
 ==================

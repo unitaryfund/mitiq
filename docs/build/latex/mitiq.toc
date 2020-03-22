@@ -18,14 +18,15 @@
 \contentsline {section}{\numberline {4.2}How to Update the Documentation}{13}{section.4.2}
 \contentsline {subsection}{\numberline {4.2.1}Work in an environment}{13}{subsection.4.2.1}
 \contentsline {subsection}{\numberline {4.2.2}Create a new branch}{14}{subsection.4.2.2}
-\contentsline {subsection}{\numberline {4.2.3}Create a new branch}{14}{subsection.4.2.3}
+\contentsline {subsection}{\numberline {4.2.3}The configuration file}{14}{subsection.4.2.3}
 \contentsline {subsection}{\numberline {4.2.4}Build the documentation locally}{14}{subsection.4.2.4}
 \contentsline {subsection}{\numberline {4.2.5}Create the html}{14}{subsection.4.2.5}
 \contentsline {subsection}{\numberline {4.2.6}Create the pdf}{14}{subsection.4.2.6}
-\contentsline {subsection}{\numberline {4.2.7}Add information in the guide with a tree of text files}{14}{subsection.4.2.7}
-\contentsline {subsection}{\numberline {4.2.8}Add features in the conf.py file}{15}{subsection.4.2.8}
-\contentsline {subsection}{\numberline {4.2.9}Automatically add information to the API doc}{15}{subsection.4.2.9}
-\contentsline {subsection}{\numberline {4.2.10}Save the pdf file in the \sphinxstyleliteralintitle {\sphinxupquote {docs/pdf}} folder}{15}{subsection.4.2.10}
+\contentsline {subsection}{\numberline {4.2.7}Add features in the conf.py file}{14}{subsection.4.2.7}
+\contentsline {subsection}{\numberline {4.2.8}Update the guide with a tree of restructured text files}{15}{subsection.4.2.8}
+\contentsline {subsection}{\numberline {4.2.9}If you want to include in the guide markdown files}{15}{subsection.4.2.9}
+\contentsline {subsection}{\numberline {4.2.10}Automatically add information to the API doc}{15}{subsection.4.2.10}
+\contentsline {subsection}{\numberline {4.2.11}Save the pdf file in the \sphinxstyleliteralintitle {\sphinxupquote {docs/pdf}} folder}{15}{subsection.4.2.11}
 \contentsline {section}{\numberline {4.3}Additional information}{15}{section.4.3}
 \contentsline {chapter}{\numberline {5}Indices and tables}{17}{chapter.5}
 \contentsline {chapter}{Python Module Index}{19}{section*.37}

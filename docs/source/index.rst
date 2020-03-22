@@ -13,14 +13,7 @@ Welcome to mitiq's documentation!
    changelog.rst
    guide/guide.rst
    apidoc.rst
-
-Indices and tables
-==================
-.. toctree::
-   :maxdepth: 2
-   :caption: Contribute:
    toc-README-docs.md
-
 
 
 Indices and tables
