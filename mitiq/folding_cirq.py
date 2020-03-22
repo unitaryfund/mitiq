@@ -131,7 +131,7 @@ def _get_num_to_fold(stretch: float, ngates: int) -> int:
         stretch: Floating point value to stretch the circuit by.
         ngates: Number of gates in the circuit to stretch.
     """
-    return int(max(round(ngates * (stretch - 1.0) / 2.0), 0))
+    return int(round(ngates * (stretch - 1.0) / 2.0))
 
 
 def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
