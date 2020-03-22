@@ -10,7 +10,7 @@ The documentation is generated with
 ```bash
 pip install -U sphinx
 ```
-### Check your installation
+### Check your Sphinx installation
 To check that Sphinx is installed you can run
 ```bash
 sphinx-build --version
@@ -39,6 +39,8 @@ involve creating the `conf.py` file. This can be generated with a wizard
 ```bash
 (mitiqenv) sphinx-quickstart
 ```
+which then asks some questions. Meta-data and specifications are accounted for
+in the `conf.py` file.
 
 ### Build the documentation locally
 - To build the documentation, from `bash`, move to the `docs` folder and run
@@ -47,6 +49,8 @@ sphinx-build -b html source build
 ```
 this generates the `docs/build` folder. This folder is not kept track of in the
  github repository, as `docs/build` is present in the `.gitignore` file.
+ You need not to modify the `docs/build` folder, as it is automatically
+ generated. You will modify only the `docs/source` files.
 
 
 The `html` and `latex`  and `pdf` files will be automatically created in the
@@ -67,7 +71,7 @@ make html
 make latexpdf
 ```
 
-### Add information in the guide
+### Add information in the guide with a tree of text files
 
 The documentation is divided into a guide, whose content needs to be written
 from scratch, and an API doc part, which can be partly automatically generated.
@@ -79,11 +83,28 @@ The main file is `index.rst`. It includes a `guide.rst` and an `apidoc.rst`
 file, as well as other files. Like in LaTeX, each file can include other files.
 
 
+```
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   changelog.rst
+```
+
+### Add features in the conf.py file
+
+- To add specific feature to the documentation, extensions can be include.
+For example to add classes and functions to the API doc, make sure that autodoc
+extension is enabled in the `conf.py` file,
+
+```
+extensions = ['sphinx.ext.autodoc']
+```
+
 ### Automatically add information to the API doc
 
-- To add new classes and functions to the API doc, make sure that autodoc
-extension is enabled in the `conf.py` file and that these are listed
-in the appropriate `.rst` file (such as `index.rst`), e.g.,
+- New modules, classes and functions can be added by listing them
+in the appropriate `.rst` file (such as `autodoc.rst` or a child), e.g.,
 
 ```
 Factories
@@ -91,18 +112,9 @@ Factories
 .. automodule:: mitiq.factories
    :members:
 ```
+will add all elements of the `mitiq.factories` module. One can hand-pick
+classes and functions to add, to comment them, as well as exclude them.
 
-### Add modules with API documentation
-- To add new classes and functions to the API doc, make sure that autodoc
-extension is enabled in the `conf.py` file and that these are listed
-in the appropriate `.rst` file (such as `index.rst`), e.g.,
-
-```
-Factories
----------
-.. automodule:: mitiq.factories
-   :members:
-```
 
 ## Additional information
 [Here](https://github.com/nathanshammah/scikit-project/blob/master/5-docs.md)
