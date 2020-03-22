@@ -1,4 +1,6 @@
-"""Functions to convert from Mitiq's internal circuit representation to supported circuit representations."""
+"""Functions to convert from Mitiq's internal circuit representation
+to Qiskit representations.
+"""
 
 import cirq
 from cirq.contrib.qasm_import import circuit_from_qasm

@@ -1,6 +1,5 @@
 """Utility functions."""
 
-from copy import deepcopy
 import random
 
 import cirq
@@ -22,7 +21,9 @@ def random_circuit(depth: int, **kwargs) -> cirq.Circuit:
 
     qubit = cirq.GridQubit(0, 0)
     gates = [cirq.ops.X, cirq.ops.Y, cirq.ops.Z]
-    circuit = cirq.Circuit([random.choice(gates).on(qubit) for _ in range(depth)])
+    circuit = cirq.Circuit(
+        [random.choice(gates).on(qubit) for _ in range(depth)]
+    )
 
     return circuit
 
@@ -38,13 +39,15 @@ def _equal(
     ----------
         circuit_one: Input circuit to compare to circuit_two.
         circuit_two: Input circuit to compare to circuit_one.
-        require_qubit_equality: Requires that the qubits be equal in the two circuits.
+        require_qubit_equality: Requires that the qubits be equal
+            in the two circuits.
 
-                                E.g., if set(circuit_one.all_qubits()) = {LineQubit(0)},
-                                then set(circuit_two_all_qubits()) must be {LineQubit(0)},
-                                else the two are not equal.
+            E.g., if set(circuit_one.all_qubits()) = {LineQubit(0)},
+            then set(circuit_two_all_qubits()) must be {LineQubit(0)},
+            else the two are not equal.
 
-                                If True, the qubits of both circuits must have a well-defined ordering.
+            If True, the qubits of both circuits must have
+            a well-defined ordering.
     """
     if circuit_one is circuit_two:
         return True
@@ -66,4 +69,6 @@ def _equal(
         print(circuit_one)
         print(circuit_two)
 
-    return cirq.CircuitDag.from_circuit(circuit_one) == cirq.CircuitDag.from_circuit(circuit_two)
+    return (cirq.CircuitDag.from_circuit(circuit_one)
+            ==
+            cirq.CircuitDag.from_circuit(circuit_two))

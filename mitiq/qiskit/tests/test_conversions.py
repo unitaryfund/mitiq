@@ -1,14 +1,20 @@
-"""Unit tests for circuit conversions between Mitiq circuits and Qiskit circuits."""
+"""Unit tests for circuit conversions between
+Mitiq circuits and Qiskit circuits.
+"""
 
 import cirq
-import qiskit.extensions.standard as qiskit_ops
 
 from mitiq.utils import (_equal, random_circuit)
-from mitiq.qiskit.conversions import (_to_qasm, _to_qiskit, _from_qasm, _from_qiskit)
+from mitiq.qiskit.conversions import (_to_qasm,
+                                      _to_qiskit,
+                                      _from_qasm,
+                                      _from_qiskit)
 
 
 def test_bell_state_to_from_circuits():
-    """Tests cirq.Circuit --> qiskit.QuantumCircuit --> cirq.Circuit with a Bell state circuit."""
+    """Tests cirq.Circuit --> qiskit.QuantumCircuit --> cirq.Circuit
+     with a Bell state circuit.
+     """
     qreg = cirq.LineQubit.range(2)
     cirq_circuit = cirq.Circuit(
         [cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1])]
@@ -19,7 +25,9 @@ def test_bell_state_to_from_circuits():
 
 
 def test_bell_state_to_from_qasm():
-    """Tests cirq.Circuit --> QASM string --> cirq.Circuit with a Bell state circuit."""
+    """Tests cirq.Circuit --> QASM string --> cirq.Circuit
+     with a Bell state circuit.
+     """
     qreg = cirq.LineQubit.range(2)
     cirq_circuit = cirq.Circuit(
         [cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1])]
@@ -30,7 +38,9 @@ def test_bell_state_to_from_qasm():
 
 
 def test_random_circuit_to_from_circuits():
-    """Tests cirq.Circuit --> qiskit.QuantumCircuit --> cirq.Circuit with a random one-qubit circuit."""
+    """Tests cirq.Circuit --> qiskit.QuantumCircuit --> cirq.Circuit
+    with a random one-qubit circuit.
+    """
     cirq_circuit = random_circuit(depth=20)
     qiskit_circuit = _to_qiskit(cirq_circuit)
     circuit_cirq = _from_qiskit(qiskit_circuit)
@@ -38,7 +48,9 @@ def test_random_circuit_to_from_circuits():
 
 
 def test_random_circuit_to_from_qasm():
-    """Tests cirq.Circuit --> QASM string --> cirq.Circuit with a random one-qubit circuit."""
+    """Tests cirq.Circuit --> QASM string --> cirq.Circuit
+     with a random one-qubit circuit.
+     """
     cirq_circuit = random_circuit(depth=20)
     qasm = _to_qasm(cirq_circuit)
     circuit_cirq = _from_qasm(qasm)
