@@ -39,4 +39,15 @@ Qiskit Utils
 .. automodule:: mitiq.qiskit.qiskit_utils
    :members:
 
+Tests
+------------
+.. automodule:: mitiq.tests.test_factories
+   :members:
+.. automodule:: mitiq.tests.test_folding_cirq
+   :members:
+.. automodule:: mitiq.pyquil.tests.test_zne
+   :members:
+.. automodule:: mitiq.qiskit.tests.test_zne
+   :members:
+
 
