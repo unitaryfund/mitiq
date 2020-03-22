@@ -29,7 +29,14 @@ Matrices
 .. automodule:: mitiq.matrices
    :members:
 
+PyQuil Utils
+------------
+.. automodule:: mitiq.pyquil.pyquil_utils
+   :members:
+
 Qiskit Utils
 ------------
 .. automodule:: mitiq.qiskit.qiskit_utils
    :members:
+
+
