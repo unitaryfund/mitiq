@@ -372,11 +372,10 @@ def fold_global(circuit: Circuit,
     base_circuit = deepcopy(folded)
 
     # Determine the number of global folds and the final fractional stretch
-    num_global_folds = int(stretch // 3)
-    fractional_stretch = stretch % 3
+    num_global_folds, fractional_stretch = divmod(stretch - 1, 2)
     ngates = len(list(circuit.all_operations()))
     # Do the global folds
-    for _ in range(num_global_folds):
+    for _ in range(int(num_global_folds)):
         folded += Circuit(inverse(base_circuit), base_circuit)
 
     # Do the local folds
