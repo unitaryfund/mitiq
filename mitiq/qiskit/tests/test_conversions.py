@@ -14,11 +14,6 @@ def test_bell_state_to_from_circuits():
         [cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1])]
     )
     qiskit_circuit = _to_qiskit(cirq_circuit)  # Qiskit from Cirq
-    ops = qiskit_circuit.data
-    assert len(ops) == 2
-    assert isinstance(ops[0], qiskit_ops.HGate)
-    assert isinstance(ops[1], qiskit_ops.CnotGate)
-
     circuit_cirq = _from_qiskit(qiskit_circuit)  # Cirq from Qiskit
     assert _equal(cirq_circuit, circuit_cirq)
 
