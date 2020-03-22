@@ -1,6 +1,6 @@
 """Contains all the main classes corresponding to different zero-noise extrapolation methods."""
 
-from typing import List, Iterable, Union
+from typing import List, Iterable, Union, Tuple
 import numpy as np
 from scipy.optimize import curve_fit
 
@@ -93,7 +93,7 @@ class BatchedFactory(Factory):
 
 class PolyFactory(BatchedFactory):
     """
-    Factory object implementing a zero-noise extrapolation algotrithm based on a polynomial fit.
+    Factory object implementing a zero-noise extrapolation algorithm based on a polynomial fit.
     Note: RichardsonFactory and LinearFactory are special cases of PolyFactory.
     """
 
@@ -154,7 +154,7 @@ class RichardsonFactory(BatchedFactory):
 
 
 class LinearFactory(BatchedFactory):
-    """Factory object implementing a zero-noise extrapolation algotrithm based on a linear fit."""
+    """Factory object implementing a zero-noise extrapolation algorithm based on a linear fit."""
 
     def reduce(self) -> float:
         """
@@ -167,12 +167,12 @@ class LinearFactory(BatchedFactory):
 
 class ExpFactory(BatchedFactory):
     """
-    Factory object implementing a zero-noise extrapolation algotrithm assuming an
+    Factory object implementing a zero-noise extrapolation algorithm assuming an
     exponential ansatz y(x) = a + b * exp(-c * x), with c > 0.
 
     If the asymptotic value (y(x->inf) = a) is known, a linear fit with respect
     to z(x) := log[sing(b) (y(x) - a)] is used.
-    Otherwise, a non-linear fit of y(x) is perfomed.
+    Otherwise, a non-linear fit of y(x) is performed.
     """
 
     def __init__(self, scalars: Iterable[float], asymptote: Union[float, None] = None) -> None:
@@ -192,12 +192,12 @@ class ExpFactory(BatchedFactory):
         """
         return PolyExpFactory.static_reduce(
             self.instack, self.outstack, self.asymptote, order=1,
-        )
+        )[0]
 
 
 class PolyExpFactory(BatchedFactory):
     """
-    Factory object implementing a zero-noise extrapolation algotrithm assuming an
+    Factory object implementing a zero-noise extrapolation algorithm assuming an
     (almost) exponential ansatz with a non linear exponent, i.e.:
 
     y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
@@ -225,11 +225,10 @@ class PolyExpFactory(BatchedFactory):
             raise ValueError("The argument 'asymptote' must be either a float or None")
         self.order = order
         self.asymptote = asymptote
-        self.sign = None
 
     @staticmethod
     def static_reduce(instack: List[float], outstack: List[float], asymptote: Union[float, None], \
-                      order: int, eps: float = 1.0e-9) -> float:
+                      order: int, eps: float = 1.0e-9,) -> Tuple[float, List[float]]:
         """
         Determines the zero-noise limit, assuming an exponential ansatz:
         y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
@@ -245,16 +244,22 @@ class PolyExpFactory(BatchedFactory):
         is performed.
 
         This static method is equivalent to the "self.reduce" method of PolyExpFactory,
-        but can be called also by other factories which are particular cases of PolyExpFactory,
-        e.g., ExpFactory.
+        but can be called also by other factories which are related to PolyExpFactory,
+        e.g., ExpFactory, AdaExpFactory.
 
-        Args:
+        Parameters
+        ----------
             instack: x data values.
             outstack: y data values.
             asymptote: y(x->inf).
-            order: extrapolation order.
-            eps: epsilon to regularize log(sign (instack - asymptote)) when
+            order: Extrapolation order.
+            eps: Epsilon to regularize log(sign (instack - asymptote)) when
                  the argument is to close to zero or negative.
+
+        Returns
+        ----------
+            (znl, params): Where "znl" is the zero-noise-limit and "params" are the
+                           optimal fitting parameters.
         """
         # Shift is 0 if asymptote is given, 1 if asymptote is not given
         shift = int(asymptote is None)
@@ -271,30 +276,19 @@ class PolyExpFactory(BatchedFactory):
             )
 
         # CASE 1: asymptote is None.
-        # TODO: it works, but there must be better way of doing this.
-        # Note: *args does not seem to work with curve_fit.
-        # For the moment only orders up to 3 are suppoerted.
-        def ansatz_zero(x: float, asympt: float, b: float) -> float:
-            """Ansatz function of order 0"""
-            return asympt + b
-        def ansatz_one(x: float, asympt: float, b: float, z_one: float) -> float:
-            """Ansatz function of order 1"""
-            return asympt + b * np.exp(-z_one * x)
-        def ansatz_two(x: float, asympt: float, b: float, z_one: float, z_two: float) -> float:
-            """Ansatz function of order 2."""
-            return asympt + b * np.exp(-z_one * x - z_two * x ** 2)
-        def ansatz_three(
-                x: float, asympt: float, b: float, z_one: float, z_two: float, z_three: float
-            ) -> float:
-            """Ansatz function of order 3."""
-            return asympt + b * np.exp(-z_one * x - z_two * x ** 2 - z_three * x ** 3)
-
-        ansatzes = (ansatz_zero, ansatz_one, ansatz_two, ansatz_three)
+        def ansatz(x: float, *coeffs: float):
+            """Ansatz function of generic order."""
+            # Coefficients of the polynomial to be exponentiated
+            z_coeffs = coeffs[2:][::-1]
+            return coeffs[0] + coeffs[1] * np.exp(x * np.polyval(z_coeffs, x))
 
         if asymptote is None:
-            opt_params, _ = curve_fit(ansatzes[order], instack, outstack)
-            # Return ansatz(0)= asympt + b
-            return opt_params[0] + opt_params[1]
+            # Initial values for the parameters
+            p_zero = [-j / (j + 1.0) for j in range(order + 2)]
+            opt_params, _ = curve_fit(ansatz, instack, outstack, p0=p_zero)
+            # The zero limit is ansatz(0)= asympt + b
+            zero_limit = opt_params[0] + opt_params[1]
+            return (zero_limit, opt_params)
 
         # CASE 2: asymptote is given.
         # deduce if the exponential is a decay or a growth
@@ -305,8 +299,10 @@ class PolyExpFactory(BatchedFactory):
         # Get coefficients {z_j} of z(x)= z_0 + z_1*x + z_2*x**2...
         # Note: coefficients are ordered from high powers of x to low powers x.
         z_coefficients = np.polyfit(instack, zstack, deg=order)
-        # return f(x=0)
-        return asymptote + sign * np.exp(z_coefficients[-1])
+        zero_limit = asymptote + sign * np.exp(z_coefficients[-1])
+        # Parameters from low order to high order
+        params = [asymptote] + list(z_coefficients[::-1])
+        return (zero_limit, params)
 
     def reduce(self) -> float:
         """Returns the zero-noise limit, assuming an exponential ansatz:
@@ -319,4 +315,88 @@ class PolyExpFactory(BatchedFactory):
 
         return self.static_reduce(
             self.instack, self.outstack, self.asymptote, self.order,
+        )[0]
+
+
+class AdaExpFactory(Factory):
+    """Factory object implementing an adaptive zero-noise extrapolation algorithm assuming an
+    exponential ansatz y(x) = a + b * exp(-c * x), with c > 0.
+
+    The noise scale factors are are chosen adaptively at each step, depending on the history
+    of collected results.
+
+    If the asymptotic value (y(x->inf) = a) is known, a linear fit with respect
+    to z(x) := log[sing(b) (y(x) - a)] is used.
+    Otherwise, a non-linear fit of y(x) is performed.
+    """
+
+    _SHIFT_FACTOR = 1.27846
+
+    def __init__(self, steps: int, scalar: float = 2, asymptote: Union[float, None] = None) -> None:
+        """Instantiate a new object of this Factory class.
+
+        Parameters
+        ----------
+            steps: The number of optimization steps. At least 3 are necessary.
+            scalar: The second noise scale factor (the first is always 1.0).
+                    Further scale factors are adaptively determined.
+            asymptote: The infinite noise limit (if known) of the expectation value.
+                       Default is None.
+        """
+        super(AdaExpFactory, self).__init__()
+        if not (asymptote is None or isinstance(asymptote, float)):
+            raise ValueError("The argument 'asymptote' must be either a float or None")
+        if scalar <= 1:
+            raise ValueError("The argument 'scalar' must be strictly larger than one.")
+        if steps < 3 + int(asymptote is None):
+            raise ValueError(
+                "The argument 'steps' must be an integer greater or equal to 3. "
+                "If 'asymptote' is None, 'steps' must be greater or equal to 4."
+            )
+        self.steps = steps
+        self.scalar = scalar
+        self.asymptote = asymptote
+        # Keep a log of the optimization process storing:
+        # noise value(s), expectation value(s), parameters, and zero limit
+        self.history = []  # type: List[Tuple[List[float], List[float], List[float], float]]
+
+    def next(self) -> float:
+        """Returns the next noise level to execute a circuit at."""
+        # The 1st noise scale parameter is always 1
+        if len(self.instack) == 0:
+            return 1.0
+        # The 2nd noise scale parameter is self.scalar
+        if len(self.instack) == 1:
+            return self.scalar
+        # If asymptote is None we use 2 * scalar as third noise parameter
+        if (len(self.instack) == 2) and (self.asymptote is None):
+            return 2 * self.scalar
+        # Call self.reduce() in order to update self.history
+        self.reduce()
+        # Get the most recent fitted parameters from self.history
+        _, _, params, _ = self.history[-1]
+        # The exponent parameter is the 3rd element of params
+        exponent = params[2]
+        # Further noise scale factors are determined with
+        # an adaptive rule which depends on self.exponent
+        return 1.0 + self._SHIFT_FACTOR / np.abs(exponent)
+
+    def is_converged(self) -> bool:
+        """Returns True if all the needed expectation values have been computed, else False."""
+        if len(self.outstack) != len(self.instack):
+            raise IndexError(
+                f"The length of 'self.instack' ({len(self.instack)}) "
+                f"and 'self.outstack' ({len(self.outstack)}) must be equal."
+            )
+        return len(self.outstack) == self.steps
+
+    def reduce(self) -> float:
+        """Returns the zero-noise limit, assuming an exponential ansatz:
+        y(x) = a + b * exp(-c * x), with c > 0.
+        """
+        zero_limit, params = PolyExpFactory.static_reduce(
+            self.instack, self.outstack, self.asymptote, order=1,
         )
+        # Update optimization history
+        self.history.append((self.instack, self.outstack, params, zero_limit))
+        return zero_limit
