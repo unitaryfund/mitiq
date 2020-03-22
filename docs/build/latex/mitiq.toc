@@ -12,6 +12,21 @@
 \contentsline {section}{\numberline {3.3}Folding}{9}{section.3.3}
 \contentsline {section}{\numberline {3.4}Matrices}{11}{section.3.4}
 \contentsline {section}{\numberline {3.5}Qiskit Utils}{11}{section.3.5}
-\contentsline {chapter}{\numberline {4}Indices and tables}{13}{chapter.4}
-\contentsline {chapter}{Python Module Index}{15}{section*.36}
-\contentsline {chapter}{Index}{17}{section*.37}
+\contentsline {chapter}{\numberline {4}Mitiq Documentation}{13}{chapter.4}
+\contentsline {section}{\numberline {4.1}Requirements}{13}{section.4.1}
+\contentsline {subsection}{\numberline {4.1.1}Check your Sphinx installation}{13}{subsection.4.1.1}
+\contentsline {section}{\numberline {4.2}How to Update the Documentation}{13}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}Work in an environment}{13}{subsection.4.2.1}
+\contentsline {subsection}{\numberline {4.2.2}Create a new branch}{14}{subsection.4.2.2}
+\contentsline {subsection}{\numberline {4.2.3}Create a new branch}{14}{subsection.4.2.3}
+\contentsline {subsection}{\numberline {4.2.4}Build the documentation locally}{14}{subsection.4.2.4}
+\contentsline {subsection}{\numberline {4.2.5}Create the html}{14}{subsection.4.2.5}
+\contentsline {subsection}{\numberline {4.2.6}Create the pdf}{14}{subsection.4.2.6}
+\contentsline {subsection}{\numberline {4.2.7}Add information in the guide with a tree of text files}{14}{subsection.4.2.7}
+\contentsline {subsection}{\numberline {4.2.8}Add features in the conf.py file}{15}{subsection.4.2.8}
+\contentsline {subsection}{\numberline {4.2.9}Automatically add information to the API doc}{15}{subsection.4.2.9}
+\contentsline {subsection}{\numberline {4.2.10}Save the pdf file in the \sphinxstyleliteralintitle {\sphinxupquote {docs/pdf}} folder}{15}{subsection.4.2.10}
+\contentsline {section}{\numberline {4.3}Additional information}{15}{section.4.3}
+\contentsline {chapter}{\numberline {5}Indices and tables}{17}{chapter.5}
+\contentsline {chapter}{Python Module Index}{19}{section*.37}
+\contentsline {chapter}{Index}{21}{section*.38}

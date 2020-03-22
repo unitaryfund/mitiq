@@ -75,7 +75,7 @@
 
 
 \title{mitiq}
-\date{Mar 21, 2020}
+\date{Mar 22, 2020}
 \release{0.1.0}
 \author{Tech Team @ Unitary Fund}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -139,13 +139,13 @@ With \sphinxtitleref{mitiq.zne} module it is possible to extrapolate what the ex
 
 
 \chapter{API\sphinxhyphen{}doc}
-\label{\detokenize{index:module-mitiq}}\label{\detokenize{index:api-doc}}\index{mitiq (module)@\spxentry{mitiq}\spxextra{module}}
+\label{\detokenize{apidoc:module-mitiq}}\label{\detokenize{apidoc:api-doc}}\label{\detokenize{apidoc::doc}}\index{mitiq (module)@\spxentry{mitiq}\spxextra{module}}
 This is the top level module from which functions and classes of
 Mitiq can be directly imported.
 \index{version() (in module mitiq)@\spxentry{version()}\spxextra{in module mitiq}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.version}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.}}\sphinxbfcode{\sphinxupquote{version}}}{}{}
+\phantomsection\label{\detokenize{apidoc:mitiq.version}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.}}\sphinxbfcode{\sphinxupquote{version}}}{}{}
 Returns the Mitiq version number.
 
 \end{fulllineitems}
@@ -153,12 +153,12 @@ Returns the Mitiq version number.
 
 
 \section{Factories}
-\label{\detokenize{index:module-mitiq.factories}}\label{\detokenize{index:factories}}\index{mitiq.factories (module)@\spxentry{mitiq.factories}\spxextra{module}}
+\label{\detokenize{apidoc:module-mitiq.factories}}\label{\detokenize{apidoc:factories}}\index{mitiq.factories (module)@\spxentry{mitiq.factories}\spxextra{module}}
 Contains all the main classes corresponding to different zero\sphinxhyphen{}noise extrapolation methods.
 \index{BatchedFactory (class in mitiq.factories)@\spxentry{BatchedFactory}\spxextra{class in mitiq.factories}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.BatchedFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{BatchedFactory}}}{\emph{scalars: Iterable{[}float{]}}}{}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.BatchedFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{BatchedFactory}}}{\emph{scalars: Iterable{[}float{]}}}{}
 Abstract class of a non\sphinxhyphen{}adaptive Factory.
 
 This is initialized with a given batch of scaling factors ("scalars").
@@ -171,7 +171,7 @@ overriding the "self.reduce" and (if necessary) the "\_\_init\_\_" method.
 \index{is\_converged() (mitiq.factories.BatchedFactory method)@\spxentry{is\_converged()}\spxextra{mitiq.factories.BatchedFactory method}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.BatchedFactory.is_converged}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{is\_converged}}}{}{{ $\rightarrow$ bool}}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.BatchedFactory.is_converged}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{is\_converged}}}{}{{ $\rightarrow$ bool}}
 Returns True if all needed expectation values have been computed, else False.
 
 \end{fulllineitems}
@@ -179,7 +179,7 @@ Returns True if all needed expectation values have been computed, else False.
 \index{next() (mitiq.factories.BatchedFactory method)@\spxentry{next()}\spxextra{mitiq.factories.BatchedFactory method}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.BatchedFactory.next}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{next}}}{}{{ $\rightarrow$ float}}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.BatchedFactory.next}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{next}}}{}{{ $\rightarrow$ float}}
 Returns the next noise level to execute a circuit at.
 
 \end{fulllineitems}
@@ -190,7 +190,7 @@ Returns the next noise level to execute a circuit at.
 \index{ExpFactory (class in mitiq.factories)@\spxentry{ExpFactory}\spxextra{class in mitiq.factories}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.ExpFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{ExpFactory}}}{\emph{scalars: Iterable{[}float{]}, asymptote: Optional{[}float{]} = None}}{}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.ExpFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{ExpFactory}}}{\emph{scalars: Iterable{[}float{]}, asymptote: Optional{[}float{]} = None}}{}
 Factory object implementing a zero\sphinxhyphen{}noise extrapolation algotrithm assuming an
 exponential ansatz y(x) = a + b * exp(\sphinxhyphen{}c * x), with c \textgreater{} 0.
 
@@ -200,7 +200,7 @@ Otherwise, a non\sphinxhyphen{}linear fit of y(x) is perfomed.
 \index{reduce() (mitiq.factories.ExpFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.ExpFactory method}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.ExpFactory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.ExpFactory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
 Returns the zero\sphinxhyphen{}noise limit, assuming an exponential ansatz:
 y(x) = a + b * exp(\sphinxhyphen{}c * x), with c \textgreater{} 0.
 
@@ -212,7 +212,7 @@ y(x) = a + b * exp(\sphinxhyphen{}c * x), with c \textgreater{} 0.
 \index{Factory (class in mitiq.factories)@\spxentry{Factory}\spxextra{class in mitiq.factories}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.Factory}}\pysigline{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{Factory}}}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.Factory}}\pysigline{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{Factory}}}
 Abstract class designed to adaptively produce a new noise scaling parameter
 based on a historical stack of previous noise scale parameters ("self.instack")
 and previously estimated expectation values ("self.outstack").
@@ -224,7 +224,7 @@ only the classical results of quantum experiments are processed by it.
 \index{is\_converged() (mitiq.factories.Factory method)@\spxentry{is\_converged()}\spxextra{mitiq.factories.Factory method}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.Factory.is_converged}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{is\_converged}}}{}{{ $\rightarrow$ bool}}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.Factory.is_converged}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{is\_converged}}}{}{{ $\rightarrow$ bool}}
 Returns True if all needed expectation values have been computed, else False.
 
 \end{fulllineitems}
@@ -232,7 +232,7 @@ Returns True if all needed expectation values have been computed, else False.
 \index{next() (mitiq.factories.Factory method)@\spxentry{next()}\spxextra{mitiq.factories.Factory method}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.Factory.next}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{next}}}{}{{ $\rightarrow$ float}}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.Factory.next}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{next}}}{}{{ $\rightarrow$ float}}
 Returns the next noise level to execute a circuit at.
 
 \end{fulllineitems}
@@ -240,7 +240,7 @@ Returns the next noise level to execute a circuit at.
 \index{push() (mitiq.factories.Factory method)@\spxentry{push()}\spxextra{mitiq.factories.Factory method}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.Factory.push}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{push}}}{\emph{instack\_val: float}, \emph{outstack\_val: float}}{{ $\rightarrow$ None}}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.Factory.push}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{push}}}{\emph{instack\_val: float}, \emph{outstack\_val: float}}{{ $\rightarrow$ None}}
 Appends "instack\_val" to "self.instack" and "outstack\_val" to "self.outstack".
 Each time a new expectation value is computed this method should be used
 to update the internal state of the Factory.
@@ -250,7 +250,7 @@ to update the internal state of the Factory.
 \index{reduce() (mitiq.factories.Factory method)@\spxentry{reduce()}\spxextra{mitiq.factories.Factory method}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.Factory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.Factory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
 Returns the extrapolation to the zero\sphinxhyphen{}noise limit.
 
 \end{fulllineitems}
@@ -261,12 +261,12 @@ Returns the extrapolation to the zero\sphinxhyphen{}noise limit.
 \index{LinearFactory (class in mitiq.factories)@\spxentry{LinearFactory}\spxextra{class in mitiq.factories}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.LinearFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{LinearFactory}}}{\emph{scalars: Iterable{[}float{]}}}{}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.LinearFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{LinearFactory}}}{\emph{scalars: Iterable{[}float{]}}}{}
 Factory object implementing a zero\sphinxhyphen{}noise extrapolation algotrithm based on a linear fit.
 \index{reduce() (mitiq.factories.LinearFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.LinearFactory method}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.LinearFactory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.LinearFactory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
 Determines, with a least squared method, the line of best fit
 associated to the data points. The intercept is returned.
 
@@ -278,7 +278,7 @@ associated to the data points. The intercept is returned.
 \index{PolyExpFactory (class in mitiq.factories)@\spxentry{PolyExpFactory}\spxextra{class in mitiq.factories}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.PolyExpFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{PolyExpFactory}}}{\emph{scalars: Iterable{[}float{]}, order: int, asymptote: Optional{[}float{]} = None}}{}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.PolyExpFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{PolyExpFactory}}}{\emph{scalars: Iterable{[}float{]}, order: int, asymptote: Optional{[}float{]} = None}}{}
 Factory object implementing a zero\sphinxhyphen{}noise extrapolation algotrithm assuming an
 (almost) exponential ansatz with a non linear exponent, i.e.:
 
@@ -294,7 +294,7 @@ Otherwise, a non\sphinxhyphen{}linear fit of y(x) is perfomed.
 \index{reduce() (mitiq.factories.PolyExpFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.PolyExpFactory method}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.PolyExpFactory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.PolyExpFactory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
 Returns the zero\sphinxhyphen{}noise limit, assuming an exponential ansatz:
 y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
 The parameter "s" is a sign variable which can be either 1 or \sphinxhyphen{}1, corresponding to
@@ -307,7 +307,7 @@ It is also assumed that z(x\sphinxhyphen{}\sphinxhyphen{}\textgreater{}inf)=\sph
 \index{static\_reduce() (mitiq.factories.PolyExpFactory static method)@\spxentry{static\_reduce()}\spxextra{mitiq.factories.PolyExpFactory static method}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.PolyExpFactory.static_reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{static }}\sphinxbfcode{\sphinxupquote{static\_reduce}}}{\emph{instack: List{[}float{]}, outstack: List{[}float{]}, asymptote: Optional{[}float{]}, order: int, eps: float = 1e\sphinxhyphen{}09}}{{ $\rightarrow$ float}}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.PolyExpFactory.static_reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{static }}\sphinxbfcode{\sphinxupquote{static\_reduce}}}{\emph{instack: List{[}float{]}, outstack: List{[}float{]}, asymptote: Optional{[}float{]}, order: int, eps: float = 1e\sphinxhyphen{}09}}{{ $\rightarrow$ float}}
 Determines the zero\sphinxhyphen{}noise limit, assuming an exponential ansatz:
 y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
 
@@ -354,13 +354,13 @@ the argument is to close to zero or negative.
 \index{PolyFactory (class in mitiq.factories)@\spxentry{PolyFactory}\spxextra{class in mitiq.factories}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.PolyFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{PolyFactory}}}{\emph{scalars: Iterable{[}float{]}, order: int}}{}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.PolyFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{PolyFactory}}}{\emph{scalars: Iterable{[}float{]}, order: int}}{}
 Factory object implementing a zero\sphinxhyphen{}noise extrapolation algotrithm based on a polynomial fit.
 Note: RichardsonFactory and LinearFactory are special cases of PolyFactory.
 \index{reduce() (mitiq.factories.PolyFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.PolyFactory method}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.PolyFactory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.PolyFactory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
 Determines with a least squared method, the polynomial of degree equal to "self.order"
 which optimally fits the input data. The zero\sphinxhyphen{}noise limit is returned.
 
@@ -369,7 +369,7 @@ which optimally fits the input data. The zero\sphinxhyphen{}noise limit is retur
 \index{static\_reduce() (mitiq.factories.PolyFactory static method)@\spxentry{static\_reduce()}\spxextra{mitiq.factories.PolyFactory static method}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.PolyFactory.static_reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{static }}\sphinxbfcode{\sphinxupquote{static\_reduce}}}{\emph{instack: List{[}float{]}, outstack: List{[}float{]}, order: int}}{{ $\rightarrow$ float}}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.PolyFactory.static_reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{static }}\sphinxbfcode{\sphinxupquote{static\_reduce}}}{\emph{instack: List{[}float{]}, outstack: List{[}float{]}, order: int}}{{ $\rightarrow$ float}}
 Determines with a least squared method, the polynomial of degree equal to \textquotesingle{}order\textquotesingle{}
 which optimally fits the input data. The zero\sphinxhyphen{}noise limit is returned.
 
@@ -385,12 +385,12 @@ e.g., LinearFactory and RichardsonFactory.
 \index{RichardsonFactory (class in mitiq.factories)@\spxentry{RichardsonFactory}\spxextra{class in mitiq.factories}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.RichardsonFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{RichardsonFactory}}}{\emph{scalars: Iterable{[}float{]}}}{}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.RichardsonFactory}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{mitiq.factories.}}\sphinxbfcode{\sphinxupquote{RichardsonFactory}}}{\emph{scalars: Iterable{[}float{]}}}{}
 Factory object implementing Richardson\textquotesingle{}s extrapolation.
 \index{reduce() (mitiq.factories.RichardsonFactory method)@\spxentry{reduce()}\spxextra{mitiq.factories.RichardsonFactory method}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.factories.RichardsonFactory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
+\phantomsection\label{\detokenize{apidoc:mitiq.factories.RichardsonFactory.reduce}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reduce}}}{}{{ $\rightarrow$ float}}
 Returns the Richardson\textquotesingle{}s extrapolation to the zero\sphinxhyphen{}noise limit.
 
 \end{fulllineitems}
@@ -401,12 +401,12 @@ Returns the Richardson\textquotesingle{}s extrapolation to the zero\sphinxhyphen
 
 
 \section{Zero Noise Extrapolation}
-\label{\detokenize{index:module-mitiq.zne}}\label{\detokenize{index:zero-noise-extrapolation}}\index{mitiq.zne (module)@\spxentry{mitiq.zne}\spxextra{module}}
+\label{\detokenize{apidoc:module-mitiq.zne}}\label{\detokenize{apidoc:zero-noise-extrapolation}}\index{mitiq.zne (module)@\spxentry{mitiq.zne}\spxextra{module}}
 Zero\sphinxhyphen{}noise extrapolation tools.
 \index{execute\_with\_zne() (in module mitiq.zne)@\spxentry{execute\_with\_zne()}\spxextra{in module mitiq.zne}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.zne.execute_with_zne}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.zne.}}\sphinxbfcode{\sphinxupquote{execute\_with\_zne}}}{\emph{qp: Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, executor: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}, fac: mitiq.factories.Factory = None, scale\_noise: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, float{]}, Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]} = None}}{{ $\rightarrow$ Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}}}
+\phantomsection\label{\detokenize{apidoc:mitiq.zne.execute_with_zne}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.zne.}}\sphinxbfcode{\sphinxupquote{execute\_with\_zne}}}{\emph{qp: Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, executor: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}, fac: mitiq.factories.Factory = None, scale\_noise: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, float{]}, Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]} = None}}{{ $\rightarrow$ Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}}}
 Takes as input a quantum circuit and returns the associated expectation value
 evaluated with error mitigation.
 \begin{quote}\begin{description}
@@ -435,7 +435,7 @@ If not specified, a default method will be used.
 \index{mitigate\_executor() (in module mitiq.zne)@\spxentry{mitigate\_executor()}\spxextra{in module mitiq.zne}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.zne.mitigate_executor}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.zne.}}\sphinxbfcode{\sphinxupquote{mitigate\_executor}}}{\emph{executor: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}, fac: mitiq.factories.Factory = None, scale\_noise: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, float{]}, Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]} = None}}{{ $\rightarrow$ Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}}}
+\phantomsection\label{\detokenize{apidoc:mitiq.zne.mitigate_executor}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.zne.}}\sphinxbfcode{\sphinxupquote{mitigate\_executor}}}{\emph{executor: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}, fac: mitiq.factories.Factory = None, scale\_noise: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, float{]}, Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]} = None}}{{ $\rightarrow$ Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}}}
 Takes as input a generic function ("executor"), difined by the user, which executes a circuit
 with an arbitrary backend and produces an expectation value.
 
@@ -463,7 +463,7 @@ If not specified, a default method is used.
 \index{qrun\_factory() (in module mitiq.zne)@\spxentry{qrun\_factory()}\spxextra{in module mitiq.zne}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.zne.qrun_factory}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.zne.}}\sphinxbfcode{\sphinxupquote{qrun\_factory}}}{\emph{fac: mitiq.factories.Factory, qp: Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, executor: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}, scale\_noise: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, float{]}, Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}}}{{ $\rightarrow$ None}}
+\phantomsection\label{\detokenize{apidoc:mitiq.zne.qrun_factory}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.zne.}}\sphinxbfcode{\sphinxupquote{qrun\_factory}}}{\emph{fac: mitiq.factories.Factory, qp: Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, executor: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}, scale\_noise: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, float{]}, Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}}}{{ $\rightarrow$ None}}
 Runs the factory until convergence executing quantum circuits with different noise levels.
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
@@ -488,7 +488,7 @@ Runs the factory until convergence executing quantum circuits with different noi
 \index{run\_factory() (in module mitiq.zne)@\spxentry{run\_factory()}\spxextra{in module mitiq.zne}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.zne.run_factory}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.zne.}}\sphinxbfcode{\sphinxupquote{run\_factory}}}{\emph{fac: mitiq.factories.Factory, noise\_to\_expval: Callable{[}{[}float{]}, float{]}, max\_iterations: int = 100}}{{ $\rightarrow$ None}}
+\phantomsection\label{\detokenize{apidoc:mitiq.zne.run_factory}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.zne.}}\sphinxbfcode{\sphinxupquote{run\_factory}}}{\emph{fac: mitiq.factories.Factory, noise\_to\_expval: Callable{[}{[}float{]}, float{]}, max\_iterations: int = 100}}{{ $\rightarrow$ None}}
 Runs a factory until convergence (or until the number of iterations reach "max\_iterations").
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
@@ -510,7 +510,7 @@ Runs a factory until convergence (or until the number of iterations reach "max\_
 \index{zne\_decorator() (in module mitiq.zne)@\spxentry{zne\_decorator()}\spxextra{in module mitiq.zne}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.zne.zne_decorator}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.zne.}}\sphinxbfcode{\sphinxupquote{zne\_decorator}}}{\emph{fac: mitiq.factories.Factory = None, scale\_noise: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, float{]}, Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]} = None}}{{ $\rightarrow$ Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}}}
+\phantomsection\label{\detokenize{apidoc:mitiq.zne.zne_decorator}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.zne.}}\sphinxbfcode{\sphinxupquote{zne\_decorator}}}{\emph{fac: mitiq.factories.Factory = None, scale\_noise: Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}, float{]}, Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]} = None}}{{ $\rightarrow$ Callable{[}{[}Union{[}qiskit.circuit.quantumcircuit.QuantumCircuit, pyquil.quil.Program{]}{]}, float{]}}}
 Decorator which automatically adds error mitigation to any circuit\sphinxhyphen{}executor function
 defined by the user.
 
@@ -535,12 +535,12 @@ If not specified, a default method will be used.
 
 
 \section{Folding}
-\label{\detokenize{index:module-mitiq.folding_cirq}}\label{\detokenize{index:folding}}\index{mitiq.folding\_cirq (module)@\spxentry{mitiq.folding\_cirq}\spxextra{module}}
+\label{\detokenize{apidoc:module-mitiq.folding_cirq}}\label{\detokenize{apidoc:folding}}\index{mitiq.folding\_cirq (module)@\spxentry{mitiq.folding\_cirq}\spxextra{module}}
 Functions to fold gates in Cirq circuits.
 \index{fold\_gates() (in module mitiq.folding\_cirq)@\spxentry{fold\_gates()}\spxextra{in module mitiq.folding\_cirq}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.folding_cirq.fold_gates}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_gates}}}{\emph{circuit: cirq.circuits.circuit.Circuit, moment\_indices: Iterable{[}int{]}, gate\_indices: List{[}Iterable{[}int{]}{]}}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
+\phantomsection\label{\detokenize{apidoc:mitiq.folding_cirq.fold_gates}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_gates}}}{\emph{circuit: cirq.circuits.circuit.Circuit, moment\_indices: Iterable{[}int{]}, gate\_indices: List{[}Iterable{[}int{]}{]}}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
 Returns a new circuit with specified gates folded.
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
@@ -578,7 +578,7 @@ and gates with indices 0, 1, and 2 in moment 1.
 \index{fold\_gates\_at\_random() (in module mitiq.folding\_cirq)@\spxentry{fold\_gates\_at\_random()}\spxextra{in module mitiq.folding\_cirq}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.folding_cirq.fold_gates_at_random}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_gates\_at\_random}}}{\emph{circuit: cirq.circuits.circuit.Circuit}, \emph{stretch: float}, \emph{seed: Optional{[}int{]} = None}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
+\phantomsection\label{\detokenize{apidoc:mitiq.folding_cirq.fold_gates_at_random}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_gates\_at\_random}}}{\emph{circuit: cirq.circuits.circuit.Circuit}, \emph{stretch: float}, \emph{seed: Optional{[}int{]} = None}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
 Returns a folded circuit by applying the map G \sphinxhyphen{}\textgreater{} G G\textasciicircum{}dag G to a random subset of gates in the input circuit.
 
 The folded circuit has a number of gates approximately equal to stretch * n where n is the number of gates in
@@ -607,7 +607,7 @@ Folding a single gate adds two gates to the circuit, hence the maximum stretch f
 \index{fold\_gates\_from\_left() (in module mitiq.folding\_cirq)@\spxentry{fold\_gates\_from\_left()}\spxextra{in module mitiq.folding\_cirq}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.folding_cirq.fold_gates_from_left}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_gates\_from\_left}}}{\emph{circuit: cirq.circuits.circuit.Circuit}, \emph{stretch: float}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
+\phantomsection\label{\detokenize{apidoc:mitiq.folding_cirq.fold_gates_from_left}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_gates\_from\_left}}}{\emph{circuit: cirq.circuits.circuit.Circuit}, \emph{stretch: float}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
 Returns a new folded circuit by applying the map G \sphinxhyphen{}\textgreater{} G G\textasciicircum{}dag G to a subset of gates of the input circuit,
 starting with gates at the left (beginning) of the circuit.
 
@@ -634,7 +634,7 @@ Folding a single gate adds two gates to the circuit, hence the maximum stretch f
 \index{fold\_gates\_from\_right() (in module mitiq.folding\_cirq)@\spxentry{fold\_gates\_from\_right()}\spxextra{in module mitiq.folding\_cirq}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.folding_cirq.fold_gates_from_right}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_gates\_from\_right}}}{\emph{circuit: cirq.circuits.circuit.Circuit}, \emph{stretch: float}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
+\phantomsection\label{\detokenize{apidoc:mitiq.folding_cirq.fold_gates_from_right}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_gates\_from\_right}}}{\emph{circuit: cirq.circuits.circuit.Circuit}, \emph{stretch: float}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
 Returns a new folded circuit by applying the map G \sphinxhyphen{}\textgreater{} G G\textasciicircum{}dag G to a subset of gates of the input circuit,
 starting with gates at the right (end) of the circuit.
 
@@ -661,7 +661,7 @@ Folding a single gate adds two gates to the circuit, hence the maximum stretch f
 \index{fold\_local() (in module mitiq.folding\_cirq)@\spxentry{fold\_local()}\spxextra{in module mitiq.folding\_cirq}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.folding_cirq.fold_local}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_local}}}{\emph{circuit: cirq.circuits.circuit.Circuit, stretch: float, fold\_method: Callable{[}{[}cirq.circuits.circuit.Circuit, float, Tuple{[}Any{]}{]}, cirq.circuits.circuit.Circuit{]} = \textless{}function fold\_gates\_from\_left\textgreater{}, fold\_method\_args: Tuple{[}Any{]} = ()}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
+\phantomsection\label{\detokenize{apidoc:mitiq.folding_cirq.fold_local}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_local}}}{\emph{circuit: cirq.circuits.circuit.Circuit, stretch: float, fold\_method: Callable{[}{[}cirq.circuits.circuit.Circuit, float, Tuple{[}Any{]}{]}, cirq.circuits.circuit.Circuit{]} = \textless{}function fold\_gates\_from\_left\textgreater{}, fold\_method\_args: Tuple{[}Any{]} = ()}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
 Returns a folded circuit by folding gates according to the input fold method.
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
@@ -709,7 +709,7 @@ fold\_method\_args = (1,)
 \index{fold\_moments() (in module mitiq.folding\_cirq)@\spxentry{fold\_moments()}\spxextra{in module mitiq.folding\_cirq}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.folding_cirq.fold_moments}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_moments}}}{\emph{circuit: cirq.circuits.circuit.Circuit, moment\_indices: List{[}int{]}}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
+\phantomsection\label{\detokenize{apidoc:mitiq.folding_cirq.fold_moments}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{fold\_moments}}}{\emph{circuit: cirq.circuits.circuit.Circuit, moment\_indices: List{[}int{]}}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
 Returns a new circuit with moments folded by mapping
 
 M\_i \sphinxhyphen{}\textgreater{} M\_i M\_i\textasciicircum{}dag M\_i
@@ -732,7 +732,7 @@ where M\_i is a moment specified by an integer in moment\_indices.
 \index{unitary\_folding() (in module mitiq.folding\_cirq)@\spxentry{unitary\_folding()}\spxextra{in module mitiq.folding\_cirq}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:mitiq.folding_cirq.unitary_folding}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{unitary\_folding}}}{\emph{circuit: cirq.circuits.circuit.Circuit}, \emph{stretch: float}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
+\phantomsection\label{\detokenize{apidoc:mitiq.folding_cirq.unitary_folding}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.folding\_cirq.}}\sphinxbfcode{\sphinxupquote{unitary\_folding}}}{\emph{circuit: cirq.circuits.circuit.Circuit}, \emph{stretch: float}}{{ $\rightarrow$ cirq.circuits.circuit.Circuit}}
 Applies global unitary folding and a final partial folding of the input circuit.
 Returns a circuit of depth approximately equal to stretch*len(circuit).
 The stretch factor can be any real number \textgreater{}= 1.
@@ -742,10 +742,205 @@ The stretch factor can be any real number \textgreater{}= 1.
 
 
 \section{Matrices}
-\label{\detokenize{index:module-mitiq.matrices}}\label{\detokenize{index:matrices}}\index{mitiq.matrices (module)@\spxentry{mitiq.matrices}\spxextra{module}}
+\label{\detokenize{apidoc:module-mitiq.matrices}}\label{\detokenize{apidoc:matrices}}\index{mitiq.matrices (module)@\spxentry{mitiq.matrices}\spxextra{module}}
 
 \section{Qiskit Utils}
-\label{\detokenize{index:qiskit-utils}}
+\label{\detokenize{apidoc:module-mitiq.qiskit.qiskit_utils}}\label{\detokenize{apidoc:qiskit-utils}}\index{mitiq.qiskit.qiskit\_utils (module)@\spxentry{mitiq.qiskit.qiskit\_utils}\spxextra{module}}\index{random\_identity\_circuit() (in module mitiq.qiskit.qiskit\_utils)@\spxentry{random\_identity\_circuit()}\spxextra{in module mitiq.qiskit.qiskit\_utils}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{apidoc:mitiq.qiskit.qiskit_utils.random_identity_circuit}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{mitiq.qiskit.qiskit\_utils.}}\sphinxbfcode{\sphinxupquote{random\_identity\_circuit}}}{\emph{depth=None}}{}
+Returns a single\sphinxhyphen{}qubit identity circuit based on Pauli gates.
+
+\end{fulllineitems}
+
+
+\sphinxincludegraphics{{/Users/nathanshammah/github/mitiq/docs/build/doctrees/images/d0e7ddd334f5cd5d1e2ff83269e13074662dde9a/badge}.svg}
+
+
+\chapter{Mitiq Documentation}
+\label{\detokenize{README-docs:mitiq-documentation}}\label{\detokenize{README-docs::doc}}
+This is the documentation of Mitiq, a Python toolkit for
+implementing error mitigation on quantum computers.
+
+
+\section{Requirements}
+\label{\detokenize{README-docs:requirements}}
+The documentation is generated with
+\sphinxhref{https://www.sphinx-doc.org/en/master/usage/installation.html}{Sphinx}.
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+pip install \PYGZhy{}U sphinx
+\end{sphinxVerbatim}
+
+
+\subsection{Check your Sphinx installation}
+\label{\detokenize{README-docs:check-your-sphinx-installation}}
+To check that Sphinx is installed you can run
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+sphinx\PYGZhy{}build \PYGZhy{}\PYGZhy{}version
+\end{sphinxVerbatim}
+
+
+\section{How to Update the Documentation}
+\label{\detokenize{README-docs:how-to-update-the-documentation}}
+
+\subsection{Work in an environment}
+\label{\detokenize{README-docs:work-in-an-environment}}\begin{itemize}
+\item {} 
+Create a conda environment for the documentation
+
+\end{itemize}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+conda create \PYGZhy{}n mitiqenv
+conda activate mitiqenv
+\end{sphinxVerbatim}
+
+
+\subsection{Create a new branch}
+\label{\detokenize{README-docs:create-a-new-branch}}\begin{itemize}
+\item {} 
+Create a branch in \sphinxcode{\sphinxupquote{git}} for the documentation with the release number up to
+minor (e.g., 0.0.2\sphinxhyphen{}\sphinxhyphen{}\sphinxhyphen{}\textgreater{}00X)
+
+\end{itemize}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{o}{(}mitiqenv\PYG{o}{)} git checkout \PYGZhy{}b mitiq00X
+\end{sphinxVerbatim}
+
+
+\subsection{Create a new branch}
+\label{\detokenize{README-docs:id1}}\begin{itemize}
+\item {} 
+Since the documentation is already created, you need not to generate it
+from scratch. If you had to generate it from scratch, the first step would
+involve creating the \sphinxcode{\sphinxupquote{conf.py}} file. This can be generated with a wizard
+
+\end{itemize}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{o}{(}mitiqenv\PYG{o}{)} sphinx\PYGZhy{}quickstart
+\end{sphinxVerbatim}
+
+which then asks some questions. Meta\sphinxhyphen{}data and specifications are accounted for
+in the \sphinxcode{\sphinxupquote{conf.py}} file.
+
+
+\subsection{Build the documentation locally}
+\label{\detokenize{README-docs:build-the-documentation-locally}}\begin{itemize}
+\item {} 
+To build the documentation, from \sphinxcode{\sphinxupquote{bash}}, move to the \sphinxcode{\sphinxupquote{docs}} folder and run
+
+\end{itemize}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+sphinx\PYGZhy{}build \PYGZhy{}b html \PYG{n+nb}{source} build
+\end{sphinxVerbatim}
+
+this generates the \sphinxcode{\sphinxupquote{docs/build}} folder. This folder is not kept track of in the
+github repository, as \sphinxcode{\sphinxupquote{docs/build}} is present in the \sphinxcode{\sphinxupquote{.gitignore}} file.
+You need not to modify the \sphinxcode{\sphinxupquote{docs/build}} folder, as it is automatically
+generated. You will modify only the \sphinxcode{\sphinxupquote{docs/source}} files.
+
+The \sphinxcode{\sphinxupquote{html}} and \sphinxcode{\sphinxupquote{latex}}  and \sphinxcode{\sphinxupquote{pdf}} files will be automatically created in the
+\sphinxcode{\sphinxupquote{docs/build}} folder.
+
+
+\subsection{Create the html}
+\label{\detokenize{README-docs:create-the-html}}\begin{itemize}
+\item {} 
+To create the html structure,
+
+\end{itemize}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+make html
+\end{sphinxVerbatim}
+
+
+\subsection{Create the pdf}
+\label{\detokenize{README-docs:create-the-pdf}}\begin{itemize}
+\item {} 
+To create the latex files and output a pdf,
+
+\end{itemize}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+make latexpdf
+\end{sphinxVerbatim}
+
+
+\subsection{Add information in the guide with a tree of text files}
+\label{\detokenize{README-docs:add-information-in-the-guide-with-a-tree-of-text-files}}
+The documentation is divided into a guide, whose content needs to be written
+from scratch, and an API doc part, which can be partly automatically generated.
+\begin{itemize}
+\item {} 
+To add information in the guide, it is possible to include new information
+as a restructured text (\sphinxcode{\sphinxupquote{.rst}}) or markdown (\sphinxcode{\sphinxupquote{.md}}) file.
+
+\end{itemize}
+
+The main file is \sphinxcode{\sphinxupquote{index.rst}}. It includes a \sphinxcode{\sphinxupquote{guide.rst}} and an \sphinxcode{\sphinxupquote{apidoc.rst}}
+file, as well as other files. Like in LaTeX, each file can include other files.
+Make sure they are included in the table of contents
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{o}{.}\PYG{o}{.} \PYG{n}{toctree}\PYG{p}{:}\PYG{p}{:}
+   \PYG{p}{:}\PYG{n}{maxdepth}\PYG{p}{:} \PYG{l+m+mi}{2}
+   \PYG{p}{:}\PYG{n}{caption}\PYG{p}{:} \PYG{n}{Contents}\PYG{p}{:}
+
+   \PYG{n}{changelog}\PYG{o}{.}\PYG{n}{rst}
+\end{sphinxVerbatim}
+
+
+\subsection{Add features in the conf.py file}
+\label{\detokenize{README-docs:add-features-in-the-conf-py-file}}\begin{itemize}
+\item {} 
+To add specific feature to the documentation, extensions can be include.
+For example to add classes and functions to the API doc, make sure that autodoc
+extension is enabled in the \sphinxcode{\sphinxupquote{conf.py}} file,
+
+\end{itemize}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{extensions} \PYG{o}{=} \PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{sphinx.ext.autodoc}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}
+\end{sphinxVerbatim}
+
+
+\subsection{Automatically add information to the API doc}
+\label{\detokenize{README-docs:automatically-add-information-to-the-api-doc}}\begin{itemize}
+\item {} 
+New modules, classes and functions can be added by listing them
+in the appropriate \sphinxcode{\sphinxupquote{.rst}} file (such as \sphinxcode{\sphinxupquote{autodoc.rst}} or a child), e.g.,
+
+\end{itemize}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{Factories}
+\PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZhy{}}
+\PYG{o}{.}\PYG{o}{.} \PYG{n}{automodule}\PYG{p}{:}\PYG{p}{:} \PYG{n}{mitiq}\PYG{o}{.}\PYG{n}{factories}
+   \PYG{p}{:}\PYG{n}{members}\PYG{p}{:}
+\end{sphinxVerbatim}
+
+will add all elements of the \sphinxcode{\sphinxupquote{mitiq.factories}} module. One can hand\sphinxhyphen{}pick
+classes and functions to add, to comment them, as well as exclude them.
+
+
+\subsection{Save the pdf file in the \sphinxstyleliteralintitle{\sphinxupquote{docs/pdf}} folder}
+\label{\detokenize{README-docs:save-the-pdf-file-in-the-docs-pdf-folder}}
+Since the \sphinxcode{\sphinxupquote{docs/build}} folder is not kept track of, copy the pdf file
+with the documentation from \sphinxcode{\sphinxupquote{docs/build/latex}} to the \sphinxcode{\sphinxupquote{docs/pdf}} folder,
+naming it according to the release version with major and minor.
+
+
+\section{Additional information}
+\label{\detokenize{README-docs:additional-information}}
+\sphinxhref{https://github.com/nathanshammah/scikit-project/blob/master/5-docs}{Here}
+are some notes on how to build docs.
+
 
 \chapter{Indices and tables}
 \label{\detokenize{index:indices-and-tables}}\begin{itemize}
@@ -765,11 +960,12 @@ The stretch factor can be any real number \textgreater{}= 1.
 \begin{sphinxtheindex}
 \let\bigletter\sphinxstyleindexlettergroup
 \bigletter{m}
-\item\relax\sphinxstyleindexentry{mitiq}\sphinxstyleindexpageref{index:\detokenize{module-mitiq}}
-\item\relax\sphinxstyleindexentry{mitiq.factories}\sphinxstyleindexpageref{index:\detokenize{module-mitiq.factories}}
-\item\relax\sphinxstyleindexentry{mitiq.folding\_cirq}\sphinxstyleindexpageref{index:\detokenize{module-mitiq.folding_cirq}}
-\item\relax\sphinxstyleindexentry{mitiq.matrices}\sphinxstyleindexpageref{index:\detokenize{module-mitiq.matrices}}
-\item\relax\sphinxstyleindexentry{mitiq.zne}\sphinxstyleindexpageref{index:\detokenize{module-mitiq.zne}}
+\item\relax\sphinxstyleindexentry{mitiq}\sphinxstyleindexpageref{apidoc:\detokenize{module-mitiq}}
+\item\relax\sphinxstyleindexentry{mitiq.factories}\sphinxstyleindexpageref{apidoc:\detokenize{module-mitiq.factories}}
+\item\relax\sphinxstyleindexentry{mitiq.folding\_cirq}\sphinxstyleindexpageref{apidoc:\detokenize{module-mitiq.folding_cirq}}
+\item\relax\sphinxstyleindexentry{mitiq.matrices}\sphinxstyleindexpageref{apidoc:\detokenize{module-mitiq.matrices}}
+\item\relax\sphinxstyleindexentry{mitiq.qiskit.qiskit\_utils}\sphinxstyleindexpageref{apidoc:\detokenize{module-mitiq.qiskit.qiskit_utils}}
+\item\relax\sphinxstyleindexentry{mitiq.zne}\sphinxstyleindexpageref{apidoc:\detokenize{module-mitiq.zne}}
 \end{sphinxtheindex}
 
 \renewcommand{\indexname}{Index}

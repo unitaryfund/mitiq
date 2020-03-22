@@ -288,6 +288,15 @@ INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrr8r.tfm
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrb8t.tfm
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/vf/adobe/courier/pcrb8t.vf
 INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrb8r.tfm
+INPUT /Users/nathanshammah/github/mitiq/docs/build/doctrees/images/d0e7ddd334f5cd5d1e2ff83269e13074662dde9a/badge.svg
+INPUT /Users/nathanshammah/github/mitiq/docs/build/doctrees/images/d0e7ddd334f5cd5d1e2ff83269e13074662dde9a/badge.svg
+INPUT /usr/local/texlive/2017/texmf-dist/tex/latex/psnfss/ts1pcr.fd
+INPUT /usr/local/texlive/2017/texmf-dist/tex/latex/psnfss/ts1pcr.fd
+INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrr8c.tfm
+INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrb8t.tfm
+INPUT /usr/local/texlive/2017/texmf-dist/fonts/vf/adobe/courier/pcrr8c.vf
+INPUT /usr/local/texlive/2017/texmf-dist/fonts/vf/adobe/courier/pcrb8t.vf
+INPUT /usr/local/texlive/2017/texmf-dist/fonts/tfm/adobe/courier/pcrb8r.tfm
 INPUT mitiq.ind
 INPUT mitiq.ind
 INPUT mitiq.aux

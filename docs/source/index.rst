@@ -16,6 +16,15 @@ Welcome to mitiq's documentation!
 
 Indices and tables
 ==================
+.. toctree::
+   :maxdepth: 2
+   :caption: Contribute:
+   toc-README-docs.md
+
+
+
+Indices and tables
+==================
 
 * :ref:`genindex`
 * :ref:`modindex`

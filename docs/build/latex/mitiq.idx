@@ -36,3 +36,5 @@
 \indexentry{fold\_moments() (in module mitiq.folding\_cirq)@\spxentry{fold\_moments()}\spxextra{in module mitiq.folding\_cirq}|hyperpage}{11}
 \indexentry{unitary\_folding() (in module mitiq.folding\_cirq)@\spxentry{unitary\_folding()}\spxextra{in module mitiq.folding\_cirq}|hyperpage}{11}
 \indexentry{mitiq.matrices (module)@\spxentry{mitiq.matrices}\spxextra{module}|hyperpage}{11}
+\indexentry{mitiq.qiskit.qiskit\_utils (module)@\spxentry{mitiq.qiskit.qiskit\_utils}\spxextra{module}|hyperpage}{11}
+\indexentry{random\_identity\_circuit() (in module mitiq.qiskit.qiskit\_utils)@\spxentry{random\_identity\_circuit()}\spxextra{in module mitiq.qiskit.qiskit\_utils}|hyperpage}{11}

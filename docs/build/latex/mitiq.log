@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.12.16)  21 MAR 2020 17:38
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.12.16)  22 MAR 2020 17:26
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1361,16 +1361,49 @@ Underfull \hbox (badness 10000) in paragraph at lines 712--712
 []\T1/ptm/m/it/10 circuit: cirq.circuits.circuit.Circuit, mo-ment_indices:
  []
 
+
+! LaTeX Error: Unknown graphics extension: .svg.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.757 ...5cd5d1e2ff83269e13074662dde9a/badge}.svg}
+                                                  
+? 
+
+! LaTeX Error: Unknown graphics extension: .svg.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.757 ...5cd5d1e2ff83269e13074662dde9a/badge}.svg}
+                                                  
+? 
 [11] [12
 
 ]
 Chapter 4.
-[13] [14
+[13] [14]
+LaTeX Font Info:    Try loading font information for TS1+pcr on input line 909.
 
-] [15
+ (/usr/local/texlive/2017/texmf-dist/tex/latex/psnfss/ts1pcr.fd
+File: ts1pcr.fd 2001/06/04 font definitions for TS1/pcr.
+)
+LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <12> not available
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 932.
+
+[15] [16
+
+]
+Chapter 5.
+[17] [18
+
+] [19
 
 
-] (./mitiq.ind [16
+] (./mitiq.ind [20
 
 
 ]
@@ -1398,31 +1431,47 @@ s.BatchedFactory
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 72--74
+Underfull \hbox (badness 6927) in paragraph at lines 62--64
+[]\T1/pcr/m/n/10 random_identity_circuit() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 in m
+od-ule mi-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 75--77
 []\T1/pcr/m/n/10 static_reduce() \T1/ptm/m/n/10 (\T1/ptm/m/it/10 mi-tiq.factori
 es.PolyExpFactory
  []
 
-[17
+[21
 
 ])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 777.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 777.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 973.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 973.
  (./mitiq.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 777.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 777.
-Package rerunfilecheck Info: File `mitiq.out' has not changed.
-(rerunfilecheck)             Checksum: B25D7E9DF733DE9CE9246F61F30EFA08;1705.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 777.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 973.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 973.
+
+
+Package rerunfilecheck Warning: File `mitiq.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `mitiq.out':
+(rerunfilecheck)             Before: AB97262CD1FBDCBCD8CF6B1573E08028;1705
+(rerunfilecheck)             After:  0D93895A5DDD75C575ADCACECD0F8107;2352.
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 973.
  ) 
 Here is how much of TeX's memory you used:
- 13743 strings out of 492995
- 191688 string characters out of 6132703
- 284245 words of memory out of 5000000
- 16916 multiletter control sequences out of 15000+600000
- 53072 words of font info for 73 fonts, out of 8000000 for 9000
+ 13810 strings out of 492995
+ 193204 string characters out of 6132703
+ 286357 words of memory out of 5000000
+ 16954 multiletter control sequences out of 15000+600000
+ 53986 words of font info for 76 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 37i,11n,45p,796b,649s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 37i,11n,48p,797b,649s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2017/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
 exlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local/tex
 live/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texl
@@ -1434,10 +1483,10 @@ t/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2017/texmf-dist/fonts
 /urw/helvetic/uhvr8a.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/urw/ti
 mes/utmb8a.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/urw/times/utmr8a
 .pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on mitiq.pdf (21 pages, 149341 bytes).
+Output written on mitiq.pdf (25 pages, 158983 bytes).
 PDF statistics:
- 313 PDF objects out of 1000 (max. 8388607)
- 271 compressed objects within 3 object streams
- 72 named destinations out of 1000 (max. 500000)
+ 357 PDF objects out of 1000 (max. 8388607)
+ 310 compressed objects within 4 object streams
+ 92 named destinations out of 1000 (max. 500000)
  133 words of extra memory for PDF output out of 10000 (max. 10000000)
 

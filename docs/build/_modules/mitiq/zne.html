@@ -39,7 +39,7 @@
 <span class="kn">from</span> <span class="nn">mitiq.factories</span> <span class="kn">import</span> <span class="n">Factory</span><span class="p">,</span> <span class="n">LinearFactory</span>
 
 
-<div class="viewcode-block" id="run_factory"><a class="viewcode-back" href="../../index.html#mitiq.zne.run_factory">[docs]</a><span class="k">def</span> <span class="nf">run_factory</span><span class="p">(</span>
+<div class="viewcode-block" id="run_factory"><a class="viewcode-back" href="../../apidoc.html#mitiq.zne.run_factory">[docs]</a><span class="k">def</span> <span class="nf">run_factory</span><span class="p">(</span>
         <span class="n">fac</span><span class="p">:</span> <span class="n">Factory</span><span class="p">,</span> <span class="n">noise_to_expval</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span> <span class="n">max_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -66,7 +66,7 @@
     <span class="k">return</span> <span class="kc">None</span></div>
 
 <span class="c1"># quantum version of run_factory. Similar to the old &quot;mitigate&quot;.</span>
-<div class="viewcode-block" id="qrun_factory"><a class="viewcode-back" href="../../index.html#mitiq.zne.qrun_factory">[docs]</a><span class="k">def</span> <span class="nf">qrun_factory</span><span class="p">(</span><span class="n">fac</span><span class="p">:</span> <span class="n">Factory</span><span class="p">,</span> <span class="n">qp</span><span class="p">:</span> <span class="n">QPROGRAM</span><span class="p">,</span> <span class="n">executor</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">QPROGRAM</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span> \
+<div class="viewcode-block" id="qrun_factory"><a class="viewcode-back" href="../../apidoc.html#mitiq.zne.qrun_factory">[docs]</a><span class="k">def</span> <span class="nf">qrun_factory</span><span class="p">(</span><span class="n">fac</span><span class="p">:</span> <span class="n">Factory</span><span class="p">,</span> <span class="n">qp</span><span class="p">:</span> <span class="n">QPROGRAM</span><span class="p">,</span> <span class="n">executor</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">QPROGRAM</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span> \
                  <span class="n">scale_noise</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">QPROGRAM</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">QPROGRAM</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Runs the factory until convergence executing quantum circuits with different noise levels.</span>
@@ -87,7 +87,7 @@
     <span class="n">run_factory</span><span class="p">(</span><span class="n">fac</span><span class="p">,</span> <span class="n">_noise_to_expval</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="execute_with_zne"><a class="viewcode-back" href="../../index.html#mitiq.zne.execute_with_zne">[docs]</a><span class="k">def</span> <span class="nf">execute_with_zne</span><span class="p">(</span>
+<div class="viewcode-block" id="execute_with_zne"><a class="viewcode-back" href="../../apidoc.html#mitiq.zne.execute_with_zne">[docs]</a><span class="k">def</span> <span class="nf">execute_with_zne</span><span class="p">(</span>
         <span class="n">qp</span><span class="p">:</span> <span class="n">QPROGRAM</span><span class="p">,</span> <span class="n">executor</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">QPROGRAM</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span> <span class="n">fac</span><span class="p">:</span> <span class="n">Factory</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">scale_noise</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">QPROGRAM</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">QPROGRAM</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">QPROGRAM</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
@@ -115,7 +115,7 @@
 
 
 <span class="c1"># Similar to the old &quot;zne&quot;.</span>
-<div class="viewcode-block" id="mitigate_executor"><a class="viewcode-back" href="../../index.html#mitiq.zne.mitigate_executor">[docs]</a><span class="k">def</span> <span class="nf">mitigate_executor</span><span class="p">(</span>
+<div class="viewcode-block" id="mitigate_executor"><a class="viewcode-back" href="../../apidoc.html#mitiq.zne.mitigate_executor">[docs]</a><span class="k">def</span> <span class="nf">mitigate_executor</span><span class="p">(</span>
         <span class="n">executor</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">QPROGRAM</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span> <span class="n">fac</span><span class="p">:</span> <span class="n">Factory</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">scale_noise</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">QPROGRAM</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">QPROGRAM</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">QPROGRAM</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
@@ -140,7 +140,7 @@
     <span class="k">return</span> <span class="n">new_executor</span></div>
 
 
-<div class="viewcode-block" id="zne_decorator"><a class="viewcode-back" href="../../index.html#mitiq.zne.zne_decorator">[docs]</a><span class="k">def</span> <span class="nf">zne_decorator</span><span class="p">(</span>
+<div class="viewcode-block" id="zne_decorator"><a class="viewcode-back" href="../../apidoc.html#mitiq.zne.zne_decorator">[docs]</a><span class="k">def</span> <span class="nf">zne_decorator</span><span class="p">(</span>
         <span class="n">fac</span><span class="p">:</span> <span class="n">Factory</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">scale_noise</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">QPROGRAM</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">QPROGRAM</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">QPROGRAM</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -184,6 +184,8 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Change Log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../guide/guide.html">Users Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../apidoc.html">API-doc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../README-docs.html">Mitiq Documentation</a></li>
 </ul>
 
 <div class="relations">

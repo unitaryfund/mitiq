@@ -39,6 +39,7 @@
   \item \spxentry{mitiq.factories}\spxextra{module}, \hyperpage{5}
   \item \spxentry{mitiq.folding\_cirq}\spxextra{module}, \hyperpage{9}
   \item \spxentry{mitiq.matrices}\spxextra{module}, \hyperpage{11}
+  \item \spxentry{mitiq.qiskit.qiskit\_utils}\spxextra{module}, \hyperpage{11}
   \item \spxentry{mitiq.zne}\spxextra{module}, \hyperpage{7}
 
   \indexspace
@@ -58,6 +59,8 @@
 
   \indexspace
   \bigletter R
+  \item \spxentry{random\_identity\_circuit()}\spxextra{in module mitiq.qiskit.qiskit\_utils}, 
+		\hyperpage{11}
   \item \spxentry{reduce()}\spxextra{mitiq.factories.ExpFactory method}, \hyperpage{5}
   \item \spxentry{reduce()}\spxextra{mitiq.factories.Factory method}, \hyperpage{6}
   \item \spxentry{reduce()}\spxextra{mitiq.factories.LinearFactory method}, \hyperpage{6}

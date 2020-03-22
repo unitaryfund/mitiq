@@ -37,7 +37,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">curve_fit</span>
 
-<div class="viewcode-block" id="Factory"><a class="viewcode-back" href="../../index.html#mitiq.factories.Factory">[docs]</a><span class="k">class</span> <span class="nc">Factory</span><span class="p">:</span>
+<div class="viewcode-block" id="Factory"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.Factory">[docs]</a><span class="k">class</span> <span class="nc">Factory</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract class designed to adaptively produce a new noise scaling parameter</span>
 <span class="sd">    based on a historical stack of previous noise scale parameters (&quot;self.instack&quot;)</span>
@@ -57,7 +57,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">instack</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outstack</span> <span class="o">=</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="Factory.push"><a class="viewcode-back" href="../../index.html#mitiq.factories.Factory.push">[docs]</a>    <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instack_val</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">outstack_val</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="Factory.push"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.Factory.push">[docs]</a>    <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instack_val</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">outstack_val</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Appends &quot;instack_val&quot; to &quot;self.instack&quot; and &quot;outstack_val&quot; to &quot;self.outstack&quot;.</span>
 <span class="sd">        Each time a new expectation value is computed this method should be used</span>
@@ -66,20 +66,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">instack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instack_val</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outstack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">outstack_val</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Factory.next"><a class="viewcode-back" href="../../index.html#mitiq.factories.Factory.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="Factory.next"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.Factory.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns the next noise level to execute a circuit at.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="Factory.is_converged"><a class="viewcode-back" href="../../index.html#mitiq.factories.Factory.is_converged">[docs]</a>    <span class="k">def</span> <span class="nf">is_converged</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="Factory.is_converged"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.Factory.is_converged">[docs]</a>    <span class="k">def</span> <span class="nf">is_converged</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns True if all needed expectation values have been computed, else False.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="Factory.reduce"><a class="viewcode-back" href="../../index.html#mitiq.factories.Factory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="Factory.reduce"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.Factory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns the extrapolation to the zero-noise limit.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
 
 
-<div class="viewcode-block" id="BatchedFactory"><a class="viewcode-back" href="../../index.html#mitiq.factories.BatchedFactory">[docs]</a><span class="k">class</span> <span class="nc">BatchedFactory</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
+<div class="viewcode-block" id="BatchedFactory"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.BatchedFactory">[docs]</a><span class="k">class</span> <span class="nc">BatchedFactory</span><span class="p">(</span><span class="n">Factory</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Abstract class of a non-adaptive Factory.</span>
 
@@ -105,7 +105,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span> <span class="o">=</span> <span class="n">scalars</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-<div class="viewcode-block" id="BatchedFactory.next"><a class="viewcode-back" href="../../index.html#mitiq.factories.BatchedFactory.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="BatchedFactory.next"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.BatchedFactory.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">next_param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outstack</span><span class="p">)]</span>
         <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
@@ -115,7 +115,7 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">next_param</span></div>
 
-<div class="viewcode-block" id="BatchedFactory.is_converged"><a class="viewcode-back" href="../../index.html#mitiq.factories.BatchedFactory.is_converged">[docs]</a>    <span class="k">def</span> <span class="nf">is_converged</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="BatchedFactory.is_converged"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.BatchedFactory.is_converged">[docs]</a>    <span class="k">def</span> <span class="nf">is_converged</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outstack</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instack</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;The length of &#39;self.instack&#39; ({len(self.instack)}) &quot;</span>
@@ -124,7 +124,7 @@
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outstack</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scalars</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="PolyFactory"><a class="viewcode-back" href="../../index.html#mitiq.factories.PolyFactory">[docs]</a><span class="k">class</span> <span class="nc">PolyFactory</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">):</span>
+<div class="viewcode-block" id="PolyFactory"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.PolyFactory">[docs]</a><span class="k">class</span> <span class="nc">PolyFactory</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Factory object implementing a zero-noise extrapolation algotrithm based on a polynomial fit.</span>
 <span class="sd">    Note: RichardsonFactory and LinearFactory are special cases of PolyFactory.</span>
@@ -141,7 +141,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">order</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">PolyFactory</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">scalars</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PolyFactory.static_reduce"><a class="viewcode-back" href="../../index.html#mitiq.factories.PolyFactory.static_reduce">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="PolyFactory.static_reduce"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.PolyFactory.static_reduce">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">static_reduce</span><span class="p">(</span><span class="n">instack</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">outstack</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">order</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Determines with a least squared method, the polynomial of degree equal to &#39;order&#39;</span>
@@ -167,7 +167,7 @@
         <span class="c1"># c_0, i.e., the value of p(x) at x=0, is returned</span>
         <span class="k">return</span> <span class="n">coefficients</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="PolyFactory.reduce"><a class="viewcode-back" href="../../index.html#mitiq.factories.PolyFactory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="PolyFactory.reduce"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.PolyFactory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Determines with a least squared method, the polynomial of degree equal to &quot;self.order&quot;</span>
 <span class="sd">        which optimally fits the input data. The zero-noise limit is returned.</span>
@@ -175,10 +175,10 @@
         <span class="k">return</span> <span class="n">PolyFactory</span><span class="o">.</span><span class="n">static_reduce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instack</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outstack</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="RichardsonFactory"><a class="viewcode-back" href="../../index.html#mitiq.factories.RichardsonFactory">[docs]</a><span class="k">class</span> <span class="nc">RichardsonFactory</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">):</span>
+<div class="viewcode-block" id="RichardsonFactory"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.RichardsonFactory">[docs]</a><span class="k">class</span> <span class="nc">RichardsonFactory</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Factory object implementing Richardson&#39;s extrapolation.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="RichardsonFactory.reduce"><a class="viewcode-back" href="../../index.html#mitiq.factories.RichardsonFactory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="RichardsonFactory.reduce"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.RichardsonFactory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns the Richardson&#39;s extrapolation to the zero-noise limit.&quot;&quot;&quot;</span>
         <span class="c1"># Richardson&#39;s extrapolation is a particular case of a polynomial fit</span>
         <span class="c1"># with order equal to the number of data points minus 1.</span>
@@ -186,10 +186,10 @@
         <span class="k">return</span> <span class="n">PolyFactory</span><span class="o">.</span><span class="n">static_reduce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instack</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outstack</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="LinearFactory"><a class="viewcode-back" href="../../index.html#mitiq.factories.LinearFactory">[docs]</a><span class="k">class</span> <span class="nc">LinearFactory</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">):</span>
+<div class="viewcode-block" id="LinearFactory"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.LinearFactory">[docs]</a><span class="k">class</span> <span class="nc">LinearFactory</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Factory object implementing a zero-noise extrapolation algotrithm based on a linear fit.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="LinearFactory.reduce"><a class="viewcode-back" href="../../index.html#mitiq.factories.LinearFactory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="LinearFactory.reduce"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.LinearFactory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Determines, with a least squared method, the line of best fit</span>
 <span class="sd">        associated to the data points. The intercept is returned.</span>
@@ -198,7 +198,7 @@
         <span class="c1"># with order equal to 1.</span>
         <span class="k">return</span> <span class="n">PolyFactory</span><span class="o">.</span><span class="n">static_reduce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instack</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outstack</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div></div>
 
-<div class="viewcode-block" id="ExpFactory"><a class="viewcode-back" href="../../index.html#mitiq.factories.ExpFactory">[docs]</a><span class="k">class</span> <span class="nc">ExpFactory</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">):</span>
+<div class="viewcode-block" id="ExpFactory"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.ExpFactory">[docs]</a><span class="k">class</span> <span class="nc">ExpFactory</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Factory object implementing a zero-noise extrapolation algotrithm assuming an</span>
 <span class="sd">    exponential ansatz y(x) = a + b * exp(-c * x), with c &gt; 0.</span>
@@ -219,7 +219,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The argument &#39;asymptote&#39; must be either a float or None&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">asymptote</span> <span class="o">=</span> <span class="n">asymptote</span>
 
-<div class="viewcode-block" id="ExpFactory.reduce"><a class="viewcode-back" href="../../index.html#mitiq.factories.ExpFactory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="ExpFactory.reduce"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.ExpFactory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns the zero-noise limit, assuming an exponential ansatz:</span>
 <span class="sd">        y(x) = a + b * exp(-c * x), with c &gt; 0.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -228,7 +228,7 @@
         <span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="PolyExpFactory"><a class="viewcode-back" href="../../index.html#mitiq.factories.PolyExpFactory">[docs]</a><span class="k">class</span> <span class="nc">PolyExpFactory</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">):</span>
+<div class="viewcode-block" id="PolyExpFactory"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.PolyExpFactory">[docs]</a><span class="k">class</span> <span class="nc">PolyExpFactory</span><span class="p">(</span><span class="n">BatchedFactory</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Factory object implementing a zero-noise extrapolation algotrithm assuming an</span>
 <span class="sd">    (almost) exponential ansatz with a non linear exponent, i.e.:</span>
@@ -260,7 +260,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">asymptote</span> <span class="o">=</span> <span class="n">asymptote</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sign</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="PolyExpFactory.static_reduce"><a class="viewcode-back" href="../../index.html#mitiq.factories.PolyExpFactory.static_reduce">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="PolyExpFactory.static_reduce"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.PolyExpFactory.static_reduce">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">static_reduce</span><span class="p">(</span><span class="n">instack</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">outstack</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">asymptote</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> \
                       <span class="n">order</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0e-9</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -341,7 +341,7 @@
         <span class="c1"># return f(x=0)</span>
         <span class="k">return</span> <span class="n">asymptote</span> <span class="o">+</span> <span class="n">sign</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z_coefficients</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="PolyExpFactory.reduce"><a class="viewcode-back" href="../../index.html#mitiq.factories.PolyExpFactory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="PolyExpFactory.reduce"><a class="viewcode-back" href="../../apidoc.html#mitiq.factories.PolyExpFactory.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns the zero-noise limit, assuming an exponential ansatz:</span>
 <span class="sd">        y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.</span>
 <span class="sd">        The parameter &quot;s&quot; is a sign variable which can be either 1 or -1, corresponding to</span>
@@ -375,6 +375,8 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Change Log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../guide/guide.html">Users Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../apidoc.html">API-doc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../README-docs.html">Mitiq Documentation</a></li>
 </ul>
 
 <div class="relations">
