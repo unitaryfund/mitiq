@@ -7,10 +7,10 @@ from cirq.contrib.qasm_import import circuit_from_qasm
 from qiskit import QuantumCircuit
 
 
-QASM = str
+QASMType = str
 
 
-def _to_qasm(circuit: cirq.Circuit) -> QASM:
+def _to_qasm(circuit: cirq.Circuit) -> QASMType:
     """Returns a QASM string representing the input Mitiq circuit.
 
     Parameters
@@ -52,7 +52,7 @@ def _from_qiskit(circuit: QuantumCircuit) -> cirq.Circuit:
     return _from_qasm(circuit.qasm())
 
 
-def _from_qasm(qasm: QASM) -> cirq.Circuit:
+def _from_qasm(qasm: QASMType) -> cirq.Circuit:
     """Returns a Qiskit circuit equivalent to the input Mitiq circuit.
 
     Parameters

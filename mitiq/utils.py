@@ -1,23 +1,22 @@
 """Utility functions."""
 
+from typing import Optional
+
 import random
 
 import cirq
 
 
-def random_circuit(depth: int, **kwargs) -> cirq.Circuit:
+def random_circuit(depth: int, seed: Optional[int] = None) -> cirq.Circuit:
     """Returns a random single-qubit circuit with Pauli gates.
 
     Parameters
     ----------
         depth: Number of gates in the circuit.
-
-    Keyword Args
-    ------------
-        seed: Sets seed for the random number generator to input `seed`.
+        seed: Seed for the random number generator.
     """
-    if "seed" in kwargs.keys():
-        random.seed(kwargs.get("seed"))
+    if seed:
+        random.seed(seed)
 
     qubit = cirq.GridQubit(0, 0)
     gates = [cirq.ops.X, cirq.ops.Y, cirq.ops.Z]
@@ -53,21 +52,11 @@ def _equal(
         return True
 
     if not require_qubit_equality:
-        print("Transforming qubits of circuit one...")
+        # Transform the qubits of circuit one to those of circuit two
         qubit_map = dict(zip(
             sorted(circuit_one.all_qubits()), sorted(circuit_two.all_qubits())
         ))
-        print("The qubit map is:")
-        print(qubit_map)
         circuit_one = circuit_one.transform_qubits(lambda q: qubit_map[q])
-        print("New qubits of circuit one:")
-        print(circuit_one.all_qubits())
-        print("New qubits of circuit two:")
-        print(circuit_two.all_qubits())
-        print("Done")
-        print("Comparing equality between the circuits:")
-        print(circuit_one)
-        print(circuit_two)
 
     return (cirq.CircuitDag.from_circuit(circuit_one)
             ==
