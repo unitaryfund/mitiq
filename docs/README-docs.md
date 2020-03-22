@@ -115,6 +115,13 @@ Factories
 will add all elements of the `mitiq.factories` module. One can hand-pick
 classes and functions to add, to comment them, as well as exclude them.
 
+### Save the pdf file in the `docs/pdf` folder
+
+Since the `docs/build` folder is not kept track of, copy the pdf file
+with the documentation from `docs/build` to the `docs/pdf` folder, naming it
+according to the release version.
+
+
 
 ## Additional information
 [Here](https://github.com/nathanshammah/scikit-project/blob/master/5-docs.md)
