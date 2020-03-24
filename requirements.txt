@@ -1,2 +1,2 @@
 numpy
-cirq>=0.7.0
+cirq==0.7.0

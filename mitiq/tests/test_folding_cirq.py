@@ -1,12 +1,12 @@
 """Unit tests for folding Cirq circuits."""
 
 from copy import deepcopy
-import random
 
 import numpy as np
 import pytest
-from cirq import (Circuit, GridQubit, LineQubit, ops, CircuitDag, inverse)
+from cirq import (Circuit, GridQubit, LineQubit, ops, inverse)
 
+from mitiq.utils import (_equal, random_circuit)
 from mitiq.folding_cirq import (_is_measurement,
                                 _pop_measurements,
                                 _append_measurements,
@@ -21,33 +21,6 @@ from mitiq.folding_cirq import (_is_measurement,
                                 fold_gates_at_random,
                                 fold_local,
                                 fold_global)
-
-
-STRETCH_VALS = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.5, 4.5, 5.0]
-DEPTH = 100
-
-
-# TODO: We will likely need to generate random circuits for testing other modules.
-#  We may want to make a (testing) utility to create random circuits.
-def random_circuit(depth: int, **kwargs):
-    """Returns a single-qubit random circuit with on Pauli gates."""
-    if "seed" in kwargs.keys():
-        np.random.seed(kwargs.get("seed"))
-    qubit = GridQubit(0, 0)
-    circuit = Circuit()
-    for _ in range(depth):
-        circuit += random.choice([ops.X(qubit), ops.Y(qubit), ops.Z(qubit)])
-    return circuit
-
-
-def _equal(circuit_one: Circuit, circuit_two: Circuit) -> bool:
-    """Returns True if circuits are equal.
-
-    Args:
-        circuit_one: Input circuit to compare to circuit_two.
-        circuit_two: Input circuit to compare to circuit_one.
-    """
-    return CircuitDag.from_circuit(circuit_one) == CircuitDag.from_circuit(circuit_two)
 
 
 def test_is_measurement():
