@@ -39,7 +39,7 @@ def _to_qiskit(circuit: cirq.Circuit) -> QuantumCircuit:
 
 
 def _from_qiskit(circuit: QuantumCircuit) -> cirq.Circuit:
-    """Returns a Qiskit circuit equivalent to the input Mitiq circuit.
+    """Returns a Mitiq circuit equivalent to the input Qiskit circuit.
 
     Parameters
     ----------
