@@ -911,6 +911,16 @@ def test_global_fold_min_stretch_with_terminal_measurements():
     assert folded is not circ
 
 
+def test_global_fold_raises_error_intermediate_measurements():
+    """Tests than an error is raised when trying to globally fold
+    a circuit with intermediate measurements.
+    """
+    qbit = GridQubit(0, 0)
+    circ = Circuit([ops.H.on(qbit), ops.measure(qbit), ops.H.on(qbit)])
+    with pytest.raises(ValueError):
+        fold_global(circ, stretch=3)
+
+
 def test_global_fold_stretch_factor_of_three():
     """Tests global folding with the stretch as a factor of 3."""
     # Test circuit
@@ -952,7 +962,7 @@ def test_global_fold_stretch_factor_of_three_with_terminal_measurements():
     assert _equal(folded, correct)
 
 
-def test_global_fold_stretch_factor_multiple_of_three_with_terminal_measurements():
+def test_global_fold_stretch_factor_nine_with_terminal_measurements():
     """Tests global folding with the stretch as a factor of 9 for a circuit with terminal measurements."""
     # Test circuit
     # 0: ───H───@───@───M───
@@ -969,11 +979,11 @@ def test_global_fold_stretch_factor_multiple_of_three_with_terminal_measurements
     )
     meas = Circuit([ops.measure_each(*qreg)])
     folded = fold_global(circ + meas, stretch=9.)
-    correct = Circuit([circ, inverse(circ)] * 3, [circ], [meas])
+    correct = Circuit([circ, inverse(circ)] * 4, [circ], [meas])
     assert _equal(folded, correct)
 
 
-def test_global_fold_stretch_non_factor_of_three_finish_fold_left():
+def test_global_fold_stretch_factor_eight_terminal_measurements():
     """Tests global folding with a stretch factor not a multiple of three so that local folding is also called."""
     # Test circuit
     # 0: ───H───@───@───M───
@@ -989,40 +999,17 @@ def test_global_fold_stretch_non_factor_of_three_finish_fold_left():
         [ops.TOFFOLI.on(*qreg)],
     )
     meas = Circuit(ops.measure_each(*qreg))
-    folded = fold_global(circ + meas, stretch=4.6)
+    folded = fold_global(circ + meas, stretch=3.5)
     correct = Circuit(
-        [ops.H.on_each(*qreg)] * 2,
         circ,
         inverse(circ),
         circ,
-        meas
-    )
-    assert _equal(folded, correct)
-
-
-def test_global_fold_stretch_non_factor_of_three_finish_fold_right():
-    """Tests global folding with a stretch factor not a multiple of three so that local folding is also called."""
-    # Test circuit
-    # 0: ───H───@───@───M───
-    #           │   │
-    # 1: ───H───X───@───M───
-    #               │
-    # 2: ───H───T───X───M───
-    qreg = LineQubit.range(3)
-    circ = Circuit(
-        [ops.H.on_each(*qreg)],
+        inverse(Circuit([ops.CNOT.on(qreg[0], qreg[1])],
+                [ops.T.on(qreg[2])],
+                [ops.TOFFOLI.on(*qreg)])),
         [ops.CNOT.on(qreg[0], qreg[1])],
         [ops.T.on(qreg[2])],
         [ops.TOFFOLI.on(*qreg)],
-    )
-    meas = Circuit(ops.measure_each(*qreg))
-    folded = fold_global(circ + meas, stretch=4.2, finish_fold_method=fold_gates_from_right)
-    correct = Circuit(
-        circ,
-        inverse(circ),
-        circ,
-        [ops.TOFFOLI.on(*qreg)] * 2,
         meas
     )
     assert _equal(folded, correct)
-
