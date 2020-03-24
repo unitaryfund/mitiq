@@ -27,7 +27,7 @@ def _pop_measurements(circuit: Circuit) -> List[List[Union[int, ops.Operation]]]
 def _append_measurements(circuit: Circuit, measurements: List[Union[int, ops.Operation]]) -> None:
     """Appends all measurements into the final moment of the circuit."""
     for i in range(len(measurements)):
-        measurements[i][0] = -1  # Make sure the moment to insert into is the last in the circuit
+        measurements[i][0] = len(circuit) + 1  # Make sure the moment to insert into is the last in the circuit
     circuit.batch_insert(measurements)
 
 
@@ -128,7 +128,7 @@ def _get_num_to_fold(stretch: float, ngates: int) -> int:
     """Returns the number of gates to fold to acheive the desired (approximate) stretch factor.
 
     Args:
-        stretch: Floating point value to stretch the circuit by. Between 1 and 3.
+        stretch: Floating point value to stretch the circuit by.
         ngates: Number of gates in the circuit to stretch.
     """
     return int(round(ngates * (stretch - 1.0) / 2.0))
@@ -328,7 +328,7 @@ def fold_local(
     if np.isclose(stretch, 1.0, atol=1e-2):
         return folded
 
-    if not 1 < stretch:
+    if not 1 <= stretch:
         raise ValueError(f"The stretch factor must be a real number greater than 1.")
 
     while stretch > 1.:
@@ -339,26 +339,41 @@ def fold_local(
 
 
 # Circuit level folding
-def unitary_folding(circuit: Circuit, stretch: float) -> Circuit:
-    """Applies global unitary folding and a final partial folding of the input circuit.
-    Returns a circuit of depth approximately equal to stretch*len(circuit).
-    The stretch factor can be any real number >= 1."""
+def fold_global(circuit: Circuit, stretch: float) -> Circuit:
+    """Returns a folded circuit obtained by folding the global unitary of the input circuit.
 
+    The returned folded circuit has a number of gates approximately equal to stretch * len(circuit).
+
+    Parameters
+    ----------
+        circuit: Circuit to fold.
+        stretch: Factor to stretch the circuit by.
+    """
     if not (stretch >= 1):
         raise ValueError("The stretch factor must be a real number >= 1.")
 
-    # determine the number of integer foldings and the final fractional_stretch
-    num_foldings, fractional_stretch = divmod(stretch - 1, 2)
+    if not circuit.are_all_measurements_terminal():
+        raise ValueError("Input circuit contains intermediate measurements and cannot be folded.")
 
-    # integer circuit folding
-    eye = Circuit()
-    for _ in range(int(num_foldings)):
-        eye += inverse(circuit) + circuit
+    folded = deepcopy(circuit)
+    measurements = _pop_measurements(folded)
+    base_circuit = deepcopy(folded)
 
-    # partial circuit folding.
-    depth = len(circuit)
-    fractional_depth = int(depth * fractional_stretch / 2)
-    if fractional_depth != 0:
-        eye += inverse(circuit[-fractional_depth:]) + circuit[-fractional_depth:]
+    # Determine the number of global folds and the final fractional stretch
+    num_global_folds, fractional_stretch = divmod(stretch - 1, 2)
+    # Do the global folds
+    for _ in range(int(num_global_folds)):
+        folded += Circuit(inverse(base_circuit), base_circuit)
 
-    return circuit + eye
+    # Fold remaining gates until the stretch is reached
+    ops = list(base_circuit.all_operations())
+    num_to_fold = int(round(fractional_stretch * len(ops)))
+
+    if num_to_fold > 0:
+        folded += Circuit(
+            [inverse(ops[-num_to_fold:])],
+            [ops[-num_to_fold:]]
+        )
+
+    _append_measurements(folded, measurements)
+    return folded
