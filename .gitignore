@@ -1,6 +1,11 @@
+.DS_Store
 .vscode
 .idea/
+*.dat
 *.ipynp
 *.ipynb_checkpoints
+_build
 __pycache__/
+docs/build/
 mitiq.egg-info/
+
