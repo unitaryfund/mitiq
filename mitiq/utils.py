@@ -20,9 +20,7 @@ def random_circuit(depth: int, seed: Optional[int] = None) -> cirq.Circuit:
 
     qubit = cirq.GridQubit(0, 0)
     gates = [cirq.ops.X, cirq.ops.Y, cirq.ops.Z]
-    circuit = cirq.Circuit(
-        [random.choice(gates).on(qubit) for _ in range(depth)]
-    )
+    circuit = cirq.Circuit([random.choice(gates).on(qubit) for _ in range(depth)])
 
     return circuit
 
@@ -54,13 +52,10 @@ def _equal(
     if not require_qubit_equality:
         # Transform the qubits of circuit one to those of circuit two
         qubit_map = dict(
-            zip(
-                sorted(circuit_one.all_qubits()),
-                sorted(circuit_two.all_qubits()),
-            )
+            zip(sorted(circuit_one.all_qubits()), sorted(circuit_two.all_qubits()),)
         )
         circuit_one = circuit_one.transform_qubits(lambda q: qubit_map[q])
 
-    return cirq.CircuitDag.from_circuit(
-        circuit_one
-    ) == cirq.CircuitDag.from_circuit(circuit_two)
+    return cirq.CircuitDag.from_circuit(circuit_one) == cirq.CircuitDag.from_circuit(
+        circuit_two
+    )

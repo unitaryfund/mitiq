@@ -16,7 +16,7 @@ QPROGRAM = Union[QuantumCircuit, Program]
 directory_of_this_file = os.path.dirname(os.path.abspath(__file__))
 
 
-with open(str(directory_of_this_file)+"/../VERSION.txt", "r") as f:
+with open(str(directory_of_this_file) + "/../VERSION.txt", "r") as f:
     __version__ = f.read().strip()
 
 

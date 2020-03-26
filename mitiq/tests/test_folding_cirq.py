@@ -30,9 +30,7 @@ def test_is_measurement():
     # Test circuit:
     # 0: ───H───X───Z───
     qbit = LineQubit(0)
-    circ = Circuit(
-        [ops.H.on(qbit), ops.X.on(qbit), ops.Z.on(qbit), ops.measure(qbit)]
-    )
+    circ = Circuit([ops.H.on(qbit), ops.X.on(qbit), ops.Z.on(qbit), ops.measure(qbit)])
     for (i, op) in enumerate(circ.all_operations()):
         if i == 3:
             assert _is_measurement(op)
@@ -59,9 +57,7 @@ def test_pop_measurements_and_add_measurements():
     copy = deepcopy(circ)
     measurements = _pop_measurements(copy)
     correct = Circuit(
-        [ops.H.on_each(qreg)],
-        [ops.T.on(qreg[0])],
-        [ops.CNOT.on(qreg[0], qreg[2])],
+        [ops.H.on_each(qreg)], [ops.T.on(qreg[0])], [ops.CNOT.on(qreg[0], qreg[2])],
     )
     assert _equal(copy, correct)
     _append_measurements(copy, measurements)
@@ -90,21 +86,15 @@ def test_fold_gate_at_index_in_moment_one_qubit():
     # Fold the zeroth operation in the zeroth moment
     folded = deepcopy(circ)
     _fold_gate_at_index_in_moment(folded, moment_index=0, gate_index=0)
-    assert folded == Circuit(
-        [ops.H.on(qbit)] * 3 + [ops.X.on(qbit)] + [ops.Z.on(qbit)]
-    )
+    assert folded == Circuit([ops.H.on(qbit)] * 3 + [ops.X.on(qbit)] + [ops.Z.on(qbit)])
     # Fold the zeroth operation in the first moment
     folded = deepcopy(circ)
     _fold_gate_at_index_in_moment(folded, moment_index=1, gate_index=0)
-    assert folded == Circuit(
-        [ops.H.on(qbit)] + [ops.X.on(qbit)] * 3 + [ops.Z.on(qbit)]
-    )
+    assert folded == Circuit([ops.H.on(qbit)] + [ops.X.on(qbit)] * 3 + [ops.Z.on(qbit)])
     # Fold the zeroth operation in the second moment
     folded = deepcopy(circ)
     _fold_gate_at_index_in_moment(folded, moment_index=2, gate_index=0)
-    assert folded == Circuit(
-        [ops.H.on(qbit)] + [ops.X.on(qbit)] + [ops.Z.on(qbit)] * 3
-    )
+    assert folded == Circuit([ops.H.on(qbit)] + [ops.X.on(qbit)] + [ops.Z.on(qbit)] * 3)
     # Make sure the original circuit wasn't modified
     old = Circuit([ops.H.on(qbit), ops.X.on(qbit), ops.Z.on(qbit)])
     assert _equal(circ, old)
@@ -125,8 +115,7 @@ def test_fold_gate_at_index_in_moment_two_qubits():
     folded = deepcopy(circ)
     _fold_gate_at_index_in_moment(folded, moment_index=0, gate_index=0)
     correct = Circuit(
-        [ops.H.on(qreg[0]), ops.H.on(qreg[0]) ** -1]
-        + list(circ.all_operations())
+        [ops.H.on(qreg[0]), ops.H.on(qreg[0]) ** -1] + list(circ.all_operations())
     )
     assert _equal(folded, correct)
 
@@ -134,8 +123,7 @@ def test_fold_gate_at_index_in_moment_two_qubits():
     folded = deepcopy(circ)
     _fold_gate_at_index_in_moment(folded, moment_index=0, gate_index=1)
     correct = Circuit(
-        [ops.H.on(qreg[1]), ops.H.on(qreg[1]) ** -1]
-        + list(circ.all_operations())
+        [ops.H.on(qreg[1]), ops.H.on(qreg[1]) ** -1] + list(circ.all_operations())
     )
     assert _equal(folded, correct)
 
@@ -178,8 +166,7 @@ def test_fold_gate_at_index_in_moment_two_qubit_gates():
     folded = deepcopy(circ)
     _fold_gate_at_index_in_moment(folded, moment_index=0, gate_index=0)
     correct = Circuit(
-        [ops.H.on(qreg[0]) ** -1, ops.H.on(qreg[0])]
-        + list(circ.all_operations())
+        [ops.H.on(qreg[0]) ** -1, ops.H.on(qreg[0])] + list(circ.all_operations())
     )
     assert _equal(folded, correct)
 
@@ -306,9 +293,7 @@ def test_fold_gates():
             ops.TOFFOLI.on(*qreg),
         ]
     )
-    folded = fold_gates(
-        circ, moment_indices=[0, 1], gate_indices=[[0, 1, 2], [1]]
-    )
+    folded = fold_gates(circ, moment_indices=[0, 1], gate_indices=[[0, 1, 2], [1]])
     correct = Circuit(
         [ops.H.on_each(*qreg)] * 3,
         [ops.CNOT.on(qreg[0], qreg[1])],
@@ -417,19 +402,13 @@ def test_fold_all_gates_locally_three_qubits():
 def test_fold_from_left_two_qubits():
     qreg = LineQubit.range(2)
     circ = Circuit(
-        [
-            ops.H.on_each(*qreg),
-            ops.CNOT.on(qreg[0], qreg[1]),
-            ops.T.on(qreg[1]),
-        ]
+        [ops.H.on_each(*qreg), ops.CNOT.on(qreg[0], qreg[1]), ops.T.on(qreg[1]),]
     )
 
     # Intermediate stretch factor
     folded = fold_gates_from_left(circ, stretch=2.5)
     correct = Circuit(
-        [ops.H.on_each(*qreg)] * 3,
-        [ops.CNOT.on(*qreg)] * 3,
-        [ops.T.on(qreg[1])],
+        [ops.H.on_each(*qreg)] * 3, [ops.CNOT.on(*qreg)] * 3, [ops.T.on(qreg[1])],
     )
     assert _equal(folded, correct)
 
@@ -551,9 +530,7 @@ def test_fold_from_right_basic():
     # 1: ───H───X───T───
     qreg = LineQubit.range(2)
     circ = Circuit(
-        [ops.H.on_each(*qreg)],
-        [ops.CNOT.on(qreg[0], qreg[1])],
-        [ops.T.on(qreg[1])],
+        [ops.H.on_each(*qreg)], [ops.CNOT.on(qreg[0], qreg[1])], [ops.T.on(qreg[1])],
     )
 
     # Small stretch factor
@@ -666,16 +643,12 @@ def test_fold_gates_at_random_seed_one_qubit():
     circuit = Circuit([ops.X.on(qubit), ops.Y.on(qubit), ops.Z.on(qubit)])
     # Small stretch
     folded = fold_gates_at_random(circuit, stretch=1.4, seed=1)
-    correct = Circuit(
-        [ops.X.on(qubit)], [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)]
-    )
+    correct = Circuit([ops.X.on(qubit)], [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)])
     assert _equal(folded, correct)
 
     # Medium stretch, fold two gates
     folded = fold_gates_at_random(circuit, stretch=2.5, seed=1)
-    correct = Circuit(
-        [ops.X.on(qubit)], [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)] * 3,
-    )
+    correct = Circuit([ops.X.on(qubit)], [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)] * 3,)
     assert _equal(folded, correct)
 
     # Max stretch, fold three gates

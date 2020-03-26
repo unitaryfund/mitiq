@@ -7,9 +7,7 @@ from mitiq.factories import Factory, LinearFactory
 
 
 def run_factory(
-    fac: Factory,
-    noise_to_expval: Callable[[float], float],
-    max_iterations: int = 100,
+    fac: Factory, noise_to_expval: Callable[[float], float], max_iterations: int = 100,
 ) -> None:
     """
     Runs a factory until convergence (or iterations reach "max_iterations").
@@ -121,8 +119,7 @@ def mitigate_executor(
 
 
 def zne_decorator(
-    fac: Factory = None,
-    scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
+    fac: Factory = None, scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
 ) -> Callable[[QPROGRAM], float]:
     """
     Decorator which automatically adds error mitigation to any circuit-executor
@@ -139,9 +136,7 @@ def zne_decorator(
     """
     # Formally, the function below is the actual decorator, while the function
     # "zne_decorator" is necessary to give additional arguments to "decorator".
-    def decorator(
-        executor: Callable[[QPROGRAM], float]
-    ) -> Callable[[QPROGRAM], float]:
+    def decorator(executor: Callable[[QPROGRAM], float]) -> Callable[[QPROGRAM], float]:
         return mitigate_executor(executor, fac, scale_noise)
 
     return decorator

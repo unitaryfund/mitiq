@@ -79,7 +79,7 @@ class BatchedFactory(Factory):
         if len(scalars) == 0:
             raise ValueError(
                 "The argument 'scalars' should contain at least one element."
-                "At least 2 elements are necessary"\
+                "At least 2 elements are necessary"
                 " for non-trivial extrapolation."
             )
         self.scalars = scalars
@@ -120,16 +120,12 @@ class PolyFactory(BatchedFactory):
                    It cannot exceed len(scalars) - 1.
         """
         if order > len(scalars) - 1:
-            raise ValueError(
-                "The extrapolation order cannot exceed len(scalars) - 1."
-            )
+            raise ValueError("The extrapolation order cannot exceed len(scalars) - 1.")
         self.order = order
         super(PolyFactory, self).__init__(scalars)
 
     @staticmethod
-    def static_reduce(
-        instack: List[float], outstack: List[float], order: int
-    ) -> float:
+    def static_reduce(instack: List[float], outstack: List[float], order: int) -> float:
         """
         Determines with a least squared method, the polynomial of degree equal
         to 'order' which optimally fits the input data.
@@ -141,9 +137,7 @@ class PolyFactory(BatchedFactory):
         and RichardsonFactory.
         """
         # Check arguments
-        error_str = (
-            "Data is not enough: at least two data points are necessary."
-        )
+        error_str = "Data is not enough: at least two data points are necessary."
         if instack is None or outstack is None:
             raise ValueError(error_str)
         if len(instack) != len(outstack) or len(instack) < 2:
@@ -165,9 +159,7 @@ class PolyFactory(BatchedFactory):
         to "self.order"
         which optimally fits the input data. The zero-noise limit is returned.
         """
-        return PolyFactory.static_reduce(
-            self.instack, self.outstack, self.order
-        )
+        return PolyFactory.static_reduce(self.instack, self.outstack, self.order)
 
 
 class RichardsonFactory(BatchedFactory):
@@ -178,9 +170,7 @@ class RichardsonFactory(BatchedFactory):
         # Richardson's extrapolation is a particular case of a polynomial fit
         # with order equal to the number of data points minus 1.
         order = len(self.instack) - 1
-        return PolyFactory.static_reduce(
-            self.instack, self.outstack, order=order
-        )
+        return PolyFactory.static_reduce(self.instack, self.outstack, order=order)
 
 
 class LinearFactory(BatchedFactory):
@@ -219,9 +209,7 @@ class ExpFactory(BatchedFactory):
         """
         super(ExpFactory, self).__init__(scalars)
         if not (asymptote is None or isinstance(asymptote, float)):
-            raise ValueError(
-                "The argument 'asymptote' must be either a float or None"
-            )
+            raise ValueError("The argument 'asymptote' must be either a float or None")
         self.asymptote = asymptote
 
     def reduce(self) -> float:
@@ -265,9 +253,7 @@ class PolyExpFactory(BatchedFactory):
         """
         super(PolyExpFactory, self).__init__(scalars)
         if not (asymptote is None or isinstance(asymptote, float)):
-            raise ValueError(
-                "The argument 'asymptote' must be either a float or None"
-            )
+            raise ValueError("The argument 'asymptote' must be either a float or None")
         self.order = order
         self.asymptote = asymptote
 
@@ -316,9 +302,7 @@ class PolyExpFactory(BatchedFactory):
         # Shift is 0 if asymptote is given, 1 if asymptote is not given
         shift = int(asymptote is None)
         # Check arguments
-        error_str = (
-            "Data is not enough: at least two data points are necessary."
-        )
+        error_str = "Data is not enough: at least two data points are necessary."
         if instack is None or outstack is None:
             raise ValueError(error_str)
         if len(instack) != len(outstack) or len(instack) < 2:
@@ -326,7 +310,7 @@ class PolyExpFactory(BatchedFactory):
         if order > len(instack) - (1 + shift):
             raise ValueError(
                 "Extrapolation order is too high. "
-                f"The order cannot exceed the number" \
+                f"The order cannot exceed the number"
                 " of data points minus {1 + shift}."
             )
 
@@ -389,10 +373,7 @@ class AdaExpFactory(Factory):
     _SHIFT_FACTOR = 1.27846
 
     def __init__(
-        self,
-        steps: int,
-        scalar: float = 2,
-        asymptote: Union[float, None] = None,
+        self, steps: int, scalar: float = 2, asymptote: Union[float, None] = None,
     ) -> None:
         """Instantiate a new object of this Factory class.
 
@@ -406,18 +387,14 @@ class AdaExpFactory(Factory):
         """
         super(AdaExpFactory, self).__init__()
         if not (asymptote is None or isinstance(asymptote, float)):
-            raise ValueError(
-                "The argument 'asymptote' must be either a float or None"
-            )
+            raise ValueError("The argument 'asymptote' must be either a float or None")
         if scalar <= 1:
-            raise ValueError(
-                "The argument 'scalar' must be strictly larger than one."
-            )
+            raise ValueError("The argument 'scalar' must be strictly larger than one.")
         if steps < 3 + int(asymptote is None):
             raise ValueError(
-                "The argument 'steps' must be an integer"\
+                "The argument 'steps' must be an integer"
                 " greater or equal to 3. "
-                "If 'asymptote' is None, 'steps' must be"\
+                "If 'asymptote' is None, 'steps' must be"
                 " greater or equal to 4."
             )
         self.steps = steps

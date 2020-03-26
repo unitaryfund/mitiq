@@ -4,11 +4,8 @@ Mitiq circuits and Qiskit circuits.
 
 import cirq
 
-from mitiq.utils import (_equal, random_circuit)
-from mitiq.qiskit.conversions import (_to_qasm,
-                                      _to_qiskit,
-                                      _from_qasm,
-                                      _from_qiskit)
+from mitiq.utils import _equal, random_circuit
+from mitiq.qiskit.conversions import _to_qasm, _to_qiskit, _from_qasm, _from_qiskit
 
 
 def test_bell_state_to_from_circuits():

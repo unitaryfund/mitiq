@@ -5,9 +5,7 @@ from qiskit import QuantumCircuit
 
 # Noise simulation packages
 from qiskit.providers.aer.noise import NoiseModel
-from qiskit.providers.aer.noise.errors.standard_errors import (
-    depolarizing_error,
-)
+from qiskit.providers.aer.noise.errors.standard_errors import depolarizing_error
 
 BACKEND = qiskit.Aer.get_backend("qasm_simulator")
 # Set the random seeds for testing
@@ -99,11 +97,9 @@ CURRENT_NOISE = None
 def scale_noise(pq, param: float):
     global CURRENT_NOISE
     noise = param * NATIVE_NOISE
-    assert (
-        noise <= 1.0
-    ), "Noise scaled to {} is out of bounds (<=1.0) for depolarizing " \
-    "channel.".format(
-        noise
+    assert noise <= 1.0, (
+        "Noise scaled to {} is out of bounds (<=1.0) for depolarizing "
+        "channel.".format(noise)
     )
 
     noise_model = NoiseModel()

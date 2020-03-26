@@ -23,9 +23,7 @@ def test_circuit_equality_identical_qubits(require_qubit_equality):
 
 
 @pytest.mark.parametrize(["require_qubit_equality"], [[True], [False]])
-def test_circuit_equality_nonidentical_but_equal_qubits(
-    require_qubit_equality,
-):
+def test_circuit_equality_nonidentical_but_equal_qubits(require_qubit_equality,):
     n = 5
     qregA = cirq.NamedQubit.range(n, prefix="q_")
     qregB = cirq.NamedQubit.range(n, prefix="q_")
