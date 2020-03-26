@@ -1,4 +1,6 @@
-"""Contains all the main classes corresponding to different zero-noise extrapolation methods."""
+"""Contains all the main classes corresponding to different zero-noise
+extrapolation methods.
+"""
 
 from typing import List, Iterable, Union, Tuple
 import numpy as np
@@ -8,28 +10,32 @@ from scipy.optimize import curve_fit
 class Factory:
     """
     Abstract class designed to adaptively produce a new noise scaling parameter
-    based on a historical stack of previous noise scale parameters ("self.instack")
-    and previously estimated expectation values ("self.outstack").
+    based on a historical stack of previous noise scale parameters
+    ("self.instack") and previously estimated expectation values
+    ("self.outstack").
 
     Specific zero-noise extrapolation algorithms, adaptive or non-adaptive,
     are derived from this class.
-    A Factory object is not supposed to directly perform any quantum computation,
-    only the classical results of quantum experiments are processed by it.
+    A Factory object is not supposed to directly perform any quantum
+    computation, only the classical results of quantum experiments are
+    processed by it.
     """
 
     def __init__(self) -> None:
         """
-        Initialization arguments (e.g. noise scale factors) depend on the particular extrapolation
-        algorithm and can be added to the "__init__" method of the associated derived class.
+        Initialization arguments (e.g. noise scale factors) depend on the
+        particular extrapolation algorithm and can be added to the "__init__"
+        method of the associated derived class.
         """
         self.instack = []
         self.outstack = []
 
     def push(self, instack_val: float, outstack_val: float) -> None:
         """
-        Appends "instack_val" to "self.instack" and "outstack_val" to "self.outstack".
-        Each time a new expectation value is computed this method should be used
-        to update the internal state of the Factory.
+        Appends "instack_val" to "self.instack" and "outstack_val" to
+        "self.outstack".
+        Each time a new expectation value is computed this method should be
+        used to update the internal state of the Factory.
         """
         self.instack.append(instack_val)
         self.outstack.append(outstack_val)
@@ -39,7 +45,9 @@ class Factory:
         raise NotImplementedError
 
     def is_converged(self) -> bool:
-        """Returns True if all needed expectation values have been computed, else False."""
+        """Returns True if all needed expectation values have been computed,
+        else False.
+        """
         raise NotImplementedError
 
     def reduce(self) -> float:
@@ -54,21 +62,25 @@ class BatchedFactory(Factory):
     This is initialized with a given batch of scaling factors ("scalars").
     The "self.next" method trivially iterates over the elements of "scalars"
     in a non-adaptive way.
-    Convergence is achieved when all the correpsonding expectation values have been measured.
+    Convergence is achieved when all the correpsonding expectation values have
+    been measured.
 
-    Specific (non-adaptive) zero-noise extrapolation algorithms can be derived from this class by
-    overriding the "self.reduce" and (if necessary) the "__init__" method.
+    Specific (non-adaptive) zero-noise extrapolation algorithms can be derived
+    from this class by overriding the "self.reduce" and (if necessary)
+    the "__init__" method.
     """
 
     def __init__(self, scalars: Iterable[float]) -> None:
         """
         Args:
-            scalars: Iterable of noise scale factors at which expectation values should be measured.
+            scalars: Iterable of noise scale factors at which expectation
+            values should be measured.
         """
         if len(scalars) == 0:
             raise ValueError(
                 "The argument 'scalars' should contain at least one element."
-                "At least 2 elements are necessary for a non-trivial extrapolation."
+                "At least 2 elements are necessary"\
+                " for non-trivial extrapolation."
             )
         self.scalars = scalars
         super(BatchedFactory, self).__init__()
@@ -94,15 +106,18 @@ class BatchedFactory(Factory):
 
 class PolyFactory(BatchedFactory):
     """
-    Factory object implementing a zero-noise extrapolation algorithm based on a polynomial fit.
+    Factory object implementing a zero-noise extrapolation algorithm based on
+    a polynomial fit.
     Note: RichardsonFactory and LinearFactory are special cases of PolyFactory.
     """
 
     def __init__(self, scalars: Iterable[float], order: int) -> None:
         """
         Args:
-            scalars: Iterable of noise scale factors at which expectation values should be measured.
-            order: Polynomial extrapolation order. It cannot exceed len(scalars) - 1.
+            scalars: Iterable of noise scale factors at which expectation
+                     values should be measured.
+            order: Polynomial extrapolation order.
+                   It cannot exceed len(scalars) - 1.
         """
         if order > len(scalars) - 1:
             raise ValueError(
@@ -116,12 +131,14 @@ class PolyFactory(BatchedFactory):
         instack: List[float], outstack: List[float], order: int
     ) -> float:
         """
-        Determines with a least squared method, the polynomial of degree equal to 'order'
-        which optimally fits the input data. The zero-noise limit is returned.
+        Determines with a least squared method, the polynomial of degree equal
+        to 'order' which optimally fits the input data.
+        The zero-noise limit is returned.
 
-        This static method is equivalent to the "self.reduce" method of PolyFactory, but
-        can be called also by other factories which are particular cases of PolyFactory,
-        e.g., LinearFactory and RichardsonFactory.
+        This static method is equivalent to the "self.reduce" method of
+        PolyFactory, but can be called also by other factories which are
+        particular cases of PolyFactory, e.g., LinearFactory
+        and RichardsonFactory.
         """
         # Check arguments
         error_str = (
@@ -136,14 +153,16 @@ class PolyFactory(BatchedFactory):
                 "Extrapolation order is too high. "
                 "The order cannot exceed the number of data points minus 1."
             )
-        # Get coefficients {c_j} of p(x)= c_0 + c_1*x + c_2*x**2... which best fits the data
+        # Get coefficients {c_j} of p(x)= c_0 + c_1*x + c_2*x**2...
+        # which best fits the data
         coefficients = np.polyfit(instack, outstack, deg=order)
         # c_0, i.e., the value of p(x) at x=0, is returned
         return coefficients[-1]
 
     def reduce(self) -> float:
         """
-        Determines with a least squared method, the polynomial of degree equal to "self.order"
+        Determines with a least squared method, the polynomial of degree equal
+        to "self.order"
         which optimally fits the input data. The zero-noise limit is returned.
         """
         return PolyFactory.static_reduce(
@@ -165,7 +184,9 @@ class RichardsonFactory(BatchedFactory):
 
 
 class LinearFactory(BatchedFactory):
-    """Factory object implementing a zero-noise extrapolation algorithm based on a linear fit."""
+    """Factory object implementing a zero-noise extrapolation algorithm based
+    on a linear fit.
+    """
 
     def reduce(self) -> float:
         """
@@ -179,8 +200,8 @@ class LinearFactory(BatchedFactory):
 
 class ExpFactory(BatchedFactory):
     """
-    Factory object implementing a zero-noise extrapolation algorithm assuming an
-    exponential ansatz y(x) = a + b * exp(-c * x), with c > 0.
+    Factory object implementing a zero-noise extrapolation algorithm assuming
+    an exponential ansatz y(x) = a + b * exp(-c * x), with c > 0.
 
     If the asymptotic value (y(x->inf) = a) is known, a linear fit with respect
     to z(x) := log[sing(b) (y(x) - a)] is used.
@@ -192,7 +213,8 @@ class ExpFactory(BatchedFactory):
     ) -> None:
         """
         Args:
-            scalars: Iterable of noise scale factors at which expectation values should be measured.
+            scalars: Iterable of noise scale factors at which expectation
+            values should be measured.
             asymptote: Infinite-noise limit (optional argument).
         """
         super(ExpFactory, self).__init__(scalars)
@@ -213,14 +235,14 @@ class ExpFactory(BatchedFactory):
 
 class PolyExpFactory(BatchedFactory):
     """
-    Factory object implementing a zero-noise extrapolation algorithm assuming an
-    (almost) exponential ansatz with a non linear exponent, i.e.:
+    Factory object implementing a zero-noise extrapolation algorithm assuming
+    an (almost) exponential ansatz with a non linear exponent, i.e.:
 
     y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
 
-    The parameter "s" is a sign variable which can be either 1 or -1, corresponding to
-    decreasing and increasing exponentials, respectively. The parameter "s" is
-    automatically deduced from the data.
+    The parameter "s" is a sign variable which can be either 1 or -1,
+    corresponding to decreasing and increasing exponentials, respectively.
+    The parameter "s" is automatically deduced from the data.
 
     If the asymptotic value (y(x->inf) = a) is known, a linear fit with respect
     to z(x) := log[s(y(x) - a)] is used.
@@ -235,8 +257,9 @@ class PolyExpFactory(BatchedFactory):
     ) -> None:
         """
         Args:
-            scalars: Iterable of noise scale factors at which expectation values should be measured.
-            order: Polynomial extrapolation order. It cannot exceed len(scalars) - 1.
+            scalars: Iterable of noise scale factors at which expectation
+            values should be measured.
+            order: Polynomial extrapolation order. Must be <=len(scalars) - 1.
                    If asymptote is None, order cannot exceed len(scalars) - 2.
             asymptote: Infinite-noise limit (optional argument).
         """
@@ -260,19 +283,21 @@ class PolyExpFactory(BatchedFactory):
         Determines the zero-noise limit, assuming an exponential ansatz:
         y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
 
-        The parameter "s" is a sign variable which can be either 1 or -1, corresponding to
-        decreasing and increasing exponentials, respectively. The parameter "s" is
-        automatically deduced from the data.
+        The parameter "s" is a sign variable which can be either 1 or -1,
+        corresponding to decreasing and increasing exponentials, respectively.
+        The parameter "s" is automatically deduced from the data.
 
         It is also assumed that z(x-->inf)=-inf, such that y(x-->inf)-->a.
 
-        If asymptote is None, the ansatz y(x) is fitted with a non-linear optimization.
-        Otherwise, a linear fit with respect to z(x) := log(sign * (y(x) - asymptote))
+        If asymptote is None, the ansatz y(x) is fitted with a non-linear
+        optimization.
+        Otherwise, a linear fit with respect to
+        z(x) := log(sign * (y(x) - asymptote))
         is performed.
 
-        This static method is equivalent to the "self.reduce" method of PolyExpFactory,
-        but can be called also by other factories which are related to PolyExpFactory,
-        e.g., ExpFactory, AdaExpFactory.
+        This static method is equivalent to the "self.reduce" method
+        of PolyExpFactory, but can be called also by other factories which are
+        related to PolyExpFactory, e.g., ExpFactory, AdaExpFactory.
 
         Parameters
         ----------
@@ -285,8 +310,8 @@ class PolyExpFactory(BatchedFactory):
 
         Returns
         ----------
-            (znl, params): Where "znl" is the zero-noise-limit and "params" are the
-                           optimal fitting parameters.
+            (znl, params): Where "znl" is the zero-noise-limit and "params"
+                           are the optimal fitting parameters.
         """
         # Shift is 0 if asymptote is given, 1 if asymptote is not given
         shift = int(asymptote is None)
@@ -301,7 +326,8 @@ class PolyExpFactory(BatchedFactory):
         if order > len(instack) - (1 + shift):
             raise ValueError(
                 "Extrapolation order is too high. "
-                f"The order cannot exceed the number of data points minus {1 + shift}."
+                f"The order cannot exceed the number" \
+                " of data points minus {1 + shift}."
             )
 
         # CASE 1: asymptote is None.
@@ -336,9 +362,9 @@ class PolyExpFactory(BatchedFactory):
     def reduce(self) -> float:
         """Returns the zero-noise limit, assuming an exponential ansatz:
         y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
-        The parameter "s" is a sign variable which can be either 1 or -1, corresponding to
-        decreasing and increasing exponentials, respectively. The parameter "s" is
-        automatically deduced from the data.
+        The parameter "s" is a sign variable which can be either 1 or -1,
+        corresponding to decreasing and increasing exponentials, respectively.
+        The parameter "s" is automatically deduced from the data.
         It is also assumed that z(x-->inf)=-inf, such that y(x-->inf)-->a.
         """
 
@@ -348,11 +374,12 @@ class PolyExpFactory(BatchedFactory):
 
 
 class AdaExpFactory(Factory):
-    """Factory object implementing an adaptive zero-noise extrapolation algorithm assuming an
-    exponential ansatz y(x) = a + b * exp(-c * x), with c > 0.
+    """Factory object implementing an adaptive zero-noise extrapolation
+    algorithm assuming an exponential ansatz y(x) = a + b * exp(-c * x),
+    with c > 0.
 
-    The noise scale factors are are chosen adaptively at each step, depending on the history
-    of collected results.
+    The noise scale factors are are chosen adaptively at each step,
+    depending on the history of collected results.
 
     If the asymptotic value (y(x->inf) = a) is known, a linear fit with respect
     to z(x) := log[sing(b) (y(x) - a)] is used.
@@ -374,8 +401,8 @@ class AdaExpFactory(Factory):
             steps: The number of optimization steps. At least 3 are necessary.
             scalar: The second noise scale factor (the first is always 1.0).
                     Further scale factors are adaptively determined.
-            asymptote: The infinite noise limit (if known) of the expectation value.
-                       Default is None.
+            asymptote: The infinite noise limit (if known) of the expectation
+                       value. Default is None.
         """
         super(AdaExpFactory, self).__init__()
         if not (asymptote is None or isinstance(asymptote, float)):
@@ -388,8 +415,10 @@ class AdaExpFactory(Factory):
             )
         if steps < 3 + int(asymptote is None):
             raise ValueError(
-                "The argument 'steps' must be an integer greater or equal to 3. "
-                "If 'asymptote' is None, 'steps' must be greater or equal to 4."
+                "The argument 'steps' must be an integer"\
+                " greater or equal to 3. "
+                "If 'asymptote' is None, 'steps' must be"\
+                " greater or equal to 4."
             )
         self.steps = steps
         self.scalar = scalar
@@ -422,7 +451,9 @@ class AdaExpFactory(Factory):
         return 1.0 + self._SHIFT_FACTOR / np.abs(exponent)
 
     def is_converged(self) -> bool:
-        """Returns True if all the needed expectation values have been computed, else False."""
+        """Returns True if all the needed expectation values have been
+        computed, else False.
+        """
         if len(self.outstack) != len(self.instack):
             raise IndexError(
                 f"The length of 'self.instack' ({len(self.instack)}) "
