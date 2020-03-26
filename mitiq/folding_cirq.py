@@ -43,7 +43,7 @@ def _append_measurements(
 def _fold_gate_at_index_in_moment(
     circuit: Circuit, moment_index: int, gate_index: int
 ) -> None:
-    """Modifies the input circuit by replacing the gate G in (moment, index) is replaced by G G^dagger G.
+    """Replaces, in a circuit, the gate G in (moment, index) with G G^dagger G.
 
     Args:
         circuit: Circuit to fold.
@@ -62,8 +62,8 @@ def _fold_gate_at_index_in_moment(
 def _fold_gates_in_moment(
     circuit: Circuit, moment_index: int, gate_indices: Iterable[int]
 ) -> None:
-    """Modifies the input circuit by applying the map G -> G G^dag G to all gates specified by
-     the input moment index and gate indices.
+    """Modifies the input circuit by applying the map G -> G G^dag G to all
+    gates specified by the input moment index and gate indices.
 
      Args:
          circuit: Circuit to fold.
@@ -97,7 +97,8 @@ def fold_gates(
 
         (2) Folds gates with indices 1, 4, and 5 in moment 0,
             and gates with indices 0, 1, and 2 in moment 1.
-        >>> fold_gates(circuit, moment_indices=[0, 3], gate_indices=[(1, 4, 5), (0, 1, 2)])
+        >>> fold_gates(circuit, moment_indices=[0, 3],
+        >>>                                gate_indices=[(1, 4, 5), (0, 1, 2)])
     """
     folded = deepcopy(circuit)
     moment_index_shift = 0
@@ -146,12 +147,13 @@ def fold_moments(circuit: Circuit, moment_indices: List[int]) -> Circuit:
 
 
 def _fold_all_gates_locally(circuit: Circuit) -> None:
-    """Replaces every gate G with G G^dag G by modifying the circuit in place."""
+    """Replaces every gate G with G G^dag G by modifying the circuit in place.
+    """
     _fold_moments(circuit, list(range(len(circuit))))
 
 
 def _get_num_to_fold(stretch: float, ngates: int) -> int:
-    """Returns the number of gates to fold to acheive the desired (approximate) stretch factor.
+    """Returns the number of gates to fold to achieve the desired (approximate) stretch factor.
 
     Args:
         stretch: Floating point value to stretch the circuit by.
@@ -161,18 +163,20 @@ def _get_num_to_fold(stretch: float, ngates: int) -> int:
 
 
 def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
-    """Returns a new folded circuit by applying the map G -> G G^dag G to a subset of gates of the input circuit,
-    starting with gates at the left (beginning) of the circuit.
+    """Returns a new folded circuit by applying the map G -> G G^dag G to a
+    subset of gates of the input circuit, starting with gates at the
+    left (beginning) of the circuit.
 
-    The folded circuit has a number of gates approximately equal to stretch * n where n is the number of gates in
-    the input circuit.
+    The folded circuit has a number of gates approximately equal to
+    stretch * n where n is the number of gates in the input circuit.
 
     Args:
         circuit: Circuit to fold.
-        stretch: Factor to stretch the circuit by. Any real number in the interval [1, 3].
+        stretch: Factor to stretch the circuit by. Any real number in [1, 3].
 
     Note:
-        Folding a single gate adds two gates to the circuit, hence the maximum stretch factor is 3.
+        Folding a single gate adds two gates to the circuit,
+        hence the maximum stretch factor is 3.
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -209,18 +213,20 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
 
 
 def fold_gates_from_right(circuit: Circuit, stretch: float) -> Circuit:
-    """Returns a new folded circuit by applying the map G -> G G^dag G to a subset of gates of the input circuit,
-    starting with gates at the right (end) of the circuit.
+    """Returns a new folded circuit by applying the map G -> G G^dag G
+    to a subset of gates of the input circuit, starting with gates at
+    the right (end) of the circuit.
 
-    The folded circuit has a number of gates approximately equal to stretch * n where n is the number of gates in
-    the input circuit.
+    The folded circuit has a number of gates approximately equal to
+    stretch * n where n is the number of gates in the input circuit.
 
     Args:
         circuit: Circuit to fold.
-        stretch: Factor to stretch the circuit by. Any real number in the interval [1, 3].
+        stretch: Factor to stretch the circuit by. Any real number in [1, 3].
 
     Note:
-        Folding a single gate adds two gates to the circuit, hence the maximum stretch factor is 3.
+        Folding a single gate adds two gates to the circuit,
+        hence the maximum stretch factor is 3.
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -239,25 +245,31 @@ def fold_gates_from_right(circuit: Circuit, stretch: float) -> Circuit:
 def _update_moment_indices(
     moment_indices: dict, moment_index_where_gate_was_folded: int
 ) -> dict:
-    """Updates moment indices to keep track of an original circuit throughout folding.
+    """Updates moment indices to keep track of an original circuit
+    throughout folding.
 
     Args:
         moment_indices: A dictionary in the format
-                        {index of moment in original circuit: index of moment in folded circuit}
+                        {index of moment in original circuit: index of moment
+                        in folded circuit}
 
                         For example, moment_indices should start out as
                         {0: 0, 1: 1, ..., M - 1: M - 1}
-                        where M is the number of moments in the original circuit.
+                        where M is the # of moments in the original circuit.
 
-                        As the circuit is folded, moment indices change. For example, if a gate in the last moment
+                        As the circuit is folded, moment indices change.
+                        For example, if a gate in the last moment
                         is folded, moment_indices gets updates to
                         {0: 0, 1: 1, ..., M - 1:, M + 1}
-                        since two moments are created in the process of folding the gate in the last moment.
+                        since two moments are created in the process of folding
+                         the gate in the last moment.
 
-                        TODO: If another gate from the last moment is folded, we could put it in the same moment as
+                        TODO: If another gate from the last moment is folded,
+                        we could put it in the same moment as
                          the previous folded gate.
 
-        moment_index_where_gate_was_folded: Index of the moment in which a gate was folded.
+        moment_index_where_gate_was_folded: Index of the moment
+        in which a gate was folded.
     """
     if moment_index_where_gate_was_folded not in moment_indices.keys():
         raise ValueError(
@@ -271,18 +283,20 @@ def _update_moment_indices(
 def fold_gates_at_random(
     circuit: Circuit, stretch: float, seed: Optional[int] = None
 ) -> Circuit:
-    """Returns a folded circuit by applying the map G -> G G^dag G to a random subset of gates in the input circuit.
+    """Returns a folded circuit by applying the map G -> G G^dag G to a random
+    subset of gates in the input circuit.
 
-    The folded circuit has a number of gates approximately equal to stretch * n where n is the number of gates in
-    the input circuit.
+    The folded circuit has a number of gates approximately equal to
+     stretch * n where n is the number of gates in the input circuit.
 
     Args:
         circuit: Circuit to fold.
-        stretch: Factor to stretch the circuit by. Any real number in the interval [1, 3].
+        stretch: Factor to stretch the circuit by. Any real number in [1, 3].
         seed: [Optional] Integer seed for random number generator.
 
     Note:
-        Folding a single gate adds two gates to the circuit, hence the maximum stretch factor is 3.
+        Folding a single gate adds two gates to the circuit,
+        hence the maximum stretch factor is 3.
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -339,7 +353,8 @@ def fold_gates_at_random(
         # Remove the gate we folded from the remaining set of gates to fold
         remaining_gate_indices[moment_index].remove(gate_index)
 
-        # If there are no gates left in the moment, remove the moment index from the remaining set
+        # If there are no gates left in the moment,
+        # remove the moment index from the remaining set
         if not remaining_gate_indices[moment_index]:
             remaining_moment_indices.remove(moment_index)
 
@@ -355,22 +370,25 @@ def fold_local(
     ] = fold_gates_from_left,
     fold_method_args: Tuple[Any] = (),
 ) -> Circuit:
-    """Returns a folded circuit by folding gates according to the input fold method.
+    """Returns a folded circuit by folding gates according to the input
+    fold method.
 
     Args:
         circuit: Circuit to fold.
         stretch: Factor to stretch the circuit by.
         fold_method: Function which defines the method for folding gates.
-                    (e.g., Randomly selects gates to fold, folds gates starting from left of circuit, etc.)
+                    (e.g., Randomly selects gates to fold, folds gates starting
+                    from left of circuit, etc.)
 
                     Must have signature
 
-                    def fold_method(circuit: Circuit, stretch: float, **kwargs):
+                    def fold_method(circuit: Circuit, stretch: float,**kwargs):
                         ...
 
                     and return a circuit.
         fold_method_args: Any additional input arguments for the fold_method.
-                          The method is called with fold_method(circuit, stretch, *fold_method_args).
+                          The method is called with
+                          fold_method(circuit, stretch, *fold_method_args).
             Example:
                 fold_method = fold_gates_at_random
                 fold_method_args = (1,)
@@ -396,9 +414,10 @@ def fold_local(
 
 # Circuit level folding
 def fold_global(circuit: Circuit, stretch: float) -> Circuit:
-    """Returns a folded circuit obtained by folding the global unitary of the input circuit.
+    """Gives a circuit by folding the global unitary of the input circuit.
 
-    The returned folded circuit has a number of gates approximately equal to stretch * len(circuit).
+    The returned folded circuit has a number of gates approximately equal to
+     stretch * len(circuit).
 
     Parameters
     ----------
