@@ -153,7 +153,8 @@ def _fold_all_gates_locally(circuit: Circuit) -> None:
 
 
 def _get_num_to_fold(stretch: float, ngates: int) -> int:
-    """Returns the number of gates to fold to achieve the desired (approximate) stretch factor.
+    """Returns the number of gates to fold to achieve the desired (approximate)
+    stretch factor.
 
     Args:
         stretch: Floating point value to stretch the circuit by.
@@ -180,7 +181,8 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
-            f"Input circuit contains intermediate measurements and cannot be folded."
+            f"Input circuit contains intermediate measurements" \
+            " and cannot be folded."
         )
 
     if not 1 <= stretch <= 3:
@@ -230,7 +232,8 @@ def fold_gates_from_right(circuit: Circuit, stretch: float) -> Circuit:
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
-            f"Input circuit contains intermediate measurements and cannot be folded."
+            f"Input circuit contains intermediate measurements" \
+            " and cannot be folded."
         )
 
     measurements = _pop_measurements(circuit)
@@ -300,7 +303,8 @@ def fold_gates_at_random(
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
-            f"Input circuit contains intermediate measurements and cannot be folded."
+            f"Input circuit contains intermediate measurements" \
+            " and cannot be folded."
         )
 
     if not 1 <= stretch <= 3:
@@ -429,7 +433,8 @@ def fold_global(circuit: Circuit, stretch: float) -> Circuit:
 
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
-            "Input circuit contains intermediate measurements and cannot be folded."
+            "Input circuit contains intermediate measurements" \
+            " and cannot be folded."
         )
 
     folded = deepcopy(circuit)
