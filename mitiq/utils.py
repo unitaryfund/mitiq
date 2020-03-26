@@ -28,9 +28,9 @@ def random_circuit(depth: int, seed: Optional[int] = None) -> cirq.Circuit:
 
 
 def _equal(
-        circuit_one: cirq.Circuit,
-        circuit_two: cirq.Circuit,
-        require_qubit_equality: bool = False
+    circuit_one: cirq.Circuit,
+    circuit_two: cirq.Circuit,
+    require_qubit_equality: bool = False,
 ) -> bool:
     """Returns True if the circuits are equal, else False.
 
@@ -53,11 +53,14 @@ def _equal(
 
     if not require_qubit_equality:
         # Transform the qubits of circuit one to those of circuit two
-        qubit_map = dict(zip(
-            sorted(circuit_one.all_qubits()), sorted(circuit_two.all_qubits())
-        ))
+        qubit_map = dict(
+            zip(
+                sorted(circuit_one.all_qubits()),
+                sorted(circuit_two.all_qubits()),
+            )
+        )
         circuit_one = circuit_one.transform_qubits(lambda q: qubit_map[q])
 
-    return (cirq.CircuitDag.from_circuit(circuit_one)
-            ==
-            cirq.CircuitDag.from_circuit(circuit_two))
+    return cirq.CircuitDag.from_circuit(
+        circuit_one
+    ) == cirq.CircuitDag.from_circuit(circuit_two)
