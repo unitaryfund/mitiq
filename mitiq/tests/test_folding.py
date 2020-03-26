@@ -7,7 +7,7 @@ import pytest
 from cirq import Circuit, GridQubit, LineQubit, ops, inverse
 
 from mitiq.utils import _equal, random_circuit
-from mitiq.folding_cirq import (
+from mitiq.folding import (
     _is_measurement,
     _pop_measurements,
     _append_measurements,
