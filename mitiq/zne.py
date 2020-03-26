@@ -7,8 +7,10 @@ from mitiq.factories import Factory, LinearFactory
 
 
 def run_factory(
-        fac: Factory, noise_to_expval: Callable[[float], float], max_iterations: int = 100,
-    ) -> None:
+    fac: Factory,
+    noise_to_expval: Callable[[float], float],
+    max_iterations: int = 100,
+) -> None:
     """
     Runs a factory until convergence (or until the number of iterations reach "max_iterations").
 
@@ -32,9 +34,14 @@ def run_factory(
 
     return None
 
+
 # quantum version of run_factory. Similar to the old "mitigate".
-def qrun_factory(fac: Factory, qp: QPROGRAM, executor: Callable[[QPROGRAM], float], \
-                 scale_noise: Callable[[QPROGRAM, float], QPROGRAM]) -> None:
+def qrun_factory(
+    fac: Factory,
+    qp: QPROGRAM,
+    executor: Callable[[QPROGRAM], float],
+    scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+) -> None:
     """
     Runs the factory until convergence executing quantum circuits with different noise levels.
 
@@ -55,9 +62,11 @@ def qrun_factory(fac: Factory, qp: QPROGRAM, executor: Callable[[QPROGRAM], floa
 
 
 def execute_with_zne(
-        qp: QPROGRAM, executor: Callable[[QPROGRAM], float], fac: Factory = None,
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
-    ) -> Callable[[QPROGRAM], float]:
+    qp: QPROGRAM,
+    executor: Callable[[QPROGRAM], float],
+    fac: Factory = None,
+    scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
+) -> Callable[[QPROGRAM], float]:
     """
     Takes as input a quantum circuit and returns the associated expectation value
     evaluated with error mitigation.
@@ -83,9 +92,10 @@ def execute_with_zne(
 
 # Similar to the old "zne".
 def mitigate_executor(
-        executor: Callable[[QPROGRAM], float], fac: Factory = None,
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
-    ) -> Callable[[QPROGRAM], float]:
+    executor: Callable[[QPROGRAM], float],
+    fac: Factory = None,
+    scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
+) -> Callable[[QPROGRAM], float]:
     """
     Takes as input a generic function ("executor"), difined by the user, which executes a circuit
     with an arbitrary backend and produces an expectation value.
@@ -108,8 +118,9 @@ def mitigate_executor(
 
 
 def zne_decorator(
-        fac: Factory = None, scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
-    ) -> Callable[[QPROGRAM], float]:
+    fac: Factory = None,
+    scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
+) -> Callable[[QPROGRAM], float]:
     """
     Decorator which automatically adds error mitigation to any circuit-executor function
     defined by the user.
@@ -125,7 +136,9 @@ def zne_decorator(
     """
     # Formally, the function below is the actual decorator, while the function
     # "zne_decorator" is necessary to give additional arguments to "decorator".
-    def decorator(executor: Callable[[QPROGRAM], float]) -> Callable[[QPROGRAM], float]:
+    def decorator(
+        executor: Callable[[QPROGRAM], float]
+    ) -> Callable[[QPROGRAM], float]:
         return mitigate_executor(executor, fac, scale_noise)
 
     return decorator
