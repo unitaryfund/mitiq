@@ -80,10 +80,14 @@ def test_poly_extr():
     # order=1 is bad while ored=2 is better.
     algo_object = PolyFactory(X_VALS, order=1)
     run_factory(algo_object, f_non_lin)
-    assert not np.isclose(algo_object.reduce(), f_non_lin(0, err=0), atol=NOT_CLOSE_TOL)
+    assert not np.isclose(
+        algo_object.reduce(), f_non_lin(0, err=0), atol=NOT_CLOSE_TOL
+    )
     algo_object = PolyFactory(X_VALS, order=2)
     run_factory(algo_object, f_non_lin)
-    assert np.isclose(algo_object.reduce(), f_non_lin(0, err=0), atol=CLOSE_TOL)
+    assert np.isclose(
+        algo_object.reduce(), f_non_lin(0, err=0), atol=CLOSE_TOL
+    )
 
 
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
@@ -101,7 +105,9 @@ def test_poly_exp_factory_with_asympt(test_f: Callable[[float], float]):
     # order=1 is bad while order=2 is better.
     algo_object = PolyExpFactory(X_VALS, order=1, asymptote=A)
     run_factory(algo_object, test_f)
-    assert not np.isclose(algo_object.reduce(), test_f(0, err=0), atol=NOT_CLOSE_TOL)
+    assert not np.isclose(
+        algo_object.reduce(), test_f(0, err=0), atol=NOT_CLOSE_TOL
+    )
     algo_object = PolyExpFactory(X_VALS, order=2, asymptote=A)
     run_factory(algo_object, test_f)
     assert np.isclose(algo_object.reduce(), test_f(0, err=0), atol=CLOSE_TOL)
@@ -122,7 +128,9 @@ def test_poly_exp_factory_no_asympt(test_f: Callable[[float], float]):
     # order=1 is bad while order=2 is better.
     algo_object = PolyExpFactory(X_VALS, order=1, asymptote=None)
     run_factory(algo_object, test_f)
-    assert not np.isclose(algo_object.reduce(), test_f(0, err=0), atol=NOT_CLOSE_TOL)
+    assert not np.isclose(
+        algo_object.reduce(), test_f(0, err=0), atol=NOT_CLOSE_TOL
+    )
     algo_object = PolyExpFactory(X_VALS, order=2, asymptote=None)
     run_factory(algo_object, test_f)
     assert np.isclose(algo_object.reduce(), test_f(0, err=0), atol=CLOSE_TOL)
@@ -137,7 +145,9 @@ def test_ada_exp_factory_with_asympt(test_f: Callable[[float], float]):
 
 
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-def test_ada_exp_factory_with_asympt_more_steps(test_f: Callable[[float], float]):
+def test_ada_exp_factory_with_asympt_more_steps(
+    test_f: Callable[[float], float]
+):
     """Test of the adaptive exponential extrapolator."""
     algo_object = AdaExpFactory(steps=6, scalar=2.0, asymptote=A)
     run_factory(algo_object, test_f)
@@ -153,7 +163,9 @@ def test_ada_exp_factory_no_asympt(test_f: Callable[[float], float]):
 
 
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-def test_ada_exp_factory_no_asympt_more_steps(test_f: Callable[[float], float]):
+def test_ada_exp_factory_no_asympt_more_steps(
+    test_f: Callable[[float], float]
+):
     """Test of the adaptive exponential extrapolator."""
     algo_object = AdaExpFactory(steps=8, scalar=2.0, asymptote=None)
     run_factory(algo_object, test_f)
