@@ -5,9 +5,11 @@ from qiskit import QuantumCircuit
 
 # Noise simulation packages
 from qiskit.providers.aer.noise import NoiseModel
-from qiskit.providers.aer.noise.errors.standard_errors import depolarizing_error
+from qiskit.providers.aer.noise.errors.standard_errors import (
+    depolarizing_error,
+)
 
-BACKEND = qiskit.Aer.get_backend('qasm_simulator')
+BACKEND = qiskit.Aer.get_backend("qasm_simulator")
 # Set the random seeds for testing
 QISKIT_SEED = 1337
 np.random.seed(1001)
@@ -61,26 +63,32 @@ def run_with_noise(circuit, noise, shots):
     # initialize a qiskit noise model
     noise_model = NoiseModel()
 
-    # we assume a depolarizing error for each gate of the standard IBM basis set (u1, u2, u3)
-    noise_model.add_all_qubit_quantum_error(depolarizing_error(noise, 1), ['u1', 'u2', 'u3'])
+    # we assume a depolarizing error for each gate of the standard IBM basis
+    # set (u1, u2, u3)
+    noise_model.add_all_qubit_quantum_error(
+        depolarizing_error(noise, 1), ["u1", "u2", "u3"]
+    )
 
     # execution of the experiment
-    job = qiskit.execute(circuit,
-                         backend=BACKEND,
-                         basis_gates=['u1', 'u2', 'u3'],
-                         # we want all gates to be actually applied,
-                         # so we skip any circuit optimization
-                         optimization_level=0,
-                         noise_model=noise_model,
-                         shots=shots,
-                         seed_simulator=QISKIT_SEED)
+    job = qiskit.execute(
+        circuit,
+        backend=BACKEND,
+        basis_gates=["u1", "u2", "u3"],
+        # we want all gates to be actually applied,
+        # so we skip any circuit optimization
+        optimization_level=0,
+        noise_model=noise_model,
+        shots=shots,
+        seed_simulator=QISKIT_SEED,
+    )
     results = job.result()
     counts = results.get_counts()
-    expval = counts['0'] / shots
+    expval = counts["0"] / shots
     return expval
 
 
-# For QISKIT the noise params are attributes of the simulation run and not of the program
+# For QISKIT the noise params are attributes of the simulation run and not of
+# the program
 # this means we need a stateful record of the scaled noise.
 # Note this is NOT A GOOD SOLUTION IN THE LONG TERM AS HIDDEN STATE IS BAD
 # Mainly this is qiskit's fault...
@@ -91,31 +99,41 @@ CURRENT_NOISE = None
 def scale_noise(pq, param: float):
     global CURRENT_NOISE
     noise = param * NATIVE_NOISE
-    assert noise <= 1.0, "Noise scaled to {} is out of bounds (<=1.0) for depolarizing channel.".format(noise)
+    assert (
+        noise <= 1.0
+    ), "Noise scaled to {} is out of bounds (<=1.0) for depolarizing " \
+    "channel.".format(
+        noise
+    )
 
     noise_model = NoiseModel()
-    # we assume a depolarizing error for each gate of the standard IBM basis set (u1, u2, u3)
-    noise_model.add_all_qubit_quantum_error(depolarizing_error(noise, 1), ['u1', 'u2', 'u3'])
+    # we assume a depolarizing error for each gate of the standard IBM basis
+    # set (u1, u2, u3)
+    noise_model.add_all_qubit_quantum_error(
+        depolarizing_error(noise, 1), ["u1", "u2", "u3"]
+    )
     CURRENT_NOISE = noise_model
     return pq
 
 
 def run_program(pq, shots: int = 100) -> float:
-    job = qiskit.execute(pq,
-                         backend=BACKEND,
-                         basis_gates=['u1', 'u2', 'u3'],
-                         # we want all gates to be actually applied,
-                         # so we skip any circuit optimization
-                         optimization_level=0,
-                         noise_model=CURRENT_NOISE,
-                         shots=shots,
-                         seed_simulator=QISKIT_SEED)
+    job = qiskit.execute(
+        pq,
+        backend=BACKEND,
+        basis_gates=["u1", "u2", "u3"],
+        # we want all gates to be actually applied,
+        # so we skip any circuit optimization
+        optimization_level=0,
+        noise_model=CURRENT_NOISE,
+        shots=shots,
+        seed_simulator=QISKIT_SEED,
+    )
     results = job.result()
     counts = results.get_counts()
-    expval = counts['0'] / shots
+    expval = counts["0"] / shots
     return expval
+
 
 def measure(circuit, qid):
     circuit.measure(0, qid)
     return circuit
-
