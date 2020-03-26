@@ -4,6 +4,7 @@ from typing import List, Iterable, Union, Tuple
 import numpy as np
 from scipy.optimize import curve_fit
 
+
 class Factory:
     """
     Abstract class designed to adaptively produce a new noise scaling parameter
@@ -104,12 +105,16 @@ class PolyFactory(BatchedFactory):
             order: Polynomial extrapolation order. It cannot exceed len(scalars) - 1.
         """
         if order > len(scalars) - 1:
-            raise ValueError("The extrapolation order cannot exceed len(scalars) - 1.")
+            raise ValueError(
+                "The extrapolation order cannot exceed len(scalars) - 1."
+            )
         self.order = order
         super(PolyFactory, self).__init__(scalars)
 
     @staticmethod
-    def static_reduce(instack: List[float], outstack: List[float], order: int) -> float:
+    def static_reduce(
+        instack: List[float], outstack: List[float], order: int
+    ) -> float:
         """
         Determines with a least squared method, the polynomial of degree equal to 'order'
         which optimally fits the input data. The zero-noise limit is returned.
@@ -119,7 +124,9 @@ class PolyFactory(BatchedFactory):
         e.g., LinearFactory and RichardsonFactory.
         """
         # Check arguments
-        error_str = "Data is not enough: at least two data points are necessary."
+        error_str = (
+            "Data is not enough: at least two data points are necessary."
+        )
         if instack is None or outstack is None:
             raise ValueError(error_str)
         if len(instack) != len(outstack) or len(instack) < 2:
@@ -139,7 +146,9 @@ class PolyFactory(BatchedFactory):
         Determines with a least squared method, the polynomial of degree equal to "self.order"
         which optimally fits the input data. The zero-noise limit is returned.
         """
-        return PolyFactory.static_reduce(self.instack, self.outstack, self.order)
+        return PolyFactory.static_reduce(
+            self.instack, self.outstack, self.order
+        )
 
 
 class RichardsonFactory(BatchedFactory):
@@ -150,7 +159,9 @@ class RichardsonFactory(BatchedFactory):
         # Richardson's extrapolation is a particular case of a polynomial fit
         # with order equal to the number of data points minus 1.
         order = len(self.instack) - 1
-        return PolyFactory.static_reduce(self.instack, self.outstack, order=order)
+        return PolyFactory.static_reduce(
+            self.instack, self.outstack, order=order
+        )
 
 
 class LinearFactory(BatchedFactory):
@@ -165,6 +176,7 @@ class LinearFactory(BatchedFactory):
         # with order equal to 1.
         return PolyFactory.static_reduce(self.instack, self.outstack, order=1)
 
+
 class ExpFactory(BatchedFactory):
     """
     Factory object implementing a zero-noise extrapolation algorithm assuming an
@@ -175,7 +187,9 @@ class ExpFactory(BatchedFactory):
     Otherwise, a non-linear fit of y(x) is performed.
     """
 
-    def __init__(self, scalars: Iterable[float], asymptote: Union[float, None] = None) -> None:
+    def __init__(
+        self, scalars: Iterable[float], asymptote: Union[float, None] = None
+    ) -> None:
         """
         Args:
             scalars: Iterable of noise scale factors at which expectation values should be measured.
@@ -183,7 +197,9 @@ class ExpFactory(BatchedFactory):
         """
         super(ExpFactory, self).__init__(scalars)
         if not (asymptote is None or isinstance(asymptote, float)):
-            raise ValueError("The argument 'asymptote' must be either a float or None")
+            raise ValueError(
+                "The argument 'asymptote' must be either a float or None"
+            )
         self.asymptote = asymptote
 
     def reduce(self) -> float:
@@ -211,8 +227,12 @@ class PolyExpFactory(BatchedFactory):
     Otherwise, a non-linear fit of y(x) is perfomed.
     """
 
-    def __init__(self, scalars: Iterable[float], order: int, \
-                 asymptote: Union[float, None] = None) -> None:
+    def __init__(
+        self,
+        scalars: Iterable[float],
+        order: int,
+        asymptote: Union[float, None] = None,
+    ) -> None:
         """
         Args:
             scalars: Iterable of noise scale factors at which expectation values should be measured.
@@ -222,13 +242,20 @@ class PolyExpFactory(BatchedFactory):
         """
         super(PolyExpFactory, self).__init__(scalars)
         if not (asymptote is None or isinstance(asymptote, float)):
-            raise ValueError("The argument 'asymptote' must be either a float or None")
+            raise ValueError(
+                "The argument 'asymptote' must be either a float or None"
+            )
         self.order = order
         self.asymptote = asymptote
 
     @staticmethod
-    def static_reduce(instack: List[float], outstack: List[float], asymptote: Union[float, None], \
-                      order: int, eps: float = 1.0e-9,) -> Tuple[float, List[float]]:
+    def static_reduce(
+        instack: List[float],
+        outstack: List[float],
+        asymptote: Union[float, None],
+        order: int,
+        eps: float = 1.0e-9,
+    ) -> Tuple[float, List[float]]:
         """
         Determines the zero-noise limit, assuming an exponential ansatz:
         y(x) = a + s * exp(z(x)), where z(x) is a polynomial of a given order.
@@ -264,7 +291,9 @@ class PolyExpFactory(BatchedFactory):
         # Shift is 0 if asymptote is given, 1 if asymptote is not given
         shift = int(asymptote is None)
         # Check arguments
-        error_str = "Data is not enough: at least two data points are necessary."
+        error_str = (
+            "Data is not enough: at least two data points are necessary."
+        )
         if instack is None or outstack is None:
             raise ValueError(error_str)
         if len(instack) != len(outstack) or len(instack) < 2:
@@ -332,7 +361,12 @@ class AdaExpFactory(Factory):
 
     _SHIFT_FACTOR = 1.27846
 
-    def __init__(self, steps: int, scalar: float = 2, asymptote: Union[float, None] = None) -> None:
+    def __init__(
+        self,
+        steps: int,
+        scalar: float = 2,
+        asymptote: Union[float, None] = None,
+    ) -> None:
         """Instantiate a new object of this Factory class.
 
         Parameters
@@ -345,9 +379,13 @@ class AdaExpFactory(Factory):
         """
         super(AdaExpFactory, self).__init__()
         if not (asymptote is None or isinstance(asymptote, float)):
-            raise ValueError("The argument 'asymptote' must be either a float or None")
+            raise ValueError(
+                "The argument 'asymptote' must be either a float or None"
+            )
         if scalar <= 1:
-            raise ValueError("The argument 'scalar' must be strictly larger than one.")
+            raise ValueError(
+                "The argument 'scalar' must be strictly larger than one."
+            )
         if steps < 3 + int(asymptote is None):
             raise ValueError(
                 "The argument 'steps' must be an integer greater or equal to 3. "
@@ -358,7 +396,9 @@ class AdaExpFactory(Factory):
         self.asymptote = asymptote
         # Keep a log of the optimization process storing:
         # noise value(s), expectation value(s), parameters, and zero limit
-        self.history = []  # type: List[Tuple[List[float], List[float], List[float], float]]
+        self.history = (
+            []
+        )  # type: List[Tuple[List[float], List[float], List[float], float]]
 
     def next(self) -> float:
         """Returns the next noise level to execute a circuit at."""
