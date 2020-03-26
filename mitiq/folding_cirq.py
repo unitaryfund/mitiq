@@ -276,7 +276,8 @@ def _update_moment_indices(
     """
     if moment_index_where_gate_was_folded not in moment_indices.keys():
         raise ValueError(
-            f"Moment index {moment_index_where_gate_was_folded} not in moment indices"
+            f"Moment index {moment_index_where_gate_was_folded} not in moment"\
+            " indices"
         )
     for i in moment_indices.keys():
         moment_indices[i] += 2 * int(i >= moment_index_where_gate_was_folded)

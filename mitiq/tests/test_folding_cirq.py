@@ -111,7 +111,9 @@ def test_fold_gate_at_index_in_moment_one_qubit():
 
 
 def test_fold_gate_at_index_in_moment_two_qubits():
-    """Tests local folding with a moment, index for a two qubit circuit with single qubit gates."""
+    """Tests local folding with a moment, index for a two qubit circuit with
+       single qubit gates.
+    """
     # Test circuit:
     # 0: ───H───T───
     #
@@ -162,7 +164,9 @@ def test_fold_gate_at_index_in_moment_two_qubits():
 
 
 def test_fold_gate_at_index_in_moment_two_qubit_gates():
-    """Tests local folding with a moment, index for a two qubit circuit with two qubit gates."""
+    """Tests local folding with a moment, index for a two qubit circuit with
+       two qubit gates.
+    """
     # Test circuit:
     # 0: ───H───@───
     #           │
@@ -655,7 +659,9 @@ def test_fold_gates_at_random_no_stretch():
 
 
 def test_fold_gates_at_random_seed_one_qubit():
-    """Test for folding gates at random on a one qubit circuit with a seed for repeated behavior."""
+    """Test for folding gates at random on a one qubit circuit with a seed for
+    repeated behavior.
+    """
     qubit = LineQubit(0)
     circuit = Circuit([ops.X.on(qubit), ops.Y.on(qubit), ops.Z.on(qubit)])
     # Small stretch
@@ -681,7 +687,9 @@ def test_fold_gates_at_random_seed_one_qubit():
 
 
 def test_fold_random_min_stretch():
-    """Tests that folding at random with min stretch returns a copy of the input circuit."""
+    """Tests that folding at random with min stretch returns a copy of the
+    input circuit.
+    """
     # Test circuit
     # 0: ───H───@───@───
     #           │   │
@@ -702,7 +710,9 @@ def test_fold_random_min_stretch():
 
 
 def test_fold_random_max_stretch():
-    """Tests that folding at random with max stretch folds all gates on a multi-qubit circuit."""
+    """Tests that folding at random with max stretch folds all gates on a
+    multi-qubit circuit.
+    """
     # Test circuit
     # 0: ───H───@───@───
     #           │   │
@@ -734,8 +744,8 @@ def test_fold_random_bad_stretch():
 
 
 def test_fold_random_no_repeats():
-    """Tests folding at random to ensure that no gates are folded twice and folded gates
-    are not folded again.
+    """Tests folding at random to ensure that no gates are folded twice and
+    folded gates are not folded again.
     """
     # Test circuit:
     # 0: ───H───@───Y───@───
@@ -942,7 +952,9 @@ def test_global_fold_stretch_factor_of_three():
 
 
 def test_global_fold_stretch_factor_of_three_with_terminal_measurements():
-    """Tests global folding with the stretch as a factor of 3 for a circuit with terminal measurements."""
+    """Tests global folding with the stretch as a factor of 3 for a circuit
+    with terminal measurements.
+    """
     # Test circuit
     # 0: ───H───@───@───M───
     #           │   │
@@ -963,7 +975,9 @@ def test_global_fold_stretch_factor_of_three_with_terminal_measurements():
 
 
 def test_global_fold_stretch_factor_nine_with_terminal_measurements():
-    """Tests global folding with the stretch as a factor of 9 for a circuit with terminal measurements."""
+    """Tests global folding with the stretch as a factor of 9 for a circuit
+    with terminal measurements.
+    """
     # Test circuit
     # 0: ───H───@───@───M───
     #           │   │
@@ -984,7 +998,9 @@ def test_global_fold_stretch_factor_nine_with_terminal_measurements():
 
 
 def test_global_fold_stretch_factor_eight_terminal_measurements():
-    """Tests global folding with a stretch factor not a multiple of three so that local folding is also called."""
+    """Tests global folding with a stretch factor not a multiple of three so
+    that local folding is also called.
+    """
     # Test circuit
     # 0: ───H───@───@───M───
     #           │   │
