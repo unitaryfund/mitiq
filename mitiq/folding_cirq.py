@@ -1,10 +1,10 @@
 """Functions to fold gates in Cirq circuits."""
 from copy import deepcopy
-from typing import (Any, Callable, Iterable, List, Optional, Tuple, Union)
+from typing import Any, Callable, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 
-from cirq import (Circuit, InsertStrategy, inverse, ops)
+from cirq import Circuit, InsertStrategy, inverse, ops
 
 
 # Helper functions
@@ -17,22 +17,32 @@ def _is_measurement(op: ops.Operation) -> bool:
     return isinstance(op.gate, ops.measurement_gate.MeasurementGate)
 
 
-def _pop_measurements(circuit: Circuit) -> List[List[Union[int, ops.Operation]]]:
+def _pop_measurements(
+    circuit: Circuit,
+) -> List[List[Union[int, ops.Operation]]]:
     """Removes all measurements from a circuit."""
-    measurements = [list(m) for m in circuit.findall_operations(_is_measurement)]
+    measurements = [
+        list(m) for m in circuit.findall_operations(_is_measurement)
+    ]
     circuit.batch_remove(measurements)
     return measurements
 
 
-def _append_measurements(circuit: Circuit, measurements: List[Union[int, ops.Operation]]) -> None:
+def _append_measurements(
+    circuit: Circuit, measurements: List[Union[int, ops.Operation]]
+) -> None:
     """Appends all measurements into the final moment of the circuit."""
     for i in range(len(measurements)):
-        measurements[i][0] = len(circuit) + 1  # Make sure the moment to insert into is the last in the circuit
+        measurements[i][0] = (
+            len(circuit) + 1
+        )  # Make sure the moment to insert into is the last in the circuit
     circuit.batch_insert(measurements)
 
 
 # Gate level folding
-def _fold_gate_at_index_in_moment(circuit: Circuit, moment_index: int, gate_index: int) -> None:
+def _fold_gate_at_index_in_moment(
+    circuit: Circuit, moment_index: int, gate_index: int
+) -> None:
     """Modifies the input circuit by replacing the gate G in (moment, index) is replaced by G G^dagger G.
 
     Args:
@@ -44,10 +54,14 @@ def _fold_gate_at_index_in_moment(circuit: Circuit, moment_index: int, gate_inde
         None
     """
     op = circuit[moment_index].operations[gate_index]
-    circuit.insert(moment_index, [op, inverse(op)], strategy=InsertStrategy.NEW)
+    circuit.insert(
+        moment_index, [op, inverse(op)], strategy=InsertStrategy.NEW
+    )
 
 
-def _fold_gates_in_moment(circuit: Circuit, moment_index: int, gate_indices: Iterable[int]) -> None:
+def _fold_gates_in_moment(
+    circuit: Circuit, moment_index: int, gate_indices: Iterable[int]
+) -> None:
     """Modifies the input circuit by applying the map G -> G G^dag G to all gates specified by
      the input moment index and gate indices.
 
@@ -60,10 +74,16 @@ def _fold_gates_in_moment(circuit: Circuit, moment_index: int, gate_indices: Ite
          None
      """
     for (i, gate_index) in enumerate(gate_indices):
-        _fold_gate_at_index_in_moment(circuit, moment_index + 2 * i, gate_index)  # Each fold adds two moments
+        _fold_gate_at_index_in_moment(
+            circuit, moment_index + 2 * i, gate_index
+        )  # Each fold adds two moments
 
 
-def fold_gates(circuit: Circuit, moment_indices: Iterable[int], gate_indices: List[Iterable[int]]) -> Circuit:
+def fold_gates(
+    circuit: Circuit,
+    moment_indices: Iterable[int],
+    gate_indices: List[Iterable[int]],
+) -> Circuit:
     """Returns a new circuit with specified gates folded.
 
     Args:
@@ -82,8 +102,12 @@ def fold_gates(circuit: Circuit, moment_indices: Iterable[int], gate_indices: Li
     folded = deepcopy(circuit)
     moment_index_shift = 0
     for (i, moment_index) in enumerate(moment_indices):
-        _fold_gates_in_moment(folded, moment_index + moment_index_shift, gate_indices[i])
-        moment_index_shift += 2 * len(gate_indices[i])  # Folding gates adds moments
+        _fold_gates_in_moment(
+            folded, moment_index + moment_index_shift, gate_indices[i]
+        )
+        moment_index_shift += 2 * len(
+            gate_indices[i]
+        )  # Folding gates adds moments
     return folded
 
 
@@ -99,7 +123,9 @@ def _fold_moments(circuit: Circuit, moment_indices: List[int]) -> None:
     """
     shift = 0
     for i in moment_indices:
-        circuit.insert(i + shift, [circuit[i + shift], inverse(circuit[i + shift])])
+        circuit.insert(
+            i + shift, [circuit[i + shift], inverse(circuit[i + shift])]
+        )
         shift += 2
 
 
@@ -149,10 +175,14 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
         Folding a single gate adds two gates to the circuit, hence the maximum stretch factor is 3.
     """
     if not circuit.are_all_measurements_terminal():
-        raise ValueError(f"Input circuit contains intermediate measurements and cannot be folded.")
+        raise ValueError(
+            f"Input circuit contains intermediate measurements and cannot be folded."
+        )
 
     if not 1 <= stretch <= 3:
-        raise ValueError("The stretch factor must be a real number between 1 and 3.")
+        raise ValueError(
+            "The stretch factor must be a real number between 1 and 3."
+        )
 
     folded = deepcopy(circuit)
 
@@ -168,7 +198,9 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
 
     for (moment_index, moment) in enumerate(circuit):
         for gate_index in range(len(moment)):
-            _fold_gate_at_index_in_moment(folded, moment_index + moment_shift, gate_index)
+            _fold_gate_at_index_in_moment(
+                folded, moment_index + moment_shift, gate_index
+            )
             moment_shift += 2
             num_folded += 1
             if num_folded == num_to_fold:
@@ -191,7 +223,9 @@ def fold_gates_from_right(circuit: Circuit, stretch: float) -> Circuit:
         Folding a single gate adds two gates to the circuit, hence the maximum stretch factor is 3.
     """
     if not circuit.are_all_measurements_terminal():
-        raise ValueError(f"Input circuit contains intermediate measurements and cannot be folded.")
+        raise ValueError(
+            f"Input circuit contains intermediate measurements and cannot be folded."
+        )
 
     measurements = _pop_measurements(circuit)
 
@@ -202,7 +236,9 @@ def fold_gates_from_right(circuit: Circuit, stretch: float) -> Circuit:
     return folded
 
 
-def _update_moment_indices(moment_indices: dict, moment_index_where_gate_was_folded: int) -> dict:
+def _update_moment_indices(
+    moment_indices: dict, moment_index_where_gate_was_folded: int
+) -> dict:
     """Updates moment indices to keep track of an original circuit throughout folding.
 
     Args:
@@ -224,13 +260,17 @@ def _update_moment_indices(moment_indices: dict, moment_index_where_gate_was_fol
         moment_index_where_gate_was_folded: Index of the moment in which a gate was folded.
     """
     if moment_index_where_gate_was_folded not in moment_indices.keys():
-        raise ValueError(f"Moment index {moment_index_where_gate_was_folded} not in moment indices")
+        raise ValueError(
+            f"Moment index {moment_index_where_gate_was_folded} not in moment indices"
+        )
     for i in moment_indices.keys():
         moment_indices[i] += 2 * int(i >= moment_index_where_gate_was_folded)
     return moment_indices
 
 
-def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int] = None) -> Circuit:
+def fold_gates_at_random(
+    circuit: Circuit, stretch: float, seed: Optional[int] = None
+) -> Circuit:
     """Returns a folded circuit by applying the map G -> G G^dag G to a random subset of gates in the input circuit.
 
     The folded circuit has a number of gates approximately equal to stretch * n where n is the number of gates in
@@ -245,10 +285,14 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int] =
         Folding a single gate adds two gates to the circuit, hence the maximum stretch factor is 3.
     """
     if not circuit.are_all_measurements_terminal():
-        raise ValueError(f"Input circuit contains intermediate measurements and cannot be folded.")
+        raise ValueError(
+            f"Input circuit contains intermediate measurements and cannot be folded."
+        )
 
     if not 1 <= stretch <= 3:
-        raise ValueError("The stretch factor must be a real number between 1 and 3.")
+        raise ValueError(
+            "The stretch factor must be a real number between 1 and 3."
+        )
 
     folded = deepcopy(circuit)
 
@@ -269,10 +313,15 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int] =
     moment_indices = {i: i for i in range(len(circuit))}
 
     # Keep track of which gates we can fold in each moment
-    remaining_gate_indices = {moment: list(range(len(circuit[moment]))) for moment in range(len(circuit))}
+    remaining_gate_indices = {
+        moment: list(range(len(circuit[moment])))
+        for moment in range(len(circuit))
+    }
 
     # Any moment with at least one gate is fair game
-    remaining_moment_indices = [i for i in remaining_gate_indices.keys() if remaining_gate_indices[i]]
+    remaining_moment_indices = [
+        i for i in remaining_gate_indices.keys() if remaining_gate_indices[i]
+    ]
 
     for _ in range(num_to_fold):
         # Get a moment index and gate index from the remaining set
@@ -280,7 +329,9 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int] =
         gate_index = np.random.choice(remaining_gate_indices[moment_index])
 
         # Do the fold
-        _fold_gate_at_index_in_moment(folded, moment_indices[moment_index], gate_index)
+        _fold_gate_at_index_in_moment(
+            folded, moment_indices[moment_index], gate_index
+        )
 
         # Update the moment indices for the folded circuit
         _update_moment_indices(moment_indices, moment_index)
@@ -297,10 +348,13 @@ def fold_gates_at_random(circuit: Circuit, stretch: float, seed: Optional[int] =
 
 
 def fold_local(
-        circuit: Circuit,
-        stretch: float,
-        fold_method: Callable[[Circuit, float, Tuple[Any]], Circuit] = fold_gates_from_left,
-        fold_method_args: Tuple[Any] = ()) -> Circuit:
+    circuit: Circuit,
+    stretch: float,
+    fold_method: Callable[
+        [Circuit, float, Tuple[Any]], Circuit
+    ] = fold_gates_from_left,
+    fold_method_args: Tuple[Any] = (),
+) -> Circuit:
     """Returns a folded circuit by folding gates according to the input fold method.
 
     Args:
@@ -329,12 +383,14 @@ def fold_local(
         return folded
 
     if not 1 <= stretch:
-        raise ValueError(f"The stretch factor must be a real number greater than 1.")
+        raise ValueError(
+            f"The stretch factor must be a real number greater than 1."
+        )
 
-    while stretch > 1.:
-        this_stretch = 3. if stretch > 3. else stretch
+    while stretch > 1.0:
+        this_stretch = 3.0 if stretch > 3.0 else stretch
         folded = fold_method(folded, this_stretch, *fold_method_args)
-        stretch /= 3.
+        stretch /= 3.0
     return folded
 
 
@@ -353,7 +409,9 @@ def fold_global(circuit: Circuit, stretch: float) -> Circuit:
         raise ValueError("The stretch factor must be a real number >= 1.")
 
     if not circuit.are_all_measurements_terminal():
-        raise ValueError("Input circuit contains intermediate measurements and cannot be folded.")
+        raise ValueError(
+            "Input circuit contains intermediate measurements and cannot be folded."
+        )
 
     folded = deepcopy(circuit)
     measurements = _pop_measurements(folded)
@@ -370,10 +428,7 @@ def fold_global(circuit: Circuit, stretch: float) -> Circuit:
     num_to_fold = int(round(fractional_stretch * len(ops)))
 
     if num_to_fold > 0:
-        folded += Circuit(
-            [inverse(ops[-num_to_fold:])],
-            [ops[-num_to_fold:]]
-        )
+        folded += Circuit([inverse(ops[-num_to_fold:])], [ops[-num_to_fold:]])
 
     _append_measurements(folded, measurements)
     return folded
