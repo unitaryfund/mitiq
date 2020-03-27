@@ -21,7 +21,7 @@ Zero Noise Extrapolation
 
 Folding
 -------
-.. automodule:: mitiq.folding_cirq
+.. automodule:: mitiq.folding
    :members:
 
 Matrices
