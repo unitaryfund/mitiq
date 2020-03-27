@@ -1,7 +1,7 @@
 # matrices.py
 import numpy as np
 
-def npI() -> ndarray:
+def npI() -> np.ndarray:
     """Returns the identity matrix in SU(2) algebra.
 
     Returns:
@@ -11,7 +11,7 @@ def npI() -> ndarray:
     np_identity = np.array([[1, 0], [0, 1]])
     return np_identity
 
-def npX() -> ndarray:
+def npX() -> np.ndarray:
     """Returns the sigma_x Pauli matrix in SU(2) algebra.
 
     Returns:
@@ -21,7 +21,7 @@ def npX() -> ndarray:
     sigma_x = np.array([[0, 1], [1, 0]])
     return sigma_x
 
-def npY() -> ndarray:
+def npY() -> np.ndarray:
     """Returns the sigma_y Pauli matrix in SU(2) algebra.
 
     Returns:
@@ -31,7 +31,7 @@ def npY() -> ndarray:
     sigma_y = np.array([[0, -1j], [1j, 0]])
     return sigma_y
 
-def npZ() -> ndarray:
+def npZ() -> np.ndarray:
     """Returns the sigma_z Pauli matrix in SU(2) algebra.
 
     Returns:
