@@ -16,7 +16,14 @@ np.random.seed(1001)
 
 
 def random_identity_circuit(depth=None):
-    """Returns a single-qubit identity circuit based on Pauli gates."""
+    """Returns a single-qubit identity circuit based on Pauli gates.
+
+    Args:
+        depth (int): depth of the quantum circuit.
+
+    Returns:
+        circuit: quantum circuit as a :class:`qiskit.QuantumCircuit` object.
+    """
 
     # initialize a quantum circuit with 1 qubit and 1 classical bit
     circuit = QuantumCircuit(1, 1)
@@ -60,6 +67,17 @@ def random_identity_circuit(depth=None):
 
 
 def run_with_noise(circuit, noise, shots):
+"""Runs the quantum circuit with a depolarizing channel noise model.
+
+    Args:
+        circuit (qiskit.QuantumCircuit): Ideal quantum circuit.
+        noise (float): Noise constant going into `depolarizing_error`.
+        shots (int): Number of shots to run the circuit on the back-end.
+
+    Returns:
+        expval: expected values.
+
+"""
     # initialize a qiskit noise model
     noise_model = NoiseModel()
 
