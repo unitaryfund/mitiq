@@ -22,4 +22,4 @@ def test_npZ() -> AssertionError:
 
 def test_matrices_algebra() -> AssertionError:
     """Test SU(2) algebra with commutation relations"""
-    assert_array_equal(npI().dot(npI()), npI())
+    assert_array_equal(npX().dot(npY())-npY().dot(npX()), 2*1j*npZ())
