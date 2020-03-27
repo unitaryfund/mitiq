@@ -45,7 +45,9 @@ Tests
    :members:
 .. automodule:: mitiq.tests.test_folding_cirq
    :members:
-.. automodule:: mitiq.pyquil.tests.test_zne
+.. automodule:: mitiq.tests.test_matrices
+   :members:
+.. automodule:: mitiq.tests.test_utils
    :members:
 .. automodule:: mitiq.qiskit.tests.test_zne
    :members:
