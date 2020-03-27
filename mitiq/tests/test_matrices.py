@@ -6,20 +6,20 @@ from mitiq.matrices import npI, npX, npY, npZ
 
 def test_npI() -> AssertionError:
     """Test square of identity in npI is a projector"""
-    assert_array_equal(npI().dot(npI()), npI())
+    assert_array_equal(npI.dot(npI), npI)
 
 def test_npX() -> AssertionError:
-    """Test square of sigma_y of npX"""
-    assert_array_equal(npX().dot(npX()), npI())
+    """Test square of sigma_x of npX"""
+    assert_array_equal(npX.dot(npX), npI)
 
 def test_npY() -> AssertionError:
     """Test square of sigma_y of npY"""
-    assert_array_equal(npY().dot(npY()), npI())
+    assert_array_equal(npY.dot(npY), npI)
 
 def test_npZ() -> AssertionError:
     """Test square of sigma_z of npZ"""
-    assert_array_equal(npZ().dot(npZ()), npI())
+    assert_array_equal(npZ.dot(npZ), npI)
 
 def test_matrices_algebra() -> AssertionError:
     """Test SU(2) algebra with commutation relations"""
-    assert_array_equal(npX().dot(npY())-npY().dot(npX()), 2*1j*npZ())
+    assert_array_equal(npX.dot(npY)-npY.dot(npX), 2*1j*npZ)
