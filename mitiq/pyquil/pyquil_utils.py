@@ -62,14 +62,14 @@ def random_identity_circuit(depth=None):
 def run_with_noise(circuit, noise, shots):
     # apply depolarizing noise to all gates
     kraus_ops = [
-        np.sqrt(1 - noise) * npI(),
-        np.sqrt(noise / 3) * npX(),
-        np.sqrt(noise / 3) * npY(),
-        np.sqrt(noise / 3) * npZ(),
+        np.sqrt(1 - noise) * npI,
+        np.sqrt(noise / 3) * npX,
+        np.sqrt(noise / 3) * npY,
+        np.sqrt(noise / 3) * npZ,
     ]
-    circuit.define_noisy_gate("X", [0], append_kraus_to_gate(kraus_ops, npX()))
-    circuit.define_noisy_gate("Y", [0], append_kraus_to_gate(kraus_ops, npY()))
-    circuit.define_noisy_gate("Z", [0], append_kraus_to_gate(kraus_ops, npZ()))
+    circuit.define_noisy_gate("X", [0], append_kraus_to_gate(kraus_ops, npX))
+    circuit.define_noisy_gate("Y", [0], append_kraus_to_gate(kraus_ops, npY))
+    circuit.define_noisy_gate("Z", [0], append_kraus_to_gate(kraus_ops, npZ))
 
     # set number of shots
     circuit.wrap_in_numshots_loop(shots)
@@ -91,14 +91,14 @@ def add_depolarizing_noise(pq: Program, noise: float) -> Program:
     pq = pq.copy()
     # apply depolarizing noise to all gates
     kraus_ops = [
-        np.sqrt(1 - noise) * npI(),
-        np.sqrt(noise / 3) * npX(),
-        np.sqrt(noise / 3) * npY(),
-        np.sqrt(noise / 3) * npZ(),
+        np.sqrt(1 - noise) * npI,
+        np.sqrt(noise / 3) * npX,
+        np.sqrt(noise / 3) * npY,
+        np.sqrt(noise / 3) * npZ,
     ]
-    pq.define_noisy_gate("X", [0], append_kraus_to_gate(kraus_ops, npX()))
-    pq.define_noisy_gate("Y", [0], append_kraus_to_gate(kraus_ops, npY()))
-    pq.define_noisy_gate("Z", [0], append_kraus_to_gate(kraus_ops, npZ()))
+    pq.define_noisy_gate("X", [0], append_kraus_to_gate(kraus_ops, npX))
+    pq.define_noisy_gate("Y", [0], append_kraus_to_gate(kraus_ops, npY))
+    pq.define_noisy_gate("Z", [0], append_kraus_to_gate(kraus_ops, npZ))
     return pq
 
 
