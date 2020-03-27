@@ -10,10 +10,12 @@ import cirq
 def random_circuit(depth: int, seed: Optional[int] = None) -> cirq.Circuit:
     """Returns a random single-qubit circuit with Pauli gates.
 
-    Parameters
-    ----------
+    Args:
         depth: Number of gates in the circuit.
         seed: Seed for the random number generator.
+
+    Returns:
+        circuit: the randomized quantum circuit as a :class:`cirq.Circuit`.
     """
     if seed:
         random.seed(seed)
@@ -34,19 +36,18 @@ def _equal(
 ) -> bool:
     """Returns True if the circuits are equal, else False.
 
-    Parameters
-    ----------
+    Args:
         circuit_one: Input circuit to compare to circuit_two.
         circuit_two: Input circuit to compare to circuit_one.
         require_qubit_equality: Requires that the qubits be equal
             in the two circuits.
 
-            E.g., if set(circuit_one.all_qubits()) = {LineQubit(0)},
-            then set(circuit_two_all_qubits()) must be {LineQubit(0)},
-            else the two are not equal.
+    Note:
+        If set(circuit_one.all_qubits()) = {LineQubit(0)},
+        then set(circuit_two_all_qubits()) must be {LineQubit(0)},
+        else the two are not equal.
+        If True, the qubits of both circuits must have a well-defined ordering.
 
-            If True, the qubits of both circuits must have
-            a well-defined ordering.
     """
     if circuit_one is circuit_two:
         return True
