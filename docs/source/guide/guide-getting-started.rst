@@ -91,7 +91,7 @@ performance.
     >>>  "factor of improvement.")
 
     Error in simulation is 0.000519
-    Mitigation provides a 97.6factor of improvement.
+    Mitigation provides a 97.6 factor of improvement.
 
 ..
 
