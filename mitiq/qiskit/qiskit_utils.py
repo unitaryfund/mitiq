@@ -23,6 +23,7 @@ def random_identity_circuit(depth=None):
 
     Returns:
         circuit: quantum circuit as a :class:`qiskit.QuantumCircuit` object.
+
     """
 
     # initialize a quantum circuit with 1 qubit and 1 classical bit
@@ -114,7 +115,18 @@ NATIVE_NOISE = 0.009
 CURRENT_NOISE = None
 
 
-def scale_noise(pq, param: float):
+def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
+"""Scales the noise in a quantum circuit of the factor `param`.
+
+    Args:
+        pq: Quantum circuit.
+        noise (float): Noise constant going into `depolarizing_error`.
+        shots (int): Number of shots to run the circuit on the back-end.
+
+    Returns:
+        pq: quantum circuit as a :class:`qiskit.QuantumCircuit` object.
+
+"""
     global CURRENT_NOISE
     noise = param * NATIVE_NOISE
     assert (
