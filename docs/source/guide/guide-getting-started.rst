@@ -93,9 +93,20 @@ performance.
     Error in simulation is 0.000519
     Mitigation provides a 97.6 factor of improvement.
 
-..
-
 The variance in the mitigated expectation value is now stored in `var`.
+
+You can also use `mitiq` to wrap your backend execution function into an
+error-mitigated version.
+
+.. code-block:: python
+
+    >>> from mitiq import mitigate_executor
+
+    >>> run_mitigated = mitigate_executor(noisy_simulation)
+    >>> mitigated, _ = run_mitigated(circ)
+    >>> mitigated
+
+    0.9994810819625853
 
 The default implementation uses Richardson extrapolation to extrapolate the
 expectation value to the zero noise limit. `Mitiq` comes equipped with other
@@ -103,6 +114,7 @@ extrapolation methods as well. Different methods of extrapolation are packaged
 into `Factory` objects. It is easy to try different ones.
 
 .. code-block:: python
+
     >>> from mitiq.factories import LinearFactory
 
     >>> fac = LinearFactory([1.0, 2.0, 2.5])

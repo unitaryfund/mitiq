@@ -7,7 +7,7 @@ import pytest
 
 from cirq import Circuit, depolarize, LineQubit, X, DensityMatrixSimulator
 
-from mitiq import execute_with_zne
+from mitiq import execute_with_zne, mitigate_executor
 from mitiq.factories import LinearFactory
 
 SIMULATOR = DensityMatrixSimulator()
@@ -74,3 +74,8 @@ def test_cirq_zne(depth):
     fac = LinearFactory([1.0, 2.0, 2.5])
     linear, _ = execute_with_zne(circ, noisy_simulation, fac=fac)
     assert (exact - linear) < (exact - unmitigated)
+
+    # Test the mitigate executor
+    run_mitigated = mitigate_executor(noisy_simulation)
+    e_mitigated, _ = run_mitigated(circ)
+    assert np.isclose(e_mitigated, mitigated)
