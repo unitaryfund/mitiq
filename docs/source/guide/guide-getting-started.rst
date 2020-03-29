@@ -77,7 +77,7 @@ noise.
 
     Error in simulation is 0.0506
 
-This shows the impact the noise has had. Let's use `mitiq to improve this
+This shows the impact the noise has had. Let's use `mitiq` to improve this
 performance.
 
 .. code-block:: python
