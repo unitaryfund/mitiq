@@ -415,8 +415,9 @@ def fold_local(
         Uses a seed of one for the fold_gates_at_random method.
 
     Note:
-        `fold_method` randomly selects gates to fold, folds gates starting
-        from left of circuit, etc. It must have signature
+        `fold_method` defines the strategy for folding gates, which could be
+        folding gates at random, from the left of the circuit, or custom strategies.
+        The signature of `fold_method` must be
             ```
             def fold_method(circuit: Circuit, stretch: float,**kwargs):
                 ...
