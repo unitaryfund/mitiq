@@ -66,7 +66,7 @@ def test_cirq_zne(depth):
     mitigated, _ = execute_with_zne(circ, noisy_simulation)
     exact = 1
     # The mitigation should improve the result.
-    assert (exact - mitigated) < (exact - unmitigated)
+    assert abs(exact - mitigated) < abs(exact - unmitigated)
 
     # Linear factories should work as well
     fac = LinearFactory([1.0, 2.0, 2.5])
