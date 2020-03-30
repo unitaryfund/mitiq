@@ -47,7 +47,6 @@ def _equal(
         then set(circuit_two_all_qubits()) must be {LineQubit(0)},
         else the two are not equal.
         If True, the qubits of both circuits must have a well-defined ordering.
-
     """
     if circuit_one is circuit_two:
         return True

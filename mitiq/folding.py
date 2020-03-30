@@ -43,7 +43,6 @@ def _append_measurements(
     Args:
         circuit: a quantum circuit as a :class:`cirq.Circuit`.
         measurements: measurements to perform.
-
     """
     for i in range(len(measurements)):
         measurements[i][0] = (
@@ -62,7 +61,6 @@ def _fold_gate_at_index_in_moment(
         circuit: Circuit to fold.
         moment_index: Moment in which the gate sits in the circuit.
         gate_index: Index of the gate within the specified moment.
-
     """
     op = circuit[moment_index].operations[gate_index]
     circuit.insert(
@@ -80,7 +78,6 @@ def _fold_gates_in_moment(
          circuit: Circuit to fold.
          moment_index: Index of moment to fold gates in.
          gate_indices: Indices of gates within the moments to fold.
-
      """
     for (i, gate_index) in enumerate(gate_indices):
         _fold_gate_at_index_in_moment(
@@ -111,7 +108,6 @@ def fold_gates(
             and gates with indices 0, 1, and 2 in moment 1.
         >>> fold_gates(circuit, moment_indices=[0, 3],
         >>>                                gate_indices=[(1, 4, 5), (0, 1, 2)])
-
     """
     folded = deepcopy(circuit)
     moment_index_shift = 0
@@ -154,7 +150,6 @@ def fold_moments(circuit: Circuit, moment_indices: List[int]) -> Circuit:
 
     Returns:
         folded: the folded quantum circuit as a :class:`cirq.Circuit` object.
-
     """
     folded = deepcopy(circuit)
     _fold_moments(folded, moment_indices)
@@ -196,7 +191,6 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
     Note:
         Folding a single gate adds two gates to the circuit,
         hence the maximum stretch factor is 3.
-
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -296,7 +290,6 @@ def _update_moment_indices(
     TODO:
         If another gate from the last moment is folded, we could put it
         in the same moment as the previous folded gate.
-
     """
     if moment_index_where_gate_was_folded not in moment_indices.keys():
         raise ValueError(
@@ -429,7 +422,6 @@ def fold_local(
                 ...
             ```
         and return a circuit.
-
     """
     folded = deepcopy(circuit)
 
@@ -461,7 +453,6 @@ def fold_global(circuit: Circuit, stretch: float) -> Circuit:
 
     Returns:
         folded: The folded quantum circuit as a :class:`cirq.Circuit` object.
-
     """
     if not (stretch >= 1):
         raise ValueError("The stretch factor must be a real number >= 1.")

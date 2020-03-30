@@ -23,7 +23,6 @@ def random_identity_circuit(depth=None):
 
     Returns:
         circuit: quantum circuit as a :class:`qiskit.QuantumCircuit` object.
-
     """
 
     # initialize a quantum circuit with 1 qubit and 1 classical bit
@@ -77,7 +76,6 @@ def run_with_noise(circuit, noise, shots):
 
     Returns:
         expval: expected values.
-
 """
     # initialize a qiskit noise model
     noise_model = NoiseModel()
@@ -125,7 +123,6 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
 
     Returns:
         pq: quantum circuit as a :class:`qiskit.QuantumCircuit` object.
-
 """
     global CURRENT_NOISE
     noise = param * NATIVE_NOISE

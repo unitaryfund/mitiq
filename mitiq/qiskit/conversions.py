@@ -30,7 +30,6 @@ def _to_qiskit(circuit: cirq.Circuit) -> QuantumCircuit:
 
     Returns:
         Qiskit.QuantumCircuit object equivalent to the input Mitiq circuit.
-
     """
     return QuantumCircuit.from_qasm_str(_to_qasm(circuit))
 
@@ -43,7 +42,6 @@ def _from_qiskit(circuit: QuantumCircuit) -> cirq.Circuit:
 
     Returns:
         Mitiq circuit representation equivalent to the input Qiskit circuit.
-
     """
     return _from_qasm(circuit.qasm())
 
