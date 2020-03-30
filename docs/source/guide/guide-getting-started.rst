@@ -118,7 +118,7 @@ into `Factory` objects. It is easy to try different ones.
     >>> fac = LinearFactory([1.0, 2.0, 2.5])
     >>> linear, _ = execute_with_zne(circ, noisy_simulation, fac=fac)
     >>> print("Mitigated error with the linear method" \
-              f"is {exact - linear:.{3}}")
+              f" is {exact - linear:.{3}}")
 
     Mitigated error with the linear methodis 0.00638
 
