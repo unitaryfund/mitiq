@@ -57,11 +57,9 @@ def test_cirq_zne(depth):
     # depths. All of these circuits should result in an expectation value of
     # 1 when measured in the computational basis.
     qbit = LineQubit(0)
-    circ = Circuit()
-    for _ in range(depth):
-        assert depth % 2 == 0, "Depths must be even to ensure an " \
-                               "expectation value of 1."
-        circ += X(qbit)
+    assert depth % 2 == 0, "Depths must be even to ensure an " \
+                           "expectation value of 1."
+    circ += Circuit(X(qbit) for _ in range(depth))
 
     # We then compare the mitigated and unmitigated results.
     unmitigated, _ = noisy_simulation(circ)
