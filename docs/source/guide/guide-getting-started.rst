@@ -8,11 +8,11 @@ Improving the performance of your quantum programs is only a few lines of
 code away.
 
 Here's an example using
-`cirq <https://cirq.readthedocs.io/en/stable/index.html>`_. We'll test `mitiq`
-by running against the noisy simulator built into `cirq`.
+`cirq <https://cirq.readthedocs.io/en/stable/index.html>`_. We'll test
+``mitiq`` by running against the noisy simulator built into ``cirq``.
 
 We first define some functions that make it simpler to simulate noise in
-`cirq`. These don't have to do with `mitiq` directly.
+``cirq``. These don't have to do with ``mitiq`` directly.
 
 .. code-block:: python
 
@@ -75,7 +75,7 @@ noise.
 
     Error in simulation is 0.0506
 
-This shows the impact the noise has had. Let's use `mitiq` to improve this
+This shows the impact the noise has had. Let's use ``mitiq`` to improve this
 performance.
 
 .. code-block:: python
@@ -91,9 +91,9 @@ performance.
     Error in simulation is 0.000519
     Mitigation provides a 97.6 factor of improvement.
 
-The variance in the mitigated expectation value is now stored in `var`.
+The variance in the mitigated expectation value is now stored in ``var``.
 
-You can also use `mitiq` to wrap your backend execution function into an
+You can also use ``mitiq`` to wrap your backend execution function into an
 error-mitigated version.
 
 .. code-block:: python
@@ -107,9 +107,9 @@ error-mitigated version.
     0.9994810819625853
 
 The default implementation uses Richardson extrapolation to extrapolate the
-expectation value to the zero noise limit. `Mitiq` comes equipped with other
+expectation value to the zero noise limit. ``Mitiq`` comes equipped with other
 extrapolation methods as well. Different methods of extrapolation are packaged
-into `Factory` objects. It is easy to try different ones.
+into ``Factory`` objects. It is easy to try different ones.
 
 .. code-block:: python
 
@@ -122,10 +122,10 @@ into `Factory` objects. It is easy to try different ones.
 
     Mitigated error with the linear methodis 0.00638
 
-You can read more about the `Factory` objects that are built into `mitiq` and
+You can read more about the ``Factory`` objects that are built into ``mitiq`` and
 how to create your own `here <factories.html>`_.
 
 Another key step in zero-noise extrapolation is to choose how your circuit is
 transformed to scale the noise. You can read more about the noise scaling
-methods built into `mitiq` and how to create your
+methods built into ``mitiq`` and how to create your
 own `here <noise-scaling.html>`_.
