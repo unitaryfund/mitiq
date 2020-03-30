@@ -1,5 +1,5 @@
 # test_zne.py
-""" This module test zne with cirq"""
+"""This module tests zne with Cirq."""
 
 import numpy as np
 from typing import Tuple
