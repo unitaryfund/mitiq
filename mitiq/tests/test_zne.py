@@ -71,7 +71,7 @@ def test_cirq_zne(depth):
     # Linear factories should work as well
     fac = LinearFactory([1.0, 2.0, 2.5])
     linear, _ = execute_with_zne(circ, noisy_simulation, fac=fac)
-    assert (exact - linear) < (exact - unmitigated)
+    assert abs(exact - linear) < abs(exact - unmitigated)
 
     # Test the mitigate executor
     run_mitigated = mitigate_executor(noisy_simulation)
