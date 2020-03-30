@@ -67,9 +67,7 @@ noise.
 .. code-block:: python
 
     >>> qbit = LineQubit(0)
-    >>> circ = Circuit()
-    >>> for _ in range(80):
-    >>>    circ += X(qbit)
+    >>> circ = Circuit(X(qbit) for _ in range(80))
 
     >>> unmitigated, _ = noisy_simulation(circ)
     >>> exact = 1
