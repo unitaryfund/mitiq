@@ -11,3 +11,5 @@ Users Guide
 
    guide-overview.rst
    guide-zne.rst
+   guide-factories.rst
+
