@@ -5,7 +5,7 @@
 A Python toolkit for implementing error mitigation on quantum computers.
 
 ## Features
-Mitiq allows to perform error mitigation protocols on quantum circuits such as:
+Mitiq performs error mitigation protocols on quantum circuits using zero-noise extrapolation.
 
 
 ## Contents
