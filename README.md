@@ -11,16 +11,28 @@ Mitiq allows to perform error mitigation protocols on quantum circuits such as:
 - Unitary folding, i.e., identity insertions
 
 ## Contents
-
-    about
-    factories
-    folding
-    matrices
-    pyquil (package)
-    qiskit (package)
-    tests (package)
-    utils
-    zne
+mitiq/mitiq/
+    | about
+    | factories
+    | folding
+    | matrices
+    | pyquil   (package)
+    	|- pyquil_utils
+    	|- tests   (package)
+       		|- test_zne
+    | qiskit   (package)
+    	|- conversions
+    	|- qiskit_utils
+       	|- tests   (package)
+       		|- test_conversions
+       		|- test_zne
+    | tests    (package)
+    	|- test_factories
+    	|- test_folding
+    	|- test_matrices
+    	|- test_utils
+    | utils
+    | zne
 
 ## Installation
 To install locally use:
