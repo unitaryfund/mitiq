@@ -67,7 +67,7 @@ def random_identity_circuit(depth=None):
 
 
 def run_with_noise(circuit, noise, shots):
-"""Runs the quantum circuit with a depolarizing channel noise model.
+    """Runs the quantum circuit with a depolarizing channel noise model.
 
     Args:
         circuit (qiskit.QuantumCircuit): Ideal quantum circuit.
@@ -76,7 +76,7 @@ def run_with_noise(circuit, noise, shots):
 
     Returns:
         expval: expected values.
-"""
+    """
     # initialize a qiskit noise model
     noise_model = NoiseModel()
 
@@ -114,7 +114,7 @@ CURRENT_NOISE = None
 
 
 def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
-"""Scales the noise in a quantum circuit of the factor `param`.
+    """Scales the noise in a quantum circuit of the factor `param`.
 
     Args:
         pq: Quantum circuit.
@@ -123,7 +123,7 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
 
     Returns:
         pq: quantum circuit as a :class:`qiskit.QuantumCircuit` object.
-"""
+    """
     global CURRENT_NOISE
     noise = param * NATIVE_NOISE
     assert (

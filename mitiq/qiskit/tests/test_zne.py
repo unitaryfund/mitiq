@@ -21,12 +21,20 @@ TEST_DEPTH = 30
 
 
 def basic_executor(qp: QPROGRAM, shots: int = 500) -> float:
-    """Runs a program."""
+    """Runs a program.
+
+        Args:
+        qp: quantum program.
+        shots: number of executions of the program.
+
+    Returns:
+        A float.
+    """
     return run_program(qp, shots)
 
 
 def test_qrun_factory():
-"""Tests qrun of a Richardson Factory."""
+    """Tests qrun of a Richardson Factory."""
     qp = random_identity_circuit(depth=TEST_DEPTH)
     qp= measure(qp, 0)
     fac = RichardsonFactory([1.0, 2.0, 3.0])
