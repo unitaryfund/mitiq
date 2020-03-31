@@ -47,18 +47,27 @@ pip install -e .[development]
 Note that this will install our testing environment that depends
 on `qiskit` and `pyquil`.
 
-## Usage
+## Use
 A Getting Started tutorial can be found in the Documentation.
 
-
 ## Development and Testing
-Ensure that you have installed the development enviornment. Then
+Ensure that you have installed the development environment. Then
 you can run tests with `pytest`.
+
+## Contributing
+You can contribute to `mitiq` code by raising an issue about a bug or
+new feature, using the labels to organize it. You can open a pull request
+and explain the bug fix or new feature. You can use `mitiq.about()` to document
+the dependencies installed in your environment.
+
+To contribute to the documentation, read the
+[instructions](docs/README-docs.md) in the `mitiq/docs` folder.
 
 
 ## Authors
 Ryan LaRose, Andrea Mari, Nathan Shammah, and Will Zeng.
-
+An up-to-date list of authors can be found
+[here](https://github.com/unitaryfund/mitiq/graphs/contributors)
 
 ## Licence
 GNU GPL v.3.0.
