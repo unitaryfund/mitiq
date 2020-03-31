@@ -21,15 +21,7 @@ TEST_DEPTH = 30
 
 
 def basic_executor(qp: QPROGRAM, shots: int = 500) -> float:
-"""Runs a program.
-
-    Args:
-        qp: quantum program.
-        shots: number of executions of the program.
-
-    Returns:
-        A float.
-"""
+    """Runs a program."""
     return run_program(qp, shots)
 
 
