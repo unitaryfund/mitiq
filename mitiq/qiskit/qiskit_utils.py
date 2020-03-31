@@ -66,8 +66,8 @@ def random_identity_circuit(depth=None):
     return circuit
 
 
-def run_with_noise(circuit, noise, shots):
-"""Runs the quantum circuit with a depolarizing channel noise model.
+def run_with_noise(circuit, noise, shots) -> float:
+    """Runs the quantum circuit with a depolarizing channel noise model.
 
     Args:
         circuit (qiskit.QuantumCircuit): Ideal quantum circuit.
@@ -76,7 +76,7 @@ def run_with_noise(circuit, noise, shots):
 
     Returns:
         expval: expected values.
-"""
+    """
     # initialize a qiskit noise model
     noise_model = NoiseModel()
 
@@ -114,7 +114,7 @@ CURRENT_NOISE = None
 
 
 def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
-"""Scales the noise in a quantum circuit of the factor `param`.
+    """Scales the noise in a quantum circuit of the factor `param`.
 
     Args:
         pq: Quantum circuit.
@@ -123,7 +123,7 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
 
     Returns:
         pq: quantum circuit as a :class:`qiskit.QuantumCircuit` object.
-"""
+    """
     global CURRENT_NOISE
     noise = param * NATIVE_NOISE
     assert (
@@ -143,7 +143,16 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
     return pq
 
 
-def run_program(pq, shots: int = 100) -> float:
+def run_program(pq: QuantumCircuit, shots: int = 100) -> float:
+    """Runs a quantum program.
+
+    Args:
+        pq: Quantum circuit.
+        shots (int): Number of shots to run the circuit on the back-end.
+
+    Returns:
+        expval: expected value.
+    """
     job = qiskit.execute(
         pq,
         backend=BACKEND,
@@ -161,6 +170,16 @@ def run_program(pq, shots: int = 100) -> float:
     return expval
 
 
-def measure(circuit, qid):
+def measure(circuit, qid) -> QuantumCircuit:
+    """Apply the measure method on the first qubit of a quantum circuit
+    given a classical register.
+
+    Args:
+        circuit: Quantum circuit.
+        qid: classical register.
+
+    Returns:
+        circuit: circuit after the measurement.
+    """
     circuit.measure(0, qid)
     return circuit

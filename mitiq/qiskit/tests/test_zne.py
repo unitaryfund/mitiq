@@ -21,20 +21,20 @@ TEST_DEPTH = 30
 
 
 def basic_executor(qp: QPROGRAM, shots: int = 500) -> float:
-"""Runs a program.
+    """Runs a program.
 
-    Args:
+        Args:
         qp: quantum program.
         shots: number of executions of the program.
 
     Returns:
         A float.
-     """
+    """
     return run_program(qp, shots)
 
 
 def test_qrun_factory():
-"""Tests qrun of a Richardson Factory."""
+    """Tests qrun of a Richardson Factory."""
     qp = random_identity_circuit(depth=TEST_DEPTH)
     qp= measure(qp, 0)
     fac = RichardsonFactory([1.0, 2.0, 3.0])
@@ -44,7 +44,8 @@ def test_qrun_factory():
 
 
 def test_execute_with_zne():
-"""Tests a random identity circuit execution with zero-noise extrapolation."""
+    """Tests a random identity circuit execution with zero-noise extrapolation.
+    """
     rand_circ = random_identity_circuit(depth=TEST_DEPTH)
     qp = measure(rand_circ, qid=0)
     result = execute_with_zne(qp, basic_executor, None, scale_noise)
@@ -52,7 +53,7 @@ def test_execute_with_zne():
 
 
 def test_mitigate_executor():
-"""Tests a random identity circuit executor."""
+    """Tests a random identity circuit executor."""
     rand_circ = random_identity_circuit(depth=TEST_DEPTH)
     qp = measure(rand_circ, qid=0)
     new_executor = mitigate_executor(basic_executor, None, scale_noise)
@@ -67,6 +68,7 @@ def decorated_executor(qp: QPROGRAM) -> float:
     return basic_executor(qp)
 
 def test_zne_decorator():
+    """Tests a zne decorator."""
     rand_circ = random_identity_circuit(depth=TEST_DEPTH)
     qp = measure(rand_circ, qid=0)
     # bad_result is computed with native noise (scale = 1)
