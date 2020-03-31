@@ -12,6 +12,7 @@ Mitiq allows to perform error mitigation protocols on quantum circuits such as:
 - Unitary folding, i.e., identity insertions
 
 ## Contents
+```
 mitiq/mitiq/
     | about
     | factories
@@ -34,7 +35,7 @@ mitiq/mitiq/
     	|- test_utils
     | utils
     | zne
-
+```
 ## Installation
 To install locally use:
 ```bash
