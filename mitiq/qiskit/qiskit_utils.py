@@ -143,7 +143,7 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
     return pq
 
 
-def run_program(pq, shots: int = 100) -> float:
+def run_program(pq: QuantumCircuit, shots: int = 100) -> float:
     """Runs a quantum program.
 
     Args:
