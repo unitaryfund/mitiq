@@ -55,10 +55,12 @@ Ensure that you have installed the development environment. Then
 you can run tests with `pytest`.
 
 ## Contributing
-You can contribute to `mitiq` code by raising an issue about a bug or
-new feature, using the labels to organize it. You can open a pull request
-and explain the bug fix or new feature. You can use `mitiq.about()` to document
-the dependencies installed in your environment.
+You can contribute to `mitiq` code by raising an
+[issue](https://github.com/unitaryfund/mitiq/issues/new) reporting a bug or
+proposing new feature, using the labels to organize it. You can open a
+[pull request](https://github.com/unitaryfund/mitiq/pulls) by pushing changes
+from a local branch, explaining the bug fix or new feature.
+You can use `mitiq.about()` to document your dependencies and work environment.
 
 To contribute to the documentation, read the
 [instructions](docs/README-docs.md) in the `mitiq/docs` folder.
@@ -70,4 +72,4 @@ An up-to-date list of authors can be found
 [here](https://github.com/unitaryfund/mitiq/graphs/contributors)
 
 ## Licence
-GNU GPL v.3.0.
+[GNU GPL v.3.0.](LICENSE)
