@@ -29,7 +29,7 @@ def basic_executor(qp: QPROGRAM, shots: int = 500) -> float:
 
     Returns:
         A float.
-     """
+"""
     return run_program(qp, shots)
 
 
