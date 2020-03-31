@@ -50,7 +50,8 @@ Note that this will install our testing environment that depends
 on `qiskit` and `pyquil`.
 
 ## Use
-A [Getting Started]() tutorial can be found in the Documentation.
+A [Getting Started](docs/source/guide/)
+tutorial can be found in the Documentation.
 
 ## Documentation
 `Mitiq` documentation is found under `mitiq/docs`. A pdf with the documentation

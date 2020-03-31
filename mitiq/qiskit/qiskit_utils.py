@@ -66,7 +66,7 @@ def random_identity_circuit(depth=None):
     return circuit
 
 
-def run_with_noise(circuit, noise, shots):
+def run_with_noise(circuit, noise, shots) -> float:
     """Runs the quantum circuit with a depolarizing channel noise model.
 
     Args:
@@ -144,6 +144,15 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
 
 
 def run_program(pq, shots: int = 100) -> float:
+    """Runs a quantum program.
+
+    Args:
+        pq: Quantum circuit.
+        shots (int): Number of shots to run the circuit on the back-end.
+
+    Returns:
+        expval: expected value.
+    """
     job = qiskit.execute(
         pq,
         backend=BACKEND,
@@ -161,6 +170,15 @@ def run_program(pq, shots: int = 100) -> float:
     return expval
 
 
-def measure(circuit, qid):
+def measure(circuit, qid) -> QuantumCircuit:
+    """Apply the measure method onto a quantum circuit given a qid.
+
+    Args:
+        circuit: Quantum circuit.
+        shots (int): Number of shots to run the circuit on the back-end.
+
+    Returns:
+        expval: expected value.
+    """
     circuit.measure(0, qid)
     return circuit
