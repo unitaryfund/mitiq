@@ -171,14 +171,15 @@ def run_program(pq, shots: int = 100) -> float:
 
 
 def measure(circuit, qid) -> QuantumCircuit:
-    """Apply the measure method onto a quantum circuit given a qid.
+    """Apply the measure method on the first qubit of a quantum circuit
+    given a classical register.
 
     Args:
         circuit: Quantum circuit.
-        shots (int): Number of shots to run the circuit on the back-end.
+        qid: classical register.
 
     Returns:
-        expval: expected value.
+        circuit: circuit after the measurement.
     """
     circuit.measure(0, qid)
     return circuit
