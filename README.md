@@ -48,7 +48,12 @@ Note that this will install our testing environment that depends
 on `qiskit` and `pyquil`.
 
 ## Use
-A Getting Started tutorial can be found in the Documentation.
+A [Getting Started]() tutorial can be found in the Documentation.
+
+## Documentation
+`Mitiq` documentation is found under `mitiq/docs`. A pdf with the documentation
+updated to the latest release can be found
+[here](docs/pdf/Mitiq-latest-release.pdf).
 
 ## Development and Testing
 Ensure that you have installed the development environment. Then
@@ -71,5 +76,5 @@ Ryan LaRose, Andrea Mari, Nathan Shammah, and Will Zeng.
 An up-to-date list of authors can be found
 [here](https://github.com/unitaryfund/mitiq/graphs/contributors)
 
-## Licence
+## License
 [GNU GPL v.3.0.](LICENSE)
