@@ -99,33 +99,12 @@ The zero-noise extrapolation is: 0.5
    In a real scenario, the quantum expectation value can be determined only up to some statistical uncertainty  
    (due to a finite number of measurement shots). This makes the zero-noise extrapolation less trivial.
    Moreover the expectation value could depend non-linearly on the noise level. In this case
-   factories with higher *extrapolation order* (``PolyFactory``, ``RichardsonFactory``, etc.)
+   factories with higher extrapolation *order* (``PolyFactory``, ``RichardsonFactory``, etc.)
    could be more appropriate.
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The ``run_factory`` function
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Running a factory until convergence is a typical step of the zero-noise extrapolation
-workflow. For this reason, in ``mitiq.zne`` there is a built-in function for this task: ``run_factory``.
-The previous example can be reduced to the following equivalent code:
-
-.. code-block:: python
-
-   from mitiq.factories import LinearFactory
-   from mitiq.zne import run_factory
-
-   # Some fixed noise levels
-   NOISE_LEVELS = [1.0, 2.0, 3.0]
-   # Instantiate a LinearFactory object
-   fac = LinearFactory(NOISE_LEVELS)
-   # Run the factory until convergence
-   run_factory(fac, noise_to_expval)
-   # Evaluate the zero-noise extrapolation.
-   zn_limit = fac.reduce()
 
 =============================================
-Defining a custom factory
+Defining a custom Factory
 =============================================
 
 All the built-in factories of ``mitiq`` can be found in the submodule ``mitiq.factories``.
