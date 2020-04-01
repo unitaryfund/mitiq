@@ -176,3 +176,8 @@ and clips the result if it falls outside its physical domain.
 
          # Return the clipped zero-noise extrapolation.
          return np.clip(intercept, self.min_expval, self.max_expval)
+
+This custom factory can be used in exactly the same way as we have
+shown in the previous section. By simply replacing ``LinearFactory``
+with ``MyFactory`` in all the previous code snippets, the new extrapolation 
+method will be applied.
