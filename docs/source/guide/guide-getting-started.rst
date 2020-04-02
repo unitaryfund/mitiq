@@ -120,7 +120,7 @@ into ``Factory`` objects. It is easy to try different ones.
     >>> print("Mitigated error with the linear method" \
               f" is {exact - linear:.{3}}")
 
-    Mitigated error with the linear methodis 0.00638
+    Mitigated error with the linear method is 0.00638
 
 You can read more about the ``Factory`` objects that are built into ``mitiq`` and
 how to create your own `here <factories.html>`_.
