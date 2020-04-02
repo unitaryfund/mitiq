@@ -11,3 +11,4 @@ Users Guide
 
    guide-overview.rst
    guide-getting-started.rst
+   guide-factories.rst
