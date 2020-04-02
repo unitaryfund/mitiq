@@ -16,11 +16,11 @@ different zero-noise extrapolation methods.
 
 The main tasks of a factory are:
     
-1. determine the noise level at which the next computation should be run;
+1. Record the result of the computation executed at the chosen noise level;
 
-2. record the result of the computation executed at the chosen noise level;
+2. Determine the noise level at which the next computation should be run;
 
-3. given the history of noise levels (``self.instack``) and results (``self.outstack``), 
+3. Given the history of noise levels (``self.instack``) and results (``self.outstack``), 
    evaluate the associated zero-noise extrapolation.
 
 The structure of the ``Factory`` class is adaptive by construction, since the choice of the next noise
