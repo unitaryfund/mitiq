@@ -49,6 +49,8 @@ Tests
    :members:
 .. automodule:: mitiq.tests.test_utils
    :members:
+.. automodule:: mitiq.tests.test_zne
+   :members:
 .. automodule:: mitiq.qiskit.tests.test_zne
    :members:
 

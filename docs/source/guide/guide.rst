@@ -10,4 +10,4 @@ Users Guide
    :maxdepth: 2
 
    guide-overview.rst
-   guide-zne.rst
+   guide-getting-started.rst
