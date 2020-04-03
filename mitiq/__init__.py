@@ -3,7 +3,6 @@
 This is the top level module from which functions and classes of
 Mitiq can be directly imported.
 """
-from importlib import import_module
 import os
 from typing import Union
 
