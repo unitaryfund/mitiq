@@ -12,27 +12,11 @@ from mitiq.factories import LinearFactory
 
 SIMULATOR = DensityMatrixSimulator()
 
-
-def meas_observable(rho: np.ndarray, obs: np.ndarray) -> Tuple[float, float]:
-    """Measures a density matrix rho against observable obs.
-
-    Args:
-        rho: A density matrix.
-        obs: A Hermitian observable.
-
-    Returns:
-        The tuple (expectation value, variance).
-    """
-    obs_avg = np.real(np.trace(rho @ obs))
-    obs_delta = np.sqrt(np.real(np.trace(rho @ obs @ obs)) - obs_avg ** 2)
-    return obs_avg, obs_delta
-
-
 # 0.1% depolarizing noise
 NOISE = 0.001
 
 
-def noisy_simulation(circ: Circuit, shots=None) -> Tuple[float, float]:
+def noisy_simulation(circ: Circuit, shots=None) -> float:
     """ Simulates a circuit with depolarizing noise at level NOISE.
 
     Args:
@@ -44,11 +28,12 @@ def noisy_simulation(circ: Circuit, shots=None) -> Tuple[float, float]:
         The observable's measurements as as
         tuple (expectation value, variance).
     """
-    A = np.diag([1, 0])
     circuit = circ.with_noise(depolarize(p=NOISE))
     rho = SIMULATOR.simulate(circuit).final_density_matrix
-    A_avg, A_delta = meas_observable(rho, obs=A)
-    return A_avg, A_delta
+    # define the computational basis observable
+    obs = np.diag([1, 0])
+    expectation = np.real(np.trace(rho @ obs))
+    return expectation
 
 
 @pytest.mark.parametrize(["depth"], [[n] for n in range(10, 80, 20)])
@@ -62,18 +47,18 @@ def test_cirq_zne(depth):
     circ = Circuit(X(qbit) for _ in range(depth))
 
     # We then compare the mitigated and unmitigated results.
-    unmitigated, _ = noisy_simulation(circ)
-    mitigated, _ = execute_with_zne(circ, noisy_simulation)
+    unmitigated = noisy_simulation(circ)
+    mitigated = execute_with_zne(circ, noisy_simulation)
     exact = 1
     # The mitigation should improve the result.
     assert abs(exact - mitigated) < abs(exact - unmitigated)
 
     # Linear factories should work as well
     fac = LinearFactory(scalars=[1.0, 2.0, 2.5])
-    linear, _ = execute_with_zne(circ, noisy_simulation, fac=fac)
+    linear = execute_with_zne(circ, noisy_simulation, fac=fac)
     assert abs(exact - linear) < abs(exact - unmitigated)
 
     # Test the mitigate executor
     run_mitigated = mitigate_executor(noisy_simulation)
-    e_mitigated, _ = run_mitigated(circ)
+    e_mitigated = run_mitigated(circ)
     assert np.isclose(e_mitigated, mitigated)

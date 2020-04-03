@@ -17,31 +17,15 @@ We first define some functions that make it simpler to simulate noise in
 .. code-block:: python
 
     import numpy as np
-    from typing import Tuple
     from cirq import Circuit, depolarize, LineQubit, X, DensityMatrixSimulator
 
     SIMULATOR = DensityMatrixSimulator()
-
-    def meas_observable(rho: np.ndarray, obs: np.ndarray) -> Tuple[float, float]:
-        """Measures a density matrix rho against observable obs.
-
-        Args:
-            rho: A density matrix.
-            obs: A Hermitian observable.
-
-        Returns:
-            The tuple (expectation value, variance).
-        """
-        obs_avg = np.real(np.trace(rho @ obs))
-        obs_delta = np.sqrt(np.real(np.trace(rho @ obs @ obs)) - obs_avg ** 2)
-        return obs_avg, obs_delta
-
 
     # 0.1% depolarizing noise
     NOISE = 0.001
 
 
-    def noisy_simulation(circ: Circuit, shots=None) -> Tuple[float, float]:
+    def noisy_simulation(circ: Circuit, shots=None) -> float:
         """ Simulates a circuit with depolarizing noise at level NOISE.
 
         Args:
@@ -53,11 +37,12 @@ We first define some functions that make it simpler to simulate noise in
             The observable's measurements as as
             tuple (expectation value, variance).
         """
-        A = np.diag([1, 0])
         circuit = circ.with_noise(depolarize(p=NOISE))
         rho = SIMULATOR.simulate(circuit).final_density_matrix
-        A_avg, A_delta = meas_observable(rho, obs=A)
-        return A_avg, A_delta
+        # define the computational basis observable
+        obs = np.diag([1, 0])
+        expectation = np.real(np.trace(rho @ obs))
+        return expectation
 
 Now we can look at our example. We'll test single qubit circuits with even
 numbers of X gates. As there are an even number of X gates, they should all
@@ -69,7 +54,7 @@ noise.
     >>> qbit = LineQubit(0)
     >>> circ = Circuit(X(qbit) for _ in range(80))
 
-    >>> unmitigated, _ = noisy_simulation(circ)
+    >>> unmitigated = noisy_simulation(circ)
     >>> exact = 1
     >>> print(f"Error in simulation is {exact - unmitigated:.{3}}")
 
@@ -101,7 +86,7 @@ error-mitigated version.
     >>> from mitiq import mitigate_executor
 
     >>> run_mitigated = mitigate_executor(noisy_simulation)
-    >>> mitigated, _ = run_mitigated(circ)
+    >>> mitigated = run_mitigated(circ)
     >>> mitigated
 
     0.9994810819625853
@@ -116,7 +101,7 @@ into ``Factory`` objects. It is easy to try different ones.
     >>> from mitiq.factories import LinearFactory
 
     >>> fac = LinearFactory(scalars=[1.0, 2.0, 2.5])
-    >>> linear, _ = execute_with_zne(circ, noisy_simulation, fac=fac)
+    >>> linear = execute_with_zne(circ, noisy_simulation, fac=fac)
     >>> print("Mitigated error with the linear method" \
               f" is {exact - linear:.{3}}")
 
