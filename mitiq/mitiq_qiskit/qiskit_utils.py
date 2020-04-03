@@ -12,7 +12,6 @@ from qiskit.providers.aer.noise.errors.standard_errors import (
 BACKEND = qiskit.Aer.get_backend("qasm_simulator")
 # Set the random seeds for testing
 QISKIT_SEED = 1337
-np.random.seed(1001)
 
 
 def random_identity_circuit(depth=None):

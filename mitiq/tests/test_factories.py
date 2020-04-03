@@ -14,6 +14,9 @@ from mitiq.factories import (
 )
 from mitiq.zne import run_factory
 
+# Set the seed for testing
+np.random.seed(808)
+
 # Constant parameters for test functions:
 A = 0.5
 B = 0.7
@@ -24,6 +27,7 @@ X_VALS = [1, 1.3, 1.7, 2.2]
 STAT_NOISE = 0.0001
 CLOSE_TOL = 1.0e-2
 NOT_CLOSE_TOL = 1.0e-1
+
 
 # Classical test functions with statistical error:
 def f_lin(x: float, err: float = STAT_NOISE) -> float:
