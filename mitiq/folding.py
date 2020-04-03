@@ -1,10 +1,19 @@
-"""Functions to fold gates in Cirq circuits."""
+"""Functions for folding gates in valid mitiq circuits.
+
+Public functions work for any circuit types supported by mitiq.
+Private functions work only for iternal mitiq circuit representations.
+"""
 from copy import deepcopy
 from typing import Any, Callable, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 
 from cirq import Circuit, InsertStrategy, inverse, ops
+from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
+
+
+class UnsupportedCircuitError(Exception):
+    pass
 
 
 # Helper functions
@@ -51,6 +60,37 @@ def _append_measurements(
     circuit.batch_insert(measurements)
 
 
+# Conversions
+def convert_to_mitiq(circuit: QPROGRAM) -> Circuit:
+    """Converts any valid input circuit to a mitiq circuit.
+
+    Args:
+        circuit: Any quantum circuit object supported by mitiq.
+                 See mitiq.SUPPORTED_PROGRAM_TYPES.
+
+    Raises:
+        UnsupportedCircuitError: If the input circuit is not supported.
+    """
+    if "qiskit" in circuit.__module__:
+        from mitiq.qiskit.conversions import _from_qiskit
+        circuit = _from_qiskit(circuit)
+    elif isinstance(circuit, Circuit):
+        pass
+    else:
+        raise UnsupportedCircuitError(
+            f"Circuit from module {circuit.__module__} is not supported.\n\n" +
+            f"Circuit types supported by mitiq are \n{SUPPORTED_PROGRAM_TYPES}"
+        )
+    return circuit
+
+
+def converter(fold_method: Callable) -> Callable:
+    """Decorator for conversions."""
+    def new_fold_method(circuit, *args, **kwargs):
+        return fold_method(convert_to_mitiq(circuit), *args, **kwargs)
+    return new_fold_method
+
+
 # Gate level folding
 def _fold_gate_at_index_in_moment(
     circuit: Circuit, moment_index: int, gate_index: int
@@ -85,6 +125,7 @@ def _fold_gates_in_moment(
         )  # Each fold adds two moments
 
 
+@converter
 def fold_gates(
     circuit: Circuit,
     moment_indices: Iterable[int],
@@ -137,6 +178,7 @@ def _fold_moments(circuit: Circuit, moment_indices: List[int]) -> None:
         shift += 2
 
 
+@converter
 def fold_moments(circuit: Circuit, moment_indices: List[int]) -> Circuit:
     """Returns a new circuit with moments folded by mapping
 
@@ -173,6 +215,7 @@ def _get_num_to_fold(stretch: float, ngates: int) -> int:
     return int(round(ngates * (stretch - 1.0) / 2.0))
 
 
+@converter
 def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
     """Returns a new folded circuit by applying the map G -> G G^dag G to a
     subset of gates of the input circuit, starting with gates at the
@@ -227,6 +270,7 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
                 return folded
 
 
+@converter
 def fold_gates_from_right(circuit: Circuit, stretch: float) -> Circuit:
     """Returns a new folded circuit by applying the map G -> G G^dag G
     to a subset of gates of the input circuit, starting with gates at
@@ -301,6 +345,7 @@ def _update_moment_indices(
     return moment_indices
 
 
+@converter
 def fold_gates_at_random(
     circuit: Circuit, stretch: float, seed: Optional[int] = None
 ) -> Circuit:
@@ -324,7 +369,7 @@ def fold_gates_at_random(
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
-            f"Input circuit contains intermediate measurements" \
+            f"Input circuit contains intermediate measurements"
             " and cannot be folded."
         )
 
@@ -387,6 +432,7 @@ def fold_gates_at_random(
     return folded
 
 
+@converter
 def fold_local(
     circuit: Circuit,
     stretch: float,
@@ -442,6 +488,7 @@ def fold_local(
 
 
 # Circuit level folding
+@converter
 def fold_global(circuit: Circuit, stretch: float) -> Circuit:
     """Gives a circuit by folding the global unitary of the input circuit.
 
