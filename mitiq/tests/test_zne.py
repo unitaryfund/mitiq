@@ -2,7 +2,6 @@
 """This module tests zne with Cirq."""
 
 import numpy as np
-from typing import Tuple
 import pytest
 
 from cirq import Circuit, depolarize, LineQubit, X, DensityMatrixSimulator
