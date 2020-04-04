@@ -66,7 +66,7 @@ def random_identity_circuit(depth=None):
     return circuit
 
 
-def run_with_noise(circuit, noise, shots) -> float:
+def run_with_noise(circuit: QuantumCircuit, noise: float, shots: int) -> float:
     """Runs the quantum circuit with a depolarizing channel noise model.
 
     Args:
