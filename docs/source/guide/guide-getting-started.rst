@@ -67,7 +67,7 @@ performance.
 
     >>> from mitiq import execute_with_zne
 
-    >>> mitigated, var = execute_with_zne(circ, noisy_simulation)
+    >>> mitigated = execute_with_zne(circ, noisy_simulation)
     >>> print(f"Error in simulation is {exact - mitigated:.{3}}")
     >>> print("Mitigation provides " \
     >>>  f"a {(exact - unmitigated) / (exact - mitigated):.{3}}" \
