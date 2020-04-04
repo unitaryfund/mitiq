@@ -5,7 +5,7 @@ from copy import deepcopy
 import numpy as np
 import pytest
 from cirq import Circuit, GridQubit, LineQubit, ops, inverse
-from qiskit import QuantumRegister, QuantumCircuit
+from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 
 from mitiq.utils import _equal, random_circuit
 from mitiq.folding import (
@@ -1218,3 +1218,211 @@ def test_fold_moments_with_qiskit_circuit_keep_input_type():
     #  This requires moderate work because H^dagger gets translated to
     #  Y-X-Y rotations in the translation from Cirq to Qiskit
     assert isinstance(folded_circuit, QuantumCircuit)
+
+
+def test_fold_from_left_with_qiskit_circuits():
+    """Tests folding from left with Qiskit circuits."""
+    # Test Qiskit circuit:
+    #          ┌───┐
+    # q0_0: |0>┤ H ├──■────■──
+    #          ├───┤┌─┴─┐  │
+    # q0_1: |0>┤ H ├┤ X ├──■──
+    #          ├───┤├───┤┌─┴─┐
+    # q0_2: |0>┤ H ├┤ T ├┤ X ├
+    #          └───┘└───┘└───┘
+    qiskit_qreg = QuantumRegister(3)
+    qiskit_creg = ClassicalRegister(3)
+    qiskit_circuit = QuantumCircuit(qiskit_qreg, qiskit_creg)
+    qiskit_circuit.h(qiskit_qreg)
+    qiskit_circuit.cnot(qiskit_qreg[0], qiskit_qreg[1])
+    qiskit_circuit.t(qiskit_qreg[2])
+    qiskit_circuit.ccx(*qiskit_qreg)
+    qiskit_circuit.measure(qiskit_qreg, qiskit_creg)
+
+    folded_circuit = fold_gates_from_left(qiskit_circuit, stretch=1.0)
+
+    qreg = LineQubit.range(3)
+    correct_folded_circuit = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+
+    assert isinstance(folded_circuit, Circuit)
+    # TODO: The following check fails because the measurements in
+    #  folded_circuit have a key, whereas the measurements in
+    #  correct_folded_circuit do not have a key.
+    #  Could add flag in _equal to ignore this, as with qubit equality.
+    # assert _equal(
+    #     folded_circuit, correct_folded_circuit, require_qubit_equality=False
+    # )
+
+    # Keep the input type
+    qiskit_folded_circuit = fold_gates_from_left(
+        qiskit_circuit, stretch=1.0, keep_input_type=True
+    )
+    assert isinstance(qiskit_folded_circuit, QuantumCircuit)
+
+
+def test_fold_from_right_with_qiskit_circuits():
+    """Tests folding from right with Qiskit circuits."""
+    # Test Qiskit circuit:
+    #          ┌───┐
+    # q0_0: |0>┤ H ├──■────■──
+    #          ├───┤┌─┴─┐  │
+    # q0_1: |0>┤ H ├┤ X ├──■──
+    #          ├───┤├───┤┌─┴─┐
+    # q0_2: |0>┤ H ├┤ T ├┤ X ├
+    #          └───┘└───┘└───┘
+    qiskit_qreg = QuantumRegister(3)
+    qiskit_creg = ClassicalRegister(3)
+    qiskit_circuit = QuantumCircuit(qiskit_qreg, qiskit_creg)
+    qiskit_circuit.h(qiskit_qreg)
+    qiskit_circuit.cnot(qiskit_qreg[0], qiskit_qreg[1])
+    qiskit_circuit.t(qiskit_qreg[2])
+    qiskit_circuit.ccx(*qiskit_qreg)
+    qiskit_circuit.measure(qiskit_qreg, qiskit_creg)
+
+    folded_circuit = fold_gates_from_right(qiskit_circuit, stretch=1.0)
+
+    qreg = LineQubit.range(3)
+    correct_folded_circuit = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+
+    assert isinstance(folded_circuit, Circuit)
+    # TODO: The following check fails because the measurements in
+    #  folded_circuit have a key, whereas the measurements in
+    #  correct_folded_circuit do not have a key.
+    #  Could add flag in _equal to ignore this, as with qubit equality.
+    # assert _equal(
+    #     folded_circuit, correct_folded_circuit, require_qubit_equality=False
+    # )
+
+    # Keep the input type
+    qiskit_folded_circuit = fold_gates_from_right(
+        qiskit_circuit, stretch=1.0, keep_input_type=True
+    )
+    assert isinstance(qiskit_folded_circuit, QuantumCircuit)
+
+
+def test_fold_at_random_with_qiskit_circuits():
+    """Tests folding at random with Qiskit circuits."""
+    # Test Qiskit circuit:
+    #          ┌───┐
+    # q0_0: |0>┤ H ├──■────■──
+    #          ├───┤┌─┴─┐  │
+    # q0_1: |0>┤ H ├┤ X ├──■──
+    #          ├───┤├───┤┌─┴─┐
+    # q0_2: |0>┤ H ├┤ T ├┤ X ├
+    #          └───┘└───┘└───┘
+    qiskit_qreg = QuantumRegister(3)
+    qiskit_creg = ClassicalRegister(3)
+    qiskit_circuit = QuantumCircuit(qiskit_qreg, qiskit_creg)
+    qiskit_circuit.h(qiskit_qreg)
+    qiskit_circuit.cnot(qiskit_qreg[0], qiskit_qreg[1])
+    qiskit_circuit.t(qiskit_qreg[2])
+    qiskit_circuit.ccx(*qiskit_qreg)
+    qiskit_circuit.measure(qiskit_qreg, qiskit_creg)
+
+    folded_circuit = fold_gates_at_random(qiskit_circuit, stretch=1.0)
+
+    qreg = LineQubit.range(3)
+    correct_folded_circuit = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+
+    assert isinstance(folded_circuit, Circuit)
+    # TODO: The following check fails because the measurements in
+    #  folded_circuit have a key, whereas the measurements in
+    #  correct_folded_circuit do not have a key.
+    #  Could add flag in _equal to ignore this, as with qubit equality.
+    # assert _equal(
+    #     folded_circuit, correct_folded_circuit, require_qubit_equality=False
+    # )
+
+    # Keep the input type
+    qiskit_folded_circuit = fold_gates_at_random(
+        qiskit_circuit, stretch=1.0, keep_input_type=True
+    )
+    assert isinstance(qiskit_folded_circuit, QuantumCircuit)
+
+
+def test_fold_local_with_qiskit_circuits():
+    """Tests fold_local with input Qiskit circuits."""
+    # Test Qiskit circuit:
+    #          ┌───┐
+    # q0_0: |0>┤ H ├──■────■──
+    #          ├───┤┌─┴─┐  │
+    # q0_1: |0>┤ H ├┤ X ├──■──
+    #          ├───┤├───┤┌─┴─┐
+    # q0_2: |0>┤ H ├┤ T ├┤ X ├
+    #          └───┘└───┘└───┘
+    qiskit_qreg = QuantumRegister(3)
+    qiskit_creg = ClassicalRegister(3)
+    qiskit_circuit = QuantumCircuit(qiskit_qreg, qiskit_creg)
+    qiskit_circuit.h(qiskit_qreg)
+    qiskit_circuit.cnot(qiskit_qreg[0], qiskit_qreg[1])
+    qiskit_circuit.t(qiskit_qreg[2])
+    qiskit_circuit.ccx(*qiskit_qreg)
+    qiskit_circuit.measure(qiskit_qreg, qiskit_creg)
+
+    # Return mitiq circuit
+    folded_circuit = fold_local(
+        qiskit_circuit, stretch=1.4, fold_method=fold_gates_from_left
+    )
+    assert isinstance(folded_circuit, Circuit)
+
+    # Return input circuit type
+    folded_qiskit_circuit = fold_local(
+        qiskit_circuit,
+        stretch=2.0,
+        fold_method=fold_gates_from_left,
+        keep_input_type=True
+    )
+    assert isinstance(folded_qiskit_circuit, QuantumCircuit)
+
+
+def test_fold_global_with_qiskit_circuits():
+    """Tests fold_local with input Qiskit circuits."""
+    # Test Qiskit circuit:
+    #          ┌───┐
+    # q0_0: |0>┤ H ├──■────■──
+    #          ├───┤┌─┴─┐  │
+    # q0_1: |0>┤ H ├┤ X ├──■──
+    #          ├───┤├───┤┌─┴─┐
+    # q0_2: |0>┤ H ├┤ T ├┤ X ├
+    #          └───┘└───┘└───┘
+    qiskit_qreg = QuantumRegister(3)
+    qiskit_creg = ClassicalRegister(3)
+    qiskit_circuit = QuantumCircuit(qiskit_qreg, qiskit_creg)
+    qiskit_circuit.h(qiskit_qreg)
+    qiskit_circuit.cnot(qiskit_qreg[0], qiskit_qreg[1])
+    qiskit_circuit.t(qiskit_qreg[2])
+    qiskit_circuit.ccx(*qiskit_qreg)
+    qiskit_circuit.measure(qiskit_qreg, qiskit_creg)
+
+    # Return mitiq circuit
+    folded_circuit = fold_global(
+        qiskit_circuit, stretch=2.71828, fold_method=fold_gates_from_left
+    )
+    assert isinstance(folded_circuit, Circuit)
+
+    # Return input circuit type
+    folded_qiskit_circuit = fold_global(
+        qiskit_circuit,
+        stretch=2.0,
+        fold_method=fold_gates_from_left,
+        keep_input_type=True
+    )
+    assert isinstance(folded_qiskit_circuit, QuantumCircuit)
