@@ -61,7 +61,7 @@ def _append_measurements(
 
 
 # Conversions
-def convert_to_mitiq(circuit: QPROGRAM) -> Circuit:
+def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
     """Converts any valid input circuit to a mitiq circuit.
 
     Args:
@@ -70,24 +70,55 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Circuit:
 
     Raises:
         UnsupportedCircuitError: If the input circuit is not supported.
+
+    Returns:
+        circuit: Mitiq circuit equivalent to input circuit.
+        input_circuit_type: Type of input circuit represented by a string.
     """
     if "qiskit" in circuit.__module__:
         from mitiq.qiskit.conversions import _from_qiskit
-        circuit = _from_qiskit(circuit)
+        input_circuit_type = "qiskit"
+        mitiq_circuit = _from_qiskit(circuit)
     elif isinstance(circuit, Circuit):
-        pass
+        input_circuit_type = "cirq"
+        mitiq_circuit = deepcopy(circuit)
     else:
         raise UnsupportedCircuitError(
             f"Circuit from module {circuit.__module__} is not supported.\n\n" +
             f"Circuit types supported by mitiq are \n{SUPPORTED_PROGRAM_TYPES}"
         )
-    return circuit
+    return mitiq_circuit, input_circuit_type
+
+
+def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
+    """Converts a mitiq circuit to a type specificed by the conversion type.
+
+    Args:
+        circuit: Mitiq circuit to convert.
+        conversion_type: String specifier for the converted circuit type.
+    """
+    if conversion_type == "qiskit":
+        from mitiq.qiskit.conversions import _to_qiskit
+        converted_circuit = _to_qiskit(circuit)
+    elif isinstance(circuit, Circuit):
+        converted_circuit = deepcopy(circuit)
+    else:
+        raise UnsupportedCircuitError(
+            f"Conversion to circuit of type {conversion_type} is not supported."
+            f"\nCircuit types supported by mitiq are {SUPPORTED_PROGRAM_TYPES}"
+        )
+    return converted_circuit
 
 
 def converter(fold_method: Callable) -> Callable:
-    """Decorator for conversions."""
+    """Decorator for handling conversions."""
     def new_fold_method(circuit, *args, **kwargs):
-        return fold_method(convert_to_mitiq(circuit), *args, **kwargs)
+        mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
+        if kwargs.get("keep_input_type"):
+            return convert_from_mitiq(
+                fold_method(mitiq_circuit, *args, **kwargs), input_circuit_type
+            )
+        return fold_method(mitiq_circuit, *args, **kwargs)
     return new_fold_method
 
 
@@ -127,16 +158,21 @@ def _fold_gates_in_moment(
 
 @converter
 def fold_gates(
-    circuit: Circuit,
+    circuit: QPROGRAM,
     moment_indices: Iterable[int],
     gate_indices: List[Iterable[int]],
-) -> Circuit:
+    **kwargs,
+) -> QPROGRAM:
     """Returns a new circuit with specified gates folded.
 
     Args:
         circuit: Circuit to fold.
         moment_indices: Indices of moments with gates to be folded.
         gate_indices: Specifies which gates within each moment to fold.
+
+    Keyword Args:
+        keep_input_type: If True, returns a circuit of the input type, else
+                         returns a mitiq circuit.
 
     Returns:
         folded: the folded quantum circuit as a :class:`cirq.Circuit` object.
@@ -179,7 +215,10 @@ def _fold_moments(circuit: Circuit, moment_indices: List[int]) -> None:
 
 
 @converter
-def fold_moments(circuit: Circuit, moment_indices: List[int]) -> Circuit:
+def fold_moments(circuit: QPROGRAM,
+                 moment_indices: List[int],
+                 **kwargs
+                 ) -> QPROGRAM:
     """Returns a new circuit with moments folded by mapping
 
     M_i -> M_i M_i^dag M_i
@@ -189,6 +228,10 @@ def fold_moments(circuit: Circuit, moment_indices: List[int]) -> Circuit:
     Args:
         circuit: Circuit to apply folding operation to.
         moment_indices: List of integers that specify moments to fold.
+
+    Keyword Args:
+        keep_input_type: If True, returns a circuit of the input type, else
+                         returns a mitiq circuit.
 
     Returns:
         folded: the folded quantum circuit as a :class:`cirq.Circuit` object.
@@ -216,7 +259,7 @@ def _get_num_to_fold(stretch: float, ngates: int) -> int:
 
 
 @converter
-def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
+def fold_gates_from_left(circuit: QPROGRAM, stretch: float) -> QPROGRAM:
     """Returns a new folded circuit by applying the map G -> G G^dag G to a
     subset of gates of the input circuit, starting with gates at the
     left (beginning) of the circuit.
