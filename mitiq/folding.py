@@ -20,7 +20,14 @@ def _is_measurement(op: ops.Operation) -> bool:
 def _pop_measurements(
     circuit: Circuit,
 ) -> List[List[Union[int, ops.Operation]]]:
-    """Removes all measurements from a circuit."""
+    """Removes all measurements from a circuit.
+
+    Args:
+        circuit: a quantum circuit as a :class:`cirq.Circuit` object.
+
+    Returns:
+        measurements: list
+    """
     measurements = [
         list(m) for m in circuit.findall_operations(_is_measurement)
     ]
@@ -31,7 +38,12 @@ def _pop_measurements(
 def _append_measurements(
     circuit: Circuit, measurements: List[Union[int, ops.Operation]]
 ) -> None:
-    """Appends all measurements into the final moment of the circuit."""
+    """Appends all measurements into the final moment of the circuit.
+
+    Args:
+        circuit: a quantum circuit as a :class:`cirq.Circuit`.
+        measurements: measurements to perform.
+    """
     for i in range(len(measurements)):
         measurements[i][0] = (
             len(circuit) + 1
@@ -49,9 +61,6 @@ def _fold_gate_at_index_in_moment(
         circuit: Circuit to fold.
         moment_index: Moment in which the gate sits in the circuit.
         gate_index: Index of the gate within the specified moment.
-
-    Returns:
-        None
     """
     op = circuit[moment_index].operations[gate_index]
     circuit.insert(
@@ -69,9 +78,6 @@ def _fold_gates_in_moment(
          circuit: Circuit to fold.
          moment_index: Index of moment to fold gates in.
          gate_indices: Indices of gates within the moments to fold.
-
-     Returns:
-         None
      """
     for (i, gate_index) in enumerate(gate_indices):
         _fold_gate_at_index_in_moment(
@@ -90,6 +96,9 @@ def fold_gates(
         circuit: Circuit to fold.
         moment_indices: Indices of moments with gates to be folded.
         gate_indices: Specifies which gates within each moment to fold.
+
+    Returns:
+        folded: the folded quantum circuit as a :class:`cirq.Circuit` object.
 
     Examples:
         (1) Folds the first three gates in moment two.
@@ -119,8 +128,6 @@ def _fold_moments(circuit: Circuit, moment_indices: List[int]) -> None:
         circuit: Circuit to fold.
         moment_indices: Indices of moments to fold in the circuit.
 
-    Returns:
-        None
     """
     shift = 0
     for i in moment_indices:
@@ -140,6 +147,9 @@ def fold_moments(circuit: Circuit, moment_indices: List[int]) -> Circuit:
     Args:
         circuit: Circuit to apply folding operation to.
         moment_indices: List of integers that specify moments to fold.
+
+    Returns:
+        folded: the folded quantum circuit as a :class:`cirq.Circuit` object.
     """
     folded = deepcopy(circuit)
     _fold_moments(folded, moment_indices)
@@ -174,6 +184,9 @@ def fold_gates_from_left(circuit: Circuit, stretch: float) -> Circuit:
     Args:
         circuit: Circuit to fold.
         stretch: Factor to stretch the circuit by. Any real number in [1, 3].
+
+    Returns:
+        folded: the folded quantum circuit as a :class:`cirq.Circuit` object.
 
     Note:
         Folding a single gate adds two gates to the circuit,
@@ -226,6 +239,9 @@ def fold_gates_from_right(circuit: Circuit, stretch: float) -> Circuit:
         circuit: Circuit to fold.
         stretch: Factor to stretch the circuit by. Any real number in [1, 3].
 
+    Returns:
+        folded: the folded quantum circuit as a :class:`cirq.Circuit` object.
+
     Note:
         Folding a single gate adds two gates to the circuit,
         hence the maximum stretch factor is 3.
@@ -256,23 +272,24 @@ def _update_moment_indices(
                         {index of moment in original circuit: index of moment
                         in folded circuit}
 
-                        For example, moment_indices should start out as
-                        {0: 0, 1: 1, ..., M - 1: M - 1}
-                        where M is the # of moments in the original circuit.
-
-                        As the circuit is folded, moment indices change.
-                        For example, if a gate in the last moment
-                        is folded, moment_indices gets updates to
-                        {0: 0, 1: 1, ..., M - 1:, M + 1}
-                        since two moments are created in the process of folding
-                         the gate in the last moment.
-
-                        TODO: If another gate from the last moment is folded,
-                        we could put it in the same moment as
-                         the previous folded gate.
-
         moment_index_where_gate_was_folded: Index of the moment
         in which a gate was folded.
+
+    Returns:
+        moment_indices: dictionary with updated moments.
+
+    Note:
+        `moment_indices` should start out as
+        {0: 0, 1: 1, ..., M - 1: M - 1} where M is the # of moments in the
+        original circuit. As the circuit is folded, moment indices change.
+
+        If a gate in the last moment is folded, moment_indices gets updates to
+        {0: 0, 1: 1, ..., M - 1:, M + 1} since two moments are created in the
+        process of folding the gate in the last moment.
+
+    TODO:
+        If another gate from the last moment is folded, we could put it
+        in the same moment as the previous folded gate.
     """
     if moment_index_where_gate_was_folded not in moment_indices.keys():
         raise ValueError(
@@ -298,9 +315,12 @@ def fold_gates_at_random(
         stretch: Factor to stretch the circuit by. Any real number in [1, 3].
         seed: [Optional] Integer seed for random number generator.
 
+    Returns:
+        folded: The folded quantum circuit as a :class:`cirq.Circuit` object.
+
     Note:
-        Folding a single gate adds two gates to the circuit,
-        hence the maximum stretch factor is 3.
+        Folding a single gate adds two gates to the circuit, hence the maximum
+        stretch factor is 3.
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -382,23 +402,27 @@ def fold_local(
         circuit: Circuit to fold.
         stretch: Factor to stretch the circuit by.
         fold_method: Function which defines the method for folding gates.
-                    (e.g., Randomly selects gates to fold, folds gates starting
-                    from left of circuit, etc.)
-
-                    Must have signature
-
-                    def fold_method(circuit: Circuit, stretch: float,**kwargs):
-                        ...
-
-                    and return a circuit.
         fold_method_args: Any additional input arguments for the fold_method.
                           The method is called with
                           fold_method(circuit, stretch, *fold_method_args).
-            Example:
-                fold_method = fold_gates_at_random
-                fold_method_args = (1,)
 
-                > Uses a seed of one for the fold_gates_at_random method.
+    Returns:
+        folded: The folded quantum circuit as a :class:`cirq.Circuit` object.
+
+    Example:
+        >>> fold_method = fold_gates_at_random
+        >>> fold_method_args = (1,)
+        Uses a seed of one for the fold_gates_at_random method.
+
+    Note:
+        `fold_method` defines the strategy for folding gates, which could be
+        folding gates at random, from the left of the circuit, or custom strategies.
+        The signature of `fold_method` must be
+            ```
+            def fold_method(circuit: Circuit, stretch: float,**kwargs):
+                ...
+            ```
+        and return a circuit.
     """
     folded = deepcopy(circuit)
 
@@ -424,10 +448,12 @@ def fold_global(circuit: Circuit, stretch: float) -> Circuit:
     The returned folded circuit has a number of gates approximately equal to
      stretch * len(circuit).
 
-    Parameters
-    ----------
+    Args:
         circuit: Circuit to fold.
         stretch: Factor to stretch the circuit by.
+
+    Returns:
+        folded: The folded quantum circuit as a :class:`cirq.Circuit` object.
     """
     if not (stretch >= 1):
         raise ValueError("The stretch factor must be a real number >= 1.")

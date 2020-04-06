@@ -108,7 +108,10 @@ class PolyFactory(BatchedFactory):
     """
     Factory object implementing a zero-noise extrapolation algorithm based on
     a polynomial fit.
-    Note: RichardsonFactory and LinearFactory are special cases of PolyFactory.
+
+    Note:
+        RichardsonFactory and LinearFactory are special cases of PolyFactory.
+
     """
 
     def __init__(self, scalars: Iterable[float], order: int) -> None:
@@ -162,8 +165,8 @@ class PolyFactory(BatchedFactory):
     def reduce(self) -> float:
         """
         Determines with a least squared method, the polynomial of degree equal
-        to "self.order"
-        which optimally fits the input data. The zero-noise limit is returned.
+        to "self.order" which optimally fits the input data.
+        The zero-noise limit is returned.
         """
         return PolyFactory.static_reduce(
             self.instack, self.outstack, self.order
@@ -299,8 +302,7 @@ class PolyExpFactory(BatchedFactory):
         of PolyExpFactory, but can be called also by other factories which are
         related to PolyExpFactory, e.g., ExpFactory, AdaExpFactory.
 
-        Parameters
-        ----------
+        Args:
             instack: x data values.
             outstack: y data values.
             asymptote: y(x->inf).
@@ -308,10 +310,10 @@ class PolyExpFactory(BatchedFactory):
             eps: Epsilon to regularize log(sign (instack - asymptote)) when
                  the argument is to close to zero or negative.
 
-        Returns
-        ----------
+        Returns:
             (znl, params): Where "znl" is the zero-noise-limit and "params"
                            are the optimal fitting parameters.
+
         """
         # Shift is 0 if asymptote is given, 1 if asymptote is not given
         shift = int(asymptote is None)
@@ -396,8 +398,7 @@ class AdaExpFactory(Factory):
     ) -> None:
         """Instantiate a new object of this Factory class.
 
-        Parameters
-        ----------
+        Args:
             steps: The number of optimization steps. At least 3 are necessary.
             scalar: The second noise scale factor (the first is always 1.0).
                     Further scale factors are adaptively determined.

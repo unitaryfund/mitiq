@@ -1,9 +1,14 @@
 """Zero-noise extrapolation tools."""
 
 from typing import Callable
+
+from qiskit import QuantumCircuit
+from cirq import Circuit
+
 import mitiq.qiskit.qiskit_utils as qs_utils
 from mitiq import QPROGRAM
-from mitiq.factories import Factory, LinearFactory
+from mitiq.factories import Factory, RichardsonFactory
+from mitiq.folding import fold_gates_at_random
 
 
 def run_factory(
@@ -67,7 +72,7 @@ def execute_with_zne(
     executor: Callable[[QPROGRAM], float],
     fac: Factory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
-) -> Callable[[QPROGRAM], float]:
+) -> float:
     """
     Takes as input a quantum circuit and returns the associated expectation
     value evaluated with error mitigation.
@@ -82,10 +87,13 @@ def execute_with_zne(
                      If not specified, a default method will be used.
     """
     if scale_noise is None:
-        # TODO this assumes is qiskit
-        scale_noise = qs_utils.scale_noise
+        scale_noise = fold_gates_at_random
+        if isinstance(qp, QuantumCircuit):
+            scale_noise = qs_utils.scale_noise
+        elif isinstance(qp, Circuit):
+            scale_noise = fold_gates_at_random
     if fac is None:
-        fac = LinearFactory([1.0, 2.0])
+        fac = RichardsonFactory([1.0, 2.0, 3.0])
     qrun_factory(fac, qp, executor, scale_noise)
 
     return fac.reduce()

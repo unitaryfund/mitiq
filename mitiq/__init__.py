@@ -6,17 +6,33 @@ Mitiq can be directly imported.
 import os
 from typing import Union
 
-from pyquil import Program
-from qiskit import QuantumCircuit
+from cirq import Circuit
 
 
-QPROGRAM = Union[QuantumCircuit, Program]
+# This is used to optionally import what program types should be allowed
+# by mitiq based on what packages are installed in the environment
+SUPPORTED_PROGRAM_TYPES = {
+    "qiskit": "QuantumCircuit",
+    "pyquil": "Program"
+}
+AVAILABLE_PROGRAM_TYPES = {Circuit}
 
+for (module, program_type) in SUPPORTED_PROGRAM_TYPES.items():
+    try:
+        AVAILABLE_PROGRAM_TYPES.add(
+            exec(f"from {module} import {program_type}")
+        )
+    except ImportError:
+        pass
 
-directory_of_this_file = os.path.dirname(os.path.abspath(__file__))
+QPROGRAM = Union[tuple(AVAILABLE_PROGRAM_TYPES)]
 
+# this must be after QPROGRAM as the zne.py module imports QPROGRAM
+from mitiq.zne import execute_with_zne, mitigate_executor
 
-with open(str(directory_of_this_file)+"/../VERSION.txt", "r") as f:
+_directory_of_this_file = os.path.dirname(os.path.abspath(__file__))
+
+with open(str(_directory_of_this_file) + "/../VERSION.txt", "r") as f:
     __version__ = f.read().strip()
 
 

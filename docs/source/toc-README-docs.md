@@ -131,3 +131,7 @@ naming it according to the release version with major and minor.
 ## Additional information
 [Here](https://github.com/nathanshammah/scikit-project/blob/master/5-docs.md)
 are some notes on how to build docs.
+
+[Here](https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html) is a 
+cheat sheet for restructed text formatting, e.g. syntax for links etc.
+

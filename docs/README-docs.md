@@ -126,8 +126,12 @@ classes and functions to add, to comment them, as well as exclude them.
 Since the `docs/build` folder is not kept track of, copy the pdf file
 with the documentation from `docs/build/latex` to the `docs/pdf` folder,
 naming it according to the release version with major and minor.
+Make a copy named `Mitiq-latest-release.pdf` in the same folder.
 
 
 ## Additional information
 [Here](https://github.com/nathanshammah/scikit-project/blob/master/5-docs.md)
 are some notes on how to build docs.
+
+[Here](https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html) is a 
+cheat sheet for restructed text formatting, e.g. syntax for links etc.
