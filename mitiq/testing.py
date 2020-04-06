@@ -48,7 +48,7 @@ def meas_observable(rho: np.ndarray, obs: np.ndarray) -> Tuple[float, float]:
 
 def noisy_simulation(circ: Circuit, obs: np.ndarray, noise: float) -> \
         Tuple[float, float]:
-    """ Simulates a circuit with depolarizing noise at level NOISE.
+    """Simulates a circuit with depolarizing noise.
 
     Args:
         circ: The quantum program as a cirq object.
