@@ -4,7 +4,9 @@ from copy import deepcopy
 
 import numpy as np
 import pytest
-from cirq import Circuit, GridQubit, LineQubit, ops, inverse
+from cirq import (
+    Circuit, GridQubit, LineQubit, ops, inverse, equal_up_to_global_phase
+)
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 
 from mitiq.utils import _equal, random_circuit
@@ -26,6 +28,7 @@ from mitiq.folding import (
     fold_local,
     fold_global,
 )
+from mitiq.qiskit.conversions import _from_qiskit
 
 
 def test_is_measurement():
@@ -1093,7 +1096,7 @@ def test_fold_gates_with_qiskit_circuit():
         gate_indices=[(0, 1, 2), (1,)]
     )
 
-    # TODO: Open issue. There's a very easy bug that could happen here if
+    # TODO: There's a very easy bug that could happen here if
     #  moments are not retained in the conversion from a qiskit.QuantumCircuit
     #  to a cirq.Circuit. Specifying the moment indices and gate indices for
     #  the qiskit.QuantumCircuit would thus lead to unexpected behavior in
@@ -1138,11 +1141,12 @@ def test_fold_gates_with_qiskit_circuit_keep_input_type():
         gate_indices=[(0, 1, 2), (1,)],
         keep_input_type=True
     )
-    # TODO: Open issue. There's a very easy bug that could happen here if
+    # TODO: There's a very easy bug that could happen here if
     #  moments are not retained in the conversion from a qiskit.QuantumCircuit
     #  to a cirq.Circuit. Specifying the moment indices and gate indices for
     #  the qiskit.QuantumCircuit would thus lead to unexpected behavior in
     #  the folded circuit. One option is to make fold_moments private.
+    #  See https://github.com/unitaryfund/mitiq/issues/100.
 
     # TODO: Check correctness of the folded circuit.
     #  This requires moderate work because H^dagger gets translated to
@@ -1168,11 +1172,12 @@ def test_fold_moments_with_qiskit_circuit():
     qiskit_circuit.ccx(*qiskit_qreg)
 
     folded_circuit = fold_moments(qiskit_circuit, moment_indices=[0])
-    # TODO: Open issue. There's a very easy bug that could happen here if
+    # TODO: There's a very easy bug that could happen here if
     #  moments are not retained in the conversion from a qiskit.QuantumCircuit
     #  to a cirq.Circuit. Specifying the moment indices and gate indices for
     #  the qiskit.QuantumCircuit would thus lead to unexpected behavior in
     #  the folded circuit. One option is to make fold_moments private.
+    #  See https://github.com/unitaryfund/mitiq/issues/100.
 
     cirq_qreg = LineQubit.range(3)
     correct_folded_circuit = Circuit(
@@ -1208,16 +1213,20 @@ def test_fold_moments_with_qiskit_circuit_keep_input_type():
     folded_circuit = fold_moments(
         qiskit_circuit, moment_indices=[0], keep_input_type=True
     )
-    # TODO: Open issue. There's a very easy bug that could happen here if
+    assert isinstance(folded_circuit, QuantumCircuit)
+    # TODO: There's a very easy bug that could happen here if
     #  moments are not retained in the conversion from a qiskit.QuantumCircuit
     #  to a cirq.Circuit. Specifying the moment indices and gate indices for
     #  the qiskit.QuantumCircuit would thus lead to unexpected behavior in
     #  the folded circuit. One option is to make fold_moments private.
+    #  See https://github.com/unitaryfund/mitiq/issues/100.
 
-    # TODO: Check correctness of the folded circuit.
-    #  This requires moderate work because H^dagger gets translated to
-    #  Y-X-Y rotations in the translation from Cirq to Qiskit
-    assert isinstance(folded_circuit, QuantumCircuit)
+    # Check equality of the final unitaries
+    cirq_circuit = _from_qiskit(qiskit_circuit)
+    unitary = cirq_circuit.unitary()
+    folded_cirq_circuit = _from_qiskit(folded_circuit)
+    folded_unitary = folded_cirq_circuit.unitary()
+    assert equal_up_to_global_phase(unitary, folded_unitary)
 
 
 def test_fold_from_left_with_qiskit_circuits():
@@ -1255,9 +1264,13 @@ def test_fold_from_left_with_qiskit_circuits():
     #  folded_circuit have a key, whereas the measurements in
     #  correct_folded_circuit do not have a key.
     #  Could add flag in _equal to ignore this, as with qubit equality.
-    # assert _equal(
-    #     folded_circuit, correct_folded_circuit, require_qubit_equality=False
-    # )
+    #  See https://github.com/unitaryfund/mitiq/issues/99.
+
+    # Check equality of the final unitaries
+    cirq_circuit = _from_qiskit(qiskit_circuit)
+    unitary = cirq_circuit.unitary()
+    folded_unitary = correct_folded_circuit.unitary()
+    assert equal_up_to_global_phase(unitary, folded_unitary)
 
     # Keep the input type
     qiskit_folded_circuit = fold_gates_from_left(
@@ -1301,9 +1314,13 @@ def test_fold_from_right_with_qiskit_circuits():
     #  folded_circuit have a key, whereas the measurements in
     #  correct_folded_circuit do not have a key.
     #  Could add flag in _equal to ignore this, as with qubit equality.
-    # assert _equal(
-    #     folded_circuit, correct_folded_circuit, require_qubit_equality=False
-    # )
+    #  See https://github.com/unitaryfund/mitiq/issues/99.
+
+    # Check equality of the final unitaries
+    cirq_circuit = _from_qiskit(qiskit_circuit)
+    unitary = cirq_circuit.unitary()
+    folded_unitary = correct_folded_circuit.unitary()
+    assert equal_up_to_global_phase(unitary, folded_unitary)
 
     # Keep the input type
     qiskit_folded_circuit = fold_gates_from_right(
@@ -1347,9 +1364,13 @@ def test_fold_at_random_with_qiskit_circuits():
     #  folded_circuit have a key, whereas the measurements in
     #  correct_folded_circuit do not have a key.
     #  Could add flag in _equal to ignore this, as with qubit equality.
-    # assert _equal(
-    #     folded_circuit, correct_folded_circuit, require_qubit_equality=False
-    # )
+    #  See https://github.com/unitaryfund/mitiq/issues/99.
+
+    # Check equality of the final unitaries
+    cirq_circuit = _from_qiskit(qiskit_circuit)
+    unitary = cirq_circuit.unitary()
+    folded_unitary = correct_folded_circuit.unitary()
+    assert equal_up_to_global_phase(unitary, folded_unitary)
 
     # Keep the input type
     qiskit_folded_circuit = fold_gates_at_random(
