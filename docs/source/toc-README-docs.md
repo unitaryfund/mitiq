@@ -1,3 +1,5 @@
+![Python Build](https://github.com/unitaryfund/mitiq/workflows/Python%20Build/badge.svg?branch=master)
+
 # Mitiq Documentation Contributors Guide
 This is the Ccntributors guide for the documentation of Mitiq,
 a Python toolkit for implementing error mitigation on quantum computers.
@@ -6,12 +8,9 @@ a Python toolkit for implementing error mitigation on quantum computers.
 The documentation is generated with
 [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html).
 ```bash
-pip install -U sphinx
+pip install -U sphinx recommonmark
 ```
-We are also including an `.md` file, so this tool is necessary
-```bash
-pip install --upgrade recommonmark
-```
+`recommonmark` allows to include `.md` files, besides `.rst`.
 
 ### Check your Sphinx installation
 To check that Sphinx is installed you can run
@@ -37,13 +36,8 @@ minor (e.g., 0.0.2--->00X)
 
 ### The configuration file
 - Since the documentation is already created, you need not to generate a
-configuration file from scratch. If you had to generate the documentation
-from scratch, the first step would have involved creating the `conf.py` file.
-This can be generated with a wizard from bash
-```bash
-(mitiqenv) sphinx-quickstart
-```
-which then asks some questions. Meta-data and specifications are accounted for
+configuration file from scratch (this is done with `sphinx-quickstart`).
+Meta-data, extentions and other custom specifications are accounted for
 in the `conf.py` file.
 
 ### Build the documentation locally
