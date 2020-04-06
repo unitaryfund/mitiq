@@ -81,7 +81,7 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
         mitiq_circuit = _from_qiskit(circuit)
     elif isinstance(circuit, Circuit):
         input_circuit_type = "cirq"
-        mitiq_circuit = deepcopy(circuit)
+        mitiq_circuit = circuit
     else:
         raise UnsupportedCircuitError(
             f"Circuit from module {circuit.__module__} is not supported.\n\n" +
@@ -101,7 +101,7 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
         from mitiq.qiskit.conversions import _to_qiskit
         converted_circuit = _to_qiskit(circuit)
     elif isinstance(circuit, Circuit):
-        converted_circuit = deepcopy(circuit)
+        converted_circuit = circuit
     else:
         raise UnsupportedCircuitError(
             f"Conversion to circuit of type {conversion_type} is not supported."
