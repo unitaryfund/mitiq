@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open("VERSION.txt", "r") as f:
     __version__ = f.read().strip()
@@ -20,9 +20,9 @@ LICENSE = "GPL v3.0"
 setup(
     name=NAME,
     version=__version__,
-    packages = ['mitiq'],
-    install_requires=[INSTALL_REQUIRES],
-    dev_requirements=[DEV_REQUIREMENTS],
+    packages = find_packages(),
+    install_requires=INSTALL_REQUIRES,
+    dev_requirements=DEV_REQUIREMENTS,
     author=AUTHOR,
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
