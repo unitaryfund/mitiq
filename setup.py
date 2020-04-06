@@ -17,7 +17,7 @@ TEST_REQUIRES = [
                     "pytest~=5.4.1"
                     ]
 NAME = "mitiq"
-AUTHOR = "Ryan LaRose, Andrea Mari, Nathan Shammah, Will Zeng"
+AUTHOR = "Unitary Fund"
 URL = "https://github.com/unitaryfund"
 LICENSE = "GPL v3.0"
 setup(
@@ -43,4 +43,3 @@ setup(
         ],
     license = LICENSE
 )
-
