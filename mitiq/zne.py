@@ -94,14 +94,13 @@ def execute_with_zne(
             scale_noise = fold_gates_at_random
     if fac is None:
         fac = RichardsonFactory([1.0, 2.0, 3.0])
+    else:
+        # Clear out the factory to make sure it is fresh.
+        fac.reset()
+
     qrun_factory(fac, qp, executor, scale_noise)
 
-    mitigated_result = fac.reduce()
-
-    # Clear out the factory in case it needs to be reused.
-    fac.reset()
-
-    return mitigated_result
+    return fac.reduce()
 
 
 # Similar to the old "zne".
