@@ -21,7 +21,7 @@ setup(
     include_package_data=True,
     install_requires=INSTALL_REQUIRES,
     dev_requirements=DEV_REQUIREMENTS,
-    tests_require=DEV_REQUIREMENTS,
+    tests_require=TEST_REQUIREMENTS,
     author=AUTHOR,
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
