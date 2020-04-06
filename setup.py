@@ -9,8 +9,6 @@ with open('requirements.txt') as f:
 with open("development_requirements.txt", "r") as f:
     DEV_REQUIREMENTS = set(f.read().splitlines())
 
-
-TEST_REQUIRES = ["pytest~=5.4.1"]
 NAME = "mitiq"
 AUTHOR = "Unitary Fund"
 URL = "https://github.com/unitaryfund"
@@ -22,7 +20,7 @@ setup(
     include_package_data=True,
     install_requires=INSTALL_REQUIRES,
     dev_requirements=DEV_REQUIREMENTS,
-    tests_require=TEST_REQUIRES,
+    tests_require=DEV_REQUIREMENTS,
     author=AUTHOR,
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
