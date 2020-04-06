@@ -3,16 +3,15 @@ from setuptools import setup, find_packages
 with open("VERSION.txt", "r") as f:
     __version__ = f.read().strip()
 
+with open("development_requirements.txt", "r") as f:
+    DEV_REQUIREMENTS = set(f.read().splitlines())
+
 INSTALL_REQUIRES = [
                     "numpy~=1.18.1",
                     "scipy~=1.4.1",
                     "cirq~=0.7.0"
                     ]
-DEV_REQUIREMENTS ={
-                    "pyquil~=2.18.0",
-                    "qiskit~=0.16.2",
-                    "pytest~=5.4.1"
-                    }
+
 TEST_REQUIRES = [
                     "pytest~=5.4.1"
                     ]
