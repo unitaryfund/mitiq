@@ -31,4 +31,5 @@ jobs:
       run: |
         pip install pytest
         pytest mitiq/tests
+        pytest mitiq/benchmarks/tests
         pytest mitiq/qiskit/tests
