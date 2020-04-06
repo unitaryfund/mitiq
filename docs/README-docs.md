@@ -12,11 +12,8 @@ pip install -U sphinx recommonmark
 ```
 `recommonmark` allows to include `.md` files, besides `.rst`.
 
-### Check your Sphinx installation
-To check that Sphinx is installed you can run
-```bash
-sphinx-build --version
-```
+
+You can check that Sphinx is installed with `sphinx-build --version`.
 
 ## How to Update the Documentation
 
@@ -133,5 +130,5 @@ Make a copy named `Mitiq-latest-release.pdf` in the same folder.
 [Here](https://github.com/nathanshammah/scikit-project/blob/master/5-docs.md)
 are some notes on how to build docs.
 
-[Here](https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html) is a 
+[Here](https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html) is a
 cheat sheet for restructed text formatting, e.g. syntax for links etc.
