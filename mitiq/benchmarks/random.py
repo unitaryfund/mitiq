@@ -119,9 +119,6 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
         mitigated, _ = execute_with_zne(qp=qc, executor=obs_sim,
                                         scale_noise=scale_noise,
                                         fac=fac)
-        # We are going to resuse the same factory on the next step of the loop
-        # and so we need to reset its instack and outstack values.
-        fac.reset()
 
         unmitigated_error.append(np.abs(exact - unmitigated))
         mitigated_error.append(np.abs(exact - mitigated))

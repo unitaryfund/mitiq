@@ -96,7 +96,12 @@ def execute_with_zne(
         fac = RichardsonFactory([1.0, 2.0, 3.0])
     qrun_factory(fac, qp, executor, scale_noise)
 
-    return fac.reduce()
+    mitigated_result = fac.reduce()
+
+    # Clear out the factory in case it needs to be reused.
+    fac.reset()
+
+    return mitigated_result
 
 
 # Similar to the old "zne".
