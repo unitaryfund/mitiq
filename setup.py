@@ -13,6 +13,9 @@ DEV_REQUIREMENTS ={
                     "qiskit~=0.16.2",
                     "pytest~=5.4.1"
                     }
+TEST_REQUIRES = [
+                    "pytest~=5.4.1"
+                    ]
 NAME = "mitiq"
 AUTHOR = "Ryan LaRose, Andrea Mari, Nathan Shammah, Will Zeng"
 URL = "https://github.com/unitaryfund"
@@ -24,6 +27,7 @@ setup(
     include_package_data=True,
     install_requires=INSTALL_REQUIRES,
     dev_requirements=DEV_REQUIREMENTS,
+    tests_require=TEST_REQUIRES,
     author=AUTHOR,
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
