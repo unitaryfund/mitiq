@@ -72,7 +72,7 @@ def execute_with_zne(
     executor: Callable[[QPROGRAM], float],
     fac: Factory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
-) -> Callable[[QPROGRAM], float]:
+) -> float:
     """
     Takes as input a quantum circuit and returns the associated expectation
     value evaluated with error mitigation.
@@ -87,6 +87,7 @@ def execute_with_zne(
                      If not specified, a default method will be used.
     """
     if scale_noise is None:
+        scale_noise = fold_gates_at_random
         if isinstance(qp, QuantumCircuit):
             scale_noise = qs_utils.scale_noise
         elif isinstance(qp, Circuit):

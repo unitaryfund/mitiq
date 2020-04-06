@@ -36,7 +36,7 @@ def basic_executor(qp: QPROGRAM, shots: int = 500) -> float:
 def test_qrun_factory():
     """Tests qrun of a Richardson Factory."""
     qp = random_identity_circuit(depth=TEST_DEPTH)
-    qp= measure(qp, 0)
+    qp = measure(qp, 0)
     fac = RichardsonFactory([1.0, 2.0, 3.0])
     qrun_factory(fac, qp, basic_executor, scale_noise)
     result = fac.reduce()
@@ -63,9 +63,11 @@ def test_mitigate_executor():
     assert not np.isclose(bad_result, 1.0, atol=1.0e-1)
     assert np.isclose(good_result, 1.0, atol=1.0e-1)
 
+
 @zne_decorator(None, scale_noise)
 def decorated_executor(qp: QPROGRAM) -> float:
     return basic_executor(qp)
+
 
 def test_zne_decorator():
     """Tests a zne decorator."""
