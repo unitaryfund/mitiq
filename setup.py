@@ -7,7 +7,8 @@ with open('requirements.txt') as f:
     INSTALL_REQUIRES = f.read().splitlines()
 
 with open("development_requirements.txt", "r") as f:
-    DEV_REQUIREMENTS = set(f.read().splitlines())
+    TEST_REQUIREMENTS = f.read().splitlines()
+    DEV_REQUIREMENTS = set(TEST_REQUIREMENTS)
 
 NAME = "mitiq"
 AUTHOR = "Unitary Fund"
