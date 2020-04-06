@@ -111,12 +111,14 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
 
         # create the simulation type
         def obs_sim(circ: Circuit, shots=None):
-            return noisy_simulation(circ, obs, noise)
+            # we only want the expectation value not the variance
+            # this is why we return [0]
+            return noisy_simulation(circ, obs, noise)[0]
 
         # evaluate the noisy answer
-        unmitigated, _ = obs_sim(qc)
+        unmitigated = obs_sim(qc)
         # evaluate the ZNE answer
-        mitigated, _ = execute_with_zne(qp=qc, executor=obs_sim,
+        mitigated = execute_with_zne(qp=qc, executor=obs_sim,
                                         scale_noise=scale_noise,
                                         fac=fac)
 
