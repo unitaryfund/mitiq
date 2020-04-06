@@ -93,10 +93,11 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
     unmitigated_error = []
     mitigated_error = []
 
+    qubits = [NamedQubit(str(xx)) for xx in range(n_qubits)]
+
     for ii in range(trials):
         if not silent and ii % 10 == 0: print(ii)
 
-        qubits = [NamedQubit(str(xx)) for xx in range(n_qubits)]
         qc = random_circuit(qubits, n_moments=depth, op_density=op_density)
         wvf = qc.final_wavefunction()
 
