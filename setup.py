@@ -3,18 +3,14 @@ from setuptools import setup, find_packages
 with open("VERSION.txt", "r") as f:
     __version__ = f.read().strip()
 
+with open('requirements.txt') as f:
+    INSTALL_REQUIRES = f.read().splitlines()
+
 with open("development_requirements.txt", "r") as f:
     DEV_REQUIREMENTS = set(f.read().splitlines())
 
-INSTALL_REQUIRES = [
-                    "numpy~=1.18.1",
-                    "scipy~=1.4.1",
-                    "cirq~=0.7.0"
-                    ]
 
-TEST_REQUIRES = [
-                    "pytest~=5.4.1"
-                    ]
+TEST_REQUIRES = ["pytest~=5.4.1"]
 NAME = "mitiq"
 AUTHOR = "Ryan LaRose, Andrea Mari, Nathan Shammah, Will Zeng"
 URL = "https://github.com/unitaryfund"
