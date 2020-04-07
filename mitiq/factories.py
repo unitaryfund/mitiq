@@ -57,6 +57,11 @@ class Factory:
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
 
+    def reset(self) -> None:
+        """Resets the instack and outstack of the Factory to empty values."""
+        self.instack = []
+        self.outstack = []
+
 
 class BatchedFactory(Factory):
     """
