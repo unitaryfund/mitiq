@@ -12,7 +12,7 @@ with open("development_requirements.txt", "r") as f:
 
 NAME = "mitiq"
 AUTHOR = "Unitary Fund"
-URL = "https://github.com/unitaryfund"
+URL = "https://unitary.fund"
 LICENSE = "GPL v3.0"
 setup(
     name=NAME,
