@@ -19,6 +19,9 @@ class Factory:
     A Factory object is not supposed to directly perform any quantum
     computation, only the classical results of quantum experiments are
     processed by it.
+
+    Example:
+        >>> fact = Factory()
     """
 
     def __init__(self) -> None:
