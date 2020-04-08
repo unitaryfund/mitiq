@@ -20,6 +20,20 @@ setup(
         'test': dev_requirements,
     },
     long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
+    author = = "Unitary Fund",
+    classifiers=[
+         "Development Status :: 2 - Pre-Alpha",
+         "Programming Language :: Python :: 3",
+         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+         "Operating System :: MacOS",
+         "Operating System :: Unix",
+         "Operating System :: Microsoft :: Windows",
+         "Topic :: Scientific/Engineering",
+         ],
+     license = "GPL v3.0",
+     url = "https://unitary.fund",
+
 )
 
 
@@ -29,9 +43,8 @@ setup(
 #     DEV_REQUIREMENTS = set(TEST_REQUIREMENTS)
 
 # NAME = "mitiq"
-# AUTHOR = "Unitary Fund"
+# AUTHOR
 # URL = "https://unitary.fund"
-# LICENSE = "GPL v3.0"
 # setup(
 #     name=NAME,
 #     version=__version__,
@@ -43,15 +56,6 @@ setup(
 #     author=AUTHOR,
 #     long_description=open('README.md').read(),
 #     long_description_content_type='text/markdown',
-#     url = URL,
-#    classifiers=[
-#         "Development Status :: 2 - Pre-Alpha",
-#         "Programming Language :: Python :: 3",
-#         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-#         "Operating System :: MacOS",
-#         "Operating System :: Unix",
-#         "Operating System :: Microsoft :: Windows",
-#         "Topic :: Scientific/Engineering",
-#         ],
-#     license = LICENSE
+#     ,
+#
 # )
