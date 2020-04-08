@@ -21,7 +21,7 @@ setup(
     },
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    author = = "Unitary Fund",
+    author = "Unitary Fund",
     classifiers=[
          "Development Status :: 2 - Pre-Alpha",
          "Programming Language :: Python :: 3",
