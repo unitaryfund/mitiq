@@ -33,3 +33,4 @@ jobs:
         pytest -v mitiq/tests
         pytest -v mitiq/benchmarks/tests
         pytest -v mitiq/qiskit/tests
+        pytest -v docs --doctest-glob="*.rst"
