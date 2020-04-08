@@ -16,7 +16,8 @@ setup(
     version=__version__,
     install_requires=requirements,
     extras_require={
-        'development': set(dev_requirements)
+        'development': set(dev_requirements),
+        'test': dev_requirements,
     },
     long_description=open('README.md').read(),
 )
