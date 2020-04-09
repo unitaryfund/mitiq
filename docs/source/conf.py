@@ -50,11 +50,12 @@ extensions = ['sphinx.ext.mathjax',
 ]
 doctest_global_setup = '''
 try:
-    from mitiq import *
+  from mitiq import *
+  from mitiq.factories import *
 except:
   pass
 try:
-    from examples.examples import *
+  from examples.examples import *
 except:
   pass
 '''
@@ -76,6 +77,7 @@ exclude_patterns = []
 # autodoc settings
 
 autodoc_mock_imports = [
+#    'mitiq',
     'numpy',
     'scipy',
     'cirq',

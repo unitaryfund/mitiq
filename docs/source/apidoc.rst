@@ -76,7 +76,7 @@ Qiskit Utils
 .. automodule:: mitiq.qiskit.qiskit_utils
    :members:
 
-.. automodule:: mitiq.qiskit.tests.tests.test_zne
+.. automodule:: mitiq.qiskit.tests.test_zne
    :members:
 
 
