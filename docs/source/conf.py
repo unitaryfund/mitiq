@@ -29,6 +29,7 @@ author = 'Tech Team @ Unitary Fund'
 release = '0.1.0'
 
 sys.path.append(os.path.abspath('sphinxext'))
+
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -87,6 +88,8 @@ autodoc_mock_imports = [
 #    'matplotlib.pyplot',
 ]
 
+# The name of the Pygments (syntax highlighting) style to use.
+pygments_style = 'sphinx'
 
 # -- Options for HTML output -------------------------------------------------
 
