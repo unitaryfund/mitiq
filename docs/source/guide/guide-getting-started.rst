@@ -52,14 +52,13 @@ noise.
 .. code-block:: python
 
     >>> from cirq import Circuit, LineQubit, X
-    >>> from mitiq.examples import noisy_simulation
+    >>> from mitiq.examples.examples import noisy_simulation
     >>> qbit = LineQubit(0)
     >>> circ = Circuit(X(qbit) for _ in range(80))
 
     >>> unmitigated = noisy_simulation(circ)
     >>> exact = 1
     >>> print(f"Error in simulation is {exact - unmitigated:.{3}}")
-
     Error in simulation is 0.0506
 
 This shows the impact the noise has had. Let's use ``mitiq`` to improve this
@@ -68,14 +67,12 @@ performance.
 .. code-block:: python
 
     >>> from mitiq import execute_with_zne
-
+    >>> unmitigated = noisy_simulation(circ)
+    >>> exact = 1
     >>> mitigated = execute_with_zne(circ, noisy_simulation)
     >>> print(f"Error in simulation is {exact - mitigated:.{3}}")
-    >>> print("Mitigation provides " \
-    >>>  f"a {(exact - unmitigated) / (exact - mitigated):.{3}}" \
-    >>>  "factor of improvement.")
-
     Error in simulation is 0.000519
+    >>> print(f"Mitigation provides a {(exact - unmitigated) / (exact - mitigated):.{3}} factor of improvement.")
     Mitigation provides a 97.6 factor of improvement.
 
 The variance in the mitigated expectation value is now stored in ``var``.
@@ -89,9 +86,8 @@ error-mitigated version.
 
     >>> run_mitigated = mitigate_executor(noisy_simulation)
     >>> mitigated = run_mitigated(circ)
-    >>> mitigated
-
-    0.9994810819625853
+    >>> round(mitigated,5)
+    0.99948
 
 The default implementation uses Richardson extrapolation to extrapolate the
 expectation value to the zero noise limit [1]. ``Mitiq`` comes equipped with other
@@ -101,12 +97,10 @@ into ``Factory`` objects. It is easy to try different ones.
 .. code-block:: python
 
     >>> from mitiq.factories import LinearFactory
-
+    >>> exact = 1
     >>> fac = LinearFactory(scalars=[1.0, 2.0, 2.5])
     >>> linear = execute_with_zne(circ, noisy_simulation, fac=fac)
-    >>> print("Mitigated error with the linear method" \
-              f" is {exact - linear:.{3}}")
-
+    >>> print(f"Mitigated error with the linear method is {exact - linear:.{3}}")
     Mitigated error with the linear method is 0.00638
 
 You can read more about the ``Factory`` objects that are built into ``mitiq`` and
