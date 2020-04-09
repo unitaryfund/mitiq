@@ -86,7 +86,7 @@ autodoc_mock_imports = [
 #    'scipy',
 #    'cirq',
 #    'qiskit',
-#    'pyquil',
+    'pyquil',
 #    'matplotlib',
 #    'matplotlib.pyplot',
 ]
