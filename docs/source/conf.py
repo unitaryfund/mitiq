@@ -55,6 +55,10 @@ try:
   from mitiq.factories import *
 except:
   pass
+try:
+  from mitiq.examples import *
+except:
+  pass
 '''
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
