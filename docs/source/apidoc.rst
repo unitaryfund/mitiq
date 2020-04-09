@@ -31,12 +31,12 @@ Matrices
 
 PyQuil Utils
 ------------
-.. automodule:: mitiq.pyquil.pyquil_utils
+.. automodule:: mitiq.mitiq_pyquil.pyquil_utils
    :members:
 
 Qiskit Utils
 ------------
-.. automodule:: mitiq.qiskit.qiskit_utils
+.. automodule:: mitiq.mitiq_qiskit.qiskit_utils
    :members:
 
 Tests
@@ -51,7 +51,7 @@ Tests
    :members:
 .. automodule:: mitiq.tests.test_zne
    :members:
-.. automodule:: mitiq.qiskit.tests.test_zne
+.. automodule:: mitiq.mitiq_qiskit.tests.test_zne
    :members:
 
 

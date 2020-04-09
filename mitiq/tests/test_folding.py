@@ -28,7 +28,7 @@ from mitiq.folding import (
     fold_local,
     fold_global,
 )
-from mitiq.qiskit.conversions import _from_qiskit
+from mitiq.mitiq_qiskit.conversions import _from_qiskit
 
 
 def test_is_measurement():
