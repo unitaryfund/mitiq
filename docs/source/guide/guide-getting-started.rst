@@ -50,10 +50,9 @@ evaluate to an expectation of 1 in the computational basis if there was no
 noise.
 
 .. code-block:: python
-.. literalinclude:: examples/examples.py
-
 
     >>> from cirq import Circuit, LineQubit, X
+    >>> from mitiq.examples import noisy_simulation
     >>> qbit = LineQubit(0)
     >>> circ = Circuit(X(qbit) for _ in range(80))
 
