@@ -51,8 +51,12 @@ extensions = ['sphinx.ext.mathjax',
 doctest_global_setup = '''
 try:
     from mitiq import *
+except:
+  pass
 try:
     from examples.examples import *
+except:
+  pass
 '''
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -68,6 +72,18 @@ language = 'Python'
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
+
+# autodoc settings
+
+autodoc_mock_imports = [
+    'numpy',
+    'scipy',
+    'cirq',
+    'qiskit',
+    'pyquil',
+#    'matplotlib',
+#    'matplotlib.pyplot',
+]
 
 
 # -- Options for HTML output -------------------------------------------------
