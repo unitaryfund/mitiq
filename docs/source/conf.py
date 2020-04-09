@@ -48,7 +48,12 @@ extensions = ['sphinx.ext.mathjax',
               'sphinx.ext.ifconfig',
               'sphinx.ext.napoleon',
 ]
-
+doctest_global_setup = '''
+try:
+    from mitiq import *
+try:
+    from examples.examples import *
+'''
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
