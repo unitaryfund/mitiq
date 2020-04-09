@@ -1,4 +1,6 @@
 ![Python Build](https://github.com/unitaryfund/mitiq/workflows/Python%20Build/badge.svg?branch=master)
+[![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
+[![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
 
 # Mitiq Documentation Contributors Guide
 This is the Ccntributors guide for the documentation of Mitiq,
@@ -141,5 +143,5 @@ Make a copy named `Mitiq-latest-release.pdf` in the same folder.
 [Here](https://github.com/nathanshammah/scikit-project/blob/master/5-docs.md)
 are some notes on how to build docs.
 
-[Here](https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html) is a 
+[Here](https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html) is a
 cheat sheet for restructed text formatting, e.g. syntax for links etc.
