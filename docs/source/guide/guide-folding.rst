@@ -132,6 +132,15 @@ Notice that we specify ``keep_input_type=True`` to return a circuit of the same 
 is not specified, the internal ``mitiq`` representation of a circuit (Cirq) will be returned.
 
 
+.. note::
+
+    Compared to the previous example which input a Cirq circuit, we see that this folded circuit has more gates. In
+    particular, the inverse Hadamard gate is expressed differently (but equivalently) as a product of three
+    rotations. This behavior occurs because circuits are first converted to ``mitiq``'s internal
+    representation (Cirq circuits), then folded, then converted back to the input circuit type.
+    Because different circuits decompose gates differently, some gates (or their inverses)
+    may be expressed differently (but equivalently) across different circuits.
+
 =============================================
 Global folding
 =============================================
