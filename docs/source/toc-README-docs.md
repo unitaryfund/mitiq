@@ -17,20 +17,6 @@ You can check that Sphinx is installed with `sphinx-build --version`.
 
 ## How to Update the Documentation
 
-### Work in an environment
-- Create a conda environment for the documentation
-```bash
-conda create -n mitiqenv
-conda activate mitiqenv
-```
-
-### Create a new branch
-- Create a branch in `git` for the documentation with the release number up to
-minor (e.g., 0.0.2--->00X)
-```bash
-(mitiqenv) git checkout -b mitiq00X
-```
-
 ### The configuration file
 - Since the documentation is already created, you need not to generate a
 configuration file from scratch (this is done with `sphinx-quickstart`).
@@ -125,9 +111,31 @@ make latexpdf
 make doctest
 ```
 
+## How to Make a New Release of the Documentation
 
-### Save the pdf file in the `docs/pdf` folder
+### Work in an environment
+- Create a conda environment for the documentation
+```bash
+conda create -n mitiqenv
+conda activate mitiqenv
+```
 
+### Create a new branch
+- Create a branch in `git` for the documentation with the release number up to
+minor (e.g., 0.0.2--->00X)
+```bash
+(mitiqenv) git checkout -b mitiq00X
+```
+
+### Create the html and pdf file and save it in the `docs/pdf` folder
+- To create the html structure
+```bash
+make html
+```
+ and for the pdf,
+```bash
+make latexpdf
+```
 Since the `docs/build` folder is not kept track of, copy the pdf file
 with the documentation from `docs/build/latex` to the `docs/pdf` folder,
 naming it according to the release version with major and minor.
