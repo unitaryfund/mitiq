@@ -23,7 +23,7 @@ For intermediate stretch values, there is a degree of freedom for which gates to
 Local folding methods
 =============================================
 
-In this section, we introduce three folding functions:
+We introduce three folding functions:
 
     1. ``mitiq.folding.fold_gates_from_left``
     2. ``mitiq.folding.fold_gates_from_right``
