@@ -9,9 +9,8 @@ At the gate level, noise is amplified by mapping gates (or groups of gates) `G` 
 .. math::
   G \mapsto G G^\dagger G .
 
-We refer to this process as *unitary folding*. If `G` is a subset of the gates in a circuit, we call it `local folding`.
-If `G` is the entire circuit, we call it `global folding`. Note that the action of the circuit is unchanged with
-either local or global folding.
+This makes the whole circuit longer (adding more noise), while keeping its function unchanged.  We refer to this process as *unitary folding*. If `G` is a subset of the gates in a circuit, we call it `local folding`.
+If `G` is the entire circuit, we call it `global folding`.
 
 In ``mitiq``, folding functions input a circuit and a *stretch* (or *stretch factor*), i.e., a floating point value
 which corresponds to how many gates to fold in the circuit. The minimum stretch is one (which corresponds to folding no gates),
