@@ -3,6 +3,7 @@
 *********************************************
 Getting Started
 *********************************************
+.. _getting_started:
 
 Improving the performance of your quantum programs is only a few lines of
 code away.
@@ -90,9 +91,10 @@ error-mitigated version.
     0.99948
 
 The default implementation uses Richardson extrapolation to extrapolate the
-expectation value to the zero noise limit [1]. ``Mitiq`` comes equipped with other
-extrapolation methods as well. Different methods of extrapolation are packaged
-into ``Factory`` objects. It is easy to try different ones.
+expectation value to the zero noise limit :cite:`Temme_2017_PRL`.
+``Mitiq`` comes equipped with other extrapolation methods as well.
+Different methods of extrapolation are packaged into ``Factory`` objects.
+It is easy to try different ones.
 
 .. code-block:: python
 
@@ -110,5 +112,3 @@ Another key step in zero-noise extrapolation is to choose how your circuit is
 transformed to scale the noise. You can read more about the noise scaling
 methods built into ``mitiq`` and how to create your
 own `here <noise-scaling.html>`_.
-
-.. [1] `Error mitigation for short-depth quantum circuits <https://arxiv.org/abs/1612.02058>`_

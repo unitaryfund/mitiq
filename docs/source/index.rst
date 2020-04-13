@@ -22,3 +22,7 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+.. bibliography:: biblio.bib
+   :cited:
+   :style: unsrt

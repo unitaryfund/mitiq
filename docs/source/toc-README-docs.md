@@ -1,10 +1,4 @@
-![Python Build](https://github.com/unitaryfund/mitiq/workflows/Python%20Build/badge.svg?branch=master)
-
 # Mitiq Documentation Contributors Guide
-![Python Build](https://github.com/unitaryfund/mitiq/workflows/Python%20Build/badge.svg?branch=master)
-[![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
-[![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
-
 This is the Ccntributors guide for the documentation of Mitiq,
 a Python toolkit for implementing error mitigation on quantum computers.
 
@@ -12,9 +6,10 @@ a Python toolkit for implementing error mitigation on quantum computers.
 The documentation is generated with
 [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html).
 ```bash
-pip install -U sphinx recommonmark
+pip install -U sphinx recommonmark sphinxcontrib-bibtex
 ```
-`recommonmark` allows to include `.md` files, besides `.rst`.
+`recommonmark` allows to include `.md` files, besides `.rst`;
+`sphinxcontrib-bibtex` allows to include citations in a `.bib` file.
 
 
 You can check that Sphinx is installed with `sphinx-build --version`.
@@ -114,6 +109,7 @@ make latexpdf
 ```bash
 make doctest
 ```
+You can also test the docstrings in `mitiq/mitiq` simply with `doctest`
 
 ## How to Make a New Release of the Documentation
 

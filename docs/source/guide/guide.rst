@@ -9,6 +9,6 @@ Users Guide
 .. toctree::
    :maxdepth: 2
 
-   guide-overview.rst
-   guide-getting-started.rst
-   guide-factories.rst
+   01_guide-overview.rst
+   02_guide-getting-started.rst
+   03_guide-factories.rst

@@ -48,6 +48,7 @@ extensions = ['sphinx.ext.mathjax',
               'sphinx.ext.viewcode',
               'sphinx.ext.ifconfig',
               'sphinx.ext.napoleon',
+              'sphinxcontrib.bibtex',
 ]
 doctest_global_setup = '''
 try:
