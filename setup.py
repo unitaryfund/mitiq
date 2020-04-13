@@ -1,7 +1,5 @@
 from setuptools import setup, find_packages
 
-#from distutils.core import setup
-
 with open("VERSION.txt", "r") as f:
     __version__ = f.read().strip()
 
@@ -37,27 +35,3 @@ setup(
      url = "https://unitary.fund",
 
 )
-
-
-
-# with open("development_requirements.txt", "r") as f:
-#     TEST_REQUIREMENTS = f.read().splitlines()
-#     DEV_REQUIREMENTS = set(TEST_REQUIREMENTS)
-
-# NAME = "mitiq"
-# AUTHOR
-# URL = "https://unitary.fund"
-# setup(
-#     name=NAME,
-#     version=__version__,
-#     packages = find_packages(),
-#     include_package_data=True,
-#     install_requires=INSTALL_REQUIRES,
-#     dev_requirements=DEV_REQUIREMENTS,
-#     tests_require=TEST_REQUIREMENTS,
-#     author=AUTHOR,
-#     long_description=open('README.md').read(),
-#     long_description_content_type='text/markdown',
-#     ,
-#
-# )
