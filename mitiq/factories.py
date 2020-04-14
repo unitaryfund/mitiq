@@ -19,9 +19,6 @@ class Factory:
     A Factory object is not supposed to directly perform any quantum
     computation, only the classical results of quantum experiments are
     processed by it.
-
-    Example:
-        >>> fact = Factory()
     """
 
     def __init__(self) -> None:
@@ -197,6 +194,10 @@ class RichardsonFactory(BatchedFactory):
 class LinearFactory(BatchedFactory):
     """Factory object implementing a zero-noise extrapolation algorithm based
     on a linear fit.
+
+    Example:
+        >>> NOISE_LEVELS = [1.0, 2.0, 3.0]
+        >>> fac = LinearFactory(NOISE_LEVELS)
     """
 
     def reduce(self) -> float:
