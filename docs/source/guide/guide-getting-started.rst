@@ -88,7 +88,7 @@ expectation value to the zero noise limit [1]. ``Mitiq`` comes equipped with oth
 extrapolation methods as well. Different methods of extrapolation are packaged
 into ``Factory`` objects. It is easy to try different ones.
 
-.. code-block:: python
+.. doctest:: python
 
     >>> from mitiq.factories import LinearFactory
     >>> fac = LinearFactory(scalars=[1.0, 2.0, 2.5])

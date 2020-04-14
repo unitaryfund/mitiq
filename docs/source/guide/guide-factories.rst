@@ -41,13 +41,13 @@ value which has a linear dependance on the noise.
 Since our aim to understand the usage of a factory, instead of actually running quantum experiments,
 we simply simulate an effective classical model which returns the expectation value as a function of the noise level:
 
-.. code-block:: python
+.. doctest:: python
 
-   def noise_to_expval(noise_level: float) -> float:
-      """A simple linear model for the expectation value."""
-      A = 0.5
-      B = 0.7
-      return A + B * noise_level
+   >>> def noise_to_expval(noise_level: float) -> float:
+   ...     """A simple linear model for the expectation value."""
+   ...     A = 0.5
+   ...     B = 0.7
+   ...     return A + B * noise_level
 
 In this case the zero noise limit is ``A = 0.5`` and we would like to deduce it by evaluating
 the function only for values of ``noise_level`` which are larger than or equal to 1.
@@ -58,7 +58,7 @@ In this example, we plan to measure the expectation value at 3 different noise l
 To get the zero-noise limit, we are going to use a ``LinearFactory`` object, run it until convergence
 (in this case until 3 expectation values are measured and saved) and eventually perform the zero noise extrapolation.
 
-.. code-block:: python
+.. doctest:: python
 
    from mitiq.factories import LinearFactory
 
@@ -91,7 +91,7 @@ In the previous code block we used the main methods of a typical ``Factory`` obj
 Since our idealized model ``noise_to_expval`` is linear and noiseless,
 the extrapolation will exactly match the true zero-noise limit ``A = 0.5``:
 
-.. code-block:: python
+.. doctest:: python
 
    zn_limit = fac.reduce()
    print(f"The zero-noise extrapolation is: {zn_limit:.3}")
@@ -137,7 +137,7 @@ spectrum.
 We can define a linear non-adaptive factory which takes into account this information
 and clips the result if it falls outside its physical domain.
 
-.. code-block:: python
+.. doctest:: python
 
    from typing import Iterable
    from mitiq.factories import BatchedFactory
