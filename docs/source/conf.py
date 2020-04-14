@@ -56,7 +56,7 @@ try:
 except:
   pass
 try:
-  from mitiq.examples import *
+  from cirq import *
 except:
   pass
 '''

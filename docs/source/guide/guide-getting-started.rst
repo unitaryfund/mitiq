@@ -14,48 +14,44 @@ Here's an example using
 We first define some functions that make it simpler to simulate noise in
 ``cirq``. These don't have to do with ``mitiq`` directly.
 
-.. code-block:: python
+.. doctest:: python
 
-    import numpy as np
-    from cirq import Circuit, depolarize, LineQubit, X, DensityMatrixSimulator
-
-    SIMULATOR = DensityMatrixSimulator()
-
-    # 0.1% depolarizing noise
-    NOISE = 0.001
-
-
-    def noisy_simulation(circ: Circuit, shots=None) -> float:
-        """ Simulates a circuit with depolarizing noise at level NOISE.
-
-        Args:
-            circ: The quantum program as a cirq object.
-            shots: This unused parameter is needed to match mitiq's expected type
-                   signature for an executor function.
-
-        Returns:
-            The observable's measurements as as
-            tuple (expectation value, variance).
-        """
-        circuit = circ.with_noise(depolarize(p=NOISE))
-        rho = SIMULATOR.simulate(circuit).final_density_matrix
-        # define the computational basis observable
-        obs = np.diag([1, 0])
-        expectation = np.real(np.trace(rho @ obs))
-        return expectation
+    >>> import numpy as np
+    >>> from cirq import Circuit, depolarize
+    >>> from cirq import LineQubit, X, DensityMatrixSimulator
+    >>> SIMULATOR = DensityMatrixSimulator()
+    >>> # 0.1% depolarizing noise
+    >>> NOISE = 0.001
+    >>> def noisy_simulation(circ: Circuit, shots=None) -> float:
+    ...     """ Simulates a circuit with depolarizing noise at level NOISE.
+    ...     Args:
+    ...         circ: The quantum program as a cirq object.
+    ...         shots: This unused parameter is needed to match mitiq's expected type
+    ...                signature for an executor function.
+    ...
+    ...     Returns:
+    ...         The observable's measurements as as
+    ...         tuple (expectation value, variance).
+    ...     """
+    ...     circuit = circ.with_noise(depolarize(p=NOISE))
+    ...     rho = SIMULATOR.simulate(circuit).final_density_matrix
+    ...     # define the computational basis observable
+    ...     obs = np.diag([1, 0])
+    ...     expectation = np.real(np.trace(rho @ obs))
+    ...     return expectation
 
 Now we can look at our example. We'll test single qubit circuits with even
 numbers of X gates. As there are an even number of X gates, they should all
 evaluate to an expectation of 1 in the computational basis if there was no
 noise.
 
-.. code-block:: python
+
+
+.. doctest:: python
 
     >>> from cirq import Circuit, LineQubit, X
-    >>> from mitiq.examples.examples import noisy_simulation
     >>> qbit = LineQubit(0)
     >>> circ = Circuit(X(qbit) for _ in range(80))
-
     >>> unmitigated = noisy_simulation(circ)
     >>> exact = 1
     >>> print(f"Error in simulation is {exact - unmitigated:.{3}}")
@@ -64,11 +60,9 @@ noise.
 This shows the impact the noise has had. Let's use ``mitiq`` to improve this
 performance.
 
-.. code-block:: python
+.. doctest:: python
 
     >>> from mitiq import execute_with_zne
-    >>> unmitigated = noisy_simulation(circ)
-    >>> exact = 1
     >>> mitigated = execute_with_zne(circ, noisy_simulation)
     >>> print(f"Error in simulation is {exact - mitigated:.{3}}")
     Error in simulation is 0.000519
@@ -80,7 +74,7 @@ The variance in the mitigated expectation value is now stored in ``var``.
 You can also use ``mitiq`` to wrap your backend execution function into an
 error-mitigated version.
 
-.. code-block:: python
+.. doctest:: python
 
     >>> from mitiq import mitigate_executor
 
@@ -97,7 +91,6 @@ into ``Factory`` objects. It is easy to try different ones.
 .. code-block:: python
 
     >>> from mitiq.factories import LinearFactory
-    >>> exact = 1
     >>> fac = LinearFactory(scalars=[1.0, 2.0, 2.5])
     >>> linear = execute_with_zne(circ, noisy_simulation, fac=fac)
     >>> print(f"Mitigated error with the linear method is {exact - linear:.{3}}")
