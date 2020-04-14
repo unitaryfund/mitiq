@@ -102,6 +102,27 @@ The zero-noise extrapolation is: 0.5
    factories with higher extrapolation *order* (``PolyFactory``, ``RichardsonFactory``, etc.)
    could be more appropriate.
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The ``run_factory`` function
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Running a factory until convergence is a typical step of the zero-noise extrapolation
+workflow. For this reason, in ``mitiq.zne`` there is a built-in function for this task: ``run_factory``.
+The previous example can be reduced to the following equivalent code:
+
+.. code-block:: python
+
+   from mitiq.factories import LinearFactory
+   from mitiq.zne import run_factory
+
+   # Some fixed noise levels
+   NOISE_LEVELS = [1.0, 2.0, 3.0]
+   # Instantiate a LinearFactory object
+   fac = LinearFactory(NOISE_LEVELS)
+   # Run the factory until convergence
+   run_factory(fac, noise_to_expval)
+   # Evaluate the zero-noise extrapolation.
+   zn_limit = fac.reduce()
 
 =============================================
 Defining a custom Factory
