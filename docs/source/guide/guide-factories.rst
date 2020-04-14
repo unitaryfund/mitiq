@@ -31,14 +31,6 @@ The main feature of ``BatchedFactory`` is that all the noise levels are determin
 *a priori* by the initialization argument ``scalars``.
 All non-adaptive methods are derived from ``BatchedFactory``.  
 
-.. autosummary::
-
-    mitiq.factories.LinearFactory
-    mitiq.factories.RichardsonFactory
-    mitiq.factories.PolyFactory
-    mitiq.factories.ExpFactory
-    mitiq.factories.PolyExpFactory
-    mitiq.factories.AdaExpFactory
 
 =============================================
 Example: basic usage of a factory.
@@ -133,10 +125,25 @@ The previous example can be reduced to the following equivalent code:
    zn_limit = fac.reduce()
 
 =============================================
-Defining a custom Factory
+Built-in factories
 =============================================
 
 All the built-in factories of ``mitiq`` can be found in the submodule ``mitiq.factories``.
+m
+.. autosummary::
+   :nosignatures:
+   
+   mitiq.factories.LinearFactory
+   mitiq.factories.RichardsonFactory
+   mitiq.factories.PolyFactory
+   mitiq.factories.ExpFactory
+   mitiq.factories.PolyExpFactory
+   mitiq.factories.AdaExpFactory
+
+=============================================
+Defining a custom Factory
+=============================================
+
 If necessary, the user can modify an existing extrapolation method by subclassing 
 the corresponding factory.
 
