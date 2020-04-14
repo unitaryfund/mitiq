@@ -31,6 +31,14 @@ The main feature of ``BatchedFactory`` is that all the noise levels are determin
 *a priori* by the initialization argument ``scalars``.
 All non-adaptive methods are derived from ``BatchedFactory``.  
 
+.. autosummary::
+
+    mitiq.factories.LinearFactory
+    mitiq.factories.RichardsonFactory
+    mitiq.factories.PolyFactory
+    mitiq.factories.ExpFactory
+    mitiq.factories.PolyExpFactory
+    mitiq.factories.AdaExpFactory
 
 =============================================
 Example: basic usage of a factory.
