@@ -112,8 +112,8 @@ def mitigate_executor(
     """
     Returns an error-mitigated version of the input "executor".
     Takes as input a generic function ("executor"), defined by the user,
-    that executes a circuit with an arbitrary backend
-     and produces an expectation value.
+    that executes a circuit with an arbitrary backend and produces an
+    expectation value.
 
     Returns an error-mitigated version of the input "executor",
     having the same signature and automatically performing ZNE at each call.
