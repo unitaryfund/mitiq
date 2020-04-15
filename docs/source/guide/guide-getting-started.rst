@@ -100,7 +100,7 @@ into ``Factory`` objects. It is easy to try different ones.
 
     >>> from mitiq.factories import LinearFactory
 
-    >>> fac = LinearFactory(scalars=[1.0, 2.0, 2.5])
+    >>> fac = LinearFactory(scale_factors=[1.0, 2.0, 2.5])
     >>> linear = execute_with_zne(circ, noisy_simulation, fac=fac)
     >>> print("Mitigated error with the linear method" \
               f" is {exact - linear:.{3}}")

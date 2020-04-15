@@ -28,7 +28,7 @@ level can depend on the history of ``self.instack`` and ``self.outstack``.
 
 The abstract class of a non-adaptive extrapolation method is ``BatchedFactory``. 
 The main feature of ``BatchedFactory`` is that all the noise levels are determined
-*a priori* by the initialization argument ``scalars``.
+*a priori* by the initialization argument ``scale_factors``.
 All non-adaptive methods are derived from ``BatchedFactory``.  
 
 
@@ -86,7 +86,8 @@ In the previous code block we used the main methods of a typical ``Factory`` obj
    - **self.next** to get the next noise level;
    - **self.push** to save data into the factory;
    - **self.is_converged** to know if enough data has been pushed;
-   - **self.reduce** to get the zero-noise extrapolation.   
+   - **self.reduce** to get the zero-noise extrapolation.
+   - **self.reset** to reset ``self.instack`` and ``self.outstack``. 
 
 Since our idealized model ``noise_to_expval`` is linear and noiseless, 
 the extrapolation will exactly match the true zero-noise limit ``A = 0.5``:
@@ -186,18 +187,18 @@ and clips the result if it falls outside its physical domain.
 
       def __init__(
             self,
-            scalars: Iterable[float],
+            scale_factors: Iterable[float],
             min_expval: float, 
             max_expval: float,
          ) -> None:
          """
          Args:
-            scalars: The noise scale factors at which expectation 
-                     values should be measured.
+            scale_factors: The noise scale factors at which
+                           expectation values should be measured.
             min_expval: The lower bound for the expectation value.
             min_expval: The upper bound for the expectation value.
          """
-         super(MyFactory, self).__init__(scalars)
+         super(MyFactory, self).__init__(scale_factors)
          self.min_expval = min_expval
          self.max_expval = max_expval
 
