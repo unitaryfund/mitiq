@@ -17,11 +17,11 @@ mitiq/mitiq/
     | factories
     | folding
     | matrices
-    | pyquil   (package)
+    | mitiq_pyquil   (package)
     	|- pyquil_utils
     	|- tests   (package)
        		|- test_zne
-    | qiskit   (package)
+    | mitiq_qiskit   (package)
     	|- conversions
     	|- qiskit_utils
        	|- tests   (package)

@@ -32,4 +32,5 @@ jobs:
         pip install pytest
         pytest mitiq/tests
         pytest mitiq/benchmarks/tests
-        pytest mitiq/qiskit/tests
+        pytest mitiq/mitiq_qiskit/tests
+        pytest -v docs --doctest-glob="*.rst"
