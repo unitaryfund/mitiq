@@ -9,11 +9,12 @@ At the gate level, noise is amplified by mapping gates (or groups of gates) `G` 
 .. math::
   G \mapsto G G^\dagger G .
 
-This makes the whole circuit longer (adding more noise), while keeping its function unchanged.  We refer to this process as *unitary folding*. If `G` is a subset of the gates in a circuit, we call it `local folding`.
+This makes the circuit longer (adding more noise), while keeping its effect unchanged.  We refer to this process as
+*unitary folding*. If `G` is a subset of the gates in a circuit, we call it `local folding`.
 If `G` is the entire circuit, we call it `global folding`.
 
 In ``mitiq``, folding functions input a circuit and a *stretch* (or *stretch factor*), i.e., a floating point value
-which corresponds to how much the length of the circuit is approximately scaled.
+which corresponds to (approximately) how much the length of the circuit is scaled.
 The minimum stretch is one (which corresponds to folding no gates), and the maximum stretch is three
 (which corresponds to folding all gates).
 
@@ -34,7 +35,7 @@ The ``mitiq`` function ``fold_gates_from_left`` will fold gates from the left (o
 until the desired stretch factor is reached.
 
 
-.. code-block:: python
+.. doctest:: python
 
     >>> import cirq
     >>> from mitiq.folding import fold_gates_from_left
@@ -66,7 +67,7 @@ In this example, we see that the folded circuit has the first (Hadamard) gate fo
 Because input circuits are not modified, we can reuse this circuit for the next example. In the following code,
 we use the ``fold_gates_from_right`` function on the same input circuit.
 
-.. code-block:: python
+.. doctest:: python
 
     >>> from mitiq.folding import fold_gates_from_right
 
@@ -99,7 +100,7 @@ following example, we fold a Qiskit circuit.
     This example assumes you have Qiskit installed. ``mitiq`` can interface with Qiskit, but Qiskit is not
     a core ``mitiq`` requirement and is not installed by default.
 
-.. code-block:: python
+.. doctest:: python
 
     >>> import qiskit
     >>> from mitiq.folding import fold_gates_from_left
@@ -150,7 +151,7 @@ As mentioned, global folding methods fold the entire circuit instead of individu
 circuit above is shown below.
 
 
-.. code-block:: python
+.. doctest:: python
 
     >>> import cirq
     >>> from mitiq.folding import fold_global
@@ -186,7 +187,7 @@ The three local folding methods introduced require that the stretch factor be be
 circuits with larger stretch factors, the function ``mitiq.folding.fold_local`` can be used. This function inputs a
 circuit, an arbitrary stretch factor, and a local folding method, as in the following example.
 
-.. code-block:: python
+.. doctest:: python
 
     >>> import cirq
     >>> from mitiq.folding import fold_local, fold_gates_from_left
@@ -217,7 +218,7 @@ Local folding with a custom strategy
 The ``fold_local`` method from the previous example can input custom folding functions. The signature
 of this function must be as follows.
 
-.. code-block:: python
+.. doctest:: python
 
     import cirq
 
@@ -227,7 +228,7 @@ of this function must be as follows.
 
 This function can then be used with ``fold_local`` as in the previous example via
 
-.. code-block:: python
+.. doctest:: python
 
     # Variables circ and stretch are a circuit to fold and a stretch factor, respectively
     folded = fold_local(circ, stretch, fold_method=my_custom_folding_function)
