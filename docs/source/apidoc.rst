@@ -40,6 +40,29 @@ PyQuil Utils
 .. automodule:: mitiq.mitiq_pyquil.pyquil_utils
    :members:
 
+.. automodule:: mitiq.mitiq_pyquil.tests.test_zne
+   :members:
+
+Qiskit Utils
+------------
+.. automodule:: mitiq.mitiq_qiskit.conversions
+   :members:
+
+.. automodule:: mitiq.mitiq_qiskit.tests.test_conversions
+   :members:
+
+.. automodule:: mitiq.mitiq_qiskit.qiskit_utils
+   :members:
+
+.. automodule:: mitiq.mitiq_qiskit.tests.test_zne
+   :members:
+
+Utils
+------------
+.. automodule:: mitiq.utils
+
+.. automodule:: mitiq.tests.test_utils
+   :members:
 
 Zero Noise Extrapolation
 ------------------------
@@ -48,37 +71,6 @@ Zero Noise Extrapolation
 
 .. automodule:: mitiq.tests.test_zne
    :members:
-
-Utils
-------------
-.. automodule:: mitiq.mitiq_qiskit.qiskit_utils
-
-.. automodule:: mitiq.tests.test_utils
-   :members:
-
-.. packages/modules: alphabetical order
-
-PyQuil Utils
-------------
-.. automodule:: mitiq.pyquil.pyquil_utils
-   :members:
-
-.. automodule:: mitiq.pyquil.tests.test_zne
-   :members:
-
-Qiskit Utils
-------------
-.. automodule:: mitiq.qiskit.conversions
-   :members:
-
-.. automodule:: mitiq.qiskit.tests.test_conversions
-   :members:
-
-.. automodule:: mitiq.qiskit.qiskit_utils
-   :members:
-.. automodule:: mitiq.mitiq_qiskit.tests.test_zne
-   :members:
-
 
 
 
