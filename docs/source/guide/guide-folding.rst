@@ -98,7 +98,7 @@ following example, we fold a Qiskit circuit.
     This example assumes you have Qiskit installed. ``mitiq`` can interface with Qiskit, but Qiskit is not
     a core ``mitiq`` requirement and is not installed by default.
 
-.. code-block:: python
+.. doctest:: python
 
     >>> import qiskit
     >>> from mitiq.folding import fold_gates_from_left
@@ -108,7 +108,12 @@ following example, we fold a Qiskit circuit.
     >>> circ = qiskit.QuantumCircuit(qreg)
     >>> _ = circ.h(qreg[0])
     >>> _ = circ.cnot(qreg[0], qreg[1])
-    >>> print("Original circuit:", circ, sep="\n")
+    >>> # print("Original circuit:", circ, sep="\n")
+
+This code (when the print statement is uncommented) should display something like:
+
+.. code-block:: python
+
     Original circuit:
              ┌───┐
     q0_0: |0>┤ H ├──■──
@@ -116,9 +121,16 @@ following example, we fold a Qiskit circuit.
     q0_1: |0>─────┤ X ├
                   └───┘
 
+We can now fold this circuit as follows.
+
     # Fold the circuit. Specify keep_input_type=True to return a Qiskit circuit.
     >>> folded = fold_gates_from_left(circ, stretch=2., keep_input_type=True)
-    >>> print("Folded circuit:", folded, sep="\n")
+    >>> # print("Folded circuit:", folded, sep="\n")
+
+This code (when the print statement is uncommented) should display something like:
+
+.. code-block:: python
+
     Folded circuit:
             ┌───┐┌──────────┐┌─────────┐┌───────────┐┌───┐
     q_0: |0>┤ H ├┤ Ry(pi/4) ├┤ Rx(-pi) ├┤ Ry(-pi/4) ├┤ H ├──■──
