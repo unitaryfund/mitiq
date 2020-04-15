@@ -9,7 +9,8 @@ At the gate level, noise is amplified by mapping gates (or groups of gates) `G` 
 .. math::
   G \mapsto G G^\dagger G .
 
-This makes the circuit longer (adding more noise), while keeping its effect unchanged.  We refer to this process as
+This makes the circuit longer (adding more noise) while keeping its effect unchanged (because
+:math:`G^\dagger = G^{-1}` for unitary gates).  We refer to this process as
 *unitary folding*. If `G` is a subset of the gates in a circuit, we call it `local folding`.
 If `G` is the entire circuit, we call it `global folding`.
 
