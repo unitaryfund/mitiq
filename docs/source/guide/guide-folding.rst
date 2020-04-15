@@ -13,15 +13,16 @@ This makes the whole circuit longer (adding more noise), while keeping its funct
 If `G` is the entire circuit, we call it `global folding`.
 
 In ``mitiq``, folding functions input a circuit and a *stretch* (or *stretch factor*), i.e., a floating point value
-which corresponds to how many gates to fold in the circuit. The minimum stretch is one (which corresponds to folding no gates),
-and the maximum stretch is three (which corresponds to folding all gates).
-
-For intermediate stretch values, there is a degree of freedom for which gates to fold first. As such,
-``mititq`` defines several local folding methods.
+which corresponds to how much the length of the circuit is approximately scaled.
+The minimum stretch is one (which corresponds to folding no gates), and the maximum stretch is three
+(which corresponds to folding all gates).
 
 =============================================
 Local folding methods
 =============================================
+
+For local folding, there is a degree of freedom for which gates to fold first. As such,
+``mititq`` defines several local folding methods.
 
 We introduce three folding functions:
 
