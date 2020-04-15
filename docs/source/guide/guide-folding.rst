@@ -98,7 +98,7 @@ following example, we fold a Qiskit circuit.
     This example assumes you have Qiskit installed. ``mitiq`` can interface with Qiskit, but Qiskit is not
     a core ``mitiq`` requirement and is not installed by default.
 
-.. doctest:: python
+.. code-block:: python
 
     >>> import qiskit
     >>> from mitiq.folding import fold_gates_from_left
