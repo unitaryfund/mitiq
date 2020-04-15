@@ -194,6 +194,10 @@ class RichardsonFactory(BatchedFactory):
 class LinearFactory(BatchedFactory):
     """Factory object implementing a zero-noise extrapolation algorithm based
     on a linear fit.
+
+    Example:
+        >>> NOISE_LEVELS = [1.0, 2.0, 3.0]
+        >>> fac = LinearFactory(NOISE_LEVELS)
     """
 
     def reduce(self) -> float:
