@@ -91,8 +91,10 @@ In the previous code block we used the main methods of a typical ``Factory`` obj
 Since our idealized model ``noise_to_expval`` is linear and noiseless, 
 the extrapolation will exactly match the true zero-noise limit ``A = 0.5``:
 
->>> print(f"The zero-noise extrapolation is: {zn_limit:.3}")
-The zero-noise extrapolation is: 0.5
+.. code-block:: python
+
+   >>> print(f"The zero-noise extrapolation is: {zn_limit:.3}")
+   The zero-noise extrapolation is: 0.5
 
 .. note::
    
