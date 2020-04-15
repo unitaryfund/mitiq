@@ -184,7 +184,7 @@ Folding with larger stretches
 
 The three local folding methods introduced require that the stretch factor be between one and three (inclusive). To fold
 circuits with larger stretch factors, the function ``mitiq.folding.fold_local`` can be used. This function inputs a
-circuit, arbitrary stretch factor, and a local folding method, as in the following example.
+circuit, an arbitrary stretch factor, and a local folding method, as in the following example.
 
 .. code-block:: python
 
