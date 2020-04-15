@@ -174,7 +174,7 @@ circuit above is shown below.
               │   │           │
     1: ───────X───X───────────X───
 
-Notice that this circuit is still logically equivalent the the input circuit, but the global folding strategy folds
+Notice that this circuit is still logically equivalent to the input circuit, but the global folding strategy folds
 the entire circuit until the input stretch factor is reached.
 
 
