@@ -1,7 +1,5 @@
 .. mitiq documentation master file, created by
    sphinx-quickstart on Tue Mar 17 18:16:53 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
 
 API-doc
 =================================
@@ -9,19 +7,27 @@ API-doc
 .. automodule:: mitiq
    :members:
 
+.. modules: alphabetical order
+
+About
+---------
+.. automodule:: mitiq.about
+   :members:
+
 Factories
 ---------
 .. automodule:: mitiq.factories
    :members:
 
-Zero Noise Extrapolation
-------------------------
-.. automodule:: mitiq.zne
+.. automodule:: mitiq.tests.test_factories
    :members:
 
 Folding
 -------
 .. automodule:: mitiq.folding
+   :members:
+
+.. automodule:: mitiq.tests.test_folding
    :members:
 
 Matrices
@@ -34,24 +40,47 @@ PyQuil Utils
 .. automodule:: mitiq.mitiq_pyquil.pyquil_utils
    :members:
 
-Qiskit Utils
-------------
-.. automodule:: mitiq.mitiq_qiskit.qiskit_utils
+
+Zero Noise Extrapolation
+------------------------
+.. automodule:: mitiq.zne
    :members:
 
-Tests
+.. automodule:: mitiq.tests.test_zne
+   :members:
+
+Utils
 ------------
-.. automodule:: mitiq.tests.test_factories
-   :members:
-.. automodule:: mitiq.tests.test_folding_cirq
-   :members:
-.. automodule:: mitiq.tests.test_matrices
-   :members:
+.. automodule:: mitiq.mitiq_qiskit.qiskit_utils
+
 .. automodule:: mitiq.tests.test_utils
    :members:
-.. automodule:: mitiq.tests.test_zne
+
+.. packages/modules: alphabetical order
+
+PyQuil Utils
+------------
+.. automodule:: mitiq.pyquil.pyquil_utils
+   :members:
+
+.. automodule:: mitiq.pyquil.tests.test_zne
+   :members:
+
+Qiskit Utils
+------------
+.. automodule:: mitiq.qiskit.conversions
+   :members:
+
+.. automodule:: mitiq.qiskit.tests.test_conversions
+   :members:
+
+.. automodule:: mitiq.qiskit.qiskit_utils
    :members:
 .. automodule:: mitiq.mitiq_qiskit.tests.test_zne
    :members:
+
+
+
+
 
 
