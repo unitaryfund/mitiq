@@ -130,7 +130,7 @@ following example, we fold a Qiskit circuit.
                                                           └───┘
 
 Notice that we specify ``keep_input_type=True`` to return a circuit of the same type as the input. If this
-is not specified, the internal ``mitiq`` representation of a circuit (Cirq) will be returned.
+is not specified, the internal ``mitiq`` representation of a circuit (using Cirq by default) will be returned.
 
 
 .. note::
