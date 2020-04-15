@@ -18,16 +18,16 @@ The main tasks of a factory are:
     
 1. Record the result of the computation executed at the chosen noise level;
 
-2. Determine the noise level at which the next computation should be run;
+2. Determine the noise scale factor at which the next computation should be run;
 
-3. Given the history of noise levels (``self.instack``) and results (``self.outstack``), 
+3. Given the history of noise scale factors (``self.instack``) and results (``self.outstack``), 
    evaluate the associated zero-noise extrapolation.
 
 The structure of the ``Factory`` class is adaptive by construction, since the choice of the next noise
 level can depend on the history of ``self.instack`` and ``self.outstack``.
 
 The abstract class of a non-adaptive extrapolation method is ``BatchedFactory``. 
-The main feature of ``BatchedFactory`` is that all the noise levels are determined
+The main feature of ``BatchedFactory`` is that all the noise scale factors are determined
 *a priori* by the initialization argument ``scale_factors``.
 All non-adaptive methods are derived from ``BatchedFactory``.  
 
@@ -39,21 +39,23 @@ Example: basic usage of a factory.
 To make an example, let us assume that the result of our quantum computation is an expectation 
 value which has a linear dependance on the noise.
 Since our aim to understand the usage of a factory, instead of actually running quantum experiments, 
-we simply simulate an effective classical model which returns the expectation value as a function of the noise level:
+we simply simulate an effective classical model which returns the expectation value as a function of the 
+noise scale factor:
 
 .. code-block:: python
 
-   def noise_to_expval(noise_level: float) -> float:
+   def noise_to_expval(scale_factor: float) -> float:
       """A simple linear model for the expectation value."""
-      A = 0.5
-      B = 0.7
-      return A + B * noise_level
+      ZERO_NOISE_LIMIT = 0.5
+      NATIVE_NOISE = 0.7
+      return A + NATIVE_NOISE * scale_factor
 
-In this case the zero noise limit is ``A = 0.5`` and we would like to deduce it by evaluating
-the function only for values of ``noise_level`` which are larger than or equal to 1.
+In this case the zero noise limit is ``0.5`` and we would like to deduce it by evaluating
+the function only for values of ``scale_factor`` which are larger than or equal to 1.
 
 
-In this example, we plan to measure the expectation value at 3 different noise levels: ``NOISE_LEVELS = [1.0, 2.0, 3.0]``.
+In this example, we plan to measure the expectation value at 3 different noise scale
+factors: ``SCALE_FACTORS = [1.0, 2.0, 3.0]``.
 
 To get the zero-noise limit, we are going to use a ``LinearFactory`` object, run it until convergence 
 (in this case until 3 expectation values are measured and saved) and eventually perform the zero noise extrapolation.
@@ -62,20 +64,20 @@ To get the zero-noise limit, we are going to use a ``LinearFactory`` object, run
 
    from mitiq.factories import LinearFactory
 
-   # Some fixed noise levels
-   NOISE_LEVELS = [1.0, 2.0, 3.0]
+   # Some fixed noise scale factors
+   SCALE_FACTORS = [1.0, 2.0, 3.0]
 
    # Instantiate a LinearFactory object
-   fac = LinearFactory(NOISE_LEVELS)
+   fac = LinearFactory(SCALE_FACTORS)
 
    # Run the factory until convergence
    while not fac.is_converged():
-      # Get the next noise level from the factory
-      next_noise_level = fac.next()
+      # Get the next noise scale factor from the factory
+      next_scale_factor = fac.next()
       # Evaluate the expectation value
-      expval = noise_to_expval(next_noise_level)
-      # Save the noise level and the result into the factory
-      fac.push(next_noise_level, expval)
+      expval = noise_to_expval(next_scale_factor)
+      # Save the noise scale factor and the result into the factory
+      fac.push(next_scale_factor, expval)
    
    # Evaluate the zero-noise extrapolation.
    zn_limit = fac.reduce()
@@ -83,14 +85,13 @@ To get the zero-noise limit, we are going to use a ``LinearFactory`` object, run
 
 In the previous code block we used the main methods of a typical ``Factory`` object:
 
-   - **self.next** to get the next noise level;
+   - **self.next** to get the next noise scale factor;
    - **self.push** to save data into the factory;
    - **self.is_converged** to know if enough data has been pushed;
    - **self.reduce** to get the zero-noise extrapolation.
-   - **self.reset** to reset ``self.instack`` and ``self.outstack``. 
 
 Since our idealized model ``noise_to_expval`` is linear and noiseless, 
-the extrapolation will exactly match the true zero-noise limit ``A = 0.5``:
+the extrapolation will exactly match the true zero-noise limit ``0.5``:
 
 .. code-block:: python
 
@@ -118,10 +119,10 @@ The previous example can be reduced to the following equivalent code:
    from mitiq.factories import LinearFactory
    from mitiq.zne import run_factory
 
-   # Some fixed noise levels
-   NOISE_LEVELS = [1.0, 2.0, 3.0]
+   # Some fixed noise scale factors
+   SCALE_FACTORS = [1.0, 2.0, 3.0]
    # Instantiate a LinearFactory object
-   fac = LinearFactory(NOISE_LEVELS)
+   fac = LinearFactory(SCALE_FACTORS)
    # Run the factory until convergence
    run_factory(fac, noise_to_expval)
    # Evaluate the zero-noise extrapolation.
@@ -132,10 +133,11 @@ Built-in factories
 =============================================
 
 All the built-in factories of ``mitiq`` can be found in the submodule ``mitiq.factories``.
-m
+
+
 .. autosummary::
    :nosignatures:
-   
+
    mitiq.factories.LinearFactory
    mitiq.factories.RichardsonFactory
    mitiq.factories.PolyFactory
@@ -151,7 +153,7 @@ If necessary, the user can modify an existing extrapolation method by subclassin
 the corresponding factory.
 
 A new adaptive extrapolation method can be derived from the abstract class ``Factory``.
-In this case its 4 core methods must be implemented:
+In this case its core methods must be implemented:
 ``self.next``, ``self.push``, ``self.is_converged``, and ``self.reduce``.
 Moreover ``self.__init__`` can also be overridden if necessary.
 
