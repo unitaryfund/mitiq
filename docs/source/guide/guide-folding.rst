@@ -44,7 +44,6 @@ until the desired stretch factor is reached.
     >>> qreg = cirq.LineQubit.range(2)
     >>> circ = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1]))
     >>> print("Original circuit:", circ, sep="\n")
-
     Original circuit:
     0: ───H───@───
               │
@@ -53,7 +52,6 @@ until the desired stretch factor is reached.
     # Fold the circuit
     >>> folded = fold_gates_from_left(circ, stretch=2.)
     >>> print("Folded circuit:", folded, sep="\n")
-
     Folded circuit:
     0: ───H───H───H───@───
                       │
@@ -74,7 +72,6 @@ we use the ``fold_gates_from_right`` function on the same input circuit.
     # Fold the circuit
     >>> folded = fold_gates_from_right(circ, stretch=2.)
     >>> print("Folded circuit:", folded, sep="\n")
-
     Folded circuit:
     0: ───H───@───@───@───
               │   │   │
@@ -111,7 +108,6 @@ following example, we fold a Qiskit circuit.
     >>> circ.h(qreg[0])
     >>> circ.cnot(qreg[0], qreg[1])
     >>> print("Original circuit:", circ, sep="\n")
-
     Original circuit:
              ┌───┐
     q0_0: |0>┤ H ├──■──
@@ -122,7 +118,6 @@ following example, we fold a Qiskit circuit.
     # Fold the circuit. Specify keep_input_type=True to return a Qiskit circuit.
     >>> folded = fold_gates_from_left(circ, stretch=2., keep_input_type=True)
     >>> print("Folded circuit:", folded, sep="\n")
-
     Folded circuit:
             ┌───┐┌──────────┐┌─────────┐┌───────────┐┌───┐
     q_0: |0>┤ H ├┤ Ry(pi/4) ├┤ Rx(-pi) ├┤ Ry(-pi/4) ├┤ H ├──■──
@@ -160,7 +155,6 @@ circuit above is shown below.
     >>> qreg = cirq.LineQubit.range(2)
     >>> circ = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1]))
     >>> print("Original circuit:", circ, sep="\n")
-
     Original circuit:
     0: ───H───@───
               │
@@ -169,7 +163,6 @@ circuit above is shown below.
     # Fold the circuit
     >>> folded = fold_global(circ, stretch=2.)
     >>> print("Folded circuit:", folded, sep="\n")
-
     Folded circuit:
     0: ───H───@───@───H───H───@───
               │   │           │
@@ -196,7 +189,6 @@ circuit, an arbitrary stretch factor, and a local folding method, as in the foll
     >>> qreg = cirq.LineQubit.range(2)
     >>> circ = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1]))
     >>> print("Original circuit:", circ, sep="\n")
-
     Original circuit:
     0: ───H───@───
               │
@@ -205,7 +197,6 @@ circuit, an arbitrary stretch factor, and a local folding method, as in the foll
     # Fold the circuit
     >>> folded = fold_local(circ, stretch=5., fold_method=fold_gates_from_left)
     >>> print("Folded circuit:", folded, sep="\n")
-
     Folded circuit:
     0: ───H───H───H───H───H───H───H───@───@───@───
                                       │   │   │
