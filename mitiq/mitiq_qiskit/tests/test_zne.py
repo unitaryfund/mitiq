@@ -10,7 +10,7 @@ from mitiq.zne import (
     mitigate_executor,
     zne_decorator,
 )
-from mitiq.qiskit.qiskit_utils import (
+from mitiq.mitiq_qiskit.qiskit_utils import (
     random_identity_circuit,
     measure,
     run_program,

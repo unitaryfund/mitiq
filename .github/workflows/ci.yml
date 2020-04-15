@@ -30,7 +30,7 @@ jobs:
     - name: Test with pytest
       run: |
         pip install pytest
-        pytest -v mitiq/tests
-        pytest -v mitiq/benchmarks/tests
-        pytest -v mitiq/qiskit/tests
+        pytest mitiq/tests
+        pytest mitiq/benchmarks/tests
+        pytest mitiq/mitiq_qiskit/tests
         pytest -v docs --doctest-glob="*.rst"

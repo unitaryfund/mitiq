@@ -76,7 +76,7 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
         input_circuit_type: Type of input circuit represented by a string.
     """
     if "qiskit" in circuit.__module__:
-        from mitiq.qiskit.conversions import _from_qiskit
+        from mitiq.mitiq_qiskit.conversions import _from_qiskit
         input_circuit_type = "qiskit"
         mitiq_circuit = _from_qiskit(circuit)
     elif isinstance(circuit, Circuit):
@@ -98,7 +98,7 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
         conversion_type: String specifier for the converted circuit type.
     """
     if conversion_type == "qiskit":
-        from mitiq.qiskit.conversions import _to_qiskit
+        from mitiq.mitiq_qiskit.conversions import _to_qiskit
         converted_circuit = _to_qiskit(circuit)
     elif isinstance(circuit, Circuit):
         converted_circuit = circuit
