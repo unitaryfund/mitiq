@@ -217,7 +217,7 @@ def test_doc_factories_three():
         def __init__(
                 self,
                 scale_factors: Iterable[float],
-                min_expval: float, 
+                min_expval: float,
                 max_expval: float,
             ) -> None:
             """
@@ -234,7 +234,7 @@ def test_doc_factories_three():
             """
             Fits a line to the data with a least squared method.
             Extrapolates and, if necessary, clips.
-            
+
             Returns:
                 The clipped extrapolation to the zero-noise limit.
             """

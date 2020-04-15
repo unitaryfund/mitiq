@@ -9,7 +9,7 @@ from scipy.optimize import curve_fit
 
 class Factory:
     """
-    Abstract class designed to adaptively produce a new noise scaling 
+    Abstract class designed to adaptively produce a new noise scaling
     parameter based on a historical stack of previous noise scale parameters
     ("self.instack") and previously estimated expectation values
     ("self.outstack").
@@ -122,7 +122,7 @@ class PolyFactory(BatchedFactory):
     def __init__(self, scale_factors: Iterable[float], order: int) -> None:
         """
         Args:
-            scale_factors: Iterable of noise scale factors at which 
+            scale_factors: Iterable of noise scale factors at which
                            expectation values should be measured.
             order: Polynomial extrapolation order.
                    It cannot exceed len(scale_factors) - 1.
