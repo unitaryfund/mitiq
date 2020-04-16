@@ -3,11 +3,12 @@ extrapolation methods.
 """
 
 from typing import List, Iterable, Union, Tuple
+from abc import ABC, abstractmethod
 import numpy as np
 from scipy.optimize import curve_fit
 
 
-class Factory:
+class Factory(ABC):
     """
     Abstract class designed to adaptively produce a new noise scaling
     parameter based on a historical stack of previous noise scale parameters
@@ -40,16 +41,19 @@ class Factory:
         self.instack.append(instack_val)
         self.outstack.append(outstack_val)
 
+    @abstractmethod
     def next(self) -> float:
         """Returns the next noise level to execute a circuit at."""
         raise NotImplementedError
-
+    
+    @abstractmethod
     def is_converged(self) -> bool:
         """Returns True if all needed expectation values have been computed,
         else False.
         """
         raise NotImplementedError
 
+    @abstractmethod
     def reduce(self) -> float:
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
