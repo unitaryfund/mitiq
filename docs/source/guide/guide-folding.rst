@@ -174,7 +174,7 @@ circuit above is shown below.
     1: ───────X───
 
     # Fold the circuit
-    >>> folded = fold_global(circ, stretch=2.)
+    >>> folded = fold_global(circ, stretch=3.)
     >>> print("Folded circuit:", folded, sep="\n")
     Folded circuit:
     0: ───H───@───@───H───H───@───
