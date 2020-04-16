@@ -40,15 +40,15 @@ To make an example, let us assume that the result of our quantum computation is 
 value which has a linear dependance on the noise.
 Since our aim to understand the usage of a factory, instead of actually running quantum experiments, 
 we simply simulate an effective classical model which returns the expectation value as a function of the 
-noise scale factor:
+noise scale factor.
 
-.. code-block:: python
+.. testcode::
 
    def noise_to_expval(scale_factor: float) -> float:
       """A simple linear model for the expectation value."""
       ZERO_NOISE_LIMIT = 0.5
       NATIVE_NOISE = 0.7
-      return A + NATIVE_NOISE * scale_factor
+      return ZERO_NOISE_LIMIT + NATIVE_NOISE * scale_factor
 
 In this case the zero noise limit is ``0.5`` and we would like to deduce it by evaluating
 the function only for values of ``scale_factor`` which are larger than or equal to 1.
@@ -60,7 +60,7 @@ factors: ``SCALE_FACTORS = [1.0, 2.0, 3.0]``.
 To get the zero-noise limit, we are going to use a ``LinearFactory`` object, run it until convergence
 (in this case until 3 expectation values are measured and saved) and eventually perform the zero noise extrapolation.
 
-.. code-block:: python
+.. testcode::
 
    from mitiq.factories import LinearFactory
 
@@ -93,9 +93,12 @@ In the previous code block we used the main methods of a typical ``Factory`` obj
 Since our idealized model ``noise_to_expval`` is linear and noiseless, 
 the extrapolation will exactly match the true zero-noise limit ``0.5``:
 
-.. code-block:: python
+.. testcode::
 
    print(f"The zero-noise extrapolation is: {zn_limit:.3}")
+
+.. testoutput::
+
    The zero-noise extrapolation is: 0.5
 
 .. note::
@@ -111,10 +114,11 @@ The ``run_factory`` function
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Running a factory until convergence is a typical step of the zero-noise extrapolation
-workflow. For this reason, in ``mitiq.zne`` there is a built-in function for this task: ``run_factory``.
-The previous example can be reduced to the following equivalent code:
+workflow. For this reason, in ``mitiq.zne`` there is a function which can be used
+for this task: ``run_factory``. The previous example can be simplified to the following
+equivalent code:
 
-.. code-block:: python
+.. testcode::
 
    from mitiq.factories import LinearFactory
    from mitiq.zne import run_factory
@@ -127,13 +131,17 @@ The previous example can be reduced to the following equivalent code:
    run_factory(fac, noise_to_expval)
    # Evaluate the zero-noise extrapolation.
    zn_limit = fac.reduce()
+   print(f"The zero-noise extrapolation is: {zn_limit:.3}")
+
+.. testoutput::
+
+   The zero-noise extrapolation is: 0.5
 
 =============================================
 Built-in factories
 =============================================
 
 All the built-in factories of ``mitiq`` can be found in the submodule ``mitiq.factories``.
-
 
 .. autosummary::
    :nosignatures:
@@ -145,6 +153,11 @@ All the built-in factories of ``mitiq`` can be found in the submodule ``mitiq.fa
    mitiq.factories.PolyExpFactory
    mitiq.factories.AdaExpFactory
 
+=============================================
+Defining a custom Factory
+=============================================
+
+If necessary, the user can modify an existing extrapolation method by subclassing
 the corresponding factory.
 
 A new adaptive extrapolation method can be derived from the abstract class ``Factory``.
@@ -169,7 +182,7 @@ spectrum.
 We can define a linear non-adaptive factory which takes into account this information
 and clips the result if it falls outside its physical domain.
 
-.. code-block:: python
+.. testcode::
 
    from typing import Iterable
    from mitiq.factories import BatchedFactory
