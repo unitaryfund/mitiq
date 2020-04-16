@@ -5,7 +5,7 @@ from typing import Callable
 from qiskit import QuantumCircuit
 from cirq import Circuit
 
-import mitiq.qiskit.qiskit_utils as qs_utils
+import mitiq.mitiq_qiskit.qiskit_utils as qs_utils
 from mitiq import QPROGRAM
 from mitiq.factories import Factory, RichardsonFactory
 from mitiq.folding import fold_gates_at_random
@@ -112,8 +112,8 @@ def mitigate_executor(
     """
     Returns an error-mitigated version of the input "executor".
     Takes as input a generic function ("executor"), defined by the user,
-    that executes a circuit with an arbitrary backend
-     and produces an expectation value.
+    that executes a circuit with an arbitrary backend and produces an
+    expectation value.
 
     Returns an error-mitigated version of the input "executor",
     having the same signature and automatically performing ZNE at each call.

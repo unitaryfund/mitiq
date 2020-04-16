@@ -4,12 +4,12 @@ import numpy as np
 from mitiq import QPROGRAM
 from mitiq.factories import RichardsonFactory
 from mitiq.zne import (
-    qrun_factory, 
-    execute_with_zne, 
-    mitigate_executor, 
+    qrun_factory,
+    execute_with_zne,
+    mitigate_executor,
     zne_decorator,
 )
-from mitiq.pyquil.pyquil_utils import (
+from mitiq.mitiq_pyquil.pyquil_utils import (
     random_identity_circuit,
     measure,
     run_program,
