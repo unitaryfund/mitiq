@@ -226,6 +226,16 @@ and clips the result if it falls outside its physical domain.
          # Return the clipped zero-noise extrapolation.
          return np.clip(intercept, self.min_expval, self.max_expval)
 
+.. testcleanup::
+
+   fac = MyFactory(SCALE_FACTORS, min_expval=-1.0, max_expval=1.0)
+   run_factory(fac, noise_to_expval)
+   assert np.isclose(fac.reduce(), 0.5)
+   # Linear model with a large zero-noise limit
+   noise_to_large_expval = lambda x : noise_to_expval(x) + 10.0
+   run_factory(fac, noise_to_large_expval)
+   assert np.isclose(fac.reduce(), 1.0)
+
 This custom factory can be used in exactly the same way as we have
 shown in the previous section. By simply replacing ``LinearFactory``
 with ``MyFactory`` in all the previous code snippets, the new extrapolation
