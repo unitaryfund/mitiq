@@ -52,7 +52,7 @@ noise scale factor.
       NOISE_ERROR = 0.7
       return ZERO_NOISE_LIMIT + NOISE_ERROR * scale_factor
 
-In this case the zero noise limit is ``0.5`` and we would like to deduce it by evaluating
+In this case the zero-noise limit is ``0.5`` and we would like to deduce it by evaluating
 the function only for values of ``scale_factor`` which are larger than or equal to 1.
 
 .. note::
