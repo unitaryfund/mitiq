@@ -1,4 +1,4 @@
-.. mitiq documentation file
+.. _guide-getting-started
 
 *********************************************
 Getting Started
@@ -91,17 +91,18 @@ into ``Factory`` objects. It is easy to try different ones.
 .. doctest:: python
 
     >>> from mitiq.factories import LinearFactory
-    >>> fac = LinearFactory(scalars=[1.0, 2.0, 2.5])
+
+    >>> fac = LinearFactory(scale_factors=[1.0, 2.0, 2.5])
     >>> linear = execute_with_zne(circ, noisy_simulation, fac=fac)
     >>> print(f"Mitigated error with the linear method is {exact - linear:.{3}}")
     Mitigated error with the linear method is 0.00638
 
 You can read more about the ``Factory`` objects that are built into ``mitiq`` and
-how to create your own `here <factories.html>`_.
+how to create your own `here <guide-factories.html>`_.
 
 Another key step in zero-noise extrapolation is to choose how your circuit is
 transformed to scale the noise. You can read more about the noise scaling
 methods built into ``mitiq`` and how to create your
-own `here <noise-scaling.html>`_.
+own `here <guide-folding.html>`_.
 
 .. [1] `Error mitigation for short-depth quantum circuits <https://arxiv.org/abs/1612.02058>`_

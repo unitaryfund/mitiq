@@ -24,6 +24,9 @@ def run_factory(
         noise_to_expval: Function mapping noise scale to expectation vales.
         max_iterations: Maximum number of iterations (optional). Default: 100.
     """
+    # Clear out the factory to make sure it is fresh.
+    fac.reset()
+
     counter = 0
     while not fac.is_converged() and counter < max_iterations:
         next_param = fac.next()
@@ -94,10 +97,6 @@ def execute_with_zne(
             scale_noise = fold_gates_at_random
     if fac is None:
         fac = RichardsonFactory([1.0, 2.0, 3.0])
-    else:
-        # Clear out the factory to make sure it is fresh.
-        fac.reset()
-
     qrun_factory(fac, qp, executor, scale_noise)
 
     return fac.reduce()

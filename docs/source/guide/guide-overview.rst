@@ -1,3 +1,7 @@
+.. mitiq documentation file
+
+.. _guide overview:
+
 Overview of mitiq
 =================
 Welcome to the `mitiq` Users Guide.
