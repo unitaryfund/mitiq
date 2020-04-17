@@ -68,7 +68,7 @@ In this example, we plan to measure the expectation value at 3 different noise s
 factors: ``SCALE_FACTORS = [1.0, 2.0, 3.0]``.
 
 To get the zero-noise limit, we are going to use a ``LinearFactory`` object, run it until convergence
-(in this case until 3 expectation values are measured and saved) and eventually perform the zero noise extrapolation.
+(in this case until 3 expectation values are measured and saved) and eventually perform the zero-noise extrapolation.
 
 .. testcode::
 
