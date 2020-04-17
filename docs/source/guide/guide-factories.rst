@@ -40,7 +40,7 @@ Example: basic usage of a factory
 
 To make an example, let us assume that the result of our quantum computation is an expectation
 value which has a linear dependance on the noise.
-Since our aim to understand the usage of a factory, instead of actually running quantum experiments, 
+Since our aim is to understand the usage of a factory, instead of actually running quantum experiments, 
 we simply simulate an effective classical model which returns the expectation value as a function of the 
 noise scale factor.
 
