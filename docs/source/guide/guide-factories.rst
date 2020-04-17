@@ -1,7 +1,9 @@
 .. mitiq documentation file
 
+.. _guide-factories:
+
 *********************************************
-Factory objects
+Factory Objects
 *********************************************
 
 *Factories* are important elements of the ``mitiq`` library.
@@ -33,7 +35,7 @@ All non-adaptive methods are derived from ``BatchedFactory``.
 
 
 =============================================
-Example: basic usage of a factory.
+Example: basic usage of a factory
 =============================================
 
 To make an example, let us assume that the result of our quantum computation is an expectation
@@ -47,11 +49,19 @@ noise scale factor.
    def noise_to_expval(scale_factor: float) -> float:
       """A simple linear model for the expectation value."""
       ZERO_NOISE_LIMIT = 0.5
-      NATIVE_NOISE = 0.7
-      return ZERO_NOISE_LIMIT + NATIVE_NOISE * scale_factor
+      NOISE_ERROR = 0.7
+      return ZERO_NOISE_LIMIT + NOISE_ERROR * scale_factor
 
 In this case the zero noise limit is ``0.5`` and we would like to deduce it by evaluating
 the function only for values of ``scale_factor`` which are larger than or equal to 1.
+
+.. note::
+
+   For implementing zero-noise extrapolation, it is not necessary to know the details of the
+   noise model. It is also not necessary to control the absolute strength of the noise
+   acting on the physical system. The only key assumption is that we can artificially scale the noise
+   with respect to its normal level by a dimensionless ``scale_factor``.
+   A practical approach for scaling the noise is discussed in the :ref:`guide-folding` section.
 
 
 In this example, we plan to measure the expectation value at 3 different noise scale
@@ -170,12 +180,12 @@ In this case it is usually sufficient to override only ``self.__init__`` and
 ``self.reduce``, which are responsible for the initialization and for the
 final zero-noise extrapolation, respectively.
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+=============================================
 Example: a simple custom factory
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+=============================================
 
-Assume that, from physical considerations, we know that the true expectation
-value must always be within two limits: ``min_expval`` and ``max_expval``.
+Assume that, from physical considerations, we know that the ideal expectation value 
+(measured by some quantum circuit) must always be within two limits: ``min_expval`` and ``max_expval``.
 For example, this is a typical situation whenever the measured observable has a bounded
 spectrum.
 
