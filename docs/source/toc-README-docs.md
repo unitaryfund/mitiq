@@ -1,16 +1,16 @@
-# Mitiq Documentation Contributors Guide
+# Contributing to the documentation
 
-This is the Ccntributors guide for the documentation of Mitiq,
+This is the Contributors guide for the documentation of Mitiq,
 a Python toolkit for implementing error mitigation on quantum computers.
 
 ## Requirements
 The documentation is generated with
 [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html).
 ```bash
-pip install -U sphinx recommonmark
+pip install -U sphinx recommonmark sphinxcontrib-bibtex
 ```
-`recommonmark` allows to include `.md` files, besides `.rst`.
-
+`recommonmark` allows to include `.md` files, besides `.rst`;
+`sphinxcontrib-bibtex` allows to include citations in a `.bib` file.
 
 You can check that Sphinx is installed with `sphinx-build --version`.
 
