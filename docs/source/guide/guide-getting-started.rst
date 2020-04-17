@@ -78,7 +78,7 @@ The variance in the mitigated expectation value is now stored in ``var``.
 You can also use ``mitiq`` to wrap your backend execution function into an
 error-mitigated version.
 
-.. testoutput::
+.. testcode::
 
     >>> from mitiq import mitigate_executor
     >>> run_mitigated = mitigate_executor(noisy_simulation)
