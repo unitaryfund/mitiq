@@ -34,4 +34,10 @@ jobs:
         pytest mitiq/tests
         pytest mitiq/benchmarks/tests
         pytest mitiq/mitiq_qiskit/tests
-        pytest -v docs --doctest-glob="*.rst"
+   - name: Test documentation
+      run: |
+        pip install sphinx
+        cd docs
+        sphinx-build -b html source build
+        make html
+        make doctest
