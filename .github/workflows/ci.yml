@@ -34,7 +34,3 @@ jobs:
         pytest mitiq/tests
         pytest mitiq/benchmarks/tests
         pytest mitiq/mitiq_qiskit/tests
-   - name: Test documentation
-      run: |
-        pip install sphinx
-        cd docs
