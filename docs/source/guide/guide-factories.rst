@@ -72,7 +72,7 @@ To get the zero-noise limit, we are going to use a ``LinearFactory`` object, run
 
 .. testcode::
 
-   from mitiq.factories import LinearFactory_WANTED_ERROR
+   from mitiq.factories import LinearFactory
 
    # Some fixed noise scale factors
    SCALE_FACTORS = [1.0, 2.0, 3.0]
