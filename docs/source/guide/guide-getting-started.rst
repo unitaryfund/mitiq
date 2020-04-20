@@ -69,14 +69,23 @@ noise.
 This shows the impact the noise has had. Let's use ``mitiq`` to improve this
 performance.
 
-.. doctest::
+.. testcode::
 
-    >>> from mitiq import execute_with_zne
+    from mitiq import execute_with_zne
 
-    >>> mitigated = execute_with_zne(circ, noisy_simulation)
-    >>> print(f"Error in simulation is {exact - mitigated:.{3}}")
+    mitigated = execute_with_zne(circ, noisy_simulation)
+    print(f"Error in simulation is {exact - mitigated:.{3}}")
+
+.. testoutput::
+
     Error in simulation is 0.000519
-    >>> print(f"Mitigation provides a {(exact - unmitigated) / (exact - mitigated):.{3}} factor of improvement.")
+
+.. testcode::
+
+    print(f"Mitigation provides a {(exact - unmitigated) / (exact - mitigated):.{3}} factor of improvement.")
+
+.. testoutput::
+
     Mitigation provides a 97.6 factor of improvement.
 
 The variance in the mitigated expectation value is now stored in ``var``.
