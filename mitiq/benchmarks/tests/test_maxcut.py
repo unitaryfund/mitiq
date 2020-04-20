@@ -17,3 +17,11 @@ def test_barbell():
     x0 = np.asarray([0., 0.3])
     out, _ = run_maxcut(graph, x0)
     assert np.isclose(out, -2.0)
+
+
+def test_noisy_square():
+    graph = [(0, 1), (1, 2), (2, 3), (3, 0)]
+    x0 = np.asarray([0., 0.5, 0.75, 1.])
+    out, _ = run_maxcut(graph, x0, noise=0.4)
+    # When there is noise the solution should be worse.
+    assert out > -4.0
