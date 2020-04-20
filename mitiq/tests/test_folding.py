@@ -1028,12 +1028,10 @@ def test_global_fold_stretch_factor_eight_terminal_measurements():
         circ,
         inverse(
             Circuit(
-                [ops.CNOT.on(qreg[0], qreg[1])],
                 [ops.T.on(qreg[2])],
                 [ops.TOFFOLI.on(*qreg)],
             )
         ),
-        [ops.CNOT.on(qreg[0], qreg[1])],
         [ops.T.on(qreg[2])],
         [ops.TOFFOLI.on(*qreg)],
         meas,

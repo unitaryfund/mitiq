@@ -593,7 +593,7 @@ def fold_global(circuit: QPROGRAM, stretch: float, **kwargs) -> QPROGRAM:
 
     # Fold remaining gates until the stretch is reached
     ops = list(base_circuit.all_operations())
-    num_to_fold = int(round(fractional_stretch * len(ops)))
+    num_to_fold = int(round(fractional_stretch * len(ops) / 2))
 
     if num_to_fold > 0:
         folded += Circuit([inverse(ops[-num_to_fold:])], [ops[-num_to_fold:]])

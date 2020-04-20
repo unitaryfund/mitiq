@@ -1,6 +1,6 @@
 """Testing of zero-noise extrapolation methods (factories) with classically generated data."""
 
-from typing import Callable
+from typing import Callable, Iterable
 from pytest import mark
 import numpy as np
 from mitiq.factories import (
@@ -10,6 +10,7 @@ from mitiq.factories import (
     ExpFactory,
     PolyExpFactory,
     AdaExpFactory,
+    BatchedFactory,
 )
 from mitiq.zne import run_factory
 
@@ -139,7 +140,7 @@ def test_poly_exp_factory_no_asympt(test_f: Callable[[float], float]):
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
 def test_ada_exp_factory_with_asympt(test_f: Callable[[float], float]):
     """Test of the adaptive exponential extrapolator."""
-    algo_object = AdaExpFactory(steps=3, scalar=2.0, asymptote=A)
+    algo_object = AdaExpFactory(steps=3, scale_factor=2.0, asymptote=A)
     run_factory(algo_object, test_f)
     assert np.isclose(algo_object.reduce(), test_f(0, err=0), atol=CLOSE_TOL)
 
@@ -149,7 +150,7 @@ def test_ada_exp_factory_with_asympt_more_steps(
     test_f: Callable[[float], float]
 ):
     """Test of the adaptive exponential extrapolator."""
-    algo_object = AdaExpFactory(steps=6, scalar=2.0, asymptote=A)
+    algo_object = AdaExpFactory(steps=6, scale_factor=2.0, asymptote=A)
     run_factory(algo_object, test_f)
     assert np.isclose(algo_object.reduce(), test_f(0, err=0), atol=CLOSE_TOL)
 
@@ -157,7 +158,7 @@ def test_ada_exp_factory_with_asympt_more_steps(
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
 def test_ada_exp_factory_no_asympt(test_f: Callable[[float], float]):
     """Test of the adaptive exponential extrapolator."""
-    algo_object = AdaExpFactory(steps=4, scalar=2.0, asymptote=None)
+    algo_object = AdaExpFactory(steps=4, scale_factor=2.0, asymptote=None)
     run_factory(algo_object, test_f)
     assert np.isclose(algo_object.reduce(), test_f(0, err=0), atol=CLOSE_TOL)
 
@@ -167,6 +168,7 @@ def test_ada_exp_factory_no_asympt_more_steps(
     test_f: Callable[[float], float]
 ):
     """Test of the adaptive exponential extrapolator."""
-    algo_object = AdaExpFactory(steps=8, scalar=2.0, asymptote=None)
+    algo_object = AdaExpFactory(steps=8, scale_factor=2.0, asymptote=None)
     run_factory(algo_object, test_f)
     assert np.isclose(algo_object.reduce(), test_f(0, err=0), atol=CLOSE_TOL)
+

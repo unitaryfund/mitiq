@@ -3,14 +3,15 @@ extrapolation methods.
 """
 
 from typing import List, Iterable, Union, Tuple
+from abc import ABC, abstractmethod
 import numpy as np
 from scipy.optimize import curve_fit
 
 
-class Factory:
+class Factory(ABC):
     """
-    Abstract class designed to adaptively produce a new noise scaling parameter
-    based on a historical stack of previous noise scale parameters
+    Abstract class designed to adaptively produce a new noise scaling
+    parameter based on a historical stack of previous noise scale parameters
     ("self.instack") and previously estimated expectation values
     ("self.outstack").
 
@@ -40,16 +41,19 @@ class Factory:
         self.instack.append(instack_val)
         self.outstack.append(outstack_val)
 
+    @abstractmethod
     def next(self) -> float:
         """Returns the next noise level to execute a circuit at."""
         raise NotImplementedError
-
+    
+    @abstractmethod
     def is_converged(self) -> bool:
         """Returns True if all needed expectation values have been computed,
         else False.
         """
         raise NotImplementedError
 
+    @abstractmethod
     def reduce(self) -> float:
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
@@ -64,9 +68,9 @@ class BatchedFactory(Factory):
     """
     Abstract class of a non-adaptive Factory.
 
-    This is initialized with a given batch of scaling factors ("scalars").
-    The "self.next" method trivially iterates over the elements of "scalars"
-    in a non-adaptive way.
+    This is initialized with a given batch of "scale_factors".
+    The "self.next" method trivially iterates over the elements of
+    "scale_factors" in a non-adaptive way.
     Convergence is achieved when all the correpsonding expectation values have
     been measured.
 
@@ -75,28 +79,28 @@ class BatchedFactory(Factory):
     the "__init__" method.
     """
 
-    def __init__(self, scalars: Iterable[float]) -> None:
+    def __init__(self, scale_factors: Iterable[float]) -> None:
         """
         Args:
-            scalars: Iterable of noise scale factors at which expectation
-            values should be measured.
+            scale_factors: Iterable of noise scale factors at which
+                           expectation values should be measured.
         """
-        if len(scalars) == 0:
+        if len(scale_factors) == 0:
             raise ValueError(
-                "The argument 'scalars' should contain at least one element."
                 "At least 2 elements are necessary"\
                 " for non-trivial extrapolation."
             )
-        self.scalars = scalars
+        self.scale_factors = scale_factors
         super(BatchedFactory, self).__init__()
 
     def next(self) -> float:
         try:
-            next_param = self.scalars[len(self.outstack)]
+            next_param = self.scale_factors[len(self.outstack)]
         except IndexError:
             raise IndexError(
-                "BatchedFactory cannot take another step. "
-                f"Number of batched scalars ({len(self.scalars)}) exceeded."
+                "BatchedFactory cannot take another step. "\
+                "Number of batched scale_factors"\
+                f" ({len(self.scale_factors)}) exceeded."
             )
         return next_param
 
@@ -106,7 +110,7 @@ class BatchedFactory(Factory):
                 f"The length of 'self.instack' ({len(self.instack)}) "
                 f"and 'self.outstack' ({len(self.outstack)}) must be equal."
             )
-        return len(self.outstack) == len(self.scalars)
+        return len(self.outstack) == len(self.scale_factors)
 
 
 class PolyFactory(BatchedFactory):
@@ -119,20 +123,20 @@ class PolyFactory(BatchedFactory):
 
     """
 
-    def __init__(self, scalars: Iterable[float], order: int) -> None:
+    def __init__(self, scale_factors: Iterable[float], order: int) -> None:
         """
         Args:
-            scalars: Iterable of noise scale factors at which expectation
-                     values should be measured.
+            scale_factors: Iterable of noise scale factors at which
+                           expectation values should be measured.
             order: Polynomial extrapolation order.
-                   It cannot exceed len(scalars) - 1.
+                   It cannot exceed len(scale_factors) - 1.
         """
-        if order > len(scalars) - 1:
+        if order > len(scale_factors) - 1:
             raise ValueError(
-                "The extrapolation order cannot exceed len(scalars) - 1."
+                "The extrapolation order cannot exceed len(scale_factors) - 1."
             )
         self.order = order
-        super(PolyFactory, self).__init__(scalars)
+        super(PolyFactory, self).__init__(scale_factors)
 
     @staticmethod
     def static_reduce(
@@ -221,15 +225,16 @@ class ExpFactory(BatchedFactory):
     """
 
     def __init__(
-        self, scalars: Iterable[float], asymptote: Union[float, None] = None
+        self, scale_factors: Iterable[float], 
+        asymptote: Union[float, None] = None,
     ) -> None:
         """
         Args:
-            scalars: Iterable of noise scale factors at which expectation
-            values should be measured.
+            scale_factors: Iterable of noise scale factors at which
+                           expectation values should be measured.
             asymptote: Infinite-noise limit (optional argument).
         """
-        super(ExpFactory, self).__init__(scalars)
+        super(ExpFactory, self).__init__(scale_factors)
         if not (asymptote is None or isinstance(asymptote, float)):
             raise ValueError(
                 "The argument 'asymptote' must be either a float or None"
@@ -258,24 +263,26 @@ class PolyExpFactory(BatchedFactory):
 
     If the asymptotic value (y(x->inf) = a) is known, a linear fit with respect
     to z(x) := log[s(y(x) - a)] is used.
-    Otherwise, a non-linear fit of y(x) is perfomed.
+    Otherwise, a non-linear fit of y(x) is performed.
     """
 
     def __init__(
         self,
-        scalars: Iterable[float],
+        scale_factors: Iterable[float],
         order: int,
         asymptote: Union[float, None] = None,
     ) -> None:
         """
         Args:
-            scalars: Iterable of noise scale factors at which expectation
-            values should be measured.
-            order: Polynomial extrapolation order. Must be <=len(scalars) - 1.
-                   If asymptote is None, order cannot exceed len(scalars) - 2.
+            scale_factors: Iterable of noise scale factors at which
+                           expectation values should be measured.
+            order: Polynomial extrapolation order.
+                   Must be <=len(scale_factors) - 1.
+                   If asymptote is None, order cannot exceed
+                   len(scale_factors) - 2.
             asymptote: Infinite-noise limit (optional argument).
         """
-        super(PolyExpFactory, self).__init__(scalars)
+        super(PolyExpFactory, self).__init__(scale_factors)
         if not (asymptote is None or isinstance(asymptote, float)):
             raise ValueError(
                 "The argument 'asymptote' must be either a float or None"
@@ -402,15 +409,16 @@ class AdaExpFactory(Factory):
     def __init__(
         self,
         steps: int,
-        scalar: float = 2,
+        scale_factor: float = 2,
         asymptote: Union[float, None] = None,
     ) -> None:
         """Instantiate a new object of this Factory class.
 
         Args:
             steps: The number of optimization steps. At least 3 are necessary.
-            scalar: The second noise scale factor (the first is always 1.0).
-                    Further scale factors are adaptively determined.
+            scale_factor: The second noise scale factor
+                          (the first is always 1.0).
+                          Further scale factors are adaptively determined.
             asymptote: The infinite noise limit (if known) of the expectation
                        value. Default is None.
         """
@@ -419,9 +427,9 @@ class AdaExpFactory(Factory):
             raise ValueError(
                 "The argument 'asymptote' must be either a float or None"
             )
-        if scalar <= 1:
+        if scale_factor <= 1:
             raise ValueError(
-                "The argument 'scalar' must be strictly larger than one."
+                "The argument 'scale_factor' must be strictly larger than one."
             )
         if steps < 3 + int(asymptote is None):
             raise ValueError(
@@ -431,7 +439,7 @@ class AdaExpFactory(Factory):
                 " greater or equal to 4."
             )
         self.steps = steps
-        self.scalar = scalar
+        self.scale_factor = scale_factor
         self.asymptote = asymptote
         # Keep a log of the optimization process storing:
         # noise value(s), expectation value(s), parameters, and zero limit
@@ -441,15 +449,15 @@ class AdaExpFactory(Factory):
 
     def next(self) -> float:
         """Returns the next noise level to execute a circuit at."""
-        # The 1st noise scale parameter is always 1
+        # The 1st scale factor is always 1
         if len(self.instack) == 0:
             return 1.0
-        # The 2nd noise scale parameter is self.scalar
+        # The 2nd scale factor is self.scale_factor
         if len(self.instack) == 1:
-            return self.scalar
-        # If asymptote is None we use 2 * scalar as third noise parameter
+            return self.scale_factor
+        # If asymptote is None we use 2 * scale_factor as third noise parameter
         if (len(self.instack) == 2) and (self.asymptote is None):
-            return 2 * self.scalar
+            return 2 * self.scale_factor
         # Call self.reduce() in order to update self.history
         self.reduce()
         # Get the most recent fitted parameters from self.history
