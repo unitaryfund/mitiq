@@ -34,3 +34,6 @@ jobs:
         pytest mitiq/tests
         pytest mitiq/benchmarks/tests
         pytest mitiq/mitiq_qiskit/tests
+    - name: Test with sphinx
+      run: |
+        pip install pytest-sphinx
