@@ -38,3 +38,4 @@ jobs:
       run: |
         pip install sphinx
         pip install pytest-sphinx
+        cd docs && pwd
