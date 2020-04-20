@@ -34,4 +34,11 @@ jobs:
         pytest mitiq/tests
         pytest mitiq/benchmarks/tests
         pytest mitiq/mitiq_qiskit/tests
-        cd docs && make doctest
+   - name: Test documentation
+      run: |
+        pip install sphinx
+        cd docs
+        sphinx-build -b html source build
+        make html
+        make doctest
+
