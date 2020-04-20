@@ -36,6 +36,8 @@ jobs:
         pytest mitiq/mitiq_qiskit/tests
     - name: Test with sphinx
       run: |
-        pip install sphinx
-        pip install pytest-sphinx
-        cd docs && pwd
+        pip install sphinx pytest-sphinx recommonmark sphinxcontrib-bibtex
+        pip install jupyter notebook matplotlib
+        cd docs && sphinx-build -b html source build
+        make html
+        make doctest
