@@ -21,30 +21,31 @@ We define some functions that make it simpler to simulate noise in
 
 .. testcode::
 
-    >>> import numpy as np
-    >>> from cirq import Circuit, depolarize
-    >>> from cirq import LineQubit, X, DensityMatrixSimulator
-    >>> SIMULATOR = DensityMatrixSimulator()
-    >>> # 0.1% depolarizing noise
-    >>> NOISE = 0.001
+    import numpy as np
+    from cirq import Circuit, depolarize
+    from cirq import LineQubit, X, DensityMatrixSimulator
 
-    >>> def noisy_simulation(circ: Circuit, shots=None) -> float:
-    ...     """ Simulates a circuit with depolarizing noise at level NOISE.
-    ...     Args:
-    ...         circ: The quantum program as a cirq object.
-    ...         shots: This unused parameter is needed to match mitiq's expected type
-    ...                signature for an executor function.
-    ...
-    ...     Returns:
-    ...         The observable's measurements as as
-    ...         tuple (expectation value, variance).
-    ...     """
-    ...     circuit = circ.with_noise(depolarize(p=NOISE))
-    ...     rho = SIMULATOR.simulate(circuit).final_density_matrix
-    ...     # define the computational basis observable
-    ...     obs = np.diag([1, 0])
-    ...     expectation = np.real(np.trace(rho @ obs))
-    ...     return expectation
+    SIMULATOR = DensityMatrixSimulator()
+    # 0.1% depolarizing noise
+    NOISE = 0.001
+
+    def noisy_simulation(circ: Circuit, shots=None) -> float:
+        """ Simulates a circuit with depolarizing noise at level NOISE.
+        Args:
+            circ: The quantum program as a cirq object.
+            shots: This unused parameter is needed to match mitiq's expected type
+                   signature for an executor function.
+
+        Returns:
+            The observable's measurements as as
+            tuple (expectation value, variance).
+        """
+        circuit = circ.with_noise(depolarize(p=NOISE))
+        rho = SIMULATOR.simulate(circuit).final_density_matrix
+        # define the computational basis observable
+        obs = np.diag([1, 0])
+        expectation = np.real(np.trace(rho @ obs))
+        return expectation
 
 Now we can look at our example. We'll test single qubit circuits with even
 numbers of X gates. As there are an even number of X gates, they should all
@@ -53,20 +54,25 @@ noise.
 
 .. testcode::
 
-    >>> from cirq import Circuit, LineQubit, X
-    >>> qbit = LineQubit(0)
-    >>> circ = Circuit(X(qbit) for _ in range(80))
-    >>> unmitigated = noisy_simulation(circ)
-    >>> exact = 1
-    >>> print(f"Error in simulation is {exact - unmitigated:.{3}}")
+    from cirq import Circuit, LineQubit, X
+
+    qbit = LineQubit(0)
+    circ = Circuit(X(qbit) for _ in range(80))
+    unmitigated = noisy_simulation(circ)
+    exact = 1
+    print(f"Error in simulation is {exact - unmitigated:.{3}}")
+
+.. testoutput::
+
     Error in simulation is 0.0506
 
 This shows the impact the noise has had. Let's use ``mitiq`` to improve this
 performance.
 
-.. testcode::
+.. doctest::
 
     >>> from mitiq import execute_with_zne
+
     >>> mitigated = execute_with_zne(circ, noisy_simulation)
     >>> print(f"Error in simulation is {exact - mitigated:.{3}}")
     Error in simulation is 0.000519
@@ -80,10 +86,14 @@ error-mitigated version.
 
 .. testcode::
 
-    >>> from mitiq import mitigate_executor
-    >>> run_mitigated = mitigate_executor(noisy_simulation)
-    >>> mitigated = run_mitigated(circ)
-    >>> round(mitigated,5)
+    from mitiq import mitigate_executor
+
+    run_mitigated = mitigate_executor(noisy_simulation)
+    mitigated = run_mitigated(circ)
+    print(round(mitigated,5))
+
+.. testoutput::
+
     0.99948
 
 The default implementation uses Richardson extrapolation to extrapolate the
@@ -93,12 +103,15 @@ into ``Factory`` objects. It is easy to try different ones.
 
 .. testcode::
 
-    >>> from mitiq import execute_with_zne
-    >>> from mitiq.factories import LinearFactory
+    from mitiq import execute_with_zne
+    from mitiq.factories import LinearFactory
 
-    >>> fac = LinearFactory(scale_factors=[1.0, 2.0, 2.5])
-    >>> linear = execute_with_zne(circ, noisy_simulation, fac=fac)
-    >>> print(f"Mitigated error with the linear method is {exact - linear:.{3}}")
+    fac = LinearFactory(scale_factors=[1.0, 2.0, 2.5])
+    linear = execute_with_zne(circ, noisy_simulation, fac=fac)
+    print(f"Mitigated error with the linear method is {exact - linear:.{3}}")
+
+.. testoutput::
+
     Mitigated error with the linear method is 0.00638
 
 You can read more about the ``Factory`` objects that are built into ``mitiq`` and
@@ -122,69 +135,73 @@ but you could also use a QPU.
 
 .. testcode::
 
-    >>> import qiskit
-    >>> from qiskit import QuantumCircuit
-    >>> # Noise simulation packages
-    >>> from qiskit.providers.aer.noise import NoiseModel
-    >>> from qiskit.providers.aer.noise.errors.standard_errors import \
-    ...    depolarizing_error
+    import qiskit
+    from qiskit import QuantumCircuit
 
-    >>> # 0.1% depolarizing noise
-    >>> NOISE = 0.001
+    # Noise simulation packages
+    from qiskit.providers.aer.noise import NoiseModel
+    from qiskit.providers.aer.noise.errors.standard_errors import depolarizing_error
 
-    >>> QISKIT_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
+    # 0.1% depolarizing noise
+    NOISE = 0.001
 
-    >>> def qs_noisy_simulation(circuit: QuantumCircuit, shots: int = 4096) -> float:
-    ...    """Runs the quantum circuit with a depolarizing
-    ...       channel noise model at level NOISE.
-    ...
-    ...    Args:
-    ...        circuit (qiskit.QuantumCircuit): Ideal quantum circuit.
-    ...        shots (int): Number of shots to run the circuit
-    ...                     on the back-end.
-    ...
-    ...    Returns:
-    ...        expval: expected values.
-    ...   """
-    ...   # initialize a qiskit noise model
-    ...    noise_model = NoiseModel()
-    ...
-    ...    # we assume a depolarizing error for each
-    ...    # gate of the standard IBM basis
-    ...    noise_model.add_all_qubit_quantum_error(
-    ...        depolarizing_error(NOISE, 1), ["u1", "u2", "u3"])
-    ...
-    ...    # execution of the experiment
-    ...    job = qiskit.execute(
-    ...        circuit,
-    ...        backend=QISKIT_SIMULATOR,
-    ...        basis_gates=["u1", "u2", "u3"],
-    ...        # we want all gates to be actually applied,
-    ...        # so we skip any circuit optimization
-    ...        optimization_level=0,
-    ...        noise_model=noise_model,
-    ...        shots=shots
-    ...    )
-    ...    results = job.result()
-    ...    counts = results.get_counts()
-    ...    expval = counts["0"] / shots
-    ...    return expval
+    QISKIT_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
+
+    def qs_noisy_simulation(circuit: QuantumCircuit, shots: int = 4096) -> float:
+        """Runs the quantum circuit with a depolarizing channel noise model at
+        level NOISE.
+
+        Args:
+            circuit (qiskit.QuantumCircuit): Ideal quantum circuit.
+            shots (int): Number of shots to run the circuit
+                         on the back-end.
+
+        Returns:
+            expval: expected values.
+        """
+        # initialize a qiskit noise model
+        noise_model = NoiseModel()
+
+        # we assume a depolarizing error for each
+        # gate of the standard IBM basis
+        noise_model.add_all_qubit_quantum_error(depolarizing_error(NOISE, 1), ["u1", "u2", "u3"])
+
+        # execution of the experiment
+        job = qiskit.execute(
+            circuit,
+            backend=QISKIT_SIMULATOR,
+            basis_gates=["u1", "u2", "u3"],
+            # we want all gates to be actually applied,
+            # so we skip any circuit optimization
+            optimization_level=0,
+            noise_model=noise_model,
+            shots=shots
+        )
+        results = job.result()
+        counts = results.get_counts()
+        expval = counts["0"] / shots
+        return expval
 
 We can then use this backend for our mitigation.
 
 .. testcode::
 
-    >>> from qiskit import QuantumCircuit
-    >>> from mitiq import execute_with_zne
-    >>> circ = QuantumCircuit(1, 1)
-    >>> for __ in range(80):
-    ...     _ = circ.x(0)
-    >>> _ = circ.measure(0, 0)
-    >>> unmitigated = qs_noisy_simulation(circ)
-    >>> mitigated = execute_with_zne(circ, qs_noisy_simulation)
-    >>> exact = 1
-    >>> # The mitigation should improve the result.
-    >>> abs(exact - mitigated) < abs(exact - unmitigated)
+    from qiskit import QuantumCircuit
+    from mitiq import execute_with_zne
+
+    circ = QuantumCircuit(1, 1)
+    for __ in range(80):
+         _ = circ.x(0)
+    _ = circ.measure(0, 0)
+
+    unmitigated = qs_noisy_simulation(circ)
+    mitigated = execute_with_zne(circ, qs_noisy_simulation)
+    exact = 1
+    # The mitigation should improve the result.
+    print(abs(exact - mitigated) < abs(exact - unmitigated))
+
+.. testoutput::
+
     True
 
 Note that we don't need to even redefine factories for different stacks. Once
