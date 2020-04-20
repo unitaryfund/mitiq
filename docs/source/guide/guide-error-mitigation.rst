@@ -1,7 +1,7 @@
 .. _guide_qem:
 
 *********************************************
-Quantum error mitigation
+About Error Mitigation
 *********************************************
 
 This is intended as a primer on quantum error mitigation, providing a
@@ -52,15 +52,7 @@ Quantum error mitigation techniques try to *reduce* the impact of noise in
 quantum computations. They generally do not completely remove it.
 
 Among the ideas that have been developed so far for quantum error mitigation,
-some of the most recognizable are:
-
-* Zero-noise extrapolation
-
-* (Quasi-)Probabilistic error cancellation
-
-* (Quasi-)Probabilistic error cancellation
-
-(randomized compiling by gate twirling
+the most recognizable one is zero-noise extrapolation.
 
 .. _guide_qem_zne:
 
@@ -68,17 +60,94 @@ some of the most recognizable are:
 Zero-noise extrapolation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. _guide_qem_pec:
+The key idea behind zero-noise extrapolation is that it is possible to make
+some general assumptions on the kind of noise that affects, with error, the
+results of a quantum computation.
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-(Quasi-)Probabilistic error cancellation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In an ideal device, the time evolution is unitary, and as such it is modeled in
+the intermediate representation of a quantum circuit,
+
+.. math::
+
+   \begin{eqnarray}
+   |\psi\rangle (t)&=&U(t)|\psi\rangle
+   =e^{-i\int_0^t H(t')/\hbar dt'}|\psi\rangle,
+     \end{eqnarray}
+
+where :math:`|\psi\rangle` is the initial state of the system (e.g., the qubits
+involved in the operation) and :math:`U(t)` the unitary
+time evolution set by a time-dependent Hamiltonian, H(t).
+
+
+In the simplest scenario for the system-environment interaction, it is still
+possible to describe the time evolution in terms of operators acting on the
+system only, at the cost of losing the unitarity of the evolution.
+
+
+The first required condition to develop such framework, is that the system
+interacts less strongly with the environment than within its own
+sub-constituents.  This allows to proceed with a perturbative approach to solve
+the problem, with a coupling constant :math:`\lambda` taking care of the e.
+
+In this case, it is possible to write the time evolution of the density matrix
+associated to the state, :math:`\hat{\rho}=|\psi\rangle\langle \psi|`, as
+
+.. math::
+
+   \begin{eqnarray}
+   \frac{\partial d}{ \partial t}\hat{\rho}&=&
+   \frac{i}{\hbar}\lbrack H(t), \hat{\rho}\rbrack+\lambda \mathcal{L}
+   \lbrack\hat{\rho}\rbrack,
+   \end{eqnarray}
+
+where :math:`mathcal{L}` is a super-operator acting on the Hilber space.
+
+The subsequent most straightforward set of sensible approximations includes
+assuming that at time zero the system and environment are not entangled, that
+the environment is memoryless, and that there is a dominant scale of times set
+by the interactions, wich allows to cut off high-frequency perturbations.
+
+These so-called, respectively, Born, Markov and Rotating-Wave approximations,
+lead to a so-called Lindblad form of the *dissipation*, i.e. to a special
+structure of the system-environment interaction that can be represented with
+a linear superoperator that always admits the Lindblad form
+
+.. math::
+
+   \begin{eqnarray}
+   \mathcal{L}\lbrack\hat{\rho}\rbrack&=&\mathcal{L}\hat{\rho}
+   =\sum_{i=1}^{N^2-1} \gamma_i \left( A_i\hat{\rho} A_i^\dagger
+   - \frac{1}{2}( A_i^\dagger A_i\hat{\rho}+ \hat{\rho}A_i^\dagger A_i )\right)
+   ,
+   \end{eqnarray}
+where :math:`\gamma_i` are constants that set the strenghts of the dissipation
+mechanisms defined by the jump operators, :math:`A_i`.
+
+The crucial idea behind zero-noise extrapolation is that, while some minimum
+strength of noise is unavoidable in the system, it is still possible to
+*increase* it to a value :math:`\lambda'=c\lambda`, with :math:`c>1`, so that
+it is then possible to extrapolate the zero-noise limit.
+
+This is done in practice by running a quantum circuit (simulation) and
+calculating a given expectation variable, :math:`\langle X\rangle_\lambda`,
+then rerunning the calculation (which is indeed a time evolution) for
+:math:`\langle X\rangle_{\lambda'}`, and then extracting
+:math:`\langle X\rangle_{0}`.
+
+The extraction for :math:`\langle X\rangle_{0}` can occur with several
+statistical fitting models, which can be linear or non-linear. These methods
+are contained in the :mod:`mitiq.zne` module.
+
 
 .. _guide_qem_uf:
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Unitary folding
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Other examples of error mitigation techniques include injecting noisy gates
+and perform a probabilistic error cancellation and inserting identity gates, or
+unitary folding, in the time evolution, as a way to stretch time with respect
+to noise processes. Here are some examples of :ref:`guide-folding`.
 
 
 .. _guide_qem_what_not:
@@ -100,16 +169,16 @@ Quantum error correction is different from quantum error mitigation, as it
 introduces a series of techniques that generally aim at completely *removing*
 the impact of errors on quantum computations. In particular, if errors
 occurs below a certain threshold, the robustness of the quantum computation can
- be preserved, and fault tolerance is reached.
+be preserved, and fault tolerance is reached.
 
 The main issue of quantum error correction techniques are that generally they
 require a large overhead in terms of additional qubits on top of those required
- for the quantum computation. Current quantum computing devices have been able
- to demonstrate quantum error correction only with a very small number of
- qubits.
+for the quantum computation. Current quantum computing devices have been able
+to demonstrate quantum error correction only with a very small number of
+qubits.
 
 What is now referred quantum error mitigation is generally a series of
-techniques that stemmed as more practical quantum error correction.
+techniques that stemmed as more practical quantum error correction solutions.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 About quantum optimal control
@@ -118,7 +187,9 @@ About quantum optimal control
 Optimal control theory is a very versatile set of techniques that can be
 applied for many scopes. It entails many fields, and it is generally based on a
 feedback loop between an agent and a target system.
-Optimal control is applied to several quantum technologies
+Optimal control is applied to several quantum technologies,
+including in the pulse shaping of gate design in quantum circuits calibration
+against noisy devices.
 
 
 .. _guide_qem_why:
@@ -127,13 +198,23 @@ Optimal control is applied to several quantum technologies
 Why is quantum error mitigation important
 -----------------------------------------
 
-^^^^^^^^^^^^
-NISQ devices
-^^^^^^^^^^^^
-* Noise + quantum computing
-* Prospects: increasing the usability of short-depth quantum circuits
-* Connections: bringing together quantum optics tools (modeling noise and open
-quantum systems) and quantum computing community.
+The noisy intermediate scale quantum computing (NISQ) era is charactherized by
+short or medium-depth circuits and noise affecting operations, state
+preparation, and measurement :cite:`Preskill_2018_Quantum`.
+
+Current short-depth quantum circuits are noisy, at at the same time it is not
+possible to implement on them quantum error correcting codes, which are more
+demanding both in terms of necessary qubits and of circuit depths.
+
+Error mitigation offers the prospects of writing more compact quantum circuits
+that can estimate observables with more precision, i.e. increase the
+performance of quantum computers.
+
+By implementing quantum optics tools (such as the modeling noise and open
+quantum systems), standard as well as cutting-edge statistics and inference
+techniques, and tweaking them for the needs of the quantum computing community,
+`mitiq` aims at providing the most comprehensive toolchain for error
+mitigation.
 
 
 .. _guide_qem_references:
@@ -152,21 +233,15 @@ Research articles
 
 A list of research articles and PhD theses is this one:
 
-:cite:`Wallman_2016_PRA` https://doi.org/10.1103/PhysRevA.94.052325
-:cite:`Temme_2017_PRL`
-:cite:`Endo_2018_PRX`
-:cite:`Kandala_2019_Nature`
-
-Suguru Endo, *Hybrid quantum-classical algorithms and error mitigation*, PhD
+- J. Wallman *et al.*, *Phys. Rev. A*, 2016 :cite:`Wallman_2016_PRA`
+- K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
+- S. Endo *et al.*, *Phys. Rev. X*, 2018 :cite:`Endo_2018_PRX`
+- A. Kandala *et al.*, *Nature*, 2019 :cite:`Kandala_2019_Nature`
+- Suguru Endo, *Hybrid quantum-classical algorithms and error mitigation*, PhD
 Thesis, 2019, Oxford University (`Link`_).
 
 .. _Link: https://ora.ox.ac.uk/objects/uuid:6733c0f6-1b19-4d12-a899-18946aa5df85
 
-.. _PyGSTi_article: https://arxiv.org/abs/2002.12476
-
-Ball, H., Biercuk, M. J., Carvalho, A., Chakravorty, R., Chen, J., de Castro, L. A., ... & Love, R. (2020). Software tools for quantum control: Improving quantum computer performance through noise and error suppression. arXiv preprint arXiv:2001.04060.
-
-Pokharel, B., Anand, N., Fortman, B., & Lidar, D. A. (2018). Demonstration of fidelity improvement using dynamical decoupling with superconducting qubits. Physical review letters, 121(22), 220502.
 
 ^^^^^^^^
 Software
@@ -203,6 +278,8 @@ This is just a selection of open-source projects related to quantum error
 mitigation. A more comprehensinve collection of software on quantum computing
 can be found `here`_.
 
+
+.. _QuTiP: http://qutip.org
 
 .. _Qiskit: https://qiskit.org
 
