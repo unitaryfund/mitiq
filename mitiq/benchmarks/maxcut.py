@@ -55,32 +55,22 @@ def make_noisy_backend(noise: float, obs: np.ndarray) \
     return noisy_backend
 
 
-def run_maxcut(graph: List[Tuple[int, int]],
-               x0: np.ndarray,
+def maxcut_executor(graph: List[Tuple[int, int]],
                noise: float=0,
                scale_noise: Callable=None,
                factory: Factory=None
-    ) -> Tuple[float, np.ndarray]:
-    """Solves MAXCUT using QAOA on a cirq wavefunction simulator using a
-       Nelder-Mead optimizer.
+    ) -> Callable:
+    """Makes an executor that evaluates the QAOA ansatz at a given beta
+    and gamma parameters.
 
     Args:
         graph: The MAXCUT graph as a list of edges with integer labelled nodes.
-        x0: The initial parameters for QAOA [betas, gammas].
-            The size of x0 determines the number of p steps.
         noise: The level of depolarizing noise.
         scale_noise: The noise scaling method for ZNE.
         factory: The factory to use for ZNE.
 
     Returns:
-        A tuple of the minimum cost and the values of beta and gamma that
-        obtained that cost.
-
-    Example:
-        >>> graph = [(0, 1), (1, 2), (2, 3), (3, 0)]
-        >>> run_maxcut(graph, x0=[1.0, 1.1, 1.4, 0.7])
-        Runs MAXCUT with 2 steps such that betas = [1.0, 1.1] and
-        gammas = [1.4, 0.7]
+        Function that evalutes the maxcut ansatz on the noisy cirq backend.
     """
     # get the list of unique nodes from the list of edges
     nodes = list({node for edge in graph for node in edge})
@@ -112,7 +102,44 @@ def run_maxcut(graph: List[Tuple[int, int]],
         half = int(len(params)/2)
         betas, gammas = params[:half], params[half:]
         qaoa_prog = init_state_prog + qaoa_ansatz(betas, gammas)
-        return noisy_backend(qaoa_prog)
+        if scale_noise is None and factory is None:
+            return noisy_backend(qaoa_prog)
+        else:
+            return execute_with_zne(qaoa_prog,
+                                    executor=noisy_backend,
+                                    scale_noise=scale_noise,
+                                    fac=factory)
+    return qaoa_cost
+
+
+def run_maxcut(graph: List[Tuple[int, int]],
+               x0: np.ndarray,
+               noise: float=0,
+               scale_noise: Callable=None,
+               factory: Factory=None
+    ) -> Tuple[float, np.ndarray]:
+    """Solves MAXCUT using QAOA on a cirq wavefunction simulator using a
+       Nelder-Mead optimizer.
+
+    Args:
+        graph: The MAXCUT graph as a list of edges with integer labelled nodes.
+        x0: The initial parameters for QAOA [betas, gammas].
+            The size of x0 determines the number of p steps.
+        noise: The level of depolarizing noise.
+        scale_noise: The noise scaling method for ZNE.
+        factory: The factory to use for ZNE.
+
+    Returns:
+        A tuple of the minimum cost and the values of beta and gamma that
+        obtained that cost.
+
+    Example:
+        >>> graph = [(0, 1), (1, 2), (2, 3), (3, 0)]
+        >>> run_maxcut(graph, x0=[1.0, 1.1, 1.4, 0.7])
+        Runs MAXCUT with 2 steps such that betas = [1.0, 1.1] and
+        gammas = [1.4, 0.7]
+    """
+    qaoa_cost = maxcut_executor(graph, noise, scale_noise, factory)
 
     res = minimize(qaoa_cost,
                    x0=x0,
