@@ -2,6 +2,8 @@ import numpy as np
 
 from mitiq.benchmarks.maxcut import run_maxcut
 
+np.random.seed(99)
+
 
 def test_square():
     graph = [(0, 1), (1, 2), (2, 3), (3, 0)]
