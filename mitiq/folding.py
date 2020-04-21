@@ -114,11 +114,12 @@ def converter(fold_method: Callable) -> Callable:
     """Decorator for handling conversions."""
     def new_fold_method(circuit: QPROGRAM, *args, **kwargs) -> QPROGRAM:
         mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
-        if kwargs.get("keep_input_type"):
-            return convert_from_mitiq(
-                fold_method(mitiq_circuit, *args, **kwargs), input_circuit_type
-            )
-        return fold_method(mitiq_circuit, *args, **kwargs)
+        if kwargs.get("keep_input_type") is False:
+            return fold_method(mitiq_circuit, *args, **kwargs)
+        return convert_from_mitiq(
+            fold_method(mitiq_circuit, *args, **kwargs), input_circuit_type
+        )
+
     return new_fold_method
 
 
