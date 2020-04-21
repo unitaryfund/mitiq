@@ -125,7 +125,7 @@ This code (when the print statement is uncommented) should display something lik
 
 We can now fold this circuit as follows.
 
-    # Fold the circuit. Specify keep_input_type=True to return a Qiskit circuit.
+    # Fold the circuit
     >>> folded = fold_gates_from_left(circ, stretch=2.)
     >>> # print("Folded circuit:", folded, sep="\n")
 
