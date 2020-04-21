@@ -154,7 +154,7 @@ with no output and
 
 ```
 
-Instead, the use of `testsetup` allows to include blocks that do not render:
+The use of `testsetup` allows blocks that do not render:
 
 ```
 .. testsetup:: python
