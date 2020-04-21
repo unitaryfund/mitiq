@@ -159,7 +159,16 @@ What quantum error mitigation *is not*
 Quantum error mitigation is connected to quantum error correction and quantum
 optimal control, two fields of study that also aim at reducing the impact of
 errors in quantum information processing in quantum computers. While these are
-fluid boundaries, it can be useful to point out some differences among these.
+fluid boundaries, it can be useful to point out some differences among these
+two well-established fields and the emerging field of quantum error mitigation.
+It is fair to say that even the terminology of "quantum error mitigation" or
+"error mitigation" has only recently coalesced (from ~2015 onward), while even
+in the previous decade similar concepts or techniques were scattered across
+these and other fields. Suggestions for additional references are `welcome`_.
+
+.. _welcome: https://github.com/unitaryfund/mitiq/issues/new
+
+.. _guide_qem_qec:
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 About quantum error correction
@@ -180,6 +189,8 @@ qubits.
 What is now referred quantum error mitigation is generally a series of
 techniques that stemmed as more practical quantum error correction solutions.
 
+.. _guide_qem_qoc:
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 About quantum optimal control
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -190,6 +201,11 @@ feedback loop between an agent and a target system.
 Optimal control is applied to several quantum technologies,
 including in the pulse shaping of gate design in quantum circuits calibration
 against noisy devices.
+
+Examples of specific application of optimal control to quantum dynamics and
+quantum computing is in dynamical decoupling, a technique that employs fast
+control pulses to effectively decouple a system and its environment, with
+techniques partly borrowed from the nuclear magnetic resonance community.
 
 
 .. _guide_qem_why:
@@ -247,31 +263,32 @@ Thesis, 2019, Oxford University (`Link`_).
 Software
 ^^^^^^^^
 
-Here is a (non-comprehensive) list of open-source software libraries:
+Here is a (non-comprehensive) list of open-source software libraries related to
+quantum computing, noisy quantum dynamics and error mitigation:
 
-IBM Q's `Qiskit`_ provides a stack for quantum computing simulation and
+**IBM Q's `Qiskit`_** provides a stack for quantum computing simulation and
 execution on real devices from the cloud. In particular, `qiskit.aer` contains
 noise models, integrated with `mitiq` tools. Qiskit's OpenPulse provides
 pulse-level control of qubit operations in some of the superconducting circuit
 devices.
 
-Goole AI Quantum's `Cirq`_ offers quantum simulation of quantum circuits. It is
+**Goole AI Quantum's `Cirq`_** offers quantum simulation of quantum circuits. It is
 integrated with  `mitiq` algorithms.
 
-Rigetti Computing's `PyQuil`_ is a library for quantum programming. Rigetti's
+**Rigetti Computing's `PyQuil`_** is a library for quantum programming. Rigetti's
 stack offers the execution of quantum circuits on superconducting circuits
 devices from the cloud, as well as their simulation on a quantum virtual
 machine (QVM), integrated with `mitiq` tools.
 
-`QuTiP`_, the quantum toolbox in Python, contains a quantum information processing
+**`QuTiP`_**, the quantum toolbox in Python, contains a quantum information processing
 module that allows to simulate quantum circuits, their implementation on
 devices, as well as the simulation of pulse-level control and time-dependent
 density matrix evolution with the `qutip.qip.noise` module.
 
-`Krotov`_ is a package implementing Krotov method for optimal control,
+**`Krotov`_** is a package implementing Krotov method for optimal control,
 interfacing with QuTiP for noisy density-matrix quantum evolution.
 
-`PyGSTi`_ allows to characterize quantum circuits by implementing techniques
+**`PyGSTi`_** allows to characterize quantum circuits by implementing techniques
 such as gate set tomography (GST) and randomized benchmarking.
 
 This is just a selection of open-source projects related to quantum error
