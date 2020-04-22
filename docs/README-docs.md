@@ -1,18 +1,18 @@
+# Contributors Guide
+This is the Ccntributors guide for the documentation of Mitiq,
+a Python toolkit for implementing error mitigation on quantum computers.
+
 ![Python Build](https://github.com/unitaryfund/mitiq/workflows/Python%20Build/badge.svg?branch=master)
 [![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
 [![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
-
-# Mitiq Documentation Contributors Guide
-This is the Ccntributors guide for the documentation of Mitiq,
-a Python toolkit for implementing error mitigation on quantum computers.
 
 ## Requirements
 The documentation is generated with
 [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html).
 ```bash
-pip install -U sphinx recommonmark
+pip install -U sphinx m2r
 ```
-`recommonmark` allows to include `.md` files, besides `.rst`.
+`m2r` allows to include `.md` files, besides `.rst`, in the documentation.
 
 
 You can check that Sphinx is installed with `sphinx-build --version`.
@@ -61,8 +61,14 @@ Make sure they are included in the table of contents
 ### You can include markdown files in the guide
 
 - Information to the guide can also be added from markdown (`.md`) files, since
- `recommonmark` (`pip install --upgrade recommonmark`) is installed and
-added to the `conf.py` file (`extensions = ['recommonmark']`).
+ `m2r` (`pip install --upgrade m2r`) is installed and
+added to the `conf.py` file (`extensions = ['m2r']`). Just add the `.md` file
+to the toctree.
+
+To include `.md` files outside of the documentation `source` directory, you can
+ add in `source` an `.rst` file to the toctree that contains inside it the
+`.. mdinclude:: ../file.md` command, where `file.md` is the one to be added.
+
 
 ### Automatically add information to the API doc
 
@@ -154,7 +160,7 @@ with no output and
 
 ```
 
-Instead, the use of `testsetup` allows to include blocks that do not render:
+The use of `testsetup` allows blocks that do not render:
 
 ```
 .. testsetup:: python
