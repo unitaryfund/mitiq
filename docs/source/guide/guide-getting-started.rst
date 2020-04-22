@@ -199,7 +199,7 @@ We can then use this backend for our mitigation.
     from mitiq import execute_with_zne
 
     circ = QuantumCircuit(1, 1)
-    for __ in range(80):
+    for __ in range(120):
          _ = circ.x(0)
     _ = circ.measure(0, 0)
 
