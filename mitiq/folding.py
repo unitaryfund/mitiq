@@ -157,13 +157,11 @@ def _fold_gates_in_moment(
         )  # Each fold adds two moments
 
 
-@converter
-def fold_gates(
-    circuit: QPROGRAM,
+def _fold_gates(
+    circuit: Circuit,
     moment_indices: Iterable[int],
     gate_indices: List[Iterable[int]],
-    **kwargs,
-) -> QPROGRAM:
+) -> Circuit:
     """Returns a new circuit with specified gates folded.
 
     Args:
@@ -171,20 +169,16 @@ def fold_gates(
         moment_indices: Indices of moments with gates to be folded.
         gate_indices: Specifies which gates within each moment to fold.
 
-    Keyword Args:
-        return_mitiq: If True, returns a mitiq circuit instead of
-                      the input circuit type, if different. (Default is False.)
-
     Returns:
-        folded: the folded quantum circuit as a QPROGRAM.
+        folded: the folded quantum circuit as a cirq.Circuit.
 
     Examples:
         (1) Folds the first three gates in moment two.
-        >>> fold_gates(circuit, moment_indices=[1], gate_indices=[(0, 1, 2)])
+        >>> _fold_gates(circuit, moment_indices=[1], gate_indices=[(0, 1, 2)])
 
         (2) Folds gates with indices 1, 4, and 5 in moment 0,
             and gates with indices 0, 1, and 2 in moment 1.
-        >>> fold_gates(circuit, moment_indices=[0, 3],
+        >>> _fold_gates(circuit, moment_indices=[0, 3],
         >>>                                gate_indices=[(1, 4, 5), (0, 1, 2)])
     """
     folded = deepcopy(circuit)
