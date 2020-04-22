@@ -217,5 +217,3 @@ We can then use this backend for our mitigation.
 Note that we don't need to even redefine factories for different stacks. Once
 you have a ``Factory`` it can be used with different front and backends.
 
-
-.. [1] `Error mitigation for short-depth quantum circuits <https://arxiv.org/abs/1612.02058>`_
