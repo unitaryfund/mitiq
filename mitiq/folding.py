@@ -134,10 +134,14 @@ def _fold_gate_at_index_in_moment(
         moment_index: Moment in which the gate sits in the circuit.
         gate_index: Index of the gate within the specified moment.
     """
-    op = circuit[moment_index].operations[gate_index]
-    circuit.insert(
-        moment_index, [op, inverse(op)], strategy=InsertStrategy.NEW
-    )
+    moment = circuit[moment_index]
+    # Sometimes empty moments are generated when programs are converted into
+    # cirq from other formats. These should not be folded.
+    if len(moment) > 0:
+        op = moment.operations[gate_index]
+        circuit.insert(
+            moment_index, [op, inverse(op)], strategy=InsertStrategy.NEW
+        )
 
 
 def _fold_gates_in_moment(
