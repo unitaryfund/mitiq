@@ -34,6 +34,7 @@ def noisy_simulation(circ: Circuit, shots=None) -> float:
     expectation = np.real(np.trace(rho @ obs))
     return expectation
 
+
 # This test is somewhat redundant with the random circuit tests but we keep in
 # because this tests the exact code used in the getting started.
 @pytest.mark.parametrize(["depth"], [[n] for n in range(10, 80, 20)])

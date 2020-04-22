@@ -91,7 +91,11 @@ To get the zero-noise limit, we are going to use a ``LinearFactory`` object, run
 
    # Evaluate the zero-noise extrapolation.
    zn_limit = fac.reduce()
+   print(f"{zn_limit:.3}")
 
+.. testoutput::
+
+   0.5
 
 In the previous code block we used the main methods of a typical ``Factory`` object:
 

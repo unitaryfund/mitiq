@@ -60,6 +60,7 @@ Qiskit Utils
 Utils
 ------------
 .. automodule:: mitiq.utils
+   :members:
 
 .. automodule:: mitiq.tests.test_utils
    :members:
@@ -69,8 +70,6 @@ Zero Noise Extrapolation
 .. automodule:: mitiq.zne
    :members:
 
-.. automodule:: mitiq.tests.test_zne
-   :members:
 
 
 

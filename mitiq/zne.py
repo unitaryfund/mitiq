@@ -2,10 +2,6 @@
 
 from typing import Callable
 
-from qiskit import QuantumCircuit
-from cirq import Circuit
-
-import mitiq.mitiq_qiskit.qiskit_utils as qs_utils
 from mitiq import QPROGRAM
 from mitiq.factories import Factory, RichardsonFactory
 from mitiq.folding import fold_gates_at_random
@@ -91,10 +87,6 @@ def execute_with_zne(
     """
     if scale_noise is None:
         scale_noise = fold_gates_at_random
-        if isinstance(qp, QuantumCircuit):
-            scale_noise = qs_utils.scale_noise
-        elif isinstance(qp, Circuit):
-            scale_noise = fold_gates_at_random
     if fac is None:
         fac = RichardsonFactory([1.0, 2.0, 3.0])
     qrun_factory(fac, qp, executor, scale_noise)
