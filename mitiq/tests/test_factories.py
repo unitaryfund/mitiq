@@ -15,7 +15,7 @@ from mitiq.factories import (
 from mitiq.zne import run_factory
 
 # Set the seed for testing
-np.random.seed(808)
+RNG = np.random.RandomState(808)
 
 # Constant parameters for test functions:
 A = 0.5
@@ -32,32 +32,32 @@ NOT_CLOSE_TOL = 1.0e-1
 # Classical test functions with statistical error:
 def f_lin(x: float, err: float = STAT_NOISE) -> float:
     """Linear function."""
-    return A + B * x + np.random.normal(scale=err)
+    return A + B * x + RNG.normal(scale=err)
 
 
 def f_non_lin(x: float, err: float = STAT_NOISE) -> float:
     """Non-linear function."""
-    return A + B * x + C * x ** 2 + np.random.normal(scale=err)
+    return A + B * x + C * x ** 2 + RNG.normal(scale=err)
 
 
 def f_exp_down(x: float, err: float = STAT_NOISE) -> float:
     """Exponential decay."""
-    return A + B * np.exp(-C * x) + np.random.normal(scale=err)
+    return A + B * np.exp(-C * x) + RNG.normal(scale=err)
 
 
 def f_exp_up(x: float, err: float = STAT_NOISE) -> float:
     """Exponential growth."""
-    return A - B * np.exp(-C * x) + np.random.normal(scale=err)
+    return A - B * np.exp(-C * x) + RNG.normal(scale=err)
 
 
 def f_poly_exp_down(x: float, err: float = STAT_NOISE) -> float:
     """Poly-exponential decay."""
-    return A + B * np.exp(-C * x - D * x ** 2) + np.random.normal(scale=err)
+    return A + B * np.exp(-C * x - D * x ** 2) + RNG.normal(scale=err)
 
 
 def f_poly_exp_up(x: float, err: float = STAT_NOISE) -> float:
     """Poly-exponential growth."""
-    return A - B * np.exp(-C * x - D * x ** 2) + np.random.normal(scale=err)
+    return A - B * np.exp(-C * x - D * x ** 2) + RNG.normal(scale=err)
 
 
 @mark.parametrize("test_f", [f_lin, f_non_lin])
