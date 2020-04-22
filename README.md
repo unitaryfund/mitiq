@@ -70,7 +70,7 @@ from a local branch, explaining the bug fix or new feature.
 You can use `mitiq.about()` to document your dependencies and work environment.
 
 To contribute to the documentation, read the
-[instructions](docs/README-docs.md) in the `mitiq/docs` folder.
+[instructions](docs/source/README-docs.md) in the `mitiq/docs` folder.
 
 
 ## Authors
