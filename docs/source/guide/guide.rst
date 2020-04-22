@@ -13,3 +13,4 @@ Users Guide
    guide-getting-started.rst
    guide-folding.rst
    guide-factories.rst
+   guide-ibmq-backends.rst
