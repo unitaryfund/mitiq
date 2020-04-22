@@ -49,17 +49,20 @@ def make_noisy_backend(noise: float, obs: np.ndarray) \
     Returns:
         A mitiq backend function.
     """
+
     # shots is none to set the required type correctly.
-    def noisy_backend(circ:Circuit, shots=None):
+    def noisy_backend(circ: Circuit, shots=None):
         return noisy_simulation(circ, noise, obs)
+
     return noisy_backend
 
 
 def maxcut_executor(graph: List[Tuple[int, int]],
-               noise: float=0,
-               scale_noise: Callable=None,
-               factory: Factory=None
-    ) -> Tuple[Callable, Circuit, np.ndarray]:
+                    noise: float = 0,
+                    scale_noise: Callable = None,
+                    factory: Factory = None
+                    ) -> Tuple[Callable[[np.ndarray], float],
+                               Callable[[np.ndarray], Circuit], np.ndarray]:
     """Makes an executor that evaluates the QAOA ansatz at a given beta
     and gamma parameters.
 
@@ -70,7 +73,11 @@ def maxcut_executor(graph: List[Tuple[int, int]],
         factory: The factory to use for ZNE.
 
     Returns:
-        Function that evalutes the maxcut ansatz on the noisy cirq backend.
+        (ansatz_eval, ansatz_maker, cost_obs) as a triple. Here
+            ansatz_eval: function that evalutes the maxcut ansatz on
+                the noisy cirq backend.
+            ansatz_maker: function that returns an ansatz circuit.
+            cost_obs: the cost observable as a dense matrix.
     """
     # get the list of unique nodes from the list of edges
     nodes = list({node for edge in graph for node in edge})
@@ -87,10 +94,10 @@ def maxcut_executor(graph: List[Tuple[int, int]],
     init_state_prog = Circuit(H.on_each(qreg))
 
     def qaoa_ansatz(params):
-        half = int(len(params)/2)
+        half = int(len(params) / 2)
         betas, gammas = params[:half], params[half:]
         qaoa_steps = sum([cost_step(beta) + mix_step(gamma)
-                    for beta, gamma in zip(betas, gammas)], Circuit())
+                          for beta, gamma in zip(betas, gammas)], Circuit())
         return init_state_prog + qaoa_steps
 
     # use pyQuil paulis as shorthand to make the dense cost operator
@@ -108,15 +115,16 @@ def maxcut_executor(graph: List[Tuple[int, int]],
                                     executor=noisy_backend,
                                     scale_noise=scale_noise,
                                     fac=factory)
+
     return qaoa_cost, qaoa_ansatz, cost_mat
 
 
 def run_maxcut(graph: List[Tuple[int, int]],
                x0: np.ndarray,
-               noise: float=0,
-               scale_noise: Callable=None,
-               factory: Factory=None
-    ) -> Tuple[float, np.ndarray, List]:
+               noise: float = 0,
+               scale_noise: Callable = None,
+               factory: Factory = None
+               ) -> Tuple[float, np.ndarray, List]:
     """Solves MAXCUT using QAOA on a cirq wavefunction simulator using a
        Nelder-Mead optimizer.
 
@@ -129,8 +137,8 @@ def run_maxcut(graph: List[Tuple[int, int]],
         factory: The factory to use for ZNE.
 
     Returns:
-        A tuple of the minimum cost and the values of beta and gamma that
-        obtained that cost.
+        A triple of the minimum cost, the values of beta and gamma that
+        obtained that cost, and a list of costs at each iteration step.
 
     Example:
         >>> graph = [(0, 1), (1, 2), (2, 3), (3, 0)]
