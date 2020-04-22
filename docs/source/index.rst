@@ -10,11 +10,11 @@ Welcome to mitiq's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   changelog.rst
+   read_README.rst
    guide/guide.rst
    apidoc.rst
-   toc-README-docs.md
-
+   read_README-docs.rst
+   changelog.rst
 
 Indices and tables
 ==================
