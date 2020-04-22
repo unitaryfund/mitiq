@@ -1,7 +1,6 @@
 name: Python Build
 
-on: [pull_request]
-  types: [review_requested]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -9,7 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6, 3.7, 3.8]
 
     steps:
