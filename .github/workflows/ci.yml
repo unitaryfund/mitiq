@@ -1,7 +1,8 @@
 name: Python Build
 
-on: [pull_request]:
-  types: [review_requested]
+on:
+  pull_request:
+    types: [review_requested]
 
 jobs:
   build:
