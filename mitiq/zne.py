@@ -86,9 +86,7 @@ def execute_with_zne(
                      If not specified, a default method will be used.
     """
     if scale_noise is None:
-        def keep_input_type_fold(*args, **kwargs):
-            return fold_gates_at_random(keep_input_type=True, *args,  **kwargs)
-        scale_noise = keep_input_type_fold
+        scale_noise = fold_gates_at_random
     if fac is None:
         fac = RichardsonFactory([1.0, 2.0, 3.0])
     qrun_factory(fac, qp, executor, scale_noise)
