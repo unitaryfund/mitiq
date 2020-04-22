@@ -6,8 +6,7 @@ a standard QAOA for MAXCUT.
 from typing import List, Tuple, Callable
 import numpy as np
 
-from cirq import Circuit, NamedQubit, X, ZZ, H, \
-    DensityMatrixSimulator, depolarize
+from cirq import Circuit, NamedQubit, X, ZZ, H, DensityMatrixSimulator
 
 from pyquil.paulis import sZ, sI
 from pyquil.simulation.tools import lifted_pauli
@@ -16,26 +15,9 @@ from scipy.optimize import minimize
 
 from mitiq import execute_with_zne
 from mitiq.factories import Factory
+from mitiq.benchmarks.utils import noisy_simulation
 
 SIMULATOR = DensityMatrixSimulator()
-
-
-def noisy_simulation(circ: Circuit, noise: float, obs: np.ndarray) -> float:
-    """ Simulates a circuit with depolarizing noise at level NOISE.
-
-    Args:
-        circ: The quantum program as a cirq object.
-        noise: The level of depolarizing noise.
-        obs: The observable that the backend should measure.
-
-    Returns:
-        The observable's expectation value.
-    """
-    circuit = circ.with_noise(depolarize(p=noise))
-    rho = SIMULATOR.simulate(circuit).final_density_matrix
-    # define the computational basis observable
-    expectation = np.real(np.trace(rho @ obs))
-    return expectation
 
 
 def make_noisy_backend(noise: float, obs: np.ndarray) \
