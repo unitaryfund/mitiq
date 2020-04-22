@@ -22,16 +22,16 @@ The main tasks of a factory are:
 
 2. Determine the noise scale factor at which the next computation should be run;
 
-3. Given the history of noise scale factors (``self.instack``) and results (``self.outstack``), 
+3. Given the history of noise scale factors (``self.instack``) and results (``self.outstack``),
    evaluate the associated zero-noise extrapolation.
 
 The structure of the ``Factory`` class is adaptive by construction, since the choice of the next noise
 level can depend on the history of ``self.instack`` and ``self.outstack``.
 
-The abstract class of a non-adaptive extrapolation method is ``BatchedFactory``. 
+The abstract class of a non-adaptive extrapolation method is ``BatchedFactory``.
 The main feature of ``BatchedFactory`` is that all the noise scale factors are determined
 *a priori* by the initialization argument ``scale_factors``.
-All non-adaptive methods are derived from ``BatchedFactory``.  
+All non-adaptive methods are derived from ``BatchedFactory``.
 
 
 =============================================
@@ -40,8 +40,8 @@ Example: basic usage of a factory
 
 To make an example, let us assume that the result of our quantum computation is an expectation
 value which has a linear dependance on the noise.
-Since our aim is to understand the usage of a factory, instead of actually running quantum experiments, 
-we simply simulate an effective classical model which returns the expectation value as a function of the 
+Since our aim is to understand the usage of a factory, instead of actually running quantum experiments,
+we simply simulate an effective classical model which returns the expectation value as a function of the
 noise scale factor.
 
 .. testcode::
@@ -88,7 +88,7 @@ To get the zero-noise limit, we are going to use a ``LinearFactory`` object, run
       expval = noise_to_expval(next_scale_factor)
       # Save the noise scale factor and the result into the factory
       fac.push(next_scale_factor, expval)
-   
+
    # Evaluate the zero-noise extrapolation.
    zn_limit = fac.reduce()
 
@@ -100,7 +100,7 @@ In the previous code block we used the main methods of a typical ``Factory`` obj
    - **self.is_converged** to know if enough data has been pushed;
    - **self.reduce** to get the zero-noise extrapolation.
 
-Since our idealized model ``noise_to_expval`` is linear and noiseless, 
+Since our idealized model ``noise_to_expval`` is linear and noiseless,
 the extrapolation will exactly match the true zero-noise limit ``0.5``:
 
 .. testcode::
@@ -184,7 +184,7 @@ final zero-noise extrapolation, respectively.
 Example: a simple custom factory
 =============================================
 
-Assume that, from physical considerations, we know that the ideal expectation value 
+Assume that, from physical considerations, we know that the ideal expectation value
 (measured by some quantum circuit) must always be within two limits: ``min_expval`` and ``max_expval``.
 For example, this is a typical situation whenever the measured observable has a bounded
 spectrum.
@@ -208,7 +208,7 @@ and clips the result if it falls outside its physical domain.
       def __init__(
             self,
             scale_factors: Iterable[float],
-            min_expval: float, 
+            min_expval: float,
             max_expval: float,
          ) -> None:
          """
