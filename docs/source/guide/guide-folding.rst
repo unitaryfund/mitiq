@@ -125,8 +125,8 @@ This code (when the print statement is uncommented) should display something lik
 
 We can now fold this circuit as follows.
 
-    # Fold the circuit. Specify keep_input_type=True to return a Qiskit circuit.
-    >>> folded = fold_gates_from_left(circ, stretch=2., keep_input_type=True)
+    # Fold the circuit
+    >>> folded = fold_gates_from_left(circ, stretch=2.)
     >>> # print("Folded circuit:", folded, sep="\n")
 
 This code (when the print statement is uncommented) should display something like:
@@ -140,8 +140,8 @@ This code (when the print statement is uncommented) should display something lik
     q_1: |0>──────────────────────────────────────────────┤ X ├
                                                           └───┘
 
-Notice that we specify ``keep_input_type=True`` to return a circuit of the same type as the input. If this
-is not specified, the internal ``mitiq`` representation of a circuit (using Cirq by default) will be returned.
+By default, the folded circuit has the same type as the input circuit. To return an internal ``mitiq`` representation
+of the folded circuit (a Cirq circuit), one can use the keyword argument ``return_mitiq=True``.
 
 
 .. note::
