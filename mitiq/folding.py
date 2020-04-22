@@ -208,33 +208,6 @@ def _fold_moments(circuit: Circuit, moment_indices: List[int]) -> None:
         shift += 2
 
 
-@converter
-def fold_moments(circuit: QPROGRAM,
-                 moment_indices: List[int],
-                 **kwargs
-                 ) -> QPROGRAM:
-    """Returns a new circuit with moments folded by mapping
-
-    M_i -> M_i M_i^dag M_i
-
-    where M_i is a moment specified by an integer in moment_indices.
-
-    Args:
-        circuit: Circuit to apply folding operation to.
-        moment_indices: List of integers that specify moments to fold.
-
-    Keyword Args:
-        return_mitiq: If True, returns a mitiq circuit instead of
-                      the input circuit type, if different. (Default is False.)
-
-    Returns:
-        folded: the folded quantum circuit as a QPROGRAM.
-    """
-    folded = deepcopy(circuit)
-    _fold_moments(folded, moment_indices)
-    return folded
-
-
 def _fold_all_gates_locally(circuit: Circuit) -> None:
     """Replaces every gate G with G G^dag G by modifying the circuit in place.
     """
