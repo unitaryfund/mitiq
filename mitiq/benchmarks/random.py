@@ -14,10 +14,6 @@ from mitiq.factories import Factory
 SIMULATOR = DensityMatrixSimulator()
 
 
-# Set the seed for testing
-np.random.seed(808)
-
-
 def sample_observable(n_qubits: int) -> np.ndarray:
     """Constructs a random computational basis observable on n_qubits
 

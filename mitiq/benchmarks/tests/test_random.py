@@ -21,6 +21,10 @@ FACTORIES = [
 ]
 
 
+# Set the seed for testing
+np.random.seed(808)
+
+
 @pytest.mark.parametrize(["scale_noise", "fac"],
                          product(SCALE_FUNCTIONS, FACTORIES))
 def test_random_benchmarks(scale_noise, fac):
