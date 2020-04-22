@@ -114,7 +114,7 @@ def converter(fold_method: Callable) -> Callable:
     """Decorator for handling conversions."""
     def new_fold_method(circuit: QPROGRAM, *args, **kwargs) -> QPROGRAM:
         mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
-        if kwargs.get("return_as_mitiq_circuit") is True:
+        if kwargs.get("return_mitiq") is True:
             return fold_method(mitiq_circuit, *args, **kwargs)
         return convert_from_mitiq(
             fold_method(mitiq_circuit, *args, **kwargs), input_circuit_type
@@ -172,12 +172,11 @@ def fold_gates(
         gate_indices: Specifies which gates within each moment to fold.
 
     Keyword Args:
-        return_as_mitiq_circuit: If True, returns a mitiq circuit instead of
-                                 the input circuit type, if different.
-                                 (Default value is False.)
+        return_mitiq: If True, returns a mitiq circuit instead of
+                      the input circuit type, if different. (Default is False.)
 
     Returns:
-        folded: the folded quantum circuit as a :class:`cirq.Circuit` object.
+        folded: the folded quantum circuit as a QPROGRAM.
 
     Examples:
         (1) Folds the first three gates in moment two.
@@ -206,7 +205,6 @@ def _fold_moments(circuit: Circuit, moment_indices: List[int]) -> None:
     Args:
         circuit: Circuit to fold.
         moment_indices: Indices of moments to fold in the circuit.
-
     """
     shift = 0
     for i in moment_indices:
@@ -232,12 +230,11 @@ def fold_moments(circuit: QPROGRAM,
         moment_indices: List of integers that specify moments to fold.
 
     Keyword Args:
-        return_as_mitiq_circuit: If True, returns a mitiq circuit instead of
-                                 the input circuit type, if different.
-                                 (Default value is False.)
+        return_mitiq: If True, returns a mitiq circuit instead of
+                      the input circuit type, if different. (Default is False.)
 
     Returns:
-        folded: the folded quantum circuit as a :class:`cirq.Circuit` object.
+        folded: the folded quantum circuit as a QPROGRAM.
     """
     folded = deepcopy(circuit)
     _fold_moments(folded, moment_indices)
@@ -277,12 +274,11 @@ def fold_gates_from_left(
         stretch: Factor to stretch the circuit by. Any real number in [1, 3].
 
     Keyword Args:
-        return_as_mitiq_circuit: If True, returns a mitiq circuit instead of
-                                 the input circuit type, if different.
-                                 (Default value is False.)
+        return_mitiq: If True, returns a mitiq circuit instead of
+                      the input circuit type, if different. (Default is False.)
 
     Returns:
-        folded: the folded quantum circuit as a :class:`cirq.Circuit` object.
+        folded: the folded quantum circuit as a QPROGRAM.
 
     Note:
         Folding a single gate adds two gates to the circuit,
@@ -339,12 +335,11 @@ def fold_gates_from_right(
         stretch: Factor to stretch the circuit by. Any real number in [1, 3].
 
     Keyword Args:
-        return_as_mitiq_circuit: If True, returns a mitiq circuit instead of
-                                 the input circuit type, if different.
-                                 (Default value is False.)
+        return_mitiq: If True, returns a mitiq circuit instead of
+                      the input circuit type, if different. (Default is False.)
 
     Returns:
-        folded: the folded quantum circuit as a :class:`cirq.Circuit` object.
+        folded: the folded quantum circuit as a QPROGRAM.
 
     Note:
         Folding a single gate adds two gates to the circuit,
@@ -421,12 +416,11 @@ def fold_gates_at_random(
         seed: [Optional] Integer seed for random number generator.
 
     Keyword Args:
-        return_as_mitiq_circuit: If True, returns a mitiq circuit instead of
-                                 the input circuit type, if different.
-                                 (Default value is False.)
+        return_mitiq: If True, returns a mitiq circuit instead of
+                      the input circuit type, if different. (Default is False.)
 
     Returns:
-        folded: The folded quantum circuit as a :class:`cirq.Circuit` object.
+        folded: the folded quantum circuit as a QPROGRAM.
 
     Note:
         Folding a single gate adds two gates to the circuit, hence the maximum
@@ -519,12 +513,11 @@ def fold_local(
                           fold_method(circuit, stretch, *fold_method_args).
 
     Keyword Args:
-        return_as_mitiq_circuit: If True, returns a mitiq circuit instead of
-                                 the input circuit type, if different.
-                                 (Default value is False.)
+        return_mitiq: If True, returns a mitiq circuit instead of
+                      the input circuit type, if different. (Default is False.)
 
     Returns:
-        folded: The folded quantum circuit as a :class:`cirq.Circuit` object.
+        folded: the folded quantum circuit as a QPROGRAM.
 
     Example:
         >>> fold_method = fold_gates_at_random
@@ -573,12 +566,11 @@ def fold_global(circuit: QPROGRAM, stretch: float, **kwargs) -> QPROGRAM:
         stretch: Factor to stretch the circuit by.
 
     Keyword Args:
-        return_as_mitiq_circuit: If True, returns a mitiq circuit instead of
-                                 the input circuit type, if different.
-                                 (Default value is False.)
+        return_mitiq: If True, returns a mitiq circuit instead of
+                      the input circuit type, if different. (Default is False.)
 
     Returns:
-        folded: The folded quantum circuit as a :class:`cirq.Circuit` object.
+        folded: the folded quantum circuit as a QPROGRAM.
     """
     if not (stretch >= 1):
         raise ValueError("The stretch factor must be a real number >= 1.")

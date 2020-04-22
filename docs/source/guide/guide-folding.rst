@@ -140,8 +140,8 @@ This code (when the print statement is uncommented) should display something lik
     q_1: |0>──────────────────────────────────────────────┤ X ├
                                                           └───┘
 
-By default, the folded circuit has the same type as the input circuit. To return a ``mitiq`` circuit, one can use the
-keyword argument ``return_as_mitiq_circuit=True``.
+By default, the folded circuit has the same type as the input circuit. To return an internal ``mitiq`` representation
+of the folded circuit (a Cirq circuit), one can use the keyword argument ``return_mitiq=True``.
 
 
 .. note::

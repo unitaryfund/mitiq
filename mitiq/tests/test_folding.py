@@ -1092,7 +1092,7 @@ def test_fold_gates_with_qiskit_circuit():
         qiskit_circuit,
         moment_indices=[0, 1],
         gate_indices=[(0, 1, 2), (1,)],
-        return_as_mitiq_circuit=True
+        return_mitiq=True
     )
 
     # TODO: There's a very easy bug that could happen here if
@@ -1138,7 +1138,7 @@ def test_fold_gates_with_qiskit_circuit_keep_input_type():
         qiskit_circuit,
         moment_indices=[0, 1],
         gate_indices=[(0, 1, 2), (1,)],
-        return_as_mitiq_circuit=False
+        return_mitiq=False
     )
     # TODO: There's a very easy bug that could happen here if
     #  moments are not retained in the conversion from a qiskit.QuantumCircuit
@@ -1171,7 +1171,7 @@ def test_fold_moments_with_qiskit_circuit():
     qiskit_circuit.ccx(*qiskit_qreg)
 
     folded_circuit = fold_moments(
-        qiskit_circuit, moment_indices=[0], return_as_mitiq_circuit=True
+        qiskit_circuit, moment_indices=[0], return_mitiq=True
     )
     # TODO: There's a very easy bug that could happen here if
     #  moments are not retained in the conversion from a qiskit.QuantumCircuit
@@ -1212,7 +1212,7 @@ def test_fold_moments_with_qiskit_circuit_keep_input_type():
     qiskit_circuit.ccx(*qiskit_qreg)
 
     folded_circuit = fold_moments(
-        qiskit_circuit, moment_indices=[0], return_as_mitiq_circuit=False
+        qiskit_circuit, moment_indices=[0], return_mitiq=False
     )
     assert isinstance(folded_circuit, QuantumCircuit)
     # TODO: There's a very easy bug that could happen here if
@@ -1250,7 +1250,7 @@ def test_fold_from_left_with_qiskit_circuits():
     qiskit_circuit.measure(qiskit_qreg, qiskit_creg)
 
     folded_circuit = fold_gates_from_left(
-        qiskit_circuit, stretch=1.0, return_as_mitiq_circuit=True
+        qiskit_circuit, stretch=1.0, return_mitiq=True
     )
 
     qreg = LineQubit.range(3)
@@ -1277,7 +1277,7 @@ def test_fold_from_left_with_qiskit_circuits():
 
     # Keep the input type
     qiskit_folded_circuit = fold_gates_from_left(
-        qiskit_circuit, stretch=1.0, return_as_mitiq_circuit=False
+        qiskit_circuit, stretch=1.0, return_mitiq=False
     )
     assert isinstance(qiskit_folded_circuit, QuantumCircuit)
 
@@ -1302,7 +1302,7 @@ def test_fold_from_right_with_qiskit_circuits():
     qiskit_circuit.measure(qiskit_qreg, qiskit_creg)
 
     folded_circuit = fold_gates_from_right(
-        qiskit_circuit, stretch=1.0, return_as_mitiq_circuit=True
+        qiskit_circuit, stretch=1.0, return_mitiq=True
     )
 
     qreg = LineQubit.range(3)
@@ -1352,7 +1352,7 @@ def test_fold_at_random_with_qiskit_circuits():
     qiskit_circuit.measure(qiskit_qreg, qiskit_creg)
 
     folded_circuit = fold_gates_at_random(
-        qiskit_circuit, stretch=1.0, return_as_mitiq_circuit=True
+        qiskit_circuit, stretch=1.0, return_mitiq=True
     )
 
     qreg = LineQubit.range(3)
@@ -1406,7 +1406,7 @@ def test_fold_local_with_qiskit_circuits():
         qiskit_circuit,
         stretch=1.4,
         fold_method=fold_gates_from_left,
-        return_as_mitiq_circuit=True
+        return_mitiq=True
     )
     assert isinstance(folded_circuit, Circuit)
 
@@ -1415,7 +1415,7 @@ def test_fold_local_with_qiskit_circuits():
         qiskit_circuit,
         stretch=2.0,
         fold_method=fold_gates_from_left,
-        return_as_mitiq_circuit=False
+        return_mitiq=False
     )
     assert isinstance(folded_qiskit_circuit, QuantumCircuit)
 
@@ -1444,7 +1444,7 @@ def test_fold_global_with_qiskit_circuits():
         qiskit_circuit,
         stretch=2.71828,
         fold_method=fold_gates_from_left,
-        return_as_mitiq_circuit=True
+        return_mitiq=True
     )
     assert isinstance(folded_circuit, Circuit)
 
