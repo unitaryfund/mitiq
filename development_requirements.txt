@@ -13,5 +13,4 @@ notebook~=6.0.3
 # to build and test the documentation
 sphinx~=3.0.2
 sphinxcontrib-bibtex~=1.0.0
-pytest-sphinx~=0.2.2
 m2r~=0.2.1
