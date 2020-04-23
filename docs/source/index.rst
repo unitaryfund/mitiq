@@ -12,7 +12,7 @@ Welcome to mitiq's documentation!
    apidoc.rst
    read_README-docs.rst
    changelog.rst
-   bibliography.rst
+   99_bibliography.rst
 
 Indices and tables
 ==================
