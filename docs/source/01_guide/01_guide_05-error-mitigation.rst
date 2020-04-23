@@ -51,6 +51,9 @@ corrected by quantum mitigation is due to the hardware.
 Quantum error mitigation techniques try to *reduce* the impact of noise in
 quantum computations. They generally do not completely remove it.
 
+Alternative nomenclature refers to error mitigation as (approximate) error
+suppression or approximate quantum error correction.
+
 Among the ideas that have been developed so far for quantum error mitigation,
 the most recognizable one is zero-noise extrapolation.
 
@@ -95,7 +98,7 @@ associated to the state, :math:`\hat{\rho}=|\psi\rangle\langle \psi|`, as
 .. math::
 
    \begin{eqnarray}
-   \frac{\partial d}{ \partial t}\hat{\rho}&=&
+   \frac{\partial }{ \partial t}\hat{\rho}&=&
    \frac{i}{\hbar}\lbrack H(t), \hat{\rho}\rbrack+\lambda \mathcal{L}
    \lbrack\hat{\rho}\rbrack,
    \end{eqnarray}
@@ -137,6 +140,12 @@ then rerunning the calculation (which is indeed a time evolution) for
 The extraction for :math:`\langle X\rangle_{0}` can occur with several
 statistical fitting models, which can be linear or non-linear. These methods
 are contained in the :mod:`mitiq.zne` module.
+
+In experiments, zero-noise extrapolation can be performed with pulse
+stretching as a means to introduce a difference between the effective time
+that a gate is affected by decoherence during its execution on hardware
+in terms of time-resolved pulses.
+
 
 
 .. _guide_qem_uf:
