@@ -106,9 +106,10 @@ error-mitigated version.
     0.99948
 
 The default implementation uses Richardson extrapolation to extrapolate the
-expectation value to the zero noise limit [1]. ``Mitiq`` comes equipped with other
-extrapolation methods as well. Different methods of extrapolation are packaged
-into ``Factory`` objects. It is easy to try different ones.
+expectation value to the zero noise limit :cite:`Temme_2017_PRL`. ``Mitiq``
+comes equipped with other extrapolation methods as well. Different methods of
+extrapolation are packaged into ``Factory`` objects. It is easy to try
+different ones.
 
 .. testcode::
 
@@ -123,13 +124,13 @@ into ``Factory`` objects. It is easy to try different ones.
 
     Mitigated error with the linear method is 0.00638
 
-You can read more about the ``Factory`` objects that are built into ``mitiq`` and
-how to create your own `here <guide-factories.html>`_.
+You can read more about the ``Factory`` objects that are built into ``mitiq``
+and how to create your own :ref:`here <guide-factories>`.
 
 Another key step in zero-noise extrapolation is to choose how your circuit is
 transformed to scale the noise. You can read more about the noise scaling
 methods built into ``mitiq`` and how to create your
-own `here <guide-folding.html>`_.
+own :ref:`here <guide-folding>`.
 
 .. _qiskit_getting_started:
 
@@ -216,5 +217,3 @@ We can then use this backend for our mitigation.
 Note that we don't need to even redefine factories for different stacks. Once
 you have a ``Factory`` it can be used with different front and backends.
 
-
-.. [1] `Error mitigation for short-depth quantum circuits <https://arxiv.org/abs/1612.02058>`_
