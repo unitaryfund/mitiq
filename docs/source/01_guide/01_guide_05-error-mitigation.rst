@@ -264,30 +264,27 @@ A list of research articles academic resources on error mitigation:
    - Theory, Y. Li and S. Benjamin, *Phys. Rev. X*, 2017 :cite:`Li_2017_PRX`
    - Theory, K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
    - Experiment on superconducting circuit chip, A. Kandala *et al.*, *Nature*, 2019 :cite:`Kandala_2019_Nature`
-   - Experiment on ion chip, :cite:`Kandala_2019_Nature`
 
 - On randomization methods:
    - Randomized compiling with twirling gates, J. Wallman *et al.*, *Phys. Rev. A*, 2016 :cite:`Wallman_2016_PRA`
    - Porbabilistic error correction, K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
-   - S. Endo *et al.*, *Phys. Rev. X*, 2018 :cite:`Endo_2018_PRX`
+   - Practical proposal, S. Endo *et al.*, *Phys. Rev. X*, 2018 :cite:`Endo_2018_PRX`
+   - Experiment on trapped ions, S. Zhang  *et al.*, *Nature Comm.* 2020 :cite:`Zhang_2020_NatComm`
+   - Experiment with gate set tomography on a supeconducting circuit device, J. Sun *et al.*, 2019 arXiv :cite:`Sun_2020_arXiv`
 
 - On subspace expansion:
    - By hybrid quantum-classical hierarchy introduction, McClean *et al.*, *Phys. Rev. A*, 2017 :cite:`McClean_2017_PRA`
    - By symmetry verification, Bonet *et al.*, *Phys. Rev. A*, 2018 :cite:`Bonet_2018_PRA`
-   - With a stabilizer-like method, McArdle *et al.*, *Phys. Rev. Lett.*, 2019,
-   :cite:`McArdle_2019_PRL`
+   - With a stabilizer-like method, McArdle *et al.*, *Phys. Rev. Lett.*, 2019, :cite:`McArdle_2019_PRL`
    - Exploiting molecular symmetries, J. McClean *et al.*, *Nat. Comm.*, 2020 :cite:`McClean_2020_NatComm`
-   - Experiment on a superconducting circuit device, R. Sagastizabal *et al.*,
-   *Phys. Rev. A*, 2019 :cite:`Sagastizabal_2019_PRA`
+   - Experiment on a superconducting circuit device, R. Sagastizabal *et al.*, *Phys. Rev. A*, 2019 :cite:`Sagastizabal_2019_PRA`
 
 - On other techniques such as:
-   - Approximate error-correcting codes in the generalized amplitude-damping
-   channels, Cafaro *et al.*, *Phys. Rev. A*, 2014 :cite:`Cafaro_2014_PRA`:
+   - Approximate error-correcting codes in the generalized amplitude-damping channels, Cafaro *et al.*, *Phys. Rev. A*, 2014 :cite:`Cafaro_2014_PRA`:
    - Extending the variational quantum eigensolver (VQE) to excited states,
-   Parrish *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Parrish_2019_PRL`
+   R. M. Parrish *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Parrish_2019_PRL`
    - Quantum imaginary time evolution, Motta *et al.*, *Nat. Phys.*, 2020 :cite:`Motta_2020_NatPhys`
-   - Error mitigation for analog quantum simulation, J. Sun *et al.*, 2020, arXiv
-   :cite:`Sun_2020_arXiv`
+   - Error mitigation for analog quantum simulation, J. Sun *et al.*, 2020, arXiv :cite:`Sun_2020_arXiv`
 
 - For an extensive introduction: S. Endo, *Hybrid quantum-classical algorithms and error mitigation*, PhD Thesis, 2019, Oxford University (`Link`_).
 
