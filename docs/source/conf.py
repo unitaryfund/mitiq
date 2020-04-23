@@ -39,7 +39,7 @@ extensions = ['sphinx.ext.mathjax',
               'IPython.sphinxext.ipython_console_highlighting',
               'IPython.sphinxext.ipython_directive',
               'matplotlib.sphinxext.plot_directive',
-              'recommonmark',
+              'm2r',
               'sphinx.ext.autodoc',
               'sphinx.ext.todo',
               'sphinx.ext.doctest',
@@ -50,6 +50,10 @@ extensions = ['sphinx.ext.mathjax',
               'sphinx.ext.napoleon',
               'sphinxcontrib.bibtex',
 ]
+
+# source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
+
 doctest_global_setup = '''
 try:
   from mitiq import *

@@ -19,8 +19,8 @@ from mitiq.folding import (
     convert_from_mitiq,
     _fold_gate_at_index_in_moment,
     _fold_gates_in_moment,
-    fold_gates,
-    fold_moments,
+    _fold_gates,
+    _fold_moments,
     _fold_all_gates_locally,
     fold_gates_from_left,
     fold_gates_from_right,
@@ -312,7 +312,7 @@ def test_fold_gates():
             ops.TOFFOLI.on(*qreg),
         ]
     )
-    folded = fold_gates(
+    folded = _fold_gates(
         circ, moment_indices=[0, 1], gate_indices=[[0, 1, 2], [1]]
     )
     correct = Circuit(
@@ -333,7 +333,7 @@ def test_fold_moments():
     #               │
     # 2: ───H───T───X───
     qreg = LineQubit.range(3)
-    circ = Circuit(
+    base = Circuit(
         [
             ops.H.on_each(*qreg),
             ops.CNOT.on(qreg[0], qreg[1]),
@@ -343,44 +343,37 @@ def test_fold_moments():
     )
 
     # Fold a single moment
-    folded = fold_moments(circ, moment_indices=[0])
-    correct = Circuit([ops.H.on_each(*qreg)] * 2, list(circ.all_operations()))
-    assert _equal(folded, correct)
+    circ = deepcopy(base)
+    _fold_moments(circ, moment_indices=[0])
+    correct = Circuit([ops.H.on_each(*qreg)] * 2, list(base.all_operations()))
+    assert _equal(circ, correct)
 
     # Fold another single moment
-    folded = fold_moments(circ, moment_indices=[2])
-    correct = Circuit(list(circ.all_operations()), [ops.TOFFOLI.on(*qreg)] * 2)
-    assert _equal(folded, correct)
+    circ = deepcopy(base)
+    _fold_moments(circ, moment_indices=[2])
+    correct = Circuit(list(base.all_operations()), [ops.TOFFOLI.on(*qreg)] * 2)
+    assert _equal(circ, correct)
 
     # Fold two moments
-    folded = fold_moments(circ, moment_indices=[0, 2])
+    circ = deepcopy(base)
+    _fold_moments(circ, moment_indices=[0, 2])
     correct = Circuit(
         [ops.H.on_each(*qreg)] * 2,
-        list(circ.all_operations()),
+        list(base.all_operations()),
         [ops.TOFFOLI.on(*qreg)] * 2,
     )
-    assert _equal(folded, correct)
+    assert _equal(circ, correct)
 
     # Fold three moments
-    folded = fold_moments(circ, moment_indices=[0, 1, 2])
+    circ = deepcopy(base)
+    _fold_moments(circ, moment_indices=[0, 1, 2])
     correct = Circuit(
         [ops.H.on_each(*qreg)] * 3,
         [ops.CNOT.on(qreg[0], qreg[1])] * 3,
         [ops.T.on(qreg[2]), ops.T.on(qreg[2]) ** -1, ops.T.on(qreg[2])],
         [ops.TOFFOLI.on(*qreg)] * 3,
     )
-    assert _equal(folded, correct)
-
-    # Make sure the original circuit wasn't modified
-    old = Circuit(
-        [
-            ops.H.on_each(*qreg),
-            ops.CNOT.on(qreg[0], qreg[1]),
-            ops.T.on(qreg[2]),
-            ops.TOFFOLI.on(*qreg),
-        ]
-    )
-    assert _equal(circ, old)
+    assert _equal(circ, correct)
 
 
 def test_fold_all_gates_locally():
@@ -1071,162 +1064,6 @@ def test_convert_to_from_mitiq_qiskit():
     assert isinstance(original_circuit, QuantumCircuit)
 
 
-def test_fold_gates_with_qiskit_circuit():
-    """Tests running fold_gates on an input Qiskit circuit."""
-    # Test Qiskit circuit:
-    #          ┌───┐
-    # q0_0: |0>┤ H ├──■────■──
-    #          ├───┤┌─┴─┐  │
-    # q0_1: |0>┤ H ├┤ X ├──■──
-    #          ├───┤├───┤┌─┴─┐
-    # q0_2: |0>┤ H ├┤ T ├┤ X ├
-    #          └───┘└───┘└───┘
-    qiskit_qreg = QuantumRegister(3)
-    qiskit_circuit = QuantumCircuit(qiskit_qreg)
-    qiskit_circuit.h(qiskit_qreg)
-    qiskit_circuit.cnot(qiskit_qreg[0], qiskit_qreg[1])
-    qiskit_circuit.t(qiskit_qreg[2])
-    qiskit_circuit.ccx(*qiskit_qreg)
-
-    folded_circuit = fold_gates(
-        qiskit_circuit,
-        moment_indices=[0, 1],
-        gate_indices=[(0, 1, 2), (1,)]
-    )
-
-    # TODO: There's a very easy bug that could happen here if
-    #  moments are not retained in the conversion from a qiskit.QuantumCircuit
-    #  to a cirq.Circuit. Specifying the moment indices and gate indices for
-    #  the qiskit.QuantumCircuit would thus lead to unexpected behavior in
-    #  the folded circuit. One option is to make fold_gates a private function.
-
-    cirq_qreg = LineQubit.range(3)
-    correct_folded_circuit = Circuit(
-        [ops.H.on_each(*cirq_qreg)] * 3,
-        [ops.CNOT.on(cirq_qreg[0], cirq_qreg[1])],
-        [ops.T.on(cirq_qreg[2]),
-         ops.T.on(cirq_qreg[2]) ** -1,
-         ops.T.on(cirq_qreg[2])],
-        [ops.TOFFOLI.on(*cirq_qreg)],
-    )
-    assert _equal(
-        folded_circuit, correct_folded_circuit, require_qubit_equality=False
-    )
-
-
-def test_fold_gates_with_qiskit_circuit_keep_input_type():
-    """Tests running fold_gates on an input Qiskit circuit and keeping the
-    output circuit the same type as the input.
-    """
-    # Test Qiskit circuit:
-    #          ┌───┐
-    # q0_0: |0>┤ H ├──■────■──
-    #          ├───┤┌─┴─┐  │
-    # q0_1: |0>┤ H ├┤ X ├──■──
-    #          ├───┤├───┤┌─┴─┐
-    # q0_2: |0>┤ H ├┤ T ├┤ X ├
-    #          └───┘└───┘└───┘
-    qiskit_qreg = QuantumRegister(3)
-    qiskit_circuit = QuantumCircuit(qiskit_qreg)
-    qiskit_circuit.h(qiskit_qreg)
-    qiskit_circuit.cnot(qiskit_qreg[0], qiskit_qreg[1])
-    qiskit_circuit.t(qiskit_qreg[2])
-    qiskit_circuit.ccx(*qiskit_qreg)
-
-    folded_circuit = fold_gates(
-        qiskit_circuit,
-        moment_indices=[0, 1],
-        gate_indices=[(0, 1, 2), (1,)],
-        keep_input_type=True
-    )
-    # TODO: There's a very easy bug that could happen here if
-    #  moments are not retained in the conversion from a qiskit.QuantumCircuit
-    #  to a cirq.Circuit. Specifying the moment indices and gate indices for
-    #  the qiskit.QuantumCircuit would thus lead to unexpected behavior in
-    #  the folded circuit. One option is to make fold_moments private.
-    #  See https://github.com/unitaryfund/mitiq/issues/100.
-
-    # TODO: Check correctness of the folded circuit.
-    #  This requires moderate work because H^dagger gets translated to
-    #  Y-X-Y rotations in the translation from Cirq to Qiskit
-    assert isinstance(folded_circuit, QuantumCircuit)
-
-
-def test_fold_moments_with_qiskit_circuit():
-    """Tests running fold_moments on an input Qiskit circuit."""
-    # Test Qiskit circuit:
-    #          ┌───┐
-    # q0_0: |0>┤ H ├──■────■──
-    #          ├───┤┌─┴─┐  │
-    # q0_1: |0>┤ H ├┤ X ├──■──
-    #          ├───┤├───┤┌─┴─┐
-    # q0_2: |0>┤ H ├┤ T ├┤ X ├
-    #          └───┘└───┘└───┘
-    qiskit_qreg = QuantumRegister(3)
-    qiskit_circuit = QuantumCircuit(qiskit_qreg)
-    qiskit_circuit.h(qiskit_qreg)
-    qiskit_circuit.cnot(qiskit_qreg[0], qiskit_qreg[1])
-    qiskit_circuit.t(qiskit_qreg[2])
-    qiskit_circuit.ccx(*qiskit_qreg)
-
-    folded_circuit = fold_moments(qiskit_circuit, moment_indices=[0])
-    # TODO: There's a very easy bug that could happen here if
-    #  moments are not retained in the conversion from a qiskit.QuantumCircuit
-    #  to a cirq.Circuit. Specifying the moment indices and gate indices for
-    #  the qiskit.QuantumCircuit would thus lead to unexpected behavior in
-    #  the folded circuit. One option is to make fold_moments private.
-    #  See https://github.com/unitaryfund/mitiq/issues/100.
-
-    cirq_qreg = LineQubit.range(3)
-    correct_folded_circuit = Circuit(
-        [ops.H.on_each(*cirq_qreg)] * 3,
-        [ops.CNOT.on(cirq_qreg[0], cirq_qreg[1])],
-        [ops.T.on(cirq_qreg[2])],
-        [ops.TOFFOLI.on(*cirq_qreg)],
-    )
-    assert _equal(
-        folded_circuit, correct_folded_circuit, require_qubit_equality=False
-    )
-
-
-def test_fold_moments_with_qiskit_circuit_keep_input_type():
-    """Tests running fold_moments on an input Qiskit circuit and keeping
-    the output circuit to be the same type as the input.
-    """
-    # Test Qiskit circuit:
-    #          ┌───┐
-    # q0_0: |0>┤ H ├──■────■──
-    #          ├───┤┌─┴─┐  │
-    # q0_1: |0>┤ H ├┤ X ├──■──
-    #          ├───┤├───┤┌─┴─┐
-    # q0_2: |0>┤ H ├┤ T ├┤ X ├
-    #          └───┘└───┘└───┘
-    qiskit_qreg = QuantumRegister(3)
-    qiskit_circuit = QuantumCircuit(qiskit_qreg)
-    qiskit_circuit.h(qiskit_qreg)
-    qiskit_circuit.cnot(qiskit_qreg[0], qiskit_qreg[1])
-    qiskit_circuit.t(qiskit_qreg[2])
-    qiskit_circuit.ccx(*qiskit_qreg)
-
-    folded_circuit = fold_moments(
-        qiskit_circuit, moment_indices=[0], keep_input_type=True
-    )
-    assert isinstance(folded_circuit, QuantumCircuit)
-    # TODO: There's a very easy bug that could happen here if
-    #  moments are not retained in the conversion from a qiskit.QuantumCircuit
-    #  to a cirq.Circuit. Specifying the moment indices and gate indices for
-    #  the qiskit.QuantumCircuit would thus lead to unexpected behavior in
-    #  the folded circuit. One option is to make fold_moments private.
-    #  See https://github.com/unitaryfund/mitiq/issues/100.
-
-    # Check equality of the final unitaries
-    cirq_circuit = _from_qiskit(qiskit_circuit)
-    unitary = cirq_circuit.unitary()
-    folded_cirq_circuit = _from_qiskit(folded_circuit)
-    folded_unitary = folded_cirq_circuit.unitary()
-    assert equal_up_to_global_phase(unitary, folded_unitary)
-
-
 def test_fold_from_left_with_qiskit_circuits():
     """Tests folding from left with Qiskit circuits."""
     # Test Qiskit circuit:
@@ -1246,7 +1083,9 @@ def test_fold_from_left_with_qiskit_circuits():
     qiskit_circuit.ccx(*qiskit_qreg)
     qiskit_circuit.measure(qiskit_qreg, qiskit_creg)
 
-    folded_circuit = fold_gates_from_left(qiskit_circuit, stretch=1.0)
+    folded_circuit = fold_gates_from_left(
+        qiskit_circuit, stretch=1.0, return_mitiq=True
+    )
 
     qreg = LineQubit.range(3)
     correct_folded_circuit = Circuit(
@@ -1272,7 +1111,7 @@ def test_fold_from_left_with_qiskit_circuits():
 
     # Keep the input type
     qiskit_folded_circuit = fold_gates_from_left(
-        qiskit_circuit, stretch=1.0, keep_input_type=True
+        qiskit_circuit, stretch=1.0, return_mitiq=False
     )
     assert isinstance(qiskit_folded_circuit, QuantumCircuit)
 
@@ -1296,7 +1135,9 @@ def test_fold_from_right_with_qiskit_circuits():
     qiskit_circuit.ccx(*qiskit_qreg)
     qiskit_circuit.measure(qiskit_qreg, qiskit_creg)
 
-    folded_circuit = fold_gates_from_right(qiskit_circuit, stretch=1.0)
+    folded_circuit = fold_gates_from_right(
+        qiskit_circuit, stretch=1.0, return_mitiq=True
+    )
 
     qreg = LineQubit.range(3)
     correct_folded_circuit = Circuit(
@@ -1321,9 +1162,7 @@ def test_fold_from_right_with_qiskit_circuits():
     assert equal_up_to_global_phase(unitary, folded_unitary)
 
     # Keep the input type
-    qiskit_folded_circuit = fold_gates_from_right(
-        qiskit_circuit, stretch=1.0, keep_input_type=True
-    )
+    qiskit_folded_circuit = fold_gates_from_right(qiskit_circuit, stretch=1.0)
     assert isinstance(qiskit_folded_circuit, QuantumCircuit)
 
 
@@ -1346,7 +1185,9 @@ def test_fold_at_random_with_qiskit_circuits():
     qiskit_circuit.ccx(*qiskit_qreg)
     qiskit_circuit.measure(qiskit_qreg, qiskit_creg)
 
-    folded_circuit = fold_gates_at_random(qiskit_circuit, stretch=1.0)
+    folded_circuit = fold_gates_at_random(
+        qiskit_circuit, stretch=1.0, return_mitiq=True
+    )
 
     qreg = LineQubit.range(3)
     correct_folded_circuit = Circuit(
@@ -1371,9 +1212,7 @@ def test_fold_at_random_with_qiskit_circuits():
     assert equal_up_to_global_phase(unitary, folded_unitary)
 
     # Keep the input type
-    qiskit_folded_circuit = fold_gates_at_random(
-        qiskit_circuit, stretch=1.0, keep_input_type=True
-    )
+    qiskit_folded_circuit = fold_gates_at_random(qiskit_circuit, stretch=1.0)
     assert isinstance(qiskit_folded_circuit, QuantumCircuit)
 
 
@@ -1398,7 +1237,10 @@ def test_fold_local_with_qiskit_circuits():
 
     # Return mitiq circuit
     folded_circuit = fold_local(
-        qiskit_circuit, stretch=1.4, fold_method=fold_gates_from_left
+        qiskit_circuit,
+        stretch=1.4,
+        fold_method=fold_gates_from_left,
+        return_mitiq=True
     )
     assert isinstance(folded_circuit, Circuit)
 
@@ -1407,7 +1249,7 @@ def test_fold_local_with_qiskit_circuits():
         qiskit_circuit,
         stretch=2.0,
         fold_method=fold_gates_from_left,
-        keep_input_type=True
+        return_mitiq=False
     )
     assert isinstance(folded_qiskit_circuit, QuantumCircuit)
 
@@ -1433,7 +1275,10 @@ def test_fold_global_with_qiskit_circuits():
 
     # Return mitiq circuit
     folded_circuit = fold_global(
-        qiskit_circuit, stretch=2.71828, fold_method=fold_gates_from_left
+        qiskit_circuit,
+        stretch=2.71828,
+        fold_method=fold_gates_from_left,
+        return_mitiq=True
     )
     assert isinstance(folded_circuit, Circuit)
 
@@ -1441,7 +1286,6 @@ def test_fold_global_with_qiskit_circuits():
     folded_qiskit_circuit = fold_global(
         qiskit_circuit,
         stretch=2.0,
-        fold_method=fold_gates_from_left,
-        keep_input_type=True
+        fold_method=fold_gates_from_left
     )
     assert isinstance(folded_qiskit_circuit, QuantumCircuit)
