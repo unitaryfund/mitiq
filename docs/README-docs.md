@@ -1,5 +1,5 @@
 # Contributors Guide
-This is the Ccntributors guide for the documentation of Mitiq,
+This is the Contributors guide for the documentation of Mitiq,
 a Python toolkit for implementing error mitigation on quantum computers.
 
 ![Python Build](https://github.com/unitaryfund/mitiq/workflows/Python%20Build/badge.svg?branch=master)

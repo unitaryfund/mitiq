@@ -247,14 +247,19 @@ circuits.
 Research articles
 ^^^^^^^^^^^^^^^^^
 
-A list of research articles and PhD theses is this one:
+A list of research articles academic resources on error mitigation:
 
-- J. Wallman *et al.*, *Phys. Rev. A*, 2016 :cite:`Wallman_2016_PRA`
-- K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
-- S. Endo *et al.*, *Phys. Rev. X*, 2018 :cite:`Endo_2018_PRX`
-- A. Kandala *et al.*, *Nature*, 2019 :cite:`Kandala_2019_Nature`
-- Suguru Endo, *Hybrid quantum-classical algorithms and error mitigation*, PhD
-Thesis, 2019, Oxford University (`Link`_).
+- On Zero-Noise Extrapolation:
+   - K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
+   - Experimental verification, - A. Kandala *et al.*, *Nature*, 2019 :cite:`Kandala_2019_Nature`
+   - c
+
+- On randomization methods:
+   - Randomized compiling with twisted gates, J. Wallman *et al.*, *Phys. Rev. A*, 2016 :cite:`Wallman_2016_PRA`
+   - Porbabilistic error correction, K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
+   - S. Endo *et al.*, *Phys. Rev. X*, 2018 :cite:`Endo_2018_PRX`
+
+- Suguru Endo, *Hybrid quantum-classical algorithms and error mitigation*, PhD Thesis, 2019, Oxford University (`Link`_).
 
 .. _Link: https://ora.ox.ac.uk/objects/uuid:6733c0f6-1b19-4d12-a899-18946aa5df85
 
@@ -266,34 +271,24 @@ Software
 Here is a (non-comprehensive) list of open-source software libraries related to
 quantum computing, noisy quantum dynamics and error mitigation:
 
-**IBM Q's `Qiskit`_** provides a stack for quantum computing simulation and
-execution on real devices from the cloud. In particular, `qiskit.aer` contains
-noise models, integrated with `mitiq` tools. Qiskit's OpenPulse provides
-pulse-level control of qubit operations in some of the superconducting circuit
-devices.
+- **IBM Q**'s `Qiskit`_ provides a stack for quantum computing simulation and execution on real devices from the cloud. In particular, `qiskit.aer` contains noise models, integrated with `mitiq` tools. Qiskit's OpenPulse provides pulse-level control of qubit operations in some of the superconducting circuit devices.
 
-**Goole AI Quantum's `Cirq`_** offers quantum simulation of quantum circuits. It is
-integrated with  `mitiq` algorithms.
 
-**Rigetti Computing's `PyQuil`_** is a library for quantum programming. Rigetti's
-stack offers the execution of quantum circuits on superconducting circuits
-devices from the cloud, as well as their simulation on a quantum virtual
-machine (QVM), integrated with `mitiq` tools.
+- **Goole AI Quantum**'s `Cirq`_ offers quantum simulation of quantum circuits. It is integrated with  `mitiq` algorithms.
 
-**`QuTiP`_**, the quantum toolbox in Python, contains a quantum information processing
-module that allows to simulate quantum circuits, their implementation on
-devices, as well as the simulation of pulse-level control and time-dependent
-density matrix evolution with the `qutip.qip.noise` module.
+- **Rigetti Computing**'s `PyQuil`_ is a library for quantum programming. Rigetti's stack offers the execution of quantum circuits on superconducting circuits devices from the cloud, as well as their simulation on a quantum virtual machine (QVM), integrated with `mitiq` tools.
 
-**`Krotov`_** is a package implementing Krotov method for optimal control,
-interfacing with QuTiP for noisy density-matrix quantum evolution.
+- `QuTiP`_, the quantum toolbox in Python, contains a quantum information processing module that allows to simulate quantum circuits, their implementation on devices, as well as the simulation of pulse-level control and time-dependent density matrix evolution with the `qutip.qip.noise` module.
 
-**`PyGSTi`_** allows to characterize quantum circuits by implementing techniques
-such as gate set tomography (GST) and randomized benchmarking.
+- `Krotov`_ is a package implementing Krotov method for optimal control interfacing with QuTiP for noisy density-matrix quantum evolution.
+
+- `Pennylane`_ is a hardware-agnostic library that brings together machine learning and quantum circuits.
+
+- `PyGSTi`_ allows to characterize quantum circuits by implementing techniques such as gate set tomography (GST) and randomized benchmarking.
 
 This is just a selection of open-source projects related to quantum error
 mitigation. A more comprehensinve collection of software on quantum computing
-can be found `here`_.
+can be found `here`_ and on `Unitary Fund`_'s list of supported projects.
 
 
 .. _QuTiP: http://qutip.org
@@ -310,3 +305,4 @@ can be found `here`_.
 
 .. _here: https://github.com/qosf/awesome-quantum-software
 
+.. _Unitary Fund: https://unitary.fund#grants-made
