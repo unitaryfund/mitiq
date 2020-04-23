@@ -123,6 +123,7 @@ a linear superoperator that always admits the Lindblad form
    - \frac{1}{2}( A_i^\dagger A_i\hat{\rho}+ \hat{\rho}A_i^\dagger A_i )\right)
    ,
    \end{eqnarray}
+
 where :math:`\gamma_i` are constants that set the strenghts of the dissipation
 mechanisms defined by the jump operators, :math:`A_i`.
 
@@ -197,7 +198,7 @@ qubits.
 
 What is now referred quantum error mitigation is generally a series of
 techniques that stemmed as more practical quantum error correction solutions
- :cite:`Knill_2005_Nature`.
+:cite:`Knill_2005_Nature`.
 
 .. _guide_qem_qoc:
 
@@ -246,7 +247,7 @@ mitigation.
 .. _guide_qem_references:
 
 ---------------------
-Additional References
+External References
 ---------------------
 
 Here is a list of useful external resources on quantum error mitigation,
@@ -260,25 +261,37 @@ Research articles
 A list of research articles academic resources on error mitigation:
 
 - On zero-noise extrapolation:
+   - Theory, Y. Li and S. Benjamin, *Phys. Rev. X*, 2017 :cite:`Li_2017_PRX`
    - Theory, K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
-   - Experiment, - A. Kandala *et al.*, *Nature*, 2019 :cite:`Kandala_2019_Nature`
+   - Experiment on superconducting circuit chip, A. Kandala *et al.*, *Nature*, 2019 :cite:`Kandala_2019_Nature`
+   - Experiment on ion chip, :cite:`Kandala_2019_Nature`
 
 - On randomization methods:
-   - Randomized compiling with twisted gates, J. Wallman *et al.*, *Phys. Rev. A*, 2016 :cite:`Wallman_2016_PRA`
+   - Randomized compiling with twirling gates, J. Wallman *et al.*, *Phys. Rev. A*, 2016 :cite:`Wallman_2016_PRA`
    - Porbabilistic error correction, K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
    - S. Endo *et al.*, *Phys. Rev. X*, 2018 :cite:`Endo_2018_PRX`
 
+- On subspace expansion:
+   - By hybrid quantum-classical hierarchy introduction, McClean *et al.*, *Phys. Rev. A*, 2017 :cite:`McClean_2017_PRA`
+   - By symmetry verification, Bonet *et al.*, *Phys. Rev. A*, 2018 :cite:`Bonet_2018_PRA`
+   - With a stabilizer-like method, McArdle *et al.*, *Phys. Rev. Lett.*, 2019,
+   :cite:`McArdle_2019_PRL`
+   - Exploiting molecular symmetries, J. McClean *et al.*, *Nat. Comm.*, 2020 :cite:`McClean_2020_NatComm`
+   - Experiment on a superconducting circuit device, R. Sagastizabal *et al.*,
+   *Phys. Rev. A*, 2019 :cite:`Sagastizabal_2019_PRA`
+
 - On other techniques such as:
-   - By approximate error-correcting codes :cite`Cafaro_2014_PRA`:
-   - By symmetry verification :cite:`Bonet_2018_PRA`
-   - By subspace reduction :cite:`McClean_2020_NatComm`
+   - Approximate error-correcting codes in the generalized amplitude-damping
+   channels, Cafaro *et al.*, *Phys. Rev. A*, 2014 :cite:`Cafaro_2014_PRA`:
+   - Extending the variational quantum eigensolver (VQE) to excited states,
+   Parrish *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Parrish_2019_PRL`
+   - Quantum imaginary time evolution, Motta *et al.*, *Nat. Phys.*, 2020 :cite:`Motta_2020_NatPhys`
+   - Error mitigation for analog quantum simulation, J. Sun *et al.*, 2020, arXiv
+   :cite:`Sun_2020_arXiv`
 
-
-- For a comprehensive overview, Suguru Endo, *Hybrid quantum-classical algorithms and error mitigation*, PhD Thesis, 2019, Oxford University (`Link`_).
+- For an extensive introduction: S. Endo, *Hybrid quantum-classical algorithms and error mitigation*, PhD Thesis, 2019, Oxford University (`Link`_).
 
 .. _Link: https://ora.ox.ac.uk/objects/uuid:6733c0f6-1b19-4d12-a899-18946aa5df85
-
-### List:  McClean_2017_PRA,
 
 ^^^^^^^^
 Software
@@ -314,6 +327,8 @@ can be found `here`_ and on `Unitary Fund`_'s list of supported projects.
 .. _Cirq: http://cirq.readthedocs.io/
 
 .. _PyQuiL: https://github.com/rigetti/pyquil
+
+.. _Pennylane: http://pennylane.ai/
 
 .. _Krotov: http://krotov.readthedocs.io/
 
