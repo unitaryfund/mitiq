@@ -7,12 +7,12 @@ Welcome to mitiq's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   read_README.rst
-   guide/guide.rst
-   apidoc.rst
-   read_README-docs.rst
-   changelog.rst
-   bibliography.rst
+   00_read_README.rst
+   01_guide.rst
+   02_apidoc.rst
+   03_read_README-docs.rst
+   04_changelog.rst
+   99_bibliography.rst
 
 Indices and tables
 ==================
