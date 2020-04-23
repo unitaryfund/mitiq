@@ -81,7 +81,7 @@ language = 'Python'
 exclude_patterns = []
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = '000_index'
 
 # autodoc settings
 

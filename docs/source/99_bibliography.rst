@@ -3,6 +3,6 @@
 References
 ==================
 
-.. bibliography:: biblio.bib
+.. bibliography:: refs.bib
    :cited:
    :style: unsrt
