@@ -187,7 +187,8 @@ to demonstrate quantum error correction only with a very small number of
 qubits.
 
 What is now referred quantum error mitigation is generally a series of
-techniques that stemmed as more practical quantum error correction solutions.
+techniques that stemmed as more practical quantum error correction solutions
+ :cite:`Knill_2005_Nature`.
 
 .. _guide_qem_qoc:
 
@@ -200,7 +201,7 @@ applied for many scopes. It entails many fields, and it is generally based on a
 feedback loop between an agent and a target system.
 Optimal control is applied to several quantum technologies,
 including in the pulse shaping of gate design in quantum circuits calibration
-against noisy devices.
+against noisy devices :cite:`Brif_2010_NJP`.
 
 Examples of specific application of optimal control to quantum dynamics and
 quantum computing is in dynamical decoupling, a technique that employs fast
@@ -227,7 +228,7 @@ that can estimate observables with more precision, i.e. increase the
 performance of quantum computers.
 
 By implementing quantum optics tools (such as the modeling noise and open
-quantum systems), standard as well as cutting-edge statistics and inference
+quantum systems) :cite:`Carmichael_1999_Springer,Carmichael_2007_Springer,Gardiner_2004_Springer,Breuer_2007_Oxford`, standard as well as cutting-edge statistics and inference
 techniques, and tweaking them for the needs of the quantum computing community,
 `mitiq` aims at providing the most comprehensive toolchain for error
 mitigation.
@@ -249,20 +250,26 @@ Research articles
 
 A list of research articles academic resources on error mitigation:
 
-- On Zero-Noise Extrapolation:
-   - K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
-   - Experimental verification, - A. Kandala *et al.*, *Nature*, 2019 :cite:`Kandala_2019_Nature`
-   - c
+- On zero-noise extrapolation:
+   - Theory, K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
+   - Experiment, - A. Kandala *et al.*, *Nature*, 2019 :cite:`Kandala_2019_Nature`
 
 - On randomization methods:
    - Randomized compiling with twisted gates, J. Wallman *et al.*, *Phys. Rev. A*, 2016 :cite:`Wallman_2016_PRA`
    - Porbabilistic error correction, K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
    - S. Endo *et al.*, *Phys. Rev. X*, 2018 :cite:`Endo_2018_PRX`
 
-- Suguru Endo, *Hybrid quantum-classical algorithms and error mitigation*, PhD Thesis, 2019, Oxford University (`Link`_).
+- On other techniques such as:
+   - By approximate error-correcting codes :cite`Cafaro_2014_PRA`:
+   - By symmetry verification :cite:`Bonet_2018_PRA`
+   - By subspace reduction :cite:`McClean_2020_NatComm`
+
+
+- For a comprehensive overview, Suguru Endo, *Hybrid quantum-classical algorithms and error mitigation*, PhD Thesis, 2019, Oxford University (`Link`_).
 
 .. _Link: https://ora.ox.ac.uk/objects/uuid:6733c0f6-1b19-4d12-a899-18946aa5df85
 
+### List:  McClean_2017_PRA,
 
 ^^^^^^^^
 Software
