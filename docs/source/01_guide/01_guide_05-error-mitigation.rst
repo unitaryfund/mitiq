@@ -103,7 +103,7 @@ associated to the state, :math:`\hat{\rho}=|\psi\rangle\langle \psi|`, as
    \lbrack\hat{\rho}\rbrack,
    \end{eqnarray}
 
-where :math:`mathcal{L}` is a super-operator acting on the Hilber space.
+where :math:`mathcal{L}` is a super-operator acting on the Hilbert space.
 
 The subsequent most straightforward set of sensible approximations includes
 assuming that at time zero the system and environment are not entangled, that
