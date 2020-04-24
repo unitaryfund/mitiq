@@ -254,8 +254,8 @@ make latexpdf
 ```
 Since the `docs/build` folder is not kept track of, copy the pdf file
 with the documentation from `docs/build/latex` to the `docs/pdf` folder,
-naming it according to the release version with major and minor.
-Make a copy named `Mitiq-latest-release.pdf` in the same folder.
+naming it according to the release version with major and minor, e.g., `mitiq-0.1.pdf`.
+Make a copy named `mitiq.pdf` in the same folder, which is the latest release.
 
 
 ## Additional information

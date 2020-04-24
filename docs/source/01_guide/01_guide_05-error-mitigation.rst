@@ -10,7 +10,7 @@ other external links framing this topic in the open-source software ecosystem.
 
 * :ref:`guide_qem_noise`
 * :ref:`guide_qem_what`
-* :ref:`guide_qem_what_not`
+* :ref:`guide_qem_related`
 * :ref:`guide_qem_why`
 * :ref:`guide_qem_references`
 
@@ -169,11 +169,11 @@ Other error mitigation techniques
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Other examples of error mitigation techniques include injecting noisy gates for randomized compiling and probabilistic error cancellation, or the use of subspace reductions and symmetries. A collection of references on this cutting-edge implementations can be found in the :ref:`guide_qem_articles` subsection.
 
-.. _guide_qem_what_not:
+.. _guide_qem_related:
 
---------------------------------------
-What quantum error mitigation *is not*
---------------------------------------
+---------------------------------------------------
+Related fields
+---------------------------------------------------
 
 Quantum error mitigation is connected to quantum error correction and quantum
 optimal control, two fields of study that also aim at reducing the impact of
@@ -191,7 +191,7 @@ these and other fields. Suggestions for additional references are `welcome`_.
 .. _guide_qem_qec:
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-About quantum error correction
+Quantum error correction
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Quantum error correction is different from quantum error mitigation, as it
@@ -213,7 +213,7 @@ techniques that stemmed as more practical quantum error correction solutions
 .. _guide_qem_qoc:
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-About quantum optimal control
+Quantum optimal control
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Optimal control theory is a very versatile set of techniques that can be
@@ -223,16 +223,12 @@ Optimal control is applied to several quantum technologies,
 including in the pulse shaping of gate design in quantum circuits calibration
 against noisy devices :cite:`Brif_2010_NJP`.
 
-Examples of specific application of optimal control to quantum dynamics and
-quantum computing is in dynamical decoupling :cite:`Viola_1999_PRL`, a
-technique that employs fast control pulses to effectively decouple a system and
-its environment, with techniques pioneered in the nuclear magnetic resonance
-community.
-
 A key difference between some quantum error mitigation techniques and quantum
-optmial control is that the former can be implemented also simply with a mix of
-quantum and classical post-processing techniques, while the latter relies on an
-active feedback loop.
+optimal control is that the former can be implemented in some instances with
+post-processing techniques, while the latter relies on an active feedback loop.
+
+An example of a specific application of optimal control to quantum dynamics that can be seen as a quantum error mitigation technique, is in dynamical decoupling :cite:`Viola_1999_PRL`. This technique employs fast control pulses to effectively decouple a system from its environment, with techniques pioneered in the nuclear magnetic resonance
+community.
 
 .. _guide_qem_why:
 
