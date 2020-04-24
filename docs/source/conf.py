@@ -53,11 +53,24 @@ extensions = ['sphinx.ext.mathjax',
               'sphinx.ext.doctest',
               'sphinx.ext.autosummary',
               'sphinx.ext.extlinks',
+              'sphinx.ext.intersphinx',
               'sphinx.ext.viewcode',
               'sphinx.ext.ifconfig',
               'sphinx.ext.napoleon',
               'sphinxcontrib.bibtex',
 ]
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3.7", "python37.inv"),
+    "numpy": ("https://docs.scipy.org/doc/numpy/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
+    "cirq": ("https://cirq.readthedocs.io/en/stable/", None),
+    "pyquil": ("http://docs.rigetti.com/en/stable/", None),
+    "qiskit": ("https://qiskit.org/documentation/", None),
+    "qutip": ("http://qutip.org/docs/latest/", None)
+    ,
+}
+
 
 # source_suffix = '.rst'
 source_suffix = ['.rst', '.md']
