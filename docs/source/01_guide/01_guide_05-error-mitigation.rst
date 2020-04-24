@@ -157,16 +157,17 @@ in terms of time-resolved pulses.
 
 .. _guide_qem_uf:
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Other techniques: Unitary folding
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Other examples of error mitigation techniques include injecting noisy gates
-to perform a probabilistic error cancellation. Others, find a way to stretch
-time with respect to noise processes by inserting identity gates. These gates
-can be decomposed in terms of gates already present in the circuit, and their
-transpose. This technique, referred to as :ref:`unitary folding<guide-folding>`,
-is present in the ``mitiq`` toolchain.
+"""""""""""""""""""""""""""""""""
+Unitary folding
+"""""""""""""""""""""""""""""""""
+A way to stretch time with respect to noise-related processes is obtained by
+inserting identity gates. These gates can be decomposed in terms of gates already present in the circuit, and their transpose. This technique, referred to as :ref:`unitary folding<guide-folding>`, is present in the ``mitiq`` toolchain.
 
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Other error mitigation techniques
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Other examples of error mitigation techniques include injecting noisy gates for randomized compiling and probabilistic error cancellation, or the use of subspace reductions and symmetries. A collection of references on this cutting-edge implementations can be found in the :ref:`guide_qem_articles` subsection.
 
 .. _guide_qem_what_not:
 
@@ -268,6 +269,8 @@ Here is a list of useful external resources on quantum error mitigation,
 including software tools that provide the possibility of studying quantum
 circuits.
 
+.. _guide_qem_articles:
+
 ^^^^^^^^^^^^^^^^^
 Research articles
 ^^^^^^^^^^^^^^^^^
@@ -311,7 +314,6 @@ quantum computing, noisy quantum dynamics and error mitigation:
 
 - **IBM Q**'s `Qiskit`_ provides a stack for quantum computing simulation and execution on real devices from the cloud. In particular, ``qiskit.Aer`` contains the :class:`~qiskit.providers.aer.noise.NoiseModel` object, integrated with ``mitiq`` tools. Qiskit's OpenPulse provides pulse-level control of qubit operations in some of the superconducting circuit devices. ``mitiq`` is integrated with ``qiskit``, in the :mod:`~mitiq.mitiq_qiskit.qiskit_utils` and :mod:`~mitiq.mitiq_qiskit.conversions` modules.
 
-
 - **Goole AI Quantum**'s `Cirq`_ offers quantum simulation of quantum circuits.
 The :class:`cirq.Circuit` object is integrated in  ``mitiq`` algorithms as the default circuit.
 
@@ -328,7 +330,6 @@ The :class:`cirq.Circuit` object is integrated in  ``mitiq`` algorithms as the d
 This is just a selection of open-source projects related to quantum error
 mitigation. A more comprehensinve collection of software on quantum computing
 can be found `here`_ and on `Unitary Fund`_'s list of supported projects.
-
 
 .. _QuTiP: http://qutip.org
 
