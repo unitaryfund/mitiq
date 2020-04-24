@@ -1,4 +1,4 @@
-# random.py
+# random_circ.py
 """
 Contains methods used for testing mitiq's performance
 """
@@ -6,12 +6,11 @@ from typing import Tuple, Callable, List
 import numpy as np
 
 from cirq.testing import random_circuit
-from cirq import NamedQubit, Circuit, DensityMatrixSimulator, depolarize
+from cirq import NamedQubit, Circuit, DensityMatrixSimulator
 
 from mitiq import execute_with_zne, QPROGRAM
 from mitiq.factories import Factory
-
-SIMULATOR = DensityMatrixSimulator()
+from mitiq.benchmarks.utils import noisy_simulation
 
 
 def sample_observable(n_qubits: int) -> np.ndarray:
@@ -29,40 +28,6 @@ def sample_observable(n_qubits: int) -> np.ndarray:
     chosenZ = np.random.randint(2 ** n_qubits)
     obs[chosenZ] = 1
     return np.diag(obs)
-
-
-def meas_observable(rho: np.ndarray, obs: np.ndarray) -> Tuple[float, float]:
-    """Measures a density matrix rho against observable obs.
-
-    Args:
-        rho: A density matrix.
-        obs: A Hermitian observable.
-
-    Returns:
-        The tuple (expectation value, variance).
-    """
-    obs_avg = np.real(np.trace(rho @ obs))
-    obs_delta = np.sqrt(np.real(np.trace(rho @ obs @ obs)) - obs_avg ** 2)
-    return obs_avg, obs_delta
-
-
-def noisy_simulation(circ: Circuit, obs: np.ndarray, noise: float) -> \
-        Tuple[float, float]:
-    """Simulates a circuit with depolarizing noise.
-
-    Args:
-        circ: The quantum program as a cirq object.
-        obs: The observable for the simulation to measure.
-        noise: The noise level of the simulation for a depolarizing channel.
-
-    Returns:
-        The observable's measurements as as
-        tuple (expectation value, variance).
-    """
-    circuit = circ.with_noise(depolarize(p=noise))
-    rho = SIMULATOR.simulate(circuit).final_density_matrix
-    A_avg, A_delta = meas_observable(rho, obs=obs)
-    return A_avg, A_delta
 
 
 def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
@@ -113,7 +78,7 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
         def obs_sim(circ: Circuit, shots=None):
             # we only want the expectation value not the variance
             # this is why we return [0]
-            return noisy_simulation(circ, obs, noise)[0]
+            return noisy_simulation(circ, noise, obs)
 
         # evaluate the noisy answer
         unmitigated = obs_sim(qc)

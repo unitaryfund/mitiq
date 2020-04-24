@@ -6,7 +6,7 @@ import numpy as np
 from mitiq.factories import LinearFactory, RichardsonFactory, PolyFactory
 from mitiq.folding import fold_gates_at_random, fold_gates_from_left, \
     fold_gates_from_right
-from mitiq.benchmarks.random import rand_benchmark_zne
+from mitiq.benchmarks.random_circ import rand_benchmark_zne
 
 SCALE_FUNCTIONS = [
     fold_gates_at_random,
