@@ -60,6 +60,16 @@ def random_identity_circuit(depth=None):
 
 
 def run_with_noise(circuit, noise, shots):
+    """Returns the expected value of a circuit run several times with noise.
+
+    Args:
+        circuit: Quantum circuit as :class:`~pyquil.quil.Program`.
+        noise: Noise constante for depolarizing channel.
+        shots: Number of shots the circuit is run.
+
+    Returns:
+        expval: Expected value.
+    """
     # apply depolarizing noise to all gates
     kraus_ops = [
         np.sqrt(1 - noise) * npI,
