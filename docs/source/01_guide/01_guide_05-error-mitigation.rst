@@ -225,7 +225,7 @@ techniques partly borrowed from the nuclear magnetic resonance community.
 Why is quantum error mitigation important
 -----------------------------------------
 
-The noisy intermediate scale quantum computing (NISQ) era is charactherized by
+The noisy intermediate scale quantum computing (NISQ) era is characterized by
 short or medium-depth circuits and noise affecting operations, state
 preparation, and measurement :cite:`Preskill_2018_Quantum`.
 
