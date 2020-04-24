@@ -45,8 +45,8 @@ What is quantum error mitigation
 Quantum error mitigation refers to a series of modern techniques aimed at
 reducing (*mitigating*) the errors that occur in quantum computing algorithms.
 
-Unlike code bugs affecting code in usual computers, the nature of errors
-corrected by quantum mitigation is due to the hardware.
+Unlike software bugs affecting code in usual computers, the errors which we 
+attempt to reduce with mitigation are due to the hardware.
 
 Quantum error mitigation techniques try to *reduce* the impact of noise in
 quantum computations. They generally do not completely remove it.
