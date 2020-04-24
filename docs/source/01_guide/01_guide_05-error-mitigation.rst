@@ -110,7 +110,7 @@ assuming that at time zero the system and environment are not entangled, that
 the environment is memoryless, and that there is a dominant scale of times set
 by the interactions, wich allows to cut off high-frequency perturbations.
 
-These so-called, respectively, Born, Markov and Rotating-Wave approximations,
+These approximations -- called the Born, Markov, and Rotating-Wave approximations, respectively --
 lead to a so-called Lindblad form of the *dissipation*, i.e. to a special
 structure of the system-environment interaction that can be represented with
 a linear superoperator that always admits the Lindblad form
