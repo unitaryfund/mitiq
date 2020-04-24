@@ -78,7 +78,7 @@ def make_maxcut(graph: List[Tuple[int, int]],
                           for beta, gamma in zip(betas, gammas)], Circuit())
         return init_state_prog + qaoa_steps
 
-    # use pyQuil paulis as shorthand to make the dense cost operator
+    # make the cost observable
     identity = np.eye(len(nodes) ** 2)
     cost_mat = -0.5 * sum(identity - Circuit(
                     [id(*qreg), ZZ(qreg[i], qreg[j])]).unitary()
