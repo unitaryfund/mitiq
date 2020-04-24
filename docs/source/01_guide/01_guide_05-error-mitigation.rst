@@ -229,9 +229,9 @@ The noisy intermediate scale quantum computing (NISQ) era is characterized by
 short or medium-depth circuits and noise affecting operations, state
 preparation, and measurement :cite:`Preskill_2018_Quantum`.
 
-Current short-depth quantum circuits are noisy, at at the same time it is not
-possible to implement on them quantum error correcting codes, which are more
-demanding both in terms of necessary qubits and of circuit depths.
+Current short-depth quantum circuits are noisy, and at the same time it is not
+possible to implement quantum error correcting codes on them due to the 
+needed qubit number and circuit depth required by these codes.
 
 Error mitigation offers the prospects of writing more compact quantum circuits
 that can estimate observables with more precision, i.e. increase the
