@@ -31,18 +31,16 @@ Errors occur for a series of reasons in quantum computers and the microscopic
 description at the physical level can vary broadly, depending on the quantum
 computing platform that is used, as well as the computing architecture.
 
-For example, superconducting-circuit-based quantum computers are more prone to
-cross-talk noise, while ion-based quantum computers need to counteract
-inhomogeneous broadening noise.
+For example, superconducting-circuit-based quantum computers have chips that
+are prone to cross-talk noise, while qubits encoded in trapped ions need to be
+shuttled with electromagnetic pulses, and solid-state artificial atoms, including quantum dots, are heavily affected by inhomogeneous broadening :cite:`Buluta_2011_RPP`.
 
 More in general, quantum computing devices can be studied in the framework of
-open quantum systems :cite:`Carmichael_1999_Springer,Carmichael_2007_Springer,
-Gardiner_2004_Springer,Breuer_2007_Oxford`, that is, systems that exchange
+open quantum systems :cite:`Carmichael_1999_Springer,Carmichael_2007_Springer,Gardiner_2004_Springer,Breuer_2007_Oxford`, that is, systems that exchange
 energy and information with the surrounding environment.
 
-When this exchange is controlled, it is actually fundamental, to extract
-information and process it. When this is not controlled, noise kicks in, thus
-introducing errors that are disruptive for the fidelity of the protocols.
+The qubit-environment exchange can be controlled, and this feature is actually fundamental to extract information and process it.
+When this interaction is not controlled, and at the fundamental level it cannot be completely suppressed, noise eventually kicks in, thus introducing errors that are disruptive for the *fidelity* of the information-processing protocols.
 
 .. _guide_qem_what:
 
@@ -311,12 +309,14 @@ Software
 Here is a (non-comprehensive) list of open-source software libraries related to
 quantum computing, noisy quantum dynamics and error mitigation:
 
-- **IBM Q**'s `Qiskit`_ provides a stack for quantum computing simulation and execution on real devices from the cloud. In particular, ``qiskit.aer`` contains noise models, integrated with ``mitiq`` tools. Qiskit's OpenPulse provides pulse-level control of qubit operations in some of the superconducting circuit devices.
+- **IBM Q**'s `Qiskit`_ provides a stack for quantum computing simulation and execution on real devices from the cloud. In particular, ``qiskit.aer`` contains noise models, integrated with ``mitiq`` tools. Qiskit's OpenPulse provides pulse-level control of qubit operations in some of the superconducting circuit devices. ``mitiq`` is integrated with ``qiskit``, in the :mod:`mitiq.mitiq_qiskit.qiskit_utils` and
+:mod:`mitiq.mitiq_qiskit.conversions` modules.
 
 
-- **Goole AI Quantum**'s `Cirq`_ offers quantum simulation of quantum circuits. It is integrated with  ``mitiq`` algorithms.
+- **Goole AI Quantum**'s `Cirq`_ offers quantum simulation of quantum circuits.
+The ``cirq.Circuit`` object is integrated in  ``mitiq`` algorithms as the default circuit.
 
-- **Rigetti Computing**'s `PyQuil`_ is a library for quantum programming. Rigetti's stack offers the execution of quantum circuits on superconducting circuits devices from the cloud, as well as their simulation on a quantum virtual machine (QVM), integrated with ``mitiq`` tools in the :mod:`mitiq_pyquil` module.
+- **Rigetti Computing**'s `PyQuil`_ is a library for quantum programming. Rigetti's stack offers the execution of quantum circuits on superconducting circuits devices from the cloud, as well as their simulation on a quantum virtual machine (QVM), integrated with ``mitiq`` tools in the :mod:`mitiq.mitiq_pyquil.pyquil_utils` module.
 
 - `QuTiP`_, the quantum toolbox in Python, contains a quantum information processing module that allows to simulate quantum circuits, their implementation on devices, as well as the simulation of pulse-level control and time-dependent density matrix evolution with the ``qutip.qip.noise`` module.
 
