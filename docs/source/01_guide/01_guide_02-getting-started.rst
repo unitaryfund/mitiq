@@ -29,12 +29,10 @@ We define some functions that make it simpler to simulate noise in
     # 0.1% depolarizing noise
     NOISE = 0.001
 
-    def noisy_simulation(circ: Circuit, shots=None) -> float:
+    def noisy_simulation(circ: Circuit) -> float:
         """ Simulates a circuit with depolarizing noise at level NOISE.
         Args:
             circ: The quantum program as a cirq object.
-            shots: This unused parameter is needed to match mitiq's expected type
-                   signature for an executor function.
 
         Returns:
             The observable's measurements as as
