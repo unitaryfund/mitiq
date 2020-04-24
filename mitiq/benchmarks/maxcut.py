@@ -7,9 +7,7 @@ from typing import List, Tuple, Callable
 import numpy as np
 
 from cirq import Circuit, NamedQubit, X, ZZ, H, DensityMatrixSimulator
-
-from pyquil.paulis import sZ, sI
-from pyquil.simulation.tools import lifted_pauli
+from cirq import identity_each as id
 
 from scipy.optimize import minimize
 
@@ -83,8 +81,10 @@ def maxcut_executor(graph: List[Tuple[int, int]],
         return init_state_prog + qaoa_steps
 
     # use pyQuil paulis as shorthand to make the dense cost operator
-    h_cost = -0.5 * sum(sI(0) - sZ(i) * sZ(j) for i, j in graph)
-    cost_mat = lifted_pauli(h_cost, nodes)
+    identity = np.eye(len(nodes) ** 2)
+    cost_mat = -0.5 * sum(identity - Circuit(
+                    [id(*qreg), ZZ(qreg[i], qreg[j])]).unitary()
+                for i, j in graph)
     noisy_backend = make_noisy_backend(noise, cost_mat)
 
     # must have this function signature to work with scipy minimize
