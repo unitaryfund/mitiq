@@ -29,19 +29,17 @@ def make_noisy_backend(noise: float, obs: np.ndarray) \
     Returns:
         A mitiq backend function.
     """
-
-    # shots is none to set the required type correctly.
-    def noisy_backend(circ: Circuit, shots=None):
+    def noisy_backend(circ: Circuit):
         return noisy_simulation(circ, noise, obs)
 
     return noisy_backend
 
 
-def maxcut_executor(graph: List[Tuple[int, int]],
-                    noise: float = 0,
-                    scale_noise: Callable = None,
-                    factory: Factory = None
-                    ) -> Tuple[Callable[[np.ndarray], float],
+def make_maxcut(graph: List[Tuple[int, int]],
+                noise: float = 0,
+                scale_noise: Callable = None,
+                factory: Factory = None
+                ) -> Tuple[Callable[[np.ndarray], float],
                                Callable[[np.ndarray], Circuit], np.ndarray]:
     """Makes an executor that evaluates the QAOA ansatz at a given beta
     and gamma parameters.
@@ -128,7 +126,7 @@ def run_maxcut(graph: List[Tuple[int, int]],
         Runs MAXCUT with 2 steps such that betas = [1.0, 1.1] and
         gammas = [1.4, 0.7]
     """
-    qaoa_cost, _, _ = maxcut_executor(graph, noise, scale_noise, factory)
+    qaoa_cost, _, _ = make_maxcut(graph, noise, scale_noise, factory)
 
     # store the optimization trajectories
     traj = []
