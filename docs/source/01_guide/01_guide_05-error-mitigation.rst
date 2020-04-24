@@ -55,7 +55,7 @@ Alternative nomenclature refers to error mitigation as (approximate) error
 suppression or approximate quantum error correction.
 
 Among the ideas that have been developed so far for quantum error mitigation,
-the most recognizable one is zero-noise extrapolation.
+a leading candidate is zero-noise extrapolation.
 
 .. _guide_qem_zne:
 
