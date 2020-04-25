@@ -237,8 +237,8 @@ Why is quantum error mitigation important
 -----------------------------------------
 
 The noisy intermediate scale quantum computing (NISQ) era is characterized by
-short or medium-depth circuits and noise affecting operations, state
-preparation, and measurement :cite:`Preskill_2018_Quantum`.
+short or medium-depth circuits in which noise affects state
+preparation, gate operations, and measurement :cite:`Preskill_2018_Quantum`.
 
 Current short-depth quantum circuits are noisy, and at the same time it is not
 possible to implement quantum error correcting codes on them due to the
