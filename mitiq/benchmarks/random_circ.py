@@ -6,28 +6,11 @@ from typing import Tuple, Callable, List
 import numpy as np
 
 from cirq.testing import random_circuit
-from cirq import NamedQubit, Circuit, DensityMatrixSimulator
+from cirq import NamedQubit, Circuit
 
 from mitiq import execute_with_zne, QPROGRAM
 from mitiq.factories import Factory
 from mitiq.benchmarks.utils import noisy_simulation
-
-
-def sample_observable(n_qubits: int) -> np.ndarray:
-    """Constructs a random computational basis observable on n_qubits
-
-    Args:
-        n_qubits: A number of qubits
-
-    Returns:
-        A random computational basis observable on n_qubits, e.g. for two
-        qubits this could be np.diag([0, 0, 0, 1]) to measure the ZZ
-        observable.
-    """
-    obs = np.zeros(int(2 ** n_qubits))
-    chosenZ = np.random.randint(2 ** n_qubits)
-    obs[chosenZ] = 1
-    return np.diag(obs)
 
 
 def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
@@ -67,17 +50,15 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
         wvf = qc.final_wavefunction()
 
         # calculate the exact
-        obs = sample_observable(n_qubits)
+        obs = np.diag([1 / 2**n_qubits] * 2**n_qubits)
         exact = np.conj(wvf).T @ obs @ wvf
 
         # make sure it is real
         exact = np.real_if_close(exact)
         assert np.isreal(exact)
 
-        # create the simulation type
-        def obs_sim(circ: Circuit, shots=None):
-            # we only want the expectation value not the variance
-            # this is why we return [0]
+        # fixes the noise level and the observable
+        def obs_sim(circ: Circuit):
             return noisy_simulation(circ, noise, obs)
 
         # evaluate the noisy answer
