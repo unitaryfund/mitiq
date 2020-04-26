@@ -59,6 +59,7 @@ def make_maxcut(graph: List[Tuple[int, int]],
     """
     # get the list of unique nodes from the list of edges
     nodes = list({node for edge in graph for node in edge})
+    nodes = range(max(nodes) + 1)
 
     # one qubit per node
     qreg = [NamedQubit(str(nn)) for nn in nodes]
