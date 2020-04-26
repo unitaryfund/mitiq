@@ -621,6 +621,7 @@ def test_fold_from_right_with_terminal_measurements_min_stretch():
         [ops.measure_each(*qreg)],
     )
     assert _equal(folded, correct)
+    assert _equal(circ, correct)
 
 
 def test_fold_from_right_with_terminal_measurements_max_stretch():
@@ -648,6 +649,26 @@ def test_fold_from_right_with_terminal_measurements_max_stretch():
         [ops.measure_each(*qreg)],
     )
     assert _equal(folded, correct)
+
+    # Make sure the original circuit is not modified
+    original = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)],
+    )
+    assert _equal(circ, original)
+
+
+def test_fold_right_retains_terminal_measurements_in_input_circuit():
+    """Tests that folding from the right doesn't modify the terminal
+    measurements in the input circuit.
+    """
+    qbit = LineQubit(1)
+    circ = Circuit(ops.H.on(qbit), ops.measure(qbit))
+    folded = fold_gates_from_right(circ, stretch=1.0)
+    assert _equal(circ, folded)
 
 
 def test_fold_gates_at_random_no_stretch():

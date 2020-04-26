@@ -321,7 +321,7 @@ def fold_gates_from_right(
             f"Input circuit contains intermediate measurements" \
             " and cannot be folded."
         )
-
+    circuit = deepcopy(circuit)
     measurements = _pop_measurements(circuit)
 
     reversed_circuit = Circuit(reversed(circuit))
