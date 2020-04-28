@@ -155,13 +155,7 @@ that a gate is affected by decoherence during its execution on hardware
 in terms of time-resolved pulses.
 
 
-.. _guide_qem_uf:
-
-"""""""""""""""""""""""""""""""""
-Unitary folding
-"""""""""""""""""""""""""""""""""
-A way to stretch time with respect to noise-related processes is obtained by
-inserting identity gates. These gates can be decomposed in terms of gates already present in the circuit, and their transpose. This technique, referred to as :ref:`unitary folding<guide-folding>`, is present in the ``mitiq`` toolchain.
+The effective noise of a quantum circuit can be scaled also at a gate-level, i.e., without requiring a direct control of the  physical hardware. For example this can be achieved with the :ref:`unitary folding<guide-folding>` technique, a method which is present in the ``mitiq`` toolchain.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
