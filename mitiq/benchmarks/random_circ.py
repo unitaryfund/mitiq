@@ -51,9 +51,9 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
                 track progress.
 
     Returns:
-        The tuple (unmitigated_error, mitigated_error) where each is a list
-        whose values are the errors of that trial in the unmitigated or
-        mitigated cases.
+        The triple (exacts, unmitigateds, mitigateds) where each is a list
+        whose values are the expectations of that trial in noiseless, noisy,
+        and error-mitigated runs respectively.
     """
     exacts = []
     unmitigateds = []
