@@ -34,7 +34,7 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
                        fac: Factory=None,
                        scale_noise: Callable[[QPROGRAM, float], QPROGRAM]=None,
                        op_density:float=0.99, silent:bool=True) \
-        -> Tuple[List, List]:
+        -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Benchmarks a zero-noise extrapolation method and noise scaling executor
     by running on randomly sampled quantum circuits.
 
@@ -55,8 +55,9 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
         whose values are the errors of that trial in the unmitigated or
         mitigated cases.
     """
-    unmitigated_error = []
-    mitigated_error = []
+    exacts = []
+    unmitigateds = []
+    mitigateds = []
 
     qubits = [NamedQubit(str(xx)) for xx in range(n_qubits)]
 
@@ -86,8 +87,8 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
         mitigated = execute_with_zne(qp=qc, executor=obs_sim,
                                         scale_noise=scale_noise,
                                         fac=fac)
+        exacts.append(exact)
+        unmitigateds.append(unmitigated)
+        mitigateds.append(mitigated)
 
-        unmitigated_error.append(np.abs(exact - unmitigated))
-        mitigated_error.append(np.abs(exact - mitigated))
-
-    return unmitigated_error, mitigated_error
+    return np.asarray(exacts), np.asarray(unmitigateds), np.asarray(mitigateds)
