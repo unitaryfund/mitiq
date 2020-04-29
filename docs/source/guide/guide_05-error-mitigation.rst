@@ -8,39 +8,10 @@ This is intended as a primer on quantum error mitigation, providing a
 collection of up-to-date resources from the academic literature, as well as
 other external links framing this topic in the open-source software ecosystem.
 
-* :ref:`guide_qem_noise`
 * :ref:`guide_qem_what`
-* :ref:`guide_qem_related`
 * :ref:`guide_qem_why`
+* :ref:`guide_qem_related`
 * :ref:`guide_qem_references`
-
-.. _guide_qem_noise:
-
---------------------------------
-Noise in quantum devices
---------------------------------
-
-A series of issues arise when someone wants to perform a calculation on a
-quantum computer.
-
-This is due to the fact that quantum computers are devices that are embedded in
-an environment and interact with it. This means that stored information can be
-corrupted, or that, during calculations, the protocols are not faithful.
-
-Errors occur for a series of reasons in quantum computers and the microscopic
-description at the physical level can vary broadly, depending on the quantum
-computing platform that is used, as well as the computing architecture.
-
-For example, superconducting-circuit-based quantum computers have chips that
-are prone to cross-talk noise, while qubits encoded in trapped ions need to be
-shuttled with electromagnetic pulses, and solid-state artificial atoms, including quantum dots, are heavily affected by inhomogeneous broadening :cite:`Buluta_2011_RPP`.
-
-More in general, quantum computing devices can be studied in the framework of
-open quantum systems :cite:`Carmichael_1999_Springer,Carmichael_2007_Springer,Gardiner_2004_Springer,Breuer_2007_Oxford`, that is, systems that exchange
-energy and information with the surrounding environment.
-
-The qubit-environment exchange can be controlled, and this feature is actually fundamental to extract information and process it.
-When this interaction is not controlled, and at the fundamental level it cannot be completely suppressed, noise eventually kicks in, thus introducing errors that are disruptive for the *fidelity* of the information-processing protocols.
 
 .. _guide_qem_what:
 
@@ -70,71 +41,6 @@ a leading candidate is zero-noise extrapolation.
 Zero-noise extrapolation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The key idea behind zero-noise extrapolation is that it is possible to make
-some general assumptions on the kind of noise that affects, with error, the
-results of a quantum computation.
-
-In an ideal device, the time evolution is unitary, and as such it is modeled in
-the intermediate representation of a quantum circuit,
-
-.. math::
-
-   \begin{eqnarray}
-   |\psi\rangle (t)&=&U(t)|\psi\rangle
-   =e^{-i\int_0^t H(t') dt'/\hbar}|\psi\rangle,
-     \end{eqnarray}
-
-where :math:`|\psi\rangle` is the initial state of the system (e.g., the qubits
-involved in the operation) and :math:`U(t)` the unitary
-time evolution set by a time-dependent Hamiltonian, H(t).
-
-
-In the simplest scenario for the system-environment interaction, it is still
-possible to describe the time evolution in terms of operators acting on the
-system only, at the cost of losing the unitarity of the evolution.
-
-
-The first required condition to develop such framework, is that the system
-interacts more weakly with the environment than within its own
-sub-constituents. This allows to proceed with a perturbative approach to solve
-the problem, with a coupling constant :math:`\lambda` quantifying the
-magnitude of the first-order expansion terms.
-
-In this case, it is possible to write the time evolution of the density matrix
-associated to the state, :math:`\hat{\rho}=|\psi\rangle\langle \psi|`, as
-
-.. math::
-
-   \begin{eqnarray}
-   \frac{\partial }{ \partial t}\hat{\rho}&=&
-   \frac{i}{\hbar}\lbrack H(t), \hat{\rho}\rbrack+\lambda \mathcal{L}
-   \lbrack\hat{\rho}\rbrack,
-   \end{eqnarray}
-
-where :math:`mathcal{L}` is a super-operator acting on the Hilbert space.
-
-The subsequent most straightforward set of sensible approximations includes
-assuming that at time zero the system and environment are not entangled, that
-the environment is memoryless, and that there is a dominant scale of times set
-by the interactions, wich allows to cut off high-frequency perturbations.
-
-These approximations -- called the Born, Markov, and Rotating-Wave approximations, respectively --
-lead to a so-called Lindblad form of the *dissipation*, i.e. to a special
-structure of the system-environment interaction that can be represented with
-a linear superoperator that always admits the Lindblad form
-
-.. math::
-
-   \begin{eqnarray}
-   \mathcal{L}\lbrack\hat{\rho}\rbrack&=&\mathcal{L}\hat{\rho}
-   =\sum_{i=1}^{N^2-1} \gamma_i \left( A_i\hat{\rho} A_i^\dagger
-   - \frac{1}{2}( A_i^\dagger A_i\hat{\rho}+ \hat{\rho}A_i^\dagger A_i )\right)
-   ,
-   \end{eqnarray}
-
-where :math:`\gamma_i` are constants that set the strenghts of the dissipation
-mechanisms defined by the jump operators, :math:`A_i`.
-
 The crucial idea behind zero-noise extrapolation is that, while some minimum
 strength of noise is unavoidable in the system, it is still possible to
 *increase* it to a value :math:`\lambda'=c\lambda`, with :math:`c>1`, so that
@@ -162,6 +68,30 @@ The effective noise of a quantum circuit can be scaled also at a gate-level, i.e
 Other error mitigation techniques
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Other examples of error mitigation techniques include injecting noisy gates for randomized compiling and probabilistic error cancellation, or the use of subspace reductions and symmetries. A collection of references on this cutting-edge implementations can be found in the :ref:`guide_qem_articles` subsection.
+
+.. _guide_qem_why:
+
+-----------------------------------------
+Why is quantum error mitigation important
+-----------------------------------------
+
+The noisy intermediate scale quantum computing (NISQ) era is characterized by
+short or medium-depth circuits in which noise affects state
+preparation, gate operations, and measurement :cite:`Preskill_2018_Quantum`.
+
+Current short-depth quantum circuits are noisy, and at the same time it is not
+possible to implement quantum error correcting codes on them due to the
+needed qubit number and circuit depth required by these codes.
+
+Error mitigation offers the prospects of writing more compact quantum circuits
+that can estimate observables with more precision, i.e. increase the
+performance of quantum computers.
+
+By implementing quantum optics tools (such as the modeling noise and open
+quantum systems) :cite:`Carmichael_1999_Springer,Carmichael_2007_Springer,Gardiner_2004_Springer,Breuer_2007_Oxford`, standard as well as cutting-edge statistics and inference
+techniques, and tweaking them for the needs of the quantum computing community,
+``mitiq`` aims at providing the most comprehensive toolchain for error
+mitigation.
 
 .. _guide_qem_related:
 
@@ -224,30 +154,26 @@ post-processing techniques, while the latter relies on an active feedback loop.
 An example of a specific application of optimal control to quantum dynamics that can be seen as a quantum error mitigation technique, is in dynamical decoupling :cite:`Viola_1999_PRL`. This technique employs fast control pulses to effectively decouple a system from its environment, with techniques pioneered in the nuclear magnetic resonance
 community.
 
-.. _guide_qem_why:
+.. _guide_qem_noise:
 
------------------------------------------
-Why is quantum error mitigation important
------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Open quantum systems
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The noisy intermediate scale quantum computing (NISQ) era is characterized by
-short or medium-depth circuits in which noise affects state
-preparation, gate operations, and measurement :cite:`Preskill_2018_Quantum`.
+More in general, quantum computing devices can be studied in the framework of
+open quantum systems :cite:`Carmichael_1999_Springer,Carmichael_2007_Springer,Gardiner_2004_Springer,Breuer_2007_Oxford`, that is, systems that exchange
+energy and information with the surrounding environment. On the one hand, the qubit-environment exchange can be controlled, and this feature is actually fundamental to extract information and process it.
+On the other hand, when this interaction is not controlled — and at the fundamental level it cannot be completely suppressed — noise eventually kicks in, thus introducing errors that are disruptive for the *fidelity* of the information-processing protocols.
 
-Current short-depth quantum circuits are noisy, and at the same time it is not
-possible to implement quantum error correcting codes on them due to the
-needed qubit number and circuit depth required by these codes.
 
-Error mitigation offers the prospects of writing more compact quantum circuits
-that can estimate observables with more precision, i.e. increase the
-performance of quantum computers.
+Indeed, a series of issues arise when someone wants to perform a calculation on a
+quantum computer. This is due to the fact that quantum computers are devices that are embedded in an environment and interact with it. This means that stored information can be corrupted, or that, during calculations, the protocols are not faithful.
 
-By implementing quantum optics tools (such as the modeling noise and open
-quantum systems) :cite:`Carmichael_1999_Springer,Carmichael_2007_Springer,Gardiner_2004_Springer,Breuer_2007_Oxford`, standard as well as cutting-edge statistics and inference
-techniques, and tweaking them for the needs of the quantum computing community,
-``mitiq`` aims at providing the most comprehensive toolchain for error
-mitigation.
-
+Errors occur for a series of reasons in quantum computers and the microscopic
+description at the physical level can vary broadly, depending on the quantum
+computing platform that is used, as well as the computing architecture. For example, superconducting-circuit-based quantum computers have chips that
+are prone to cross-talk noise, while qubits encoded in trapped ions need to be
+shuttled with electromagnetic pulses, and solid-state artificial atoms, including quantum dots, are heavily affected by inhomogeneous broadening :cite:`Buluta_2011_RPP`.
 
 .. _guide_qem_references:
 
@@ -285,7 +211,7 @@ A list of research articles academic resources on error mitigation:
    - Exploiting molecular symmetries, J. McClean *et al.*, *Nat. Comm.*, 2020 :cite:`McClean_2020_NatComm`
    - Experiment on a superconducting circuit device, R. Sagastizabal *et al.*, *Phys. Rev. A*, 2019 :cite:`Sagastizabal_2019_PRA`
 
-- On other techniques such as:
+- On **other error-mitigation techniques** such as:
    - Approximate error-correcting codes in the generalized amplitude-damping channels, C. Cafaro *et al.*, *Phys. Rev. A*, 2014 :cite:`Cafaro_2014_PRA`:
    - Extending the variational quantum eigensolver (VQE) to excited states, R. M. Parrish *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Parrish_2019_PRL`
    - Quantum imaginary time evolution, M. Motta *et al.*, *Nat. Phys.*, 2020 :cite:`Motta_2020_NatPhys`
