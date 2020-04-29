@@ -49,7 +49,7 @@ statistical fitting models, which can be linear or non-linear. These methods
 are contained in the :mod:`mitiq.factories` and :mod:`mitiq.zne` modules.
 
 In theory, one way zero-noise extrapolation can be simulated, also with ``mitiq``,
-is by picking an underlying noise model, e.g., a memoryless bath such that the system dissipates with Lindblad dynamics. Likewise, zero-noise extrapolation can be applied also to non-Markovian noise models :cite:`Temme_2017_PRL`. However, it is important to point out that zero-noise extrapolation is a very general method in which one is free to scale and extrapolate almost whatever parameter one wishes to, even if the underlying noise model is unknown. E.g., in the Yousef example we scale the random angle variance, with unitary folding we scale the circuit depth without assuming any specific error model
+is by picking an underlying noise model, e.g., a memoryless bath such that the system dissipates with Lindblad dynamics. Likewise, zero-noise extrapolation can be applied also to non-Markovian noise models :cite:`Temme_2017_PRL`. However, it is important to point out that zero-noise extrapolation is a very general method in which one is free to scale and extrapolate almost whatever parameter one wishes to, even if the underlying noise model is unknown.
 
 In experiments, zero-noise extrapolation has been performed with pulse
 stretching :cite:`Kandala_2019_Nature`. In this way, a difference between the effective time that a gate is affected by decoherence during its execution on the hardware
