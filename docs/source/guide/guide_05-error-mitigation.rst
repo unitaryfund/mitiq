@@ -21,32 +21,25 @@ What is quantum error mitigation
 
 Quantum error mitigation refers to a series of modern techniques aimed at
 reducing (*mitigating*) the errors that occur in quantum computing algorithms.
-
 Unlike software bugs affecting code in usual computers, the errors which we
 attempt to reduce with mitigation are due to the hardware.
 
 Quantum error mitigation techniques try to *reduce* the impact of noise in
-quantum computations. They generally do not completely remove it.
-
-Alternative nomenclature refers to error mitigation as (approximate) error
+quantum computations. They generally do not completely remove it. Alternative nomenclature refers to error mitigation as (approximate) error
 suppression or approximate quantum error correction, but it is worth noting
-that it is :ref:`different from error correction<guide_qem_what_not>`.
-
-Among the ideas that have been developed so far for quantum error mitigation,
+that it is :ref:`different from error correction<guide_qem_what_not>`. Among the ideas that have been developed so far for quantum error mitigation,
 a leading candidate is zero-noise extrapolation.
 
 .. _guide_qem_zne:
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Zero-noise extrapolation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The crucial idea behind zero-noise extrapolation is that, while some minimum
 strength of noise is unavoidable in the system, it is still possible to
 *increase* it to a value :math:`\lambda'=c\lambda`, with :math:`c>1`, so that
-it is then possible to extrapolate the zero-noise limit.
-
-This is done in practice by running a quantum circuit (simulation) and
+it is then possible to extrapolate the zero-noise limit. This is done in practice by running a quantum circuit (simulation) and
 calculating a given expectation variable, :math:`\langle X\rangle_\lambda`,
 then re-running the calculation (which is indeed a time evolution) for
 :math:`\langle X\rangle_{\lambda'}`, and then extracting
@@ -56,16 +49,11 @@ statistical fitting models, which can be linear or non-linear. These methods
 are contained in the :mod:`mitiq.factories` and :mod:`mitiq.zne` modules.
 
 In theory, one way zero-noise extrapolation can be simulated, also with ``mitiq``,
-is by picking an underlying noise model, e.g., a memoryless bath such that the system dissipates with Lindblad dynamics. Likewise, zero-noise extrapolation can be applied also to non-Markovian noise models :cite:`Temme_2017_PRL`.
-
-However, it is important to point out that zero-noise extrapolation is a very general method in which one is free to scale and extrapolate almost whatever parameter one wishes to, even if the underlying noise model is unknown. E.g., in the Yousef example we scale the random angle variance, with unitary folding we scale the circuit depth without assuming any specific error model
+is by picking an underlying noise model, e.g., a memoryless bath such that the system dissipates with Lindblad dynamics. Likewise, zero-noise extrapolation can be applied also to non-Markovian noise models :cite:`Temme_2017_PRL`. However, it is important to point out that zero-noise extrapolation is a very general method in which one is free to scale and extrapolate almost whatever parameter one wishes to, even if the underlying noise model is unknown. E.g., in the Yousef example we scale the random angle variance, with unitary folding we scale the circuit depth without assuming any specific error model
 
 In experiments, zero-noise extrapolation has been performed with pulse
 stretching :cite:`Kandala_2019_Nature`. In this way, a difference between the effective time that a gate is affected by decoherence during its execution on the hardware
-was introduced by controlling only the gate-defining pulses.
-
-
-The effective noise of a quantum circuit can be scaled also at a gate-level, i.e., without requiring a direct control of the  physical hardware. For example this can be achieved with the :ref:`unitary folding<guide-folding>` technique, a method which is present in the ``mitiq`` toolchain.
+was introduced by controlling only the gate-defining pulses. The effective noise of a quantum circuit can be scaled also at a gate-level, i.e., without requiring a direct control of the  physical hardware. For example this can be achieved with the :ref:`unitary folding<guide-folding>` technique, a method which is present in the ``mitiq`` toolchain.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -81,27 +69,22 @@ Why is quantum error mitigation important
 
 The noisy intermediate scale quantum computing (NISQ) era is characterized by
 short or medium-depth circuits in which noise affects state
-preparation, gate operations, and measurement :cite:`Preskill_2018_Quantum`.
-
-Current short-depth quantum circuits are noisy, and at the same time it is not
+preparation, gate operations, and measurement :cite:`Preskill_2018_Quantum`. Current short-depth quantum circuits are noisy, and at the same time it is not
 possible to implement quantum error correcting codes on them due to the
 needed qubit number and circuit depth required by these codes.
 
 Error mitigation offers the prospects of writing more compact quantum circuits
 that can estimate observables with more precision, i.e. increase the
-performance of quantum computers.
-
-By implementing quantum optics tools (such as the modeling noise and open
-quantum systems) :cite:`Carmichael_1999_Springer,Carmichael_2007_Springer,Gardiner_2004_Springer,Breuer_2007_Oxford`, standard as well as cutting-edge statistics and inference
+performance of quantum computers. By implementing quantum optics tools (such as the modeling noise and open quantum systems) :cite:`Carmichael_1999_Springer,Carmichael_2007_Springer,Gardiner_2004_Springer,Breuer_2007_Oxford`, standard as well as cutting-edge statistics and inference
 techniques, and tweaking them for the needs of the quantum computing community,
 ``mitiq`` aims at providing the most comprehensive toolchain for error
 mitigation.
 
 .. _guide_qem_related:
 
----------------------------------------------------
+--------------------------------------------------
 Related fields
----------------------------------------------------
+--------------------------------------------------
 
 Quantum error mitigation is connected to quantum error correction and quantum
 optimal control, two fields of study that also aim at reducing the impact of
@@ -132,9 +115,7 @@ The main issue of quantum error correction techniques are that generally they
 require a large overhead in terms of additional qubits on top of those required
 for the quantum computation. Current quantum computing devices have been able
 to demonstrate quantum error correction only with a very small number of
-qubits.
-
-What is now referred quantum error mitigation is generally a series of
+qubits. What is now referred quantum error mitigation is generally a series of
 techniques that stemmed as more practical quantum error correction solutions
 :cite:`Knill_2005_Nature`.
 
@@ -153,16 +134,14 @@ against noisy devices :cite:`Brif_2010_NJP`.
 
 A key difference between some quantum error mitigation techniques and quantum
 optimal control is that the former can be implemented in some instances with
-post-processing techniques, while the latter relies on an active feedback loop.
-
-An example of a specific application of optimal control to quantum dynamics that can be seen as a quantum error mitigation technique, is in dynamical decoupling :cite:`Viola_1999_PRL`. This technique employs fast control pulses to effectively decouple a system from its environment, with techniques pioneered in the nuclear magnetic resonance
+post-processing techniques, while the latter relies on an active feedback loop. An example of a specific application of optimal control to quantum dynamics that can be seen as a quantum error mitigation technique, is in dynamical decoupling :cite:`Viola_1999_PRL`. This technique employs fast control pulses to effectively decouple a system from its environment, with techniques pioneered in the nuclear magnetic resonance
 community.
 
 .. _guide_qem_noise:
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Open quantum systems
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 More in general, quantum computing devices can be studied in the framework of
 open quantum systems :cite:`Carmichael_1999_Springer,Carmichael_2007_Springer,Gardiner_2004_Springer,Breuer_2007_Oxford`, that is, systems that exchange
@@ -234,8 +213,7 @@ quantum computing, noisy quantum dynamics and error mitigation:
 
 - **IBM Q**'s `Qiskit`_ provides a stack for quantum computing simulation and execution on real devices from the cloud. In particular, ``qiskit.Aer`` contains the :class:`~qiskit.providers.aer.noise.NoiseModel` object, integrated with ``mitiq`` tools. Qiskit's OpenPulse provides pulse-level control of qubit operations in some of the superconducting circuit devices. ``mitiq`` is integrated with ``qiskit``, in the :mod:`~mitiq.mitiq_qiskit.qiskit_utils` and :mod:`~mitiq.mitiq_qiskit.conversions` modules.
 
-- **Goole AI Quantum**'s `Cirq`_ offers quantum simulation of quantum circuits.
-The :class:`cirq.Circuit` object is integrated in  ``mitiq`` algorithms as the default circuit.
+- **Goole AI Quantum**'s `Cirq`_ offers quantum simulation of quantum circuits. The :class:`cirq.Circuit` object is integrated in  ``mitiq`` algorithms as the default circuit.
 
 - **Rigetti Computing**'s `PyQuil`_ is a library for quantum programming. Rigetti's stack offers the execution of quantum circuits on superconducting circuits devices from the cloud, as well as their simulation on a quantum virtual machine (QVM), integrated with ``mitiq`` tools in the :mod:`~mitiq.mitiq_pyquil.pyquil_utils` module.
 
