@@ -55,10 +55,14 @@ The extraction for :math:`\langle X\rangle_{0}` can occur with several
 statistical fitting models, which can be linear or non-linear. These methods
 are contained in the :mod:`mitiq.factories` and :mod:`mitiq.zne` modules.
 
-In experiments, zero-noise extrapolation can be performed with pulse
-stretching as a means to introduce a difference between the effective time
-that a gate is affected by decoherence during its execution on hardware
-in terms of time-resolved pulses.
+In theory, one way zero-noise extrapolation can be simulated, also with ``mitiq``,
+is by picking an underlying noise model, e.g., a memoryless bath such that the system dissipates with Lindblad dynamics. Likewise, zero-noise extrapolation can be applied also to non-Markovian noise models :cite:`Temme_2017_PRL`.
+
+However, it is important to point out that zero-noise extrapolation is a very general method in which one is free to scale and extrapolate almost whatever parameter one wishes to, even if the underlying noise model is unknown. E.g., in the Yousef example we scale the random angle variance, with unitary folding we scale the circuit depth without assuming any specific error model
+
+In experiments, zero-noise extrapolation has been performed with pulse
+stretching :cite:`Kandala_2019_Nature`. In this way, a difference between the effective time that a gate is affected by decoherence during its execution on the hardware
+was introduced by controlling only the gate-defining pulses.
 
 
 The effective noise of a quantum circuit can be scaled also at a gate-level, i.e., without requiring a direct control of the  physical hardware. For example this can be achieved with the :ref:`unitary folding<guide-folding>` technique, a method which is present in the ``mitiq`` toolchain.
