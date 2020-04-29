@@ -37,7 +37,7 @@ Zero-noise extrapolation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The crucial idea behind zero-noise extrapolation is that, while some minimum
-strength of noise is unavoidable in the system, it is still possible to
+strength of noise is unavoidable in the system, quantified by a quantity :math:`\lambda`,  it is still possible to
 *increase* it to a value :math:`\lambda'=c\lambda`, with :math:`c>1`, so that
 it is then possible to extrapolate the zero-noise limit. This is done in practice by running a quantum circuit (simulation) and
 calculating a given expectation variable, :math:`\langle X\rangle_\lambda`,
