@@ -14,3 +14,4 @@ Users Guide
    guide_03-folding.rst
    guide_04-factories.rst
    guide_05-error-mitigation.rst
+.. _guide_06-zne-lindblad.rst
