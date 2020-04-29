@@ -14,8 +14,7 @@ the intermediate representation of a quantum circuit,
 .. math::
 
    \begin{eqnarray}
-   |\psi\rangle (t)&=&U(t)|\psi\rangle
-   =e^{-i\int_0^t H(t') dt'/\hbar}|\psi\rangle,
+   \frac{d}{dt}|\psi\rangle =-\frac{i}{\hbar}H(t)|\psi\rangle,
      \end{eqnarray}
 
 where :math:`|\psi\rangle` is the initial state of the system (e.g., the qubits
