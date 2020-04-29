@@ -313,8 +313,6 @@ The :class:`cirq.Circuit` object is integrated in  ``mitiq`` algorithms as the d
 
 - `Krotov`_ is a package implementing Krotov method for optimal control interfacing with QuTiP for noisy density-matrix quantum evolution.
 
-- `Pennylane`_ is a hardware-agnostic library that brings together machine learning and quantum circuits.
-
 - `PyGSTi`_ allows to characterize quantum circuits by implementing techniques such as gate set tomography (GST) and randomized benchmarking.
 
 This is just a selection of open-source projects related to quantum error
@@ -328,8 +326,6 @@ can be found `here`_ and on `Unitary Fund`_'s list of supported projects.
 .. _Cirq: http://cirq.readthedocs.io/
 
 .. _PyQuiL: https://github.com/rigetti/pyquil
-
-.. _Pennylane: http://pennylane.ai/
 
 .. _Krotov: http://krotov.readthedocs.io/
 
