@@ -154,6 +154,16 @@ def scale_noise(pq: Program, param: float) -> Program:
 
 
 def measure(circuit, qid):
+    """Returns a circuit adding a register for readout results.
+
+    Args:
+        circuit: Quantum circuit as :class:`~pyquil.quil.Program`.
+        qid: position of the measurement in the circuit.
+
+    Returns:
+
+        Quantum program with added measurement.
+    """
     ro = circuit.declare("ro", "BIT", 1)
     circuit += MEASURE(qid, ro[0])
     return circuit
