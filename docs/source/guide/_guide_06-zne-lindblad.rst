@@ -8,7 +8,7 @@ Zero-Noise Extrapolation
 Zero-Noise Extrapolation: Lindblad dynamics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In an ideal device, the time evolution is unitary, and as such it is modeled in
+In an ideal device, the time evolution is unitary, and as is modeled in
 the intermediate representation of a quantum circuit,
 
 .. math::
