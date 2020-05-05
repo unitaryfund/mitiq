@@ -1374,3 +1374,94 @@ def test_fold_global_with_qiskit_circuits():
         fold_method=fold_gates_from_left
     )
     assert isinstance(folded_qiskit_circuit, QuantumCircuit)
+
+
+def test_fold_left_squash_moments():
+    """Tests folding from left with kwarg squash_moments."""
+    # Test circuit
+    # 0: ───H───@───@───M───
+    #           │   │
+    # 1: ───H───X───@───M───
+    #               │
+    # 2: ───H───T───X───M───
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+    folded_not_squashed = fold_gates_from_left(
+        circ, stretch=3, squash_moments=False
+    )
+    folded_and_squashed = fold_gates_from_left(
+        circ, stretch=3, squash_moments=True
+    )
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+        [ops.T.on(qreg[2]), ops.T.on(qreg[2]) ** -1, ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3,
+        [ops.measure_each(*qreg)],
+    )
+    assert _equal(folded_and_squashed, folded_not_squashed)
+    assert _equal(folded_and_squashed, correct)
+    assert len(folded_and_squashed) == 10
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left,
+     fold_gates_from_right,
+     fold_gates_at_random,
+     fold_global]
+)
+def test_fold_and_squash_max_stretch(fold_method):
+    """Tests folding and squashing a two-qubit circuit."""
+    # Test circuit:
+    # 0: ───────H───────H───────H───────H───────H───
+    #
+    # 1: ───H───────H───────H───────H───────H───────
+
+    # Get the test circuit
+    d = 10
+    qreg = LineQubit.range(2)
+    circuit = Circuit()
+    for i in range(d):
+        circuit.insert(
+            0, ops.H.on(qreg[i % 2]), strategy=InsertStrategy.NEW
+        )
+    folded_not_squashed = fold_method(
+        circuit, stretch=3., squash_moments=False
+    )
+    folded_and_squashed = fold_method(
+        circuit, stretch=3., squash_moments=True
+    )
+    assert len(folded_not_squashed) == 30
+    assert len(folded_and_squashed) == 15
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left,
+     fold_gates_from_right,
+     fold_gates_at_random,
+     fold_global]
+)
+def test_fold_and_squash_random_circuits_random_stretches(fold_method):
+    """Tests folding and squashing random circuits and ensures the number of
+    moments in the squashed circuits is never greater than the number of
+    moments in the un-squashed circuit.
+    """
+    rng = np.random.RandomState(seed=1)
+    for _ in range(100):
+        circuit = testing.random_circuit(qubits=8, n_moments=8, op_density=0.75)
+        stretch = 2 * rng.random() + 1
+        folded_not_squashed = fold_method(
+            circuit, stretch=stretch, squash_moments=False
+        )
+        folded_and_squashed = fold_method(
+            circuit, stretch=stretch, squash_moments=True
+        )
+        assert len(folded_and_squashed) <= len(folded_not_squashed)
