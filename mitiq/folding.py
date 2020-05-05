@@ -232,31 +232,31 @@ def _fold_all_gates_locally(circuit: Circuit) -> None:
     _fold_moments(circuit, list(range(len(circuit))))
 
 
-def _get_num_to_fold(stretch: float, ngates: int) -> int:
+def _get_num_to_fold(scale_factor: float, ngates: int) -> int:
     """Returns the number of gates to fold to achieve the desired (approximate)
-    stretch factor.
+    scale factor.
 
     Args:
-        stretch: Floating point value to stretch the circuit by.
-        ngates: Number of gates in the circuit to stretch.
+        scale_factor: Floating point value to scale the circuit by.
+        ngates: Number of gates in the circuit to fold.
     """
-    return int(round(ngates * (stretch - 1.0) / 2.0))
+    return int(round(ngates * (scale_factor - 1.0) / 2.0))
 
 
 @converter
 def fold_gates_from_left(
-        circuit: QPROGRAM, stretch: float, **kwargs
+        circuit: QPROGRAM, scale_factor: float, **kwargs
 ) -> QPROGRAM:
     """Returns a new folded circuit by applying the map G -> G G^dag G to a
     subset of gates of the input circuit, starting with gates at the
     left (beginning) of the circuit.
 
     The folded circuit has a number of gates approximately equal to
-    stretch * n where n is the number of gates in the input circuit.
+    scale_factor * n where n is the number of gates in the input circuit.
 
     Args:
         circuit: Circuit to fold.
-        stretch: Factor to stretch the circuit by. Any real number in [1, 3].
+        scale_factor: Factor to scale the circuit by. Any real number in [1, 3].
 
     Keyword Args:
         squash_moments: If True, moments are squashed in the returned circuit.
@@ -268,7 +268,7 @@ def fold_gates_from_left(
 
     Note:
         Folding a single gate adds two gates to the circuit,
-        hence the maximum stretch factor is 3.
+        hence the maximum scale factor is 3 (when all gates are folded).
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -276,9 +276,9 @@ def fold_gates_from_left(
             " and cannot be folded."
         )
 
-    if not 1 <= stretch <= 3:
+    if not 1 <= scale_factor <= 3:
         raise ValueError(
-            "The stretch factor must be a real number between 1 and 3."
+            "The scale factor must be a real number between 1 and 3."
         )
 
     folded = deepcopy(circuit)
@@ -286,7 +286,7 @@ def fold_gates_from_left(
     measurements = _pop_measurements(folded)
 
     ngates = len(list(folded.all_operations()))
-    num_to_fold = _get_num_to_fold(stretch, ngates)
+    num_to_fold = _get_num_to_fold(scale_factor, ngates)
     if num_to_fold == 0:
         _append_measurements(folded, measurements)
         return folded
@@ -309,18 +309,18 @@ def fold_gates_from_left(
 
 @converter
 def fold_gates_from_right(
-        circuit: QPROGRAM, stretch: float, **kwargs
+        circuit: QPROGRAM, scale_factor: float, **kwargs
 ) -> Circuit:
     """Returns a new folded circuit by applying the map G -> G G^dag G
     to a subset of gates of the input circuit, starting with gates at
     the right (end) of the circuit.
 
     The folded circuit has a number of gates approximately equal to
-    stretch * n where n is the number of gates in the input circuit.
+    scale_factor * n where n is the number of gates in the input circuit.
 
     Args:
         circuit: Circuit to fold.
-        stretch: Factor to stretch the circuit by. Any real number in [1, 3].
+        scale_factor: Factor to scale the circuit by. Any real number in [1, 3].
 
     Keyword Args:
         squash_moments: If True, moments are squashed in the returned circuit.
@@ -332,18 +332,20 @@ def fold_gates_from_right(
 
     Note:
         Folding a single gate adds two gates to the circuit,
-        hence the maximum stretch factor is 3.
+        hence the maximum scale factor is 3.
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
-            f"Input circuit contains intermediate measurements" \
+            f"Input circuit contains intermediate measurements"
             " and cannot be folded."
         )
     circuit = deepcopy(circuit)
     measurements = _pop_measurements(circuit)
 
     reversed_circuit = Circuit(reversed(circuit))
-    reversed_folded_circuit = fold_gates_from_left(reversed_circuit, stretch)
+    reversed_folded_circuit = fold_gates_from_left(
+        reversed_circuit, scale_factor
+    )
     folded = Circuit(reversed(reversed_folded_circuit))
     _append_measurements(folded, measurements)
     if kwargs.get("squash_moments") is True:
@@ -393,17 +395,17 @@ def _update_moment_indices(
 
 @converter
 def fold_gates_at_random(
-    circuit: QPROGRAM, stretch: float, seed: Optional[int] = None, **kwargs
+    circuit: QPROGRAM, scale_factor: float, seed: Optional[int] = None, **kwargs
 ) -> QPROGRAM:
     """Returns a folded circuit by applying the map G -> G G^dag G to a random
     subset of gates in the input circuit.
 
     The folded circuit has a number of gates approximately equal to
-     stretch * n where n is the number of gates in the input circuit.
+    scale_factor * n where n is the number of gates in the input circuit.
 
     Args:
         circuit: Circuit to fold.
-        stretch: Factor to stretch the circuit by. Any real number in [1, 3].
+        scale_factor: Factor to scale the circuit by. Any real number in [1, 3].
         seed: [Optional] Integer seed for random number generator.
 
     Keyword Args:
@@ -416,7 +418,7 @@ def fold_gates_at_random(
 
     Note:
         Folding a single gate adds two gates to the circuit, hence the maximum
-        stretch factor is 3.
+        scale factor is 3.
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -424,16 +426,16 @@ def fold_gates_at_random(
             " and cannot be folded."
         )
 
-    if not 1 <= stretch <= 3:
+    if not 1 <= scale_factor <= 3:
         raise ValueError(
-            "The stretch factor must be a real number between 1 and 3."
+            "The scale factor must be a real number between 1 and 3."
         )
 
     folded = deepcopy(circuit)
 
     measurements = _pop_measurements(folded)
 
-    if np.isclose(stretch, 3.0, atol=1e-3):
+    if np.isclose(scale_factor, 3.0, atol=1e-3):
         _fold_all_gates_locally(folded)
         _append_measurements(folded, measurements)
         if kwargs.get("squash_moments") is True:
@@ -444,7 +446,7 @@ def fold_gates_at_random(
         np.random.seed(seed)
 
     ngates = len(list(folded.all_operations()))
-    num_to_fold = _get_num_to_fold(stretch, ngates)
+    num_to_fold = _get_num_to_fold(scale_factor, ngates)
 
     # Keep track of where moments are in the folded circuit
     moment_indices = {i: i for i in range(len(circuit))}
@@ -490,7 +492,7 @@ def fold_gates_at_random(
 @converter
 def fold_local(
     circuit: QPROGRAM,
-    stretch: float,
+    scale_factor: float,
     fold_method: Callable[
         [Circuit, float, Tuple[Any]], Circuit
     ] = fold_gates_from_left,
@@ -502,11 +504,11 @@ def fold_local(
 
     Args:
         circuit: Circuit to fold.
-        stretch: Factor to stretch the circuit by.
+        scale_factor: Factor to scale the circuit by.
         fold_method: Function which defines the method for folding gates.
         fold_method_args: Any additional input arguments for the fold_method.
                           The method is called with
-                          fold_method(circuit, stretch, *fold_method_args).
+                          fold_method(circuit, scale_factor, *fold_method_args).
 
     Keyword Args:
         squash_moments: If True, moments are squashed in the returned circuit.
@@ -528,39 +530,40 @@ def fold_local(
 
         The signature of `fold_method` must be
             ```
-            def fold_method(circuit: Circuit, stretch: float,**kwargs):
+            def fold_method(circuit: Circuit, scale_factor: float,**kwargs):
                 ...
             ```
         and return a circuit.
     """
     folded = deepcopy(circuit)
 
-    if np.isclose(stretch, 1.0, atol=1e-2):
+    if np.isclose(scale_factor, 1.0, atol=1e-2):
         return folded
 
-    if not 1 <= stretch:
+    if not 1 <= scale_factor:
         raise ValueError(
-            f"The stretch factor must be a real number greater than 1."
+            f"The scale factor must be a real number greater than 1."
         )
 
-    while stretch > 1.0:
-        this_stretch = 3.0 if stretch > 3.0 else stretch
+    while scale_factor > 1.0:
+        this_stretch = 3.0 if scale_factor > 3.0 else scale_factor
         folded = fold_method(folded, this_stretch, *fold_method_args, **kwargs)
-        stretch /= 3.0
+        scale_factor /= 3.0
     return folded
 
 
 # Circuit level folding
 @converter
-def fold_global(circuit: QPROGRAM, stretch: float, **kwargs) -> QPROGRAM:
-    """Gives a circuit by folding the global unitary of the input circuit.
+def fold_global(circuit: QPROGRAM, scale_factor: float, **kwargs) -> QPROGRAM:
+    """Returns a new circuit obtained by folding the global unitary of the 
+    input circuit.
 
     The returned folded circuit has a number of gates approximately equal to
-     stretch * len(circuit).
+    scale_factor * len(circuit).
 
     Args:
         circuit: Circuit to fold.
-        stretch: Factor to stretch the circuit by.
+        scale_factor: Factor to scale the circuit by.
 
     Keyword Args:
         squash_moments: If True, moments are squashed in the returned circuit.
@@ -570,8 +573,8 @@ def fold_global(circuit: QPROGRAM, stretch: float, **kwargs) -> QPROGRAM:
     Returns:
         folded: the folded quantum circuit as a QPROGRAM.
     """
-    if not (stretch >= 1):
-        raise ValueError("The stretch factor must be a real number >= 1.")
+    if not (scale_factor >= 1):
+        raise ValueError("The scale factor must be a real number >= 1.")
 
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -583,15 +586,15 @@ def fold_global(circuit: QPROGRAM, stretch: float, **kwargs) -> QPROGRAM:
     measurements = _pop_measurements(folded)
     base_circuit = deepcopy(folded)
 
-    # Determine the number of global folds and the final fractional stretch
-    num_global_folds, fractional_stretch = divmod(stretch - 1, 2)
+    # Determine the number of global folds and the final fractional scale
+    num_global_folds, fraction_scale = divmod(scale_factor - 1, 2)
     # Do the global folds
     for _ in range(int(num_global_folds)):
         folded += Circuit(inverse(base_circuit), base_circuit)
 
-    # Fold remaining gates until the stretch is reached
+    # Fold remaining gates until the scale is reached
     ops = list(base_circuit.all_operations())
-    num_to_fold = int(round(fractional_stretch * len(ops) / 2))
+    num_to_fold = int(round(fraction_scale * len(ops) / 2))
 
     if num_to_fold > 0:
         folded += Circuit([inverse(ops[-num_to_fold:])], [ops[-num_to_fold:]])

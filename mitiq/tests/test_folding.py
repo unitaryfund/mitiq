@@ -487,8 +487,8 @@ def test_fold_from_left_two_qubits():
         ]
     )
 
-    # Intermediate stretch factor
-    folded = fold_gates_from_left(circ, stretch=2.5)
+    # Intermediate scale factor
+    folded = fold_gates_from_left(circ, scale_factor=2.5)
     correct = Circuit(
         [ops.H.on_each(*qreg)] * 3,
         [ops.CNOT.on(*qreg)] * 3,
@@ -496,8 +496,8 @@ def test_fold_from_left_two_qubits():
     )
     assert _equal(folded, correct)
 
-    # Full stretch factor
-    folded = fold_gates_from_left(circ, stretch=3)
+    # Full scale factor
+    folded = fold_gates_from_left(circ, scale_factor=3)
     correct = Circuit(
         [ops.H.on_each(*qreg)] * 3,
         [ops.CNOT.on(*qreg)] * 3,
@@ -507,7 +507,7 @@ def test_fold_from_left_two_qubits():
 
 
 def test_fold_from_left_three_qubits():
-    """Unit test for folding gates from left to stretch a circuit."""
+    """Unit test for folding gates from left to scale a circuit."""
     qreg = LineQubit.range(3)
     circ = Circuit(
         [
@@ -518,24 +518,24 @@ def test_fold_from_left_three_qubits():
         ]
     )
 
-    folded = fold_gates_from_left(circ, stretch=2)
+    folded = fold_gates_from_left(circ, scale_factor=2)
     correct = Circuit([ops.H.on_each(*qreg)] * 2, list(circ.all_operations()))
     assert _equal(folded, correct)
 
 
 def test_fold_from_left_no_stretch():
-    """Unit test for folding gates from left for a stretch factor of one."""
+    """Unit test for folding gates from left for a scale factor of one."""
     circuit = random_circuit(depth=100)
-    folded = fold_gates_from_left(circuit, stretch=1)
+    folded = fold_gates_from_left(circuit, scale_factor=1)
     assert _equal(folded, circuit)
     assert not (folded is circuit)
 
 
 def test_fold_from_left_bad_stretch():
-    """Tests that a ValueError is raised for an invalid stretch factor."""
+    """Tests that a ValueError is raised for an invalid scale factor."""
     circuit = random_circuit(100)
     with pytest.raises(ValueError):
-        fold_gates_from_left(circuit, stretch=10)
+        fold_gates_from_left(circuit, scale_factor=10)
 
 
 def test_fold_from_left_with_terminal_measurements_min_stretch():
@@ -554,7 +554,7 @@ def test_fold_from_left_with_terminal_measurements_min_stretch():
         [ops.TOFFOLI.on(*qreg)],
         [ops.measure_each(*qreg)],
     )
-    folded = fold_gates_from_left(circ, stretch=1.0)
+    folded = fold_gates_from_left(circ, scale_factor=1.0)
     correct = Circuit(
         [ops.H.on_each(*qreg)],
         [ops.CNOT.on(qreg[0], qreg[1])],
@@ -581,7 +581,7 @@ def test_fold_from_left_with_terminal_measurements_max_stretch():
         [ops.TOFFOLI.on(*qreg)],
         [ops.measure_each(*qreg)],
     )
-    folded = fold_gates_from_left(circ, stretch=3.0)
+    folded = fold_gates_from_left(circ, scale_factor=3.0)
     correct = Circuit(
         [ops.H.on_each(*qreg)] * 3,
         [ops.CNOT.on(qreg[0], qreg[1])] * 3,
@@ -603,7 +603,7 @@ def test_fold_with_intermediate_measurements_raises_error(fold_method):
     qbit = LineQubit(0)
     circ = Circuit([ops.H.on(qbit)], [ops.measure(qbit)], [ops.T.on(qbit)])
     with pytest.raises(ValueError):
-        fold_method(circ, stretch=2.0)
+        fold_method(circ, scale_factor=2.0)
 
 
 def test_fold_from_right_basic():
@@ -619,8 +619,8 @@ def test_fold_from_right_basic():
         [ops.T.on(qreg[1])],
     )
 
-    # Small stretch factor
-    folded = fold_gates_from_right(circ, stretch=1.5)
+    # Small scale factor
+    folded = fold_gates_from_right(circ, scale_factor=1.5)
     correct = Circuit(
         [ops.H.on_each(*qreg)],
         [ops.CNOT.on(*qreg)],
@@ -628,8 +628,8 @@ def test_fold_from_right_basic():
     )
     assert _equal(folded, correct)
 
-    # Intermediate stretch factor
-    folded = fold_gates_from_right(circ, stretch=2.5)
+    # Intermediate scale factor
+    folded = fold_gates_from_right(circ, scale_factor=2.5)
     correct = Circuit(
         [ops.H.on(qreg[0])] * 3,
         [ops.H.on(qreg[1])],
@@ -640,7 +640,7 @@ def test_fold_from_right_basic():
 
 
 def test_fold_from_right_max_stretch():
-    """Tests that fold from right = fold from left with maximum stretch."""
+    """Tests that fold from right = fold from left with maximum scale."""
     # Test circuit
     # 0: ───H───@───@───
     #           │   │
@@ -655,8 +655,8 @@ def test_fold_from_right_max_stretch():
         [ops.TOFFOLI.on(*qreg)],
     )
 
-    left_folded = fold_gates_from_left(circ, stretch=3.0)
-    right_folded = fold_gates_from_right(circ, stretch=3.0)
+    left_folded = fold_gates_from_left(circ, scale_factor=3.0)
+    right_folded = fold_gates_from_right(circ, scale_factor=3.0)
     assert _equal(left_folded, right_folded)
 
 
@@ -676,7 +676,7 @@ def test_fold_from_right_with_terminal_measurements_min_stretch():
         [ops.TOFFOLI.on(*qreg)],
         [ops.measure_each(*qreg)],
     )
-    folded = fold_gates_from_right(circ, stretch=1.0)
+    folded = fold_gates_from_right(circ, scale_factor=1.0)
     correct = Circuit(
         [ops.H.on_each(*qreg)],
         [ops.CNOT.on(qreg[0], qreg[1])],
@@ -704,7 +704,7 @@ def test_fold_from_right_with_terminal_measurements_max_stretch():
         [ops.TOFFOLI.on(*qreg)],
         [ops.measure_each(*qreg)],
     )
-    folded = fold_gates_from_right(circ, stretch=3.0)
+    folded = fold_gates_from_right(circ, scale_factor=3.0)
     correct = Circuit(
         [ops.H.on_each(*qreg)] * 3,
         [ops.CNOT.on(qreg[0], qreg[1])] * 3,
@@ -731,14 +731,14 @@ def test_fold_right_retains_terminal_measurements_in_input_circuit():
     """
     qbit = LineQubit(1)
     circ = Circuit(ops.H.on(qbit), ops.measure(qbit))
-    folded = fold_gates_from_right(circ, stretch=1.0)
+    folded = fold_gates_from_right(circ, scale_factor=1.0)
     assert _equal(circ, folded)
 
 
 def test_fold_gates_at_random_no_stretch():
-    """Tests folded circuit is identical for a stretch factor of one."""
+    """Tests folded circuit is identical for a scale factor of one."""
     circuit = random_circuit(10)
-    folded = fold_gates_at_random(circuit, stretch=1, seed=None)
+    folded = fold_gates_at_random(circuit, scale_factor=1, seed=None)
     assert _equal(folded, circuit)
 
 
@@ -748,22 +748,22 @@ def test_fold_gates_at_random_seed_one_qubit():
     """
     qubit = LineQubit(0)
     circuit = Circuit([ops.X.on(qubit), ops.Y.on(qubit), ops.Z.on(qubit)])
-    # Small stretch
-    folded = fold_gates_at_random(circuit, stretch=1.4, seed=1)
+    # Small scale
+    folded = fold_gates_at_random(circuit, scale_factor=1.4, seed=1)
     correct = Circuit(
         [ops.X.on(qubit)], [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)]
     )
     assert _equal(folded, correct)
 
-    # Medium stretch, fold two gates
-    folded = fold_gates_at_random(circuit, stretch=2.5, seed=1)
+    # Medium scale, fold two gates
+    folded = fold_gates_at_random(circuit, scale_factor=2.5, seed=1)
     correct = Circuit(
         [ops.X.on(qubit)], [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)] * 3,
     )
     assert _equal(folded, correct)
 
-    # Max stretch, fold three gates
-    folded = fold_gates_at_random(circuit, stretch=3, seed=1)
+    # Max scale, fold three gates
+    folded = fold_gates_at_random(circuit, scale_factor=3, seed=1)
     correct = Circuit(
         [ops.X.on(qubit)] * 3, [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)] * 3,
     )
@@ -771,7 +771,7 @@ def test_fold_gates_at_random_seed_one_qubit():
 
 
 def test_fold_random_min_stretch():
-    """Tests that folding at random with min stretch returns a copy of the
+    """Tests that folding at random with min scale returns a copy of the
     input circuit.
     """
     # Test circuit
@@ -788,13 +788,13 @@ def test_fold_random_min_stretch():
         [ops.TOFFOLI.on(*qreg)],
     )
 
-    folded = fold_gates_at_random(circ, stretch=1, seed=1)
+    folded = fold_gates_at_random(circ, scale_factor=1, seed=1)
     assert _equal(folded, circ)
     assert folded is not circ
 
 
 def test_fold_random_max_stretch():
-    """Tests that folding at random with max stretch folds all gates on a
+    """Tests that folding at random with max scale folds all gates on a
     multi-qubit circuit.
     """
     # Test circuit
@@ -811,7 +811,7 @@ def test_fold_random_max_stretch():
         [ops.TOFFOLI.on(*qreg)],
     )
 
-    folded = fold_gates_at_random(circ, stretch=3, seed=1)
+    folded = fold_gates_at_random(circ, scale_factor=3, seed=1)
     correct = Circuit(
         [ops.H.on_each(*qreg)] * 3,
         [ops.CNOT.on(qreg[0], qreg[1])] * 3,
@@ -822,9 +822,9 @@ def test_fold_random_max_stretch():
 
 
 def test_fold_random_bad_stretch():
-    """Tests that an error is raised when a bad stretch is provided."""
+    """Tests that an error is raised when a bad scale is provided."""
     with pytest.raises(ValueError):
-        fold_gates_at_random(Circuit(), stretch=4)
+        fold_gates_at_random(Circuit(), scale_factor=4)
 
 
 def test_fold_random_no_repeats():
@@ -847,8 +847,8 @@ def test_fold_random_no_repeats():
     )
     circuit_ops = set(circ.all_operations())
 
-    for stretch in np.linspace(1.0, 3.0, 5):
-        folded = fold_gates_at_random(circ, stretch=stretch, seed=1)
+    for scale in np.linspace(1.0, 3.0, 5):
+        folded = fold_gates_at_random(circ, scale_factor=scale, seed=1)
         gates = list(folded.all_operations())
         counts = {gate: gates.count(gate) for gate in circuit_ops}
         assert all(count <= 3 for count in counts.values())
@@ -870,7 +870,7 @@ def test_fold_random_with_terminal_measurements_min_stretch():
         [ops.TOFFOLI.on(*qreg)],
         [ops.measure_each(*qreg)],
     )
-    folded = fold_gates_at_random(circ, stretch=1.0)
+    folded = fold_gates_at_random(circ, scale_factor=1.0)
     correct = Circuit(
         [ops.H.on_each(*qreg)],
         [ops.CNOT.on(qreg[0], qreg[1])],
@@ -897,7 +897,7 @@ def test_fold_random_with_terminal_measurements_max_stretch():
         [ops.TOFFOLI.on(*qreg)],
         [ops.measure_each(*qreg)],
     )
-    folded = fold_gates_at_random(circ, stretch=3.0)
+    folded = fold_gates_at_random(circ, scale_factor=3.0)
     correct = Circuit(
         [ops.H.on_each(*qreg)] * 3,
         [ops.CNOT.on(qreg[0], qreg[1])] * 3,
@@ -909,7 +909,7 @@ def test_fold_random_with_terminal_measurements_max_stretch():
 
 
 def test_fold_local_small_stretch_from_left():
-    """Test for local folding with stretch < 3."""
+    """Test for local folding with scale < 3."""
     qreg = LineQubit.range(3)
     circ = Circuit(
         [
@@ -920,13 +920,13 @@ def test_fold_local_small_stretch_from_left():
         ]
     )
 
-    folded = fold_local(circ, stretch=2, fold_method=fold_gates_from_left)
+    folded = fold_local(circ, scale_factor=2, fold_method=fold_gates_from_left)
     correct = Circuit([ops.H.on_each(*qreg)] * 2, list(circ.all_operations()))
     assert _equal(folded, correct)
 
 
 def test_fold_local_stretch_three_from_left():
-    """Test for local folding with stretch > 3."""
+    """Test for local folding with scale > 3."""
     qreg = LineQubit.range(3)
     circ = Circuit(
         [
@@ -936,12 +936,12 @@ def test_fold_local_stretch_three_from_left():
             ops.TOFFOLI.on(*qreg),
         ]
     )
-    folded = fold_local(circ, stretch=3, fold_method=fold_gates_from_left)
-    assert _equal(folded, fold_gates_from_left(circ, stretch=3))
+    folded = fold_local(circ, scale_factor=3, fold_method=fold_gates_from_left)
+    assert _equal(folded, fold_gates_from_left(circ, scale_factor=3))
 
 
 def test_fold_local_big_stretch_from_left():
-    """Test for local folding with stretch > 3."""
+    """Test for local folding with scale > 3."""
     qreg = LineQubit.range(3)
     circ = Circuit(
         [
@@ -951,7 +951,7 @@ def test_fold_local_big_stretch_from_left():
             ops.TOFFOLI.on(*qreg),
         ]
     )
-    folded = fold_local(circ, stretch=4, fold_method=fold_gates_from_left)
+    folded = fold_local(circ, scale_factor=4, fold_method=fold_gates_from_left)
     correct = Circuit(
         [ops.H.on(qreg[0])] * 7,
         [ops.H.on(qreg[1])] * 5,
@@ -964,7 +964,7 @@ def test_fold_local_big_stretch_from_left():
 
 
 def test_global_fold_min_stretch():
-    """Tests that global fold with stretch = 1 is the same circuit."""
+    """Tests that global fold with scale = 1 is the same circuit."""
     # Test circuit
     # 0: ───H───@───@───
     #           │   │
@@ -985,7 +985,7 @@ def test_global_fold_min_stretch():
 
 
 def test_global_fold_min_stretch_with_terminal_measurements():
-    """Tests that global fold with stretch = 1 is the same circuit."""
+    """Tests that global fold with scale = 1 is the same circuit."""
     # Test circuit
     # 0: ───H───@───@───M───
     #           │   │
@@ -1000,7 +1000,7 @@ def test_global_fold_min_stretch_with_terminal_measurements():
         [ops.TOFFOLI.on(*qreg)],
         [ops.measure_each(*qreg)],
     )
-    folded = fold_global(circ, stretch=1.0)
+    folded = fold_global(circ, scale_factor=1.0)
     assert _equal(folded, circ)
     assert folded is not circ
 
@@ -1012,11 +1012,11 @@ def test_global_fold_raises_error_intermediate_measurements():
     qbit = GridQubit(0, 0)
     circ = Circuit([ops.H.on(qbit), ops.measure(qbit), ops.H.on(qbit)])
     with pytest.raises(ValueError):
-        fold_global(circ, stretch=3)
+        fold_global(circ, scale_factor=3)
 
 
 def test_global_fold_stretch_factor_of_three():
-    """Tests global folding with the stretch as a factor of 3."""
+    """Tests global folding with the scale as a factor of 3."""
     # Test circuit
     # 0: ───H───@───@───
     #           │   │
@@ -1030,13 +1030,13 @@ def test_global_fold_stretch_factor_of_three():
         [ops.T.on(qreg[2])],
         [ops.TOFFOLI.on(*qreg)],
     )
-    folded = fold_global(circ, stretch=3.0)
+    folded = fold_global(circ, scale_factor=3.0)
     correct = Circuit(circ, inverse(circ), circ)
     assert _equal(folded, correct)
 
 
 def test_global_fold_stretch_factor_of_three_with_terminal_measurements():
-    """Tests global folding with the stretch as a factor of 3 for a circuit
+    """Tests global folding with the scale as a factor of 3 for a circuit
     with terminal measurements.
     """
     # Test circuit
@@ -1053,13 +1053,13 @@ def test_global_fold_stretch_factor_of_three_with_terminal_measurements():
         [ops.TOFFOLI.on(*qreg)],
     )
     meas = Circuit([ops.measure_each(*qreg)])
-    folded = fold_global(circ + meas, stretch=3.0)
+    folded = fold_global(circ + meas, scale_factor=3.0)
     correct = Circuit(circ, inverse(circ), circ, meas)
     assert _equal(folded, correct)
 
 
 def test_global_fold_stretch_factor_nine_with_terminal_measurements():
-    """Tests global folding with the stretch as a factor of 9 for a circuit
+    """Tests global folding with the scale as a factor of 9 for a circuit
     with terminal measurements.
     """
     # Test circuit
@@ -1076,13 +1076,13 @@ def test_global_fold_stretch_factor_nine_with_terminal_measurements():
         [ops.TOFFOLI.on(*qreg)],
     )
     meas = Circuit([ops.measure_each(*qreg)])
-    folded = fold_global(circ + meas, stretch=9.0)
+    folded = fold_global(circ + meas, scale_factor=9.0)
     correct = Circuit([circ, inverse(circ)] * 4, [circ], [meas])
     assert _equal(folded, correct)
 
 
 def test_global_fold_stretch_factor_eight_terminal_measurements():
-    """Tests global folding with a stretch factor not a multiple of three so
+    """Tests global folding with a scale factor not a multiple of three so
     that local folding is also called.
     """
     # Test circuit
@@ -1099,7 +1099,7 @@ def test_global_fold_stretch_factor_eight_terminal_measurements():
         [ops.TOFFOLI.on(*qreg)],
     )
     meas = Circuit(ops.measure_each(*qreg))
-    folded = fold_global(circ + meas, stretch=3.5)
+    folded = fold_global(circ + meas, scale_factor=3.5)
     correct = Circuit(
         circ,
         inverse(circ),
@@ -1169,7 +1169,7 @@ def test_fold_from_left_with_qiskit_circuits():
     qiskit_circuit.measure(qiskit_qreg, qiskit_creg)
 
     folded_circuit = fold_gates_from_left(
-        qiskit_circuit, stretch=1.0, return_mitiq=True
+        qiskit_circuit, scale_factor=1.0, return_mitiq=True
     )
 
     qreg = LineQubit.range(3)
@@ -1196,7 +1196,7 @@ def test_fold_from_left_with_qiskit_circuits():
 
     # Keep the input type
     qiskit_folded_circuit = fold_gates_from_left(
-        qiskit_circuit, stretch=1.0, return_mitiq=False
+        qiskit_circuit, scale_factor=1.0, return_mitiq=False
     )
     assert isinstance(qiskit_folded_circuit, QuantumCircuit)
 
@@ -1221,7 +1221,7 @@ def test_fold_from_right_with_qiskit_circuits():
     qiskit_circuit.measure(qiskit_qreg, qiskit_creg)
 
     folded_circuit = fold_gates_from_right(
-        qiskit_circuit, stretch=1.0, return_mitiq=True
+        qiskit_circuit, scale_factor=1.0, return_mitiq=True
     )
 
     qreg = LineQubit.range(3)
@@ -1247,7 +1247,7 @@ def test_fold_from_right_with_qiskit_circuits():
     assert equal_up_to_global_phase(unitary, folded_unitary)
 
     # Keep the input type
-    qiskit_folded_circuit = fold_gates_from_right(qiskit_circuit, stretch=1.0)
+    qiskit_folded_circuit = fold_gates_from_right(qiskit_circuit, scale_factor=1.0)
     assert isinstance(qiskit_folded_circuit, QuantumCircuit)
 
 
@@ -1271,7 +1271,7 @@ def test_fold_at_random_with_qiskit_circuits():
     qiskit_circuit.measure(qiskit_qreg, qiskit_creg)
 
     folded_circuit = fold_gates_at_random(
-        qiskit_circuit, stretch=1.0, return_mitiq=True
+        qiskit_circuit, scale_factor=1.0, return_mitiq=True
     )
 
     qreg = LineQubit.range(3)
@@ -1297,7 +1297,7 @@ def test_fold_at_random_with_qiskit_circuits():
     assert equal_up_to_global_phase(unitary, folded_unitary)
 
     # Keep the input type
-    qiskit_folded_circuit = fold_gates_at_random(qiskit_circuit, stretch=1.0)
+    qiskit_folded_circuit = fold_gates_at_random(qiskit_circuit, scale_factor=1.0)
     assert isinstance(qiskit_folded_circuit, QuantumCircuit)
 
 
@@ -1323,7 +1323,7 @@ def test_fold_local_with_qiskit_circuits():
     # Return mitiq circuit
     folded_circuit = fold_local(
         qiskit_circuit,
-        stretch=1.4,
+        scale_factor=1.4,
         fold_method=fold_gates_from_left,
         return_mitiq=True
     )
@@ -1332,7 +1332,7 @@ def test_fold_local_with_qiskit_circuits():
     # Return input circuit type
     folded_qiskit_circuit = fold_local(
         qiskit_circuit,
-        stretch=2.0,
+        scale_factor=2.0,
         fold_method=fold_gates_from_left,
         return_mitiq=False
     )
@@ -1361,7 +1361,7 @@ def test_fold_global_with_qiskit_circuits():
     # Return mitiq circuit
     folded_circuit = fold_global(
         qiskit_circuit,
-        stretch=2.71828,
+        scale_factor=2.71828,
         fold_method=fold_gates_from_left,
         return_mitiq=True
     )
@@ -1370,7 +1370,7 @@ def test_fold_global_with_qiskit_circuits():
     # Return input circuit type
     folded_qiskit_circuit = fold_global(
         qiskit_circuit,
-        stretch=2.0,
+        scale_factor=2.0,
         fold_method=fold_gates_from_left
     )
     assert isinstance(folded_qiskit_circuit, QuantumCircuit)
@@ -1393,10 +1393,10 @@ def test_fold_left_squash_moments():
         [ops.measure_each(*qreg)]
     )
     folded_not_squashed = fold_gates_from_left(
-        circ, stretch=3, squash_moments=False
+        circ, scale_factor=3, squash_moments=False
     )
     folded_and_squashed = fold_gates_from_left(
-        circ, stretch=3, squash_moments=True
+        circ, scale_factor=3, squash_moments=True
     )
     correct = Circuit(
         [ops.H.on_each(*qreg)] * 3,
@@ -1433,10 +1433,10 @@ def test_fold_and_squash_max_stretch(fold_method):
             0, ops.H.on(qreg[i % 2]), strategy=InsertStrategy.NEW
         )
     folded_not_squashed = fold_method(
-        circuit, stretch=3., squash_moments=False
+        circuit, scale_factor=3., squash_moments=False
     )
     folded_and_squashed = fold_method(
-        circuit, stretch=3., squash_moments=True
+        circuit, scale_factor=3., squash_moments=True
     )
     assert len(folded_not_squashed) == 30
     assert len(folded_and_squashed) == 15
@@ -1457,11 +1457,11 @@ def test_fold_and_squash_random_circuits_random_stretches(fold_method):
     rng = np.random.RandomState(seed=1)
     for _ in range(100):
         circuit = testing.random_circuit(qubits=8, n_moments=8, op_density=0.75)
-        stretch = 2 * rng.random() + 1
+        scale = 2 * rng.random() + 1
         folded_not_squashed = fold_method(
-            circuit, stretch=stretch, squash_moments=False
+            circuit, scale_factor=scale, squash_moments=False
         )
         folded_and_squashed = fold_method(
-            circuit, stretch=stretch, squash_moments=True
+            circuit, scale_factor=scale, squash_moments=True
         )
         assert len(folded_and_squashed) <= len(folded_not_squashed)
