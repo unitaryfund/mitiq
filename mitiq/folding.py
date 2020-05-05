@@ -60,6 +60,20 @@ def _append_measurements(
     circuit.batch_insert(measurements)
 
 
+def squash_moments(circuit: Circuit) -> Circuit:
+    """Returns a copy of the input circuit with all gates squashed into as few
+    moments as possible.
+
+    Args:
+        circuit: Circuit to squash moments of.
+    """
+    return Circuit(
+        circuit.all_operations(),
+        strategy=InsertStrategy.EARLIEST,
+        device=circuit.device
+    )
+
+
 # Conversions
 def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
     """Converts any valid input circuit to a mitiq circuit.
