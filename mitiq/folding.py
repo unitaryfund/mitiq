@@ -60,6 +60,20 @@ def _append_measurements(
     circuit.batch_insert(measurements)
 
 
+def squash_moments(circuit: Circuit) -> Circuit:
+    """Returns a copy of the input circuit with all gates squashed into as few
+    moments as possible.
+
+    Args:
+        circuit: Circuit to squash moments of.
+    """
+    return Circuit(
+        circuit.all_operations(),
+        strategy=InsertStrategy.EARLIEST,
+        device=circuit.device
+    )
+
+
 # Conversions
 def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
     """Converts any valid input circuit to a mitiq circuit.
@@ -245,6 +259,7 @@ def fold_gates_from_left(
         stretch: Factor to stretch the circuit by. Any real number in [1, 3].
 
     Keyword Args:
+        squash_moments: If True, moments are squashed in the returned circuit.
         return_mitiq: If True, returns a mitiq circuit instead of
                       the input circuit type, if different. (Default is False.)
 
@@ -287,6 +302,8 @@ def fold_gates_from_left(
             num_folded += 1
             if num_folded == num_to_fold:
                 _append_measurements(folded, measurements)
+                if kwargs.get("squash_moments") is True:
+                    folded = squash_moments(folded)
                 return folded
 
 
@@ -306,6 +323,7 @@ def fold_gates_from_right(
         stretch: Factor to stretch the circuit by. Any real number in [1, 3].
 
     Keyword Args:
+        squash_moments: If True, moments are squashed in the returned circuit.
         return_mitiq: If True, returns a mitiq circuit instead of
                       the input circuit type, if different. (Default is False.)
 
@@ -328,6 +346,8 @@ def fold_gates_from_right(
     reversed_folded_circuit = fold_gates_from_left(reversed_circuit, stretch)
     folded = Circuit(reversed(reversed_folded_circuit))
     _append_measurements(folded, measurements)
+    if kwargs.get("squash_moments") is True:
+        folded = squash_moments(folded)
     return folded
 
 
@@ -387,6 +407,7 @@ def fold_gates_at_random(
         seed: [Optional] Integer seed for random number generator.
 
     Keyword Args:
+        squash_moments: If True, moments are squashed in the returned circuit.
         return_mitiq: If True, returns a mitiq circuit instead of
                       the input circuit type, if different. (Default is False.)
 
@@ -415,6 +436,8 @@ def fold_gates_at_random(
     if np.isclose(stretch, 3.0, atol=1e-3):
         _fold_all_gates_locally(folded)
         _append_measurements(folded, measurements)
+        if kwargs.get("squash_moments") is True:
+            folded = squash_moments(folded)
         return folded
 
     if seed:
@@ -459,6 +482,8 @@ def fold_gates_at_random(
             remaining_moment_indices.remove(moment_index)
 
     _append_measurements(folded, measurements)
+    if kwargs.get("squash_moments") is True:
+        folded = squash_moments(folded)
     return folded
 
 
@@ -484,6 +509,7 @@ def fold_local(
                           fold_method(circuit, stretch, *fold_method_args).
 
     Keyword Args:
+        squash_moments: If True, moments are squashed in the returned circuit.
         return_mitiq: If True, returns a mitiq circuit instead of
                       the input circuit type, if different. (Default is False.)
 
@@ -519,7 +545,7 @@ def fold_local(
 
     while stretch > 1.0:
         this_stretch = 3.0 if stretch > 3.0 else stretch
-        folded = fold_method(folded, this_stretch, *fold_method_args)
+        folded = fold_method(folded, this_stretch, *fold_method_args, **kwargs)
         stretch /= 3.0
     return folded
 
@@ -537,6 +563,7 @@ def fold_global(circuit: QPROGRAM, stretch: float, **kwargs) -> QPROGRAM:
         stretch: Factor to stretch the circuit by.
 
     Keyword Args:
+        squash_moments: If True, moments are squashed in the returned circuit.
         return_mitiq: If True, returns a mitiq circuit instead of
                       the input circuit type, if different. (Default is False.)
 
@@ -570,4 +597,6 @@ def fold_global(circuit: QPROGRAM, stretch: float, **kwargs) -> QPROGRAM:
         folded += Circuit([inverse(ops[-num_to_fold:])], [ops[-num_to_fold:]])
 
     _append_measurements(folded, measurements)
+    if kwargs.get("squash_moments") is True:
+        folded = squash_moments(folded)
     return folded

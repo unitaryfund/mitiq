@@ -5,8 +5,16 @@ from copy import deepcopy
 import numpy as np
 import pytest
 from cirq import (
-    Circuit, GridQubit, LineQubit, ops, inverse, equal_up_to_global_phase
+    Circuit,
+    GridQubit,
+    LineQubit,
+    ops,
+    inverse,
+    equal_up_to_global_phase,
+    InsertStrategy,
+    testing
 )
+from cirq.google import Sycamore
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 
 from mitiq.utils import _equal, random_circuit
@@ -14,6 +22,7 @@ from mitiq.folding import (
     _is_measurement,
     _pop_measurements,
     _append_measurements,
+    squash_moments,
     _update_moment_indices,
     convert_to_mitiq,
     convert_from_mitiq,
@@ -72,6 +81,61 @@ def test_pop_measurements_and_add_measurements():
     assert _equal(copy, correct)
     _append_measurements(copy, measurements)
     assert _equal(copy, circ)
+
+
+def test_squash_moments_two_qubits():
+    """Tests squashing moments in a two-qubit circuit with 'staggered' single
+    qubit gats.
+    """
+    # Test circuit:
+    # 0: ───────H───────H───────H───────H───────H───
+    #
+    # 1: ───H───────H───────H───────H───────H───────
+
+    # Get the test circuit
+    d = 10
+    qreg = LineQubit.range(2)
+    circuit = Circuit()
+    for i in range(d):
+        circuit.insert(
+            0, ops.H.on(qreg[i % 2]), strategy=InsertStrategy.NEW
+        )
+    assert len(circuit) == d
+
+    # Squash the moments
+    squashed = squash_moments(circuit)
+    assert len(squashed) == d // 2
+
+
+def test_squash_moments_returns_new_circuit_and_doesnt_modify_input_circuit():
+    """Tests that squash moments returns a new circuit and doesn't modify the
+    input circuit.
+    """
+    qbit = GridQubit(0, 0)
+    circ = Circuit(ops.H.on(qbit))
+    squashed = squash_moments(circ)
+    assert len(squashed) == 1
+    assert circ is not squashed
+    assert _equal(circ, Circuit(ops.H.on(qbit)))
+
+
+def test_squash_moments_retains_device():
+    """Tests that the returned circuit from squash_moments has the same device
+    as the input circuit.
+    """
+    circuit = Circuit(device=Sycamore)
+    squashed = squash_moments(circuit)
+    assert squashed.device == Sycamore
+
+
+def test_squash_moments_never_increases_moments():
+    """Squashes moments for several random circuits and ensures the squashed
+    circuit always <= # moments as the input circuit.
+    """
+    for _ in range(50):
+        circuit = testing.random_circuit(qubits=5, n_moments=8, op_density=0.75)
+        squashed = squash_moments(circuit)
+        assert len(squashed) <= len(circuit)
 
 
 def test_update_moment_indices():
@@ -1310,3 +1374,94 @@ def test_fold_global_with_qiskit_circuits():
         fold_method=fold_gates_from_left
     )
     assert isinstance(folded_qiskit_circuit, QuantumCircuit)
+
+
+def test_fold_left_squash_moments():
+    """Tests folding from left with kwarg squash_moments."""
+    # Test circuit
+    # 0: ───H───@───@───M───
+    #           │   │
+    # 1: ───H───X───@───M───
+    #               │
+    # 2: ───H───T───X───M───
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)]
+    )
+    folded_not_squashed = fold_gates_from_left(
+        circ, stretch=3, squash_moments=False
+    )
+    folded_and_squashed = fold_gates_from_left(
+        circ, stretch=3, squash_moments=True
+    )
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+        [ops.T.on(qreg[2]), ops.T.on(qreg[2]) ** -1, ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3,
+        [ops.measure_each(*qreg)],
+    )
+    assert _equal(folded_and_squashed, folded_not_squashed)
+    assert _equal(folded_and_squashed, correct)
+    assert len(folded_and_squashed) == 10
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left,
+     fold_gates_from_right,
+     fold_gates_at_random,
+     fold_global]
+)
+def test_fold_and_squash_max_stretch(fold_method):
+    """Tests folding and squashing a two-qubit circuit."""
+    # Test circuit:
+    # 0: ───────H───────H───────H───────H───────H───
+    #
+    # 1: ───H───────H───────H───────H───────H───────
+
+    # Get the test circuit
+    d = 10
+    qreg = LineQubit.range(2)
+    circuit = Circuit()
+    for i in range(d):
+        circuit.insert(
+            0, ops.H.on(qreg[i % 2]), strategy=InsertStrategy.NEW
+        )
+    folded_not_squashed = fold_method(
+        circuit, stretch=3., squash_moments=False
+    )
+    folded_and_squashed = fold_method(
+        circuit, stretch=3., squash_moments=True
+    )
+    assert len(folded_not_squashed) == 30
+    assert len(folded_and_squashed) == 15
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left,
+     fold_gates_from_right,
+     fold_gates_at_random,
+     fold_global]
+)
+def test_fold_and_squash_random_circuits_random_stretches(fold_method):
+    """Tests folding and squashing random circuits and ensures the number of
+    moments in the squashed circuits is never greater than the number of
+    moments in the un-squashed circuit.
+    """
+    rng = np.random.RandomState(seed=1)
+    for _ in range(100):
+        circuit = testing.random_circuit(qubits=8, n_moments=8, op_density=0.75)
+        stretch = 2 * rng.random() + 1
+        folded_not_squashed = fold_method(
+            circuit, stretch=stretch, squash_moments=False
+        )
+        folded_and_squashed = fold_method(
+            circuit, stretch=stretch, squash_moments=True
+        )
+        assert len(folded_and_squashed) <= len(folded_not_squashed)
