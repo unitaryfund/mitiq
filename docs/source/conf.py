@@ -12,6 +12,14 @@
 #
 import os
 import sys
+
+
+import pybtex.style.formatting
+import pybtex.style.formatting.unsrt
+import pybtex.style.template
+from pybtex.plugin import register_plugin as pybtex_register_plugin
+
+
 # sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('.'))
 #sys.path.append(os.path.abspath('../mitiq/'))
@@ -45,10 +53,24 @@ extensions = ['sphinx.ext.mathjax',
               'sphinx.ext.doctest',
               'sphinx.ext.autosummary',
               'sphinx.ext.extlinks',
+              'sphinx.ext.intersphinx',
               'sphinx.ext.viewcode',
               'sphinx.ext.ifconfig',
               'sphinx.ext.napoleon',
+              'sphinxcontrib.bibtex',
 ]
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3.7", "python37.inv"),
+    "numpy": ("https://docs.scipy.org/doc/numpy/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
+    "cirq": ("https://cirq.readthedocs.io/en/stable/", None),
+    "pyquil": ("http://docs.rigetti.com/en/stable/", None),
+    "qiskit": ("https://qiskit.org/documentation/", None),
+    "qutip": ("http://qutip.org/docs/latest/", None)
+    ,
+}
+
 
 # source_suffix = '.rst'
 source_suffix = ['.rst', '.md']
@@ -100,6 +122,133 @@ pygments_style = 'sphinx'
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
+
+# Sphinxcontrib-bibtex
+pybtex.style.formatting.unsrt.date = pybtex.style.template.words(sep="")[
+    "(", pybtex.style.template.field("year"), ")"
+]
+
+
+class ApsStyle(pybtex.style.formatting.unsrt.Style):
+    """Style that mimicks APS journals."""
+
+    def __init__(
+        self,
+        label_style=None,
+        name_style=None,
+        sorting_style=None,
+        abbreviate_names=True,
+        min_crossrefs=2,
+        **kwargs
+    ):
+        super().__init__(
+            label_style=label_style,
+            name_style=name_style,
+            sorting_style=sorting_style,
+            abbreviate_names=abbreviate_names,
+            min_crossrefs=min_crossrefs,
+            **kwargs
+        )
+
+    def format_title(self, e, which_field, as_sentence=True):
+        """Set titles in italics."""
+        formatted_title = pybtex.style.template.field(
+            which_field, apply_func=lambda text: text.capitalize()
+        )
+        formatted_title = pybtex.style.template.tag("em")[formatted_title]
+        if as_sentence:
+            return pybtex.style.template.sentence[formatted_title]
+        else:
+            return formatted_title
+
+    def get_article_template(self, e):
+        volume_and_pages = pybtex.style.template.first_of[
+            # volume and pages
+            pybtex.style.template.optional[
+                pybtex.style.template.join[
+                    " ",
+                    pybtex.style.template.tag("strong")[
+                        pybtex.style.template.field("volume")
+                    ],
+                    ", ",
+                    pybtex.style.template.field(
+                        "pages",
+                        apply_func=pybtex.style.formatting.unsrt.dashify,
+                    ),
+                ],
+            ],
+            # pages only
+            pybtex.style.template.words[
+                "pages",
+                pybtex.style.template.field(
+                    "pages", apply_func=pybtex.style.formatting.unsrt.dashify
+                ),
+            ],
+        ]
+        template = pybtex.style.formatting.toplevel[
+            self.format_names("author"),
+            self.format_title(e, "title"),
+            pybtex.style.template.sentence(sep=" ")[
+                pybtex.style.template.field("journal"),
+                pybtex.style.template.optional[volume_and_pages],
+                pybtex.style.formatting.unsrt.date,
+            ],
+            self.format_web_refs(e),
+        ]
+        return template
+
+    def get_book_template(self, e):
+        template = pybtex.style.formatting.toplevel[
+            self.format_author_or_editor(e),
+            self.format_btitle(e, "title"),
+            self.format_volume_and_series(e),
+            pybtex.style.template.sentence(sep=" ")[
+                pybtex.style.template.sentence(add_period=False)[
+                    pybtex.style.template.field("publisher"),
+                    pybtex.style.template.optional_field("address"),
+                    self.format_edition(e),
+                ],
+                pybtex.style.formatting.unsrt.date,
+            ],
+            pybtex.style.template.optional[
+                pybtex.style.template.sentence[self.format_isbn(e)]
+            ],
+            pybtex.style.template.sentence[
+                pybtex.style.template.optional_field("note")
+            ],
+            self.format_web_refs(e),
+        ]
+        return template
+
+    def get_incollection_template(self, e):
+        template = pybtex.style.formatting.toplevel[
+            pybtex.style.template.sentence[self.format_names("author")],
+            self.format_title(e, "title"),
+            pybtex.style.template.words[
+                "In",
+                pybtex.style.template.sentence[
+                    pybtex.style.template.optional[
+                        self.format_editor(e, as_sentence=False)
+                    ],
+                    self.format_btitle(e, "booktitle", as_sentence=False),
+                    self.format_volume_and_series(e, as_sentence=False),
+                    self.format_chapter_and_pages(e),
+                ],
+            ],
+            pybtex.style.template.sentence(sep=" ")[
+                pybtex.style.template.sentence(add_period=False)[
+                    pybtex.style.template.optional_field("publisher"),
+                    pybtex.style.template.optional_field("address"),
+                    self.format_edition(e),
+                ],
+                pybtex.style.formatting.unsrt.date,
+            ],
+            self.format_web_refs(e),
+        ]
+        return template
+
+
+pybtex_register_plugin("pybtex.style.formatting", "apsstyle", ApsStyle)
 
 # -- Options for HTML output -------------------------------------------------
 

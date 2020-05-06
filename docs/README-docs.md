@@ -10,9 +10,12 @@ a Python toolkit for implementing error mitigation on quantum computers.
 The documentation is generated with
 [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html).
 ```bash
-pip install -U sphinx m2r
+pip install -U sphinx m2r sphinxcontrib-bibtex pybtex
 ```
-`m2r` allows to include `.md` files, besides `.rst`, in the documentation.
+
+`m2r` allows to include `.md` files, besides `.rst`, in the documentation;
+`sphinxcontrib-bibtex` allows to include citations in a `.bib` file and
+`pybtex` allows to customize how they are rendered, e.g., APS-style.
 
 
 You can check that Sphinx is installed with `sphinx-build --version`.
