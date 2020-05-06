@@ -16,17 +16,17 @@ This makes the circuit longer (adding more noise) while keeping its effect uncha
 *unitary folding*. If `G` is a subset of the gates in a circuit, we call it `local folding`.
 If `G` is the entire circuit, we call it `global folding`.
 
-In ``mitiq``, folding functions input a circuit and a *stretch* (or *stretch factor*), i.e., a floating point value
+In ``mitiq``, folding functions input a circuit and a *scale factor* (or simply *scale*), i.e., a floating point value
 which corresponds to (approximately) how much the length of the circuit is scaled.
-The minimum stretch is one (which corresponds to folding no gates), and the maximum stretch is three
+The minimum scale factor is one (which corresponds to folding no gates), and the maximum scale factor is three
 (which corresponds to folding all gates).
 
 =============================================
 Local folding methods
 =============================================
 
-For local folding, there is a degree of freedom for which gates to fold first. As such,
-``mititq`` defines several local folding methods.
+For local folding, there is a degree of freedom for which gates to fold first. The order in which gates are folded can
+have an important effect on how the noise is caled. As such, ``mititq`` defines several local folding methods.
 
 We introduce three folding functions:
 
@@ -35,7 +35,7 @@ We introduce three folding functions:
     3. ``mitiq.folding.fold_gates_at_random``
 
 The ``mitiq`` function ``fold_gates_from_left`` will fold gates from the left (or start) of the circuit
-until the desired stretch factor is reached.
+until the desired scale factor is reached.
 
 
 .. doctest:: python
@@ -53,7 +53,7 @@ until the desired stretch factor is reached.
     1: ───────X───
 
     # Fold the circuit
-    >>> folded = fold_gates_from_left(circ, stretch=2.)
+    >>> folded = fold_gates_from_left(circ, scale_factor=2.)
     >>> print("Folded circuit:", folded, sep="\n")
     Folded circuit:
     0: ───H───H───H───@───
@@ -73,7 +73,7 @@ we use the ``fold_gates_from_right`` function on the same input circuit.
     >>> from mitiq.folding import fold_gates_from_right
 
     # Fold the circuit
-    >>> folded = fold_gates_from_right(circ, stretch=2.)
+    >>> folded = fold_gates_from_right(circ, scale_factor=2.)
     >>> print("Folded circuit:", folded, sep="\n")
     Folded circuit:
     0: ───H───@───@───@───
@@ -81,11 +81,11 @@ we use the ``fold_gates_from_right`` function on the same input circuit.
     1: ───────X───X───X───
 
 We see the second (CNOT) gate in the circuit is folded, as expected when we start folding from the right (or end) of
-the circuit instead of the left (start).
+the circuit instead of the left (or start).
 
 Finally, we mention ``fold_gates_at_random`` which folds gates according to the following rules.
 
-    1. Gates are selected at random and folded until the input stretch factor is reached.
+    1. Gates are selected at random and folded until the input scale factor is reached.
     2. No gate is folded more than once.
     3. "Virtual gates" (i.e., gates appearing from folding) are never folded.
 
@@ -93,7 +93,7 @@ Finally, we mention ``fold_gates_at_random`` which folds gates according to the 
 Any supported circuits can be folded
 =============================================
 
-Any program types supported by ``mitiq`` can be folded. The interface for all folding functions is the same. In the
+Any program types supported by ``mitiq`` can be folded, and the interface for all folding functions is the same. In the
 following example, we fold a Qiskit circuit.
 
 .. note::
@@ -126,7 +126,7 @@ This code (when the print statement is uncommented) should display something lik
 We can now fold this circuit as follows.
 
     # Fold the circuit
-    >>> folded = fold_gates_from_left(circ, stretch=2.)
+    >>> folded = fold_gates_from_left(circ, scale_factor=2.)
     >>> # print("Folded circuit:", folded, sep="\n")
 
 This code (when the print statement is uncommented) should display something like:
@@ -164,36 +164,36 @@ circuit above is shown below.
 .. doctest:: python
 
     >>> import cirq
-    >>> from mitiq.folding import fold_global
+        >>> from mitiq.folding import fold_global
 
-    # Get a circuit to fold
-    >>> qreg = cirq.LineQubit.range(2)
-    >>> circ = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1]))
-    >>> print("Original circuit:", circ, sep="\n")
-    Original circuit:
-    0: ───H───@───
-              │
-    1: ───────X───
+        # Get a circuit to fold
+        >>> qreg = cirq.LineQubit.range(2)
+        >>> circ = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1]))
+        >>> print("Original circuit:", circ, sep="\n")
+        Original circuit:
+        0: ───H───@───
+                  │
+        1: ───────X───
 
-    # Fold the circuit
-    >>> folded = fold_global(circ, stretch=3.)
-    >>> print("Folded circuit:", folded, sep="\n")
-    Folded circuit:
-    0: ───H───@───@───H───H───@───
-              │   │           │
-    1: ───────X───X───────────X───
+        # Fold the circuit
+        >>> folded = fold_global(circ, scale_factor=3.)
+        >>> print("Folded circuit:", folded, sep="\n")
+        Folded circuit:
+        0: ───H───@───@───H───H───@───
+                  │   │           │
+        1: ───────X───X───────────X───
 
 Notice that this circuit is still logically equivalent to the input circuit, but the global folding strategy folds
-the entire circuit until the input stretch factor is reached.
+the entire circuit until the input scale factor is reached.
 
 
 =============================================
 Folding with larger stretches
 =============================================
 
-The three local folding methods introduced require that the stretch factor be between one and three (inclusive). To fold
-circuits with larger stretch factors, the function ``mitiq.folding.fold_local`` can be used. This function inputs a
-circuit, an arbitrary stretch factor, and a local folding method, as in the following example.
+The three local folding methods introduced require that the scale factor be between one and three (inclusive). To fold
+circuits with larger scale factors, the function ``mitiq.folding.fold_local`` can be used. This function inputs a
+circuit, an arbitrary scale factor, and a local folding method, as in the following example.
 
 .. doctest:: python
 
@@ -210,7 +210,7 @@ circuit, an arbitrary stretch factor, and a local folding method, as in the foll
     1: ───────X───
 
     # Fold the circuit
-    >>> folded = fold_local(circ, stretch=5., fold_method=fold_gates_from_left)
+    >>> folded = fold_local(circ, scale_factor=5., fold_method=fold_gates_from_left)
     >>> print("Folded circuit:", folded, sep="\n")
     Folded circuit:
     0: ───H───H───H───H───H───H───H───@───@───@───
@@ -228,7 +228,7 @@ of this function must be as follows.
 
     import cirq
 
-    def my_custom_folding_function(circuit: cirq.Circuit, stretch: float) -> cirq.Circuit:
+    def my_custom_folding_function(circuit: cirq.Circuit, scale_factor: float) -> cirq.Circuit:
         # Implements the custom folding strategy
         return folded_circuit
 
@@ -236,5 +236,5 @@ This function can then be used with ``fold_local`` as in the previous example vi
 
 .. doctest:: python
 
-    # Variables circ and stretch are a circuit to fold and a stretch factor, respectively
-    folded = fold_local(circ, stretch, fold_method=my_custom_folding_function)
+    # Variables circ and scale are a circuit to fold and a scale factor, respectively
+    folded = fold_local(circ, scale, fold_method=my_custom_folding_function)
