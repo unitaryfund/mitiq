@@ -64,6 +64,35 @@ class Factory(ABC):
         self.instack = []
         self.outstack = []
 
+    def iterate(self, noise_to_expval: Callable[[float], float],
+                 max_iterations: int = 100) -> 'Factory':
+        """
+        Runs a factory until convergence (or iterations reach
+            "max_iterations").
+
+        Args:
+            noise_to_expval: Function mapping noise scale to expectation vales.
+            max_iterations: Maximum number of iterations (optional).
+                            Default: 100.
+        """
+        # Clear out the factory to make sure it is fresh.
+        self.reset()
+
+        counter = 0
+        while not self.is_converged() and counter < max_iterations:
+            next_param = self.next()
+            next_result = noise_to_expval(next_param)
+            self.push(next_param, next_result)
+            counter += 1
+
+        if counter == max_iterations:
+            raise Warning(
+                "Factory iteration loop stopped before convergence. "
+                f"Maximum number of iterations ({max_iterations}) was reached."
+            )
+
+        return self
+
     def run(self, qp: QPROGRAM,
             executor: Callable[[QPROGRAM], float],
             scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
@@ -89,23 +118,7 @@ class Factory(ABC):
 
             return executor(scaled_qp)
 
-        # Clear out the factory to make sure it is fresh.
-        self.reset()
-
-        counter = 0
-        while not self.is_converged() and counter < max_iterations:
-            next_param = self.next()
-            next_result = _noise_to_expval(next_param)
-            self.push(next_param, next_result)
-            counter += 1
-
-        if counter == max_iterations:
-            raise Warning(
-                "Factory iteration loop stopped before convergence. "
-                f"Maximum number of iterations ({max_iterations}) was reached."
-            )
-
-        return self
+        return self.iterate(_noise_to_expval, max_iterations)
 
 
 class BatchedFactory(Factory):

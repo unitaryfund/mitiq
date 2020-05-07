@@ -3,6 +3,9 @@
 from typing import Callable, Iterable
 from pytest import mark
 import numpy as np
+
+from cirq import Circuit
+
 from mitiq.factories import (
     RichardsonFactory,
     LinearFactory,
@@ -11,8 +14,10 @@ from mitiq.factories import (
     PolyExpFactory,
     AdaExpFactory,
     BatchedFactory,
+    Factory,
 )
 from mitiq.zne import run_factory
+from mitiq import QPROGRAM
 
 # Set the seed for testing
 RNG = np.random.RandomState(808)
@@ -64,14 +69,14 @@ def f_poly_exp_up(x: float, err: float = STAT_NOISE) -> float:
 def test_richardson_extr(test_f: Callable[[float], float]):
     """Test of the Richardson's extrapolator."""
     algo_object = RichardsonFactory(X_VALS)
-    run_factory(algo_object, test_f)
+    algo_object.iterate(test_f)
     assert np.isclose(algo_object.reduce(), test_f(0, err=0), atol=CLOSE_TOL)
 
 
 def test_linear_extr():
     """Test of linear extrapolator."""
     algo_object = LinearFactory(X_VALS)
-    run_factory(algo_object, f_lin)
+    algo_object.iterate(f_lin)
     assert np.isclose(algo_object.reduce(), f_lin(0, err=0), atol=CLOSE_TOL)
 
 
@@ -79,17 +84,17 @@ def test_poly_extr():
     """Test of polynomial extrapolator."""
     # test (order=1)
     algo_object = PolyFactory(X_VALS, order=1)
-    run_factory(algo_object, f_lin)
+    algo_object.iterate(f_lin)
     assert np.isclose(algo_object.reduce(), f_lin(0, err=0), atol=CLOSE_TOL)
     # test that, for some non-linear functions,
     # order=1 is bad while ored=2 is better.
     algo_object = PolyFactory(X_VALS, order=1)
-    run_factory(algo_object, f_non_lin)
+    algo_object.iterate(f_non_lin)
     assert not np.isclose(
         algo_object.reduce(), f_non_lin(0, err=0), atol=NOT_CLOSE_TOL
     )
     algo_object = PolyFactory(X_VALS, order=2)
-    run_factory(algo_object, f_non_lin)
+    algo_object.iterate(f_non_lin)
     assert np.isclose(
         algo_object.reduce(), f_non_lin(0, err=0), atol=CLOSE_TOL
     )
@@ -99,7 +104,7 @@ def test_poly_extr():
 def test_exp_factory_with_asympt(test_f: Callable[[float], float]):
     """Test of exponential extrapolator."""
     algo_object = ExpFactory(X_VALS, asymptote=A)
-    run_factory(algo_object, test_f)
+    algo_object.iterate(test_f)
     assert np.isclose(algo_object.reduce(), test_f(0, err=0), atol=CLOSE_TOL)
 
 
@@ -109,12 +114,12 @@ def test_poly_exp_factory_with_asympt(test_f: Callable[[float], float]):
     # test that, for a non-linear exponent,
     # order=1 is bad while order=2 is better.
     algo_object = PolyExpFactory(X_VALS, order=1, asymptote=A)
-    run_factory(algo_object, test_f)
+    algo_object.iterate(test_f)
     assert not np.isclose(
         algo_object.reduce(), test_f(0, err=0), atol=NOT_CLOSE_TOL
     )
     algo_object = PolyExpFactory(X_VALS, order=2, asymptote=A)
-    run_factory(algo_object, test_f)
+    algo_object.iterate(test_f)
     assert np.isclose(algo_object.reduce(), test_f(0, err=0), atol=CLOSE_TOL)
 
 
@@ -122,7 +127,7 @@ def test_poly_exp_factory_with_asympt(test_f: Callable[[float], float]):
 def test_exp_factory_no_asympt(test_f: Callable[[float], float]):
     """Test of exponential extrapolator."""
     algo_object = ExpFactory(X_VALS, asymptote=None)
-    run_factory(algo_object, test_f)
+    algo_object.iterate(test_f)
     assert np.isclose(algo_object.reduce(), test_f(0, err=0), atol=CLOSE_TOL)
 
 
@@ -132,12 +137,12 @@ def test_poly_exp_factory_no_asympt(test_f: Callable[[float], float]):
     # test that, for a non-linear exponent,
     # order=1 is bad while order=2 is better.
     algo_object = PolyExpFactory(X_VALS, order=1, asymptote=None)
-    run_factory(algo_object, test_f)
+    algo_object.iterate(test_f)
     assert not np.isclose(
         algo_object.reduce(), test_f(0, err=0), atol=NOT_CLOSE_TOL
     )
     algo_object = PolyExpFactory(X_VALS, order=2, asymptote=None)
-    run_factory(algo_object, test_f)
+    algo_object.iterate(test_f)
     assert np.isclose(algo_object.reduce(), test_f(0, err=0), atol=CLOSE_TOL)
 
 
@@ -145,7 +150,7 @@ def test_poly_exp_factory_no_asympt(test_f: Callable[[float], float]):
 def test_ada_exp_factory_with_asympt(test_f: Callable[[float], float]):
     """Test of the adaptive exponential extrapolator."""
     algo_object = AdaExpFactory(steps=3, scale_factor=2.0, asymptote=A)
-    run_factory(algo_object, test_f)
+    algo_object.iterate(test_f)
     assert np.isclose(algo_object.reduce(), test_f(0, err=0), atol=CLOSE_TOL)
 
 
@@ -155,7 +160,7 @@ def test_ada_exp_factory_with_asympt_more_steps(
 ):
     """Test of the adaptive exponential extrapolator."""
     algo_object = AdaExpFactory(steps=6, scale_factor=2.0, asymptote=A)
-    run_factory(algo_object, test_f)
+    algo_object.iterate(test_f)
     assert np.isclose(algo_object.reduce(), test_f(0, err=0), atol=CLOSE_TOL)
 
 
@@ -163,7 +168,7 @@ def test_ada_exp_factory_with_asympt_more_steps(
 def test_ada_exp_factory_no_asympt(test_f: Callable[[float], float]):
     """Test of the adaptive exponential extrapolator."""
     algo_object = AdaExpFactory(steps=4, scale_factor=2.0, asymptote=None)
-    run_factory(algo_object, test_f)
+    algo_object.iterate(test_f)
     assert np.isclose(algo_object.reduce(), test_f(0, err=0), atol=CLOSE_TOL)
 
 
@@ -173,6 +178,6 @@ def test_ada_exp_factory_no_asympt_more_steps(
 ):
     """Test of the adaptive exponential extrapolator."""
     algo_object = AdaExpFactory(steps=8, scale_factor=2.0, asymptote=None)
-    run_factory(algo_object, test_f)
+    algo_object.iterate(test_f)
     assert np.isclose(algo_object.reduce(), test_f(0, err=0), atol=CLOSE_TOL)
 
