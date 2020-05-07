@@ -37,7 +37,7 @@ from mitiq.folding import (
     fold_local,
     fold_global,
 )
-from mitiq.mitiq_qiskit.conversions import _from_qiskit
+from mitiq.mitiq_qiskit.conversions import from_qiskit
 
 
 def test_is_measurement():
@@ -1189,7 +1189,7 @@ def test_fold_from_left_with_qiskit_circuits():
     #  See https://github.com/unitaryfund/mitiq/issues/99.
 
     # Check equality of the final unitaries
-    cirq_circuit = _from_qiskit(qiskit_circuit)
+    cirq_circuit = from_qiskit(qiskit_circuit)
     unitary = cirq_circuit.unitary()
     folded_unitary = correct_folded_circuit.unitary()
     assert equal_up_to_global_phase(unitary, folded_unitary)
@@ -1241,7 +1241,7 @@ def test_fold_from_right_with_qiskit_circuits():
     #  See https://github.com/unitaryfund/mitiq/issues/99.
 
     # Check equality of the final unitaries
-    cirq_circuit = _from_qiskit(qiskit_circuit)
+    cirq_circuit = from_qiskit(qiskit_circuit)
     unitary = cirq_circuit.unitary()
     folded_unitary = correct_folded_circuit.unitary()
     assert equal_up_to_global_phase(unitary, folded_unitary)
@@ -1291,7 +1291,7 @@ def test_fold_at_random_with_qiskit_circuits():
     #  See https://github.com/unitaryfund/mitiq/issues/99.
 
     # Check equality of the final unitaries
-    cirq_circuit = _from_qiskit(qiskit_circuit)
+    cirq_circuit = from_qiskit(qiskit_circuit)
     unitary = cirq_circuit.unitary()
     folded_unitary = correct_folded_circuit.unitary()
     assert equal_up_to_global_phase(unitary, folded_unitary)
