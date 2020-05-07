@@ -9,6 +9,7 @@ from scipy.optimize import curve_fit
 
 from mitiq import QPROGRAM
 
+
 class Factory(ABC):
     """
     Abstract class designed to adaptively produce a new noise scaling
@@ -46,7 +47,7 @@ class Factory(ABC):
     def next(self) -> float:
         """Returns the next noise level to execute a circuit at."""
         raise NotImplementedError
-    
+
     @abstractmethod
     def is_converged(self) -> bool:
         """Returns True if all needed expectation values have been computed,
@@ -65,7 +66,7 @@ class Factory(ABC):
         self.outstack = []
 
     def iterate(self, noise_to_expval: Callable[[float], float],
-                 max_iterations: int = 100) -> 'Factory':
+                max_iterations: int = 100) -> 'Factory':
         """
         Runs a factory until convergence (or iterations reach
             "max_iterations").
@@ -144,7 +145,7 @@ class BatchedFactory(Factory):
         """
         if len(scale_factors) == 0:
             raise ValueError(
-                "At least 2 elements are necessary"\
+                "At least 2 elements are necessary" \
                 " for non-trivial extrapolation."
             )
         self.scale_factors = scale_factors
@@ -155,9 +156,9 @@ class BatchedFactory(Factory):
             next_param = self.scale_factors[len(self.outstack)]
         except IndexError:
             raise IndexError(
-                "BatchedFactory cannot take another step. "\
-                "Number of batched scale_factors"\
-                f" ({len(self.scale_factors)}) exceeded."
+                "BatchedFactory cannot take another step. " \
+                "Number of batched scale_factors" \
+                    f" ({len(self.scale_factors)}) exceeded."
             )
         return next_param
 
@@ -197,7 +198,7 @@ class PolyFactory(BatchedFactory):
 
     @staticmethod
     def static_reduce(
-        instack: List[float], outstack: List[float], order: int
+            instack: List[float], outstack: List[float], order: int
     ) -> float:
         """
         Determines with a least squared method, the polynomial of degree equal
@@ -282,8 +283,8 @@ class ExpFactory(BatchedFactory):
     """
 
     def __init__(
-        self, scale_factors: Iterable[float], 
-        asymptote: Union[float, None] = None,
+            self, scale_factors: Iterable[float],
+            asymptote: Union[float, None] = None,
     ) -> None:
         """
         Args:
@@ -324,10 +325,10 @@ class PolyExpFactory(BatchedFactory):
     """
 
     def __init__(
-        self,
-        scale_factors: Iterable[float],
-        order: int,
-        asymptote: Union[float, None] = None,
+            self,
+            scale_factors: Iterable[float],
+            order: int,
+            asymptote: Union[float, None] = None,
     ) -> None:
         """
         Args:
@@ -349,11 +350,11 @@ class PolyExpFactory(BatchedFactory):
 
     @staticmethod
     def static_reduce(
-        instack: List[float],
-        outstack: List[float],
-        asymptote: Union[float, None],
-        order: int,
-        eps: float = 1.0e-9,
+            instack: List[float],
+            outstack: List[float],
+            asymptote: Union[float, None],
+            order: int,
+            eps: float = 1.0e-9,
     ) -> Tuple[float, List[float]]:
         """
         Determines the zero-noise limit, assuming an exponential ansatz:
@@ -464,10 +465,10 @@ class AdaExpFactory(Factory):
     _SHIFT_FACTOR = 1.27846
 
     def __init__(
-        self,
-        steps: int,
-        scale_factor: float = 2,
-        asymptote: Union[float, None] = None,
+            self,
+            steps: int,
+            scale_factor: float = 2,
+            asymptote: Union[float, None] = None,
     ) -> None:
         """Instantiate a new object of this Factory class.
 
@@ -490,9 +491,9 @@ class AdaExpFactory(Factory):
             )
         if steps < 3 + int(asymptote is None):
             raise ValueError(
-                "The argument 'steps' must be an integer"\
+                "The argument 'steps' must be an integer" \
                 " greater or equal to 3. "
-                "If 'asymptote' is None, 'steps' must be"\
+                "If 'asymptote' is None, 'steps' must be" \
                 " greater or equal to 4."
             )
         self.steps = steps
