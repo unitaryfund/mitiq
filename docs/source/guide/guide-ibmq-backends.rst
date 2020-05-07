@@ -111,6 +111,40 @@ scaling noise by folding gates starting from the left (instead of at random, the
 Any different combination of noise scaling and extrapolation technique can be pass as arguments to
 ``mitiq.execute_with_zne``.
 
+Cirq frontend
+*************
+
+It isn't necessary to use Qiskit frontends (circuits) to run on IBM backends. We can use conversions in
+``mitiq`` to use any supported frontend with any supported backend. Below, we show how to run a Cirq circuit on an
+IBMQ backend.
+
+First, we define the Cirq circuit.
+
+.. doctest:: python
+
+    import cirq
+
+    qbit = cirq.GridQubit(0, 0)
+    cirq_circuit = cirq.Circuit(cirq.ops.H.on(qbit)
+
+Now, we simply add a line to our executor function which converts from a Cirq circuit to a Qiskit circuit.
+
+.. doctest:: python
+
+    from mitiq.mitiq_qiskit.conversions import to_qiskit
+
+    def cirq_armonk_executor(cirq_circuit: cirq.Circuit, shots: int = 1024) -> float:
+        qiskit_circuit = to_qiskit(cirq_circuit)
+        return armonk_executor(qiskit_circuit, shots)
+
+After this, we can use ``mitiq.execute_with_zne`` in the same way as above.
+
+.. code-block:: python
+
+    mitigated = mitiq.execute_with_zne(cirq_circuit, cirq_armonk_executor)
+
+As above, different noise scaling or extrapolation methods can be used.
+
 Lower-level usage
 #################
 
