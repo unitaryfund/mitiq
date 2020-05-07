@@ -31,10 +31,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest mitiq/tests
-        pytest mitiq/benchmarks/tests
-        pytest mitiq/mitiq_qiskit/tests
+        ./test_build.sh -tests
     - name: Test documentation with sphinx
       run: |
-        cd docs && make html
-        make doctest
+        ./test_build.sh -docs
