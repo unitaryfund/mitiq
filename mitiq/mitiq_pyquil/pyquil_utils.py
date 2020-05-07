@@ -98,7 +98,7 @@ def run_program(pq: Program, shots: int = 500) -> float:
         shots: (Default: 500) Number of shots the circuit is run.
 
     Returns:
-        pq: Quantum program with added noise.
+        expval: Expected value.
     """
     pq.wrap_in_numshots_loop(shots)
     results = QVM.run(pq)
