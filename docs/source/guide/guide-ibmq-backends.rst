@@ -123,17 +123,17 @@ local folding method.
 
 .. testsetup:: python
 
-    >>> depth = 10
-    >>> circuit = random_identity_circuit(depth=depth)
+    depth = 10
+    circuit = random_identity_circuit(depth=depth)
 
 .. doctest:: python
 
-    >>> scale_factors = [1., 1.5, 2., 2.5, 3.]
-    >>> folded_circuits = [
-    ...         mitiq.folding.fold_local(
-    ...         circuit, scale, method=mitiq.folding.fold_gates_at_random
-    ...     ) for scale in scale_factors
-    ... ]
+    scale_factors = [1., 1.5, 2., 2.5, 3.]
+    folded_circuits = [
+            mitiq.folding.fold_local(
+            circuit, scale, method=mitiq.folding.fold_gates_at_random
+        ) for scale in scale_factors
+    ]
 
 We now add the observables we want to measure to the circuit. Here we use a single observable
 :math:`\Pi_0 \equiv |0\rangle \langle0|` -- i.e., the probability of measuring the ground state -- but other observables
