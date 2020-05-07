@@ -8,7 +8,7 @@ Error mitigation on IBMQ backends
 
 This tutorial shows an example of how to mitigate noise on IBMQ backends. First we import Qiskit and mitiq.
 
-.. code-block:: python
+.. doctest:: python
 
     import qiskit
     import mitiq
@@ -16,7 +16,7 @@ This tutorial shows an example of how to mitigate noise on IBMQ backends. First 
 
 For simplicity, we'll use a random single-qubit circuit with ten gates that compiles to the identity, defined below.
 
-.. code-block:: python
+.. doctest:: python
 
     >>> circuit = random_identity_circuit(depth=10)
     >>> print(circuit)
@@ -121,14 +121,19 @@ example explains the code in the previous section in more detail.
 First, we define factors to scale the circuit length by and fold the circuit using the ``fold_gates_at_random``
 local folding method.
 
-.. code-block:: python
+.. testsetup:: python
 
-    scale_factors = [1.0, 1.5, 2.0, 2.5, 3.0]
-    folded_circuits = [
-        mitiq.folding.fold_local(
-            circuit, scale, method=mitiq.folding.fold_gates_at_random
-        ) for scale in scale_factors
-    ]
+    >>> depth = 10
+    >>> circuit = random_identity_circuit(depth=depth)
+
+.. doctest:: python
+
+    >>> scale_factors = [1., 1.5, 2., 2.5, 3.]
+    >>> folded_circuits = [
+    ...         mitiq.folding.fold_local(
+    ...         circuit, scale, method=mitiq.folding.fold_gates_at_random
+    ...     ) for scale in scale_factors
+    ... ]
 
 We now add the observables we want to measure to the circuit. Here we use a single observable
 :math:`\Pi_0 \equiv |0\rangle \langle0|` -- i.e., the probability of measuring the ground state -- but other observables
@@ -191,7 +196,7 @@ corresponds to a circuit with scale factor one, i.e., the original circuit.)
     >>> print("Unmitigated expectation value:", round(expectation_values[0], 3))
     Unmitigated expectation value: 0.945
 
-Now we can using the ``reduce`` method of ``mitiq.Factory`` objects to extrapolate to the zero-noise limit. Below we use
+Now we can use the ``reduce`` method of ``mitiq.Factory`` objects to extrapolate to the zero-noise limit. Below we use
 a linear fit (order one polynomial fit) and print out the extrapolated zero-noise value.
 
 .. code-block:: python
