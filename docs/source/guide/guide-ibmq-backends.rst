@@ -16,7 +16,7 @@ This tutorial shows an example of how to mitigate noise on IBMQ backends. First 
 
 For simplicity, we'll use a random single-qubit circuit with ten gates that compiles to the identity, defined below.
 
-.. doctest:: python
+.. code-block:: python
 
     >>> circuit = random_identity_circuit(depth=10)
     >>> print(circuit)
@@ -121,7 +121,7 @@ example explains the code in the previous section in more detail.
 First, we define factors to scale the circuit length by and fold the circuit using the ``fold_gates_at_random``
 local folding method.
 
-.. testsetup:: python
+.. code-block:: python
 
     depth = 10
     circuit = random_identity_circuit(depth=depth)
