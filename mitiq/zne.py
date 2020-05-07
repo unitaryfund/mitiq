@@ -7,38 +7,6 @@ from mitiq.factories import Factory, RichardsonFactory
 from mitiq.folding import fold_gates_at_random
 
 
-def run_factory(
-    fac: Factory,
-    noise_to_expval: Callable[[float], float],
-    max_iterations: int = 100,
-) -> None:
-    """
-    Runs a factory until convergence (or iterations reach "max_iterations").
-
-    Args:
-        fac: Instance of Factory object to be run.
-        noise_to_expval: Function mapping noise scale to expectation vales.
-        max_iterations: Maximum number of iterations (optional). Default: 100.
-    """
-    # Clear out the factory to make sure it is fresh.
-    fac.reset()
-
-    counter = 0
-    while not fac.is_converged() and counter < max_iterations:
-        next_param = fac.next()
-        next_result = noise_to_expval(next_param)
-        fac.push(next_param, next_result)
-        counter += 1
-
-    if counter == max_iterations:
-        raise Warning(
-            "Factory iteration loop stopped before convergence. "
-            f"Maximum number of iterations ({max_iterations}) was reached."
-        )
-
-    return None
-
-
 def execute_with_zne(
     qp: QPROGRAM,
     executor: Callable[[QPROGRAM], float],

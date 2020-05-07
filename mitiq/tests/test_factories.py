@@ -1,10 +1,9 @@
-"""Testing of zero-noise extrapolation methods (factories) with classically generated data."""
+"""Testing of zero-noise extrapolation methods (factories) with classically
+generated data."""
 
-from typing import Callable, Iterable
+from typing import Callable
 from pytest import mark
 import numpy as np
-
-from cirq import Circuit
 
 from mitiq.factories import (
     RichardsonFactory,
@@ -13,11 +12,7 @@ from mitiq.factories import (
     ExpFactory,
     PolyExpFactory,
     AdaExpFactory,
-    BatchedFactory,
-    Factory,
 )
-from mitiq.zne import run_factory
-from mitiq import QPROGRAM
 
 # Set the seed for testing
 RNG = np.random.RandomState(808)
