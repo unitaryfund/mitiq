@@ -39,33 +39,6 @@ def run_factory(
     return None
 
 
-# quantum version of run_factory. Similar to the old "mitigate".
-def qrun_factory(
-    fac: Factory,
-    qp: QPROGRAM,
-    executor: Callable[[QPROGRAM], float],
-    scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
-) -> None:
-    """
-    Runs the factory until convergence executing quantum circuits.
-    Accepts different noise levels.
-
-    Args:
-        fac: Factory object to run until convergence.
-        qp: Circuit to mitigate.
-        executor: Function executing a circuit; returns an expectation value.
-        scale_noise: Function that scales the noise level of a quantum circuit.
-    """
-
-    def _noise_to_expval(noise_param: float) -> float:
-        """Evaluates the quantum expectation value for a given noise_param"""
-        scaled_qp = scale_noise(qp, noise_param)
-
-        return executor(scaled_qp)
-
-    run_factory(fac, _noise_to_expval)
-
-
 def execute_with_zne(
     qp: QPROGRAM,
     executor: Callable[[QPROGRAM], float],
@@ -89,7 +62,7 @@ def execute_with_zne(
         scale_noise = fold_gates_at_random
     if fac is None:
         fac = RichardsonFactory([1.0, 2.0, 3.0])
-    qrun_factory(fac, qp, executor, scale_noise)
+    fac.run(qp, executor, scale_noise)
 
     return fac.reduce()
 

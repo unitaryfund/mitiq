@@ -2,11 +2,12 @@
 extrapolation methods.
 """
 
-from typing import List, Iterable, Union, Tuple
+from typing import List, Iterable, Union, Tuple, Callable
 from abc import ABC, abstractmethod
 import numpy as np
 from scipy.optimize import curve_fit
 
+from mitiq import QPROGRAM
 
 class Factory(ABC):
     """
@@ -62,6 +63,49 @@ class Factory(ABC):
         """Resets the instack and outstack of the Factory to empty values."""
         self.instack = []
         self.outstack = []
+
+    def run(self, qp: QPROGRAM,
+            executor: Callable[[QPROGRAM], float],
+            scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+            max_iterations: int = 100) -> 'Factory':
+        """
+        Runs the factory until convergence executing quantum circuits.
+        Accepts different noise levels.
+
+        Args:
+            qp: Circuit to mitigate.
+            executor: Function executing a circuit; returns an expectation
+                      value.
+            scale_noise: Function that scales the noise level of a quantum
+                         circuit.
+            max_iterations: Maximum number of iterations (optional).
+                            Default: 100.
+        """
+
+        def _noise_to_expval(noise_param: float) -> float:
+            """Evaluates the quantum expectation value for a given noise_
+            param"""
+            scaled_qp = scale_noise(qp, noise_param)
+
+            return executor(scaled_qp)
+
+        # Clear out the factory to make sure it is fresh.
+        self.reset()
+
+        counter = 0
+        while not self.is_converged() and counter < max_iterations:
+            next_param = self.next()
+            next_result = _noise_to_expval(next_param)
+            self.push(next_param, next_result)
+            counter += 1
+
+        if counter == max_iterations:
+            raise Warning(
+                "Factory iteration loop stopped before convergence. "
+                f"Maximum number of iterations ({max_iterations}) was reached."
+            )
+
+        return self
 
 
 class BatchedFactory(Factory):
