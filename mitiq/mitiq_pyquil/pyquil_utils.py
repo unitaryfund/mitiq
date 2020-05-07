@@ -158,7 +158,6 @@ def measure(circuit, qid):
         qid: position of the measurement in the circuit.
 
     Returns:
-
         Quantum program with added measurement.
     """
     ro = circuit.declare("ro", "BIT", 1)
