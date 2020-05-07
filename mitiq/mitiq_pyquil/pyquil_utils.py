@@ -68,7 +68,6 @@ def run_with_noise(circuit: Program, noise: float, shots: int)-> float:
         shots: Number of shots the circuit is run.
 
     Returns:
-
         expval: Expected value.
     """
     # apply depolarizing noise to all gates
