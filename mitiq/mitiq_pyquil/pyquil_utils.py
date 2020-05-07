@@ -141,7 +141,6 @@ def scale_noise(pq: Program, param: float) -> Program:
         param: noise scaling.
 
     Returns:
-
         Quantum program with added noise.
     """
     noise = param * NATIVE_NOISE
