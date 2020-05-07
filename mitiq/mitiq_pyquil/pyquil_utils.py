@@ -115,7 +115,6 @@ def add_depolarizing_noise(pq: Program, noise: float) -> Program:
         noise: Noise constant for depolarizing channel.
 
     Returns:
-
         expval: Expected value.
     """
     pq = pq.copy()
