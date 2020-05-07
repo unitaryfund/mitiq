@@ -114,7 +114,7 @@ def add_depolarizing_noise(pq: Program, noise: float) -> Program:
         noise: Noise constant for depolarizing channel.
 
     Returns:
-        expval: Expected value.
+        pq: Quantum program with added noise.
     """
     pq = pq.copy()
     # apply depolarizing noise to all gates
