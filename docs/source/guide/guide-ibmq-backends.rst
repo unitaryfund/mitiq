@@ -235,10 +235,9 @@ a linear fit (order one polynomial fit) and print out the extrapolated zero-nois
 
 .. code-block:: python
 
-    >>> order = 1
-    >>> zero_noise_value = mitiq.factories.PolyFactory.static_reduce(
-    >>>     scale_factors[1:], expectation_values[1:], order=order
-    >>> )
+    >>> fac = mitiq.factories.LinearFactory(scale_factors)
+    >>> fac.instack, fac.outstack = scale_factors, expectation_values
+    >>> zero_noise_value = fac.reduce()
     >>> print(f"Extrapolated zero-noise value:", round(zero_noise_value, 3))
     Extrapolated zero-noise value: 0.961
 
