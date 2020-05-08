@@ -14,6 +14,13 @@ Mitiq performs error mitigation protocols on quantum circuits using zero-noise e
 ```
 mitiq/mitiq/
     | about
+    | benchmarks    (package)
+        |- maxcut
+        |- tests    (package)
+            |- test_maxcut
+            |- test_random_circ
+        |- random_circ
+        |- utils
     | factories
     | folding
     | matrices
@@ -32,6 +39,7 @@ mitiq/mitiq/
     	|- test_folding
     	|- test_matrices
     	|- test_utils
+        |- test_zne
     | utils
     | zne
 ```
