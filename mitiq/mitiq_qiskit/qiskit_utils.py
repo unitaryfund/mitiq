@@ -10,19 +10,20 @@ from qiskit.providers.aer.noise.errors.standard_errors import (
 )
 
 BACKEND = qiskit.Aer.get_backend("qasm_simulator")
-# Set the random seeds for testing
-QISKIT_SEED = 1337
 
 
-def random_identity_circuit(depth=None):
+def random_identity_circuit(depth: int, seed: int = None) -> QuantumCircuit:
     """Returns a single-qubit identity circuit based on Pauli gates.
 
     Args:
-        depth (int): depth of the quantum circuit.
+        depth: Depth of the quantum circuit.
+        seed: Optional seed for random number generator.
 
     Returns:
-        circuit: quantum circuit as a :class:`qiskit.QuantumCircuit` object.
+        circuit: Quantum circuit as a :class:`qiskit.QuantumCircuit` object.
     """
+    # initialize a local random number generator
+    rnd_state = np.random.RandomState(seed)
 
     # initialize a quantum circuit with 1 qubit and 1 classical bit
     circuit = QuantumCircuit(1, 1)
@@ -33,7 +34,7 @@ def random_identity_circuit(depth=None):
     # apply a random sequence of Pauli gates
     for _ in range(depth):
         # random index for the next gate: 1=X, 2=Y, 3=Z
-        k = np.random.choice([1, 2, 3])
+        k = rnd_state.choice([1, 2, 3])
         # apply the Pauli gate "k"
         if k == 1:
             circuit.x(0)
@@ -65,13 +66,15 @@ def random_identity_circuit(depth=None):
     return circuit
 
 
-def run_with_noise(circuit: QuantumCircuit, noise: float, shots: int) -> float:
+def run_with_noise(circuit: QuantumCircuit, noise: float, \
+    shots: int, seed: int = None) -> float:
     """Runs the quantum circuit with a depolarizing channel noise model.
 
     Args:
-        circuit (qiskit.QuantumCircuit): Ideal quantum circuit.
-        noise (float): Noise constant going into `depolarizing_error`.
-        shots (int): Number of shots to run the circuit on the back-end.
+        circuit: Ideal quantum circuit.
+        noise: Noise constant going into `depolarizing_error`.
+        shots: The Number of shots to run the circuit on the back-end.
+        seed: Optional seed for qiskit simulator.
 
     Returns:
         expval: expected values.
@@ -95,7 +98,7 @@ def run_with_noise(circuit: QuantumCircuit, noise: float, shots: int) -> float:
         optimization_level=0,
         noise_model=noise_model,
         shots=shots,
-        seed_simulator=QISKIT_SEED,
+        seed_simulator=seed,
     )
     results = job.result()
     counts = results.get_counts()
@@ -117,8 +120,8 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
 
     Args:
         pq: Quantum circuit.
-        noise (float): Noise constant going into `depolarizing_error`.
-        shots (int): Number of shots to run the circuit on the back-end.
+        noise: Noise constant going into `depolarizing_error`.
+        shots: Number of shots to run the circuit on the back-end.
 
     Returns:
         pq: quantum circuit as a :class:`qiskit.QuantumCircuit` object.
@@ -142,12 +145,14 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
     return pq
 
 
-def run_program(pq: QuantumCircuit, shots: int = 100) -> float:
+def run_program(pq: QuantumCircuit, shots: int = 100,
+                seed: int = None) -> float:
     """Runs a quantum program.
 
     Args:
         pq: Quantum circuit.
-        shots (int): Number of shots to run the circuit on the back-end.
+        shots: Number of shots to run the circuit on the back-end.
+        seed: Optional seed for qiskit simulator.
 
     Returns:
         expval: expected value.
@@ -161,7 +166,7 @@ def run_program(pq: QuantumCircuit, shots: int = 100) -> float:
         optimization_level=0,
         noise_model=CURRENT_NOISE,
         shots=shots,
-        seed_simulator=QISKIT_SEED,
+        seed_simulator=seed,
     )
     results = job.result()
     counts = results.get_counts()

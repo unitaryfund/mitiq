@@ -33,7 +33,9 @@ def sample_observable(n_qubits: int) -> np.ndarray:
 def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
                        fac: Factory=None,
                        scale_noise: Callable[[QPROGRAM, float], QPROGRAM]=None,
-                       op_density:float=0.99, silent:bool=True) \
+                       op_density: float=0.99, 
+                       silent: bool=True,
+                       seed: int=None) \
         -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Benchmarks a zero-noise extrapolation method and noise scaling executor
     by running on randomly sampled quantum circuits.
@@ -49,6 +51,7 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
                     any moment.
         silent: If False will print out statements every tenth trial to
                 track progress.
+        seed: Optional seed for random number generator.
 
     Returns:
         The triple (exacts, unmitigateds, mitigateds) where each is a list
@@ -61,10 +64,16 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
 
     qubits = [NamedQubit(str(xx)) for xx in range(n_qubits)]
 
+    if seed:
+        random_state = np.random.RandomState(seed)
+    else:
+        random_state = None
+
     for ii in range(trials):
         if not silent and ii % 10 == 0: print(ii)
 
-        qc = random_circuit(qubits, n_moments=depth, op_density=op_density)
+        qc = random_circuit(qubits, n_moments=depth, op_density=op_density, random_state=random_state)
+
         wvf = qc.final_wavefunction()
 
         # calculate the exact
