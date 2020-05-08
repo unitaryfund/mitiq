@@ -52,7 +52,6 @@ We define this function in the following code block. Because we are using IBMQ b
 
         Args:
             circuit: Circuit to run.
-            backend_name: Specifies the IBMQ backend to run on.
             shots: Number of times to execute the circuit to compute the expectation value.
         """
         # (1) Add measurements to the circuit
