@@ -124,7 +124,7 @@ the extrapolation will exactly match the true zero-noise limit ``0.5``:
    could be more appropriate.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The ``Factory().iterate`` function
+The ``Factory().iterate`` method
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Running a factory until convergence is a typical step of the zero-noise extrapolation
