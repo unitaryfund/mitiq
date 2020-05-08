@@ -1,5 +1,5 @@
-"""Functions to convert from Mitiq's internal circuit representation
-to Qiskit representations.
+"""Functions to convert between Mitiq's internal circuit representation
+and Qiskit's circuit representation.
 """
 
 import cirq
@@ -10,7 +10,7 @@ from qiskit import QuantumCircuit
 QASMType = str
 
 
-def _to_qasm(circuit: cirq.Circuit) -> QASMType:
+def to_qasm(circuit: cirq.Circuit) -> QASMType:
     """Returns a QASM string representing the input Mitiq circuit.
 
     Args:
@@ -22,7 +22,7 @@ def _to_qasm(circuit: cirq.Circuit) -> QASMType:
     return circuit.to_qasm()
 
 
-def _to_qiskit(circuit: cirq.Circuit) -> QuantumCircuit:
+def to_qiskit(circuit: cirq.Circuit) -> QuantumCircuit:
     """Returns a Qiskit circuit equivalent to the input Mitiq circuit.
 
     Args:
@@ -31,10 +31,10 @@ def _to_qiskit(circuit: cirq.Circuit) -> QuantumCircuit:
     Returns:
         Qiskit.QuantumCircuit object equivalent to the input Mitiq circuit.
     """
-    return QuantumCircuit.from_qasm_str(_to_qasm(circuit))
+    return QuantumCircuit.from_qasm_str(to_qasm(circuit))
 
 
-def _from_qiskit(circuit: QuantumCircuit) -> cirq.Circuit:
+def from_qiskit(circuit: QuantumCircuit) -> cirq.Circuit:
     """Returns a Mitiq circuit equivalent to the input Qiskit circuit.
 
     Args:
@@ -43,10 +43,10 @@ def _from_qiskit(circuit: QuantumCircuit) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input Qiskit circuit.
     """
-    return _from_qasm(circuit.qasm())
+    return from_qasm(circuit.qasm())
 
 
-def _from_qasm(qasm: QASMType) -> cirq.Circuit:
+def from_qasm(qasm: QASMType) -> cirq.Circuit:
     """Returns a Mitiq circuit equivalent to the input QASM string.
 
     Args:
