@@ -40,32 +40,32 @@ def reset_rnd_state(seed):
     rnd_state = np.random.RandomState(seed)
 
 # Classical test functions with statistical error:
-def f_lin(x: float, err: float=STAT_NOISE) -> float:
+def f_lin(x: float, err: float = STAT_NOISE) -> float:
     """Linear function."""
     return A + B * x + rnd_state.normal(scale=err)
 
 
-def f_non_lin(x: float, err: float=STAT_NOISE) -> float:
+def f_non_lin(x: float, err: float = STAT_NOISE) -> float:
     """Non-linear function."""
     return A + B * x + C * x ** 2 + rnd_state.normal(scale=err)
 
 
-def f_exp_down(x: float, err: float=STAT_NOISE) -> float:
+def f_exp_down(x: float, err: float = STAT_NOISE) -> float:
     """Exponential decay."""
     return A + B * np.exp(-C * x) + rnd_state.normal(scale=err)
 
 
-def f_exp_up(x: float, err: float=STAT_NOISE) -> float:
+def f_exp_up(x: float, err: float = STAT_NOISE) -> float:
     """Exponential growth."""
     return A - B * np.exp(-C * x) + rnd_state.normal(scale=err)
 
 
-def f_poly_exp_down(x: float, err: float=STAT_NOISE) -> float:
+def f_poly_exp_down(x: float, err: float = STAT_NOISE) -> float:
     """Poly-exponential decay."""
     return A + B * np.exp(-C * x - D * x ** 2) + rnd_state.normal(scale=err)
 
 
-def f_poly_exp_up(x: float, err: float=STAT_NOISE) -> float:
+def f_poly_exp_up(x: float, err: float = STAT_NOISE) -> float:
     """Poly-exponential growth."""
     return A - B * np.exp(-C * x - D * x ** 2) + rnd_state.normal(scale=err)
 
