@@ -108,7 +108,7 @@ scaling noise by folding gates starting from the left (instead of at random, the
 
     mitigated = mitiq.execute_with_zne(circuit, armonk_executor, scale_noise=mitiq.folding.fold_gates_from_left)
 
-Any different combination of noise scaling and extrapolation technique can be pass as arguments to
+Any different combination of noise scaling and extrapolation technique can be passed as arguments to
 ``mitiq.execute_with_zne``.
 
 Cirq frontend
