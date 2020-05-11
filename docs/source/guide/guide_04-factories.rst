@@ -124,25 +124,24 @@ the extrapolation will exactly match the true zero-noise limit ``0.5``:
    could be more appropriate.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The ``run_factory`` function
+The ``Factory().iterate`` method
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Running a factory until convergence is a typical step of the zero-noise extrapolation
-workflow. For this reason, in ``mitiq.zne`` there is a function which can be used
-for this task: ``run_factory``. The previous example can be simplified to the following
+workflow. For this reason, every factory can be run to convergence using an
+``iterate`` method. The previous example can be simplified to the following
 equivalent code:
 
 .. testcode::
 
    from mitiq.factories import LinearFactory
-   from mitiq.zne import run_factory
 
    # Some fixed noise scale factors
    SCALE_FACTORS = [1.0, 2.0, 3.0]
    # Instantiate a LinearFactory object
    fac = LinearFactory(SCALE_FACTORS)
    # Run the factory until convergence
-   run_factory(fac, noise_to_expval)
+   fac.iterate(noise_to_expval)
    # Evaluate the zero-noise extrapolation.
    zn_limit = fac.reduce()
    print(f"The zero-noise extrapolation is: {zn_limit:.3}")
@@ -243,11 +242,11 @@ and clips the result if it falls outside its physical domain.
 .. testcleanup::
 
    fac = MyFactory(SCALE_FACTORS, min_expval=-1.0, max_expval=1.0)
-   run_factory(fac, noise_to_expval)
+   fac.iterate(noise_to_expval)
    assert np.isclose(fac.reduce(), 0.5)
    # Linear model with a large zero-noise limit
    noise_to_large_expval = lambda x : noise_to_expval(x) + 10.0
-   run_factory(fac, noise_to_large_expval)
+   fac.iterate(noise_to_large_expval)
    assert np.isclose(fac.reduce(), 1.0)
 
 This custom factory can be used in exactly the same way as we have

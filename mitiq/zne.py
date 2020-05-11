@@ -7,65 +7,6 @@ from mitiq.factories import Factory, RichardsonFactory
 from mitiq.folding import fold_gates_at_random
 
 
-def run_factory(
-    fac: Factory,
-    noise_to_expval: Callable[[float], float],
-    max_iterations: int = 100,
-) -> None:
-    """
-    Runs a factory until convergence (or iterations reach "max_iterations").
-
-    Args:
-        fac: Instance of Factory object to be run.
-        noise_to_expval: Function mapping noise scale to expectation vales.
-        max_iterations: Maximum number of iterations (optional). Default: 100.
-    """
-    # Clear out the factory to make sure it is fresh.
-    fac.reset()
-
-    counter = 0
-    while not fac.is_converged() and counter < max_iterations:
-        next_param = fac.next()
-        next_result = noise_to_expval(next_param)
-        fac.push(next_param, next_result)
-        counter += 1
-
-    if counter == max_iterations:
-        raise Warning(
-            "Factory iteration loop stopped before convergence. "
-            f"Maximum number of iterations ({max_iterations}) was reached."
-        )
-
-    return None
-
-
-# quantum version of run_factory. Similar to the old "mitigate".
-def qrun_factory(
-    fac: Factory,
-    qp: QPROGRAM,
-    executor: Callable[[QPROGRAM], float],
-    scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
-) -> None:
-    """
-    Runs the factory until convergence executing quantum circuits.
-    Accepts different noise levels.
-
-    Args:
-        fac: Factory object to run until convergence.
-        qp: Circuit to mitigate.
-        executor: Function executing a circuit; returns an expectation value.
-        scale_noise: Function that scales the noise level of a quantum circuit.
-    """
-
-    def _noise_to_expval(noise_param: float) -> float:
-        """Evaluates the quantum expectation value for a given noise_param"""
-        scaled_qp = scale_noise(qp, noise_param)
-
-        return executor(scaled_qp)
-
-    run_factory(fac, _noise_to_expval)
-
-
 def execute_with_zne(
     qp: QPROGRAM,
     executor: Callable[[QPROGRAM], float],
@@ -89,7 +30,7 @@ def execute_with_zne(
         scale_noise = fold_gates_at_random
     if fac is None:
         fac = RichardsonFactory([1.0, 2.0, 3.0])
-    qrun_factory(fac, qp, executor, scale_noise)
+    fac.run(qp, executor, scale_noise)
 
     return fac.reduce()
 
