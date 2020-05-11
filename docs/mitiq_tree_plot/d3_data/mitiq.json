@@ -1,0 +1,293 @@
+{
+    "children": [
+        {
+            "children": [
+                {
+                    "color": "#0B5FA5",
+                    "name": "run_factory",
+                    "size": 1000
+                },
+                {
+                    "color": "#0B5FA5",
+                    "name": "qrun_factory",
+                    "size": 1000
+                },
+                {
+                    "color": "#0B5FA5",
+                    "name": "execute_with_zne",
+                    "size": 1000
+                },
+                {
+                    "color": "#0B5FA5",
+                    "name": "mitigate_executor",
+                    "size": 1000
+                },
+                {
+                    "color": "#0B5FA5",
+                    "name": "zne_decorator",
+                    "size": 1000
+                }
+            ],
+            "color": "#0B5FA5",
+            "idx": 0,
+            "name": "zne"
+        },
+        {
+            "children": [
+                {
+                    "color": "#043C6B",
+                    "name": "Factory",
+                    "size": 1000
+                },
+                {
+                    "color": "#043C6B",
+                    "name": "BatchedFactory",
+                    "size": 1000
+                },
+                {
+                    "color": "#043C6B",
+                    "name": "PolyFactory",
+                    "size": 1000
+                },
+                {
+                    "color": "#043C6B",
+                    "name": "RichardsonFactory",
+                    "size": 1000
+                },
+                {
+                    "color": "#043C6B",
+                    "name": "LinearFactory",
+                    "size": 1000
+                },
+                {
+                    "color": "#043C6B",
+                    "name": "ExpFactory",
+                    "size": 1000
+                },
+                {
+                    "color": "#043C6B",
+                    "name": "PolyExpFactory",
+                    "size": 1000
+                },
+                {
+                    "color": "#043C6B",
+                    "name": "AdaExpFactory",
+                    "size": 1000
+                }
+            ],
+            "color": "#043C6B",
+            "idx": 1,
+            "name": "factories"
+        },
+        {
+            "children": [
+                {
+                    "color": "#3F8FD2",
+                    "name": "random_identity_circuit",
+                    "size": 10
+                },
+                {
+                    "color": "#3F8FD2",
+                    "name": "run_with_noise",
+                    "size": 10
+                },
+                {
+                    "color": "#3F8FD2",
+                    "name": "run_program",
+                    "size": 10
+                },
+                {
+                    "color": "#3F8FD2",
+                    "name": "add_depolarizing_noise",
+                    "size": 10
+                },
+                {
+                    "color": "#3F8FD2",
+                    "name": "scale_noise",
+                    "size": 10
+                },
+                {
+                    "color": "#3F8FD2",
+                    "name": "measure",
+                    "size": 10
+                }
+            ],
+            "color": "#3F8FD2",
+            "idx": 2,
+            "name": "pyquil_utils"
+        },
+        {
+            "children": [],
+            "color": "#00AE68",
+            "idx": 3,
+            "name": "conversions"
+        },
+        {
+            "children": [
+                {
+                    "color": "#00AE68",
+                    "name": "random_identity_circuit",
+                    "size": 10
+                },
+                {
+                    "color": "#00AE68",
+                    "name": "run_with_noise",
+                    "size": 10
+                },
+                {
+                    "color": "#00AE68",
+                    "name": "scale_noise",
+                    "size": 10
+                },
+                {
+                    "color": "#00AE68",
+                    "name": "run_program",
+                    "size": 10
+                },
+                {
+                    "color": "#00AE68",
+                    "name": "measure",
+                    "size": 10
+                }
+            ],
+            "color": "#00AE68",
+            "idx": 3,
+            "name": "qiskit_utils"
+        },
+        {
+            "children": [
+                {
+                    "color": "#007143",
+                    "name": "UnsupportedCircuitError",
+                    "size": 1000
+                },
+                {
+                    "color": "#007143",
+                    "name": "convert_to_mitiq",
+                    "size": 1000
+                },
+                {
+                    "color": "#007143",
+                    "name": "convert_from_mitiq",
+                    "size": 1000
+                },
+                {
+                    "color": "#007143",
+                    "name": "converter",
+                    "size": 1000
+                },
+                {
+                    "color": "#007143",
+                    "name": "fold_gates_from_left",
+                    "size": 1000
+                },
+                {
+                    "color": "#007143",
+                    "name": "fold_gates_from_right",
+                    "size": 1000
+                },
+                {
+                    "color": "#007143",
+                    "name": "fold_gates_at_random",
+                    "size": 1000
+                },
+                {
+                    "color": "#007143",
+                    "name": "fold_local",
+                    "size": 1000
+                },
+                {
+                    "color": "#007143",
+                    "name": "fold_global",
+                    "size": 1000
+                }
+            ],
+            "color": "#007143",
+            "idx": 4,
+            "name": "folding"
+        },
+        {
+            "children": [
+                {
+                    "color": "#36D695",
+                    "name": "make_noisy_backend",
+                    "size": 10
+                },
+                {
+                    "color": "#36D695",
+                    "name": "make_maxcut",
+                    "size": 10
+                },
+                {
+                    "color": "#36D695",
+                    "name": "run_maxcut",
+                    "size": 10
+                }
+            ],
+            "color": "#36D695",
+            "idx": 5,
+            "name": "maxcut"
+        },
+        {
+            "children": [
+                {
+                    "color": "#36D695",
+                    "name": "sample_observable",
+                    "size": 10
+                },
+                {
+                    "color": "#36D695",
+                    "name": "rand_benchmark_zne",
+                    "size": 10
+                }
+            ],
+            "color": "#36D695",
+            "idx": 5,
+            "name": "random_circ"
+        },
+        {
+            "children": [],
+            "color": "#FF4500",
+            "idx": 6,
+            "name": "matrices"
+        },
+        {
+            "children": [
+                {
+                    "color": "#692102",
+                    "name": "about",
+                    "size": 1000
+                }
+            ],
+            "color": "#692102",
+            "idx": 7,
+            "name": "about"
+        },
+        {
+            "children": [
+                {
+                    "color": "#BF5730",
+                    "name": "random_circuit",
+                    "size": 1000
+                }
+            ],
+            "color": "#BF5730",
+            "idx": 8,
+            "name": "utils"
+        },
+        {
+            "children": [
+                {
+                    "color": "#BF5730",
+                    "name": "noisy_simulation",
+                    "size": 10
+                }
+            ],
+            "color": "#BF5730",
+            "idx": 8,
+            "name": "utils"
+        }
+    ],
+    "name": "mitiq",
+    "size": 2000
+}
