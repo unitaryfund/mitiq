@@ -84,32 +84,32 @@
                 {
                     "color": "#3F8FD2",
                     "name": "random_identity_circuit",
-                    "size": 10
+                    "size": 1000
                 },
                 {
                     "color": "#3F8FD2",
                     "name": "run_with_noise",
-                    "size": 10
+                    "size": 1000
                 },
                 {
                     "color": "#3F8FD2",
                     "name": "run_program",
-                    "size": 10
+                    "size": 1000
                 },
                 {
                     "color": "#3F8FD2",
                     "name": "add_depolarizing_noise",
-                    "size": 10
+                    "size": 1000
                 },
                 {
                     "color": "#3F8FD2",
                     "name": "scale_noise",
-                    "size": 10
+                    "size": 1000
                 },
                 {
                     "color": "#3F8FD2",
                     "name": "measure",
-                    "size": 10
+                    "size": 1000
                 }
             ],
             "color": "#3F8FD2",
@@ -127,27 +127,27 @@
                 {
                     "color": "#00AE68",
                     "name": "random_identity_circuit",
-                    "size": 10
+                    "size": 1000
                 },
                 {
                     "color": "#00AE68",
                     "name": "run_with_noise",
-                    "size": 10
+                    "size": 1000
                 },
                 {
                     "color": "#00AE68",
                     "name": "scale_noise",
-                    "size": 10
+                    "size": 1000
                 },
                 {
                     "color": "#00AE68",
                     "name": "run_program",
-                    "size": 10
+                    "size": 1000
                 },
                 {
                     "color": "#00AE68",
                     "name": "measure",
-                    "size": 10
+                    "size": 1000
                 }
             ],
             "color": "#00AE68",
@@ -211,17 +211,17 @@
                 {
                     "color": "#36D695",
                     "name": "make_noisy_backend",
-                    "size": 10
+                    "size": 1000
                 },
                 {
                     "color": "#36D695",
                     "name": "make_maxcut",
-                    "size": 10
+                    "size": 1000
                 },
                 {
                     "color": "#36D695",
                     "name": "run_maxcut",
-                    "size": 10
+                    "size": 1000
                 }
             ],
             "color": "#36D695",
@@ -233,12 +233,12 @@
                 {
                     "color": "#36D695",
                     "name": "sample_observable",
-                    "size": 10
+                    "size": 1000
                 },
                 {
                     "color": "#36D695",
                     "name": "rand_benchmark_zne",
-                    "size": 10
+                    "size": 1000
                 }
             ],
             "color": "#36D695",
@@ -280,7 +280,7 @@
                 {
                     "color": "#BF5730",
                     "name": "noisy_simulation",
-                    "size": 10
+                    "size": 1000
                 }
             ],
             "color": "#BF5730",
