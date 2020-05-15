@@ -1,0 +1,7 @@
+include README.md
+include LICENSE
+include requirements.txt
+include development_requirements.txt
+include test_build.sh
+recursive-include docs/ *.ini
+recursive-include docs/ README-docs.md
