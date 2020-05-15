@@ -13,19 +13,25 @@ from mitiq.factories import Factory
 from mitiq.benchmarks.utils import noisy_simulation
 
 
-def sample_observable(n_qubits: int) -> np.ndarray:
+def sample_observable(n_qubits: int, 
+                      rnd_state: np.random.RandomState = None) -> np.ndarray:
     """Constructs a random computational basis observable on n_qubits
 
     Args:
         n_qubits: A number of qubits
+        rnd_state: Optional numpy.random.RandomState object.
 
     Returns:
         A random computational basis observable on n_qubits, e.g. for two
-        qubits this could be np.diag([0, 0, 0, 1]) to measure the ZZ
-        observable.
+        qubits this could be np.diag([0, 0, 0, 1]), corresponding to the
+        projector on the |11> state.
     """
     obs = np.zeros(int(2 ** n_qubits))
-    chosenZ = np.random.randint(2 ** n_qubits)
+
+    if rnd_state is None:
+        rnd_state = np.random
+
+    chosenZ =rnd_state.randint(2 ** n_qubits)
     obs[chosenZ] = 1
     return np.diag(obs)
 
@@ -65,19 +71,22 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
     qubits = [NamedQubit(str(xx)) for xx in range(n_qubits)]
 
     if seed:
-        random_state = np.random.RandomState(seed)
+        rnd_state = np.random.RandomState(seed)
     else:
-        random_state = None
+        rnd_state = None
 
     for ii in range(trials):
         if not silent and ii % 10 == 0: print(ii)
 
-        qc = random_circuit(qubits, n_moments=depth, op_density=op_density, random_state=random_state)
+        qc = random_circuit(qubits,
+                            n_moments=depth,
+                            op_density=op_density,
+                            random_state=rnd_state)
 
         wvf = qc.final_wavefunction()
 
         # calculate the exact
-        obs = sample_observable(n_qubits)
+        obs = sample_observable(n_qubits, rnd_state=rnd_state)
         exact = np.conj(wvf).T @ obs @ wvf
 
         # make sure it is real
