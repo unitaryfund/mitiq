@@ -15,14 +15,14 @@ from mitiq.benchmarks.utils import noisy_simulation
 
 def sample_observable(n_qubits: int, 
                       rnd_state: np.random.RandomState = None) -> np.ndarray:
-    """Constructs a random computational basis observable on n_qubits
+    """Constructs a projector on a random computational basis state of n_qubits.
 
     Args:
         n_qubits: A number of qubits
         rnd_state: Optional numpy.random.RandomState object.
 
     Returns:
-        A random computational basis observable on n_qubits, e.g. for two
+        A random computational basis projector on n_qubits. E.g., for two
         qubits this could be np.diag([0, 0, 0, 1]), corresponding to the
         projector on the |11> state.
     """
