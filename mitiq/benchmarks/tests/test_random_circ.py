@@ -7,14 +7,15 @@ from mitiq.factories import LinearFactory, RichardsonFactory, PolyFactory
 from mitiq.folding import fold_gates_at_random, fold_gates_from_left, \
     fold_gates_from_right
 from mitiq.benchmarks.random_circ import rand_benchmark_zne
-from mitiq import QPROGRAM
 
 # Fix a seed for this test file
 SEED = 808
 
+
 # Make fold_gates_at_random deterministic
 def fold_gates_at_random_seeded(circuit, scale_factor):
     return fold_gates_at_random(circuit, scale_factor, seed=SEED)
+
 
 SCALE_FUNCTIONS = [
     fold_gates_at_random_seeded,

@@ -1,6 +1,9 @@
-"""Testing of zero-noise extrapolation methods (factories) with classically generated data."""
+"""
+Testing of zero-noise extrapolation methods
+(factories) with classically generated data.
+"""
 
-from typing import Callable, Iterable
+from typing import Callable
 from pytest import mark
 import numpy as np
 from mitiq.factories import (

@@ -2,11 +2,11 @@
 """
 Contains methods used for testing mitiq's performance
 """
-from typing import Tuple, Callable, List
+from typing import Tuple, Callable
 import numpy as np
 
 from cirq.testing import random_circuit
-from cirq import NamedQubit, Circuit, DensityMatrixSimulator
+from cirq import NamedQubit, Circuit
 
 from mitiq import execute_with_zne, QPROGRAM
 from mitiq.factories import Factory
@@ -31,17 +31,17 @@ def sample_observable(n_qubits: int,
     if rnd_state is None:
         rnd_state = np.random
 
-    chosenZ =rnd_state.randint(2 ** n_qubits)
+    chosenZ = rnd_state.randint(2 ** n_qubits)
     obs[chosenZ] = 1
     return np.diag(obs)
 
 
 def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
-                       fac: Factory=None,
-                       scale_noise: Callable[[QPROGRAM, float], QPROGRAM]=None,
-                       op_density: float=0.99, 
-                       silent: bool=True,
-                       seed: int=None) \
+                       fac: Factory = None,
+                       scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
+                       op_density: float = 0.99,
+                       silent: bool = True,
+                       seed: int = None) \
         -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Benchmarks a zero-noise extrapolation method and noise scaling executor
     by running on randomly sampled quantum circuits.
