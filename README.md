@@ -14,6 +14,13 @@ Mitiq performs error mitigation protocols on quantum circuits using zero-noise e
 ```
 mitiq/mitiq/
     | about
+    | benchmarks    (package)
+        |- maxcut
+        |- tests    (package)
+            |- test_maxcut
+            |- test_random_circ
+        |- random_circ
+        |- utils
     | factories
     | folding
     | matrices
@@ -32,6 +39,7 @@ mitiq/mitiq/
     	|- test_folding
     	|- test_matrices
     	|- test_utils
+        |- test_zne
     | utils
     | zne
 ```
@@ -59,7 +67,7 @@ updated to the latest release can be found
 
 ## Development and Testing
 Ensure that you have installed the development environment. Then
-you can run tests with `pytest`.
+you can run tests and build the docs with `./test_build.sh`.
 
 ## Contributing
 You can contribute to `mitiq` code by raising an

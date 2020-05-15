@@ -59,6 +59,7 @@ def make_maxcut(graph: List[Tuple[int, int]],
     """
     # get the list of unique nodes from the list of edges
     nodes = list({node for edge in graph for node in edge})
+    nodes = range(max(nodes) + 1)
 
     # one qubit per node
     qreg = [NamedQubit(str(nn)) for nn in nodes]
@@ -79,7 +80,7 @@ def make_maxcut(graph: List[Tuple[int, int]],
         return init_state_prog + qaoa_steps
 
     # make the cost observable
-    identity = np.eye(len(nodes) ** 2)
+    identity = np.eye(2 ** len(nodes))
     cost_mat = -0.5 * sum(identity - Circuit(
                     [id(*qreg), ZZ(qreg[i], qreg[j])]).unitary()
                 for i, j in graph)
