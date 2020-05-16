@@ -9,6 +9,7 @@ a Python toolkit for implementing error mitigation on quantum computers.
 ## Requirements
 The documentation is generated with
 [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html).
+
 ```bash
 pip install -U sphinx m2r sphinxcontrib-bibtex pybtex
 ```
@@ -90,6 +91,7 @@ classes and functions to add, to comment them, as well as exclude them.
 
 ### Build the documentation locally
 - To build the documentation, from `bash`, move to the `docs` folder and run
+
 ```bash
 sphinx-build -b html source build
 ```
@@ -209,11 +211,13 @@ blocks. Moreover, it does not parse the `conf.py` file nor uses sphinx.
 A way to include testing of `testcode` and `testoutput` blocks is with the
 [`pytest-sphinx`](https://github.com/thisch/pytest-sphinx) plugin. Once
 installed,
+
 ```bash
 pip install pytest-sphinx
 ```
 it will show up as a plugin, just like `pytest-coverage` and others, simply
 calling
+
 ```bash
 pytest --doctest-glob='*.rst'
 ```
@@ -233,6 +237,7 @@ One can also use various `doctest` [features](http://doc.pytest.org/en/latest/do
 
 ### Work in an environment
 - Create a conda environment for the documentation
+
 ```bash
 conda create -n mitiqenv
 conda activate mitiqenv
@@ -241,16 +246,24 @@ conda activate mitiqenv
 ### Create a new branch
 - Create a branch in `git` for the documentation with the release number up to
 minor (e.g., 0.0.2--->00X)
+
 ```bash
 (mitiqenv) git checkout -b mitiq00X
 ```
 
+### Update the code tree
+Check that the code tree reflects the latest package structure, following the
+guide for updating it [here](tree.html).
+
+
 ### Create the html and pdf file and save it in the `docs/pdf` folder
 - To create the html structure
+
 ```bash
 make html
 ```
  and for the pdf,
+
 ```bash
 make latexpdf
 ```

@@ -1,4 +1,5 @@
-# Mitiq code tree
+
+## About mitiq's code tree
 
 This readme contains instructions to generate an html and pdf version of
 mitiq code tree.

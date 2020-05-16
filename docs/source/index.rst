@@ -9,6 +9,7 @@ Welcome to mitiq's documentation!
 
    read_README.rst
    guide/guide_00.rst
+   tree.rst
    apidoc.rst
    read_README-docs.rst
    changelog.rst
