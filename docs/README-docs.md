@@ -267,6 +267,9 @@ make html
 ```bash
 make latexpdf
 ```
+
+If there are errors arising in the latex build of the pdf, override them pressing "s"+ENTER.
+
 Since the `docs/build` folder is not kept track of, copy the pdf file
 with the documentation from `docs/build/latex` to the `docs/pdf` folder,
 naming it according to the release version with major and minor.

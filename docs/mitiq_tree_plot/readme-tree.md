@@ -1,13 +1,13 @@
 
 ## About mitiq's code tree
 
-This readme contains instructions to generate an html and pdf version of
-mitiq code tree.
+Below you can find information on the contents of the folder containing the script that generates `mitiq`'s code tree, which is generated from `mitiq/docs/mitiq_tree_plot` with
+`python mitiq-structure.py`.
 
 
 ### Contents
 
-The folder `mitiq_tree_plot` contains the files required to generate the code tree.
+The folder `mitiq/docs/mitiq_tree_plot` contains the files required to generate the code tree.
 The code is adapted from `qutip/qutip-doc` repository.
 #### The Python script
 
@@ -55,8 +55,11 @@ the text size, and the graphics properties of the circles representing each node
 
 * `d3.layout.min.js` and `d3.min.js` contain some JavaScript specifics.
 
-
 ### Generating the code tree
+
+These are instructions to generate an html and pdf version of
+mitiq code tree.
+
 
 For each `mitiq` release, generate a new code tree to include it in the
 documentation.
