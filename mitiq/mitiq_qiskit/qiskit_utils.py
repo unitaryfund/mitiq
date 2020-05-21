@@ -151,7 +151,9 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
 
 def run_program(pq: QuantumCircuit, shots: int = 100,
                 seed: int = None) -> float:
-    """Runs a quantum program.
+    """Runs a single-qubit circuit for multiple shots and 
+    returns the expectation value of the ground state projector.
+
 
     Args:
         pq: Quantum circuit.
