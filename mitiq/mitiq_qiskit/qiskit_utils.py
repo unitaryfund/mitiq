@@ -1,5 +1,5 @@
+from typing import Optional
 import numpy as np
-
 import qiskit
 from qiskit import QuantumCircuit
 
@@ -12,7 +12,8 @@ from qiskit.providers.aer.noise.errors.standard_errors import (
 BACKEND = qiskit.Aer.get_backend("qasm_simulator")
 
 
-def random_identity_circuit(depth: int, seed: int = None) -> QuantumCircuit:
+def random_identity_circuit(depth: int, 
+                            seed: Optional[int] = None) -> QuantumCircuit:
     """Returns a single-qubit identity circuit based on Pauli gates.
 
     Args:
@@ -150,7 +151,7 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
 
 
 def run_program(pq: QuantumCircuit, shots: int = 100,
-                seed: int = None) -> float:
+                seed: Optional[int] = None) -> float:
     """Runs a single-qubit circuit for multiple shots and 
     returns the expectation value of the ground state projector.
 

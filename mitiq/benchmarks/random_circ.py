@@ -2,7 +2,7 @@
 """
 Contains methods used for testing mitiq's performance
 """
-from typing import Tuple, Callable, Union
+from typing import Tuple, Callable, Union, Optional
 import numpy as np
 
 from cirq.testing import random_circuit
@@ -13,8 +13,10 @@ from mitiq.factories import Factory
 from mitiq.benchmarks.utils import noisy_simulation
 
 
-def sample_projector(n_qubits: int, 
-                      seed: Union[int, np.random.RandomState] = None) -> np.ndarray:
+def sample_projector(
+    n_qubits: int,
+    seed: Union[None, int, np.random.RandomState] = None,
+)-> np.ndarray:
     """Constructs a projector on a random computational basis state of n_qubits.
 
     Args:
@@ -42,11 +44,11 @@ def sample_projector(n_qubits: int,
 
 
 def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
-                       fac: Factory = None,
+                       fac: Optional[Factory] = None,
                        scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
                        op_density: float = 0.99,
                        silent: bool = True,
-                       seed: int = None) \
+                       seed: Optional[int] = None) \
         -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Benchmarks a zero-noise extrapolation method and noise scaling executor
     by running on randomly sampled quantum circuits.
