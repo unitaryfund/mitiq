@@ -2,7 +2,7 @@
 """
 Contains methods used for testing mitiq's performance
 """
-from typing import Tuple, Callable
+from typing import Tuple, Callable, Union
 import numpy as np
 
 from cirq.testing import random_circuit
@@ -13,13 +13,14 @@ from mitiq.factories import Factory
 from mitiq.benchmarks.utils import noisy_simulation
 
 
-def sample_observable(n_qubits: int, 
-                      rnd_state: np.random.RandomState = None) -> np.ndarray:
+def sample_projector(n_qubits: int, 
+                      seed: Union[int, np.random.RandomState] = None) -> np.ndarray:
     """Constructs a projector on a random computational basis state of n_qubits.
 
     Args:
         n_qubits: A number of qubits
-        rnd_state: Optional numpy.random.RandomState object.
+        seed: Optional seed for random number generator. 
+              It can be an integer or a numpy.random.RandomState object.
 
     Returns:
         A random computational basis projector on n_qubits. E.g., for two
@@ -28,8 +29,12 @@ def sample_observable(n_qubits: int,
     """
     obs = np.zeros(int(2 ** n_qubits))
 
-    if rnd_state is None:
+    if seed is None:
         rnd_state = np.random
+    elif isinstance(seed, int):
+        rnd_state = np.random.RandomState(seed)
+    else:
+        rnd_state = seed
 
     chosenZ = rnd_state.randint(2 ** n_qubits)
     obs[chosenZ] = 1
@@ -86,7 +91,7 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
         wvf = qc.final_wavefunction()
 
         # calculate the exact
-        obs = sample_observable(n_qubits, rnd_state=rnd_state)
+        obs = sample_projector(n_qubits, seed=rnd_state)
         exact = np.conj(wvf).T @ obs @ wvf
 
         # make sure it is real
