@@ -52,7 +52,6 @@ We define this function in the following code block. Because we are using IBMQ b
 
         Args:
             circuit: Circuit to run.
-            backend_name: Specifies the IBMQ backend to run on.
             shots: Number of times to execute the circuit to compute the expectation value.
         """
         # (1) Add measurements to the circuit
@@ -109,7 +108,7 @@ scaling noise by folding gates starting from the left (instead of at random, the
 
     mitigated = mitiq.execute_with_zne(circuit, armonk_executor, scale_noise=mitiq.folding.fold_gates_from_left)
 
-Any different combination of noise scaling and extrapolation technique can be pass as arguments to
+Any different combination of noise scaling and extrapolation technique can be passed as arguments to
 ``mitiq.execute_with_zne``.
 
 Cirq frontend
@@ -235,10 +234,9 @@ a linear fit (order one polynomial fit) and print out the extrapolated zero-nois
 
 .. code-block:: python
 
-    >>> order = 1
-    >>> zero_noise_value = mitiq.factories.PolyFactory.static_reduce(
-    >>>     scale_factors[1:], expectation_values[1:], order=order
-    >>> )
+    >>> fac = mitiq.factories.LinearFactory(scale_factors)
+    >>> fac.instack, fac.outstack = scale_factors, expectation_values
+    >>> zero_noise_value = fac.reduce()
     >>> print(f"Extrapolated zero-noise value:", round(zero_noise_value, 3))
     Extrapolated zero-noise value: 0.961
 
