@@ -43,7 +43,7 @@ We define this function in the following code block. Because we are using IBMQ b
 .. note::
     The following code requires a valid IBMQ account. See https://quantum-computing.ibm.com/ for instructions.
 
-.. code-block:: python
+.. doctest:: python
 
     provider = qiskit.IBMQ.load_account()
 
@@ -61,8 +61,9 @@ We define this function in the following code block. Because we are using IBMQ b
         # (2) Run the circuit
         job = qiskit.execute(
             experiments=circuit,
-            backend=provider.get_backend("ibmq_armonk"),
-            optimization_level=0,
+            # Change backend=provider.get_backend("ibmq_armonk") to run on hardware
+            backend=provider.get_backend("ibmq_qasm_simulator"),
+            optimization_level=0,  # Important!
             shots=shots
         )
 
@@ -77,7 +78,7 @@ We define this function in the following code block. Because we are using IBMQ b
 At this point, the circuit can be executed to return a mitigated expectation value by running ``mitiq.execute_with_zne``,
 as follows.
 
-.. code-block:: python
+.. doctest:: python
 
     mitigated = mitiq.execute_with_zne(circuit, armonk_executor)
 
@@ -94,7 +95,7 @@ By default, noise is scaled by locally folding gates at random, and the default 
 To specify a different extrapolation technique, we can pass a different ``Factory`` object to ``execute_with_zne``. The
 following code block shows an example of using linear extrapolation with five different (noise) scale factors.
 
-.. code-block:: python
+.. doctest:: python
 
     linear_factory = mitiq.factories.LinearFactory(scale_factors=[1.0, 1.5, 2.0, 2.5, 3.0])
     mitigated = mitiq.execute_with_zne(circuit, armonk_executor, fac=linear_factory)
@@ -104,7 +105,7 @@ function should input a circuit and scale factor and return a circuit. The follo
 scaling noise by folding gates starting from the left (instead of at random, the default behavior for
 ``mitiq.execute_with_zne``).
 
-.. code-block:: python
+.. doctest:: python
 
     mitigated = mitiq.execute_with_zne(circuit, armonk_executor, scale_noise=mitiq.folding.fold_gates_from_left)
 
@@ -139,7 +140,7 @@ Now, we simply add a line to our executor function which converts from a Cirq ci
 
 After this, we can use ``mitiq.execute_with_zne`` in the same way as above.
 
-.. code-block:: python
+.. doctest:: python
 
     mitigated = mitiq.execute_with_zne(cirq_circuit, cirq_armonk_executor)
 
@@ -155,12 +156,10 @@ example explains the code in the previous section in more detail.
 First, we define factors to scale the circuit length by and fold the circuit using the ``fold_gates_at_random``
 local folding method.
 
-.. code-block:: python
+.. doctest:: python
 
     depth = 10
     circuit = random_identity_circuit(depth=depth)
-
-.. doctest:: python
 
     scale_factors = [1., 1.5, 2., 2.5, 3.]
     folded_circuits = [
@@ -173,7 +172,7 @@ We now add the observables we want to measure to the circuit. Here we use a sing
 :math:`\Pi_0 \equiv |0\rangle \langle0|` -- i.e., the probability of measuring the ground state -- but other observables
 can be used.
 
-.. code-block:: python
+.. doctest:: python
 
     for folded_circuit in folded_circuits:
         folded_circuit.measure(folded_circuit.qregs[0], folded_circuit.cregs[0])
@@ -204,7 +203,8 @@ available, you may wish to choose a different backend by changing the ``backend_
 
     job = qiskit.execute(
        experiments=folded_circuits,
-       backend=provider.get_backend(backend_name),
+       # Change backend=provider.get_backend(backend_name) to run on hardware
+       backend=provider.get_backend("ibmq_qasm_simulator"),
        optimization_level=0,
        shots=shots
     )
@@ -217,7 +217,7 @@ available, you may wish to choose a different backend by changing the ``backend_
 Once the job has finished executing, we can convert the raw measurement statistics to observable values by running the
 following code block.
 
-.. code-block:: python
+.. doctest:: python
 
     all_counts = [job.result().get_counts(i) for i in range(len(folded_circuits))]
     expectation_values = [counts.get("0") / shots for counts in all_counts]
