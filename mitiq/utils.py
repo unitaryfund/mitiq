@@ -1,37 +1,11 @@
 """Utility functions."""
 
-from typing import Optional
-
-import random
-
-import cirq
-
-
-def random_circuit(depth: int, seed: Optional[int] = None) -> cirq.Circuit:
-    """Returns a random single-qubit circuit with Pauli gates.
-
-    Args:
-        depth: Number of gates in the circuit.
-        seed: Seed for the random number generator.
-
-    Returns:
-        circuit: the randomized quantum circuit as a :class:`cirq.Circuit`.
-    """
-    if seed:
-        random.seed(seed)
-
-    qubit = cirq.GridQubit(0, 0)
-    gates = [cirq.ops.X, cirq.ops.Y, cirq.ops.Z]
-    circuit = cirq.Circuit(
-        [random.choice(gates).on(qubit) for _ in range(depth)]
-    )
-
-    return circuit
+from cirq import Circuit, CircuitDag
 
 
 def _equal(
-    circuit_one: cirq.Circuit,
-    circuit_two: cirq.Circuit,
+    circuit_one: Circuit,
+    circuit_two: Circuit,
     require_qubit_equality: bool = False,
 ) -> bool:
     """Returns True if the circuits are equal, else False.
@@ -61,6 +35,6 @@ def _equal(
         )
         circuit_one = circuit_one.transform_qubits(lambda q: qubit_map[q])
 
-    return cirq.CircuitDag.from_circuit(
+    return CircuitDag.from_circuit(
         circuit_one
-    ) == cirq.CircuitDag.from_circuit(circuit_two)
+    ) == CircuitDag.from_circuit(circuit_two)

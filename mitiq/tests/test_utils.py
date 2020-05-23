@@ -4,13 +4,7 @@ import pytest
 
 import cirq
 
-from mitiq.utils import _equal, random_circuit
-
-
-def test_random_circuit_simple():
-    n = 100
-    circuit = random_circuit(depth=n)
-    assert len(list(circuit.all_operations())) == n
+from mitiq.utils import _equal
 
 
 @pytest.mark.parametrize(["require_qubit_equality"], [[True], [False]])
