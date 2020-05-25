@@ -57,12 +57,14 @@ def test_random_projector(n_qubits):
 
 def test_random_projector_seeding():
     # test both seed types
-    assert (sample_projector(6, seed=0) == sample_projector(6, seed=0)).all()
-    first_sample = sample_projector(6, np.random.RandomState(123))
-    second_sample = sample_projector(6, np.random.RandomState(123))
+    first_sample = sample_projector(6, seed=SEED)
+    second_sample = sample_projector(6, seed=SEED)
+    assert (first_sample == first_sample).all
+    first_sample = sample_projector(6, np.random.RandomState(SEED))
+    second_sample = sample_projector(6, np.random.RandomState(SEED))
     assert (first_sample == first_sample).all
     # test that RandomState mutates as expected
-    rnd_state = np.random.RandomState(123)
+    rnd_state = np.random.RandomState(SEED)
     different_results = False
     for _ in range(100):
         first_sample = sample_projector(6, rnd_state)
