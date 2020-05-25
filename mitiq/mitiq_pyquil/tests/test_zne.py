@@ -4,7 +4,6 @@ import numpy as np
 from mitiq import QPROGRAM
 from mitiq.factories import RichardsonFactory
 from mitiq.zne import (
-    qrun_factory,
     execute_with_zne,
     mitigate_executor,
     zne_decorator,
@@ -23,11 +22,11 @@ def basic_executor(qp: QPROGRAM, shots: int = 500) -> float:
     return run_program(qp, shots)
 
 
-def test_qrun_factory():
+def test_run_factory():
     rand_circ = random_identity_circuit(depth=TEST_DEPTH)
     qp = measure(rand_circ, qid=0)
     fac = RichardsonFactory([1.0, 2.0, 3.0])
-    qrun_factory(fac, qp, basic_executor, scale_noise)
+    fac.run(qp, basic_executor, scale_noise)
     result = fac.reduce()
     assert np.isclose(result, 1.0, atol=1.0e-1)
 
@@ -49,9 +48,11 @@ def test_mitigate_executor():
     assert not np.isclose(bad_result, 1.0, atol=1.0e-1)
     assert np.isclose(good_result, 1.0, atol=1.0e-1)
 
+
 @zne_decorator(None, scale_noise)
 def decorated_executor(qp: QPROGRAM) -> float:
     return basic_executor(qp)
+
 
 def test_zne_decorator():
     rand_circ = random_identity_circuit(depth=TEST_DEPTH)

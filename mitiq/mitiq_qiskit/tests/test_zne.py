@@ -5,7 +5,6 @@ import numpy as np
 
 from mitiq.factories import RichardsonFactory
 from mitiq.zne import (
-    qrun_factory,
     execute_with_zne,
     mitigate_executor,
     zne_decorator,
@@ -34,12 +33,12 @@ def basic_executor(qp: QPROGRAM, shots: int = 500) -> float:
     return run_program(qp, shots, QISKIT_SEED)
 
 
-def test_qrun_factory():
+def test_run_factory():
     """Tests qrun of a Richardson Factory."""
     qp = random_identity_circuit(depth=TEST_DEPTH, seed=CIRCUIT_SEED)
     qp = measure(qp, 0)
     fac = RichardsonFactory([1.0, 2.0, 3.0])
-    qrun_factory(fac, qp, basic_executor, scale_noise)
+    fac.run(qp, basic_executor, scale_noise)
     result = fac.reduce()
     assert np.isclose(result, 1.0, atol=1.0e-1)
 
