@@ -15,8 +15,21 @@ About
    :members:
 
 Benchmarks
----------
+----------
+
+MaxCut
+^^^^^^^^^^
 .. automodule:: mitiq.benchmarks.maxcut
+   :members:
+
+Random Circuit
+^^^^^^^^^^^^^^
+.. automodule:: mitiq.benchmarks.random_circ
+   :members:
+
+Utils
+^^^^^^^^^^
+.. automodule:: mitiq.benchmarks.utils
    :members:
 
 Factories
@@ -34,16 +47,24 @@ Matrices
 .. automodule:: mitiq.matrices
    :members:
 
+Mitiq - PyQuil
+--------------
+
 PyQuil Utils
-------------
+^^^^^^^^^^^^
 .. automodule:: mitiq.mitiq_pyquil.pyquil_utils
    :members:
 
-Qiskit Utils
-------------
+Mitiq - Qiskit
+--------------
+
+Conversions
+^^^^^^^^^^^^
 .. automodule:: mitiq.mitiq_qiskit.conversions
    :members:
 
+Qiskit Utils
+^^^^^^^^^^^^
 .. automodule:: mitiq.mitiq_qiskit.qiskit_utils
    :members:
 
