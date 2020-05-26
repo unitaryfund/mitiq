@@ -24,8 +24,8 @@ def rb_circuits(n_qubits: int, num_cfds: List[int], trials: int) -> \
     Args:
         n_qubits: The number of qubits. Can be either 1 or 2
         num_cfds: A list of numbers of Clifford group elements in the random
-                    circuits. This is proportional to the eventual depth
-                    per circuit.
+                  circuits. This is proportional to the eventual depth
+                  per circuit.
         trials: The number of random circuits at each num_cfd
 
     Returns:
