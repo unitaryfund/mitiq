@@ -122,10 +122,16 @@ def run_maxcut(graph: List[Tuple[int, int]],
         obtained that cost, and a list of costs at each iteration step.
 
     Example:
+        Run MAXCUT with 2 steps such that betas = [1.0, 1.1] and
+        gammas = [1.4, 0.7] on a graph with four edges and four nodes.
+
         >>> graph = [(0, 1), (1, 2), (2, 3), (3, 0)]
-        >>> run_maxcut(graph, x0=[1.0, 1.1, 1.4, 0.7])
-        Runs MAXCUT with 2 steps such that betas = [1.0, 1.1] and
-        gammas = [1.4, 0.7]
+        >>> fun,x,traj = run_maxcut(graph, x0=[1.0, 1.1, 1.4, 0.7])
+        Optimization terminated successfully.
+                 Current function value: -4.000000
+                 Iterations: 108
+                 Function evaluations: 188
+
     """
     qaoa_cost, _, _ = make_maxcut(graph, noise, scale_noise, factory)
 
