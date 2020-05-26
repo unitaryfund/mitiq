@@ -58,6 +58,8 @@ extensions = ['sphinx.ext.mathjax',
               'sphinx.ext.ifconfig',
               'sphinx.ext.napoleon',
               'sphinxcontrib.bibtex',
+              'sphinx_copybutton',
+
 ]
 
 intersphinx_mapping = {

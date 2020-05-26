@@ -14,5 +14,6 @@ notebook~=6.0.3
 # to build and test the documentation
 sphinx~=2.4.4
 sphinxcontrib-bibtex~=1.0.0
+sphinx-copybutton~=0.2.11
 m2r~=0.2.1
 pybtex~=0.22.2
