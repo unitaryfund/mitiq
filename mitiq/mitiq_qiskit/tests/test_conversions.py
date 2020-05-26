@@ -4,7 +4,7 @@ Mitiq circuits and Qiskit circuits.
 
 import cirq
 
-from mitiq.utils import (_equal, random_circuit)
+from mitiq.utils import _equal
 from mitiq.mitiq_qiskit.conversions import (to_qasm,
                                             to_qiskit,
                                             from_qasm,
@@ -39,19 +39,27 @@ def test_bell_state_to_from_qasm():
 
 def test_random_circuit_to_from_circuits():
     """Tests cirq.Circuit --> qiskit.QuantumCircuit --> cirq.Circuit
-    with a random one-qubit circuit.
+    with a random two-qubit circuit.
     """
-    cirq_circuit = random_circuit(depth=20)
+    cirq_circuit = cirq.testing.random_circuit(
+        qubits=2, n_moments=10, op_density=0.99, random_state=1
+    )
     qiskit_circuit = to_qiskit(cirq_circuit)
     circuit_cirq = from_qiskit(qiskit_circuit)
-    assert _equal(cirq_circuit, circuit_cirq)
+    assert cirq.equal_up_to_global_phase(
+        cirq_circuit.unitary(), circuit_cirq.unitary()
+    )
 
 
 def test_random_circuit_to_from_qasm():
     """Tests cirq.Circuit --> QASM string --> cirq.Circuit
      with a random one-qubit circuit.
     """
-    cirq_circuit = random_circuit(depth=20)
+    cirq_circuit = cirq.testing.random_circuit(
+        qubits=2, n_moments=10, op_density=0.99, random_state=2
+    )
     qasm = to_qasm(cirq_circuit)
     circuit_cirq = from_qasm(qasm)
-    assert _equal(cirq_circuit, circuit_cirq)
+    assert cirq.equal_up_to_global_phase(
+        cirq_circuit.unitary(), circuit_cirq.unitary()
+    )
