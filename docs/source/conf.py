@@ -48,15 +48,16 @@ extensions = ['sphinx.ext.mathjax',
               'IPython.sphinxext.ipython_directive',
               'matplotlib.sphinxext.plot_directive',
               'm2r',
+              'sphinx.ext.napoleon',
               'sphinx.ext.autodoc',
+              'sphinx.ext.autosummary',
+              'sphinx_autodoc_typehints', # after napoleon and autodoc
               'sphinx.ext.todo',
               'sphinx.ext.doctest',
-              'sphinx.ext.autosummary',
               'sphinx.ext.extlinks',
               'sphinx.ext.intersphinx',
               'sphinx.ext.viewcode',
               'sphinx.ext.ifconfig',
-              'sphinx.ext.napoleon',
               'sphinxcontrib.bibtex',
               'sphinx_copybutton',
 
@@ -108,7 +109,6 @@ exclude_patterns = []
 master_doc = 'index'
 
 # autodoc settings
-
 napoleon_google_docstring = True
 napoleon_use_ivar = True
 
@@ -122,6 +122,12 @@ autodoc_mock_imports = [
 #    'matplotlib',
 #    'matplotlib.pyplot',
 ]
+
+# autodoc-typehints extension setting
+typehints_fully_qualified = False
+always_document_param_types = True
+set_type_checking_flag = False
+typehints_document_rtype = True
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
