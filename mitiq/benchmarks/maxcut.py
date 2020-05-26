@@ -104,8 +104,8 @@ def run_maxcut(graph: List[Tuple[int, int]],
                x0: np.ndarray,
                noise: float = 0,
                scale_noise: Callable = None,
-               factory: Factory = None
-               ) -> Tuple[float, np.ndarray, List]:
+               factory: Factory = None,
+               verbose: bool = True) -> Tuple[float, np.ndarray, List]:
     """Solves MAXCUT using QAOA on a cirq wavefunction simulator using a
        Nelder-Mead optimizer.
 
@@ -146,6 +146,6 @@ def run_maxcut(graph: List[Tuple[int, int]],
                    x0=x0,
                    method='Nelder-Mead',
                    callback=callback,
-                   options={'disp': True})
+                   options={'disp': verbose})
 
     return res.fun, res.x, traj
