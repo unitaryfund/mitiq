@@ -6,7 +6,19 @@
 Error mitigation on IBMQ backends
 *********************************************
 
-This tutorial shows an example of how to mitigate noise on IBMQ backends. First we import Qiskit and mitiq.
+This tutorial shows an example of how to mitigate noise on IBMQ backends, broken down in the following steps.
+
+* :ref:`setup`
+* :ref:`high_level_usage`
+* :ref:`cirq_frontend`
+* :ref:`low_level_usage`
+
+.. _setup:
+
+Setup: Defining a circuit
+#########################
+
+First we import Qiskit and mitiq.
 
 .. doctest:: python
 
@@ -27,6 +39,8 @@ For simplicity, we'll use a random single-qubit circuit with ten gates that comp
 
 Currently this circuit has no measurements, but we will add a measurement below and use the probability of the ground
 state as our observable to mitigate.
+
+.. _high_level_usage:
 
 High-level usage
 ################
@@ -85,6 +99,8 @@ as follows.
 As long as a circuit and a function for executing the circuit are defined, the ``mitiq.execute_with_zne`` function can
 be called as above to return zero-noise extrapolated expectation value(s).
 
+.. _options:
+
 Options
 *******
 
@@ -110,6 +126,8 @@ scaling noise by folding gates starting from the left (instead of at random, the
 
 Any different combination of noise scaling and extrapolation technique can be passed as arguments to
 ``mitiq.execute_with_zne``.
+
+.. _cirq_frontend:
 
 Cirq frontend
 *************
@@ -144,6 +162,8 @@ After this, we can use ``mitiq.execute_with_zne`` in the same way as above.
     mitigated = mitiq.execute_with_zne(cirq_circuit, cirq_armonk_executor)
 
 As above, different noise scaling or extrapolation methods can be used.
+
+.. _low_level_usage:
 
 Lower-level usage
 #################
@@ -204,7 +224,7 @@ available, you may wish to choose a different backend by changing the ``backend_
        experiments=folded_circuits,
        # Change backend=provider.get_backend(backend_name) to run on hardware
        backend=provider.get_backend("ibmq_qasm_simulator"),
-       optimization_level=0,
+       optimization_level=0,  # Important!
        shots=shots
     )
 
