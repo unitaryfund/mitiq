@@ -17,7 +17,7 @@ from cirq import (
 from cirq.google import Sycamore
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 
-from mitiq.utils import _equal, random_circuit
+from mitiq.utils import _equal
 from mitiq.folding import (
     _is_measurement,
     _pop_measurements,
@@ -525,7 +525,7 @@ def test_fold_from_left_three_qubits():
 
 def test_fold_from_left_no_stretch():
     """Unit test for folding gates from left for a scale factor of one."""
-    circuit = random_circuit(depth=100)
+    circuit = testing.random_circuit(qubits=2, n_moments=10, op_density=0.99)
     folded = fold_gates_from_left(circuit, scale_factor=1)
     assert _equal(folded, circuit)
     assert not (folded is circuit)
@@ -533,7 +533,7 @@ def test_fold_from_left_no_stretch():
 
 def test_fold_from_left_bad_stretch():
     """Tests that a ValueError is raised for an invalid scale factor."""
-    circuit = random_circuit(100)
+    circuit = testing.random_circuit(qubits=2, n_moments=10, op_density=0.99)
     with pytest.raises(ValueError):
         fold_gates_from_left(circuit, scale_factor=10)
 
@@ -737,7 +737,7 @@ def test_fold_right_retains_terminal_measurements_in_input_circuit():
 
 def test_fold_gates_at_random_no_stretch():
     """Tests folded circuit is identical for a scale factor of one."""
-    circuit = random_circuit(10)
+    circuit = testing.random_circuit(qubits=3, n_moments=10, op_density=0.99)
     folded = fold_gates_at_random(circuit, scale_factor=1, seed=None)
     assert _equal(folded, circuit)
 
