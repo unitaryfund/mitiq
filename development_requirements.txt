@@ -4,6 +4,7 @@ qiskit~=0.16.2
 
 # to test the code
 pytest~=5.4.1
+pytest-cov~=2.8.1
 flake8~=3.7.9
 
 # to run examples

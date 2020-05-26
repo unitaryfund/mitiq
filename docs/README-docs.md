@@ -125,8 +125,13 @@ of `sphinx`. This is set in the `conf.py` file and is executed with
 ```bash
 make doctest
 ```
-This tests the code examples in the guide and ".rst" files, as well as testing
-the docstrings, since these are imported with the `autodoc` extension.
+from the `mitiq/docs` directory. From the root directory `mitiq`, simply run
+```bash
+./test_build.sh -docs
+```
+to obtain the same result, calling the `test_build.sh` file with bash script.
+
+These equivalent commands test the code examples in the guide and ".rst" files, as well as testing the docstrings, since these are imported with the `autodoc` extension.
 
 When writing a new example, you can use different directives in the rst file to
 include code blocks. One of them is
