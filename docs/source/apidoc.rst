@@ -19,15 +19,9 @@ Factories
 .. automodule:: mitiq.factories
    :members:
 
-.. automodule:: mitiq.tests.test_factories
-   :members:
-
 Folding
 -------
 .. automodule:: mitiq.folding
-   :members:
-
-.. automodule:: mitiq.tests.test_folding
    :members:
 
 Matrices
@@ -40,29 +34,17 @@ PyQuil Utils
 .. automodule:: mitiq.mitiq_pyquil.pyquil_utils
    :members:
 
-.. automodule:: mitiq.mitiq_pyquil.tests.test_zne
-   :members:
-
 Qiskit Utils
 ------------
 .. automodule:: mitiq.mitiq_qiskit.conversions
    :members:
 
-.. automodule:: mitiq.mitiq_qiskit.tests.test_conversions
-   :members:
-
 .. automodule:: mitiq.mitiq_qiskit.qiskit_utils
-   :members:
-
-.. automodule:: mitiq.mitiq_qiskit.tests.test_zne
    :members:
 
 Utils
 ------------
 .. automodule:: mitiq.utils
-   :members:
-
-.. automodule:: mitiq.tests.test_utils
    :members:
 
 Zero Noise Extrapolation
