@@ -14,6 +14,11 @@ About
 .. automodule:: mitiq.about
    :members:
 
+Benchmarks
+---------
+.. automodule:: mitiq.benchmarks.maxcut
+   :members:
+
 Factories
 ---------
 .. automodule:: mitiq.factories
