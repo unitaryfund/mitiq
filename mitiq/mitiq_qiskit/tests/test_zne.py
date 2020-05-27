@@ -20,6 +20,7 @@ TEST_DEPTH = 30
 CIRCUIT_SEED = 1
 QISKIT_SEED = 1337
 
+
 def basic_executor(qp: QPROGRAM, shots: int = 500) -> float:
     """Runs a program.
 
@@ -35,7 +36,7 @@ def basic_executor(qp: QPROGRAM, shots: int = 500) -> float:
 
 def test_run_factory():
     """Tests qrun of a Richardson Factory."""
-    qp = random_identity_circuit(depth=TEST_DEPTH, seed=CIRCUIT_SEED)
+    qp = random_identity_circuit(num_cliffords=TEST_DEPTH, seed=CIRCUIT_SEED)
     qp = measure(qp, 0)
     fac = RichardsonFactory([1.0, 2.0, 3.0])
     fac.run(qp, basic_executor, scale_noise)
@@ -46,7 +47,8 @@ def test_run_factory():
 def test_execute_with_zne():
     """Tests a random identity circuit execution with zero-noise extrapolation.
     """
-    rand_circ = random_identity_circuit(depth=TEST_DEPTH, seed=CIRCUIT_SEED)
+    rand_circ = random_identity_circuit(num_cliffords=TEST_DEPTH,
+                                        seed=CIRCUIT_SEED)
     qp = measure(rand_circ, qid=0)
     result = execute_with_zne(qp, basic_executor, None, scale_noise)
     assert np.isclose(result, 1.0, atol=1.0e-1)
@@ -54,7 +56,7 @@ def test_execute_with_zne():
 
 def test_mitigate_executor():
     """Tests a random identity circuit executor."""
-    rand_circ = random_identity_circuit(depth=TEST_DEPTH)
+    rand_circ = random_identity_circuit(num_cliffords=TEST_DEPTH)
     qp = measure(rand_circ, qid=0)
     new_executor = mitigate_executor(basic_executor, None, scale_noise)
     # bad_result is computed with native noise (scale = 1)
@@ -71,7 +73,8 @@ def decorated_executor(qp: QPROGRAM) -> float:
 
 def test_zne_decorator():
     """Tests a zne decorator."""
-    rand_circ = random_identity_circuit(depth=TEST_DEPTH, seed=CIRCUIT_SEED)
+    rand_circ = random_identity_circuit(num_cliffords=TEST_DEPTH,
+                                        seed=CIRCUIT_SEED)
     qp = measure(rand_circ, qid=0)
     # bad_result is computed with native noise (scale = 1)
     bad_result = basic_executor(scale_noise(qp, 1))

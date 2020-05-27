@@ -22,9 +22,14 @@ MaxCut
 .. automodule:: mitiq.benchmarks.maxcut
    :members:
 
-Random Circuit
+Random Circuits
 ^^^^^^^^^^^^^^
-.. automodule:: mitiq.benchmarks.random_circ
+.. automodule:: mitiq.benchmarks.random_circuits
+   :members:
+
+Randomized Benchmarking
+^^^^^^^^^^^^^^
+.. automodule:: mitiq.benchmarks.randomized_benchmarking
    :members:
 
 Utils

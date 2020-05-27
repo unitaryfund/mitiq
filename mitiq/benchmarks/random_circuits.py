@@ -1,6 +1,6 @@
-# random_circ.py
+# random_circuits.py
 """
-Contains methods used for testing mitiq's performance
+Contains methods used for testing mitiq's performance on random circuits
 """
 from typing import Tuple, Callable, Union, Optional
 import numpy as np
@@ -43,12 +43,12 @@ def sample_projector(
     return np.diag(obs)
 
 
-def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
-                       fac: Optional[Factory] = None,
-                       scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
-                       op_density: float = 0.99,
-                       silent: bool = True,
-                       seed: Optional[int] = None) \
+def rand_circuit_zne(n_qubits: int, depth: int, trials: int, noise: float,
+                     fac: Factory = None,
+                     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
+                     op_density: float = 0.99,
+                     silent: bool = True,
+                     seed: Optional[int] = None) \
         -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Benchmarks a zero-noise extrapolation method and noise scaling executor
     by running on randomly sampled quantum circuits.
@@ -83,7 +83,8 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
         rnd_state = None
 
     for ii in range(trials):
-        if not silent and ii % 10 == 0: print(ii)
+        if not silent and ii % 10 == 0:
+            print(ii)
 
         qc = random_circuit(qubits,
                             n_moments=depth,
@@ -101,7 +102,7 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
         assert np.isreal(exact)
 
         # create the simulation type
-        def obs_sim(circ: Circuit, shots=None):
+        def obs_sim(circ: Circuit):
             # we only want the expectation value not the variance
             # this is why we return [0]
             return noisy_simulation(circ, noise, obs)
@@ -110,8 +111,8 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
         unmitigated = obs_sim(qc)
         # evaluate the ZNE answer
         mitigated = execute_with_zne(qp=qc, executor=obs_sim,
-                                        scale_noise=scale_noise,
-                                        fac=fac)
+                                     scale_noise=scale_noise,
+                                     fac=fac)
         exacts.append(exact)
         unmitigateds.append(unmitigated)
         mitigateds.append(mitigated)
