@@ -2,7 +2,7 @@ import numpy as np
 
 from mitiq.benchmarks.maxcut import run_maxcut
 
-np.random.seed(99)
+# Seed is not necessary for density matrix simulations
 
 
 def test_square():

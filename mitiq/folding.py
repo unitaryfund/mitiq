@@ -443,7 +443,11 @@ def fold_gates_at_random(
         return folded
 
     if seed:
-        np.random.seed(seed)
+        # local random number generator with seed
+        rnd_state = np.random.RandomState(seed)
+    else:
+        # global random number generator of NumPy
+        rnd_state = np.random
 
     ngates = len(list(folded.all_operations()))
     num_to_fold = _get_num_to_fold(scale_factor, ngates)
@@ -464,8 +468,9 @@ def fold_gates_at_random(
 
     for _ in range(num_to_fold):
         # Get a moment index and gate index from the remaining set
-        moment_index = np.random.choice(remaining_moment_indices)
-        gate_index = np.random.choice(remaining_gate_indices[moment_index])
+
+        moment_index = rnd_state.choice(remaining_moment_indices)
+        gate_index = rnd_state.choice(remaining_gate_indices[moment_index])  
 
         # Do the fold
         _fold_gate_at_index_in_moment(

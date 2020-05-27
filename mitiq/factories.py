@@ -145,7 +145,7 @@ class BatchedFactory(Factory):
         """
         if len(scale_factors) == 0:
             raise ValueError(
-                "At least 2 elements are necessary" \
+                "At least 2 elements are necessary"
                 " for non-trivial extrapolation."
             )
         self.scale_factors = scale_factors
@@ -156,9 +156,9 @@ class BatchedFactory(Factory):
             next_param = self.scale_factors[len(self.outstack)]
         except IndexError:
             raise IndexError(
-                "BatchedFactory cannot take another step. " \
-                "Number of batched scale_factors" \
-                    f" ({len(self.scale_factors)}) exceeded."
+                "BatchedFactory cannot take another step. "
+                "Number of batched scale_factors"
+                f" ({len(self.scale_factors)}) exceeded."
             )
         return next_param
 
@@ -282,10 +282,8 @@ class ExpFactory(BatchedFactory):
     Otherwise, a non-linear fit of y(x) is performed.
     """
 
-    def __init__(
-            self, scale_factors: Iterable[float],
-            asymptote: Union[float, None] = None,
-    ) -> None:
+    def __init__(self, scale_factors: Iterable[float],
+                 asymptote: Union[float, None] = None) -> None:
         """
         Args:
             scale_factors: Iterable of noise scale factors at which
@@ -402,8 +400,8 @@ class PolyExpFactory(BatchedFactory):
         if order > len(instack) - (1 + shift):
             raise ValueError(
                 "Extrapolation order is too high. "
-                f"The order cannot exceed the number" \
-                " of data points minus {1 + shift}."
+                "The order cannot exceed the number"
+                f" of data points minus {1 + shift}."
             )
 
         # CASE 1: asymptote is None.
@@ -491,9 +489,9 @@ class AdaExpFactory(Factory):
             )
         if steps < 3 + int(asymptote is None):
             raise ValueError(
-                "The argument 'steps' must be an integer" \
+                "The argument 'steps' must be an integer"
                 " greater or equal to 3. "
-                "If 'asymptote' is None, 'steps' must be" \
+                "If 'asymptote' is None, 'steps' must be"
                 " greater or equal to 4."
             )
         self.steps = steps
