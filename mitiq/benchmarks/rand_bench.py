@@ -29,7 +29,7 @@ def rb_circuits(n_qubits: int, num_cfds: List[int], trials: int) -> \
         trials: The number of random circuits at each num_cfd.
 
     Returns:
-        A list of randomized benchmarking circuits
+        A list of randomized benchmarking circuits.
     """
     rb_circuits = []
     for num in num_cfds:
