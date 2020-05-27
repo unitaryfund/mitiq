@@ -9,13 +9,21 @@ a Python toolkit for implementing error mitigation on quantum computers.
 ## Requirements
 The documentation is generated with
 [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html).
+The necessary packages can be installed, from the root `mitiq` directory
 ```bash
-pip install -U sphinx m2r sphinxcontrib-bibtex pybtex
+pip -e install .[development]
+```
+as they are present in the `development_requirements.txt` file. Otherwise, with
+
+```bash
+pip install -U sphinx m2r sphinxcontrib-bibtex pybtex sphinx-copybutton sphinx-autodoc-typehints
 ```
 
-`m2r` allows to include `.md` files, besides `.rst`, in the documentation;
+`m2r` allows to include `.md` files, besides `.rst`, in the documentation.
 `sphinxcontrib-bibtex` allows to include citations in a `.bib` file and
 `pybtex` allows to customize how they are rendered, e.g., APS-style.
+`sphinx-copybutton` allows to easily copy-paste code snippets from examples.
+`sphinx-autodoc-typehints` allows to control how annotations are displayed in the API-doc part of the documentation, integrating with `sphinx-autodoc` and `sphinx-napoleon`.
 
 
 You can check that Sphinx is installed with `sphinx-build --version`.

@@ -48,16 +48,19 @@ extensions = ['sphinx.ext.mathjax',
               'IPython.sphinxext.ipython_directive',
               'matplotlib.sphinxext.plot_directive',
               'm2r',
+              'sphinx.ext.napoleon',
               'sphinx.ext.autodoc',
+              'sphinx.ext.autosummary',
+              'sphinx_autodoc_typehints', # after napoleon and autodoc
               'sphinx.ext.todo',
               'sphinx.ext.doctest',
-              'sphinx.ext.autosummary',
               'sphinx.ext.extlinks',
               'sphinx.ext.intersphinx',
               'sphinx.ext.viewcode',
               'sphinx.ext.ifconfig',
-              'sphinx.ext.napoleon',
               'sphinxcontrib.bibtex',
+              'sphinx_copybutton',
+
 ]
 
 intersphinx_mapping = {
@@ -79,6 +82,7 @@ doctest_global_setup = '''
 try:
   from mitiq import *
   from mitiq.factories import *
+  from mitiq.benchmarks.maxcut import *
 except:
   pass
 try:
@@ -105,6 +109,8 @@ exclude_patterns = []
 master_doc = 'index'
 
 # autodoc settings
+napoleon_google_docstring = True
+napoleon_use_ivar = True
 
 autodoc_mock_imports = [
 #    'mitiq',
@@ -116,6 +122,12 @@ autodoc_mock_imports = [
 #    'matplotlib',
 #    'matplotlib.pyplot',
 ]
+
+# autodoc-typehints extension setting
+typehints_fully_qualified = False
+always_document_param_types = True
+set_type_checking_flag = False
+typehints_document_rtype = True
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -255,7 +267,8 @@ pybtex_register_plugin("pybtex.style.formatting", "apsstyle", ApsStyle)
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-# html_theme = 'alabaster'
+#html_theme = 'sphinx_rtd_theme'
+html_theme = 'sphinx_rtd_theme'#'pydata_sphinx_theme' #'alabaster', 'sphinx_rtd_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
