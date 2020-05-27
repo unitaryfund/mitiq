@@ -155,8 +155,8 @@ class BatchedFactory(Factory):
             next_param = self.scale_factors[len(self.outstack)]
         except IndexError:
             raise IndexError(
-                "BatchedFactory cannot take another step. " \
-                "Number of batched scale_factors" \
+                "BatchedFactory cannot take another step. "
+                "Number of batched scale_factors"
                 f" ({len(self.scale_factors)}) exceeded."
             )
         return next_param
@@ -207,6 +207,12 @@ class PolyFactory(BatchedFactory):
         PolyFactory, but can be called also by other factories which are
         particular cases of PolyFactory, e.g., LinearFactory
         and RichardsonFactory.
+
+        Args:
+            instack: x data values.
+            outstack: y data values.
+            order: Extrapolation order (degree of the polynomial fit).
+                   It cannot exceed len(scale_factors) - 1.
         """
         # Check arguments
         error_str = (
@@ -343,8 +349,8 @@ class PolyExpFactory(BatchedFactory):
     Args:
         scale_factors: Iterable of noise scale factors at which
                        expectation values should be measured.
-        order: Polynomial extrapolation order.
-               Must be <=len(scale_factors) - 1.
+        order: Extrapolation order (degree of the polynomial z(x)).
+               It cannot exceed len(scale_factors) - 1.
                If asymptote is None, order cannot exceed
                len(scale_factors) - 2.
         asymptote: Infinite-noise limit (optional argument).
@@ -382,7 +388,7 @@ class PolyExpFactory(BatchedFactory):
     ) -> Tuple[float, List[float]]:
         """
         Determines the zero-noise limit, assuming an exponential ansatz:
-        y(x) = a + sign * exp(z(x)), where z(x) is a polynomial of a given order.
+        y(x) = a + sign * exp(z(x)), where z(x) is a polynomial.
 
         The parameter "sign" is a sign variable which can be either 1 or -1,
         corresponding to decreasing and increasing exponentials, respectively.
@@ -404,12 +410,12 @@ class PolyExpFactory(BatchedFactory):
             instack: x data values.
             outstack: y data values.
             asymptote: y(x->inf).
-            order: Extrapolation order.
+            order: Extrapolation order (degree of the polynomial z(x)).
             avoid_log: If set to True, the exponential model is not linearized
                        with a logarithm and a non-linear fit is applied even
                        if asymptote is not None. The default value is False.
             eps: Epsilon to regularize log(sign (instack - asymptote)) when
-                 the argument is to close to zero or negative. 
+                 the argument is to close to zero or negative.
 
         Returns:
             (znl, params): Where "znl" is the zero-noise-limit and "params"
@@ -429,8 +435,8 @@ class PolyExpFactory(BatchedFactory):
         if order > len(instack) - (1 + shift):
             raise ValueError(
                 "Extrapolation order is too high. "
-                f"The order cannot exceed the number" \
-                " of data points minus {1 + shift}."
+                "The order cannot exceed the number"
+                f" of data points minus {1 + shift}."
             )
 
         # Deduce if the exponential is a decay or a growth
@@ -443,7 +449,7 @@ class PolyExpFactory(BatchedFactory):
             # Coefficients of the polynomial to be exponentiated
             z_coeffs = coeffs[2:][::-1]
             return coeffs[0] + coeffs[1] * np.exp(x * np.polyval(z_coeffs, x))
-        
+
         def _ansatz_b(x: float, *coeffs: float):
             """Ansatz of generic order with known asymptote."""
             # Coefficients of the polynomial to be exponentiated
@@ -458,7 +464,7 @@ class PolyExpFactory(BatchedFactory):
             # The zero noise limit is ansatz(0)= asympt + b
             zero_limit = opt_params[0] + opt_params[1]
             return (zero_limit, opt_params)
-            
+
         # CASE 2: asymptote is given and "avoid_log" is True
         if avoid_log:
             # First guess for the parameter (decay or growth from "sign")
@@ -488,7 +494,7 @@ class PolyExpFactory(BatchedFactory):
     def reduce(self) -> float:
         """Returns the zero-noise limit."""
         return self.static_reduce(
-            self.instack, 
+            self.instack,
             self.outstack,
             self.asymptote,
             self.order,
@@ -543,9 +549,9 @@ class AdaExpFactory(Factory):
             )
         if steps < 3 + int(asymptote is None):
             raise ValueError(
-                "The argument 'steps' must be an integer" \
+                "The argument 'steps' must be an integer"
                 " greater or equal to 3. "
-                "If 'asymptote' is None, 'steps' must be" \
+                "If 'asymptote' is None, 'steps' must be"
                 " greater or equal to 4."
             )
         self.steps = steps
