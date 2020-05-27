@@ -548,8 +548,8 @@ class AdaExpFactory(Factory):
         self.avoid_log = avoid_log
         # Keep a log of the optimization process storing:
         # noise value(s), expectation value(s), parameters, and zero limit
-        # type: List[Tuple[List[float], List[float], List[float], float]]
-        self.history = []
+        self.history = [
+        ]  # type: List[Tuple[List[float], List[float], List[float], float]]
 
     def next(self) -> float:
         """Returns the next noise level to execute a circuit at."""
