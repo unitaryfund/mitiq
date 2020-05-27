@@ -1,5 +1,4 @@
 from typing import Optional
-import numpy as np
 import qiskit
 from qiskit import QuantumCircuit, ClassicalRegister
 
