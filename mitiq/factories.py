@@ -436,13 +436,13 @@ class PolyExpFactory(BatchedFactory):
         # Deduce "sign" parameter of the exponential ansatz
         sign = np.sign(-slope)
 
-        def _ansatz_a(x: float, *coeffs: float):
+        def _ansatz_unknown(x: float, *coeffs: float):
             """Ansatz of generic order with unknown asymptote."""
             # Coefficients of the polynomial to be exponentiated
             z_coeffs = coeffs[2:][::-1]
             return coeffs[0] + coeffs[1] * np.exp(x * np.polyval(z_coeffs, x))
 
-        def _ansatz_b(x: float, *coeffs: float):
+        def _ansatz_known(x: float, *coeffs: float):
             """Ansatz of generic order with known asymptote."""
             # Coefficients of the polynomial to be exponentiated
             z_coeffs = coeffs[1:][::-1]
@@ -452,7 +452,10 @@ class PolyExpFactory(BatchedFactory):
         if asymptote is None:
             # First guess for the parameter (decay or growth from "sign" to 0)
             p_zero = [0.0, sign, -1.0] + [0.0 for _ in range(order - 1)]
-            opt_params, _ = curve_fit(_ansatz_a, instack, outstack, p0=p_zero)
+            opt_params, _ = curve_fit(_ansatz_unknown,
+                                      instack,
+                                      outstack,
+                                      p0=p_zero)
             # The zero noise limit is ansatz(0)= asympt + b
             zero_limit = opt_params[0] + opt_params[1]
             return (zero_limit, opt_params)
@@ -461,7 +464,7 @@ class PolyExpFactory(BatchedFactory):
         if avoid_log:
             # First guess for the parameter (decay or growth from "sign")
             p_zero = [sign, -1.0] + [0.0 for _ in range(order - 1)]
-            opt_params, _ = curve_fit(_ansatz_b, instack, outstack, p0=p_zero)
+            opt_params, _ = curve_fit(_ansatz_known, instack, outstack, p0=p_zero)
             # The zero noise limit is ansatz(0)= asymptote + b
             zero_limit = asymptote + opt_params[0]
             return (zero_limit, [asymptote] + list(opt_params))
