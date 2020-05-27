@@ -2,7 +2,7 @@ import pytest
 from itertools import product
 import numpy as np
 
-from mitiq.benchmarks.rand_bench import rb_circuits
+from mitiq.benchmarks.randomized_benchmarking import rb_circuits
 from mitiq.factories import LinearFactory, RichardsonFactory, PolyFactory
 from mitiq.folding import fold_gates_at_random, fold_gates_from_left, \
     fold_gates_from_right, fold_global
@@ -28,7 +28,7 @@ def test_rb_circuits():
 
     # test single qubit RB
     for trials in [2, 3]:
-        circuits = rb_circuits(n_qubits=1, num_cfds=depths, trials=trials)
+        circuits = rb_circuits(n_qubits=1, num_cliffords=depths, trials=trials)
         for qc in circuits:
             # we check the ground state population to ignore any global phase
             wvf = qc.final_wavefunction()
@@ -37,7 +37,7 @@ def test_rb_circuits():
 
     # test two qubit RB
     for trials in [2, 3]:
-        circuits = rb_circuits(n_qubits=2, num_cfds=depths, trials=trials)
+        circuits = rb_circuits(n_qubits=2, num_cliffords=depths, trials=trials)
         for qc in circuits:
             # we check the ground state population to ignore any global phase
             wvf = qc.final_wavefunction()
@@ -50,7 +50,7 @@ def test_rb_circuits():
 def test_random_benchmarks(scale_noise, fac):
     depths = [2, 4]
     trials = 3
-    circuits = rb_circuits(n_qubits=2, num_cfds=depths, trials=trials)
+    circuits = rb_circuits(n_qubits=2, num_cliffords=depths, trials=trials)
     noise = 0.01
     obs = np.diag([1, 0, 0, 0])
 

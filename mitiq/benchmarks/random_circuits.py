@@ -1,4 +1,4 @@
-# random_circ.py
+# random_circuits.py
 """
 Contains methods used for testing mitiq's performance on random circuits
 """

@@ -6,7 +6,7 @@ import numpy as np
 from mitiq.factories import LinearFactory, RichardsonFactory, PolyFactory
 from mitiq.folding import fold_gates_at_random, fold_gates_from_left, \
     fold_gates_from_right
-from mitiq.benchmarks.random_circ import rand_circuit_zne, sample_projector
+from mitiq.benchmarks.random_circuits import rand_circuit_zne, sample_projector
 
 # Fix a seed for this test file
 SEED = 808

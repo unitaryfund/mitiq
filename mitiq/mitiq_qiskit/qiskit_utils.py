@@ -9,32 +9,31 @@ from qiskit.providers.aer.noise.errors.standard_errors import (
     depolarizing_error,
 )
 
-from mitiq.benchmarks.rand_bench import rb_circuits
+from mitiq.benchmarks.randomized_benchmarking import rb_circuits
 from mitiq.mitiq_qiskit.conversions import to_qiskit
 
 BACKEND = qiskit.Aer.get_backend("qasm_simulator")
 
 
-def random_identity_circuit(ncfds=None, seed: Optional[int] = None):
+def random_identity_circuit(num_cliffords=None, seed: Optional[int] = None):
     """Returns a single-qubit identity circuit.
 
     Args:
-        ncfds (int): Number of cliffords used to generate the random circuit.
+        num_cliffords (int): Number of cliffords used to generate the random circuit.
         seed: Optional seed for random number generator.
 
     Returns:
         circuit: Quantum circuit as a :class:`qiskit.QuantumCircuit` object.
     """
     return to_qiskit(rb_circuits(n_qubits=1,
-                                 num_cfds=[ncfds],
-                                 trials=1,
-                                 seed=seed)[0])
+                                 num_cliffords=[num_cliffords],
+                                 trials=1)[0])
 
 
 def run_with_noise(
-        circuit: QuantumCircuit, 
+        circuit: QuantumCircuit,
         noise: float,
-        shots: int, 
+        shots: int,
         seed: Optional[int] = None
 ) -> float:
     """Runs the quantum circuit with a depolarizing channel noise model.
