@@ -116,7 +116,6 @@ class Factory(ABC):
             """Evaluates the quantum expectation value for a given noise_
             param"""
             scaled_qp = scale_noise(qp, noise_param)
-
             return executor(scaled_qp)
 
         return self.iterate(_noise_to_expval, max_iterations)
@@ -312,7 +311,6 @@ class ExpFactory(BatchedFactory):
             avoid_log: bool = False,
     ) -> None:
         """Instantiate an new object of this Factory class."""
-
         super(ExpFactory, self).__init__(scale_factors)
         if not (asymptote is None or isinstance(asymptote, float)):
             raise ValueError(
@@ -323,10 +321,11 @@ class ExpFactory(BatchedFactory):
 
     def reduce(self) -> float:
         """Returns the zero-noise limit"""
-
-        return PolyExpFactory.static_reduce(
-            self.instack, self.outstack, self.asymptote, 1, self.avoid_log,
-        )[0]
+        return PolyExpFactory.static_reduce(self.instack,
+                                            self.outstack,
+                                            self.asymptote,
+                                            order=1,
+                                            avoid_log=self.avoid_log)[0]
 
 
 class PolyExpFactory(BatchedFactory):
@@ -359,15 +358,12 @@ class PolyExpFactory(BatchedFactory):
                    if asymptote is not None. The default value is False.
     """
 
-    def __init__(
-            self,
-            scale_factors: Iterable[float],
-            order: int,
-            asymptote: Optional[float] = None,
-            avoid_log: bool = False,
-    ) -> None:
+    def __init__(self,
+                 scale_factors: Iterable[float],
+                 order: int,
+                 asymptote: Optional[float] = None,
+                 avoid_log: bool = False) -> None:
         """Instantiates a new object of this Factory class."""
-
         super(PolyExpFactory, self).__init__(scale_factors)
         if not (asymptote is None or isinstance(asymptote, float)):
             raise ValueError(
@@ -378,14 +374,12 @@ class PolyExpFactory(BatchedFactory):
         self.avoid_log = avoid_log
 
     @staticmethod
-    def static_reduce(
-            instack: List[float],
-            outstack: List[float],
-            asymptote: Optional[float],
-            order: int,
-            avoid_log: bool = False,
-            eps: float = 1.0e-6,
-    ) -> Tuple[float, List[float]]:
+    def static_reduce(instack: List[float],
+                      outstack: List[float],
+                      asymptote: Optional[float],
+                      order: int,
+                      avoid_log: bool = False,
+                      eps: float = 1.0e-6) -> Tuple[float, List[float]]:
         """
         Determines the zero-noise limit, assuming an exponential ansatz:
         y(x) = a + sign * exp(z(x)), where z(x) is a polynomial.
@@ -433,15 +427,13 @@ class PolyExpFactory(BatchedFactory):
         if len(instack) != len(outstack) or len(instack) < 2:
             raise ValueError(error_str)
         if order > len(instack) - (1 + shift):
-            raise ValueError(
-                "Extrapolation order is too high. "
-                "The order cannot exceed the number"
-                f" of data points minus {1 + shift}."
-            )
+            raise ValueError("Extrapolation order is too high. "
+                             "The order cannot exceed the number"
+                             f" of data points minus {1 + shift}.")
 
         # Deduce if the exponential is a decay or a growth
         slope, _ = np.polyfit(instack, outstack, deg=1)
-        # Deduce sign coefficient "s" of the exponential ansatz
+        # Deduce "sign" parameter of the exponential ansatz
         sign = np.sign(-slope)
 
         def _ansatz_a(x: float, *coeffs: float):
@@ -493,13 +485,11 @@ class PolyExpFactory(BatchedFactory):
 
     def reduce(self) -> float:
         """Returns the zero-noise limit."""
-        return self.static_reduce(
-            self.instack,
-            self.outstack,
-            self.asymptote,
-            self.order,
-            self.avoid_log,
-        )[0]
+        return self.static_reduce(self.instack,
+                                  self.outstack,
+                                  self.asymptote,
+                                  self.order,
+                                  self.avoid_log)[0]
 
 
 class AdaExpFactory(Factory):
@@ -548,21 +538,18 @@ class AdaExpFactory(Factory):
                 "The argument 'scale_factor' must be strictly larger than one."
             )
         if steps < 3 + int(asymptote is None):
-            raise ValueError(
-                "The argument 'steps' must be an integer"
-                " greater or equal to 3. "
-                "If 'asymptote' is None, 'steps' must be"
-                " greater or equal to 4."
-            )
+            raise ValueError("The argument 'steps' must be an integer"
+                             " greater or equal to 3. "
+                             "If 'asymptote' is None, 'steps' must be"
+                             " greater or equal to 4.")
         self.steps = steps
         self.scale_factor = scale_factor
         self.asymptote = asymptote
         self.avoid_log = avoid_log
         # Keep a log of the optimization process storing:
         # noise value(s), expectation value(s), parameters, and zero limit
-        self.history = (
-            []
-        )  # type: List[Tuple[List[float], List[float], List[float], float]]
+        # type: List[Tuple[List[float], List[float], List[float], float]]
+        self.history = []
 
     def next(self) -> float:
         """Returns the next noise level to execute a circuit at."""
@@ -599,7 +586,11 @@ class AdaExpFactory(Factory):
     def reduce(self) -> float:
         """Returns the zero-noise limit."""
         zero_limit, params = PolyExpFactory.static_reduce(
-            self.instack, self.outstack, self.asymptote, 1, self.avoid_log,
+            self.instack,
+            self.outstack,
+            self.asymptote,
+            order=1,
+            avoid_log=self.avoid_log,
         )
         # Update optimization history
         self.history.append((self.instack, self.outstack, params, zero_limit))
