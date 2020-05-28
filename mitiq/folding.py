@@ -259,9 +259,10 @@ def fold_gates_from_left(
         scale_factor: Factor to scale the circuit by. Any real number in [1, 3].
 
     Keyword Args:
-        squash_moments: If True, moments are squashed in the returned circuit.
-        return_mitiq: If True, returns a mitiq circuit instead of
-                      the input circuit type, if different. (Default is False.)
+        squash_moments (bool): If True, moments are squashed in the returned
+            circuit. Default is True.
+        return_mitiq (bool): If True, returns a mitiq circuit instead of
+            the input circuit type (if different). Default is False.
 
     Returns:
         folded: the folded quantum circuit as a QPROGRAM.
@@ -280,6 +281,9 @@ def fold_gates_from_left(
         raise ValueError(
             "The scale factor must be a real number between 1 and 3."
         )
+    #
+    # if kwargs.get("squash_moments") is None:
+    #     kwargs["squash_moments"] = True
 
     folded = deepcopy(circuit)
 
@@ -552,8 +556,11 @@ def fold_local(
 
     while scale_factor > 1.0:
         this_stretch = 3.0 if scale_factor > 3.0 else scale_factor
-        folded = fold_method(folded, this_stretch, *fold_method_args, **kwargs)
+        folded = fold_method(folded, this_stretch, *fold_method_args)
         scale_factor /= 3.0
+
+    if not kwargs.get("squash_moments") is False:
+        folded = squash_moments(folded)
     return folded
 
 
