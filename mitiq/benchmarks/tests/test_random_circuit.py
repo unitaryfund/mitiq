@@ -37,7 +37,7 @@ def test_random_benchmarks(scale_noise, fac):
                                                      depth=20,
                                                      trials=8,
                                                      op_density=0.99,
-                                                     noise=0.003,
+                                                     noise=0.04,
                                                      fac=fac,
                                                      scale_noise=scale_noise,
                                                      seed=SEED)

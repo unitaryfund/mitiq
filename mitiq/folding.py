@@ -259,9 +259,12 @@ def fold_gates_from_left(
         scale_factor: Factor to scale the circuit by. Any real number in [1, 3].
 
     Keyword Args:
-        squash_moments: If True, moments are squashed in the returned circuit.
-        return_mitiq: If True, returns a mitiq circuit instead of
-                      the input circuit type, if different. (Default is False.)
+        squash_moments (bool): If True, all gates (including folded gates) are
+            placed as early as possible in the circuit. If False, new moments
+            are created for folded gates. This option only applies to QPROGRAM
+            types which have a "moment" or "time" structure. Default is True.
+        return_mitiq (bool): If True, returns a mitiq circuit instead of
+            the input circuit type (if different). Default is False.
 
     Returns:
         folded: the folded quantum circuit as a QPROGRAM.
@@ -302,7 +305,7 @@ def fold_gates_from_left(
             num_folded += 1
             if num_folded == num_to_fold:
                 _append_measurements(folded, measurements)
-                if kwargs.get("squash_moments") is True:
+                if not (kwargs.get("squash_moments") is False):
                     folded = squash_moments(folded)
                 return folded
 
@@ -323,9 +326,12 @@ def fold_gates_from_right(
         scale_factor: Factor to scale the circuit by. Any real number in [1, 3].
 
     Keyword Args:
-        squash_moments: If True, moments are squashed in the returned circuit.
-        return_mitiq: If True, returns a mitiq circuit instead of
-                      the input circuit type, if different. (Default is False.)
+        squash_moments (bool): If True, all gates (including folded gates) are
+            placed as early as possible in the circuit. If False, new moments
+            are created for folded gates. This option only applies to QPROGRAM
+            types which have a "moment" or "time" structure. Default is True.
+        return_mitiq (bool): If True, returns a mitiq circuit instead of
+            the input circuit type (if different). Default is False.
 
     Returns:
         folded: the folded quantum circuit as a QPROGRAM.
@@ -344,11 +350,12 @@ def fold_gates_from_right(
 
     reversed_circuit = Circuit(reversed(circuit))
     reversed_folded_circuit = fold_gates_from_left(
-        reversed_circuit, scale_factor
+        reversed_circuit, scale_factor, squash_moments=False
     )
     folded = Circuit(reversed(reversed_folded_circuit))
+
     _append_measurements(folded, measurements)
-    if kwargs.get("squash_moments") is True:
+    if not (kwargs.get("squash_moments") is False):
         folded = squash_moments(folded)
     return folded
 
@@ -409,9 +416,12 @@ def fold_gates_at_random(
         seed: [Optional] Integer seed for random number generator.
 
     Keyword Args:
-        squash_moments: If True, moments are squashed in the returned circuit.
-        return_mitiq: If True, returns a mitiq circuit instead of
-                      the input circuit type, if different. (Default is False.)
+        squash_moments (bool): If True, all gates (including folded gates) are
+            placed as early as possible in the circuit. If False, new moments
+            are created for folded gates. This option only applies to QPROGRAM
+            types which have a "moment" or "time" structure. Default is True.
+        return_mitiq (bool): If True, returns a mitiq circuit instead of
+            the input circuit type (if different). Default is False.
 
     Returns:
         folded: the folded quantum circuit as a QPROGRAM.
@@ -438,7 +448,7 @@ def fold_gates_at_random(
     if np.isclose(scale_factor, 3.0, atol=1e-3):
         _fold_all_gates_locally(folded)
         _append_measurements(folded, measurements)
-        if kwargs.get("squash_moments") is True:
+        if not (kwargs.get("squash_moments") is False):
             folded = squash_moments(folded)
         return folded
 
@@ -489,7 +499,7 @@ def fold_gates_at_random(
             remaining_moment_indices.remove(moment_index)
 
     _append_measurements(folded, measurements)
-    if kwargs.get("squash_moments") is True:
+    if not (kwargs.get("squash_moments") is False):
         folded = squash_moments(folded)
     return folded
 
@@ -516,9 +526,12 @@ def fold_local(
                           fold_method(circuit, scale_factor, *fold_method_args).
 
     Keyword Args:
-        squash_moments: If True, moments are squashed in the returned circuit.
-        return_mitiq: If True, returns a mitiq circuit instead of
-                      the input circuit type, if different. (Default is False.)
+        squash_moments (bool): If True, all gates (including folded gates) are
+            placed as early as possible in the circuit. If False, new moments
+            are created for folded gates. This option only applies to QPROGRAM
+            types which have a "moment" or "time" structure. Default is True.
+        return_mitiq (bool): If True, returns a mitiq circuit instead of
+            the input circuit type (if different). Default is False.
 
     Returns:
         folded: the folded quantum circuit as a QPROGRAM.
@@ -552,8 +565,13 @@ def fold_local(
 
     while scale_factor > 1.0:
         this_stretch = 3.0 if scale_factor > 3.0 else scale_factor
-        folded = fold_method(folded, this_stretch, *fold_method_args, **kwargs)
+        folded = fold_method(
+            folded, this_stretch, *fold_method_args, squash_moments=False
+        )
         scale_factor /= 3.0
+
+    if not (kwargs.get("squash_moments") is False):
+        folded = squash_moments(folded)
     return folded
 
 
@@ -571,9 +589,12 @@ def fold_global(circuit: QPROGRAM, scale_factor: float, **kwargs) -> QPROGRAM:
         scale_factor: Factor to scale the circuit by.
 
     Keyword Args:
-        squash_moments: If True, moments are squashed in the returned circuit.
-        return_mitiq: If True, returns a mitiq circuit instead of
-                      the input circuit type, if different. (Default is False.)
+        squash_moments (bool): If True, all gates (including folded gates) are
+            placed as early as possible in the circuit. If False, new moments
+            are created for folded gates. This option only applies to QPROGRAM
+            types which have a "moment" or "time" structure. Default is True.
+        return_mitiq (bool): If True, returns a mitiq circuit instead of
+            the input circuit type (if different). Default is False.
 
     Returns:
         folded: the folded quantum circuit as a QPROGRAM.
@@ -605,6 +626,6 @@ def fold_global(circuit: QPROGRAM, scale_factor: float, **kwargs) -> QPROGRAM:
         folded += Circuit([inverse(ops[-num_to_fold:])], [ops[-num_to_fold:]])
 
     _append_measurements(folded, measurements)
-    if kwargs.get("squash_moments") is True:
+    if not (kwargs.get("squash_moments") is False):
         folded = squash_moments(folded)
     return folded

@@ -940,7 +940,8 @@ def test_fold_local_stretch_three_from_left():
     assert _equal(folded, fold_gates_from_left(circ, scale_factor=3))
 
 
-def test_fold_local_big_stretch_from_left():
+@pytest.mark.parametrize("squash", [True, False])
+def test_fold_local_big_stretch_from_left(squash: bool):
     """Test for local folding with scale > 3."""
     qreg = LineQubit.range(3)
     circ = Circuit(
@@ -951,7 +952,12 @@ def test_fold_local_big_stretch_from_left():
             ops.TOFFOLI.on(*qreg),
         ]
     )
-    folded = fold_local(circ, scale_factor=4, fold_method=fold_gates_from_left)
+    folded = fold_local(
+        circ,
+        scale_factor=4,
+        fold_method=fold_gates_from_left,
+        squash_moments=squash
+    )
     correct = Circuit(
         [ops.H.on(qreg[0])] * 7,
         [ops.H.on(qreg[1])] * 5,
@@ -1438,8 +1444,12 @@ def test_fold_and_squash_max_stretch(fold_method):
     folded_and_squashed = fold_method(
         circuit, scale_factor=3., squash_moments=True
     )
+    folded_with_squash_moments_not_specified = fold_method(
+        circuit, scale_factor=3.
+    )  # Checks that the default is to squash moments
     assert len(folded_not_squashed) == 30
     assert len(folded_and_squashed) == 15
+    assert len(folded_with_squash_moments_not_specified) == 15
 
 
 @pytest.mark.parametrize(
