@@ -256,7 +256,7 @@ def fold_gates_from_left(
 
     Args:
         circuit: Circuit to fold.
-        scale_factor: Factor to scale the circuit by. Any real number in [1, 3].
+        scale_factor: Factor to scale the circuit by. Any real number >= 1.
 
     Keyword Args:
         squash_moments (bool): If True, all gates (including folded gates) are
@@ -268,10 +268,6 @@ def fold_gates_from_left(
 
     Returns:
         folded: the folded quantum circuit as a QPROGRAM.
-
-    Note:
-        Folding a single gate adds two gates to the circuit,
-        hence the maximum scale factor is 3 (when all gates are folded).
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -279,9 +275,14 @@ def fold_gates_from_left(
             " and cannot be folded."
         )
 
-    if not 1 <= scale_factor <= 3:
+    if not 1. <= scale_factor:
         raise ValueError(
-            "The scale factor must be a real number between 1 and 3."
+            f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
+        )
+
+    if scale_factor > 3.:
+        return fold_local(
+            circuit, scale_factor, fold_method=fold_gates_from_left, **kwargs
         )
 
     folded = deepcopy(circuit)
@@ -323,7 +324,7 @@ def fold_gates_from_right(
 
     Args:
         circuit: Circuit to fold.
-        scale_factor: Factor to scale the circuit by. Any real number in [1, 3].
+        scale_factor: Factor to scale the circuit by. Any real number >= 1.
 
     Keyword Args:
         squash_moments (bool): If True, all gates (including folded gates) are
@@ -335,10 +336,6 @@ def fold_gates_from_right(
 
     Returns:
         folded: the folded quantum circuit as a QPROGRAM.
-
-    Note:
-        Folding a single gate adds two gates to the circuit,
-        hence the maximum scale factor is 3.
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -412,7 +409,7 @@ def fold_gates_at_random(
 
     Args:
         circuit: Circuit to fold.
-        scale_factor: Factor to scale the circuit by. Any real number in [1, 3].
+        scale_factor: Factor to scale the circuit by. Any real number >= 1.
         seed: [Optional] Integer seed for random number generator.
 
     Keyword Args:
@@ -425,10 +422,6 @@ def fold_gates_at_random(
 
     Returns:
         folded: the folded quantum circuit as a QPROGRAM.
-
-    Note:
-        Folding a single gate adds two gates to the circuit, hence the maximum
-        scale factor is 3.
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -436,9 +429,18 @@ def fold_gates_at_random(
             " and cannot be folded."
         )
 
-    if not 1 <= scale_factor <= 3:
+    if not 1. <= scale_factor:
         raise ValueError(
-            "The scale factor must be a real number between 1 and 3."
+            f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
+        )
+
+    if scale_factor > 3.:
+        return fold_local(
+            circuit,
+            scale_factor,
+            fold_method=fold_gates_at_random,
+            fold_method_args=(seed,),
+            **kwargs
         )
 
     folded = deepcopy(circuit)

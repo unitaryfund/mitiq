@@ -531,11 +531,34 @@ def test_fold_from_left_no_stretch():
     assert not (folded is circuit)
 
 
-def test_fold_from_left_bad_stretch():
-    """Tests that a ValueError is raised for an invalid scale factor."""
-    circuit = testing.random_circuit(qubits=2, n_moments=10, op_density=0.99)
-    with pytest.raises(ValueError):
-        fold_gates_from_left(circuit, scale_factor=10)
+def test_fold_from_left_scale_factor_larger_than_three():
+    """Tests folding from left with a scale_factor larger than three."""
+    qreg = LineQubit.range(2)
+    circuit = Circuit(
+        [ops.SWAP.on(*qreg)],
+        [ops.CNOT.on(*qreg)]
+    )
+    folded = fold_gates_from_left(circuit, scale_factor=6.)
+    correct = Circuit(
+        [ops.SWAP.on(*qreg)] * 9,
+        [ops.CNOT.on(*qreg)] * 3
+    )
+    assert _equal(folded, correct)
+
+
+def test_fold_from_right_scale_factor_larger_than_three():
+    """Tests folding from right with a scale_factor larger than three."""
+    qreg = LineQubit.range(2)
+    circuit = Circuit(
+        [ops.SWAP.on(*qreg)],
+        [ops.CNOT.on(*qreg)]
+    )
+    folded = fold_gates_from_right(circuit, scale_factor=6.)
+    correct = Circuit(
+        [ops.SWAP.on(*qreg)] * 3,
+        [ops.CNOT.on(*qreg)] * 9
+    )
+    assert _equal(folded, correct)
 
 
 def test_fold_from_left_with_terminal_measurements_min_stretch():
@@ -821,10 +844,20 @@ def test_fold_random_max_stretch():
     assert _equal(folded, correct)
 
 
-def test_fold_random_bad_stretch():
-    """Tests that an error is raised when a bad scale is provided."""
-    with pytest.raises(ValueError):
-        fold_gates_at_random(Circuit(), scale_factor=4)
+def test_fold_random_scale_factor_larger_than_three():
+    """Folds at random with a scale_factor larger than three."""
+    qreg = LineQubit.range(2)
+    circuit = Circuit(
+        [ops.SWAP.on(*qreg)],
+        [ops.CNOT.on(*qreg)]
+    )
+    folded = fold_gates_at_random(circuit, scale_factor=6., seed=1)
+    correct = Circuit(
+        [ops.SWAP.on(*qreg)] * 5,
+        [ops.CNOT.on(*qreg)] * 7
+    )
+    assert len(folded) == 12
+    assert _equal(folded, correct)
 
 
 def test_fold_random_no_repeats():
