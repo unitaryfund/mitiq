@@ -25,8 +25,8 @@ X_VALS = [1, 1.3, 1.7, 2.2]
 
 STAT_NOISE = 0.0001
 CLOSE_TOL = 1.0e-2
-# PolyExp fit is non-linear, so we set a larger tolerance 
-POLYEXP_TOL = 2 * CLOSE_TOL 
+# PolyExp fit is non-linear, so we set a larger tolerance
+POLYEXP_TOL = 2 * CLOSE_TOL
 NOT_CLOSE_TOL = 1.0e-1
 
 # Set a seed.
@@ -37,6 +37,7 @@ def apply_seed_to_func(func: Callable, seed: int) -> Callable:
     """Applies the input seed to the input function by
     using a random state and returns the seeded function."""
     rnd_state = RandomState(seed)
+
     def seeded_func(x: float, err: float = STAT_NOISE) -> float:
         return func(x, err, rnd_state)
     return seeded_func
@@ -131,30 +132,15 @@ def test_poly_extr():
     )
 
 
+@mark.parametrize("avoid_log", [False, True])
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-def test_exp_factory_with_asympt(test_f: Callable[[float], float]):
+def test_exp_factory_with_asympt(test_f: Callable[[float], float],
+                                 avoid_log: bool):
     """Test of exponential extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = ExpFactory(X_VALS, asymptote=A)
+    fac = ExpFactory(X_VALS, asymptote=A, avoid_log=True)
     fac.iterate(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
-
-
-@mark.parametrize("test_f", [f_poly_exp_down, f_poly_exp_up])
-def test_poly_exp_factory_with_asympt(test_f: Callable[[float], float]):
-    """Test of (almost) exponential extrapolator."""
-    # test that, for a non-linear exponent,
-    # order=1 is bad while order=2 is better.
-    seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = PolyExpFactory(X_VALS, order=1, asymptote=A)
-    fac.iterate(seeded_f)
-    assert not np.isclose(
-        fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL
-    )
-    seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = PolyExpFactory(X_VALS, order=2, asymptote=A)
-    fac.iterate(seeded_f)
-    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=POLYEXP_TOL)
 
 
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
@@ -164,6 +150,25 @@ def test_exp_factory_no_asympt(test_f: Callable[[float], float]):
     fac = ExpFactory(X_VALS, asymptote=None)
     fac.iterate(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+
+
+@mark.parametrize("avoid_log", [False, True])
+@mark.parametrize("test_f", [f_poly_exp_down, f_poly_exp_up])
+def test_poly_exp_factory_with_asympt(test_f: Callable[[float], float],
+                                      avoid_log: bool):
+    """Test of (almost) exponential extrapolator."""
+    # test that, for a non-linear exponent,
+    # order=1 is bad while order=2 is better.
+    seeded_f = apply_seed_to_func(test_f, SEED)
+    fac = PolyExpFactory(X_VALS, order=1, asymptote=A, avoid_log=avoid_log)
+    fac.iterate(seeded_f)
+    assert not np.isclose(
+        fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL
+    )
+    seeded_f = apply_seed_to_func(test_f, SEED)
+    fac = PolyExpFactory(X_VALS, order=2, asymptote=A, avoid_log=avoid_log)
+    fac.iterate(seeded_f)
+    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=POLYEXP_TOL)
 
 
 @mark.parametrize("test_f", [f_poly_exp_down, f_poly_exp_up])
@@ -183,22 +188,30 @@ def test_poly_exp_factory_no_asympt(test_f: Callable[[float], float]):
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=POLYEXP_TOL)
 
 
+@mark.parametrize("avoid_log", [False, True])
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-def test_ada_exp_factory_with_asympt(test_f: Callable[[float], float]):
+def test_ada_exp_factory_with_asympt(test_f: Callable[[float], float],
+                                     avoid_log: bool):
     """Test of the adaptive exponential extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = AdaExpFactory(steps=3, scale_factor=2.0, asymptote=A)
+    fac = AdaExpFactory(steps=3,
+                        scale_factor=2.0,
+                        asymptote=A,
+                        avoid_log=avoid_log)
     fac.iterate(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
 
+@mark.parametrize("avoid_log", [False, True])
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-def test_ada_exp_factory_with_asympt_more_steps(
-    test_f: Callable[[float], float]
-):
-    """Test of the adaptive exponential extrapolator."""
+def test_ada_exp_fac_with_asympt_more_steps(test_f: Callable[[float], float],
+                                            avoid_log: bool):
+    """Test of the adaptive exponential extrapolator with more steps."""
     seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = AdaExpFactory(steps=6, scale_factor=2.0, asymptote=A)
+    fac = AdaExpFactory(steps=6,
+                        scale_factor=2.0,
+                        asymptote=A,
+                        avoid_log=avoid_log)
     fac.iterate(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
@@ -221,3 +234,13 @@ def test_ada_exp_factory_no_asympt_more_steps(
     fac = AdaExpFactory(steps=8, scale_factor=2.0, asymptote=None)
     fac.iterate(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+
+
+def test_avoid_log_keyword():
+    """Test that avoid_log=True and avoid_log=False give different results."""
+    fac = ExpFactory(X_VALS, asymptote=A, avoid_log=False)
+    fac.iterate(f_exp_down)
+    znl_with_log = fac.reduce()
+    fac.avoid_log = True
+    znl_without_log = fac.reduce()
+    assert not znl_with_log == znl_without_log
