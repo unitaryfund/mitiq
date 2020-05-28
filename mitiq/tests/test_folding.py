@@ -1444,8 +1444,12 @@ def test_fold_and_squash_max_stretch(fold_method):
     folded_and_squashed = fold_method(
         circuit, scale_factor=3., squash_moments=True
     )
+    folded_with_squash_moments_not_specified = fold_method(
+        circuit, scale_factor=3.
+    )  # Checks that the default is to squash moments
     assert len(folded_not_squashed) == 30
     assert len(folded_and_squashed) == 15
+    assert len(folded_with_squash_moments_not_specified) == 15
 
 
 @pytest.mark.parametrize(
