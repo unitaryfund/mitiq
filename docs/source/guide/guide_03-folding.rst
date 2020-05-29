@@ -18,8 +18,8 @@ If `G` is the entire circuit, we call it `global folding`.
 
 In ``mitiq``, folding functions input a circuit and a *scale factor* (or simply *scale*), i.e., a floating point value
 which corresponds to (approximately) how much the length of the circuit is scaled.
-The minimum scale factor is one (which corresponds to folding no gates), and the maximum scale factor is three
-(which corresponds to folding all gates).
+The minimum scale factor is one (which corresponds to folding no gates). A scale factor of three corresponds to folding
+all gates locally. Scale factors beyond three begin to fold gates more than once.
 
 =============================================
 Local folding methods
