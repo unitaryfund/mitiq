@@ -4,7 +4,7 @@ Testing of zero-noise extrapolation methods
 """
 
 from typing import Callable
-from pytest import mark
+from pytest import mark, raises
 import numpy as np
 from numpy.random import RandomState
 from mitiq.factories import (
@@ -244,3 +244,27 @@ def test_avoid_log_keyword():
     fac.avoid_log = True
     znl_without_log = fac.reduce()
     assert not znl_with_log == znl_without_log
+
+
+def test_few_scale_factors_error():
+    """Test that a wrong initialization error is raised."""
+    with raises(ValueError, match=r"The extrapolation order cannot exceed"):
+        _ = PolyFactory(X_VALS, order=10)
+
+
+def test_few_points_error():
+    """Test that the correct error is raised if data is not enough to fit."""
+    fac = PolyFactory(X_VALS, order=2)
+    fac.instack = [1.0, 2.0]
+    fac.outstack = [1.0, 2.0]
+    with raises(ValueError, match=r"Extrapolation order is too high."):
+        fac.reduce()
+
+
+def test_failing_fit_error():
+    """Test error handinling for a failing fit."""
+    fac = ExpFactory(X_VALS, asymptote=None)
+    fac.instack = X_VALS
+    fac.outstack = [1.0, 2.0, 1.0, 2.0]
+    with raises(RuntimeError, match=r"Extrapolation fit failed to converge."):
+        fac.reduce()

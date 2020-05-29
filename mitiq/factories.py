@@ -10,6 +10,22 @@ from scipy.optimize import curve_fit
 from mitiq import QPROGRAM
 
 
+def handle_exceptions(exception: Exception):
+    """Handles extrapolation fit exceptions."""
+    # raising "from None" to suppress error trace-back
+    if isinstance(exception, RuntimeError):
+        raise RuntimeError("Extrapolation fit failed to converge."
+                           " The problem may be solved by switching"
+                           " to a more stable extrapolation model"
+                           " such as LinearFactory.") from None
+    elif isinstance(exception, Warning):
+        raise Warning("Extrapolation fit is ill-conditioned."
+                      " Likely, more data points are necessary"
+                      " to fit the parameters of the model.") from None
+    else:
+        raise exception
+
+
 class Factory(ABC):
     """
     Abstract class designed to adaptively produce a new noise scaling
@@ -179,6 +195,9 @@ class PolyFactory(BatchedFactory):
                        expectation values should be measured.
         order: Extrapolation order (degree of the polynomial fit).
                It cannot exceed len(scale_factors) - 1.
+    Raises:
+        ValueError: If data is not consistent with the extrapolation model.
+        Warning: If the extrapolation fit is ill-conditioned.
     Note:
         RichardsonFactory and LinearFactory are special cases of PolyFactory.
     """
@@ -228,7 +247,10 @@ class PolyFactory(BatchedFactory):
             )
         # Get coefficients {c_j} of p(x)= c_0 + c_1*x + c_2*x**2...
         # which best fits the data
-        coefficients = np.polyfit(instack, outstack, deg=order)
+        try:
+            coefficients = np.polyfit(instack, outstack, deg=order)
+        except Warning as err:
+            handle_exceptions(err)
         # c_0, i.e., the value of p(x) at x=0, is returned
         return coefficients[-1]
 
@@ -249,6 +271,9 @@ class RichardsonFactory(BatchedFactory):
     Args:
         scale_factors: Iterable of noise scale factors at which
                        expectation values should be measured.
+    Raises:
+        ValueError: If data is not consistent with the extrapolation model.
+        Warning: If the extrapolation fit is ill-conditioned.
     """
 
     def reduce(self) -> float:
@@ -269,7 +294,9 @@ class LinearFactory(BatchedFactory):
     Args:
         scale_factors: Iterable of noise scale factors at which
                        expectation values should be measured.
-
+    Raises:
+        ValueError: If data is not consistent with the extrapolation model.
+        Warning: If the extrapolation fit is ill-conditioned.
     Example:
         >>> NOISE_LEVELS = [1.0, 2.0, 3.0]
         >>> fac = LinearFactory(NOISE_LEVELS)
@@ -303,6 +330,10 @@ class ExpFactory(BatchedFactory):
         avoid_log: If set to True, the exponential model is not linearized
                    with a logarithm and a non-linear fit is applied even
                    if asymptote is not None. The default value is False.
+    Raises:
+        ValueError: If data is not consistent with the extrapolation model.
+        RuntimeError: If the extrapolation fit fails.
+        Warning: If the extrapolation fit is ill-conditioned.
     """
 
     def __init__(
@@ -356,6 +387,10 @@ class PolyExpFactory(BatchedFactory):
         avoid_log: If set to True, the exponential model is not linearized
                    with a logarithm and a non-linear fit is applied even
                    if asymptote is not None. The default value is False.
+    Raises:
+        ValueError: If data is not consistent with the extrapolation model.
+        RuntimeError: If the extrapolation fit fails.
+        Warning: If the extrapolation fit is ill-conditioned.
     """
 
     def __init__(self,
@@ -410,11 +445,13 @@ class PolyExpFactory(BatchedFactory):
                        if asymptote is not None. The default value is False.
             eps: Epsilon to regularize log(sign (instack - asymptote)) when
                  the argument is to close to zero or negative.
-
         Returns:
             (znl, params): Where "znl" is the zero-noise-limit and "params"
                            are the optimal fitting parameters.
-
+        Raises:
+            ValueError: If data is not consistent with the extrapolation model.
+            RuntimeError: If the extrapolation fit fails.
+            Warning: If the extrapolation fit is ill-conditioned.
         """
         # Shift is 0 if asymptote is given, 1 if asymptote is not given
         shift = int(asymptote is None)
@@ -432,7 +469,10 @@ class PolyExpFactory(BatchedFactory):
                              f" of data points minus {1 + shift}.")
 
         # Deduce if the exponential is a decay or a growth
-        slope, _ = np.polyfit(instack, outstack, deg=1)
+        try:
+            slope, _ = np.polyfit(instack, outstack, deg=1)
+        except Warning as err:
+            handle_exceptions(err)
         # Deduce "sign" parameter of the exponential ansatz
         sign = np.sign(-slope)
 
@@ -452,10 +492,14 @@ class PolyExpFactory(BatchedFactory):
         if asymptote is None:
             # First guess for the parameter (decay or growth from "sign" to 0)
             p_zero = [0.0, sign, -1.0] + [0.0 for _ in range(order - 1)]
-            opt_params, _ = curve_fit(_ansatz_unknown,
-                                      instack,
-                                      outstack,
-                                      p0=p_zero)
+            try:
+                opt_params, _ = curve_fit(_ansatz_unknown,
+                                          instack,
+                                          outstack,
+                                          p0=p_zero)
+            except (RuntimeError, Warning) as err:
+                handle_exceptions(err)
+
             # The zero noise limit is ansatz(0)= asympt + b
             zero_limit = opt_params[0] + opt_params[1]
             return (zero_limit, opt_params)
@@ -464,7 +508,13 @@ class PolyExpFactory(BatchedFactory):
         if avoid_log:
             # First guess for the parameter (decay or growth from "sign")
             p_zero = [sign, -1.0] + [0.0 for _ in range(order - 1)]
-            opt_params, _ = curve_fit(_ansatz_known, instack, outstack, p0=p_zero)
+            try:
+                opt_params, _ = curve_fit(_ansatz_known,
+                                          instack,
+                                          outstack,
+                                          p0=p_zero)
+            except (RuntimeError, Warning) as err:
+                handle_exceptions(err)
             # The zero noise limit is ansatz(0)= asymptote + b
             zero_limit = asymptote + opt_params[0]
             return (zero_limit, [asymptote] + list(opt_params))
@@ -477,10 +527,13 @@ class PolyExpFactory(BatchedFactory):
         # Note: coefficients are ordered from high powers to powers of x
         # Weights "w" are used to compensate for error propagation
         # after the log transformation y --> z
-        z_coefficients = np.polyfit(instack,
-                                    zstack,
-                                    deg=order,
-                                    w=np.sqrt(np.abs(shifted_y)))
+        try:
+            z_coefficients = np.polyfit(instack,
+                                        zstack,
+                                        deg=order,
+                                        w=np.sqrt(np.abs(shifted_y)))
+        except Warning as err:
+            handle_exceptions(err)
         zero_limit = asymptote + sign * np.exp(z_coefficients[-1])
         # Parameters from low order to high order
         params = [asymptote] + list(z_coefficients[::-1])
@@ -519,6 +572,10 @@ class AdaExpFactory(Factory):
         avoid_log: If set to True, the exponential model is not linearized
                    with a logarithm and a non-linear fit is applied even
                    if asymptote is not None. The default value is False.
+    Raises:
+        ValueError: If data is not consistent with the extrapolation model.
+        RuntimeError: If the extrapolation fit fails.
+        Warning: If the extrapolation fit is ill-conditioned.
     """
 
     _SHIFT_FACTOR = 1.27846
