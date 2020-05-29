@@ -34,7 +34,7 @@ from mitiq.folding import (
     fold_gates_from_left,
     fold_gates_from_right,
     fold_gates_at_random,
-    fold_local,
+    _fold_local,
     fold_global,
 )
 from mitiq.mitiq_qiskit.conversions import from_qiskit
@@ -953,7 +953,7 @@ def test_fold_local_small_stretch_from_left():
         ]
     )
 
-    folded = fold_local(circ, scale_factor=2, fold_method=fold_gates_from_left)
+    folded = _fold_local(circ, scale_factor=2, fold_method=fold_gates_from_left)
     correct = Circuit([ops.H.on_each(*qreg)] * 2, list(circ.all_operations()))
     assert _equal(folded, correct)
 
@@ -969,7 +969,7 @@ def test_fold_local_stretch_three_from_left():
             ops.TOFFOLI.on(*qreg),
         ]
     )
-    folded = fold_local(circ, scale_factor=3, fold_method=fold_gates_from_left)
+    folded = _fold_local(circ, scale_factor=3, fold_method=fold_gates_from_left)
     assert _equal(folded, fold_gates_from_left(circ, scale_factor=3))
 
 
@@ -985,7 +985,7 @@ def test_fold_local_big_stretch_from_left(squash: bool):
             ops.TOFFOLI.on(*qreg),
         ]
     )
-    folded = fold_local(
+    folded = _fold_local(
         circ,
         scale_factor=4,
         fold_method=fold_gates_from_left,
@@ -1340,46 +1340,8 @@ def test_fold_at_random_with_qiskit_circuits():
     assert isinstance(qiskit_folded_circuit, QuantumCircuit)
 
 
-def test_fold_local_with_qiskit_circuits():
-    """Tests fold_local with input Qiskit circuits."""
-    # Test Qiskit circuit:
-    #          ┌───┐
-    # q0_0: |0>┤ H ├──■────■──
-    #          ├───┤┌─┴─┐  │
-    # q0_1: |0>┤ H ├┤ X ├──■──
-    #          ├───┤├───┤┌─┴─┐
-    # q0_2: |0>┤ H ├┤ T ├┤ X ├
-    #          └───┘└───┘└───┘
-    qiskit_qreg = QuantumRegister(3)
-    qiskit_creg = ClassicalRegister(3)
-    qiskit_circuit = QuantumCircuit(qiskit_qreg, qiskit_creg)
-    qiskit_circuit.h(qiskit_qreg)
-    qiskit_circuit.cnot(qiskit_qreg[0], qiskit_qreg[1])
-    qiskit_circuit.t(qiskit_qreg[2])
-    qiskit_circuit.ccx(*qiskit_qreg)
-    qiskit_circuit.measure(qiskit_qreg, qiskit_creg)
-
-    # Return mitiq circuit
-    folded_circuit = fold_local(
-        qiskit_circuit,
-        scale_factor=1.4,
-        fold_method=fold_gates_from_left,
-        return_mitiq=True
-    )
-    assert isinstance(folded_circuit, Circuit)
-
-    # Return input circuit type
-    folded_qiskit_circuit = fold_local(
-        qiskit_circuit,
-        scale_factor=2.0,
-        fold_method=fold_gates_from_left,
-        return_mitiq=False
-    )
-    assert isinstance(folded_qiskit_circuit, QuantumCircuit)
-
-
 def test_fold_global_with_qiskit_circuits():
-    """Tests fold_local with input Qiskit circuits."""
+    """Tests _fold_local with input Qiskit circuits."""
     # Test Qiskit circuit:
     #          ┌───┐
     # q0_0: |0>┤ H ├──■────■──
