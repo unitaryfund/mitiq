@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-if [ "$1" != "-docs" ]; then
+if [ "$1" == "-tests-with-pyquil" ]; then
+    echo "Running Tests...";
+    pytest --cov=mitiq mitiq/tests mitiq/benchmarks/tests mitiq/mitiq_qiskit/tests mitiq/mitiq_pyquil/tests;
+elif [ "$1" != "-docs" ]; then
     echo "Running Tests...";
     pytest --cov=mitiq mitiq/tests mitiq/benchmarks/tests mitiq/mitiq_qiskit/tests;
 elif [ "$1" != "-tests" ]; then

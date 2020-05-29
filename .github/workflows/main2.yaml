@@ -18,4 +18,6 @@ jobs:
           docker pull rigetti/qvm
           docker run --rm -idt -p 5000:5000 rigetti/qvm -S
           docker run --rm -idt -p 5555:5555 rigetti/quilc -R
-          pip3 install pytest
+    - name: Test pyquil with pytest
+      run: |
+        ./test_build.sh -tests-with-pyquil
