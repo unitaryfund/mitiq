@@ -20,4 +20,4 @@ jobs:
           docker run --rm -idt -p 5555:5555 rigetti/quilc -R
     - name: Test pyquil with pytest
       run: |
-          ./test_build.sh -tests-with-pyquil
+          chmod +x ./test_build.sh -tests-with-pyquil
