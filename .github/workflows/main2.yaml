@@ -3,19 +3,16 @@ on: [push]
 jobs:
   hello_world_job:
     runs-on: ubuntu-latest
-    name: A job to start qvm
+    name: A job to test pyquil with the qvm
     steps:
       # To use this repository's private action,
       # you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Hello world action step
+      - name: Run root action with pip -e .[development] command
         uses: ./ # Uses an action in the root directory
         id: hello
-        with:
-          who-to-greet: 'Mona the Octocat'
-      # Use the output from the `hello` step
-      - name: Get the output time
+      - name: Set up qvm and quilc with docker
         # run: echo "The time was ${{ steps.hello.outputs.time }}"
         run: |
           docker pull rigetti/qvm
