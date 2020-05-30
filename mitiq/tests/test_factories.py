@@ -4,10 +4,13 @@ Testing of zero-noise extrapolation methods
 """
 
 from typing import Callable
-from pytest import mark, raises
+from pytest import mark, raises, warns
 import numpy as np
 from numpy.random import RandomState
 from mitiq.factories import (
+    ExtrapolationError,
+    ExtrapolationWarning,
+    ConvergenceWarning,
     RichardsonFactory,
     LinearFactory,
     PolyFactory,
@@ -266,5 +269,24 @@ def test_failing_fit_error():
     fac = ExpFactory(X_VALS, asymptote=None)
     fac.instack = X_VALS
     fac.outstack = [1.0, 2.0, 1.0, 2.0]
-    with raises(RuntimeError, match=r"Extrapolation fit failed to converge."):
+    with raises(ExtrapolationError,
+                match=r"The extrapolation fit failed to converge."):
         fac.reduce()
+
+
+@mark.parametrize("fac", [LinearFactory([1, 1, 1]), ExpFactory([1, 1, 1])])
+def test_failing_fit_warnings(fac):
+    """Test that the correct warning is raised for an ill-conditioned fit."""
+    fac.instack = [1, 1, 1, 1]
+    fac.outstack = [1, 1, 1, 1]
+    with warns(ExtrapolationWarning,
+               match=r"The extrapolation fit may be ill-conditioned."):
+        fac.reduce()
+
+
+def test_iteration_warnings():
+    """Test that the correct warning is raised beyond the iteration limit."""
+    fac = LinearFactory(X_VALS)
+    with warns(ConvergenceWarning,
+               match=r"Factory iteration loop stopped before convergence."):
+        fac.iterate(lambda scale_factor: 1.0, max_iterations=3)

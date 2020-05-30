@@ -2,28 +2,40 @@
 extrapolation methods.
 """
 
+import warnings
+from mitiq import QPROGRAM
 from typing import List, Iterable, Optional, Tuple, Callable
 from abc import ABC, abstractmethod
 import numpy as np
 from scipy.optimize import curve_fit
 
-from mitiq import QPROGRAM
+
+class ExtrapolationError(Exception):
+    """Error raised by `mitiq.factories.Factory` objects when
+    the extrapolation fit fails.
+    """
 
 
-def handle_exceptions(exception: Exception):
-    """Handles extrapolation fit exceptions."""
-    # raising "from None" to suppress error trace-back
-    if isinstance(exception, RuntimeError):
-        raise RuntimeError("Extrapolation fit failed to converge."
-                           " The problem may be solved by switching"
-                           " to a more stable extrapolation model"
-                           " such as LinearFactory.") from None
-    elif isinstance(exception, Warning):
-        raise Warning("Extrapolation fit is ill-conditioned."
-                      " Likely, more data points are necessary"
-                      " to fit the parameters of the model.") from None
-    else:
-        raise exception
+EXTR_ERR = ("The extrapolation fit failed to converge."
+            " The problem may be solved by switching to a more stable"
+            " extrapolation model such as `LinearFactory`.")
+
+
+class ExtrapolationWarning(Warning):
+    """Warning raised by `mitiq.factories.Factory` objects when
+    the extrapolation fit is ill-conditioned.
+    """
+
+
+EXTR_WARN = (" The extrapolation fit may be ill-conditioned."
+             " Likely, more data points are necessary to fit the parameters"
+             " of the model.")
+
+
+class ConvergenceWarning(Warning):
+    """Warning raised by `mitiq.factories.Factory` objects when
+    their `iterate` method fails to converge.
+    """
 
 
 class Factory(ABC):
@@ -103,9 +115,11 @@ class Factory(ABC):
             counter += 1
 
         if counter == max_iterations:
-            raise Warning(
+            warnings.warn(
                 "Factory iteration loop stopped before convergence. "
-                f"Maximum number of iterations ({max_iterations}) was reached."
+                f"Maximum number of iterations ({max_iterations}) "
+                "was reached.",
+                ConvergenceWarning,
             )
 
         return self
@@ -247,10 +261,12 @@ class PolyFactory(BatchedFactory):
             )
         # Get coefficients {c_j} of p(x)= c_0 + c_1*x + c_2*x**2...
         # which best fits the data
-        try:
+        with warnings.catch_warnings(record=True) as fit_warn:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter("always")
             coefficients = np.polyfit(instack, outstack, deg=order)
-        except Warning as err:
-            handle_exceptions(err)
+        if fit_warn:
+            warnings.warn(EXTR_WARN, ExtrapolationWarning)
         # c_0, i.e., the value of p(x) at x=0, is returned
         return coefficients[-1]
 
@@ -468,11 +484,14 @@ class PolyExpFactory(BatchedFactory):
                              "The order cannot exceed the number"
                              f" of data points minus {1 + shift}.")
 
-        # Deduce if the exponential is a decay or a growth
-        try:
+        with warnings.catch_warnings(record=True) as fit_warn:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter("always")
+            # Deduce if the exponential is a decay or a growth
             slope, _ = np.polyfit(instack, outstack, deg=1)
-        except Warning as err:
-            handle_exceptions(err)
+        if fit_warn:
+            warnings.warn(EXTR_WARN, ExtrapolationWarning)
+
         # Deduce "sign" parameter of the exponential ansatz
         sign = np.sign(-slope)
 
@@ -493,13 +512,17 @@ class PolyExpFactory(BatchedFactory):
             # First guess for the parameter (decay or growth from "sign" to 0)
             p_zero = [0.0, sign, -1.0] + [0.0 for _ in range(order - 1)]
             try:
-                opt_params, _ = curve_fit(_ansatz_unknown,
-                                          instack,
-                                          outstack,
-                                          p0=p_zero)
-            except (RuntimeError, Warning) as err:
-                handle_exceptions(err)
-
+                with warnings.catch_warnings(record=True) as fit_warn:
+                    # Cause all warnings to always be triggered.
+                    warnings.simplefilter("always")
+                    opt_params, _ = curve_fit(_ansatz_unknown,
+                                              instack,
+                                              outstack,
+                                              p0=p_zero)
+                    if fit_warn:
+                        warnings.warn(EXTR_WARN, ExtrapolationWarning)
+            except RuntimeError:
+                raise ExtrapolationError(EXTR_ERR) from None
             # The zero noise limit is ansatz(0)= asympt + b
             zero_limit = opt_params[0] + opt_params[1]
             return (zero_limit, opt_params)
@@ -509,12 +532,17 @@ class PolyExpFactory(BatchedFactory):
             # First guess for the parameter (decay or growth from "sign")
             p_zero = [sign, -1.0] + [0.0 for _ in range(order - 1)]
             try:
-                opt_params, _ = curve_fit(_ansatz_known,
-                                          instack,
-                                          outstack,
-                                          p0=p_zero)
-            except (RuntimeError, Warning) as err:
-                handle_exceptions(err)
+                with warnings.catch_warnings(record=True) as fit_warn:
+                    # Cause all warnings to always be triggered.
+                    warnings.simplefilter("always")
+                    opt_params, _ = curve_fit(_ansatz_known,
+                                              instack,
+                                              outstack,
+                                              p0=p_zero)
+                if fit_warn:
+                    warnings.warn(EXTR_WARN, ExtrapolationWarning)
+            except RuntimeError:
+                raise ExtrapolationError(EXTR_ERR) from None
             # The zero noise limit is ansatz(0)= asymptote + b
             zero_limit = asymptote + opt_params[0]
             return (zero_limit, [asymptote] + list(opt_params))
@@ -527,13 +555,17 @@ class PolyExpFactory(BatchedFactory):
         # Note: coefficients are ordered from high powers to powers of x
         # Weights "w" are used to compensate for error propagation
         # after the log transformation y --> z
-        try:
+
+        with warnings.catch_warnings(record=True) as fit_warn:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter("always")
             z_coefficients = np.polyfit(instack,
                                         zstack,
                                         deg=order,
                                         w=np.sqrt(np.abs(shifted_y)))
-        except Warning as err:
-            handle_exceptions(err)
+        if fit_warn:
+            warnings.warn(EXTR_WARN, ExtrapolationWarning)
+
         zero_limit = asymptote + sign * np.exp(z_coefficients[-1])
         # Parameters from low order to high order
         params = [asymptote] + list(z_coefficients[::-1])
@@ -622,8 +654,12 @@ class AdaExpFactory(Factory):
         # If asymptote is None we use 2 * scale_factor as third noise parameter
         if (len(self.instack) == 2) and (self.asymptote is None):
             return 2 * self.scale_factor
-        # Call self.reduce() in order to update self.history
-        self.reduce()
+
+        with warnings.catch_warnings():
+            # This is an intermediate fit, so we suppress its warning messages
+            warnings.simplefilter("ignore")
+            # Call reduce() to fit the exponent and save it in self.history
+            self.reduce()
         # Get the most recent fitted parameters from self.history
         _, _, params, _ = self.history[-1]
         # The exponent parameter is the 3rd element of params
