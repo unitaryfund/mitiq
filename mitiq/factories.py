@@ -103,6 +103,8 @@ class Factory(ABC):
             noise_to_expval: Function mapping noise scale to expectation vales.
             max_iterations: Maximum number of iterations (optional).
                             Default: 100.
+        Raises:
+            ConvergenceWarning: iteration loop stops before convergence.
         """
         # Clear out the factory to make sure it is fresh.
         self.reset()
@@ -168,6 +170,9 @@ class BatchedFactory(Factory):
     Args:
         scale_factors: Iterable of noise scale factors at which
                        expectation values should be measured.
+    Raises:
+        ValueError: if the scale_factors argument is not appropriate.
+        IndexError: if an iteration step fails.
     """
 
     def __init__(self, scale_factors: Iterable[float]) -> None:
@@ -211,7 +216,7 @@ class PolyFactory(BatchedFactory):
                It cannot exceed len(scale_factors) - 1.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
-        Warning: If the extrapolation fit is ill-conditioned.
+        ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
     Note:
         RichardsonFactory and LinearFactory are special cases of PolyFactory.
     """
@@ -245,6 +250,9 @@ class PolyFactory(BatchedFactory):
             outstack: y data values.
             order: Extrapolation order (degree of the polynomial fit).
                    It cannot exceed len(scale_factors) - 1.
+        Raises:
+            ValueError: If data is not consistent with the extrapolation model.
+            ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
         """
         # Check arguments
         error_str = (
@@ -289,7 +297,7 @@ class RichardsonFactory(BatchedFactory):
                        expectation values should be measured.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
-        Warning: If the extrapolation fit is ill-conditioned.
+        ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
     """
 
     def reduce(self) -> float:
@@ -312,7 +320,7 @@ class LinearFactory(BatchedFactory):
                        expectation values should be measured.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
-        Warning: If the extrapolation fit is ill-conditioned.
+        ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
     Example:
         >>> NOISE_LEVELS = [1.0, 2.0, 3.0]
         >>> fac = LinearFactory(NOISE_LEVELS)
@@ -348,8 +356,8 @@ class ExpFactory(BatchedFactory):
                    if asymptote is not None. The default value is False.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
-        RuntimeError: If the extrapolation fit fails.
-        Warning: If the extrapolation fit is ill-conditioned.
+        ExtrapolationError: If the extrapolation fit fails.
+        ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
     """
 
     def __init__(
@@ -405,8 +413,8 @@ class PolyExpFactory(BatchedFactory):
                    if asymptote is not None. The default value is False.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
-        RuntimeError: If the extrapolation fit fails.
-        Warning: If the extrapolation fit is ill-conditioned.
+        ExtrapolationError: If the extrapolation fit fails.
+        ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
     """
 
     def __init__(self,
@@ -466,8 +474,8 @@ class PolyExpFactory(BatchedFactory):
                            are the optimal fitting parameters.
         Raises:
             ValueError: If data is not consistent with the extrapolation model.
-            RuntimeError: If the extrapolation fit fails.
-            Warning: If the extrapolation fit is ill-conditioned.
+            ExtrapolationError: If the extrapolation fit fails.
+            ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
         """
         # Shift is 0 if asymptote is given, 1 if asymptote is not given
         shift = int(asymptote is None)
@@ -606,8 +614,8 @@ class AdaExpFactory(Factory):
                    if asymptote is not None. The default value is False.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
-        RuntimeError: If the extrapolation fit fails.
-        Warning: If the extrapolation fit is ill-conditioned.
+        ExtrapolationError: If the extrapolation fit fails.
+        ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
     """
 
     _SHIFT_FACTOR = 1.27846
