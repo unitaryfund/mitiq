@@ -86,7 +86,7 @@ the circuit instead of the left (or start).
 Finally, we mention ``fold_gates_at_random`` which folds gates according to the following rules.
 
     1. Gates are selected at random and folded until the input scale factor is reached.
-    2. No gate is folded more than once.
+    2. No gate is folded more than once for any ``scale_factor <= 3``.
     3. "Virtual gates" (i.e., gates appearing from folding) are never folded.
 
 All of these local folding methods can be called with any ``scale_factor >= 1``.
