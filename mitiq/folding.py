@@ -256,7 +256,7 @@ def fold_gates_from_left(
 
     Args:
         circuit: Circuit to fold.
-        scale_factor: Factor to scale the circuit by. Any real number in [1, 3].
+        scale_factor: Factor to scale the circuit by. Any real number >= 1.
 
     Keyword Args:
         squash_moments (bool): If True, all gates (including folded gates) are
@@ -268,10 +268,6 @@ def fold_gates_from_left(
 
     Returns:
         folded: the folded quantum circuit as a QPROGRAM.
-
-    Note:
-        Folding a single gate adds two gates to the circuit,
-        hence the maximum scale factor is 3 (when all gates are folded).
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -279,9 +275,14 @@ def fold_gates_from_left(
             " and cannot be folded."
         )
 
-    if not 1 <= scale_factor <= 3:
+    if not 1. <= scale_factor:
         raise ValueError(
-            "The scale factor must be a real number between 1 and 3."
+            f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
+        )
+
+    if scale_factor > 3.:
+        return _fold_local(
+            circuit, scale_factor, fold_method=fold_gates_from_left, **kwargs
         )
 
     folded = deepcopy(circuit)
@@ -323,7 +324,7 @@ def fold_gates_from_right(
 
     Args:
         circuit: Circuit to fold.
-        scale_factor: Factor to scale the circuit by. Any real number in [1, 3].
+        scale_factor: Factor to scale the circuit by. Any real number >= 1.
 
     Keyword Args:
         squash_moments (bool): If True, all gates (including folded gates) are
@@ -335,10 +336,6 @@ def fold_gates_from_right(
 
     Returns:
         folded: the folded quantum circuit as a QPROGRAM.
-
-    Note:
-        Folding a single gate adds two gates to the circuit,
-        hence the maximum scale factor is 3.
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -412,7 +409,7 @@ def fold_gates_at_random(
 
     Args:
         circuit: Circuit to fold.
-        scale_factor: Factor to scale the circuit by. Any real number in [1, 3].
+        scale_factor: Factor to scale the circuit by. Any real number >= 1.
         seed: [Optional] Integer seed for random number generator.
 
     Keyword Args:
@@ -425,10 +422,6 @@ def fold_gates_at_random(
 
     Returns:
         folded: the folded quantum circuit as a QPROGRAM.
-
-    Note:
-        Folding a single gate adds two gates to the circuit, hence the maximum
-        scale factor is 3.
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -436,9 +429,18 @@ def fold_gates_at_random(
             " and cannot be folded."
         )
 
-    if not 1 <= scale_factor <= 3:
+    if not 1. <= scale_factor:
         raise ValueError(
-            "The scale factor must be a real number between 1 and 3."
+            f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
+        )
+
+    if scale_factor > 3.:
+        return _fold_local(
+            circuit,
+            scale_factor,
+            fold_method=fold_gates_at_random,
+            fold_method_args=(seed,),
+            **kwargs
         )
 
     folded = deepcopy(circuit)
@@ -504,18 +506,16 @@ def fold_gates_at_random(
     return folded
 
 
-@converter
-def fold_local(
-    circuit: QPROGRAM,
+def _fold_local(
+    circuit: Circuit,
     scale_factor: float,
-    fold_method: Callable[
-        [Circuit, float, Tuple[Any]], Circuit
-    ] = fold_gates_from_left,
+    fold_method: Callable[[Circuit, float, Tuple[Any]], Circuit],
     fold_method_args: Tuple[Any] = (),
     **kwargs
-) -> QPROGRAM:
-    """Returns a folded circuit by folding gates according to the input
-    fold method.
+) -> Circuit:
+    """Helper function for implementing a local folding method (which nominally
+    requires 1 <= scale_factor <= 3) at any scale_factor >= 1. Returns a folded
+    circuit by folding gates according to the input fold method.
 
     Args:
         circuit: Circuit to fold.
@@ -530,16 +530,9 @@ def fold_local(
             placed as early as possible in the circuit. If False, new moments
             are created for folded gates. This option only applies to QPROGRAM
             types which have a "moment" or "time" structure. Default is True.
-        return_mitiq (bool): If True, returns a mitiq circuit instead of
-            the input circuit type (if different). Default is False.
 
     Returns:
-        folded: the folded quantum circuit as a QPROGRAM.
-
-    Example:
-        >>> fold_method = fold_gates_at_random
-        >>> fold_method_args = (1,)
-        Uses a seed of one for the fold_gates_at_random method.
+        folded: The folded quantum circuit as a Cirq Circuit.
 
     Note:
         `fold_method` defines the strategy for folding gates, which could be
