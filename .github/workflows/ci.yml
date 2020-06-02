@@ -1,8 +1,11 @@
 name: Python Build
 
 on:
+  push:
+    branches:
+      - master
   pull_request:
-    types: [review_requested]
+    types: [assigned, review_requested]
 
 jobs:
   build:
