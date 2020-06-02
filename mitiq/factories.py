@@ -17,7 +17,7 @@ class ExtrapolationError(Exception):
     pass
 
 
-EXTR_ERR = ("The extrapolation fit failed to converge."
+_EXTR_ERR = ("The extrapolation fit failed to converge."
             " The problem may be solved by switching to a more stable"
             " extrapolation model such as `LinearFactory`.")
 
@@ -29,7 +29,7 @@ class ExtrapolationWarning(Warning):
     pass
 
 
-EXTR_WARN = (" The extrapolation fit may be ill-conditioned."
+_EXTR_WARN = (" The extrapolation fit may be ill-conditioned."
              " Likely, more data points are necessary to fit the parameters"
              " of the model.")
 
@@ -174,8 +174,8 @@ class BatchedFactory(Factory):
         scale_factors: Iterable of noise scale factors at which
                        expectation values should be measured.
     Raises:
-        ValueError: if the scale_factors argument is not appropriate.
-        IndexError: if an iteration step fails.
+        ValueError: If number of scale factors is less than 2.
+        IndexError: If an iteration step fails.
     """
 
     def __init__(self, scale_factors: Iterable[float]) -> None:
@@ -277,7 +277,7 @@ class PolyFactory(BatchedFactory):
             warnings.simplefilter("always")
             coefficients = np.polyfit(instack, outstack, deg=order)
         if fit_warn:
-            warnings.warn(EXTR_WARN, ExtrapolationWarning)
+            warnings.warn(_EXTR_WARN, ExtrapolationWarning)
         # c_0, i.e., the value of p(x) at x=0, is returned
         return coefficients[-1]
 
@@ -501,7 +501,7 @@ class PolyExpFactory(BatchedFactory):
             # Deduce if the exponential is a decay or a growth
             slope, _ = np.polyfit(instack, outstack, deg=1)
         if fit_warn:
-            warnings.warn(EXTR_WARN, ExtrapolationWarning)
+            warnings.warn(_EXTR_WARN, ExtrapolationWarning)
 
         # Deduce "sign" parameter of the exponential ansatz
         sign = np.sign(-slope)
@@ -531,9 +531,9 @@ class PolyExpFactory(BatchedFactory):
                                               outstack,
                                               p0=p_zero)
                     if fit_warn:
-                        warnings.warn(EXTR_WARN, ExtrapolationWarning)
+                        warnings.warn(_EXTR_WARN, ExtrapolationWarning)
             except RuntimeError:
-                raise ExtrapolationError(EXTR_ERR) from None
+                raise ExtrapolationError(_EXTR_ERR) from None
             # The zero noise limit is ansatz(0)= asympt + b
             zero_limit = opt_params[0] + opt_params[1]
             return (zero_limit, opt_params)
@@ -551,9 +551,9 @@ class PolyExpFactory(BatchedFactory):
                                               outstack,
                                               p0=p_zero)
                 if fit_warn:
-                    warnings.warn(EXTR_WARN, ExtrapolationWarning)
+                    warnings.warn(_EXTR_WARN, ExtrapolationWarning)
             except RuntimeError:
-                raise ExtrapolationError(EXTR_ERR) from None
+                raise ExtrapolationError(_EXTR_ERR) from None
             # The zero noise limit is ansatz(0)= asymptote + b
             zero_limit = asymptote + opt_params[0]
             return (zero_limit, [asymptote] + list(opt_params))
@@ -575,7 +575,7 @@ class PolyExpFactory(BatchedFactory):
                                         deg=order,
                                         w=np.sqrt(np.abs(shifted_y)))
         if fit_warn:
-            warnings.warn(EXTR_WARN, ExtrapolationWarning)
+            warnings.warn(_EXTR_WARN, ExtrapolationWarning)
 
         zero_limit = asymptote + sign * np.exp(z_coefficients[-1])
         # Parameters from low order to high order
