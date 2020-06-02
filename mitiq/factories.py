@@ -11,9 +11,10 @@ from scipy.optimize import curve_fit
 
 
 class ExtrapolationError(Exception):
-    """Error raised by `mitiq.factories.Factory` objects when
+    """Error raised by :class:`.Factory` objects when
     the extrapolation fit fails.
     """
+    pass
 
 
 EXTR_ERR = ("The extrapolation fit failed to converge."
@@ -22,9 +23,10 @@ EXTR_ERR = ("The extrapolation fit failed to converge."
 
 
 class ExtrapolationWarning(Warning):
-    """Warning raised by `mitiq.factories.Factory` objects when
+    """Warning raised by :class:`.Factory` objects when
     the extrapolation fit is ill-conditioned.
     """
+    pass
 
 
 EXTR_WARN = (" The extrapolation fit may be ill-conditioned."
@@ -33,9 +35,10 @@ EXTR_WARN = (" The extrapolation fit may be ill-conditioned."
 
 
 class ConvergenceWarning(Warning):
-    """Warning raised by `mitiq.factories.Factory` objects when
+    """Warning raised by :class:`.Factory` objects when
     their `iterate` method fails to converge.
     """
+    pass
 
 
 class Factory(ABC):
