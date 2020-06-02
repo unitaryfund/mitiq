@@ -1,6 +1,13 @@
 name: Python Build
 
 on:
+  # Trigger the workflow on pull request,
+  # for the master branch
+  pull_request:
+    types: [closed]
+      branches:
+        - master
+
   pull_request:
     types: [assigned, review_requested]
 
