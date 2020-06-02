@@ -86,8 +86,6 @@ performance.
 
     Mitigation provides a 97.6 factor of improvement.
 
-The variance in the mitigated expectation value is now stored in ``var``.
-
 You can also use ``mitiq`` to wrap your backend execution function into an
 error-mitigated version.
 
