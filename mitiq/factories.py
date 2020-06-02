@@ -174,7 +174,7 @@ class BatchedFactory(Factory):
         scale_factors: Iterable of noise scale factors at which
                        expectation values should be measured.
     Raises:
-        ValueError: If number of scale factors is less than 2.
+        ValueError: If the number of scale factors is less than 2.
         IndexError: If an iteration step fails.
     """
 
