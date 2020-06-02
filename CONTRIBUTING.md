@@ -6,7 +6,7 @@ Contributions are welcome, and they are greatly appreciated, every little helps.
 You can begin contributing to `mitiq` code by raising an
 [issue](https://github.com/unitaryfund/mitiq/issues/new), reporting a bug or
 proposing a new feature request, using the labels to organize it.
-You can use `mitiq.about()` to document your dependencies and work environment.
+Please use `mitiq.about.about()` to document your dependencies and working environment.
 
 ## Opening a pull request
 You can open a [pull request](https://github.com/unitaryfund/mitiq/pulls) by pushing changes from a local branch, explaining the bug fix or new feature.
@@ -45,10 +45,10 @@ In order to install all the libraries useful for contributing to the development
 This command will use `pip` to read the requirements contained in `requirements.txt` and `development_requirements.txt`
 
 ### Adding tests
-If you add new features to a function or class, it is strongly encouraged to add tests for such function. Mitiq uses a nested structure for packaging tests in directories named `tests` at the same level of each module.
+If you add new features to a function or class, it is strongly encouraged to add tests for such object. Mitiq uses a nested structure for packaging tests in directories named `tests` at the same level of each module.
 
 ### Updating the documentation
-Follow the guidelines in the Contributing to docs [file](docs/README-docs.md), which include updating the API-doc list of modules and wiriting examples in the users guide.
+Follow the guidelines in the Contributing to docs [instructions](docs/build/read_README-docs.rst) (look here on [GitHub](https://github.com/unitaryfund/mitiq/blob/master/docs/README-docs.md)), which include guidelines about updating the API-doc list of modules and writing examples in the users guide.
 
 ### Checking local tests
 You can check that tests run with `pytest`. The `test_build.sh` file contains some bash commands to automate all tests. If you added new test packages, add them there too, so that they will be tested also in continuous integration. To test this run from root
