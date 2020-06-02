@@ -265,7 +265,7 @@ def test_few_points_error():
 
 
 def test_failing_fit_error():
-    """Test error handinling for a failing fit."""
+    """Test error handling for a failing fit."""
     fac = ExpFactory(X_VALS, asymptote=None)
     fac.instack = X_VALS
     fac.outstack = [1.0, 2.0, 1.0, 2.0]
