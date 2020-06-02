@@ -70,15 +70,10 @@ Ensure that you have installed the development environment. Then
 you can run tests and build the docs with `./test_build.sh`.
 
 ## Contributing
-You can contribute to `mitiq` code by raising an
-[issue](https://github.com/unitaryfund/mitiq/issues/new) reporting a bug or
-proposing new feature, using the labels to organize it. You can open a
-[pull request](https://github.com/unitaryfund/mitiq/pulls) by pushing changes
-from a local branch, explaining the bug fix or new feature.
-You can use `mitiq.about()` to document your dependencies and work environment.
+You can find information on contributing to `mitiq` code in the [contributing guidelines](CONTRIBUTING.md).
 
 To contribute to the documentation, read the
-[instructions](docs/source/README-docs.md) in the `mitiq/docs` folder.
+[instructions](docs/README-docs.md) in the `mitiq/docs` folder.
 
 
 ## Authors
