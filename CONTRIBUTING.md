@@ -1,6 +1,6 @@
 # Contributing to mitiq
 
-Contributions are welcome, and they are greatly appreciated, every little helps.
+Contributions are welcome, and they are greatly appreciated, every little bit helps.
 
 ## Opening an issue
 You can begin contributing to `mitiq` code by raising an
