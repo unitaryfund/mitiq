@@ -2,7 +2,7 @@ name: Python Build
 
 on:
   pull_request:
-    types: [review_requested]
+    types: [assigned, review_requested]
 
 jobs:
   build:
