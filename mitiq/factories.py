@@ -273,8 +273,6 @@ class PolyFactory(BatchedFactory):
         # Get coefficients {c_j} of p(x)= c_0 + c_1*x + c_2*x**2...
         # which best fits the data
         with warnings.catch_warnings(record=True) as fit_warn:
-            # Cause all warnings to always be triggered.
-            warnings.simplefilter("always")
             coefficients = np.polyfit(instack, outstack, deg=order)
         if fit_warn:
             warnings.warn(_EXTR_WARN, ExtrapolationWarning)
@@ -496,8 +494,6 @@ class PolyExpFactory(BatchedFactory):
                              f" of data points minus {1 + shift}.")
 
         with warnings.catch_warnings(record=True) as fit_warn:
-            # Cause all warnings to always be triggered.
-            warnings.simplefilter("always")
             # Deduce if the exponential is a decay or a growth
             slope, _ = np.polyfit(instack, outstack, deg=1)
         if fit_warn:
@@ -524,8 +520,6 @@ class PolyExpFactory(BatchedFactory):
             p_zero = [0.0, sign, -1.0] + [0.0 for _ in range(order - 1)]
             try:
                 with warnings.catch_warnings(record=True) as fit_warn:
-                    # Cause all warnings to always be triggered.
-                    warnings.simplefilter("always")
                     opt_params, _ = curve_fit(_ansatz_unknown,
                                               instack,
                                               outstack,
@@ -544,8 +538,6 @@ class PolyExpFactory(BatchedFactory):
             p_zero = [sign, -1.0] + [0.0 for _ in range(order - 1)]
             try:
                 with warnings.catch_warnings(record=True) as fit_warn:
-                    # Cause all warnings to always be triggered.
-                    warnings.simplefilter("always")
                     opt_params, _ = curve_fit(_ansatz_known,
                                               instack,
                                               outstack,
@@ -568,8 +560,6 @@ class PolyExpFactory(BatchedFactory):
         # after the log transformation y --> z
 
         with warnings.catch_warnings(record=True) as fit_warn:
-            # Cause all warnings to always be triggered.
-            warnings.simplefilter("always")
             z_coefficients = np.polyfit(instack,
                                         zstack,
                                         deg=order,
