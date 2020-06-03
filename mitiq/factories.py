@@ -47,7 +47,7 @@ def _mitiq_curve_fit(ansatz: Callable[..., float],
                      outstack: List[float],
                      init_params: Optional[List[float]] = None,
                      ) -> List[float]:
-    """This is a wrapping of `scipy.optimize.curve_fit` function with
+    """This is a wrapping of the `scipy.optimize.curve_fit` function with
     custom errors and warnings. It is used to make a non-linear fit.
 
     Args:
@@ -64,7 +64,6 @@ def _mitiq_curve_fit(ansatz: Callable[..., float],
         ExtrapolationError: If the extrapolation fit fails.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
     """
-
     try:
         with warnings.catch_warnings():
             # ignore OptimizeWarning
