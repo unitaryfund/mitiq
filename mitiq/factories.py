@@ -65,20 +65,20 @@ def _mitiq_curve_fit(ansatz: Callable[..., float],
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
     """
     try:
-        with warnings.catch_warnings():
-            # ignore OptimizeWarning
-            warnings.simplefilter("ignore", OptimizeWarning)
+        with warnings.catch_warnings(record=True) as warn_list:
             opt_params, _ = curve_fit(ansatz,
                                       instack,
                                       outstack,
                                       p0=init_params)
-            # repeat to catch OptimizeWarning as an error
-            warnings.simplefilter("error", OptimizeWarning)
-            curve_fit(ansatz, instack, outstack, p0=init_params)
+        for warn in warn_list:
+            # replace OptimizeWarning with ExtrapolationWarning
+            if warn.category is OptimizeWarning:
+                warn.category = ExtrapolationWarning
+                warn.message = _EXTR_WARN
+            # re-raise all warnings
+            warnings.warn(warn.message, warn.category)
     except RuntimeError:
         raise ExtrapolationError(_EXTR_ERR) from None
-    except OptimizeWarning:
-        warnings.warn(_EXTR_WARN, ExtrapolationWarning)
     return opt_params
 
 
@@ -87,7 +87,7 @@ def _mitiq_polyfit(instack: List[float],
                    deg: int,
                    weights: Optional[List[float]] = None) -> List[float]:
     """This is a wrapping of the `numpy.polyfit` function with
-    custom errors and warnings. It is used to make a polynomial fit.
+    custom warnings. It is used to make a polynomial fit.
 
     Args:
         instack: The array of noise scale factors.
@@ -100,16 +100,15 @@ def _mitiq_polyfit(instack: List[float],
     Raises:
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
     """
-    try:
-        with warnings.catch_warnings():
-            # ignore RankWarning
-            warnings.simplefilter("ignore", RankWarning)
-            opt_params = np.polyfit(instack, outstack, deg, w=weights)
-            # repeat to catch RankWarning as an error
-            warnings.simplefilter("error", RankWarning)
-            np.polyfit(instack, outstack, deg, w=weights)
-    except RankWarning:
-        warnings.warn(_EXTR_WARN, ExtrapolationWarning)
+    with warnings.catch_warnings(record=True) as warn_list:
+        opt_params = np.polyfit(instack, outstack, deg, w=weights)
+    for warn in warn_list:
+        # replace RankWarning with ExtrapolationWarning
+        if warn.category is RankWarning:
+            warn.category = ExtrapolationWarning
+            warn.message = _EXTR_WARN
+        # re-raise all warnings
+        warnings.warn(warn.message, warn.category)
     return opt_params
 
 
