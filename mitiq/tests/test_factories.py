@@ -24,7 +24,7 @@ A = 0.5
 B = 0.7
 C = 0.4
 D = 0.3
-X_VALS = [1, 1.3, 1.7, 2.2]
+X_VALS = [1, 1.3, 1.7, 2.2, 2.4]
 
 STAT_NOISE = 0.0001
 CLOSE_TOL = 1.0e-2
@@ -268,7 +268,7 @@ def test_failing_fit_error():
     """Test error handling for a failing fit."""
     fac = ExpFactory(X_VALS, asymptote=None)
     fac.instack = X_VALS
-    fac.outstack = [1.0, 2.0, 1.0, 2.0]
+    fac.outstack = [1.0, 2.0, 1.0, 2.0, 1.0]
     with raises(ExtrapolationError,
                 match=r"The extrapolation fit failed to converge."):
         fac.reduce()

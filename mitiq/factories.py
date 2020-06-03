@@ -7,7 +7,8 @@ from mitiq import QPROGRAM
 from typing import List, Iterable, Optional, Tuple, Callable
 from abc import ABC, abstractmethod
 import numpy as np
-from scipy.optimize import curve_fit
+from numpy.lib.polynomial import RankWarning
+from scipy.optimize import curve_fit, OptimizeWarning
 
 
 class ExtrapolationError(Exception):
@@ -18,8 +19,8 @@ class ExtrapolationError(Exception):
 
 
 _EXTR_ERR = ("The extrapolation fit failed to converge."
-            " The problem may be solved by switching to a more stable"
-            " extrapolation model such as `LinearFactory`.")
+             " The problem may be solved by switching to a more stable"
+             " extrapolation model such as `LinearFactory`.")
 
 
 class ExtrapolationWarning(Warning):
@@ -30,8 +31,8 @@ class ExtrapolationWarning(Warning):
 
 
 _EXTR_WARN = (" The extrapolation fit may be ill-conditioned."
-             " Likely, more data points are necessary to fit the parameters"
-             " of the model.")
+              " Likely, more data points are necessary to fit the parameters"
+              " of the model.")
 
 
 class ConvergenceWarning(Warning):
@@ -39,6 +40,78 @@ class ConvergenceWarning(Warning):
     their `iterate` method fails to converge.
     """
     pass
+
+
+def _mitiq_curve_fit(ansatz: Callable[..., float],
+                     instack: List[float],
+                     outstack: List[float],
+                     init_params: Optional[List[float]] = None,
+                     ) -> List[float]:
+    """This is a wrapping of `scipy.optimize.curve_fit` function with
+    custom errors and warnings. It is used to make a non-linear fit.
+
+    Args:
+        ansatz : The model function used for zero-noise extrapolation.
+                 The first argument is the noise scale variable,
+                 the remaining arguments are the parameters to fit.
+        instack: The array of noise scale factors.
+        outstack: The array of expectation values.
+        init_params: Initial guess for the parameters.
+                     If None, the initial values are set to 1.
+    Returns:
+        opt_params: The array of optimal parameters.
+    Raises:
+        ExtrapolationError: If the extrapolation fit fails.
+        ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
+    """
+
+    try:
+        with warnings.catch_warnings():
+            # ignore OptimizeWarning
+            warnings.simplefilter("ignore", OptimizeWarning)
+            opt_params, _ = curve_fit(ansatz,
+                                      instack,
+                                      outstack,
+                                      p0=init_params)
+            # repeat to catch OptimizeWarning as an error
+            warnings.simplefilter("error", OptimizeWarning)
+            curve_fit(ansatz, instack, outstack, p0=init_params)
+    except RuntimeError:
+        raise ExtrapolationError(_EXTR_ERR) from None
+    except OptimizeWarning:
+        warnings.warn(_EXTR_WARN, ExtrapolationWarning)
+    return opt_params
+
+
+def _mitiq_polyfit(instack: List[float],
+                   outstack: List[float],
+                   deg: int,
+                   weights: Optional[List[float]] = None) -> List[float]:
+    """This is a wrapping of the `numpy.polyfit` function with
+    custom errors and warnings. It is used to make a polynomial fit.
+
+    Args:
+        instack: The array of noise scale factors.
+        outstack: The array of expectation values.
+        deg: The degree of the polynomial fit.
+        weights: Optional array of weights for each sampled point.
+                 This is used to make a weighted least squares fit.
+    Returns:
+        opt_params: The array of optimal parameters.
+    Raises:
+        ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
+    """
+    try:
+        with warnings.catch_warnings():
+            # ignore RankWarning
+            warnings.simplefilter("ignore", RankWarning)
+            opt_params = np.polyfit(instack, outstack, deg, w=weights)
+            # repeat to catch RankWarning as an error
+            warnings.simplefilter("error", RankWarning)
+            np.polyfit(instack, outstack, deg, w=weights)
+    except RankWarning:
+        warnings.warn(_EXTR_WARN, ExtrapolationWarning)
+    return opt_params
 
 
 class Factory(ABC):
@@ -249,8 +322,8 @@ class PolyFactory(BatchedFactory):
         and RichardsonFactory.
 
         Args:
-            instack: x data values.
-            outstack: y data values.
+            instack: The array of noise scale factors.
+            outstack: The array of expectation values.
             order: Extrapolation order (degree of the polynomial fit).
                    It cannot exceed len(scale_factors) - 1.
         Raises:
@@ -272,10 +345,7 @@ class PolyFactory(BatchedFactory):
             )
         # Get coefficients {c_j} of p(x)= c_0 + c_1*x + c_2*x**2...
         # which best fits the data
-        with warnings.catch_warnings(record=True) as fit_warn:
-            coefficients = np.polyfit(instack, outstack, deg=order)
-        if fit_warn:
-            warnings.warn(_EXTR_WARN, ExtrapolationWarning)
+        coefficients = _mitiq_polyfit(instack, outstack, deg=order)
         # c_0, i.e., the value of p(x) at x=0, is returned
         return coefficients[-1]
 
@@ -493,13 +563,8 @@ class PolyExpFactory(BatchedFactory):
                              "The order cannot exceed the number"
                              f" of data points minus {1 + shift}.")
 
-        with warnings.catch_warnings(record=True) as fit_warn:
-            # Deduce if the exponential is a decay or a growth
-            slope, _ = np.polyfit(instack, outstack, deg=1)
-        if fit_warn:
-            warnings.warn(_EXTR_WARN, ExtrapolationWarning)
-
         # Deduce "sign" parameter of the exponential ansatz
+        slope, _ = _mitiq_polyfit(instack, outstack, deg=1)
         sign = np.sign(-slope)
 
         def _ansatz_unknown(x: float, *coeffs: float):
@@ -518,16 +583,10 @@ class PolyExpFactory(BatchedFactory):
         if asymptote is None:
             # First guess for the parameter (decay or growth from "sign" to 0)
             p_zero = [0.0, sign, -1.0] + [0.0 for _ in range(order - 1)]
-            try:
-                with warnings.catch_warnings(record=True) as fit_warn:
-                    opt_params, _ = curve_fit(_ansatz_unknown,
-                                              instack,
-                                              outstack,
-                                              p0=p_zero)
-                    if fit_warn:
-                        warnings.warn(_EXTR_WARN, ExtrapolationWarning)
-            except RuntimeError:
-                raise ExtrapolationError(_EXTR_ERR) from None
+            opt_params = _mitiq_curve_fit(_ansatz_unknown,
+                                          instack,
+                                          outstack,
+                                          p_zero)
             # The zero noise limit is ansatz(0)= asympt + b
             zero_limit = opt_params[0] + opt_params[1]
             return (zero_limit, opt_params)
@@ -536,16 +595,10 @@ class PolyExpFactory(BatchedFactory):
         if avoid_log:
             # First guess for the parameter (decay or growth from "sign")
             p_zero = [sign, -1.0] + [0.0 for _ in range(order - 1)]
-            try:
-                with warnings.catch_warnings(record=True) as fit_warn:
-                    opt_params, _ = curve_fit(_ansatz_known,
-                                              instack,
-                                              outstack,
-                                              p0=p_zero)
-                if fit_warn:
-                    warnings.warn(_EXTR_WARN, ExtrapolationWarning)
-            except RuntimeError:
-                raise ExtrapolationError(_EXTR_ERR) from None
+            opt_params = _mitiq_curve_fit(_ansatz_known,
+                                          instack,
+                                          outstack,
+                                          p_zero)
             # The zero noise limit is ansatz(0)= asymptote + b
             zero_limit = asymptote + opt_params[0]
             return (zero_limit, [asymptote] + list(opt_params))
@@ -558,15 +611,11 @@ class PolyExpFactory(BatchedFactory):
         # Note: coefficients are ordered from high powers to powers of x
         # Weights "w" are used to compensate for error propagation
         # after the log transformation y --> z
-
-        with warnings.catch_warnings(record=True) as fit_warn:
-            z_coefficients = np.polyfit(instack,
+        z_coefficients = _mitiq_polyfit(instack,
                                         zstack,
                                         deg=order,
-                                        w=np.sqrt(np.abs(shifted_y)))
-        if fit_warn:
-            warnings.warn(_EXTR_WARN, ExtrapolationWarning)
-
+                                        weights=np.sqrt(np.abs(shifted_y)))
+        # The zero noise limit is ansatz(0)
         zero_limit = asymptote + sign * np.exp(z_coefficients[-1])
         # Parameters from low order to high order
         params = [asymptote] + list(z_coefficients[::-1])
@@ -658,7 +707,7 @@ class AdaExpFactory(Factory):
 
         with warnings.catch_warnings():
             # This is an intermediate fit, so we suppress its warning messages
-            warnings.simplefilter("ignore")
+            warnings.simplefilter("ignore", ExtrapolationWarning)
             # Call reduce() to fit the exponent and save it in self.history
             self.reduce()
         # Get the most recent fitted parameters from self.history
