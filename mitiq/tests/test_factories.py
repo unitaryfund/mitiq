@@ -4,10 +4,13 @@ Testing of zero-noise extrapolation methods
 """
 
 from typing import Callable
-from pytest import mark
+from pytest import mark, raises, warns
 import numpy as np
 from numpy.random import RandomState
 from mitiq.factories import (
+    ExtrapolationError,
+    ExtrapolationWarning,
+    ConvergenceWarning,
     RichardsonFactory,
     LinearFactory,
     PolyFactory,
@@ -21,7 +24,7 @@ A = 0.5
 B = 0.7
 C = 0.4
 D = 0.3
-X_VALS = [1, 1.3, 1.7, 2.2]
+X_VALS = [1, 1.3, 1.7, 2.2, 2.4]
 
 STAT_NOISE = 0.0001
 CLOSE_TOL = 1.0e-2
@@ -244,3 +247,46 @@ def test_avoid_log_keyword():
     fac.avoid_log = True
     znl_without_log = fac.reduce()
     assert not znl_with_log == znl_without_log
+
+
+def test_few_scale_factors_error():
+    """Test that a wrong initialization error is raised."""
+    with raises(ValueError, match=r"The extrapolation order cannot exceed"):
+        _ = PolyFactory(X_VALS, order=10)
+
+
+def test_few_points_error():
+    """Test that the correct error is raised if data is not enough to fit."""
+    fac = PolyFactory(X_VALS, order=2)
+    fac.instack = [1.0, 2.0]
+    fac.outstack = [1.0, 2.0]
+    with raises(ValueError, match=r"Extrapolation order is too high."):
+        fac.reduce()
+
+
+def test_failing_fit_error():
+    """Test error handling for a failing fit."""
+    fac = ExpFactory(X_VALS, asymptote=None)
+    fac.instack = X_VALS
+    fac.outstack = [1.0, 2.0, 1.0, 2.0, 1.0]
+    with raises(ExtrapolationError,
+                match=r"The extrapolation fit failed to converge."):
+        fac.reduce()
+
+
+@mark.parametrize("fac", [LinearFactory([1, 1, 1]), ExpFactory([1, 1, 1])])
+def test_failing_fit_warnings(fac):
+    """Test that the correct warning is raised for an ill-conditioned fit."""
+    fac.instack = [1, 1, 1, 1]
+    fac.outstack = [1, 1, 1, 1]
+    with warns(ExtrapolationWarning,
+               match=r"The extrapolation fit may be ill-conditioned."):
+        fac.reduce()
+
+
+def test_iteration_warnings():
+    """Test that the correct warning is raised beyond the iteration limit."""
+    fac = LinearFactory(X_VALS)
+    with warns(ConvergenceWarning,
+               match=r"Factory iteration loop stopped before convergence."):
+        fac.iterate(lambda scale_factor: 1.0, max_iterations=3)
