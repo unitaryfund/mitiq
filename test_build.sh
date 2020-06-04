@@ -4,7 +4,7 @@
 # mitiq/mitiq_pyquil/tests
 if [ "$1" != "-docs" ]; then
     echo "Running Tests...";
-    pytest --cov=mitiq mitiq/tests mitiq/benchmarks/tests mitiq/mitiq_qiskit/tests;
+    pytest --cov=mitiq mitiq/tests mitiq/benchmarks/tests mitiq/mitiq_qiskit/tests mitiq/mitiq_pyquil/tests;
 elif [ "$1" != "-tests" ]; then
     echo "Building and Testing Docs...";
     cd docs && make html;
