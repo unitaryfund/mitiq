@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
         python-version: [3.8]
 
     steps:
@@ -35,10 +35,11 @@ jobs:
     - name: Install Python dependencies
       run: |
         python3 -m pip install --upgrade pip
-        pip install numpy~=1.18.1 scipy~=1.4.1 cirq~=0.7.0
-        pip install pyquil~=2.18.0 qiskit~=0.16.2
-        pip install pytest~=5.4.1 pytest-cov~=2.8.1 flake8~=3.7.9
-        python3 setup.py install
+        #pip install numpy~=1.18.1 scipy~=1.4.1 cirq~=0.7.0
+        #pip install pyquil~=2.18.0 qiskit~=0.16.2
+        #pip install pytest~=5.4.1 pytest-cov~=2.8.1 flake8~=3.7.9
+        #python3 setup.py install
+        pip install -e .[development]
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
