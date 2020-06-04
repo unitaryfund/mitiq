@@ -19,10 +19,9 @@ jobs:
       - name: Run root action with pip -e .[development] command
         uses: ./ # Uses an action in the root directory
         id: qvm
-#      - name: Set up qvm and quilc with docker
-#        # run: echo "The time was ${{ steps.hello.outputs.time }}"
-#        run: |
-#          docker pull rigetti/qvm
+      - name: Set up qvm and quilc with docker
+        run: |
+          docker pull rigetti/qvm
 #          docker run --rm -idt -p 5000:5000 rigetti/qvm -S
 #          docker run --rm -idt -p 5555:5555 rigetti/quilc -R
 #    - name: Test pyquil with pytest
