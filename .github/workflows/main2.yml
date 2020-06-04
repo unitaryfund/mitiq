@@ -16,9 +16,9 @@ jobs:
       # you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Run root action with pip -e .[development] command
-        uses: ./ # Uses an action in the root directory
-        id: qvm
+        # - name: Run root action with pip -e .[development] command
+        # uses: ./ # Uses an action in the root directory
+        # id: qvm
       - name: Set up qvm and quilc with docker
         run: |
           pip3 install --upgrade pip setuptools wheel
