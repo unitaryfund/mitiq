@@ -2,8 +2,8 @@ name: Docker Build
 
 on:
   push:
-    branches:
-      - master
+#    branches:
+#      - master
   pull_request:
     types: [push, assigned, review_requested]
 
