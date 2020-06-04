@@ -13,8 +13,7 @@ from cirq import Circuit
 # by mitiq based on what packages are installed in the environment
 SUPPORTED_PROGRAM_TYPES = {
     "cirq": "Circuit",
-    "qiskit": "QuantumCircuit",
-    "pyquil": "Program"
+    "qiskit": "QuantumCircuit"
 }
 AVAILABLE_PROGRAM_TYPES = {}
 
@@ -25,7 +24,10 @@ for (module, program_type) in SUPPORTED_PROGRAM_TYPES.items():
     except ImportError:
         pass
 
-QPROGRAM = Union[tuple(AVAILABLE_PROGRAM_TYPES)]
+QPROGRAM = Union[
+    tuple(f"{package}.{circuit}"
+     for package, circuit in AVAILABLE_PROGRAM_TYPES.items())
+]
 
 # this must be after QPROGRAM as the zne.py module imports QPROGRAM
 from mitiq.zne import execute_with_zne, mitigate_executor
