@@ -8,39 +8,46 @@ on:
     types: [push, assigned, review_requested]
 
 jobs:
-  docker_job:
-    runs-on: ubuntu-latest
-    name: A job to test pyquil with the qvm
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: [3.6, 3.7, 3.8]
+
     steps:
-      # To use this repository's private action,
-      # you must check out the repository
-      - name: Checkout
-        uses: actions/checkout@v2
-        # - name: Run root action with pip -e .[development] command
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
         # uses: ./ # Uses an action in the root directory
         # id: qvm
-      - name: Set up qvm and quilc with docker
-        run: |
-          pip3 install --upgrade pip setuptools wheel
-          # docker pull rigetti/qvm
-          # docker run --rm -idt -p 5000:5000 rigetti/qvm -S
-          # docker run --rm -idt -p 5555:5555 rigetti/quilc -R
-      - name: Install Python dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install numpy~=1.18.1 scipy~=1.4.1 cirq~=0.7.0
-          pip install pyquil~=2.18.0 qiskit~=0.16.2
-          pip install pytest~=5.4.1 pytest-cov~=2.8.1 flake8~=3.7.9
-          python3 setup.py install
-      - name: Lint with flake8
-        run: |
-          # stop the build if there are Python syntax errors or undefined names
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      - name: Test with pytest
-        run: |
-          ./test_build.sh -tests
+    - name: Set up qvm and quilc with docker
+      run: |
+        pip3 install --upgrade pip setuptools wheel
+        # docker pull rigetti/qvm
+        # docker run --rm -idt -p 5000:5000 rigetti/qvm -S
+        # docker run --rm -idt -p 5555:5555 rigetti/quilc -R
+    - name: Install Python dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install numpy~=1.18.1 scipy~=1.4.1 cirq~=0.7.0
+        pip install pyquil~=2.18.0 qiskit~=0.16.2
+        pip install pytest~=5.4.1 pytest-cov~=2.8.1 flake8~=3.7.9
+        python3 setup.py install
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Test with pytest
+      run: |
+        ./test_build.sh -tests
 #    - name: Test pyquil with pytest
 #      run: |
 #          chmod +x ./test_build.sh -tests-with-pyquil
