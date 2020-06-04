@@ -26,7 +26,7 @@ jobs:
           docker run --rm -idt -p 5555:5555 rigetti/quilc -R
       - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip
+          python3 -m pip install --upgrade pip
           pip install -e .[development]
       - name: Lint with flake8
         run: |
