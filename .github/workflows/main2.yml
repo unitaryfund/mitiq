@@ -5,7 +5,7 @@ on:
     branches:
       - master
   pull_request:
-    types: [assigned, review_requested]
+    types: [push, assigned, review_requested]
 
 jobs:
   docker_job:
