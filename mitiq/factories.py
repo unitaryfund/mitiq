@@ -113,7 +113,12 @@ def _mitiq_polyfit(instack: List[float],
             warn.category = ExtrapolationWarning
             warn.message = _EXTR_WARN
         # re-raise all warnings
-        warnings.warn(warn.message, warn.category)
+        warnings.warn_explicit(
+                warn.message,
+                warn.category,
+                warn.filename,
+                warn.lineno
+            )
     return opt_params
 
 
