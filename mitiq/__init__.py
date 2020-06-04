@@ -12,16 +12,16 @@ from cirq import Circuit
 # This is used to optionally import what program types should be allowed
 # by mitiq based on what packages are installed in the environment
 SUPPORTED_PROGRAM_TYPES = {
+    "cirq": "Circuit",
     "qiskit": "QuantumCircuit",
     "pyquil": "Program"
 }
-AVAILABLE_PROGRAM_TYPES = {Circuit}
+AVAILABLE_PROGRAM_TYPES = {}
 
 for (module, program_type) in SUPPORTED_PROGRAM_TYPES.items():
     try:
-        AVAILABLE_PROGRAM_TYPES.add(
-            exec(f"from {module} import {program_type}")
-        )
+        exec(f"from {module} import {program_type}")
+        AVAILABLE_PROGRAM_TYPES.update({module: program_type})
     except ImportError:
         pass
 
