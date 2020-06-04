@@ -22,9 +22,9 @@ jobs:
       - name: Set up qvm and quilc with docker
         run: |
           pip3 install --upgrade pip setuptools wheel
-          docker pull rigetti/qvm
-          docker run --rm -idt -p 5000:5000 rigetti/qvm -S
-          docker run --rm -idt -p 5555:5555 rigetti/quilc -R
+          # docker pull rigetti/qvm
+          # docker run --rm -idt -p 5000:5000 rigetti/qvm -S
+          # docker run --rm -idt -p 5555:5555 rigetti/quilc -R
       - name: Install Python dependencies
         run: |
           python3 -m pip install --upgrade pip
