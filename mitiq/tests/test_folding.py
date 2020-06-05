@@ -1470,3 +1470,83 @@ def test_fold_and_squash_random_circuits_random_stretches(fold_method):
             circuit, scale_factor=scale, squash_moments=True
         )
         assert len(folded_and_squashed) <= len(folded_not_squashed)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left,
+     fold_gates_from_right]
+)
+def test_fold_local_with_weights(fold_method):
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        ops.H.on_each(*qreg),
+        ops.CNOT.on(qreg[0], qreg[1]),
+        ops.T.on(qreg[2]),
+        ops.TOFFOLI.on(*qreg)
+    )
+    # Only fold the Toffoli gate
+    weights = {"H": 0., "T": 0., "CNOT": 0., "TOFFOLI": 3.}
+    folded = fold_method(
+        circ, scale_factor=2., weights=weights
+    )
+    correct = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3
+    )
+    assert _equal(folded, correct)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left,
+     fold_gates_from_right]
+)
+def test_fold_local_with_zero_weights_runtime_warning(fold_method):
+    """Makes sure a warning is raised if a the scale factor is not reached."""
+    qbit = LineQubit(0)
+    circ = Circuit([ops.H.on(qbit)] * 3)
+    with pytest.warns(RuntimeWarning, match="Scale factor not reached"):
+        fold_method(
+            circ, scale_factor=2., weights={"H": 0.1}
+        )
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left,
+     fold_gates_from_right]
+)
+def test_fold_local_with_single_qubit_gates_weighted_zero(fold_method):
+    """Tests folding only two-qubit gates by using weights = {"single": 0.}."""
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        ops.H.on_each(*qreg),
+        ops.CNOT.on(qreg[0], qreg[1]),
+        ops.T.on(qreg[2]),
+        ops.TOFFOLI.on(*qreg)
+    )
+    # Note: This scale_factor + weights makes sure all gates are passed over
+    # in the folding method, which we want to do here.
+    folded = fold_method(
+        circ, scale_factor=2., weights={"single": 0., "CNOT": 1, "TOFFOLI": 2}
+    )
+    correct = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3
+    )
+    assert _equal(folded, correct)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left,
+     fold_gates_from_right]
+)
+def test_fold_local_raises_error_with_negative_weights(fold_method):
+    with pytest.raises(ValueError, match="Negative weights were provided"):
+        fold_method(Circuit(), scale_factor=1.21, weights={"H": -1.})

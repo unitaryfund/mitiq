@@ -1,10 +1,8 @@
-"""Functions for folding gates in valid mitiq circuits.
+"""Functions for local and global unitary folding on supported circuits."""
 
-Public functions work for any circuit types supported by mitiq.
-Private functions work only for iternal mitiq circuit representations.
-"""
 from copy import deepcopy
 from typing import Any, Callable, Iterable, List, Optional, Tuple, Union
+import warnings
 
 import numpy as np
 
@@ -243,6 +241,49 @@ def _get_num_to_fold(scale_factor: float, ngates: int) -> int:
     return int(round(ngates * (scale_factor - 1.0) / 2.0))
 
 
+def _get_weight_for_gate(
+        weights: Union[dict, None],
+        op: ops.Operation
+) -> float:
+    """Returns the weight for a given gate, using a default value of 1.0 if
+    weights is None or if the weight is not specified.
+
+    Args:
+
+
+    """
+    if not weights:
+        return 1.
+
+    _cirq_gates_to_string_keys = {
+        ops.H: "H",
+        ops.X: "X",
+        ops.Y: "Y",
+        ops.Z: "Z",
+        ops.T: "T",
+        ops.I: "I",
+        ops.CNOT: "CNOT",
+        ops.CZ: "CZ",
+        ops.TOFFOLI: "TOFFOLI"
+    }
+
+    weight = 1.
+
+    if "single" in weights.keys() and len(op.qubits) == 1:
+        weight = weights["single"]
+    elif "double" in weights.keys() and len(op.qubits) == 2:
+        weight = weights["double"]
+    elif "triple" in weights.keys() and len(op.qubits) == 3:
+        weight = weights["triple"]
+
+    if op.gate in _cirq_gates_to_string_keys.keys():
+        # Get the string key for this gate
+        key = _cirq_gates_to_string_keys[op.gate]
+        if key in weights.keys():
+            weight = weights[_cirq_gates_to_string_keys[op.gate]]
+    return weight
+
+
 @converter
 def fold_gates_from_left(
         circuit: QPROGRAM, scale_factor: float, **kwargs
@@ -259,15 +300,45 @@ def fold_gates_from_left(
         scale_factor: Factor to scale the circuit by. Any real number >= 1.
 
     Keyword Args:
+        weights (dict): Dictionary which defines the relative noise for each
+            gate. Each key is a string which specifices the gate and each value
+            is the weight for each gate. For example, the weight dictionary
+            `weights = {"H": 1.0, "T": 0.5, "CNOT", 1.5}` means that T gates are
+            50% as noisy as Hadamard gates, and CNOT gates are 3x as noisy as
+            T gates. Gates not specified have a default weight of 1.0.
+
+            Weights can be any positive floating point value. Supported gate
+            keys are listed in the following table.
+
+            Gate key    | Gate
+            -------------------------
+            "H"         | Hadamard
+            "X"         | Pauli X
+            "Y"         | Pauli Y
+            "Z"         | Pauli Z
+            "I"         | Identity
+            "CNOT"      | CNOT
+            "CZ"        | CZ gate
+            "TOFFOLI"   | Toffoli gate
+            "single"    | All single qubit gates
+            "double"    | All two-qubit gates
+            "triple"    | All three-qubit gates
+
+            Note: If specific gate keys are present, they override the weight
+            for a "single", "double", or "triple". For example, if
+            `weights = {"double": 1.5, "CNOT": 1.2}`, the weight of a CNOT is
+            1.2 and the weight of every other two-qubit gates is 1.5.
+
         squash_moments (bool): If True, all gates (including folded gates) are
             placed as early as possible in the circuit. If False, new moments
             are created for folded gates. This option only applies to QPROGRAM
             types which have a "moment" or "time" structure. Default is True.
+
         return_mitiq (bool): If True, returns a mitiq circuit instead of
             the input circuit type (if different). Default is False.
 
     Returns:
-        folded: the folded quantum circuit as a QPROGRAM.
+        folded: The folded quantum circuit as a QPROGRAM.
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -285,8 +356,13 @@ def fold_gates_from_left(
             circuit, scale_factor, fold_method=fold_gates_from_left, **kwargs
         )
 
-    folded = deepcopy(circuit)
+    weights = kwargs.get("weights")
+    if weights and any(w < 0. for w in weights.values()):
+        raise ValueError(
+            "Negative weights were provided but weights should be non-negative."
+        )
 
+    folded = deepcopy(circuit)
     measurements = _pop_measurements(folded)
 
     ngates = len(list(folded.all_operations()))
@@ -294,17 +370,29 @@ def fold_gates_from_left(
     if num_to_fold == 0:
         _append_measurements(folded, measurements)
         return folded
-    num_folded = 0
-    moment_shift = 0
 
+    weight_folded = 0.
+
+    moment_shift = 0
+    iteration = 0
     for (moment_index, moment) in enumerate(circuit):
         for gate_index in range(len(moment)):
-            _fold_gate_at_index_in_moment(
-                folded, moment_index + moment_shift, gate_index
-            )
-            moment_shift += 2
-            num_folded += 1
-            if num_folded == num_to_fold:
+            iteration += 1
+            op = folded[moment_index + moment_shift].operations[gate_index]
+            weight = _get_weight_for_gate(weights, op)
+            if weight > 0.:
+                _fold_gate_at_index_in_moment(
+                    folded, moment_index + moment_shift, gate_index
+                )
+                moment_shift += 2
+                weight_folded += weight
+
+            if weight_folded >= num_to_fold or iteration == ngates:
+                if weight_folded < num_to_fold:
+                    warnings.warn(
+                        "Scale factor not reached in folding",
+                        category=RuntimeWarning
+                    )
                 _append_measurements(folded, measurements)
                 if not (kwargs.get("squash_moments") is False):
                     folded = squash_moments(folded)
@@ -327,15 +415,45 @@ def fold_gates_from_right(
         scale_factor: Factor to scale the circuit by. Any real number >= 1.
 
     Keyword Args:
+        weights (dict): Dictionary which defines the relative noise for each
+            gate. Each key is a string which specifices the gate and each value
+            is the weight for each gate. For example, the weight dictionary
+            `weights = {"H": 1.0, "T": 0.5, "CNOT", 1.5}` means that T gates are
+            50% as noisy as Hadamard gates, and CNOT gates are 3x as noisy as
+            T gates. Gates not specified have a default weight of 1.0.
+
+            Weights can be any positive floating point value. Supported gate
+            keys are listed in the following table.
+
+            Gate key    | Gate
+            -------------------------
+            "H"         | Hadamard
+            "X"         | Pauli X
+            "Y"         | Pauli Y
+            "Z"         | Pauli Z
+            "I"         | Identity
+            "CNOT"      | CNOT
+            "CZ"        | CZ gate
+            "TOFFOLI"   | Toffoli gate
+            "single"    | All single qubit gates
+            "double"    | All two-qubit gates
+            "triple"    | All three-qubit gates
+
+            Note: If specific gate keys are present, they override the weight
+            for a "single", "double", or "triple". For example, if
+            `weights = {"double": 1.5, "CNOT": 1.2}`, the weight of a CNOT is
+            1.2 and the weight of every other two-qubit gates is 1.5.
+
         squash_moments (bool): If True, all gates (including folded gates) are
             placed as early as possible in the circuit. If False, new moments
             are created for folded gates. This option only applies to QPROGRAM
             types which have a "moment" or "time" structure. Default is True.
+
         return_mitiq (bool): If True, returns a mitiq circuit instead of
             the input circuit type (if different). Default is False.
 
     Returns:
-        folded: the folded quantum circuit as a QPROGRAM.
+        folded: The folded quantum circuit as a QPROGRAM.
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -347,7 +465,10 @@ def fold_gates_from_right(
 
     reversed_circuit = Circuit(reversed(circuit))
     reversed_folded_circuit = fold_gates_from_left(
-        reversed_circuit, scale_factor, squash_moments=False
+        reversed_circuit,
+        scale_factor,
+        weights=kwargs.get("weights"),
+        squash_moments=False
     )
     folded = Circuit(reversed(reversed_folded_circuit))
 
