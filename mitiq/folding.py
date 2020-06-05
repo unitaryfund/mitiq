@@ -372,9 +372,8 @@ def fold_gates_from_left(
         return folded
 
     weight_folded = 0.
-
-    moment_shift = 0
     iteration = 0
+    moment_shift = 0
     for (moment_index, moment) in enumerate(circuit):
         for gate_index in range(len(moment)):
             iteration += 1
@@ -503,15 +502,11 @@ def _update_moment_indices(
         If a gate in the last moment is folded, moment_indices gets updates to
         {0: 0, 1: 1, ..., M - 1:, M + 1} since two moments are created in the
         process of folding the gate in the last moment.
-
-    TODO:
-        If another gate from the last moment is folded, we could put it
-        in the same moment as the previous folded gate.
     """
     if moment_index_where_gate_was_folded not in moment_indices.keys():
         raise ValueError(
-            f"Moment index {moment_index_where_gate_was_folded} not in moment"\
-            " indices"
+            f"Moment index {moment_index_where_gate_was_folded} not in moment"
+            " indices."
         )
     for i in moment_indices.keys():
         moment_indices[i] += 2 * int(i >= moment_index_where_gate_was_folded)
@@ -533,16 +528,47 @@ def fold_gates_at_random(
         scale_factor: Factor to scale the circuit by. Any real number >= 1.
         seed: [Optional] Integer seed for random number generator.
 
+
     Keyword Args:
+        weights (dict): Dictionary which defines the relative noise for each
+            gate. Each key is a string which specifices the gate and each value
+            is the weight for each gate. For example, the weight dictionary
+            `weights = {"H": 1.0, "T": 0.5, "CNOT", 1.5}` means that T gates are
+            50% as noisy as Hadamard gates, and CNOT gates are 3x as noisy as
+            T gates. Gates not specified have a default weight of 1.0.
+
+            Weights can be any positive floating point value. Supported gate
+            keys are listed in the following table.
+
+            Gate key    | Gate
+            -------------------------
+            "H"         | Hadamard
+            "X"         | Pauli X
+            "Y"         | Pauli Y
+            "Z"         | Pauli Z
+            "I"         | Identity
+            "CNOT"      | CNOT
+            "CZ"        | CZ gate
+            "TOFFOLI"   | Toffoli gate
+            "single"    | All single qubit gates
+            "double"    | All two-qubit gates
+            "triple"    | All three-qubit gates
+
+            Note: If specific gate keys are present, they override the weight
+            for a "single", "double", or "triple". For example, if
+            `weights = {"double": 1.5, "CNOT": 1.2}`, the weight of a CNOT is
+            1.2 and the weight of every other two-qubit gates is 1.5.
+
         squash_moments (bool): If True, all gates (including folded gates) are
             placed as early as possible in the circuit. If False, new moments
             are created for folded gates. This option only applies to QPROGRAM
             types which have a "moment" or "time" structure. Default is True.
+
         return_mitiq (bool): If True, returns a mitiq circuit instead of
             the input circuit type (if different). Default is False.
 
     Returns:
-        folded: the folded quantum circuit as a QPROGRAM.
+        folded: The folded quantum circuit as a QPROGRAM.
     """
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
@@ -564,34 +590,31 @@ def fold_gates_at_random(
             **kwargs
         )
 
-    folded = deepcopy(circuit)
+    weights = kwargs.get("weights")
+    if weights and any(w < 0. for w in weights.values()):
+        raise ValueError(
+            "Negative weights were provided but weights should be non-negative."
+        )
 
+    folded = deepcopy(circuit)
     measurements = _pop_measurements(folded)
 
-    if np.isclose(scale_factor, 3.0, atol=1e-3):
-        _fold_all_gates_locally(folded)
-        _append_measurements(folded, measurements)
-        if not (kwargs.get("squash_moments") is False):
-            folded = squash_moments(folded)
-        return folded
-
-    if seed:
-        # local random number generator with seed
-        rnd_state = np.random.RandomState(seed)
-    else:
-        # global random number generator of NumPy
-        rnd_state = np.random
+    # Seed the random number generator
+    rnd_state = np.random.RandomState(seed)
 
     ngates = len(list(folded.all_operations()))
     num_to_fold = _get_num_to_fold(scale_factor, ngates)
+    if num_to_fold == 0:
+        _append_measurements(folded, measurements)
+        return folded
 
     # Keep track of where moments are in the folded circuit
-    moment_indices = {i: i for i in range(len(circuit))}
+    moment_indices = {i: i for i in range(len(folded))}
 
     # Keep track of which gates we can fold in each moment
     remaining_gate_indices = {
-        moment: list(range(len(circuit[moment])))
-        for moment in range(len(circuit))
+        moment: list(range(len(folded[moment])))
+        for moment in range(len(folded)) if len(folded[moment]) > 0
     }
 
     # Any moment with at least one gate is fair game
@@ -599,27 +622,41 @@ def fold_gates_at_random(
         i for i in remaining_gate_indices.keys() if remaining_gate_indices[i]
     ]
 
-    for _ in range(num_to_fold):
+    weight_folded = 0.
+    while remaining_moment_indices:
         # Get a moment index and gate index from the remaining set
-
         moment_index = rnd_state.choice(remaining_moment_indices)
-        gate_index = rnd_state.choice(remaining_gate_indices[moment_index])  
+        gate_index = rnd_state.choice(remaining_gate_indices[moment_index])
+
+        # Get the weight of the gate at this moment index and gate index
+        op = folded[moment_indices[moment_index]].operations[gate_index]
+        weight = _get_weight_for_gate(weights, op)
 
         # Do the fold
-        _fold_gate_at_index_in_moment(
-            folded, moment_indices[moment_index], gate_index
-        )
+        if weight > 0.:
+            _fold_gate_at_index_in_moment(
+                folded, moment_indices[moment_index], gate_index
+            )
+            weight_folded += weight
 
-        # Update the moment indices for the folded circuit
-        _update_moment_indices(moment_indices, moment_index)
+            # Update the moment indices for the folded circuit
+            _update_moment_indices(moment_indices, moment_index)
 
-        # Remove the gate we folded from the remaining set of gates to fold
+        # Remove the current gate from the remaining set of gates to fold
         remaining_gate_indices[moment_index].remove(gate_index)
 
-        # If there are no gates left in the moment,
-        # remove the moment index from the remaining set
+        # If there are no gates left in this moment, remove the moment
         if not remaining_gate_indices[moment_index]:
             remaining_moment_indices.remove(moment_index)
+
+        if weight_folded >= num_to_fold:
+            break
+
+    if weight_folded < num_to_fold:
+        warnings.warn(
+            "Scale factor not reached in folding",
+            category=RuntimeWarning
+        )
 
     _append_measurements(folded, measurements)
     if not (kwargs.get("squash_moments") is False):

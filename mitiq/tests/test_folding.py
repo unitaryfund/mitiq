@@ -1475,7 +1475,8 @@ def test_fold_and_squash_random_circuits_random_stretches(fold_method):
 @pytest.mark.parametrize(
     "fold_method",
     [fold_gates_from_left,
-     fold_gates_from_right]
+     fold_gates_from_right,
+     fold_gates_at_random]
 )
 def test_fold_local_with_weights(fold_method):
     qreg = LineQubit.range(3)
@@ -1502,10 +1503,11 @@ def test_fold_local_with_weights(fold_method):
 @pytest.mark.parametrize(
     "fold_method",
     [fold_gates_from_left,
-     fold_gates_from_right]
+     fold_gates_from_right,
+     fold_gates_at_random]
 )
-def test_fold_local_with_zero_weights_runtime_warning(fold_method):
-    """Makes sure a warning is raised if a the scale factor is not reached."""
+def test_fold_local_raises_warning_when_scale_factor_not_reached(fold_method):
+    """Makes sure a warning is raised if the scale factor is not reached."""
     qbit = LineQubit(0)
     circ = Circuit([ops.H.on(qbit)] * 3)
     with pytest.warns(RuntimeWarning, match="Scale factor not reached"):
@@ -1517,7 +1519,8 @@ def test_fold_local_with_zero_weights_runtime_warning(fold_method):
 @pytest.mark.parametrize(
     "fold_method",
     [fold_gates_from_left,
-     fold_gates_from_right]
+     fold_gates_from_right,
+     fold_gates_at_random]
 )
 def test_fold_local_with_single_qubit_gates_weighted_zero(fold_method):
     """Tests folding only two-qubit gates by using weights = {"single": 0.}."""
@@ -1545,7 +1548,8 @@ def test_fold_local_with_single_qubit_gates_weighted_zero(fold_method):
 @pytest.mark.parametrize(
     "fold_method",
     [fold_gates_from_left,
-     fold_gates_from_right]
+     fold_gates_from_right,
+     fold_gates_at_random]
 )
 def test_fold_local_raises_error_with_negative_weights(fold_method):
     with pytest.raises(ValueError, match="Negative weights were provided"):
