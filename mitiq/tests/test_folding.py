@@ -1478,7 +1478,8 @@ def test_fold_and_squash_random_circuits_random_stretches(fold_method):
      fold_gates_from_right,
      fold_gates_at_random]
 )
-def test_fold_local_with_weights(fold_method):
+@pytest.mark.parametrize("qiskit", [True, False])
+def test_fold_local_with_weights(fold_method, qiskit):
     qreg = LineQubit.range(3)
     circ = Circuit(
         ops.H.on_each(*qreg),
@@ -1486,6 +1487,8 @@ def test_fold_local_with_weights(fold_method):
         ops.T.on(qreg[2]),
         ops.TOFFOLI.on(*qreg)
     )
+    if qiskit:
+        circ = convert_from_mitiq(circ, "qiskit")
     # Only fold the Toffoli gate
     weights = {"H": 0., "T": 0., "CNOT": 0., "TOFFOLI": 3.}
     folded = fold_method(
@@ -1497,7 +1500,11 @@ def test_fold_local_with_weights(fold_method):
         [ops.T.on(qreg[2])],
         [ops.TOFFOLI.on(*qreg)] * 3
     )
-    assert _equal(folded, correct)
+    if qiskit:
+        folded, _ = convert_to_mitiq(folded)
+        assert equal_up_to_global_phase(folded.unitary(), correct.unitary())
+    else:
+        assert _equal(folded, correct)
 
 
 @pytest.mark.parametrize(
@@ -1522,7 +1529,8 @@ def test_fold_local_raises_warning_when_scale_factor_not_reached(fold_method):
      fold_gates_from_right,
      fold_gates_at_random]
 )
-def test_fold_local_with_single_qubit_gates_weighted_zero(fold_method):
+@pytest.mark.parametrize("qiskit", [True, False])
+def test_fold_local_with_single_qubit_gates_weighted_zero(fold_method, qiskit):
     """Tests folding only two-qubit gates by using weights = {"single": 0.}."""
     qreg = LineQubit.range(3)
     circ = Circuit(
@@ -1531,6 +1539,8 @@ def test_fold_local_with_single_qubit_gates_weighted_zero(fold_method):
         ops.T.on(qreg[2]),
         ops.TOFFOLI.on(*qreg)
     )
+    if qiskit:
+        circ = convert_from_mitiq(circ, "qiskit")
     # Note: This scale_factor + weights makes sure all gates are passed over
     # in the folding method, which we want to do here.
     folded = fold_method(
@@ -1542,7 +1552,11 @@ def test_fold_local_with_single_qubit_gates_weighted_zero(fold_method):
         [ops.T.on(qreg[2])],
         [ops.TOFFOLI.on(*qreg)] * 3
     )
-    assert _equal(folded, correct)
+    if qiskit:
+        folded, _ = convert_to_mitiq(folded)
+        assert equal_up_to_global_phase(folded.unitary(), correct.unitary())
+    else:
+        assert _equal(folded, correct)
 
 
 @pytest.mark.parametrize(
