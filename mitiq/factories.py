@@ -662,7 +662,7 @@ class AdaExpFactory(Factory):
         avoid_log: If set to True, the exponential model is not linearized
                    with a logarithm and a non-linear fit is applied even
                    if asymptote is not None. The default value is False.
-        max_scale_factor: Maximum noise scale factor. Default it 6.0.
+        max_scale_factor: Maximum noise scale factor. Default is 6.0.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationError: If the extrapolation fit fails.
