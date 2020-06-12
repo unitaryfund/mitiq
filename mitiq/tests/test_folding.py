@@ -1509,7 +1509,8 @@ def test_compute_weight_of_circuit():
 @pytest.mark.parametrize(
     "fold_method",
     [fold_gates_from_left,
-     fold_gates_from_right]
+     fold_gates_from_right,
+     fold_gates_at_random]
 )
 @pytest.mark.parametrize("qiskit", [True, False])
 def test_fold_local_with_fidelities(fold_method, qiskit):
@@ -1543,7 +1544,8 @@ def test_fold_local_with_fidelities(fold_method, qiskit):
 @pytest.mark.parametrize(
     "fold_method",
     [fold_gates_from_left,
-     fold_gates_from_right]
+     fold_gates_from_right,
+     fold_gates_at_random]
 )
 @pytest.mark.parametrize("qiskit", [True, False])
 def test_fold_local_with_single_qubit_gates_fidelity_one(fold_method, qiskit):
@@ -1579,7 +1581,8 @@ def test_fold_local_with_single_qubit_gates_fidelity_one(fold_method, qiskit):
 @pytest.mark.parametrize(
     "fold_method",
     [fold_gates_from_left,
-     fold_gates_from_right]
+     fold_gates_from_right,
+     fold_gates_at_random]
 )
 @pytest.mark.parametrize("qiskit", [True, False])
 def test_all_gates_folded_at_max_scale_with_fidelities(fold_method, qiskit):
@@ -1624,8 +1627,15 @@ def test_all_gates_folded_at_max_scale_with_fidelities(fold_method, qiskit):
 @pytest.mark.parametrize(
     "fold_method",
     [fold_gates_from_left,
-     fold_gates_from_right]
+     fold_gates_from_right,
+     fold_gates_at_random]
 )
 def test_fold_local_raises_error_with_bad_fidelities(fold_method):
     with pytest.raises(ValueError, match="Fidelities should be"):
         fold_method(Circuit(), scale_factor=1.21, fidelities={"H": -1.})
+
+    with pytest.raises(ValueError, match="Fidelities should be"):
+        fold_method(Circuit(), scale_factor=1.21, fidelities={"CNOT": 0.})
+
+    with pytest.raises(ValueError, match="Fidelities should be"):
+        fold_method(Circuit(), scale_factor=1.21, fidelities={"triple": 1.2})
