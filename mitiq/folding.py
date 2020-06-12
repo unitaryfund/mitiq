@@ -319,32 +319,32 @@ def fold_gates_from_left(
 
     Keyword Args:
         fidelities (Dict[str, float]): Dictionary of gate fidelities. Each key
-        is a string which specifices the gate and each value is the fidelity of
-        that gate. When this argument is provided, folded gates contribute an
-        amount proporitional to their infidelity (1 - fidelity) to the total
-        noise scaling. Fidelity values must be in the interval (0, 1]. Gates not
-        specified have a default fidelity of 1.0 - 0.05n where n is the number
-        of qubits the gates act on.
+            is a string which specifices the gate and each value is the fidelity
+            of that gate. When this argument is provided, folded gates
+            contribute an amount proporitional to their infidelity
+            (1 - fidelity) to the total noise scaling. Fidelity values must be
+            in the interval (0, 1]. Gates not specified have a default fidelity
+             of 0.99**n where n is the number of qubits the gates act on.
 
-        Supported gate keys are listed in the following table.
+            Supported gate keys are listed in the following table.
 
-            Gate key    | Gate
-            -------------------------
-            "H"         | Hadamard
-            "X"         | Pauli X
-            "Y"         | Pauli Y
-            "Z"         | Pauli Z
-            "I"         | Identity
-            "CNOT"      | CNOT
-            "CZ"        | CZ gate
-            "TOFFOLI"   | Toffoli gate
-            "single"    | All single qubit gates
-            "double"    | All two-qubit gates
-            "triple"    | All three-qubit gates
+                Gate key    | Gate
+                -------------------------
+                "H"         | Hadamard
+                "X"         | Pauli X
+                "Y"         | Pauli Y
+                "Z"         | Pauli Z
+                "I"         | Identity
+                "CNOT"      | CNOT
+                "CZ"        | CZ gate
+                "TOFFOLI"   | Toffoli gate
+                "single"    | All single qubit gates
+                "double"    | All two-qubit gates
+                "triple"    | All three-qubit gates
 
-        Keys for specific gates override the values set by "single", "double",
-        and "triple". For example, `fidelities = {"single": 1.0, "H", 0.99}`
-        sets all single qubit gates except Hadamard to have fidelity one.
+            Keys for specific gates override values set by "single", "double",
+            and "triple". For example, `fidelities = {"single": 1.0, "H", 0.99}`
+            sets all single qubit gates except Hadamard to have fidelity one.
 
         squash_moments (bool): If True, all gates (including folded gates) are
             placed as early as possible in the circuit. If False, new moments
@@ -428,7 +428,7 @@ def fold_gates_from_left(
                 tot += weight
 
             if tot >= stop:
-                print("Reached weight folded =", tot, "which is greater than stop =", stop)
+                print("Reached weight folded =", tot, "which is >= stop =", stop)
                 _append_measurements(folded, measurements)
                 if not (kwargs.get("squash_moments") is False):
                     folded = squash_moments(folded)
@@ -451,34 +451,33 @@ def fold_gates_from_right(
         scale_factor: Factor to scale the circuit by. Any real number >= 1.
 
     Keyword Args:
-        weights (dict): Dictionary which defines the relative noise for each
-            gate. Each key is a string which specifices the gate and each value
-            is the weight for each gate. For example, the weight dictionary
-            `weights = {"H": 1.0, "T": 0.5, "CNOT", 1.5}` means that T gates are
-            50% as noisy as Hadamard gates, and CNOT gates are 3x as noisy as
-            T gates. Gates not specified have a default weight of 1.0.
+        fidelities (Dict[str, float]): Dictionary of gate fidelities. Each key
+            is a string which specifices the gate and each value is the fidelity
+            of that gate. When this argument is provided, folded gates
+            contribute an amount proporitional to their infidelity
+            (1 - fidelity) to the total noise scaling. Fidelity values must be
+            in the interval (0, 1]. Gates not specified have a default fidelity
+             of 0.99**n where n is the number of qubits the gates act on.
 
-            Weights can be any positive floating point value. Supported gate
-            keys are listed in the following table.
+            Supported gate keys are listed in the following table.
 
-            Gate key    | Gate
-            -------------------------
-            "H"         | Hadamard
-            "X"         | Pauli X
-            "Y"         | Pauli Y
-            "Z"         | Pauli Z
-            "I"         | Identity
-            "CNOT"      | CNOT
-            "CZ"        | CZ gate
-            "TOFFOLI"   | Toffoli gate
-            "single"    | All single qubit gates
-            "double"    | All two-qubit gates
-            "triple"    | All three-qubit gates
+                Gate key    | Gate
+                -------------------------
+                "H"         | Hadamard
+                "X"         | Pauli X
+                "Y"         | Pauli Y
+                "Z"         | Pauli Z
+                "I"         | Identity
+                "CNOT"      | CNOT
+                "CZ"        | CZ gate
+                "TOFFOLI"   | Toffoli gate
+                "single"    | All single qubit gates
+                "double"    | All two-qubit gates
+                "triple"    | All three-qubit gates
 
-            Note: If specific gate keys are present, they override the weight
-            for a "single", "double", or "triple". For example, if
-            `weights = {"double": 1.5, "CNOT": 1.2}`, the weight of a CNOT is
-            1.2 and the weight of every other two-qubit gates is 1.5.
+            Keys for specific gates override values set by "single", "double",
+            and "triple". For example, `fidelities = {"single": 1.0, "H", 0.99}`
+            sets all single qubit gates except Hadamard to have fidelity one.
 
         squash_moments (bool): If True, all gates (including folded gates) are
             placed as early as possible in the circuit. If False, new moments
@@ -503,7 +502,7 @@ def fold_gates_from_right(
     reversed_folded_circuit = fold_gates_from_left(
         reversed_circuit,
         scale_factor,
-        weights=kwargs.get("weights"),
+        fidelities=kwargs.get("fidelities"),
         squash_moments=False
     )
     folded = Circuit(reversed(reversed_folded_circuit))
