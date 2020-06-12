@@ -243,33 +243,9 @@ def _fold_all_gates_locally(circuit: Circuit) -> None:
     _fold_moments(circuit, list(range(len(circuit))))
 
 
-def _compute_weight(circuit: Circuit, weights: Dict[str, float]) -> float:
-    """Returns the weight of the circuit as the sum of weights of individual
-    gates. Gates not defined have a default weight of one.
-
-    Args:
-        circuit: Circuit to compute the weight of.
-        weights: Dictionary mapping string keys of gates to weights.
-    """
-    return sum(
-        _get_weight_for_gate(weights, op) for op in circuit.all_operations()
-    )
-
-
-def _get_num_to_fold(scale_factor: float, ngates: int) -> int:
-    """Returns the number of gates to fold to achieve the desired (approximate)
-    scale factor.
-
-    Args:
-        scale_factor: Floating point value to scale the circuit by.
-        ngates: Number of gates in the circuit to fold.
-    """
-    return int(round(ngates * (scale_factor - 1.0) / 2.0))
-
-
 def _default_weight(op: ops.Operation):
     """Returns a default weight for an operation."""
-    return 1. - 0.05 * len(op.qubits)
+    return 0.99 ** len(op.qubits)
 
 
 def _get_weight_for_gate(
@@ -300,6 +276,30 @@ def _get_weight_for_gate(
         if key in weights.keys():
             weight = weights[_cirq_gates_to_string_keys[op.gate]]
     return weight
+
+
+def _compute_weight(circuit: Circuit, weights: Dict[str, float]) -> float:
+    """Returns the weight of the circuit as the sum of weights of individual
+    gates. Gates not defined have a default weight of one.
+
+    Args:
+        circuit: Circuit to compute the weight of.
+        weights: Dictionary mapping string keys of gates to weights.
+    """
+    return sum(
+        _get_weight_for_gate(weights, op) for op in circuit.all_operations()
+    )
+
+
+def _get_num_to_fold(scale_factor: float, ngates: int) -> int:
+    """Returns the number of gates to fold to achieve the desired (approximate)
+    scale factor.
+
+    Args:
+        scale_factor: Floating point value to scale the circuit by.
+        ngates: Number of gates in the circuit to fold.
+    """
+    return int(round(ngates * (scale_factor - 1.0) / 2.0))
 
 
 @converter

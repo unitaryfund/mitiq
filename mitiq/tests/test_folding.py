@@ -24,6 +24,8 @@ from mitiq.folding import (
     _append_measurements,
     squash_moments,
     _update_moment_indices,
+    _default_weight,
+    _compute_weight,
     convert_to_mitiq,
     convert_from_mitiq,
     _fold_gate_at_index_in_moment,
@@ -1547,3 +1549,35 @@ def test_fold_local_with_single_qubit_gates_fidelity_one(fold_method, qiskit):
 def test_fold_local_raises_error_with_bad_fidelities(fold_method):
     with pytest.raises(ValueError, match="Fidelities should be"):
         fold_method(Circuit(), scale_factor=1.21, fidelities={"H": -1.})
+
+
+def test_default_weight():
+    """Tests default weight of an n-qubit gates is 0.99**n."""
+    qreg = LineQubit.range(3)
+    assert np.isclose(_default_weight(ops.H.on(qreg[0])), 0.99)
+    assert np.isclose(_default_weight(ops.CZ.on(qreg[0], qreg[1])), 0.9801)
+    assert np.isclose(_default_weight(ops.TOFFOLI.on(*qreg[:3])), 0.970299)
+
+
+def test_compute_weight_of_circuit():
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        ops.H.on_each(*qreg),
+        ops.CNOT.on(qreg[0], qreg[1]),
+        ops.T.on(qreg[2]),
+        ops.TOFFOLI.on(*qreg)
+    )
+    weight = _compute_weight(
+        circ, weights={"H": 0.01, "CNOT": 0.05, "T": 0., "TOFFOLI": 0.1}
+    )
+    assert np.isclose(weight, 0.18)
+
+    weight = _compute_weight(
+        circ, weights={"single": 0., "double": 0., "triple": 0.1}
+    )
+    assert np.isclose(weight, 0.1)
+
+    weight = _compute_weight(
+        circ, weights={"single": 0., "H": 0.01, "CNOT": 0.1, "TOFFOLI": 0.2}
+    )
+    assert np.isclose(weight, 0.33)
