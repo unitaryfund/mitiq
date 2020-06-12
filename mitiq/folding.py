@@ -371,7 +371,6 @@ def fold_gates_from_left(
 
     fidelities = kwargs.get("fidelities")
     if fidelities and not all(0. < f <= 1. for f in fidelities.values()):
-        print("Provided fidelities:", fidelities)
         raise ValueError(
             "Fidelities should be in the interval (0, 1]."
         )
@@ -388,18 +387,12 @@ def fold_gates_from_left(
     # Determine the stopping condition for folding
     ngates = len(list(folded.all_operations()))
     if fidelities:
-        print("Fidelities provided")
         weights = {k: 1. - f for k, f in fidelities.items()}
-        print("Weights are:", weights)
         total_weight = _compute_weight(folded, weights)
-        print("Weight of circuit:", total_weight)
         stop = total_weight * (scale_factor - 1.0) / 2.0
-        print("stop =", stop)
     else:
-        print("No fidelities provided")
         weights = None
         stop = _get_num_to_fold(scale_factor, ngates)
-        print("stop =", stop)
 
     # Fold gates from left until the stopping condition is met
     if np.isclose(stop, 0.):
@@ -417,10 +410,8 @@ def fold_gates_from_left(
                 weight = _get_weight_for_gate(weights, op)
             else:
                 weight = 1
-            print("Total weight folded =", tot)
-            print("Looking at op", op, "which has weight", weight)
+
             if weight > 0.:
-                print("Folding this op")
                 _fold_gate_at_index_in_moment(
                     folded, moment_index + moment_shift, gate_index
                 )
@@ -428,7 +419,6 @@ def fold_gates_from_left(
                 tot += weight
 
             if tot >= stop:
-                print("Reached weight folded =", tot, "which is >= stop =", stop)
                 _append_measurements(folded, measurements)
                 if not (kwargs.get("squash_moments") is False):
                     folded = squash_moments(folded)
