@@ -1,7 +1,7 @@
 """Functions for local and global unitary folding on supported circuits."""
 
 from copy import deepcopy
-from typing import Any, Callable, Iterable, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 import warnings
 
 import numpy as np
@@ -12,6 +12,19 @@ from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
 
 class UnsupportedCircuitError(Exception):
     pass
+
+
+_cirq_gates_to_string_keys = {
+        ops.H: "H",
+        ops.X: "X",
+        ops.Y: "Y",
+        ops.Z: "Z",
+        ops.T: "T",
+        ops.I: "I",
+        ops.CNOT: "CNOT",
+        ops.CZ: "CZ",
+        ops.TOFFOLI: "TOFFOLI"
+    }
 
 
 # Helper functions
@@ -230,6 +243,19 @@ def _fold_all_gates_locally(circuit: Circuit) -> None:
     _fold_moments(circuit, list(range(len(circuit))))
 
 
+def _compute_weight(circuit: Circuit, weights: Dict[str, float]) -> float:
+    """Returns the weight of the circuit as the sum of weights of individual
+    gates. Gates not defined have a default weight of one.
+
+    Args:
+        circuit: Circuit to compute the weight of.
+        weights: Dictionary mapping string keys of gates to weights.
+    """
+    return sum(
+        _get_weight_for_gate(weights, op) for op in circuit.all_operations()
+    )
+
+
 def _get_num_to_fold(scale_factor: float, ngates: int) -> int:
     """Returns the number of gates to fold to achieve the desired (approximate)
     scale factor.
@@ -241,33 +267,25 @@ def _get_num_to_fold(scale_factor: float, ngates: int) -> int:
     return int(round(ngates * (scale_factor - 1.0) / 2.0))
 
 
+def _default_weight(op: ops.Operation):
+    """Returns a default weight for an operation."""
+    return 1. - 0.05 * len(op.qubits)
+
+
 def _get_weight_for_gate(
-        weights: Union[dict, None],
+        weights: Union[Dict[str, float], None],
         op: ops.Operation
 ) -> float:
     """Returns the weight for a given gate, using a default value of 1.0 if
     weights is None or if the weight is not specified.
 
     Args:
-
-
+        weights: Dictionary of string keys mapping gates to weights.
+        op: Operation to get the weight of.
     """
+    weight = _default_weight(op)
     if not weights:
-        return 1.
-
-    _cirq_gates_to_string_keys = {
-        ops.H: "H",
-        ops.X: "X",
-        ops.Y: "Y",
-        ops.Z: "Z",
-        ops.T: "T",
-        ops.I: "I",
-        ops.CNOT: "CNOT",
-        ops.CZ: "CZ",
-        ops.TOFFOLI: "TOFFOLI"
-    }
-
-    weight = 1.
+        return weight
 
     if "single" in weights.keys() and len(op.qubits) == 1:
         weight = weights["single"]
@@ -300,15 +318,15 @@ def fold_gates_from_left(
         scale_factor: Factor to scale the circuit by. Any real number >= 1.
 
     Keyword Args:
-        weights (dict): Dictionary which defines the relative noise for each
-            gate. Each key is a string which specifices the gate and each value
-            is the weight for each gate. For example, the weight dictionary
-            `weights = {"H": 1.0, "T": 0.5, "CNOT", 1.5}` means that T gates are
-            50% as noisy as Hadamard gates, and CNOT gates are 3x as noisy as
-            T gates. Gates not specified have a default weight of 1.0.
+        fidelities (Dict[str, float]): Dictionary of gate fidelities. Each key
+        is a string which specifices the gate and each value is the fidelity of
+        that gate. When this argument is provided, folded gates contribute an
+        amount proporitional to their infidelity (1 - fidelity) to the total
+        noise scaling. Fidelity values must be in the interval (0, 1]. Gates not
+        specified have a default fidelity of 1.0 - 0.05n where n is the number
+        of qubits the gates act on.
 
-            Weights can be any positive floating point value. Supported gate
-            keys are listed in the following table.
+        Supported gate keys are listed in the following table.
 
             Gate key    | Gate
             -------------------------
@@ -324,10 +342,9 @@ def fold_gates_from_left(
             "double"    | All two-qubit gates
             "triple"    | All three-qubit gates
 
-            Note: If specific gate keys are present, they override the weight
-            for a "single", "double", or "triple". For example, if
-            `weights = {"double": 1.5, "CNOT": 1.2}`, the weight of a CNOT is
-            1.2 and the weight of every other two-qubit gates is 1.5.
+        Keys for specific gates override the values set by "single", "double",
+        and "triple". For example, `fidelities = {"single": 1.0, "H", 0.99}`
+        sets all single qubit gates except Hadamard to have fidelity one.
 
         squash_moments (bool): If True, all gates (including folded gates) are
             placed as early as possible in the circuit. If False, new moments
@@ -340,6 +357,7 @@ def fold_gates_from_left(
     Returns:
         folded: The folded quantum circuit as a QPROGRAM.
     """
+    # Check inputs and handle keyword arguments
     if not circuit.are_all_measurements_terminal():
         raise ValueError(
             f"Input circuit contains intermediate measurements"
@@ -351,47 +369,66 @@ def fold_gates_from_left(
             f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
         )
 
+    fidelities = kwargs.get("fidelities")
+    if fidelities and not all(0. < f <= 1. for f in fidelities.values()):
+        print("Provided fidelities:", fidelities)
+        raise ValueError(
+            "Fidelities should be in the interval (0, 1]."
+        )
+
     if scale_factor > 3.:
         return _fold_local(
             circuit, scale_factor, fold_method=fold_gates_from_left, **kwargs
         )
 
-    weights = kwargs.get("weights")
-    if weights and any(w < 0. for w in weights.values()):
-        raise ValueError(
-            "Negative weights were provided but weights should be non-negative."
-        )
-
+    # Copy the circuit and remove measurements
     folded = deepcopy(circuit)
     measurements = _pop_measurements(folded)
 
+    # Determine the stopping condition for folding
     ngates = len(list(folded.all_operations()))
-    num_to_fold = _get_num_to_fold(scale_factor, ngates)
-    if num_to_fold == 0:
+    if fidelities:
+        print("Fidelities provided")
+        weights = {k: 1. - f for k, f in fidelities.items()}
+        print("Weights are:", weights)
+        total_weight = _compute_weight(folded, weights)
+        print("Weight of circuit:", total_weight)
+        stop = total_weight * (scale_factor - 1.0) / 2.0
+        print("stop =", stop)
+    else:
+        print("No fidelities provided")
+        weights = None
+        stop = _get_num_to_fold(scale_factor, ngates)
+        print("stop =", stop)
+
+    # Fold gates from left until the stopping condition is met
+    if np.isclose(stop, 0.):
         _append_measurements(folded, measurements)
         return folded
 
-    weight_folded = 0.
+    tot = 0.
     iteration = 0
     moment_shift = 0
     for (moment_index, moment) in enumerate(circuit):
         for gate_index in range(len(moment)):
             iteration += 1
             op = folded[moment_index + moment_shift].operations[gate_index]
-            weight = _get_weight_for_gate(weights, op)
+            if weights:
+                weight = _get_weight_for_gate(weights, op)
+            else:
+                weight = 1
+            print("Total weight folded =", tot)
+            print("Looking at op", op, "which has weight", weight)
             if weight > 0.:
+                print("Folding this op")
                 _fold_gate_at_index_in_moment(
                     folded, moment_index + moment_shift, gate_index
                 )
                 moment_shift += 2
-                weight_folded += weight
+                tot += weight
 
-            if weight_folded >= num_to_fold or iteration == ngates:
-                if weight_folded < num_to_fold:
-                    warnings.warn(
-                        "Scale factor not reached in folding",
-                        category=RuntimeWarning
-                    )
+            if tot >= stop:
+                print("Reached weight folded =", tot, "which is greater than stop =", stop)
                 _append_measurements(folded, measurements)
                 if not (kwargs.get("squash_moments") is False):
                     folded = squash_moments(folded)

@@ -1474,12 +1474,10 @@ def test_fold_and_squash_random_circuits_random_stretches(fold_method):
 
 @pytest.mark.parametrize(
     "fold_method",
-    [fold_gates_from_left,
-     fold_gates_from_right,
-     fold_gates_at_random]
+    [fold_gates_from_left]
 )
 @pytest.mark.parametrize("qiskit", [True, False])
-def test_fold_local_with_weights(fold_method, qiskit):
+def test_fold_local_with_fidelities(fold_method, qiskit):
     qreg = LineQubit.range(3)
     circ = Circuit(
         ops.H.on_each(*qreg),
@@ -1490,9 +1488,9 @@ def test_fold_local_with_weights(fold_method, qiskit):
     if qiskit:
         circ = convert_from_mitiq(circ, "qiskit")
     # Only fold the Toffoli gate
-    weights = {"H": 0., "T": 0., "CNOT": 0., "TOFFOLI": 3.}
+    fidelities = {"H": 1., "T": 1., "CNOT": 1., "TOFFOLI": 0.95}
     folded = fold_method(
-        circ, scale_factor=2., weights=weights
+        circ, scale_factor=2., fidelities=fidelities
     )
     correct = Circuit(
         [ops.H.on_each(*qreg)],
@@ -1509,29 +1507,12 @@ def test_fold_local_with_weights(fold_method, qiskit):
 
 @pytest.mark.parametrize(
     "fold_method",
-    [fold_gates_from_left,
-     fold_gates_from_right,
-     fold_gates_at_random]
-)
-def test_fold_local_raises_warning_when_scale_factor_not_reached(fold_method):
-    """Makes sure a warning is raised if the scale factor is not reached."""
-    qbit = LineQubit(0)
-    circ = Circuit([ops.H.on(qbit)] * 3)
-    with pytest.warns(RuntimeWarning, match="Scale factor not reached"):
-        fold_method(
-            circ, scale_factor=2., weights={"H": 0.1}
-        )
-
-
-@pytest.mark.parametrize(
-    "fold_method",
-    [fold_gates_from_left,
-     fold_gates_from_right,
-     fold_gates_at_random]
+    [fold_gates_from_left]
 )
 @pytest.mark.parametrize("qiskit", [True, False])
-def test_fold_local_with_single_qubit_gates_weighted_zero(fold_method, qiskit):
-    """Tests folding only two-qubit gates by using weights = {"single": 0.}."""
+def test_fold_local_with_single_qubit_gates_fidelity_one(fold_method, qiskit):
+    """Tests folding only two-qubit gates by using fidelities = {"single": 1.}.
+    """
     qreg = LineQubit.range(3)
     circ = Circuit(
         ops.H.on_each(*qreg),
@@ -1541,10 +1522,10 @@ def test_fold_local_with_single_qubit_gates_weighted_zero(fold_method, qiskit):
     )
     if qiskit:
         circ = convert_from_mitiq(circ, "qiskit")
-    # Note: This scale_factor + weights makes sure all gates are passed over
-    # in the folding method, which we want to do here.
     folded = fold_method(
-        circ, scale_factor=2., weights={"single": 0., "CNOT": 1, "TOFFOLI": 2}
+        circ, scale_factor=2., fidelities={"single": 1.0,
+                                           "CNOT": 0.99,
+                                           "TOFFOLI": 0.95}
     )
     correct = Circuit(
         [ops.H.on_each(*qreg)],
@@ -1561,10 +1542,8 @@ def test_fold_local_with_single_qubit_gates_weighted_zero(fold_method, qiskit):
 
 @pytest.mark.parametrize(
     "fold_method",
-    [fold_gates_from_left,
-     fold_gates_from_right,
-     fold_gates_at_random]
+    [fold_gates_from_left]
 )
-def test_fold_local_raises_error_with_negative_weights(fold_method):
-    with pytest.raises(ValueError, match="Negative weights were provided"):
-        fold_method(Circuit(), scale_factor=1.21, weights={"H": -1.})
+def test_fold_local_raises_error_with_bad_fidelities(fold_method):
+    with pytest.raises(ValueError, match="Fidelities should be"):
+        fold_method(Circuit(), scale_factor=1.21, fidelities={"H": -1.})
