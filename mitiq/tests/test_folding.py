@@ -24,6 +24,8 @@ from mitiq.folding import (
     _append_measurements,
     squash_moments,
     _update_moment_indices,
+    _default_weight,
+    _compute_weight,
     convert_to_mitiq,
     convert_from_mitiq,
     _fold_gate_at_index_in_moment,
@@ -1470,3 +1472,170 @@ def test_fold_and_squash_random_circuits_random_stretches(fold_method):
             circuit, scale_factor=scale, squash_moments=True
         )
         assert len(folded_and_squashed) <= len(folded_not_squashed)
+
+
+def test_default_weight():
+    """Tests default weight of an n-qubit gates is 0.99**n."""
+    qreg = LineQubit.range(3)
+    assert np.isclose(_default_weight(ops.H.on(qreg[0])), 0.99)
+    assert np.isclose(_default_weight(ops.CZ.on(qreg[0], qreg[1])), 0.9801)
+    assert np.isclose(_default_weight(ops.TOFFOLI.on(*qreg[:3])), 0.970299)
+
+
+def test_compute_weight_of_circuit():
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        ops.H.on_each(*qreg),
+        ops.CNOT.on(qreg[0], qreg[1]),
+        ops.T.on(qreg[2]),
+        ops.TOFFOLI.on(*qreg)
+    )
+    weight = _compute_weight(
+        circ, weights={"H": 0.01, "CNOT": 0.05, "T": 0., "TOFFOLI": 0.1}
+    )
+    assert np.isclose(weight, 0.18)
+
+    weight = _compute_weight(
+        circ, weights={"single": 0., "double": 0., "triple": 0.1}
+    )
+    assert np.isclose(weight, 0.1)
+
+    weight = _compute_weight(
+        circ, weights={"single": 0., "H": 0.01, "CNOT": 0.1, "TOFFOLI": 0.2}
+    )
+    assert np.isclose(weight, 0.33)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left,
+     fold_gates_from_right,
+     fold_gates_at_random]
+)
+@pytest.mark.parametrize("qiskit", [True, False])
+def test_fold_local_with_fidelities(fold_method, qiskit):
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        ops.H.on_each(*qreg),
+        ops.CNOT.on(qreg[0], qreg[1]),
+        ops.T.on(qreg[2]),
+        ops.TOFFOLI.on(*qreg)
+    )
+    if qiskit:
+        circ = convert_from_mitiq(circ, "qiskit")
+    # Only fold the Toffoli gate
+    fidelities = {"H": 1., "T": 1., "CNOT": 1., "TOFFOLI": 0.95}
+    folded = fold_method(
+        circ, scale_factor=3., fidelities=fidelities
+    )
+    correct = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3
+    )
+    if qiskit:
+        folded, _ = convert_to_mitiq(folded)
+        assert equal_up_to_global_phase(folded.unitary(), correct.unitary())
+    else:
+        assert _equal(folded, correct)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left,
+     fold_gates_from_right,
+     fold_gates_at_random]
+)
+@pytest.mark.parametrize("qiskit", [True, False])
+def test_fold_local_with_single_qubit_gates_fidelity_one(fold_method, qiskit):
+    """Tests folding only two-qubit gates by using fidelities = {"single": 1.}.
+    """
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        ops.H.on_each(*qreg),
+        ops.CNOT.on(qreg[0], qreg[1]),
+        ops.T.on(qreg[2]),
+        ops.TOFFOLI.on(*qreg)
+    )
+    if qiskit:
+        circ = convert_from_mitiq(circ, "qiskit")
+    folded = fold_method(
+        circ, scale_factor=3., fidelities={"single": 1.0,
+                                           "CNOT": 0.99,
+                                           "TOFFOLI": 0.95}
+    )
+    correct = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3
+    )
+    if qiskit:
+        folded, _ = convert_to_mitiq(folded)
+        assert equal_up_to_global_phase(folded.unitary(), correct.unitary())
+    else:
+        assert _equal(folded, correct)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left,
+     fold_gates_from_right,
+     fold_gates_at_random]
+)
+@pytest.mark.parametrize("qiskit", [True, False])
+def test_all_gates_folded_at_max_scale_with_fidelities(fold_method, qiskit):
+    """Tests that all gates are folded regardless of the input fidelities when
+    the scale factor is three.
+    """
+    rng = np.random.RandomState(1)
+
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        ops.H.on_each(*qreg),
+        ops.CNOT.on(qreg[0], qreg[1]),
+        ops.T.on(qreg[2]),
+        ops.TOFFOLI.on(*qreg)
+    )
+    ngates = len(list(circ.all_operations()))
+
+    if qiskit:
+        circ = convert_from_mitiq(circ, "qiskit")
+
+    for _ in range(10):
+        folded = fold_method(
+            circ, scale_factor=3., fidelities={"H": rng.rand(),
+                                               "T": rng.rand(),
+                                               "CNOT": rng.rand(),
+                                               "TOFFOLI": rng.rand()}
+        )
+        correct = Circuit(
+            [ops.H.on_each(*qreg)] * 3,
+            [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+            [ops.T.on(qreg[2]), ops.T.on(qreg[2])**-1, ops.T.on(qreg[2])],
+            [ops.TOFFOLI.on(*qreg)] * 3
+        )
+        if qiskit:
+            folded, _ = convert_to_mitiq(folded)
+            assert equal_up_to_global_phase(folded.unitary(), correct.unitary())
+        else:
+            assert _equal(folded, correct)
+            assert len(list(folded.all_operations())) == 3 * ngates
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left,
+     fold_gates_from_right,
+     fold_gates_at_random]
+)
+def test_fold_local_raises_error_with_bad_fidelities(fold_method):
+    with pytest.raises(ValueError, match="Fidelities should be"):
+        fold_method(Circuit(), scale_factor=1.21, fidelities={"H": -1.})
+
+    with pytest.raises(ValueError, match="Fidelities should be"):
+        fold_method(Circuit(), scale_factor=1.21, fidelities={"CNOT": 0.})
+
+    with pytest.raises(ValueError, match="Fidelities should be"):
+        fold_method(Circuit(), scale_factor=1.21, fidelities={"triple": 1.2})
