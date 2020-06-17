@@ -112,7 +112,7 @@ def rand_circuit_zne(n_qubits: int, depth: int, trials: int, noise: float,
         # evaluate the ZNE answer
         mitigated = execute_with_zne(qp=qc, executor=obs_sim,
                                      scale_noise=scale_noise,
-                                     fac=fac)
+                                     factory=fac)
         exacts.append(exact)
         unmitigateds.append(unmitigated)
         mitigateds.append(mitigated)
