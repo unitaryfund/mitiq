@@ -113,7 +113,7 @@ different ones.
     from mitiq.factories import LinearFactory
 
     fac = LinearFactory(scale_factors=[1.0, 2.0, 2.5])
-    linear = execute_with_zne(circ, noisy_simulation, fac=fac)
+    linear = execute_with_zne(circ, noisy_simulation, factory=fac)
     print(f"Mitigated error with the linear method is {exact - linear:.{3}}")
 
 .. testoutput::
