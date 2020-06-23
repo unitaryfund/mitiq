@@ -9,7 +9,7 @@ Zero noise extrapolation has two main components: noise scaling and then extrapo
 Unitary folding is a method for noise scaling that operates directly at the gate level.
 This makes is easy to use across platforms. It is especially appropriate when
 your underlying noise should scale with the depth and/or the number of gates in your
-quantum program. More details can be found in :cite:``
+quantum program. More details can be found in :cite:`Giurgica_Tiron_2020_arXiv`
 where the unitary folding framework was introduced.
 
 At the gate level, noise is amplified by mapping gates (or groups of gates) `G` to
