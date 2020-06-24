@@ -34,7 +34,7 @@ def execute_with_zne(
     if not callable(scale_noise):
         raise TypeError("Argument `scale_noise` must be callable.")
 
-    return factory.run(qp, executor, scale_noise).reduce()
+    return factory.copy().run(qp, executor, scale_noise).reduce()
 
 
 def mitigate_executor(
@@ -55,7 +55,7 @@ def mitigate_executor(
         scale_noise: Function for scaling the noise of a quantum circuit.
     """
     def new_executor(qp: QPROGRAM) -> float:
-        return execute_with_zne(qp, executor, factory, scale_noise)
+        return execute_with_zne(qp, executor, factory.copy(), scale_noise)
     return new_executor
 
 
@@ -74,5 +74,5 @@ def zne_decorator(
     def decorator(
         executor: Callable[[QPROGRAM], float]
     ) -> Callable[[QPROGRAM], float]:
-        return mitigate_executor(executor, factory, scale_noise)
+        return mitigate_executor(executor, factory.copy(), scale_noise)
     return decorator
