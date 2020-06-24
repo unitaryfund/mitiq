@@ -429,6 +429,12 @@ class RichardsonFactory(BatchedFactory):
             self.instack, self.outstack, order=order
         )
 
+    def copy(self) -> 'RichardsonFactory':
+        copied_factory = RichardsonFactory(self.scale_factors)
+        copied_factory.instack = self.instack
+        copied_factory.outstack = self.outstack
+        return copied_factory
+
 
 class LinearFactory(BatchedFactory):
     """
@@ -454,6 +460,12 @@ class LinearFactory(BatchedFactory):
         # Richardson's extrapolation is a particular case of a polynomial fit
         # with order equal to 1.
         return PolyFactory.static_reduce(self.instack, self.outstack, order=1)
+
+    def copy(self) -> 'LinearFactory':
+        copied_factory = LinearFactory(self.scale_factors)
+        copied_factory.instack = self.instack
+        copied_factory.outstack = self.outstack
+        return copied_factory
 
 
 class ExpFactory(BatchedFactory):

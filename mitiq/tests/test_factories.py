@@ -293,12 +293,6 @@ def test_iteration_warnings():
         fac.iterate(lambda scale_factor: 1.0, max_iterations=3)
 
 
-def _check_scale_factors_and_stacks(fac1, fac2):
-    assert np.allclose(fac1.scale_factors, fac2.scale_factors)
-    assert np.allclose(fac1.instack, fac2.instack)
-    assert np.allclose(fac1.outstack, fac2.outstack)
-
-
 def copy_factory(copy_type: str, factory):
     if copy_type == "call":
         copied_factory = factory.copy()
@@ -399,6 +393,5 @@ def test_copy_poly_exp_factory(copy_type):
 
         if iterate:
             factory.reduce()
-            _check_scale_factors_and_stacks(copied_factory, factory)
             assert copied_factory == factory
             assert copied_factory is not factory
