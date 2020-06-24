@@ -34,8 +34,7 @@ def execute_with_zne(
     if not callable(scale_noise):
         raise TypeError("Argument `scale_noise` must be callable.")
 
-    fac = factory.copy()
-    return fac.run(qp, executor, scale_noise).reduce()
+    return factory.copy().run(qp, executor, scale_noise).reduce()
 
 
 def mitigate_executor(
