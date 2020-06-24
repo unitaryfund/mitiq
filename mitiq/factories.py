@@ -177,6 +177,11 @@ class Factory(ABC):
         self.instack = []
         self.outstack = []
 
+    @abstractmethod
+    def copy(self) -> 'Factory':
+        """Returns a copy of the Factory."""
+        raise NotImplementedError
+
     def iterate(self, noise_to_expval: Callable[[float], float],
                 max_iterations: int = 100) -> 'Factory':
         """
@@ -236,6 +241,15 @@ class Factory(ABC):
 
         return self.iterate(_noise_to_expval, max_iterations)
 
+    def __copy__(self):
+        return self.copy()
+
+    def __eq__(self, other):
+        return (
+            np.allclose(self.instack, other.instack) and
+            np.allclose(self.outstack, other.outstack)
+        )
+
 
 class BatchedFactory(Factory):
     """
@@ -286,6 +300,21 @@ class BatchedFactory(Factory):
                 f"and 'self.outstack' ({len(self.outstack)}) must be equal."
             )
         return len(self.outstack) == len(self.scale_factors)
+
+    def reduce(self) -> float:
+        raise NotImplementedError
+
+    def copy(self) -> 'BatchedFactory':
+        copied_factory = BatchedFactory(scale_factors=self.scale_factors)
+        copied_factory.instack = self.instack
+        copied_factory.outstack = self.outstack
+        return copied_factory
+
+    def __eq__(self, other):
+        return (
+            Factory.__eq__(self, other) and
+            np.allclose(self.scale_factors, other.scale_factors)
+        )
 
 
 class PolyFactory(BatchedFactory):
@@ -366,6 +395,18 @@ class PolyFactory(BatchedFactory):
         return PolyFactory.static_reduce(
             self.instack, self.outstack, self.order
         )
+
+    def copy(self) -> 'PolyFactory':
+        copied_factory = PolyFactory(
+            scale_factors=self.scale_factors,
+            order=self.order
+        )
+        copied_factory.instack = self.instack
+        copied_factory.outstack = self.outstack
+        return copied_factory
+
+    def __eq__(self, other):
+        return BatchedFactory.__eq__(self, other) and self.order == other.order
 
 
 class RichardsonFactory(BatchedFactory):
@@ -460,6 +501,23 @@ class ExpFactory(BatchedFactory):
                                             self.asymptote,
                                             order=1,
                                             avoid_log=self.avoid_log)[0]
+
+    def copy(self) -> 'ExpFactory':
+        copied_factory = ExpFactory(
+            scale_factors=self.scale_factors,
+            asymptote=self.asymptote,
+            avoid_log=self.avoid_log
+        )
+        copied_factory.instack = self.instack
+        copied_factory.outstack = self.outstack
+        return copied_factory
+
+    def __eq__(self, other):
+        return (
+            BatchedFactory.__eq__(self, other) and
+            np.isclose(self.asymptote, other.asymptote) and
+            self.avoid_log == other.avoid_log
+        )
 
 
 class PolyExpFactory(BatchedFactory):
@@ -627,7 +685,7 @@ class PolyExpFactory(BatchedFactory):
         zero_limit = asymptote + sign * np.exp(z_coefficients[-1])
         # Parameters from low order to high order
         params = [asymptote] + list(z_coefficients[::-1])
-        return (zero_limit, params)
+        return zero_limit, params
 
     def reduce(self) -> float:
         """Returns the zero-noise limit."""
@@ -636,6 +694,25 @@ class PolyExpFactory(BatchedFactory):
                                   self.asymptote,
                                   self.order,
                                   self.avoid_log)[0]
+
+    def copy(self) -> 'PolyExpFactory':
+        copied_factory = PolyExpFactory(
+            scale_factors=self.scale_factors,
+            order=self.order,
+            asymptote=self.asymptote,
+            avoid_log=self.avoid_log
+        )
+        copied_factory.instack = self.instack
+        copied_factory.outstack = self.outstack
+        return copied_factory
+
+    def __eq__(self, other):
+        return (
+                BatchedFactory.__eq__(self, other) and
+                np.isclose(self.asymptote, other.asymptote) and
+                self.avoid_log == other.avoid_log and
+                self.order == other.order
+        )
 
 
 class AdaExpFactory(Factory):
@@ -749,3 +826,25 @@ class AdaExpFactory(Factory):
         # Update optimization history
         self.history.append((self.instack, self.outstack, params, zero_limit))
         return zero_limit
+
+    def copy(self) -> 'AdaExpFactory':
+        copied_factory = AdaExpFactory(
+            steps=self.steps,
+            scale_factor=self.scale_factor,
+            asymptote=self.asymptote,
+            avoid_log=self.avoid_log
+        )
+        copied_factory.instack = self.instack
+        copied_factory.outstack = self.outstack
+        copied_factory.history = self.history
+        return copied_factory
+
+    def __eq__(self, other) -> bool:
+        return (
+            Factory.__eq__(self, other) and
+            self.steps == other.steps and
+            self.scale_factor == other.scale_factor and
+            np.isclose(self.asymptote, other.asymptote) and
+            self.avoid_log == other.avoid_log and
+            np.allclose(self.history, other.history)
+        )
