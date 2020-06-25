@@ -27,4 +27,4 @@ In the future other error-mitigating techniques will be added to `mitiq`.
 for quantum programmers using any quantum programming framework and any quantum
 backend. Today we support `cirq` and `qiskit` inputs and backends.
 
-Check out more in our `getting started <guide-getting-started.html>`_ section.
+Check out more in our `getting started <guide_02-getting-started.html>`_ section.
