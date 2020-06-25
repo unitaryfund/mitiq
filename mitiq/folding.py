@@ -3,6 +3,7 @@
 from copy import deepcopy
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 import warnings
+from functools import wraps
 
 import numpy as np
 
@@ -134,9 +135,9 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
         )
     return converted_circuit
 
-
 def converter(fold_method: Callable) -> Callable:
     """Decorator for handling conversions."""
+    @wraps(fold_method)
     def new_fold_method(circuit: QPROGRAM, *args, **kwargs) -> QPROGRAM:
         mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
         if kwargs.get("return_mitiq") is True:
@@ -758,7 +759,7 @@ def _fold_local(
 # Circuit level folding
 @converter
 def fold_global(circuit: QPROGRAM, scale_factor: float, **kwargs) -> QPROGRAM:
-    """Returns a new circuit obtained by folding the global unitary of the 
+    """Returns a new circuit obtained by folding the global unitary of the
     input circuit.
 
     The returned folded circuit has a number of gates approximately equal to
