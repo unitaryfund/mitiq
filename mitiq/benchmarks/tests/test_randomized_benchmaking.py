@@ -3,7 +3,11 @@ from itertools import product
 import numpy as np
 
 from mitiq.benchmarks.randomized_benchmarking import rb_circuits
-from mitiq.factories import LinearFactory, RichardsonFactory, PolyFactory
+from mitiq.factories import (LinearFactory,
+                             RichardsonFactory,
+                             PolyFactory,
+                             ExpFactory,
+                             AdaExpFactory)
 from mitiq.folding import fold_gates_at_random, fold_gates_from_left, \
     fold_gates_from_right, fold_global
 from mitiq.benchmarks.utils import noisy_simulation
@@ -17,6 +21,8 @@ SCALE_FUNCTIONS = [
 ]
 
 FACTORIES = [
+    AdaExpFactory(steps=3, scale_factor=1.5, asymptote=0.25),
+    ExpFactory([1.0, 1.4, 2.1], asymptote=0.25),
     RichardsonFactory([1.0, 1.4, 2.1]),
     LinearFactory([1.0, 1.6]),
     PolyFactory([1.0, 1.4, 2.1], order=2),

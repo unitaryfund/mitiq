@@ -662,6 +662,7 @@ class AdaExpFactory(Factory):
         avoid_log: If set to True, the exponential model is not linearized
                    with a logarithm and a non-linear fit is applied even
                    if asymptote is not None. The default value is False.
+        max_scale_factor: Maximum noise scale factor. Default is 6.0.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationError: If the extrapolation fit fails.
@@ -675,7 +676,8 @@ class AdaExpFactory(Factory):
             steps: int,
             scale_factor: float = 2,
             asymptote: Optional[float] = None,
-            avoid_log: bool = False
+            avoid_log: bool = False,
+            max_scale_factor: float = 6.0
     ) -> None:
         """Instantiate a new object of this Factory class."""
         super(AdaExpFactory, self).__init__()
@@ -692,10 +694,14 @@ class AdaExpFactory(Factory):
                              " greater or equal to 3. "
                              "If 'asymptote' is None, 'steps' must be"
                              " greater or equal to 4.")
+        if max_scale_factor <= 1:
+            raise ValueError("The argument 'max_scale_factor' must be"
+                             " strictly larger than one.")
         self.steps = steps
         self.scale_factor = scale_factor
         self.asymptote = asymptote
         self.avoid_log = avoid_log
+        self.max_scale_factor = max_scale_factor
         # Keep a log of the optimization process storing:
         # noise value(s), expectation value(s), parameters, and zero limit
         self.history = [
@@ -724,7 +730,9 @@ class AdaExpFactory(Factory):
         exponent = params[2]
         # Further noise scale factors are determined with
         # an adaptive rule which depends on self.exponent
-        return 1.0 + self._SHIFT_FACTOR / np.abs(exponent)
+        next_scale_factor = min(1.0 + self._SHIFT_FACTOR / np.abs(exponent),
+                                self.max_scale_factor)
+        return next_scale_factor
 
     def is_converged(self) -> bool:
         """Returns True if all the needed expectation values have been
