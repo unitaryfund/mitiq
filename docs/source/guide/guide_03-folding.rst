@@ -161,6 +161,59 @@ of the folded circuit (a Cirq circuit), one can use the keyword argument ``retur
     Because different circuits decompose gates differently, some gates (or their inverses)
     may be expressed differently (but equivalently) across different circuits.
 
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Folding gates by fidelity
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In local folding methods, gates can be folded according to a custom fidelities by passing the keyword argument
+``fidelities`` into a local folding method. This argument should be a dictionary where each key is a string which
+specifies the gate and the value of the key is the fidelity of that gate. An example is shown below where we set the
+fidelity of all single qubit gates to be 1.0, meaning that these gates introduce no errors in the computation.
+
+.. doctest:: python
+
+    from cirq import Circuit, LineQubit, ops
+    from mitiq.folding import fold_gates_at_random
+
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        ops.H.on_each(*qreg),
+        ops.CNOT.on(qreg[0], qreg[1]),
+        ops.T.on(qreg[2]),
+        ops.TOFFOLI.on(*qreg)
+    )
+    print(circ)
+    # 0: ───H───@───@───
+    #           │   │
+    # 1: ───H───X───@───
+    #               │
+    # 2: ───H───T───X───
+
+
+    folded = fold_method(
+        circ, scale_factor=3., fidelities={"single": 1.0,
+                                           "CNOT": 0.99,
+                                           "TOFFOLI": 0.95}
+    )
+    print(folded)
+    # 0: ───H───@───@───@───@───@───@───
+    #           │   │   │   │   │   │
+    # 1: ───H───X───X───X───@───@───@───
+    #                       │   │   │
+    # 2: ───H───T───────────X───X───X───
+
+
+We can see that only the two-qubit gates and three-qubit gates have been folded in the folded circuit.
+
+Specific gate keys override the global "single", "double", or "triple" options. For example, the dictionary
+``fidelities = {"single": 1.0, "H": 0.99}`` sets all single qubit gates to fidelity one except the Hadamard gate.
+
+
+A full list of string keys for gates can be found with ``help(fold_method)`` where ``fold_method`` is a valid local
+folding method. Fidelity values must be between zero and one.
+
+
 =============================================
 Global folding
 =============================================
@@ -172,24 +225,24 @@ circuit above is shown below.
 .. doctest:: python
 
     >>> import cirq
-        >>> from mitiq.folding import fold_global
+    >>> from mitiq.folding import fold_global
 
-        # Get a circuit to fold
-        >>> qreg = cirq.LineQubit.range(2)
-        >>> circ = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1]))
-        >>> print("Original circuit:", circ, sep="\n")
-        Original circuit:
-        0: ───H───@───
-                  │
-        1: ───────X───
+    # Get a circuit to fold
+    >>> qreg = cirq.LineQubit.range(2)
+    >>> circ = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1]))
+    >>> print("Original circuit:", circ, sep="\n")
+    Original circuit:
+    0: ───H───@───
+              │
+    1: ───────X───
 
-        # Fold the circuit
-        >>> folded = fold_global(circ, scale_factor=3.)
-        >>> print("Folded circuit:", folded, sep="\n")
-        Folded circuit:
-        0: ───H───@───@───H───H───@───
-                  │   │           │
-        1: ───────X───X───────────X───
+    # Fold the circuit
+    >>> folded = fold_global(circ, scale_factor=3.)
+    >>> print("Folded circuit:", folded, sep="\n")
+    Folded circuit:
+    0: ───H───@───@───H───H───@───
+              │   │           │
+    1: ───────X───X───────────X───
 
 Notice that this circuit is still logically equivalent to the input circuit, but the global folding strategy folds
 the entire circuit until the input scale factor is reached. As with local folding methods, global folding can be called
