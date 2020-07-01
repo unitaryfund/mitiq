@@ -2,7 +2,6 @@
 
 from copy import deepcopy
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
-import warnings
 from functools import wraps
 
 import numpy as np
@@ -12,6 +11,10 @@ from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
 
 
 class UnsupportedCircuitError(Exception):
+    pass
+
+
+class UnfoldableGateError(Exception):
     pass
 
 
@@ -135,6 +138,7 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
         )
     return converted_circuit
 
+
 def converter(fold_method: Callable) -> Callable:
     """Decorator for handling conversions."""
     @wraps(fold_method)
@@ -236,12 +240,6 @@ def _fold_moments(circuit: Circuit, moment_indices: List[int]) -> None:
             i + shift, [circuit[i + shift], inverse(circuit[i + shift])]
         )
         shift += 2
-
-
-def _fold_all_gates_locally(circuit: Circuit) -> None:
-    """Replaces every gate G with G G^dag G by modifying the circuit in place.
-    """
-    _fold_moments(circuit, list(range(len(circuit))))
 
 
 def _default_weight(op: ops.Operation):
