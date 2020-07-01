@@ -84,7 +84,7 @@ def _mitiq_curve_fit(ansatz: Callable[..., float],
             )
     except RuntimeError:
         raise ExtrapolationError(_EXTR_ERR) from None
-    return opt_params
+    return list(opt_params)
 
 
 def _mitiq_polyfit(instack: List[float],
@@ -114,12 +114,12 @@ def _mitiq_polyfit(instack: List[float],
             warn.message = _EXTR_WARN
         # re-raise all warnings
         warnings.warn_explicit(
-                warn.message,
-                warn.category,
-                warn.filename,
-                warn.lineno
-            )
-    return opt_params
+            warn.message,
+            warn.category,
+            warn.filename,
+            warn.lineno
+        )
+    return list(opt_params)
 
 
 class Factory(ABC):
@@ -176,11 +176,6 @@ class Factory(ABC):
         """Resets the instack and outstack of the Factory to empty values."""
         self.instack = []
         self.outstack = []
-
-    @abstractmethod
-    def copy(self) -> 'Factory':
-        """Returns a copy of the Factory."""
-        raise NotImplementedError
 
     def iterate(self, noise_to_expval: Callable[[float], float],
                 max_iterations: int = 100) -> 'Factory':
@@ -241,13 +236,10 @@ class Factory(ABC):
 
         return self.iterate(_noise_to_expval, max_iterations)
 
-    def __copy__(self):
-        return self.copy()
-
     def __eq__(self, other):
         return (
-            np.allclose(self.instack, other.instack) and
-            np.allclose(self.outstack, other.outstack)
+                np.allclose(self.instack, other.instack) and
+                np.allclose(self.outstack, other.outstack)
         )
 
 
@@ -304,16 +296,10 @@ class BatchedFactory(Factory):
     def reduce(self) -> float:
         raise NotImplementedError
 
-    def copy(self) -> 'BatchedFactory':
-        copied_factory = BatchedFactory(scale_factors=self.scale_factors)
-        copied_factory.instack = self.instack
-        copied_factory.outstack = self.outstack
-        return copied_factory
-
     def __eq__(self, other):
         return (
-            Factory.__eq__(self, other) and
-            np.allclose(self.scale_factors, other.scale_factors)
+                Factory.__eq__(self, other) and
+                np.allclose(self.scale_factors, other.scale_factors)
         )
 
 
@@ -396,15 +382,6 @@ class PolyFactory(BatchedFactory):
             self.instack, self.outstack, self.order
         )
 
-    def copy(self) -> 'PolyFactory':
-        copied_factory = PolyFactory(
-            scale_factors=self.scale_factors,
-            order=self.order
-        )
-        copied_factory.instack = self.instack
-        copied_factory.outstack = self.outstack
-        return copied_factory
-
     def __eq__(self, other):
         return BatchedFactory.__eq__(self, other) and self.order == other.order
 
@@ -428,12 +405,6 @@ class RichardsonFactory(BatchedFactory):
         return PolyFactory.static_reduce(
             self.instack, self.outstack, order=order
         )
-
-    def copy(self) -> 'RichardsonFactory':
-        copied_factory = RichardsonFactory(self.scale_factors)
-        copied_factory.instack = self.instack
-        copied_factory.outstack = self.outstack
-        return copied_factory
 
 
 class LinearFactory(BatchedFactory):
@@ -460,12 +431,6 @@ class LinearFactory(BatchedFactory):
         # Richardson's extrapolation is a particular case of a polynomial fit
         # with order equal to 1.
         return PolyFactory.static_reduce(self.instack, self.outstack, order=1)
-
-    def copy(self) -> 'LinearFactory':
-        copied_factory = LinearFactory(self.scale_factors)
-        copied_factory.instack = self.instack
-        copied_factory.outstack = self.outstack
-        return copied_factory
 
 
 class ExpFactory(BatchedFactory):
@@ -514,21 +479,19 @@ class ExpFactory(BatchedFactory):
                                             order=1,
                                             avoid_log=self.avoid_log)[0]
 
-    def copy(self) -> 'ExpFactory':
-        copied_factory = ExpFactory(
-            scale_factors=self.scale_factors,
-            asymptote=self.asymptote,
-            avoid_log=self.avoid_log
-        )
-        copied_factory.instack = self.instack
-        copied_factory.outstack = self.outstack
-        return copied_factory
-
     def __eq__(self, other):
+        if (self.asymptote and other.asymptote is None or
+                self.asymptote is None and other.asymptote):
+            return False
+        if self.asymptote is None and other.asymptote is None:
+            return (
+                    BatchedFactory.__eq__(self, other) and
+                    self.avoid_log == other.avoid_log
+            )
         return (
-            BatchedFactory.__eq__(self, other) and
-            np.isclose(self.asymptote, other.asymptote) and
-            self.avoid_log == other.avoid_log
+                BatchedFactory.__eq__(self, other) and
+                np.isclose(self.asymptote, other.asymptote) and
+                self.avoid_log == other.avoid_log
         )
 
 
@@ -707,17 +670,6 @@ class PolyExpFactory(BatchedFactory):
                                   self.order,
                                   self.avoid_log)[0]
 
-    def copy(self) -> 'PolyExpFactory':
-        copied_factory = PolyExpFactory(
-            scale_factors=self.scale_factors,
-            order=self.order,
-            asymptote=self.asymptote,
-            avoid_log=self.avoid_log
-        )
-        copied_factory.instack = self.instack
-        copied_factory.outstack = self.outstack
-        return copied_factory
-
     def __eq__(self, other):
         return (
                 BatchedFactory.__eq__(self, other) and
@@ -839,24 +791,12 @@ class AdaExpFactory(Factory):
         self.history.append((self.instack, self.outstack, params, zero_limit))
         return zero_limit
 
-    def copy(self) -> 'AdaExpFactory':
-        copied_factory = AdaExpFactory(
-            steps=self.steps,
-            scale_factor=self.scale_factor,
-            asymptote=self.asymptote,
-            avoid_log=self.avoid_log
-        )
-        copied_factory.instack = self.instack
-        copied_factory.outstack = self.outstack
-        copied_factory.history = self.history
-        return copied_factory
-
     def __eq__(self, other) -> bool:
         return (
-            Factory.__eq__(self, other) and
-            self.steps == other.steps and
-            self.scale_factor == other.scale_factor and
-            np.isclose(self.asymptote, other.asymptote) and
-            self.avoid_log == other.avoid_log and
-            np.allclose(self.history, other.history)
+                Factory.__eq__(self, other) and
+                self.steps == other.steps and
+                self.scale_factor == other.scale_factor and
+                np.isclose(self.asymptote, other.asymptote) and
+                self.avoid_log == other.avoid_log and
+                np.allclose(self.history, other.history)
         )

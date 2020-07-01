@@ -11,7 +11,6 @@ from mitiq.factories import (
     ExtrapolationError,
     ExtrapolationWarning,
     ConvergenceWarning,
-    BatchedFactory,
     RichardsonFactory,
     LinearFactory,
     PolyFactory,
@@ -293,105 +292,26 @@ def test_iteration_warnings():
         fac.iterate(lambda scale_factor: 1.0, max_iterations=3)
 
 
-def copy_factory(copy_type: str, factory):
-    if copy_type == "call":
-        copied_factory = factory.copy()
-    elif copy_type == "copy":
-        copied_factory = copy(factory)
-    elif copy_type == "deepcopy":
-        copied_factory = deepcopy(factory)
-    else:
-        raise ValueError("Invalid copy_type.")
-    return copied_factory
-
-
-@mark.parametrize("copy_type", ["call", "copy", "deepcopy"])
-def test_copy_batched_factory(copy_type):
-    rng = np.random.RandomState(seed=SEED)
-    for _ in range(10):
-        factory = BatchedFactory(scale_factors=[1, 2, 3])
-        factory.outstack = rng.rand(len(factory.scale_factors))
-        copied_factory = copy_factory(copy_type, factory)
-        assert copied_factory == factory
-        assert copied_factory is not factory
-
-
-@mark.parametrize("copy_type", ["call", "copy", "deepcopy"])
-def test_copy_poly_factory(copy_type):
-    for order in (1, 2, 3, 5):
-        for iterate in (True, False):
-            polyfac = PolyFactory(scale_factors=list(range(1, 10)), order=order)
-
-            if iterate:
-                polyfac.iterate(noise_to_expval=lambda x: x)
-
-            copied_factory = copy_factory(copy_type, polyfac)
-            assert copied_factory == polyfac
-            assert copied_factory is not polyfac
-
-            if iterate:
-                polyfac.reduce()
-                copied_factory = polyfac.copy()
-                assert copied_factory == polyfac
-                assert copied_factory is not polyfac
-
-
-@mark.parametrize("factory", (LinearFactory, RichardsonFactory))
-@mark.parametrize("copy_type", ["call", "copy", "deepcopy"])
-def test_copy(factory, copy_type):
+@mark.parametrize(
+    "factory", (LinearFactory, RichardsonFactory, PolyFactory)
+)
+def test_equal(factory):
+    """Tests that copies are factories are equal to the original factories."""
     for iterate in (True, False):
-        fac = factory(scale_factors=[1, 2, 3, 4])
-        if iterate:
-            fac.iterate(noise_to_expval=lambda x: x)
+        if factory is PolyFactory:
+            fac = factory(scale_factors=[1, 2, 3], order=2)
+        else:
+            fac = factory(scale_factors=[1, 2, 3])
 
-        copied_factory = copy_factory(copy_type, fac)
+        if iterate:
+            fac.iterate(noise_to_expval=lambda x: np.exp(x) + 0.5)
+
+        copied_factory = copy(fac)
         assert copied_factory == fac
         assert copied_factory is not fac
 
         if iterate:
             fac.reduce()
-            copied_factory = fac.copy()
+            copied_factory = copy(fac)
             assert copied_factory == fac
             assert copied_factory is not fac
-
-
-@mark.parametrize("copy_type", ["call", "copy", "deepcopy"])
-def test_copy_exp_factory(copy_type):
-    for iterate in (True, False):
-        factory = ExpFactory(
-            scale_factors=[1, 2, 3, 4],
-            asymptote=0.5,
-            avoid_log=True)
-        if iterate:
-            factory.iterate(noise_to_expval=lambda x: x)
-
-        copied_factory = copy_factory(copy_type, factory)
-        assert copied_factory == factory
-        assert copied_factory is not factory
-
-        if iterate:
-            factory.reduce()
-            assert copied_factory == factory
-            assert copied_factory is not factory
-
-
-@mark.parametrize("copy_type", ["call", "copy", "deepcopy"])
-def test_copy_poly_exp_factory(copy_type):
-    for iterate in (True, False):
-        factory = PolyExpFactory(
-            scale_factors=[1, 2, 3, 4],
-            order=2,
-            asymptote=0.5,
-            avoid_log=True
-        )
-        if iterate:
-            factory.iterate(noise_to_expval=lambda x: x)
-
-        copied_factory = copy_factory(copy_type, factory)
-        assert copied_factory == factory
-        assert copied_factory is not factory
-
-        if iterate:
-            factory.reduce()
-            assert copied_factory == factory
-            assert copied_factory is not factory
