@@ -3,9 +3,13 @@ import pytest
 
 import numpy as np
 
-from mitiq.factories import LinearFactory, RichardsonFactory, PolyFactory
+from mitiq.factories import (LinearFactory,
+                             RichardsonFactory,
+                             PolyFactory,
+                             ExpFactory,
+                             AdaExpFactory)
 from mitiq.folding import fold_gates_at_random, fold_gates_from_left, \
-    fold_gates_from_right
+    fold_gates_from_right, fold_global
 from mitiq.benchmarks.random_circuits import rand_circuit_zne, sample_projector
 
 # Fix a seed for this test file
@@ -18,6 +22,7 @@ def fold_gates_at_random_seeded(circuit, scale_factor):
 
 
 SCALE_FUNCTIONS = [
+    fold_global,
     fold_gates_at_random_seeded,
     fold_gates_from_left,
     fold_gates_from_right
@@ -26,7 +31,9 @@ SCALE_FUNCTIONS = [
 FACTORIES = [
     RichardsonFactory([1.0, 1.4, 2.1]),
     LinearFactory([1.0, 1.6]),
-    PolyFactory([1.0, 1.4, 2.1], order=2)
+    PolyFactory([1.0, 1.4, 2.1], order=2),
+    ExpFactory([1.0, 1.4, 2.1], asymptote=0.25),
+    AdaExpFactory(steps=3, scale_factor=1.5, asymptote=0.25),
 ]
 
 

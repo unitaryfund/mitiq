@@ -9,4 +9,5 @@ _build
 __pycache__/
 docs/build/
 mitiq.egg-info/
-
+dist/
+build/
