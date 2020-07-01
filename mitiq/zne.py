@@ -10,7 +10,7 @@ from mitiq.folding import fold_gates_at_random
 def execute_with_zne(
     qp: QPROGRAM,
     executor: Callable[[QPROGRAM], float],
-    factory: Factory = RichardsonFactory(scale_factors=[1., 2., 3.]),
+    factory: Factory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
 ) -> float:
     """Returns the zero-noise extrapolated expectation value that is computed
@@ -22,6 +22,9 @@ def execute_with_zne(
         factory: Factory object determining the zero-noise extrapolation method.
         scale_noise: Function for scaling the noise of a quantum circuit.
     """
+    if not factory:
+        factory = RichardsonFactory(scale_factors=[1., 2., 3.])
+
     if not callable(executor):
         raise TypeError("Argument `executor` must be callable.")
 
@@ -34,12 +37,12 @@ def execute_with_zne(
     if not callable(scale_noise):
         raise TypeError("Argument `scale_noise` must be callable.")
 
-    return factory.copy().run(qp, executor, scale_noise).reduce()
+    return factory.run(qp, executor, scale_noise).reduce()
 
 
 def mitigate_executor(
     executor: Callable[[QPROGRAM], float],
-    factory: Factory = RichardsonFactory(scale_factors=[1., 2., 3.]),
+    factory: Factory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
 ) -> Callable[[QPROGRAM], float]:
     """Returns an error-mitigated version of the input `executor`.
@@ -55,12 +58,12 @@ def mitigate_executor(
         scale_noise: Function for scaling the noise of a quantum circuit.
     """
     def new_executor(qp: QPROGRAM) -> float:
-        return execute_with_zne(qp, executor, factory.copy(), scale_noise)
+        return execute_with_zne(qp, executor, factory, scale_noise)
     return new_executor
 
 
 def zne_decorator(
-    factory: Factory = RichardsonFactory(scale_factors=[1., 2., 3.]),
+    factory: Factory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
 ) -> Callable[[QPROGRAM], float]:
     """Decorator which adds error mitigation to an executor function, i.e., a
@@ -74,5 +77,5 @@ def zne_decorator(
     def decorator(
         executor: Callable[[QPROGRAM], float]
     ) -> Callable[[QPROGRAM], float]:
-        return mitigate_executor(executor, factory.copy(), scale_noise)
+        return mitigate_executor(executor, factory, scale_noise)
     return decorator

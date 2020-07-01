@@ -48,7 +48,7 @@ def test_execute_with_zne_bad_arguments():
         execute_with_zne(circ, None)
 
     with pytest.raises(TypeError, match="Argument `factory` must be of type"):
-        execute_with_zne(circ, executor, factory=None)
+        execute_with_zne(circ, executor, factory=RichardsonFactory)
 
     with pytest.raises(TypeError, match="Argument `scale_noise` must be"):
         execute_with_zne(circ, executor, scale_noise=None)
