@@ -19,6 +19,7 @@ from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 
 from mitiq.utils import _equal
 from mitiq.folding import (
+    UnfoldableGateError,
     _is_measurement,
     _pop_measurements,
     _append_measurements,
@@ -276,10 +277,31 @@ def test_fold_gate_at_index_in_moment_empty_circuit():
 
 def test_fold_gate_at_index_in_moment_bad_moment():
     """Tests local folding with a moment index not in the input circuit."""
-    qreg = [GridQubit(x, y) for x in range(2) for y in range(2)]
+    qreg = GridQubit.rect(2, 2)
     circ = Circuit([ops.H.on_each(*qreg)])
     with pytest.raises(IndexError):
         _fold_gate_at_index_in_moment(circ, 1, 0)
+
+
+def test_unfoldable_gate_error_cirq():
+    """Tries to fold a gate without an inverse and checks an error is raised."""
+    qbit = LineQubit(0)
+    circ = Circuit(ops.measure(qbit))
+    with pytest.raises(UnfoldableGateError):
+        _fold_gate_at_index_in_moment(circ, moment_index=0, gate_index=0)
+
+
+def test_unfoldable_gate_error_qiskit():
+    """Tries to fold a gate without an inverse and checks an error is raised."""
+    qreg = QuantumRegister(1)
+    creg = ClassicalRegister(1)
+    circ = QuantumCircuit(qreg, creg)
+    circ.measure(qreg, creg)
+    cirq_circuit, _ = convert_to_mitiq(circ)
+    with pytest.raises(UnfoldableGateError):
+        _fold_gate_at_index_in_moment(
+            cirq_circuit, moment_index=0, gate_index=0
+        )
 
 
 def test_fold_gates_in_moment_single_qubit_gates():
