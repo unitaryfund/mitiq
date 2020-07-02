@@ -2,7 +2,6 @@
 
 from copy import deepcopy
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
-import warnings
 from functools import wraps
 
 import numpy as np
@@ -12,6 +11,10 @@ from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
 
 
 class UnsupportedCircuitError(Exception):
+    pass
+
+
+class UnfoldableGateError(Exception):
     pass
 
 
@@ -135,6 +138,7 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
         )
     return converted_circuit
 
+
 def converter(fold_method: Callable) -> Callable:
     """Decorator for handling conversions."""
     @wraps(fold_method)
@@ -153,21 +157,26 @@ def converter(fold_method: Callable) -> Callable:
 def _fold_gate_at_index_in_moment(
     circuit: Circuit, moment_index: int, gate_index: int
 ) -> None:
-    """Replaces, in a circuit, the gate G in (moment, index) with G G^dagger G.
+    """Replaces the gate G at (moment, index) with G G^dagger G, modifying the
+    circuit in place. Inserts two new moments into the circuit for G^dagger & G.
 
     Args:
-        circuit: Circuit to fold.
-        moment_index: Moment in which the gate sits in the circuit.
-        gate_index: Index of the gate within the specified moment.
+        circuit: Circuit with gates to fold.
+        moment_index: Moment in which the gate to be folded sits in the circuit.
+        gate_index: Index of the gate to be folded within the specified moment.
     """
     moment = circuit[moment_index]
-    # Sometimes empty moments are generated when programs are converted into
-    # cirq from other formats. These should not be folded.
-    if len(moment) > 0:
-        op = moment.operations[gate_index]
-        circuit.insert(
-            moment_index, [op, inverse(op)], strategy=InsertStrategy.NEW
+    op = moment.operations[gate_index]
+    try:
+        inverse_op = inverse(op)
+    except TypeError:
+        raise UnfoldableGateError(
+            f"Operation {op} does not have a defined "
+            f"inverse and cannot be folded."
         )
+    circuit.insert(
+        moment_index, [op, inverse_op], strategy=InsertStrategy.NEW
+    )
 
 
 def _fold_gates_in_moment(
@@ -236,12 +245,6 @@ def _fold_moments(circuit: Circuit, moment_indices: List[int]) -> None:
             i + shift, [circuit[i + shift], inverse(circuit[i + shift])]
         )
         shift += 2
-
-
-def _fold_all_gates_locally(circuit: Circuit) -> None:
-    """Replaces every gate G with G G^dag G by modifying the circuit in place.
-    """
-    _fold_moments(circuit, list(range(len(circuit))))
 
 
 def _default_weight(op: ops.Operation):

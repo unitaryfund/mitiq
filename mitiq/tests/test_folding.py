@@ -19,6 +19,7 @@ from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 
 from mitiq.utils import _equal
 from mitiq.folding import (
+    UnfoldableGateError,
     _is_measurement,
     _pop_measurements,
     _append_measurements,
@@ -32,7 +33,6 @@ from mitiq.folding import (
     _fold_gates_in_moment,
     _fold_gates,
     _fold_moments,
-    _fold_all_gates_locally,
     fold_gates_from_left,
     fold_gates_from_right,
     fold_gates_at_random,
@@ -277,10 +277,31 @@ def test_fold_gate_at_index_in_moment_empty_circuit():
 
 def test_fold_gate_at_index_in_moment_bad_moment():
     """Tests local folding with a moment index not in the input circuit."""
-    qreg = [GridQubit(x, y) for x in range(2) for y in range(2)]
+    qreg = GridQubit.rect(2, 2)
     circ = Circuit([ops.H.on_each(*qreg)])
     with pytest.raises(IndexError):
         _fold_gate_at_index_in_moment(circ, 1, 0)
+
+
+def test_unfoldable_gate_error_cirq():
+    """Tries to fold a gate without an inverse and checks an error is raised."""
+    qbit = LineQubit(0)
+    circ = Circuit(ops.measure(qbit))
+    with pytest.raises(UnfoldableGateError):
+        _fold_gate_at_index_in_moment(circ, moment_index=0, gate_index=0)
+
+
+def test_unfoldable_gate_error_qiskit():
+    """Tries to fold a gate without an inverse and checks an error is raised."""
+    qreg = QuantumRegister(1)
+    creg = ClassicalRegister(1)
+    circ = QuantumCircuit(qreg, creg)
+    circ.measure(qreg, creg)
+    cirq_circuit, _ = convert_to_mitiq(circ)
+    with pytest.raises(UnfoldableGateError):
+        _fold_gate_at_index_in_moment(
+            cirq_circuit, moment_index=0, gate_index=0
+        )
 
 
 def test_fold_gates_in_moment_single_qubit_gates():
@@ -433,43 +454,6 @@ def test_fold_moments():
     # Fold three moments
     circ = deepcopy(base)
     _fold_moments(circ, moment_indices=[0, 1, 2])
-    correct = Circuit(
-        [ops.H.on_each(*qreg)] * 3,
-        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
-        [ops.T.on(qreg[2]), ops.T.on(qreg[2]) ** -1, ops.T.on(qreg[2])],
-        [ops.TOFFOLI.on(*qreg)] * 3,
-    )
-    assert _equal(circ, correct)
-
-
-def test_fold_all_gates_locally():
-    # Test circuit:
-    # 0: ───H───@───
-    #           │
-    # 1: ───H───X───
-    qreg = LineQubit.range(2)
-    circ = Circuit([ops.H.on(qreg[0])], [ops.CNOT.on(*qreg)])
-    folded = deepcopy(circ)
-    _fold_all_gates_locally(folded)
-    correct = Circuit([ops.H.on(qreg[0])] * 3, [ops.CNOT.on(*qreg)] * 3,)
-    assert _equal(folded, correct)
-
-
-def test_fold_all_gates_locally_three_qubits():
-    # Test circuit
-    # 0: ───H───@───@───
-    #           │   │
-    # 1: ───H───X───@───
-    #               │
-    # 2: ───H───T───X───
-    qreg = LineQubit.range(3)
-    circ = Circuit(
-        [ops.H.on_each(*qreg)],
-        [ops.CNOT.on(qreg[0], qreg[1])],
-        [ops.T.on(qreg[2])],
-        [ops.TOFFOLI.on(*qreg)],
-    )
-    _fold_all_gates_locally(circ)
     correct = Circuit(
         [ops.H.on_each(*qreg)] * 3,
         [ops.CNOT.on(qreg[0], qreg[1])] * 3,
@@ -1288,7 +1272,9 @@ def test_fold_from_right_with_qiskit_circuits():
     assert equal_up_to_global_phase(unitary, folded_unitary)
 
     # Keep the input type
-    qiskit_folded_circuit = fold_gates_from_right(qiskit_circuit, scale_factor=1.0)
+    qiskit_folded_circuit = fold_gates_from_right(
+        qiskit_circuit, scale_factor=1.0
+    )
     assert isinstance(qiskit_folded_circuit, QuantumCircuit)
 
 
@@ -1338,7 +1324,9 @@ def test_fold_at_random_with_qiskit_circuits():
     assert equal_up_to_global_phase(unitary, folded_unitary)
 
     # Keep the input type
-    qiskit_folded_circuit = fold_gates_at_random(qiskit_circuit, scale_factor=1.0)
+    qiskit_folded_circuit = fold_gates_at_random(
+        qiskit_circuit, scale_factor=1.0
+    )
     assert isinstance(qiskit_folded_circuit, QuantumCircuit)
 
 
