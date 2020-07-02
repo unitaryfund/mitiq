@@ -166,7 +166,7 @@ of the folded circuit (a Cirq circuit), one can use the keyword argument ``retur
 Folding gates by fidelity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In local folding methods, gates can be folded according to a custom fidelities by passing the keyword argument
+In local folding methods, gates can be folded according to custom fidelities by passing the keyword argument
 ``fidelities`` into a local folding method. This argument should be a dictionary where each key is a string which
 specifies the gate and the value of the key is the fidelity of that gate. An example is shown below where we set the
 fidelity of all single qubit gates to be 1.0, meaning that these gates introduce no errors in the computation.
@@ -191,7 +191,7 @@ fidelity of all single qubit gates to be 1.0, meaning that these gates introduce
     # 2: ───H───T───X───
 
 
-    folded = fold_method(
+    folded = fold_gates_at_random(
         circ, scale_factor=3., fidelities={"single": 1.0,
                                            "CNOT": 0.99,
                                            "TOFFOLI": 0.95}
