@@ -1,39 +1,35 @@
 from typing import Optional
-import qiskit
-from qiskit import QuantumCircuit, ClassicalRegister
+from qiskit import Aer, execute, ClassicalRegister, QuantumCircuit
 
 # Noise simulation packages
 from qiskit.providers.aer.noise import NoiseModel
-from qiskit.providers.aer.noise.errors.standard_errors import (
-    depolarizing_error,
-)
+from qiskit.providers.aer.noise.errors.standard_errors import depolarizing_error
 
 from mitiq.benchmarks.randomized_benchmarking import rb_circuits
 from mitiq.mitiq_qiskit.conversions import to_qiskit
 
-BACKEND = qiskit.Aer.get_backend("qasm_simulator")
+BACKEND = Aer.get_backend("qasm_simulator")
 
 
-def random_identity_circuit(num_cliffords=None, seed: Optional[int] = None):
+def random_one_qubit_identity_circuit(num_cliffords: int) -> QuantumCircuit:
     """Returns a single-qubit identity circuit.
 
     Args:
-        num_cliffords (int): Number of cliffords used to generate the random circuit.
-        seed: Optional seed for random number generator.
+        num_cliffords (int): Number of cliffords used to generate the circuit.
 
     Returns:
         circuit: Quantum circuit as a :class:`qiskit.QuantumCircuit` object.
     """
-    return to_qiskit(rb_circuits(n_qubits=1,
-                                 num_cliffords=[num_cliffords],
-                                 trials=1)[0])
+    return to_qiskit(
+        rb_circuits(n_qubits=1, num_cliffords=[num_cliffords], trials=1)[0]
+    )
 
 
 def run_with_noise(
-        circuit: QuantumCircuit,
-        noise: float,
-        shots: int,
-        seed: Optional[int] = None
+    circuit: QuantumCircuit,
+    noise: float,
+    shots: int,
+    seed: Optional[int] = None
 ) -> float:
     """Runs the quantum circuit with a depolarizing channel noise model.
 
@@ -56,7 +52,7 @@ def run_with_noise(
     )
 
     # execution of the experiment
-    job = qiskit.execute(
+    job = execute(
         circuit,
         backend=BACKEND,
         basis_gates=["u1", "u2", "u3"],
@@ -126,7 +122,7 @@ def run_program(pq: QuantumCircuit, shots: int = 100,
     Returns:
         expval: expected value.
     """
-    job = qiskit.execute(
+    job = execute(
         pq,
         backend=BACKEND,
         basis_gates=["u1", "u2", "u3"],
@@ -141,22 +137,3 @@ def run_program(pq: QuantumCircuit, shots: int = 100,
     counts = results.get_counts()
     expval = counts["0"] / shots
     return expval
-
-
-def measure(circuit, qid) -> QuantumCircuit:
-    """Apply the measure method on the first qubit of a quantum circuit
-    given a classical register.
-
-    Args:
-        circuit: Quantum circuit.
-        qid: classical register.
-
-    Returns:
-        circuit: circuit after the measurement.
-    """
-    # Ensure that we have a classical register of enough size available
-    if len(circuit.clbits) == 0:
-        reg = ClassicalRegister(qid + 1,'creg')
-        circuit.add_register(reg)
-    circuit.measure(0, qid)
-    return circuit
