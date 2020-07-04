@@ -2,6 +2,8 @@
 
 from typing import Callable
 
+from functools import wraps
+
 from mitiq import QPROGRAM
 from mitiq.factories import Factory, RichardsonFactory
 from mitiq.folding import fold_gates_at_random
@@ -57,7 +59,7 @@ def mitigate_executor(
         scale_noise: Function for scaling the noise of a quantum circuit.
                      If not specified, a default method is used.
     """
-
+    @wraps(executor)
     def new_executor(qp: QPROGRAM) -> float:
         return execute_with_zne(qp, executor, fac, scale_noise)
 
