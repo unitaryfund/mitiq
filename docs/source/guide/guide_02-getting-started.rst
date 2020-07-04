@@ -101,6 +101,29 @@ error-mitigated version.
 
     0.99948
 
+
+.. note::
+   As shown here, ``Mitiq`` wraps executor functions that have a specific type:
+   they take quantum programs as input and return expectation values. However,
+   one often has execution function with other arguments such as the number of
+   shots, the observable to measure, or the noise level of a noisy simulation.
+   It is still easy to use these with mitiq by using partial function application.
+   Here's a pseudo-code example:
+
+   .. code-block::
+
+      from functools import partial
+
+      def shot_executor(qprogram, n_shots) -> float:
+          ...
+      # we partially apply the n_shots argument to get a function that just
+      # takes a quantum program
+      mitigated = execute_with_zne(circ, partial(shot_executor, n_shots=100))
+
+   You can read more about functools partial application
+   `here <https://docs.python.org/3/library/functools.html#functools.partial>`_.
+
+
 The default implementation uses Richardson extrapolation to extrapolate the
 expectation value to the zero noise limit :cite:`Temme_2017_PRL`. ``Mitiq``
 comes equipped with other extrapolation methods as well. Different methods of
