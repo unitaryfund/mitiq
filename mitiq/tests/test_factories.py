@@ -2,7 +2,7 @@
 Testing of zero-noise extrapolation methods
 (factories) with classically generated data.
 """
-
+from copy import copy, deepcopy
 from typing import Callable
 from pytest import mark, raises, warns
 import numpy as np
@@ -290,3 +290,28 @@ def test_iteration_warnings():
     with warns(ConvergenceWarning,
                match=r"Factory iteration loop stopped before convergence."):
         fac.iterate(lambda scale_factor: 1.0, max_iterations=3)
+
+
+@mark.parametrize(
+    "factory", (LinearFactory, RichardsonFactory, PolyFactory)
+)
+def test_equal(factory):
+    """Tests that copies are factories are equal to the original factories."""
+    for iterate in (True, False):
+        if factory is PolyFactory:
+            fac = factory(scale_factors=[1, 2, 3], order=2)
+        else:
+            fac = factory(scale_factors=[1, 2, 3])
+
+        if iterate:
+            fac.iterate(noise_to_expval=lambda x: np.exp(x) + 0.5)
+
+        copied_factory = copy(fac)
+        assert copied_factory == fac
+        assert copied_factory is not fac
+
+        if iterate:
+            fac.reduce()
+            copied_factory = copy(fac)
+            assert copied_factory == fac
+            assert copied_factory is not fac

@@ -84,7 +84,7 @@ def _mitiq_curve_fit(ansatz: Callable[..., float],
             )
     except RuntimeError:
         raise ExtrapolationError(_EXTR_ERR) from None
-    return opt_params
+    return list(opt_params)
 
 
 def _mitiq_polyfit(instack: List[float],
@@ -114,12 +114,12 @@ def _mitiq_polyfit(instack: List[float],
             warn.message = _EXTR_WARN
         # re-raise all warnings
         warnings.warn_explicit(
-                warn.message,
-                warn.category,
-                warn.filename,
-                warn.lineno
-            )
-    return opt_params
+            warn.message,
+            warn.category,
+            warn.filename,
+            warn.lineno
+        )
+    return list(opt_params)
 
 
 class Factory(ABC):
@@ -236,6 +236,12 @@ class Factory(ABC):
 
         return self.iterate(_noise_to_expval, max_iterations)
 
+    def __eq__(self, other):
+        return (
+                np.allclose(self.instack, other.instack) and
+                np.allclose(self.outstack, other.outstack)
+        )
+
 
 class BatchedFactory(Factory):
     """
@@ -286,6 +292,15 @@ class BatchedFactory(Factory):
                 f"and 'self.outstack' ({len(self.outstack)}) must be equal."
             )
         return len(self.outstack) == len(self.scale_factors)
+
+    def reduce(self) -> float:
+        raise NotImplementedError
+
+    def __eq__(self, other):
+        return (
+                Factory.__eq__(self, other) and
+                np.allclose(self.scale_factors, other.scale_factors)
+        )
 
 
 class PolyFactory(BatchedFactory):
@@ -366,6 +381,9 @@ class PolyFactory(BatchedFactory):
         return PolyFactory.static_reduce(
             self.instack, self.outstack, self.order
         )
+
+    def __eq__(self, other):
+        return BatchedFactory.__eq__(self, other) and self.order == other.order
 
 
 class RichardsonFactory(BatchedFactory):
@@ -460,6 +478,21 @@ class ExpFactory(BatchedFactory):
                                             self.asymptote,
                                             order=1,
                                             avoid_log=self.avoid_log)[0]
+
+    def __eq__(self, other):
+        if (self.asymptote and other.asymptote is None or
+                self.asymptote is None and other.asymptote):
+            return False
+        if self.asymptote is None and other.asymptote is None:
+            return (
+                    BatchedFactory.__eq__(self, other) and
+                    self.avoid_log == other.avoid_log
+            )
+        return (
+                BatchedFactory.__eq__(self, other) and
+                np.isclose(self.asymptote, other.asymptote) and
+                self.avoid_log == other.avoid_log
+        )
 
 
 class PolyExpFactory(BatchedFactory):
@@ -627,7 +660,7 @@ class PolyExpFactory(BatchedFactory):
         zero_limit = asymptote + sign * np.exp(z_coefficients[-1])
         # Parameters from low order to high order
         params = [asymptote] + list(z_coefficients[::-1])
-        return (zero_limit, params)
+        return zero_limit, params
 
     def reduce(self) -> float:
         """Returns the zero-noise limit."""
@@ -636,6 +669,14 @@ class PolyExpFactory(BatchedFactory):
                                   self.asymptote,
                                   self.order,
                                   self.avoid_log)[0]
+
+    def __eq__(self, other):
+        return (
+                BatchedFactory.__eq__(self, other) and
+                np.isclose(self.asymptote, other.asymptote) and
+                self.avoid_log == other.avoid_log and
+                self.order == other.order
+        )
 
 
 class AdaExpFactory(Factory):
@@ -757,3 +798,13 @@ class AdaExpFactory(Factory):
         # Update optimization history
         self.history.append((self.instack, self.outstack, params, zero_limit))
         return zero_limit
+
+    def __eq__(self, other) -> bool:
+        return (
+                Factory.__eq__(self, other) and
+                self.steps == other.steps and
+                self.scale_factor == other.scale_factor and
+                np.isclose(self.asymptote, other.asymptote) and
+                self.avoid_log == other.avoid_log and
+                np.allclose(self.history, other.history)
+        )

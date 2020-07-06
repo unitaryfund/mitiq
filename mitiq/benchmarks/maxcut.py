@@ -95,7 +95,7 @@ def make_maxcut(graph: List[Tuple[int, int]],
             return execute_with_zne(qaoa_prog,
                                     executor=noisy_backend,
                                     scale_noise=scale_noise,
-                                    fac=factory)
+                                    factory=factory)
 
     return qaoa_cost, qaoa_ansatz, cost_mat
 
