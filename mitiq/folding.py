@@ -6,7 +6,7 @@ from functools import wraps
 
 import numpy as np
 
-from cirq import Circuit, InsertStrategy, inverse, ops
+from cirq import Circuit, InsertStrategy, inverse, ops, has_mixture
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
 
 
@@ -15,6 +15,10 @@ class UnsupportedCircuitError(Exception):
 
 
 class UnfoldableGateError(Exception):
+    pass
+
+
+class UnfoldableCircuitError(Exception):
     pass
 
 
@@ -47,10 +51,10 @@ def _pop_measurements(
     """Removes all measurements from a circuit.
 
     Args:
-        circuit: a quantum circuit as a :class:`cirq.Circuit` object.
+        circuit: A quantum circuit as a :class:`cirq.Circuit` object.
 
     Returns:
-        measurements: list
+        measurements: List of measurements in the circuit.
     """
     measurements = [
         list(m) for m in circuit.findall_operations(_is_measurement)
@@ -73,6 +77,30 @@ def _append_measurements(
             len(circuit) + 1
         )  # Make sure the moment to insert into is the last in the circuit
     circuit.batch_insert(measurements)
+
+
+def _check_foldable(circuit: Circuit) -> None:
+    """Raises an error if the input circuit cannot be folded.
+
+    Args:
+        circuit: Checks whether this circuit is able to be folded.
+
+    Raises:
+        UnfoldableCircuitError:
+            * If the circuit has intermediate measurements.
+            * If the circuit has non-unitary channels which are not terminal
+              measurements.
+    """
+    if not circuit.are_all_measurements_terminal():
+        raise UnfoldableCircuitError(
+            "Circuit contains intermediate measurements and cannot be folded."
+        )
+
+    if any(has_mixture(op) for op in circuit.all_operations()):
+        raise UnfoldableCircuitError(
+            "Circuit contains non-unitary channels which are not terminal "
+            "measurements and cannot be folded."
+        )
 
 
 def squash_moments(circuit: Circuit) -> Circuit:
@@ -306,6 +334,7 @@ def _get_num_to_fold(scale_factor: float, ngates: int) -> int:
     return int(round(ngates * (scale_factor - 1.0) / 2.0))
 
 
+# Local folding functions
 @converter
 def fold_gates_from_left(
         circuit: QPROGRAM, scale_factor: float, **kwargs
@@ -362,11 +391,7 @@ def fold_gates_from_left(
         folded: The folded quantum circuit as a QPROGRAM.
     """
     # Check inputs and handle keyword arguments
-    if not circuit.are_all_measurements_terminal():
-        raise ValueError(
-            f"Input circuit contains intermediate measurements"
-            " and cannot be folded."
-        )
+    _check_foldable(circuit)
 
     if not 1. <= scale_factor:
         raise ValueError(
@@ -482,11 +507,8 @@ def fold_gates_from_right(
     Returns:
         folded: The folded quantum circuit as a QPROGRAM.
     """
-    if not circuit.are_all_measurements_terminal():
-        raise ValueError(
-            f"Input circuit contains intermediate measurements"
-            " and cannot be folded."
-        )
+    _check_foldable(circuit)
+
     circuit = deepcopy(circuit)
     measurements = _pop_measurements(circuit)
 
@@ -597,11 +619,8 @@ def fold_gates_at_random(
     Returns:
         folded: The folded quantum circuit as a QPROGRAM.
     """
-    if not circuit.are_all_measurements_terminal():
-        raise ValueError(
-            f"Input circuit contains intermediate measurements"
-            " and cannot be folded."
-        )
+    # Check inputs and handle keyword arguments
+    _check_foldable(circuit)
 
     if not 1. <= scale_factor:
         raise ValueError(
@@ -759,7 +778,7 @@ def _fold_local(
     return folded
 
 
-# Circuit level folding
+# Global folding function
 @converter
 def fold_global(circuit: QPROGRAM, scale_factor: float, **kwargs) -> QPROGRAM:
     """Returns a new circuit obtained by folding the global unitary of the
@@ -783,14 +802,10 @@ def fold_global(circuit: QPROGRAM, scale_factor: float, **kwargs) -> QPROGRAM:
     Returns:
         folded: the folded quantum circuit as a QPROGRAM.
     """
+    _check_foldable(circuit)
+
     if not (scale_factor >= 1):
         raise ValueError("The scale factor must be a real number >= 1.")
-
-    if not circuit.are_all_measurements_terminal():
-        raise ValueError(
-            "Input circuit contains intermediate measurements"
-            " and cannot be folded."
-        )
 
     folded = deepcopy(circuit)
     measurements = _pop_measurements(folded)
@@ -803,11 +818,13 @@ def fold_global(circuit: QPROGRAM, scale_factor: float, **kwargs) -> QPROGRAM:
         folded += Circuit(inverse(base_circuit), base_circuit)
 
     # Fold remaining gates until the scale is reached
-    ops = list(base_circuit.all_operations())
-    num_to_fold = int(round(fraction_scale * len(ops) / 2))
+    operations = list(base_circuit.all_operations())
+    num_to_fold = int(round(fraction_scale * len(operations) / 2))
 
     if num_to_fold > 0:
-        folded += Circuit([inverse(ops[-num_to_fold:])], [ops[-num_to_fold:]])
+        folded += Circuit(
+            [inverse(operations[-num_to_fold:])], [operations[-num_to_fold:]]
+        )
 
     _append_measurements(folded, measurements)
     if not (kwargs.get("squash_moments") is False):

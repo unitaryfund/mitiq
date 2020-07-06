@@ -20,6 +20,7 @@ from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 from mitiq.utils import _equal
 from mitiq.folding import (
     UnfoldableGateError,
+    UnfoldableCircuitError,
     _is_measurement,
     _pop_measurements,
     _append_measurements,
@@ -602,17 +603,43 @@ def test_fold_from_left_with_terminal_measurements_max_stretch():
 
 
 @pytest.mark.parametrize(
-    ["fold_method"],
-    [[fold_gates_from_left], [fold_gates_from_right], [fold_gates_at_random]],
+    "fold_method",
+    [fold_gates_from_left, fold_gates_from_right,
+     fold_gates_at_random, fold_global],
 )
 def test_fold_with_intermediate_measurements_raises_error(fold_method):
-    """Tests folding from left with intermediate measurements."""
-    # Test circuit
-    #
+    """Tests local folding functions raise an error on circuits with
+    intermediate measurements.
+    """
     qbit = LineQubit(0)
     circ = Circuit([ops.H.on(qbit)], [ops.measure(qbit)], [ops.T.on(qbit)])
-    with pytest.raises(ValueError):
-        fold_method(circ, scale_factor=2.0)
+    with pytest.raises(
+            UnfoldableCircuitError,
+            match="Circuit contains intermediate measurements"
+    ):
+        fold_method(circ, scale_factor=3.0)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left, fold_gates_from_right,
+     fold_gates_at_random, fold_global],
+)
+def test_fold_with_channels_raises_error(fold_method):
+    """Tests local folding functions raise an error on circuits with
+    non-unitary channels (which are not measurements).
+    """
+    qbit = LineQubit(0)
+    circ = Circuit(
+        ops.H.on(qbit),
+        ops.depolarize(p=0.1).on(qbit),
+        ops.measure(qbit)
+    )
+    with pytest.raises(
+            UnfoldableCircuitError,
+            match="Circuit contains non-unitary channels"
+    ):
+        fold_method(circ, scale_factor=3.0)
 
 
 def test_fold_from_right_basic():
@@ -1028,16 +1055,6 @@ def test_global_fold_min_stretch_with_terminal_measurements():
     folded = fold_global(circ, scale_factor=1.0)
     assert _equal(folded, circ)
     assert folded is not circ
-
-
-def test_global_fold_raises_error_intermediate_measurements():
-    """Tests than an error is raised when trying to globally fold
-    a circuit with intermediate measurements.
-    """
-    qbit = GridQubit(0, 0)
-    circ = Circuit([ops.H.on(qbit), ops.measure(qbit), ops.H.on(qbit)])
-    with pytest.raises(ValueError):
-        fold_global(circ, scale_factor=3)
 
 
 def test_global_fold_stretch_factor_of_three():
