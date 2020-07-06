@@ -85,8 +85,8 @@ def _check_foldable(circuit: Circuit) -> None:
     Args:
         circuit: Checks whether this circuit is able to be folded.
 
-     Raises:
-         UnfoldableCircuitError:
+    Raises:
+        UnfoldableCircuitError:
             * If the circuit has intermediate measurements.
             * If the circuit has non-unitary channels which are not terminal
               measurements.
