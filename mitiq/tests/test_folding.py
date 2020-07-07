@@ -1224,17 +1224,7 @@ def test_fold_from_left_with_qiskit_circuits():
     )
 
     assert isinstance(folded_circuit, Circuit)
-    # TODO: The following check fails because the measurements in
-    #  folded_circuit have a key, whereas the measurements in
-    #  correct_folded_circuit do not have a key.
-    #  Could add flag in _equal to ignore this, as with qubit equality.
-    #  See https://github.com/unitaryfund/mitiq/issues/99.
-
-    # Check equality of the final unitaries
-    cirq_circuit = from_qiskit(qiskit_circuit)
-    unitary = cirq_circuit.unitary()
-    folded_unitary = correct_folded_circuit.unitary()
-    assert equal_up_to_global_phase(unitary, folded_unitary)
+    assert _equal(folded_circuit, correct_folded_circuit)
 
     # Keep the input type
     qiskit_folded_circuit = fold_gates_from_left(
@@ -1276,17 +1266,7 @@ def test_fold_from_right_with_qiskit_circuits():
     )
 
     assert isinstance(folded_circuit, Circuit)
-    # TODO: The following check fails because the measurements in
-    #  folded_circuit have a key, whereas the measurements in
-    #  correct_folded_circuit do not have a key.
-    #  Could add flag in _equal to ignore this, as with qubit equality.
-    #  See https://github.com/unitaryfund/mitiq/issues/99.
-
-    # Check equality of the final unitaries
-    cirq_circuit = from_qiskit(qiskit_circuit)
-    unitary = cirq_circuit.unitary()
-    folded_unitary = correct_folded_circuit.unitary()
-    assert equal_up_to_global_phase(unitary, folded_unitary)
+    assert _equal(folded_circuit, correct_folded_circuit)
 
     # Keep the input type
     qiskit_folded_circuit = fold_gates_from_right(
@@ -1328,17 +1308,7 @@ def test_fold_at_random_with_qiskit_circuits():
     )
 
     assert isinstance(folded_circuit, Circuit)
-    # TODO: The following check fails because the measurements in
-    #  folded_circuit have a key, whereas the measurements in
-    #  correct_folded_circuit do not have a key.
-    #  Could add flag in _equal to ignore this, as with qubit equality.
-    #  See https://github.com/unitaryfund/mitiq/issues/99.
-
-    # Check equality of the final unitaries
-    cirq_circuit = from_qiskit(qiskit_circuit)
-    unitary = cirq_circuit.unitary()
-    folded_unitary = correct_folded_circuit.unitary()
-    assert equal_up_to_global_phase(unitary, folded_unitary)
+    assert _equal(folded_circuit, correct_folded_circuit)
 
     # Keep the input type
     qiskit_folded_circuit = fold_gates_at_random(
