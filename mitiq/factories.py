@@ -42,11 +42,11 @@ class ConvergenceWarning(Warning):
     pass
 
 
-def _mitiq_curve_fit(ansatz: Callable[..., float],
-                     instack: List[float],
-                     outstack: List[float],
-                     init_params: Optional[List[float]] = None,
-                     ) -> List[float]:
+def mitiq_curve_fit(ansatz: Callable[..., float],
+                    instack: List[float],
+                    outstack: List[float],
+                    init_params: Optional[List[float]] = None,
+                    ) -> List[float]:
     """This is a wrapping of the `scipy.optimize.curve_fit` function with
     custom errors and warnings. It is used to make a non-linear fit.
 
@@ -87,10 +87,10 @@ def _mitiq_curve_fit(ansatz: Callable[..., float],
     return list(opt_params)
 
 
-def _mitiq_polyfit(instack: List[float],
-                   outstack: List[float],
-                   deg: int,
-                   weights: Optional[List[float]] = None) -> List[float]:
+def mitiq_polyfit(instack: List[float],
+                  outstack: List[float],
+                  deg: int,
+                  weights: Optional[List[float]] = None) -> List[float]:
     """This is a wrapping of the `numpy.polyfit` function with
     custom warnings. It is used to make a polynomial fit.
 
@@ -271,17 +271,17 @@ class BatchedFactory(Factory):
             raise ValueError(
                 "At least 2 scale factors are necessary."
             )
-        self.scale_factors = scale_factors
+        self._scale_factors = scale_factors
         super(BatchedFactory, self).__init__()
 
     def next(self) -> float:
         try:
-            next_param = self.scale_factors[len(self.outstack)]
+            next_param = self._scale_factors[len(self.outstack)]
         except IndexError:
             raise IndexError(
                 "BatchedFactory cannot take another step. "
                 "Number of batched scale_factors"
-                f" ({len(self.scale_factors)}) exceeded."
+                f" ({len(self._scale_factors)}) exceeded."
             )
         return next_param
 
@@ -291,7 +291,7 @@ class BatchedFactory(Factory):
                 f"The length of 'self.instack' ({len(self.instack)}) "
                 f"and 'self.outstack' ({len(self.outstack)}) must be equal."
             )
-        return len(self.outstack) == len(self.scale_factors)
+        return len(self.outstack) == len(self._scale_factors)
 
     def reduce(self) -> float:
         raise NotImplementedError
@@ -299,7 +299,7 @@ class BatchedFactory(Factory):
     def __eq__(self, other):
         return (
                 Factory.__eq__(self, other) and
-                np.allclose(self.scale_factors, other.scale_factors)
+                np.allclose(self._scale_factors, other._scale_factors)
         )
 
 
@@ -368,7 +368,7 @@ class PolyFactory(BatchedFactory):
             )
         # Get coefficients {c_j} of p(x)= c_0 + c_1*x + c_2*x**2...
         # which best fits the data
-        coefficients = _mitiq_polyfit(instack, outstack, deg=order)
+        coefficients = mitiq_polyfit(instack, outstack, deg=order)
         # c_0, i.e., the value of p(x) at x=0, is returned
         return coefficients[-1]
 
@@ -605,7 +605,7 @@ class PolyExpFactory(BatchedFactory):
                              f" of data points minus {1 + shift}.")
 
         # Deduce "sign" parameter of the exponential ansatz
-        slope, _ = _mitiq_polyfit(instack, outstack, deg=1)
+        slope, _ = mitiq_polyfit(instack, outstack, deg=1)
         sign = np.sign(-slope)
 
         def _ansatz_unknown(x: float, *coeffs: float):
@@ -624,10 +624,10 @@ class PolyExpFactory(BatchedFactory):
         if asymptote is None:
             # First guess for the parameter (decay or growth from "sign" to 0)
             p_zero = [0.0, sign, -1.0] + [0.0 for _ in range(order - 1)]
-            opt_params = _mitiq_curve_fit(_ansatz_unknown,
-                                          instack,
-                                          outstack,
-                                          p_zero)
+            opt_params = mitiq_curve_fit(_ansatz_unknown,
+                                         instack,
+                                         outstack,
+                                         p_zero)
             # The zero noise limit is ansatz(0)= asympt + b
             zero_limit = opt_params[0] + opt_params[1]
             return (zero_limit, opt_params)
@@ -636,10 +636,10 @@ class PolyExpFactory(BatchedFactory):
         if avoid_log:
             # First guess for the parameter (decay or growth from "sign")
             p_zero = [sign, -1.0] + [0.0 for _ in range(order - 1)]
-            opt_params = _mitiq_curve_fit(_ansatz_known,
-                                          instack,
-                                          outstack,
-                                          p_zero)
+            opt_params = mitiq_curve_fit(_ansatz_known,
+                                         instack,
+                                         outstack,
+                                         p_zero)
             # The zero noise limit is ansatz(0)= asymptote + b
             zero_limit = asymptote + opt_params[0]
             return (zero_limit, [asymptote] + list(opt_params))
@@ -652,10 +652,10 @@ class PolyExpFactory(BatchedFactory):
         # Note: coefficients are ordered from high powers to powers of x
         # Weights "w" are used to compensate for error propagation
         # after the log transformation y --> z
-        z_coefficients = _mitiq_polyfit(instack,
-                                        zstack,
-                                        deg=order,
-                                        weights=np.sqrt(np.abs(shifted_y)))
+        z_coefficients = mitiq_polyfit(instack,
+                                       zstack,
+                                       deg=order,
+                                       weights=np.sqrt(np.abs(shifted_y)))
         # The zero noise limit is ansatz(0)
         zero_limit = asymptote + sign * np.exp(z_coefficients[-1])
         # Parameters from low order to high order
@@ -738,8 +738,8 @@ class AdaExpFactory(Factory):
         if max_scale_factor <= 1:
             raise ValueError("The argument 'max_scale_factor' must be"
                              " strictly larger than one.")
-        self.steps = steps
-        self.scale_factor = scale_factor
+        self._steps = steps
+        self._scale_factor = scale_factor
         self.asymptote = asymptote
         self.avoid_log = avoid_log
         self.max_scale_factor = max_scale_factor
@@ -753,12 +753,12 @@ class AdaExpFactory(Factory):
         # The 1st scale factor is always 1
         if len(self.instack) == 0:
             return 1.0
-        # The 2nd scale factor is self.scale_factor
+        # The 2nd scale factor is self._scale_factor
         if len(self.instack) == 1:
-            return self.scale_factor
+            return self._scale_factor
         # If asymptote is None we use 2 * scale_factor as third noise parameter
         if (len(self.instack) == 2) and (self.asymptote is None):
-            return 2 * self.scale_factor
+            return 2 * self._scale_factor
 
         with warnings.catch_warnings():
             # This is an intermediate fit, so we suppress its warning messages
@@ -784,7 +784,7 @@ class AdaExpFactory(Factory):
                 f"The length of 'self.instack' ({len(self.instack)}) "
                 f"and 'self.outstack' ({len(self.outstack)}) must be equal."
             )
-        return len(self.outstack) == self.steps
+        return len(self.outstack) == self._steps
 
     def reduce(self) -> float:
         """Returns the zero-noise limit."""
@@ -802,8 +802,8 @@ class AdaExpFactory(Factory):
     def __eq__(self, other) -> bool:
         return (
                 Factory.__eq__(self, other) and
-                self.steps == other.steps and
-                self.scale_factor == other.scale_factor and
+                self._steps == other._steps and
+                self._scale_factor_ == other._scale_factor and
                 np.isclose(self.asymptote, other.asymptote) and
                 self.avoid_log == other.avoid_log and
                 np.allclose(self.history, other.history)
