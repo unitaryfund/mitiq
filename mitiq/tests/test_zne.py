@@ -10,7 +10,7 @@ from mitiq.factories import LinearFactory, RichardsonFactory
 from mitiq.folding import (
     fold_gates_from_left, fold_gates_from_right, fold_gates_at_random
 )
-from mitiq.zne import execute_with_zne
+from mitiq.zne import execute_with_zne, mitigate_executor, zne_decorator
 
 
 # Default qubit register and circuit for unit tests
@@ -52,3 +52,30 @@ def test_execute_with_zne_bad_arguments():
 
     with pytest.raises(TypeError, match="Argument `scale_noise` must be"):
         execute_with_zne(circ, executor, scale_noise=None)
+
+def test_error_zne_decorator():
+    """Tests that the proper error is raised if the decorator is used without parenthesis."""
+    with pytest.raises(TypeError, match="The decorator must be used with parenthesis"):
+        @zne_decorator
+        def test_executor(circuit):
+            return 0
+
+def test_doc_is_preserved():
+    """Tests that the doc of the original executor is preserved."""
+    
+    def first_executor(circuit):
+        """Doc of the original executor."""
+        return 0
+
+    mit_executor = mitigate_executor(first_executor)
+    assert mit_executor.__doc__ == first_executor.__doc__
+
+    @zne_decorator()
+    def second_executor(circuit):
+        """Doc of the original executor."""
+        return 0
+
+    assert second_executor.__doc__ == first_executor.__doc__
+
+
+
