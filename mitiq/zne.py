@@ -1,6 +1,7 @@
 """High-level zero-noise extrapolation tools."""
 
 from typing import Callable
+from functools import wraps
 
 from mitiq import QPROGRAM
 from mitiq.factories import Factory, RichardsonFactory
@@ -57,6 +58,8 @@ def mitigate_executor(
         factory: Factory object determining the zero-noise extrapolation method.
         scale_noise: Function for scaling the noise of a quantum circuit.
     """
+
+    @wraps(executor)
     def new_executor(qp: QPROGRAM) -> float:
         return execute_with_zne(qp, executor, factory, scale_noise)
     return new_executor
@@ -74,6 +77,12 @@ def zne_decorator(
         factory: Factory object determining the zero-noise extrapolation method.
         scale_noise: Function for scaling the noise of a quantum circuit.
     """
+    
+    # raise an error if the decorator is used without parenthesis
+    if callable(factory):
+        raise TypeError("The decorator must be used with parenthesis even"
+                        " if no explicit arguments are passed, i.e., @zne_decorator().")
+
     def decorator(
         executor: Callable[[QPROGRAM], float]
     ) -> Callable[[QPROGRAM], float]:
