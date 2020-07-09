@@ -9,7 +9,7 @@ Mitigating a MaxCut Landscape with QAOA
 This tutorial shows an example of mitigating the energy landscape for a two-qubit instance of MaxCut using the quantum
 alternating operator ansatz (QAOA). We first import the libraries we will use.
 
-.. doctest:: python
+.. testcode:: python
 
     import matplotlib.pyplot as plt
     import numpy as np
@@ -18,6 +18,7 @@ alternating operator ansatz (QAOA). We first import the libraries we will use.
     from mitiq.zne import mitigate_executor
 
     SIMULATOR = DensityMatrixSimulator()
+
 
 We will use the density matrix simulator to compute the final density matrix of our noisy circuit, from which we then
 compute expectation values to mitigate.
@@ -28,7 +29,7 @@ Defining the noiseless circuit
 We define a function below which returns a two-qubit QAOA circuit at a specified driver angle :math:`\gamma`. The mixer
 angle :math:`\beta` is set to :math:`\pi / 8` and we will sweep over :math:`\gamma` to compute an energy landscape.
 
-.. doctest:: python
+.. testcode:: python
 
     def maxcut_qaoa_circuit(gamma: float) -> Circuit:
         """Returns two-qubit MaxCut QAOA circuit with beta = pi/8 and with the provided gamma.
@@ -69,7 +70,7 @@ To interface with ``mitiq``, we now define an executor function which adds noise
 expectation value of the usual QAOA observable :math:`Z \otimes Z`, i.e., Pauli-:math:`Z` on each qubit. The code block
 below first creates this observable, then sets a noise value, then defines the executor.
 
-.. doctest:: python
+.. testcode:: python
 
     # Observable to measure
     z = np.diag([1, -1])
@@ -107,7 +108,7 @@ Computing the unmitigated landscape
 
 We now compute the unmitigated energy landscape :math:`\langle Z \otimes Z \rangle(\gamma)` in the following code block.
 
-.. doctest:: python
+.. testcode:: python
 
     gammas = np.linspace(-np.pi, np.pi, 50)
     expectations = []
@@ -120,7 +121,7 @@ We now compute the unmitigated energy landscape :math:`\langle Z \otimes Z \rang
 
 The following code plots these values for visualization.
 
-.. doctest:: python
+.. testcode:: python
 
     plt.figure(figsize=(8, 6))
     plt.scatter(gammas, expectations, color="r", label="Unmitigated")
@@ -144,14 +145,14 @@ We now do the same task but use ``mitiq`` to mitigate the energy landscape.
 
 We do so by first getting a mitigated executor as follows.
 
-.. doctest:: python
+.. testcode:: python
 
     mitigated_executor = mitigate_executor(executor)
 
 We then run the same code above to compute the energy landscape, but this time use the ``mitigated_exectuor`` instead of
 just the executor.
 
-.. doctest:: python
+.. testcode:: python
 
     mitigated_expectations = []
 
@@ -162,7 +163,7 @@ just the executor.
 
 We can visualize the mitigated landscape alongside the unmitigated landscape with the following code for plotting.
 
-.. doctest:: python
+.. testcode:: python
 
     plt.figure(figsize=(8, 6))
     plt.scatter(gammas, expectations, color="r", label="Unmitigated")
