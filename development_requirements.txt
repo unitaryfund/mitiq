@@ -18,3 +18,4 @@ sphinx-copybutton~=0.2.11
 sphinx-autodoc-typehints~=1.10.3
 m2r~=0.2.1
 pybtex~=0.22.2
+pydata-sphinx-theme~=0.3.1
