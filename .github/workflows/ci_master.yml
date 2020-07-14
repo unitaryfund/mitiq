@@ -1,15 +1,16 @@
-name: Python Build
+name: Python Build on Master
 
 on:
-  pull_request:
-    types: [assigned, review_requested]
+  push:
+    branches:
+      - master
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6, 3.7, 3.8]
 
     steps:
