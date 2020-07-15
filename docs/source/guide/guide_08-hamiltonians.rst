@@ -117,7 +117,7 @@ For the angle :math:`\gamma = \pi`, this ansatz has the following structure:
 
 .. doctest:: python
 
-    >>> print(ansatz(gamma=0.1))
+    >>> print(ansatz(gamma=np.pi))
     0: ───Ry(π)───@───Rx(0.5π)───
                   │
     1: ───────────X───Rx(0.5π)───
