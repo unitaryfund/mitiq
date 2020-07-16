@@ -9,6 +9,14 @@ with open('requirements.txt') as f:
 with open('development_requirements.txt') as f:
     dev_requirements = f.read().splitlines()
 
+# save the source code in version.py
+with open("mitiq/version.py", "r") as f:
+    version_file_source = f.read()
+
+# overwrite version.py in the source distribution
+with open("mitiq/version.py", "w") as f:
+    f.write(f"__version__ = '{__version__}'\n")
+
 setup(
     name='mitiq',
     version=__version__,
@@ -35,3 +43,7 @@ setup(
      url = "https://unitary.fund",
 
 )
+
+# restore version.py to its previous state
+with open("mitiq/version.py", "w") as f:
+    f.write(version_file_source)
