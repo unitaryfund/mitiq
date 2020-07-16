@@ -1,8 +1,8 @@
 .. mitiq documentation file
 
-*********************************************
-Defining Hamiltonians as Pauli String Objects
-*********************************************
+*************************************************************
+Defining Hamiltonians as Linear Combinations of Pauli Strings
+*************************************************************
 
 This tutorial shows an example of using Hamiltonians defined as ``cirq.PauliSum``s or similar objects in other
 supported frontends. The usage of these Hamiltonian-like objects does not change the interface with ``mitiq``, but we
@@ -168,3 +168,38 @@ This produces a plot of expectation value (unmitigated and mitigated) :math:`\la
     :alt: Mitigated vs unmitigated expectation values at different noise strengths.
 
 As we can see, the mitigated expectation values are closer, on average, to the true expectation value.
+
+Sampling
+########
+
+Finally, we note that :math:`\langle H \rangle` can be estimated by sampling using the ``cirq.PauliSumCollector``. An
+example of a ``sampling_executor`` which uses this is shown below.
+
+.. testcode:: python
+
+    def sampling_executor(
+        circuit: cirq.Circuit,
+        hamiltonian: cirq.PauliSum,
+        noise_value: float,
+        nsamples: int = 10_000
+    ) -> float:
+        """Runs the circuit and returns the expectation value of the Hamiltonian.
+
+        Args:
+            circuit: Defines the ansatz wavefunction.
+            hamiltonian: Hamiltonian to compute the expectation value of w.r.t. the ansatz wavefunction.
+            noise_value: Probability of depolarizing noise.
+            nsamples: Number of samples to take per each term of the Hamiltonian.
+        """
+        # Add noise
+        noisy_circuit = circuit.with_noise(cirq.depolarize(noise_value))
+
+        # Do the sampling
+        psum = cirq.PauliSumCollector(circuit, ham, samples_per_term=nsamples)
+        psum.collect(sampler=cirq.Simulator())
+
+        # Return the expectation value
+        return psum.estimated_energy()
+
+This executor can be used in the same way as the previously defined ``executor`` which used a density matrix simulation
+to evaluate :math:`\langle H \rangle`.
