@@ -257,17 +257,16 @@ class Factory(ABC):
                             Default: 100.
         """
 
-        def _noise_to_expval(in_params: InType) -> float:
+        def _noise_to_expval(noise_param: InType) -> float:
             """Evaluates the quantum expectation value for a given noise_
-            param"""
+            param (which can be a numeric scale factor or a more
+            complex InParams object."""
 
-            if isinstance(in_params, float):
-                scaled_qp = scale_noise(qp, in_params)
-                return executor(scaled_qp)
-            scaled_qp = scale_noise(qp, in_params.scale_factor)
-            return executor(scaled_qp, **in_params.get_keywords)
-
-            
+            if isinstance(noise_param, InParams):    
+                scaled_qp = scale_noise(qp, noise_param.scale_factor)
+                return executor(scaled_qp, **noise_param.get_keywords)
+            scaled_qp = scale_noise(qp, noise_param)
+            return executor(scaled_qp)
 
         return self.iterate(_noise_to_expval, max_iterations)
 
@@ -903,4 +902,5 @@ class ShotFactory(BatchedFactory):
         return in_params
 
     def __eq__(self, other):
-        return super.__eq__(other) and self._shot_list == other._shot_list
+        return super().__eq__(other) and self._shot_list == other._shot_list
+
