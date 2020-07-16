@@ -15,4 +15,5 @@ Users Guide
    guide_04-factories.rst
    guide_05-error-mitigation.rst
    guide_06-ibmq-backends.rst
+   guide_07-qaoa-landscape.rst
 .. _guide_07-zne-lindblad.rst

@@ -12,7 +12,11 @@ from mitiq.factories import (
 from mitiq.folding import (
     fold_gates_from_left, fold_gates_from_right, fold_gates_at_random
 )
+<<<<<<< HEAD
 from mitiq.zne import execute_with_zne, mitigate_executor
+=======
+from mitiq.zne import execute_with_zne, mitigate_executor, zne_decorator
+>>>>>>> origin/master
 
 
 # Default qubit register and circuit for unit tests
@@ -29,12 +33,6 @@ def executor(circuit):
     return np.real(
         wavefunction.conj().T @ np.kron(npX, npZ) @ wavefunction
     )
-
-
-# Mock executor with shots argument for unit tests
-def executor_with_shots(circuit, shots):
-    fake_noise = np.random.rand() / np.sqrt(shots)
-    return executor(circuit) + fake_noise
 
 
 @pytest.mark.parametrize(
@@ -62,6 +60,12 @@ def test_execute_with_zne_bad_arguments():
 
     with pytest.raises(TypeError, match="Argument `scale_noise` must be"):
         execute_with_zne(circ, executor, scale_noise=None)
+
+
+# Mock executor with shots argument for unit tests
+def executor_with_shots(circuit, shots):
+    fake_noise = np.random.rand() / np.sqrt(shots)
+    return executor(circuit) + fake_noise
 
 
 def test_run_factory_with_number_of_shots():
@@ -96,3 +100,29 @@ def test_mitigate_executor_with_shot_list():
     mitigated_executor = mitigate_executor(executor_with_shots,
                                            factory=good_fac)
     assert np.isclose(mitigated_executor(circ), 0.0, atol=1.0e-3)
+def test_error_zne_decorator():
+    """Tests that the proper error is raised if the decorator is used without parenthesis."""
+    with pytest.raises(TypeError, match="The decorator must be used with parenthesis"):
+        @zne_decorator
+        def test_executor(circuit):
+            return 0
+
+def test_doc_is_preserved():
+    """Tests that the doc of the original executor is preserved."""
+    
+    def first_executor(circuit):
+        """Doc of the original executor."""
+        return 0
+
+    mit_executor = mitigate_executor(first_executor)
+    assert mit_executor.__doc__ == first_executor.__doc__
+
+    @zne_decorator()
+    def second_executor(circuit):
+        """Doc of the original executor."""
+        return 0
+
+    assert second_executor.__doc__ == first_executor.__doc__
+
+
+
