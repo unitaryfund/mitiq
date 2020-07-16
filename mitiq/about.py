@@ -3,13 +3,20 @@ Command line output of information on Mitiq and dependencies.
 """
 __all__ = ['about']
 
-import sys
-import os
-import platform
-import numpy
-import scipy
-import mitiq
 import inspect
+import platform
+import os
+import sys
+
+from cirq import __version__ as cirq_version
+from numpy import __version__ as numpy_version
+from scipy import __version__ as scipy_version
+
+import mitiq
+
+MITIQ_INSTALL_PATH = os.path.dirname(inspect.getsourcefile(mitiq))
+PYTHON_VERSION = sys.version_info[0:3]
+
 
 def about():
     """
@@ -17,38 +24,32 @@ def about():
     Mitiq, NumPy, SciPy, Cirq, PyQuil, Qiskit.
     """
     try:
-        import cirq
-        cirq_ver = cirq.__version__
-    except:
-        cirq_ver = 'None'
+        from pyquil import __version__ as pyquil_version
+    except ImportError:
+        pyquil_version = 'Not installed'
     try:
-        import pyquil
-        pyquil_ver = pyquil.__version__
-    except:
-        pyquil_ver = 'None'
-    try:
-        import qiskit
-        qiskit_ver = qiskit.__version__
-    except:
-        qiskit_ver = 'None'
-    print("")
-    print("Mitiq: A Python toolkit for implementing ") 
-    print("error mitigation on quantum computers.")
-    print("========================================")
-    print("Mitiq team – 2020 and later.")
-    print("See https://github.com/unitaryfund/mitiq for details.")
-    print("")
-    print("Mitiq Version:      %s" % mitiq.__version__)
-    print("Numpy Version:      %s" % numpy.__version__)
-    print("Scipy Version:      %s" % scipy.__version__)
-    print("Cirq Version:       %s" % cirq_ver)
-    print("Pyquil Version:     %s" % pyquil_ver)
-    print("Qiskit Version:     %s" % qiskit_ver)
-    print("Python Version:     %d.%d.%d" % sys.version_info[0:3])
-    print("Platform Info:      %s (%s)" % (platform.system(),
-                                           platform.machine()))
-    mitiq_install_path = os.path.dirname(inspect.getsourcefile(mitiq))
-    print("Installation path:  %s" % mitiq_install_path)
+        from qiskit import __version__ as qiskit_version
+    except ImportError:
+        qiskit_version = 'Not installed'
+
+    about_str = f"""
+Mitiq: A Python toolkit for implementing error mitigation on quantum computers
+==============================================================================
+Authored by: Mitiq team, 2020 & later (https://github.com/unitaryfund/mitiq)
+
+Mitiq Version:\t{mitiq.__version__}
+
+Cirq Version:\t{cirq_version}
+NumPy Version:\t{numpy_version}
+SciPy Version:\t{scipy_version}
+PyQuil Version:\t{pyquil_version}
+Qiskit Version:\t{qiskit_version}
+
+Python Version:\t{PYTHON_VERSION[0]}.{PYTHON_VERSION[1]}.{PYTHON_VERSION[2]}
+Platform Info:\t{platform.system()} ({platform.machine()})
+Install Path:\t{MITIQ_INSTALL_PATH}"""
+    print(about_str)
+
 
 if __name__ == "__main__":
     about()
