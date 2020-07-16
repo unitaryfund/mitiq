@@ -10,6 +10,8 @@ from typing import Union
 
 from cirq import Circuit
 
+from mitiq.about import about
+
 
 # This is used to optionally import what program types should be allowed
 # by mitiq based on what packages are installed in the environment
