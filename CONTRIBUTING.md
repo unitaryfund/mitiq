@@ -6,7 +6,7 @@ Contributions are welcome, and they are greatly appreciated, every little bit he
 You can begin contributing to `mitiq` code by raising an
 [issue](https://github.com/unitaryfund/mitiq/issues/new), reporting a bug or
 proposing a new feature request, using the labels to organize it.
-Please use `mitiq.about.about()` to document your dependencies and working environment.
+Please use `mitiq.about()` to document your dependencies and working environment.
 
 ## Opening a pull request
 You can open a [pull request](https://github.com/unitaryfund/mitiq/pulls) by pushing changes from a local branch, explaining the bug fix or new feature.

@@ -10,7 +10,7 @@ from typing import Union
 
 from cirq import Circuit
 
-from mitiq.about import about
+from mitiq._about import about
 
 
 # This is used to optionally import what program types should be allowed
