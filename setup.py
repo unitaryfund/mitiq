@@ -25,11 +25,11 @@ setup(
         'development': set(dev_requirements),
         'test': dev_requirements,
     },
-    packages = find_packages(),
+    packages=find_packages(),
     include_package_data=True,
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    author = "Unitary Fund",
+    author="Unitary Fund",
     classifiers=[
          "Development Status :: 2 - Pre-Alpha",
          "Programming Language :: Python :: 3",
@@ -39,9 +39,8 @@ setup(
          "Operating System :: Microsoft :: Windows",
          "Topic :: Scientific/Engineering",
          ],
-     license = "GPL v3.0",
-     url = "https://unitary.fund",
-
+    license="GPL v3.0",
+    url="https://unitary.fund",
 )
 
 # restore _version.py to its previous state

@@ -2,7 +2,7 @@
 Testing of zero-noise extrapolation methods
 (factories) with classically generated data.
 """
-from copy import copy, deepcopy
+from copy import copy
 from typing import Callable
 from pytest import mark, raises, warns
 import numpy as np

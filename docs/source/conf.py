@@ -13,7 +13,6 @@
 import os
 import sys
 
-
 import pybtex.style.formatting
 import pybtex.style.formatting.unsrt
 import pybtex.style.template
@@ -22,7 +21,7 @@ from pybtex.plugin import register_plugin as pybtex_register_plugin
 
 # sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('.'))
-#sys.path.append(os.path.abspath('../mitiq/'))
+# sys.path.append(os.path.abspath('../mitiq/'))
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../../'))
 sys.path.insert(0, os.path.abspath('..'))
@@ -51,7 +50,7 @@ extensions = ['sphinx.ext.mathjax',
               'sphinx.ext.napoleon',
               'sphinx.ext.autodoc',
               'sphinx.ext.autosummary',
-              'sphinx_autodoc_typehints', # after napoleon and autodoc
+              'sphinx_autodoc_typehints',  # after napoleon and autodoc
               'sphinx.ext.todo',
               'sphinx.ext.doctest',
               'sphinx.ext.extlinks',
@@ -60,8 +59,7 @@ extensions = ['sphinx.ext.mathjax',
               'sphinx.ext.ifconfig',
               'sphinxcontrib.bibtex',
               'sphinx_copybutton',
-
-]
+              ]
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3.7", "python37.inv"),
@@ -70,8 +68,7 @@ intersphinx_mapping = {
     "cirq": ("https://cirq.readthedocs.io/en/stable/", None),
     "pyquil": ("http://docs.rigetti.com/en/stable/", None),
     "qiskit": ("https://qiskit.org/documentation/", None),
-    "qutip": ("http://qutip.org/docs/latest/", None)
-    ,
+    "qutip": ("http://qutip.org/docs/latest/", None),
 }
 
 
@@ -113,14 +110,14 @@ napoleon_google_docstring = True
 napoleon_use_ivar = True
 
 autodoc_mock_imports = [
-#    'mitiq',
-#    'numpy',
-#    'scipy',
-#    'cirq',
-#    'qiskit',
+    #    'mitiq',
+    #    'numpy',
+    #    'scipy',
+    #    'cirq',
+    #    'qiskit',
     'pyquil',
-#    'matplotlib',
-#    'matplotlib.pyplot',
+    #    'matplotlib',
+    #    'matplotlib.pyplot',
 ]
 
 # autodoc-typehints extension setting
@@ -267,9 +264,9 @@ pybtex_register_plugin("pybtex.style.formatting", "apsstyle", ApsStyle)
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'pydata_sphinx_theme' #'alabaster', 'sphinx_rtd_theme'
+html_theme = 'pydata_sphinx_theme'  # 'alabaster', 'sphinx_rtd_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-#html_static_path = ['_static']
+# html_static_path = ['_static']

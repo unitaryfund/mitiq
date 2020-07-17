@@ -40,7 +40,6 @@ from mitiq.folding import (
     _fold_local,
     fold_global,
 )
-from mitiq.mitiq_qiskit.conversions import from_qiskit
 
 
 def test_is_measurement():
