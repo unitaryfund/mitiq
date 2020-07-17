@@ -34,8 +34,3 @@ QPROGRAM = Union[
 
 # this must be after QPROGRAM as the zne.py module imports QPROGRAM
 from mitiq.zne import execute_with_zne, mitigate_executor
-
-
-def version():
-    """Returns the Mitiq version number."""
-    return __version__
