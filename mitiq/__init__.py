@@ -3,12 +3,13 @@
 This is the top level module from which functions and classes of
 Mitiq can be directly imported.
 """
-from mitiq.version import __version__
 
-import os
 from typing import Union
 
 from cirq import Circuit
+
+from mitiq._about import about
+from mitiq._version import __version__
 
 
 # This is used to optionally import what program types should be allowed
@@ -33,8 +34,3 @@ QPROGRAM = Union[
 
 # this must be after QPROGRAM as the zne.py module imports QPROGRAM
 from mitiq.zne import execute_with_zne, mitigate_executor
-
-
-def version():
-    """Returns the Mitiq version number."""
-    return __version__
