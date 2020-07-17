@@ -1,6 +1,10 @@
 .PHONY: all
 all: dist
 
+.PHONY: check-style
+check-style:
+	flake8
+
 .PHONY: clean
 clean:
 	rm -rf dist
