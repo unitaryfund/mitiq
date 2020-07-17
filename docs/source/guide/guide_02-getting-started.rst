@@ -105,7 +105,7 @@ error-mitigated version.
 .. note::
    As shown here, ``mitiq`` wraps executor functions that have a specific type:
    they take quantum programs as input and return expectation values. However,
-   one often has execution function with other arguments such as the number of
+   one often has an execution function with other arguments such as the number of
    shots, the observable to measure, or the noise level of a noisy simulation.
    It is still easy to use these with mitiq by using partial function application.
    Here's a pseudo-code example:
