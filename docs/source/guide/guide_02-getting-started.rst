@@ -103,7 +103,7 @@ error-mitigated version.
 
 
 .. note::
-   As shown here, ``Mitiq`` wraps executor functions that have a specific type:
+   As shown here, ``mitiq`` wraps executor functions that have a specific type:
    they take quantum programs as input and return expectation values. However,
    one often has execution function with other arguments such as the number of
    shots, the observable to measure, or the noise level of a noisy simulation.
@@ -235,4 +235,3 @@ We can then use this backend for our mitigation.
 
 Note that we don't need to even redefine factories for different stacks. Once
 you have a ``Factory`` it can be used with different front and backends.
-
