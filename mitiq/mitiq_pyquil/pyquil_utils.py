@@ -3,10 +3,9 @@ from pyquil import Program
 
 # Backend and Noise simulation
 from pyquil import get_qc
-from pyquil.noise import append_kraus_to_gate
 from pyquil.gates import X, Y, Z, MEASURE
-
-from mitiq.matrices import npI, npZ, npX, npY
+from pyquil.noise import append_kraus_to_gate
+from pyquil.simulation.matrices import I as npI, X as npX, Y as npY, Z as npZ
 
 QVM = get_qc("1q-qvm")
 

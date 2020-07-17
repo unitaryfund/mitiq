@@ -5,13 +5,17 @@ import pytest
 
 import cirq
 
-from mitiq.matrices import npX, npZ
 from mitiq.factories import LinearFactory, RichardsonFactory
 from mitiq.folding import (
     fold_gates_from_left, fold_gates_from_right, fold_gates_at_random
 )
 from mitiq.zne import execute_with_zne, mitigate_executor, zne_decorator
 
+npX = np.array([[0, 1], [1, 0]])
+"""Defines the sigma_x Pauli matrix in SU(2) algebra as a (2,2) `np.array`."""
+
+npZ = np.array([[1, 0], [0, -1]])
+"""Defines the sigma_z Pauli matrix in SU(2) algebra as a (2,2) `np.array`."""
 
 # Default qubit register and circuit for unit tests
 qreg = cirq.GridQubit.rect(2, 1)

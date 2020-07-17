@@ -9,11 +9,6 @@ API-doc
 
 .. modules: alphabetical order
 
-About
----------
-.. automodule:: mitiq.about
-   :members:
-
 Benchmarks
 ----------
 
@@ -45,11 +40,6 @@ Factories
 Folding
 -------
 .. automodule:: mitiq.folding
-   :members:
-
-Matrices
---------
-.. automodule:: mitiq.matrices
    :members:
 
 Mitiq - PyQuil

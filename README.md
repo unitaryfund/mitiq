@@ -13,7 +13,6 @@ Mitiq performs error mitigation protocols on quantum circuits using zero-noise e
 ## Contents
 ```
 mitiq/mitiq/
-    | about
     | benchmarks    (package)
         |- maxcut
         |- tests    (package)
@@ -23,7 +22,6 @@ mitiq/mitiq/
         |- utils
     | factories
     | folding
-    | matrices
     | mitiq_pyquil   (package)
     	|- pyquil_utils
     	|- tests   (package)
@@ -37,7 +35,6 @@ mitiq/mitiq/
     | tests    (package)
     	|- test_factories
     	|- test_folding
-    	|- test_matrices
     	|- test_utils
         |- test_zne
     | utils
