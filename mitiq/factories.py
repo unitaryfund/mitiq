@@ -830,4 +830,83 @@ class ShotFactory(BatchedFactory):
 
         return self.iterate(_noise_to_expval, max_iterations)
 
+class ParameterFactory(ShotFactory):
+    """
+    Class for allowing runs that use the parameter scaling
+    method of zero noise extrapolation. Subclasses ShotFactory,
+    and adds a sigma value.
+    """
+    def __init__(self, scale_factors: Iterable[float], 
+                        sigma: float        
+                        shots: int = None,
+                        ) -> None:
+        self.sigma = sigma
+        super(ParameteryFactory, self, scale_factors, shots).__init__()
+
+    def next(self) -> [float, float]:
+        try:
+            next_param = self.scale_factors[len(self.outstack)]
+            next_shots = self.shot_list[len(self.outstack)]
+        except IndexError:
+            raise IndexError(
+                "BatchedFactory cannot take another step. "
+                "Number of batched scale_factors"
+                f" ({len(self.scale_factors)}) exceeded."
+            )
+        return next_param, next_shots
+
+    def iterate(self, noise_to_expval: Callable[[float, int, float], float],
+                max_iterations: int = 100) -> 'Factory':
+        """
+        A slightly modified version of BatchedFactory's iterate method
+        that changes the type of the executor, allowing it to take 
+        in an int that determines how many shots to run. Otherwise,
+        it's the same.
+
+        Args:
+            qp: Circuit to mitigate.
+            executor: Function executing a circuit for a number of shots; 
+                    returns an expectation value.
+            scale_noise: Function that scales the noise level of a quantum
+                         circuit.
+            max_iterations: Maximum number of iterations (optional).
+                            Default: 100.
+        """
+        self.reset()
+
+        counter = 0
+        while not self.is_converged() and counter < max_iterations:
+            next_param, next_shots = self.next()
+            next_result = noise_to_expval(next_param, next_shots, self.sigma)
+            self.push(next_param, next_result)
+            counter += 1
+
+        if counter == max_iterations:
+            warnings.warn(
+                "Factory iteration loop stopped before convergence. "
+                f"Maximum number of iterations ({max_iterations}) "
+                "was reached.",
+                ConvergenceWarning,
+            )
+
+        return self
+
+    def run(self, qp: QPROGRAM,
+            executor: Callable[[QPROGRAM, int], float],
+            scale_noise: Callable[[QPROGRAM, float, float], QPROGRAM],
+            max_iterations: int = 100) -> 'Factory':
+        """
+        A slightly modified version of the run method from BatchedFactory.
+        Runs a factory until convergence with a modified executor that takes
+        in the number of shots.
+        """
+
+        def _noise_to_expval(noise_param: float, shots: int) -> float:
+            """Evaluates the quantum expectation value for a given noise_
+            param for a given number of shots"""
+            scaled_qp = scale_noise(qp, noise_param, self.sigma)
+            return executor(scaled_qp, shots)
+
+        return self.iterate(_noise_to_expval, max_iterations)
+
 
