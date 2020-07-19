@@ -5,9 +5,9 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 from functools import wraps
 
 import numpy as np
-
 from cirq import Circuit, InsertStrategy, inverse, ops, has_mixture
-from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
+
+from mitiq._typing import SUPPORTED_PROGRAM_TYPES, QPROGRAM
 
 
 class UnsupportedCircuitError(Exception):

@@ -3,7 +3,7 @@
 from typing import Callable
 from functools import wraps
 
-from mitiq import QPROGRAM
+from mitiq._typing import QPROGRAM
 from mitiq.factories import Factory, RichardsonFactory
 from mitiq.folding import fold_gates_at_random
 

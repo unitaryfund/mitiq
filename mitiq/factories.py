@@ -3,12 +3,14 @@ extrapolation methods.
 """
 
 import warnings
-from mitiq import QPROGRAM
-from typing import List, Iterable, Optional, Tuple, Callable
 from abc import ABC, abstractmethod
+from typing import List, Iterable, Optional, Tuple, Callable
+
 import numpy as np
 from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
+
+from mitiq._typing import QPROGRAM
 
 
 class ExtrapolationError(Exception):

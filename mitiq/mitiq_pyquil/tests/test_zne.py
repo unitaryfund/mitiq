@@ -1,7 +1,7 @@
 """Tests for zne.py with PyQuil backend."""
 
 import numpy as np
-from mitiq import QPROGRAM
+from mitiq._typing import QPROGRAM
 from mitiq.factories import RichardsonFactory
 from mitiq.zne import (
     execute_with_zne,
