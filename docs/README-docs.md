@@ -13,7 +13,7 @@ The necessary packages can be installed, from the root `mitiq` directory
 ```bash
 pip -e install .[development]
 ```
-as they are present in the `development_requirements.txt` file. Otherwise, with
+as they are present in the `requirements.txt` file. Otherwise, with
 
 ```bash
 pip install -U sphinx m2r sphinxcontrib-bibtex pybtex sphinx-copybutton sphinx-autodoc-typehints

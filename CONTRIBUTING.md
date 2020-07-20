@@ -42,7 +42,7 @@ In order to install all the libraries useful for contributing to the development
 ```bash
 (myenv) pip install -e .[development]
 ```
-This command will use `pip` to read the requirements contained in `requirements.txt` and `development_requirements.txt`
+This command will use `pip` to read the requirements contained in `requirements.txt`.
 
 ### Adding tests
 If you add new features to a function or class, it is strongly encouraged to add tests for such object. Mitiq uses a nested structure for packaging tests in directories named `tests` at the same level of each module.
