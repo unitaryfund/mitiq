@@ -44,10 +44,10 @@ jobs:
   # this includes the pyQuil and Qiskit tests
   test:
     runs-on: ${{ matrix.os }}
-      strategy:
-        matrix:
-          os: [ubuntu-latest]
-          python-version: [3.6, 3.7, 3.8]
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.6, 3.7, 3.8]
 
     steps:
       - name: Check out mitiq
