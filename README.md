@@ -51,7 +51,7 @@ pip install -e .
 To install the requirements for development use:
 
 ```bash
-pip install -r requirements.tx
+pip install -r requirements.txt
 ```
 
 Note that this will install our testing environment that depends

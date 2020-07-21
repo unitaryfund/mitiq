@@ -85,8 +85,8 @@ docstrings with
 (myenv) make docs
 ```
 
-If you add new `/tests` directories, you might need to update the `Makefile`
-so that they will included as part of continuous integration.
+If you add new `/tests` directories, you will need to update the `Makefile`
+so that they will be included as part of continuous integration.
 
 ### Code style
 
