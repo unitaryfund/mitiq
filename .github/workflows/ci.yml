@@ -1,8 +1,11 @@
-name: Build (PR)
+name: Build
 
 on:
   pull_request:
     types: [assigned, review_requested]
+  push:
+    branches:
+      - master
 
 jobs:
 
