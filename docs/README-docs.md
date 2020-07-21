@@ -11,7 +11,8 @@ The documentation is generated with
 [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html).
 The necessary packages can be installed, from the root `mitiq` directory
 ```bash
-pip -e install .[development]
+pip install -e .
+pip install -r requirements.txt
 ```
 as they are present in the `requirements.txt` file. Otherwise, with
 
@@ -135,9 +136,9 @@ make doctest
 ```
 from the `mitiq/docs` directory. From the root directory `mitiq`, simply run
 ```bash
-./test_build.sh -docs
+make docs
 ```
-to obtain the same result, calling the `test_build.sh` file with bash script.
+to obtain the same result.
 
 These equivalent commands test the code examples in the guide and ".rst" files, as well as testing the docstrings, since these are imported with the `autodoc` extension.
 
