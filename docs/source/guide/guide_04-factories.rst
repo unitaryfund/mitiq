@@ -8,15 +8,16 @@ Factory Objects
 
 *Factories* are important elements of the ``mitiq`` library.
 
-The abstract class ``Factory`` is a high-level representation of a generic error mitigation method.
-A factory is not just hardware-agnostic, it is even *quantum-agnostic*,
-in the sense that it only deals with classical data: the classical input and the classical output of a
-noisy computation.
+A ``Factory`` class is a self-contained representation of an error mitigation method.
+This representation not just hardware-agnostic, it is even *quantum-agnostic*,
+in the sense that it mainly deals with classical data: the classical input and the classical output of a
+noisy computation. Nonetheless, a factory object can easily interact with a quantum system via its ``self.run`` method
+which is the only interface between the *"classical world"* of a factory and the *"quantum world"* of a circuit.
 
-Specific classes derived from ``Factory``, like ``LinearFactory``, ``RichardsonFactory``, etc., represent
+Specific classes derived from the abstract class ``Factory``, like ``LinearFactory``, ``RichardsonFactory``, etc., represent
 different zero-noise extrapolation methods.
 
-The main tasks of a factory are:
+The typical tasks of a factory are:
 
 1. Record the result of the computation executed at the chosen noise level;
 
@@ -33,9 +34,135 @@ The main feature of ``BatchedFactory`` is that all the noise scale factors are d
 *a priori* by the initialization argument ``scale_factors``.
 All non-adaptive methods are derived from ``BatchedFactory``.
 
+Once instantiated, a factory object can be passed as an argument to the high-level functions contained in the module ``mitiq.zne``.
+Alternatively, a factory object can also be used to implement an entire zero-noise extrapolation procedure in an self-contained way, i.e., without 
+using the high-level tools in ``mitiq.zne``. This approach may require more lines of code but allows for a low-level control on 
+the zero-noise extrapolation method.
+
+In the following sections we are going to perform the same zero-noise extrapolation task at different levels of abstraction: high-level,
+intermediate-level and low-level. The user is free to chose one of the three alternative methods, depending on the particular problem of interest 
+and on the desired level of flexibility.
 
 =============================================
-Example: basic usage of a factory
+High level usage of factory objects
+=============================================
+
+
+Let us consider an ``executor`` function which is similar to the one used in the :ref:`getting started <guide-getting-started>` section.
+
+
+.. testcode::
+
+   import numpy as np
+   from cirq import Circuit, depolarize, DensityMatrixSimulator
+
+   # initialize a backend
+   SIMULATOR = DensityMatrixSimulator()
+   # 5% depolarizing noise
+   NOISE = 0.05
+
+   def executor(circ: Circuit) -> float:
+      """Executes a circuit with depolarizing noise and 
+      returns the expectation value of the projector |0><0|."""
+      circuit = circ.with_noise(depolarize(p=NOISE))
+      rho = SIMULATOR.simulate(circuit).final_density_matrix
+      obs = np.diag([1, 0])
+      expectation = np.real(np.trace(rho @ obs))
+      return expectation
+
+.. note::
+   
+   In this example we used *Cirq* but other quantum software platforms can be used as well,
+   as discussed in :ref:`getting started <guide-getting-started>` section.
+
+We define a single-qubit circuit whose ideal expectation value is by construction equal to
+``1.0``. 
+
+.. testcode::
+
+   from cirq import LineQubit, X, H
+
+   qubit = LineQubit(0)
+   circuit = Circuit(X(qubit), H(qubit), H(qubit), X(qubit))
+   expval = executor(circuit)
+   exact = 1
+   print(f"The ideal result should be {exact}")
+   print(f"The real result is {expval:.4}")
+   print(f"The abslute error is {abs(exact - expval):.4}")
+
+.. testoutput::
+
+   The ideal result should be 1
+   The real result is 0.8794
+   The abslute error is 0.1206
+
+
+Now we are going to instantiate different factory objects, each encapsulating a different zero-noise extrapolation method. 
+
+.. testcode::
+
+   from mitiq.factories import LinearFactory, RichardsonFactory, PolyFactory
+
+   # method: scale noise 1 and 2, then extrapolate linearly to the zero noise limit.
+   linear_fac = LinearFactory(scale_factors = [1.0, 2.0])
+
+   # method: scale noise by 1, 2 and 3, then evaluate the Richardson extrapolation.
+   richardson_fac = RichardsonFactory(scale_factors = [1.0, 2.0, 3.0])
+
+   # method: scale noise by 1, 2, 3, and 4, then extrapolate quadratically to the zero noise limit.
+   poly_fac = PolyFactory(scale_factors = [1.0, 2.0, 3.0, 4.0], order=2)
+
+The previous factory objects can be passed as arguments to the high-level functions in ``mitiq.zne``. For example:
+
+.. testcode::
+
+   from mitiq.zne import execute_with_zne
+
+   zne_expval = execute_with_zne(circuit, executor, factory = linear_fac)
+   print(f"Error with linear_fac: {abs(exact - zne_expval):.4}")
+
+   zne_expval = execute_with_zne(circuit, executor, factory = richardson_fac)
+   print(f"Error with richardson_fac: {abs(exact - zne_expval):.4}")
+
+   zne_expval = execute_with_zne(circuit, executor, factory = poly_fac)
+   print(f"Error with poly_fac: {abs(exact - zne_expval):.4}")
+
+.. testoutput::
+
+   Error with linear_fac: 0.02908
+   Error with richardson_fac: 0.007013
+   Error with poly_fac: 2.37e-07
+
+
+=============================================
+Intermediate-level usage of a factory
+=============================================
+
+Zero-noise extrapolation can also be implemented by directly using the methods ``self.qrun`` and ``self.reduce`` of factory object.
+The method ``self.run`` *runs* the factory object until convergence, i.e., it evaluates different expectation values at different
+noise levels until a sufficient amount of data is collected. The ``self.reduce`` method instead returns the final
+zero-noise extrapolation and corresponds to a classical inference based on the measured data.
+
+.. testcode::
+
+   # we use fold_global but other noise scale functions could be used
+   from mitiq.folding import fold_global
+
+   linear_fac.run(circuit, executor, scale_noise = fold_global)
+   zne_expval = linear_fac.reduce()
+   print(f"Error with linear_fac: {abs(exact - zne_expval):.4}")
+
+   richardson_fac.run(circuit, executor, scale_noise = fold_global)
+   zne_expval = richardson_fac.reduce()
+   print(f"Error with richardson_fac: {abs(exact - zne_expval):.4}")
+
+   poly_fac.run(circuit, executor, scale_noise = fold_global)
+   zne_expval = poly_fac.reduce()
+   print(f"Error with poly_fac: {abs(exact - zne_expval):.4}")
+
+
+=============================================
+Low-level usage of a factory
 =============================================
 
 To make an example, let us assume that the result of our quantum computation is an expectation
