@@ -38,11 +38,13 @@ Once you will finish the modifications, you can deactivate the environment with
 ```
 
 ### Development install
-In order to install all the libraries useful for contributing to the development of the library, from your local clone of the fork, run
+In order to install all the libraries useful for contributing to the
+development of the library, from your local clone of the fork, run
+
 ```bash
-(myenv) pip install -e .[development]
+(myenv) pip install -e .
+(myenv) pip install -r requirements.txt
 ```
-This command will use `pip` to read the requirements contained in `requirements.txt`.
 
 ### Adding tests
 If you add new features to a function or class, it is strongly encouraged to add tests for such object. Mitiq uses a nested structure for packaging tests in directories named `tests` at the same level of each module.
@@ -51,23 +53,51 @@ If you add new features to a function or class, it is strongly encouraged to add
 Follow the guidelines in the Contributing to docs [instructions](docs/build/read_README-docs.rst) (look here on [GitHub](https://github.com/unitaryfund/mitiq/blob/master/docs/README-docs.md)), which include guidelines about updating the API-doc list of modules and writing examples in the users guide.
 
 ### Checking local tests
-You can check that tests run with `pytest`. The `test_build.sh` file contains some bash commands to automate all tests. If you added new test packages, add them there too, so that they will be tested also in continuous integration. To test this run from root
+
+You can check that tests run with `pytest`. The [`Makefile`](Makefile) contains
+some commands for running different collections of tests for the repository.
+
+To run just the tests contained in `mitiq/tests` and `mitiq/benchmarks/tests` run
+
 ```bash
-(myenv) ./test_build.sh
+(myenv) make test
 ```
 
-You can check that all tests run also in the documentation examples and docstrings with
+To run the tests for the pyQuil and Qiskit plugins (which of course require for
+pyQuil and Qiskit to be installed) run
 
 ```bash
-./test_build.sh -docs
+(myenv) make test
 ```
+
+*NOTE*: For the pyQuil tests to run, you will need to have QVM & quilc servers
+running in the background. The easiest way to do this is with Docker via
+
+```bash
+docker run --rm -idt -p 5000:5000 rigetti/qvm -S
+docker run --rm -idt -p 5555:5555 rigetti/quilc -R
+```
+
+You can also check that all tests run also in the documentation examples and
+docstrings with
+
+```bash
+(myenv) make docs
+```
+
+If you add new `/tests` directories, you might need to update the `Makefile`
+so that they will included as part of continuous integration.
 
 ### Code style
+
 Mitiq code is developed according the best practices of Python development.
 * Please get familiar with [PEP 8](https://www.python.org/dev/peps/pep-0008/) (code) and [PEP 257](https://www.python.org/dev/peps/pep-0257/) (docstrings) guidelines.
 * You can use [`black`](https://github.com/psf/black) code formatter to implement some PEP 8 and PEP 257 rules. For example, line length limit is 79 characters.
 * Use annotations for type hints in the objects' signature.
 * Write google-style docstrings.
+
+As part of continuous integration, we check that `flake8` runs successfully,
+so it is recommended that you run it locally before opening a PR.
 
 ### Code of conduct
 Mitiq development abides to the [Contrutors' Covenant](CODE_OF_CONDUCT.md).
