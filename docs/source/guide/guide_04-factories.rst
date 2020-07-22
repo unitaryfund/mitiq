@@ -44,7 +44,7 @@ depending on the particular problem of interest
 and on the desired level of flexibility.
 
 =============================================
-High-level usage of factory objects
+High-level usage of a factory
 =============================================
 
 
@@ -310,9 +310,9 @@ In this case it is usually sufficient to override only the ``self.__init__`` and
 the ``self.reduce`` methods, which are responsible for the initialization and for the
 final zero-noise extrapolation, respectively.
 
-=============================================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Example: a simple custom factory
-=============================================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Assume that, from physical considerations, we know that the ideal expectation value
 (measured by some quantum circuit) must always be within two limits: ``min_expval`` and ``max_expval``.
