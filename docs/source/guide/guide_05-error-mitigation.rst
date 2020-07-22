@@ -177,15 +177,15 @@ Research articles
 A list of research articles academic resources on error mitigation:
 
 - On **zero-noise extrapolation**:
-   - Theory, Y. Li and S. Benjamin, *Phys. Rev. X*, 2017 :cite:`Li_2017_PRX` and K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
-   - Experiment on superconducting circuit chip, A. Kandala *et al.*, *Nature*, 2019 :cite:`Kandala_2019_Nature`
+    - Theory, Y. Li and S. Benjamin, *Phys. Rev. X*, 2017 :cite:`Li_2017_PRX` and K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
+    - Experiment on superconducting circuit chip, A. Kandala *et al.*, *Nature*, 2019 :cite:`Kandala_2019_Nature`
 
 - On **randomization methods**:
-   - Randomized compiling with twirling gates, J. Wallman *et al.*, *Phys. Rev. A*, 2016 :cite:`Wallman_2016_PRA`
-   - Porbabilistic error correction, K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
-   - Practical proposal, S. Endo *et al.*, *Phys. Rev. X*, 2018 :cite:`Endo_2018_PRX`
-   - Experiment on trapped ions, S. Zhang  *et al.*, *Nature Comm.* 2020 :cite:`Zhang_2020_NatComm`
-   - Experiment with gate set tomography on a supeconducting circuit device, J. Sun *et al.*, 2019 arXiv :cite:`Sun_2020_arXiv`
+    - Randomized compiling with twirling gates, J. Wallman *et al.*, *Phys. Rev. A*, 2016 :cite:`Wallman_2016_PRA`
+    - Porbabilistic error correction, K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
+    - Practical proposal, S. Endo *et al.*, *Phys. Rev. X*, 2018 :cite:`Endo_2018_PRX`
+    - Experiment on trapped ions, S. Zhang  *et al.*, *Nature Comm.* 2020 :cite:`Zhang_2020_NatComm`
+    - Experiment with gate set tomography on a supeconducting circuit device, J. Sun *et al.*, 2019 arXiv :cite:`Sun_2020_arXiv`
 
 - On **subspace expansion**:
    - By hybrid quantum-classical hierarchy introduction, J. McClean *et al.*, *Phys. Rev. A*, 2017 :cite:`McClean_2017_PRA`
