@@ -1,4 +1,4 @@
-.. _guide-getting-started
+.. _guide-getting-started:
 
 *********************************************
 Getting Started
