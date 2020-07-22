@@ -38,19 +38,16 @@ This approach may require more lines of code but can allow for a better control 
 
 
 To clarify this aspect, in the following sections we are going to perform the same zero-noise 
-extrapolation task at different levels of abstraction: high-level,
-intermediate-level and low-level. The user is free to chose one of the three alternative methods, 
-depending on the particular problem of interest 
-and on the desired level of flexibility.
+extrapolation task with 4 different levels of abstraction: high-level,
+intermediate-level, low-level and very low-level. The user is free to chose one of the alternative methods, 
+depending on the particular problem of interest and on the desired level of flexibility.
 
 =============================================
 High-level usage of a factory
 =============================================
 
-
 Let us consider an ``executor`` function which is similar to the one used in
 the :ref:`getting started <guide-getting-started>` section.
-
 
 .. testcode::
 
