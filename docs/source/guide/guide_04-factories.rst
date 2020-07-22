@@ -81,14 +81,14 @@ We also define a simple quantum circuit whose ideal expectation value is by cons
    qubit = LineQubit(0)
    circuit = Circuit(X(qubit), H(qubit), H(qubit), X(qubit))
    expval = executor(circuit)
-   exact = 1
+   exact = 1.0
    print(f"The ideal result should be {exact}")
    print(f"The real result is {expval:.4f}")
    print(f"The abslute error is {abs(exact - expval):.4f}")
 
 .. testoutput::
 
-   The ideal result should be 1
+   The ideal result should be 1.0
    The real result is 0.8794
    The abslute error is 0.1206
 
@@ -142,12 +142,12 @@ and ``self.reduce`` of factory object.
 The method ``self.run`` evaluates different expectation values at different noise levels
 until a sufficient amount of data is collected.
 
-The method ``self.reduce`` instead returns the final zero-noise extrapolation and, in practice,
-corresponds to a classical post-processing of the measured data.
+The method ``self.reduce`` instead returns the final zero-noise extrapolation which, in practice,
+corresponds to a statistical inference based on the measured data.
 
 .. testcode::
 
-   import one of the built-in noise scaling function
+   # we import one of the built-in noise scaling function
    from mitiq.folding import fold_gates_at_random
 
    linear_fac.run(circuit, executor, scale_noise=fold_gates_at_random)
@@ -172,9 +172,9 @@ corresponds to a classical post-processing of the measured data.
 Low-level usage of a factory
 =============================================
 
-The method ``self.run`` takes as arguments a circuit and other quantum "quantum" arguments.
-On the other hand, the core computation of any factory object actually corresponds to 
-a classical post-processing of the measured data.
+The method ``self.run`` takes as arguments a circuit and other "quantum" objects.
+On the other hand, the core computation performed by any factory corresponds to 
+some classical post-processing of the measurement results.
 
 At a lower-level, it is possible to clearly separate the quantum and the 
 classical steps of a zero-noise extrapolation procedure.
@@ -196,8 +196,9 @@ corresponding expectation value.
    numbers to real numbers.
 
 The function ``noise_to_expval`` encapsulate the "quantum part" of the problem. The "classical
-part" of the zero-noise extrapolation procedure can be executed by passing ``noise_to_expval`` as an argument 
-to the ``self.iterate`` method. This method will call ``noise_to_expval`` for different 
+part" of the problem can be solved by passing ``noise_to_expval`` as an argument 
+to the ``self.iterate`` method of a factory object.
+This method will repeatedly call ``noise_to_expval`` for different 
 noise levels until a sufficient amount of data is collected. 
 So, one can view ``self.iterate`` as the classical counterpart of the quantum method ``self.run``.
 
@@ -230,14 +231,12 @@ by manually measuring individual expectation values and saving them, one by one,
 
 .. note::
    In a typical scenario, such a deep level of control is likely unnecessary.
-   Anyway, this section can be still instructive to understand the internal structure of the 
-   Factory class. This can be particularly useful for advanced users who are interested
+   Anyway, this section can still be instructive to understand the internal structure of the 
+   Factory class. This can be useful for advanced users who are interested
    in developing a custom ``Factory`` or in directly contributing to ``mitiq``.
 
 
 .. testcode::
-
-   from mitiq.factories import LinearFactory
 
    zne_list = []
    # loop over different factories
@@ -299,7 +298,7 @@ In this case its core methods must be implemented:
 ``self.next``, ``self.push``, ``self.is_converged``, ``self.reduce``, etc..
 Typically, the ``self.__init__`` method must be overridden.
 
-A new non-adaptive method can instead be derived from the ``BatchedFactory`` class.
+A new non-adaptive method can instead be derived from the abstract ``BatchedFactory`` class.
 In this case it is usually sufficient to override only the ``self.__init__`` and
 the ``self.reduce`` methods, which are responsible for the initialization and for the
 final zero-noise extrapolation, respectively.
