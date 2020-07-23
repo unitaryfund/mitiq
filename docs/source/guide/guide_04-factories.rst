@@ -137,7 +137,7 @@ Intermediate-level usage of a factory
 =============================================
 
 Zero-noise extrapolation can also be implemented by directly using the methods ``self.qrun``
-and ``self.reduce`` of factory object.
+and ``self.reduce`` of a :class:`.Factory` object.
 
 The method ``self.run`` evaluates different expectation values at different noise levels
 until a sufficient amount of data is collected.
