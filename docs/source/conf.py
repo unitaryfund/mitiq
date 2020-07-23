@@ -19,12 +19,9 @@ import pybtex.style.template
 from pybtex.plugin import register_plugin as pybtex_register_plugin
 
 
-# sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('.'))
-# sys.path.append(os.path.abspath('../mitiq/'))
-sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('../../'))
 sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('../../'))
 
 # -- Project information -----------------------------------------------------
 
@@ -110,14 +107,7 @@ napoleon_google_docstring = True
 napoleon_use_ivar = True
 
 autodoc_mock_imports = [
-    #    'mitiq',
-    #    'numpy',
-    #    'scipy',
-    #    'cirq',
-    #    'qiskit',
     'pyquil',
-    #    'matplotlib',
-    #    'matplotlib.pyplot',
 ]
 
 # autodoc-typehints extension setting
