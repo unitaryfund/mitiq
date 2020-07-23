@@ -37,7 +37,7 @@ This approach may require more lines of code but can allow for a better control 
 
 To clarify this aspect, in the following sections we are going to perform the same zero-noise 
 extrapolation task with 4 different levels of abstraction: high-level,
-intermediate-level, low-level and very low-level. The user is free to chose one of the alternative methods, 
+intermediate-level, low-level and very low-level. The user is free to choose one of the alternative methods, 
 depending on the particular problem of interest and on the desired level of flexibility.
 
 =============================================
