@@ -2,7 +2,7 @@ numpy~=1.18.1
 scipy~=1.4.1
 cirq~=0.8.0
 
-# to develop the code
+# third-party integration
 pyquil~=2.18.0
 qiskit~=0.16.2
 
