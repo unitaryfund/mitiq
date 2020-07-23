@@ -1,5 +1,5 @@
 from typing import Optional
-from qiskit import Aer, execute, ClassicalRegister, QuantumCircuit
+from qiskit import Aer, execute, QuantumCircuit
 
 # Noise simulation packages
 from qiskit.providers.aer.noise import NoiseModel
@@ -94,7 +94,7 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
     assert (
         noise <= 1.0
     ), "Noise scaled to {} is out of bounds (<=1.0) for depolarizing " \
-    "channel.".format(
+        "channel.".format(
         noise
     )
 
@@ -110,7 +110,7 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
 
 def run_program(pq: QuantumCircuit, shots: int = 100,
                 seed: Optional[int] = None) -> float:
-    """Runs a single-qubit circuit for multiple shots and 
+    """Runs a single-qubit circuit for multiple shots and
     returns the expectation value of the ground state projector.
 
 

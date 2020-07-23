@@ -1,11 +1,50 @@
-name: Python Build
+name: Build
 
 on:
   pull_request:
     types: [assigned, review_requested]
+  push:
+    branches:
+      - master
 
 jobs:
-  build:
+
+  # builds & tests the docs on py38
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out mitiq
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          make install requirements
+      - name: Build and test Sphinx docs
+        run: make docs
+
+  # runs flake8 style checks on py38
+  style:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out mitiq
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          make install requirements
+      - name: Lint with flake8
+        run: make check-style
+
+  # runs all the unit tests (including pyQuil/Qiskit) on ubuntu and py36/37/38
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -13,24 +52,19 @@ jobs:
         python-version: [3.6, 3.7, 3.8]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e .[development]
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        ./test_build.sh -tests
-    - name: Test documentation with sphinx
-      run: |
-        ./test_build.sh -docs
+      - name: Check out mitiq
+        uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          make install requirements
+      - name: Run the quilc & qvm Docker images
+        run: |
+          docker run --rm -idt -p 5000:5000 rigetti/qvm -S
+          docker run --rm -idt -p 5555:5555 rigetti/quilc -R
+      - name: Run all the unit tests via pytest
+        run: make test-all

@@ -60,7 +60,8 @@ def test_random_benchmarks(scale_noise, fac):
     noise = 0.01
     obs = np.diag([1, 0, 0, 0])
 
-    executor = lambda qc: noisy_simulation(qc, noise=noise, obs=obs)
+    def executor(qc):
+        return noisy_simulation(qc, noise=noise, obs=obs)
     mit_executor = mitigate_executor(executor, fac, scale_noise)
 
     unmitigated = []
