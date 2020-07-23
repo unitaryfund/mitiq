@@ -295,7 +295,7 @@ the corresponding factory.
 
 A new adaptive extrapolation method can be derived from the abstract class ``Factory``.
 In this case its core methods must be implemented:
-``self.next``, ``self.push``, ``self.is_converged``, ``self.reduce``, etc..
+``self.next``, ``self.push``, ``self.is_converged``, ``self.reduce``, etc.
 Typically, the ``self.__init__`` method must be overridden.
 
 A new non-adaptive method can instead be derived from the abstract ``BatchedFactory`` class.
