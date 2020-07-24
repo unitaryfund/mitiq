@@ -169,8 +169,7 @@ class Factory(ABC):
 
     @abstractmethod
     def next(self) -> float:
-        """Returns the next noise scale factor (or InParams object)
-        to execute a circuit at."""
+        """Returns a dictionary of parameters to execute a circuit at."""
         raise NotImplementedError
 
     @abstractmethod
@@ -404,8 +403,8 @@ class PolyFactory(BatchedFactory):
         and RichardsonFactory.
 
         Args:
-            instack: The array of noise scale factors.
-                     Must be a list of floats or a list of InParams.
+            instack: The array of input dictionaries, where each
+                     dictionary is supposed to have the key "scale_factor".
             exp_values: The array of expectation values.
             order: Extrapolation order (degree of the polynomial fit).
                    It cannot exceed len(scale_factors) - 1.
@@ -657,8 +656,8 @@ class PolyExpFactory(BatchedFactory):
         related to PolyExpFactory, e.g., ExpFactory, AdaExpFactory.
 
         Args:
-            instack: The array of noise scale factors.
-                     Must be a list of floats or a list of InParams.
+            instack: The array of input dictionaries, where each
+                     dictionary is supposed to have the key "scale_factor".
             exp_values: The array of expectation values.
             asymptote: y(x->inf).
             order: Extrapolation order (degree of the polynomial z(x)).
