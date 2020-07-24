@@ -17,19 +17,7 @@ from mitiq.factories import (
     ExpFactory,
     PolyExpFactory,
     AdaExpFactory,
-    BatchedShotFactory,
-    InParams,
 )
-
-
-class PolyShotFactory(BatchedShotFactory, PolyFactory):
-    """Extended PolyFactory with a "shot_list" argument."""
-    def __init__(self, scale_factors, shot_list, order):
-        self.instack = []
-        self.outstack = []
-        self._scale_factors = scale_factors
-        self._shot_list = shot_list
-        self.order = order
 
 
 # Constant parameters for test functions:
@@ -94,16 +82,6 @@ def f_poly_exp_up(x: float, err: float = STAT_NOISE,
                   rnd_state: RandomState = np.random) -> float:
     """Poly-exponential growth."""
     return A - B * np.exp(-C * x - D * x ** 2) + rnd_state.normal(scale=err)
-
-
-def f_lin_shot(in_params: InParams, err: float = STAT_NOISE,
-               rnd_state: RandomState = np.random) -> float:
-    """Classical function mapping an input noise scale factor and an
-    input number of shots to an expectation value.
-    """
-    x = in_params.scale_factor
-    shot_noise = 1 / np.sqrt(in_params.shots)
-    return A + B * x + shot_noise * rnd_state.normal(scale=err)
 
 
 @mark.parametrize("test_f", [f_lin, f_non_lin])
@@ -316,26 +294,17 @@ def test_iteration_warnings():
 
 
 @mark.parametrize(
-    "factory", (LinearFactory, RichardsonFactory, PolyFactory, PolyShotFactory)
+    "factory", (LinearFactory, RichardsonFactory, PolyFactory)
 )
 def test_equal(factory):
     """Tests that copies are factories are equal to the original factories."""
     for iterate in (True, False):
-        if factory is PolyFactory and factory is not PolyShotFactory:
+        if factory is PolyFactory:
             fac = factory(scale_factors=[1, 2, 3], order=2)
-        elif factory is PolyShotFactory:
-            fac = factory(scale_factors=[1, 2, 3],
-                          shot_list=[10, 10, 10],
-                          order=2,
-                          )
         else:
             fac = factory(scale_factors=[1, 2, 3])
-
         if iterate:
-            if factory is PolyShotFactory:
-                fac.iterate(noise_to_expval=f_lin_shot)
-            else:
-                fac.iterate(noise_to_expval=lambda x: np.exp(x) + 0.5)
+            fac.iterate(noise_to_expval=lambda x: np.exp(x) + 0.5)
 
         copied_factory = copy(fac)
         assert copied_factory == fac
@@ -346,51 +315,3 @@ def test_equal(factory):
             copied_factory = copy(fac)
             assert copied_factory == fac
             assert copied_factory is not fac
-
-
-def test_poly_shot_factory():
-    """Tests usage of poly_shot_factory."""
-
-    fac = PolyShotFactory([1, 2, 3], shot_list=[10, 100, 100], order=2)
-    seeded_f = apply_seed_to_func(f_lin_shot, SEED)
-    fac.iterate(seeded_f)
-    ideal_params = InParams(scale_factor=0, shots=1)
-    assert np.isclose(fac.reduce(),
-                      seeded_f(ideal_params, err=0),
-                      atol=CLOSE_TOL)
-    expected_instack = [InParams(scale_factor=1, shots=10),
-                        InParams(scale_factor=2, shots=100),
-                        InParams(scale_factor=3, shots=100)]
-    assert fac.instack == expected_instack
-
-
-def test_batched_shot_factory_is_abstract():
-    """Tests that one cannot instantiate a Batched_Shot_Factory."""
-    with raises(TypeError, match=r"Can't instantiate abstract class"):
-        BatchedShotFactory()
-
-
-def test_errors_of_batched_shot_factory():
-    """Tests main errors raised by a Batched_Shot_Factory."""
-
-    class MyShotFactory(BatchedShotFactory):
-        """Non-abstract version of a BatchedShotFactory"""
-        def reduce():
-            pass
-
-    with raises(
-            TypeError,
-            match="The argument shot_list must be an iterable of integers"
-    ):
-        MyShotFactory([1, 2, 3], shot_list=[10.0, 100, 100])
-
-    with raises(
-        IndexError,
-        match="must have equal length but"
-    ):
-        MyShotFactory([1, 2, 3], shot_list=[10, 100])
-    with raises(
-        IndexError,
-        match="At least 2 scale factors are necessary"
-    ):
-        MyShotFactory([1], shot_list=[10])

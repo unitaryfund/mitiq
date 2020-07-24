@@ -7,7 +7,7 @@ import cirq
 
 from mitiq.matrices import npX, npZ
 from mitiq.factories import (
-    LinearFactory, RichardsonFactory, BatchedShotFactory
+    LinearFactory, RichardsonFactory
 )
 from mitiq.folding import (
     fold_gates_from_left, fold_gates_from_right, fold_gates_at_random
@@ -65,14 +65,10 @@ def executor_with_shots(circuit, shots):
 
 
 def test_run_factory_with_number_of_shots():
-    """Tests qrun of a RichardsonFactory merged with BatchedShotFactory."""
+    """Tests qrun of a RichardsonFactory with shot_list."""
 
-    class RichardsonShotFactory(BatchedShotFactory, RichardsonFactory):
-        """Richardson extrapolation factory with shot_list argument."""
-        pass
-
-    fac = RichardsonShotFactory([1.0, 2.0, 3.0],
-                                shot_list=[10 ** 6, 10 ** 6, 10 ** 6])
+    fac = RichardsonFactory([1.0, 2.0, 3.0],
+                            shot_list=[10 ** 6, 10 ** 6, 10 ** 6])
     fac.run(circ, executor_with_shots, scale_noise=fold_gates_from_left)
     result = fac.reduce()
     assert np.isclose(result, 0.0, atol=1.0e-2)
@@ -83,15 +79,11 @@ def test_mitigate_executor_with_shot_list():
     for each noise scale factor.
     """
 
-    class LinearShotFactory(BatchedShotFactory, LinearFactory):
-        """Linear extrapolation factory with shot_list argument."""
-        pass
-
-    bad_fac = LinearShotFactory([1.0, 2.0, 3.0], shot_list=[1, 1, 1])
+    bad_fac = LinearFactory([1.0, 2.0, 3.0], shot_list=[1, 1, 1])
     mitigated_executor = mitigate_executor(executor_with_shots,
                                            factory=bad_fac)
     assert not np.isclose(mitigated_executor(circ), 0.0, atol=1.0e-3)
-    good_fac = LinearShotFactory([1.0, 2.0, 3.0],
+    good_fac = LinearFactory([1.0, 2.0, 3.0],
                                  shot_list=[10**9, 10**9, 10**9])
     mitigated_executor = mitigate_executor(executor_with_shots,
                                            factory=good_fac)

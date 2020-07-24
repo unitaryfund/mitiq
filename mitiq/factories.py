@@ -3,49 +3,23 @@ extrapolation methods.
 """
 
 import warnings
+from copy import deepcopy
 from mitiq import QPROGRAM
 from typing import (
     List, Iterable, Optional, Tuple, Callable, Union,
 )
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 
 import numpy as np
 from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
 
 
-@dataclass
-class InParams:
-    """Dataclass for the input parameters. Each time a new expectation value
-    is measured, a new instance of InParams is appended to the instack
-    attribute of a factory object.
-    """
-    scale_factor: Optional[float] = None
-    shots: Optional[int] = None
 
-    def get_keywords(self) -> dict:
-        """Returns a dictionary of keywords arguments to be used
-        when calling the circuit executor function.
-        If a parameter is None, it is not included in the dictionary.
-        """
-        keywords = {}
-        if self.shots:
-            keywords.update({'shots': self.shots})
-        return keywords
-
-
-# The instack attribute of a Factory is list of objects.
-# Each object can be of the following type:
-InType = Union[float, InParams]
-
-
-def _instack_to_scale_factors(instack: List[InType]) -> List[float]:
-    """Extracts a list of scale factors from a list of InType objects."""
-    if not instack:
-        return []
-    if all([isinstance(p, InParams) for p in instack]):
-        return [p.scale_factor for p in instack]
+def _instack_to_scale_factors(instack: dict) -> List[float]:
+    """Extracts a list of scale factors from a list of dictionaries."""
+    if all([isinstance(params, dict) for params in instack]):
+        return [params["scale_factor"] for params in instack]
     return instack
 
 
@@ -183,7 +157,7 @@ class Factory(ABC):
         self.instack = []
         self.outstack = []
 
-    def push(self, instack_val: InType, outstack_val: float) -> None:
+    def push(self, instack_val: dict, outstack_val: float) -> None:
         """
         Appends "instack_val" to "self.instack" and "outstack_val" to
         "self.outstack".
@@ -216,15 +190,18 @@ class Factory(ABC):
         self.instack = []
         self.outstack = []
 
-    def iterate(self, noise_to_expval: Callable[[InType], float],
+    def iterate(self, 
+                noise_to_expval: Callable[[float], float],
                 max_iterations: int = 100) -> 'Factory':
         """
-        Runs the factory until convergence (or iterations reach
-        "max_iterations").
+        Evaluates a sequence of expectation values until enough
+        data is collected (or iterations reach "max_iterations").
 
         Args:
-            noise_to_expval: Function mapping a noise scale to an
-                             expectation vale.
+            noise_to_expval: Function mapping a noise scale factor to an
+                             expectation value. If shot_list is not None,
+                             "shot" must be an argument of the function.
+
             max_iterations: Maximum number of iterations (optional).
                             Default: 100.
         Raises:
@@ -236,8 +213,11 @@ class Factory(ABC):
         counter = 0
         while not self.is_converged() and counter < max_iterations:
             next_in_params = self.next()
-            next_result = noise_to_expval(next_in_params)
-            self.push(next_in_params, next_result)
+            next_exec_params = deepcopy(next_in_params)
+            # get next scale factor and remove it from next_exec_params
+            scale_factor = next_exec_params.pop("scale_factor")
+            next_expval = noise_to_expval(scale_factor, **next_exec_params)
+            self.push(next_in_params, next_expval)
             counter += 1
 
         if counter == max_iterations:
@@ -256,28 +236,27 @@ class Factory(ABC):
             scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
             max_iterations: int = 100) -> 'Factory':
         """
-        Runs the factory until convergence executing quantum circuits.
+        Evaluates a sequence of expectation values by executing quantum
+        circuits until enough data is collected (or iterations reach
+        "max_iterations").
 
         Args:
             qp: Circuit to mitigate.
             executor: Function executing a circuit; returns an expectation
-                      value.
+                      value. If shot_list is not None, then "shot" must be
+                      an additional argument of the executor.
             scale_noise: Function that scales the noise level of a quantum
                          circuit.
             max_iterations: Maximum number of iterations (optional).
                             Default: 100.
         """
 
-        def _noise_to_expval(noise_param: InType) -> float:
-            """Evaluates the quantum expectation value for a given noise_
-            param (which can be a numeric scale factor or a more
-            complex InParams object."""
+        def _noise_to_expval(scale_factor, **exec_params) -> float:
+            """Evaluates the quantum expectation value for a given 
+            scale_factor and other executor parameters."""
 
-            if isinstance(noise_param, InParams):
-                scaled_qp = scale_noise(qp, noise_param.scale_factor)
-                return executor(scaled_qp, **noise_param.get_keywords())
-            scaled_qp = scale_noise(qp, noise_param)
-            return executor(scaled_qp)
+            scaled_qp = scale_noise(qp, scale_factor)
+            return executor(scaled_qp, **exec_params)
 
         return self.iterate(_noise_to_expval, max_iterations)
 
@@ -305,31 +284,57 @@ class BatchedFactory(Factory):
     Args:
         scale_factors: Iterable of noise scale factors at which
                        expectation values should be measured.
+        shot_list: Optional iterable of integers corresponding to the number
+                   of measurements used for each expectation value. If this
+                   argument is explicitly passed to the factory, it must have
+                   the same length of scale_factors and the executor function
+                   must accept "shots" as a valid keyword argument.
     Raises:
         IndexError: If the number of scale factors is less than 2.
         IndexError: If an iteration step fails.
     """
 
-    def __init__(self, scale_factors: Iterable[float]) -> None:
+    def __init__(self, 
+                 scale_factors: Iterable[float], 
+                 shot_list: Optional[List[int]] = None) -> None:
         """Instantiates a new object of this Factory class."""
         if len(scale_factors) < 2:
             raise IndexError(
                 "At least 2 scale factors are necessary."
             )
+
+        if  (shot_list and 
+            (not isinstance(shot_list, Iterable) or
+             not all([isinstance(shots, int) for shots in shot_list]))
+        ):
+            raise TypeError("The optional argument shot_list must be None " 
+                            "or a valid iterator of integers.")
+        if shot_list and (len(scale_factors)!=len(shot_list)):
+            raise IndexError("The arguments scale_factors and shot_list"
+                             "must have the same length. " 
+                             f"But len(scale_factors) is {len(scale_factors)}"
+                             f" and len(shot_list) is {len(shot_list)}.")
+
         self._scale_factors = scale_factors
+        self._shot_list = shot_list
+
         super(BatchedFactory, self).__init__()
 
     def next(self) -> float:
-        """Returns the next noise level to execute a circuit at."""
+        """Returns a dictionary of parameters to execute a circuit at."""
+        in_params = {} 
         try:
-            next_param = self._scale_factors[len(self.outstack)]
+            index = len(self.outstack)
+            in_params["scale_factor"] = self._scale_factors[index]
+            if self._shot_list:
+                in_params["shots"] = self._shot_list[index]
         except IndexError:
             raise IndexError(
                 "BatchedFactory cannot take another step. "
                 "Number of batched scale_factors"
                 f" ({len(self._scale_factors)}) exceeded."
             )
-        return next_param
+        return in_params
 
     def is_converged(self) -> bool:
         """Returns True if all needed expectation values have been computed,
@@ -359,6 +364,11 @@ class PolyFactory(BatchedFactory):
                        expectation values should be measured.
         order: Extrapolation order (degree of the polynomial fit).
                It cannot exceed len(scale_factors) - 1.
+        shot_list: Optional iterable of integers corresponding to the number
+                   of measurements used for each expectation value. If this
+                   argument is explicitly passed to the factory, it must have
+                   the same length of scale_factors and the executor function
+                   must accept "shots" as a valid keyword argument.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
@@ -366,7 +376,10 @@ class PolyFactory(BatchedFactory):
         RichardsonFactory and LinearFactory are special cases of PolyFactory.
     """
 
-    def __init__(self, scale_factors: Iterable[float], order: int) -> None:
+    def __init__(self,
+                 scale_factors: Iterable[float],
+                 order: int,
+                 shot_list: Optional[List[int]] = None) -> None:
         """Instantiates a new object of this Factory class."""
 
         if order > len(scale_factors) - 1:
@@ -374,11 +387,11 @@ class PolyFactory(BatchedFactory):
                 "The extrapolation order cannot exceed len(scale_factors) - 1."
             )
         self.order = order
-        super(PolyFactory, self).__init__(scale_factors)
+        super(PolyFactory, self).__init__(scale_factors, shot_list)
 
     @staticmethod
     def static_reduce(
-            instack: List[InType], exp_values: List[float], order: int
+            instack: List[dict], exp_values: List[float], order: int
     ) -> float:
         """
         Determines with a least squared method, the polynomial of degree equal
@@ -400,7 +413,9 @@ class PolyFactory(BatchedFactory):
             ValueError: If data is not consistent with the extrapolation model.
             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
         """
+        print(instack)
         scale_factors = _instack_to_scale_factors(instack)
+        print(scale_factors)
         # Check arguments
         error_str = (
             "Data is not enough: at least two data points are necessary."
@@ -440,6 +455,11 @@ class RichardsonFactory(BatchedFactory):
     Args:
         scale_factors: Iterable of noise scale factors at which
                        expectation values should be measured.
+        shot_list: Optional iterable of integers corresponding to the number
+                   of measurements used for each expectation value. If this
+                   argument is explicitly passed to the factory, it must have
+                   the same length of scale_factors and the executor function
+                   must accept "shots" as a valid keyword argument.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
@@ -463,6 +483,11 @@ class LinearFactory(BatchedFactory):
     Args:
         scale_factors: Iterable of noise scale factors at which
                        expectation values should be measured.
+        shot_list: Optional iterable of integers corresponding to the number
+                   of measurements used for each expectation value. If this
+                   argument is explicitly passed to the factory, it must have
+                   the same length of scale_factors and the executor function
+                   must accept "shots" as a valid keyword argument.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
@@ -499,6 +524,11 @@ class ExpFactory(BatchedFactory):
         avoid_log: If set to True, the exponential model is not linearized
                    with a logarithm and a non-linear fit is applied even
                    if asymptote is not None. The default value is False.
+        shot_list: Optional iterable of integers corresponding to the number
+                   of measurements used for each expectation value. If this
+                   argument is explicitly passed to the factory, it must have
+                   the same length of scale_factors and the executor function
+                   must accept "shots" as a valid keyword argument.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationError: If the extrapolation fit fails.
@@ -506,12 +536,13 @@ class ExpFactory(BatchedFactory):
     """
 
     def __init__(
-            self, scale_factors: Iterable[float],
+            self,
+            scale_factors: Iterable[float],
             asymptote: Optional[float] = None,
             avoid_log: bool = False,
-    ) -> None:
+            shot_list: Optional[List[int]] = None) -> None:
         """Instantiate an new object of this Factory class."""
-        super(ExpFactory, self).__init__(scale_factors)
+        super(ExpFactory, self).__init__(scale_factors, shot_list)
         if not (asymptote is None or isinstance(asymptote, float)):
             raise ValueError(
                 "The argument 'asymptote' must be either a float or None"
@@ -571,6 +602,11 @@ class PolyExpFactory(BatchedFactory):
         avoid_log: If set to True, the exponential model is not linearized
                    with a logarithm and a non-linear fit is applied even
                    if asymptote is not None. The default value is False.
+        shot_list: Optional iterable of integers corresponding to the number
+                   of measurements used for each expectation value. If this
+                   argument is explicitly passed to the factory, it must have
+                   the same length of scale_factors and the executor function
+                   must accept "shots" as a valid keyword argument.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationError: If the extrapolation fit fails.
@@ -581,9 +617,10 @@ class PolyExpFactory(BatchedFactory):
                  scale_factors: Iterable[float],
                  order: int,
                  asymptote: Optional[float] = None,
-                 avoid_log: bool = False) -> None:
+                 avoid_log: bool = False,
+                 shot_list: Optional[List[int]] = None) -> None:
         """Instantiates a new object of this Factory class."""
-        super(PolyExpFactory, self).__init__(scale_factors)
+        super(PolyExpFactory, self).__init__(scale_factors, shot_list)
         if not (asymptote is None or isinstance(asymptote, float)):
             raise ValueError(
                 "The argument 'asymptote' must be either a float or None"
@@ -593,7 +630,7 @@ class PolyExpFactory(BatchedFactory):
         self.avoid_log = avoid_log
 
     @staticmethod
-    def static_reduce(instack: List[InType],
+    def static_reduce(instack: List[dict],
                       exp_values: List[float],
                       asymptote: Optional[float],
                       order: int,
@@ -769,7 +806,7 @@ class AdaExpFactory(Factory):
     def __init__(
             self,
             steps: int,
-            scale_factor: float = 2,
+            scale_factor: float = 2.0,
             asymptote: Optional[float] = None,
             avoid_log: bool = False,
             max_scale_factor: float = 6.0
@@ -803,16 +840,16 @@ class AdaExpFactory(Factory):
         ]  # type: List[Tuple[List[float], List[float], List[float], float]]
 
     def next(self) -> float:
-        """Returns the next noise level to execute a circuit at."""
+        """Returns a dictionary of parameters to execute a circuit at."""
         # The 1st scale factor is always 1
         if len(self.instack) == 0:
-            return 1.0
+            return {"scale_factor" : 1.0}
         # The 2nd scale factor is self._scale_factor
         if len(self.instack) == 1:
-            return self._scale_factor
+            return {"scale_factor" : self._scale_factor}
         # If asymptote is None we use 2 * scale_factor as third noise parameter
         if (len(self.instack) == 2) and (self.asymptote is None):
-            return 2 * self._scale_factor
+            return {"scale_factor" : 2 * self._scale_factor}
 
         with warnings.catch_warnings():
             # This is an intermediate fit, so we suppress its warning messages
@@ -827,7 +864,8 @@ class AdaExpFactory(Factory):
         # an adaptive rule which depends on self.exponent
         next_scale_factor = min(1.0 + self._SHIFT_FACTOR / np.abs(exponent),
                                 self.max_scale_factor)
-        return next_scale_factor
+        return {"scale_factor" : next_scale_factor}
+
 
     def is_converged(self) -> bool:
         """Returns True if all the needed expectation values have been
@@ -862,63 +900,4 @@ class AdaExpFactory(Factory):
                 self.avoid_log == other.avoid_log and
                 np.allclose(self.history, other.history)
         )
-
-
-class BatchedShotFactory(BatchedFactory):
-    """Abstract class of a non-adaptive Factory in which it is possible to
-    set the number of measurements associated to each noise scale factor.
-
-    It is supposed to be used with an executor function with signature
-    executor(circuit: QPROGRAM, shots: Optional[int] = None) -> float.
-
-    Non-adaptive factories which require to control the number of measurements,
-    can be derived from this class.
-
-    Args:
-        scale_factors: Iterable of noise scale factors at which expectation
-                       values should be measured.
-        shot_list: Iterable of integers corresponding to the measurement shots
-                   associated to each noise scale factor.
     Raises:
-        TypeError: If the type of scale_factors and shot_list is not correct.
-        IndexError: If the number of scale factors is less than 2.
-        IndexError: If the number of scale factors is not equal to the number
-                    of measurement shots.
-        IndexError: If an iteration step fails.
-    """
-
-    def __init__(self,
-                 scale_factors: Iterable[float],
-                 shot_list: Iterable[int]) -> None:
-        """Instantiates a new object of this Factory class."""
-        super(BatchedShotFactory, self).__init__(scale_factors)
-        if len(scale_factors) != len(shot_list):
-            raise IndexError(
-                "The arguments scale_factors and shot_list "
-                "must have equal length but len(scale_factor) = "
-                f"{len(scale_factors)} and len(shot_list) = {len(shot_list)}."
-            )
-        if (
-            not isinstance(shot_list, Iterable) or
-            not all(isinstance(shots, int) for shots in shot_list)
-        ):
-            raise TypeError(
-                "The argument shot_list must be an iterable of integers."
-            )
-        self._shot_list = shot_list
-
-    def next(self) -> float:
-        in_params = InParams()
-        try:
-            in_params.scale_factor = self._scale_factors[len(self.outstack)]
-            in_params.shots = self._shot_list[len(self.outstack)]
-        except IndexError:
-            raise IndexError(
-                "BatchedFactory cannot take another step. "
-                "Number of batched scale_factors"
-                f" ({len(self._scale_factors)}) exceeded."
-            )
-        return in_params
-
-    def __eq__(self, other):
-        return super().__eq__(other) and self._shot_list == other._shot_list
