@@ -74,7 +74,7 @@ def op_from_inst(inst: object) -> None:
     raise TypeError(f"Quil instruction {inst} of type {type(inst)} not currently supported in Cirq.")
 
 
-@op_from_inst.register
+@op_from_inst.register(PyQuilGate)
 def _(inst: PyQuilGate) -> Gate:
     """
     Convert pyQuil gates to Cirq operations.
@@ -91,7 +91,7 @@ def _(inst: PyQuilGate) -> Gate:
     raise UnsupportedQuilGate(f"Quil gate {quil_gate_name} not supported in Cirq.")
 
 
-@op_from_inst.register
+@op_from_inst.register(PyQuilMeasurement)
 def _(inst: PyQuilMeasurement) -> MeasurementGate:
     """
     Convert pyQuil MEASURE operations to Cirq MeasurementGate objects.
@@ -101,7 +101,7 @@ def _(inst: PyQuilMeasurement) -> MeasurementGate:
     return MeasurementGate(1, key=quil_memory_reference)(line_qubit)
 
 
-@op_from_inst.register
+@op_from_inst.register(Declare)
 def _(inst: Declare) -> Circuit:
     """
     Pass when encountering a DECLARE.
@@ -109,7 +109,7 @@ def _(inst: Declare) -> Circuit:
     return Circuit()
 
 
-@op_from_inst.register
+@op_from_inst.register(Pragma)
 def _(inst: Pragma) -> Circuit:
     """
     Pass and warn when encountering a PRAGMA.
@@ -118,7 +118,7 @@ def _(inst: Pragma) -> Circuit:
     return Circuit()
 
 
-@op_from_inst.register
+@op_from_inst.register(Reset)
 def _(inst: Reset) -> Circuit:
     """
     Pass and warn when encountering a RESET.
@@ -127,7 +127,7 @@ def _(inst: Reset) -> Circuit:
     return Circuit()
 
 
-@op_from_inst.register
+@op_from_inst.register(ResetQubit)
 def _(inst: ResetQubit) -> Circuit:
     """
     Pass and warn when encountering a RESET q.
