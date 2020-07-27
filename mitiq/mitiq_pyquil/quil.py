@@ -13,8 +13,8 @@ from pyquil.quilbase import (Declare,
 
 from cirq import Circuit, LineQubit
 from cirq.ops import (CCNOT, CNOT, CSWAP, CZ, CZPowGate, Gate, H, I, ISWAP,
-                      ISwapPowGate, MeasurementGate, S, SWAP, T, X, Y, Z,
-                      ZPowGate, rx, ry, rz)
+                      ISwapPowGate, MatrixGate, MeasurementGate, S, SWAP, T,
+                      X, Y, Z, ZPowGate, rx, ry, rz)
 
 
 class UnsupportedQuilGate(Exception):
@@ -28,11 +28,55 @@ def cphase(param: float) -> CZPowGate:
     return CZPowGate(exponent=param / np.pi)
 
 
+def cphase00(phi: float) -> MatrixGate:
+    """
+    PyQuil's CPHASE00 gate can be defined using Cirq's MatrixGate.
+    """
+    cphase00_matrix = np.array([[np.exp(1j * phi), 0, 0, 0],
+                                [0, 1, 0, 0],
+                                [0, 0, 1, 0],
+                                [0, 0, 0, 1]])
+    return MatrixGate(cphase00_matrix)
+
+
+def cphase01(phi: float) -> MatrixGate:
+    """
+    PyQuil's CPHASE01 gate can be defined using Cirq's MatrixGate.
+    """
+    cphase01_matrix = np.array([[1, 0, 0, 0],
+                                [0, np.exp(1j * phi), 0, 0],
+                                [0, 0, 1, 0],
+                                [0, 0, 0, 1]])
+    return MatrixGate(cphase01_matrix)
+
+
+def cphase10(phi: float) -> MatrixGate:
+    """
+    PyQuil's CPHASE10 gate can be defined using Cirq's MatrixGate.
+    """
+    cphase10_matrix = np.array([[1, 0, 0, 0],
+                                [0, 1, 0, 0],
+                                [0, 0, np.exp(1j * phi), 0],
+                                [0, 0, 0, 1]])
+    return MatrixGate(cphase10_matrix)
+
+
 def phase(param: float) -> ZPowGate:
     """
     PyQuil's PHASE and Cirq's ZPowGate are the same up to a factor of pi.
     """
     return ZPowGate(exponent=param / np.pi)
+
+
+def pswap(phi: float) -> MatrixGate:
+    """
+    PyQuil's PSWAP gate can be defined using Cirq's MatrixGate.
+    """
+    pswap_matrix = np.array([[1, 0, 0, 0],
+                             [0, 0, np.exp(1j * phi), 0],
+                             [0, np.exp(1j * phi), 0, 0],
+                             [0, 0, 0, 1]])
+    return MatrixGate(pswap_matrix)
 
 
 def xy(param: float) -> ISwapPowGate:
@@ -48,11 +92,15 @@ SUPPORTED_GATES: Mapping[str, Union[Gate, Callable[..., Gate]]] = {
     "CNOT": CNOT,
     "CSWAP": CSWAP,
     "CPHASE": cphase,
+    "CPHASE00": cphase00,
+    "CPHASE01": cphase01,
+    "CPHASE10": cphase10,
     "CZ": CZ,
     "PHASE": phase,
     "H": H,
     "I": I,
     "ISWAP": ISWAP,
+    "PSWAP": pswap,
     "RX": rx,
     "RY": ry,
     "RZ": rz,

@@ -5,7 +5,8 @@ from cirq.ops import (CCNOT, CNOT, CSWAP, CZ, H, I, ISWAP,
                       MeasurementGate, S, SWAP, T, X, Y, Z,
                       rx, ry, rz)
 
-from mitiq.mitiq_pyquil.quil import circuit_from_quil, cphase, xy
+from mitiq.mitiq_pyquil.quil import (circuit_from_quil, cphase, cphase00,
+                                     cphase01, cphase10, pswap, xy)
 
 
 QUIL_PROGRAM = """
@@ -28,8 +29,12 @@ RZ(pi/2) 2
 CZ 0 1
 CNOT 1 2
 CPHASE(pi/2) 0 1
-SWAP 1 2
+CPHASE00(pi/2) 1 2
+CPHASE01(pi/2) 0 1
+CPHASE10(pi/2) 1 2
 ISWAP 0 1
+PSWAP(pi/2) 1 2
+SWAP 0 1
 XY(pi/2) 1 2
 CCNOT 0 1 2
 CSWAP 0 1 2
@@ -59,8 +64,12 @@ def test_circuit_from_quil():
                             CZ(q0, q1),
                             CNOT(q1, q2),
                             cphase(np.pi/2)(q0, q1),
-                            SWAP(q1, q2),
+                            cphase00(np.pi/2)(q1, q2),
+                            cphase01(np.pi/2)(q0, q1),
+                            cphase10(np.pi/2)(q1, q2),
                             ISWAP(q0, q1),
+                            pswap(np.pi/2)(q1, q2),
+                            SWAP(q0, q1),
                             xy(np.pi/2)(q1, q2),
                             CCNOT(q0, q1, q2),
                             CSWAP(q0, q1, q2),
