@@ -1,6 +1,6 @@
 """Tests for zne.py with Qiskit backend."""
 
-from mitiq import QPROGRAM
+from mitiq._typing import QPROGRAM
 import numpy as np
 
 from qiskit import ClassicalRegister, QuantumCircuit

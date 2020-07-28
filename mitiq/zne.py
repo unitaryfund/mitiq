@@ -3,7 +3,7 @@
 from typing import Callable
 from functools import wraps
 
-from mitiq import QPROGRAM
+from mitiq._typing import QPROGRAM
 from mitiq.factories import Factory, RichardsonFactory
 from mitiq.folding import fold_gates_at_random
 
@@ -77,7 +77,7 @@ def zne_decorator(
         factory: Factory object determining the zero-noise extrapolation method.
         scale_noise: Function for scaling the noise of a quantum circuit.
     """
-    
+
     # raise an error if the decorator is used without parenthesis
     if callable(factory):
         raise TypeError("The decorator must be used with parenthesis even"

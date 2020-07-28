@@ -5,14 +5,14 @@ extrapolation methods.
 import warnings
 from copy import deepcopy
 from mitiq import QPROGRAM
-from typing import (
-    List, Iterable, Optional, Tuple, Callable
-)
+from typing import List, Iterable, Optional, Tuple, Callable
 from abc import ABC, abstractmethod
 
 import numpy as np
 from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
+
+from mitiq._typing import QPROGRAM
 
 
 def _instack_to_scale_factors(instack: dict) -> List[float]:

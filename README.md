@@ -13,7 +13,6 @@ Mitiq performs error mitigation protocols on quantum circuits using zero-noise e
 ## Contents
 ```
 mitiq/mitiq/
-    | about
     | benchmarks    (package)
         |- maxcut
         |- tests    (package)
@@ -23,7 +22,6 @@ mitiq/mitiq/
         |- utils
     | factories
     | folding
-    | matrices
     | mitiq_pyquil   (package)
     	|- pyquil_utils
     	|- tests   (package)
@@ -37,22 +35,25 @@ mitiq/mitiq/
     | tests    (package)
     	|- test_factories
     	|- test_folding
-    	|- test_matrices
     	|- test_utils
         |- test_zne
     | utils
     | zne
 ```
 ## Installation
+
 To install locally use:
+
 ```bash
 pip install -e .
 ```
 
-To install for development use:
+To install the requirements for development use:
+
 ```bash
-pip install -e .[development]
+pip install -r requirements.txt
 ```
+
 Note that this will install our testing environment that depends
 on `qiskit` and `pyquil`.
 
@@ -66,8 +67,10 @@ updated to the latest release can be found
 [here](docs/pdf/Mitiq-latest-release.pdf).
 
 ## Development and Testing
-Ensure that you have installed the development environment. Then
-you can run tests and build the docs with `./test_build.sh`.
+
+Ensure that you have installed the development environment. Then you can run
+the tests using `make test` and build the docs using `make docs`. For more
+information, see the contributor's guide (linked below).
 
 ## Contributing
 You can find information on contributing to `mitiq` code in the [contributing guidelines](CONTRIBUTING.md).

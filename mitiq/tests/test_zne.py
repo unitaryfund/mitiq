@@ -5,15 +5,17 @@ import pytest
 
 import cirq
 
-from mitiq.matrices import npX, npZ
-from mitiq.factories import (
-    LinearFactory, RichardsonFactory
-)
+from mitiq.factories import LinearFactory, RichardsonFactory
 from mitiq.folding import (
     fold_gates_from_left, fold_gates_from_right, fold_gates_at_random
 )
 from mitiq.zne import execute_with_zne, mitigate_executor, zne_decorator
 
+npX = np.array([[0, 1], [1, 0]])
+"""Defines the sigma_x Pauli matrix in SU(2) algebra as a (2,2) `np.array`."""
+
+npZ = np.array([[1, 0], [0, -1]])
+"""Defines the sigma_z Pauli matrix in SU(2) algebra as a (2,2) `np.array`."""
 
 # Default qubit register and circuit for unit tests
 qreg = cirq.GridQubit.rect(2, 1)
@@ -56,38 +58,6 @@ def test_execute_with_zne_bad_arguments():
 
     with pytest.raises(TypeError, match="Argument `scale_noise` must be"):
         execute_with_zne(circ, executor, scale_noise=None)
-
-
-# Mock executor with shots argument for unit tests
-def executor_with_shots(circuit, shots):
-    fake_noise = np.random.rand() / np.sqrt(shots)
-    return executor(circuit) + fake_noise
-
-
-def test_run_factory_with_number_of_shots():
-    """Tests qrun of a RichardsonFactory with shot_list."""
-
-    fac = RichardsonFactory([1.0, 2.0, 3.0],
-                            shot_list=[10 ** 6, 10 ** 6, 10 ** 6])
-    fac.run(circ, executor_with_shots, scale_noise=fold_gates_from_left)
-    result = fac.reduce()
-    assert np.isclose(result, 0.0, atol=1.0e-2)
-
-
-def test_mitigate_executor_with_shot_list():
-    """Tests the mitigation of an executor using different shots
-    for each noise scale factor.
-    """
-
-    bad_fac = LinearFactory([1.0, 2.0, 3.0], shot_list=[1, 1, 1])
-    mitigated_executor = mitigate_executor(executor_with_shots,
-                                           factory=bad_fac)
-    assert not np.isclose(mitigated_executor(circ), 0.0, atol=1.0e-3)
-    good_fac = LinearFactory([1.0, 2.0, 3.0],
-                             shot_list=[10**9, 10**9, 10**9])
-    mitigated_executor = mitigate_executor(executor_with_shots,
-                                           factory=good_fac)
-    assert np.isclose(mitigated_executor(circ), 0.0, atol=1.0e-3)
 
 
 def test_error_zne_decorator():
