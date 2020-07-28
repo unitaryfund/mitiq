@@ -7,7 +7,7 @@ Users Guide
 *******************
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    guide_01-overview.rst
    guide_02-getting-started.rst

@@ -2,9 +2,9 @@
 
 .. _guide-factories:
 
-*********************************************
-Factory Objects
-*********************************************
+******************************************************
+Classical fitting and extrapolation: Factory Objects
+******************************************************
 
 *Factories* are important elements of the ``mitiq`` library.
 
