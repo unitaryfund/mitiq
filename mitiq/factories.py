@@ -899,4 +899,3 @@ class AdaExpFactory(Factory):
                 self.avoid_log == other.avoid_log and
                 np.allclose(self.history, other.history)
         )
-    Raises:
