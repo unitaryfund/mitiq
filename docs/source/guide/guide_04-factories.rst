@@ -83,11 +83,11 @@ To get the zero-noise limit, we are going to use a ``LinearFactory`` object, run
    # Run the factory until convergence
    while not fac.is_converged():
       # Get the next noise scale factor from the factory
-      next_scale_factor = fac.next()
+      next_params = fac.next()
       # Evaluate the expectation value
-      expval = noise_to_expval(next_scale_factor)
+      expval = noise_to_expval(next_params["scale_factor"])
       # Save the noise scale factor and the result into the factory
-      fac.push(next_scale_factor, expval)
+      fac.push(next_params, expval)
 
    # Evaluate the zero-noise extrapolation.
    zn_limit = fac.reduce()
@@ -234,7 +234,8 @@ and clips the result if it falls outside its physical domain.
             The clipped extrapolation to the zero-noise limit.
          """
          # Fit a line and get the intercept
-         _, intercept = np.polyfit(self.instack, self.outstack, 1)
+         in_factors = [params["scale_factor"] for params in self.instack]
+         _, intercept = np.polyfit(in_factors, self.outstack, 1)
 
          # Return the clipped zero-noise extrapolation.
          return np.clip(intercept, self.min_expval, self.max_expval)

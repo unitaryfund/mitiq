@@ -43,7 +43,7 @@ def apply_seed_to_func(func: Callable, seed: int) -> Callable:
     rnd_state = RandomState(seed)
 
     def seeded_func(x: float, err: float = STAT_NOISE) -> float:
-        return func(x, err, rnd_state)
+        return func(x, err=err, rnd_state=rnd_state)
     return seeded_func
 
 
@@ -82,6 +82,10 @@ def f_poly_exp_up(x: float, err: float = STAT_NOISE,
                   rnd_state: RandomState = np.random) -> float:
     """Poly-exponential growth."""
     return A - B * np.exp(-C * x - D * x ** 2) + rnd_state.normal(scale=err)
+
+def f_lin_shot(x: float, shots=1) -> float:
+    """Linear function with "shots" argument."""
+    return A + B * x + 0.001 / np.sqrt(shots)
 
 
 @mark.parametrize("test_f", [f_lin, f_non_lin])
@@ -300,11 +304,13 @@ def test_equal(factory):
     """Tests that copies are factories are equal to the original factories."""
     for iterate in (True, False):
         if factory is PolyFactory:
-            fac = factory(scale_factors=[1, 2, 3], order=2)
+            fac = factory(scale_factors=[1, 2, 3], 
+                          order=2,
+                          shot_list=[1, 2, 3])
         else:
-            fac = factory(scale_factors=[1, 2, 3])
+            fac = factory(scale_factors=[1, 2, 3], shot_list = [1, 2, 3])
         if iterate:
-            fac.iterate(noise_to_expval=lambda x: np.exp(x) + 0.5)
+            fac.iterate(noise_to_expval=lambda x, shots: np.exp(x) + 0.5)
 
         copied_factory = copy(fac)
         assert copied_factory == fac
@@ -315,3 +321,36 @@ def test_equal(factory):
             copied_factory = copy(fac)
             assert copied_factory == fac
             assert copied_factory is not fac
+
+
+@mark.parametrize("fac_class", [LinearFactory, RichardsonFactory])
+def test_iterate_with_shot_list(fac_class):
+    """Tests factories with (and without) the "shot_list" argument."""
+    # first test without shot_list
+    SHOT_LIST = [100, 200, 300, 400, 500]
+    fac = fac_class(X_VALS)
+    fac.iterate(f_lin_shot)
+    assert np.isclose(fac.reduce(), f_lin_shot(0), atol=CLOSE_TOL)
+    # check instack and outstack are as expected
+    for j, shots in enumerate(SHOT_LIST):
+        assert fac.instack[j] == {"scale_factor" : X_VALS[j]}
+        assert fac.outstack[j] != f_lin_shot(X_VALS[j], shots=shots)
+        assert fac.outstack[j] == f_lin_shot(X_VALS[j])
+    # now pass an arbitrary shot_list as an argument
+    fac = fac_class(X_VALS, shot_list=SHOT_LIST)
+    fac.iterate(f_lin_shot)
+    assert np.isclose(fac.reduce(), f_lin_shot(0), atol=CLOSE_TOL)
+      # check instack and outstack are as expected
+    for j, shots in enumerate(SHOT_LIST):
+        assert fac.instack[j] == {"scale_factor" : X_VALS[j], "shots" : shots}
+        assert fac.outstack[j] == f_lin_shot(X_VALS[j], shots=shots)
+        assert fac.outstack[j] != f_lin_shot(X_VALS[j])
+
+
+def test_shot_list_errors():
+    """Test errors related to the "shot_lists" argument."""
+    with raises(IndexError, match=r"must have the same length."):
+        PolyFactory(X_VALS, order=2, shot_list = [1, 2])
+    with raises(TypeError, match=r"valid iterator of integers"):
+        PolyFactory(X_VALS, order=2, shot_list = [1.0, 2])
+

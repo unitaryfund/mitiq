@@ -310,8 +310,8 @@ class BatchedFactory(Factory):
                             "or a valid iterator of integers.")
         if shot_list and (len(scale_factors)!=len(shot_list)):
             raise IndexError("The arguments scale_factors and shot_list"
-                             "must have the same length. " 
-                             f"But len(scale_factors) is {len(scale_factors)}"
+                             " must have the same length." 
+                             f" But len(scale_factors) is {len(scale_factors)}"
                              f" and len(shot_list) is {len(shot_list)}.")
 
         self._scale_factors = scale_factors
@@ -412,9 +412,7 @@ class PolyFactory(BatchedFactory):
             ValueError: If data is not consistent with the extrapolation model.
             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
         """
-        print(instack)
         scale_factors = _instack_to_scale_factors(instack)
-        print(scale_factors)
         # Check arguments
         error_str = (
             "Data is not enough: at least two data points are necessary."
