@@ -22,9 +22,10 @@ def Parameter(fac: Factory) -> Factory:
 
 
 def parameter_run(self, qp: QPROGRAM,
-        executor: Callable[[QPROGRAM], float],
-        shots: int,
-        max_iterations: int = 100) -> Factory:
+                  executor: Callable[[QPROGRAM], float],
+                  apply_noise: Callable[[QPROGRAM, float], QPROGRAM],
+                  shots: int,
+                  max_iterations: int = 100) -> Factory:
     """
     Runs the factory until convergence executing quantum circuits.
     Accepts different noise levels.
@@ -33,6 +34,9 @@ def parameter_run(self, qp: QPROGRAM,
         qp: Circuit to mitigate.
         executor: Function executing a circuit; returns an expectation
                   value.
+        apply_noise: Function applying random tweaks to parameter values in
+                  order to scale the noise.
+        shots: The number of shots to take for each expectation value.
         max_iterations: Maximum number of iterations (optional). Default: 100.
     """
     def _noise_to_expval(noise_param: float) -> float:
@@ -40,14 +44,14 @@ def parameter_run(self, qp: QPROGRAM,
         param"""
         outcome = []
         for _ in range(shots):
-            qp = param_scale_noise(qp, noise_param)
+            qp = apply_noise(qp, noise_param)
             outcome.append(executor(qp))
         return np.mean(outcome)
 
     return self.iterate(_noise_to_expval, max_iterations)
 
 
-def param_scale_noise(scale_factor: float, qc: QPROGRAM) -> QPROGRAM:
+def param_scale_noise(qc: QPROGRAM, scale_factor: float) -> QPROGRAM:
     """ Alters the parameters in the program for a given scale_factor """
     # TODO
     return Circuit()
