@@ -84,7 +84,7 @@ def test_mitigate_executor_with_shot_list():
                                            factory=bad_fac)
     assert not np.isclose(mitigated_executor(circ), 0.0, atol=1.0e-3)
     good_fac = LinearFactory([1.0, 2.0, 3.0],
-                                 shot_list=[10**9, 10**9, 10**9])
+                             shot_list=[10**9, 10**9, 10**9])
     mitigated_executor = mitigate_executor(executor_with_shots,
                                            factory=good_fac)
     assert np.isclose(mitigated_executor(circ), 0.0, atol=1.0e-3)

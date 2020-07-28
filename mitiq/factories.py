@@ -6,14 +6,13 @@ import warnings
 from copy import deepcopy
 from mitiq import QPROGRAM
 from typing import (
-    List, Iterable, Optional, Tuple, Callable, Union,
+    List, Iterable, Optional, Tuple, Callable
 )
 from abc import ABC, abstractmethod
 
 import numpy as np
 from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
-
 
 
 def _instack_to_scale_factors(instack: dict) -> List[float]:
@@ -189,7 +188,7 @@ class Factory(ABC):
         self.instack = []
         self.outstack = []
 
-    def iterate(self, 
+    def iterate(self,
                 noise_to_expval: Callable[[float], float],
                 max_iterations: int = 100) -> 'Factory':
         """
@@ -251,7 +250,7 @@ class Factory(ABC):
         """
 
         def _noise_to_expval(scale_factor, **exec_params) -> float:
-            """Evaluates the quantum expectation value for a given 
+            """Evaluates the quantum expectation value for a given
             scale_factor and other executor parameters."""
 
             scaled_qp = scale_noise(qp, scale_factor)
@@ -293,8 +292,8 @@ class BatchedFactory(Factory):
         IndexError: If an iteration step fails.
     """
 
-    def __init__(self, 
-                 scale_factors: Iterable[float], 
+    def __init__(self,
+                 scale_factors: Iterable[float],
                  shot_list: Optional[List[int]] = None) -> None:
         """Instantiates a new object of this Factory class."""
         if len(scale_factors) < 2:
@@ -302,15 +301,16 @@ class BatchedFactory(Factory):
                 "At least 2 scale factors are necessary."
             )
 
-        if  (shot_list and 
+        if (
+            shot_list and
             (not isinstance(shot_list, Iterable) or
              not all([isinstance(shots, int) for shots in shot_list]))
-        ):
-            raise TypeError("The optional argument shot_list must be None " 
+           ):
+            raise TypeError("The optional argument shot_list must be None "
                             "or a valid iterator of integers.")
-        if shot_list and (len(scale_factors)!=len(shot_list)):
+        if shot_list and (len(scale_factors) != len(shot_list)):
             raise IndexError("The arguments scale_factors and shot_list"
-                             " must have the same length." 
+                             " must have the same length."
                              f" But len(scale_factors) is {len(scale_factors)}"
                              f" and len(shot_list) is {len(shot_list)}.")
 
@@ -321,7 +321,7 @@ class BatchedFactory(Factory):
 
     def next(self) -> float:
         """Returns a dictionary of parameters to execute a circuit at."""
-        in_params = {} 
+        in_params = {}
         try:
             index = len(self.outstack)
             in_params["scale_factor"] = self._scale_factors[index]
@@ -840,13 +840,13 @@ class AdaExpFactory(Factory):
         """Returns a dictionary of parameters to execute a circuit at."""
         # The 1st scale factor is always 1
         if len(self.instack) == 0:
-            return {"scale_factor" : 1.0}
+            return {"scale_factor": 1.0}
         # The 2nd scale factor is self._scale_factor
         if len(self.instack) == 1:
-            return {"scale_factor" : self._scale_factor}
+            return {"scale_factor": self._scale_factor}
         # If asymptote is None we use 2 * scale_factor as third noise parameter
         if (len(self.instack) == 2) and (self.asymptote is None):
-            return {"scale_factor" : 2 * self._scale_factor}
+            return {"scale_factor": 2 * self._scale_factor}
 
         with warnings.catch_warnings():
             # This is an intermediate fit, so we suppress its warning messages
@@ -861,8 +861,7 @@ class AdaExpFactory(Factory):
         # an adaptive rule which depends on self.exponent
         next_scale_factor = min(1.0 + self._SHIFT_FACTOR / np.abs(exponent),
                                 self.max_scale_factor)
-        return {"scale_factor" : next_scale_factor}
-
+        return {"scale_factor": next_scale_factor}
 
     def is_converged(self) -> bool:
         """Returns True if all the needed expectation values have been
