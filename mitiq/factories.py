@@ -257,7 +257,7 @@ class Factory(ABC):
 
     def __eq__(self, other):
         instack_vals = [list(p.values()) for p in self.instack]
-        other_vals = [list(p.values())  for p in other.instack]
+        other_vals = [list(p.values()) for p in other.instack]
         return (
                 np.allclose(instack_vals, other_vals),
                 np.allclose(self.outstack, other.outstack)
