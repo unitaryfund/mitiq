@@ -84,7 +84,7 @@ documentation `here <https://cirq.readthedocs.io/en/master/generated/cirq.PauliS
 
     def wvf_sampling_sim(circ: Circuit, obs: cirq.PauliString, shots: int) -> float:
         # Do the sampling
-        psum = cirq.PauliSumCollector(qc, obs, samples_per_term=shots)
+        psum = cirq.PauliSumCollector(circ, obs, samples_per_term=shots)
         psum.collect(sampler=cirq.Simulator())
 
         # Return the expectation value
