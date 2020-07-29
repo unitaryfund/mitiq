@@ -21,6 +21,10 @@ class UnsupportedQuilGate(Exception):
     pass
 
 
+class UnsupportedQuilInstruction(Exception):
+    pass
+
+
 def cphase(param: float) -> CZPowGate:
     """
     PyQuil's CPHASE and Cirq's CZPowGate are the same up to a factor of pi.
@@ -118,8 +122,11 @@ SUPPORTED_GATES: Mapping[str, Union[Gate, Callable[..., Gate]]] = {
 def op_from_inst(inst: object) -> None:
     """
     Generic function for converting pyQuil instructions to Cirq operations.
+    Raise a general error when encountering an unregistered type.
     """
-    raise TypeError(f"Quil instruction {inst} of type {type(inst)} not currently supported in Cirq.")
+    raise UnsupportedQuilInstruction(
+        f"Quil instruction {inst} of type {type(inst)} not currently supported in Cirq."
+    )
 
 
 @op_from_inst.register(PyQuilGate)
@@ -157,31 +164,40 @@ def _(inst: Declare) -> Circuit:
     return Circuit()
 
 
+PRAGMA_ERROR = """
+Please remove PRAGMAs from your Quil program.
+If you would like to add noise, do so after conversion.
+"""
+
+
 @op_from_inst.register(Pragma)
 def _(inst: Pragma) -> Circuit:
     """
-    Pass and warn when encountering a PRAGMA.
+    Raise a targeted error when encountering a PRAGMA.
     """
-    warnings.warn(f"Ignoring unsupported operation {inst}")
-    return Circuit()
+    raise UnsupportedQuilInstruction(PRAGMA_ERROR)
+
+
+RESET_ERROR = """
+Please remove RESETs from your Quil program.
+RESET directives have special meaning on QCS, to enable active reset.
+"""
 
 
 @op_from_inst.register(Reset)
 def _(inst: Reset) -> Circuit:
     """
-    Pass and warn when encountering a RESET.
+    Raise a targeted error when encountering a RESET.
     """
-    warnings.warn(f"Ignoring unsupported operation {inst}")
-    return Circuit()
+    raise UnsupportedQuilInstruction(RESET_ERROR)
 
 
 @op_from_inst.register(ResetQubit)
 def _(inst: ResetQubit) -> Circuit:
     """
-    Pass and warn when encountering a RESET q.
+    Raise a targeted error when encountering a RESET q.
     """
-    warnings.warn(f"Ignoring unsupported operation {inst}")
-    return Circuit()
+    raise UnsupportedQuilInstruction(RESET_ERROR)
 
 
 def circuit_from_quil(quil: str) -> Circuit:
