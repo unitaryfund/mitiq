@@ -1,4 +1,3 @@
-from functools import singledispatch
 from typing import Callable, Dict, Union
 
 import numpy as np
@@ -24,6 +23,9 @@ class UnsupportedQuilGate(Exception):
 class UnsupportedQuilInstruction(Exception):
     pass
 
+#
+# Functions for converting supported parameterized Quil gates.
+#
 
 def cphase(param: float) -> CZPowGate:
     """
@@ -90,7 +92,17 @@ def xy(param: float) -> ISwapPowGate:
     return ISwapPowGate(exponent=param / np.pi)
 
 
-# parameterized gates map to functions that produce Gate constructors
+PRAGMA_ERROR = """
+Please remove PRAGMAs from your Quil program.
+If you would like to add noise, do so after conversion.
+"""
+
+RESET_ERROR = """
+Please remove RESETs from your Quil program.
+RESET directives have special meaning on QCS, to enable active reset.
+"""
+
+# Parameterized gates map to functions that produce Gate constructors.
 SUPPORTED_GATES: Dict[str, Union[Gate, Callable[..., Gate]]] = {
     "CCNOT": CCNOT,
     "CNOT": CNOT,
@@ -118,107 +130,61 @@ SUPPORTED_GATES: Dict[str, Union[Gate, Callable[..., Gate]]] = {
 }
 
 
-@singledispatch
-def op_from_inst(inst: object) -> None:
-    """
-    Generic function for converting pyQuil instructions to Cirq operations.
-    Raise a general error when encountering an unregistered type.
-    """
-    raise UnsupportedQuilInstruction(
-        f"Quil instruction {inst} of type {type(inst)} not currently supported in Cirq."
-    )
-
-
-@op_from_inst.register(PyQuilGate)
-def _(inst: PyQuilGate) -> Gate:
-    """
-    Convert pyQuil gates to Cirq operations.
-    """
-    quil_gate_name = inst.name
-    quil_gate_params = inst.params
-    line_qubits = list(LineQubit(q.index) for q in inst.qubits)
-
-    if quil_gate_name in SUPPORTED_GATES:
-        cirq_gate_fn = SUPPORTED_GATES[quil_gate_name]
-        if quil_gate_params:
-            return cirq_gate_fn(*quil_gate_params)(*line_qubits)
-        return cirq_gate_fn(*line_qubits)
-    raise UnsupportedQuilGate(f"Quil gate {quil_gate_name} not supported in Cirq.")
-
-
-@op_from_inst.register(PyQuilMeasurement)
-def _(inst: PyQuilMeasurement) -> MeasurementGate:
-    """
-    Convert pyQuil MEASURE operations to Cirq MeasurementGate objects.
-    """
-    line_qubit = LineQubit(inst.qubit.index)
-    quil_memory_reference = inst.classical_reg.out()
-    return MeasurementGate(1, key=quil_memory_reference)(line_qubit)
-
-
-@op_from_inst.register(Declare)
-def _(inst: Declare) -> Circuit:
-    """
-    Pass when encountering a DECLARE.
-    """
-    return Circuit()
-
-
-@op_from_inst.register(DefGate)
-def _(inst: DefGate) -> Circuit:
-    """
-    Add DEFGATE-defined gates to SUPPORTED_GATES using MatrixGate.
-    """
-    if inst.parameters:
-        raise UnsupportedQuilInstruction(
-            "Parameterized DEFGATEs are currently unsupported."
-        )
-    SUPPORTED_GATES[inst.name] = MatrixGate(inst.matrix)
-    return Circuit()
-
-
-PRAGMA_ERROR = """
-Please remove PRAGMAs from your Quil program.
-If you would like to add noise, do so after conversion.
-"""
-
-
-@op_from_inst.register(Pragma)
-def _(inst: Pragma) -> Circuit:
-    """
-    Raise a targeted error when encountering a PRAGMA.
-    """
-    raise UnsupportedQuilInstruction(PRAGMA_ERROR)
-
-
-RESET_ERROR = """
-Please remove RESETs from your Quil program.
-RESET directives have special meaning on QCS, to enable active reset.
-"""
-
-
-@op_from_inst.register(Reset)
-def _(inst: Reset) -> Circuit:
-    """
-    Raise a targeted error when encountering a RESET.
-    """
-    raise UnsupportedQuilInstruction(RESET_ERROR)
-
-
-@op_from_inst.register(ResetQubit)
-def _(inst: ResetQubit) -> Circuit:
-    """
-    Raise a targeted error when encountering a RESET q.
-    """
-    raise UnsupportedQuilInstruction(RESET_ERROR)
-
-
 def circuit_from_quil(quil: str) -> Circuit:
     """
     Convert a Quil program to a Cirq Circuit.
     """
     circuit = Circuit()
+    defgates = {}
     instructions = parse(quil)
+
     for inst in instructions:
-        circuit += op_from_inst(inst)
+        # Add DEFGATE-defined gates to defgates dict using MatrixGate.
+        if isinstance(inst, DefGate):
+            if inst.parameters:
+                raise UnsupportedQuilInstruction(
+                    "Parameterized DEFGATEs are currently unsupported."
+                )
+            defgates[inst.name] = MatrixGate(inst.matrix)
+
+        # Pass when encountering a DECLARE.
+        elif isinstance(inst, Declare):
+            pass
+
+        # Convert pyQuil gates to Cirq operations.
+        elif isinstance(inst, PyQuilGate):
+            quil_gate_name = inst.name
+            quil_gate_params = inst.params
+            line_qubits = list(LineQubit(q.index) for q in inst.qubits)
+            defgates_and_supported_gates = dict(**defgates, **SUPPORTED_GATES)
+            if quil_gate_name not in defgates_and_supported_gates:
+                raise UnsupportedQuilGate(
+                    f"Quil gate {quil_gate_name} not supported in Cirq."
+                )
+            cirq_gate_fn = defgates_and_supported_gates[quil_gate_name]
+            if quil_gate_params:
+                circuit += cirq_gate_fn(*quil_gate_params)(*line_qubits)
+            else:
+                circuit += cirq_gate_fn(*line_qubits)
+
+        # Convert pyQuil MEASURE operations to Cirq MeasurementGate objects.
+        elif isinstance(inst, PyQuilMeasurement):
+            line_qubit = LineQubit(inst.qubit.index)
+            quil_memory_reference = inst.classical_reg.out()
+            circuit += MeasurementGate(1, key=quil_memory_reference)(line_qubit)
+
+        # Raise a targeted error when encountering a PRAGMA.
+        elif isinstance(inst, Pragma):
+            raise UnsupportedQuilInstruction(PRAGMA_ERROR)
+
+        # Raise a targeted error when encountering a RESET.
+        elif isinstance(inst, (Reset, ResetQubit)):
+            raise UnsupportedQuilInstruction(RESET_ERROR)
+
+        # Raise a general error when encountering an unconsidered type.
+        else:
+            raise UnsupportedQuilInstruction(
+                f"Quil instruction {inst} of type {type(inst)} not currently supported in Cirq."
+            )
+
     return circuit
