@@ -4,6 +4,8 @@ from cirq import Circuit, LineQubit
 from cirq.ops import (CCNOT, CNOT, CSWAP, CZ, H, I, ISWAP,
                       MeasurementGate, S, SWAP, T, X, Y, Z,
                       rx, ry, rz)
+from pyquil import Program
+from pyquil.simulation.tools import program_unitary
 
 from mitiq.mitiq_pyquil.quil import (circuit_from_quil, cphase, cphase00,
                                      cphase01, cphase10, pswap, xy)
@@ -76,6 +78,17 @@ def test_circuit_from_quil():
                             MeasurementGate(1, key="ro[0]")(q0),
                             MeasurementGate(1, key="ro[1]")(q1),
                             MeasurementGate(1, key="ro[2]")(q2)])
-
+    # build the same Circuit, using Quil
     quil_circuit = circuit_from_quil(QUIL_PROGRAM)
+    # test Circuit equivalence
     assert cirq_circuit == quil_circuit
+
+    pyquil_circuit = Program(QUIL_PROGRAM)
+    # drop declare and measures, get Program unitary
+    pyquil_unitary = program_unitary(pyquil_circuit[1:-3], n_qubits=3)
+    # fix qubit order convention
+    cirq_circuit_swapped = Circuit(SWAP(q0, q2), cirq_circuit[:-1], SWAP(q0, q2))
+    # get Circuit unitary
+    cirq_unitary = cirq_circuit_swapped.unitary()
+    # test unitary equivalence
+    assert np.isclose(pyquil_unitary, cirq_unitary).all()
