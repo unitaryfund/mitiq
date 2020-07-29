@@ -84,7 +84,7 @@ documentation `here <https://cirq.readthedocs.io/en/master/generated/cirq.PauliS
 
     def wvf_sampling_sim(circ: Circuit, obs: cirq.PauliString, shots: int) -> float:
         # Do the sampling
-        psum = cirq.PauliSumCollector(qc, obs, samples_per_term=shots)
+        psum = cirq.PauliSumCollector(circ, obs, samples_per_term=shots)
         psum.collect(sampler=cirq.Simulator())
 
         # Return the expectation value
@@ -169,6 +169,7 @@ You can also include both noise models and finite sampling in your executor.
         """
         # add the noise
         noisy = circ.with_noise(depolarize(p=noise))
+        
         # Do the sampling
         psum = cirq.PauliSumCollector(noisy, obs, samples_per_term=shots)
         psum.collect(sampler=cirq.DensityMatrixSimulator())
