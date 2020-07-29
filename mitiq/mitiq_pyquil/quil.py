@@ -27,6 +27,7 @@ class UnsupportedQuilInstruction(Exception):
 # Functions for converting supported parameterized Quil gates.
 #
 
+
 def cphase(param: float) -> CZPowGate:
     """
     PyQuil's CPHASE and Cirq's CZPowGate are the same up to a factor of pi.
