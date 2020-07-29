@@ -32,15 +32,17 @@ Specific classes derived from the abstract class :class:`.Factory`, like :class:
 All the built-in factories can be found in the module :py:mod:`mitiq.factories` and
 are summarized in the following table.
 
-.. autosummary::
-   :nosignatures:
+.. _built-in-factories:
 
-   mitiq.factories.LinearFactory
-   mitiq.factories.RichardsonFactory
-   mitiq.factories.PolyFactory
-   mitiq.factories.ExpFactory
-   mitiq.factories.PolyExpFactory
-   mitiq.factories.AdaExpFactory
+   .. autosummary::
+      :nosignatures:
+
+      mitiq.factories.LinearFactory
+      mitiq.factories.RichardsonFactory
+      mitiq.factories.PolyFactory
+      mitiq.factories.ExpFactory
+      mitiq.factories.PolyExpFactory
+      mitiq.factories.AdaExpFactory
 
 
 Once instantiated, a factory can be passed as an argument to the high-level functions contained in the module :py:mod:`mitiq.zne`.
@@ -309,9 +311,8 @@ In the previous code block we used the some core methods of a :class:`.Factory` 
 Defining a custom factory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If necessary, the user can modify an existing extrapolation method by subclassing
-the corresponding factory (e.g., :class:`.LinearFactory`, 
-:class:`.RichardsonFactory`, etc.).
+If necessary, the user can modify an existing extrapolation methods by subclassing
+one of the :ref:`built-in factories <built-in-factories>`. 
 
 Alternatively, a new adaptive extrapolation method can be derived from the abstract class :class:`.Factory`.
 In this case its core methods must be implemented:
