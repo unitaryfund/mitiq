@@ -378,7 +378,7 @@ class PolyFactory(BatchedFactory):
         order: Extrapolation order (degree of the polynomial fit).
                It cannot exceed len(scale_factors) - 1.
         shot_list: Optional iterable of integers corresponding to the number
-                   of measurements used for each expectation value. If this
+                   of samples taken for each expectation value. If this
                    argument is explicitly passed to the factory, it must have
                    the same length of scale_factors and the executor function
                    must accept "shots" as a valid keyword argument.
