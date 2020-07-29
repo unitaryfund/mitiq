@@ -255,6 +255,12 @@ def test_avoid_log_keyword():
     assert not znl_with_log == znl_without_log
 
 
+def test_less_than_two_scale_factors_error():
+    """Test less than 2 scale_factors."""
+    with raises(ValueError, match=r"At least 2 scale factors are necessary"):
+        _ = LinearFactory([1])
+
+
 def test_few_scale_factors_error():
     """Test that a wrong initialization error is raised."""
     with raises(ValueError, match=r"The extrapolation order cannot exceed"):

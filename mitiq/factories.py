@@ -287,7 +287,7 @@ class BatchedFactory(Factory):
                    the same length of scale_factors and the executor function
                    must accept "shots" as a valid keyword argument.
     Raises:
-        IndexError: If the number of scale factors is less than 2.
+        ValueError: If the number of scale factors is less than 2.
         IndexError: If an iteration step fails.
     """
 
@@ -296,7 +296,7 @@ class BatchedFactory(Factory):
                  shot_list: Optional[List[int]] = None) -> None:
         """Instantiates a new object of this Factory class."""
         if len(scale_factors) < 2:
-            raise IndexError(
+            raise ValueError(
                 "At least 2 scale factors are necessary."
             )
 
