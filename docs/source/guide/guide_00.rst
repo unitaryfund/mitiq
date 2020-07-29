@@ -16,4 +16,5 @@ Users Guide
    guide_05-error-mitigation.rst
    guide_06-ibmq-backends.rst
    guide_07-qaoa-landscape.rst
+   guide_08-hamiltonians.rst
 .. _guide_07-zne-lindblad.rst

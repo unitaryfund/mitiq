@@ -57,6 +57,7 @@ def test_execute_with_zne_bad_arguments():
     with pytest.raises(TypeError, match="Argument `scale_noise` must be"):
         execute_with_zne(circ, executor, scale_noise=None)
 
+
 def test_error_zne_decorator():
     """Tests that the proper error is raised if the decorator is used without parenthesis."""
     with pytest.raises(TypeError, match="The decorator must be used with parenthesis"):
@@ -64,9 +65,10 @@ def test_error_zne_decorator():
         def test_executor(circuit):
             return 0
 
+
 def test_doc_is_preserved():
     """Tests that the doc of the original executor is preserved."""
-    
+
     def first_executor(circuit):
         """Doc of the original executor."""
         return 0
@@ -80,6 +82,3 @@ def test_doc_is_preserved():
         return 0
 
     assert second_executor.__doc__ == first_executor.__doc__
-
-
-

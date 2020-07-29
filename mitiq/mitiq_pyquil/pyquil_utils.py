@@ -58,7 +58,7 @@ def random_identity_circuit(depth=None):
     return prog
 
 
-def run_with_noise(circuit: Program, noise: float, shots: int)-> float:
+def run_with_noise(circuit: Program, noise: float, shots: int) -> float:
     """Returns the expectation value of a circuit run several times with noise.
 
     Args:
@@ -144,7 +144,7 @@ def scale_noise(pq: Program, param: float) -> Program:
     """
     noise = param * NATIVE_NOISE
     assert (noise <= 1.0), "Noise scaled to {} is out of bounds (<=1.0) for " \
-    "depolarizing channel.".format(noise)
+        "depolarizing channel.".format(noise)
     return add_depolarizing_noise(pq, noise)
 
 
