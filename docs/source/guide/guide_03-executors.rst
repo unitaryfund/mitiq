@@ -244,6 +244,10 @@ but to also include finite sampling of measurements. Note that this executor
 can be :ref:`wrapped using partial function application <partial-note>`
 to be used in ``mitiq``.
 
+Note that this executor implementation measures arbitrary observables by using
+a change of basis into the computational basis. More information about the math
+behind how this example is available `here <https://quantumcomputing.stackexchange.com/a/6944>`_.
+
 .. testcode::
 
     import copy
