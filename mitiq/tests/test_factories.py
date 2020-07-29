@@ -349,7 +349,8 @@ def test_iterate_with_shot_list(fac_class):
     fac = fac_class(X_VALS, shot_list=SHOT_LIST)
     fac.iterate(f_lin_shot)
     assert np.isclose(fac.reduce(), f_lin_shot(0), atol=CLOSE_TOL)
-    # check instack and outstack are as expected
+    
+    # Check instack and outstack are as expected
     for j, shots in enumerate(SHOT_LIST):
         assert fac.instack[j] == {"scale_factor": X_VALS[j], "shots": shots}
         assert fac.outstack[j] == f_lin_shot(X_VALS[j], shots=shots)
