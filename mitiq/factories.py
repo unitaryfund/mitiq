@@ -256,8 +256,10 @@ class Factory(ABC):
         return self.iterate(_noise_to_expval, max_iterations)
 
     def __eq__(self, other):
+        instack_vals = [list(p.values()) for p in self.instack]
+        other_vals = [list(p.values())  for p in other.instack]
         return (
-                self.instack == other.instack and
+                np.allclose(instack_vals, other_vals),
                 np.allclose(self.outstack, other.outstack)
         )
 
