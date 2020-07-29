@@ -265,7 +265,7 @@ behind how this example is available `here <https://quantumcomputing.stackexchan
         Returns:
             expval: expected value of the observable obs.
         """
-        if len(circ.clbits > 0:
+        if len(circ.clbits) > 0:
             raise ValueError("This executor only works on programs with no classical bits.")
 
         circ = copy.deepcopy(circ)
@@ -274,8 +274,6 @@ behind how this example is available `here <https://quantumcomputing.stackexchan
         eigvals, U = np.linalg.eigh(obs)
         circ.unitary(U, qubits=range(circ.n_qubits))
 
-        # measure all qubits in the computational basis
-        # assume classical register of same size as quantum register
         circ.measure_all()
 
         # execution of the experiment
@@ -341,7 +339,7 @@ This executor can be used for noisy depolarizing simulation.
         Returns:
             expval: expected value of the observable obs.
         """
-        if len(circ.clbits > 0:
+        if len(circ.clbits) > 0:
             raise ValueError("This executor only works on programs with no classical bits.")
 
         circ = copy.deepcopy(circ)
@@ -350,10 +348,7 @@ This executor can be used for noisy depolarizing simulation.
         eigvals, U = np.linalg.eigh(obs)
         circ.unitary(U, qubits=range(circ.n_qubits))
 
-        # measure all qubits in the computational basis
-        # assume classical register of same size as quantum register
-        for qq in range(circ.n_qubits):
-            circ.measure(qq, qq)
+        circ.measure_all()
 
         # initialize a qiskit noise model
         noise_model = NoiseModel()
@@ -385,7 +380,7 @@ This executor can be used for noisy depolarizing simulation.
 .. testcode::
     :hide:
 
-    qc = QuantumCircuit(1, 1)
+    qc = QuantumCircuit(1)
     for _ in range(10):
         qc.u1(0, 0)
     assert 0.1 < qs_noisy_sampling_sim(qc, np.diag([1, 0]), 0.02, 1000) < 1.0
