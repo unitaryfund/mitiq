@@ -265,6 +265,9 @@ behind how this example is available `here <https://quantumcomputing.stackexchan
         Returns:
             expval: expected value of the observable obs.
         """
+        if len(circ.clbits > 0:
+            raise ValueError("This executor only works on programs with no classical bits.")
+
         circ = copy.deepcopy(circ)
         # we need to modify the circuit to measure our observable
         # we do this by appending a rotation U
@@ -287,6 +290,8 @@ behind how this example is available `here <https://quantumcomputing.stackexchan
         results = job.result()
         counts = results.get_counts()
         expectation = 0
+        # classical bits are included in bitstrings with a space
+        # this is what breaks if you have them
         for bitstring, count in counts.items():
             expectation += eigvals[int(bitstring, 2)] * count / shots
         return expectation
@@ -295,7 +300,7 @@ behind how this example is available `here <https://quantumcomputing.stackexchan
 .. testcode::
     :hide:
 
-    qc = QuantumCircuit(2, 2)
+    qc = QuantumCircuit(2)
     qc.h(0)
     qc.cnot(0, 1)
     out = qs_wvf_sampling_sim(qc, obs=np.diag([0, 0, 0, 1]), shots=50)
@@ -336,6 +341,9 @@ This executor can be used for noisy depolarizing simulation.
         Returns:
             expval: expected value of the observable obs.
         """
+        if len(circ.clbits > 0:
+            raise ValueError("This executor only works on programs with no classical bits.")
+
         circ = copy.deepcopy(circ)
         # we need to modify the circuit to measure our observable
         # we do this by appending a rotation U
@@ -368,6 +376,8 @@ This executor can be used for noisy depolarizing simulation.
         results = job.result()
         counts = results.get_counts()
         expectation = 0
+        # classical bits are included in bitstrings with a space
+        # this is what breaks if you have them
         for bitstring, count in counts.items():
             expectation += eigvals[int(bitstring, 2)] * count / shots
         return expectation
