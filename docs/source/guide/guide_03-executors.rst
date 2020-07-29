@@ -356,7 +356,6 @@ This executor can be used for noisy depolarizing simulation.
             backend=QISKIT_SIMULATOR,
             backend_options={'method':'density_matrix'},
             noise_model=noise_model,
-            basis_gates=["u1", "u2", "u3"],
             # we want all gates to be actually applied,
             # so we skip any circuit optimization
             optimization_level=0,
@@ -364,11 +363,18 @@ This executor can be used for noisy depolarizing simulation.
         )
         results = job.result()
         counts = results.get_counts()
-        print(counts)
         expectation = 0
         for bitstring, count in counts.items():
             expectation += eigvals[int(bitstring, 2)] * count / shots
         return expectation
+
+.. testcode::
+    :hide:
+
+    qc = QuantumCircuit(1, 1)
+    for _ in range(10):
+        qc.u1(0, 0)
+    assert 0.1 < qs_noisy_sampling_sim(qc, np.diag([1, 0]), 0.02, 1000) < 1.0
 
 Other noise models can be defined using any functionality available in ``qiskit``.
 More details can be found in the ``qiskit``
