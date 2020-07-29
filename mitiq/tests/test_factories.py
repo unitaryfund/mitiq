@@ -343,7 +343,8 @@ def test_iterate_with_shot_list(fac_class):
         assert fac.instack[j] == {"scale_factor": X_VALS[j]}
         assert fac.outstack[j] != f_lin_shot(X_VALS[j], shots=shots)
         assert fac.outstack[j] == f_lin_shot(X_VALS[j])
-    # now pass an arbitrary shot_list as an argument
+        
+    # Now pass an arbitrary shot_list as an argument
     SHOT_LIST = [100, 200, 300, 400, 500]
     fac = fac_class(X_VALS, shot_list=SHOT_LIST)
     fac.iterate(f_lin_shot)
