@@ -19,6 +19,21 @@ def _instack_to_scale_factors(instack: dict) -> List[float]:
     return instack
 
 
+def _are_close_dict(dict_a: dict, dict_b: dict) -> bool:
+    """Returns True if the two dictionaries have equal keys and
+    their corresponding values are "sufficiently" close."""
+    if len(dict_a) != len(dict_b):
+        return False
+    keys_a = dict_a.keys()
+    keys_b = dict_b.keys()
+    if set(keys_a) != set(keys_b):
+        return False
+    # use keys_a in both cases to ensure the same order
+    values_a = [dict_a[key] for key in keys_a]
+    values_b = [dict_b[key] for key in keys_a]
+    return np.allclose(values_a, values_b)
+
+
 class ExtrapolationError(Exception):
     """Error raised by :class:`.Factory` objects when
     the extrapolation fit fails.
@@ -256,12 +271,12 @@ class Factory(ABC):
         return self.iterate(_noise_to_expval, max_iterations)
 
     def __eq__(self, other):
-        instack_vals = [list(p.values()) for p in self.instack]
-        other_vals = [list(p.values()) for p in other.instack]
-        return (
-                np.allclose(instack_vals, other_vals),
-                np.allclose(self.outstack, other.outstack)
-        )
+        if len(self.instack) != len(other.instack):
+            return False
+        for dict_a, dict_b in zip(self.instack, other.instack):
+            if not _are_close_dict(dict_a, dict_b):
+                return False
+        return np.allclose(self.outstack, other.outstack)
 
 
 class BatchedFactory(Factory):
