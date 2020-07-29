@@ -334,7 +334,6 @@ def test_equal(factory):
 def test_iterate_with_shot_list(fac_class):
     """Tests factories with (and without) the "shot_list" argument."""
     # first test without shot_list
-    SHOT_LIST = [100, 200, 300, 400, 500]
     fac = fac_class(X_VALS)
     fac.iterate(f_lin_shot)
     assert np.isclose(fac.reduce(), f_lin_shot(0), atol=CLOSE_TOL)
