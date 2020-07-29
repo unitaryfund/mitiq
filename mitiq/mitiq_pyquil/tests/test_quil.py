@@ -92,3 +92,20 @@ def test_circuit_from_quil():
     cirq_unitary = cirq_circuit_swapped.unitary()
     # test unitary equivalence
     assert np.isclose(pyquil_unitary, cirq_unitary).all()
+
+
+QUIL_PROGRAM_WITH_DEFGATE = """
+DEFGATE MYZ:
+    1,0
+    0,-1
+
+X 0
+MYZ 0
+"""
+
+
+def test_quil_with_defgate():
+    q0 = LineQubit(0)
+    cirq_circuit = Circuit([X(q0), Z(q0)])
+    quil_circuit = circuit_from_quil(QUIL_PROGRAM_WITH_DEFGATE)
+    assert np.isclose(quil_circuit.unitary(), cirq_circuit.unitary()).all()

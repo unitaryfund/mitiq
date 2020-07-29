@@ -1,10 +1,10 @@
-import warnings
 from functools import singledispatch
-from typing import Callable, Mapping, Union
+from typing import Callable, Dict, Union
 
 import numpy as np
 from pyquil.parser import parse
 from pyquil.quilbase import (Declare,
+                             DefGate,
                              Gate as PyQuilGate,
                              Measurement as PyQuilMeasurement,
                              Pragma,
@@ -91,7 +91,7 @@ def xy(param: float) -> ISwapPowGate:
 
 
 # parameterized gates map to functions that produce Gate constructors
-SUPPORTED_GATES: Mapping[str, Union[Gate, Callable[..., Gate]]] = {
+SUPPORTED_GATES: Dict[str, Union[Gate, Callable[..., Gate]]] = {
     "CCNOT": CCNOT,
     "CNOT": CNOT,
     "CSWAP": CSWAP,
@@ -161,6 +161,19 @@ def _(inst: Declare) -> Circuit:
     """
     Pass when encountering a DECLARE.
     """
+    return Circuit()
+
+
+@op_from_inst.register(DefGate)
+def _(inst: DefGate) -> Circuit:
+    """
+    Add DEFGATE-defined gates to SUPPORTED_GATES using MatrixGate.
+    """
+    if inst.parameters:
+        raise UnsupportedQuilInstruction(
+            "Parameterized DEFGATEs are currently unsupported."
+        )
+    SUPPORTED_GATES[inst.name] = MatrixGate(inst.matrix)
     return Circuit()
 
 
