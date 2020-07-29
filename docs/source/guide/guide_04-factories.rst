@@ -6,15 +6,12 @@
 Factory Objects
 *********************************************
 
-A ``Factory`` object is a self-contained representation of an error mitigation method.
+A :class:`.Factory` object is a self-contained representation of an error mitigation method.
 
 This representation is not just hardware-agnostic, it is even *quantum-agnostic*,
 in the sense that it mainly deals with classical data: the classical input and the classical output of a
-noisy computation. Nonetheless, a ``Factory`` can easily interact with a quantum system via its ``self.run`` method
+noisy computation. Nonetheless, a factory can easily interact with a quantum system via its ``self.run`` method
 which is the only interface between the "classical world" of a factory and the "quantum world" of a circuit.
-
-Specific classes derived from the abstract class ``Factory``, like ``LinearFactory``, ``RichardsonFactory``, etc., 
-represent different zero-noise extrapolation methods.
 
 The typical tasks of a factory are:
 
@@ -26,23 +23,34 @@ The typical tasks of a factory are:
    (respectively stored in the object attributes ``self.instack``
    and ``self.outstack``), evaluate the associated zero-noise extrapolation.
 
-The structure of the ``Factory`` class is adaptive by construction, since the choice of the next noise
+The structure of the :class:`.Factory` class is adaptive by construction, since the choice of the next noise
 level can depend on the history of ``self.instack`` and ``self.outstack``. Obviously, non-adaptive
 methods are supported too and they actually represent the most common choice.
 
-Once instantiated, a factory can be passed as an argument to the high-level functions contained in the module ``mitiq.zne``.
+Specific classes derived from the abstract class :class:`.Factory`, like :class:`.LinearFactory`, 
+:class:`.RichardsonFactory`, etc., represent different zero-noise extrapolation methods.
+All the built-in factories can be found in the module :py:mod:`mitiq.factories` and
+are summarized in the following table.
+
+.. autosummary::
+   :nosignatures:
+
+   mitiq.factories.LinearFactory
+   mitiq.factories.RichardsonFactory
+   mitiq.factories.PolyFactory
+   mitiq.factories.ExpFactory
+   mitiq.factories.PolyExpFactory
+   mitiq.factories.AdaExpFactory
+
+
+Once instantiated, a factory can be passed as an argument to the high-level functions contained in the module :py:mod:`mitiq.zne`.
 Alternatively, a factory can be directly used to implement a zero-noise extrapolation procedure in a fully self-contained way. 
-This approach may require more lines of code but can allow for a better control on the error mitigation method.
 
+To clarify this aspect, we now perform the same zero-noise extrapolation with both methods.
 
-To clarify this aspect, in the following sections we are going to perform the same zero-noise 
-extrapolation task with 4 different levels of abstraction: high-level,
-intermediate-level, low-level and very low-level. The user is free to choose one of the alternative methods, 
-depending on the particular problem of interest and on the desired level of flexibility.
-
-=============================================
-High-level usage of a factory
-=============================================
+===============================================================
+Using a factory object with the :py:mod:`mitiq.zne` module
+===============================================================
 
 Let us consider an ``executor`` function which is similar to the one used in
 the :ref:`getting started <guide-getting-started>` section.
@@ -93,7 +101,7 @@ We also define a simple quantum circuit whose ideal expectation value is by cons
    The abslute error is 0.1206
 
 
-Now we are going to initialize 3 factory objects, each one encapsulating a different
+Now we are going to initialize three factory objects, each one encapsulating a different
 zero-noise extrapolation method. 
 
 .. testcode::
@@ -132,11 +140,11 @@ in ``mitiq.zne``. For example:
    Error with poly_fac: 0.0110
 
 
-=============================================
-Intermediate-level usage of a factory
-=============================================
+======================================================
+Directly using a factory for error mitigation
+======================================================
 
-Zero-noise extrapolation can also be implemented by directly using the methods ``self.qrun``
+Zero-noise extrapolation can also be implemented by directly using the methods ``self.run``
 and ``self.reduce`` of a :class:`.Factory` object.
 
 The method ``self.run`` evaluates different expectation values at different noise levels
@@ -168,15 +176,33 @@ corresponds to a statistical inference based on the measured data.
    Error with richardson_fac: 0.0070
    Error with poly_fac: 0.0110
 
-=============================================
-Low-level usage of a factory
-=============================================
+============================
+Advanced usage of a factory
+============================
 
-The method ``self.run`` takes as arguments a circuit and other "quantum" objects.
+.. note::
+   This section can be safely skipped by all the readers who are interested 
+   in a standard usage of ``mitiq``.
+   On the other hand, more experienced users and ``mitiq`` contributors 
+   may find this content useful to understand how a factory object actually
+   works at a deeper level.
+
+In this advanced section we present a *low-level usage* and a *very-low-level usage* of a factory.
+Again, for simplicity, we solve the same zero-noise extrapolation problem that we have just considered
+in the previous sections. 
+
+Eventually we will also discuss how the user can easily define a custom factory class.
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Low-level usage: the ``iterate`` method.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``self.run`` method takes as arguments a circuit and other "quantum" objects.
 On the other hand, the core computation performed by any factory corresponds to 
-some classical post-processing of the measurement results.
+a some classical computation applied to the measurement results.
 
-At a lower-level, it is possible to clearly separate the quantum and the 
+At a lower level, it is possible to clearly separate the quantum and the 
 classical steps of a zero-noise extrapolation procedure.
 This can be done by defining a function which maps a noise scale factor to the
 corresponding expectation value.
@@ -196,7 +222,7 @@ corresponding expectation value.
    numbers to real numbers.
 
 The function ``noise_to_expval`` encapsulate the "quantum part" of the problem. The "classical
-part" of the problem can be solved by passing ``noise_to_expval`` as an argument 
+part" of the problem can be solved by passing ``noise_to_expval``
 to the ``self.iterate`` method of a factory object.
 This method will repeatedly call ``noise_to_expval`` for different 
 noise levels until a sufficient amount of data is collected. 
@@ -222,18 +248,27 @@ So, one can view ``self.iterate`` as the classical counterpart of the quantum me
    Error with richardson_fac: 0.0070
    Error with poly_fac: 0.0110
 
-=============================================
+.. note::
+   With respect to ``self.run`` the ``self.iterate`` method is much more flexible and 
+   can be applied whenever the user is able to autonomously scale the noise level associated 
+   to an expectation value. Indeed, the function ``noise_to_expval`` can represent any experiment
+   or any simulation in which noise can be artificially increased. The scenario
+   is therefore not restricted to quantum circuits but can be easily extended to
+   annealing devices or to gates which are controllable at a pulse level. In principle,
+   one could even use the ``self.iterate`` method to mitigate experiments which are 
+   unrelated to quantum computing.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Very low-level usage of a factory
-=============================================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 It is also possible to emulate the action of the ``self.iterate`` method 
 by manually measuring individual expectation values and saving them, one by one, into the factory.
 
 .. note::
-   In a typical scenario, such a deep level of control is likely unnecessary.
-   Anyway, this section can still be instructive to understand the internal structure of the 
-   Factory class. This can be useful for advanced users who are interested
-   in developing a custom ``Factory`` or in directly contributing to ``mitiq``.
+   In a typical situation, such a deep level of control is likely unnecessary.
+   It is anyway instructive to understand the internal structure of the 
+   :class:`.Factory` class, especially if one is interested in defining a custom factory.
 
 
 .. testcode::
@@ -263,49 +298,34 @@ by manually measuring individual expectation values and saving them, one by one,
    Error with poly_fac: 0.0110
 
 
-In the previous code block we used the some core methods of a ``Factory`` object:
+In the previous code block we used the some core methods of a :class:`.Factory` object:
 
-   - **self.next** to get the next noise scale factor;
-   - **self.push** to save the measured data into the factory;
-   - **self.is_converged** to know if enough data has been collected.
+   - ``self.next`` to get the next noise scale factor;
+   - ``self.push`` to save the measured data into the factory;
+   - ``self.is_converged`` to know if enough data has been collected.
 
 
-=============================================
-Built-in factories
-=============================================
-
-All the built-in factories of ``mitiq`` can be found in the submodule ``mitiq.factories``.
-
-.. autosummary::
-   :nosignatures:
-
-   mitiq.factories.LinearFactory
-   mitiq.factories.RichardsonFactory
-   mitiq.factories.PolyFactory
-   mitiq.factories.ExpFactory
-   mitiq.factories.PolyExpFactory
-   mitiq.factories.AdaExpFactory
-
-=============================================
-Defining a custom Factory
-=============================================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Defining a custom factory
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If necessary, the user can modify an existing extrapolation method by subclassing
-the corresponding factory.
+the corresponding factory (e.g., :class:`.LinearFactory`, 
+:class:`.RichardsonFactory`, etc.).
 
-A new adaptive extrapolation method can be derived from the abstract class ``Factory``.
+Alternatively, a new adaptive extrapolation method can be derived from the abstract class :class:`.Factory`.
 In this case its core methods must be implemented:
 ``self.next``, ``self.push``, ``self.is_converged``, ``self.reduce``, etc.
 Typically, the ``self.__init__`` method must be overridden.
 
-A new non-adaptive method can instead be derived from the abstract ``BatchedFactory`` class.
+A new non-adaptive method can instead be derived from the abstract :class:`.BatchedFactory` class.
 In this case it is usually sufficient to override only the ``self.__init__`` and
 the ``self.reduce`` methods, which are responsible for the initialization and for the
 final zero-noise extrapolation, respectively.
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------------------------
 Example: a simple custom factory
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------------------------
 
 Assume that, from physical considerations, we know that the ideal expectation value
 (measured by some quantum circuit) must always be within two limits: ``min_expval`` and ``max_expval``.
@@ -318,7 +338,7 @@ and clips the result if it falls outside its physical domain.
 .. testcode::
 
    from typing import Iterable
-   from mitiq.factories import BatchedFactory
+   from mitiq.factories import BatchedFactory, mitiq_polyfit
    import numpy as np
 
    class MyFactory(BatchedFactory):
@@ -353,7 +373,7 @@ and clips the result if it falls outside its physical domain.
             The clipped extrapolation to the zero-noise limit.
          """
          # Fit a line and get the intercept
-         _, intercept = np.polyfit(self.instack, self.outstack, 1)
+         _, intercept = mitiq_polyfit(self.instack, self.outstack, deg=1)
 
          # Return the clipped zero-noise extrapolation.
          return np.clip(intercept, self.min_expval, self.max_expval)
@@ -373,3 +393,18 @@ This custom factory can be used in exactly the same way as we have
 shown in the previous section. By simply replacing ``LinearFactory``
 with ``MyFactory`` in all the previous code snippets, the new extrapolation
 method will be applied.
+
+---------------------------------------------
+Regression tools in :py:mod:`mitiq.factories`
+---------------------------------------------
+
+In the body of the previous ``MyFactory`` example, we imported and used the :py:func:`.mitiq_polyfit` function.
+This is simply a wrap of :py:func:`numpy.polyfit`, slightly adapted to the notion and to the error types  
+of ``mitiq``. This function can be used to fit a polynomial ansatz to the measured expectation values. This function performs 
+a least squares minimization which is **linear** (with respect to the coefficients) and therefore admits an algebraic solution.
+   
+Similarly, from :py:mod:`mitiq.factories` one can also import :py:func:`.mitiq_curve_fit`, 
+which is instead a wrap of :py:func:`scipy.optimize.curve_fit`. Differently from :py:func:`.mitiq_polyfit`,
+:py:func:`.mitiq_curve_fit` can be used with a generic (user-defined) ansatz. 
+Since the fit is based on a numerical **non-linear** least squares minimization, this method may fail to converge
+or could be subject to numerical instabilities.
