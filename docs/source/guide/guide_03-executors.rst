@@ -169,6 +169,7 @@ You can also include both noise models and finite sampling in your executor.
         """
         # add the noise
         noisy = circ.with_noise(depolarize(p=noise))
+        
         # Do the sampling
         psum = cirq.PauliSumCollector(noisy, obs, samples_per_term=shots)
         psum.collect(sampler=cirq.DensityMatrixSimulator())
