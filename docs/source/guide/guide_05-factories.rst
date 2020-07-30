@@ -374,7 +374,8 @@ and clips the result if it falls outside its physical domain.
             The clipped extrapolation to the zero-noise limit.
          """
          # Fit a line and get the intercept
-         _, intercept = mitiq_polyfit(self.instack, self.outstack, deg=1)
+         scale_factors = [params["scale_factor"] for params in self.instack]
+         _, intercept = mitiq_polyfit(scale_factors, self.outstack, deg=1)
 
          # Return the clipped zero-noise extrapolation.
          return np.clip(intercept, self.min_expval, self.max_expval)

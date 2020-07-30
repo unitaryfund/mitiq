@@ -47,8 +47,10 @@ def test_execute_with_zne_no_noise(fold_method, factory):
 
 
 def test_execute_with_zne_bad_arguments():
-    """Tests errors are raised when execute_with_zne is called with bad args."""
-    with pytest.raises(TypeError, match="Argument `executor` must be callable"):
+    """Tests errors are raised when execute_with_zne is called with bad args.
+    """
+    with pytest.raises(TypeError,
+                       match="Argument `executor` must be callable"):
         execute_with_zne(circ, None)
 
     with pytest.raises(TypeError, match="Argument `factory` must be of type"):
@@ -59,8 +61,11 @@ def test_execute_with_zne_bad_arguments():
 
 
 def test_error_zne_decorator():
-    """Tests that the proper error is raised if the decorator is used without parenthesis."""
-    with pytest.raises(TypeError, match="The decorator must be used with parenthesis"):
+    """Tests that the proper error is raised if the decorator is
+    used without parenthesis.
+    """
+    with pytest.raises(TypeError,
+                       match="The decorator must be used with parenthesis"):
         @zne_decorator
         def test_executor(circuit):
             return 0
