@@ -1,6 +1,12 @@
 {
     "children": [
         {
+            "children": [],
+            "color": "black",
+            "idx": -1,
+            "name": "utils"
+        },
+        {
             "children": [
                 {
                     "color": "black",
@@ -21,6 +27,18 @@
             "color": "black",
             "idx": -1,
             "name": "maxcut"
+        },
+        {
+            "children": [
+                {
+                    "color": "black",
+                    "name": "noisy_simulation",
+                    "size": 1000
+                }
+            ],
+            "color": "black",
+            "idx": -1,
+            "name": "utils"
         },
         {
             "children": [
@@ -297,24 +315,6 @@
             "color": "#007143",
             "idx": 4,
             "name": "folding"
-        },
-        {
-            "children": [],
-            "color": "#BF5730",
-            "idx": 8,
-            "name": "utils"
-        },
-        {
-            "children": [
-                {
-                    "color": "#BF5730",
-                    "name": "noisy_simulation",
-                    "size": 1000
-                }
-            ],
-            "color": "#BF5730",
-            "idx": 8,
-            "name": "utils"
         }
     ],
     "name": "mitiq",

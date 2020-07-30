@@ -20,15 +20,12 @@ colors = ["#0B5FA5", "#043C6B", "#3F8FD2", # blue colors
 module_cmap = {"zne":               0, # zne
                "factories":         1, # factories
                "pyquil_utils":      2, # APIs: pyquil
+               "mitiq_qiskit":      3, # APIs: qiskit
                "qiskit_utils":      3, # APIs: qiskit
                "conversions":       3,
                "folding":           4,
                "benchmarks":        5, # benchmarks
                "random_circ":       5,
-               "matrices":          6, # matrices
-               "__init__":          7, # init
-               "about":             7, # about
-               "utils":             8, # utilities
                }
 # add here hidden modules
 hidden_modules = ['benchmarks', 'mitiq_pyquil', 'mitiq_qiskit']
