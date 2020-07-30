@@ -3,15 +3,34 @@
         {
             "children": [
                 {
-                    "color": "#0B5FA5",
-                    "name": "run_factory",
+                    "color": "black",
+                    "name": "sample_projector",
                     "size": 1000
                 },
                 {
-                    "color": "#0B5FA5",
-                    "name": "qrun_factory",
+                    "color": "black",
+                    "name": "rand_circuit_zne",
                     "size": 1000
-                },
+                }
+            ],
+            "color": "black",
+            "idx": -1,
+            "name": "random_circuits"
+        },
+        {
+            "children": [
+                {
+                    "color": "black",
+                    "name": "rb_circuits",
+                    "size": 1000
+                }
+            ],
+            "color": "black",
+            "idx": -1,
+            "name": "randomized_benchmarking"
+        },
+        {
+            "children": [
                 {
                     "color": "#0B5FA5",
                     "name": "execute_with_zne",
@@ -34,6 +53,31 @@
         },
         {
             "children": [
+                {
+                    "color": "#043C6B",
+                    "name": "ExtrapolationError",
+                    "size": 1000
+                },
+                {
+                    "color": "#043C6B",
+                    "name": "ExtrapolationWarning",
+                    "size": 1000
+                },
+                {
+                    "color": "#043C6B",
+                    "name": "ConvergenceWarning",
+                    "size": 1000
+                },
+                {
+                    "color": "#043C6B",
+                    "name": "mitiq_curve_fit",
+                    "size": 1000
+                },
+                {
+                    "color": "#043C6B",
+                    "name": "mitiq_polyfit",
+                    "size": 1000
+                },
                 {
                     "color": "#043C6B",
                     "name": "Factory",
@@ -117,7 +161,28 @@
             "name": "pyquil_utils"
         },
         {
-            "children": [],
+            "children": [
+                {
+                    "color": "#00AE68",
+                    "name": "to_qasm",
+                    "size": 1000
+                },
+                {
+                    "color": "#00AE68",
+                    "name": "to_qiskit",
+                    "size": 1000
+                },
+                {
+                    "color": "#00AE68",
+                    "name": "from_qiskit",
+                    "size": 1000
+                },
+                {
+                    "color": "#00AE68",
+                    "name": "from_qasm",
+                    "size": 1000
+                }
+            ],
             "color": "#00AE68",
             "idx": 3,
             "name": "conversions"
@@ -126,7 +191,7 @@
             "children": [
                 {
                     "color": "#00AE68",
-                    "name": "random_identity_circuit",
+                    "name": "random_one_qubit_identity_circuit",
                     "size": 1000
                 },
                 {
@@ -143,11 +208,6 @@
                     "color": "#00AE68",
                     "name": "run_program",
                     "size": 1000
-                },
-                {
-                    "color": "#00AE68",
-                    "name": "measure",
-                    "size": 1000
                 }
             ],
             "color": "#00AE68",
@@ -159,6 +219,21 @@
                 {
                     "color": "#007143",
                     "name": "UnsupportedCircuitError",
+                    "size": 1000
+                },
+                {
+                    "color": "#007143",
+                    "name": "UnfoldableGateError",
+                    "size": 1000
+                },
+                {
+                    "color": "#007143",
+                    "name": "UnfoldableCircuitError",
+                    "size": 1000
+                },
+                {
+                    "color": "#007143",
+                    "name": "squash_moments",
                     "size": 1000
                 },
                 {
@@ -189,11 +264,6 @@
                 {
                     "color": "#007143",
                     "name": "fold_gates_at_random",
-                    "size": 1000
-                },
-                {
-                    "color": "#007143",
-                    "name": "fold_local",
                     "size": 1000
                 },
                 {
@@ -229,48 +299,7 @@
             "name": "maxcut"
         },
         {
-            "children": [
-                {
-                    "color": "#36D695",
-                    "name": "sample_observable",
-                    "size": 1000
-                },
-                {
-                    "color": "#36D695",
-                    "name": "rand_benchmark_zne",
-                    "size": 1000
-                }
-            ],
-            "color": "#36D695",
-            "idx": 5,
-            "name": "random_circ"
-        },
-        {
             "children": [],
-            "color": "#FF4500",
-            "idx": 6,
-            "name": "matrices"
-        },
-        {
-            "children": [
-                {
-                    "color": "#692102",
-                    "name": "about",
-                    "size": 1000
-                }
-            ],
-            "color": "#692102",
-            "idx": 7,
-            "name": "about"
-        },
-        {
-            "children": [
-                {
-                    "color": "#BF5730",
-                    "name": "random_circuit",
-                    "size": 1000
-                }
-            ],
             "color": "#BF5730",
             "idx": 8,
             "name": "utils"
