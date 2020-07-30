@@ -22,16 +22,14 @@ def _instack_to_scale_factors(instack: dict) -> List[float]:
 def _are_close_dict(dict_a: dict, dict_b: dict) -> bool:
     """Returns True if the two dictionaries have equal keys and
     their corresponding values are "sufficiently" close."""
-    if len(dict_a) != len(dict_b):
-        return False
     keys_a = dict_a.keys()
     keys_b = dict_b.keys()
     if set(keys_a) != set(keys_b):
         return False
-    # use keys_a in both cases to ensure the same order
-    values_a = [dict_a[key] for key in keys_a]
-    values_b = [dict_b[key] for key in keys_a]
-    return np.allclose(values_a, values_b)
+    for ka, va in dict_a.items():
+        if not np.isclose(dict_b[ka], va):
+            return False
+    return True
 
 
 class ExtrapolationError(Exception):
