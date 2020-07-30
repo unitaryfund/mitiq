@@ -23,7 +23,7 @@ module_cmap = {"zne":               0, # zne
                "qiskit_utils":      3, # APIs: qiskit
                "conversions":       3,
                "folding":           4,
-               "maxcut":            5, # benchmarks
+               "benchmarks":        5, # benchmarks
                "random_circ":       5,
                "matrices":          6, # matrices
                "__init__":          7, # init
