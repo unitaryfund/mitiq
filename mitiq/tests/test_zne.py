@@ -1,65 +1,84 @@
-# test_zne.py
-"""This module tests zne with Cirq."""
+"""Unit tests for zero-noise extrapolation."""
 
 import numpy as np
 import pytest
 
-from cirq import Circuit, depolarize, LineQubit, X, DensityMatrixSimulator
+import cirq
 
-from mitiq import execute_with_zne, mitigate_executor
-from mitiq.factories import LinearFactory
+from mitiq.factories import LinearFactory, RichardsonFactory
+from mitiq.folding import (
+    fold_gates_from_left, fold_gates_from_right, fold_gates_at_random
+)
+from mitiq.zne import execute_with_zne, mitigate_executor, zne_decorator
 
-SIMULATOR = DensityMatrixSimulator()
+npX = np.array([[0, 1], [1, 0]])
+"""Defines the sigma_x Pauli matrix in SU(2) algebra as a (2,2) `np.array`."""
 
-# 0.1% depolarizing noise
-NOISE = 0.001
+npZ = np.array([[1, 0], [0, -1]])
+"""Defines the sigma_z Pauli matrix in SU(2) algebra as a (2,2) `np.array`."""
 
-
-def noisy_simulation(circ: Circuit, shots=None) -> float:
-    """ Simulates a circuit with depolarizing noise at level NOISE.
-
-    Args:
-        circ: The quantum program as a cirq object.
-        shots: This unused parameter is needed to match mitiq's expected type
-               signature for an executor function.
-
-    Returns:
-        The observable's measurements as as
-        tuple (expectation value, variance).
-    """
-    circuit = circ.with_noise(depolarize(p=NOISE))
-    rho = SIMULATOR.simulate(circuit).final_density_matrix
-    # define the computational basis observable
-    obs = np.diag([1, 0])
-    expectation = np.real(np.trace(rho @ obs))
-    return expectation
+# Default qubit register and circuit for unit tests
+qreg = cirq.GridQubit.rect(2, 1)
+circ = cirq.Circuit(
+    cirq.ops.H.on_each(*qreg),
+    cirq.measure_each(*qreg)
+)
 
 
-# This test is somewhat redundant with the random circuit tests but we keep in
-# because this tests the exact code used in the getting started.
-@pytest.mark.parametrize(["depth"], [[n] for n in range(10, 80, 20)])
-def test_cirq_zne(depth):
-    # This test runs circuits with an even number of X gates at varying
-    # depths. All of these circuits should result in an expectation value of
-    # 1 when measured in the computational basis.
-    qbit = LineQubit(0)
-    assert depth % 2 == 0, "Depths must be even to ensure an " \
-                           "expectation value of 1."
-    circ = Circuit(X(qbit) for _ in range(depth))
+# Default executor for unit tests
+def executor(circuit):
+    wavefunction = circuit.final_wavefunction()
+    return np.real(
+        wavefunction.conj().T @ np.kron(npX, npZ) @ wavefunction
+    )
 
-    # We then compare the mitigated and unmitigated results.
-    unmitigated = noisy_simulation(circ)
-    mitigated = execute_with_zne(circ, noisy_simulation)
-    exact = 1
-    # The mitigation should improve the result.
-    assert abs(exact - mitigated) < abs(exact - unmitigated)
 
-    # Linear factories should work as well
-    fac = LinearFactory(scale_factors=[1.0, 2.0, 2.5])
-    linear = execute_with_zne(circ, noisy_simulation, fac=fac)
-    assert abs(exact - linear) < abs(exact - unmitigated)
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left, fold_gates_from_right, fold_gates_at_random]
+)
+@pytest.mark.parametrize("factory", [LinearFactory, RichardsonFactory])
+def test_execute_with_zne_no_noise(fold_method, factory):
+    """Tests execute_with_zne with noiseless simulation."""
+    zne_value = execute_with_zne(
+        circ, executor, scale_noise=fold_method, factory=factory([1., 2., 3.])
+    )
+    assert np.isclose(zne_value, 0.)
 
-    # Test the mitigate executor
-    run_mitigated = mitigate_executor(noisy_simulation)
-    e_mitigated = run_mitigated(circ)
-    assert np.isclose(e_mitigated, mitigated)
+
+def test_execute_with_zne_bad_arguments():
+    """Tests errors are raised when execute_with_zne is called with bad args."""
+    with pytest.raises(TypeError, match="Argument `executor` must be callable"):
+        execute_with_zne(circ, None)
+
+    with pytest.raises(TypeError, match="Argument `factory` must be of type"):
+        execute_with_zne(circ, executor, factory=RichardsonFactory)
+
+    with pytest.raises(TypeError, match="Argument `scale_noise` must be"):
+        execute_with_zne(circ, executor, scale_noise=None)
+
+
+def test_error_zne_decorator():
+    """Tests that the proper error is raised if the decorator is used without parenthesis."""
+    with pytest.raises(TypeError, match="The decorator must be used with parenthesis"):
+        @zne_decorator
+        def test_executor(circuit):
+            return 0
+
+
+def test_doc_is_preserved():
+    """Tests that the doc of the original executor is preserved."""
+
+    def first_executor(circuit):
+        """Doc of the original executor."""
+        return 0
+
+    mit_executor = mitigate_executor(first_executor)
+    assert mit_executor.__doc__ == first_executor.__doc__
+
+    @zne_decorator()
+    def second_executor(circuit):
+        """Doc of the original executor."""
+        return 0
+
+    assert second_executor.__doc__ == first_executor.__doc__

@@ -1,4 +1,4 @@
-.. _guide-getting-started
+.. _guide-getting-started:
 
 *********************************************
 Getting Started
@@ -12,6 +12,22 @@ This getting started shows examples using cirq
 `qiskit <https://qiskit.org/>`_. We'll first test ``mitiq`` by running
 against the noisy simulator built into ``cirq``. The qiskit example work
 similarly as you will see in :ref:`Qiskit Mitigation <qiskit_getting_started>`.
+
+
+Multi-platform Framework
+----------------------------------------------
+In ``mitiq``, a "back-end" is a function that executes quantum programs. A
+"front-end" is a library/language that constructs quantum programs. ``mitiq``
+lets you mix and match these. For example, you could write a quantum program in
+``qiskit`` and then execute it using a ``cirq`` backend, or vice versa.
+
+Back-ends are abstracted to functions called ``executors`` that always accept
+a quantum program, sometimes accept other arguments, and always
+return an expectation value as a float. You can see some examples of different
+executors for common packages :ref:`here <guide-executors>` and in this
+getting started. If your quantum programming interface of choice can be used
+to make a Python function with this type, then it can be used with mitiq.
+
 
 Error Mitigation with Zero-Noise Extrapolation
 ----------------------------------------------
@@ -35,8 +51,7 @@ We define some functions that make it simpler to simulate noise in
             circ: The quantum program as a cirq object.
 
         Returns:
-            The observable's measurements as as
-            tuple (expectation value, variance).
+            The expectation value of the |0> state.
         """
         circuit = circ.with_noise(depolarize(p=NOISE))
         rho = SIMULATOR.simulate(circuit).final_density_matrix
@@ -86,8 +101,6 @@ performance.
 
     Mitigation provides a 97.6 factor of improvement.
 
-The variance in the mitigated expectation value is now stored in ``var``.
-
 You can also use ``mitiq`` to wrap your backend execution function into an
 error-mitigated version.
 
@@ -103,6 +116,30 @@ error-mitigated version.
 
     0.99948
 
+.. _partial-note:
+
+.. note::
+   As shown here, ``mitiq`` wraps executor functions that have a specific type:
+   they take quantum programs as input and return expectation values. However,
+   one often has an execution function with other arguments such as the number of
+   shots, the observable to measure, or the noise level of a noisy simulation.
+   It is still easy to use these with mitiq by using partial function application.
+   Here's a pseudo-code example:
+
+   .. code-block::
+
+      from functools import partial
+
+      def shot_executor(qprogram, n_shots) -> float:
+          ...
+      # we partially apply the n_shots argument to get a function that just
+      # takes a quantum program
+      mitigated = execute_with_zne(circ, partial(shot_executor, n_shots=100))
+
+   You can read more about functools partial application
+   `here <https://docs.python.org/3/library/functools.html#functools.partial>`_.
+
+
 The default implementation uses Richardson extrapolation to extrapolate the
 expectation value to the zero noise limit :cite:`Temme_2017_PRL`. ``Mitiq``
 comes equipped with other extrapolation methods as well. Different methods of
@@ -115,7 +152,7 @@ different ones.
     from mitiq.factories import LinearFactory
 
     fac = LinearFactory(scale_factors=[1.0, 2.0, 2.5])
-    linear = execute_with_zne(circ, noisy_simulation, fac=fac)
+    linear = execute_with_zne(circ, noisy_simulation, factory=fac)
     print(f"Mitigated error with the linear method is {exact - linear:.{3}}")
 
 .. testoutput::
@@ -214,4 +251,3 @@ We can then use this backend for our mitigation.
 
 Note that we don't need to even redefine factories for different stacks. Once
 you have a ``Factory`` it can be used with different front and backends.
-

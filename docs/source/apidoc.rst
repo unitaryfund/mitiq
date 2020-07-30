@@ -9,9 +9,27 @@ API-doc
 
 .. modules: alphabetical order
 
-About
----------
-.. automodule:: mitiq.about
+Benchmarks
+----------
+
+MaxCut
+^^^^^^^^^^
+.. automodule:: mitiq.benchmarks.maxcut
+   :members:
+
+Random Circuits
+^^^^^^^^^^^^^^
+.. automodule:: mitiq.benchmarks.random_circuits
+   :members:
+
+Randomized Benchmarking
+^^^^^^^^^^^^^^
+.. automodule:: mitiq.benchmarks.randomized_benchmarking
+   :members:
+
+Utils
+^^^^^^^^^^
+.. automodule:: mitiq.benchmarks.utils
    :members:
 
 Factories
@@ -19,50 +37,35 @@ Factories
 .. automodule:: mitiq.factories
    :members:
 
-.. automodule:: mitiq.tests.test_factories
-   :members:
-
 Folding
 -------
 .. automodule:: mitiq.folding
    :members:
 
-.. automodule:: mitiq.tests.test_folding
-   :members:
-
-Matrices
---------
-.. automodule:: mitiq.matrices
-   :members:
+Mitiq - PyQuil
+--------------
 
 PyQuil Utils
-------------
+^^^^^^^^^^^^
 .. automodule:: mitiq.mitiq_pyquil.pyquil_utils
    :members:
 
-.. automodule:: mitiq.mitiq_pyquil.tests.test_zne
-   :members:
+Mitiq - Qiskit
+--------------
 
-Qiskit Utils
-------------
+Conversions
+^^^^^^^^^^^^
 .. automodule:: mitiq.mitiq_qiskit.conversions
    :members:
 
-.. automodule:: mitiq.mitiq_qiskit.tests.test_conversions
-   :members:
-
+Qiskit Utils
+^^^^^^^^^^^^
 .. automodule:: mitiq.mitiq_qiskit.qiskit_utils
-   :members:
-
-.. automodule:: mitiq.mitiq_qiskit.tests.test_zne
    :members:
 
 Utils
 ------------
 .. automodule:: mitiq.utils
-   :members:
-
-.. automodule:: mitiq.tests.test_utils
    :members:
 
 Zero Noise Extrapolation

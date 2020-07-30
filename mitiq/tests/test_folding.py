@@ -17,27 +17,29 @@ from cirq import (
 from cirq.google import Sycamore
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 
-from mitiq.utils import _equal, random_circuit
+from mitiq.utils import _equal
 from mitiq.folding import (
+    UnfoldableGateError,
+    UnfoldableCircuitError,
     _is_measurement,
     _pop_measurements,
     _append_measurements,
     squash_moments,
     _update_moment_indices,
+    _default_weight,
+    _compute_weight,
     convert_to_mitiq,
     convert_from_mitiq,
     _fold_gate_at_index_in_moment,
     _fold_gates_in_moment,
     _fold_gates,
     _fold_moments,
-    _fold_all_gates_locally,
     fold_gates_from_left,
     fold_gates_from_right,
     fold_gates_at_random,
-    fold_local,
+    _fold_local,
     fold_global,
 )
-from mitiq.mitiq_qiskit.conversions import from_qiskit
 
 
 def test_is_measurement():
@@ -275,10 +277,31 @@ def test_fold_gate_at_index_in_moment_empty_circuit():
 
 def test_fold_gate_at_index_in_moment_bad_moment():
     """Tests local folding with a moment index not in the input circuit."""
-    qreg = [GridQubit(x, y) for x in range(2) for y in range(2)]
+    qreg = GridQubit.rect(2, 2)
     circ = Circuit([ops.H.on_each(*qreg)])
     with pytest.raises(IndexError):
         _fold_gate_at_index_in_moment(circ, 1, 0)
+
+
+def test_unfoldable_gate_error_cirq():
+    """Tries to fold a gate without an inverse and checks an error is raised."""
+    qbit = LineQubit(0)
+    circ = Circuit(ops.measure(qbit))
+    with pytest.raises(UnfoldableGateError):
+        _fold_gate_at_index_in_moment(circ, moment_index=0, gate_index=0)
+
+
+def test_unfoldable_gate_error_qiskit():
+    """Tries to fold a gate without an inverse and checks an error is raised."""
+    qreg = QuantumRegister(1)
+    creg = ClassicalRegister(1)
+    circ = QuantumCircuit(qreg, creg)
+    circ.measure(qreg, creg)
+    cirq_circuit, _ = convert_to_mitiq(circ)
+    with pytest.raises(UnfoldableGateError):
+        _fold_gate_at_index_in_moment(
+            cirq_circuit, moment_index=0, gate_index=0
+        )
 
 
 def test_fold_gates_in_moment_single_qubit_gates():
@@ -440,43 +463,6 @@ def test_fold_moments():
     assert _equal(circ, correct)
 
 
-def test_fold_all_gates_locally():
-    # Test circuit:
-    # 0: ───H───@───
-    #           │
-    # 1: ───H───X───
-    qreg = LineQubit.range(2)
-    circ = Circuit([ops.H.on(qreg[0])], [ops.CNOT.on(*qreg)])
-    folded = deepcopy(circ)
-    _fold_all_gates_locally(folded)
-    correct = Circuit([ops.H.on(qreg[0])] * 3, [ops.CNOT.on(*qreg)] * 3,)
-    assert _equal(folded, correct)
-
-
-def test_fold_all_gates_locally_three_qubits():
-    # Test circuit
-    # 0: ───H───@───@───
-    #           │   │
-    # 1: ───H───X───@───
-    #               │
-    # 2: ───H───T───X───
-    qreg = LineQubit.range(3)
-    circ = Circuit(
-        [ops.H.on_each(*qreg)],
-        [ops.CNOT.on(qreg[0], qreg[1])],
-        [ops.T.on(qreg[2])],
-        [ops.TOFFOLI.on(*qreg)],
-    )
-    _fold_all_gates_locally(circ)
-    correct = Circuit(
-        [ops.H.on_each(*qreg)] * 3,
-        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
-        [ops.T.on(qreg[2]), ops.T.on(qreg[2]) ** -1, ops.T.on(qreg[2])],
-        [ops.TOFFOLI.on(*qreg)] * 3,
-    )
-    assert _equal(circ, correct)
-
-
 def test_fold_from_left_two_qubits():
     qreg = LineQubit.range(2)
     circ = Circuit(
@@ -525,17 +511,40 @@ def test_fold_from_left_three_qubits():
 
 def test_fold_from_left_no_stretch():
     """Unit test for folding gates from left for a scale factor of one."""
-    circuit = random_circuit(depth=100)
+    circuit = testing.random_circuit(qubits=2, n_moments=10, op_density=0.99)
     folded = fold_gates_from_left(circuit, scale_factor=1)
     assert _equal(folded, circuit)
     assert not (folded is circuit)
 
 
-def test_fold_from_left_bad_stretch():
-    """Tests that a ValueError is raised for an invalid scale factor."""
-    circuit = random_circuit(100)
-    with pytest.raises(ValueError):
-        fold_gates_from_left(circuit, scale_factor=10)
+def test_fold_from_left_scale_factor_larger_than_three():
+    """Tests folding from left with a scale_factor larger than three."""
+    qreg = LineQubit.range(2)
+    circuit = Circuit(
+        [ops.SWAP.on(*qreg)],
+        [ops.CNOT.on(*qreg)]
+    )
+    folded = fold_gates_from_left(circuit, scale_factor=6.)
+    correct = Circuit(
+        [ops.SWAP.on(*qreg)] * 9,
+        [ops.CNOT.on(*qreg)] * 3
+    )
+    assert _equal(folded, correct)
+
+
+def test_fold_from_right_scale_factor_larger_than_three():
+    """Tests folding from right with a scale_factor larger than three."""
+    qreg = LineQubit.range(2)
+    circuit = Circuit(
+        [ops.SWAP.on(*qreg)],
+        [ops.CNOT.on(*qreg)]
+    )
+    folded = fold_gates_from_right(circuit, scale_factor=6.)
+    correct = Circuit(
+        [ops.SWAP.on(*qreg)] * 3,
+        [ops.CNOT.on(*qreg)] * 9
+    )
+    assert _equal(folded, correct)
 
 
 def test_fold_from_left_with_terminal_measurements_min_stretch():
@@ -593,17 +602,43 @@ def test_fold_from_left_with_terminal_measurements_max_stretch():
 
 
 @pytest.mark.parametrize(
-    ["fold_method"],
-    [[fold_gates_from_left], [fold_gates_from_right], [fold_gates_at_random]],
+    "fold_method",
+    [fold_gates_from_left, fold_gates_from_right,
+     fold_gates_at_random, fold_global],
 )
 def test_fold_with_intermediate_measurements_raises_error(fold_method):
-    """Tests folding from left with intermediate measurements."""
-    # Test circuit
-    #
+    """Tests local folding functions raise an error on circuits with
+    intermediate measurements.
+    """
     qbit = LineQubit(0)
     circ = Circuit([ops.H.on(qbit)], [ops.measure(qbit)], [ops.T.on(qbit)])
-    with pytest.raises(ValueError):
-        fold_method(circ, scale_factor=2.0)
+    with pytest.raises(
+            UnfoldableCircuitError,
+            match="Circuit contains intermediate measurements"
+    ):
+        fold_method(circ, scale_factor=3.0)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left, fold_gates_from_right,
+     fold_gates_at_random, fold_global],
+)
+def test_fold_with_channels_raises_error(fold_method):
+    """Tests local folding functions raise an error on circuits with
+    non-unitary channels (which are not measurements).
+    """
+    qbit = LineQubit(0)
+    circ = Circuit(
+        ops.H.on(qbit),
+        ops.depolarize(p=0.1).on(qbit),
+        ops.measure(qbit)
+    )
+    with pytest.raises(
+            UnfoldableCircuitError,
+            match="Circuit contains non-unitary channels"
+    ):
+        fold_method(circ, scale_factor=3.0)
 
 
 def test_fold_from_right_basic():
@@ -737,7 +772,7 @@ def test_fold_right_retains_terminal_measurements_in_input_circuit():
 
 def test_fold_gates_at_random_no_stretch():
     """Tests folded circuit is identical for a scale factor of one."""
-    circuit = random_circuit(10)
+    circuit = testing.random_circuit(qubits=3, n_moments=10, op_density=0.99)
     folded = fold_gates_at_random(circuit, scale_factor=1, seed=None)
     assert _equal(folded, circuit)
 
@@ -821,10 +856,20 @@ def test_fold_random_max_stretch():
     assert _equal(folded, correct)
 
 
-def test_fold_random_bad_stretch():
-    """Tests that an error is raised when a bad scale is provided."""
-    with pytest.raises(ValueError):
-        fold_gates_at_random(Circuit(), scale_factor=4)
+def test_fold_random_scale_factor_larger_than_three():
+    """Folds at random with a scale_factor larger than three."""
+    qreg = LineQubit.range(2)
+    circuit = Circuit(
+        [ops.SWAP.on(*qreg)],
+        [ops.CNOT.on(*qreg)]
+    )
+    folded = fold_gates_at_random(circuit, scale_factor=6., seed=1)
+    correct = Circuit(
+        [ops.SWAP.on(*qreg)] * 5,
+        [ops.CNOT.on(*qreg)] * 7
+    )
+    assert len(folded) == 12
+    assert _equal(folded, correct)
 
 
 def test_fold_random_no_repeats():
@@ -920,7 +965,7 @@ def test_fold_local_small_stretch_from_left():
         ]
     )
 
-    folded = fold_local(circ, scale_factor=2, fold_method=fold_gates_from_left)
+    folded = _fold_local(circ, scale_factor=2, fold_method=fold_gates_from_left)
     correct = Circuit([ops.H.on_each(*qreg)] * 2, list(circ.all_operations()))
     assert _equal(folded, correct)
 
@@ -936,11 +981,12 @@ def test_fold_local_stretch_three_from_left():
             ops.TOFFOLI.on(*qreg),
         ]
     )
-    folded = fold_local(circ, scale_factor=3, fold_method=fold_gates_from_left)
+    folded = _fold_local(circ, scale_factor=3, fold_method=fold_gates_from_left)
     assert _equal(folded, fold_gates_from_left(circ, scale_factor=3))
 
 
-def test_fold_local_big_stretch_from_left():
+@pytest.mark.parametrize("squash", [True, False])
+def test_fold_local_big_stretch_from_left(squash: bool):
     """Test for local folding with scale > 3."""
     qreg = LineQubit.range(3)
     circ = Circuit(
@@ -951,7 +997,12 @@ def test_fold_local_big_stretch_from_left():
             ops.TOFFOLI.on(*qreg),
         ]
     )
-    folded = fold_local(circ, scale_factor=4, fold_method=fold_gates_from_left)
+    folded = _fold_local(
+        circ,
+        scale_factor=4,
+        fold_method=fold_gates_from_left,
+        squash_moments=squash
+    )
     correct = Circuit(
         [ops.H.on(qreg[0])] * 7,
         [ops.H.on(qreg[1])] * 5,
@@ -1003,16 +1054,6 @@ def test_global_fold_min_stretch_with_terminal_measurements():
     folded = fold_global(circ, scale_factor=1.0)
     assert _equal(folded, circ)
     assert folded is not circ
-
-
-def test_global_fold_raises_error_intermediate_measurements():
-    """Tests than an error is raised when trying to globally fold
-    a circuit with intermediate measurements.
-    """
-    qbit = GridQubit(0, 0)
-    circ = Circuit([ops.H.on(qbit), ops.measure(qbit), ops.H.on(qbit)])
-    with pytest.raises(ValueError):
-        fold_global(circ, scale_factor=3)
 
 
 def test_global_fold_stretch_factor_of_three():
@@ -1182,17 +1223,7 @@ def test_fold_from_left_with_qiskit_circuits():
     )
 
     assert isinstance(folded_circuit, Circuit)
-    # TODO: The following check fails because the measurements in
-    #  folded_circuit have a key, whereas the measurements in
-    #  correct_folded_circuit do not have a key.
-    #  Could add flag in _equal to ignore this, as with qubit equality.
-    #  See https://github.com/unitaryfund/mitiq/issues/99.
-
-    # Check equality of the final unitaries
-    cirq_circuit = from_qiskit(qiskit_circuit)
-    unitary = cirq_circuit.unitary()
-    folded_unitary = correct_folded_circuit.unitary()
-    assert equal_up_to_global_phase(unitary, folded_unitary)
+    assert _equal(folded_circuit, correct_folded_circuit)
 
     # Keep the input type
     qiskit_folded_circuit = fold_gates_from_left(
@@ -1234,20 +1265,12 @@ def test_fold_from_right_with_qiskit_circuits():
     )
 
     assert isinstance(folded_circuit, Circuit)
-    # TODO: The following check fails because the measurements in
-    #  folded_circuit have a key, whereas the measurements in
-    #  correct_folded_circuit do not have a key.
-    #  Could add flag in _equal to ignore this, as with qubit equality.
-    #  See https://github.com/unitaryfund/mitiq/issues/99.
-
-    # Check equality of the final unitaries
-    cirq_circuit = from_qiskit(qiskit_circuit)
-    unitary = cirq_circuit.unitary()
-    folded_unitary = correct_folded_circuit.unitary()
-    assert equal_up_to_global_phase(unitary, folded_unitary)
+    assert _equal(folded_circuit, correct_folded_circuit)
 
     # Keep the input type
-    qiskit_folded_circuit = fold_gates_from_right(qiskit_circuit, scale_factor=1.0)
+    qiskit_folded_circuit = fold_gates_from_right(
+        qiskit_circuit, scale_factor=1.0
+    )
     assert isinstance(qiskit_folded_circuit, QuantumCircuit)
 
 
@@ -1284,63 +1307,17 @@ def test_fold_at_random_with_qiskit_circuits():
     )
 
     assert isinstance(folded_circuit, Circuit)
-    # TODO: The following check fails because the measurements in
-    #  folded_circuit have a key, whereas the measurements in
-    #  correct_folded_circuit do not have a key.
-    #  Could add flag in _equal to ignore this, as with qubit equality.
-    #  See https://github.com/unitaryfund/mitiq/issues/99.
-
-    # Check equality of the final unitaries
-    cirq_circuit = from_qiskit(qiskit_circuit)
-    unitary = cirq_circuit.unitary()
-    folded_unitary = correct_folded_circuit.unitary()
-    assert equal_up_to_global_phase(unitary, folded_unitary)
+    assert _equal(folded_circuit, correct_folded_circuit)
 
     # Keep the input type
-    qiskit_folded_circuit = fold_gates_at_random(qiskit_circuit, scale_factor=1.0)
+    qiskit_folded_circuit = fold_gates_at_random(
+        qiskit_circuit, scale_factor=1.0
+    )
     assert isinstance(qiskit_folded_circuit, QuantumCircuit)
 
 
-def test_fold_local_with_qiskit_circuits():
-    """Tests fold_local with input Qiskit circuits."""
-    # Test Qiskit circuit:
-    #          ┌───┐
-    # q0_0: |0>┤ H ├──■────■──
-    #          ├───┤┌─┴─┐  │
-    # q0_1: |0>┤ H ├┤ X ├──■──
-    #          ├───┤├───┤┌─┴─┐
-    # q0_2: |0>┤ H ├┤ T ├┤ X ├
-    #          └───┘└───┘└───┘
-    qiskit_qreg = QuantumRegister(3)
-    qiskit_creg = ClassicalRegister(3)
-    qiskit_circuit = QuantumCircuit(qiskit_qreg, qiskit_creg)
-    qiskit_circuit.h(qiskit_qreg)
-    qiskit_circuit.cnot(qiskit_qreg[0], qiskit_qreg[1])
-    qiskit_circuit.t(qiskit_qreg[2])
-    qiskit_circuit.ccx(*qiskit_qreg)
-    qiskit_circuit.measure(qiskit_qreg, qiskit_creg)
-
-    # Return mitiq circuit
-    folded_circuit = fold_local(
-        qiskit_circuit,
-        scale_factor=1.4,
-        fold_method=fold_gates_from_left,
-        return_mitiq=True
-    )
-    assert isinstance(folded_circuit, Circuit)
-
-    # Return input circuit type
-    folded_qiskit_circuit = fold_local(
-        qiskit_circuit,
-        scale_factor=2.0,
-        fold_method=fold_gates_from_left,
-        return_mitiq=False
-    )
-    assert isinstance(folded_qiskit_circuit, QuantumCircuit)
-
-
 def test_fold_global_with_qiskit_circuits():
-    """Tests fold_local with input Qiskit circuits."""
+    """Tests _fold_local with input Qiskit circuits."""
     # Test Qiskit circuit:
     #          ┌───┐
     # q0_0: |0>┤ H ├──■────■──
@@ -1438,8 +1415,12 @@ def test_fold_and_squash_max_stretch(fold_method):
     folded_and_squashed = fold_method(
         circuit, scale_factor=3., squash_moments=True
     )
+    folded_with_squash_moments_not_specified = fold_method(
+        circuit, scale_factor=3.
+    )  # Checks that the default is to squash moments
     assert len(folded_not_squashed) == 30
     assert len(folded_and_squashed) == 15
+    assert len(folded_with_squash_moments_not_specified) == 15
 
 
 @pytest.mark.parametrize(
@@ -1465,3 +1446,170 @@ def test_fold_and_squash_random_circuits_random_stretches(fold_method):
             circuit, scale_factor=scale, squash_moments=True
         )
         assert len(folded_and_squashed) <= len(folded_not_squashed)
+
+
+def test_default_weight():
+    """Tests default weight of an n-qubit gates is 0.99**n."""
+    qreg = LineQubit.range(3)
+    assert np.isclose(_default_weight(ops.H.on(qreg[0])), 0.99)
+    assert np.isclose(_default_weight(ops.CZ.on(qreg[0], qreg[1])), 0.9801)
+    assert np.isclose(_default_weight(ops.TOFFOLI.on(*qreg[:3])), 0.970299)
+
+
+def test_compute_weight_of_circuit():
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        ops.H.on_each(*qreg),
+        ops.CNOT.on(qreg[0], qreg[1]),
+        ops.T.on(qreg[2]),
+        ops.TOFFOLI.on(*qreg)
+    )
+    weight = _compute_weight(
+        circ, weights={"H": 0.01, "CNOT": 0.05, "T": 0., "TOFFOLI": 0.1}
+    )
+    assert np.isclose(weight, 0.18)
+
+    weight = _compute_weight(
+        circ, weights={"single": 0., "double": 0., "triple": 0.1}
+    )
+    assert np.isclose(weight, 0.1)
+
+    weight = _compute_weight(
+        circ, weights={"single": 0., "H": 0.01, "CNOT": 0.1, "TOFFOLI": 0.2}
+    )
+    assert np.isclose(weight, 0.33)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left,
+     fold_gates_from_right,
+     fold_gates_at_random]
+)
+@pytest.mark.parametrize("qiskit", [True, False])
+def test_fold_local_with_fidelities(fold_method, qiskit):
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        ops.H.on_each(*qreg),
+        ops.CNOT.on(qreg[0], qreg[1]),
+        ops.T.on(qreg[2]),
+        ops.TOFFOLI.on(*qreg)
+    )
+    if qiskit:
+        circ = convert_from_mitiq(circ, "qiskit")
+    # Only fold the Toffoli gate
+    fidelities = {"H": 1., "T": 1., "CNOT": 1., "TOFFOLI": 0.95}
+    folded = fold_method(
+        circ, scale_factor=3., fidelities=fidelities
+    )
+    correct = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3
+    )
+    if qiskit:
+        folded, _ = convert_to_mitiq(folded)
+        assert equal_up_to_global_phase(folded.unitary(), correct.unitary())
+    else:
+        assert _equal(folded, correct)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left,
+     fold_gates_from_right,
+     fold_gates_at_random]
+)
+@pytest.mark.parametrize("qiskit", [True, False])
+def test_fold_local_with_single_qubit_gates_fidelity_one(fold_method, qiskit):
+    """Tests folding only two-qubit gates by using fidelities = {"single": 1.}.
+    """
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        ops.H.on_each(*qreg),
+        ops.CNOT.on(qreg[0], qreg[1]),
+        ops.T.on(qreg[2]),
+        ops.TOFFOLI.on(*qreg)
+    )
+    if qiskit:
+        circ = convert_from_mitiq(circ, "qiskit")
+    folded = fold_method(
+        circ, scale_factor=3., fidelities={"single": 1.0,
+                                           "CNOT": 0.99,
+                                           "TOFFOLI": 0.95}
+    )
+    correct = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3
+    )
+    if qiskit:
+        folded, _ = convert_to_mitiq(folded)
+        assert equal_up_to_global_phase(folded.unitary(), correct.unitary())
+    else:
+        assert _equal(folded, correct)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left,
+     fold_gates_from_right,
+     fold_gates_at_random]
+)
+@pytest.mark.parametrize("qiskit", [True, False])
+def test_all_gates_folded_at_max_scale_with_fidelities(fold_method, qiskit):
+    """Tests that all gates are folded regardless of the input fidelities when
+    the scale factor is three.
+    """
+    rng = np.random.RandomState(1)
+
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        ops.H.on_each(*qreg),
+        ops.CNOT.on(qreg[0], qreg[1]),
+        ops.T.on(qreg[2]),
+        ops.TOFFOLI.on(*qreg)
+    )
+    ngates = len(list(circ.all_operations()))
+
+    if qiskit:
+        circ = convert_from_mitiq(circ, "qiskit")
+
+    for _ in range(10):
+        folded = fold_method(
+            circ, scale_factor=3., fidelities={"H": rng.rand(),
+                                               "T": rng.rand(),
+                                               "CNOT": rng.rand(),
+                                               "TOFFOLI": rng.rand()}
+        )
+        correct = Circuit(
+            [ops.H.on_each(*qreg)] * 3,
+            [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+            [ops.T.on(qreg[2]), ops.T.on(qreg[2])**-1, ops.T.on(qreg[2])],
+            [ops.TOFFOLI.on(*qreg)] * 3
+        )
+        if qiskit:
+            folded, _ = convert_to_mitiq(folded)
+            assert equal_up_to_global_phase(folded.unitary(), correct.unitary())
+        else:
+            assert _equal(folded, correct)
+            assert len(list(folded.all_operations())) == 3 * ngates
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left,
+     fold_gates_from_right,
+     fold_gates_at_random]
+)
+def test_fold_local_raises_error_with_bad_fidelities(fold_method):
+    with pytest.raises(ValueError, match="Fidelities should be"):
+        fold_method(Circuit(), scale_factor=1.21, fidelities={"H": -1.})
+
+    with pytest.raises(ValueError, match="Fidelities should be"):
+        fold_method(Circuit(), scale_factor=1.21, fidelities={"CNOT": 0.})
+
+    with pytest.raises(ValueError, match="Fidelities should be"):
+        fold_method(Circuit(), scale_factor=1.21, fidelities={"triple": 1.2})

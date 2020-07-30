@@ -40,7 +40,7 @@ def make_maxcut(graph: List[Tuple[int, int]],
                 scale_noise: Callable = None,
                 factory: Factory = None
                 ) -> Tuple[Callable[[np.ndarray], float],
-                               Callable[[np.ndarray], Circuit], np.ndarray]:
+                           Callable[[np.ndarray], Circuit], np.ndarray]:
     """Makes an executor that evaluates the QAOA ansatz at a given beta
     and gamma parameters.
 
@@ -95,7 +95,7 @@ def make_maxcut(graph: List[Tuple[int, int]],
             return execute_with_zne(qaoa_prog,
                                     executor=noisy_backend,
                                     scale_noise=scale_noise,
-                                    fac=factory)
+                                    factory=factory)
 
     return qaoa_cost, qaoa_ansatz, cost_mat
 
@@ -104,8 +104,8 @@ def run_maxcut(graph: List[Tuple[int, int]],
                x0: np.ndarray,
                noise: float = 0,
                scale_noise: Callable = None,
-               factory: Factory = None
-               ) -> Tuple[float, np.ndarray, List]:
+               factory: Factory = None,
+               verbose: bool = True) -> Tuple[float, np.ndarray, List]:
     """Solves MAXCUT using QAOA on a cirq wavefunction simulator using a
        Nelder-Mead optimizer.
 
@@ -122,10 +122,16 @@ def run_maxcut(graph: List[Tuple[int, int]],
         obtained that cost, and a list of costs at each iteration step.
 
     Example:
+        Run MAXCUT with 2 steps such that betas = [1.0, 1.1] and
+        gammas = [1.4, 0.7] on a graph with four edges and four nodes.
+
         >>> graph = [(0, 1), (1, 2), (2, 3), (3, 0)]
-        >>> run_maxcut(graph, x0=[1.0, 1.1, 1.4, 0.7])
-        Runs MAXCUT with 2 steps such that betas = [1.0, 1.1] and
-        gammas = [1.4, 0.7]
+        >>> fun,x,traj = run_maxcut(graph, x0=[1.0, 1.1, 1.4, 0.7])
+        Optimization terminated successfully.
+                 Current function value: -4.000000
+                 Iterations: 108
+                 Function evaluations: 188
+
     """
     qaoa_cost, _, _ = make_maxcut(graph, noise, scale_noise, factory)
 
@@ -140,6 +146,6 @@ def run_maxcut(graph: List[Tuple[int, int]],
                    x0=x0,
                    method='Nelder-Mead',
                    callback=callback,
-                   options={'disp': True})
+                   options={'disp': verbose})
 
     return res.fun, res.x, traj

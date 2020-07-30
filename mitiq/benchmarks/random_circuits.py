@@ -1,39 +1,55 @@
-# random_circ.py
+# random_circuits.py
 """
-Contains methods used for testing mitiq's performance
+Contains methods used for testing mitiq's performance on random circuits
 """
-from typing import Tuple, Callable, List
+from typing import Tuple, Callable, Union, Optional
 import numpy as np
 
 from cirq.testing import random_circuit
-from cirq import NamedQubit, Circuit, DensityMatrixSimulator
+from cirq import NamedQubit, Circuit
 
-from mitiq import execute_with_zne, QPROGRAM
+from mitiq import execute_with_zne
+from mitiq._typing import QPROGRAM
 from mitiq.factories import Factory
 from mitiq.benchmarks.utils import noisy_simulation
 
 
-def sample_observable(n_qubits: int) -> np.ndarray:
-    """Constructs a random computational basis observable on n_qubits
+def sample_projector(
+    n_qubits: int,
+    seed: Union[None, int, np.random.RandomState] = None,
+) -> np.ndarray:
+    """Constructs a projector on a random computational basis state of n_qubits.
 
     Args:
         n_qubits: A number of qubits
+        seed: Optional seed for random number generator.
+              It can be an integer or a numpy.random.RandomState object.
 
     Returns:
-        A random computational basis observable on n_qubits, e.g. for two
-        qubits this could be np.diag([0, 0, 0, 1]) to measure the ZZ
-        observable.
+        A random computational basis projector on n_qubits. E.g., for two
+        qubits this could be np.diag([0, 0, 0, 1]), corresponding to the
+        projector on the |11> state.
     """
     obs = np.zeros(int(2 ** n_qubits))
-    chosenZ = np.random.randint(2 ** n_qubits)
+
+    if seed is None:
+        rnd_state = np.random
+    elif isinstance(seed, int):
+        rnd_state = np.random.RandomState(seed)
+    else:
+        rnd_state = seed
+
+    chosenZ = rnd_state.randint(2 ** n_qubits)
     obs[chosenZ] = 1
     return np.diag(obs)
 
 
-def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
-                       fac: Factory=None,
-                       scale_noise: Callable[[QPROGRAM, float], QPROGRAM]=None,
-                       op_density:float=0.99, silent:bool=True) \
+def rand_circuit_zne(n_qubits: int, depth: int, trials: int, noise: float,
+                     fac: Factory = None,
+                     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
+                     op_density: float = 0.99,
+                     silent: bool = True,
+                     seed: Optional[int] = None) \
         -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Benchmarks a zero-noise extrapolation method and noise scaling executor
     by running on randomly sampled quantum circuits.
@@ -49,6 +65,7 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
                     any moment.
         silent: If False will print out statements every tenth trial to
                 track progress.
+        seed: Optional seed for random number generator.
 
     Returns:
         The triple (exacts, unmitigateds, mitigateds) where each is a list
@@ -61,14 +78,24 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
 
     qubits = [NamedQubit(str(xx)) for xx in range(n_qubits)]
 
-    for ii in range(trials):
-        if not silent and ii % 10 == 0: print(ii)
+    if seed:
+        rnd_state = np.random.RandomState(seed)
+    else:
+        rnd_state = None
 
-        qc = random_circuit(qubits, n_moments=depth, op_density=op_density)
+    for ii in range(trials):
+        if not silent and ii % 10 == 0:
+            print(ii)
+
+        qc = random_circuit(qubits,
+                            n_moments=depth,
+                            op_density=op_density,
+                            random_state=rnd_state)
+
         wvf = qc.final_wavefunction()
 
         # calculate the exact
-        obs = sample_observable(n_qubits)
+        obs = sample_projector(n_qubits, seed=rnd_state)
         exact = np.conj(wvf).T @ obs @ wvf
 
         # make sure it is real
@@ -76,7 +103,7 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
         assert np.isreal(exact)
 
         # create the simulation type
-        def obs_sim(circ: Circuit, shots=None):
+        def obs_sim(circ: Circuit):
             # we only want the expectation value not the variance
             # this is why we return [0]
             return noisy_simulation(circ, noise, obs)
@@ -85,8 +112,8 @@ def rand_benchmark_zne(n_qubits: int, depth: int, trials: int, noise: float,
         unmitigated = obs_sim(qc)
         # evaluate the ZNE answer
         mitigated = execute_with_zne(qp=qc, executor=obs_sim,
-                                        scale_noise=scale_noise,
-                                        fac=fac)
+                                     scale_noise=scale_noise,
+                                     factory=fac)
         exacts.append(exact)
         unmitigateds.append(unmitigated)
         mitigateds.append(mitigated)

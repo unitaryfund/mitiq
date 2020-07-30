@@ -1,6 +1,6 @@
-# Contributors Guide
-This is the Ccntributors guide for the documentation of Mitiq,
-a Python toolkit for implementing error mitigation on quantum computers.
+# Contributing to the Documentation
+This is the Contributors guide for the documentation of Mitiq,
+the Python toolkit for implementing error mitigation on quantum computers.
 
 ![Python Build](https://github.com/unitaryfund/mitiq/workflows/Python%20Build/badge.svg?branch=master)
 [![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
@@ -10,13 +10,22 @@ a Python toolkit for implementing error mitigation on quantum computers.
 The documentation is generated with
 [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html).
 
+The necessary packages can be installed, from the root `mitiq` directory
 ```bash
-pip install -U sphinx m2r sphinxcontrib-bibtex pybtex
+pip install -e .
+pip install -r requirements.txt
+```
+as they are present in the `requirements.txt` file. Otherwise, with
+
+```bash
+pip install -U sphinx m2r sphinxcontrib-bibtex pybtex sphinx-copybutton sphinx-autodoc-typehints
 ```
 
-`m2r` allows to include `.md` files, besides `.rst`, in the documentation;
+`m2r` allows to include `.md` files, besides `.rst`, in the documentation.
 `sphinxcontrib-bibtex` allows to include citations in a `.bib` file and
 `pybtex` allows to customize how they are rendered, e.g., APS-style.
+`sphinx-copybutton` allows to easily copy-paste code snippets from examples.
+`sphinx-autodoc-typehints` allows to control how annotations are displayed in the API-doc part of the documentation, integrating with `sphinx-autodoc` and `sphinx-napoleon`.
 
 
 You can check that Sphinx is installed with `sphinx-build --version`.
@@ -127,8 +136,13 @@ of `sphinx`. This is set in the `conf.py` file and is executed with
 ```bash
 make doctest
 ```
-This tests the code examples in the guide and ".rst" files, as well as testing
-the docstrings, since these are imported with the `autodoc` extension.
+from the `mitiq/docs` directory. From the root directory `mitiq`, simply run
+```bash
+make docs
+```
+to obtain the same result.
+
+These equivalent commands test the code examples in the guide and ".rst" files, as well as testing the docstrings, since these are imported with the `autodoc` extension.
 
 When writing a new example, you can use different directives in the rst file to
 include code blocks. One of them is

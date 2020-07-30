@@ -1,77 +1,43 @@
-import numpy as np
-
-import qiskit
-from qiskit import QuantumCircuit
+from typing import Optional
+from qiskit import Aer, execute, QuantumCircuit
 
 # Noise simulation packages
 from qiskit.providers.aer.noise import NoiseModel
-from qiskit.providers.aer.noise.errors.standard_errors import (
-    depolarizing_error,
-)
+from qiskit.providers.aer.noise.errors.standard_errors import depolarizing_error
 
-BACKEND = qiskit.Aer.get_backend("qasm_simulator")
-# Set the random seeds for testing
-QISKIT_SEED = 1337
+from mitiq.benchmarks.randomized_benchmarking import rb_circuits
+from mitiq.mitiq_qiskit.conversions import to_qiskit
+
+BACKEND = Aer.get_backend("qasm_simulator")
 
 
-def random_identity_circuit(depth=None):
-    """Returns a single-qubit identity circuit based on Pauli gates.
+def random_one_qubit_identity_circuit(num_cliffords: int) -> QuantumCircuit:
+    """Returns a single-qubit identity circuit.
 
     Args:
-        depth (int): depth of the quantum circuit.
+        num_cliffords (int): Number of cliffords used to generate the circuit.
 
     Returns:
-        circuit: quantum circuit as a :class:`qiskit.QuantumCircuit` object.
+        circuit: Quantum circuit as a :class:`qiskit.QuantumCircuit` object.
     """
-
-    # initialize a quantum circuit with 1 qubit and 1 classical bit
-    circuit = QuantumCircuit(1, 1)
-
-    # index of the (inverting) final gate: 0=I, 1=X, 2=Y, 3=Z
-    k_inv = 0
-
-    # apply a random sequence of Pauli gates
-    for _ in range(depth):
-        # random index for the next gate: 1=X, 2=Y, 3=Z
-        k = np.random.choice([1, 2, 3])
-        # apply the Pauli gate "k"
-        if k == 1:
-            circuit.x(0)
-        elif k == 2:
-            circuit.y(0)
-        elif k == 3:
-            circuit.z(0)
-
-        # update the inverse index according to
-        # the product rules of Pauli matrices k and k_inv
-        if k_inv == 0:
-            k_inv = k
-        elif k_inv == k:
-            k_inv = 0
-        else:
-            _ = [1, 2, 3]
-            _.remove(k_inv)
-            _.remove(k)
-            k_inv = _[0]
-
-    # apply the final inverse gate
-    if k_inv == 1:
-        circuit.x(0)
-    elif k_inv == 2:
-        circuit.y(0)
-    elif k_inv == 3:
-        circuit.z(0)
-
-    return circuit
+    return to_qiskit(
+        rb_circuits(n_qubits=1, num_cliffords=[num_cliffords], trials=1)[0]
+    )
 
 
-def run_with_noise(circuit: QuantumCircuit, noise: float, shots: int) -> float:
+def run_with_noise(
+    circuit: QuantumCircuit,
+    noise: float,
+    shots: int,
+    seed: Optional[int] = None
+) -> float:
     """Runs the quantum circuit with a depolarizing channel noise model.
 
     Args:
-        circuit (qiskit.QuantumCircuit): Ideal quantum circuit.
-        noise (float): Noise constant going into `depolarizing_error`.
-        shots (int): Number of shots to run the circuit on the back-end.
+        circuit: Ideal quantum circuit.
+        noise: Noise constant going into `depolarizing_error`.
+        shots: The Number of shots to run the circuit on the back-end.
+        seed: Optional seed for qiskit simulator.
 
     Returns:
         expval: expected values.
@@ -86,7 +52,7 @@ def run_with_noise(circuit: QuantumCircuit, noise: float, shots: int) -> float:
     )
 
     # execution of the experiment
-    job = qiskit.execute(
+    job = execute(
         circuit,
         backend=BACKEND,
         basis_gates=["u1", "u2", "u3"],
@@ -95,7 +61,7 @@ def run_with_noise(circuit: QuantumCircuit, noise: float, shots: int) -> float:
         optimization_level=0,
         noise_model=noise_model,
         shots=shots,
-        seed_simulator=QISKIT_SEED,
+        seed_simulator=seed,
     )
     results = job.result()
     counts = results.get_counts()
@@ -117,8 +83,8 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
 
     Args:
         pq: Quantum circuit.
-        noise (float): Noise constant going into `depolarizing_error`.
-        shots (int): Number of shots to run the circuit on the back-end.
+        noise: Noise constant going into `depolarizing_error`.
+        shots: Number of shots to run the circuit on the back-end.
 
     Returns:
         pq: quantum circuit as a :class:`qiskit.QuantumCircuit` object.
@@ -128,7 +94,7 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
     assert (
         noise <= 1.0
     ), "Noise scaled to {} is out of bounds (<=1.0) for depolarizing " \
-    "channel.".format(
+        "channel.".format(
         noise
     )
 
@@ -142,17 +108,21 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
     return pq
 
 
-def run_program(pq: QuantumCircuit, shots: int = 100) -> float:
-    """Runs a quantum program.
+def run_program(pq: QuantumCircuit, shots: int = 100,
+                seed: Optional[int] = None) -> float:
+    """Runs a single-qubit circuit for multiple shots and
+    returns the expectation value of the ground state projector.
+
 
     Args:
         pq: Quantum circuit.
-        shots (int): Number of shots to run the circuit on the back-end.
+        shots: Number of shots to run the circuit on the back-end.
+        seed: Optional seed for qiskit simulator.
 
     Returns:
         expval: expected value.
     """
-    job = qiskit.execute(
+    job = execute(
         pq,
         backend=BACKEND,
         basis_gates=["u1", "u2", "u3"],
@@ -161,24 +131,9 @@ def run_program(pq: QuantumCircuit, shots: int = 100) -> float:
         optimization_level=0,
         noise_model=CURRENT_NOISE,
         shots=shots,
-        seed_simulator=QISKIT_SEED,
+        seed_simulator=seed,
     )
     results = job.result()
     counts = results.get_counts()
     expval = counts["0"] / shots
     return expval
-
-
-def measure(circuit, qid) -> QuantumCircuit:
-    """Apply the measure method on the first qubit of a quantum circuit
-    given a classical register.
-
-    Args:
-        circuit: Quantum circuit.
-        qid: classical register.
-
-    Returns:
-        circuit: circuit after the measurement.
-    """
-    circuit.measure(0, qid)
-    return circuit
