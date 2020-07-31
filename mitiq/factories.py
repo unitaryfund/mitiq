@@ -255,11 +255,7 @@ class Factory(ABC):
             scale_noise: Function that scales the noise level of a quantum
                 circuit.
             num_to_average: Number of times expectation values are computed by
-                the executor after each call to scale_noise, then averaged. If
-                scale_noise returns the same circuit for each scale factor,
-                then only `num_to_average=1` is needed. If scale_noise returns a
-                different circuit for each scale factor, a larger
-                `num_to_average` can be used to average over differences.
+                the executor after each call to scale_noise, then averaged.
             max_iterations: Maximum number of iterations (optional).
         """
 
