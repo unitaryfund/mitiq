@@ -22,7 +22,8 @@ setup(
         # note: this should be a subset of requirements.txt
         "numpy~=1.18.1",
         "scipy~=1.4.1",
-        "cirq~=0.8.0",
+        # this is the version that has quil_output.py
+        "cirq-unstable==0.9.0.dev20200508234715",
     ],
     extras_require={
         'development': set(requirements),
