@@ -64,8 +64,7 @@ def test_error_zne_decorator():
     """Tests that the proper error is raised if the decorator is
     used without parenthesis.
     """
-    with pytest.raises(TypeError,
-                       match="The decorator must be used with parenthesis"):
+    with pytest.raises(TypeError, match="Decorator must be used with paren"):
         @zne_decorator
         def test_executor(circuit):
             return 0
