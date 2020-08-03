@@ -2,7 +2,7 @@ import numpy as np
 from pyquil import Program
 from pyquil.gates import CNOT, H, RZ
 
-from mitiq.mitiq_pyquil.conversions import from_pyquil, to_pyquil
+# from mitiq.mitiq_pyquil.conversions import from_pyquil, to_pyquil
 
 
 def maxcut_qaoa_program(gamma: float) -> Program:
