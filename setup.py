@@ -23,6 +23,7 @@ setup(
         "numpy~=1.18.1",
         "scipy~=1.4.1",
         # this is the version that has quil_output.py
+        # TODO gh-271: later versions break folding
         "cirq-unstable==0.9.0.dev20200508234715",
     ],
     extras_require={
