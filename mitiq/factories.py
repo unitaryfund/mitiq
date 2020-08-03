@@ -5,7 +5,7 @@ extrapolation methods.
 import warnings
 from copy import deepcopy
 from mitiq import QPROGRAM
-from typing import List, Iterable, Optional, Tuple, Callable
+from typing import Callable, List, Optional, Sequence, Tuple
 from abc import ABC, abstractmethod
 import numpy as np
 from numpy.lib.polynomial import RankWarning
@@ -51,7 +51,7 @@ class ExtrapolationWarning(Warning):
     pass
 
 
-_EXTR_WARN = (" The extrapolation fit may be ill-conditioned."
+_EXTR_WARN = ("The extrapolation fit may be ill-conditioned."
               " Likely, more data points are necessary to fit the parameters"
               " of the model.")
 
@@ -79,8 +79,10 @@ def mitiq_curve_fit(ansatz: Callable[..., float],
         exp_values: The array of expectation values.
         init_params: Initial guess for the parameters.
                      If None, the initial values are set to 1.
+
     Returns:
         opt_params: The array of optimal parameters.
+
     Raises:
         ExtrapolationError: If the extrapolation fit fails.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
@@ -121,8 +123,10 @@ def mitiq_polyfit(scale_factors: List[float],
         deg: The degree of the polynomial fit.
         weights: Optional array of weights for each sampled point.
                  This is used to make a weighted least squares fit.
+
     Returns:
         opt_params: The array of optimal parameters.
+
     Raises:
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
     """
@@ -144,8 +148,7 @@ def mitiq_polyfit(scale_factors: List[float],
 
 
 class Factory(ABC):
-    """
-    Abstract class designed to adaptively produce a new noise scaling
+    """Abstract class designed to adaptively produce a new noise scaling
     parameter based on a historical stack of previous noise scale parameters
     ("self.instack") and previously estimated expectation values
     ("self.outstack").
@@ -158,8 +161,7 @@ class Factory(ABC):
     """
 
     def __init__(self) -> None:
-        """
-        Initialization arguments (e.g. noise scale factors) depend on the
+        """Initialization arguments (e.g. noise scale factors) depend on the
         particular extrapolation algorithm and can be added to the "__init__"
         method of the associated derived class.
         """
@@ -167,11 +169,9 @@ class Factory(ABC):
         self.outstack = []
 
     def push(self, instack_val: dict, outstack_val: float) -> None:
-        """
-        Appends "instack_val" to "self.instack" and "outstack_val" to
-        "self.outstack".
-        Each time a new expectation value is computed this method should be
-        used to update the internal state of the Factory.
+        """Appends "instack_val" to "self.instack" and "outstack_val" to
+        "self.outstack". Each time a new expectation value is computed this
+        method should be used to update the internal state of the Factory.
         """
         self.instack.append(instack_val)
         self.outstack.append(outstack_val)
@@ -201,8 +201,7 @@ class Factory(ABC):
     def iterate(self,
                 noise_to_expval: Callable[[float], float],
                 max_iterations: int = 100) -> 'Factory':
-        """
-        Evaluates a sequence of expectation values until enough
+        """Evaluates a sequence of expectation values until enough
         data is collected (or iterations reach "max_iterations").
 
         Args:
@@ -242,29 +241,32 @@ class Factory(ABC):
             qp: QPROGRAM,
             executor: Callable[[QPROGRAM], float],
             scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+            num_to_average: int = 1,
             max_iterations: int = 100) -> 'Factory':
-        """
-        Evaluates a sequence of expectation values by executing quantum
+        """Evaluates a sequence of expectation values by executing quantum
         circuits until enough data is collected (or iterations reach
         "max_iterations").
 
         Args:
             qp: Circuit to mitigate.
             executor: Function executing a circuit; returns an expectation
-                      value. If shot_list is not None, then "shot" must be
-                      an additional argument of the executor.
+                value. If shot_list is not None, then "shot" must be
+                an additional argument of the executor.
             scale_noise: Function that scales the noise level of a quantum
-                         circuit.
+                circuit.
+            num_to_average: Number of times expectation values are computed by
+                the executor after each call to scale_noise, then averaged.
             max_iterations: Maximum number of iterations (optional).
-                            Default: 100.
         """
 
         def _noise_to_expval(scale_factor, **exec_params) -> float:
             """Evaluates the quantum expectation value for a given
             scale_factor and other executor parameters."""
-
-            scaled_qp = scale_noise(qp, scale_factor)
-            return executor(scaled_qp, **exec_params)
+            expectation_values = []
+            for _ in range(num_to_average):
+                scaled_qp = scale_noise(qp, scale_factor)
+                expectation_values.append(executor(scaled_qp, **exec_params))
+            return np.average(expectation_values)
 
         return self.iterate(_noise_to_expval, max_iterations)
 
@@ -278,8 +280,7 @@ class Factory(ABC):
 
 
 class BatchedFactory(Factory):
-    """
-    Abstract class of a non-adaptive Factory.
+    """Abstract class of a non-adaptive Factory.
 
     This is initialized with a given batch of "scale_factors".
     The "self.next" method trivially iterates over the elements of
@@ -292,20 +293,21 @@ class BatchedFactory(Factory):
     the "__init__" method.
 
     Args:
-        scale_factors: Iterable of noise scale factors at which
+        scale_factors: Sequence of noise scale factors at which
                        expectation values should be measured.
-        shot_list: Optional iterable of integers corresponding to the number
+        shot_list: Optional sequence of integers corresponding to the number
                    of samples taken for each expectation value. If this
                    argument is explicitly passed to the factory, it must have
                    the same length of scale_factors and the executor function
                    must accept "shots" as a valid keyword argument.
+
     Raises:
         ValueError: If the number of scale factors is less than 2.
         IndexError: If an iteration step fails.
     """
 
     def __init__(self,
-                 scale_factors: Iterable[float],
+                 scale_factors: Sequence[float],
                  shot_list: Optional[List[int]] = None) -> None:
         """Instantiates a new object of this Factory class."""
         if len(scale_factors) < 2:
@@ -315,7 +317,7 @@ class BatchedFactory(Factory):
 
         if (
             shot_list and
-            (not isinstance(shot_list, Iterable) or
+            (not isinstance(shot_list, Sequence) or
              not all([isinstance(shots, int) for shots in shot_list]))
            ):
             raise TypeError("The optional argument shot_list must be None "
@@ -360,8 +362,8 @@ class BatchedFactory(Factory):
 
     def __eq__(self, other):
         return (
-                Factory.__eq__(self, other) and
-                np.allclose(self._scale_factors, other._scale_factors)
+            Factory.__eq__(self, other) and
+            np.allclose(self._scale_factors, other._scale_factors)
         )
 
 
@@ -371,24 +373,26 @@ class PolyFactory(BatchedFactory):
     a polynomial fit.
 
     Args:
-        scale_factors: Iterable of noise scale factors at which
+        scale_factors: Sequence of noise scale factors at which
                        expectation values should be measured.
         order: Extrapolation order (degree of the polynomial fit).
                It cannot exceed len(scale_factors) - 1.
-        shot_list: Optional iterable of integers corresponding to the number
+        shot_list: Optional sequence of integers corresponding to the number
                    of samples taken for each expectation value. If this
                    argument is explicitly passed to the factory, it must have
                    the same length of scale_factors and the executor function
                    must accept "shots" as a valid keyword argument.
+
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
+
     Note:
         RichardsonFactory and LinearFactory are special cases of PolyFactory.
     """
 
     def __init__(self,
-                 scale_factors: Iterable[float],
+                 scale_factors: Sequence[float],
                  order: int,
                  shot_list: Optional[List[int]] = None) -> None:
         """Instantiates a new object of this Factory class."""
@@ -462,9 +466,9 @@ class RichardsonFactory(BatchedFactory):
     """Factory object implementing Richardson's extrapolation.
 
     Args:
-        scale_factors: Iterable of noise scale factors at which
+        scale_factors: Sequence of noise scale factors at which
                        expectation values should be measured.
-        shot_list: Optional iterable of integers corresponding to the number
+        shot_list: Optional sequence of integers corresponding to the number
                    of samples taken for each expectation value. If this
                    argument is explicitly passed to the factory, it must have
                    the same length of scale_factors and the executor function
@@ -490,9 +494,9 @@ class LinearFactory(BatchedFactory):
     on a linear fit.
 
     Args:
-        scale_factors: Iterable of noise scale factors at which
+        scale_factors: Sequence of noise scale factors at which
                        expectation values should be measured.
-        shot_list: Optional iterable of integers corresponding to the number
+        shot_list: Optional sequence of integers corresponding to the number
                    of samples taken for each expectation value. If this
                    argument is explicitly passed to the factory, it must have
                    the same length of scale_factors and the executor function
@@ -527,13 +531,13 @@ class ExpFactory(BatchedFactory):
     model is mapped into a linear model by logarithmic transformation.
 
     Args:
-        scale_factors: Iterable of noise scale factors at which
+        scale_factors: Sequence of noise scale factors at which
                        expectation values should be measured.
         asymptote: Infinite-noise limit (optional argument).
         avoid_log: If set to True, the exponential model is not linearized
                    with a logarithm and a non-linear fit is applied even
                    if asymptote is not None. The default value is False.
-        shot_list: Optional iterable of integers corresponding to the number
+        shot_list: Optional sequence of integers corresponding to the number
                    of samples taken for each expectation value. If this
                    argument is explicitly passed to the factory, it must have
                    the same length of scale_factors and the executor function
@@ -546,7 +550,7 @@ class ExpFactory(BatchedFactory):
 
     def __init__(
             self,
-            scale_factors: Iterable[float],
+            scale_factors: Sequence[float],
             asymptote: Optional[float] = None,
             avoid_log: bool = False,
             shot_list: Optional[List[int]] = None) -> None:
@@ -601,7 +605,7 @@ class PolyExpFactory(BatchedFactory):
     model is mapped into a polynomial model by logarithmic transformation.
 
     Args:
-        scale_factors: Iterable of noise scale factors at which
+        scale_factors: Sequence of noise scale factors at which
                        expectation values should be measured.
         order: Extrapolation order (degree of the polynomial z(x)).
                It cannot exceed len(scale_factors) - 1.
@@ -611,7 +615,7 @@ class PolyExpFactory(BatchedFactory):
         avoid_log: If set to True, the exponential model is not linearized
                    with a logarithm and a non-linear fit is applied even
                    if asymptote is not None. The default value is False.
-        shot_list: Optional iterable of integers corresponding to the number
+        shot_list: Optional sequence of integers corresponding to the number
                    of samples taken for each expectation value. If this
                    argument is explicitly passed to the factory, it must have
                    the same length of scale_factors and the executor function
@@ -623,7 +627,7 @@ class PolyExpFactory(BatchedFactory):
     """
 
     def __init__(self,
-                 scale_factors: Iterable[float],
+                 scale_factors: Sequence[float],
                  order: int,
                  asymptote: Optional[float] = None,
                  avoid_log: bool = False,
