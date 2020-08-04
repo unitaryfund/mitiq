@@ -10,7 +10,7 @@ qiskit~=0.16.2
 pytest~=5.4.1
 pytest-cov~=2.8.1
 flake8~=3.7.9
-black~=19.10
+black~=19.10b0
 
 # to run examples
 matplotlib~=3.2.1
