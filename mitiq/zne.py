@@ -13,7 +13,7 @@ def execute_with_zne(
     executor: Callable[[QPROGRAM], float],
     factory: Factory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
-    num_to_average: int = 1
+    num_to_average: int = 1,
 ) -> float:
     """Returns the zero-noise extrapolated expectation value that is computed
     by running the quantum program `qp` with the executor function.
@@ -27,7 +27,7 @@ def execute_with_zne(
                 the executor after each call to scale_noise, then averaged.
     """
     if not factory:
-        factory = RichardsonFactory(scale_factors=[1., 2., 3.])
+        factory = RichardsonFactory(scale_factors=[1.0, 2.0, 3.0])
 
     if not callable(executor):
         raise TypeError("Argument `executor` must be callable.")
@@ -51,7 +51,7 @@ def mitigate_executor(
     executor: Callable[[QPROGRAM], float],
     factory: Factory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
-    num_to_average: int = 1
+    num_to_average: int = 1,
 ) -> Callable[[QPROGRAM], float]:
     """Returns an error-mitigated version of the input `executor`.
 
@@ -67,18 +67,18 @@ def mitigate_executor(
         num_to_average: Number of times expectation values are computed by
                 the executor after each call to scale_noise, then averaged.
     """
+
     @wraps(executor)
     def new_executor(qp: QPROGRAM) -> float:
-        return execute_with_zne(
-            qp, executor, factory, scale_noise, num_to_average
-        )
+        return execute_with_zne(qp, executor, factory, scale_noise, num_to_average)
+
     return new_executor
 
 
 def zne_decorator(
     factory: Factory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
-    num_to_average: int = 1
+    num_to_average: int = 1,
 ) -> Callable[[QPROGRAM], float]:
     """Decorator which adds error mitigation to an executor function, i.e., a
     function which executes a quantum circuit with an arbitrary backend and
@@ -97,9 +97,7 @@ def zne_decorator(
             "even if no explicit arguments are passed."
         )
 
-    def decorator(
-        executor: Callable[[QPROGRAM], float]
-    ) -> Callable[[QPROGRAM], float]:
+    def decorator(executor: Callable[[QPROGRAM], float]) -> Callable[[QPROGRAM], float]:
         return mitigate_executor(executor, factory, scale_noise, num_to_average)
 
     return decorator

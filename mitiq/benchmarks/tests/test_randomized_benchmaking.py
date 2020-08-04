@@ -3,13 +3,19 @@ from itertools import product
 import numpy as np
 
 from mitiq.benchmarks.randomized_benchmarking import rb_circuits
-from mitiq.factories import (LinearFactory,
-                             RichardsonFactory,
-                             PolyFactory,
-                             ExpFactory,
-                             AdaExpFactory)
-from mitiq.folding import fold_gates_at_random, fold_gates_from_left, \
-    fold_gates_from_right, fold_global
+from mitiq.factories import (
+    LinearFactory,
+    RichardsonFactory,
+    PolyFactory,
+    ExpFactory,
+    AdaExpFactory,
+)
+from mitiq.folding import (
+    fold_gates_at_random,
+    fold_gates_from_left,
+    fold_gates_from_right,
+    fold_global,
+)
 from mitiq.benchmarks.utils import noisy_simulation
 from mitiq.zne import mitigate_executor
 
@@ -17,7 +23,7 @@ SCALE_FUNCTIONS = [
     fold_gates_at_random,
     fold_gates_from_left,
     fold_gates_from_right,
-    fold_global
+    fold_global,
 ]
 
 FACTORIES = [
@@ -51,8 +57,7 @@ def test_rb_circuits():
             assert np.isclose(zero_prob, 1)
 
 
-@pytest.mark.parametrize(["scale_noise", "fac"],
-                         product(SCALE_FUNCTIONS, FACTORIES))
+@pytest.mark.parametrize(["scale_noise", "fac"], product(SCALE_FUNCTIONS, FACTORIES))
 def test_random_benchmarks(scale_noise, fac):
     depths = [2, 4]
     trials = 3
@@ -62,6 +67,7 @@ def test_random_benchmarks(scale_noise, fac):
 
     def executor(qc):
         return noisy_simulation(qc, noise=noise, obs=obs)
+
     mit_executor = mitigate_executor(executor, fac, scale_noise)
 
     unmitigated = []

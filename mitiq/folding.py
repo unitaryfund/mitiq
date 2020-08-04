@@ -23,16 +23,16 @@ class UnfoldableCircuitError(Exception):
 
 
 _cirq_gates_to_string_keys = {
-        ops.H: "H",
-        ops.X: "X",
-        ops.Y: "Y",
-        ops.Z: "Z",
-        ops.T: "T",
-        ops.I: "I",
-        ops.CNOT: "CNOT",
-        ops.CZ: "CZ",
-        ops.TOFFOLI: "TOFFOLI"
-    }
+    ops.H: "H",
+    ops.X: "X",
+    ops.Y: "Y",
+    ops.Z: "Z",
+    ops.T: "T",
+    ops.I: "I",
+    ops.CNOT: "CNOT",
+    ops.CZ: "CZ",
+    ops.TOFFOLI: "TOFFOLI",
+}
 
 
 # Helper functions
@@ -45,9 +45,7 @@ def _is_measurement(op: ops.Operation) -> bool:
     return isinstance(op.gate, ops.measurement_gate.MeasurementGate)
 
 
-def _pop_measurements(
-    circuit: Circuit,
-) -> List[List[Union[int, ops.Operation]]]:
+def _pop_measurements(circuit: Circuit,) -> List[List[Union[int, ops.Operation]]]:
     """Removes all measurements from a circuit.
 
     Args:
@@ -56,9 +54,7 @@ def _pop_measurements(
     Returns:
         measurements: List of measurements in the circuit.
     """
-    measurements = [
-        list(m) for m in circuit.findall_operations(_is_measurement)
-    ]
+    measurements = [list(m) for m in circuit.findall_operations(_is_measurement)]
     circuit.batch_remove(measurements)
     return measurements
 
@@ -113,7 +109,7 @@ def squash_moments(circuit: Circuit) -> Circuit:
     return Circuit(
         circuit.all_operations(),
         strategy=InsertStrategy.EARLIEST,
-        device=circuit.device
+        device=circuit.device,
     )
 
 
@@ -134,10 +130,12 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
     """
     if "qiskit" in circuit.__module__:
         from mitiq.mitiq_qiskit.conversions import from_qiskit
+
         input_circuit_type = "qiskit"
         mitiq_circuit = from_qiskit(circuit)
     elif "pyquil" in circuit.__module__:
         from mitiq.mitiq_pyquil.conversions import from_pyquil
+
         input_circuit_type = "pyquil"
         mitiq_circuit = from_pyquil(circuit)
     elif isinstance(circuit, Circuit):
@@ -145,8 +143,8 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
         mitiq_circuit = circuit
     else:
         raise UnsupportedCircuitError(
-            f"Circuit from module {circuit.__module__} is not supported.\n\n" +
-            f"Circuit types supported by mitiq are \n{SUPPORTED_PROGRAM_TYPES}"
+            f"Circuit from module {circuit.__module__} is not supported.\n\n"
+            + f"Circuit types supported by mitiq are \n{SUPPORTED_PROGRAM_TYPES}"
         )
     return mitiq_circuit, input_circuit_type
 
@@ -160,9 +158,11 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
     """
     if conversion_type == "qiskit":
         from mitiq.mitiq_qiskit.conversions import to_qiskit
+
         converted_circuit = to_qiskit(circuit)
     elif conversion_type == "pyquil":
         from mitiq.mitiq_pyquil.conversions import to_pyquil
+
         converted_circuit = to_pyquil(circuit)
     elif isinstance(circuit, Circuit):
         converted_circuit = circuit
@@ -176,6 +176,7 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
 
 def converter(fold_method: Callable) -> Callable:
     """Decorator for handling conversions."""
+
     @wraps(fold_method)
     def new_fold_method(circuit: QPROGRAM, *args, **kwargs) -> QPROGRAM:
         mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
@@ -206,12 +207,9 @@ def _fold_gate_at_index_in_moment(
         inverse_op = inverse(op)
     except TypeError:
         raise UnfoldableGateError(
-            f"Operation {op} does not have a defined "
-            f"inverse and cannot be folded."
+            f"Operation {op} does not have a defined " f"inverse and cannot be folded."
         )
-    circuit.insert(
-        moment_index, [op, inverse_op], strategy=InsertStrategy.NEW
-    )
+    circuit.insert(moment_index, [op, inverse_op], strategy=InsertStrategy.NEW)
 
 
 def _fold_gates_in_moment(
@@ -232,9 +230,7 @@ def _fold_gates_in_moment(
 
 
 def _fold_gates(
-    circuit: Circuit,
-    moment_indices: Iterable[int],
-    gate_indices: List[Iterable[int]],
+    circuit: Circuit, moment_indices: Iterable[int], gate_indices: List[Iterable[int]],
 ) -> Circuit:
     """Returns a new circuit with specified gates folded.
 
@@ -261,9 +257,7 @@ def _fold_gates(
         _fold_gates_in_moment(
             folded, moment_index + moment_index_shift, gate_indices[i]
         )
-        moment_index_shift += 2 * len(
-            gate_indices[i]
-        )  # Folding gates adds moments
+        moment_index_shift += 2 * len(gate_indices[i])  # Folding gates adds moments
     return folded
 
 
@@ -276,9 +270,7 @@ def _fold_moments(circuit: Circuit, moment_indices: List[int]) -> None:
     """
     shift = 0
     for i in moment_indices:
-        circuit.insert(
-            i + shift, [circuit[i + shift], inverse(circuit[i + shift])]
-        )
+        circuit.insert(i + shift, [circuit[i + shift], inverse(circuit[i + shift])])
         shift += 2
 
 
@@ -288,8 +280,7 @@ def _default_weight(op: ops.Operation):
 
 
 def _get_weight_for_gate(
-        weights: Union[Dict[str, float], None],
-        op: ops.Operation
+    weights: Union[Dict[str, float], None], op: ops.Operation
 ) -> float:
     """Returns the weight for a given gate, using a default value of 1.0 if
     weights is None or if the weight is not specified.
@@ -325,9 +316,7 @@ def _compute_weight(circuit: Circuit, weights: Dict[str, float]) -> float:
         circuit: Circuit to compute the weight of.
         weights: Dictionary mapping string keys of gates to weights.
     """
-    return sum(
-        _get_weight_for_gate(weights, op) for op in circuit.all_operations()
-    )
+    return sum(_get_weight_for_gate(weights, op) for op in circuit.all_operations())
 
 
 def _get_num_to_fold(scale_factor: float, ngates: int) -> int:
@@ -343,9 +332,7 @@ def _get_num_to_fold(scale_factor: float, ngates: int) -> int:
 
 # Local folding functions
 @converter
-def fold_gates_from_left(
-        circuit: QPROGRAM, scale_factor: float, **kwargs
-) -> QPROGRAM:
+def fold_gates_from_left(circuit: QPROGRAM, scale_factor: float, **kwargs) -> QPROGRAM:
     """Returns a new folded circuit by applying the map G -> G G^dag G to a
     subset of gates of the input circuit, starting with gates at the
     left (beginning) of the circuit.
@@ -400,18 +387,16 @@ def fold_gates_from_left(
     # Check inputs and handle keyword arguments
     _check_foldable(circuit)
 
-    if not 1. <= scale_factor:
+    if not 1.0 <= scale_factor:
         raise ValueError(
             f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
         )
 
     fidelities = kwargs.get("fidelities")
-    if fidelities and not all(0. < f <= 1. for f in fidelities.values()):
-        raise ValueError(
-            "Fidelities should be in the interval (0, 1]."
-        )
+    if fidelities and not all(0.0 < f <= 1.0 for f in fidelities.values()):
+        raise ValueError("Fidelities should be in the interval (0, 1].")
 
-    if scale_factor > 3.:
+    if scale_factor > 3.0:
         return _fold_local(
             circuit, scale_factor, fold_method=fold_gates_from_left, **kwargs
         )
@@ -423,7 +408,7 @@ def fold_gates_from_left(
     # Determine the stopping condition for folding
     ngates = len(list(folded.all_operations()))
     if fidelities:
-        weights = {k: 1. - f for k, f in fidelities.items()}
+        weights = {k: 1.0 - f for k, f in fidelities.items()}
         total_weight = _compute_weight(folded, weights)
         stop = total_weight * (scale_factor - 1.0) / 2.0
     else:
@@ -431,11 +416,11 @@ def fold_gates_from_left(
         stop = _get_num_to_fold(scale_factor, ngates)
 
     # Fold gates from left until the stopping condition is met
-    if np.isclose(stop, 0.):
+    if np.isclose(stop, 0.0):
         _append_measurements(folded, measurements)
         return folded
 
-    tot = 0.
+    tot = 0.0
     moment_shift = 0
     for (moment_index, moment) in enumerate(circuit):
         for gate_index in range(len(moment)):
@@ -445,7 +430,7 @@ def fold_gates_from_left(
             else:
                 weight = 1
 
-            if weight > 0.:
+            if weight > 0.0:
                 _fold_gate_at_index_in_moment(
                     folded, moment_index + moment_shift, gate_index
                 )
@@ -460,9 +445,7 @@ def fold_gates_from_left(
 
 
 @converter
-def fold_gates_from_right(
-        circuit: QPROGRAM, scale_factor: float, **kwargs
-) -> Circuit:
+def fold_gates_from_right(circuit: QPROGRAM, scale_factor: float, **kwargs) -> Circuit:
     """Returns a new folded circuit by applying the map G -> G G^dag G
     to a subset of gates of the input circuit, starting with gates at
     the right (end) of the circuit.
@@ -524,7 +507,7 @@ def fold_gates_from_right(
         reversed_circuit,
         scale_factor,
         fidelities=kwargs.get("fidelities"),
-        squash_moments=False
+        squash_moments=False,
     )
     folded = Circuit(reversed(reversed_folded_circuit))
 
@@ -629,24 +612,22 @@ def fold_gates_at_random(
     # Check inputs and handle keyword arguments
     _check_foldable(circuit)
 
-    if not 1. <= scale_factor:
+    if not 1.0 <= scale_factor:
         raise ValueError(
             f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
         )
 
     fidelities = kwargs.get("fidelities")
-    if fidelities and not all(0. < f <= 1. for f in fidelities.values()):
-        raise ValueError(
-            "Fidelities should be in the interval (0, 1]."
-        )
+    if fidelities and not all(0.0 < f <= 1.0 for f in fidelities.values()):
+        raise ValueError("Fidelities should be in the interval (0, 1].")
 
-    if scale_factor > 3.:
+    if scale_factor > 3.0:
         return _fold_local(
             circuit,
             scale_factor,
             fold_method=fold_gates_at_random,
             fold_method_args=(seed,),
-            **kwargs
+            **kwargs,
         )
 
     # Copy the circuit and remove measurements
@@ -659,14 +640,14 @@ def fold_gates_at_random(
     # Determine the stopping condition for folding
     ngates = len(list(folded.all_operations()))
     if fidelities:
-        weights = {k: 1. - f for k, f in fidelities.items()}
+        weights = {k: 1.0 - f for k, f in fidelities.items()}
         total_weight = _compute_weight(folded, weights)
         stop = total_weight * (scale_factor - 1.0) / 2.0
     else:
         weights = None
         stop = _get_num_to_fold(scale_factor, ngates)
 
-    if np.isclose(stop, 0.):
+    if np.isclose(stop, 0.0):
         _append_measurements(folded, measurements)
         return folded
 
@@ -676,7 +657,8 @@ def fold_gates_at_random(
     # Keep track of which gates we can fold in each moment
     remaining_gate_indices = {
         moment: list(range(len(folded[moment])))
-        for moment in range(len(folded)) if len(folded[moment]) > 0
+        for moment in range(len(folded))
+        if len(folded[moment]) > 0
     }
 
     # Any moment with at least one gate is fair game
@@ -684,7 +666,7 @@ def fold_gates_at_random(
         i for i in remaining_gate_indices.keys() if remaining_gate_indices[i]
     ]
 
-    tot = 0.
+    tot = 0.0
     while remaining_moment_indices:
         # Get a moment index and gate index from the remaining set
         moment_index = rnd_state.choice(remaining_moment_indices)
@@ -698,7 +680,7 @@ def fold_gates_at_random(
             weight = 1
 
         # Do the fold
-        if weight > 0.:
+        if weight > 0.0:
             _fold_gate_at_index_in_moment(
                 folded, moment_indices[moment_index], gate_index
             )
@@ -728,7 +710,7 @@ def _fold_local(
     scale_factor: float,
     fold_method: Callable[[Circuit, float, Tuple[Any]], Circuit],
     fold_method_args: Tuple[Any] = (),
-    **kwargs
+    **kwargs,
 ) -> Circuit:
     """Helper function for implementing a local folding method (which nominally
     requires 1 <= scale_factor <= 3) at any scale_factor >= 1. Returns a folded
@@ -769,9 +751,7 @@ def _fold_local(
         return folded
 
     if not 1 <= scale_factor:
-        raise ValueError(
-            f"The scale factor must be a real number greater than 1."
-        )
+        raise ValueError(f"The scale factor must be a real number greater than 1.")
 
     while scale_factor > 1.0:
         this_stretch = 3.0 if scale_factor > 3.0 else scale_factor

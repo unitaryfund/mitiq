@@ -15,8 +15,7 @@ from mitiq.benchmarks.utils import noisy_simulation
 
 
 def sample_projector(
-    n_qubits: int,
-    seed: Union[None, int, np.random.RandomState] = None,
+    n_qubits: int, seed: Union[None, int, np.random.RandomState] = None,
 ) -> np.ndarray:
     """Constructs a projector on a random computational basis state of n_qubits.
 
@@ -44,13 +43,17 @@ def sample_projector(
     return np.diag(obs)
 
 
-def rand_circuit_zne(n_qubits: int, depth: int, trials: int, noise: float,
-                     fac: Factory = None,
-                     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
-                     op_density: float = 0.99,
-                     silent: bool = True,
-                     seed: Optional[int] = None) \
-        -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def rand_circuit_zne(
+    n_qubits: int,
+    depth: int,
+    trials: int,
+    noise: float,
+    fac: Factory = None,
+    scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
+    op_density: float = 0.99,
+    silent: bool = True,
+    seed: Optional[int] = None,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Benchmarks a zero-noise extrapolation method and noise scaling executor
     by running on randomly sampled quantum circuits.
 
@@ -87,10 +90,9 @@ def rand_circuit_zne(n_qubits: int, depth: int, trials: int, noise: float,
         if not silent and ii % 10 == 0:
             print(ii)
 
-        qc = random_circuit(qubits,
-                            n_moments=depth,
-                            op_density=op_density,
-                            random_state=rnd_state)
+        qc = random_circuit(
+            qubits, n_moments=depth, op_density=op_density, random_state=rnd_state
+        )
 
         wvf = qc.final_wavefunction()
 
@@ -111,9 +113,9 @@ def rand_circuit_zne(n_qubits: int, depth: int, trials: int, noise: float,
         # evaluate the noisy answer
         unmitigated = obs_sim(qc)
         # evaluate the ZNE answer
-        mitigated = execute_with_zne(qp=qc, executor=obs_sim,
-                                     scale_noise=scale_noise,
-                                     factory=fac)
+        mitigated = execute_with_zne(
+            qp=qc, executor=obs_sim, scale_noise=scale_noise, factory=fac
+        )
         exacts.append(exact)
         unmitigateds.append(unmitigated)
         mitigateds.append(mitigated)

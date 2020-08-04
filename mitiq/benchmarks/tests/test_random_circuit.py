@@ -3,13 +3,19 @@ import pytest
 
 import numpy as np
 
-from mitiq.factories import (LinearFactory,
-                             RichardsonFactory,
-                             PolyFactory,
-                             ExpFactory,
-                             AdaExpFactory)
-from mitiq.folding import fold_gates_at_random, fold_gates_from_left, \
-    fold_gates_from_right, fold_global
+from mitiq.factories import (
+    LinearFactory,
+    RichardsonFactory,
+    PolyFactory,
+    ExpFactory,
+    AdaExpFactory,
+)
+from mitiq.folding import (
+    fold_gates_at_random,
+    fold_gates_from_left,
+    fold_gates_from_right,
+    fold_global,
+)
 from mitiq.benchmarks.random_circuits import rand_circuit_zne, sample_projector
 
 # Fix a seed for this test file
@@ -25,7 +31,7 @@ SCALE_FUNCTIONS = [
     fold_global,
     fold_gates_at_random_seeded,
     fold_gates_from_left,
-    fold_gates_from_right
+    fold_gates_from_right,
 ]
 
 FACTORIES = [
@@ -37,17 +43,18 @@ FACTORIES = [
 ]
 
 
-@pytest.mark.parametrize(["scale_noise", "fac"],
-                         product(SCALE_FUNCTIONS, FACTORIES))
+@pytest.mark.parametrize(["scale_noise", "fac"], product(SCALE_FUNCTIONS, FACTORIES))
 def test_random_benchmarks(scale_noise, fac):
-    exact, unmitigated, mitigated = rand_circuit_zne(n_qubits=2,
-                                                     depth=20,
-                                                     trials=8,
-                                                     op_density=0.99,
-                                                     noise=0.04,
-                                                     fac=fac,
-                                                     scale_noise=scale_noise,
-                                                     seed=SEED)
+    exact, unmitigated, mitigated = rand_circuit_zne(
+        n_qubits=2,
+        depth=20,
+        trials=8,
+        op_density=0.99,
+        noise=0.04,
+        fac=fac,
+        scale_noise=scale_noise,
+        seed=SEED,
+    )
 
     unmit_err = np.abs(exact - unmitigated)
     mit_err = np.abs(exact - mitigated)

@@ -18,9 +18,7 @@ def test_circuit_equality_identical_qubits(require_qubit_equality):
 
 
 @pytest.mark.parametrize("require_qubit_equality", [True, False])
-def test_circuit_equality_nonidentical_but_equal_qubits(
-    require_qubit_equality
-):
+def test_circuit_equality_nonidentical_but_equal_qubits(require_qubit_equality):
     n = 5
     qregA = cirq.NamedQubit.range(n, prefix="q_")
     qregB = cirq.NamedQubit.range(n, prefix="q_")
@@ -108,7 +106,7 @@ def test_circuit_equality_unequal_measurement_keys_terminal_measurements():
 
 @pytest.mark.parametrize("require_measurement_equality", [True, False])
 def test_circuit_equality_equal_measurement_keys_terminal_measurements(
-        require_measurement_equality
+    require_measurement_equality,
 ):
     base_circuit = cirq.testing.random_circuit(
         qubits=5, n_moments=10, op_density=0.99, random_state=1
@@ -149,7 +147,7 @@ def test_circuit_equality_unequal_measurement_keys_nonterminal_measurements():
 
 @pytest.mark.parametrize("require_measurement_equality", [True, False])
 def test_circuit_equality_equal_measurement_keys_nonterminal_measurements(
-        require_measurement_equality
+    require_measurement_equality,
 ):
     base_circuit = cirq.testing.random_circuit(
         qubits=5, n_moments=10, op_density=0.99, random_state=1

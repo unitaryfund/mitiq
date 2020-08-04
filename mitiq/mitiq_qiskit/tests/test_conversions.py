@@ -5,10 +5,7 @@ Mitiq circuits and Qiskit circuits.
 import cirq
 
 from mitiq.utils import _equal
-from mitiq.mitiq_qiskit.conversions import (to_qasm,
-                                            to_qiskit,
-                                            from_qasm,
-                                            from_qiskit)
+from mitiq.mitiq_qiskit.conversions import to_qasm, to_qiskit, from_qasm, from_qiskit
 
 
 def test_bell_state_to_from_circuits():
@@ -46,9 +43,7 @@ def test_random_circuit_to_from_circuits():
     )
     qiskit_circuit = to_qiskit(cirq_circuit)
     circuit_cirq = from_qiskit(qiskit_circuit)
-    assert cirq.equal_up_to_global_phase(
-        cirq_circuit.unitary(), circuit_cirq.unitary()
-    )
+    assert cirq.equal_up_to_global_phase(cirq_circuit.unitary(), circuit_cirq.unitary())
 
 
 def test_random_circuit_to_from_qasm():
@@ -60,6 +55,4 @@ def test_random_circuit_to_from_qasm():
     )
     qasm = to_qasm(cirq_circuit)
     circuit_cirq = from_qasm(qasm)
-    assert cirq.equal_up_to_global_phase(
-        cirq_circuit.unitary(), circuit_cirq.unitary()
-    )
+    assert cirq.equal_up_to_global_phase(cirq_circuit.unitary(), circuit_cirq.unitary())
