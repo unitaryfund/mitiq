@@ -13,6 +13,7 @@ def execute_with_zne(
     executor: Callable[[QPROGRAM], float],
     factory: Factory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
+    num_to_average: int = 1
 ) -> float:
     """Returns the zero-noise extrapolated expectation value that is computed
     by running the quantum program `qp` with the executor function.
@@ -22,6 +23,8 @@ def execute_with_zne(
         executor: Executes a circuit and returns an expectation value.
         factory: Factory object determining the zero-noise extrapolation method.
         scale_noise: Function for scaling the noise of a quantum circuit.
+        num_to_average: Number of times expectation values are computed by
+                the executor after each call to scale_noise, then averaged.
     """
     if not factory:
         factory = RichardsonFactory(scale_factors=[1., 2., 3.])
@@ -38,13 +41,17 @@ def execute_with_zne(
     if not callable(scale_noise):
         raise TypeError("Argument `scale_noise` must be callable.")
 
-    return factory.run(qp, executor, scale_noise).reduce()
+    if num_to_average < 1:
+        raise ValueError("Argument `num_to_average` must be a positive int.")
+
+    return factory.run(qp, executor, scale_noise, int(num_to_average)).reduce()
 
 
 def mitigate_executor(
     executor: Callable[[QPROGRAM], float],
     factory: Factory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
+    num_to_average: int = 1
 ) -> Callable[[QPROGRAM], float]:
     """Returns an error-mitigated version of the input `executor`.
 
@@ -57,17 +64,21 @@ def mitigate_executor(
         executor: Executes a circuit and returns an expectation value.
         factory: Factory object determining the zero-noise extrapolation method.
         scale_noise: Function for scaling the noise of a quantum circuit.
+        num_to_average: Number of times expectation values are computed by
+                the executor after each call to scale_noise, then averaged.
     """
-
     @wraps(executor)
     def new_executor(qp: QPROGRAM) -> float:
-        return execute_with_zne(qp, executor, factory, scale_noise)
+        return execute_with_zne(
+            qp, executor, factory, scale_noise, num_to_average
+        )
     return new_executor
 
 
 def zne_decorator(
     factory: Factory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
+    num_to_average: int = 1
 ) -> Callable[[QPROGRAM], float]:
     """Decorator which adds error mitigation to an executor function, i.e., a
     function which executes a quantum circuit with an arbitrary backend and
@@ -76,15 +87,19 @@ def zne_decorator(
     Args:
         factory: Factory object determining the zero-noise extrapolation method.
         scale_noise: Function for scaling the noise of a quantum circuit.
+        num_to_average: Number of times expectation values are computed by
+                the executor after each call to scale_noise, then averaged.
     """
-
-    # raise an error if the decorator is used without parenthesis
+    # Raise an error if the decorator is used without parenthesis
     if callable(factory):
-        raise TypeError("The decorator must be used with parenthesis even"
-                        " if no explicit arguments are passed, i.e., @zne_decorator().")
+        raise TypeError(
+            "Decorator must be used with parentheses (i.e., @zne_decorator()) "
+            "even if no explicit arguments are passed."
+        )
 
     def decorator(
         executor: Callable[[QPROGRAM], float]
     ) -> Callable[[QPROGRAM], float]:
-        return mitigate_executor(executor, factory, scale_noise)
+        return mitigate_executor(executor, factory, scale_noise, num_to_average)
+
     return decorator

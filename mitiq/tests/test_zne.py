@@ -26,7 +26,7 @@ circ = cirq.Circuit(
 
 
 # Default executor for unit tests
-def executor(circuit):
+def executor(circuit) -> float:
     wavefunction = circuit.final_wavefunction()
     return np.real(
         wavefunction.conj().T @ np.kron(npX, npZ) @ wavefunction
@@ -38,17 +38,62 @@ def executor(circuit):
     [fold_gates_from_left, fold_gates_from_right, fold_gates_at_random]
 )
 @pytest.mark.parametrize("factory", [LinearFactory, RichardsonFactory])
-def test_execute_with_zne_no_noise(fold_method, factory):
+@pytest.mark.parametrize("num_to_average", [1, 2, 5])
+def test_execute_with_zne_no_noise(fold_method, factory, num_to_average):
     """Tests execute_with_zne with noiseless simulation."""
     zne_value = execute_with_zne(
-        circ, executor, scale_noise=fold_method, factory=factory([1., 2., 3.])
+        circ,
+        executor,
+        num_to_average=num_to_average,
+        scale_noise=fold_method,
+        factory=factory([1., 2., 3.])
     )
     assert np.isclose(zne_value, 0.)
 
 
+@pytest.mark.parametrize("factory", [LinearFactory, RichardsonFactory])
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left, fold_gates_from_right, fold_gates_at_random]
+)
+def test_averaging_improves_zne_value_with_fake_noise(factory, fold_method):
+    """Tests that averaging with Gaussian noise produces a better ZNE value
+    compared to not averaging with several folding methods.
+
+    For non-deterministic folding, the ZNE value with average should be better.
+    For deterministic folding, the ZNE value should be the same.
+    """
+    for seed in range(5):
+        rng = np.random.RandomState(seed)
+
+        def noisy_executor(circuit) -> float:
+            return executor(circuit) + rng.randn()
+
+        zne_value_no_averaging = execute_with_zne(
+            circ,
+            noisy_executor,
+            num_to_average=1,
+            scale_noise=fold_gates_at_random,
+            factory=factory([1., 2., 3.])
+        )
+
+        zne_value_averaging = execute_with_zne(
+            circ,
+            noisy_executor,
+            num_to_average=10,
+            scale_noise=fold_method,
+            factory=factory([1., 2., 3.])
+        )
+
+        # True (noiseless) value is zero. Averaging should ==> closer to zero.
+        assert abs(zne_value_averaging) <= abs(zne_value_no_averaging)
+
+
 def test_execute_with_zne_bad_arguments():
-    """Tests errors are raised when execute_with_zne is called with bad args."""
-    with pytest.raises(TypeError, match="Argument `executor` must be callable"):
+    """Tests errors are raised when execute_with_zne is called with bad args.
+    """
+    with pytest.raises(TypeError,
+                       match="Argument `executor` must be callable"):
         execute_with_zne(circ, None)
 
     with pytest.raises(TypeError, match="Argument `factory` must be of type"):
@@ -59,8 +104,10 @@ def test_execute_with_zne_bad_arguments():
 
 
 def test_error_zne_decorator():
-    """Tests that the proper error is raised if the decorator is used without parenthesis."""
-    with pytest.raises(TypeError, match="The decorator must be used with parenthesis"):
+    """Tests that the proper error is raised if the decorator is
+    used without parenthesis.
+    """
+    with pytest.raises(TypeError, match="Decorator must be used with paren"):
         @zne_decorator
         def test_executor(circuit):
             return 0
