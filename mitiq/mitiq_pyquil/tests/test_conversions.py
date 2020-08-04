@@ -1,8 +1,18 @@
 import numpy as np
 from pyquil import Program
-from pyquil.gates import CNOT, H, RZ
+from pyquil.gates import CNOT, CZ, H, RZ, X, Y, Z
 
-# from mitiq.mitiq_pyquil.conversions import from_pyquil, to_pyquil
+from mitiq.mitiq_pyquil.conversions import from_pyquil, to_pyquil
+
+
+def test_to_pyquil_from_pyquil():
+    p = Program()
+    p += X(0)
+    p += Y(1)
+    p += Z(2)
+    p += CNOT(0, 1)
+    p += CZ(1, 2)
+    assert p.out() == to_pyquil(from_pyquil(p)).out()
 
 
 def maxcut_qaoa_program(gamma: float) -> Program:
@@ -31,6 +41,6 @@ def maxcut_qaoa_program(gamma: float) -> Program:
 
 
 # TODO: bug in to_quil, need to write a Cirq PR to fix
-# def test_to_pyquil_from_pyquil():
+# def test_to_pyquil_from_pyquil_parameterized():
 #     p = maxcut_qaoa_program(np.pi)
 #     assert p.out() == to_pyquil(from_pyquil(p)).out()
