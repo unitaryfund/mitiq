@@ -136,6 +136,10 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
         from mitiq.mitiq_qiskit.conversions import from_qiskit
         input_circuit_type = "qiskit"
         mitiq_circuit = from_qiskit(circuit)
+    elif "pyquil" in circuit.__module__:
+        from mitiq.mitiq_pyquil.conversions import from_pyquil
+        input_circuit_type = "pyquil"
+        mitiq_circuit = from_pyquil(circuit)
     elif isinstance(circuit, Circuit):
         input_circuit_type = "cirq"
         mitiq_circuit = circuit
@@ -157,6 +161,9 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
     if conversion_type == "qiskit":
         from mitiq.mitiq_qiskit.conversions import to_qiskit
         converted_circuit = to_qiskit(circuit)
+    elif conversion_type == "pyquil":
+        from mitiq.mitiq_pyquil.conversions import to_pyquil
+        converted_circuit = to_pyquil(circuit)
     elif isinstance(circuit, Circuit):
         converted_circuit = circuit
     else:

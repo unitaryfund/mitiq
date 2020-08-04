@@ -7,7 +7,8 @@ from typing import Union
 
 SUPPORTED_PROGRAM_TYPES = {
     "cirq": "Circuit",
-    "qiskit": "QuantumCircuit"
+    "pyquil": "Program",
+    "qiskit": "QuantumCircuit",
 }
 
 AVAILABLE_PROGRAM_TYPES = {}
