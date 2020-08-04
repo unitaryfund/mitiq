@@ -19,16 +19,16 @@ colors = ["#0B5FA5", "#043C6B", "#3F8FD2", # blue colors
 ## specifiy code tree structure:
 module_cmap = {"zne":               0, # zne
                "factories":         1, # factories
-               "pyquil_utils":      2, # APIs: pyquil
-               "mitiq_qiskit":      3, # APIs: qiskit
-               "qiskit_utils":      3, # APIs: qiskit
+               #"pyquil_utils":      2, # APIs: pyquil
+               #"mitiq_qiskit":      3, # APIs: qiskit
+               #"qiskit_utils":      3, # APIs: qiskit
                "conversions":       3,
                "folding":           4,
-               "benchmarks":        5, # benchmarks
-               "random_circ":       5,
+               #"benchmarks":        5, # benchmarks
+               #"random_circ":       5,
                }
 # add here hidden modules
-hidden_modules = ['benchmarks', 'mitiq_pyquil', 'mitiq_qiskit']
+hidden_modules = []#'benchmarks', 'mitiq_pyquil', 'mitiq_qiskit']
 module_list  = []
 num_items = 0
 

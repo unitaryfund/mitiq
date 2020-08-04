@@ -75,7 +75,9 @@ Run from bash `python mitiq-structure.py`.
 
 #### 2. Check the html and generate the pdf
 
-By opening `mitiq_tree.html` with FireFox (will not render with other browsers),
-the tree should be rendered. Save the graphics by printing it to a pdf file
+In order to open `mitiq_tree.html`, you need to set up a local server.
+Run from the terminal:
+`python3 -m http.server` and open your browser. Go to `http://localhost:8000/` and from there navigate to the `mitiq_tree.html` file and open it.
+The tree should be rendered. Save the graphics by printing it to a pdf file
 as `Mitiq_Code_Tree.pdf`.
 
