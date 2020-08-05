@@ -94,7 +94,7 @@ Mitiq code is developed according the best practices of Python development.
 * Please get familiar with [PEP 8](https://www.python.org/dev/peps/pep-0008/) (code)
   and [PEP 257](https://www.python.org/dev/peps/pep-0257/) (docstrings) guidelines.
 * Use annotations for type hints in the objects' signature.
-* Write google-style docstrings.
+* Write [google-style docstrings](https://google.github.io/styleguide/pyguide.html#doc-function-args).
 
 We use [Black](https://black.readthedocs.io/en/stable/index.html) and `flake8` to automatically
 lint the code and enforce style requirements as part of the CI pipeline. You can run these style
