@@ -103,7 +103,9 @@ and `make check-format` (to see if `black` would reformat the code) in the top-l
 the repository. If you aren't presented with any errors, then that means your code is good enough
 for the linter (`flake8`) and formatter (`black`). If `make check-format` fails, it will present
 you with a diff, which you can resolve by running `make format`. Black is very opinionated, but
-saves a lot of time by removing the need for style nitpicks in PR review.
+saves a lot of time by removing the need for style nitpicks in PR review. We only deviate from its
+default behavior in one category: we choose to use a line length of 79 rather than the Black
+default of 88 (this is configured in the [`pyproject.toml`](pyproject.toml) file).
 
 ### Code of conduct
 Mitiq development abides to the [Contributors' Covenant](CODE_OF_CONDUCT.md).
