@@ -210,7 +210,8 @@ def circuit_from_quil(quil: str) -> Circuit:
         # Raise a general error when encountering an unconsidered type.
         else:
             raise UnsupportedQuilInstruction(
-                f"Quil instruction {inst} of type {type(inst)} not currently supported in Cirq."
+                f"Quil instruction {inst} of type {type(inst)}"
+                " not currently supported in Cirq."
             )
 
     return circuit
