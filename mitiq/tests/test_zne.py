@@ -31,7 +31,8 @@ def executor(circuit) -> float:
 
 
 @pytest.mark.parametrize(
-    "fold_method", [fold_gates_from_left, fold_gates_from_right, fold_gates_at_random]
+    "fold_method",
+    [fold_gates_from_left, fold_gates_from_right, fold_gates_at_random],
 )
 @pytest.mark.parametrize("factory", [LinearFactory, RichardsonFactory])
 @pytest.mark.parametrize("num_to_average", [1, 2, 5])
@@ -49,7 +50,8 @@ def test_execute_with_zne_no_noise(fold_method, factory, num_to_average):
 
 @pytest.mark.parametrize("factory", [LinearFactory, RichardsonFactory])
 @pytest.mark.parametrize(
-    "fold_method", [fold_gates_from_left, fold_gates_from_right, fold_gates_at_random]
+    "fold_method",
+    [fold_gates_from_left, fold_gates_from_right, fold_gates_at_random],
 )
 def test_averaging_improves_zne_value_with_fake_noise(factory, fold_method):
     """Tests that averaging with Gaussian noise produces a better ZNE value
@@ -87,7 +89,9 @@ def test_averaging_improves_zne_value_with_fake_noise(factory, fold_method):
 def test_execute_with_zne_bad_arguments():
     """Tests errors are raised when execute_with_zne is called with bad args.
     """
-    with pytest.raises(TypeError, match="Argument `executor` must be callable"):
+    with pytest.raises(
+        TypeError, match="Argument `executor` must be callable"
+    ):
         execute_with_zne(circ, None)
 
     with pytest.raises(TypeError, match="Argument `factory` must be of type"):

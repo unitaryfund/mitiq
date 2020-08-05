@@ -37,7 +37,10 @@ def _equal(
     if not require_qubit_equality:
         # Transform the qubits of circuit one to those of circuit two
         qubit_map = dict(
-            zip(sorted(circuit_one.all_qubits()), sorted(circuit_two.all_qubits()))
+            zip(
+                sorted(circuit_one.all_qubits()),
+                sorted(circuit_two.all_qubits()),
+            )
         )
         circuit_one = circuit_one.transform_qubits(lambda q: qubit_map[q])
 
@@ -56,4 +59,6 @@ def _equal(
 
             circ.batch_insert(measurements)
 
-    return CircuitDag.from_circuit(circuit_one) == CircuitDag.from_circuit(circuit_two)
+    return CircuitDag.from_circuit(circuit_one) == CircuitDag.from_circuit(
+        circuit_two
+    )

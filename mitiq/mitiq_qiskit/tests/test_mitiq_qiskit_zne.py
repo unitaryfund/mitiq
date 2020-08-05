@@ -122,7 +122,9 @@ def test_mitigate_executor_with_shot_list():
     rand_circ = random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH)
     qp = measure(rand_circ, qid=0)
 
-    fac = RichardsonFactory([1.0, 2.0, 3.0], shot_list=[10 ** 4, 10 ** 5, 10 ** 6])
+    fac = RichardsonFactory(
+        [1.0, 2.0, 3.0], shot_list=[10 ** 4, 10 ** 5, 10 ** 6]
+    )
     new_executor = mitigate_executor(
         basic_executor, scale_noise=scale_noise, factory=fac
     )

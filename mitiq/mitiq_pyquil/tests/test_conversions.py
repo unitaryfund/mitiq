@@ -17,7 +17,8 @@ def test_to_pyquil_from_pyquil():
 
 def maxcut_qaoa_program(gamma: float) -> Program:
     """
-    Generates a 2Q MAXCUT QAOA circuit with beta = pi/8 and with the provided gamma.
+    Generates a 2Q MAXCUT QAOA circuit with beta = pi/8 and with the provided
+    gamma.
 
     Args:
         gamma: One of the two variational parameters (the other is fixed).

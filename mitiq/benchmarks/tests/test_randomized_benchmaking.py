@@ -57,7 +57,9 @@ def test_rb_circuits():
             assert np.isclose(zero_prob, 1)
 
 
-@pytest.mark.parametrize(["scale_noise", "fac"], product(SCALE_FUNCTIONS, FACTORIES))
+@pytest.mark.parametrize(
+    ["scale_noise", "fac"], product(SCALE_FUNCTIONS, FACTORIES)
+)
 def test_random_benchmarks(scale_noise, fac):
     depths = [2, 4]
     trials = 3

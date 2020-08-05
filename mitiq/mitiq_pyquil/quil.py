@@ -197,7 +197,9 @@ def circuit_from_quil(quil: str) -> Circuit:
         elif isinstance(inst, PyQuilMeasurement):
             line_qubit = LineQubit(inst.qubit.index)
             quil_memory_reference = inst.classical_reg.out()
-            circuit += MeasurementGate(1, key=quil_memory_reference)(line_qubit)
+            circuit += MeasurementGate(1, key=quil_memory_reference)(
+                line_qubit
+            )
 
         # Raise a targeted error when encountering a PRAGMA.
         elif isinstance(inst, Pragma):

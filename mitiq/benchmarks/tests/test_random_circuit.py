@@ -43,7 +43,9 @@ FACTORIES = [
 ]
 
 
-@pytest.mark.parametrize(["scale_noise", "fac"], product(SCALE_FUNCTIONS, FACTORIES))
+@pytest.mark.parametrize(
+    ["scale_noise", "fac"], product(SCALE_FUNCTIONS, FACTORIES)
+)
 def test_random_benchmarks(scale_noise, fac):
     exact, unmitigated, mitigated = rand_circuit_zne(
         n_qubits=2,

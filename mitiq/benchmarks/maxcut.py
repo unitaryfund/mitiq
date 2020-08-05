@@ -42,7 +42,9 @@ def make_maxcut(
     noise: float = 0,
     scale_noise: Callable = None,
     factory: Factory = None,
-) -> Tuple[Callable[[np.ndarray], float], Callable[[np.ndarray], Circuit], np.ndarray]:
+) -> Tuple[
+    Callable[[np.ndarray], float], Callable[[np.ndarray], Circuit], np.ndarray
+]:
     """Makes an executor that evaluates the QAOA ansatz at a given beta
     and gamma parameters.
 
@@ -78,7 +80,10 @@ def make_maxcut(
         half = int(len(params) / 2)
         betas, gammas = params[:half], params[half:]
         qaoa_steps = sum(
-            [cost_step(beta) + mix_step(gamma) for beta, gamma in zip(betas, gammas)],
+            [
+                cost_step(beta) + mix_step(gamma)
+                for beta, gamma in zip(betas, gammas)
+            ],
             Circuit(),
         )
         return init_state_prog + qaoa_steps

@@ -22,6 +22,7 @@ for (module, program_type) in SUPPORTED_PROGRAM_TYPES.items():
 
 QPROGRAM = Union[
     tuple(
-        f"{package}.{circuit}" for package, circuit in AVAILABLE_PROGRAM_TYPES.items()
+        f"{package}.{circuit}"
+        for package, circuit in AVAILABLE_PROGRAM_TYPES.items()
     )
 ]

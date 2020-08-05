@@ -147,7 +147,9 @@ def test_poly_extr():
 
 @mark.parametrize("avoid_log", [False, True])
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-def test_exp_factory_with_asympt(test_f: Callable[[float], float], avoid_log: bool):
+def test_exp_factory_with_asympt(
+    test_f: Callable[[float], float], avoid_log: bool
+):
     """Test of exponential extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = ExpFactory(X_VALS, asymptote=A, avoid_log=True)
@@ -199,10 +201,14 @@ def test_poly_exp_factory_no_asympt(test_f: Callable[[float], float]):
 
 @mark.parametrize("avoid_log", [False, True])
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-def test_ada_exp_factory_with_asympt(test_f: Callable[[float], float], avoid_log: bool):
+def test_ada_exp_factory_with_asympt(
+    test_f: Callable[[float], float], avoid_log: bool
+):
     """Test of the adaptive exponential extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = AdaExpFactory(steps=3, scale_factor=2.0, asymptote=A, avoid_log=avoid_log)
+    fac = AdaExpFactory(
+        steps=3, scale_factor=2.0, asymptote=A, avoid_log=avoid_log
+    )
     fac.iterate(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
@@ -214,7 +220,9 @@ def test_ada_exp_fac_with_asympt_more_steps(
 ):
     """Test of the adaptive exponential extrapolator with more steps."""
     seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = AdaExpFactory(steps=6, scale_factor=2.0, asymptote=A, avoid_log=avoid_log)
+    fac = AdaExpFactory(
+        steps=6, scale_factor=2.0, asymptote=A, avoid_log=avoid_log
+    )
     fac.iterate(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
@@ -229,7 +237,9 @@ def test_ada_exp_factory_no_asympt(test_f: Callable[[float], float]):
 
 
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-def test_ada_exp_factory_no_asympt_more_steps(test_f: Callable[[float], float],):
+def test_ada_exp_factory_no_asympt_more_steps(
+    test_f: Callable[[float], float],
+):
     """Test of the adaptive exponential extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = AdaExpFactory(steps=8, scale_factor=2.0, asymptote=None)
@@ -273,7 +283,9 @@ def test_failing_fit_error():
     fac = ExpFactory(X_VALS, asymptote=None)
     fac.instack = X_VALS
     fac.outstack = [1.0, 2.0, 1.0, 2.0, 1.0]
-    with raises(ExtrapolationError, match=r"The extrapolation fit failed to converge."):
+    with raises(
+        ExtrapolationError, match=r"The extrapolation fit failed to converge."
+    ):
         fac.reduce()
 
 
@@ -283,7 +295,8 @@ def test_failing_fit_warnings(fac):
     fac.instack = [1, 1, 1, 1]
     fac.outstack = [1, 1, 1, 1]
     with warns(
-        ExtrapolationWarning, match=r"The extrapolation fit may be ill-conditioned."
+        ExtrapolationWarning,
+        match=r"The extrapolation fit may be ill-conditioned.",
     ):
         fac.reduce()
 
@@ -292,7 +305,8 @@ def test_iteration_warnings():
     """Test that the correct warning is raised beyond the iteration limit."""
     fac = LinearFactory(X_VALS)
     with warns(
-        ConvergenceWarning, match=r"Factory iteration loop stopped before convergence."
+        ConvergenceWarning,
+        match=r"Factory iteration loop stopped before convergence.",
     ):
         fac.iterate(lambda scale_factor: 1.0, max_iterations=3)
 
@@ -302,7 +316,9 @@ def test_equal(factory):
     """Tests that copies are factories are equal to the original factories."""
     for iterate in (True, False):
         if factory is PolyFactory:
-            fac = factory(scale_factors=[1, 2, 3], order=2, shot_list=[1, 2, 3])
+            fac = factory(
+                scale_factors=[1, 2, 3], order=2, shot_list=[1, 2, 3]
+            )
         else:
             fac = factory(scale_factors=[1, 2, 3], shot_list=[1, 2, 3])
         if iterate:

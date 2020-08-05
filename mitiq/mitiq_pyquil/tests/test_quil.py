@@ -114,7 +114,9 @@ def test_circuit_from_quil():
     # drop declare and measures, get Program unitary
     pyquil_unitary = program_unitary(pyquil_circuit[1:-3], n_qubits=3)
     # fix qubit order convention
-    cirq_circuit_swapped = Circuit(SWAP(q0, q2), cirq_circuit[:-1], SWAP(q0, q2))
+    cirq_circuit_swapped = Circuit(
+        SWAP(q0, q2), cirq_circuit[:-1], SWAP(q0, q2)
+    )
     # get Circuit unitary
     cirq_unitary = cirq_circuit_swapped.unitary()
     # test unitary equivalence

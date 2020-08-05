@@ -91,7 +91,10 @@ def rand_circuit_zne(
             print(ii)
 
         qc = random_circuit(
-            qubits, n_moments=depth, op_density=op_density, random_state=rnd_state
+            qubits,
+            n_moments=depth,
+            op_density=op_density,
+            random_state=rnd_state,
         )
 
         wvf = qc.final_wavefunction()
