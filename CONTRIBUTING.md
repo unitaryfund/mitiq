@@ -106,4 +106,4 @@ you with a diff, which you can resolve by running `make format`. Black is very o
 saves a lot of time by removing the need for style nitpicks in PR review.
 
 ### Code of conduct
-Mitiq development abides to the [Contrutors' Covenant](CODE_OF_CONDUCT.md).
+Mitiq development abides to the [Contributors' Covenant](CODE_OF_CONDUCT.md).
