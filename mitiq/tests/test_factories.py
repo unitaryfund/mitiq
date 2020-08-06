@@ -45,42 +45,49 @@ def apply_seed_to_func(func: Callable, seed: int) -> Callable:
 
     def seeded_func(x: float, err: float = STAT_NOISE) -> float:
         return func(x, err=err, rnd_state=rnd_state)
+
     return seeded_func
 
 
 # Classical test functions with statistical error:
-def f_lin(x: float, err: float = STAT_NOISE,
-          rnd_state: RandomState = np.random) -> float:
+def f_lin(
+    x: float, err: float = STAT_NOISE, rnd_state: RandomState = np.random
+) -> float:
     """Linear function."""
     return A + B * x + rnd_state.normal(scale=err)
 
 
-def f_non_lin(x: float, err: float = STAT_NOISE,
-              rnd_state: RandomState = np.random) -> float:
+def f_non_lin(
+    x: float, err: float = STAT_NOISE, rnd_state: RandomState = np.random
+) -> float:
     """Non-linear function."""
     return A + B * x + C * x ** 2 + rnd_state.normal(scale=err)
 
 
-def f_exp_down(x: float, err: float = STAT_NOISE,
-               rnd_state: RandomState = np.random) -> float:
+def f_exp_down(
+    x: float, err: float = STAT_NOISE, rnd_state: RandomState = np.random
+) -> float:
     """Exponential decay."""
     return A + B * np.exp(-C * x) + rnd_state.normal(scale=err)
 
 
-def f_exp_up(x: float, err: float = STAT_NOISE,
-             rnd_state: RandomState = np.random) -> float:
+def f_exp_up(
+    x: float, err: float = STAT_NOISE, rnd_state: RandomState = np.random
+) -> float:
     """Exponential growth."""
     return A - B * np.exp(-C * x) + rnd_state.normal(scale=err)
 
 
-def f_poly_exp_down(x: float, err: float = STAT_NOISE,
-                    rnd_state: RandomState = np.random) -> float:
+def f_poly_exp_down(
+    x: float, err: float = STAT_NOISE, rnd_state: RandomState = np.random
+) -> float:
     """Poly-exponential decay."""
     return A + B * np.exp(-C * x - D * x ** 2) + rnd_state.normal(scale=err)
 
 
-def f_poly_exp_up(x: float, err: float = STAT_NOISE,
-                  rnd_state: RandomState = np.random) -> float:
+def f_poly_exp_up(
+    x: float, err: float = STAT_NOISE, rnd_state: RandomState = np.random
+) -> float:
     """Poly-exponential growth."""
     return A - B * np.exp(-C * x - D * x ** 2) + rnd_state.normal(scale=err)
 
@@ -131,21 +138,18 @@ def test_poly_extr():
     seeded_f = apply_seed_to_func(f_non_lin, SEED)
     fac = PolyFactory(X_VALS, order=1)
     fac.iterate(seeded_f)
-    assert not np.isclose(
-        fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL
-    )
+    assert not np.isclose(fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL)
     seeded_f = apply_seed_to_func(f_non_lin, SEED)
     fac = PolyFactory(X_VALS, order=2)
     fac.iterate(seeded_f)
-    assert np.isclose(
-        fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL
-    )
+    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
 
 @mark.parametrize("avoid_log", [False, True])
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-def test_exp_factory_with_asympt(test_f: Callable[[float], float],
-                                 avoid_log: bool):
+def test_exp_factory_with_asympt(
+    test_f: Callable[[float], float], avoid_log: bool
+):
     """Test of exponential extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = ExpFactory(X_VALS, asymptote=A, avoid_log=True)
@@ -164,17 +168,16 @@ def test_exp_factory_no_asympt(test_f: Callable[[float], float]):
 
 @mark.parametrize("avoid_log", [False, True])
 @mark.parametrize("test_f", [f_poly_exp_down, f_poly_exp_up])
-def test_poly_exp_factory_with_asympt(test_f: Callable[[float], float],
-                                      avoid_log: bool):
+def test_poly_exp_factory_with_asympt(
+    test_f: Callable[[float], float], avoid_log: bool
+):
     """Test of (almost) exponential extrapolator."""
     # test that, for a non-linear exponent,
     # order=1 is bad while order=2 is better.
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = PolyExpFactory(X_VALS, order=1, asymptote=A, avoid_log=avoid_log)
     fac.iterate(seeded_f)
-    assert not np.isclose(
-        fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL
-    )
+    assert not np.isclose(fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL)
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = PolyExpFactory(X_VALS, order=2, asymptote=A, avoid_log=avoid_log)
     fac.iterate(seeded_f)
@@ -189,9 +192,7 @@ def test_poly_exp_factory_no_asympt(test_f: Callable[[float], float]):
     # order=1 is bad while order=2 is better.
     fac = PolyExpFactory(X_VALS, order=1, asymptote=None)
     fac.iterate(seeded_f)
-    assert not np.isclose(
-        fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL
-    )
+    assert not np.isclose(fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL)
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = PolyExpFactory(X_VALS, order=2, asymptote=None)
     fac.iterate(seeded_f)
@@ -200,28 +201,28 @@ def test_poly_exp_factory_no_asympt(test_f: Callable[[float], float]):
 
 @mark.parametrize("avoid_log", [False, True])
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-def test_ada_exp_factory_with_asympt(test_f: Callable[[float], float],
-                                     avoid_log: bool):
+def test_ada_exp_factory_with_asympt(
+    test_f: Callable[[float], float], avoid_log: bool
+):
     """Test of the adaptive exponential extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = AdaExpFactory(steps=3,
-                        scale_factor=2.0,
-                        asymptote=A,
-                        avoid_log=avoid_log)
+    fac = AdaExpFactory(
+        steps=3, scale_factor=2.0, asymptote=A, avoid_log=avoid_log
+    )
     fac.iterate(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
 
 @mark.parametrize("avoid_log", [False, True])
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-def test_ada_exp_fac_with_asympt_more_steps(test_f: Callable[[float], float],
-                                            avoid_log: bool):
+def test_ada_exp_fac_with_asympt_more_steps(
+    test_f: Callable[[float], float], avoid_log: bool
+):
     """Test of the adaptive exponential extrapolator with more steps."""
     seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = AdaExpFactory(steps=6,
-                        scale_factor=2.0,
-                        asymptote=A,
-                        avoid_log=avoid_log)
+    fac = AdaExpFactory(
+        steps=6, scale_factor=2.0, asymptote=A, avoid_log=avoid_log
+    )
     fac.iterate(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
@@ -237,7 +238,7 @@ def test_ada_exp_factory_no_asympt(test_f: Callable[[float], float]):
 
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
 def test_ada_exp_factory_no_asympt_more_steps(
-        test_f: Callable[[float], float],
+    test_f: Callable[[float], float],
 ):
     """Test of the adaptive exponential extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
@@ -282,8 +283,9 @@ def test_failing_fit_error():
     fac = ExpFactory(X_VALS, asymptote=None)
     fac.instack = X_VALS
     fac.outstack = [1.0, 2.0, 1.0, 2.0, 1.0]
-    with raises(ExtrapolationError,
-                match=r"The extrapolation fit failed to converge."):
+    with raises(
+        ExtrapolationError, match=r"The extrapolation fit failed to converge."
+    ):
         fac.reduce()
 
 
@@ -292,29 +294,31 @@ def test_failing_fit_warnings(fac):
     """Test that the correct warning is raised for an ill-conditioned fit."""
     fac.instack = [1, 1, 1, 1]
     fac.outstack = [1, 1, 1, 1]
-    with warns(ExtrapolationWarning,
-               match=r"The extrapolation fit may be ill-conditioned."):
+    with warns(
+        ExtrapolationWarning,
+        match=r"The extrapolation fit may be ill-conditioned.",
+    ):
         fac.reduce()
 
 
 def test_iteration_warnings():
     """Test that the correct warning is raised beyond the iteration limit."""
     fac = LinearFactory(X_VALS)
-    with warns(ConvergenceWarning,
-               match=r"Factory iteration loop stopped before convergence."):
+    with warns(
+        ConvergenceWarning,
+        match=r"Factory iteration loop stopped before convergence.",
+    ):
         fac.iterate(lambda scale_factor: 1.0, max_iterations=3)
 
 
-@mark.parametrize(
-    "factory", (LinearFactory, RichardsonFactory, PolyFactory)
-)
+@mark.parametrize("factory", (LinearFactory, RichardsonFactory, PolyFactory))
 def test_equal(factory):
     """Tests that copies are factories are equal to the original factories."""
     for iterate in (True, False):
         if factory is PolyFactory:
-            fac = factory(scale_factors=[1, 2, 3],
-                          order=2,
-                          shot_list=[1, 2, 3])
+            fac = factory(
+                scale_factors=[1, 2, 3], order=2, shot_list=[1, 2, 3]
+            )
         else:
             fac = factory(scale_factors=[1, 2, 3], shot_list=[1, 2, 3])
         if iterate:
@@ -369,10 +373,10 @@ def test_shot_list_errors():
 def test_are_close_dict():
     """Tests the _are_close_dict function."""
     dict1 = {"a": 1, "b": 0.0}
-    dict2 = {"a": 1, "b": 0.0 + 1.e-10}
+    dict2 = {"a": 1, "b": 0.0 + 1.0e-10}
     assert _are_close_dict(dict1, dict2)
     assert _are_close_dict(dict2, dict1)
-    dict2 = {"b": 0.0 + 1.e-10, "a": 1}
+    dict2 = {"b": 0.0 + 1.0e-10, "a": 1}
     assert _are_close_dict(dict1, dict2)
     assert _are_close_dict(dict2, dict1)
     dict2 = {"a": 1, "b": 1.0}

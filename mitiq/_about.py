@@ -1,7 +1,7 @@
 """
 Command line output of information on Mitiq and dependencies.
 """
-__all__ = ['about']
+__all__ = ["about"]
 
 import inspect
 import platform
@@ -26,11 +26,11 @@ def about():
     try:
         from pyquil import __version__ as pyquil_version
     except ImportError:
-        pyquil_version = 'Not installed'
+        pyquil_version = "Not installed"
     try:
         from qiskit import __version__ as qiskit_version
     except ImportError:
-        qiskit_version = 'Not installed'
+        qiskit_version = "Not installed"
 
     about_str = f"""
 Mitiq: A Python toolkit for implementing error mitigation on quantum computers

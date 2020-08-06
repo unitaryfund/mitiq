@@ -1,6 +1,16 @@
 .PHONY: all
 all: dist
 
+.PHONY: build
+build: check-all docs test-all
+
+.PHONY: check-all
+check-all: check-format check-style
+
+.PHONY: check-format
+check-format:
+	black --check --diff mitiq
+
 .PHONY: check-style
 check-style:
 	flake8
@@ -19,6 +29,10 @@ dist:
 docs:
 	make -C docs html
 	make -C docs doctest
+
+.PHONY: format
+format:
+	black mitiq
 
 .PHONY: install
 install:

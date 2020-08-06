@@ -35,7 +35,7 @@ def measure(circuit, qid) -> QuantumCircuit:
     """
     # Ensure that we have a classical register of enough size available
     if len(circuit.clbits) == 0:
-        reg = ClassicalRegister(qid + 1, 'creg')
+        reg = ClassicalRegister(qid + 1, "creg")
         circuit.add_register(reg)
     circuit.measure(0, qid)
     return circuit
@@ -106,8 +106,7 @@ def test_run_factory_with_number_of_shots():
 
     qp = random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH)
     qp = measure(qp, 0)
-    fac = ExpFactory([1.0, 2.0, 3.0],
-                     shot_list=[10 ** 4, 10 ** 5, 10 ** 6])
+    fac = ExpFactory([1.0, 2.0, 3.0], shot_list=[10 ** 4, 10 ** 5, 10 ** 6])
     fac.run(qp, basic_executor, scale_noise=scale_noise)
     result = fac.reduce()
     assert np.isclose(result, 1.0, atol=1.0e-1)
@@ -123,11 +122,12 @@ def test_mitigate_executor_with_shot_list():
     rand_circ = random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH)
     qp = measure(rand_circ, qid=0)
 
-    fac = RichardsonFactory([1.0, 2.0, 3.0],
-                            shot_list=[10 ** 4, 10 ** 5, 10 ** 6])
-    new_executor = mitigate_executor(basic_executor,
-                                     scale_noise=scale_noise,
-                                     factory=fac)
+    fac = RichardsonFactory(
+        [1.0, 2.0, 3.0], shot_list=[10 ** 4, 10 ** 5, 10 ** 6]
+    )
+    new_executor = mitigate_executor(
+        basic_executor, scale_noise=scale_noise, factory=fac
+    )
     # bad_result is computed with native noise (scale = 1)
     bad_result = basic_executor(scale_noise(qp, 1))
     good_result = new_executor(qp)

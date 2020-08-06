@@ -18,8 +18,9 @@ from mitiq.benchmarks.utils import noisy_simulation
 SIMULATOR = DensityMatrixSimulator()
 
 
-def make_noisy_backend(noise: float, obs: np.ndarray) \
-        -> Callable[[Circuit, int], float]:
+def make_noisy_backend(
+    noise: float, obs: np.ndarray
+) -> Callable[[Circuit, int], float]:
     """ Helper function to match mitiq's backend type signature.
 
     Args:
@@ -29,18 +30,21 @@ def make_noisy_backend(noise: float, obs: np.ndarray) \
     Returns:
         A mitiq backend function.
     """
+
     def noisy_backend(circ: Circuit):
         return noisy_simulation(circ, noise, obs)
 
     return noisy_backend
 
 
-def make_maxcut(graph: List[Tuple[int, int]],
-                noise: float = 0,
-                scale_noise: Callable = None,
-                factory: Factory = None
-                ) -> Tuple[Callable[[np.ndarray], float],
-                           Callable[[np.ndarray], Circuit], np.ndarray]:
+def make_maxcut(
+    graph: List[Tuple[int, int]],
+    noise: float = 0,
+    scale_noise: Callable = None,
+    factory: Factory = None,
+) -> Tuple[
+    Callable[[np.ndarray], float], Callable[[np.ndarray], Circuit], np.ndarray
+]:
     """Makes an executor that evaluates the QAOA ansatz at a given beta
     and gamma parameters.
 
@@ -75,15 +79,21 @@ def make_maxcut(graph: List[Tuple[int, int]],
     def qaoa_ansatz(params):
         half = int(len(params) / 2)
         betas, gammas = params[:half], params[half:]
-        qaoa_steps = sum([cost_step(beta) + mix_step(gamma)
-                          for beta, gamma in zip(betas, gammas)], Circuit())
+        qaoa_steps = sum(
+            [
+                cost_step(beta) + mix_step(gamma)
+                for beta, gamma in zip(betas, gammas)
+            ],
+            Circuit(),
+        )
         return init_state_prog + qaoa_steps
 
     # make the cost observable
     identity = np.eye(2 ** len(nodes))
-    cost_mat = -0.5 * sum(identity - Circuit(
-                    [id(*qreg), ZZ(qreg[i], qreg[j])]).unitary()
-                for i, j in graph)
+    cost_mat = -0.5 * sum(
+        identity - Circuit([id(*qreg), ZZ(qreg[i], qreg[j])]).unitary()
+        for i, j in graph
+    )
     noisy_backend = make_noisy_backend(noise, cost_mat)
 
     # must have this function signature to work with scipy minimize
@@ -92,20 +102,24 @@ def make_maxcut(graph: List[Tuple[int, int]],
         if scale_noise is None and factory is None:
             return noisy_backend(qaoa_prog)
         else:
-            return execute_with_zne(qaoa_prog,
-                                    executor=noisy_backend,
-                                    scale_noise=scale_noise,
-                                    factory=factory)
+            return execute_with_zne(
+                qaoa_prog,
+                executor=noisy_backend,
+                scale_noise=scale_noise,
+                factory=factory,
+            )
 
     return qaoa_cost, qaoa_ansatz, cost_mat
 
 
-def run_maxcut(graph: List[Tuple[int, int]],
-               x0: np.ndarray,
-               noise: float = 0,
-               scale_noise: Callable = None,
-               factory: Factory = None,
-               verbose: bool = True) -> Tuple[float, np.ndarray, List]:
+def run_maxcut(
+    graph: List[Tuple[int, int]],
+    x0: np.ndarray,
+    noise: float = 0,
+    scale_noise: Callable = None,
+    factory: Factory = None,
+    verbose: bool = True,
+) -> Tuple[float, np.ndarray, List]:
     """Solves MAXCUT using QAOA on a cirq wavefunction simulator using a
        Nelder-Mead optimizer.
 
@@ -142,10 +156,12 @@ def run_maxcut(graph: List[Tuple[int, int]],
         traj.append(qaoa_cost(xk))
         return True
 
-    res = minimize(qaoa_cost,
-                   x0=x0,
-                   method='Nelder-Mead',
-                   callback=callback,
-                   options={'disp': verbose})
+    res = minimize(
+        qaoa_cost,
+        x0=x0,
+        method="Nelder-Mead",
+        callback=callback,
+        options={"disp": verbose},
+    )
 
     return res.fun, res.x, traj

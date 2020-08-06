@@ -2,18 +2,41 @@ from typing import Callable, Dict, Union
 
 import numpy as np
 from pyquil.parser import parse
-from pyquil.quilbase import (Declare,
-                             DefGate,
-                             Gate as PyQuilGate,
-                             Measurement as PyQuilMeasurement,
-                             Pragma,
-                             Reset,
-                             ResetQubit)
+from pyquil.quilbase import (
+    Declare,
+    DefGate,
+    Gate as PyQuilGate,
+    Measurement as PyQuilMeasurement,
+    Pragma,
+    Reset,
+    ResetQubit,
+)
 
 from cirq import Circuit, LineQubit
-from cirq.ops import (CCNOT, CNOT, CSWAP, CZ, CZPowGate, Gate, H, I, ISWAP,
-                      ISwapPowGate, MatrixGate, MeasurementGate, S, SWAP, T,
-                      X, Y, Z, ZPowGate, rx, ry, rz)
+from cirq.ops import (
+    CCNOT,
+    CNOT,
+    CSWAP,
+    CZ,
+    CZPowGate,
+    Gate,
+    H,
+    I,
+    ISWAP,
+    ISwapPowGate,
+    MatrixGate,
+    MeasurementGate,
+    S,
+    SWAP,
+    T,
+    X,
+    Y,
+    Z,
+    ZPowGate,
+    rx,
+    ry,
+    rz,
+)
 
 
 class UnsupportedQuilGate(Exception):
@@ -22,6 +45,7 @@ class UnsupportedQuilGate(Exception):
 
 class UnsupportedQuilInstruction(Exception):
     pass
+
 
 #
 # Functions for converting supported parameterized Quil gates.
@@ -39,10 +63,9 @@ def cphase00(phi: float) -> MatrixGate:
     """
     PyQuil's CPHASE00 gate can be defined using Cirq's MatrixGate.
     """
-    cphase00_matrix = np.array([[np.exp(1j * phi), 0, 0, 0],
-                                [0, 1, 0, 0],
-                                [0, 0, 1, 0],
-                                [0, 0, 0, 1]])
+    cphase00_matrix = np.array(
+        [[np.exp(1j * phi), 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
+    )
     return MatrixGate(cphase00_matrix)
 
 
@@ -50,10 +73,9 @@ def cphase01(phi: float) -> MatrixGate:
     """
     PyQuil's CPHASE01 gate can be defined using Cirq's MatrixGate.
     """
-    cphase01_matrix = np.array([[1, 0, 0, 0],
-                                [0, np.exp(1j * phi), 0, 0],
-                                [0, 0, 1, 0],
-                                [0, 0, 0, 1]])
+    cphase01_matrix = np.array(
+        [[1, 0, 0, 0], [0, np.exp(1j * phi), 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
+    )
     return MatrixGate(cphase01_matrix)
 
 
@@ -61,10 +83,9 @@ def cphase10(phi: float) -> MatrixGate:
     """
     PyQuil's CPHASE10 gate can be defined using Cirq's MatrixGate.
     """
-    cphase10_matrix = np.array([[1, 0, 0, 0],
-                                [0, 1, 0, 0],
-                                [0, 0, np.exp(1j * phi), 0],
-                                [0, 0, 0, 1]])
+    cphase10_matrix = np.array(
+        [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, np.exp(1j * phi), 0], [0, 0, 0, 1]]
+    )
     return MatrixGate(cphase10_matrix)
 
 
@@ -79,10 +100,14 @@ def pswap(phi: float) -> MatrixGate:
     """
     PyQuil's PSWAP gate can be defined using Cirq's MatrixGate.
     """
-    pswap_matrix = np.array([[1, 0, 0, 0],
-                             [0, 0, np.exp(1j * phi), 0],
-                             [0, np.exp(1j * phi), 0, 0],
-                             [0, 0, 0, 1]])
+    pswap_matrix = np.array(
+        [
+            [1, 0, 0, 0],
+            [0, 0, np.exp(1j * phi), 0],
+            [0, np.exp(1j * phi), 0, 0],
+            [0, 0, 0, 1],
+        ]
+    )
     return MatrixGate(pswap_matrix)
 
 
@@ -172,7 +197,9 @@ def circuit_from_quil(quil: str) -> Circuit:
         elif isinstance(inst, PyQuilMeasurement):
             line_qubit = LineQubit(inst.qubit.index)
             quil_memory_reference = inst.classical_reg.out()
-            circuit += MeasurementGate(1, key=quil_memory_reference)(line_qubit)
+            circuit += MeasurementGate(1, key=quil_memory_reference)(
+                line_qubit
+            )
 
         # Raise a targeted error when encountering a PRAGMA.
         elif isinstance(inst, Pragma):
@@ -185,7 +212,8 @@ def circuit_from_quil(quil: str) -> Circuit:
         # Raise a general error when encountering an unconsidered type.
         else:
             raise UnsupportedQuilInstruction(
-                f"Quil instruction {inst} of type {type(inst)} not currently supported in Cirq."
+                f"Quil instruction {inst} of type {type(inst)}"
+                " not currently supported in Cirq."
             )
 
     return circuit
