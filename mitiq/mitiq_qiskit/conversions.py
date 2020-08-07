@@ -5,6 +5,7 @@ and Qiskit's circuit representation.
 import cirq
 from cirq.contrib.qasm_import import circuit_from_qasm
 from qiskit import QuantumCircuit
+from mitiq.utils import _simplify_circuit
 
 
 QASMType = str
@@ -19,6 +20,8 @@ def to_qasm(circuit: cirq.Circuit) -> QASMType:
     Returns:
         QASMType: QASM string equivalent to the input Mitiq circuit.
     """
+    # simplify individual gates, e.g. H**-1 is simplified to H
+    _simplify_circuit(circuit)
     return circuit.to_qasm()
 
 
