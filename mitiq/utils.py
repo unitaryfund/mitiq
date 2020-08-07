@@ -2,8 +2,44 @@
 
 from copy import deepcopy
 
-from cirq import Circuit, CircuitDag
+from cirq import Circuit, CircuitDag, Gate, Moment, X, Y, Z, H, CNOT
 from cirq.ops.measurement_gate import MeasurementGate
+
+
+def _simplify_gate(gate: Gate) -> Gate:
+    """If possible, returns a simpler but equivalent gate.
+    Otherwise, the input gate is returned.
+    The input does not mutate.
+
+    Args:
+        gate: The input gate to simplify.
+
+    Returns: The simplified gate.
+    """
+    SELF_INVERSE_GATES = [X, Y, Z, H, CNOT]
+    for self_inv_gate in SELF_INVERSE_GATES:
+        if gate == self_inv_gate:
+            return self_inv_gate
+    return gate
+
+
+def _simplify_circuit(circuit: Circuit) -> None:
+    """If possible, mutates each gate of the
+    input circuit with a simpler but equivalent gate.
+
+    Args:
+        gate: The input circuit to simplify.
+    """
+    # iterate over moments
+    for moment_idx, moment in enumerate(circuit):
+        simplified_operations = []
+        # iterate over operations in moment
+        for op in moment:
+            simplified_gate = _simplify_gate(op.gate)
+            simplified_operation = op.with_gate(simplified_gate)
+            simplified_operations.append(simplified_operation)
+        # mutate input circuit
+        circuit[moment_idx] = Moment(simplified_operations)
 
 
 def _equal(
