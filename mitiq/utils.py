@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 
-from cirq import Circuit, CircuitDag, Gate, Moment, X, Y, Z, H, CNOT
+from cirq import Circuit, CircuitDag, Gate, Moment, X, Y, Z, H, CNOT, CZ
 from cirq.ops.measurement_gate import MeasurementGate
 
 
@@ -16,10 +16,11 @@ def _simplify_gate(gate: Gate) -> Gate:
 
     Returns: The simplified gate.
     """
-    SELF_INVERSE_GATES = [X, Y, Z, H, CNOT]
-    for self_inv_gate in SELF_INVERSE_GATES:
-        if gate == self_inv_gate:
-            return self_inv_gate
+    # this set of gates can be extended if necessary
+    SIMPLE_GATES = [X, Y, Z, H, CNOT, CZ]
+    for simple_gate in SIMPLE_GATES:
+        if gate == simple_gate:
+            return simple_gate
     return gate
 
 
