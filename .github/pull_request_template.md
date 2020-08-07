@@ -10,7 +10,7 @@ Please make sure you have finished the following tasks before opening the pull r
 - [ ] Please read [Contributing to mitiq](https://github.com/unitaryfund/mitiq/blob/master/CONTRIBUTING.md)
 - [ ] Contributions to qutip should follow the [pep8 style](https://www.python.org/dev/peps/pep-0008/). You can enforce it easily with `black`
 - [ ] Please add tests to cover your changes if applicable.
-- [ ] If the behavior of the code has changed or new feature has been added, please also update the documentation.
+- [ ] If the behavior of the code has changed or new feature has been added, please also update the documentation, after reading [Contributing to mitiq documentation](https://github.com/unitaryfund/mitiq/blob/master/docs/README-docs.md).
 
 Delete this checklist after you have completed all the tasks. If you have not finished them all, you can also open a [Draft Pull Request](https://github.blog/2019-02-14-introducing-draft-pull-requests/) to let the others know this on-going work and keep this checklist in the PR description.
 
