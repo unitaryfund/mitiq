@@ -17,10 +17,6 @@ from cirq import rx, ry, rz, CZ, X, Z, Y
 
 from cirq import ZPowGate,YPowGate,XPowGate, HPowGate, CXPowGate, CZPowGate, MeasurementGate
 
-
-
-
-    
 def angle_noise_1q(noise, H):
     return AngleChannel1Q(noise, H)
 
@@ -57,8 +53,6 @@ def add_parameter_noise(circ: QPROGRAM, scale_factor: float, sigma: float) -> QP
                 new_param = (param + error)
                 curr_moment.append(base_gate(exponent = new_param/np.pi)(*qubits))
         final_moments.append(Moment(curr_moment))
-
-    #final_moments.append(circ[-1])
     return Circuit(final_moments)
 
 def _get_base_gate(gate):

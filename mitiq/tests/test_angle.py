@@ -21,8 +21,7 @@ def test_identity_scale_1q():
         [ops.X.on_each(qreg)],
         [ops.Y.on(qreg[0])]
     )
-    scale_fn = add_param_noise_wrapper(base_noise=0.001)
-    scaled = scale_fn(circ, 1)
+    scaled = add_parameter_noise(circ, scale_factor=1, sigma=0.001)
     assert _equal(circ, scaled)
 
 def test_non_identity_scale_1q():
@@ -37,10 +36,10 @@ def test_non_identity_scale_1q():
     stretch = 2
     base_noise = 0.001
     noises = np.random.normal(loc=0.0, scale=np.sqrt((stretch-1)*base_noise), size = (4,))
-    scale_fn = add_param_noise_wrapper(base_noise=base_noise)
     np.random.seed(42)
+
+    scaled = add_parameter_noise(circ, scale_factor=stretch, sigma=base_noise)
     result = []
-    scaled = scale_fn(circ, stretch)
     for moment in scaled:
         for op in moment.operations:
             gate = deepcopy(op.gate)
@@ -55,8 +54,7 @@ def test_identity_scale_2q():
     circ = Circuit(
         [ops.CNOT.on(qreg[0], qreg[1])]
     )
-    scale_fn = add_param_noise_wrapper(base_noise=0.001)
-    scaled = scale_fn(circ, 1)
+    scaled = add_parameter_noise(circ, scale_factor=1, sigma=0.001)
     assert _equal(circ, scaled)
 
 def test_non_identity_scale_2q():
@@ -70,10 +68,9 @@ def test_non_identity_scale_2q():
     stretch = 2
     base_noise = 0.001
     noises = np.random.normal(loc=0.0, scale=np.sqrt((stretch-1)*base_noise), size = (1,))
-    scale_fn = add_param_noise_wrapper(base_noise=base_noise)
     np.random.seed(42)
+    scaled = add_parameter_noise(circ, scale_factor=stretch, sigma=base_noise)
     result = []
-    scaled = scale_fn(circ, stretch)
     for moment in scaled:
         for op in moment.operations:
             gate = deepcopy(op.gate)
@@ -99,6 +96,5 @@ def test_scale_with_measurement():
         [ops.CNOT.on(qreg[0], qreg[2])],
         [ops.measure(qreg[0], qreg[2])],
     )
-    scale_fn = add_param_noise_wrapper(base_noise=0.001)
-    scaled = scale_fn(circ, 1)
+    scaled = add_parameter_noise(circ, scale_factor=1, sigma=0.001)
     assert _equal(circ, scaled)
