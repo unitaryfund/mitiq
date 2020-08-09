@@ -12,9 +12,10 @@ from mitiq.angle import (
     add_parameter_noise
 )
 
+
 def test_identity_scale_1q():
-    # tests that when scale factor = 1, the circuit is the 
-    # same. 
+    # tests that when scale factor = 1, the circuit is the
+    # same.
     qreg = LineQubit.range(3)
     circ = Circuit(
         [ops.X.on_each(qreg)],
@@ -23,9 +24,10 @@ def test_identity_scale_1q():
     scaled = add_parameter_noise(circ, scale_factor=1, sigma=0.001)
     assert _equal(circ, scaled)
 
+
 def test_non_identity_scale_1q():
-    # tests that when scale factor = 1, the circuit is the 
-    # same. 
+    # tests that when scale factor = 1, the circuit is the
+    # same.
     qreg = LineQubit.range(3)
     circ = Circuit(
         [ops.rx(np.pi*1.0).on_each(qreg)],
@@ -34,7 +36,8 @@ def test_non_identity_scale_1q():
     np.random.seed(42)
     stretch = 2
     base_noise = 0.001
-    noises = np.random.normal(loc=0.0, scale=np.sqrt((stretch-1)*base_noise), size = (4,))
+    noises = np.random.normal(loc=0.0, scale=np.sqrt(
+        (stretch-1)*base_noise), size=(4,))
     np.random.seed(42)
 
     scaled = add_parameter_noise(circ, scale_factor=stretch, sigma=base_noise)
@@ -46,9 +49,10 @@ def test_non_identity_scale_1q():
             result.append(param*np.pi - np.pi)
     assert np.all(np.isclose(result - noises, 0))
 
+
 def test_identity_scale_2q():
-    # tests that when scale factor = 1, the circuit is the 
-    # same. 
+    # tests that when scale factor = 1, the circuit is the
+    # same.
     qreg = LineQubit.range(2)
     circ = Circuit(
         [ops.CNOT.on(qreg[0], qreg[1])]
@@ -56,9 +60,10 @@ def test_identity_scale_2q():
     scaled = add_parameter_noise(circ, scale_factor=1, sigma=0.001)
     assert _equal(circ, scaled)
 
+
 def test_non_identity_scale_2q():
-    # tests that when scale factor = 1, the circuit is the 
-    # same. 
+    # tests that when scale factor = 1, the circuit is the
+    # same.
     qreg = LineQubit.range(2)
     circ = Circuit(
         [ops.CNOT.on(qreg[0], qreg[1])]
@@ -66,7 +71,8 @@ def test_non_identity_scale_2q():
     np.random.seed(42)
     stretch = 2
     base_noise = 0.001
-    noises = np.random.normal(loc=0.0, scale=np.sqrt((stretch-1)*base_noise), size = (1,))
+    noises = np.random.normal(loc=0.0, scale=np.sqrt(
+        (stretch-1)*base_noise), size=(1,))
     np.random.seed(42)
     scaled = add_parameter_noise(circ, scale_factor=stretch, sigma=base_noise)
     result = []
@@ -80,7 +86,7 @@ def test_non_identity_scale_2q():
 
 def test_scale_with_measurement():
     """We should ignore measurement gates."""
-    
+
     # Test circuit:
     # 0: ───H───T───@───M───
     #               │   │
