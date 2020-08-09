@@ -16,6 +16,8 @@ from cirq import rx, ry, rz, CZ, X, Z, Y
 
 
 from cirq import ZPowGate,YPowGate,XPowGate, HPowGate, CXPowGate, CZPowGate, MeasurementGate
+from mitiq._typing import SUPPORTED_PROGRAM_TYPES, QPROGRAM
+
 
 def angle_noise_1q(noise, H):
     return AngleChannel1Q(noise, H)

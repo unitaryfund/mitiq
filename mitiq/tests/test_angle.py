@@ -7,10 +7,9 @@ import pytest
 from cirq import Circuit, GridQubit, LineQubit, ops, inverse
 from cirq import rx, ry, CNOT, X, Y, Z
 
-from mitiq.utils import _equal, random_circuit
+from mitiq.utils import _equal
 from mitiq.angle import (
-    inject_param_noise,
-    add_param_noise_wrapper
+    add_parameter_noise
 )
 
 def test_identity_scale_1q():
