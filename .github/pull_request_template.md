@@ -8,7 +8,7 @@ Checklist
 Please make sure you have finished the following tasks before opening the pull request (PR).
 
 - [ ] Please read [Contributing to mitiq](https://github.com/unitaryfund/mitiq/blob/master/CONTRIBUTING.md)
-- [ ] Contributions to qutip should follow the [pep8 style](https://www.python.org/dev/peps/pep-0008/). You can enforce it easily with `black`
+- [ ] Contributions to mitiq should follow the [pep8 style](https://www.python.org/dev/peps/pep-0008/). You can enforce it easily with `black`
 - [ ] Please add tests to cover your changes if applicable.
 - [ ] If the behavior of the code has changed or new feature has been added, please also update the documentation, after reading [Contributing to mitiq documentation](https://github.com/unitaryfund/mitiq/blob/master/docs/README-docs.md).
 
