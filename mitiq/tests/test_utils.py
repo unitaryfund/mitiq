@@ -6,7 +6,11 @@ import pytest
 import cirq
 from cirq import LineQubit, Circuit, X, Y, Z, H, CNOT, S, T
 
-from mitiq.utils import _equal, _simplify_gate, _simplify_circuit
+from mitiq.utils import (
+    _equal,
+    _simplify_gate_exponent,
+    _simplify_circuit_exponents,
+)
 
 
 @pytest.mark.parametrize("require_qubit_equality", [True, False])
@@ -174,27 +178,27 @@ def test_circuit_equality_equal_measurement_keys_nonterminal_measurements(
 
 
 @pytest.mark.parametrize("gate", [X, Y, Z, H])
-def test_simplify_gate(gate):
+def test_simplify_gate_exponent(gate):
     inverse_gate = gate ** -1
     # check the inverse is initially represented differently
     assert gate.__str__() != inverse_gate.__str__()
     # simplify
-    simplfied_inverse = _simplify_gate(inverse_gate)
+    simplfied_inverse = _simplify_gate_exponent(inverse_gate)
     # test the gate was simplified
     assert gate.__str__() == simplfied_inverse.__str__()
 
 
 @pytest.mark.parametrize("gate", [T, S])
-def test_simplify_gate_with_non_self_inverse_gates(gate):
+def test_simplify_gate_exponent_with_non_self_inverse_gates(gate):
     inverse_gate = gate ** -1
     inverse_repr_before = inverse_gate.__str__()
-    simplified_inverse = _simplify_gate(inverse_gate)
+    simplified_inverse = _simplify_gate_exponent(inverse_gate)
     inverse_repr_after = simplified_inverse.__str__()
     # check no simplification occurred
     assert inverse_repr_before == inverse_repr_after
 
 
-def test_simplify_circuit():
+def test_simplify_circuit_exponents():
     qreg = LineQubit.range(2)
     circuit = Circuit([H.on(qreg[0]), CNOT.on(*qreg), Z.on(qreg[1])])
 
@@ -215,7 +219,7 @@ def test_simplify_circuit():
     assert inverse_qasm != expected_qasm
 
     # simplify the circuit
-    _simplify_circuit(inverse_circuit)
+    _simplify_circuit_exponents(inverse_circuit)
 
     # check inverse_circuit has the expected simplified representation
     simplified_repr = inverse_circuit.__repr__()
@@ -225,7 +229,7 @@ def test_simplify_circuit():
     assert simplified_qasm == expected_qasm
 
 
-def test_simplify_circuit_with_non_self_inverse_gates():
+def test_simplify_circuit_exponents_with_non_self_inverse_gates():
     qreg = LineQubit.range(2)
     # make a circuit with gates which are not self-inverse
     circuit = Circuit([S.on(qreg[0]), T.on(qreg[1])])
@@ -235,7 +239,7 @@ def test_simplify_circuit_with_non_self_inverse_gates():
     inverse_qasm = inverse_circuit._to_qasm_output().__str__()
 
     # simplify the circuit (it should not change this circuit)
-    _simplify_circuit(inverse_circuit)
+    _simplify_circuit_exponents(inverse_circuit)
 
     # check inverse_circuit did not change
     simplified_repr = inverse_circuit.__repr__()

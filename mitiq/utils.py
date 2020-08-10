@@ -6,9 +6,9 @@ from cirq import Circuit, CircuitDag, Gate, Moment
 from cirq.ops.measurement_gate import MeasurementGate
 
 
-def _simplify_gate(gate: Gate) -> Gate:
-    """Returns a simpler but equivalent gate if possible,
-    otherwise the input gate is returned.
+def _simplify_gate_exponent(gate: Gate) -> Gate:
+    """Returns the input gate with a simplified exponent if possible,
+    otherwise the input gate is returned without any change.
 
     The input gate is not mutated.
 
@@ -23,22 +23,22 @@ def _simplify_gate(gate: Gate) -> Gate:
     return gate
 
 
-def _simplify_circuit(circuit: Circuit) -> None:
-    """Replaces each gate of the input circuit with a simpler
-    but equivalent gate if possible, mutating the input circuit.
+def _simplify_circuit_exponents(circuit: Circuit) -> None:
+    """Simplifies the gate exponents of the input circuit if possible,
+    mutating the input circuit.
 
     Args:
-        circuit: Circuit to simplify.
+        circuit: The circuit to simplify.
     """
-    # iterate over moments
+    # Iterate over moments
     for moment_idx, moment in enumerate(circuit):
         simplified_operations = []
-        # iterate over operations in moment
+        # Iterate over operations in moment
         for op in moment:
-            simplified_gate = _simplify_gate(op.gate)
+            simplified_gate = _simplify_gate_exponent(op.gate)
             simplified_operation = op.with_gate(simplified_gate)
             simplified_operations.append(simplified_operation)
-        # mutate input circuit
+        # Mutate the input circuit
         circuit[moment_idx] = Moment(simplified_operations)
 
 
