@@ -88,16 +88,24 @@ docstrings with
 If you add new `/tests` directories, you will need to update the `Makefile`
 so that they will be included as part of continuous integration.
 
-### Code style
+### Style Guidelines
 
 Mitiq code is developed according the best practices of Python development.
-* Please get familiar with [PEP 8](https://www.python.org/dev/peps/pep-0008/) (code) and [PEP 257](https://www.python.org/dev/peps/pep-0257/) (docstrings) guidelines.
-* You can use [`black`](https://github.com/psf/black) code formatter to implement some PEP 8 and PEP 257 rules. For example, line length limit is 79 characters.
+* Please get familiar with [PEP 8](https://www.python.org/dev/peps/pep-0008/) (code)
+  and [PEP 257](https://www.python.org/dev/peps/pep-0257/) (docstrings) guidelines.
 * Use annotations for type hints in the objects' signature.
-* Write google-style docstrings.
+* Write [google-style docstrings](https://google.github.io/styleguide/pyguide.html#doc-function-args).
 
-As part of continuous integration, we check that `flake8` runs successfully,
-so it is recommended that you run it locally before opening a PR.
+We use [Black](https://black.readthedocs.io/en/stable/index.html) and `flake8` to automatically
+lint the code and enforce style requirements as part of the CI pipeline. You can run these style
+tests yourself locally by running `make check-style` (to check for violations of the `flake8` rules)
+and `make check-format` (to see if `black` would reformat the code) in the top-level directory of
+the repository. If you aren't presented with any errors, then that means your code is good enough
+for the linter (`flake8`) and formatter (`black`). If `make check-format` fails, it will present
+you with a diff, which you can resolve by running `make format`. Black is very opinionated, but
+saves a lot of time by removing the need for style nitpicks in PR review. We only deviate from its
+default behavior in one category: we choose to use a line length of 79 rather than the Black
+default of 88 (this is configured in the [`pyproject.toml`](pyproject.toml) file).
 
 ### Code of conduct
-Mitiq development abides to the [Contrutors' Covenant](CODE_OF_CONDUCT.md).
+Mitiq development abides to the [Contributors' Covenant](CODE_OF_CONDUCT.md).

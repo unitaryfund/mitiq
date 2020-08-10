@@ -1,6 +1,6 @@
 numpy~=1.18.1
 scipy~=1.4.1
-cirq~=0.8.0
+cirq-unstable==0.9.0.dev20200508234715
 
 # third-party integration
 pyquil~=2.18.0
@@ -10,6 +10,7 @@ qiskit~=0.16.2
 pytest~=5.4.1
 pytest-cov~=2.8.1
 flake8~=3.7.9
+black~=19.10b0
 
 # to run examples
 matplotlib~=3.2.1

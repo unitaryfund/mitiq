@@ -7,7 +7,8 @@ from typing import Union
 
 SUPPORTED_PROGRAM_TYPES = {
     "cirq": "Circuit",
-    "qiskit": "QuantumCircuit"
+    "pyquil": "Program",
+    "qiskit": "QuantumCircuit",
 }
 
 AVAILABLE_PROGRAM_TYPES = {}
@@ -20,6 +21,8 @@ for (module, program_type) in SUPPORTED_PROGRAM_TYPES.items():
         pass
 
 QPROGRAM = Union[
-    tuple(f"{package}.{circuit}"
-          for package, circuit in AVAILABLE_PROGRAM_TYPES.items())
+    tuple(
+        f"{package}.{circuit}"
+        for package, circuit in AVAILABLE_PROGRAM_TYPES.items()
+    )
 ]

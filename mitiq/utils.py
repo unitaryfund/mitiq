@@ -10,7 +10,7 @@ def _equal(
     circuit_one: Circuit,
     circuit_two: Circuit,
     require_qubit_equality: bool = False,
-    require_measurement_equality: bool = False
+    require_measurement_equality: bool = False,
 ) -> bool:
     """Returns True if the circuits are equal, else False.
 
@@ -39,7 +39,7 @@ def _equal(
         qubit_map = dict(
             zip(
                 sorted(circuit_one.all_qubits()),
-                sorted(circuit_two.all_qubits())
+                sorted(circuit_two.all_qubits()),
             )
         )
         circuit_one = circuit_one.transform_qubits(lambda q: qubit_map[q])
@@ -47,8 +47,10 @@ def _equal(
     if not require_measurement_equality:
         for circ in (circuit_one, circuit_two):
             measurements = [
-                (moment, op) for moment, op, _ in
-                circ.findall_operations_with_gate_type(MeasurementGate)
+                (moment, op)
+                for moment, op, _ in circ.findall_operations_with_gate_type(
+                    MeasurementGate
+                )
             ]
             circ.batch_remove(measurements)
 
@@ -57,6 +59,6 @@ def _equal(
 
             circ.batch_insert(measurements)
 
-    return CircuitDag.from_circuit(
-        circuit_one
-    ) == CircuitDag.from_circuit(circuit_two)
+    return CircuitDag.from_circuit(circuit_one) == CircuitDag.from_circuit(
+        circuit_two
+    )

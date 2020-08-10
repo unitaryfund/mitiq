@@ -3,7 +3,9 @@ from qiskit import Aer, execute, QuantumCircuit
 
 # Noise simulation packages
 from qiskit.providers.aer.noise import NoiseModel
-from qiskit.providers.aer.noise.errors.standard_errors import depolarizing_error
+from qiskit.providers.aer.noise.errors.standard_errors import (
+    depolarizing_error,
+)
 
 from mitiq.benchmarks.randomized_benchmarking import rb_circuits
 from mitiq.mitiq_qiskit.conversions import to_qiskit
@@ -29,7 +31,7 @@ def run_with_noise(
     circuit: QuantumCircuit,
     noise: float,
     shots: int,
-    seed: Optional[int] = None
+    seed: Optional[int] = None,
 ) -> float:
     """Runs the quantum circuit with a depolarizing channel noise model.
 
@@ -91,11 +93,9 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
     """
     global CURRENT_NOISE
     noise = param * NATIVE_NOISE
-    assert (
-        noise <= 1.0
-    ), "Noise scaled to {} is out of bounds (<=1.0) for depolarizing " \
-        "channel.".format(
-        noise
+    assert noise <= 1.0, (
+        "Noise scaled to {} is out of bounds (<=1.0) for depolarizing "
+        "channel.".format(noise)
     )
 
     noise_model = NoiseModel()
@@ -108,8 +108,9 @@ def scale_noise(pq: QuantumCircuit, param: float) -> QuantumCircuit:
     return pq
 
 
-def run_program(pq: QuantumCircuit, shots: int = 100,
-                seed: Optional[int] = None) -> float:
+def run_program(
+    pq: QuantumCircuit, shots: int = 100, seed: Optional[int] = None
+) -> float:
     """Runs a single-qubit circuit for multiple shots and
     returns the expectation value of the ground state projector.
 

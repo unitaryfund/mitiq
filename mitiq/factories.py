@@ -3,52 +3,79 @@ extrapolation methods.
 """
 
 import warnings
+from copy import deepcopy
+from mitiq import QPROGRAM
+from typing import Callable, List, Optional, Sequence, Tuple
 from abc import ABC, abstractmethod
-from typing import List, Iterable, Optional, Tuple, Callable
-
 import numpy as np
 from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
 
-from mitiq._typing import QPROGRAM
+
+def _instack_to_scale_factors(instack: dict) -> List[float]:
+    """Extracts a list of scale factors from a list of dictionaries."""
+    if all([isinstance(params, dict) for params in instack]):
+        return [params["scale_factor"] for params in instack]
+    return instack
+
+
+def _are_close_dict(dict_a: dict, dict_b: dict) -> bool:
+    """Returns True if the two dictionaries have equal keys and
+    their corresponding values are "sufficiently" close."""
+    keys_a = dict_a.keys()
+    keys_b = dict_b.keys()
+    if set(keys_a) != set(keys_b):
+        return False
+    for ka, va in dict_a.items():
+        if not np.isclose(dict_b[ka], va):
+            return False
+    return True
 
 
 class ExtrapolationError(Exception):
     """Error raised by :class:`.Factory` objects when
     the extrapolation fit fails.
     """
+
     pass
 
 
-_EXTR_ERR = ("The extrapolation fit failed to converge."
-             " The problem may be solved by switching to a more stable"
-             " extrapolation model such as `LinearFactory`.")
+_EXTR_ERR = (
+    "The extrapolation fit failed to converge."
+    " The problem may be solved by switching to a more stable"
+    " extrapolation model such as `LinearFactory`."
+)
 
 
 class ExtrapolationWarning(Warning):
     """Warning raised by :class:`.Factory` objects when
     the extrapolation fit is ill-conditioned.
     """
+
     pass
 
 
-_EXTR_WARN = (" The extrapolation fit may be ill-conditioned."
-              " Likely, more data points are necessary to fit the parameters"
-              " of the model.")
+_EXTR_WARN = (
+    "The extrapolation fit may be ill-conditioned."
+    " Likely, more data points are necessary to fit the parameters"
+    " of the model."
+)
 
 
 class ConvergenceWarning(Warning):
     """Warning raised by :class:`.Factory` objects when
     their `iterate` method fails to converge.
     """
+
     pass
 
 
-def mitiq_curve_fit(ansatz: Callable[..., float],
-                    instack: List[float],
-                    outstack: List[float],
-                    init_params: Optional[List[float]] = None,
-                    ) -> List[float]:
+def mitiq_curve_fit(
+    ansatz: Callable[..., float],
+    scale_factors: List[float],
+    exp_values: List[float],
+    init_params: Optional[List[float]] = None,
+) -> List[float]:
     """This is a wrapping of the `scipy.optimize.curve_fit` function with
     custom errors and warnings. It is used to make a non-linear fit.
 
@@ -56,22 +83,23 @@ def mitiq_curve_fit(ansatz: Callable[..., float],
         ansatz : The model function used for zero-noise extrapolation.
                  The first argument is the noise scale variable,
                  the remaining arguments are the parameters to fit.
-        instack: The array of noise scale factors.
-        outstack: The array of expectation values.
+        scale_factors: The array of noise scale factors.
+        exp_values: The array of expectation values.
         init_params: Initial guess for the parameters.
                      If None, the initial values are set to 1.
+
     Returns:
         opt_params: The array of optimal parameters.
+
     Raises:
         ExtrapolationError: If the extrapolation fit fails.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
     """
     try:
         with warnings.catch_warnings(record=True) as warn_list:
-            opt_params, _ = curve_fit(ansatz,
-                                      instack,
-                                      outstack,
-                                      p0=init_params)
+            opt_params, _ = curve_fit(
+                ansatz, scale_factors, exp_values, p0=init_params
+            )
         for warn in warn_list:
             # replace OptimizeWarning with ExtrapolationWarning
             if warn.category is OptimizeWarning:
@@ -79,36 +107,37 @@ def mitiq_curve_fit(ansatz: Callable[..., float],
                 warn.message = _EXTR_WARN
             # re-raise all warnings
             warnings.warn_explicit(
-                warn.message,
-                warn.category,
-                warn.filename,
-                warn.lineno
+                warn.message, warn.category, warn.filename, warn.lineno
             )
     except RuntimeError:
         raise ExtrapolationError(_EXTR_ERR) from None
     return list(opt_params)
 
 
-def mitiq_polyfit(instack: List[float],
-                  outstack: List[float],
-                  deg: int,
-                  weights: Optional[List[float]] = None) -> List[float]:
+def mitiq_polyfit(
+    scale_factors: List[float],
+    exp_values: List[float],
+    deg: int,
+    weights: Optional[List[float]] = None,
+) -> List[float]:
     """This is a wrapping of the `numpy.polyfit` function with
     custom warnings. It is used to make a polynomial fit.
 
     Args:
-        instack: The array of noise scale factors.
-        outstack: The array of expectation values.
+        scale_factors: The array of noise scale factors.
+        exp_values: The array of expectation values.
         deg: The degree of the polynomial fit.
         weights: Optional array of weights for each sampled point.
                  This is used to make a weighted least squares fit.
+
     Returns:
         opt_params: The array of optimal parameters.
+
     Raises:
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
     """
     with warnings.catch_warnings(record=True) as warn_list:
-        opt_params = np.polyfit(instack, outstack, deg, w=weights)
+        opt_params = np.polyfit(scale_factors, exp_values, deg, w=weights)
     for warn in warn_list:
         # replace RankWarning with ExtrapolationWarning
         if warn.category is RankWarning:
@@ -116,17 +145,13 @@ def mitiq_polyfit(instack: List[float],
             warn.message = _EXTR_WARN
         # re-raise all warnings
         warnings.warn_explicit(
-            warn.message,
-            warn.category,
-            warn.filename,
-            warn.lineno
+            warn.message, warn.category, warn.filename, warn.lineno
         )
     return list(opt_params)
 
 
 class Factory(ABC):
-    """
-    Abstract class designed to adaptively produce a new noise scaling
+    """Abstract class designed to adaptively produce a new noise scaling
     parameter based on a historical stack of previous noise scale parameters
     ("self.instack") and previously estimated expectation values
     ("self.outstack").
@@ -139,27 +164,24 @@ class Factory(ABC):
     """
 
     def __init__(self) -> None:
-        """
-        Initialization arguments (e.g. noise scale factors) depend on the
+        """Initialization arguments (e.g. noise scale factors) depend on the
         particular extrapolation algorithm and can be added to the "__init__"
         method of the associated derived class.
         """
         self.instack = []
         self.outstack = []
 
-    def push(self, instack_val: float, outstack_val: float) -> None:
-        """
-        Appends "instack_val" to "self.instack" and "outstack_val" to
-        "self.outstack".
-        Each time a new expectation value is computed this method should be
-        used to update the internal state of the Factory.
+    def push(self, instack_val: dict, outstack_val: float) -> None:
+        """Appends "instack_val" to "self.instack" and "outstack_val" to
+        "self.outstack". Each time a new expectation value is computed this
+        method should be used to update the internal state of the Factory.
         """
         self.instack.append(instack_val)
         self.outstack.append(outstack_val)
 
     @abstractmethod
     def next(self) -> float:
-        """Returns the next noise level to execute a circuit at."""
+        """Returns a dictionary of parameters to execute a circuit at."""
         raise NotImplementedError
 
     @abstractmethod
@@ -179,27 +201,35 @@ class Factory(ABC):
         self.instack = []
         self.outstack = []
 
-    def iterate(self, noise_to_expval: Callable[[float], float],
-                max_iterations: int = 100) -> 'Factory':
-        """
-        Runs a factory until convergence (or iterations reach
-            "max_iterations").
+    def iterate(
+        self,
+        noise_to_expval: Callable[[float], float],
+        max_iterations: int = 100,
+    ) -> "Factory":
+        """Evaluates a sequence of expectation values until enough
+        data is collected (or iterations reach "max_iterations").
 
         Args:
-            noise_to_expval: Function mapping noise scale to expectation vales.
+            noise_to_expval: Function mapping a noise scale factor to an
+                             expectation value. If shot_list is not None,
+                             "shot" must be an argument of the function.
+
             max_iterations: Maximum number of iterations (optional).
                             Default: 100.
         Raises:
-            ConvergenceWarning: iteration loop stops before convergence.
+            ConvergenceWarning: If iteration loop stops before convergence.
         """
         # Clear out the factory to make sure it is fresh.
         self.reset()
 
         counter = 0
         while not self.is_converged() and counter < max_iterations:
-            next_param = self.next()
-            next_result = noise_to_expval(next_param)
-            self.push(next_param, next_result)
+            next_in_params = self.next()
+            next_exec_params = deepcopy(next_in_params)
+            # get next scale factor and remove it from next_exec_params
+            scale_factor = next_exec_params.pop("scale_factor")
+            next_expval = noise_to_expval(scale_factor, **next_exec_params)
+            self.push(next_in_params, next_expval)
             counter += 1
 
         if counter == max_iterations:
@@ -212,42 +242,52 @@ class Factory(ABC):
 
         return self
 
-    def run(self, qp: QPROGRAM,
-            executor: Callable[[QPROGRAM], float],
-            scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
-            max_iterations: int = 100) -> 'Factory':
-        """
-        Runs the factory until convergence executing quantum circuits.
-        Accepts different noise levels.
+    def run(
+        self,
+        qp: QPROGRAM,
+        executor: Callable[[QPROGRAM], float],
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        num_to_average: int = 1,
+        max_iterations: int = 100,
+    ) -> "Factory":
+        """Evaluates a sequence of expectation values by executing quantum
+        circuits until enough data is collected (or iterations reach
+        "max_iterations").
 
         Args:
             qp: Circuit to mitigate.
             executor: Function executing a circuit; returns an expectation
-                      value.
+                value. If shot_list is not None, then "shot" must be
+                an additional argument of the executor.
             scale_noise: Function that scales the noise level of a quantum
-                         circuit.
+                circuit.
+            num_to_average: Number of times expectation values are computed by
+                the executor after each call to scale_noise, then averaged.
             max_iterations: Maximum number of iterations (optional).
-                            Default: 100.
         """
 
-        def _noise_to_expval(noise_param: float) -> float:
-            """Evaluates the quantum expectation value for a given noise_
-            param"""
-            scaled_qp = scale_noise(qp, noise_param)
-            return executor(scaled_qp)
+        def _noise_to_expval(scale_factor, **exec_params) -> float:
+            """Evaluates the quantum expectation value for a given
+            scale_factor and other executor parameters."""
+            expectation_values = []
+            for _ in range(num_to_average):
+                scaled_qp = scale_noise(qp, scale_factor)
+                expectation_values.append(executor(scaled_qp, **exec_params))
+            return np.average(expectation_values)
 
         return self.iterate(_noise_to_expval, max_iterations)
 
     def __eq__(self, other):
-        return (
-                np.allclose(self.instack, other.instack) and
-                np.allclose(self.outstack, other.outstack)
-        )
+        if len(self.instack) != len(other.instack):
+            return False
+        for dict_a, dict_b in zip(self.instack, other.instack):
+            if not _are_close_dict(dict_a, dict_b):
+                return False
+        return np.allclose(self.outstack, other.outstack)
 
 
 class BatchedFactory(Factory):
-    """
-    Abstract class of a non-adaptive Factory.
+    """Abstract class of a non-adaptive Factory.
 
     This is initialized with a given batch of "scale_factors".
     The "self.next" method trivially iterates over the elements of
@@ -260,34 +300,69 @@ class BatchedFactory(Factory):
     the "__init__" method.
 
     Args:
-        scale_factors: Iterable of noise scale factors at which
+        scale_factors: Sequence of noise scale factors at which
                        expectation values should be measured.
+        shot_list: Optional sequence of integers corresponding to the number
+                   of samples taken for each expectation value. If this
+                   argument is explicitly passed to the factory, it must have
+                   the same length of scale_factors and the executor function
+                   must accept "shots" as a valid keyword argument.
+
     Raises:
         ValueError: If the number of scale factors is less than 2.
         IndexError: If an iteration step fails.
     """
 
-    def __init__(self, scale_factors: Iterable[float]) -> None:
+    def __init__(
+        self,
+        scale_factors: Sequence[float],
+        shot_list: Optional[List[int]] = None,
+    ) -> None:
         """Instantiates a new object of this Factory class."""
         if len(scale_factors) < 2:
-            raise ValueError(
-                "At least 2 scale factors are necessary."
+            raise ValueError("At least 2 scale factors are necessary.")
+
+        if shot_list and (
+            not isinstance(shot_list, Sequence)
+            or not all([isinstance(shots, int) for shots in shot_list])
+        ):
+            raise TypeError(
+                "The optional argument shot_list must be None "
+                "or a valid iterator of integers."
             )
+        if shot_list and (len(scale_factors) != len(shot_list)):
+            raise IndexError(
+                "The arguments scale_factors and shot_list"
+                " must have the same length."
+                f" But len(scale_factors) is {len(scale_factors)}"
+                f" and len(shot_list) is {len(shot_list)}."
+            )
+
         self._scale_factors = scale_factors
+        self._shot_list = shot_list
+
         super(BatchedFactory, self).__init__()
 
     def next(self) -> float:
+        """Returns a dictionary of parameters to execute a circuit at."""
+        in_params = {}
         try:
-            next_param = self._scale_factors[len(self.outstack)]
+            index = len(self.outstack)
+            in_params["scale_factor"] = self._scale_factors[index]
+            if self._shot_list:
+                in_params["shots"] = self._shot_list[index]
         except IndexError:
             raise IndexError(
                 "BatchedFactory cannot take another step. "
                 "Number of batched scale_factors"
                 f" ({len(self._scale_factors)}) exceeded."
             )
-        return next_param
+        return in_params
 
     def is_converged(self) -> bool:
+        """Returns True if all needed expectation values have been computed,
+        else False.
+        """
         if len(self.outstack) != len(self.instack):
             raise IndexError(
                 f"The length of 'self.instack' ({len(self.instack)}) "
@@ -295,13 +370,9 @@ class BatchedFactory(Factory):
             )
         return len(self.outstack) == len(self._scale_factors)
 
-    def reduce(self) -> float:
-        raise NotImplementedError
-
     def __eq__(self, other):
-        return (
-                Factory.__eq__(self, other) and
-                np.allclose(self._scale_factors, other._scale_factors)
+        return Factory.__eq__(self, other) and np.allclose(
+            self._scale_factors, other._scale_factors
         )
 
 
@@ -311,18 +382,30 @@ class PolyFactory(BatchedFactory):
     a polynomial fit.
 
     Args:
-        scale_factors: Iterable of noise scale factors at which
+        scale_factors: Sequence of noise scale factors at which
                        expectation values should be measured.
         order: Extrapolation order (degree of the polynomial fit).
                It cannot exceed len(scale_factors) - 1.
+        shot_list: Optional sequence of integers corresponding to the number
+                   of samples taken for each expectation value. If this
+                   argument is explicitly passed to the factory, it must have
+                   the same length of scale_factors and the executor function
+                   must accept "shots" as a valid keyword argument.
+
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
+
     Note:
         RichardsonFactory and LinearFactory are special cases of PolyFactory.
     """
 
-    def __init__(self, scale_factors: Iterable[float], order: int) -> None:
+    def __init__(
+        self,
+        scale_factors: Sequence[float],
+        order: int,
+        shot_list: Optional[List[int]] = None,
+    ) -> None:
         """Instantiates a new object of this Factory class."""
 
         if order > len(scale_factors) - 1:
@@ -330,11 +413,11 @@ class PolyFactory(BatchedFactory):
                 "The extrapolation order cannot exceed len(scale_factors) - 1."
             )
         self.order = order
-        super(PolyFactory, self).__init__(scale_factors)
+        super(PolyFactory, self).__init__(scale_factors, shot_list)
 
     @staticmethod
     def static_reduce(
-            instack: List[float], outstack: List[float], order: int
+        instack: List[dict], exp_values: List[float], order: int
     ) -> float:
         """
         Determines with a least squared method, the polynomial of degree equal
@@ -347,30 +430,32 @@ class PolyFactory(BatchedFactory):
         and RichardsonFactory.
 
         Args:
-            instack: The array of noise scale factors.
-            outstack: The array of expectation values.
+            instack: The array of input dictionaries, where each
+                     dictionary is supposed to have the key "scale_factor".
+            exp_values: The array of expectation values.
             order: Extrapolation order (degree of the polynomial fit).
                    It cannot exceed len(scale_factors) - 1.
         Raises:
             ValueError: If data is not consistent with the extrapolation model.
             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
         """
+        scale_factors = _instack_to_scale_factors(instack)
         # Check arguments
         error_str = (
             "Data is not enough: at least two data points are necessary."
         )
-        if instack is None or outstack is None:
+        if scale_factors is None or exp_values is None:
             raise ValueError(error_str)
-        if len(instack) != len(outstack) or len(instack) < 2:
+        if len(scale_factors) != len(exp_values) or len(scale_factors) < 2:
             raise ValueError(error_str)
-        if order > len(instack) - 1:
+        if order > len(scale_factors) - 1:
             raise ValueError(
                 "Extrapolation order is too high. "
                 "The order cannot exceed the number of data points minus 1."
             )
         # Get coefficients {c_j} of p(x)= c_0 + c_1*x + c_2*x**2...
         # which best fits the data
-        coefficients = mitiq_polyfit(instack, outstack, deg=order)
+        coefficients = mitiq_polyfit(scale_factors, exp_values, deg=order)
         # c_0, i.e., the value of p(x) at x=0, is returned
         return coefficients[-1]
 
@@ -392,8 +477,13 @@ class RichardsonFactory(BatchedFactory):
     """Factory object implementing Richardson's extrapolation.
 
     Args:
-        scale_factors: Iterable of noise scale factors at which
+        scale_factors: Sequence of noise scale factors at which
                        expectation values should be measured.
+        shot_list: Optional sequence of integers corresponding to the number
+                   of samples taken for each expectation value. If this
+                   argument is explicitly passed to the factory, it must have
+                   the same length of scale_factors and the executor function
+                   must accept "shots" as a valid keyword argument.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
@@ -415,8 +505,13 @@ class LinearFactory(BatchedFactory):
     on a linear fit.
 
     Args:
-        scale_factors: Iterable of noise scale factors at which
+        scale_factors: Sequence of noise scale factors at which
                        expectation values should be measured.
+        shot_list: Optional sequence of integers corresponding to the number
+                   of samples taken for each expectation value. If this
+                   argument is explicitly passed to the factory, it must have
+                   the same length of scale_factors and the executor function
+                   must accept "shots" as a valid keyword argument.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
@@ -447,12 +542,17 @@ class ExpFactory(BatchedFactory):
     model is mapped into a linear model by logarithmic transformation.
 
     Args:
-        scale_factors: Iterable of noise scale factors at which
+        scale_factors: Sequence of noise scale factors at which
                        expectation values should be measured.
         asymptote: Infinite-noise limit (optional argument).
         avoid_log: If set to True, the exponential model is not linearized
                    with a logarithm and a non-linear fit is applied even
                    if asymptote is not None. The default value is False.
+        shot_list: Optional sequence of integers corresponding to the number
+                   of samples taken for each expectation value. If this
+                   argument is explicitly passed to the factory, it must have
+                   the same length of scale_factors and the executor function
+                   must accept "shots" as a valid keyword argument.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationError: If the extrapolation fit fails.
@@ -460,12 +560,14 @@ class ExpFactory(BatchedFactory):
     """
 
     def __init__(
-            self, scale_factors: Iterable[float],
-            asymptote: Optional[float] = None,
-            avoid_log: bool = False,
+        self,
+        scale_factors: Sequence[float],
+        asymptote: Optional[float] = None,
+        avoid_log: bool = False,
+        shot_list: Optional[List[int]] = None,
     ) -> None:
         """Instantiate an new object of this Factory class."""
-        super(ExpFactory, self).__init__(scale_factors)
+        super(ExpFactory, self).__init__(scale_factors, shot_list)
         if not (asymptote is None or isinstance(asymptote, float)):
             raise ValueError(
                 "The argument 'asymptote' must be either a float or None"
@@ -475,25 +577,31 @@ class ExpFactory(BatchedFactory):
 
     def reduce(self) -> float:
         """Returns the zero-noise limit"""
-        return PolyExpFactory.static_reduce(self.instack,
-                                            self.outstack,
-                                            self.asymptote,
-                                            order=1,
-                                            avoid_log=self.avoid_log)[0]
+        return PolyExpFactory.static_reduce(
+            self.instack,
+            self.outstack,
+            self.asymptote,
+            order=1,
+            avoid_log=self.avoid_log,
+        )[0]
 
     def __eq__(self, other):
-        if (self.asymptote and other.asymptote is None or
-                self.asymptote is None and other.asymptote):
+        if (
+            self.asymptote
+            and other.asymptote is None
+            or self.asymptote is None
+            and other.asymptote
+        ):
             return False
         if self.asymptote is None and other.asymptote is None:
             return (
-                    BatchedFactory.__eq__(self, other) and
-                    self.avoid_log == other.avoid_log
+                BatchedFactory.__eq__(self, other)
+                and self.avoid_log == other.avoid_log
             )
         return (
-                BatchedFactory.__eq__(self, other) and
-                np.isclose(self.asymptote, other.asymptote) and
-                self.avoid_log == other.avoid_log
+            BatchedFactory.__eq__(self, other)
+            and np.isclose(self.asymptote, other.asymptote)
+            and self.avoid_log == other.avoid_log
         )
 
 
@@ -515,7 +623,7 @@ class PolyExpFactory(BatchedFactory):
     model is mapped into a polynomial model by logarithmic transformation.
 
     Args:
-        scale_factors: Iterable of noise scale factors at which
+        scale_factors: Sequence of noise scale factors at which
                        expectation values should be measured.
         order: Extrapolation order (degree of the polynomial z(x)).
                It cannot exceed len(scale_factors) - 1.
@@ -525,19 +633,27 @@ class PolyExpFactory(BatchedFactory):
         avoid_log: If set to True, the exponential model is not linearized
                    with a logarithm and a non-linear fit is applied even
                    if asymptote is not None. The default value is False.
+        shot_list: Optional sequence of integers corresponding to the number
+                   of samples taken for each expectation value. If this
+                   argument is explicitly passed to the factory, it must have
+                   the same length of scale_factors and the executor function
+                   must accept "shots" as a valid keyword argument.
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationError: If the extrapolation fit fails.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
     """
 
-    def __init__(self,
-                 scale_factors: Iterable[float],
-                 order: int,
-                 asymptote: Optional[float] = None,
-                 avoid_log: bool = False) -> None:
+    def __init__(
+        self,
+        scale_factors: Sequence[float],
+        order: int,
+        asymptote: Optional[float] = None,
+        avoid_log: bool = False,
+        shot_list: Optional[List[int]] = None,
+    ) -> None:
         """Instantiates a new object of this Factory class."""
-        super(PolyExpFactory, self).__init__(scale_factors)
+        super(PolyExpFactory, self).__init__(scale_factors, shot_list)
         if not (asymptote is None or isinstance(asymptote, float)):
             raise ValueError(
                 "The argument 'asymptote' must be either a float or None"
@@ -547,12 +663,14 @@ class PolyExpFactory(BatchedFactory):
         self.avoid_log = avoid_log
 
     @staticmethod
-    def static_reduce(instack: List[float],
-                      outstack: List[float],
-                      asymptote: Optional[float],
-                      order: int,
-                      avoid_log: bool = False,
-                      eps: float = 1.0e-6) -> Tuple[float, List[float]]:
+    def static_reduce(
+        instack: List[dict],
+        exp_values: List[float],
+        asymptote: Optional[float],
+        order: int,
+        avoid_log: bool = False,
+        eps: float = 1.0e-6,
+    ) -> Tuple[float, List[float]]:
         """
         Determines the zero-noise limit, assuming an exponential ansatz:
         y(x) = a + sign * exp(z(x)), where z(x) is a polynomial.
@@ -574,8 +692,9 @@ class PolyExpFactory(BatchedFactory):
         related to PolyExpFactory, e.g., ExpFactory, AdaExpFactory.
 
         Args:
-            instack: x data values.
-            outstack: y data values.
+            instack: The array of input dictionaries, where each
+                     dictionary is supposed to have the key "scale_factor".
+            exp_values: The array of expectation values.
             asymptote: y(x->inf).
             order: Extrapolation order (degree of the polynomial z(x)).
             avoid_log: If set to True, the exponential model is not linearized
@@ -591,23 +710,30 @@ class PolyExpFactory(BatchedFactory):
             ExtrapolationError: If the extrapolation fit fails.
             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
         """
+
         # Shift is 0 if asymptote is given, 1 if asymptote is not given
         shift = int(asymptote is None)
+
+        scale_factors = _instack_to_scale_factors(instack)
+
         # Check arguments
         error_str = (
             "Data is not enough: at least two data points are necessary."
         )
-        if instack is None or outstack is None:
+
+        if scale_factors is None or exp_values is None:
             raise ValueError(error_str)
-        if len(instack) != len(outstack) or len(instack) < 2:
+        if len(scale_factors) != len(exp_values) or len(scale_factors) < 2:
             raise ValueError(error_str)
-        if order > len(instack) - (1 + shift):
-            raise ValueError("Extrapolation order is too high. "
-                             "The order cannot exceed the number"
-                             f" of data points minus {1 + shift}.")
+        if order > len(scale_factors) - (1 + shift):
+            raise ValueError(
+                "Extrapolation order is too high. "
+                "The order cannot exceed the number"
+                f" of data points minus {1 + shift}."
+            )
 
         # Deduce "sign" parameter of the exponential ansatz
-        slope, _ = mitiq_polyfit(instack, outstack, deg=1)
+        slope, _ = mitiq_polyfit(scale_factors, exp_values, deg=1)
         sign = np.sign(-slope)
 
         def _ansatz_unknown(x: float, *coeffs: float):
@@ -626,10 +752,9 @@ class PolyExpFactory(BatchedFactory):
         if asymptote is None:
             # First guess for the parameter (decay or growth from "sign" to 0)
             p_zero = [0.0, sign, -1.0] + [0.0 for _ in range(order - 1)]
-            opt_params = mitiq_curve_fit(_ansatz_unknown,
-                                         instack,
-                                         outstack,
-                                         p_zero)
+            opt_params = mitiq_curve_fit(
+                _ansatz_unknown, scale_factors, exp_values, p_zero
+            )
             # The zero noise limit is ansatz(0)= asympt + b
             zero_limit = opt_params[0] + opt_params[1]
             return (zero_limit, opt_params)
@@ -638,26 +763,27 @@ class PolyExpFactory(BatchedFactory):
         if avoid_log:
             # First guess for the parameter (decay or growth from "sign")
             p_zero = [sign, -1.0] + [0.0 for _ in range(order - 1)]
-            opt_params = mitiq_curve_fit(_ansatz_known,
-                                         instack,
-                                         outstack,
-                                         p_zero)
+            opt_params = mitiq_curve_fit(
+                _ansatz_known, scale_factors, exp_values, p_zero
+            )
             # The zero noise limit is ansatz(0)= asymptote + b
             zero_limit = asymptote + opt_params[0]
             return (zero_limit, [asymptote] + list(opt_params))
 
         # CASE 3: asymptote is given and "avoid_log" is False
         # Polynomial fit of z(x).
-        shifted_y = [max(sign * (y - asymptote), eps) for y in outstack]
+        shifted_y = [max(sign * (y - asymptote), eps) for y in exp_values]
         zstack = np.log(shifted_y)
         # Get coefficients {z_j} of z(x)= z_0 + z_1*x + z_2*x**2...
         # Note: coefficients are ordered from high powers to powers of x
         # Weights "w" are used to compensate for error propagation
         # after the log transformation y --> z
-        z_coefficients = mitiq_polyfit(instack,
-                                       zstack,
-                                       deg=order,
-                                       weights=np.sqrt(np.abs(shifted_y)))
+        z_coefficients = mitiq_polyfit(
+            scale_factors,
+            zstack,
+            deg=order,
+            weights=np.sqrt(np.abs(shifted_y)),
+        )
         # The zero noise limit is ansatz(0)
         zero_limit = asymptote + sign * np.exp(z_coefficients[-1])
         # Parameters from low order to high order
@@ -666,18 +792,20 @@ class PolyExpFactory(BatchedFactory):
 
     def reduce(self) -> float:
         """Returns the zero-noise limit."""
-        return self.static_reduce(self.instack,
-                                  self.outstack,
-                                  self.asymptote,
-                                  self.order,
-                                  self.avoid_log)[0]
+        return self.static_reduce(
+            self.instack,
+            self.outstack,
+            self.asymptote,
+            self.order,
+            self.avoid_log,
+        )[0]
 
     def __eq__(self, other):
         return (
-                BatchedFactory.__eq__(self, other) and
-                np.isclose(self.asymptote, other.asymptote) and
-                self.avoid_log == other.avoid_log and
-                self.order == other.order
+            BatchedFactory.__eq__(self, other)
+            and np.isclose(self.asymptote, other.asymptote)
+            and self.avoid_log == other.avoid_log
+            and self.order == other.order
         )
 
 
@@ -715,12 +843,12 @@ class AdaExpFactory(Factory):
     _SHIFT_FACTOR = 1.27846
 
     def __init__(
-            self,
-            steps: int,
-            scale_factor: float = 2,
-            asymptote: Optional[float] = None,
-            avoid_log: bool = False,
-            max_scale_factor: float = 6.0
+        self,
+        steps: int,
+        scale_factor: float = 2.0,
+        asymptote: Optional[float] = None,
+        avoid_log: bool = False,
+        max_scale_factor: float = 6.0,
     ) -> None:
         """Instantiate a new object of this Factory class."""
         super(AdaExpFactory, self).__init__()
@@ -733,13 +861,17 @@ class AdaExpFactory(Factory):
                 "The argument 'scale_factor' must be strictly larger than one."
             )
         if steps < 3 + int(asymptote is None):
-            raise ValueError("The argument 'steps' must be an integer"
-                             " greater or equal to 3. "
-                             "If 'asymptote' is None, 'steps' must be"
-                             " greater or equal to 4.")
+            raise ValueError(
+                "The argument 'steps' must be an integer"
+                " greater or equal to 3. "
+                "If 'asymptote' is None, 'steps' must be"
+                " greater or equal to 4."
+            )
         if max_scale_factor <= 1:
-            raise ValueError("The argument 'max_scale_factor' must be"
-                             " strictly larger than one.")
+            raise ValueError(
+                "The argument 'max_scale_factor' must be"
+                " strictly larger than one."
+            )
         self._steps = steps
         self._scale_factor = scale_factor
         self.asymptote = asymptote
@@ -747,20 +879,21 @@ class AdaExpFactory(Factory):
         self.max_scale_factor = max_scale_factor
         # Keep a log of the optimization process storing:
         # noise value(s), expectation value(s), parameters, and zero limit
-        self.history = [
-        ]  # type: List[Tuple[List[float], List[float], List[float], float]]
+        self.history = (
+            []
+        )  # type: List[Tuple[List[float], List[float], List[float], float]]
 
     def next(self) -> float:
-        """Returns the next noise level to execute a circuit at."""
+        """Returns a dictionary of parameters to execute a circuit at."""
         # The 1st scale factor is always 1
         if len(self.instack) == 0:
-            return 1.0
+            return {"scale_factor": 1.0}
         # The 2nd scale factor is self._scale_factor
         if len(self.instack) == 1:
-            return self._scale_factor
+            return {"scale_factor": self._scale_factor}
         # If asymptote is None we use 2 * scale_factor as third noise parameter
         if (len(self.instack) == 2) and (self.asymptote is None):
-            return 2 * self._scale_factor
+            return {"scale_factor": 2 * self._scale_factor}
 
         with warnings.catch_warnings():
             # This is an intermediate fit, so we suppress its warning messages
@@ -773,9 +906,10 @@ class AdaExpFactory(Factory):
         exponent = params[2]
         # Further noise scale factors are determined with
         # an adaptive rule which depends on self.exponent
-        next_scale_factor = min(1.0 + self._SHIFT_FACTOR / np.abs(exponent),
-                                self.max_scale_factor)
-        return next_scale_factor
+        next_scale_factor = min(
+            1.0 + self._SHIFT_FACTOR / np.abs(exponent), self.max_scale_factor
+        )
+        return {"scale_factor": next_scale_factor}
 
     def is_converged(self) -> bool:
         """Returns True if all the needed expectation values have been
@@ -803,10 +937,10 @@ class AdaExpFactory(Factory):
 
     def __eq__(self, other) -> bool:
         return (
-                Factory.__eq__(self, other) and
-                self._steps == other._steps and
-                self._scale_factor_ == other._scale_factor and
-                np.isclose(self.asymptote, other.asymptote) and
-                self.avoid_log == other.avoid_log and
-                np.allclose(self.history, other.history)
+            Factory.__eq__(self, other)
+            and self._steps == other._steps
+            and self._scale_factor == other._scale_factor
+            and np.isclose(self.asymptote, other.asymptote)
+            and self.avoid_log == other.avoid_log
+            and np.allclose(self.history, other.history)
         )

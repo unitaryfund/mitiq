@@ -1,4 +1,4 @@
-.. _guide-getting-started
+.. _guide-getting-started:
 
 *********************************************
 Getting Started
@@ -12,6 +12,22 @@ This getting started shows examples using cirq
 `qiskit <https://qiskit.org/>`_. We'll first test ``mitiq`` by running
 against the noisy simulator built into ``cirq``. The qiskit example work
 similarly as you will see in :ref:`Qiskit Mitigation <qiskit_getting_started>`.
+
+
+Multi-platform Framework
+----------------------------------------------
+In ``mitiq``, a "back-end" is a function that executes quantum programs. A
+"front-end" is a library/language that constructs quantum programs. ``mitiq``
+lets you mix and match these. For example, you could write a quantum program in
+``qiskit`` and then execute it using a ``cirq`` backend, or vice versa.
+
+Back-ends are abstracted to functions called ``executors`` that always accept
+a quantum program, sometimes accept other arguments, and always
+return an expectation value as a float. You can see some examples of different
+executors for common packages :ref:`here <guide-executors>` and in this
+getting started. If your quantum programming interface of choice can be used
+to make a Python function with this type, then it can be used with mitiq.
+
 
 Error Mitigation with Zero-Noise Extrapolation
 ----------------------------------------------
@@ -35,8 +51,7 @@ We define some functions that make it simpler to simulate noise in
             circ: The quantum program as a cirq object.
 
         Returns:
-            The observable's measurements as as
-            tuple (expectation value, variance).
+            The expectation value of the |0> state.
         """
         circuit = circ.with_noise(depolarize(p=NOISE))
         rho = SIMULATOR.simulate(circuit).final_density_matrix
@@ -101,6 +116,7 @@ error-mitigated version.
 
     0.99948
 
+.. _partial-note:
 
 .. note::
    As shown here, ``mitiq`` wraps executor functions that have a specific type:

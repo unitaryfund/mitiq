@@ -143,8 +143,10 @@ def scale_noise(pq: Program, param: float) -> Program:
         Quantum program with added noise.
     """
     noise = param * NATIVE_NOISE
-    assert (noise <= 1.0), "Noise scaled to {} is out of bounds (<=1.0) for " \
+    assert noise <= 1.0, (
+        "Noise scaled to {} is out of bounds (<=1.0) for "
         "depolarizing channel.".format(noise)
+    )
     return add_depolarizing_noise(pq, noise)
 
 
