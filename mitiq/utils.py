@@ -7,9 +7,10 @@ from cirq.ops.measurement_gate import MeasurementGate
 
 
 def _simplify_gate(gate: Gate) -> Gate:
-    """If possible, returns a simpler but equivalent gate.
-    Otherwise, the input gate is returned.
-    The input does not mutate.
+    """Returns a simpler but equivalent gate if possible,
+    otherwise the input gate is returned.
+    
+    The input gate is not mutated.
 
     Args:
         gate: The input gate to simplify.
