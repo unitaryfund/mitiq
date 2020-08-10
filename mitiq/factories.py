@@ -168,6 +168,16 @@ class Factory(ABC):
         self.instack.append(instack_val)
         self.outstack.append(outstack_val)
 
+    def get_scale_factors(self) -> np.ndarray:
+        """Returns the scale factors at which the factory has computed
+        expectation values.
+        """
+        return np.array([params.get("scale_factor") for params in self.instack])
+
+    def get_expectation_values(self) -> np.ndarray:
+        """Returns the expectation values computed by the factory."""
+        return np.array(self.outstack)
+
     @abstractmethod
     def next(self) -> float:
         """Returns a dictionary of parameters to execute a circuit at."""
