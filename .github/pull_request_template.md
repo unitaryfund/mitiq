@@ -5,32 +5,20 @@ Describe here the proposed change. Thank you for contributing to mitiq! 🙂
 
 Checklist
 -----------
-Please make sure you have finished the following tasks before opening the pull request (PR).
+Please make sure you have finished the following tasks before requesting a review of the pull request (PR).
 
 - [ ] Please read [Contributing to mitiq](https://github.com/unitaryfund/mitiq/blob/master/CONTRIBUTING.md)
-- [ ] Contributions to mitiq should follow the [pep8 style](https://www.python.org/dev/peps/pep-0008/). You can enforce it easily with `black`
-- [ ] Please add tests to cover your changes if applicable.
-- [ ] If the behavior of the code has changed or new feature has been added, please also update the documentation, after reading [Contributing to mitiq documentation](https://github.com/unitaryfund/mitiq/blob/master/docs/README-docs.md).
-
-Delete this checklist after you have completed all the tasks. If you have not finished them all, you can also open a [Draft Pull Request](https://github.blog/2019-02-14-introducing-draft-pull-requests/) to let the others know this on-going work and keep this checklist in the PR description.
-
-
-Related issues or PRs
----------------------
-Please mention the related issues or PRs here. If the PR fixes an issue, use the keyword fix/fixes/fixed followed by the issue id. For example, if the PR fixes issue 1184, type "Fixes #1184" (without quotes).
-
-Changelog
----------
-Give a short description of the PR in a few words. This will be shown in the mitiq change log after the PR gets merged.
-
-
-- [ ] There are unit tests that cover these changes.
+- [ ] Contributions to mitiq should follow the [pep8 style](https://www.python.org/dev/peps/pep-0008/). You can enforce it easily with [`black`][black] style and with [`flake8`][flake8] conventions.
+- [ ] Please add tests to cover your changes, if applicable.
 - [ ] All new and existing tests pass locally.
+- [ ] If the behavior of the code has changed or new feature has been added, please also update the documentation, after reading [Contributing to mitiq documentation](https://github.com/unitaryfund/mitiq/blob/master/docs/README-docs.md).
 - [ ] Functions and classes have useful [Google-style][google] docstrings and type hints in the signature of the objects.
-- [ ] All code follows [Black][black] style and obeys [`flake8`][flake8] conventions.
-- [ ] (New Feature) The [docs][docs] have been updated accordingly.
-- [ ] (Bugfix) The associated issue is referenced above using [auto-close keywords][auto-close].
 - [ ] The [changelog][changelog] is updated, including author and PR number (@username, gh-xxx).
+- [ ] (Bug fix) The associated issue is referenced above using [auto-close keywords][auto-close]. If the PR fixes an issue, use the keyword fix/fixes/fixed followed by the issue id. For example, if the PR fixes issue 1184, type "Fixes #1184" (without quotes).
+
+
+If you have not finished all tasks in the checklist, you can also open a [Draft Pull Request](https://github.blog/2019-02-14-introducing-draft-pull-requests/) to let the others know this on-going work and keep this checklist in the PR description.
+
 
 
 [auto-close]: https://help.github.com/en/articles/closing-issues-using-keywords
