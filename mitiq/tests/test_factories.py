@@ -8,7 +8,6 @@ from pytest import mark, raises, warns
 import numpy as np
 from numpy.random import RandomState
 from mitiq.factories import (
-    _are_close_dict,
     ExtrapolationError,
     ExtrapolationWarning,
     ConvergenceWarning,
@@ -368,23 +367,3 @@ def test_shot_list_errors():
         PolyFactory(X_VALS, order=2, shot_list=[1, 2])
     with raises(TypeError, match=r"valid iterator of integers"):
         PolyFactory(X_VALS, order=2, shot_list=[1.0, 2])
-
-
-def test_are_close_dict():
-    """Tests the _are_close_dict function."""
-    dict1 = {"a": 1, "b": 0.0}
-    dict2 = {"a": 1, "b": 0.0 + 1.0e-10}
-    assert _are_close_dict(dict1, dict2)
-    assert _are_close_dict(dict2, dict1)
-    dict2 = {"b": 0.0 + 1.0e-10, "a": 1}
-    assert _are_close_dict(dict1, dict2)
-    assert _are_close_dict(dict2, dict1)
-    dict2 = {"a": 1, "b": 1.0}
-    assert not _are_close_dict(dict1, dict2)
-    assert not _are_close_dict(dict2, dict1)
-    dict2 = {"b": 1, "a": 0.0}
-    assert not _are_close_dict(dict1, dict2)
-    assert not _are_close_dict(dict2, dict1)
-    dict2 = {"a": 1, "b": 0.0, "c": 1}
-    assert not _are_close_dict(dict1, dict2)
-    assert not _are_close_dict(dict2, dict1)
