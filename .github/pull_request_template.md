@@ -17,7 +17,7 @@ Delete this checklist after you have completed all the tasks. If you have not fi
 
 Related issues or PRs
 ---------------------
-Please mention the related issues or PRs here. If the PR fixes an issue, use the keyword fix/fixes/fixed followed by the issue id, e.g. fix #1184
+Please mention the related issues or PRs here. If the PR fixes an issue, use the keyword fix/fixes/fixed followed by the issue id. For example, if the PR fixes issue 1184, type "Fixes #1184" (without quotes).
 
 Changelog
 ---------
