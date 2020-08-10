@@ -24,11 +24,11 @@ def _simplify_gate(gate: Gate) -> Gate:
 
 
 def _simplify_circuit(circuit: Circuit) -> None:
-    """If possible, mutates each gate of the
-    input circuit with a simpler but equivalent gate.
+    """Replaces each gate of the input circuit with a simpler
+    but equivalent gate if possible, mutating the input circuit.
 
     Args:
-        gate: The input circuit to simplify.
+        circuit: Circuit to simplify.
     """
     # iterate over moments
     for moment_idx, moment in enumerate(circuit):
