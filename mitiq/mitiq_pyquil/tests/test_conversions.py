@@ -41,7 +41,6 @@ def maxcut_qaoa_program(gamma: float) -> Program:
     return p
 
 
-# TODO: bug in to_quil, need to write a Cirq PR to fix
-# def test_to_pyquil_from_pyquil_parameterized():
-#     p = maxcut_qaoa_program(np.pi)
-#     assert p.out() == to_pyquil(from_pyquil(p)).out()
+def test_to_pyquil_from_pyquil_parameterized():
+    p = maxcut_qaoa_program(np.pi)
+    assert p.out() == to_pyquil(from_pyquil(p)).out()
