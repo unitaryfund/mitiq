@@ -14,7 +14,7 @@ Please make sure you have finished the following tasks before requesting a revie
 - [ ] Please add tests to cover your changes, if applicable.
 - [ ] All new and existing tests pass locally.
 - [ ] If the behavior of the code has changed or new feature has been added, please also [update the documentation](docs/README-docs.md).
-- [ ] Functions and classes have useful [Google-style][google] docstrings and type hints in the signature of the objects.
+- [ ] Functions and classes have useful [Google-style][google] docstrings and [type hints][hints] in the signature of the objects.
 - [ ] The [changelog][changelog] is updated, including author and PR number (@username, gh-xxx).
 
 
@@ -27,5 +27,6 @@ If you have not finished all tasks in the checklist, you can also open a [Draft 
 [contributing]: https://github.com/unitaryfund/mitiq/blob/master/CONTRIBUTING.md
 [docs]: https://github.com/unitaryfund/mitiq/blob/master/docs/source/
 [flake8]: http://flake8.pycqa.org
-[pep-484]: https://www.python.org/dev/peps/pep-0484/
 [google]: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
+[hints]: https://www.python.org/dev/peps/pep-0484/
+[pep-484]: https://www.python.org/dev/peps/pep-0484/
