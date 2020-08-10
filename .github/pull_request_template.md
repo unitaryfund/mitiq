@@ -7,7 +7,8 @@ Checklist
 -----------
 Please make sure you have finished the following tasks before requesting a review of the pull request (PR).
 
-- [ ] Please read [Contributing to mitiq](https://github.com/unitaryfund/mitiq/blob/master/CONTRIBUTING.md)
+Please make sure you have finished the following tasks before requesting a review of the pull request (PR). For more information, please refer to the [Contributor's Guide](CONTRIBUTING.md):
+
 - [ ] Contributions to mitiq should follow the [pep8 style](https://www.python.org/dev/peps/pep-0008/). You can enforce it easily with [`black`][black] style and with [`flake8`][flake8] conventions.
 - [ ] Please add tests to cover your changes, if applicable.
 - [ ] All new and existing tests pass locally.
