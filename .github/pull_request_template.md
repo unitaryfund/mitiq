@@ -24,7 +24,7 @@ Changelog
 Give a short description of the PR in a few words. This will be shown in the mitiq change log after the PR gets merged.
 
 
-- [ ] There is a unit test that covers these changes.
+- [ ] There are unit tests that cover these changes.
 - [ ] All new and existing tests pass locally.
 - [ ] Functions and classes have useful [Google-style][google] docstrings and type hints in the signature of the objects.
 - [ ] All code follows [Black][black] style and obeys [`flake8`][flake8] conventions.
