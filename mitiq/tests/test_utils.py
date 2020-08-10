@@ -1,11 +1,11 @@
-"""Unit test for utility functions."""
+"""Tests for utility functions."""
 
 from copy import deepcopy
 import pytest
 
 import cirq
 
-from mitiq.utils import _equal
+from mitiq.utils import _are_close_dict, _equal
 
 
 @pytest.mark.parametrize("require_qubit_equality", [True, False])
@@ -170,3 +170,23 @@ def test_circuit_equality_equal_measurement_keys_nonterminal_measurements(
     assert _equal(
         circ1, circ2, require_measurement_equality=require_measurement_equality
     )
+
+
+def test_are_close_dict():
+    """Tests the _are_close_dict function."""
+    dict1 = {"a": 1, "b": 0.0}
+    dict2 = {"a": 1, "b": 0.0 + 1.0e-10}
+    assert _are_close_dict(dict1, dict2)
+    assert _are_close_dict(dict2, dict1)
+    dict2 = {"b": 0.0 + 1.0e-10, "a": 1}
+    assert _are_close_dict(dict1, dict2)
+    assert _are_close_dict(dict2, dict1)
+    dict2 = {"a": 1, "b": 1.0}
+    assert not _are_close_dict(dict1, dict2)
+    assert not _are_close_dict(dict2, dict1)
+    dict2 = {"b": 1, "a": 0.0}
+    assert not _are_close_dict(dict1, dict2)
+    assert not _are_close_dict(dict2, dict1)
+    dict2 = {"a": 1, "b": 0.0, "c": 1}
+    assert not _are_close_dict(dict1, dict2)
+    assert not _are_close_dict(dict2, dict1)
