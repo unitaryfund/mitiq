@@ -4,7 +4,7 @@ from copy import deepcopy
 import pytest
 
 import cirq
-from cirq import LineQubit, Circuit, X, Y, Z, H, CNOT, S, T
+from cirq import LineQubit, Circuit, X, Y, Z, H, CNOT, S, T, MeasurementGate
 
 from mitiq.utils import (
     _equal,
@@ -177,25 +177,18 @@ def test_circuit_equality_equal_measurement_keys_nonterminal_measurements(
     )
 
 
-@pytest.mark.parametrize("gate", [X, Y, Z, H])
+@pytest.mark.parametrize("gate", [X ** 3, Y ** -3, Z ** -1, H ** -1])
 def test_simplify_gate_exponent(gate):
-    inverse_gate = gate ** -1
-    # check the inverse is initially represented differently
-    assert gate.__str__() != inverse_gate.__str__()
-    # simplify
-    simplfied_inverse = _simplify_gate_exponent(inverse_gate)
-    # test the gate was simplified
-    assert gate.__str__() == simplfied_inverse.__str__()
+    # Check exponent is simplified to 1
+    assert _simplify_gate_exponent(gate).exponent == 1
+    # Check simplified gate is equivalent to the input
+    assert _simplify_gate_exponent(gate) == gate
 
 
-@pytest.mark.parametrize("gate", [T, S])
-def test_simplify_gate_exponent_with_non_self_inverse_gates(gate):
-    inverse_gate = gate ** -1
-    inverse_repr_before = inverse_gate.__str__()
-    simplified_inverse = _simplify_gate_exponent(inverse_gate)
-    inverse_repr_after = simplified_inverse.__str__()
-    # check no simplification occurred
-    assert inverse_repr_before == inverse_repr_after
+@pytest.mark.parametrize("gate", [T ** -1, S ** -1, MeasurementGate(1)])
+def test_simplify_gate_exponent_with_gates_that_cannot_be_simplified(gate):
+    # Check the gate is not simplified (same representation)
+    assert _simplify_gate_exponent(gate).__repr__() == gate.__repr__()
 
 
 def test_simplify_circuit_exponents():
