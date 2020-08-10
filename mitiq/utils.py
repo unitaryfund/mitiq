@@ -2,14 +2,14 @@
 
 from copy import deepcopy
 
-from cirq import Circuit, CircuitDag, Gate, Moment, X, Y, Z, H, CNOT, CZ
+from cirq import Circuit, CircuitDag, Gate, Moment
 from cirq.ops.measurement_gate import MeasurementGate
 
 
 def _simplify_gate(gate: Gate) -> Gate:
     """Returns a simpler but equivalent gate if possible,
     otherwise the input gate is returned.
-    
+
     The input gate is not mutated.
 
     Args:
@@ -17,9 +17,8 @@ def _simplify_gate(gate: Gate) -> Gate:
 
     Returns: The simplified gate.
     """
-    # this set of gates can be extended if necessary
-    SIMPLE_GATES = [X, Y, Z, H, CNOT, CZ]
-    if gate in SIMPLE_GATES:
+    # Try to simplify the gate exponent to 1
+    if hasattr(gate, "_with_exponent") and gate == gate._with_exponent(1):
         return gate._with_exponent(1)
     return gate
 
