@@ -110,7 +110,13 @@ def test_noise_seeding(test_f: Callable[[float], float]):
 
 @mark.parametrize(
     "factory",
-    (LinearFactory, RichardsonFactory, PolyFactory, ExpFactory, PolyExpFactory)
+    (
+        LinearFactory,
+        RichardsonFactory,
+        PolyFactory,
+        ExpFactory,
+        PolyExpFactory,
+    ),
 )
 def test_get_scale_factors_static_factories(factory):
     scale_factors = np.linspace(1.0, 10.0, num=20)
@@ -144,7 +150,16 @@ def test_get_scale_factors_adaptive_factories(factory):
 
     # Given this seeded executor, the scale factors should be as follows
     correct_scale_factors = np.array(
-        [1.0, 2.0, 4.0, 4.20469548, 4.20310693, 4.2054822, 4.2031916, 4.2052843]
+        [
+            1.0,
+            2.0,
+            4.0,
+            4.20469548,
+            4.20310693,
+            4.2054822,
+            4.2031916,
+            4.2052843,
+        ]
     )
     assert len(fac.get_scale_factors()) == num_steps
     assert np.allclose(fac.get_scale_factors(), correct_scale_factors)
@@ -152,7 +167,13 @@ def test_get_scale_factors_adaptive_factories(factory):
 
 @mark.parametrize(
     "factory",
-    (LinearFactory, RichardsonFactory, PolyFactory, ExpFactory, PolyExpFactory)
+    (
+        LinearFactory,
+        RichardsonFactory,
+        PolyFactory,
+        ExpFactory,
+        PolyExpFactory,
+    ),
 )
 def test_get_expectation_values_static_factories(factory):
     scale_factors = np.linspace(1.0, 10.0, num=20)
@@ -190,7 +211,16 @@ def test_get_expectation_values_adaptive_factories(factory):
 
     # Given this seeded executor, the scale factors should be as follows
     correct_scale_factors = np.array(
-        [1.0, 2.0, 4.0, 4.20469548, 4.20310693, 4.2054822, 4.2031916, 4.2052843]
+        [
+            1.0,
+            2.0,
+            4.0,
+            4.20469548,
+            4.20310693,
+            4.2054822,
+            4.2031916,
+            4.2052843,
+        ]
     )
     correct_expectation_values = np.array(
         [executor(scale) for scale in correct_scale_factors]

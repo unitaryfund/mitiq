@@ -172,7 +172,9 @@ class Factory(ABC):
         """Returns the scale factors at which the factory has computed
         expectation values.
         """
-        return np.array([params.get("scale_factor") for params in self.instack])
+        return np.array(
+            [params.get("scale_factor") for params in self.instack]
+        )
 
     def get_expectation_values(self) -> np.ndarray:
         """Returns the expectation values computed by the factory."""
