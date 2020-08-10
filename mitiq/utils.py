@@ -18,9 +18,8 @@ def _simplify_gate(gate: Gate) -> Gate:
     """
     # this set of gates can be extended if necessary
     SIMPLE_GATES = [X, Y, Z, H, CNOT, CZ]
-    for simple_gate in SIMPLE_GATES:
-        if gate == simple_gate:
-            return simple_gate
+    if gate in SIMPLE_GATES:
+        return gate._with_exponent(1)
     return gate
 
 
