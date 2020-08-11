@@ -1,4 +1,4 @@
-"""Unit test for utility functions."""
+"""Tests for utility functions."""
 
 from copy import deepcopy
 import pytest
@@ -7,6 +7,7 @@ import cirq
 from cirq import LineQubit, Circuit, X, Y, Z, H, CNOT, S, T, MeasurementGate
 
 from mitiq.utils import (
+    _are_close_dict,
     _equal,
     _simplify_gate_exponent,
     _simplify_circuit_exponents,
@@ -239,3 +240,23 @@ def test_simplify_circuit_exponents_with_non_self_inverse_gates():
     simplified_qasm = inverse_circuit._to_qasm_output().__str__()
     assert simplified_repr == inverse_repr
     assert simplified_qasm == inverse_qasm
+
+
+def test_are_close_dict():
+    """Tests the _are_close_dict function."""
+    dict1 = {"a": 1, "b": 0.0}
+    dict2 = {"a": 1, "b": 0.0 + 1.0e-10}
+    assert _are_close_dict(dict1, dict2)
+    assert _are_close_dict(dict2, dict1)
+    dict2 = {"b": 0.0 + 1.0e-10, "a": 1}
+    assert _are_close_dict(dict1, dict2)
+    assert _are_close_dict(dict2, dict1)
+    dict2 = {"a": 1, "b": 1.0}
+    assert not _are_close_dict(dict1, dict2)
+    assert not _are_close_dict(dict2, dict1)
+    dict2 = {"b": 1, "a": 0.0}
+    assert not _are_close_dict(dict1, dict2)
+    assert not _are_close_dict(dict2, dict1)
+    dict2 = {"a": 1, "b": 0.0, "c": 1}
+    assert not _are_close_dict(dict1, dict2)
+    assert not _are_close_dict(dict2, dict1)

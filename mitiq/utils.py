@@ -2,6 +2,8 @@
 
 from copy import deepcopy
 
+import numpy as np
+
 from cirq import Circuit, CircuitDag, Gate, Moment
 from cirq.ops.measurement_gate import MeasurementGate
 
@@ -98,3 +100,16 @@ def _equal(
     return CircuitDag.from_circuit(circuit_one) == CircuitDag.from_circuit(
         circuit_two
     )
+
+
+def _are_close_dict(dict_a: dict, dict_b: dict) -> bool:
+    """Returns True if the two dictionaries have equal keys and
+    their corresponding values are "sufficiently" close."""
+    keys_a = dict_a.keys()
+    keys_b = dict_b.keys()
+    if set(keys_a) != set(keys_b):
+        return False
+    for ka, va in dict_a.items():
+        if not np.isclose(dict_b[ka], va):
+            return False
+    return True

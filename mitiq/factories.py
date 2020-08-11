@@ -1,15 +1,16 @@
-"""Contains all the main classes corresponding to different zero-noise
-extrapolation methods.
-"""
+"""Classes corresponding to different zero-noise extrapolation methods."""
 
-import warnings
-from copy import deepcopy
-from mitiq import QPROGRAM
-from typing import Callable, List, Optional, Sequence, Tuple
 from abc import ABC, abstractmethod
+from copy import deepcopy
+from typing import Callable, List, Optional, Sequence, Tuple
+import warnings
+
 import numpy as np
 from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
+
+from mitiq import QPROGRAM
+from mitiq.utils import _are_close_dict
 
 
 def _instack_to_scale_factors(instack: dict) -> List[float]:
@@ -17,19 +18,6 @@ def _instack_to_scale_factors(instack: dict) -> List[float]:
     if all([isinstance(params, dict) for params in instack]):
         return [params["scale_factor"] for params in instack]
     return instack
-
-
-def _are_close_dict(dict_a: dict, dict_b: dict) -> bool:
-    """Returns True if the two dictionaries have equal keys and
-    their corresponding values are "sufficiently" close."""
-    keys_a = dict_a.keys()
-    keys_b = dict_b.keys()
-    if set(keys_a) != set(keys_b):
-        return False
-    for ka, va in dict_a.items():
-        if not np.isclose(dict_b[ka], va):
-            return False
-    return True
 
 
 class ExtrapolationError(Exception):
@@ -158,6 +146,7 @@ class Factory(ABC):
 
     Specific zero-noise extrapolation algorithms, adaptive or non-adaptive,
     are derived from this class.
+
     A Factory object is not supposed to directly perform any quantum
     computation, only the classical results of quantum experiments are
     processed by it.
@@ -178,6 +167,18 @@ class Factory(ABC):
         """
         self.instack.append(instack_val)
         self.outstack.append(outstack_val)
+
+    def get_scale_factors(self) -> np.ndarray:
+        """Returns the scale factors at which the factory has computed
+        expectation values.
+        """
+        return np.array(
+            [params.get("scale_factor") for params in self.instack]
+        )
+
+    def get_expectation_values(self) -> np.ndarray:
+        """Returns the expectation values computed by the factory."""
+        return np.array(self.outstack)
 
     @abstractmethod
     def next(self) -> float:
