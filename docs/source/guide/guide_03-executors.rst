@@ -285,9 +285,9 @@ behind how this example is available `here <https://quantumcomputing.stackexchan
             raise ValueError("This executor only works on programs with no classical bits.")
 
         circ = copy.deepcopy(circ)
-        # we need to modify the circuit to measure our observable
-        # we do this by appending a rotation U
-        eigvals, U = np.linalg.eigh(obs)
+        # we need to modify the circuit to measure obs in its eigenbasis
+        # we do this by appending a unitary operation
+        eigvals, U = np.linalg.eigh(obs) # obtains a U s.t. obs = U diag(eigvals) U^dag
         circ.unitary(np.linalg.inv(U), qubits=range(circ.n_qubits))
 
         circ.measure_all()
@@ -365,9 +365,9 @@ This executor can be used for noisy depolarizing simulation.
             raise ValueError("This executor only works on programs with no classical bits.")
 
         circ = copy.deepcopy(circ)
-        # we need to modify the circuit to measure our observable
-        # we do this by appending a rotation U
-        eigvals, U = np.linalg.eigh(obs)
+        # we need to modify the circuit to measure obs in its eigenbasis
+        # we do this by appending a unitary operation
+        eigvals, U = np.linalg.eigh(obs) # obtains a U s.t. obs = U diag(eigvals) U^dag
         circ.unitary(np.linalg.inv(U), qubits=range(circ.n_qubits))
 
         circ.measure_all()
