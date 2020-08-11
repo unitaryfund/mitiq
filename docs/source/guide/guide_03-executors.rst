@@ -322,8 +322,8 @@ behind how this example is available `here <https://quantumcomputing.stackexchan
     out = qs_wvf_sampling_sim(qc, obs=np.diag([0, 0, 0, 1]), shots=int(1e5))
     assert abs(out - 0.5) < 0.1
 
-    qc_vaccum = QuantumCircuit(1)
-    out = qs_wvf_sampling_sim(qc_vaccum, obs=np.diag([1, 0]), shots=50)
+    qc_zero = QuantumCircuit(1)
+    out = qs_wvf_sampling_sim(qc_zero, obs=np.diag([1, 0]), shots=50)
     assert np.isclose(out, 1.0)
 
 
@@ -409,10 +409,10 @@ This executor can be used for noisy depolarizing simulation.
         qc.u1(0, 0)
     assert 0.1 < qs_noisy_sampling_sim(qc, np.diag([1, 0]), 0.02, 1000) < 1.0
 
-    qc_vaccum = QuantumCircuit(2)
-    out = qs_noisy_sampling_sim(qc_vaccum, obs=np.diag([1, 0, 0, 0]), noise=0.0, shots=10)
+    qc_zero = QuantumCircuit(2)
+    out = qs_noisy_sampling_sim(qc_zero, obs=np.diag([1, 0, 0, 0]), noise=0.0, shots=10)
     assert np.isclose(out, 1.0)
-    out = qs_noisy_sampling_sim(qc_vaccum, obs=np.diag([1, 0, 0, 0]), noise=1.0, shots=10 ** 5)
+    out = qs_noisy_sampling_sim(qc_zero, obs=np.diag([1, 0, 0, 0]), noise=1.0, shots=10 ** 5)
     assert np.isclose(out, 0.25, atol=0.1)
 
 Other noise models can be defined using any functionality available in ``qiskit``.
