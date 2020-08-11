@@ -35,14 +35,14 @@ to be used in ``mitiq``.
 
     def wvf_sim(circ: Circuit, obs: np.ndarray) -> float:
         """Simulates noiseless wavefunction evolution and returns the
-            expectation value of some observable.
+        expectation value of some observable.
 
         Args:
-            circ: The quantum program as a cirq object.
-            obs: A numpy array representation of the observable.
+            circ: The input Cirq circuit.
+            obs: The observable to measure as a NumPy array.
 
         Returns:
-            The observable's expectation value.
+            The expectation value of obs as a float.
         """
         final_wvf = circ.final_wavefunction()
         return np.real(final_wvf.conj().T @ obs @ final_wvf)
@@ -83,6 +83,18 @@ documentation `here <https://cirq.readthedocs.io/en/master/generated/cirq.PauliS
 .. testcode::
 
     def wvf_sampling_sim(circ: Circuit, obs: cirq.PauliString, shots: int) -> float:
+        """Simulates noiseless wavefunction evolution and returns the
+        expectation value of a PauliString observable.
+
+        Args:
+            circ: The input Cirq circuit.
+            obs: The observable to measure as a cirq.PauliString.
+            shots: The number of measurements.
+
+        Returns: 
+            The expectation value of obs as a float.
+        """
+
         # Do the sampling
         psum = cirq.PauliSumCollector(circ, obs, samples_per_term=shots)
         psum.collect(sampler=cirq.Simulator())
@@ -116,9 +128,9 @@ This executor can be used for noisy depolarizing simulation.
         """Simulates a circuit with depolarizing noise at level noise.
 
         Args:
-            circ: The quantum program as a cirq circuit.
-            obs: The observable to measure as an np.ndarray
-            noise: The depolarizing noise as a float, i.e. 0.001 is 0.1% noise
+            circ: The input Cirq circuit.
+            obs: The observable to measure as a NumPy array.
+            noise: The depolarizing noise as a float, i.e. 0.001 is 0.1% noise.
 
         Returns:
             The expectation value of obs as a float.
@@ -160,9 +172,10 @@ You can also include both noise models and finite sampling in your executor.
         """Simulates a circuit with depolarizing noise at level noise.
 
         Args:
-            circ: The quantum program as a cirq circuit.
-            obs: The observable to measure as an np.ndarray
-            noise: The depolarizing noise as a float, i.e. 0.001 is 0.1% noise
+            circ: The input Cirq circuit.
+            obs: The observable to measure as a NumPy array.
+            noise: The depolarizing noise strength as a float, i.e. 0.001 is 0.1%.
+            shots: The number of measurements.
 
         Returns:
             The expectation value of obs as a float.
@@ -215,14 +228,14 @@ to be used in ``mitiq``.
 
     def qs_wvf_sim(circ: QuantumCircuit, obs: np.ndarray) -> float:
         """Simulates noiseless wavefunction evolution and returns the
-            expectation value of some observable.
+        expectation value of some observable.
 
         Args:
-            circ: The quantum program as a qiskit circuit.
-            obs: A numpy array representation of the observable.
+            circ: The input Qiskit circuit.
+            obs: The observable to measure as a NumPy array.
 
         Returns:
-            The observable's expectation value.
+            The expectation value of obs as a float.
         """
         result = qiskit.execute(circ, wvf_simulator).result()
         final_wvf = result.get_statevector()
@@ -256,15 +269,17 @@ behind how this example is available `here <https://quantumcomputing.stackexchan
     QISKIT_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
 
     def qs_wvf_sampling_sim(circ: QuantumCircuit, obs: np.ndarray, shots: int) -> float:
-        """Simulates the evolution of the circuit and measures the expectation value of the observable.
+        """Simulates the evolution of the circuit and returns
+        the expectation value of the observable.
 
         Args:
-            circuit (qiskit.QuantumCircuit): Ideal quantum circuit with no measurements.
-            shots (int): Number of shots to run the circuit.
-            obs (np.ndarray): A numpy array representation of the observable.
+            circ: The input Qiskit circuit.
+            obs: The observable to measure as a NumPy array.
+            shots: The number of measurements.
 
-        Returns:
-            expval: expected value of the observable obs.
+        Returns: 
+            The expectation value of obs as a float.
+
         """
         if len(circ.clbits) > 0:
             raise ValueError("This executor only works on programs with no classical bits.")
@@ -273,7 +288,7 @@ behind how this example is available `here <https://quantumcomputing.stackexchan
         # we need to modify the circuit to measure our observable
         # we do this by appending a rotation U
         eigvals, U = np.linalg.eigh(obs)
-        circ.unitary(U, qubits=range(circ.n_qubits))
+        circ.unitary(np.linalg.inv(U), qubits=range(circ.n_qubits))
 
         circ.measure_all()
 
@@ -307,6 +322,10 @@ behind how this example is available `here <https://quantumcomputing.stackexchan
     out = qs_wvf_sampling_sim(qc, obs=np.diag([0, 0, 0, 1]), shots=int(1e5))
     assert abs(out - 0.5) < 0.1
 
+    qc_vaccum = QuantumCircuit(1)
+    out = qs_wvf_sampling_sim(qc_vaccum, obs=np.diag([1, 0]), shots=50)
+    assert np.isclose(out, 1.0)
+
 
 Qiskit: Density-matrix Simulation with Depolarizing Noise
 -----------------------------------------------------------
@@ -330,15 +349,17 @@ This executor can be used for noisy depolarizing simulation.
     QISKIT_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
 
     def qs_noisy_sampling_sim(circ: QuantumCircuit, obs: np.ndarray, noise: float, shots: int) -> float:
-        """Simulates the evolution of the noisy circuit and returns the expectation value of the observable.
+        """Simulates the evolution of the noisy circuit and returns
+        the expectation value of the observable.
 
         Args:
-            circuit (qiskit.QuantumCircuit): Ideal quantum circuit with no measurements.
-            shots (int): Number of shots to run the circuit.
-            obs (np.ndarray): A numpy array representation of the observable.
+            circ: The input Cirq circuit.
+            obs: The observable to measure as a NumPy array.
+            noise: The depolarizing noise strength as a float, i.e. 0.001 is 0.1%.
+            shots: The number of measurements.
 
-        Returns:
-            expval: expected value of the observable obs.
+        Returns: 
+            The expectation value of obs as a float.
         """
         if len(circ.clbits) > 0:
             raise ValueError("This executor only works on programs with no classical bits.")
@@ -347,16 +368,17 @@ This executor can be used for noisy depolarizing simulation.
         # we need to modify the circuit to measure our observable
         # we do this by appending a rotation U
         eigvals, U = np.linalg.eigh(obs)
-        circ.unitary(U, qubits=range(circ.n_qubits))
+        circ.unitary(np.linalg.inv(U), qubits=range(circ.n_qubits))
 
         circ.measure_all()
 
         # initialize a qiskit noise model
         noise_model = NoiseModel()
 
-        # we assume a depolarizing error for each
+        # we assume the same depolarizing error for each
         # gate of the standard IBM basis
         noise_model.add_all_qubit_quantum_error(depolarizing_error(noise, 1), ["u1", "u2", "u3"])
+        noise_model.add_all_qubit_quantum_error(depolarizing_error(noise, 2), ["cx"])
 
         # execution of the experiment
         job = qiskit.execute(
@@ -366,8 +388,9 @@ This executor can be used for noisy depolarizing simulation.
             noise_model=noise_model,
             # we want all gates to be actually applied,
             # so we skip any circuit optimization
+            basis_gates=noise_model.basis_gates,
             optimization_level=0,
-            shots=shots
+            shots=shots,
         )
         results = job.result()
         counts = results.get_counts()
@@ -385,6 +408,12 @@ This executor can be used for noisy depolarizing simulation.
     for _ in range(10):
         qc.u1(0, 0)
     assert 0.1 < qs_noisy_sampling_sim(qc, np.diag([1, 0]), 0.02, 1000) < 1.0
+
+    qc_vaccum = QuantumCircuit(2)
+    out = qs_noisy_sampling_sim(qc_vaccum, obs=np.diag([1, 0, 0, 0]), noise=0.0, shots=10)
+    assert np.isclose(out, 1.0)
+    out = qs_noisy_sampling_sim(qc_vaccum, obs=np.diag([1, 0, 0, 0]), noise=1.0, shots=10 ** 5)
+    assert np.isclose(out, 0.25, atol=0.1)
 
 Other noise models can be defined using any functionality available in ``qiskit``.
 More details can be found in the ``qiskit``
