@@ -4,7 +4,7 @@ Welcome to mitiq's documentation!
 =================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
    read_README.rst
