@@ -4,8 +4,44 @@ from copy import deepcopy
 
 import numpy as np
 
-from cirq import Circuit, CircuitDag
+from cirq import Circuit, CircuitDag, Gate, Moment
 from cirq.ops.measurement_gate import MeasurementGate
+
+
+def _simplify_gate_exponent(gate: Gate) -> Gate:
+    """Returns the input gate with a simplified exponent if possible,
+    otherwise the input gate is returned without any change.
+
+    The input gate is not mutated.
+
+    Args:
+        gate: The input gate to simplify.
+
+    Returns: The simplified gate.
+    """
+    # Try to simplify the gate exponent to 1
+    if hasattr(gate, "_with_exponent") and gate == gate._with_exponent(1):
+        return gate._with_exponent(1)
+    return gate
+
+
+def _simplify_circuit_exponents(circuit: Circuit) -> None:
+    """Simplifies the gate exponents of the input circuit if possible,
+    mutating the input circuit.
+
+    Args:
+        circuit: The circuit to simplify.
+    """
+    # Iterate over moments
+    for moment_idx, moment in enumerate(circuit):
+        simplified_operations = []
+        # Iterate over operations in moment
+        for op in moment:
+            simplified_gate = _simplify_gate_exponent(op.gate)
+            simplified_operation = op.with_gate(simplified_gate)
+            simplified_operations.append(simplified_operation)
+        # Mutate the input circuit
+        circuit[moment_idx] = Moment(simplified_operations)
 
 
 def _equal(
