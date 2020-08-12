@@ -225,7 +225,7 @@ def test_simplify_circuit_exponents():
 
 def test_simplify_circuit_exponents_with_non_self_inverse_gates():
     qreg = LineQubit.range(2)
-    # make a circuit with gates which are not self-inverse
+    # Make a circuit with gates which are not self-inverse
     circuit = Circuit([S.on(qreg[0]), T.on(qreg[1])])
 
     inverse_circuit = cirq.inverse(circuit)
