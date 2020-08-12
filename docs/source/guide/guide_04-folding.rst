@@ -118,7 +118,7 @@ following example, we fold a Qiskit circuit.
     >>> circ = qiskit.QuantumCircuit(qreg)
     >>> _ = circ.h(qreg[0])
     >>> _ = circ.cnot(qreg[0], qreg[1])
-    >>> print("Original circuit:", circ, sep="\n") # doctest: +NORMALIZE_WHITESPACE
+    >>> print("Original circuit:", circ, sep="\n") # doctest: +SKIP +NORMALIZE_WHITESPACE
     Original circuit:
            ┌───┐     
     q31_0: ┤ H ├──■──
@@ -135,7 +135,7 @@ We can now fold this circuit as follows.
 .. doctest:: python
 
     >>> folded = fold_gates_from_left(circ, scale_factor=2.)
-    >>> print("Folded circuit:", folded, sep="\n") # doctest: +NORMALIZE_WHITESPACE
+    >>> print("Folded circuit:", folded, sep="\n") # doctest: +SKIP +NORMALIZE_WHITESPACE
     Folded circuit:
          ┌───┐┌───┐┌───┐     
     q_0: ┤ H ├┤ H ├┤ H ├──■──
