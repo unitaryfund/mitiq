@@ -7,9 +7,9 @@ Zero Noise Extrapolation
 *********************************************
 Zero noise extrapolation has two main components: noise scaling and then extrapolation.
 
-*********************************************
+======================================
 Digital noise scaling: Unitary Folding
-*********************************************
+======================================
 Unitary folding is a method for noise scaling that operates directly at the gate level.
 This makes it easy to use across platforms. It is especially appropriate when
 your underlying noise should scale with the depth and/or the number of gates in your
@@ -31,9 +31,9 @@ which corresponds to (approximately) how much the length of the circuit is scale
 The minimum scale factor is one (which corresponds to folding no gates). A scale factor of three corresponds to folding
 all gates locally. Scale factors beyond three begin to fold gates more than once.
 
-=============================================
+---------------------
 Local folding methods
-=============================================
+---------------------
 
 For local folding, there is a degree of freedom for which gates to fold first. The order in which gates are folded can
 have an important effect on how the noise is caled. As such, ``mititq`` defines several local folding methods.
@@ -101,9 +101,9 @@ Finally, we mention ``fold_gates_at_random`` which folds gates according to the 
 
 All of these local folding methods can be called with any ``scale_factor >= 1``.
 
-=============================================
+------------------------------------
 Any supported circuits can be folded
-=============================================
+------------------------------------
 
 Any program types supported by ``mitiq`` can be folded, and the interface for all folding functions is the same. In the
 following example, we fold a Qiskit circuit.
@@ -218,9 +218,9 @@ A full list of string keys for gates can be found with ``help(fold_method)`` whe
 folding method. Fidelity values must be between zero and one.
 
 
-=============================================
+--------------
 Global folding
-=============================================
+--------------
 
 As mentioned, global folding methods fold the entire circuit instead of individual gates. An example using the same Cirq
 circuit above is shown below.
@@ -253,9 +253,9 @@ the entire circuit until the input scale factor is reached. As with local foldin
 with any ``scale_factor >= 3``.
 
 
-=============================================
+----------------------
 Custom folding methods
-=============================================
+----------------------
 
 Custom folding methods can be defined and used with ``mitiq`` (e.g., with ``mitiq.execute_with_zne``. The signature
 of this function must be as follows.
