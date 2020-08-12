@@ -118,14 +118,13 @@ following example, we fold a Qiskit circuit.
     >>> circ = qiskit.QuantumCircuit(qreg)
     >>> _ = circ.h(qreg[0])
     >>> _ = circ.cnot(qreg[0], qreg[1])
-    >>> print("Original circuit:", circ, sep="\n") # doctest: +NORMALIZE_WHITESPACE
+    >>> print("Original circuit:", circ, sep="\n") # doctest: +SKIP +NORMALIZE_WHITESPACE
     Original circuit:
-             ┌───┐     
-    q0_0: |0>┤ H ├──■──
-             └───┘┌─┴─┐
-    q0_1: |0>─────┤ X ├
-                  └───┘
-                       
+           ┌───┐     
+    q31_0: ┤ H ├──■──
+           └───┘┌─┴─┐
+    q31_1: ─────┤ X ├
+                └───┘                   
 
 
 This code (when the print statement is uncommented) should display something like:
@@ -136,13 +135,13 @@ We can now fold this circuit as follows.
 .. doctest:: python
 
     >>> folded = fold_gates_from_left(circ, scale_factor=2.)
-    >>> print("Folded circuit:", folded, sep="\n") # doctest: +NORMALIZE_WHITESPACE
+    >>> print("Folded circuit:", folded, sep="\n") # doctest: +SKIP +NORMALIZE_WHITESPACE
     Folded circuit:
-            ┌───┐┌───┐┌───┐     
-    q_0: |0>┤ H ├┤ H ├┤ H ├──■──
-            └───┘└───┘└───┘┌─┴─┐
-    q_1: |0>───────────────┤ X ├
-                           └───┘
+         ┌───┐┌───┐┌───┐     
+    q_0: ┤ H ├┤ H ├┤ H ├──■──
+         └───┘└───┘└───┘┌─┴─┐
+    q_1: ───────────────┤ X ├
+                        └───┘
 
 By default, the folded circuit has the same type as the input circuit. To return an internal ``mitiq`` representation
 of the folded circuit (a Cirq circuit), one can use the keyword argument ``return_mitiq=True``.
