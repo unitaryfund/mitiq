@@ -235,7 +235,7 @@ def test_simplify_circuit_exponents_with_non_self_inverse_gates():
     # simplify the circuit (it should not change this circuit)
     _simplify_circuit_exponents(inverse_circuit)
 
-    # check inverse_circuit did not change
+    # Check inverse_circuit did not change
     simplified_repr = inverse_circuit.__repr__()
     simplified_qasm = inverse_circuit._to_qasm_output().__str__()
     assert simplified_repr == inverse_repr
