@@ -206,7 +206,7 @@ def test_simplify_circuit_exponents():
     expected_repr = expected_inv.__repr__()
     expected_qasm = expected_inv._to_qasm_output().__str__()
 
-    # check inverse_circuit is logically equivalent to expected_inverse
+    # Check inverse_circuit is logically equivalent to expected_inverse
     # but they have a different representation
     assert inverse_circuit == expected_inv
     assert inverse_repr != expected_repr
