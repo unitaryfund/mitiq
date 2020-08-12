@@ -212,7 +212,7 @@ def test_simplify_circuit_exponents():
     assert inverse_repr != expected_repr
     assert inverse_qasm != expected_qasm
 
-    # simplify the circuit
+    # Simplify the circuit
     _simplify_circuit_exponents(inverse_circuit)
 
     # Check inverse_circuit has the expected simplified representation
