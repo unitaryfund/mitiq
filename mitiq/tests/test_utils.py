@@ -201,7 +201,7 @@ def test_simplify_circuit_exponents():
     inverse_repr = inverse_circuit.__repr__()
     inverse_qasm = inverse_circuit._to_qasm_output().__str__()
 
-    # expected circuit after simplification
+    # Expected circuit after simplification
     expected_inv = Circuit([Z.on(qreg[1]), CNOT.on(*qreg), H.on(qreg[0])])
     expected_repr = expected_inv.__repr__()
     expected_qasm = expected_inv._to_qasm_output().__str__()
