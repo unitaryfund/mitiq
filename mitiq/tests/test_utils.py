@@ -196,7 +196,7 @@ def test_simplify_circuit_exponents():
     qreg = LineQubit.range(2)
     circuit = Circuit([H.on(qreg[0]), CNOT.on(*qreg), Z.on(qreg[1])])
 
-    # invert circuit
+    # Invert circuit
     inverse_circuit = cirq.inverse(circuit)
     inverse_repr = inverse_circuit.__repr__()
     inverse_qasm = inverse_circuit._to_qasm_output().__str__()
