@@ -118,48 +118,34 @@ following example, we fold a Qiskit circuit.
     >>> circ = qiskit.QuantumCircuit(qreg)
     >>> _ = circ.h(qreg[0])
     >>> _ = circ.cnot(qreg[0], qreg[1])
-    >>> # print("Original circuit:", circ, sep="\n")
-
-This code (when the print statement is uncommented) should display something like:
-
-.. code-block:: python
-
+    >>> print("Original circuit:", circ, sep="\n") # doctest: +NORMALIZE_WHITESPACE
     Original circuit:
-             ┌───┐
+             ┌───┐     
     q0_0: |0>┤ H ├──■──
              └───┘┌─┴─┐
     q0_1: |0>─────┤ X ├
                   └───┘
+                       
 
-We can now fold this circuit as follows.
-
-    # Fold the circuit
-    >>> folded = fold_gates_from_left(circ, scale_factor=2.)
-    >>> # print("Folded circuit:", folded, sep="\n")
 
 This code (when the print statement is uncommented) should display something like:
 
-.. code-block:: python
 
+We can now fold this circuit as follows.
+
+.. doctest:: python
+
+    >>> folded = fold_gates_from_left(circ, scale_factor=2.)
+    >>> print("Folded circuit:", folded, sep="\n") # doctest: +NORMALIZE_WHITESPACE
     Folded circuit:
-            ┌───┐┌──────────┐┌─────────┐┌───────────┐┌───┐
-    q_0: |0>┤ H ├┤ Ry(pi/4) ├┤ Rx(-pi) ├┤ Ry(-pi/4) ├┤ H ├──■──
-            └───┘└──────────┘└─────────┘└───────────┘└───┘┌─┴─┐
-    q_1: |0>──────────────────────────────────────────────┤ X ├
-                                                          └───┘
+            ┌───┐┌───┐┌───┐     
+    q_0: |0>┤ H ├┤ H ├┤ H ├──■──
+            └───┘└───┘└───┘┌─┴─┐
+    q_1: |0>───────────────┤ X ├
+                           └───┘
 
 By default, the folded circuit has the same type as the input circuit. To return an internal ``mitiq`` representation
 of the folded circuit (a Cirq circuit), one can use the keyword argument ``return_mitiq=True``.
-
-
-.. note::
-
-    Compared to the previous example which input a Cirq circuit, we see that this folded circuit has more gates. In
-    particular, the inverse Hadamard gate is expressed differently (but equivalently) as a product of three
-    rotations. This behavior occurs because circuits are first converted to ``mitiq``'s internal
-    representation (Cirq circuits), then folded, then converted back to the input circuit type.
-    Because different circuits decompose gates differently, some gates (or their inverses)
-    may be expressed differently (but equivalently) across different circuits.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
