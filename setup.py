@@ -22,7 +22,7 @@ setup(
         # note: this should be a subset of requirements.txt
         "numpy~=1.18.1",
         "scipy~=1.4.1",
-        "cirq-unstable==0.9.0.dev20200810183951",
+        "cirq-unstable==0.9.0.dev20200812182135",
     ],
     extras_require={
         'development': set(requirements),
