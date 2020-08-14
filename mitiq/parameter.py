@@ -1,4 +1,3 @@
-# needed imports
 from typing import Iterable
 import numpy as np
 
@@ -13,30 +12,35 @@ from cirq import (
 from cirq.ops import gate_features
 
 from mitiq._typing import QPROGRAM
+from mitiq.folding import converter
 
+BASE_GATES = [ZPowGate, HPowGate, XPowGate, YPowGate, CXPowGate \
+            CZPowGate]
 
-def add_parameter_noise(
-    circ: QPROGRAM,
+@converter
+def scale_parameters(
+    circ: Circuit,
     scale_factor: float,
-    sigma: float
-) -> QPROGRAM:
-    """Adds angle noise to a circuit with level noise.
+    sigma: float,
+    seed: int = None
+) -> Circuit:
+    """Adds parameter noise to a circuit with level noise.
     This adds noise to the actual parameter instead of
-    adding an angle channel.
+    adding an parameter channel.
 
     Args:
-        circ: The quantum program as a cirq object. Assuming
-                        last moment is a measurement moment.
-        scale_factor: the variance of rotations
-        sigam: base noise level
+        circ: The quantum program as a Cirq circuit object. All measurements
+            should be in the last moment of the circuit.
+        scale_factor: Amount to scale the base noise level of parameter rotations by.
+        sigma: Base noise level (variance) in parameter rotations
+        seed: 
 
     Returns:
-        Noisy circuit with the same number of gates,
-        but with slightly "noised" parameters.
+        The input circuit with scaled rotation angles
 
     """
     final_moments = []
-    noise = (scale_factor - 1)*sigma
+    noise = (scale_factor - 1) * sigma
     for moment in circ:
         curr_moment = []
         for op in moment.operations:
@@ -46,8 +50,9 @@ def add_parameter_noise(
                 curr_moment.append(gate(*qubits))
             else:
                 base_gate = _get_base_gate(gate)
-                param = gate.exponent*np.pi
-                error = np.random.normal(loc=0.0, scale=np.sqrt(noise))
+                param = gate.exponent * np.pi
+                rng = np.random.RandomState(seed)
+                error = rng.normal(loc=0.0, scale=np.sqrt(noise))
                 new_param = (param + error)
                 curr_moment.append(
                     base_gate(exponent=new_param/np.pi)(*qubits))
@@ -56,26 +61,16 @@ def add_parameter_noise(
 
 
 def _get_base_gate(gate):
-    if isinstance(gate, ZPowGate):
-        return ZPowGate
-    if isinstance(gate, HPowGate):
-        return HPowGate
-    if isinstance(gate, XPowGate):
-        return XPowGate
-    if isinstance(gate, YPowGate):
-        return YPowGate
-    if isinstance(gate, CXPowGate):
-        return CXPowGate
-    if isinstance(gate, CZPowGate):
-        return CZPowGate
-    else:
-        raise Exception(
-            "Must have circuit be made of rotation gates. \
-            Your gate {} may not be supported".format(gate))
+    for base_gate in BASE_GATES:
+        if isinstance(gate, base_gate):
+            return base_gate
+    raise Exception(
+        "Must have circuit be made of rotation gates. \
+        Your gate {} may not be supported".format(gate))
 
 
-def add_parameter_noise_channel(circ: Circuit, noise=None) -> Circuit:
-    """Adds angle noise to a circuit with level noise via noise channel.
+def scale_parameters_channel(circ: Circuit, noise=None) -> Circuit:
+    """Adds parameter noise to a circuit with level noise via noise channel.
 
     Args:
         circ: The quantum program as a cirq object.
@@ -94,31 +89,36 @@ def add_parameter_noise_channel(circ: Circuit, noise=None) -> Circuit:
             qubits = op.qubits
             if len(qubits) == 1:
                 qubits = qubits[0]
-                noisy_op = angle_noise_1q(noise, gate)(qubits)
+                noisy_op = parameter_noise_1q(noise, gate)(qubits)
+            elif len(qubits) == 2:
+                noisy_op = parameter_noise_2q(noise, gate)(qubits[0], qubits[1])
             else:
-                noisy_op = angle_noise_2q(noise, gate)(qubits[0], qubits[1])
+                raise Exception(
+                    "Gates for more than two qubits are not \
+                    supported with parameter noise scaling.")
             curr_moment.append(noisy_op)
         final_moments.append(Moment(curr_moment))
     return Circuit(final_moments)
 
 
-def angle_noise_1q(noise, H):
-    return AngleChannel1Q(noise, H)
+def parameter_noise_1q(noise, base_gate):
+    return parameterChannel1Q(noise, base_gate)
 
 
-def angle_noise_2q(noise, H):
-    return AngleChannel2Q(noise, H)
+def parameter_noise_2q(noise, base_gate):
+    return parameterChannel2Q(noise, base_gate)
 
 
 @value.value_equality
-class AngleChannel1Q(gate_features.SingleQubitGate):
+class parameterChannel1Q(gate_features.SingleQubitGate):
     """A channel that depolarizes a qubit."""
 
-    def __init__(self, noise: float, H: Gate) -> None:
-        r"""The Angle channel.
+    def __init__(self, noise: float, base_gate: Gate) -> None:
+        r"""The parameter channel.
 
-        This channel applies the angle sampling channel that is described
-        in our literature. Given a noise level "noise", we are able to
+        This channel applies the parameter sampling channel that is described
+        in our literature (https://arxiv.org/abs/2005.10921).
+        Given a noise level "noise", we are able to
         compute what the channel is:
 
         This channel evolves a density matrix via
@@ -139,14 +139,14 @@ class AngleChannel1Q(gate_features.SingleQubitGate):
         self._noise = noise
 
         if isinstance(H, XPowGate):
-            self._H = X
+            self._base_gate = X
         elif isinstance(H, YPowGate):
-            self._H = Y
+            self._base_gate = Y
         elif isinstance(H, ZPowGate):
-            self._H = Z
+            self._base_gate = Z
         else:
-            self._H = H
-        self.unitary = unitary(self._H)
+            self._base_gate = H
+        self.unitary = unitary(self._base_gate)
         self._Q = self.calc_Q()
 
     def calc_Q(self):
@@ -165,13 +165,13 @@ class AngleChannel1Q(gate_features.SingleQubitGate):
         return self._noise
 
     def __repr__(self) -> str:
-        return 'cirq.angle_channel(noise={!r},H={!r})'.format(
-            self._noise, self._H
+        return 'cirq.parameter_channel(noise={!r},H={!r})'.format(
+            self._noise, self._base_gate
         )
 
     def __str__(self) -> str:
-        return 'angle_channel(noise={!r},H={!r})'.format(
-            self._noise, self._H
+        return 'parameter_channel(noise={!r},H={!r})'.format(
+            self._noise, self._base_gate
         )
 
     def _circuit_diagram_info_(
@@ -180,22 +180,23 @@ class AngleChannel1Q(gate_features.SingleQubitGate):
     ) -> str:
         if args.precision is not None:
             f = '{:.' + str(args.precision) + 'g}'
-            return 'AC({},{})'.format(f, self._H).format(self._noise)
-        return 'AC({!r}, {})'.format(self._noise, self._H)
+            return 'AC({},{})'.format(f, self._base_gate).format(self._noise)
+        return 'AC({!r}, {})'.format(self._noise, self._base_gate)
 
     def _json_dict_(self):
         return protocols.obj_to_dict_helper(self, ['noise'])
 
 
 @value.value_equality
-class AngleChannel2Q(gate_features.TwoQubitGate):
+class parameterChannel2Q(gate_features.TwoQubitGate):
     """A channel that depolarizes a qubit."""
 
-    def __init__(self, noise: float, H: Gate) -> None:
-        r"""The Angle channel for two qubits
+    def __init__(self, noise: float, base_gate: Gate) -> None:
+        r"""The parameter channel for two qubits
 
-        This channel applies the angle sampling channel that is described
-        in our literature. Given a noise level "noise", we are able to
+        This channel applies the parameter sampling channel that is described
+        in our literature (https://arxiv.org/abs/2005.10921).
+        Given a noise level "noise", we are able to
         compute what the channel is:
 
         This channel evolves a density matrix via
@@ -214,8 +215,8 @@ class AngleChannel2Q(gate_features.TwoQubitGate):
         """
 
         self._noise = noise
-        self._H = H
-        self.unitary = unitary(self._H)
+        self._base_gate = base_gate
+        self.unitary = unitary(self._base_gate)
         self._Q = self.calc_Q()
 
     def calc_Q(self):
@@ -234,13 +235,13 @@ class AngleChannel2Q(gate_features.TwoQubitGate):
         return self._noise
 
     def __repr__(self) -> str:
-        return 'cirq.angle_channel_2q(noise={!r},H={!r})'.format(
-            self._noise, self._H
+        return 'cirq.parameter_channel_2q(noise={!r},H={!r})'.format(
+            self._noise, self._base_gate
         )
 
     def __str__(self) -> str:
-        return 'angle_channel_2q(noise={!r},H={!r})'.format(
-            self._noise, self._H
+        return 'parameter_channel_2q(noise={!r},H={!r})'.format(
+            self._noise, self._base_gate
         )
 
     def _circuit_diagram_info_(
@@ -249,8 +250,8 @@ class AngleChannel2Q(gate_features.TwoQubitGate):
     ) -> str:
         if args.precision is not None:
             f = '{:.' + str(args.precision) + 'g}'
-            return ['AC2({},{})'.format(f, self._H).format(self._noise)]*2
-        return ['AC2({!r}, {})'.format(self._noise, self._H)]*2
+            return ['AC2({},{})'.format(f, self._base_gate).format(self._noise)]*2
+        return ['AC2({!r}, {})'.format(self._noise, self._base_gate)]*2
 
     def _json_dict_(self):
         return protocols.obj_to_dict_helper(self, ['noise'])
