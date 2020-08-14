@@ -124,7 +124,7 @@ in ``mitiq.zne``. For example:
 
 .. testcode::
 
-   from mitiq.zne import execute_with_zne
+   from mitiq.zne.zne import execute_with_zne
 
    zne_expval = execute_with_zne(circuit, executor, factory=linear_fac)
    print(f"Error with linear_fac: {abs(exact - zne_expval):.4f}")
