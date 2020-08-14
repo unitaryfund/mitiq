@@ -1,4 +1,4 @@
-![Python Build](https://github.com/unitaryfund/mitiq/workflows/Python%20Build/badge.svg?branch=master)
+[![build](https://github.com/unitaryfund/mitiq/workflows/Build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
 [![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
 
