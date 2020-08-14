@@ -51,7 +51,7 @@ Alternatively, a factory can be directly used to implement a zero-noise extrapol
 To clarify this aspect, we now perform the same zero-noise extrapolation with both methods.
 
 ===============================================================
-Using a factory object with the :py:mod:`mitiq.zne.zne` module
+Using a factory object with the :py:mod:`mitiq.zne` module
 ===============================================================
 
 Let us consider an ``executor`` function which is similar to the one used in
