@@ -7,9 +7,20 @@
 # Mitiq
 A Python toolkit for implementing error mitigation on quantum computers.
 
-## Features
-Mitiq performs error mitigation protocols on quantum circuits using zero-noise extrapolation.
+## Documentation
+The full documentation is available at [mitiq.readthedocs.io](mitiq.readthedocs.io).
 
+A pdf with the documentation updated to the latest release can be found
+[here](docs/pdf/).
+
+## Features
+Mitiq  is  an  open-source Python library that interfaces with multiple front-end quantum programming languages to implement 
+[error-mitigation](https://mitiq.readthedocs.io/en/latest/guide/guide_06-error-mitigation.html) techniques
+on various real and simulated quantum  processors.
+
+Mitiq is compatible with [Cirq](https://github.com/quantumlib/Cirq), [Qiskit](https://github.com/Qiskit), and [PyQuil](https://github.com/rigetti/pyquil).  
+
+Mitiq currently implements [zero-noise extrapolation](https://mitiq.readthedocs.io/en/latest/guide/guide_06-error-mitigation.html#zero-noise-extrapolation) and is designed to be modular to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
 
 ## Contents
 ```
@@ -50,12 +61,8 @@ on `qiskit` and `pyquil`.
 
 ## Use
 A [Getting Started](https://mitiq.readthedocs.io/en/latest/guide/guide_02-getting-started.html)
-tutorial can be found in the Documentation.
+tutorial can be found in the [documentation](https://mitiq.readthedocs.io).
 
-## Documentation
-`Mitiq` documentation is found under `mitiq/docs`. A pdf with the documentation
-updated to the latest release can be found
-[here](docs/pdf/Mitiq-latest-release.pdf).
 
 ## Development and Testing
 
