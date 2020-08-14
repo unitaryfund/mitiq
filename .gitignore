@@ -2,7 +2,7 @@
 .vscode
 .python-version
 .idea/
-.coverage*
+.coverage
 *.dat
 *.ipynp
 *.ipynb_checkpoints
