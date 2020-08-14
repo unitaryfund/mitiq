@@ -12,3 +12,4 @@ docs/build/
 mitiq.egg-info/
 dist/
 build/
+coverage.xml
