@@ -44,16 +44,16 @@ requirements: requirements.txt
 
 .PHONY: test
 test:
-	pytest -v --cov=mitiq mitiq/tests mitiq/benchmarks/tests
+	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/tests mitiq/benchmarks/tests
 
 .PHONY: test-pyquil
 test-pyquil:
-	pytest -v --cov=mitiq mitiq/mitiq_pyquil/tests
+	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/mitiq_pyquil/tests
 
 .PHONY: test-qiskit
 test-qiskit:
-	pytest -v --cov=mitiq mitiq/mitiq_qiskit/tests
+	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/mitiq_qiskit/tests
 
 .PHONY: test-all
 test-all:
-	pytest --cov=mitiq
+	pytest --cov=mitiq --cov-report=term --cov-report=xml
