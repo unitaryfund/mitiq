@@ -1,5 +1,5 @@
 """
-Testing of zero-noise extrapolation methods
+Testing of zero-noise inference and extrapolation methods
 (factories) with classically generated data.
 """
 from copy import copy
@@ -7,7 +7,7 @@ from typing import Callable
 from pytest import mark, raises, warns
 import numpy as np
 from numpy.random import RandomState
-from mitiq.factories import (
+from mitiq.zne.inference import (
     ExtrapolationError,
     ExtrapolationWarning,
     ConvergenceWarning,

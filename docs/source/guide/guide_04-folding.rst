@@ -36,9 +36,9 @@ have an important effect on how the noise is caled. As such, ``mititq`` defines 
 
 We introduce three folding functions:
 
-    1. ``mitiq.folding.fold_gates_from_left``
-    2. ``mitiq.folding.fold_gates_from_right``
-    3. ``mitiq.folding.fold_gates_at_random``
+    1. ``mitiq.zne.scaling.fold_gates_from_left``
+    2. ``mitiq.zne.scaling.fold_gates_from_right``
+    3. ``mitiq.zne.scaling.fold_gates_at_random``
 
 The ``mitiq`` function ``fold_gates_from_left`` will fold gates from the left (or start) of the circuit
 until the desired scale factor is reached.
@@ -47,7 +47,7 @@ until the desired scale factor is reached.
 .. doctest:: python
 
     >>> import cirq
-    >>> from mitiq.folding import fold_gates_from_left
+    >>> from mitiq.zne.scaling import fold_gates_from_left
 
     # Get a circuit to fold
     >>> qreg = cirq.LineQubit.range(2)
@@ -76,7 +76,7 @@ we use the ``fold_gates_from_right`` function on the same input circuit.
 
 .. doctest:: python
 
-    >>> from mitiq.folding import fold_gates_from_right
+    >>> from mitiq.zne.scaling import fold_gates_from_right
 
     # Fold the circuit
     >>> folded = fold_gates_from_right(circ, scale_factor=2.)
@@ -111,7 +111,7 @@ following example, we fold a Qiskit circuit.
 .. doctest:: python
 
     >>> import qiskit
-    >>> from mitiq.folding import fold_gates_from_left
+    >>> from mitiq.zne.scaling import fold_gates_from_left
 
     # Get a circuit to fold
     >>> qreg = qiskit.QuantumRegister(2)
@@ -120,11 +120,11 @@ following example, we fold a Qiskit circuit.
     >>> _ = circ.cnot(qreg[0], qreg[1])
     >>> print("Original circuit:", circ, sep="\n") # doctest: +SKIP +NORMALIZE_WHITESPACE
     Original circuit:
-           ┌───┐     
+           ┌───┐
     q31_0: ┤ H ├──■──
            └───┘┌─┴─┐
     q31_1: ─────┤ X ├
-                └───┘                   
+                └───┘
 
 
 This code (when the print statement is uncommented) should display something like:
@@ -137,7 +137,7 @@ We can now fold this circuit as follows.
     >>> folded = fold_gates_from_left(circ, scale_factor=2.)
     >>> print("Folded circuit:", folded, sep="\n") # doctest: +SKIP +NORMALIZE_WHITESPACE
     Folded circuit:
-         ┌───┐┌───┐┌───┐     
+         ┌───┐┌───┐┌───┐
     q_0: ┤ H ├┤ H ├┤ H ├──■──
          └───┘└───┘└───┘┌─┴─┐
     q_1: ───────────────┤ X ├
@@ -159,7 +159,7 @@ fidelity of all single qubit gates to be 1.0, meaning that these gates introduce
 .. doctest:: python
 
     from cirq import Circuit, LineQubit, ops
-    from mitiq.folding import fold_gates_at_random
+    from mitiq.zne.scaling import fold_gates_at_random
 
     qreg = LineQubit.range(3)
     circ = Circuit(
@@ -210,7 +210,7 @@ circuit above is shown below.
 .. doctest:: python
 
     >>> import cirq
-    >>> from mitiq.folding import fold_global
+    >>> from mitiq.zne.scaling import fold_global
 
     # Get a circuit to fold
     >>> qreg = cirq.LineQubit.range(2)
@@ -244,7 +244,7 @@ of this function must be as follows.
 .. doctest:: python
 
     import cirq
-    from mitiq.folding import converter
+    from mitiq.zne.scaling import converter
 
     @converter
     def my_custom_folding_function(circuit: cirq.Circuit, scale_factor: float) -> cirq.Circuit:

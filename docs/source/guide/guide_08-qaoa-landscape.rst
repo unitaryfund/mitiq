@@ -15,7 +15,7 @@ alternating operator ansatz (QAOA). We first import the libraries we will use.
     import numpy as np
 
     from cirq import Circuit, CNOT, DensityMatrixSimulator, H, LineQubit, depolarize, rz
-    from mitiq.zne import mitigate_executor
+    from mitiq.zne.zne import mitigate_executor
 
     SIMULATOR = DensityMatrixSimulator()
 

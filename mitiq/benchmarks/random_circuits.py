@@ -10,7 +10,7 @@ from cirq import NamedQubit, Circuit
 
 from mitiq import execute_with_zne
 from mitiq._typing import QPROGRAM
-from mitiq.factories import Factory
+from mitiq.zne.inference import Factory
 from mitiq.benchmarks.utils import noisy_simulation
 
 

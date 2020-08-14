@@ -75,7 +75,7 @@ source_suffix = ['.rst', '.md']
 doctest_global_setup = '''
 try:
   from mitiq import *
-  from mitiq.factories import *
+  from mitiq.zne.inference import *
   from mitiq.benchmarks.maxcut import *
 except:
   pass

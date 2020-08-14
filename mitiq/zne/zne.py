@@ -4,8 +4,8 @@ from typing import Callable
 from functools import wraps
 
 from mitiq._typing import QPROGRAM
-from mitiq.factories import Factory, RichardsonFactory
-from mitiq.folding import fold_gates_at_random
+from mitiq.zne.inference import Factory, RichardsonFactory
+from mitiq.zne.scaling import fold_gates_at_random
 
 
 def execute_with_zne(
