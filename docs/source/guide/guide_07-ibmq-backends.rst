@@ -112,7 +112,7 @@ following code block shows an example of using linear extrapolation with five di
 
 .. doctest:: python
 
-    linear_factory = mitiq.factories.LinearFactory(scale_factors=[1.0, 1.5, 2.0, 2.5, 3.0])
+    linear_factory = mitiq.zne.inference.factories.LinearFactory(scale_factors=[1.0, 1.5, 2.0, 2.5, 3.0])
     mitigated = mitiq.execute_with_zne(circuit, armonk_executor, fac=linear_factory)
 
 To specify a different noise scaling method, we can pass a different function for the argument ``scale_noise``. This
@@ -254,7 +254,7 @@ a linear fit (order one polynomial fit) and print out the extrapolated zero-nois
 
 .. code-block:: python
 
-    >>> fac = mitiq.factories.LinearFactory(scale_factors)
+    >>> fac = mitiq.zne.inference.LinearFactory(scale_factors)
     >>> fac.instack, fac.outstack = scale_factors, expectation_values
     >>> zero_noise_value = fac.reduce()
     >>> print(f"Extrapolated zero-noise value:", round(zero_noise_value, 3))
