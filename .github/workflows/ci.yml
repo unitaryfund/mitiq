@@ -86,6 +86,8 @@ jobs:
       - name: Run all the unit tests & generate coverage report with pytest
         run: make test-all
       - name: Submit coverage report to Codecov
+        # only submit to Codecov once
+        if: ${{ matrix.python-version == 3.8 }}
         uses: codecov/codecov-action@v1.0.12
         with:
           fail_ci_if_error: true
