@@ -112,7 +112,7 @@ following code block shows an example of using linear extrapolation with five di
 
 .. doctest:: python
 
-    linear_factory = mitiq.zne.inference.factories.LinearFactory(scale_factors=[1.0, 1.5, 2.0, 2.5, 3.0])
+    linear_factory = mitiq.zne.inference.LinearFactory(scale_factors=[1.0, 1.5, 2.0, 2.5, 3.0])
     mitigated = mitiq.execute_with_zne(circuit, armonk_executor, fac=linear_factory)
 
 To specify a different noise scaling method, we can pass a different function for the argument ``scale_noise``. This
@@ -122,7 +122,7 @@ scaling noise by folding gates starting from the left (instead of at random, the
 
 .. doctest:: python
 
-    mitigated = mitiq.execute_with_zne(circuit, armonk_executor, scale_noise=mitiq.folding.fold_gates_from_left)
+    mitigated = mitiq.execute_with_zne(circuit, armonk_executor, scale_noise=mitiq.zne.scaling.fold_gates_from_left)
 
 Any different combination of noise scaling and extrapolation technique can be passed as arguments to
 ``mitiq.execute_with_zne``.
@@ -182,8 +182,8 @@ local folding method.
 
     scale_factors = [1., 1.5, 2., 2.5, 3.]
     folded_circuits = [
-            mitiq.folding.fold_local(
-            circuit, scale, method=mitiq.folding.fold_gates_at_random
+            mitiq.zne.scaling.fold_local(
+            circuit, scale, method=mitiq.zne.scaling.fold_gates_at_random
         ) for scale in scale_factors
     ]
 

@@ -158,7 +158,7 @@ corresponds to a statistical inference based on the measured data.
 .. testcode::
 
    # we import one of the built-in noise scaling function
-   from mitiq.folding import fold_gates_at_random
+   from mitiq.zne.scaling import fold_gates_at_random
 
    linear_fac.run(circuit, executor, scale_noise=fold_gates_at_random)
    zne_expval = linear_fac.reduce()

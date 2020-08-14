@@ -2,8 +2,8 @@
 
 import numpy as np
 from mitiq._typing import QPROGRAM
-from mitiq.factories import RichardsonFactory
-from mitiq.zne import (
+from mitiq.zne.inference import RichardsonFactory
+from mitiq.zne.zne import (
     execute_with_zne,
     mitigate_executor,
     zne_decorator,
