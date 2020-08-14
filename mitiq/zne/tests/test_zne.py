@@ -5,8 +5,8 @@ import pytest
 
 import cirq
 
-from mitiq.factories import LinearFactory, RichardsonFactory
-from mitiq.folding import (
+from mitiq.zne.inference import LinearFactory, RichardsonFactory
+from mitiq.zne.scaling import (
     fold_gates_from_left,
     fold_gates_from_right,
     fold_gates_at_random,

@@ -3,14 +3,14 @@ from itertools import product
 import numpy as np
 
 from mitiq.benchmarks.randomized_benchmarking import rb_circuits
-from mitiq.factories import (
+from mitiq.zne.inference import (
     LinearFactory,
     RichardsonFactory,
     PolyFactory,
     ExpFactory,
     AdaExpFactory,
 )
-from mitiq.folding import (
+from mitiq.zne.scaling import (
     fold_gates_at_random,
     fold_gates_from_left,
     fold_gates_from_right,

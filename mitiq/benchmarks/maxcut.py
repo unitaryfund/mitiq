@@ -12,7 +12,7 @@ from cirq import identity_each as id
 from scipy.optimize import minimize
 
 from mitiq import execute_with_zne
-from mitiq.factories import Factory
+from mitiq.zne.inference import Factory
 from mitiq.benchmarks.utils import noisy_simulation
 
 SIMULATOR = DensityMatrixSimulator()

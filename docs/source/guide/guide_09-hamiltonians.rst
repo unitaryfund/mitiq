@@ -29,7 +29,7 @@ First we import libraries for this example.
 
     import cirq
     from mitiq import execute_with_zne
-    from mitiq.factories import LinearFactory
+    from mitiq.zne.inference import LinearFactory
 
 Defining the Hamiltonian
 ########################

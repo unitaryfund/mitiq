@@ -5,7 +5,7 @@ import numpy as np
 
 from qiskit import ClassicalRegister, QuantumCircuit
 
-from mitiq.factories import RichardsonFactory, ExpFactory
+from mitiq.zne.inference import RichardsonFactory, ExpFactory
 from mitiq.zne import (
     execute_with_zne,
     mitigate_executor,
