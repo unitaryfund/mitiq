@@ -59,7 +59,7 @@ Note that this will install our testing environment that depends
 on `qiskit` and `pyquil`.
 
 ## Use
-A [Getting Started](docs/source/guide/)
+A [Getting Started](https://mitiq.readthedocs.io/en/latest/guide/guide_02-getting-started.html)
 tutorial can be found in the Documentation.
 
 ## Documentation
@@ -81,7 +81,6 @@ To contribute to the documentation, read the
 
 
 ## Authors
-Ryan LaRose, Andrea Mari, Nathan Shammah, and Will Zeng.
 An up-to-date list of authors can be found
 [here](https://github.com/unitaryfund/mitiq/graphs/contributors)
 
