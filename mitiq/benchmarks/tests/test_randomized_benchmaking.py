@@ -3,21 +3,21 @@ from itertools import product
 import numpy as np
 
 from mitiq.benchmarks.randomized_benchmarking import rb_circuits
-from mitiq.factories import (
+from mitiq.zne.inference import (
     LinearFactory,
     RichardsonFactory,
     PolyFactory,
     ExpFactory,
     AdaExpFactory,
 )
-from mitiq.folding import (
+from mitiq.zne.scaling import (
     fold_gates_at_random,
     fold_gates_from_left,
     fold_gates_from_right,
     fold_global,
 )
 from mitiq.benchmarks.utils import noisy_simulation
-from mitiq.zne import mitigate_executor
+from mitiq.zne.zne import mitigate_executor
 
 SCALE_FUNCTIONS = [
     fold_gates_at_random,
