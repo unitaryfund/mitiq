@@ -5,7 +5,7 @@ from pyquil.gates import CNOT, CZ, H, RZ, X, Y, Z
 from mitiq.mitiq_pyquil.conversions import from_pyquil, to_pyquil
 
 
-def test_to_pyquil_from_pyquil():
+def test_to_pyquil_from_pyquil_simple():
     p = Program()
     p += X(0)
     p += Y(1)
@@ -41,7 +41,39 @@ def maxcut_qaoa_program(gamma: float) -> Program:
     return p
 
 
-# TODO: bug in to_quil, need to write a Cirq PR to fix
-# def test_to_pyquil_from_pyquil_parameterized():
-#     p = maxcut_qaoa_program(np.pi)
-#     assert p.out() == to_pyquil(from_pyquil(p)).out()
+def test_to_pyquil_from_pyquil_parameterized():
+    p = maxcut_qaoa_program(np.pi)
+    assert p.out() == to_pyquil(from_pyquil(p)).out()
+
+
+MEASURELESS_QUIL_PROGRAM = """
+I 0
+I 1
+I 2
+X 0
+Y 1
+Z 2
+RX(pi/2) 0
+RY(pi/2) 1
+RZ(pi/2) 2
+H 0
+CZ 0 1
+CNOT 1 2
+CPHASE(pi/2) 0 1
+CPHASE00(pi/2) 1 2
+CPHASE01(pi/2) 0 1
+CPHASE10(pi/2) 1 2
+ISWAP 0 1
+SWAP 1 2
+XY(pi/2) 0 1
+CCNOT 0 1 2
+CSWAP 0 1 2
+"""
+
+
+def test_to_pyquil_from_pyquil_almost_all_gates():
+    """PHASE, PSWAP, S, T, declaration, and measurement don't convert back
+    and forth perfectly (in terms of labels -- the program unitaries and
+    number of measurements are equivalent)."""
+    p = Program(MEASURELESS_QUIL_PROGRAM)
+    assert p.out() == to_pyquil(from_pyquil(p)).out()

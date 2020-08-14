@@ -6,12 +6,11 @@ and pyQuil's circuit representation (Quil programs).
 from cirq import Circuit
 from pyquil import Program
 
-from mitiq.mitiq_pyquil.quil import circuit_from_quil
+from cirq.contrib.quil_import import circuit_from_quil
 
 QuilType = str
 
 
-# TODO: to_quil needs cirq-unstable or v0.9.0 to be released
 def to_quil(circuit: Circuit) -> QuilType:
     """Returns a Quil string representing the input Mitiq circuit.
 
@@ -48,7 +47,6 @@ def from_pyquil(program: Program) -> Circuit:
     return from_quil(program.out())
 
 
-# TODO: eventually circuit_from_quil will be moved to Cirq
 def from_quil(quil: QuilType) -> Circuit:
     """Returns a Mitiq circuit equivalent to the input Quil string.
 
