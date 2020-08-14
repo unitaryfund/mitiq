@@ -1,4 +1,4 @@
-"""Unit tests for folding Cirq circuits."""
+"""Unit tests for scaling noise by folding Cirq circuits."""
 
 from copy import deepcopy
 
@@ -18,7 +18,7 @@ from cirq.google import Sycamore
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 
 from mitiq.utils import _equal
-from mitiq.folding import (
+from mitiq.zne.scaling import (
     UnfoldableGateError,
     UnfoldableCircuitError,
     _is_measurement,
