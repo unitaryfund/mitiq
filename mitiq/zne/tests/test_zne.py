@@ -11,7 +11,7 @@ from mitiq.zne.scaling import (
     fold_gates_from_right,
     fold_gates_at_random,
 )
-from mitiq.zne.zne import execute_with_zne, mitigate_executor, zne_decorator
+from mitiq.zne import execute_with_zne, mitigate_executor, zne_decorator
 
 npX = np.array([[0, 1], [1, 0]])
 """Defines the sigma_x Pauli matrix in SU(2) algebra as a (2,2) `np.array`."""
