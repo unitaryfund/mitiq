@@ -8,7 +8,7 @@
 A Python toolkit for implementing error mitigation on quantum computers.
 
 ## Documentation
-The full documentation is available at [mitiq.readthedocs.io](mitiq.readthedocs.io).
+The full documentation is available at [mitiq.readthedocs.io](https://mitiq.readthedocs.io).
 
 A pdf with the documentation updated to the latest release can be found
 [here](docs/pdf/).
