@@ -17,7 +17,7 @@
 import numpy as np
 from mitiq._typing import QPROGRAM
 from mitiq.zne.inference import RichardsonFactory
-from mitiq.zne.zne import (
+from mitiq.zne import (
     execute_with_zne,
     mitigate_executor,
     zne_decorator,
