@@ -435,8 +435,7 @@ class PolyFactory(BatchedFactory):
 
     def reduce(self) -> float:
         """Returns the zero-noise limit found by fitting a polynomial of degree
-        equal to `self.order` to the input data of scale factors and expectation
-        values.
+        `self.order` to the input data of scale factors and expectation values.
 
         Stores the optimal parameters for the fit in `self.opt_params`.
         """
@@ -695,8 +694,8 @@ class PolyExpFactory(BatchedFactory):
         """Determines the zero-noise limit assuming an exponential ansatz.
 
         The exponential ansatz is y(x) = a + sign * exp(z(x)) where z(x) is a
-        polynomial and "sign" is either +1 or -1 corresponding to decreasing and
-        increasing exponentials, respectively. The parameter "sign" is
+        polynomial and "sign" is either +1 or -1 corresponding to decreasing
+        and increasing exponentials, respectively. The parameter "sign" is
         automatically deduced from the data.
 
         It is also assumed that z(x-->inf) = -inf, such that y(x-->inf) --> a.
