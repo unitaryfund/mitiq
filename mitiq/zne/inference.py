@@ -74,8 +74,8 @@ class ConvergenceWarning(Warning):
 
 def mitiq_curve_fit(
     ansatz: Callable[..., float],
-    scale_factors: List[float],
-    exp_values: List[float],
+    scale_factors: Sequence[float],
+    exp_values: Sequence[float],
     init_params: Optional[List[float]] = None,
 ) -> List[float]:
     """This is a wrapping of the `scipy.optimize.curve_fit` function with
@@ -117,10 +117,10 @@ def mitiq_curve_fit(
 
 
 def mitiq_polyfit(
-    scale_factors: List[float],
-    exp_values: List[float],
+    scale_factors: Sequence[float],
+    exp_values: Sequence[float],
     deg: int,
-    weights: Optional[List[float]] = None,
+    weights: Optional[Sequence[float]] = None,
 ) -> List[float]:
     """This is a wrapping of the `numpy.polyfit` function with
     custom warnings. It is used to make a polynomial fit.
@@ -173,6 +173,7 @@ class Factory(ABC):
         """
         self.instack = []
         self.outstack = []
+        self.opt_params = []
 
     def push(self, instack_val: dict, outstack_val: float) -> None:
         """Appends "instack_val" to "self.instack" and "outstack_val" to
@@ -212,9 +213,12 @@ class Factory(ABC):
         raise NotImplementedError
 
     def reset(self) -> None:
-        """Resets the instack and outstack of the Factory to empty values."""
+        """Resets the instack, outstack, and optimal parameters of the Factory
+        to empty lists.
+        """
         self.instack = []
         self.outstack = []
+        self.opt_params = []
 
     def iterate(
         self,
@@ -234,7 +238,7 @@ class Factory(ABC):
         Raises:
             ConvergenceWarning: If iteration loop stops before convergence.
         """
-        # Clear out the factory to make sure it is fresh.
+        # Reset the instack, outstack, and optimal parameters
         self.reset()
 
         counter = 0
@@ -392,8 +396,7 @@ class BatchedFactory(Factory):
 
 
 class PolyFactory(BatchedFactory):
-    """
-    Factory object implementing a zero-noise extrapolation algorithm based on
+    """Factory object implementing a zero-noise extrapolation algorithm based on
     a polynomial fit.
 
     Args:
@@ -422,7 +425,6 @@ class PolyFactory(BatchedFactory):
         shot_list: Optional[List[int]] = None,
     ) -> None:
         """Instantiates a new object of this Factory class."""
-
         if order > len(scale_factors) - 1:
             raise ValueError(
                 "The extrapolation order cannot exceed len(scale_factors) - 1."
@@ -430,59 +432,17 @@ class PolyFactory(BatchedFactory):
         self.order = order
         super(PolyFactory, self).__init__(scale_factors, shot_list)
 
-    @staticmethod
-    def static_reduce(
-        instack: List[dict], exp_values: List[float], order: int
-    ) -> float:
-        """
-        Determines with a least squared method, the polynomial of degree equal
-        to 'order' which optimally fits the input data.
-        The zero-noise limit is returned.
-
-        This static method is equivalent to the "self.reduce" method of
-        PolyFactory, but can be called also by other factories which are
-        particular cases of PolyFactory, e.g., LinearFactory
-        and RichardsonFactory.
-
-        Args:
-            instack: The array of input dictionaries, where each
-                     dictionary is supposed to have the key "scale_factor".
-            exp_values: The array of expectation values.
-            order: Extrapolation order (degree of the polynomial fit).
-                   It cannot exceed len(scale_factors) - 1.
-        Raises:
-            ValueError: If data is not consistent with the extrapolation model.
-            ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
-        """
-        scale_factors = _instack_to_scale_factors(instack)
-        # Check arguments
-        error_str = (
-            "Data is not enough: at least two data points are necessary."
-        )
-        if scale_factors is None or exp_values is None:
-            raise ValueError(error_str)
-        if len(scale_factors) != len(exp_values) or len(scale_factors) < 2:
-            raise ValueError(error_str)
-        if order > len(scale_factors) - 1:
-            raise ValueError(
-                "Extrapolation order is too high. "
-                "The order cannot exceed the number of data points minus 1."
-            )
-        # Get coefficients {c_j} of p(x)= c_0 + c_1*x + c_2*x**2...
-        # which best fits the data
-        coefficients = mitiq_polyfit(scale_factors, exp_values, deg=order)
-        # c_0, i.e., the value of p(x) at x=0, is returned
-        return coefficients[-1]
-
     def reduce(self) -> float:
+        """Returns the zero-noise limit found by fitting a polynomial of degree
+        equal to `self.order` to the input data of scale factors and expectation
+        values.
+
+        Stores the optimal parameters for the fit in `self.opt_params`.
         """
-        Determines with a least squared method, the polynomial of degree equal
-        to "self.order" which optimally fits the input data.
-        The zero-noise limit is returned.
-        """
-        return PolyFactory.static_reduce(
-            self.instack, self.outstack, self.order
+        self.opt_params = mitiq_polyfit(
+            self.get_scale_factors(), self.get_expectation_values(), self.order
         )
+        return self.opt_params[-1]
 
     def __eq__(self, other):
         return BatchedFactory.__eq__(self, other) and self.order == other.order
@@ -505,13 +465,18 @@ class RichardsonFactory(BatchedFactory):
     """
 
     def reduce(self) -> float:
-        """Returns the Richardson's extrapolation to the zero-noise limit."""
+        """Returns the zero-noise limit found by Richardson's extrapolation.
+
+        Stores the optimal parameters for the fit in `self.opt_params`.
+        """
         # Richardson's extrapolation is a particular case of a polynomial fit
         # with order equal to the number of data points minus 1.
-        order = len(self.instack) - 1
-        return PolyFactory.static_reduce(
-            self.instack, self.outstack, order=order
+        self.opt_params = mitiq_polyfit(
+            self.get_scale_factors(),
+            self.get_expectation_values(),
+            deg=len(self.get_scale_factors()) - 1
         )
+        return self.opt_params[-1]
 
 
 class LinearFactory(BatchedFactory):
@@ -536,13 +501,19 @@ class LinearFactory(BatchedFactory):
     """
 
     def reduce(self) -> float:
-        """
-        Determines, with a least squared method, the line of best fit
-        associated to the data points. The intercept is returned.
+        """Returns the zero-noise limit found by fitting a line to the input
+        data of scale factors and expectation values.
+
+        Stores the optimal parameters for the fit in `self.opt_params`.
         """
         # Richardson's extrapolation is a particular case of a polynomial fit
         # with order equal to 1.
-        return PolyFactory.static_reduce(self.instack, self.outstack, order=1)
+        self.opt_params = mitiq_polyfit(
+            self.get_scale_factors(),
+            self.get_expectation_values(),
+            deg=1
+        )
+        return self.opt_params[-1]
 
 
 class ExpFactory(BatchedFactory):
@@ -568,6 +539,7 @@ class ExpFactory(BatchedFactory):
                    argument is explicitly passed to the factory, it must have
                    the same length of scale_factors and the executor function
                    must accept "shots" as a valid keyword argument.
+
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationError: If the extrapolation fit fails.
@@ -653,6 +625,7 @@ class PolyExpFactory(BatchedFactory):
                    argument is explicitly passed to the factory, it must have
                    the same length of scale_factors and the executor function
                    must accept "shots" as a valid keyword argument.
+
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationError: If the extrapolation fit fails.
@@ -686,15 +659,14 @@ class PolyExpFactory(BatchedFactory):
         avoid_log: bool = False,
         eps: float = 1.0e-6,
     ) -> Tuple[float, List[float]]:
-        """
-        Determines the zero-noise limit, assuming an exponential ansatz:
-        y(x) = a + sign * exp(z(x)), where z(x) is a polynomial.
+        """Determines the zero-noise limit assuming an exponential ansatz.
 
-        The parameter "sign" is a sign variable which can be either 1 or -1,
-        corresponding to decreasing and increasing exponentials, respectively.
-        The parameter "sign" is automatically deduced from the data.
+        The exponential ansatz is y(x) = a + sign * exp(z(x)) where z(x) is a
+        polynomial and "sign" is either +1 or -1 corresponding to decreasing and
+        increasing exponentials, respectively. The parameter "sign" is
+        automatically deduced from the data.
 
-        It is also assumed that z(x-->inf)=-inf, such that y(x-->inf)-->a.
+        It is also assumed that z(x-->inf) = -inf, such that y(x-->inf) --> a.
 
         If asymptote is None, the ansatz y(x) is fitted with a non-linear
         optimization.
@@ -717,15 +689,16 @@ class PolyExpFactory(BatchedFactory):
                        if asymptote is not None. The default value is False.
             eps: Epsilon to regularize log(sign (instack - asymptote)) when
                  the argument is to close to zero or negative.
+
         Returns:
             (znl, params): Where "znl" is the zero-noise-limit and "params"
                            are the optimal fitting parameters.
+
         Raises:
             ValueError: If data is not consistent with the extrapolation model.
             ExtrapolationError: If the extrapolation fit fails.
             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
         """
-
         # Shift is 0 if asymptote is given, 1 if asymptote is not given
         shift = int(asymptote is None)
 
