@@ -117,16 +117,15 @@ def test_zne_decorator():
 
 def test_run_factory_with_number_of_shots():
     """Tests "run" method of an ExpFactory with shot_list."""
-
     qp = random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH)
     qp = measure(qp, 0)
     fac = ExpFactory([1.0, 2.0, 3.0], shot_list=[10 ** 4, 10 ** 5, 10 ** 6])
     fac.run(qp, basic_executor, scale_noise=scale_noise)
     result = fac.reduce()
     assert np.isclose(result, 1.0, atol=1.0e-1)
-    assert fac.instack[0] == {"scale_factor": 1.0, "shots": 10 ** 4}
-    assert fac.instack[1] == {"scale_factor": 2.0, "shots": 10 ** 5}
-    assert fac.instack[2] == {"scale_factor": 3.0, "shots": 10 ** 6}
+    assert fac._instack[0] == {"scale_factor": 1.0, "shots": 10 ** 4}
+    assert fac._instack[1] == {"scale_factor": 2.0, "shots": 10 ** 5}
+    assert fac._instack[2] == {"scale_factor": 3.0, "shots": 10 ** 6}
 
 
 def test_mitigate_executor_with_shot_list():
@@ -147,6 +146,6 @@ def test_mitigate_executor_with_shot_list():
     good_result = new_executor(qp)
     assert not np.isclose(bad_result, 1.0, atol=1.0e-1)
     assert np.isclose(good_result, 1.0, atol=1.0e-1)
-    assert fac.instack[0] == {"scale_factor": 1.0, "shots": 10 ** 4}
-    assert fac.instack[1] == {"scale_factor": 2.0, "shots": 10 ** 5}
-    assert fac.instack[2] == {"scale_factor": 3.0, "shots": 10 ** 6}
+    assert fac._instack[0] == {"scale_factor": 1.0, "shots": 10 ** 4}
+    assert fac._instack[1] == {"scale_factor": 2.0, "shots": 10 ** 5}
+    assert fac._instack[2] == {"scale_factor": 3.0, "shots": 10 ** 6}

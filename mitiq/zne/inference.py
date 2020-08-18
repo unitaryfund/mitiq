@@ -16,7 +16,7 @@
 """Classes corresponding to different zero-noise extrapolation methods."""
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Callable, List, Optional, Sequence, Tuple
+from typing import Callable, Dict, List, Optional, Sequence, Tuple
 import warnings
 
 import numpy as np
@@ -171,8 +171,8 @@ class Factory(ABC):
         particular extrapolation algorithm and can be added to the "__init__"
         method of the associated derived class.
         """
-        self.instack = []
-        self.outstack = []
+        self._instack = []
+        self._outstack = []
         self.opt_params = []
 
     def push(self, instack_val: dict, outstack_val: float) -> None:
@@ -180,20 +180,20 @@ class Factory(ABC):
         "self.outstack". Each time a new expectation value is computed this
         method should be used to update the internal state of the Factory.
         """
-        self.instack.append(instack_val)
-        self.outstack.append(outstack_val)
+        self._instack.append(instack_val)
+        self._outstack.append(outstack_val)
 
     def get_scale_factors(self) -> np.ndarray:
         """Returns the scale factors at which the factory has computed
         expectation values.
         """
         return np.array(
-            [params.get("scale_factor") for params in self.instack]
+            [params.get("scale_factor") for params in self._instack]
         )
 
     def get_expectation_values(self) -> np.ndarray:
         """Returns the expectation values computed by the factory."""
-        return np.array(self.outstack)
+        return np.array(self._outstack)
 
     @abstractmethod
     def next(self) -> float:
@@ -216,8 +216,8 @@ class Factory(ABC):
         """Resets the instack, outstack, and optimal parameters of the Factory
         to empty lists.
         """
-        self.instack = []
-        self.outstack = []
+        self._instack = []
+        self._outstack = []
         self.opt_params = []
 
     def iterate(
@@ -245,7 +245,8 @@ class Factory(ABC):
         while not self.is_converged() and counter < max_iterations:
             next_in_params = self.next()
             next_exec_params = deepcopy(next_in_params)
-            # get next scale factor and remove it from next_exec_params
+
+            # Get next scale factor and remove it from next_exec_params
             scale_factor = next_exec_params.pop("scale_factor")
             next_expval = noise_to_expval(scale_factor, **next_exec_params)
             self.push(next_in_params, next_expval)
@@ -297,12 +298,12 @@ class Factory(ABC):
         return self.iterate(_noise_to_expval, max_iterations)
 
     def __eq__(self, other):
-        if len(self.instack) != len(other.instack):
+        if len(self._instack) != len(other._instack):
             return False
-        for dict_a, dict_b in zip(self.instack, other.instack):
+        for dict_a, dict_b in zip(self._instack, other._instack):
             if not _are_close_dict(dict_a, dict_b):
                 return False
-        return np.allclose(self.outstack, other.outstack)
+        return np.allclose(self._outstack, other._outstack)
 
 
 class BatchedFactory(Factory):
@@ -362,11 +363,11 @@ class BatchedFactory(Factory):
 
         super(BatchedFactory, self).__init__()
 
-    def next(self) -> float:
+    def next(self) -> Dict[str, float]:
         """Returns a dictionary of parameters to execute a circuit at."""
         in_params = {}
         try:
-            index = len(self.outstack)
+            index = len(self._outstack)
             in_params["scale_factor"] = self._scale_factors[index]
             if self._shot_list:
                 in_params["shots"] = self._shot_list[index]
@@ -382,12 +383,12 @@ class BatchedFactory(Factory):
         """Returns True if all needed expectation values have been computed,
         else False.
         """
-        if len(self.outstack) != len(self.instack):
+        if len(self._outstack) != len(self._instack):
             raise IndexError(
-                f"The length of 'self.instack' ({len(self.instack)}) "
-                f"and 'self.outstack' ({len(self.outstack)}) must be equal."
+                f"The length of 'self.instack' ({len(self._instack)}) "
+                f"and 'self.outstack' ({len(self._outstack)}) must be equal."
             )
-        return len(self.outstack) == len(self._scale_factors)
+        return len(self._outstack) == len(self._scale_factors)
 
     def __eq__(self, other):
         return Factory.__eq__(self, other) and np.allclose(
@@ -439,8 +440,23 @@ class PolyFactory(BatchedFactory):
 
         Stores the optimal parameters for the fit in `self.opt_params`.
         """
+        scale_factors = self.get_scale_factors()
+        expectation_values = self.get_expectation_values()
+
+        if len(scale_factors) < 2:
+            raise ValueError(
+                "At least two data points are needed to fit a polynomial."
+            )
+
+        if self.order > len(scale_factors) - 1:
+            raise ValueError(
+                f"Extrapolation order is too high. The order cannot exceed "
+                f"len(self.get_scale_factors()) but order = {self.order} and "
+                f"len(self.get_scale_factors()) = {len(scale_factors)}."
+            )
+
         self.opt_params = mitiq_polyfit(
-            self.get_scale_factors(), self.get_expectation_values(), self.order
+            scale_factors, expectation_values, self.order
         )
         return self.opt_params[-1]
 
@@ -565,8 +581,8 @@ class ExpFactory(BatchedFactory):
     def reduce(self) -> float:
         """Returns the zero-noise limit"""
         return PolyExpFactory.static_reduce(
-            self.instack,
-            self.outstack,
+            self._instack,
+            self._outstack,
             self.asymptote,
             order=1,
             avoid_log=self.avoid_log,
@@ -781,8 +797,8 @@ class PolyExpFactory(BatchedFactory):
     def reduce(self) -> float:
         """Returns the zero-noise limit."""
         return self.static_reduce(
-            self.instack,
-            self.outstack,
+            self._instack,
+            self._outstack,
             self.asymptote,
             self.order,
             self.avoid_log,
@@ -874,13 +890,13 @@ class AdaExpFactory(Factory):
     def next(self) -> float:
         """Returns a dictionary of parameters to execute a circuit at."""
         # The 1st scale factor is always 1
-        if len(self.instack) == 0:
+        if len(self._instack) == 0:
             return {"scale_factor": 1.0}
         # The 2nd scale factor is self._scale_factor
-        if len(self.instack) == 1:
+        if len(self._instack) == 1:
             return {"scale_factor": self._scale_factor}
         # If asymptote is None we use 2 * scale_factor as third noise parameter
-        if (len(self.instack) == 2) and (self.asymptote is None):
+        if (len(self._instack) == 2) and (self.asymptote is None):
             return {"scale_factor": 2 * self._scale_factor}
 
         with warnings.catch_warnings():
@@ -903,24 +919,24 @@ class AdaExpFactory(Factory):
         """Returns True if all the needed expectation values have been
         computed, else False.
         """
-        if len(self.outstack) != len(self.instack):
+        if len(self._outstack) != len(self._instack):
             raise IndexError(
-                f"The length of 'self.instack' ({len(self.instack)}) "
-                f"and 'self.outstack' ({len(self.outstack)}) must be equal."
+                f"The length of 'self.instack' ({len(self._instack)}) "
+                f"and 'self.outstack' ({len(self._outstack)}) must be equal."
             )
-        return len(self.outstack) == self._steps
+        return len(self._outstack) == self._steps
 
     def reduce(self) -> float:
         """Returns the zero-noise limit."""
         zero_limit, params = PolyExpFactory.static_reduce(
-            self.instack,
-            self.outstack,
+            self._instack,
+            self._outstack,
             self.asymptote,
             order=1,
             avoid_log=self.avoid_log,
         )
         # Update optimization history
-        self.history.append((self.instack, self.outstack, params, zero_limit))
+        self.history.append((self._instack, self._outstack, params, zero_limit))
         return zero_limit
 
     def __eq__(self, other) -> bool:

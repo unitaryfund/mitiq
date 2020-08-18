@@ -407,39 +407,39 @@ def test_few_scale_factors_error():
         _ = PolyFactory(X_VALS, order=10)
 
 
-# TODO: Setting instack to this list isn't valid since instack must be a dict.
-# def test_few_points_error():
-#     """Test that the correct error is raised if data is not enough to fit."""
-#     fac = PolyFactory(X_VALS, order=2)
-#     fac.instack = [1.0, 2.0]
-#     fac.outstack = [1.0, 2.0]
-#     with raises(ValueError, match=r"Extrapolation order is too high."):
-#         fac.reduce()
+def test_too_few_points_for_polyfit_error():
+    """Test that the correct error is raised if data is not enough to fit."""
+    fac = PolyFactory(X_VALS, order=2)
+    fac._instack = [
+        {"scale_factor": 1.0, "shots": 100},
+        {"scale_factor": 2.0, "shots": 100},
+    ]
+    fac._outstack = [1.0, 2.0]
+    with raises(ValueError, match=r"Extrapolation order is too high."):
+        fac.reduce()
 
 
-# TODO: Setting instack to this list isn't valid since instack must be a dict.
-# def test_failing_fit_error():
-#     """Test error handling for a failing fit."""
-#     fac = ExpFactory(X_VALS, asymptote=None)
-#     fac.instack = X_VALS
-#     fac.outstack = [1.0, 2.0, 1.0, 2.0, 1.0]
-#     with raises(
-#         ExtrapolationError, match=r"The extrapolation fit failed to converge."
-#     ):
-#         fac.reduce()
+def test_failing_fit_error():
+    """Test error handling for a failing fit."""
+    fac = ExpFactory(X_VALS, asymptote=None)
+    fac._instack = [{"scale_factor": x} for x in X_VALS]
+    fac._outstack = [1.0, 2.0, 1.0, 2.0, 1.0]
+    with raises(
+        ExtrapolationError, match=r"The extrapolation fit failed to converge."
+    ):
+        fac.reduce()
 
 
-# TODO: Setting instack to this list isn't valid since instack must be a dict.
-# @mark.parametrize("fac", [LinearFactory([1, 1, 1]), ExpFactory([1, 1, 1])])
-# def test_failing_fit_warnings(fac):
-#     """Test that the correct warning is raised for an ill-conditioned fit."""
-#     fac.instack = [1, 1, 1, 1]
-#     fac.outstack = [1, 1, 1, 1]
-#     with warns(
-#         ExtrapolationWarning,
-#         match=r"The extrapolation fit may be ill-conditioned.",
-#     ):
-#         fac.reduce()
+@mark.parametrize("fac", [LinearFactory([1, 1, 1]), ExpFactory([1, 1, 1])])
+def test_failing_fit_warnings(fac):
+    """Test that the correct warning is raised for an ill-conditioned fit."""
+    fac._instack = [{"scale_factor": 1.0} for _ in range(4)]
+    fac._outstack = [1, 1, 1, 1]
+    with warns(
+        ExtrapolationWarning,
+        match=r"The extrapolation fit may be ill-conditioned.",
+    ):
+        fac.reduce()
 
 
 def test_iteration_warnings():
@@ -487,9 +487,9 @@ def test_iterate_with_shot_list(fac_class):
     # Check instack and outstack are as expected
     SHOT_LIST = [100, 200, 300, 400, 500]
     for j, shots in enumerate(SHOT_LIST):
-        assert fac.instack[j] == {"scale_factor": X_VALS[j]}
-        assert fac.outstack[j] != f_lin_shot(X_VALS[j], shots=shots)
-        assert fac.outstack[j] == f_lin_shot(X_VALS[j])
+        assert fac._instack[j] == {"scale_factor": X_VALS[j]}
+        assert fac._outstack[j] != f_lin_shot(X_VALS[j], shots=shots)
+        assert fac._outstack[j] == f_lin_shot(X_VALS[j])
 
     # Now pass an arbitrary shot_list as an argument
     fac = fac_class(X_VALS, shot_list=SHOT_LIST)
@@ -498,9 +498,9 @@ def test_iterate_with_shot_list(fac_class):
 
     # Check instack and outstack are as expected
     for j, shots in enumerate(SHOT_LIST):
-        assert fac.instack[j] == {"scale_factor": X_VALS[j], "shots": shots}
-        assert fac.outstack[j] == f_lin_shot(X_VALS[j], shots=shots)
-        assert fac.outstack[j] != f_lin_shot(X_VALS[j])
+        assert fac._instack[j] == {"scale_factor": X_VALS[j], "shots": shots}
+        assert fac._outstack[j] == f_lin_shot(X_VALS[j], shots=shots)
+        assert fac._outstack[j] != f_lin_shot(X_VALS[j])
 
 
 def test_shot_list_errors():
