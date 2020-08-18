@@ -232,9 +232,9 @@ class Factory(ABC):
             noise_to_expval: Function mapping a noise scale factor to an
                              expectation value. If shot_list is not None,
                              "shot" must be an argument of the function.
-
             max_iterations: Maximum number of iterations (optional).
                             Default: 100.
+
         Raises:
             ConvergenceWarning: If iteration loop stops before convergence.
         """
@@ -475,6 +475,7 @@ class RichardsonFactory(BatchedFactory):
                    argument is explicitly passed to the factory, it must have
                    the same length of scale_factors and the executor function
                    must accept "shots" as a valid keyword argument.
+
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.

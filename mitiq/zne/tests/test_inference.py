@@ -249,17 +249,23 @@ def test_get_expectation_values_adaptive_factories(factory):
 def test_richardson_extr(test_f: Callable[[float], float]):
     """Test of the Richardson's extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = RichardsonFactory(X_VALS)
+    fac = RichardsonFactory(scale_factors=X_VALS)
+    assert fac.opt_params == []
     fac.iterate(seeded_f)
-    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+    zne_value = fac.reduce()
+    assert np.isclose(zne_value, seeded_f(0, err=0), atol=CLOSE_TOL)
+    assert len(fac.opt_params) == len(X_VALS)
+    assert np.isclose(fac.opt_params[-1], zne_value)
 
 
 def test_linear_extr():
-    """Test of linear extrapolator."""
+    """Tests extrapolation with a LinearFactory."""
     seeded_f = apply_seed_to_func(f_lin, SEED)
     fac = LinearFactory(X_VALS)
+    assert fac.opt_params == []
     fac.iterate(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+    assert np.allclose(fac.opt_params, [B, A], atol=CLOSE_TOL)
 
 
 def test_poly_extr():
@@ -267,9 +273,6 @@ def test_poly_extr():
     # test (order=1)
     fac = PolyFactory(X_VALS, order=1)
     fac.iterate(f_lin)
-    print(fac.reduce())
-    print(fac.opt_params)
-    print(f_lin(0, err=0))
     assert np.isclose(fac.reduce(), f_lin(0, err=0), atol=CLOSE_TOL)
     # test that, for some non-linear functions,
     # order=1 is bad while order=2 is better.
@@ -283,6 +286,18 @@ def test_poly_extr():
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
 
+@mark.parametrize("order", [2, 3, 4, 5])
+def test_opt_params_poly_factory(order):
+    """Tests that optimal parameters are stored after calling the reduce method.
+    """
+    fac = PolyFactory(scale_factors=np.linspace(1, 10, 10), order=order)
+    assert fac.opt_params == []
+    fac.iterate(apply_seed_to_func(f_non_lin, seed=SEED))
+    zne_value = fac.reduce()
+    assert len(fac.opt_params) == order + 1
+    assert np.isclose(fac.opt_params[-1], zne_value)
+
+
 @mark.parametrize("avoid_log", [False, True])
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
 def test_exp_factory_with_asympt(
@@ -292,7 +307,11 @@ def test_exp_factory_with_asympt(
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = ExpFactory(X_VALS, asymptote=A, avoid_log=True)
     fac.iterate(seeded_f)
+    assert len(fac.opt_params) == 0
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+
+    # There are three parameters to fit in the exponential ansatz
+    assert len(fac.opt_params) == 3
 
 
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
@@ -301,7 +320,11 @@ def test_exp_factory_no_asympt(test_f: Callable[[float], float]):
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = ExpFactory(X_VALS, asymptote=None)
     fac.iterate(seeded_f)
+    assert len(fac.opt_params) == 0
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+
+    # There are three parameters to fit in the exponential ansatz
+    assert len(fac.opt_params) == 3
 
 
 @mark.parametrize("avoid_log", [False, True])
@@ -319,7 +342,11 @@ def test_poly_exp_factory_with_asympt(
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = PolyExpFactory(X_VALS, order=2, asymptote=A, avoid_log=avoid_log)
     fac.iterate(seeded_f)
+    assert len(fac.opt_params) == 0
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=POLYEXP_TOL)
+
+    # There are four parameters to fit for the PolyExpFactory of order 1
+    assert len(fac.opt_params) == 4
 
 
 @mark.parametrize("test_f", [f_poly_exp_down, f_poly_exp_up])
@@ -347,8 +374,15 @@ def test_ada_exp_factory_with_asympt(
     fac = AdaExpFactory(
         steps=3, scale_factor=2.0, asymptote=A, avoid_log=avoid_log
     )
+    # Note: iterate calls next which calls reduce, so calling fac.iterate with
+    # an AdaExpFactory sets the optimal parameters as well. Hence we check that
+    # the opt_params are empty before AdaExpFactory.iterate is called.
+    assert len(fac.opt_params) == 0
     fac.iterate(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+
+    # There are three parameters to fit for the (adaptive) exponential ansatz
+    assert len(fac.opt_params) == 3
 
 
 @mark.parametrize("avoid_log", [False, True])
