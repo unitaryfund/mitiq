@@ -895,7 +895,7 @@ class AdaExpFactory(Factory):
             []
         )  # type: List[Tuple[List[float], List[float], List[float], float]]
 
-    def next(self) -> float:
+    def next(self) -> Dict[str, float]:
         """Returns a dictionary of parameters to execute a circuit at."""
         # The 1st scale factor is always 1
         if len(self._instack) == 0:
@@ -936,7 +936,7 @@ class AdaExpFactory(Factory):
 
     def reduce(self) -> float:
         """Returns the zero-noise limit."""
-        zero_limit, params = PolyExpFactory.static_reduce(
+        zero_limit, self.opt_params = PolyExpFactory.static_reduce(
             self._instack,
             self._outstack,
             self.asymptote,
@@ -944,7 +944,9 @@ class AdaExpFactory(Factory):
             avoid_log=self.avoid_log,
         )
         # Update optimization history
-        self.history.append((self._instack, self._outstack, params, zero_limit))
+        self.history.append(
+            (self._instack, self._outstack, self.opt_params, zero_limit)
+        )
         return zero_limit
 
     def __eq__(self, other) -> bool:
