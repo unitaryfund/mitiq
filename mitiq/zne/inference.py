@@ -579,14 +579,18 @@ class ExpFactory(BatchedFactory):
         self.avoid_log = avoid_log
 
     def reduce(self) -> float:
-        """Returns the zero-noise limit"""
-        return PolyExpFactory.static_reduce(
+        """Returns the zero-noise limit found by fitting the exponential ansatz.
+
+        Stores the optimal parameters for the fit in `self.opt_params`.
+        """
+        zne_value, self.opt_params = PolyExpFactory.static_reduce(
             self._instack,
             self._outstack,
             self.asymptote,
             order=1,
             avoid_log=self.avoid_log,
-        )[0]
+        )
+        return zne_value
 
     def __eq__(self, other):
         if (
@@ -666,6 +670,20 @@ class PolyExpFactory(BatchedFactory):
         self.asymptote = asymptote
         self.avoid_log = avoid_log
 
+    def reduce(self) -> float:
+        """Returns the zero-noise limit found by fitting the ansatz.
+
+        Stores the optimal parameters for the fit in `self.opt_params`.
+        """
+        zne_value, self.opt_params = self.static_reduce(
+            self._instack,
+            self._outstack,
+            self.asymptote,
+            self.order,
+            self.avoid_log,
+        )
+        return zne_value
+
     @staticmethod
     def static_reduce(
         instack: List[dict],
@@ -724,7 +742,6 @@ class PolyExpFactory(BatchedFactory):
         error_str = (
             "Data is not enough: at least two data points are necessary."
         )
-
         if scale_factors is None or exp_values is None:
             raise ValueError(error_str)
         if len(scale_factors) != len(exp_values) or len(scale_factors) < 2:
@@ -778,6 +795,7 @@ class PolyExpFactory(BatchedFactory):
         # Polynomial fit of z(x).
         shifted_y = [max(sign * (y - asymptote), eps) for y in exp_values]
         zstack = np.log(shifted_y)
+
         # Get coefficients {z_j} of z(x)= z_0 + z_1*x + z_2*x**2...
         # Note: coefficients are ordered from high powers to powers of x
         # Weights "w" are used to compensate for error propagation
@@ -793,16 +811,6 @@ class PolyExpFactory(BatchedFactory):
         # Parameters from low order to high order
         params = [asymptote] + list(z_coefficients[::-1])
         return zero_limit, params
-
-    def reduce(self) -> float:
-        """Returns the zero-noise limit."""
-        return self.static_reduce(
-            self._instack,
-            self._outstack,
-            self.asymptote,
-            self.order,
-            self.avoid_log,
-        )[0]
 
     def __eq__(self, other):
         return (
