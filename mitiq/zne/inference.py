@@ -491,7 +491,7 @@ class RichardsonFactory(BatchedFactory):
         self.opt_params = mitiq_polyfit(
             self.get_scale_factors(),
             self.get_expectation_values(),
-            deg=len(self.get_scale_factors()) - 1
+            deg=len(self.get_scale_factors()) - 1,
         )
         return self.opt_params[-1]
 
@@ -526,9 +526,7 @@ class LinearFactory(BatchedFactory):
         # Richardson's extrapolation is a particular case of a polynomial fit
         # with order equal to 1.
         self.opt_params = mitiq_polyfit(
-            self.get_scale_factors(),
-            self.get_expectation_values(),
-            deg=1
+            self.get_scale_factors(), self.get_expectation_values(), deg=1
         )
         return self.opt_params[-1]
 
