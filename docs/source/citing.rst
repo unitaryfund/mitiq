@@ -17,4 +17,8 @@ If you are using ``Mitiq`` for your research, please cite it:
 	  year={2020}
 	}
 
-If you have developed new features for error mitigation, or found bugs, please consider `contributing <contributing.rst>`_.
+
+You can download the :download:`bibtex file <mitiq.bib>`
+
+
+If you have developed new features for error mitigation, or found bugs in ``mitiq``, please consider `contributing <contributing.rst>`_ your code.
