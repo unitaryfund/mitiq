@@ -10,8 +10,8 @@ Welcome to mitiq's documentation!
    read_README.rst
    guide/guide_00.rst
    apidoc.rst
-   contributing.rst
    citing.rst
+   contributing.rst
    changelog.rst
    zz_bibliography.rst
 
