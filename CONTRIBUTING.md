@@ -54,7 +54,7 @@ Follow the guidelines in the Contributing to docs [instructions](https://mitiq.r
 
 ### Checking local tests
 
-You can check that tests run with `pytest`. The [`Makefile`](https://github.com/unitaryfund/mitiq/blob/master/Makefile) contains
+You can check that tests run with `pytest`. The [Makefile][makefile] contains
 some commands for running different collections of tests for the repository.
 
 To run just the tests contained in `mitiq/tests` and `mitiq/benchmarks/tests` run
@@ -109,3 +109,5 @@ default of 88 (this is configured in the [`pyproject.toml`](pyproject.toml) file
 
 ### Code of conduct
 Mitiq development abides to the [Contributors' Covenant](https://mitiq.readthedocs.io/en/latest/CODE_OF_CONDUCT.html).
+
+[makefile]: https://github.com/unitaryfund/mitiq/blob/master/Makefile
