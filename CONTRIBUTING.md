@@ -50,11 +50,11 @@ development of the library, from your local clone of the fork, run
 If you add new features to a function or class, it is strongly encouraged to add tests for such object. Mitiq uses a nested structure for packaging tests in directories named `tests` at the same level of each module.
 
 ### Updating the documentation
-Follow the guidelines in the Contributing to docs [instructions](docs/build/read_README-docs.rst) (look here on [GitHub](https://github.com/unitaryfund/mitiq/blob/master/docs/README-docs.md)), which include guidelines about updating the API-doc list of modules and writing examples in the users guide.
+Follow the guidelines in the Contributing to docs [instructions](https://mitiq.readthedocs.io/en/latest/read_README-docs.html) (look here on [GitHub](https://github.com/unitaryfund/mitiq/blob/master/docs/README-docs.md)), which include guidelines about updating the API-doc list of modules and writing examples in the users guide.
 
 ### Checking local tests
 
-You can check that tests run with `pytest`. The [`Makefile`](Makefile) contains
+You can check that tests run with `pytest`. The [`Makefile`](https://github.com/unitaryfund/mitiq/blob/master/Makefile) contains
 some commands for running different collections of tests for the repository.
 
 To run just the tests contained in `mitiq/tests` and `mitiq/benchmarks/tests` run
