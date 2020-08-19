@@ -7,11 +7,11 @@ Welcome to mitiq's documentation!
    :maxdepth: 3
    :caption: Contents:
 
-   read_README.rst
+   README.rst
    guide/guide_00.rst
    apidoc.rst
    citing.rst
-   contributing.rst
+   toc_contributing.rst
    changelog.rst
    zz_bibliography.rst
 

@@ -108,4 +108,4 @@ default behavior in one category: we choose to use a line length of 79 rather th
 default of 88 (this is configured in the [`pyproject.toml`](pyproject.toml) file).
 
 ### Code of conduct
-Mitiq development abides to the [Contributors' Covenant](CODE_OF_CONDUCT.md).
+Mitiq development abides to the [Contributors' Covenant](https://mitiq.readthedocs.io/en/latest/CODE_OF_CONDUCT.html).
