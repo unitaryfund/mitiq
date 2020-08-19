@@ -11,3 +11,4 @@ Contributing
 
    read_CONTRIBUTING.rst
    read_README-docs.rst
+   read_CODE_OF_CONDUCT.rst

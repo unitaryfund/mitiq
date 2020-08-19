@@ -11,6 +11,7 @@ Welcome to mitiq's documentation!
    guide/guide_00.rst
    apidoc.rst
    contributing.rst
+   citing.rst
    changelog.rst
    zz_bibliography.rst
 
