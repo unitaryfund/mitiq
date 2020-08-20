@@ -28,6 +28,10 @@ class UnsupportedCircuitError(Exception):
     pass
 
 
+class CircuitConversionError(Exception):
+    pass
+
+
 class UnfoldableGateError(Exception):
     pass
 
@@ -150,20 +154,33 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
         from mitiq.mitiq_qiskit.conversions import from_qiskit
 
         input_circuit_type = "qiskit"
-        mitiq_circuit = from_qiskit(circuit)
+        conversion_function = from_qiskit
     elif "pyquil" in circuit.__module__:
         from mitiq.mitiq_pyquil.conversions import from_pyquil
 
         input_circuit_type = "pyquil"
-        mitiq_circuit = from_pyquil(circuit)
+        conversion_function = from_pyquil
     elif isinstance(circuit, Circuit):
         input_circuit_type = "cirq"
-        mitiq_circuit = circuit
+
+        def conversion_function(circ):
+            return circ
     else:
         raise UnsupportedCircuitError(
             f"Circuit from module {circuit.__module__} is not supported.\n\n"
-            f"Circuit types supported by mitiq = \n{SUPPORTED_PROGRAM_TYPES}"
+            f"Circuit types supported by Mitiq are \n{SUPPORTED_PROGRAM_TYPES}"
         )
+
+    try:
+        mitiq_circuit = conversion_function(circuit)
+    except Exception:
+        raise CircuitConversionError(
+            "Circuit could not be converted to an internal Mitiq circuit. "
+            "This may be because the circuit contains custom gates or Pragmas "
+            "(pyQuil). If you think this is a bug, you can open an issue at "
+            "https://github.com/unitaryfund/mitiq."
+        )
+
     return mitiq_circuit, input_circuit_type
 
 
@@ -177,18 +194,28 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
     if conversion_type == "qiskit":
         from mitiq.mitiq_qiskit.conversions import to_qiskit
 
-        converted_circuit = to_qiskit(circuit)
+        conversion_function = to_qiskit
     elif conversion_type == "pyquil":
         from mitiq.mitiq_pyquil.conversions import to_pyquil
 
-        converted_circuit = to_pyquil(circuit)
+        conversion_function = to_pyquil
     elif isinstance(circuit, Circuit):
-        converted_circuit = circuit
+        def conversion_function(circ):
+            return circ
     else:
         raise UnsupportedCircuitError(
             f"Conversion to circuit of type {conversion_type} is unsupported."
             f"\nCircuit types supported by mitiq = {SUPPORTED_PROGRAM_TYPES}"
         )
+
+    try:
+        converted_circuit = conversion_function(circuit)
+    except Exception:
+        raise CircuitConversionError(
+            f"Circuit could not be converted from an internal Mitiq type to a "
+            f"circuit of type {conversion_type}."
+        )
+
     return converted_circuit
 
 
