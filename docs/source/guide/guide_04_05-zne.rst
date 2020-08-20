@@ -309,7 +309,7 @@ methods are supported too and they actually represent the most common choice.
 
 Specific classes derived from the abstract class :class:`.Factory`, like :class:`.LinearFactory`,
 :class:`.RichardsonFactory`, etc., represent different zero-noise extrapolation methods.
-All the built-in factories can be found in the module :py:mod:`mitiq.factories` and
+All the built-in factories can be found in the module :py:mod:`mitiq.zne.inference` and
 are summarized in the following table.
 
 .. _built-in-factories:
@@ -317,15 +317,19 @@ are summarized in the following table.
    .. autosummary::
       :nosignatures:
 
-      mitiq.factories.LinearFactory
-      mitiq.factories.RichardsonFactory
-      mitiq.factories.PolyFactory
-      mitiq.factories.ExpFactory
-      mitiq.factories.PolyExpFactory
-      mitiq.factories.AdaExpFactory
+      mitiq.zne.inference.LinearFactory
+      mitiq.zne.inference.RichardsonFactory
+      mitiq.zne.inference.PolyFactory
+      mitiq.zne.inference.ExpFactory
+      mitiq.zne.inference.PolyExpFactory
+      mitiq.zne.inference.AdaExpFactory
 
 
+<<<<<<< HEAD:docs/source/guide/guide_04_05-zne.rst
 Once instantiated, a factory can be passed as an argument to the high-level functions contained in the module :py:mod:`mitiq.zne`.
+=======
+Once instantiated, a factory can be passed as an argument to the high-level functions contained in the module :py:mod:`mitiq.zne.zne`.
+>>>>>>> 8145158f37cdb722a12eb26d7ef00810be33f621:docs/source/guide/guide_05-factories.rst
 Alternatively, a factory can be directly used to implement a zero-noise extrapolation procedure in a fully self-contained way.
 
 To clarify this aspect, we now perform the same zero-noise extrapolation with both methods.
@@ -388,7 +392,7 @@ zero-noise extrapolation method.
 
 .. testcode::
 
-   from mitiq.factories import LinearFactory, RichardsonFactory, PolyFactory
+   from mitiq.zne.inference import LinearFactory, RichardsonFactory, PolyFactory
 
    # method: scale noise by 1 and 2, then extrapolate linearly to the zero noise limit.
    linear_fac = LinearFactory(scale_factors=[1.0, 2.0])
@@ -404,7 +408,7 @@ in ``mitiq.zne``. For example:
 
 .. testcode::
 
-   from mitiq.zne import execute_with_zne
+   from mitiq.zne.zne import execute_with_zne
 
    zne_expval = execute_with_zne(circuit, executor, factory=linear_fac)
    print(f"Error with linear_fac: {abs(exact - zne_expval):.4f}")
@@ -438,7 +442,7 @@ corresponds to a statistical inference based on the measured data.
 .. testcode::
 
    # we import one of the built-in noise scaling function
-   from mitiq.folding import fold_gates_at_random
+   from mitiq.zne.scaling import fold_gates_at_random
 
    linear_fac.run(circuit, executor, scale_noise=fold_gates_at_random)
    zne_expval = linear_fac.reduce()
@@ -619,7 +623,7 @@ and clips the result if it falls outside its physical domain.
 .. testcode::
 
    from typing import Iterable
-   from mitiq.factories import BatchedFactory, mitiq_polyfit
+   from mitiq.zne.inference import BatchedFactory, mitiq_polyfit
    import numpy as np
 
    class MyFactory(BatchedFactory):
@@ -677,7 +681,7 @@ with ``MyFactory`` in all the previous code snippets, the new extrapolation
 method will be applied.
 
 ---------------------------------------------
-Regression tools in :py:mod:`mitiq.factories`
+Regression tools in :py:mod:`mitiq.zne.inference`
 ---------------------------------------------
 
 In the body of the previous ``MyFactory`` example, we imported and used the :py:func:`.mitiq_polyfit` function.
@@ -685,7 +689,11 @@ This is simply a wrap of :py:func:`numpy.polyfit`, slightly adapted to the notio
 of ``mitiq``. This function can be used to fit a polynomial ansatz to the measured expectation values. This function performs
 a least squares minimization which is **linear** (with respect to the coefficients) and therefore admits an algebraic solution.
 
+<<<<<<< HEAD:docs/source/guide/guide_04_05-zne.rst
 Similarly, from :py:mod:`mitiq.factories` one can also import :py:func:`.mitiq_curve_fit`,
+=======
+Similarly, from :py:mod:`mitiq.zne.inference` one can also import :py:func:`.mitiq_curve_fit`,
+>>>>>>> 8145158f37cdb722a12eb26d7ef00810be33f621:docs/source/guide/guide_05-factories.rst
 which is instead a wrap of :py:func:`scipy.optimize.curve_fit`. Differently from :py:func:`.mitiq_polyfit`,
 :py:func:`.mitiq_curve_fit` can be used with a generic (user-defined) ansatz.
 Since the fit is based on a numerical **non-linear** least squares minimization, this method may fail to converge

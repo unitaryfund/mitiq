@@ -1,11 +1,25 @@
-"""Functions for local and global unitary folding on supported circuits."""
+# Copyright (C) 2020 Unitary Fund
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""Functions for local and global unitary folding on supported circuits."""
 from copy import deepcopy
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 from functools import wraps
 
 import numpy as np
-from cirq import Circuit, InsertStrategy, inverse, ops, has_mixture
+from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary
 
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES, QPROGRAM
 
@@ -96,7 +110,7 @@ def _check_foldable(circuit: Circuit) -> None:
             "Circuit contains intermediate measurements and cannot be folded."
         )
 
-    if any(has_mixture(op) for op in circuit.all_operations()):
+    if not has_unitary(circuit):
         raise UnfoldableCircuitError(
             "Circuit contains non-unitary channels which are not terminal "
             "measurements and cannot be folded."

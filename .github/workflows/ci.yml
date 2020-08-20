@@ -1,4 +1,4 @@
-name: Build
+name: build
 
 on:
   pull_request:
@@ -60,7 +60,7 @@ jobs:
       - name: Lint with flake8
         run: make check-style
 
-  # runs all the unit tests (including pyQuil/Qiskit) on ubuntu and py36/37/38
+  # runs all the unit tests (on Ubuntu, py36/37/38) and measures code coverage
   test:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -83,5 +83,11 @@ jobs:
         run: |
           docker run --rm -idt -p 5000:5000 rigetti/qvm -S
           docker run --rm -idt -p 5555:5555 rigetti/quilc -R
-      - name: Run all the unit tests via pytest
+      - name: Run all the unit tests & generate coverage report with pytest
         run: make test-all
+      - name: Submit coverage report to Codecov
+        # only submit to Codecov once
+        if: ${{ matrix.python-version == 3.8 }}
+        uses: codecov/codecov-action@v1.0.12
+        with:
+          fail_ci_if_error: true

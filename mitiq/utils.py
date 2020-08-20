@@ -1,9 +1,61 @@
-"""Utility functions."""
+# Copyright (C) 2020 Unitary Fund
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""Utility functions."""
 from copy import deepcopy
 
-from cirq import Circuit, CircuitDag
+import numpy as np
+
+from cirq import Circuit, CircuitDag, Gate, Moment
 from cirq.ops.measurement_gate import MeasurementGate
+
+
+def _simplify_gate_exponent(gate: Gate) -> Gate:
+    """Returns the input gate with a simplified exponent if possible,
+    otherwise the input gate is returned without any change.
+
+    The input gate is not mutated.
+
+    Args:
+        gate: The input gate to simplify.
+
+    Returns: The simplified gate.
+    """
+    # Try to simplify the gate exponent to 1
+    if hasattr(gate, "_with_exponent") and gate == gate._with_exponent(1):
+        return gate._with_exponent(1)
+    return gate
+
+
+def _simplify_circuit_exponents(circuit: Circuit) -> None:
+    """Simplifies the gate exponents of the input circuit if possible,
+    mutating the input circuit.
+
+    Args:
+        circuit: The circuit to simplify.
+    """
+    # Iterate over moments
+    for moment_idx, moment in enumerate(circuit):
+        simplified_operations = []
+        # Iterate over operations in moment
+        for op in moment:
+            simplified_gate = _simplify_gate_exponent(op.gate)
+            simplified_operation = op.with_gate(simplified_gate)
+            simplified_operations.append(simplified_operation)
+        # Mutate the input circuit
+        circuit[moment_idx] = Moment(simplified_operations)
 
 
 def _equal(
@@ -62,3 +114,16 @@ def _equal(
     return CircuitDag.from_circuit(circuit_one) == CircuitDag.from_circuit(
         circuit_two
     )
+
+
+def _are_close_dict(dict_a: dict, dict_b: dict) -> bool:
+    """Returns True if the two dictionaries have equal keys and
+    their corresponding values are "sufficiently" close."""
+    keys_a = dict_a.keys()
+    keys_b = dict_b.keys()
+    if set(keys_a) != set(keys_b):
+        return False
+    for ka, va in dict_a.items():
+        if not np.isclose(dict_b[ka], va):
+            return False
+    return True

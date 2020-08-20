@@ -149,7 +149,7 @@ different ones.
 .. testcode::
 
     from mitiq import execute_with_zne
-    from mitiq.factories import LinearFactory
+    from mitiq.zne.inference import LinearFactory
 
     fac = LinearFactory(scale_factors=[1.0, 2.0, 2.5])
     linear = execute_with_zne(circ, noisy_simulation, factory=fac)

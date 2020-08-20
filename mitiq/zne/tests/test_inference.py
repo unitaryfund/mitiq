@@ -1,14 +1,27 @@
-"""
-Testing of zero-noise extrapolation methods
-(factories) with classically generated data.
+# Copyright (C) 2020 Unitary Fund
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+"""Tests for zero-noise inference and extrapolation methods (factories) with
+classically generated data.
 """
 from copy import copy
 from typing import Callable
 from pytest import mark, raises, warns
 import numpy as np
 from numpy.random import RandomState
-from mitiq.factories import (
-    _are_close_dict,
+from mitiq.zne.inference import (
     ExtrapolationError,
     ExtrapolationWarning,
     ConvergenceWarning,
@@ -109,6 +122,129 @@ def test_noise_seeding(test_f: Callable[[float], float]):
     assert noise_a == noise_c
 
 
+@mark.parametrize(
+    "factory",
+    (
+        LinearFactory,
+        RichardsonFactory,
+        PolyFactory,
+        ExpFactory,
+        PolyExpFactory,
+    ),
+)
+def test_get_scale_factors_static_factories(factory):
+    scale_factors = np.linspace(1.0, 10.0, num=20)
+    if factory is PolyFactory or factory is PolyExpFactory:
+        fac = factory(scale_factors=scale_factors, order=2)
+    else:
+        fac = factory(scale_factors=scale_factors)
+
+    # Expectation values haven't been computed at any scale factors yet
+    assert isinstance(fac.get_scale_factors(), np.ndarray)
+    assert len(fac.get_scale_factors()) == 0
+
+    # Compute expectation values at all the scale factors
+    fac.iterate(apply_seed_to_func(f_lin, seed=1))
+    assert isinstance(fac.get_scale_factors(), np.ndarray)
+    assert np.allclose(fac.get_scale_factors(), scale_factors)
+
+
+@mark.parametrize("factory", (AdaExpFactory,))
+def test_get_scale_factors_adaptive_factories(factory):
+    num_steps = 8
+    fac = AdaExpFactory(steps=num_steps, scale_factor=2.0, asymptote=None)
+
+    # Expectation values haven't been computed at any scale factors yet
+    assert isinstance(fac.get_scale_factors(), np.ndarray)
+    assert len(fac.get_scale_factors()) == 0
+
+    # Compute expectation values at all the scale factors
+    fac.iterate(apply_seed_to_func(f_exp_up, seed=1))
+    assert isinstance(fac.get_scale_factors(), np.ndarray)
+
+    # Given this seeded executor, the scale factors should be as follows
+    correct_scale_factors = np.array(
+        [
+            1.0,
+            2.0,
+            4.0,
+            4.20469548,
+            4.20310693,
+            4.2054822,
+            4.2031916,
+            4.2052843,
+        ]
+    )
+    assert len(fac.get_scale_factors()) == num_steps
+    assert np.allclose(fac.get_scale_factors(), correct_scale_factors)
+
+
+@mark.parametrize(
+    "factory",
+    (
+        LinearFactory,
+        RichardsonFactory,
+        PolyFactory,
+        ExpFactory,
+        PolyExpFactory,
+    ),
+)
+def test_get_expectation_values_static_factories(factory):
+    scale_factors = np.linspace(1.0, 10.0, num=20)
+    executor = apply_seed_to_func(f_lin, seed=1)
+    expectation_values = np.array([executor(scale) for scale in scale_factors])
+
+    if factory is PolyFactory or factory is PolyExpFactory:
+        fac = factory(scale_factors=scale_factors, order=2)
+    else:
+        fac = factory(scale_factors=scale_factors)
+
+    # Expectation values haven't been computed at any scale factors yet
+    assert isinstance(fac.get_expectation_values(), np.ndarray)
+    assert len(fac.get_expectation_values()) == 0
+
+    # Compute expectation values at all the scale factors
+    fac.iterate(apply_seed_to_func(f_lin, seed=1))
+    assert isinstance(fac.get_expectation_values(), np.ndarray)
+    assert np.allclose(fac.get_expectation_values(), expectation_values)
+
+
+@mark.parametrize("factory", (AdaExpFactory,))
+def test_get_expectation_values_adaptive_factories(factory):
+    num_steps = 8
+    fac = AdaExpFactory(steps=num_steps, scale_factor=2.0, asymptote=None)
+    executor = apply_seed_to_func(f_exp_up, seed=1)
+
+    # Expectation values haven't been computed at any scale factors yet
+    assert isinstance(fac.get_expectation_values(), np.ndarray)
+    assert len(fac.get_expectation_values()) == 0
+
+    # Compute expectation values at all the scale factors
+    fac.iterate(executor)
+    assert isinstance(fac.get_scale_factors(), np.ndarray)
+
+    # Given this seeded executor, the scale factors should be as follows
+    correct_scale_factors = np.array(
+        [
+            1.0,
+            2.0,
+            4.0,
+            4.20469548,
+            4.20310693,
+            4.2054822,
+            4.2031916,
+            4.2052843,
+        ]
+    )
+    correct_expectation_values = np.array(
+        [executor(scale) for scale in correct_scale_factors]
+    )
+    assert len(fac.get_expectation_values()) == num_steps
+    assert np.allclose(
+        fac.get_expectation_values(), correct_expectation_values, atol=1e-3
+    )
+
+
 @mark.parametrize("test_f", [f_lin, f_non_lin])
 def test_richardson_extr(test_f: Callable[[float], float]):
     """Test of the Richardson's extrapolator."""
@@ -128,7 +264,6 @@ def test_linear_extr():
 
 def test_poly_extr():
     """Test of polynomial extrapolator."""
-    seeded_f = apply_seed_to_func(f_lin, SEED)
     # test (order=1)
     fac = PolyFactory(X_VALS, order=1)
     fac.iterate(f_lin)
@@ -368,23 +503,3 @@ def test_shot_list_errors():
         PolyFactory(X_VALS, order=2, shot_list=[1, 2])
     with raises(TypeError, match=r"valid iterator of integers"):
         PolyFactory(X_VALS, order=2, shot_list=[1.0, 2])
-
-
-def test_are_close_dict():
-    """Tests the _are_close_dict function."""
-    dict1 = {"a": 1, "b": 0.0}
-    dict2 = {"a": 1, "b": 0.0 + 1.0e-10}
-    assert _are_close_dict(dict1, dict2)
-    assert _are_close_dict(dict2, dict1)
-    dict2 = {"b": 0.0 + 1.0e-10, "a": 1}
-    assert _are_close_dict(dict1, dict2)
-    assert _are_close_dict(dict2, dict1)
-    dict2 = {"a": 1, "b": 1.0}
-    assert not _are_close_dict(dict1, dict2)
-    assert not _are_close_dict(dict2, dict1)
-    dict2 = {"b": 1, "a": 0.0}
-    assert not _are_close_dict(dict1, dict2)
-    assert not _are_close_dict(dict2, dict1)
-    dict2 = {"a": 1, "b": 0.0, "c": 1}
-    assert not _are_close_dict(dict1, dict2)
-    assert not _are_close_dict(dict2, dict1)

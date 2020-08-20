@@ -1,10 +1,25 @@
-"""Functions to convert between Mitiq's internal circuit representation
-and Qiskit's circuit representation.
-"""
+# Copyright (C) 2020 Unitary Fund
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""Functions to convert between Mitiq's internal circuit representation and
+Qiskit's circuit representation.
+"""
 import cirq
 from cirq.contrib.qasm_import import circuit_from_qasm
 from qiskit import QuantumCircuit
+from mitiq.utils import _simplify_circuit_exponents
 
 
 QASMType = str
@@ -19,6 +34,8 @@ def to_qasm(circuit: cirq.Circuit) -> QASMType:
     Returns:
         QASMType: QASM string equivalent to the input Mitiq circuit.
     """
+    # Simplify exponents of gates. For example, H**-1 is simplified to H.
+    _simplify_circuit_exponents(circuit)
     return circuit.to_qasm()
 
 
