@@ -97,7 +97,7 @@ It is fair to say that even the terminology of "quantum error mitigation" or
 in the previous decade similar concepts or techniques were scattered across
 these and other fields. Suggestions for additional references are `welcome`_.
 
-.. _welcome: https://github.com/unitaryfund/mitiq/issues/new
+.. _welcome: https://github.com/unitaryfund/mitiq/issues/new/choose
 
 .. _guide_qem_qec:
 
