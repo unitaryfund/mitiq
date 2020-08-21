@@ -8,7 +8,7 @@ Welcome to mitiq's documentation!
    :caption: Contents:
 
    README.rst
-   guide/guide_00.rst
+   guide/guide.rst
    apidoc.rst
    citing.rst
    toc_contributing.rst
