@@ -16,7 +16,7 @@ other external links framing this topic in the open-source software ecosystem.
 .. _guide_qem_what:
 
 --------------------------------
-What is quantum error mitigation
+What quantum error mitigation is
 --------------------------------
 
 Quantum error mitigation refers to a series of modern techniques aimed at
@@ -64,7 +64,7 @@ Other examples of error mitigation techniques include injecting noisy gates for 
 .. _guide_qem_why:
 
 -----------------------------------------
-Why is quantum error mitigation important
+Why quantum error mitigation is important
 -----------------------------------------
 
 The noisy intermediate scale quantum computing (NISQ) era is characterized by
