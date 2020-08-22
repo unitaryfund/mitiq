@@ -47,7 +47,7 @@ development of the library, from your local clone of the fork, run
 ```
 
 ### Adding tests
-If you add new features to a function or class, it is strongly encouraged to add tests for such object. Mitiq uses a nested structure for packaging tests in directories named `tests` at the same level of each module.
+If you add new features to a function or class, it is required to add tests for such object. Mitiq uses a nested structure for packaging tests in directories named `tests` at the same level of each module.
 
 ### Updating the documentation
 Follow the guidelines in the Contributing to docs [instructions](https://mitiq.readthedocs.io/en/latest/read_README-docs.html) (look here on [GitHub](https://github.com/unitaryfund/mitiq/blob/master/docs/README-docs.md)), which include guidelines about updating the API-doc list of modules and writing examples in the users guide.
