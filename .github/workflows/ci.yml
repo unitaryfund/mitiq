@@ -2,7 +2,8 @@ name: build
 
 on:
   pull_request:
-    types: [assigned, review_requested]
+    branches:
+      - master
   push:
     branches:
       - master
