@@ -14,9 +14,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Utility functions for benchmarking."""
+from typing import cast
+
 import numpy as np
 
-from cirq import Circuit, depolarize, DensityMatrixSimulator
+from cirq import Circuit, depolarize, DensityMatrixSimulator, DensityMatrixTrialResult
 
 SIMULATOR = DensityMatrixSimulator()
 
@@ -33,7 +35,8 @@ def noisy_simulation(circ: Circuit, noise: float, obs: np.ndarray) -> float:
         The observable's expectation value.
     """
     circuit = circ.with_noise(depolarize(p=noise))
-    rho = SIMULATOR.simulate(circuit).final_density_matrix
+    result = cast(DensityMatrixTrialResult, SIMULATOR.simulate(circuit))
+    rho = result.final_density_matrix
     # measure the expectation by taking the trace of the density matrix
     expectation = np.real(np.trace(rho @ obs))
     return expectation
