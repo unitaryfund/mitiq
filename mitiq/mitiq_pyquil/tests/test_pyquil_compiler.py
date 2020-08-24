@@ -55,7 +55,6 @@ from mitiq.mitiq_pyquil.compiler import (
     _CPHASE,
     _H,
     _ISWAP,
-    _RX,
     _RY,
     _S,
     _SWAP,
