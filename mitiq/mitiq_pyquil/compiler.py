@@ -218,9 +218,9 @@ def _Z(q: int) -> Program:
 
 
 # This function is taken from cirq. License: apache 2.
-def match_global_phase(a: np.ndarray,
-                       b: np.ndarray
-                       ) -> Tuple[np.ndarray, np.ndarray]:
+def match_global_phase(
+    a: np.ndarray, b: np.ndarray
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Phases the given matrices so that they agree on the phase of one entry.
     To maximize precision, the position with the largest entry from one of the
@@ -255,9 +255,11 @@ def match_global_phase(a: np.ndarray,
 
 
 def is_magic_angle(angle: float) -> bool:
-    return (np.isclose(np.abs(angle), pi / 2)
-            or np.isclose(np.abs(angle), pi)
-            or np.isclose(angle, 0.0))
+    return (
+        np.isclose(np.abs(angle), pi / 2)
+        or np.isclose(np.abs(angle), pi)
+        or np.isclose(angle, 0.0)
+    )
 
 
 def basic_compile(program: Program) -> Program:
@@ -282,54 +284,56 @@ def basic_compile(program: Program) -> Program:
         if isinstance(inst, Gate):
             # TODO: this is only a stopgap while the noisy QVM does not support modifiers.
             # dagger this gate if odd number of daggers. Ignore controlled for now.
-            needs_dagger = inst.modifiers.count('DAGGER') % 2 == 1
+            needs_dagger = inst.modifiers.count("DAGGER") % 2 == 1
             angle_param = None
             if len(inst.params) > 0:
                 angle_param = inst.params[0]
                 if needs_dagger:
                     angle_param = -angle_param
 
-            if 'CONTROLLED' in inst.modifiers:
-                raise ValueError("Controlled gates are not currently supported.")
+            if "CONTROLLED" in inst.modifiers:
+                raise ValueError(
+                    "Controlled gates are not currently supported."
+                )
 
-            if inst.name == 'CCNOT':
+            if inst.name == "CCNOT":
                 new_prog += _CCNOT(*inst.qubits)
-            elif inst.name == 'CNOT':
+            elif inst.name == "CNOT":
                 new_prog += _CNOT(*inst.qubits)
             # NB: we haven't implemented CPHASE00/01/10
-            elif inst.name == 'CPHASE':
+            elif inst.name == "CPHASE":
                 new_prog += _CPHASE(angle_param, *inst.qubits)
-            elif inst.name == 'CZ':
+            elif inst.name == "CZ":
                 new_prog += CZ(*inst.qubits)  # remove dag modifiers
             elif inst.name == "H":
                 new_prog += _H(inst.qubits[0])
-            elif inst.name == 'I':
+            elif inst.name == "I":
                 new_prog += I(inst.qubits[0])  # remove dag modifiers
-            elif inst.name == 'ISWAP':
+            elif inst.name == "ISWAP":
                 new_prog += _ISWAP(*inst.qubits)  # remove dag modifiers
-            elif inst.name == 'PHASE':
+            elif inst.name == "PHASE":
                 new_prog += _PHASE(angle_param, inst.qubits[0])
-            elif inst.name == 'RX':
+            elif inst.name == "RX":
                 if is_magic_angle(inst.params[0]):
                     # in case dagger
                     new_prog += RX(angle_param, inst.qubits[0])
                 else:
                     new_prog += _RX(angle_param, inst.qubits[0])
-            elif inst.name == 'RY':
+            elif inst.name == "RY":
                 new_prog += _RY(angle_param, inst.qubits[0])
-            elif inst.name == 'RZ':
+            elif inst.name == "RZ":
                 # in case dagger
                 new_prog += RZ(angle_param, inst.qubits[0])
-            elif inst.name == 'S':
+            elif inst.name == "S":
                 new_prog += _S(inst.qubits[0], needs_dagger)
             # NB: we haven't implemented CSWAP or PSWAP
-            elif inst.name == 'SWAP':
+            elif inst.name == "SWAP":
                 new_prog += _SWAP(*inst.qubits)
-            elif inst.name == 'T':
+            elif inst.name == "T":
                 new_prog += _T(inst.qubits[0], needs_dagger)
             elif inst.name == "X":
                 new_prog += _X(inst.qubits[0])
-            elif inst.name == 'XY':
+            elif inst.name == "XY":
                 new_prog += XY(angle_param, *inst.qubits)
             elif inst.name == "Y":
                 new_prog += _Y(inst.qubits[0])
@@ -337,7 +341,7 @@ def basic_compile(program: Program) -> Program:
                 new_prog += _Z(inst.qubits[0])
             elif inst.name in [gate.name for gate in new_prog.defined_gates]:
                 if needs_dagger and inst.name not in daggered_defgates:
-                    new_prog.defgate(inst.name + 'DAG', inst.matrix.T.conj())
+                    new_prog.defgate(inst.name + "DAG", inst.matrix.T.conj())
                     daggered_defgates.append(inst.name)
                 new_prog += inst
             else:
@@ -347,12 +351,12 @@ def basic_compile(program: Program) -> Program:
             new_prog += inst
 
     new_prog.native_quil_metadata = {
-        'final_rewiring': None,
-        'gate_depth': None,
-        'gate_volume': None,
-        'multiqubit_gate_depth': None,
-        'program_duration': None,
-        'program_fidelity': None,
-        'topological_swaps': 0,
+        "final_rewiring": None,
+        "gate_depth": None,
+        "gate_volume": None,
+        "multiqubit_gate_depth": None,
+        "program_duration": None,
+        "program_fidelity": None,
+        "topological_swaps": 0,
     }
     return new_prog

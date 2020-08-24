@@ -28,18 +28,34 @@ import pytest
 from pyquil.gates import *
 from pyquil.quil import Program
 
-from mitiq.mitiq_pyquil.compiler import (basic_compile, _CCNOT, _CNOT, _CPHASE, _H,
-                                         _ISWAP, _RY, _S, _SWAP, _T, _X, _Y, _Z,
-                                         match_global_phase)
+from mitiq.mitiq_pyquil.compiler import (
+    basic_compile,
+    _CCNOT,
+    _CNOT,
+    _CPHASE,
+    _H,
+    _ISWAP,
+    _RY,
+    _S,
+    _SWAP,
+    _T,
+    _X,
+    _Y,
+    _Z,
+    match_global_phase,
+)
 
 try:
     from pyquil.simulation.tools import program_unitary
+
     unitary_tools = True
 except ImportError:
     unitary_tools = False
 
 
-def assert_all_close_up_to_global_phase(actual, desired, rtol: float = 1e-7, atol: float = 0):
+def assert_all_close_up_to_global_phase(
+    actual, desired, rtol: float = 1e-7, atol: float = 0
+):
     actual, desired = match_global_phase(actual, desired)
     np.testing.assert_allclose(actual, desired, rtol=rtol, atol=atol)
 
@@ -54,7 +70,7 @@ def test_basic_compile_defgate():
     assert p == basic_compile(p)
 
 
-@pytest.mark.skipif(not unitary_tools, reason='Requires unitary_tools')
+@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_CCNOT():
     for perm in itertools.permutations([0, 1, 2]):
         u1 = program_unitary(Program(CCNOT(*perm)), n_qubits=3)
@@ -62,7 +78,7 @@ def test_CCNOT():
         assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason='Requires unitary_tools')
+@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_CNOT():
     u1 = program_unitary(Program(CNOT(0, 1)), n_qubits=2)
     u2 = program_unitary(_CNOT(0, 1), n_qubits=2)
@@ -73,7 +89,7 @@ def test_CNOT():
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason='Requires unitary_tools')
+@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_CPHASE():
     for theta in np.linspace(-2 * np.pi, 2 * np.pi):
         u1 = program_unitary(Program(CPHASE(theta, 0, 1)), n_qubits=2)
@@ -85,14 +101,14 @@ def test_CPHASE():
         assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason='Requires unitary_tools')
+@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_H():
     u1 = program_unitary(Program(H(0)), n_qubits=1)
     u2 = program_unitary(_H(0), n_qubits=1)
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason='Requires unitary_tools')
+@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_ISWAP():
     u1 = program_unitary(Program(ISWAP(0, 1)), n_qubits=2)
     u2 = program_unitary(_ISWAP(0, 1), n_qubits=2)
@@ -103,7 +119,7 @@ def test_ISWAP():
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason='Requires unitary_tools')
+@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_RY():
     for theta in np.linspace(-2 * np.pi, 2 * np.pi):
         u1 = program_unitary(Program(RY(theta, 0)), n_qubits=1)
@@ -111,14 +127,14 @@ def test_RY():
         assert_all_close_up_to_global_phase(u1, u2)
 
 
-@pytest.mark.skipif(not unitary_tools, reason='Requires unitary_tools')
+@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_S():
     u1 = program_unitary(Program(S(0)), n_qubits=1)
     u2 = program_unitary(_S(0), n_qubits=1)
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason='Requires unitary_tools')
+@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_SWAP():
     u1 = program_unitary(Program(SWAP(0, 1)), n_qubits=2)
     u2 = program_unitary(_SWAP(0, 1), n_qubits=2)
@@ -129,28 +145,28 @@ def test_SWAP():
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason='Requires unitary_tools')
+@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_T():
     u1 = program_unitary(Program(T(0)), n_qubits=1)
     u2 = program_unitary(_T(0), n_qubits=1)
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason='Requires unitary_tools')
+@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_X():
     u1 = program_unitary(Program(X(0)), n_qubits=1)
     u2 = program_unitary(_X(0), n_qubits=1)
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason='Requires unitary_tools')
+@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_Y():
     u1 = program_unitary(Program(Y(0)), n_qubits=1)
     u2 = program_unitary(_Y(0), n_qubits=1)
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason='Requires unitary_tools')
+@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_Z():
     u1 = program_unitary(Program(Z(0)), n_qubits=1)
     u2 = program_unitary(_Z(0), n_qubits=1)
@@ -158,35 +174,38 @@ def test_Z():
 
 
 # Note to developers: unsupported gates are commented out.
-QUANTUM_GATES = {'I': I,
-                 'X': X,
-                 'Y': Y,
-                 'Z': Z,
-                 'H': H,
-                 'S': S,
-                 'T': T,
-                 'PHASE': PHASE,
-                 'RX': RX,
-                 'RY': RY,
-                 'RZ': RZ,
-                 'CZ': CZ,
-                 'CNOT': CNOT,
-                 'CCNOT': CCNOT,
-                 # 'CPHASE00': CPHASE00,
-                 # 'CPHASE01': CPHASE01,
-                 # 'CPHASE10': CPHASE10,
-                 'CPHASE': CPHASE,
-                 'SWAP': SWAP,
-                 # 'CSWAP': CSWAP,
-                 'ISWAP': ISWAP,
-                 # 'PSWAP': PSWAP
-                 }
+QUANTUM_GATES = {
+    "I": I,
+    "X": X,
+    "Y": Y,
+    "Z": Z,
+    "H": H,
+    "S": S,
+    "T": T,
+    "PHASE": PHASE,
+    "RX": RX,
+    "RY": RY,
+    "RZ": RZ,
+    "CZ": CZ,
+    "CNOT": CNOT,
+    "CCNOT": CCNOT,
+    # 'CPHASE00': CPHASE00,
+    # 'CPHASE01': CPHASE01,
+    # 'CPHASE10': CPHASE10,
+    "CPHASE": CPHASE,
+    "SWAP": SWAP,
+    # 'CSWAP': CSWAP,
+    "ISWAP": ISWAP,
+    # 'PSWAP': PSWAP
+}
 
 
 def _generate_random_program(n_qubits, length):
     """Randomly sample gates and arguments (qubits, angles)"""
     if n_qubits < 3:
-        raise ValueError("Please request n_qubits >= 3 so we can use 3-qubit gates.")
+        raise ValueError(
+            "Please request n_qubits >= 3 so we can use 3-qubit gates."
+        )
 
     gates = list(QUANTUM_GATES.values())
     prog = Program()
@@ -197,12 +216,21 @@ def _generate_random_program(n_qubits, length):
 
         param_vals = []
         for param in sig.parameters:
-            if param in ['qubit', 'q1', 'q2', 'control',
-                         'control1', 'control2', 'target', 'target_1', 'target_2',
-                         'classical_reg']:
+            if param in [
+                "qubit",
+                "q1",
+                "q2",
+                "control",
+                "control1",
+                "control2",
+                "target",
+                "target_1",
+                "target_2",
+                "classical_reg",
+            ]:
                 param_val = random.choice(list(possible_qubits))
                 possible_qubits.remove(param_val)
-            elif param == 'angle':
+            elif param == "angle":
                 # TODO: support rx(theta)
                 if gate == RX:
                     param_val = random.choice([-1, -0.5, 0, 0.5, 1]) * pi
@@ -228,7 +256,7 @@ def prog_length(request):
     return request.param
 
 
-@pytest.mark.skipif(not unitary_tools, reason='Requires unitary_tools')
+@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_random_progs(n_qubits, prog_length):
     for repeat_i in range(10):
         prog = _generate_random_program(n_qubits=n_qubits, length=prog_length)

@@ -34,7 +34,10 @@ CFD_MAT_1Q = np.array([_gate_seq_to_mats(gates) for gates in C1])
 
 
 def rb_circuits(
-    n_qubits: int, num_cliffords: List[int], trials: int, qubit_labels: Optional[List[int]] = None,
+    n_qubits: int,
+    num_cliffords: List[int],
+    trials: int,
+    qubit_labels: Optional[List[int]] = None,
 ) -> List[Circuit]:
     """Generates a set of randomized benchmarking circuits, i.e. circuits that
     are equivalent to the identity.
