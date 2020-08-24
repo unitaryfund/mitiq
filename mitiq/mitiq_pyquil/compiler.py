@@ -228,7 +228,7 @@ def match_global_phase(
     the two matrices.
     :param a: The first matrix
     :param b: The second matrix
-    :return: A tuple (a', b') where a' == b' implies a == b*exp(i t) for some t.
+    :return: A tuple (a', b') where a' == b' implies a == b*exp(i t) for some t
     """
 
     # Not much point when they have different shapes.
@@ -266,13 +266,14 @@ def basic_compile(program: Program) -> Program:
     """
     A rudimentary but predictable compiler.
 
-    No rewiring or optimization is done by this compilation step. There may be some gates that
-    are not yet supported. Gates defined in the input program are included without change in the
-    output program.
+    No rewiring or optimization is done by this compilation step. There may be
+    some gates that are not yet supported. Gates defined in the input program
+    are included without change in the output program.
 
-    :param program: a program to be compiled to native quil with simple replacements.
-    :return: a program with some of the input non-native quil gates replaced with basic native quil
-        gate implementations.
+    :param program: A program to be compiled to native quil with simple
+        replacements.
+    :return: A program with some of the input non-native quil gates replaced
+        with basic native quil gate implementations.
     """
     new_prog = Program()
     new_prog.num_shots = program.num_shots
@@ -282,8 +283,8 @@ def basic_compile(program: Program) -> Program:
 
     for inst in program:
         if isinstance(inst, Gate):
-            # TODO: this is only a stopgap while the noisy QVM does not support modifiers.
-            # dagger this gate if odd number of daggers. Ignore controlled for now.
+            # Dagger this gate if odd number of daggers.
+            # Ignore controlled for now.
             needs_dagger = inst.modifiers.count("DAGGER") % 2 == 1
             angle_param = None
             if len(inst.params) > 0:

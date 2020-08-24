@@ -25,7 +25,25 @@ from math import pi
 import numpy as np
 import pytest
 
-from pyquil.gates import *
+from pyquil.gates import (
+    CCNOT,
+    CNOT,
+    CPHASE,
+    CZ,
+    H,
+    I,
+    ISWAP,
+    PHASE,
+    RX,
+    RY,
+    RZ,
+    S,
+    SWAP,
+    T,
+    X,
+    Y,
+    Z,
+)
 from pyquil.quil import Program
 
 from mitiq.mitiq_pyquil.compiler import (
