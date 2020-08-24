@@ -155,8 +155,8 @@ def mitiq_polyfit(
 class Factory(ABC):
     """Abstract class designed to adaptively produce a new noise scaling
     parameter based on a historical stack of previous noise scale parameters
-    ("self.instack") and previously estimated expectation values
-    ("self.outstack").
+    ("self._instack") and previously estimated expectation values
+    ("self._outstack").
 
     Specific zero-noise extrapolation algorithms, adaptive or non-adaptive,
     are derived from this class.
@@ -176,8 +176,8 @@ class Factory(ABC):
         self.opt_params = []
 
     def push(self, instack_val: dict, outstack_val: float) -> None:
-        """Appends "instack_val" to "self.instack" and "outstack_val" to
-        "self.outstack". Each time a new expectation value is computed this
+        """Appends "instack_val" to "self._instack" and "outstack_val" to
+        "self._outstack". Each time a new expectation value is computed this
         method should be used to update the internal state of the Factory.
         """
         self._instack.append(instack_val)
@@ -385,8 +385,8 @@ class BatchedFactory(Factory):
         """
         if len(self._outstack) != len(self._instack):
             raise IndexError(
-                f"The length of 'self.instack' ({len(self._instack)}) "
-                f"and 'self.outstack' ({len(self._outstack)}) must be equal."
+                f"The length of 'self._instack' ({len(self._instack)}) "
+                f"and 'self._outstack' ({len(self._outstack)}) must be equal."
             )
         return len(self._outstack) == len(self._scale_factors)
 
@@ -927,8 +927,8 @@ class AdaExpFactory(Factory):
         """
         if len(self._outstack) != len(self._instack):
             raise IndexError(
-                f"The length of 'self.instack' ({len(self._instack)}) "
-                f"and 'self.outstack' ({len(self._outstack)}) must be equal."
+                f"The length of 'self._instack' ({len(self._instack)}) "
+                f"and 'self._outstack' ({len(self._outstack)}) must be equal."
             )
         return len(self._outstack) == self._steps
 
