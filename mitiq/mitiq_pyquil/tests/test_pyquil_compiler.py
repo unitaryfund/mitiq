@@ -29,6 +29,7 @@ from pyquil.gates import (
     CCNOT,
     CNOT,
     CPHASE,
+    CSWAP,
     CZ,
     H,
     I,
@@ -41,6 +42,7 @@ from pyquil.gates import (
     SWAP,
     T,
     X,
+    XY,
     Y,
     Z,
 )
@@ -53,6 +55,7 @@ from mitiq.mitiq_pyquil.compiler import (
     _CPHASE,
     _H,
     _ISWAP,
+    _RX,
     _RY,
     _S,
     _SWAP,
@@ -138,6 +141,15 @@ def test_ISWAP():
 
 
 @pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
+def test_RX():
+    for theta in np.linspace(-2 * np.pi, 2 * np.pi):
+        p = Program(RX(theta, 0))
+        u1 = program_unitary(p, n_qubits=1)
+        u2 = program_unitary(basic_compile(p), n_qubits=1)
+        assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+
+
+@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_RY():
     for theta in np.linspace(-2 * np.pi, 2 * np.pi):
         u1 = program_unitary(Program(RY(theta, 0)), n_qubits=1)
@@ -175,6 +187,20 @@ def test_X():
     u1 = program_unitary(Program(X(0)), n_qubits=1)
     u2 = program_unitary(_X(0), n_qubits=1)
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+
+
+@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
+def test_XY():
+    for theta in np.linspace(-2 * np.pi, 2 * np.pi):
+        p = Program(XY(theta, 0, 1))
+        u1 = program_unitary(p, n_qubits=2)
+        u2 = program_unitary(basic_compile(p), n_qubits=2)
+        assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+
+        p = Program(XY(theta, 1, 0))
+        u1 = program_unitary(p, n_qubits=2)
+        u2 = program_unitary(basic_compile(p), n_qubits=2)
+        assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
 @pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
@@ -282,3 +308,13 @@ def test_random_progs(n_qubits, prog_length):
         u2 = program_unitary(basic_compile(prog), n_qubits=n_qubits)
 
         assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+
+
+def test_unsupported_gate():
+    with pytest.raises(ValueError):
+        basic_compile(Program(CSWAP(0, 1, 2)))
+
+
+def test_other_instructions():
+    p = Program("DECLARE ro BIT[2]")
+    assert p == basic_compile(p)

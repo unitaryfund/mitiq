@@ -151,14 +151,11 @@ def _RY(angle: float, q: int) -> Program:
     return p
 
 
-def _S(q: int, dagger: bool = False) -> Program:
+def _S(q: int) -> Program:
     """
     An S in terms of RZ(theta)
     """
-    if dagger:
-        return Program(RZ(-np.pi / 2, q))
-    else:
-        return Program(RZ(np.pi / 2, q))
+    return Program(RZ(np.pi / 2, q))
 
 
 def _SWAP(q0: int, q1: int) -> Program:
@@ -168,7 +165,6 @@ def _SWAP(q0: int, q1: int) -> Program:
     .. note:
         This uses :py:func:`_CNOT`, so it picks up a global phase.
         Don't control this gate.
-
     """
     p = Program()
     p.inst(_CNOT(q0, q1))
@@ -233,7 +229,7 @@ def match_global_phase(
 
     # Not much point when they have different shapes.
     if a.shape != b.shape:
-        return a, b
+        return a, b  # pragma: no coverage
 
     # Find the entry with the largest magnitude in one of the matrices.
     k = max(np.ndindex(*a.shape), key=lambda t: abs(b[t]))
@@ -279,23 +275,11 @@ def basic_compile(program: Program) -> Program:
     new_prog.num_shots = program.num_shots
     new_prog.inst(program.defined_gates)
 
-    daggered_defgates = []
-
     for inst in program:
         if isinstance(inst, Gate):
-            # Dagger this gate if odd number of daggers.
-            # Ignore controlled for now.
-            needs_dagger = inst.modifiers.count("DAGGER") % 2 == 1
             angle_param = None
             if len(inst.params) > 0:
                 angle_param = inst.params[0]
-                if needs_dagger:
-                    angle_param = -angle_param
-
-            if "CONTROLLED" in inst.modifiers:
-                raise ValueError(
-                    "Controlled gates are not currently supported."
-                )
 
             if inst.name == "CCNOT":
                 new_prog += _CCNOT(*inst.qubits)
@@ -326,12 +310,12 @@ def basic_compile(program: Program) -> Program:
                 # in case dagger
                 new_prog += RZ(angle_param, inst.qubits[0])
             elif inst.name == "S":
-                new_prog += _S(inst.qubits[0], needs_dagger)
+                new_prog += _S(inst.qubits[0])
             # NB: we haven't implemented CSWAP or PSWAP
             elif inst.name == "SWAP":
                 new_prog += _SWAP(*inst.qubits)
             elif inst.name == "T":
-                new_prog += _T(inst.qubits[0], needs_dagger)
+                new_prog += _T(inst.qubits[0])
             elif inst.name == "X":
                 new_prog += _X(inst.qubits[0])
             elif inst.name == "XY":
@@ -341,13 +325,9 @@ def basic_compile(program: Program) -> Program:
             elif inst.name == "Z":
                 new_prog += _Z(inst.qubits[0])
             elif inst.name in [gate.name for gate in new_prog.defined_gates]:
-                if needs_dagger and inst.name not in daggered_defgates:
-                    new_prog.defgate(inst.name + "DAG", inst.matrix.T.conj())
-                    daggered_defgates.append(inst.name)
                 new_prog += inst
             else:
                 raise ValueError(f"Unknown gate instruction {inst}")
-
         else:
             new_prog += inst
 
