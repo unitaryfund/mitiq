@@ -15,27 +15,35 @@
 
 """This file is used to optionally import what program types should be allowed
 by mitiq based on what packages are installed in the environment.
+
+Supported program types:
+    cirq.Circuit
+    pyquil.Program
+    qiskit.QuantumCircuit
+
+When pyquil or qiskit are not available for import, we take advantage of a
+clever hack in the except ImportError block, setting the type alias
+corresponding to the class that we failed to import equal to cirq.Circuit,
+which is then handled gracefully by the Union type.
 """
 from typing import Union
+
+from cirq import Circuit
+
+try:
+    from pyquil import Program
+except ImportError:
+    Program = Circuit
+
+try:
+    from qiskit import QuantumCircuit
+except ImportError:
+    QuantumCircuit = Circuit
+
+QPROGRAM = Union[Circuit, Program, QuantumCircuit]
 
 SUPPORTED_PROGRAM_TYPES = {
     "cirq": "Circuit",
     "pyquil": "Program",
     "qiskit": "QuantumCircuit",
 }
-
-AVAILABLE_PROGRAM_TYPES = {}
-
-for (module, program_type) in SUPPORTED_PROGRAM_TYPES.items():
-    try:
-        exec(f"from {module} import {program_type}")
-        AVAILABLE_PROGRAM_TYPES.update({module: program_type})
-    except ImportError:
-        pass
-
-QPROGRAM = Union[
-    tuple(
-        f"{package}.{circuit}"
-        for package, circuit in AVAILABLE_PROGRAM_TYPES.items()
-    )
-]
