@@ -18,7 +18,12 @@ from typing import cast
 
 import numpy as np
 
-from cirq import Circuit, depolarize, DensityMatrixSimulator, DensityMatrixTrialResult
+from cirq import (
+    Circuit,
+    depolarize,
+    DensityMatrixSimulator,
+    DensityMatrixTrialResult,
+)
 
 SIMULATOR = DensityMatrixSimulator()
 
