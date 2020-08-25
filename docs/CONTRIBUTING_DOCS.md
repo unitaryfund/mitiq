@@ -1,4 +1,4 @@
-# Contributing to the Documentation
+## Contributing to the Documentation
 This is the Contributors guide for the documentation of Mitiq,
 the Python toolkit for implementing error mitigation on quantum computers.
 
@@ -6,7 +6,7 @@ the Python toolkit for implementing error mitigation on quantum computers.
 [![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
 [![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
 
-## Requirements
+### Requirements
 The documentation is generated with
 [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html).
 The necessary packages can be installed, from the root `mitiq` directory
@@ -29,15 +29,15 @@ pip install -U sphinx m2r sphinxcontrib-bibtex pybtex sphinx-copybutton sphinx-a
 
 You can check that Sphinx is installed with `sphinx-build --version`.
 
-## How to Update the Documentation
+### How to Update the Documentation
 
-### The configuration file
+#### The configuration file
 - Since the documentation is already created, you need not to generate a
 configuration file from scratch (this is done with `sphinx-quickstart`).
 Meta-data, extentions and other custom specifications are accounted for
 in the `conf.py` file.
 
-### Add features in the conf.py file
+#### Add features in the conf.py file
 
 - To add specific feature to the documentation, extensions can be include.
 For example to add classes and functions to the API doc, make sure that autodoc
@@ -47,7 +47,7 @@ extension is enabled in the `conf.py` file, and for tests the `doctest` one,
 extensions = ['sphinx.ext.autodoc','sphinx.ext.doctest']
 ```
 
-### Update the guide with a tree of restructured text files
+#### Update the guide with a tree of restructured text files
 
 You need not to modify the `docs/build` folder, as it is automatically
  generated. You will modify only the `docs/source` files.
@@ -70,7 +70,7 @@ Make sure they are included in the table of contents
 
    changelog.rst
 ```
-### You can include markdown files in the guide
+#### You can include markdown files in the guide
 
 - Information to the guide can also be added from markdown (`.md`) files, since
  `m2r` (`pip install --upgrade m2r`) is installed and
@@ -82,7 +82,7 @@ To include `.md` files outside of the documentation `source` directory, you can
 `.. mdinclude:: ../file.md` command, where `file.md` is the one to be added.
 
 
-### Automatically add information to the API doc
+#### Automatically add information to the API doc
 
 - New modules, classes and functions can be added by listing them
 in the appropriate `.rst` file (such as `autodoc.rst` or a child), e.g.,
@@ -97,7 +97,7 @@ will add all elements of the `mitiq.factories` module. One can hand-pick
 classes and functions to add, to comment them, as well as exclude them.
 
 
-### Build the documentation locally
+#### Build the documentation locally
 - To build the documentation, from `bash`, move to the `docs` folder and run
 ```bash
 sphinx-build -b html source build
@@ -110,21 +110,21 @@ The `html` and `latex`  and `pdf` files will be automatically created in the
 `docs/build` folder.
 
 
-### Create the html
+#### Create the html
 - To create the html structure,
 
 ```bash
 make html
 ```
 
-### Create the pdf
+#### Create the pdf
 - To create the latex files and output a pdf,
 
 ```bash
 make latexpdf
 ```
 
-## How to Test the Documentation Examples
+### How to Test the Documentation Examples
 
 There are several ways to check that the documentation examples work.
 Currently, `mitiq` is testing them with the `doctest`
@@ -243,23 +243,23 @@ One can also use various `doctest` [features](http://doc.pytest.org/en/latest/do
 `docs/pytest.ini` file.
 
 
-## How to Make a New Release of the Documentation
+### How to Make a New Release of the Documentation
 
-### Work in an environment
+#### Work in an environment
 - Create a conda environment for the documentation
 ```bash
 conda create -n mitiqenv
 conda activate mitiqenv
 ```
 
-### Create a new branch
+#### Create a new branch
 - Create a branch in `git` for the documentation with the release number up to
 minor (e.g., 0.0.2--->00X)
 ```bash
 (mitiqenv) git checkout -b mitiq00X
 ```
 
-### Create the html and pdf file and save it in the `docs/pdf` folder
+#### Create the html and pdf file and save it in the `docs/pdf` folder
 - To create the html structure
 ```bash
 make html
@@ -274,7 +274,7 @@ naming it according to the release version with major and minor.
 Make a copy named `Mitiq-latest-release.pdf` in the same folder.
 
 
-## Additional information
+### Additional information
 [Here](https://github.com/nathanshammah/scikit-project/blob/master/5-docs.md)
 are some notes on how to build docs.
 
