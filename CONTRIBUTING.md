@@ -1,4 +1,4 @@
-# Contributing to mitiq
+# Contributing to Mitiq
 
 Contributions are welcome, and they are greatly appreciated, every little bit helps.
 
@@ -47,14 +47,14 @@ development of the library, from your local clone of the fork, run
 ```
 
 ### Adding tests
-If you add new features to a function or class, it is strongly encouraged to add tests for such object. Mitiq uses a nested structure for packaging tests in directories named `tests` at the same level of each module.
+If you add new features to a function or class, it is required to add tests for such object. Mitiq uses a nested structure for packaging tests in directories named `tests` at the same level of each module.
 
 ### Updating the documentation
-Follow the guidelines in the Contributing to docs [instructions](docs/build/read_README-docs.rst) (look here on [GitHub](https://github.com/unitaryfund/mitiq/blob/master/docs/README-docs.md)), which include guidelines about updating the API-doc list of modules and writing examples in the users guide.
+Follow the guidelines in the Contributing to docs [instructions](https://mitiq.readthedocs.io/en/latest/read_README-docs.html) (look here on [GitHub](https://github.com/unitaryfund/mitiq/blob/master/docs/README-docs.md)), which include guidelines about updating the API-doc list of modules and writing examples in the users guide.
 
 ### Checking local tests
 
-You can check that tests run with `pytest`. The [`Makefile`](Makefile) contains
+You can check that tests run with `pytest`. The [Makefile][makefile] contains
 some commands for running different collections of tests for the repository.
 
 To run just the tests contained in `mitiq/tests` and `mitiq/benchmarks/tests` run
@@ -108,4 +108,6 @@ default behavior in one category: we choose to use a line length of 79 rather th
 default of 88 (this is configured in the [`pyproject.toml`](pyproject.toml) file).
 
 ### Code of conduct
-Mitiq development abides to the [Contributors' Covenant](CODE_OF_CONDUCT.md).
+Mitiq development abides to the [Contributors' Covenant](https://mitiq.readthedocs.io/en/latest/CODE_OF_CONDUCT.html).
+
+[makefile]: https://github.com/unitaryfund/mitiq/blob/master/Makefile

@@ -23,7 +23,14 @@ Change Log
 ..
 .. - Fix the bug.
 
-Version 0.1.0 (Date)
+Version 0.1a2 (August 17th, 2020)
 ++++++++++++++++++++++++++++++
 
-- **Initial release.**
+- **Initial release (public: on Github and PyPI).**
+
+
+
+Version 0.1a1 (June 5th, 2020)
+++++++++++++++++++++++++++++++
+
+- **Initial release (internal).**
