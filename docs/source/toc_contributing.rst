@@ -11,4 +11,5 @@ Contributing
 
    contributing.rst
    contributing_docs.rst
+   release.rst
    code_of_conduct.rst
