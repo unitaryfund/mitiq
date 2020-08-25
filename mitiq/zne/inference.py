@@ -442,10 +442,6 @@ class PolyFactory(BatchedFactory):
         scale_factors = self.get_scale_factors()
         expectation_values = self.get_expectation_values()
 
-        if len(scale_factors) < 2:
-            raise ValueError(
-                "At least two data points are needed to fit a polynomial."
-            )
 
         if self.order > len(scale_factors) - 1:
             raise ValueError(
