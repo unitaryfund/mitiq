@@ -285,12 +285,10 @@ The typical tasks of a factory are:
 
 2. Determine the noise scale factor at which the next computation should be run;
 
-3. Given the history of noise scale factors and results
-   (respectively stored in the object attributes ``self.instack``
-   and ``self.outstack``), evaluate the associated zero-noise extrapolation.
+3. Given the history of noise scale factors and results, evaluate the associated zero-noise extrapolation.
 
 The structure of the :class:`.Factory` class is adaptive by construction, since the choice of the next noise
-level can depend on the history of ``self.instack`` and ``self.outstack``. Obviously, non-adaptive
+level can depend on the history of these values. Obviously, non-adaptive
 methods are supported too and they actually represent the most common choice.
 
 Specific classes derived from the abstract class :class:`.Factory`, like :class:`.LinearFactory`,
@@ -640,8 +638,9 @@ and clips the result if it falls outside its physical domain.
             The clipped extrapolation to the zero-noise limit.
          """
          # Fit a line and get the intercept
-         scale_factors = [params["scale_factor"] for params in self.instack]
-         _, intercept = mitiq_polyfit(scale_factors, self.outstack, deg=1)
+         _, intercept = mitiq_polyfit(
+            self.get_scale_factors(), self.get_expectation_values(), deg=1
+        )
 
          # Return the clipped zero-noise extrapolation.
          return np.clip(intercept, self.min_expval, self.max_expval)

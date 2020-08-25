@@ -165,6 +165,7 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
 
         def conversion_function(circ):
             return circ
+
     else:
         raise UnsupportedCircuitError(
             f"Circuit from module {circuit.__module__} is not supported.\n\n"
@@ -200,8 +201,10 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
 
         conversion_function = to_pyquil
     elif isinstance(circuit, Circuit):
+
         def conversion_function(circ):
             return circ
+
     else:
         raise UnsupportedCircuitError(
             f"Conversion to circuit of type {conversion_type} is unsupported."
