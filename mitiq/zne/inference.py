@@ -442,7 +442,6 @@ class PolyFactory(BatchedFactory):
         scale_factors = self.get_scale_factors()
         expectation_values = self.get_expectation_values()
 
-
         if self.order > len(scale_factors) - 1:
             raise ValueError(
                 f"Extrapolation order is too high. The order cannot exceed "
