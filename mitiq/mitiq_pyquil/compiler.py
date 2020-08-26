@@ -21,11 +21,9 @@ and modified to support a larger gateset (e.g. CPHASE).
 """
 
 from math import pi
-from typing import Tuple
 
 import numpy as np
 
-from cirq import match_global_phase
 from pyquil.gates import RX, RZ, CZ, I, XY
 from pyquil.quil import Program
 from pyquil.quilbase import Gate

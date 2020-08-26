@@ -25,6 +25,7 @@ from math import pi
 import numpy as np
 import pytest
 
+from cirq import equal_up_to_global_phase
 from pyquil.gates import (
     CCNOT,
     CNOT,
@@ -63,14 +64,7 @@ from mitiq.mitiq_pyquil.compiler import (
     _X,
     _Y,
     _Z,
-    match_global_phase,
 )
-
-def assert_all_close_up_to_global_phase(
-    actual, desired, rtol: float = 1e-7, atol: float = 0
-):
-    actual, desired = match_global_phase(actual, desired)
-    np.testing.assert_allclose(actual, desired, rtol=rtol, atol=atol)
 
 
 def test_basic_compile_defgate():
@@ -87,44 +81,44 @@ def test_CCNOT():
     for perm in itertools.permutations([0, 1, 2]):
         u1 = program_unitary(Program(CCNOT(*perm)), n_qubits=3)
         u2 = program_unitary(_CCNOT(*perm), n_qubits=3)
-        assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+        assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
 def test_CNOT():
     u1 = program_unitary(Program(CNOT(0, 1)), n_qubits=2)
     u2 = program_unitary(_CNOT(0, 1), n_qubits=2)
-    assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+    assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
     u1 = program_unitary(Program(CNOT(1, 0)), n_qubits=2)
     u2 = program_unitary(_CNOT(1, 0), n_qubits=2)
-    assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+    assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
 def test_CPHASE():
     for theta in np.linspace(-2 * np.pi, 2 * np.pi):
         u1 = program_unitary(Program(CPHASE(theta, 0, 1)), n_qubits=2)
         u2 = program_unitary(_CPHASE(theta, 0, 1), n_qubits=2)
-        assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+        assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
         u1 = program_unitary(Program(CPHASE(theta, 1, 0)), n_qubits=2)
         u2 = program_unitary(_CPHASE(theta, 1, 0), n_qubits=2)
-        assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+        assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
 def test_H():
     u1 = program_unitary(Program(H(0)), n_qubits=1)
     u2 = program_unitary(_H(0), n_qubits=1)
-    assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+    assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
 def test_ISWAP():
     u1 = program_unitary(Program(ISWAP(0, 1)), n_qubits=2)
     u2 = program_unitary(_ISWAP(0, 1), n_qubits=2)
-    assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+    assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
     u1 = program_unitary(Program(ISWAP(1, 0)), n_qubits=2)
     u2 = program_unitary(_ISWAP(1, 0), n_qubits=2)
-    assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+    assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
 def test_RX():
@@ -132,42 +126,42 @@ def test_RX():
         p = Program(RX(theta, 0))
         u1 = program_unitary(p, n_qubits=1)
         u2 = program_unitary(basic_compile(p), n_qubits=1)
-        assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+        assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
 def test_RY():
     for theta in np.linspace(-2 * np.pi, 2 * np.pi):
         u1 = program_unitary(Program(RY(theta, 0)), n_qubits=1)
         u2 = program_unitary(_RY(theta, 0), n_qubits=1)
-        assert_all_close_up_to_global_phase(u1, u2)
+        assert equal_up_to_global_phase(u1, u2)
 
 
 def test_S():
     u1 = program_unitary(Program(S(0)), n_qubits=1)
     u2 = program_unitary(_S(0), n_qubits=1)
-    assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+    assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
 def test_SWAP():
     u1 = program_unitary(Program(SWAP(0, 1)), n_qubits=2)
     u2 = program_unitary(_SWAP(0, 1), n_qubits=2)
-    assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+    assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
     u1 = program_unitary(Program(SWAP(1, 0)), n_qubits=2)
     u2 = program_unitary(_SWAP(1, 0), n_qubits=2)
-    assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+    assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
 def test_T():
     u1 = program_unitary(Program(T(0)), n_qubits=1)
     u2 = program_unitary(_T(0), n_qubits=1)
-    assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+    assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
 def test_X():
     u1 = program_unitary(Program(X(0)), n_qubits=1)
     u2 = program_unitary(_X(0), n_qubits=1)
-    assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+    assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
 def test_XY():
@@ -175,24 +169,24 @@ def test_XY():
         p = Program(XY(theta, 0, 1))
         u1 = program_unitary(p, n_qubits=2)
         u2 = program_unitary(basic_compile(p), n_qubits=2)
-        assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+        assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
         p = Program(XY(theta, 1, 0))
         u1 = program_unitary(p, n_qubits=2)
         u2 = program_unitary(basic_compile(p), n_qubits=2)
-        assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+        assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
 def test_Y():
     u1 = program_unitary(Program(Y(0)), n_qubits=1)
     u2 = program_unitary(_Y(0), n_qubits=1)
-    assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+    assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
 def test_Z():
     u1 = program_unitary(Program(Z(0)), n_qubits=1)
     u2 = program_unitary(_Z(0), n_qubits=1)
-    assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+    assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
 # Note to developers: unsupported gates are commented out.
@@ -283,8 +277,7 @@ def test_random_progs(n_qubits, prog_length):
         prog = _generate_random_program(n_qubits=n_qubits, length=prog_length)
         u1 = program_unitary(prog, n_qubits=n_qubits)
         u2 = program_unitary(basic_compile(prog), n_qubits=n_qubits)
-
-        assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
+        assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
 def test_unsupported_gate():
