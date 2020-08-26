@@ -47,6 +47,7 @@ from pyquil.gates import (
     Z,
 )
 from pyquil.quil import Program
+from pyquil.simulation.tools import program_unitary
 
 from mitiq.mitiq_pyquil.compiler import (
     basic_compile,
@@ -65,14 +66,6 @@ from mitiq.mitiq_pyquil.compiler import (
     match_global_phase,
 )
 
-try:
-    from pyquil.simulation.tools import program_unitary
-
-    unitary_tools = True
-except ImportError:
-    unitary_tools = False
-
-
 def assert_all_close_up_to_global_phase(
     actual, desired, rtol: float = 1e-7, atol: float = 0
 ):
@@ -90,7 +83,6 @@ def test_basic_compile_defgate():
     assert p == basic_compile(p)
 
 
-@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_CCNOT():
     for perm in itertools.permutations([0, 1, 2]):
         u1 = program_unitary(Program(CCNOT(*perm)), n_qubits=3)
@@ -98,7 +90,6 @@ def test_CCNOT():
         assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_CNOT():
     u1 = program_unitary(Program(CNOT(0, 1)), n_qubits=2)
     u2 = program_unitary(_CNOT(0, 1), n_qubits=2)
@@ -109,7 +100,6 @@ def test_CNOT():
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_CPHASE():
     for theta in np.linspace(-2 * np.pi, 2 * np.pi):
         u1 = program_unitary(Program(CPHASE(theta, 0, 1)), n_qubits=2)
@@ -121,14 +111,12 @@ def test_CPHASE():
         assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_H():
     u1 = program_unitary(Program(H(0)), n_qubits=1)
     u2 = program_unitary(_H(0), n_qubits=1)
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_ISWAP():
     u1 = program_unitary(Program(ISWAP(0, 1)), n_qubits=2)
     u2 = program_unitary(_ISWAP(0, 1), n_qubits=2)
@@ -139,7 +127,6 @@ def test_ISWAP():
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_RX():
     for theta in np.linspace(-2 * np.pi, 2 * np.pi):
         p = Program(RX(theta, 0))
@@ -148,7 +135,6 @@ def test_RX():
         assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_RY():
     for theta in np.linspace(-2 * np.pi, 2 * np.pi):
         u1 = program_unitary(Program(RY(theta, 0)), n_qubits=1)
@@ -156,14 +142,12 @@ def test_RY():
         assert_all_close_up_to_global_phase(u1, u2)
 
 
-@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_S():
     u1 = program_unitary(Program(S(0)), n_qubits=1)
     u2 = program_unitary(_S(0), n_qubits=1)
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_SWAP():
     u1 = program_unitary(Program(SWAP(0, 1)), n_qubits=2)
     u2 = program_unitary(_SWAP(0, 1), n_qubits=2)
@@ -174,21 +158,18 @@ def test_SWAP():
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_T():
     u1 = program_unitary(Program(T(0)), n_qubits=1)
     u2 = program_unitary(_T(0), n_qubits=1)
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_X():
     u1 = program_unitary(Program(X(0)), n_qubits=1)
     u2 = program_unitary(_X(0), n_qubits=1)
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_XY():
     for theta in np.linspace(-2 * np.pi, 2 * np.pi):
         p = Program(XY(theta, 0, 1))
@@ -202,14 +183,12 @@ def test_XY():
         assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_Y():
     u1 = program_unitary(Program(Y(0)), n_qubits=1)
     u2 = program_unitary(_Y(0), n_qubits=1)
     assert_all_close_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_Z():
     u1 = program_unitary(Program(Z(0)), n_qubits=1)
     u2 = program_unitary(_Z(0), n_qubits=1)
@@ -299,7 +278,6 @@ def prog_length(request):
     return request.param
 
 
-@pytest.mark.skipif(not unitary_tools, reason="Requires unitary_tools")
 def test_random_progs(n_qubits, prog_length):
     for repeat_i in range(10):
         prog = _generate_random_program(n_qubits=n_qubits, length=prog_length)
