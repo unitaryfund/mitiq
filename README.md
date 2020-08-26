@@ -6,81 +6,70 @@
 
 
 # Mitiq
-A Python toolkit for implementing error mitigation on quantum computers.
 
-## Documentation
-The full documentation is available at [mitiq.readthedocs.io](https://mitiq.readthedocs.io).
+Mitiq is a Python toolkit for implementing error mitigation techniques on quantum computers.
 
-A pdf with the documentation updated to the latest release can be found
-[here](docs/pdf/).
-
-## Features
-Mitiq  is  an  open-source Python library that interfaces with multiple front-end quantum programming languages to implement 
-[error-mitigation](https://mitiq.readthedocs.io/en/latest/guide/guide_06-error-mitigation.html) techniques
-on various real and simulated quantum  processors.
-
-Mitiq is compatible with [Cirq](https://github.com/quantumlib/Cirq), [Qiskit](https://github.com/Qiskit), and [PyQuil](https://github.com/rigetti/pyquil).  
-
-Mitiq currently implements [zero-noise extrapolation](https://mitiq.readthedocs.io/en/latest/guide/guide_06-error-mitigation.html#zero-noise-extrapolation) and is designed to be modular to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
-
-## Contents
-```
-mitiq/mitiq/
-    | benchmarks
-        |- maxcut
-        |- random_circuits
-        |- randomized_benchmarking
-        |- utils
-    | mitiq_pyquil
-        |- conversions
-    	|- pyquil_utils
-        |- quil
-    | mitiq_qiskit
-    	|- conversions
-    	|- qiskit_utils
-    | zne
-        |- zne
-        |- inference
-        |- scaling
-```
 ## Installation
 
-To install locally use:
+Mitiq can be installed from PyPi via
 
 ```bash
-pip install -e .
+pip install mitiq
 ```
 
-To install the requirements for development use:
+To test installation, run
 
-```bash
-pip install -r requirements.txt
+```python
+import mitiq
+mitiq.about()
 ```
 
-Note that this will install our testing environment that depends
-on `qiskit` and `pyquil`.
+This prints out version information about core requirements and optional quantum software packages which Mitiq can
+interface with. 
 
-## Use
-A [Getting Started](https://mitiq.readthedocs.io/en/latest/guide/guide_02-getting-started.html)
-tutorial can be found in the [documentation](https://mitiq.readthedocs.io).
+### Supported quantum programming languages
 
+Mitiq can currently interface with
 
-## Development and Testing
+* [Cirq](https://github.com/quantumlib/Cirq) >= 0.9.0, 
+* [Qiskit](https://qiskit.org/) >= 0.19.0, and 
+* [pyQuil](https://github.com/rigetti/pyquil) >= 2.18.0. 
 
-Ensure that you have installed the development environment. Then you can run
-the tests using `make test` and build the docs using `make docs`. For more
-information, see the contributor's guide (linked below).
+Cirq is a core requirement of Mitiq and is automatically installed. To use Mitiq with other quantum programming
+languages, install the optional package(s) following the instructions linked above.
 
-## Contributing
-You can find information on contributing to `mitiq` code in the [contributing guidelines](CONTRIBUTING.md).
+### Supported quantum processors
 
-To contribute to the documentation, read the
-[instructions](docs/README-docs.md) in the `mitiq/docs` folder.
+Mitiq can be used on any quantum processor which can be accessed by supported quantum programming languages and is 
+available to the user.
+
+## Getting started
+
+See this [getting started](https://mitiq.readthedocs.io/en/latest/guide/guide-getting-started.html) guide in 
+[Mitiq's documentation](https://mitiq.readthedocs.io).
+
+## Error mitigation techniques
+
+Mitiq currently implements [zero-noise extrapolation](https://mitiq.readthedocs.io/en/latest/guide/guide-zne.html) and 
+is designed to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
+
+## Documentation
+
+Mitiq's documentation is hosted at [mitiq.readthedocs.io](https://mitiq.readthedocs.io). A PDF version of the latest 
+release can be found [here](https://mitiq.readthedocs.io/_/downloads/en/latest/pdf/).
+
+## Developer information
+
+We welcome contributions to Mitiq including bug fixes, feature requests, etc. Please see the 
+[contribution guidelines](CONTRIBUTING.md) for more details. To contribute to the documentation, please see these
+[documentation guidelines](docs/README-docs.md).
 
 
 ## Authors
+
 An up-to-date list of authors can be found
-[here](https://github.com/unitaryfund/mitiq/graphs/contributors)
+[here](https://github.com/unitaryfund/mitiq/graphs/contributors).
 
 ## License
+
 [GNU GPL v.3.0.](LICENSE)
