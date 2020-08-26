@@ -25,6 +25,7 @@ from typing import Tuple
 
 import numpy as np
 
+from cirq import match_global_phase
 from pyquil.gates import RX, RZ, CZ, I, XY
 from pyquil.quil import Program
 from pyquil.quilbase import Gate
@@ -213,44 +214,10 @@ def _Z(q: int) -> Program:
     return p
 
 
-# This function is taken from cirq. License: apache 2.
-def match_global_phase(
-    a: np.ndarray, b: np.ndarray
-) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Phases the given matrices so that they agree on the phase of one entry.
-    To maximize precision, the position with the largest entry from one of the
-    matrices is used when attempting to compute the phase difference between
-    the two matrices.
-    :param a: The first matrix
-    :param b: The second matrix
-    :return: A tuple (a', b') where a' == b' implies a == b*exp(i t) for some t
-    """
-
-    # Not much point when they have different shapes.
-    if a.shape != b.shape:
-        return a, b  # pragma: no coverage
-
-    # Find the entry with the largest magnitude in one of the matrices.
-    k = max(np.ndindex(*a.shape), key=lambda t: abs(b[t]))
-
-    def dephase(v):
-        r = np.real(v)
-        i = np.imag(v)
-
-        # Avoid introducing floating point error when axis-aligned.
-        if i == 0:
-            return -1 if r < 0 else 1
-        if r == 0:
-            return 1j if i < 0 else -1j
-
-        return np.exp(-1j * np.arctan2(i, r))
-
-    # Zero the phase at this entry in both matrices.
-    return a * dephase(a[k]), b * dephase(b[k])
-
-
 def is_magic_angle(angle: float) -> bool:
+    """
+    Checks to see if an angle is 0, +/-pi/2, or +/-pi.
+    """
     return (
         np.isclose(np.abs(angle), pi / 2)
         or np.isclose(np.abs(angle), pi)
