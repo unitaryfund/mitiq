@@ -28,19 +28,19 @@ which is then handled gracefully by the Union type.
 """
 from typing import Union
 
-from cirq import Circuit
+from cirq import Circuit as _Circuit
 
 try:
-    from pyquil import Program
-except ImportError:
-    Program = Circuit
+    from pyquil import Program as _Program
+except ImportError:  # pragma: no coverage
+    _Program = _Circuit
 
 try:
-    from qiskit import QuantumCircuit
-except ImportError:
-    QuantumCircuit = Circuit
+    from qiskit import QuantumCircuit as _QuantumCircuit
+except ImportError:  # pragma: no coverage
+    _QuantumCircuit = _Circuit
 
-QPROGRAM = Union[Circuit, Program, QuantumCircuit]
+QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit]
 
 SUPPORTED_PROGRAM_TYPES = {
     "cirq": "Circuit",
