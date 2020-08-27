@@ -812,6 +812,13 @@ class PolyExpFactory(BatchedFactory):
         )
 
 
+# Keep a log of the optimization process storing:
+# noise value(s), expectation value(s), parameters, and zero limit
+OptimizationHistory = List[
+    Tuple[List[Dict[str, float]], List[float], List[float], float]
+]
+
+
 class AdaExpFactory(Factory):
     """Factory object implementing an adaptive zero-noise extrapolation
     algorithm assuming an exponential ansatz y(x) = a + b * exp(-c * x),
@@ -880,11 +887,7 @@ class AdaExpFactory(Factory):
         self.asymptote = asymptote
         self.avoid_log = avoid_log
         self.max_scale_factor = max_scale_factor
-        # Keep a log of the optimization process storing:
-        # noise value(s), expectation value(s), parameters, and zero limit
-        self.history: List[
-            Tuple[List[Dict[str, float]], List[float], List[float], float]
-        ] = []
+        self.history: OptimizationHistory = []
 
     def next(self) -> Dict[str, float]:
         """Returns a dictionary of parameters to execute a circuit at."""
