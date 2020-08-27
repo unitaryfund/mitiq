@@ -61,7 +61,7 @@ release can be found [here](https://mitiq.readthedocs.io/_/downloads/en/latest/p
 ## Developer information
 
 We welcome contributions to Mitiq including bug fixes, feature requests, etc. Please see the 
-[contribution guidelines](CONTRIBUTING.md) for more details. To contribute to the documentation, please see these
+[contribution guidelines](https://github.com/unitaryfund/mitiq/blob/master/CONTRIBUTING.md) for more details. To contribute to the documentation, please see these
 [documentation guidelines](docs/README-docs.md).
 
 
