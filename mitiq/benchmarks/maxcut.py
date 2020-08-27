@@ -33,7 +33,7 @@ SIMULATOR = DensityMatrixSimulator()
 
 def make_noisy_backend(
     noise: float, obs: np.ndarray
-) -> Callable[[Circuit, int], float]:
+) -> Callable[[Circuit], float]:
     """ Helper function to match mitiq's backend type signature.
 
     Args:
@@ -44,7 +44,7 @@ def make_noisy_backend(
         A mitiq backend function.
     """
 
-    def noisy_backend(circ: Circuit):
+    def noisy_backend(circ: Circuit) -> float:
         return noisy_simulation(circ, noise, obs)
 
     return noisy_backend
@@ -76,7 +76,7 @@ def make_maxcut(
     """
     # get the list of unique nodes from the list of edges
     nodes = list({node for edge in graph for node in edge})
-    nodes = range(max(nodes) + 1)
+    nodes = list(range(max(nodes) + 1))
 
     # one qubit per node
     qreg = [NamedQubit(str(nn)) for nn in nodes]

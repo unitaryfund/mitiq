@@ -54,17 +54,26 @@ def rb_circuits(
         qubit1 = NamedQubit("0")
         if n_qubits == 1:
             rb_circuits = [
-                _random_single_q_clifford(qubit1, num, C1, CFD_MAT_1Q)
+                _random_single_q_clifford(
+                    qubit1,  # type: ignore
+                    num,
+                    C1,
+                    CFD_MAT_1Q,
+                )
                 for _ in range(trials)
             ]
         elif n_qubits == 2:
             qubit2 = NamedQubit("1")
             cfd_matrices = _two_qubit_clifford_matrices(
-                qubit1, qubit2, CLIFFORDS
+                qubit1, qubit2, CLIFFORDS,  # type: ignore
             )
             rb_circuits = [
                 _random_two_q_clifford(
-                    qubit1, qubit2, num, cfd_matrices, CLIFFORDS
+                    qubit1,  # type: ignore
+                    qubit2,  # type: ignore
+                    num,
+                    cfd_matrices,
+                    CLIFFORDS,
                 )
                 for _ in range(trials)
             ]
