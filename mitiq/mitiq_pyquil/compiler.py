@@ -242,16 +242,13 @@ def basic_compile(program: Program) -> Program:
 
     for inst in program:
         if isinstance(inst, Gate):
-            angle_param = None
-            if len(inst.params) > 0:
-                angle_param = inst.params[0]
-
             if inst.name == "CCNOT":
                 new_prog += _CCNOT(*inst.qubits)
             elif inst.name == "CNOT":
                 new_prog += _CNOT(*inst.qubits)
             # NB: we haven't implemented CPHASE00/01/10
             elif inst.name == "CPHASE":
+                angle_param = inst.params[0]
                 new_prog += _CPHASE(angle_param, *inst.qubits)
             elif inst.name == "CZ":
                 new_prog += CZ(*inst.qubits)  # remove dag modifiers
@@ -262,17 +259,21 @@ def basic_compile(program: Program) -> Program:
             elif inst.name == "ISWAP":
                 new_prog += _ISWAP(*inst.qubits)  # remove dag modifiers
             elif inst.name == "PHASE":
+                angle_param = inst.params[0]
                 new_prog += _PHASE(angle_param, inst.qubits[0])
             elif inst.name == "RX":
+                angle_param = inst.params[0]
                 if is_magic_angle(inst.params[0]):
                     # in case dagger
                     new_prog += RX(angle_param, inst.qubits[0])
                 else:
                     new_prog += _RX(angle_param, inst.qubits[0])
             elif inst.name == "RY":
+                angle_param = inst.params[0]
                 new_prog += _RY(angle_param, inst.qubits[0])
             elif inst.name == "RZ":
                 # in case dagger
+                angle_param = inst.params[0]
                 new_prog += RZ(angle_param, inst.qubits[0])
             elif inst.name == "S":
                 new_prog += _S(inst.qubits[0])
@@ -284,6 +285,7 @@ def basic_compile(program: Program) -> Program:
             elif inst.name == "X":
                 new_prog += _X(inst.qubits[0])
             elif inst.name == "XY":
+                angle_param = inst.params[0]
                 new_prog += XY(angle_param, *inst.qubits)
             elif inst.name == "Y":
                 new_prog += _Y(inst.qubits[0])
