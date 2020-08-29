@@ -79,4 +79,4 @@ def generate_rb_program(
         interleaver=interleaved_gate,
         seed=random_seed,
     )
-    return Program("".join(map(lambda p: p.out(), programs)))
+    return Program(programs)
