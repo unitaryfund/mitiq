@@ -6,7 +6,7 @@ import numpy as np
 from cirq import Circuit, LineQubit, ops
 
 from mitiq.utils import _equal
-from mitiq.parameter import (
+from mitiq.zne.parameter import (
     scale_parameters
 )
 

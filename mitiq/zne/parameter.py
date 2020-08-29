@@ -11,7 +11,7 @@ from cirq import (
 )
 from cirq.ops import gate_features
 from cirq import protocols
-from mitiq.folding import converter
+from mitiq.zne.scaling import converter
 
 BASE_GATES = [ZPowGate, HPowGate, XPowGate, YPowGate, CXPowGate, CZPowGate]
 
