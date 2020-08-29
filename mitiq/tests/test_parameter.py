@@ -3,9 +3,7 @@
 from copy import deepcopy
 
 import numpy as np
-import pytest
-from cirq import Circuit, GridQubit, LineQubit, ops, inverse
-from cirq import rx, ry, CNOT, X, Y, Z
+from cirq import Circuit, LineQubit, ops
 
 from mitiq.utils import _equal
 from mitiq.parameter import (
@@ -42,7 +40,8 @@ def test_non_identity_scale_1q():
         (stretch-1)*base_noise), size=(4,))
     np.random.seed(42)
 
-    scaled = scale_parameters(circ, scale_factor=stretch, sigma=base_noise)
+    scaled = scale_parameters(
+        circ, scale_factor=stretch, sigma=base_noise, seed=42)
     result = []
     for moment in scaled:
         for op in moment.operations:
@@ -78,7 +77,8 @@ def test_non_identity_scale_2q():
     noises = np.random.normal(loc=0.0, scale=np.sqrt(
         (stretch-1)*base_noise), size=(1,))
     np.random.seed(42)
-    scaled = scale_parameters(circ, scale_factor=stretch, sigma=base_noise)
+    scaled = scale_parameters(
+        circ, scale_factor=stretch, sigma=base_noise, seed=42)
     result = []
     for moment in scaled:
         for op in moment.operations:
