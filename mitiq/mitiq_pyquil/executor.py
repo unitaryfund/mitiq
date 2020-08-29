@@ -32,6 +32,7 @@ def generate_qcs_executor(
     expectation_fn: Callable[[np.ndarray], float],
     shots: int = 1000,
     reset: bool = True,
+    debug: bool = False,
 ) -> Callable[[Program], float]:
     """
     Generates an executor for QCS that ingests pyQuil programs.
@@ -40,6 +41,7 @@ def generate_qcs_executor(
     :param expectation_fn: Takes in bitstring results and produces a float.
     :param shots: Number of shots to take.
     :param reset: Whether or not to enable active reset.
+    :param debug: If true, print the program after compilation.
     """
 
     def executor(program: Program) -> float:
@@ -65,6 +67,10 @@ def generate_qcs_executor(
 
         # nativize the circuit
         p = basic_compile(p)
+
+        # print out nativized program
+        if debug:
+            print(p)
 
         # compile the circuit
         b = qc.compiler.native_quil_to_executable(p)
