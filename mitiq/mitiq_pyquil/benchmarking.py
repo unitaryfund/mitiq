@@ -31,7 +31,7 @@ MAGIC_ANGLES = [-np.pi, -np.pi / 2, np.pi / 2, np.pi]
 
 def one_qubit_gateset(qubit: int) -> List[Gate]:
     """
-    Yield the gateset for 1-qubit randomized benchmarking.
+    Return the RX, RZ native gateset on one qubit.
     """
     return list(
         gate(angle, qubit)
@@ -42,9 +42,9 @@ def one_qubit_gateset(qubit: int) -> List[Gate]:
 
 def two_qubit_gateset(q0: int, q1: int) -> List[Gate]:
     """
-    Yield the gateset for 2-qubit randomized benchmarking.
+    Return the RX, RZ, CZ native gateset on two qubits.
     """
-    return one_qubit_gateset(q0) + one_qubit_gateset(q0) + [CZ(q0, q1)]
+    return one_qubit_gateset(q0) + one_qubit_gateset(q1) + [CZ(q0, q1)]
 
 
 def generate_rb_program(
