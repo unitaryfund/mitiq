@@ -1,5 +1,19 @@
-"""Unit tests for folding Cirq circuits."""
+# Copyright (C) 2020 Unitary Fund
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""Unit tests for scaling noise by folding Cirq circuits."""
 from copy import deepcopy
 
 import numpy as np
@@ -16,11 +30,15 @@ from cirq import (
 )
 from cirq.google import Sycamore
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
+from qiskit.quantum_info.operators import Operator
+from pyquil import Program
+from pyquil.quilbase import Pragma
 
 from mitiq.utils import _equal
-from mitiq.folding import (
+from mitiq.zne.scaling import (
     UnfoldableGateError,
     UnfoldableCircuitError,
+    CircuitConversionError,
     _is_measurement,
     _pop_measurements,
     _append_measurements,
@@ -1598,3 +1616,78 @@ def test_fold_local_raises_error_with_bad_fidelities(fold_method):
 
     with pytest.raises(ValueError, match="Fidelities should be"):
         fold_method(Circuit(), scale_factor=1.21, fidelities={"triple": 1.2})
+
+
+@pytest.mark.parametrize("conversion_type", ("qiskit", "pyquil"))
+def test_convert_from_mitiq_circuit_conversion_error(conversion_type):
+    circuit = testing.random_circuit(qubits=5, n_moments=5, op_density=0.99)
+    noisy = circuit.with_noise(ops.depolarize(p=0.1))
+
+    with pytest.raises(
+        CircuitConversionError, match="Circuit could not be converted from"
+    ):
+        convert_from_mitiq(noisy, conversion_type)
+
+
+def test_convert_qiskit_to_mitiq_circuit_conversion_error():
+    # Custom gates are not supported in conversions
+    gate = Operator([[0.0, 1.0], [-1.0, 0.0]])
+    qreg = QuantumRegister(1)
+    circ = QuantumCircuit(qreg)
+    circ.unitary(gate, [0])
+
+    with pytest.raises(
+        CircuitConversionError, match="Circuit could not be converted to"
+    ):
+        convert_to_mitiq(circ)
+
+
+def test_convert_pyquil_to_mitiq_circuit_conversion_error():
+    # Pragmas are not supported in conversions
+    prog = Program(Pragma("INITIAL_REWIRING", ['"Partial"']))
+
+    with pytest.raises(
+        CircuitConversionError, match="Circuit could not be converted to"
+    ):
+        convert_to_mitiq(prog)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    (
+        fold_gates_from_left,
+        fold_gates_from_right,
+        fold_gates_at_random,
+        fold_global,
+    ),
+)
+def test_folding_circuit_conversion_error_qiskit(fold_method):
+    # Custom gates are not supported in conversions
+    gate = Operator([[0.0, 1.0], [-1.0, 0.0]])
+    qreg = QuantumRegister(1)
+    circ = QuantumCircuit(qreg)
+    circ.unitary(gate, [0])
+
+    with pytest.raises(
+        CircuitConversionError, match="Circuit could not be converted to"
+    ):
+        fold_method(circ, scale_factor=2.0)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    (
+        fold_gates_from_left,
+        fold_gates_from_right,
+        fold_gates_at_random,
+        fold_global,
+    ),
+)
+def test_folding_circuit_conversion_error_pyquil(fold_method):
+    # Pragmas are not supported in conversions
+    prog = Program(Pragma("INITIAL_REWIRING", ['"Partial"']))
+
+    with pytest.raises(
+        CircuitConversionError, match="Circuit could not be converted to"
+    ):
+        fold_method(prog, scale_factor=2.0)

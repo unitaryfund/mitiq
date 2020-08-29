@@ -1,11 +1,25 @@
-"""High-level zero-noise extrapolation tools."""
+# Copyright (C) 2020 Unitary Fund
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""High-level zero-noise extrapolation tools."""
 from typing import Callable
 from functools import wraps
 
 from mitiq._typing import QPROGRAM
-from mitiq.factories import Factory, RichardsonFactory
-from mitiq.folding import fold_gates_at_random
+from mitiq.zne.inference import Factory, RichardsonFactory
+from mitiq.zne.scaling import fold_gates_at_random
 
 
 def execute_with_zne(
@@ -83,7 +97,7 @@ def zne_decorator(
     factory: Factory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
-) -> Callable[[QPROGRAM], float]:
+) -> Callable[[Callable[[QPROGRAM], float]], Callable[[QPROGRAM], float]]:
     """Decorator which adds error mitigation to an executor function, i.e., a
     function which executes a quantum circuit with an arbitrary backend and
     returns an expectation value.

@@ -1,16 +1,44 @@
-"""Functions for local and global unitary folding on supported circuits."""
+# Copyright (C) 2020 Unitary Fund
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""Functions for local and global unitary folding on supported circuits."""
 from copy import deepcopy
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    Collection,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
 from functools import wraps
 
 import numpy as np
-from cirq import Circuit, InsertStrategy, inverse, ops, has_mixture
+from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary
 
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES, QPROGRAM
 
 
 class UnsupportedCircuitError(Exception):
+    pass
+
+
+class CircuitConversionError(Exception):
     pass
 
 
@@ -45,9 +73,7 @@ def _is_measurement(op: ops.Operation) -> bool:
     return isinstance(op.gate, ops.measurement_gate.MeasurementGate)
 
 
-def _pop_measurements(
-    circuit: Circuit,
-) -> List[List[Union[int, ops.Operation]]]:
+def _pop_measurements(circuit: Circuit,) -> List[Tuple[int, ops.Operation]]:
     """Removes all measurements from a circuit.
 
     Args:
@@ -56,15 +82,13 @@ def _pop_measurements(
     Returns:
         measurements: List of measurements in the circuit.
     """
-    measurements = [
-        list(m) for m in circuit.findall_operations(_is_measurement)
-    ]
+    measurements = list(circuit.findall_operations(_is_measurement))
     circuit.batch_remove(measurements)
     return measurements
 
 
 def _append_measurements(
-    circuit: Circuit, measurements: List[Union[int, ops.Operation]]
+    circuit: Circuit, measurements: List[Tuple[int, ops.Operation]]
 ) -> None:
     """Appends all measurements into the final moment of the circuit.
 
@@ -72,11 +96,11 @@ def _append_measurements(
         circuit: a quantum circuit as a :class:`cirq.Circuit`.
         measurements: measurements to perform.
     """
+    new_measurements: List[Tuple[int, ops.Operation]] = []
     for i in range(len(measurements)):
-        measurements[i][0] = (
-            len(circuit) + 1
-        )  # Make sure the moment to insert into is the last in the circuit
-    circuit.batch_insert(measurements)
+        # Make sure the moment to insert into is the last in the circuit
+        new_measurements.append((len(circuit) + 1, measurements[i][1]))
+    circuit.batch_insert(new_measurements)
 
 
 def _check_foldable(circuit: Circuit) -> None:
@@ -96,7 +120,7 @@ def _check_foldable(circuit: Circuit) -> None:
             "Circuit contains intermediate measurements and cannot be folded."
         )
 
-    if any(has_mixture(op) for op in circuit.all_operations()):
+    if not has_unitary(circuit):
         raise UnfoldableCircuitError(
             "Circuit contains non-unitary channels which are not terminal "
             "measurements and cannot be folded."
@@ -132,24 +156,39 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
         circuit: Mitiq circuit equivalent to input circuit.
         input_circuit_type: Type of input circuit represented by a string.
     """
+    conversion_function: Callable[[QPROGRAM], Circuit]
     if "qiskit" in circuit.__module__:
         from mitiq.mitiq_qiskit.conversions import from_qiskit
 
         input_circuit_type = "qiskit"
-        mitiq_circuit = from_qiskit(circuit)
+        conversion_function = from_qiskit
     elif "pyquil" in circuit.__module__:
         from mitiq.mitiq_pyquil.conversions import from_pyquil
 
         input_circuit_type = "pyquil"
-        mitiq_circuit = from_pyquil(circuit)
+        conversion_function = from_pyquil
     elif isinstance(circuit, Circuit):
         input_circuit_type = "cirq"
-        mitiq_circuit = circuit
+
+        def conversion_function(circ):
+            return circ
+
     else:
         raise UnsupportedCircuitError(
             f"Circuit from module {circuit.__module__} is not supported.\n\n"
-            f"Circuit types supported by mitiq = \n{SUPPORTED_PROGRAM_TYPES}"
+            f"Circuit types supported by Mitiq are \n{SUPPORTED_PROGRAM_TYPES}"
         )
+
+    try:
+        mitiq_circuit = conversion_function(circuit)
+    except Exception:
+        raise CircuitConversionError(
+            "Circuit could not be converted to an internal Mitiq circuit. "
+            "This may be because the circuit contains custom gates or Pragmas "
+            "(pyQuil). If you think this is a bug, you can open an issue at "
+            "https://github.com/unitaryfund/mitiq."
+        )
+
     return mitiq_circuit, input_circuit_type
 
 
@@ -163,18 +202,30 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
     if conversion_type == "qiskit":
         from mitiq.mitiq_qiskit.conversions import to_qiskit
 
-        converted_circuit = to_qiskit(circuit)
+        conversion_function = to_qiskit
     elif conversion_type == "pyquil":
         from mitiq.mitiq_pyquil.conversions import to_pyquil
 
-        converted_circuit = to_pyquil(circuit)
+        conversion_function = to_pyquil
     elif isinstance(circuit, Circuit):
-        converted_circuit = circuit
+
+        def conversion_function(circ):
+            return circ
+
     else:
         raise UnsupportedCircuitError(
             f"Conversion to circuit of type {conversion_type} is unsupported."
             f"\nCircuit types supported by mitiq = {SUPPORTED_PROGRAM_TYPES}"
         )
+
+    try:
+        converted_circuit = conversion_function(circuit)
+    except Exception:
+        raise CircuitConversionError(
+            f"Circuit could not be converted from an internal Mitiq type to a "
+            f"circuit of type {conversion_type}."
+        )
+
     return converted_circuit
 
 
@@ -240,7 +291,7 @@ def _fold_gates_in_moment(
 def _fold_gates(
     circuit: Circuit,
     moment_indices: Iterable[int],
-    gate_indices: List[Iterable[int]],
+    gate_indices: List[Collection[int]],
 ) -> Circuit:
     """Returns a new circuit with specified gates folded.
 
@@ -315,7 +366,7 @@ def _get_weight_for_gate(
     elif "triple" in weights.keys() and len(op.qubits) == 3:
         weight = weights["triple"]
 
-    if op.gate in _cirq_gates_to_string_keys.keys():
+    if op.gate and op.gate in _cirq_gates_to_string_keys.keys():
         # Get the string key for this gate
         key = _cirq_gates_to_string_keys[op.gate]
         if key in weights.keys():
@@ -429,6 +480,7 @@ def fold_gates_from_left(
 
     # Determine the stopping condition for folding
     ngates = len(list(folded.all_operations()))
+    weights: Optional[Dict[str, float]]
     if fidelities:
         weights = {k: 1.0 - f for k, f in fidelities.items()}
         total_weight = _compute_weight(folded, weights)
@@ -464,6 +516,8 @@ def fold_gates_from_left(
                 if not (kwargs.get("squash_moments") is False):
                     folded = squash_moments(folded)
                 return folded
+
+    return folded
 
 
 @converter
@@ -529,7 +583,7 @@ def fold_gates_from_right(
     circuit = deepcopy(circuit)
     measurements = _pop_measurements(circuit)
 
-    reversed_circuit = Circuit(reversed(circuit))
+    reversed_circuit = Circuit(reversed(circuit.moments))
     reversed_folded_circuit = fold_gates_from_left(
         reversed_circuit,
         scale_factor,
@@ -672,6 +726,7 @@ def fold_gates_at_random(
 
     # Determine the stopping condition for folding
     ngates = len(list(folded.all_operations()))
+    weights: Optional[Dict[str, float]]
     if fidelities:
         weights = {k: 1.0 - f for k, f in fidelities.items()}
         total_weight = _compute_weight(folded, weights)
@@ -741,8 +796,8 @@ def fold_gates_at_random(
 def _fold_local(
     circuit: Circuit,
     scale_factor: float,
-    fold_method: Callable[[Circuit, float, Tuple[Any]], Circuit],
-    fold_method_args: Tuple[Any] = (),
+    fold_method: Callable[..., Circuit],
+    fold_method_args: Optional[Tuple[Any]] = None,
     **kwargs,
 ) -> Circuit:
     """Helper function for implementing a local folding method (which nominally
@@ -790,9 +845,12 @@ def _fold_local(
 
     while scale_factor > 1.0:
         this_stretch = 3.0 if scale_factor > 3.0 else scale_factor
-        folded = fold_method(
-            folded, this_stretch, *fold_method_args, squash_moments=False
-        )
+        if fold_method_args:
+            folded = fold_method(
+                folded, this_stretch, *fold_method_args, squash_moments=False
+            )
+        else:
+            folded = fold_method(folded, this_stretch, squash_moments=False)
         scale_factor /= 3.0
 
     if not (kwargs.get("squash_moments") is False):

@@ -1,11 +1,25 @@
-"""Tests for zne.py with Qiskit backend."""
+# Copyright (C) 2020 Unitary Fund
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""Tests for zne.py with Qiskit backend."""
 from mitiq._typing import QPROGRAM
 import numpy as np
 
 from qiskit import ClassicalRegister, QuantumCircuit
 
-from mitiq.factories import RichardsonFactory, ExpFactory
+from mitiq.zne.inference import RichardsonFactory, ExpFactory
 from mitiq.zne import (
     execute_with_zne,
     mitigate_executor,
@@ -103,16 +117,15 @@ def test_zne_decorator():
 
 def test_run_factory_with_number_of_shots():
     """Tests "run" method of an ExpFactory with shot_list."""
-
     qp = random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH)
     qp = measure(qp, 0)
     fac = ExpFactory([1.0, 2.0, 3.0], shot_list=[10 ** 4, 10 ** 5, 10 ** 6])
     fac.run(qp, basic_executor, scale_noise=scale_noise)
     result = fac.reduce()
     assert np.isclose(result, 1.0, atol=1.0e-1)
-    assert fac.instack[0] == {"scale_factor": 1.0, "shots": 10 ** 4}
-    assert fac.instack[1] == {"scale_factor": 2.0, "shots": 10 ** 5}
-    assert fac.instack[2] == {"scale_factor": 3.0, "shots": 10 ** 6}
+    assert fac._instack[0] == {"scale_factor": 1.0, "shots": 10 ** 4}
+    assert fac._instack[1] == {"scale_factor": 2.0, "shots": 10 ** 5}
+    assert fac._instack[2] == {"scale_factor": 3.0, "shots": 10 ** 6}
 
 
 def test_mitigate_executor_with_shot_list():
@@ -133,6 +146,6 @@ def test_mitigate_executor_with_shot_list():
     good_result = new_executor(qp)
     assert not np.isclose(bad_result, 1.0, atol=1.0e-1)
     assert np.isclose(good_result, 1.0, atol=1.0e-1)
-    assert fac.instack[0] == {"scale_factor": 1.0, "shots": 10 ** 4}
-    assert fac.instack[1] == {"scale_factor": 2.0, "shots": 10 ** 5}
-    assert fac.instack[2] == {"scale_factor": 3.0, "shots": 10 ** 6}
+    assert fac._instack[0] == {"scale_factor": 1.0, "shots": 10 ** 4}
+    assert fac._instack[1] == {"scale_factor": 2.0, "shots": 10 ** 5}
+    assert fac._instack[2] == {"scale_factor": 3.0, "shots": 10 ** 6}

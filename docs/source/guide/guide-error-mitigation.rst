@@ -16,7 +16,7 @@ other external links framing this topic in the open-source software ecosystem.
 .. _guide_qem_what:
 
 --------------------------------
-What is quantum error mitigation
+What quantum error mitigation is
 --------------------------------
 
 Quantum error mitigation refers to a series of modern techniques aimed at
@@ -46,7 +46,7 @@ then re-running the calculation (which is indeed a time evolution) for
 :math:`\langle X\rangle_{0}`.
 The extraction for :math:`\langle X\rangle_{0}` can occur with several
 statistical fitting models, which can be linear or non-linear. These methods
-are contained in the :mod:`mitiq.factories` and :mod:`mitiq.zne` modules.
+are contained in the :mod:`mitiq.zne.inference` and :mod:`mitiq.zne` modules.
 
 In theory, one way zero-noise extrapolation can be simulated, also with ``mitiq``,
 is by picking an underlying noise model, e.g., a memoryless bath such that the system dissipates with Lindblad dynamics. Likewise, zero-noise extrapolation can be applied also to non-Markovian noise models :cite:`Temme_2017_PRL`. However, it is important to point out that zero-noise extrapolation is a very general method in which one is free to scale and extrapolate almost whatever parameter one wishes to, even if the underlying noise model is unknown.
@@ -64,7 +64,7 @@ Other examples of error mitigation techniques include injecting noisy gates for 
 .. _guide_qem_why:
 
 -----------------------------------------
-Why is quantum error mitigation important
+Why quantum error mitigation is important
 -----------------------------------------
 
 The noisy intermediate scale quantum computing (NISQ) era is characterized by
@@ -97,7 +97,7 @@ It is fair to say that even the terminology of "quantum error mitigation" or
 in the previous decade similar concepts or techniques were scattered across
 these and other fields. Suggestions for additional references are `welcome`_.
 
-.. _welcome: https://github.com/unitaryfund/mitiq/issues/new
+.. _welcome: https://github.com/unitaryfund/mitiq/issues/new/choose
 
 .. _guide_qem_qec:
 

@@ -1,7 +1,20 @@
-# /benchmarks/maxcut.py
-"""
-This module contains methods for benchmarking mitiq error extrapolation against
-a standard QAOA for MAXCUT.
+# Copyright (C) 2020 Unitary Fund
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+"""This module contains methods for benchmarking mitiq error extrapolation
+against a standard QAOA for MAXCUT.
 """
 from typing import List, Tuple, Callable
 import numpy as np
@@ -12,7 +25,7 @@ from cirq import identity_each as id
 from scipy.optimize import minimize
 
 from mitiq import execute_with_zne
-from mitiq.factories import Factory
+from mitiq.zne.inference import Factory
 from mitiq.benchmarks.utils import noisy_simulation
 
 SIMULATOR = DensityMatrixSimulator()
@@ -20,7 +33,7 @@ SIMULATOR = DensityMatrixSimulator()
 
 def make_noisy_backend(
     noise: float, obs: np.ndarray
-) -> Callable[[Circuit, int], float]:
+) -> Callable[[Circuit], float]:
     """ Helper function to match mitiq's backend type signature.
 
     Args:
@@ -31,7 +44,7 @@ def make_noisy_backend(
         A mitiq backend function.
     """
 
-    def noisy_backend(circ: Circuit):
+    def noisy_backend(circ: Circuit) -> float:
         return noisy_simulation(circ, noise, obs)
 
     return noisy_backend
@@ -63,7 +76,7 @@ def make_maxcut(
     """
     # get the list of unique nodes from the list of edges
     nodes = list({node for edge in graph for node in edge})
-    nodes = range(max(nodes) + 1)
+    nodes = list(range(max(nodes) + 1))
 
     # one qubit per node
     qreg = [NamedQubit(str(nn)) for nn in nodes]

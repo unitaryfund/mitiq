@@ -32,15 +32,6 @@ Utils
 .. automodule:: mitiq.benchmarks.utils
    :members:
 
-Factories
----------
-.. automodule:: mitiq.factories
-   :members:
-
-Folding
--------
-.. automodule:: mitiq.folding
-   :members:
 
 Mitiq - PyQuil
 --------------
@@ -64,13 +55,26 @@ Qiskit Utils
    :members:
 
 Utils
-------------
+-----
 .. automodule:: mitiq.utils
    :members:
 
 Zero Noise Extrapolation
 ------------------------
-.. automodule:: mitiq.zne
+
+Zero Noise Extrapolation (High-Level Tools)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.zne.zne
+   :members:
+
+Inference and Extrapolation: Factories
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.zne.inference
+   :members:
+
+Noise Scaling: Unitary Folding
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.zne.scaling
    :members:
 
 

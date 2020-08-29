@@ -1,11 +1,31 @@
-"""Unit test for utility functions."""
+# Copyright (C) 2020 Unitary Fund
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""Tests for utility functions."""
 from copy import deepcopy
 import pytest
 
 import cirq
+from cirq import LineQubit, Circuit, X, Y, Z, H, CNOT, S, T, MeasurementGate
 
-from mitiq.utils import _equal
+from mitiq.utils import (
+    _are_close_dict,
+    _equal,
+    _simplify_gate_exponent,
+    _simplify_circuit_exponents,
+)
 
 
 @pytest.mark.parametrize("require_qubit_equality", [True, False])
@@ -170,3 +190,87 @@ def test_circuit_equality_equal_measurement_keys_nonterminal_measurements(
     assert _equal(
         circ1, circ2, require_measurement_equality=require_measurement_equality
     )
+
+
+@pytest.mark.parametrize("gate", [X ** 3, Y ** -3, Z ** -1, H ** -1])
+def test_simplify_gate_exponent(gate):
+    # Check exponent is simplified to 1
+    assert _simplify_gate_exponent(gate).exponent == 1
+    # Check simplified gate is equivalent to the input
+    assert _simplify_gate_exponent(gate) == gate
+
+
+@pytest.mark.parametrize("gate", [T ** -1, S ** -1, MeasurementGate(1)])
+def test_simplify_gate_exponent_with_gates_that_cannot_be_simplified(gate):
+    # Check the gate is not simplified (same representation)
+    assert _simplify_gate_exponent(gate).__repr__() == gate.__repr__()
+
+
+def test_simplify_circuit_exponents():
+    qreg = LineQubit.range(2)
+    circuit = Circuit([H.on(qreg[0]), CNOT.on(*qreg), Z.on(qreg[1])])
+
+    # Invert circuit
+    inverse_circuit = cirq.inverse(circuit)
+    inverse_repr = inverse_circuit.__repr__()
+    inverse_qasm = inverse_circuit._to_qasm_output().__str__()
+
+    # Expected circuit after simplification
+    expected_inv = Circuit([Z.on(qreg[1]), CNOT.on(*qreg), H.on(qreg[0])])
+    expected_repr = expected_inv.__repr__()
+    expected_qasm = expected_inv._to_qasm_output().__str__()
+
+    # Check inverse_circuit is logically equivalent to expected_inverse
+    # but they have a different representation
+    assert inverse_circuit == expected_inv
+    assert inverse_repr != expected_repr
+    assert inverse_qasm != expected_qasm
+
+    # Simplify the circuit
+    _simplify_circuit_exponents(inverse_circuit)
+
+    # Check inverse_circuit has the expected simplified representation
+    simplified_repr = inverse_circuit.__repr__()
+    simplified_qasm = inverse_circuit._to_qasm_output().__str__()
+    assert inverse_circuit == expected_inv
+    assert simplified_repr == expected_repr
+    assert simplified_qasm == expected_qasm
+
+
+def test_simplify_circuit_exponents_with_non_self_inverse_gates():
+    qreg = LineQubit.range(2)
+    # Make a circuit with gates which are not self-inverse
+    circuit = Circuit([S.on(qreg[0]), T.on(qreg[1])])
+
+    inverse_circuit = cirq.inverse(circuit)
+    inverse_repr = inverse_circuit.__repr__()
+    inverse_qasm = inverse_circuit._to_qasm_output().__str__()
+
+    # Simplify the circuit (it should not change this circuit)
+    _simplify_circuit_exponents(inverse_circuit)
+
+    # Check inverse_circuit did not change
+    simplified_repr = inverse_circuit.__repr__()
+    simplified_qasm = inverse_circuit._to_qasm_output().__str__()
+    assert simplified_repr == inverse_repr
+    assert simplified_qasm == inverse_qasm
+
+
+def test_are_close_dict():
+    """Tests the _are_close_dict function."""
+    dict1 = {"a": 1, "b": 0.0}
+    dict2 = {"a": 1, "b": 0.0 + 1.0e-10}
+    assert _are_close_dict(dict1, dict2)
+    assert _are_close_dict(dict2, dict1)
+    dict2 = {"b": 0.0 + 1.0e-10, "a": 1}
+    assert _are_close_dict(dict1, dict2)
+    assert _are_close_dict(dict2, dict1)
+    dict2 = {"a": 1, "b": 1.0}
+    assert not _are_close_dict(dict1, dict2)
+    assert not _are_close_dict(dict2, dict1)
+    dict2 = {"b": 1, "a": 0.0}
+    assert not _are_close_dict(dict1, dict2)
+    assert not _are_close_dict(dict2, dict1)
+    dict2 = {"a": 1, "b": 0.0, "c": 1}
+    assert not _are_close_dict(dict1, dict2)
+    assert not _are_close_dict(dict2, dict1)

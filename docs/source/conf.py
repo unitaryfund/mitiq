@@ -75,7 +75,7 @@ source_suffix = ['.rst', '.md']
 doctest_global_setup = '''
 try:
   from mitiq import *
-  from mitiq.factories import *
+  from mitiq.zne.inference import *
   from mitiq.benchmarks.maxcut import *
 except:
   pass
@@ -121,6 +121,9 @@ pygments_style = 'sphinx'
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
+
+# display logo on top-left of html pages
+html_logo = 'img/unitary_fund_logo.png'
 
 # Sphinxcontrib-bibtex
 pybtex.style.formatting.unsrt.date = pybtex.style.template.words(sep="")[

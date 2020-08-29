@@ -1,17 +1,29 @@
-"""
-Functions to convert between Mitiq's internal circuit representation
-and pyQuil's circuit representation (Quil programs).
-"""
+# Copyright (C) 2020 Unitary Fund
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from cirq import Circuit
+"""Functions to convert between Mitiq's internal circuit representation and
+pyQuil's circuit representation (Quil programs).
+"""
+from cirq import Circuit, LineQubit
 from pyquil import Program
 
-from mitiq.mitiq_pyquil.quil import circuit_from_quil
+from cirq.contrib.quil_import import circuit_from_quil
 
 QuilType = str
 
 
-# TODO: to_quil needs cirq-unstable or v0.9.0 to be released
 def to_quil(circuit: Circuit) -> QuilType:
     """Returns a Quil string representing the input Mitiq circuit.
 
@@ -21,6 +33,12 @@ def to_quil(circuit: Circuit) -> QuilType:
     Returns:
         QuilType: Quil string equivalent to the input Mitiq circuit.
     """
+    max_qubit = max(circuit.all_qubits())
+    # if we are using LineQubits, keep the qubit labeling the same
+    if isinstance(max_qubit, LineQubit):
+        qubit_range = max_qubit.x + 1
+        return circuit.to_quil(qubit_order=LineQubit.range(qubit_range))
+    # otherwise, use the default ordering (starting from zero)
     return circuit.to_quil()
 
 
@@ -48,7 +66,6 @@ def from_pyquil(program: Program) -> Circuit:
     return from_quil(program.out())
 
 
-# TODO: eventually circuit_from_quil will be moved to Cirq
 def from_quil(quil: QuilType) -> Circuit:
     """Returns a Mitiq circuit equivalent to the input Quil string.
 

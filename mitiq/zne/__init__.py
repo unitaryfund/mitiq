@@ -13,12 +13,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Reads in version information.
-
-Note: This file will be overwritten by the packaging process."""
-import os
-
-directory_of_this_file = os.path.dirname(os.path.abspath(__file__))
-
-with open(f"{directory_of_this_file}/../VERSION.txt", "r") as f:
-    __version__ = f.read().strip()
+from mitiq.zne.zne import execute_with_zne, mitigate_executor, zne_decorator
