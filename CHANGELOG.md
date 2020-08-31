@@ -8,7 +8,7 @@
 [//]: # " - [Bug Fix]"
 [//]: # " - Fix the bug."
 
-## Version 0.1.0 (September 1st, 2020)
+## Version 0.1.0 (August 31st, 2020)
 
 ### Changes
 
