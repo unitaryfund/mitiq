@@ -33,10 +33,6 @@ minor (e.g., v.0.0.2--->v00X)
 
 You will then open a pull request which will be merged into the ``master`` branch.
 
-------------------------------------------------
-How to Make a New Release of the Code
-------------------------------------------------
-
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Generate the html tree and the pdf file for the documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -55,11 +51,27 @@ Since the `docs/build` folder is not kept track of, copy the pdf file
 with the documentation from `docs/build/latex` to the `docs/pdf` folder, saving it as `mitiq.pdf`, thus replacing the previous version.
 Add a copy of the pdf file by naming it according to the release version with major and minor, e.g., `mitiq-0.1.pdf` in the same folder.
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Create a distribution locally
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Release the new version on Github
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-You need to be a mantainer of the Github repository. Make a new release on Github from the website, at https://github.com/unitaryfund/mitiq/releases. Choose a tag and  add information on the release using the same style used for previous releases.
+.. note::
+	You need to be a write access of the ``mitiq``'s' Github repository to make a new release.
+
+Make a new release on Github from the website, at https://github.com/unitaryfund/mitiq/releases.
+
+	- Choose a tag and add information on the release using the same style used for previous releases.
+
+	- Make sure that a branch with the version number has been created and is referenced for the given release.
+
+	- Github will create compressed files with the repository. Upload the ``mitiq.pdf`` file and add the locally generated distribution and the Python wheels.
+
+	- Add a brief text with a description of the version release.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
