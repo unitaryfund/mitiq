@@ -60,9 +60,9 @@ and for the pdf,
 
 	$ make latexpdf
 
-Since the `docs/build` folder is not kept track of, copy the pdf file
-with the documentation from `docs/build/latex` to the `docs/pdf` folder, saving it as `mitiq.pdf`, thus replacing the previous version.
-Add a copy of the pdf file by naming it according to the release version with major and minor, e.g., `mitiq-0.1.pdf` in the same folder.
+Since the ``docs/build`` folder is not kept track of, copy the pdf file
+with the documentation from ``docs/build/latex`` to the ``docs/pdf`` folder, saving it as ``mitiq.pdf``, thus replacing the previous version.
+Add a copy of the pdf file by naming it according to the release version with major and minor, e.g., ``mitiq-0.1.pdf`` in the same folder.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Create a distribution locally
