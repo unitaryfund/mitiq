@@ -12,6 +12,10 @@ Core Developers' Reference: Making a New Release
 
 When the time is ready for a new release, follow the checklist and instructions of this document to go through all the steps below:
 
+.. contents:: :local:
+    :depth: 3
+
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Make sure that the changelog is updated
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -139,8 +143,7 @@ Release the new documentation on Read the Docs
 .. note::
 	You need to be a registered user at Read the Docs and a mantainer for the ``mitiq`` project on the Read the Docs website in order to be able to update the documentation. You can ensure that you have the permissions for ``mitiq`` at https://readthedocs.org/dashboard/.
 
-Once the relative pull request is merged, the `latest` documentation will be updated on the Read the Docs website, https://mitiq.readthedocs.io/. Ensure that the branch for the new release, as well as the branch relative to the previous release, are tagged in the project overview, activating the relative version
-https://readthedocs.org/projects/mitiq/versions/.
+Once the relative pull request is merged, the `latest` documentation will be updated on the Read the Docs website, https://mitiq.readthedocs.io/. Ensure that the branch for the new release, as well as the branch relative to the previous release, are tagged in the project overview, activating the relative version at https://readthedocs.org/projects/mitiq/versions/.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
