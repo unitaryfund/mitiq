@@ -7,9 +7,10 @@
 Core Developers' Reference: Making a New Release
 ================================================
 
-These instructions are aimed at the mantainers of the ``mitiq`` library.
-When the time is ready for a new release, follow the checklist and instructions of this document to go through all the steps:
+.. note::
+	These instructions are aimed at the mantainers of the ``mitiq`` library.
 
+When the time is ready for a new release, follow the checklist and instructions of this document to go through all the steps below:
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Work in a siloed environment
@@ -67,7 +68,8 @@ Release the new versionon TestPyPI
 
 Before uploading the package on PyPI, since that action cannot be undone, it is good practice to upload it on the test channel TestPyPI.
 
-You need to be a registered user on TestPyPI and a mantainer of the project in order to be able to upload the package.
+.. note::
+	You need to be a registered user on TestPyPI and a mantainer of the ``mitiq`` project in order to be able to upload the package.
 
 - Upload the package. In order to upload it, you need to have ``twine``, which can be installed with ``pip install twine``. Go to the ``mitiq`` directory, after having created the source distribution version ``sdist``, and simply type
 
@@ -88,6 +90,9 @@ The ``--extra-index-url`` is necessary since otherwise ``TestPyPI``  would be lo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Release on PyPI
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+	You need to be a registered user on PyPI and a mantainer of the ``mitiq`` project in order to be able to upload the package.
 
 If you already created the source distribution and wheels and tested it on TestPyPI, then you need to just type from bash, in your local ``mitiq`` root directory
 
