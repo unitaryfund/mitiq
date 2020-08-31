@@ -27,7 +27,10 @@ from scipy import __version__ as scipy_version
 
 import mitiq
 
-MITIQ_INSTALL_PATH = os.path.dirname(inspect.getsourcefile(mitiq))
+MITIQ_SOURCE_FILE = inspect.getsourcefile(mitiq)
+assert MITIQ_SOURCE_FILE
+
+MITIQ_INSTALL_PATH = os.path.dirname(MITIQ_SOURCE_FILE)
 PYTHON_VERSION = sys.version_info[0:3]
 
 

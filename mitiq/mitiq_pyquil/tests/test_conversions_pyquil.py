@@ -93,3 +93,13 @@ def test_to_pyquil_from_pyquil_almost_all_gates():
     number of measurements are equivalent)."""
     p = Program(MEASURELESS_QUIL_PROGRAM)
     assert p.out() == to_pyquil(from_pyquil(p)).out()
+
+
+def test_to_pyquil_from_pyquil_not_starting_at_zero():
+    p = Program()
+    p += X(10)
+    p += Y(11)
+    p += Z(12)
+    p += CNOT(10, 11)
+    p += CZ(11, 12)
+    assert p.out() == to_pyquil(from_pyquil(p)).out()

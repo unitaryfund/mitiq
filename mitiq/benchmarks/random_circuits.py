@@ -23,6 +23,7 @@ from cirq import NamedQubit, Circuit
 from mitiq import execute_with_zne
 from mitiq._typing import QPROGRAM
 from mitiq.zne.inference import Factory
+from mitiq.zne.scaling import fold_gates_at_random
 from mitiq.benchmarks.utils import noisy_simulation
 
 
@@ -61,7 +62,7 @@ def rand_circuit_zne(
     trials: int,
     noise: float,
     fac: Factory = None,
-    scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = None,
+    scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     op_density: float = 0.99,
     silent: bool = True,
     seed: Optional[int] = None,

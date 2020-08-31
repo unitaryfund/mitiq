@@ -15,7 +15,17 @@
 
 """Functions for local and global unitary folding on supported circuits."""
 from copy import deepcopy
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    Collection,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
 from functools import wraps
 
 import numpy as np
@@ -63,9 +73,7 @@ def _is_measurement(op: ops.Operation) -> bool:
     return isinstance(op.gate, ops.measurement_gate.MeasurementGate)
 
 
-def _pop_measurements(
-    circuit: Circuit,
-) -> List[List[Union[int, ops.Operation]]]:
+def _pop_measurements(circuit: Circuit,) -> List[Tuple[int, ops.Operation]]:
     """Removes all measurements from a circuit.
 
     Args:
@@ -74,15 +82,13 @@ def _pop_measurements(
     Returns:
         measurements: List of measurements in the circuit.
     """
-    measurements = [
-        list(m) for m in circuit.findall_operations(_is_measurement)
-    ]
+    measurements = list(circuit.findall_operations(_is_measurement))
     circuit.batch_remove(measurements)
     return measurements
 
 
 def _append_measurements(
-    circuit: Circuit, measurements: List[Union[int, ops.Operation]]
+    circuit: Circuit, measurements: List[Tuple[int, ops.Operation]]
 ) -> None:
     """Appends all measurements into the final moment of the circuit.
 
@@ -90,11 +96,11 @@ def _append_measurements(
         circuit: a quantum circuit as a :class:`cirq.Circuit`.
         measurements: measurements to perform.
     """
+    new_measurements: List[Tuple[int, ops.Operation]] = []
     for i in range(len(measurements)):
-        measurements[i][0] = (
-            len(circuit) + 1
-        )  # Make sure the moment to insert into is the last in the circuit
-    circuit.batch_insert(measurements)
+        # Make sure the moment to insert into is the last in the circuit
+        new_measurements.append((len(circuit) + 1, measurements[i][1]))
+    circuit.batch_insert(new_measurements)
 
 
 def _check_foldable(circuit: Circuit) -> None:
@@ -150,6 +156,7 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
         circuit: Mitiq circuit equivalent to input circuit.
         input_circuit_type: Type of input circuit represented by a string.
     """
+    conversion_function: Callable[[QPROGRAM], Circuit]
     if "qiskit" in circuit.__module__:
         from mitiq.mitiq_qiskit.conversions import from_qiskit
 
@@ -284,7 +291,7 @@ def _fold_gates_in_moment(
 def _fold_gates(
     circuit: Circuit,
     moment_indices: Iterable[int],
-    gate_indices: List[Iterable[int]],
+    gate_indices: List[Collection[int]],
 ) -> Circuit:
     """Returns a new circuit with specified gates folded.
 
@@ -359,7 +366,7 @@ def _get_weight_for_gate(
     elif "triple" in weights.keys() and len(op.qubits) == 3:
         weight = weights["triple"]
 
-    if op.gate in _cirq_gates_to_string_keys.keys():
+    if op.gate and op.gate in _cirq_gates_to_string_keys.keys():
         # Get the string key for this gate
         key = _cirq_gates_to_string_keys[op.gate]
         if key in weights.keys():
@@ -473,6 +480,7 @@ def fold_gates_from_left(
 
     # Determine the stopping condition for folding
     ngates = len(list(folded.all_operations()))
+    weights: Optional[Dict[str, float]]
     if fidelities:
         weights = {k: 1.0 - f for k, f in fidelities.items()}
         total_weight = _compute_weight(folded, weights)
@@ -508,6 +516,8 @@ def fold_gates_from_left(
                 if not (kwargs.get("squash_moments") is False):
                     folded = squash_moments(folded)
                 return folded
+
+    return folded
 
 
 @converter
@@ -573,7 +583,7 @@ def fold_gates_from_right(
     circuit = deepcopy(circuit)
     measurements = _pop_measurements(circuit)
 
-    reversed_circuit = Circuit(reversed(circuit))
+    reversed_circuit = Circuit(reversed(circuit.moments))
     reversed_folded_circuit = fold_gates_from_left(
         reversed_circuit,
         scale_factor,
@@ -716,6 +726,7 @@ def fold_gates_at_random(
 
     # Determine the stopping condition for folding
     ngates = len(list(folded.all_operations()))
+    weights: Optional[Dict[str, float]]
     if fidelities:
         weights = {k: 1.0 - f for k, f in fidelities.items()}
         total_weight = _compute_weight(folded, weights)
@@ -785,8 +796,8 @@ def fold_gates_at_random(
 def _fold_local(
     circuit: Circuit,
     scale_factor: float,
-    fold_method: Callable[[Circuit, float, Tuple[Any]], Circuit],
-    fold_method_args: Tuple[Any] = (),
+    fold_method: Callable[..., Circuit],
+    fold_method_args: Optional[Tuple[Any]] = None,
     **kwargs,
 ) -> Circuit:
     """Helper function for implementing a local folding method (which nominally
@@ -834,9 +845,12 @@ def _fold_local(
 
     while scale_factor > 1.0:
         this_stretch = 3.0 if scale_factor > 3.0 else scale_factor
-        folded = fold_method(
-            folded, this_stretch, *fold_method_args, squash_moments=False
-        )
+        if fold_method_args:
+            folded = fold_method(
+                folded, this_stretch, *fold_method_args, squash_moments=False
+            )
+        else:
+            folded = fold_method(folded, this_stretch, squash_moments=False)
         scale_factor /= 3.0
 
     if not (kwargs.get("squash_moments") is False):

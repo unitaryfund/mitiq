@@ -11,6 +11,7 @@ pytest~=5.4.1
 pytest-cov~=2.8.1
 flake8~=3.7.9
 black~=19.10b0
+mypy~=0.782
 
 # to run examples
 matplotlib~=3.2.1
