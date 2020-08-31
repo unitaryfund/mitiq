@@ -15,14 +15,15 @@
 
 """Utility functions."""
 from copy import deepcopy
+from typing import cast
 
 import numpy as np
 
-from cirq import Circuit, CircuitDag, Gate, Moment
+from cirq import Circuit, CircuitDag, EigenGate, Gate, GateOperation, Moment
 from cirq.ops.measurement_gate import MeasurementGate
 
 
-def _simplify_gate_exponent(gate: Gate) -> Gate:
+def _simplify_gate_exponent(gate: EigenGate) -> EigenGate:
     """Returns the input gate with a simplified exponent if possible,
     otherwise the input gate is returned without any change.
 
@@ -51,7 +52,11 @@ def _simplify_circuit_exponents(circuit: Circuit) -> None:
         simplified_operations = []
         # Iterate over operations in moment
         for op in moment:
-            simplified_gate = _simplify_gate_exponent(op.gate)
+            assert isinstance(op, GateOperation)
+            if isinstance(op.gate, EigenGate):
+                simplified_gate: Gate = _simplify_gate_exponent(op.gate)
+            else:
+                simplified_gate = op.gate
             simplified_operation = op.with_gate(simplified_gate)
             simplified_operations.append(simplified_operation)
         # Mutate the input circuit
@@ -107,7 +112,8 @@ def _equal(
             circ.batch_remove(measurements)
 
             for i in range(len(measurements)):
-                measurements[i][1].gate.key = ""
+                gate = cast(MeasurementGate, measurements[i][1].gate)
+                gate.key = ""
 
             circ.batch_insert(measurements)
 

@@ -27,11 +27,11 @@ from mitiq import QPROGRAM
 from mitiq.utils import _are_close_dict
 
 
-def _instack_to_scale_factors(instack: dict) -> List[float]:
+def _instack_to_scale_factors(instack: List[Dict[str, float]]) -> List[float]:
     """Extracts a list of scale factors from a list of dictionaries."""
-    if all([isinstance(params, dict) for params in instack]):
-        return [params["scale_factor"] for params in instack]
-    return instack
+    if not all(isinstance(params, dict) for params in instack):
+        raise ValueError("instack must be a list of dictionaries")
+    return [params["scale_factor"] for params in instack]
 
 
 class ExtrapolationError(Exception):
@@ -106,7 +106,7 @@ def mitiq_curve_fit(
             # replace OptimizeWarning with ExtrapolationWarning
             if warn.category is OptimizeWarning:
                 warn.category = ExtrapolationWarning
-                warn.message = _EXTR_WARN
+                warn.message = _EXTR_WARN  # type: ignore
             # re-raise all warnings
             warnings.warn_explicit(
                 warn.message, warn.category, warn.filename, warn.lineno
@@ -144,7 +144,7 @@ def mitiq_polyfit(
         # replace RankWarning with ExtrapolationWarning
         if warn.category is RankWarning:
             warn.category = ExtrapolationWarning
-            warn.message = _EXTR_WARN
+            warn.message = _EXTR_WARN  # type: ignore
         # re-raise all warnings
         warnings.warn_explicit(
             warn.message, warn.category, warn.filename, warn.lineno
@@ -171,9 +171,9 @@ class Factory(ABC):
         particular extrapolation algorithm and can be added to the "__init__"
         method of the associated derived class.
         """
-        self._instack = []
-        self._outstack = []
-        self.opt_params = []
+        self._instack: List[Dict[str, float]] = []
+        self._outstack: List[float] = []
+        self.opt_params: List[float] = []
 
     def push(self, instack_val: dict, outstack_val: float) -> None:
         """Appends "instack_val" to "self._instack" and "outstack_val" to
@@ -196,7 +196,7 @@ class Factory(ABC):
         return np.array(self._outstack)
 
     @abstractmethod
-    def next(self) -> float:
+    def next(self) -> Dict[str, float]:
         """Returns a dictionary of parameters to execute a circuit at."""
         raise NotImplementedError
 
@@ -221,9 +221,7 @@ class Factory(ABC):
         self.opt_params = []
 
     def iterate(
-        self,
-        noise_to_expval: Callable[[float], float],
-        max_iterations: int = 100,
+        self, noise_to_expval: Callable[..., float], max_iterations: int = 100,
     ) -> "Factory":
         """Evaluates a sequence of expectation values until enough
         data is collected (or iterations reach "max_iterations").
@@ -265,7 +263,7 @@ class Factory(ABC):
     def run(
         self,
         qp: QPROGRAM,
-        executor: Callable[[QPROGRAM], float],
+        executor: Callable[..., float],
         scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
         num_to_average: int = 1,
         max_iterations: int = 100,
@@ -814,6 +812,13 @@ class PolyExpFactory(BatchedFactory):
         )
 
 
+# Keep a log of the optimization process storing:
+# noise value(s), expectation value(s), parameters, and zero limit
+OptimizationHistory = List[
+    Tuple[List[Dict[str, float]], List[float], List[float], float]
+]
+
+
 class AdaExpFactory(Factory):
     """Factory object implementing an adaptive zero-noise extrapolation
     algorithm assuming an exponential ansatz y(x) = a + b * exp(-c * x),
@@ -882,11 +887,7 @@ class AdaExpFactory(Factory):
         self.asymptote = asymptote
         self.avoid_log = avoid_log
         self.max_scale_factor = max_scale_factor
-        # Keep a log of the optimization process storing:
-        # noise value(s), expectation value(s), parameters, and zero limit
-        self.history = (
-            []
-        )  # type: List[Tuple[List[float], List[float], List[float], float]]
+        self.history: OptimizationHistory = []
 
     def next(self) -> Dict[str, float]:
         """Returns a dictionary of parameters to execute a circuit at."""

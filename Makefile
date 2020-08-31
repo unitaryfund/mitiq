@@ -5,7 +5,7 @@ all: dist
 build: check-all docs test-all
 
 .PHONY: check-all
-check-all: check-format check-style
+check-all: check-format check-style check-types
 
 .PHONY: check-format
 check-format:
@@ -14,6 +14,10 @@ check-format:
 .PHONY: check-style
 check-style:
 	flake8
+
+.PHONY: check-types
+check-types:
+	mypy .
 
 .PHONY: clean
 clean:

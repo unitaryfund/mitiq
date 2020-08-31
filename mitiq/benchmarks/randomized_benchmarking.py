@@ -16,7 +16,7 @@
 """Contains methods used for testing mitiq's performance on randomized
 benchmarking circuits.
 """
-from typing import List
+from typing import List, Optional
 import numpy as np
 
 from cirq.experiments.qubit_characterizations import (
@@ -26,7 +26,7 @@ from cirq.experiments.qubit_characterizations import (
     _gate_seq_to_mats,
     _two_qubit_clifford_matrices,
 )
-from cirq import NamedQubit, Circuit
+from cirq import LineQubit, Circuit
 
 CLIFFORDS = _single_qubit_cliffords()
 C1 = CLIFFORDS.c1_in_xy
@@ -34,7 +34,10 @@ CFD_MAT_1Q = np.array([_gate_seq_to_mats(gates) for gates in C1])
 
 
 def rb_circuits(
-    n_qubits: int, num_cliffords: List[int], trials: int
+    n_qubits: int,
+    num_cliffords: List[int],
+    trials: int,
+    qubit_labels: Optional[List[int]] = None,
 ) -> List[Circuit]:
     """Generates a set of randomized benchmarking circuits, i.e. circuits that
     are equivalent to the identity.
@@ -51,20 +54,31 @@ def rb_circuits(
     """
     rb_circuits = []
     for num in num_cliffords:
-        qubit1 = NamedQubit("0")
+        qid0 = qubit_labels[0] if qubit_labels else 0
+        qubit1 = LineQubit(qid0)
         if n_qubits == 1:
             rb_circuits = [
-                _random_single_q_clifford(qubit1, num, C1, CFD_MAT_1Q)
+                _random_single_q_clifford(
+                    qubit1,  # type: ignore
+                    num,
+                    C1,
+                    CFD_MAT_1Q,
+                )
                 for _ in range(trials)
             ]
         elif n_qubits == 2:
-            qubit2 = NamedQubit("1")
+            qid1 = qubit_labels[1] if qubit_labels else 1
+            qubit2 = LineQubit(qid1)
             cfd_matrices = _two_qubit_clifford_matrices(
-                qubit1, qubit2, CLIFFORDS
+                qubit1, qubit2, CLIFFORDS,  # type: ignore
             )
             rb_circuits = [
                 _random_two_q_clifford(
-                    qubit1, qubit2, num, cfd_matrices, CLIFFORDS
+                    qubit1,  # type: ignore
+                    qubit2,  # type: ignore
+                    num,
+                    cfd_matrices,
+                    CLIFFORDS,
                 )
                 for _ in range(trials)
             ]

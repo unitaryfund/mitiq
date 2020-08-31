@@ -97,7 +97,7 @@ def zne_decorator(
     factory: Factory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
-) -> Callable[[QPROGRAM], float]:
+) -> Callable[[Callable[[QPROGRAM], float]], Callable[[QPROGRAM], float]]:
     """Decorator which adds error mitigation to an executor function, i.e., a
     function which executes a quantum circuit with an arbitrary backend and
     returns an expectation value.
