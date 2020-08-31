@@ -22,10 +22,10 @@ Work in a siloed environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - Create a conda environment
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-	conda create -n mitiqenv
-	conda activate mitiqenv
+	$ conda create -n mitiqenv
+	$ conda activate mitiqenv
 
 
 ^^^^^^^^^^^^^^^^^^^
@@ -34,9 +34,9 @@ Create a new branch
 - Create a branch in `git` for the documentation with the release number up to
 minor (e.g., v.0.0.2--->v00X)
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-	(mitiqenv) git checkout -b v00X
+	$(mitiqenv) git checkout -b v00X
 
 You will then open a pull request which will be merged into the ``master`` branch.
 
@@ -45,16 +45,16 @@ Generate the html tree and the pdf file for the documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - To create the html structure
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-	make html
+	$ make html
 
 
 and for the pdf,
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-	make latexpdf
+	$ make latexpdf
 
 Since the `docs/build` folder is not kept track of, copy the pdf file
 with the documentation from `docs/build/latex` to the `docs/pdf` folder, saving it as `mitiq.pdf`, thus replacing the previous version.
@@ -66,9 +66,9 @@ Create a distribution locally
 
 Go to your local directory from the Terminal, e.g., ``github/mitiq/`` and there run
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-	python setup.py sdist bdist_wheel
+	$ python setup.py sdist bdist_wheel
 
 This will create a source distribution and a built distribution with wheel. This should create a ``build/`` and ``sdist/`` folder.
 
@@ -109,9 +109,9 @@ You can then check at https://test.pypi.org/project/mitiq that the library is co
 
 - In order to check that the distribution runs correctly, set up a new (conda) environment and try to install the library, for example for version 0.1a1 this is done with:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-	pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.python.org/simple/ mitiq==0.1a1
+	$ pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.python.org/simple/ mitiq==0.1a1
 
 The ``--extra-index-url`` is necessary since otherwise ``TestPyPI``  would be looking for the required dependencies therein, but we want it to install them from the real PyPI channel.
 
@@ -125,9 +125,9 @@ Release on PyPI
 
 If you already created the source distribution and wheels and tested it on TestPyPI, then you need to just type from bash, in your local ``mitiq`` root directory
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-	twine upload dist/*
+	$ twine upload dist/*
 
 You will be prompted to insert your login credentials (username and password). You can then verify the upload on https://pypi.org/project/mitiq/.
 
