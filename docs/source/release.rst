@@ -100,9 +100,9 @@ Before uploading the package on PyPI, since that action cannot be undone, it is 
 
 - Upload the package. In order to upload it, you need to have ``twine``, which can be installed with ``pip install twine``. Go to the ``mitiq`` directory, after having created the source distribution version ``sdist``, and simply type
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-	twine upload --repository testpypi dist/*
+	$ twine upload --repository testpypi dist/*
 
 You can then check at https://test.pypi.org/project/mitiq that the library is correctly uploaded.
 
