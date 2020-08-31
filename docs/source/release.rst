@@ -12,12 +12,18 @@ Core Developers' Reference: Making a New Release
 
 When the time is ready for a new release, follow the checklist and instructions of this document to go through all the steps below:
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Make sure that the changelog is updated
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Make sure that the changelog is updated at ``mitiq/CHANGELOG.md`` and if not, add the latest merged pull requests (PRs), including author and PR number (@username, gh-xxx).
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Work in a siloed environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - Create a conda environment
 
 .. code-block:: bash
+
 	conda create -n mitiqenv
 	conda activate mitiqenv
 
@@ -29,6 +35,7 @@ Create a new branch
 minor (e.g., v.0.0.2--->v00X)
 
 .. code-block:: bash
+
 	(mitiqenv) git checkout -b v00X
 
 You will then open a pull request which will be merged into the ``master`` branch.
@@ -39,12 +46,14 @@ Generate the html tree and the pdf file for the documentation
 - To create the html structure
 
 .. code-block:: bash
+
 	make html
 
 
 and for the pdf,
 
 .. code-block:: bash
+
 	make latexpdf
 
 Since the `docs/build` folder is not kept track of, copy the pdf file
@@ -55,7 +64,13 @@ Add a copy of the pdf file by naming it according to the release version with ma
 Create a distribution locally
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Go to your local directory from the Terminal, e.g., ``github/mitiq/`` and there run
 
+.. code-block:: bash
+
+	python setup.py sdist bdist_wheel
+
+This will create a source distribution and a built distribution with wheel. This should create a ``build/`` and ``sdist/`` folder.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Release the new version on Github
@@ -86,14 +101,16 @@ Before uploading the package on PyPI, since that action cannot be undone, it is 
 - Upload the package. In order to upload it, you need to have ``twine``, which can be installed with ``pip install twine``. Go to the ``mitiq`` directory, after having created the source distribution version ``sdist``, and simply type
 
 .. code-block:: bash
-	twine
+
+	twine upload --repository testpypi dist/*
+
+You can then check at https://test.pypi.org/project/mitiq that the library is correctly uploaded.
 
 
-- You can verify the upload on https://test.pypi.org/project/mitiq
-
-- In order to check that the distribution run correctly, set up a new (conda) environment and try to install the library, for example for version 0.1a1 this is done with:
+- In order to check that the distribution runs correctly, set up a new (conda) environment and try to install the library, for example for version 0.1a1 this is done with:
 
 .. code-block:: bash
+
 	pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.python.org/simple/ mitiq==0.1a1
 
 The ``--extra-index-url`` is necessary since otherwise ``TestPyPI``  would be looking for the required dependencies therein, but we want it to install them from the real PyPI channel.
@@ -109,6 +126,7 @@ Release on PyPI
 If you already created the source distribution and wheels and tested it on TestPyPI, then you need to just type from bash, in your local ``mitiq`` root directory
 
 .. code-block:: bash
+
 	twine upload dist/*
 
 You will be prompted to insert your login credentials (username and password). You can then verify the upload on https://pypi.org/project/mitiq/.
@@ -117,6 +135,9 @@ You will be prompted to insert your login credentials (username and password). Y
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Release the new documentation on Read the Docs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+	You need to be a registered user at Read the Docs and a mantainer for the ``mitiq`` project on the Read the Docs website in order to be able to update the documentation. You can ensure that you have the permissions for ``mitiq`` at https://readthedocs.org/dashboard/.
 
 Once the relative pull request is merged, the `latest` documentation will be updated on the Read the Docs website, https://mitiq.readthedocs.io/. Ensure that the branch for the new release, as well as the branch relative to the previous release, are tagged in the project overview, activating the relative version
 https://readthedocs.org/projects/mitiq/versions/.
