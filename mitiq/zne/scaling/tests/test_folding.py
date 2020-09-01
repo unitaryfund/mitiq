@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Unit tests for scaling noise by folding Cirq circuits."""
+"""Unit tests for scaling noise by unitary folding."""
 from copy import deepcopy
 
 import numpy as np
@@ -35,10 +35,14 @@ from pyquil import Program
 from pyquil.quilbase import Pragma
 
 from mitiq.utils import _equal
-from mitiq.zne.scaling import (
+from mitiq.zne.scaling.conversions import (
+    CircuitConversionError,
+    convert_to_mitiq,
+    convert_from_mitiq,
+)
+from mitiq.zne.scaling.folding import (
     UnfoldableGateError,
     UnfoldableCircuitError,
-    CircuitConversionError,
     _is_measurement,
     _pop_measurements,
     _append_measurements,
@@ -46,8 +50,6 @@ from mitiq.zne.scaling import (
     _update_moment_indices,
     _default_weight,
     _compute_weight,
-    convert_to_mitiq,
-    convert_from_mitiq,
     _fold_gate_at_index_in_moment,
     _fold_gates_in_moment,
     _fold_gates,
