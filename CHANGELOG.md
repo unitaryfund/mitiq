@@ -49,7 +49,6 @@
 - Make test file names unique (@rmlarose, gh-#319).
 
 - Update package version from v. 0.1a2, released, to 0.10dev (@nathanshammah, gh-#314).
->>>>>>> master
 
 
 ## Version 0.1a2 (August 17th, 2020)
