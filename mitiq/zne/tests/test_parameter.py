@@ -1,13 +1,31 @@
+# Copyright (C) 2020 Unitary Fund
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 """Unit tests for Param Cirq circuits."""
 
 from copy import deepcopy
 
+import pytest
 import numpy as np
-from cirq import Circuit, LineQubit, ops
+from cirq import Circuit, LineQubit, ops, CSWAP
 
 from mitiq.utils import _equal
 from mitiq.zne.parameter import (
-    scale_parameters
+    scale_parameters,
+    _get_base_gate,
+    GateTypeException
 )
 
 
@@ -109,3 +127,12 @@ def test_scale_with_measurement():
     )
     scaled = scale_parameters(circ, scale_factor=1, sigma=0.001)
     assert _equal(circ, scaled)
+
+
+def test_gate_type():
+    qreg = LineQubit.range(3)
+    allowed_op = ops.H.on(qreg[0])
+    _get_base_gate(allowed_op.gate)
+    with pytest.raises(GateTypeException):
+        forbidden_op = CSWAP(qreg[0], qreg[1], qreg[2])
+        _get_base_gate(forbidden_op)
