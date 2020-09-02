@@ -80,7 +80,7 @@ This will create a source distribution and a built distribution with wheel. This
 Release the new version on Github
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. note::
-	You need to be a write access of the ``mitiq``'s' Github repository to make a new release.
+	You need to have write access to the ``mitiq``'s' Github repository to make a new release.
 
 Make a new release on Github from the website, at https://github.com/unitaryfund/mitiq/releases.
 
