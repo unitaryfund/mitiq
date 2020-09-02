@@ -94,7 +94,7 @@ Make a new release on Github from the website, at https://github.com/unitaryfund
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Release the new versionon TestPyPI
+Release the new versionon on TestPyPI
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Before uploading the package on PyPI, since that action cannot be undone, it is good practice to upload it on the test channel TestPyPI.
@@ -151,4 +151,3 @@ Bump the next version in the master
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Open a pull request bumping up the version number to development mode, e.g., if you just released 0.1.0, update the ``version.txt`` file to 0.1.1dev.
-
