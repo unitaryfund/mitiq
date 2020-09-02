@@ -243,37 +243,6 @@ One can also use various `doctest` [features](http://doc.pytest.org/en/latest/do
 `docs/pytest.ini` file.
 
 
-### How to Make a New Release of the Documentation
-
-#### Work in an environment
-- Create a conda environment for the documentation
-```bash
-conda create -n mitiqenv
-conda activate mitiqenv
-```
-
-#### Create a new branch
-- Create a branch in `git` for the documentation with the release number up to
-minor (e.g., 0.0.2--->00X)
-```bash
-(mitiqenv) git checkout -b mitiq00X
-```
-
-#### Create the html and pdf file and save it in the `docs/pdf` folder
-- To create the html structure
-```bash
-make html
-```
- and for the pdf,
-```bash
-make latexpdf
-```
-Since the `docs/build` folder is not kept track of, copy the pdf file
-with the documentation from `docs/build/latex` to the `docs/pdf` folder,
-naming it according to the release version with major and minor.
-Make a copy named `Mitiq-latest-release.pdf` in the same folder.
-
-
 ### Additional information
 [Here](https://github.com/nathanshammah/scikit-project/blob/master/5-docs.md)
 are some notes on how to build docs.
