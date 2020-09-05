@@ -31,7 +31,7 @@ import numpy as np
 from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary
 
 from mitiq._typing import QPROGRAM
-from mitiq.zne.scaling.conversions import converter
+from mitiq.conversions import converter
 
 
 class UnfoldableGateError(Exception):

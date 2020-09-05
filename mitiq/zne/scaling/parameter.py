@@ -28,7 +28,7 @@ from cirq import (
     CZPowGate,
     MeasurementGate,
 )
-from mitiq.zne.scaling.conversions import converter
+from mitiq.conversions import converter
 
 
 BASE_GATES = [ZPowGate, HPowGate, XPowGate, YPowGate, CXPowGate, CZPowGate]

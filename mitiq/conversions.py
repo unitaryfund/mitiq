@@ -117,16 +117,22 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
     return converted_circuit
 
 
-def converter(fold_method: Callable) -> Callable:
-    """Decorator for handling conversions."""
+def converter(noise_scaling_function: Callable) -> Callable:
+    """Decorator for handling conversions.
 
-    @wraps(fold_method)
-    def new_fold_method(circuit: QPROGRAM, *args, **kwargs) -> QPROGRAM:
+    Args:
+        noise_scaling_function: Function which inputs a cirq.Circuit, modifies
+            it to scale noise, then returns a cirq.Circuit.
+    """
+
+    @wraps(noise_scaling_function)
+    def new_scaling_function(circuit: QPROGRAM, *args, **kwargs) -> QPROGRAM:
         mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
         if kwargs.get("return_mitiq") is True:
-            return fold_method(mitiq_circuit, *args, **kwargs)
+            return noise_scaling_function(mitiq_circuit, *args, **kwargs)
         return convert_from_mitiq(
-            fold_method(mitiq_circuit, *args, **kwargs), input_circuit_type
+            noise_scaling_function(mitiq_circuit, *args, **kwargs),
+            input_circuit_type,
         )
 
-    return new_fold_method
+    return new_scaling_function
