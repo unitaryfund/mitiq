@@ -20,13 +20,32 @@ import copy
 
 from cirq import Circuit, Moment
 from cirq import (
-    ZPowGate, YPowGate, XPowGate,
-    HPowGate, CXPowGate, CZPowGate,
-    MeasurementGate
+    ZPowGate,
+    YPowGate,
+    XPowGate,
+    HPowGate,
+    CXPowGate,
+    CZPowGate,
+    MeasurementGate,
 )
-from mitiq.zne.scaling import converter
+from mitiq.conversions import converter
+
 
 BASE_GATES = [ZPowGate, HPowGate, XPowGate, YPowGate, CXPowGate, CZPowGate]
+
+
+class GateTypeException(Exception):
+    pass
+
+
+def _get_base_gate(gate):
+    for base_gate in BASE_GATES:
+        if isinstance(gate, base_gate):
+            return base_gate
+    raise GateTypeException(
+        "Must have circuit be made of rotation gates. "
+        "Your gate {} may not be supported".format(gate)
+    )
 
 
 @converter
@@ -34,7 +53,7 @@ def scale_parameters(
     circ: Circuit,
     scale_factor: float,
     sigma: float,
-    seed: Optional[int] = None
+    seed: Optional[int] = None,
 ) -> Circuit:
     """Adds parameter noise to a circuit with level noise.
     This adds noise to the actual parameter instead of
@@ -65,21 +84,9 @@ def scale_parameters(
                 base_gate = _get_base_gate(gate)
                 param = gate.exponent * np.pi
                 error = rng.normal(loc=0.0, scale=np.sqrt(noise))
-                new_param = (param + error)
+                new_param = param + error
                 curr_moment.append(
-                    base_gate(exponent=new_param/np.pi)(*qubits))
+                    base_gate(exponent=new_param / np.pi)(*qubits)
+                )
         final_moments.append(Moment(curr_moment))
     return Circuit(final_moments)
-
-
-class GateTypeException(Exception):
-    pass
-
-
-def _get_base_gate(gate):
-    for base_gate in BASE_GATES:
-        if isinstance(gate, base_gate):
-            return base_gate
-    raise GateTypeException(
-        "Must have circuit be made of rotation gates. \
-        Your gate {} may not be supported".format(gate))
