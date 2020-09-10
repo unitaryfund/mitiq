@@ -64,11 +64,27 @@ We welcome contributions to Mitiq including bug fixes, feature requests, etc. Pl
 [contribution guidelines](https://github.com/unitaryfund/mitiq/blob/master/CONTRIBUTING.md) for more details. To contribute to the documentation, please see these
 [documentation guidelines](https://github.com/unitaryfund/mitiq/blob/master/docs/CONTRIBUTING_DOCS.md).
 
-
 ## Authors
 
 An up-to-date list of authors can be found
 [here](https://github.com/unitaryfund/mitiq/graphs/contributors).
+
+## Citation
+
+If you use Mitiq in your research, please reference the [Mitiq preprint][arxiv] as follows:
+
+```bibtex
+@misc{larose2020mitiq,
+    title={Mitiq: A software package for error mitigation on noisy quantum computers},
+    author={Ryan LaRose and Andrea Mari and Peter J. Karalekas and Nathan Shammah and William J. Zeng},
+    year={2020},
+    eprint={2009.04417},
+    archivePrefix={arXiv},
+    primaryClass={quant-ph}
+}
+```
+
+[arxiv]: https://arxiv.org/abs/2009.04417
 
 ## License
 
