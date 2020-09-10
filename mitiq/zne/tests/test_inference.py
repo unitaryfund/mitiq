@@ -449,8 +449,11 @@ def test_too_few_points_for_polyfit_error():
         {"scale_factor": 2.0, "shots": 100},
     ]
     fac._outstack = [1.0, 2.0]
-    with raises(ValueError, match=r"Extrapolation order is too high."):
+    with raises(ExtrapolationError, match=r"Extrapolation order is too high."):
         fac.reduce()
+    # test also the static "extrapolate" method.
+    with raises(ExtrapolationError, match=r"Extrapolation order is too high."):
+        PolyFactory.extrapolate([1.0, 2.0], [1.0, 2.0], order=2)
 
 
 def test_failing_fit_error():
@@ -462,6 +465,11 @@ def test_failing_fit_error():
         ExtrapolationError, match=r"The extrapolation fit failed to converge."
     ):
         fac.reduce()
+    # test also the static "extrapolate" method.
+    with raises(
+        ExtrapolationError, match=r"The extrapolation fit failed to converge."
+    ):
+        ExpFactory.extrapolate(X_VALS, [1.0, 2.0, 1.0, 2.0, 1.0])
 
 
 @mark.parametrize("fac", [LinearFactory([1, 1, 1]), ExpFactory([1, 1, 1])])
@@ -474,6 +482,12 @@ def test_failing_fit_warnings(fac):
         match=r"The extrapolation fit may be ill-conditioned.",
     ):
         fac.reduce()
+    # test also the static "extrapolate" method.
+    with warns(
+        ExtrapolationWarning,
+        match=r"The extrapolation fit may be ill-conditioned.",
+    ):
+        fac.extrapolate([1, 1, 1, 1], [1.0, 1.0, 1.0, 1.0])
 
 
 def test_iteration_warnings():
