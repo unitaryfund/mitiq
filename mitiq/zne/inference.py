@@ -184,14 +184,25 @@ class Factory(ABC):
         self._instack: List[Dict[str, float]] = []
         self._outstack: List[float] = []
         self.opt_params: List[float] = []
+        self._already_reduced = False
 
-    def push(self, instack_val: dict, outstack_val: float) -> None:
+    def push(self, instack_val: dict, outstack_val: float) -> "Factory":
         """Appends "instack_val" to "self._instack" and "outstack_val" to
         "self._outstack". Each time a new expectation value is computed this
         method should be used to update the internal state of the Factory.
         """
+        if self._already_reduced:
+            warnings.warn(
+                "You are pushing new data into a factory object despite its "
+                ".reduce() method has already been called. Please make "
+                "sure your intention is to append new data to the stack of "
+                "previous data. Otherwise, the method .reset() can be used "
+                "to clean the internal state of the factory.",
+                ExtrapolationWarning,
+            )
         self._instack.append(instack_val)
         self._outstack.append(outstack_val)
+        return self
 
     def get_scale_factors(self) -> np.ndarray:
         """Returns the scale factors at which the factory has computed
@@ -222,13 +233,15 @@ class Factory(ABC):
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
 
-    def reset(self) -> None:
+    def reset(self) -> "Factory":
         """Resets the instack, outstack, and optimal parameters of the Factory
         to empty lists.
         """
         self._instack = []
         self._outstack = []
         self.opt_params = []
+        self._already_reduced = False
+        return self
 
     def iterate(
         self, noise_to_expval: Callable[..., float], max_iterations: int = 100,
@@ -306,6 +319,8 @@ class Factory(ABC):
         return self.iterate(_noise_to_expval, max_iterations)
 
     def __eq__(self, other):
+        if self._already_reduced != other._already_reduced:
+            return False
         if len(self._instack) != len(other._instack):
             return False
         for dict_a, dict_b in zip(self._instack, other._instack):
@@ -481,6 +496,7 @@ class PolyFactory(BatchedFactory):
         zero_lim, self.opt_params = self.extrapolate(
             self.get_scale_factors(), self.get_expectation_values(), self.order
         )
+        self._already_reduced = True
         return zero_lim
 
     def __eq__(self, other):
@@ -541,6 +557,7 @@ class RichardsonFactory(BatchedFactory):
         zero_lim, self.opt_params = self.extrapolate(
             self.get_scale_factors(), self.get_expectation_values()
         )
+        self._already_reduced = True
         return zero_lim
 
 
@@ -601,6 +618,7 @@ class LinearFactory(BatchedFactory):
         zero_lim, self.opt_params = self.extrapolate(
             self.get_scale_factors(), self.get_expectation_values()
         )
+        self._already_reduced = True
         return zero_lim
 
 
@@ -714,6 +732,7 @@ class ExpFactory(BatchedFactory):
             asymptote=self.asymptote,
             avoid_log=self.avoid_log,
         )
+        self._already_reduced = True
         return zero_lim
 
     def __eq__(self, other):
@@ -945,6 +964,7 @@ class PolyExpFactory(BatchedFactory):
             self.asymptote,
             self.avoid_log,
         )
+        self._already_reduced = True
         return zero_lim
 
 
@@ -986,6 +1006,7 @@ class AdaExpFactory(Factory):
     """
 
     _SHIFT_FACTOR = 1.27846
+    _EPSILON = 1.0e-9
 
     def __init__(
         self,
@@ -1041,6 +1062,9 @@ class AdaExpFactory(Factory):
             warnings.simplefilter("ignore", ExtrapolationWarning)
             # Call reduce() to fit the exponent and save it in self.history
             self.reduce()
+            # The next line avoids warnings after intermediate extrapolations
+            self._already_reduced = False
+
         # Get the most recent fitted parameters from self.history
         _, _, params, _ = self.history[-1]
         # The exponent parameter is the 3rd element of params
@@ -1048,7 +1072,8 @@ class AdaExpFactory(Factory):
         # Further noise scale factors are determined with
         # an adaptive rule which depends on self.exponent
         next_scale_factor = min(
-            1.0 + self._SHIFT_FACTOR / np.abs(exponent), self.max_scale_factor
+            1.0 + self._SHIFT_FACTOR / np.abs(exponent + self._EPSILON),
+            self.max_scale_factor,
         )
         return {"scale_factor": next_scale_factor}
 
@@ -1075,6 +1100,7 @@ class AdaExpFactory(Factory):
         self.history.append(
             (self._instack, self._outstack, self.opt_params, zero_limit)
         )
+        self._already_reduced = True
         return zero_limit
 
     def __eq__(self, other) -> bool:

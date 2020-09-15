@@ -557,3 +557,22 @@ def test_shot_list_errors():
         PolyFactory(X_VALS, order=2, shot_list=[1, 2])
     with raises(TypeError, match=r"valid iterator of integers"):
         PolyFactory(X_VALS, order=2, shot_list=[1.0, 2])
+
+
+def test_push_after_already_reduced_warning():
+    """Tests a warning is raised if new data is pushed in a factory
+    which was already reduced."""
+    fac = LinearFactory([1, 2])
+    fac.push({"scale_factor": 1.0}, 1.0)
+    fac.push({"scale_factor": 2.0}, 2.0)
+    fac.reduce()
+    with warns(
+        ExtrapolationWarning,
+        match=r"You are pushing new data into a factory object",
+    ):
+        fac.push({"scale_factor": 3.0}, 3.0)
+    # Assert no warning is raised when .reset() is used
+    fac.reset()
+    fac.push({"scale_factor": 1.0}, 2.0)
+    fac.push({"scale_factor": 2.0}, 1.0)
+    assert np.isclose(3.0, fac.reduce())
