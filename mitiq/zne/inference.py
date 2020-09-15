@@ -27,13 +27,6 @@ from mitiq import QPROGRAM
 from mitiq.utils import _are_close_dict
 
 
-def _instack_to_scale_factors(instack: List[Dict[str, float]]) -> List[float]:
-    """Extracts a list of scale factors from a list of dictionaries."""
-    if not all(isinstance(params, dict) for params in instack):
-        raise ValueError("instack must be a list of dictionaries")
-    return [params["scale_factor"] for params in instack]
-
-
 class ExtrapolationError(Exception):
     """Error raised by :class:`.Factory` objects when
     the extrapolation fit fails.
