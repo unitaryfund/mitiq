@@ -441,18 +441,24 @@ def test_few_scale_factors_error():
         _ = PolyFactory(X_VALS, order=10)
 
 
-def test_too_few_points_for_polyfit_error():
-    """Test that the correct error is raised if data is not enough to fit."""
+def test_too_few_points_for_polyfit_warning():
+    """Test that the correct warning is raised if data is not enough to fit."""
     fac = PolyFactory(X_VALS, order=2)
     fac._instack = [
         {"scale_factor": 1.0, "shots": 100},
         {"scale_factor": 2.0, "shots": 100},
     ]
     fac._outstack = [1.0, 2.0]
-    with raises(ExtrapolationError, match=r"Extrapolation order is too high."):
+    with warns(
+        ExtrapolationWarning,
+        match=r"The extrapolation fit may be ill-conditioned.",
+    ):
         fac.reduce()
     # test also the static "extrapolate" method.
-    with raises(ExtrapolationError, match=r"Extrapolation order is too high."):
+    with warns(
+        ExtrapolationWarning,
+        match=r"The extrapolation fit may be ill-conditioned.",
+    ):
         PolyFactory.extrapolate([1.0, 2.0], [1.0, 2.0], order=2)
 
 

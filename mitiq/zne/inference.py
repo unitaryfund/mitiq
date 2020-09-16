@@ -16,7 +16,7 @@
 """Classes corresponding to different zero-noise extrapolation methods."""
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Callable, Dict, List, Optional, Sequence, Tuple
+from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union
 import warnings
 
 import numpy as np
@@ -130,16 +130,7 @@ def mitiq_polyfit(
 
     Raises:
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
-        ExtrapolationError: if the deg > len(scale_factors) - 1.
     """
-
-    # This check may be overkilling.
-    if deg > len(scale_factors) - 1:
-        raise ExtrapolationError(
-            "Extrapolation order is too high. The order cannot exceed "
-            f"len(scale_factors) - 1 but order = {deg} and "
-            f"len(scale_factors) = {len(scale_factors)}."
-        )
 
     with warnings.catch_warnings(record=True) as warn_list:
         opt_params = np.polyfit(scale_factors, exp_values, deg, w=weights)
@@ -220,6 +211,36 @@ class Factory(ABC):
         else False.
         """
         raise NotImplementedError
+
+    @staticmethod
+    def extrapolate(
+        scale_factors: List[float],
+        exp_values: List[float],
+        full_output: bool = False,
+    ) -> Union[float, Tuple[float, List[float]]]:
+        """Static method which evaluates the extrapolation to the
+        zero-noise limit.
+
+        Args:
+            scale_factors: The array of noise scale factors.
+            exp_values: The array of expectation values.
+            full_output: If False (default), only the zero-noise limit is
+                returned. If True, the optimal parameters are returned too.
+            Other arguments such as "order" may be necessary.
+
+        Returns:
+            zero_lim: The extrapolated zero-noise limit.
+            opt_params: The parameter array of the best fitting model.
+                        This is returned only if "full_output" is True.
+
+        Note:
+            This method computes the zero-noise limit only from the information
+            contained in the input arguments. To extrapolate from the internal
+            data of an instantiated Factory object, the bound method
+            ".reduce()" should be called instead.
+        """
+        raise NotImplementedError
+
 
     @abstractmethod
     def reduce(self) -> float:
@@ -437,8 +458,11 @@ class PolyFactory(BatchedFactory):
 
     @staticmethod
     def extrapolate(
-        scale_factors: List[float], exp_values: List[float], order: int,
-    ) -> Tuple[float, List[float]]:
+        scale_factors: List[float],
+        exp_values: List[float],
+        order: int,
+        full_output: bool = False,
+    ) -> Union[float, Tuple[float, List[float]]]:
         """Static method which evaluates a polynomial extrapolation to the
         zero-noise limit.
 
@@ -446,11 +470,12 @@ class PolyFactory(BatchedFactory):
             scale_factors: The array of noise scale factors.
             exp_values: The array of expectation values.
             order: The extrapolation order (degree of the polynomial fit).
-                It cannot exceed len(scale_factors) - 1.
-
+            full_output: If False (default), only the zero-noise limit is
+                returned. If True, the optimal parameters are returned too.
         Returns:
-            (zero_lim, opt_params): Where "zero_lim" is the zero-noise limit
-            and "opt_params" is the parameter array of the best fitting model.
+            zero_lim: The extrapolated zero-noise limit.
+            opt_params: The parameter array of the best fitting model.
+                        This is returned only if "full_output" is True.
 
         Raises:
             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
@@ -464,7 +489,7 @@ class PolyFactory(BatchedFactory):
 
         opt_params = mitiq_polyfit(scale_factors, exp_values, order)
         zero_lim = opt_params[-1]
-        return zero_lim, opt_params
+        return zero_lim, opt_params if full_output else zero_lim
 
     def __init__(
         self,
@@ -487,7 +512,10 @@ class PolyFactory(BatchedFactory):
         Stores the optimal parameters for the fit in `self.opt_params`.
         """
         zero_lim, self.opt_params = self.extrapolate(
-            self.get_scale_factors(), self.get_expectation_values(), self.order
+            self.get_scale_factors(),
+            self.get_expectation_values(),
+            self.order,
+            full_output=True,
         )
         self._already_reduced = True
         return zero_lim
@@ -515,18 +543,23 @@ class RichardsonFactory(BatchedFactory):
 
     @staticmethod
     def extrapolate(
-        scale_factors: List[float], exp_values: List[float],
-    ) -> Tuple[float, List[float]]:
+        scale_factors: List[float],
+        exp_values: List[float],
+        full_output: bool = False,
+    ) -> Union[float, Tuple[float, List[float]]]:
         """Static method which evaluates the Richardson extrapolation to the
         zero-noise limit.
 
         Args:
             scale_factors: The array of noise scale factors.
             exp_values: The array of expectation values.
+            full_output: If False (default), only the zero-noise limit is
+                returned. If True, the optimal parameters are returned too.
 
         Returns:
-            (zero_lim, opt_params): Where "zero_lim" is the zero-noise limit
-            and "opt_params" is the parameter array of the best fitting model.
+            zero_lim: The extrapolated zero-noise limit.
+            opt_params: The parameter array of the best fitting model.
+                        This is returned only if "full_output" is True.
 
        Raises:
             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
@@ -540,7 +573,9 @@ class RichardsonFactory(BatchedFactory):
         # Richardson extrapolation is a particular case of a polynomial fit
         # with order equal to the number of data points minus 1.
         order = len(scale_factors) - 1
-        return PolyFactory.extrapolate(scale_factors, exp_values, order)
+        return PolyFactory.extrapolate(
+            scale_factors, exp_values, order, full_output,
+        )
 
     def reduce(self) -> float:
         """Returns the zero-noise limit found by Richardson extrapolation.
@@ -548,7 +583,9 @@ class RichardsonFactory(BatchedFactory):
         Stores the optimal parameters for the fit in `self.opt_params`.
         """
         zero_lim, self.opt_params = self.extrapolate(
-            self.get_scale_factors(), self.get_expectation_values()
+            self.get_scale_factors(), 
+            self.get_expectation_values(),
+            full_output=True,
         )
         self._already_reduced = True
         return zero_lim
@@ -577,18 +614,23 @@ class LinearFactory(BatchedFactory):
 
     @staticmethod
     def extrapolate(
-        scale_factors: List[float], exp_values: List[float],
-    ) -> Tuple[float, List[float]]:
+        scale_factors: List[float],
+        exp_values: List[float],
+        full_output: bool = False,
+    ) -> Union[float, Tuple[float, List[float]]]:
         """Static method which evaluates the linear extrapolation to the
         zero-noise limit.
 
         Args:
             scale_factors: The array of noise scale factors.
             exp_values: The array of expectation values.
+            full_output: If False (default), only the zero-noise limit is
+                returned. If True, the optimal parameters are returned too.
 
         Returns:
-            (zero_lim, opt_params): Where "zero_lim" is the zero-noise limit
-            and "opt_params" is the parameter array of the best fitting model.
+            zero_lim: The extrapolated zero-noise limit.
+            opt_params: The parameter array of the best fitting model.
+                        This is returned only if "full_output" is True.
 
         Raises:
             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
@@ -600,7 +642,9 @@ class LinearFactory(BatchedFactory):
             ".reduce()" should be called instead.
         """
         # Linear extrapolation is equivalent to a polynomial fit with order=1
-        return PolyFactory.extrapolate(scale_factors, exp_values, 1)
+        return PolyFactory.extrapolate(
+            scale_factors, exp_values, 1, full_output,
+        )
 
     def reduce(self) -> float:
         """Returns the zero-noise limit found by fitting a line to the input
@@ -609,7 +653,9 @@ class LinearFactory(BatchedFactory):
         Stores the optimal parameters for the fit in `self.opt_params`.
         """
         zero_lim, self.opt_params = self.extrapolate(
-            self.get_scale_factors(), self.get_expectation_values()
+            self.get_scale_factors(),
+            self.get_expectation_values(),
+            full_output=True,
         )
         self._already_reduced = True
         return zero_lim
@@ -668,7 +714,8 @@ class ExpFactory(BatchedFactory):
         asymptote: Optional[float] = None,
         avoid_log: bool = False,
         eps: float = 1.0e-6,
-    ) -> Tuple[float, List[float]]:
+        full_output: bool = False,
+    ) -> Union[float, Tuple[float, List[float]]]:
         """Static method which evaluates the extrapolation to the zero-noise
         limit assuming an exponential ansatz y(x) = a + b * exp(-c * x),
         with c > 0.
@@ -688,10 +735,13 @@ class ExpFactory(BatchedFactory):
                 asymptote is not None. The default value is False.
             eps: Epsilon to regularize log(sign(scale_factors - asymptote))
                 when the argument is to close to zero or negative.
+            full_output: If False (default), only the zero-noise limit is
+                returned. If True, the optimal parameters are returned too.
 
         Returns:
-            (zero_lim, opt_params): Where "zero_lim" is the zero-noise limit
-            and "opt_params" is the parameter array of the best fitting model.
+            zero_lim: The extrapolated zero-noise limit.
+            opt_params: The parameter array of the best fitting model.
+                        This is returned only if "full_output" is True.
 
         Raises:
             ValueError: If the arguments are not consistent with the
@@ -712,6 +762,7 @@ class ExpFactory(BatchedFactory):
             asymptote=asymptote,
             avoid_log=avoid_log,
             eps=eps,
+            full_output=full_output,
         )
 
     def reduce(self) -> float:
@@ -724,6 +775,7 @@ class ExpFactory(BatchedFactory):
             self.get_expectation_values(),
             asymptote=self.asymptote,
             avoid_log=self.avoid_log,
+            full_output=True,
         )
         self._already_reduced = True
         return zero_lim
@@ -796,7 +848,8 @@ class PolyExpFactory(BatchedFactory):
         asymptote: Optional[float] = None,
         avoid_log: bool = False,
         eps: float = 1.0e-6,
-    ) -> Tuple[float, List[float]]:
+        full_output: bool = False,
+    ) -> Union[float, Tuple[float, List[float]]]:
         """Static method which evaluates the extrapolation to the
         zero-noise limit with an exponential ansatz (whose exponent
         is a polynomial of degree "order").
@@ -824,10 +877,13 @@ class PolyExpFactory(BatchedFactory):
                 asymptote is not None. The default value is False.
             eps: Epsilon to regularize log(sign(scale_factors - asymptote))
                 when the argument is to close to zero or negative.
+            full_output: If False (default), only the zero-noise limit is
+                returned. If True, the optimal parameters are returned too.
 
         Returns:
-            (znl, params): Where "znl" is the zero-noise-limit and "params"
-                are the optimal fitting parameters.
+            zero_lim: The extrapolated zero-noise limit.
+            opt_params: The parameter array of the best fitting model.
+                        This is returned only if "full_output" is True.
 
         Raises:
             ValueError: If the arguments are not consistent with the
@@ -884,8 +940,9 @@ class PolyExpFactory(BatchedFactory):
                 _ansatz_unknown, scale_factors, exp_values, p_zero
             )
             # The zero noise limit is ansatz(0)= asympt + b
-            zero_limit = opt_params[0] + opt_params[1]
-            return (zero_limit, opt_params)
+            zero_lim = opt_params[0] + opt_params[1]
+            return zero_lim, opt_params if full_output else zero_lim
+
 
         # CASE 2: asymptote is given and "avoid_log" is True
         if avoid_log:
@@ -895,8 +952,10 @@ class PolyExpFactory(BatchedFactory):
                 _ansatz_known, scale_factors, exp_values, p_zero
             )
             # The zero noise limit is ansatz(0)= asymptote + b
-            zero_limit = asymptote + opt_params[0]
-            return (zero_limit, [asymptote] + list(opt_params))
+            zero_lim = asymptote + opt_params[0]
+            opt_params = [asymptote] + list(opt_params)
+            return zero_lim, opt_params if full_output else zero_lim
+ 
 
         # CASE 3: asymptote is given and "avoid_log" is False
         # Polynomial fit of z(x).
@@ -914,10 +973,10 @@ class PolyExpFactory(BatchedFactory):
             weights=np.sqrt(np.abs(shifted_y)),
         )
         # The zero noise limit is ansatz(0)
-        zero_limit = asymptote + sign * np.exp(z_coefficients[-1])
+        zero_lim = asymptote + sign * np.exp(z_coefficients[-1])
         # Parameters from low order to high order
         opt_params = [asymptote] + list(z_coefficients[::-1])
-        return zero_limit, opt_params
+        return zero_lim, opt_params if full_output else zero_lim
 
     def __eq__(self, other):
         return (
@@ -956,6 +1015,7 @@ class PolyExpFactory(BatchedFactory):
             self.order,
             self.asymptote,
             self.avoid_log,
+            full_output=True,
         )
         self._already_reduced = True
         return zero_lim
@@ -1081,13 +1141,71 @@ class AdaExpFactory(Factory):
             )
         return len(self._outstack) == self._steps
 
+    @staticmethod
+    def extrapolate(
+        scale_factors: List[float],
+        exp_values: List[float],
+        asymptote: Optional[float] = None,
+        avoid_log: bool = False,
+        eps: float = 1.0e-6,
+        full_output: bool = False,
+    ) -> Union[float, Tuple[float, List[float]]]:
+        """Static method which evaluates the extrapolation to the zero-noise
+        limit assuming an exponential ansatz y(x) = a + b * exp(-c * x),
+        with c > 0.
+
+        If y(x->inf) is unknown, the ansatz y(x) is fitted with a non-linear
+        optimization.
+
+        If y(x->inf) is given and avoid_log=False, the exponential
+        model is mapped into a linear model by a logarithmic transformation.
+
+        Args:
+            scale_factors: The array of noise scale factors.
+            exp_values: The array of expectation values.
+            asymptote: The infinite-noise limit y(x->inf) (optional argument).
+            avoid_log: If set to True, the exponential model is not linearized
+                with a logarithm and a non-linear fit is applied even if
+                asymptote is not None. The default value is False.
+            eps: Epsilon to regularize log(sign(scale_factors - asymptote))
+                when the argument is to close to zero or negative.
+            full_output: If False (default), only the zero-noise limit is
+                returned. If True, the optimal parameters are returned too.
+
+        Returns:
+            zero_lim: The extrapolated zero-noise limit.
+            opt_params: The parameter array of the best fitting model.
+                        This is returned only if "full_output" is True.
+
+        Raises:
+            ValueError: If the arguments are not consistent with the
+                extrapolation model.
+            ExtrapolationError: If the extrapolation fit fails.
+            ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
+
+        Note:
+            This method computes the zero-noise limit only from the information
+            contained in the input arguments. To extrapolate from the internal
+            data of an instantiated Factory object, the bound method
+            ".reduce()" should be called instead.
+        """
+        return ExpFactory.extrapolate(
+            scale_factors,
+            exp_values,
+            asymptote=asymptote,
+            avoid_log=avoid_log,
+            eps=eps,
+            full_output=full_output,
+        )
+
     def reduce(self) -> float:
         """Returns the zero-noise limit."""
-        zero_limit, self.opt_params = ExpFactory.extrapolate(
+        zero_limit, self.opt_params = self.extrapolate(
             self.get_scale_factors(),
             self.get_expectation_values(),
             asymptote=self.asymptote,
             avoid_log=self.avoid_log,
+            full_output=True,
         )
         # Update optimization history
         self.history.append(
@@ -1105,3 +1223,13 @@ class AdaExpFactory(Factory):
             and self.avoid_log == other.avoid_log
             and np.allclose(self.history, other.history)
         )
+
+def test_full_output_keyword():
+    """Tests the full_output keyword in extrapolate method."""
+    zlim = LinearFactory.extrapolate([1, 2], [1, 2])
+    assert np.isclose(zlim, 0.0)
+    zlim, opt_params = LinearFactory.extrapolate([1, 2], [1, 2], full_output=True)
+    assert len(opt_params) == 2
+    assert np.isclose(zlim, 0.0)
+    assert np.isclose(0.0, opt_params[1])
+    assert np.isclose(1.0, opt_params[0])
