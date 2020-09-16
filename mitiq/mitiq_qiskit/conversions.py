@@ -19,10 +19,26 @@ Qiskit's circuit representation.
 import cirq
 from cirq.contrib.qasm_import import circuit_from_qasm
 from qiskit import QuantumCircuit
+from qiskit.circuit.barrier import Barrier
+
 from mitiq.utils import _simplify_circuit_exponents
 
 
 QASMType = str
+
+
+def _remove_barriers(circuit: QuantumCircuit) -> QuantumCircuit:
+    """Returns a copy of the input circuit with all barriers removed.
+
+    Args:
+        circuit: Qiskit circuit to remove barriers from.
+    """
+    copy = circuit.copy()
+    for instr in copy.data:
+        gate = instr[0]
+        if isinstance(gate, Barrier):
+            copy.data.remove(instr)
+    return copy
 
 
 def to_qasm(circuit: cirq.Circuit) -> QASMType:
@@ -60,6 +76,7 @@ def from_qiskit(circuit: QuantumCircuit) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input Qiskit circuit.
     """
+    circuit = _remove_barriers(circuit)
     return from_qasm(circuit.qasm())
 
 
@@ -72,4 +89,5 @@ def from_qasm(qasm: QASMType) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input QASM string.
     """
+    qasm = _remove_barriers(QuantumCircuit.from_qasm_str(qasm)).qasm()
     return circuit_from_qasm(qasm)
