@@ -212,36 +212,6 @@ class Factory(ABC):
         """
         raise NotImplementedError
 
-    @staticmethod
-    def extrapolate(
-        scale_factors: List[float],
-        exp_values: List[float],
-        full_output: bool = False,
-    ) -> Union[float, Tuple[float, List[float]]]:
-        """Static method which evaluates the extrapolation to the
-        zero-noise limit.
-
-        Args:
-            scale_factors: The array of noise scale factors.
-            exp_values: The array of expectation values.
-            full_output: If False (default), only the zero-noise limit is
-                returned. If True, the optimal parameters are returned too.
-            Other arguments such as "order" may be necessary.
-
-        Returns:
-            zero_lim: The extrapolated zero-noise limit.
-            opt_params: The parameter array of the best fitting model.
-                        This is returned only if "full_output" is True.
-
-        Note:
-            This method computes the zero-noise limit only from the information
-            contained in the input arguments. To extrapolate from the internal
-            data of an instantiated Factory object, the bound method
-            ".reduce()" should be called instead.
-        """
-        raise NotImplementedError
-
-
     @abstractmethod
     def reduce(self) -> float:
         """Returns the extrapolation to the zero-noise limit."""
@@ -458,8 +428,8 @@ class PolyFactory(BatchedFactory):
 
     @staticmethod
     def extrapolate(
-        scale_factors: List[float],
-        exp_values: List[float],
+        scale_factors: Sequence[float],
+        exp_values: Sequence[float],
         order: int,
         full_output: bool = False,
     ) -> Union[float, Tuple[float, List[float]]]:
@@ -489,7 +459,7 @@ class PolyFactory(BatchedFactory):
 
         opt_params = mitiq_polyfit(scale_factors, exp_values, order)
         zero_lim = opt_params[-1]
-        return zero_lim, opt_params if full_output else zero_lim
+        return (zero_lim, opt_params) if full_output else zero_lim
 
     def __init__(
         self,
@@ -511,7 +481,7 @@ class PolyFactory(BatchedFactory):
 
         Stores the optimal parameters for the fit in `self.opt_params`.
         """
-        zero_lim, self.opt_params = self.extrapolate(
+        zero_lim, self.opt_params = self.extrapolate(  # type: ignore
             self.get_scale_factors(),
             self.get_expectation_values(),
             self.order,
@@ -543,8 +513,8 @@ class RichardsonFactory(BatchedFactory):
 
     @staticmethod
     def extrapolate(
-        scale_factors: List[float],
-        exp_values: List[float],
+        scale_factors: Sequence[float],
+        exp_values: Sequence[float],
         full_output: bool = False,
     ) -> Union[float, Tuple[float, List[float]]]:
         """Static method which evaluates the Richardson extrapolation to the
@@ -582,8 +552,8 @@ class RichardsonFactory(BatchedFactory):
 
         Stores the optimal parameters for the fit in `self.opt_params`.
         """
-        zero_lim, self.opt_params = self.extrapolate(
-            self.get_scale_factors(), 
+        zero_lim, self.opt_params = self.extrapolate(  # type: ignore
+            self.get_scale_factors(),
             self.get_expectation_values(),
             full_output=True,
         )
@@ -614,8 +584,8 @@ class LinearFactory(BatchedFactory):
 
     @staticmethod
     def extrapolate(
-        scale_factors: List[float],
-        exp_values: List[float],
+        scale_factors: Sequence[float],
+        exp_values: Sequence[float],
         full_output: bool = False,
     ) -> Union[float, Tuple[float, List[float]]]:
         """Static method which evaluates the linear extrapolation to the
@@ -652,7 +622,7 @@ class LinearFactory(BatchedFactory):
 
         Stores the optimal parameters for the fit in `self.opt_params`.
         """
-        zero_lim, self.opt_params = self.extrapolate(
+        zero_lim, self.opt_params = self.extrapolate(  # type: ignore
             self.get_scale_factors(),
             self.get_expectation_values(),
             full_output=True,
@@ -709,8 +679,8 @@ class ExpFactory(BatchedFactory):
 
     @staticmethod
     def extrapolate(
-        scale_factors: List[float],
-        exp_values: List[float],
+        scale_factors: Sequence[float],
+        exp_values: Sequence[float],
         asymptote: Optional[float] = None,
         avoid_log: bool = False,
         eps: float = 1.0e-6,
@@ -770,7 +740,7 @@ class ExpFactory(BatchedFactory):
 
         Stores the optimal parameters for the fit in `self.opt_params`.
         """
-        zero_lim, self.opt_params = self.extrapolate(
+        zero_lim, self.opt_params = self.extrapolate(  # type: ignore
             self.get_scale_factors(),
             self.get_expectation_values(),
             asymptote=self.asymptote,
@@ -842,8 +812,8 @@ class PolyExpFactory(BatchedFactory):
 
     @staticmethod
     def extrapolate(
-        scale_factors: List[float],
-        exp_values: List[float],
+        scale_factors: Sequence[float],
+        exp_values: Sequence[float],
         order: int,
         asymptote: Optional[float] = None,
         avoid_log: bool = False,
@@ -941,8 +911,7 @@ class PolyExpFactory(BatchedFactory):
             )
             # The zero noise limit is ansatz(0)= asympt + b
             zero_lim = opt_params[0] + opt_params[1]
-            return zero_lim, opt_params if full_output else zero_lim
-
+            return (zero_lim, opt_params) if full_output else zero_lim
 
         # CASE 2: asymptote is given and "avoid_log" is True
         if avoid_log:
@@ -954,8 +923,7 @@ class PolyExpFactory(BatchedFactory):
             # The zero noise limit is ansatz(0)= asymptote + b
             zero_lim = asymptote + opt_params[0]
             opt_params = [asymptote] + list(opt_params)
-            return zero_lim, opt_params if full_output else zero_lim
- 
+            return (zero_lim, opt_params) if full_output else zero_lim
 
         # CASE 3: asymptote is given and "avoid_log" is False
         # Polynomial fit of z(x).
@@ -976,7 +944,7 @@ class PolyExpFactory(BatchedFactory):
         zero_lim = asymptote + sign * np.exp(z_coefficients[-1])
         # Parameters from low order to high order
         opt_params = [asymptote] + list(z_coefficients[::-1])
-        return zero_lim, opt_params if full_output else zero_lim
+        return (zero_lim, opt_params) if full_output else zero_lim
 
     def __eq__(self, other):
         return (
@@ -1009,7 +977,7 @@ class PolyExpFactory(BatchedFactory):
 
         Stores the optimal parameters for the fit in `self.opt_params`.
         """
-        zero_lim, self.opt_params = self.extrapolate(
+        zero_lim, self.opt_params = self.extrapolate(  # type: ignore
             self.get_scale_factors(),
             self.get_expectation_values(),
             self.order,
@@ -1143,8 +1111,8 @@ class AdaExpFactory(Factory):
 
     @staticmethod
     def extrapolate(
-        scale_factors: List[float],
-        exp_values: List[float],
+        scale_factors: Sequence[float],
+        exp_values: Sequence[float],
         asymptote: Optional[float] = None,
         avoid_log: bool = False,
         eps: float = 1.0e-6,
@@ -1200,7 +1168,7 @@ class AdaExpFactory(Factory):
 
     def reduce(self) -> float:
         """Returns the zero-noise limit."""
-        zero_limit, self.opt_params = self.extrapolate(
+        zero_limit, self.opt_params = self.extrapolate(  # type: ignore
             self.get_scale_factors(),
             self.get_expectation_values(),
             asymptote=self.asymptote,
@@ -1223,13 +1191,3 @@ class AdaExpFactory(Factory):
             and self.avoid_log == other.avoid_log
             and np.allclose(self.history, other.history)
         )
-
-def test_full_output_keyword():
-    """Tests the full_output keyword in extrapolate method."""
-    zlim = LinearFactory.extrapolate([1, 2], [1, 2])
-    assert np.isclose(zlim, 0.0)
-    zlim, opt_params = LinearFactory.extrapolate([1, 2], [1, 2], full_output=True)
-    assert len(opt_params) == 2
-    assert np.isclose(zlim, 0.0)
-    assert np.isclose(0.0, opt_params[1])
-    assert np.isclose(1.0, opt_params[0])

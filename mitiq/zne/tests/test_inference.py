@@ -582,3 +582,16 @@ def test_push_after_already_reduced_warning():
     fac.push({"scale_factor": 1.0}, 2.0)
     fac.push({"scale_factor": 2.0}, 1.0)
     assert np.isclose(3.0, fac.reduce())
+
+
+def test_full_output_keyword():
+    """Tests the full_output keyword in extrapolate method."""
+    zlim = LinearFactory.extrapolate([1, 2], [1, 2])
+    assert np.isclose(zlim, 0.0)
+    zlim, opt_params = LinearFactory.extrapolate(
+        [1, 2], [1, 2], full_output=True
+    )
+    assert len(opt_params) == 2
+    assert np.isclose(zlim, 0.0)
+    assert np.isclose(0.0, opt_params[1])
+    assert np.isclose(1.0, opt_params[0])
