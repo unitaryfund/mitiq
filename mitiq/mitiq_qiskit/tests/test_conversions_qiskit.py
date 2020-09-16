@@ -87,17 +87,14 @@ def test_convert_with_barrier(as_qasm):
     """Tests converting a Qiskit circuit with a barrier to a Cirq circuit."""
     n = 5
     qiskit_circuit = qiskit.QuantumCircuit(qiskit.QuantumRegister(n))
-    qiskit_circuit.measure_all()  # Adds barrier + terminal measurements
+    qiskit_circuit.barrier()
 
     if as_qasm:
         cirq_circuit = from_qasm(qiskit_circuit.qasm())
     else:
         cirq_circuit = from_qiskit(qiskit_circuit)
 
-    correct = cirq.Circuit(
-        cirq.measure(q) for q in cirq.LineQubit.range(n)
-    )
-    assert _equal(cirq_circuit, correct)
+    assert _equal(cirq_circuit, cirq.Circuit())
 
 
 @pytest.mark.parametrize("as_qasm", (True, False))
