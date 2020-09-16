@@ -19,7 +19,7 @@ Qiskit's circuit representation.
 import cirq
 from cirq.contrib.qasm_import import circuit_from_qasm
 from qiskit import QuantumCircuit
-from qiskit.circuit.barrier import Barrier
+from qiskit.circuit import Barrier
 
 from mitiq.utils import _simplify_circuit_exponents
 
