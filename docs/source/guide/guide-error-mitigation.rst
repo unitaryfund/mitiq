@@ -56,6 +56,28 @@ stretching :cite:`Kandala_2019_Nature`. In this way, a difference between the ef
 was introduced by controlling only the gate-defining pulses. The effective noise of a quantum circuit can be scaled also at a gate-level, i.e., without requiring a direct control of the  physical hardware. For example this can be achieved with the :ref:`unitary folding<guide-folding>` technique, a method which is present in the ``mitiq`` toolchain.
 
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Limitations of zero-noise extrapolation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Zero-noise extrapolation is a useful error mitigation technique but it is not without limitations. First and foremost,
+the zero-noise estimate is extrapolated, meaning that performance guarantees are quite difficult in general. If a
+reasonable estimate of how increasing the noise affects the observable is known, then ZNE can produce good zero-noise
+estimates. This is the case for simple noise models such as depolarizing noise, but noise in actual quantum systems is
+more complicated and can produce different behavior than expected. In this case the performance of ZNE is tied to the
+performance of the underlying hardware. If expectation values do not produce a smooth curve as noise is increased, the
+zero-noise estimate may be poor and certain inference techniques may fail. In particular, one has to take into account
+that any initial error in the measured expectation values will propagate to the zero-noise extrapolation value. This
+fact can significantly amplify the final estimation uncertainty. In practice, this implies that the evaluation of a
+mitigated expectation value requires more measurement shots with respect to the unmitigated one.
+
+Additionally, zero-noise extrapolation cannot increase the performance of arbitrary circuits. If the circuit is large
+enough such that the expectation of the observable is almost constant as noise is increased (e.g., if the state is
+maximally mixed), then extrapolation will of course not help the zero-noise estimate. The regime in which ZNE is
+applicable thus depends on the performance of the underlying hardware as well as the circuit. A detailed description
+of when zero-noise extrapolation is effective, and how effective it is, is the subject of ongoing research.
+
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Other error mitigation techniques
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
