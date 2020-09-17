@@ -76,7 +76,6 @@ def from_qiskit(circuit: QuantumCircuit) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input Qiskit circuit.
     """
-    circuit = _remove_barriers(circuit)
     return from_qasm(circuit.qasm())
 
 
