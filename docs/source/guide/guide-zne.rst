@@ -442,9 +442,37 @@ corresponds to a statistical inference based on the measured data.
    Error with richardson_fac: 0.0070
    Error with poly_fac: 0.0110
 
----------------------------
+Behind the scenes, a factory object collects different expectation values at different scale factors.
+After running a factory, this information can be accessed with appropriate *get* methods. For example:
+
+.. testcode::
+
+   scale_factors = poly_fac.get_scale_factors()
+   print("Scale factors:", scale_factors)
+   exp_values = poly_fac.get_expectation_values()
+   print("Expectation values:", np.round(exp_values, 2))
+
+.. testoutput::
+
+   Scale factors: [1. 2. 3. 4.]
+   Expectation values: [0.88 0.79 0.72 0.67]
+
+If the user has manually evaluated a list of expectation values associated to a list of scale factors, the
+simplest way to estimate the corresponding zero-noise limit is to directly call the static `extrapolate` method of the 
+desired factory class (in this case initializing a factory object is unnecessary).  For example:
+
+.. testcode::
+
+   zero_limit = PolyFactory.extrapolate(scale_factors, exp_values, order=2)
+   print(f"Error with PolyFactory.extrapolate method: {abs(exact - zero_limit):.4f}")
+
+.. testoutput::
+
+   Error with PolyFactory.extrapolate method: 0.0110
+
+---------------------------------------------
 Advanced usage of a factory
----------------------------
+---------------------------------------------
 
 .. note::
    This section can be safely skipped by all the readers who are interested
