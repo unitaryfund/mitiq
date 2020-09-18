@@ -470,6 +470,8 @@ desired factory class (in this case initializing a factory object is unnecessary
 
    Error with PolyFactory.extrapolate method: 0.0110
 
+Both the zero-noise value and the optimal parameters of the fit can be returned from `extrapolate` by specifying `full_output = True`.
+
 ---------------------------------------------
 Advanced usage of a factory
 ---------------------------------------------
