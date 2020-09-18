@@ -18,7 +18,7 @@ from typing import Callable
 from functools import wraps
 
 from mitiq._typing import QPROGRAM
-from mitiq.zne.inference import BaseFactory, RichardsonFactory
+from mitiq.zne.inference.factories import BaseFactory, RichardsonFactory
 from mitiq.zne.scaling import fold_gates_at_random
 
 

@@ -20,11 +20,14 @@ from typing import Callable, Dict, List, Optional, Sequence, Tuple
 import warnings
 
 import numpy as np
-from numpy.lib.polynomial import RankWarning
-from scipy.optimize import curve_fit, OptimizeWarning
 
 from mitiq import QPROGRAM
 from mitiq.utils import _are_close_dict
+from mitiq.zne.inference.fitting import (
+    mitiq_polyfit,
+    mitiq_curve_fit,
+    ExtrapolationWarning,
+)
 
 
 def _instack_to_scale_factors(instack: List[Dict[str, float]]) -> List[float]:
@@ -34,122 +37,12 @@ def _instack_to_scale_factors(instack: List[Dict[str, float]]) -> List[float]:
     return [params["scale_factor"] for params in instack]
 
 
-class ExtrapolationError(Exception):
-    """Error raised by :class:`.Factory` objects when
-    the extrapolation fit fails.
-    """
-
-    pass
-
-
-_EXTR_ERR = (
-    "The extrapolation fit failed to converge."
-    " The problem may be solved by switching to a more stable"
-    " extrapolation model such as `LinearFactory`."
-)
-
-
-class ExtrapolationWarning(Warning):
-    """Warning raised by :class:`.Factory` objects when
-    the extrapolation fit is ill-conditioned.
-    """
-
-    pass
-
-
-_EXTR_WARN = (
-    "The extrapolation fit may be ill-conditioned."
-    " Likely, more data points are necessary to fit the parameters"
-    " of the model."
-)
-
-
 class ConvergenceWarning(Warning):
-    """Warning raised by :class:`.Factory` objects when
+    """Warning raised by :class:`.AdaptiveFactory` objects when
     their `iterate` method fails to converge.
     """
 
     pass
-
-
-def mitiq_curve_fit(
-    ansatz: Callable[..., float],
-    scale_factors: Sequence[float],
-    exp_values: Sequence[float],
-    init_params: Optional[List[float]] = None,
-) -> List[float]:
-    """This is a wrapping of the `scipy.optimize.curve_fit` function with
-    custom errors and warnings. It is used to make a non-linear fit.
-
-    Args:
-        ansatz : The model function used for zero-noise extrapolation.
-                 The first argument is the noise scale variable,
-                 the remaining arguments are the parameters to fit.
-        scale_factors: The array of noise scale factors.
-        exp_values: The array of expectation values.
-        init_params: Initial guess for the parameters.
-                     If None, the initial values are set to 1.
-
-    Returns:
-        opt_params: The array of optimal parameters.
-
-    Raises:
-        ExtrapolationError: If the extrapolation fit fails.
-        ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
-    """
-    try:
-        with warnings.catch_warnings(record=True) as warn_list:
-            opt_params, _ = curve_fit(
-                ansatz, scale_factors, exp_values, p0=init_params
-            )
-        for warn in warn_list:
-            # replace OptimizeWarning with ExtrapolationWarning
-            if warn.category is OptimizeWarning:
-                warn.category = ExtrapolationWarning
-                warn.message = _EXTR_WARN  # type: ignore
-            # re-raise all warnings
-            warnings.warn_explicit(
-                warn.message, warn.category, warn.filename, warn.lineno
-            )
-    except RuntimeError:
-        raise ExtrapolationError(_EXTR_ERR) from None
-    return list(opt_params)
-
-
-def mitiq_polyfit(
-    scale_factors: Sequence[float],
-    exp_values: Sequence[float],
-    deg: int,
-    weights: Optional[Sequence[float]] = None,
-) -> List[float]:
-    """This is a wrapping of the `numpy.polyfit` function with
-    custom warnings. It is used to make a polynomial fit.
-
-    Args:
-        scale_factors: The array of noise scale factors.
-        exp_values: The array of expectation values.
-        deg: The degree of the polynomial fit.
-        weights: Optional array of weights for each sampled point.
-                 This is used to make a weighted least squares fit.
-
-    Returns:
-        opt_params: The array of optimal parameters.
-
-    Raises:
-        ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
-    """
-    with warnings.catch_warnings(record=True) as warn_list:
-        opt_params = np.polyfit(scale_factors, exp_values, deg, w=weights)
-    for warn in warn_list:
-        # replace RankWarning with ExtrapolationWarning
-        if warn.category is RankWarning:
-            warn.category = ExtrapolationWarning
-            warn.message = _EXTR_WARN  # type: ignore
-        # re-raise all warnings
-        warnings.warn_explicit(
-            warn.message, warn.category, warn.filename, warn.lineno
-        )
-    return list(opt_params)
 
 
 class BaseFactory(ABC):
@@ -230,6 +123,10 @@ class BatchedFactory(BaseFactory, ABC):
                     f"len(scale_factors) = {len(scale_factors)} and "
                     f"len(shot_list) = {len(shot_list)}."
                 )
+            self._instack = [
+                {"scale_factor": scale_factor, "shots": shots}
+                for scale_factor, shots in zip(scale_factors, shot_list)
+            ]
 
         self._instack = [
             {"scale_factor": scale_factor} for
@@ -252,7 +149,7 @@ class BatchedFactory(BaseFactory, ABC):
 
         # Send them as a batch to the executor OR run them one by one
         # TODO: Determine which executor type is input and call appropriately.
-        #  For now, just assume the executor inputs a single circuit and run
+        #  For now, assume the executor inputs a single circuit and just run
         #  each individually.
         res = []
         for circuit in to_run:

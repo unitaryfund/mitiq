@@ -13,9 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Tests for zero-noise inference and extrapolation methods (factories) with
-classically generated data.
-"""
+"""Tests for factory objects with classically generated data."""
 from copy import copy
 from typing import Callable
 from pytest import mark, raises, warns
@@ -24,10 +22,7 @@ from numpy.random import RandomState
 
 import cirq
 
-from mitiq.zne.inference import (
-    ExtrapolationError,
-    ExtrapolationWarning,
-    ConvergenceWarning,
+from mitiq.zne.inference.factories import (
     RichardsonFactory,
     LinearFactory,
     PolyFactory,
@@ -35,7 +30,7 @@ from mitiq.zne.inference import (
     PolyExpFactory,
     AdaExpFactory,
 )
-
+from mitiq.zne.inference.fitting import ExtrapolationError, ExtrapolationWarning
 
 # Constant parameters for test functions:
 A = 0.5
@@ -363,61 +358,61 @@ def test_get_expectation_values_adaptive_factories(factory):
 #     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=POLYEXP_TOL)
 #
 #
-# @mark.parametrize("avoid_log", [False, True])
-# @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-# def test_ada_exp_factory_with_asympt(
-#     test_f: Callable[[float], float], avoid_log: bool
-# ):
-#     """Test of the adaptive exponential extrapolator."""
-#     seeded_f = apply_seed_to_func(test_f, SEED)
-#     fac = AdaExpFactory(
-#         steps=3, scale_factor=2.0, asymptote=A, avoid_log=avoid_log
-#     )
-#     # Note: iterate calls next which calls reduce, so calling fac.iterate with
-#     # an AdaExpFactory sets the optimal parameters as well. Hence we check that
-#     # the opt_params are empty before AdaExpFactory.iterate is called.
-#     assert len(fac.opt_params) == 0
-#     fac.iterate(seeded_f)
-#     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
-#
-#     # There are three parameters to fit for the (adaptive) exponential ansatz
-#     assert len(fac.opt_params) == 3
-#
-#
-# @mark.parametrize("avoid_log", [False, True])
-# @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-# def test_ada_exp_fac_with_asympt_more_steps(
-#     test_f: Callable[[float], float], avoid_log: bool
-# ):
-#     """Test of the adaptive exponential extrapolator with more steps."""
-#     seeded_f = apply_seed_to_func(test_f, SEED)
-#     fac = AdaExpFactory(
-#         steps=6, scale_factor=2.0, asymptote=A, avoid_log=avoid_log
-#     )
-#     fac.iterate(seeded_f)
-#     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
-#
-#
-# @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-# def test_ada_exp_factory_no_asympt(test_f: Callable[[float], float]):
-#     """Test of the adaptive exponential extrapolator."""
-#     seeded_f = apply_seed_to_func(test_f, SEED)
-#     fac = AdaExpFactory(steps=4, scale_factor=2.0, asymptote=None)
-#     fac.iterate(seeded_f)
-#     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
-#
-#
-# @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-# def test_ada_exp_factory_no_asympt_more_steps(
-#     test_f: Callable[[float], float],
-# ):
-#     """Test of the adaptive exponential extrapolator."""
-#     seeded_f = apply_seed_to_func(test_f, SEED)
-#     fac = AdaExpFactory(steps=8, scale_factor=2.0, asymptote=None)
-#     fac.iterate(seeded_f)
-#     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
-#
-#
+@mark.parametrize("avoid_log", [False, True])
+@mark.parametrize("test_f", [f_exp_down, f_exp_up])
+def test_ada_exp_factory_with_asympt(
+    test_f: Callable[[float], float], avoid_log: bool
+):
+    """Test of the adaptive exponential extrapolator."""
+    seeded_f = apply_seed_to_func(test_f, SEED)
+    fac = AdaExpFactory(
+        steps=3, scale_factor=2.0, asymptote=A, avoid_log=avoid_log
+    )
+    # Note: iterate calls next which calls reduce, so calling fac.iterate with
+    # an AdaExpFactory sets the optimal parameters as well. Hence we check that
+    # the opt_params are empty before AdaExpFactory.iterate is called.
+    assert len(fac.opt_params) == 0
+    fac.iterate(seeded_f)
+    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+
+    # There are three parameters to fit for the (adaptive) exponential ansatz
+    assert len(fac.opt_params) == 3
+
+
+@mark.parametrize("avoid_log", [False, True])
+@mark.parametrize("test_f", [f_exp_down, f_exp_up])
+def test_ada_exp_fac_with_asympt_more_steps(
+    test_f: Callable[[float], float], avoid_log: bool
+):
+    """Test of the adaptive exponential extrapolator with more steps."""
+    seeded_f = apply_seed_to_func(test_f, SEED)
+    fac = AdaExpFactory(
+        steps=6, scale_factor=2.0, asymptote=A, avoid_log=avoid_log
+    )
+    fac.iterate(seeded_f)
+    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+
+
+@mark.parametrize("test_f", [f_exp_down, f_exp_up])
+def test_ada_exp_factory_no_asympt(test_f: Callable[[float], float]):
+    """Test of the adaptive exponential extrapolator."""
+    seeded_f = apply_seed_to_func(test_f, SEED)
+    fac = AdaExpFactory(steps=4, scale_factor=2.0, asymptote=None)
+    fac.iterate(seeded_f)
+    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+
+
+@mark.parametrize("test_f", [f_exp_down, f_exp_up])
+def test_ada_exp_factory_no_asympt_more_steps(
+    test_f: Callable[[float], float],
+):
+    """Test of the adaptive exponential extrapolator."""
+    seeded_f = apply_seed_to_func(test_f, SEED)
+    fac = AdaExpFactory(steps=8, scale_factor=2.0, asymptote=None)
+    fac.iterate(seeded_f)
+    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+
+
 # def test_avoid_log_keyword():
 #     """Test that avoid_log=True and avoid_log=False give different results."""
 #     fac = ExpFactory(X_VALS, asymptote=A, avoid_log=False)
@@ -426,54 +421,54 @@ def test_get_expectation_values_adaptive_factories(factory):
 #     fac.avoid_log = True
 #     znl_without_log = fac.reduce()
 #     assert not znl_with_log == znl_without_log
-#
+
 #
 # def test_less_than_two_scale_factors_error():
 #     """Test less than 2 scale_factors."""
 #     with raises(ValueError, match=r"At least 2 scale factors are necessary"):
 #         _ = LinearFactory([1])
-#
-#
-# def test_few_scale_factors_error():
-#     """Test that a wrong initialization error is raised."""
-#     with raises(ValueError, match=r"The extrapolation order cannot exceed"):
-#         _ = PolyFactory(X_VALS, order=10)
-#
-#
-# def test_too_few_points_for_polyfit_error():
-#     """Test that the correct error is raised if data is not enough to fit."""
-#     fac = PolyFactory(X_VALS, order=2)
-#     fac._instack = [
-#         {"scale_factor": 1.0, "shots": 100},
-#         {"scale_factor": 2.0, "shots": 100},
-#     ]
-#     fac._outstack = [1.0, 2.0]
-#     with raises(ValueError, match=r"Extrapolation order is too high."):
-#         fac.reduce()
-#
-#
-# def test_failing_fit_error():
-#     """Test error handling for a failing fit."""
-#     fac = ExpFactory(X_VALS, asymptote=None)
-#     fac._instack = [{"scale_factor": x} for x in X_VALS]
-#     fac._outstack = [1.0, 2.0, 1.0, 2.0, 1.0]
-#     with raises(
-#         ExtrapolationError, match=r"The extrapolation fit failed to converge."
-#     ):
-#         fac.reduce()
-#
-#
-# @mark.parametrize("fac", [LinearFactory([1, 1, 1]), ExpFactory([1, 1, 1])])
-# def test_failing_fit_warnings(fac):
-#     """Test that the correct warning is raised for an ill-conditioned fit."""
-#     fac._instack = [{"scale_factor": 1.0} for _ in range(4)]
-#     fac._outstack = [1, 1, 1, 1]
-#     with warns(
-#         ExtrapolationWarning,
-#         match=r"The extrapolation fit may be ill-conditioned.",
-#     ):
-#         fac.reduce()
-#
+
+
+def test_few_scale_factors_error():
+    """Test that a wrong initialization error is raised."""
+    with raises(ValueError, match=r"The extrapolation order cannot exceed"):
+        _ = PolyFactory(X_VALS, order=10)
+
+
+def test_too_few_points_for_polyfit_error():
+    """Test that the correct error is raised if data is not enough to fit."""
+    fac = PolyFactory(X_VALS, order=2)
+    fac._instack = [
+        {"scale_factor": 1.0, "shots": 100},
+        {"scale_factor": 2.0, "shots": 100},
+    ]
+    fac._outstack = [1.0, 2.0]
+    with raises(ValueError, match=r"Extrapolation order is too high."):
+        fac.reduce()
+
+
+def test_failing_fit_error():
+    """Test error handling for a failing fit."""
+    fac = ExpFactory(X_VALS, asymptote=None)
+    fac._instack = [{"scale_factor": x} for x in X_VALS]
+    fac._outstack = [1.0, 2.0, 1.0, 2.0, 1.0]
+    with raises(
+        ExtrapolationError, match=r"The extrapolation fit failed to converge."
+    ):
+        fac.reduce()
+
+
+@mark.parametrize("fac", [LinearFactory([1, 1, 1]), ExpFactory([1, 1, 1])])
+def test_failing_fit_warnings(fac):
+    """Test that the correct warning is raised for an ill-conditioned fit."""
+    fac._instack = [{"scale_factor": 1.0} for _ in range(4)]
+    fac._outstack = [1, 1, 1, 1]
+    with warns(
+        ExtrapolationWarning,
+        match=r"The extrapolation fit may be ill-conditioned.",
+    ):
+        fac.reduce()
+
 #
 # def test_iteration_warnings():
 #     """Test that the correct warning is raised beyond the iteration limit."""
@@ -534,11 +529,10 @@ def test_get_expectation_values_adaptive_factories(factory):
 #         assert fac._instack[j] == {"scale_factor": X_VALS[j], "shots": shots}
 #         assert fac._outstack[j] == f_lin_shot(X_VALS[j], shots=shots)
 #         assert fac._outstack[j] != f_lin_shot(X_VALS[j])
-#
-#
-# def test_shot_list_errors():
-#     """Tests errors related to the "shot_lists" argument."""
-#     with raises(IndexError, match=r"must have the same length."):
-#         PolyFactory(X_VALS, order=2, shot_list=[1, 2])
-#     with raises(TypeError, match=r"valid iterator of integers"):
-#         PolyFactory(X_VALS, order=2, shot_list=[1.0, 2])
+
+
+def test_shot_list_errors():
+    """Tests errors related to the "shot_lists" argument."""
+    with raises(ValueError, match=r"must be equal"):
+        PolyFactory([1, 2, 3], order=2, shot_list=[1, 2])
+
