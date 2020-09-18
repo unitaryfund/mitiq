@@ -152,20 +152,7 @@ def mitiq_polyfit(
     return list(opt_params)
 
 
-class Factory(ABC):
-    """Abstract class designed to adaptively produce a new noise scaling
-    parameter based on a historical stack of previous noise scale parameters
-    ("self._instack") and previously estimated expectation values
-    ("self._outstack").
-
-    Specific zero-noise extrapolation algorithms, adaptive or non-adaptive,
-    are derived from this class.
-
-    A Factory object is not supposed to directly perform any quantum
-    computation, only the classical results of quantum experiments are
-    processed by it.
-    """
-
+class BaseFactory(ABC):
     def __init__(self) -> None:
         """Initialization arguments (e.g. noise scale factors) depend on the
         particular extrapolation algorithm and can be added to the "__init__"
@@ -175,6 +162,21 @@ class Factory(ABC):
         self._outstack: List[float] = []
         self.opt_params: List[float] = []
 
+    @abstractmethod
+    def run(
+        self,
+        qp: QPROGRAM,
+        executor: Callable[..., float],
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        num_to_average: int = 1,
+    ):
+        raise NotImplementedError
+
+    @abstractmethod
+    def reduce(self) -> float:
+        """Returns the extrapolation to the zero-noise limit."""
+        raise NotImplementedError
+
     def push(self, instack_val: dict, outstack_val: float) -> None:
         """Appends "instack_val" to "self._instack" and "outstack_val" to
         "self._outstack". Each time a new expectation value is computed this
@@ -182,6 +184,14 @@ class Factory(ABC):
         """
         self._instack.append(instack_val)
         self._outstack.append(outstack_val)
+
+    def reset(self) -> None:
+        """Resets the instack, outstack, and optimal parameters of the Factory
+        to empty lists.
+        """
+        self._instack = []
+        self._outstack = []
+        self.opt_params = []
 
     def get_scale_factors(self) -> np.ndarray:
         """Returns the scale factors at which the factory has computed
@@ -195,6 +205,67 @@ class Factory(ABC):
         """Returns the expectation values computed by the factory."""
         return np.array(self._outstack)
 
+    def __eq__(self, other):
+        if len(self._instack) != len(other._instack):
+            return False
+        for dict_a, dict_b in zip(self._instack, other._instack):
+            if not _are_close_dict(dict_a, dict_b):
+                return False
+        return np.allclose(self._outstack, other._outstack)
+
+
+class BatchedFactory(BaseFactory, ABC):
+    """A factory in which all circuits to be executed can be pre-computed."""
+    def __init__(
+            self,
+            scale_factors: Sequence[float],
+            shot_list: Optional[Sequence[float]] = None,
+    ) -> None:
+        super(BatchedFactory, self).__init__()
+
+        if shot_list:
+            if len(shot_list) != len(scale_factors):
+                raise ValueError(
+                    "len(scale_factors) and len(shot_list) must be equal but "
+                    f"len(scale_factors) = {len(scale_factors)} and "
+                    f"len(shot_list) = {len(shot_list)}."
+                )
+
+        self._instack = [
+            {"scale_factor": scale_factor} for
+            scale_factor in scale_factors
+        ]
+
+    def run(
+        self,
+        qp: QPROGRAM,
+        executor: Callable[..., float],
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        num_to_average: int = 1,
+    ) -> None:
+        """Computes the expectation values at each scale factor."""
+        # Generate all the noise scaled circuits to run
+        to_run = []  # TODO: Store this?
+        for scale_factor in self.get_scale_factors():
+            for _ in range(num_to_average):
+                to_run.append(scale_noise(qp, scale_factor))
+
+        # Send them as a batch to the executor OR run them one by one
+        # TODO: Determine which executor type is input and call appropriately.
+        #  For now, just assume the executor inputs a single circuit and run
+        #  each individually.
+        res = []
+        for circuit in to_run:
+            res.append(executor(circuit))  # TODO: Use shots/other optional args
+
+        # Average the expectation results
+        self._outstack = [
+            np.average(res[i * num_to_average: (i + 1) * num_to_average])
+            for i in range(len(res) // num_to_average)
+        ]
+
+
+class AdaptiveFactory(BaseFactory, ABC):
     @abstractmethod
     def next(self) -> Dict[str, float]:
         """Returns a dictionary of parameters to execute a circuit at."""
@@ -207,22 +278,9 @@ class Factory(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod
-    def reduce(self) -> float:
-        """Returns the extrapolation to the zero-noise limit."""
-        raise NotImplementedError
-
-    def reset(self) -> None:
-        """Resets the instack, outstack, and optimal parameters of the Factory
-        to empty lists.
-        """
-        self._instack = []
-        self._outstack = []
-        self.opt_params = []
-
     def iterate(
         self, noise_to_expval: Callable[..., float], max_iterations: int = 100,
-    ) -> "Factory":
+    ) -> "AdaptiveFactory":
         """Evaluates a sequence of expectation values until enough
         data is collected (or iterations reach "max_iterations").
 
@@ -267,7 +325,7 @@ class Factory(ABC):
         scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
         num_to_average: int = 1,
         max_iterations: int = 100,
-    ) -> "Factory":
+    ) -> "AdaptiveFactory":
         """Evaluates a sequence of expectation values by executing quantum
         circuits until enough data is collected (or iterations reach
         "max_iterations").
@@ -294,104 +352,6 @@ class Factory(ABC):
             return np.average(expectation_values)
 
         return self.iterate(_noise_to_expval, max_iterations)
-
-    def __eq__(self, other):
-        if len(self._instack) != len(other._instack):
-            return False
-        for dict_a, dict_b in zip(self._instack, other._instack):
-            if not _are_close_dict(dict_a, dict_b):
-                return False
-        return np.allclose(self._outstack, other._outstack)
-
-
-class BatchedFactory(Factory):
-    """Abstract class of a non-adaptive Factory.
-
-    This is initialized with a given batch of "scale_factors".
-    The "self.next" method trivially iterates over the elements of
-    "scale_factors" in a non-adaptive way.
-    Convergence is achieved when all the correpsonding expectation values have
-    been measured.
-
-    Specific (non-adaptive) zero-noise extrapolation algorithms can be derived
-    from this class by overriding the "self.reduce" and (if necessary)
-    the "__init__" method.
-
-    Args:
-        scale_factors: Sequence of noise scale factors at which
-                       expectation values should be measured.
-        shot_list: Optional sequence of integers corresponding to the number
-                   of samples taken for each expectation value. If this
-                   argument is explicitly passed to the factory, it must have
-                   the same length of scale_factors and the executor function
-                   must accept "shots" as a valid keyword argument.
-
-    Raises:
-        ValueError: If the number of scale factors is less than 2.
-        IndexError: If an iteration step fails.
-    """
-
-    def __init__(
-        self,
-        scale_factors: Sequence[float],
-        shot_list: Optional[List[int]] = None,
-    ) -> None:
-        """Instantiates a new object of this Factory class."""
-        if len(scale_factors) < 2:
-            raise ValueError("At least 2 scale factors are necessary.")
-
-        if shot_list and (
-            not isinstance(shot_list, Sequence)
-            or not all([isinstance(shots, int) for shots in shot_list])
-        ):
-            raise TypeError(
-                "The optional argument shot_list must be None "
-                "or a valid iterator of integers."
-            )
-        if shot_list and (len(scale_factors) != len(shot_list)):
-            raise IndexError(
-                "The arguments scale_factors and shot_list"
-                " must have the same length."
-                f" But len(scale_factors) is {len(scale_factors)}"
-                f" and len(shot_list) is {len(shot_list)}."
-            )
-
-        self._scale_factors = scale_factors
-        self._shot_list = shot_list
-
-        super(BatchedFactory, self).__init__()
-
-    def next(self) -> Dict[str, float]:
-        """Returns a dictionary of parameters to execute a circuit at."""
-        in_params = {}
-        try:
-            index = len(self._outstack)
-            in_params["scale_factor"] = self._scale_factors[index]
-            if self._shot_list:
-                in_params["shots"] = self._shot_list[index]
-        except IndexError:
-            raise IndexError(
-                "BatchedFactory cannot take another step. "
-                "Number of batched scale_factors"
-                f" ({len(self._scale_factors)}) exceeded."
-            )
-        return in_params
-
-    def is_converged(self) -> bool:
-        """Returns True if all needed expectation values have been computed,
-        else False.
-        """
-        if len(self._outstack) != len(self._instack):
-            raise IndexError(
-                f"The length of 'self._instack' ({len(self._instack)}) "
-                f"and 'self._outstack' ({len(self._outstack)}) must be equal."
-            )
-        return len(self._outstack) == len(self._scale_factors)
-
-    def __eq__(self, other):
-        return Factory.__eq__(self, other) and np.allclose(
-            self._scale_factors, other._scale_factors
-        )
 
 
 class PolyFactory(BatchedFactory):
@@ -819,7 +779,7 @@ OptimizationHistory = List[
 ]
 
 
-class AdaExpFactory(Factory):
+class AdaExpFactory(AdaptiveFactory):
     """Factory object implementing an adaptive zero-noise extrapolation
     algorithm assuming an exponential ansatz y(x) = a + b * exp(-c * x),
     with c > 0.
@@ -945,7 +905,7 @@ class AdaExpFactory(Factory):
 
     def __eq__(self, other) -> bool:
         return (
-            Factory.__eq__(self, other)
+            AdaptiveFactory.__eq__(self, other)
             and self._steps == other._steps
             and self._scale_factor == other._scale_factor
             and np.isclose(self.asymptote, other.asymptote)

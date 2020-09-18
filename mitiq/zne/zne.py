@@ -18,14 +18,14 @@ from typing import Callable
 from functools import wraps
 
 from mitiq._typing import QPROGRAM
-from mitiq.zne.inference import Factory, RichardsonFactory
+from mitiq.zne.inference import BaseFactory, RichardsonFactory
 from mitiq.zne.scaling import fold_gates_at_random
 
 
 def execute_with_zne(
     qp: QPROGRAM,
     executor: Callable[[QPROGRAM], float],
-    factory: Factory = None,
+    factory: BaseFactory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
 ) -> float:
@@ -47,7 +47,7 @@ def execute_with_zne(
     if not callable(executor):
         raise TypeError("Argument `executor` must be callable.")
 
-    if not isinstance(factory, Factory):
+    if not isinstance(factory, BaseFactory):
         raise TypeError(
             f"Argument `factory` must be of type mitiq.factories.Factory "
             f"but type(factory) is {type(factory)}."
@@ -64,7 +64,7 @@ def execute_with_zne(
 
 def mitigate_executor(
     executor: Callable[[QPROGRAM], float],
-    factory: Factory = None,
+    factory: BaseFactory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
 ) -> Callable[[QPROGRAM], float]:
@@ -94,7 +94,7 @@ def mitigate_executor(
 
 
 def zne_decorator(
-    factory: Factory = None,
+    factory: BaseFactory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
 ) -> Callable[[Callable[[QPROGRAM], float]], Callable[[QPROGRAM], float]]:
