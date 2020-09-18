@@ -62,7 +62,7 @@ class BaseFactory(ABC):
         executor: Callable[..., float],
         scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
         num_to_average: int = 1,
-    ):
+    ) -> "BaseFactory":
         raise NotImplementedError
 
     @abstractmethod
@@ -139,7 +139,7 @@ class BatchedFactory(BaseFactory, ABC):
         executor: Callable[..., float],
         scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
         num_to_average: int = 1,
-    ) -> None:
+    ) -> "BatchedFactory":
         """Computes the expectation values at each scale factor."""
         # Generate all the noise scaled circuits to run
         to_run = []  # TODO: Store this?
@@ -160,6 +160,8 @@ class BatchedFactory(BaseFactory, ABC):
             np.average(res[i * num_to_average: (i + 1) * num_to_average])
             for i in range(len(res) // num_to_average)
         ]
+
+        return self
 
 
 class AdaptiveFactory(BaseFactory, ABC):
