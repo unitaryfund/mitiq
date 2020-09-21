@@ -122,6 +122,3 @@ def mitiq_polyfit(
             warn.message, warn.category, warn.filename, warn.lineno
         )
     return list(opt_params)
-
-
-

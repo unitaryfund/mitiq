@@ -16,7 +16,7 @@
 """Classes corresponding to different zero-noise extrapolation methods."""
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Callable, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 import warnings
 
 import numpy as np
@@ -98,6 +98,12 @@ class BaseFactory(ABC):
         """Returns the expectation values computed by the factory."""
         return np.array(self._outstack)
 
+    def _get_keyword_args(self) -> List[Dict[str, Any]]:
+        params = deepcopy(self._instack)
+        for d in params:
+            _ = d.pop("scale_factor")
+        return params
+
     def __eq__(self, other):
         if len(self._instack) != len(other._instack):
             return False
@@ -109,17 +115,18 @@ class BaseFactory(ABC):
 
 class BatchedFactory(BaseFactory, ABC):
     """A factory in which all circuits to be executed can be pre-computed."""
+
     def __init__(
-            self,
-            scale_factors: Sequence[float],
-            shot_list: Optional[Sequence[float]] = None,
+        self,
+        scale_factors: Sequence[float],
+        shot_list: Optional[Sequence[float]] = None,
     ) -> None:
         super(BatchedFactory, self).__init__()
 
         if shot_list:
             if len(shot_list) != len(scale_factors):
                 raise ValueError(
-                    "len(scale_factors) and len(shot_list) must be equal but "
+                    "len(scale_factors) must equal len(shot_list) but "
                     f"len(scale_factors) = {len(scale_factors)} and "
                     f"len(shot_list) = {len(shot_list)}."
                 )
@@ -127,11 +134,30 @@ class BatchedFactory(BaseFactory, ABC):
                 {"scale_factor": scale_factor, "shots": shots}
                 for scale_factor, shots in zip(scale_factors, shot_list)
             ]
+        else:
+            self._instack = [
+                {"scale_factor": scale_factor} for scale_factor in scale_factors
+            ]
 
-        self._instack = [
-            {"scale_factor": scale_factor} for
-            scale_factor in scale_factors
+    def run_classical(
+        self, scale_factor_to_expectation_value: Callable[..., float],
+    ) -> "BatchedFactory":
+        """Computes expectation values by calling the input function at each
+        scale factor.
+
+        Args:
+            scale_factor_to_expectation_value: Function which inputs a scale
+                factor (float) and outputs the expectation value at this scale
+                factor. This is a classical analogue to what a quantum computer
+                would do provided a circuit, noise scaling method, and scale
+                factor.
+        """
+        kwargs = self._get_keyword_args()
+        self._outstack = [
+            scale_factor_to_expectation_value(scale_factor, **kwargs[i])
+            for i, scale_factor in enumerate(self.get_scale_factors())
         ]
+        return self
 
     def run(
         self,
@@ -141,6 +167,8 @@ class BatchedFactory(BaseFactory, ABC):
         num_to_average: int = 1,
     ) -> "BatchedFactory":
         """Computes the expectation values at each scale factor."""
+        kwargs = self._get_keyword_args()
+
         # Generate all the noise scaled circuits to run
         to_run = []  # TODO: Store this?
         for scale_factor in self.get_scale_factors():
@@ -152,8 +180,8 @@ class BatchedFactory(BaseFactory, ABC):
         #  For now, assume the executor inputs a single circuit and just run
         #  each individually.
         res = []
-        for circuit in to_run:
-            res.append(executor(circuit))  # TODO: Use shots/other optional args
+        for i, circuit in enumerate(to_run):
+            res.append(executor(circuit, **kwargs[i]))
 
         # Average the expectation results
         self._outstack = [

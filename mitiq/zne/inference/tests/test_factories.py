@@ -30,7 +30,10 @@ from mitiq.zne.inference.factories import (
     PolyExpFactory,
     AdaExpFactory,
 )
-from mitiq.zne.inference.fitting import ExtrapolationError, ExtrapolationWarning
+from mitiq.zne.inference.fitting import (
+    ExtrapolationError,
+    ExtrapolationWarning,
+)
 
 # Constant parameters for test functions:
 A = 0.5
@@ -197,10 +200,12 @@ def test_get_expectation_values_static_factories(factory):
     fac.run(
         cirq.Circuit(),
         executor=lambda circ: 1.0,
-        scale_noise=lambda circ, _: circ
+        scale_noise=lambda circ, _: circ,
     )
     assert isinstance(fac.get_expectation_values(), np.ndarray)
-    assert np.allclose(fac.get_expectation_values(), np.ones_like(scale_factors))
+    assert np.allclose(
+        fac.get_expectation_values(), np.ones_like(scale_factors)
+    )
 
 
 @mark.parametrize("factory", (AdaExpFactory,))
@@ -239,125 +244,125 @@ def test_get_expectation_values_adaptive_factories(factory):
     )
 
 
-# @mark.parametrize("test_f", [f_lin, f_non_lin])
-# def test_richardson_extr(test_f: Callable[[float], float]):
-#     """Test of the Richardson's extrapolator."""
-#     seeded_f = apply_seed_to_func(test_f, SEED)
-#     fac = RichardsonFactory(scale_factors=X_VALS)
-#     assert fac.opt_params == []
-#     fac.iterate(seeded_f)
-#     zne_value = fac.reduce()
-#     assert np.isclose(zne_value, seeded_f(0, err=0), atol=CLOSE_TOL)
-#     assert len(fac.opt_params) == len(X_VALS)
-#     assert np.isclose(fac.opt_params[-1], zne_value)
-#
-#
-# def test_linear_extr():
-#     """Tests extrapolation with a LinearFactory."""
-#     seeded_f = apply_seed_to_func(f_lin, SEED)
-#     fac = LinearFactory(X_VALS)
-#     assert fac.opt_params == []
-#     fac.iterate(seeded_f)
-#     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
-#     assert np.allclose(fac.opt_params, [B, A], atol=CLOSE_TOL)
-#
-#
-# def test_poly_extr():
-#     """Test of polynomial extrapolator."""
-#     # test (order=1)
-#     fac = PolyFactory(X_VALS, order=1)
-#     fac.iterate(f_lin)
-#     assert np.isclose(fac.reduce(), f_lin(0, err=0), atol=CLOSE_TOL)
-#     # test that, for some non-linear functions,
-#     # order=1 is bad while order=2 is better.
-#     seeded_f = apply_seed_to_func(f_non_lin, SEED)
-#     fac = PolyFactory(X_VALS, order=1)
-#     fac.iterate(seeded_f)
-#     assert not np.isclose(fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL)
-#     seeded_f = apply_seed_to_func(f_non_lin, SEED)
-#     fac = PolyFactory(X_VALS, order=2)
-#     fac.iterate(seeded_f)
-#     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
-#
-#
-# @mark.parametrize("order", [2, 3, 4, 5])
-# def test_opt_params_poly_factory(order):
-#     """Tests that optimal parameters are stored after calling the reduce method.
-#     """
-#     fac = PolyFactory(scale_factors=np.linspace(1, 10, 10), order=order)
-#     assert fac.opt_params == []
-#     fac.iterate(apply_seed_to_func(f_non_lin, seed=SEED))
-#     zne_value = fac.reduce()
-#     assert len(fac.opt_params) == order + 1
-#     assert np.isclose(fac.opt_params[-1], zne_value)
-#
-#
-# @mark.parametrize("avoid_log", [False, True])
-# @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-# def test_exp_factory_with_asympt(
-#     test_f: Callable[[float], float], avoid_log: bool
-# ):
-#     """Test of exponential extrapolator."""
-#     seeded_f = apply_seed_to_func(test_f, SEED)
-#     fac = ExpFactory(X_VALS, asymptote=A, avoid_log=True)
-#     fac.iterate(seeded_f)
-#     assert len(fac.opt_params) == 0
-#     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
-#
-#     # There are three parameters to fit in the exponential ansatz
-#     assert len(fac.opt_params) == 3
-#
-#
-# @mark.parametrize("test_f", [f_exp_down, f_exp_up])
-# def test_exp_factory_no_asympt(test_f: Callable[[float], float]):
-#     """Test of exponential extrapolator."""
-#     seeded_f = apply_seed_to_func(test_f, SEED)
-#     fac = ExpFactory(X_VALS, asymptote=None)
-#     fac.iterate(seeded_f)
-#     assert len(fac.opt_params) == 0
-#     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
-#
-#     # There are three parameters to fit in the exponential ansatz
-#     assert len(fac.opt_params) == 3
-#
-#
-# @mark.parametrize("avoid_log", [False, True])
-# @mark.parametrize("test_f", [f_poly_exp_down, f_poly_exp_up])
-# def test_poly_exp_factory_with_asympt(
-#     test_f: Callable[[float], float], avoid_log: bool
-# ):
-#     """Test of (almost) exponential extrapolator."""
-#     # test that, for a non-linear exponent,
-#     # order=1 is bad while order=2 is better.
-#     seeded_f = apply_seed_to_func(test_f, SEED)
-#     fac = PolyExpFactory(X_VALS, order=1, asymptote=A, avoid_log=avoid_log)
-#     fac.iterate(seeded_f)
-#     assert not np.isclose(fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL)
-#     seeded_f = apply_seed_to_func(test_f, SEED)
-#     fac = PolyExpFactory(X_VALS, order=2, asymptote=A, avoid_log=avoid_log)
-#     fac.iterate(seeded_f)
-#     assert len(fac.opt_params) == 0
-#     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=POLYEXP_TOL)
-#
-#     # There are four parameters to fit for the PolyExpFactory of order 1
-#     assert len(fac.opt_params) == 4
-#
-#
-# @mark.parametrize("test_f", [f_poly_exp_down, f_poly_exp_up])
-# def test_poly_exp_factory_no_asympt(test_f: Callable[[float], float]):
-#     """Test of (almost) exponential extrapolator."""
-#     seeded_f = apply_seed_to_func(test_f, SEED)
-#     # test that, for a non-linear exponent,
-#     # order=1 is bad while order=2 is better.
-#     fac = PolyExpFactory(X_VALS, order=1, asymptote=None)
-#     fac.iterate(seeded_f)
-#     assert not np.isclose(fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL)
-#     seeded_f = apply_seed_to_func(test_f, SEED)
-#     fac = PolyExpFactory(X_VALS, order=2, asymptote=None)
-#     fac.iterate(seeded_f)
-#     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=POLYEXP_TOL)
-#
-#
+@mark.parametrize("test_f", [f_lin, f_non_lin])
+def test_richardson_extr(test_f: Callable[[float], float]):
+    """Test of the Richardson's extrapolator."""
+    seeded_f = apply_seed_to_func(test_f, SEED)
+    fac = RichardsonFactory(scale_factors=X_VALS)
+    assert fac.opt_params == []
+    fac.run_classical(seeded_f)
+    zne_value = fac.reduce()
+    assert np.isclose(zne_value, seeded_f(0, err=0), atol=CLOSE_TOL)
+    assert len(fac.opt_params) == len(X_VALS)
+    assert np.isclose(fac.opt_params[-1], zne_value)
+
+
+def test_linear_extr():
+    """Tests extrapolation with a LinearFactory."""
+    seeded_f = apply_seed_to_func(f_lin, SEED)
+    fac = LinearFactory(X_VALS)
+    assert fac.opt_params == []
+    fac.run_classical(seeded_f)
+    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+    assert np.allclose(fac.opt_params, [B, A], atol=CLOSE_TOL)
+
+
+def test_poly_extr():
+    """Test of polynomial extrapolator."""
+    # test (order=1)
+    fac = PolyFactory(X_VALS, order=1)
+    fac.run_classical(f_lin)
+    assert np.isclose(fac.reduce(), f_lin(0, err=0), atol=CLOSE_TOL)
+    # test that, for some non-linear functions,
+    # order=1 is bad while order=2 is better.
+    seeded_f = apply_seed_to_func(f_non_lin, SEED)
+    fac = PolyFactory(X_VALS, order=1)
+    fac.run_classical(seeded_f)
+    assert not np.isclose(fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL)
+    seeded_f = apply_seed_to_func(f_non_lin, SEED)
+    fac = PolyFactory(X_VALS, order=2)
+    fac.run_classical(seeded_f)
+    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+
+
+@mark.parametrize("order", [2, 3, 4, 5])
+def test_opt_params_poly_factory(order):
+    """Tests that optimal parameters are stored after calling the reduce method.
+    """
+    fac = PolyFactory(scale_factors=np.linspace(1, 10, 10), order=order)
+    assert fac.opt_params == []
+    fac.run_classical(apply_seed_to_func(f_non_lin, seed=SEED))
+    zne_value = fac.reduce()
+    assert len(fac.opt_params) == order + 1
+    assert np.isclose(fac.opt_params[-1], zne_value)
+
+
+@mark.parametrize("avoid_log", [False, True])
+@mark.parametrize("test_f", [f_exp_down, f_exp_up])
+def test_exp_factory_with_asympt(
+    test_f: Callable[[float], float], avoid_log: bool
+):
+    """Test of exponential extrapolator."""
+    seeded_f = apply_seed_to_func(test_f, SEED)
+    fac = ExpFactory(X_VALS, asymptote=A, avoid_log=True)
+    fac.run_classical(seeded_f)
+    assert len(fac.opt_params) == 0
+    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+
+    # There are three parameters to fit in the exponential ansatz
+    assert len(fac.opt_params) == 3
+
+
+@mark.parametrize("test_f", [f_exp_down, f_exp_up])
+def test_exp_factory_no_asympt(test_f: Callable[[float], float]):
+    """Test of exponential extrapolator."""
+    seeded_f = apply_seed_to_func(test_f, SEED)
+    fac = ExpFactory(X_VALS, asymptote=None)
+    fac.run_classical(seeded_f)
+    assert len(fac.opt_params) == 0
+    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+
+    # There are three parameters to fit in the exponential ansatz
+    assert len(fac.opt_params) == 3
+
+
+@mark.parametrize("avoid_log", [False, True])
+@mark.parametrize("test_f", [f_poly_exp_down, f_poly_exp_up])
+def test_poly_exp_factory_with_asympt(
+    test_f: Callable[[float], float], avoid_log: bool
+):
+    """Test of (almost) exponential extrapolator."""
+    # test that, for a non-linear exponent,
+    # order=1 is bad while order=2 is better.
+    seeded_f = apply_seed_to_func(test_f, SEED)
+    fac = PolyExpFactory(X_VALS, order=1, asymptote=A, avoid_log=avoid_log)
+    fac.run_classical(seeded_f)
+    assert not np.isclose(fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL)
+    seeded_f = apply_seed_to_func(test_f, SEED)
+    fac = PolyExpFactory(X_VALS, order=2, asymptote=A, avoid_log=avoid_log)
+    fac.run_classical(seeded_f)
+    assert len(fac.opt_params) == 0
+    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=POLYEXP_TOL)
+
+    # There are four parameters to fit for the PolyExpFactory of order 1
+    assert len(fac.opt_params) == 4
+
+
+@mark.parametrize("test_f", [f_poly_exp_down, f_poly_exp_up])
+def test_poly_exp_factory_no_asympt(test_f: Callable[[float], float]):
+    """Test of (almost) exponential extrapolator."""
+    seeded_f = apply_seed_to_func(test_f, SEED)
+    # test that, for a non-linear exponent,
+    # order=1 is bad while order=2 is better.
+    fac = PolyExpFactory(X_VALS, order=1, asymptote=None)
+    fac.run_classical(seeded_f)
+    assert not np.isclose(fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL)
+    seeded_f = apply_seed_to_func(test_f, SEED)
+    fac = PolyExpFactory(X_VALS, order=2, asymptote=None)
+    fac.run_classical(seeded_f)
+    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=POLYEXP_TOL)
+
+
 @mark.parametrize("avoid_log", [False, True])
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
 def test_ada_exp_factory_with_asympt(
@@ -413,14 +418,14 @@ def test_ada_exp_factory_no_asympt_more_steps(
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
 
-# def test_avoid_log_keyword():
-#     """Test that avoid_log=True and avoid_log=False give different results."""
-#     fac = ExpFactory(X_VALS, asymptote=A, avoid_log=False)
-#     fac.iterate(f_exp_down)
-#     znl_with_log = fac.reduce()
-#     fac.avoid_log = True
-#     znl_without_log = fac.reduce()
-#     assert not znl_with_log == znl_without_log
+def test_avoid_log_keyword():
+    """Test that avoid_log=True and avoid_log=False give different results."""
+    fac = ExpFactory(X_VALS, asymptote=A, avoid_log=False)
+    fac.run_classical(f_exp_down)
+    znl_with_log = fac.reduce()
+    fac.avoid_log = True
+    znl_without_log = fac.reduce()
+    assert znl_with_log != znl_without_log
 
 #
 # def test_less_than_two_scale_factors_error():
@@ -469,6 +474,7 @@ def test_failing_fit_warnings(fac):
     ):
         fac.reduce()
 
+
 #
 # def test_iteration_warnings():
 #     """Test that the correct warning is raised beyond the iteration limit."""
@@ -480,59 +486,60 @@ def test_failing_fit_warnings(fac):
 #         fac.iterate(lambda scale_factor: 1.0, max_iterations=3)
 #
 #
-# @mark.parametrize("factory", (LinearFactory, RichardsonFactory, PolyFactory))
-# def test_equal(factory):
-#     """Tests that copies are factories are equal to the original factories."""
-#     for iterate in (True, False):
-#         if factory is PolyFactory:
-#             fac = factory(
-#                 scale_factors=[1, 2, 3], order=2, shot_list=[1, 2, 3]
-#             )
-#         else:
-#             fac = factory(scale_factors=[1, 2, 3], shot_list=[1, 2, 3])
-#         if iterate:
-#             fac.iterate(noise_to_expval=lambda x, shots: np.exp(x) + 0.5)
-#
-#         copied_factory = copy(fac)
-#         assert copied_factory == fac
-#         assert copied_factory is not fac
-#
-#         if iterate:
-#             fac.reduce()
-#             copied_factory = copy(fac)
-#             assert copied_factory == fac
-#             assert copied_factory is not fac
-#
-#
-# @mark.parametrize("fac_class", [LinearFactory, RichardsonFactory])
-# def test_iterate_with_shot_list(fac_class):
-#     """Tests factories with (and without) the "shot_list" argument."""
-#     # first test without shot_list
-#     fac = fac_class(X_VALS)
-#     fac.iterate(f_lin_shot)
-#     assert np.isclose(fac.reduce(), f_lin_shot(0), atol=CLOSE_TOL)
-#
-#     # Check instack and outstack are as expected
-#     SHOT_LIST = [100, 200, 300, 400, 500]
-#     for j, shots in enumerate(SHOT_LIST):
-#         assert fac._instack[j] == {"scale_factor": X_VALS[j]}
-#         assert fac._outstack[j] != f_lin_shot(X_VALS[j], shots=shots)
-#         assert fac._outstack[j] == f_lin_shot(X_VALS[j])
-#
-#     # Now pass an arbitrary shot_list as an argument
-#     fac = fac_class(X_VALS, shot_list=SHOT_LIST)
-#     fac.iterate(f_lin_shot)
-#     assert np.isclose(fac.reduce(), f_lin_shot(0), atol=CLOSE_TOL)
-#
-#     # Check instack and outstack are as expected
-#     for j, shots in enumerate(SHOT_LIST):
-#         assert fac._instack[j] == {"scale_factor": X_VALS[j], "shots": shots}
-#         assert fac._outstack[j] == f_lin_shot(X_VALS[j], shots=shots)
-#         assert fac._outstack[j] != f_lin_shot(X_VALS[j])
+@mark.parametrize("factory", (LinearFactory, RichardsonFactory, PolyFactory))
+def test_equal(factory):
+    """Tests that copies of factories are equal to the original factories."""
+    for iterate in (True, False):
+        if factory is PolyFactory:
+            fac = factory(
+                scale_factors=[1, 2, 3], order=2, shot_list=[1, 2, 3]
+            )
+        else:
+            fac = factory(scale_factors=[1, 2, 3], shot_list=[1, 2, 3])
+        if iterate:
+            fac.run_classical(lambda x, shots: np.exp(x) + 0.5)
+
+        copied_factory = copy(fac)
+        assert copied_factory == fac
+        assert copied_factory is not fac
+
+        if iterate:
+            fac.reduce()
+            copied_factory = copy(fac)
+            assert copied_factory == fac
+            assert copied_factory is not fac
+
+
+@mark.parametrize("factory", [LinearFactory, RichardsonFactory])
+def test_iterate_with_shot_list(factory):
+    """Tests factories with (and without) the "shot_list" argument."""
+    # first test without shot_list
+    fac = factory(X_VALS)
+    fac.run_classical(f_lin_shot)
+    assert np.isclose(fac.reduce(), f_lin_shot(0), atol=CLOSE_TOL)
+
+    # Check instack and outstack are as expected
+    SHOT_LIST = [100, 200, 300, 400, 500]
+    for j, shots in enumerate(SHOT_LIST):
+        assert fac._instack[j] == {"scale_factor": X_VALS[j]}
+        assert fac._outstack[j] != f_lin_shot(X_VALS[j], shots=shots)
+        assert fac._outstack[j] == f_lin_shot(X_VALS[j])
+
+    # Now pass an arbitrary shot_list as an argument
+    fac = factory(X_VALS, shot_list=SHOT_LIST)
+    fac.run_classical(f_lin_shot)
+    assert np.isclose(fac.reduce(), f_lin_shot(0), atol=CLOSE_TOL)
+
+    print(fac._instack)
+
+    # Check instack and outstack are as expected
+    for j, shots in enumerate(SHOT_LIST):
+        assert fac._instack[j] == {"scale_factor": X_VALS[j], "shots": shots}
+        assert np.isclose(fac._outstack[j], f_lin_shot(X_VALS[j], shots=shots))
+        assert fac._outstack[j] != f_lin_shot(X_VALS[j])
 
 
 def test_shot_list_errors():
     """Tests errors related to the "shot_lists" argument."""
-    with raises(ValueError, match=r"must be equal"):
+    with raises(ValueError, match="must equal"):
         PolyFactory([1, 2, 3], order=2, shot_list=[1, 2])
-

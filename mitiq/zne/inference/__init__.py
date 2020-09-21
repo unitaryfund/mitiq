@@ -14,10 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tools for fitting data and extrapolating to the zero-noise limit."""
-from mitiq.zne.inference.fitting import (
-    mitiq_curve_fit,
-    mitiq_polyfit
-)
+from mitiq.zne.inference.fitting import mitiq_curve_fit, mitiq_polyfit
 from mitiq.zne.inference.factories import (
     AdaExpFactory,
     ExpFactory,
