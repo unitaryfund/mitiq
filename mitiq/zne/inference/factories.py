@@ -210,6 +210,7 @@ class BatchedFactory(BaseFactory, ABC):
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
 
         # Run the circuits in a batch
+        # TODO: Deal with keyword args better.
         res = batched_executor(to_run, kwargs=kwargs)
 
         # Average the expectation results
@@ -245,6 +246,9 @@ class BatchedFactory(BaseFactory, ABC):
             quantum backend.
         """
         kwargs = self._get_keyword_args()
+        kwargs = np.array(
+            [[k for _ in range(num_to_average)] for k in kwargs]
+        ).flatten().tolist()
 
         # Get all noise-scaled circuits to run
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
