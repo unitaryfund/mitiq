@@ -441,16 +441,25 @@ def test_few_scale_factors_error():
         _ = PolyFactory(X_VALS, order=10)
 
 
-def test_too_few_points_for_polyfit_error():
-    """Test that the correct error is raised if data is not enough to fit."""
+def test_too_few_points_for_polyfit_warning():
+    """Test that the correct warning is raised if data is not enough to fit."""
     fac = PolyFactory(X_VALS, order=2)
     fac._instack = [
         {"scale_factor": 1.0, "shots": 100},
         {"scale_factor": 2.0, "shots": 100},
     ]
     fac._outstack = [1.0, 2.0]
-    with raises(ValueError, match=r"Extrapolation order is too high."):
+    with warns(
+        ExtrapolationWarning,
+        match=r"The extrapolation fit may be ill-conditioned.",
+    ):
         fac.reduce()
+    # test also the static "extrapolate" method.
+    with warns(
+        ExtrapolationWarning,
+        match=r"The extrapolation fit may be ill-conditioned.",
+    ):
+        PolyFactory.extrapolate([1.0, 2.0], [1.0, 2.0], order=2)
 
 
 def test_failing_fit_error():
@@ -462,6 +471,11 @@ def test_failing_fit_error():
         ExtrapolationError, match=r"The extrapolation fit failed to converge."
     ):
         fac.reduce()
+    # test also the static "extrapolate" method.
+    with raises(
+        ExtrapolationError, match=r"The extrapolation fit failed to converge."
+    ):
+        ExpFactory.extrapolate(X_VALS, [1.0, 2.0, 1.0, 2.0, 1.0])
 
 
 @mark.parametrize("fac", [LinearFactory([1, 1, 1]), ExpFactory([1, 1, 1])])
@@ -474,6 +488,12 @@ def test_failing_fit_warnings(fac):
         match=r"The extrapolation fit may be ill-conditioned.",
     ):
         fac.reduce()
+    # test also the static "extrapolate" method.
+    with warns(
+        ExtrapolationWarning,
+        match=r"The extrapolation fit may be ill-conditioned.",
+    ):
+        fac.extrapolate([1, 1, 1, 1], [1.0, 1.0, 1.0, 1.0])
 
 
 def test_iteration_warnings():
@@ -543,3 +563,35 @@ def test_shot_list_errors():
         PolyFactory(X_VALS, order=2, shot_list=[1, 2])
     with raises(TypeError, match=r"valid iterator of integers"):
         PolyFactory(X_VALS, order=2, shot_list=[1.0, 2])
+
+
+def test_push_after_already_reduced_warning():
+    """Tests a warning is raised if new data is pushed in a factory
+    which was already reduced."""
+    fac = LinearFactory([1, 2])
+    fac.push({"scale_factor": 1.0}, 1.0)
+    fac.push({"scale_factor": 2.0}, 2.0)
+    fac.reduce()
+    with warns(
+        ExtrapolationWarning,
+        match=r"You are pushing new data into a factory object",
+    ):
+        fac.push({"scale_factor": 3.0}, 3.0)
+    # Assert no warning is raised when .reset() is used
+    fac.reset()
+    fac.push({"scale_factor": 1.0}, 2.0)
+    fac.push({"scale_factor": 2.0}, 1.0)
+    assert np.isclose(3.0, fac.reduce())
+
+
+def test_full_output_keyword():
+    """Tests the full_output keyword in extrapolate method."""
+    zlim = LinearFactory.extrapolate([1, 2], [1, 2])
+    assert np.isclose(zlim, 0.0)
+    zlim, opt_params = LinearFactory.extrapolate(
+        [1, 2], [1, 2], full_output=True
+    )
+    assert len(opt_params) == 2
+    assert np.isclose(zlim, 0.0)
+    assert np.isclose(0.0, opt_params[1])
+    assert np.isclose(1.0, opt_params[0])

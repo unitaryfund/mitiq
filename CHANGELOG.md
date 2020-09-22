@@ -17,6 +17,7 @@ This marks the first public release of Mitiq on a stable version.
 
 ### All Changes
 
+- Add static extrapolate method to all factories (@andreamari, gh-352).
 - Add the ``angle`` module for parameter noise scaling (@yhindy, gh-288).
 - Add to the documentation instructions for maintainers to make a new release (@nathanshammah, gh-332).
 - Add basic compilation facilities, don't relabel qubits (@karalekas, gh-324).
