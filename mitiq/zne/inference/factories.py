@@ -214,7 +214,7 @@ class BatchedFactory(BaseFactory, ABC):
 
         # Average the expectation results
         self._outstack = [
-            np.average(res[i * num_to_average : (i + 1) * num_to_average])
+            np.average(res[i * num_to_average: (i + 1) * num_to_average])
             for i in range(len(res) // num_to_average)
         ]
 
@@ -256,7 +256,7 @@ class BatchedFactory(BaseFactory, ABC):
 
         # Average the expectation results
         self._outstack = [
-            np.average(res[i * num_to_average : (i + 1) * num_to_average])
+            np.average(res[i * num_to_average: (i + 1) * num_to_average])
             for i in range(len(res) // num_to_average)
         ]
 
