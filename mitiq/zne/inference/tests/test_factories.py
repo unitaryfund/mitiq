@@ -199,16 +199,17 @@ def test_get_expectation_values_static_factories(factory, batched):
 
     # Compute expectation values at all the scale factors
     if batched:
+
         def batched_executor(circuits, kwargs):
             return [1.0] * len(circuits)
 
-        fac.run(
+        fac.run_batched(
             cirq.Circuit(),
             batched_executor=batched_executor,
             scale_noise=lambda circ, _: circ,
         )
     else:
-        fac.run_sequential(
+        fac.run(
             cirq.Circuit(),
             executor=lambda circ: 1.0,
             scale_noise=lambda circ, _: circ,

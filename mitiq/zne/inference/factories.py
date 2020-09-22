@@ -163,7 +163,7 @@ class BatchedFactory(BaseFactory, ABC):
         self,
         circuit: QPROGRAM,
         scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
-        num_to_average: int = 1
+        num_to_average: int = 1,
     ) -> List[QPROGRAM]:
         """Returns all noise-scaled circuits to run.
 
@@ -179,14 +179,15 @@ class BatchedFactory(BaseFactory, ABC):
                 to_run.append(scale_noise(circuit, scale_factor))
         return to_run
 
-    def run(
+    def run_batched(
         self,
         qp: QPROGRAM,
         batched_executor: Callable[..., List[float]],
         scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
         num_to_average: int = 1,
     ) -> "BatchedFactory":
-        """Computes the expectation values at each scale factor.
+        """Computes the expectation values at each scale factor by calling
+        `batched_executor` on a list of all circuits to run.
 
         Args:
             qp: Quantum circuit to run.
@@ -219,7 +220,7 @@ class BatchedFactory(BaseFactory, ABC):
 
         return self
 
-    def run_sequential(
+    def run(
         self,
         qp: QPROGRAM,
         executor: Callable[..., float],
