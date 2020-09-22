@@ -136,7 +136,7 @@ class BatchedFactory(BaseFactory, ABC):
             ]
         else:
             self._instack = [
-                {"scale_factor": scale_factor} for scale_factor in scale_factors
+                {"scale_factor": scale} for scale in scale_factors
             ]
 
     def run_classical(
@@ -159,33 +159,103 @@ class BatchedFactory(BaseFactory, ABC):
         ]
         return self
 
+    def _generate_circuits(
+        self,
+        circuit: QPROGRAM,
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        num_to_average: int = 1
+    ) -> List[QPROGRAM]:
+        """Returns all noise-scaled circuits to run.
+
+        Args:
+            circuit: Base circuit to scale noise in.
+            scale_noise: Noise scaling function.
+            num_to_average: Number of times to call scale_noise at each scale
+                factor.
+        """
+        to_run = []  # TODO: Store this?
+        for scale_factor in self.get_scale_factors():
+            for _ in range(num_to_average):
+                to_run.append(scale_noise(circuit, scale_factor))
+        return to_run
+
     def run(
+        self,
+        qp: QPROGRAM,
+        batched_executor: Callable[..., List[float]],
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        num_to_average: int = 1,
+    ) -> "BatchedFactory":
+        """Computes the expectation values at each scale factor.
+
+        Args:
+            qp: Quantum circuit to run.
+            batched_executor: Function which inputs a list of circuits and
+                outputs a list of expectation values.
+            scale_noise: Noise scaling function.
+            scale_noise: Noise scaling function.
+            num_to_average: Number of times to call scale_noise at each scale
+                factor.
+
+        Notes:
+            `BatchedFactory.run_sequential` uses an executor which inputs a
+            single quantum circuit and outputs a single expectation value. This
+            method may take significantly longer to run due to back-and-forth
+            communication with the quantum backend.
+        """
+        kwargs = self._get_keyword_args()
+
+        # Get all noise-scaled circuits to run
+        to_run = self._generate_circuits(qp, scale_noise, num_to_average)
+
+        # Run the circuits in a batch
+        res = batched_executor(to_run, kwargs=kwargs)
+
+        # Average the expectation results
+        self._outstack = [
+            np.average(res[i * num_to_average : (i + 1) * num_to_average])
+            for i in range(len(res) // num_to_average)
+        ]
+
+        return self
+
+    def run_sequential(
         self,
         qp: QPROGRAM,
         executor: Callable[..., float],
         scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
         num_to_average: int = 1,
     ) -> "BatchedFactory":
-        """Computes the expectation values at each scale factor."""
+        """Computes the expectation values at each scale factor by calling the
+        executor sequentially.
+
+        Args:
+            qp: Quantum circuit to run.
+            executor: Function which inputs a single circuit and outputs a
+                single expectation value of interest.
+            scale_noise: Noise scaling function.
+            num_to_average: Number of times to call scale_noise at each scale
+                factor.
+
+        Notes:
+            `BatchedFactory.run` is an alternative which runs sends all
+            circuits to run in a single batch. This can significantly decrease
+            execution time by avoiding back-and-forth communication with the
+            quantum backend.
+        """
         kwargs = self._get_keyword_args()
 
-        # Generate all the noise scaled circuits to run
-        to_run = []  # TODO: Store this?
-        for scale_factor in self.get_scale_factors():
-            for _ in range(num_to_average):
-                to_run.append(scale_noise(qp, scale_factor))
+        # Get all noise-scaled circuits to run
+        to_run = self._generate_circuits(qp, scale_noise, num_to_average)
 
-        # Send them as a batch to the executor OR run them one by one
-        # TODO: Determine which executor type is input and call appropriately.
-        #  For now, assume the executor inputs a single circuit and just run
-        #  each individually.
+        # Run them sequentially
         res = []
         for i, circuit in enumerate(to_run):
             res.append(executor(circuit, **kwargs[i]))
 
         # Average the expectation results
         self._outstack = [
-            np.average(res[i * num_to_average: (i + 1) * num_to_average])
+            np.average(res[i * num_to_average : (i + 1) * num_to_average])
             for i in range(len(res) // num_to_average)
         ]
 

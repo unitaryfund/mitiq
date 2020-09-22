@@ -184,7 +184,8 @@ def test_get_scale_factors_adaptive_factories(factory):
         PolyExpFactory,
     ),
 )
-def test_get_expectation_values_static_factories(factory):
+@mark.parametrize("batched", (True, False))
+def test_get_expectation_values_static_factories(factory, batched):
     scale_factors = np.linspace(1.0, 10.0, num=20)
 
     if factory is PolyFactory or factory is PolyExpFactory:
@@ -197,11 +198,21 @@ def test_get_expectation_values_static_factories(factory):
     assert len(fac.get_expectation_values()) == 0
 
     # Compute expectation values at all the scale factors
-    fac.run(
-        cirq.Circuit(),
-        executor=lambda circ: 1.0,
-        scale_noise=lambda circ, _: circ,
-    )
+    if batched:
+        def batched_executor(circuits, kwargs):
+            return [1.0] * len(circuits)
+
+        fac.run(
+            cirq.Circuit(),
+            batched_executor=batched_executor,
+            scale_noise=lambda circ, _: circ,
+        )
+    else:
+        fac.run_sequential(
+            cirq.Circuit(),
+            executor=lambda circ: 1.0,
+            scale_noise=lambda circ, _: circ,
+        )
     assert isinstance(fac.get_expectation_values(), np.ndarray)
     assert np.allclose(
         fac.get_expectation_values(), np.ones_like(scale_factors)
@@ -427,6 +438,7 @@ def test_avoid_log_keyword():
     znl_without_log = fac.reduce()
     assert znl_with_log != znl_without_log
 
+
 #
 # def test_less_than_two_scale_factors_error():
 #     """Test less than 2 scale_factors."""
@@ -529,8 +541,6 @@ def test_iterate_with_shot_list(factory):
     fac = factory(X_VALS, shot_list=SHOT_LIST)
     fac.run_classical(f_lin_shot)
     assert np.isclose(fac.reduce(), f_lin_shot(0), atol=CLOSE_TOL)
-
-    print(fac._instack)
 
     # Check instack and outstack are as expected
     for j, shots in enumerate(SHOT_LIST):
