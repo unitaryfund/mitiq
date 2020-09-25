@@ -19,6 +19,7 @@
 - Redesign factories, batch runs in BatchedFactory, fix Qiskit utils tests (@rmlarose, @andreamari, gh-381).
 - Added Tensorflow Quantum executor to docs (@k-m-schultz, gh-348).
 - Fix a collection of small build & docs issues (@karalekas, gh-410).
+- Add optimal QPR decomposition for depolarizing noise (@karalekas, gh-371).
 
 Thanks to @erkska and @k-m-schultz for their contributions to this release!
 
