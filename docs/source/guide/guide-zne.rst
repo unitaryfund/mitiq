@@ -412,7 +412,7 @@ We can also specify the number of shots to use for each noise-scaled circuit.
    from mitiq.zne.inference import LinearFactory
 
    # Specify the number of shots for each scale factor.
-   linear_fac = LinearFactory(scale_factors=[1.0, 2.0], shot_list=[100, 200])
+   factory_with_shots = LinearFactory(scale_factors=[1.0, 2.0], shot_list=[100, 200])
 
 In this case the factory will pass the number of shots from the `shot_list` to the `executor`. Accordingly, the
 `executor` should support a `shots` keyword argument, otherwise the shot values will go unused.
