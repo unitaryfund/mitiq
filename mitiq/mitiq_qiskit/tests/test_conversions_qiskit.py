@@ -14,8 +14,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for conversions between Mitiq circuits and Qiskit circuits."""
+import pytest
 
 import cirq
+import qiskit
 
 from mitiq.utils import _equal
 from mitiq.mitiq_qiskit.conversions import (
@@ -78,3 +80,42 @@ def test_random_circuit_to_from_qasm():
     assert cirq.equal_up_to_global_phase(
         cirq_circuit.unitary(), circuit_cirq.unitary()
     )
+
+
+@pytest.mark.parametrize("as_qasm", (True, False))
+def test_convert_with_barrier(as_qasm):
+    """Tests converting a Qiskit circuit with a barrier to a Cirq circuit."""
+    n = 5
+    qiskit_circuit = qiskit.QuantumCircuit(qiskit.QuantumRegister(n))
+    qiskit_circuit.barrier()
+
+    if as_qasm:
+        cirq_circuit = from_qasm(qiskit_circuit.qasm())
+    else:
+        cirq_circuit = from_qiskit(qiskit_circuit)
+
+    assert _equal(cirq_circuit, cirq.Circuit())
+
+
+@pytest.mark.parametrize("as_qasm", (True, False))
+def test_convert_with_multiple_barriers(as_qasm):
+    """Tests converting a Qiskit circuit with barriers to a Cirq circuit."""
+    n = 1
+    num_ops = 10
+
+    qreg = qiskit.QuantumRegister(n)
+    qiskit_circuit = qiskit.QuantumCircuit(qreg)
+    for _ in range(num_ops):
+        qiskit_circuit.h(qreg)
+        qiskit_circuit.barrier()
+
+    if as_qasm:
+        cirq_circuit = from_qasm(qiskit_circuit.qasm())
+    else:
+        cirq_circuit = from_qiskit(qiskit_circuit)
+
+    qbit = cirq.LineQubit(0)
+    correct = cirq.Circuit(
+        cirq.ops.H.on(qbit) for _ in range(num_ops)
+    )
+    assert _equal(cirq_circuit, correct)
