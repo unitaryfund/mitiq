@@ -16,7 +16,17 @@
 """Classes corresponding to different zero-noise extrapolation methods."""
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
+import inspect
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+)
 import warnings
 
 import numpy as np
@@ -215,7 +225,7 @@ class BatchedFactory(BaseFactory, ABC):
 
         # Average the expectation results
         self._outstack = [
-            np.average(res[i * num_to_average: (i + 1) * num_to_average])
+            np.average(res[i * num_to_average : (i + 1) * num_to_average])
             for i in range(len(res) // num_to_average)
         ]
 
@@ -224,17 +234,24 @@ class BatchedFactory(BaseFactory, ABC):
     def run(
         self,
         qp: QPROGRAM,
-        executor: Callable[..., float],
+        executor: Tuple[Callable[..., float], Callable[..., List[float]]],
         scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
         num_to_average: int = 1,
     ) -> "BatchedFactory":
-        """Computes the expectation values at each scale factor by calling the
-        executor sequentially.
+        """Computes the expectation values at each scale factor and stores them
+        in the factory. If the executor returns a single expectation value, the
+        circuits are run sequentially. If the executor is batched and returns
+        a list of expectation values (one for each circuit), then the circuits
+        are sent to the backend as a single job. To detect if an executor is
+        batched, it must be annotated.
 
         Args:
             qp: Quantum circuit to run.
-            executor: Function which inputs a single circuit and outputs a
+            executor: A "single executor" (1) or a "batched executor" (2).
+                (1) A function which inputs a single circuit and outputs a
                 single expectation value of interest.
+                (2) A function which inputs a list of circuits and outputs a
+                list of expectation values (one for each circuit).
             scale_noise: Noise scaling function.
             num_to_average: Number of times to call scale_noise at each scale
                 factor.
@@ -245,10 +262,22 @@ class BatchedFactory(BaseFactory, ABC):
             execution time by avoiding back-and-forth communication with the
             quantum backend.
         """
+        executor_annotation = inspect.getfullargspec(executor).annotations
+        if executor_annotation.get("return") in (
+            List[float],
+            Sequence[float],
+            Tuple[float],
+            Iterable[float],
+        ):
+            self.run_batched(qp, executor, scale_noise, num_to_average)
+            return self
+
         kwargs = self._get_keyword_args()
-        kwargs = np.array(
-            [[k for _ in range(num_to_average)] for k in kwargs]
-        ).flatten().tolist()
+        kwargs = (
+            np.array([[k for _ in range(num_to_average)] for k in kwargs])
+            .flatten()
+            .tolist()
+        )
 
         # Get all noise-scaled circuits to run
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
