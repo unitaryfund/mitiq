@@ -8,6 +8,12 @@
 [//]: # " - [Bug Fix]"
 [//]: # " - Fix the bug."
 
+## Development 0.2.0dev
+
+### All Changes
+
+- Add arxiv badge to readme header (@nathanshammah, gh-376).
+
 ## Version 0.1.0 (September 2nd, 2020)
 
 ### Summary
