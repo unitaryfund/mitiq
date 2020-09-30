@@ -30,7 +30,7 @@ from mitiq.mitiq_qiskit.conversions import (
 
 def test_bell_state_to_from_circuits():
     """Tests cirq.Circuit --> qiskit.QuantumCircuit --> cirq.Circuit
-     with a Bell state circuit.
+    with a Bell state circuit.
     """
     qreg = cirq.LineQubit.range(2)
     cirq_circuit = cirq.Circuit(
@@ -43,7 +43,7 @@ def test_bell_state_to_from_circuits():
 
 def test_bell_state_to_from_qasm():
     """Tests cirq.Circuit --> QASM string --> cirq.Circuit
-     with a Bell state circuit.
+    with a Bell state circuit.
     """
     qreg = cirq.LineQubit.range(2)
     cirq_circuit = cirq.Circuit(
@@ -70,7 +70,7 @@ def test_random_circuit_to_from_circuits():
 
 def test_random_circuit_to_from_qasm():
     """Tests cirq.Circuit --> QASM string --> cirq.Circuit
-     with a random one-qubit circuit.
+    with a random one-qubit circuit.
     """
     cirq_circuit = cirq.testing.random_circuit(
         qubits=2, n_moments=10, op_density=0.99, random_state=2
@@ -115,7 +115,5 @@ def test_convert_with_multiple_barriers(as_qasm):
         cirq_circuit = from_qiskit(qiskit_circuit)
 
     qbit = cirq.LineQubit(0)
-    correct = cirq.Circuit(
-        cirq.ops.H.on(qbit) for _ in range(num_ops)
-    )
+    correct = cirq.Circuit(cirq.ops.H.on(qbit) for _ in range(num_ops))
     assert _equal(cirq_circuit, correct)

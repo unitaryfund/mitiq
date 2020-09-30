@@ -22,13 +22,14 @@ from cirq import NamedQubit, Circuit
 
 from mitiq import execute_with_zne
 from mitiq._typing import QPROGRAM
-from mitiq.zne.inference import Factory
+from mitiq.zne.inference import BaseFactory
 from mitiq.zne.scaling import fold_gates_at_random
 from mitiq.benchmarks.utils import noisy_simulation
 
 
 def sample_projector(
-    n_qubits: int, seed: Union[None, int, np.random.RandomState] = None,
+    n_qubits: int,
+    seed: Union[None, int, np.random.RandomState] = None,
 ) -> np.ndarray:
     """Constructs a projector on a random computational basis state of n_qubits.
 
@@ -61,7 +62,7 @@ def rand_circuit_zne(
     depth: int,
     trials: int,
     noise: float,
-    fac: Factory = None,
+    fac: BaseFactory = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     op_density: float = 0.99,
     silent: bool = True,

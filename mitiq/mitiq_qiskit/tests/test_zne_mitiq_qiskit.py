@@ -79,8 +79,7 @@ def test_run_factory():
 
 
 def test_execute_with_zne():
-    """Tests a random identity circuit execution with zero-noise extrapolation.
-    """
+    """Tests a random identity circuit execution with zero-noise extrapolation."""
     rand_circ = random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH)
     qp = measure(rand_circ, qid=0)
     result = execute_with_zne(qp, basic_executor, scale_noise=scale_noise)

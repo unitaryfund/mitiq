@@ -25,7 +25,7 @@ from cirq import identity_each as id
 from scipy.optimize import minimize
 
 from mitiq import execute_with_zne
-from mitiq.zne.inference import Factory
+from mitiq.zne.inference import BaseFactory
 from mitiq.benchmarks.utils import noisy_simulation
 
 SIMULATOR = DensityMatrixSimulator()
@@ -34,7 +34,7 @@ SIMULATOR = DensityMatrixSimulator()
 def make_noisy_backend(
     noise: float, obs: np.ndarray
 ) -> Callable[[Circuit], float]:
-    """ Helper function to match mitiq's backend type signature.
+    """Helper function to match mitiq's backend type signature.
 
     Args:
         noise: The level of depolarizing noise.
@@ -54,7 +54,7 @@ def make_maxcut(
     graph: List[Tuple[int, int]],
     noise: float = 0,
     scale_noise: Callable = None,
-    factory: Factory = None,
+    factory: BaseFactory = None,
 ) -> Tuple[
     Callable[[np.ndarray], float], Callable[[np.ndarray], Circuit], np.ndarray
 ]:
@@ -130,7 +130,7 @@ def run_maxcut(
     x0: np.ndarray,
     noise: float = 0,
     scale_noise: Callable = None,
-    factory: Factory = None,
+    factory: BaseFactory = None,
     verbose: bool = True,
 ) -> Tuple[float, np.ndarray, List]:
     """Solves MAXCUT using QAOA on a cirq wavefunction simulator using a

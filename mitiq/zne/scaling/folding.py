@@ -65,7 +65,9 @@ def _is_measurement(op: ops.Operation) -> bool:
     return isinstance(op.gate, ops.measurement_gate.MeasurementGate)
 
 
-def _pop_measurements(circuit: Circuit,) -> List[Tuple[int, ops.Operation]]:
+def _pop_measurements(
+    circuit: Circuit,
+) -> List[Tuple[int, ops.Operation]]:
     """Removes all measurements from a circuit.
 
     Args:
@@ -170,7 +172,7 @@ def _fold_gates_in_moment(
          circuit: Circuit to fold.
          moment_index: Index of moment to fold gates in.
          gate_indices: Indices of gates within the moments to fold.
-     """
+    """
     for (i, gate_index) in enumerate(gate_indices):
         _fold_gate_at_index_in_moment(
             circuit, moment_index + 2 * i, gate_index

@@ -16,7 +16,18 @@
 """Classes corresponding to different zero-noise extrapolation methods."""
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union
+import inspect
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 import warnings
 
 import numpy as np
@@ -146,20 +157,7 @@ def mitiq_polyfit(
     return list(opt_params)
 
 
-class Factory(ABC):
-    """Abstract class designed to adaptively produce a new noise scaling
-    parameter based on a historical stack of previous noise scale parameters
-    ("self._instack") and previously estimated expectation values
-    ("self._outstack").
-
-    Specific zero-noise extrapolation algorithms, adaptive or non-adaptive,
-    are derived from this class.
-
-    A Factory object is not supposed to directly perform any quantum
-    computation, only the classical results of quantum experiments are
-    processed by it.
-    """
-
+class BaseFactory(ABC):
     def __init__(self) -> None:
         """Initialization arguments (e.g. noise scale factors) depend on the
         particular extrapolation algorithm and can be added to the "__init__"
@@ -170,7 +168,22 @@ class Factory(ABC):
         self.opt_params: List[float] = []
         self._already_reduced = False
 
-    def push(self, instack_val: dict, outstack_val: float) -> "Factory":
+    @abstractmethod
+    def run(
+        self,
+        qp: QPROGRAM,
+        executor: Callable[..., float],
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        num_to_average: int = 1,
+    ) -> "BaseFactory":
+        raise NotImplementedError
+
+    @abstractmethod
+    def reduce(self) -> float:
+        """Returns the extrapolation to the zero-noise limit."""
+        raise NotImplementedError
+
+    def push(self, instack_val: dict, outstack_val: float) -> "BaseFactory":
         """Appends "instack_val" to "self._instack" and "outstack_val" to
         "self._outstack". Each time a new expectation value is computed this
         method should be used to update the internal state of the Factory.
@@ -188,6 +201,16 @@ class Factory(ABC):
         self._outstack.append(outstack_val)
         return self
 
+    def reset(self) -> "BaseFactory":
+        """Resets the instack, outstack, and optimal parameters of the Factory
+        to empty lists.
+        """
+        self._instack = []
+        self._outstack = []
+        self.opt_params = []
+        self._already_reduced = False
+        return self
+
     def get_scale_factors(self) -> np.ndarray:
         """Returns the scale factors at which the factory has computed
         expectation values.
@@ -200,107 +223,11 @@ class Factory(ABC):
         """Returns the expectation values computed by the factory."""
         return np.array(self._outstack)
 
-    @abstractmethod
-    def next(self) -> Dict[str, float]:
-        """Returns a dictionary of parameters to execute a circuit at."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def is_converged(self) -> bool:
-        """Returns True if all needed expectation values have been computed,
-        else False.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def reduce(self) -> float:
-        """Returns the extrapolation to the zero-noise limit."""
-        raise NotImplementedError
-
-    def reset(self) -> "Factory":
-        """Resets the instack, outstack, and optimal parameters of the Factory
-        to empty lists.
-        """
-        self._instack = []
-        self._outstack = []
-        self.opt_params = []
-        self._already_reduced = False
-        return self
-
-    def iterate(
-        self, noise_to_expval: Callable[..., float], max_iterations: int = 100,
-    ) -> "Factory":
-        """Evaluates a sequence of expectation values until enough
-        data is collected (or iterations reach "max_iterations").
-
-        Args:
-            noise_to_expval: Function mapping a noise scale factor to an
-                             expectation value. If shot_list is not None,
-                             "shot" must be an argument of the function.
-            max_iterations: Maximum number of iterations (optional).
-                            Default: 100.
-
-        Raises:
-            ConvergenceWarning: If iteration loop stops before convergence.
-        """
-        # Reset the instack, outstack, and optimal parameters
-        self.reset()
-
-        counter = 0
-        while not self.is_converged() and counter < max_iterations:
-            next_in_params = self.next()
-            next_exec_params = deepcopy(next_in_params)
-
-            # Get next scale factor and remove it from next_exec_params
-            scale_factor = next_exec_params.pop("scale_factor")
-            next_expval = noise_to_expval(scale_factor, **next_exec_params)
-            self.push(next_in_params, next_expval)
-            counter += 1
-
-        if counter == max_iterations:
-            warnings.warn(
-                "Factory iteration loop stopped before convergence. "
-                f"Maximum number of iterations ({max_iterations}) "
-                "was reached.",
-                ConvergenceWarning,
-            )
-
-        return self
-
-    def run(
-        self,
-        qp: QPROGRAM,
-        executor: Callable[..., float],
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
-        num_to_average: int = 1,
-        max_iterations: int = 100,
-    ) -> "Factory":
-        """Evaluates a sequence of expectation values by executing quantum
-        circuits until enough data is collected (or iterations reach
-        "max_iterations").
-
-        Args:
-            qp: Circuit to mitigate.
-            executor: Function executing a circuit; returns an expectation
-                value. If shot_list is not None, then "shot" must be
-                an additional argument of the executor.
-            scale_noise: Function that scales the noise level of a quantum
-                circuit.
-            num_to_average: Number of times expectation values are computed by
-                the executor after each call to scale_noise, then averaged.
-            max_iterations: Maximum number of iterations (optional).
-        """
-
-        def _noise_to_expval(scale_factor, **exec_params) -> float:
-            """Evaluates the quantum expectation value for a given
-            scale_factor and other executor parameters."""
-            expectation_values = []
-            for _ in range(num_to_average):
-                scaled_qp = scale_noise(qp, scale_factor)
-                expectation_values.append(executor(scaled_qp, **exec_params))
-            return np.average(expectation_values)
-
-        return self.iterate(_noise_to_expval, max_iterations)
+    def _get_keyword_args(self) -> List[Dict[str, Any]]:
+        params = deepcopy(self._instack)
+        for d in params:
+            _ = d.pop("scale_factor")
+        return params
 
     def __eq__(self, other):
         if self._already_reduced != other._already_reduced:
@@ -313,7 +240,7 @@ class Factory(ABC):
         return np.allclose(self._outstack, other._outstack)
 
 
-class BatchedFactory(Factory):
+class BatchedFactory(BaseFactory, ABC):
     """Abstract class of a non-adaptive Factory.
 
     This is initialized with a given batch of "scale_factors".
@@ -370,6 +297,167 @@ class BatchedFactory(Factory):
 
         super(BatchedFactory, self).__init__()
 
+    def _batch_populate_instack(self) -> None:
+        """Populates the instack with all computed values."""
+        if self._shot_list:
+            self._instack = [
+                {"scale_factor": scale, "shots": shots}
+                for scale, shots in zip(self._scale_factors, self._shot_list)
+            ]
+        else:
+            self._instack = [
+                {"scale_factor": scale} for scale in self._scale_factors
+            ]
+
+    def run_batched(
+        self,
+        qp: QPROGRAM,
+        batched_executor: Callable[..., List[float]],
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        num_to_average: int = 1,
+    ) -> "BatchedFactory":
+        """Computes the expectation values at each scale factor by calling
+        `batched_executor` on a list of all circuits to run.
+
+        Args:
+            qp: Quantum circuit to run.
+            batched_executor: Function which inputs a list of circuits and
+                outputs a list of expectation values.
+            scale_noise: Noise scaling function.
+            scale_noise: Noise scaling function.
+            num_to_average: Number of times to call scale_noise at each scale
+                factor.
+
+        Notes:
+            `BatchedFactory.run_sequential` uses an executor which inputs a
+            single quantum circuit and outputs a single expectation value. This
+            method may take significantly longer to run due to back-and-forth
+            communication with the quantum backend.
+        """
+        kwargs = self._get_keyword_args()
+
+        # Get all noise-scaled circuits to run
+        to_run = self._generate_circuits(qp, scale_noise, num_to_average)
+
+        # Run the circuits in a batch
+        # TODO: Deal with keyword args better.
+        res = batched_executor(to_run, kwargs=kwargs)
+
+        # Average the expectation results
+        self._outstack = [
+            np.average(res[i * num_to_average: (i + 1) * num_to_average])
+            for i in range(len(res) // num_to_average)
+        ]
+        self._batch_populate_instack()
+
+        return self
+
+    def run(
+        self,
+        qp: QPROGRAM,
+        executor: Tuple[Callable[..., float], Callable[..., List[float]]],
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        num_to_average: int = 1,
+    ) -> "BatchedFactory":
+        """Computes the expectation values at each scale factor and stores them
+        in the factory. If the executor returns a single expectation value, the
+        circuits are run sequentially. If the executor is batched and returns
+        a list of expectation values (one for each circuit), then the circuits
+        are sent to the backend as a single job. To detect if an executor is
+        batched, it must be annotated.
+
+        Args:
+            qp: Quantum circuit to run.
+            executor: A "single executor" (1) or a "batched executor" (2).
+                (1) A function which inputs a single circuit and outputs a
+                single expectation value of interest.
+                (2) A function which inputs a list of circuits and outputs a
+                list of expectation values (one for each circuit).
+            scale_noise: Noise scaling function.
+            num_to_average: Number of times to call scale_noise at each scale
+                factor.
+
+        Notes:
+            `BatchedFactory.run` is an alternative which runs sends all
+            circuits to run in a single batch. This can significantly decrease
+            execution time by avoiding back-and-forth communication with the
+            quantum backend.
+        """
+        executor_annotation = inspect.getfullargspec(executor).annotations
+        if executor_annotation.get("return") in (
+            List[float],
+            Sequence[float],
+            Tuple[float],
+            Iterable[float],
+        ):
+            self.run_batched(qp, executor, scale_noise, num_to_average)
+            return self
+
+        kwargs = self._get_keyword_args()
+        kwargs = (
+            np.array([[k for _ in range(num_to_average)] for k in kwargs])
+            .flatten()
+            .tolist()
+        )
+
+        # Get all noise-scaled circuits to run
+        to_run = self._generate_circuits(qp, scale_noise, num_to_average)
+
+        # Run them sequentially
+        res = []
+        for i, circuit in enumerate(to_run):
+            res.append(executor(circuit, **kwargs[i]))
+
+        # Average the expectation results
+        self._outstack = [
+            np.average(res[i * num_to_average: (i + 1) * num_to_average])
+            for i in range(len(res) // num_to_average)
+        ]
+        self._batch_populate_instack()
+
+        return self
+
+    def run_classical(
+        self,
+        scale_factor_to_expectation_value: Callable[..., float],
+    ) -> "BatchedFactory":
+        """Computes expectation values by calling the input function at each
+        scale factor.
+        Args:
+            scale_factor_to_expectation_value: Function which inputs a scale
+                factor (float) and outputs the expectation value at this scale
+                factor. This is a classical analogue to what a quantum computer
+                would do provided a circuit, noise scaling method, and scale
+                factor.
+        """
+        kwargs = self._get_keyword_args()
+        self._outstack = [
+            scale_factor_to_expectation_value(scale_factor, **kwargs[i])
+            for i, scale_factor in enumerate(self.get_scale_factors())
+        ]
+        self._batch_populate_instack()
+        return self
+
+    def _generate_circuits(
+        self,
+        circuit: QPROGRAM,
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        num_to_average: int = 1,
+    ) -> List[QPROGRAM]:
+        """Returns all noise-scaled circuits to run.
+
+        Args:
+            circuit: Base circuit to scale noise in.
+            scale_noise: Noise scaling function.
+            num_to_average: Number of times to call scale_noise at each scale
+                factor.
+        """
+        to_run = []  # TODO: Store this?
+        for scale_factor in self.get_scale_factors():
+            for _ in range(num_to_average):
+                to_run.append(scale_noise(circuit, scale_factor))
+        return to_run
+
     def next(self) -> Dict[str, float]:
         """Returns a dictionary of parameters to execute a circuit at."""
         in_params = {}
@@ -398,9 +486,118 @@ class BatchedFactory(Factory):
         return len(self._outstack) == len(self._scale_factors)
 
     def __eq__(self, other):
-        return Factory.__eq__(self, other) and np.allclose(
+        return BaseFactory.__eq__(self, other) and np.allclose(
             self._scale_factors, other._scale_factors
         )
+
+
+class AdaptiveFactory(BaseFactory, ABC):
+    """Abstract class designed to adaptively produce a new noise scaling
+    parameter based on a historical stack of previous noise scale parameters
+    ("self._instack") and previously estimated expectation values
+    ("self._outstack").
+
+    Specific zero-noise extrapolation algorithms, adaptive or non-adaptive,
+    are derived from this class.
+
+    A Factory object is not supposed to directly perform any quantum
+    computation, only the classical results of quantum experiments are
+    processed by it.
+    """
+
+    @abstractmethod
+    def next(self) -> Dict[str, float]:
+        """Returns a dictionary of parameters to execute a circuit at."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def is_converged(self) -> bool:
+        """Returns True if all needed expectation values have been computed,
+        else False.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def reduce(self) -> float:
+        """Returns the extrapolation to the zero-noise limit."""
+        raise NotImplementedError
+
+    def iterate(
+        self,
+        noise_to_expval: Callable[..., float],
+        max_iterations: int = 100,
+    ) -> "AdaptiveFactory":
+        """Evaluates a sequence of expectation values until enough
+        data is collected (or iterations reach "max_iterations").
+
+        Args:
+            noise_to_expval: Function mapping a noise scale factor to an
+                             expectation value. If shot_list is not None,
+                             "shot" must be an argument of the function.
+            max_iterations: Maximum number of iterations (optional).
+                            Default: 100.
+
+        Raises:
+            ConvergenceWarning: If iteration loop stops before convergence.
+        """
+        # Reset the instack, outstack, and optimal parameters
+        self.reset()
+
+        counter = 0
+        while not self.is_converged() and counter < max_iterations:
+            next_in_params = self.next()
+            next_exec_params = deepcopy(next_in_params)
+
+            # Get next scale factor and remove it from next_exec_params
+            scale_factor = next_exec_params.pop("scale_factor")
+            next_expval = noise_to_expval(scale_factor, **next_exec_params)
+            self.push(next_in_params, next_expval)
+            counter += 1
+
+        if counter == max_iterations:
+            warnings.warn(
+                "Factory iteration loop stopped before convergence. "
+                f"Maximum number of iterations ({max_iterations}) "
+                "was reached.",
+                ConvergenceWarning,
+            )
+
+        return self
+
+    def run(
+        self,
+        qp: QPROGRAM,
+        executor: Callable[..., float],
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        num_to_average: int = 1,
+        max_iterations: int = 100,
+    ) -> "AdaptiveFactory":
+        """Evaluates a sequence of expectation values by executing quantum
+        circuits until enough data is collected (or iterations reach
+        "max_iterations").
+
+        Args:
+            qp: Circuit to mitigate.
+            executor: Function executing a circuit; returns an expectation
+                value. If shot_list is not None, then "shot" must be
+                an additional argument of the executor.
+            scale_noise: Function that scales the noise level of a quantum
+                circuit.
+            num_to_average: Number of times expectation values are computed by
+                the executor after each call to scale_noise, then averaged.
+            max_iterations: Maximum number of iterations (optional).
+        """
+
+        def _noise_to_expval(scale_factor, **exec_params) -> float:
+            """Evaluates the quantum expectation value for a given
+            scale_factor and other executor parameters."""
+            expectation_values = []
+            for _ in range(num_to_average):
+                scaled_qp = scale_noise(qp, scale_factor)
+                expectation_values.append(executor(scaled_qp, **exec_params))
+            return np.average(expectation_values)
+
+        return self.iterate(_noise_to_expval, max_iterations)
 
 
 class PolyFactory(BatchedFactory):
@@ -518,33 +715,36 @@ class RichardsonFactory(BatchedFactory):
         full_output: bool = False,
     ) -> Union[float, Tuple[float, List[float]]]:
         """Static method which evaluates the Richardson extrapolation to the
-        zero-noise limit.
+         zero-noise limit.
 
-        Args:
-            scale_factors: The array of noise scale factors.
-            exp_values: The array of expectation values.
-            full_output: If False (default), only the zero-noise limit is
-                returned. If True, the optimal parameters are returned too.
+         Args:
+             scale_factors: The array of noise scale factors.
+             exp_values: The array of expectation values.
+             full_output: If False (default), only the zero-noise limit is
+                 returned. If True, the optimal parameters are returned too.
 
-        Returns:
-            zero_lim: The extrapolated zero-noise limit.
-            opt_params: The parameter array of the best fitting model.
-                        This is returned only if "full_output" is True.
+         Returns:
+             zero_lim: The extrapolated zero-noise limit.
+             opt_params: The parameter array of the best fitting model.
+                         This is returned only if "full_output" is True.
 
-       Raises:
-            ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
+        Raises:
+             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
 
-        Note:
-            This method computes the zero-noise limit only from the information
-            contained in the input arguments. To extrapolate from the internal
-            data of an instantiated Factory object, the bound method
-            ".reduce()" should be called instead.
+         Note:
+             This method computes the zero-noise limit only from the information
+             contained in the input arguments. To extrapolate from the internal
+             data of an instantiated Factory object, the bound method
+             ".reduce()" should be called instead.
         """
         # Richardson extrapolation is a particular case of a polynomial fit
         # with order equal to the number of data points minus 1.
         order = len(scale_factors) - 1
         return PolyFactory.extrapolate(
-            scale_factors, exp_values, order, full_output,
+            scale_factors,
+            exp_values,
+            order,
+            full_output,
         )
 
     def reduce(self) -> float:
@@ -613,7 +813,10 @@ class LinearFactory(BatchedFactory):
         """
         # Linear extrapolation is equivalent to a polynomial fit with order=1
         return PolyFactory.extrapolate(
-            scale_factors, exp_values, 1, full_output,
+            scale_factors,
+            exp_values,
+            1,
+            full_output,
         )
 
     def reduce(self) -> float:
@@ -996,7 +1199,7 @@ OptimizationHistory = List[
 ]
 
 
-class AdaExpFactory(Factory):
+class AdaExpFactory(AdaptiveFactory):
     """Factory object implementing an adaptive zero-noise extrapolation
     algorithm assuming an exponential ansatz y(x) = a + b * exp(-c * x),
     with c > 0.
@@ -1184,7 +1387,7 @@ class AdaExpFactory(Factory):
 
     def __eq__(self, other) -> bool:
         return (
-            Factory.__eq__(self, other)
+            BaseFactory.__eq__(self, other)
             and self._steps == other._steps
             and self._scale_factor == other._scale_factor
             and np.isclose(self.asymptote, other.asymptote)
