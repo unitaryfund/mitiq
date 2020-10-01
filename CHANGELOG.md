@@ -13,6 +13,7 @@
 ### All Changes
 
 - Add arxiv badge to readme header (@nathanshammah, gh-376).
+- Make mypy checking stricter (@karalekas, gh-380).
 
 ## Version 0.1.0 (September 2nd, 2020)
 
