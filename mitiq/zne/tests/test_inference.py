@@ -424,9 +424,10 @@ def test_ada_exp_factory_with_asympt(
     fac = AdaExpFactory(
         steps=3, scale_factor=2.0, asymptote=A, avoid_log=avoid_log
     )
-    # Note: run_classical calls next which calls reduce, so calling fac.run_classical with
-    # an AdaExpFactory sets the optimal parameters as well. Hence we check that
-    # the opt_params are empty before AdaExpFactory.run_classical is called.
+    # Note: run_classical calls next which calls reduce, so calling
+    # fac.run_classical with an AdaExpFactory sets the optimal parameters as
+    # well. Hence we check that the opt_params are empty before
+    # AdaExpFactory.run_classical is called.
     assert len(fac.opt_params) == 0
     fac.run_classical(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
