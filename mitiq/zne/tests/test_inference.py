@@ -497,96 +497,96 @@ def test_failing_fit_warnings(fac):
     ):
         fac.extrapolate([1, 1, 1, 1], [1.0, 1.0, 1.0, 1.0])
 
-#
-# @mark.parametrize("factory", (LinearFactory, RichardsonFactory, PolyFactory))
-# def test_equal(factory):
-#     """Tests that copies are factories are equal to the original factories."""
-#     for iterate in (True, False):
-#         if factory is PolyFactory:
-#             fac = factory(
-#                 scale_factors=[1, 2, 3], order=2, shot_list=[1, 2, 3]
-#             )
-#         else:
-#             fac = factory(scale_factors=[1, 2, 3], shot_list=[1, 2, 3])
-#         if iterate:
-#             fac.run_classical(
-#                 scale_factor_to_expectation_value=
-#                 lambda x, shots: np.exp(x) + 0.5
-#             )
-#
-#         copied_factory = copy(fac)
-#         assert copied_factory == fac
-#         assert copied_factory is not fac
-#
-#         if iterate:
-#             fac.reduce()
-#             copied_factory = copy(fac)
-#             assert copied_factory == fac
-#             assert copied_factory is not fac
-#
 
-# @mark.parametrize("fac_class", [LinearFactory, RichardsonFactory])
-# def test_iterate_with_shot_list(fac_class):
-#     """Tests factories with (and without) the "shot_list" argument."""
-#     # first test without shot_list
-#     fac = fac_class(X_VALS)
-#     fac.iterate(f_lin_shot)
-#     assert np.isclose(fac.reduce(), f_lin_shot(0), atol=CLOSE_TOL)
-#
-#     # Check instack and outstack are as expected
-#     SHOT_LIST = [100, 200, 300, 400, 500]
-#     for j, shots in enumerate(SHOT_LIST):
-#         assert fac._instack[j] == {"scale_factor": X_VALS[j]}
-#         assert fac._outstack[j] != f_lin_shot(X_VALS[j], shots=shots)
-#         assert fac._outstack[j] == f_lin_shot(X_VALS[j])
-#
-#     # Now pass an arbitrary shot_list as an argument
-#     fac = fac_class(X_VALS, shot_list=SHOT_LIST)
-#     fac.iterate(f_lin_shot)
-#     assert np.isclose(fac.reduce(), f_lin_shot(0), atol=CLOSE_TOL)
-#
-#     # Check instack and outstack are as expected
-#     for j, shots in enumerate(SHOT_LIST):
-#         assert fac._instack[j] == {"scale_factor": X_VALS[j], "shots": shots}
-#         assert fac._outstack[j] == f_lin_shot(X_VALS[j], shots=shots)
-#         assert fac._outstack[j] != f_lin_shot(X_VALS[j])
-#
-#
-# def test_shot_list_errors():
-#     """Tests errors related to the "shot_lists" argument."""
-#     with raises(IndexError, match=r"must have the same length."):
-#         PolyFactory(X_VALS, order=2, shot_list=[1, 2])
-#     with raises(TypeError, match=r"valid iterator of integers"):
-#         PolyFactory(X_VALS, order=2, shot_list=[1.0, 2])
-#
-#
-# def test_push_after_already_reduced_warning():
-#     """Tests a warning is raised if new data is pushed in a factory
-#     which was already reduced."""
-#     fac = LinearFactory([1, 2])
-#     fac.push({"scale_factor": 1.0}, 1.0)
-#     fac.push({"scale_factor": 2.0}, 2.0)
-#     fac.reduce()
-#     with warns(
-#         ExtrapolationWarning,
-#         match=r"You are pushing new data into a factory object",
-#     ):
-#         fac.push({"scale_factor": 3.0}, 3.0)
-#     # Assert no warning is raised when .reset() is used
-#     fac.reset()
-#     fac.push({"scale_factor": 1.0}, 2.0)
-#     fac.push({"scale_factor": 2.0}, 1.0)
-#     assert np.isclose(3.0, fac.reduce())
-#
-#
-# def test_full_output_keyword():
-#     """Tests the full_output keyword in extrapolate method."""
-#     zlim = LinearFactory.extrapolate([1, 2], [1, 2])
-#     assert np.isclose(zlim, 0.0)
-#     zlim, opt_params = LinearFactory.extrapolate(
-#         [1, 2], [1, 2], full_output=True
-#     )
-#     assert len(opt_params) == 2
-#     assert np.isclose(zlim, 0.0)
-#     assert np.isclose(0.0, opt_params[1])
-#     assert np.isclose(1.0, opt_params[0])
+@mark.parametrize("factory", (LinearFactory, RichardsonFactory, PolyFactory))
+def test_equal(factory):
+    """Tests that copies are factories are equal to the original factories."""
+    for iterate in (True, False):
+        if factory is PolyFactory:
+            fac = factory(
+                scale_factors=[1, 2, 3], order=2, shot_list=[1, 2, 3]
+            )
+        else:
+            fac = factory(scale_factors=[1, 2, 3], shot_list=[1, 2, 3])
+        if iterate:
+            fac.run_classical(
+                scale_factor_to_expectation_value=
+                lambda x, shots: np.exp(x) + 0.5
+            )
+
+        copied_factory = copy(fac)
+        assert copied_factory == fac
+        assert copied_factory is not fac
+
+        if iterate:
+            fac.reduce()
+            copied_factory = copy(fac)
+            assert copied_factory == fac
+            assert copied_factory is not fac
+
+
+@mark.parametrize("fac_class", [LinearFactory, RichardsonFactory])
+def test_iterate_with_shot_list(fac_class):
+    """Tests factories with (and without) the "shot_list" argument."""
+    # first test without shot_list
+    fac = fac_class(X_VALS)
+    fac.run_classical(f_lin_shot)
+    assert np.isclose(fac.reduce(), f_lin_shot(0), atol=CLOSE_TOL)
+
+    # Check instack and outstack are as expected
+    SHOT_LIST = [100, 200, 300, 400, 500]
+    for j, shots in enumerate(SHOT_LIST):
+        assert fac._instack[j] == {"scale_factor": X_VALS[j]}
+        assert fac._outstack[j] != f_lin_shot(X_VALS[j], shots=shots)
+        assert fac._outstack[j] == f_lin_shot(X_VALS[j])
+
+    # Now pass an arbitrary shot_list as an argument
+    fac = fac_class(X_VALS, shot_list=SHOT_LIST)
+    fac.run_classical(f_lin_shot)
+    assert np.isclose(fac.reduce(), f_lin_shot(0), atol=CLOSE_TOL)
+
+    # Check instack and outstack are as expected
+    for j, shots in enumerate(SHOT_LIST):
+        assert fac._instack[j] == {"scale_factor": X_VALS[j], "shots": shots}
+        assert fac._outstack[j] == f_lin_shot(X_VALS[j], shots=shots)
+        assert fac._outstack[j] != f_lin_shot(X_VALS[j])
+
+
+def test_shot_list_errors():
+    """Tests errors related to the "shot_lists" argument."""
+    with raises(IndexError, match=r"must have the same length."):
+        PolyFactory(X_VALS, order=2, shot_list=[1, 2])
+    with raises(TypeError, match=r"valid iterator of integers"):
+        PolyFactory(X_VALS, order=2, shot_list=[1.0, 2])
+
+
+def test_push_after_already_reduced_warning():
+    """Tests a warning is raised if new data is pushed in a factory
+    which was already reduced."""
+    fac = LinearFactory([1, 2])
+    fac.push({"scale_factor": 1.0}, 1.0)
+    fac.push({"scale_factor": 2.0}, 2.0)
+    fac.reduce()
+    with warns(
+        ExtrapolationWarning,
+        match=r"You are pushing new data into a factory object",
+    ):
+        fac.push({"scale_factor": 3.0}, 3.0)
+    # Assert no warning is raised when .reset() is used
+    fac.reset()
+    fac.push({"scale_factor": 1.0}, 2.0)
+    fac.push({"scale_factor": 2.0}, 1.0)
+    assert np.isclose(3.0, fac.reduce())
+
+
+def test_full_output_keyword():
+    """Tests the full_output keyword in extrapolate method."""
+    zlim = LinearFactory.extrapolate([1, 2], [1, 2])
+    assert np.isclose(zlim, 0.0)
+    zlim, opt_params = LinearFactory.extrapolate(
+        [1, 2], [1, 2], full_output=True
+    )
+    assert len(opt_params) == 2
+    assert np.isclose(zlim, 0.0)
+    assert np.isclose(0.0, opt_params[1])
+    assert np.isclose(1.0, opt_params[0])
