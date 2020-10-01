@@ -277,12 +277,6 @@ class BaseFactory(ABC):
         """Returns the expectation values computed by the factory."""
         return np.array(self._outstack)
 
-    def _get_keyword_args(self) -> List[Dict[str, Any]]:
-        params = deepcopy(self._instack)
-        for d in params:
-            _ = d.pop("scale_factor")
-        return params
-
     def __eq__(self, other):
         if self._already_reduced != other._already_reduced:
             return False
@@ -378,20 +372,6 @@ class BatchedFactory(BaseFactory, ABC):
             )
         return len(self._outstack) == len(self._scale_factors)
 
-    def _batch_populate_instack(self) -> None:
-        """Populates the instack with all parameters at which to compute
-        expectation values.
-        """
-        if self._shot_list:
-            self._instack = [
-                {"scale_factor": scale, "shots": shots}
-                for scale, shots in zip(self._scale_factors, self._shot_list)
-            ]
-        else:
-            self._instack = [
-                {"scale_factor": scale} for scale in self._scale_factors
-            ]
-
     def run_batched(
         self,
         qp: QPROGRAM,
@@ -446,7 +426,7 @@ class BatchedFactory(BaseFactory, ABC):
 
         Args:
             qp: Quantum circuit to run.
-            executor: A "single executor" (1) or a "batched executor" (2).
+            executor: A "sequential executor" (1) or a "batched executor" (2).
                 (1) A function which inputs a single circuit and outputs a
                 single expectation value of interest.
                 (2) A function which inputs a list of circuits and outputs a
@@ -463,8 +443,7 @@ class BatchedFactory(BaseFactory, ABC):
             Tuple[float],
             Iterable[float],
         ):
-            self.run_batched(qp, executor, scale_noise, num_to_average)
-            return self
+            return self.run_batched(qp, executor, scale_noise, num_to_average)
 
         def _noise_to_expval(scale_factor, **exec_params) -> float:
             """Evaluates the quantum expectation value for a given
@@ -498,6 +477,26 @@ class BatchedFactory(BaseFactory, ABC):
             for _ in range(num_to_average):
                 to_run.append(scale_noise(circuit, scale_factor))
         return to_run
+
+    def _batch_populate_instack(self) -> None:
+        """Populates the instack with all parameters at which to compute
+        expectation values.
+        """
+        if self._shot_list:
+            self._instack = [
+                {"scale_factor": scale, "shots": shots}
+                for scale, shots in zip(self._scale_factors, self._shot_list)
+            ]
+        else:
+            self._instack = [
+                {"scale_factor": scale} for scale in self._scale_factors
+            ]
+
+    def _get_keyword_args(self) -> List[Dict[str, Any]]:
+        params = deepcopy(self._instack)
+        for d in params:
+            _ = d.pop("scale_factor")
+        return params
 
     def __eq__(self, other):
         return BaseFactory.__eq__(self, other) and np.allclose(
