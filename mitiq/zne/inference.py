@@ -196,9 +196,9 @@ class BaseFactory(ABC):
         raise NotImplementedError
 
     def iterate(
-            self,
-            noise_to_expval: Callable[..., float],
-            max_iterations: int = 100,
+        self,
+        noise_to_expval: Callable[..., float],
+        max_iterations: int = 100,
     ) -> "BaseFactory":
         """Evaluates a sequence of expectation values until enough
         data is collected (or iterations reach "max_iterations").
