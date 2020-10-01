@@ -130,7 +130,7 @@ def run_maxcut(
     graph: List[Tuple[int, int]],
     x0: np.ndarray,
     noise: float = 0,
-    scale_noise:  Optional[Callable[[QPROGRAM, float], QPROGRAM]] = None,
+    scale_noise: Optional[Callable[[QPROGRAM, float], QPROGRAM]] = None,
     factory: Optional[Factory] = None,
     verbose: bool = True,
 ) -> Tuple[float, np.ndarray, List[float]]:

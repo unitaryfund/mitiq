@@ -170,7 +170,9 @@ class Factory(ABC):
         self.opt_params: List[float] = []
         self._already_reduced = False
 
-    def push(self, instack_val: Dict[str, float], outstack_val: float) -> "Factory":
+    def push(
+        self, instack_val: Dict[str, float], outstack_val: float
+    ) -> "Factory":
         """Appends "instack_val" to "self._instack" and "outstack_val" to
         "self._outstack". Each time a new expectation value is computed this
         method should be used to update the internal state of the Factory.

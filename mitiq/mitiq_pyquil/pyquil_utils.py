@@ -14,8 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """pyQuil utility functions."""
-from typing import Optional
-
 import numpy as np
 from pyquil import Program
 

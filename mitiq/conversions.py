@@ -118,7 +118,9 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
     return converted_circuit
 
 
-def converter(noise_scaling_function: Callable[..., Any]) -> Callable[..., Any]:
+def converter(
+    noise_scaling_function: Callable[..., Any]
+) -> Callable[..., Any]:
     """Decorator for handling conversions.
 
     Args:
@@ -127,7 +129,9 @@ def converter(noise_scaling_function: Callable[..., Any]) -> Callable[..., Any]:
     """
 
     @wraps(noise_scaling_function)
-    def new_scaling_function(circuit: QPROGRAM, *args: Any, **kwargs: Any) -> QPROGRAM:
+    def new_scaling_function(
+        circuit: QPROGRAM, *args: Any, **kwargs: Any
+    ) -> QPROGRAM:
         mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
         if kwargs.get("return_mitiq") is True:
             return noise_scaling_function(mitiq_circuit, *args, **kwargs)

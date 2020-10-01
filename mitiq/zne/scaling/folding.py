@@ -750,7 +750,9 @@ def _fold_local(
 
 # Global folding function
 @converter
-def fold_global(circuit: QPROGRAM, scale_factor: float, **kwargs: Any) -> QPROGRAM:
+def fold_global(
+    circuit: QPROGRAM, scale_factor: float, **kwargs: Any
+) -> QPROGRAM:
     """Returns a new circuit obtained by folding the global unitary of the
     input circuit.
 
