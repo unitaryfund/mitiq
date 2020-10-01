@@ -17,14 +17,16 @@
 classically generated data.
 """
 from copy import copy
-from typing import Callable
+from typing import Callable, List
 from pytest import mark, raises, warns
+
 import numpy as np
 from numpy.random import RandomState
+
+import cirq
 from mitiq.zne.inference import (
     ExtrapolationError,
     ExtrapolationWarning,
-    ConvergenceWarning,
     RichardsonFactory,
     LinearFactory,
     PolyFactory,
@@ -247,6 +249,51 @@ def test_get_expectation_values_adaptive_factories(factory):
     )
 
 
+@mark.parametrize(
+    "factory",
+    (
+        LinearFactory,
+        RichardsonFactory,
+        PolyFactory,
+        ExpFactory,
+        PolyExpFactory,
+    ),
+)
+@mark.parametrize("batched", (True, False))
+def test_run_sequential_and_batched(factory, batched):
+    scale_factors = np.linspace(1.0, 10.0, num=20)
+
+    if factory is PolyFactory or factory is PolyExpFactory:
+        fac = factory(scale_factors=scale_factors, order=2)
+    else:
+        fac = factory(scale_factors=scale_factors)
+
+    # Expectation values haven't been computed at any scale factors yet
+    assert isinstance(fac.get_expectation_values(), np.ndarray)
+    assert len(fac.get_expectation_values()) == 0
+
+    # Compute expectation values at all the scale factors
+    if batched:
+
+        def executor(circuits, kwargs) -> List[float]:
+            return [1.0] * len(circuits)
+
+    else:
+
+        def executor(circuit):
+            return 1.0
+
+    fac.run(
+        cirq.Circuit(),
+        executor,
+        scale_noise=lambda circ, _: circ,
+    )
+    assert isinstance(fac.get_expectation_values(), np.ndarray)
+    assert np.allclose(
+        fac.get_expectation_values(), np.ones_like(scale_factors)
+    )
+
+
 @mark.parametrize("test_f", [f_lin, f_non_lin])
 def test_richardson_extr(test_f: Callable[[float], float]):
     """Test of the Richardson's extrapolator."""
@@ -431,10 +478,11 @@ def test_avoid_log_keyword():
     assert not znl_with_log == znl_without_log
 
 
-def test_less_than_two_scale_factors_error():
+@mark.parametrize("factory", (LinearFactory, RichardsonFactory))
+def test_too_few_scale_factors(factory):
     """Test less than 2 scale_factors."""
     with raises(ValueError, match=r"At least 2 scale factors are necessary"):
-        _ = LinearFactory([1])
+        _ = factory([1])
 
 
 def test_few_scale_factors_error():
