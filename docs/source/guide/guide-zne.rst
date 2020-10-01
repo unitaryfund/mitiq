@@ -405,6 +405,17 @@ in ``mitiq.zne``. For example:
    Error with richardson_fac: 0.0070
    Error with poly_fac: 0.0110
 
+We can also specify the number of shots to use for each noise-scaled circuit.
+
+.. testcode::
+
+   from mitiq.zne.inference import LinearFactory
+
+   # Specify the number of shots for each scale factor.
+   factory_with_shots = LinearFactory(scale_factors=[1.0, 2.0], shot_list=[100, 200])
+
+In this case the factory will pass the number of shots from the `shot_list` to the `executor`. Accordingly, the
+`executor` should support a `shots` keyword argument, otherwise the shot values will go unused.
 
 ---------------------------------------------
 Directly using a factory for error mitigation
