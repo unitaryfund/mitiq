@@ -732,7 +732,7 @@ def _fold_local(
 
     if not 1 <= scale_factor:
         raise ValueError(
-            f"The scale factor must be a real number greater than 1."
+            "The scale factor must be a real number greater than 1."
         )
 
     while scale_factor > 1.0:

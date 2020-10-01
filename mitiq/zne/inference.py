@@ -733,10 +733,10 @@ class RichardsonFactory(BatchedFactory):
              ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
 
          Note:
-             This method computes the zero-noise limit only from the information
-             contained in the input arguments. To extrapolate from the internal
-             data of an instantiated Factory object, the bound method
-             ".reduce()" should be called instead.
+             This method computes the zero-noise limit only from the
+             information contained in the input arguments. To extrapolate from
+             the internal data of an instantiated Factory object, the bound
+             method ".reduce()" should be called instead.
         """
         # Richardson extrapolation is a particular case of a polynomial fit
         # with order equal to the number of data points minus 1.

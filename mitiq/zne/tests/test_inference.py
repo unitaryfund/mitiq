@@ -337,7 +337,8 @@ def test_poly_extr():
 
 @mark.parametrize("order", [2, 3, 4, 5])
 def test_opt_params_poly_factory(order):
-    """Tests that optimal parameters are stored after calling the reduce method.
+    """Tests that optimal parameters are stored after calling the reduce
+    method.
     """
     fac = PolyFactory(scale_factors=np.linspace(1, 10, 10), order=order)
     assert fac.opt_params == []
@@ -558,8 +559,8 @@ def test_equal(factory):
             fac = factory(scale_factors=[1, 2, 3], shot_list=[1, 2, 3])
         if iterate:
             fac.run_classical(
-                scale_factor_to_expectation_value=
-                lambda x, shots: np.exp(x) + 0.5
+                scale_factor_to_expectation_value=lambda x, shots: np.exp(x)
+                + 0.5
             )
 
         copied_factory = copy(fac)
