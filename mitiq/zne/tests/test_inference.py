@@ -178,37 +178,37 @@ def test_get_scale_factors_adaptive_factories(factory):
     assert len(fac.get_scale_factors()) == num_steps
     assert np.allclose(fac.get_scale_factors(), correct_scale_factors)
 
-#
-# @mark.parametrize(
-#     "factory",
-#     (
-#         LinearFactory,
-#         RichardsonFactory,
-#         PolyFactory,
-#         ExpFactory,
-#         PolyExpFactory,
-#     ),
-# )
-# def test_get_expectation_values_static_factories(factory):
-#     scale_factors = np.linspace(1.0, 10.0, num=20)
-#     executor = apply_seed_to_func(f_lin, seed=1)
-#     expectation_values = np.array([executor(scale) for scale in scale_factors])
-#     print(expectation_values)
-#
-#     if factory is PolyFactory or factory is PolyExpFactory:
-#         fac = factory(scale_factors=scale_factors, order=2)
-#     else:
-#         fac = factory(scale_factors=scale_factors)
-#
-#     # Expectation values haven't been computed at any scale factors yet
-#     assert isinstance(fac.get_expectation_values(), np.ndarray)
-#     assert len(fac.get_expectation_values()) == 0
-#
-#     # Compute expectation values at all the scale factors
-#     fac.run_classical(lambda scale_factor: 1)
-#     assert isinstance(fac.get_expectation_values(), np.ndarray)
-#     print(fac.get_expectation_values())
-#     # assert np.allclose(fac.get_expectation_values(), expectation_values)
+
+@mark.parametrize(
+    "factory",
+    (
+        LinearFactory,
+        RichardsonFactory,
+        PolyFactory,
+        ExpFactory,
+        PolyExpFactory,
+    ),
+)
+def test_get_expectation_values_static_factories(factory):
+    scale_factors = np.linspace(1.0, 10.0, num=20)
+    executor = apply_seed_to_func(f_lin, seed=1)
+    expectation_values = np.array([executor(scale) for scale in scale_factors])
+
+    if factory is PolyFactory or factory is PolyExpFactory:
+        fac = factory(scale_factors=scale_factors, order=2)
+    else:
+        fac = factory(scale_factors=scale_factors)
+
+    # Expectation values haven't been computed at any scale factors yet
+    assert isinstance(fac.get_expectation_values(), np.ndarray)
+    assert len(fac.get_expectation_values()) == 0
+
+    # Compute expectation values at all the scale factors
+    fac.run_classical(executor)
+    assert isinstance(fac.get_expectation_values(), np.ndarray)
+    assert np.allclose(
+        fac.get_expectation_values(), expectation_values, atol=1e-3
+    )
 
 
 # @mark.parametrize("factory", (AdaExpFactory,))

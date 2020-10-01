@@ -423,6 +423,7 @@ class BatchedFactory(BaseFactory, ABC):
     ) -> "BatchedFactory":
         """Computes expectation values by calling the input function at each
         scale factor.
+
         Args:
             scale_factor_to_expectation_value: Function which inputs a scale
                 factor (float) and outputs the expectation value at this scale
@@ -432,8 +433,8 @@ class BatchedFactory(BaseFactory, ABC):
         """
         kwargs = self._get_keyword_args()
         self._outstack = [
-            scale_factor_to_expectation_value(scale_factor, **kwargs[i])
-            for i, scale_factor in enumerate(self.get_scale_factors())
+            scale_factor_to_expectation_value(scale_factor, *kwargs)
+            for i, scale_factor in enumerate(self._scale_factors)
         ]
         self._batch_populate_instack()
         return self
