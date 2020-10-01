@@ -334,6 +334,7 @@ class BatchedFactory(BaseFactory, ABC):
             method may take significantly longer to run due to back-and-forth
             communication with the quantum backend.
         """
+        self._batch_populate_instack()
         kwargs = self._get_keyword_args()
 
         # Get all noise-scaled circuits to run
@@ -348,7 +349,6 @@ class BatchedFactory(BaseFactory, ABC):
             np.average(res[i * num_to_average: (i + 1) * num_to_average])
             for i in range(len(res) // num_to_average)
         ]
-        self._batch_populate_instack()
 
         return self
 
@@ -393,6 +393,7 @@ class BatchedFactory(BaseFactory, ABC):
             self.run_batched(qp, executor, scale_noise, num_to_average)
             return self
 
+        self._batch_populate_instack()
         kwargs = self._get_keyword_args()
         kwargs = (
             np.array([[k for _ in range(num_to_average)] for k in kwargs])
@@ -413,7 +414,6 @@ class BatchedFactory(BaseFactory, ABC):
             np.average(res[i * num_to_average: (i + 1) * num_to_average])
             for i in range(len(res) // num_to_average)
         ]
-        self._batch_populate_instack()
 
         return self
 
@@ -431,12 +431,12 @@ class BatchedFactory(BaseFactory, ABC):
                 would do provided a circuit, noise scaling method, and scale
                 factor.
         """
+        self._batch_populate_instack()
         kwargs = self._get_keyword_args()
         self._outstack = [
-            scale_factor_to_expectation_value(scale_factor, *kwargs)
+            scale_factor_to_expectation_value(scale_factor, **kwargs[i])
             for i, scale_factor in enumerate(self._scale_factors)
         ]
-        self._batch_populate_instack()
         return self
 
     def _generate_circuits(
