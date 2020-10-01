@@ -15,7 +15,7 @@
 
 """Functions for converting to/from Mitiq's internal circuit representation."""
 from functools import wraps
-from typing import Callable, Tuple
+from typing import Any, Callable, Tuple
 
 from cirq import Circuit
 
@@ -58,7 +58,7 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
     elif isinstance(circuit, Circuit):
         input_circuit_type = "cirq"
 
-        def conversion_function(circ):
+        def conversion_function(circ: Circuit) -> Circuit:
             return circ
 
     else:
@@ -87,6 +87,7 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
         circuit: Mitiq circuit to convert.
         conversion_type: String specifier for the converted circuit type.
     """
+    conversion_function: Callable[[Circuit], QPROGRAM]
     if conversion_type == "qiskit":
         from mitiq.mitiq_qiskit.conversions import to_qiskit
 
@@ -97,7 +98,7 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
         conversion_function = to_pyquil
     elif isinstance(circuit, Circuit):
 
-        def conversion_function(circ):
+        def conversion_function(circ: Circuit) -> Circuit:
             return circ
 
     else:
@@ -117,7 +118,7 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
     return converted_circuit
 
 
-def converter(noise_scaling_function: Callable) -> Callable:
+def converter(noise_scaling_function: Callable[..., Any]) -> Callable[..., Any]:
     """Decorator for handling conversions.
 
     Args:
@@ -126,7 +127,7 @@ def converter(noise_scaling_function: Callable) -> Callable:
     """
 
     @wraps(noise_scaling_function)
-    def new_scaling_function(circuit: QPROGRAM, *args, **kwargs) -> QPROGRAM:
+    def new_scaling_function(circuit: QPROGRAM, *args: Any, **kwargs: Any) -> QPROGRAM:
         mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
         if kwargs.get("return_mitiq") is True:
             return noise_scaling_function(mitiq_circuit, *args, **kwargs)

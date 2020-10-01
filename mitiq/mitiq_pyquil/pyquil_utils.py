@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""pyQuil utitility functions."""
+"""pyQuil utility functions."""
+from typing import Optional
+
 import numpy as np
 from pyquil import Program
 
@@ -30,7 +32,7 @@ QVM.qam.random_seed = 1337
 np.random.seed(1001)
 
 
-def random_identity_circuit(depth=None):
+def random_identity_circuit(depth: int) -> Program:
     """Returns a single-qubit identity circuit based on Pauli gates."""
 
     # initialize a quantum circuit
@@ -102,7 +104,7 @@ def run_with_noise(circuit: Program, noise: float, shots: int) -> float:
     # we want to simulate noise, so we run without compiling
     results = QVM.run(circuit)
     expval = (results == [0]).sum() / shots
-    return expval
+    return float(expval)
 
 
 def run_program(pq: Program, shots: int = 500) -> float:
@@ -118,7 +120,7 @@ def run_program(pq: Program, shots: int = 500) -> float:
     pq.wrap_in_numshots_loop(shots)
     results = QVM.run(pq)
     expval = (results == [0]).sum() / shots
-    return expval
+    return float(expval)
 
 
 def add_depolarizing_noise(pq: Program, noise: float) -> Program:
@@ -166,7 +168,7 @@ def scale_noise(pq: Program, param: float) -> Program:
     return add_depolarizing_noise(pq, noise)
 
 
-def measure(circuit, qid):
+def measure(circuit: Program, qid: int) -> Program:
     """Returns a circuit adding a register for readout results.
 
     Args:
