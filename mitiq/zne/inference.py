@@ -183,6 +183,60 @@ class BaseFactory(ABC):
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
 
+    @abstractmethod
+    def next(self) -> Dict[str, float]:
+        """Returns a dictionary of parameters to execute a circuit at."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def is_converged(self) -> bool:
+        """Returns True if all needed expectation values have been computed,
+        else False.
+        """
+        raise NotImplementedError
+
+    def iterate(
+            self,
+            noise_to_expval: Callable[..., float],
+            max_iterations: int = 100,
+    ) -> "BaseFactory":
+        """Evaluates a sequence of expectation values until enough
+        data is collected (or iterations reach "max_iterations").
+
+        Args:
+            noise_to_expval: Function mapping a noise scale factor to an
+                             expectation value. If shot_list is not None,
+                             "shot" must be an argument of the function.
+            max_iterations: Maximum number of iterations (optional).
+                            Default: 100.
+
+        Raises:
+            ConvergenceWarning: If iteration loop stops before convergence.
+        """
+        # Reset the instack, outstack, and optimal parameters
+        self.reset()
+
+        counter = 0
+        while not self.is_converged() and counter < max_iterations:
+            next_in_params = self.next()
+            next_exec_params = deepcopy(next_in_params)
+
+            # Get next scale factor and remove it from next_exec_params
+            scale_factor = next_exec_params.pop("scale_factor")
+            next_expval = noise_to_expval(scale_factor, **next_exec_params)
+            self.push(next_in_params, next_expval)
+            counter += 1
+
+        if counter == max_iterations:
+            warnings.warn(
+                "Factory iteration loop stopped before convergence. "
+                f"Maximum number of iterations ({max_iterations}) "
+                "was reached.",
+                ConvergenceWarning,
+            )
+
+        return self
+
     def push(self, instack_val: dict, outstack_val: float) -> "BaseFactory":
         """Appends "instack_val" to "self._instack" and "outstack_val" to
         "self._outstack". Each time a new expectation value is computed this
@@ -297,6 +351,33 @@ class BatchedFactory(BaseFactory, ABC):
 
         super(BatchedFactory, self).__init__()
 
+    def next(self) -> Dict[str, float]:
+        """Returns a dictionary of parameters to execute a circuit at."""
+        in_params = {}
+        try:
+            index = len(self._outstack)
+            in_params["scale_factor"] = self._scale_factors[index]
+            if self._shot_list:
+                in_params["shots"] = self._shot_list[index]
+        except IndexError:
+            raise IndexError(
+                "BatchedFactory cannot take another step. "
+                "Number of batched scale_factors"
+                f" ({len(self._scale_factors)}) exceeded."
+            )
+        return in_params
+
+    def is_converged(self) -> bool:
+        """Returns True if all needed expectation values have been computed,
+        else False.
+        """
+        if len(self._outstack) != len(self._instack):
+            raise IndexError(
+                f"The length of 'self._instack' ({len(self._instack)}) "
+                f"and 'self._outstack' ({len(self._outstack)}) must be equal."
+            )
+        return len(self._outstack) == len(self._scale_factors)
+
     def _batch_populate_instack(self) -> None:
         """Populates the instack with all computed values."""
         if self._shot_list:
@@ -334,6 +415,7 @@ class BatchedFactory(BaseFactory, ABC):
             method may take significantly longer to run due to back-and-forth
             communication with the quantum backend.
         """
+        self.reset()
         self._batch_populate_instack()
         kwargs = self._get_keyword_args()
 
@@ -383,6 +465,7 @@ class BatchedFactory(BaseFactory, ABC):
             execution time by avoiding back-and-forth communication with the
             quantum backend.
         """
+        self.reset()
         executor_annotation = inspect.getfullargspec(executor).annotations
         if executor_annotation.get("return") in (
             List[float],
@@ -393,29 +476,18 @@ class BatchedFactory(BaseFactory, ABC):
             self.run_batched(qp, executor, scale_noise, num_to_average)
             return self
 
-        self._batch_populate_instack()
-        kwargs = self._get_keyword_args()
-        kwargs = (
-            np.array([[k for _ in range(num_to_average)] for k in kwargs])
-            .flatten()
-            .tolist()
+        def _noise_to_expval(scale_factor, **exec_params) -> float:
+            """Evaluates the quantum expectation value for a given
+            scale_factor and other executor parameters."""
+            expectation_values = []
+            for _ in range(num_to_average):
+                scaled_qp = scale_noise(qp, scale_factor)
+                expectation_values.append(executor(scaled_qp, **exec_params))
+            return np.average(expectation_values)
+
+        return self.iterate(
+            _noise_to_expval, max_iterations=len(self._scale_factors) + 1
         )
-
-        # Get all noise-scaled circuits to run
-        to_run = self._generate_circuits(qp, scale_noise, num_to_average)
-
-        # Run them sequentially
-        res = []
-        for i, circuit in enumerate(to_run):
-            res.append(executor(circuit, **kwargs[i]))
-
-        # Average the expectation results
-        self._outstack = [
-            np.average(res[i * num_to_average: (i + 1) * num_to_average])
-            for i in range(len(res) // num_to_average)
-        ]
-
-        return self
 
     def run_classical(
         self,
@@ -431,6 +503,7 @@ class BatchedFactory(BaseFactory, ABC):
                 would do provided a circuit, noise scaling method, and scale
                 factor.
         """
+        self.reset()
         self._batch_populate_instack()
         kwargs = self._get_keyword_args()
         self._outstack = [
@@ -459,33 +532,6 @@ class BatchedFactory(BaseFactory, ABC):
                 to_run.append(scale_noise(circuit, scale_factor))
         return to_run
 
-    def next(self) -> Dict[str, float]:
-        """Returns a dictionary of parameters to execute a circuit at."""
-        in_params = {}
-        try:
-            index = len(self._outstack)
-            in_params["scale_factor"] = self._scale_factors[index]
-            if self._shot_list:
-                in_params["shots"] = self._shot_list[index]
-        except IndexError:
-            raise IndexError(
-                "BatchedFactory cannot take another step. "
-                "Number of batched scale_factors"
-                f" ({len(self._scale_factors)}) exceeded."
-            )
-        return in_params
-
-    def is_converged(self) -> bool:
-        """Returns True if all needed expectation values have been computed,
-        else False.
-        """
-        if len(self._outstack) != len(self._instack):
-            raise IndexError(
-                f"The length of 'self._instack' ({len(self._instack)}) "
-                f"and 'self._outstack' ({len(self._outstack)}) must be equal."
-            )
-        return len(self._outstack) == len(self._scale_factors)
-
     def __eq__(self, other):
         return BaseFactory.__eq__(self, other) and np.allclose(
             self._scale_factors, other._scale_factors
@@ -505,65 +551,6 @@ class AdaptiveFactory(BaseFactory, ABC):
     computation, only the classical results of quantum experiments are
     processed by it.
     """
-
-    @abstractmethod
-    def next(self) -> Dict[str, float]:
-        """Returns a dictionary of parameters to execute a circuit at."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def is_converged(self) -> bool:
-        """Returns True if all needed expectation values have been computed,
-        else False.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def reduce(self) -> float:
-        """Returns the extrapolation to the zero-noise limit."""
-        raise NotImplementedError
-
-    def iterate(
-        self,
-        noise_to_expval: Callable[..., float],
-        max_iterations: int = 100,
-    ) -> "AdaptiveFactory":
-        """Evaluates a sequence of expectation values until enough
-        data is collected (or iterations reach "max_iterations").
-
-        Args:
-            noise_to_expval: Function mapping a noise scale factor to an
-                             expectation value. If shot_list is not None,
-                             "shot" must be an argument of the function.
-            max_iterations: Maximum number of iterations (optional).
-                            Default: 100.
-
-        Raises:
-            ConvergenceWarning: If iteration loop stops before convergence.
-        """
-        # Reset the instack, outstack, and optimal parameters
-        self.reset()
-
-        counter = 0
-        while not self.is_converged() and counter < max_iterations:
-            next_in_params = self.next()
-            next_exec_params = deepcopy(next_in_params)
-
-            # Get next scale factor and remove it from next_exec_params
-            scale_factor = next_exec_params.pop("scale_factor")
-            next_expval = noise_to_expval(scale_factor, **next_exec_params)
-            self.push(next_in_params, next_expval)
-            counter += 1
-
-        if counter == max_iterations:
-            warnings.warn(
-                "Factory iteration loop stopped before convergence. "
-                f"Maximum number of iterations ({max_iterations}) "
-                "was reached.",
-                ConvergenceWarning,
-            )
-
-        return self
 
     def run(
         self,

@@ -69,7 +69,7 @@ def basic_executor(qp: QPROGRAM, shots: int = 500) -> float:
 
 
 def test_run_factory():
-    """Tests qrun of a Richardson Factory."""
+    """Tests directly running a Richardson Factory."""
     qp = random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH)
     qp = measure(qp, 0)
     fac = RichardsonFactory([1.0, 2.0, 3.0])
