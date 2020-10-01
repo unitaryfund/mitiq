@@ -223,12 +223,6 @@ class Factory(ABC):
         """Returns the expectation values computed by the factory."""
         return np.array(self._outstack)
 
-    def _get_keyword_args(self) -> List[Dict[str, Any]]:
-        params = deepcopy(self._instack)
-        for d in params:
-            _ = d.pop("scale_factor")
-        return params
-
     def __eq__(self, other):
         if self._already_reduced != other._already_reduced:
             return False
@@ -296,18 +290,6 @@ class BatchedFactory(Factory, ABC):
         self._shot_list = shot_list
 
         super(BatchedFactory, self).__init__()
-
-    def _batch_populate_instack(self) -> None:
-        """Populates the instack with all computed values."""
-        if self._shot_list:
-            self._instack = [
-                {"scale_factor": scale, "shots": shots}
-                for scale, shots in zip(self._scale_factors, self._shot_list)
-            ]
-        else:
-            self._instack = [
-                {"scale_factor": scale} for scale in self._scale_factors
-            ]
 
     def run_batched(
         self,
@@ -458,6 +440,24 @@ class BatchedFactory(Factory, ABC):
             for _ in range(num_to_average):
                 to_run.append(scale_noise(circuit, scale_factor))
         return to_run
+
+    def _batch_populate_instack(self) -> None:
+        """Populates the instack with all computed values."""
+        if self._shot_list:
+            self._instack = [
+                {"scale_factor": scale, "shots": shots}
+                for scale, shots in zip(self._scale_factors, self._shot_list)
+            ]
+        else:
+            self._instack = [
+                {"scale_factor": scale} for scale in self._scale_factors
+            ]
+
+    def _get_keyword_args(self) -> List[Dict[str, Any]]:
+        params = deepcopy(self._instack)
+        for d in params:
+            _ = d.pop("scale_factor")
+        return params
 
     def next(self) -> Dict[str, float]:
         """Returns a dictionary of parameters to execute a circuit at."""
