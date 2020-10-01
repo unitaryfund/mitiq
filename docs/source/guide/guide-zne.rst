@@ -411,7 +411,7 @@ Directly using a factory for error mitigation
 ---------------------------------------------
 
 Zero-noise extrapolation can also be implemented by directly using the methods ``self.run``
-and ``self.reduce`` of a :class:`.Factory` object.
+and ``self.reduce`` of a factory object.
 
 The method ``self.run`` evaluates different expectation values at different noise levels
 until a sufficient amount of data is collected.
@@ -519,23 +519,23 @@ corresponding expectation value.
 
 The function ``noise_to_expval`` encapsulate the "quantum part" of the problem. The "classical
 part" of the problem can be solved by passing ``noise_to_expval``
-to the ``self.iterate`` method of an adaptive factory, or the ``self.run_classical`` method of a batched factory.
+to the ``self.iterate`` method of a factory.
 This method will repeatedly call ``noise_to_expval`` for different
 noise levels until a sufficient amount of data is collected.
-So, one can view ``self.iterate`` and ``self.run_classical`` as the classical counterpart of the quantum method
+So, one can view ``self.iterate`` as the classical counterpart of the quantum method
 ``self.run``.
 
 .. testcode::
 
-   linear_fac.run_classical(noise_to_expval)
+   linear_fac.iterate(noise_to_expval)
    zne_expval = linear_fac.reduce()
    print(f"Error with linear_fac: {abs(exact - zne_expval):.4f}")
 
-   richardson_fac.run_classical(noise_to_expval)
+   richardson_fac.iterate(noise_to_expval)
    zne_expval = richardson_fac.reduce()
    print(f"Error with richardson_fac: {abs(exact - zne_expval):.4f}")
 
-   poly_fac.run_classical(noise_to_expval)
+   poly_fac.iterate(noise_to_expval)
    zne_expval = poly_fac.reduce()
    print(f"Error with poly_fac: {abs(exact - zne_expval):.4f}")
 
@@ -546,13 +546,13 @@ So, one can view ``self.iterate`` and ``self.run_classical`` as the classical co
    Error with poly_fac: 0.0110
 
 .. note::
-   With respect to ``self.run`` the ``self.run_classical`` or ``self.iterate`` methods are much more flexible and
+   With respect to ``self.run``, the``self.iterate`` method is much more flexible and
    can be applied whenever the user is able to autonomously scale the noise level associated
    to an expectation value. Indeed, the function ``noise_to_expval`` can represent any experiment
    or any simulation in which noise can be artificially increased. The scenario
    is therefore not restricted to quantum circuits but can be easily extended to
    annealing devices or to gates which are controllable at a pulse level. In principle,
-   one could even use the ``self.run_classical`` or ``self.iterate`` methods to mitigate experiments which are
+   one could even use the ``self.iterate`` method to mitigate experiments which are
    unrelated to quantum computing.
 
 
@@ -563,7 +563,7 @@ Defining a custom factory
 If necessary, the user can modify an existing extrapolation methods by subclassing
 one of the :ref:`built-in factories <built-in-factories>`.
 
-Alternatively, a new adaptive extrapolation method can be derived from the abstract class :class:`.Factory`.
+Alternatively, a new adaptive extrapolation method can be derived from the abstract class :class:`.BaseFactory`.
 In this case its core methods must be implemented:
 ``self.next``, ``self.push``, ``self.is_converged``, ``self.reduce``, etc.
 Typically, the ``self.__init__`` method must be overridden.
@@ -633,11 +633,11 @@ and clips the result if it falls outside its physical domain.
 .. testcleanup::
 
    fac = MyFactory([1, 2, 3], min_expval=0.0, max_expval=2.0)
-   fac.run_classical(noise_to_expval)
+   fac.iterate(noise_to_expval)
    assert np.isclose(fac.reduce(), 1.0, atol=0.1)
    # Linear model with a large zero-noise limit
    noise_to_large_expval = lambda x : noise_to_expval(x) + 10.0
-   fac.run_classical(noise_to_large_expval)
+   fac.iterate(noise_to_large_expval)
    # assert the output is clipped to 2.0
    assert np.isclose(fac.reduce(), 2.0)
 

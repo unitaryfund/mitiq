@@ -379,7 +379,9 @@ class BatchedFactory(BaseFactory, ABC):
         return len(self._outstack) == len(self._scale_factors)
 
     def _batch_populate_instack(self) -> None:
-        """Populates the instack with all computed values."""
+        """Populates the instack with all parameters at which to compute
+        expectation values.
+        """
         if self._shot_list:
             self._instack = [
                 {"scale_factor": scale, "shots": shots}
@@ -408,12 +410,6 @@ class BatchedFactory(BaseFactory, ABC):
             scale_noise: Noise scaling function.
             num_to_average: Number of times to call scale_noise at each scale
                 factor.
-
-        Notes:
-            `BatchedFactory.run_sequential` uses an executor which inputs a
-            single quantum circuit and outputs a single expectation value. This
-            method may take significantly longer to run due to back-and-forth
-            communication with the quantum backend.
         """
         self.reset()
         self._batch_populate_instack()
@@ -458,12 +454,6 @@ class BatchedFactory(BaseFactory, ABC):
             scale_noise: Noise scaling function.
             num_to_average: Number of times to call scale_noise at each scale
                 factor.
-
-        Notes:
-            `BatchedFactory.run` is an alternative which runs sends all
-            circuits to run in a single batch. This can significantly decrease
-            execution time by avoiding back-and-forth communication with the
-            quantum backend.
         """
         self.reset()
         executor_annotation = inspect.getfullargspec(executor).annotations
