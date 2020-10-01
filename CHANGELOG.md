@@ -12,6 +12,7 @@
 
 ### All Changes
 
+- Redesign factory objects (@rmlarose, gh-381).
 - Add arxiv badge to readme header (@nathanshammah, gh-376).
 
 ## Version 0.1.0 (September 2nd, 2020)
