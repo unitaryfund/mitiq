@@ -272,7 +272,7 @@ This function can then be used with ``mitiq.execute_with_zne`` as an option to s
 Classical fitting and extrapolation: Factory Objects
 ====================================================
 
-A :class:`.BaseFactory` object is a self-contained representation of an error mitigation method.
+A :class:`.Factory` object is a self-contained representation of an error mitigation method.
 
 This representation is not just hardware-agnostic, it is even *quantum-agnostic*,
 in the sense that it mainly deals with classical data: the classical input and the classical output of a
@@ -292,7 +292,7 @@ level can depend on the history of these values. Obviously, non-adaptive
 methods are supported too and they actually represent the most common choice. Non-adaptive factories are instances
 of :class:`.BatchedFactory` objects. Adaptive factories are instances of :class:`.AdaptiveFactory` objects.
 
-Specific classes derived from the abstract class :class:`.BaseFactory` represent different zero-noise extrapolation
+Specific classes derived from the abstract class :class:`.Factory` represent different zero-noise extrapolation
 methods. All the built-in factories can be found in the module :py:mod:`mitiq.zne.inference` and
 are summarized in the following table.
 
@@ -490,9 +490,9 @@ in the previous sections.
 Eventually we will also discuss how the user can easily define a custom factory class.
 
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Low-level usage: the ``iterate`` method.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Low-level usage: the ``run_classical`` method.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``self.run`` method takes as arguments a circuit and other "quantum" objects.
 On the other hand, the core computation performed by any factory corresponds to
@@ -519,10 +519,9 @@ corresponding expectation value.
 
 The function ``noise_to_expval`` encapsulate the "quantum part" of the problem. The "classical
 part" of the problem can be solved by passing ``noise_to_expval``
-to the ``self.iterate`` method of an adaptive factory, or the ``self.run_classical`` method of a batched factory.
+to the ``self.run_classical`` method of a factory.
 This method will repeatedly call ``noise_to_expval`` for different
-noise levels until a sufficient amount of data is collected.
-So, one can view ``self.iterate`` and ``self.run_classical`` as the classical counterpart of the quantum method
+noise levels, so one can view ``self.run_classical`` as the classical counterpart of the quantum method
 ``self.run``.
 
 .. testcode::
@@ -546,13 +545,13 @@ So, one can view ``self.iterate`` and ``self.run_classical`` as the classical co
    Error with poly_fac: 0.0110
 
 .. note::
-   With respect to ``self.run`` the ``self.run_classical`` or ``self.iterate`` methods are much more flexible and
+   With respect to ``self.run``, the ``self.run_classical`` method is much more flexible and
    can be applied whenever the user is able to autonomously scale the noise level associated
    to an expectation value. Indeed, the function ``noise_to_expval`` can represent any experiment
    or any simulation in which noise can be artificially increased. The scenario
    is therefore not restricted to quantum circuits but can be easily extended to
    annealing devices or to gates which are controllable at a pulse level. In principle,
-   one could even use the ``self.run_classical`` or ``self.iterate`` methods to mitigate experiments which are
+   one could even use the ``self.run_classical`` method to mitigate experiments which are
    unrelated to quantum computing.
 
 

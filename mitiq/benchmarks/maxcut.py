@@ -25,7 +25,7 @@ from cirq import identity_each as id
 from scipy.optimize import minimize
 
 from mitiq import execute_with_zne
-from mitiq.zne.inference import BaseFactory
+from mitiq.zne.inference import Factory
 from mitiq.benchmarks.utils import noisy_simulation
 
 SIMULATOR = DensityMatrixSimulator()
@@ -54,7 +54,7 @@ def make_maxcut(
     graph: List[Tuple[int, int]],
     noise: float = 0,
     scale_noise: Callable = None,
-    factory: BaseFactory = None,
+    factory: Factory = None,
 ) -> Tuple[
     Callable[[np.ndarray], float], Callable[[np.ndarray], Circuit], np.ndarray
 ]:
@@ -130,7 +130,7 @@ def run_maxcut(
     x0: np.ndarray,
     noise: float = 0,
     scale_noise: Callable = None,
-    factory: BaseFactory = None,
+    factory: Factory = None,
     verbose: bool = True,
 ) -> Tuple[float, np.ndarray, List]:
     """Solves MAXCUT using QAOA on a cirq wavefunction simulator using a

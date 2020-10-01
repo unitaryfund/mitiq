@@ -70,7 +70,7 @@ _EXTR_WARN = (
 
 class ConvergenceWarning(Warning):
     """Warning raised by :class:`.Factory` objects when
-    their `iterate` method fails to converge.
+    their `run_classical` method fails to converge.
     """
 
     pass
@@ -157,7 +157,7 @@ def mitiq_polyfit(
     return list(opt_params)
 
 
-class BaseFactory(ABC):
+class Factory(ABC):
     def __init__(self) -> None:
         """Initialization arguments (e.g. noise scale factors) depend on the
         particular extrapolation algorithm and can be added to the "__init__"
@@ -175,7 +175,7 @@ class BaseFactory(ABC):
         executor: Callable[..., float],
         scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
         num_to_average: int = 1,
-    ) -> "BaseFactory":
+    ) -> "Factory":
         raise NotImplementedError
 
     @abstractmethod
@@ -183,7 +183,7 @@ class BaseFactory(ABC):
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
 
-    def push(self, instack_val: dict, outstack_val: float) -> "BaseFactory":
+    def push(self, instack_val: dict, outstack_val: float) -> "Factory":
         """Appends "instack_val" to "self._instack" and "outstack_val" to
         "self._outstack". Each time a new expectation value is computed this
         method should be used to update the internal state of the Factory.
@@ -201,7 +201,7 @@ class BaseFactory(ABC):
         self._outstack.append(outstack_val)
         return self
 
-    def reset(self) -> "BaseFactory":
+    def reset(self) -> "Factory":
         """Resets the instack, outstack, and optimal parameters of the Factory
         to empty lists.
         """
@@ -240,7 +240,7 @@ class BaseFactory(ABC):
         return np.allclose(self._outstack, other._outstack)
 
 
-class BatchedFactory(BaseFactory, ABC):
+class BatchedFactory(Factory, ABC):
     """Abstract class of a non-adaptive Factory.
 
     This is initialized with a given batch of "scale_factors".
@@ -487,12 +487,12 @@ class BatchedFactory(BaseFactory, ABC):
         return len(self._outstack) == len(self._scale_factors)
 
     def __eq__(self, other):
-        return BaseFactory.__eq__(self, other) and np.allclose(
+        return Factory.__eq__(self, other) and np.allclose(
             self._scale_factors, other._scale_factors
         )
 
 
-class AdaptiveFactory(BaseFactory, ABC):
+class AdaptiveFactory(Factory, ABC):
     """Abstract class designed to adaptively produce a new noise scaling
     parameter based on a historical stack of previous noise scale parameters
     ("self._instack") and previously estimated expectation values
@@ -523,7 +523,7 @@ class AdaptiveFactory(BaseFactory, ABC):
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
 
-    def iterate(
+    def run_classical(
         self,
         noise_to_expval: Callable[..., float],
         max_iterations: int = 100,
@@ -598,7 +598,7 @@ class AdaptiveFactory(BaseFactory, ABC):
                 expectation_values.append(executor(scaled_qp, **exec_params))
             return np.average(expectation_values)
 
-        return self.iterate(_noise_to_expval, max_iterations)
+        return self.run_classical(_noise_to_expval, max_iterations)
 
 
 class PolyFactory(BatchedFactory):
@@ -1388,10 +1388,10 @@ class AdaExpFactory(AdaptiveFactory):
 
     def __eq__(self, other) -> bool:
         return (
-            BaseFactory.__eq__(self, other)
-            and self._steps == other._steps
-            and self._scale_factor == other._scale_factor
-            and np.isclose(self.asymptote, other.asymptote)
-            and self.avoid_log == other.avoid_log
-            and np.allclose(self.history, other.history)
+                Factory.__eq__(self, other)
+                and self._steps == other._steps
+                and self._scale_factor == other._scale_factor
+                and np.isclose(self.asymptote, other.asymptote)
+                and self.avoid_log == other.avoid_log
+                and np.allclose(self.history, other.history)
         )

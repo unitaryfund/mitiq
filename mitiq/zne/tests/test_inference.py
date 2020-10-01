@@ -161,7 +161,7 @@ def test_get_scale_factors_adaptive_factories(factory):
     assert len(fac.get_scale_factors()) == 0
 
     # Compute expectation values at all the scale factors
-    fac.iterate(apply_seed_to_func(f_exp_up, seed=1))
+    fac.run_classical(apply_seed_to_func(f_exp_up, seed=1))
     assert isinstance(fac.get_scale_factors(), np.ndarray)
 
     # Given this seeded executor, the scale factors should be as follows
@@ -224,7 +224,7 @@ def test_get_expectation_values_adaptive_factories(factory):
     assert len(fac.get_expectation_values()) == 0
 
     # Compute expectation values at all the scale factors
-    fac.iterate(executor)
+    fac.run_classical(executor)
     assert isinstance(fac.get_scale_factors(), np.ndarray)
 
     # Given this seeded executor, the scale factors should be as follows
@@ -424,11 +424,11 @@ def test_ada_exp_factory_with_asympt(
     fac = AdaExpFactory(
         steps=3, scale_factor=2.0, asymptote=A, avoid_log=avoid_log
     )
-    # Note: iterate calls next which calls reduce, so calling fac.iterate with
+    # Note: run_classical calls next which calls reduce, so calling fac.run_classical with
     # an AdaExpFactory sets the optimal parameters as well. Hence we check that
-    # the opt_params are empty before AdaExpFactory.iterate is called.
+    # the opt_params are empty before AdaExpFactory.run_classical is called.
     assert len(fac.opt_params) == 0
-    fac.iterate(seeded_f)
+    fac.run_classical(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
     # There are three parameters to fit for the (adaptive) exponential ansatz
@@ -445,7 +445,7 @@ def test_ada_exp_fac_with_asympt_more_steps(
     fac = AdaExpFactory(
         steps=6, scale_factor=2.0, asymptote=A, avoid_log=avoid_log
     )
-    fac.iterate(seeded_f)
+    fac.run_classical(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
 
@@ -454,7 +454,7 @@ def test_ada_exp_factory_no_asympt(test_f: Callable[[float], float]):
     """Test of the adaptive exponential extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = AdaExpFactory(steps=4, scale_factor=2.0, asymptote=None)
-    fac.iterate(seeded_f)
+    fac.run_classical(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
 
@@ -465,7 +465,7 @@ def test_ada_exp_factory_no_asympt_more_steps(
     """Test of the adaptive exponential extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = AdaExpFactory(steps=8, scale_factor=2.0, asymptote=None)
-    fac.iterate(seeded_f)
+    fac.run_classical(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
 
