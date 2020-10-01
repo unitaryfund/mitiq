@@ -158,11 +158,22 @@ def mitiq_polyfit(
 
 
 class Factory(ABC):
+    """Abstract base class which performs the classical parts of zero-noise
+    extrapolation. This minimally includes:
+
+        * scaling circuits,
+        * sending jobs to execute,
+        * collecting the results,
+        * fitting the collected data,
+        * Extrapolating to the zero-noise limit.
+
+    If all scale factors are set a priori, the jobs can be batched. This is
+    handled by a BatchedFactory.
+
+    If the next scale factor depends on the previous history of results,
+    jobs are run sequentially. This is handled by an AdaptiveFactory.
+    """
     def __init__(self) -> None:
-        """Initialization arguments (e.g. noise scale factors) depend on the
-        particular extrapolation algorithm and can be added to the "__init__"
-        method of the associated derived class.
-        """
         self._instack: List[Dict[str, float]] = []
         self._outstack: List[float] = []
         self.opt_params: List[float] = []
@@ -235,30 +246,11 @@ class Factory(ABC):
 
 
 class BatchedFactory(Factory, ABC):
-    """Abstract class of a non-adaptive Factory.
+    """Abstract class of a non-adaptive Factory initialized with a
+    pre-determined set of scale factors.
 
-    This is initialized with a given batch of "scale_factors".
-    The "self.next" method trivially iterates over the elements of
-    "scale_factors" in a non-adaptive way.
-    Convergence is achieved when all the correpsonding expectation values have
-    been measured.
-
-    Specific (non-adaptive) zero-noise extrapolation algorithms can be derived
-    from this class by overriding the "self.reduce" and (if necessary)
-    the "__init__" method.
-
-    Args:
-        scale_factors: Sequence of noise scale factors at which
-                       expectation values should be measured.
-        shot_list: Optional sequence of integers corresponding to the number
-                   of samples taken for each expectation value. If this
-                   argument is explicitly passed to the factory, it must have
-                   the same length of scale_factors and the executor function
-                   must accept "shots" as a valid keyword argument.
-
-    Raises:
-        ValueError: If the number of scale factors is less than 2.
-        IndexError: If an iteration step fails.
+    Specific (non-adaptive) extrapolation algorithms are derived from this
+    class by defining the `reduce` method.
     """
 
     def __init__(
@@ -266,7 +258,21 @@ class BatchedFactory(Factory, ABC):
         scale_factors: Sequence[float],
         shot_list: Optional[List[int]] = None,
     ) -> None:
-        """Instantiates a new object of this Factory class."""
+        """Constructs a BatchedFactory.
+
+        Args:
+            scale_factors: Sequence of noise scale factors at which expectation
+                values should be measured.
+            shot_list: Optional sequence of integers corresponding to the
+                number of samples taken for each expectation value. If this
+                argument is explicitly passed to the factory, it must have the
+                same length of scale_factors and the executor function must
+                accept "shots" as a valid keyword argument.
+
+        Raises:
+            ValueError: If the number of scale factors is less than 2.
+            TypeError: If shot_list is provided and has any non-integer values.
+        """
         if len(scale_factors) < 2:
             raise ValueError("At least 2 scale factors are necessary.")
 
@@ -299,22 +305,15 @@ class BatchedFactory(Factory, ABC):
         num_to_average: int = 1,
     ) -> "BatchedFactory":
         """Computes the expectation values at each scale factor by calling
-        `batched_executor` on a list of all circuits to run.
+        `batched_executor` on a sequence of circuits to run.
 
         Args:
             qp: Quantum circuit to run.
             batched_executor: Function which inputs a list of circuits and
                 outputs a list of expectation values.
             scale_noise: Noise scaling function.
-            scale_noise: Noise scaling function.
             num_to_average: Number of times to call scale_noise at each scale
                 factor.
-
-        Notes:
-            `BatchedFactory.run_sequential` uses an executor which inputs a
-            single quantum circuit and outputs a single expectation value. This
-            method may take significantly longer to run due to back-and-forth
-            communication with the quantum backend.
         """
         self._batch_populate_instack()
         kwargs = self._get_keyword_args()
@@ -346,7 +345,14 @@ class BatchedFactory(Factory, ABC):
         circuits are run sequentially. If the executor is batched and returns
         a list of expectation values (one for each circuit), then the circuits
         are sent to the backend as a single job. To detect if an executor is
-        batched, it must be annotated.
+        batched, it must be annotated with a return type that is one of the
+        following:
+
+            * Iterable[float]
+            * List[float]
+            * Sequence[float]
+            * Tuple[float]
+            * numpy.ndarray
 
         Args:
             qp: Quantum circuit to run.
@@ -358,12 +364,6 @@ class BatchedFactory(Factory, ABC):
             scale_noise: Noise scaling function.
             num_to_average: Number of times to call scale_noise at each scale
                 factor.
-
-        Notes:
-            `BatchedFactory.run` is an alternative which runs sends all
-            circuits to run in a single batch. This can significantly decrease
-            execution time by avoiding back-and-forth communication with the
-            quantum backend.
         """
         executor_annotation = inspect.getfullargspec(executor).annotations
         if executor_annotation.get("return") in (
@@ -371,6 +371,7 @@ class BatchedFactory(Factory, ABC):
             Sequence[float],
             Tuple[float],
             Iterable[float],
+            np.ndarray
         ):
             self.run_batched(qp, executor, scale_noise, num_to_average)
             return self
@@ -435,7 +436,7 @@ class BatchedFactory(Factory, ABC):
             num_to_average: Number of times to call scale_noise at each scale
                 factor.
         """
-        to_run = []  # TODO: Store this?
+        to_run = []
         for scale_factor in self.get_scale_factors():
             for _ in range(num_to_average):
                 to_run.append(scale_noise(circuit, scale_factor))
@@ -498,12 +499,8 @@ class AdaptiveFactory(Factory, ABC):
     ("self._instack") and previously estimated expectation values
     ("self._outstack").
 
-    Specific zero-noise extrapolation algorithms, adaptive or non-adaptive,
-    are derived from this class.
-
-    A Factory object is not supposed to directly perform any quantum
-    computation, only the classical results of quantum experiments are
-    processed by it.
+    Specific zero-noise extrapolation algorithms which are adaptive are derived
+    from this class.
     """
 
     @abstractmethod
