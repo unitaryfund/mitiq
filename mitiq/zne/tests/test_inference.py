@@ -146,7 +146,7 @@ def test_get_scale_factors_static_factories(factory):
     assert len(fac.get_scale_factors()) == 0
 
     # Compute expectation values at all the scale factors
-    fac.run_classical(apply_seed_to_func(f_lin, seed=1))
+    fac.iterate(apply_seed_to_func(f_lin, seed=1))
     assert isinstance(fac.get_scale_factors(), np.ndarray)
     assert np.allclose(fac.get_scale_factors(), scale_factors)
 
@@ -206,7 +206,7 @@ def test_get_expectation_values_static_factories(factory):
     assert len(fac.get_expectation_values()) == 0
 
     # Compute expectation values at all the scale factors
-    fac.run_classical(executor)
+    fac.iterate(executor)
     assert isinstance(fac.get_expectation_values(), np.ndarray)
     assert np.allclose(
         fac.get_expectation_values(), expectation_values, atol=1e-3
@@ -300,7 +300,7 @@ def test_richardson_extr(test_f: Callable[[float], float]):
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = RichardsonFactory(scale_factors=X_VALS)
     assert fac.opt_params == []
-    fac.run_classical(seeded_f)
+    fac.iterate(seeded_f)
     zne_value = fac.reduce()
     assert np.isclose(zne_value, seeded_f(0, err=0), atol=CLOSE_TOL)
     assert len(fac.opt_params) == len(X_VALS)
@@ -312,7 +312,7 @@ def test_linear_extr():
     seeded_f = apply_seed_to_func(f_lin, SEED)
     fac = LinearFactory(X_VALS)
     assert fac.opt_params == []
-    fac.run_classical(seeded_f)
+    fac.iterate(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
     assert np.allclose(fac.opt_params, [B, A], atol=CLOSE_TOL)
 
@@ -321,17 +321,17 @@ def test_poly_extr():
     """Test of polynomial extrapolator."""
     # test (order=1)
     fac = PolyFactory(X_VALS, order=1)
-    fac.run_classical(f_lin)
+    fac.iterate(f_lin)
     assert np.isclose(fac.reduce(), f_lin(0, err=0), atol=CLOSE_TOL)
     # test that, for some non-linear functions,
     # order=1 is bad while order=2 is better.
     seeded_f = apply_seed_to_func(f_non_lin, SEED)
     fac = PolyFactory(X_VALS, order=1)
-    fac.run_classical(seeded_f)
+    fac.iterate(seeded_f)
     assert not np.isclose(fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL)
     seeded_f = apply_seed_to_func(f_non_lin, SEED)
     fac = PolyFactory(X_VALS, order=2)
-    fac.run_classical(seeded_f)
+    fac.iterate(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
 
@@ -342,7 +342,7 @@ def test_opt_params_poly_factory(order):
     """
     fac = PolyFactory(scale_factors=np.linspace(1, 10, 10), order=order)
     assert fac.opt_params == []
-    fac.run_classical(apply_seed_to_func(f_non_lin, seed=SEED))
+    fac.iterate(apply_seed_to_func(f_non_lin, seed=SEED))
     zne_value = fac.reduce()
     assert len(fac.opt_params) == order + 1
     assert np.isclose(fac.opt_params[-1], zne_value)
@@ -356,7 +356,7 @@ def test_exp_factory_with_asympt(
     """Test of exponential extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = ExpFactory(X_VALS, asymptote=A, avoid_log=True)
-    fac.run_classical(seeded_f)
+    fac.iterate(seeded_f)
     assert len(fac.opt_params) == 0
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
@@ -369,7 +369,7 @@ def test_exp_factory_no_asympt(test_f: Callable[[float], float]):
     """Test of exponential extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = ExpFactory(X_VALS, asymptote=None)
-    fac.run_classical(seeded_f)
+    fac.iterate(seeded_f)
     assert len(fac.opt_params) == 0
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
@@ -387,11 +387,11 @@ def test_poly_exp_factory_with_asympt(
     # order=1 is bad while order=2 is better.
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = PolyExpFactory(X_VALS, order=1, asymptote=A, avoid_log=avoid_log)
-    fac.run_classical(seeded_f)
+    fac.iterate(seeded_f)
     assert not np.isclose(fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL)
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = PolyExpFactory(X_VALS, order=2, asymptote=A, avoid_log=avoid_log)
-    fac.run_classical(seeded_f)
+    fac.iterate(seeded_f)
     assert len(fac.opt_params) == 0
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=POLYEXP_TOL)
 
@@ -406,11 +406,11 @@ def test_poly_exp_factory_no_asympt(test_f: Callable[[float], float]):
     # test that, for a non-linear exponent,
     # order=1 is bad while order=2 is better.
     fac = PolyExpFactory(X_VALS, order=1, asymptote=None)
-    fac.run_classical(seeded_f)
+    fac.iterate(seeded_f)
     assert not np.isclose(fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL)
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = PolyExpFactory(X_VALS, order=2, asymptote=None)
-    fac.run_classical(seeded_f)
+    fac.iterate(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=POLYEXP_TOL)
 
 
@@ -472,7 +472,7 @@ def test_ada_exp_factory_no_asympt_more_steps(
 def test_avoid_log_keyword():
     """Test that avoid_log=True and avoid_log=False give different results."""
     fac = ExpFactory(X_VALS, asymptote=A, avoid_log=False)
-    fac.run_classical(f_exp_down)
+    fac.iterate(f_exp_down)
     znl_with_log = fac.reduce()
     fac.avoid_log = True
     znl_without_log = fac.reduce()
@@ -558,10 +558,7 @@ def test_equal(factory):
         else:
             fac = factory(scale_factors=[1, 2, 3], shot_list=[1, 2, 3])
         if iterate:
-            fac.run_classical(
-                scale_factor_to_expectation_value=lambda x, shots: np.exp(x)
-                + 0.5
-            )
+            fac.iterate(lambda x, shots: np.exp(x) + 0.5)
 
         copied_factory = copy(fac)
         assert copied_factory == fac
@@ -579,7 +576,7 @@ def test_iterate_with_shot_list(fac_class):
     """Tests factories with (and without) the "shot_list" argument."""
     # first test without shot_list
     fac = fac_class(X_VALS)
-    fac.run_classical(f_lin_shot)
+    fac.iterate(f_lin_shot)
     assert np.isclose(fac.reduce(), f_lin_shot(0), atol=CLOSE_TOL)
 
     # Check instack and outstack are as expected
@@ -591,7 +588,7 @@ def test_iterate_with_shot_list(fac_class):
 
     # Now pass an arbitrary shot_list as an argument
     fac = fac_class(X_VALS, shot_list=SHOT_LIST)
-    fac.run_classical(f_lin_shot)
+    fac.iterate(f_lin_shot)
     assert np.isclose(fac.reduce(), f_lin_shot(0), atol=CLOSE_TOL)
 
     # Check instack and outstack are as expected

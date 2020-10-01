@@ -489,29 +489,6 @@ class BatchedFactory(BaseFactory, ABC):
             _noise_to_expval, max_iterations=len(self._scale_factors) + 1
         )
 
-    def run_classical(
-        self,
-        scale_factor_to_expectation_value: Callable[..., float],
-    ) -> "BatchedFactory":
-        """Computes expectation values by calling the input function at each
-        scale factor.
-
-        Args:
-            scale_factor_to_expectation_value: Function which inputs a scale
-                factor (float) and outputs the expectation value at this scale
-                factor. This is a classical analogue to what a quantum computer
-                would do provided a circuit, noise scaling method, and scale
-                factor.
-        """
-        self.reset()
-        self._batch_populate_instack()
-        kwargs = self._get_keyword_args()
-        self._outstack = [
-            scale_factor_to_expectation_value(scale_factor, **kwargs[i])
-            for i, scale_factor in enumerate(self._scale_factors)
-        ]
-        return self
-
     def _generate_circuits(
         self,
         circuit: QPROGRAM,
