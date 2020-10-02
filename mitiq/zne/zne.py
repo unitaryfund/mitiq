@@ -49,7 +49,7 @@ def execute_with_zne(
 
     if not isinstance(factory, Factory):
         raise TypeError(
-            f"Argument `factory` must be of type mitiq.factories.BaseFactory "
+            f"Argument `factory` must be of type mitiq.factories.Factory "
             f"but type(factory) is {type(factory)}."
         )
 
