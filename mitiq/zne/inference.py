@@ -200,7 +200,7 @@ def _make_batched_executor(
     ) -> List[float]:
 
         if batched_kwargs is None:
-            return [executor(circ) for circ in batch]
+            return [executor(circ) for circ in batch]  # type: ignore
         results = []
         for circ, kwargs in zip(batch, batched_kwargs):
             results.append(executor(circ, **kwargs))
@@ -384,10 +384,7 @@ class BatchedFactory(Factory, ABC):
         """
         self.reset()
         self._batch_populate_instack()
-        kw_list = self._get_keyword_args()
-
-        # Batch keywords taking into account num_to_average
-        batched_kwargs = [k for k in kw_list for _ in range(num_to_average)]
+        kw_lst = self._get_keyword_args()
 
         # Get all noise-scaled circuits to run
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
@@ -395,7 +392,9 @@ class BatchedFactory(Factory, ABC):
         # Run the circuits in a batch
         batched_executor = _make_batched_executor(executor)
 
-        if batched_kwargs:
+        if kw_lst:
+            # Batch keywords taking into account num_to_average
+            batched_kwargs = [k for k in kw_lst for _ in range(num_to_average)]
             res = batched_executor(to_run, batched_kwargs=batched_kwargs)
         else:
             res = batched_executor(to_run)
@@ -423,11 +422,18 @@ class BatchedFactory(Factory, ABC):
         """
         self.reset()
         self._batch_populate_instack()
-        kwargs = self._get_keyword_args()
-        self._outstack = [
-            scale_factor_to_expectation_value(scale_factor, **kwargs[i])
-            for i, scale_factor in enumerate(self._scale_factors)
-        ]
+        kw_list = self._get_keyword_args()
+
+        if kw_list:
+            self._outstack = [
+                scale_factor_to_expectation_value(scale_factor, **kw_list[i])
+                for i, scale_factor in enumerate(self._scale_factors)
+            ]
+        else:
+            self._outstack = [
+                scale_factor_to_expectation_value(scale_factor)
+                for i, scale_factor in enumerate(self._scale_factors)
+            ]
         return self
 
     def _generate_circuits(
