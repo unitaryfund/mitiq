@@ -384,7 +384,10 @@ class BatchedFactory(Factory, ABC):
         """
         self.reset()
         self._batch_populate_instack()
-        batched_kwargs = self._get_keyword_args()
+        kw_list = self._get_keyword_args()
+
+        # Batch keywords taking into account num_to_average
+        batched_kwargs = [k for k in kw_list for _ in range(num_to_average)]
 
         # Get all noise-scaled circuits to run
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
