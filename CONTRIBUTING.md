@@ -85,8 +85,17 @@ docstrings with
 (myenv) make docs
 ```
 
+To generate the pdf version of the documentation, type from the root directory
+
+```bash
+(myenv) make latexpdf
+```
+and override eventual error messages during the latex build by typying `s` and then the `Return` key.
+
 If you add new `/tests` directories, you will need to update the `Makefile`
 so that they will be included as part of continuous integration.
+
+
 
 ### Style Guidelines
 
