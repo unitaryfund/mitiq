@@ -37,11 +37,15 @@ def generate_qcs_executor(
     """
     Generates an executor for QCS that ingests pyQuil programs.
 
-    :param qc: The QuantumComputer object to use as backend.
-    :param expectation_fn: Takes in bitstring results and produces a float.
-    :param shots: Number of shots to take.
-    :param reset: Whether or not to enable active reset.
-    :param debug: If true, print the program after compilation.
+    Args:
+        qc: The QuantumComputer object to use as backend.
+        expectation_fn: Takes in bitstring results and produces a float.
+        shots: Number of shots to take.
+        reset: Whether or not to enable active reset.
+        debug: If true, print the program after compilation.
+
+    Returns:
+        A customized executor function.
     """
 
     def executor(program: Program) -> float:
@@ -89,6 +93,12 @@ def ground_state_expectation(results: np.ndarray) -> float:
     """
     Example expectation_fn. Computes the ground state expectation, also
     called survival probability.
+
+    Args:
+        results: Array of bitstrings from running a quantum program.
+
+    Returns:
+        A single expectation value computed from the results.
     """
     num_shots = len(results)
     return (

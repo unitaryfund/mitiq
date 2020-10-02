@@ -32,6 +32,12 @@ MAGIC_ANGLES = [-np.pi, -np.pi / 2, np.pi / 2, np.pi]
 def one_qubit_gateset(qubit: int) -> List[Gate]:
     """
     Return the RX, RZ native gateset on one qubit.
+
+    Args:
+        qubit: The qubit to build a 1Q gateset with.
+
+    Returns:
+        A list of Gate objects representing an (RX, RZ) 1Q gateset.
     """
     return list(
         gate(angle, qubit)
@@ -43,6 +49,13 @@ def one_qubit_gateset(qubit: int) -> List[Gate]:
 def two_qubit_gateset(q0: int, q1: int) -> List[Gate]:
     """
     Return the RX, RZ, CZ native gateset on two qubits.
+
+    Args:
+        q0: One of the two qubits to use for the gateset.
+        q1: The other qubit to use for the gateset.
+
+    Returns:
+        A list of Gate objects representing an (RX, RZ, CZ) 2Q gateset.
     """
     return one_qubit_gateset(q0) + one_qubit_gateset(q1) + [CZ(q0, q1)]
 
@@ -57,11 +70,15 @@ def generate_rb_program(
     """
     Generate a randomized benchmarking program.
 
-    :param benchmarker: Connection object to quilc for generating sequences.
-    :param qubits: The qubits to generate and RB sequence for.
-    :param depth: Total number of Cliffords in the sequence (with inverse).
-    :param interleaved_gate: Gate to interleave into the sequence for IRB.
-    :param random_seed: Random seed passed to the benchmarker.
+    Args:
+        benchmarker: Connection object to quilc for generating sequences.
+        qubits: The qubits to generate and RB sequence for.
+        depth: Total number of Cliffords in the sequence (with inverse).
+        interleaved_gate: Gate to interleave into the sequence for IRB.
+        random_seed: Random seed passed to the benchmarker.
+
+    Returns:
+        A pyQuil Program for a randomized benchmarking sequence.
     """
     if depth < 2:
         raise ValueError("Sequence depth must be at least 2 for RB sequences.")
