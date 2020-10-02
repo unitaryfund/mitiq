@@ -82,6 +82,11 @@ print(f"Error in simulation (w/o  mitigation): {1.0 - unmitigated:.{3}}")
 mitigated = execute_with_zne(circ, noisy_simulation)
 print(f"Error in simulation (with mitigation): {1.0 - mitigated:.{3}}")
 ```
+Sample output:
+```
+Error in simulation (w/o  mitigation): 0.0506
+Error in simulation (with mitigation): 0.000519
+```
 
 ## Error mitigation techniques
 
