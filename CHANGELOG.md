@@ -13,6 +13,7 @@
 ### All Changes
 
 - Add arxiv badge to readme header (@nathanshammah, gh-376).
+- Spruce up the README a bit (@karalekas, gh-383).
 
 ## Version 0.1.0 (September 2nd, 2020)
 
