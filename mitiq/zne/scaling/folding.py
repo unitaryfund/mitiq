@@ -230,7 +230,7 @@ def _fold_moments(circuit: Circuit, moment_indices: List[int]) -> None:
 
 
 # Helper functions for folding by fidelity
-def _default_weight(op: ops.Operation):
+def _default_weight(op: ops.Operation) -> float:
     """Returns a default weight for an operation."""
     return 0.99 ** len(op.qubits)
 
@@ -291,7 +291,7 @@ def _get_num_to_fold(scale_factor: float, ngates: int) -> int:
 # Local folding functions
 @converter
 def fold_gates_from_left(
-    circuit: QPROGRAM, scale_factor: float, **kwargs
+    circuit: QPROGRAM, scale_factor: float, **kwargs: Any
 ) -> QPROGRAM:
     """Returns a new folded circuit by applying the map G -> G G^dag G to a
     subset of gates of the input circuit, starting with gates at the
@@ -412,7 +412,7 @@ def fold_gates_from_left(
 
 @converter
 def fold_gates_from_right(
-    circuit: QPROGRAM, scale_factor: float, **kwargs
+    circuit: QPROGRAM, scale_factor: float, **kwargs: Any
 ) -> Circuit:
     """Returns a new folded circuit by applying the map G -> G G^dag G
     to a subset of gates of the input circuit, starting with gates at
@@ -489,8 +489,8 @@ def fold_gates_from_right(
 
 
 def _update_moment_indices(
-    moment_indices: dict, moment_index_where_gate_was_folded: int
-) -> dict:
+    moment_indices: Dict[int, int], moment_index_where_gate_was_folded: int
+) -> Dict[int, int]:
     """Updates moment indices to keep track of an original circuit
     throughout folding.
 
@@ -529,7 +529,7 @@ def fold_gates_at_random(
     circuit: QPROGRAM,
     scale_factor: float,
     seed: Optional[int] = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> QPROGRAM:
     """Returns a folded circuit by applying the map G -> G G^dag G to a random
     subset of gates in the input circuit.
@@ -688,7 +688,7 @@ def _fold_local(
     scale_factor: float,
     fold_method: Callable[..., Circuit],
     fold_method_args: Optional[Tuple[Any]] = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> Circuit:
     """Helper function for implementing a local folding method (which nominally
     requires 1 <= scale_factor <= 3) at any scale_factor >= 1. Returns a folded
@@ -750,7 +750,9 @@ def _fold_local(
 
 # Global folding function
 @converter
-def fold_global(circuit: QPROGRAM, scale_factor: float, **kwargs) -> QPROGRAM:
+def fold_global(
+    circuit: QPROGRAM, scale_factor: float, **kwargs: Any
+) -> QPROGRAM:
     """Returns a new circuit obtained by folding the global unitary of the
     input circuit.
 

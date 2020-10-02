@@ -16,7 +16,7 @@
 """Classes corresponding to different zero-noise extrapolation methods."""
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 import warnings
 
 import numpy as np
@@ -170,7 +170,9 @@ class Factory(ABC):
         self.opt_params: List[float] = []
         self._already_reduced = False
 
-    def push(self, instack_val: dict, outstack_val: float) -> "Factory":
+    def push(
+        self, instack_val: Dict[str, float], outstack_val: float
+    ) -> "Factory":
         """Appends "instack_val" to "self._instack" and "outstack_val" to
         "self._outstack". Each time a new expectation value is computed this
         method should be used to update the internal state of the Factory.
@@ -291,7 +293,7 @@ class Factory(ABC):
             max_iterations: Maximum number of iterations (optional).
         """
 
-        def _noise_to_expval(scale_factor, **exec_params) -> float:
+        def _noise_to_expval(scale_factor: float, **exec_params: Any) -> float:
             """Evaluates the quantum expectation value for a given
             scale_factor and other executor parameters."""
             expectation_values = []
@@ -302,7 +304,9 @@ class Factory(ABC):
 
         return self.iterate(_noise_to_expval, max_iterations)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Factory):
+            return False
         if self._already_reduced != other._already_reduced:
             return False
         if len(self._instack) != len(other._instack):
@@ -397,7 +401,7 @@ class BatchedFactory(Factory):
             )
         return len(self._outstack) == len(self._scale_factors)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         return Factory.__eq__(self, other) and np.allclose(
             self._scale_factors, other._scale_factors
         )
@@ -490,7 +494,7 @@ class PolyFactory(BatchedFactory):
         self._already_reduced = True
         return zero_lim
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         return BatchedFactory.__eq__(self, other) and self.order == other.order
 
 
@@ -750,7 +754,9 @@ class ExpFactory(BatchedFactory):
         self._already_reduced = True
         return zero_lim
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, ExpFactory):
+            return False
         if (
             self.asymptote
             and other.asymptote is None
@@ -890,13 +896,13 @@ class PolyExpFactory(BatchedFactory):
         slope, _ = mitiq_polyfit(scale_factors, exp_values, deg=1)
         sign = np.sign(-slope)
 
-        def _ansatz_unknown(x: float, *coeffs: float):
+        def _ansatz_unknown(x: float, *coeffs: float) -> float:
             """Ansatz of generic order with unknown asymptote."""
             # Coefficients of the polynomial to be exponentiated
             z_coeffs = coeffs[2:][::-1]
             return coeffs[0] + coeffs[1] * np.exp(x * np.polyval(z_coeffs, x))
 
-        def _ansatz_known(x: float, *coeffs: float):
+        def _ansatz_known(x: float, *coeffs: float) -> float:
             """Ansatz of generic order with known asymptote."""
             # Coefficients of the polynomial to be exponentiated
             z_coeffs = coeffs[1:][::-1]
@@ -946,9 +952,10 @@ class PolyExpFactory(BatchedFactory):
         opt_params = [asymptote] + list(z_coefficients[::-1])
         return (zero_lim, opt_params) if full_output else zero_lim
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         return (
             BatchedFactory.__eq__(self, other)
+            and isinstance(other, PolyExpFactory)
             and np.isclose(self.asymptote, other.asymptote)
             and self.avoid_log == other.avoid_log
             and self.order == other.order
@@ -1182,9 +1189,10 @@ class AdaExpFactory(Factory):
         self._already_reduced = True
         return zero_limit
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         return (
             Factory.__eq__(self, other)
+            and isinstance(other, AdaExpFactory)
             and self._steps == other._steps
             and self._scale_factor == other._scale_factor
             and np.isclose(self.asymptote, other.asymptote)

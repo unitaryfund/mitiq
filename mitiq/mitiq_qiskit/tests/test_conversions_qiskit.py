@@ -115,7 +115,5 @@ def test_convert_with_multiple_barriers(as_qasm):
         cirq_circuit = from_qiskit(qiskit_circuit)
 
     qbit = cirq.LineQubit(0)
-    correct = cirq.Circuit(
-        cirq.ops.H.on(qbit) for _ in range(num_ops)
-    )
+    correct = cirq.Circuit(cirq.ops.H.on(qbit) for _ in range(num_ops))
     assert _equal(cirq_circuit, correct)

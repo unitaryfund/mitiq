@@ -13,12 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Optional
+from typing import cast, Optional
 import numpy as np
 
 import copy
 
-from cirq import Circuit, Moment
+from cirq import Circuit, EigenGate, Moment
 from cirq import (
     ZPowGate,
     YPowGate,
@@ -38,10 +38,10 @@ class GateTypeException(Exception):
     pass
 
 
-def _get_base_gate(gate):
+def _get_base_gate(gate: EigenGate) -> EigenGate:
     for base_gate in BASE_GATES:
         if isinstance(gate, base_gate):
-            return base_gate
+            return cast(EigenGate, base_gate)
     raise GateTypeException(
         "Must have circuit be made of rotation gates. "
         "Your gate {} may not be supported".format(gate)
@@ -81,6 +81,7 @@ def scale_parameters(
             if isinstance(gate, MeasurementGate):
                 curr_moment.append(gate(*qubits))
             else:
+                assert isinstance(gate, EigenGate)
                 base_gate = _get_base_gate(gate)
                 param = gate.exponent * np.pi
                 error = rng.normal(loc=0.0, scale=np.sqrt(noise))
