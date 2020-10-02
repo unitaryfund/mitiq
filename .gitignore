@@ -9,6 +9,7 @@
 _build
 __pycache__/
 docs/build/
+!docs/build/latex/mitiq.pdf
 mitiq.egg-info/
 dist/
 build/

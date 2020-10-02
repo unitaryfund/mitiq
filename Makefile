@@ -34,6 +34,10 @@ docs:
 	make -C docs html
 	make -C docs doctest
 
+.PHONY: latexpdf
+latexpdf:
+	make -C docs latexpdf
+
 .PHONY: format
 format:
 	black mitiq
