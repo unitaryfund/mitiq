@@ -21,7 +21,6 @@ from typing import Callable
 import numpy as np
 from pyquil import Program
 from pyquil.api import QuantumComputer
-from pyquil.experiment import bitstrings_to_expectations
 from pyquil.gates import MEASURE, RESET
 
 from mitiq.mitiq_pyquil.compiler import basic_compile

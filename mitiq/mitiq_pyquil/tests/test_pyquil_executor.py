@@ -29,3 +29,11 @@ def test_ground_state_executor():
     executor = generate_qcs_executor(QVM, ground_state_expectation, debug=True)
     program = Program(X(0))
     assert 0.0 == executor(program)
+
+    # works for any number of qubits
+    program = Program(X(0), X(1))
+    assert 0.0 == executor(program)
+
+    # when programs compose to the identity, we should get 1.0
+    program = Program(X(0), X(0), X(1), X(1))
+    assert 1.0 == executor(program)
