@@ -287,7 +287,7 @@ The typical tasks of a factory are:
 
 3. Given the history of noise scale factors and results, evaluate the associated zero-noise extrapolation.
 
-The structure of the :class:`.BaseFactory` class is adaptive by construction, since the choice of the next noise
+The structure of the :class:`.Factory` class is adaptive by construction, since the choice of the next noise
 level can depend on the history of these values. Obviously, non-adaptive
 methods are supported too and they actually represent the most common choice. Non-adaptive factories are instances
 of :class:`.BatchedFactory` objects. Adaptive factories are instances of :class:`.AdaptiveFactory` objects.
