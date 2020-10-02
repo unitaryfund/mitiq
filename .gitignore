@@ -8,7 +8,10 @@
 *.ipynb_checkpoints
 _build
 __pycache__/
-docs/build/*
+docs/build/html
+docs/build/doctest
+docs/build/doctrees
+docs/build/latex/*
 !docs/build/latex/mitiq.pdf
 mitiq.egg-info/
 dist/
