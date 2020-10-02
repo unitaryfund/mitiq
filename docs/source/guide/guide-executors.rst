@@ -217,19 +217,23 @@ This executor can be used to run on `Quantum Cloud Services <https://arxiv.org/a
 (QCS), the hardware platform provided by Rigetti Computing. Requires a QCS account and
 reservation on a quantum processor (QPU).
 
-In addition, ``mitiq_pyquil/executors.py`` has a function for generating a
-QCS executor of this form.
+In addition, ``mitiq_pyquil/executors.py`` has a function ``generate_qcs_executor`` for
+easily generating a QCS executor of this form from a template.
 
-.. code-block::
+Note that you will have to replace the string in ``get_qc`` with the name of an actual
+Rigetti QPU, and will need to have a QCS account and reservation, in order to run on
+real quantum hardware.
+
+.. testcode::
 
     from pyquil import Program, get_qc
-    from pyquil.gates import MEASURE, RESET
+    from pyquil.gates import MEASURE, RESET, X
 
     from mitiq.mitiq_pyquil.compiler import basic_compile
     from mitiq.mitiq_pyquil.executor import ground_state_expectation
 
-    # this will only work if running on QCS and engaged to Aspen-8
-    qpu = get_qc("Aspen-8")
+    # replace with qpu = get_qc("Aspen-8") to run on the Aspen-8 QPU
+    qpu = get_qc("2q-pyqvm")
 
     def executor(program: Program, shots: int = 1000) -> float:
         p = Program()
@@ -264,12 +268,18 @@ QCS executor of this form.
         # compute ground state expectation value
         return ground_state_expectation(results)
 
+    # prepare state |11>
     program = Program()
     program += X(0)
     program += X(1)
 
     # should give 0.0 with a noiseless backend
     executor(program)
+
+.. testcode::
+    :hide:
+
+    assert executor(program) == 0.0
 
 .. _qiskit_executors:
 
