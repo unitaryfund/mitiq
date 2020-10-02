@@ -20,7 +20,6 @@ from pyquil.gates import X
 from mitiq.mitiq_pyquil.executor import (
     generate_qcs_executor,
     ground_state_expectation,
-    zz_expectation,
 )
 
 QVM = get_qc("2q-qvm")
@@ -30,9 +29,3 @@ def test_ground_state_executor():
     executor = generate_qcs_executor(QVM, ground_state_expectation, debug=True)
     program = Program(X(0))
     assert 0.0 == executor(program)
-
-
-def test_zz_executor():
-    executor = generate_qcs_executor(QVM, zz_expectation, debug=True)
-    program = Program(X(0), X(1))
-    assert 1.0 == executor(program)

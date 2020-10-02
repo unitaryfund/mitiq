@@ -104,12 +104,3 @@ def ground_state_expectation(results: np.ndarray) -> float:
     return (
         num_shots - np.count_nonzero(np.count_nonzero(results, axis=1))
     ) / num_shots
-
-
-def zz_expectation(results: np.ndarray) -> float:
-    """
-    Example expectation_fn. Computes the ZZ expectation value.
-    """
-    expectations = bitstrings_to_expectations(results, [[0, 1]])
-    means = np.mean(expectations, axis=0)
-    return means[0]

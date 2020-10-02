@@ -226,7 +226,7 @@ QCS executor of this form.
     from pyquil.gates import MEASURE, RESET
 
     from mitiq.mitiq_pyquil.compiler import basic_compile
-    from mitiq.mitiq_pyquil.executor import zz_expectation
+    from mitiq.mitiq_pyquil.executor import ground_state_expectation
 
     # this will only work if running on QCS and engaged to Aspen-8
     qpu = get_qc("Aspen-8")
@@ -261,14 +261,14 @@ QCS executor of this form.
         qpu.reset()
         results = qpu.run(b)
 
-        # compute ZZ expectation value
-        return zz_expectation(results)
+        # compute ground state expectation value
+        return ground_state_expectation(results)
 
     program = Program()
     program += X(0)
     program += X(1)
 
-    # should give 1.0 with a noiseless backend
+    # should give 0.0 with a noiseless backend
     executor(program)
 
 .. _qiskit_executors:
