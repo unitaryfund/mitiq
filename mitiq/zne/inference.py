@@ -16,6 +16,7 @@
 """Classes corresponding to different zero-noise extrapolation methods."""
 from abc import ABC, abstractmethod
 from copy import deepcopy
+from functools import wraps
 import inspect
 from typing import (
     Any,
@@ -157,6 +158,57 @@ def mitiq_polyfit(
     return list(opt_params)
 
 
+def _make_batched_executor(
+        executor: Union[Callable[..., float], Callable[..., List[float]]],
+) -> Callable[..., List[float]]:
+    """Function transforming a single-circuit executor into a batched executor.
+    If the input is annotated with a return type that is one of the following:
+        * Iterable[float]
+        * List[float]
+        * Sequence[float]
+        * Tuple[float]
+        * numpy.ndarray
+    it is detected as "batched" and is returned without any change.
+
+    Note: Once a single-circuit executor is transformed into a batched one,
+    keyword arguments can be passed using the optional argument
+    (batched_kwargs) in the form of a list of ditionaries.
+
+    Args:
+        executor: A "single executor" (1) or a "batched executor" (2).
+            (1) A function which inputs a single circuit and outputs a
+            single expectation value of interest.
+            (2) A function which inputs a list of circuits and outputs a
+            list of expectation values (one for each circuit).
+
+    Returns:
+        batched_executor: The batched executor.
+    """
+    executor_annotation = inspect.getfullargspec(executor).annotations
+    if executor_annotation.get("return") in (
+        List[float],
+        Sequence[float],
+        Tuple[float],
+        Iterable[float],
+        np.ndarray,
+    ):
+        return executor  # type: ignore
+
+    @wraps(executor)
+    def batched_executor(
+        batch: List[QPROGRAM], batched_kwargs: Optional[List[Dict]] = None,
+    ) -> List[float]:
+
+        if batched_kwargs is None:
+            return [executor(circ) for circ in batch]
+        results = []
+        for circ, kwargs in zip(batch, batched_kwargs):
+            results.append(executor(circ, **kwargs))
+        return results  # type: ignore
+
+    return batched_executor
+
+
 class Factory(ABC):
     """Abstract base class which performs the classical parts of zero-noise
     extrapolation. This minimally includes:
@@ -173,6 +225,7 @@ class Factory(ABC):
     If the next scale factor depends on the previous history of results,
     jobs are run sequentially. This is handled by an AdaptiveFactory.
     """
+
     def __init__(self) -> None:
         self._instack: List[Dict[str, float]] = []
         self._outstack: List[float] = []
@@ -297,46 +350,10 @@ class BatchedFactory(Factory, ABC):
 
         super(BatchedFactory, self).__init__()
 
-    def run_batched(
-        self,
-        qp: QPROGRAM,
-        batched_executor: Callable[..., List[float]],
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
-        num_to_average: int = 1,
-    ) -> "BatchedFactory":
-        """Computes the expectation values at each scale factor by calling
-        `batched_executor` on a sequence of circuits to run.
-
-        Args:
-            qp: Quantum circuit to run.
-            batched_executor: Function which inputs a list of circuits and
-                outputs a list of expectation values.
-            scale_noise: Noise scaling function.
-            num_to_average: Number of times to call scale_noise at each scale
-                factor.
-        """
-        self._batch_populate_instack()
-        kwargs = self._get_keyword_args()
-
-        # Get all noise-scaled circuits to run
-        to_run = self._generate_circuits(qp, scale_noise, num_to_average)
-
-        # Run the circuits in a batch
-        # TODO: Deal with keyword args better.
-        res = batched_executor(to_run, kwargs=kwargs)
-
-        # Average the expectation results
-        self._outstack = [
-            np.average(res[i * num_to_average: (i + 1) * num_to_average])
-            for i in range(len(res) // num_to_average)
-        ]
-
-        return self
-
     def run(
         self,
         qp: QPROGRAM,
-        executor: Tuple[Callable[..., float], Callable[..., List[float]]],
+        executor: Union[Callable[..., float], Callable[..., List[float]]],
         scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
         num_to_average: int = 1,
     ) -> "BatchedFactory":
@@ -365,32 +382,20 @@ class BatchedFactory(Factory, ABC):
             num_to_average: Number of times to call scale_noise at each scale
                 factor.
         """
-        executor_annotation = inspect.getfullargspec(executor).annotations
-        if executor_annotation.get("return") in (
-            List[float],
-            Sequence[float],
-            Tuple[float],
-            Iterable[float],
-            np.ndarray
-        ):
-            self.run_batched(qp, executor, scale_noise, num_to_average)
-            return self
-
+        self.reset()
         self._batch_populate_instack()
-        kwargs = self._get_keyword_args()
-        kwargs = (
-            np.array([[k for _ in range(num_to_average)] for k in kwargs])
-            .flatten()
-            .tolist()
-        )
+        batched_kwargs = self._get_keyword_args()
 
         # Get all noise-scaled circuits to run
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
 
-        # Run them sequentially
-        res = []
-        for i, circuit in enumerate(to_run):
-            res.append(executor(circuit, **kwargs[i]))
+        # Run the circuits in a batch
+        batched_executor = _make_batched_executor(executor)
+
+        if batched_kwargs:
+            res = batched_executor(to_run, batched_kwargs=batched_kwargs)
+        else:
+            res = batched_executor(to_run)
 
         # Average the expectation results
         self._outstack = [
@@ -401,8 +406,7 @@ class BatchedFactory(Factory, ABC):
         return self
 
     def run_classical(
-        self,
-        scale_factor_to_expectation_value: Callable[..., float],
+        self, scale_factor_to_expectation_value: Callable[..., float],
     ) -> "BatchedFactory":
         """Computes expectation values by calling the input function at each
         scale factor.
@@ -414,6 +418,7 @@ class BatchedFactory(Factory, ABC):
                 would do provided a circuit, noise scaling method, and scale
                 factor.
         """
+        self.reset()
         self._batch_populate_instack()
         kwargs = self._get_keyword_args()
         self._outstack = [
@@ -454,38 +459,20 @@ class BatchedFactory(Factory, ABC):
                 {"scale_factor": scale} for scale in self._scale_factors
             ]
 
-    def _get_keyword_args(self) -> List[Dict[str, Any]]:
+    def _get_keyword_args(self) -> Union[List[Dict[str, Any]], None]:
+        """Returns a list of keyword dictionaries to be used by a batched
+        executor. If keywords are not necessary, None is returned.
+        """
+
         params = deepcopy(self._instack)
         for d in params:
             _ = d.pop("scale_factor")
+
+        # Check if keywords are absent
+        if params is [{} for _ in params]:
+            return None
+
         return params
-
-    def next(self) -> Dict[str, float]:
-        """Returns a dictionary of parameters to execute a circuit at."""
-        in_params = {}
-        try:
-            index = len(self._outstack)
-            in_params["scale_factor"] = self._scale_factors[index]
-            if self._shot_list:
-                in_params["shots"] = self._shot_list[index]
-        except IndexError:
-            raise IndexError(
-                "BatchedFactory cannot take another step. "
-                "Number of batched scale_factors"
-                f" ({len(self._scale_factors)}) exceeded."
-            )
-        return in_params
-
-    def is_converged(self) -> bool:
-        """Returns True if all needed expectation values have been computed,
-        else False.
-        """
-        if len(self._outstack) != len(self._instack):
-            raise IndexError(
-                f"The length of 'self._instack' ({len(self._instack)}) "
-                f"and 'self._outstack' ({len(self._outstack)}) must be equal."
-            )
-        return len(self._outstack) == len(self._scale_factors)
 
     def __eq__(self, other):
         return Factory.__eq__(self, other) and np.allclose(
