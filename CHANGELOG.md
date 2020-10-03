@@ -15,6 +15,7 @@
 - Add arxiv badge to readme header (@nathanshammah, gh-376).
 - Spruce up the README a bit (@karalekas, gh-383).
 - Make mypy checking stricter (@karalekas, gh-380).
+- Add pyQuil executor examples and benchmarking circuits (@karalekas, gh-339).
 
 ## Version 0.1.0 (September 2nd, 2020)
 
