@@ -10,6 +10,10 @@
 
 ## Version 0.2.0 (October 4th, 2020)
 
+### Announcements
+
+The preprint for Mitiq is live on the arXiv [here][arxiv]!
+
 ### Summary
 
 This release centered on source code reorganization and documentation, as well
