@@ -12,6 +12,8 @@
 
 ### All Changes
 
+- Refresh the release process documentation (@karalekas, gh-392).
+
 ## Version 0.2.0 (October 4th, 2020)
 
 ### Announcements
