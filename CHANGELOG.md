@@ -8,6 +8,10 @@
 [//]: # " - [Bug Fix]"
 [//]: # " - Fix the bug."
 
+## Version 0.3.0 (In Development)
+
+### All Changes
+
 ## Version 0.2.0 (October 4th, 2020)
 
 ### Announcements
