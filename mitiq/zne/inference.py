@@ -195,7 +195,9 @@ class Factory(ABC):
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
 
-    def push(self, instack_val: dict, outstack_val: float) -> "Factory":
+    def push(
+            self, instack_val: Dict[str, float], outstack_val: float
+    ) -> "Factory":
         """Appends "instack_val" to "self._instack" and "outstack_val" to
         "self._outstack". Each time a new expectation value is computed this
         method should be used to update the internal state of the Factory.
@@ -235,7 +237,9 @@ class Factory(ABC):
         """Returns the expectation values computed by the factory."""
         return np.array(self._outstack)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Factory):
+            return False
         if self._already_reduced != other._already_reduced:
             return False
         if len(self._instack) != len(other._instack):
@@ -462,10 +466,10 @@ class BatchedFactory(Factory, ABC):
             num_to_average: The number of times the same keywords are used
                 for each scale factor. This should correspond to the number
                 of circuits executed for each scale factor.
+
         Returns:
             The output list of keyword dictionaries.
         """
-
         params = deepcopy(self._instack)
         for d in params:
             _ = d.pop("scale_factor")
@@ -473,7 +477,7 @@ class BatchedFactory(Factory, ABC):
         # Repeat each keyward num_to_average times
         return [k for k in params for _ in range(num_to_average)]
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         return Factory.__eq__(self, other) and np.allclose(
             self._scale_factors, other._scale_factors
         )
@@ -572,7 +576,7 @@ class AdaptiveFactory(Factory, ABC):
             max_iterations: Maximum number of iterations (optional).
         """
 
-        def _noise_to_expval(scale_factor, **exec_params) -> float:
+        def _noise_to_expval(scale_factor: float, **exec_params: Any) -> float:
             """Evaluates the quantum expectation value for a given
             scale_factor and other executor parameters."""
             expectation_values = []
@@ -671,7 +675,7 @@ class PolyFactory(BatchedFactory):
         self._already_reduced = True
         return zero_lim
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         return BatchedFactory.__eq__(self, other) and self.order == other.order
 
 
@@ -937,7 +941,9 @@ class ExpFactory(BatchedFactory):
         self._already_reduced = True
         return zero_lim
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, ExpFactory):
+            return False
         if (
             self.asymptote
             and other.asymptote is None
@@ -1077,7 +1083,7 @@ class PolyExpFactory(BatchedFactory):
         slope, _ = mitiq_polyfit(scale_factors, exp_values, deg=1)
         sign = np.sign(-slope)
 
-        def _ansatz_unknown(x: float, *coeffs: float):
+        def _ansatz_unknown(x: float, *coeffs: float) -> float:
             """Ansatz of generic order with unknown asymptote."""
             # Coefficients of the polynomial to be exponentiated
             z_coeffs = coeffs[2:][::-1]
@@ -1133,9 +1139,10 @@ class PolyExpFactory(BatchedFactory):
         opt_params = [asymptote] + list(z_coefficients[::-1])
         return (zero_lim, opt_params) if full_output else zero_lim
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         return (
             BatchedFactory.__eq__(self, other)
+            and isinstance(other, PolyExpFactory)
             and np.isclose(self.asymptote, other.asymptote)
             and self.avoid_log == other.avoid_log
             and self.order == other.order
@@ -1369,9 +1376,10 @@ class AdaExpFactory(AdaptiveFactory):
         self._already_reduced = True
         return zero_limit
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         return (
             Factory.__eq__(self, other)
+            and isinstance(other, AdaExpFactory)
             and self._steps == other._steps
             and self._scale_factor == other._scale_factor
             and np.isclose(self.asymptote, other.asymptote)
