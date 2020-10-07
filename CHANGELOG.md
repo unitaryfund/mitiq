@@ -12,6 +12,7 @@
 
 ### All Changes
 
+- Fix broken links on the website (@erkska, gh-400).
 ## Version 0.2.0 (October 4th, 2020)
 
 ### Announcements
