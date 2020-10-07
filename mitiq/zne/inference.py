@@ -30,6 +30,8 @@ from typing import (
 )
 import warnings
 
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
@@ -236,6 +238,28 @@ class Factory(ABC):
     def get_expectation_values(self) -> np.ndarray:
         """Returns the expectation values computed by the factory."""
         return np.array(self._outstack)
+
+    def plot_data(self) -> Figure:
+        """Returns a figure which is a scatter plot of (x, y) data where x are
+        scale factors at which expectation values have been computed, and y are
+        the associated expectation values.
+
+        Returns:
+            fig: A 2D scatter plot described above.
+        """
+        fig = plt.figure(figsize=(7, 5))
+        plt.plot(
+            self.get_scale_factors(),
+            self.get_expectation_values(),
+            "--o",
+            markersize=10,
+            markeredgecolor="black",
+            alpha=0.8,
+            label="Data",
+        )
+        plt.xlabel("Noise scale factor")
+        plt.ylabel("Observable value")
+        return fig
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Factory):
@@ -674,6 +698,31 @@ class PolyFactory(BatchedFactory):
         )
         self._already_reduced = True
         return zero_lim
+
+    def plot(self) -> Figure:
+        """Returns a figure which plots the experimental data as well as the
+        best fit curve.
+
+        Returns:
+            fig: A figure which plots the best fit curve as well as the data.
+        """
+        fig = self.plot_data()
+
+        smooth_scale_factors = np.linspace(
+            self.get_scale_factors()[0], self.get_scale_factors()[-1], 20
+        )
+        best_fit = np.polyval(self.opt_params, smooth_scale_factors)
+
+        fig.axes[0].plot(
+            smooth_scale_factors,
+            best_fit,
+            "-",
+            lw=3,
+            color="black",
+            label="Best fit",
+        )
+
+        return fig
 
     def __eq__(self, other: Any) -> bool:
         return BatchedFactory.__eq__(self, other) and self.order == other.order
