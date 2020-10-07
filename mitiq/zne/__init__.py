@@ -14,3 +14,4 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from mitiq.zne.zne import execute_with_zne, mitigate_executor, zne_decorator
+from mitiq.zne import scaling
