@@ -30,7 +30,9 @@ copyright = '2020, Tech Team @ Unitary Fund'
 author = 'Tech Team @ Unitary Fund'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.0'
+directory_of_this_file = os.path.dirname(os.path.abspath(__file__))
+with open(f"{directory_of_this_file}/../../VERSION.txt", "r") as f:
+    release = f.read().strip()
 
 sys.path.append(os.path.abspath('sphinxext'))
 

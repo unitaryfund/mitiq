@@ -62,7 +62,7 @@ def rand_circuit_zne(
     depth: int,
     trials: int,
     noise: float,
-    fac: Factory = None,
+    fac: Optional[Factory] = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     op_density: float = 0.99,
     silent: bool = True,
@@ -122,7 +122,7 @@ def rand_circuit_zne(
         assert np.isreal(exact)
 
         # create the simulation type
-        def obs_sim(circ: Circuit):
+        def obs_sim(circ: Circuit) -> float:
             # we only want the expectation value not the variance
             # this is why we return [0]
             return noisy_simulation(circ, noise, obs)

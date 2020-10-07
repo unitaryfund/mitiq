@@ -34,7 +34,7 @@ MITIQ_INSTALL_PATH = os.path.dirname(MITIQ_SOURCE_FILE)
 PYTHON_VERSION = sys.version_info[0:3]
 
 
-def about():
+def about() -> None:
     """
     About box for Mitiq. Gives version numbers for
     Mitiq, NumPy, SciPy, Cirq, PyQuil, Qiskit.

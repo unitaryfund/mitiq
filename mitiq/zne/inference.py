@@ -1089,7 +1089,7 @@ class PolyExpFactory(BatchedFactory):
             z_coeffs = coeffs[2:][::-1]
             return coeffs[0] + coeffs[1] * np.exp(x * np.polyval(z_coeffs, x))
 
-        def _ansatz_known(x: float, *coeffs: float):
+        def _ansatz_known(x: float, *coeffs: float) -> float:
             """Ansatz of generic order with known asymptote."""
             # Coefficients of the polynomial to be exponentiated
             z_coeffs = coeffs[1:][::-1]
