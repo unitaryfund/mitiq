@@ -275,7 +275,7 @@ def test_run_sequential_and_batched(factory, batched):
     # Compute expectation values at all the scale factors
     if batched:
 
-        def executor(circuits, **kwargs) -> List[float]:
+        def executor(circuits) -> List[float]:
             return [1.0] * len(circuits)
 
     else:
