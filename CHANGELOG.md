@@ -10,6 +10,8 @@
 
 ## Version 0.3.0 (In Development)
 
+- Update mitiq.about() (@rmlarose, gh-399).
+
 ### All Changes
 
 ## Version 0.2.0 (October 4th, 2020)
