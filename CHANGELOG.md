@@ -8,19 +8,46 @@
 [//]: # " - [Bug Fix]"
 [//]: # " - Fix the bug."
 
-## Development 0.2.0dev
+## Version 0.3.0 (In Development)
+
+- Redesign factories, batch runs in BatchedFactory, fix Qiskit utils tests (@rmlarose, @andreamari, gh-381).
 
 ### All Changes
 
-- Redesign factory objects (@rmlarose, gh-381).
-- Add arxiv badge to readme header (@nathanshammah, gh-376).
+## Version 0.2.0 (October 4th, 2020)
+
+### Announcements
+
+The preprint for Mitiq is live on the arXiv [here][arxiv]!
+
+### Summary
+
+This release centered on source code reorganization and documentation, as well
+as wrapping up some holdovers from the initial public release. In addition, the
+team began investigating probabilistic error cancellation (PEC), which will be the
+main focus of the following release.
+
+### All Changes
+
+- Re-organize scaling code into its own module (@rmlarose, gh-338).
+- Add BibTeX snippet for [arXiv citation][arxiv] (@karalekas, gh-351).
+- Fix broken links in PR template (@rmlarose, gh-359).
+- Add limitations of ZNE section to docs (@rmlarose, gh-361).
+- Add static extrapolate method to all factories (@andreamari, gh-352).
+- Removes barriers in conversions from a Qiskit circuit (@rmlarose, gh-362).
+- Add arXiv badge to readme header (@nathanshammah, gh-376).
+- Add note on shot list in factory docs (@rmlarose, gh-375).
+- Spruce up the README a bit (@karalekas, gh-383).
+- Make mypy checking stricter (@karalekas, gh-380).
+- Add pyQuil executor examples and benchmarking circuits (@karalekas, gh-339).
+
+[arxiv]: https://arxiv.org/abs/2009.04417
 
 ## Version 0.1.0 (September 2nd, 2020)
 
 ### Summary
 
 This marks the first public release of Mitiq on a stable version.
-
 
 ### All Changes
 
