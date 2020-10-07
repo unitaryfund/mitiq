@@ -16,7 +16,6 @@
 """Classes corresponding to different zero-noise extrapolation methods."""
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from functools import wraps
 import inspect
 from typing import (
     Any,
@@ -156,57 +155,6 @@ def mitiq_polyfit(
             warn.message, warn.category, warn.filename, warn.lineno
         )
     return list(opt_params)
-
-
-def _make_batched_executor(
-        executor: Union[Callable[..., float], Callable[..., List[float]]],
-) -> Callable[..., List[float]]:
-    """Function transforming a single-circuit executor into a batched executor.
-    If the input is annotated with a return type that is one of the following:
-        * Iterable[float]
-        * List[float]
-        * Sequence[float]
-        * Tuple[float]
-        * numpy.ndarray
-    it is detected as "batched" and is returned without any change.
-
-    Note: Once a single-circuit executor is transformed into a batched one,
-    keyword arguments can be passed using the optional argument
-    (batched_kwargs) in the form of a list of ditionaries.
-
-    Args:
-        executor: A "single executor" (1) or a "batched executor" (2).
-            (1) A function which inputs a single circuit and outputs a
-            single expectation value of interest.
-            (2) A function which inputs a list of circuits and outputs a
-            list of expectation values (one for each circuit).
-
-    Returns:
-        batched_executor: The batched executor.
-    """
-    executor_annotation = inspect.getfullargspec(executor).annotations
-    if executor_annotation.get("return") in (
-        List[float],
-        Sequence[float],
-        Tuple[float],
-        Iterable[float],
-        np.ndarray,
-    ):
-        return executor  # type: ignore
-
-    @wraps(executor)
-    def batched_executor(
-        batch: List[QPROGRAM], batched_kwargs: Optional[List[Dict]] = None,
-    ) -> List[float]:
-
-        if batched_kwargs is None:
-            return [executor(circ) for circ in batch]  # type: ignore
-        results = []
-        for circ, kwargs in zip(batch, batched_kwargs):
-            results.append(executor(circ, **kwargs))
-        return results  # type: ignore
-
-    return batched_executor
 
 
 class Factory(ABC):
@@ -350,6 +298,39 @@ class BatchedFactory(Factory, ABC):
 
         super(BatchedFactory, self).__init__()
 
+    @staticmethod
+    def _is_executor_batched(
+        executor: Union[Callable[..., float], Callable[..., List[float]]],
+    ) -> bool:
+        """Returns True if the input function is recognized as a "batched
+        executor".
+
+        The executor is detected as "batched" only if it is annotated with
+        a return type that is one of the following:
+            * Iterable[float]
+            * List[float]
+            * Sequence[float]
+            * Tuple[float]
+            * numpy.ndarray
+
+        Args:
+            executor: A "single executor" (1) or a "batched executor" (2).
+                (1) A function which inputs a single circuit and outputs a
+                single expectation value of interest.
+                (2) A function which inputs a list of circuits and outputs a
+                list of expectation values (one for each circuit).
+
+        Returns: True if the executor is detected as batched, False otherwise.
+        """
+        executor_annotation = inspect.getfullargspec(executor).annotations
+        return executor_annotation.get("return") in (
+            List[float],
+            Sequence[float],
+            Tuple[float],
+            Iterable[float],
+            np.ndarray,
+        )
+
     def run(
         self,
         qp: QPROGRAM,
@@ -377,38 +358,48 @@ class BatchedFactory(Factory, ABC):
                 (1) A function which inputs a single circuit and outputs a
                 single expectation value of interest.
                 (2) A function which inputs a list of circuits and outputs a
-                list of expectation values (one for each circuit).
+                list of expectation values (one for each circuit). A batched
+                executor can also take an optional "kwargs_list" argument to
+                set a list of keyword arguments (one for each circuit). This
+                is necessary only if the factory is initialized using the
+                optional "shot_list" parameter.
+
             scale_noise: Noise scaling function.
-            num_to_average: Number of times to call scale_noise at each scale
-                factor.
+            num_to_average: The number of circuits executed for each noise
+                scale factor. This parameter can be used to increase the
+                precision of the "executor" or to average the effect of a
+                non-deterministic "scale_noise" function.
         """
         self.reset()
         self._batch_populate_instack()
-        kw_lst = self._get_keyword_args()
 
         # Get all noise-scaled circuits to run
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
 
-        # Run the circuits in a batch
-        batched_executor = _make_batched_executor(executor)
+        # Get the list of keywords associated to each circuit in "to_run"
+        kwargs_list = self._get_keyword_args(num_to_average)
 
-        if kw_lst:
-            # Batch keywords taking into account num_to_average
-            batched_kwargs = [k for k in kw_lst for _ in range(num_to_average)]
-            res = batched_executor(to_run, batched_kwargs=batched_kwargs)
+        if self._is_executor_batched(executor):
+            if all([kwargs == {} for kwargs in kwargs_list]):
+                res = executor(to_run)
+            else:
+                res = executor(to_run, kwargs_list=kwargs_list)
         else:
-            res = batched_executor(to_run)
+            res = [
+                executor(circ, **kwargs)  # type: ignore
+                for circ, kwargs in zip(to_run, kwargs_list)
+            ]
 
-        # Average the expectation results
-        self._outstack = [
-            np.average(res[i * num_to_average: (i + 1) * num_to_average])
-            for i in range(len(res) // num_to_average)
-        ]
+        # Reshape "res" to have "num_to_average" columns
+        res = np.array(res).reshape((-1, num_to_average))
+
+        # Average the "num_to_average" columns
+        self._outstack = np.average(res, axis=1)
 
         return self
 
     def run_classical(
-        self, scale_factor_to_expectation_value: Callable[..., float],
+        self, scale_factor_to_expectation_value: Callable[..., float]
     ) -> "BatchedFactory":
         """Computes expectation values by calling the input function at each
         scale factor.
@@ -422,18 +413,13 @@ class BatchedFactory(Factory, ABC):
         """
         self.reset()
         self._batch_populate_instack()
-        kw_list = self._get_keyword_args()
+        kwargs_list = self._get_keyword_args(num_to_average=1)
 
-        if kw_list:
-            self._outstack = [
-                scale_factor_to_expectation_value(scale_factor, **kw_list[i])
-                for i, scale_factor in enumerate(self._scale_factors)
-            ]
-        else:
-            self._outstack = [
-                scale_factor_to_expectation_value(scale_factor)
-                for i, scale_factor in enumerate(self._scale_factors)
-            ]
+        self._outstack = [
+            scale_factor_to_expectation_value(scale_factor, **kwargs)
+            for scale_factor, kwargs in zip(self._scale_factors, kwargs_list)
+        ]
+
         return self
 
     def _generate_circuits(
@@ -468,20 +454,24 @@ class BatchedFactory(Factory, ABC):
                 {"scale_factor": scale} for scale in self._scale_factors
             ]
 
-    def _get_keyword_args(self) -> Union[List[Dict[str, Any]], None]:
-        """Returns a list of keyword dictionaries to be used by a batched
-        executor. If keywords are not necessary, None is returned.
+    def _get_keyword_args(self, num_to_average: int) -> List[Dict[str, Any]]:
+        """Returns a list of keyword dictionaries to be used for
+        executing the circuits generated by the method "_generate_circuits".
+
+        Args:
+            num_to_average: The number of times the same keywords are used
+                for each scale factor. This should correspond to the number
+                of circuits executed for each scale factor.
+        Returns:
+            The output list of keyword dictionaries.
         """
 
         params = deepcopy(self._instack)
         for d in params:
             _ = d.pop("scale_factor")
 
-        # Check if keywords are absent
-        if params is [{} for _ in params]:
-            return None
-
-        return params
+        # Repeat each keyward num_to_average times
+        return [k for k in params for _ in range(num_to_average)]
 
     def __eq__(self, other):
         return Factory.__eq__(self, other) and np.allclose(
@@ -1381,10 +1371,10 @@ class AdaExpFactory(AdaptiveFactory):
 
     def __eq__(self, other) -> bool:
         return (
-                Factory.__eq__(self, other)
-                and self._steps == other._steps
-                and self._scale_factor == other._scale_factor
-                and np.isclose(self.asymptote, other.asymptote)
-                and self.avoid_log == other.avoid_log
-                and np.allclose(self.history, other.history)
+            Factory.__eq__(self, other)
+            and self._steps == other._steps
+            and self._scale_factor == other._scale_factor
+            and np.isclose(self.asymptote, other.asymptote)
+            and self.avoid_log == other.avoid_log
+            and np.allclose(self.history, other.history)
         )
