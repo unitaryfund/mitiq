@@ -140,8 +140,7 @@ def test_get_scale_factors_static_factories(factory):
         fac = factory(scale_factors=scale_factors)
 
     # Expectation values haven't been computed at any scale factors yet
-    assert isinstance(fac.get_scale_factors(), np.ndarray)
-    assert len(fac.get_scale_factors()) == 0
+    assert not fac.get_scale_factors()
 
     # Compute expectation values at all the scale factors
     fac.iterate(apply_seed_to_func(f_lin, seed=1))
@@ -250,22 +249,22 @@ def test_richardson_extr(test_f: Callable[[float], float]):
     """Test of the Richardson's extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = RichardsonFactory(scale_factors=X_VALS)
-    assert fac.opt_params == []
+    assert not fac._opt_params
     fac.iterate(seeded_f)
     zne_value = fac.reduce()
     assert np.isclose(zne_value, seeded_f(0, err=0), atol=CLOSE_TOL)
-    assert len(fac.opt_params) == len(X_VALS)
-    assert np.isclose(fac.opt_params[-1], zne_value)
+    assert len(fac._opt_params) == len(X_VALS)
+    assert np.isclose(fac._opt_params[-1], zne_value)
 
 
 def test_linear_extr():
     """Tests extrapolation with a LinearFactory."""
     seeded_f = apply_seed_to_func(f_lin, SEED)
     fac = LinearFactory(X_VALS)
-    assert fac.opt_params == []
+    assert not fac._opt_params
     fac.iterate(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
-    assert np.allclose(fac.opt_params, [B, A], atol=CLOSE_TOL)
+    assert np.allclose(fac._opt_params, [B, A], atol=CLOSE_TOL)
 
 
 def test_poly_extr():
@@ -291,11 +290,11 @@ def test_opt_params_poly_factory(order):
     """Tests that optimal parameters are stored after calling the reduce method.
     """
     fac = PolyFactory(scale_factors=np.linspace(1, 10, 10), order=order)
-    assert fac.opt_params == []
+    assert not fac._opt_params
     fac.iterate(apply_seed_to_func(f_non_lin, seed=SEED))
     zne_value = fac.reduce()
-    assert len(fac.opt_params) == order + 1
-    assert np.isclose(fac.opt_params[-1], zne_value)
+    assert len(fac._opt_params) == order + 1
+    assert np.isclose(fac._opt_params[-1], zne_value)
 
 
 @mark.parametrize("avoid_log", [False, True])
@@ -307,11 +306,11 @@ def test_exp_factory_with_asympt(
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = ExpFactory(X_VALS, asymptote=A, avoid_log=True)
     fac.iterate(seeded_f)
-    assert len(fac.opt_params) == 0
+    assert not fac._opt_params
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
     # There are three parameters to fit in the exponential ansatz
-    assert len(fac.opt_params) == 3
+    assert len(fac._opt_params) == 3
 
 
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
@@ -320,11 +319,11 @@ def test_exp_factory_no_asympt(test_f: Callable[[float], float]):
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = ExpFactory(X_VALS, asymptote=None)
     fac.iterate(seeded_f)
-    assert len(fac.opt_params) == 0
+    assert not fac._opt_params
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
     # There are three parameters to fit in the exponential ansatz
-    assert len(fac.opt_params) == 3
+    assert len(fac._opt_params) == 3
 
 
 @mark.parametrize("avoid_log", [False, True])
@@ -342,11 +341,11 @@ def test_poly_exp_factory_with_asympt(
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = PolyExpFactory(X_VALS, order=2, asymptote=A, avoid_log=avoid_log)
     fac.iterate(seeded_f)
-    assert len(fac.opt_params) == 0
+    assert not fac._opt_params
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=POLYEXP_TOL)
 
     # There are four parameters to fit for the PolyExpFactory of order 1
-    assert len(fac.opt_params) == 4
+    assert len(fac._opt_params) == 4
 
 
 @mark.parametrize("test_f", [f_poly_exp_down, f_poly_exp_up])
@@ -377,12 +376,12 @@ def test_ada_exp_factory_with_asympt(
     # Note: iterate calls next which calls reduce, so calling fac.iterate with
     # an AdaExpFactory sets the optimal parameters as well. Hence we check that
     # the opt_params are empty before AdaExpFactory.iterate is called.
-    assert len(fac.opt_params) == 0
+    assert not fac._opt_params
     fac.iterate(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
     # There are three parameters to fit for the (adaptive) exponential ansatz
-    assert len(fac.opt_params) == 3
+    assert len(fac._opt_params) == 3
 
 
 @mark.parametrize("avoid_log", [False, True])
@@ -586,12 +585,71 @@ def test_push_after_already_reduced_warning():
 
 def test_full_output_keyword():
     """Tests the full_output keyword in extrapolate method."""
-    zlim = LinearFactory.extrapolate([1, 2], [1, 2])
-    assert np.isclose(zlim, 0.0)
-    zlim, opt_params = LinearFactory.extrapolate(
-        [1, 2], [1, 2], full_output=True
-    )
+    zne_limit = LinearFactory.extrapolate([1, 2], [1, 2])
+    assert np.isclose(zne_limit, 0.0)
+    (
+        zne_limit,
+        zne_std,
+        opt_params,
+        params_cov,
+        zne_curve,
+    ) = LinearFactory.extrapolate([1, 2], [1, 2], full_output=True)
+
     assert len(opt_params) == 2
-    assert np.isclose(zlim, 0.0)
+    assert np.isclose(zne_limit, 0.0)
     assert np.isclose(0.0, opt_params[1])
     assert np.isclose(1.0, opt_params[0])
+    assert zne_std is None
+    assert params_cov is None
+    assert np.isclose(zne_curve(0), 0.0)
+    assert np.isclose(zne_curve(2), 2.0)
+
+
+def test_full_output_keyword_cov_std():
+    """Tests the full_output keyword in extrapolate method."""
+    zne_limit = PolyFactory.extrapolate([1, 2, 3], [1, 4, 9], order=2)
+    assert np.isclose(zne_limit, 0.0)
+    (
+        zne_limit,
+        zne_std,
+        opt_params,
+        params_cov,
+        zne_curve,
+    ) = PolyFactory.extrapolate(
+        [1, 2, 3], [1, 4, 9], order=2, full_output=True
+    )
+
+    assert len(opt_params) == 3
+    assert np.isclose(zne_limit, 0.0)
+    assert np.isclose(0.0, opt_params[1])
+    assert np.isclose(1.0, opt_params[0])
+    assert params_cov is None
+    assert zne_std is None
+    assert np.isclose(zne_curve(0), 0.0)
+    assert np.isclose(zne_curve(2), 4.0)
+    assert np.isclose(zne_curve(3), 9.0)
+
+
+def test_params_cov_and_zne_std():
+    """Tests the variance of the parametes and of the zne are produced."""
+    x_values = [0, 0, 1]
+    y_values = [-1, 1, 0]
+    zne_limit = PolyFactory.extrapolate(x_values, y_values, order=1)
+    assert np.isclose(zne_limit, 0.0, atol=1.0e-4)
+    (
+        zne_limit,
+        zne_std,
+        opt_params,
+        params_cov,
+        zne_curve,
+    ) = PolyFactory.extrapolate(
+        x_values, y_values, order=1, full_output=True
+    )
+    assert len(opt_params) == 2
+    assert np.isclose(zne_limit, 0.0)
+    assert np.isclose(0.0, opt_params[1])
+    assert np.isclose(0.0, opt_params[0])
+    assert np.allclose(params_cov, [[3.0, -1.0], [-1.0, 1.0]])
+    assert np.isclose(zne_std, 1.0)
+    assert np.isclose(zne_curve(0), 0.0)
+    assert np.isclose(zne_curve(0.5), 0.0)
