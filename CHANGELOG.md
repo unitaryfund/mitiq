@@ -14,6 +14,7 @@
 
 - Fix broken links on the website (@erkska, gh-400).
 - Use cirq v0.9.0 instead of cirq-unstable (@karalekas, gh-402).
+- Update mitiq.about() (@rmlarose, gh-399).
 
 ## Version 0.2.0 (October 4th, 2020)
 
