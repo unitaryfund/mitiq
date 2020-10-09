@@ -678,13 +678,13 @@ and clips the result if it falls outside its physical domain.
          Returns:
             The clipped extrapolation to the zero-noise limit.
          """
-         # Fit a line and get the intercept
-         _, intercept = mitiq_polyfit(
+         # Fit a line and get the optimal parameters (slope, intercept)
+         opt_params, _ = mitiq_polyfit(
             self.get_scale_factors(), self.get_expectation_values(), deg=1
         )
 
          # Return the clipped zero-noise extrapolation.
-         return np.clip(intercept, self.min_expval, self.max_expval)
+         return np.clip(opt_params[-1], self.min_expval, self.max_expval)
 
 .. testcleanup::
 
