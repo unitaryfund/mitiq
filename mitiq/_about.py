@@ -52,14 +52,14 @@ Authored by: Mitiq team, 2020 & later (https://github.com/unitaryfund/mitiq)
 
 Mitiq Version:\t{mitiq.__version__}
 
-Core packages
--------------
+Core Dependencies
+-----------------
 Cirq Version:\t{cirq_version}
 NumPy Version:\t{numpy_version}
 SciPy Version:\t{scipy_version}
 
-Optional supported packages
----------------------------
+Optional Dependencies
+---------------------
 PyQuil Version:\t{pyquil_version}
 Qiskit Version:\t{qiskit_version}
 
