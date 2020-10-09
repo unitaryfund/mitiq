@@ -50,7 +50,7 @@ development of the library, from your local clone of the fork, run
 If you add new features to a function or class, it is required to add tests for such object. Mitiq uses a nested structure for packaging tests in directories named `tests` at the same level of each module.
 
 ### Updating the documentation
-Follow the guidelines in the Contributing to docs [instructions](https://mitiq.readthedocs.io/en/latest/read_README-docs.html) (look here on [GitHub](https://github.com/unitaryfund/mitiq/blob/master/docs/README-docs.md)), which include guidelines about updating the API-doc list of modules and writing examples in the users guide.
+Follow these [instructions for contributing to the documentation](https://mitiq.readthedocs.io/en/latest/contributing_docs.html) which include guidelines about updating the API-doc list of modules and writing examples in the users guide.
 
 ### Checking local tests
 
@@ -108,6 +108,6 @@ default behavior in one category: we choose to use a line length of 79 rather th
 default of 88 (this is configured in the [`pyproject.toml`](pyproject.toml) file).
 
 ### Code of conduct
-Mitiq development abides to the [Contributors' Covenant](https://mitiq.readthedocs.io/en/latest/CODE_OF_CONDUCT.html).
+Mitiq development abides to the [Contributors' Covenant](https://mitiq.readthedocs.io/en/latest/code_of_conduct.html).
 
 [makefile]: https://github.com/unitaryfund/mitiq/blob/master/Makefile
