@@ -512,7 +512,7 @@ class BatchedFactory(Factory, ABC):
         for d in params:
             _ = d.pop("scale_factor")
 
-        # Repeat each keyward num_to_average times
+        # Repeat each keyword num_to_average times
         return [k for k in params for _ in range(num_to_average)]
 
     def __eq__(self, other: Any) -> bool:
