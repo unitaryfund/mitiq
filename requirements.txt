@@ -6,6 +6,9 @@ cirq-unstable==0.9.0.dev20200813185757
 pyquil~=2.18.0
 qiskit~=0.16.2
 
+# to handle deprecations
+deprecation~=2.1.0
+
 # to test the code
 pytest~=5.4.1
 pytest-cov~=2.8.1

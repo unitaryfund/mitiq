@@ -30,11 +30,12 @@ from typing import (
 )
 import warnings
 
+from deprecation import deprecated
 import numpy as np
 from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
 
-from mitiq import QPROGRAM
+from mitiq import QPROGRAM, __version__
 from mitiq.utils import _are_close_dict
 
 
@@ -188,12 +189,52 @@ class Factory(ABC):
         scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
         num_to_average: int = 1,
     ) -> "Factory":
+        """Calls the executor function on noise-scaled quantum circuit and
+        stores the results.
+
+        Args:
+            qp: Quantum circuit to scale noise in.
+            executor: Function which inputs a (list of) quantum circuits and
+                outputs a (list of) expectation values.
+            scale_noise: Function which inputs a quantum circuit and outputs
+                a noise-scaled quantum circuit.
+            num_to_average: Number of times the executor function is called
+                on each noise-scaled quantum circuit.
+        """
         raise NotImplementedError
 
     @abstractmethod
     def reduce(self) -> float:
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
+
+    @abstractmethod
+    def run_classical(
+            self,
+            scale_factor_to_expectation_value: Callable[..., float],
+    ) -> "Factory":
+        """Calls the function scale_factor_to_expectation_value at each scale
+        factor of the factory, and stores the results.
+
+        Args:
+            scale_factor_to_expectation_value: A function which inputs a scale
+                factor and outputs an expectation value. This does not have to
+                involve a quantum processor making this a "classical analogue"
+                of the run method.
+        """
+        raise NotImplementedError
+
+    @deprecated(
+        deprecated_in="0.3.0",
+        removed_in="0.4.0",
+        current_version=__version__,
+        details="Call run_classical instead of iterate."
+    )
+    def iterate(
+            self, noise_to_expval: Callable[..., float],
+            max_iterations: int = 100,
+    ) -> "Factory":
+        return self.run_classical(noise_to_expval)
 
     def push(
             self, instack_val: Dict[str, float], outstack_val: float
@@ -367,7 +408,6 @@ class BatchedFactory(Factory, ABC):
                 set a list of keyword arguments (one for each circuit). This
                 is necessary only if the factory is initialized using the
                 optional "shot_list" parameter.
-
             scale_noise: Noise scaling function.
             num_to_average: The number of circuits executed for each noise
                 scale factor. This parameter can be used to increase the
@@ -409,11 +449,9 @@ class BatchedFactory(Factory, ABC):
         scale factor.
 
         Args:
-            scale_factor_to_expectation_value: Function which inputs a scale
-                factor (float) and outputs the expectation value at this scale
-                factor. This is a classical analogue to what a quantum computer
-                would do provided a circuit, noise scaling method, and scale
-                factor.
+            scale_factor_to_expectation_value: Function mapping a noise scale
+                factor to an expectation value. If shot_list is not None,
+                "shots" must be an argument of this function.
         """
         self.reset()
         self._batch_populate_instack()
@@ -512,18 +550,18 @@ class AdaptiveFactory(Factory, ABC):
 
     def run_classical(
         self,
-        noise_to_expval: Callable[..., float],
+        scale_factor_to_expectation_value: Callable[..., float],
         max_iterations: int = 100,
     ) -> "AdaptiveFactory":
         """Evaluates a sequence of expectation values until enough
         data is collected (or iterations reach "max_iterations").
 
         Args:
-            noise_to_expval: Function mapping a noise scale factor to an
-                             expectation value. If shot_list is not None,
-                             "shot" must be an argument of the function.
+            scale_factor_to_expectation_value: Function mapping a noise scale
+                factor to an expectation value. If shot_list is not None,
+                "shots" must be an argument of this function.
             max_iterations: Maximum number of iterations (optional).
-                            Default: 100.
+                Default: 100.
 
         Raises:
             ConvergenceWarning: If iteration loop stops before convergence.
@@ -538,7 +576,9 @@ class AdaptiveFactory(Factory, ABC):
 
             # Get next scale factor and remove it from next_exec_params
             scale_factor = next_exec_params.pop("scale_factor")
-            next_expval = noise_to_expval(scale_factor, **next_exec_params)
+            next_expval = scale_factor_to_expectation_value(
+                scale_factor, **next_exec_params
+            )
             self.push(next_in_params, next_expval)
             counter += 1
 
@@ -576,7 +616,9 @@ class AdaptiveFactory(Factory, ABC):
             max_iterations: Maximum number of iterations (optional).
         """
 
-        def _noise_to_expval(scale_factor: float, **exec_params: Any) -> float:
+        def scale_factor_to_expectation_value(
+                scale_factor: float, **exec_params: Any
+        ) -> float:
             """Evaluates the quantum expectation value for a given
             scale_factor and other executor parameters."""
             expectation_values = []
@@ -585,7 +627,9 @@ class AdaptiveFactory(Factory, ABC):
                 expectation_values.append(executor(scaled_qp, **exec_params))
             return np.average(expectation_values)
 
-        return self.run_classical(_noise_to_expval, max_iterations)
+        return self.run_classical(
+            scale_factor_to_expectation_value, max_iterations
+        )
 
 
 class PolyFactory(BatchedFactory):
