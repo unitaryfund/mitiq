@@ -16,6 +16,7 @@
 - Use cirq v0.9.0 instead of cirq-unstable (@karalekas, gh-402).
 - Update mitiq.about() (@rmlarose, gh-399).
 - Refresh the release process documentation (@karalekas, gh-392).
+- Redesign factories, batch runs in BatchedFactory, fix Qiskit utils tests (@rmlarose, @andreamari, gh-381).
 
 ## Version 0.2.0 (October 4th, 2020)
 

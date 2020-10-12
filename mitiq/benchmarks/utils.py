@@ -29,7 +29,7 @@ SIMULATOR = DensityMatrixSimulator()
 
 
 def noisy_simulation(circ: Circuit, noise: float, obs: np.ndarray) -> float:
-    """ Simulates a circuit with depolarizing noise at level NOISE.
+    """Simulates a circuit with depolarizing noise at level NOISE.
 
     Args:
         circ: The quantum program as a cirq object.

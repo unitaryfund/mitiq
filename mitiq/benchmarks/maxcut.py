@@ -34,7 +34,7 @@ SIMULATOR = DensityMatrixSimulator()
 def make_noisy_backend(
     noise: float, obs: np.ndarray
 ) -> Callable[[Circuit], float]:
-    """ Helper function to match mitiq's backend type signature.
+    """Helper function to match mitiq's backend type signature.
 
     Args:
         noise: The level of depolarizing noise.
