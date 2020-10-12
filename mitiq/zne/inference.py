@@ -30,12 +30,11 @@ from typing import (
 )
 import warnings
 
-from deprecation import deprecated
 import numpy as np
 from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
 
-from mitiq import QPROGRAM, __version__
+from mitiq import QPROGRAM
 from mitiq.utils import _are_close_dict
 
 
@@ -224,16 +223,14 @@ class Factory(ABC):
         """
         raise NotImplementedError
 
-    @deprecated(
-        deprecated_in="0.3.0",
-        removed_in="0.4.0",
-        current_version=__version__,
-        details="Call run_classical instead of iterate."
-    )
     def iterate(
             self, noise_to_expval: Callable[..., float],
             max_iterations: int = 100,
     ) -> "Factory":
+        warnings.warn(
+            "The `iterate` method is deprecated in v0.3.0 and will be removed "
+            "in v0.4.0. Use `run_classical` instead.", DeprecationWarning
+        )
         return self.run_classical(noise_to_expval)
 
     def push(
