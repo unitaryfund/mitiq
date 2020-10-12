@@ -16,7 +16,7 @@
 """Tests for zero-noise inference and extrapolation methods (factories) with
 classically generated data.
 """
-from copy import copy
+from copy import copy, deepcopy
 from typing import Callable, List
 from pytest import mark, raises, warns
 
@@ -27,6 +27,7 @@ import cirq
 from mitiq.zne.inference import (
     ExtrapolationError,
     ExtrapolationWarning,
+    ConvergenceWarning,
     RichardsonFactory,
     LinearFactory,
     PolyFactory,
@@ -294,6 +295,47 @@ def test_run_sequential_and_batched(factory, batched):
     )
 
 
+@mark.parametrize(
+    "factory",
+    (
+        LinearFactory,
+        RichardsonFactory,
+        PolyFactory,
+        ExpFactory,
+        PolyExpFactory,
+    ),
+)
+def test_run_batched_with_keyword_args_list(factory):
+    scale_factors = np.linspace(1.0, 10.0, num=20)
+    shot_list = [int(scale) for scale in scale_factors]
+
+    if factory is PolyFactory or factory is PolyExpFactory:
+        fac = factory(
+            scale_factors=scale_factors, order=2, shot_list=shot_list
+        )
+    else:
+        fac = factory(scale_factors=scale_factors, shot_list=shot_list)
+
+    # Expectation values haven't been computed at any scale factors yet
+    assert isinstance(fac.get_expectation_values(), np.ndarray)
+    assert len(fac.get_expectation_values()) == 0
+
+    # Compute expectation values at all the scale factors
+    def executor(circuits, kwargs_list) -> List[float]:
+        assert len(circuits) == len(kwargs_list)
+        return [1.0] * len(circuits)
+
+    fac.run(
+        cirq.Circuit(),
+        executor,
+        scale_noise=lambda circ, _: circ,
+    )
+    assert isinstance(fac.get_expectation_values(), np.ndarray)
+    assert np.allclose(
+        fac.get_expectation_values(), np.ones_like(scale_factors)
+    )
+
+
 @mark.parametrize("test_f", [f_lin, f_non_lin])
 def test_richardson_extr(test_f: Callable[[float], float]):
     """Test of the Richardson's extrapolator."""
@@ -355,13 +397,18 @@ def test_exp_factory_with_asympt(
 ):
     """Test of exponential extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = ExpFactory(X_VALS, asymptote=A, avoid_log=True)
+    fac = ExpFactory(X_VALS, asymptote=A, avoid_log=avoid_log)
     fac.run_classical(seeded_f)
     assert len(fac.opt_params) == 0
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
     # There are three parameters to fit in the exponential ansatz
     assert len(fac.opt_params) == 3
+
+
+def test_exp_factory_bad_asympt():
+    with raises(ValueError, match="must be either a float or None"):
+        ExpFactory(X_VALS, asymptote=1j)
 
 
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
@@ -470,6 +517,20 @@ def test_ada_exp_factory_no_asympt_more_steps(
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
 
+def test_ada_exp_factory_bad_arguments():
+    with raises(ValueError, match="must be an integer greater or equal to 3"):
+        AdaExpFactory(steps=2.5)
+
+    with raises(ValueError, match="must be strictly larger than one"):
+        AdaExpFactory(steps=4, scale_factor=0.5)
+
+    with raises(ValueError, match="must be strictly larger than one"):
+        AdaExpFactory(steps=4, max_scale_factor=1)
+
+    with raises(ValueError, match="must be either a float or None"):
+        AdaExpFactory(steps=10, asymptote=1j)
+
+
 def test_avoid_log_keyword():
     """Test that avoid_log=True and avoid_log=False give different results."""
     fac = ExpFactory(X_VALS, asymptote=A, avoid_log=False)
@@ -487,7 +548,7 @@ def test_too_few_scale_factors(factory):
         _ = factory([1])
 
 
-def test_few_scale_factors_error():
+def test_order_is_too_high_for_scale_factors():
     """Test that a wrong initialization error is raised."""
     with raises(ValueError, match=r"The extrapolation order cannot exceed"):
         _ = PolyFactory(X_VALS, order=10)
@@ -548,17 +609,42 @@ def test_failing_fit_warnings(fac):
         fac.extrapolate([1, 1, 1, 1], [1.0, 1.0, 1.0, 1.0])
 
 
+def test_adaptive_factory_max_iteration_warnings():
+    """Test that the correct warning is raised beyond the iteration limit."""
+    fac = AdaExpFactory(steps=10)
+    with warns(
+        ConvergenceWarning,
+        match=r"Factory iteration loop stopped before convergence.",
+    ):
+        fac.run_classical(lambda scale_factor: 1.0, max_iterations=3)
+
+
+def test_equal_simple():
+    fac = LinearFactory(scale_factors=[1, 2, 3])
+    assert fac != 1
+
+    copied_fac = copy(fac)
+    assert copied_fac == fac
+    copied_fac._already_reduced = True
+    assert copied_fac != fac
+
+    fac._instack = [{"scale_factor": 1, "shots": 100}]
+    copied_fac = deepcopy(fac)
+    assert copied_fac == fac
+    copied_fac._instack[0].update({"shots": 101})
+    assert copied_fac != fac
+
+
 @mark.parametrize("factory", (LinearFactory, RichardsonFactory, PolyFactory))
 def test_equal(factory):
-    """Tests that copies are factories are equal to the original factories."""
-    for iterate in (True, False):
+    for run_classical in (True, False):
         if factory is PolyFactory:
             fac = factory(
                 scale_factors=[1, 2, 3], order=2, shot_list=[1, 2, 3]
             )
         else:
             fac = factory(scale_factors=[1, 2, 3], shot_list=[1, 2, 3])
-        if iterate:
+        if run_classical:
             fac.run_classical(
                 scale_factor_to_expectation_value=lambda x, shots: np.exp(x)
                 + 0.5
@@ -568,7 +654,7 @@ def test_equal(factory):
         assert copied_factory == fac
         assert copied_factory is not fac
 
-        if iterate:
+        if run_classical:
             fac.reduce()
             copied_factory = copy(fac)
             assert copied_factory == fac
