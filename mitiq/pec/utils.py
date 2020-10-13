@@ -70,7 +70,7 @@ def _simple_pauli_deco_dict(
     epsilon = base_noise * 4 / 3
     c_neg = -(1 / 4) * epsilon / (1 - epsilon)
     c_pos = 1 - 3 * c_neg
-    assert c_pos + 3 * c_neg == 1
+    assert np.isclose(c_pos + 3 * c_neg, 1.0)
 
     # Single-qubit decomposition dictionary
     deco_dict = {}
@@ -107,7 +107,7 @@ def _simple_pauli_deco_dict(
     c_pos_pos = c_pos * c_pos
     c_pos_neg = c_neg * c_pos
     c_neg_neg = c_neg * c_neg
-    assert c_pos_pos + 6 * c_pos_neg + 9 * c_neg_neg == 1
+    assert np.isclose(c_pos_pos + 6 * c_pos_neg + 9 * c_neg_neg, 1.0)
 
     cnot = CNOT.on(qreg[0], qreg[1])
     cnot_decomposition = [(c_pos_pos, [cnot])]
