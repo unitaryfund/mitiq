@@ -289,11 +289,11 @@ The typical tasks of a factory are:
 
 The structure of the :class:`.Factory` class is adaptive by construction, since the choice of the next noise
 level can depend on the history of these values. Obviously, non-adaptive
-methods are supported too and they actually represent the most common choice.
+methods are supported too and they actually represent the most common choice. Non-adaptive factories are instances
+of :class:`.BatchedFactory` objects. Adaptive factories are instances of :class:`.AdaptiveFactory` objects.
 
-Specific classes derived from the abstract class :class:`.Factory`, like :class:`.LinearFactory`,
-:class:`.RichardsonFactory`, etc., represent different zero-noise extrapolation methods.
-All the built-in factories can be found in the module :py:mod:`mitiq.zne.inference` and
+Specific classes derived from the abstract class :class:`.Factory` represent different zero-noise extrapolation
+methods. All the built-in factories can be found in the module :py:mod:`mitiq.zne.inference` and
 are summarized in the following table.
 
 .. _built-in-factories:
@@ -309,7 +309,7 @@ are summarized in the following table.
       mitiq.zne.inference.AdaExpFactory
 
 
-Once instantiated, a factory can be passed as an argument to the high-level functions contained in the module :py:mod:`mitiq.zne.zne`.
+Once instantiated, a factory can be passed as an argument to the high-level functions contained in the module :py:mod:`mitiq.zne`.
 Alternatively, a factory can be directly used to implement a zero-noise extrapolation procedure in a fully self-contained way.
 
 To clarify this aspect, we now perform the same zero-noise extrapolation with both methods.
@@ -405,6 +405,17 @@ in ``mitiq.zne``. For example:
    Error with richardson_fac: 0.0070
    Error with poly_fac: 0.0110
 
+We can also specify the number of shots to use for each noise-scaled circuit.
+
+.. testcode::
+
+   from mitiq.zne.inference import LinearFactory
+
+   # Specify the number of shots for each scale factor.
+   factory_with_shots = LinearFactory(scale_factors=[1.0, 2.0], shot_list=[100, 200])
+
+In this case the factory will pass the number of shots from the `shot_list` to the `executor`. Accordingly, the
+`executor` should support a `shots` keyword argument, otherwise the shot values will go unused.
 
 ---------------------------------------------
 Directly using a factory for error mitigation
@@ -490,9 +501,9 @@ in the previous sections.
 Eventually we will also discuss how the user can easily define a custom factory class.
 
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Low-level usage: the ``iterate`` method.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Low-level usage: the ``run_classical`` method.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``self.run`` method takes as arguments a circuit and other "quantum" objects.
 On the other hand, the core computation performed by any factory corresponds to
@@ -519,22 +530,22 @@ corresponding expectation value.
 
 The function ``noise_to_expval`` encapsulate the "quantum part" of the problem. The "classical
 part" of the problem can be solved by passing ``noise_to_expval``
-to the ``self.iterate`` method of a factory object.
+to the ``self.run_classical`` method of a factory.
 This method will repeatedly call ``noise_to_expval`` for different
-noise levels until a sufficient amount of data is collected.
-So, one can view ``self.iterate`` as the classical counterpart of the quantum method ``self.run``.
+noise levels, so one can view ``self.run_classical`` as the classical counterpart of the quantum method
+``self.run``.
 
 .. testcode::
 
-   linear_fac.iterate(noise_to_expval)
+   linear_fac.run_classical(noise_to_expval)
    zne_expval = linear_fac.reduce()
    print(f"Error with linear_fac: {abs(exact - zne_expval):.4f}")
 
-   richardson_fac.iterate(noise_to_expval)
+   richardson_fac.run_classical(noise_to_expval)
    zne_expval = richardson_fac.reduce()
    print(f"Error with richardson_fac: {abs(exact - zne_expval):.4f}")
 
-   poly_fac.iterate(noise_to_expval)
+   poly_fac.run_classical(noise_to_expval)
    zne_expval = poly_fac.reduce()
    print(f"Error with poly_fac: {abs(exact - zne_expval):.4f}")
 
@@ -545,60 +556,14 @@ So, one can view ``self.iterate`` as the classical counterpart of the quantum me
    Error with poly_fac: 0.0110
 
 .. note::
-   With respect to ``self.run`` the ``self.iterate`` method is much more flexible and
+   With respect to ``self.run``, the ``self.run_classical`` method is much more flexible and
    can be applied whenever the user is able to autonomously scale the noise level associated
    to an expectation value. Indeed, the function ``noise_to_expval`` can represent any experiment
    or any simulation in which noise can be artificially increased. The scenario
    is therefore not restricted to quantum circuits but can be easily extended to
    annealing devices or to gates which are controllable at a pulse level. In principle,
-   one could even use the ``self.iterate`` method to mitigate experiments which are
+   one could even use the ``self.run_classical`` method to mitigate experiments which are
    unrelated to quantum computing.
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Very low-level usage of a factory
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-It is also possible to emulate the action of the ``self.iterate`` method
-by manually measuring individual expectation values and saving them, one by one, into the factory.
-
-.. note::
-   In a typical situation, such a deep level of control is likely unnecessary.
-   It is anyway instructive to understand the internal structure of the
-   :class:`.Factory` class, especially if one is interested in defining a custom factory.
-
-
-.. testcode::
-
-   zne_list = []
-   # loop over different factories
-   for fac in [linear_fac, richardson_fac, poly_fac]:
-      # loop until enough expectation values are measured
-      while not fac.is_converged():
-         # Get the next noise scale factor from the factory
-         next_scale_factor = fac.next()
-         # Evaluate the expectation value
-         expval = noise_to_expval(next_scale_factor)
-         # Save the noise scale factor and the result into the factory
-         fac.push(next_scale_factor, expval)
-      # evaluate the zero-noise limit and append it to zne_list
-      zne_list.append(fac.reduce())
-
-   print(f"Error with linear_fac: {abs(exact - zne_list[0]):.4f}")
-   print(f"Error with richardson_fac: {abs(exact - zne_list[1]):.4f}")
-   print(f"Error with poly_fac: {abs(exact - zne_list[2]):.4f}")
-
-.. testoutput::
-
-   Error with linear_fac: 0.0291
-   Error with richardson_fac: 0.0070
-   Error with poly_fac: 0.0110
-
-
-In the previous code block we used the some core methods of a :class:`.Factory` object:
-
-   - ``self.next`` to get the next noise scale factor;
-   - ``self.push`` to save the measured data into the factory;
-   - ``self.is_converged`` to know if enough data has been collected.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -678,11 +643,11 @@ and clips the result if it falls outside its physical domain.
 .. testcleanup::
 
    fac = MyFactory([1, 2, 3], min_expval=0.0, max_expval=2.0)
-   fac.iterate(noise_to_expval)
+   fac.run_classical(noise_to_expval)
    assert np.isclose(fac.reduce(), 1.0, atol=0.1)
    # Linear model with a large zero-noise limit
    noise_to_large_expval = lambda x : noise_to_expval(x) + 10.0
-   fac.iterate(noise_to_large_expval)
+   fac.run_classical(noise_to_large_expval)
    # assert the output is clipped to 2.0
    assert np.isclose(fac.reduce(), 2.0)
 
