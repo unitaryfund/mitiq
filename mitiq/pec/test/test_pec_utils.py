@@ -17,7 +17,7 @@
 
 from pytest import mark
 import numpy as np
-from cirq import Gate, LineQubit, X, Y, Z, I
+from cirq import Gate, LineQubit, X, Y, Z, I, CNOT
 from mitiq.pec.utils import (
     _simple_pauli_deco_dict,
     get_coefficients,
@@ -30,14 +30,31 @@ BASE_NOISE = 0.01
 DECO_DICT = _simple_pauli_deco_dict(base_noise=BASE_NOISE)
 
 
+def test_simple_pauli_deco_dict_CNOT(gate: Gate = CNOT):
+    epsilon = BASE_NOISE * 4.0 / 3.0
+    c_neg = -(1 / 4) * epsilon / (1 - epsilon)
+    c_pos = 1 - 3 * c_neg
+    qreg = LineQubit.range(2)
+    
+    deco = DECO_DICT[gate.on(*qreg)]
+    first_coefficient, first_imp_seq = deco[0]
+    assert np.isclose(c_pos * c_pos, first_coefficient)
+    assert first_imp_seq == [gate.on(*qreg)]
+    second_coefficient, second_imp_seq = deco[1]
+    assert np.isclose(c_pos * c_neg, second_coefficient)
+    assert second_imp_seq == [gate.on(*qreg), X.on(qreg[0])]
+    last_coefficient, last_imp_seq = deco[-1]
+    assert np.isclose(c_neg * c_neg, last_coefficient)
+    assert last_imp_seq == [gate.on(*qreg), Z.on(qreg[0]), Z.on(qreg[1])]
+
+
 @mark.parametrize("gate", [X, Y, Z])
-def test_simple_pauli_deco_dict(gate: Gate):
+def test_simple_pauli_deco_dict_single_qubit(gate: Gate):
     epsilon = BASE_NOISE * 4.0 / 3.0
     c_neg = -(1 / 4) * epsilon / (1 - epsilon)
     c_pos = 1 - 3 * c_neg
     qreg = LineQubit.range(2)
     for q in qreg:
-
         deco = DECO_DICT[gate.on(q)]
         first_coefficient, first_imp_seq = deco[0]
         assert np.isclose(c_pos, first_coefficient)

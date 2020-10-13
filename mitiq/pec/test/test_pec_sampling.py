@@ -16,7 +16,7 @@
 """Tests related to mitiq.pec.utils functions."""
 
 from pytest import mark
-from cirq import Gate, LineQubit, X, Y, Z, Operation
+from cirq import Gate, LineQubit, X, Y, Z, CNOT, Operation
 
 from mitiq.pec.utils import _simple_pauli_deco_dict
 from mitiq.pec.sampling import sample_sequence
@@ -25,11 +25,15 @@ BASE_NOISE = 0.01
 DECO_DICT = _simple_pauli_deco_dict(base_noise=BASE_NOISE)
 
 
-@mark.parametrize("gate", [X, Y, Z])
-def test_gsample_sequence(gate: Gate):
-    q = LineQubit(0)
+@mark.parametrize("gate", [X, Y, Z, CNOT])
+def test_sample_sequence(gate: Gate):
+    q_a = LineQubit(0)
+    q_b = LineQubit(1)
     for _ in range(1000):
-        imp_seq, sign, norm = sample_sequence(gate.on(q), DECO_DICT)
+        if gate is CNOT:
+            imp_seq, sign, norm = sample_sequence(gate.on(q_a, q_b), DECO_DICT)
+        else:
+            imp_seq, sign, norm = sample_sequence(gate.on(q_a), DECO_DICT)
         assert all([isinstance(op, Operation) for op in imp_seq])
         assert sign in {1.0, -1.0}
         assert norm > 1
