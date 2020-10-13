@@ -70,7 +70,9 @@ def rb_circuits(
             qid1 = qubit_labels[1] if qubit_labels else 1
             qubit2 = LineQubit(qid1)
             cfd_matrices = _two_qubit_clifford_matrices(
-                qubit1, qubit2, CLIFFORDS,  # type: ignore
+                qubit1,
+                qubit2,
+                CLIFFORDS,  # type: ignore
             )
             rb_circuits = [
                 _random_two_q_clifford(
