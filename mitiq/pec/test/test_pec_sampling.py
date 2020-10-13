@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Tests related to mitiq.pec.utils functions."""
+"""Tests related to mitiq.pec.sampling functions."""
 
 from pytest import mark
 from cirq import Gate, LineQubit, X, Y, Z, CNOT, Operation
@@ -37,3 +37,5 @@ def test_sample_sequence(gate: Gate):
         assert all([isinstance(op, Operation) for op in imp_seq])
         assert sign in {1.0, -1.0}
         assert norm > 1
+
+# TODO: Add a similar test for sample_circuit.
