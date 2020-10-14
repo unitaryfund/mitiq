@@ -21,7 +21,15 @@
 
 import numpy as np
 from typing import Tuple, List, Dict
-from cirq import Operation, I, X, Y, Z, CNOT, LineQubit
+from cirq import (
+    Operation,
+    I,
+    X,
+    Y,
+    Z,
+    CNOT,
+    LineQubit,
+)
 
 # Type definition for a decomposition dictionary.
 # Keys are ideal operations.

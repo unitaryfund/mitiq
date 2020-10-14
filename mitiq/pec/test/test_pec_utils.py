@@ -17,7 +17,7 @@
 
 from pytest import mark
 import numpy as np
-from cirq import Gate, LineQubit, X, Y, Z, I, CNOT
+from cirq import Gate, LineQubit, X, Y, Z, I, CNOT, depolarize
 from mitiq.pec.utils import (
     _simple_pauli_deco_dict,
     get_coefficients,
@@ -25,9 +25,12 @@ from mitiq.pec.utils import (
     get_one_norm,
     get_probabilities,
 )
+from mitiq.utils import _operation_to_choi
 
 BASE_NOISE = 0.01
-DECO_DICT = _simple_pauli_deco_dict(base_noise=BASE_NOISE)
+DECO_DICT = _simple_pauli_deco_dict(BASE_NOISE)
+DECO_DICT_SIMP = _simple_pauli_deco_dict(BASE_NOISE, simplify_paulis=True)
+NOISELESS_DECO_DICT = _simple_pauli_deco_dict(0)
 
 
 def test_simple_pauli_deco_dict_CNOT(gate: Gate = CNOT):
@@ -67,7 +70,7 @@ def test_simple_pauli_deco_dict_single_qubit(gate: Gate):
 @mark.parametrize("gate", [X, Y, Z])
 def test_simplify_paulist_in_simple_pauli_deco_dict(gate: Gate):
     qreg = LineQubit.range(2)
-    deco_dict = _simple_pauli_deco_dict(BASE_NOISE, simplify_paulis=True)
+    deco_dict = DECO_DICT_SIMP
     for q in qreg:
         deco = deco_dict[gate.on(q)]
         _, first_imp_seq = deco[0]
@@ -89,7 +92,7 @@ def test_get_coefficients(gate: Gate):
 
 
 def test_get_imp_sequences_with_simplify():
-    deco_dict = _simple_pauli_deco_dict(BASE_NOISE, simplify_paulis=True)
+    deco_dict = DECO_DICT_SIMP
     q = LineQubit(0)
     expected_imp_sequences = [[X.on(q)], [I.on(q)], [Z.on(q)], [Y.on(q)]]
     assert get_imp_sequences(X.on(q), deco_dict) == expected_imp_sequences
@@ -121,3 +124,20 @@ def test_get_probabilities(gate: Gate):
     probs = get_probabilities(gate.on(q), DECO_DICT)
     assert all([p >= 0 for p in probs])
     assert np.isclose(sum(probs), 1.0)
+
+
+@mark.parametrize("gate", [X, Y, Z, CNOT])
+def test_simple_pauli_deco_dict_with_Choi(gate: Gate):
+    """Tests the decomposition by comparing the exact Choi matrices."""
+    qreg = LineQubit.range(gate.num_qubits())
+    ideal_choi = _operation_to_choi(gate.on(*qreg))
+    op_decomp = DECO_DICT[gate.on(*qreg)]
+    choi_components = []
+    for coeff, imp_seq in op_decomp:
+        # Apply noise after each sequence.
+        # NOTE: noise is not applied after each operation.
+        noisy_sequence = [imp_seq] + [depolarize(BASE_NOISE)(q) for q in qreg]
+        sequence_choi = _operation_to_choi(noisy_sequence)
+        choi_components.append(coeff * sequence_choi)
+    combination_choi = np.sum(choi_components, axis=0)
+    assert np.allclose(ideal_choi, combination_choi)
