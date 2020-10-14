@@ -32,7 +32,7 @@ def execute_with_pec(
     """Evaluates the expectation value associated to the input circuit
     using probabilistic error cancellation (PEC) [Temme2017]_.
 
-    This function implements PEC by: 
+    This function implements PEC by:
 
     1. Sampling different implementable circuits from the quasi-probability
        representation of the input circuit;
@@ -53,13 +53,13 @@ def execute_with_pec(
             larger than 1 (default), reduces the statistical error associated
             to each noisy expectation value.
         num_samples: The number of noisy circuits to be sampled for PEC.
-            If None, it is deduced from the amount of "negativity" of the 
+            If None, it is deduced from the amount of "negativity" of the
             quasi-probability representation of the input circuit.
-        
+
     Returns:
-        The PEC estimate of the ideal expectation value associated 
+        The PEC estimate of the ideal expectation value associated
         to the input circuit.
-    
+
     .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
         "Error mitigation for short-depth quantum circuits,"
         *Phys. Rev. Lett.* **119**, 180509 (2017),
@@ -91,7 +91,7 @@ def execute_with_pec(
 
     # The norm of the quasi-distribution should be independent of sample
     assert np.all(norms == norms[0])
-    norm = norms[0] 
+    norm = norms[0]
 
     # Repeat each sampled circuit "num_to_average" times
     to_run = [circ for circ in sampled_circuits for _ in range(num_to_average)]
@@ -107,7 +107,7 @@ def execute_with_pec(
     exp_values = np.average(results, axis=1)
 
     # Evaluate unbiased estimators [Temme2017], [Endo2018], [Takagi2020]
-    unbiased_estimates = [sign * norm * exp_val for exp_val, sign in zip(exp_values, signs)]
+    unbiased_estimators = [s * norm * val for val, s in zip(exp_values, signs)]
 
     # Average to return the PEC estimate of the ideal expectation value
-    return np.average(unbiased_estimates)
+    return np.average(unbiased_estimators)

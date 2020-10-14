@@ -38,4 +38,5 @@ def test_sample_sequence(gate: Gate):
         assert sign in {1.0, -1.0}
         assert norm > 1
 
+
 # TODO: Add a similar test for sample_circuit.
