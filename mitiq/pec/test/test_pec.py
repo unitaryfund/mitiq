@@ -17,7 +17,7 @@
 
 from pytest import mark
 import numpy as np
-from cirq import Circuit, LineQubit, X, Y, Z, CNOT
+from cirq import Circuit, LineQubit, X, Z, CNOT
 
 from mitiq.pec.utils import _simple_pauli_deco_dict, DecoType
 from mitiq.pec.pec import execute_with_pec
@@ -30,6 +30,7 @@ DECO_DICT = _simple_pauli_deco_dict(BASE_NOISE)
 DECO_DICT_SIMP = _simple_pauli_deco_dict(BASE_NOISE, simplify_paulis=True)
 NOISELESS_DECO_DICT = _simple_pauli_deco_dict(0)
 
+
 def executor(circuit: Circuit) -> float:
     """A one- or two-qubit noisy executor function.
     It executes the input circuit with BASE_NOISE depolarizing noise and
@@ -38,16 +39,17 @@ def executor(circuit: Circuit) -> float:
     if len(circuit.all_qubits()) == 1:
         obs = np.array([[1, 0], [0, 0]])
     elif len(circuit.all_qubits()) == 2:
-        obs = np.array([[1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]])
+        obs = np.array(
+            [[1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+        )
     else:
         raise ValueError("The input must be a circuit with 1 or 2 qubits.")
 
     return noisy_simulation(
-        circuit, 
+        circuit,
         BASE_NOISE,
         obs,
     )
-    
 
 
 # Simple identity 1-qubit circuit for testing
@@ -62,9 +64,8 @@ twoq_circ = Circuit(
     CNOT.on(*qreg),
 )
 
-@mark.parametrize(
-    "circuit", [oneq_circ, twoq_circ]
-)
+
+@mark.parametrize("circuit", [oneq_circ, twoq_circ])
 @mark.parametrize(
     "deco_dict", [NOISELESS_DECO_DICT, DECO_DICT_SIMP, DECO_DICT]
 )
@@ -104,7 +105,7 @@ def test_averaging_improves_zne_value_with_fake_noise():
             fake_noisy_executor,
             deco_dict=NOISELESS_DECO_DICT,
             num_to_average=1,
-            num_samples=1
+            num_samples=1,
         )
 
         pec_value_averaging = execute_with_pec(
@@ -119,9 +120,9 @@ def test_averaging_improves_zne_value_with_fake_noise():
         error_no_averaging = abs(pec_value_no_averaging - 0.0)
         error_averaging = abs(pec_value_averaging - 0.0)
         assert error_averaging < error_no_averaging
-    
+
+
 def test_averaging_is_irrelevant_for_deterministic_executors():
-    
     def fake_deterministic_executor(circuit) -> float:
         return np.pi
 
@@ -130,8 +131,8 @@ def test_averaging_is_irrelevant_for_deterministic_executors():
         fake_deterministic_executor,
         deco_dict=NOISELESS_DECO_DICT,
         num_to_average=1,
-        num_samples=1
-        )
+        num_samples=1,
+    )
 
     pec_value_averaging = execute_with_pec(
         oneq_circ,
@@ -142,4 +143,3 @@ def test_averaging_is_irrelevant_for_deterministic_executors():
     )
 
     assert np.isclose(pec_value_no_averaging, pec_value_averaging)
-

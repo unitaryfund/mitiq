@@ -35,7 +35,7 @@ def test_simple_pauli_deco_dict_CNOT(gate: Gate = CNOT):
     c_neg = -(1 / 4) * epsilon / (1 - epsilon)
     c_pos = 1 - 3 * c_neg
     qreg = LineQubit.range(2)
-    
+
     deco = DECO_DICT[gate.on(*qreg)]
     first_coefficient, first_imp_seq = deco[0]
     assert np.isclose(c_pos * c_pos, first_coefficient)

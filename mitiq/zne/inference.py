@@ -209,8 +209,8 @@ class Factory(ABC):
 
     @abstractmethod
     def run_classical(
-            self,
-            scale_factor_to_expectation_value: Callable[..., float],
+        self,
+        scale_factor_to_expectation_value: Callable[..., float],
     ) -> "Factory":
         """Calls the function scale_factor_to_expectation_value at each scale
         factor of the factory, and stores the results.
@@ -224,17 +224,17 @@ class Factory(ABC):
         raise NotImplementedError
 
     def iterate(
-            self, noise_to_expval: Callable[..., float],
-            max_iterations: int = 100,
+        self, noise_to_expval: Callable[..., float], max_iterations: int = 100
     ) -> "Factory":
         warnings.warn(
             "The `iterate` method is deprecated in v0.3.0 and will be removed "
-            "in v0.4.0. Use `run_classical` instead.", DeprecationWarning
+            "in v0.4.0. Use `run_classical` instead.",
+            DeprecationWarning,
         )
         return self.run_classical(noise_to_expval)
 
     def push(
-            self, instack_val: Dict[str, float], outstack_val: float
+        self, instack_val: Dict[str, float], outstack_val: float
     ) -> "Factory":
         """Appends "instack_val" to "self._instack" and "outstack_val" to
         "self._outstack". Each time a new expectation value is computed this
@@ -614,7 +614,7 @@ class AdaptiveFactory(Factory, ABC):
         """
 
         def scale_factor_to_expectation_value(
-                scale_factor: float, **exec_params: Any
+            scale_factor: float, **exec_params: Any
         ) -> float:
             """Evaluates the quantum expectation value for a given
             scale_factor and other executor parameters."""

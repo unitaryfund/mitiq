@@ -30,7 +30,7 @@ DecoType = Dict[Operation, List[Tuple[float, List[Operation]]]]
 
 
 def _simple_pauli_deco_dict(
-    base_noise: float, simplify_paulis: bool = False,
+    base_noise: float, simplify_paulis: bool = False
 ) -> DecoType:
     """Returns a simple hard-coded decomposition
     dictionary to be used for testing and protoptyping.
@@ -122,61 +122,59 @@ def _simple_pauli_deco_dict(
 
 
 def get_coefficients(
-    ideal_operation: Operation, decomposition: DecoType
+    ideal_operation: Operation, deco_dict: DecoType
 ) -> List[float]:
     """Extracts, from the input decomposition dictionary, the decomposition
     coefficients associated to the input ideal_operation.
 
     Args:
         ideal_operation: The input ideal operation.
-        decomposition: The input decomposition dictionary.
+        deco_dict: The input decomposition dictionary.
 
     Returns:
         The decomposition coefficients of the input operation.
     """
-    op_decomp = decomposition[ideal_operation]
+    op_decomp = deco_dict[ideal_operation]
 
     return [coeff_and_seq[0] for coeff_and_seq in op_decomp]
 
 
 def get_imp_sequences(
-    ideal_operation: Operation, decomposition: DecoType
+    ideal_operation: Operation, deco_dict: DecoType
 ) -> List[List[Operation]]:
     """Extracts, from the input decomposition dictionary, the list of
     implementable sequences associated to the input ideal_operation.
 
     Args:
         ideal_operation: The input ideal operation.
-        decomposition: The input decomposition dictionary.
+        deco_dict: The input decomposition dictionary.
 
     Returns:
         The list of implementable sequences.
     """
-    op_decomp = decomposition[ideal_operation]
+    op_decomp = deco_dict[ideal_operation]
 
     return [coeff_and_seq[1] for coeff_and_seq in op_decomp]
 
 
-def get_one_norm(
-    ideal_operation: Operation, decomposition: DecoType,
-) -> float:
+def get_one_norm(ideal_operation: Operation, deco_dict: DecoType) -> float:
     """Extracts, from the input decomposition dictionary, the one-norm
     (i.e. the sum of absolute values) of the the decomposition coefficients
     associated to the input ideal_operation.
 
     Args:
         ideal_operation: The input ideal operation.
-        decomposition: The input decomposition dictionary.
+        deco_dict: The input decomposition dictionary.
 
     Returns:
         The one-norm of the decomposition coefficients.
     """
-    coeffs = get_coefficients(ideal_operation, decomposition)
+    coeffs = get_coefficients(ideal_operation, deco_dict)
     return np.linalg.norm(coeffs, ord=1)
 
 
 def get_probabilities(
-    ideal_operation: Operation, decomposition: DecoType,
+    ideal_operation: Operation, deco_dict: DecoType
 ) -> List[float]:
     """Evaluates, from the input decomposition dictionary, the normalized
     probability distribution associated to the input ideal_operation.
@@ -187,10 +185,10 @@ def get_probabilities(
 
     Args:
         ideal_operation: The input ideal operation.
-        decomposition: The input decomposition dictionary.
+        deco_dict: The input decomposition dictionary.
 
     Returns:
         The probability distribution suitable for Monte Carlo sampling.
     """
-    coeffs = get_coefficients(ideal_operation, decomposition)
+    coeffs = get_coefficients(ideal_operation, deco_dict)
     return list(np.abs(coeffs) / np.linalg.norm(coeffs, ord=1))
