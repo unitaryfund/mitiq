@@ -57,7 +57,7 @@ def sample_sequence(
     # Get the coefficient and the implementanble sequence associated to "idx"
     coeff, imp_seq = deco_dict[ideal_operation][idx]
 
-    return imp_seq, np.sign(coeff), one_norm
+    return imp_seq, int(np.sign(coeff)), one_norm
 
 
 def sample_circuit(
