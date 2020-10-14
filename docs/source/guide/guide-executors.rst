@@ -469,10 +469,10 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
         for i, moment in enumerate(circ.moments):
             noisy_circuit.append(moment)
             for j, q in enumerate(circ.all_qubits()):
-                noisy_circuit.append(cirq.rx(h_array[j,i]).on(q))
+                noisy_circuit.append(cirq.rx(h_array[j, i]).on(q))
         
         # rotations will be pi w/ prob p, 0 w/ prob 1-p
-        vals = [np.reshape((np.random.rand(len(circ.all_qubits()),len(circ.moments))<p)*np.pi,(1,len(circ.all_qubits())*len(circ.moments))) for _ in range(num_MC)]
+        vals = [np.reshape((np.random.rand(len(circ.all_qubits()), len(circ.moments)) < p)*np.pi, (1, len(circ.all_qubits())*len(circ.moments))) for _ in range(num_MC)]
         
 
         
@@ -485,10 +485,10 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
         state = tfq.layers.State()
         
         # Execute monte carlo sim with symbolic values specified by vals
-        out = state(noisy_circuit,symbol_names=h,symbol_values=vals).to_tensor()
+        out = state(noisy_circuit, symbol_names=h, symbol_values=vals).to_tensor()
         
         # Fancy way of computing and summing individual density operators, follwed by averaging
-        dm = tf.tensordot(tf.transpose(out),tf.math.conj(out),axes=[[1],[0]]).numpy()/num_MC
+        dm = tf.tensordot(tf.transpose(out), tf.math.conj(out), axes=[[1],[0]]).numpy() / num_MC
         
         # return measurement of 0 state
         return np.real(dm[0, 0])
