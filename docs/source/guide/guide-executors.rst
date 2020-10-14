@@ -439,7 +439,7 @@ Despite this latter limitation, there is a crossover point where Monte Carlo usi
 
 Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
 
-.. code::
+.. testcode::
 
     import numpy as np
     from cirq import Circuit
@@ -449,7 +449,7 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
     import tensorflow_quantum as tfq
 
 
-    def stochastic_bit_flip_simulation(circ: Circuit, p, num_MC=100):
+    def stochastic_bit_flip_simulation(circ: Circuit, p: float, num_MC: int=100) -> float:
         """
         Simulates a circuit with random bit flip (X(\pi)) errors
         Args:
@@ -460,18 +460,18 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
             The expectation value of the 0 state as a float
         """
     
-        #Create array of symbolic variables and reshape to natural circuit parameterization
+        # Create array of symbolic variables and reshape to natural circuit parameterization
         h = sympy.symbols(''.join(['h_{0} '.format(i) for i in range(len(circ.moments)*len(circ.all_qubits()))]),positive=True)
         h_array = np.asarray(h).reshape((len(circ.all_qubits()),len(circ.moments)))
 
-        #Symbolicly add X gates to the input circuit
+        # Symbolicly add X gates to the input circuit
         noisy_circuit = Circuit()
-        for i,moment in enumerate(circ.moments):
+        for i, moment in enumerate(circ.moments):
             noisy_circuit.append(moment)
-            for j,q in enumerate(circ.all_qubits()):
+            for j, q in enumerate(circ.all_qubits()):
                 noisy_circuit.append(cirq.rx(h_array[j,i]).on(q))
         
-        #rotations will be pi w/ prob p, 0 w/ prob 1-p
+        # rotations will be pi w/ prob p, 0 w/ prob 1-p
         vals = [np.reshape((np.random.rand(len(circ.all_qubits()),len(circ.moments))<p)*np.pi,(1,len(circ.all_qubits())*len(circ.moments))) for _ in range(num_MC)]
         
 
@@ -481,29 +481,27 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
         if num_MC == 1:
             vals = [vals]
         
-        #Instantiate tfq layer for computing state vector
+        # Instantiate tfq layer for computing state vector
         state = tfq.layers.State()
         
-        #Execute monte carlo sim with symbolic values specified by vals
+        # Execute monte carlo sim with symbolic values specified by vals
         out = state(noisy_circuit,symbol_names=h,symbol_values=vals).to_tensor()
         
-        #Fancy way of computing and summing individual density operators, follwed by averaging
+        # Fancy way of computing and summing individual density operators, follwed by averaging
         dm = tf.tensordot(tf.transpose(out),tf.math.conj(out),axes=[[1],[0]]).numpy()/num_MC
         
-        #return measurement of 0 state
-        return np.real(dm[0,0])
+        # return measurement of 0 state
+        return np.real(dm[0, 0])
 
 .. testcode::
     :hide:
     
-    #Issue with tfq prevents this working on build server, commenting out for now
-    
-    #import cirq
-    #from mitiq.benchmarks import randomized_benchmarking
-    #circ = randomized_benchmarking.rb_circuits(1,[20],1)[0]
+    import cirq
+    from mitiq.benchmarks import randomized_benchmarking
+    circ = randomized_benchmarking.rb_circuits(1, [20], 1)[0]
 
-    ##Need to make sure the qubits are cirq.GridQubit
-    #circ=circ.transform_qubits(lambda q: cirq.GridQubit.rect(1,1)[0])
+    # Need to make sure the qubits are cirq.GridQubit
+    circ=circ.transform_qubits(lambda q: cirq.GridQubit.rect(1,1)[0])
 
-    #out = stochastic_bit_flip_simulation(circ, .001)
-    #assert .97 < out < 1
+    out = stochastic_bit_flip_simulation(circ, .001)
+    assert .5 < out < 1

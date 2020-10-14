@@ -8,6 +8,8 @@
 [//]: # " - [Bug Fix]"
 [//]: # " - Fix the bug."
 
+- Added Tensorflow Quantum executor to docs, closes #334 (@k-m-schultz, gh-348)
+
 ## Version 0.1.0 (September 2nd, 2020)
 
 ### Summary
