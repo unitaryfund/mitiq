@@ -17,6 +17,7 @@
 - Update mitiq.about() (@rmlarose, gh-399).
 - Refresh the release process documentation (@karalekas, gh-392).
 - Redesign factories, batch runs in BatchedFactory, fix Qiskit utils tests (@rmlarose, @andreamari, gh-381).
+- Add PEC basic implementation assuming a decomposition dictionary is given (@andreamari, gh-373).
 
 ## Version 0.2.0 (October 4th, 2020)
 
