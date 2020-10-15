@@ -17,7 +17,7 @@
 
 from pytest import mark
 import numpy as np
-from cirq import Circuit, LineQubit, X, Z, CNOT
+from cirq import Circuit, LineQubit, Y, Z, CNOT
 
 from mitiq.pec.utils import _simple_pauli_deco_dict, DecoType
 from mitiq.pec.pec import execute_with_pec
@@ -59,9 +59,9 @@ oneq_circ = Circuit(Z.on(q), Z.on(q))
 # Simple identity 2-qubit circuit for testing
 qreg = LineQubit.range(2)
 twoq_circ = Circuit(
-    X.on(qreg[0]),
-    X.on(qreg[0]),
+    Y.on(qreg[1]),
     CNOT.on(*qreg),
+    Y.on(qreg[1]),
 )
 
 
@@ -84,6 +84,7 @@ def test_execute_with_pec_one_qubit(circuit: Circuit, deco_dict: DecoType):
         assert np.isclose(unmitigated, mitigated)
     else:
         assert error_mitigated < error_unmitigated
+        assert np.isclose(mitigated, 1.0, atol=0.1)
 
 
 def test_averaging_improves_zne_value_with_fake_noise():
