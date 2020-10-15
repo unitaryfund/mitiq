@@ -43,7 +43,7 @@ def execute_with_pec(
 
     Args:
         circuit = The input circuit to execute with error-mitigation.
-        executor = A function which executes a circuits and returns an
+        executor = A function which executes a circuit and returns an
             expectation value.
         deco_dict = The decomposition dictionary containing the quasi-
             probability representation of the ideal operations (those
@@ -53,8 +53,10 @@ def execute_with_pec(
             larger than 1 (default), reduces the statistical error associated
             to each noisy expectation value.
         num_samples: The number of noisy circuits to be sampled for PEC.
-            If None, it is deduced from the amount of "negativity" of the
-            quasi-probability representation of the input circuit.
+            If equal to None, it is deduced from the amount of "negativity"
+            of the quasi-probability representation of the input circuit.
+            Note: the latter feature is not yet implemented and num_samples
+            is just set to 1000 if not specified.
 
     Returns:
         The PEC estimate of the ideal expectation value associated
@@ -75,7 +77,7 @@ def execute_with_pec(
         (https://arxiv.org/abs/2006.12509).
     """
 
-    # TODO: deduce num_to_sample from the "negativity" of the decomposition
+    # TODO: maybe deduce num_to_sample from the decomposition "negativity"
     if not num_samples:
         num_samples = 1000
 
@@ -83,7 +85,7 @@ def execute_with_pec(
     signs = []
     norms = []
 
-    for i in range(num_samples):
+    for _ in range(num_samples):
         sampled_circuit, sign, norm = sample_circuit(circuit, deco_dict)
         sampled_circuits.append(sampled_circuit)
         signs.append(sign)
@@ -96,7 +98,7 @@ def execute_with_pec(
     # Repeat each sampled circuit "num_to_average" times
     to_run = [circ for circ in sampled_circuits for _ in range(num_to_average)]
 
-    # TODO: deal with batched executors
+    # TODO: think about dealing with batched executors
     # Execute all the circuits
     results = np.array([executor(circ) for circ in to_run])
 
