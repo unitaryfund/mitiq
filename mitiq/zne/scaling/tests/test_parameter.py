@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Unit tests for Param Cirq circuits."""
-
+"""Unit tests for parameter scaling."""
 from copy import deepcopy
 
 import pytest
@@ -22,10 +21,10 @@ import numpy as np
 from cirq import Circuit, LineQubit, ops, CSWAP
 
 from mitiq.utils import _equal
-from mitiq.zne.parameter import (
+from mitiq.zne.scaling.parameter import (
     scale_parameters,
     _get_base_gate,
-    GateTypeException
+    GateTypeException,
 )
 
 
@@ -34,10 +33,7 @@ def test_identity_scale_1q():
     same.
     """
     qreg = LineQubit.range(3)
-    circ = Circuit(
-        [ops.X.on_each(qreg)],
-        [ops.Y.on(qreg[0])]
-    )
+    circ = Circuit([ops.X.on_each(qreg)], [ops.Y.on(qreg[0])])
     scaled = scale_parameters(circ, scale_factor=1, sigma=0.001)
     assert _equal(circ, scaled)
 
@@ -48,24 +44,25 @@ def test_non_identity_scale_1q():
     """
     qreg = LineQubit.range(3)
     circ = Circuit(
-        [ops.rx(np.pi*1.0).on_each(qreg)],
-        [ops.ry(np.pi*1.0).on(qreg[0])]
+        [ops.rx(np.pi * 1.0).on_each(qreg)], [ops.ry(np.pi * 1.0).on(qreg[0])]
     )
     np.random.seed(42)
     stretch = 2
     base_noise = 0.001
-    noises = np.random.normal(loc=0.0, scale=np.sqrt(
-        (stretch-1)*base_noise), size=(4,))
+    noises = np.random.normal(
+        loc=0.0, scale=np.sqrt((stretch - 1) * base_noise), size=(4,)
+    )
     np.random.seed(42)
 
     scaled = scale_parameters(
-        circ, scale_factor=stretch, sigma=base_noise, seed=42)
+        circ, scale_factor=stretch, sigma=base_noise, seed=42
+    )
     result = []
     for moment in scaled:
         for op in moment.operations:
             gate = deepcopy(op.gate)
             param = gate.exponent
-            result.append(param*np.pi - np.pi)
+            result.append(param * np.pi - np.pi)
     assert np.all(np.isclose(result - noises, 0))
 
 
@@ -74,9 +71,7 @@ def test_identity_scale_2q():
     same.
     """
     qreg = LineQubit.range(2)
-    circ = Circuit(
-        [ops.CNOT.on(qreg[0], qreg[1])]
-    )
+    circ = Circuit([ops.CNOT.on(qreg[0], qreg[1])])
     scaled = scale_parameters(circ, scale_factor=1, sigma=0.001)
     assert _equal(circ, scaled)
 
@@ -86,23 +81,23 @@ def test_non_identity_scale_2q():
     same.
     """
     qreg = LineQubit.range(2)
-    circ = Circuit(
-        [ops.CNOT.on(qreg[0], qreg[1])]
-    )
+    circ = Circuit([ops.CNOT.on(qreg[0], qreg[1])])
     np.random.seed(42)
     stretch = 2
     base_noise = 0.001
-    noises = np.random.normal(loc=0.0, scale=np.sqrt(
-        (stretch-1)*base_noise), size=(1,))
+    noises = np.random.normal(
+        loc=0.0, scale=np.sqrt((stretch - 1) * base_noise), size=(1,)
+    )
     np.random.seed(42)
     scaled = scale_parameters(
-        circ, scale_factor=stretch, sigma=base_noise, seed=42)
+        circ, scale_factor=stretch, sigma=base_noise, seed=42
+    )
     result = []
     for moment in scaled:
         for op in moment.operations:
             gate = deepcopy(op.gate)
             param = gate.exponent
-            result.append(param*np.pi - np.pi)
+            result.append(param * np.pi - np.pi)
     assert np.all(np.isclose(result - noises, 0))
 
 

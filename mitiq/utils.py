@@ -15,7 +15,7 @@
 
 """Utility functions."""
 from copy import deepcopy
-from typing import cast
+from typing import cast, Any, Dict
 
 import numpy as np
 
@@ -122,7 +122,7 @@ def _equal(
     )
 
 
-def _are_close_dict(dict_a: dict, dict_b: dict) -> bool:
+def _are_close_dict(dict_a: Dict[Any, Any], dict_b: Dict[Any, Any]) -> bool:
     """Returns True if the two dictionaries have equal keys and
     their corresponding values are "sufficiently" close."""
     keys_a = dict_a.keys()

@@ -216,7 +216,7 @@ def is_magic_angle(angle: float) -> bool:
     """
     Checks to see if an angle is 0, +/-pi/2, or +/-pi.
     """
-    return (
+    return bool(
         np.isclose(np.abs(angle), pi / 2)
         or np.isclose(np.abs(angle), pi)
         or np.isclose(angle, 0.0)

@@ -13,12 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Command line output of information on Mitiq and dependencies."""
+"""Information about Mitiq and dependencies."""
 __all__ = ["about"]
 
 import inspect
 import platform
-import os
 import sys
 
 from cirq import __version__ as cirq_version
@@ -30,14 +29,12 @@ import mitiq
 MITIQ_SOURCE_FILE = inspect.getsourcefile(mitiq)
 assert MITIQ_SOURCE_FILE
 
-MITIQ_INSTALL_PATH = os.path.dirname(MITIQ_SOURCE_FILE)
 PYTHON_VERSION = sys.version_info[0:3]
 
 
-def about():
-    """
-    About box for Mitiq. Gives version numbers for
-    Mitiq, NumPy, SciPy, Cirq, PyQuil, Qiskit.
+def about() -> None:
+    """Displays information about Mitiq, core/optional packages, and Python
+    version/platform information.
     """
     try:
         from pyquil import __version__ as pyquil_version
@@ -55,15 +52,19 @@ Authored by: Mitiq team, 2020 & later (https://github.com/unitaryfund/mitiq)
 
 Mitiq Version:\t{mitiq.__version__}
 
+Core Dependencies
+-----------------
 Cirq Version:\t{cirq_version}
 NumPy Version:\t{numpy_version}
 SciPy Version:\t{scipy_version}
+
+Optional Dependencies
+---------------------
 PyQuil Version:\t{pyquil_version}
 Qiskit Version:\t{qiskit_version}
 
 Python Version:\t{PYTHON_VERSION[0]}.{PYTHON_VERSION[1]}.{PYTHON_VERSION[2]}
-Platform Info:\t{platform.system()} ({platform.machine()})
-Install Path:\t{MITIQ_INSTALL_PATH}"""
+Platform Info:\t{platform.system()} ({platform.machine()})"""
     print(about_str)
 
 

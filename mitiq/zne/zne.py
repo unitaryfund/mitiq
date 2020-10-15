@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """High-level zero-noise extrapolation tools."""
-from typing import Callable
+from typing import Callable, Optional
 from functools import wraps
 
 from mitiq._typing import QPROGRAM
@@ -25,7 +25,7 @@ from mitiq.zne.scaling import fold_gates_at_random
 def execute_with_zne(
     qp: QPROGRAM,
     executor: Callable[[QPROGRAM], float],
-    factory: Factory = None,
+    factory: Optional[Factory] = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
 ) -> float:
@@ -64,7 +64,7 @@ def execute_with_zne(
 
 def mitigate_executor(
     executor: Callable[[QPROGRAM], float],
-    factory: Factory = None,
+    factory: Optional[Factory] = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
 ) -> Callable[[QPROGRAM], float]:
@@ -94,7 +94,7 @@ def mitigate_executor(
 
 
 def zne_decorator(
-    factory: Factory = None,
+    factory: Optional[Factory] = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
 ) -> Callable[[Callable[[QPROGRAM], float]], Callable[[QPROGRAM], float]]:

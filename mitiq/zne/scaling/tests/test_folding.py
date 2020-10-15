@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Unit tests for scaling noise by folding Cirq circuits."""
+"""Unit tests for scaling noise by unitary folding."""
 from copy import deepcopy
 
 import numpy as np
@@ -35,10 +35,14 @@ from pyquil import Program
 from pyquil.quilbase import Pragma
 
 from mitiq.utils import _equal
-from mitiq.zne.scaling import (
+from mitiq.conversions import (
+    CircuitConversionError,
+    convert_to_mitiq,
+    convert_from_mitiq,
+)
+from mitiq.zne.scaling.folding import (
     UnfoldableGateError,
     UnfoldableCircuitError,
-    CircuitConversionError,
     _is_measurement,
     _pop_measurements,
     _append_measurements,
@@ -46,8 +50,6 @@ from mitiq.zne.scaling import (
     _update_moment_indices,
     _default_weight,
     _compute_weight,
-    convert_to_mitiq,
-    convert_from_mitiq,
     _fold_gate_at_index_in_moment,
     _fold_gates_in_moment,
     _fold_gates,
@@ -202,7 +204,7 @@ def test_fold_gate_at_index_in_moment_one_qubit():
 
 def test_fold_gate_at_index_in_moment_two_qubits():
     """Tests local folding with a moment, index for a two qubit circuit with
-       single qubit gates.
+    single qubit gates.
     """
     # Test circuit:
     # 0: ───H───T───
@@ -255,7 +257,7 @@ def test_fold_gate_at_index_in_moment_two_qubits():
 
 def test_fold_gate_at_index_in_moment_two_qubit_gates():
     """Tests local folding with a moment, index for a two qubit circuit with
-       two qubit gates.
+    two qubit gates.
     """
     # Test circuit:
     # 0: ───H───@───
@@ -806,14 +808,18 @@ def test_fold_gates_at_random_seed_one_qubit():
     # Medium scale, fold two gates
     folded = fold_gates_at_random(circuit, scale_factor=2.5, seed=1)
     correct = Circuit(
-        [ops.X.on(qubit)], [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)] * 3,
+        [ops.X.on(qubit)],
+        [ops.Y.on(qubit)] * 3,
+        [ops.Z.on(qubit)] * 3,
     )
     assert _equal(folded, correct)
 
     # Max scale, fold three gates
     folded = fold_gates_at_random(circuit, scale_factor=3, seed=1)
     correct = Circuit(
-        [ops.X.on(qubit)] * 3, [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)] * 3,
+        [ops.X.on(qubit)] * 3,
+        [ops.Y.on(qubit)] * 3,
+        [ops.Z.on(qubit)] * 3,
     )
     assert _equal(folded, correct)
 
@@ -1156,7 +1162,12 @@ def test_global_fold_stretch_factor_eight_terminal_measurements():
         circ,
         inverse(circ),
         circ,
-        inverse(Circuit([ops.T.on(qreg[2])], [ops.TOFFOLI.on(*qreg)],)),
+        inverse(
+            Circuit(
+                [ops.T.on(qreg[2])],
+                [ops.TOFFOLI.on(*qreg)],
+            )
+        ),
         [ops.T.on(qreg[2])],
         [ops.TOFFOLI.on(*qreg)],
         meas,
@@ -1524,7 +1535,8 @@ def test_fold_local_with_fidelities(fold_method, qiskit):
 )
 @pytest.mark.parametrize("qiskit", [True, False])
 def test_fold_local_with_single_qubit_gates_fidelity_one(fold_method, qiskit):
-    """Tests folding only two-qubit gates by using fidelities = {"single": 1.}.
+    """Tests folding only two-qubit gates by using
+    fidelities = {"single": 1.}.
     """
     qreg = LineQubit.range(3)
     circ = Circuit(
