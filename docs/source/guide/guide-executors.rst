@@ -510,7 +510,7 @@ TensorFlow Quantum Executors
 This section provides an example of how to use TensorFlow Quantum as an executor. Note that at the time of
 this writing, TensorFlow Quantum is limited to
 
-  1. ``circ`` ``Circuits`` that use  ``circ`` ``GridQubit`` instances
+  1. ``Cirq`` ``Circuits`` that use  ``Cirq`` ``GridQubit`` instances
   2. Unitary circuits only, so non-unitary errors need to use Monte Carlo
 
 Despite this latter limitation, there is a crossover point where Monte Carlo using Tensorflow evaluates faster than the exact density matrix simulation using ``circ``.
