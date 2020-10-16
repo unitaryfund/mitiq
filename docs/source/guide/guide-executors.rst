@@ -513,7 +513,7 @@ this writing, TensorFlow Quantum is limited to
   1. ``Cirq`` ``Circuits`` that use  ``Cirq`` ``GridQubit`` instances
   2. Unitary circuits only, so non-unitary errors need to use Monte Carlo
 
-Despite this latter limitation, there is a crossover point where Monte Carlo using Tensorflow evaluates faster than the exact density matrix simulation using ``circ``.
+Despite this latter limitation, there is a crossover point where Monte Carlo using Tensorflow evaluates faster than the exact density matrix simulation using ``Cirq``.
 
 Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
 
