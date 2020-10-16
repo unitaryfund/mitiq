@@ -507,7 +507,7 @@ An example of an executor that runs on IBMQ hardware is given
 TensorFlow Quantum Executors
 ==========================================
 
-This section provides an example of how to use TensorFlow Quantum as an executor. Note that at the time of
+This section provides an example of how to use `TensorFlow Quantum <https://github.com/tensorflow/quantum>`_ as an executor. Note that at the time of
 this writing, TensorFlow Quantum is limited to
 
   1. ``Cirq`` ``Circuits`` that use  ``Cirq`` ``GridQubit`` instances
