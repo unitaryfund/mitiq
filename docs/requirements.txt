@@ -1,2 +1,10 @@
+# to build and test the documentation
+sphinx~=2.4.4
+sphinxcontrib-bibtex~=1.0.0
+sphinx-copybutton~=0.2.11
+sphinx-autodoc-typehints~=1.10.3
+m2r~=0.2.1
+pybtex~=0.22.2
+pydata-sphinx-theme~=0.3.1
 tensorflow~=2.3.1
-tfq-nightly~=0.4.0.dev20201001
+tensorflow-quantum~=0.4.0
