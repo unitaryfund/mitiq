@@ -564,7 +564,7 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
         out = state(noisy_circuit, symbol_names=h, symbol_values=vals).to_tensor()
         
         # Fancy way of computing and summing individual density operators, follwed by averaging
-        dm = tf.tensordot(tf.transpose(out), tf.math.conj(out), axes=[[1], [0]]).numpy() / num_MC
+        dm = tf.tensordot(tf.transpose(out), tf.math.conj(out), axes=[[1], [0]]).numpy() / num_monte_carlo
         
         # return measurement of 0 state
         return np.real(dm[0, 0])
