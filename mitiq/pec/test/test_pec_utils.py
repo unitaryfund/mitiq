@@ -68,7 +68,7 @@ def test_simple_pauli_deco_dict_single_qubit(gate: Gate):
 
 
 @mark.parametrize("gate", [X, Y, Z])
-def test_simplify_paulist_in_simple_pauli_deco_dict(gate: Gate):
+def test_simplify_paulis_in_simple_pauli_deco_dict(gate: Gate):
     qreg = LineQubit.range(2)
     deco_dict = DECO_DICT_SIMP
     for q in qreg:
