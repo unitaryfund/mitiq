@@ -417,6 +417,37 @@ We can also specify the number of shots to use for each noise-scaled circuit.
 In this case the factory will pass the number of shots from the `shot_list` to the `executor`. Accordingly, the
 `executor` should support a `shots` keyword argument, otherwise the shot values will go unused.
 
+------------------------------------------------------
+Using batched executors with :class:`.BatchedFactory`s
+------------------------------------------------------
+
+As mentioned, :class:`.BatchedFactory` objects are such that all circuits to execute can be precomputed. This is in
+contrast to :class:`.AdapativeFactory` objects in which the next circuit to execute depends on the result of the previous
+circuit execution.
+
+If the quantum processor is costly to access (e.g., in a queue-based system), executing circuits sequentially can result
+in high runtimes for zero-noise extrapolation. To deal with this, all classical inference techniques which inherit from
+a :class:`.BatchedFactory` can use a "batched executor." In contrast to the previous ``executor`` which inputs a single
+circuit and outputs a single expectation value, a batched executor inputs a list of circuits and outputs a list
+of expectation values (one for each circuit).
+
+To indicate that an executor is batched, one must provide a `return annotation <https://www.python.org/dev/peps/pep-3107/>`_
+which is either a ``numpy.ndarray``, ``List[float]``, ``Tuple[float]``, ``Sequence[float]``, or ``Iterable[float]``.
+For example:
+
+
+.. testcode::
+
+    from typing import List
+    from mitiq import QPROGRAM
+
+    def batched_executor(circuits: List[QPROGRAM]) -> List[float]:
+        pass
+
+
+A :class::`.BatchedFactory`` will detect from the return annotation if an executor is batched or not. If no annotation
+is provided, the executor is assumed to be sequential (i.e., not batched).
+
 ---------------------------------------------
 Directly using a factory for error mitigation
 ---------------------------------------------

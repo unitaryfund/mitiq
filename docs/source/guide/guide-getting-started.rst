@@ -10,7 +10,7 @@ code away.
 This getting started shows examples using cirq
 `cirq <https://cirq.readthedocs.io/en/stable/index.html>`_ and
 `qiskit <https://qiskit.org/>`_. We'll first test ``mitiq`` by running
-against the noisy simulator built into ``cirq``. The qiskit example work
+against the noisy simulator built into ``cirq``. The qiskit example works
 similarly as you will see in :ref:`Qiskit Mitigation <qiskit_getting_started>`.
 
 
