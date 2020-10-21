@@ -109,7 +109,7 @@ def execute_with_pec(
     exp_values = np.average(results, axis=1)
 
     # Evaluate unbiased estimators [Temme2017], [Endo2018], [Takagi2020]
-    unbiased_estimators = [s * norm * val for val, s in zip(exp_values, signs)]
+    unbiased_estimators = [s * norm * val for s, val in zip(signs, exp_values)]
 
     # Average to return the PEC estimate of the ideal expectation value
     return np.average(unbiased_estimators)
