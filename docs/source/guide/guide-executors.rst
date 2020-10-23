@@ -539,8 +539,11 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
         """
     
         # Create array of symbolic variables and reshape to natural circuit parameterization
-        h = sympy.symbols(''.join(['h_{0} '.format(i) for i in range(len(circ.moments)*len(circ.all_qubits()))]),positive=True)
-        h_array = np.asarray(h).reshape((len(circ.all_qubits()),len(circ.moments)))
+        total_range = len(circ.moments) * len(circ.all_qubits())
+        for i in range(total_range):
+           to_join = 'h_{0} '.format(i) 
+        h = sympy.symbols(''.join([to_join]), positive = True)
+        h_array = np.asarray(h).reshape((len(circ.all_qubits()), len(circ.moments)))
 
         # Symbolicly add X gates to the input circuit
         noisy_circuit = Circuit()
