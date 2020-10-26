@@ -16,7 +16,8 @@
 from typing import List, Tuple
 
 import numpy as np
-from cirq import CNOT, LineQubit, Operation
+import pytest
+from cirq import CCNOT, CNOT, CZ, ISWAP, LineQubit, Operation, SWAP
 
 from mitiq.pec.decomposition.optimal import depolarizing_decomposition, PAULIS
 
@@ -73,9 +74,19 @@ def test_two_qubit_depolarizing_decomposition():
     q0, q1 = LineQubit.range(2)
     noise_level = 0.05
     optimal_overhead = two_qubit_depolarizing_optimal_overhead(noise_level)
-    assert np.isclose(
-        optimal_overhead,
-        decomposition_overhead(
-            depolarizing_decomposition(CNOT(q0, q1), noise_level)
-        ),
+    assert all(
+        np.isclose(
+            optimal_overhead,
+            decomposition_overhead(
+                depolarizing_decomposition(G(q0, q1), noise_level)
+            ),
+        )
+        for G in (CZ, CNOT, ISWAP, SWAP)
     )
+
+
+def test_three_qubit_depolarizing_decomposition():
+    q0, q1, q2 = LineQubit.range(3)
+    noise_level = 0.05
+    with pytest.raises(ValueError):
+        depolarizing_decomposition(CCNOT(q0, q1, q2), noise_level)

@@ -26,15 +26,18 @@ def depolarizing_decomposition(
     r"""As described in [Temme2017]_, optimally decompose a single-qubit
     ``ideal_operation`` :math:`\mathcal{U}_{\beta}` into its quasi-probability
     representation (QPR), which is a linear combination of noisy implementable
-    operations :math:`\{\eta_{\alpha} \mathcal{O}_{\alpha}\}`. Takes as an
-    assumption that the basis of implementable operations includes any desired
-    ideal operation followed by a depolarizing channel (meaning that all
-    :math:`\mathcal{O}_{\alpha} = \mathcal{D} \circ \mathcal{U}`, where
-    :math:`\mathcal{D}(\rho) =  (1 - \epsilon) \rho + \epsilon I/2`). Given
-    that assumption, it was proven in [Takagi2020]_ that this method gives an
-    optimal decomposition for a given depolarizing ``noise_level`` (we can
-    easily calculate :math:`\epsilon` from this ``noise_level`` value). For a
-    single-qubit ``ideal_operation``, the optimal decomposition is as follows:
+    operations :math:`\{\eta_{\alpha} \mathcal{O}_{\alpha}\}`.
+
+    This function assumes depolarizing noise is the only noise present. In
+    particular, it assumes that the basis of implementable operations includes
+    any desired ideal operation followed by a depolarizing channel (meaning
+    that all :math:`\mathcal{O}_{\alpha} = \mathcal{D} \circ \mathcal{U}`,
+    where :math:`\mathcal{D}(\rho) =  (1 - \epsilon) \rho + \epsilon I/(2^n)`).
+    Given that assumption, it was proven in [Takagi2020]_ that this method
+    gives an optimal decomposition for a given depolarizing ``noise_level``
+    (we can easily calculate :math:`\epsilon` from this ``noise_level`` value).
+    For a single-qubit ``ideal_operation``, the optimal decomposition is as
+    follows:
 
     .. math::
          \mathcal{U}_{\beta} = \eta_1 \mathcal{O}_1 + \eta_2 \mathcal{O}_2 +
