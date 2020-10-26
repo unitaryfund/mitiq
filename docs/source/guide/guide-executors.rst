@@ -507,27 +507,27 @@ An example of an executor that runs on IBMQ hardware is given
 TensorFlow Quantum Executors
 ==========================================
 
-This section provides an example of how to use `TensorFlow Quantum <https://github.com/tensorflow/quantum>`_ as an executor. Note that at the time of
-this writing, TensorFlow Quantum is limited to
+This section provides an example of how to use `TensorFlow Quantum <https://github.com/tensorflow/quantum>`_
+as an executor. Note that at the time of this writing, TensorFlow Quantum is limited to
 
   1. ``Cirq`` ``Circuits`` that use  ``Cirq`` ``GridQubit`` instances
   2. Unitary circuits only, so non-unitary errors need to use Monte Carlo simulations
 
-Despite this latter limitation, there is a crossover point where Monte Carlo using Tensorflow evaluates faster than the exact density matrix simulation using ``Cirq``.
+Despite this latter limitation, there is a crossover point where Monte Carlo using
+Tensorflow evaluates faster than the exact density matrix simulation using ``Cirq``.
 
 Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
 
 .. testcode::
 
     import numpy as np
-    from cirq import Circuit
     import sympy
-
     import tensorflow as tf
     import tensorflow_quantum as tfq
+    from cirq import Circuit
 
 
-    def stochastic_bit_flip_simulation(circ: Circuit, p: float, num_monte_carlo: int=100) -> float:
+    def stochastic_bit_flip_simulation(circ: Circuit, p: float, num_monte_carlo: int = 100) -> float:
         """
         Simulates a circuit with random bit flip (X(\pi)) errors
         Args:
@@ -537,10 +537,12 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
         Returns:
             The expectation value of the 0 state as a float
         """
+        nM = len(circ.moments)
+        nQ = len(circ.all_qubits())
     
         # Create array of symbolic variables and reshape to natural circuit parameterization
-        h = sympy.symbols(''.join(['h_{0} '.format(i) for i in range(len(circ.moments)*len(circ.all_qubits()))]),positive=True)
-        h_array = np.asarray(h).reshape((len(circ.all_qubits()),len(circ.moments)))
+        h = sympy.symbols(''.join(['h_{0} '.format(i) for i in range(nM * nQ)]), positive=True)
+        h_array = np.asarray(h).reshape((nQ, nM))
 
         # Symbolicly add X gates to the input circuit
         noisy_circuit = Circuit()
@@ -550,7 +552,7 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
                 noisy_circuit.append(cirq.rx(h_array[j, i]).on(q))
         
         # rotations will be pi w/ prob p, 0 w/ prob 1-p
-        vals = [np.reshape((np.random.rand(len(circ.all_qubits()), len(circ.moments)) < p)*np.pi, (1, len(circ.all_qubits())*len(circ.moments))) for _ in range(num_monte_carlo)]
+        vals = [np.reshape((np.random.rand(nQ, nM) < p) * np.pi, (1, nQ * nM)) for _ in range(num_monte_carlo)]
         
         # needs to be a rank 2 tensor
         vals = np.squeeze(vals)
@@ -579,5 +581,5 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
     # Need to make sure the qubits are cirq.GridQubit
     circ=circ.transform_qubits(lambda q: cirq.GridQubit.rect(1, 1)[0])
 
-    out = stochastic_bit_flip_simulation(circ, .001)
-    assert .5 < out < 1
+    out = stochastic_bit_flip_simulation(circ, 0.001)
+    assert 0.5 < out < 1
