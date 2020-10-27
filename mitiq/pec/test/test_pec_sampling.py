@@ -54,26 +54,26 @@ def test_sample_sequence_types(gate: Gate):
     for _ in range(1000):
         imp_seq, sign, norm = sample_sequence(gate.on(*qreg), DECO_DICT)
         assert all([isinstance(op, Operation) for op in imp_seq])
-        assert sign in {1.0, -1.0}
+        assert sign in {1, -1}
         assert norm > 1
 
 
-def test_sample_circuit_types(circuit: Circuit = twoq_circ):
-    imp_circuit, sign, norm = sample_circuit(circuit, DECO_DICT)
+def test_sample_circuit_types():
+    imp_circuit, sign, norm = sample_circuit(twoq_circ, DECO_DICT)
     assert isinstance(imp_circuit, Circuit)
-    assert sign in {1, 1}
+    assert sign in {1, -1}
     assert norm > 1
 
 
-def test_sample_circuit_types_trivial(circuit: Circuit = twoq_circ):
-    imp_circuit, sign, norm = sample_circuit(circuit, NOISELESS_DECO_DICT)
-    assert imp_circuit == circuit
+def test_sample_circuit_types_trivial():
+    imp_circuit, sign, norm = sample_circuit(twoq_circ, NOISELESS_DECO_DICT)
+    assert imp_circuit == twoq_circ
     assert sign == 1
     assert np.isclose(norm, 1)
 
 
 @mark.parametrize("gate", [Y, CNOT])
-def test_sample_sequence_choi(gate: Gate, deco_dict: DecoType = DECO_DICT):
+def test_sample_sequence_choi(gate: Gate):
     """Tests the sample_sequence by comparing the exact Choi matrices."""
     qreg = LineQubit.range(gate.num_qubits())
     ideal_op = gate.on(*qreg)
@@ -82,7 +82,7 @@ def test_sample_sequence_choi(gate: Gate, deco_dict: DecoType = DECO_DICT):
     noisy_choi = _operation_to_choi(noisy_op_tree)
     choi_unbiased_estimates = []
     for _ in range(500):
-        imp_seq, sign, norm = sample_sequence(gate.on(*qreg), deco_dict)
+        imp_seq, sign, norm = sample_sequence(gate.on(*qreg), DECO_DICT)
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.
         noisy_sequence = [imp_seq] + [depolarize(BASE_NOISE)(q) for q in qreg]

@@ -24,7 +24,7 @@ from mitiq.pec.pec import execute_with_pec
 from mitiq.benchmarks.utils import noisy_simulation
 
 # The level of depolarizing noise for the simulated backend
-BASE_NOISE = 0.01
+BASE_NOISE = 0.02
 # Define some decomposition dictionaries for testing
 DECO_DICT = _simple_pauli_deco_dict(BASE_NOISE)
 DECO_DICT_SIMP = _simple_pauli_deco_dict(BASE_NOISE, simplify_paulis=True)
@@ -70,11 +70,12 @@ twoq_circ = Circuit(
     "deco_dict", [NOISELESS_DECO_DICT, DECO_DICT_SIMP, DECO_DICT]
 )
 def test_execute_with_pec_one_qubit(circuit: Circuit, deco_dict: DecoType):
+    """Tests that execute_with_pec mitigates the error of a noisy
+    expectation value.
+    """
     unmitigated = executor(circuit)
     mitigated = execute_with_pec(
-        circuit,
-        executor,
-        deco_dict=deco_dict,
+        circuit, executor, deco_dict=deco_dict
     )
     error_unmitigated = abs(unmitigated - 1.0)
     error_mitigated = abs(mitigated - 1.0)
@@ -84,3 +85,22 @@ def test_execute_with_pec_one_qubit(circuit: Circuit, deco_dict: DecoType):
     else:
         assert error_mitigated < error_unmitigated
         assert np.isclose(mitigated, 1.0, atol=0.1)
+
+@mark.parametrize("circuit", [oneq_circ, twoq_circ])
+def test_execute_with_pec_with_different_samples(circuit: Circuit):
+    """Tests that, on average, the error decreases as the number of samples is
+    increased.
+    """
+    errors_few_samples = []
+    errors_more_samples = []
+    for _ in range(10):
+        mitigated = execute_with_pec(
+            circuit, executor, deco_dict=DECO_DICT, num_samples=10
+        )
+        errors_few_samples.append(abs(mitigated - 1.0))
+        mitigated = execute_with_pec(
+            circuit, executor, deco_dict=DECO_DICT, num_samples=100
+        )
+        errors_more_samples.append(abs(mitigated - 1.0))
+    
+    assert np.average(errors_more_samples) < np.average(errors_few_samples) 

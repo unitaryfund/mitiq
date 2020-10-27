@@ -33,26 +33,46 @@ DECO_DICT_SIMP = _simple_pauli_deco_dict(BASE_NOISE, simplify_paulis=True)
 NOISELESS_DECO_DICT = _simple_pauli_deco_dict(0)
 
 
-def test_simple_pauli_deco_dict_CNOT(gate: Gate = CNOT):
+def test_simple_pauli_deco_dict_CNOT():
+    """Tests that the _simple_pauli_deco_dict function returns a decomposition
+    dicitonary which is consistent with a local depolarizing noise model.
+
+    The channel acting on the state each qubit is assumed to be:
+    D(rho) = = (1 - epsilon) rho + epsilon I/2
+    = (1 - p) rho + p/3 (X rho X + Y rho Y^dag + Z rho Z)
+    """
+
+    # Deduce epsilon from BASE_NOISE
     epsilon = BASE_NOISE * 4.0 / 3.0
     c_neg = -(1 / 4) * epsilon / (1 - epsilon)
     c_pos = 1 - 3 * c_neg
     qreg = LineQubit.range(2)
 
-    deco = DECO_DICT[gate.on(*qreg)]
+    # Get the decomposition of a CNOT gate
+    deco = DECO_DICT[CNOT.on(*qreg)]
+
+    # The first term of 'deco' corresponds to no error occurring
     first_coefficient, first_imp_seq = deco[0]
     assert np.isclose(c_pos * c_pos, first_coefficient)
-    assert first_imp_seq == [gate.on(*qreg)]
+    assert first_imp_seq == [CNOT.on(*qreg)]
+    # The second term corresponds to a Pauli X error on one qubit
     second_coefficient, second_imp_seq = deco[1]
     assert np.isclose(c_pos * c_neg, second_coefficient)
-    assert second_imp_seq == [gate.on(*qreg), X.on(qreg[0])]
+    assert second_imp_seq == [CNOT.on(*qreg), X.on(qreg[0])]
+    # The last term corresponds to two Pauli Z errors on both qubits
     last_coefficient, last_imp_seq = deco[-1]
     assert np.isclose(c_neg * c_neg, last_coefficient)
-    assert last_imp_seq == [gate.on(*qreg), Z.on(qreg[0]), Z.on(qreg[1])]
+    assert last_imp_seq == [CNOT.on(*qreg), Z.on(qreg[0]), Z.on(qreg[1])]
 
 
 @mark.parametrize("gate", [X, Y, Z])
 def test_simple_pauli_deco_dict_single_qubit(gate: Gate):
+    """Tests that the _simple_pauli_deco_dict function returns a decomposition
+    dicitonary which is consistent with a local depolarizing noise model.
+
+    This is similar to test_simple_pauli_deco_dict_CNOT but applied to
+    single-qubit gates.
+    """
     epsilon = BASE_NOISE * 4.0 / 3.0
     c_neg = -(1 / 4) * epsilon / (1 - epsilon)
     c_pos = 1 - 3 * c_neg
@@ -69,6 +89,10 @@ def test_simple_pauli_deco_dict_single_qubit(gate: Gate):
 
 @mark.parametrize("gate", [X, Y, Z])
 def test_simplify_paulis_in_simple_pauli_deco_dict(gate: Gate):
+    """Tests DECO_DICT_SIMP which is initialized using the 'simplify_paulis'
+    option. This should produce decomposition dictionary in which Pauli
+    sequences are simplified to single Pauli gates.
+    """
     qreg = LineQubit.range(2)
     deco_dict = DECO_DICT_SIMP
     for q in qreg:
