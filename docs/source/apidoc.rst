@@ -59,7 +59,7 @@ Probabilistic Error Cancellation
 
 Decomposition into Quasi-Probability Representation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. automodule:: mitiq.pec.decomposition.optimal
+.. automodule:: mitiq.pec.decomposition.depolarizing
    :members:
 
 Utils
