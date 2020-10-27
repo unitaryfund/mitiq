@@ -74,9 +74,7 @@ def test_execute_with_pec_one_qubit(circuit: Circuit, deco_dict: DecoType):
     expectation value.
     """
     unmitigated = executor(circuit)
-    mitigated = execute_with_pec(
-        circuit, executor, deco_dict=deco_dict
-    )
+    mitigated = execute_with_pec(circuit, executor, deco_dict=deco_dict)
     error_unmitigated = abs(unmitigated - 1.0)
     error_mitigated = abs(mitigated - 1.0)
     # For a trivial noiseless decomposition no PEC mitigation should happen
@@ -85,6 +83,7 @@ def test_execute_with_pec_one_qubit(circuit: Circuit, deco_dict: DecoType):
     else:
         assert error_mitigated < error_unmitigated
         assert np.isclose(mitigated, 1.0, atol=0.1)
+
 
 @mark.parametrize("circuit", [oneq_circ, twoq_circ])
 def test_execute_with_pec_with_different_samples(circuit: Circuit):
@@ -102,5 +101,5 @@ def test_execute_with_pec_with_different_samples(circuit: Circuit):
             circuit, executor, deco_dict=DECO_DICT, num_samples=100
         )
         errors_more_samples.append(abs(mitigated - 1.0))
-    
-    assert np.average(errors_more_samples) < np.average(errors_few_samples) 
+
+    assert np.average(errors_more_samples) < np.average(errors_few_samples)
