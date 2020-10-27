@@ -15,7 +15,7 @@
 
 """High-level probabilistic error cancellation tools."""
 
-from typing import Optional, Callable
+from typing import Optional, Callable, Union, Tuple
 import numpy as np
 from mitiq._typing import QPROGRAM
 from mitiq.pec.utils import DecoType
@@ -27,7 +27,8 @@ def execute_with_pec(
     executor: Callable[[QPROGRAM], float],
     deco_dict: DecoType,
     num_samples: Optional[int] = None,
-) -> float:
+    full_output: bool = False,
+) -> Union[float, Tuple[float, float]]:
     """Evaluates the expectation value associated to the input circuit
     using probabilistic error cancellation (PEC) [Temme2017]_.
 
@@ -41,10 +42,10 @@ def execute_with_pec(
        combination of the noisy ones.
 
     Args:
-        circuit = The input circuit to execute with error-mitigation.
-        executor = A function which executes a circuit and returns an
+        circuit: The input circuit to execute with error-mitigation.
+        executor: A function which executes a circuit and returns an
             expectation value.
-        deco_dict = The decomposition dictionary containing the quasi-
+        deco_dict: The decomposition dictionary containing the quasi-
             probability representation of the ideal operations (those
             which are part of the input circuit).
         num_samples: The number of noisy circuits to be sampled for PEC.
@@ -52,10 +53,17 @@ def execute_with_pec(
             of the quasi-probability representation of the input circuit.
             Note: the latter feature is not yet implemented and num_samples
             is just set to 1000 if not specified.
+        full_output: If False only the average PEC value is returned.
+            If True the associated error (standard deviation) is returned too.
 
     Returns:
-        The PEC estimate of the ideal expectation value associated
-        to the input circuit.
+        pec_value: The PEC estimate of the ideal expectation value associated
+            to the input circuit.
+        pec_std: The standard deviation of the PEC samples, i.e., the square
+            root of the mean squared deviation (from pec_value).
+            After deviding this quantity by sqrt(num_samples), one obtains 
+            an estimate of the error between 'pec_value' and the actual
+            ideal expectation value.
 
     .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
         "Error mitigation for short-depth quantum circuits,"
@@ -92,5 +100,7 @@ def execute_with_pec(
     # Evaluate unbiased estimators [Temme2017], [Endo2018], [Takagi2020]
     unbiased_estimators = [norm * s * val for s, val in zip(signs, exp_values)]
 
-    # Average to get the PEC estimate of the ideal expectation value
+    if full_output:
+        return np.average(unbiased_estimators), np.std(unbiased_estimators)
+
     return np.average(unbiased_estimators)

@@ -103,3 +103,20 @@ def test_execute_with_pec_with_different_samples(circuit: Circuit):
         errors_more_samples.append(abs(mitigated - 1.0))
 
     assert np.average(errors_more_samples) < np.average(errors_few_samples)
+
+
+def test_execute_with_pec_with_full_output():
+    """Tests the standard deviation of the PEC value is returned if
+    the option 'full_output' is set to True.
+    """
+    rnd_state = np.random.RandomState(0)
+
+    def fake_exec(circuit: Circuit):
+        """A fake executor which just samples from a normal distribution."""
+        return rnd_state.randn()
+
+    _, pec_std = execute_with_pec(
+        oneq_circ, fake_exec, DECO_DICT, num_samples=1000, full_output=True
+    )
+
+    assert np.isclose(pec_std, 1.0, atol=0.1)
