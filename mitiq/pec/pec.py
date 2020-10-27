@@ -61,7 +61,7 @@ def execute_with_pec(
             to the input circuit.
         pec_std: The standard deviation of the PEC samples, i.e., the square
             root of the mean squared deviation (from pec_value).
-            After deviding this quantity by sqrt(num_samples), one obtains 
+            After dividing this quantity by sqrt(num_samples), one obtains
             an estimate of the error between 'pec_value' and the actual
             ideal expectation value.
 
