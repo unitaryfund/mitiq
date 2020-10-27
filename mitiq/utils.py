@@ -133,3 +133,50 @@ def _are_close_dict(dict_a: Dict[Any, Any], dict_b: Dict[Any, Any]) -> bool:
         if not np.isclose(dict_b[ka], va):
             return False
     return True
+
+
+def _get_base_gate(gate: EigenGate) -> EigenGate:
+    BASE_GATES = [ZPowGate, HPowGate, XPowGate, YPowGate, CXPowGate, CZPowGate]
+
+    for base_gate in BASE_GATES:
+        if isinstance(gate, base_gate):
+            return cast(EigenGate, base_gate)
+    raise GateTypeException(
+        "Must have circuit be made of rotation gates. "
+        "Your gate {} may not be supported".format(gate)
+    )
+
+
+def _poor_mans_tomography(
+        executor: Callabe[..., float],
+        gate: Gate,
+        qubit: int, 
+        depth: int = 100) -> float:
+    """
+    Given an executor and a gate, determines the effective "sigma"
+    that can be used for parameter noise scaling later on. 
+    """
+
+    base_gate = _get_base_gate(gate)
+
+    def PMT_circuit(qubits, depth, gate):
+        """
+        Generates a circuit which should be the identity. Given a rotation
+        gate R(param), it applies R(2 * pi / depth) depth times, resulting
+        in R(2*pi)
+        """
+        rotation_angle = 2*np.pi / depth
+        moments: List[ops.Moment] = []
+        for _ in range(depth):
+            operations = []
+            num_qubits = gate(rotation_angle).num_qubits()
+            assert num_qubits == len(qubits)
+            operations.append(gate(rotation_angle)(*qubits))
+            moments.append(ops.Moment(operations))
+        return Circuit(moments)
+
+    circuit = PMT_circuit([qubit], depth, base_gate)
+    expectation = executor(circuit)
+    Q = (1 - np.power(2*expectation-1, 1/depth))/2
+    sigma = -0.5*np.log(1 - 2*Q)
+    return sigma

@@ -29,23 +29,12 @@ from cirq import (
     MeasurementGate,
 )
 from mitiq.conversions import converter
-
-
-BASE_GATES = [ZPowGate, HPowGate, XPowGate, YPowGate, CXPowGate, CZPowGate]
+from mitiq.utils import _get_base_gate
 
 
 class GateTypeException(Exception):
     pass
 
-
-def _get_base_gate(gate: EigenGate) -> EigenGate:
-    for base_gate in BASE_GATES:
-        if isinstance(gate, base_gate):
-            return cast(EigenGate, base_gate)
-    raise GateTypeException(
-        "Must have circuit be made of rotation gates. "
-        "Your gate {} may not be supported".format(gate)
-    )
 
 
 @converter
