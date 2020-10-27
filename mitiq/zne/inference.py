@@ -307,8 +307,7 @@ class Factory(ABC):
 
     @abstractmethod
     def run_classical(
-        self,
-        scale_factor_to_expectation_value: Callable[..., float],
+        self, scale_factor_to_expectation_value: Callable[..., float],
     ) -> "Factory":
         """Calls the function scale_factor_to_expectation_value at each scale
         factor of the factory, and stores the results.
@@ -322,9 +321,7 @@ class Factory(ABC):
         raise NotImplementedError
 
     def iterate(
-        self,
-        noise_to_expval: Callable[..., float],
-        max_iterations: int = 100,
+        self, noise_to_expval: Callable[..., float], max_iterations: int = 100,
     ) -> "Factory":
         warnings.warn(
             "The `iterate` method is deprecated in v0.3.0 and will be removed "
@@ -892,10 +889,7 @@ class RichardsonFactory(BatchedFactory):
         # with order equal to the number of data points minus 1.
         order = len(scale_factors) - 1
         return PolyFactory.extrapolate(
-            scale_factors,
-            exp_values,
-            order,
-            full_output,
+            scale_factors, exp_values, order, full_output,
         )
 
     def reduce(self) -> float:
@@ -987,10 +981,7 @@ class LinearFactory(BatchedFactory):
         """
         # Linear extrapolation is equivalent to a polynomial fit with order=1
         return PolyFactory.extrapolate(
-            scale_factors,
-            exp_values,
-            1,
-            full_output,
+            scale_factors, exp_values, 1, full_output,
         )
 
     def reduce(self) -> float:
@@ -1433,7 +1424,8 @@ class PolyExpFactory(BatchedFactory):
         # if params_cov is not None:
         #     if params_cov.shape == (order + 2, order + 2):
         #         zne_std = np.sqrt(params_cov[0, 0] +
-        #             _ansatz_known(0, *opt_params) * (params_cov[order + 1, order + 1])
+        #             _ansatz_known(0, *opt_params) *
+        #             (params_cov[order + 1, order + 1])
         #         )
 
         # Parameters from low order to high order
@@ -1441,7 +1433,6 @@ class PolyExpFactory(BatchedFactory):
 
         if full_output:
             return zero_limit, zne_std, opt_params, params_cov, _zne_curve
-
         return zne_limit
 
     def __eq__(self, other: Any) -> bool:
