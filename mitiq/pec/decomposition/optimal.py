@@ -17,7 +17,7 @@ from typing import List, Tuple
 
 from cirq import I, Operation, X, Y, Z
 
-PAULIS = [I, X, Y, Z]
+NON_ID_PAULIS = [X, Y, Z]
 
 
 def depolarizing_decomposition(
@@ -93,7 +93,8 @@ def depolarizing_decomposition(
         alpha_neg = -(1 / 4) * epsilon / (1 - epsilon)
 
         alphas = [alpha_pos] + 3 * [alpha_neg]
-        post_ops = [[P(q)] for P in PAULIS]
+        post_ops = [[]]  # for alpha_pos, we do nothing, rather than I
+        post_ops += [[P(q)] for P in NON_ID_PAULIS]  # 1Q Paulis
 
     # the two-qubit case: linear combination of 2Q Paulis
     elif len(qubits) == 2:
@@ -104,7 +105,12 @@ def depolarizing_decomposition(
         alpha_neg = -(1 / 16) * epsilon / (1 - epsilon)
 
         alphas = [alpha_pos] + 15 * [alpha_neg]
-        post_ops = [[Pi(q0), Pj(q1)] for Pi in PAULIS for Pj in PAULIS]
+        post_ops = [[]]  # for alpha_pos, we do nothing, rather than I x I
+        post_ops += [[P(q0)] for P in NON_ID_PAULIS]  # 1Q Paulis for q0
+        post_ops += [[P(q1)] for P in NON_ID_PAULIS]  # 1Q Paulis for q1
+        post_ops += [
+            [Pi(q0), Pj(q1)] for Pi in NON_ID_PAULIS for Pj in NON_ID_PAULIS
+        ]  # 2Q Paulis
 
     else:
         raise ValueError(

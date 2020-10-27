@@ -19,7 +19,10 @@ import numpy as np
 import pytest
 from cirq import CCNOT, CNOT, CZ, ISWAP, LineQubit, Operation, SWAP
 
-from mitiq.pec.decomposition.optimal import depolarizing_decomposition, PAULIS
+from mitiq.pec.decomposition.optimal import (
+    depolarizing_decomposition,
+    NON_ID_PAULIS,
+)
 
 
 def decomposition_overhead(
@@ -66,7 +69,7 @@ def test_single_qubit_depolarizing_decomposition():
                 depolarizing_decomposition(P(q), noise_level)
             ),
         )
-        for P in PAULIS
+        for P in NON_ID_PAULIS
     )
 
 
