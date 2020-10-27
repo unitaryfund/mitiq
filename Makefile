@@ -48,7 +48,7 @@ requirements: requirements.txt
 
 .PHONY: test
 test:
-	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/tests mitiq/benchmarks/tests
+	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/tests mitiq/benchmarks/tests mitiq/zne/tests
 
 .PHONY: test-pyquil
 test-pyquil:
