@@ -148,34 +148,35 @@ def _are_close_dict(dict_a: Dict[Any, Any], dict_b: Dict[Any, Any]) -> bool:
 
 
 def _max_ent_state_circuit(num_qubits: int) -> Circuit:
-    r"""Generates a circuits which prepares the maximally entangled state
+    r"""Generates a circuit which prepares the maximally entangled state
     |\omega\rangle = U |0\rangle  = \sum_i |i\rangle \otimes |i\rangle .
 
     Args:
         num_qubits: The number of qubits on which the circuit is applied.
-            Only 2 or 4 qubits are supported.
+            It must be an even number because of the structure of a
+            maximally entangled state.
 
     Returns:
         The circuits which prepares the state |\omega\rangle.
+
+    Raises:
+        Value error: if num_qubits is not an even positive integer.
     """
 
-    qreg = LineQubit.range(num_qubits)
-    circ = Circuit()
-    if num_qubits == 2:
-        circ.append(H.on(qreg[0]))
-        circ.append(CNOT.on(*qreg))
-    elif num_qubits == 4:
-        # Prepare half of the qubits in a uniform superposition
-        circ.append(H.on(qreg[0]))
-        circ.append(H.on(qreg[1]))
-        # Create a perfect correlation between the two halves of the qubits.
-        circ.append(CNOT.on(qreg[0], qreg[2]))
-        circ.append(CNOT.on(qreg[1], qreg[3]))
-    else:
-        raise NotImplementedError(
-            "Only 2- or 4-qubit maximally entangling circuits are supported."
+    if not isinstance(num_qubits, int) or num_qubits % 2 or num_qubits == 0:
+        raise ValueError(
+            "The argument 'num_qubits' must be an even and positive integer."
         )
-    return circ
+
+    alice_reg = LineQubit.range(num_qubits // 2)
+    bob_reg = LineQubit.range(num_qubits // 2, num_qubits)
+
+    return Circuit(
+        # Prepare alice_register in a uniform superposition
+        H.on_each(*alice_reg),
+        # Correlate alice_register with bob_register
+        [CNOT.on(alice_reg[i], bob_reg[i]) for i in range(num_qubits // 2)],
+    )
 
 
 def _circuit_to_choi(circuit: Circuit) -> np.ndarray:

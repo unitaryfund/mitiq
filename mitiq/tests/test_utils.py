@@ -305,6 +305,16 @@ def test_max_ent_state_circuit():
     )
 
 
+def test_max_ent_state_circuit_error():
+    """Tests an error is raised if the argument num_qubits is not valid."""
+    for num_qubits in [0, 1, 3, 5, 2.0]:
+        with pytest.raises(ValueError, match="The argument 'num_qubits' must"):
+            _max_ent_state_circuit(num_qubits)
+    # Test expected good arguments are ok
+    for num_qubits in [2, 4, 6, 8]:
+        assert _max_ent_state_circuit(num_qubits)
+
+
 def test_circuit_to_choi_and_operation_to_choi():
     """Tests the Choi matrix of a depolarizing channel is recovered."""
     # Define first the expected result

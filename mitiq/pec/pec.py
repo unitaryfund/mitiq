@@ -26,7 +26,6 @@ def execute_with_pec(
     circuit: QPROGRAM,
     executor: Callable[[QPROGRAM], float],
     deco_dict: DecoType,
-    num_to_average: int = 1,
     num_samples: Optional[int] = None,
 ) -> float:
     """Evaluates the expectation value associated to the input circuit
@@ -48,10 +47,6 @@ def execute_with_pec(
         deco_dict = The decomposition dictionary containing the quasi-
             probability representation of the ideal operations (those
             which are part of the input circuit).
-        num_to_average: The number times the expectation value of each sampled
-            circuit is evaluated, then averaged. Setting this number to values
-            larger than 1 (default), reduces the statistical error associated
-            to each noisy expectation value.
         num_samples: The number of noisy circuits to be sampled for PEC.
             If equal to None, it is deduced from the amount of "negativity"
             of the quasi-probability representation of the input circuit.
@@ -83,33 +78,19 @@ def execute_with_pec(
 
     sampled_circuits = []
     signs = []
-    norms = []
 
     for _ in range(num_samples):
+        # Note: the norm is the same for each sample.
         sampled_circuit, sign, norm = sample_circuit(circuit, deco_dict)
         sampled_circuits.append(sampled_circuit)
         signs.append(sign)
-        norms.append(norm)
 
-    # The norm of the quasi-distribution should be independent of sample
-    assert np.all(norms == norms[0])
-    norm = norms[0]
-
-    # Repeat each sampled circuit "num_to_average" times
-    to_run = [circ for circ in sampled_circuits for _ in range(num_to_average)]
-
-    # TODO: think about dealing with batched executors
+    # TODO: add support for batched executors
     # Execute all the circuits
-    results = np.array([executor(circ) for circ in to_run])
-
-    # Reshape results to "num_to_average" columns
-    results = results.reshape(-1, num_to_average)
-
-    # Average the "num_to_average" columns
-    exp_values = np.average(results, axis=1)
+    exp_values = [executor(circ) for circ in sampled_circuits]
 
     # Evaluate unbiased estimators [Temme2017], [Endo2018], [Takagi2020]
-    unbiased_estimators = [s * norm * val for s, val in zip(signs, exp_values)]
+    unbiased_estimators = [norm * s * val for s, val in zip(signs, exp_values)]
 
-    # Average to return the PEC estimate of the ideal expectation value
+    # Average to get the PEC estimate of the ideal expectation value
     return np.average(unbiased_estimators)

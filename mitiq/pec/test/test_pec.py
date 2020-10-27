@@ -75,7 +75,6 @@ def test_execute_with_pec_one_qubit(circuit: Circuit, deco_dict: DecoType):
         circuit,
         executor,
         deco_dict=deco_dict,
-        num_to_average=1,
     )
     error_unmitigated = abs(unmitigated - 1.0)
     error_mitigated = abs(mitigated - 1.0)
@@ -85,62 +84,3 @@ def test_execute_with_pec_one_qubit(circuit: Circuit, deco_dict: DecoType):
     else:
         assert error_mitigated < error_unmitigated
         assert np.isclose(mitigated, 1.0, atol=0.1)
-
-
-def test_averaging_improves_zne_value_with_fake_noise():
-    """Tests that averaging with Gaussian noise produces a better PEC value
-    compared to not averaging.
-
-    For non-deterministic executors, the PEC value with average should be
-    better. For deterministic executors (exact density matrix simulation),
-    the PEC value should be the same.
-    """
-    for seed in range(5):
-        rng = np.random.RandomState(seed)
-
-        def fake_noisy_executor(circuit) -> float:
-            return rng.randn()
-
-        pec_value_no_averaging = execute_with_pec(
-            oneq_circ,
-            fake_noisy_executor,
-            deco_dict=NOISELESS_DECO_DICT,
-            num_to_average=1,
-            num_samples=1,
-        )
-
-        pec_value_averaging = execute_with_pec(
-            oneq_circ,
-            fake_noisy_executor,
-            deco_dict=NOISELESS_DECO_DICT,
-            num_to_average=100,
-            num_samples=1,
-        )
-
-        # True (noiseless) value is zero. Averaging should ==> closer to zero.
-        error_no_averaging = abs(pec_value_no_averaging - 0.0)
-        error_averaging = abs(pec_value_averaging - 0.0)
-        assert error_averaging < error_no_averaging
-
-
-def test_averaging_is_irrelevant_for_deterministic_executors():
-    def fake_deterministic_executor(circuit) -> float:
-        return np.pi
-
-    pec_value_no_averaging = execute_with_pec(
-        oneq_circ,
-        fake_deterministic_executor,
-        deco_dict=NOISELESS_DECO_DICT,
-        num_to_average=1,
-        num_samples=1,
-    )
-
-    pec_value_averaging = execute_with_pec(
-        oneq_circ,
-        fake_deterministic_executor,
-        deco_dict=NOISELESS_DECO_DICT,
-        num_to_average=100,
-        num_samples=1,
-    )
-
-    assert np.isclose(pec_value_no_averaging, pec_value_averaging)
