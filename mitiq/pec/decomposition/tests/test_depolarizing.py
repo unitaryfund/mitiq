@@ -19,7 +19,7 @@ import numpy as np
 import pytest
 from cirq import CCNOT, CNOT, CZ, ISWAP, LineQubit, Operation, SWAP
 
-from mitiq.pec.decomposition.optimal import (
+from mitiq.pec.decomposition.depolarizing import (
     depolarizing_decomposition,
     NON_ID_PAULIS,
 )

@@ -15,7 +15,7 @@
 
 from typing import List, Tuple
 
-from cirq import I, Operation, X, Y, Z
+from cirq import Operation, X, Y, Z
 
 NON_ID_PAULIS = [X, Y, Z]
 
@@ -82,6 +82,7 @@ def depolarizing_decomposition(
         "Optimal resource cost for error mitigation,"
         (https://arxiv.org/abs/2006.12509).
     """
+    post_ops: List[List[Operation]]
     qubits = ideal_operation.qubits
 
     # the single-qubit case: linear combination of 1Q Paulis
