@@ -1363,6 +1363,15 @@ class PolyExpFactory(BatchedFactory):
             def zne_curve(scale_factor: float) -> float:
                 return _ansatz_unknown(scale_factor, *opt_params)
 
+            # Need to use propagation of errors to calculate zne_std
+            if params_cov is not None:
+                if params_cov.shape == (order + 2, order + 2):
+                    zne_std = np.sqrt(
+                        params_cov[0, 0]
+                        + _ansatz_unknown(0, *opt_params)
+                        * (params_cov[order + 1, order + 1])
+                    )
+
             if full_output:
                 return (zne_limit, zne_std, opt_params, params_cov, zne_curve)
 
@@ -1380,6 +1389,15 @@ class PolyExpFactory(BatchedFactory):
 
             def zne_curve(scale_factor: float) -> float:
                 return _ansatz_known(scale_factor, *opt_params)
+
+            # Need to use propagation of errors to calculate zne_std
+            if params_cov is not None:
+                if params_cov.shape == (order + 2, order + 2):
+                    zne_std = np.sqrt(
+                        params_cov[0, 0]
+                        + _ansatz_known(0, *opt_params)
+                        * (params_cov[order + 1, order + 1])
+                    )
 
             opt_params = [asymptote] + list(opt_params)
 
@@ -1410,6 +1428,13 @@ class PolyExpFactory(BatchedFactory):
             return asymptote + sign * np.exp(
                 np.polyval(z_coefficients, scale_factor)
             )
+
+        # Need to use propagation of errors to calculate zne_std
+        # if params_cov is not None:
+        #     if params_cov.shape == (order + 2, order + 2):
+        #         zne_std = np.sqrt(params_cov[0, 0] +
+        #             _ansatz_known(0, *opt_params) * (params_cov[order + 1, order + 1])
+        #         )
 
         # Parameters from low order to high order
         opt_params = [asymptote] + list(z_coefficients[::-1])
