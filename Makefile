@@ -42,13 +42,17 @@ format:
 install:
 	pip install -e .
 
+.PHONY: pdf
+pdf:
+	echo "s" | make -C docs latexpdf
+
 .PHONY: requirements
 requirements: requirements.txt
 	pip install -r requirements.txt
 
 .PHONY: test
 test:
-	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/tests mitiq/benchmarks/tests
+	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/tests mitiq/benchmarks/tests mitiq/zne/tests
 
 .PHONY: test-pyquil
 test-pyquil:
