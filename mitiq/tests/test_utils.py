@@ -315,7 +315,7 @@ def test_max_ent_state_circuit_error():
         assert _max_ent_state_circuit(num_qubits)
 
 
-def test_circuit_to_choi_and_operation_to_choi():
+def test_operation_to_choi():
     """Tests the Choi matrix of a depolarizing channel is recovered."""
     # Define first the expected result
     base_noise = 0.01
@@ -337,10 +337,20 @@ def test_circuit_to_choi_and_operation_to_choi():
     noisy_operation = depolarize(base_noise).on(q)
     noisy_sequence = [noisy_operation, noisy_operation]
     assert np.allclose(choi, _operation_to_choi(noisy_operation))
-    noisy_circuit = Circuit(noisy_operation)
-    noisy_circuit_twice = Circuit(noisy_sequence)
-    assert np.allclose(choi, _circuit_to_choi(noisy_circuit))
-    print(noisy_circuit_twice)
-    print(_circuit_to_choi(noisy_circuit_twice))
-    print(choi_twice)
-    assert np.allclose(choi_twice, _circuit_to_choi(noisy_circuit_twice))
+    assert np.allclose(choi_twice, _operation_to_choi(noisy_sequence))
+
+
+def test_circuit_to_choi():
+    """Tests _circuit_to_choi is consistent with _operation_to_choi."""
+    base_noise = 0.01
+    q = LineQubit(0)
+    noisy_operation = depolarize(base_noise).on(q)
+    assert np.allclose(
+        _operation_to_choi(noisy_operation),
+        _circuit_to_choi(Circuit(noisy_operation)),
+    )
+    noisy_sequence = [noisy_operation, noisy_operation]
+    assert np.allclose(
+        _operation_to_choi(noisy_sequence),
+        _circuit_to_choi(Circuit(noisy_sequence)),
+    )
