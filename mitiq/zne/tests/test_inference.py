@@ -284,9 +284,7 @@ def test_run_sequential_and_batched(factory, batched):
             return 1.0
 
     fac.run(
-        cirq.Circuit(),
-        executor,
-        scale_noise=lambda circ, _: circ,
+        cirq.Circuit(), executor, scale_noise=lambda circ, _: circ,
     )
     assert isinstance(fac.get_expectation_values(), np.ndarray)
     assert np.allclose(
@@ -325,9 +323,7 @@ def test_run_batched_with_keyword_args_list(factory):
         return [1.0] * len(circuits)
 
     fac.run(
-        cirq.Circuit(),
-        executor,
-        scale_noise=lambda circ, _: circ,
+        cirq.Circuit(), executor, scale_noise=lambda circ, _: circ,
     )
     assert isinstance(fac.get_expectation_values(), np.ndarray)
     assert np.allclose(

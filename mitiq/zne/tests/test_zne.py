@@ -102,38 +102,26 @@ def test_averaging_improves_zne_value_with_fake_noise(factory, fold_method):
 
 @pytest.mark.parametrize("factory", [LinearFactory, RichardsonFactory])
 def test_execute_with_zne_fit_fail(factory):
-    """Tests errors are raised when asking for fitting parameters that can't be calculated."""
+    """Tests errors are raised when asking for fitting parameters that can't
+    be calculated.
+    """
     with pytest.raises(
         ValueError,
-        match="Data is either ill-defined or not enough to evaluate the required information. Please make sure that the 'run' and 'reduce' methods have been called and that enough expectation values have been measured.",
+        match="""Data is either ill-defined or not enough to evaluate the
+        required information. Please make sure that the 'run' and 'reduce'
+        methods have been called and that enough expectation values have been
+        measured.""",
     ):
         factory([1.0, 2.0]).get_zero_noise_limit_error()
-
-    with pytest.raises(
-        ValueError,
-        match="Data is either ill-defined or not enough to evaluate the required information. Please make sure that the 'run' and 'reduce' methods have been called and that enough expectation values have been measured.",
-    ):
         factory([1.0, 2.0]).get_optimal_parameters()
-
-    with pytest.raises(
-        ValueError,
-        match="Data is either ill-defined or not enough to evaluate the required information. Please make sure that the 'run' and 'reduce' methods have been called and that enough expectation values have been measured.",
-    ):
         factory([1.0, 2.0]).get_parameters_covariance()
-    with pytest.raises(
-        ValueError,
-        match="Data is either ill-defined or not enough to evaluate the required information. Please make sure that the 'run' and 'reduce' methods have been called and that enough expectation values have been measured.",
-    ):
         factory([1.0, 2.0]).get_zero_noise_limit()
-    with pytest.raises(
-        ValueError,
-        match="Data is either ill-defined or not enough to evaluate the required information. Please make sure that the 'run' and 'reduce' methods have been called and that enough expectation values have been measured.",
-    ):
         factory([1.0, 2.0]).get_extrapolation_curve()
 
 
 def test_execute_with_zne_bad_arguments():
-    """Tests errors are raised when execute_with_zne is called with bad args."""
+    """Tests errors are raised when execute_with_zne is called with bad args.
+    """
     with pytest.raises(
         TypeError, match="Argument `executor` must be callable"
     ):
