@@ -54,6 +54,14 @@ Qiskit Utils
 .. automodule:: mitiq.mitiq_qiskit.qiskit_utils
    :members:
 
+Probabilistic Error Cancellation
+--------------------------------
+
+Decomposition into Quasi-Probability Representation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.pec.decomposition.depolarizing
+   :members:
+
 Utils
 -----
 .. automodule:: mitiq.utils
