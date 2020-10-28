@@ -54,7 +54,7 @@ def sample_sequence(
     # Sample an index from the distribution "probs"
     idx = np.random.choice(list(range(len(probs))), p=probs)
 
-    # Get the coefficient and the implementanble sequence associated to "idx"
+    # Get the coefficient and the implementable sequence associated to "idx"
     coeff, imp_seq = decomposition_dict[ideal_operation][idx]
 
     return imp_seq, int(np.sign(coeff)), one_norm
