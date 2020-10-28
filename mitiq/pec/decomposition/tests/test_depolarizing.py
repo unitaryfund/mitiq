@@ -34,7 +34,7 @@ def decomposition_overhead(
     return float(np.sum(np.abs([a for a, _ in decomposition])))
 
 
-def single_qubit_depolarizing_optimal_overhead(noise_level: float) -> float:
+def single_qubit_depolarizing_overhead(noise_level: float) -> float:
     """See [Temme2017]_ for more information.
 
     .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
@@ -46,7 +46,7 @@ def single_qubit_depolarizing_optimal_overhead(noise_level: float) -> float:
     return (1 + epsilon / 2) / (1 - epsilon)
 
 
-def two_qubit_depolarizing_optimal_overhead(noise_level: float) -> float:
+def two_qubit_depolarizing_overhead(noise_level: float) -> float:
     """See [Temme2017]_ for more information.
 
         .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
@@ -61,7 +61,7 @@ def two_qubit_depolarizing_optimal_overhead(noise_level: float) -> float:
 def test_single_qubit_depolarizing_decomposition():
     q = LineQubit(0)
     noise_level = 0.05
-    optimal_overhead = single_qubit_depolarizing_optimal_overhead(noise_level)
+    optimal_overhead = single_qubit_depolarizing_overhead(noise_level)
     assert all(
         np.isclose(
             optimal_overhead,
@@ -76,7 +76,7 @@ def test_single_qubit_depolarizing_decomposition():
 def test_two_qubit_depolarizing_decomposition():
     q0, q1 = LineQubit.range(2)
     noise_level = 0.05
-    optimal_overhead = two_qubit_depolarizing_optimal_overhead(noise_level)
+    optimal_overhead = two_qubit_depolarizing_overhead(noise_level)
     assert all(
         np.isclose(
             optimal_overhead,
