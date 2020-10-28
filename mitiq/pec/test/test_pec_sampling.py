@@ -30,9 +30,13 @@ from cirq import (
     depolarize,
 )
 
-from mitiq.pec.utils import _simple_pauli_deco_dict, DecompositionDict
+from mitiq.pec.utils import (
+    _simple_pauli_deco_dict,
+    DecompositionDict,
+    _operation_to_choi,
+    _circuit_to_choi,
+)
 from mitiq.pec.sampling import sample_sequence, sample_circuit
-from mitiq.utils import _operation_to_choi, _circuit_to_choi
 
 BASE_NOISE = 0.02
 DECO_DICT = _simple_pauli_deco_dict(BASE_NOISE)

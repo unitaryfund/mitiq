@@ -21,14 +21,21 @@
 
 import numpy as np
 from typing import Tuple, List, Dict
+
+from copy import deepcopy
+
 from cirq import (
+    Circuit,
     Operation,
+    OP_TREE,
     I,
     X,
     Y,
     Z,
+    H,
     CNOT,
     LineQubit,
+    DensityMatrixSimulator,
 )
 
 # Type definition for a decomposition dictionary.
@@ -204,3 +211,72 @@ def get_probabilities(
     """
     coeffs = get_coefficients(ideal_operation, decomposition_dict)
     return list(np.abs(coeffs) / np.linalg.norm(coeffs, ord=1))
+
+
+def _max_ent_state_circuit(num_qubits: int) -> Circuit:
+    r"""Generates a circuit which prepares the maximally entangled state
+    |\omega\rangle = U |0\rangle  = \sum_i |i\rangle \otimes |i\rangle .
+
+    Args:
+        num_qubits: The number of qubits on which the circuit is applied.
+            It must be an even number because of the structure of a
+            maximally entangled state.
+
+    Returns:
+        The circuits which prepares the state |\omega\rangle.
+
+    Raises:
+        Value error: if num_qubits is not an even positive integer.
+    """
+
+    if not isinstance(num_qubits, int) or num_qubits % 2 or num_qubits == 0:
+        raise ValueError(
+            "The argument 'num_qubits' must be an even and positive integer."
+        )
+
+    alice_reg = LineQubit.range(num_qubits // 2)
+    bob_reg = LineQubit.range(num_qubits // 2, num_qubits)
+
+    return Circuit(
+        # Prepare alice_register in a uniform superposition
+        H.on_each(*alice_reg),
+        # Correlate alice_register with bob_register
+        [CNOT.on(alice_reg[i], bob_reg[i]) for i in range(num_qubits // 2)],
+    )
+
+
+def _circuit_to_choi(circuit: Circuit) -> np.ndarray:
+    """Returns the density matrix of the Choi state associated to the
+    input circuit.
+
+    The density matrix completely characterizes the quantum channel induced by
+    the input circuit (including the effect of noise if present).
+
+    Args:
+        circuit: The input circuit.
+    Returns:
+        The density matrix of the Choi state associated to the input circuit.
+    """
+    simulator = DensityMatrixSimulator()
+    num_qubits = len(circuit.all_qubits())
+    # Copy and remove all operations
+    full_circ = deepcopy(circuit)[0:0]
+    full_circ += _max_ent_state_circuit(2 * num_qubits)
+    full_circ += circuit
+    return simulator.simulate(full_circ).final_density_matrix  # type: ignore
+
+
+def _operation_to_choi(operation_tree: OP_TREE) -> np.ndarray:
+    """Returns the density matrix of the Choi state associated to the
+    input operation tree (e.g. a single operation or a sequence of operations).
+
+    The density matrix completely characterizes the quantum channel induced by
+    the input operation tree (including the effect of noise if present).
+
+    Args:
+        circuit: The input circuit.
+    Returns:
+        The density matrix of the Choi state associated to the input circuit.
+    """
+    circuit = Circuit(operation_tree)
+    return _circuit_to_choi(circuit)
