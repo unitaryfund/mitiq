@@ -283,9 +283,8 @@ def test_run_sequential_and_batched(factory, batched):
         def executor(circuit):
             return 1.0
 
-    fac.run(
-        cirq.Circuit(), executor, scale_noise=lambda circ, _: circ,
-    )
+    fac.run(cirq.Circuit(), executor, scale_noise=lambda circ, _: circ)
+
     assert isinstance(fac.get_expectation_values(), np.ndarray)
     assert np.allclose(
         fac.get_expectation_values(), np.ones_like(scale_factors)
@@ -322,9 +321,8 @@ def test_run_batched_with_keyword_args_list(factory):
         assert len(circuits) == len(kwargs_list)
         return [1.0] * len(circuits)
 
-    fac.run(
-        cirq.Circuit(), executor, scale_noise=lambda circ, _: circ,
-    )
+    fac.run(cirq.Circuit(), executor, scale_noise=lambda circ, _: circ)
+
     assert isinstance(fac.get_expectation_values(), np.ndarray)
     assert np.allclose(
         fac.get_expectation_values(), np.ones_like(scale_factors)
@@ -778,3 +776,20 @@ def test_params_cov_and_zne_std():
     assert np.isclose(zne_std, 1.0)
     assert np.isclose(zne_curve(0), 0.0)
     assert np.isclose(zne_curve(0.5), 0.0)
+
+
+@mark.parametrize("factory", [LinearFactory, RichardsonFactory])
+def test_execute_with_zne_fit_fail(factory):
+    """Tests errors are raised when asking for fitting parameters that can't
+    be calculated.
+    """
+    with raises(ValueError, match="Data is either ill-defined or not enough"):
+        factory([1.0, 2.0]).get_zero_noise_limit_error()
+    with raises(ValueError, match="Data is either ill-defined or not enough"):
+        factory([1.0, 2.0]).get_optimal_parameters()
+    with raises(ValueError, match="Data is either ill-defined or not enough"):
+        factory([1.0, 2.0]).get_parameters_covariance()
+    with raises(ValueError, match="Data is either ill-defined or not enough"):
+        factory([1.0, 2.0]).get_zero_noise_limit()
+    with raises(ValueError, match="Data is either ill-defined or not enough"):
+        factory([1.0, 2.0]).get_extrapolation_curve()

@@ -1383,7 +1383,11 @@ class PolyExpFactory(BatchedFactory):
 
             if full_output:
                 return (
-                    zne_limit, zne_error, opt_params, params_cov, zne_curve
+                    zne_limit,
+                    zne_error,
+                    opt_params,
+                    params_cov,
+                    zne_curve,
                 )
 
             return zne_limit
@@ -1423,7 +1427,11 @@ class PolyExpFactory(BatchedFactory):
 
             if full_output:
                 return (
-                    zne_limit, zne_error, opt_params, params_cov, zne_curve
+                    zne_limit,
+                    zne_error,
+                    opt_params,
+                    params_cov,
+                    zne_curve,
                 )
 
             return zne_limit
