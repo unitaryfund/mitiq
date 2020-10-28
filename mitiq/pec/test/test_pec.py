@@ -19,7 +19,7 @@ from pytest import mark
 import numpy as np
 from cirq import Circuit, LineQubit, Y, Z, CNOT
 
-from mitiq.pec.utils import _simple_pauli_deco_dict, DecoType
+from mitiq.pec.utils import _simple_pauli_deco_dict, DecompositionDict
 from mitiq.pec.pec import execute_with_pec
 from mitiq.benchmarks.utils import noisy_simulation
 
@@ -67,18 +67,22 @@ twoq_circ = Circuit(
 
 @mark.parametrize("circuit", [oneq_circ, twoq_circ])
 @mark.parametrize(
-    "deco_dict", [NOISELESS_DECO_DICT, DECO_DICT_SIMP, DECO_DICT]
+    "decomposition_dict", [NOISELESS_DECO_DICT, DECO_DICT_SIMP, DECO_DICT]
 )
-def test_execute_with_pec_one_qubit(circuit: Circuit, deco_dict: DecoType):
+def test_execute_with_pec_one_qubit(
+    circuit: Circuit, decomposition_dict: DecompositionDict
+):
     """Tests that execute_with_pec mitigates the error of a noisy
     expectation value.
     """
     unmitigated = executor(circuit)
-    mitigated = execute_with_pec(circuit, executor, deco_dict=deco_dict)
+    mitigated = execute_with_pec(
+        circuit, executor, decomposition_dict=decomposition_dict
+    )
     error_unmitigated = abs(unmitigated - 1.0)
     error_mitigated = abs(mitigated - 1.0)
     # For a trivial noiseless decomposition no PEC mitigation should happen
-    if deco_dict == NOISELESS_DECO_DICT:
+    if decomposition_dict == NOISELESS_DECO_DICT:
         assert np.isclose(unmitigated, mitigated)
     else:
         assert error_mitigated < error_unmitigated
@@ -94,11 +98,11 @@ def test_execute_with_pec_with_different_samples(circuit: Circuit):
     errors_more_samples = []
     for _ in range(10):
         mitigated = execute_with_pec(
-            circuit, executor, deco_dict=DECO_DICT, num_samples=10
+            circuit, executor, decomposition_dict=DECO_DICT, num_samples=10
         )
         errors_few_samples.append(abs(mitigated - 1.0))
         mitigated = execute_with_pec(
-            circuit, executor, deco_dict=DECO_DICT, num_samples=100
+            circuit, executor, decomposition_dict=DECO_DICT, num_samples=100
         )
         errors_more_samples.append(abs(mitigated - 1.0))
 

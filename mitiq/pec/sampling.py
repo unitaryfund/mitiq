@@ -22,14 +22,14 @@ import numpy as np
 from cirq import Operation, Circuit
 
 from mitiq.pec.utils import (
-    DecoType,
+    DecompositionDict,
     get_one_norm,
     get_probabilities,
 )
 
 
 def sample_sequence(
-    ideal_operation: Operation, deco_dict: DecoType
+    ideal_operation: Operation, decomposition_dict: DecompositionDict
 ) -> Tuple[List[Operation], int, float]:
     """Samples an implementable sequence from the PEC decomposition of the
     input ideal operation. Moreover it also returns the "sign" and "norm"
@@ -38,8 +38,8 @@ def sample_sequence(
     Args:
         ideal_operation = The ideal operation from which an implementable
             sequence is sampled.
-        deco_dict = The decomposition dictionary from which the decomposition
-            of the input ideal_operation can be extracted.
+        decomposition_dict = The decomposition dictionary from which the
+            decomposition of the input ideal_operation can be extracted.
 
     Returns:
         imp_seq: The sampled implementable sequence as list of one
@@ -48,20 +48,20 @@ def sample_sequence(
         norm: The one norm of the decomposition coefficients.
     """
     # Extract information from the decomposition dictionary
-    probs = get_probabilities(ideal_operation, deco_dict)
-    one_norm = get_one_norm(ideal_operation, deco_dict)
+    probs = get_probabilities(ideal_operation, decomposition_dict)
+    one_norm = get_one_norm(ideal_operation, decomposition_dict)
 
     # Sample an index from the distribution "probs"
     idx = np.random.choice(list(range(len(probs))), p=probs)
 
     # Get the coefficient and the implementanble sequence associated to "idx"
-    coeff, imp_seq = deco_dict[ideal_operation][idx]
+    coeff, imp_seq = decomposition_dict[ideal_operation][idx]
 
     return imp_seq, int(np.sign(coeff)), one_norm
 
 
 def sample_circuit(
-    ideal_circuit: Circuit, deco_dict: DecoType
+    ideal_circuit: Circuit, decomposition_dict: DecompositionDict
 ) -> Tuple[Circuit, int, float]:
     """Samples an implementable circuit according from the PEC decomposition
     of the input ideal circuit. Moreover it also returns the "sign" and "norm"
@@ -70,7 +70,7 @@ def sample_circuit(
     Args:
         ideal_circuit: The ideal circuit from which an implementable circuit
             is sampled.
-        deco_dict = The decomposition dictionary containing the quasi-
+        decomposition_dict = The decomposition dictionary containing the quasi-
             probability representation of the ideal operations (those
             which are part of "ideal_circuit").
 
@@ -90,7 +90,7 @@ def sample_circuit(
     for ideal_operation in ideal_circuit.all_operations():
         # Sample an imp. sequence from the decomp. of ideal_operation
         imp_seq, loc_sign, loc_norm = sample_sequence(
-            ideal_operation, deco_dict
+            ideal_operation, decomposition_dict
         )
         sign *= loc_sign
         norm *= loc_norm

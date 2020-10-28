@@ -18,14 +18,14 @@
 from typing import Optional, Callable, Union, Tuple
 import numpy as np
 from mitiq._typing import QPROGRAM
-from mitiq.pec.utils import DecoType
+from mitiq.pec.utils import DecompositionDict
 from mitiq.pec.sampling import sample_circuit
 
 
 def execute_with_pec(
     circuit: QPROGRAM,
     executor: Callable[[QPROGRAM], float],
-    deco_dict: DecoType,
+    decomposition_dict: DecompositionDict,
     num_samples: Optional[int] = None,
     full_output: bool = False,
 ) -> Union[float, Tuple[float, float]]:
@@ -45,8 +45,8 @@ def execute_with_pec(
         circuit: The input circuit to execute with error-mitigation.
         executor: A function which executes a circuit and returns an
             expectation value.
-        deco_dict: The decomposition dictionary containing the quasi-
-            probability representation of the ideal operations (those
+        decomposition_dict: The decomposition dictionary containing the
+            quasi-probability representation of the ideal operations (those
             which are part of the input circuit).
         num_samples: The number of noisy circuits to be sampled for PEC.
             If equal to None, it is deduced from the amount of "negativity"
@@ -80,7 +80,7 @@ def execute_with_pec(
         (https://arxiv.org/abs/2006.12509).
     """
 
-    # TODO: maybe deduce num_to_sample from the decomposition "negativity"
+    # TODO gh-413: Add option to automatically deduce the number of PEC samples
     if not num_samples:
         num_samples = 1000
 
@@ -89,11 +89,13 @@ def execute_with_pec(
 
     for _ in range(num_samples):
         # Note: the norm is the same for each sample.
-        sampled_circuit, sign, norm = sample_circuit(circuit, deco_dict)
+        sampled_circuit, sign, norm = sample_circuit(
+            circuit, decomposition_dict
+        )
         sampled_circuits.append(sampled_circuit)
         signs.append(sign)
 
-    # TODO: add support for batched executors
+    # TODO gh-412: Add support for batched executors in the PEC module
     # Execute all the circuits
     exp_values = [executor(circ) for circ in sampled_circuits]
 

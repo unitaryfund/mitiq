@@ -30,7 +30,7 @@ from cirq import (
     depolarize,
 )
 
-from mitiq.pec.utils import _simple_pauli_deco_dict, DecoType
+from mitiq.pec.utils import _simple_pauli_deco_dict, DecompositionDict
 from mitiq.pec.sampling import sample_sequence, sample_circuit
 from mitiq.utils import _operation_to_choi, _circuit_to_choi
 
@@ -95,15 +95,15 @@ def test_sample_sequence_choi(gate: Gate):
     assert np.allclose(ideal_choi, choi_pec_estimate, atol=0.05)
 
 
-@mark.parametrize("deco_dict", [DECO_DICT, DECO_DICT_SIMP])
-def test_sample_circuit_choi(deco_dict: DecoType):
+@mark.parametrize("decomposition_dict", [DECO_DICT, DECO_DICT_SIMP])
+def test_sample_circuit_choi(decomposition_dict: DecompositionDict):
     """Tests the sample_circuit by comparing the exact Choi matrices."""
     ideal_choi = _circuit_to_choi(twoq_circ)
     noisy_circuit = twoq_circ.with_noise(depolarize(BASE_NOISE))
     noisy_choi = _circuit_to_choi(noisy_circuit)
     choi_unbiased_estimates = []
     for _ in range(500):
-        imp_circuit, sign, norm = sample_circuit(twoq_circ, deco_dict)
+        imp_circuit, sign, norm = sample_circuit(twoq_circ, decomposition_dict)
         noisy_imp_circuit = imp_circuit.with_noise(depolarize(BASE_NOISE))
         imp_circuit_choi = _circuit_to_choi(noisy_imp_circuit)
         choi_unbiased_estimates.append(norm * sign * imp_circuit_choi)

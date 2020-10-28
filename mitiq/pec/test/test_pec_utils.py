@@ -94,9 +94,9 @@ def test_simplify_paulis_in_simple_pauli_deco_dict(gate: Gate):
     sequences are simplified to single Pauli gates.
     """
     qreg = LineQubit.range(2)
-    deco_dict = DECO_DICT_SIMP
+    decomposition_dict = DECO_DICT_SIMP
     for q in qreg:
-        deco = deco_dict[gate.on(q)]
+        deco = decomposition_dict[gate.on(q)]
         _, first_imp_seq = deco[0]
         assert first_imp_seq == [gate.on(q)]
         _, second_imp_seq = deco[1]
@@ -116,10 +116,9 @@ def test_get_coefficients(gate: Gate):
 
 
 def test_get_imp_sequences_with_simplify():
-    deco_dict = DECO_DICT_SIMP
     q = LineQubit(0)
     expected_imp_sequences = [[X.on(q)], [I.on(q)], [Z.on(q)], [Y.on(q)]]
-    assert get_imp_sequences(X.on(q), deco_dict) == expected_imp_sequences
+    assert get_imp_sequences(X.on(q), DECO_DICT_SIMP) == expected_imp_sequences
 
 
 @mark.parametrize("gate", [X, Y, Z])
