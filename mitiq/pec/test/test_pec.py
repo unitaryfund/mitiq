@@ -110,7 +110,7 @@ def test_execute_with_pec_with_different_samples(circuit: Circuit):
 
 
 def test_execute_with_pec_with_full_output():
-    """Tests the standard deviation of the PEC value is returned if
+    """Tests that the error associated to the PEC value is returned if
     the option 'full_output' is set to True.
     """
     rnd_state = np.random.RandomState(0)
@@ -119,8 +119,13 @@ def test_execute_with_pec_with_full_output():
         """A fake executor which just samples from a normal distribution."""
         return rnd_state.randn()
 
-    _, pec_std = execute_with_pec(
-        oneq_circ, fake_exec, DECO_DICT, num_samples=1000, full_output=True
+    _, error_few_samples = execute_with_pec(
+        oneq_circ, fake_exec, DECO_DICT, num_samples=100, full_output=True
     )
 
-    assert np.isclose(pec_std, 1.0, atol=0.1)
+    _, error_many_samples = execute_with_pec(
+        oneq_circ, fake_exec, DECO_DICT, num_samples=1000, full_output=True
+    )
+    # The error should scale as 1/sqrt(num_samples)
+    assert np.isclose(error_few_samples * np.sqrt(100), 1.0, atol=0.1)
+    assert np.isclose(error_many_samples * np.sqrt(1000), 1.0, atol=0.1)

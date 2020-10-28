@@ -54,16 +54,17 @@ def execute_with_pec(
             Note: the latter feature is not yet implemented and num_samples
             is just set to 1000 if not specified.
         full_output: If False only the average PEC value is returned.
-            If True the associated error (standard deviation) is returned too.
+            If True an estimate of the associated error is returned too.
 
     Returns:
         pec_value: The PEC estimate of the ideal expectation value associated
             to the input circuit.
-        pec_std: The standard deviation of the PEC samples, i.e., the square
-            root of the mean squared deviation (from pec_value).
-            After dividing this quantity by sqrt(num_samples), one obtains
-            an estimate of the error between 'pec_value' and the actual
-            ideal expectation value.
+        pec_error: The estimated error between the mitigated 'pec_value' and
+            the actual ideal expectation value. This is estimated as the ratio
+            pec_std / sqrt(num_samples), where 'pec_std' is the
+            standard deviation of the PEC samples, i.e., the square root of
+            the mean squared deviation of the sampled values from 'pec_value'.
+            This is returned only if 'full_output' is True.
 
     .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
         "Error mitigation for short-depth quantum circuits,"
@@ -102,7 +103,10 @@ def execute_with_pec(
     # Evaluate unbiased estimators [Temme2017], [Endo2018], [Takagi2020]
     unbiased_estimators = [norm * s * val for s, val in zip(signs, exp_values)]
 
-    if full_output:
-        return np.average(unbiased_estimators), np.std(unbiased_estimators)
+    pec_value = np.average(unbiased_estimators)
 
-    return np.average(unbiased_estimators)
+    if full_output:
+        pec_error = np.std(unbiased_estimators) / np.sqrt(num_samples)
+        return pec_value, pec_error
+
+    return pec_value
