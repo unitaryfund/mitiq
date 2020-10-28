@@ -198,7 +198,7 @@ class Factory(ABC):
         self._opt_params: Union[List[float], None] = None
         self._params_cov: Union[np.ndarray, None] = None
         self._zne_limit: Union[float, None] = None
-        self._zne_std: Union[float, None] = None
+        self._zne_error: Union[float, None] = None
         self._zne_curve: Union[Callable[[float], float], None] = None
         self._already_reduced = False
 
@@ -260,13 +260,18 @@ class Factory(ABC):
         return self._zne_limit
 
     def get_zero_noise_limit_error(self) -> float:
-        """Returns the standard deviation of the zero-noise limit. It is
-        deduced from the covariance matrix of the parameters which is
-        produced by the extrapolation fit.
+        """Returns the extrapolation error representing the uncertainty
+        affecting the zero-noise limit. It is deduced by error propagation
+        from the covariance matrix associated to the fit parameters.
+
+        Note: this quantity is only related to the ability of the model
+            to fit the measured data. Therefore, it may underestimate the
+            actual error existing between the zero-noise limit and the 
+            true ideal expectation value.
         """
-        if self._zne_std is None:
+        if self._zne_error is None:
             raise ValueError(DATA_MISSING_ERR)
-        return self._zne_std
+        return self._zne_error
 
     def get_extrapolation_curve(self) -> Callable[[float], float]:
         """Returns the extrapolation curve, i.e., a function which
@@ -338,7 +343,7 @@ class Factory(ABC):
         self._opt_params = None
         self._params_cov = None
         self._zne_limit = None
-        self._zne_std = None
+        self._zne_error = None
         self._already_reduced = False
         return self
 
@@ -761,7 +766,7 @@ class PolyFactory(BatchedFactory):
         Returns:
             zne_limit: The extrapolated zero-noise limit. If "full_output"
                 is False (default value), only this parameter is returned.
-            zne_std: The standard deviation of the extrapolated zero-noise
+            zne_error: The error associated to the extrapolated zero-noise
                 limit deduced from the covariance matrix "params_cov".
             opt_params: The parameter array of the best fitting model.
             params_cov: The parameter covariance matrix of the best fitting
@@ -788,15 +793,15 @@ class PolyFactory(BatchedFactory):
         if not full_output:
             return zne_limit
 
-        zne_std = None
+        zne_error = None
         if params_cov is not None:
             if params_cov.shape == (order + 1, order + 1):
-                zne_std = np.sqrt(params_cov[order, order])
+                zne_error = np.sqrt(params_cov[order, order])
 
         def zne_curve(scale_factor: float) -> float:
             return np.polyval(opt_params, scale_factor)
 
-        return zne_limit, zne_std, opt_params, params_cov, zne_curve
+        return zne_limit, zne_error, opt_params, params_cov, zne_curve
 
     def reduce(self) -> float:
         """Evaluates the zero-noise limit found by fitting a polynomial of degree
@@ -807,7 +812,7 @@ class PolyFactory(BatchedFactory):
         """
         (
             self._zne_limit,
-            self._zne_std,
+            self._zne_error,
             self._opt_params,
             self._params_cov,
             self._zne_curve,
@@ -867,7 +872,7 @@ class RichardsonFactory(BatchedFactory):
         Returns:
             zne_limit: The extrapolated zero-noise limit. If "full_output"
                 is False (default value), only this parameter is returned.
-            zne_std: The standard deviation of the extrapolated zero-noise
+            zne_error: The error associated to the extrapolated zero-noise
                 limit deduced from the covariance matrix "params_cov".
             opt_params: The parameter array of the best fitting model.
             params_cov: The parameter covariance matrix of the best fitting
@@ -901,7 +906,7 @@ class RichardsonFactory(BatchedFactory):
         """
         (
             self._zne_limit,
-            self._zne_std,
+            self._zne_error,
             self._opt_params,
             self._params_cov,
             self._zne_curve,
@@ -961,7 +966,7 @@ class LinearFactory(BatchedFactory):
         Returns:
             zne_limit: The extrapolated zero-noise limit. If "full_output"
                 is False (default value), only this parameter is returned.
-            zne_std: The standard deviation of the extrapolated zero-noise
+            zne_error: The error associated to the extrapolated zero-noise
                 limit deduced from the covariance matrix "params_cov".
             opt_params: The parameter array of the best fitting model.
             params_cov: The parameter covariance matrix of the best fitting
@@ -993,7 +998,7 @@ class LinearFactory(BatchedFactory):
         """
         (
             self._zne_limit,
-            self._zne_std,
+            self._zne_error,
             self._opt_params,
             self._params_cov,
             self._zne_curve,
@@ -1095,7 +1100,7 @@ class ExpFactory(BatchedFactory):
         Returns:
             zne_limit: The extrapolated zero-noise limit. If "full_output"
                 is False (default value), only this parameter is returned.
-            zne_std: The standard deviation of the extrapolated zero-noise
+            zne_error: The error associated to the extrapolated zero-noise
                 limit deduced from the covariance matrix "params_cov".
             opt_params: The parameter array of the best fitting model.
             params_cov: The parameter covariance matrix of the best fitting
@@ -1135,7 +1140,7 @@ class ExpFactory(BatchedFactory):
         """
         (
             self._zne_limit,
-            self._zne_std,
+            self._zne_error,
             self._opt_params,
             self._params_cov,
             self._zne_curve,
@@ -1281,7 +1286,7 @@ class PolyExpFactory(BatchedFactory):
         Returns:
             zne_limit: The extrapolated zero-noise limit. If "full_output"
                 is False (default value), only this parameter is returned.
-            zne_std: The standard deviation of the extrapolated zero-noise
+            zne_error: The error associated to the extrapolated zero-noise
                 limit deduced from the covariance matrix "params_cov".
             opt_params: The parameter array of the best fitting model.
             params_cov: The parameter covariance matrix of the best fitting
@@ -1322,7 +1327,7 @@ class PolyExpFactory(BatchedFactory):
             )
 
         # Initialize default errors
-        zne_std = None
+        zne_error = None
         params_cov = None
 
         # Deduce "sign" parameter of the exponential ansatz
@@ -1354,17 +1359,19 @@ class PolyExpFactory(BatchedFactory):
             def zne_curve(scale_factor: float) -> float:
                 return _ansatz_unknown(scale_factor, *opt_params)
 
-            # Need to use propagation of errors to calculate zne_std
+            # Need to use propagation of errors to calculate zne_error
             if params_cov is not None:
                 if params_cov.shape == (order + 2, order + 2):
-                    zne_std = np.sqrt(
+                    zne_error = np.sqrt(
                         params_cov[0, 0]
                         + _ansatz_unknown(0, *opt_params)
                         * (params_cov[order + 1, order + 1])
                     )
 
             if full_output:
-                return (zne_limit, zne_std, opt_params, params_cov, zne_curve)
+                return (
+                    zne_limit, zne_error, opt_params, params_cov, zne_curve
+                )
 
             return zne_limit
 
@@ -1381,10 +1388,10 @@ class PolyExpFactory(BatchedFactory):
             def zne_curve(scale_factor: float) -> float:
                 return _ansatz_known(scale_factor, *opt_params)
 
-            # Need to use propagation of errors to calculate zne_std
+            # Need to use propagation of errors to calculate zne_error
             if params_cov is not None:
                 if params_cov.shape == (order + 2, order + 2):
-                    zne_std = np.sqrt(
+                    zne_error = np.sqrt(
                         params_cov[0, 0]
                         + _ansatz_known(0, *opt_params)
                         * (params_cov[order + 1, order + 1])
@@ -1393,7 +1400,9 @@ class PolyExpFactory(BatchedFactory):
             opt_params = [asymptote] + list(opt_params)
 
             if full_output:
-                return (zne_limit, zne_std, opt_params, params_cov, zne_curve)
+                return (
+                    zne_limit, zne_error, opt_params, params_cov, zne_curve
+                )
 
             return zne_limit
 
@@ -1420,10 +1429,10 @@ class PolyExpFactory(BatchedFactory):
                 np.polyval(z_coefficients, scale_factor)
             )
 
-        # Need to use propagation of errors to calculate zne_std
+        # Need to use propagation of errors to calculate zne_error
         # if params_cov is not None:
         #     if params_cov.shape == (order + 2, order + 2):
-        #         zne_std = np.sqrt(params_cov[0, 0] +
+        #         zne_error = np.sqrt(params_cov[0, 0] +
         #             _ansatz_known(0, *opt_params) *
         #             (params_cov[order + 1, order + 1])
         #         )
@@ -1432,7 +1441,7 @@ class PolyExpFactory(BatchedFactory):
         opt_params = [asymptote] + list(z_coefficients[::-1])
 
         if full_output:
-            return zero_limit, zne_std, opt_params, params_cov, _zne_curve
+            return zero_limit, zne_error, opt_params, params_cov, _zne_curve
         return zne_limit
 
     def __eq__(self, other: Any) -> bool:
@@ -1453,7 +1462,7 @@ class PolyExpFactory(BatchedFactory):
         """
         (
             self._zne_limit,
-            self._zne_std,
+            self._zne_error,
             self._opt_params,
             self._params_cov,
             self._zne_curve,
@@ -1632,7 +1641,7 @@ class AdaExpFactory(AdaptiveFactory):
         Returns:
             zne_limit: The extrapolated zero-noise limit. If "full_output"
                 is False (default value), only this parameter is returned.
-            zne_std: The standard deviation of the extrapolated zero-noise
+            zne_error: The standard deviation of the extrapolated zero-noise
                 limit deduced from the covariance matrix "params_cov".
             opt_params: The parameter array of the best fitting model.
             params_cov: The parameter covariance matrix of the best fitting
@@ -1671,7 +1680,7 @@ class AdaExpFactory(AdaptiveFactory):
         """
         (
             self._zne_limit,
-            self._zne_std,
+            self._zne_error,
             self._opt_params,
             self._params_cov,
             self._zne_curve,
