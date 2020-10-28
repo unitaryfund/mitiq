@@ -36,9 +36,9 @@ def sample_sequence(
     parameters which are necessary for the Monte Carlo estimation.
 
     Args:
-        ideal_operation = The ideal operation from which an implementable
+        ideal_operation: The ideal operation from which an implementable
             sequence is sampled.
-        decomposition_dict = The decomposition dictionary from which the
+        decomposition_dict: The decomposition dictionary from which the
             decomposition of the input ideal_operation can be extracted.
 
     Returns:
@@ -70,7 +70,7 @@ def sample_circuit(
     Args:
         ideal_circuit: The ideal circuit from which an implementable circuit
             is sampled.
-        decomposition_dict = The decomposition dictionary containing the quasi-
+        decomposition_dict: The decomposition dictionary containing the quasi-
             probability representation of the ideal operations (those
             which are part of "ideal_circuit").
 
