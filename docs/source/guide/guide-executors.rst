@@ -523,7 +523,12 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
     import numpy as np
     import sympy
     import tensorflow as tf
-    import tensorflow_quantum as tfq
+    # tensorflow-quantum 0.4.0 is unavailable on Windows
+    try:
+        import tensorflow_quantum as tfq
+        tfq_exists = True
+    except ImportError:
+        tfq_exists = False
     from cirq import Circuit
 
 
@@ -573,13 +578,15 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
 
 .. testcode::
     :hide:
-    
-    import cirq
-    from mitiq.benchmarks import randomized_benchmarking
-    circ = randomized_benchmarking.rb_circuits(1, [20], 1)[0]
 
-    # Need to make sure the qubits are cirq.GridQubit
-    circ=circ.transform_qubits(lambda q: cirq.GridQubit.rect(1, 1)[0])
+    if tfq_exists:
+        import cirq
+        from mitiq.benchmarks import randomized_benchmarking
 
-    out = stochastic_bit_flip_simulation(circ, 0.001)
-    assert 0.5 < out < 1
+        circ = randomized_benchmarking.rb_circuits(1, [20], 1)[0]
+
+        # Need to make sure the qubits are cirq.GridQubit
+        circ=circ.transform_qubits(lambda q: cirq.GridQubit.rect(1, 1)[0])
+
+        out = stochastic_bit_flip_simulation(circ, 0.001)
+        assert 0.5 < out < 1
