@@ -483,6 +483,29 @@ desired factory class (in this case initializing a factory object is unnecessary
 
 Both the zero-noise value and the optimal parameters of the fit can be returned from `extrapolate` by specifying `full_output = True`.
 
+There are also a number of methods to get additional information calculated by the factory class:
+
+.. testcode::
+
+   from mitiq.zne.inference import LinearFactory
+   from mitiq.zne.zne import execute_with_zne
+
+   linear_fac = LinearFactory(scale_factors=[1.0, 2.0, 3.0])
+   zne_expval = execute_with_zne(circuit, executor, factory=linear_fac)
+   print(f"Error on Zero Noise: {linear_fac.get_zero_noise_limit_error()}")
+   print(f"Covariance of fitted model parameters: {linear_fac.get_parameters_covariance()}")
+   print(f"Fitted model parameters: {linear_fac.get_optimal_parameters()}")
+   #Curve that was fit to the data: 
+   f = linear_fac.get_extrapolation_curve()
+
+.. testoutput::
+
+   Error on Zero Noise: 0.013761310256280792
+   Covariance of fitted model parameters: [[ 4.0580070e-05 -8.1160140e-05]
+   [-8.1160140e-05  1.8937366e-04]]
+   Fitted model parameters: [-0.08046895  0.95620809]
+
+
 ---------------------------------------------
 Advanced usage of a factory
 ---------------------------------------------
