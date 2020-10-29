@@ -26,8 +26,19 @@ pip install -U sphinx m2r sphinxcontrib-bibtex pybtex sphinx-copybutton sphinx-a
 `sphinx-copybutton` allows to easily copy-paste code snippets from examples.
 `sphinx-autodoc-typehints` allows to control how annotations are displayed in the API-doc part of the documentation, integrating with `sphinx-autodoc` and `sphinx-napoleon`.
 
-
 You can check that Sphinx is installed with `sphinx-build --version`.
+
+In addition, there are two requirements, `tensorflow` and `tensorflow-quantum`,
+which are used solely in `guide/guide-executors.rst`. They can be installed via:
+
+```bash
+pip install -r docs/requirements.txt
+```
+
+If they are not installed, the test that uses them will be skipped. We do this because
+`tensorflow-quantum` has incompatibility issues -- version `0.4.0` works on `py38` but
+not Windows, and version `0.3.1` works on Windows but not `py38`. Therefore, these two
+requirements cannot be installed on Windows. See gh-419 for more information.
 
 ### How to Update the Documentation
 
