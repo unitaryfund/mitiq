@@ -29,7 +29,7 @@ pip install -U sphinx m2r sphinxcontrib-bibtex pybtex sphinx-copybutton sphinx-a
 You can check that Sphinx is installed with `sphinx-build --version`.
 
 In addition, there are two requirements, `tensorflow` and `tensorflow-quantum`,
-which are used in solely `guide/guide-executors.rst`. They can be installed via:
+which are used solely in `guide/guide-executors.rst`. They can be installed via:
 
 ```bash
 pip install -r docs/requirements.txt
