@@ -18,7 +18,7 @@ matplotlib~=3.2.1
 notebook~=6.0.3
 
 # to build and test the documentation
-# see docs/optional-requirements.txt for more
+# see docs/requirements.txt for more non-essential dependencies
 sphinx~=2.4.4
 sphinxcontrib-bibtex~=1.0.0
 sphinx-copybutton~=0.2.11

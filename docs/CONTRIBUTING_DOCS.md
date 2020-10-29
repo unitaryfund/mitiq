@@ -28,17 +28,17 @@ pip install -U sphinx m2r sphinxcontrib-bibtex pybtex sphinx-copybutton sphinx-a
 
 You can check that Sphinx is installed with `sphinx-build --version`.
 
-In addition, there are two optional requirements, `tensorflow` and `tensorflow-quantum`,
-which are used in `guide/guide-executors.rst`. They can be installed via:
+In addition, there are two requirements, `tensorflow` and `tensorflow-quantum`,
+which are used in solely `guide/guide-executors.rst`. They can be installed via:
 
 ```bash
-pip install -r docs/optional-requirements.txt
+pip install -r docs/requirements.txt
 ```
 
-They are currently optional because `tensorflow-quantum` has incompatibility issues.
-Version `0.4.0` works on `py38` but not Windows, and version `0.3.1` works on Windows
-but not `py38`. As such, the optional requirements as they stand cannot be installed
-on Windows.
+If they are not installed, the test that uses them will be skipped. We do this because
+`tensorflow-quantum` has incompatibility issues -- version `0.4.0` works on `py38` but
+not Windows, and version `0.3.1` works on Windows but not `py38`. Therefore, these two
+requirements cannot be installed on Windows. See gh-419 for more information.
 
 ### How to Update the Documentation
 
