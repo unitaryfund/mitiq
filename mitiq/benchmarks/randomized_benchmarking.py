@@ -59,7 +59,7 @@ def rb_circuits(
         if n_qubits == 1:
             rb_circuits = [
                 _random_single_q_clifford(
-                    qubit1,  # type: ignore
+                    qubit1,
                     num,
                     C1,
                     CFD_MAT_1Q,

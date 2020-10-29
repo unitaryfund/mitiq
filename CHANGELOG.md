@@ -20,6 +20,7 @@
 - Added Tensorflow Quantum executor to docs (@k-m-schultz, gh-348).
 - Fix a collection of small build & docs issues (@karalekas, gh-410).
 - Add optimal QPR decomposition for depolarizing noise (@karalekas, gh-371).
+- Add PEC basic implementation assuming a decomposition dictionary is given (@andreamari, gh-373).
 
 Thanks to @erkska and @k-m-schultz for their contributions to this release!
 

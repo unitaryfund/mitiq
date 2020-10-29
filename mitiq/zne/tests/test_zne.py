@@ -101,7 +101,8 @@ def test_averaging_improves_zne_value_with_fake_noise(factory, fold_method):
 
 
 def test_execute_with_zne_bad_arguments():
-    """Tests errors are raised when execute_with_zne is called with bad args.
+    """Tests errors are raised when execute_with_zne is called with bad
+    arguments.
     """
     with pytest.raises(
         TypeError, match="Argument `executor` must be callable"
