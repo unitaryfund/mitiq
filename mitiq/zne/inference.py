@@ -1380,19 +1380,6 @@ class PolyExpFactory(BatchedFactory):
             def zne_curve(scale_factor: float) -> float:
                 return _ansatz_unknown(scale_factor, *opt_params)
 
-            # Previous formula: to remove if the new is fine.
-            # Note: the new one is based on the fact that, at x=0,
-            # _ansatz_unknown is opt_params[0] + opt_params[1].
-            # i.e. there is no zero-order term in the exponent.
-            #
-            # if params_cov is not None:
-            #    if params_cov.shape == (order + 2, order + 2):
-            #        zne_error = np.sqrt(
-            #            params_cov[0, 0]
-            #            + _ansatz_unknown(0, *opt_params)
-            #            * (params_cov[order + 1, order + 1])
-            #        )
-
             # Use propagation of errors to calculate zne_error
             if params_cov is not None:
                 if params_cov.shape == (order + 2, order + 2):
@@ -1425,19 +1412,6 @@ class PolyExpFactory(BatchedFactory):
 
             def zne_curve(scale_factor: float) -> float:
                 return _ansatz_known(scale_factor, *opt_params)
-
-            # Previous formula: to remove if the new is fine.
-            # Note: the new one is based on the fact that, at x=0,
-            # _ansatz_unknown is asymptote + opt_params[0].
-            # i.e. there is no zero-order term in the exponent.
-            #
-            # if params_cov is not None:
-            #    if params_cov.shape == (order + 1, order + 1):
-            #        zne_error = np.sqrt(
-            #            params_cov[0, 0]
-            #            + _ansatz_known(0, *opt_params)
-            #            * (params_cov[order + 1, order + 1])
-            #        )
 
             # Use propagation of errors to calculate zne_error
             if params_cov is not None:
