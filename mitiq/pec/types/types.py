@@ -88,8 +88,8 @@ class NoisyOperation:
         Args:
             ideal: An ideal (noiseless) gate, operation, sequence of
                 operations, or circuit.
-            real: The actual matrix of `ideal`, not necessarily unitary,
-                performed when implemented on a quantum processor.
+            real: Superoperator of the ideal operation performed when
+                implemented on a quantum processor.
             qubits: The qubits to implement `ideal` on.
 
         Raises:
