@@ -202,26 +202,6 @@ class Factory(ABC):
         self._zne_curve: Union[Callable[[float], float], None] = None
         self._already_reduced = False
 
-    def push(
-        self, instack_val: Dict[str, float], outstack_val: float
-    ) -> "Factory":
-        """Appends "instack_val" to "self._instack" and "outstack_val" to
-        "self._outstack". Each time a new expectation value is computed this
-        method should be used to update the internal state of the Factory.
-        """
-        if self._already_reduced:
-            warnings.warn(
-                "You are pushing new data into a factory object despite its "
-                ".reduce() method has already been called. Please make "
-                "sure your intention is to append new data to the stack of "
-                "previous data. Otherwise, the method .reset() can be used "
-                "to clean the internal state of the factory.",
-                ExtrapolationWarning,
-            )
-        self._instack.append(instack_val)
-        self._outstack.append(outstack_val)
-        return self
-
     def get_scale_factors(self) -> np.ndarray:
         """Returns the scale factors at which the factory has computed
         expectation values.
