@@ -33,8 +33,8 @@ class NoisyOperation:
         Args:
             ideal: An ideal (noiseless) gate, operation, sequence of
                 operations, or circuit.
-            real: The actual matrix of `ideal`, not necessarily unitary,
-                performed when implemented on a quantum processor.
+            real: Superoperator of the ideal operation performed when
+                implemented on a quantum processor.
 
         Raises:
             ValueError:
@@ -67,11 +67,12 @@ class NoisyOperation:
         self._num_qubits = len(self._qubits)
         self._dimension = 2 ** self._num_qubits
 
-        if real.shape != (self._dimension, self._dimension):
+        if real.shape != (self._dimension ** 2, self._dimension ** 2):
             raise ValueError(
                 f"Arg `real` has shape {real.shape} but `ideal` has shape"
-                f" {self._dimension, self._dimension}."
+                f" {self._dimension ** 2, self._dimension ** 2}."
             )
+        # TODO: Check if real is a valid superoperator.
 
         self._ideal = deepcopy(self._ideal)
         self._real = deepcopy(real)

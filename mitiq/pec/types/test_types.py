@@ -24,7 +24,7 @@ from mitiq.pec.types import NoisyOperation
 
 def test_init_with_gate():
     ideal_gate = cirq.Z
-    real = np.array([[0.94, 0.05], [0.13, -0.98]])
+    real = np.zeros(shape=(4, 4))
     noisy_op = NoisyOperation(ideal_gate, real)
     assert isinstance(noisy_op.ideal_circuit, cirq.Circuit)
     assert _equal(
@@ -44,7 +44,7 @@ def test_init_with_gate():
 )
 def test_init_with_operation(qubit):
     ideal_op = cirq.H.on(qubit)
-    real = np.array([[0.51, 0.49], [0.46, -0.45]]) / np.sqrt(2)
+    real = np.zeros(shape=(4, 4))
     noisy_op = NoisyOperation(ideal_op, real)
 
     assert isinstance(noisy_op.ideal_circuit, cirq.Circuit)
@@ -62,7 +62,7 @@ def test_init_with_operation(qubit):
 def test_init_with_op_tree():
     qreg = cirq.LineQubit.range(2)
     ideal_ops = [cirq.H.on(qreg[0]), cirq.CNOT.on(*qreg)]
-    real = np.empty(shape=(4, 4))
+    real = np.zeros(shape=(16, 16))
     noisy_op = NoisyOperation(ideal_ops, real)
 
     assert isinstance(noisy_op.ideal_circuit, cirq.Circuit)
@@ -82,7 +82,7 @@ def test_init_with_op_tree():
 def test_init_with_circuit():
     qreg = cirq.LineQubit.range(2)
     circ = cirq.Circuit(cirq.H.on(qreg[0]), cirq.CNOT.on(*qreg))
-    real = np.empty(shape=(4, 4))
+    real = np.zeros(shape=(16, 16))
     noisy_op = NoisyOperation(circ, real)
 
     assert isinstance(noisy_op.ideal_circuit, cirq.Circuit)
@@ -95,21 +95,21 @@ def test_init_with_circuit():
 
 def test_init_with_bad_types():
     ideal_ops = [cirq.H, cirq.CNOT]
-    real = np.empty(shape=(4, 4))
+    real = np.zeros(shape=(16, 16))
     with pytest.raises(ValueError, match="must be cirq.CIRCUIT_LIKE"):
         NoisyOperation(ideal_ops, real)
 
 
 def test_init_dimenension_mismatch_error():
     ideal = cirq.H
-    real = np.empty(shape=(3, 3))
+    real = np.zeros(shape=(3, 3))
     with pytest.raises(ValueError, match="has shape"):
         NoisyOperation(ideal, real)
 
 
 def test_add_simple():
     ideal = cirq.Circuit([cirq.X.on(cirq.NamedQubit("Q"))])
-    real = np.array([[0.01, 0.99], [0.98, 0.02]])
+    real = np.random.rand(4, 4)
 
     noisy_op1 = NoisyOperation(ideal, real)
     noisy_op2 = NoisyOperation(ideal, real)
@@ -132,7 +132,7 @@ def test_add_simple():
     ),
 )
 def test_on_each_single_qubit(qreg):
-    real = np.array([[0.01, 0.99], [0.98, 0.02]])
+    real = np.zeros(shape=(4, 4))
     noisy_ops = NoisyOperation.on_each(cirq.X, real, qubits=qreg)
 
     assert len(noisy_ops) == len(qreg)
@@ -152,14 +152,7 @@ def test_on_each_single_qubit(qreg):
     ),
 )
 def test_on_each_multiple_qubits(qubits):
-    real_cnot = np.array(
-        [
-            [0.99, 0, 0.01, 0.01],
-            [0.01, 0.97, 0, 0.02],
-            [0.01, 0, 0.03, 0.98],
-            [0.02, 0.01, 0.95, 0],
-        ]
-    )
+    real_cnot = np.zeros(shape=(16, 16))
     noisy_ops = NoisyOperation.on_each(cirq.CNOT, real_cnot, qubits=qubits)
     assert len(noisy_ops) == 2
 
@@ -170,14 +163,7 @@ def test_on_each_multiple_qubits(qubits):
 
 
 def test_on_each_multiple_qubits_bad_qubits_shape():
-    real_cnot = np.array(
-        [
-            [0.99, 0, 0.01, 0.01],
-            [0.01, 0.97, 0, 0.02],
-            [0.01, 0, 0.03, 0.98],
-            [0.02, 0.01, 0.95, 0],
-        ]
-    )
+    real_cnot = np.zeros(shape=(16, 16))
     qubits = [cirq.LineQubit.range(3)]
     with pytest.raises(
         ValueError, match="Number of qubits in each register should be"
@@ -189,7 +175,7 @@ def test_on_each_multiple_qubits_bad_qubits_shape():
     "qubit", (cirq.NamedQubit("New qubit"), cirq.GridQubit(2, 3))
 )
 def test_transform_qubits_single_qubit(qubit):
-    real = np.empty(shape=(2, 2))
+    real = np.zeros(shape=(4, 4))
     gate = cirq.H
     noisy_op = NoisyOperation(gate, real)
 
@@ -202,7 +188,7 @@ def test_transform_qubits_single_qubit(qubit):
     "qubits", (cirq.LineQubit.range(4, 6), cirq.GridQubit.rect(1, 2))
 )
 def test_transform_qubits_multiple_qubits(qubits):
-    real = np.empty(shape=(4, 4))
+    real = np.zeros(shape=(16, 16))
     qreg = [cirq.NamedQubit("Dummy 1"), cirq.NamedQubit("Dummy 2")]
     ideal = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(*qreg))
     noisy_op = NoisyOperation(ideal, real)
@@ -216,7 +202,7 @@ def test_transform_qubits_multiple_qubits(qubits):
 
 
 def test_with_qubits():
-    real = np.empty(shape=(4, 4))
+    real = np.zeros(shape=(16, 16))
     qreg = [cirq.NamedQubit("Dummy 1"), cirq.NamedQubit("Dummy 2")]
     ideal = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(*qreg))
     noisy_op = NoisyOperation(ideal, real)
@@ -233,7 +219,7 @@ def test_with_qubits():
 def test_extend_to_single_qubit():
     qbit, qreg = cirq.LineQubit(0), cirq.LineQubit.range(1, 10)
     ideal = cirq.Z.on(qbit)
-    real = np.array([[0.94, 0.05], [0.13, -0.98]])
+    real = np.zeros(shape=(4, 4))
     noisy_op_on_one_qubit = NoisyOperation(ideal, real)
 
     noisy_ops_on_all_qubits = noisy_op_on_one_qubit.extend_to(qreg)
