@@ -12,11 +12,13 @@
 
 ### Summary
 
-The focus of this release was probabilistic error cancellation (PEC), which was
-introduced in [Temme2017][temme2017] as a method for quantum error mitigation.
-We completed a first draft of the major components in the PEC workflow, and in
-the next release plan to demonstrate the full end-to-end operation of the new
-functionality.
+Factories now support "batched" executors, meaning that when a backend allows
+for the batch execution of a collection of quantum circuits, factories can now
+leverage that functionality. In addition, the main focus of this release was
+implementing probabilistic error cancellation (PEC), which was introduced in
+[Temme2017][temme2017] as a method for quantum error mitigation. We completed
+a first draft of the major components in the PEC workflow, and in the next
+release plan to demonstrate the full end-to-end operation of the new technique.
 
 [temme2017]: https://arxiv.org/abs/1612.02058
 
