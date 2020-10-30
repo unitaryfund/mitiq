@@ -18,7 +18,18 @@ from copy import deepcopy
 import pytest
 
 import cirq
-from cirq import LineQubit, Circuit, X, Y, Z, H, CNOT, S, T, MeasurementGate
+from cirq import (
+    LineQubit,
+    Circuit,
+    X,
+    Y,
+    Z,
+    H,
+    CNOT,
+    S,
+    T,
+    MeasurementGate,
+)
 
 from mitiq.utils import (
     _are_close_dict,

@@ -17,6 +17,13 @@
 - Update mitiq.about() (@rmlarose, gh-399).
 - Refresh the release process documentation (@karalekas, gh-392).
 - Redesign factories, batch runs in BatchedFactory, fix Qiskit utils tests (@rmlarose, @andreamari, gh-381).
+- Added Tensorflow Quantum executor to docs (@k-m-schultz, gh-348).
+- Fix a collection of small build & docs issues (@karalekas, gh-410).
+- Add optimal QPR decomposition for depolarizing noise (@karalekas, gh-371).
+- Add PEC basic implementation assuming a decomposition dictionary is given (@andreamari, gh-373).
+- Make tensorflow requirements optional for docs (@karalekas, gh-417).
+
+Thanks to @erkska and @k-m-schultz for their contributions to this release!
 
 ## Version 0.2.0 (October 4th, 2020)
 

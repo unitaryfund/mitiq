@@ -19,7 +19,14 @@ from typing import cast, Any, Dict
 
 import numpy as np
 
-from cirq import Circuit, CircuitDag, EigenGate, Gate, GateOperation, Moment
+from cirq import (
+    Circuit,
+    CircuitDag,
+    EigenGate,
+    Gate,
+    GateOperation,
+    Moment,
+)
 from cirq.ops.measurement_gate import MeasurementGate
 
 

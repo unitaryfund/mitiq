@@ -312,7 +312,8 @@ class Factory(ABC):
 
     @abstractmethod
     def run_classical(
-        self, scale_factor_to_expectation_value: Callable[..., float]
+        self,
+        scale_factor_to_expectation_value: Callable[..., float],
     ) -> "Factory":
         """Calls the function scale_factor_to_expectation_value at each scale
         factor of the factory, and stores the results.
@@ -334,6 +335,26 @@ class Factory(ABC):
             DeprecationWarning,
         )
         return self.run_classical(noise_to_expval)
+
+    def push(
+        self, instack_val: Dict[str, float], outstack_val: float
+    ) -> "Factory":
+        """Appends "instack_val" to "self._instack" and "outstack_val" to
+        "self._outstack". Each time a new expectation value is computed this
+        method should be used to update the internal state of the Factory.
+        """
+        if self._already_reduced:
+            warnings.warn(
+                "You are pushing new data into a factory object despite its "
+                ".reduce() method has already been called. Please make "
+                "sure your intention is to append new data to the stack of "
+                "previous data. Otherwise, the method .reset() can be used "
+                "to clean the internal state of the factory.",
+                ExtrapolationWarning,
+            )
+        self._instack.append(instack_val)
+        self._outstack.append(outstack_val)
+        return self
 
     def reset(self) -> "Factory":
         """Resets the internal state of the Factory."""

@@ -501,3 +501,92 @@ Qiskit: Hardware
 ------------------------------------------------------------
 An example of an executor that runs on IBMQ hardware is given
 :ref:`here <high_level_usage>`.
+
+.. _tfq_executors:
+
+TensorFlow Quantum Executors
+==========================================
+
+This section provides an example of how to use `TensorFlow Quantum <https://github.com/tensorflow/quantum>`_
+as an executor. Note that at the time of this writing, TensorFlow Quantum is limited to
+
+  1. ``Cirq`` ``Circuits`` that use  ``Cirq`` ``GridQubit`` instances
+  2. Unitary circuits only, so non-unitary errors need to use Monte Carlo simulations
+
+Despite this latter limitation, there is a crossover point where Monte Carlo using
+Tensorflow evaluates faster than the exact density matrix simulation using ``Cirq``.
+
+Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
+
+.. testcode::
+
+    import numpy as np
+    import sympy
+    import tensorflow as tf
+    # tensorflow-quantum 0.4.0 is unavailable on Windows
+    try:
+        import tensorflow_quantum as tfq
+        tfq_exists = True
+    except ImportError:
+        tfq_exists = False
+    from cirq import Circuit
+
+
+    def stochastic_bit_flip_simulation(circ: Circuit, p: float, num_monte_carlo: int = 100) -> float:
+        """
+        Simulates a circuit with random bit flip (X(\pi)) errors
+        Args:
+            circ: The quantum program as a cirq object
+            p: probability of an X(\pi) gate on each qubit after each gate in circ
+            num_monte_carlo: number of random trajectories to average over
+        Returns:
+            The expectation value of the 0 state as a float
+        """
+        nM = len(circ.moments)
+        nQ = len(circ.all_qubits())
+    
+        # Create array of symbolic variables and reshape to natural circuit parameterization
+        h = sympy.symbols(''.join(['h_{0} '.format(i) for i in range(nM * nQ)]), positive=True)
+        h_array = np.asarray(h).reshape((nQ, nM))
+
+        # Symbolicly add X gates to the input circuit
+        noisy_circuit = Circuit()
+        for i, moment in enumerate(circ.moments):
+            noisy_circuit.append(moment)
+            for j, q in enumerate(circ.all_qubits()):
+                noisy_circuit.append(cirq.rx(h_array[j, i]).on(q))
+        
+        # rotations will be pi w/ prob p, 0 w/ prob 1-p
+        vals = [np.reshape((np.random.rand(nQ, nM) < p) * np.pi, (1, nQ * nM)) for _ in range(num_monte_carlo)]
+        
+        # needs to be a rank 2 tensor
+        vals = np.squeeze(vals)
+        if num_monte_carlo == 1:
+            vals = [vals]
+        
+        # Instantiate tfq layer for computing state vector
+        state = tfq.layers.State()
+        
+        # Execute monte carlo sim with symbolic values specified by vals
+        out = state(noisy_circuit, symbol_names=h, symbol_values=vals).to_tensor()
+        
+        # Fancy way of computing and summing individual density operators, follwed by averaging
+        dm = tf.tensordot(tf.transpose(out), tf.math.conj(out), axes=[[1], [0]]).numpy() / num_monte_carlo
+        
+        # return measurement of 0 state
+        return np.real(dm[0, 0])
+
+.. testcode::
+    :hide:
+
+    if tfq_exists:
+        import cirq
+        from mitiq.benchmarks import randomized_benchmarking
+
+        circ = randomized_benchmarking.rb_circuits(1, [20], 1)[0]
+
+        # Need to make sure the qubits are cirq.GridQubit
+        circ=circ.transform_qubits(lambda q: cirq.GridQubit.rect(1, 1)[0])
+
+        out = stochastic_bit_flip_simulation(circ, 0.001)
+        assert 0.5 < out < 1
