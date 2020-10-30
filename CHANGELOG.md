@@ -8,7 +8,17 @@
 [//]: # " - [Bug Fix]"
 [//]: # " - Fix the bug."
 
-## Version 0.3.0 (In Development)
+## Version 0.3.0 (October 30th, 2020)
+
+### Summary
+
+The focus of this release was probabilistic error cancellation (PEC), which was
+introduced in [Temme2017][temme2017] as a method for quantum error mitigation.
+We completed a first draft of the major components in the PEC workflow, and in
+the next release plan to demonstrate the full end-to-end operation of the new
+functionality.
+
+[temme2017]: https://arxiv.org/abs/1612.02058
 
 ### All Changes
 
@@ -17,6 +27,7 @@
 - Update mitiq.about() (@rmlarose, gh-399).
 - Refresh the release process documentation (@karalekas, gh-392).
 - Redesign factories, batch runs in BatchedFactory, fix Qiskit utils tests (@rmlarose, @andreamari, gh-381).
+- Add note on batched executors to docs (@rmlarose, gh-405).
 - Added Tensorflow Quantum executor to docs (@k-m-schultz, gh-348).
 - Fix a collection of small build & docs issues (@karalekas, gh-410).
 - Add optimal QPR decomposition for depolarizing noise (@karalekas, gh-371).
