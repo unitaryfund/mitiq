@@ -21,25 +21,32 @@
 
 import numpy as np
 from typing import Tuple, List, Dict
+
+from copy import deepcopy
+
 from cirq import (
+    Circuit,
     Operation,
+    OP_TREE,
     I,
     X,
     Y,
     Z,
+    H,
     CNOT,
     LineQubit,
+    DensityMatrixSimulator,
 )
 
 # Type definition for a decomposition dictionary.
 # Keys are ideal operations.
 # Values describe the associated decompositions.
-DecoType = Dict[Operation, List[Tuple[float, List[Operation]]]]
+DecompositionDict = Dict[Operation, List[Tuple[float, List[Operation]]]]
 
 
 def _simple_pauli_deco_dict(
     base_noise: float, simplify_paulis: bool = False
-) -> DecoType:
+) -> DecompositionDict:
     """Returns a simple hard-coded decomposition
     dictionary to be used for testing and protoptyping.
 
@@ -57,7 +64,7 @@ def _simple_pauli_deco_dict(
             single Pauli. If False, Pauli sequences are not simplified.
 
     Returns:
-        deco_dict: The decomposition dictionary.
+        decomposition_dict: The decomposition dictionary.
 
     """
     # Initialize two qubits
@@ -81,10 +88,10 @@ def _simple_pauli_deco_dict(
     assert np.isclose(c_pos + 3 * c_neg, 1.0)
 
     # Single-qubit decomposition dictionary
-    deco_dict = {}
+    decomposition_dict = {}
     if simplify_paulis:
         # Hard-coded simplified gates
-        deco_dict = {
+        decomposition_dict = {
             x0: [(c_pos, [x0]), (c_neg, [i0]), (c_neg, [z0]), (c_neg, [y0])],
             y0: [(c_pos, [y0]), (c_neg, [z0]), (c_neg, [i0]), (c_neg, [x0])],
             z0: [(c_pos, [z0]), (c_neg, [y0]), (c_neg, [x0]), (c_neg, [i0])],
@@ -97,7 +104,9 @@ def _simple_pauli_deco_dict(
             for key in local_paulis:
                 key_deco_pos = [(c_pos, [key])]
                 key_deco_neg = [(c_neg, [key, op]) for op in local_paulis]
-                deco_dict[key] = key_deco_pos + key_deco_neg  # type: ignore
+                decomposition_dict[key] = (
+                    key_deco_pos + key_deco_neg  # type: ignore
+                )
 
     # Two-qubit Paulis
     xx = [x0, x1]
@@ -124,65 +133,67 @@ def _simple_pauli_deco_dict(
     for pp in double_paulis:
         cnot_decomposition.append((c_neg_neg, [cnot] + pp))  # type: ignore
 
-    deco_dict[cnot] = cnot_decomposition  # type: ignore
+    decomposition_dict[cnot] = cnot_decomposition  # type: ignore
 
-    return deco_dict  # type: ignore
+    return decomposition_dict  # type: ignore
 
 
 def get_coefficients(
-    ideal_operation: Operation, deco_dict: DecoType
+    ideal_operation: Operation, decomposition_dict: DecompositionDict
 ) -> List[float]:
     """Extracts, from the input decomposition dictionary, the decomposition
     coefficients associated to the input ideal_operation.
 
     Args:
         ideal_operation: The input ideal operation.
-        deco_dict: The input decomposition dictionary.
+        decomposition_dict: The input decomposition dictionary.
 
     Returns:
         The decomposition coefficients of the input operation.
     """
-    op_decomp = deco_dict[ideal_operation]
+    op_decomp = decomposition_dict[ideal_operation]
 
     return [coeff_and_seq[0] for coeff_and_seq in op_decomp]
 
 
 def get_imp_sequences(
-    ideal_operation: Operation, deco_dict: DecoType
+    ideal_operation: Operation, decomposition_dict: DecompositionDict
 ) -> List[List[Operation]]:
     """Extracts, from the input decomposition dictionary, the list of
     implementable sequences associated to the input ideal_operation.
 
     Args:
         ideal_operation: The input ideal operation.
-        deco_dict: The input decomposition dictionary.
+        decomposition_dict: The input decomposition dictionary.
 
     Returns:
         The list of implementable sequences.
     """
-    op_decomp = deco_dict[ideal_operation]
+    op_decomp = decomposition_dict[ideal_operation]
 
     return [coeff_and_seq[1] for coeff_and_seq in op_decomp]
 
 
-def get_one_norm(ideal_operation: Operation, deco_dict: DecoType) -> float:
+def get_one_norm(
+    ideal_operation: Operation, decomposition_dict: DecompositionDict
+) -> float:
     """Extracts, from the input decomposition dictionary, the one-norm
     (i.e. the sum of absolute values) of the the decomposition coefficients
     associated to the input ideal_operation.
 
     Args:
         ideal_operation: The input ideal operation.
-        deco_dict: The input decomposition dictionary.
+        decomposition_dict: The input decomposition dictionary.
 
     Returns:
         The one-norm of the decomposition coefficients.
     """
-    coeffs = get_coefficients(ideal_operation, deco_dict)
+    coeffs = get_coefficients(ideal_operation, decomposition_dict)
     return np.linalg.norm(coeffs, ord=1)
 
 
 def get_probabilities(
-    ideal_operation: Operation, deco_dict: DecoType
+    ideal_operation: Operation, decomposition_dict: DecompositionDict
 ) -> List[float]:
     """Evaluates, from the input decomposition dictionary, the normalized
     probability distribution associated to the input ideal_operation.
@@ -193,10 +204,79 @@ def get_probabilities(
 
     Args:
         ideal_operation: The input ideal operation.
-        deco_dict: The input decomposition dictionary.
+        decomposition_dict: The input decomposition dictionary.
 
     Returns:
         The probability distribution suitable for Monte Carlo sampling.
     """
-    coeffs = get_coefficients(ideal_operation, deco_dict)
+    coeffs = get_coefficients(ideal_operation, decomposition_dict)
     return list(np.abs(coeffs) / np.linalg.norm(coeffs, ord=1))
+
+
+def _max_ent_state_circuit(num_qubits: int) -> Circuit:
+    r"""Generates a circuit which prepares the maximally entangled state
+    |\omega\rangle = U |0\rangle  = \sum_i |i\rangle \otimes |i\rangle .
+
+    Args:
+        num_qubits: The number of qubits on which the circuit is applied.
+            It must be an even number because of the structure of a
+            maximally entangled state.
+
+    Returns:
+        The circuits which prepares the state |\omega\rangle.
+
+    Raises:
+        Value error: if num_qubits is not an even positive integer.
+    """
+
+    if not isinstance(num_qubits, int) or num_qubits % 2 or num_qubits == 0:
+        raise ValueError(
+            "The argument 'num_qubits' must be an even and positive integer."
+        )
+
+    alice_reg = LineQubit.range(num_qubits // 2)
+    bob_reg = LineQubit.range(num_qubits // 2, num_qubits)
+
+    return Circuit(
+        # Prepare alice_register in a uniform superposition
+        H.on_each(*alice_reg),
+        # Correlate alice_register with bob_register
+        [CNOT.on(alice_reg[i], bob_reg[i]) for i in range(num_qubits // 2)],
+    )
+
+
+def _circuit_to_choi(circuit: Circuit) -> np.ndarray:
+    """Returns the density matrix of the Choi state associated to the
+    input circuit.
+
+    The density matrix completely characterizes the quantum channel induced by
+    the input circuit (including the effect of noise if present).
+
+    Args:
+        circuit: The input circuit.
+    Returns:
+        The density matrix of the Choi state associated to the input circuit.
+    """
+    simulator = DensityMatrixSimulator()
+    num_qubits = len(circuit.all_qubits())
+    # Copy and remove all operations
+    full_circ = deepcopy(circuit)[0:0]
+    full_circ += _max_ent_state_circuit(2 * num_qubits)
+    full_circ += circuit
+    return simulator.simulate(full_circ).final_density_matrix  # type: ignore
+
+
+def _operation_to_choi(operation_tree: OP_TREE) -> np.ndarray:
+    """Returns the density matrix of the Choi state associated to the
+    input operation tree (e.g. a single operation or a sequence of operations).
+
+    The density matrix completely characterizes the quantum channel induced by
+    the input operation tree (including the effect of noise if present).
+
+    Args:
+        circuit: The input circuit.
+    Returns:
+        The density matrix of the Choi state associated to the input circuit.
+    """
+    circuit = Circuit(operation_tree)
+    return _circuit_to_choi(circuit)

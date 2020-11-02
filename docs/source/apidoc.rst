@@ -54,6 +54,29 @@ Qiskit Utils
 .. automodule:: mitiq.mitiq_qiskit.qiskit_utils
    :members:
 
+Probabilistic Error Cancellation
+--------------------------------
+
+Decomposition into Quasi-Probability Representation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.pec.decomposition.depolarizing
+   :members:
+
+Probabilistic Error Cancellation (High-Level Tools)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.pec.pec
+   :members:
+
+Sampling from a Noisy Decomposition of an Ideal Operation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.pec.sampling
+   :members:
+
+Probabilistic Error Cancellation (Utilities)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.pec.utils
+   :members:
+
 Utils
 -----
 .. automodule:: mitiq.utils
@@ -76,9 +99,3 @@ Noise Scaling: Unitary Folding
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.zne.scaling
    :members:
-
-
-
-
-
-
