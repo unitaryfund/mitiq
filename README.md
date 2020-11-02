@@ -8,7 +8,14 @@
 
 # Mitiq
 
-Mitiq is a Python toolkit for implementing error mitigation techniques on quantum computers.
+Mitiq is a Python toolkit for implementing error mitigation techniques on quantum computers. 
+
+Current quantum computers
+are noisy due to interactions with the environment, imperfect gate applications, state preparation and measurement
+errors, etc. Error mitigation seeks to reduce these effects at the software level by compiling quantum programs in 
+clever ways.
+
+Want to know more? Check out our [documentation](https://mitiq.readthedocs.io/en/latest/guide/guide-overview.html).
 
 ## Installation
 
