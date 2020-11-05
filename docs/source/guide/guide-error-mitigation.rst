@@ -7,6 +7,8 @@ About Error Mitigation
 This is intended as a primer on quantum error mitigation, providing a
 collection of up-to-date resources from the academic literature, as well as
 other external links framing this topic in the open-source software ecosystem.
+This recent review article :cite:`Endo_2020_arXiv` summarizes the theory behind many error-mitigating
+techniques.
 
 * :ref:`guide_qem_what`
 * :ref:`guide_qem_why`
@@ -222,7 +224,7 @@ A list of research articles academic resources on error mitigation:
    - Quantum imaginary time evolution, M. Motta *et al.*, *Nat. Phys.*, 2020 :cite:`Motta_2020_NatPhys`
    - Error mitigation for analog quantum simulation, J. Sun *et al.*, 2020, arXiv :cite:`Sun_2020_arXiv`
 
-- For an extensive introduction: S. Endo, *Hybrid quantum-classical algorithms and error mitigation*, PhD Thesis, 2019, Oxford University (`Link`_).
+- For an extensive introduction: S. Endo, *Hybrid quantum-classical algorithms and error mitigation*, PhD Thesis, 2019, Oxford University (`Link`_), or :cite:`Endo_2020_arXiv`.
 
 .. _Link: https://ora.ox.ac.uk/objects/uuid:6733c0f6-1b19-4d12-a899-18946aa5df85
 
