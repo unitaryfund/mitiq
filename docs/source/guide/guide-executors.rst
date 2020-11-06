@@ -230,7 +230,7 @@ real quantum hardware.
     from pyquil.gates import MEASURE, RESET, X
 
     from mitiq.mitiq_pyquil.compiler import basic_compile
-    from mitiq.mitiq_pyquil.executor import ground_state_expectation
+    from mitiq.mitiq_pyquil.pyquil_utils import ground_state_expectation
 
     # replace with qpu = get_qc("Aspen-8") to run on the Aspen-8 QPU
     qpu = get_qc("2q-pyqvm")
