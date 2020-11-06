@@ -15,12 +15,15 @@
 
 """pyQuil utility functions."""
 import numpy as np
-from pyquil import Program
+from typing import Callable
 
-# Backend and Noise simulation
-from pyquil.gates import X, Y, Z
+from pyquil import Program
+from pyquil.api import QuantumComputer
+from pyquil.gates import MEASURE, RESET, X, Y, Z
 from pyquil.noise import append_kraus_to_gate
 from pyquil.simulation.matrices import I as npI, X as npX, Y as npY, Z as npZ
+
+from mitiq.mitiq_pyquil.compiler import basic_compile
 
 
 def random_identity_circuit(depth: int) -> Program:
@@ -89,3 +92,81 @@ def add_depolarizing_noise(pq: Program, noise: float) -> Program:
     pq.define_noisy_gate("Y", [0], append_kraus_to_gate(kraus_ops, npY))
     pq.define_noisy_gate("Z", [0], append_kraus_to_gate(kraus_ops, npZ))
     return pq
+
+
+def generate_qcs_executor(
+    qc: QuantumComputer,
+    expectation_fn: Callable[[np.ndarray], float],
+    shots: int = 1000,
+    reset: bool = True,
+    debug: bool = False,
+) -> Callable[[Program], float]:
+    """Generates an executor for QCS that ingests pyQuil programs.
+
+    Args:
+        qc: The QuantumComputer object to use as backend.
+        expectation_fn: Takes in bitstring results and produces a float.
+        shots: Number of shots to take.
+        reset: Whether or not to enable active reset.
+        debug: If true, print the program after compilation.
+
+    Returns:
+        A customized executor function.
+    """
+
+    def executor(program: Program) -> float:
+        p = Program()
+
+        # add reset
+        if reset:
+            p += RESET()
+
+        # add main body program
+        p += program.copy()
+
+        # add memory declaration
+        qubits = p.get_qubits()
+        ro = p.declare("ro", "BIT", len(qubits))
+
+        # add measurements
+        for idx, q in enumerate(qubits):
+            p += MEASURE(q, ro[idx])
+
+        # add numshots
+        p.wrap_in_numshots_loop(shots)
+
+        # nativize the circuit
+        p = basic_compile(p)
+
+        # print out nativized program
+        if debug:
+            print(p)
+
+        # compile the circuit
+        b = qc.compiler.native_quil_to_executable(p)
+
+        # run the circuit, collect bitstrings
+        qc.reset()
+        results = qc.run(b)
+
+        # compute expectation value
+        return expectation_fn(results)
+
+    return executor
+
+
+def ground_state_expectation(results: np.ndarray) -> float:
+    """
+    Example expectation_fn. Computes the ground state expectation, also
+    called survival probability.
+
+    Args:
+        results: Array of bitstrings from running a quantum program.
+
+    Returns:
+        A single expectation value computed from the results.
+    """
+    num_shots = len(results)
+    return (
+        num_shots - np.count_nonzero(np.count_nonzero(results, axis=1))
+    ) / num_shots
