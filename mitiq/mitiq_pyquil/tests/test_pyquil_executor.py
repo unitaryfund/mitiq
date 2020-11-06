@@ -26,7 +26,7 @@ QVM = get_qc("2q-qvm")
 
 
 def test_ground_state_executor():
-    executor = generate_qcs_executor(QVM, ground_state_expectation, debug=True)
+    executor = generate_qcs_executor(QVM, ground_state_expectation)
     program = Program(X(0))
     assert 0.0 == executor(program)
 

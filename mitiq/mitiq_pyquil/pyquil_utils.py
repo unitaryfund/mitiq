@@ -26,50 +26,6 @@ from pyquil.simulation.matrices import I as npI, X as npX, Y as npY, Z as npZ
 from mitiq.mitiq_pyquil.compiler import basic_compile
 
 
-def random_identity_circuit(depth: int) -> Program:
-    """Returns a single-qubit identity circuit based on Pauli gates."""
-
-    # initialize a quantum circuit
-    prog = Program()
-
-    # index of the (inverting) final gate: 0=I, 1=X, 2=Y, 3=Z
-    k_inv = 0
-
-    # apply a random sequence of Pauli gates
-    for _ in range(depth):
-        # random index for the next gate: 1=X, 2=Y, 3=Z
-        k = np.random.choice([1, 2, 3])
-        # apply the Pauli gate "k"
-        if k == 1:
-            prog += X(0)
-        elif k == 2:
-            prog += Y(0)
-        elif k == 3:
-            prog += Z(0)
-
-        # update the inverse index according to
-        # the product rules of Pauli matrices k and k_inv
-        if k_inv == 0:
-            k_inv = k
-        elif k_inv == k:
-            k_inv = 0
-        else:
-            _ = [1, 2, 3]
-            _.remove(k_inv)
-            _.remove(k)
-            k_inv = _[0]
-
-    # apply the final inverse gate
-    if k_inv == 1:
-        prog += X(0)
-    elif k_inv == 2:
-        prog += Y(0)
-    elif k_inv == 3:
-        prog += Z(0)
-
-    return prog
-
-
 def add_depolarizing_noise(pq: Program, noise: float) -> Program:
     """Returns a quantum program with depolarizing channel noise.
 
