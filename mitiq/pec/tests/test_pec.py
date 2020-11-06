@@ -45,11 +45,7 @@ def executor(circuit: Circuit) -> float:
     else:
         raise ValueError("The input must be a circuit with 1 or 2 qubits.")
 
-    return noisy_simulation(
-        circuit,
-        BASE_NOISE,
-        obs,
-    )
+    return noisy_simulation(circuit, BASE_NOISE, obs,)
 
 
 # Simple identity 1-qubit circuit for testing
@@ -58,11 +54,7 @@ oneq_circ = Circuit(Z.on(q), Z.on(q))
 
 # Simple identity 2-qubit circuit for testing
 qreg = LineQubit.range(2)
-twoq_circ = Circuit(
-    Y.on(qreg[1]),
-    CNOT.on(*qreg),
-    Y.on(qreg[1]),
-)
+twoq_circ = Circuit(Y.on(qreg[1]), CNOT.on(*qreg), Y.on(qreg[1]),)
 
 
 @mark.parametrize("circuit", [oneq_circ, twoq_circ])

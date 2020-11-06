@@ -19,7 +19,7 @@ from typing import Callable
 
 from pyquil import Program
 from pyquil.api import QuantumComputer
-from pyquil.gates import MEASURE, RESET, X, Y, Z
+from pyquil.gates import MEASURE, RESET
 from pyquil.noise import append_kraus_to_gate
 from pyquil.simulation.matrices import I as npI, X as npX, Y as npY, Z as npZ
 
