@@ -15,64 +15,66 @@
 
 """Tests for zne.py with PyQuil backend."""
 import numpy as np
-from mitiq._typing import QPROGRAM
-from mitiq.zne.inference import RichardsonFactory
+
+import pyquil
+
+from mitiq import QPROGRAM
 from mitiq.zne import (
+    inference,
+    scaling,
     execute_with_zne,
     mitigate_executor,
     zne_decorator,
 )
+from mitiq.mitiq_pyquil.executor import (
+    generate_qcs_executor, ground_state_expectation
+)
 from mitiq.mitiq_pyquil.pyquil_utils import (
     random_identity_circuit,
-    measure,
-    run_program,
-    scale_noise,
 )
 
 TEST_DEPTH = 30
 
 
-def basic_executor(qp: QPROGRAM, shots: int = 500) -> float:
-    return run_program(qp, shots)
+QVM = pyquil.get_qc("1q-qvm")
+QVM.qam.random_seed = 1337
+noiseless_executor = generate_qcs_executor(
+    qc=pyquil.get_qc("1q-qvm"),
+    expectation_fn=ground_state_expectation,
+    shots=10_000,
+)
 
 
 def test_run_factory():
-    rand_circ = random_identity_circuit(depth=TEST_DEPTH)
-    qp = measure(rand_circ, qid=0)
-    fac = RichardsonFactory([1.0, 2.0, 3.0])
-    fac.run(qp, basic_executor, scale_noise)
+    qp = random_identity_circuit(depth=TEST_DEPTH)
+    fac = inference.RichardsonFactory([1.0, 2.0, 3.0])
+
+    fac.run(qp, noiseless_executor, scale_noise=scaling.fold_gates_at_random)
     result = fac.reduce()
-    assert np.isclose(result, 1.0, atol=1.0e-1)
+    assert np.isclose(result, 1.0, atol=1e-5)
 
 
 def test_execute_with_zne():
-    rand_circ = random_identity_circuit(depth=TEST_DEPTH)
-    qp = measure(rand_circ, qid=0)
-    result = execute_with_zne(qp, basic_executor, None, scale_noise)
-    assert np.isclose(result, 1.0, atol=1.0e-1)
+    qp = random_identity_circuit(depth=TEST_DEPTH)
+    result = execute_with_zne(qp, noiseless_executor)
+    assert np.isclose(result, 1.0, atol=1e-5)
 
 
 def test_mitigate_executor():
-    rand_circ = random_identity_circuit(depth=TEST_DEPTH)
-    qp = measure(rand_circ, qid=0)
-    new_executor = mitigate_executor(basic_executor, None, scale_noise)
-    # bad_result is computed with native noise (scale = 1)
-    bad_result = basic_executor(scale_noise(qp, 1))
-    good_result = new_executor(qp)
-    assert not np.isclose(bad_result, 1.0, atol=1.0e-1)
-    assert np.isclose(good_result, 1.0, atol=1.0e-1)
+    qp = random_identity_circuit(depth=TEST_DEPTH)
+
+    new_executor = mitigate_executor(noiseless_executor)
+    result = new_executor(qp)
+    assert np.isclose(result, 1.0, atol=1e-5)
 
 
-@zne_decorator(None, scale_noise)
+@zne_decorator(scale_noise=scaling.fold_gates_at_random)
 def decorated_executor(qp: QPROGRAM) -> float:
-    return basic_executor(qp)
+    return noiseless_executor(qp)
 
 
 def test_zne_decorator():
-    rand_circ = random_identity_circuit(depth=TEST_DEPTH)
-    qp = measure(rand_circ, qid=0)
-    # bad_result is computed with native noise (scale = 1)
-    bad_result = basic_executor(scale_noise(qp, 1))
-    good_result = decorated_executor(qp)
-    assert not np.isclose(bad_result, 1.0, atol=1.0e-1)
-    assert np.isclose(good_result, 1.0, atol=1.0e-1)
+    qp = random_identity_circuit(depth=TEST_DEPTH)
+
+    result = decorated_executor(qp)
+    assert np.isclose(result, 1.0, atol=1e-5)
