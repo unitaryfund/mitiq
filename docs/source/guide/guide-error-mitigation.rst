@@ -84,7 +84,7 @@ In Mitiq, this technique is implemented in the module :mod:`mitiq.zne`.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Probabilistic error cancellation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Probabilistic error cancellation uses a quasi-probability representation :cite:`Temme_2017_PRL` to express an ideal quantum 
+Probabilistic error cancellation uses a quasi-probability representation :cite:`Temme_2017_PRL` to express an ideal (unitary) quantum 
 channel as a linear combination of noisy operations. Given a set of noisy but implementable operations :math:`\Omega = \{O_1, \dots, O_m\}`, an ideal unitary gate 
 can be expressed as :math:`\mathcal{G} = \sum_{\alpha} \eta_{\alpha} \mathcal{O}_\alpha = \gamma \sum_{\alpha} P(\alpha) \sigma(\alpha) \mathcal{O}_\alpha`, where
 :math:`\eta_\alpha` are real coefficients, :math:`\gamma = \sum_{\alpha} |\eta_\alpha|`, :math:`P(\alpha)=|\eta_\alpha | /\gamma` is a probability 
