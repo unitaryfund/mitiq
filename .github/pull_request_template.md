@@ -14,4 +14,3 @@ Please make sure you have finished the following tasks before requesting a revie
 - [ ] If the behavior of the code has changed or new feature has been added, please also [update the documentation](../blob/master/docs/CONTRIBUTING_DOCS.md).
 - [ ] Functions and classes have useful [Google-style](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html) docstrings and [type hints](https://www.python.org/dev/peps/pep-0484/) in the signature of the objects.
 - [ ] (Bug fix) The associated issue is referenced above using [auto-close keywords](https://help.github.com/en/articles/closing-issues-using-keywords). If the PR fixes an issue, use the keyword fix/fixes/fixed followed by the issue id. For example, if the PR fixes issue 1184, type "Fixes #1184" (without quotes).
-- [ ] The [changelog](https://github.com/unitaryfund/mitiq/blob/master/CHANGELOG.md) is updated, including author and PR number (@username, gh-xxx).
