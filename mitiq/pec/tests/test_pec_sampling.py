@@ -30,6 +30,7 @@ from cirq import (
     depolarize,
 )
 
+from mitiq.utils import _equal
 from mitiq.pec.utils import (
     _simple_pauli_deco_dict,
     DecompositionDict,
@@ -62,11 +63,56 @@ def test_sample_sequence_types(gate: Gate):
         assert norm > 1
 
 
+@mark.parametrize("seed", (1, 2, 3, 5))
+@mark.parametrize("seed_type", (int, np.random.RandomState))
+@mark.parametrize("op", [X(qreg[0]), Y(qreg[0]), Z(qreg[0]), CNOT(*qreg)])
+def test_sample_sequence_random_state(seed, seed_type, op):
+    decomposition = _simple_pauli_deco_dict(0.5)
+
+    if isinstance(seed_type, np.random.RandomState):
+        seed = np.random.RandomState(seed)
+    sequence, sign, norm = sample_sequence(
+        op, decomposition, random_state=seed
+    )
+
+    for _ in range(20):
+        if isinstance(seed_type, np.random.RandomState):
+            seed = np.random.RandomState(seed)
+        new_sequence, new_sign, new_norm = sample_sequence(
+            op, decomposition, random_state=seed
+        )
+        assert new_sequence == sequence
+        assert new_sign == sign
+        assert np.isclose(new_norm, norm)
+
+
 def test_sample_circuit_types():
     imp_circuit, sign, norm = sample_circuit(twoq_circ, DECO_DICT)
     assert isinstance(imp_circuit, Circuit)
     assert sign in {1, -1}
     assert norm > 1
+
+
+@mark.parametrize("seed", (1, 2, 3, 5))
+@mark.parametrize("seed_type", (int, np.random.RandomState))
+def test_sample_circuit_random_state(seed, seed_type):
+    decomposition = _simple_pauli_deco_dict(0.5)
+
+    if isinstance(seed_type, np.random.RandomState):
+        seed = np.random.RandomState(seed)
+    circuit, sign, norm = sample_circuit(
+        twoq_circ, decomposition, random_state=seed
+    )
+
+    for _ in range(20):
+        if isinstance(seed_type, np.random.RandomState):
+            seed = np.random.RandomState(seed)
+        new_circuit, new_sign, new_norm = sample_circuit(
+            twoq_circ, decomposition, random_state=seed
+        )
+        assert _equal(new_circuit, circuit)
+        assert new_sign == sign
+        assert np.isclose(new_norm, norm)
 
 
 def test_sample_circuit_types_trivial():
