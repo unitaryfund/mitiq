@@ -97,5 +97,5 @@ Inference and Extrapolation: Factories
 
 Noise Scaling: Unitary Folding
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. automodule:: mitiq.zne.scaling
+.. automodule:: mitiq.zne.scaling.folding
    :members:
