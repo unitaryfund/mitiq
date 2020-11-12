@@ -46,10 +46,7 @@ NOISELESS_DECO_DICT = _simple_pauli_deco_dict(0)
 
 # Simple 2-qubit circuit
 qreg = LineQubit.range(2)
-twoq_circ = Circuit(
-    X.on(qreg[0]),
-    CNOT.on(*qreg),
-)
+twoq_circ = Circuit(X.on(qreg[0]), CNOT.on(*qreg),)
 
 
 @mark.parametrize("gate", [X, Y, Z, CNOT])

@@ -79,7 +79,7 @@ def sample_sequence(
 def sample_circuit(
     ideal_circuit: Circuit,
     decomposition_dict: DecompositionDict,
-    random_state: Optional[Union[int, np.random.RandomState]] = None
+    random_state: Optional[Union[int, np.random.RandomState]] = None,
 ) -> Tuple[Circuit, int, float]:
     """Samples an implementable circuit according from the PEC decomposition
     of the input ideal circuit. Moreover it also returns the "sign" and "norm"
