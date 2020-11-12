@@ -90,7 +90,8 @@ def test_execute_with_pec_one_qubit(
 
 
 @mark.parametrize("circuit", [oneq_circ, twoq_circ])
-def test_execute_with_pec_with_different_samples(circuit: Circuit):
+@mark.parametrize("seed", (1, 2, 3))
+def test_execute_with_pec_with_different_samples(circuit: Circuit, seed):
     """Tests that, on average, the error decreases as the number of samples is
     increased.
     """
@@ -98,11 +99,19 @@ def test_execute_with_pec_with_different_samples(circuit: Circuit):
     errors_more_samples = []
     for _ in range(10):
         mitigated = execute_with_pec(
-            circuit, executor, decomposition_dict=DECO_DICT, num_samples=10
+            circuit,
+            executor,
+            decomposition_dict=DECO_DICT,
+            num_samples=10,
+            random_state=seed,
         )
         errors_few_samples.append(abs(mitigated - 1.0))
         mitigated = execute_with_pec(
-            circuit, executor, decomposition_dict=DECO_DICT, num_samples=100
+            circuit,
+            executor,
+            decomposition_dict=DECO_DICT,
+            num_samples=100,
+            random_state=seed
         )
         errors_more_samples.append(abs(mitigated - 1.0))
 
