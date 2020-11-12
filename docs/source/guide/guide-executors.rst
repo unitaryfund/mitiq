@@ -91,7 +91,7 @@ documentation `here <https://cirq.readthedocs.io/en/master/generated/cirq.PauliS
             obs: The observable to measure as a cirq.PauliString.
             shots: The number of measurements.
 
-        Returns: 
+        Returns:
             The expectation value of obs as a float.
         """
 
@@ -182,7 +182,7 @@ You can also include both noise models and finite sampling in your executor.
         """
         # add the noise
         noisy = circ.with_noise(depolarize(p=noise))
-        
+
         # Do the sampling
         psum = cirq.PauliSumCollector(noisy, obs, samples_per_term=shots)
         psum.collect(sampler=cirq.DensityMatrixSimulator())
@@ -355,7 +355,7 @@ behind how this example is available `here <https://quantumcomputing.stackexchan
             obs: The observable to measure as a NumPy array.
             shots: The number of measurements.
 
-        Returns: 
+        Returns:
             The expectation value of obs as a float.
 
         """
@@ -436,7 +436,7 @@ This executor can be used for noisy depolarizing simulation.
             noise: The depolarizing noise strength as a float, i.e. 0.001 is 0.1%.
             shots: The number of measurements.
 
-        Returns: 
+        Returns:
             The expectation value of obs as a float.
         """
         if len(circ.clbits) > 0:
@@ -522,9 +522,9 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
 
     import numpy as np
     import sympy
-    import tensorflow as tf
     # tensorflow-quantum 0.4.0 is unavailable on Windows
     try:
+        import tensorflow as tf
         import tensorflow_quantum as tfq
         tfq_exists = True
     except ImportError:
@@ -544,7 +544,7 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
         """
         nM = len(circ.moments)
         nQ = len(circ.all_qubits())
-    
+
         # Create array of symbolic variables and reshape to natural circuit parameterization
         h = sympy.symbols(''.join(['h_{0} '.format(i) for i in range(nM * nQ)]), positive=True)
         h_array = np.asarray(h).reshape((nQ, nM))
@@ -555,24 +555,24 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
             noisy_circuit.append(moment)
             for j, q in enumerate(circ.all_qubits()):
                 noisy_circuit.append(cirq.rx(h_array[j, i]).on(q))
-        
+
         # rotations will be pi w/ prob p, 0 w/ prob 1-p
         vals = [np.reshape((np.random.rand(nQ, nM) < p) * np.pi, (1, nQ * nM)) for _ in range(num_monte_carlo)]
-        
+
         # needs to be a rank 2 tensor
         vals = np.squeeze(vals)
         if num_monte_carlo == 1:
             vals = [vals]
-        
+
         # Instantiate tfq layer for computing state vector
         state = tfq.layers.State()
-        
+
         # Execute monte carlo sim with symbolic values specified by vals
         out = state(noisy_circuit, symbol_names=h, symbol_values=vals).to_tensor()
-        
+
         # Fancy way of computing and summing individual density operators, follwed by averaging
         dm = tf.tensordot(tf.transpose(out), tf.math.conj(out), axes=[[1], [0]]).numpy() / num_monte_carlo
-        
+
         # return measurement of 0 state
         return np.real(dm[0, 0])
 
