@@ -20,34 +20,8 @@ from typing import Callable
 from pyquil import Program
 from pyquil.api import QuantumComputer
 from pyquil.gates import MEASURE, RESET
-from pyquil.noise import append_kraus_to_gate
-from pyquil.simulation.matrices import I as npI, X as npX, Y as npY, Z as npZ
 
 from mitiq.mitiq_pyquil.compiler import basic_compile
-
-
-def add_depolarizing_noise(pq: Program, noise: float) -> Program:
-    """Returns a quantum program with depolarizing channel noise.
-
-    Args:
-        pq: Quantum program as :class:`~pyquil.quil.Program`.
-        noise: Noise constant for depolarizing channel.
-
-    Returns:
-        pq: Quantum program with added noise.
-    """
-    pq = pq.copy()
-    # apply depolarizing noise to all gates
-    kraus_ops = [
-        np.sqrt(1 - noise) * npI,
-        np.sqrt(noise / 3) * npX,
-        np.sqrt(noise / 3) * npY,
-        np.sqrt(noise / 3) * npZ,
-    ]
-    pq.define_noisy_gate("X", [0], append_kraus_to_gate(kraus_ops, npX))
-    pq.define_noisy_gate("Y", [0], append_kraus_to_gate(kraus_ops, npY))
-    pq.define_noisy_gate("Z", [0], append_kraus_to_gate(kraus_ops, npZ))
-    return pq
 
 
 def generate_qcs_executor(
