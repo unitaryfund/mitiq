@@ -793,3 +793,27 @@ def test_execute_with_zne_fit_fail(factory):
         factory([1.0, 2.0]).get_zero_noise_limit()
     with raises(ValueError, match="Data is either ill-defined or not enough"):
         factory([1.0, 2.0]).get_extrapolation_curve()
+
+
+def test_get_methods_of_factories():
+    """Tests the get methods of a factory"""
+    x_values = [0, 0, 1]
+    y_values = [-1, 1, 0]
+    fac = LinearFactory(x_values)
+    fac._instack = [
+        {"scale_factor": 0},
+        {"scale_factor": 0},
+        {"scale_factor": 1},
+    ]
+    fac._outstack = y_values
+    zne_reduce = fac.reduce()
+
+    assert np.allclose(fac.get_expectation_values(), y_values)
+    assert np.allclose(fac.get_extrapolation_curve()(0.0), zne_reduce)
+    assert np.allclose(fac.get_optimal_parameters(), [0.0, 0.0])
+    assert np.allclose(
+        fac.get_parameters_covariance(), [[3.0, -1.0], [-1.0, 1.0]]
+    )
+    assert np.allclose(fac.get_scale_factors(), x_values)
+    assert np.allclose(fac.get_zero_noise_limit(), zne_reduce)
+    assert np.allclose(fac.get_zero_noise_limit_error(), 1.0)
