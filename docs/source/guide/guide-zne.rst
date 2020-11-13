@@ -445,7 +445,7 @@ For example:
         pass
 
 
-A :class::`.BatchedFactory`` will detect from the return annotation if an executor is batched or not. If no annotation
+A :class::`.BatchedFactory` will detect from the return annotation if an executor is batched or not. If no annotation
 is provided, the executor is assumed to be sequential (i.e., not batched).
 
 ---------------------------------------------
@@ -479,7 +479,6 @@ corresponds to a statistical inference based on the measured data.
    print(f"Error with poly_fac: {abs(exact - zne_expval):.4f}") 
 
 .. testoutput::
-   :skipif: true
    
    Error with linear_fac: 0.0291
    Error with richardson_fac: 0.0070
@@ -522,21 +521,20 @@ There are also a number of methods to get additional information calculated by t
    from mitiq.zne.inference import LinearFactory
    from mitiq.zne.zne import execute_with_zne
 
-   linear_fac = LinearFactory(scale_factors=[1.0, 2.0, 3.0])
-   zne_expval = execute_with_zne(circuit, executor, factory=linear_fac)
-   print(f"Error on Zero Noise: {linear_fac.get_zero_noise_limit_error():.4f}") 
-   print(f"Covariance of fitted model parameters: {linear_fac.get_parameters_covariance()}") 
-   print(f"Fitted model parameters: {linear_fac.get_optimal_parameters():.4f}")
-   #Curve that was fit to the data: 
-   f = linear_fac.get_extrapolation_curve()
+   fac = LinearFactory(scale_factors=[1.0, 2.0, 3.0])
+   zne_expval = execute_with_zne(circuit, executor, factory=fac)
+   print(f"Error on Zero Noise: {fac.get_zero_noise_limit_error():.4f}") 
+   print(f"Covariance of fitted model parameters: {np.round(fac.get_parameters_covariance(), 5)}") 
+   print(f"Fitted model parameters: {np.round(fac.get_optimal_parameters(), 4)}")
+   # Curve that was fit to the data: 
+   # f = fac.get_extrapolation_curve()
 
 .. testoutput::
-   :skipif: true
 
-   Error on Zero Noise: 0.013761310256280792
-   Covariance of fitted model parameters: [[ 4.0580070e-05 -8.1160140e-05]
-   [-8.1160140e-05  1.8937366e-04]]
-   Fitted model parameters: [-0.08046895  0.95620809]
+   Error on Zero Noise: 0.0138
+   Covariance of fitted model parameters: [[ 4.0e-05 -8.0e-05]
+    [-8.0e-05  1.9e-04]]
+   Fitted model parameters: [-0.0805  0.9562]
 
 
 ---------------------------------------------
