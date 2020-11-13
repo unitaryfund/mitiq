@@ -32,12 +32,12 @@ from cirq import Circuit as _Circuit
 
 try:
     from pyquil import Program as _Program
-except ImportError:  # pragma: no coverage
+except ImportError:  # pragma: no cover
     _Program = _Circuit
 
 try:
     from qiskit import QuantumCircuit as _QuantumCircuit
-except ImportError:  # pragma: no coverage
+except ImportError:  # pragma: no cover
     _QuantumCircuit = _Circuit
 
 QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit]
