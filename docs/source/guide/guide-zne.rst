@@ -512,7 +512,8 @@ desired factory class (in this case initializing a factory object is unnecessary
 
    Error with PolyFactory.extrapolate method: 0.0110
 
-Both the zero-noise value and the optimal parameters of the fit can be returned from `extrapolate` by specifying `full_output = True`.
+Beyond the zero-noise limit, additional information about the fit (e.g., optimal parameters, errors, extrapolation curve, etc.) 
+can be returned from `extrapolate` by specifying `full_output = True`.
 
 There are also a number of methods to get additional information calculated by the factory class:
 
@@ -522,19 +523,21 @@ There are also a number of methods to get additional information calculated by t
    from mitiq.zne.zne import execute_with_zne
 
    fac = LinearFactory(scale_factors=[1.0, 2.0, 3.0])
-   zne_expval = execute_with_zne(circuit, executor, factory=fac)
-   print(f"Error on Zero Noise: {fac.get_zero_noise_limit_error():.4f}") 
+   _ = execute_with_zne(circuit, executor, factory=fac)
+   print(f"Zero-noise limit: {fac.get_zero_noise_limit():.4f}") 
+   print(f"Fit error on zero-noise limit: {fac.get_zero_noise_limit_error():.4f}") 
    print(f"Covariance of fitted model parameters: {np.round(fac.get_parameters_covariance(), 5)}") 
    print(f"Fitted model parameters: {np.round(fac.get_optimal_parameters(), 4)}")
-   # Curve that was fit to the data: 
-   # f = fac.get_extrapolation_curve()
+   print(f"Extrapolation curve evaluated at zero: {fac.get_extrapolation_curve()(0):.4f}")
 
 .. testoutput::
 
-   Error on Zero Noise: 0.0138
+   Zero-noise limit: 0.9562
+   Fit error on zero-noise limit: 0.0138
    Covariance of fitted model parameters: [[ 4.0e-05 -8.0e-05]
     [-8.0e-05  1.9e-04]]
    Fitted model parameters: [-0.0805  0.9562]
+   Extrapolation curve evaluated at zero: 0.9562
 
 
 ---------------------------------------------
