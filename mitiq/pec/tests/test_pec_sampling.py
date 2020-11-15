@@ -62,7 +62,9 @@ def test_sample_sequence_types(gate: Gate):
 
 @pytest.mark.parametrize("seed", (1, 2, 3, 5))
 @pytest.mark.parametrize("seed_type", (int, np.random.RandomState))
-@pytest.mark.parametrize("op", [X(qreg[0]), Y(qreg[0]), Z(qreg[0]), CNOT(*qreg)])
+@pytest.mark.parametrize(
+    "op", [X(qreg[0]), Y(qreg[0]), Z(qreg[0]), CNOT(*qreg)]
+)
 def test_sample_sequence_random_state(seed, seed_type, op):
     decomposition = _simple_pauli_deco_dict(0.5)
 
