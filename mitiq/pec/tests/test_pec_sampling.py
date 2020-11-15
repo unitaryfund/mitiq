@@ -15,7 +15,7 @@
 
 """Tests related to mitiq.pec.sampling functions."""
 
-from pytest import mark
+import pytest
 import numpy as np
 
 from cirq import (
@@ -49,7 +49,7 @@ qreg = LineQubit.range(2)
 twoq_circ = Circuit(X.on(qreg[0]), CNOT.on(*qreg),)
 
 
-@mark.parametrize("gate", [X, Y, Z, CNOT])
+@pytest.mark.parametrize("gate", [X, Y, Z, CNOT])
 def test_sample_sequence_types(gate: Gate):
     num_qubits = gate.num_qubits()
     qreg = LineQubit.range(num_qubits)
@@ -60,9 +60,9 @@ def test_sample_sequence_types(gate: Gate):
         assert norm > 1
 
 
-@mark.parametrize("seed", (1, 2, 3, 5))
-@mark.parametrize("seed_type", (int, np.random.RandomState))
-@mark.parametrize("op", [X(qreg[0]), Y(qreg[0]), Z(qreg[0]), CNOT(*qreg)])
+@pytest.mark.parametrize("seed", (1, 2, 3, 5))
+@pytest.mark.parametrize("seed_type", (int, np.random.RandomState))
+@pytest.mark.parametrize("op", [X(qreg[0]), Y(qreg[0]), Z(qreg[0]), CNOT(*qreg)])
 def test_sample_sequence_random_state(seed, seed_type, op):
     decomposition = _simple_pauli_deco_dict(0.5)
 
@@ -90,8 +90,8 @@ def test_sample_circuit_types():
     assert norm > 1
 
 
-@mark.parametrize("seed", (1, 2, 3, 5))
-@mark.parametrize("seed_type", (int, np.random.RandomState))
+@pytest.mark.parametrize("seed", (1, 2, 3, 5))
+@pytest.mark.parametrize("seed_type", (int, np.random.RandomState))
 def test_sample_circuit_random_state(seed, seed_type):
     decomposition = _simple_pauli_deco_dict(0.5)
 
@@ -112,6 +112,11 @@ def test_sample_circuit_random_state(seed, seed_type):
         assert np.isclose(new_norm, norm)
 
 
+def test_sample_sequence_bad_random_state():
+    with pytest.raises(ValueError, match="Bad type for random_state."):
+        sample_sequence(X(qreg[0]), DECO_DICT, random_state="")
+
+
 def test_sample_circuit_types_trivial():
     imp_circuit, sign, norm = sample_circuit(twoq_circ, NOISELESS_DECO_DICT)
     assert imp_circuit == twoq_circ
@@ -119,7 +124,7 @@ def test_sample_circuit_types_trivial():
     assert np.isclose(norm, 1)
 
 
-@mark.parametrize("gate", [Y, CNOT])
+@pytest.mark.parametrize("gate", [Y, CNOT])
 def test_sample_sequence_choi(gate: Gate):
     """Tests the sample_sequence by comparing the exact Choi matrices."""
     qreg = LineQubit.range(gate.num_qubits())
@@ -142,7 +147,7 @@ def test_sample_sequence_choi(gate: Gate):
     assert np.allclose(ideal_choi, choi_pec_estimate, atol=0.05)
 
 
-@mark.parametrize("decomposition_dict", [DECO_DICT, DECO_DICT_SIMP])
+@pytest.mark.parametrize("decomposition_dict", [DECO_DICT, DECO_DICT_SIMP])
 def test_sample_circuit_choi(decomposition_dict: DecompositionDict):
     """Tests the sample_circuit by comparing the exact Choi matrices."""
     ideal_choi = _circuit_to_choi(twoq_circ)

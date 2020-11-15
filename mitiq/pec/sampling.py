@@ -50,7 +50,7 @@ def sample_sequence(
         sign: The sign associated to sampled sequence.
         norm: The one norm of the decomposition coefficients.
     """
-    if not random_state:
+    if random_state is None:
         rng = np.random
     else:
         if isinstance(random_state, int):
