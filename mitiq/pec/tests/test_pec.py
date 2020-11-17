@@ -45,11 +45,7 @@ def executor(circuit: Circuit) -> float:
     else:
         raise ValueError("The input must be a circuit with 1 or 2 qubits.")
 
-    return noisy_simulation(
-        circuit,
-        BASE_NOISE,
-        obs,
-    )
+    return noisy_simulation(circuit, BASE_NOISE, obs,)
 
 
 # Simple identity 1-qubit circuit for testing
@@ -58,11 +54,7 @@ oneq_circ = Circuit(Z.on(q), Z.on(q))
 
 # Simple identity 2-qubit circuit for testing
 qreg = LineQubit.range(2)
-twoq_circ = Circuit(
-    Y.on(qreg[1]),
-    CNOT.on(*qreg),
-    Y.on(qreg[1]),
-)
+twoq_circ = Circuit(Y.on(qreg[1]), CNOT.on(*qreg), Y.on(qreg[1]),)
 
 
 @mark.parametrize("circuit", [oneq_circ, twoq_circ])
@@ -90,7 +82,8 @@ def test_execute_with_pec_one_qubit(
 
 
 @mark.parametrize("circuit", [oneq_circ, twoq_circ])
-def test_execute_with_pec_with_different_samples(circuit: Circuit):
+@mark.parametrize("seed", (1, 2, 3))
+def test_execute_with_pec_with_different_samples(circuit: Circuit, seed):
     """Tests that, on average, the error decreases as the number of samples is
     increased.
     """
@@ -98,11 +91,19 @@ def test_execute_with_pec_with_different_samples(circuit: Circuit):
     errors_more_samples = []
     for _ in range(10):
         mitigated = execute_with_pec(
-            circuit, executor, decomposition_dict=DECO_DICT, num_samples=10
+            circuit,
+            executor,
+            decomposition_dict=DECO_DICT,
+            num_samples=10,
+            random_state=seed,
         )
         errors_few_samples.append(abs(mitigated - 1.0))
         mitigated = execute_with_pec(
-            circuit, executor, decomposition_dict=DECO_DICT, num_samples=100
+            circuit,
+            executor,
+            decomposition_dict=DECO_DICT,
+            num_samples=100,
+            random_state=seed,
         )
         errors_more_samples.append(abs(mitigated - 1.0))
 

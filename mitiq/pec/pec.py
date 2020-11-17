@@ -27,6 +27,7 @@ def execute_with_pec(
     executor: Callable[[QPROGRAM], float],
     decomposition_dict: DecompositionDict,
     num_samples: Optional[int] = None,
+    random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
 ) -> Union[float, Tuple[float, float]]:
     """Evaluates the expectation value associated to the input circuit
@@ -53,6 +54,7 @@ def execute_with_pec(
             of the quasi-probability representation of the input circuit.
             Note: the latter feature is not yet implemented and num_samples
             is just set to 1000 if not specified.
+        random_state: Seed for sampling circuits.
         full_output: If False only the average PEC value is returned.
             If True an estimate of the associated error is returned too.
 
@@ -91,7 +93,7 @@ def execute_with_pec(
     for _ in range(num_samples):
         # Note: the norm is the same for each sample.
         sampled_circuit, sign, norm = sample_circuit(
-            circuit, decomposition_dict
+            circuit, decomposition_dict, random_state
         )
         sampled_circuits.append(sampled_circuit)
         signs.append(sign)
