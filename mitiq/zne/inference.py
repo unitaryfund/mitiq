@@ -330,6 +330,55 @@ class Factory(ABC):
         self._instack.append(instack_val)
         self._outstack.append(outstack_val)
         return self
+    
+    def plot_data(self) -> Figure:
+        """Returns a figure which is a scatter plot of (x, y) data where x are
+        scale factors at which expectation values have been computed, and y are
+        the associated expectation values.
+
+        Returns:
+            fig: A 2D scatter plot described above.
+        """
+        fig = plt.figure(figsize=(7, 5))
+        ax = plt.gca()
+        plt.plot(
+            self.get_scale_factors(),
+            self.get_expectation_values(),
+            "o",
+            markersize=10,
+            markeredgecolor="black",
+            alpha=0.8,
+            label="Data",
+        )
+        ax.grid(True)
+        plt.xlabel("Noise scale factor")
+        plt.ylabel("Observable value")
+        return fig
+
+    def plot_fit(self) -> Figure:
+        """Returns a figure which plots the experimental data as well as the
+        best fit curve.
+
+        Returns:
+            fig: A figure which plots the best fit curve as well as the data.
+        """
+        fig = self.plot_data()
+
+        smooth_scale_factors = np.linspace(
+            0, self.get_scale_factors()[-1], 20
+        )
+        smooth_expectations = self.get_extrapolation_curve()(smooth_scale_factors)
+
+        fig.axes[0].plot(
+            smooth_scale_factors,
+            smooth_expectations,
+            "--",
+            lw=2,
+            color="black",
+            label="Best fit",
+        )
+
+        return fig
 
     def reset(self) -> "Factory":
         """Resets the internal state of the Factory."""
@@ -585,285 +634,6 @@ class BatchedFactory(Factory, ABC):
             self._scale_factors, other._scale_factors
         )
 
-
-class AdaptiveFactory(Factory, ABC):
-    """Abstract class designed to adaptively produce a new noise scaling
-    parameter based on a historical stack of previous noise scale parameters
-    ("self._instack") and previously estimated expectation values
-    ("self._outstack").
-
-    Specific zero-noise extrapolation algorithms which are adaptive are derived
-    from this class.
-    """
-
-    def plot_data(self) -> Figure:
-        """Returns a figure which is a scatter plot of (x, y) data where x are
-        scale factors at which expectation values have been computed, and y are
-        the associated expectation values.
-
-        Returns:
-            fig: A 2D scatter plot described above.
-        """
-        fig = plt.figure(figsize=(7, 5))
-        plt.plot(
-            self.get_scale_factors(),
-            self.get_expectation_values(),
-            "--o",
-            markersize=10,
-            markeredgecolor="black",
-            alpha=0.8,
-            label="Data",
-        )
-        plt.xlabel("Noise scale factor")
-        plt.ylabel("Observable value")
-        return fig
-
-    def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, Factory):
-            return False
-        if self._already_reduced != other._already_reduced:
-            return False
-        if len(self._instack) != len(other._instack):
-            return False
-        for dict_a, dict_b in zip(self._instack, other._instack):
-            if not _are_close_dict(dict_a, dict_b):
-                return False
-        return np.allclose(self._outstack, other._outstack)
-
-
-class BatchedFactory(Factory, ABC):
-    """Abstract class of a non-adaptive Factory initialized with a
-    pre-determined set of scale factors.
-
-    Specific (non-adaptive) extrapolation algorithms are derived from this
-    class by defining the `reduce` method.
-    """
-
-    def __init__(
-        self,
-        scale_factors: Sequence[float],
-        shot_list: Optional[List[int]] = None,
-    ) -> None:
-        """Constructs a BatchedFactory.
-
-        Args:
-            scale_factors: Sequence of noise scale factors at which expectation
-                values should be measured.
-            shot_list: Optional sequence of integers corresponding to the
-                number of samples taken for each expectation value. If this
-                argument is explicitly passed to the factory, it must have the
-                same length of scale_factors and the executor function must
-                accept "shots" as a valid keyword argument.
-
-        Raises:
-            ValueError: If the number of scale factors is less than 2.
-            TypeError: If shot_list is provided and has any non-integer values.
-        """
-        if len(scale_factors) < 2:
-            raise ValueError("At least 2 scale factors are necessary.")
-
-        if shot_list and (
-            not isinstance(shot_list, Sequence)
-            or not all([isinstance(shots, int) for shots in shot_list])
-        ):
-            raise TypeError(
-                "The optional argument shot_list must be None "
-                "or a valid iterator of integers."
-            )
-        if shot_list and (len(scale_factors) != len(shot_list)):
-            raise IndexError(
-                "The arguments scale_factors and shot_list"
-                " must have the same length."
-                f" But len(scale_factors) is {len(scale_factors)}"
-                f" and len(shot_list) is {len(shot_list)}."
-            )
-
-        self._scale_factors = scale_factors
-        self._shot_list = shot_list
-
-        super(BatchedFactory, self).__init__()
-
-    @staticmethod
-    def _is_executor_batched(
-        executor: Union[Callable[..., float], Callable[..., List[float]]],
-    ) -> bool:
-        """Returns True if the input function is recognized as a "batched
-        executor".
-
-        The executor is detected as "batched" only if it is annotated with
-        a return type that is one of the following:
-            * Iterable[float]
-            * List[float]
-            * Sequence[float]
-            * Tuple[float]
-            * numpy.ndarray
-
-        Args:
-            executor: A "single executor" (1) or a "batched executor" (2).
-                (1) A function which inputs a single circuit and outputs a
-                single expectation value of interest.
-                (2) A function which inputs a list of circuits and outputs a
-                list of expectation values (one for each circuit).
-
-        Returns: True if the executor is detected as batched, False otherwise.
-        """
-        executor_annotation = inspect.getfullargspec(executor).annotations
-        return executor_annotation.get("return") in (
-            List[float],
-            Sequence[float],
-            Tuple[float],
-            Iterable[float],
-            np.ndarray,
-        )
-
-    def run(
-        self,
-        qp: QPROGRAM,
-        executor: Union[Callable[..., float], Callable[..., List[float]]],
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
-        num_to_average: int = 1,
-    ) -> "BatchedFactory":
-        """Computes the expectation values at each scale factor and stores them
-        in the factory. If the executor returns a single expectation value, the
-        circuits are run sequentially. If the executor is batched and returns
-        a list of expectation values (one for each circuit), then the circuits
-        are sent to the backend as a single job. To detect if an executor is
-        batched, it must be annotated with a return type that is one of the
-        following:
-
-            * Iterable[float]
-            * List[float]
-            * Sequence[float]
-            * Tuple[float]
-            * numpy.ndarray
-
-        Args:
-            qp: Quantum circuit to run.
-            executor: A "single executor" (1) or a "batched executor" (2).
-                (1) A function which inputs a single circuit and outputs a
-                single expectation value of interest.
-                (2) A function which inputs a list of circuits and outputs a
-                list of expectation values (one for each circuit). A batched
-                executor can also take an optional "kwargs_list" argument to
-                set a list of keyword arguments (one for each circuit). This
-                is necessary only if the factory is initialized using the
-                optional "shot_list" parameter.
-
-            scale_noise: Noise scaling function.
-            num_to_average: The number of circuits executed for each noise
-                scale factor. This parameter can be used to increase the
-                precision of the "executor" or to average the effect of a
-                non-deterministic "scale_noise" function.
-        """
-        self.reset()
-        self._batch_populate_instack()
-
-        # Get all noise-scaled circuits to run
-        to_run = self._generate_circuits(qp, scale_noise, num_to_average)
-
-        # Get the list of keywords associated to each circuit in "to_run"
-        kwargs_list = self._get_keyword_args(num_to_average)
-
-        if self._is_executor_batched(executor):
-            if all([kwargs == {} for kwargs in kwargs_list]):
-                res = executor(to_run)
-            else:
-                res = executor(to_run, kwargs_list=kwargs_list)
-        else:
-            res = [
-                executor(circ, **kwargs)  # type: ignore
-                for circ, kwargs in zip(to_run, kwargs_list)
-            ]
-
-        # Reshape "res" to have "num_to_average" columns
-        res = np.array(res).reshape((-1, num_to_average))
-
-        # Average the "num_to_average" columns
-        self._outstack = np.average(res, axis=1)
-
-        return self
-
-    def run_classical(
-        self, scale_factor_to_expectation_value: Callable[..., float]
-    ) -> "BatchedFactory":
-        """Computes expectation values by calling the input function at each
-        scale factor.
-
-        Args:
-            scale_factor_to_expectation_value: Function which inputs a scale
-                factor (float) and outputs the expectation value at this scale
-                factor. This is a classical analogue to what a quantum computer
-                would do provided a circuit, noise scaling method, and scale
-                factor.
-        """
-        self.reset()
-        self._batch_populate_instack()
-        kwargs_list = self._get_keyword_args(num_to_average=1)
-
-        self._outstack = [
-            scale_factor_to_expectation_value(scale_factor, **kwargs)
-            for scale_factor, kwargs in zip(self._scale_factors, kwargs_list)
-        ]
-
-        return self
-
-    def _generate_circuits(
-        self,
-        circuit: QPROGRAM,
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
-        num_to_average: int = 1,
-    ) -> List[QPROGRAM]:
-        """Returns all noise-scaled circuits to run.
-
-        Args:
-            circuit: Base circuit to scale noise in.
-            scale_noise: Noise scaling function.
-            num_to_average: Number of times to call scale_noise at each scale
-                factor.
-        """
-        to_run = []
-        for scale_factor in self.get_scale_factors():
-            for _ in range(num_to_average):
-                to_run.append(scale_noise(circuit, scale_factor))
-        return to_run
-
-    def _batch_populate_instack(self) -> None:
-        """Populates the instack with all computed values."""
-        if self._shot_list:
-            self._instack = [
-                {"scale_factor": scale, "shots": shots}
-                for scale, shots in zip(self._scale_factors, self._shot_list)
-            ]
-        else:
-            self._instack = [
-                {"scale_factor": scale} for scale in self._scale_factors
-            ]
-
-    def _get_keyword_args(self, num_to_average: int) -> List[Dict[str, Any]]:
-        """Returns a list of keyword dictionaries to be used for
-        executing the circuits generated by the method "_generate_circuits".
-
-        Args:
-            num_to_average: The number of times the same keywords are used
-                for each scale factor. This should correspond to the number
-                of circuits executed for each scale factor.
-
-        Returns:
-            The output list of keyword dictionaries.
-        """
-        params = deepcopy(self._instack)
-        for d in params:
-            _ = d.pop("scale_factor")
-
-        # Repeat each keyward num_to_average times
-        return [k for k in params for _ in range(num_to_average)]
-
-    def __eq__(self, other: Any) -> bool:
-        return Factory.__eq__(self, other) and np.allclose(
-            self._scale_factors, other._scale_factors
-        )
-
-
 class AdaptiveFactory(Factory, ABC):
     """Abstract class designed to adaptively produce a new noise scaling
     parameter based on a historical stack of previous noise scale parameters
@@ -1098,31 +868,6 @@ class PolyFactory(BatchedFactory):
         )
         self._already_reduced = True
         return self._zne_limit
-
-    def plot(self) -> Figure:
-        """Returns a figure which plots the experimental data as well as the
-        best fit curve.
-
-        Returns:
-            fig: A figure which plots the best fit curve as well as the data.
-        """
-        fig = self.plot_data()
-
-        smooth_scale_factors = np.linspace(
-            self.get_scale_factors()[0], self.get_scale_factors()[-1], 20
-        )
-        best_fit = np.polyval(self.opt_params, smooth_scale_factors)
-
-        fig.axes[0].plot(
-            smooth_scale_factors,
-            best_fit,
-            "-",
-            lw=3,
-            color="black",
-            label="Best fit",
-        )
-
-        return fig
 
     def __eq__(self, other: Any) -> bool:
         return BatchedFactory.__eq__(self, other) and self.order == other.order
