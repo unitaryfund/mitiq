@@ -417,6 +417,37 @@ We can also specify the number of shots to use for each noise-scaled circuit.
 In this case the factory will pass the number of shots from the `shot_list` to the `executor`. Accordingly, the
 `executor` should support a `shots` keyword argument, otherwise the shot values will go unused.
 
+------------------------------------------------------
+Using batched executors with :class:`.BatchedFactory`s
+------------------------------------------------------
+
+As mentioned, :class:`.BatchedFactory` objects are such that all circuits to execute can be precomputed. This is in
+contrast to :class:`.AdapativeFactory` objects in which the next circuit to execute depends on the result of the previous
+circuit execution.
+
+If the quantum processor is costly to access (e.g., in a queue-based system), executing circuits sequentially can result
+in high runtimes for zero-noise extrapolation. To deal with this, all classical inference techniques which inherit from
+a :class:`.BatchedFactory` can use a "batched executor." In contrast to the previous ``executor`` which inputs a single
+circuit and outputs a single expectation value, a batched executor inputs a list of circuits and outputs a list
+of expectation values (one for each circuit).
+
+To indicate that an executor is batched, one must provide a `return annotation <https://www.python.org/dev/peps/pep-3107/>`_
+which is either a ``numpy.ndarray``, ``List[float]``, ``Tuple[float]``, ``Sequence[float]``, or ``Iterable[float]``.
+For example:
+
+
+.. testcode::
+
+    from typing import List
+    from mitiq import QPROGRAM
+
+    def batched_executor(circuits: List[QPROGRAM]) -> List[float]:
+        pass
+
+
+A :class::`.BatchedFactory` will detect from the return annotation if an executor is batched or not. If no annotation
+is provided, the executor is assumed to be sequential (i.e., not batched).
+
 ---------------------------------------------
 Directly using a factory for error mitigation
 ---------------------------------------------
@@ -437,18 +468,18 @@ corresponds to a statistical inference based on the measured data.
 
    linear_fac.run(circuit, executor, scale_noise=fold_gates_at_random)
    zne_expval = linear_fac.reduce()
-   print(f"Error with linear_fac: {abs(exact - zne_expval):.4f}")
+   print(f"Error with linear_fac: {abs(exact - zne_expval):.4f}") 
 
    richardson_fac.run(circuit, executor, scale_noise=fold_gates_at_random)
    zne_expval = richardson_fac.reduce()
-   print(f"Error with richardson_fac: {abs(exact - zne_expval):.4f}")
+   print(f"Error with richardson_fac: {abs(exact - zne_expval):.4f}") 
 
    poly_fac.run(circuit, executor, scale_noise=fold_gates_at_random)
    zne_expval = poly_fac.reduce()
-   print(f"Error with poly_fac: {abs(exact - zne_expval):.4f}")
+   print(f"Error with poly_fac: {abs(exact - zne_expval):.4f}") 
 
 .. testoutput::
-
+   
    Error with linear_fac: 0.0291
    Error with richardson_fac: 0.0070
    Error with poly_fac: 0.0110
@@ -481,7 +512,33 @@ desired factory class (in this case initializing a factory object is unnecessary
 
    Error with PolyFactory.extrapolate method: 0.0110
 
-Both the zero-noise value and the optimal parameters of the fit can be returned from `extrapolate` by specifying `full_output = True`.
+Beyond the zero-noise limit, additional information about the fit (e.g., optimal parameters, errors, extrapolation curve, etc.) 
+can be returned from `extrapolate` by specifying `full_output = True`.
+
+There are also a number of methods to get additional information calculated by the factory class:
+
+.. testcode::
+
+   from mitiq.zne.inference import LinearFactory
+   from mitiq.zne.zne import execute_with_zne
+
+   fac = LinearFactory(scale_factors=[1.0, 2.0, 3.0])
+   _ = execute_with_zne(circuit, executor, factory=fac)
+   print(f"Zero-noise limit: {fac.get_zero_noise_limit():.4f}") 
+   print(f"Fit error on zero-noise limit: {fac.get_zero_noise_limit_error():.4f}") 
+   print(f"Covariance of fitted model parameters: {np.round(fac.get_parameters_covariance(), 5)}") 
+   print(f"Fitted model parameters: {np.round(fac.get_optimal_parameters(), 4)}")
+   print(f"Extrapolation curve evaluated at zero: {fac.get_extrapolation_curve()(0):.4f}")
+
+.. testoutput::
+
+   Zero-noise limit: 0.9562
+   Fit error on zero-noise limit: 0.0138
+   Covariance of fitted model parameters: [[ 4.0e-05 -8.0e-05]
+    [-8.0e-05  1.9e-04]]
+   Fitted model parameters: [-0.0805  0.9562]
+   Extrapolation curve evaluated at zero: 0.9562
+
 
 ---------------------------------------------
 Advanced usage of a factory
@@ -632,13 +689,13 @@ and clips the result if it falls outside its physical domain.
          Returns:
             The clipped extrapolation to the zero-noise limit.
          """
-         # Fit a line and get the intercept
-         _, intercept = mitiq_polyfit(
+         # Fit a line and get the optimal parameters (slope, intercept)
+         opt_params, _ = mitiq_polyfit(
             self.get_scale_factors(), self.get_expectation_values(), deg=1
         )
 
          # Return the clipped zero-noise extrapolation.
-         return np.clip(intercept, self.min_expval, self.max_expval)
+         return np.clip(opt_params[-1], self.min_expval, self.max_expval)
 
 .. testcleanup::
 

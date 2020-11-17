@@ -58,12 +58,7 @@ def rb_circuits(
         qubit1 = LineQubit(qid0)
         if n_qubits == 1:
             rb_circuits = [
-                _random_single_q_clifford(
-                    qubit1,  # type: ignore
-                    num,
-                    C1,
-                    CFD_MAT_1Q,
-                )
+                _random_single_q_clifford(qubit1, num, C1, CFD_MAT_1Q,)
                 for _ in range(trials)
             ]
         elif n_qubits == 2:

@@ -4,7 +4,7 @@
 Defining Hamiltonians as Linear Combinations of Pauli Strings
 *************************************************************
 
-This tutorial shows an example of using Hamiltonians defined as ``cirq.PauliSum``s or similar objects in other
+This tutorial shows an example of using Hamiltonians defined as :class:`~cirq.PauliSum` objects or similar objects in other
 supported frontends. The usage of these Hamiltonian-like objects does not change the interface with ``mitiq``, but we
 show an example for users who prefer these constructions.
 
@@ -34,7 +34,7 @@ First we import libraries for this example.
 Defining the Hamiltonian
 ########################
 
-Now we define the Hamiltonian as a ``cirq.PauliSum`` by defining the Pauli strings :math:`X_1 Z_2` and :math:`Y_1` then
+Now we define the Hamiltonian as a :class:`~cirq.PauliSum` by defining the Pauli strings :math:`X_1 Z_2` and :math:`Y_1` then
 taking a linear combination of these to create the Hamiltonian above.
 
 .. testcode:: python
@@ -57,7 +57,7 @@ By printing the Hamiltonian we see:
     >>> print(ham)
     1.500*X(0)*Z(1)-0.700*Y(1)
 
-Note that we could have created the Hamiltonian by directly defining a ``cirq.PauliSum`` with the coefficients.
+Note that we could have created the Hamiltonian by directly defining a :class:`~cirq.PauliSum` with the coefficients.
 
 
 Using the Hamiltonian in the executor
@@ -93,7 +93,7 @@ value. In the code block below, we show how to define this function and return t
         ).real
 
 This executor inputs a Hamiltonian as well as a noise value, adds noise, then uses the
-``cirq.PauliSum.expectation_from_density_matrix`` method to return the expectation value.
+:meth:`cirq.PauliSum.expectation_from_density_matrix` method to return the expectation value.
 
 The remaining interface is as usual with ``mitiq``. For the sake of example, we show an application mitigating the
 expectation value of :math:`H` with an example ansatz at different noise levels.
@@ -130,8 +130,8 @@ We now compute expectation values of :math:`H` using the ``executor`` as follows
     expvals = [executor(ansatz(gamma=np.pi), ham, p) for p in pvals]
 
 We can compute mitigated expectation values at these same noise levels by running the following. Here, we use a
-``LinearFactory`` and use the ``partial`` function to update the ``executor`` for each noise value. The latter point
-ensures ``this_executor`` has the correct signature (input circuit, output float) to use with ``execute_with_zne``.
+:class:`.LinearFactory` and use the ``partial`` function to update the ``executor`` for each noise value. The latter point
+ensures ``this_executor`` has the correct signature (input circuit, output float) to use with :func:`.execute_with_zne`.
 
 .. testcode:: python
 
@@ -172,7 +172,7 @@ As we can see, the mitigated expectation values are closer, on average, to the t
 Sampling
 ########
 
-Finally, we note that :math:`\langle H \rangle` can be estimated by sampling using the ``cirq.PauliSumCollector``. An
+Finally, we note that :math:`\langle H \rangle` can be estimated by sampling using the :class:`cirq.PauliSumCollector`. An
 example of a ``sampling_executor`` which uses this is shown below.
 
 .. testcode:: python

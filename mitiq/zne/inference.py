@@ -69,6 +69,12 @@ _EXTR_WARN = (
     " of the model."
 )
 
+DATA_MISSING_ERR = (
+    "Data is either ill-defined or not enough to evaluate the required"
+    " information. Please make sure that the 'run' and 'reduce' methods"
+    " have been called and that enough expectation values have been measured."
+)
+
 
 class ConvergenceWarning(Warning):
     """Warning raised by :class:`.Factory` objects when
@@ -83,7 +89,7 @@ def mitiq_curve_fit(
     scale_factors: Sequence[float],
     exp_values: Sequence[float],
     init_params: Optional[List[float]] = None,
-) -> List[float]:
+) -> Tuple[List[float], np.ndarray]:
     """This is a wrapping of the `scipy.optimize.curve_fit` function with
     custom errors and warnings. It is used to make a non-linear fit.
 
@@ -98,6 +104,8 @@ def mitiq_curve_fit(
 
     Returns:
         opt_params: The array of optimal parameters.
+        params_cov: The covariance matrix of the parameters.
+            If ill conditioned, params_cov may contain np.inf elements.
 
     Raises:
         ExtrapolationError: If the extrapolation fit fails.
@@ -105,7 +113,7 @@ def mitiq_curve_fit(
     """
     try:
         with warnings.catch_warnings(record=True) as warn_list:
-            opt_params, _ = curve_fit(
+            opt_params, params_cov = curve_fit(
                 ansatz, scale_factors, exp_values, p0=init_params
             )
         for warn in warn_list:
@@ -119,7 +127,7 @@ def mitiq_curve_fit(
             )
     except RuntimeError:
         raise ExtrapolationError(_EXTR_ERR) from None
-    return list(opt_params)
+    return list(opt_params), params_cov
 
 
 def mitiq_polyfit(
@@ -127,7 +135,7 @@ def mitiq_polyfit(
     exp_values: Sequence[float],
     deg: int,
     weights: Optional[Sequence[float]] = None,
-) -> List[float]:
+) -> Tuple[List[float], Union[np.ndarray, None]]:
     """This is a wrapping of the `numpy.polyfit` function with
     custom warnings. It is used to make a polynomial fit.
 
@@ -140,13 +148,23 @@ def mitiq_polyfit(
 
     Returns:
         opt_params: The array of optimal parameters.
+        params_cov: The covariance matrix of the parameters.
+            If data is not enough to estimate the covariance matrix,
+            params_cov is returned as None.
 
     Raises:
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
     """
 
     with warnings.catch_warnings(record=True) as warn_list:
-        opt_params = np.polyfit(scale_factors, exp_values, deg, w=weights)
+        try:
+            opt_params, params_cov = np.polyfit(
+                scale_factors, exp_values, deg, w=weights, cov=True
+            )
+        except (ValueError, np.linalg.LinAlgError):
+            opt_params = np.polyfit(scale_factors, exp_values, deg, w=weights)
+            params_cov = None
+
     for warn in warn_list:
         # replace RankWarning with ExtrapolationWarning
         if warn.category is RankWarning:
@@ -156,7 +174,7 @@ def mitiq_polyfit(
         warnings.warn_explicit(
             warn.message, warn.category, warn.filename, warn.lineno
         )
-    return list(opt_params)
+    return list(opt_params), params_cov
 
 
 class Factory(ABC):
@@ -179,8 +197,71 @@ class Factory(ABC):
     def __init__(self) -> None:
         self._instack: List[Dict[str, float]] = []
         self._outstack: List[float] = []
-        self.opt_params: List[float] = []
+        self._opt_params: Union[List[float], None] = None
+        self._params_cov: Union[np.ndarray, None] = None
+        self._zne_limit: Union[float, None] = None
+        self._zne_error: Union[float, None] = None
+        self._zne_curve: Union[Callable[[float], float], None] = None
         self._already_reduced = False
+
+    def get_scale_factors(self) -> np.ndarray:
+        """Returns the scale factors at which the factory has computed
+        expectation values.
+        """
+        return np.array(
+            [params.get("scale_factor") for params in self._instack]
+        )
+
+    def get_expectation_values(self) -> np.ndarray:
+        """Returns the expectation values computed by the factory."""
+        return np.array(self._outstack)
+        """Returns the optimal model parameters produced by the extrapolation
+        fit.
+        """
+        if self._opt_params is None:
+            raise ValueError(DATA_MISSING_ERR)
+        return np.array(self._opt_params)
+
+    def get_parameters_covariance(self) -> np.ndarray:
+        """Returns the covariance matrix of the model parameters produced by
+        the extrapolation fit.
+        """
+        if self._params_cov is None:
+            raise ValueError(DATA_MISSING_ERR)
+        return np.array(self._params_cov)
+
+    def get_zero_noise_limit(self) -> float:
+        """Returns the last evaluation of the zero-noise limit
+        computed by the factory. To re-evaluate
+        its value, the method 'reduce' should be called first.
+        """
+        if self._zne_limit is None:
+            raise ValueError(DATA_MISSING_ERR)
+        return self._zne_limit
+
+    def get_zero_noise_limit_error(self) -> float:
+        """Returns the extrapolation error representing the uncertainty
+        affecting the zero-noise limit. It is deduced by error propagation
+        from the covariance matrix associated to the fit parameters.
+
+        Note: this quantity is only related to the ability of the model
+            to fit the measured data. Therefore, it may underestimate the
+            actual error existing between the zero-noise limit and the
+            true ideal expectation value.
+        """
+        if self._zne_error is None:
+            raise ValueError(DATA_MISSING_ERR)
+        return self._zne_error
+
+    def get_extrapolation_curve(self) -> Callable[[float], float]:
+        """Returns the extrapolation curve, i.e., a function which
+        inputs a noise scale factor and outputs the associated expectation
+        value. This function is the solution of the regression problem
+        used to evaluate the zero-noise extrapolation.
+        """
+        if self._zne_curve is None:
+            raise ValueError(DATA_MISSING_ERR)
+        return self._zne_curve
 
     @abstractmethod
     def run(
@@ -190,12 +271,45 @@ class Factory(ABC):
         scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
         num_to_average: int = 1,
     ) -> "Factory":
+        """Calls the executor function on noise-scaled quantum circuit and
+            qp: Quantum circuit to scale noise in.
+            executor: Function which inputs a (list of) quantum circuits and
+                outputs a (list of) expectation values.
+            scale_noise: Function which inputs a quantum circuit and outputs
+                a noise-scaled quantum circuit.
+            num_to_average: Number of times the executor function is called
+                on each noise-scaled quantum circuit.
+        """
         raise NotImplementedError
 
-    @abstractmethod
     def reduce(self) -> float:
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
+
+    @abstractmethod
+    def run_classical(
+        self, scale_factor_to_expectation_value: Callable[..., float],
+    ) -> "Factory":
+        """Calls the function scale_factor_to_expectation_value at each scale
+        factor of the factory, and stores the results.
+
+        Args:
+            scale_factor_to_expectation_value: A function which inputs a scale
+                factor and outputs an expectation value. This does not have to
+                involve a quantum processor making this a "classical analogue"
+                of the run method.
+        """
+        raise NotImplementedError
+
+    def iterate(
+        self, noise_to_expval: Callable[..., float], max_iterations: int = 100
+    ) -> "Factory":
+        warnings.warn(
+            "The `iterate` method is deprecated in v0.3.0 and will be removed "
+            "in v0.4.0. Use `run_classical` instead.",
+            DeprecationWarning,
+        )
+        return self.run_classical(noise_to_expval)
 
     def push(
             self, instack_val: Dict[str, float], outstack_val: float
@@ -218,26 +332,269 @@ class Factory(ABC):
         return self
 
     def reset(self) -> "Factory":
-        """Resets the instack, outstack, and optimal parameters of the Factory
-        to empty lists.
-        """
+        """Resets the internal state of the Factory."""
+
         self._instack = []
         self._outstack = []
-        self.opt_params = []
+        self._opt_params = None
+        self._params_cov = None
+        self._zne_limit = None
+        self._zne_error = None
         self._already_reduced = False
         return self
 
-    def get_scale_factors(self) -> np.ndarray:
-        """Returns the scale factors at which the factory has computed
-        expectation values.
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Factory):
+            return False
+        if self._already_reduced != other._already_reduced:
+            return False
+        if len(self._instack) != len(other._instack):
+            return False
+        for dict_a, dict_b in zip(self._instack, other._instack):
+            if not _are_close_dict(dict_a, dict_b):
+                return False
+        return np.allclose(self._outstack, other._outstack)
+
+
+class BatchedFactory(Factory, ABC):
+    """Abstract class of a non-adaptive Factory initialized with a
+    pre-determined set of scale factors.
+
+    Specific (non-adaptive) extrapolation algorithms are derived from this
+    class by defining the `reduce` method.
+    """
+
+    def __init__(
+        self,
+        scale_factors: Sequence[float],
+        shot_list: Optional[List[int]] = None,
+    ) -> None:
+        """Constructs a BatchedFactory.
+
+        Args:
+            scale_factors: Sequence of noise scale factors at which expectation
+                values should be measured.
+            shot_list: Optional sequence of integers corresponding to the
+                number of samples taken for each expectation value. If this
+                argument is explicitly passed to the factory, it must have the
+                same length of scale_factors and the executor function must
+                accept "shots" as a valid keyword argument.
+
+        Raises:
+            ValueError: If the number of scale factors is less than 2.
+            TypeError: If shot_list is provided and has any non-integer values.
         """
-        return np.array(
-            [params.get("scale_factor") for params in self._instack]
+        if len(scale_factors) < 2:
+            raise ValueError("At least 2 scale factors are necessary.")
+
+        if shot_list and (
+            not isinstance(shot_list, Sequence)
+            or not all([isinstance(shots, int) for shots in shot_list])
+        ):
+            raise TypeError(
+                "The optional argument shot_list must be None "
+                "or a valid iterator of integers."
+            )
+        if shot_list and (len(scale_factors) != len(shot_list)):
+            raise IndexError(
+                "The arguments scale_factors and shot_list"
+                " must have the same length."
+                f" But len(scale_factors) is {len(scale_factors)}"
+                f" and len(shot_list) is {len(shot_list)}."
+            )
+
+        self._scale_factors = scale_factors
+        self._shot_list = shot_list
+
+        super(BatchedFactory, self).__init__()
+
+    @staticmethod
+    def _is_executor_batched(
+        executor: Union[Callable[..., float], Callable[..., List[float]]],
+    ) -> bool:
+        """Returns True if the input function is recognized as a "batched
+        executor".
+
+        The executor is detected as "batched" only if it is annotated with
+        a return type that is one of the following:
+            * Iterable[float]
+            * List[float]
+            * Sequence[float]
+            * Tuple[float]
+            * numpy.ndarray
+
+        Args:
+            executor: A "single executor" (1) or a "batched executor" (2).
+                (1) A function which inputs a single circuit and outputs a
+                single expectation value of interest.
+                (2) A function which inputs a list of circuits and outputs a
+                list of expectation values (one for each circuit).
+
+        Returns: True if the executor is detected as batched, False otherwise.
+        """
+        executor_annotation = inspect.getfullargspec(executor).annotations
+        return executor_annotation.get("return") in (
+            List[float],
+            Sequence[float],
+            Tuple[float],
+            Iterable[float],
+            np.ndarray,
         )
 
-    def get_expectation_values(self) -> np.ndarray:
-        """Returns the expectation values computed by the factory."""
-        return np.array(self._outstack)
+    def run(
+        self,
+        qp: QPROGRAM,
+        executor: Union[Callable[..., float], Callable[..., List[float]]],
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        num_to_average: int = 1,
+    ) -> "BatchedFactory":
+        """Computes the expectation values at each scale factor and stores them
+        in the factory. If the executor returns a single expectation value, the
+        circuits are run sequentially. If the executor is batched and returns
+        a list of expectation values (one for each circuit), then the circuits
+        are sent to the backend as a single job. To detect if an executor is
+        batched, it must be annotated with a return type that is one of the
+        following:
+
+            * Iterable[float]
+            * List[float]
+            * Sequence[float]
+            * Tuple[float]
+            * numpy.ndarray
+
+        Args:
+            qp: Quantum circuit to run.
+            executor: A "single executor" (1) or a "batched executor" (2).
+                (1) A function which inputs a single circuit and outputs a
+                single expectation value of interest.
+                (2) A function which inputs a list of circuits and outputs a
+                list of expectation values (one for each circuit). A batched
+                executor can also take an optional "kwargs_list" argument to
+                set a list of keyword arguments (one for each circuit). This
+                is necessary only if the factory is initialized using the
+                optional "shot_list" parameter.
+            scale_noise: Noise scaling function.
+            num_to_average: The number of circuits executed for each noise
+                scale factor. This parameter can be used to increase the
+                precision of the "executor" or to average the effect of a
+                non-deterministic "scale_noise" function.
+        """
+        self.reset()
+        self._batch_populate_instack()
+
+        # Get all noise-scaled circuits to run
+        to_run = self._generate_circuits(qp, scale_noise, num_to_average)
+
+        # Get the list of keywords associated to each circuit in "to_run"
+        kwargs_list = self._get_keyword_args(num_to_average)
+
+        if self._is_executor_batched(executor):
+            if all([kwargs == {} for kwargs in kwargs_list]):
+                res = executor(to_run)
+            else:
+                res = executor(to_run, kwargs_list=kwargs_list)
+        else:
+            res = [
+                executor(circ, **kwargs)  # type: ignore
+                for circ, kwargs in zip(to_run, kwargs_list)
+            ]
+
+        # Reshape "res" to have "num_to_average" columns
+        res = np.array(res).reshape((-1, num_to_average))
+
+        # Average the "num_to_average" columns
+        self._outstack = np.average(res, axis=1)
+
+        return self
+
+    def run_classical(
+        self, scale_factor_to_expectation_value: Callable[..., float]
+    ) -> "BatchedFactory":
+        """Computes expectation values by calling the input function at each
+        scale factor.
+
+        Args:
+            scale_factor_to_expectation_value: Function mapping a noise scale
+                factor to an expectation value. If shot_list is not None,
+                "shots" must be an argument of this function.
+        """
+        self.reset()
+        self._batch_populate_instack()
+        kwargs_list = self._get_keyword_args(num_to_average=1)
+
+        self._outstack = [
+            scale_factor_to_expectation_value(scale_factor, **kwargs)
+            for scale_factor, kwargs in zip(self._scale_factors, kwargs_list)
+        ]
+
+        return self
+
+    def _generate_circuits(
+        self,
+        circuit: QPROGRAM,
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        num_to_average: int = 1,
+    ) -> List[QPROGRAM]:
+        """Returns all noise-scaled circuits to run.
+
+        Args:
+            circuit: Base circuit to scale noise in.
+            scale_noise: Noise scaling function.
+            num_to_average: Number of times to call scale_noise at each scale
+                factor.
+        """
+        to_run = []
+        for scale_factor in self.get_scale_factors():
+            for _ in range(num_to_average):
+                to_run.append(scale_noise(circuit, scale_factor))
+        return to_run
+
+    def _batch_populate_instack(self) -> None:
+        """Populates the instack with all computed values."""
+        if self._shot_list:
+            self._instack = [
+                {"scale_factor": scale, "shots": shots}
+                for scale, shots in zip(self._scale_factors, self._shot_list)
+            ]
+        else:
+            self._instack = [
+                {"scale_factor": scale} for scale in self._scale_factors
+            ]
+
+    def _get_keyword_args(self, num_to_average: int) -> List[Dict[str, Any]]:
+        """Returns a list of keyword dictionaries to be used for
+        executing the circuits generated by the method "_generate_circuits".
+
+        Args:
+            num_to_average: The number of times the same keywords are used
+                for each scale factor. This should correspond to the number
+                of circuits executed for each scale factor.
+
+        Returns:
+            The output list of keyword dictionaries.
+        """
+        params = deepcopy(self._instack)
+        for d in params:
+            _ = d.pop("scale_factor")
+
+        # Repeat each keyword num_to_average times
+        return [k for k in params for _ in range(num_to_average)]
+
+    def __eq__(self, other: Any) -> bool:
+        return Factory.__eq__(self, other) and np.allclose(
+            self._scale_factors, other._scale_factors
+        )
+
+
+class AdaptiveFactory(Factory, ABC):
+    """Abstract class designed to adaptively produce a new noise scaling
+    parameter based on a historical stack of previous noise scale parameters
+    ("self._instack") and previously estimated expectation values
+    ("self._outstack").
+
+    Specific zero-noise extrapolation algorithms which are adaptive are derived
+    from this class.
+    """
 
     def plot_data(self) -> Figure:
         """Returns a figure which is a scatter plot of (x, y) data where x are
@@ -536,18 +893,18 @@ class AdaptiveFactory(Factory, ABC):
 
     def run_classical(
         self,
-        noise_to_expval: Callable[..., float],
+        scale_factor_to_expectation_value: Callable[..., float],
         max_iterations: int = 100,
     ) -> "AdaptiveFactory":
         """Evaluates a sequence of expectation values until enough
         data is collected (or iterations reach "max_iterations").
 
         Args:
-            noise_to_expval: Function mapping a noise scale factor to an
-                             expectation value. If shot_list is not None,
-                             "shot" must be an argument of the function.
+            scale_factor_to_expectation_value: Function mapping a noise scale
+                factor to an expectation value. If shot_list is not None,
+                "shots" must be an argument of this function.
             max_iterations: Maximum number of iterations (optional).
-                            Default: 100.
+                Default: 100.
 
         Raises:
             ConvergenceWarning: If iteration loop stops before convergence.
@@ -562,7 +919,9 @@ class AdaptiveFactory(Factory, ABC):
 
             # Get next scale factor and remove it from next_exec_params
             scale_factor = next_exec_params.pop("scale_factor")
-            next_expval = noise_to_expval(scale_factor, **next_exec_params)
+            next_expval = scale_factor_to_expectation_value(
+                scale_factor, **next_exec_params
+            )
             self.push(next_in_params, next_expval)
             counter += 1
 
@@ -600,7 +959,9 @@ class AdaptiveFactory(Factory, ABC):
             max_iterations: Maximum number of iterations (optional).
         """
 
-        def _noise_to_expval(scale_factor: float, **exec_params: Any) -> float:
+        def scale_factor_to_expectation_value(
+            scale_factor: float, **exec_params: Any
+        ) -> float:
             """Evaluates the quantum expectation value for a given
             scale_factor and other executor parameters."""
             expectation_values = []
@@ -609,7 +970,9 @@ class AdaptiveFactory(Factory, ABC):
                 expectation_values.append(executor(scaled_qp, **exec_params))
             return np.average(expectation_values)
 
-        return self.run_classical(_noise_to_expval, max_iterations)
+        return self.run_classical(
+            scale_factor_to_expectation_value, max_iterations
+        )
 
 
 class PolyFactory(BatchedFactory):
@@ -635,41 +998,6 @@ class PolyFactory(BatchedFactory):
         RichardsonFactory and LinearFactory are special cases of PolyFactory.
     """
 
-    @staticmethod
-    def extrapolate(
-        scale_factors: Sequence[float],
-        exp_values: Sequence[float],
-        order: int,
-        full_output: bool = False,
-    ) -> Union[float, Tuple[float, List[float]]]:
-        """Static method which evaluates a polynomial extrapolation to the
-        zero-noise limit.
-
-        Args:
-            scale_factors: The array of noise scale factors.
-            exp_values: The array of expectation values.
-            order: The extrapolation order (degree of the polynomial fit).
-            full_output: If False (default), only the zero-noise limit is
-                returned. If True, the optimal parameters are returned too.
-        Returns:
-            zero_lim: The extrapolated zero-noise limit.
-            opt_params: The parameter array of the best fitting model.
-                        This is returned only if "full_output" is True.
-
-        Raises:
-            ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
-
-        Note:
-            This method computes the zero-noise limit only from the information
-            contained in the input arguments. To extrapolate from the internal
-            data of an instantiated Factory object, the bound method
-            ".reduce()" should be called instead.
-        """
-
-        opt_params = mitiq_polyfit(scale_factors, exp_values, order)
-        zero_lim = opt_params[-1]
-        return (zero_lim, opt_params) if full_output else zero_lim
-
     def __init__(
         self,
         scale_factors: Sequence[float],
@@ -684,20 +1012,92 @@ class PolyFactory(BatchedFactory):
         self.order = order
         super(PolyFactory, self).__init__(scale_factors, shot_list)
 
-    def reduce(self) -> float:
-        """Returns the zero-noise limit found by fitting a polynomial of degree
-        `self.order` to the input data of scale factors and expectation values.
+    @staticmethod
+    def extrapolate(
+        scale_factors: Sequence[float],
+        exp_values: Sequence[float],
+        order: int,
+        full_output: bool = False,
+    ) -> Union[
+        float,
+        Tuple[
+            float,
+            Union[float, None],
+            List[float],
+            Union[np.ndarray, None],
+            Callable[[float], float],
+        ],
+    ]:
+        """Static method which evaluates a polynomial extrapolation to the
+        zero-noise limit.
 
-        Stores the optimal parameters for the fit in `self.opt_params`.
+        Args:
+            scale_factors: The array of noise scale factors.
+            exp_values: The array of expectation values.
+            order: The extrapolation order (degree of the polynomial fit).
+            full_output: If False (default), only the zero-noise limit is
+                returned. If True, additional results are returned too.
+        Returns:
+            zne_limit: The extrapolated zero-noise limit. If "full_output"
+                is False (default value), only this parameter is returned.
+            zne_error: The error associated to the extrapolated zero-noise
+                limit deduced from the covariance matrix "params_cov".
+            opt_params: The parameter array of the best fitting model.
+            params_cov: The parameter covariance matrix of the best fitting
+                model.
+            zne_curve: The callable function which best fit the input data.
+                It maps a real noise scale factor to a real expectation value.
+                It is equal "zne_limit" when evaluated at zero.
+
+        Raises:
+            ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
+
+        Note:
+            This method computes the zero-noise limit only from the information
+            contained in the input arguments. To extrapolate from the internal
+            data of an instantiated Factory object, the bound method
+            ".reduce()" should be called instead.
         """
-        zero_lim, self.opt_params = self.extrapolate(  # type: ignore
+
+        opt_params, params_cov = mitiq_polyfit(
+            scale_factors, exp_values, order
+        )
+        zne_limit = opt_params[-1]
+
+        if not full_output:
+            return zne_limit
+
+        zne_error = None
+        if params_cov is not None:
+            if params_cov.shape == (order + 1, order + 1):
+                zne_error = np.sqrt(params_cov[order, order])
+
+        def zne_curve(scale_factor: float) -> float:
+            return np.polyval(opt_params, scale_factor)
+
+        return zne_limit, zne_error, opt_params, params_cov, zne_curve
+
+    def reduce(self) -> float:
+        """Evaluates the zero-noise limit found by fitting a polynomial of degree
+        `self.order` to the internal data stored in the factory.
+
+        Returns:
+            The zero-noise limit.
+        """
+        (
+            self._zne_limit,
+            self._zne_error,
+            self._opt_params,
+            self._params_cov,
+            self._zne_curve,
+        ) = self.extrapolate(  # type: ignore
             self.get_scale_factors(),
             self.get_expectation_values(),
             self.order,
             full_output=True,
         )
         self._already_reduced = True
-        return zero_lim
+        return self._zne_limit
 
     def plot(self) -> Figure:
         """Returns a figure which plots the experimental data as well as the
@@ -750,23 +1150,38 @@ class RichardsonFactory(BatchedFactory):
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
-    ) -> Union[float, Tuple[float, List[float]]]:
+    ) -> Union[
+        float,
+        Tuple[
+            float,
+            Union[float, None],
+            List[float],
+            Union[np.ndarray, None],
+            Callable[[float], float],
+        ],
+    ]:
         """Static method which evaluates the Richardson extrapolation to the
          zero-noise limit.
 
-         Args:
-             scale_factors: The array of noise scale factors.
-             exp_values: The array of expectation values.
-             full_output: If False (default), only the zero-noise limit is
-                 returned. If True, the optimal parameters are returned too.
-
-         Returns:
-             zero_lim: The extrapolated zero-noise limit.
-             opt_params: The parameter array of the best fitting model.
-                         This is returned only if "full_output" is True.
+        Args:
+            scale_factors: The array of noise scale factors.
+            exp_values: The array of expectation values.
+            full_output: If False (default), only the zero-noise limit is
+                returned. If True, additional results are returned too.
+        Returns:
+            zne_limit: The extrapolated zero-noise limit. If "full_output"
+                is False (default value), only this parameter is returned.
+            zne_error: The error associated to the extrapolated zero-noise
+                limit deduced from the covariance matrix "params_cov".
+            opt_params: The parameter array of the best fitting model.
+            params_cov: The parameter covariance matrix of the best fitting
+                model.
+            zne_curve: The callable function which best fit the input data.
+                It maps a real noise scale factor to a real expectation value.
+                It is equal "zne_limit" when evaluated at zero.
 
         Raises:
-             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
+            ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
 
          Note:
              This method computes the zero-noise limit only from the
@@ -778,24 +1193,29 @@ class RichardsonFactory(BatchedFactory):
         # with order equal to the number of data points minus 1.
         order = len(scale_factors) - 1
         return PolyFactory.extrapolate(
-            scale_factors,
-            exp_values,
-            order,
-            full_output,
+            scale_factors, exp_values, order, full_output
         )
 
     def reduce(self) -> float:
-        """Returns the zero-noise limit found by Richardson extrapolation.
+        """Evaluates the zero-noise limit found by applying Richardson
+        extrapolation to the internal data stored in the factory.
 
-        Stores the optimal parameters for the fit in `self.opt_params`.
+        Returns:
+            The zero-noise limit.
         """
-        zero_lim, self.opt_params = self.extrapolate(  # type: ignore
+        (
+            self._zne_limit,
+            self._zne_error,
+            self._opt_params,
+            self._params_cov,
+            self._zne_curve,
+        ) = self.extrapolate(  # type: ignore
             self.get_scale_factors(),
             self.get_expectation_values(),
             full_output=True,
         )
         self._already_reduced = True
-        return zero_lim
+        return self._zne_limit
 
 
 class LinearFactory(BatchedFactory):
@@ -824,7 +1244,16 @@ class LinearFactory(BatchedFactory):
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
-    ) -> Union[float, Tuple[float, List[float]]]:
+    ) -> Union[
+        float,
+        Tuple[
+            float,
+            Union[float, None],
+            List[float],
+            Union[np.ndarray, None],
+            Callable[[float], float],
+        ],
+    ]:
         """Static method which evaluates the linear extrapolation to the
         zero-noise limit.
 
@@ -832,12 +1261,18 @@ class LinearFactory(BatchedFactory):
             scale_factors: The array of noise scale factors.
             exp_values: The array of expectation values.
             full_output: If False (default), only the zero-noise limit is
-                returned. If True, the optimal parameters are returned too.
-
+                returned. If True, additional results are returned too.
         Returns:
-            zero_lim: The extrapolated zero-noise limit.
+            zne_limit: The extrapolated zero-noise limit. If "full_output"
+                is False (default value), only this parameter is returned.
+            zne_error: The error associated to the extrapolated zero-noise
+                limit deduced from the covariance matrix "params_cov".
             opt_params: The parameter array of the best fitting model.
-                        This is returned only if "full_output" is True.
+            params_cov: The parameter covariance matrix of the best fitting
+                model.
+            zne_curve: The callable function which best fit the input data.
+                It maps a real noise scale factor to a real expectation value.
+                It is equal "zne_limit" when evaluated at zero.
 
         Raises:
             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
@@ -850,25 +1285,29 @@ class LinearFactory(BatchedFactory):
         """
         # Linear extrapolation is equivalent to a polynomial fit with order=1
         return PolyFactory.extrapolate(
-            scale_factors,
-            exp_values,
-            1,
-            full_output,
+            scale_factors, exp_values, 1, full_output
         )
 
     def reduce(self) -> float:
-        """Returns the zero-noise limit found by fitting a line to the input
-        data of scale factors and expectation values.
+        """Returns the zero-noise limit found by fitting a line to the internal
+        data stored in the factory.
 
-        Stores the optimal parameters for the fit in `self.opt_params`.
+        Returns:
+            The zero-noise limit.
         """
-        zero_lim, self.opt_params = self.extrapolate(  # type: ignore
+        (
+            self._zne_limit,
+            self._zne_error,
+            self._opt_params,
+            self._params_cov,
+            self._zne_curve,
+        ) = self.extrapolate(  # type: ignore
             self.get_scale_factors(),
             self.get_expectation_values(),
             full_output=True,
         )
         self._already_reduced = True
-        return zero_lim
+        return self._zne_limit
 
 
 class ExpFactory(BatchedFactory):
@@ -925,7 +1364,16 @@ class ExpFactory(BatchedFactory):
         avoid_log: bool = False,
         eps: float = 1.0e-6,
         full_output: bool = False,
-    ) -> Union[float, Tuple[float, List[float]]]:
+    ) -> Union[
+        float,
+        Tuple[
+            float,
+            Union[float, None],
+            List[float],
+            Union[np.ndarray, None],
+            Callable[[float], float],
+        ],
+    ]:
         """Static method which evaluates the extrapolation to the zero-noise
         limit assuming an exponential ansatz y(x) = a + b * exp(-c * x),
         with c > 0.
@@ -946,12 +1394,19 @@ class ExpFactory(BatchedFactory):
             eps: Epsilon to regularize log(sign(scale_factors - asymptote))
                 when the argument is to close to zero or negative.
             full_output: If False (default), only the zero-noise limit is
-                returned. If True, the optimal parameters are returned too.
+                returned. If True, additional results are returned too.
 
         Returns:
-            zero_lim: The extrapolated zero-noise limit.
+            zne_limit: The extrapolated zero-noise limit. If "full_output"
+                is False (default value), only this parameter is returned.
+            zne_error: The error associated to the extrapolated zero-noise
+                limit deduced from the covariance matrix "params_cov".
             opt_params: The parameter array of the best fitting model.
-                        This is returned only if "full_output" is True.
+            params_cov: The parameter covariance matrix of the best fitting
+                model.
+            zne_curve: The callable function which best fit the input data.
+                It maps a real noise scale factor to a real expectation value.
+                It is equal "zne_limit" when evaluated at zero.
 
         Raises:
             ValueError: If the arguments are not consistent with the
@@ -976,11 +1431,19 @@ class ExpFactory(BatchedFactory):
         )
 
     def reduce(self) -> float:
-        """Returns the zero-noise limit found by fitting the exponential ansatz.
+        """Returns the zero-noise limit found by fitting an exponential
+        model to the internal data stored in the factory.
 
-        Stores the optimal parameters for the fit in `self.opt_params`.
+        Returns:
+            The zero-noise limit.
         """
-        zero_lim, self.opt_params = self.extrapolate(  # type: ignore
+        (
+            self._zne_limit,
+            self._zne_error,
+            self._opt_params,
+            self._params_cov,
+            self._zne_curve,
+        ) = self.extrapolate(  # type: ignore
             self.get_scale_factors(),
             self.get_expectation_values(),
             asymptote=self.asymptote,
@@ -988,7 +1451,7 @@ class ExpFactory(BatchedFactory):
             full_output=True,
         )
         self._already_reduced = True
-        return zero_lim
+        return self._zne_limit
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, ExpFactory):
@@ -1052,6 +1515,24 @@ class PolyExpFactory(BatchedFactory):
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
     """
 
+    def __init__(
+        self,
+        scale_factors: Sequence[float],
+        order: int,
+        asymptote: Optional[float] = None,
+        avoid_log: bool = False,
+        shot_list: Optional[List[int]] = None,
+    ) -> None:
+        """Instantiates a new object of this Factory class."""
+        super(PolyExpFactory, self).__init__(scale_factors, shot_list)
+        if not (asymptote is None or isinstance(asymptote, float)):
+            raise ValueError(
+                "The argument 'asymptote' must be either a float or None"
+            )
+        self.order = order
+        self.asymptote = asymptote
+        self.avoid_log = avoid_log
+
     @staticmethod
     def extrapolate(
         scale_factors: Sequence[float],
@@ -1061,7 +1542,16 @@ class PolyExpFactory(BatchedFactory):
         avoid_log: bool = False,
         eps: float = 1.0e-6,
         full_output: bool = False,
-    ) -> Union[float, Tuple[float, List[float]]]:
+    ) -> Union[
+        float,
+        Tuple[
+            float,
+            Union[float, None],
+            List[float],
+            Union[np.ndarray, None],
+            Callable[[float], float],
+        ],
+    ]:
         """Static method which evaluates the extrapolation to the
         zero-noise limit with an exponential ansatz (whose exponent
         is a polynomial of degree "order").
@@ -1090,12 +1580,19 @@ class PolyExpFactory(BatchedFactory):
             eps: Epsilon to regularize log(sign(scale_factors - asymptote))
                 when the argument is to close to zero or negative.
             full_output: If False (default), only the zero-noise limit is
-                returned. If True, the optimal parameters are returned too.
+                returned. If True, additional results are returned too.
 
         Returns:
-            zero_lim: The extrapolated zero-noise limit.
+            zne_limit: The extrapolated zero-noise limit. If "full_output"
+                is False (default value), only this parameter is returned.
+            zne_error: The error associated to the extrapolated zero-noise
+                limit deduced from the covariance matrix "params_cov".
             opt_params: The parameter array of the best fitting model.
-                        This is returned only if "full_output" is True.
+            params_cov: The parameter covariance matrix of the best fitting
+                model.
+            zne_curve: The callable function which best fit the input data.
+                It maps a real noise scale factor to a real expectation value.
+                It is equal "zne_limit" when evaluated at zero.
 
         Raises:
             ValueError: If the arguments are not consistent with the
@@ -1128,9 +1625,13 @@ class PolyExpFactory(BatchedFactory):
                 f" of data points minus {1 + shift}."
             )
 
+        # Initialize default errors
+        zne_error = None
+        params_cov = None
+
         # Deduce "sign" parameter of the exponential ansatz
-        slope, _ = mitiq_polyfit(scale_factors, exp_values, deg=1)
-        sign = np.sign(-slope)
+        linear_params, _ = mitiq_polyfit(scale_factors, exp_values, deg=1)
+        sign = np.sign(-linear_params[0])
 
         def _ansatz_unknown(x: float, *coeffs: float) -> float:
             """Ansatz of generic order with unknown asymptote."""
@@ -1146,26 +1647,67 @@ class PolyExpFactory(BatchedFactory):
 
         # CASE 1: asymptote is None.
         if asymptote is None:
-            # First guess for the parameter (decay or growth from "sign" to 0)
+            # First guess for the parameters
             p_zero = [0.0, sign, -1.0] + [0.0 for _ in range(order - 1)]
-            opt_params = mitiq_curve_fit(
+            opt_params, params_cov = mitiq_curve_fit(
                 _ansatz_unknown, scale_factors, exp_values, p_zero
             )
             # The zero noise limit is ansatz(0)= asympt + b
-            zero_lim = opt_params[0] + opt_params[1]
-            return (zero_lim, opt_params) if full_output else zero_lim
+            zne_limit = opt_params[0] + opt_params[1]
+
+            def zne_curve(scale_factor: float) -> float:
+                return _ansatz_unknown(scale_factor, *opt_params)
+
+            # Use propagation of errors to calculate zne_error
+            if params_cov is not None:
+                if params_cov.shape == (order + 2, order + 2):
+                    zne_error = np.sqrt(
+                        params_cov[0, 0]
+                        + 2 * params_cov[0, 1]
+                        + params_cov[1, 1]
+                    )
+
+            if full_output:
+                return (
+                    zne_limit,
+                    zne_error,
+                    opt_params,
+                    params_cov,
+                    zne_curve,
+                )
+
+            return zne_limit
 
         # CASE 2: asymptote is given and "avoid_log" is True
         if avoid_log:
-            # First guess for the parameter (decay or growth from "sign")
+            # First guess for the parameters
             p_zero = [sign, -1.0] + [0.0 for _ in range(order - 1)]
-            opt_params = mitiq_curve_fit(
+            opt_params, params_cov = mitiq_curve_fit(
                 _ansatz_known, scale_factors, exp_values, p_zero
             )
             # The zero noise limit is ansatz(0)= asymptote + b
-            zero_lim = asymptote + opt_params[0]
+            zne_limit = asymptote + opt_params[0]
+
+            def zne_curve(scale_factor: float) -> float:
+                return _ansatz_known(scale_factor, *opt_params)
+
+            # Use propagation of errors to calculate zne_error
+            if params_cov is not None:
+                if params_cov.shape == (order + 1, order + 1):
+                    zne_error = np.sqrt(params_cov[0, 0])
+
             opt_params = [asymptote] + list(opt_params)
-            return (zero_lim, opt_params) if full_output else zero_lim
+
+            if full_output:
+                return (
+                    zne_limit,
+                    zne_error,
+                    opt_params,
+                    params_cov,
+                    zne_curve,
+                )
+
+            return zne_limit
 
         # CASE 3: asymptote is given and "avoid_log" is False
         # Polynomial fit of z(x).
@@ -1176,17 +1718,33 @@ class PolyExpFactory(BatchedFactory):
         # Note: coefficients are ordered from high powers to powers of x
         # Weights "w" are used to compensate for error propagation
         # after the log transformation y --> z
-        z_coefficients = mitiq_polyfit(
+        z_coefficients, param_cov = mitiq_polyfit(
             scale_factors,
             zstack,
             deg=order,
             weights=np.sqrt(np.abs(shifted_y)),
         )
         # The zero noise limit is ansatz(0)
-        zero_lim = asymptote + sign * np.exp(z_coefficients[-1])
+        zero_limit = asymptote + sign * np.exp(z_coefficients[-1])
+
+        def _zne_curve(scale_factor: float) -> float:
+            return asymptote + sign * np.exp(
+                np.polyval(z_coefficients, scale_factor)
+            )
+
+        # Use propagation of errors to calculate zne_error
+        if params_cov is not None:
+            if params_cov.shape == (order + 1, order + 1):
+                zne_error = np.exp(z_coefficients[-1]) * np.sqrt(
+                    params_cov[order + 1, order + 1]
+                )
+
         # Parameters from low order to high order
         opt_params = [asymptote] + list(z_coefficients[::-1])
-        return (zero_lim, opt_params) if full_output else zero_lim
+
+        if full_output:
+            return zero_limit, zne_error, opt_params, params_cov, _zne_curve
+        return zne_limit
 
     def __eq__(self, other: Any) -> bool:
         return (
@@ -1197,30 +1755,20 @@ class PolyExpFactory(BatchedFactory):
             and self.order == other.order
         )
 
-    def __init__(
-        self,
-        scale_factors: Sequence[float],
-        order: int,
-        asymptote: Optional[float] = None,
-        avoid_log: bool = False,
-        shot_list: Optional[List[int]] = None,
-    ) -> None:
-        """Instantiates a new object of this Factory class."""
-        super(PolyExpFactory, self).__init__(scale_factors, shot_list)
-        if not (asymptote is None or isinstance(asymptote, float)):
-            raise ValueError(
-                "The argument 'asymptote' must be either a float or None"
-            )
-        self.order = order
-        self.asymptote = asymptote
-        self.avoid_log = avoid_log
-
     def reduce(self) -> float:
-        """Returns the zero-noise limit found by fitting the ansatz.
+        """Returns the zero-noise limit found by fitting an the
+        model to the internal data stored in the factory.
 
-        Stores the optimal parameters for the fit in `self.opt_params`.
+        Returns:
+            The zero-noise limit.
         """
-        zero_lim, self.opt_params = self.extrapolate(  # type: ignore
+        (
+            self._zne_limit,
+            self._zne_error,
+            self._opt_params,
+            self._params_cov,
+            self._zne_curve,
+        ) = self.extrapolate(  # type: ignore
             self.get_scale_factors(),
             self.get_expectation_values(),
             self.order,
@@ -1229,7 +1777,7 @@ class PolyExpFactory(BatchedFactory):
             full_output=True,
         )
         self._already_reduced = True
-        return zero_lim
+        return self._zne_limit
 
 
 # Keep a log of the optimization process storing:
@@ -1360,7 +1908,16 @@ class AdaExpFactory(AdaptiveFactory):
         avoid_log: bool = False,
         eps: float = 1.0e-6,
         full_output: bool = False,
-    ) -> Union[float, Tuple[float, List[float]]]:
+    ) -> Union[
+        float,
+        Tuple[
+            float,
+            Union[float, None],
+            List[float],
+            Union[np.ndarray, None],
+            Callable[[float], float],
+        ],
+    ]:
         """Static method which evaluates the extrapolation to the zero-noise
         limit assuming an exponential ansatz y(x) = a + b * exp(-c * x),
         with c > 0.
@@ -1381,12 +1938,19 @@ class AdaExpFactory(AdaptiveFactory):
             eps: Epsilon to regularize log(sign(scale_factors - asymptote))
                 when the argument is to close to zero or negative.
             full_output: If False (default), only the zero-noise limit is
-                returned. If True, the optimal parameters are returned too.
+                returned. If True, additional results are returned too.
 
         Returns:
-            zero_lim: The extrapolated zero-noise limit.
+            zne_limit: The extrapolated zero-noise limit. If "full_output"
+                is False (default value), only this parameter is returned.
+            zne_error: The standard deviation of the extrapolated zero-noise
+                limit deduced from the covariance matrix "params_cov".
             opt_params: The parameter array of the best fitting model.
-                        This is returned only if "full_output" is True.
+            params_cov: The parameter covariance matrix of the best fitting
+                model.
+            zne_curve: The callable function which best fit the input data.
+                It maps a real noise scale factor to a real expectation value.
+                It is equal "zne_limit" when evaluated at zero.
 
         Raises:
             ValueError: If the arguments are not consistent with the
@@ -1410,8 +1974,19 @@ class AdaExpFactory(AdaptiveFactory):
         )
 
     def reduce(self) -> float:
-        """Returns the zero-noise limit."""
-        zero_limit, self.opt_params = self.extrapolate(  # type: ignore
+        """Returns the zero-noise limit found by fitting an exponential
+        model to the internal data stored in the factory.
+
+        Returns:
+            The zero-noise limit.
+        """
+        (
+            self._zne_limit,
+            self._zne_error,
+            self._opt_params,
+            self._params_cov,
+            self._zne_curve,
+        ) = self.extrapolate(  # type: ignore
             self.get_scale_factors(),
             self.get_expectation_values(),
             asymptote=self.asymptote,
@@ -1420,10 +1995,10 @@ class AdaExpFactory(AdaptiveFactory):
         )
         # Update optimization history
         self.history.append(
-            (self._instack, self._outstack, self.opt_params, zero_limit)
+            (self._instack, self._outstack, self._opt_params, self._zne_limit)
         )
         self._already_reduced = True
-        return zero_limit
+        return self._zne_limit
 
     def __eq__(self, other: Any) -> bool:
         return (
