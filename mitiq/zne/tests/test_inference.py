@@ -322,7 +322,7 @@ def test_run_batched_with_keyword_args_list(factory):
         return [1.0] * len(circuits)
 
     fac.run(cirq.Circuit(), executor, scale_noise=lambda circ, _: circ)
-  
+
     assert isinstance(fac.get_expectation_values(), np.ndarray)
     assert np.allclose(
         fac.get_expectation_values(), np.ones_like(scale_factors)
