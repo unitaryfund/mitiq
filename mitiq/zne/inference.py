@@ -209,8 +209,7 @@ class Factory(ABC):
 
     @abstractmethod
     def run_classical(
-        self,
-        scale_factor_to_expectation_value: Callable[..., float],
+        self, scale_factor_to_expectation_value: Callable[..., float],
     ) -> "Factory":
         """Calls the function scale_factor_to_expectation_value at each scale
         factor of the factory, and stores the results.
@@ -770,10 +769,7 @@ class RichardsonFactory(BatchedFactory):
         # with order equal to the number of data points minus 1.
         order = len(scale_factors) - 1
         return PolyFactory.extrapolate(
-            scale_factors,
-            exp_values,
-            order,
-            full_output,
+            scale_factors, exp_values, order, full_output,
         )
 
     def reduce(self) -> float:
@@ -842,10 +838,7 @@ class LinearFactory(BatchedFactory):
         """
         # Linear extrapolation is equivalent to a polynomial fit with order=1
         return PolyFactory.extrapolate(
-            scale_factors,
-            exp_values,
-            1,
-            full_output,
+            scale_factors, exp_values, 1, full_output,
         )
 
     def reduce(self) -> float:

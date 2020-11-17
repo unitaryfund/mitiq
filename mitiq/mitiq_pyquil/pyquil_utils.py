@@ -15,167 +15,88 @@
 
 """pyQuil utility functions."""
 import numpy as np
+from typing import Callable
+
 from pyquil import Program
+from pyquil.api import QuantumComputer
+from pyquil.gates import MEASURE, RESET
 
-# Backend and Noise simulation
-from pyquil import get_qc
-from pyquil.gates import X, Y, Z, MEASURE
-from pyquil.noise import append_kraus_to_gate
-from pyquil.simulation.matrices import I as npI, X as npX, Y as npY, Z as npZ
-
-QVM = get_qc("1q-qvm")
-
-# Set the random seeds for testing
-QVM.qam.random_seed = 1337
-np.random.seed(1001)
+from mitiq.mitiq_pyquil.compiler import basic_compile
 
 
-def random_identity_circuit(depth: int) -> Program:
-    """Returns a single-qubit identity circuit based on Pauli gates."""
-
-    # initialize a quantum circuit
-    prog = Program()
-
-    # index of the (inverting) final gate: 0=I, 1=X, 2=Y, 3=Z
-    k_inv = 0
-
-    # apply a random sequence of Pauli gates
-    for _ in range(depth):
-        # random index for the next gate: 1=X, 2=Y, 3=Z
-        k = np.random.choice([1, 2, 3])
-        # apply the Pauli gate "k"
-        if k == 1:
-            prog += X(0)
-        elif k == 2:
-            prog += Y(0)
-        elif k == 3:
-            prog += Z(0)
-
-        # update the inverse index according to
-        # the product rules of Pauli matrices k and k_inv
-        if k_inv == 0:
-            k_inv = k
-        elif k_inv == k:
-            k_inv = 0
-        else:
-            _ = [1, 2, 3]
-            _.remove(k_inv)
-            _.remove(k)
-            k_inv = _[0]
-
-    # apply the final inverse gate
-    if k_inv == 1:
-        prog += X(0)
-    elif k_inv == 2:
-        prog += Y(0)
-    elif k_inv == 3:
-        prog += Z(0)
-
-    return prog
-
-
-def run_with_noise(circuit: Program, noise: float, shots: int) -> float:
-    """Returns the expectation value of a circuit run several times with noise.
+def generate_qcs_executor(
+    qc: QuantumComputer,
+    expectation_fn: Callable[[np.ndarray], float],
+    shots: int = 1000,
+    reset: bool = True,
+    debug: bool = False,
+) -> Callable[[Program], float]:
+    """Generates an executor for QCS that ingests pyQuil programs.
 
     Args:
-        circuit: Quantum circuit as :class:`~pyquil.quil.Program`.
-        noise: Noise constant for depolarizing channel.
-        shots: Number of shots the circuit is run.
+        qc: The QuantumComputer object to use as backend.
+        expectation_fn: Takes in bitstring results and produces a float.
+        shots: Number of shots to take.
+        reset: Whether or not to enable active reset.
+        debug: If true, print the program after compilation.
 
     Returns:
-        expval: Expectation value.
+        A customized executor function.
     """
-    # apply depolarizing noise to all gates
-    kraus_ops = [
-        np.sqrt(1 - noise) * npI,
-        np.sqrt(noise / 3) * npX,
-        np.sqrt(noise / 3) * npY,
-        np.sqrt(noise / 3) * npZ,
-    ]
-    circuit.define_noisy_gate("X", [0], append_kraus_to_gate(kraus_ops, npX))
-    circuit.define_noisy_gate("Y", [0], append_kraus_to_gate(kraus_ops, npY))
-    circuit.define_noisy_gate("Z", [0], append_kraus_to_gate(kraus_ops, npZ))
 
-    # set number of shots
-    circuit.wrap_in_numshots_loop(shots)
+    def executor(program: Program) -> float:
+        p = Program()
 
-    # we want to simulate noise, so we run without compiling
-    results = QVM.run(circuit)
-    expval = (results == [0]).sum() / shots
-    return float(expval)
+        # add reset
+        if reset:
+            p += RESET()
+
+        # add main body program
+        p += program.copy()
+
+        # add memory declaration
+        qubits = p.get_qubits()
+        ro = p.declare("ro", "BIT", len(qubits))
+
+        # add measurements
+        for idx, q in enumerate(qubits):
+            p += MEASURE(q, ro[idx])
+
+        # add numshots
+        p.wrap_in_numshots_loop(shots)
+
+        # nativize the circuit
+        p = basic_compile(p)
+
+        # print out nativized program
+        if debug:
+            print(p)
+
+        # compile the circuit
+        b = qc.compiler.native_quil_to_executable(p)
+
+        # run the circuit, collect bitstrings
+        qc.reset()
+        results = qc.run(b)
+
+        # compute expectation value
+        return expectation_fn(results)
+
+    return executor
 
 
-def run_program(pq: Program, shots: int = 500) -> float:
-    """Returns the expectation value of a circuit run several times.
+def ground_state_expectation(results: np.ndarray) -> float:
+    """
+    Example expectation_fn. Computes the ground state expectation, also
+    called survival probability.
 
     Args:
-        pq: Quantum circuit as :class:`~pyquil.quil.Program`.
-        shots: (Default: 500) Number of shots the circuit is run.
+        results: Array of bitstrings from running a quantum program.
 
     Returns:
-        expval: Expectation value.
+        A single expectation value computed from the results.
     """
-    pq.wrap_in_numshots_loop(shots)
-    results = QVM.run(pq)
-    expval = (results == [0]).sum() / shots
-    return float(expval)
-
-
-def add_depolarizing_noise(pq: Program, noise: float) -> Program:
-    """Returns a quantum program with depolarizing channel noise.
-
-    Args:
-        pq: Quantum program as :class:`~pyquil.quil.Program`.
-        noise: Noise constant for depolarizing channel.
-
-    Returns:
-        pq: Quantum program with added noise.
-    """
-    pq = pq.copy()
-    # apply depolarizing noise to all gates
-    kraus_ops = [
-        np.sqrt(1 - noise) * npI,
-        np.sqrt(noise / 3) * npX,
-        np.sqrt(noise / 3) * npY,
-        np.sqrt(noise / 3) * npZ,
-    ]
-    pq.define_noisy_gate("X", [0], append_kraus_to_gate(kraus_ops, npX))
-    pq.define_noisy_gate("Y", [0], append_kraus_to_gate(kraus_ops, npY))
-    pq.define_noisy_gate("Z", [0], append_kraus_to_gate(kraus_ops, npZ))
-    return pq
-
-
-NATIVE_NOISE = 0.007
-
-
-def scale_noise(pq: Program, param: float) -> Program:
-    """Returns a circuit rescaled by the depolarizing noise parameter.
-
-    Args:
-        pq: Quantum circuit as :class:`~pyquil.quil.Program`.
-        param: noise scaling.
-
-    Returns:
-        Quantum program with added noise.
-    """
-    noise = param * NATIVE_NOISE
-    assert noise <= 1.0, (
-        "Noise scaled to {} is out of bounds (<=1.0) for "
-        "depolarizing channel.".format(noise)
-    )
-    return add_depolarizing_noise(pq, noise)
-
-
-def measure(circuit: Program, qid: int) -> Program:
-    """Returns a circuit adding a register for readout results.
-
-    Args:
-        circuit: Quantum circuit as :class:`~pyquil.quil.Program`.
-        qid: position of the measurement in the circuit.
-
-    Returns:
-        Quantum program with added measurement.
-    """
-    ro = circuit.declare("ro", "BIT", 1)
-    circuit += MEASURE(qid, ro[0])
-    return circuit
+    num_shots = len(results)
+    return (
+        num_shots - np.count_nonzero(np.count_nonzero(results, axis=1))
+    ) / num_shots

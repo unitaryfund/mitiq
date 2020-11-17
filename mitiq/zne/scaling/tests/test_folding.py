@@ -808,18 +808,14 @@ def test_fold_gates_at_random_seed_one_qubit():
     # Medium scale, fold two gates
     folded = fold_gates_at_random(circuit, scale_factor=2.5, seed=1)
     correct = Circuit(
-        [ops.X.on(qubit)],
-        [ops.Y.on(qubit)] * 3,
-        [ops.Z.on(qubit)] * 3,
+        [ops.X.on(qubit)], [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)] * 3,
     )
     assert _equal(folded, correct)
 
     # Max scale, fold three gates
     folded = fold_gates_at_random(circuit, scale_factor=3, seed=1)
     correct = Circuit(
-        [ops.X.on(qubit)] * 3,
-        [ops.Y.on(qubit)] * 3,
-        [ops.Z.on(qubit)] * 3,
+        [ops.X.on(qubit)] * 3, [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)] * 3,
     )
     assert _equal(folded, correct)
 
@@ -1162,12 +1158,7 @@ def test_global_fold_stretch_factor_eight_terminal_measurements():
         circ,
         inverse(circ),
         circ,
-        inverse(
-            Circuit(
-                [ops.T.on(qreg[2])],
-                [ops.TOFFOLI.on(*qreg)],
-            )
-        ),
+        inverse(Circuit([ops.T.on(qreg[2])], [ops.TOFFOLI.on(*qreg)],)),
         [ops.T.on(qreg[2])],
         [ops.TOFFOLI.on(*qreg)],
         meas,
