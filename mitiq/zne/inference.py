@@ -367,8 +367,8 @@ class Factory(ABC):
         smooth_scale_factors = np.linspace(
             0, self.get_scale_factors()[-1], 20
         )
-        smooth_expectations = self.get_extrapolation_curve()(smooth_scale_factors)
-
+        smooth_expectations = (self.get_extrapolation_curve())(smooth_scale_factors)
+        plt.xlim(left=0)
         fig.axes[0].plot(
             smooth_scale_factors,
             smooth_expectations,
