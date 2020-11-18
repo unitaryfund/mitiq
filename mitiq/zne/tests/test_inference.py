@@ -249,6 +249,7 @@ def test_get_expectation_values_adaptive_factories(factory):
         fac.get_expectation_values(), correct_expectation_values, atol=1e-3
     )
 
+
 @mark.parametrize(
     "factory",
     (
@@ -269,6 +270,7 @@ def test_plot_factory_data(factory):
 
     assert isinstance(fac.plot_data(), figure.Figure)
     assert isinstance(fac.plot_fit(), figure.Figure)
+
 
 @mark.parametrize(
     "factory",
@@ -709,6 +711,7 @@ def test_shot_list_errors():
     with raises(TypeError, match=r"valid iterator of integers"):
         PolyFactory(X_VALS, order=2, shot_list=[1.0, 2])
 
+
 @mark.parametrize(
     "factory",
     (
@@ -727,9 +730,13 @@ def test_iterate_deprecation_warning(factory):
     else:
         fac = factory(scale_factors=scale_factors)
 
-    with raises(DeprecationWarning, match=r"The `iterate` method is deprecated in v0.3.0 and will be removed "
-            "in v0.4.0. Use `run_classical` instead."):
+    with raises(
+        DeprecationWarning,
+        match=r"The `iterate` method is deprecated in v0.3.0 and will be "
+        "removed in v0.4.0. Use `run_classical` instead.",
+    ):
         fac.iterate(apply_seed_to_func(f_lin, seed=1))
+
 
 def test_push_after_already_reduced_warning():
     """Tests a warning is raised if new data is pushed in a factory
