@@ -468,18 +468,18 @@ corresponds to a statistical inference based on the measured data.
 
    linear_fac.run(circuit, executor, scale_noise=fold_gates_at_random)
    zne_expval = linear_fac.reduce()
-   print(f"Error with linear_fac: {abs(exact - zne_expval):.4f}") 
+   print(f"Error with linear_fac: {abs(exact - zne_expval):.4f}")
 
    richardson_fac.run(circuit, executor, scale_noise=fold_gates_at_random)
    zne_expval = richardson_fac.reduce()
-   print(f"Error with richardson_fac: {abs(exact - zne_expval):.4f}") 
+   print(f"Error with richardson_fac: {abs(exact - zne_expval):.4f}")
 
    poly_fac.run(circuit, executor, scale_noise=fold_gates_at_random)
    zne_expval = poly_fac.reduce()
-   print(f"Error with poly_fac: {abs(exact - zne_expval):.4f}") 
+   print(f"Error with poly_fac: {abs(exact - zne_expval):.4f}")
 
 .. testoutput::
-   
+
    Error with linear_fac: 0.0291
    Error with richardson_fac: 0.0070
    Error with poly_fac: 0.0110
@@ -500,7 +500,7 @@ After running a factory, this information can be accessed with appropriate *get*
    Expectation values: [0.88 0.79 0.72 0.67]
 
 If the user has manually evaluated a list of expectation values associated to a list of scale factors, the
-simplest way to estimate the corresponding zero-noise limit is to directly call the static `extrapolate` method of the 
+simplest way to estimate the corresponding zero-noise limit is to directly call the static `extrapolate` method of the
 desired factory class (in this case initializing a factory object is unnecessary).  For example:
 
 .. testcode::
@@ -512,7 +512,7 @@ desired factory class (in this case initializing a factory object is unnecessary
 
    Error with PolyFactory.extrapolate method: 0.0110
 
-Beyond the zero-noise limit, additional information about the fit (e.g., optimal parameters, errors, extrapolation curve, etc.) 
+Beyond the zero-noise limit, additional information about the fit (e.g., optimal parameters, errors, extrapolation curve, etc.)
 can be returned from `extrapolate` by specifying `full_output = True`.
 
 There are also a number of methods to get additional information calculated by the factory class:
@@ -524,9 +524,9 @@ There are also a number of methods to get additional information calculated by t
 
    fac = LinearFactory(scale_factors=[1.0, 2.0, 3.0])
    _ = execute_with_zne(circuit, executor, factory=fac)
-   print(f"Zero-noise limit: {fac.get_zero_noise_limit():.4f}") 
-   print(f"Fit error on zero-noise limit: {fac.get_zero_noise_limit_error():.4f}") 
-   print(f"Covariance of fitted model parameters: {np.round(fac.get_parameters_covariance(), 5)}") 
+   print(f"Zero-noise limit: {fac.get_zero_noise_limit():.4f}")
+   print(f"Fit error on zero-noise limit: {fac.get_zero_noise_limit_error():.4f}")
+   print(f"Covariance of fitted model parameters: {np.round(fac.get_parameters_covariance(), 5)}")
    print(f"Fitted model parameters: {np.round(fac.get_optimal_parameters(), 4)}")
    print(f"Extrapolation curve evaluated at zero: {fac.get_extrapolation_curve()(0):.4f}")
 
