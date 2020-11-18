@@ -27,6 +27,7 @@ import cirq
 from mitiq.zne.inference import (
     ExtrapolationError,
     ExtrapolationWarning,
+    ConvergenceWarning,
     RichardsonFactory,
     LinearFactory,
     PolyFactory,

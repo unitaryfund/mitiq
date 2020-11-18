@@ -314,7 +314,7 @@ class Factory(ABC):
         return self.run_classical(noise_to_expval)
 
     def push(
-            self, instack_val: Dict[str, float], outstack_val: float
+        self, instack_val: Dict[str, float], outstack_val: float
     ) -> "Factory":
         """Appends "instack_val" to "self._instack" and "outstack_val" to
         "self._outstack". Each time a new expectation value is computed this
@@ -332,7 +332,7 @@ class Factory(ABC):
         self._instack.append(instack_val)
         self._outstack.append(outstack_val)
         return self
-    
+
     def plot_data(self) -> Figure:
         """Returns a figure which is a scatter plot of (x, y) data where x are
         scale factors at which expectation values have been computed, and y are
@@ -366,10 +366,10 @@ class Factory(ABC):
         """
         fig = self.plot_data()
 
-        smooth_scale_factors = np.linspace(
-            0, self.get_scale_factors()[-1], 20
+        smooth_scale_factors = np.linspace(0, self.get_scale_factors()[-1], 20)
+        smooth_expectations = (self.get_extrapolation_curve())(
+            smooth_scale_factors
         )
-        smooth_expectations = (self.get_extrapolation_curve())(smooth_scale_factors)
         plt.xlim(left=0)
         fig.axes[0].plot(
             smooth_scale_factors,
@@ -635,6 +635,7 @@ class BatchedFactory(Factory, ABC):
         return Factory.__eq__(self, other) and np.allclose(
             self._scale_factors, other._scale_factors
         )
+
 
 class AdaptiveFactory(Factory, ABC):
     """Abstract class designed to adaptively produce a new noise scaling
