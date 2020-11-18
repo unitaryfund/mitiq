@@ -22,6 +22,7 @@ from pytest import mark, raises, warns
 
 import numpy as np
 from numpy.random import RandomState
+from matplotlib import figure
 
 import cirq
 from mitiq.zne.inference import (
@@ -248,6 +249,26 @@ def test_get_expectation_values_adaptive_factories(factory):
         fac.get_expectation_values(), correct_expectation_values, atol=1e-3
     )
 
+@mark.parametrize(
+    "factory",
+    (
+        LinearFactory,
+        RichardsonFactory,
+        PolyFactory,
+        ExpFactory,
+        PolyExpFactory,
+    ),
+)
+def test_plot_factory_data(factory):
+    scale_factors = np.linspace(1.0, 10.0, num=20)
+
+    if factory is PolyFactory or factory is PolyExpFactory:
+        fac = factory(scale_factors=scale_factors, order=2)
+    else:
+        fac = factory(scale_factors=scale_factors)
+
+    assert isinstance(fac.plot_data(), figure.Figure)
+    assert isinstance(fac.plot_fit(), figure.Figure)
 
 @mark.parametrize(
     "factory",
@@ -688,6 +709,27 @@ def test_shot_list_errors():
     with raises(TypeError, match=r"valid iterator of integers"):
         PolyFactory(X_VALS, order=2, shot_list=[1.0, 2])
 
+@mark.parametrize(
+    "factory",
+    (
+        LinearFactory,
+        RichardsonFactory,
+        PolyFactory,
+        ExpFactory,
+        PolyExpFactory,
+    ),
+)
+def test_iterate_deprecation_warning(factory):
+    """Tests errors related to the "shot_lists" argument."""
+    scale_factors = np.linspace(1.0, 10.0, num=20)
+    if factory is PolyFactory or factory is PolyExpFactory:
+        fac = factory(scale_factors=scale_factors, order=2)
+    else:
+        fac = factory(scale_factors=scale_factors)
+
+    with raises(DeprecationWarning, match=r"The `iterate` method is deprecated in v0.3.0 and will be removed "
+            "in v0.4.0. Use `run_classical` instead."):
+        fac.iterate(apply_seed_to_func(f_lin, seed=1))
 
 def test_push_after_already_reduced_warning():
     """Tests a warning is raised if new data is pushed in a factory
