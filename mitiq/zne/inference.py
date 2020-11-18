@@ -1095,7 +1095,7 @@ class ExpFactory(BatchedFactory):
             eps: Epsilon to regularize log(sign(scale_factors - asymptote))
                 when the argument is to close to zero or negative.
             full_output: If False (default), only the zero-noise limit is
-                returned. If True, additional results are returned too.
+                returned. If True, additional information about the extrapolated limit is returned too.
 
         Returns:
             zne_limit: The extrapolated zero-noise limit. If "full_output"
