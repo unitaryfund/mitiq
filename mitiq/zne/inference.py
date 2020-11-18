@@ -762,7 +762,7 @@ class PolyFactory(BatchedFactory):
             exp_values: The array of expectation values.
             order: The extrapolation order (degree of the polynomial fit).
             full_output: If False (default), only the zero-noise limit is
-                returned. If True, additional results are returned too.
+                returned. If True, additional information about the extrapolated limit is returned too.
         Returns:
             zne_limit: The extrapolated zero-noise limit. If "full_output"
                 is False (default value), only this parameter is returned.
