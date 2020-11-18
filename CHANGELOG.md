@@ -14,6 +14,7 @@
 
 - Add refernce to review paper in docs (@willzeng, gh-423).
 - Add unitary folding API (@rmlarose, gh-429).
+- Add new get methods (for fit errors, extrapolation curve, etc.) to Factory objects (@crazy4pi314, @andreamari, gh-403).
 
 ## Version 0.3.0 (October 30th, 2020)
 
