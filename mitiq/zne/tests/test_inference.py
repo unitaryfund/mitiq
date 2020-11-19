@@ -45,6 +45,9 @@ C = 0.4
 D = 0.3
 X_VALS = [1, 1.3, 1.7, 2.2, 2.4]
 
+# RungeFactory only accepts equally spaced scale factos
+Runge_X_VALS = [1, 1.5, 2.0, 2.5, 3.0]
+
 STAT_NOISE = 0.0001
 CLOSE_TOL = 1.0e-2
 # PolyExp fit is non-linear, so we set a larger tolerance
@@ -351,7 +354,7 @@ def test_richardson_extr(test_f: Callable[[float], float]):
 def test_runge_extr(test_f: Callable[[float], float]):
     """Test of the Runge's extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = RungeFactory(scale_factors=X_VALS)
+    fac = RungeFactory(scale_factors=Runge_X_VALS)
     assert not fac._opt_params
     fac.run_classical(seeded_f)
     zne_value = fac.reduce()
