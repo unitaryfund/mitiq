@@ -29,6 +29,7 @@ from mitiq.zne.inference import (
     ExtrapolationWarning,
     ConvergenceWarning,
     RichardsonFactory,
+    RungeFactory,
     LinearFactory,
     PolyFactory,
     ExpFactory,
@@ -130,6 +131,7 @@ def test_noise_seeding(test_f: Callable[[float], float]):
     (
         LinearFactory,
         RichardsonFactory,
+        RungeFactory,
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
@@ -186,6 +188,7 @@ def test_get_scale_factors_adaptive_factories(factory):
     (
         LinearFactory,
         RichardsonFactory,
+        RungeFactory,
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
@@ -254,6 +257,7 @@ def test_get_expectation_values_adaptive_factories(factory):
     (
         LinearFactory,
         RichardsonFactory,
+        RungeFactory,
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
@@ -296,6 +300,7 @@ def test_run_sequential_and_batched(factory, batched):
     (
         LinearFactory,
         RichardsonFactory,
+        RungeFactory,
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
@@ -334,6 +339,18 @@ def test_richardson_extr(test_f: Callable[[float], float]):
     """Test of the Richardson's extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = RichardsonFactory(scale_factors=X_VALS)
+    assert not fac._opt_params
+    fac.run_classical(seeded_f)
+    zne_value = fac.reduce()
+    assert np.isclose(zne_value, seeded_f(0, err=0), atol=CLOSE_TOL)
+    assert len(fac._opt_params) == len(X_VALS)
+    assert np.isclose(fac._opt_params[-1], zne_value)
+
+
+def test_runge_extr(test_f: Callable[[float], float]):
+    """Test of the Runge's extrapolator."""
+    seeded_f = apply_seed_to_func(test_f, SEED)
+    fac = RungeFactory(scale_factors=X_VALS)
     assert not fac._opt_params
     fac.run_classical(seeded_f)
     zne_value = fac.reduce()
@@ -481,7 +498,8 @@ def test_ada_exp_factory_with_asympt(
 def test_ada_exp_fac_with_asympt_more_steps(
     test_f: Callable[[float], float], avoid_log: bool
 ):
-    """Test of the adaptive exponential extrapolator with more steps."""
+    """Test of the adaptive exponential extrapolator with more steps.
+    """
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = AdaExpFactory(
         steps=6, scale_factor=2.0, asymptote=A, avoid_log=avoid_log
@@ -534,7 +552,7 @@ def test_avoid_log_keyword():
     assert not znl_with_log == znl_without_log
 
 
-@mark.parametrize("factory", (LinearFactory, RichardsonFactory))
+@mark.parametrize("factory", (LinearFactory, RichardsonFactory, RungeFactory))
 def test_too_few_scale_factors(factory):
     """Test less than 2 scale_factors."""
     with raises(ValueError, match=r"At least 2 scale factors are necessary"):
@@ -628,7 +646,9 @@ def test_equal_simple():
     assert copied_fac != fac
 
 
-@mark.parametrize("factory", (LinearFactory, RichardsonFactory, PolyFactory))
+@mark.parametrize(
+    "factory", (LinearFactory, RichardsonFactory, RungeFactory, PolyFactory)
+)
 def test_equal(factory):
     for run_classical in (True, False):
         if factory is PolyFactory:
@@ -654,7 +674,9 @@ def test_equal(factory):
             assert copied_factory is not fac
 
 
-@mark.parametrize("fac_class", [LinearFactory, RichardsonFactory])
+@mark.parametrize(
+    "fac_class", [LinearFactory, RichardsonFactory, RungeFactory]
+)
 def test_iterate_with_shot_list(fac_class):
     """Tests factories with (and without) the "shot_list" argument."""
     # first test without shot_list
@@ -778,7 +800,7 @@ def test_params_cov_and_zne_std():
     assert np.isclose(zne_curve(0.5), 0.0)
 
 
-@mark.parametrize("factory", [LinearFactory, RichardsonFactory])
+@mark.parametrize("factory", [LinearFactory, RichardsonFactory, RungeFactory])
 def test_execute_with_zne_fit_fail(factory):
     """Tests errors are raised when asking for fitting parameters that can't
     be calculated.
