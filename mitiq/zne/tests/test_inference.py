@@ -347,6 +347,7 @@ def test_richardson_extr(test_f: Callable[[float], float]):
     assert np.isclose(fac._opt_params[-1], zne_value)
 
 
+@mark.parametrize("test_f", [f_lin, f_non_lin])
 def test_runge_extr(test_f: Callable[[float], float]):
     """Test of the Runge's extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)

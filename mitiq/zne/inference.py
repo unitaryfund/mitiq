@@ -929,9 +929,6 @@ class RungeFactory(BatchedFactory):
     interpolation when there are a lot of nodes, especially close to the
     edges of the domain.
 
-    Reference:
-        https://www.sciencedirect.com/science/article/abs/pii/S0377042719303449
-
     Args:
         scale_factors: Sequence of noise scale factors at which
                        expectation values should be measured.
@@ -944,6 +941,12 @@ class RungeFactory(BatchedFactory):
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
+
+    .. [De2020polynomial]: S.De Marchia. F. Marchetti, E.Perracchionea
+        and D.Poggialia,
+        "Polynomial interpolation via mapped bases without resampling,"
+        *Journ of Comp. and App. Math.* **364**, 112347 (2020),
+        (https://www.sciencedirect.com/science/article/abs/pii/S0377042719303449).
     """
 
     @staticmethod
@@ -969,18 +972,21 @@ class RungeFactory(BatchedFactory):
         order = len(scale_factors) - 1
 
         # Define interval [a, b] for which the scale_factors are mapped to
-        a = 1.0
-        b = scale_factors[-1]
+        a = min(scale_factors)
+        b = max(scale_factors)
+
+        if not RungeFactory._is_equally_spaced(scale_factors):
+            raise ValueError("The scale factors must be equally spaced.")
 
         # Mapping to the fake nodes
-        _S_scale_factors = RungeFactory._map(scale_factors, a, b)
+        _S_scale_factors = RungeFactory._map_to_fake_nodes(scale_factors, a, b)
 
         opt_params, params_cov = mitiq_polyfit(
             _S_scale_factors, exp_values, order
         )
 
         poly = np.poly1d(opt_params)
-        zne_limit = poly(RungeFactory._map(0.0, a, b))
+        zne_limit = poly(RungeFactory._map_to_fake_nodes(0.0, a, b))
 
         if not full_output:
             return zne_limit
@@ -1020,13 +1026,11 @@ class RungeFactory(BatchedFactory):
         return self._zne_limit
 
     @staticmethod
-    def _map(
-            x: Union[Sequence[float], float],
-            a: float,
-            b: float
-        ) -> Sequence[float]:
+    def _map_to_fake_nodes(
+        x: Union[Sequence[float], float], a: float, b: float
+    ) -> Sequence[float]:
         """
-        A function that maps points to Chebyshev-Lobatto points. Based on
+        A function that maps inputs to Chebyshev-Lobatto points. Based on
         the function:
             S(x) = (a - b)/2 * cos(pi * (x - a)/(b - a)) + (a + b)/2.
         Where a and b are the endpoints of the interval [a, b] of CL points
@@ -1047,9 +1051,20 @@ class RungeFactory(BatchedFactory):
             return (a - b) / 2 * np.cos(np.pi * (x - a) / (b - a)) + (
                 a + b
             ) / 2
+
         if isinstance(x, float):
             return S(x)
+
         return np.array([S(y) for y in x])
+
+    @staticmethod
+    def _is_equally_spaced(arr: Sequence[float]) -> bool:
+        """Checks if the sequence is equally spaced."""
+        diff = arr[1] - arr[0]
+        for num in range(1, len(arr) - 1):
+            if arr[num + 1] - arr[num] != diff:
+                return False
+        return True
 
 
 class LinearFactory(BatchedFactory):
