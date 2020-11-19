@@ -1023,7 +1023,12 @@ class RungeFactory(BatchedFactory):
     def _map(x: Union[Sequence[float], float], 
             a: float, b: float) -> Sequence[float]:
         """
-        A function that maps the scale_factors to Chebyshev-Lobatto points.
+        A function that maps points to Chebyshev-Lobatto points. Based on
+        the function:
+            S(x) = (a - b)/2 * cos(pi * (x - a)/(b - a)) + (a + b)/2. 
+        Where a and b are the endpoints of the interval [a, b] of CL points 
+        we are mapping to.
+
         Args:
             x:
                 Sequence[float]: Map sequence of floats to another sequence
@@ -1120,7 +1125,7 @@ class LinearFactory(BatchedFactory):
 
     def reduce(self) -> float:
         """Returns the zero-noise limit found by fitting a line to the internal
-        data stored in the factory.
+            data stored in the factory.
 
         Returns:
             The zero-noise limit.
