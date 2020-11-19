@@ -45,7 +45,7 @@ C = 0.4
 D = 0.3
 X_VALS = [1, 1.3, 1.7, 2.2, 2.4]
 
-# RungeFactory only accepts equally spaced scale factos
+# RungeFactory only accepts equally spaced scale factors
 Runge_X_VALS = [1, 1.5, 2.0, 2.5, 3.0]
 
 STAT_NOISE = 0.0001

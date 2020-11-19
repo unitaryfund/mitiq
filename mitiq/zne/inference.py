@@ -1061,8 +1061,10 @@ class RungeFactory(BatchedFactory):
     def _is_equally_spaced(arr: Sequence[float]) -> bool:
         """Checks if the sequence is equally spaced."""
         diff = arr[1] - arr[0]
+        import math
+
         for num in range(1, len(arr) - 1):
-            if arr[num + 1] - arr[num] != diff:
+            if not math.isclose(arr[num + 1] - arr[num], diff, rel_tol=1.0e-9):
                 return False
         return True
 
