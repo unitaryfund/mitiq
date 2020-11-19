@@ -1020,25 +1020,24 @@ class RungeFactory(BatchedFactory):
         return self._zne_limit
 
     @staticmethod
-    def _map(x: Union[Sequence[float], float], 
-            a: float, b: float) -> Sequence[float]:
+    def _map(
+            x: Union[Sequence[float], float],
+            a: float,
+            b: float
+        ) -> Sequence[float]:
         """
         A function that maps points to Chebyshev-Lobatto points. Based on
         the function:
-            S(x) = (a - b)/2 * cos(pi * (x - a)/(b - a)) + (a + b)/2. 
-        Where a and b are the endpoints of the interval [a, b] of CL points 
+            S(x) = (a - b)/2 * cos(pi * (x - a)/(b - a)) + (a + b)/2.
+        Where a and b are the endpoints of the interval [a, b] of CL points
         we are mapping to.
 
         Args:
             x:
-                Sequence[float]: Map sequence of floats to another sequence
-                            of floats.
-                float: Map a single float to another float.
+                Sequence[float]: Set of values to be mapped to CL points.
+                float: A single value to be mapped to a CL point.
             a: A float representing the interval starting at a
-            b: A float representing the interval starting at a
-        Raises:
-            ValueError: If the last scale factor in the scale_factors
-                    sequence is smaller than 1.0.
+            b: A float representing the interval ending at b
         Returns:
             A new sequence of fake nodes (Chebyshev-Lobatto points).
         """
