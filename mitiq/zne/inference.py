@@ -789,12 +789,14 @@ class PolyFactory(BatchedFactory):
         opt_params, params_cov = mitiq_polyfit(
             scale_factors, exp_values, order
         )
+
         zne_limit = opt_params[-1]
 
         if not full_output:
             return zne_limit
 
         zne_error = None
+
         if params_cov is not None:
             if params_cov.shape == (order + 1, order + 1):
                 zne_error = np.sqrt(params_cov[order, order])
@@ -920,6 +922,137 @@ class RichardsonFactory(BatchedFactory):
         return self._zne_limit
 
 
+class RungeFactory(BatchedFactory):
+    """Factory object implementing another version of Richardson extrapolation.
+    In this version the original set of nodes (scale_factors) are mapped to set
+    of fake nodes known as Chebyshev-Lobatto points. This method gives a better
+    interpolation when there are a lot of nodes, especially close to the
+    edges of the domain.
+
+    Reference:
+        https://www.sciencedirect.com/science/article/abs/pii/S0377042719303449
+
+    Args:
+        scale_factors: Sequence of noise scale factors at which
+                       expectation values should be measured.
+        shot_list: Optional sequence of integers corresponding to the number
+                   of samples taken for each expectation value. If this
+                   argument is explicitly passed to the factory, it must have
+                   the same length of scale_factors and the executor function
+                   must accept "shots" as a valid keyword argument.
+
+    Raises:
+        ValueError: If data is not consistent with the extrapolation model.
+        ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
+    """
+
+    @staticmethod
+    def extrapolate(
+        scale_factors: Sequence[float],
+        exp_values: Sequence[float],
+        full_output: bool = False,
+    ) -> Union[
+        float,
+        Tuple[
+            float,
+            Union[float, None],
+            List[float],
+            Union[np.ndarray, None],
+            Callable[[float], float],
+        ],
+    ]:
+        # Richardson extrapolation is a particular case of a polynomial fit
+        # with order equal to the number of data points minus 1.
+        # In this version of Richardson extrapolation we map the samples to
+        # a new set of fake nodes and polynomially extrapolate.
+
+        order = len(scale_factors) - 1
+
+        # Define interval [a, b] for which the scale_factors are mapped to
+        a = 1.0
+        b = scale_factors[-1]
+
+        # Mapping to the fake nodes
+        _S_scale_factors = RungeFactory._map(scale_factors, a, b)
+
+        opt_params, params_cov = mitiq_polyfit(
+            _S_scale_factors, exp_values, order
+        )
+
+        poly = np.poly1d(opt_params)
+        zne_limit = poly(RungeFactory._map(0.0, a, b))
+
+        if not full_output:
+            return zne_limit
+
+        zne_error = None
+
+        if params_cov is not None:
+            if params_cov.shape == (order + 1, order + 1):
+                zne_error = np.sqrt(params_cov[order, order])
+
+        def zne_curve(scale_factor: float) -> float:
+            return np.polyval(opt_params, scale_factor)
+
+        return zne_limit, zne_error, opt_params, params_cov, zne_curve
+
+    def reduce(self) -> float:
+        """Evaluates the zero-noise limit found by applying the fake node
+        Richardson extrapolation to the internal data stored in the factory.
+
+        Returns:
+            The zero-noise limit.
+        """
+
+        (
+            self._zne_limit,
+            self._zne_error,
+            self._opt_params,
+            self._params_cov,
+            self._zne_curve,
+        ) = self.extrapolate(  # type: ignore
+            self.get_scale_factors(),
+            self.get_expectation_values(),
+            full_output=True,
+        )
+
+        self._already_reduced = True
+        return self._zne_limit
+
+    @staticmethod
+    def _map(x: Union[Sequence[float], float], 
+            a: float, b: float) -> Sequence[float]:
+        """
+        A function that maps points to Chebyshev-Lobatto points. Based on
+        the function:
+            S(x) = (a - b)/2 * cos(pi * (x - a)/(b - a)) + (a + b)/2. 
+        Where a and b are the endpoints of the interval [a, b] of CL points 
+        we are mapping to.
+
+        Args:
+            x:
+                Sequence[float]: Map sequence of floats to another sequence
+                            of floats.
+                float: Map a single float to another float.
+            a: A float representing the interval starting at a
+            b: A float representing the interval starting at a
+        Raises:
+            ValueError: If the last scale factor in the scale_factors
+                    sequence is smaller than 1.0.
+        Returns:
+            A new sequence of fake nodes (Chebyshev-Lobatto points).
+        """
+
+        # The mapping function
+        def S(x):
+            return (a - b) / 2 * np.cos(np.pi * (x - a) / (b - a)) + (
+                a + b
+            ) / 2
+        if isinstance(x, float):
+            return S(x)
+        return np.array([S(y) for y in x])
+
+
 class LinearFactory(BatchedFactory):
     """
     Factory object implementing zero-noise extrapolation based
@@ -992,7 +1125,7 @@ class LinearFactory(BatchedFactory):
 
     def reduce(self) -> float:
         """Returns the zero-noise limit found by fitting a line to the internal
-        data stored in the factory.
+            data stored in the factory.
 
         Returns:
             The zero-noise limit.
