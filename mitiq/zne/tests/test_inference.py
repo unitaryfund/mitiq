@@ -355,7 +355,7 @@ def test_richardson_extr(test_f: Callable[[float], float]):
 
 @mark.parametrize("test_f", [f_lin, f_non_lin])
 def test_runge_extr(test_f: Callable[[float], float]):
-    """Test of the Runge's extrapolator."""
+    """Test of the Runge extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = RungeFactory(scale_factors=RUNGE_X_VALS)
     assert not fac._opt_params
@@ -363,7 +363,7 @@ def test_runge_extr(test_f: Callable[[float], float]):
     zne_value = fac.reduce()
     assert np.isclose(zne_value, seeded_f(0, err=0), atol=RUNGE_TOL)
     assert len(fac._opt_params) == len(X_VALS)
-    assert np.isclose(fac._opt_params[-1], zne_value)
+    assert np.isclose(fac._opt_params[-1], zne_value, atol=RUNGE_TOL)
 
 
 def test_linear_extr():
