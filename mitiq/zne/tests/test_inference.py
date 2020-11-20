@@ -46,7 +46,10 @@ D = 0.3
 X_VALS = [1, 1.3, 1.7, 2.2, 2.4]
 
 # RungeFactory only accepts equally spaced scale factors
-Runge_X_VALS = [1, 1.5, 2.0, 2.5, 3.0]
+RUNGE_X_VALS = [1, 1.5, 2.0, 2.5, 3.0]
+
+# RungeFactory tolerance is larger than Richardson
+RUNGE_TOL = 1.0e-1
 
 STAT_NOISE = 0.0001
 CLOSE_TOL = 1.0e-2
@@ -354,11 +357,11 @@ def test_richardson_extr(test_f: Callable[[float], float]):
 def test_runge_extr(test_f: Callable[[float], float]):
     """Test of the Runge's extrapolator."""
     seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = RungeFactory(scale_factors=Runge_X_VALS)
+    fac = RungeFactory(scale_factors=RUNGE_X_VALS)
     assert not fac._opt_params
     fac.run_classical(seeded_f)
     zne_value = fac.reduce()
-    assert np.isclose(zne_value, seeded_f(0, err=0), atol=CLOSE_TOL)
+    assert np.isclose(zne_value, seeded_f(0, err=0), atol=RUNGE_TOL)
     assert len(fac._opt_params) == len(X_VALS)
     assert np.isclose(fac._opt_params[-1], zne_value)
 

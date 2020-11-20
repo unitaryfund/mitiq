@@ -925,9 +925,9 @@ class RichardsonFactory(BatchedFactory):
 class RungeFactory(BatchedFactory):
     """Factory object implementing another version of Richardson extrapolation.
     In this version the original set of nodes (scale_factors) are mapped to set
-    of fake nodes known as Chebyshev-Lobatto points. This method gives a better
-    interpolation when there are a lot of nodes, especially close to the
-    edges of the domain.
+    of fake nodes known as Chebyshev-Lobatto points.
+    This method can give a better interpolation when there are many nodes,
+    especially close to the edges of the domain.
 
     Args:
         scale_factors: Sequence of noise scale factors at which
@@ -964,43 +964,42 @@ class RungeFactory(BatchedFactory):
             Callable[[float], float],
         ],
     ]:
-        # Richardson extrapolation is a particular case of a polynomial fit
-        # with order equal to the number of data points minus 1.
-        # In this version of Richardson extrapolation we map the samples to
-        # a new set of fake nodes and polynomially extrapolate.
-
         order = len(scale_factors) - 1
-
-        # Define interval [a, b] for which the scale_factors are mapped to
-        a = min(scale_factors)
-        b = max(scale_factors)
 
         if not RungeFactory._is_equally_spaced(scale_factors):
             raise ValueError("The scale factors must be equally spaced.")
 
+        # Define interval [a, b] for which the scale_factors are mapped to
+        a = 0.0
+        b = min(scale_factors) + max(scale_factors)
+
         # Mapping to the fake nodes
         _S_scale_factors = RungeFactory._map_to_fake_nodes(scale_factors, a, b)
 
-        opt_params, params_cov = mitiq_polyfit(
-            _S_scale_factors, exp_values, order
+        return PolyFactory.extrapolate(
+            _S_scale_factors, exp_values, order, full_output
         )
 
-        poly = np.poly1d(opt_params)
-        zne_limit = poly(RungeFactory._map_to_fake_nodes(0.0, a, b))
+        # opt_params, params_cov = mitiq_polyfit(
+        #     _S_scale_factors, exp_values, order
+        # )
 
-        if not full_output:
-            return zne_limit
+        # poly = np.poly1d(opt_params)
+        # zne_limit = poly(RungeFactory._map_to_fake_nodes(0.0, a, b))
 
-        zne_error = None
+        # if not full_output:
+        #     return zne_limit
 
-        if params_cov is not None:
-            if params_cov.shape == (order + 1, order + 1):
-                zne_error = np.sqrt(params_cov[order, order])
+        # zne_error = None
 
-        def zne_curve(scale_factor: float) -> float:
-            return np.polyval(opt_params, scale_factor)
+        # if params_cov is not None:
+        #     if params_cov.shape == (order + 1, order + 1):
+        #         zne_error = np.sqrt(params_cov[order, order])
 
-        return zne_limit, zne_error, opt_params, params_cov, zne_curve
+        # def zne_curve(scale_factor: float) -> float:
+        #     return np.polyval(opt_params, scale_factor)
+
+        # return zne_limit, zne_error, opt_params, params_cov, zne_curve
 
     def reduce(self) -> float:
         """Evaluates the zero-noise limit found by applying the fake node
@@ -1060,13 +1059,9 @@ class RungeFactory(BatchedFactory):
     @staticmethod
     def _is_equally_spaced(arr: Sequence[float]) -> bool:
         """Checks if the sequence is equally spaced."""
-        diff = arr[1] - arr[0]
-        import math
 
-        for num in range(1, len(arr) - 1):
-            if not math.isclose(arr[num + 1] - arr[num], diff, rel_tol=1.0e-9):
-                return False
-        return True
+        diff_arr = np.diff(np.sort(arr))
+        return np.allclose(diff_arr, diff_arr[0])
 
 
 class LinearFactory(BatchedFactory):
