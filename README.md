@@ -36,7 +36,7 @@ This prints out version information about core requirements and optional quantum
 interface with.
 
 If you'd prefer to clone and install from source, our would like to develop Mitiq, check out the
-[contribution guidelines](CONTRIBUTING.md) for more information.
+[contribution guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) for more information.
 
 ### Supported quantum programming libraries
 
@@ -108,8 +108,8 @@ release can be found [here](https://mitiq.readthedocs.io/_/downloads/en/latest/p
 ## Developer information
 
 We welcome contributions to Mitiq including bug fixes, feature requests, etc.
-Please see the  [contribution guidelines](CONTRIBUTING.md) for more details.
-To contribute to the documentation, please see these [documentation guidelines](docs/CONTRIBUTING_DOCS.md).
+Please see the  [contribution guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) for more details.
+To contribute to the documentation, please see these [documentation guidelines](https://mitiq.readthedocs.io/en/stable/contributing_docs.html).
 
 ## Authors
 
