@@ -15,7 +15,7 @@ are noisy due to interactions with the environment, imperfect gate applications,
 errors, etc. Error mitigation seeks to reduce these effects at the software level by compiling quantum programs in 
 clever ways.
 
-Want to know more? Check out our [documentation](https://mitiq.readthedocs.io/en/latest/guide/guide-overview.html).
+Want to know more? Check out our [documentation](https://mitiq.readthedocs.io/en/stable/guide/guide-overview.html).
 
 ## Installation
 
@@ -56,7 +56,7 @@ available to the user.
 
 ## Getting started
 
-See the [getting started](https://mitiq.readthedocs.io/en/latest/guide/guide-getting-started.html) guide in
+See the [getting started](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html) guide in
 [Mitiq's documentation](https://mitiq.readthedocs.io) for a complete walkthrough of how to use mitiq. For
 a quick preview, check out the following snippet for a simple example of Mitiq in action:
 
@@ -97,7 +97,7 @@ Error in simulation (with mitigation): 0.000519
 
 ## Error mitigation techniques
 
-Mitiq currently implements [zero-noise extrapolation](https://mitiq.readthedocs.io/en/latest/guide/guide-zne.html) and 
+Mitiq currently implements [zero-noise extrapolation](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html) and 
 is designed to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
 
 ## Documentation
