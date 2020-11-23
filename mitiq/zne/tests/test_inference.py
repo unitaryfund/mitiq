@@ -29,7 +29,7 @@ from mitiq.zne.inference import (
     ExtrapolationWarning,
     ConvergenceWarning,
     RichardsonFactory,
-    RungeFactory,
+    FakeNodesFactory,
     LinearFactory,
     PolyFactory,
     ExpFactory,
@@ -45,11 +45,11 @@ C = 0.4
 D = 0.3
 X_VALS = [1, 1.3, 1.7, 2.2, 2.4]
 
-# RungeFactory only accepts equally spaced scale factors
-RUNGE_X_VALS = [1, 1.5, 2.0, 2.5, 3.0]
+# FakeNodesFactory only accepts equally spaced scale factors
+UNIFORM_X = np.linspace(1.0, 3.0, 20)
 
-# RungeFactory tolerance is larger than Richardson
-RUNGE_TOL = 1.0e-1
+# FakeNodesFactory needs a larger tolerance
+LARGE_TOL = 1.0e-1
 
 STAT_NOISE = 0.0001
 CLOSE_TOL = 1.0e-2
@@ -120,6 +120,13 @@ def f_lin_shot(x: float, shots=1) -> float:
     return A + B * x + 0.001 / np.sqrt(shots)
 
 
+def f_runge(x: float) -> float:
+    """Function with a peak at x=3, which has a strong Runge effect
+    with RichardsonFactory but not with FakeNodesFactory.
+    """
+    return 1.0 / ((x - 2) ** 2 + 1.0)
+
+
 @mark.parametrize("test_f", [f_lin, f_non_lin])
 def test_noise_seeding(test_f: Callable[[float], float]):
     """Check that seeding works as expected."""
@@ -137,7 +144,7 @@ def test_noise_seeding(test_f: Callable[[float], float]):
     (
         LinearFactory,
         RichardsonFactory,
-        RungeFactory,
+        FakeNodesFactory,
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
@@ -194,7 +201,7 @@ def test_get_scale_factors_adaptive_factories(factory):
     (
         LinearFactory,
         RichardsonFactory,
-        RungeFactory,
+        FakeNodesFactory,
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
@@ -263,7 +270,7 @@ def test_get_expectation_values_adaptive_factories(factory):
     (
         LinearFactory,
         RichardsonFactory,
-        RungeFactory,
+        FakeNodesFactory,
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
@@ -306,7 +313,7 @@ def test_run_sequential_and_batched(factory, batched):
     (
         LinearFactory,
         RichardsonFactory,
-        RungeFactory,
+        FakeNodesFactory,
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
@@ -353,17 +360,31 @@ def test_richardson_extr(test_f: Callable[[float], float]):
     assert np.isclose(fac._opt_params[-1], zne_value)
 
 
-@mark.parametrize("test_f", [f_lin, f_non_lin])
-def test_runge_extr(test_f: Callable[[float], float]):
-    """Test of the Runge extrapolator."""
-    seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = RungeFactory(scale_factors=RUNGE_X_VALS)
+def test_fake_nodes_factory():
+    """Test FakeNodesFactory in a specific regime in which the fake nodes
+    interpolation method works well.
+    """
+    fac = FakeNodesFactory(UNIFORM_X)
     assert not fac._opt_params
-    fac.run_classical(seeded_f)
+    fac.run_classical(f_runge)
     zne_value = fac.reduce()
-    assert np.isclose(zne_value, seeded_f(0, err=0), atol=RUNGE_TOL)
-    assert len(fac._opt_params) == len(X_VALS)
-    assert np.isclose(fac._opt_params[-1], zne_value, atol=RUNGE_TOL)
+    assert np.isclose(zne_value, f_runge(0.0), atol=LARGE_TOL)
+    assert len(fac._opt_params) == len(UNIFORM_X)
+    assert np.isclose(fac._opt_params[-1], zne_value)
+
+
+def test_fake_nodes_extrapolation():
+    """Test that there exists a regime in which FakeNodesFactory
+    is better than RichardsonFactory.
+    Note: in many cases RichardsonFactory is better.
+    """
+    y_vals = [f_runge(x) for x in UNIFORM_X]
+    zne_runge = FakeNodesFactory.extrapolate(UNIFORM_X, y_vals)
+    zne_richard = RichardsonFactory.extrapolate(UNIFORM_X, y_vals)
+    abs_err_runge = np.abs(zne_runge - f_runge(0.0))
+    abs_err_richard = np.abs(zne_richard - f_runge(0.0))
+    # Test Richardson extrapolation error is much larger
+    assert 500 * abs_err_runge < abs_err_richard
 
 
 def test_linear_extr():
@@ -559,7 +580,9 @@ def test_avoid_log_keyword():
     assert not znl_with_log == znl_without_log
 
 
-@mark.parametrize("factory", (LinearFactory, RichardsonFactory, RungeFactory))
+@mark.parametrize(
+    "factory", (LinearFactory, RichardsonFactory, FakeNodesFactory)
+)
 def test_too_few_scale_factors(factory):
     """Test less than 2 scale_factors."""
     with raises(ValueError, match=r"At least 2 scale factors are necessary"):
@@ -654,7 +677,9 @@ def test_equal_simple():
 
 
 @mark.parametrize(
-    "factory", (LinearFactory, RichardsonFactory, RungeFactory, PolyFactory)
+    "factory", (
+        LinearFactory, RichardsonFactory, FakeNodesFactory, PolyFactory
+    ),
 )
 def test_equal(factory):
     for run_classical in (True, False):
@@ -682,7 +707,7 @@ def test_equal(factory):
 
 
 @mark.parametrize(
-    "fac_class", [LinearFactory, RichardsonFactory, RungeFactory]
+    "fac_class", [LinearFactory, RichardsonFactory]
 )
 def test_iterate_with_shot_list(fac_class):
     """Tests factories with (and without) the "shot_list" argument."""
@@ -807,7 +832,9 @@ def test_params_cov_and_zne_std():
     assert np.isclose(zne_curve(0.5), 0.0)
 
 
-@mark.parametrize("factory", [LinearFactory, RichardsonFactory, RungeFactory])
+@mark.parametrize(
+    "factory", [LinearFactory, RichardsonFactory, FakeNodesFactory]
+)
 def test_execute_with_zne_fit_fail(factory):
     """Tests errors are raised when asking for fitting parameters that can't
     be calculated.

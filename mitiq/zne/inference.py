@@ -922,12 +922,14 @@ class RichardsonFactory(BatchedFactory):
         return self._zne_limit
 
 
-class RungeFactory(BatchedFactory):
-    """Factory object implementing another version of Richardson extrapolation.
-    In this version the original set of nodes (scale_factors) are mapped to set
-    of fake nodes known as Chebyshev-Lobatto points.
-    This method can give a better interpolation when there are many nodes,
-    especially close to the edges of the domain.
+class FakeNodesFactory(BatchedFactory):
+    """Factory object implementing a modified version [De2020polynomial]_ of
+    Richardson extrapolation. In this version the original set of scale factors
+    is mapped to a new set of fake nodes, known as Chebyshev-Lobatto points.
+    This method may give a better interpolation for particular types of curves
+    and if the number of scale factors is large (> 10). One should be aware
+    that, in many other cases, the fake nodes extrapolation method is usually
+    not superior to standard Richardson extrapolation.
 
     Args:
         scale_factors: Sequence of noise scale factors at which
@@ -964,9 +966,8 @@ class RungeFactory(BatchedFactory):
             Callable[[float], float],
         ],
     ]:
-        order = len(scale_factors) - 1
 
-        if not RungeFactory._is_equally_spaced(scale_factors):
+        if not FakeNodesFactory._is_equally_spaced(scale_factors):
             raise ValueError("The scale factors must be equally spaced.")
 
         # Define interval [a, b] for which the scale_factors are mapped to
@@ -974,32 +975,28 @@ class RungeFactory(BatchedFactory):
         b = min(scale_factors) + max(scale_factors)
 
         # Mapping to the fake nodes
-        _S_scale_factors = RungeFactory._map_to_fake_nodes(scale_factors, a, b)
+        fake_nodes = FakeNodesFactory._map_to_fake_nodes(scale_factors, a, b)
 
-        return PolyFactory.extrapolate(
-            _S_scale_factors, exp_values, order, full_output
-        )
+        if not full_output:
+            return RichardsonFactory.extrapolate(fake_nodes, exp_values)
 
-        # opt_params, params_cov = mitiq_polyfit(
-        #     _S_scale_factors, exp_values, order
-        # )
+        (
+            zne_limit,
+            zne_error,
+            opt_params,
+            params_cov,
+            zne_curve,
+        ) = RichardsonFactory.extrapolate(fake_nodes, exp_values, True)
 
-        # poly = np.poly1d(opt_params)
-        # zne_limit = poly(RungeFactory._map_to_fake_nodes(0.0, a, b))
+        # Convert zne_curve from the "fake node space" to the real space.
+        # Note: since a=0.0, this conversion is not necessary for zne_limit.
+        def new_curve(scale_factor: float) -> float:
+            """Get real zne_cruve from the curve based on fake nodes."""
+            return zne_curve(
+                FakeNodesFactory._map_to_fake_nodes(scale_factor, a, b)
+            )
 
-        # if not full_output:
-        #     return zne_limit
-
-        # zne_error = None
-
-        # if params_cov is not None:
-        #     if params_cov.shape == (order + 1, order + 1):
-        #         zne_error = np.sqrt(params_cov[order, order])
-
-        # def zne_curve(scale_factor: float) -> float:
-        #     return np.polyval(opt_params, scale_factor)
-
-        # return zne_limit, zne_error, opt_params, params_cov, zne_curve
+        return zne_limit, zne_error, opt_params, params_cov, zne_curve
 
     def reduce(self) -> float:
         """Evaluates the zero-noise limit found by applying the fake node
@@ -1030,7 +1027,7 @@ class RungeFactory(BatchedFactory):
     ) -> Sequence[float]:
         """
         A function that maps inputs to Chebyshev-Lobatto points. Based on
-        the function:
+        the function [De2020polynomial]_:
             S(x) = (a - b)/2 * cos(pi * (x - a)/(b - a)) + (a + b)/2.
         Where a and b are the endpoints of the interval [a, b] of CL points
         we are mapping to.
@@ -1043,6 +1040,12 @@ class RungeFactory(BatchedFactory):
             b: A float representing the interval ending at b
         Returns:
             A new sequence of fake nodes (Chebyshev-Lobatto points).
+
+        .. [De2020polynomial]: S.De Marchia. F. Marchetti, E.Perracchionea
+            and D.Poggialia,
+            "Polynomial interpolation via mapped bases without resampling,"
+            *Journ of Comp. and App. Math.* **364**, 112347 (2020),
+            (https://www.sciencedirect.com/science/article/abs/pii/S0377042719303449).
         """
 
         # The mapping function
