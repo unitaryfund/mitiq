@@ -15,7 +15,7 @@
 
 """Types used in probabilistic error cancellation."""
 from copy import deepcopy
-from typing import Any, List, Sequence, Tuple, Union
+from typing import Any, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
@@ -157,9 +157,17 @@ class NoisyOperation:
     ) -> "NoisyOperation":
         raise NotImplementedError
 
-    @property
-    def ideal_circuit(self) -> cirq.Circuit:
-        return self._ideal
+    def ideal_circuit(self, return_type: Optional[str] = None) -> cirq.Circuit:
+        """Returns the ideal circuit of the NoisyOperation.
+
+        Args:
+            return_type: Type of the circuit to return.
+                If not specified, the returned type is the same type as the
+                circuit used to initialize the NoisyOperation.
+        """
+        if not return_type:
+            return self._native_ideal
+        return convert_from_mitiq(self._ideal, return_type)
 
     @property
     def qubits(self) -> Tuple[cirq.Qid]:

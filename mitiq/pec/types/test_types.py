@@ -28,9 +28,10 @@ def test_init_with_gate():
     ideal_gate = cirq.Z
     real = np.zeros(shape=(4, 4))
     noisy_op = NoisyOperation.from_cirq(ideal_gate, real)
-    assert isinstance(noisy_op.ideal_circuit, cirq.Circuit)
+    assert isinstance(noisy_op._ideal, cirq.Circuit)
+
     assert _equal(
-        noisy_op.ideal_circuit,
+        noisy_op.ideal_circuit(),
         cirq.Circuit(ideal_gate.on(cirq.LineQubit(0))),
         require_qubit_equality=False,
     )
@@ -40,7 +41,7 @@ def test_init_with_gate():
     assert noisy_op.real_matrix is not real
 
     assert noisy_op._native_type == "cirq"
-    assert _equal(noisy_op._native_ideal, noisy_op.ideal_circuit)
+    assert _equal(noisy_op._native_ideal, noisy_op.ideal_circuit())
 
 
 @pytest.mark.parametrize(
@@ -52,9 +53,9 @@ def test_init_with_operation(qubit):
     real = np.zeros(shape=(4, 4))
     noisy_op = NoisyOperation.from_cirq(ideal_op, real)
 
-    assert isinstance(noisy_op.ideal_circuit, cirq.Circuit)
+    assert isinstance(noisy_op._ideal, cirq.Circuit)
     assert _equal(
-        noisy_op.ideal_circuit,
+        noisy_op.ideal_circuit(),
         cirq.Circuit(ideal_op),
         require_qubit_equality=True,
     )
@@ -64,7 +65,7 @@ def test_init_with_operation(qubit):
     assert noisy_op.real_matrix is not real
 
     assert noisy_op._native_type == "cirq"
-    assert _equal(noisy_op._native_ideal, noisy_op.ideal_circuit)
+    assert _equal(noisy_op._native_ideal, noisy_op.ideal_circuit())
 
 
 def test_init_with_op_tree():
@@ -73,9 +74,9 @@ def test_init_with_op_tree():
     real = np.zeros(shape=(16, 16))
     noisy_op = NoisyOperation.from_cirq(ideal_ops, real)
 
-    assert isinstance(noisy_op.ideal_circuit, cirq.Circuit)
+    assert isinstance(noisy_op._ideal, cirq.Circuit)
     assert _equal(
-        noisy_op.ideal_circuit,
+        noisy_op.ideal_circuit(),
         cirq.Circuit(ideal_ops),
         require_qubit_equality=True,
     )
@@ -93,8 +94,8 @@ def test_init_with_cirq_circuit():
     real = np.zeros(shape=(16, 16))
     noisy_op = NoisyOperation(circ, real)
 
-    assert isinstance(noisy_op.ideal_circuit, cirq.Circuit)
-    assert _equal(noisy_op.ideal_circuit, circ, require_qubit_equality=True)
+    assert isinstance(noisy_op._ideal, cirq.Circuit)
+    assert _equal(noisy_op.ideal_circuit(), circ, require_qubit_equality=True)
     assert set(noisy_op.qubits) == set(qreg)
     assert np.allclose(noisy_op.ideal_matrix, cirq.unitary(circ))
     assert np.allclose(noisy_op.real_matrix, real)
@@ -107,15 +108,17 @@ def test_init_with_qiskit_circuit():
     _ = circ.h(qreg[0])
     _ = circ.cnot(*qreg)
 
-    real = np.zeros(shape=(16, 16))
-    noisy_op = NoisyOperation(circ, real)
-    assert isinstance(noisy_op.ideal_circuit, cirq.Circuit)
-    assert noisy_op._native_ideal == circ
-    assert noisy_op._native_type == "qiskit"
-
     cirq_qreg = cirq.LineQubit.range(2)
     cirq_circ = cirq.Circuit(cirq.H.on(cirq_qreg[0]), cirq.CNOT.on(*cirq_qreg))
-    assert _equal(noisy_op.ideal_circuit, cirq_circ)
+
+    real = np.zeros(shape=(16, 16))
+    noisy_op = NoisyOperation(circ, real)
+    assert isinstance(noisy_op._ideal, cirq.Circuit)
+    assert _equal(noisy_op._ideal, cirq_circ)
+
+    assert noisy_op.ideal_circuit() == circ
+    assert noisy_op._native_ideal == circ
+    assert noisy_op._native_type == "qiskit"
 
     assert np.allclose(noisy_op.ideal_matrix, cirq.unitary(cirq_circ))
     assert np.allclose(noisy_op.real_matrix, real)
@@ -127,15 +130,17 @@ def test_init_with_pyquil_program():
         pyquil.gates.H(0), pyquil.gates.CNOT(0, 1)
     )
 
-    real = np.zeros(shape=(16, 16))
-    noisy_op = NoisyOperation(circ, real)
-    assert isinstance(noisy_op.ideal_circuit, cirq.Circuit)
-    assert noisy_op._native_ideal == circ
-    assert noisy_op._native_type == "pyquil"
-
     cirq_qreg = cirq.LineQubit.range(2)
     cirq_circ = cirq.Circuit(cirq.H.on(cirq_qreg[0]), cirq.CNOT.on(*cirq_qreg))
-    assert _equal(noisy_op.ideal_circuit, cirq_circ)
+
+    real = np.zeros(shape=(16, 16))
+    noisy_op = NoisyOperation(circ, real)
+    assert isinstance(noisy_op._ideal, cirq.Circuit)
+    assert _equal(noisy_op._ideal, cirq_circ)
+
+    assert noisy_op.ideal_circuit() == circ
+    assert noisy_op._native_ideal == circ
+    assert noisy_op._native_type == "pyquil"
 
     assert np.allclose(noisy_op.ideal_matrix, cirq.unitary(cirq_circ))
     assert np.allclose(noisy_op.real_matrix, real)
@@ -167,7 +172,7 @@ def test_add_simple():
 
     correct = cirq.Circuit([cirq.X.on(cirq.NamedQubit("Q"))] * 2)
 
-    assert _equal(noisy_op.ideal_circuit, correct, require_qubit_equality=True)
+    assert _equal(noisy_op._ideal, correct, require_qubit_equality=True)
     assert np.allclose(noisy_op.ideal_matrix, np.identity(2))
     assert np.allclose(noisy_op.real_matrix, real @ real)
 
