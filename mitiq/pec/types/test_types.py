@@ -177,6 +177,16 @@ def test_add_simple():
     assert np.allclose(noisy_op.real_matrix, real @ real)
 
 
+def test_add_bad_type():
+    ideal = cirq.Circuit([cirq.X.on(cirq.NamedQubit("Q"))])
+    real = np.random.rand(4, 4)
+
+    noisy_op = NoisyOperation(ideal, real)
+
+    with pytest.raises(ValueError, match="must be a NoisyOperation"):
+        noisy_op + ideal
+
+
 @pytest.mark.parametrize(
     "qreg",
     (
