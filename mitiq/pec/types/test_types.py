@@ -177,113 +177,113 @@ def test_add_simple():
     assert np.allclose(noisy_op.real_matrix, real @ real)
 
 
-# @pytest.mark.parametrize(
-#     "qreg",
-#     (
-#         cirq.LineQubit.range(5),
-#         cirq.GridQubit.square(5),
-#         [cirq.NamedQubit(str(i)) for i in range(5)],
-#     ),
-# )
-# def test_on_each_single_qubit(qreg):
-#     real = np.zeros(shape=(4, 4))
-#     noisy_ops = NoisyOperation.on_each(cirq.X, real, qubits=qreg)
-#
-#     assert len(noisy_ops) == len(qreg)
-#
-#     for i, op in enumerate(noisy_ops):
-#         assert np.allclose(op.real_matrix, real)
-#         assert op.num_qubits == 1
-#         assert list(op.ideal_circuit.all_qubits())[0] == qreg[i]
-#
+@pytest.mark.parametrize(
+    "qreg",
+    (
+        cirq.LineQubit.range(5),
+        cirq.GridQubit.square(5),
+        [cirq.NamedQubit(str(i)) for i in range(5)],
+    ),
+)
+def test_on_each_single_qubit(qreg):
+    real = np.zeros(shape=(4, 4))
+    noisy_ops = NoisyOperation.on_each(cirq.X, real, qubits=qreg)
 
-# @pytest.mark.parametrize(
-#     "qubits",
-#     (
-#         [cirq.LineQubit.range(2), cirq.LineQubit.range(2, 4)],
-#         [cirq.LineQubit.range(5, 7), cirq.LineQubit.range(10, 12)],
-#         [cirq.GridQubit.rect(1, 2), cirq.GridQubit.rect(2, 1)],
-#     ),
-# )
-# def test_on_each_multiple_qubits(qubits):
-#     real_cnot = np.zeros(shape=(16, 16))
-#     noisy_ops = NoisyOperation.on_each(cirq.CNOT, real_cnot, qubits=qubits)
-#     assert len(noisy_ops) == 2
-#
-#     for i, op in enumerate(noisy_ops):
-#         assert np.allclose(op.real_matrix, real_cnot)
-#         assert op.num_qubits == 2
-#         assert set(op.qubits) == set(qubits[i])
-#
-#
-# def test_on_each_multiple_qubits_bad_qubits_shape():
-#     real_cnot = np.zeros(shape=(16, 16))
-#     qubits = [cirq.LineQubit.range(3)]
-#     with pytest.raises(
-#         ValueError, match="Number of qubits in each register should be"
-#     ):
-#         NoisyOperation.on_each(cirq.CNOT, real_cnot, qubits=qubits)
-#
-#
-# @pytest.mark.parametrize(
-#     "qubit", (cirq.NamedQubit("New qubit"), cirq.GridQubit(2, 3))
-# )
-# def test_transform_qubits_single_qubit(qubit):
-#     real = np.zeros(shape=(4, 4))
-#     gate = cirq.H
-#     noisy_op = NoisyOperation(gate, real)
-#
-#     assert set(noisy_op.qubits) != {qubit}
-#     noisy_op.transform_qubits(qubit)
-#     assert set(noisy_op.qubits) == {qubit}
-#
-#
-# @pytest.mark.parametrize(
-#     "qubits", (cirq.LineQubit.range(4, 6), cirq.GridQubit.rect(1, 2))
-# )
-# def test_transform_qubits_multiple_qubits(qubits):
-#     real = np.zeros(shape=(16, 16))
-#     qreg = [cirq.NamedQubit("Dummy 1"), cirq.NamedQubit("Dummy 2")]
-#     ideal = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(*qreg))
-#     noisy_op = NoisyOperation(ideal, real)
-#
-#     assert set(noisy_op.qubits) != set(qubits)
-#     assert np.allclose(noisy_op.real_matrix, real)
-#
-#     noisy_op.transform_qubits(qubits)
-#     assert set(noisy_op.qubits) == set(qubits)
-#     assert np.allclose(noisy_op.real_matrix, real)
-#
-#
-# def test_with_qubits():
-#     real = np.zeros(shape=(16, 16))
-#     qreg = [cirq.NamedQubit("Dummy 1"), cirq.NamedQubit("Dummy 2")]
-#     ideal = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(*qreg))
-#     noisy_op = NoisyOperation(ideal, real)
-#
-#     assert set(noisy_op.qubits) == set(qreg)
-#     assert np.allclose(noisy_op.real_matrix, real)
-#
-#     qubits = cirq.LineQubit.range(2)
-#     new_noisy_op = noisy_op.with_qubits(qubits)
-#     assert set(new_noisy_op.qubits) == set(qubits)
-#     assert np.allclose(new_noisy_op.real_matrix, real)
-#
-#
-# def test_extend_to_single_qubit():
-#     qbit, qreg = cirq.LineQubit(0), cirq.LineQubit.range(1, 10)
-#     ideal = cirq.Z.on(qbit)
-#     real = np.zeros(shape=(4, 4))
-#     noisy_op_on_one_qubit = NoisyOperation(ideal, real)
-#
-#     noisy_ops_on_all_qubits = noisy_op_on_one_qubit.extend_to(qreg)
-#
-#     assert isinstance(noisy_ops_on_all_qubits, list)
-#     assert len(noisy_ops_on_all_qubits) == 10
-#
-#     for op in noisy_ops_on_all_qubits:
-#         assert _equal(
-#             op.ideal_circuit, cirq.Circuit(ideal), require_qubit_equality=False
-#         )
-#         assert np.allclose(op.ideal_matrix, cirq.unitary(ideal))
-#         assert np.allclose(op.real_matrix, real)
+    assert len(noisy_ops) == len(qreg)
+
+    for i, op in enumerate(noisy_ops):
+        assert np.allclose(op.real_matrix, real)
+        assert op.num_qubits == 1
+        assert list(op.ideal_circuit().all_qubits())[0] == qreg[i]
+
+
+@pytest.mark.parametrize(
+    "qubits",
+    (
+        [cirq.LineQubit.range(2), cirq.LineQubit.range(2, 4)],
+        [cirq.LineQubit.range(5, 7), cirq.LineQubit.range(10, 12)],
+        [cirq.GridQubit.rect(1, 2), cirq.GridQubit.rect(2, 1)],
+    ),
+)
+def test_on_each_multiple_qubits(qubits):
+    real_cnot = np.zeros(shape=(16, 16))
+    noisy_ops = NoisyOperation.on_each(cirq.CNOT, real_cnot, qubits=qubits)
+    assert len(noisy_ops) == 2
+
+    for i, op in enumerate(noisy_ops):
+        assert np.allclose(op.real_matrix, real_cnot)
+        assert op.num_qubits == 2
+        assert set(op.qubits) == set(qubits[i])
+
+
+def test_on_each_multiple_qubits_bad_qubits_shape():
+    real_cnot = np.zeros(shape=(16, 16))
+    qubits = [cirq.LineQubit.range(3)]
+    with pytest.raises(
+        ValueError, match="Number of qubits in each register should be"
+    ):
+        NoisyOperation.on_each(cirq.CNOT, real_cnot, qubits=qubits)
+
+
+@pytest.mark.parametrize(
+    "qubit", (cirq.NamedQubit("New qubit"), cirq.GridQubit(2, 3))
+)
+def test_transform_qubits_single_qubit(qubit):
+    real = np.zeros(shape=(4, 4))
+    gate = cirq.H
+    noisy_op = NoisyOperation.from_cirq(gate, real)
+
+    assert set(noisy_op.qubits) != {qubit}
+    noisy_op.transform_qubits(qubit)
+    assert set(noisy_op.qubits) == {qubit}
+
+
+@pytest.mark.parametrize(
+    "qubits", (cirq.LineQubit.range(4, 6), cirq.GridQubit.rect(1, 2))
+)
+def test_transform_qubits_multiple_qubits(qubits):
+    real = np.zeros(shape=(16, 16))
+    qreg = [cirq.NamedQubit("Dummy 1"), cirq.NamedQubit("Dummy 2")]
+    ideal = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(*qreg))
+    noisy_op = NoisyOperation(ideal, real)
+
+    assert set(noisy_op.qubits) != set(qubits)
+    assert np.allclose(noisy_op.real_matrix, real)
+
+    noisy_op.transform_qubits(qubits)
+    assert set(noisy_op.qubits) == set(qubits)
+    assert np.allclose(noisy_op.real_matrix, real)
+
+
+def test_with_qubits():
+    real = np.zeros(shape=(16, 16))
+    qreg = [cirq.NamedQubit("Dummy 1"), cirq.NamedQubit("Dummy 2")]
+    ideal = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(*qreg))
+    noisy_op = NoisyOperation(ideal, real)
+
+    assert set(noisy_op.qubits) == set(qreg)
+    assert np.allclose(noisy_op.real_matrix, real)
+
+    qubits = cirq.LineQubit.range(2)
+    new_noisy_op = noisy_op.with_qubits(qubits)
+    assert set(new_noisy_op.qubits) == set(qubits)
+    assert np.allclose(new_noisy_op.real_matrix, real)
+
+
+def test_extend_to_single_qubit():
+    qbit, qreg = cirq.LineQubit(0), cirq.LineQubit.range(1, 10)
+    ideal = cirq.Z.on(qbit)
+    real = np.zeros(shape=(4, 4))
+    noisy_op_on_one_qubit = NoisyOperation.from_cirq(ideal, real)
+
+    noisy_ops_on_all_qubits = noisy_op_on_one_qubit.extend_to(qreg)
+
+    assert isinstance(noisy_ops_on_all_qubits, list)
+    assert len(noisy_ops_on_all_qubits) == 10
+
+    for op in noisy_ops_on_all_qubits:
+        assert _equal(
+            op.ideal_circuit(), cirq.Circuit(ideal)
+        )
+        assert np.allclose(op.ideal_matrix, cirq.unitary(ideal))
+        assert np.allclose(op.real_matrix, real)

@@ -130,7 +130,7 @@ class NoisyOperation:
             )
 
         noisy_ops = []  # type: List[NoisyOperation]
-        base_circuit = NoisyOperation(ideal, real).ideal_circuit
+        base_circuit = NoisyOperation.from_cirq(ideal, real).ideal_circuit()
         base_qubits = list(base_circuit.all_qubits())
 
         for new_qubits in qubits:
@@ -212,7 +212,7 @@ class NoisyOperation:
         self._ideal = self._ideal.transform_qubits(lambda q: qubit_map[q])
         self._qubits = tuple(qubits)
 
-    def with_qubits(self, qubits: Sequence[cirq.Qid]) -> "NoisyOperation":
+    def with_qubits(self, qubits: Sequence[cirq.Qid]) -> 'NoisyOperation':
         """Returns the noisy operation acting on the input qubits.
 
         Args:
@@ -230,7 +230,7 @@ class NoisyOperation:
         """Returns a copy of the noisy operation."""
         return NoisyOperation(self._ideal, self._real)
 
-    def __add__(self, other: Any) -> "NoisyOperation":
+    def __add__(self, other: Any) -> 'NoisyOperation':
         if not isinstance(other, NoisyOperation):
             raise ValueError(
                 f"Arg `other` must be a NoisyOperation but was {type(other)}."
