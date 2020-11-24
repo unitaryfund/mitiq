@@ -15,7 +15,7 @@
 
 """Tests related to mitiq.pec.pec functions."""
 
-from pytest import mark
+from pytest import mark, raises
 import numpy as np
 from cirq import Circuit, LineQubit, Y, Z, CNOT
 
@@ -110,7 +110,8 @@ def test_execute_with_pec_with_different_samples(circuit: Circuit, seed):
     assert np.average(errors_more_samples) < np.average(errors_few_samples)
 
 
-def test_execute_with_pec_with_full_output():
+@mark.parametrize("num_samples", [100, 1000])
+def test_execute_with_pec_with_full_output(num_samples: int):
     """Tests that the error associated to the PEC value is returned if
     the option 'full_output' is set to True.
     """
@@ -120,13 +121,55 @@ def test_execute_with_pec_with_full_output():
         """A fake executor which just samples from a normal distribution."""
         return rnd_state.randn()
 
-    _, error_few_samples = execute_with_pec(
-        oneq_circ, fake_exec, DECO_DICT, num_samples=100, full_output=True
-    )
-
-    _, error_many_samples = execute_with_pec(
-        oneq_circ, fake_exec, DECO_DICT, num_samples=1000, full_output=True
+    _, error_pec = execute_with_pec(
+        oneq_circ,
+        fake_exec,
+        DECO_DICT,
+        num_samples=num_samples,
+        full_output=True,
     )
     # The error should scale as 1/sqrt(num_samples)
-    assert np.isclose(error_few_samples * np.sqrt(100), 1.0, atol=0.1)
-    assert np.isclose(error_many_samples * np.sqrt(1000), 1.0, atol=0.1)
+    assert np.isclose(error_pec * np.sqrt(num_samples), 1.0, atol=0.1)
+
+
+@mark.parametrize("precision", [0.1, 0.01])
+def test_precision_option_in_execute_with_pec(precision: float):
+    """Tests that the 'precision' argument is used to deduce num_samples."""
+
+    rnd_state = np.random.RandomState(0)
+
+    def fake_exec(circuit: Circuit):
+        """A fake executor which just samples from a normal distribution."""
+        return rnd_state.randn()
+
+    # For a noiseless circuit we expect num_samples = 1/precision^2:
+    _, pec_error = execute_with_pec(
+        oneq_circ,
+        fake_exec,
+        NOISELESS_DECO_DICT,
+        precision=precision,
+        full_output=True,
+    )
+    # The error should scale as precision
+    assert np.isclose(pec_error / precision, 1.0, atol=0.1)
+
+    # If num_samples is given, precision is ignored.
+    _, pec_error = execute_with_pec(
+        oneq_circ,
+        fake_exec,
+        NOISELESS_DECO_DICT,
+        precision=precision,
+        num_samples=1000,
+        full_output=True,
+    )
+    # The error should scale as 1/sqrt(num_samples)
+    assert not np.isclose(pec_error / precision, 1.0, atol=0.1)
+    assert np.isclose(pec_error * np.sqrt(1000), 1.0, atol=0.1)
+
+
+@mark.parametrize("bad_value", (0, -1, 2))
+def test_bad_precision_argument(bad_value: float):
+    """Tests that if 'precision' is not within (0, 1] an error is raised."""
+
+    with raises(ValueError, match="The value of 'precision' should"):
+        execute_with_pec(oneq_circ, executor, DECO_DICT, precision=bad_value)
