@@ -15,29 +15,43 @@
 
 """Types used in probabilistic error cancellation."""
 from copy import deepcopy
-from typing import Any, List, Optional, Sequence, Tuple, Union
+from itertools import product
+from typing import Any, List, Optional, Sequence, Set, Tuple, Union
 
 import numpy as np
 
 import cirq
 
 from mitiq import QPROGRAM
-from mitiq.conversions import convert_from_mitiq, convert_to_mitiq
+from mitiq.conversions import (
+    convert_from_mitiq,
+    convert_to_mitiq,
+    CircuitConversionError,
+    UnsupportedCircuitError,
+)
 
 
 class NoisyOperation:
     """An operation (or sequence of operations) which a quantum computer can
      actually implement.
      """
+
     def __init__(self, ideal: QPROGRAM, real: np.ndarray) -> None:
         self._native_ideal = ideal
-        ideal_cirq, self._native_type = convert_to_mitiq(ideal)
+
+        try:
+            ideal_cirq, self._native_type = convert_to_mitiq(ideal)
+        except (CircuitConversionError, UnsupportedCircuitError):
+            raise TypeError(
+                f"Arg `ideal` must be of type {QPROGRAM} but was {type(ideal)}."
+            )
+
         self._init_from_cirq(ideal_cirq, real)
 
     @staticmethod
     def from_cirq(
-            ideal: cirq.CIRCUIT_LIKE, real: np.ndarray
-    ) -> 'NoisyOperation':
+        ideal: cirq.CIRCUIT_LIKE, real: np.ndarray
+    ) -> "NoisyOperation":
         if isinstance(ideal, cirq.Gate):
             qubits = tuple(cirq.LineQubit.range(ideal.num_qubits()))
             ideal = cirq.Circuit(ideal.on(*qubits))
@@ -58,9 +72,7 @@ class NoisyOperation:
                 )
         return NoisyOperation(ideal, real)
 
-    def _init_from_cirq(
-            self, ideal: cirq.Circuit, real: np.ndarray
-    ) -> None:
+    def _init_from_cirq(self, ideal: cirq.Circuit, real: np.ndarray) -> None:
         """Initializes a noisy operation expressed as a Cirq circuit.
 
         Args:
@@ -92,7 +104,7 @@ class NoisyOperation:
         ideal: cirq.CIRCUIT_LIKE,
         real: np.ndarray,
         qubits: Sequence[List[cirq.Qid]],
-    ) -> List['NoisyOperation']:
+    ) -> List["NoisyOperation"]:
         """Returns a NoisyOperation(ideal, real) on each qubit in qubits.
 
         Args:
@@ -212,7 +224,7 @@ class NoisyOperation:
         self._ideal = self._ideal.transform_qubits(lambda q: qubit_map[q])
         self._qubits = tuple(qubits)
 
-    def with_qubits(self, qubits: Sequence[cirq.Qid]) -> 'NoisyOperation':
+    def with_qubits(self, qubits: Sequence[cirq.Qid]) -> "NoisyOperation":
         """Returns the noisy operation acting on the input qubits.
 
         Args:
@@ -230,7 +242,7 @@ class NoisyOperation:
         """Returns a copy of the noisy operation."""
         return NoisyOperation(self._ideal, self._real)
 
-    def __add__(self, other: Any) -> 'NoisyOperation':
+    def __add__(self, other: Any) -> "NoisyOperation":
         if not isinstance(other, NoisyOperation):
             raise ValueError(
                 f"Arg `other` must be a NoisyOperation but was {type(other)}."
@@ -248,3 +260,68 @@ class NoisyOperation:
 
     def __str__(self) -> str:
         return self._ideal.__str__()
+
+
+class NoisyBasis:
+    def __init__(self, *basis_elements: NoisyOperation) -> None:
+        """Initializes a NoisyBasis.
+
+        Args:
+            basis_elements: Sequence of basis elements as `NoisyOperation`s.
+        """
+        if not all(
+            isinstance(element, NoisyOperation) for element in basis_elements
+        ):
+            raise ValueError(
+                "All basis elements must be of type `NoisyOperation`."
+            )
+
+        self._basis_elements = set(basis_elements)
+
+    @property
+    def elements(self):
+        return self._basis_elements
+
+    def all_qubits(self) -> Set[cirq.Qid]:
+        """Returns the set of qubits that basis elements act on."""
+        qubits = set()
+        for noisy_op in self._basis_elements:
+            qubits.update(set(noisy_op.qubits))
+        return qubits
+
+    def add(self, *basis_elements) -> None:
+        for noisy_op in basis_elements:
+            if not isinstance(noisy_op, NoisyOperation):
+                raise ValueError(
+                    "All basis elements must be of type `NoisyOperation`."
+                )
+            self._basis_elements.add(noisy_op)
+
+    def extend_to(self, qubits: Sequence[List[cirq.Qid]]) -> None:
+        """Extends each basis element to act on the provided qubits.
+
+        Args:
+            qubits: Additional qubits for each basis element to act on.
+        """
+        for noisy_op in tuple(self._basis_elements):
+            self._basis_elements.update(
+                set(
+                    NoisyOperation.on_each(
+                        noisy_op.ideal_circuit(return_type="cirq"),
+                        noisy_op.real_matrix,
+                        qubits,
+                    )
+                )
+            )
+
+    def get_sequences(self, length: int) -> List[NoisyOperation]:
+        sequences = []
+        for prod in product(self._basis_elements, repeat=length):
+            this_sequence = prod[0]
+            for noisy_op in prod[1:]:
+                this_sequence += noisy_op
+            sequences.append(this_sequence)
+        return sequences
+
+    # def decompose(self, ideal: cirq.CIRCUIT_LIKE) -> OperationDecomposition:
+    #     raise NotImplementedError

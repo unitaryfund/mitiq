@@ -21,7 +21,7 @@ import pyquil
 import qiskit
 
 from mitiq.utils import _equal
-from mitiq.pec.types import NoisyOperation
+from mitiq.pec.types import NoisyOperation, NoisyBasis
 
 
 def test_init_with_gate():
@@ -125,10 +125,24 @@ def test_init_with_qiskit_circuit():
     assert noisy_op.real_matrix is not real
 
 
+@pytest.mark.parametrize(
+    "gate",
+    (
+        cirq.H,
+        cirq.H(cirq.LineQubit(0)),
+        qiskit.extensions.HGate,
+        qiskit.extensions.CHGate,
+        pyquil.gates.H,
+    ),
+)
+def test_init_with_gates_raises_error(gate):
+    rng = np.random.RandomState(seed=1)
+    with pytest.raises(TypeError, match="Arg `ideal` must be of type"):
+        NoisyOperation(ideal=gate, real=rng.rand(4, 4))
+
+
 def test_init_with_pyquil_program():
-    circ = pyquil.Program(
-        pyquil.gates.H(0), pyquil.gates.CNOT(0, 1)
-    )
+    circ = pyquil.Program(pyquil.gates.H(0), pyquil.gates.CNOT(0, 1))
 
     cirq_qreg = cirq.LineQubit.range(2)
     cirq_circ = cirq.Circuit(cirq.H.on(cirq_qreg[0]), cirq.CNOT.on(*cirq_qreg))
@@ -292,8 +306,85 @@ def test_extend_to_single_qubit():
     assert len(noisy_ops_on_all_qubits) == 10
 
     for op in noisy_ops_on_all_qubits:
-        assert _equal(
-            op.ideal_circuit(), cirq.Circuit(ideal)
-        )
+        assert _equal(op.ideal_circuit(), cirq.Circuit(ideal))
         assert np.allclose(op.ideal_matrix, cirq.unitary(ideal))
         assert np.allclose(op.real_matrix, real)
+
+
+def test_noisy_basis_simple():
+    rng = np.random.RandomState(seed=1)
+    noisy_basis = NoisyBasis(
+        NoisyOperation.from_cirq(ideal=cirq.I, real=rng.rand(4, 4)),
+        NoisyOperation.from_cirq(ideal=cirq.X, real=rng.rand(4, 4)),
+        NoisyOperation.from_cirq(ideal=cirq.Y, real=rng.rand(4, 4)),
+        NoisyOperation.from_cirq(ideal=cirq.Z, real=rng.rand(4, 4)),
+    )
+    assert len(noisy_basis.elements) == 4
+    assert noisy_basis.all_qubits() == {cirq.LineQubit(0)}
+
+
+@pytest.mark.parametrize(
+    "element",
+    (
+        cirq.X,
+        cirq.CNOT(*cirq.LineQubit.range(2)),
+        pyquil.gates.H,
+        pyquil.gates.CNOT(0, 1),
+        qiskit.extensions.HGate,
+        qiskit.extensions.CnotGate,
+    ),
+)
+def test_noisy_basis_bad_types(element):
+    with pytest.raises(ValueError, match="must be of type `NoisyOperation`"):
+        NoisyBasis(element)
+
+
+def test_noisy_basis_add():
+    rng = np.random.RandomState(seed=1)
+    noisy_basis = NoisyBasis(
+        NoisyOperation.from_cirq(ideal=cirq.I, real=rng.rand(4, 4)),
+        NoisyOperation.from_cirq(ideal=cirq.X, real=rng.rand(4, 4)),
+    )
+    assert len(noisy_basis.elements) == 2
+
+    noisy_basis.add(
+        NoisyOperation.from_cirq(ideal=cirq.Y, real=rng.rand(4, 4)),
+        NoisyOperation.from_cirq(ideal=cirq.Z, real=rng.rand(4, 4)),
+    )
+    assert len(noisy_basis.elements) == 4
+
+
+def test_extend_to_simple():
+    rng = np.random.RandomState(seed=1)
+    noisy_basis = NoisyBasis(
+        NoisyOperation.from_cirq(ideal=cirq.I, real=rng.rand(4, 4)),
+        NoisyOperation.from_cirq(ideal=cirq.X, real=rng.rand(4, 4)),
+    )
+    assert len(noisy_basis.elements) == 2
+
+    noisy_basis.extend_to(cirq.LineQubit.range(1, 3))
+    assert len(noisy_basis.elements) == 6
+
+
+def test_get_sequences_simple():
+    rng = np.random.RandomState(seed=1)
+    noisy_basis = NoisyBasis(
+        NoisyOperation.from_cirq(ideal=cirq.I, real=rng.rand(4, 4)),
+        NoisyOperation.from_cirq(ideal=cirq.X, real=rng.rand(4, 4)),
+    )
+    sequences = noisy_basis.get_sequences(length=2)
+    assert all(isinstance(s, NoisyOperation) for s in sequences)
+
+    q = cirq.LineQubit(0)
+    expected_circuits = [
+        cirq.Circuit(cirq.I(q), cirq.I(q)),
+        cirq.Circuit(cirq.I(q), cirq.X(q)),
+        cirq.Circuit(cirq.X(q), cirq.I(q)),
+        cirq.Circuit(cirq.X(q), cirq.X(q))
+    ]
+    for sequence, expected in zip(sequences, expected_circuits):
+        assert _equal(
+            sequence.ideal_circuit(return_type="cirq"),
+            expected,
+            require_qubit_equality=True,
+        )
