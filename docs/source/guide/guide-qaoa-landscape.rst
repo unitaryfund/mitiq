@@ -149,7 +149,7 @@ We do so by first getting a mitigated executor as follows.
 
     mitigated_executor = mitigate_executor(executor)
 
-We then run the same code above to compute the energy landscape, but this time use the ``mitigated_exectuor`` instead of
+We then run the same code above to compute the energy landscape, but this time use the ``mitigated_executor`` instead of
 just the executor.
 
 .. testcode:: python
