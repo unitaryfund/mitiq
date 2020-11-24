@@ -21,49 +21,59 @@ import numpy as np
 
 import cirq
 
+from mitiq import QPROGRAM
+from mitiq.conversions import convert_from_mitiq, convert_to_mitiq
+
 
 class NoisyOperation:
     """An operation (or sequence of operations) which a quantum computer can
      actually implement.
      """
+    def __init__(self, ideal: QPROGRAM, real: np.ndarray) -> None:
+        self._native_ideal = ideal
+        ideal_cirq, self._native_type = convert_to_mitiq(ideal)
+        self._init_from_cirq(ideal_cirq, real)
 
-    def __init__(self, ideal: cirq.CIRCUIT_LIKE, real: np.ndarray) -> None:
-        """Initializes a noisy operation.
-
-        Args:
-            ideal: An ideal (noiseless) gate, operation, sequence of
-                operations, or circuit.
-            real: Superoperator of the ideal operation performed when
-                implemented on a quantum processor.
-
-        Raises:
-            ValueError:
-                * If `ideal` is not cirq.CIRCUIT_LIKE.
-                * If the shape of `real` does not match the expected shape
-                    from `ideal`.
-        """
+    @staticmethod
+    def from_cirq(
+            ideal: cirq.CIRCUIT_LIKE, real: np.ndarray
+    ) -> 'NoisyOperation':
         if isinstance(ideal, cirq.Gate):
-            self._qubits = tuple(cirq.LineQubit.range(ideal.num_qubits()))
-            self._ideal = cirq.Circuit(ideal.on(*self._qubits))
+            qubits = tuple(cirq.LineQubit.range(ideal.num_qubits()))
+            ideal = cirq.Circuit(ideal.on(*qubits))
 
         elif isinstance(ideal, cirq.Operation):
-            self._qubits = ideal.qubits
-            self._ideal = cirq.Circuit(ideal)
+            ideal = cirq.Circuit(ideal)
 
         elif isinstance(ideal, cirq.Circuit):
-            self._ideal = deepcopy(ideal)
-            self._qubits = tuple(self._ideal.all_qubits())
+            ideal = deepcopy(ideal)
 
         else:
             try:
-                self._ideal = cirq.Circuit(ideal)
-                self._qubits = tuple(self._ideal.all_qubits())
+                ideal = cirq.Circuit(ideal)
             except Exception:
                 raise ValueError(
                     f"Arg `ideal` must be cirq.CIRCUIT_LIKE "
                     f"but was {type(ideal)}."
                 )
+        return NoisyOperation(ideal, real)
 
+    def _init_from_cirq(
+            self, ideal: cirq.Circuit, real: np.ndarray
+    ) -> None:
+        """Initializes a noisy operation expressed as a Cirq circuit.
+
+        Args:
+            ideal: An ideal (noiseless) circuit.
+            real: Superoperator of the ideal circuit performed when
+                implemented on a quantum processor.
+
+        Raises:
+            ValueError:
+                * If the shape of `real` does not match the expected shape
+                    from `ideal`.
+        """
+        self._qubits = tuple(ideal.all_qubits())
         self._num_qubits = len(self._qubits)
         self._dimension = 2 ** self._num_qubits
 
@@ -74,7 +84,7 @@ class NoisyOperation:
             )
         # TODO: Check if real is a valid superoperator.
 
-        self._ideal = deepcopy(self._ideal)
+        self._ideal = deepcopy(ideal)
         self._real = deepcopy(real)
 
     @staticmethod
@@ -82,7 +92,7 @@ class NoisyOperation:
         ideal: cirq.CIRCUIT_LIKE,
         real: np.ndarray,
         qubits: Sequence[List[cirq.Qid]],
-    ) -> List["NoisyOperation"]:
+    ) -> List['NoisyOperation']:
         """Returns a NoisyOperation(ideal, real) on each qubit in qubits.
 
         Args:
