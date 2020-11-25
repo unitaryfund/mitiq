@@ -190,8 +190,12 @@ class NoisyOperation:
         return len(self.qubits)
 
     @property
-    def ideal_matrix(self) -> np.ndarray:
+    def ideal_unitary(self) -> np.ndarray:
         return cirq.unitary(self._ideal)
+
+    @property
+    def ideal_matrix(self) -> np.ndarray:
+        raise NotImplementedError
 
     @property
     def real_matrix(self) -> np.ndarray:
