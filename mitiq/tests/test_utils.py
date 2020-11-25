@@ -17,6 +17,7 @@
 from copy import deepcopy
 import pytest
 
+import numpy as np
 import cirq
 from cirq import LineQubit, Circuit, X, Y, Z, H, CNOT, S, T, MeasurementGate, ZPowGate
 
@@ -277,8 +278,20 @@ def test_are_close_dict():
     assert not _are_close_dict(dict2, dict1)
 
 def test_generate_pmt_circuit():
-    qubits = [1,2,3]
+    n_qubits = 1
+    qubits = LineQubit.range(n_qubits)
     depth = 10
     circuit = _generate_pmt_circuit(qubits, depth, ZPowGate)
-    import pdb; pdb.set_trace()
+    assert len(circuit) == depth
+    # Make sure the exponents in the 
+    for i in range(len(circuit)):
+        assert circuit[i].operations[0].gate.exponent == 2*np.pi/depth
 
+
+def test_generate_pmt_circuit_failure():
+    n_qubits = 3
+    qubits = LineQubit.range(n_qubits)
+    depth = 10
+    # Should raise exception because too many qubits
+    with pytest.raises(Exception):
+        circuit = _generate_pmt_circuit(qubits, depth, ZPowGate)

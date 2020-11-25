@@ -15,11 +15,11 @@
 
 """Utility functions."""
 from copy import deepcopy
-from typing import cast, Any, Dict, Callable
+from typing import cast, Any, Dict, Callable, Iterable
 
 import numpy as np
 
-from cirq import Circuit, CircuitDag, EigenGate, Gate, GateOperation, Moment
+from cirq import Circuit, CircuitDag, EigenGate, Gate, GateOperation, Moment, ops
 from cirq.ops.measurement_gate import MeasurementGate
 
 
@@ -134,8 +134,14 @@ def _are_close_dict(dict_a: Dict[Any, Any], dict_b: Dict[Any, Any]) -> bool:
             return False
     return True
 
+class CircuitMismatchException(Exception):
+    pass
 
-def _generate_pmt_circuit(qubits, depth, gate):
+
+def _generate_pmt_circuit(
+        qubits: Iterable, 
+        depth: int,
+        gate: EigenGate):
     """
     Generates a circuit which should be the identity. Given a rotation
     gate R(param), it applies R(2 * pi / depth) depth times, resulting
@@ -145,10 +151,10 @@ def _generate_pmt_circuit(qubits, depth, gate):
     moments: List[ops.Moment] = []
     for _ in range(depth):
         operations = []
-        import pdb; pdb.set_trace()
-        num_qubits = gate(rotation_angle).num_qubits()
-        assert num_qubits == len(qubits)
-        operations.append(gate(rotation_angle)(*qubits))
+        num_qubits = gate().num_qubits()
+        if num_qubits != len(qubits):
+            raise CircuitMismatchException("Number of qubits does not match domain size of gate.")
+        operations.append(gate(exponent=rotation_angle)(*qubits))
         moments.append(ops.Moment(operations))
     return Circuit(moments)
 
