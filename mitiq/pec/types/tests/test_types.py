@@ -319,7 +319,7 @@ def test_noisy_basis_simple():
         NoisyOperation.from_cirq(ideal=cirq.Y, real=rng.rand(4, 4)),
         NoisyOperation.from_cirq(ideal=cirq.Z, real=rng.rand(4, 4)),
     )
-    assert len(noisy_basis.elements) == 4
+    assert len(noisy_basis) == 4
     assert noisy_basis.all_qubits() == {cirq.LineQubit(0)}
 
 
@@ -345,13 +345,13 @@ def test_noisy_basis_add():
         NoisyOperation.from_cirq(ideal=cirq.I, real=rng.rand(4, 4)),
         NoisyOperation.from_cirq(ideal=cirq.X, real=rng.rand(4, 4)),
     )
-    assert len(noisy_basis.elements) == 2
+    assert len(noisy_basis) == 2
 
     noisy_basis.add(
         NoisyOperation.from_cirq(ideal=cirq.Y, real=rng.rand(4, 4)),
         NoisyOperation.from_cirq(ideal=cirq.Z, real=rng.rand(4, 4)),
     )
-    assert len(noisy_basis.elements) == 4
+    assert len(noisy_basis) == 4
 
 
 def test_extend_to_simple():
@@ -366,25 +366,17 @@ def test_extend_to_simple():
     assert len(noisy_basis.elements) == 6
 
 
-def test_get_sequences_simple():
+@pytest.mark.parametrize("length", (2, 3, 5))
+def test_get_sequences_simple(length):
     rng = np.random.RandomState(seed=1)
     noisy_basis = NoisyBasis(
         NoisyOperation.from_cirq(ideal=cirq.I, real=rng.rand(4, 4)),
         NoisyOperation.from_cirq(ideal=cirq.X, real=rng.rand(4, 4)),
     )
-    sequences = noisy_basis.get_sequences(length=2)
-    assert all(isinstance(s, NoisyOperation) for s in sequences)
 
-    q = cirq.LineQubit(0)
-    expected_circuits = [
-        cirq.Circuit(cirq.I(q), cirq.I(q)),
-        cirq.Circuit(cirq.I(q), cirq.X(q)),
-        cirq.Circuit(cirq.X(q), cirq.I(q)),
-        cirq.Circuit(cirq.X(q), cirq.X(q)),
-    ]
-    for sequence, expected in zip(sequences, expected_circuits):
-        assert _equal(
-            sequence.ideal_circuit(return_type="cirq"),
-            expected,
-            require_qubit_equality=True,
-        )
+    sequences = noisy_basis.get_sequences(length=length)
+    assert all(isinstance(s, NoisyOperation) for s in sequences)
+    assert len(sequences) == len(noisy_basis) ** length
+
+    for sequence in sequences:
+        assert len(sequence.ideal_circuit()) == length

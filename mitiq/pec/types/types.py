@@ -325,3 +325,6 @@ class NoisyBasis:
 
     def decompose(self, ideal: QPROGRAM):
         raise NotImplementedError
+
+    def __len__(self):
+        return len(self._basis_elements)
