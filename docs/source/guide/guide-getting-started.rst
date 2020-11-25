@@ -220,7 +220,9 @@ but you could also use a QPU.
             # so we skip any circuit optimization
             optimization_level=0,
             noise_model=noise_model,
-            shots=shots
+            shots=shots,
+            seed_transpiler=1,
+            seed_simulator=1
         )
         results = job.result()
         counts = results.get_counts()
@@ -235,19 +237,16 @@ We can then use this backend for our mitigation.
     from mitiq import execute_with_zne
 
     circ = QuantumCircuit(1, 1)
-    for __ in range(120):
+    for _ in range(100):
          _ = circ.x(0)
     _ = circ.measure(0, 0)
 
+    exact = 1
     unmitigated = qs_noisy_simulation(circ)
     mitigated = execute_with_zne(circ, qs_noisy_simulation)
-    exact = 1
+
     # The mitigation should improve the result.
-    print(abs(exact - mitigated) < abs(exact - unmitigated))
-
-.. testoutput::
-
-    True
+    assert abs(exact - mitigated) < abs(exact - unmitigated)
 
 Note that we don't need to even redefine factories for different stacks. Once
 you have a ``Factory`` it can be used with different front and backends.

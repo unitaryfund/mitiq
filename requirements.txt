@@ -1,6 +1,6 @@
 numpy~=1.18.1
 scipy~=1.4.1
-cirq==0.9.0
+cirq~=0.9.1
 
 # third-party integration
 pyquil~=2.18.0
@@ -15,4 +15,14 @@ mypy~=0.782
 
 # to run examples
 matplotlib~=3.2.1
-notebook~=6.0.3
+notebook~=6.1.5
+
+# to build and test the documentation
+# see docs/requirements.txt for more non-essential dependencies
+sphinx~=2.4.4
+sphinxcontrib-bibtex~=1.0.0
+sphinx-copybutton~=0.2.11
+sphinx-autodoc-typehints~=1.10.3
+m2r~=0.2.1
+pybtex~=0.22.2
+pydata-sphinx-theme~=0.3.1

@@ -445,7 +445,7 @@ For example:
         pass
 
 
-A :class::`.BatchedFactory`` will detect from the return annotation if an executor is batched or not. If no annotation
+A :class::`.BatchedFactory` will detect from the return annotation if an executor is batched or not. If no annotation
 is provided, the executor is assumed to be sequential (i.e., not batched).
 
 ---------------------------------------------
@@ -500,7 +500,7 @@ After running a factory, this information can be accessed with appropriate *get*
    Expectation values: [0.88 0.79 0.72 0.67]
 
 If the user has manually evaluated a list of expectation values associated to a list of scale factors, the
-simplest way to estimate the corresponding zero-noise limit is to directly call the static `extrapolate` method of the 
+simplest way to estimate the corresponding zero-noise limit is to directly call the static `extrapolate` method of the
 desired factory class (in this case initializing a factory object is unnecessary).  For example:
 
 .. testcode::
@@ -512,7 +512,33 @@ desired factory class (in this case initializing a factory object is unnecessary
 
    Error with PolyFactory.extrapolate method: 0.0110
 
-Both the zero-noise value and the optimal parameters of the fit can be returned from `extrapolate` by specifying `full_output = True`.
+Beyond the zero-noise limit, additional information about the fit (e.g., optimal parameters, errors, extrapolation curve, etc.)
+can be returned from `extrapolate` by specifying `full_output = True`.
+
+There are also a number of methods to get additional information calculated by the factory class:
+
+.. testcode::
+
+   from mitiq.zne.inference import LinearFactory
+   from mitiq.zne.zne import execute_with_zne
+
+   fac = LinearFactory(scale_factors=[1.0, 2.0, 3.0])
+   _ = execute_with_zne(circuit, executor, factory=fac)
+   print(f"Zero-noise limit: {fac.get_zero_noise_limit():.4f}")
+   print(f"Fit error on zero-noise limit: {fac.get_zero_noise_limit_error():.4f}")
+   print(f"Covariance of fitted model parameters: {np.round(fac.get_parameters_covariance(), 5)}")
+   print(f"Fitted model parameters: {np.round(fac.get_optimal_parameters(), 4)}")
+   print(f"Extrapolation curve evaluated at zero: {fac.get_extrapolation_curve()(0):.4f}")
+
+.. testoutput::
+
+   Zero-noise limit: 0.9562
+   Fit error on zero-noise limit: 0.0138
+   Covariance of fitted model parameters: [[ 4.0e-05 -8.0e-05]
+    [-8.0e-05  1.9e-04]]
+   Fitted model parameters: [-0.0805  0.9562]
+   Extrapolation curve evaluated at zero: 0.9562
+
 
 ---------------------------------------------
 Advanced usage of a factory
@@ -663,13 +689,13 @@ and clips the result if it falls outside its physical domain.
          Returns:
             The clipped extrapolation to the zero-noise limit.
          """
-         # Fit a line and get the intercept
-         _, intercept = mitiq_polyfit(
+         # Fit a line and get the optimal parameters (slope, intercept)
+         opt_params, _ = mitiq_polyfit(
             self.get_scale_factors(), self.get_expectation_values(), deg=1
         )
 
          # Return the clipped zero-noise extrapolation.
-         return np.clip(intercept, self.min_expval, self.max_expval)
+         return np.clip(opt_params[-1], self.min_expval, self.max_expval)
 
 .. testcleanup::
 

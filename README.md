@@ -8,7 +8,14 @@
 
 # Mitiq
 
-Mitiq is a Python toolkit for implementing error mitigation techniques on quantum computers.
+Mitiq is a Python toolkit for implementing error mitigation techniques on quantum computers. 
+
+Current quantum computers
+are noisy due to interactions with the environment, imperfect gate applications, state preparation and measurement
+errors, etc. Error mitigation seeks to reduce these effects at the software level by compiling quantum programs in 
+clever ways.
+
+Want to know more? Check out our [documentation](https://mitiq.readthedocs.io/en/stable/guide/guide-overview.html).
 
 ## Installation
 
@@ -29,7 +36,7 @@ This prints out version information about core requirements and optional quantum
 interface with.
 
 If you'd prefer to clone and install from source, our would like to develop Mitiq, check out the
-[contribution guidelines](CONTRIBUTING.md) for more information.
+[contribution guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) for more information.
 
 ### Supported quantum programming libraries
 
@@ -49,7 +56,7 @@ available to the user.
 
 ## Getting started
 
-See the [getting started](https://mitiq.readthedocs.io/en/latest/guide/guide-getting-started.html) guide in
+See the [getting started](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html) guide in
 [Mitiq's documentation](https://mitiq.readthedocs.io) for a complete walkthrough of how to use mitiq. For
 a quick preview, check out the following snippet for a simple example of Mitiq in action:
 
@@ -90,7 +97,7 @@ Error in simulation (with mitigation): 0.000519
 
 ## Error mitigation techniques
 
-Mitiq currently implements [zero-noise extrapolation](https://mitiq.readthedocs.io/en/latest/guide/guide-zne.html) and 
+Mitiq currently implements [zero-noise extrapolation](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html) and 
 is designed to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
 
 ## Documentation
@@ -101,8 +108,8 @@ release can be found [here](https://mitiq.readthedocs.io/_/downloads/en/latest/p
 ## Developer information
 
 We welcome contributions to Mitiq including bug fixes, feature requests, etc.
-Please see the  [contribution guidelines](CONTRIBUTING.md) for more details.
-To contribute to the documentation, please see these [documentation guidelines](docs/CONTRIBUTING_DOCS.md).
+Please see the  [contribution guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) for more details.
+To contribute to the documentation, please see these [documentation guidelines](https://mitiq.readthedocs.io/en/stable/contributing_docs.html).
 
 ## Authors
 

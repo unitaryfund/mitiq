@@ -19,7 +19,19 @@ import pytest
 
 import numpy as np
 import cirq
-from cirq import LineQubit, Circuit, X, Y, Z, H, CNOT, S, T, MeasurementGate, ZPowGate
+from cirq import (
+    LineQubit,
+    Circuit,
+    X,
+    Y,
+    Z,
+    H,
+    CNOT,
+    S,
+    T,
+    MeasurementGate,
+    ZPowGate
+)
 
 from mitiq.utils import (
     _are_close_dict,

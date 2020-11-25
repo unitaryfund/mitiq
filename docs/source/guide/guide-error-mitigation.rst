@@ -7,6 +7,8 @@ About Error Mitigation
 This is intended as a primer on quantum error mitigation, providing a
 collection of up-to-date resources from the academic literature, as well as
 other external links framing this topic in the open-source software ecosystem.
+This recent review article :cite:`Endo_2020_arXiv` summarizes the theory behind many error-mitigating
+techniques.
 
 * :ref:`guide_qem_what`
 * :ref:`guide_qem_why`
@@ -77,11 +79,42 @@ maximally mixed), then extrapolation will of course not help the zero-noise esti
 applicable thus depends on the performance of the underlying hardware as well as the circuit. A detailed description
 of when zero-noise extrapolation is effective, and how effective it is, is the subject of ongoing research.
 
+In Mitiq, this technique is implemented in the module :mod:`mitiq.zne`.
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Probabilistic error cancellation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Probabilistic error cancellation uses a quasi-probability representation :cite:`Temme_2017_PRL` to express an ideal (unitary) quantum 
+channel as a linear combination of noisy operations. Given a set of noisy but implementable operations :math:`\Omega = \{O_1, \dots, O_m\}`, an ideal unitary gate 
+can be expressed as :math:`\mathcal{G} = \sum_{\alpha} \eta_{\alpha} \mathcal{O}_\alpha = \gamma \sum_{\alpha} P(\alpha) \sigma(\alpha) \mathcal{O}_\alpha`, where
+:math:`\eta_\alpha` are real coefficients, :math:`\gamma = \sum_{\alpha} |\eta_\alpha|`, :math:`P(\alpha)=|\eta_\alpha | /\gamma` is a probability 
+distribution, and :math:`\sigma(\alpha)={\rm sign}(\eta_\alpha)`.
+
+In this setting, we would like to estimate the ideal expectation value of some observable of interest :math:`\langle X\rangle_{\text{ideal}}`, 
+after the action of an ideal circuit given by a sequence of ideal quantum gates :math:`\{\mathcal{\mathcal G}_i\}_{i=1}^L`. This can be achieved by 
+sampling for each ideal gate :math:`\mathcal{G}_i` a noisy operation :math:`\mathcal{O}_{\alpha}` with probability 
+:math:`P_i(\alpha)`. This random sampling will produce a noisy circuit (given by the sequence of sampled operations :math:`\{\mathcal{O}_{\alpha_i}\}_{i=1}^L`)
+whose execution produces the final mixed state :math:`\rho_f`.
+Then, by measuring the observable :math:`X`, setting :math:`\gamma_{\text{tot}} := \prod_{i}^L \gamma_i` and 
+:math:`\sigma_{\text{tot}} = \prod_{i=1}^L \sigma_i(\alpha)`, one can obtain an unbiased estimate of the ideal expectation value as :math:`\langle 
+X\rangle_{\text{ideal}} =  \mathbb E \left[ \gamma_{\text{tot}} \sigma_{\text{tot}} X_{\rm noisy} \right]`, where :math:`X_{\rm noisy}` is
+the experimental estimate of :math:`{\rm tr}[\rho_f X]` and :math:`\mathbb E` is the sample average over many repetitions of the previous procedure.
+
+In Mitiq, this technique is implemented in the module :mod:`mitiq.pec`.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Limitations of probabilistic error cancellation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The number of samples required to estimate the ideal expectation value with error :math:`\delta` and probability :math:`1-\epsilon` scales as 
+:math:`\left(2 \gamma_{\text{tot}}^{2} / \delta^{2}\right) \log (2 / \epsilon)`  :cite:`Takagi2020optimal`. Thus, the sampling overhead is determined 
+by :math:`\gamma_{\text{tot}}` which grows exponentially in the number of gates. It is then crucial to find a linear decomposition that minimizes :math:`\gamma_{\text{tot}}`. 
+In addition, a full characterization of the noisy operations up to a good precision is required, which can be costly depending on the implementation.
+ 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Other error mitigation techniques
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Other examples of error mitigation techniques include injecting noisy gates for randomized compiling and probabilistic error cancellation, or the use of subspace reductions and symmetries. A collection of references on this cutting-edge implementations can be found in the :ref:`guide_qem_articles` subsection.
+Other examples of error mitigation techniques include injecting noisy gates for randomized compiling or the use of subspace reductions and symmetries. A collection of references on this cutting-edge implementations can be found in the :ref:`guide_qem_articles` subsection.
 
 .. _guide_qem_why:
 
@@ -201,6 +234,10 @@ A list of research articles academic resources on error mitigation:
 - On **zero-noise extrapolation**:
    - Theory, Y. Li and S. Benjamin, *Phys. Rev. X*, 2017 :cite:`Li_2017_PRX` and K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
    - Experiment on superconducting circuit chip, A. Kandala *et al.*, *Nature*, 2019 :cite:`Kandala_2019_Nature`
+   
+- On **probabilistic error cancellation**:
+   - Theory, Y. Li and S. Benjamin, *Phys. Rev. X*, 2017 :cite:`Li_2017_PRX` and K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
+   - Resource analysis for probabilistic error cancellation, Ryuji Takagi, arxiv, 2020 :cite:`Takagi2020optimal`
 
 - On **randomization methods**:
    - Randomized compiling with twirling gates, J. Wallman *et al.*, *Phys. Rev. A*, 2016 :cite:`Wallman_2016_PRA`
@@ -222,7 +259,7 @@ A list of research articles academic resources on error mitigation:
    - Quantum imaginary time evolution, M. Motta *et al.*, *Nat. Phys.*, 2020 :cite:`Motta_2020_NatPhys`
    - Error mitigation for analog quantum simulation, J. Sun *et al.*, 2020, arXiv :cite:`Sun_2020_arXiv`
 
-- For an extensive introduction: S. Endo, *Hybrid quantum-classical algorithms and error mitigation*, PhD Thesis, 2019, Oxford University (`Link`_).
+- For an extensive introduction: S. Endo, *Hybrid quantum-classical algorithms and error mitigation*, PhD Thesis, 2019, Oxford University (`Link`_), or :cite:`Endo_2020_arXiv`.
 
 .. _Link: https://ora.ox.ac.uk/objects/uuid:6733c0f6-1b19-4d12-a899-18946aa5df85
 
