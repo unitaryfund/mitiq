@@ -289,13 +289,14 @@ def test_are_close_dict():
     assert not _are_close_dict(dict1, dict2)
     assert not _are_close_dict(dict2, dict1)
 
+
 def test_generate_pmt_circuit():
     n_qubits = 1
     qubits = LineQubit.range(n_qubits)
     depth = 10
     circuit = _generate_pmt_circuit(qubits, depth, ZPowGate)
     assert len(circuit) == depth
-    # Make sure the exponents in the 
+    # Make sure the exponents in the
     for i in range(len(circuit)):
         assert circuit[i].operations[0].gate.exponent == 2*np.pi/depth
 

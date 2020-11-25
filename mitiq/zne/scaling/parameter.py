@@ -30,8 +30,10 @@ from cirq import (
 )
 from mitiq.conversions import converter
 
+
 class GateTypeException(Exception):
     pass
+
 
 def _get_base_gate(gate: EigenGate) -> EigenGate:
     BASE_GATES = [ZPowGate, HPowGate, XPowGate, YPowGate, CXPowGate, CZPowGate]
@@ -40,9 +42,10 @@ def _get_base_gate(gate: EigenGate) -> EigenGate:
         if isinstance(gate, base_gate):
             return base_gate
     raise GateTypeException(
-         "Must have circuit be made of rotation gates. "
+        "Must have circuit be made of rotation gates. "
         "Your gate {} may not be supported".format(gate)
     )
+
 
 @converter
 def scale_parameters(

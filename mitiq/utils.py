@@ -142,12 +142,13 @@ def _are_close_dict(dict_a: Dict[Any, Any], dict_b: Dict[Any, Any]) -> bool:
             return False
     return True
 
+
 class CircuitMismatchException(Exception):
     pass
 
 
 def _generate_pmt_circuit(
-        qubits: Iterable, 
+        qubits: Iterable,
         depth: int,
         gate: EigenGate):
     """
@@ -161,7 +162,8 @@ def _generate_pmt_circuit(
         operations = []
         num_qubits = gate().num_qubits()
         if num_qubits != len(qubits):
-            raise CircuitMismatchException("Number of qubits does not match domain size of gate.")
+            raise CircuitMismatchException(
+                "Number of qubits does not match domain size of gate.")
         operations.append(gate(exponent=rotation_angle)(*qubits))
         moments.append(ops.Moment(operations))
     return Circuit(moments)
@@ -170,7 +172,7 @@ def _generate_pmt_circuit(
 def _poor_mans_tomography(
         executor: Callable[..., float],
         gate: Gate,
-        qubit: int, 
+        qubit: int,
         depth: int = 100) -> float:
     """
     Given an executor and a gate, determines the effective "sigma"
