@@ -16,7 +16,7 @@
 """Types used in probabilistic error cancellation."""
 from copy import deepcopy
 from itertools import product
-from typing import Any, List, Optional, Sequence, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Union
 
 import numpy as np
 
@@ -29,6 +29,7 @@ from mitiq.conversions import (
     CircuitConversionError,
     UnsupportedCircuitError,
 )
+from mitiq.utils import _equal
 
 
 class NoisyOperation:
@@ -349,3 +350,101 @@ class NoisyBasis:
 
     def __len__(self):
         return len(self._basis_elements)
+
+
+class OperationDecomposition:
+    def __init__(
+            self,
+            ideal: QPROGRAM,
+            basis_expansion: Dict[NoisyOperation, float]
+    ) -> None:
+        self._ideal = ideal
+
+        if not all(
+            isinstance(op, NoisyOperation) for op in basis_expansion.keys()
+        ):
+            raise TypeError(
+                "All keys of `basis_expansion` must be "
+                "of type `NoisyOperation`."
+            )
+
+        self._basis_expansion = cirq.LinearDict(basis_expansion)
+        self._negativity = sum(abs(coeff) for coeff in self.coeffs)
+
+    @property
+    def ideal(self) -> QPROGRAM:
+        return self._ideal
+
+    @property
+    def basis_expansion(self) -> cirq.LinearDict:
+        return self._basis_expansion
+
+    @property
+    def noisy_operations(self) -> Tuple[NoisyOperation]:
+        return tuple(self._basis_expansion.keys())
+
+    @property
+    def coeffs(self) -> Tuple[float]:
+        return tuple(self._basis_expansion.values())
+
+    @property
+    def negativity(self) -> float:
+        return self._negativity
+
+    def quasi_distribution(self) -> np.ndarray:
+        """Returns the Quasi-Probability Representation (QPR) of the
+        decomposition. The QPR is the normalized magnitude of each coefficient
+        in the basis expansion.
+        """
+        return np.array(list(map(abs, self.coeffs))) / self.negativity
+
+    def coeff_of(self, noisy_op: NoisyOperation) -> float:
+        """Returns the coefficient of the noisy operation in the basis
+        expansion.
+
+        Args:
+            noisy_op: NoisyOperation to get the coefficient of.
+
+        Raises:
+            ValueError: If noisy_op doesn't appear in the basis expansion.
+        """
+        if noisy_op not in self.noisy_operations:
+            raise ValueError(
+                "Arg `noisy_op` does not appear in the basis expansion."
+            )
+        return self._basis_expansion.get(noisy_op)
+
+    def sign_of(self, noisy_op: NoisyOperation) -> float:
+        """Returns the sign of the noisy operation in the basis expansion.
+
+        Args:
+            noisy_op: NoisyOperation to get the sign of.
+
+        Raises:
+            ValueError: If noisy_op doesn't appear in the basis expansion.
+        """
+        return np.sign(self.coeff_of(noisy_op))
+
+    def sample(
+        self,
+        random_state: Optional[np.random.RandomState] = None
+    ) -> Tuple[float, float, NoisyOperation]:
+        """Returns a randomly sampled NoisyOperation from the basis expansion.
+
+        Args:
+            random_state: Defines the seed for sampling if provided.
+        """
+        if not random_state:
+            rng = np.random
+        elif isinstance(random_state, np.random.RandomState):
+            rng = random_state
+        else:
+            raise TypeError(
+                "Arg `seed` should be of type np.random.RandomState but "
+                f"was {type(random_state)}."
+            )
+
+        noisy_op = rng.choice(
+            self.noisy_operations, p=self.quasi_distribution()
+        )
+        return self.sign_of(noisy_op), self.coeff_of(noisy_op), noisy_op
