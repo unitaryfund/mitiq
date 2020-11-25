@@ -37,6 +37,16 @@ class NoisyOperation:
      """
 
     def __init__(self, ideal: QPROGRAM, real: np.ndarray) -> None:
+        """Initializes a NoisyOperation.
+
+        Args:
+            ideal: The operation a noiseless quantum computer would implement.
+            real: Superoperator representation of the actual operation
+                implemented on a noisy quantum computer.
+
+        Raises:
+            TypeError: If ideal is not a QPROGRAM.
+        """
         self._native_ideal = ideal
 
         try:
@@ -267,6 +277,9 @@ class NoisyOperation:
 
 
 class NoisyBasis:
+    """A set of noisy operations which a quantum computer can actually
+    implement, assumed to form a basis of n-qubit unitary matrices.
+    """
     def __init__(self, *basis_elements: NoisyOperation) -> None:
         """Initializes a NoisyBasis.
 
@@ -352,9 +365,23 @@ class NoisyBasis:
 
 
 class OperationDecomposition:
+    """A decomposition, or basis expansion, of an operation (or sequence of
+    operations) in a basis of noisy, implementable operations.
+    """
     def __init__(
         self, ideal: QPROGRAM, basis_expansion: Dict[NoisyOperation, float]
     ) -> None:
+        """Initializes an OperationDecomposition.
+
+        Args:
+            ideal: The ideal operation desired to be implemented.
+            basis_expansion: Representation of the ideal operation in a noisy
+                basis.
+
+        Raises:
+            TypeError: If all keys of `basis_expansion` are not instances of
+                `NoisyOperation`s.
+        """
         self._ideal = ideal
 
         if not all(
@@ -366,7 +393,7 @@ class OperationDecomposition:
             )
 
         self._basis_expansion = cirq.LinearDict(basis_expansion)
-        self._negativity = sum(abs(coeff) for coeff in self.coeffs)
+        self._norm = sum(abs(coeff) for coeff in self.coeffs)
 
     @property
     def ideal(self) -> QPROGRAM:
@@ -385,15 +412,16 @@ class OperationDecomposition:
         return tuple(self._basis_expansion.values())
 
     @property
-    def negativity(self) -> float:
-        return self._negativity
+    def norm(self) -> float:
+        """Returns the L1 norm of the basis expansion coefficients."""
+        return self._norm
 
-    def quasi_distribution(self) -> np.ndarray:
+    def distribution(self) -> np.ndarray:
         """Returns the Quasi-Probability Representation (QPR) of the
         decomposition. The QPR is the normalized magnitude of each coefficient
         in the basis expansion.
         """
-        return np.array(list(map(abs, self.coeffs))) / self.negativity
+        return np.array(list(map(abs, self.coeffs))) / self.norm
 
     def coeff_of(self, noisy_op: NoisyOperation) -> float:
         """Returns the coefficient of the noisy operation in the basis
@@ -441,6 +469,6 @@ class OperationDecomposition:
             )
 
         noisy_op = rng.choice(
-            self.noisy_operations, p=self.quasi_distribution()
+            self.noisy_operations, p=self.distribution()
         )
         return self.sign_of(noisy_op), self.coeff_of(noisy_op), noisy_op

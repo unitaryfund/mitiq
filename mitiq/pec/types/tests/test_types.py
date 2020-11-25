@@ -478,8 +478,8 @@ def test_decomposition_simple():
 
     assert _equal(decomp.ideal, ideal)
     assert decomp.coeffs == (0.5, -0.5)
-    assert np.allclose(decomp.quasi_distribution(), np.array([0.5, 0.5]))
-    assert np.isclose(decomp.negativity, 1.0)
+    assert np.allclose(decomp.distribution(), np.array([0.5, 0.5]))
+    assert np.isclose(decomp.norm, 1.0)
     assert isinstance(decomp.basis_expansion, cirq.LinearDict)
     assert set(decomp.noisy_operations) == {noisy_xop, noisy_zop}
 
