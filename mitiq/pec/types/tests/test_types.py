@@ -380,7 +380,7 @@ def test_get_sequences_simple():
         cirq.Circuit(cirq.I(q), cirq.I(q)),
         cirq.Circuit(cirq.I(q), cirq.X(q)),
         cirq.Circuit(cirq.X(q), cirq.I(q)),
-        cirq.Circuit(cirq.X(q), cirq.X(q))
+        cirq.Circuit(cirq.X(q), cirq.X(q)),
     ]
     for sequence, expected in zip(sequences, expected_circuits):
         assert _equal(

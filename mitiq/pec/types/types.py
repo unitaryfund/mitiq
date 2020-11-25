@@ -323,5 +323,5 @@ class NoisyBasis:
             sequences.append(this_sequence)
         return sequences
 
-    # def decompose(self, ideal: cirq.CIRCUIT_LIKE) -> OperationDecomposition:
-    #     raise NotImplementedError
+    def decompose(self, ideal: QPROGRAM):
+        raise NotImplementedError
