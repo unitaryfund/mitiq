@@ -468,11 +468,7 @@ def get_test_decomp():
     )
 
     decomp = OperationDecomposition(
-        ideal=ideal,
-        basis_expansion={
-            noisy_xop: 0.5,
-            noisy_zop: -0.5
-        }
+        ideal=ideal, basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5}
     )
     return ideal, noisy_xop, noisy_zop, decomp
 
@@ -504,10 +500,7 @@ def test_decomposition_coeff_of_nonexistant_operation():
     )
 
     decomp = OperationDecomposition(
-        ideal=ideal,
-        basis_expansion={
-            noisy_xop: 0.5,
-        }
+        ideal=ideal, basis_expansion=dict([(noisy_xop, 0.5)])
     )
 
     noisy_zop = NoisyOperation.from_cirq(
@@ -565,7 +558,7 @@ def test_decomposition_sample_zero_coefficient():
         basis_expansion={
             noisy_xop: 0.5,
             noisy_zop: 0.0,  # This should never be sampled.
-        }
+        },
     )
 
     random_state = np.random.RandomState(seed=1)

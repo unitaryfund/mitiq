@@ -29,7 +29,6 @@ from mitiq.conversions import (
     CircuitConversionError,
     UnsupportedCircuitError,
 )
-from mitiq.utils import _equal
 
 
 class NoisyOperation:
@@ -354,9 +353,7 @@ class NoisyBasis:
 
 class OperationDecomposition:
     def __init__(
-            self,
-            ideal: QPROGRAM,
-            basis_expansion: Dict[NoisyOperation, float]
+        self, ideal: QPROGRAM, basis_expansion: Dict[NoisyOperation, float]
     ) -> None:
         self._ideal = ideal
 
@@ -426,8 +423,7 @@ class OperationDecomposition:
         return np.sign(self.coeff_of(noisy_op))
 
     def sample(
-        self,
-        random_state: Optional[np.random.RandomState] = None
+        self, random_state: Optional[np.random.RandomState] = None
     ) -> Tuple[float, float, NoisyOperation]:
         """Returns a randomly sampled NoisyOperation from the basis expansion.
 
