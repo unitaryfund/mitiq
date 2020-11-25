@@ -15,7 +15,7 @@
 
 """Utility functions."""
 from copy import deepcopy
-from typing import cast, Any, Dict
+from typing import cast, Any, Dict, Callable
 
 import numpy as np
 
@@ -135,22 +135,6 @@ def _are_close_dict(dict_a: Dict[Any, Any], dict_b: Dict[Any, Any]) -> bool:
     return True
 
 
-def _get_base_gate(gate: EigenGate) -> EigenGate:
-    BASE_GATES = [ZPowGate, HPowGate, XPowGate, YPowGate, CXPowGate, CZPowGate]
-    """
-    Given a quantum gate in a circuit, return the base gate, i.e. the gate that generates
-    the rotation through which the original gate moves the qubit. For example, an X gate
-    would be given as an RX(pi), up to a global phase. 
-    """
-    for base_gate in BASE_GATES:
-        if isinstance(gate, base_gate):
-            return base_gate
-    raise GateTypeException(
-        "Must have circuit be made of rotation gates. "
-        "Your gate {} may not be supported".format(gate)
-    )
-
-
 def _generate_pmt_circuit(qubits, depth, gate):
     """
     Generates a circuit which should be the identity. Given a rotation
@@ -161,6 +145,7 @@ def _generate_pmt_circuit(qubits, depth, gate):
     moments: List[ops.Moment] = []
     for _ in range(depth):
         operations = []
+        import pdb; pdb.set_trace()
         num_qubits = gate(rotation_angle).num_qubits()
         assert num_qubits == len(qubits)
         operations.append(gate(rotation_angle)(*qubits))

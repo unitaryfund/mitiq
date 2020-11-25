@@ -18,13 +18,14 @@ from copy import deepcopy
 import pytest
 
 import cirq
-from cirq import LineQubit, Circuit, X, Y, Z, H, CNOT, S, T, MeasurementGate
+from cirq import LineQubit, Circuit, X, Y, Z, H, CNOT, S, T, MeasurementGate, ZPowGate
 
 from mitiq.utils import (
     _are_close_dict,
     _equal,
     _simplify_gate_exponent,
-    _simplify_circuit_exponents
+    _simplify_circuit_exponents,
+    _generate_pmt_circuit
 )
 
 
@@ -274,3 +275,10 @@ def test_are_close_dict():
     dict2 = {"a": 1, "b": 0.0, "c": 1}
     assert not _are_close_dict(dict1, dict2)
     assert not _are_close_dict(dict2, dict1)
+
+def test_generate_pmt_circuit():
+    qubits = [1,2,3]
+    depth = 10
+    circuit = _generate_pmt_circuit(qubits, depth, ZPowGate)
+    import pdb; pdb.set_trace()
+
