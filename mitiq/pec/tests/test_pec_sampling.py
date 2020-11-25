@@ -126,7 +126,7 @@ def test_sample_circuit_with_seed():
     expected = sample_circuit(circ, decomp, random_state=4)[0]
 
     # Check we're not sampling the same operation every call to sample_sequence
-    assert len(list(expected.all_operations())) > 1
+    assert len(set(expected.all_operations())) > 1
 
     for _ in range(10):
         sampled = sample_circuit(circ, decomp, random_state=4)[0]
