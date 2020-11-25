@@ -86,6 +86,8 @@ def execute_with_pec(
         "Optimal resource cost for error mitigation,"
         (https://arxiv.org/abs/2006.12509).
     """
+    if isinstance(random_state, int):
+        random_state = np.random.RandomState(random_state)
 
     # Get the 1-norm of the circuit quasi-probability representation
     _, _, norm = sample_circuit(circuit, decomposition_dict)
