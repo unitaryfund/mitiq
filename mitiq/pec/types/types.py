@@ -43,7 +43,7 @@ class NoisyOperation:
             ideal_cirq, self._native_type = convert_to_mitiq(ideal)
         except (CircuitConversionError, UnsupportedCircuitError):
             raise TypeError(
-                f"Arg `ideal` must be of type {QPROGRAM} but was {type(ideal)}."
+                f"Arg `ideal` must be one of {QPROGRAM} but was {type(ideal)}."
             )
 
         self._init_from_cirq(ideal_cirq, real)
