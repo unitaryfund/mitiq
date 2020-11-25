@@ -286,6 +286,13 @@ def test_on_each_multiple_qubits_bad_qubits_shape():
         NoisyOperation.on_each(cirq.CNOT, real_cnot, qubits=qubits)
 
 
+def test_on_each_bad_types():
+    ideal = cirq.Circuit(cirq.I(cirq.LineQubit(0)))
+    real = np.identity(4)
+    with pytest.raises(TypeError, match="must be iterable"):
+        NoisyOperation.on_each(ideal, real, qubits=cirq.NamedQubit("new"))
+
+
 @pytest.mark.parametrize(
     "qubit", (cirq.NamedQubit("New qubit"), cirq.GridQubit(2, 3))
 )
@@ -314,6 +321,16 @@ def test_transform_qubits_multiple_qubits(qubits):
     noisy_op.transform_qubits(qubits)
     assert set(noisy_op.qubits) == set(qubits)
     assert np.allclose(noisy_op.real_matrix, real)
+
+
+def test_transform_qubits_wrong_number():
+    real = np.zeros(shape=(16, 16))
+    qreg = [cirq.NamedQubit("Dummy 1"), cirq.NamedQubit("Dummy 2")]
+    ideal = cirq.Circuit(cirq.ops.CNOT.on(*qreg))
+    noisy_op = NoisyOperation(ideal, real)
+
+    with pytest.raises(ValueError, match="Expected 2 qubits but received"):
+        noisy_op.transform_qubits(qubits=[cirq.NamedQubit("new")])
 
 
 def test_with_qubits():
@@ -346,6 +363,11 @@ def test_extend_to_single_qubit():
         assert _equal(op.ideal_circuit(), cirq.Circuit(ideal))
         assert np.allclose(op.ideal_unitary, cirq.unitary(ideal))
         assert np.allclose(op.real_matrix, real)
+
+
+def test_noisy_operation_str():
+    noisy_op = NoisyOperation.from_cirq(ideal=cirq.I, real=np.identity(4))
+    assert isinstance(noisy_op.__str__(), str)
 
 
 def test_noisy_basis_simple():
@@ -429,6 +451,17 @@ def test_noisy_basis_add():
     assert len(noisy_basis) == 4
 
 
+def test_noisy_basis_add_bad_types():
+    rng = np.random.RandomState(seed=1)
+    noisy_basis = NoisyBasis(
+        NoisyOperation.from_cirq(ideal=cirq.I, real=rng.rand(4, 4)),
+        NoisyOperation.from_cirq(ideal=cirq.X, real=rng.rand(4, 4)),
+    )
+
+    with pytest.raises(TypeError, match="All basis elements must be of type"):
+        noisy_basis.add(cirq.Y)
+
+
 def test_extend_to_simple():
     rng = np.random.RandomState(seed=1)
     noisy_basis = NoisyBasis(
@@ -491,6 +524,19 @@ def test_decomposition_coeff_of():
     assert np.isclose(decomp.coeff_of(noisy_zop), -0.5)
 
 
+def test_decomposition_bad_type_for_basis_expansion():
+    ideal = cirq.Circuit(cirq.H(cirq.LineQubit(0)))
+
+    noisy_xop = NoisyOperation.from_cirq(
+        ideal=cirq.X, real=np.zeros(shape=(4, 4))
+    )
+
+    with pytest.raises(TypeError, match="All keys of `basis_expansion` must"):
+        OperationDecomposition(
+            ideal=ideal, basis_expansion=dict([(1.0, noisy_xop)])
+        )
+
+
 def test_decomposition_coeff_of_nonexistant_operation():
     qbit = cirq.LineQubit(0)
     ideal = cirq.Circuit(cirq.X(qbit))
@@ -541,6 +587,12 @@ def test_decomposition_sample_seed():
 
         assert sign1 == sign2
         assert np.isclose(coeff1, coeff2)
+
+
+def test_decomposition_sample_bad_seed_type():
+    _, _, _, decomp = get_test_decomp()
+    with pytest.raises(TypeError, match="should be of type"):
+        decomp.sample(random_state=7)
 
 
 def test_decomposition_sample_zero_coefficient():

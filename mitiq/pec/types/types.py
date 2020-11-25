@@ -269,9 +269,6 @@ class NoisyOperation:
             self._ideal + other._ideal, self._real @ other._real
         )
 
-    def __repr__(self) -> str:
-        return self._ideal.__repr__() + "\n:\n" + self._real.__repr__()
-
     def __str__(self) -> str:
         return self._ideal.__str__()
 
@@ -315,7 +312,7 @@ class NoisyBasis:
         """
         for noisy_op in basis_elements:
             if not isinstance(noisy_op, NoisyOperation):
-                raise ValueError(
+                raise TypeError(
                     "All basis elements must be of type `NoisyOperation`."
                 )
             self._basis_elements.add(noisy_op)
@@ -465,8 +462,8 @@ class OperationDecomposition:
             rng = random_state
         else:
             raise TypeError(
-                "Arg `seed` should be of type `np.random.RandomState` but "
-                f"was {type(random_state)}."
+                "Arg `random_state` should be of type `np.random.RandomState` "
+                f"but was {type(random_state)}."
             )
 
         noisy_op = rng.choice(
