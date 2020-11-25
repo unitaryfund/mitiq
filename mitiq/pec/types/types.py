@@ -239,7 +239,7 @@ class NoisyOperation:
         return copy
 
     def copy(self) -> "NoisyOperation":
-        """Returns a copy of the noisy operation."""
+        """Returns a copy of the NoisyOperation."""
         return NoisyOperation(self._ideal, self._real)
 
     def __add__(self, other: Any) -> "NoisyOperation":
@@ -290,6 +290,12 @@ class NoisyBasis:
         return qubits
 
     def add(self, *basis_elements) -> None:
+        """Add elements to the NoisyBasis.
+
+        Args:
+            basis_elements: Sequence of basis elements as `NoisyOperation`s to
+                add to the current basis elements.
+        """
         for noisy_op in basis_elements:
             if not isinstance(noisy_op, NoisyOperation):
                 raise ValueError(
@@ -315,6 +321,17 @@ class NoisyBasis:
             )
 
     def get_sequences(self, length: int) -> List[NoisyOperation]:
+        """Returns a list of all implementable NoisyOperation's of the given
+        length.
+
+        Example: If the ideal operations of the noisy basis elements are {I, X}
+            and length = 2, then this method returns the four NoisyOperations
+            whose ideal operations are {II, IX, XI, XX}.
+
+        Args:
+            length: Number of NoisyOperation's in each element of the returned
+                list.
+        """
         sequences = []
         for prod in product(self._basis_elements, repeat=length):
             this_sequence = prod[0]
