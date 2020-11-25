@@ -24,7 +24,7 @@ from mitiq.utils import (
     _are_close_dict,
     _equal,
     _simplify_gate_exponent,
-    _simplify_circuit_exponents,
+    _simplify_circuit_exponents
 )
 
 
