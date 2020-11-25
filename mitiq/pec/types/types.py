@@ -394,6 +394,7 @@ class OperationDecomposition:
 
         self._basis_expansion = cirq.LinearDict(basis_expansion)
         self._norm = sum(abs(coeff) for coeff in self.coeffs)
+        self._distribution = np.array(list(map(abs, self.coeffs))) / self.norm
 
     @property
     def ideal(self) -> QPROGRAM:
@@ -421,7 +422,7 @@ class OperationDecomposition:
         decomposition. The QPR is the normalized magnitude of each coefficient
         in the basis expansion.
         """
-        return np.array(list(map(abs, self.coeffs))) / self.norm
+        return self._distribution
 
     def coeff_of(self, noisy_op: NoisyOperation) -> float:
         """Returns the coefficient of the noisy operation in the basis
@@ -464,7 +465,7 @@ class OperationDecomposition:
             rng = random_state
         else:
             raise TypeError(
-                "Arg `seed` should be of type np.random.RandomState but "
+                "Arg `seed` should be of type `np.random.RandomState` but "
                 f"was {type(random_state)}."
             )
 
