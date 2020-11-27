@@ -17,12 +17,14 @@
 import numpy as np
 import copy
 from typing import Optional
+import qiskit
 from qiskit import Aer, execute, QuantumCircuit
 
 # Noise simulation packages
 from qiskit.providers.aer.noise import NoiseModel
-from qiskit.providers.aer.noise.errors.standard_errors import depolarizing_error
-
+from qiskit.providers.aer.noise.errors.standard_errors import (
+    depolarizing_error,
+)
 from mitiq.benchmarks.randomized_benchmarking import rb_circuits
 from mitiq.mitiq_qiskit.conversions import to_qiskit
 
