@@ -16,7 +16,6 @@
 """Unit tests for conversions between Mitiq circuits and Qiskit circuits."""
 import pytest
 import sys
-sys.path.append("/Users/pchung/Desktop/mitiq")
 import qiskit
 import numpy as np
 from mitiq.utils import _equal
