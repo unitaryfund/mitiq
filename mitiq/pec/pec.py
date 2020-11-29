@@ -17,6 +17,7 @@
 
 from typing import Optional, Callable, Union, Tuple
 import numpy as np
+from warnings import warn
 from mitiq._typing import QPROGRAM
 from mitiq.pec.utils import DecompositionDict
 from mitiq.pec.sampling import sample_circuit
@@ -101,6 +102,10 @@ def execute_with_pec(
     # Deduce the number of samples (if not given by the user)
     if not isinstance(num_samples, int):
         num_samples = int((norm / precision) ** 2)
+    
+    #Issue warning for very large sample size
+    if num_samples > 10 ** 5:
+            warn("Sample size in PEC is very large.It may take serveral mintues.",UserWarning)
 
     sampled_circuits = []
     signs = []
