@@ -196,7 +196,26 @@ def test_circuit_collection_unique_with_counts():
         assert unique_with_counts[i][1] == correct[i][1]
 
 
-def test_circuit_collection_multiplicity_of():
+def test_circuit_collection_indices_of_unique_circuits():
+    qbit = cirq.LineQubit(0)
+    circuits = [
+        cirq.Circuit(cirq.X(qbit)),
+        cirq.Circuit(cirq.Y(qbit)),
+        cirq.Circuit(cirq.X(qbit)),
+        cirq.Circuit(cirq.Z(qbit)),
+    ]
+    collection = CircuitCollection(circuits)
+    assert collection.indices_of_unique_circuits() == [0, 1, 3]
+
+
+def test_circuit_collection_indices_of_unique_circuits_two():
+    qbit = cirq.LineQubit(0)
+    circuits = [cirq.Circuit(cirq.X(qbit))] * 20 + [cirq.Circuit(cirq.Z(qbit))]
+    collection = CircuitCollection(circuits)
+    assert collection.indices_of_unique_circuits() == [0, 20]
+
+
+def test_circuit_collection_count_of():
     rng = np.random.RandomState(1)
 
     qbit = cirq.LineQubit(0)
@@ -217,15 +236,15 @@ def test_circuit_collection_multiplicity_of():
         collection = CircuitCollection(circuits)
 
         assert len(collection.unique) == 4
-        assert collection.multiplicity_of(cirq.Circuit(cirq.X(qbit))) == 2
-        assert collection.multiplicity_of(cirq.Circuit(cirq.Z(qbit))) == 1
-        assert collection.multiplicity_of(cirq.Circuit(cirq.Y(qbit))) == 4
-        assert collection.multiplicity_of(cirq.Circuit(cirq.H(qbit))) == 2
-        assert collection.multiplicity_of(cirq.Circuit(cirq.I(qbit))) == 0
+        assert collection.count_of(cirq.Circuit(cirq.X(qbit))) == 2
+        assert collection.count_of(cirq.Circuit(cirq.Z(qbit))) == 1
+        assert collection.count_of(cirq.Circuit(cirq.Y(qbit))) == 4
+        assert collection.count_of(cirq.Circuit(cirq.H(qbit))) == 2
+        assert collection.count_of(cirq.Circuit(cirq.I(qbit))) == 0
 
 
 @pytest.mark.parametrize("item", ("circuit", 1, None))
 def test_circuit_collection_multiplicity_of_bad_type(item):
     qbit = cirq.LineQubit(0)
     collection = CircuitCollection([cirq.Circuit(cirq.X(qbit))])
-    assert collection.multiplicity_of(item) == 0
+    assert collection.count_of(item) == 0

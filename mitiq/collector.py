@@ -16,8 +16,9 @@
 """Defines utilities for efficiently running collections of circuits generated
 by error mitigation techniques to compute expectation values."""
 
+from copy import deepcopy
 import inspect
-from typing import Any, Callable, Iterable, List, Sequence, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Sequence, Tuple, Union
 
 import numpy as np
 
@@ -50,7 +51,7 @@ class Collector:
         self._can_batch = Collector.is_batched_executor(executor)
         self._max_batch_size = max_batch_size
 
-        self._executed_programs: List[QPROGRAM] = []
+        self._executed_circuits: List[QPROGRAM] = []
         self._computed_results: List[float] = []
 
         self._calls_to_executor: int = 0
@@ -64,6 +65,12 @@ class Collector:
         return self._calls_to_executor
 
     def run(self, circuits: Sequence[QPROGRAM]) -> List[float]:
+        """Runs all input circuits using the least number of possible calls to
+        the executor.
+
+        Args:
+            circuits: Sequence of circuits to execute using the executor.
+        """
         collection = CircuitCollection(circuits)
         to_run = collection.unique
 
@@ -82,7 +89,7 @@ class Collector:
                     batch = to_run[i * step : (i + 1) * step]
                     self._call_executor(batch)
 
-        # Expand computed results to all results using multiplicities.
+        # Expand computed results to all results using counts.
         results = []
         for value, mult in zip(self._computed_results, collection.counts()):
             results += [value] * mult
@@ -96,17 +103,16 @@ class Collector:
         Args:
             to_run: Circuit(s) to run.
         """
-        # TODO: Make sure `to_run` is a List[QPROGRAM].
         result = self._executor(to_run)
         self._calls_to_executor += 1
 
         try:
             result = list(result)
             self._computed_results += result
-            self._executed_programs += to_run
+            self._executed_circuits += to_run
         except TypeError:
             self._computed_results.append(result)
-            self._executed_programs.append(to_run)
+            self._executed_circuits.append(to_run)
 
     @staticmethod
     def is_batched_executor(executor: Callable) -> bool:
@@ -148,16 +154,27 @@ class Collector:
 
 
 class CircuitCollection:
-    """A collection of circuits to execute."""
+    """A collection of circuits, nominally to execute on some backend."""
 
     def __init__(self, circuits: Sequence[QPROGRAM]) -> None:
-        self._raw_circuits = circuits
+        """Initializes a CircuitCollection.
+
+        Args:
+            circuits: Sequence of circuits to form the CircuitCollection.
+        """
+        self._raw_circuits = deepcopy(circuits)
         self._cirq_circuits = [
-            convert_to_mitiq(circuit)[0] for circuit in circuits
+            convert_to_mitiq(circuit)[0] for circuit in self._raw_circuits
         ]
 
+        # List of unique circuits.
         self._unique: List[cirq.Circuit] = []
-        self._counts = {}
+
+        # Dictionary where each key refers to an index of self._raw_circuits
+        # that is the first occurrence of a unique circuit. The value of this
+        # key is the multiplicity/count (number of occurrences) of this circuit
+        # in self._raw_circuits. See CircuitCollection.unique_with_counts.
+        self._counts: Dict[int, int] = {}
 
         for i, circ in enumerate(self._cirq_circuits):
             found = False
@@ -180,12 +197,40 @@ class CircuitCollection:
         return [self._raw_circuits[i] for i in self._counts.keys()]
 
     def counts(self) -> List[int]:
+        """Returns the counts of unique circuits in the CircuitCollection.
+
+        For example, if `CircuitCollection.unique()` = [a, b] and
+        `CircuitCollection.counts() = [3, 4]`, this means that `a` occurs 3
+        times in the CircuitCollection and `b` occurs 4 times.
+        """
         return list(self._counts.values())
 
     def unique_with_counts(self) -> List[Tuple[QPROGRAM, int]]:
+        """Returns the unique circuits along with their counts.
+
+        For example, if
+        `CircuitCollection.unique_with_counts() = [(a, 3), (b, 4)]`, this means
+        that circuit `a` occurs 3 times in the CircuitCollection and circuit
+        `b` occurs 4 times.
+        """
         return [(self._raw_circuits[k], v) for k, v in self._counts.items()]
 
-    def multiplicity_of(self, item: Any) -> int:
+    def indices_of_unique_circuits(self) -> List[int]:
+        """Returns the indices of unique circuits in the original sequence of
+        circuits which formed the CircuitCollection.
+
+        For example, if `collection = CircuitCollection([a, b, a, c])`, then
+        `collection.indices_of_unique_circuits() = [0, 1, 3]`.
+        """
+        return list(self._counts.keys())
+
+    def count_of(self, item: Any) -> int:
+        """Returns the count (number of occurrences) of the item in the
+        CircuitCollection.
+
+        Args:
+            item: Any value to get the number of occurrences of.
+        """
         try:
             item, _ = convert_to_mitiq(item)
         except (CircuitConversionError, UnsupportedCircuitError):
