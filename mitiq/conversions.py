@@ -45,12 +45,20 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
         input_circuit_type: Type of input circuit represented by a string.
     """
     conversion_function: Callable[[QPROGRAM], Circuit]
-    if "qiskit" in circuit.__module__:
+
+    try:
+        package = circuit.__module__
+    except AttributeError:
+        raise UnsupportedCircuitError(
+            "Could not determine the package of the input circuit."
+        )
+
+    if "qiskit" in package:
         from mitiq.mitiq_qiskit.conversions import from_qiskit
 
         input_circuit_type = "qiskit"
         conversion_function = from_qiskit
-    elif "pyquil" in circuit.__module__:
+    elif "pyquil" in package:
         from mitiq.mitiq_pyquil.conversions import from_pyquil
 
         input_circuit_type = "pyquil"
@@ -63,7 +71,7 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
 
     else:
         raise UnsupportedCircuitError(
-            f"Circuit from module {circuit.__module__} is not supported.\n\n"
+            f"Circuit from module {package} is not supported.\n\n"
             f"Circuit types supported by Mitiq are \n{SUPPORTED_PROGRAM_TYPES}"
         )
 
