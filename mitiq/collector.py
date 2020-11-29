@@ -64,15 +64,23 @@ class Collector:
     def calls_to_executor(self) -> int:
         return self._calls_to_executor
 
-    def run(self, circuits: Sequence[QPROGRAM]) -> List[float]:
+    def run(
+        self, circuits: Sequence[QPROGRAM], force_run_all: bool = False
+    ) -> List[float]:
         """Runs all input circuits using the least number of possible calls to
         the executor.
 
         Args:
             circuits: Sequence of circuits to execute using the executor.
+            force_run_all: If True, force every circuit in the input sequence
+            to be executed (if some are identical). Else, detects identical
+            circuits and runs a minimal set.
         """
-        collection = CircuitCollection(circuits)
-        to_run = collection.unique
+        if force_run_all:
+            to_run = circuits
+        else:
+            collection = CircuitCollection(circuits)
+            to_run = collection.unique
 
         if not self._can_batch:
             for circuit in to_run:
@@ -90,6 +98,8 @@ class Collector:
                     self._call_executor(batch)
 
         # Expand computed results to all results using counts.
+        if force_run_all:
+            return self._computed_results
         results = []
         for value, mult in zip(self._computed_results, collection.counts()):
             results += [value] * mult

@@ -105,8 +105,26 @@ def test_run_collector_all_unique(ncircuits, batch_size):
     ]
     results = collector.run(circuits)
 
-    assert np.allclose(results, np.zeros(len(circuits)))
+    assert np.allclose(results, np.zeros(ncircuits))
     assert collector.calls_to_executor == np.ceil(ncircuits / batch_size)
+
+
+@pytest.mark.parametrize("ncircuits", (5, 21))
+@pytest.mark.parametrize("force_run_all", (True, False))
+def test_run_collector_force_run_all_serial_executor_identical_circuits(
+    ncircuits, force_run_all
+):
+    collector = Collector(executor=executor_serial)
+    assert not collector.can_batch
+
+    circuits = [cirq.Circuit(cirq.H(cirq.LineQubit(0)))] * ncircuits
+    results = collector.run(circuits, force_run_all=force_run_all)
+
+    assert np.allclose(results, np.zeros(ncircuits))
+    if force_run_all:
+        assert collector.calls_to_executor == ncircuits
+    else:
+        assert collector.calls_to_executor == 1
 
 
 def test_circuit_collection_simple():
