@@ -110,7 +110,7 @@ def test_execute_with_pec_with_different_samples(circuit: Circuit, seed):
     assert np.average(errors_more_samples) < np.average(errors_few_samples)
 
 
-@mark.parametrize("num_samples", [100, 1000])
+@mark.parametrize("num_samples", [100, 1000, 100001])
 def test_execute_with_pec_with_full_output(num_samples: int):
     """Tests that the error associated to the PEC value is returned if
     the option 'full_output' is set to True.
