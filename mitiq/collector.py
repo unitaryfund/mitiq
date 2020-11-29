@@ -94,7 +94,7 @@ class Collector:
                 stop = len(to_run)
                 step = self._max_batch_size
                 for i in range(int(np.ceil(stop / step))):
-                    batch = to_run[i * step : (i + 1) * step]
+                    batch = to_run[i * step: (i + 1) * step]
                     self._call_executor(batch)
 
         # Expand computed results to all results using counts.
