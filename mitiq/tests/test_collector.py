@@ -26,16 +26,19 @@ from mitiq.collector import CircuitCollection, Collector
 from mitiq.utils import _equal
 
 
-def executor_batched(circuits) -> np.ndarray:
-    return np.zeros(len(circuits))
+def executor_batched(circuits, **kwargs) -> np.ndarray:
+    return np.full(
+        shape=(len(circuits),),
+        fill_value=kwargs.setdefault("return_value", 0.0),
+    )
 
 
-def executor_serial_typed(*args) -> float:
-    return 0.0
+def executor_serial_typed(*args, **kwargs) -> float:
+    return executor_serial(*args, **kwargs)
 
 
-def executor_serial(*args):
-    return 0.0
+def executor_serial(*args, **kwargs):
+    return kwargs.setdefault("return_value", 0.0)
 
 
 def executor_pyquil_batched(programs) -> List[float]:
