@@ -16,6 +16,7 @@
 - Add unitary folding API (@rmlarose, gh-429).
 - Add new get methods (for fit errors, extrapolation curve, etc.) to Factory objects (@crazy4pi314, @andreamari, gh-403).
 - Add option to automatically deduce the number of samples in PEC (@andreamari, gh-451).
+- Add warning for large samples in PEC (@sid1993, gh-459).
 
 ## Version 0.3.0 (October 30th, 2020)
 

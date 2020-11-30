@@ -17,10 +17,23 @@
 
 from typing import Optional, Callable, Union, Tuple
 import numpy as np
-from warnings import warn
+import warnings
 from mitiq._typing import QPROGRAM
 from mitiq.pec.utils import DecompositionDict
 from mitiq.pec.sampling import sample_circuit
+
+
+class LargeSampleWarning(Warning):
+    """Warning is raised when PEC sample size is greater than 10 ** 5
+    """
+
+    pass
+
+
+_LARGE_SAMPLE_WARN = (
+    "The number of PEC samples is very large. It may take several minutes."
+    " It may be necessary to reduce 'precision' or 'num_samples'."
+)
 
 
 def execute_with_pec(
@@ -105,10 +118,7 @@ def execute_with_pec(
 
     # Issue warning for very large sample size
     if num_samples > 10 ** 5:
-        warn(
-            "Sample size in PEC is very large.It may take serveral mintues.",
-            UserWarning
-            )
+        warnings.warn(_LARGE_SAMPLE_WARN, LargeSampleWarning)
 
     sampled_circuits = []
     signs = []
