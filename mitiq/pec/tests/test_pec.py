@@ -187,7 +187,7 @@ def test_large_sample_size_warning(num_samples: int):
         return rnd_state.randn()
     with warns(
         LargeSampleWarning,
-         match=r"The number of PEC samples is very large."
+        match=r"The number of PEC samples is very large."
          ):
         execute_with_pec(
          oneq_circ, fake_exec, DECO_DICT, num_samples=num_samples)
