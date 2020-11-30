@@ -47,6 +47,7 @@ release plan to demonstrate the full end-to-end operation of the new technique.
 
 Thanks to @erkska and @k-m-schultz for their contributions to this release!
 
+
 ## Version 0.2.0 (October 4th, 2020)
 
 ### Announcements
