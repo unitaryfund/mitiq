@@ -13,10 +13,11 @@
 - Redesign factories, batch runs in BatchedFactory, fix Qiskit utils tests (@rmlarose, @andreamari, gh-381).
 
 ### All Changes
-
-- Add refernce to review paper in docs (@willzeng, gh-423).
+- Update notebook version in requirements to resolve vulnerability found by security bot.(@nathanshammah, gh-445) 
+- Add reference to review paper in docs (@willzeng, gh-423).
 - Add unitary folding API (@rmlarose, gh-429).
 - Add new get methods (for fit errors, extrapolation curve, etc.) to Factory objects (@crazy4pi314, @andreamari, gh-403).
+- Add option to automatically deduce the number of samples in PEC (@andreamari, gh-451).
 
 ## Version 0.3.0 (October 30th, 2020)
 
@@ -47,6 +48,7 @@ release plan to demonstrate the full end-to-end operation of the new technique.
 - Make tensorflow requirements optional for docs (@karalekas, gh-417).
 
 Thanks to @erkska and @k-m-schultz for their contributions to this release!
+
 
 ## Version 0.2.0 (October 4th, 2020)
 

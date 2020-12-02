@@ -26,12 +26,13 @@ def execute_with_pec(
     circuit: QPROGRAM,
     executor: Callable[[QPROGRAM], float],
     decomposition_dict: DecompositionDict,
+    precision: float = 0.03,
     num_samples: Optional[int] = None,
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
 ) -> Union[float, Tuple[float, float]]:
     """Evaluates the expectation value associated to the input circuit
-    using probabilistic error cancellation (PEC) [Temme2017]_.
+    using probabilistic error cancellation (PEC) [Temme2017]_ [Endo2018]_.
 
     This function implements PEC by:
 
@@ -50,10 +51,13 @@ def execute_with_pec(
             quasi-probability representation of the ideal operations (those
             which are part of the input circuit).
         num_samples: The number of noisy circuits to be sampled for PEC.
-            If equal to None, it is deduced from the amount of "negativity"
-            of the quasi-probability representation of the input circuit.
-            Note: the latter feature is not yet implemented and num_samples
-            is just set to 1000 if not specified.
+            If not given, this is deduced from the argument 'precision'.
+        precision: The desired estimation precision (assuming the observable
+            is bounded by 1). The number of samples is deduced according
+            to the formula (one_norm / precision) ** 2, where 'one_norm'
+            is related to the negativity of the quasi-probability
+            representation [Temme2017]_. If 'num_samples' is explicitly set
+            by the user, 'precision' is ignored and has no effect.
         random_state: Seed for sampling circuits.
         full_output: If False only the average PEC value is returned.
             If True an estimate of the associated error is returned too.
@@ -82,17 +86,27 @@ def execute_with_pec(
         "Optimal resource cost for error mitigation,"
         (https://arxiv.org/abs/2006.12509).
     """
+    if isinstance(random_state, int):
+        random_state = np.random.RandomState(random_state)
 
-    # TODO gh-413: Add option to automatically deduce the number of PEC samples
-    if not num_samples:
-        num_samples = 1000
+    # Get the 1-norm of the circuit quasi-probability representation
+    _, _, norm = sample_circuit(circuit, decomposition_dict)
+
+    if not (0 < precision <= 1):
+        raise ValueError(
+            "The value of 'precision' should be within the interval (0, 1],"
+            f" but precision is {precision}."
+        )
+
+    # Deduce the number of samples (if not given by the user)
+    if not isinstance(num_samples, int):
+        num_samples = int((norm / precision) ** 2)
 
     sampled_circuits = []
     signs = []
 
     for _ in range(num_samples):
-        # Note: the norm is the same for each sample.
-        sampled_circuit, sign, norm = sample_circuit(
+        sampled_circuit, sign, _ = sample_circuit(
             circuit, decomposition_dict, random_state
         )
         sampled_circuits.append(sampled_circuit)
@@ -102,7 +116,7 @@ def execute_with_pec(
     # Execute all the circuits
     exp_values = [executor(circ) for circ in sampled_circuits]
 
-    # Evaluate unbiased estimators [Temme2017], [Endo2018], [Takagi2020]
+    # Evaluate unbiased estimators [Temme2017] [Endo2018] [Takagi2020]
     unbiased_estimators = [norm * s * val for s, val in zip(signs, exp_values)]
 
     pec_value = np.average(unbiased_estimators)
