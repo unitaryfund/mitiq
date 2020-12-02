@@ -30,6 +30,8 @@ from typing import (
 )
 import warnings
 
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
@@ -273,7 +275,7 @@ class Factory(ABC):
     ) -> "Factory":
         """Calls the executor function on noise-scaled quantum circuit and
         stores the results.
-
+        
         Args:
             qp: Quantum circuit to scale noise in.
             executor: Function which inputs a (list of) quantum circuits and
@@ -285,7 +287,6 @@ class Factory(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod
     def reduce(self) -> float:
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
@@ -334,6 +335,55 @@ class Factory(ABC):
         self._instack.append(instack_val)
         self._outstack.append(outstack_val)
         return self
+
+    def plot_data(self) -> Figure:
+        """Returns a figure which is a scatter plot of (x, y) data where x are
+        scale factors at which expectation values have been computed, and y are
+        the associated expectation values.
+
+        Returns:
+            fig: A 2D scatter plot described above.
+        """
+        fig = plt.figure(figsize=(7, 5))
+        ax = plt.gca()
+        plt.plot(
+            self.get_scale_factors(),
+            self.get_expectation_values(),
+            "o",
+            markersize=10,
+            markeredgecolor="black",
+            alpha=0.8,
+            label="Data",
+        )
+        ax.grid(True)
+        plt.xlabel("Noise scale factor")
+        plt.ylabel("Observable value")
+        return fig
+
+    def plot_fit(self) -> Figure:
+        """Returns a figure which plots the experimental data as well as the
+        best fit curve.
+
+        Returns:
+            fig: A figure which plots the best fit curve as well as the data.
+        """
+        fig = self.plot_data()
+
+        smooth_scale_factors = np.linspace(0, self.get_scale_factors()[-1], 20)
+        smooth_expectations = (self.get_extrapolation_curve())(
+            smooth_scale_factors
+        )
+        plt.xlim(left=0)
+        fig.axes[0].plot(
+            smooth_scale_factors,
+            smooth_expectations,
+            "--",
+            lw=2,
+            color="black",
+            label="Best fit",
+        )
+
+        return fig
 
     def reset(self) -> "Factory":
         """Resets the internal state of the Factory."""
