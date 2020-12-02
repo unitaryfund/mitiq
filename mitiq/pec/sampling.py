@@ -99,6 +99,8 @@ def sample_circuit(
         norm: The one norm of the decomposition coefficients
             (of the full circuit).
     """
+    if isinstance(random_state, int):
+        random_state = np.random.RandomState(random_state)
 
     # copy and remove all moments
     sampled_circuit = deepcopy(ideal_circuit)[0:0]
