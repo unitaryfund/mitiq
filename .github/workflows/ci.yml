@@ -9,25 +9,6 @@ on:
       - master
 
 jobs:
-  # set up anaconda and install pandoc
-  example-1:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up conda
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: 3.8
-      - name: Conda info
-        shell: bash -l {0}
-        run: conda info
-      - name: Conda list
-        shell: pwsh
-        run: conda list
-      - name: Conda install
-        shell: pwsh
-        run: conda install -c conda-forge pandoc
-
   # builds & tests the docs on py38
   docs:
     runs-on: ubuntu-latest
