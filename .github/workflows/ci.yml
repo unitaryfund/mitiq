@@ -10,7 +10,7 @@ on:
 
 jobs:
   # set up anaconda and install pandoc
-  conda:
+  example-1:
     runs-on: ubuntu-latest
     steps:
       - name: Set up conda
@@ -27,6 +27,7 @@ jobs:
       - name: Conda install
         shell: pwsh
         run: conda install -c conda-forge pandoc
+
   # builds & tests the docs on py38
   docs:
     runs-on: ubuntu-latest
