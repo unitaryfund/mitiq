@@ -179,7 +179,7 @@ def test_bad_precision_argument(bad_value: float):
         execute_with_pec(oneq_circ, executor, DECO_DICT, precision=bad_value)
 
 
-@mark.parametrize("num_samples", [100001, 105000])
+@mark.parametrize("num_samples", [100001])
 def test_large_sample_size_warning(num_samples: int):
     """Tests whether a warning is raised when PEC sample size
     is greater than 10 ** 5
