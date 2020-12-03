@@ -57,19 +57,23 @@ qreg = LineQubit.range(2)
 twoq_circ = Circuit(Y.on(qreg[1]), CNOT.on(*qreg), Y.on(qreg[1]),)
 
 
+@mark.parametrize("seed", (100, 101))
 @mark.parametrize("circuit", [oneq_circ, twoq_circ])
 @mark.parametrize(
     "decomposition_dict", [NOISELESS_DECO_DICT, DECO_DICT_SIMP, DECO_DICT]
 )
-def test_execute_with_pec_one_qubit(
-    circuit: Circuit, decomposition_dict: DecompositionDict
+def test_execute_with_pec(
+    circuit: Circuit, decomposition_dict: DecompositionDict, seed: int
 ):
     """Tests that execute_with_pec mitigates the error of a noisy
     expectation value.
     """
     unmitigated = executor(circuit)
     mitigated = execute_with_pec(
-        circuit, executor, decomposition_dict=decomposition_dict
+        circuit,
+        executor,
+        decomposition_dict=decomposition_dict,
+        random_state=seed,
     )
     error_unmitigated = abs(unmitigated - 1.0)
     error_mitigated = abs(mitigated - 1.0)
@@ -83,7 +87,7 @@ def test_execute_with_pec_one_qubit(
 
 @mark.parametrize("circuit", [oneq_circ, twoq_circ])
 @mark.parametrize("seed", (1, 2, 3))
-def test_execute_with_pec_with_different_samples(circuit: Circuit, seed):
+def test_execute_with_pec_with_different_samples(circuit: Circuit, seed: int):
     """Tests that, on average, the error decreases as the number of samples is
     increased.
     """
@@ -175,7 +179,7 @@ def test_bad_precision_argument(bad_value: float):
         execute_with_pec(oneq_circ, executor, DECO_DICT, precision=bad_value)
 
 
-@mark.parametrize("num_samples", [100001, 105000])
+@mark.parametrize("num_samples", [100001])
 def test_large_sample_size_warning(num_samples: int):
     """Tests whether a warning is raised when PEC sample size
     is greater than 10 ** 5
@@ -187,7 +191,7 @@ def test_large_sample_size_warning(num_samples: int):
         return rnd_state.randn()
     with warns(
         LargeSampleWarning,
-        match=r"The number of PEC samples is very large."
-         ):
+        match=r"The number of PEC samples is very large.",
+    ):
         execute_with_pec(
          oneq_circ, fake_exec, DECO_DICT, num_samples=num_samples)
