@@ -21,6 +21,8 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up pandoc
+        uses: docker://pandoc/core:2.9
       - name: Check out mitiq
         uses: actions/checkout@v2
       - name: Set up Python
