@@ -24,6 +24,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           make install requirements
+          conda install -c conda-forge pandoc
           pip install -r docs/requirements.txt
       - name: Build and test Sphinx docs
         run: make docs
