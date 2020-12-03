@@ -15,12 +15,12 @@
 
 """Tests related to mitiq.pec.pec functions."""
 
-from pytest import mark, raises
+from pytest import mark, raises, warns
 import numpy as np
 from cirq import Circuit, LineQubit, Y, Z, CNOT
 
 from mitiq.pec.utils import _simple_pauli_deco_dict, DecompositionDict
-from mitiq.pec.pec import execute_with_pec
+from mitiq.pec.pec import execute_with_pec, LargeSampleWarning
 from mitiq.benchmarks.utils import noisy_simulation
 
 # The level of depolarizing noise for the simulated backend
@@ -173,3 +173,21 @@ def test_bad_precision_argument(bad_value: float):
 
     with raises(ValueError, match="The value of 'precision' should"):
         execute_with_pec(oneq_circ, executor, DECO_DICT, precision=bad_value)
+
+
+@mark.parametrize("num_samples", [100001, 105000])
+def test_large_sample_size_warning(num_samples: int):
+    """Tests whether a warning is raised when PEC sample size
+    is greater than 10 ** 5
+    """
+    rnd_state = np.random.RandomState(0)
+
+    def fake_exec(circuit: Circuit):
+        """A fake executor which just samples from a normal distribution."""
+        return rnd_state.randn()
+    with warns(
+        LargeSampleWarning,
+        match=r"The number of PEC samples is very large."
+         ):
+        execute_with_pec(
+         oneq_circ, fake_exec, DECO_DICT, num_samples=num_samples)
