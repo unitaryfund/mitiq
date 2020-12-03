@@ -10,17 +10,12 @@ on:
 
 jobs:
   # set up anaconda and install pandoc
-  example-1:
+  convert_via_pandoc:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up conda
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: docker://pandoc/core:2.9
         with:
-          auto-update-conda: true
-          python-version: 3.8
-      - name: Conda info
-        shell: bash -l {0}
-        run: conda info
+          args: "--help" # gets appended to pandoc command
 
   # builds & tests the docs on py38
   docs:
