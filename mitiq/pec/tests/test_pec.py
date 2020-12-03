@@ -62,7 +62,7 @@ twoq_circ = Circuit(Y.on(qreg[1]), CNOT.on(*qreg), Y.on(qreg[1]),)
 @mark.parametrize(
     "decomposition_dict", [NOISELESS_DECO_DICT, DECO_DICT_SIMP, DECO_DICT]
 )
-def test_execute_with_pec_one_qubit(
+def test_execute_with_pec(
     circuit: Circuit, decomposition_dict: DecompositionDict, seed: int
 ):
     """Tests that execute_with_pec mitigates the error of a noisy
