@@ -72,11 +72,14 @@ def test_qs_noisy_sampling_sim_single_qubit():
     single_qubit_circ = qiskit.QuantumCircuit(qiskit.QuantumRegister(1))
     single_qubit_circ.z(0)
 
+    current_exp_value = 1.0
+
     for noise in [0.01, 0.1, 0.2, 1.0]:
         expectation_value = qs_noisy_sampling_sim(circ=single_qubit_circ, obs=observable, noise=noise, shots=shots)
         # anticipate that the expectation value will be less than the noiseless simulation
         # of the same circuit
-        assert expectation_value < 1.0
+        assert expectation_value < current_exp_value
+        current_exp_value = expectation_value
 
 def test_qs_noisy_sampling_sim_two_qubit():
     """ Tests the noisy sampling executor and makes sure that the expectation value is
@@ -84,14 +87,17 @@ def test_qs_noisy_sampling_sim_two_qubit():
     """
 
     two_qubit_circ = qiskit.QuantumCircuit(qiskit.QuantumRegister(2))
-    two_qubit_circ.y(0)
     two_qubit_circ.cx(0, 1)
+
+    current_exp_value = 1.0
 
     for noise in [0.01, 0.1, 0.2, 1.0]:
         expectation_value = qs_noisy_sampling_sim(circ=two_qubit_circ, obs=two_qubit_observable, noise=noise, shots=shots)
         # anticipate that the expectation value will be less than the noiseless simulation
         # of the same circuit
-        assert expectation_value < 1.0
+        assert expectation_value < current_exp_value
+        current_exp_value = expectation_value
+
 
 def test_qs_noisy_sampling_sim_error():
     """ Tests that an error is raised when a classical register is present in a Qiskit
