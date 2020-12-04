@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import List, Tuple
-
 import numpy as np
 import pytest
 from cirq import Circuit, CCNOT, CNOT, CZ, ISWAP, LineQubit, SWAP
@@ -26,9 +24,7 @@ from mitiq.pec.decomposition.depolarizing import (
 )
 
 
-def decomposition_overhead(
-    decomposition: OperationDecomposition
-) -> float:
+def decomposition_overhead(decomposition: OperationDecomposition) -> float:
     """The overhead of a particular decomposition is the sum of the absolute
     values of the coefficients of the quasi-probability representation (QPR).
     """

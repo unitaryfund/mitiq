@@ -25,7 +25,7 @@ NON_ID_PAULIS = [X, Y, Z]
 
 
 def depolarizing_decomposition(
-    ideal_operation: QPROGRAM, noise_level: float
+    ideal: QPROGRAM, noise_level: float
 ) -> OperationDecomposition:
     r"""As described in [Temme2017]_, optimally decompose a single-qubit
     ``ideal_operation`` :math:`\mathcal{U}_{\beta}` into its quasi-probability
@@ -61,7 +61,7 @@ def depolarizing_decomposition(
         \mathcal{O}_4 = \mathcal{D} \circ \mathcal{Z} \circ \mathcal{U}
 
     Args:
-        ideal_operation: The input ideal operation (gate + qubit) to decompose.
+        ideal: The input ideal operation (gate + qubit) to decompose.
         noise_level: The noise level (as a float) of the depolarizing channel.
 
     Returns:
@@ -86,10 +86,10 @@ def depolarizing_decomposition(
         "Optimal resource cost for error mitigation,"
         (https://arxiv.org/abs/2006.12509).
     """
-    ideal_operation, _ = convert_to_mitiq(ideal_operation)
+    ideal, _ = convert_to_mitiq(ideal)
 
     post_ops: List[List[Operation]]
-    qubits = list(ideal_operation.all_qubits())
+    qubits = list(ideal.all_qubits())
 
     # the single-qubit case: linear combination of 1Q Paulis
     if len(qubits) == 1:
@@ -126,9 +126,8 @@ def depolarizing_decomposition(
         )
 
     return OperationDecomposition(
-        ideal=ideal_operation,
+        ideal=ideal,
         basis_expansion={
-            NoisyOperation(ideal_operation + p): a
-            for a, p in zip(alphas, post_ops)
-        }
+            NoisyOperation(ideal + p): a for a, p in zip(alphas, post_ops)
+        },
     )
