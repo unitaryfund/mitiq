@@ -96,7 +96,7 @@ To include `.md` files outside of the documentation `source` directory, you can
 `.. mdinclude:: ../file.md` command, where `file.md` is the one to be added.
 
 
-#### You can include Jupyter noteebooks as examples in the documentation
+#### You can include Jupyter notebooks as examples in the documentation
 
 - Examples on the use of Mitiq can be added to the documentation from Jupyter notebook (`.ipynb`) files, since `nbsphinx` is installed and added as a plugin to the `conf.py` file. These examples, such as on reproducing results from the literature, are contained in the `examples/` folder. Make sure to add a link to any new example in the Jupyter notebook `docs/source/examples.ipynb`.
 
