@@ -9,7 +9,7 @@ Welcome to mitiq's documentation!
 
    README.rst
    guide/guide.rst
-   tutorials
+   examples
    apidoc.rst
    citing.rst
    toc_contributing.rst
