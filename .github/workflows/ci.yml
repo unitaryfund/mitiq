@@ -43,5 +43,69 @@ jobs:
           conda activate base
           make docs
           make doctest
+  # checks code style with Black & reports diff
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out mitiq
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          make install requirements
+      - name: Check code style with Black
+        run: make check-format || echo "run make format to resolve issues"
 
+  # runs flake8 style checks on py38
+  style:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out mitiq
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          make install requirements
+      - name: Lint with flake8
+        run: make check-style
+
+  # runs all the unit tests (on Ubuntu, py36/37/38) and measures code coverage
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.6, 3.7, 3.8]
+
+    steps:
+      - name: Check out mitiq
+        uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          make install requirements
+      - name: Run the quilc & qvm Docker images
+        run: |
+          docker run --rm -idt -p 5000:5000 rigetti/qvm -S
+          docker run --rm -idt -p 5555:5555 rigetti/quilc -R
+      - name: Run all the unit tests & generate coverage report with pytest
+        run: make test-all
+      - name: Submit coverage report to Codecov
+        # only submit to Codecov once
+        if: ${{ matrix.python-version == 3.8 }}
+        uses: codecov/codecov-action@v1.0.12
+        with:
+          fail_ci_if_error: true
 
