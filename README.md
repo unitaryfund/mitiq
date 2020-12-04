@@ -8,11 +8,11 @@
 
 # Mitiq
 
-Mitiq is a Python toolkit for implementing error mitigation techniques on quantum computers. 
+Mitiq is a Python toolkit for implementing error mitigation techniques on quantum computers.
 
 Current quantum computers
 are noisy due to interactions with the environment, imperfect gate applications, state preparation and measurement
-errors, etc. Error mitigation seeks to reduce these effects at the software level by compiling quantum programs in 
+errors, etc. Error mitigation seeks to reduce these effects at the software level by compiling quantum programs in
 clever ways.
 
 Want to know more? Check out our [documentation](https://mitiq.readthedocs.io/en/stable/guide/guide-overview.html).
@@ -42,9 +42,9 @@ If you'd prefer to clone and install from source, our would like to develop Miti
 
 Mitiq can currently interface with
 
-* [Cirq](https://github.com/quantumlib/Cirq) >= 0.9.0, 
-* [Qiskit](https://qiskit.org/) >= 0.19.0, and 
-* [pyQuil](https://github.com/rigetti/pyquil) >= 2.18.0. 
+* [Cirq](https://github.com/quantumlib/Cirq) >= 0.9.0,
+* [Qiskit](https://qiskit.org/) >= 0.19.0, and
+* [pyQuil](https://github.com/rigetti/pyquil) >= 2.18.0.
 
 Cirq is a core requirement of Mitiq and is automatically installed. To use Mitiq with other quantum programming
 libraries, install the optional package(s) following the instructions linked above.
@@ -97,13 +97,17 @@ Error in simulation (with mitigation): 0.000519
 
 ## Error mitigation techniques
 
-Mitiq currently implements [zero-noise extrapolation](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html) and 
+Mitiq currently implements [zero-noise extrapolation](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html) and
 is designed to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
 
 ## Documentation
 
-Mitiq's documentation is hosted at [mitiq.readthedocs.io](https://mitiq.readthedocs.io). A PDF version of the latest 
+Mitiq's documentation is hosted at [mitiq.readthedocs.io](https://mitiq.readthedocs.io). A PDF version of the latest
 release can be found [here](https://mitiq.readthedocs.io/_/downloads/en/latest/pdf/).
+
+## Examples
+
+Examples on the use of Mitiq are present in the form of Jupyter notebooks in the [examples/](https://github.com/unitaryfund/mitiq/tree/master/examples) repository. They are collected in this [index](examples.html) and rendered as part of the documentation.
 
 ## Developer information
 
