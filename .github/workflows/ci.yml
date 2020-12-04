@@ -25,7 +25,8 @@ jobs:
           $CONDA/bin/conda env update --file environment.yml --name base
       - name: Install Python dependencies
         run: |
-          $CONDA/bin/conda activate base
+          source ~/anaconda3/etc/profile.d/conda.sh
+          conda activate base
           python -m pip install --upgrade pip
           make install requirements
           pip install -r docs/requirements.txt
