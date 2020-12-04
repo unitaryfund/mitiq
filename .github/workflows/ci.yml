@@ -13,14 +13,14 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up pandoc
-        uses: docker://pandoc/core:2.9
       - name: Check out mitiq
         uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
+      - name: Set up pandoc
+        uses: docker://pandoc/core:2.9
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
