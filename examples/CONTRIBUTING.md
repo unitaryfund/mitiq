@@ -1,4 +1,4 @@
-# Contributing to Mitiq Examples
+# Contributing Examples to Mitiq
 
 Contributions are welcome, and they are greatly appreciated, every little bit helps.
 
