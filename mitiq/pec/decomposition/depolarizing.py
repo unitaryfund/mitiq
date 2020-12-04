@@ -13,19 +13,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import List, Tuple
+from typing import List
 
 from cirq import Operation, X, Y, Z
 
 from mitiq import QPROGRAM
 from mitiq.conversions import convert_to_mitiq
+from mitiq.pec.types import NoisyOperation, OperationDecomposition
 
 NON_ID_PAULIS = [X, Y, Z]
 
 
 def depolarizing_decomposition(
     ideal_operation: QPROGRAM, noise_level: float
-) -> List[Tuple[float, List[Operation]]]:
+) -> OperationDecomposition:
     r"""As described in [Temme2017]_, optimally decompose a single-qubit
     ``ideal_operation`` :math:`\mathcal{U}_{\beta}` into its quasi-probability
     representation (QPR), which is a linear combination of noisy implementable
@@ -124,4 +125,10 @@ def depolarizing_decomposition(
             "Consider pre-compiling your circuit."
         )
 
-    return [(a, [ideal_operation] + p) for a, p in zip(alphas, post_ops)]
+    return OperationDecomposition(
+        ideal=ideal_operation,
+        basis_expansion={
+            NoisyOperation(ideal_operation + p): a
+            for a, p in zip(alphas, post_ops)
+        }
+    )

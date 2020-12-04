@@ -17,8 +17,9 @@ from typing import List, Tuple
 
 import numpy as np
 import pytest
-from cirq import Circuit, CCNOT, CNOT, CZ, ISWAP, LineQubit, Operation, SWAP
+from cirq import Circuit, CCNOT, CNOT, CZ, ISWAP, LineQubit, SWAP
 
+from mitiq.pec.types import OperationDecomposition
 from mitiq.pec.decomposition.depolarizing import (
     depolarizing_decomposition,
     NON_ID_PAULIS,
@@ -26,12 +27,12 @@ from mitiq.pec.decomposition.depolarizing import (
 
 
 def decomposition_overhead(
-    decomposition: List[Tuple[float, List[Operation]]]
+    decomposition: OperationDecomposition
 ) -> float:
     """The overhead of a particular decomposition is the sum of the absolute
     values of the coefficients of the quasi-probability representation (QPR).
     """
-    return float(np.sum(np.abs([a for a, _ in decomposition])))
+    return decomposition.norm
 
 
 def single_qubit_depolarizing_overhead(noise_level: float) -> float:
