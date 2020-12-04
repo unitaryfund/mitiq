@@ -31,6 +31,9 @@ jobs:
           make install requirements
           pip install -r docs/requirements.txt
       - name: Build and test Sphinx docs
-        run: make docs
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate base
+          make docs
 
 
