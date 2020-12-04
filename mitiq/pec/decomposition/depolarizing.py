@@ -17,11 +17,14 @@ from typing import List, Tuple
 
 from cirq import Operation, X, Y, Z
 
+from mitiq import QPROGRAM
+from mitiq.conversions import convert_to_mitiq
+
 NON_ID_PAULIS = [X, Y, Z]
 
 
 def depolarizing_decomposition(
-    ideal_operation: Operation, noise_level: float
+    ideal_operation: QPROGRAM, noise_level: float
 ) -> List[Tuple[float, List[Operation]]]:
     r"""As described in [Temme2017]_, optimally decompose a single-qubit
     ``ideal_operation`` :math:`\mathcal{U}_{\beta}` into its quasi-probability
@@ -82,12 +85,14 @@ def depolarizing_decomposition(
         "Optimal resource cost for error mitigation,"
         (https://arxiv.org/abs/2006.12509).
     """
+    ideal_operation, _ = convert_to_mitiq(ideal_operation)
+
     post_ops: List[List[Operation]]
-    qubits = ideal_operation.qubits
+    qubits = list(ideal_operation.all_qubits())
 
     # the single-qubit case: linear combination of 1Q Paulis
     if len(qubits) == 1:
-        q = ideal_operation.qubits[0]
+        q = qubits[0]
 
         epsilon = 4 / 3 * noise_level
         alpha_pos = 1 + ((3 / 4) * epsilon / (1 - epsilon))
