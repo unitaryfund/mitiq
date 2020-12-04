@@ -41,8 +41,8 @@ def test_init_with_gate():
     )
     assert noisy_op.qubits == (cirq.LineQubit(0),)
     assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq.Z))
-    assert np.allclose(noisy_op.real_matrix, real)
-    assert noisy_op.real_matrix is not real
+    assert np.allclose(noisy_op.real_matrix(), real)
+    assert noisy_op.real_matrix() is not real
 
     assert noisy_op._native_type == "cirq"
     assert _equal(noisy_op._native_ideal, noisy_op.ideal_circuit())
@@ -65,8 +65,8 @@ def test_init_with_operation(qubit):
     )
     assert noisy_op.qubits == (qubit,)
     assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(ideal_op))
-    assert np.allclose(noisy_op.real_matrix, real)
-    assert noisy_op.real_matrix is not real
+    assert np.allclose(noisy_op.real_matrix(), real)
+    assert noisy_op.real_matrix() is not real
 
     assert noisy_op._native_type == "cirq"
     assert _equal(noisy_op._native_ideal, noisy_op.ideal_circuit())
@@ -88,8 +88,8 @@ def test_init_with_op_tree():
     assert np.allclose(
         noisy_op.ideal_unitary, cirq.unitary(cirq.Circuit(ideal_ops))
     )
-    assert np.allclose(noisy_op.real_matrix, real)
-    assert noisy_op.real_matrix is not real
+    assert np.allclose(noisy_op.real_matrix(), real)
+    assert noisy_op.real_matrix() is not real
 
 
 def test_init_with_cirq_circuit():
@@ -102,8 +102,22 @@ def test_init_with_cirq_circuit():
     assert _equal(noisy_op.ideal_circuit(), circ, require_qubit_equality=True)
     assert set(noisy_op.qubits) == set(qreg)
     assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(circ))
-    assert np.allclose(noisy_op.real_matrix, real)
-    assert noisy_op.real_matrix is not real
+    assert np.allclose(noisy_op.real_matrix(), real)
+    assert noisy_op.real_matrix() is not real
+
+
+def test_init_with_no_real_superoperator():
+    qreg = cirq.LineQubit.range(2)
+    circ = cirq.Circuit(cirq.H.on(qreg[0]), cirq.CNOT.on(*qreg))
+    noisy_op = NoisyOperation(circ)
+
+    assert isinstance(noisy_op._ideal, cirq.Circuit)
+    assert _equal(noisy_op.ideal_circuit(), circ, require_qubit_equality=True)
+    assert set(noisy_op.qubits) == set(qreg)
+    assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(circ))
+
+    with pytest.raises(ValueError, match="has no real_matrix()"):
+        noisy_op.real_matrix()
 
 
 def test_init_with_qiskit_circuit():
@@ -125,8 +139,8 @@ def test_init_with_qiskit_circuit():
     assert noisy_op._native_type == "qiskit"
 
     assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq_circ))
-    assert np.allclose(noisy_op.real_matrix, real)
-    assert noisy_op.real_matrix is not real
+    assert np.allclose(noisy_op.real_matrix(), real)
+    assert noisy_op.real_matrix() is not real
 
 
 @pytest.mark.parametrize(
@@ -161,8 +175,8 @@ def test_init_with_pyquil_program():
     assert noisy_op._native_type == "pyquil"
 
     assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq_circ))
-    assert np.allclose(noisy_op.real_matrix, real)
-    assert noisy_op.real_matrix is not real
+    assert np.allclose(noisy_op.real_matrix(), real)
+    assert noisy_op.real_matrix() is not real
 
 
 def test_init_with_bad_types():
@@ -191,7 +205,7 @@ def test_add_simple():
     correct = cirq.Circuit([cirq.X.on(cirq.NamedQubit("Q"))] * 2)
 
     assert _equal(noisy_op._ideal, correct, require_qubit_equality=True)
-    assert np.allclose(noisy_op.real_matrix, real @ real)
+    assert np.allclose(noisy_op.real_matrix(), real @ real)
 
 
 def test_add_pyquil_noisy_operations():
@@ -207,7 +221,7 @@ def test_add_pyquil_noisy_operations():
 
     assert _equal(noisy_op._ideal, correct, require_qubit_equality=False)
     assert np.allclose(noisy_op.ideal_unitary, np.identity(2))
-    assert np.allclose(noisy_op.real_matrix, real @ real)
+    assert np.allclose(noisy_op.real_matrix(), real @ real)
 
 
 def test_add_qiskit_noisy_operations():
@@ -225,7 +239,7 @@ def test_add_qiskit_noisy_operations():
 
     assert _equal(noisy_op._ideal, correct, require_qubit_equality=False)
     assert np.allclose(noisy_op.ideal_unitary, np.identity(2))
-    assert np.allclose(noisy_op.real_matrix, real @ real)
+    assert np.allclose(noisy_op.real_matrix(), real @ real)
 
 
 def test_add_bad_type():
@@ -253,7 +267,7 @@ def test_on_each_single_qubit(qreg):
     assert len(noisy_ops) == len(qreg)
 
     for i, op in enumerate(noisy_ops):
-        assert np.allclose(op.real_matrix, real)
+        assert np.allclose(op.real_matrix(), real)
         assert op.num_qubits == 1
         assert list(op.ideal_circuit().all_qubits())[0] == qreg[i]
 
@@ -272,7 +286,7 @@ def test_on_each_multiple_qubits(qubits):
     assert len(noisy_ops) == 2
 
     for i, op in enumerate(noisy_ops):
-        assert np.allclose(op.real_matrix, real_cnot)
+        assert np.allclose(op.real_matrix(), real_cnot)
         assert op.num_qubits == 2
         assert set(op.qubits) == set(qubits[i])
 
@@ -316,11 +330,11 @@ def test_transform_qubits_multiple_qubits(qubits):
     noisy_op = NoisyOperation(ideal, real)
 
     assert set(noisy_op.qubits) != set(qubits)
-    assert np.allclose(noisy_op.real_matrix, real)
+    assert np.allclose(noisy_op.real_matrix(), real)
 
     noisy_op.transform_qubits(qubits)
     assert set(noisy_op.qubits) == set(qubits)
-    assert np.allclose(noisy_op.real_matrix, real)
+    assert np.allclose(noisy_op.real_matrix(), real)
 
 
 def test_transform_qubits_wrong_number():
@@ -340,12 +354,12 @@ def test_with_qubits():
     noisy_op = NoisyOperation(ideal, real)
 
     assert set(noisy_op.qubits) == set(qreg)
-    assert np.allclose(noisy_op.real_matrix, real)
+    assert np.allclose(noisy_op.real_matrix(), real)
 
     qubits = cirq.LineQubit.range(2)
     new_noisy_op = noisy_op.with_qubits(qubits)
     assert set(new_noisy_op.qubits) == set(qubits)
-    assert np.allclose(new_noisy_op.real_matrix, real)
+    assert np.allclose(new_noisy_op.real_matrix(), real)
 
 
 def test_extend_to_single_qubit():
@@ -362,7 +376,7 @@ def test_extend_to_single_qubit():
     for op in noisy_ops_on_all_qubits:
         assert _equal(op.ideal_circuit(), cirq.Circuit(ideal))
         assert np.allclose(op.ideal_unitary, cirq.unitary(ideal))
-        assert np.allclose(op.real_matrix, real)
+        assert np.allclose(op.real_matrix(), real)
 
 
 def test_noisy_operation_str():

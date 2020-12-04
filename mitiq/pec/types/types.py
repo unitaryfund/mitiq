@@ -36,7 +36,7 @@ class NoisyOperation:
      actually implement.
      """
 
-    def __init__(self, ideal: QPROGRAM, real: np.ndarray) -> None:
+    def __init__(self, ideal: QPROGRAM, real: Optional[np.ndarray] = None) -> None:
         """Initializes a NoisyOperation.
 
         Args:
@@ -82,7 +82,7 @@ class NoisyOperation:
                 )
         return NoisyOperation(ideal, real)
 
-    def _init_from_cirq(self, ideal: cirq.Circuit, real: np.ndarray) -> None:
+    def _init_from_cirq(self, ideal: cirq.Circuit, real: Optional[np.ndarray] = None) -> None:
         """Initializes a noisy operation expressed as a Cirq circuit.
 
         Args:
@@ -99,12 +99,13 @@ class NoisyOperation:
         self._num_qubits = len(self._qubits)
         self._dimension = 2 ** self._num_qubits
 
-        if real.shape != (self._dimension ** 2, self._dimension ** 2):
-            raise ValueError(
-                f"Arg `real` has shape {real.shape} but `ideal` has shape"
-                f" {self._dimension ** 2, self._dimension ** 2}."
-            )
-        # TODO: Check if real is a valid superoperator.
+        if isinstance(real, np.ndarray):
+            if real.shape != (self._dimension ** 2, self._dimension ** 2):
+                raise ValueError(
+                    f"Arg `real` has shape {real.shape} but `ideal` has shape"
+                    f" {self._dimension ** 2, self._dimension ** 2}."
+                )
+            # TODO: Check if real is a valid superoperator.
 
         self._ideal = deepcopy(ideal)
         self._real = deepcopy(real)
@@ -207,8 +208,14 @@ class NoisyOperation:
     def ideal_matrix(self) -> np.ndarray:
         raise NotImplementedError
 
-    @property
     def real_matrix(self) -> np.ndarray:
+        """Returns the superoperator of the NoisyOperation, if known.
+
+        Raises:
+            ValueError: If the NoisyOperation has no superoperator.
+        """
+        if self._real is None:
+            raise ValueError("NoisyOperation has no real_matrix.")
         return deepcopy(self._real)
 
     def transform_qubits(
