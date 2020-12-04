@@ -1,0 +1,5 @@
+name: pandoc
+channels:
+    - conda-forge
+dependencies:
+    - pandoc~=2.11.2
