@@ -22,7 +22,7 @@ jobs:
       - name: Set up conda
         run: |
           # $CONDA is an environment variable pointing to the root of the miniconda directory
-          $CONDA/bin/conda env update --file environment.yml --name base
+          $CONDA/bin/conda update --file environment.yml --name base
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
