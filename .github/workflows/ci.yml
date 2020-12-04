@@ -30,13 +30,6 @@ jobs:
           python -m pip install --upgrade pip
           make install requirements
           pip install -r docs/requirements.txt
-      - name: Run the quilc & qvm Docker images
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda activate base
-          docker run --rm -idt -p 5000:5000 rigetti/qvm -S
-          docker run --rm -idt -p 5555:5555 rigetti/quilc -R
-
       - name: Build and test Sphinx docs
         run: |
           eval "$(conda shell.bash hook)"
