@@ -224,7 +224,7 @@ Note that you will have to replace the string in ``get_qc`` with the name of an 
 Rigetti QPU, and will need to have a QCS account and reservation, in order to run on
 real quantum hardware.
 
-.. code-block::
+.. testcode::
 
     from pyquil import Program, get_qc
     from pyquil.gates import MEASURE, RESET, X
