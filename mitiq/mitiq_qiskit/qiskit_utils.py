@@ -125,7 +125,7 @@ def qs_wvf_sampling_sim(circ: QuantumCircuit, obs: np.ndarray, shots: int) -> fl
     circ = copy.deepcopy(circ)
     # we need to modify the circuit to measure obs in its eigenbasis
     # we do this by appending a unitary operation
-    eigvals, U = np.linalg.eigh(obs) # obtains a U s.t. obs = U diag(eigvals) U^dag
+    eigvals, U = np.linalg.eigh(obs)  # obtains a U s.t. obs = U diag(eigvals) U^dag
     circ.unitary(np.linalg.inv(U), qubits=range(circ.n_qubits))
 
     circ.measure_all()
@@ -168,7 +168,7 @@ def qs_noisy_sampling_sim(circ: QuantumCircuit, obs: np.ndarray, noise: float, s
     circ = copy.deepcopy(circ)
     # we need to modify the circuit to measure obs in its eigenbasis
     # we do this by appending a unitary operation
-    eigvals, U = np.linalg.eigh(obs) # obtains a U s.t. obs = U diag(eigvals) U^dag
+    eigvals, U = np.linalg.eigh(obs)  # obtains a U s.t. obs = U diag(eigvals) U^dag
     circ.unitary(np.linalg.inv(U), qubits=range(circ.n_qubits))
 
     circ.measure_all()
@@ -185,7 +185,7 @@ def qs_noisy_sampling_sim(circ: QuantumCircuit, obs: np.ndarray, noise: float, s
     job = qiskit.execute(
         circ,
         backend=BACKEND,
-        backend_options={'method':'density_matrix'},
+        backend_options={'method': 'density_matrix'},
         noise_model=noise_model,
         # we want all gates to be actually applied,
         # so we skip any circuit optimization
