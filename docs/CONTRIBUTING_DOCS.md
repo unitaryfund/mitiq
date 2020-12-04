@@ -14,17 +14,20 @@ The necessary packages can be installed, from the root `mitiq` directory
 pip install -e .
 pip install -r requirements.txt
 ```
-as they are present in the `requirements.txt` file. Otherwise, with
-
+as they are present in the `requirements.txt` file, together with the `pandoc` package. `pandoc` can be [installed](https://pandoc.org/installing.html) in various ways: it is included in the `environment.yaml` file, that gives instruction for anaconda installation. It can simply be installed with conda in an [environment](https://mitiq.readthedocs.io/en/stable/contributing.html)
 ```bash
-pip install -U sphinx m2r sphinxcontrib-bibtex pybtex sphinx-copybutton sphinx-autodoc-typehints
+conda activate myenv
+(myenv) conda install -c conda-forge pandoc
 ```
+
+The packages relevant to the documentation are:
 
 `m2r` allows to include `.md` files, besides `.rst`, in the documentation.
 `sphinxcontrib-bibtex` allows to include citations in a `.bib` file and
 `pybtex` allows to customize how they are rendered, e.g., APS-style.
 `sphinx-copybutton` allows to easily copy-paste code snippets from examples.
 `sphinx-autodoc-typehints` allows to control how annotations are displayed in the API-doc part of the documentation, integrating with `sphinx-autodoc` and `sphinx-napoleon`.
+`nbsphinx` and `pandoc` allow us to include Jupyter notebooks in the documentation.
 
 You can check that Sphinx is installed with `sphinx-build --version`.
 
