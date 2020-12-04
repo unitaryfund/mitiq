@@ -276,6 +276,11 @@ real quantum hardware.
     # should give 0.0 with a noiseless backend
     executor(program)
 
+.. testcode::
+    :hide:
+
+    assert executor(program) == 0.0
+
 
 .. _qiskit_executors:
 
