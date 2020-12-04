@@ -32,6 +32,10 @@ dist:
 .PHONY: docs
 docs:
 	make -C docs html
+
+.PHONY: doctest
+doctest:
+	make -C docs html
 	make -C docs doctest
 
 .PHONY: format
