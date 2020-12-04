@@ -276,10 +276,6 @@ real quantum hardware.
     # should give 0.0 with a noiseless backend
     executor(program)
 
-.. testcode::
-    :hide:
-
-    assert executor(program) == 0.0
 
 .. _qiskit_executors:
 
@@ -518,7 +514,7 @@ Tensorflow evaluates faster than the exact density matrix simulation using ``Cir
 
 Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
 
-.. testcode::
+.. code-block::
 
     import numpy as np
     import sympy
@@ -576,7 +572,7 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
         # return measurement of 0 state
         return np.real(dm[0, 0])
 
-.. testcode::
+.. code-block::
     :hide:
 
     if tfq_exists:

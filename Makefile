@@ -35,7 +35,6 @@ docs:
 
 .PHONY: doctest
 doctest:
-	make -C docs html
 	make -C docs doctest
 
 .PHONY: format
