@@ -24,7 +24,7 @@ from mitiq.mitiq_qiskit.qiskit_utils import (
 )
 
 observable = np.array([[1, 0], [0, 0]])
-two_qubit_observable = np.diag([[1, 0, 0, 0]])
+two_qubit_observable = np.array([[1,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]])
 shots = 1000
 
 def test_qs_wvf_sim():

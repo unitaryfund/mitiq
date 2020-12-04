@@ -17,7 +17,6 @@
 import numpy as np
 import copy
 from typing import Optional
-import qiskit
 from qiskit import Aer, execute, QuantumCircuit
 
 # Noise simulation packages
@@ -101,7 +100,7 @@ def qs_wvf_sim(circ: QuantumCircuit, obs: np.ndarray) -> float:
     Returns:
         The expectation value of obs as a float.
     """
-    result = qiskit.execute(circ, WVF_SIMULATOR).result()
+    result = execute(circ, WVF_SIMULATOR).result()
     final_wvf = result.get_statevector()
     return np.real(final_wvf.conj().T @ obs @ final_wvf)
 
@@ -131,7 +130,7 @@ def qs_wvf_sampling_sim(circ: QuantumCircuit, obs: np.ndarray, shots: int) -> fl
     circ.measure_all()
 
     # execution of the experiment
-    job = qiskit.execute(
+    job = execute(
         circ,
         backend=BACKEND,
         # we want all gates to be actually applied,
@@ -182,7 +181,7 @@ def qs_noisy_sampling_sim(circ: QuantumCircuit, obs: np.ndarray, noise: float, s
     noise_model.add_all_qubit_quantum_error(depolarizing_error(noise, 2), ["cx"])
 
     # execution of the experiment
-    job = qiskit.execute(
+    job = execute(
         circ,
         backend=BACKEND,
         backend_options={'method': 'density_matrix'},
