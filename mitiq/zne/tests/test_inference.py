@@ -677,9 +677,8 @@ def test_equal_simple():
 
 
 @mark.parametrize(
-    "factory", (
-        LinearFactory, RichardsonFactory, FakeNodesFactory, PolyFactory
-    ),
+    "factory",
+    (LinearFactory, RichardsonFactory, FakeNodesFactory, PolyFactory),
 )
 def test_equal(factory):
     for run_classical in (True, False):
@@ -706,9 +705,7 @@ def test_equal(factory):
             assert copied_factory is not fac
 
 
-@mark.parametrize(
-    "fac_class", [LinearFactory, RichardsonFactory]
-)
+@mark.parametrize("fac_class", [LinearFactory, RichardsonFactory])
 def test_iterate_with_shot_list(fac_class):
     """Tests factories with (and without) the "shot_list" argument."""
     # first test without shot_list
@@ -873,3 +870,19 @@ def test_get_methods_of_factories():
     assert np.allclose(fac.get_scale_factors(), x_values)
     assert np.allclose(fac.get_zero_noise_limit(), zne_reduce)
     assert np.allclose(fac.get_zero_noise_limit_error(), 1.0)
+
+
+def test__FakeNodes_scale_factors_equally_spaced():
+    """FakeNodesFactory should only accept equally spaced scale factors."""
+    y_vals = [0.5, 1.0, 1.5]
+    with raises(
+        ValueError, match=r"The scale factors must be equally spaced."
+    ):
+        _ = FakeNodesFactory(X_VALS).extrapolate(X_VALS, y_vals)
+
+
+def test_map_to_fakenodes():
+    """Test the fake nodes map in FakeNodesFactory."""
+    fac = FakeNodesFactory(UNIFORM_X)
+    test_argument = 1.0
+    assert np.isclose(fac._map_to_fake_nodes(1.0, 2.0, test_argument), 1.0,)
