@@ -11,7 +11,8 @@
 ## Version 0.4.0 (In Development)
 
 ### All Changes
-- Update notebook version in requirements to resolve vulnerability found by security bot.(@nathanshammah, gh-445) 
+- Add notebooks to documentation with nbsphinx, close gh-450 (@nathanshammah, gh-461)
+- Update notebook version in requirements to resolve vulnerability found by security bot.(@nathanshammah, gh-445)
 - Add reference to review paper in docs (@willzeng, gh-423).
 - Add unitary folding API (@rmlarose, gh-429).
 - Add new get methods (for fit errors, extrapolation curve, etc.) to Factory objects (@crazy4pi314, @andreamari, gh-403).
