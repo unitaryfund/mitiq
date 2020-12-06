@@ -12,5 +12,4 @@ docs/build/
 mitiq.egg-info/
 dist/
 build/
-examples/*.ipynb_checkpoints
 coverage.xml
