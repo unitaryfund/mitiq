@@ -872,7 +872,7 @@ def test_get_methods_of_factories():
     assert np.allclose(fac.get_zero_noise_limit_error(), 1.0)
 
 
-def test__FakeNodes_scale_factors_equally_spaced():
+def test__fakenodes_scale_factors_equally_spaced():
     """FakeNodesFactory should only accept equally spaced scale factors."""
     y_vals = [0.5, 1.0, 1.5]
     with raises(

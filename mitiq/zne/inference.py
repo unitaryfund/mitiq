@@ -1025,8 +1025,7 @@ class FakeNodesFactory(BatchedFactory):
     def _map_to_fake_nodes(
         x: Union[Sequence[float], float], a: float, b: float
     ) -> Sequence[float]:
-        """
-        A function that maps inputs to Chebyshev-Lobatto points. Based on
+        """A function that maps inputs to Chebyshev-Lobatto points. Based on
         the function [De2020polynomial]_:
             S(x) = (a - b)/2 * cos(pi * (x - a)/(b - a)) + (a + b)/2.
         Where a and b are the endpoints of the interval [a, b] of CL points
