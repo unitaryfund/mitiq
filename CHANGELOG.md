@@ -11,7 +11,7 @@
 ## Version 0.5.0 (In Development)
 
 ### All Changes
-
+- Add a new FakeNodesFactory class based on an alternative interpolation method (@elmandouh, gh-444).
 
 ## Version 0.4.0 (December 6th, 2020)
 
