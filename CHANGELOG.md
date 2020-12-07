@@ -8,16 +8,42 @@
 [//]: # " - [Bug Fix]"
 [//]: # " - Fix the bug."
 
-## Version 0.4.0 (In Development)
+## Version 0.5.0 (In Development)
 
 ### All Changes
-- Update notebook version in requirements to resolve vulnerability found by security bot.(@nathanshammah, gh-445) 
-- Add reference to review paper in docs (@willzeng, gh-423).
-- Add unitary folding API (@rmlarose, gh-429).
-- Add new get methods (for fit errors, extrapolation curve, etc.) to Factory objects (@crazy4pi314, @andreamari, gh-403).
-- Add theory subsection about PEC in docs (@elmandouh, gh-428).
+
+
+## Version 0.4.0 (December 6th, 2020)
 - Add a new FakeNodesFactory class based on an alternative interpolation method (@elmandouh, gh-444).
+
+### Summary
+
+This release adds new getter methods for fit errors, extrapolation curves, etc. in ZNE factory objects as well as
+custom types for noisy operations, noisy bases, and decompositions in PEC. It also includes small updates and fixes
+to the documentation, seeding options for PEC sampling functions, and bug fixes for a few non-deterministic test failures.
+
+### All Changes
+
+- Add reference to review paper in docs (@willzeng, gh-423).
+- Add unitary folding API to RTD (@rmlarose, gh-429).
+- Add theory subsection on PEC in docs (@elmandouh, gh-428).
+- Fix small typo in documentation function name (@nathanshammah, gh-435).
+- Seed Qiskit simulator to fix non-deterministic test failure (@rmlarose, gh-425).
+- Fix formatting typo and include hyperlinks to documentation objects (@nathanshammah, gh-438).
+- Remove error in docs testing without tensorflow (@nathanshammah, gh-439).
+- Add seed to PEC functions (@rmlarose, gh-432).
+- Consolidate functions to generate randomized benchmarking circuits in different platforms, and clean up pyquil utils (@rmlarose, gh-426).
+- Add new get methods (for fit errors, extrapolation curve, etc.) to Factory objects (@crazy4pi314, @andreamari, gh-403).
+- Update notebook version in requirements to resolve vulnerability found by security bot.(@nathanshammah, gh-445).
+- Add brief description of noise and error mitigtation to readme (@rmlarose, gh-422).
+- Fix broken links in documentation (@purva-thakre, gh-448).
+- Link to stable RTD instead of latest RTD in readme (@rmlarose, gh-449).
 - Add option to automatically deduce the number of samples in PEC (@andreamari, gh-451).
+- Fix PEC sampling bug (@rmlarose, gh-453).
+- Add types for PEC (@rmlarose, gh-408).
+- Add warning for large samples in PEC (@sid1993, gh-459).
+- Seed a PEC test to avoid non-deterministic failure (@andreamari, gh-460).
+- Update contributing docs (@purva-thakre, gh-465).
 
 ## Version 0.3.0 (October 30th, 2020)
 
