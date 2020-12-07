@@ -285,35 +285,6 @@ class Factory(ABC):
         """
         raise NotImplementedError
 
-    @staticmethod
-    @abstractmethod
-    def extrapolate(*args, **kwargs) -> float:
-        """Returns the extrapolation to the zero-noise limit."""
-        raise NotImplementedError
-
-    def reduce(self) -> float:
-        """Evaluates the zero-noise limit found by fitting according to
-        the factory's extrapolation method.
-
-        Returns:
-            The zero-noise limit.
-        """
-        (
-            self._zne_limit,
-            self._zne_error,
-            self._opt_params,
-            self._params_cov,
-            self._zne_curve,
-        ) = self.extrapolate(  # type: ignore
-            self.get_scale_factors(),
-            self.get_expectation_values(),
-            full_output=True,
-            **self._extrapolate_args(),
-        )
-
-        self._already_reduced = True
-        return self._zne_limit
-
     @abstractmethod
     def run_classical(
         self, scale_factor_to_expectation_value: Callable[..., float],
@@ -443,6 +414,35 @@ class BatchedFactory(Factory, ABC):
         For example in PolyFac, return {"order": self.order, ...}.
         """
         raise NotImplementedError
+    
+    @staticmethod
+    @abstractmethod
+    def extrapolate(*args, **kwargs) -> float:
+        """Returns the extrapolation to the zero-noise limit."""
+        raise NotImplementedError
+
+    def reduce(self) -> float:
+        """Evaluates the zero-noise limit found by fitting according to
+        the factory's extrapolation method.
+
+        Returns:
+            The zero-noise limit.
+        """
+        (
+            self._zne_limit,
+            self._zne_error,
+            self._opt_params,
+            self._params_cov,
+            self._zne_curve,
+        ) = self.extrapolate(  # type: ignore
+            self.get_scale_factors(),
+            self.get_expectation_values(),
+            full_output=True,
+            **self._extrapolate_args(),
+        )
+
+        self._already_reduced = True
+        return self._zne_limit
 
     @staticmethod
     def _is_executor_batched(
