@@ -285,14 +285,6 @@ class Factory(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod
-    def _extrapolate_args(self) -> Dict[str, Any]:
-        """Returns a dictionary with factort specific arguments
-        to pass to extrapolate().
-        For example in PolyFac, return {"order": self.order, ...}.
-        """
-        raise NotImplementedError
-
     @staticmethod
     @abstractmethod
     def extrapolate(*args, **kwargs) -> float:
@@ -443,6 +435,14 @@ class BatchedFactory(Factory, ABC):
         self._shot_list = shot_list
 
         super(BatchedFactory, self).__init__()
+
+    @abstractmethod
+    def _extrapolate_args(self) -> Dict[str, Any]:
+        """Returns a dictionary with factort specific arguments
+        to pass to extrapolate().
+        For example in PolyFac, return {"order": self.order, ...}.
+        """
+        raise NotImplementedError
 
     @staticmethod
     def _is_executor_batched(
