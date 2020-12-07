@@ -414,7 +414,7 @@ class BatchedFactory(Factory, ABC):
         For example in PolyFac, return {"order": self.order, ...}.
         """
         raise NotImplementedError
-    
+
     @staticmethod
     @abstractmethod
     def extrapolate(*args, **kwargs) -> float:
