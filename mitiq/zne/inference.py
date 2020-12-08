@@ -1717,8 +1717,8 @@ class BayesFactory(BatchedFactory):
         with pm.Model():
             """
             We assumme that the priors for the model parameters is a uniform
-            distribution an upper limit 1 and a lower limit 0, except for b
-            with lower limit -1.
+            distribution with an upper limit 1 and a lower limit 0,
+            except for b with a lower limit -1.
             """
             a = pm.Uniform('a', 0, 1)
             b = pm.Uniform('b', -1, 1)

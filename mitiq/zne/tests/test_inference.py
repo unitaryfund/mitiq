@@ -419,6 +419,17 @@ def test_poly_extr():
     fac.run_classical(seeded_f)
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
+@mark.parametrize("test_f", [f_lin, f_non_lin])
+def test_bayes_extr(test_f: Callable[[float], float]):
+    """Test of the BayesFactory's extrapolator."""
+    seeded_f = apply_seed_to_func(test_f, SEED)
+    fac = BayesFactory(scale_factors=X_VALS)
+    assert not fac._opt_params
+    fac.run_classical(seeded_f)
+    zne_value = fac.reduce()
+    assert np.isclose(zne_value, seeded_f(0, err=0), atol=CLOSE_TOL)
+    assert len(fac._opt_params) == len(X_VALS)
+    assert np.isclose(fac._opt_params[-1], zne_value)
 
 @mark.parametrize("order", [2, 3, 4, 5])
 def test_opt_params_poly_factory(order):
