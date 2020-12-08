@@ -26,7 +26,10 @@ jobs:
           make install requirements
           pip install -r docs/requirements.txt
       - name: Build and test Sphinx docs
-        run: make docs
+        uses: docker://pandoc/core:2.9
+        run: |
+          make docs
+          make doctest
 
   # checks code style with Black & reports diff
   format:
