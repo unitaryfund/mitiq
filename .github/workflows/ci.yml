@@ -25,8 +25,9 @@ jobs:
           python -m pip install --upgrade pip
           make install requirements
           pip install -r docs/requirements.txt
-      - name: Build and test Sphinx docs
+      - name: Install Pandoc.
         uses: docker://pandoc/latex:2.11.2
+      - name: Build and test Sphinx docs
         run: |
           make docs
           make doctest
