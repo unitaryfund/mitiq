@@ -1,6 +1,7 @@
 numpy~=1.18.1
 scipy~=1.4.1
 cirq~=0.9.1
+pymc3~=3.9.3
 
 # third-party integration
 pyquil~=2.18.0

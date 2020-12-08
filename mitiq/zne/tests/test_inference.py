@@ -35,6 +35,7 @@ from mitiq.zne.inference import (
     ExpFactory,
     PolyExpFactory,
     AdaExpFactory,
+    BayesFactory,
 )
 
 
@@ -148,6 +149,7 @@ def test_noise_seeding(test_f: Callable[[float], float]):
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
+        BayesFactory,
     ),
 )
 def test_get_scale_factors_static_factories(factory):
@@ -205,6 +207,7 @@ def test_get_scale_factors_adaptive_factories(factory):
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
+        BayesFactory,
     ),
 )
 def test_get_expectation_values_static_factories(factory):
@@ -274,6 +277,7 @@ def test_get_expectation_values_adaptive_factories(factory):
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
+        BayesFactory,
     ),
 )
 @mark.parametrize("batched", (True, False))
@@ -317,6 +321,7 @@ def test_run_sequential_and_batched(factory, batched):
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
+        BayesFactory,
     ),
 )
 def test_run_batched_with_keyword_args_list(factory):
@@ -581,7 +586,13 @@ def test_avoid_log_keyword():
 
 
 @mark.parametrize(
-    "factory", (LinearFactory, RichardsonFactory, FakeNodesFactory)
+    "factory",
+    (
+        LinearFactory,
+        RichardsonFactory,
+        FakeNodesFactory,
+        BayesFactory,
+    )
 )
 def test_too_few_scale_factors(factory):
     """Test less than 2 scale_factors."""
@@ -678,7 +689,13 @@ def test_equal_simple():
 
 @mark.parametrize(
     "factory",
-    (LinearFactory, RichardsonFactory, FakeNodesFactory, PolyFactory),
+    (
+        LinearFactory,
+        RichardsonFactory,
+        FakeNodesFactory,
+        PolyFactory,
+        BayesFactory,
+    ),
 )
 def test_equal(factory):
     for run_classical in (True, False):
@@ -830,7 +847,13 @@ def test_params_cov_and_zne_std():
 
 
 @mark.parametrize(
-    "factory", [LinearFactory, RichardsonFactory, FakeNodesFactory]
+    "factory",
+    [
+        LinearFactory,
+        RichardsonFactory,
+        FakeNodesFactory,
+        BayesFactory,
+    ]
 )
 def test_execute_with_zne_fit_fail(factory):
     """Tests errors are raised when asking for fitting parameters that can't

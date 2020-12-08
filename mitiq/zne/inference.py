@@ -34,6 +34,8 @@ import numpy as np
 from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
 
+import pymc3 as pm
+
 from mitiq import QPROGRAM
 from mitiq.utils import _are_close_dict
 
@@ -1635,6 +1637,138 @@ class PolyExpFactory(BatchedFactory):
 OptimizationHistory = List[
     Tuple[List[Dict[str, float]], List[float], List[float], float]
 ]
+
+
+class BayesFactory(BatchedFactory):
+    """Factory object implementing a zero-noise extrapolation algorithm based on
+    Bayesian Inference.
+
+    Args:
+        scale_factors: Sequence of noise scale factors at which
+                       expectation values should be measured.
+        shot_list: Optional sequence of integers corresponding to the number
+                   of samples taken for each expectation value. If this
+                   argument is explicitly passed to the factory, it must have
+                   the same length of scale_factors and the executor function
+                   must accept "shots" as a valid keyword argument.
+
+    Raises:
+        ValueError: If data is not consistent with the extrapolation model.
+    Note:
+        RichardsonFactory and LinearFactory are special cases of PolyFactory.
+    """
+
+    @staticmethod
+    def _likelihood(
+        a: float,
+        b: float,
+        c: float,
+        scale_factor: float
+    ) -> float:
+        """The likelihood function is an exponential in the scale factor:
+        E(lambda) = a + b * e**(-c*lambda),
+        where a, b and c are model parameters that need to be estimated.
+
+        Args:
+            a: Model parameter.
+            b: Model parameter.
+            c: Model parameter.
+            scale_factors: The array of noise scale factors.
+
+        Returns:
+            The expected value according to the model parameters and
+            scale factor.
+        """
+
+        return a + b * np.exp(-1.0 * c * scale_factor)
+
+    @staticmethod
+    def extrapolate(
+        scale_factors: Sequence[float],
+        exp_values: Sequence[float],
+        full_output: bool = False,
+    ) -> Union[
+
+        float,
+    ]:
+        """Static method which evaluates an exponential extrapolation to the
+        zero-noise limit using Bayesian inference.
+
+        Args:
+            scale_factors: The array of noise scale factors.
+            exp_values: The array of expectation values.
+            full_output: If False (default), only the zero-noise limit is
+                returned. If True, additional information about the
+                extrapolated limit is returned too.
+        Returns:
+            zne_limit: The extrapolated zero-noise limit. If "full_output"
+                is False (default value), only this parameter is returned.
+            opt_params: The parameter array of the best fitting model.
+            zne_curve: The callable function which best fit the input data.
+                It maps a real noise scale factor to a real expectation value.
+                It is equal "zne_limit" when evaluated at zero.
+
+        Note:
+            This method computes the zero-noise limit only from the information
+            contained in the input arguments. To extrapolate from the internal
+            data of an instantiated Factory object, the bound method
+            ".reduce()" should be called instead.
+        """
+        with pm.Model():
+            """
+            We assumme that the priors for the model parameters is a uniform
+            distribution an upper limit 1 and a lower limit 0, except for b
+            with lower limit -1.
+            """
+            a = pm.Uniform('a', 0, 1)
+            b = pm.Uniform('b', -1, 1)
+            c = pm.Uniform('c', 0, 1)
+            eps = pm.Uniform('eps', 0, 0.5)
+
+            pm.Normal(
+                'expval',
+                mu=BayesFactory._likelihood(a, b, c, scale_factors),
+                sd=eps,
+                observed=exp_values,
+            )
+
+            trace = pm.sample(1000, tune=2000, cores=2)
+
+        a = trace['a'].mean()
+        b = trace['b'].mean()
+        c = trace['c'].mean()
+
+        def zne_curve(scale_factor: float) -> float:
+            return BayesFactory._likelihood(a, b, c, scale_factor)
+
+        zne_limit = BayesFactory._likelihood(a, b, c, 0.0)
+        if not full_output:
+            return zne_limit
+
+        opt_params = (trace['a'], trace['b'], trace['c'])
+        return zne_limit, zne_curve, opt_params
+
+    def reduce(self) -> float:
+        """Evaluates the zero-noise limit found by fitting a polynomial of degree
+        `self.order` to the internal data stored in the factory.
+
+        Returns:
+            The zero-noise limit.
+        """
+        (
+            self._zne_limit,
+            self._zne_curve,
+            self._opt_params,
+        ) = self.extrapolate(  # type: ignore
+            self.get_scale_factors(),
+            self.get_expectation_values(),
+            full_output=True,
+        )
+        self._already_reduced = True
+        return self._zne_limit
+
+    def __eq__(self, other: Any) -> bool:
+        return BatchedFactory.__eq__(self, other)
 
 
 class AdaExpFactory(AdaptiveFactory):
