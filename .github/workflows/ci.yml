@@ -14,6 +14,7 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
+      - uses: docker://pandoc/core:2.9
       - name: Check out mitiq
         uses: actions/checkout@v2
       - name: Set up Python
@@ -26,7 +27,6 @@ jobs:
           make install requirements
           pip install -r docs/requirements.txt
       - name: Build and test Sphinx docs
-        uses: docker://pandoc/core:2.9
         run: |
           make docs
           make doctest
