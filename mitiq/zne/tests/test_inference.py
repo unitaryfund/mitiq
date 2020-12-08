@@ -128,6 +128,13 @@ def f_runge(x: float) -> float:
     return 1.0 / ((x - 2) ** 2 + 1.0)
 
 
+def f_exp_bayes(
+    x: float, err: float = STAT_NOISE, rnd_state: RandomState = np.random
+) -> float:
+    """Exponential decay with with parameters suiting BayesFactroy."""
+    return 0.5 + 0.5 * np.exp(-0.5 * x) + rnd_state.normal(scale=err)
+
+
 @mark.parametrize("test_f", [f_lin, f_non_lin])
 def test_noise_seeding(test_f: Callable[[float], float]):
     """Check that seeding works as expected."""
@@ -420,17 +427,16 @@ def test_poly_extr():
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
 
-@mark.parametrize("test_f", [f_lin, f_non_lin])
-def test_bayes_extr(test_f: Callable[[float], float]):
+def test_bayes_extr():
     """Test of the BayesFactory's extrapolator."""
-    seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = BayesFactory(scale_factors=X_VALS)
+    x_vals = np.linspace(1.0, 5.0, 20)
+    seeded_f = apply_seed_to_func(f_exp_bayes, SEED)
+    fac = BayesFactory(scale_factors=x_vals)
     assert not fac._opt_params
     fac.run_classical(seeded_f)
     zne_value = fac.reduce()
     assert np.isclose(zne_value, seeded_f(0, err=0), atol=CLOSE_TOL)
-    assert len(fac._opt_params) == len(X_VALS)
-    assert np.isclose(fac._opt_params[-1], zne_value)
+    assert np.isclose(fac._zne_curve(0), seeded_f(0, err=0), atol=CLOSE_TOL)
 
 
 @mark.parametrize("order", [2, 3, 4, 5])
