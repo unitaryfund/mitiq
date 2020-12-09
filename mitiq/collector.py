@@ -16,6 +16,7 @@
 """Defines utilities for efficiently running collections of circuits generated
 by error mitigation techniques to compute expectation values."""
 
+from collections import Counter
 from copy import deepcopy
 import inspect
 from typing import Any, Callable, Dict, Iterable, List, Sequence, Tuple, Union
@@ -25,6 +26,7 @@ import numpy as np
 import cirq
 from mitiq import QPROGRAM
 from mitiq.conversions import (
+    convert_from_mitiq,
     convert_to_mitiq,
     UnsupportedCircuitError,
     CircuitConversionError,
@@ -79,8 +81,24 @@ class Collector:
         if force_run_all:
             to_run = circuits
         else:
-            collection = CircuitCollection(circuits)
-            to_run = collection.unique
+            # Convert to FrozenCircuits
+            # Note: Assumes all circuits are the same type.
+            _, conversion_type = convert_to_mitiq(circuits[0])
+            circuits = [
+                cirq.FrozenCircuit(
+                    convert_to_mitiq(circ)[0].all_operations(),
+                    strategy=cirq.InsertStrategy.EARLIEST,
+                )
+                for circ in circuits
+            ]
+
+            # Get the unique circuits and counts
+            collection = Counter(circuits)
+            to_run = [
+                convert_from_mitiq(circ, conversion_type)
+                for circ in collection.keys()
+            ]
+            counts = list(collection.values())
 
         if not self._can_batch:
             for circuit in to_run:
@@ -101,7 +119,7 @@ class Collector:
         if force_run_all:
             return self._computed_results
         results = []
-        for value, mult in zip(self._computed_results, collection.counts()):
+        for value, mult in zip(self._computed_results, counts):
             results += [value] * mult
         return results
 
