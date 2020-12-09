@@ -1,6 +1,6 @@
 numpy~=1.18.1
 scipy~=1.4.1
-cirq-unstable
+cirq==0.10.0.dev20201203012958
 
 # third-party integration
 pyquil~=2.18.0
