@@ -275,7 +275,7 @@ class Factory(ABC):
     ) -> "Factory":
         """Calls the executor function on noise-scaled quantum circuit and
         stores the results.
-        
+
         Args:
             qp: Quantum circuit to scale noise in.
             executor: Function which inputs a (list of) quantum circuits and
