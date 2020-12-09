@@ -518,7 +518,7 @@ Tensorflow evaluates faster than the exact density matrix simulation using ``Cir
 
 Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
 
-.. testcode::
+.. code-block::
 
     import numpy as np
     import sympy
