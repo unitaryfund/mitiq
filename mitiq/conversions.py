@@ -17,7 +17,7 @@
 from functools import wraps
 from typing import Any, Callable, Tuple
 
-from cirq import Circuit
+from cirq import AbstractCircuit, Circuit
 
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES, QPROGRAM
 
@@ -104,7 +104,7 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
         from mitiq.mitiq_pyquil.conversions import to_pyquil
 
         conversion_function = to_pyquil
-    elif isinstance(circuit, Circuit):
+    elif isinstance(circuit, AbstractCircuit):
 
         def conversion_function(circ: Circuit) -> Circuit:
             return circ
