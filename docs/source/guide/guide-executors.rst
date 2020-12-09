@@ -576,7 +576,7 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
         # return measurement of 0 state
         return np.real(dm[0, 0])
 
-.. testcode::
+.. code-block::
     :hide:
 
     if tfq_exists:
