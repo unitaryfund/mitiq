@@ -17,9 +17,8 @@
 by error mitigation techniques to compute expectation values."""
 
 from collections import Counter
-from copy import deepcopy
 import inspect
-from typing import Any, Callable, Dict, Iterable, List, Sequence, Tuple, Union
+from typing import Callable, Iterable, List, Sequence, Tuple, Union
 
 import numpy as np
 
@@ -28,10 +27,7 @@ from mitiq import QPROGRAM
 from mitiq.conversions import (
     convert_from_mitiq,
     convert_to_mitiq,
-    UnsupportedCircuitError,
-    CircuitConversionError,
 )
-from mitiq.utils import _equal
 
 
 class Collector:
@@ -179,103 +175,3 @@ class Collector:
             Iterable[float],
             np.ndarray,
         )
-
-
-class CircuitCollection:
-    """A collection of circuits, nominally to execute on some backend."""
-
-    def __init__(self, circuits: Sequence[QPROGRAM]) -> None:
-        """Initializes a CircuitCollection.
-
-        Args:
-            circuits: Sequence of circuits to form the CircuitCollection.
-        """
-        self._raw_circuits = deepcopy(circuits)
-        self._cirq_circuits = [
-            convert_to_mitiq(circuit)[0] for circuit in self._raw_circuits
-        ]
-
-        # List of unique circuits.
-        self._unique: List[cirq.Circuit] = []
-
-        # Dictionary where each key refers to an index of self._raw_circuits
-        # that is the first occurrence of a unique circuit. The value of this
-        # key is the multiplicity/count (number of occurrences) of this circuit
-        # in self._raw_circuits. See CircuitCollection.unique_with_counts.
-        self._counts: Dict[int, int] = {}
-
-        for i, circ in enumerate(self._cirq_circuits):
-            found = False
-            for j, circuit in enumerate(self._unique):
-                if _equal(circ, circuit):
-                    self._counts[list(self._counts.keys())[j]] += 1
-                    found = True
-                    break
-
-            if not found:
-                self._unique.append(circ)
-                self._counts[i] = 1
-
-    @property
-    def all(self) -> List[QPROGRAM]:
-        return list(self._raw_circuits)
-
-    @property
-    def unique(self) -> List[QPROGRAM]:
-        return [self._raw_circuits[i] for i in self._counts.keys()]
-
-    def counts(self) -> List[int]:
-        """Returns the counts of unique circuits in the CircuitCollection.
-
-        For example, if `CircuitCollection.unique()` = [a, b] and
-        `CircuitCollection.counts() = [3, 4]`, this means that `a` occurs 3
-        times in the CircuitCollection and `b` occurs 4 times.
-        """
-        return list(self._counts.values())
-
-    def unique_with_counts(self) -> List[Tuple[QPROGRAM, int]]:
-        """Returns the unique circuits along with their counts.
-
-        For example, if
-        `CircuitCollection.unique_with_counts() = [(a, 3), (b, 4)]`, this means
-        that circuit `a` occurs 3 times in the CircuitCollection and circuit
-        `b` occurs 4 times.
-        """
-        return [(self._raw_circuits[k], v) for k, v in self._counts.items()]
-
-    def indices_of_unique_circuits(self) -> List[int]:
-        """Returns the indices of unique circuits in the original sequence of
-        circuits which formed the CircuitCollection.
-
-        For example, if `collection = CircuitCollection([a, b, a, c])`, then
-        `collection.indices_of_unique_circuits() = [0, 1, 3]`.
-        """
-        return list(self._counts.keys())
-
-    def count_of(self, item: Any) -> int:
-        """Returns the count (number of occurrences) of the item in the
-        CircuitCollection.
-
-        Args:
-            item: Any value to get the number of occurrences of.
-        """
-        try:
-            item, _ = convert_to_mitiq(item)
-        except (CircuitConversionError, UnsupportedCircuitError):
-            return 0
-
-        for i, circ in enumerate(self._cirq_circuits):
-            if _equal(item, circ):
-                return self._counts[i]
-        return 0
-
-    def __contains__(self, item: Any) -> bool:
-        try:
-            circuit, _ = convert_to_mitiq(item)
-        except (CircuitConversionError, UnsupportedCircuitError):
-            return False
-
-        for circ in self._unique:
-            if _equal(circuit, circ):
-                return True
-        return False
