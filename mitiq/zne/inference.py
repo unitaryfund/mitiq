@@ -1732,11 +1732,13 @@ class BayesFactory(BatchedFactory):
                 observed=exp_values,
             )
 
-            trace = pm.sample(1000, tune=2000, cores=2)
+            trace = pm.sample()
 
+        # Optimal model parameters:
         a = trace['a'].mean()
         b = trace['b'].mean()
         c = trace['c'].mean()
+        opt_params, zne_error = [a, b, c], trace['eps'].mean()
 
         def zne_curve(scale_factor: float) -> float:
             return BayesFactory._likelihood(a, b, c, scale_factor)
@@ -1745,8 +1747,8 @@ class BayesFactory(BatchedFactory):
         if not full_output:
             return zne_limit
 
-        opt_params = (trace['a'], trace['b'], trace['c'])
-        return zne_limit, zne_curve, opt_params
+        params_cov = None
+        return zne_limit, zne_error, opt_params, params_cov, zne_curve
 
     def reduce(self) -> float:
         """Evaluates the zero-noise limit found by fitting a polynomial of degree
@@ -1757,8 +1759,10 @@ class BayesFactory(BatchedFactory):
         """
         (
             self._zne_limit,
-            self._zne_curve,
+            self._zne_error,
             self._opt_params,
+            self._params_cov,
+            self._zne_curve,
         ) = self.extrapolate(  # type: ignore
             self.get_scale_factors(),
             self.get_expectation_values(),

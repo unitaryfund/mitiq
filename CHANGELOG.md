@@ -12,7 +12,7 @@
 
 ### All Changes
 - Add a new FakeNodesFactory class based on an alternative interpolation method (@elmandouh, gh-444).
-
+- Add a new BayesFactory class based on Bayesian Inference (@elmandouh, gh-471).
 ## Version 0.4.0 (December 6th, 2020)
 
 ### Summary
