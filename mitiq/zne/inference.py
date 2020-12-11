@@ -1732,7 +1732,7 @@ class BayesFactory(BatchedFactory):
                 observed=exp_values,
             )
 
-            trace = pm.sample()
+            trace = pm.sample(target_accept = 0.95)
 
         # Optimal model parameters:
         a = trace['a'].mean()
