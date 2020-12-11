@@ -67,7 +67,8 @@ To run the tests for the pyQuil and Qiskit plugins (which of course require for
 pyQuil and Qiskit to be installed) run
 
 ```bash
-(myenv) make test
+(myenv) make test-pyquil
+(myenv) make test-qiskit
 ```
 
 *NOTE*: For the pyQuil tests to run, you will need to have QVM & quilc servers

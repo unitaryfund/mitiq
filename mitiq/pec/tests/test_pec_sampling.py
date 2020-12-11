@@ -119,6 +119,20 @@ def test_sample_sequence_bad_random_state():
         sample_sequence(X(qreg[0]), DECO_DICT, random_state="")
 
 
+def test_sample_circuit_with_seed():
+    decomp = _simple_pauli_deco_dict(0.7, simplify_paulis=True)
+    circ = Circuit([X.on(LineQubit(0)) for _ in range(10)])
+
+    expected = sample_circuit(circ, decomp, random_state=4)[0]
+
+    # Check we're not sampling the same operation every call to sample_sequence
+    assert len(set(expected.all_operations())) > 1
+
+    for _ in range(10):
+        sampled = sample_circuit(circ, decomp, random_state=4)[0]
+        assert _equal(sampled, expected)
+
+
 def test_sample_circuit_types_trivial():
     imp_circuit, sign, norm = sample_circuit(twoq_circ, NOISELESS_DECO_DICT)
     assert imp_circuit == twoq_circ
