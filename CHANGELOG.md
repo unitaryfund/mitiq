@@ -12,7 +12,7 @@
 
 ### All Changes
 - Add a new FakeNodesFactory class based on an alternative interpolation method (@elmandouh, gh-444).
-- Replace Qiskit utils with Qiskit executors from docs  (@pchung, gh-379)
+- Replace Qiskit utils with Qiskit executors from docs  (@pchung39, gh-379)
 
 ## Version 0.4.0 (December 6th, 2020)
 
