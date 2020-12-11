@@ -89,7 +89,10 @@ def run_with_noise(
     return expval
 
 
-def qs_wvf_sim(circ: QuantumCircuit, obs: np.ndarray) -> float:
+def qs_wvf_sim(
+    circ: QuantumCircuit,
+    obs: np.ndarray
+) -> float:
     """Simulates noiseless wavefunction evolution and returns the
     expectation value of some observable.
 
@@ -105,7 +108,11 @@ def qs_wvf_sim(circ: QuantumCircuit, obs: np.ndarray) -> float:
     return np.real(final_wvf.conj().T @ obs @ final_wvf)
 
 
-def qs_wvf_sampling_sim(circ: QuantumCircuit, obs: np.ndarray, shots: int) -> float:
+def qs_wvf_sampling_sim(
+    circ: QuantumCircuit,
+    obs: np.ndarray,
+    shots: int
+) -> float:
     """Simulates the evolution of the circuit and returns
     the expectation value of the observable.
 
@@ -119,12 +126,15 @@ def qs_wvf_sampling_sim(circ: QuantumCircuit, obs: np.ndarray, shots: int) -> fl
 
     """
     if len(circ.clbits) > 0:
-        raise ValueError("This executor only works on programs with no classical bits.")
+        raise ValueError(
+            "This executor only works on programs with "
+            f"no classical bits.")
 
     circ = copy.deepcopy(circ)
     # we need to modify the circuit to measure obs in its eigenbasis
     # we do this by appending a unitary operation
-    eigvals, U = np.linalg.eigh(obs)  # obtains a U s.t. obs = U diag(eigvals) U^dag
+    # obtains a U s.t. obs = U diag(eigvals) U^dag
+    eigvals, U = np.linalg.eigh(obs)
     circ.unitary(np.linalg.inv(U), qubits=range(circ.n_qubits))
 
     circ.measure_all()
@@ -148,26 +158,35 @@ def qs_wvf_sampling_sim(circ: QuantumCircuit, obs: np.ndarray, shots: int) -> fl
     return expectation
 
 
-def qs_noisy_sampling_sim(circ: QuantumCircuit, obs: np.ndarray, noise: float, shots: int) -> float:
+def qs_noisy_sampling_sim(
+    circ: QuantumCircuit,
+    obs: np.ndarray,
+    noise: float,
+    shots: int
+) -> float:
     """Simulates the evolution of the noisy circuit and returns
     the expectation value of the observable.
 
     Args:
         circ: The input Cirq circuit.
         obs: The observable to measure as a NumPy array.
-        noise: The depolarizing noise strength as a float, i.e. 0.001 is 0.1%.
+        noise: The depolarizing noise strength as a float,
+               i.e. 0.001 is 0.1%.
         shots: The number of measurements.
 
     Returns:
         The expectation value of obs as a float.
     """
     if len(circ.clbits) > 0:
-        raise ValueError("This executor only works on programs with no classical bits.")
+        raise ValueError(
+            "This executor only works on programs "
+            f"with no classical bits.")
 
     circ = copy.deepcopy(circ)
     # we need to modify the circuit to measure obs in its eigenbasis
     # we do this by appending a unitary operation
-    eigvals, U = np.linalg.eigh(obs)  # obtains a U s.t. obs = U diag(eigvals) U^dag
+    # obtains a U s.t. obs = U diag(eigvals) U^dag
+    eigvals, U = np.linalg.eigh(obs)
     circ.unitary(np.linalg.inv(U), qubits=range(circ.n_qubits))
 
     circ.measure_all()
@@ -177,8 +196,12 @@ def qs_noisy_sampling_sim(circ: QuantumCircuit, obs: np.ndarray, noise: float, s
 
     # we assume the same depolarizing error for each
     # gate of the standard IBM basis
-    noise_model.add_all_qubit_quantum_error(depolarizing_error(noise, 1), ["u1", "u2", "u3"])
-    noise_model.add_all_qubit_quantum_error(depolarizing_error(noise, 2), ["cx"])
+    noise_model.add_all_qubit_quantum_error(
+        depolarizing_error(noise, 1), ["u1", "u2", "u3"]
+    )
+    noise_model.add_all_qubit_quantum_error(
+        depolarizing_error(noise, 2), ["cx"]
+    )
 
     # execution of the experiment
     job = execute(
