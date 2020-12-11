@@ -37,8 +37,9 @@ def test_qs_wvf_sim():
     expected_value = qs_wvf_sim(circ=circ, obs=observable)
     assert 1.0 == expected_value
 
-    circ.x(0)
-    expected_value = qs_wvf_sim(circ=circ, obs=observable)
+    second_circ = qiskit.QuantumCircuit(qiskit.QuantumRegister(1))
+    second_circ.x(0)
+    expected_value = qs_wvf_sim(circ=second_circ, obs=observable)
     assert 0.0 == expected_value
 
 
@@ -52,8 +53,9 @@ def test_qs_wvf_sampling_sim():
                                             shots=shots)
     assert expectation_value == 1.0
 
-    circ.x(0)
-    expectation_value = qs_wvf_sampling_sim(circ=circ, obs=observable,
+    second_circ = qiskit.QuantumCircuit(qiskit.QuantumRegister(1))
+    second_circ.x(0)
+    expectation_value = qs_wvf_sampling_sim(circ=second_circ, obs=observable,
                                             shots=shots)
     assert expectation_value == 0.0
 
@@ -72,9 +74,8 @@ def test_qs_wvf_sampling_sim_error():
 
 
 def test_qs_noisy_sampling_sim_single_qubit():
-    """ Tests the noisy sampling executor and makes sure
-    that the expectation value is less than 1 when single
-    qubit gates are used.
+    """ Tests the noisy sampling executor across increasing levels
+    of single qubit gate noise
     """
 
     single_qubit_circ = qiskit.QuantumCircuit(qiskit.QuantumRegister(1))
@@ -94,9 +95,8 @@ def test_qs_noisy_sampling_sim_single_qubit():
 
 
 def test_qs_noisy_sampling_sim_two_qubit():
-    """ Tests the noisy sampling executor and makes sure that
-    the expectation value is less than 1 when two qubit gates
-    are used.
+    """ Tests the noisy sampling executor across increasing levels of
+    two qubit gate noise
     """
 
     two_qubit_circ = qiskit.QuantumCircuit(qiskit.QuantumRegister(2))
