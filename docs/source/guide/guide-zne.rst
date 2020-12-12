@@ -707,12 +707,27 @@ and clips the result if it falls outside its physical domain.
 
    fac = MyFactory([1, 2, 3], min_expval=0.0, max_expval=2.0)
    fac.run_classical(noise_to_expval)
-   assert np.isclose(fac.reduce(), 1.0, atol=0.1)
+   assert np.isclose(
+      fac.extrapolate(
+         fac.get_scale_factors,
+         fac.get_expectation_values,
+         fac.min_expval,
+         fac.max_expval,
+      ),
+      1.0, atol=0.1
+   )
    # Linear model with a large zero-noise limit
    noise_to_large_expval = lambda x : noise_to_expval(x) + 10.0
    fac.run_classical(noise_to_large_expval)
    # assert the output is clipped to 2.0
-   assert np.isclose(fac.reduce(), 2.0)
+   assert np.isclose(
+      fac.extrapolate(
+         fac.get_scale_factors,
+         fac.get_expectation_values,
+         fac.min_expval,
+         fac.max_expval,
+      ), 2.0
+   )
 
 This custom factory can be used in exactly the same way as we have
 shown in the previous section. By simply replacing ``LinearFactory``
