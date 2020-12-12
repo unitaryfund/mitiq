@@ -575,7 +575,7 @@ def test_avoid_log_keyword():
     fac = ExpFactory(X_VALS, asymptote=A, avoid_log=False)
     fac.run_classical(f_exp_down)
     znl_with_log = fac.reduce()
-    fac.avoid_log = True
+    fac._options['avoid_log'] = True
     znl_without_log = fac.reduce()
     assert not znl_with_log == znl_without_log
 
