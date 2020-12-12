@@ -682,22 +682,25 @@ and clips the result if it falls outside its physical domain.
          self.min_expval = min_expval
          self.max_expval = max_expval
 
-      def reduce(self) -> float:
+      def extrapolate(
+         scale_factors,
+         exp_values,
+         min_expval,
+         max_expval,
+      ) -> float:
          """
          Fit a linear model and clip its zero-noise limit.
-
-         Note: This overrides the reduce method in BatchedFactroy.
 
          Returns:
             The clipped extrapolation to the zero-noise limit.
          """
          # Fit a line and get the optimal parameters (slope, intercept)
          opt_params, _ = mitiq_polyfit(
-            self.get_scale_factors(), self.get_expectation_values(), deg=1
+            scale_factors, exp_values, deg=1
         )
 
          # Return the clipped zero-noise extrapolation.
-         return np.clip(opt_params[-1], self.min_expval, self.max_expval)
+         return np.clip(opt_params[-1], min_expval, max_expval)
 
 
 .. testcleanup::
