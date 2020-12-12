@@ -712,7 +712,7 @@ and clips the result if it falls outside its physical domain.
          fac.get_scale_factors,
          fac.get_expectation_values,
          fac.min_expval,
-         fac.max_expval,
+         fac.max_expval
       ),
       1.0, atol=0.1
    )
@@ -725,7 +725,7 @@ and clips the result if it falls outside its physical domain.
          fac.get_scale_factors,
          fac.get_expectation_values,
          fac.min_expval,
-         fac.max_expval,
+         fac.max_expval
       ), 2.0
    )
 
