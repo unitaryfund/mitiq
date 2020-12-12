@@ -201,6 +201,7 @@ class Factory(ABC):
         self._zne_error: Union[float, None] = None
         self._zne_curve: Union[Callable[[float], float], None] = None
         self._already_reduced = False
+        self._options: Dict[str, float] = {}
 
     def get_scale_factors(self) -> np.ndarray:
         """Returns the scale factors at which the factory has computed
@@ -407,14 +408,6 @@ class BatchedFactory(Factory, ABC):
 
         super(BatchedFactory, self).__init__()
 
-    @abstractmethod
-    def _extrapolate_args(self) -> Dict[str, Any]:
-        """Returns a dictionary with factort specific arguments
-        to pass to extrapolate().
-        For example in PolyFac, return {"order": self.order, ...}.
-        """
-        raise NotImplementedError
-
     @staticmethod
     @abstractmethod
     def extrapolate(*args, **kwargs) -> float:
@@ -438,7 +431,7 @@ class BatchedFactory(Factory, ABC):
             self.get_scale_factors(),
             self.get_expectation_values(),
             full_output=True,
-            **self._extrapolate_args(),
+            **self._options,
         )
 
         self._already_reduced = True
@@ -767,8 +760,8 @@ class PolyFactory(BatchedFactory):
             raise ValueError(
                 "The extrapolation order cannot exceed len(scale_factors) - 1."
             )
-        self.order = order
         super(PolyFactory, self).__init__(scale_factors, shot_list)
+        self._options = {'order': order}
 
     @staticmethod
     def extrapolate(
@@ -838,18 +831,11 @@ class PolyFactory(BatchedFactory):
 
         return zne_limit, zne_error, opt_params, params_cov, zne_curve
 
-    def _extrapolate_args(self) -> Dict[str, Any]:
-        """
-        Return the arguments necessary for polynomial extrapolation.
-
-        Return:
-            Dictionary with arguments to be passed to extrapolate().
-        """
-        args = {"order": self.order}
-        return args
-
     def __eq__(self, other: Any) -> bool:
-        return BatchedFactory.__eq__(self, other) and self.order == other.order
+        return (
+            BatchedFactory.__eq__(self, other) and
+            self._options['order'] == other._options['order']
+         )
 
 
 class RichardsonFactory(BatchedFactory):
@@ -919,15 +905,6 @@ class RichardsonFactory(BatchedFactory):
         return PolyFactory.extrapolate(
             scale_factors, exp_values, order, full_output
         )
-
-    def _extrapolate_args(self) -> Dict[str, Any]:
-        """
-        Return the arguments necessary for Richardson extrapolation.
-
-        Return:
-            Dictionary with arguments to be passed to extrapolate().
-        """
-        return {}
 
 
 class FakeNodesFactory(BatchedFactory):
@@ -1005,16 +982,6 @@ class FakeNodesFactory(BatchedFactory):
             )
 
         return zne_limit, zne_error, opt_params, params_cov, zne_curve
-
-    def _extrapolate_args(self) -> Dict[str, Any]:
-        """
-        Return the arguments necessary for FakeNodes extrapolation.
-
-        Return:
-            Dictionary with arguments to be passed to extrapolate().
-        """
-        args = {}
-        return args
 
     @staticmethod
     def _map_to_fake_nodes(
@@ -1132,16 +1099,6 @@ class LinearFactory(BatchedFactory):
             scale_factors, exp_values, 1, full_output
         )
 
-    def _extrapolate_args(self) -> Dict[str, Any]:
-        """
-        Return the arguments necessary for linear extrapolation.
-
-        Return:
-            Dictionary with arguments to be passed to extrapolate().
-        """
-        args = {}
-        return args
-
 
 class ExpFactory(BatchedFactory):
     """
@@ -1186,21 +1143,10 @@ class ExpFactory(BatchedFactory):
             raise ValueError(
                 "The argument 'asymptote' must be either a float or None"
             )
-        self.asymptote = asymptote
-        self.avoid_log = avoid_log
-
-    def _extrapolate_args(self) -> Dict[str, Any]:
-        """
-        Return the arguments necessary for exponential extrapolation.
-
-        Return:
-            Dictionary with arguments to be passed to extrapolate().
-        """
-        args = {
-            "asymptote": self.asymptote,
-            "avoid_log": self.avoid_log,
+        self._options = {
+            'asymptote': asymptote,
+            'avoid_log': avoid_log,
         }
-        return args
 
     @staticmethod
     def extrapolate(
@@ -1281,21 +1227,27 @@ class ExpFactory(BatchedFactory):
         if not isinstance(other, ExpFactory):
             return False
         if (
-            self.asymptote
-            and other.asymptote is None
-            or self.asymptote is None
-            and other.asymptote
+            self._options['asymptote']
+            and other._options['asymptote'] is None
+            or self._options['asymptote'] is None
+            and other._options['asymptote']
         ):
             return False
-        if self.asymptote is None and other.asymptote is None:
+        if (
+            self._options['asymptote'] is None
+            and other._options['asymptote'] is None
+        ):
             return (
                 BatchedFactory.__eq__(self, other)
-                and self.avoid_log == other.avoid_log
+                and self._options['avoid_log'] == other._options['avoid_log']
             )
         return (
             BatchedFactory.__eq__(self, other)
-            and np.isclose(self.asymptote, other.asymptote)
-            and self.avoid_log == other.avoid_log
+            and np.isclose(
+                self._options['asymptote'],
+                other._options['asymptote'],
+            )
+            and self._options['avoid_log'] == other._options['avoid_log']
         )
 
 
@@ -1353,9 +1305,11 @@ class PolyExpFactory(BatchedFactory):
             raise ValueError(
                 "The argument 'asymptote' must be either a float or None"
             )
-        self.order = order
-        self.asymptote = asymptote
-        self.avoid_log = avoid_log
+        self._options = {
+            "order": order,
+            "asymptote": asymptote,
+            "avoid_log": avoid_log,
+        }
 
     @staticmethod
     def extrapolate(
@@ -1575,25 +1529,13 @@ class PolyExpFactory(BatchedFactory):
         return (
             BatchedFactory.__eq__(self, other)
             and isinstance(other, PolyExpFactory)
-            and np.isclose(self.asymptote, other.asymptote)
-            and self.avoid_log == other.avoid_log
-            and self.order == other.order
+            and np.isclose(
+                self._options['asymptote'],
+                other._options['asymptote'],
+            )
+            and self._options['avoid_log'] == other._options['avoid_log']
+            and self._options['order'] == other._options['order']
         )
-
-    def _extrapolate_args(self) -> Dict[str, Any]:
-        """
-        Return the arguments necessary for poly-exponential extrapolation.
-
-        Return:
-            Dictionary with arguments to be passed to extrapolate().
-        """
-
-        args = {
-            "order": self.order,
-            "asymptote": self.asymptote,
-            "avoid_log": self.avoid_log,
-        }
-        return args
 
 
 # Keep a log of the optimization process storing:

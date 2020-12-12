@@ -699,20 +699,6 @@ and clips the result if it falls outside its physical domain.
          # Return the clipped zero-noise extrapolation.
          return np.clip(opt_params[-1], self.min_expval, self.max_expval)
 
-      # Every factory derived from BatchedFactory must implement the
-      # following two methods.
-
-      def extrapolate():
-        """Since reduce handles all the extrapolation by calling
-        mitiq_polyfit we do nothing here.
-        """
-        pass
-      
-      def _extrapolate_args():
-        """We don't need to pass anything to extrapolate so we
-        do nothing.
-        """
-        pass
 
 .. testcleanup::
 
