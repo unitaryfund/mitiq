@@ -27,7 +27,7 @@ from cirq import (
     Gate,
     GateOperation,
     Moment,
-    ops
+    ops,
     CNOT,
     H,
     DensityMatrixSimulator,
@@ -181,7 +181,7 @@ def _poor_mans_tomography(
         depth: int = 100) -> float:
     """
     Given an executor and a gate, determines the effective "sigma"
-    that can be used for parameter noise scaling later on. 
+    that can be used for parameter noise scaling later on.
     """
 
     base_gate = _get_base_gate(gate)
@@ -190,6 +190,7 @@ def _poor_mans_tomography(
     Q = (1 - np.power(2*expectation-1, 1/depth))/2
     sigma = -0.5*np.log(1 - 2*Q)
     return sigma
+
 
 def _max_ent_state_circuit(num_qubits: int) -> Circuit:
     r"""Generates a circuits which prepares the maximally entangled state

@@ -30,7 +30,7 @@ from cirq import (
     S,
     T,
     MeasurementGate,
-    ZPowGate
+    ZPowGate,
     depolarize,
 )
 
@@ -295,6 +295,7 @@ def test_are_close_dict():
 
 
 def test_generate_pmt_circuit():
+    """Tests generating a simple PMT circuit"""
     n_qubits = 1
     qubits = LineQubit.range(n_qubits)
     depth = 10
@@ -306,12 +307,15 @@ def test_generate_pmt_circuit():
 
 
 def test_generate_pmt_circuit_failure():
+    """Tests that pmt circuit generation fails because there
+    are too many qubits"""
     n_qubits = 3
     qubits = LineQubit.range(n_qubits)
     depth = 10
     # Should raise exception because too many qubits
     with pytest.raises(Exception):
         circuit = _generate_pmt_circuit(qubits, depth, ZPowGate)
+
 
 def test_max_ent_state_circuit():
     """Tests 1-qubit and 2-qubit maximally entangled states are generated."""
