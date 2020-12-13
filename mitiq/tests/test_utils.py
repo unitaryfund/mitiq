@@ -39,7 +39,7 @@ from mitiq.utils import (
     _equal,
     _simplify_gate_exponent,
     _simplify_circuit_exponents,
-    _generate_pmt_circuit
+    _generate_pmt_circuit,
     _max_ent_state_circuit,
     _circuit_to_choi,
     _operation_to_choi,
@@ -314,7 +314,7 @@ def test_generate_pmt_circuit_failure():
     depth = 10
     # Should raise exception because too many qubits
     with pytest.raises(Exception):
-        circuit = _generate_pmt_circuit(qubits, depth, ZPowGate)
+        _generate_pmt_circuit(qubits, depth, ZPowGate)
 
 
 def test_max_ent_state_circuit():

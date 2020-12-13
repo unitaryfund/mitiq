@@ -15,7 +15,7 @@
 
 """Utility functions."""
 from copy import deepcopy
-from typing import cast, Any, Dict, Callable, Iterable
+from typing import cast, Any, Dict, Callable, Iterable, List
 
 import numpy as np
 
@@ -34,6 +34,7 @@ from cirq import (
     OP_TREE,
 )
 from cirq.ops.measurement_gate import MeasurementGate
+from mitiq.zne.scaling.parameter import _get_base_gate
 
 
 def _simplify_gate_exponent(gate: EigenGate) -> EigenGate:
@@ -162,7 +163,7 @@ def _generate_pmt_circuit(
     in R(2*pi)
 
     Args:
-        qubits: a list of qubits 
+        qubits: a list of qubits
         depth: the length of the circuit to create
         gate: the base gate to apply several times
     Returns:
