@@ -31,6 +31,7 @@ from cirq import (
     T,
     MeasurementGate,
     ZPowGate
+    depolarize,
 )
 
 from mitiq.utils import (
@@ -39,6 +40,9 @@ from mitiq.utils import (
     _simplify_gate_exponent,
     _simplify_circuit_exponents,
     _generate_pmt_circuit
+    _max_ent_state_circuit,
+    _circuit_to_choi,
+    _operation_to_choi,
 )
 
 
@@ -308,3 +312,45 @@ def test_generate_pmt_circuit_failure():
     # Should raise exception because too many qubits
     with pytest.raises(Exception):
         circuit = _generate_pmt_circuit(qubits, depth, ZPowGate)
+
+def test_max_ent_state_circuit():
+    """Tests 1-qubit and 2-qubit maximally entangled states are generated."""
+    two_state = np.array([1, 0, 0, 1]) / np.sqrt(2)
+    four_state = np.array(3 * [1, 0, 0, 0, 0] + [1]) / 2.0
+    assert np.allclose(
+        _max_ent_state_circuit(2).final_state_vector(), two_state
+    )
+    assert np.allclose(
+        _max_ent_state_circuit(4).final_state_vector(), four_state
+    )
+
+
+def test_circuit_to_choi_and_operation_to_choi():
+    """Tests the Choi matrix of a depolarizing channel is recovered."""
+    # Define first the expected result
+    base_noise = 0.01
+    max_ent_state = np.array([1, 0, 0, 1]) / np.sqrt(2)
+    identity_part = np.outer(max_ent_state, max_ent_state)
+    mixed_part = np.eye(4) / 4.0
+    epsilon = base_noise * 4.0 / 3.0
+    choi = (1.0 - epsilon) * identity_part + epsilon * mixed_part
+    # Choi matrix of the double application of a depolarizing channel
+    choi_twice = sum(
+        [
+            ((1.0 - epsilon) ** 2 * identity_part),
+            (2 * epsilon - epsilon ** 2) * mixed_part,
+        ]
+    )
+
+    # Evaluate the Choi matrix of one or two depolarizing channels
+    q = LineQubit(0)
+    noisy_operation = depolarize(base_noise).on(q)
+    noisy_sequence = [noisy_operation, noisy_operation]
+    assert np.allclose(choi, _operation_to_choi(noisy_operation))
+    noisy_circuit = Circuit(noisy_operation)
+    noisy_circuit_twice = Circuit(noisy_sequence)
+    assert np.allclose(choi, _circuit_to_choi(noisy_circuit))
+    print(noisy_circuit_twice)
+    print(_circuit_to_choi(noisy_circuit_twice))
+    print(choi_twice)
+    assert np.allclose(choi_twice, _circuit_to_choi(noisy_circuit_twice))
