@@ -22,7 +22,7 @@ import numpy as np
 import cirq
 import pyquil
 
-from mitiq.collector import Collector
+from mitiq.collector import Collector, generate_collected_executor
 
 
 def executor_batched(circuits, **kwargs) -> np.ndarray:
@@ -127,3 +127,21 @@ def test_run_collector_force_run_all_serial_executor_identical_circuits(
         assert collector.calls_to_executor == ncircuits
     else:
         assert collector.calls_to_executor == 1
+
+
+@pytest.mark.parametrize("executor", (executor_serial, executor_batched))
+@pytest.mark.parametrize("ncircuits", (10, 25))
+@pytest.mark.parametrize("rval", (0.0, 1.0))
+def test_generate_collected_executor(executor, ncircuits, rval):
+    collected_executor = generate_collected_executor(
+        executor, return_value=rval
+    )
+    expvals = collected_executor([cirq.Circuit()] * ncircuits)
+    print(rval)
+    print(expvals)
+    assert np.allclose(expvals, np.full(shape=(ncircuits,), fill_value=rval))
+
+
+def test_generate_collected_executor_not_callable():
+    with pytest.raises(ValueError, match="must be callable"):
+        generate_collected_executor(None)

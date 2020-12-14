@@ -18,7 +18,7 @@ by error mitigation techniques to compute expectation values."""
 
 from collections import Counter
 import inspect
-from typing import Callable, Iterable, List, Sequence, Tuple, Union
+from typing import Any, Callable, Iterable, List, Sequence, Tuple, Union
 
 import numpy as np
 
@@ -28,6 +28,50 @@ from mitiq.conversions import (
     convert_from_mitiq,
     convert_to_mitiq,
 )
+
+
+def generate_collected_executor(
+    executor: Callable[[Union[QPROGRAM, Sequence[QPROGRAM]]], Any],
+    max_batch_size: int = 75,
+    force_run_all: bool = False,
+    **kwargs,
+) -> Callable:
+    """Returns a new executor function which efficiently collects expectation
+    values by detecting identical circuits and calling the executor as few
+    times as possible.
+
+    Args:
+        executor: A serial or batched executor. A serial executor inputs one
+            quantum circuit and outputs one expectation value. A batched
+            executor inputs a list of quantum circuits and outputs a list of
+            expectation values (one for each circuit).
+
+            An executor is detected as batched if and only if it is annotated
+            with a return type that is one of the following:
+
+            * Iterable[float]
+            * List[float]
+            * Sequence[float]
+            * Tuple[float]
+            * numpy.ndarray
+
+        max_batch_size: The maximum number of circuits which can be processed
+            with one call to the executor. If the executor is serial, this
+            argument can be ignored and defaults to one.
+        force_run_all: If True, all circuits are run by the executor even if
+            some circuits are identical. Otherwise, the set of unique circuits
+            is found and only this set is run by the executor.
+        kwargs: Keyword arguments to provide to the executor at each call.
+    """
+    if not callable(executor):
+        raise ValueError("Arg `executor` must be callable.")
+
+    def collected(circuits: Any):
+        return Collector(executor, max_batch_size).run(
+            circuits, force_run_all=force_run_all, **kwargs
+        )
+
+    return collected
 
 
 class Collector:
@@ -63,7 +107,10 @@ class Collector:
         return self._calls_to_executor
 
     def run(
-        self, circuits: Sequence[QPROGRAM], force_run_all: bool = False
+        self,
+        circuits: Sequence[QPROGRAM],
+        force_run_all: bool = False,
+        **kwargs,
     ) -> List[float]:
         """Runs all input circuits using the least number of possible calls to
         the executor.
@@ -98,18 +145,18 @@ class Collector:
 
         if not self._can_batch:
             for circuit in to_run:
-                self._call_executor(circuit)
+                self._call_executor(circuit, **kwargs)
 
         else:
             if self._max_batch_size >= len(to_run):
-                self._call_executor(to_run)
+                self._call_executor(to_run, **kwargs)
 
             else:
                 stop = len(to_run)
                 step = self._max_batch_size
                 for i in range(int(np.ceil(stop / step))):
                     batch = to_run[i * step: (i + 1) * step]
-                    self._call_executor(batch)
+                    self._call_executor(batch, **kwargs)
 
         # Expand computed results to all results using counts.
         if force_run_all:
@@ -120,14 +167,14 @@ class Collector:
         return results
 
     def _call_executor(
-        self, to_run: Union[QPROGRAM, Sequence[QPROGRAM]]
+        self, to_run: Union[QPROGRAM, Sequence[QPROGRAM]], **kwargs
     ) -> None:
         """Calls the executor on the input circuit(s) to run.
 
         Args:
             to_run: Circuit(s) to run.
         """
-        result = self._executor(to_run)
+        result = self._executor(to_run, **kwargs)
         self._calls_to_executor += 1
 
         try:
