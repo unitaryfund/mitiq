@@ -1,6 +1,0 @@
-name: pandoc
-channels:
-    - conda-forge
-dependencies:
-    - pandoc~=2.11.2
-    - ruamel.yaml~=0.16.12
