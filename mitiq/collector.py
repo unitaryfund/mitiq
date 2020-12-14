@@ -35,7 +35,7 @@ class Collector:
     collecting the results.
     """
 
-    def __init__(self, executor: Callable, max_batch_size: int = 100) -> None:
+    def __init__(self, executor: Callable, max_batch_size: int = 75) -> None:
         """Initializes a Collector.
 
         Args:
