@@ -26,7 +26,9 @@ jobs:
           make install requirements
           pip install -r docs/requirements.txt
       - name: Install Pandoc.
-        run: sudo apt-get install pandoc=1.19.2.4
+        run: |
+          wget https://github.com/jgm/pandoc/releases/download/2.11.2/pandoc-2.11.2-1-amd64.deb
+          sudo dpkg -i pandoc-2.9.2.1-1-amd64.deb
       - name: Build and test Sphinx docs
         run: |
           make docs
