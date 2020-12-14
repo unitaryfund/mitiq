@@ -492,9 +492,6 @@ class BatchedFactory(Factory, ABC):
         # Get the list of keywords associated to each circuit in "to_run"
         kwargs_list = self._get_keyword_args(num_to_average)
 
-        # TODO:
-        #  res = Collector(executor).run(to_run, kwargs_list)
-
         if self._is_executor_batched(executor):
             if all([kwargs == {} for kwargs in kwargs_list]):
                 res = executor(to_run)
