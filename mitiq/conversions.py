@@ -107,7 +107,7 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
     elif conversion_type == "cirq":
 
         def conversion_function(circ: Circuit) -> Circuit:
-            return circ
+            return Circuit(circ)
 
     else:
         raise UnsupportedCircuitError(
