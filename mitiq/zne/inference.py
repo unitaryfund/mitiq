@@ -1227,15 +1227,15 @@ class ExpFactory(BatchedFactory):
         if not isinstance(other, ExpFactory):
             return False
         if (
-            self._options['asymptote']
-            and other._options['asymptote'] is None
-            or self._options['asymptote'] is None
-            and other._options['asymptote']
+            self._options['asymptote'] and
+            other._options['asymptote'] is None or
+            self._options['asymptote'] is None and
+            other._options['asymptote']
         ):
             return False
         if (
-            self._options['asymptote'] is None
-            and other._options['asymptote'] is None
+            self._options['asymptote'] is None and
+            other._options['asymptote'] is None
         ):
             return (
                 BatchedFactory.__eq__(self, other)

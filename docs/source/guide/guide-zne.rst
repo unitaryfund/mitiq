@@ -683,6 +683,7 @@ and clips the result if it falls outside its physical domain.
          self.max_expval = max_expval
 
       def extrapolate(
+         _,
          scale_factors,
          exp_values,
          min_expval,
