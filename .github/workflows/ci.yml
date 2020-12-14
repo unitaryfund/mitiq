@@ -23,6 +23,11 @@ jobs:
         run: |
           # $CONDA is an environment variable pointing to the root of the miniconda directory
           $CONDA/bin/conda env update --file environment.yml --name base
+      - name: Install Pandoc
+      # pandoc is later used by nbsphinx to convert Juoyter notebooks in the docs examples
+        run: |
+          wget https://github.com/jgm/pandoc/releases/download/2.11.2/pandoc-2.11.2-1-amd64.deb
+          sudo dpkg -i pandoc-2.11.2-1-amd64.deb
       - name: Install Python dependencies
         run: |
           eval "$(conda shell.bash hook)"
