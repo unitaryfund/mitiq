@@ -428,7 +428,7 @@ def test_qiskit_noisy_basis():
         pyquil.gates.H,
         pyquil.gates.CNOT(0, 1),
         qiskit.extensions.HGate,
-        qiskit.extensions.CnotGate,
+        qiskit.extensions.CXGate,
     ),
 )
 def test_noisy_basis_bad_types(element):
