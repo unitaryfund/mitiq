@@ -839,12 +839,14 @@ class PolyFactory(BatchedFactory):
         opt_params, params_cov = mitiq_polyfit(
             scale_factors, exp_values, order
         )
+
         zne_limit = opt_params[-1]
 
         if not full_output:
             return zne_limit
 
         zne_error = None
+
         if params_cov is not None:
             if params_cov.shape == (order + 1, order + 1):
                 zne_error = np.sqrt(params_cov[order, order])
@@ -970,6 +972,150 @@ class RichardsonFactory(BatchedFactory):
         return self._zne_limit
 
 
+class FakeNodesFactory(BatchedFactory):
+    """Factory object implementing a modified version [De2020polynomial]_ of
+    Richardson extrapolation. In this version the original set of scale factors
+    is mapped to a new set of fake nodes, known as Chebyshev-Lobatto points.
+    This method may give a better interpolation for particular types of curves
+    and if the number of scale factors is large (> 10). One should be aware
+    that, in many other cases, the fake nodes extrapolation method is usually
+    not superior to standard Richardson extrapolation.
+
+    Args:
+        scale_factors: Sequence of noise scale factors at which
+                       expectation values should be measured.
+        shot_list: Optional sequence of integers corresponding to the number
+                   of samples taken for each expectation value. If this
+                   argument is explicitly passed to the factory, it must have
+                   the same length of scale_factors and the executor function
+                   must accept "shots" as a valid keyword argument.
+
+    Raises:
+        ValueError: If data is not consistent with the extrapolation model.
+        ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
+
+    .. [De2020polynomial]: S.De Marchia. F. Marchetti, E.Perracchionea
+        and D.Poggialia,
+        "Polynomial interpolation via mapped bases without resampling,"
+        *Journ of Comp. and App. Math.* **364**, 112347 (2020),
+        (https://www.sciencedirect.com/science/article/abs/pii/S0377042719303449).
+    """
+
+    @staticmethod
+    def extrapolate(
+        scale_factors: Sequence[float],
+        exp_values: Sequence[float],
+        full_output: bool = False,
+    ) -> Union[
+        float,
+        Tuple[
+            float,
+            Union[float, None],
+            List[float],
+            Union[np.ndarray, None],
+            Callable[[float], float],
+        ],
+    ]:
+
+        if not FakeNodesFactory._is_equally_spaced(scale_factors):
+            raise ValueError("The scale factors must be equally spaced.")
+
+        # Define interval [a, b] for which the scale_factors are mapped to
+        a = 0.0
+        b = min(scale_factors) + max(scale_factors)
+
+        # Mapping to the fake nodes
+        fake_nodes = FakeNodesFactory._map_to_fake_nodes(scale_factors, a, b)
+
+        if not full_output:
+            return RichardsonFactory.extrapolate(fake_nodes, exp_values)
+
+        (
+            zne_limit,
+            zne_error,
+            opt_params,
+            params_cov,
+            zne_curve,
+        ) = RichardsonFactory.extrapolate(fake_nodes, exp_values, True)
+
+        # Convert zne_curve from the "fake node space" to the real space.
+        # Note: since a=0.0, this conversion is not necessary for zne_limit.
+        def new_curve(scale_factor: float) -> float:
+            """Get real zne_cruve from the curve based on fake nodes."""
+            return zne_curve(
+                FakeNodesFactory._map_to_fake_nodes(scale_factor, a, b)
+            )
+
+        return zne_limit, zne_error, opt_params, params_cov, zne_curve
+
+    def reduce(self) -> float:
+        """Evaluates the zero-noise limit found by applying the fake node
+        Richardson extrapolation to the internal data stored in the factory.
+
+        Returns:
+            The zero-noise limit.
+        """
+
+        (
+            self._zne_limit,
+            self._zne_error,
+            self._opt_params,
+            self._params_cov,
+            self._zne_curve,
+        ) = self.extrapolate(  # type: ignore
+            self.get_scale_factors(),
+            self.get_expectation_values(),
+            full_output=True,
+        )
+
+        self._already_reduced = True
+        return self._zne_limit
+
+    @staticmethod
+    def _map_to_fake_nodes(
+        x: Union[Sequence[float], float], a: float, b: float
+    ) -> Sequence[float]:
+        """A function that maps inputs to Chebyshev-Lobatto points. Based on
+        the function [De2020polynomial]_:
+            S(x) = (a - b)/2 * cos(pi * (x - a)/(b - a)) + (a + b)/2.
+        Where a and b are the endpoints of the interval [a, b] of CL points
+        we are mapping to.
+
+        Args:
+            x:
+                Sequence[float]: Set of values to be mapped to CL points.
+                float: A single value to be mapped to a CL point.
+            a: A float representing the interval starting at a
+            b: A float representing the interval ending at b
+        Returns:
+            A new sequence of fake nodes (Chebyshev-Lobatto points).
+
+        .. [De2020polynomial]: S.De Marchia. F. Marchetti, E.Perracchionea
+            and D.Poggialia,
+            "Polynomial interpolation via mapped bases without resampling,"
+            *Journ of Comp. and App. Math.* **364**, 112347 (2020),
+            (https://www.sciencedirect.com/science/article/abs/pii/S0377042719303449).
+        """
+
+        # The mapping function
+        def S(x):
+            return (a - b) / 2 * np.cos(np.pi * (x - a) / (b - a)) + (
+                a + b
+            ) / 2
+
+        if isinstance(x, float):
+            return S(x)
+
+        return np.array([S(y) for y in x])
+
+    @staticmethod
+    def _is_equally_spaced(arr: Sequence[float]) -> bool:
+        """Checks if the sequence is equally spaced."""
+
+        diff_arr = np.diff(np.sort(arr))
+        return np.allclose(diff_arr, diff_arr[0])
+
+
 class LinearFactory(BatchedFactory):
     """
     Factory object implementing zero-noise extrapolation based
@@ -1042,7 +1188,7 @@ class LinearFactory(BatchedFactory):
 
     def reduce(self) -> float:
         """Returns the zero-noise limit found by fitting a line to the internal
-        data stored in the factory.
+            data stored in the factory.
 
         Returns:
             The zero-noise limit.
