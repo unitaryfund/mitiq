@@ -189,9 +189,10 @@ def test_large_sample_size_warning(num_samples: int):
     def fake_exec(circuit: Circuit):
         """A fake executor which just samples from a normal distribution."""
         return rnd_state.randn()
+
     with warns(
-        LargeSampleWarning,
-        match=r"The number of PEC samples is very large.",
+        LargeSampleWarning, match=r"The number of PEC samples is very large.",
     ):
         execute_with_pec(
-         oneq_circ, fake_exec, DECO_DICT, num_samples=num_samples)
+            oneq_circ, fake_exec, DECO_DICT, num_samples=num_samples
+        )

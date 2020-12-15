@@ -871,13 +871,9 @@ def test_get_methods_of_factories():
     assert np.allclose(fac.get_zero_noise_limit(), zne_reduce)
     assert np.allclose(fac.get_zero_noise_limit_error(), 1.0)
 
+
 @mark.parametrize(
-    "factory",
-    (
-        LinearFactory,
-        RichardsonFactory,
-        PolyFactory,
-    ),
+    "factory", (LinearFactory, RichardsonFactory, PolyFactory,),
 )
 def test_plot_data(factory):
     """Test that plot_data() outputs the correct x and y values."""
@@ -892,8 +888,7 @@ def test_plot_data(factory):
     x_data, y_data = ax.lines[0].get_xydata().T
     zne_curve = fac.get_extrapolation_curve()
     np.testing.assert_equal(
-        np.any(np.not_equal(y_data, zne_curve(x_data))),
-        True,
+        np.any(np.not_equal(y_data, zne_curve(x_data))), True,
     )
 
 
@@ -913,18 +908,12 @@ def test_plot_data_exp_factory(factory):
     x_data, y_data = ax.lines[0].get_xydata().T
     zne_curve = fac.get_extrapolation_curve()
     np.testing.assert_equal(
-        np.any(np.not_equal(y_data, zne_curve(x_data))),
-        True,
+        np.any(np.not_equal(y_data, zne_curve(x_data))), True,
     )
 
 
 @mark.parametrize(
-    "factory",
-    (
-        LinearFactory,
-        RichardsonFactory,
-        PolyFactory,
-    ),
+    "factory", (LinearFactory, RichardsonFactory, PolyFactory,),
 )
 def test_plot_fit(factory):
     """Test that plot_fit() outputs the correct x and y values."""
@@ -939,8 +928,7 @@ def test_plot_fit(factory):
     x_data, y_data = ax.lines[0].get_xydata().T
     zne_curve = fac.get_extrapolation_curve()
     np.testing.assert_equal(
-        np.any(np.not_equal(y_data, zne_curve(x_data))),
-        True,
+        np.any(np.not_equal(y_data, zne_curve(x_data))), True,
     )
 
 
@@ -960,9 +948,9 @@ def test_plot_fit_exp_factory(factory):
     x_data, y_data = ax.lines[0].get_xydata().T
     zne_curve = fac.get_extrapolation_curve()
     np.testing.assert_equal(
-        np.any(np.not_equal(y_data, zne_curve(x_data))),
-        True,
+        np.any(np.not_equal(y_data, zne_curve(x_data))), True,
     )
+
 
 def test__fakenodes_scale_factors_equally_spaced():
     """FakeNodesFactory should only accept equally spaced scale factors."""
