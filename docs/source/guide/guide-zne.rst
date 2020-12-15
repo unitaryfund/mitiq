@@ -637,7 +637,7 @@ Typically, the ``self.__init__`` method must be overridden.
 
 A new non-adaptive method can instead be derived from the abstract :class:`.BatchedFactory` class.
 In this case it is usually sufficient to override only the ``self.__init__`` and
-the ``self.reduce`` methods, which are responsible for the initialization and for the
+the ``self.extrapolate`` methods, which are responsible for the initialization and for the
 final zero-noise extrapolation, respectively.
 
 ---------------------------------------------
