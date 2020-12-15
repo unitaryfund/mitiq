@@ -851,7 +851,7 @@ def test_plot_data_exp_factory(factory):
     for ExpFactory and PolyExpFactory.
     """
     if factory is PolyExpFactory:
-        fac = factory(scale_factors=X_VALS, order=3)
+        fac = factory(scale_factors=X_VALS, order=2)
     else:
         fac = factory(scale_factors=X_VALS)
     fac.run_classical(apply_seed_to_func(f_exp_down, SEED))
@@ -898,7 +898,7 @@ def test_plot_fit_exp_factory(factory):
     for ExpFactory and PolyExpFactory.
     """
     if factory is PolyExpFactory:
-        fac = factory(scale_factors=X_VALS, order=3)
+        fac = factory(scale_factors=X_VALS, order=2)
     else:
         fac = factory(scale_factors=X_VALS)
     fac.run_classical(apply_seed_to_func(f_exp_down, SEED))
