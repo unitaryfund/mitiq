@@ -659,8 +659,9 @@ def test_adaptive_factory_max_iteration_warnings():
     ):
         fac.run_classical(lambda scale_factor: 1.0, max_iterations=3)
 
-@mark.parametrize("factory", (LinearFactory, ExpFactory))
-def test_equal_simple():
+
+@mark.parametrize("factory", [LinearFactory, ExpFactory])
+def test_equal_simple(factory):
     fac = factory(scale_factors=[1, 2, 3])
     assert fac != 1
 
