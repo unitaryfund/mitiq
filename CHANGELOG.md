@@ -22,7 +22,7 @@ custom types for noisy operations, noisy bases, and decompositions in PEC. It al
 to the documentation, seeding options for PEC sampling functions, and bug fixes for a few non-deterministic test failures.
 
 ### All Changes
-
+- Corrects typo of CnotGate in qiskit.extensions (@purva-thakre, gh-482)
 - Add reference to review paper in docs (@willzeng, gh-423).
 - Add unitary folding API to RTD (@rmlarose, gh-429).
 - Add theory subsection on PEC in docs (@elmandouh, gh-428).
