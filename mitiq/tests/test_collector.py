@@ -32,6 +32,14 @@ def executor_batched(circuits, **kwargs) -> np.ndarray:
     )
 
 
+def executor_batched_unique(circuits) -> List[float]:
+    return [executor_serial_unique(circuit) for circuit in circuits]
+
+
+def executor_serial_unique(circuit):
+    return float(len(circuit))
+
+
 def executor_serial_typed(*args, **kwargs) -> float:
     return executor_serial(*args, **kwargs)
 
@@ -127,6 +135,23 @@ def test_run_collector_force_run_all_serial_executor_identical_circuits(
         assert collector.calls_to_executor == ncircuits
     else:
         assert collector.calls_to_executor == 1
+
+
+@pytest.mark.parametrize("s", (50, 100, 150))
+@pytest.mark.parametrize("b", (1, 2, 100))
+def test_run_collector_preserves_order(s, b):
+    rng = np.random.RandomState(1)
+
+    collector = Collector(executor=executor_batched_unique, max_batch_size=b)
+    assert collector.can_batch
+
+    circuits = [
+        cirq.Circuit(cirq.H(cirq.LineQubit(0))),
+        cirq.Circuit([cirq.H(cirq.LineQubit(0))] * 2),
+    ]
+    batch = [circuits[i] for i in rng.random_integers(low=0, high=1, size=s)]
+
+    assert np.allclose(collector.run(batch), executor_batched_unique(batch))
 
 
 @pytest.mark.parametrize("executor", (executor_serial, executor_batched))
