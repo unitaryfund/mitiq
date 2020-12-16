@@ -41,28 +41,24 @@ def about() -> None:
     except ImportError:
         pyquil_version = "Not installed"
     try:
-        from qiskit import __version__ as qiskit_version
+        from qiskit import __qiskit_version__ as qiskit_version
     except ImportError:
-        qiskit_version = "Not installed"
-
+        qiskit_version = {'qiskit-terra':"Not installed",'qiskit-aer':"Not installed",'qiskit-ibmq-provider':"Not installed"}
+    
     about_str = f"""
 Mitiq: A Python toolkit for implementing error mitigation on quantum computers
 ==============================================================================
 Authored by: Mitiq team, 2020 & later (https://github.com/unitaryfund/mitiq)
-
 Mitiq Version:\t{mitiq.__version__}
-
 Core Dependencies
 -----------------
 Cirq Version:\t{cirq_version}
 NumPy Version:\t{numpy_version}
 SciPy Version:\t{scipy_version}
-
 Optional Dependencies
 ---------------------
 PyQuil Version:\t{pyquil_version}
 Qiskit Version:\t{qiskit_version}
-
 Python Version:\t{PYTHON_VERSION[0]}.{PYTHON_VERSION[1]}.{PYTHON_VERSION[2]}
 Platform Info:\t{platform.system()} ({platform.machine()})"""
     print(about_str)
