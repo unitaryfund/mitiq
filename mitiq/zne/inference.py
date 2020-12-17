@@ -35,6 +35,7 @@ from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
 
 from mitiq import QPROGRAM
+from mitiq.collector import Collector
 from mitiq.utils import _are_close_dict
 
 
@@ -412,39 +413,6 @@ class BatchedFactory(Factory, ABC):
 
         super(BatchedFactory, self).__init__()
 
-    @staticmethod
-    def _is_executor_batched(
-        executor: Union[Callable[..., float], Callable[..., List[float]]],
-    ) -> bool:
-        """Returns True if the input function is recognized as a "batched
-        executor".
-
-        The executor is detected as "batched" only if it is annotated with
-        a return type that is one of the following:
-            * Iterable[float]
-            * List[float]
-            * Sequence[float]
-            * Tuple[float]
-            * numpy.ndarray
-
-        Args:
-            executor: A "single executor" (1) or a "batched executor" (2).
-                (1) A function which inputs a single circuit and outputs a
-                single expectation value of interest.
-                (2) A function which inputs a list of circuits and outputs a
-                list of expectation values (one for each circuit).
-
-        Returns: True if the executor is detected as batched, False otherwise.
-        """
-        executor_annotation = inspect.getfullargspec(executor).annotations
-        return executor_annotation.get("return") in (
-            List[float],
-            Sequence[float],
-            Tuple[float],
-            Iterable[float],
-            np.ndarray,
-        )
-
     def run(
         self,
         qp: QPROGRAM,
@@ -492,7 +460,7 @@ class BatchedFactory(Factory, ABC):
         # Get the list of keywords associated to each circuit in "to_run"
         kwargs_list = self._get_keyword_args(num_to_average)
 
-        if self._is_executor_batched(executor):
+        if Collector.is_batched_executor(executor):
             if all([kwargs == {} for kwargs in kwargs_list]):
                 res = executor(to_run)
             else:
