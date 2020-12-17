@@ -89,7 +89,7 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
 
 
 def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
-    """Converts a mitiq circuit to a type specificed by the conversion type.
+    """Converts a Mitiq circuit to a type specified by the conversion type.
 
     Args:
         circuit: Mitiq circuit to convert.
