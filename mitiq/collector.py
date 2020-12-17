@@ -123,6 +123,7 @@ class Collector:
         """
         if force_run_all:
             to_run = circuits
+            batch_size = 1
         else:
             # Make circuits hashable.
             # Note: Assumes all circuits are the same type.
@@ -142,29 +143,24 @@ class Collector:
                 for circ in collection.keys()
             ]
 
-        if not self._can_batch:
-            for circuit in to_run:
-                self._call_executor(circuit, **kwargs)
+            batch_size = self._max_batch_size
+
+        if batch_size >= len(to_run):
+            self._call_executor(to_run, **kwargs)
 
         else:
-            if self._max_batch_size >= len(to_run):
-                self._call_executor(to_run, **kwargs)
-
-            else:
-                stop = len(to_run)
-                step = self._max_batch_size
-                for i in range(int(np.ceil(stop / step))):
-                    batch = to_run[i * step : (i + 1) * step]
-                    self._call_executor(batch, **kwargs)
+            stop = len(to_run)
+            step = batch_size
+            for i in range(int(np.ceil(stop / step))):
+                batch = to_run[i * step: (i + 1) * step]
+                self._call_executor(batch, **kwargs)
 
         # Expand computed results to all results using counts.
         if force_run_all:
             return self._computed_results
 
         expval_dict = dict(zip(collection.keys(), self._computed_results))
-        results = [expval_dict[key] for key in hashable_circuits]
-
-        return results
+        return [expval_dict[key] for key in hashable_circuits]
 
     def _call_executor(
         self, to_run: Union[QPROGRAM, Sequence[QPROGRAM]], **kwargs
