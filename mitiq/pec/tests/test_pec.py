@@ -34,10 +34,10 @@ DECO_DICT_SIMP = _simple_pauli_deco_dict(BASE_NOISE, simplify_paulis=True)
 NOISELESS_DECO_DICT = _simple_pauli_deco_dict(0)
 
 
-def executor(circuit: Circuit) -> float:
-    """A one- or two-qubit noisy executor function.
-    It executes the input circuit with BASE_NOISE depolarizing noise and
-    returns the expectation value of the ground state projector.
+def serial_executor(circuit: Circuit, noise: float = BASE_NOISE) -> float:
+    """A one- or two-qubit noisy executor function which executes the input
+    circuit with `noise` depolarizing noise and returns the expectation value
+    of the ground state projector.
     """
     if len(circuit.all_qubits()) == 1:
         obs = np.array([[1, 0], [0, 0]])
@@ -48,7 +48,11 @@ def executor(circuit: Circuit) -> float:
     else:
         raise ValueError("The input must be a circuit with 1 or 2 qubits.")
 
-    return noisy_simulation(circuit, BASE_NOISE, obs,)
+    return noisy_simulation(circuit, noise, obs)
+
+
+def batched_executor(circuits) -> np.ndarray:
+    return np.array([serial_executor(circuit) for circuit in circuits])
 
 
 def fake_executor(circuit: Circuit, random_state: np.random.RandomState):
@@ -65,18 +69,17 @@ qreg = LineQubit.range(2)
 twoq_circ = Circuit(Y.on(qreg[1]), CNOT.on(*qreg), Y.on(qreg[1]),)
 
 
-@pytest.mark.parametrize("seed", (100, 101))
 @pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
+@pytest.mark.parametrize("executor", [serial_executor, batched_executor])
 @pytest.mark.parametrize(
     "decomposition_dict", [NOISELESS_DECO_DICT, DECO_DICT_SIMP, DECO_DICT]
 )
-def test_execute_with_pec(
-    circuit: Circuit, decomposition_dict: DecompositionDict, seed: int
-):
+@pytest.mark.parametrize("seed", (100, 101))
+def test_execute_with_pec(circuit, executor, decomposition_dict, seed):
     """Tests that execute_with_pec mitigates the error of a noisy
     expectation value.
     """
-    unmitigated = executor(circuit)
+    unmitigated = serial_executor(circuit)
     mitigated = execute_with_pec(
         circuit,
         executor,
@@ -105,7 +108,7 @@ def test_execute_with_pec_with_different_samples(circuit: Circuit, seed: int):
     for _ in range(10):
         mitigated = execute_with_pec(
             circuit,
-            executor,
+            serial_executor,
             decomposition_dict=DECO_DICT,
             num_samples=10,
             force_run_all=False,
@@ -114,7 +117,7 @@ def test_execute_with_pec_with_different_samples(circuit: Circuit, seed: int):
         errors_few_samples.append(abs(mitigated - 1.0))
         mitigated = execute_with_pec(
             circuit,
-            executor,
+            serial_executor,
             decomposition_dict=DECO_DICT,
             num_samples=100,
             random_state=seed,
@@ -176,7 +179,9 @@ def test_bad_precision_argument(bad_value: float):
     """Tests that if 'precision' is not within (0, 1] an error is raised."""
 
     with pytest.raises(ValueError, match="The value of 'precision' should"):
-        execute_with_pec(oneq_circ, executor, DECO_DICT, precision=bad_value)
+        execute_with_pec(
+            oneq_circ, serial_executor, DECO_DICT, precision=bad_value
+        )
 
 
 @pytest.mark.skip(reason="Slow test.")
