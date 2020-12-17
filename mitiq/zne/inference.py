@@ -1754,12 +1754,6 @@ class ExpBayesFactory(BatchedFactory):
         return zne_limit, zne_error, opt_params, params_cov, zne_curve
 
     def reduce(self) -> float:
-        """Evaluates the zero-noise limit found by fitting a polynomial of degree
-        `self.order` to the internal data stored in the factory.
-
-        Returns:
-            The zero-noise limit.
-        """
         (
             self._zne_limit,
             self._zne_error,
