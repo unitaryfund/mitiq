@@ -127,11 +127,7 @@ class Collector:
             # Note: Assumes all circuits are the same type.
             _, conversion_type = convert_to_mitiq(circuits[0])
             hashable_circuits = [
-                cirq.FrozenCircuit(
-                    convert_to_mitiq(circ)[0].all_operations(),
-                    strategy=cirq.InsertStrategy.EARLIEST,
-                )
-                for circ in circuits
+                convert_to_mitiq(circ)[0].freeze() for circ in circuits
             ]
 
             # Get the unique circuits and counts
@@ -146,15 +142,11 @@ class Collector:
                 self._call_executor(circuit, **kwargs)
 
         else:
-            if self._max_batch_size >= len(to_run):
-                self._call_executor(to_run, **kwargs)
-
-            else:
-                stop = len(to_run)
-                step = self._max_batch_size
-                for i in range(int(np.ceil(stop / step))):
-                    batch = to_run[i * step: (i + 1) * step]
-                    self._call_executor(batch, **kwargs)
+            stop = len(to_run)
+            step = self._max_batch_size
+            for i in range(int(np.ceil(stop / step))):
+                batch = to_run[i * step: (i + 1) * step]
+                self._call_executor(batch, **kwargs)
 
         # Expand computed results to all results using counts.
         if force_run_all:
