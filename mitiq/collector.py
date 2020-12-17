@@ -22,7 +22,6 @@ from typing import Any, Callable, Iterable, List, Sequence, Tuple, Union
 
 import numpy as np
 
-import cirq
 from mitiq import QPROGRAM
 from mitiq.conversions import (
     convert_from_mitiq,
