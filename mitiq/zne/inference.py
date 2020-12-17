@@ -1639,9 +1639,12 @@ OptimizationHistory = List[
 ]
 
 
-class BayesFactory(BatchedFactory):
+class ExpBayesFactory(BatchedFactory):
     """Factory object implementing a zero-noise extrapolation algorithm based on
-    Bayesian Inference.
+    Bayesian Inference. The exponential ansatz for the expecation value:
+        E(lambda) = a + b * e**(-c*lambda),
+    where a, b and c are model parameters that need to be estimated,
+    while lambda is the noise scale factor.
 
     Args:
         scale_factors: Sequence of noise scale factors at which
@@ -1659,15 +1662,15 @@ class BayesFactory(BatchedFactory):
     """
 
     @staticmethod
-    def _likelihood(
+    def _exp_ansatz(
         a: float,
         b: float,
         c: float,
         scale_factor: float
     ) -> float:
-        """The likelihood function is an exponential in the scale factor:
-        E(lambda) = a + b * e**(-c*lambda),
-        where a, b and c are model parameters that need to be estimated.
+        """
+        Calculates the expecation given a scale factor and model
+        parameters.
 
         Args:
             a: Model parameter.
@@ -1727,7 +1730,7 @@ class BayesFactory(BatchedFactory):
 
             pm.Normal(
                 'expval',
-                mu=BayesFactory._likelihood(a, b, c, scale_factors),
+                mu=ExpBayesFactory._exp_ansatz(a, b, c, scale_factors),
                 sd=eps,
                 observed=exp_values,
             )
@@ -1741,9 +1744,9 @@ class BayesFactory(BatchedFactory):
         opt_params, zne_error = [a, b, c], trace['eps'].mean()
 
         def zne_curve(scale_factor: float) -> float:
-            return BayesFactory._likelihood(a, b, c, scale_factor)
+            return ExpBayesFactory._likelihood(a, b, c, scale_factor)
 
-        zne_limit = BayesFactory._likelihood(a, b, c, 0.0)
+        zne_limit = ExpBayesFactory._likelihood(a, b, c, 0.0)
         if not full_output:
             return zne_limit
 
