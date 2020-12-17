@@ -14,7 +14,7 @@ The necessary packages can be installed, from the root `mitiq` directory
 pip install -e .
 pip install -r requirements.txt
 ```
-as they are present in the `requirements.txt` file, together with the `pandoc` package. `pandoc` can be [installed](https://pandoc.org/installing.html) in various ways: it is included in the `environment.yaml` file, that gives instruction for anaconda installation. It can simply be installed with conda in an [environment](https://mitiq.readthedocs.io/en/stable/contributing.html)
+as they are present in the `requirements.txt` file, together with the `pandoc` package. `pandoc` can be [installed](https://pandoc.org/installing.html) in various ways, for example it can simply be installed with conda in an [environment](https://mitiq.readthedocs.io/en/stable/contributing.html) with
 ```bash
 conda activate myenv
 (myenv) conda install -c conda-forge pandoc
