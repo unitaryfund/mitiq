@@ -21,7 +21,7 @@ import pytest
 import numpy as np
 from cirq import Circuit, LineQubit, Y, Z, CNOT
 
-from mitiq.pec.utils import _simple_pauli_deco_dict, DecompositionDict
+from mitiq.pec.utils import _simple_pauli_deco_dict
 from mitiq.pec.pec import execute_with_pec, LargeSampleWarning
 from mitiq.benchmarks.utils import noisy_simulation
 

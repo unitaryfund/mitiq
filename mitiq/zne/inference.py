@@ -16,12 +16,10 @@
 """Classes corresponding to different zero-noise extrapolation methods."""
 from abc import ABC, abstractmethod
 from copy import deepcopy
-import inspect
 from typing import (
     Any,
     Callable,
     Dict,
-    Iterable,
     List,
     Optional,
     Sequence,
