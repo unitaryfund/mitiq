@@ -1744,9 +1744,9 @@ class ExpBayesFactory(BatchedFactory):
         opt_params, zne_error = [a, b, c], trace['eps'].mean()
 
         def zne_curve(scale_factor: float) -> float:
-            return ExpBayesFactory._likelihood(a, b, c, scale_factor)
+            return ExpBayesFactory._exp_ansatz(a, b, c, scale_factor)
 
-        zne_limit = ExpBayesFactory._likelihood(a, b, c, 0.0)
+        zne_limit = ExpBayesFactory._exp_ansatz(a, b, c, 0.0)
         if not full_output:
             return zne_limit
 
