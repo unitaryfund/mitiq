@@ -40,10 +40,11 @@ _LARGE_SAMPLE_WARN = (
 
 def execute_with_pec(
     circuit: QPROGRAM,
-    executor: Callable[[QPROGRAM], float],
+    executor: Callable,
     decomposition_dict: DecompositionDict,
     precision: float = 0.03,
     num_samples: Optional[int] = None,
+    force_run_all: bool = True,
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
 ) -> Union[float, Tuple[float, float]]:
@@ -61,19 +62,21 @@ def execute_with_pec(
 
     Args:
         circuit: The input circuit to execute with error-mitigation.
-        executor: A function which executes a circuit and returns an
-            expectation value.
+        executor: A function which executes a circuit (sequence of circuits)
+            and returns an expectation value (sequence of expectation values).
         decomposition_dict: The decomposition dictionary containing the
             quasi-probability representation of the ideal operations (those
             which are part of the input circuit).
-        num_samples: The number of noisy circuits to be sampled for PEC.
-            If not given, this is deduced from the argument 'precision'.
         precision: The desired estimation precision (assuming the observable
             is bounded by 1). The number of samples is deduced according
             to the formula (one_norm / precision) ** 2, where 'one_norm'
             is related to the negativity of the quasi-probability
             representation [Temme2017]_. If 'num_samples' is explicitly set
             by the user, 'precision' is ignored and has no effect.
+        num_samples: The number of noisy circuits to be sampled for PEC.
+            If not given, this is deduced from the argument 'precision'.
+        force_run_all: If True, all sampled circuits are executed regardless of
+            uniqueness, else a minimal unique set is executed.
         random_state: Seed for sampling circuits.
         full_output: If False only the average PEC value is returned.
             If True an estimate of the associated error is returned too.
@@ -132,9 +135,9 @@ def execute_with_pec(
         sampled_circuits.append(sampled_circuit)
         signs.append(sign)
 
-    # Execute all the circuits
+    # Execute all sampled circuits
     collected_executor = generate_collected_executor(
-        executor, force_run_all=True
+        executor, force_run_all=force_run_all
     )
     exp_values = collected_executor(sampled_circuits)
 
