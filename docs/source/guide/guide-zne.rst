@@ -682,8 +682,8 @@ and clips the result if it falls outside its physical domain.
          self.min_expval = min_expval
          self.max_expval = max_expval
 
+      @staticmethod
       def extrapolate(
-         _,
          scale_factors,
          exp_values,
          min_expval,
