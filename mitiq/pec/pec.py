@@ -17,7 +17,7 @@
 
 from typing import Optional, Callable, Union, Tuple
 import numpy as np
-from mitiq._typing import QPROGRAM
+from mitiq import generate_collected_executor, QPROGRAM
 from mitiq.pec.utils import DecompositionDict
 from mitiq.pec.sampling import sample_circuit
 
@@ -112,9 +112,11 @@ def execute_with_pec(
         sampled_circuits.append(sampled_circuit)
         signs.append(sign)
 
-    # TODO gh-412: Add support for batched executors in the PEC module
     # Execute all the circuits
-    exp_values = [executor(circ) for circ in sampled_circuits]
+    collected_executor = generate_collected_executor(
+        executor, force_run_all=True
+    )
+    exp_values = collected_executor(sampled_circuits)
 
     # Evaluate unbiased estimators [Temme2017] [Endo2018] [Takagi2020]
     unbiased_estimators = [norm * s * val for s, val in zip(signs, exp_values)]
