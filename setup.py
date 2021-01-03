@@ -37,7 +37,7 @@ setup(
         # note: this should be a subset of requirements.txt
         "numpy~=1.18.1",
         "scipy~=1.4.1",
-        "cirq~=0.9.1",
+        "cirq==0.10.0.dev20201203012958",
     ],
     extras_require={
         'development': set(requirements),
