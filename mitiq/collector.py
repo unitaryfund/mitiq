@@ -132,7 +132,7 @@ class Collector:
             # Get the unique circuits and counts
             collection = Counter(hashable_circuits)
             to_run = [
-                convert_from_mitiq(circ, conversion_type)
+                convert_from_mitiq(circ.unfreeze(), conversion_type)
                 for circ in collection.keys()
             ]
 
