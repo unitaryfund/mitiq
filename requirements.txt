@@ -5,7 +5,7 @@ cirq==0.10.0.dev20201203012958
 # third-party integration
 pyquil~=2.18.0
 qiskit-aer>0.7
-qiskit-ibmq-provider>0.11
+qiskit-terra>0.17
 
 # to test the code
 pytest~=5.4.1
