@@ -38,7 +38,6 @@ setup(
     install_requires=requirements,
     extras_require={
         'development': set(dev_requirements),
-        'test': dev_requirements,
     },
     packages=find_packages(),
     include_package_data=True,
