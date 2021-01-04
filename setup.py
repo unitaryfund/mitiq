@@ -21,6 +21,9 @@ with open("VERSION.txt", "r") as f:
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
+with open('dev_requirements.txt') as f:
+    dev_requirements = f.read().splitlines()
+
 # save the source code in _version.py
 with open("mitiq/_version.py", "r") as f:
     version_file_source = f.read()
@@ -32,16 +35,10 @@ with open("mitiq/_version.py", "w") as f:
 setup(
     name='mitiq',
     version=__version__,
-    install_requires=[
-        # The minimum spec for a working mitiq install
-        # note: this should be a subset of requirements.txt
-        "numpy~=1.18.1",
-        "scipy~=1.4.1",
-        "cirq==0.10.0.dev20201203012958",
-    ],
+    install_requires=requirements,
     extras_require={
-        'development': set(requirements),
-        'test': requirements,
+        'development': set(dev_requirements),
+        'test': dev_requirements,
     },
     packages=find_packages(),
     include_package_data=True,
