@@ -40,7 +40,7 @@ format:
 
 .PHONY: install
 install:
-	pip install -e .
+	pip install -e .[development]
 
 .PHONY: pdf
 pdf:
