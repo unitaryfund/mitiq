@@ -110,7 +110,7 @@ def test_init_with_qiskit_circuit():
     qreg = qiskit.QuantumRegister(2)
     circ = qiskit.QuantumCircuit(qreg)
     _ = circ.h(qreg[0])
-    _ = circ.cnot(*qreg)
+    _ = circ.cx(*qreg)
 
     cirq_qreg = cirq.LineQubit.range(2)
     cirq_circ = cirq.Circuit(cirq.H.on(cirq_qreg[0]), cirq.CNOT.on(*cirq_qreg))
