@@ -120,7 +120,7 @@ following example, we fold a Qiskit circuit.
     >>> qreg = qiskit.QuantumRegister(2)
     >>> circ = qiskit.QuantumCircuit(qreg)
     >>> _ = circ.h(qreg[0])
-    >>> _ = circ.cnot(qreg[0], qreg[1])
+    >>> _ = circ.cx(qreg[0], qreg[1])
     >>> print("Original circuit:", circ, sep="\n") # doctest: +SKIP +NORMALIZE_WHITESPACE
     Original circuit:
            ┌───┐

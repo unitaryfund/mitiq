@@ -324,7 +324,7 @@ to be used in ``mitiq``.
 
     qc = QuantumCircuit(2)
     qc.x(0)
-    qc.cnot(0, 1)
+    qc.cx(0, 1)
     assert np.isclose(qs_wvf_sim(qc, obs=np.diag([1, 0, 0, 0])), 0.0)
     assert np.isclose(qs_wvf_sim(qc, obs=np.diag([0, 0, 0, 1])), 1.0)
 
@@ -394,7 +394,7 @@ behind how this example is available `here <https://quantumcomputing.stackexchan
 
     qc = QuantumCircuit(2)
     qc.h(0)
-    qc.cnot(0, 1)
+    qc.cx(0, 1)
     out = qs_wvf_sampling_sim(qc, obs=np.diag([0, 0, 0, 1]), shots=50)
     assert 0.0 < out < 1.0
     out = qs_wvf_sampling_sim(qc, obs=np.diag([0, 0, 0, 1]), shots=int(1e5))
