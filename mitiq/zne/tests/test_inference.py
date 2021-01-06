@@ -575,7 +575,7 @@ def test_avoid_log_keyword():
     fac = ExpFactory(X_VALS, asymptote=A, avoid_log=False)
     fac.run_classical(f_exp_down)
     znl_with_log = fac.reduce()
-    fac.avoid_log = True
+    fac._options['avoid_log'] = True
     znl_without_log = fac.reduce()
     assert not znl_with_log == znl_without_log
 
@@ -660,8 +660,9 @@ def test_adaptive_factory_max_iteration_warnings():
         fac.run_classical(lambda scale_factor: 1.0, max_iterations=3)
 
 
-def test_equal_simple():
-    fac = LinearFactory(scale_factors=[1, 2, 3])
+@mark.parametrize("factory", [LinearFactory, ExpFactory])
+def test_equal_simple(factory):
+    fac = factory(scale_factors=[1, 2, 3])
     assert fac != 1
 
     copied_fac = copy(fac)
