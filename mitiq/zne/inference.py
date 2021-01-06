@@ -16,12 +16,10 @@
 """Classes corresponding to different zero-noise extrapolation methods."""
 from abc import ABC, abstractmethod
 from copy import deepcopy
-import inspect
 from typing import (
     Any,
     Callable,
     Dict,
-    Iterable,
     List,
     Optional,
     Sequence,
@@ -35,6 +33,7 @@ from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
 
 from mitiq import QPROGRAM
+from mitiq.collector import Collector
 from mitiq.utils import _are_close_dict
 
 
@@ -517,7 +516,7 @@ class BatchedFactory(Factory, ABC):
         # Get the list of keywords associated to each circuit in "to_run"
         kwargs_list = self._get_keyword_args(num_to_average)
 
-        if self._is_executor_batched(executor):
+        if Collector.is_batched_executor(executor):
             if all([kwargs == {} for kwargs in kwargs_list]):
                 res = executor(to_run)
             else:

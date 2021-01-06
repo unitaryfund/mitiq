@@ -20,7 +20,12 @@ import cirq
 from pyquil import Program, gates
 import qiskit
 
-from mitiq.conversions import convert_to_mitiq, convert_from_mitiq, converter
+from mitiq.conversions import (
+    convert_to_mitiq,
+    convert_from_mitiq,
+    converter,
+    UnsupportedCircuitError,
+)
 from mitiq.utils import _equal
 
 # Cirq Bell circuit
@@ -51,6 +56,15 @@ def test_to_mitiq(circuit):
     converted_circuit, input_type = convert_to_mitiq(circuit)
     assert _equal(converted_circuit, cirq_circuit)
     assert input_type in circuit.__module__
+
+
+@pytest.mark.parametrize("item", ("circuit", 1, None))
+def test_to_mitiq_bad_types(item):
+    with pytest.raises(
+        UnsupportedCircuitError,
+        match="Could not determine the package of the input circuit.",
+    ):
+        convert_to_mitiq(item)
 
 
 @pytest.mark.parametrize("to_type", ("qiskit", "pyquil"))
