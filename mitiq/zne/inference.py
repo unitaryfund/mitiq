@@ -1726,6 +1726,8 @@ class ExpBayesFactory(BatchedFactory):
             a = pm.Uniform('a', 0, 1)
             b = pm.Uniform('b', -1, 1)
             c = pm.Uniform('c', 0, 1)
+
+            # Noise parameter
             eps = pm.Uniform('eps', 0, 0.5)
 
             pm.Normal(

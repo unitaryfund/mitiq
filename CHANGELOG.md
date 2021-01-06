@@ -12,6 +12,7 @@
 
 ### All Changes
 - Add a new FakeNodesFactory class based on an alternative interpolation method (@elmandouh, gh-444).
+- Remove duplication of the reduce method in every (non-adaptive) factory (@elmandouh, gh-470).
 - Add a new ExpBayesFactory class based on Bayesian Inference (@elmandouh, gh-471).
 ## Version 0.4.0 (December 6th, 2020)
 
