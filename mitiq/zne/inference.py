@@ -436,39 +436,6 @@ class BatchedFactory(Factory, ABC):
         self._already_reduced = True
         return self._zne_limit
 
-    @staticmethod
-    def _is_executor_batched(
-        executor: Union[Callable[..., float], Callable[..., List[float]]],
-    ) -> bool:
-        """Returns True if the input function is recognized as a "batched
-        executor".
-
-        The executor is detected as "batched" only if it is annotated with
-        a return type that is one of the following:
-            * Iterable[float]
-            * List[float]
-            * Sequence[float]
-            * Tuple[float]
-            * numpy.ndarray
-
-        Args:
-            executor: A "single executor" (1) or a "batched executor" (2).
-                (1) A function which inputs a single circuit and outputs a
-                single expectation value of interest.
-                (2) A function which inputs a list of circuits and outputs a
-                list of expectation values (one for each circuit).
-
-        Returns: True if the executor is detected as batched, False otherwise.
-        """
-        executor_annotation = inspect.getfullargspec(executor).annotations
-        return executor_annotation.get("return") in (
-            List[float],
-            Sequence[float],
-            Tuple[float],
-            Iterable[float],
-            np.ndarray,
-        )
-
     def run(
         self,
         qp: QPROGRAM,
