@@ -8,10 +8,25 @@
 [//]: # " - [Bug Fix]"
 [//]: # " - Fix the bug."
 
+
 ## Version 0.5.0 (In Development)
 
 ### All Changes
 
+## Version 0.4.1 (January 11th, 2021)
+
+### Summary
+This patch-release fixes a bug in the documentation related to the IBM example section.
+
+
+### All Changes
+
+- Add a new FakeNodesFactory class based on an alternative interpolation method (@elmandouh, gh-444).
+- Remove duplication of the reduce method in every (non-adaptive) factory (@elmandouh, gh-470).
+- Fix PEC test with seed (@rmlarose, gh-481).
+- Adds Collector for efficiently collecting expectation values (@rmlarose, gh-457).
+- Fix IBMQ guide (@rmlarose, gh-488).
+- Update to development version. Fixes and clarifications in release docs (@rmlarose, gh-469).
 
 ## Version 0.4.0 (December 6th, 2020)
 
