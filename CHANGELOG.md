@@ -18,7 +18,6 @@
 ### Summary
 This patch-release fixes a bug in the documentation related to the IBM example section.
 
-
 ### All Changes
 
 - Add a new FakeNodesFactory class based on an alternative interpolation method (@elmandouh, gh-444).
