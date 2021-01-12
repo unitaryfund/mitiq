@@ -12,6 +12,14 @@
 
 ### All Changes
 
+## Version 0.4.1 (January 12th, 2021)
+
+### Summary
+
+This release fixes a bug in the docs.
+
+### All Changes
+- [Bug Fix] Fix IBMQ guide (@rmlarose, gh-488).
 
 ## Version 0.4.0 (December 6th, 2020)
 
