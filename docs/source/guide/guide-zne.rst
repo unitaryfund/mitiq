@@ -418,7 +418,7 @@ In this case the factory will pass the number of shots from the `shot_list` to t
 `executor` should support a `shots` keyword argument, otherwise the shot values will go unused.
 
 ------------------------------------------------------
-Using batched executors with :class:`.BatchedFactory`s
+Using batched executors with :class:`.BatchedFactory`
 ------------------------------------------------------
 
 As mentioned, :class:`.BatchedFactory` objects are such that all circuits to execute can be precomputed. This is in
