@@ -727,7 +727,7 @@ class PolyFactory(BatchedFactory):
                 "The extrapolation order cannot exceed len(scale_factors) - 1."
             )
         super(PolyFactory, self).__init__(scale_factors, shot_list)
-        self._options = {'order': order}
+        self._options = {"order": order}
 
     @staticmethod
     def extrapolate(
@@ -799,9 +799,9 @@ class PolyFactory(BatchedFactory):
 
     def __eq__(self, other: Any) -> bool:
         return (
-            BatchedFactory.__eq__(self, other) and
-            self._options['order'] == other._options['order']
-         )
+            BatchedFactory.__eq__(self, other)
+            and self._options["order"] == other._options["order"]
+        )
 
 
 class RichardsonFactory(BatchedFactory):
@@ -1110,8 +1110,8 @@ class ExpFactory(BatchedFactory):
                 "The argument 'asymptote' must be either a float or None"
             )
         self._options = {
-            'asymptote': asymptote,
-            'avoid_log': avoid_log,
+            "asymptote": asymptote,
+            "avoid_log": avoid_log,
         }
 
     @staticmethod
@@ -1193,27 +1193,26 @@ class ExpFactory(BatchedFactory):
         if not isinstance(other, ExpFactory):
             return False
         if (
-            self._options['asymptote'] and
-            other._options['asymptote'] is None or
-            self._options['asymptote'] is None and
-            other._options['asymptote']
+            self._options["asymptote"]
+            and other._options["asymptote"] is None
+            or self._options["asymptote"] is None
+            and other._options["asymptote"]
         ):
             return False
         if (
-            self._options['asymptote'] is None and
-            other._options['asymptote'] is None
+            self._options["asymptote"] is None
+            and other._options["asymptote"] is None
         ):
             return (
                 BatchedFactory.__eq__(self, other)
-                and self._options['avoid_log'] == other._options['avoid_log']
+                and self._options["avoid_log"] == other._options["avoid_log"]
             )
         return (
             BatchedFactory.__eq__(self, other)
             and np.isclose(
-                self._options['asymptote'],
-                other._options['asymptote'],
+                self._options["asymptote"], other._options["asymptote"],
             )
-            and self._options['avoid_log'] == other._options['avoid_log']
+            and self._options["avoid_log"] == other._options["avoid_log"]
         )
 
 
@@ -1496,11 +1495,10 @@ class PolyExpFactory(BatchedFactory):
             BatchedFactory.__eq__(self, other)
             and isinstance(other, PolyExpFactory)
             and np.isclose(
-                self._options['asymptote'],
-                other._options['asymptote'],
+                self._options["asymptote"], other._options["asymptote"],
             )
-            and self._options['avoid_log'] == other._options['avoid_log']
-            and self._options['order'] == other._options['order']
+            and self._options["avoid_log"] == other._options["avoid_log"]
+            and self._options["order"] == other._options["order"]
         )
 
 
