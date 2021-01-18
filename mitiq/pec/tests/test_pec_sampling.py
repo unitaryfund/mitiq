@@ -149,8 +149,11 @@ def test_sample_sequence_choi(gate: Gate):
     ideal_choi = _operation_to_choi(gate.on(*qreg))
     noisy_choi = _operation_to_choi(noisy_op_tree)
     choi_unbiased_estimates = []
+    rng = np.random.RandomState(1)
     for _ in range(500):
-        imp_seq, sign, norm = sample_sequence(gate.on(*qreg), DECO_DICT)
+        imp_seq, sign, norm = sample_sequence(
+            gate.on(*qreg), DECO_DICT, random_state=rng
+        )
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.
         noisy_sequence = [imp_seq] + [depolarize(BASE_NOISE)(q) for q in qreg]

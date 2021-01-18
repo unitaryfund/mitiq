@@ -277,6 +277,7 @@ class NoisyBasis:
     """A set of noisy operations which a quantum computer can actually
     implement, assumed to form a basis of n-qubit unitary matrices.
     """
+
     def __init__(self, *basis_elements: NoisyOperation) -> None:
         """Initializes a NoisyBasis.
 
@@ -365,6 +366,7 @@ class OperationDecomposition:
     """A decomposition, or basis expansion, of an operation (or sequence of
     operations) in a basis of noisy, implementable operations.
     """
+
     def __init__(
         self, ideal: QPROGRAM, basis_expansion: Dict[NoisyOperation, float]
     ) -> None:
@@ -466,7 +468,5 @@ class OperationDecomposition:
                 f"but was {type(random_state)}."
             )
 
-        noisy_op = rng.choice(
-            self.noisy_operations, p=self.distribution()
-        )
+        noisy_op = rng.choice(self.noisy_operations, p=self.distribution())
         return self.sign_of(noisy_op), self.coeff_of(noisy_op), noisy_op

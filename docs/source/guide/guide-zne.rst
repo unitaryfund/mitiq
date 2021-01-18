@@ -418,7 +418,7 @@ In this case the factory will pass the number of shots from the `shot_list` to t
 `executor` should support a `shots` keyword argument, otherwise the shot values will go unused.
 
 ------------------------------------------------------
-Using batched executors with :class:`.BatchedFactory`s
+Using batched executors with :class:`.BatchedFactory`
 ------------------------------------------------------
 
 As mentioned, :class:`.BatchedFactory` objects are such that all circuits to execute can be precomputed. This is in
@@ -637,7 +637,7 @@ Typically, the ``self.__init__`` method must be overridden.
 
 A new non-adaptive method can instead be derived from the abstract :class:`.BatchedFactory` class.
 In this case it is usually sufficient to override only the ``self.__init__`` and
-the ``self.reduce`` methods, which are responsible for the initialization and for the
+the ``self.extrapolate`` methods, which are responsible for the initialization and for the
 final zero-noise extrapolation, respectively.
 
 ---------------------------------------------
@@ -682,7 +682,13 @@ and clips the result if it falls outside its physical domain.
          self.min_expval = min_expval
          self.max_expval = max_expval
 
-      def reduce(self) -> float:
+      @staticmethod
+      def extrapolate(
+         scale_factors,
+         exp_values,
+         min_expval,
+         max_expval,
+      ) -> float:
          """
          Fit a linear model and clip its zero-noise limit.
 
@@ -691,22 +697,38 @@ and clips the result if it falls outside its physical domain.
          """
          # Fit a line and get the optimal parameters (slope, intercept)
          opt_params, _ = mitiq_polyfit(
-            self.get_scale_factors(), self.get_expectation_values(), deg=1
+            scale_factors, exp_values, deg=1
         )
 
          # Return the clipped zero-noise extrapolation.
-         return np.clip(opt_params[-1], self.min_expval, self.max_expval)
+         return np.clip(opt_params[-1], min_expval, max_expval)
+
 
 .. testcleanup::
 
    fac = MyFactory([1, 2, 3], min_expval=0.0, max_expval=2.0)
    fac.run_classical(noise_to_expval)
-   assert np.isclose(fac.reduce(), 1.0, atol=0.1)
+   assert np.isclose(
+      fac.extrapolate(
+         fac.get_scale_factors(),
+         fac.get_expectation_values(),
+         fac.min_expval,
+         fac.max_expval
+      ),
+      1.0, atol=0.1
+   )
    # Linear model with a large zero-noise limit
    noise_to_large_expval = lambda x : noise_to_expval(x) + 10.0
    fac.run_classical(noise_to_large_expval)
    # assert the output is clipped to 2.0
-   assert np.isclose(fac.reduce(), 2.0)
+   assert np.isclose(
+      fac.extrapolate(
+         fac.get_scale_factors(),
+         fac.get_expectation_values(),
+         fac.min_expval,
+         fac.max_expval
+      ), 2.0
+   )
 
 This custom factory can be used in exactly the same way as we have
 shown in the previous section. By simply replacing ``LinearFactory``

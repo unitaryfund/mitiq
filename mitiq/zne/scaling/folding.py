@@ -386,6 +386,7 @@ def fold_gates_from_left(
 
     tot = 0.0
     moment_shift = 0
+    # Get weight at particular moment and gate index then fold gate
     for (moment_index, moment) in enumerate(circuit):
         for gate_index in range(len(moment)):
             op = folded[moment_index + moment_shift].operations[gate_index]
@@ -393,14 +394,14 @@ def fold_gates_from_left(
                 weight = _get_weight_for_gate(weights, op)
             else:
                 weight = 1
-
+            # Fold the gate
             if weight > 0.0:
                 _fold_gate_at_index_in_moment(
                     folded, moment_index + moment_shift, gate_index
                 )
                 moment_shift += 2
                 tot += weight
-
+            # Append measurements after stop condition is satisfied
             if tot >= stop:
                 _append_measurements(folded, measurements)
                 if not (kwargs.get("squash_moments") is False):
@@ -468,11 +469,12 @@ def fold_gates_from_right(
     Returns:
         folded: The folded quantum circuit as a QPROGRAM.
     """
+    # Check inputs and handle keyword arguments
     _check_foldable(circuit)
-
+    # Copy the circuit and remove measurements
     circuit = deepcopy(circuit)
     measurements = _pop_measurements(circuit)
-
+    # Gates are folded from left after iteration order is reversed
     reversed_circuit = Circuit(reversed(circuit.moments))
     reversed_folded_circuit = fold_gates_from_left(
         reversed_circuit,
@@ -480,6 +482,7 @@ def fold_gates_from_right(
         fidelities=kwargs.get("fidelities"),
         squash_moments=False,
     )
+    # Correct reversed iteration
     folded = Circuit(reversed(reversed_folded_circuit))
 
     _append_measurements(folded, measurements)

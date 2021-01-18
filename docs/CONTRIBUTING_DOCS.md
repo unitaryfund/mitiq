@@ -110,11 +110,12 @@ classes and functions to add, to comment them, as well as exclude them.
 
 #### Build the documentation locally
 - To build the documentation, from `bash`, move to the `docs` folder and run
+
 ```bash
 sphinx-build -b html source build
 ```
 this generates the `docs/build` folder. This folder is not kept track of in the
- github repository, as `docs/build` is present in the `.gitignore` file.
+github repository, as `docs/build` is present in the `.gitignore` file.
 
 
 The `html` and `latex`  and `pdf` files will be automatically created in the
