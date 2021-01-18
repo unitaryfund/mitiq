@@ -648,3 +648,25 @@ def test_decomposition_sample_zero_coefficient():
         assert sign == 1
         assert coeff == 0.5
         assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq.X))
+
+
+def test_print_cirq_operation_decomposition():
+    ideal = cirq.Circuit(cirq.H(cirq.LineQubit(0)))
+
+    noisy_xop = NoisyOperation.from_cirq(
+        ideal=cirq.X, real=np.zeros(shape=(4, 4))
+    )
+    noisy_zop = NoisyOperation.from_cirq(
+        ideal=cirq.Z, real=np.zeros(shape=(4, 4))
+    )
+
+    decomp = OperationDecomposition(
+        ideal=ideal,
+        basis_expansion={
+            noisy_xop: 0.5,
+            noisy_zop: 0.5,
+        },
+    )
+
+    expected = r"0: ───H─── = 0.500*0: ───X───+0.500*0: ───Z───"
+    assert str(decomp) == expected

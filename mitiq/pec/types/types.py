@@ -481,3 +481,6 @@ class OperationDecomposition:
 
         noisy_op = rng.choice(self.noisy_operations, p=self.distribution())
         return noisy_op, int(self.sign_of(noisy_op)), self.coeff_of(noisy_op)
+
+    def __str__(self):
+        return str(self._ideal) + " = " + str(self.basis_expansion)
