@@ -12,7 +12,7 @@
 
 ### All Changes
 - Add a new FakeNodesFactory class based on an alternative interpolation method (@elmandouh, gh-444).
-- Add angle calibration noise tomography to find base noise for parameter noise (@yhindy, gh-411).
+- Add parameter calibration method to find base noise for parameter noise (@yhindy, gh-411).
 
 ## Version 0.4.0 (December 6th, 2020)
 

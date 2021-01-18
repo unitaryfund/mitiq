@@ -188,7 +188,8 @@ def _poor_mans_tomography(
         qubit: int,
         depth: int = 100) -> float:
     """
-    Given an executor and a gate, determines the effective "sigma"
+    Given an executor and a gate, determines the effective
+    variance in the control parameter
     that can be used for parameter noise scaling later on.
 
     Args:
