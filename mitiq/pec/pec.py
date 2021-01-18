@@ -15,14 +15,14 @@
 
 """High-level probabilistic error cancellation tools."""
 
-from typing import Optional, Callable, Union, Tuple
+from typing import Optional, Callable, List, Union, Tuple
 import warnings
 
 import numpy as np
 
 from mitiq import generate_collected_executor, QPROGRAM
-from mitiq.pec.utils import DecompositionDict
-from mitiq.pec.sampling import sample_circuit
+from mitiq.pec.sampling import _sample_circuit
+from mitiq.pec.types import OperationDecomposition
 
 
 class LargeSampleWarning(Warning):
@@ -41,7 +41,7 @@ _LARGE_SAMPLE_WARN = (
 def execute_with_pec(
     circuit: QPROGRAM,
     executor: Callable,
-    decomposition_dict: DecompositionDict,
+    decompositions: List[OperationDecomposition],
     precision: float = 0.03,
     num_samples: Optional[int] = None,
     force_run_all: bool = True,
@@ -64,9 +64,8 @@ def execute_with_pec(
         circuit: The input circuit to execute with error-mitigation.
         executor: A function which executes a circuit (sequence of circuits)
             and returns an expectation value (sequence of expectation values).
-        decomposition_dict: The decomposition dictionary containing the
-            quasi-probability representation of the ideal operations (those
-            which are part of the input circuit).
+        decompositions: Decompositions (basis expansions) of each operation in
+            the input circuit.
         precision: The desired estimation precision (assuming the observable
             is bounded by 1). The number of samples is deduced according
             to the formula (one_norm / precision) ** 2, where 'one_norm'
@@ -109,7 +108,7 @@ def execute_with_pec(
         random_state = np.random.RandomState(random_state)
 
     # Get the 1-norm of the circuit quasi-probability representation
-    _, _, norm = sample_circuit(circuit, decomposition_dict)
+    _, _, norm = _sample_circuit(circuit, decompositions)
 
     if not (0 < precision <= 1):
         raise ValueError(
@@ -129,8 +128,8 @@ def execute_with_pec(
     signs = []
 
     for _ in range(num_samples):
-        sampled_circuit, sign, _ = sample_circuit(
-            circuit, decomposition_dict, random_state
+        sampled_circuit, sign, _ = _sample_circuit(
+            circuit, decompositions, random_state
         )
         sampled_circuits.append(sampled_circuit)
         signs.append(sign)
