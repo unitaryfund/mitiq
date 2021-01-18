@@ -62,7 +62,7 @@ class NoisyOperation:
 
     @staticmethod
     def from_cirq(
-        ideal: cirq.CIRCUIT_LIKE, real: np.ndarray
+        ideal: cirq.CIRCUIT_LIKE, real: Optional[np.ndarray] = None
     ) -> "NoisyOperation":
         if isinstance(ideal, cirq.Gate):
             qubits = tuple(cirq.LineQubit.range(ideal.num_qubits()))
@@ -304,7 +304,7 @@ class NoisyBasis:
         self._basis_elements = set(basis_elements)
 
     @property
-    def elements(self):
+    def elements(self) -> Set[NoisyOperation]:
         return self._basis_elements
 
     def all_qubits(self) -> Set[cirq.Qid]:
@@ -373,8 +373,8 @@ class NoisyBasis:
 
 
 class OperationDecomposition:
-    """A decomposition, or basis expansion, of an operation (or sequence of
-    operations) in a basis of noisy, implementable operations.
+    """A decomposition (basis expansion) of an operation or sequence of
+    operations in a basis of noisy, implementable operations.
     """
 
     def __init__(
@@ -391,7 +391,8 @@ class OperationDecomposition:
             TypeError: If all keys of `basis_expansion` are not instances of
                 `NoisyOperation`s.
         """
-        self._ideal = ideal
+        self._native_ideal = ideal
+        self._ideal, self._native_type = convert_to_mitiq(ideal)
 
         if not all(
             isinstance(op, NoisyOperation) for op in basis_expansion.keys()
@@ -462,7 +463,7 @@ class OperationDecomposition:
 
     def sample(
         self, random_state: Optional[np.random.RandomState] = None
-    ) -> Tuple[float, float, NoisyOperation]:
+    ) -> Tuple[NoisyOperation, int, float]:
         """Returns a randomly sampled NoisyOperation from the basis expansion.
 
         Args:
@@ -479,4 +480,4 @@ class OperationDecomposition:
             )
 
         noisy_op = rng.choice(self.noisy_operations, p=self.distribution())
-        return self.sign_of(noisy_op), self.coeff_of(noisy_op), noisy_op
+        return noisy_op, int(self.sign_of(noisy_op)), self.coeff_of(noisy_op)

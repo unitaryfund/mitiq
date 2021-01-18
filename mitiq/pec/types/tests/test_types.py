@@ -596,8 +596,8 @@ def test_decomposition_sample():
     _, noisy_xop, noisy_zop, decomp = get_test_decomp()
 
     for _ in range(10):
-        sign, coeff, noisy_op = decomp.sample()
-        assert sign in (-1.0, 1.0)
+        noisy_op, sign, coeff = decomp.sample()
+        assert sign in (-1, 1)
         assert coeff in (-0.5, 0.5)
         assert noisy_op in (noisy_xop, noisy_zop)
 
@@ -611,8 +611,8 @@ def test_decomposition_sample_seed():
     seed1 = np.random.RandomState(seed=1)
     seed2 = np.random.RandomState(seed=1)
     for _ in range(10):
-        sign1, coeff1, _ = decomp.sample(random_state=seed1)
-        sign2, coeff2, _ = decomp.sample(random_state=seed2)
+        _, sign1, coeff1 = decomp.sample(random_state=seed1)
+        _, sign2, coeff2 = decomp.sample(random_state=seed2)
 
         assert sign1 == sign2
         assert np.isclose(coeff1, coeff2)
@@ -644,7 +644,7 @@ def test_decomposition_sample_zero_coefficient():
 
     random_state = np.random.RandomState(seed=1)
     for _ in range(500):
-        sign, coeff, noisy_op = decomp.sample(random_state=random_state)
+        noisy_op, sign, coeff = decomp.sample(random_state=random_state)
         assert sign == 1
         assert coeff == 0.5
         assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq.X))
