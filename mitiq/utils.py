@@ -153,7 +153,7 @@ class CircuitMismatchException(Exception):
     pass
 
 
-def _generate_pmt_circuit(
+def _generate_pc_circuit(
         qubits: Iterable,
         depth: int,
         gate: EigenGate) -> Circuit:
@@ -167,7 +167,7 @@ def _generate_pmt_circuit(
         depth: the length of the circuit to create
         gate: the base gate to apply several times
     Returns:
-        circuit: a PMT circuit that can be used for profiling
+        circuit: a pc circuit that can be used for profiling
     """
     rotation_angle = 2*np.pi / depth
     moments: List[ops.Moment] = []
@@ -182,7 +182,7 @@ def _generate_pmt_circuit(
     return Circuit(moments)
 
 
-def _poor_mans_tomography(
+def _parameter_calibration(
         executor: Callable[..., float],
         gate: Gate,
         qubit: int,
@@ -205,7 +205,7 @@ def _poor_mans_tomography(
     """
 
     base_gate = _get_base_gate(gate)
-    circuit = _generate_pmt_circuit([qubit], depth, base_gate)
+    circuit = _generate_pc_circuit([qubit], depth, base_gate)
     expectation = executor(circuit)
     Q = (1 - np.power(2*expectation-1, 1/depth))/2
     sigma = -0.5*np.log(1 - 2*Q)
