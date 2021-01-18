@@ -192,6 +192,47 @@ def test_sample_circuit_pyquil():
         assert norm >= 1
 
 
+def test_sample_circuit_with_seed():
+    circ = Circuit([X.on(LineQubit(0)) for _ in range(10)])
+    decomp = OperationDecomposition(
+        ideal=cirq.Circuit(cirq.X.on(cirq.LineQubit(0))),
+        basis_expansion={
+            NoisyOperation.from_cirq(cirq.Z): 1.0,
+            NoisyOperation.from_cirq(cirq.X): -1.0,
+        }
+    )
+
+    expected_circuit, expected_sign, expected_norm = _sample_circuit(
+        circ, [decomp], random_state=4
+    )
+
+    # Check we're not sampling the same operation every call to sample_sequence
+    assert len(set(expected_circuit.all_operations())) > 1
+
+    for _ in range(10):
+        sampled_circuit, sampled_sign, sampled_norm = _sample_circuit(
+            circ, [decomp], random_state=4
+        )
+        assert _equal(sampled_circuit, expected_circuit)
+        assert sampled_sign == expected_sign
+        assert sampled_norm == expected_norm
+
+
+def test_sample_circuit_trivial_decomposition():
+    circuit = cirq.Circuit(cirq.ops.H.on(cirq.NamedQubit("Q")))
+    decomp = OperationDecomposition(
+        ideal=circuit,
+        basis_expansion={NoisyOperation(circuit): 1.0}
+    )
+
+    sampled_circuit, sign, norm = _sample_circuit(
+        circuit, [decomp], random_state=1
+    )
+    assert _equal(sampled_circuit, circuit)
+    assert sign == 1
+    assert np.isclose(norm, 1)
+
+
 # Old tests.
 BASE_NOISE = 0.02
 DECO_DICT = _simple_pauli_deco_dict(BASE_NOISE)
@@ -201,27 +242,6 @@ NOISELESS_DECO_DICT = _simple_pauli_deco_dict(0)
 # Simple 2-qubit circuit
 qreg = LineQubit.range(2)
 twoq_circ = Circuit(X.on(qreg[0]), CNOT.on(*qreg),)
-
-
-def test_sample_circuit_with_seed():
-    decomp = _simple_pauli_deco_dict(0.7, simplify_paulis=True)
-    circ = Circuit([X.on(LineQubit(0)) for _ in range(10)])
-
-    expected = sample_circuit(circ, decomp, random_state=4)[0]
-
-    # Check we're not sampling the same operation every call to sample_sequence
-    assert len(set(expected.all_operations())) > 1
-
-    for _ in range(10):
-        sampled = sample_circuit(circ, decomp, random_state=4)[0]
-        assert _equal(sampled, expected)
-
-
-def test_sample_circuit_types_trivial():
-    imp_circuit, sign, norm = sample_circuit(twoq_circ, NOISELESS_DECO_DICT)
-    assert imp_circuit == twoq_circ
-    assert sign == 1
-    assert np.isclose(norm, 1)
 
 
 @pytest.mark.parametrize("gate", [Y, CNOT])
