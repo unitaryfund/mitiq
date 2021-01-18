@@ -85,7 +85,7 @@ class NoisyOperation:
         return NoisyOperation(ideal, real)
 
     def _init_from_cirq(
-            self, ideal: cirq.Circuit, real: Optional[np.ndarray] = None
+        self, ideal: cirq.Circuit, real: Optional[np.ndarray] = None
     ) -> None:
         """Initializes a noisy operation expressed as a Cirq circuit.
 
