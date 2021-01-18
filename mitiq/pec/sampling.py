@@ -21,11 +21,39 @@ import numpy as np
 
 from cirq import Operation, Circuit
 
+from mitiq import QPROGRAM
+from mitiq.utils import _equal
+from mitiq.conversions import convert_to_mitiq
+from mitiq.pec.types import OperationDecomposition
 from mitiq.pec.utils import (
     DecompositionDict,
     get_one_norm,
     get_probabilities,
 )
+
+
+def _sample_sequence(
+    ideal_operation: QPROGRAM,
+    decompositions: List[OperationDecomposition],
+    random_state: Optional[Union[int, np.random.RandomState]] = None,
+) -> Tuple[QPROGRAM, int, float]:
+    # Grab the decomposition for the given ideal operation.
+    ideal, _ = convert_to_mitiq(ideal_operation)
+    operation_decomposition = None
+    for decomposition in decompositions:
+        if _equal(decomposition.ideal, ideal):
+            operation_decomposition = decomposition
+            break
+
+    if operation_decomposition is None:
+        raise ValueError(
+            f"Decomposition for ideal operation {ideal_operation} not found "
+            f"in provided decompositions."
+        )
+
+    # Sample from this decomposition.
+    noisy_operation, sign, _ = operation_decomposition.sample(random_state)
+    return noisy_operation.ideal_circuit(), sign, operation_decomposition.norm
 
 
 def sample_sequence(

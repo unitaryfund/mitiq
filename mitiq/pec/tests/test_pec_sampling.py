@@ -39,6 +39,87 @@ from mitiq.pec.utils import (
 )
 from mitiq.pec.sampling import sample_sequence, sample_circuit
 
+
+import cirq
+import pyquil
+import qiskit
+
+from mitiq.pec.sampling import _sample_sequence
+from mitiq.pec.types import NoisyOperation, OperationDecomposition
+
+
+def test_sample_sequence_cirq():
+    circuit = cirq.Circuit(cirq.H(cirq.LineQubit(0)))
+
+    noisy_xop = NoisyOperation.from_cirq(ideal=cirq.X)
+    noisy_zop = NoisyOperation.from_cirq(ideal=cirq.Z)
+
+    decomp = OperationDecomposition(
+        ideal=circuit,
+        basis_expansion={
+            noisy_xop: 0.5,
+            noisy_zop: -0.5,
+        },
+    )
+
+    for _ in range(50):
+        seq, sign, norm = _sample_sequence(circuit, decompositions=[decomp])
+        assert isinstance(seq, cirq.Circuit)
+        assert sign in {1, -1}
+        assert norm == 1.0
+
+
+def test_sample_sequence_qiskit():
+    qreg = qiskit.QuantumRegister(1)
+    circuit = qiskit.QuantumCircuit(qreg)
+    _ = circuit.h(qreg)
+
+    xcircuit = qiskit.QuantumCircuit(qreg)
+    _ = xcircuit.x(qreg)
+
+    zcircuit = qiskit.QuantumCircuit(qreg)
+    _ = zcircuit.z(qreg)
+
+    noisy_xop = NoisyOperation(xcircuit)
+    noisy_zop = NoisyOperation(zcircuit)
+
+    decomp = OperationDecomposition(
+        ideal=circuit,
+        basis_expansion={
+            noisy_xop: 0.5,
+            noisy_zop: -0.5,
+        },
+    )
+
+    for _ in range(50):
+        seq, sign, norm = _sample_sequence(circuit, decompositions=[decomp])
+        assert isinstance(seq, qiskit.QuantumCircuit)
+        assert sign in {1, -1}
+        assert norm == 1.0
+
+
+def test_sample_sequence_pyquil():
+    circuit = pyquil.Program(pyquil.gates.H(0))
+
+    noisy_xop = NoisyOperation(pyquil.Program(pyquil.gates.X(0)))
+    noisy_zop = NoisyOperation(pyquil.Program(pyquil.gates.Z(0)))
+
+    decomp = OperationDecomposition(
+        ideal=circuit,
+        basis_expansion={
+            noisy_xop: 0.5,
+            noisy_zop: -0.5,
+        },
+    )
+
+    for _ in range(50):
+        seq, sign, norm = _sample_sequence(circuit, decompositions=[decomp])
+        assert isinstance(seq, pyquil.Program)
+        assert sign in {1, -1}
+        assert norm == 1.0
+
+
+# Old tests.
 BASE_NOISE = 0.02
 DECO_DICT = _simple_pauli_deco_dict(BASE_NOISE)
 DECO_DICT_SIMP = _simple_pauli_deco_dict(BASE_NOISE, simplify_paulis=True)
