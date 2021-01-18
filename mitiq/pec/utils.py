@@ -19,10 +19,11 @@
 
 """Utilities related to probabilistic error cancellation."""
 
+from copy import deepcopy
+from itertools import product
+
 import numpy as np
 from typing import Tuple, List, Dict
-
-from copy import deepcopy
 
 from cirq import (
     Circuit,
@@ -38,10 +39,63 @@ from cirq import (
     DensityMatrixSimulator,
 )
 
+import cirq
+
+from mitiq.utils import _equal
+from mitiq.pec.types import NoisyOperation, OperationDecomposition
+
+
 # Type definition for a decomposition dictionary.
 # Keys are ideal operations.
 # Values describe the associated decompositions.
 DecompositionDict = Dict[Operation, List[Tuple[float, List[Operation]]]]
+
+
+def _pauli_decomposition(base_noise: float) -> List[OperationDecomposition]:
+    qreg = cirq.LineQubit.range(2)
+    pauli_ops = [cirq.I, cirq.X, cirq.Y, cirq.Z]
+
+    # Single-qubit decomposition coefficients.
+    epsilon = base_noise * 4 / 3
+    c_neg = -(1 / 4) * epsilon / (1 - epsilon)
+    c_pos = 1 - 3 * c_neg
+
+    # This does
+    #  X = c_neg I + c_pos X + c_neg Y + c_neg Z
+    #  Y = c_neg I + c_neg X + c c_pos + c_neg Z
+    #  Z = c_neg I + c_neg X + c_neg Y + c_pos Z
+    #  for both qubits.
+    decompositions = []
+    for q in qreg:
+        paulis = [cirq.Circuit(p.on(q)) for p in pauli_ops]
+        for p in paulis[1:]:
+            decompositions.append(
+                OperationDecomposition(
+                    ideal=p,
+                    basis_expansion={
+                        NoisyOperation(op): c_pos
+                        if _equal(op, p) else c_neg for op in paulis
+                    }
+                )
+            )
+
+    # Two-qubit decomposition coefficients (assuming local noise).
+    c_pos_pos = c_pos * c_pos
+    c_pos_neg = c_neg * c_pos
+    c_neg_neg = c_neg * c_neg
+
+    # TODO: Add equation of what this code is doing.
+    cnot_circuit = cirq.Circuit(cirq.CNOT.on(qreg[0], qreg[1]))
+    cd = {NoisyOperation(cnot_circuit): c_pos_pos}
+
+    for p in [cirq.Circuit(p.on(q)) for p in pauli_ops[1:] for q in qreg]:
+        cd.update({NoisyOperation(cnot_circuit + p): c_pos_neg})
+
+    for (p0, p1) in product(pauli_ops[1:], repeat=2):
+        circ = cnot_circuit + cirq.Circuit(p0.on(qreg[0]), p1.on(qreg[1]))
+        cd.update({NoisyOperation(circ): c_neg_neg})
+
+    return decompositions + [OperationDecomposition(cnot_circuit, cd)]
 
 
 def _simple_pauli_deco_dict(
@@ -138,6 +192,76 @@ def _simple_pauli_deco_dict(
     return decomposition_dict  # type: ignore
 
 
+def _max_ent_state_circuit(num_qubits: int) -> Circuit:
+    r"""Generates a circuit which prepares the maximally entangled state
+    |\omega\rangle = U |0\rangle  = \sum_i |i\rangle \otimes |i\rangle .
+
+    Args:
+        num_qubits: The number of qubits on which the circuit is applied.
+            It must be an even number because of the structure of a
+            maximally entangled state.
+
+    Returns:
+        The circuits which prepares the state |\omega\rangle.
+
+    Raises:
+        Value error: if num_qubits is not an even positive integer.
+    """
+
+    if not isinstance(num_qubits, int) or num_qubits % 2 or num_qubits == 0:
+        raise ValueError(
+            "The argument 'num_qubits' must be an even and positive integer."
+        )
+
+    alice_reg = LineQubit.range(num_qubits // 2)
+    bob_reg = LineQubit.range(num_qubits // 2, num_qubits)
+
+    return Circuit(
+        # Prepare alice_register in a uniform superposition
+        H.on_each(*alice_reg),
+        # Correlate alice_register with bob_register
+        [CNOT.on(alice_reg[i], bob_reg[i]) for i in range(num_qubits // 2)],
+    )
+
+
+def _circuit_to_choi(circuit: Circuit) -> np.ndarray:
+    """Returns the density matrix of the Choi state associated to the
+    input circuit.
+
+    The density matrix completely characterizes the quantum channel induced by
+    the input circuit (including the effect of noise if present).
+
+    Args:
+        circuit: The input circuit.
+    Returns:
+        The density matrix of the Choi state associated to the input circuit.
+    """
+    simulator = DensityMatrixSimulator()
+    num_qubits = len(circuit.all_qubits())
+    # Copy and remove all operations
+    full_circ = deepcopy(circuit)[0:0]
+    full_circ += _max_ent_state_circuit(2 * num_qubits)
+    full_circ += circuit
+    return simulator.simulate(full_circ).final_density_matrix  # type: ignore
+
+
+def _operation_to_choi(operation_tree: OP_TREE) -> np.ndarray:
+    """Returns the density matrix of the Choi state associated to the
+    input operation tree (e.g. a single operation or a sequence of operations).
+
+    The density matrix completely characterizes the quantum channel induced by
+    the input operation tree (including the effect of noise if present).
+
+    Args:
+        circuit: The input circuit.
+    Returns:
+        The density matrix of the Choi state associated to the input circuit.
+    """
+    circuit = Circuit(operation_tree)
+    return _circuit_to_choi(circuit)
+
+
+# Outdated functions.
 def get_coefficients(
     ideal_operation: Operation, decomposition_dict: DecompositionDict
 ) -> List[float]:
@@ -212,71 +336,3 @@ def get_probabilities(
     coeffs = get_coefficients(ideal_operation, decomposition_dict)
     return list(np.abs(coeffs) / np.linalg.norm(coeffs, ord=1))
 
-
-def _max_ent_state_circuit(num_qubits: int) -> Circuit:
-    r"""Generates a circuit which prepares the maximally entangled state
-    |\omega\rangle = U |0\rangle  = \sum_i |i\rangle \otimes |i\rangle .
-
-    Args:
-        num_qubits: The number of qubits on which the circuit is applied.
-            It must be an even number because of the structure of a
-            maximally entangled state.
-
-    Returns:
-        The circuits which prepares the state |\omega\rangle.
-
-    Raises:
-        Value error: if num_qubits is not an even positive integer.
-    """
-
-    if not isinstance(num_qubits, int) or num_qubits % 2 or num_qubits == 0:
-        raise ValueError(
-            "The argument 'num_qubits' must be an even and positive integer."
-        )
-
-    alice_reg = LineQubit.range(num_qubits // 2)
-    bob_reg = LineQubit.range(num_qubits // 2, num_qubits)
-
-    return Circuit(
-        # Prepare alice_register in a uniform superposition
-        H.on_each(*alice_reg),
-        # Correlate alice_register with bob_register
-        [CNOT.on(alice_reg[i], bob_reg[i]) for i in range(num_qubits // 2)],
-    )
-
-
-def _circuit_to_choi(circuit: Circuit) -> np.ndarray:
-    """Returns the density matrix of the Choi state associated to the
-    input circuit.
-
-    The density matrix completely characterizes the quantum channel induced by
-    the input circuit (including the effect of noise if present).
-
-    Args:
-        circuit: The input circuit.
-    Returns:
-        The density matrix of the Choi state associated to the input circuit.
-    """
-    simulator = DensityMatrixSimulator()
-    num_qubits = len(circuit.all_qubits())
-    # Copy and remove all operations
-    full_circ = deepcopy(circuit)[0:0]
-    full_circ += _max_ent_state_circuit(2 * num_qubits)
-    full_circ += circuit
-    return simulator.simulate(full_circ).final_density_matrix  # type: ignore
-
-
-def _operation_to_choi(operation_tree: OP_TREE) -> np.ndarray:
-    """Returns the density matrix of the Choi state associated to the
-    input operation tree (e.g. a single operation or a sequence of operations).
-
-    The density matrix completely characterizes the quantum channel induced by
-    the input operation tree (including the effect of noise if present).
-
-    Args:
-        circuit: The input circuit.
-    Returns:
-        The density matrix of the Choi state associated to the input circuit.
-    """
-    circuit = Circuit(operation_tree)
-    return _circuit_to_choi(circuit)
