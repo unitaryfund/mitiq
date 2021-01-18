@@ -23,7 +23,7 @@ from cirq import Operation, Circuit
 
 from mitiq import QPROGRAM
 from mitiq.utils import _equal
-from mitiq.conversions import convert_to_mitiq
+from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 from mitiq.pec.types import OperationDecomposition
 from mitiq.pec.utils import (
     DecompositionDict,
@@ -54,6 +54,36 @@ def _sample_sequence(
     # Sample from this decomposition.
     noisy_operation, sign, _ = operation_decomposition.sample(random_state)
     return noisy_operation.ideal_circuit(), sign, operation_decomposition.norm
+
+
+def _sample_circuit(
+    ideal_circuit: QPROGRAM,
+    decompositions: List[OperationDecomposition],
+    random_state: Optional[Union[int, np.random.RandomState]] = None,
+) -> Tuple[QPROGRAM, int, float]:
+    if isinstance(random_state, int):
+        random_state = np.random.RandomState(random_state)
+
+    # TODO: Likely to cause issues - conversions may introduce gates which are
+    #  not included in `decompositions`.
+    ideal, rtype = convert_to_mitiq(ideal_circuit)
+
+    # copy and remove all moments
+    sampled_circuit = deepcopy(ideal)[0:0]
+
+    # Iterate over all operations
+    sign = 1
+    norm = 1.0
+    for op in ideal.all_operations():
+        imp_seq, loc_sign, loc_norm = _sample_sequence(
+            Circuit(op), decompositions, random_state
+        )
+        cirq_seq, _ = convert_to_mitiq(imp_seq)
+        sign *= loc_sign
+        norm *= loc_norm
+        sampled_circuit.append(cirq_seq.all_operations())
+
+    return convert_from_mitiq(sampled_circuit, rtype), sign, norm
 
 
 def sample_sequence(
