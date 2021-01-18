@@ -36,13 +36,15 @@ class NoisyOperation:
      actually implement.
      """
 
-    def __init__(self, ideal: QPROGRAM, real: np.ndarray) -> None:
+    def __init__(
+        self, ideal: QPROGRAM, real: Optional[np.ndarray] = None
+    ) -> None:
         """Initializes a NoisyOperation.
 
         Args:
             ideal: The operation a noiseless quantum computer would implement.
             real: Superoperator representation of the actual operation
-                implemented on a noisy quantum computer.
+                implemented on a noisy quantum computer, if known.
 
         Raises:
             TypeError: If ideal is not a QPROGRAM.
@@ -82,7 +84,9 @@ class NoisyOperation:
                 )
         return NoisyOperation(ideal, real)
 
-    def _init_from_cirq(self, ideal: cirq.Circuit, real: np.ndarray) -> None:
+    def _init_from_cirq(
+            self, ideal: cirq.Circuit, real: Optional[np.ndarray] = None
+    ) -> None:
         """Initializes a noisy operation expressed as a Cirq circuit.
 
         Args:
@@ -95,9 +99,15 @@ class NoisyOperation:
                 * If the shape of `real` does not match the expected shape
                     from `ideal`.
         """
-        self._qubits = tuple(ideal.all_qubits())
+        self._ideal = deepcopy(ideal)
+
+        self._qubits = tuple(self._ideal.all_qubits())
         self._num_qubits = len(self._qubits)
         self._dimension = 2 ** self._num_qubits
+
+        if real is None:
+            self._real = None
+            return
 
         if real.shape != (self._dimension ** 2, self._dimension ** 2):
             raise ValueError(
@@ -105,15 +115,13 @@ class NoisyOperation:
                 f" {self._dimension ** 2, self._dimension ** 2}."
             )
         # TODO: Check if real is a valid superoperator.
-
-        self._ideal = deepcopy(ideal)
         self._real = deepcopy(real)
 
     @staticmethod
     def on_each(
         ideal: cirq.CIRCUIT_LIKE,
-        real: np.ndarray,
         qubits: Sequence[List[cirq.Qid]],
+        real: Optional[np.ndarray] = None,
     ) -> List["NoisyOperation"]:
         """Returns a NoisyOperation(ideal, real) on each qubit in qubits.
 
@@ -171,7 +179,7 @@ class NoisyOperation:
     def extend_to(
         self, qubits: Sequence[List[cirq.Qid]]
     ) -> Sequence["NoisyOperation"]:
-        return [self] + NoisyOperation.on_each(self._ideal, self._real, qubits)
+        return [self] + NoisyOperation.on_each(self._ideal, qubits, self._real)
 
     @staticmethod
     def from_noise_model(
@@ -209,6 +217,8 @@ class NoisyOperation:
 
     @property
     def real_matrix(self) -> np.ndarray:
+        if self._real is None:
+            raise ValueError("Real matrix is unknown.")
         return deepcopy(self._real)
 
     def transform_qubits(
@@ -329,8 +339,8 @@ class NoisyBasis:
                 set(
                     NoisyOperation.on_each(
                         noisy_op.ideal_circuit(return_type="cirq"),
-                        noisy_op.real_matrix,
                         qubits,
+                        noisy_op.real_matrix,
                     )
                 )
             )
