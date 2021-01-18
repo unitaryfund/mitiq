@@ -199,7 +199,7 @@ def test_unknown_real_matrix():
     assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq_circ))
 
     with pytest.raises(ValueError, match="Real matrix is unknown."):
-        matrix = noisy_op.real_matrix
+        _ = noisy_op.real_matrix
 
 
 def test_add_simple():

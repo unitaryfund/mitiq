@@ -53,7 +53,7 @@ def test_sample_sequence_cirq():
     noisy_zop = NoisyOperation.from_cirq(ideal=cirq.Z)
 
     decomp = OperationDecomposition(
-        ideal=circuit, basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5,},
+        ideal=circuit, basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
     )
 
     for _ in range(50):
@@ -78,7 +78,7 @@ def test_sample_sequence_qiskit():
     noisy_zop = NoisyOperation(zcircuit)
 
     decomp = OperationDecomposition(
-        ideal=circuit, basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5,},
+        ideal=circuit, basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
     )
 
     for _ in range(50):
@@ -95,7 +95,7 @@ def test_sample_sequence_pyquil():
     noisy_zop = NoisyOperation(pyquil.Program(pyquil.gates.Z(0)))
 
     decomp = OperationDecomposition(
-        ideal=circuit, basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5,},
+        ideal=circuit, basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
     )
 
     for _ in range(50):
