@@ -45,13 +45,13 @@ def my_depolarizing_channel(p: float, n_qubits: int):
     # TODO: upstream bug to Cirq. Once fixed, this function can be removed.
 
     error_probabilities = {}
-    p_depol = p / (4**n_qubits - 1)
+    p_depol = p / (4 ** n_qubits - 1)
     p_identity = 1.0 - p
     for pauli_tuple in itertools.product(
-        ['I', 'X', 'Y', 'Z'], repeat=n_qubits
+        ["I", "X", "Y", "Z"], repeat=n_qubits
     ):
-        pauli_string = ''.join(pauli_tuple)
-        if pauli_string == 'I' * n_qubits:
+        pauli_string = "".join(pauli_tuple)
+        if pauli_string == "I" * n_qubits:
             error_probabilities[pauli_string] = p_identity
         else:
             error_probabilities[pauli_string] = p_depol
@@ -146,4 +146,4 @@ def test_depolarizing_decomposition_with_Choi(gate: Gate, noise: float):
         sequence_choi = _operation_to_choi(noisy_sequence)
         choi_components.append(coeff * sequence_choi)
     combination_choi = np.sum(choi_components, axis=0)
-    assert np.allclose(ideal_choi, combination_choi, atol=10**-6)
+    assert np.allclose(ideal_choi, combination_choi, atol=10 ** -6)
