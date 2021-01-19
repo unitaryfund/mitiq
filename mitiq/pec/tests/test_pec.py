@@ -155,33 +155,28 @@ def test_execute_with_pec_cirq_noiseless_decomposition(circuit):
     assert np.isclose(unmitigated, mitigated)
 
 
-# @pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
-# @pytest.mark.parametrize("executor", [serial_executor, batched_executor])
-# @pytest.mark.parametrize(
-#     "decomposition_dict", [NOISELESS_DECO_DICT, DECO_DICT_SIMP, DECO_DICT]
-# )
-# @pytest.mark.parametrize("seed", (100, 101))
-# def test_execute_with_pec(circuit, executor, decomposition_dict, seed):
-#     """Tests that execute_with_pec mitigates the error of a noisy
-#     expectation value.
-#     """
-#     unmitigated = serial_executor(circuit)
-#     mitigated = execute_with_pec(
-#         circuit,
-#         executor,
-#         decomposition_dict=decomposition_dict,
-#         force_run_all=False,
-#         random_state=seed,
-#     )
-#     error_unmitigated = abs(unmitigated - 1.0)
-#     error_mitigated = abs(mitigated - 1.0)
-#     # For a trivial noiseless decomposition no PEC mitigation should happen
-#     if decomposition_dict == NOISELESS_DECO_DICT:
-#         assert np.isclose(unmitigated, mitigated)
-#     else:
-#         assert error_mitigated < error_unmitigated
-#         assert np.isclose(mitigated, 1.0, atol=0.1)
-#
+@pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
+@pytest.mark.parametrize("executor", [serial_executor, batched_executor])
+@pytest.mark.parametrize("decompositions", [pauli_decompositions])
+def test_execute_with_pec_mitigates_noise(circuit, executor, decompositions):
+    """Tests that execute_with_pec mitigates the error of a noisy
+    expectation value.
+    """
+    true_noiseless_value = 1.0
+    unmitigated = serial_executor(circuit)
+    mitigated = execute_with_pec(
+        circuit,
+        executor,
+        decompositions=decompositions,
+        force_run_all=False,
+        random_state=101,
+    )
+    error_unmitigated = abs(unmitigated - true_noiseless_value)
+    error_mitigated = abs(mitigated - true_noiseless_value)
+
+    assert error_mitigated < error_unmitigated
+    assert np.isclose(mitigated, true_noiseless_value, atol=0.1)
+
 #
 # @pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
 # @pytest.mark.parametrize("seed", (1, 2, 3))
