@@ -37,9 +37,9 @@ from mitiq.benchmarks.utils import noisy_simulation
 # The level of depolarizing noise for the simulated backend.
 BASE_NOISE = 0.02
 
-# Define some decomposition dictionaries for testing.
-decompositions = _pauli_decomposition(BASE_NOISE)
-decompositions_no_noise = _pauli_decomposition(base_noise=0.0)
+# Decompositions for testing.
+pauli_decompositions = _pauli_decomposition(BASE_NOISE)
+noiseless_pauli_decompositions = _pauli_decomposition(base_noise=0.0)
 
 
 def serial_executor(circuit: QPROGRAM, noise: float = BASE_NOISE) -> float:
@@ -65,6 +65,10 @@ def batched_executor(circuits) -> np.ndarray:
     return np.array([serial_executor(circuit) for circuit in circuits])
 
 
+def noiseless_serial_executor(circuit: QPROGRAM) -> float:
+    return serial_executor(circuit, noise=0.0)
+
+
 def fake_executor(circuit: Circuit, random_state: np.random.RandomState):
     """A fake executor which just samples from a normal distribution."""
     return random_state.randn()
@@ -81,13 +85,14 @@ def test_execute_with_pec_cirq_trivial_decomposition():
     decomposition = OperationDecomposition(
         circuit, basis_expansion={NoisyOperation(circuit): 1.0}
     )
-    unmitigated = serial_executor(circuit)
 
+    unmitigated = serial_executor(circuit)
     mitigated = execute_with_pec(
         circuit,
         serial_executor,
         decompositions=[decomposition],
         force_run_all=False,
+        num_samples=100,
         random_state=1,
     )
 
@@ -105,6 +110,7 @@ def test_execute_with_pec_pyquil_trivial_decomposition():
         circuit,
         serial_executor,
         decompositions=[decomposition],
+        num_samples=100,
         force_run_all=False,
         random_state=1,
     )
@@ -125,6 +131,7 @@ def test_execute_with_pec_qiskit_trivial_decomposition():
         circuit,
         serial_executor,
         decompositions=[decomposition],
+        num_samples=100,
         force_run_all=False,
         random_state=1,
     )
@@ -132,15 +139,16 @@ def test_execute_with_pec_qiskit_trivial_decomposition():
     assert np.isclose(unmitigated, mitigated)
 
 
-def test_execute_with_pec_cirq_noiseless_decomposition():
-    circuit = oneq_circ
-    unmitigated = serial_executor(circuit)
+@pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
+def test_execute_with_pec_cirq_noiseless_decomposition(circuit):
+    unmitigated = noiseless_serial_executor(circuit)
 
     mitigated = execute_with_pec(
         circuit,
-        serial_executor,
-        decompositions=decompositions_no_noise,
+        noiseless_serial_executor,
+        decompositions=noiseless_pauli_decompositions,
         force_run_all=False,
+        num_samples=100,
         random_state=1,
     )
 
