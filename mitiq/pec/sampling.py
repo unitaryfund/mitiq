@@ -41,7 +41,7 @@ def _sample_sequence(
     ideal, _ = convert_to_mitiq(ideal_operation)
     operation_decomposition = None
     for decomposition in decompositions:
-        if _equal(decomposition.ideal, ideal):
+        if _equal(decomposition.ideal, ideal, require_qubit_equality=True):
             operation_decomposition = decomposition
             break
 
