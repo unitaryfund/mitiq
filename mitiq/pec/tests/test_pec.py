@@ -177,36 +177,37 @@ def test_execute_with_pec_mitigates_noise(circuit, executor, decompositions):
     assert error_mitigated < error_unmitigated
     assert np.isclose(mitigated, true_noiseless_value, atol=0.1)
 
-#
-# @pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
-# @pytest.mark.parametrize("seed", (1, 2, 3))
-# def test_execute_with_pec_with_different_samples(circuit: Circuit, seed: int):
-#     """Tests that, on average, the error decreases as the number of samples is
-#     increased.
-#     """
-#     errors_few_samples = []
-#     errors_more_samples = []
-#     for _ in range(10):
-#         mitigated = execute_with_pec(
-#             circuit,
-#             serial_executor,
-#             decomposition_dict=DECO_DICT,
-#             num_samples=10,
-#             force_run_all=False,
-#             random_state=seed,
-#         )
-#         errors_few_samples.append(abs(mitigated - 1.0))
-#         mitigated = execute_with_pec(
-#             circuit,
-#             serial_executor,
-#             decomposition_dict=DECO_DICT,
-#             num_samples=100,
-#             random_state=seed,
-#         )
-#         errors_more_samples.append(abs(mitigated - 1.0))
-#
-#     assert np.average(errors_more_samples) < np.average(errors_few_samples)
-#
+
+@pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
+@pytest.mark.parametrize("seed", (2, 3))
+def test_execute_with_pec_with_different_samples(circuit: Circuit, seed: int):
+    """Tests that, on average, the error decreases as the number of samples is
+    increased.
+    """
+    errors_few_samples = []
+    errors_more_samples = []
+    for _ in range(10):
+        mitigated = execute_with_pec(
+            circuit,
+            serial_executor,
+            decompositions=pauli_decompositions,
+            num_samples=10,
+            force_run_all=True,
+            random_state=seed,
+        )
+        errors_few_samples.append(abs(mitigated - 1.0))
+        mitigated = execute_with_pec(
+            circuit,
+            serial_executor,
+            decompositions=pauli_decompositions,
+            num_samples=100,
+            force_run_all=True,
+            random_state=seed,
+        )
+        errors_more_samples.append(abs(mitigated - 1.0))
+
+    assert np.average(errors_more_samples) < np.average(errors_few_samples)
+
 #
 # @pytest.mark.parametrize("num_samples", [100, 1000])
 # def test_execute_with_pec_error(num_samples: int):
