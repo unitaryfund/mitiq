@@ -113,8 +113,6 @@ def execute_with_pec(
     # Get the 1-norm of the circuit quasi-probability representation
     _, _, norm = _sample_circuit(circuit, decompositions)
 
-    # print("Norm:", norm)
-
     if not (0 < precision <= 1):
         raise ValueError(
             "The value of 'precision' should be within the interval (0, 1],"
@@ -137,26 +135,14 @@ def execute_with_pec(
         sampled_circuit, sign, _ = _sample_circuit(
             circuit, decompositions, random_state
         )
-        # print("In execute_with_pec, sampled circuit:")
-        # print(sampled_circuit)
-        # print("Sampled sign:", sign)
         sampled_circuits.append(sampled_circuit)
         signs.append(sign)
-
-    # # DEBUG
-    # print("Manually mapping circuits to expectation values:")
-    # for c in sampled_circuits:
-    #     print(c)
-    #     print(executor(c))
 
     # Execute all sampled circuits
     collected_executor = generate_collected_executor(
         executor, force_run_all=force_run_all
     )
     exp_values = collected_executor(sampled_circuits)
-
-    # print("Expectation values:")
-    # print(exp_values)
 
     # Evaluate unbiased estimators [Temme2017] [Endo2018] [Takagi2020]
     unbiased_estimators = [norm * s * val for s, val in zip(signs, exp_values)]
