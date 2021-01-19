@@ -187,7 +187,7 @@ def test_sample_circuit_with_seed():
         basis_expansion={
             NoisyOperation.from_cirq(cirq.Z): 1.0,
             NoisyOperation.from_cirq(cirq.X): -1.0,
-        }
+        },
     )
 
     expected_circuit, expected_sign, expected_norm = _sample_circuit(
@@ -209,8 +209,7 @@ def test_sample_circuit_with_seed():
 def test_sample_circuit_trivial_decomposition():
     circuit = cirq.Circuit(cirq.ops.H.on(cirq.NamedQubit("Q")))
     decomp = OperationDecomposition(
-        ideal=circuit,
-        basis_expansion={NoisyOperation(circuit): 1.0}
+        ideal=circuit, basis_expansion={NoisyOperation(circuit): 1.0}
     )
 
     sampled_circuit, sign, norm = _sample_circuit(
@@ -248,7 +247,9 @@ def test_sample_sequence_choi(gate: cirq.Gate):
         )
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.
-        noisy_sequence = [imp_seq] + [cirq.depolarize(BASE_NOISE)(q) for q in qreg]
+        noisy_sequence = [imp_seq] + [
+            cirq.depolarize(BASE_NOISE)(q) for q in qreg
+        ]
         sequence_choi = _operation_to_choi(noisy_sequence)
         choi_unbiased_estimates.append(norm * sign * sequence_choi)
     choi_pec_estimate = np.average(choi_unbiased_estimates, axis=0)
