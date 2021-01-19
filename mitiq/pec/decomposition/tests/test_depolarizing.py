@@ -14,15 +14,50 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from typing import List, Tuple
-
+import itertools
 import numpy as np
 import pytest
-from cirq import CCNOT, CNOT, CZ, ISWAP, LineQubit, Operation, SWAP
+from cirq import (
+    CCNOT,
+    CNOT,
+    CZ,
+    ISWAP,
+    H,
+    SWAP,
+    Gate,
+    LineQubit,
+    Operation,
+    AsymmetricDepolarizingChannel,
+)
 
 from mitiq.pec.decomposition.depolarizing import (
     depolarizing_decomposition,
     NON_ID_PAULIS,
 )
+
+from mitiq.pec.utils import _operation_to_choi
+
+
+def my_depolarizing_channel(p: float, n_qubits: int):
+    """Build a depolarizing channel from cirq.AsymmetricDepolarizingChannel
+    since cirq.DepolarizingChannel is buggy when n_qubits is larger than 1."""
+
+    # TODO: upstream bug to Cirq. Once fixed, this function can be removed.
+
+    error_probabilities = {}
+    p_depol = p / (4**n_qubits - 1)
+    p_identity = 1.0 - p
+    for pauli_tuple in itertools.product(
+        ['I', 'X', 'Y', 'Z'], repeat=n_qubits
+    ):
+        pauli_string = ''.join(pauli_tuple)
+        if pauli_string == 'I' * n_qubits:
+            error_probabilities[pauli_string] = p_identity
+        else:
+            error_probabilities[pauli_string] = p_depol
+    return AsymmetricDepolarizingChannel(
+        error_probabilities=error_probabilities
+    )
 
 
 def decomposition_overhead(
@@ -93,3 +128,22 @@ def test_three_qubit_depolarizing_decomposition():
     noise_level = 0.05
     with pytest.raises(ValueError):
         depolarizing_decomposition(CCNOT(q0, q1, q2), noise_level)
+
+
+@pytest.mark.parametrize("noise", [0, 0.1, 0.5, 1.0])
+@pytest.mark.parametrize("gate", NON_ID_PAULIS + [H, CZ, CNOT, ISWAP, SWAP])
+def test_depolarizing_decomposition_with_Choi(gate: Gate, noise: float):
+    """Tests the decomposition by comparing exact Choi matrices."""
+    qreg = LineQubit.range(gate.num_qubits())
+    ideal_choi = _operation_to_choi(gate.on(*qreg))
+    op_decomp = depolarizing_decomposition(gate.on(*qreg), noise)
+    choi_components = []
+    for coeff, imp_seq in op_decomp:
+        # Apply noise after each sequence.
+        # NOTE: noise is not applied after each operation.
+        depolarizing_op = my_depolarizing_channel(noise, len(qreg))(*qreg)
+        noisy_sequence = [imp_seq] + [depolarizing_op]
+        sequence_choi = _operation_to_choi(noisy_sequence)
+        choi_components.append(coeff * sequence_choi)
+    combination_choi = np.sum(choi_components, axis=0)
+    assert np.allclose(ideal_choi, combination_choi, atol=10**-6)
