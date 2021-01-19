@@ -227,34 +227,35 @@ def test_execute_with_pec_error_scaling(num_samples: int):
     assert np.isclose(error_pec * np.sqrt(num_samples), 1.0, atol=0.1)
 
 
-# @pytest.mark.parametrize("precision", [0.1, 0.01])
-# def test_precision_option_in_execute_with_pec(precision: float):
-#     """Tests that the 'precision' argument is used to deduce num_samples."""
-#     # For a noiseless circuit we expect num_samples = 1/precision^2:
-#     _, pec_error = execute_with_pec(
-#         oneq_circ,
-#         partial(fake_executor, random_state=np.random.RandomState(0)),
-#         NOISELESS_DECO_DICT,
-#         precision=precision,
-#         force_run_all=True,
-#         full_output=True,
-#     )
-#     # The error should scale as precision
-#     assert np.isclose(pec_error / precision, 1.0, atol=0.1)
-#
-#     # If num_samples is given, precision is ignored.
-#     _, pec_error = execute_with_pec(
-#         oneq_circ,
-#         partial(fake_executor, random_state=np.random.RandomState(0)),
-#         NOISELESS_DECO_DICT,
-#         precision=precision,
-#         num_samples=1000,
-#         full_output=True,
-#     )
-#     # The error should scale as 1/sqrt(num_samples)
-#     assert not np.isclose(pec_error / precision, 1.0, atol=0.1)
-#     assert np.isclose(pec_error * np.sqrt(1000), 1.0, atol=0.1)
-#
+@pytest.mark.parametrize("precision", [0.1, 0.01])
+def test_precision_option_in_execute_with_pec(precision: float):
+    """Tests that the 'precision' argument is used to deduce num_samples."""
+    # For a noiseless circuit we expect num_samples = 1/precision^2:
+    _, pec_error = execute_with_pec(
+        oneq_circ,
+        partial(fake_executor, random_state=np.random.RandomState(0)),
+        decompositions=pauli_decompositions,
+        precision=precision,
+        force_run_all=True,
+        full_output=True,
+    )
+    # The error should scale as precision
+    assert np.isclose(pec_error / precision, 1.0, atol=0.1)
+
+    # If num_samples is given, precision is ignored.
+    nsamples = 1000
+    _, pec_error = execute_with_pec(
+        oneq_circ,
+        partial(fake_executor, random_state=np.random.RandomState(0)),
+        decompositions=pauli_decompositions,
+        precision=precision,
+        num_samples=nsamples,
+        full_output=True,
+    )
+    # The error should scale as 1/sqrt(num_samples)
+    assert not np.isclose(pec_error / precision, 1.0, atol=0.1)
+    assert np.isclose(pec_error * np.sqrt(nsamples), 1.0, atol=0.1)
+
 #
 # @pytest.mark.parametrize("bad_value", (0, -1, 2))
 # def test_bad_precision_argument(bad_value: float):
