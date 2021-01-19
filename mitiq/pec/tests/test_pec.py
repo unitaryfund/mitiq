@@ -208,25 +208,25 @@ def test_execute_with_pec_with_different_samples(circuit: Circuit, seed: int):
 
     assert np.average(errors_more_samples) < np.average(errors_few_samples)
 
-#
-# @pytest.mark.parametrize("num_samples", [100, 1000])
-# def test_execute_with_pec_error(num_samples: int):
-#     """Tests that the error associated to the PEC value scales as
-#     1/sqrt(num_samples).
-#     """
-#     _, error_pec = execute_with_pec(
-#         oneq_circ,
-#         partial(fake_executor, random_state=np.random.RandomState(0)),
-#         DECO_DICT,
-#         num_samples=num_samples,
-#         force_run_all=True,
-#         full_output=True,
-#     )
-#     # The error should scale as 1/sqrt(num_samples)
-#     print(error_pec * np.sqrt(num_samples))
-#     assert np.isclose(error_pec * np.sqrt(num_samples), 1.0, atol=0.1)
-#
-#
+
+@pytest.mark.parametrize("num_samples", [100, 1000])
+def test_execute_with_pec_error_scaling(num_samples: int):
+    """Tests that the error associated to the PEC value scales as
+    1/sqrt(num_samples).
+    """
+    _, error_pec = execute_with_pec(
+        oneq_circ,
+        partial(fake_executor, random_state=np.random.RandomState(0)),
+        decompositions=pauli_decompositions,
+        num_samples=num_samples,
+        force_run_all=True,
+        full_output=True,
+    )
+    # The error should scale as 1/sqrt(num_samples)
+    print(error_pec * np.sqrt(num_samples))
+    assert np.isclose(error_pec * np.sqrt(num_samples), 1.0, atol=0.1)
+
+
 # @pytest.mark.parametrize("precision", [0.1, 0.01])
 # def test_precision_option_in_execute_with_pec(precision: float):
 #     """Tests that the 'precision' argument is used to deduce num_samples."""
