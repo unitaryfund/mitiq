@@ -13,21 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Tests related to mitiq.pec.sampling functions."""
+"""Tests for mitiq.pec.sampling functions."""
 
-import pytest
 import numpy as np
+import pytest
 
-from cirq import (
-    Circuit,
-    Gate,
-    LineQubit,
-    X,
-    Y,
-    CNOT,
-    depolarize,
-)
+import cirq
+import pyquil
+import qiskit
 
+from mitiq.pec.sampling import _sample_sequence, _sample_circuit
+from mitiq.pec.types import NoisyOperation, OperationDecomposition
 from mitiq.utils import _equal
 from mitiq.pec.utils import (
     _simple_pauli_deco_dict,
@@ -36,14 +32,6 @@ from mitiq.pec.utils import (
     _circuit_to_choi,
 )
 from mitiq.pec.sampling import sample_sequence, sample_circuit
-
-
-import cirq
-import pyquil
-import qiskit
-
-from mitiq.pec.sampling import _sample_sequence, _sample_circuit
-from mitiq.pec.types import NoisyOperation, OperationDecomposition
 
 
 def test_sample_sequence_cirq():
@@ -193,7 +181,7 @@ def test_sample_circuit_pyquil():
 
 
 def test_sample_circuit_with_seed():
-    circ = Circuit([X.on(LineQubit(0)) for _ in range(10)])
+    circ = cirq.Circuit([cirq.X.on(cirq.LineQubit(0)) for _ in range(10)])
     decomp = OperationDecomposition(
         ideal=cirq.Circuit(cirq.X.on(cirq.LineQubit(0))),
         basis_expansion={
@@ -240,16 +228,16 @@ DECO_DICT_SIMP = _simple_pauli_deco_dict(BASE_NOISE, simplify_paulis=True)
 NOISELESS_DECO_DICT = _simple_pauli_deco_dict(0)
 
 # Simple 2-qubit circuit
-qreg = LineQubit.range(2)
-twoq_circ = Circuit(X.on(qreg[0]), CNOT.on(*qreg),)
+qreg = cirq.LineQubit.range(2)
+twoq_circ = cirq.Circuit(cirq.X.on(qreg[0]), cirq.CNOT.on(*qreg),)
 
 
-@pytest.mark.parametrize("gate", [Y, CNOT])
-def test_sample_sequence_choi(gate: Gate):
+@pytest.mark.parametrize("gate", [cirq.Y, cirq.CNOT])
+def test_sample_sequence_choi(gate: cirq.Gate):
     """Tests the sample_sequence by comparing the exact Choi matrices."""
-    qreg = LineQubit.range(gate.num_qubits())
+    qreg = cirq.LineQubit.range(gate.num_qubits())
     ideal_op = gate.on(*qreg)
-    noisy_op_tree = [ideal_op] + [depolarize(BASE_NOISE)(q) for q in qreg]
+    noisy_op_tree = [ideal_op] + [cirq.depolarize(BASE_NOISE)(q) for q in qreg]
     ideal_choi = _operation_to_choi(gate.on(*qreg))
     noisy_choi = _operation_to_choi(noisy_op_tree)
     choi_unbiased_estimates = []
@@ -260,7 +248,7 @@ def test_sample_sequence_choi(gate: Gate):
         )
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.
-        noisy_sequence = [imp_seq] + [depolarize(BASE_NOISE)(q) for q in qreg]
+        noisy_sequence = [imp_seq] + [cirq.depolarize(BASE_NOISE)(q) for q in qreg]
         sequence_choi = _operation_to_choi(noisy_sequence)
         choi_unbiased_estimates.append(norm * sign * sequence_choi)
     choi_pec_estimate = np.average(choi_unbiased_estimates, axis=0)
@@ -274,12 +262,12 @@ def test_sample_sequence_choi(gate: Gate):
 def test_sample_circuit_choi(decomposition_dict: DecompositionDict):
     """Tests the sample_circuit by comparing the exact Choi matrices."""
     ideal_choi = _circuit_to_choi(twoq_circ)
-    noisy_circuit = twoq_circ.with_noise(depolarize(BASE_NOISE))
+    noisy_circuit = twoq_circ.with_noise(cirq.depolarize(BASE_NOISE))
     noisy_choi = _circuit_to_choi(noisy_circuit)
     choi_unbiased_estimates = []
     for _ in range(500):
         imp_circuit, sign, norm = sample_circuit(twoq_circ, decomposition_dict)
-        noisy_imp_circuit = imp_circuit.with_noise(depolarize(BASE_NOISE))
+        noisy_imp_circuit = imp_circuit.with_noise(cirq.depolarize(BASE_NOISE))
         imp_circuit_choi = _circuit_to_choi(noisy_imp_circuit)
         choi_unbiased_estimates.append(norm * sign * imp_circuit_choi)
     choi_pec_estimate = np.average(choi_unbiased_estimates, axis=0)

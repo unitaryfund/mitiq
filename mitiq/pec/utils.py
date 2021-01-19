@@ -14,13 +14,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # TODO: Functions which don't fit in pec.py and sampling.py are placed here.
-# Some of them could be moved in future new sub-modules of PEC
-# (e.g. decomposition, tomo, etc.)
+#  Some of them could be moved in future new sub-modules of PEC
+#  (e.g. decomposition, tomo, etc.)
 
 """Utilities related to probabilistic error cancellation."""
 
 from copy import deepcopy
-from itertools import product
 
 import numpy as np
 from typing import Tuple, List, Dict
@@ -39,63 +38,10 @@ from cirq import (
     DensityMatrixSimulator,
 )
 
-import cirq
-
-from mitiq.utils import _equal
-from mitiq.pec.types import NoisyOperation, OperationDecomposition
-
-
 # Type definition for a decomposition dictionary.
 # Keys are ideal operations.
 # Values describe the associated decompositions.
 DecompositionDict = Dict[Operation, List[Tuple[float, List[Operation]]]]
-
-
-def _pauli_decomposition(base_noise: float) -> List[OperationDecomposition]:
-    qreg = cirq.LineQubit.range(2)
-    pauli_ops = [cirq.I, cirq.X, cirq.Y, cirq.Z]
-
-    # Single-qubit decomposition coefficients.
-    epsilon = base_noise * 4 / 3
-    c_neg = -(1 / 4) * epsilon / (1 - epsilon)
-    c_pos = 1 - 3 * c_neg
-
-    # This does
-    #  X = c_neg I + c_pos X + c_neg Y + c_neg Z
-    #  Y = c_neg I + c_neg X + c c_pos + c_neg Z
-    #  Z = c_neg I + c_neg X + c_neg Y + c_pos Z
-    #  for both qubits.
-    decompositions = []
-    for q in qreg:
-        paulis = [cirq.Circuit(p.on(q)) for p in pauli_ops]
-        for p in paulis[1:]:
-            decompositions.append(
-                OperationDecomposition(
-                    ideal=p,
-                    basis_expansion={
-                        NoisyOperation(op): c_pos
-                        if _equal(op, p) else c_neg for op in paulis
-                    }
-                )
-            )
-
-    # Two-qubit decomposition coefficients (assuming local noise).
-    c_pos_pos = c_pos * c_pos
-    c_pos_neg = c_neg * c_pos
-    c_neg_neg = c_neg * c_neg
-
-    # TODO: Add equation of what this code is doing.
-    cnot_circuit = cirq.Circuit(cirq.CNOT.on(qreg[0], qreg[1]))
-    cd = {NoisyOperation(cnot_circuit): c_pos_pos}
-
-    for p in [cirq.Circuit(p.on(q)) for p in pauli_ops[1:] for q in qreg]:
-        cd.update({NoisyOperation(cnot_circuit + p): c_pos_neg})
-
-    for (p0, p1) in product(pauli_ops[1:], repeat=2):
-        circ = cnot_circuit + cirq.Circuit(p0.on(qreg[0]), p1.on(qreg[1]))
-        cd.update({NoisyOperation(circ): c_neg_neg})
-
-    return decompositions + [OperationDecomposition(cnot_circuit, cd)]
 
 
 def _simple_pauli_deco_dict(
@@ -253,7 +199,7 @@ def _operation_to_choi(operation_tree: OP_TREE) -> np.ndarray:
     the input operation tree (including the effect of noise if present).
 
     Args:
-        circuit: The input circuit.
+        operation_tree: Nested list of operations.
     Returns:
         The density matrix of the Choi state associated to the input circuit.
     """
@@ -335,4 +281,3 @@ def get_probabilities(
     """
     coeffs = get_coefficients(ideal_operation, decomposition_dict)
     return list(np.abs(coeffs) / np.linalg.norm(coeffs, ord=1))
-

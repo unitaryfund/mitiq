@@ -15,29 +15,74 @@
 
 """Unit tests for PEC."""
 
+from itertools import product
+from typing import List
 from functools import partial
 import pytest
 
 import numpy as np
-from cirq import Circuit, LineQubit, Y, Z, CNOT
-
-
 import cirq
 import pyquil
 import qiskit
 
-from mitiq.pec.utils import _simple_pauli_deco_dict, _pauli_decomposition
-from mitiq.pec.pec import execute_with_pec, LargeSampleWarning
-from mitiq.pec.types import NoisyOperation, OperationDecomposition
-
 from mitiq import QPROGRAM
+from mitiq.utils import _equal
 from mitiq.conversions import convert_to_mitiq
 from mitiq.benchmarks.utils import noisy_simulation
 
-# The level of depolarizing noise for the simulated backend.
-BASE_NOISE = 0.02
+from mitiq.pec.pec import execute_with_pec, LargeSampleWarning
+from mitiq.pec.types import NoisyOperation, OperationDecomposition
+
 
 # Decompositions for testing.
+def _pauli_decomposition(base_noise: float) -> List[OperationDecomposition]:
+    qreg = cirq.LineQubit.range(2)
+    pauli_ops = [cirq.I, cirq.X, cirq.Y, cirq.Z]
+
+    # Single-qubit decomposition coefficients.
+    epsilon = base_noise * 4 / 3
+    c_neg = -(1 / 4) * epsilon / (1 - epsilon)
+    c_pos = 1 - 3 * c_neg
+
+    # This does
+    #  X = c_neg I + c_pos X + c_neg Y + c_neg Z
+    #  Y = c_neg I + c_neg X + c c_pos + c_neg Z
+    #  Z = c_neg I + c_neg X + c_neg Y + c_pos Z
+    #  for both qubits.
+    decompositions = []
+    for q in qreg:
+        paulis = [cirq.Circuit(p.on(q)) for p in pauli_ops]
+        for p in paulis[1:]:
+            decompositions.append(
+                OperationDecomposition(
+                    ideal=p,
+                    basis_expansion={
+                        NoisyOperation(op): c_pos
+                        if _equal(op, p) else c_neg for op in paulis
+                    }
+                )
+            )
+
+    # Two-qubit decomposition coefficients (assuming local noise).
+    c_pos_pos = c_pos * c_pos
+    c_pos_neg = c_neg * c_pos
+    c_neg_neg = c_neg * c_neg
+
+    # TODO: Add equation of what this code is doing.
+    cnot_circuit = cirq.Circuit(cirq.CNOT.on(qreg[0], qreg[1]))
+    cd = {NoisyOperation(cnot_circuit): c_pos_pos}
+
+    for p in [cirq.Circuit(p.on(q)) for p in pauli_ops[1:] for q in qreg]:
+        cd.update({NoisyOperation(cnot_circuit + p): c_pos_neg})
+
+    for (p0, p1) in product(pauli_ops[1:], repeat=2):
+        circ = cnot_circuit + cirq.Circuit(p0.on(qreg[0]), p1.on(qreg[1]))
+        cd.update({NoisyOperation(circ): c_neg_neg})
+
+    return decompositions + [OperationDecomposition(cnot_circuit, cd)]
+
+
+BASE_NOISE = 0.02
 pauli_decompositions = _pauli_decomposition(BASE_NOISE)
 noiseless_pauli_decompositions = _pauli_decomposition(base_noise=0.0)
 
@@ -69,15 +114,15 @@ def noiseless_serial_executor(circuit: QPROGRAM) -> float:
     return serial_executor(circuit, noise=0.0)
 
 
-def fake_executor(circuit: Circuit, random_state: np.random.RandomState):
+def fake_executor(circuit: cirq.Circuit, random_state: np.random.RandomState):
     """A fake executor which just samples from a normal distribution."""
     return random_state.randn()
 
 
 # Simple circuits for testing.
 q0, q1 = cirq.LineQubit.range(2)
-oneq_circ = cirq.Circuit(Z.on(q0), Z.on(q0))
-twoq_circ = cirq.Circuit(Y.on(q1), CNOT.on(q0, q1), Y.on(q1))
+oneq_circ = cirq.Circuit(cirq.Z.on(q0), cirq.Z.on(q0))
+twoq_circ = cirq.Circuit(cirq.Y.on(q1), cirq.CNOT.on(q0, q1), cirq.Y.on(q1))
 
 
 def test_execute_with_pec_cirq_trivial_decomposition():
@@ -180,7 +225,7 @@ def test_execute_with_pec_mitigates_noise(circuit, executor, decompositions):
 
 @pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
 @pytest.mark.parametrize("seed", (2, 3))
-def test_execute_with_pec_with_different_samples(circuit: Circuit, seed: int):
+def test_execute_with_pec_with_different_samples(circuit, seed):
     """Tests that, on average, the error decreases as the number of samples is
     increased.
     """
@@ -256,25 +301,30 @@ def test_precision_option_in_execute_with_pec(precision: float):
     assert not np.isclose(pec_error / precision, 1.0, atol=0.1)
     assert np.isclose(pec_error * np.sqrt(nsamples), 1.0, atol=0.1)
 
-#
-# @pytest.mark.parametrize("bad_value", (0, -1, 2))
-# def test_bad_precision_argument(bad_value: float):
-#     """Tests that if 'precision' is not within (0, 1] an error is raised."""
-#
-#     with pytest.raises(ValueError, match="The value of 'precision' should"):
-#         execute_with_pec(
-#             oneq_circ, serial_executor, DECO_DICT, precision=bad_value
-#         )
-#
-#
-# @pytest.mark.skip(reason="Slow test.")
-# def test_large_sample_size_warning():
-#     """Tests whether a warning is raised when PEC sample size
-#     is greater than 10 ** 5
-#     """
-#     with pytest.warns(
-#         LargeSampleWarning, match=r"The number of PEC samples is very large.",
-#     ):
-#         execute_with_pec(
-#             oneq_circ, fake_executor, DECO_DICT, num_samples=100001
-#         )
+
+@pytest.mark.parametrize("bad_value", (0, -1, 2))
+def test_bad_precision_argument(bad_value: float):
+    """Tests that if 'precision' is not within (0, 1] an error is raised."""
+    with pytest.raises(ValueError, match="The value of 'precision' should"):
+        execute_with_pec(
+            oneq_circ,
+            serial_executor,
+            pauli_decompositions,
+            precision=bad_value
+        )
+
+
+@pytest.mark.skip(reason="Slow test.")
+def test_large_sample_size_warning():
+    """Tests whether a warning is raised when PEC sample size
+    is greater than 10 ** 5
+    """
+    with pytest.warns(
+        LargeSampleWarning, match=r"The number of PEC samples is very large.",
+    ):
+        execute_with_pec(
+            oneq_circ,
+            partial(fake_executor, random_state=np.random.RandomState(0)),
+            pauli_decompositions,
+            num_samples=100001
+        )
