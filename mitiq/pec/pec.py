@@ -130,7 +130,6 @@ def execute_with_pec(
     sampled_circuits = []
     signs = []
 
-    print(f"In execute_with_pec, sampling {num_samples} circuits.")
     for _ in range(num_samples):
         sampled_circuit, sign, _ = sample_circuit(
             circuit, representations, random_state

@@ -16,7 +16,7 @@
 """Unit tests for PEC."""
 
 from itertools import product
-from typing import List
+from typing import List, Optional
 from functools import partial
 import pytest
 
@@ -27,7 +27,7 @@ import qiskit
 
 from mitiq import QPROGRAM
 from mitiq.utils import _equal
-from mitiq.conversions import convert_to_mitiq
+from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 from mitiq.benchmarks.utils import noisy_simulation
 
 from mitiq.pec.pec import execute_with_pec, LargeSampleWarning
@@ -36,9 +36,13 @@ from mitiq.pec.types import NoisyOperation, OperationRepresentation
 
 # Noisy representations of Pauli operations for testing.
 def get_pauli_representations(
-    base_noise: float
+    base_noise: float,
+    qubits: Optional[List[cirq.Qid]] = None,
 ) -> List[OperationRepresentation]:
-    qreg = cirq.LineQubit.range(2)
+    if qubits is None:
+        qreg = cirq.LineQubit.range(2)
+    else:
+        qreg = qubits
     pauli_ops = [cirq.I, cirq.X, cirq.Y, cirq.Z]
 
     # Single-qubit decomposition coefficients.
@@ -121,7 +125,7 @@ def fake_executor(circuit: cirq.Circuit, random_state: np.random.RandomState):
     return random_state.randn()
 
 
-# Simple Cirq circuits for testing.
+# Simple circuits for testing.
 q0, q1 = cirq.LineQubit.range(2)
 oneq_circ = cirq.Circuit(cirq.Z.on(q0), cirq.Z.on(q0))
 twoq_circ = cirq.Circuit(cirq.Y.on(q1), cirq.CNOT.on(q0, q1), cirq.Y.on(q1))
@@ -204,13 +208,25 @@ def test_execute_with_pec_cirq_noiseless_decomposition(circuit):
 
 @pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
 @pytest.mark.parametrize("executor", [serial_executor, batched_executor])
-@pytest.mark.parametrize("reps", [pauli_representations])
-def test_execute_with_pec_mitigates_noise(circuit, executor, reps):
+@pytest.mark.parametrize("circuit_type", ["cirq", "qiskit", "pyquil"])
+def test_execute_with_pec_mitigates_noise(circuit, executor, circuit_type):
     """Tests that execute_with_pec mitigates the error of a noisy
     expectation value.
     """
+    circuit = convert_from_mitiq(circuit, circuit_type)
+
     true_noiseless_value = 1.0
     unmitigated = serial_executor(circuit)
+
+    if circuit_type == "qiskit":
+        # Note this is an important subtlety necessary because of conversions.
+        reps = get_pauli_representations(
+            base_noise=BASE_NOISE,
+            qubits=[cirq.NamedQubit(name) for name in ("q_0", "q_1")]
+        )
+    else:
+        reps = pauli_representations
+
     mitigated = execute_with_pec(
         circuit,
         executor,
