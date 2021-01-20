@@ -35,7 +35,7 @@ DECO_DICT_SIMP = _simple_pauli_deco_dict(BASE_NOISE, simplify_paulis=True)
 NOISELESS_DECO_DICT = _simple_pauli_deco_dict(0)
 
 
-def test_simple_pauli_deco_dict_CNOT():
+def test_simple_pauli_deco_dict_cnot():
     """Tests that the _simple_pauli_deco_dict function returns a decomposition
     dicitonary which is consistent with a local depolarizing noise model.
 
@@ -152,7 +152,7 @@ def test_get_probabilities(gate: Gate):
 
 
 @mark.parametrize("gate", [X, Y, Z, CNOT])
-def test_simple_pauli_deco_dict_with_Choi(gate: Gate):
+def test_simple_pauli_deco_dict_with_choi(gate: Gate):
     """Tests the decomposition by comparing the exact Choi matrices."""
     qreg = LineQubit.range(gate.num_qubits())
     ideal_choi = _operation_to_choi(gate.on(*qreg))
