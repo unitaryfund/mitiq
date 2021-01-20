@@ -888,9 +888,7 @@ def test_plot_data(factory):
     ax = fig.gca()
     x_data, y_data = ax.lines[0].get_xydata().T
     zne_curve = fac.get_extrapolation_curve()
-    np.testing.assert_equal(
-        np.any(np.not_equal(y_data, zne_curve(x_data))), True,
-    )
+    np.allclose(y_data, zne_curve(x_data))
 
 
 @mark.parametrize("factory", (ExpFactory, PolyExpFactory))
@@ -908,9 +906,7 @@ def test_plot_data_exp_factory(factory):
     ax = fig.gca()
     x_data, y_data = ax.lines[0].get_xydata().T
     zne_curve = fac.get_extrapolation_curve()
-    np.testing.assert_equal(
-        np.any(np.not_equal(y_data, zne_curve(x_data))), True,
-    )
+    np.allclose(y_data, zne_curve(x_data))
 
 
 @mark.parametrize(
@@ -928,9 +924,7 @@ def test_plot_fit(factory):
     ax = fig.gca()
     x_data, y_data = ax.lines[0].get_xydata().T
     zne_curve = fac.get_extrapolation_curve()
-    np.testing.assert_equal(
-        np.any(np.not_equal(y_data, zne_curve(x_data))), True,
-    )
+    np.allclose(y_data, zne_curve(x_data))
 
 
 @mark.parametrize("factory", (ExpFactory, PolyExpFactory))
@@ -948,9 +942,7 @@ def test_plot_fit_exp_factory(factory):
     ax = fig.gca()
     x_data, y_data = ax.lines[0].get_xydata().T
     zne_curve = fac.get_extrapolation_curve()
-    np.testing.assert_equal(
-        np.any(np.not_equal(y_data, zne_curve(x_data))), True,
-    )
+    np.allclose(y_data, zne_curve(x_data))
 
 
 def test__fakenodes_scale_factors_equally_spaced():
