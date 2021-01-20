@@ -22,7 +22,7 @@ import cirq
 import pyquil
 import qiskit
 
-from mitiq.pec.sampling import _sample_sequence, _sample_circuit
+from mitiq.pec.sampling import sample_sequence, sample_circuit
 from mitiq.pec.types import NoisyOperation, OperationDecomposition
 from mitiq.utils import _equal
 
@@ -38,7 +38,7 @@ def test_sample_sequence_cirq():
     )
 
     for _ in range(50):
-        seq, sign, norm = _sample_sequence(circuit, decompositions=[decomp])
+        seq, sign, norm = sample_sequence(circuit, decompositions=[decomp])
         assert isinstance(seq, cirq.Circuit)
         assert sign in {1, -1}
         assert norm == 1.0
@@ -63,7 +63,7 @@ def test_sample_sequence_qiskit():
     )
 
     for _ in range(50):
-        seq, sign, norm = _sample_sequence(circuit, decompositions=[decomp])
+        seq, sign, norm = sample_sequence(circuit, decompositions=[decomp])
         assert isinstance(seq, qiskit.QuantumCircuit)
         assert sign in {1, -1}
         assert norm == 1.0
@@ -80,7 +80,7 @@ def test_sample_sequence_pyquil():
     )
 
     for _ in range(50):
-        seq, sign, norm = _sample_sequence(circuit, decompositions=[decomp])
+        seq, sign, norm = sample_sequence(circuit, decompositions=[decomp])
         assert isinstance(seq, pyquil.Program)
         assert sign in {1, -1}
         assert norm == 1.0
@@ -97,12 +97,12 @@ def test_sample_sequence_cirq_random_state(seed):
         },
     )
 
-    sequence, sign, norm = _sample_sequence(
+    sequence, sign, norm = sample_sequence(
         circuit, [decomposition], random_state=np.random.RandomState(seed)
     )
 
     for _ in range(20):
-        new_sequence, new_sign, new_norm = _sample_sequence(
+        new_sequence, new_sign, new_norm = sample_sequence(
             circuit, [decomposition], random_state=np.random.RandomState(seed)
         )
         assert _equal(new_sequence, sequence)
@@ -133,7 +133,7 @@ def test_sample_circuit_cirq():
     )
 
     for _ in range(50):
-        sampled_circuit, sign, norm = _sample_circuit(
+        sampled_circuit, sign, norm = sample_circuit(
             circuit, decompositions=[hdecomposition, cnot_decomposition]
         )
 
@@ -163,7 +163,7 @@ def test_sample_circuit_pyquil():
     )
 
     for _ in range(50):
-        sampled_circuit, sign, norm = _sample_circuit(
+        sampled_circuit, sign, norm = sample_circuit(
             circuit, decompositions=[hdecomposition, cnot_decomposition]
         )
 
@@ -183,7 +183,7 @@ def test_sample_circuit_with_seed():
         },
     )
 
-    expected_circuit, expected_sign, expected_norm = _sample_circuit(
+    expected_circuit, expected_sign, expected_norm = sample_circuit(
         circ, [decomp], random_state=4
     )
 
@@ -191,7 +191,7 @@ def test_sample_circuit_with_seed():
     assert len(set(expected_circuit.all_operations())) > 1
 
     for _ in range(10):
-        sampled_circuit, sampled_sign, sampled_norm = _sample_circuit(
+        sampled_circuit, sampled_sign, sampled_norm = sample_circuit(
             circ, [decomp], random_state=4
         )
         assert _equal(sampled_circuit, expected_circuit)
@@ -205,7 +205,7 @@ def test_sample_circuit_trivial_decomposition():
         ideal=circuit, basis_expansion={NoisyOperation(circuit): 1.0}
     )
 
-    sampled_circuit, sign, norm = _sample_circuit(
+    sampled_circuit, sign, norm = sample_circuit(
         circuit, [decomp], random_state=1
     )
     assert _equal(sampled_circuit, circuit)

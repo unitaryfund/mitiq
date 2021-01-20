@@ -22,7 +22,7 @@ import numpy as np
 
 from mitiq import generate_collected_executor, QPROGRAM
 from mitiq.conversions import convert_to_mitiq
-from mitiq.pec.sampling import _sample_circuit
+from mitiq.pec.sampling import sample_circuit
 from mitiq.pec.types import OperationDecomposition
 
 
@@ -111,7 +111,7 @@ def execute_with_pec(
         random_state = np.random.RandomState(random_state)
 
     # Get the 1-norm of the circuit quasi-probability representation
-    _, _, norm = _sample_circuit(circuit, decompositions)
+    _, _, norm = sample_circuit(circuit, decompositions)
 
     if not (0 < precision <= 1):
         raise ValueError(
@@ -132,7 +132,7 @@ def execute_with_pec(
 
     print(f"In execute_with_pec, sampling {num_samples} circuits.")
     for _ in range(num_samples):
-        sampled_circuit, sign, _ = _sample_circuit(
+        sampled_circuit, sign, _ = sample_circuit(
             circuit, decompositions, random_state
         )
         sampled_circuits.append(sampled_circuit)

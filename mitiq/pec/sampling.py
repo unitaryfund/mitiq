@@ -27,7 +27,7 @@ from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 from mitiq.pec.types import OperationDecomposition
 
 
-def _sample_sequence(
+def sample_sequence(
     ideal_operation: QPROGRAM,
     decompositions: List[OperationDecomposition],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
@@ -78,7 +78,7 @@ def _sample_sequence(
     return noisy_operation.ideal_circuit(), sign, operation_decomposition.norm
 
 
-def _sample_circuit(
+def sample_circuit(
     ideal_circuit: QPROGRAM,
     decompositions: List[OperationDecomposition],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
@@ -121,7 +121,7 @@ def _sample_circuit(
     sign = 1
     norm = 1.0
     for op in ideal.all_operations():
-        imp_seq, loc_sign, loc_norm = _sample_sequence(
+        imp_seq, loc_sign, loc_norm = sample_sequence(
             cirq.Circuit(op), decompositions, random_state
         )
         cirq_seq, _ = convert_to_mitiq(imp_seq)
