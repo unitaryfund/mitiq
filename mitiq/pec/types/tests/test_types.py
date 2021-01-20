@@ -24,7 +24,7 @@ from mitiq.utils import _equal
 from mitiq.pec.types import (
     NoisyBasis,
     NoisyOperation,
-    OperationDecomposition,
+    OperationRepresentation,
 )
 
 
@@ -519,7 +519,7 @@ def test_get_sequences_simple(length):
         assert len(sequence.ideal_circuit()) == length
 
 
-def get_test_decomp():
+def get_test_representation():
     ideal = cirq.Circuit(cirq.H(cirq.LineQubit(0)))
 
     noisy_xop = NoisyOperation.from_cirq(
@@ -529,14 +529,14 @@ def get_test_decomp():
         ideal=cirq.Z, real=np.zeros(shape=(4, 4))
     )
 
-    decomp = OperationDecomposition(
+    decomp = OperationRepresentation(
         ideal=ideal, basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5}
     )
     return ideal, noisy_xop, noisy_zop, decomp
 
 
-def test_decomposition_simple():
-    ideal, noisy_xop, noisy_zop, decomp = get_test_decomp()
+def test_representation_simple():
+    ideal, noisy_xop, noisy_zop, decomp = get_test_representation()
 
     assert _equal(decomp.ideal, ideal)
     assert decomp.coeffs == (0.5, -0.5)
@@ -546,14 +546,14 @@ def test_decomposition_simple():
     assert set(decomp.noisy_operations) == {noisy_xop, noisy_zop}
 
 
-def test_decomposition_coeff_of():
-    ideal, noisy_xop, noisy_zop, decomp = get_test_decomp()
+def test_representation_coeff_of():
+    ideal, noisy_xop, noisy_zop, decomp = get_test_representation()
 
     assert np.isclose(decomp.coeff_of(noisy_xop), 0.5)
     assert np.isclose(decomp.coeff_of(noisy_zop), -0.5)
 
 
-def test_decomposition_bad_type_for_basis_expansion():
+def test_representation_bad_type_for_basis_expansion():
     ideal = cirq.Circuit(cirq.H(cirq.LineQubit(0)))
 
     noisy_xop = NoisyOperation.from_cirq(
@@ -561,12 +561,12 @@ def test_decomposition_bad_type_for_basis_expansion():
     )
 
     with pytest.raises(TypeError, match="All keys of `basis_expansion` must"):
-        OperationDecomposition(
+        OperationRepresentation(
             ideal=ideal, basis_expansion=dict([(1.0, noisy_xop)])
         )
 
 
-def test_decomposition_coeff_of_nonexistant_operation():
+def test_representation_coeff_of_nonexistant_operation():
     qbit = cirq.LineQubit(0)
     ideal = cirq.Circuit(cirq.X(qbit))
 
@@ -574,7 +574,7 @@ def test_decomposition_coeff_of_nonexistant_operation():
         ideal=cirq.X, real=np.zeros(shape=(4, 4))
     )
 
-    decomp = OperationDecomposition(
+    decomp = OperationRepresentation(
         ideal=ideal, basis_expansion=dict([(noisy_xop, 0.5)])
     )
 
@@ -585,15 +585,15 @@ def test_decomposition_coeff_of_nonexistant_operation():
         decomp.coeff_of(noisy_zop)
 
 
-def test_decomposition_sign_of():
-    _, noisy_xop, noisy_zop, decomp = get_test_decomp()
+def test_representation_sign_of():
+    _, noisy_xop, noisy_zop, decomp = get_test_representation()
 
     assert decomp.sign_of(noisy_xop) == 1.0
     assert decomp.sign_of(noisy_zop) == -1.0
 
 
-def test_decomposition_sample():
-    _, noisy_xop, noisy_zop, decomp = get_test_decomp()
+def test_representation_sample():
+    _, noisy_xop, noisy_zop, decomp = get_test_representation()
 
     for _ in range(10):
         noisy_op, sign, coeff = decomp.sample()
@@ -605,8 +605,8 @@ def test_decomposition_sample():
         assert decomp.coeff_of(noisy_op) == coeff
 
 
-def test_decomposition_sample_seed():
-    _, noisy_xop, noisy_zop, decomp = get_test_decomp()
+def test_representation_sample_seed():
+    _, noisy_xop, noisy_zop, decomp = get_test_representation()
 
     seed1 = np.random.RandomState(seed=1)
     seed2 = np.random.RandomState(seed=1)
@@ -618,13 +618,13 @@ def test_decomposition_sample_seed():
         assert np.isclose(coeff1, coeff2)
 
 
-def test_decomposition_sample_bad_seed_type():
-    _, _, _, decomp = get_test_decomp()
+def test_representation_sample_bad_seed_type():
+    _, _, _, decomp = get_test_representation()
     with pytest.raises(TypeError, match="should be of type"):
         decomp.sample(random_state=7)
 
 
-def test_decomposition_sample_zero_coefficient():
+def test_representation_sample_zero_coefficient():
     ideal = cirq.Circuit(cirq.H(cirq.LineQubit(0)))
 
     noisy_xop = NoisyOperation.from_cirq(
@@ -634,7 +634,7 @@ def test_decomposition_sample_zero_coefficient():
         ideal=cirq.Z, real=np.zeros(shape=(4, 4))
     )
 
-    decomp = OperationDecomposition(
+    decomp = OperationRepresentation(
         ideal=ideal,
         basis_expansion={
             noisy_xop: 0.5,
@@ -650,7 +650,7 @@ def test_decomposition_sample_zero_coefficient():
         assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq.X))
 
 
-def test_print_cirq_operation_decomposition():
+def test_print_cirq_operation_representation():
     ideal = cirq.Circuit(cirq.H(cirq.LineQubit(0)))
 
     noisy_xop = NoisyOperation.from_cirq(
@@ -660,7 +660,7 @@ def test_print_cirq_operation_decomposition():
         ideal=cirq.Z, real=np.zeros(shape=(4, 4))
     )
 
-    decomp = OperationDecomposition(
+    decomp = OperationRepresentation(
         ideal=ideal,
         basis_expansion={
             noisy_xop: 0.5,

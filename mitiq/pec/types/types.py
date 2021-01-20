@@ -365,14 +365,14 @@ class NoisyBasis:
             sequences.append(this_sequence)
         return sequences
 
-    def decompose(self, ideal: QPROGRAM):
+    def represent(self, ideal: QPROGRAM):
         raise NotImplementedError
 
     def __len__(self):
         return len(self._basis_elements)
 
 
-class OperationDecomposition:
+class OperationRepresentation:
     """A decomposition (basis expansion) of an operation or sequence of
     operations in a basis of noisy, implementable operations.
     """
@@ -380,12 +380,12 @@ class OperationDecomposition:
     def __init__(
         self, ideal: QPROGRAM, basis_expansion: Dict[NoisyOperation, float]
     ) -> None:
-        """Initializes an OperationDecomposition.
+        """Initializes an OperationRepresentation.
 
         Args:
             ideal: The ideal operation desired to be implemented.
-            basis_expansion: Representation of the ideal operation in a noisy
-                basis.
+            basis_expansion: Representation of the ideal operation in a basis
+                of `NoisyOperation`s.
 
         Raises:
             TypeError: If all keys of `basis_expansion` are not instances of
@@ -483,4 +483,6 @@ class OperationDecomposition:
         return noisy_op, int(self.sign_of(noisy_op)), self.coeff_of(noisy_op)
 
     def __str__(self):
+        # TODO: This works well for one-qubit representations, but doesn't
+        #  display nicely in general.
         return str(self._ideal) + " = " + str(self.basis_expansion)

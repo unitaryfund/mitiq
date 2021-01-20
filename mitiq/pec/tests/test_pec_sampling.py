@@ -23,7 +23,7 @@ import pyquil
 import qiskit
 
 from mitiq.pec.sampling import sample_sequence, sample_circuit
-from mitiq.pec.types import NoisyOperation, OperationDecomposition
+from mitiq.pec.types import NoisyOperation, OperationRepresentation
 from mitiq.utils import _equal
 
 
@@ -33,12 +33,12 @@ def test_sample_sequence_cirq():
     noisy_xop = NoisyOperation.from_cirq(ideal=cirq.X)
     noisy_zop = NoisyOperation.from_cirq(ideal=cirq.Z)
 
-    decomp = OperationDecomposition(
+    rep = OperationRepresentation(
         ideal=circuit, basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
     )
 
     for _ in range(50):
-        seq, sign, norm = sample_sequence(circuit, decompositions=[decomp])
+        seq, sign, norm = sample_sequence(circuit, representations=[rep])
         assert isinstance(seq, cirq.Circuit)
         assert sign in {1, -1}
         assert norm == 1.0
@@ -58,12 +58,12 @@ def test_sample_sequence_qiskit():
     noisy_xop = NoisyOperation(xcircuit)
     noisy_zop = NoisyOperation(zcircuit)
 
-    decomp = OperationDecomposition(
+    rep = OperationRepresentation(
         ideal=circuit, basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
     )
 
     for _ in range(50):
-        seq, sign, norm = sample_sequence(circuit, decompositions=[decomp])
+        seq, sign, norm = sample_sequence(circuit, representations=[rep])
         assert isinstance(seq, qiskit.QuantumCircuit)
         assert sign in {1, -1}
         assert norm == 1.0
@@ -75,12 +75,12 @@ def test_sample_sequence_pyquil():
     noisy_xop = NoisyOperation(pyquil.Program(pyquil.gates.X(0)))
     noisy_zop = NoisyOperation(pyquil.Program(pyquil.gates.Z(0)))
 
-    decomp = OperationDecomposition(
+    rep = OperationRepresentation(
         ideal=circuit, basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
     )
 
     for _ in range(50):
-        seq, sign, norm = sample_sequence(circuit, decompositions=[decomp])
+        seq, sign, norm = sample_sequence(circuit, representations=[rep])
         assert isinstance(seq, pyquil.Program)
         assert sign in {1, -1}
         assert norm == 1.0
@@ -89,7 +89,7 @@ def test_sample_sequence_pyquil():
 @pytest.mark.parametrize("seed", (1, 2, 3, 5))
 def test_sample_sequence_cirq_random_state(seed):
     circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
-    decomposition = OperationDecomposition(
+    rep = OperationRepresentation(
         ideal=circuit,
         basis_expansion={
             NoisyOperation.from_cirq(ideal=cirq.X): 0.5,
@@ -98,12 +98,12 @@ def test_sample_sequence_cirq_random_state(seed):
     )
 
     sequence, sign, norm = sample_sequence(
-        circuit, [decomposition], random_state=np.random.RandomState(seed)
+        circuit, [rep], random_state=np.random.RandomState(seed)
     )
 
     for _ in range(20):
         new_sequence, new_sign, new_norm = sample_sequence(
-            circuit, [decomposition], random_state=np.random.RandomState(seed)
+            circuit, [rep], random_state=np.random.RandomState(seed)
         )
         assert _equal(new_sequence, sequence)
         assert new_sign == sign
@@ -116,7 +116,7 @@ def test_sample_circuit_cirq():
         cirq.ops.CNOT.on(*cirq.LineQubit.range(2)),
     )
 
-    hdecomposition = OperationDecomposition(
+    h_rep = OperationRepresentation(
         ideal=circuit[:1],
         basis_expansion={
             NoisyOperation.from_cirq(ideal=cirq.X): 0.6,
@@ -124,7 +124,7 @@ def test_sample_circuit_cirq():
         },
     )
 
-    cnot_decomposition = OperationDecomposition(
+    cnot_rep = OperationRepresentation(
         ideal=circuit[1:],
         basis_expansion={
             NoisyOperation.from_cirq(ideal=cirq.CNOT): 0.7,
@@ -134,7 +134,7 @@ def test_sample_circuit_cirq():
 
     for _ in range(50):
         sampled_circuit, sign, norm = sample_circuit(
-            circuit, decompositions=[hdecomposition, cnot_decomposition]
+            circuit, representations=[h_rep, cnot_rep]
         )
 
         assert isinstance(sampled_circuit, cirq.Circuit)
@@ -146,7 +146,7 @@ def test_sample_circuit_cirq():
 def test_sample_circuit_pyquil():
     circuit = pyquil.Program(pyquil.gates.H(0), pyquil.gates.CNOT(0, 1))
 
-    hdecomposition = OperationDecomposition(
+    h_rep = OperationRepresentation(
         ideal=circuit[:1],
         basis_expansion={
             NoisyOperation(pyquil.Program(pyquil.gates.X(0))): 0.6,
@@ -154,7 +154,7 @@ def test_sample_circuit_pyquil():
         },
     )
 
-    cnot_decomposition = OperationDecomposition(
+    cnot_rep = OperationRepresentation(
         ideal=circuit[1:],
         basis_expansion={
             NoisyOperation(pyquil.Program(pyquil.gates.CNOT(0, 1))): 0.7,
@@ -164,7 +164,7 @@ def test_sample_circuit_pyquil():
 
     for _ in range(50):
         sampled_circuit, sign, norm = sample_circuit(
-            circuit, decompositions=[hdecomposition, cnot_decomposition]
+            circuit, representations=[h_rep, cnot_rep]
         )
 
         assert isinstance(sampled_circuit, pyquil.Program)
@@ -175,7 +175,7 @@ def test_sample_circuit_pyquil():
 
 def test_sample_circuit_with_seed():
     circ = cirq.Circuit([cirq.X.on(cirq.LineQubit(0)) for _ in range(10)])
-    decomp = OperationDecomposition(
+    rep = OperationRepresentation(
         ideal=cirq.Circuit(cirq.X.on(cirq.LineQubit(0))),
         basis_expansion={
             NoisyOperation.from_cirq(cirq.Z): 1.0,
@@ -184,7 +184,7 @@ def test_sample_circuit_with_seed():
     )
 
     expected_circuit, expected_sign, expected_norm = sample_circuit(
-        circ, [decomp], random_state=4
+        circ, [rep], random_state=4
     )
 
     # Check we're not sampling the same operation every call to sample_sequence
@@ -192,7 +192,7 @@ def test_sample_circuit_with_seed():
 
     for _ in range(10):
         sampled_circuit, sampled_sign, sampled_norm = sample_circuit(
-            circ, [decomp], random_state=4
+            circ, [rep], random_state=4
         )
         assert _equal(sampled_circuit, expected_circuit)
         assert sampled_sign == expected_sign
@@ -201,12 +201,12 @@ def test_sample_circuit_with_seed():
 
 def test_sample_circuit_trivial_decomposition():
     circuit = cirq.Circuit(cirq.ops.H.on(cirq.NamedQubit("Q")))
-    decomp = OperationDecomposition(
+    rep = OperationRepresentation(
         ideal=circuit, basis_expansion={NoisyOperation(circuit): 1.0}
     )
 
     sampled_circuit, sign, norm = sample_circuit(
-        circuit, [decomp], random_state=1
+        circuit, [rep], random_state=1
     )
     assert _equal(sampled_circuit, circuit)
     assert sign == 1

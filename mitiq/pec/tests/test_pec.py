@@ -31,11 +31,13 @@ from mitiq.conversions import convert_to_mitiq
 from mitiq.benchmarks.utils import noisy_simulation
 
 from mitiq.pec.pec import execute_with_pec, LargeSampleWarning
-from mitiq.pec.types import NoisyOperation, OperationDecomposition
+from mitiq.pec.types import NoisyOperation, OperationRepresentation
 
 
-# Decompositions for testing.
-def _pauli_decomposition(base_noise: float) -> List[OperationDecomposition]:
+# Noisy representations of Pauli operations for testing.
+def get_pauli_representations(
+    base_noise: float
+) -> List[OperationRepresentation]:
     qreg = cirq.LineQubit.range(2)
     pauli_ops = [cirq.I, cirq.X, cirq.Y, cirq.Z]
 
@@ -49,12 +51,12 @@ def _pauli_decomposition(base_noise: float) -> List[OperationDecomposition]:
     #  Y = c_neg I + c_neg X + c c_pos + c_neg Z
     #  Z = c_neg I + c_neg X + c_neg Y + c_pos Z
     #  for both qubits.
-    decompositions = []
+    representations = []
     for q in qreg:
         paulis = [cirq.Circuit(p.on(q)) for p in pauli_ops]
         for p in paulis[1:]:
-            decompositions.append(
-                OperationDecomposition(
+            representations.append(
+                OperationRepresentation(
                     ideal=p,
                     basis_expansion={
                         NoisyOperation(op): c_pos
@@ -79,12 +81,12 @@ def _pauli_decomposition(base_noise: float) -> List[OperationDecomposition]:
         circ = cnot_circuit + cirq.Circuit(p0.on(qreg[0]), p1.on(qreg[1]))
         cd.update({NoisyOperation(circ): c_neg_neg})
 
-    return decompositions + [OperationDecomposition(cnot_circuit, cd)]
+    return representations + [OperationRepresentation(cnot_circuit, cd)]
 
 
 BASE_NOISE = 0.02
-pauli_decompositions = _pauli_decomposition(BASE_NOISE)
-noiseless_pauli_decompositions = _pauli_decomposition(base_noise=0.0)
+pauli_representations = get_pauli_representations(base_noise=BASE_NOISE)
+noiseless_pauli_representations = get_pauli_representations(base_noise=0.0)
 
 
 def serial_executor(circuit: QPROGRAM, noise: float = BASE_NOISE) -> float:
@@ -119,7 +121,7 @@ def fake_executor(circuit: cirq.Circuit, random_state: np.random.RandomState):
     return random_state.randn()
 
 
-# Simple circuits for testing.
+# Simple Cirq circuits for testing.
 q0, q1 = cirq.LineQubit.range(2)
 oneq_circ = cirq.Circuit(cirq.Z.on(q0), cirq.Z.on(q0))
 twoq_circ = cirq.Circuit(cirq.Y.on(q1), cirq.CNOT.on(q0, q1), cirq.Y.on(q1))
@@ -127,7 +129,7 @@ twoq_circ = cirq.Circuit(cirq.Y.on(q1), cirq.CNOT.on(q0, q1), cirq.Y.on(q1))
 
 def test_execute_with_pec_cirq_trivial_decomposition():
     circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
-    decomposition = OperationDecomposition(
+    rep = OperationRepresentation(
         circuit, basis_expansion={NoisyOperation(circuit): 1.0}
     )
 
@@ -135,7 +137,7 @@ def test_execute_with_pec_cirq_trivial_decomposition():
     mitigated = execute_with_pec(
         circuit,
         serial_executor,
-        decompositions=[decomposition],
+        representations=[rep],
         force_run_all=False,
         num_samples=100,
         random_state=1,
@@ -146,7 +148,7 @@ def test_execute_with_pec_cirq_trivial_decomposition():
 
 def test_execute_with_pec_pyquil_trivial_decomposition():
     circuit = pyquil.Program(pyquil.gates.H(0))
-    decomposition = OperationDecomposition(
+    rep = OperationRepresentation(
         circuit, basis_expansion={NoisyOperation(circuit): 1.0}
     )
     unmitigated = serial_executor(circuit)
@@ -154,7 +156,7 @@ def test_execute_with_pec_pyquil_trivial_decomposition():
     mitigated = execute_with_pec(
         circuit,
         serial_executor,
-        decompositions=[decomposition],
+        representations=[rep],
         num_samples=100,
         force_run_all=False,
         random_state=1,
@@ -167,7 +169,7 @@ def test_execute_with_pec_qiskit_trivial_decomposition():
     qreg = qiskit.QuantumRegister(1)
     circuit = qiskit.QuantumCircuit(qreg)
     _ = circuit.x(qreg)
-    decomposition = OperationDecomposition(
+    rep = OperationRepresentation(
         circuit, basis_expansion={NoisyOperation(circuit): 1.0}
     )
     unmitigated = serial_executor(circuit)
@@ -175,7 +177,7 @@ def test_execute_with_pec_qiskit_trivial_decomposition():
     mitigated = execute_with_pec(
         circuit,
         serial_executor,
-        decompositions=[decomposition],
+        representations=[rep],
         num_samples=100,
         force_run_all=False,
         random_state=1,
@@ -191,7 +193,7 @@ def test_execute_with_pec_cirq_noiseless_decomposition(circuit):
     mitigated = execute_with_pec(
         circuit,
         noiseless_serial_executor,
-        decompositions=noiseless_pauli_decompositions,
+        representations=noiseless_pauli_representations,
         force_run_all=False,
         num_samples=100,
         random_state=1,
@@ -202,8 +204,8 @@ def test_execute_with_pec_cirq_noiseless_decomposition(circuit):
 
 @pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
 @pytest.mark.parametrize("executor", [serial_executor, batched_executor])
-@pytest.mark.parametrize("decompositions", [pauli_decompositions])
-def test_execute_with_pec_mitigates_noise(circuit, executor, decompositions):
+@pytest.mark.parametrize("reps", [pauli_representations])
+def test_execute_with_pec_mitigates_noise(circuit, executor, reps):
     """Tests that execute_with_pec mitigates the error of a noisy
     expectation value.
     """
@@ -212,7 +214,7 @@ def test_execute_with_pec_mitigates_noise(circuit, executor, decompositions):
     mitigated = execute_with_pec(
         circuit,
         executor,
-        decompositions=decompositions,
+        representations=reps,
         force_run_all=False,
         random_state=101,
     )
@@ -235,7 +237,7 @@ def test_execute_with_pec_with_different_samples(circuit, seed):
         mitigated = execute_with_pec(
             circuit,
             serial_executor,
-            decompositions=pauli_decompositions,
+            representations=pauli_representations,
             num_samples=10,
             force_run_all=True,
             random_state=seed,
@@ -244,7 +246,7 @@ def test_execute_with_pec_with_different_samples(circuit, seed):
         mitigated = execute_with_pec(
             circuit,
             serial_executor,
-            decompositions=pauli_decompositions,
+            representations=pauli_representations,
             num_samples=100,
             force_run_all=True,
             random_state=seed,
@@ -262,7 +264,7 @@ def test_execute_with_pec_error_scaling(num_samples: int):
     _, error_pec = execute_with_pec(
         oneq_circ,
         partial(fake_executor, random_state=np.random.RandomState(0)),
-        decompositions=pauli_decompositions,
+        representations=pauli_representations,
         num_samples=num_samples,
         force_run_all=True,
         full_output=True,
@@ -279,7 +281,7 @@ def test_precision_option_in_execute_with_pec(precision: float):
     _, pec_error = execute_with_pec(
         oneq_circ,
         partial(fake_executor, random_state=np.random.RandomState(0)),
-        decompositions=pauli_decompositions,
+        representations=pauli_representations,
         precision=precision,
         force_run_all=True,
         full_output=True,
@@ -292,7 +294,7 @@ def test_precision_option_in_execute_with_pec(precision: float):
     _, pec_error = execute_with_pec(
         oneq_circ,
         partial(fake_executor, random_state=np.random.RandomState(0)),
-        decompositions=pauli_decompositions,
+        representations=pauli_representations,
         precision=precision,
         num_samples=nsamples,
         full_output=True,
@@ -309,7 +311,7 @@ def test_bad_precision_argument(bad_value: float):
         execute_with_pec(
             oneq_circ,
             serial_executor,
-            pauli_decompositions,
+            pauli_representations,
             precision=bad_value
         )
 
@@ -317,7 +319,7 @@ def test_bad_precision_argument(bad_value: float):
 @pytest.mark.skip(reason="Slow test.")
 def test_large_sample_size_warning():
     """Tests whether a warning is raised when PEC sample size
-    is greater than 10 ** 5
+    is greater than 10 ** 5.
     """
     with pytest.warns(
         LargeSampleWarning, match=r"The number of PEC samples is very large.",
@@ -325,6 +327,6 @@ def test_large_sample_size_warning():
         execute_with_pec(
             oneq_circ,
             partial(fake_executor, random_state=np.random.RandomState(0)),
-            pauli_decompositions,
+            pauli_representations,
             num_samples=100001
         )

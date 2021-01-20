@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Tools for sampling from the noisy decomposition of ideal operations."""
+"""Tools for sampling from the noisy representations of ideal operations."""
 
 from typing import List, Optional, Tuple, Union
 from copy import deepcopy
@@ -24,12 +24,12 @@ import cirq
 from mitiq import QPROGRAM
 from mitiq.utils import _equal
 from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
-from mitiq.pec.types import OperationDecomposition
+from mitiq.pec.types import OperationRepresentation
 
 
 def sample_sequence(
     ideal_operation: QPROGRAM,
-    decompositions: List[OperationDecomposition],
+    representations: List[OperationRepresentation],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
 ) -> Tuple[QPROGRAM, int, float]:
     """Samples an implementable sequence from the PEC representation of the
@@ -47,8 +47,9 @@ def sample_sequence(
     Args:
         ideal_operation: The ideal operation from which an implementable
             sequence is sampled.
-        decompositions: A list of decompositions. If no decomposition is
-            included for the input `ideal_operation`, a ValueError is raised.
+        representations: A list of representations of ideal operations in a
+            noisy basis. If no representation is found for `ideal_operation`,
+            a ValueError is raised.
         random_state: Seed for sampling.
 
     Returns:
@@ -57,30 +58,30 @@ def sample_sequence(
         norm: The one-norm of the decomposition coefficients.
 
     Raises:
-        ValueError: If no decomposition is found for the input ideal_operation.
+        ValueError: If no representation is found for `ideal_operation`.
     """
-    # Grab the decomposition for the given ideal operation.
+    # Grab the representation for the given ideal operation.
     ideal, _ = convert_to_mitiq(ideal_operation)
-    operation_decomposition = None
-    for decomposition in decompositions:
-        if _equal(decomposition.ideal, ideal, require_qubit_equality=True):
-            operation_decomposition = decomposition
+    operation_representation = None
+    for representation in representations:
+        if _equal(representation.ideal, ideal, require_qubit_equality=True):
+            operation_representation = representation
             break
 
-    if operation_decomposition is None:
+    if operation_representation is None:
         raise ValueError(
-            f"Decomposition for ideal operation {ideal_operation} not found "
-            f"in provided decompositions."
+            f"Representation of ideal operation {ideal_operation} not found "
+            f"in provided representations."
         )
 
-    # Sample from this decomposition.
-    noisy_operation, sign, _ = operation_decomposition.sample(random_state)
-    return noisy_operation.ideal_circuit(), sign, operation_decomposition.norm
+    # Sample from this representation.
+    noisy_operation, sign, _ = operation_representation.sample(random_state)
+    return noisy_operation.ideal_circuit(), sign, operation_representation.norm
 
 
 def sample_circuit(
     ideal_circuit: QPROGRAM,
-    decompositions: List[OperationDecomposition],
+    representations: List[OperationRepresentation],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
 ) -> Tuple[QPROGRAM, int, float]:
     """Samples an implementable circuit from the PEC representation of the
@@ -93,19 +94,19 @@ def sample_circuit(
     Args:
         ideal_circuit: The ideal circuit from which an implementable circuit
             is sampled.
-        decompositions: List of decompositions for every operation in the input
-            circuit. If a decomposition cannot be found for an operation in the
-            circuit, a ValueError is raised.
+        representations: List of representations of every operation in the
+            input circuit. If a representation cannot be found for an operation
+            in the circuit, a ValueError is raised.
         random_state: Seed for sampling.
 
     Returns:
         imp_circuit: The sampled implementable circuit.
         sign: The sign associated to sampled_circuit.
-        norm: The one norm of the decomposition coefficients of the circuit.
+        norm: The one norm of the PEC coefficients of the circuit.
 
     Raises:
         ValueError:
-            If a decomposition cannot be found for an operation in the circuit.
+            If a representation is not found for an operation in the circuit.
     """
     if isinstance(random_state, int):
         random_state = np.random.RandomState(random_state)
@@ -122,7 +123,7 @@ def sample_circuit(
     norm = 1.0
     for op in ideal.all_operations():
         imp_seq, loc_sign, loc_norm = sample_sequence(
-            cirq.Circuit(op), decompositions, random_state
+            cirq.Circuit(op), representations, random_state
         )
         cirq_seq, _ = convert_to_mitiq(imp_seq)
         sign *= loc_sign

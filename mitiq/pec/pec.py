@@ -23,7 +23,7 @@ import numpy as np
 from mitiq import generate_collected_executor, QPROGRAM
 from mitiq.conversions import convert_to_mitiq
 from mitiq.pec.sampling import sample_circuit
-from mitiq.pec.types import OperationDecomposition
+from mitiq.pec.types import OperationRepresentation
 
 
 class LargeSampleWarning(Warning):
@@ -42,7 +42,7 @@ _LARGE_SAMPLE_WARN = (
 def execute_with_pec(
     circuit: QPROGRAM,
     executor: Callable,
-    decompositions: List[OperationDecomposition],
+    representations: List[OperationRepresentation],
     precision: float = 0.03,
     num_samples: Optional[int] = None,
     force_run_all: bool = True,
@@ -65,8 +65,8 @@ def execute_with_pec(
         circuit: The input circuit to execute with error-mitigation.
         executor: A function which executes a circuit (sequence of circuits)
             and returns an expectation value (sequence of expectation values).
-        decompositions: Decompositions (basis expansions) of each operation in
-            the input circuit.
+        representations: Representations (basis expansions) of each operation
+            in the input circuit.
         precision: The desired estimation precision (assuming the observable
             is bounded by 1). The number of samples is deduced according
             to the formula (one_norm / precision) ** 2, where 'one_norm'
@@ -111,7 +111,7 @@ def execute_with_pec(
         random_state = np.random.RandomState(random_state)
 
     # Get the 1-norm of the circuit quasi-probability representation
-    _, _, norm = sample_circuit(circuit, decompositions)
+    _, _, norm = sample_circuit(circuit, representations)
 
     if not (0 < precision <= 1):
         raise ValueError(
@@ -133,7 +133,7 @@ def execute_with_pec(
     print(f"In execute_with_pec, sampling {num_samples} circuits.")
     for _ in range(num_samples):
         sampled_circuit, sign, _ = sample_circuit(
-            circuit, decompositions, random_state
+            circuit, representations, random_state
         )
         sampled_circuits.append(sampled_circuit)
         signs.append(sign)
