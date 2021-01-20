@@ -14,6 +14,7 @@ Welcome to mitiq's documentation!
    toc_contributing.rst
    changelog.rst
    zz_bibliography.rst
+   examples.rst
 
 Indices and tables
 ==================

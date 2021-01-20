@@ -17,4 +17,4 @@ Users Guide
    guide-ibmq-backends.rst
    guide-qaoa-landscape.rst
    guide-hamiltonians.rst
-.. _guide-zne-lindblad.rst
+   guide-zne-lindblad.rst
