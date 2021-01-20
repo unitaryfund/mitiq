@@ -11,7 +11,11 @@
 ## Version 0.5.0 (In Development)
 
 ### All Changes
+- Ensure code is tested in IBMQ guide and adds a doctest target in Makefile(@rmlarose, gh-488)
+- Fixes random failure of PEC sampling test(@rmlarose, gh-481)
+- Exact copying of shell commands, update make target for pdf and update development version(@rmlarose, gh-469).
 - Add a new FakeNodesFactory class based on an alternative interpolation method (@elmandouh, gh-444).
+- Remove duplication of the reduce method in every (non-adaptive) factory (@elmandouh, gh-470).
 
 ## Version 0.4.0 (December 6th, 2020)
 
@@ -22,7 +26,6 @@ custom types for noisy operations, noisy bases, and decompositions in PEC. It al
 to the documentation, seeding options for PEC sampling functions, and bug fixes for a few non-deterministic test failures.
 
 ### All Changes
-
 - Add reference to review paper in docs (@willzeng, gh-423).
 - Add unitary folding API to RTD (@rmlarose, gh-429).
 - Add theory subsection on PEC in docs (@elmandouh, gh-428).
