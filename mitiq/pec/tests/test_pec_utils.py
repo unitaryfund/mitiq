@@ -20,10 +20,6 @@ import numpy as np
 from cirq import Gate, LineQubit, X, Y, Z, I, CNOT, depolarize, Circuit
 from mitiq.pec.utils import (
     _simple_pauli_deco_dict,
-    get_coefficients,
-    get_imp_sequences,
-    get_one_norm,
-    get_probabilities,
     _max_ent_state_circuit,
     _operation_to_choi,
     _circuit_to_choi,
@@ -104,51 +100,6 @@ def test_simplify_paulis_in_simple_pauli_deco_dict(gate: Gate):
         _, second_imp_seq = deco[1]
         input_times_x = {X: I, Y: Z, Z: Y}
         assert second_imp_seq == [input_times_x[gate].on(q)]
-
-
-@mark.parametrize("gate", [X, Y, Z])
-def test_get_coefficients(gate: Gate):
-    q = LineQubit(0)
-    coeffs = get_coefficients(gate.on(q), DECO_DICT)
-    epsilon = BASE_NOISE * 4.0 / 3.0
-    c_neg = -(1 / 4) * epsilon / (1 - epsilon)
-    c_pos = 1 - 3 * c_neg
-    assert np.isclose(np.sum(coeffs), 1.0)
-    assert np.allclose(coeffs, [c_pos, c_neg, c_neg, c_neg])
-
-
-def test_get_imp_sequences_with_simplify():
-    q = LineQubit(0)
-    expected_imp_sequences = [[X.on(q)], [I.on(q)], [Z.on(q)], [Y.on(q)]]
-    assert get_imp_sequences(X.on(q), DECO_DICT_SIMP) == expected_imp_sequences
-
-
-@mark.parametrize("gate", [X, Y, Z])
-def test_get_imp_sequences_no_simplify(gate: Gate):
-    q = LineQubit(0)
-    expected_imp_sequences = [
-        [gate.on(q)],
-        [gate.on(q), X.on(q)],
-        [gate.on(q), Y.on(q)],
-        [gate.on(q), Z.on(q)],
-    ]
-    assert get_imp_sequences(gate.on(q), DECO_DICT) == expected_imp_sequences
-
-
-@mark.parametrize("gate", [X, Y, Z])
-def test_get_one_norm(gate: Gate):
-    q = LineQubit(0)
-    epsilon = BASE_NOISE * 4.0 / 3.0
-    expected_one_norm = (1.0 + 0.5 * epsilon) / (1.0 - epsilon)
-    assert np.isclose(get_one_norm(gate.on(q), DECO_DICT), expected_one_norm)
-
-
-@mark.parametrize("gate", [X, Y, Z])
-def test_get_probabilities(gate: Gate):
-    q = LineQubit(0)
-    probs = get_probabilities(gate.on(q), DECO_DICT)
-    assert all([p >= 0 for p in probs])
-    assert np.isclose(sum(probs), 1.0)
 
 
 @mark.parametrize("gate", [X, Y, Z, CNOT])
