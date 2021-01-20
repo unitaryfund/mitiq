@@ -353,7 +353,7 @@ class Factory(ABC):
         )
         ax.grid(True)
         plt.xlabel("Noise scale factor")
-        plt.ylabel("Observable value")
+        plt.ylabel("Expectation value")
         return fig
 
     def plot_fit(self) -> Figure:
