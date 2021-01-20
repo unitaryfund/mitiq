@@ -223,14 +223,16 @@ def test_sample_circuit_trivial_decomposition():
 # # Simple 2-qubit circuit
 # qreg = cirq.LineQubit.range(2)
 # twoq_circ = cirq.Circuit(cirq.X.on(qreg[0]), cirq.CNOT.on(*qreg),)
-
-
+#
+#
 # @pytest.mark.parametrize("gate", [cirq.Y, cirq.CNOT])
 # def test_sample_sequence_choi(gate: cirq.Gate):
 #     """Tests the sample_sequence by comparing the exact Choi matrices."""
 #     qreg = cirq.LineQubit.range(gate.num_qubits())
 #     ideal_op = gate.on(*qreg)
-#     noisy_op_tree = [ideal_op] + [cirq.depolarize(BASE_NOISE)(q) for q in qreg]
+#     noisy_op_tree = (
+#             [ideal_op] + [cirq.depolarize(BASE_NOISE)(q) for q in qreg]
+#     )
 #     ideal_choi = _operation_to_choi(gate.on(*qreg))
 #     noisy_choi = _operation_to_choi(noisy_op_tree)
 #     choi_unbiased_estimates = []
@@ -261,8 +263,12 @@ def test_sample_circuit_trivial_decomposition():
 #     noisy_choi = _circuit_to_choi(noisy_circuit)
 #     choi_unbiased_estimates = []
 #     for _ in range(500):
-#         imp_circuit, sign, norm = sample_circuit(twoq_circ, decomposition_dict)
-#         noisy_imp_circuit = imp_circuit.with_noise(cirq.depolarize(BASE_NOISE))
+#         imp_circuit, sign, norm = sample_circuit(
+#             twoq_circ, decomposition_dict
+#         )
+#         noisy_imp_circuit = imp_circuit.with_noise(
+#             cirq.depolarize(BASE_NOISE)
+#         )
 #         imp_circuit_choi = _circuit_to_choi(noisy_imp_circuit)
 #         choi_unbiased_estimates.append(norm * sign * imp_circuit_choi)
 #     choi_pec_estimate = np.average(choi_unbiased_estimates, axis=0)
