@@ -154,7 +154,7 @@ This executor can be used for noisy depolarizing simulation.
 Other noise models can be used by substituting the ``depolarize`` channel with
 any other channel available in ``cirq``, for example ``cirq.amplitude_damp``.
 More details can be found in the ``cirq``
-`noise documentation <https://cirq.readthedocs.io/en/stable/noise.html>`_
+`noise documentation <https://cirq.readthedocs.io/en/stable/noise.html>`__
 
 Cirq: Density-matrix Simulation with Depolarizing Noise and Sampling
 ------------------------------------------------------------------------
@@ -208,12 +208,12 @@ You can also include both noise models and finite sampling in your executor.
 PyQuil Executors
 ================
 
-This section contains executors for use with `pyQuil <https://github.com/rigetti/pyquil>`_.
+This section contains executors for use with `pyQuil <https://github.com/rigetti/pyquil>`__.
 
 PyQuil: Quantum Cloud Services
 ------------------------------
 
-This executor can be used to run on `Quantum Cloud Services <https://arxiv.org/abs/2001.04449>`_
+This executor can be used to run on `Quantum Cloud Services <https://arxiv.org/abs/2001.04449>`__
 (QCS), the hardware platform provided by Rigetti Computing. Requires a QCS account and
 reservation on a quantum processor (QPU).
 
@@ -338,7 +338,7 @@ to be used in ``mitiq``.
 
 Note that this executor implementation measures arbitrary observables by using
 a change of basis into the computational basis. More information about the math
-behind how this example is available `here <https://quantumcomputing.stackexchange.com/a/6944>`_.
+behind how this example is available `here <https://quantumcomputing.stackexchange.com/a/6944>`__.
 
 .. testcode::
 
@@ -495,7 +495,7 @@ This executor can be used for noisy depolarizing simulation.
 
 Other noise models can be defined using any functionality available in ``qiskit``.
 More details can be found in the ``qiskit``
-`simulator documentation <https://qiskit.org/documentation/tutorials/simulators/index.html>`_
+`simulator documentation <https://qiskit.org/documentation/tutorials/simulators/index.html>`__
 
 Qiskit: Hardware
 ------------------------------------------------------------
@@ -507,7 +507,7 @@ An example of an executor that runs on IBMQ hardware is given
 TensorFlow Quantum Executors
 ==========================================
 
-This section provides an example of how to use `TensorFlow Quantum <https://github.com/tensorflow/quantum>`_
+This section provides an example of how to use `TensorFlow Quantum <https://github.com/tensorflow/quantum>`__
 as an executor. Note that at the time of this writing, TensorFlow Quantum is limited to
 
   1. ``Cirq`` ``Circuits`` that use  ``Cirq`` ``GridQubit`` instances
