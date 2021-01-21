@@ -30,8 +30,8 @@ from mitiq.utils import _equal
 from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 from mitiq.benchmarks.utils import noisy_simulation
 
-from mitiq.pec.pec import execute_with_pec, LargeSampleWarning
-from mitiq.pec.types import NoisyOperation, OperationRepresentation
+from mitiq.pec import execute_with_pec, NoisyOperation, OperationRepresentation
+from mitiq.pec.pec import LargeSampleWarning
 
 
 # Noisy representations of Pauli operations for testing.
@@ -45,7 +45,7 @@ def get_pauli_representations(
         qreg = qubits
     pauli_ops = [cirq.I, cirq.X, cirq.Y, cirq.Z]
 
-    # Single-qubit decomposition coefficients.
+    # Single-qubit representation coefficients.
     epsilon = base_noise * 4 / 3
     c_neg = -(1 / 4) * epsilon / (1 - epsilon)
     c_pos = 1 - 3 * c_neg
@@ -69,7 +69,7 @@ def get_pauli_representations(
                 )
             )
 
-    # Two-qubit decomposition coefficients (assuming local noise).
+    # Two-qubit representation coefficients (assuming local noise).
     c_pos_pos = c_pos * c_pos
     c_pos_neg = c_neg * c_pos
     c_neg_neg = c_neg * c_neg
@@ -94,20 +94,16 @@ noiseless_pauli_representations = get_pauli_representations(base_noise=0.0)
 
 
 def serial_executor(circuit: QPROGRAM, noise: float = BASE_NOISE) -> float:
-    """A one- or two-qubit noisy executor function which executes the input
-    circuit with `noise` depolarizing noise and returns the expectation value
-    of the ground state projector.
+    """A noisy executor function which executes the input circuit with `noise`
+    depolarizing noise and returns the expectation value of the ground state
+    projector. Simulation will be slow for "large circuits" (> a few qubits).
     """
     circuit, _ = convert_to_mitiq(circuit)
 
-    if len(circuit.all_qubits()) == 1:
-        obs = np.array([[1, 0], [0, 0]])
-    elif len(circuit.all_qubits()) == 2:
-        obs = np.array(
-            [[1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
-        )
-    else:
-        raise ValueError("The input must be a circuit with 1 or 2 qubits.")
+    # Ground state projector.
+    d = 2 ** len(circuit.all_qubits())
+    obs = np.zeros(shape=(d, d), dtype=np.float32)
+    obs[0, 0] = 1.0
 
     return noisy_simulation(circuit, noise, obs)
 
@@ -204,6 +200,73 @@ def test_execute_with_pec_cirq_noiseless_decomposition(circuit):
     )
 
     assert np.isclose(unmitigated, mitigated)
+
+
+@pytest.mark.parametrize("nqubits", [1, 2, 5])
+def test_pyquil_noiseless_decomposition_multiqubit(nqubits):
+    circuit = pyquil.Program(pyquil.gates.H(q) for q in range(nqubits))
+
+    # Decompose H(q) for each qubit q into Paulis.
+    representations = []
+    for q in range(nqubits):
+        representation = OperationRepresentation(
+            ideal=pyquil.Program(pyquil.gates.H(q)),
+            basis_expansion={
+                NoisyOperation(ideal=pyquil.Program(pyquil.gates.X(q))): 0.5,
+                NoisyOperation(ideal=pyquil.Program(pyquil.gates.Z(q))): 0.5,
+            }
+        )
+        representations.append(representation)
+
+    exact = noiseless_serial_executor(circuit)
+    pec_value = execute_with_pec(
+        circuit,
+        noiseless_serial_executor,
+        representations=representations,
+        num_samples=500,
+        random_state=1,
+    )
+    assert np.isclose(pec_value, exact, atol=0.1)
+
+
+@pytest.mark.skip(reason="Slow test.")
+@pytest.mark.parametrize("nqubits", [1, 2])
+def test_qiskit_noiseless_decomposition_multiqubit(nqubits):
+    qreg = [qiskit.QuantumRegister(1) for _ in range(nqubits)]
+    circuit = qiskit.QuantumCircuit(*qreg)
+    for q in qreg:
+        circuit.h(q)
+
+    # Decompose H(q) for each qubit q into Paulis.
+    representations = []
+    for q in qreg:
+        opcircuit = qiskit.QuantumCircuit(q)
+        opcircuit.h(q)
+
+        xcircuit = qiskit.QuantumCircuit(q)
+        xcircuit.x(q)
+
+        zcircuit = qiskit.QuantumCircuit(q)
+        zcircuit.z(q)
+
+        representation = OperationRepresentation(
+            ideal=opcircuit,
+            basis_expansion={
+                NoisyOperation(ideal=xcircuit): 0.5,
+                NoisyOperation(ideal=zcircuit): 0.5,
+            }
+        )
+        representations.append(representation)
+
+    exact = noiseless_serial_executor(circuit)
+    pec_value = execute_with_pec(
+        circuit,
+        noiseless_serial_executor,
+        representations=representations,
+        num_samples=500,
+        random_state=1,
+    )
+    assert np.isclose(pec_value, exact, atol=0.1)
 
 
 @pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
