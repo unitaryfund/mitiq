@@ -5,4 +5,5 @@
 maxdepth: 2 
 ---
 examples/test
+examples/maxcut_tutorial.ipynb
 ```

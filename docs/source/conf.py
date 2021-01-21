@@ -151,7 +151,9 @@ language = 'Python'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['docs/source/guide/_guide-zne-lindblad.rst']
+exclude_patterns = ['guide/_guide-zne-lindblad.rst']
+execution_timeout = 600
+jupyter_execute_notebooks = "cache"
 
 # The master toctree document.
 master_doc = 'index'

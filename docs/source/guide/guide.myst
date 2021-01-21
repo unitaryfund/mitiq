@@ -14,5 +14,4 @@ guide-error-mitigation.rst
 guide-ibmq-backends.rst
 guide-qaoa-landscape.rst
 guide-hamiltonians.rst
-% guide-zne-lindblad.rst
 ```
