@@ -36,7 +36,7 @@ setup(
     name="mitiq",
     version=__version__,
     install_requires=requirements,
-    extras_require={"development": set(dev_requirements),},
+    extras_require={"development": set(dev_requirements), },
     packages=find_packages(),
     include_package_data=True,
     long_description=open("README.md").read(),

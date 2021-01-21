@@ -11,6 +11,7 @@
 ## Version 0.5.0 (In Development)
 
 ### All Changes
+- Added new `plot_data` and `plot_fit` methods for factories(@crazy4pi314 @elmandouh, gh-333)
 - Ensure code is tested in IBMQ guide and adds a doctest target in Makefile(@rmlarose, gh-488)
 - Fixes random failure of PEC sampling test(@rmlarose, gh-481)
 - Exact copying of shell commands, update make target for pdf and update development version(@rmlarose, gh-469).
