@@ -22,8 +22,12 @@ import cirq
 import pyquil
 import qiskit
 
-from mitiq.pec.sampling import sample_sequence, sample_circuit
-from mitiq.pec.types import NoisyOperation, OperationRepresentation
+from mitiq.pec import (
+    sample_sequence,
+    sample_circuit,
+    NoisyOperation,
+    OperationRepresentation,
+)
 from mitiq.utils import _equal
 
 

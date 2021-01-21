@@ -22,8 +22,7 @@ import numpy as np
 
 from mitiq import generate_collected_executor, QPROGRAM
 from mitiq.conversions import convert_to_mitiq
-from mitiq.pec.sampling import sample_circuit
-from mitiq.pec.types import OperationRepresentation
+from mitiq.pec import sample_circuit, OperationRepresentation
 
 
 class LargeSampleWarning(Warning):
