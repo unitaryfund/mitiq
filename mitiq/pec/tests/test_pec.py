@@ -353,7 +353,7 @@ def test_execute_with_pec_error_scaling(num_samples: int):
     assert np.isclose(error_pec * np.sqrt(num_samples), 1.0, atol=0.1)
 
 
-@pytest.mark.parametrize("precision", [0.1, 0.01])
+@pytest.mark.parametrize("precision", [0.1, 0.05])
 def test_precision_option_in_execute_with_pec(precision: float):
     """Tests that the 'precision' argument is used to deduce num_samples."""
     # For a noiseless circuit we expect num_samples = 1/precision^2:
