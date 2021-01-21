@@ -1,0 +1,8 @@
+# Mitiq Examples
+
+```{toctree}
+---
+maxdepth: 2 
+---
+examples/test.mystnb
+```

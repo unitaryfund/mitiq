@@ -41,11 +41,13 @@ sys.path.append(os.path.abspath('sphinxext'))
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.mathjax',
+extensions = [
+              #'myst_parser',
+              'myst_nb',
+              'sphinx.ext.mathjax',
               'IPython.sphinxext.ipython_console_highlighting',
               'IPython.sphinxext.ipython_directive',
               'matplotlib.sphinxext.plot_directive',
-              'm2r',
               'sphinx.ext.napoleon',
               'sphinx.ext.autodoc',
               'sphinx.ext.autosummary',
@@ -57,7 +59,7 @@ extensions = ['sphinx.ext.mathjax',
               'sphinx.ext.viewcode',
               'sphinx.ext.ifconfig',
               'sphinxcontrib.bibtex',
-              'sphinx_copybutton',
+              'sphinx_copybutton'
               ]
 
 intersphinx_mapping = {
@@ -72,7 +74,57 @@ intersphinx_mapping = {
 
 
 # source_suffix = '.rst'
-source_suffix = ['.rst', '.md']
+source_suffix = {'.rst': 'restructuredtext',
+    '.ipynb': 'myst-nb',
+    '.myst': 'myst-nb',
+    '.mystnb': 'myst-nb'}
+
+#myst_enable_extensions = [
+#    "amsmath",
+#    "colon_fence",
+#    "deflist",
+#    "dollarmath",
+#    "html_image",
+#    "linkify",
+#    "replacements",
+#    "smartquotes",
+#    "substitution"
+#]
+
+myst_enable_extensions = [
+    "amsmath",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "html_image",
+]
+myst_url_schemes = ("http", "https", "mailto")
+
+#https://myst-nb.readthedocs.io/en/latest/use/formatting_outputs.html#render-priority
+nb_render_priority = {
+  "html": (
+            "application/vnd.jupyter.widget-view+json",
+            "application/javascript",
+            "text/html",
+            "image/svg+xml",
+            "image/png",
+            "image/jpeg",
+            "text/markdown",
+            "text/latex",
+            "text/plain",
+        ),
+    "doctest": (
+        "application/vnd.jupyter.widget-view+json",
+        "application/javascript",
+        "text/html",
+        "image/svg+xml",
+        "image/png",
+        "image/jpeg",
+        "text/markdown",
+        "text/latex",
+        "text/plain",
+    )
+}
 
 doctest_global_setup = '''
 try:
