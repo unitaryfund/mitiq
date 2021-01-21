@@ -106,7 +106,7 @@ for the linter (`flake8`) and formatter (`black`). If `make check-format` fails,
 you with a diff, which you can resolve by running `make format`. Black is very opinionated, but
 saves a lot of time by removing the need for style nitpicks in PR review. We only deviate from its
 default behavior in one category: we choose to use a line length of 79 rather than the Black
-default of 88 (this is configured in the [`pyproject.toml`](pyproject.toml) file).
+default of 88 (this is configured in the [`pyproject.toml`](https://github.com/unitaryfund/mitiq/blob/master/pyproject.toml) file).
 
 ### Code of conduct
 Mitiq development abides to the [Contributors' Covenant](https://mitiq.readthedocs.io/en/latest/code_of_conduct.html).

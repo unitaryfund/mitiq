@@ -136,4 +136,4 @@ If you use Mitiq in your research, please reference the [Mitiq preprint][arxiv] 
 
 ## License
 
-[GNU GPL v.3.0.](LICENSE)
+[GNU GPL v.3.0.](https://github.com/unitaryfund/mitiq/blob/master/LICENSE)
