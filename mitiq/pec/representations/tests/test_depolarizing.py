@@ -30,7 +30,7 @@ from cirq import (
     AsymmetricDepolarizingChannel,
 )
 
-from mitiq.pec.decomposition.depolarizing import (
+from mitiq.pec.representations.depolarizing import (
     depolarizing_decomposition,
     NON_ID_PAULIS,
 )
