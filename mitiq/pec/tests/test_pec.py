@@ -194,5 +194,4 @@ def test_large_sample_size_warning():
     ):
         execute_with_pec(
             oneq_circ, fake_executor, DECO_DICT, num_samples=100001
-
-    )
+        )
