@@ -14,15 +14,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # TODO: Functions which don't fit in pec.py and sampling.py are placed here.
-# Some of them could be moved in future new sub-modules of PEC
-# (e.g. decomposition, tomo, etc.)
+#  Some of them could be moved in future new sub-modules of PEC
+#  (e.g. decomposition, tomo, etc.)
 
 """Utilities related to probabilistic error cancellation."""
 
+from copy import deepcopy
+
 import numpy as np
 from typing import Tuple, List, Dict
-
-from copy import deepcopy
 
 from cirq import (
     Circuit,
@@ -138,81 +138,6 @@ def _simple_pauli_deco_dict(
     return decomposition_dict  # type: ignore
 
 
-def get_coefficients(
-    ideal_operation: Operation, decomposition_dict: DecompositionDict
-) -> List[float]:
-    """Extracts, from the input decomposition dictionary, the decomposition
-    coefficients associated to the input ideal_operation.
-
-    Args:
-        ideal_operation: The input ideal operation.
-        decomposition_dict: The input decomposition dictionary.
-
-    Returns:
-        The decomposition coefficients of the input operation.
-    """
-    op_decomp = decomposition_dict[ideal_operation]
-
-    return [coeff_and_seq[0] for coeff_and_seq in op_decomp]
-
-
-def get_imp_sequences(
-    ideal_operation: Operation, decomposition_dict: DecompositionDict
-) -> List[List[Operation]]:
-    """Extracts, from the input decomposition dictionary, the list of
-    implementable sequences associated to the input ideal_operation.
-
-    Args:
-        ideal_operation: The input ideal operation.
-        decomposition_dict: The input decomposition dictionary.
-
-    Returns:
-        The list of implementable sequences.
-    """
-    op_decomp = decomposition_dict[ideal_operation]
-
-    return [coeff_and_seq[1] for coeff_and_seq in op_decomp]
-
-
-def get_one_norm(
-    ideal_operation: Operation, decomposition_dict: DecompositionDict
-) -> float:
-    """Extracts, from the input decomposition dictionary, the one-norm
-    (i.e. the sum of absolute values) of the the decomposition coefficients
-    associated to the input ideal_operation.
-
-    Args:
-        ideal_operation: The input ideal operation.
-        decomposition_dict: The input decomposition dictionary.
-
-    Returns:
-        The one-norm of the decomposition coefficients.
-    """
-    coeffs = get_coefficients(ideal_operation, decomposition_dict)
-    return np.linalg.norm(coeffs, ord=1)
-
-
-def get_probabilities(
-    ideal_operation: Operation, decomposition_dict: DecompositionDict
-) -> List[float]:
-    """Evaluates, from the input decomposition dictionary, the normalized
-    probability distribution associated to the input ideal_operation.
-
-    Sampling implementable sequences with this distribution (taking
-    into account the corresponding "sign") approximates the exact
-    decomposition of the input ideal_operation.
-
-    Args:
-        ideal_operation: The input ideal operation.
-        decomposition_dict: The input decomposition dictionary.
-
-    Returns:
-        The probability distribution suitable for Monte Carlo sampling.
-    """
-    coeffs = get_coefficients(ideal_operation, decomposition_dict)
-    return list(np.abs(coeffs) / np.linalg.norm(coeffs, ord=1))
-
-
 def _max_ent_state_circuit(num_qubits: int) -> Circuit:
     r"""Generates a circuit which prepares the maximally entangled state
     |\omega\rangle = U |0\rangle  = \sum_i |i\rangle \otimes |i\rangle .
@@ -274,7 +199,7 @@ def _operation_to_choi(operation_tree: OP_TREE) -> np.ndarray:
     the input operation tree (including the effect of noise if present).
 
     Args:
-        circuit: The input circuit.
+        operation_tree: Nested list of operations.
     Returns:
         The density matrix of the Choi state associated to the input circuit.
     """
