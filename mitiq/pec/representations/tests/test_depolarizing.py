@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import List, Tuple
 import itertools
 import numpy as np
 import pytest
@@ -22,20 +21,20 @@ from cirq import (
     CNOT,
     CZ,
     ISWAP,
+    X,
+    Y,
+    Z,
     H,
     SWAP,
     Gate,
     LineQubit,
-    Operation,
+    Circuit,
     AsymmetricDepolarizingChannel,
 )
 
-from mitiq.pec.representations.depolarizing import (
-    depolarizing_decomposition,
-    NON_ID_PAULIS,
-)
+from mitiq.pec.representations.depolarizing import depolarizing_representation
 
-from mitiq.pec.utils import _operation_to_choi
+from mitiq.pec.utils import _operation_to_choi, _circuit_to_choi
 
 
 def my_depolarizing_channel(p: float, n_qubits: int):
@@ -58,15 +57,6 @@ def my_depolarizing_channel(p: float, n_qubits: int):
     return AsymmetricDepolarizingChannel(
         error_probabilities=error_probabilities
     )
-
-
-def decomposition_overhead(
-    decomposition: List[Tuple[float, List[Operation]]]
-) -> float:
-    """The overhead of a particular decomposition is the sum of the absolute
-    values of the coefficients of the quasi-probability representation (QPR).
-    """
-    return float(np.sum(np.abs([a for a, _ in decomposition])))
 
 
 def single_qubit_depolarizing_overhead(noise_level: float) -> float:
@@ -93,57 +83,45 @@ def two_qubit_depolarizing_overhead(noise_level: float) -> float:
     return (1 + 7 * epsilon / 8) / (1 - epsilon)
 
 
-def test_single_qubit_depolarizing_decomposition():
+@pytest.mark.parametrize("noise", [0, 0.1, 0.7])
+@pytest.mark.parametrize("gate", [X, Y, Z, H])
+def test_single_qubit_representation_norm(gate: Gate, noise: float):
     q = LineQubit(0)
-    noise_level = 0.05
-    optimal_overhead = single_qubit_depolarizing_overhead(noise_level)
-    assert all(
-        np.isclose(
-            optimal_overhead,
-            decomposition_overhead(
-                depolarizing_decomposition(P(q), noise_level)
-            ),
-        )
-        for P in NON_ID_PAULIS
-    )
+    optimal_norm = single_qubit_depolarizing_overhead(noise)
+    norm = depolarizing_representation(Circuit(gate(q)), noise).norm
+    assert np.isclose(optimal_norm, norm)
 
 
-def test_two_qubit_depolarizing_decomposition():
-    q0, q1 = LineQubit.range(2)
-    noise_level = 0.05
-    optimal_overhead = two_qubit_depolarizing_overhead(noise_level)
-    assert all(
-        np.isclose(
-            optimal_overhead,
-            decomposition_overhead(
-                depolarizing_decomposition(G(q0, q1), noise_level)
-            ),
-        )
-        for G in (CZ, CNOT, ISWAP, SWAP)
-    )
+@pytest.mark.parametrize("noise", [0, 0.1, 0.7])
+@pytest.mark.parametrize("gate", (CZ, CNOT, ISWAP, SWAP))
+def test_two_qubit_representation_norm(gate: Gate, noise: float):
+    qreg = LineQubit.range(2)
+    optimal_norm = two_qubit_depolarizing_overhead(noise)
+    norm = depolarizing_representation(Circuit(gate(*qreg)), noise).norm
+    assert np.isclose(optimal_norm, norm)
 
 
-def test_three_qubit_depolarizing_decomposition():
+def test_three_qubit_depolarizing_representation_error():
     q0, q1, q2 = LineQubit.range(3)
-    noise_level = 0.05
     with pytest.raises(ValueError):
-        depolarizing_decomposition(CCNOT(q0, q1, q2), noise_level)
+        depolarizing_representation(Circuit(CCNOT(q0, q1, q2)), 0.05)
 
 
-@pytest.mark.parametrize("noise", [0, 0.1, 0.5, 1.0])
-@pytest.mark.parametrize("gate", NON_ID_PAULIS + [H, CZ, CNOT, ISWAP, SWAP])
-def test_depolarizing_decomposition_with_Choi(gate: Gate, noise: float):
-    """Tests the decomposition by comparing exact Choi matrices."""
+@pytest.mark.parametrize("noise", [0, 0.1, 0.7])
+@pytest.mark.parametrize("gate", [X, Y, Z, H, CZ, CNOT, ISWAP, SWAP])
+def test_depolarizing_representation_with_Choi(gate: Gate, noise: float):
+    """Tests the representation by comparing exact Choi matrices."""
     qreg = LineQubit.range(gate.num_qubits())
     ideal_choi = _operation_to_choi(gate.on(*qreg))
-    op_decomp = depolarizing_decomposition(gate.on(*qreg), noise)
+    op_rep = depolarizing_representation(Circuit(gate.on(*qreg)), noise)
     choi_components = []
-    for coeff, imp_seq in op_decomp:
+    for noisy_op, coeff in op_rep.basis_expansion.items():
+        implementable_circ = noisy_op.ideal_circuit()
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.
         depolarizing_op = my_depolarizing_channel(noise, len(qreg))(*qreg)
-        noisy_sequence = [imp_seq] + [depolarizing_op]
-        sequence_choi = _operation_to_choi(noisy_sequence)
+        implementable_circ.append(depolarizing_op)
+        sequence_choi = _circuit_to_choi(implementable_circ)
         choi_components.append(coeff * sequence_choi)
     combination_choi = np.sum(choi_components, axis=0)
     assert np.allclose(ideal_choi, combination_choi, atol=10 ** -6)
