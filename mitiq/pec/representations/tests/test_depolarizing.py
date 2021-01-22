@@ -30,9 +30,13 @@ from cirq import (
     LineQubit,
     Circuit,
     AsymmetricDepolarizingChannel,
+    DepolarizingChannel,
 )
 
-from mitiq.pec.representations.depolarizing import depolarizing_representation
+from mitiq.pec.representations.depolarizing import (
+    depolarizing_representation,
+    local_depolarizing_representation,
+)
 
 from mitiq.pec.utils import _operation_to_choi, _circuit_to_choi
 
@@ -120,6 +124,29 @@ def test_depolarizing_representation_with_Choi(gate: Gate, noise: float):
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.
         depolarizing_op = my_depolarizing_channel(noise, len(qreg))(*qreg)
+        implementable_circ.append(depolarizing_op)
+        sequence_choi = _circuit_to_choi(implementable_circ)
+        choi_components.append(coeff * sequence_choi)
+    combination_choi = np.sum(choi_components, axis=0)
+    assert np.allclose(ideal_choi, combination_choi, atol=10 ** -6)
+
+
+@pytest.mark.parametrize("noise", [0, 0.1, 0.7])
+@pytest.mark.parametrize("gate", [X, Y, Z, H, CZ, CNOT, ISWAP, SWAP])
+def test_local_depolarizing_representation_with_Choi(
+    gate: Gate, noise: float
+):
+    """Tests the representation by comparing exact Choi matrices."""
+    qreg = LineQubit.range(gate.num_qubits())
+    ideal_choi = _operation_to_choi(gate.on(*qreg))
+    op_rep = local_depolarizing_representation(Circuit(gate.on(*qreg)), noise)
+    choi_components = []
+    for noisy_op, coeff in op_rep.basis_expansion.items():
+        implementable_circ = noisy_op.ideal_circuit()
+        # The representation assume local noise on each qubit.
+        depolarizing_op = DepolarizingChannel(noise).on_each(*qreg)
+        # Apply noise after each sequence.
+        # NOTE: noise is not applied after each operation.
         implementable_circ.append(depolarizing_op)
         sequence_choi = _circuit_to_choi(implementable_circ)
         choi_components.append(coeff * sequence_choi)

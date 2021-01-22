@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from typing import List
+from itertools import product
 
 from cirq import Operation, X, Y, Z, Circuit
 from mitiq import QPROGRAM
@@ -24,7 +25,7 @@ from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 def depolarizing_representation(
     ideal_operation: QPROGRAM, noise_level: float
 ) -> OperationRepresentation:
-    r"""As described in [Temme2017]_, this function maps a single-qubit
+    r"""As described in [Temme2017]_, this function maps an
     ``ideal_operation`` :math:`\mathcal{U}_{\beta}` into its quasi-probability
     representation (QPR), which is a linear combination of noisy implementable
     operations :math:`\{\eta_{\alpha} \mathcal{O}_{\alpha}\}`.
@@ -122,6 +123,88 @@ def depolarizing_representation(
 
     # Basis of implementable operations as circuits
     imp_op_circuits = [circ + Circuit(op) for op in post_ops]
+
+    # Convert back to input type
+    imp_op_circuits = [convert_from_mitiq(c, in_type) for c in imp_op_circuits]
+
+    # Build basis_expantion
+    expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}
+
+    return OperationRepresentation(ideal_operation, expansion)
+
+
+def local_depolarizing_representation(
+    ideal_operation: QPROGRAM, noise_level: float
+) -> OperationRepresentation:
+    r"""As described in [Temme2017]_, this function maps an
+    ``ideal_operation`` :math:`\mathcal{U}_{\beta}` into its quasi-probability
+    representation (QPR), which is a linear combination of noisy implementable
+    operations :math:`\{\eta_{\alpha} \mathcal{O}_{\alpha}\}`.
+
+    This function assumes that the noise acting the system is the tensor
+    product of n local depolarizing channels, where n is the number of
+    qubits associated to the input operation.
+    For a single-qubit ``ideal_operation``, this is equivalent to the
+    ``depolarizing_representation`` function.
+
+    More information about the quasi-probability representation of depolarizing
+    noise can be found in the docstring of ``depolarizing_representation``.
+
+    Args:
+        ideal_operation: The ideal operation (as a QPROGRAM) to represent.
+        noise_level: The noise level of each depolarizing channel.
+
+    Returns:
+        The quasi-probability representation (QPR) of the ``ideal_operation``.
+
+    .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
+        "Error mitigation for short-depth quantum circuits,"
+        *Phys. Rev. Lett.* **119**, 180509 (2017),
+        (https://arxiv.org/abs/1612.02058).
+
+    .. [Takagi2020] : Ryuji Takagi,
+        "Optimal resource cost for error mitigation,"
+        (https://arxiv.org/abs/2006.12509).
+    """
+    circ, in_type = convert_to_mitiq(ideal_operation)
+
+    qubits = circ.all_qubits()
+
+    if len(qubits) == 1:
+        return depolarizing_representation(ideal_operation, noise_level)
+
+    # The two-qubit case: tensor product of two depolarizing channels.
+    elif len(qubits) == 2:
+        q0, q1 = qubits
+
+        # Single-qubit representation coefficients.
+        epsilon = noise_level * 4 / 3
+        c_neg = -(1 / 4) * epsilon / (1 - epsilon)
+        c_pos = 1 - 3 * c_neg
+
+        imp_op_circuits = []
+        alphas = []
+
+        # The zero-pauli term in the linear combination
+        imp_op_circuits.append(circ)
+        alphas.append(c_pos * c_pos)
+
+        # The single-pauli terms in the linear combination
+        for qubit in qubits:
+            for pauli in [X, Y, Z]:
+                imp_op_circuits.append(circ + Circuit(pauli(qubit)))
+                alphas.append(c_neg * c_pos)
+
+        # The two-pauli terms in the linear combination
+        for pauli_0, pauli_1 in product([X, Y, Z], repeat=2):
+            imp_op_circuits.append(circ + Circuit(pauli_0(q0), pauli_1(q1)))
+            alphas.append(c_neg * c_neg)
+
+    else:
+        raise ValueError(
+            "Can only represent single- and two-qubit gates."
+            "Consider pre-compiling your circuit."
+        )
 
     # Convert back to input type
     imp_op_circuits = [convert_from_mitiq(c, in_type) for c in imp_op_circuits]
