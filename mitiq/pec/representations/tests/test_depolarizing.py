@@ -152,3 +152,9 @@ def test_local_depolarizing_representation_with_Choi(
         choi_components.append(coeff * sequence_choi)
     combination_choi = np.sum(choi_components, axis=0)
     assert np.allclose(ideal_choi, combination_choi, atol=10 ** -6)
+
+
+def test_three_qubit_local_depolarizing_representation_error():
+    q0, q1, q2 = LineQubit.range(3)
+    with pytest.raises(ValueError):
+        local_depolarizing_representation(Circuit(CCNOT(q0, q1, q2)), 0.05)
