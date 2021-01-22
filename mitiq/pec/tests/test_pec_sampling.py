@@ -29,6 +29,10 @@ from mitiq.pec import (
     OperationRepresentation,
 )
 from mitiq.utils import _equal
+from mitiq.pec.representations.depolarizing import (
+    local_depolarizing_representation,
+)
+from mitiq.pec.utils import _operation_to_choi, _circuit_to_choi
 
 
 def test_sample_sequence_cirq():
@@ -217,67 +221,75 @@ def test_sample_circuit_trivial_decomposition():
     assert np.isclose(norm, 1)
 
 
-# TODO: Modify these tests for new sampling functions and decompositions.
-#  See https://github.com/unitaryfund/mitiq/pull/502.
-# BASE_NOISE = 0.02
-# DECO_DICT = _simple_pauli_deco_dict(BASE_NOISE)
-# DECO_DICT_SIMP = _simple_pauli_deco_dict(BASE_NOISE, simplify_paulis=True)
-# NOISELESS_DECO_DICT = _simple_pauli_deco_dict(0)
-#
-# # Simple 2-qubit circuit
-# qreg = cirq.LineQubit.range(2)
-# twoq_circ = cirq.Circuit(cirq.X.on(qreg[0]), cirq.CNOT.on(*qreg),)
-#
-#
-# @pytest.mark.parametrize("gate", [cirq.Y, cirq.CNOT])
-# def test_sample_sequence_choi(gate: cirq.Gate):
-#     """Tests the sample_sequence by comparing the exact Choi matrices."""
-#     qreg = cirq.LineQubit.range(gate.num_qubits())
-#     ideal_op = gate.on(*qreg)
-#     noisy_op_tree = (
-#             [ideal_op] + [cirq.depolarize(BASE_NOISE)(q) for q in qreg]
-#     )
-#     ideal_choi = _operation_to_choi(gate.on(*qreg))
-#     noisy_choi = _operation_to_choi(noisy_op_tree)
-#     choi_unbiased_estimates = []
-#     rng = np.random.RandomState(1)
-#     for _ in range(500):
-#         imp_seq, sign, norm = sample_sequence(
-#             gate.on(*qreg), DECO_DICT, random_state=rng
-#         )
-#         # Apply noise after each sequence.
-#         # NOTE: noise is not applied after each operation.
-#         noisy_sequence = [imp_seq] + [
-#             cirq.depolarize(BASE_NOISE)(q) for q in qreg
-#         ]
-#         sequence_choi = _operation_to_choi(noisy_sequence)
-#         choi_unbiased_estimates.append(norm * sign * sequence_choi)
-#     choi_pec_estimate = np.average(choi_unbiased_estimates, axis=0)
-#     noise_error = np.linalg.norm(ideal_choi - noisy_choi)
-#     pec_error = np.linalg.norm(ideal_choi - choi_pec_estimate)
-#     assert pec_error < noise_error
-#     assert np.allclose(ideal_choi, choi_pec_estimate, atol=0.05)
-#
-#
-# @pytest.mark.parametrize("decomposition_dict", [DECO_DICT, DECO_DICT_SIMP])
-# def test_sample_circuit_choi(decomposition_dict: DecompositionDict):
-#     """Tests the sample_circuit by comparing the exact Choi matrices."""
-#     ideal_choi = _circuit_to_choi(twoq_circ)
-#     noisy_circuit = twoq_circ.with_noise(cirq.depolarize(BASE_NOISE))
-#     noisy_choi = _circuit_to_choi(noisy_circuit)
-#     choi_unbiased_estimates = []
-#     for _ in range(500):
-#         imp_circuit, sign, norm = sample_circuit(
-#             twoq_circ, decomposition_dict
-#         )
-#         noisy_imp_circuit = imp_circuit.with_noise(
-#             cirq.depolarize(BASE_NOISE)
-#         )
-#         imp_circuit_choi = _circuit_to_choi(noisy_imp_circuit)
-#         choi_unbiased_estimates.append(norm * sign * imp_circuit_choi)
-#     choi_pec_estimate = np.average(choi_unbiased_estimates, axis=0)
-#
-#     noise_error = np.linalg.norm(ideal_choi - noisy_choi)
-#     pec_error = np.linalg.norm(ideal_choi - choi_pec_estimate)
-#     assert pec_error < noise_error
-#     assert np.allclose(ideal_choi, choi_pec_estimate, atol=0.05)
+BASE_NOISE = 0.02
+qreg = cirq.LineQubit.range(2)
+
+
+@pytest.mark.parametrize("gate", [cirq.Y, cirq.CNOT])
+def test_sample_sequence_choi(gate: cirq.Gate):
+    """Tests the sample_sequence by comparing the exact Choi matrices."""
+    qreg = cirq.LineQubit.range(gate.num_qubits())
+    ideal_op = gate.on(*qreg)
+    ideal_circ = cirq.Circuit(ideal_op)
+    noisy_op_tree = (
+        [ideal_op] + [cirq.depolarize(BASE_NOISE)(q) for q in qreg]
+    )
+
+    ideal_choi = _operation_to_choi(ideal_op)
+    noisy_choi = _operation_to_choi(noisy_op_tree)
+
+    representation = local_depolarizing_representation(ideal_circ, BASE_NOISE)
+
+    choi_unbiased_estimates = []
+    rng = np.random.RandomState(1)
+    for _ in range(500):
+        imp_seq, sign, norm = sample_sequence(
+            ideal_circ, [representation], random_state=rng
+        )
+        noisy_sequence = imp_seq.with_noise(cirq.depolarize(BASE_NOISE))
+        sequence_choi = _circuit_to_choi(noisy_sequence)
+        choi_unbiased_estimates.append(norm * sign * sequence_choi)
+
+    choi_pec_estimate = np.average(choi_unbiased_estimates, axis=0)
+    noise_error = np.linalg.norm(ideal_choi - noisy_choi)
+    pec_error = np.linalg.norm(ideal_choi - choi_pec_estimate)
+
+    assert pec_error < noise_error
+    assert np.allclose(ideal_choi, choi_pec_estimate, atol=0.05)
+
+
+def test_sample_circuit_choi():
+    """Tests the sample_circuit by comparing the exact Choi matrices."""
+    # A simple 2-qubit circuit
+    qreg = cirq.LineQubit.range(2)
+    ideal_circ = cirq.Circuit(
+        cirq.X.on(qreg[0]), cirq.I.on(qreg[1]), cirq.CNOT.on(*qreg),
+    )
+
+    noisy_circuit = ideal_circ.with_noise(cirq.depolarize(BASE_NOISE))
+
+    ideal_choi = _circuit_to_choi(ideal_circ)
+    noisy_choi = _operation_to_choi(noisy_circuit)
+
+    rep_list = []
+    for op in ideal_circ.all_operations():
+        rep_list.append(
+            local_depolarizing_representation(cirq.Circuit(op), BASE_NOISE)
+        )
+
+    choi_unbiased_estimates = []
+    rng = np.random.RandomState(1)
+    for _ in range(500):
+        imp_circ, sign, norm = sample_circuit(
+            ideal_circ, rep_list, random_state=rng
+        )
+        noisy_imp_circ = imp_circ.with_noise(cirq.depolarize(BASE_NOISE))
+        sequence_choi = _circuit_to_choi(noisy_imp_circ)
+        choi_unbiased_estimates.append(norm * sign * sequence_choi)
+
+    choi_pec_estimate = np.average(choi_unbiased_estimates, axis=0)
+    noise_error = np.linalg.norm(ideal_choi - noisy_choi)
+    pec_error = np.linalg.norm(ideal_choi - choi_pec_estimate)
+
+    assert pec_error < noise_error
+    assert np.allclose(ideal_choi, choi_pec_estimate, atol=0.05)

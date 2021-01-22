@@ -50,7 +50,7 @@ def get_pauli_representations(
     # Generate all ideal single-qubit Pauli operations for both qubits
     pauli_gates = [cirq.X, cirq.Y, cirq.Z]
     ideal_operations = []
-    qreg[0]
+
     for gate in pauli_gates:
         for qubit in qreg:
             ideal_operations.append(cirq.Circuit(gate(qubit)))
@@ -269,7 +269,7 @@ def test_execute_with_pec_mitigates_noise(circuit, executor, circuit_type):
         # Note this is an important subtlety necessary because of conversions.
         reps = get_pauli_representations(
             base_noise=BASE_NOISE,
-            qubits=[cirq.NamedQubit(name) for name in ("q_0", "q_1")]
+            qubits=[cirq.NamedQubit(name) for name in ("q_0", "q_1")],
         )
     else:
         reps = pauli_representations
