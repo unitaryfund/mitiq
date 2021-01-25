@@ -27,7 +27,7 @@ def depolarizing_representation(
 ) -> OperationRepresentation:
     r"""As described in [Temme2017]_, this function maps an
     ``ideal_operation`` :math:`\mathcal{U}_{\beta}` into its quasi-probability
-    representation (QPR), which is a linear combination of noisy implementable
+    representation, which is a linear combination of noisy implementable
     operations :math:`\{\eta_{\alpha} \mathcal{O}_{\alpha}\}`.
 
     This function assumes depolarizing noise is the only noise present. In
@@ -63,15 +63,21 @@ def depolarizing_representation(
         noise_level: The noise level (as a float) of the depolarizing channel.
 
     Returns:
-        The quasi-probability representation (QPR) of the ``ideal_operation``.
+        The quasi-probability representation of the ``ideal_operation``.
 
     .. note::
-        We allow each "noisy implementable operation" composing the
-        basis of the final representation to be a sequence of 1 or 2 gates.
-        This is based on the ideal assumption that one can implement *any*
-        ``ideal_operation`` followed by a single depolarizing noise channel.
-        When running on a simulator or QPU, this assumption breaks down for
-        high ``noise_level`` values.
+        This representation is based on the ideal assumption that one
+        can append Pauli gates to a noisy operation without introducing
+        additional noise. For a beckend which violates this assumption,
+        it remains a good approximation for small values of ``noise_level``.
+    
+    .. note::
+        The input ``ideal_operation`` is typically a QPROGRAM with a single
+        gate but could also correspond to a sequence of more gates. 
+        This is possible as long as the unitary associated to the input
+        operation, followed by a single final depolarizing channel, is
+        physically implementable.
+
 
     .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
         "Error mitigation for short-depth quantum circuits,"
@@ -138,7 +144,7 @@ def local_depolarizing_representation(
 ) -> OperationRepresentation:
     r"""As described in [Temme2017]_, this function maps an
     ``ideal_operation`` :math:`\mathcal{U}_{\beta}` into its quasi-probability
-    representation (QPR), which is a linear combination of noisy implementable
+    representation, which is a linear combination of noisy implementable
     operations :math:`\{\eta_{\alpha} \mathcal{O}_{\alpha}\}`.
 
     This function assumes that the noise acting the system is the tensor
@@ -155,16 +161,13 @@ def local_depolarizing_representation(
         noise_level: The noise level of each depolarizing channel.
 
     Returns:
-        The quasi-probability representation (QPR) of the ``ideal_operation``.
+        The quasi-probability representation of the ``ideal_operation``.
 
     .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
         "Error mitigation for short-depth quantum circuits,"
         *Phys. Rev. Lett.* **119**, 180509 (2017),
         (https://arxiv.org/abs/1612.02058).
 
-    .. [Takagi2020] : Ryuji Takagi,
-        "Optimal resource cost for error mitigation,"
-        (https://arxiv.org/abs/2006.12509).
     """
     circ, in_type = convert_to_mitiq(ideal_operation)
 
