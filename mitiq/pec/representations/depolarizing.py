@@ -70,10 +70,10 @@ def depolarizing_representation(
         can append Pauli gates to a noisy operation without introducing
         additional noise. For a beckend which violates this assumption,
         it remains a good approximation for small values of ``noise_level``.
-    
+
     .. note::
         The input ``ideal_operation`` is typically a QPROGRAM with a single
-        gate but could also correspond to a sequence of more gates. 
+        gate but could also correspond to a sequence of more gates.
         This is possible as long as the unitary associated to the input
         operation, followed by a single final depolarizing channel, is
         physically implementable.

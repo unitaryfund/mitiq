@@ -44,8 +44,7 @@ from mitiq.pec.utils import _operation_to_choi, _circuit_to_choi
 def my_depolarizing_channel(p: float, n_qubits: int):
     """Build a depolarizing channel from cirq.AsymmetricDepolarizingChannel
     since cirq.DepolarizingChannel is buggy when n_qubits is larger than 1."""
-
-    # TODO: upstream bug to Cirq. Once fixed, this function can be removed.
+    # Link to GitHub issue: https://github.com/quantumlib/Cirq/issues/3685
 
     error_probabilities = {}
     p_depol = p / (4 ** n_qubits - 1)
