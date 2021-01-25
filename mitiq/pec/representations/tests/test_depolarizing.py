@@ -33,9 +33,9 @@ from cirq import (
     DepolarizingChannel,
 )
 
-from mitiq.pec.representations.depolarizing import (
-    depolarizing_representation,
-    local_depolarizing_representation,
+from mitiq.pec.representations import (
+    represent_operation_with_global_depolarizing_noise,
+    represent_operation_with_local_depolarizing_noise,
 )
 
 from mitiq.pec.utils import _operation_to_choi, _circuit_to_choi
@@ -91,7 +91,10 @@ def two_qubit_depolarizing_overhead(noise_level: float) -> float:
 def test_single_qubit_representation_norm(gate: Gate, noise: float):
     q = LineQubit(0)
     optimal_norm = single_qubit_depolarizing_overhead(noise)
-    norm = depolarizing_representation(Circuit(gate(q)), noise).norm
+    norm = represent_operation_with_global_depolarizing_noise(
+        Circuit(gate(q)),
+        noise,
+    ).norm
     assert np.isclose(optimal_norm, norm)
 
 
@@ -100,14 +103,20 @@ def test_single_qubit_representation_norm(gate: Gate, noise: float):
 def test_two_qubit_representation_norm(gate: Gate, noise: float):
     qreg = LineQubit.range(2)
     optimal_norm = two_qubit_depolarizing_overhead(noise)
-    norm = depolarizing_representation(Circuit(gate(*qreg)), noise).norm
+    norm = represent_operation_with_global_depolarizing_noise(
+        Circuit(gate(*qreg)),
+        noise,
+    ).norm
     assert np.isclose(optimal_norm, norm)
 
 
 def test_three_qubit_depolarizing_representation_error():
     q0, q1, q2 = LineQubit.range(3)
     with pytest.raises(ValueError):
-        depolarizing_representation(Circuit(CCNOT(q0, q1, q2)), 0.05)
+        represent_operation_with_global_depolarizing_noise(
+            Circuit(CCNOT(q0, q1, q2)),
+            0.05,
+        )
 
 
 @pytest.mark.parametrize("noise", [0, 0.1, 0.7])
@@ -116,7 +125,10 @@ def test_depolarizing_representation_with_choi(gate: Gate, noise: float):
     """Tests the representation by comparing exact Choi matrices."""
     qreg = LineQubit.range(gate.num_qubits())
     ideal_choi = _operation_to_choi(gate.on(*qreg))
-    op_rep = depolarizing_representation(Circuit(gate.on(*qreg)), noise)
+    op_rep = represent_operation_with_global_depolarizing_noise(
+        Circuit(gate.on(*qreg)),
+        noise,
+    )
     choi_components = []
     for noisy_op, coeff in op_rep.basis_expansion.items():
         implementable_circ = noisy_op.ideal_circuit()
@@ -138,7 +150,10 @@ def test_local_depolarizing_representation_with_choi(
     """Tests the representation by comparing exact Choi matrices."""
     qreg = LineQubit.range(gate.num_qubits())
     ideal_choi = _operation_to_choi(gate.on(*qreg))
-    op_rep = local_depolarizing_representation(Circuit(gate.on(*qreg)), noise)
+    op_rep = represent_operation_with_local_depolarizing_noise(
+        Circuit(gate.on(*qreg)),
+        noise,
+    )
     choi_components = []
     for noisy_op, coeff in op_rep.basis_expansion.items():
         implementable_circ = noisy_op.ideal_circuit()
@@ -156,4 +171,7 @@ def test_local_depolarizing_representation_with_choi(
 def test_three_qubit_local_depolarizing_representation_error():
     q0, q1, q2 = LineQubit.range(3)
     with pytest.raises(ValueError):
-        local_depolarizing_representation(Circuit(CCNOT(q0, q1, q2)), 0.05)
+        represent_operation_with_local_depolarizing_noise(
+            Circuit(CCNOT(q0, q1, q2)),
+            0.05,
+        )

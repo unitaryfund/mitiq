@@ -29,8 +29,8 @@ from mitiq.pec import (
     OperationRepresentation,
 )
 from mitiq.utils import _equal
-from mitiq.pec.representations.depolarizing import (
-    local_depolarizing_representation,
+from mitiq.pec.representations import (
+    represent_operation_with_local_depolarizing_noise,
 )
 from mitiq.pec.utils import _operation_to_choi, _circuit_to_choi
 
@@ -238,7 +238,10 @@ def test_sample_sequence_choi(gate: cirq.Gate):
     ideal_choi = _operation_to_choi(ideal_op)
     noisy_choi = _operation_to_choi(noisy_op_tree)
 
-    representation = local_depolarizing_representation(ideal_circ, BASE_NOISE)
+    representation = represent_operation_with_local_depolarizing_noise(
+        ideal_circ,
+        BASE_NOISE,
+    )
 
     choi_unbiased_estimates = []
     rng = np.random.RandomState(1)
@@ -274,7 +277,10 @@ def test_sample_circuit_choi():
     rep_list = []
     for op in ideal_circ.all_operations():
         rep_list.append(
-            local_depolarizing_representation(cirq.Circuit(op), BASE_NOISE)
+            represent_operation_with_local_depolarizing_noise(
+                cirq.Circuit(op),
+                BASE_NOISE,
+            )
         )
 
     choi_unbiased_estimates = []

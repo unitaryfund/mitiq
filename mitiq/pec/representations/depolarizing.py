@@ -22,23 +22,25 @@ from mitiq.pec.types import OperationRepresentation, NoisyOperation
 from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 
 
-def depolarizing_representation(
+def represent_operation_with_global_depolarizing_noise(
     ideal_operation: QPROGRAM, noise_level: float
 ) -> OperationRepresentation:
     r"""As described in [Temme2017]_, this function maps an
-    ``ideal_operation`` :math:`\mathcal{U}_{\beta}` into its quasi-probability
+    ``ideal_operation`` :math:`\mathcal{U}` into its quasi-probability
     representation, which is a linear combination of noisy implementable
-    operations :math:`\{\eta_{\alpha} \mathcal{O}_{\alpha}\}`.
+    operations :math:`\sum_\alpha \eta_{\alpha} \mathcal{O}_{\alpha}`.
 
-    This function assumes depolarizing noise is the only noise present. In
-    particular, it assumes that the basis of implementable operations includes
-    any desired ideal operation followed by a depolarizing channel (meaning
-    that all :math:`\mathcal{O}_{\alpha} = \mathcal{D} \circ \mathcal{U}`,
-    where :math:`\mathcal{D}(\rho) =  (1 - \epsilon) \rho + \epsilon I/(2^n)`).
-    Given that assumption, it was proven in [Takagi2020]_ that this method
-    gives an optimal representation for a given depolarizing ``noise_level``
-    (we can easily calculate :math:`\epsilon` from this ``noise_level`` value).
-    For a single-qubit ``ideal_operation``, the optimal representation is as
+    This function assumes a depolarizing noise model, and more precicely,
+    that the following noisy operations are implementable
+    :math:`\mathcal{O}_{\alpha} = \mathcal{D} \circ \mathcal P_\alpha
+    \circ \mathcal{U}`, where :math:`\mathcal{U}` is the unitary associated
+    to the input ``ideal_operation`` acting on :math:`k` qubits,
+    :math:`\mathcal{P}_\alpha` is a Pauli operation and
+    :math:`\mathcal{D}(\rho) = (1 - \epsilon) \rho + \epsilon I/2^k` is a
+    depolarizing channel (:math:`\epsilon` is a simple function of
+    ``noise_level``).
+
+    For a single-qubit ``ideal_operation``, the representation is as
     follows:
 
     .. math::
@@ -58,6 +60,9 @@ def depolarizing_representation(
         \eta_4 =- \frac{1}{4}\frac{\epsilon}{1- \epsilon} , \qquad
         \mathcal{O}_4 = \mathcal{D} \circ \mathcal{Z} \circ \mathcal{U}
 
+    It was proven in [Takagi2020]_ that, under suitable assumptions,
+    this representation is optimal (minimum 1-norm).
+
     Args:
         ideal_operation: The ideal operation (as a QPROGRAM) to represent.
         noise_level: The noise level (as a float) of the depolarizing channel.
@@ -75,7 +80,7 @@ def depolarizing_representation(
         The input ``ideal_operation`` is typically a QPROGRAM with a single
         gate but could also correspond to a sequence of more gates.
         This is possible as long as the unitary associated to the input
-        operation, followed by a single final depolarizing channel, is
+        QPROGRAM, followed by a single final depolarizing channel, is
         physically implementable.
 
 
@@ -139,22 +144,28 @@ def depolarizing_representation(
     return OperationRepresentation(ideal_operation, expansion)
 
 
-def local_depolarizing_representation(
+def represent_operation_with_local_depolarizing_noise(
     ideal_operation: QPROGRAM, noise_level: float
 ) -> OperationRepresentation:
     r"""As described in [Temme2017]_, this function maps an
-    ``ideal_operation`` :math:`\mathcal{U}_{\beta}` into its quasi-probability
+    ``ideal_operation`` :math:`\mathcal{U}` into its quasi-probability
     representation, which is a linear combination of noisy implementable
-    operations :math:`\{\eta_{\alpha} \mathcal{O}_{\alpha}\}`.
+    operations :math:`\sum_\alpha \eta_{\alpha} \mathcal{O}_{\alpha}`.
 
-    This function assumes that the noise acting the system is the tensor
-    product of n local depolarizing channels, where n is the number of
-    qubits associated to the input operation.
-    For a single-qubit ``ideal_operation``, this is equivalent to the
-    ``depolarizing_representation`` function.
+    This function assumes a (local) single-qubit depolarizing noise model even
+    for multi-qubit operations. More precicely, it assumes that the following
+    noisy operations are implementable :math:`\mathcal{O}_{\alpha} =
+    \mathcal{D}^{\otimes k} \circ \mathcal P_\alpha \circ \mathcal{U}`,
+    where :math:`\mathcal{U}` is the unitary associated
+    to the input ``ideal_operation`` acting on :math:`k` qubits,
+    :math:`\mathcal{P}_\alpha` is a Pauli operation and
+    :math:`\mathcal{D}(\rho) = (1 - \epsilon) \rho + \epsilon I/2` is a
+    single-qubit depolarizing channel (:math:`\epsilon` is a simple function
+    of ``noise_level``).
 
     More information about the quasi-probability representation of depolarizing
-    noise can be found in the docstring of ``depolarizing_representation``.
+    noise can be found in the docstring of
+    ``represent_operation_with_global_depolarizing_noise``.
 
     Args:
         ideal_operation: The ideal operation (as a QPROGRAM) to represent.
@@ -163,18 +174,27 @@ def local_depolarizing_representation(
     Returns:
         The quasi-probability representation of the ``ideal_operation``.
 
+    .. note::
+        The input ``ideal_operation`` is typically a QPROGRAM with a single
+        gate but could also correspond to a sequence of more gates.
+        This is possible as long as the unitary associated to the input
+        QPROGRAM, followed by a single final depolarizing channel, is
+        physically implementable.
+
     .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
         "Error mitigation for short-depth quantum circuits,"
         *Phys. Rev. Lett.* **119**, 180509 (2017),
         (https://arxiv.org/abs/1612.02058).
-
     """
     circ, in_type = convert_to_mitiq(ideal_operation)
 
     qubits = circ.all_qubits()
 
     if len(qubits) == 1:
-        return depolarizing_representation(ideal_operation, noise_level)
+        return represent_operation_with_global_depolarizing_noise(
+            ideal_operation,
+            noise_level,
+        )
 
     # The two-qubit case: tensor product of two depolarizing channels.
     elif len(qubits) == 2:

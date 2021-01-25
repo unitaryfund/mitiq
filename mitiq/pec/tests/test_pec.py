@@ -31,8 +31,8 @@ from mitiq.benchmarks.utils import noisy_simulation
 
 from mitiq.pec import execute_with_pec, NoisyOperation, OperationRepresentation
 from mitiq.pec.pec import LargeSampleWarning
-from mitiq.pec.representations.depolarizing import (
-    local_depolarizing_representation
+from mitiq.pec.representations import (
+    represent_operation_with_local_depolarizing_noise
 )
 
 
@@ -67,7 +67,11 @@ def get_pauli_representations(
     # Generate all representations
     reps = []
     for op in ideal_operations:
-        reps.append(local_depolarizing_representation(op, base_noise))
+        reps.append(represent_operation_with_local_depolarizing_noise(
+            op,
+            base_noise,
+        )
+        )
 
     return reps
 
