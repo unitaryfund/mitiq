@@ -113,7 +113,7 @@ def test_three_qubit_depolarizing_representation_error():
 
 @pytest.mark.parametrize("noise", [0, 0.1, 0.7])
 @pytest.mark.parametrize("gate", [X, Y, Z, H, CZ, CNOT, ISWAP, SWAP])
-def test_depolarizing_representation_with_Choi(gate: Gate, noise: float):
+def test_depolarizing_representation_with_choi(gate: Gate, noise: float):
     """Tests the representation by comparing exact Choi matrices."""
     qreg = LineQubit.range(gate.num_qubits())
     ideal_choi = _operation_to_choi(gate.on(*qreg))
