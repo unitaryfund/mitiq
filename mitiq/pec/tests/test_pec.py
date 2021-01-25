@@ -26,12 +26,14 @@ import pyquil
 import qiskit
 
 from mitiq import QPROGRAM
-from mitiq.utils import _equal
 from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 from mitiq.benchmarks.utils import noisy_simulation
 
 from mitiq.pec import execute_with_pec, NoisyOperation, OperationRepresentation
 from mitiq.pec.pec import LargeSampleWarning
+from mitiq.pec.representations import (
+    represent_operation_with_local_depolarizing_noise
+)
 
 
 # Noisy representations of Pauli operations for testing.
@@ -39,53 +41,39 @@ def get_pauli_representations(
     base_noise: float,
     qubits: Optional[List[cirq.Qid]] = None,
 ) -> List[OperationRepresentation]:
+
     if qubits is None:
         qreg = cirq.LineQubit.range(2)
     else:
         qreg = qubits
-    pauli_ops = [cirq.I, cirq.X, cirq.Y, cirq.Z]
 
-    # Single-qubit representation coefficients.
-    epsilon = base_noise * 4 / 3
-    c_neg = -(1 / 4) * epsilon / (1 - epsilon)
-    c_pos = 1 - 3 * c_neg
+    # Generate all ideal single-qubit Pauli operations for both qubits
+    pauli_gates = [cirq.X, cirq.Y, cirq.Z]
+    ideal_operations = []
 
-    # This does
-    #  X = c_neg I + c_pos X + c_neg Y + c_neg Z
-    #  Y = c_neg I + c_neg X + c c_pos + c_neg Z
-    #  Z = c_neg I + c_neg X + c_neg Y + c_pos Z
-    #  for both qubits.
-    representations = []
-    for q in qreg:
-        paulis = [cirq.Circuit(p.on(q)) for p in pauli_ops]
-        for p in paulis[1:]:
-            representations.append(
-                OperationRepresentation(
-                    ideal=p,
-                    basis_expansion={
-                        NoisyOperation(op): c_pos
-                        if _equal(op, p) else c_neg for op in paulis
-                    }
-                )
-            )
+    for gate in pauli_gates:
+        for qubit in qreg:
+            ideal_operations.append(cirq.Circuit(gate(qubit)))
 
-    # Two-qubit representation coefficients (assuming local noise).
-    c_pos_pos = c_pos * c_pos
-    c_pos_neg = c_neg * c_pos
-    c_neg_neg = c_neg * c_neg
+    # Generate all ideal 2-qubit Pauli operations
+    for gate_a, gate_b in product(pauli_gates, repeat=2):
+        ideal_operations.append(
+            cirq.Circuit([gate_a(qreg[0]), gate_b(qreg[1])])
+        )
 
-    # TODO: Add equation of what this code is doing.
-    cnot_circuit = cirq.Circuit(cirq.CNOT.on(qreg[0], qreg[1]))
-    cd = {NoisyOperation(cnot_circuit): c_pos_pos}
+    # Add CNOT too
+    ideal_operations.append(cirq.Circuit(cirq.CNOT(*qreg)))
 
-    for p in [cirq.Circuit(p.on(q)) for p in pauli_ops[1:] for q in qreg]:
-        cd.update({NoisyOperation(cnot_circuit + p): c_pos_neg})
+    # Generate all representations
+    reps = []
+    for op in ideal_operations:
+        reps.append(represent_operation_with_local_depolarizing_noise(
+            op,
+            base_noise,
+        )
+        )
 
-    for (p0, p1) in product(pauli_ops[1:], repeat=2):
-        circ = cnot_circuit + cirq.Circuit(p0.on(qreg[0]), p1.on(qreg[1]))
-        cd.update({NoisyOperation(circ): c_neg_neg})
-
-    return representations + [OperationRepresentation(cnot_circuit, cd)]
+    return reps
 
 
 BASE_NOISE = 0.02
@@ -285,7 +273,7 @@ def test_execute_with_pec_mitigates_noise(circuit, executor, circuit_type):
         # Note this is an important subtlety necessary because of conversions.
         reps = get_pauli_representations(
             base_noise=BASE_NOISE,
-            qubits=[cirq.NamedQubit(name) for name in ("q_0", "q_1")]
+            qubits=[cirq.NamedQubit(name) for name in ("q_0", "q_1")],
         )
     else:
         reps = pauli_representations
