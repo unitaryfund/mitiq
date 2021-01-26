@@ -70,8 +70,8 @@ def sample_sequence(
 
     if operation_representation is None:
         raise ValueError(
-            f"Representation of ideal operation {ideal_operation} not found "
-            f"in provided representations."
+            f"Representation of ideal operation \n\n{ideal_operation}\n\n not "
+            "found in provided representations."
         )
 
     # Sample from this representation.
@@ -122,6 +122,10 @@ def sample_circuit(
     sign = 1
     norm = 1.0
     for op in ideal.all_operations():
+        # Ignore all measurements.
+        if cirq.is_measurement(op):
+            continue
+
         imp_seq, loc_sign, loc_norm = sample_sequence(
             cirq.Circuit(op), representations, random_state
         )

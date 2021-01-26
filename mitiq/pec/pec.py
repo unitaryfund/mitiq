@@ -21,7 +21,6 @@ import warnings
 import numpy as np
 
 from mitiq import generate_collected_executor, QPROGRAM
-from mitiq.conversions import convert_to_mitiq
 from mitiq.pec import sample_circuit, OperationRepresentation
 
 
@@ -104,19 +103,17 @@ def execute_with_pec(
         "Optimal resource cost for error mitigation,"
         (https://arxiv.org/abs/2006.12509).
     """
-    circuit, _ = convert_to_mitiq(circuit)
-
     if isinstance(random_state, int):
         random_state = np.random.RandomState(random_state)
-
-    # Get the 1-norm of the circuit quasi-probability representation
-    _, _, norm = sample_circuit(circuit, representations)
 
     if not (0 < precision <= 1):
         raise ValueError(
             "The value of 'precision' should be within the interval (0, 1],"
             f" but precision is {precision}."
         )
+
+    # Get the 1-norm of the circuit quasi-probability representation
+    _, _, norm = sample_circuit(circuit, representations)
 
     # Deduce the number of samples (if not given by the user)
     if not isinstance(num_samples, int):
