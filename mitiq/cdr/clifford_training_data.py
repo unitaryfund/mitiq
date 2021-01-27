@@ -29,8 +29,8 @@ def generate_training_circuits(
         List: [map_to_near_clifford(circuit, fraction_non_clifford, method, can_compile) for _ in range(num_training_circuits)]
     '''
     circuits_list = []
-    # First turn circuit into an data array which is easier to deal with:
-    data = circuit_to_array(circuit)
+    # First turn circuit into an data array which is easier to deal with, empty circuit is used to store qubit layout:
+    data, empty_circuit = circuit_to_array(circuit)
     mask_rz = data[1, :] == 'rz'
     rz_circ_data = data[:, mask_rz]
     mask_not_rz = data[1, :] != 'rz'
@@ -82,7 +82,7 @@ def generate_training_circuits(
         projected_circuit_data = new_circ[:,i]
 
         # Convert data arry into cirq circuit and append it to the storage array:
-        projected_circuit = array_to_circuit(projected_circuit_data)
+        projected_circuit = array_to_circuit(projected_circuit_data, empty_circuit)
         circuits_list.append(projected_circuit_data)
 
     return(circuits_list)
@@ -109,7 +109,7 @@ def count_non_cliffords(
 
 def circuit_to_array(
     circuit: QPROGRAM
-)-> np.ndarray:
+)-> (np.ndarray, QPROGRAM):
     '''Function to return the order of gates, their names and paramters in a more managable data structure than a Qiskit
     quantum circuit.
     
@@ -121,6 +121,7 @@ def circuit_to_array(
         where order is the order of the gates from 0 to depth, names are the names of the gates, parameters are the paramters 
         specifying the gates and qubits and cbits are the qubits and classical bits on which they act.
         qubits (int): number of qubits.
+        QPROGRAM: empty circuit with same qubit layout as original. 
     '''
     order=[]
     gates_list = []
