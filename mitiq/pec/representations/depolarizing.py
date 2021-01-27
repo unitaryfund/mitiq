@@ -249,7 +249,7 @@ def represent_operations_in_circuit_with_global_depolarizing_noise(
     ``noise_level`` affects each implemented operation.
 
     This function internally calls
-    :func:`represent_operation_with_global_depolarizing_noise` (more datails
+    :func:`represent_operation_with_global_depolarizing_noise` (more details
     about the quasi-probability representation can be found in its docstring).
 
     Args:
@@ -289,7 +289,7 @@ def represent_operations_in_circuit_with_local_depolarizing_noise(
     ``k`` is the number of qubits associated to the operation.
 
     This function internally calls
-    :func:`represent_operation_with_local_depolarizing_noise` (more datails
+    :func:`represent_operation_with_local_depolarizing_noise` (more details
     about the quasi-probability representation can be found in its docstring).
 
     Args:

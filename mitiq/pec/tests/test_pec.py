@@ -36,7 +36,7 @@ from mitiq.pec.representations import (
 
 
 # Noisy representations of Pauli and CNOT operations for testing.
-def get_pauli_and_CNOT_representations(
+def get_pauli_and_cnot_representations(
     base_noise: float,
     qubits: Optional[List[cirq.Qid]] = None,
 ) -> List[OperationRepresentation]:
@@ -65,8 +65,8 @@ def get_pauli_and_CNOT_representations(
 
 
 BASE_NOISE = 0.02
-pauli_representations = get_pauli_and_CNOT_representations(BASE_NOISE)
-noiseless_pauli_representations = get_pauli_and_CNOT_representations(0.0)
+pauli_representations = get_pauli_and_cnot_representations(BASE_NOISE)
+noiseless_pauli_representations = get_pauli_and_cnot_representations(0.0)
 
 
 def serial_executor(circuit: QPROGRAM, noise: float = BASE_NOISE) -> float:
@@ -259,7 +259,7 @@ def test_execute_with_pec_mitigates_noise(circuit, executor, circuit_type):
 
     if circuit_type == "qiskit":
         # Note this is an important subtlety necessary because of conversions.
-        reps = get_pauli_and_CNOT_representations(
+        reps = get_pauli_and_cnot_representations(
             base_noise=BASE_NOISE,
             qubits=[cirq.NamedQubit(name) for name in ("q_0", "q_1")],
         )
