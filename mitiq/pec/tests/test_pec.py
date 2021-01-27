@@ -263,6 +263,9 @@ def test_execute_with_pec_mitigates_noise(circuit, executor, circuit_type):
             base_noise=BASE_NOISE,
             qubits=[cirq.NamedQubit(name) for name in ("q_0", "q_1")],
         )
+        # TODO: PEC with Qiskit is slow.
+        #  See https://github.com/unitaryfund/mitiq/issues/507.
+        circuit, _ = convert_to_mitiq(circuit)
     else:
         reps = pauli_representations
 

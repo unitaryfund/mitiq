@@ -39,11 +39,13 @@ from mitiq.pec.utils import _operation_to_choi, _circuit_to_choi
 def test_sample_sequence_cirq():
     circuit = cirq.Circuit(cirq.H(cirq.LineQubit(0)))
 
-    noisy_xop = NoisyOperation.from_cirq(ideal=cirq.X)
-    noisy_zop = NoisyOperation.from_cirq(ideal=cirq.Z)
+    circuit.append(cirq.measure(cirq.LineQubit(0)))
 
     rep = OperationRepresentation(
-        ideal=circuit, basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
+        ideal=circuit, basis_expansion={
+            NoisyOperation.from_cirq(ideal=cirq.X): 0.5,
+            NoisyOperation.from_cirq(ideal=cirq.Z): -0.5
+        }
     )
 
     for _ in range(50):
@@ -119,11 +121,14 @@ def test_sample_sequence_cirq_random_state(seed):
         assert np.isclose(new_norm, norm)
 
 
-def test_sample_circuit_cirq():
+@pytest.mark.parametrize("measure", [True, False])
+def test_sample_circuit_cirq(measure):
     circuit = cirq.Circuit(
         cirq.ops.H.on(cirq.LineQubit(0)),
         cirq.ops.CNOT.on(*cirq.LineQubit.range(2)),
     )
+    if measure:
+        circuit.append(cirq.measure_each(*cirq.LineQubit.range(2)))
 
     h_rep = OperationRepresentation(
         ideal=circuit[:1],
@@ -134,7 +139,7 @@ def test_sample_circuit_cirq():
     )
 
     cnot_rep = OperationRepresentation(
-        ideal=circuit[1:],
+        ideal=circuit[1:2],
         basis_expansion={
             NoisyOperation.from_cirq(ideal=cirq.CNOT): 0.7,
             NoisyOperation.from_cirq(ideal=cirq.CZ): -0.7,
