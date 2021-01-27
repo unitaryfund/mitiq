@@ -85,7 +85,7 @@ def generate_training_circuits(
         projected_circuit = array_to_circuit(projected_circuit_data)
         circuits_list.append(projected_circuit_data)
 
-        return(circuits_list)
+    return(circuits_list)
 
 def count_non_cliffords(
     circuit: QPROGRAM,
