@@ -262,17 +262,18 @@ def represent_operations_in_circuit_with_global_depolarizing_noise(
         the operations of the input ``ideal_circuit``.
     """
 
-    circ, in_type = convert_to_mitiq(ideal_circuit)
+    circ, _ = convert_to_mitiq(ideal_circuit)
 
     representations = []
     for op in set(circ.all_operations()):
         representations.append(
             represent_operation_with_global_depolarizing_noise(
-                convert_from_mitiq(Circuit(op), in_type),
+                Circuit(op),
                 noise_level,
             )
         )
-
+    # TODO: if gh-516 will be fixed we may return native representations.
+    # Now, for each rep., the attribute _native_ideal is a cirq.Circuit.
     return representations
 
 
@@ -300,15 +301,16 @@ def represent_operations_in_circuit_with_local_depolarizing_noise(
         The list of quasi-probability representations associated to
         the operations of the input ``ideal_circuit``.
     """
-    circ, in_type = convert_to_mitiq(ideal_circuit)
+    circ, _ = convert_to_mitiq(ideal_circuit)
 
     representations = []
     for op in set(circ.all_operations()):
         representations.append(
             represent_operation_with_local_depolarizing_noise(
-                convert_from_mitiq(Circuit(op), in_type),
+                Circuit(op),
                 noise_level,
             )
         )
-
+    # TODO: if gh-516 will be fixed we may return native representations.
+    # Now, for each rep., the attribute _native_ideal is a cirq.Circuit.
     return representations

@@ -202,34 +202,8 @@ def test_represent_operations_in_circuit_global(circuit_type: str):
     assert len(reps) == 3
 
 
-@pytest.mark.parametrize("circuit_type", ["cirq", "pyquil"])
+@pytest.mark.parametrize("circuit_type", ["cirq", "qiskit", "pyquil"])
 def test_represent_operations_in_circuit_local(circuit_type: str):
-    """Tests all operation representations are created."""
-    qreg = LineQubit.range(2)
-    circ_mitiq = Circuit([CNOT(*qreg), H(qreg[0]), Y(qreg[1]), CNOT(*qreg)])
-    circ = convert_from_mitiq(circ_mitiq, circuit_type)
-
-    reps = represent_operations_in_circuit_with_local_depolarizing_noise(
-        ideal_circuit=circ,
-        noise_level=0.1,
-    )
-
-    for op in convert_to_mitiq(circ)[0].all_operations():
-        found = False
-        for rep in reps:
-            if _equal(rep.ideal, Circuit(op), require_qubit_equality=True):
-                found = True
-        assert found
-
-    # The number of reps. should match the number of unique operations
-    assert len(reps) == 3
-
-
-# TODO: Once the problem with qubit names is fixed, remove the next
-# test and add "qiskit" circuit type the test above.
-@pytest.mark.skip(reason="Problem with conversions of qiskit qubit names")
-@pytest.mark.parametrize("circuit_type", ["qiskit"])
-def test_represent_operations_in_circuit_local_qiskit(circuit_type: str):
     """Tests all operation representations are created."""
     qreg = LineQubit.range(2)
     circ_mitiq = Circuit([CNOT(*qreg), H(qreg[0]), Y(qreg[1]), CNOT(*qreg)])
