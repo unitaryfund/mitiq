@@ -31,6 +31,7 @@ from cirq import (
     Circuit,
     AsymmetricDepolarizingChannel,
     DepolarizingChannel,
+    MeasurementGate,
 )
 
 from mitiq.pec.representations import (
@@ -223,3 +224,32 @@ def test_represent_operations_in_circuit_local(circuit_type: str):
 
     # The number of reps. should match the number of unique operations
     assert len(reps) == 3
+
+
+@pytest.mark.parametrize("circuit_type", ["cirq", "qiskit", "pyquil"])
+def test_represent_operations_in_circuit_with_measurements(circuit_type: str):
+    """Tests measurements in circuit are ignored (not represented)."""
+    q0, q1 = LineQubit.range(2)
+    circ_mitiq = Circuit(
+        X(q1),
+        MeasurementGate(num_qubits=1)(q0),
+        X(q1),
+        MeasurementGate(num_qubits=1)(q0),
+    )
+    circ = convert_from_mitiq(circ_mitiq, circuit_type)
+
+    reps = represent_operations_in_circuit_with_local_depolarizing_noise(
+        ideal_circuit=circ,
+        noise_level=0.1,
+    )
+
+    for op in convert_to_mitiq(circ)[0].all_operations():
+        found = False
+        for rep in reps:
+            if _equal(rep.ideal, Circuit(op), require_qubit_equality=True):
+                found = True
+        if not isinstance(op.gate, MeasurementGate):
+            assert found
+
+    # Number of unique gates excluding measurement gates
+    assert len(reps) == 1

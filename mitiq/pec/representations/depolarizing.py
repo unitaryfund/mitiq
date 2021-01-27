@@ -16,7 +16,7 @@
 from typing import List
 from itertools import product
 
-from cirq import Operation, X, Y, Z, Circuit
+from cirq import Operation, X, Y, Z, Circuit, MeasurementGate
 from mitiq import QPROGRAM
 from mitiq.pec.types import OperationRepresentation, NoisyOperation
 from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
@@ -260,18 +260,22 @@ def represent_operations_in_circuit_with_global_depolarizing_noise(
     Returns:
         The list of quasi-probability representations associated to
         the operations of the input ``ideal_circuit``.
+
+    .. note::
+        Measurement gates are ignored (not represented).
     """
 
     circ, _ = convert_to_mitiq(ideal_circuit)
 
     representations = []
     for op in set(circ.all_operations()):
-        representations.append(
-            represent_operation_with_global_depolarizing_noise(
-                Circuit(op),
-                noise_level,
+        if not isinstance(op.gate, MeasurementGate):
+            representations.append(
+                represent_operation_with_global_depolarizing_noise(
+                    Circuit(op),
+                    noise_level,
+                )
             )
-        )
     # TODO: if gh-516 will be fixed we may return native representations.
     # Now, for each rep., the attribute _native_ideal is a cirq.Circuit.
     return representations
@@ -300,17 +304,21 @@ def represent_operations_in_circuit_with_local_depolarizing_noise(
     Returns:
         The list of quasi-probability representations associated to
         the operations of the input ``ideal_circuit``.
+
+    .. note::
+        Measurement gates are ignored (not represented).
     """
     circ, _ = convert_to_mitiq(ideal_circuit)
 
     representations = []
     for op in set(circ.all_operations()):
-        representations.append(
-            represent_operation_with_local_depolarizing_noise(
-                Circuit(op),
-                noise_level,
+        if not isinstance(op.gate, MeasurementGate):
+            representations.append(
+                represent_operation_with_local_depolarizing_noise(
+                    Circuit(op),
+                    noise_level,
+                )
             )
-        )
     # TODO: if gh-516 will be fixed we may return native representations.
     # Now, for each rep., the attribute _native_ideal is a cirq.Circuit.
     return representations
