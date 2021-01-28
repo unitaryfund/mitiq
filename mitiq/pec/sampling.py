@@ -45,10 +45,11 @@ def sample_sequence(
         random_state: Seed for sampling.
 
     Returns:
-        imp_seq: The sampled implementable sequence as list of one
-            or more operations.
-        sign: The sign associated to sampled sequence.
-        norm: The one norm of the decomposition coefficients.
+        A tuple of (``imp_seq``, ``sign``, ``norm``) where ``imp_seq``
+        is the sampled implementable sequence as list of one or more 
+        operations, ``sign`` is the sign associated with sequence, and 
+        ``norm`` is the one norm of the decomposition coefficients.
+        
     """
     if random_state is None:
         rng = np.random
@@ -94,10 +95,11 @@ def sample_circuit(
         random_state: Seed for sampling.
 
     Returns:
-        imp_circuit: The sampled implementable circuit.
-        sign: The sign associated to sampled_circuit.
-        norm: The one norm of the decomposition coefficients
-            (of the full circuit).
+        A tuple of (``imp_circuit``, ``sign``, ``norm``) where ``imp_circuit``
+        is the sampled implementable circuit, ``sign`` is the sign associated
+        with sampled_circuit, and ``norm`` is the one norm of the 
+        decomposition coefficients (of the full circuit).
+
     """
     if isinstance(random_state, int):
         random_state = np.random.RandomState(random_state)

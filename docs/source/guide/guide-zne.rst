@@ -5,6 +5,8 @@ Zero Noise Extrapolation
 *********************************************
 Zero noise extrapolation has two main components: noise scaling and then extrapolation.
 
+.. _guide_zne_folding:
+
 ======================================
 Digital noise scaling: Unitary Folding
 ======================================
@@ -267,6 +269,8 @@ This function can then be used with ``mitiq.execute_with_zne`` as an option to s
     # Variables circ and scale are a circuit to fold and a scale factor, respectively
     zne = mitiq.execute_with_zne(circuit, executor, scale_noise=my_custom_folding_function)
 
+
+.. _guide_zne_factory:
 
 ====================================================
 Classical fitting and extrapolation: Factory Objects

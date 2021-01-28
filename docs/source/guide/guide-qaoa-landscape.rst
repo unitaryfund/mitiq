@@ -1,6 +1,6 @@
 .. mitiq documentation file
 
-.. _guide-ibmq-backends:
+.. _guide-qaoa-ibmq-backends:
 
 *********************************************
 Mitigating a MaxCut Landscape with QAOA

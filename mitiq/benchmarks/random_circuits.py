@@ -36,11 +36,10 @@ def sample_projector(
         n_qubits: A number of qubits
         seed: Optional seed for random number generator.
               It can be an integer or a numpy.random.RandomState object.
-
     Returns:
         A random computational basis projector on n_qubits. E.g., for two
-        qubits this could be np.diag([0, 0, 0, 1]), corresponding to the
-        projector on the |11> state.
+        qubits this could be ``np.diag([0, 0, 0, 1])``, corresponding to the 
+        projector on the :math:`\\left|11\\right\\rangle` state.
     """
     obs = np.zeros(int(2 ** n_qubits))
 

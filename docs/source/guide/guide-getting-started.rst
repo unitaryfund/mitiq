@@ -160,12 +160,12 @@ different ones.
     Mitigated error with the linear method is 0.00638
 
 You can read more about the ``Factory`` objects that are built into ``mitiq``
-and how to create your own :ref:`here <guide-factories>`.
+and how to create your own :ref:`here <guide_zne_factory>`.
 
 Another key step in zero-noise extrapolation is to choose how your circuit is
 transformed to scale the noise. You can read more about the noise scaling
 methods built into ``mitiq`` and how to create your
-own :ref:`here <guide-folding>`.
+own :ref:`here <guide_zne_folding>`.
 
 .. _qiskit_getting_started:
 

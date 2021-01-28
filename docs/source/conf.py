@@ -62,10 +62,11 @@ extensions = [
 ]
 
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3.7", "python37.inv"),
+    "python": ("https://docs.python.org/3.7", None),
     "numpy": ("https://docs.scipy.org/doc/numpy/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
-    "cirq": ("https://quantumai.google/cirq", None),
+    # Cirq no no longer using sphinx docs so interlinking is not possible.
+    #"cirq": ("https://quantumai.google/cirq", None),
     "pyquil": ("https://pyquil-docs.rigetti.com/en/stable/", None),
     "qiskit": ("https://qiskit.org/documentation/", None),
     "qutip": ("http://qutip.org/docs/latest/", None),
@@ -140,7 +141,7 @@ language = "Python"
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ["guide/_guide-zne-lindblad.rst"]
+exclude_patterns = ["guide/_guide-zne-lindblad.rst", "examples/maxcut_tutorial.ipynb"]
 execution_timeout = 600
 jupyter_execute_notebooks = "cache"
 
@@ -174,6 +175,7 @@ html_logo = "img/unitary_fund_logo.png"
 pybtex.style.formatting.unsrt.date = pybtex.style.template.words(sep="")[
     "(", pybtex.style.template.field("year"), ")"
 ]
+bibtex_bibfiles = ['refs.bib']
 
 
 class ApsStyle(pybtex.style.formatting.unsrt.Style):
