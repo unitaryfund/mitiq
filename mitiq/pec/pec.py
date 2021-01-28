@@ -47,7 +47,7 @@ def execute_with_pec(
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
 ) -> Union[float, Tuple[float, Dict[str, Any]]]:
-    """Evaluates the expectation value associated to the input circuit
+    r"""Evaluates the expectation value associated to the input circuit
     using probabilistic error cancellation (PEC) [Temme2017]_ [Endo2018]_.
 
     This function implements PEC by:
@@ -77,17 +77,17 @@ def execute_with_pec(
             uniqueness, else a minimal unique set is executed.
         random_state: Seed for sampling circuits.
         full_output: If False only the average PEC value is returned.
-            If True an estimate of the associated error is returned too.
+            If True a dictionary containing all PEC data is returned too.
 
     Returns:
         pec_value: The PEC estimate of the ideal expectation value associated
             to the input circuit.
-        pec_error: The estimated error between the mitigated 'pec_value' and
-            the actual ideal expectation value. This is estimated as the ratio
-            pec_std / sqrt(num_samples), where 'pec_std' is the
-            standard deviation of the PEC samples, i.e., the square root of
-            the mean squared deviation of the sampled values from 'pec_value'.
-            This is returned only if 'full_output' is True.
+        pec_data: A dictionary which contains all the raw data involved in the
+            PEC process (including the PEC estimation error). The error is
+            estimated as pec_std / sqrt(num_samples), where 'pec_std' is the
+            standard deviation of the PEC samples, i.e., the square root of the
+            mean squared deviation of the sampled values from 'pec_value'.
+            This is returned only if ``full_output`` is ``True``.
 
     .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
         "Error mitigation for short-depth quantum circuits,"
