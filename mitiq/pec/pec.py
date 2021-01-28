@@ -15,7 +15,7 @@
 
 """High-level probabilistic error cancellation tools."""
 
-from typing import Optional, Callable, List, Union, Tuple
+from typing import Optional, Callable, List, Union, Tuple, Dict, Any
 import warnings
 
 import numpy as np
@@ -46,7 +46,7 @@ def execute_with_pec(
     force_run_all: bool = True,
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
-) -> Union[float, Tuple[float, float]]:
+) -> Union[float, Tuple[float, Dict[str, Any]]]:
     """Evaluates the expectation value associated to the input circuit
     using probabilistic error cancellation (PEC) [Temme2017]_ [Endo2018]_.
 
@@ -144,8 +144,20 @@ def execute_with_pec(
 
     pec_value = np.average(unbiased_estimators)
 
-    if full_output:
-        pec_error = np.std(unbiased_estimators) / np.sqrt(num_samples)
-        return pec_value, pec_error
+    if not full_output:
+        return pec_value
 
-    return pec_value
+    # Build dictionary with additional results and data
+    pec_data: Dict[str, Any] = {}
+
+    pec_data = {
+        "num_samples": num_samples,
+        "precision": precision,
+        "pec_value": pec_value,
+        "pec_error": np.std(unbiased_estimators) / np.sqrt(num_samples),
+        "unbiased_estimators": unbiased_estimators,
+        "measured_expectation_values": exp_values,
+        "sampled_circuits": sampled_circuits,
+    }
+
+    return pec_value, pec_data
