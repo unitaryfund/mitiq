@@ -11,6 +11,7 @@
 ## Version 0.5.0 (In Development)
 
 ### All Changes
+- Optionally return a dictionary with all pec data in execute_with_pec (@andreamari, gh-518)
 - Added local_depolarizing_representations and Choi-based tests (@andreamari, gh-502)
 - Added new `plot_data` and `plot_fit` methods for factories(@crazy4pi314 @elmandouh, gh-333)
 - Ensure code is tested in IBMQ guide and adds a doctest target in Makefile(@rmlarose, gh-488)
