@@ -319,7 +319,7 @@ def test_execute_with_pec_error_scaling(num_samples: int):
     """Tests that the error associated to the PEC value scales as
     1/sqrt(num_samples).
     """
-    _, error_pec = execute_with_pec(
+    _, pec_data = execute_with_pec(
         oneq_circ,
         partial(fake_executor, random_state=np.random.RandomState(0)),
         representations=pauli_representations,
@@ -328,15 +328,15 @@ def test_execute_with_pec_error_scaling(num_samples: int):
         full_output=True,
     )
     # The error should scale as 1/sqrt(num_samples)
-    print(error_pec * np.sqrt(num_samples))
-    assert np.isclose(error_pec * np.sqrt(num_samples), 1.0, atol=0.1)
+    normalized_error = pec_data["pec_error"] * np.sqrt(num_samples)
+    assert np.isclose(normalized_error, 1.0, atol=0.1)
 
 
 @pytest.mark.parametrize("precision", [0.1, 0.05])
 def test_precision_option_in_execute_with_pec(precision: float):
     """Tests that the 'precision' argument is used to deduce num_samples."""
     # For a noiseless circuit we expect num_samples = 1/precision^2:
-    _, pec_error = execute_with_pec(
+    _, pec_data = execute_with_pec(
         oneq_circ,
         partial(fake_executor, random_state=np.random.RandomState(0)),
         representations=pauli_representations,
@@ -345,11 +345,11 @@ def test_precision_option_in_execute_with_pec(precision: float):
         full_output=True,
     )
     # The error should scale as precision
-    assert np.isclose(pec_error / precision, 1.0, atol=0.1)
+    assert np.isclose(pec_data["pec_error"] / precision, 1.0, atol=0.1)
 
     # If num_samples is given, precision is ignored.
     nsamples = 1000
-    _, pec_error = execute_with_pec(
+    _, pec_data = execute_with_pec(
         oneq_circ,
         partial(fake_executor, random_state=np.random.RandomState(0)),
         representations=pauli_representations,
@@ -358,8 +358,8 @@ def test_precision_option_in_execute_with_pec(precision: float):
         full_output=True,
     )
     # The error should scale as 1/sqrt(num_samples)
-    assert not np.isclose(pec_error / precision, 1.0, atol=0.1)
-    assert np.isclose(pec_error * np.sqrt(nsamples), 1.0, atol=0.1)
+    assert not np.isclose(pec_data["pec_error"] / precision, 1.0, atol=0.1)
+    assert np.isclose(pec_data["pec_error"] * np.sqrt(nsamples), 1.0, atol=0.1)
 
 
 @pytest.mark.parametrize("bad_value", (0, -1, 2))
@@ -388,3 +388,38 @@ def test_large_sample_size_warning():
             pauli_representations,
             num_samples=100001
         )
+
+
+def test_pec_data_with_full_output():
+    """Tests that execute_with_pec mitigates the error of a noisy
+    expectation value.
+    """
+    precision = 0.1
+    pec_value, pec_data = execute_with_pec(
+        twoq_circ,
+        serial_executor,
+        precision=precision,
+        representations=pauli_representations,
+        full_output=True,
+        random_state=102,
+    )
+    # Get num samples from precision
+    norm = 1.0
+    for op in twoq_circ.all_operations():
+        for rep in pauli_representations:
+            if rep.ideal == cirq.Circuit(op):
+                norm *= rep.norm
+    num_samples = int((norm / precision) ** 2)
+
+    # Manually get raw expectation values
+    exp_values = [serial_executor(c) for c in pec_data["sampled_circuits"]]
+
+    assert pec_data["num_samples"] == num_samples
+    assert pec_data["precision"] == precision
+    assert np.isclose(pec_data["pec_value"], pec_value)
+    assert np.isclose(
+        pec_data["pec_error"],
+        np.std(pec_data["unbiased_estimators"]) / np.sqrt(num_samples),
+    )
+    assert np.isclose(np.average(pec_data["unbiased_estimators"]), pec_value)
+    assert np.allclose(pec_data["measured_expectation_values"], exp_values)
