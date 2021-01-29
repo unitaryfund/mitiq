@@ -111,6 +111,7 @@ print('number of non Clifford gates ORIG = ', non_cliffords)
 training_circuits = generate_training_circuits(circuit, num_training_circuits, fraction_non_clifford, method_select = 'random', method_replace = 'probabilistic')
 
 
+# testing circuits look good. Note that a figure is saved with every circuit in the trianing set for visual inspection:
 for i, training_circuit in enumerate(training_circuits):
     non_cliffords = count_non_cliffords(training_circuit)
     print('number of non Clifford gates = ', non_cliffords)
