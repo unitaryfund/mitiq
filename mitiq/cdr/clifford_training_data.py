@@ -1,17 +1,17 @@
-from cirq import Circuit
+import cirq
 from random import sample, choice, randint
 import numpy as np
 from mitiq._typing import QPROGRAM
 
 def generate_training_circuits(
-    circuit: cirq.Circuit,
+    circuit: cirq.circuits.Circuit,
     num_training_circuits: int,
     fraction_non_clifford: float,
     method_select: str = 'random',
     method_replace: str = 'nearest',
     sigma_select: float = 0.5,
     sigma_replace: float = 0.5,
-)-> List[cirq.Circuit]:
+)-> list:
 
     '''Returns a list of near-Clifford circuits to act as training data.
 
@@ -40,7 +40,6 @@ def generate_training_circuits(
     mask_cliff = is_clifford_angle(rz_circ_data[2, :]) == True
     rz_cliff = rz_circ_data[:, mask_cliff]
     total_non_cliff = len(rz_non_cliff[0])
-
     # define N:
     N = int(fraction_non_clifford * total_non_cliff)
 
@@ -48,6 +47,7 @@ def generate_training_circuits(
     all_cliff = np.column_stack((not_rz_circ_data, rz_cliff))
 
     for n in range(num_training_circuits):
+        empty_circuit_copy = empty_circuit.copy()
         rz_non_cliff_copy = rz_non_cliff.copy()
 
         # Choose non Clifford gates to change according to selection methods:
@@ -62,6 +62,8 @@ def generate_training_circuits(
             columns_to_change = np.random.choice(np.arange(0, total_non_cliff,1).tolist(), total_non_cliff - N, replace=False,
                                                 p=prob_choose_gate)
 
+        else: 
+            raise Exception('method_select must = "random", "probabilistic"')
         rz_non_cliff_selected = rz_non_cliff_copy[:, columns_to_change]
         # Remove these columns from the circuit data (as they are to be changed below):
         rz_non_cliff_copy = np.delete(rz_non_cliff_copy, columns_to_change, axis=1)
@@ -75,6 +77,8 @@ def generate_training_circuits(
         elif method_replace == 'probabilistic':
             rz_non_cliff_selected[2,:] = probabilistic_angle_to_clifford(rz_non_cliff_selected[2,:], sigma_replace)
 
+        else: 
+            raise Exception('method_replace must = "closest", "random", "probabilistic"')
         # Add back into rest of data and re-order instructions:
         new_circ = np.column_stack((all_cliff, rz_non_cliff_selected))
         new_circ = np.column_stack((new_circ, rz_non_cliff_copy))
@@ -82,8 +86,8 @@ def generate_training_circuits(
         projected_circuit_data = new_circ[:,i]
 
         # Convert data arry into cirq circuit and append it to the storage array:
-        projected_circuit = array_to_circuit(projected_circuit_data, empty_circuit)
-        circuits_list.append(projected_circuit_data)
+        projected_circuit = array_to_circuit(projected_circuit_data, empty_circuit_copy)
+        circuits_list.append(projected_circuit)
 
     return(circuits_list)
 
