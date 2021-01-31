@@ -114,11 +114,13 @@ def _transform_registers(
     new_qregs: Optional[List[qiskit.QuantumRegister]] = None,
     new_cregs: Optional[List[qiskit.ClassicalRegister]] = None,
 ) -> None:
-    """Transforms the quantum registers in the circuit to the new registers.
+    """Transforms the registers in the circuit to the new registers.
 
     Args:
-        circuit: Qiskit circuit with one quantum register and either zero
-            classical registers or 1 or n classical registers of n bits.
+        circuit: Qiskit circuit with one quantum register and either
+            * No classical registers, or
+            * One single classical register of n bits, or
+            * n single-bit classical registers.
         new_qregs: The new quantum registers for the circuit.
         new_cregs: The new classical registers for the circuit.
 
@@ -127,6 +129,8 @@ def _transform_registers(
             * If the input circuit has more than one quantum register.
             * If the number of qubits in the new quantum registers does not
             match the number of qubits in the circuit.
+            * If the input circuit has a classical register with more than one
+            bit.
             * If the number of bits in the new classical registers does not
             match the number of bits in the circuit.
     """
