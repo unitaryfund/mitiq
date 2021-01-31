@@ -223,6 +223,8 @@ def to_qiskit(
     qiskit_circuit = qiskit.QuantumCircuit.from_qasm_str(to_qasm(circuit))
 
     # Assign register structure.
+    # Note: Output qiskit_circuit has one quantum register and n classical
+    # registers of 1 bit where n is the total number of classical bits.
     if len(qiskit_circuit.cregs) > 0:
         _transform_registers(qiskit_circuit, new_qregs=qregs, new_cregs=cregs)
     else:
