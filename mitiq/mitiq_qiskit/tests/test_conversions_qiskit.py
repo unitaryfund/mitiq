@@ -179,7 +179,7 @@ def test_map_bit_index(reg_sizes):
         assert mapped_index == expected_mapped_index
 
         expected_mapped_index += 1
-        if bit_index == sum(reg_sizes[:expected_register_index + 1]) - 1:
+        if bit_index == sum(reg_sizes[: expected_register_index + 1]) - 1:
             expected_register_index += 1
             expected_mapped_index = 0
 
