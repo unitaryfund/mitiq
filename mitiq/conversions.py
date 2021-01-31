@@ -150,7 +150,7 @@ def converter(
             return scaled_circuit
 
         # Base conversion back to input type.
-        converted_scaled_circuit = convert_from_mitiq(
+        scaled_circuit = convert_from_mitiq(
             scaled_circuit, input_circuit_type
         )
 
@@ -159,13 +159,13 @@ def converter(
             from mitiq.mitiq_qiskit.conversions import _transform_registers
 
             _transform_registers(
-                converted_scaled_circuit,
+                scaled_circuit,
                 new_qregs=circuit.qregs,
-                new_cregs=circuit.cregs if circuit.cregs else None
+                new_cregs=circuit.cregs if scaled_circuit.cregs else None
             )
-            if circuit.cregs and not converted_scaled_circuit.cregs:
-                converted_scaled_circuit.add_register(*circuit.cregs)
+            if circuit.cregs and not scaled_circuit.cregs:
+                scaled_circuit.add_register(*circuit.cregs)
 
-        return converted_scaled_circuit
+        return scaled_circuit
 
     return new_scaling_function

@@ -84,14 +84,39 @@ def _map_bit_index(
     )
 
 
-def _map_bits(bits, new_register_sizes, new_registers):
+def _map_cbits(bits, registers, new_register_sizes, new_registers):
+    """Maps bits to new registers. Assumes the input ``bits`` come from
+    n registers, where n is the number of bits.
+    """
+    if len(new_registers) == 0:
+        return bits
+
+    indices = [bit.index for bit in bits]  # Bug: This will always be zero for cbits.
+    mapped_indices = [_map_bit_index(i, new_register_sizes) for i in indices]
+
+    if isinstance(new_registers[0], qiskit.QuantumRegister):
+        Bit = qiskit.circuit.Qubit
+    else:
+        Bit = qiskit.circuit.Clbit
+
+    return [Bit(new_registers[i], j) for i, j in mapped_indices]
+
+
+def _map_bits(bits, registers, new_register_sizes, new_registers):
     """Maps (qu)bits to new registers. Assumes the input ``bits`` come from
     a single register or n registers, where n is the number of bits.
     """
     if len(new_registers) == 0:
         return bits
 
-    indices = [bit.index for bit in bits]
+    # Only two support cases:
+    if len(registers) == 1:
+        # Case where there are n bits in a single register.
+        indices = [bit.index for bit in bits]
+    else:
+        # Case where there are n single-bit registers.
+        indices = [registers.index(bit.register) for bit in bits]
+
     mapped_indices = [_map_bit_index(i, new_register_sizes) for i in indices]
 
     if isinstance(new_registers[0], qiskit.QuantumRegister):
@@ -132,14 +157,15 @@ def _transform_registers(
     if new_cregs is None:
         new_cregs = []
 
-    if len(circuit.qregs) > 1:
+    qreg_sizes = [qreg.size for qreg in new_qregs]
+    old_qregs = circuit.qregs
+    nqubits_in_circuit = sum(qreg.size for qreg in old_qregs)
+
+    if len(old_qregs) > 1:
         raise ValueError(
             "Input circuit is required to have <= 1 quantum register but has "
             f"{len(circuit.qregs)} quantum registers."
         )
-
-    qreg_sizes = [qreg.size for qreg in new_qregs]
-    nqubits_in_circuit = sum(qreg.size for qreg in circuit.qregs)
 
     if len(qreg_sizes) and sum(qreg_sizes) != nqubits_in_circuit:
         raise ValueError(
@@ -148,9 +174,10 @@ def _transform_registers(
         )
 
     creg_sizes = [creg.size for creg in new_cregs]
-    nbits_in_circuit = sum(creg.size for creg in circuit.cregs)
+    old_cregs = circuit.cregs
+    nbits_in_circuit = sum(creg.size for creg in old_cregs)
 
-    if len(circuit.cregs) not in (0, 1, nbits_in_circuit):
+    if len(old_cregs) not in (0, 1, nbits_in_circuit):
         raise ValueError(
             f"Input circuit is required to have 0, 1, or {nbits_in_circuit} "
             f"classical registers but has {len(circuit.cregs)} classical "
@@ -171,11 +198,12 @@ def _transform_registers(
 
     # Map the (qu)bits in operations to the new (qu)bits.
     new_ops = []
+    # print("Iterating through ops and transforming qubits:")
     for op in circuit.data:
         gate, qubits, cbits = op
 
-        new_qubits = _map_bits(qubits, qreg_sizes, new_qregs)
-        new_cbits = _map_bits(cbits, creg_sizes, new_cregs)
+        new_qubits = _map_bits(qubits, old_qregs, qreg_sizes, new_qregs)
+        new_cbits = _map_bits(cbits, old_cregs, creg_sizes, new_cregs)
 
         new_ops.append((gate, new_qubits, new_cbits))
 
