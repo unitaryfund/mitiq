@@ -84,24 +84,6 @@ def _map_bit_index(
     )
 
 
-def _map_cbits(bits, registers, new_register_sizes, new_registers):
-    """Maps bits to new registers. Assumes the input ``bits`` come from
-    n registers, where n is the number of bits.
-    """
-    if len(new_registers) == 0:
-        return bits
-
-    indices = [bit.index for bit in bits]  # Bug: This will always be zero for cbits.
-    mapped_indices = [_map_bit_index(i, new_register_sizes) for i in indices]
-
-    if isinstance(new_registers[0], qiskit.QuantumRegister):
-        Bit = qiskit.circuit.Qubit
-    else:
-        Bit = qiskit.circuit.Clbit
-
-    return [Bit(new_registers[i], j) for i, j in mapped_indices]
-
-
 def _map_bits(bits, registers, new_register_sizes, new_registers):
     """Maps (qu)bits to new registers. Assumes the input ``bits`` come from
     a single register or n registers, where n is the number of bits.
