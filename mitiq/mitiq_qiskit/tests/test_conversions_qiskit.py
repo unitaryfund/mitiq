@@ -128,18 +128,43 @@ def test_to_qiskit_assign_qregs(qreg_sizes):
     cirq_circuit = cirq.testing.random_circuit(
         nbits, n_moments=5, op_density=1, random_state=10
     )
-    print(cirq_circuit)
+
     qregs = [qiskit.QuantumRegister(s) for s in qreg_sizes]
     qiskit_circuit = to_qiskit(cirq_circuit, qregs=qregs)
 
-    print(qiskit_circuit)
     assert qiskit_circuit.qregs == qregs
-
-    new_cirq_circuit = from_qiskit(qiskit_circuit)
-    print(new_cirq_circuit)
+    assert qiskit_circuit.cregs == []
     cirq.testing.assert_allclose_up_to_global_phase(
         cirq.unitary(from_qiskit(qiskit_circuit)),
-        cirq.unitary((cirq_circuit)),
+        cirq.unitary(cirq_circuit),
+        atol=1e-5,
+    )
+
+
+@pytest.mark.parametrize("qreg_sizes", [[2], [1, 3, 2], [2, 1], [1, 1, 1]])
+@pytest.mark.parametrize("measure", [True, False])
+@pytest.mark.parametrize("flip_creg", [True, False])
+def test_to_qiskit_assign_qregs_and_cregs(qreg_sizes, measure, flip_creg):
+    nbits = sum(qreg_sizes)
+    cirq_circuit = cirq.testing.random_circuit(
+        nbits, n_moments=5, op_density=1, random_state=10
+    )
+    if measure:
+        cirq_circuit.append(cirq.measure_each(*cirq_circuit.all_qubits()))
+
+    qregs = [qiskit.QuantumRegister(s) for s in qreg_sizes]
+    cregs = [qiskit.ClassicalRegister(s) for s in qreg_sizes]
+    if flip_creg:
+        cregs = cregs[::-1]
+
+    qiskit_circuit = to_qiskit(cirq_circuit, qregs=qregs, cregs=cregs)
+
+    assert qiskit_circuit.qregs == qregs
+    assert qiskit_circuit.cregs == cregs
+
+    cirq.testing.assert_allclose_up_to_global_phase(
+        cirq.unitary(from_qiskit(qiskit_circuit)),
+        cirq.unitary(cirq_circuit),
         atol=1e-5,
     )
 
