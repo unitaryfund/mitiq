@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for conversions between Mitiq circuits and Qiskit circuits."""
+import numpy as np
 import pytest
 
 import cirq
@@ -119,6 +120,28 @@ def test_convert_with_multiple_barriers(as_qasm):
     qbit = cirq.LineQubit(0)
     correct = cirq.Circuit(cirq.ops.H.on(qbit) for _ in range(num_ops))
     assert _equal(cirq_circuit, correct)
+
+
+@pytest.mark.parametrize("qreg_sizes", [[1], [1, 2], [2, 1], [1, 1, 1]])
+def test_to_qiskit_assign_qregs(qreg_sizes):
+    nbits = sum(qreg_sizes)
+    cirq_circuit = cirq.testing.random_circuit(
+        nbits, n_moments=5, op_density=1, random_state=10
+    )
+    print(cirq_circuit)
+    qregs = [qiskit.QuantumRegister(s) for s in qreg_sizes]
+    qiskit_circuit = to_qiskit(cirq_circuit, qregs=qregs)
+
+    print(qiskit_circuit)
+    assert qiskit_circuit.qregs == qregs
+
+    new_cirq_circuit = from_qiskit(qiskit_circuit)
+    print(new_cirq_circuit)
+    cirq.testing.assert_allclose_up_to_global_phase(
+        cirq.unitary(from_qiskit(qiskit_circuit)),
+        cirq.unitary((cirq_circuit)),
+        atol=1e-5,
+    )
 
 
 @pytest.mark.parametrize("reg_sizes", [[2, 4, 1, 6], [5, 4, 2], [6]])
