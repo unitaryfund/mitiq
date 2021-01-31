@@ -151,8 +151,8 @@ def _transform_registers(
 
     if len(creg_sizes) and sum(creg_sizes) != nbits_in_circuit:
         raise ValueError(
-            f"The circuit has {nqubits_in_circuit} bits, but the provided "
-            f"quantum registers have {sum(qreg_sizes)} bits."
+            f"The circuit has {nbits_in_circuit} bits, but the provided "
+            f"classical registers have {sum(creg_sizes)} bits."
         )
 
     # Assign the new registers.
