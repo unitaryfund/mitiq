@@ -60,6 +60,10 @@ def _map_bit_index(
         bit_index = 3, new_register_sizes = [2, 3]
         returns (1, 0), meaning the mapped (qu)bit is in the 1st new register
         and has index 0 in this register.
+
+    Note:
+        The bit_index is assumed to come from a circuit with 1 or n registers
+        where n is the maximum bit_index.
     """
     max_indices_in_registers = np.cumsum(new_register_sizes) - 1
 
@@ -81,7 +85,9 @@ def _map_bit_index(
 
 
 def _map_bits(bits, new_register_sizes, new_registers):
-    """Maps (qu)bits to new registers."""
+    """Maps (qu)bits to new registers. Assumes the input ``bits`` come from
+    a single register or n registers, where n is the number of bits.
+    """
     if len(new_registers) == 0:
         return bits
 
@@ -104,7 +110,8 @@ def _transform_registers(
     """Transforms the quantum registers in the circuit to the new registers.
 
     Args:
-        circuit: Qiskit circuit with one quantum register.
+        circuit: Qiskit circuit with one quantum register and either zero
+            classical registers or 1 or n classical registers of n bits.
         new_qregs: The new quantum registers for the circuit.
         new_cregs: The new classical registers for the circuit.
 
@@ -131,12 +138,6 @@ def _transform_registers(
             f"{len(circuit.qregs)} quantum registers."
         )
 
-    if len(circuit.cregs) > 1:
-        raise ValueError(
-            "Input circuit is required to have <= 1 classical register but has"
-            f" {len(circuit.cregs)} classical registers."
-        )
-
     qreg_sizes = [qreg.size for qreg in new_qregs]
     nqubits_in_circuit = sum(qreg.size for qreg in circuit.qregs)
 
@@ -148,6 +149,13 @@ def _transform_registers(
 
     creg_sizes = [creg.size for creg in new_cregs]
     nbits_in_circuit = sum(creg.size for creg in circuit.cregs)
+
+    if len(circuit.cregs) not in (0, 1, nbits_in_circuit):
+        raise ValueError(
+            f"Input circuit is required to have 0, 1, or {nbits_in_circuit} "
+            f"classical registers but has {len(circuit.cregs)} classical "
+            f"registers."
+        )
 
     if len(creg_sizes) and sum(creg_sizes) != nbits_in_circuit:
         raise ValueError(
@@ -192,6 +200,7 @@ def to_qiskit(
     circuit: cirq.Circuit,
     qregs: Optional[List[qiskit.QuantumRegister]] = None,
     cregs: Optional[List[qiskit.ClassicalRegister]] = None,
+    add_cregs_if_cannot_transform: bool = True,
 ) -> qiskit.QuantumCircuit:
     """Returns a Qiskit circuit equivalent to the input Mitiq circuit.
 
@@ -199,8 +208,13 @@ def to_qiskit(
         circuit: Mitiq circuit to convert to a Qiskit circuit.
         qregs: Quantum registers of the returned Qiskit circuit. If none are
             provided, a single default register is used.
-        cregs: Classical registers of the return Qiskit circuit. If none are
-            provided, a single default register is used.
+        cregs: Classical registers of the returned Qiskit circuit, provided
+            that the original circuit has classical registers and
+            ``add_cregs_if_cannot_transform`` is True. If none are provided,
+             a single default register is used.
+        add_cregs_if_cannot_transform: If True, the provided ``cregs`` are
+            added to the circuit if there are no classical registers in the
+            original ``circuit``.
 
     Returns:
         Qiskit.QuantumCircuit object equivalent to the input Mitiq circuit.
@@ -209,7 +223,12 @@ def to_qiskit(
     qiskit_circuit = qiskit.QuantumCircuit.from_qasm_str(to_qasm(circuit))
 
     # Assign register structure.
-    _transform_registers(qiskit_circuit, new_qregs=qregs, new_cregs=cregs)
+    if len(qiskit_circuit.cregs) > 0:
+        _transform_registers(qiskit_circuit, new_qregs=qregs, new_cregs=cregs)
+    else:
+        _transform_registers(qiskit_circuit, new_qregs=qregs)
+        if cregs and add_cregs_if_cannot_transform:
+            qiskit_circuit.add_register(*cregs)
 
     return qiskit_circuit
 
