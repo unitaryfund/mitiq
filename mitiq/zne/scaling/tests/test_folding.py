@@ -1237,6 +1237,8 @@ def test_fold_from_left_with_qiskit_circuits():
         qiskit_circuit, scale_factor=1.0, return_mitiq=False
     )
     assert isinstance(qiskit_folded_circuit, QuantumCircuit)
+    assert qiskit_folded_circuit.qregs == qiskit_circuit.qregs
+    assert qiskit_folded_circuit.cregs == qiskit_circuit.cregs
 
 
 def test_fold_from_right_with_qiskit_circuits():
@@ -1279,6 +1281,8 @@ def test_fold_from_right_with_qiskit_circuits():
         qiskit_circuit, scale_factor=1.0
     )
     assert isinstance(qiskit_folded_circuit, QuantumCircuit)
+    assert qiskit_folded_circuit.qregs == qiskit_circuit.qregs
+    assert qiskit_folded_circuit.cregs == qiskit_circuit.cregs
 
 
 def test_fold_at_random_with_qiskit_circuits():
@@ -1321,6 +1325,8 @@ def test_fold_at_random_with_qiskit_circuits():
         qiskit_circuit, scale_factor=1.0
     )
     assert isinstance(qiskit_folded_circuit, QuantumCircuit)
+    assert qiskit_folded_circuit.qregs == qiskit_circuit.qregs
+    assert qiskit_folded_circuit.cregs == qiskit_circuit.cregs
 
 
 def test_fold_global_with_qiskit_circuits():
@@ -1356,6 +1362,8 @@ def test_fold_global_with_qiskit_circuits():
         qiskit_circuit, scale_factor=2.0, fold_method=fold_gates_from_left
     )
     assert isinstance(folded_qiskit_circuit, QuantumCircuit)
+    assert folded_qiskit_circuit.qregs == qiskit_circuit.qregs
+    assert folded_qiskit_circuit.cregs == qiskit_circuit.cregs
 
 
 def test_fold_left_squash_moments():
@@ -1550,6 +1558,8 @@ def test_fold_local_with_single_qubit_gates_fidelity_one(fold_method, qiskit):
         [ops.TOFFOLI.on(*qreg)] * 3,
     )
     if qiskit:
+        assert folded.qregs == circ.qregs
+        assert folded.cregs == circ.cregs
         folded, _ = convert_to_mitiq(folded)
         assert equal_up_to_global_phase(folded.unitary(), correct.unitary())
     else:
@@ -1597,6 +1607,8 @@ def test_all_gates_folded_at_max_scale_with_fidelities(fold_method, qiskit):
             [ops.TOFFOLI.on(*qreg)] * 3,
         )
         if qiskit:
+            assert folded.qregs == circ.qregs
+            assert folded.cregs == circ.cregs
             folded, _ = convert_to_mitiq(folded)
             assert equal_up_to_global_phase(
                 folded.unitary(), correct.unitary()
