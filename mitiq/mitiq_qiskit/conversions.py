@@ -180,7 +180,6 @@ def _transform_registers(
 
     # Map the (qu)bits in operations to the new (qu)bits.
     new_ops = []
-    # print("Iterating through ops and transforming qubits:")
     for op in circuit.data:
         gate, qubits, cbits = op
 
