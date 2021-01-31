@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for conversions between Mitiq circuits and Qiskit circuits."""
-import numpy as np
 import pytest
 
 import cirq
