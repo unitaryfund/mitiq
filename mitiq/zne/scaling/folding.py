@@ -740,10 +740,19 @@ def _fold_local(
         this_stretch = 3.0 if scale_factor > 3.0 else scale_factor
         if fold_method_args:
             folded = fold_method(
-                folded, this_stretch, *fold_method_args, squash_moments=False
+                folded,
+                this_stretch,
+                *fold_method_args,
+                squash_moments=False,
+                **{k: v for k, v in kwargs.items() if k != "squash_moments"},
             )
         else:
-            folded = fold_method(folded, this_stretch, squash_moments=False)
+            folded = fold_method(
+                folded,
+                this_stretch,
+                squash_moments=False,
+                **{k: v for k, v in kwargs.items() if k != "squash_moments"}
+            )
         scale_factor /= 3.0
 
     if not (kwargs.get("squash_moments") is False):
