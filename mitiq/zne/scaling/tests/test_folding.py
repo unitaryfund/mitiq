@@ -1694,3 +1694,18 @@ def test_folding_circuit_conversion_error_pyquil(fold_method):
         CircuitConversionError, match="Circuit could not be converted to"
     ):
         fold_method(prog, scale_factor=2.0)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [fold_gates_from_left, fold_gates_from_right, fold_gates_at_random],
+)
+@pytest.mark.parametrize("scale", [1, 3, 5, 9])
+def test_fold_fidelity_large_scale_factor_only_twoq_gates(fold_method, scale):
+    qreg = LineQubit.range(2)
+    circuit = Circuit(ops.H(qreg[0]), ops.CNOT(*qreg))
+    folded = fold_method(
+        circuit, scale_factor=scale, fidelities={"single": 1.0}
+    )
+    correct = Circuit(ops.H(qreg[0]), [ops.CNOT(*qreg)] * scale)
+    assert _equal(folded, correct)
