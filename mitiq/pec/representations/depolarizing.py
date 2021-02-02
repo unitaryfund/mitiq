@@ -278,7 +278,6 @@ def represent_operations_in_circuit_with_global_depolarizing_noise(
             )
         )
     # TODO: if gh-516 will be fixed we may return native representations.
-    # Now, for each rep., the attribute _native_ideal is a cirq.Circuit.
     return representations
 
 
@@ -322,5 +321,4 @@ def represent_operations_in_circuit_with_local_depolarizing_noise(
             )
         )
     # TODO: if gh-516 will be fixed we may return native representations.
-    # Now, for each rep., the attribute _native_ideal is a cirq.Circuit.
     return representations
