@@ -90,3 +90,21 @@ def test_converter(circuit_and_type):
     cirq_scaled = scaling_function(circuit, return_mitiq=True)
     assert isinstance(cirq_scaled, cirq.Circuit)
     assert _equal(cirq_scaled, cirq_circuit)
+
+
+@pytest.mark.parametrize("nbits", [1, 10])
+@pytest.mark.parametrize("measure", [True, False])
+def test_converter_keeps_register_structure_qiskit(nbits, measure):
+    qreg = qiskit.QuantumRegister(nbits)
+    creg = qiskit.ClassicalRegister(nbits)
+    circ = qiskit.QuantumCircuit(qreg, creg)
+    circ.h(qreg)
+
+    if measure:
+        circ.measure(qreg, creg)
+
+    scaled = scaling_function(circ)
+
+    assert scaled.qregs == circ.qregs
+    assert scaled.cregs == circ.cregs
+    assert scaled == circ
