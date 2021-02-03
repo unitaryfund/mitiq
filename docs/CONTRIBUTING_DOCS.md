@@ -56,8 +56,6 @@ extensions = ['sphinx.ext.autodoc','sphinx.ext.doctest']
 
 ## Updating the Documentation
 
-### Updating the guide by adding files and updating the table of contents
-
 You need not to modify the `docs/build` folder, as it is automatically generated. You should only modify the `docs/source` files.
 
 The documentation is divided into:
@@ -67,44 +65,47 @@ written from scratch,
 - an **API-doc** part, which is (mostly)
 automatically generated.
 
-To add information in the guide, it is recommended to add markdown (`.md`) or MyST markdown files (`.myst`) to the `docs/guide/` directory.
-Currently, `.rst` is still supported, but the migration plan is to move everything to MyST serialization.
-If you want a good intro to MyST and how it compares to `.rst` see [this guide](https://myst-parser.readthedocs.io/en/latest/using/intro.html#intro-writing).
+Information in the docs can be added as markdown (`.md`/`.myst`) files, since
+the `myst-parser` extension supports both basic markdown syntax as well as
+the extended MyST syntax. Just add the file to `source` directory and a TOC somewhere (if you want that).
 
-```{admonition} Note
-Remember to add any files you add to the `docs/guide/` directory to the guide TOC file {doc}`docs/source/guide/guide.myst` 
+```{warning}
+Currently, `.rst` is supported for any of the files in the docs, but the current migration plan is to move everything to MyST serialization, to make it easier to include Jupyter notebooks and more consistant with documentation in the project root.
+If you want a good intro to MyST and how it compares to `.rst` see [this guide](https://myst-parser.readthedocs.io/en/latest/using/intro.html#intro-writing).
 ```
 
-The main file is `index.myst`. It includes a `guide.myst` and an `apidoc.myst`
-file, as well as other files. Like in LaTeX, each file can include other files.
-Make sure they are included in the table of contents
+The main table of contents (TOC) file for the docs is `index.myst`. It includes `guide\guide.myst` and `apidoc.myst`, among other files. To add a new file to the base TOC, make sure it gets listed in the `toctree` directive like this:
 ````
 ```{toctree}
 ---
 maxdepth: 2 
 caption: Contents
 ---
-readme.myst
+file.myst
 ```
 ````
-
-### Including markdown files in the guide 
-
-Information to the guide can be added as markdown (`.md`) files, since
-the `myst-parser` extension supports both basic markdown syntax as well as
-the extended MyST syntax. 
-Just add the `.md` file to repo and the toctree.
+### Including other files in the docs 
 
 To include `.md` files outside of the documentation `source` directory, you can add a stub `*.myst` file to the toctree inside the `docs\source` directory that contains:
 
 ````
-```{include} ../../file.md
+```{include} path/to/file.md
 :relative-docs: docs/
 :relative-images:
 ```
 ````
 
 where `file.md` is the one to be added. For more info on including files external to the docs, see the [MyST docs](https://myst-parser.readthedocs.io/en/latest/using/howto.html#include-a-file-from-outside-the-docs-folder-like-readme-md).
+
+### Adding to the user guide
+
+To add information in the guide, it is recommended to add markdown (`.md`) or MyST markdown files (`.myst`) to the `docs/guide/` directory.
+Remember to add any files you add to the `docs/guide/` directory to the guide TOC file {doc}`docs/source/guide/guide.myst` 
+
+### Adding to the examples
+
+All examples live in the `examples` directory in the docs source. You can add regular
+Jupyter notebooks there 
 
 ### Automatically add information from the API docs
 
@@ -116,8 +117,8 @@ in the appropriate `.md or `*.myst` file (such as `apidoc.myst` or a child), e.g
 ```{automodule} mitiq.factories
    :members:
 ```
-will add all elements of the `mitiq.factories` module. You can hand-pick
-classes and functions to add, to comment them, as well as exclude them.
+will add all elements of the `mitiq.factories` module with a Factories subtitle. 
+You can hand-pick classes and functions to add, to comment them, as well as exclude them.
 
 ```{tip}
 If you are adding new features to Mitiq, make sure to add API docs in the
@@ -210,34 +211,11 @@ Python blocks. These need to be given this way:
    array(2)
 ```
 ````
-{note}`Notice that no space is left between the last input and the output.`
-
-A way to test docstrings without installing sphinx is with [`pytest` +
- `doctest`](http://doc.pytest.org/en/latest/doctest.html):
-
-```bash
-pytest --doctest-glob='*.rst'
-```
-or alternatively
-
-```bash
-pytest --doctest-modules
+```{note}
+Notice that no space is left between the last input and the output when writing code blocks with interactive inputs and outputs.
 ```
 
-However, this only checks `doctest` blocks, and does not recognize `testcode`
-blocks. Moreover, it does not parse the `conf.py` file nor uses sphinx.
-A way to include testing of `testcode` and `testoutput` blocks is with the
-[`pytest-sphinx`](https://github.com/thisch/pytest-sphinx) plugin. Once
-installed,
-```bash
-pip install pytest-sphinx
-```
-it will show up as a plugin, just like `pytest-coverage` and others, simply
-calling
-```bash
-pytest --doctest-glob='*.rst'
-```
-The `pytest-sphinx` plugin does not support `testsetup` directives.
+### Skipping or ignoring a test
 
 In order to skip a test, if this is problematic, one can use the `SKIP` and
 `IGNORE` keywords, adding them as comments next to the relevant line or block:
@@ -245,8 +223,6 @@ In order to skip a test, if this is problematic, one can use the `SKIP` and
 ```
 >>> something_that_raises()  # doctest: +IGNORE
 ```
-One can also use various `doctest` [features](http://doc.pytest.org/en/latest/doctest.html#using-doctest-options) by configuring them in the
-`docs/pytest.ini` file.
 
 ### Running the tests
 
@@ -259,10 +235,14 @@ from the root directory.
 
 This command tests the code examples in the documentation files, as well as testing the docstrings, since these are imported with the `autodoc` extension.
 
+One can also use various `doctest` [features](http://doc.pytest.org/en/latest/doctest.html#using-doctest-options) by configuring them in the
+`docs/pytest.ini` file.
 
 ## Additional information
 [Here](https://github.com/nathanshammah/scikit-project/blob/master/5-docs.md)
 are some notes on how to build docs.
 
-[Here](https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html) is a
-cheat sheet for restructed text formatting, e.g. syntax for links etc.
+[The MyST syntax guide](https://myst-parser.readthedocs.io/en/latest/using/syntax.html) is a
+cheat sheet for the extended markdown formatting that applies to both markdown files as well as markdown in Jupyter notebooks.
+
+[The MyST-NB Notebook guide](https://myst-nb.readthedocs.io/en/latest/use/markdown.html) can help you get you write or convert your notebook content for the docs.

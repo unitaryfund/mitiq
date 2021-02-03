@@ -12,7 +12,7 @@ citing.rst
 toc_contributing.myst
 changelog.myst
 zz_bibliography.rst
-examples.rst
+examples/examples.rst
 ```
 
 ## Indices and tables
