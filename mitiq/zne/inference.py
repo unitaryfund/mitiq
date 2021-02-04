@@ -747,7 +747,7 @@ class AdaptiveFactory(Factory, ABC):
 class PolyFactory(BatchedFactory):
     """Factory object implementing a zero-noise extrapolation algorithm based on
     a polynomial fit.
-   
+
     Args:
         scale_factors: Sequence of noise scale factors at which
             expectation values should be measured.
@@ -808,7 +808,7 @@ class PolyFactory(BatchedFactory):
             full_output: If False (default), only the zero-noise limit is
                 returned. If True, additional information about the
                 extrapolated limit is returned too.
-                
+
         Returns:
             zne_limit: The extrapolated zero-noise limit. If "full_output"
                 is False (default value), only this parameter is returned.

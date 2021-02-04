@@ -38,7 +38,7 @@ def sample_projector(
               It can be an integer or a numpy.random.RandomState object.
     Returns:
         A random computational basis projector on n_qubits. E.g., for two
-        qubits this could be ``np.diag([0, 0, 0, 1])``, corresponding to the 
+        qubits this could be ``np.diag([0, 0, 0, 1])``, corresponding to the
         projector on the :math:`\\left|11\\right\\rangle` state.
     """
     obs = np.zeros(int(2 ** n_qubits))

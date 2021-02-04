@@ -316,7 +316,7 @@ def fold_gates_from_left(
 
             Supported gate keys are listed in the following table.::
 
-                Gate key    | Gate          
+                Gate key    | Gate
                 -------------------------
                 "H"         | Hadamard
                 "X"         | Pauli X
@@ -438,7 +438,7 @@ def fold_gates_from_right(
             on.
 
             Supported gate keys are listed in the following table.::
-            
+
                 Gate key    | Gate
                 -------------------------
                 "H"         | Hadamard
@@ -558,7 +558,7 @@ def fold_gates_at_random(
             on.
 
             Supported gate keys are listed in the following table.::
-            
+
                 Gate key    | Gate
                 -------------------------
                 "H"         | Hadamard
@@ -589,7 +589,7 @@ def fold_gates_at_random(
 
     Returns:
         folded: The folded quantum circuit as a QPROGRAM.
-        
+
     """
     # Check inputs and handle keyword arguments
     _check_foldable(circuit)
@@ -753,7 +753,7 @@ def _fold_local(
                 folded,
                 this_stretch,
                 squash_moments=False,
-                **{k: v for k, v in kwargs.items() if k != "squash_moments"}
+                **{k: v for k, v in kwargs.items() if k != "squash_moments"},
             )
         scale_factor /= 3.0
 

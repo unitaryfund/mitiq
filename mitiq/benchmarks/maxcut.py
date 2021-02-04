@@ -71,10 +71,11 @@ def make_maxcut(
     Returns:
         (ansatz_eval, ansatz_maker, cost_obs) as a triple where
 
-        * **ansatz_eval** -- function that evalutes the maxcut ansatz on the noisy cirq backend.
+        * **ansatz_eval** -- function that evalutes the maxcut ansatz on the
+            noisy cirq backend.
         * **ansatz_maker** -- function that returns an ansatz circuit.
         * **cost_obs** -- the cost observable as a dense matrix.
-            
+
     """
     # get the list of unique nodes from the list of edges
     nodes = list({node for edge in graph for node in edge})

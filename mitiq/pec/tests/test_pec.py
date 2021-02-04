@@ -32,14 +32,13 @@ from mitiq.benchmarks.utils import noisy_simulation
 from mitiq.pec import execute_with_pec, NoisyOperation, OperationRepresentation
 from mitiq.pec.pec import LargeSampleWarning
 from mitiq.pec.representations import (
-    represent_operation_with_local_depolarizing_noise
+    represent_operation_with_local_depolarizing_noise,
 )
 
 
 # Noisy representations of Pauli operations for testing.
 def get_pauli_representations(
-    base_noise: float,
-    qubits: Optional[List[cirq.Qid]] = None,
+    base_noise: float, qubits: Optional[List[cirq.Qid]] = None,
 ) -> List[OperationRepresentation]:
 
     if qubits is None:
@@ -67,10 +66,8 @@ def get_pauli_representations(
     # Generate all representations
     reps = []
     for op in ideal_operations:
-        reps.append(represent_operation_with_local_depolarizing_noise(
-            op,
-            base_noise,
-        )
+        reps.append(
+            represent_operation_with_local_depolarizing_noise(op, base_noise,)
         )
 
     return reps
@@ -202,7 +199,7 @@ def test_pyquil_noiseless_decomposition_multiqubit(nqubits):
             basis_expansion={
                 NoisyOperation(ideal=pyquil.Program(pyquil.gates.X(q))): 0.5,
                 NoisyOperation(ideal=pyquil.Program(pyquil.gates.Z(q))): 0.5,
-            }
+            },
         )
         representations.append(representation)
 
@@ -242,7 +239,7 @@ def test_qiskit_noiseless_decomposition_multiqubit(nqubits):
             basis_expansion={
                 NoisyOperation(ideal=xcircuit): 0.5,
                 NoisyOperation(ideal=zcircuit): 0.5,
-            }
+            },
         )
         representations.append(representation)
 
@@ -382,7 +379,7 @@ def test_bad_precision_argument(bad_value: float):
             oneq_circ,
             serial_executor,
             pauli_representations,
-            precision=bad_value
+            precision=bad_value,
         )
 
 
@@ -398,7 +395,7 @@ def test_large_sample_size_warning():
             oneq_circ,
             partial(fake_executor, random_state=np.random.RandomState(0)),
             pauli_representations,
-            num_samples=100001
+            num_samples=100001,
         )
 
 
