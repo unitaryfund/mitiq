@@ -65,7 +65,7 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3.7", None),
     "numpy": ("https://docs.scipy.org/doc/numpy/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
-    # Cirq no no longer using sphinx docs so interlinking is not possible.
+    # Cirq is no longer using sphinx docs so interlinking is not possible.
     #"cirq": ("https://quantumai.google/cirq", None),
     "pyquil": ("https://pyquil-docs.rigetti.com/en/stable/", None),
     "qiskit": ("https://qiskit.org/documentation/", None),
