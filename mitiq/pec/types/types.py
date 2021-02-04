@@ -36,13 +36,15 @@ class NoisyOperation:
      actually implement.
      """
 
-    def __init__(self, ideal: QPROGRAM, real: np.ndarray) -> None:
+    def __init__(
+        self, ideal: QPROGRAM, real: Optional[np.ndarray] = None
+    ) -> None:
         """Initializes a NoisyOperation.
 
         Args:
             ideal: The operation a noiseless quantum computer would implement.
             real: Superoperator representation of the actual operation
-                implemented on a noisy quantum computer.
+                implemented on a noisy quantum computer, if known.
 
         Raises:
             TypeError: If ideal is not a QPROGRAM.
@@ -60,7 +62,7 @@ class NoisyOperation:
 
     @staticmethod
     def from_cirq(
-        ideal: cirq.CIRCUIT_LIKE, real: np.ndarray
+        ideal: cirq.CIRCUIT_LIKE, real: Optional[np.ndarray] = None
     ) -> "NoisyOperation":
         if isinstance(ideal, cirq.Gate):
             qubits = tuple(cirq.LineQubit.range(ideal.num_qubits()))
@@ -82,7 +84,9 @@ class NoisyOperation:
                 )
         return NoisyOperation(ideal, real)
 
-    def _init_from_cirq(self, ideal: cirq.Circuit, real: np.ndarray) -> None:
+    def _init_from_cirq(
+        self, ideal: cirq.Circuit, real: Optional[np.ndarray] = None
+    ) -> None:
         """Initializes a noisy operation expressed as a Cirq circuit.
 
         Args:
@@ -95,9 +99,15 @@ class NoisyOperation:
                 * If the shape of `real` does not match the expected shape
                     from `ideal`.
         """
-        self._qubits = tuple(ideal.all_qubits())
+        self._ideal = deepcopy(ideal)
+
+        self._qubits = tuple(self._ideal.all_qubits())
         self._num_qubits = len(self._qubits)
         self._dimension = 2 ** self._num_qubits
+
+        if real is None:
+            self._real = None
+            return
 
         if real.shape != (self._dimension ** 2, self._dimension ** 2):
             raise ValueError(
@@ -105,15 +115,13 @@ class NoisyOperation:
                 f" {self._dimension ** 2, self._dimension ** 2}."
             )
         # TODO: Check if real is a valid superoperator.
-
-        self._ideal = deepcopy(ideal)
         self._real = deepcopy(real)
 
     @staticmethod
     def on_each(
         ideal: cirq.CIRCUIT_LIKE,
-        real: np.ndarray,
         qubits: Sequence[List[cirq.Qid]],
+        real: Optional[np.ndarray] = None,
     ) -> List["NoisyOperation"]:
         """Returns a NoisyOperation(ideal, real) on each qubit in qubits.
 
@@ -171,7 +179,7 @@ class NoisyOperation:
     def extend_to(
         self, qubits: Sequence[List[cirq.Qid]]
     ) -> Sequence["NoisyOperation"]:
-        return [self] + NoisyOperation.on_each(self._ideal, self._real, qubits)
+        return [self] + NoisyOperation.on_each(self._ideal, qubits, self._real)
 
     @staticmethod
     def from_noise_model(
@@ -209,6 +217,8 @@ class NoisyOperation:
 
     @property
     def real_matrix(self) -> np.ndarray:
+        if self._real is None:
+            raise ValueError("Real matrix is unknown.")
         return deepcopy(self._real)
 
     def transform_qubits(
@@ -294,7 +304,7 @@ class NoisyBasis:
         self._basis_elements = set(basis_elements)
 
     @property
-    def elements(self):
+    def elements(self) -> Set[NoisyOperation]:
         return self._basis_elements
 
     def all_qubits(self) -> Set[cirq.Qid]:
@@ -329,8 +339,8 @@ class NoisyBasis:
                 set(
                     NoisyOperation.on_each(
                         noisy_op.ideal_circuit(return_type="cirq"),
-                        noisy_op.real_matrix,
                         qubits,
+                        noisy_op.real_matrix,
                     )
                 )
             )
@@ -355,33 +365,34 @@ class NoisyBasis:
             sequences.append(this_sequence)
         return sequences
 
-    def decompose(self, ideal: QPROGRAM):
+    def represent(self, ideal: QPROGRAM):
         raise NotImplementedError
 
     def __len__(self):
         return len(self._basis_elements)
 
 
-class OperationDecomposition:
-    """A decomposition, or basis expansion, of an operation (or sequence of
-    operations) in a basis of noisy, implementable operations.
+class OperationRepresentation:
+    """A decomposition (basis expansion) of an operation or sequence of
+    operations in a basis of noisy, implementable operations.
     """
 
     def __init__(
         self, ideal: QPROGRAM, basis_expansion: Dict[NoisyOperation, float]
     ) -> None:
-        """Initializes an OperationDecomposition.
+        """Initializes an OperationRepresentation.
 
         Args:
             ideal: The ideal operation desired to be implemented.
-            basis_expansion: Representation of the ideal operation in a noisy
-                basis.
+            basis_expansion: Representation of the ideal operation in a basis
+                of `NoisyOperation`s.
 
         Raises:
             TypeError: If all keys of `basis_expansion` are not instances of
                 `NoisyOperation`s.
         """
-        self._ideal = ideal
+        self._native_ideal = ideal
+        self._ideal, self._native_type = convert_to_mitiq(ideal)
 
         if not all(
             isinstance(op, NoisyOperation) for op in basis_expansion.keys()
@@ -452,7 +463,7 @@ class OperationDecomposition:
 
     def sample(
         self, random_state: Optional[np.random.RandomState] = None
-    ) -> Tuple[float, float, NoisyOperation]:
+    ) -> Tuple[NoisyOperation, int, float]:
         """Returns a randomly sampled NoisyOperation from the basis expansion.
 
         Args:
@@ -469,4 +480,9 @@ class OperationDecomposition:
             )
 
         noisy_op = rng.choice(self.noisy_operations, p=self.distribution())
-        return self.sign_of(noisy_op), self.coeff_of(noisy_op), noisy_op
+        return noisy_op, int(self.sign_of(noisy_op)), self.coeff_of(noisy_op)
+
+    def __str__(self):
+        # TODO: This works well for one-qubit representations, but doesn't
+        #  display nicely in general.
+        return str(self._ideal) + " = " + str(self.basis_expansion)

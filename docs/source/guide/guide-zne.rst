@@ -555,11 +555,8 @@ Advanced usage of a factory
    may find this content useful to understand how a factory object actually
    works at a deeper level.
 
-In this advanced section we present a *low-level usage* and a *very-low-level usage* of a factory.
-Again, for simplicity, we solve the same zero-noise extrapolation problem that we have just considered
-in the previous sections.
-
-Eventually we will also discuss how the user can easily define a custom factory class.
+In this advanced section we present a low-level usage of a factory and we
+also discuss how the user can easily define a custom factory class.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

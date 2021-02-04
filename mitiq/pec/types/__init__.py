@@ -16,5 +16,5 @@
 from mitiq.pec.types.types import (
     NoisyBasis,
     NoisyOperation,
-    OperationDecomposition,
+    OperationRepresentation,
 )

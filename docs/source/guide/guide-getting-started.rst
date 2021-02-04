@@ -159,6 +159,18 @@ different ones.
 
     Mitigated error with the linear method is 0.00638
 
+You can use bult-in methods from factories like ``plot_data`` and ``plot_fit`` 
+to plot the noise scale factors v. the expectation value returned by the
+executor.
+
+.. testcode::
+
+   fac.plot_fit()
+
+.. image:: ../img/factory-plot_fit.png
+    :width: 600
+    :alt: factory data from executor.
+
 You can read more about the ``Factory`` objects that are built into ``mitiq``
 and how to create your own :ref:`here <guide_zne_factory>`.
 
