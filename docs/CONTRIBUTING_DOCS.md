@@ -84,6 +84,10 @@ caption: Contents
 file.myst
 ```
 ````
+
+```{tip}
+If you use VS Code as your text editor there is a nice extension that does syntax highlighting for MyST: https://marketplace.visualstudio.com/items?itemName=ExecutableBookProject.myst-highlight
+```
 ### Including other files in the docs 
 
 To include `.md` files outside of the documentation `source` directory, you can add a stub `*.myst` file to the toctree inside the `docs\source` directory that contains:
@@ -105,7 +109,16 @@ Remember to add any files you add to the `docs/guide/` directory to the guide TO
 ### Adding to the examples
 
 All examples live in the `examples` directory in the docs source. You can add regular
-Jupyter notebooks there 
+Jupyter notebooks (`.ipynb`) or MyST formatted markdown notebooks (`.myst` or `.md`) which you can think of as notebooks if you could write them in markdown.
+In general MyST formatting will be prefered as it is much easier to diff in version control, but adds one additional step for folks contributing them directly.
+If you have a notebook you want to add, and want to automatically convert it from an `.ipynb` to a `.myst` you can use a great Python command line tool called [jupytext](https://jupytext.readthedocs.io/en/latest/index.html).
+Not only can `jupytext` convert between the formats on demand, but once you install it, you can configure it to manage _both_ a jupyter and markdown version of your file so you don't have to remeber to do converstions, see their docs on [paired notebooks](https://jupytext.readthedocs.io/en/latest/index.html#paired-notebooks).
+Using the paired notebooks you can continue your development in the notebooks as normal, and just commit to git the markdown serialized version when you want to add to the docs.
+You can even add this tool as a [git pre-commit hook](https://jupytext.readthedocs.io/en/latest/using-pre-commit.html) if you want!
+
+```{tip}
+There is a sample markdown formatted notebook in the `examples` directory for you to take a look at as you write your own!
+```
 
 ### Automatically add information from the API docs
 
