@@ -163,13 +163,31 @@ ax.scatter(*data, c=data[2])
 The following cells setup a test (which won't be rendered in the notebook), the test code and the test output cell:
 
 ```{testsetup} python
-import numpy as np  # this block is not rendered in the html or pdf
+# this block is not rendered in the html or pdf
+import numpy as np
+from cirq import Circuit, depolarize
+from cirq import LineQubit, X, DensityMatrixSimulator
 ```
 
-```{testcode} python
-np.round(np.pi)
+```{testcode}
+SIMULATOR = DensityMatrixSimulator()
+# 0.1% depolarizing noise
+qbit = LineQubit(0)
+circ = Circuit(X(qbit) for _ in range(80))
+
+def simulate_with_noise(circ: Circuit) -> float:
+   circuit = circ.with_noise(depolarize(p=0.001))
+   rho = SIMULATOR.simulate(circuit).final_density_matrix
+   # define the computational basis observable
+   obs = np.diag([1, 0])
+   expectation = np.real(np.trace(rho @ obs))
+   return expectation
+
+unmitigated = simulate_with_noise(circ)
+exact = 1
+print(f"Error in simulation is {exact - unmitigated:.{3}}")
 ```
 
-```{testoutput} python
-3.0
+```{testoutput}
+Error in simulation is 0.0506
 ```
