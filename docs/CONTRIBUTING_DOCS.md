@@ -70,7 +70,7 @@ the `myst-parser` extension supports both basic markdown syntax as well as
 the extended MyST syntax. Just add the file to `source` directory and a TOC somewhere (if you want that).
 
 ```{warning}
-Currently, `.rst` is supported for any of the files in the docs, but the current migration plan is to move everything to MyST serialization, to make it easier to include Jupyter notebooks and more consistant with documentation in the project root.
+Currently, `.rst` is supported for any of the files in the docs, but the current migration plan is to move everything to MyST serialization, to make it easier to include Jupyter notebooks and more consistent with documentation in the project root.
 If you want a good intro to MyST and how it compares to `.rst` see [this guide](https://myst-parser.readthedocs.io/en/latest/using/intro.html#intro-writing).
 ```
 
@@ -110,9 +110,9 @@ Remember to add any files you add to the `docs/guide/` directory to the guide TO
 
 All examples live in the `examples` directory in the docs source. You can add regular
 Jupyter notebooks (`.ipynb`) or MyST formatted markdown notebooks (`.myst` or `.md`) which you can think of as notebooks if you could write them in markdown.
-In general MyST formatting will be prefered as it is much easier to diff in version control, but adds one additional step for folks contributing them directly.
+In general MyST formatting will be preferred as it is much easier to diff in version control, but adds one additional step for folks contributing them directly.
 If you have a notebook you want to add, and want to automatically convert it from an `.ipynb` to a `.myst` you can use a great Python command line tool called [jupytext](https://jupytext.readthedocs.io/en/latest/index.html).
-Not only can `jupytext` convert between the formats on demand, but once you install it, you can configure it to manage _both_ a jupyter and markdown version of your file so you don't have to remeber to do converstions, see their docs on [paired notebooks](https://jupytext.readthedocs.io/en/latest/index.html#paired-notebooks).
+Not only can `jupytext` convert between the formats on demand, but once you install it, you can configure it to manage _both_ a jupyter and markdown version of your file so you don't have to remember to do conversions, see their docs on [paired notebooks](https://jupytext.readthedocs.io/en/latest/index.html#paired-notebooks).
 Using the paired notebooks you can continue your development in the notebooks as normal, and just commit to git the markdown serialized version when you want to add to the docs.
 You can even add this tool as a [git pre-commit hook](https://jupytext.readthedocs.io/en/latest/using-pre-commit.html) if you want!
 
