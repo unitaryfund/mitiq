@@ -14,7 +14,7 @@ The necessary packages can be installed, from the root `mitiq` directory
 pip install -e .
 pip install -r requirements-dev.txt
 ```
-as they are included in the `requirements-dev.txt` file.
+as they are included in the `dev_requirements.txt` file.
 Alternately, you can use the docker image provided in the repo and all requirements for working with the docs are already installed there.
 
 ### Sphinx extensions used to build the docs
