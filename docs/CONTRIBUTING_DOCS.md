@@ -12,9 +12,9 @@ Our documentation is generated with
 The necessary packages can be installed, from the root `mitiq` directory
 ```bash
 pip install -e .
-pip install -r requirements-dev.txt
+pip install -r dev_requirements.txt
 ```
-as they are included in the `requirements-dev.txt` file.
+as they are included in the `dev_requirements.txt` file.
 Alternately, you can use the docker image provided in the repo and all requirements for working with the docs are already installed there.
 
 ### Sphinx extensions used to build the docs
@@ -86,7 +86,7 @@ file.myst
 ````
 
 ```{tip}
-If you use VS Code as your text editor there is a nice extension that does syntax highlighting for MyST: https://marketplace.visualstudio.com/items?itemName=ExecutableBookProject.myst-highlight
+If you use VS Code as your text editor there is a nice extension that does syntax highlighting for MyST: [https://marketplace.visualstudio.com/items?itemName=ExecutableBookProject.myst-highlight](https://marketplace.visualstudio.com/items?itemName=ExecutableBookProject.myst-highlight)
 ```
 ### Including other files in the docs 
 
@@ -99,20 +99,21 @@ To include `.md` files outside of the documentation `source` directory, you can 
 ```
 ````
 
-where `file.md` is the one to be added. For more info on including files external to the docs, see the [MyST docs](https://myst-parser.readthedocs.io/en/latest/using/howto.html#include-a-file-from-outside-the-docs-folder-like-readme-md).
+where `file.md` is the one to be added. For more information on including files external to the docs, see the [MyST docs](https://myst-parser.readthedocs.io/en/latest/using/howto.html#include-a-file-from-outside-the-docs-folder-like-readme-md).
 
-### Adding to the user guide
+### Adding files to the user guide
 
 To add information in the guide, it is recommended to add markdown (`.md`) or MyST markdown files (`.myst`) to the `docs/guide/` directory.
 Remember to add any files you add to the `docs/guide/` directory to the guide TOC file {doc}`docs/source/guide/guide.myst` 
 
-### Adding to the examples
+### Adding code examples
 
-All examples live in the `examples` directory in the docs source. You can add regular
+All code examples, besides explanations on the use of core software package features, live in the `examples` directory under `docs/source`. You can add regular
 Jupyter notebooks (`.ipynb`) or MyST formatted markdown notebooks (`.myst` or `.md`) which you can think of as notebooks if you could write them in markdown.
 In general MyST formatting will be preferred as it is much easier to diff in version control, but adds one additional step for folks contributing them directly.
-If you have a notebook you want to add, and want to automatically convert it from an `.ipynb` to a `.myst` you can use a great Python command line tool called [jupytext](https://jupytext.readthedocs.io/en/latest/index.html).
-Not only can `jupytext` convert between the formats on demand, but once you install it, you can configure it to manage _both_ a jupyter and markdown version of your file so you don't have to remember to do conversions, see their docs on [paired notebooks](https://jupytext.readthedocs.io/en/latest/index.html#paired-notebooks).
+
+If you have a notebook you want to add, and want to automatically convert it from the `.ipynb` to the `.myst` file format, you can use a great Python command line tool called [jupytext](https://jupytext.readthedocs.io/en/latest/index.html).
+Not only can `jupytext` convert between the formats on demand, but once you install it, you can configure it to manage _both_ a Jupyter and Markdown version of your file, so you don't have to remember to do conversions (for more details, see the `jupytext` docs on [paired notebooks](https://jupytext.readthedocs.io/en/latest/index.html#paired-notebooks).
 Using the paired notebooks you can continue your development in the notebooks as normal, and just commit to git the markdown serialized version when you want to add to the docs.
 You can even add this tool as a [git pre-commit hook](https://jupytext.readthedocs.io/en/latest/using-pre-commit.html) if you want!
 
@@ -234,7 +235,7 @@ In order to skip a test, if this is problematic, one can use the `SKIP` and
 `IGNORE` keywords, adding them as comments next to the relevant line or block:
 
 ```
->>> something_that_raises()  # doctest: +IGNORE
+>>> something_that_raises()  #: doctest: +IGNORE
 ```
 
 ### Running the tests
@@ -256,6 +257,6 @@ One can also use various `doctest` [features](http://doc.pytest.org/en/latest/do
 are some notes on how to build docs.
 
 [The MyST syntax guide](https://myst-parser.readthedocs.io/en/latest/using/syntax.html) is a
-cheat sheet for the extended markdown formatting that applies to both markdown files as well as markdown in Jupyter notebooks.
+cheat sheet for the extended Markdown formatting that applies to both Markdown files as well as Markdown in Jupyter notebooks.
 
 [The MyST-NB Notebook guide](https://myst-nb.readthedocs.io/en/latest/use/markdown.html) can help you get you write or convert your notebook content for the docs.
