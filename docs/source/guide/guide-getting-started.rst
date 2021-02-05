@@ -275,7 +275,7 @@ and the same Cirq circuit (``circuit``) that we have already defined in the sect
 
 Differently from ZNE, PEC requires the knowledge of the noise model and of the noise strength acting on the system.
 In particular for each operation of the circuit, we need to build a quasi-probability representation of the 
-ideal unitary gate expanded in a basis of noisy implementable operations. For more details on PEC see
+ideal unitary gate expanded in a basis of noisy implementable operations. For more details behind the theory of PEC see
 the :ref:`Probabilistic Error Cancellation <guide_qem_pec>` section.
 
 In our simple case, ``circuit`` corresponds to the repetition of the same X gate,
