@@ -283,7 +283,7 @@ whose representation in the presence of depolarizing noise can be obtained as fo
 
 .. testcode::
 
-    from mitiq.pec.representations import represent_operation_with_local_depolarizing_noise
+    from mitiq.pec import represent_operation_with_local_depolarizing_noise
 
     x_representation = represent_operation_with_local_depolarizing_noise(
         ideal_operation=Circuit(X(qubit)), 
