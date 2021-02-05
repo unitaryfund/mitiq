@@ -87,7 +87,6 @@ language = "Python"
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = [
     "guide/_guide-zne-lindblad.rst",
-    "examples/maxcut_tutorial.ipynb",
 ]
 
 # The master toctree document.
