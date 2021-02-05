@@ -303,7 +303,7 @@ as a linear combination of noisy operations (right-hand-side of the printed outp
 We can now implement PEC by importing the function :func:`~mitiq.pec.pec.execute_with_pec` from the 
 :mod:`~mitiq.pec.pec` module.
 
-.. testcode:: python
+.. testcode::
 
     from mitiq.pec import execute_with_pec
 
