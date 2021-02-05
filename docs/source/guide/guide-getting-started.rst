@@ -91,15 +91,12 @@ Zero-noise extrapolation can be easily implemented by importing the function
     
     print(f"Error without mitigation: {abs(exact_result - noisy_result):.{3}}")
     print(f"Error with mitigation (ZNE): {abs(exact_result - mitigated_result):.{3}}")
-    
-    ratio = abs((exact_result - noisy_result) / (exact_result - mitigated_result))
-    print(f"Mitigation (ZNE) provides a {ratio:.{4}} factor of improvement.")
+
 
 .. testoutput::
 
     Error without mitigation: 0.0387
     Error with mitigation (ZNE): 0.000232
-    Mitigation (ZNE) provides a 167.1 factor of improvement.
 
 You can also use Mitiq to wrap your backend execution function into an
 error-mitigated version.
@@ -322,12 +319,9 @@ We can now implement PEC by importing the function :func:`~mitiq.pec.pec.execute
 
     print(f"Error without mitigation: {abs(exact_result - noisy_result):.{3}}")
     print(f"Error with mitigation (PEC): {abs(exact_result - pec_result):.{3}}")
-    
-    ratio = abs((exact_result - noisy_result) / (exact_result - pec_result))
-    print(f"Mitigation (PEC) provides a {ratio:.{3}} factor of improvement.")
+
 
 .. testoutput::
 
     Error without mitigation: 0.0387
     Error with mitigation (PEC): 0.00364
-    Mitigation (PEC) provides a 10.6 factor of improvement.
