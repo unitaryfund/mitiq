@@ -7,123 +7,120 @@ Getting Started
 Improving the performance of your quantum programs is only a few lines of
 code away.
 
-This getting started shows examples using cirq
-`cirq <https://cirq.readthedocs.io/en/stable/index.html>`_ and
-`qiskit <https://qiskit.org/>`_. We'll first test ``mitiq`` by running
-against the noisy simulator built into ``cirq``. The qiskit example works
-similarly as you will see in :ref:`Qiskit Mitigation <qiskit_getting_started>`.
+This getting started shows examples using
+`Cirq <https://cirq.readthedocs.io/en/stable/index.html>`_ and
+`Qiskit <https://qiskit.org/>`_. We'll first test Mitiq by running
+against the noisy simulator built into Cirq. The Qiskit example works
+similarly as you will see in :ref:`Zero-Noise Extrapolation with Qiskit <qiskit_getting_started>`.
 
+
+.. _multi_platform_framework:
 
 Multi-platform Framework
-----------------------------------------------
-In ``mitiq``, a "back-end" is a function that executes quantum programs. A
-"front-end" is a library/language that constructs quantum programs. ``mitiq``
-lets you mix and match these. For example, you could write a quantum program in
-``qiskit`` and then execute it using a ``cirq`` backend, or vice versa.
+------------------------
 
-Back-ends are abstracted to functions called ``executors`` that always accept
-a quantum program, sometimes accept other arguments, and always
+In Mitiq, a "back-end" is a function that executes quantum programs. A
+"front-end" is a library/language that constructs quantum programs. Mitiq
+lets you mix and match these. For example, you could write a quantum program in
+Qiskit and then execute it using a Cirq backend, or vice versa.
+
+Back-ends are abstracted to user-defined functions called *executors* that
+always accept a quantum program, sometimes accept other arguments, and always
 return an expectation value as a float. You can see some examples of different
 executors for common packages :ref:`here <guide-executors>` and in this
 getting started. If your quantum programming interface of choice can be used
-to make a Python function with this type, then it can be used with mitiq.
+to make a Python function with this type, then it can be used with Mitiq.
 
-
-Error Mitigation with Zero-Noise Extrapolation
-----------------------------------------------
-
-We define some functions that make it simpler to simulate noise in
-``cirq``. These don't have to do with ``mitiq`` directly.
+Let us define a simple ``executor`` function which simulates a Cirq circuit
+with depolarizing noise and returns the expectation value of
+:math:`|00...\rangle \langle00...|`.
 
 .. testcode::
 
     import numpy as np
-    from cirq import Circuit, depolarize
-    from cirq import LineQubit, X, DensityMatrixSimulator
+    from cirq import Circuit, depolarize, DensityMatrixSimulator
 
     SIMULATOR = DensityMatrixSimulator()
-    # 0.1% depolarizing noise
-    NOISE = 0.001
+    # 1% depolarizing noise
+    NOISE_LEVEL = 0.01
 
-    def noisy_simulation(circ: Circuit) -> float:
-        """ Simulates a circuit with depolarizing noise at level NOISE.
+    def executor(circ: Circuit) -> float:
+        """ Simulates a circuit with depolarizing noise at level NOISE_LEVEL.
         Args:
-            circ: The quantum program as a cirq object.
+            circ: The quantum program as a Cirq object.
 
         Returns:
-            The expectation value of the |0> state.
+            The expectation value of the ground state projector.
         """
-        circuit = circ.with_noise(depolarize(p=NOISE))
+        circuit = circ.with_noise(depolarize(p=NOISE_LEVEL))
         rho = SIMULATOR.simulate(circuit).final_density_matrix
-        # define the computational basis observable
-        obs = np.diag([1, 0])
-        expectation = np.real(np.trace(rho @ obs))
-        return expectation
+        return np.real(rho[0,0])
 
-Now we can look at our example. We'll test single qubit circuits with even
-numbers of X gates. As there are an even number of X gates, they should all
-evaluate to an expectation of 1 in the computational basis if there was no
-noise.
+Now we consider a simple example: a single-qubit circuit with an even
+number of X gates. By construction, the ideal expectation value should be
+1, but the noisy expectation value will be slightly different.
 
 .. testcode::
 
     from cirq import Circuit, LineQubit, X
 
-    qbit = LineQubit(0)
-    circ = Circuit(X(qbit) for _ in range(80))
-    unmitigated = noisy_simulation(circ)
-    exact = 1
-    print(f"Error in simulation is {exact - unmitigated:.{3}}")
+    qubit = LineQubit(0)
+    circuit = Circuit(X(qubit) for _ in range(6))
+    noisy_result = executor(circuit)
+    exact_result = 1
+    print(f"Error in noisy simulation: {abs(exact_result - noisy_result):.{3}}")
 
 .. testoutput::
 
-    Error in simulation is 0.0506
+    Error in noisy simulation: 0.0387
 
-This shows the impact the noise has had. Let's use ``mitiq`` to improve this
-performance.
+This shows the impact of noise on the final expectation value (without error mitigation).
+Now let's use Mitiq to improve this performance.
+
+Error Mitigation with Zero-Noise Extrapolation
+----------------------------------------------
+
+Zero-noise extrapolation can be easily implemented by importing the function
+:func:`~mitiq.zne.zne.execute_with_zne` from the :mod:`~mitiq.zne.zne` module.
 
 .. testcode::
 
     from mitiq import execute_with_zne
 
-    mitigated = execute_with_zne(circ, noisy_simulation)
-    print(f"Error in simulation is {exact - mitigated:.{3}}")
+    mitigated_result = execute_with_zne(circuit, executor)
+    
+    print(f"Error without mitigation: {abs(exact_result - noisy_result):.{3}}")
+    print(f"Error with mitigation (ZNE): {abs(exact_result - mitigated_result):.{3}}")
+
 
 .. testoutput::
 
-    Error in simulation is 0.000519
+    Error without mitigation: 0.0387
+    Error with mitigation (ZNE): 0.000232
 
-.. testcode::
-
-    print(f"Mitigation provides a {(exact - unmitigated) / (exact - mitigated):.{3}} factor of improvement.")
-
-.. testoutput::
-
-    Mitigation provides a 97.6 factor of improvement.
-
-You can also use ``mitiq`` to wrap your backend execution function into an
+You can also use Mitiq to wrap your backend execution function into an
 error-mitigated version.
 
 .. testcode::
 
     from mitiq import mitigate_executor
 
-    run_mitigated = mitigate_executor(noisy_simulation)
-    mitigated = run_mitigated(circ)
-    print(round(mitigated,5))
+    run_mitigated = mitigate_executor(executor)
+    mitigated_result = run_mitigated(circuit)
+    print(round(mitigated_result, 5))
 
 .. testoutput::
 
-    0.99948
+    0.99977
 
 .. _partial-note:
 
 .. note::
-   As shown here, ``mitiq`` wraps executor functions that have a specific type:
+   As shown here, Mitiq wraps executor functions that have a specific type:
    they take quantum programs as input and return expectation values. However,
    one often has an execution function with other arguments such as the number of
    shots, the observable to measure, or the noise level of a noisy simulation.
-   It is still easy to use these with mitiq by using partial function application.
+   It is still easy to use these with Mitiq by using partial function application.
    Here's a pseudo-code example:
 
    .. code-block::
@@ -136,15 +133,15 @@ error-mitigated version.
       # takes a quantum program
       mitigated = execute_with_zne(circ, partial(shot_executor, n_shots=100))
 
-   You can read more about functools partial application
+   You can read more about ``functools`` partial application
    `here <https://docs.python.org/3/library/functools.html#functools.partial>`_.
 
 
 The default implementation uses Richardson extrapolation to extrapolate the
-expectation value to the zero noise limit :cite:`Temme_2017_PRL`. ``Mitiq``
+expectation value to the zero noise limit :cite:`Temme_2017_PRL`. Mitiq
 comes equipped with other extrapolation methods as well. Different methods of
-extrapolation are packaged into ``Factory`` objects. It is easy to try
-different ones.
+extrapolation are packaged into :class:`~mitiq.zne.inference.Factory` objects.
+It is easy to try different ones.
 
 .. testcode::
 
@@ -152,16 +149,17 @@ different ones.
     from mitiq.zne.inference import LinearFactory
 
     fac = LinearFactory(scale_factors=[1.0, 2.0, 2.5])
-    linear = execute_with_zne(circ, noisy_simulation, factory=fac)
-    print(f"Mitigated error with the linear method is {exact - linear:.{3}}")
+    linear_zne_result = execute_with_zne(circuit, executor, factory=fac)
+    abs_error = abs(exact_result - linear_zne_result)
+    print(f"Mitigated error with linear ZNE: {abs_error:.{3}}")
 
 .. testoutput::
 
-    Mitigated error with the linear method is 0.00638
+    Mitigated error with linear ZNE: 0.00769
 
-You can use bult-in methods from factories like ``plot_data`` and ``plot_fit`` 
-to plot the noise scale factors v. the expectation value returned by the
-executor.
+You can use bult-in methods from factories like :meth:`~mitiq.zne.inference.Factory.plot_data`
+and :meth:`~mitiq.zne.inference.Factory.plot_fit` to plot the noise scale factors v. the expectation
+value returned by the executor.
 
 .. testcode::
 
@@ -171,23 +169,23 @@ executor.
     :width: 600
     :alt: factory data from executor.
 
-You can read more about the ``Factory`` objects that are built into ``mitiq``
+You can read more about the :class:`~mitiq.zne.inference.Factory` objects that are built into Mitiq
 and how to create your own :ref:`here <guide-factories>`.
 
 Another key step in zero-noise extrapolation is to choose how your circuit is
 transformed to scale the noise. You can read more about the noise scaling
-methods built into ``mitiq`` and how to create your
+methods built into Mitiq and how to create your
 own :ref:`here <guide-folding>`.
 
 .. _qiskit_getting_started:
 
-Qiskit Mitigation
---------------------------
+Zero-Noise Extrapolation with Qiskit
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-``Mitiq`` is designed to be agnostic to the stack that you are using. Thus for
-``qiskit`` things work in the same manner as before. Since we are now using ``qiskit``,
-we want to run the error mitigated programs on a qiskit backend. Let's define
-the new backend that accepts ``qiskit`` circuits. In this case it is a simulator,
+Mitiq is designed to be agnostic to the stack that you are using. Thus for
+Qiskit things work in the same manner as before. Since we are now using Qiskit,
+we want to run the error mitigated programs on a Qiskit backend. Let's define
+the new backend that accepts Qiskit circuits. In this case it is a simulator,
 but you could also use a QPU.
 
 .. testcode::
@@ -200,7 +198,7 @@ but you could also use a QPU.
     from qiskit.providers.aer.noise.errors.standard_errors import depolarizing_error
 
     # 0.1% depolarizing noise
-    NOISE = 0.001
+    QISKIT_NOISE = 0.001
 
     QISKIT_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
 
@@ -221,7 +219,10 @@ but you could also use a QPU.
 
         # we assume a depolarizing error for each
         # gate of the standard IBM basis
-        noise_model.add_all_qubit_quantum_error(depolarizing_error(NOISE, 1), ["u1", "u2", "u3"])
+        noise_model.add_all_qubit_quantum_error(
+            depolarizing_error(QISKIT_NOISE, 1),
+            ["u1", "u2", "u3"],
+        )
 
         # execution of the experiment
         job = qiskit.execute(
@@ -261,4 +262,65 @@ We can then use this backend for our mitigation.
     assert abs(exact - mitigated) < abs(exact - unmitigated)
 
 Note that we don't need to even redefine factories for different stacks. Once
-you have a ``Factory`` it can be used with different front and backends.
+you have a :class:`~mitiq.zne.inference.Factory` it can be used with different front and backends.
+
+Error Mitigation with Probabilistic Error Cancellation
+------------------------------------------------------
+
+In *Mitiq*, it is very easy to switch between different error mitigation methods.
+
+For example, we can implement Probabilistic Error Cancellation (PEC) by using the same execution function (``executor``)
+and the same Cirq circuit (``circuit``) that we have already defined in the section
+:ref:`Multi-platform Framework <multi_platform_framework>`.
+
+PEC requires a good knowledge of the noise model and of the noise strength acting on the system.
+In particular for each operation of the circuit, we need to build a quasi-probability representation of the 
+ideal unitary gate expanded in a basis of noisy implementable operations. For more details behind the theory of PEC see
+the :ref:`Probabilistic Error Cancellation <guide_qem_pec>` section.
+
+In our simple case, ``circuit`` corresponds to the repetition of the same X gate,
+whose representation in the presence of depolarizing noise can be obtained as follows:
+
+.. testcode::
+
+    from mitiq.pec import represent_operation_with_local_depolarizing_noise
+
+    x_representation = represent_operation_with_local_depolarizing_noise(
+        ideal_operation=Circuit(X(qubit)), 
+        noise_level=NOISE_LEVEL,
+    )
+
+    print(x_representation)
+
+.. testoutput::
+
+    0: ───X─── = 1.010*0: ───X───-0.003*0: ───X───X───-0.003*0: ───X───Y───-0.003*0: ───X───Z───
+
+The result above is an :class:`~mitiq.pec.types.types.OperationRepresentation` object which contains
+the information for representing the ideal operation X (left-hand-side of the printed output)
+as a linear combination of noisy operations (right-hand-side of the printed output). 
+
+We can now implement PEC by importing the function :func:`~mitiq.pec.pec.execute_with_pec` from the 
+:mod:`~mitiq.pec.pec` module.
+
+.. testcode::
+
+    from mitiq.pec import execute_with_pec
+
+    SEED = 0
+    exact_result = 1
+    noisy_result = executor(circuit)
+    pec_result = execute_with_pec(
+        circuit,
+        executor,
+        representations=[x_representation],
+        random_state=SEED,
+    )
+
+    print(f"Error without mitigation: {abs(exact_result - noisy_result):.{3}}")
+    print(f"Error with mitigation (PEC): {abs(exact_result - pec_result):.{3}}")
+
+.. testoutput::
+
+    Error without mitigation: 0.0387
+    Error with mitigation (PEC): 0.00364

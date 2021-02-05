@@ -16,3 +16,7 @@
 from mitiq.pec.types import NoisyOperation, NoisyBasis, OperationRepresentation
 from mitiq.pec.sampling import sample_sequence, sample_circuit
 from mitiq.pec.pec import execute_with_pec
+from mitiq.pec.representations import (
+    represent_operation_with_global_depolarizing_noise,
+    represent_operation_with_local_depolarizing_noise,
+)

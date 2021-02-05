@@ -11,6 +11,8 @@
 ## Version 0.5.0 (In Development)
 
 ### All Changes
+
+- Add minimal documentation for PEC in the Getting Started (@andreamari, gh-532)
 - Optionally return a dictionary with all pec data in execute_with_pec (@andreamari, gh-518)
 - Added local_depolarizing_representations and Choi-based tests (@andreamari, gh-502)
 - Added new `plot_data` and `plot_fit` methods for factories(@crazy4pi314 @elmandouh, gh-333)
