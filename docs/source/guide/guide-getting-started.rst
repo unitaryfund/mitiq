@@ -273,7 +273,7 @@ For example, we can implement Probabilistic Error Cancellation (PEC) by using th
 and the same Cirq circuit (``circuit``) that we have already defined in the section
 :ref:`Multi-platform Framework <multi_platform_framework>`.
 
-PEC requires the a good knowledge of the noise model and of the noise strength acting on the system.
+PEC requires a good knowledge of the noise model and of the noise strength acting on the system.
 In particular for each operation of the circuit, we need to build a quasi-probability representation of the 
 ideal unitary gate expanded in a basis of noisy implementable operations. For more details behind the theory of PEC see
 the :ref:`Probabilistic Error Cancellation <guide_qem_pec>` section.
