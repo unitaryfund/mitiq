@@ -56,7 +56,7 @@ with depolarizing noise and returns the expectation value of
         rho = SIMULATOR.simulate(circuit).final_density_matrix
         return np.real(rho[0,0])
 
-Now we consider a simple example: single-qubit circuit with an even
+Now we consider a simple example: a single-qubit circuit with an even
 number of X gates. By construction, the ideal expectation value should be
 1, but the noisy expectation value will be slightly different.
 
@@ -81,7 +81,7 @@ Error Mitigation with Zero-Noise Extrapolation
 ----------------------------------------------
 
 Zero-noise extrapolation can be easily implemented by importing the function
-``execute_with_zne`` from the ``mitiq.zne`` module.
+:func:`~mitiq.zne.zne.execute_with_zne` from the :mod:`~mitiq.zne.zne` module.
 
 .. testcode::
 
@@ -143,8 +143,8 @@ error-mitigated version.
 The default implementation uses Richardson extrapolation to extrapolate the
 expectation value to the zero noise limit :cite:`Temme_2017_PRL`. ``Mitiq``
 comes equipped with other extrapolation methods as well. Different methods of
-extrapolation are packaged into ``Factory`` objects. It is easy to try
-different ones.
+extrapolation are packaged into :class:`~mitiq.zne.inference.Factory` objects.
+It is easy to try different ones.
 
 .. testcode::
 
@@ -160,9 +160,9 @@ different ones.
 
     Mitigated error with linear ZNE: 0.00769
 
-You can use bult-in methods from factories like ``plot_data`` and ``plot_fit`` 
-to plot the noise scale factors v. the expectation value returned by the
-executor.
+You can use bult-in methods from factories like :func:`~mitiq.zne.inference.Factory.plot_data`
+and :func:`~mitiq.zne.inference.Factory.plot_fit` to plot the noise scale factors v. the expectation
+value returned by the executor.
 
 .. testcode::
 
@@ -172,7 +172,7 @@ executor.
     :width: 600
     :alt: factory data from executor.
 
-You can read more about the ``Factory`` objects that are built into ``mitiq``
+You can read more about the :class:`~mitiq.zne.inference.Factory` objects that are built into ``mitiq``
 and how to create your own :ref:`here <guide-factories>`.
 
 Another key step in zero-noise extrapolation is to choose how your circuit is
@@ -265,7 +265,7 @@ We can then use this backend for our mitigation.
     assert abs(exact - mitigated) < abs(exact - unmitigated)
 
 Note that we don't need to even redefine factories for different stacks. Once
-you have a ``Factory`` it can be used with different front and backends.
+you have a :class:`~mitiq.zne.inference.Factory` it can be used with different front and backends.
 
 Error Mitigation with Probabilistic Error Cancellation
 ------------------------------------------------------
@@ -299,12 +299,12 @@ whose representation in the presence of depolarizing noise can be obtained as fo
 
     0: ───X─── = 1.010*0: ───X───-0.003*0: ───X───X───-0.003*0: ───X───Y───-0.003*0: ───X───Z───
 
-The result above is an :class:`OperationRepresentation` object which contains the information for 
+The result above is an :class:`~mitiq.pec.types.types.OperationRepresentation` object which contains the information for 
 representing the ideal operation X (left-hand-side of the printed output) as a linear combination of
 noisy operations (right-hand-side of the printed output). 
 
-We can now implement PEC by importing the function ``execute_with_pec`` from the 
-``mitiq.pec`` module.
+We can now implement PEC by importing the function :func:`~mitiq.pec.pec.execute_with_pec` from the 
+:mod:`~mitiq.pec.pec` module.
 
 .. testcode::
 

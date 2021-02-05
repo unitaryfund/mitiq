@@ -72,15 +72,11 @@ Sampling from a Noisy Decomposition of an Ideal Operation
 .. automodule:: mitiq.pec.sampling
    :members:
 
-Probabilistic Error Cancellation (Utilities)
+Probabilistic Error Cancellation Types
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. automodule:: mitiq.pec.utils
+.. automodule:: mitiq.pec.types.types
    :members:
 
-Utils
------
-.. automodule:: mitiq.utils
-   :members:
 
 Zero Noise Extrapolation
 ------------------------
