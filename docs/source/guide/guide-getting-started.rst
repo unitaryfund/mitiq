@@ -160,8 +160,8 @@ It is easy to try different ones.
 
     Mitigated error with linear ZNE: 0.00769
 
-You can use bult-in methods from factories like :func:`~mitiq.zne.inference.Factory.plot_data`
-and :func:`~mitiq.zne.inference.Factory.plot_fit` to plot the noise scale factors v. the expectation
+You can use bult-in methods from factories like :meth:`~mitiq.zne.inference.Factory.plot_data`
+and :meth:`~mitiq.zne.inference.Factory.plot_fit` to plot the noise scale factors v. the expectation
 value returned by the executor.
 
 .. testcode::
@@ -306,14 +306,19 @@ noisy operations (right-hand-side of the printed output).
 We can now implement PEC by importing the function :func:`~mitiq.pec.pec.execute_with_pec` from the 
 :mod:`~mitiq.pec.pec` module.
 
-.. testcode::
+.. testcode:: python
 
     from mitiq.pec import execute_with_pec
 
     SEED = 0
     exact_result = 1
     noisy_result = executor(circuit)
-    pec_result = execute_with_pec(circuit, executor, [x_representation], random_state=SEED)
+    pec_result = execute_with_pec(
+        circuit,
+        executor,
+        representations=[x_representation],
+        random_state=SEED,
+    )
 
     print(f"Error without mitigation: {abs(exact_result - noisy_result):.{3}}")
     print(f"Error with mitigation (PEC): {abs(exact_result - pec_result):.{3}}")
