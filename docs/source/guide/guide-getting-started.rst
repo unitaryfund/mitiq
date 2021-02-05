@@ -7,10 +7,10 @@ Getting Started
 Improving the performance of your quantum programs is only a few lines of
 code away.
 
-This getting started shows examples using cirq
-`cirq <https://cirq.readthedocs.io/en/stable/index.html>`_ and
-`qiskit <https://qiskit.org/>`_. We'll first test ``mitiq`` by running
-against the noisy simulator built into ``cirq``. The qiskit example works
+This getting started shows examples using
+`Cirq <https://cirq.readthedocs.io/en/stable/index.html>`_ and
+`Qiskit <https://qiskit.org/>`_. We'll first test Mitiq by running
+against the noisy simulator built into Cirq. The Qiskit example works
 similarly as you will see in :ref:`Zero-Noise Extrapolation with Qiskit <qiskit_getting_started>`.
 
 
@@ -19,17 +19,17 @@ similarly as you will see in :ref:`Zero-Noise Extrapolation with Qiskit <qiskit_
 Multi-platform Framework
 ------------------------
 
-In ``mitiq``, a "back-end" is a function that executes quantum programs. A
-"front-end" is a library/language that constructs quantum programs. ``mitiq``
+In Mitiq, a "back-end" is a function that executes quantum programs. A
+"front-end" is a library/language that constructs quantum programs. Mitiq
 lets you mix and match these. For example, you could write a quantum program in
-``qiskit`` and then execute it using a ``cirq`` backend, or vice versa.
+Qiskit and then execute it using a Cirq backend, or vice versa.
 
 Back-ends are abstracted to user-defined functions called *executors* that
 always accept a quantum program, sometimes accept other arguments, and always
 return an expectation value as a float. You can see some examples of different
 executors for common packages :ref:`here <guide-executors>` and in this
 getting started. If your quantum programming interface of choice can be used
-to make a Python function with this type, then it can be used with mitiq.
+to make a Python function with this type, then it can be used with Mitiq.
 
 Let us define a simple ``executor`` function which simulates a Cirq circuit
 with depolarizing noise and returns the expectation value of
@@ -75,7 +75,7 @@ number of X gates. By construction, the ideal expectation value should be
     Error in noisy simulation: 0.0387
 
 This shows the impact of noise on the final expectation value (without error mitigation).
-Now let's use ``mitiq`` to improve this performance.
+Now let's use Mitiq to improve this performance.
 
 Error Mitigation with Zero-Noise Extrapolation
 ----------------------------------------------
@@ -101,7 +101,7 @@ Zero-noise extrapolation can be easily implemented by importing the function
     Error with mitigation (ZNE): 0.000232
     Mitigation (ZNE) provides a 167.1 factor of improvement.
 
-You can also use ``mitiq`` to wrap your backend execution function into an
+You can also use Mitiq to wrap your backend execution function into an
 error-mitigated version.
 
 .. testcode::
@@ -119,11 +119,11 @@ error-mitigated version.
 .. _partial-note:
 
 .. note::
-   As shown here, ``mitiq`` wraps executor functions that have a specific type:
+   As shown here, Mitiq wraps executor functions that have a specific type:
    they take quantum programs as input and return expectation values. However,
    one often has an execution function with other arguments such as the number of
    shots, the observable to measure, or the noise level of a noisy simulation.
-   It is still easy to use these with mitiq by using partial function application.
+   It is still easy to use these with Mitiq by using partial function application.
    Here's a pseudo-code example:
 
    .. code-block::
@@ -141,7 +141,7 @@ error-mitigated version.
 
 
 The default implementation uses Richardson extrapolation to extrapolate the
-expectation value to the zero noise limit :cite:`Temme_2017_PRL`. ``Mitiq``
+expectation value to the zero noise limit :cite:`Temme_2017_PRL`. Mitiq
 comes equipped with other extrapolation methods as well. Different methods of
 extrapolation are packaged into :class:`~mitiq.zne.inference.Factory` objects.
 It is easy to try different ones.
@@ -172,12 +172,12 @@ value returned by the executor.
     :width: 600
     :alt: factory data from executor.
 
-You can read more about the :class:`~mitiq.zne.inference.Factory` objects that are built into ``mitiq``
+You can read more about the :class:`~mitiq.zne.inference.Factory` objects that are built into Mitiq
 and how to create your own :ref:`here <guide-factories>`.
 
 Another key step in zero-noise extrapolation is to choose how your circuit is
 transformed to scale the noise. You can read more about the noise scaling
-methods built into ``mitiq`` and how to create your
+methods built into Mitiq and how to create your
 own :ref:`here <guide-folding>`.
 
 .. _qiskit_getting_started:
@@ -185,10 +185,10 @@ own :ref:`here <guide-folding>`.
 Zero-Noise Extrapolation with Qiskit
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-``Mitiq`` is designed to be agnostic to the stack that you are using. Thus for
-``qiskit`` things work in the same manner as before. Since we are now using ``qiskit``,
-we want to run the error mitigated programs on a qiskit backend. Let's define
-the new backend that accepts ``qiskit`` circuits. In this case it is a simulator,
+Mitiq is designed to be agnostic to the stack that you are using. Thus for
+Qiskit things work in the same manner as before. Since we are now using Qiskit,
+we want to run the error mitigated programs on a Qiskit backend. Let's define
+the new backend that accepts Qiskit circuits. In this case it is a simulator,
 but you could also use a QPU.
 
 .. testcode::
@@ -273,7 +273,7 @@ Error Mitigation with Probabilistic Error Cancellation
 In *Mitiq*, it is very easy to switch between different error mitigation methods.
 
 For example, we can implement Probabilistic Error Cancellation (PEC) by using the same execution function (``executor``)
-and the same *Cirq* circuit (``circuit``) that we have already defined in the section
+and the same Cirq circuit (``circuit``) that we have already defined in the section
 :ref:`Multi-platform Framework <multi_platform_framework>`.
 
 Differently from ZNE, PEC requires the knowledge of the noise model and of the noise strength acting on the system.
