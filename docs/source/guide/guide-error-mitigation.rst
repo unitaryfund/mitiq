@@ -83,6 +83,8 @@ of when zero-noise extrapolation is effective, and how effective it is, is the s
 
 In Mitiq, this technique is implemented in the module :mod:`mitiq.zne`.
 
+.. _guide_qem_pec:
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Probabilistic error cancellation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
