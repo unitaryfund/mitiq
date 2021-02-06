@@ -157,7 +157,7 @@ of the ``mitiq`` repository:
     twine upload dist/*
 
 You will be prompted to insert your login credentials (username and password).
-You can then verify the upload `here <https://pypi.org/project/mitiq/>`_.
+You can then verify the upload `here <https://pypi.org/project/mitiq/>`__.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Release the new version on Github
@@ -168,7 +168,7 @@ Release the new version on Github
     a new release.
 
 Make a new release on Github
-`here <https://github.com/unitaryfund/mitiq/releases>`_.
+`here <https://github.com/unitaryfund/mitiq/releases>`__.
 
     - Choose the tag you recently created, and add information on the release
       by pulling from ``CHANGELOG.md`` as in previous releases.
@@ -180,7 +180,7 @@ Make a new release on Github
     If all the above steps have been successfully completed,
     ReadTheDocs (RTD) will automatically build new ``latest`` and ``stable`` versions
     of the documentation. So, no additional steps are needed for updating RTD. You can
-    verify changes have been updating by viewing `<https://mitiq.readthedocs.io/>`_.
+    verify changes have been updating by viewing `<https://mitiq.readthedocs.io/>`__.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Update the changelog for new development version

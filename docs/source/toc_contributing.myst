@@ -1,0 +1,11 @@
+# Contributing
+
+```{toctree}
+---
+maxdepth: 2 
+---
+contributing.myst
+contributing_docs.myst
+release.rst
+code_of_conduct.myst
+```

@@ -41,10 +41,11 @@ def test_sample_sequence_cirq():
     circuit.append(cirq.measure(cirq.LineQubit(0)))
 
     rep = OperationRepresentation(
-        ideal=circuit, basis_expansion={
+        ideal=circuit,
+        basis_expansion={
             NoisyOperation.from_cirq(ideal=cirq.X): 0.5,
-            NoisyOperation.from_cirq(ideal=cirq.Z): -0.5
-        }
+            NoisyOperation.from_cirq(ideal=cirq.Z): -0.5,
+        },
     )
 
     for _ in range(50):
@@ -236,16 +237,13 @@ def test_sample_sequence_choi(gate: cirq.Gate):
     qreg = cirq.LineQubit.range(gate.num_qubits())
     ideal_op = gate.on(*qreg)
     ideal_circ = cirq.Circuit(ideal_op)
-    noisy_op_tree = (
-        [ideal_op] + [cirq.depolarize(BASE_NOISE)(q) for q in qreg]
-    )
+    noisy_op_tree = [ideal_op] + [cirq.depolarize(BASE_NOISE)(q) for q in qreg]
 
     ideal_choi = _operation_to_choi(ideal_op)
     noisy_choi = _operation_to_choi(noisy_op_tree)
 
     representation = represent_operation_with_local_depolarizing_noise(
-        ideal_circ,
-        BASE_NOISE,
+        ideal_circ, BASE_NOISE,
     )
 
     choi_unbiased_estimates = []
@@ -283,8 +281,7 @@ def test_sample_circuit_choi():
     for op in ideal_circ.all_operations():
         rep_list.append(
             represent_operation_with_local_depolarizing_noise(
-                cirq.Circuit(op),
-                BASE_NOISE,
+                cirq.Circuit(op), BASE_NOISE,
             )
         )
 

@@ -94,12 +94,12 @@ def mitiq_curve_fit(
 
     Args:
         ansatz : The model function used for zero-noise extrapolation.
-                 The first argument is the noise scale variable,
-                 the remaining arguments are the parameters to fit.
+            The first argument is the noise scale variable,
+            the remaining arguments are the parameters to fit.
         scale_factors: The array of noise scale factors.
         exp_values: The array of expectation values.
         init_params: Initial guess for the parameters.
-                     If None, the initial values are set to 1.
+            If None, the initial values are set to 1.
 
     Returns:
         opt_params: The array of optimal parameters.
@@ -143,7 +143,7 @@ def mitiq_polyfit(
         exp_values: The array of expectation values.
         deg: The degree of the polynomial fit.
         weights: Optional array of weights for each sampled point.
-                 This is used to make a weighted least squares fit.
+            This is used to make a weighted least squares fit.
 
     Returns:
         opt_params: The array of optimal parameters.
@@ -153,6 +153,7 @@ def mitiq_polyfit(
 
     Raises:
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
+
     """
 
     with warnings.catch_warnings(record=True) as warn_list:
@@ -749,14 +750,14 @@ class PolyFactory(BatchedFactory):
 
     Args:
         scale_factors: Sequence of noise scale factors at which
-                       expectation values should be measured.
+            expectation values should be measured.
         order: Extrapolation order (degree of the polynomial fit).
-               It cannot exceed len(scale_factors) - 1.
+            It cannot exceed len(scale_factors) - 1.
         shot_list: Optional sequence of integers corresponding to the number
-                   of samples taken for each expectation value. If this
-                   argument is explicitly passed to the factory, it must have
-                   the same length of scale_factors and the executor function
-                   must accept "shots" as a valid keyword argument.
+            of samples taken for each expectation value. If this
+            argument is explicitly passed to the factory, it must have
+            the same length of scale_factors and the executor function
+            must accept "shots" as a valid keyword argument.
 
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
@@ -764,6 +765,7 @@ class PolyFactory(BatchedFactory):
 
     Note:
         RichardsonFactory and LinearFactory are special cases of PolyFactory.
+
     """
 
     def __init__(
@@ -806,6 +808,7 @@ class PolyFactory(BatchedFactory):
             full_output: If False (default), only the zero-noise limit is
                 returned. If True, additional information about the
                 extrapolated limit is returned too.
+
         Returns:
             zne_limit: The extrapolated zero-noise limit. If "full_output"
                 is False (default value), only this parameter is returned.
@@ -826,6 +829,7 @@ class PolyFactory(BatchedFactory):
             contained in the input arguments. To extrapolate from the internal
             data of an instantiated Factory object, the bound method
             ".reduce()" should be called instead.
+
         """
 
         opt_params, params_cov = mitiq_polyfit(
@@ -946,7 +950,7 @@ class FakeNodesFactory(BatchedFactory):
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
 
-    .. [De2020polynomial]: S.De Marchia. F. Marchetti, E.Perracchionea
+    .. [De2020polynomial] : S.De Marchia. F. Marchetti, E.Perracchionea
         and D.Poggialia,
         "Polynomial interpolation via mapped bases without resampling,"
         *Journ of Comp. and App. Math.* **364**, 112347 (2020),
@@ -1588,6 +1592,7 @@ class AdaExpFactory(AdaptiveFactory):
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationError: If the extrapolation fit fails.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
+
     """
 
     _SHIFT_FACTOR = 1.27846
