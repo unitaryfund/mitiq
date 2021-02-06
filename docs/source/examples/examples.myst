@@ -1,0 +1,11 @@
+# Mitiq Examples
+
+```{toctree}
+---
+maxdepth: 2 
+---
+ibmq-backends.rst
+qaoa-landscape.rst
+hamiltonians.rst
+test
+```

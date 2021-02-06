@@ -192,8 +192,7 @@ def represent_operation_with_local_depolarizing_noise(
 
     if len(qubits) == 1:
         return represent_operation_with_global_depolarizing_noise(
-            ideal_operation,
-            noise_level,
+            ideal_operation, noise_level,
         )
 
     # The two-qubit case: tensor product of two depolarizing channels.

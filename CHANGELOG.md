@@ -1,16 +1,19 @@
 # Changelog
 
-[//]: # " ## Development 0.X.Ydev (Month DDth, YYYY)"
-[//]: # " ## (Future) Version 0.1.1 (Date)"
-[//]: # " ### Changes"
-[//]: # " - **MAJOR FEATURE**: New integration."
-[//]: # " - Improve something."
-[//]: # " - [Bug Fix]"
-[//]: # " - Fix the bug."
+% # " ## Development 0.X.Ydev (Month DDth, YYYY)"
+% # " ## (Future) Version 0.1.1 (Date)"
+% # " ### Changes"
+% # " - **MAJOR FEATURE**: New integration."
+% # " - Improve something."
+% # " - [Bug Fix]"
+% # " - Fix the bug."
 
 ## Version 0.5.0 (In Development)
 
 ### All Changes
+
+- Adding documentation section for examples, support for Jyupyter notebooks (@crazy4pi314, gh-509)
+- Add minimal documentation for PEC in the Getting Started (@andreamari, gh-532)
 - Optionally return a dictionary with all pec data in execute_with_pec (@andreamari, gh-518)
 - Added local_depolarizing_representations and Choi-based tests (@andreamari, gh-502)
 - Added new `plot_data` and `plot_fit` methods for factories(@crazy4pi314 @elmandouh, gh-333)
