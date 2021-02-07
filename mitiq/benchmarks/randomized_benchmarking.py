@@ -13,10 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Contains methods used for testing mitiq's performance on randomized
-benchmarking circuits.
-"""
-from typing import List, Optional
+"""Functions for generating randomized benchmarking circuits."""
+from typing import List
 import numpy as np
 
 from cirq.experiments.qubit_characterizations import (
@@ -35,51 +33,43 @@ CFD_MAT_1Q = np.array([_gate_seq_to_mats(gates) for gates in C1])
 
 def rb_circuits(
     n_qubits: int,
-    num_cliffords: List[int],
-    trials: int,
-    qubit_labels: Optional[List[int]] = None,
+    num_cliffords: int,
+    trials: int = 1,
 ) -> List[Circuit]:
-    """Generates a set of randomized benchmarking circuits, i.e. circuits that
+    """Returns a list of randomized benchmarking circuits, i.e. circuits that
     are equivalent to the identity.
 
     Args:
         n_qubits: The number of qubits. Can be either 1 or 2
-        num_cliffords: A list of numbers of Clifford group elements in the
-            random circuits. This is proportional to the eventual depth per
-            circuit.
+        num_cliffords: The number of Clifford group elements in the
+            random circuits. This is proportional to the depth per circuit.
         trials: The number of random circuits at each num_cfd.
 
     Returns:
         A list of randomized benchmarking circuits.
     """
-    rb_circuits = []
-    for num in num_cliffords:
-        qid0 = qubit_labels[0] if qubit_labels else 0
-        qubit1 = LineQubit(qid0)
-        if n_qubits == 1:
-            rb_circuits = [
-                _random_single_q_clifford(qubit1, num, C1, CFD_MAT_1Q,)
-                for _ in range(trials)
-            ]
-        elif n_qubits == 2:
-            qid1 = qubit_labels[1] if qubit_labels else 1
-            qubit2 = LineQubit(qid1)
-            cfd_matrices = _two_qubit_clifford_matrices(
-                qubit1, qubit2, CLIFFORDS,  # type: ignore
-            )
-            rb_circuits = [
-                _random_two_q_clifford(
-                    qubit1,  # type: ignore
-                    qubit2,  # type: ignore
-                    num,
-                    cfd_matrices,
-                    CLIFFORDS,
-                )
-                for _ in range(trials)
-            ]
-        else:
-            raise ValueError(
-                "Only generates RB circuits on one or two "
-                f"qubits not {n_qubits}."
-            )
-    return rb_circuits
+    if n_qubits not in (1, 2):
+        raise ValueError(
+            "Only generates RB circuits on one or two "
+            f"qubits not {n_qubits}."
+        )
+    qubits = LineQubit.range(n_qubits)
+
+    if n_qubits == 1:
+        return [
+            _random_single_q_clifford(*qubits, num_cliffords, C1, CFD_MAT_1Q)
+            for _ in range(trials)
+        ]
+
+    cfd_matrices = _two_qubit_clifford_matrices(
+        *qubits, CLIFFORDS,  # type: ignore
+    )
+    return [
+        _random_two_q_clifford(
+            *qubits,  # type: ignore
+            num_cliffords,
+            cfd_matrices,
+            CLIFFORDS,
+        )
+        for _ in range(trials)
+    ]
