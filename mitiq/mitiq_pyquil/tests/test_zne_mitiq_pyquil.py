@@ -31,7 +31,7 @@ from mitiq.mitiq_pyquil.pyquil_utils import (
     ground_state_expectation,
 )
 from mitiq.mitiq_pyquil.conversions import to_pyquil
-from mitiq.benchmarks.randomized_benchmarking import rb_circuits
+from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 
 TEST_DEPTH = 30
 
@@ -46,7 +46,7 @@ def random_one_qubit_identity_circuit(num_cliffords: int) -> pyquil.Program:
         circuit: Quantum circuit as a :class:`pyquil.Program` object.
     """
     return to_pyquil(
-        rb_circuits(n_qubits=1, num_cliffords=[num_cliffords], trials=1)[0]
+        generate_rb_circuits(n_qubits=1, num_cliffords=[num_cliffords], trials=1)[0]
     )
 
 
