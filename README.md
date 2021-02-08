@@ -41,11 +41,11 @@ If you'd prefer to clone and install from source, our would like to develop Miti
 
 ### Supported quantum programming libraries
 
-Mitiq can currently interface with
+Mitiq can currently interface with:
 
-* [Cirq](https://github.com/quantumlib/Cirq) >= 0.9.0, 
-* [Qiskit](https://qiskit.org/) >= 0.19.0, and 
-* [pyQuil](https://github.com/rigetti/pyquil) >= 2.18.0. 
+* [Cirq](https://github.com/quantumlib/Cirq),
+* [Qiskit](https://qiskit.org/),
+* [pyQuil](https://github.com/rigetti/pyquil).
 
 Cirq is a core requirement of Mitiq and is automatically installed. To use Mitiq with other quantum programming
 libraries, install the optional package(s) following the instructions linked above.
@@ -98,8 +98,11 @@ Error in simulation (with mitigation): 0.000519
 
 ## Error mitigation techniques
 
-Mitiq currently implements [zero-noise extrapolation](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html) and 
-is designed to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
+Mitiq currently implements:
+* [Zero-Noise Extrapolation](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html),
+* [Probabilistic Error Cancellation](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#error-mitigation-with-probabilistic-error-cancellation),
+ 
+and is designed to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
 
 ## Documentation
 
