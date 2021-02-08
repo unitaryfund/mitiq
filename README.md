@@ -100,7 +100,7 @@ Error in simulation (with mitigation): 0.000519
 
 Mitiq currently implements:
 * [Zero-Noise Extrapolation](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html),
-* [Probabilistic Error Cancellation](https://mitiq.readthedocs.io/en/readthedocs-config/guide/guide-getting-started.html#error-mitigation-with-probabilistic-error-cancellation),
+* [Probabilistic Error Cancellation](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#error-mitigation-with-probabilistic-error-cancellation),
  
 and is designed to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
 
