@@ -8,20 +8,37 @@
 % # " - [Bug Fix]"
 % # " - Fix the bug."
 
-## Version 0.5.0 (In Development)
+
+## Version 0.5.0 (February 8th, 2021)
+
+### Summary
+The implementation of Probabilistic Error Cancellation is now multi-platform and
+documented in the docs (for the moment only in the *Getting Started* section). 
+A new infrastructure based on [MyST](https://myst-parser.readthedocs.io/en/stable/)
+can now be used for writing the documentation and, in particular, for adding new examples
+in the *Mitiq Examples* section.
 
 ### All Changes
 
-- Adding documentation section for examples, support for Jyupyter notebooks (@crazy4pi314, gh-509)
-- Add minimal documentation for PEC in the Getting Started (@andreamari, gh-532)
-- Optionally return a dictionary with all pec data in execute_with_pec (@andreamari, gh-518)
-- Added local_depolarizing_representations and Choi-based tests (@andreamari, gh-502)
-- Added new `plot_data` and `plot_fit` methods for factories(@crazy4pi314 @elmandouh, gh-333)
-- Ensure code is tested in IBMQ guide and adds a doctest target in Makefile(@rmlarose, gh-488)
-- Fixes random failure of PEC sampling test(@rmlarose, gh-481)
+- Adding documentation section for examples, support for Jyupyter notebooks (@crazy4pi314, gh-509).
+- Add minimal documentation for PEC in the Getting Started (@andreamari, gh-532).
+- Optionally return a dictionary with all pec data in execute_with_pec (@andreamari, gh-518).
+- Added local_depolarizing_representations and Choi-based tests (@andreamari, gh-502).
+- Add multi-platform support for PEC (@rmlarose, gh-500).
+- Added new `plot_data` and `plot_fit` methods for factories(@crazy4pi314 @elmandouh, gh-333).
+- Fixes random failure of PEC sampling test(@rmlarose, gh-481).
 - Exact copying of shell commands, update make target for pdf and update development version(@rmlarose, gh-469).
 - Add a new FakeNodesFactory class based on an alternative interpolation method (@elmandouh, gh-444).
 - Remove duplication of the reduce method in every (non-adaptive) factory (@elmandouh, gh-470).
+
+## Version 0.4.1 (January 12th, 2021)
+
+### Summary
+
+This release fixes a bug in the docs.
+
+### All Changes
+- [Bug Fix] Ensure code is tested in IBMQ guide and adds a doctest target in Makefile(@rmlarose, gh-488)
 
 ## Version 0.4.0 (December 6th, 2020)
 
@@ -32,6 +49,7 @@ custom types for noisy operations, noisy bases, and decompositions in PEC. It al
 to the documentation, seeding options for PEC sampling functions, and bug fixes for a few non-deterministic test failures.
 
 ### All Changes
+
 - Add reference to review paper in docs (@willzeng, gh-423).
 - Add unitary folding API to RTD (@rmlarose, gh-429).
 - Add theory subsection on PEC in docs (@elmandouh, gh-428).
