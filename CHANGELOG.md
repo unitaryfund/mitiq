@@ -9,7 +9,7 @@
 % # " - Fix the bug."
 
 
-## Version 0.6.0 (February 8th, 2021)
+## Version 0.5.0 (February 8th, 2021)
 
 ### Summary
 The implementation of Probabilistic Error Cancellation is now multi-platform and
