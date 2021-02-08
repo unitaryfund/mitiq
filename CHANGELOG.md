@@ -9,9 +9,15 @@
 % # " - Fix the bug."
 
 
+## Version 0.6.0 (In Development)
+
+### All Changes
+
+
 ## Version 0.5.0 (February 8th, 2021)
 
 ### Summary
+
 The implementation of Probabilistic Error Cancellation is now multi-platform and
 documented in the docs (for the moment only in the *Getting Started* section). 
 A new infrastructure based on [MyST](https://myst-parser.readthedocs.io/en/stable/)
@@ -38,6 +44,7 @@ in the *Mitiq Examples* section.
 This release fixes a bug in the docs.
 
 ### All Changes
+
 - [Bug Fix] Ensure code is tested in IBMQ guide and adds a doctest target in Makefile(@rmlarose, gh-488)
 
 ## Version 0.4.0 (December 6th, 2020)
