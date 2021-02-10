@@ -15,7 +15,6 @@
 
 """Functions for generating randomized benchmarking circuits."""
 from typing import List
-import numpy as np
 
 from cirq.experiments.qubit_characterizations import (
     _single_qubit_cliffords,
@@ -25,10 +24,6 @@ from cirq.experiments.qubit_characterizations import (
     _two_qubit_clifford_matrices,
 )
 from cirq import LineQubit, Circuit
-
-CLIFFORDS = _single_qubit_cliffords()
-C1 = CLIFFORDS.c1_in_xy
-CFD_MAT_1Q = np.array([_gate_seq_to_mats(gates) for gates in C1])
 
 
 def generate_rb_circuits(
@@ -52,22 +47,27 @@ def generate_rb_circuits(
             f"qubits not {n_qubits}."
         )
     qubits = LineQubit.range(n_qubits)
+    cliffords = _single_qubit_cliffords()
 
     if n_qubits == 1:
+
+        c1 = cliffords.c1_in_xy
+        cfd_mat_1q = [_gate_seq_to_mats(gates) for gates in c1]
+
         return [
-            _random_single_q_clifford(*qubits, num_cliffords, C1, CFD_MAT_1Q)
+            _random_single_q_clifford(*qubits, num_cliffords, c1, cfd_mat_1q)
             for _ in range(trials)
         ]
 
     cfd_matrices = _two_qubit_clifford_matrices(
-        *qubits, CLIFFORDS,  # type: ignore
+        *qubits, cliffords,  # type: ignore
     )
     return [
         _random_two_q_clifford(
             *qubits,  # type: ignore
             num_cliffords,
             cfd_matrices,
-            CLIFFORDS,
+            cliffords,
         )
         for _ in range(trials)
     ]
