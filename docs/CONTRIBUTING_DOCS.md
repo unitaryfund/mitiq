@@ -144,6 +144,10 @@ The easiest way to build the docs is to just run `make docs` from the project
 root directory in bash, which by default builds the html docs output.
 You can also use from root `make pdf` to generate the PDF version.
 
+```{tip}
+If you want to remove previous builds and make the HTML docs fresh, try `make docs-clean`!
+```
+
 If you want to call sphinx directly, you can from bash move to the `docs` 
 folder and run
 
