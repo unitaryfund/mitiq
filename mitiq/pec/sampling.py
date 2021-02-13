@@ -32,7 +32,7 @@ def sample_sequence(
     representations: List[OperationRepresentation],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
 ) -> Tuple[QPROGRAM, int, float]:
-    r"""Samples an implementable sequence from the PEC representation of the
+    """Samples an implementable sequence from the PEC representation of the
     input ideal operation & returns this sequence as well as its sign and norm.
 
     For example, if the ideal operation is U with representation U = a A + b B,
