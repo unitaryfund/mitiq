@@ -17,11 +17,11 @@ techniques.
 
 .. _guide_qem_what:
 
---------------------------------
-What quantum error mitigation is
---------------------------------
+---------------------------------
+What is quantum error mitigation?
+---------------------------------
 
-Quantum error mitigation refers to a series of modern techniques aimed at
+Quantum error mitigation refers to a series of techniques aimed at
 reducing (*mitigating*) the errors that occur in quantum computing algorithms.
 Unlike software bugs affecting code in usual computers, the errors which we
 attempt to reduce with mitigation are due to the hardware.
@@ -29,10 +29,10 @@ attempt to reduce with mitigation are due to the hardware.
 Quantum error mitigation techniques try to *reduce* the impact of noise in
 quantum computations. They generally do not completely remove it. Alternative 
 nomenclature refers to error mitigation as (approximate) error suppression or 
-approximate quantum error correction, but it is worth noting that it is 
-different from :ref:`error correction <guide_qem_qec>`. Among the ideas 
-that have been developed so far for quantum error mitigation, a leading 
-candidate is zero-noise extrapolation.
+approximate quantum error correction, but it is worth noting that error mitigation
+is distinctly different from :ref:`error correction <guide_qem_qec>`. Two leading
+ideas error mitigation techniques implemented in Mitiq are zero-noise extrapolation
+and probabilistic error cancellation.
 
 .. _guide_qem_zne:
 
@@ -40,104 +40,93 @@ candidate is zero-noise extrapolation.
 Zero-noise extrapolation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The crucial idea behind zero-noise extrapolation is that, while some minimum
-strength of noise is unavoidable in the system, quantified by a quantity :math:`\lambda`,  it is still possible to
-*increase* it to a value :math:`\lambda'=c\lambda`, with :math:`c>1`, so that
-it is then possible to extrapolate the zero-noise limit. This is done in practice by running a quantum circuit (simulation) and
-calculating a given expectation variable, :math:`\langle X\rangle_\lambda`,
-then re-running the calculation (which is indeed a time evolution) for
-:math:`\langle X\rangle_{\lambda'}`, and then extracting
-:math:`\langle X\rangle_{0}`.
-The extraction for :math:`\langle X\rangle_{0}` can occur with several
-statistical fitting models, which can be linear or non-linear. These methods
-are contained in the :mod:`mitiq.zne.inference` and :mod:`mitiq.zne` modules.
+In Mitiq, zero-noise extrapolation is implemented in the module :mod:`mitiq.zne`.
 
-In theory, one way zero-noise extrapolation can be simulated, also with ``mitiq``,
-is by picking an underlying noise model, e.g., a memoryless bath such that the system dissipates with Lindblad dynamics. Likewise, zero-noise extrapolation can be applied also to non-Markovian noise models :cite:`Temme_2017_PRL`. However, it is important to point out that zero-noise extrapolation is a very general method in which one is free to scale and extrapolate almost whatever parameter one wishes to, even if the underlying noise model is unknown.
+The crucial idea behind zero-noise extrapolation is that, although some minimum
+noise strength quantified :math:`\lambda` exists in the computer,
+it is possible to *increase* the noise to :math:`\lambda'=c\lambda` where :math:`c>1`.
+In Mitiq, noise-scaling methods are contained in :mod:`mitiq.zne.scaling`. After computing
+the observable of interest at increased noise levels, we can fit a trend to this data and
+extrapolate to the zero-noise limit. In Mitiq, extrapolation (or inference) methods are
+contained in :mod:`mitiq.zne.inference`.
 
-In experiments, zero-noise extrapolation has been performed with pulse
-stretching :cite:`Kandala_2019_Nature`. In this way, a difference between the effective time that a gate is affected by decoherence during its execution on the hardware
-was introduced by controlling only the gate-defining pulses. The effective noise of a quantum circuit can be scaled also at a gate-level, i.e., without requiring a direct control of the  physical hardware. For example this can be achieved with the :ref:`unitary folding <guide_zne_folding>` technique, a method which is present in the ``mitiq`` toolchain.
-
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Limitations of zero-noise extrapolation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Zero-noise extrapolation is a useful error mitigation technique but it is not without limitations. First and foremost,
-the zero-noise estimate is extrapolated, meaning that performance guarantees are quite difficult in general. If a
-reasonable estimate of how increasing the noise affects the observable is known, then ZNE can produce good zero-noise
-estimates. This is the case for simple noise models such as depolarizing noise, but noise in actual quantum systems is
-more complicated and can produce different behavior than expected. In this case the performance of ZNE is tied to the
-performance of the underlying hardware. If expectation values do not produce a smooth curve as noise is increased, the
-zero-noise estimate may be poor and certain inference techniques may fail. In particular, one has to take into account
-that any initial error in the measured expectation values will propagate to the zero-noise extrapolation value. This
-fact can significantly amplify the final estimation uncertainty. In practice, this implies that the evaluation of a
-mitigated expectation value requires more measurement shots with respect to the unmitigated one.
-
-Additionally, zero-noise extrapolation cannot increase the performance of arbitrary circuits. If the circuit is large
-enough such that the expectation of the observable is almost constant as noise is increased (e.g., if the state is
-maximally mixed), then extrapolation will of course not help the zero-noise estimate. The regime in which ZNE is
-applicable thus depends on the performance of the underlying hardware as well as the circuit. A detailed description
-of when zero-noise extrapolation is effective, and how effective it is, is the subject of ongoing research.
-
-In Mitiq, this technique is implemented in the module :mod:`mitiq.zne`.
+While zero-noise extrapolation is very general and can be applied even if
+the underlying noise model is unknown, the method can be sensitive to
+extrapolation. For this reason, it is important to choose a good
+noise-scaling method, set of scale factors, and extrapolation method, which
+*a priori* may not be known.
 
 .. _guide_qem_pec:
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Probabilistic error cancellation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Probabilistic error cancellation uses a quasi-probability representation :cite:`Temme_2017_PRL` to express an ideal (unitary) quantum 
-channel as a linear combination of noisy operations. Given a set of noisy but implementable operations :math:`\Omega = \{O_1, \dots, O_m\}`, an ideal unitary gate 
-can be expressed as :math:`\mathcal{G} = \sum_{\alpha} \eta_{\alpha} \mathcal{O}_\alpha = \gamma \sum_{\alpha} P(\alpha) \sigma(\alpha) \mathcal{O}_\alpha`, where
-:math:`\eta_\alpha` are real coefficients, :math:`\gamma = \sum_{\alpha} |\eta_\alpha|`, :math:`P(\alpha)=|\eta_\alpha | /\gamma` is a probability 
-distribution, and :math:`\sigma(\alpha)={\rm sign}(\eta_\alpha)`.
 
-In this setting, we would like to estimate the ideal expectation value of some observable of interest :math:`\langle X\rangle_{\text{ideal}}`, 
-after the action of an ideal circuit given by a sequence of ideal quantum gates :math:`\{\mathcal{\mathcal G}_i\}_{i=1}^L`. This can be achieved by 
-sampling for each ideal gate :math:`\mathcal{G}_i` a noisy operation :math:`\mathcal{O}_{\alpha}` with probability 
-:math:`P_i(\alpha)`. This random sampling will produce a noisy circuit (given by the sequence of sampled operations :math:`\{\mathcal{O}_{\alpha_i}\}_{i=1}^L`)
-whose execution produces the final mixed state :math:`\rho_f`.
-Then, by measuring the observable :math:`X`, setting :math:`\gamma_{\text{tot}} := \prod_{i}^L \gamma_i` and 
-:math:`\sigma_{\text{tot}} = \prod_{i=1}^L \sigma_i(\alpha)`, one can obtain an unbiased estimate of the ideal expectation value as :math:`\langle 
-X\rangle_{\text{ideal}} =  \mathbb E \left[ \gamma_{\text{tot}} \sigma_{\text{tot}} X_{\rm noisy} \right]`, where :math:`X_{\rm noisy}` is
-the experimental estimate of :math:`{\rm tr}[\rho_f X]` and :math:`\mathbb E` is the sample average over many repetitions of the previous procedure.
+In Mitiq, probabilistic error cancellation is implemented in the module :mod:`mitiq.pec`.
 
-In Mitiq, this technique is implemented in the module :mod:`mitiq.pec`.
+Probabilistic error cancellation (PEC) uses a quasi-probability representation :cite:`Temme_2017_PRL`
+to express an ideal (unitary) quantum channel as a linear combination of noisy operations.
+Given a set of noisy but implementable operations :math:`\Omega = \{O_1, \dots, O_m\}`, an
+ideal unitary gate can be expressed as
+:math:`\mathcal{G} = \sum_{\alpha} \eta_{\alpha} \mathcal{O}_\alpha = \gamma \sum_{\alpha} P(\alpha) \sigma(\alpha) \mathcal{O}_\alpha`,
+where :math:`\eta_\alpha` are real coefficients, :math:`\gamma = \sum_{\alpha} |\eta_\alpha|`,
+:math:`P(\alpha)=|\eta_\alpha | /\gamma` is a probability distribution,
+and :math:`\sigma(\alpha)={\rm sign}(\eta_\alpha)`.
+
+As usual, we want to estimate the ideal expectation value of some observable
+of interest :math:`\langle X\rangle_{\text{ideal}}` after the action of an ideal circuit
+:math:`\{\mathcal{\mathcal G}_i\}_{i=1}^L`. To do this in PEC, we sample a noisy operation
+:math:`\mathcal{O}_{\alpha}` for each ideal gate :math:`\mathcal{G}_i`
+with probability :math:`P_i(\alpha)`. This sampling produces a sequence of noisy operations
+:math:`\{\mathcal{O}_{\alpha_i}\}_{i=1}^L`) whose execution produces the
+final mixed state :math:`\rho_f`. Then, by measuring the observable :math:`X`, setting
+:math:`\gamma_{\text{tot}} := \prod_{i}^L \gamma_i` and
+:math:`\sigma_{\text{tot}} = \prod_{i=1}^L \sigma_i(\alpha)`, we can obtain an unbiased
+estimate of the ideal expectation value as
+:math:`\langleX\rangle_{\text{ideal}} =  \mathbb E \left[ \gamma_{\text{tot}} \sigma_{\text{tot}} X_{\rm noisy} \right]`,
+where :math:`X_{\rm noisy}` is the experimental estimate of :math:`{\rm tr}[\rho_f X]`
+and :math:`\mathbb E` is the sample average over many repetitions of the previous procedure.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Limitations of probabilistic error cancellation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The number of samples required to estimate the ideal expectation value with error :math:`\delta` and probability :math:`1-\epsilon` scales as 
-:math:`\left(2 \gamma_{\text{tot}}^{2} / \delta^{2}\right) \log (2 / \epsilon)`  :cite:`Takagi2020optimal`. Thus, the sampling overhead is determined 
-by :math:`\gamma_{\text{tot}}` which grows exponentially in the number of gates. It is then crucial to find a linear decomposition that minimizes :math:`\gamma_{\text{tot}}`. 
-In addition, a full characterization of the noisy operations up to a good precision is required, which can be costly depending on the implementation.
+The number of samples required to estimate the ideal expectation value with error
+:math:`\delta` and probability :math:`1-\epsilon` scales as
+:math:`\left(2 \gamma_{\text{tot}}^{2} / \delta^{2}\right) \log (2 / \epsilon)`
+:cite:`Takagi2020optimal`. Thus, the sampling overhead is determined
+by :math:`\gamma_{\text{tot}}` which grows exponentially in the number of gates.
+It is then crucial to find a linear decomposition that minimizes :math:`\gamma_{\text{tot}}`.
+In addition, a full characterization of the noisy operations up to a good precision
+is required, which can be costly depending on the implementation.
  
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Other error mitigation techniques
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Other examples of error mitigation techniques include injecting noisy gates for randomized compiling or the use of subspace reductions and symmetries. A collection of references on this cutting-edge implementations can be found in the :ref:`guide_qem_articles` subsection.
+
+A collection of references on additional error mitigation techniques,
+including randomized compiling or subspace expansion, can be found in
+:ref:`guide_qem_articles`.
 
 .. _guide_qem_why:
 
------------------------------------------
-Why quantum error mitigation is important
------------------------------------------
+------------------------------------------
+Why is quantum error mitigation important?
+------------------------------------------
 
-The noisy intermediate scale quantum computing (NISQ) era is characterized by
-short or medium-depth circuits in which noise affects state
-preparation, gate operations, and measurement :cite:`Preskill_2018_Quantum`. Current short-depth quantum circuits are noisy, and at the same time it is not
-possible to implement quantum error correcting codes on them due to the
-needed qubit number and circuit depth required by these codes.
+The noisy intermediate-scale quantum (NISQ) era is characterized by
+short-depth circuits in which noise affects state
+preparation, gate operations, and measurement :cite:`Preskill_2018_Quantum`.
+It is not possible to implement quantum error correcting codes on them due to the
+needed qubit number and circuit depth required by these codes. Error mitigation
+offers low-overhead methods to more accurately and reliably estimate observable values.
 
-Error mitigation offers the prospects of writing more compact quantum circuits
-that can estimate observables with more precision, i.e. increase the
-performance of quantum computers. By implementing quantum optics tools (such as the modeling noise and open quantum systems) :cite:`Carmichael_1999_Springer,Carmichael_2007_Springer,Gardiner_2004_Springer,Breuer_2007_Oxford`, standard as well as cutting-edge statistics and inference
-techniques, and tweaking them for the needs of the quantum computing community,
-``mitiq`` aims at providing the most comprehensive toolchain for error
-mitigation.
+Mitiq aims at providing a comprehensive, flexible, and performant toolchain for
+error mitigation techniques to increase the performance of NISQ computers.
 
 .. _guide_qem_related:
 
@@ -274,11 +263,11 @@ Software
 Here is a (non-comprehensive) list of open-source software libraries related to
 quantum computing, noisy quantum dynamics and error mitigation:
 
-- **IBM Q**'s `Qiskit`_ provides a stack for quantum computing simulation and execution on real devices from the cloud. In particular, ``qiskit.Aer`` contains the :class:`~qiskit.providers.aer.noise.NoiseModel` object, integrated with ``mitiq`` tools. Qiskit's OpenPulse provides pulse-level control of qubit operations in some of the superconducting circuit devices. ``mitiq`` is integrated with ``qiskit``, in the :mod:`~mitiq.mitiq_qiskit.qiskit_utils` and :mod:`~mitiq.mitiq_qiskit.conversions` modules.
+- **IBM Q**'s `Qiskit`_ provides a stack for quantum computing simulation and execution on real devices from the cloud. In particular, ``qiskit.Aer`` contains the :class:`~qiskit.providers.aer.noise.NoiseModel` object, integrated with Mitiq tools. Qiskit's OpenPulse provides pulse-level control of qubit operations in some of the superconducting circuit devices. Mitiq is integrated with ``qiskit``, in the :mod:`~mitiq.mitiq_qiskit.qiskit_utils` and :mod:`~mitiq.mitiq_qiskit.conversions` modules.
 
-- **Goole AI Quantum**'s `Cirq`_ offers quantum simulation of quantum circuits. The :class:`cirq.Circuit` object is integrated in  ``mitiq`` algorithms as the default circuit.
+- **Goole AI Quantum**'s `Cirq`_ offers quantum simulation of quantum circuits. The :class:`cirq.Circuit` object is integrated in Mitiq algorithms as the default circuit.
 
-- **Rigetti Computing**'s `PyQuil`_ is a library for quantum programming. Rigetti's stack offers the execution of quantum circuits on superconducting circuits devices from the cloud, as well as their simulation on a quantum virtual machine (QVM), integrated with ``mitiq`` tools in the :mod:`~mitiq.mitiq_pyquil.pyquil_utils` module.
+- **Rigetti Computing**'s `PyQuil`_ is a library for quantum programming. Rigetti's stack offers the execution of quantum circuits on superconducting circuits devices from the cloud, as well as their simulation on a quantum virtual machine (QVM), integrated with Mitiq tools in the :mod:`~mitiq.mitiq_pyquil.pyquil_utils` module.
 
 - `QuTiP`_, the quantum toolbox in Python, contains a quantum information processing module that allows to simulate quantum circuits, their implementation on devices, as well as the simulation of pulse-level control and time-dependent density matrix evolution with the :class:`qutip.Qobj` object and the :class:`~qutip.qip.device.Processor` object in the ``qutip.qip`` module.
 
