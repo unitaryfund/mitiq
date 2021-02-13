@@ -182,8 +182,12 @@ against noisy devices :cite:`Brif_2010_NJP`.
 
 A key difference between some quantum error mitigation techniques and quantum
 optimal control is that the former can be implemented in some instances with
-post-processing techniques, while the latter relies on an active feedback loop. An example of a specific application of optimal control to quantum dynamics that can be seen as a quantum error mitigation technique, is in dynamical decoupling :cite:`Viola_1999_PRL`. This technique employs fast control pulses to effectively decouple a system from its environment, with techniques pioneered in the nuclear magnetic resonance
-community.
+post-processing techniques, while the latter relies on an active feedback loop.
+An example of a specific application of optimal control to quantum dynamics that
+can be seen as a quantum error mitigation technique, is in dynamical decoupling
+:cite:`Viola_1999_PRL`. This technique employs fast control pulses to effectively
+decouple a system from its environment, with techniques pioneered in the nuclear
+magnetic resonance community.
 
 .. _guide_qem_noise:
 
@@ -192,19 +196,26 @@ Open quantum systems
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 More in general, quantum computing devices can be studied in the framework of
-open quantum systems :cite:`Carmichael_1999_Springer,Carmichael_2007_Springer,Gardiner_2004_Springer,Breuer_2007_Oxford`, that is, systems that exchange
-energy and information with the surrounding environment. On the one hand, the qubit-environment exchange can be controlled, and this feature is actually fundamental to extract information and process it.
-On the other hand, when this interaction is not controlled — and at the fundamental level it cannot be completely suppressed — noise eventually kicks in, thus introducing errors that are disruptive for the *fidelity* of the information-processing protocols.
-
+open quantum systems :cite:`Carmichael_1999_Springer,Carmichael_2007_Springer,Gardiner_2004_Springer,Breuer_2007_Oxford`,
+that is, systems that exchange energy and information with the surrounding
+environment. On the one hand, the qubit-environment exchange can be controlled,
+and this feature is actually fundamental to extract information and process it.
+On the other hand, when this interaction is not controlled — and at the fundamental
+level it cannot be completely suppressed — noise eventually kicks in, thus introducing
+errors that are disruptive for the *fidelity* of the information-processing protocols.
 
 Indeed, a series of issues arise when someone wants to perform a calculation on a
-quantum computer. This is due to the fact that quantum computers are devices that are embedded in an environment and interact with it. This means that stored information can be corrupted, or that, during calculations, the protocols are not faithful.
+quantum computer. This is due to the fact that quantum computers are devices that
+are embedded in an environment and interact with it. This means that stored information
+can be corrupted, or that, during calculations, the protocols are not faithful.
 
 Errors occur for a series of reasons in quantum computers and the microscopic
 description at the physical level can vary broadly, depending on the quantum
-computing platform that is used, as well as the computing architecture. For example, superconducting-circuit-based quantum computers have chips that
+computing platform that is used, as well as the computing architecture. For example,
+superconducting-circuit-based quantum computers have chips that
 are prone to cross-talk noise, while qubits encoded in trapped ions need to be
-shuttled with electromagnetic pulses, and solid-state artificial atoms, including quantum dots, are heavily affected by inhomogeneous broadening :cite:`Buluta_2011_RPP`.
+shuttled with electromagnetic pulses, and solid-state artificial atoms, including
+quantum dots, are heavily affected by inhomogeneous broadening :cite:`Buluta_2011_RPP`.
 
 .. _guide_qem_references:
 
