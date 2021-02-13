@@ -154,7 +154,6 @@ def mitiq_polyfit(
 
     Raises:
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
-
     """
 
     with warnings.catch_warnings(record=True) as warn_list:
