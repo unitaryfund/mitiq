@@ -4,36 +4,25 @@
 Getting Started
 *********************************************
 
-Improving the performance of your quantum programs is only a few lines of
-code away.
-
-This getting started shows examples using
-`Cirq <https://cirq.readthedocs.io/en/stable/index.html>`_ and
-`Qiskit <https://qiskit.org/>`_. We'll first test Mitiq by running
-against the noisy simulator built into Cirq. The Qiskit example works
-similarly as you will see in :ref:`Zero-Noise Extrapolation with Qiskit <qiskit_getting_started>`.
-
+This guide shows short examples of two error mitigation techniques in Mitiq:
+zero-noise extrapolation and probabilistic error cancellation.
+First, we highlight the general workflow of both methods.
 
 .. _multi_platform_framework:
 
-Multi-platform Framework
-------------------------
+General workflow: Front-ends, backends, and executors
+-----------------------------------------------------
 
-In Mitiq, a "back-end" is a function that executes quantum programs. A
-"front-end" is a library/language that constructs quantum programs. Mitiq
-lets you mix and match these. For example, you could write a quantum program in
-Qiskit and then execute it using a Cirq backend, or vice versa.
+We refer to a library/language that constructs quantum programs as a "front-end,"
+and a quantum computer or quantum computer simulator as a "backend." Mitiq currently
+supports Cirq, Qiskit, and pyQuil front-ends, and is backend agnostic - as long as you
+can run one a quantum program in one of the supported front-ends, you can use it with Mitiq.
 
-Back-ends are abstracted to user-defined functions which we call *executors*.
-These functions always accept a quantum program, sometimes accept other arguments,
-and always return an expectation value as a float. You can see some examples of different
-executors for common packages :ref:`here <guide-executors>` and in this
-getting started guide. If your quantum programming interface of choice can be used
-to make a Python function with this type, then it can be used with Mitiq.
-
-Let us define a simple executor function which simulates a Cirq circuit
-with depolarizing noise and returns the expectation value of
-:math:`|00...\rangle \langle00...|`.
+We refer to a user-defined function that inputs a quantum program and executes it on a backend
+as an *executor*. Such functions always accept a quantum program, sometimes accept other arguments,
+and always return an expectation value as a float. As an example, below we define a simple executor
+function which inputs a Cirq circuit, executes it on a noisy simulator, and returns the
+probability of the ground state.
 
 .. testcode::
 
@@ -51,10 +40,10 @@ with depolarizing noise and returns the expectation value of
         """
         circuit = circ.with_noise(cirq.depolarize(p=0.01))
         result = cirq.DensityMatrixSimulator().simulate(circuit)
-        return np.real(result.final_density_matrix[0,0])
+        return np.real(result.final_density_matrix[0, 0])
 
 Now we consider a simple example: a single-qubit circuit with an even
-number of X gates. By construction, the ideal expectation value should be
+number of Pauli-X gates. By construction, the ideal expectation value should be
 1, but the noisy expectation value will be slightly different.
 
 .. testcode::
@@ -75,8 +64,8 @@ number of X gates. By construction, the ideal expectation value should be
 This shows the impact of noise on the final expectation value (without error mitigation).
 Now let's use Mitiq to improve this performance.
 
-Error Mitigation with Zero-Noise Extrapolation
-----------------------------------------------
+Zero-Noise Extrapolation
+------------------------
 
 Zero-noise extrapolation can be easily implemented with the function
 :func:`~mitiq.zne.execute_with_zne`.
@@ -252,12 +241,11 @@ We can then use this backend for our mitigation.
 Note that :class:`~mitiq.zne.inference.Factory` are only used for fitting
 classical data and are completely frontend/backend agnostic.
 
-Error Mitigation with Probabilistic Error Cancellation
-------------------------------------------------------
+Probabilistic Error Cancellation
+--------------------------------
 
-In Mitiq, it is very easy to switch between different error mitigation methods.
-
-For example, we can implement Probabilistic Error Cancellation (PEC) by using the
+The workflow for probabilistic error cancellation is very similar to that of zero-noise extrapolation.
+In particular, we can use Probabilistic Error Cancellation (PEC) with the
 same execution function (``executor``) and the same Cirq circuit (``circuit``) that
 we have already defined in the section :ref:`Multi-platform Framework <multi_platform_framework>`.
 
