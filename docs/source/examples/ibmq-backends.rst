@@ -133,7 +133,7 @@ Cirq frontend
 *************
 
 It isn't necessary to use Qiskit frontends (circuits) to run on IBM backends. We can use conversions in
-``mitiq`` to use any supported frontend with any supported backend. Below, we show how to run a Cirq circuit on an
+Mitiq to use any supported frontend with any supported backend. Below, we show how to run a Cirq circuit on an
 IBMQ backend.
 
 First, we define the Cirq circuit.
@@ -168,8 +168,8 @@ As above, different noise scaling or extrapolation methods can be used.
 Lower-level usage
 #################
 
-Here, we give more detailed usage of the ``mitiq`` library which mimics what happens in the call to
-``mitiq.execute_with_zne`` in the previous example. In addition to showing more of the ``mitiq`` library, this
+Here, we give more detailed usage of the Mitiq library which mimics what happens in the call to
+``mitiq.execute_with_zne`` in the previous example. In addition to showing more of the Mitiq library, this
 example explains the code in the previous section in more detail.
 
 First, we define factors to scale the circuit length by and fold the circuit using the ``fold_gates_at_random``
