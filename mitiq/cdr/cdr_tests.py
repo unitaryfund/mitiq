@@ -53,7 +53,7 @@ def qiskit_circuit_transplation(
     # Rz(phi+pi)Rx(pi/2)Rz(theta+pi)Rx(pi/2)Rz(lambda)
     try:
         circ_new = QuantumCircuit(len(circ.qubits), len(circ.clbits))
-    except:
+    except Exception:
         circ_new = QuantumCircuit(len(circ.qubits))
     for i in range(len(circ.data)):
         # get information for the gate

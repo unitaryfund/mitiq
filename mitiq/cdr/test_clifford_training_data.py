@@ -9,7 +9,6 @@ from clifford_training_data import _array_to_circuit, _circuit_to_array, \
     generate_training_circuits
 from qiskit import compiler, QuantumCircuit, QuantumRegister
 from mitiq.mitiq_qiskit.conversions import to_qiskit, from_qiskit
-from mitiq.benchmarks.randomized_benchmarking import rb_circuits
 
 """Tests for training circuits generation for Clifford data regression.
 """
@@ -158,9 +157,10 @@ def test_map_to_near_cliffords():
     rz_circ_data = data[:, mask_rz]
     mask_not_rz = data[1, :] != 'rz'
     not_rz_circ_data = data[:, mask_not_rz]
-    mask_non_cliff = _is_clifford_angle(rz_circ_data[2, :]) == False
+    mask_non_cliff = _is_clifford_angle(rz_circ_data[2, :])
+    mask_non_cliff = ~mask_non_cliff
     rz_non_cliff = rz_circ_data[:, mask_non_cliff]
-    mask_cliff = _is_clifford_angle(rz_circ_data[2, :]) == True
+    mask_cliff = _is_clifford_angle(rz_circ_data[2, :])
     rz_cliff = rz_circ_data[:, mask_cliff]
     total_non_cliff = len(rz_non_cliff[0])
     # find all the non-Clifford gates:
