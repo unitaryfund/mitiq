@@ -213,7 +213,6 @@ def count_non_cliffords(
     mask_rz = data[1, :] == 'rz'
     rz_circ_data = data[:, mask_rz]
     mask_not_rz = data[1, :] != 'rz'
-    not_rz_circ_data = data[:, mask_not_rz]
     mask_non_cliff = _is_clifford_angle(rz_circ_data[2, :])
     mask_non_cliff = ~mask_non_cliff
     rz_non_cliff = rz_circ_data[:, mask_non_cliff]
@@ -245,8 +244,6 @@ def _circuit_to_array(
     qubits_list = []
     operation_list = []
     parameters_list = []
-    depth = len(circuit)
-    nqubits = len(circuit.all_qubits())
     operations = circuit.all_operations()
     # loop through and construct arrays:
     for i, operation in enumerate(operations):

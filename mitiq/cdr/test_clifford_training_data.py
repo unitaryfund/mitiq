@@ -1,5 +1,5 @@
 import cirq
-from random import sample, choice, randint, uniform
+from random import randint, uniform
 import numpy as np
 from mitiq._typing import QPROGRAM
 from clifford_training_data import _array_to_circuit, _circuit_to_array, \
@@ -7,7 +7,7 @@ from clifford_training_data import _array_to_circuit, _circuit_to_array, \
     _random_clifford, _angle_to_probabilities, \
     _probabilistic_angle_to_clifford, count_non_cliffords, \
     generate_training_circuits
-from qiskit import compiler, QuantumCircuit, QuantumRegister
+from qiskit import compiler, QuantumCircuit
 from mitiq.mitiq_qiskit.conversions import to_qiskit, from_qiskit
 
 """Tests for training circuits generation for Clifford data regression.
@@ -60,7 +60,7 @@ def qiskit_circuit_transplation(
     # Rz(phi+pi)Rx(pi/2)Rz(theta+pi)Rx(pi/2)Rz(lambda)
     try:
         circ_new = QuantumCircuit(len(circ.qubits), len(circ.clbits))
-    except:
+    except Exception:
         circ_new = QuantumCircuit(len(circ.qubits))
     for i in range(len(circ.data)):
         # get information for the gate
@@ -143,7 +143,6 @@ def test_map_to_near_cliffords():
     num_qubits = 4
     layers = 2
     measure = True
-    num_training_circuits = 10
     fraction_non_clifford = 0.3
     circuit = cirq.circuits.Circuit(
         random_circuit(num_qubits, layers, measure))
