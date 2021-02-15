@@ -8,7 +8,7 @@ assignees: ''
 ---
 ## Pre-Request Checklist
 
-- [ ] I checked to make sure that this feature has not already been requested
+- [ ] I checked other issues on Mitiq to make sure that this feature has not already been requested
 - [ ] I or my organization would be willing to help implement and/or test this.
 - [ ] This is **not** a breaking change to Mitiq.
 
