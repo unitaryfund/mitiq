@@ -27,10 +27,12 @@ Unlike software bugs affecting code in usual computers, the errors which we
 attempt to reduce with mitigation are due to the hardware.
 
 Quantum error mitigation techniques try to *reduce* the impact of noise in
-quantum computations. They generally do not completely remove it. Alternative nomenclature refers to error mitigation as (approximate) error
-suppression or approximate quantum error correction, but it is worth noting
-that it is :ref:`different from error correction<guide_qem_what_not>`. Among the ideas that have been developed so far for quantum error mitigation,
-a leading candidate is zero-noise extrapolation.
+quantum computations. They generally do not completely remove it. Alternative 
+nomenclature refers to error mitigation as (approximate) error suppression or 
+approximate quantum error correction, but it is worth noting that it is 
+different from :ref:`error correction <guide_qem_qec>`. Among the ideas 
+that have been developed so far for quantum error mitigation, a leading 
+candidate is zero-noise extrapolation.
 
 .. _guide_qem_zne:
 
@@ -55,7 +57,7 @@ is by picking an underlying noise model, e.g., a memoryless bath such that the s
 
 In experiments, zero-noise extrapolation has been performed with pulse
 stretching :cite:`Kandala_2019_Nature`. In this way, a difference between the effective time that a gate is affected by decoherence during its execution on the hardware
-was introduced by controlling only the gate-defining pulses. The effective noise of a quantum circuit can be scaled also at a gate-level, i.e., without requiring a direct control of the  physical hardware. For example this can be achieved with the :ref:`unitary folding<guide-folding>` technique, a method which is present in the ``mitiq`` toolchain.
+was introduced by controlling only the gate-defining pulses. The effective noise of a quantum circuit can be scaled also at a gate-level, i.e., without requiring a direct control of the  physical hardware. For example this can be achieved with the :ref:`unitary folding <guide_zne_folding>` technique, a method which is present in the ``mitiq`` toolchain.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -80,6 +82,8 @@ applicable thus depends on the performance of the underlying hardware as well as
 of when zero-noise extrapolation is effective, and how effective it is, is the subject of ongoing research.
 
 In Mitiq, this technique is implemented in the module :mod:`mitiq.zne`.
+
+.. _guide_qem_pec:
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Probabilistic error cancellation

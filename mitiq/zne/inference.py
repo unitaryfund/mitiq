@@ -16,12 +16,10 @@
 """Classes corresponding to different zero-noise extrapolation methods."""
 from abc import ABC, abstractmethod
 from copy import deepcopy
-import inspect
 from typing import (
     Any,
     Callable,
     Dict,
-    Iterable,
     List,
     Optional,
     Sequence,
@@ -30,11 +28,14 @@ from typing import (
 )
 import warnings
 
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
 
 from mitiq import QPROGRAM
+from mitiq.collector import Collector
 from mitiq.utils import _are_close_dict
 
 
@@ -93,12 +94,12 @@ def mitiq_curve_fit(
 
     Args:
         ansatz : The model function used for zero-noise extrapolation.
-                 The first argument is the noise scale variable,
-                 the remaining arguments are the parameters to fit.
+            The first argument is the noise scale variable,
+            the remaining arguments are the parameters to fit.
         scale_factors: The array of noise scale factors.
         exp_values: The array of expectation values.
         init_params: Initial guess for the parameters.
-                     If None, the initial values are set to 1.
+            If None, the initial values are set to 1.
 
     Returns:
         opt_params: The array of optimal parameters.
@@ -142,7 +143,7 @@ def mitiq_polyfit(
         exp_values: The array of expectation values.
         deg: The degree of the polynomial fit.
         weights: Optional array of weights for each sampled point.
-                 This is used to make a weighted least squares fit.
+            This is used to make a weighted least squares fit.
 
     Returns:
         opt_params: The array of optimal parameters.
@@ -152,6 +153,7 @@ def mitiq_polyfit(
 
     Raises:
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
+
     """
 
     with warnings.catch_warnings(record=True) as warn_list:
@@ -201,6 +203,7 @@ class Factory(ABC):
         self._zne_error: Union[float, None] = None
         self._zne_curve: Union[Callable[[float], float], None] = None
         self._already_reduced = False
+        self._options: Dict[str, float] = {}
 
     def get_scale_factors(self) -> np.ndarray:
         """Returns the scale factors at which the factory has computed
@@ -286,11 +289,6 @@ class Factory(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def reduce(self) -> float:
-        """Returns the extrapolation to the zero-noise limit."""
-        raise NotImplementedError
-
-    @abstractmethod
     def run_classical(
         self, scale_factor_to_expectation_value: Callable[..., float],
     ) -> "Factory":
@@ -334,6 +332,55 @@ class Factory(ABC):
         self._instack.append(instack_val)
         self._outstack.append(outstack_val)
         return self
+
+    def plot_data(self) -> Figure:
+        """Returns a figure which is a scatter plot of (x, y) data where x are
+        scale factors at which expectation values have been computed, and y are
+        the associated expectation values.
+
+        Returns:
+            fig: A 2D scatter plot described above.
+        """
+        fig = plt.figure(figsize=(7, 5))
+        ax = plt.gca()
+        plt.plot(
+            self.get_scale_factors(),
+            self.get_expectation_values(),
+            "o",
+            markersize=10,
+            markeredgecolor="black",
+            alpha=0.8,
+            label="Data",
+        )
+        ax.grid(True)
+        plt.xlabel("Noise scale factor")
+        plt.ylabel("Expectation value")
+        return fig
+
+    def plot_fit(self) -> Figure:
+        """Returns a figure which plots the experimental data as well as the
+        best fit curve.
+
+        Returns:
+            fig: A figure which plots the best fit curve as well as the data.
+        """
+        fig = self.plot_data()
+
+        smooth_scale_factors = np.linspace(0, self.get_scale_factors()[-1], 20)
+        smooth_expectations = (self.get_extrapolation_curve())(
+            smooth_scale_factors
+        )
+        plt.xlim(left=0)
+        fig.axes[0].plot(
+            smooth_scale_factors,
+            smooth_expectations,
+            "--",
+            lw=2,
+            color="black",
+            label="Best fit",
+        )
+
+        return fig
 
     def reset(self) -> "Factory":
         """Resets the internal state of the Factory."""
@@ -413,37 +460,33 @@ class BatchedFactory(Factory, ABC):
         super(BatchedFactory, self).__init__()
 
     @staticmethod
-    def _is_executor_batched(
-        executor: Union[Callable[..., float], Callable[..., List[float]]],
-    ) -> bool:
-        """Returns True if the input function is recognized as a "batched
-        executor".
+    @abstractmethod
+    def extrapolate(*args, **kwargs) -> float:
+        """Returns the extrapolation to the zero-noise limit."""
+        raise NotImplementedError
 
-        The executor is detected as "batched" only if it is annotated with
-        a return type that is one of the following:
-            * Iterable[float]
-            * List[float]
-            * Sequence[float]
-            * Tuple[float]
-            * numpy.ndarray
+    def reduce(self) -> float:
+        """Evaluates the zero-noise limit found by fitting according to
+        the factory's extrapolation method.
 
-        Args:
-            executor: A "single executor" (1) or a "batched executor" (2).
-                (1) A function which inputs a single circuit and outputs a
-                single expectation value of interest.
-                (2) A function which inputs a list of circuits and outputs a
-                list of expectation values (one for each circuit).
-
-        Returns: True if the executor is detected as batched, False otherwise.
+        Returns:
+            The zero-noise limit.
         """
-        executor_annotation = inspect.getfullargspec(executor).annotations
-        return executor_annotation.get("return") in (
-            List[float],
-            Sequence[float],
-            Tuple[float],
-            Iterable[float],
-            np.ndarray,
+        (
+            self._zne_limit,
+            self._zne_error,
+            self._opt_params,
+            self._params_cov,
+            self._zne_curve,
+        ) = self.extrapolate(  # type: ignore
+            self.get_scale_factors(),
+            self.get_expectation_values(),
+            full_output=True,
+            **self._options,
         )
+
+        self._already_reduced = True
+        return self._zne_limit
 
     def run(
         self,
@@ -492,7 +535,7 @@ class BatchedFactory(Factory, ABC):
         # Get the list of keywords associated to each circuit in "to_run"
         kwargs_list = self._get_keyword_args(num_to_average)
 
-        if self._is_executor_batched(executor):
+        if Collector.is_batched_executor(executor):
             if all([kwargs == {} for kwargs in kwargs_list]):
                 res = executor(to_run)
             else:
@@ -707,14 +750,14 @@ class PolyFactory(BatchedFactory):
 
     Args:
         scale_factors: Sequence of noise scale factors at which
-                       expectation values should be measured.
+            expectation values should be measured.
         order: Extrapolation order (degree of the polynomial fit).
-               It cannot exceed len(scale_factors) - 1.
+            It cannot exceed len(scale_factors) - 1.
         shot_list: Optional sequence of integers corresponding to the number
-                   of samples taken for each expectation value. If this
-                   argument is explicitly passed to the factory, it must have
-                   the same length of scale_factors and the executor function
-                   must accept "shots" as a valid keyword argument.
+            of samples taken for each expectation value. If this
+            argument is explicitly passed to the factory, it must have
+            the same length of scale_factors and the executor function
+            must accept "shots" as a valid keyword argument.
 
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
@@ -722,6 +765,7 @@ class PolyFactory(BatchedFactory):
 
     Note:
         RichardsonFactory and LinearFactory are special cases of PolyFactory.
+
     """
 
     def __init__(
@@ -735,8 +779,8 @@ class PolyFactory(BatchedFactory):
             raise ValueError(
                 "The extrapolation order cannot exceed len(scale_factors) - 1."
             )
-        self.order = order
         super(PolyFactory, self).__init__(scale_factors, shot_list)
+        self._options = {"order": order}
 
     @staticmethod
     def extrapolate(
@@ -764,6 +808,7 @@ class PolyFactory(BatchedFactory):
             full_output: If False (default), only the zero-noise limit is
                 returned. If True, additional information about the
                 extrapolated limit is returned too.
+
         Returns:
             zne_limit: The extrapolated zero-noise limit. If "full_output"
                 is False (default value), only this parameter is returned.
@@ -784,6 +829,7 @@ class PolyFactory(BatchedFactory):
             contained in the input arguments. To extrapolate from the internal
             data of an instantiated Factory object, the bound method
             ".reduce()" should be called instead.
+
         """
 
         opt_params, params_cov = mitiq_polyfit(
@@ -806,30 +852,11 @@ class PolyFactory(BatchedFactory):
 
         return zne_limit, zne_error, opt_params, params_cov, zne_curve
 
-    def reduce(self) -> float:
-        """Evaluates the zero-noise limit found by fitting a polynomial of degree
-        `self.order` to the internal data stored in the factory.
-
-        Returns:
-            The zero-noise limit.
-        """
-        (
-            self._zne_limit,
-            self._zne_error,
-            self._opt_params,
-            self._params_cov,
-            self._zne_curve,
-        ) = self.extrapolate(  # type: ignore
-            self.get_scale_factors(),
-            self.get_expectation_values(),
-            self.order,
-            full_output=True,
-        )
-        self._already_reduced = True
-        return self._zne_limit
-
     def __eq__(self, other: Any) -> bool:
-        return BatchedFactory.__eq__(self, other) and self.order == other.order
+        return (
+            BatchedFactory.__eq__(self, other)
+            and self._options["order"] == other._options["order"]
+        )
 
 
 class RichardsonFactory(BatchedFactory):
@@ -900,27 +927,6 @@ class RichardsonFactory(BatchedFactory):
             scale_factors, exp_values, order, full_output
         )
 
-    def reduce(self) -> float:
-        """Evaluates the zero-noise limit found by applying Richardson
-        extrapolation to the internal data stored in the factory.
-
-        Returns:
-            The zero-noise limit.
-        """
-        (
-            self._zne_limit,
-            self._zne_error,
-            self._opt_params,
-            self._params_cov,
-            self._zne_curve,
-        ) = self.extrapolate(  # type: ignore
-            self.get_scale_factors(),
-            self.get_expectation_values(),
-            full_output=True,
-        )
-        self._already_reduced = True
-        return self._zne_limit
-
 
 class FakeNodesFactory(BatchedFactory):
     """Factory object implementing a modified version [De2020polynomial]_ of
@@ -944,7 +950,7 @@ class FakeNodesFactory(BatchedFactory):
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
 
-    .. [De2020polynomial]: S.De Marchia. F. Marchetti, E.Perracchionea
+    .. [De2020polynomial] : S.De Marchia. F. Marchetti, E.Perracchionea
         and D.Poggialia,
         "Polynomial interpolation via mapped bases without resampling,"
         *Journ of Comp. and App. Math.* **364**, 112347 (2020),
@@ -998,34 +1004,12 @@ class FakeNodesFactory(BatchedFactory):
 
         return zne_limit, zne_error, opt_params, params_cov, zne_curve
 
-    def reduce(self) -> float:
-        """Evaluates the zero-noise limit found by applying the fake node
-        Richardson extrapolation to the internal data stored in the factory.
-
-        Returns:
-            The zero-noise limit.
-        """
-
-        (
-            self._zne_limit,
-            self._zne_error,
-            self._opt_params,
-            self._params_cov,
-            self._zne_curve,
-        ) = self.extrapolate(  # type: ignore
-            self.get_scale_factors(),
-            self.get_expectation_values(),
-            full_output=True,
-        )
-
-        self._already_reduced = True
-        return self._zne_limit
-
     @staticmethod
     def _map_to_fake_nodes(
         x: Union[Sequence[float], float], a: float, b: float
     ) -> Sequence[float]:
-        """A function that maps inputs to Chebyshev-Lobatto points. Based on
+        """
+        A function that maps inputs to Chebyshev-Lobatto points. Based on
         the function [De2020polynomial]_:
             S(x) = (a - b)/2 * cos(pi * (x - a)/(b - a)) + (a + b)/2.
         Where a and b are the endpoints of the interval [a, b] of CL points
@@ -1136,27 +1120,6 @@ class LinearFactory(BatchedFactory):
             scale_factors, exp_values, 1, full_output
         )
 
-    def reduce(self) -> float:
-        """Returns the zero-noise limit found by fitting a line to the internal
-            data stored in the factory.
-
-        Returns:
-            The zero-noise limit.
-        """
-        (
-            self._zne_limit,
-            self._zne_error,
-            self._opt_params,
-            self._params_cov,
-            self._zne_curve,
-        ) = self.extrapolate(  # type: ignore
-            self.get_scale_factors(),
-            self.get_expectation_values(),
-            full_output=True,
-        )
-        self._already_reduced = True
-        return self._zne_limit
-
 
 class ExpFactory(BatchedFactory):
     """
@@ -1201,8 +1164,10 @@ class ExpFactory(BatchedFactory):
             raise ValueError(
                 "The argument 'asymptote' must be either a float or None"
             )
-        self.asymptote = asymptote
-        self.avoid_log = avoid_log
+        self._options = {
+            "asymptote": asymptote,
+            "avoid_log": avoid_log,
+        }
 
     @staticmethod
     def extrapolate(
@@ -1279,48 +1244,30 @@ class ExpFactory(BatchedFactory):
             full_output=full_output,
         )
 
-    def reduce(self) -> float:
-        """Returns the zero-noise limit found by fitting an exponential
-        model to the internal data stored in the factory.
-
-        Returns:
-            The zero-noise limit.
-        """
-        (
-            self._zne_limit,
-            self._zne_error,
-            self._opt_params,
-            self._params_cov,
-            self._zne_curve,
-        ) = self.extrapolate(  # type: ignore
-            self.get_scale_factors(),
-            self.get_expectation_values(),
-            asymptote=self.asymptote,
-            avoid_log=self.avoid_log,
-            full_output=True,
-        )
-        self._already_reduced = True
-        return self._zne_limit
-
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, ExpFactory):
             return False
         if (
-            self.asymptote
-            and other.asymptote is None
-            or self.asymptote is None
-            and other.asymptote
+            self._options["asymptote"]
+            and other._options["asymptote"] is None
+            or self._options["asymptote"] is None
+            and other._options["asymptote"]
         ):
             return False
-        if self.asymptote is None and other.asymptote is None:
+        if (
+            self._options["asymptote"] is None
+            and other._options["asymptote"] is None
+        ):
             return (
                 BatchedFactory.__eq__(self, other)
-                and self.avoid_log == other.avoid_log
+                and self._options["avoid_log"] == other._options["avoid_log"]
             )
         return (
             BatchedFactory.__eq__(self, other)
-            and np.isclose(self.asymptote, other.asymptote)
-            and self.avoid_log == other.avoid_log
+            and np.isclose(
+                self._options["asymptote"], other._options["asymptote"],
+            )
+            and self._options["avoid_log"] == other._options["avoid_log"]
         )
 
 
@@ -1378,9 +1325,11 @@ class PolyExpFactory(BatchedFactory):
             raise ValueError(
                 "The argument 'asymptote' must be either a float or None"
             )
-        self.order = order
-        self.asymptote = asymptote
-        self.avoid_log = avoid_log
+        self._options = {
+            "order": order,
+            "asymptote": asymptote,
+            "avoid_log": avoid_log,
+        }
 
     @staticmethod
     def extrapolate(
@@ -1600,34 +1549,12 @@ class PolyExpFactory(BatchedFactory):
         return (
             BatchedFactory.__eq__(self, other)
             and isinstance(other, PolyExpFactory)
-            and np.isclose(self.asymptote, other.asymptote)
-            and self.avoid_log == other.avoid_log
-            and self.order == other.order
+            and np.isclose(
+                self._options["asymptote"], other._options["asymptote"],
+            )
+            and self._options["avoid_log"] == other._options["avoid_log"]
+            and self._options["order"] == other._options["order"]
         )
-
-    def reduce(self) -> float:
-        """Returns the zero-noise limit found by fitting an the
-        model to the internal data stored in the factory.
-
-        Returns:
-            The zero-noise limit.
-        """
-        (
-            self._zne_limit,
-            self._zne_error,
-            self._opt_params,
-            self._params_cov,
-            self._zne_curve,
-        ) = self.extrapolate(  # type: ignore
-            self.get_scale_factors(),
-            self.get_expectation_values(),
-            self.order,
-            self.asymptote,
-            self.avoid_log,
-            full_output=True,
-        )
-        self._already_reduced = True
-        return self._zne_limit
 
 
 # Keep a log of the optimization process storing:
@@ -1665,6 +1592,7 @@ class AdaExpFactory(AdaptiveFactory):
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationError: If the extrapolation fit fails.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
+
     """
 
     _SHIFT_FACTOR = 1.27846

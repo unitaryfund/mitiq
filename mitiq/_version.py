@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Reads in version information.
-
 Note: This file will be overwritten by the packaging process."""
 import os
 

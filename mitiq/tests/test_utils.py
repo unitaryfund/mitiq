@@ -23,6 +23,7 @@ import cirq
 from cirq import (
     LineQubit,
     Circuit,
+    ControlledGate,
     X,
     Y,
     Z,
@@ -221,6 +222,16 @@ def test_simplify_gate_exponent(gate):
 def test_simplify_gate_exponent_with_gates_that_cannot_be_simplified(gate):
     # Check the gate is not simplified (same representation)
     assert _simplify_gate_exponent(gate).__repr__() == gate.__repr__()
+
+
+def test_simplify_circuit_exponents_controlled_gate():
+    circuit = Circuit(
+        ControlledGate(CNOT, num_controls=1).on(*LineQubit.range(3))
+    )
+    copy = circuit.copy()
+
+    _simplify_circuit_exponents(circuit)
+    assert _equal(circuit, copy)
 
 
 def test_simplify_circuit_exponents():

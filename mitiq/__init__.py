@@ -16,4 +16,5 @@
 from mitiq._about import about
 from mitiq._typing import QPROGRAM
 from mitiq._version import __version__
+from mitiq.collector import generate_collected_executor
 from mitiq.zne import execute_with_zne, mitigate_executor, zne_decorator

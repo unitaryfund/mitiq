@@ -575,7 +575,7 @@ def test_avoid_log_keyword():
     fac = ExpFactory(X_VALS, asymptote=A, avoid_log=False)
     fac.run_classical(f_exp_down)
     znl_with_log = fac.reduce()
-    fac.avoid_log = True
+    fac._options["avoid_log"] = True
     znl_without_log = fac.reduce()
     assert not znl_with_log == znl_without_log
 
@@ -660,8 +660,9 @@ def test_adaptive_factory_max_iteration_warnings():
         fac.run_classical(lambda scale_factor: 1.0, max_iterations=3)
 
 
-def test_equal_simple():
-    fac = LinearFactory(scale_factors=[1, 2, 3])
+@mark.parametrize("factory", [LinearFactory, ExpFactory])
+def test_equal_simple(factory):
+    fac = factory(scale_factors=[1, 2, 3])
     assert fac != 1
 
     copied_fac = copy(fac)
@@ -870,6 +871,78 @@ def test_get_methods_of_factories():
     assert np.allclose(fac.get_scale_factors(), x_values)
     assert np.allclose(fac.get_zero_noise_limit(), zne_reduce)
     assert np.allclose(fac.get_zero_noise_limit_error(), 1.0)
+
+
+@mark.parametrize(
+    "factory", (LinearFactory, RichardsonFactory, PolyFactory,),
+)
+def test_plot_data(factory):
+    """Test that plot_data() outputs the correct x and y values."""
+    if factory is PolyFactory:
+        fac = factory(scale_factors=X_VALS, order=3)
+    else:
+        fac = factory(scale_factors=X_VALS)
+    fac.run_classical(apply_seed_to_func(f_lin, SEED))
+    fac.reduce()
+    fig = fac.plot_data()
+    ax = fig.gca()
+    x_data, y_data = ax.lines[0].get_xydata().T
+    zne_curve = fac.get_extrapolation_curve()
+    np.allclose(y_data, zne_curve(x_data))
+
+
+@mark.parametrize("factory", (ExpFactory, PolyExpFactory))
+def test_plot_data_exp_factory(factory):
+    """Test that plot_data() outputs the correct x and y values
+    for ExpFactory and PolyExpFactory.
+    """
+    if factory is PolyExpFactory:
+        fac = factory(scale_factors=X_VALS, order=2)
+    else:
+        fac = factory(scale_factors=X_VALS)
+    fac.run_classical(apply_seed_to_func(f_exp_down, SEED))
+    fac.reduce()
+    fig = fac.plot_data()
+    ax = fig.gca()
+    x_data, y_data = ax.lines[0].get_xydata().T
+    zne_curve = fac.get_extrapolation_curve()
+    np.allclose(y_data, zne_curve(x_data))
+
+
+@mark.parametrize(
+    "factory", (LinearFactory, RichardsonFactory, PolyFactory,),
+)
+def test_plot_fit(factory):
+    """Test that plot_fit() outputs the correct x and y values."""
+    if factory is PolyFactory or factory is PolyExpFactory:
+        fac = factory(scale_factors=X_VALS, order=2)
+    else:
+        fac = factory(scale_factors=X_VALS)
+    fac.run_classical(apply_seed_to_func(f_lin, SEED))
+    fac.reduce()
+    fig = fac.plot_fit()
+    ax = fig.gca()
+    x_data, y_data = ax.lines[0].get_xydata().T
+    zne_curve = fac.get_extrapolation_curve()
+    np.allclose(y_data, zne_curve(x_data))
+
+
+@mark.parametrize("factory", (ExpFactory, PolyExpFactory))
+def test_plot_fit_exp_factory(factory):
+    """Test that plot_fit() outputs the correct x and y values
+    for ExpFactory and PolyExpFactory.
+    """
+    if factory is PolyExpFactory:
+        fac = factory(scale_factors=X_VALS, order=2)
+    else:
+        fac = factory(scale_factors=X_VALS)
+    fac.run_classical(apply_seed_to_func(f_exp_down, SEED))
+    fac.reduce()
+    fig = fac.plot_fit()
+    ax = fig.gca()
+    x_data, y_data = ax.lines[0].get_xydata().T
+    zne_curve = fac.get_extrapolation_curve()
+    np.allclose(y_data, zne_curve(x_data))
 
 
 def test__fakenodes_scale_factors_equally_spaced():

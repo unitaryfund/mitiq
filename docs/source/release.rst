@@ -7,7 +7,7 @@ Releasing a new version of Mitiq
 ================================
 
 .. note::
-    These instructions are aimed at the mantainers of the ``mitiq`` library.
+    These instructions are aimed at the maintainers of the ``mitiq`` library.
 
 When the time is ready for a new release, follow the checklist and
 instructions of this document to go through all the steps below:
@@ -26,8 +26,8 @@ as intended.
 
 .. code-block:: shell-session
 
-    $ conda create -n mitiqenv
-    $ conda activate mitiqenv
+    conda create -n mitiqenv
+    conda activate mitiqenv
 
 ^^^^^^^^^^^^^^^^^^^^
 Update the changelog
@@ -59,13 +59,13 @@ directory of the repository:
 
 .. code-block:: shell-session
 
-    $ make docs
+    make docs
 
 To create the PDF documentation, do the following:
 
 .. code-block:: shell-session
 
-    $ make -C latexpdf
+    make pdf
 
 Finally, Since the ``docs/build`` folder is not version controlled, copy the
 newly created PDF file from ``docs/build/latex`` to ``docs/pdf`` folder as
@@ -97,30 +97,13 @@ From the top-level directory of the repository, run:
 
 .. code-block:: shell-session
 
-    $ python setup.py sdist bdist_wheel
+    python setup.py sdist bdist_wheel
 
 This will create a "source" distribution and a "built" distribution using
 ``wheel``. This should create a ``build/`` and ``sdist/`` folder.
 
 **NOTE**: You will need to have installed ``wheel`` to create the "built"
 distribution.
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Release the new version on Github
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. note::
-    You need to have write access to the ``mitiq`` Github repository to make
-    a new release.
-
-Make a new release on Github
-`here <https://github.com/unitaryfund/mitiq/releases>`_.
-
-    - Choose the tag you recently created, and add information on the release
-      by pulling from ``CHANGELOG.md`` as in previous releases.
-    - Github will create compressed files with the repository. Upload the
-      ``mitiq.pdf`` file and add the locally generated distribution tarball and
-      wheel.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Release and test the new version on TestPyPI
@@ -140,18 +123,18 @@ and simply run:
 
 .. code-block:: shell-session
 
-    $ twine upload --repository testpypi dist/*
+    twine upload --repository testpypi dist/*
 
 You can then check at `here <https://test.pypi.org/project/mitiq>`_ that
 the library has been correctly uploaded.
 
 In order to check that the distribution runs correctly, set up a new virtual
-environment and try to install the library. For example, for version ``v0.1.0``
+environment and try to install the library. For example, for version ``x.y.z``
 this is done via:
 
 .. code-block:: shell-session
 
-    $ pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.python.org/simple/ mitiq==0.1.0
+    pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.python.org/simple/ mitiq==x.y.z
 
 The ``--extra-index-url`` is necessary since otherwise ``TestPyPI``  would be
 looking for the required dependencies therein, but we want it to install them
@@ -171,23 +154,38 @@ of the ``mitiq`` repository:
 
 .. code-block:: shell-session
 
-    $ twine upload dist/*
+    twine upload dist/*
 
 You will be prompted to insert your login credentials (username and password).
-You can then verify the upload `here <https://pypi.org/project/mitiq/>`_.
+You can then verify the upload `here <https://pypi.org/project/mitiq/>`__.
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Update the changelog for development
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Release the new version on Github
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+    You need to have write access to the ``mitiq`` Github repository to make
+    a new release.
+
+Make a new release on Github
+`here <https://github.com/unitaryfund/mitiq/releases>`__.
+
+    - Choose the tag you recently created, and add information on the release
+      by pulling from ``CHANGELOG.md`` as in previous releases.
+    - Github will create compressed files with the repository. Upload the
+      ``mitiq.pdf`` file and add the locally generated distribution tarball and
+      wheel.
+
+.. note::
+    If all the above steps have been successfully completed,
+    ReadTheDocs (RTD) will automatically build new ``latest`` and ``stable`` versions
+    of the documentation. So, no additional steps are needed for updating RTD. You can
+    verify changes have been updating by viewing `<https://mitiq.readthedocs.io/>`__.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Update the changelog for new development version
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Add a new section to the ``CHANGELOG.md`` to track changes in the following
 release, meaning that if ``vX.Y.Z`` was just released, then there should be
 a section for ``vX.(Y+1).Z`` that is marked "In Development".
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Release the new docs on Read the Docs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Nothing has to be done here -- if all the above steps have been completed,
-ReadTheDocs will automatically build new ``latest`` and ``stable`` versions
-of the documentation.

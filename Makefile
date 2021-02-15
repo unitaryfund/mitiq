@@ -32,6 +32,14 @@ dist:
 .PHONY: docs
 docs:
 	make -C docs html
+
+.PHONY: docs-clean
+docs-clean:
+	make -C docs clean
+	make -C docs html
+
+.PHONY: doctest
+doctest:
 	make -C docs doctest
 
 .PHONY: format
@@ -40,7 +48,7 @@ format:
 
 .PHONY: install
 install:
-	pip install -e .
+	pip install -e .[development]
 
 .PHONY: pdf
 pdf:

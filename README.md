@@ -1,8 +1,9 @@
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
-[![Documentation Status](https://readthedocs.org/projects/mitiq/badge/?version=latest)](https://mitiq.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/mitiq/badge/?version=stable)](https://mitiq.readthedocs.io/en/stable/)
 [![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
 [![arXiv](https://img.shields.io/badge/arXiv-2009.04417-<COLOR>.svg)](https://arxiv.org/abs/2009.04417)
+[![Downloads](https://static.pepy.tech/personalized-badge/mitiq?period=total&units=international_system&left_color=black&right_color=green&left_text=Downloads)](https://pepy.tech/project/mitiq)
 [![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
 
 
@@ -40,11 +41,11 @@ If you'd prefer to clone and install from source, our would like to develop Miti
 
 ### Supported quantum programming libraries
 
-Mitiq can currently interface with
+Mitiq can currently interface with:
 
-* [Cirq](https://github.com/quantumlib/Cirq) >= 0.9.0, 
-* [Qiskit](https://qiskit.org/) >= 0.19.0, and 
-* [pyQuil](https://github.com/rigetti/pyquil) >= 2.18.0. 
+* [Cirq](https://github.com/quantumlib/Cirq),
+* [Qiskit](https://qiskit.org/),
+* [pyQuil](https://github.com/rigetti/pyquil).
 
 Cirq is a core requirement of Mitiq and is automatically installed. To use Mitiq with other quantum programming
 libraries, install the optional package(s) following the instructions linked above.
@@ -97,8 +98,11 @@ Error in simulation (with mitigation): 0.000519
 
 ## Error mitigation techniques
 
-Mitiq currently implements [zero-noise extrapolation](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html) and 
-is designed to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
+Mitiq currently implements:
+* [Zero-Noise Extrapolation](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html),
+* [Probabilistic Error Cancellation](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#error-mitigation-with-probabilistic-error-cancellation),
+ 
+and is designed to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
 
 ## Documentation
 
@@ -135,4 +139,4 @@ If you use Mitiq in your research, please reference the [Mitiq preprint][arxiv] 
 
 ## License
 
-[GNU GPL v.3.0.](LICENSE)
+[GNU GPL v.3.0.](https://github.com/unitaryfund/mitiq/blob/master/LICENSE)

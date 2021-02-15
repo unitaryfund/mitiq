@@ -154,7 +154,7 @@ This executor can be used for noisy depolarizing simulation.
 Other noise models can be used by substituting the ``depolarize`` channel with
 any other channel available in ``cirq``, for example ``cirq.amplitude_damp``.
 More details can be found in the ``cirq``
-`noise documentation <https://cirq.readthedocs.io/en/stable/noise.html>`_
+`noise documentation <https://cirq.readthedocs.io/en/stable/noise.html>`__
 
 Cirq: Density-matrix Simulation with Depolarizing Noise and Sampling
 ------------------------------------------------------------------------
@@ -208,12 +208,12 @@ You can also include both noise models and finite sampling in your executor.
 PyQuil Executors
 ================
 
-This section contains executors for use with `pyQuil <https://github.com/rigetti/pyquil>`_.
+This section contains executors for use with `pyQuil <https://github.com/rigetti/pyquil>`__.
 
 PyQuil: Quantum Cloud Services
 ------------------------------
 
-This executor can be used to run on `Quantum Cloud Services <https://arxiv.org/abs/2001.04449>`_
+This executor can be used to run on `Quantum Cloud Services <https://arxiv.org/abs/2001.04449>`__
 (QCS), the hardware platform provided by Rigetti Computing. Requires a QCS account and
 reservation on a quantum processor (QPU).
 
@@ -338,7 +338,7 @@ to be used in ``mitiq``.
 
 Note that this executor implementation measures arbitrary observables by using
 a change of basis into the computational basis. More information about the math
-behind how this example is available `here <https://quantumcomputing.stackexchange.com/a/6944>`_.
+behind how this example is available `here <https://quantumcomputing.stackexchange.com/a/6944>`__.
 
 .. testcode::
 
@@ -495,7 +495,7 @@ This executor can be used for noisy depolarizing simulation.
 
 Other noise models can be defined using any functionality available in ``qiskit``.
 More details can be found in the ``qiskit``
-`simulator documentation <https://qiskit.org/documentation/tutorials/simulators/index.html>`_
+`simulator documentation <https://qiskit.org/documentation/tutorials/simulators/index.html>`__
 
 Qiskit: Hardware
 ------------------------------------------------------------
@@ -507,7 +507,7 @@ An example of an executor that runs on IBMQ hardware is given
 TensorFlow Quantum Executors
 ==========================================
 
-This section provides an example of how to use `TensorFlow Quantum <https://github.com/tensorflow/quantum>`_
+This section provides an example of how to use `TensorFlow Quantum <https://github.com/tensorflow/quantum>`__
 as an executor. Note that at the time of this writing, TensorFlow Quantum is limited to
 
   1. ``Cirq`` ``Circuits`` that use  ``Cirq`` ``GridQubit`` instances
@@ -545,35 +545,35 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
         nM = len(circ.moments)
         nQ = len(circ.all_qubits())
 
-        # Create array of symbolic variables and reshape to natural circuit parameterization
+        # Create array of symbolic variables and reshape to natural circuit parameterization.
         h = sympy.symbols(''.join(['h_{0} '.format(i) for i in range(nM * nQ)]), positive=True)
         h_array = np.asarray(h).reshape((nQ, nM))
 
-        # Symbolicly add X gates to the input circuit
+        # Symbolically add X gates to the input circuit.
         noisy_circuit = Circuit()
         for i, moment in enumerate(circ.moments):
             noisy_circuit.append(moment)
             for j, q in enumerate(circ.all_qubits()):
                 noisy_circuit.append(cirq.rx(h_array[j, i]).on(q))
 
-        # rotations will be pi w/ prob p, 0 w/ prob 1-p
+        # Rotations will be pi w/ prob p, 0 w/ prob 1 - p.
         vals = [np.reshape((np.random.rand(nQ, nM) < p) * np.pi, (1, nQ * nM)) for _ in range(num_monte_carlo)]
 
-        # needs to be a rank 2 tensor
+        # Needs to be a rank 2 tensor.
         vals = np.squeeze(vals)
         if num_monte_carlo == 1:
             vals = [vals]
 
-        # Instantiate tfq layer for computing state vector
+        # Instantiate tfq layer for computing state vector.
         state = tfq.layers.State()
 
-        # Execute monte carlo sim with symbolic values specified by vals
+        # Execute monte carlo sim with symbolic values specified by vals.
         out = state(noisy_circuit, symbol_names=h, symbol_values=vals).to_tensor()
 
-        # Fancy way of computing and summing individual density operators, follwed by averaging
+        # Fancy way of computing and summing individual density operators, followed by averaging.
         dm = tf.tensordot(tf.transpose(out), tf.math.conj(out), axes=[[1], [0]]).numpy() / num_monte_carlo
 
-        # return measurement of 0 state
+        # Return measurement of 0 state.
         return np.real(dm[0, 0])
 
 .. testcode::
@@ -581,12 +581,12 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
 
     if tfq_exists:
         import cirq
-        from mitiq.benchmarks import randomized_benchmarking
+        from mitiq.benchmarks import generate_rb_circuits
 
-        circ = randomized_benchmarking.rb_circuits(1, [20], 1)[0]
+        circ = generate_rb_circuits(1, 20, 1)[0]
 
         # Need to make sure the qubits are cirq.GridQubit
-        circ=circ.transform_qubits(lambda q: cirq.GridQubit.rect(1, 1)[0])
+        circ = circ.transform_qubits(lambda q: cirq.GridQubit.rect(1, 1)[0])
 
         out = stochastic_bit_flip_simulation(circ, 0.001)
         assert 0.5 < out < 1

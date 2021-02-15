@@ -1,0 +1,25 @@
+# third-party integration
+pyquil~=2.18.0
+qiskit~=0.16.2
+
+# to test the code
+pytest~=5.4.1
+pytest-cov~=2.8.1
+flake8~=3.7.9
+black~=19.10b0
+mypy~=0.782
+
+# to run examples
+matplotlib~=3.2.1
+notebook~=6.1.5
+
+# to build and test the documentation
+# see docs/requirements.txt for more non-essential dependencies
+sphinx~=2.4.4
+sphinxcontrib-bibtex~=1.0.0
+sphinx-copybutton~=0.2.11
+sphinx-autodoc-typehints~=1.10.3
+myst-nb~=0.11.1
+myst-parser~=0.13.3
+pybtex~=0.22.2
+pydata-sphinx-theme~=0.3.1

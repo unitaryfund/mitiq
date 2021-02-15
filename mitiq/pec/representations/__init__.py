@@ -12,3 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+from mitiq.pec.representations.depolarizing import (
+    represent_operation_with_global_depolarizing_noise,
+    represent_operation_with_local_depolarizing_noise,
+)

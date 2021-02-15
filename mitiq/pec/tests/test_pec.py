@@ -13,81 +13,288 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Tests related to mitiq.pec.pec functions."""
+"""Unit tests for PEC."""
 
-from pytest import mark, raises, warns
+from itertools import product
+from typing import List, Optional
+from functools import partial
+import pytest
+
 import numpy as np
-from cirq import Circuit, LineQubit, Y, Z, CNOT
+import cirq
+import pyquil
+import qiskit
 
-from mitiq.pec.utils import _simple_pauli_deco_dict, DecompositionDict
-from mitiq.pec.pec import execute_with_pec, LargeSampleWarning
+from mitiq import QPROGRAM
+from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 from mitiq.benchmarks.utils import noisy_simulation
 
-# The level of depolarizing noise for the simulated backend
-BASE_NOISE = 0.02
-# Define some decomposition dictionaries for testing
-DECO_DICT = _simple_pauli_deco_dict(BASE_NOISE)
-DECO_DICT_SIMP = _simple_pauli_deco_dict(BASE_NOISE, simplify_paulis=True)
-NOISELESS_DECO_DICT = _simple_pauli_deco_dict(0)
-
-
-def executor(circuit: Circuit) -> float:
-    """A one- or two-qubit noisy executor function.
-    It executes the input circuit with BASE_NOISE depolarizing noise and
-    returns the expectation value of the ground state projector.
-    """
-    if len(circuit.all_qubits()) == 1:
-        obs = np.array([[1, 0], [0, 0]])
-    elif len(circuit.all_qubits()) == 2:
-        obs = np.array(
-            [[1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
-        )
-    else:
-        raise ValueError("The input must be a circuit with 1 or 2 qubits.")
-
-    return noisy_simulation(circuit, BASE_NOISE, obs,)
-
-
-# Simple identity 1-qubit circuit for testing
-q = LineQubit(1)
-oneq_circ = Circuit(Z.on(q), Z.on(q))
-
-# Simple identity 2-qubit circuit for testing
-qreg = LineQubit.range(2)
-twoq_circ = Circuit(Y.on(qreg[1]), CNOT.on(*qreg), Y.on(qreg[1]),)
-
-
-@mark.parametrize("seed", (100, 101))
-@mark.parametrize("circuit", [oneq_circ, twoq_circ])
-@mark.parametrize(
-    "decomposition_dict", [NOISELESS_DECO_DICT, DECO_DICT_SIMP, DECO_DICT]
+from mitiq.pec import execute_with_pec, NoisyOperation, OperationRepresentation
+from mitiq.pec.pec import LargeSampleWarning
+from mitiq.pec.representations import (
+    represent_operation_with_local_depolarizing_noise,
 )
-def test_execute_with_pec(
-    circuit: Circuit, decomposition_dict: DecompositionDict, seed: int
-):
+
+
+# Noisy representations of Pauli operations for testing.
+def get_pauli_representations(
+    base_noise: float, qubits: Optional[List[cirq.Qid]] = None,
+) -> List[OperationRepresentation]:
+
+    if qubits is None:
+        qreg = cirq.LineQubit.range(2)
+    else:
+        qreg = qubits
+
+    # Generate all ideal single-qubit Pauli operations for both qubits
+    pauli_gates = [cirq.X, cirq.Y, cirq.Z]
+    ideal_operations = []
+
+    for gate in pauli_gates:
+        for qubit in qreg:
+            ideal_operations.append(cirq.Circuit(gate(qubit)))
+
+    # Generate all ideal 2-qubit Pauli operations
+    for gate_a, gate_b in product(pauli_gates, repeat=2):
+        ideal_operations.append(
+            cirq.Circuit([gate_a(qreg[0]), gate_b(qreg[1])])
+        )
+
+    # Add CNOT too
+    ideal_operations.append(cirq.Circuit(cirq.CNOT(*qreg)))
+
+    # Generate all representations
+    reps = []
+    for op in ideal_operations:
+        reps.append(
+            represent_operation_with_local_depolarizing_noise(op, base_noise,)
+        )
+
+    return reps
+
+
+BASE_NOISE = 0.02
+pauli_representations = get_pauli_representations(base_noise=BASE_NOISE)
+noiseless_pauli_representations = get_pauli_representations(base_noise=0.0)
+
+
+def serial_executor(circuit: QPROGRAM, noise: float = BASE_NOISE) -> float:
+    """A noisy executor function which executes the input circuit with `noise`
+    depolarizing noise and returns the expectation value of the ground state
+    projector. Simulation will be slow for "large circuits" (> a few qubits).
+    """
+    circuit, _ = convert_to_mitiq(circuit)
+
+    # Ground state projector.
+    d = 2 ** len(circuit.all_qubits())
+    obs = np.zeros(shape=(d, d), dtype=np.float32)
+    obs[0, 0] = 1.0
+
+    return noisy_simulation(circuit, noise, obs)
+
+
+def batched_executor(circuits) -> np.ndarray:
+    return np.array([serial_executor(circuit) for circuit in circuits])
+
+
+def noiseless_serial_executor(circuit: QPROGRAM) -> float:
+    return serial_executor(circuit, noise=0.0)
+
+
+def fake_executor(circuit: cirq.Circuit, random_state: np.random.RandomState):
+    """A fake executor which just samples from a normal distribution."""
+    return random_state.randn()
+
+
+# Simple circuits for testing.
+q0, q1 = cirq.LineQubit.range(2)
+oneq_circ = cirq.Circuit(cirq.Z.on(q0), cirq.Z.on(q0))
+twoq_circ = cirq.Circuit(cirq.Y.on(q1), cirq.CNOT.on(q0, q1), cirq.Y.on(q1))
+
+
+def test_execute_with_pec_cirq_trivial_decomposition():
+    circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
+    rep = OperationRepresentation(
+        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+    )
+
+    unmitigated = serial_executor(circuit)
+    mitigated = execute_with_pec(
+        circuit,
+        serial_executor,
+        representations=[rep],
+        force_run_all=False,
+        num_samples=100,
+        random_state=1,
+    )
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+def test_execute_with_pec_pyquil_trivial_decomposition():
+    circuit = pyquil.Program(pyquil.gates.H(0))
+    rep = OperationRepresentation(
+        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+    )
+    unmitigated = serial_executor(circuit)
+
+    mitigated = execute_with_pec(
+        circuit,
+        serial_executor,
+        representations=[rep],
+        num_samples=100,
+        force_run_all=False,
+        random_state=1,
+    )
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+def test_execute_with_pec_qiskit_trivial_decomposition():
+    qreg = qiskit.QuantumRegister(1)
+    circuit = qiskit.QuantumCircuit(qreg)
+    _ = circuit.x(qreg)
+    rep = OperationRepresentation(
+        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+    )
+    unmitigated = serial_executor(circuit)
+
+    mitigated = execute_with_pec(
+        circuit,
+        serial_executor,
+        representations=[rep],
+        num_samples=100,
+        force_run_all=False,
+        random_state=1,
+    )
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+@pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
+def test_execute_with_pec_cirq_noiseless_decomposition(circuit):
+    unmitigated = noiseless_serial_executor(circuit)
+
+    mitigated = execute_with_pec(
+        circuit,
+        noiseless_serial_executor,
+        representations=noiseless_pauli_representations,
+        force_run_all=False,
+        num_samples=100,
+        random_state=1,
+    )
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+@pytest.mark.parametrize("nqubits", [1, 2, 5])
+def test_pyquil_noiseless_decomposition_multiqubit(nqubits):
+    circuit = pyquil.Program(pyquil.gates.H(q) for q in range(nqubits))
+
+    # Decompose H(q) for each qubit q into Paulis.
+    representations = []
+    for q in range(nqubits):
+        representation = OperationRepresentation(
+            ideal=pyquil.Program(pyquil.gates.H(q)),
+            basis_expansion={
+                NoisyOperation(ideal=pyquil.Program(pyquil.gates.X(q))): 0.5,
+                NoisyOperation(ideal=pyquil.Program(pyquil.gates.Z(q))): 0.5,
+            },
+        )
+        representations.append(representation)
+
+    exact = noiseless_serial_executor(circuit)
+    pec_value = execute_with_pec(
+        circuit,
+        noiseless_serial_executor,
+        representations=representations,
+        num_samples=500,
+        random_state=1,
+    )
+    assert np.isclose(pec_value, exact, atol=0.1)
+
+
+@pytest.mark.skip(reason="Slow test.")
+@pytest.mark.parametrize("nqubits", [1, 2])
+def test_qiskit_noiseless_decomposition_multiqubit(nqubits):
+    qreg = [qiskit.QuantumRegister(1) for _ in range(nqubits)]
+    circuit = qiskit.QuantumCircuit(*qreg)
+    for q in qreg:
+        circuit.h(q)
+
+    # Decompose H(q) for each qubit q into Paulis.
+    representations = []
+    for q in qreg:
+        opcircuit = qiskit.QuantumCircuit(q)
+        opcircuit.h(q)
+
+        xcircuit = qiskit.QuantumCircuit(q)
+        xcircuit.x(q)
+
+        zcircuit = qiskit.QuantumCircuit(q)
+        zcircuit.z(q)
+
+        representation = OperationRepresentation(
+            ideal=opcircuit,
+            basis_expansion={
+                NoisyOperation(ideal=xcircuit): 0.5,
+                NoisyOperation(ideal=zcircuit): 0.5,
+            },
+        )
+        representations.append(representation)
+
+    exact = noiseless_serial_executor(circuit)
+    pec_value = execute_with_pec(
+        circuit,
+        noiseless_serial_executor,
+        representations=representations,
+        num_samples=500,
+        random_state=1,
+    )
+    assert np.isclose(pec_value, exact, atol=0.1)
+
+
+@pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
+@pytest.mark.parametrize("executor", [serial_executor, batched_executor])
+@pytest.mark.parametrize("circuit_type", ["cirq", "qiskit", "pyquil"])
+def test_execute_with_pec_mitigates_noise(circuit, executor, circuit_type):
     """Tests that execute_with_pec mitigates the error of a noisy
     expectation value.
     """
-    unmitigated = executor(circuit)
+    circuit = convert_from_mitiq(circuit, circuit_type)
+
+    true_noiseless_value = 1.0
+    unmitigated = serial_executor(circuit)
+
+    if circuit_type == "qiskit":
+        # Note this is an important subtlety necessary because of conversions.
+        reps = get_pauli_representations(
+            base_noise=BASE_NOISE,
+            qubits=[cirq.NamedQubit(name) for name in ("q_0", "q_1")],
+        )
+        # TODO: PEC with Qiskit is slow.
+        #  See https://github.com/unitaryfund/mitiq/issues/507.
+        circuit, _ = convert_to_mitiq(circuit)
+    else:
+        reps = pauli_representations
+
     mitigated = execute_with_pec(
         circuit,
         executor,
-        decomposition_dict=decomposition_dict,
-        random_state=seed,
+        representations=reps,
+        force_run_all=False,
+        random_state=101,
     )
-    error_unmitigated = abs(unmitigated - 1.0)
-    error_mitigated = abs(mitigated - 1.0)
-    # For a trivial noiseless decomposition no PEC mitigation should happen
-    if decomposition_dict == NOISELESS_DECO_DICT:
-        assert np.isclose(unmitigated, mitigated)
-    else:
-        assert error_mitigated < error_unmitigated
-        assert np.isclose(mitigated, 1.0, atol=0.1)
+    error_unmitigated = abs(unmitigated - true_noiseless_value)
+    error_mitigated = abs(mitigated - true_noiseless_value)
+
+    assert error_mitigated < error_unmitigated
+    assert np.isclose(mitigated, true_noiseless_value, atol=0.1)
 
 
-@mark.parametrize("circuit", [oneq_circ, twoq_circ])
-@mark.parametrize("seed", (1, 2, 3))
-def test_execute_with_pec_with_different_samples(circuit: Circuit, seed: int):
+@pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
+@pytest.mark.parametrize("seed", (2, 3))
+def test_execute_with_pec_with_different_samples(circuit, seed):
     """Tests that, on average, the error decreases as the number of samples is
     increased.
     """
@@ -96,17 +303,19 @@ def test_execute_with_pec_with_different_samples(circuit: Circuit, seed: int):
     for _ in range(10):
         mitigated = execute_with_pec(
             circuit,
-            executor,
-            decomposition_dict=DECO_DICT,
+            serial_executor,
+            representations=pauli_representations,
             num_samples=10,
+            force_run_all=True,
             random_state=seed,
         )
         errors_few_samples.append(abs(mitigated - 1.0))
         mitigated = execute_with_pec(
             circuit,
-            executor,
-            decomposition_dict=DECO_DICT,
+            serial_executor,
+            representations=pauli_representations,
             num_samples=100,
+            force_run_all=True,
             random_state=seed,
         )
         errors_more_samples.append(abs(mitigated - 1.0))
@@ -114,84 +323,112 @@ def test_execute_with_pec_with_different_samples(circuit: Circuit, seed: int):
     assert np.average(errors_more_samples) < np.average(errors_few_samples)
 
 
-@mark.parametrize("num_samples", [100, 1000])
-def test_execute_with_pec_with_full_output(num_samples: int):
-    """Tests that the error associated to the PEC value is returned if
-    the option 'full_output' is set to True.
+@pytest.mark.parametrize("num_samples", [100, 1000])
+def test_execute_with_pec_error_scaling(num_samples: int):
+    """Tests that the error associated to the PEC value scales as
+    1/sqrt(num_samples).
     """
-    rnd_state = np.random.RandomState(0)
-
-    def fake_exec(circuit: Circuit):
-        """A fake executor which just samples from a normal distribution."""
-        return rnd_state.randn()
-
-    _, error_pec = execute_with_pec(
+    _, pec_data = execute_with_pec(
         oneq_circ,
-        fake_exec,
-        DECO_DICT,
+        partial(fake_executor, random_state=np.random.RandomState(0)),
+        representations=pauli_representations,
         num_samples=num_samples,
+        force_run_all=True,
         full_output=True,
     )
     # The error should scale as 1/sqrt(num_samples)
-    assert np.isclose(error_pec * np.sqrt(num_samples), 1.0, atol=0.1)
+    normalized_error = pec_data["pec_error"] * np.sqrt(num_samples)
+    assert np.isclose(normalized_error, 1.0, atol=0.1)
 
 
-@mark.parametrize("precision", [0.1, 0.01])
+@pytest.mark.parametrize("precision", [0.1, 0.05])
 def test_precision_option_in_execute_with_pec(precision: float):
     """Tests that the 'precision' argument is used to deduce num_samples."""
-
-    rnd_state = np.random.RandomState(0)
-
-    def fake_exec(circuit: Circuit):
-        """A fake executor which just samples from a normal distribution."""
-        return rnd_state.randn()
-
     # For a noiseless circuit we expect num_samples = 1/precision^2:
-    _, pec_error = execute_with_pec(
+    _, pec_data = execute_with_pec(
         oneq_circ,
-        fake_exec,
-        NOISELESS_DECO_DICT,
+        partial(fake_executor, random_state=np.random.RandomState(0)),
+        representations=pauli_representations,
         precision=precision,
+        force_run_all=True,
         full_output=True,
     )
     # The error should scale as precision
-    assert np.isclose(pec_error / precision, 1.0, atol=0.1)
+    assert np.isclose(pec_data["pec_error"] / precision, 1.0, atol=0.1)
 
     # If num_samples is given, precision is ignored.
-    _, pec_error = execute_with_pec(
+    nsamples = 1000
+    _, pec_data = execute_with_pec(
         oneq_circ,
-        fake_exec,
-        NOISELESS_DECO_DICT,
+        partial(fake_executor, random_state=np.random.RandomState(0)),
+        representations=pauli_representations,
         precision=precision,
-        num_samples=1000,
+        num_samples=nsamples,
         full_output=True,
     )
     # The error should scale as 1/sqrt(num_samples)
-    assert not np.isclose(pec_error / precision, 1.0, atol=0.1)
-    assert np.isclose(pec_error * np.sqrt(1000), 1.0, atol=0.1)
+    assert not np.isclose(pec_data["pec_error"] / precision, 1.0, atol=0.1)
+    assert np.isclose(pec_data["pec_error"] * np.sqrt(nsamples), 1.0, atol=0.1)
 
 
-@mark.parametrize("bad_value", (0, -1, 2))
+@pytest.mark.parametrize("bad_value", (0, -1, 2))
 def test_bad_precision_argument(bad_value: float):
     """Tests that if 'precision' is not within (0, 1] an error is raised."""
+    with pytest.raises(ValueError, match="The value of 'precision' should"):
+        execute_with_pec(
+            oneq_circ,
+            serial_executor,
+            pauli_representations,
+            precision=bad_value,
+        )
 
-    with raises(ValueError, match="The value of 'precision' should"):
-        execute_with_pec(oneq_circ, executor, DECO_DICT, precision=bad_value)
 
-
-@mark.parametrize("num_samples", [100001])
-def test_large_sample_size_warning(num_samples: int):
+@pytest.mark.skip(reason="Slow test.")
+def test_large_sample_size_warning():
     """Tests whether a warning is raised when PEC sample size
-    is greater than 10 ** 5
+    is greater than 10 ** 5.
     """
-    rnd_state = np.random.RandomState(0)
-
-    def fake_exec(circuit: Circuit):
-        """A fake executor which just samples from a normal distribution."""
-        return rnd_state.randn()
-    with warns(
-        LargeSampleWarning,
-        match=r"The number of PEC samples is very large.",
+    with pytest.warns(
+        LargeSampleWarning, match=r"The number of PEC samples is very large.",
     ):
         execute_with_pec(
-         oneq_circ, fake_exec, DECO_DICT, num_samples=num_samples)
+            oneq_circ,
+            partial(fake_executor, random_state=np.random.RandomState(0)),
+            pauli_representations,
+            num_samples=100001,
+        )
+
+
+def test_pec_data_with_full_output():
+    """Tests that execute_with_pec mitigates the error of a noisy
+    expectation value.
+    """
+    precision = 0.1
+    pec_value, pec_data = execute_with_pec(
+        twoq_circ,
+        serial_executor,
+        precision=precision,
+        representations=pauli_representations,
+        full_output=True,
+        random_state=102,
+    )
+    # Get num samples from precision
+    norm = 1.0
+    for op in twoq_circ.all_operations():
+        for rep in pauli_representations:
+            if rep.ideal == cirq.Circuit(op):
+                norm *= rep.norm
+    num_samples = int((norm / precision) ** 2)
+
+    # Manually get raw expectation values
+    exp_values = [serial_executor(c) for c in pec_data["sampled_circuits"]]
+
+    assert pec_data["num_samples"] == num_samples
+    assert pec_data["precision"] == precision
+    assert np.isclose(pec_data["pec_value"], pec_value)
+    assert np.isclose(
+        pec_data["pec_error"],
+        np.std(pec_data["unbiased_estimators"]) / np.sqrt(num_samples),
+    )
+    assert np.isclose(np.average(pec_data["unbiased_estimators"]), pec_value)
+    assert np.allclose(pec_data["measured_expectation_values"], exp_values)

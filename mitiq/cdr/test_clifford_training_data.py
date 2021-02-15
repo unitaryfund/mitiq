@@ -19,11 +19,11 @@ def random_circuit(
     depth: int,
     measure: bool,
 ) -> QPROGRAM:
-    '''Function to generate a random quantum circuit in cirq. The circuit is \
-       based on the hardware efficient ansatz, with alternating CNOT layers \
+    '''Function to generate a random quantum circuit in cirq. The circuit is
+       based on the hardware efficient ansatz, with alternating CNOT layers
        with randomly selected single qubit gates in between.
     Args:
-        qubits: number of qubits in circuit.
+        # qubits: number of qubits in circuit.
         depth: depth of the RQC.
         measure: measurements or not.
     Returns:

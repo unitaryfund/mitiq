@@ -20,7 +20,12 @@ import cirq
 from pyquil import Program, gates
 import qiskit
 
-from mitiq.conversions import convert_to_mitiq, convert_from_mitiq, converter
+from mitiq.conversions import (
+    convert_to_mitiq,
+    convert_from_mitiq,
+    converter,
+    UnsupportedCircuitError,
+)
 from mitiq.utils import _equal
 
 # Cirq Bell circuit
@@ -53,6 +58,15 @@ def test_to_mitiq(circuit):
     assert input_type in circuit.__module__
 
 
+@pytest.mark.parametrize("item", ("circuit", 1, None))
+def test_to_mitiq_bad_types(item):
+    with pytest.raises(
+        UnsupportedCircuitError,
+        match="Could not determine the package of the input circuit.",
+    ):
+        convert_to_mitiq(item)
+
+
 @pytest.mark.parametrize("to_type", ("qiskit", "pyquil"))
 def test_from_mitiq(to_type):
     converted_circuit = convert_from_mitiq(cirq_circuit, to_type)
@@ -76,3 +90,21 @@ def test_converter(circuit_and_type):
     cirq_scaled = scaling_function(circuit, return_mitiq=True)
     assert isinstance(cirq_scaled, cirq.Circuit)
     assert _equal(cirq_scaled, cirq_circuit)
+
+
+@pytest.mark.parametrize("nbits", [1, 10])
+@pytest.mark.parametrize("measure", [True, False])
+def test_converter_keeps_register_structure_qiskit(nbits, measure):
+    qreg = qiskit.QuantumRegister(nbits)
+    creg = qiskit.ClassicalRegister(nbits)
+    circ = qiskit.QuantumCircuit(qreg, creg)
+    circ.h(qreg)
+
+    if measure:
+        circ.measure(qreg, creg)
+
+    scaled = scaling_function(circ)
+
+    assert scaled.qregs == circ.qregs
+    assert scaled.cregs == circ.cregs
+    assert scaled == circ
