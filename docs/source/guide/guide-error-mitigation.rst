@@ -56,7 +56,7 @@ Limitations of zero-noise extrapolation
 
 While zero-noise extrapolation is very general and can be applied even if
 the underlying noise model is unknown, the method can be sensitive to
-extrapolation. For this reason, it is important to choose a good
+extrapolation errors. For this reason, it is important to choose a good
 noise-scaling method, set of scale factors, and extrapolation method, which
 *a priori* may not be known.
 
