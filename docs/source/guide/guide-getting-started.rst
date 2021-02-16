@@ -273,12 +273,12 @@ whose representation in the presence of depolarizing noise can be obtained as fo
 
     0: ───X─── = 1.010*0: ───X───-0.003*0: ───X───X───-0.003*0: ───X───Y───-0.003*0: ───X───Z───
 
-The result above is an :class:`~mitiq.pec.types.OperationRepresentation` object which contains
+The result above is an :class:`~mitiq.pec.types.types.OperationRepresentation` object which contains
 the information for representing the ideal operation X (left-hand-side of the printed output)
 as a linear combination of noisy operations (right-hand-side of the printed output). 
 
 We can now implement PEC by importing the function :func:`~mitiq.pec.pec.execute_with_pec` from the
-:mod:`~mitiq.pec` module.
+:mod:`~mitiq.pec.pec` module.
 
 .. testcode::
 
