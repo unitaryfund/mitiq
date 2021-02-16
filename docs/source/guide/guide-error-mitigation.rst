@@ -31,7 +31,7 @@ quantum computations. They generally do not completely remove it. Alternative
 nomenclature refers to error mitigation as (approximate) error suppression or 
 approximate quantum error correction, but it is worth noting that error mitigation
 is distinctly different from :ref:`error correction <guide_qem_qec>`. Two leading
-ideas error mitigation techniques implemented in Mitiq are zero-noise extrapolation
+error mitigation techniques implemented in Mitiq are zero-noise extrapolation
 and probabilistic error cancellation.
 
 .. _guide_qem_zne:
