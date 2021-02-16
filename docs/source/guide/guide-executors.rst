@@ -366,7 +366,7 @@ behind how this example is available `here <https://quantumcomputing.stackexchan
         # we need to modify the circuit to measure obs in its eigenbasis
         # we do this by appending a unitary operation
         eigvals, U = np.linalg.eigh(obs) # obtains a U s.t. obs = U diag(eigvals) U^dag
-        circ.unitary(np.linalg.inv(U), qubits=range(circ.n_qubits))
+        circ.unitary(np.linalg.inv(U), qubits=range(circ.num_qubits))
 
         circ.measure_all()
 
@@ -446,7 +446,7 @@ This executor can be used for noisy depolarizing simulation.
         # we need to modify the circuit to measure obs in its eigenbasis
         # we do this by appending a unitary operation
         eigvals, U = np.linalg.eigh(obs) # obtains a U s.t. obs = U diag(eigvals) U^dag
-        circ.unitary(np.linalg.inv(U), qubits=range(circ.n_qubits))
+        circ.unitary(np.linalg.inv(U), qubits=range(circ.num_qubits))
 
         circ.measure_all()
 
