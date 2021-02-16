@@ -68,7 +68,7 @@ Zero-Noise Extrapolation
 ------------------------
 
 Zero-noise extrapolation can be easily implemented with the function
-:func:`~mitiq.zne.execute_with_zne`.
+:func:`mitiq.zne.zne.execute_with_zne`.
 
 .. testcode::
 
@@ -124,7 +124,7 @@ error-mitigated version.
    `here <https://docs.python.org/3/library/functools.html#functools.partial>`_.
 
 
-By default, :func:`~mitiq.zne.execute_with_zne` uses Richardson extrapolation
+By default, :func:`mitiq.zne.zne.execute_with_zne` uses Richardson extrapolation
 to extrapolate the expectation value to the zero noise limit :cite:`Temme_2017_PRL`.
 Mitiq comes equipped with other extrapolation methods as well. Different methods of
 extrapolation are packaged into :class:`~mitiq.zne.inference.Factory` objects.
@@ -238,7 +238,7 @@ We can then use this backend for our mitigation.
     # The mitigation should improve the result.
     assert abs(exact - mitigated) < abs(exact - unmitigated)
 
-Note that :class:`~mitiq.zne.inference.Factory` are only used for fitting
+Note that :class:`~mitiq.zne.inference.Factory`'s are only used for fitting
 classical data and are completely frontend/backend agnostic.
 
 Probabilistic Error Cancellation
@@ -247,7 +247,7 @@ Probabilistic Error Cancellation
 The workflow for probabilistic error cancellation is very similar to that of zero-noise extrapolation.
 In particular, we can use Probabilistic Error Cancellation (PEC) with the
 same execution function (``executor``) and the same Cirq circuit (``circuit``) that
-we have already defined in the section :ref:`Multi-platform Framework <multi_platform_framework>`.
+we have already defined in the :ref:`General Workflow <multi_platform_framework>` section.
 
 PEC requires a good knowledge of the noise model and of the noise strength acting
 on the system. In particular for each operation of the circuit, we need to build
@@ -277,7 +277,7 @@ The result above is an :class:`~mitiq.pec.types.OperationRepresentation` object 
 the information for representing the ideal operation X (left-hand-side of the printed output)
 as a linear combination of noisy operations (right-hand-side of the printed output). 
 
-We can now implement PEC by importing the function :func:`~mitiq.pec.execute_with_pec` from the
+We can now implement PEC by importing the function :func:`~mitiq.pec.pec.execute_with_pec` from the
 :mod:`~mitiq.pec` module.
 
 .. testcode::
