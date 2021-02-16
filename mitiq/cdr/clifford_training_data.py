@@ -12,35 +12,35 @@ def generate_training_circuits(
     method_replace: str = 'nearest',
     **additional_options: dict
 ) -> list:
-    '''Function to return a list of near-Clifford circuits to create the \
-       training data.
+    '''Function to return a list of near-Clifford circuits to create the
+    training data.
 
     Args:
         circuit: A circuit of interest.
         num_training_circuits: Number of circuits in the returned training set,
-                               assumes already compiled into gate set \
+                               assumes already compiled into gate set
                                (Rz, Rx, Z, X, CNOT)
-        fraction_non_clifford: The (approximate) fraction of non-Clifford \
+        fraction_non_clifford: The (approximate) fraction of non-Clifford
                                gates in each returned circuit.
-        method_select: option to define the way in which the non-Clifford \
-                              gates to replace with Cliffords are chosen can \
-                              take strings 'random' or 'probabilistic'. \
-        method_replace: str = option to define the way the chosen non-Clifford\
-                              gates are replace with a Clifford gate can take \
+        method_select: option to define the way in which the non-Clifford
+                              gates to replace with Cliffords are chosen can
+                              take strings 'random' or 'probabilistic'.
+        method_replace: str = option to define the way the chosen non-Clifford
+                              gates are replace with a Clifford gate can take
                               strings 'random', 'probabilistic' or 'closest'.
         additional_options: dictionary with the following keys and values:
-            'sigma_select': float -  postitive variable definined width of \
-                                     probability distribution used in choosing\
-                                     which non-Cliffords to replace, only has\
-                                     an impact if \
+            'sigma_select': float -  postitive variable definined width of
+                                     probability distribution used in choosing
+                                     which non-Cliffords to replace, only has
+                                     an impact if
                                      method_select = 'probabilistic'.
-            'sigma_replace': float - positive variable definined width of \
-                                     probability distribution used in choosing\
-                                     which Clifford to replace the \
-                                     non-Clifford with, only has an impact if \
+            'sigma_replace': float - positive variable definined width of
+                                     probability distribution used in choosing
+                                     which Clifford to replace the
+                                     non-Clifford with, only has an impact if
                                      method_replace = 'probabilistic'.
     Returns:
-        list of near-Clifford circuits constructed from the circuits of \
+        list of near-Clifford circuits constructed from the circuits of
         interest.
     '''
     circuits_list = []
@@ -97,29 +97,29 @@ def _map_to_near_clifford(
     method_replace: str = 'closest',
     **additional_options: dict
 ) -> cirq.circuits.Circuit:
-    ''' Function to take the information in some circuit of interest and \
-        return a near-Clifford circuit as constructed according to \
+    ''' Function to take the information in some circuit of interest and
+        return a near-Clifford circuit as constructed according to
         some user defined methods.
     Args:
-        rz_non_cliff: array containing non-Clifford gates from the circuit of \
+        rz_non_cliff: array containing non-Clifford gates from the circuit of
                       interest.
-        all_cliff: array containing Clifford gates from the circuit of \
+        all_cliff: array containing Clifford gates from the circuit of
                    interest.
         empty_circuit: empty circuit strcuture (stores qubit geometry).
         total_non_cliff: total number of non-Clifford gates.
-        fraction_non_clifford: the fraction of non-Clifford gates to replace \
+        fraction_non_clifford: the fraction of non-Clifford gates to replace
                                in the circuit of interest.
-        method_select: string defining the method used to select the \
-                       non-Clifford gates to replace: 'random' or \
+        method_select: string defining the method used to select the
+                       non-Clifford gates to replace: 'random' or
                        'probabilistic'.
-        method_replace: string defining method used to replace selected \
-                        non-Clifford gates: 'closest', 'random' or \
+        method_replace: string defining method used to replace selected
+                        non-Clifford gates: 'closest', 'random' or
                         'probabilistic'.
-        sigma_select: width of probability distribution used in selection \
-                      of non-Clifford gates to replace, only has effect if \
+        sigma_select: width of probability distribution used in selection
+                      of non-Clifford gates to replace, only has effect if
                       method_select = 'probabilistic'
-        sigma_replace: width of probability distribution used in replacement \
-                       of selected non-Clifford gates, only has effect if \
+        sigma_replace: width of probability distribution used in replacement
+                       of selected non-Clifford gates, only has effect if
                        method_replace = 'probabilistic'.
         Returns:
             Near-Clifford projected circuit.
@@ -143,7 +143,7 @@ def _map_to_near_clifford(
                 sigma_replace = additional_options.get('sigma_replace')
             else:
                 raise Exception('additional options must be dicitonary with \
-                                 keys containing one or both of '
+                                keys containing one or both of '
                                 '"sigma_select" and "sigma_replace" both \
                                 equal to some positive float')
     else:
@@ -203,7 +203,7 @@ def count_non_cliffords(
     '''Function to check how many non-Clifford gates are in a give circuit.
 
     Args:
-        circuit: some quantum circuit already decomposed into the basis \
+        circuit: some quantum circuit already decomposed into the basis
                  {Rz, Rx(pi/2), CNOT, X}
 
     Returns:
@@ -212,7 +212,6 @@ def count_non_cliffords(
     data, _ = _circuit_to_array(circuit)
     mask_rz = data[1, :] == 'rz'
     rz_circ_data = data[:, mask_rz]
-    mask_not_rz = data[1, :] != 'rz'
     mask_non_cliff = _is_clifford_angle(rz_circ_data[2, :])
     mask_non_cliff = ~mask_non_cliff
     rz_non_cliff = rz_circ_data[:, mask_non_cliff]
@@ -222,7 +221,7 @@ def count_non_cliffords(
 def _circuit_to_array(
     circuit: QPROGRAM
 ) -> (np.ndarray, QPROGRAM):
-    '''Function to return the order of gates, their names and paramters in a \
+    '''Function to return the order of gates, their names and paramters in a
        more managable data structure than a Qiskit
     quantum circuit.
 
@@ -230,11 +229,11 @@ def _circuit_to_array(
         circ (QPROGRAM): cirq circuit (decomposed).
 
     Returns:
-        data (np.ndarray): np.array([order], [names], [parameters], [qubits]) \
-                           where order is the order of the gates from 0 to \
-                           depth, names are the names of the gates, \
-                           parameters are the paramters specifying the \
-                           gates and qubits and cbits are the qubits and \
+        data (np.ndarray): np.array([order], [names], [parameters], [qubits])
+                           where order is the order of the gates from 0 to
+                           depth, names are the names of the gates,
+                           parameters are the paramters specifying the
+                           gates and qubits and cbits are the qubits and
                            classical bits on which they act.
         qubits (int): number of qubits.
         QPROGRAM: empty circuit with same qubit layout as original.
@@ -401,6 +400,17 @@ def _closest_clifford(
 
 # vectorize so function can take array of angles.
 _closest_clifford = np.vectorize(_closest_clifford)
+
+'''
+for i in [0, np.pi/2, np.pi, np.pi*3/2, 2*np.pi,np.pi/4]:
+    j = i%(2*np.pi)/(np.pi/2)
+    print(j)
+    if j/0.5 != (1,3,5):
+        j_rounded = np.round(j)
+    else:
+        j_rounded = randint(j/0.5, j/0.5 -1)
+    print(j_rounded*np.pi/2)
+'''
 
 
 def _random_clifford(
