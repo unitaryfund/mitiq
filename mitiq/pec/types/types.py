@@ -318,8 +318,8 @@ class NoisyBasis:
         """Add elements to the NoisyBasis.
 
         Args:
-            basis_elements: Sequence of basis elements as NoisyOperations to
-                add to the current basis elements.
+            basis_elements: Sequence of basis elements as ``NoisyOperation``'s
+                to add to the current basis elements.
         """
         for noisy_op in basis_elements:
             if not isinstance(noisy_op, NoisyOperation):
