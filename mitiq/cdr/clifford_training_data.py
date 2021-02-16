@@ -3,6 +3,8 @@ from random import sample, choice, randint
 import numpy as np
 from mitiq._typing import QPROGRAM
 
+# Global variable of Clifford angles in Rz gates:
+CLIFFORD_ANGLES = (0, np.pi/2, np.pi, 3/2*(np.pi))
 
 def generate_training_circuits(
     circuit: cirq.circuits.Circuit,
@@ -356,10 +358,8 @@ def _is_clifford_angle(
     Returns:
         bool: True / False for Clifford or not.
     '''
-    diff_list = []
-    for cliff_ang in CLIFFORD_ANGLES:
-        diff_list.append(abs(abs(ang) % (2*np.pi) - cliff_ang) % (2 * np.pi))
-    if any(np.array(diff_list) <= tol):
+    closest_clifford = _closest_clifford(ang)
+    if abs(closest_clifford - ang) < tol:
         return True
     else:
         return False
@@ -381,36 +381,20 @@ def _closest_clifford(
     Returns:
         Clifford angle: closest clifford angle.
     '''
-    cliff_angs = [np.pi/2, np.pi, np.pi*3/2, 2*np.pi]
-    cliff_angs_array = np.asarray(cliff_angs)
-    diff_array = np.abs(cliff_angs_array - abs(ang)) % (2*np.pi)
-    min_1, min_2, *_ = np.partition(diff_array, 1)
-    idx_1 = diff_array.tolist().index(min_1)
-    idx_2 = diff_array.tolist().index(min_2)
+    ang_scaled = ang%(2*np.pi)/(np.pi/2)
     # if just one min value, return the corresponding nearest cliff.
-    if abs(min_1-min_2) > 10**(-8):
-        return (cliff_angs[idx_1])
+    if ang_scaled/0.5 !=(1,3,5) :
+        return (CLIFFORD_ANGLES[ang_scaled])
     # if two min values (ie two cliff gates equidistant) randomly choose the
     # cliff gate to return.
     else:
-        index_list = [idx_1, idx_2]
+        index_list = [ang_scaled/0.5, ang_scaled/0.5 -1]
         index = choice(index_list)
-        return cliff_angs[index]
+        return CLIFFORD_ANGLES[index]
 
 
 # vectorize so function can take array of angles.
 _closest_clifford = np.vectorize(_closest_clifford)
-
-'''
-for i in [0, np.pi/2, np.pi, np.pi*3/2, 2*np.pi,np.pi/4]:
-    j = i%(2*np.pi)/(np.pi/2)
-    print(j)
-    if j/0.5 != (1,3,5):
-        j_rounded = np.round(j)
-    else:
-        j_rounded = randint(j/0.5, j/0.5 -1)
-    print(j_rounded*np.pi/2)
-'''
 
 
 def _random_clifford(
@@ -425,9 +409,8 @@ def _random_clifford(
     Returns:
         Clifford angle: closest clifford angle.
     '''
-    cliff_angs = [np.pi/2, np.pi, np.pi*3/2, 2*np.pi]
     random_index = randint(0, 3)
-    return cliff_angs[random_index]
+    return CLIFFORD_ANGLES[random_index]
 
 
 # vectorize so function can take array:
@@ -452,7 +435,6 @@ def _angle_to_probabilities(
     Rz = np.array([[1, 0.0], [0.0, np.exp(angle*1j)]])
     dists = []
     for i in range(4):
-        i += 1
         diff = np.linalg.norm(Rz - S ** (i))
         dists.append(np.exp(-(diff / sigma) ** 2))
     return sum(dists)
@@ -483,12 +465,10 @@ def _probabilistic_angle_to_clifford(
         Clifford angle: clifford angle to replace gate angle, calculated \
         probabilistically.
     '''
-    CLIFFORD_ANGLES = (np.pi / 2, np.pi, np.pi * 3 / 2, 2 * np.pi)
     S = np.array([[1, 0.0], [0.0, 1j]])
     Rz = np.array([[1, 0.0], [0.0, np.exp(ang*1j)]])
     dists = []
     for i in range(4):
-        i += 1
         diff = np.linalg.norm(Rz - S ** (i))
         dists.append(np.exp(-(diff/sigma) ** 2))
     prob_gate = [i/sum(dists) for i in dists]
