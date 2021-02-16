@@ -104,7 +104,7 @@ where `file.md` is the one to be added. For more information on including files 
 ### Adding files to the user guide
 
 To add information in the guide, it is recommended to add markdown (`.md`) or MyST markdown files (`.myst`) to the `docs/guide/` directory.
-Remember to add any files you add to the `docs/guide/` directory to the guide TOC file {doc}`docs/source/guide/guide.myst` 
+Remember to add any files you add to the `docs/guide/` directory to the guide TOC file `docs/source/guide/guide.myst`.
 
 ### Adding code examples
 
