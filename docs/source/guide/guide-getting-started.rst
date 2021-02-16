@@ -273,6 +273,15 @@ whose representation in the presence of depolarizing noise can be obtained as fo
 
     0: ───X─── = 1.010*0: ───X───-0.003*0: ───X───X───-0.003*0: ───X───Y───-0.003*0: ───X───Z───
 
+.. note::
+
+    Note that we use the same ``noise_level`` in the call to
+    ``represent_operation_with_local_depolarizing_noise`` that we use for the
+    noisy simulator (i.e., in the ``execute`` function). For this method of getting
+    operation representations, it is important to provide a good estimate of
+    the noise level so the representations are faithful.
+
+
 The result above is an :class:`~mitiq.pec.types.types.OperationRepresentation` object which contains
 the information for representing the ideal operation X (left-hand-side of the printed output)
 as a linear combination of noisy operations (right-hand-side of the printed output). 
