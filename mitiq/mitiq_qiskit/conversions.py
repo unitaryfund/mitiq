@@ -242,8 +242,8 @@ def to_qiskit(
             provided, a single default register is used.
         cregs: Classical registers of the returned Qiskit circuit, provided
             that the original circuit has classical registers and
-            ``add_cregs_if_cannot_transform`` is True. If none are provided,
-             a single default register is used.
+            ``add_cregs_if_cannot_transform`` is True. If none are provided, a
+            single default register is used.
         add_cregs_if_cannot_transform: If True, the provided ``cregs`` are
             added to the circuit if there are no classical registers in the
             original ``circuit``.

@@ -89,11 +89,6 @@ def execute_with_pec(
             mean squared deviation of the sampled values from 'pec_value'.
             This is returned only if ``full_output`` is ``True``.
 
-    .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
-        "Error mitigation for short-depth quantum circuits,"
-        *Phys. Rev. Lett.* **119**, 180509 (2017),
-        (https://arxiv.org/abs/1612.02058).
-
     .. [Endo2018] : Suguru Endo, Simon C. Benjamin, Ying Li,
         "Practical Quantum Error Mitigation for Near-Future Applications"
         *Phys. Rev. **X 8**, 031027 (2018),

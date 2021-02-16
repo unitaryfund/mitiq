@@ -3,18 +3,19 @@
 *********************************************
 Zero Noise Extrapolation
 *********************************************
-Zero noise extrapolation has two main components: noise scaling and then extrapolation.
+
+Zero noise extrapolation has two main components: noise scaling and extrapolation.
 
 .. _guide_zne_folding:
 
-======================================
-Digital noise scaling: Unitary Folding
-======================================
-Zero noise extrapolation has two main components: noise scaling and then extrapolation.
+================================
+Noise scaling by unitary folding
+================================
+
 Unitary folding is a method for noise scaling that operates directly at the gate level.
-This makes it easy to use across platforms. It is especially appropriate when
-your underlying noise should scale with the depth and/or the number of gates in your
-quantum program. More details can be found in :cite:`Giurgica_Tiron_2020_arXiv`
+This makes it easy to use with current quantum computing libraries. It is especially
+appropriate when the underlying noise scales with the depth and/or the number
+of gates of a quantum program. More details can be found in :cite:`Giurgica_Tiron_2020_arXiv`
 where the unitary folding framework was introduced.
 
 At the gate level, noise is amplified by mapping gates (or groups of gates) `G` to
@@ -24,28 +25,28 @@ At the gate level, noise is amplified by mapping gates (or groups of gates) `G` 
 
 This makes the circuit longer (adding more noise) while keeping its effect unchanged (because
 :math:`G^\dagger = G^{-1}` for unitary gates).  We refer to this process as
-*unitary folding*. If `G` is a subset of the gates in a circuit, we call it `local folding`.
-If `G` is the entire circuit, we call it `global folding`.
+*unitary folding*. If :math:`G` is a subset of the gates in a circuit, we call it *local folding*.
+If :math:`G` is the entire circuit, we call it *global folding*.
 
-In ``mitiq``, folding functions input a circuit and a *scale factor* (or simply *scale*), i.e., a floating point value
-which corresponds to (approximately) how much the length of the circuit is scaled.
-The minimum scale factor is one (which corresponds to folding no gates). A scale factor of three corresponds to folding
-all gates locally. Scale factors beyond three begin to fold gates more than once.
+In Mitiq, folding functions input a circuit and a *scale factor*,
+i.e., a floating point value which corresponds to (approximately) how much the length
+of the circuit is scaled. The minimum scale factor is one (which corresponds to folding no gates).
+A scale factor of three corresponds to folding all gates locally. Scale factors beyond three
+begin to fold gates more than once.
 
 ---------------------
 Local folding methods
 ---------------------
 
-For local folding, there is a degree of freedom for which gates to fold first. The order in which gates are folded can
-have an important effect on how the noise is caled. As such, ``mititq`` defines several local folding methods.
+For local folding, there is a degree of freedom for which gates to fold first.
+The order in which gates are folded can have an important effect on how the noise is scaled.
+As such, Mitiq defines several local folding methods.
 
-We introduce three folding functions:
+    1. :func:`mitiq.zne.scaling.fold_gates_from_left`
+    2. :func:`mitiq.zne.scaling.fold_gates_from_right`
+    3. :func:`mitiq.zne.scaling.fold_gates_at_random`
 
-    1. ``mitiq.zne.scaling.fold_gates_from_left``
-    2. ``mitiq.zne.scaling.fold_gates_from_right``
-    3. ``mitiq.zne.scaling.fold_gates_at_random``
-
-The ``mitiq`` function ``fold_gates_from_left`` will fold gates from the left (or start) of the circuit
+The function ``fold_gates_from_left`` will fold gates from the left (or start) of the circuit
 until the desired scale factor is reached.
 
 
@@ -74,10 +75,10 @@ until the desired scale factor is reached.
 In this example, we see that the folded circuit has the first (Hadamard) gate folded.
 
 .. note::
-    ``mitiq`` folding functions do not modify the input circuit.
+    Mitiq folding functions do not modify the input circuit.
 
-Because input circuits are not modified, we can reuse this circuit for the next example. In the following code,
-we use the ``fold_gates_from_right`` function on the same input circuit.
+Because input circuits are not modified, we can reuse this circuit for the next example.
+In the following code, we use the ``fold_gates_from_right`` function on the same input circuit.
 
 .. doctest:: python
 
@@ -91,8 +92,8 @@ we use the ``fold_gates_from_right`` function on the same input circuit.
               │   │   │
     1: ───────X───X───X───
 
-We see the second (CNOT) gate in the circuit is folded, as expected when we start folding from the right (or end) of
-the circuit instead of the left (or start).
+We see the second (CNOT) gate in the circuit is folded, as expected when we start folding
+from the right (or end) of the circuit instead of the left (or start).
 
 Finally, we mention ``fold_gates_at_random`` which folds gates according to the following rules.
 
@@ -106,12 +107,12 @@ All of these local folding methods can be called with any ``scale_factor >= 1``.
 Any supported circuits can be folded
 ------------------------------------
 
-Any program types supported by ``mitiq`` can be folded, and the interface for all folding functions is the same. In the
-following example, we fold a Qiskit circuit.
+Any program types supported by Mitiq can be folded, and the interface for all folding
+functions is the same. In the following example, we fold a Qiskit circuit.
 
 .. note::
-    This example assumes you have Qiskit installed. ``mitiq`` can interface with Qiskit, but Qiskit is not
-    a core ``mitiq`` requirement and is not installed by default.
+    This example assumes you have Qiskit installed. Mitiq can interface with Qiskit,
+    but Qiskit is not a core Mitiq requirement and is not installed by default.
 
 .. doctest:: python
 
@@ -132,9 +133,6 @@ following example, we fold a Qiskit circuit.
                 └───┘
 
 
-This code (when the print statement is uncommented) should display something like:
-
-
 We can now fold this circuit as follows.
 
 .. doctest:: python
@@ -148,18 +146,21 @@ We can now fold this circuit as follows.
     q_1: ───────────────┤ X ├
                         └───┘
 
-By default, the folded circuit has the same type as the input circuit. To return an internal ``mitiq`` representation
-of the folded circuit (a Cirq circuit), one can use the keyword argument ``return_mitiq=True``.
+By default, the folded circuit has the same type as the input circuit.
+To return an internal Mitiq representation of the folded circuit (a Cirq circuit),
+one can use the keyword argument ``return_mitiq=True``.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Folding gates by fidelity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In local folding methods, gates can be folded according to custom fidelities by passing the keyword argument
-``fidelities`` into a local folding method. This argument should be a dictionary where each key is a string which
-specifies the gate and the value of the key is the fidelity of that gate. An example is shown below where we set the
-fidelity of all single qubit gates to be 1.0, meaning that these gates introduce no errors in the computation.
+In local folding methods, gates can be folded according to custom fidelities by
+passing the keyword argument ``fidelities`` into a local folding method. This
+argument should be a dictionary where each key is a string which specifies the
+gate and the value of the key is the fidelity of that gate. An example is shown
+below where we set the fidelity of all single qubit gates to be 1.0, meaning that
+these gates introduce no errors in the computation.
 
 .. doctest:: python
 
@@ -208,8 +209,8 @@ folding method. Fidelity values must be between zero and one.
 Global folding
 --------------
 
-As mentioned, global folding methods fold the entire circuit instead of individual gates. An example using the same Cirq
-circuit above is shown below.
+As mentioned, global folding methods fold the entire circuit instead of individual gates.
+An example using the same Cirq circuit above is shown below.
 
 
 .. doctest:: python
@@ -234,8 +235,9 @@ circuit above is shown below.
               │   │           │
     1: ───────X───X───────────X───
 
-Notice that this circuit is still logically equivalent to the input circuit, but the global folding strategy folds
-the entire circuit until the input scale factor is reached. As with local folding methods, global folding can be called
+Notice that this circuit is still logically equivalent to the input circuit,
+but the global folding strategy folds the entire circuit until the input scale
+factor is reached. As with local folding methods, global folding can be called
 with any ``scale_factor >= 3``.
 
 
@@ -243,8 +245,8 @@ with any ``scale_factor >= 3``.
 Custom folding methods
 ----------------------
 
-Custom folding methods can be defined and used with ``mitiq`` (e.g., with ``mitiq.execute_with_zne``. The signature
-of this function must be as follows.
+Custom folding methods can be defined and used with Mitiq (e.g., with ``mitiq.zne.execute_with_zne``).
+The signature of this function must be as follows.
 
 .. doctest:: python
 
@@ -258,11 +260,12 @@ of this function must be as follows.
 
 .. note::
 
-    The ``converter`` decorator makes it so ``my_custom_folding_function`` can be used with any supported circuit type,
-    not just Cirq circuits. The body of the ``my_custom_folding_function`` should assume the input circuit is a Cirq
-    circuit, however.
+    The ``converter`` decorator makes it so ``my_custom_folding_function``
+    can be used with any supported circuit type, not just Cirq circuits.
+    The body of the ``my_custom_folding_function`` should assume the input
+    circuit is a Cirq circuit, however.
 
-This function can then be used with ``mitiq.execute_with_zne`` as an option to scale the noise:
+This function can then be used with ``mitiq.zne.execute_with_zne`` as an option to scale the noise:
 
 .. doctest:: python
 
@@ -418,8 +421,8 @@ We can also specify the number of shots to use for each noise-scaled circuit.
    # Specify the number of shots for each scale factor.
    factory_with_shots = LinearFactory(scale_factors=[1.0, 2.0], shot_list=[100, 200])
 
-In this case the factory will pass the number of shots from the `shot_list` to the `executor`. Accordingly, the
-`executor` should support a `shots` keyword argument, otherwise the shot values will go unused.
+In this case the factory will pass the number of shots from the ``shot_list`` to the ``executor``. Accordingly, the
+``executor`` should support a ``shots`` keyword argument, otherwise the shot values will go unused.
 
 ------------------------------------------------------
 Using batched executors with :class:`.BatchedFactory`
@@ -550,8 +553,8 @@ Advanced usage of a factory
 
 .. note::
    This section can be safely skipped by all the readers who are interested
-   in a standard usage of ``mitiq``.
-   On the other hand, more experienced users and ``mitiq`` contributors
+   in a standard usage of Mitiq.
+   On the other hand, more experienced users and Mitiq contributors
    may find this content useful to understand how a factory object actually
    works at a deeper level.
 
@@ -742,7 +745,7 @@ Regression tools in :py:mod:`mitiq.zne.inference`
 
 In the body of the previous ``MyFactory`` example, we imported and used the :py:func:`.mitiq_polyfit` function.
 This is simply a wrap of :py:func:`numpy.polyfit`, slightly adapted to the notion and to the error types
-of ``mitiq``. This function can be used to fit a polynomial ansatz to the measured expectation values. This function performs
+of Mitiq. This function can be used to fit a polynomial ansatz to the measured expectation values. This function performs
 a least squares minimization which is **linear** (with respect to the coefficients) and therefore admits an algebraic solution.
 
 Similarly, from :py:mod:`mitiq.zne.inference` one can also import :py:func:`.mitiq_curve_fit`,

@@ -89,22 +89,23 @@ def mitiq_curve_fit(
     exp_values: Sequence[float],
     init_params: Optional[List[float]] = None,
 ) -> Tuple[List[float], np.ndarray]:
-    """This is a wrapping of the `scipy.optimize.curve_fit` function with
-    custom errors and warnings. It is used to make a non-linear fit.
+    """Fits the ansatz to the (scale factor, expectation value) data using
+    ``scipy.optimize.curve_fit``, returning the optimal parameters and
+    covariance matrix of the parameters.
 
     Args:
-        ansatz : The model function used for zero-noise extrapolation.
-            The first argument is the noise scale variable,
-            the remaining arguments are the parameters to fit.
+        ansatz: The model function used for zero-noise extrapolation. The first
+            argument is the noise scale variable, the remaining arguments are
+            the parameters to fit.
         scale_factors: The array of noise scale factors.
         exp_values: The array of expectation values.
-        init_params: Initial guess for the parameters.
-            If None, the initial values are set to 1.
+        init_params: Initial guess for the parameters. If None, the initial
+            values are set to 1.
 
     Returns:
-        opt_params: The array of optimal parameters.
-        params_cov: The covariance matrix of the parameters.
-            If ill conditioned, params_cov may contain np.inf elements.
+        The array of optimal parameters and the covariance matrix of the
+        parameters. If the fit is ill-conditioned, the covariance matrix may
+        contain np.inf elements.
 
     Raises:
         ExtrapolationError: If the extrapolation fit fails.
@@ -135,8 +136,9 @@ def mitiq_polyfit(
     deg: int,
     weights: Optional[Sequence[float]] = None,
 ) -> Tuple[List[float], Union[np.ndarray, None]]:
-    """This is a wrapping of the `numpy.polyfit` function with
-    custom warnings. It is used to make a polynomial fit.
+    """Fits the ansatz to the (scale factor, expectation value) data using
+    ``numpy.polyfit``, returning the optimal parameters and covariance matrix
+    of the parameters.
 
     Args:
         scale_factors: The array of noise scale factors.
@@ -146,14 +148,12 @@ def mitiq_polyfit(
             This is used to make a weighted least squares fit.
 
     Returns:
-        opt_params: The array of optimal parameters.
-        params_cov: The covariance matrix of the parameters.
-            If data is not enough to estimate the covariance matrix,
-            params_cov is returned as None.
+        The optimal parameters and covariance matrix of the parameters.
+        If there is not enough data to estimate the covariance matrix, it is
+        returned as None.
 
     Raises:
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
-
     """
 
     with warnings.catch_warnings(record=True) as warn_list:
@@ -765,7 +765,6 @@ class PolyFactory(BatchedFactory):
 
     Note:
         RichardsonFactory and LinearFactory are special cases of PolyFactory.
-
     """
 
     def __init__(
@@ -810,26 +809,20 @@ class PolyFactory(BatchedFactory):
                 extrapolated limit is returned too.
 
         Returns:
-            zne_limit: The extrapolated zero-noise limit. If "full_output"
-                is False (default value), only this parameter is returned.
-            zne_error: The error associated to the extrapolated zero-noise
-                limit deduced from the covariance matrix "params_cov".
-            opt_params: The parameter array of the best fitting model.
-            params_cov: The parameter covariance matrix of the best fitting
-                model.
-            zne_curve: The callable function which best fit the input data.
-                It maps a real noise scale factor to a real expectation value.
-                It is equal "zne_limit" when evaluated at zero.
+            The extrapolated zero-noise limit. If full_output is True, also
+            returns
+            * standard deviation of the extrapolated zero-noise limit,
+            * optimal parameters of the best-fit model,
+            * parameter covariance matrix of best-fit model,
+            * best-fit model as a Callable[[float], float] function.
 
         Raises:
             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
 
         Note:
-            This method computes the zero-noise limit only from the information
-            contained in the input arguments. To extrapolate from the internal
-            data of an instantiated Factory object, the bound method
-            ".reduce()" should be called instead.
-
+            This static method computes the zero-noise limit from input
+            parameters. To compute the zero-noise limit from the Factory
+            parameters, use the ``reduce`` method.
         """
 
         opt_params, params_cov = mitiq_polyfit(
@@ -899,26 +892,22 @@ class RichardsonFactory(BatchedFactory):
             exp_values: The array of expectation values.
             full_output: If False (default), only the zero-noise limit is
                 returned. If True, additional results are returned too.
+
         Returns:
-            zne_limit: The extrapolated zero-noise limit. If "full_output"
-                is False (default value), only this parameter is returned.
-            zne_error: The error associated to the extrapolated zero-noise
-                limit deduced from the covariance matrix "params_cov".
-            opt_params: The parameter array of the best fitting model.
-            params_cov: The parameter covariance matrix of the best fitting
-                model.
-            zne_curve: The callable function which best fit the input data.
-                It maps a real noise scale factor to a real expectation value.
-                It is equal "zne_limit" when evaluated at zero.
+            The extrapolated zero-noise limit. If full_output is True, also
+            returns
+            * standard deviation of the extrapolated zero-noise limit,
+            * optimal parameters of the best-fit model,
+            * parameter covariance matrix of best-fit model,
+            * best-fit model as a Callable[[float], float] function.
 
         Raises:
             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
 
-         Note:
-             This method computes the zero-noise limit only from the
-             information contained in the input arguments. To extrapolate from
-             the internal data of an instantiated Factory object, the bound
-             method ".reduce()" should be called instead.
+        Note:
+            This static method computes the zero-noise limit from input
+            parameters. To compute the zero-noise limit from the Factory
+            parameters, use the ``reduce`` method.
         """
         # Richardson extrapolation is a particular case of a polynomial fit
         # with order equal to the number of data points minus 1.
@@ -1063,9 +1052,11 @@ class LinearFactory(BatchedFactory):
                    argument is explicitly passed to the factory, it must have
                    the same length of scale_factors and the executor function
                    must accept "shots" as a valid keyword argument.
+
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
+
     Example:
         >>> NOISE_LEVELS = [1.0, 2.0, 3.0]
         >>> fac = LinearFactory(NOISE_LEVELS)
@@ -1094,26 +1085,22 @@ class LinearFactory(BatchedFactory):
             exp_values: The array of expectation values.
             full_output: If False (default), only the zero-noise limit is
                 returned. If True, additional results are returned too.
+
         Returns:
-            zne_limit: The extrapolated zero-noise limit. If "full_output"
-                is False (default value), only this parameter is returned.
-            zne_error: The error associated to the extrapolated zero-noise
-                limit deduced from the covariance matrix "params_cov".
-            opt_params: The parameter array of the best fitting model.
-            params_cov: The parameter covariance matrix of the best fitting
-                model.
-            zne_curve: The callable function which best fit the input data.
-                It maps a real noise scale factor to a real expectation value.
-                It is equal "zne_limit" when evaluated at zero.
+            The extrapolated zero-noise limit. If full_output is True, also
+            returns
+            * standard deviation of the extrapolated zero-noise limit,
+            * optimal parameters of the best-fit model,
+            * parameter covariance matrix of best-fit model,
+            * best-fit model as a Callable[[float], float] function.
 
         Raises:
             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
 
         Note:
-            This method computes the zero-noise limit only from the information
-            contained in the input arguments. To extrapolate from the internal
-            data of an instantiated Factory object, the bound method
-            ".reduce()" should be called instead.
+            This static method computes the zero-noise limit from input
+            parameters. To compute the zero-noise limit from the Factory
+            parameters, use the ``reduce`` method.
         """
         # Linear extrapolation is equivalent to a polynomial fit with order=1
         return PolyFactory.extrapolate(
@@ -1211,16 +1198,12 @@ class ExpFactory(BatchedFactory):
                 extrapolated limit is returned too.
 
         Returns:
-            zne_limit: The extrapolated zero-noise limit. If "full_output"
-                is False (default value), only this parameter is returned.
-            zne_error: The error associated to the extrapolated zero-noise
-                limit deduced from the covariance matrix "params_cov".
-            opt_params: The parameter array of the best fitting model.
-            params_cov: The parameter covariance matrix of the best fitting
-                model.
-            zne_curve: The callable function which best fit the input data.
-                It maps a real noise scale factor to a real expectation value.
-                It is equal "zne_limit" when evaluated at zero.
+            The extrapolated zero-noise limit. If full_output is True, also
+            returns
+            * standard deviation of the extrapolated zero-noise limit,
+            * optimal parameters of the best-fit model,
+            * parameter covariance matrix of best-fit model,
+            * best-fit model as a Callable[[float], float] function.
 
         Raises:
             ValueError: If the arguments are not consistent with the
@@ -1229,10 +1212,9 @@ class ExpFactory(BatchedFactory):
             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
 
         Note:
-            This method computes the zero-noise limit only from the information
-            contained in the input arguments. To extrapolate from the internal
-            data of an instantiated Factory object, the bound method
-            ".reduce()" should be called instead.
+            This static method computes the zero-noise limit from input
+            parameters. To compute the zero-noise limit from the Factory
+            parameters, use the ``reduce`` method.
         """
         return PolyExpFactory.extrapolate(
             scale_factors,
@@ -1382,16 +1364,12 @@ class PolyExpFactory(BatchedFactory):
                 extrapolated limit is returned too.
 
         Returns:
-            zne_limit: The extrapolated zero-noise limit. If "full_output"
-                is False (default value), only this parameter is returned.
-            zne_error: The error associated to the extrapolated zero-noise
-                limit deduced from the covariance matrix "params_cov".
-            opt_params: The parameter array of the best fitting model.
-            params_cov: The parameter covariance matrix of the best fitting
-                model.
-            zne_curve: The callable function which best fit the input data.
-                It maps a real noise scale factor to a real expectation value.
-                It is equal "zne_limit" when evaluated at zero.
+            The extrapolated zero-noise limit. If full_output is True, also
+            returns
+            * standard deviation of the extrapolated zero-noise limit,
+            * optimal parameters of the best-fit model,
+            * parameter covariance matrix of best-fit model,
+            * best-fit model as a Callable[[float], float] function.
 
         Raises:
             ValueError: If the arguments are not consistent with the
@@ -1400,10 +1378,9 @@ class PolyExpFactory(BatchedFactory):
             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
 
         Note:
-            This method computes the zero-noise limit only from the information
-            contained in the input arguments. To extrapolate from the internal
-            data of an instantiated Factory object, the bound method
-            ".reduce()" should be called instead.
+            This static method computes the zero-noise limit from input
+            parameters. To compute the zero-noise limit from the Factory
+            parameters, use the ``reduce`` method.
         """
 
         # Shift is 0 if asymptote is given, 1 if asymptote is not given
@@ -1719,16 +1696,12 @@ class AdaExpFactory(AdaptiveFactory):
                 returned. If True, additional results are returned too.
 
         Returns:
-            zne_limit: The extrapolated zero-noise limit. If "full_output"
-                is False (default value), only this parameter is returned.
-            zne_error: The standard deviation of the extrapolated zero-noise
-                limit deduced from the covariance matrix "params_cov".
-            opt_params: The parameter array of the best fitting model.
-            params_cov: The parameter covariance matrix of the best fitting
-                model.
-            zne_curve: The callable function which best fit the input data.
-                It maps a real noise scale factor to a real expectation value.
-                It is equal "zne_limit" when evaluated at zero.
+            The extrapolated zero-noise limit. If full_output is True, also
+            returns
+            * standard deviation of the extrapolated zero-noise limit,
+            * optimal parameters of the best-fit model,
+            * parameter covariance matrix of best-fit model,
+            * best-fit model as a Callable[[float], float] function.
 
         Raises:
             ValueError: If the arguments are not consistent with the
@@ -1737,10 +1710,9 @@ class AdaExpFactory(AdaptiveFactory):
             ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
 
         Note:
-            This method computes the zero-noise limit only from the information
-            contained in the input arguments. To extrapolate from the internal
-            data of an instantiated Factory object, the bound method
-            ".reduce()" should be called instead.
+            This static method computes the zero-noise limit from input
+            parameters. To compute the zero-noise limit from the Factory
+            parameters, use the ``reduce`` method.
         """
         return ExpFactory.extrapolate(
             scale_factors,
