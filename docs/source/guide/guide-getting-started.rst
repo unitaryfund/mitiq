@@ -92,8 +92,8 @@ error-mitigated version.
 
     from mitiq.zne import mitigate_executor
 
-    execute = mitigate_executor(executor)
-    mitigated_result = execute(circuit)
+    mitigated_executor = mitigate_executor(executor)
+    mitigated_result = mitigated_executor(circuit)
     print(round(mitigated_result, 5))
 
 .. testoutput::
