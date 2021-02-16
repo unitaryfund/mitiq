@@ -1,6 +1,6 @@
 # third-party integration
 pyquil~=2.18.0
-qiskit~=0.23.0
+qiskit~=0.23.1
 
 # to test the code
 pytest~=5.4.1
