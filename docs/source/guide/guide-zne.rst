@@ -28,7 +28,7 @@ This makes the circuit longer (adding more noise) while keeping its effect uncha
 *unitary folding*. If :math:`G` is a subset of the gates in a circuit, we call it *local folding*.
 If :math:`G` is the entire circuit, we call it *global folding*.
 
-In Mitiq, folding functions input a circuit and a *scale factor* (or simply *scale*),
+In Mitiq, folding functions input a circuit and a *scale factor*,
 i.e., a floating point value which corresponds to (approximately) how much the length
 of the circuit is scaled. The minimum scale factor is one (which corresponds to folding no gates).
 A scale factor of three corresponds to folding all gates locally. Scale factors beyond three
