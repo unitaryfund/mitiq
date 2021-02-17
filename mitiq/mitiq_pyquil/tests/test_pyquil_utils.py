@@ -25,7 +25,7 @@ from mitiq.mitiq_pyquil.pyquil_utils import (
 QVM = get_qc("2q-qvm")
 
 
-def test_ground_state_executor():
+def test_ground_state_executor() -> None:
     executor = generate_qcs_executor(QVM, ground_state_expectation)
     program = Program(X(0))
     assert 0.0 == executor(program)

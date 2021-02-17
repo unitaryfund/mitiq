@@ -39,7 +39,7 @@ _LARGE_SAMPLE_WARN = (
 
 def execute_with_pec(
     circuit: QPROGRAM,
-    executor: Callable,
+    executor: Callable[[QPROGRAM], float],
     representations: List[OperationRepresentation],
     precision: float = 0.03,
     num_samples: Optional[int] = None,

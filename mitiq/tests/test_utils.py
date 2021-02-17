@@ -15,6 +15,7 @@
 
 """Tests for utility functions."""
 from copy import deepcopy
+from cirq.ops.eigen_gate import EigenGate
 import pytest
 
 import numpy as np
@@ -47,7 +48,7 @@ from mitiq.utils import (
 
 
 @pytest.mark.parametrize("require_qubit_equality", [True, False])
-def test_circuit_equality_identical_qubits(require_qubit_equality):
+def test_circuit_equality_identical_qubits(require_qubit_equality: bool) -> None:
     qreg = cirq.NamedQubit.range(5, prefix="q_")
     circA = cirq.Circuit(cirq.ops.H.on_each(*qreg))
     circB = cirq.Circuit(cirq.ops.H.on_each(*qreg))
@@ -57,8 +58,8 @@ def test_circuit_equality_identical_qubits(require_qubit_equality):
 
 @pytest.mark.parametrize("require_qubit_equality", [True, False])
 def test_circuit_equality_nonidentical_but_equal_qubits(
-    require_qubit_equality,
-):
+    require_qubit_equality: bool,
+) -> None:
     n = 5
     qregA = cirq.NamedQubit.range(n, prefix="q_")
     qregB = cirq.NamedQubit.range(n, prefix="q_")
@@ -68,7 +69,7 @@ def test_circuit_equality_nonidentical_but_equal_qubits(
     assert _equal(circA, circB, require_qubit_equality=require_qubit_equality)
 
 
-def test_circuit_equality_linequbit_gridqubit_equal_indices():
+def test_circuit_equality_linequbit_gridqubit_equal_indices() -> None:
     n = 10
     qregA = cirq.LineQubit.range(n)
     qregB = [cirq.GridQubit(x, 0) for x in range(n)]
@@ -78,7 +79,7 @@ def test_circuit_equality_linequbit_gridqubit_equal_indices():
     assert not _equal(circA, circB, require_qubit_equality=True)
 
 
-def test_circuit_equality_linequbit_gridqubit_unequal_indices():
+def test_circuit_equality_linequbit_gridqubit_unequal_indices() -> None:
     n = 10
     qregA = cirq.LineQubit.range(n)
     qregB = [cirq.GridQubit(x + 3, 0) for x in range(n)]
@@ -88,7 +89,7 @@ def test_circuit_equality_linequbit_gridqubit_unequal_indices():
     assert not _equal(circA, circB, require_qubit_equality=True)
 
 
-def test_circuit_equality_linequbit_namedqubit_equal_indices():
+def test_circuit_equality_linequbit_namedqubit_equal_indices() -> None:
     n = 8
     qregA = cirq.LineQubit.range(n)
     qregB = cirq.NamedQubit.range(n, prefix="q_")
@@ -98,7 +99,7 @@ def test_circuit_equality_linequbit_namedqubit_equal_indices():
     assert not _equal(circA, circB, require_qubit_equality=True)
 
 
-def test_circuit_equality_linequbit_namedqubit_unequal_indices():
+def test_circuit_equality_linequbit_namedqubit_unequal_indices() -> None:
     n = 11
     qregA = cirq.LineQubit.range(n)
     qregB = [cirq.NamedQubit(str(x + 10)) for x in range(n)]
@@ -108,7 +109,7 @@ def test_circuit_equality_linequbit_namedqubit_unequal_indices():
     assert not _equal(circA, circB, require_qubit_equality=True)
 
 
-def test_circuit_equality_gridqubit_namedqubit_equal_indices():
+def test_circuit_equality_gridqubit_namedqubit_equal_indices() -> None:
     n = 8
     qregA = [cirq.GridQubit(0, x) for x in range(n)]
     qregB = cirq.NamedQubit.range(n, prefix="q_")
@@ -118,7 +119,7 @@ def test_circuit_equality_gridqubit_namedqubit_equal_indices():
     assert not _equal(circA, circB, require_qubit_equality=True)
 
 
-def test_circuit_equality_gridqubit_namedqubit_unequal_indices():
+def test_circuit_equality_gridqubit_namedqubit_unequal_indices() -> None:
     n = 5
     qregA = [cirq.GridQubit(x + 2, 0) for x in range(n)]
     qregB = [cirq.NamedQubit(str(x + 10)) for x in range(n)]
@@ -128,7 +129,7 @@ def test_circuit_equality_gridqubit_namedqubit_unequal_indices():
     assert not _equal(circA, circB, require_qubit_equality=True)
 
 
-def test_circuit_equality_unequal_measurement_keys_terminal_measurements():
+def test_circuit_equality_unequal_measurement_keys_terminal_measurements() -> None:
     base_circuit = cirq.testing.random_circuit(
         qubits=5, n_moments=10, op_density=0.99, random_state=1
     )
@@ -146,8 +147,8 @@ def test_circuit_equality_unequal_measurement_keys_terminal_measurements():
 
 @pytest.mark.parametrize("require_measurement_equality", [True, False])
 def test_circuit_equality_equal_measurement_keys_terminal_measurements(
-    require_measurement_equality,
-):
+    require_measurement_equality: bool,
+) -> None:
     base_circuit = cirq.testing.random_circuit(
         qubits=5, n_moments=10, op_density=0.99, random_state=1
     )
@@ -164,7 +165,7 @@ def test_circuit_equality_equal_measurement_keys_terminal_measurements(
     )
 
 
-def test_circuit_equality_unequal_measurement_keys_nonterminal_measurements():
+def test_circuit_equality_unequal_measurement_keys_nonterminal_measurements() -> None:
     base_circuit = cirq.testing.random_circuit(
         qubits=5, n_moments=10, op_density=0.99, random_state=1
     )
@@ -187,8 +188,8 @@ def test_circuit_equality_unequal_measurement_keys_nonterminal_measurements():
 
 @pytest.mark.parametrize("require_measurement_equality", [True, False])
 def test_circuit_equality_equal_measurement_keys_nonterminal_measurements(
-    require_measurement_equality,
-):
+    require_measurement_equality: bool,
+) -> None:
     base_circuit = cirq.testing.random_circuit(
         qubits=5, n_moments=10, op_density=0.99, random_state=1
     )
@@ -211,7 +212,7 @@ def test_circuit_equality_equal_measurement_keys_nonterminal_measurements(
 
 
 @pytest.mark.parametrize("gate", [X ** 3, Y ** -3, Z ** -1, H ** -1])
-def test_simplify_gate_exponent(gate):
+def test_simplify_gate_exponent(gate: EigenGate) -> None:
     # Check exponent is simplified to 1
     assert _simplify_gate_exponent(gate).exponent == 1
     # Check simplified gate is equivalent to the input
@@ -219,12 +220,12 @@ def test_simplify_gate_exponent(gate):
 
 
 @pytest.mark.parametrize("gate", [T ** -1, S ** -1, MeasurementGate(1)])
-def test_simplify_gate_exponent_with_gates_that_cannot_be_simplified(gate):
+def test_simplify_gate_exponent_with_gates_that_cannot_be_simplified(gate: EigenGate) -> None:
     # Check the gate is not simplified (same representation)
     assert _simplify_gate_exponent(gate).__repr__() == gate.__repr__()
 
 
-def test_simplify_circuit_exponents_controlled_gate():
+def test_simplify_circuit_exponents_controlled_gate() -> None:
     circuit = Circuit(
         ControlledGate(CNOT, num_controls=1).on(*LineQubit.range(3))
     )
@@ -234,7 +235,7 @@ def test_simplify_circuit_exponents_controlled_gate():
     assert _equal(circuit, copy)
 
 
-def test_simplify_circuit_exponents():
+def test_simplify_circuit_exponents() -> None:
     qreg = LineQubit.range(2)
     circuit = Circuit([H.on(qreg[0]), CNOT.on(*qreg), Z.on(qreg[1])])
 
@@ -265,7 +266,7 @@ def test_simplify_circuit_exponents():
     assert simplified_qasm == expected_qasm
 
 
-def test_simplify_circuit_exponents_with_non_self_inverse_gates():
+def test_simplify_circuit_exponents_with_non_self_inverse_gates() -> None:
     qreg = LineQubit.range(2)
     # Make a circuit with gates which are not self-inverse
     circuit = Circuit([S.on(qreg[0]), T.on(qreg[1])])
@@ -284,7 +285,7 @@ def test_simplify_circuit_exponents_with_non_self_inverse_gates():
     assert simplified_qasm == inverse_qasm
 
 
-def test_are_close_dict():
+def test_are_close_dict() -> None:
     """Tests the _are_close_dict function."""
     dict1 = {"a": 1, "b": 0.0}
     dict2 = {"a": 1, "b": 0.0 + 1.0e-10}
@@ -304,7 +305,7 @@ def test_are_close_dict():
     assert not _are_close_dict(dict2, dict1)
 
 
-def test_max_ent_state_circuit():
+def test_max_ent_state_circuit() -> None:
     """Tests 1-qubit and 2-qubit maximally entangled states are generated."""
     two_state = np.array([1, 0, 0, 1]) / np.sqrt(2)
     four_state = np.array(3 * [1, 0, 0, 0, 0] + [1]) / 2.0
@@ -316,7 +317,7 @@ def test_max_ent_state_circuit():
     )
 
 
-def test_circuit_to_choi_and_operation_to_choi():
+def test_circuit_to_choi_and_operation_to_choi() -> None:
     """Tests the Choi matrix of a depolarizing channel is recovered."""
     # Define first the expected result
     base_noise = 0.01

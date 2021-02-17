@@ -25,7 +25,7 @@ from mitiq.pec.utils import (
 )
 
 
-def test_max_ent_state_circuit():
+def test_max_ent_state_circuit() -> None:
     """Tests 1-qubit and 2-qubit maximally entangled states are generated."""
     two_state = np.array([1, 0, 0, 1]) / np.sqrt(2)
     four_state = np.array(3 * [1, 0, 0, 0, 0] + [1]) / 2.0
@@ -37,7 +37,7 @@ def test_max_ent_state_circuit():
     )
 
 
-def test_max_ent_state_circuit_error():
+def test_max_ent_state_circuit_error() -> None:
     """Tests an error is raised if the argument num_qubits is not valid."""
     for num_qubits in [0, 1, 3, 5, 2.0]:
         with raises(ValueError, match="The argument 'num_qubits' must"):
@@ -47,7 +47,7 @@ def test_max_ent_state_circuit_error():
         assert _max_ent_state_circuit(num_qubits)
 
 
-def test_operation_to_choi():
+def test_operation_to_choi() -> None:
     """Tests the Choi matrix of a depolarizing channel is recovered."""
     # Define first the expected result
     base_noise = 0.01
@@ -72,7 +72,7 @@ def test_operation_to_choi():
     assert np.allclose(choi_twice, _operation_to_choi(noisy_sequence))
 
 
-def test_circuit_to_choi():
+def test_circuit_to_choi() -> None:
     """Tests _circuit_to_choi is consistent with _operation_to_choi."""
     base_noise = 0.01
     q = LineQubit(0)

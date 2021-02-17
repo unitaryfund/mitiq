@@ -15,12 +15,14 @@
 
 """Unit tests for random circuits and projectors."""
 from itertools import product
+from typing import Callable
+from mitiq import QPROGRAM
 import pytest
 
 import numpy as np
 
 from mitiq.zne.inference import (
-    LinearFactory,
+    Factory, LinearFactory,
     RichardsonFactory,
     PolyFactory,
     ExpFactory,
@@ -39,7 +41,7 @@ SEED = 808
 
 
 # Make fold_gates_at_random deterministic
-def fold_gates_at_random_seeded(circuit, scale_factor):
+def fold_gates_at_random_seeded(circuit: QPROGRAM, scale_factor: Callable) -> QPROGRAM:
     return fold_gates_at_random(circuit, scale_factor, seed=SEED)
 
 
@@ -62,7 +64,7 @@ FACTORIES = [
 @pytest.mark.parametrize(
     ["scale_noise", "fac"], product(SCALE_FUNCTIONS, FACTORIES)
 )
-def test_random_benchmarks(scale_noise, fac):
+def test_random_benchmarks(scale_noise: Callable, fac: Factory):
     exact, unmitigated, mitigated = rand_circuit_zne(
         n_qubits=2,
         depth=20,
@@ -81,12 +83,12 @@ def test_random_benchmarks(scale_noise, fac):
 
 
 @pytest.mark.parametrize("n_qubits", [0, 1, 2, 3])
-def test_random_projector(n_qubits):
+def test_random_projector(n_qubits: int) -> None:
     BASIS = np.eye(2 ** n_qubits)
     assert sample_projector(n_qubits) in BASIS
 
 
-def test_random_projector_seeding():
+def test_random_projector_seeding() -> None:
     # test seeding with an integer
     first_sample = sample_projector(6, seed=SEED)
     second_sample = sample_projector(6, seed=SEED)

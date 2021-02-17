@@ -87,6 +87,8 @@ jobs:
         run: |
           docker run --rm -idt -p 5000:5000 rigetti/qvm -S
           docker run --rm -idt -p 5555:5555 rigetti/quilc -R
+      - name: Run the type checker
+        run: make check-types
       - name: Run all the unit tests & generate coverage report with pytest
         run: make test-all
       - name: Submit coverage report to Codecov
