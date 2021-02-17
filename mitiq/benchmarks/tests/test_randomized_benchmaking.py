@@ -14,13 +14,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tests for randomized benchmarking with zero-noise extrapolation."""
+from typing import Callable, List
+from cirq.circuits.circuit import Circuit
 import pytest
 from itertools import product
 import numpy as np
 
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 from mitiq.zne.inference import (
-    LinearFactory,
+    Factory, LinearFactory,
     RichardsonFactory,
     PolyFactory,
     ExpFactory,
@@ -52,7 +54,7 @@ FACTORIES = [
 
 
 @pytest.mark.parametrize("n_qubits", (1, 2))
-def test_rb_circuits(n_qubits):
+def test_rb_circuits(n_qubits: int) -> None:
     depth = 10
 
     # test single qubit RB
@@ -70,13 +72,13 @@ def test_rb_circuits(n_qubits):
 @pytest.mark.parametrize(
     ["scale_noise", "fac"], product(SCALE_FUNCTIONS, FACTORIES)
 )
-def test_random_benchmarks(scale_noise, fac):
+def test_random_benchmarks(scale_noise: Callable, fac: Factory) -> None:
     trials = 3
     circuits = generate_rb_circuits(n_qubits=2, num_cliffords=4, trials=trials)
     noise = 0.01
     obs = np.diag([1, 0, 0, 0])
 
-    def executor(qc):
+    def executor(qc: List[Circuit]) -> float:
         return noisy_simulation(qc, noise=noise, obs=obs)
 
     mit_executor = mitigate_executor(executor, fac, scale_noise)

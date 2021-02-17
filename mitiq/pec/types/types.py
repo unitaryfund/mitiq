@@ -183,7 +183,7 @@ class NoisyOperation:
 
     @staticmethod
     def from_noise_model(
-        ideal: cirq.CIRCUIT_LIKE, noise_model
+        ideal: cirq.CIRCUIT_LIKE, noise_model: Any
     ) -> "NoisyOperation":
         raise NotImplementedError
 
@@ -314,7 +314,7 @@ class NoisyBasis:
             qubits.update(set(noisy_op.qubits))
         return qubits
 
-    def add(self, *basis_elements) -> None:
+    def add(self, *basis_elements: Sequence[NoisyOperation]) -> None:
         """Add elements to the NoisyBasis.
 
         Args:

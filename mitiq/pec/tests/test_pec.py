@@ -16,7 +16,8 @@
 """Unit tests for PEC."""
 
 from itertools import product
-from typing import List, Optional
+from typing import Callable, List, Optional
+from cirq.circuits.circuit import Circuit
 from functools import partial
 import pytest
 
@@ -93,7 +94,7 @@ def serial_executor(circuit: QPROGRAM, noise: float = BASE_NOISE) -> float:
     return noisy_simulation(circuit, noise, obs)
 
 
-def batched_executor(circuits) -> np.ndarray:
+def batched_executor(circuits: np.array[QPROGRAM]) -> np.ndarray:
     return np.array([serial_executor(circuit) for circuit in circuits])
 
 
@@ -101,7 +102,7 @@ def noiseless_serial_executor(circuit: QPROGRAM) -> float:
     return serial_executor(circuit, noise=0.0)
 
 
-def fake_executor(circuit: cirq.Circuit, random_state: np.random.RandomState):
+def fake_executor(circuit: cirq.Circuit, random_state: np.random.RandomState) -> float:
     """A fake executor which just samples from a normal distribution."""
     return random_state.randn()
 
@@ -112,7 +113,7 @@ oneq_circ = cirq.Circuit(cirq.Z.on(q0), cirq.Z.on(q0))
 twoq_circ = cirq.Circuit(cirq.Y.on(q1), cirq.CNOT.on(q0, q1), cirq.Y.on(q1))
 
 
-def test_execute_with_pec_cirq_trivial_decomposition():
+def test_execute_with_pec_cirq_trivial_decomposition() -> None:
     circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
     rep = OperationRepresentation(
         circuit, basis_expansion={NoisyOperation(circuit): 1.0}
@@ -131,7 +132,7 @@ def test_execute_with_pec_cirq_trivial_decomposition():
     assert np.isclose(unmitigated, mitigated)
 
 
-def test_execute_with_pec_pyquil_trivial_decomposition():
+def test_execute_with_pec_pyquil_trivial_decomposition() -> None:
     circuit = pyquil.Program(pyquil.gates.H(0))
     rep = OperationRepresentation(
         circuit, basis_expansion={NoisyOperation(circuit): 1.0}
@@ -150,7 +151,7 @@ def test_execute_with_pec_pyquil_trivial_decomposition():
     assert np.isclose(unmitigated, mitigated)
 
 
-def test_execute_with_pec_qiskit_trivial_decomposition():
+def test_execute_with_pec_qiskit_trivial_decomposition() -> None:
     qreg = qiskit.QuantumRegister(1)
     circuit = qiskit.QuantumCircuit(qreg)
     _ = circuit.x(qreg)
@@ -172,7 +173,7 @@ def test_execute_with_pec_qiskit_trivial_decomposition():
 
 
 @pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
-def test_execute_with_pec_cirq_noiseless_decomposition(circuit):
+def test_execute_with_pec_cirq_noiseless_decomposition(circuit: QPROGRAM) -> None:
     unmitigated = noiseless_serial_executor(circuit)
 
     mitigated = execute_with_pec(
@@ -188,7 +189,7 @@ def test_execute_with_pec_cirq_noiseless_decomposition(circuit):
 
 
 @pytest.mark.parametrize("nqubits", [1, 2, 5])
-def test_pyquil_noiseless_decomposition_multiqubit(nqubits):
+def test_pyquil_noiseless_decomposition_multiqubit(nqubits: int) -> None:
     circuit = pyquil.Program(pyquil.gates.H(q) for q in range(nqubits))
 
     # Decompose H(q) for each qubit q into Paulis.
@@ -216,7 +217,7 @@ def test_pyquil_noiseless_decomposition_multiqubit(nqubits):
 
 @pytest.mark.skip(reason="Slow test.")
 @pytest.mark.parametrize("nqubits", [1, 2])
-def test_qiskit_noiseless_decomposition_multiqubit(nqubits):
+def test_qiskit_noiseless_decomposition_multiqubit(nqubits: int) -> None:
     qreg = [qiskit.QuantumRegister(1) for _ in range(nqubits)]
     circuit = qiskit.QuantumCircuit(*qreg)
     for q in qreg:
@@ -257,7 +258,7 @@ def test_qiskit_noiseless_decomposition_multiqubit(nqubits):
 @pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
 @pytest.mark.parametrize("executor", [serial_executor, batched_executor])
 @pytest.mark.parametrize("circuit_type", ["cirq", "qiskit", "pyquil"])
-def test_execute_with_pec_mitigates_noise(circuit, executor, circuit_type):
+def test_execute_with_pec_mitigates_noise(circuit: QPROGRAM, executor: Callable[[QPROGRAM], float], circuit_type: str) -> None:
     """Tests that execute_with_pec mitigates the error of a noisy
     expectation value.
     """
@@ -294,7 +295,7 @@ def test_execute_with_pec_mitigates_noise(circuit, executor, circuit_type):
 
 @pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
 @pytest.mark.parametrize("seed", (2, 3))
-def test_execute_with_pec_with_different_samples(circuit, seed):
+def test_execute_with_pec_with_different_samples(circuit: Circuit, seed: int) -> None:
     """Tests that, on average, the error decreases as the number of samples is
     increased.
     """
@@ -324,7 +325,7 @@ def test_execute_with_pec_with_different_samples(circuit, seed):
 
 
 @pytest.mark.parametrize("num_samples", [100, 1000])
-def test_execute_with_pec_error_scaling(num_samples: int):
+def test_execute_with_pec_error_scaling(num_samples: int) -> None:
     """Tests that the error associated to the PEC value scales as
     1/sqrt(num_samples).
     """
@@ -342,7 +343,7 @@ def test_execute_with_pec_error_scaling(num_samples: int):
 
 
 @pytest.mark.parametrize("precision", [0.1, 0.05])
-def test_precision_option_in_execute_with_pec(precision: float):
+def test_precision_option_in_execute_with_pec(precision: float) -> None:
     """Tests that the 'precision' argument is used to deduce num_samples."""
     # For a noiseless circuit we expect num_samples = 1/precision^2:
     _, pec_data = execute_with_pec(
@@ -372,7 +373,7 @@ def test_precision_option_in_execute_with_pec(precision: float):
 
 
 @pytest.mark.parametrize("bad_value", (0, -1, 2))
-def test_bad_precision_argument(bad_value: float):
+def test_bad_precision_argument(bad_value: float) -> None:
     """Tests that if 'precision' is not within (0, 1] an error is raised."""
     with pytest.raises(ValueError, match="The value of 'precision' should"):
         execute_with_pec(
@@ -384,7 +385,7 @@ def test_bad_precision_argument(bad_value: float):
 
 
 @pytest.mark.skip(reason="Slow test.")
-def test_large_sample_size_warning():
+def test_large_sample_size_warning() -> None:
     """Tests whether a warning is raised when PEC sample size
     is greater than 10 ** 5.
     """
@@ -399,7 +400,7 @@ def test_large_sample_size_warning():
         )
 
 
-def test_pec_data_with_full_output():
+def test_pec_data_with_full_output() -> None:
     """Tests that execute_with_pec mitigates the error of a noisy
     expectation value.
     """

@@ -35,7 +35,7 @@ from mitiq.pec.representations import (
 from mitiq.pec.utils import _operation_to_choi, _circuit_to_choi
 
 
-def test_sample_sequence_cirq():
+def test_sample_sequence_cirq() -> None:
     circuit = cirq.Circuit(cirq.H(cirq.LineQubit(0)))
 
     circuit.append(cirq.measure(cirq.LineQubit(0)))
@@ -55,7 +55,7 @@ def test_sample_sequence_cirq():
         assert norm == 1.0
 
 
-def test_sample_sequence_qiskit():
+def test_sample_sequence_qiskit() -> None:
     qreg = qiskit.QuantumRegister(1)
     circuit = qiskit.QuantumCircuit(qreg)
     _ = circuit.h(qreg)
@@ -80,7 +80,7 @@ def test_sample_sequence_qiskit():
         assert norm == 1.0
 
 
-def test_sample_sequence_pyquil():
+def test_sample_sequence_pyquil() -> None:
     circuit = pyquil.Program(pyquil.gates.H(0))
 
     noisy_xop = NoisyOperation(pyquil.Program(pyquil.gates.X(0)))
@@ -98,7 +98,7 @@ def test_sample_sequence_pyquil():
 
 
 @pytest.mark.parametrize("seed", (1, 2, 3, 5))
-def test_sample_sequence_cirq_random_state(seed):
+def test_sample_sequence_cirq_random_state(seed: int) -> None:
     circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
     rep = OperationRepresentation(
         ideal=circuit,
@@ -122,7 +122,7 @@ def test_sample_sequence_cirq_random_state(seed):
 
 
 @pytest.mark.parametrize("measure", [True, False])
-def test_sample_circuit_cirq(measure):
+def test_sample_circuit_cirq(measure: bool) -> None:
     circuit = cirq.Circuit(
         cirq.ops.H.on(cirq.LineQubit(0)),
         cirq.ops.CNOT.on(*cirq.LineQubit.range(2)),
@@ -157,7 +157,7 @@ def test_sample_circuit_cirq(measure):
         assert norm >= 1
 
 
-def test_sample_circuit_pyquil():
+def test_sample_circuit_pyquil() -> None:
     circuit = pyquil.Program(pyquil.gates.H(0), pyquil.gates.CNOT(0, 1))
 
     h_rep = OperationRepresentation(
@@ -187,7 +187,7 @@ def test_sample_circuit_pyquil():
         assert norm >= 1
 
 
-def test_sample_circuit_with_seed():
+def test_sample_circuit_with_seed() -> None:
     circ = cirq.Circuit([cirq.X.on(cirq.LineQubit(0)) for _ in range(10)])
     rep = OperationRepresentation(
         ideal=cirq.Circuit(cirq.X.on(cirq.LineQubit(0))),
@@ -213,7 +213,7 @@ def test_sample_circuit_with_seed():
         assert sampled_norm == expected_norm
 
 
-def test_sample_circuit_trivial_decomposition():
+def test_sample_circuit_trivial_decomposition() -> None:
     circuit = cirq.Circuit(cirq.ops.H.on(cirq.NamedQubit("Q")))
     rep = OperationRepresentation(
         ideal=circuit, basis_expansion={NoisyOperation(circuit): 1.0}
@@ -232,7 +232,7 @@ qreg = cirq.LineQubit.range(2)
 
 
 @pytest.mark.parametrize("gate", [cirq.Y, cirq.CNOT])
-def test_sample_sequence_choi(gate: cirq.Gate):
+def test_sample_sequence_choi(gate: cirq.Gate) -> None:
     """Tests the sample_sequence by comparing the exact Choi matrices."""
     qreg = cirq.LineQubit.range(gate.num_qubits())
     ideal_op = gate.on(*qreg)
@@ -264,7 +264,7 @@ def test_sample_sequence_choi(gate: cirq.Gate):
     assert np.allclose(ideal_choi, choi_pec_estimate, atol=0.05)
 
 
-def test_sample_circuit_choi():
+def test_sample_circuit_choi() -> None:
     """Tests the sample_circuit by comparing the exact Choi matrices."""
     # A simple 2-qubit circuit
     qreg = cirq.LineQubit.range(2)

@@ -62,7 +62,7 @@ from mitiq.zne.scaling.folding import (
 )
 
 
-def test_is_measurement():
+def test_is_measurement() -> None:
     """Tests for checking if operations are measurements."""
     # Test circuit:
     # 0: ───H───X───Z───
@@ -77,7 +77,7 @@ def test_is_measurement():
             assert not _is_measurement(op)
 
 
-def test_pop_measurements_and_add_measurements():
+def test_pop_measurements_and_add_measurements() -> None:
     """Tests popping measurements from a circuit.."""
     # Test circuit:
     # 0: ───H───T───@───M───
@@ -105,7 +105,7 @@ def test_pop_measurements_and_add_measurements():
     assert _equal(copy, circ)
 
 
-def test_squash_moments_two_qubits():
+def test_squash_moments_two_qubits() -> None:
     """Tests squashing moments in a two-qubit circuit with 'staggered' single
     qubit gats.
     """
@@ -127,7 +127,7 @@ def test_squash_moments_two_qubits():
     assert len(squashed) == d // 2
 
 
-def test_squash_moments_returns_new_circuit_and_doesnt_modify_input_circuit():
+def test_squash_moments_returns_new_circuit_and_doesnt_modify_input_circuit() -> None:
     """Tests that squash moments returns a new circuit and doesn't modify the
     input circuit.
     """
@@ -139,7 +139,7 @@ def test_squash_moments_returns_new_circuit_and_doesnt_modify_input_circuit():
     assert _equal(circ, Circuit(ops.H.on(qbit)))
 
 
-def test_squash_moments_retains_device():
+def test_squash_moments_retains_device() -> None:
     """Tests that the returned circuit from squash_moments has the same device
     as the input circuit.
     """
@@ -148,7 +148,7 @@ def test_squash_moments_retains_device():
     assert squashed.device == Sycamore
 
 
-def test_squash_moments_never_increases_moments():
+def test_squash_moments_never_increases_moments() -> None:
     """Squashes moments for several random circuits and ensures the squashed
     circuit always <= # moments as the input circuit.
     """
@@ -160,7 +160,7 @@ def test_squash_moments_never_increases_moments():
         assert len(squashed) <= len(circuit)
 
 
-def test_update_moment_indices():
+def test_update_moment_indices() -> None:
     """Tests indices of moments are properly updated."""
     moment_indices = {i: i for i in range(5)}
     _update_moment_indices(moment_indices, 3)
@@ -173,7 +173,7 @@ def test_update_moment_indices():
         _update_moment_indices(moment_indices, 6)
 
 
-def test_fold_gate_at_index_in_moment_one_qubit():
+def test_fold_gate_at_index_in_moment_one_qubit() -> None:
     """Tests local folding with a moment, index for a one qubit circuit."""
     # Test circuit:
     # 0: ───H───X───Z───
@@ -202,7 +202,7 @@ def test_fold_gate_at_index_in_moment_one_qubit():
     assert _equal(circ, old)
 
 
-def test_fold_gate_at_index_in_moment_two_qubits():
+def test_fold_gate_at_index_in_moment_two_qubits() -> None:
     """Tests local folding with a moment, index for a two qubit circuit with
     single qubit gates.
     """
@@ -255,7 +255,7 @@ def test_fold_gate_at_index_in_moment_two_qubits():
     assert Circuit([ops.H.on_each(*qreg), ops.T.on_each(*qreg)])
 
 
-def test_fold_gate_at_index_in_moment_two_qubit_gates():
+def test_fold_gate_at_index_in_moment_two_qubit_gates() -> None:
     """Tests local folding with a moment, index for a two qubit circuit with
     two qubit gates.
     """
@@ -286,7 +286,7 @@ def test_fold_gate_at_index_in_moment_two_qubit_gates():
     assert _equal(circ, old)
 
 
-def test_fold_gate_at_index_in_moment_empty_circuit():
+def test_fold_gate_at_index_in_moment_empty_circuit() -> None:
     """Tests local folding with a moment, index with an empty circuit."""
     circ = Circuit()
 
@@ -295,7 +295,7 @@ def test_fold_gate_at_index_in_moment_empty_circuit():
         _fold_gate_at_index_in_moment(circ, moment_index=0, gate_index=0)
 
 
-def test_fold_gate_at_index_in_moment_bad_moment():
+def test_fold_gate_at_index_in_moment_bad_moment() -> None:
     """Tests local folding with a moment index not in the input circuit."""
     qreg = GridQubit.rect(2, 2)
     circ = Circuit([ops.H.on_each(*qreg)])
@@ -303,7 +303,7 @@ def test_fold_gate_at_index_in_moment_bad_moment():
         _fold_gate_at_index_in_moment(circ, 1, 0)
 
 
-def test_unfoldable_gate_error_cirq():
+def test_unfoldable_gate_error_cirq() -> None:
     """Tries to fold a gate without an inverse and checks an error is
     raised."""
     qbit = LineQubit(0)
@@ -312,7 +312,7 @@ def test_unfoldable_gate_error_cirq():
         _fold_gate_at_index_in_moment(circ, moment_index=0, gate_index=0)
 
 
-def test_unfoldable_gate_error_qiskit():
+def test_unfoldable_gate_error_qiskit() -> None:
     """Tries to fold a gate without an inverse and checks an error is
     raised."""
     qreg = QuantumRegister(1)
@@ -326,7 +326,7 @@ def test_unfoldable_gate_error_qiskit():
         )
 
 
-def test_fold_gates_in_moment_single_qubit_gates():
+def test_fold_gates_in_moment_single_qubit_gates() -> None:
     """Tests folding gates at given indices within a moment."""
     # Test circuit:
     # 0: ───H───T───
@@ -355,7 +355,7 @@ def test_fold_gates_in_moment_single_qubit_gates():
     assert _equal(folded, correct)
 
 
-def test_fold_gates_in_moment_multi_qubit_gates():
+def test_fold_gates_in_moment_multi_qubit_gates() -> None:
     """Tests folding gates at given indices within a moment."""
     # Test circuit:
     # 0: ───H───@───@───
@@ -404,7 +404,7 @@ def test_fold_gates_in_moment_multi_qubit_gates():
     assert _equal(circ, correct)
 
 
-def test_fold_gates():
+def test_fold_gates() -> None:
     """Test folding gates at specified indices within specified moments."""
     # Test circuit:
     # 0: ───H───@───@───
@@ -433,7 +433,7 @@ def test_fold_gates():
     assert _equal(folded, correct)
 
 
-def test_fold_moments():
+def test_fold_moments() -> None:
     """Tests folding moments in a circuit."""
     # Test circuit
     # 0: ───H───@───@───
@@ -485,7 +485,7 @@ def test_fold_moments():
     assert _equal(circ, correct)
 
 
-def test_fold_from_left_two_qubits():
+def test_fold_from_left_two_qubits() -> None:
     qreg = LineQubit.range(2)
     circ = Circuit(
         [
@@ -514,7 +514,7 @@ def test_fold_from_left_two_qubits():
     assert _equal(folded, correct)
 
 
-def test_fold_from_left_three_qubits():
+def test_fold_from_left_three_qubits() -> None:
     """Unit test for folding gates from left to scale a circuit."""
     qreg = LineQubit.range(3)
     circ = Circuit(
@@ -531,7 +531,7 @@ def test_fold_from_left_three_qubits():
     assert _equal(folded, correct)
 
 
-def test_fold_from_left_no_stretch():
+def test_fold_from_left_no_stretch() -> None:
     """Unit test for folding gates from left for a scale factor of one."""
     circuit = testing.random_circuit(qubits=2, n_moments=10, op_density=0.99)
     folded = fold_gates_from_left(circuit, scale_factor=1)
@@ -539,7 +539,7 @@ def test_fold_from_left_no_stretch():
     assert not (folded is circuit)
 
 
-def test_fold_from_left_scale_factor_larger_than_three():
+def test_fold_from_left_scale_factor_larger_than_three() -> None:
     """Tests folding from left with a scale_factor larger than three."""
     qreg = LineQubit.range(2)
     circuit = Circuit([ops.SWAP.on(*qreg)], [ops.CNOT.on(*qreg)])
@@ -548,7 +548,7 @@ def test_fold_from_left_scale_factor_larger_than_three():
     assert _equal(folded, correct)
 
 
-def test_fold_from_right_scale_factor_larger_than_three():
+def test_fold_from_right_scale_factor_larger_than_three() -> None:
     """Tests folding from right with a scale_factor larger than three."""
     qreg = LineQubit.range(2)
     circuit = Circuit([ops.SWAP.on(*qreg)], [ops.CNOT.on(*qreg)])
@@ -557,7 +557,7 @@ def test_fold_from_right_scale_factor_larger_than_three():
     assert _equal(folded, correct)
 
 
-def test_fold_from_left_with_terminal_measurements_min_stretch():
+def test_fold_from_left_with_terminal_measurements_min_stretch() -> None:
     """Tests folding from left with terminal measurements."""
     # Test circuit
     # 0: ───H───@───@───M───
@@ -584,7 +584,7 @@ def test_fold_from_left_with_terminal_measurements_min_stretch():
     assert _equal(folded, correct)
 
 
-def test_fold_from_left_with_terminal_measurements_max_stretch():
+def test_fold_from_left_with_terminal_measurements_max_stretch() -> None:
     """Tests folding from left with terminal measurements."""
     # Test circuit
     # 0: ───H───@───@───M───
@@ -656,7 +656,7 @@ def test_fold_with_channels_raises_error(fold_method):
         fold_method(circ, scale_factor=3.0)
 
 
-def test_fold_from_right_basic():
+def test_fold_from_right_basic() -> None:
     """Tests folding gates from the right for a two-qubit circuit."""
     # Test circuit:
     # 0: ───H───@───────
@@ -689,7 +689,7 @@ def test_fold_from_right_basic():
     assert _equal(folded, correct)
 
 
-def test_fold_from_right_max_stretch():
+def test_fold_from_right_max_stretch() -> None:
     """Tests that fold from right = fold from left with maximum scale."""
     # Test circuit
     # 0: ───H───@───@───
@@ -710,7 +710,7 @@ def test_fold_from_right_max_stretch():
     assert _equal(left_folded, right_folded)
 
 
-def test_fold_from_right_with_terminal_measurements_min_stretch():
+def test_fold_from_right_with_terminal_measurements_min_stretch() -> None:
     """Tests folding from left with terminal measurements."""
     # Test circuit
     # 0: ───H───@───@───M───
@@ -738,7 +738,7 @@ def test_fold_from_right_with_terminal_measurements_min_stretch():
     assert _equal(circ, correct)
 
 
-def test_fold_from_right_with_terminal_measurements_max_stretch():
+def test_fold_from_right_with_terminal_measurements_max_stretch() -> None:
     """Tests folding from left with terminal measurements."""
     # Test circuit
     # 0: ───H───@───@───M───
@@ -775,7 +775,7 @@ def test_fold_from_right_with_terminal_measurements_max_stretch():
     assert _equal(circ, original)
 
 
-def test_fold_right_retains_terminal_measurements_in_input_circuit():
+def test_fold_right_retains_terminal_measurements_in_input_circuit() -> None:
     """Tests that folding from the right doesn't modify the terminal
     measurements in the input circuit.
     """
@@ -785,14 +785,14 @@ def test_fold_right_retains_terminal_measurements_in_input_circuit():
     assert _equal(circ, folded)
 
 
-def test_fold_gates_at_random_no_stretch():
+def test_fold_gates_at_random_no_stretch() -> None:
     """Tests folded circuit is identical for a scale factor of one."""
     circuit = testing.random_circuit(qubits=3, n_moments=10, op_density=0.99)
     folded = fold_gates_at_random(circuit, scale_factor=1, seed=None)
     assert _equal(folded, circuit)
 
 
-def test_fold_gates_at_random_seed_one_qubit():
+def test_fold_gates_at_random_seed_one_qubit() -> None:
     """Test for folding gates at random on a one qubit circuit with a seed for
     repeated behavior.
     """
@@ -820,7 +820,7 @@ def test_fold_gates_at_random_seed_one_qubit():
     assert _equal(folded, correct)
 
 
-def test_fold_random_min_stretch():
+def test_fold_random_min_stretch() -> None:
     """Tests that folding at random with min scale returns a copy of the
     input circuit.
     """
@@ -843,7 +843,7 @@ def test_fold_random_min_stretch():
     assert folded is not circ
 
 
-def test_fold_random_max_stretch():
+def test_fold_random_max_stretch() -> None:
     """Tests that folding at random with max scale folds all gates on a
     multi-qubit circuit.
     """
@@ -871,7 +871,7 @@ def test_fold_random_max_stretch():
     assert _equal(folded, correct)
 
 
-def test_fold_random_scale_factor_larger_than_three():
+def test_fold_random_scale_factor_larger_than_three() -> None:
     """Folds at random with a scale_factor larger than three."""
     qreg = LineQubit.range(2)
     circuit = Circuit([ops.SWAP.on(*qreg)], [ops.CNOT.on(*qreg)])
@@ -881,7 +881,7 @@ def test_fold_random_scale_factor_larger_than_three():
     assert _equal(folded, correct)
 
 
-def test_fold_random_no_repeats():
+def test_fold_random_no_repeats() -> None:
     """Tests folding at random to ensure that no gates are folded twice and
     folded gates are not folded again.
     """
@@ -908,7 +908,7 @@ def test_fold_random_no_repeats():
         assert all(count <= 3 for count in counts.values())
 
 
-def test_fold_random_with_terminal_measurements_min_stretch():
+def test_fold_random_with_terminal_measurements_min_stretch() -> None:
     """Tests folding from left with terminal measurements."""
     # Test circuit
     # 0: ───H───@───@───M───
@@ -935,7 +935,7 @@ def test_fold_random_with_terminal_measurements_min_stretch():
     assert _equal(folded, correct)
 
 
-def test_fold_random_with_terminal_measurements_max_stretch():
+def test_fold_random_with_terminal_measurements_max_stretch() -> None:
     """Tests folding from left with terminal measurements."""
     # Test circuit
     # 0: ───H───@───@───M───
@@ -962,7 +962,7 @@ def test_fold_random_with_terminal_measurements_max_stretch():
     assert _equal(folded, correct)
 
 
-def test_fold_local_small_stretch_from_left():
+def test_fold_local_small_stretch_from_left() -> None:
     """Test for local folding with scale < 3."""
     qreg = LineQubit.range(3)
     circ = Circuit(
@@ -981,7 +981,7 @@ def test_fold_local_small_stretch_from_left():
     assert _equal(folded, correct)
 
 
-def test_fold_local_stretch_three_from_left():
+def test_fold_local_stretch_three_from_left() -> None:
     """Test for local folding with scale > 3."""
     qreg = LineQubit.range(3)
     circ = Circuit(
@@ -1027,7 +1027,7 @@ def test_fold_local_big_stretch_from_left(squash: bool):
     assert _equal(folded, correct)
 
 
-def test_global_fold_min_stretch():
+def test_global_fold_min_stretch() -> None:
     """Tests that global fold with scale = 1 is the same circuit."""
     # Test circuit
     # 0: ───H───@───@───
@@ -1048,7 +1048,7 @@ def test_global_fold_min_stretch():
     assert folded is not circ
 
 
-def test_global_fold_min_stretch_with_terminal_measurements():
+def test_global_fold_min_stretch_with_terminal_measurements() -> None:
     """Tests that global fold with scale = 1 is the same circuit."""
     # Test circuit
     # 0: ───H───@───@───M───
@@ -1069,7 +1069,7 @@ def test_global_fold_min_stretch_with_terminal_measurements():
     assert folded is not circ
 
 
-def test_global_fold_stretch_factor_of_three():
+def test_global_fold_stretch_factor_of_three() -> None:
     """Tests global folding with the scale as a factor of 3."""
     # Test circuit
     # 0: ───H───@───@───
@@ -1089,7 +1089,7 @@ def test_global_fold_stretch_factor_of_three():
     assert _equal(folded, correct)
 
 
-def test_global_fold_stretch_factor_of_three_with_terminal_measurements():
+def test_global_fold_stretch_factor_of_three_with_terminal_measurements() -> None:
     """Tests global folding with the scale as a factor of 3 for a circuit
     with terminal measurements.
     """
@@ -1112,7 +1112,7 @@ def test_global_fold_stretch_factor_of_three_with_terminal_measurements():
     assert _equal(folded, correct)
 
 
-def test_global_fold_stretch_factor_nine_with_terminal_measurements():
+def test_global_fold_stretch_factor_nine_with_terminal_measurements() -> None:
     """Tests global folding with the scale as a factor of 9 for a circuit
     with terminal measurements.
     """
@@ -1135,7 +1135,7 @@ def test_global_fold_stretch_factor_nine_with_terminal_measurements():
     assert _equal(folded, correct)
 
 
-def test_global_fold_stretch_factor_eight_terminal_measurements():
+def test_global_fold_stretch_factor_eight_terminal_measurements() -> None:
     """Tests global folding with a scale factor not a multiple of three so
     that local folding is also called.
     """
@@ -1166,7 +1166,7 @@ def test_global_fold_stretch_factor_eight_terminal_measurements():
     assert _equal(folded, correct)
 
 
-def test_convert_to_from_mitiq_qiskit():
+def test_convert_to_from_mitiq_qiskit() -> None:
     """Basic test for converting a Qiskit circuit to a Cirq circuit."""
     # Test Qiskit circuit:
     #          ┌───┐
@@ -1197,7 +1197,7 @@ def test_convert_to_from_mitiq_qiskit():
     assert isinstance(original_circuit, QuantumCircuit)
 
 
-def test_fold_from_left_with_qiskit_circuits():
+def test_fold_from_left_with_qiskit_circuits() -> None:
     """Tests folding from left with Qiskit circuits."""
     # Test Qiskit circuit:
     #          ┌───┐
@@ -1241,7 +1241,7 @@ def test_fold_from_left_with_qiskit_circuits():
     assert qiskit_folded_circuit.cregs == qiskit_circuit.cregs
 
 
-def test_fold_from_right_with_qiskit_circuits():
+def test_fold_from_right_with_qiskit_circuits() -> None:
     """Tests folding from right with Qiskit circuits."""
     # Test Qiskit circuit:
     #          ┌───┐
@@ -1285,7 +1285,7 @@ def test_fold_from_right_with_qiskit_circuits():
     assert qiskit_folded_circuit.cregs == qiskit_circuit.cregs
 
 
-def test_fold_at_random_with_qiskit_circuits():
+def test_fold_at_random_with_qiskit_circuits() -> None:
     """Tests folding at random with Qiskit circuits."""
     # Test Qiskit circuit:
     #          ┌───┐
@@ -1329,7 +1329,7 @@ def test_fold_at_random_with_qiskit_circuits():
     assert qiskit_folded_circuit.cregs == qiskit_circuit.cregs
 
 
-def test_fold_global_with_qiskit_circuits():
+def test_fold_global_with_qiskit_circuits() -> None:
     """Tests _fold_local with input Qiskit circuits."""
     # Test Qiskit circuit:
     #          ┌───┐
@@ -1366,7 +1366,7 @@ def test_fold_global_with_qiskit_circuits():
     assert folded_qiskit_circuit.cregs == qiskit_circuit.cregs
 
 
-def test_fold_left_squash_moments():
+def test_fold_left_squash_moments() -> None:
     """Tests folding from left with kwarg squash_moments."""
     # Test circuit
     # 0: ───H───@───@───M───
@@ -1465,7 +1465,7 @@ def test_fold_and_squash_random_circuits_random_stretches(fold_method):
         assert len(folded_and_squashed) <= len(folded_not_squashed)
 
 
-def test_default_weight():
+def test_default_weight() -> None:
     """Tests default weight of an n-qubit gates is 0.99**n."""
     qreg = LineQubit.range(3)
     assert np.isclose(_default_weight(ops.H.on(qreg[0])), 0.99)
@@ -1473,7 +1473,7 @@ def test_default_weight():
     assert np.isclose(_default_weight(ops.TOFFOLI.on(*qreg[:3])), 0.970299)
 
 
-def test_compute_weight_of_circuit():
+def test_compute_weight_of_circuit() -> None:
     qreg = LineQubit.range(3)
     circ = Circuit(
         ops.H.on_each(*qreg),
@@ -1644,7 +1644,7 @@ def test_convert_from_mitiq_circuit_conversion_error(conversion_type):
         convert_from_mitiq(noisy, conversion_type)
 
 
-def test_convert_qiskit_to_mitiq_circuit_conversion_error():
+def test_convert_qiskit_to_mitiq_circuit_conversion_error() -> None:
     # Custom gates are not supported in conversions
     gate = Operator([[0.0, 1.0], [-1.0, 0.0]])
     qreg = QuantumRegister(1)
@@ -1657,7 +1657,7 @@ def test_convert_qiskit_to_mitiq_circuit_conversion_error():
         convert_to_mitiq(circ)
 
 
-def test_convert_pyquil_to_mitiq_circuit_conversion_error():
+def test_convert_pyquil_to_mitiq_circuit_conversion_error() -> None:
     # Pragmas are not supported in conversions
     prog = Program(Pragma("INITIAL_REWIRING", ['"Partial"']))
 

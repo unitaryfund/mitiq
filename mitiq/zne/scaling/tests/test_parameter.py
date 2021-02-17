@@ -28,7 +28,7 @@ from mitiq.zne.scaling.parameter import (
 )
 
 
-def test_identity_scale_1q():
+def test_identity_scale_1q() -> None:
     """Tests that when scale factor = 1, the circuit is the
     same.
     """
@@ -38,7 +38,7 @@ def test_identity_scale_1q():
     assert _equal(circ, scaled)
 
 
-def test_non_identity_scale_1q():
+def test_non_identity_scale_1q() -> None:
     """Tests that when scale factor = 1, the circuit is the
     same.
     """
@@ -66,7 +66,7 @@ def test_non_identity_scale_1q():
     assert np.all(np.isclose(result - noises, 0))
 
 
-def test_identity_scale_2q():
+def test_identity_scale_2q() -> None:
     """Tests that when scale factor = 1, the circuit is the
     same.
     """
@@ -76,7 +76,7 @@ def test_identity_scale_2q():
     assert _equal(circ, scaled)
 
 
-def test_non_identity_scale_2q():
+def test_non_identity_scale_2q() -> None:
     """Tests that when scale factor = 1, the circuit is the
     same.
     """
@@ -101,7 +101,7 @@ def test_non_identity_scale_2q():
     assert np.all(np.isclose(result - noises, 0))
 
 
-def test_scale_with_measurement():
+def test_scale_with_measurement() -> None:
     """Tests that we ignore measurement gates.
 
     Test circuit:
@@ -124,7 +124,7 @@ def test_scale_with_measurement():
     assert _equal(circ, scaled)
 
 
-def test_gate_type():
+def test_gate_type() -> None:
     qreg = LineQubit.range(3)
     allowed_op = ops.H.on(qreg[0])
     _get_base_gate(allowed_op.gate)

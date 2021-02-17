@@ -21,6 +21,7 @@ import inspect
 import random
 import itertools
 from math import pi
+from typing import List
 
 import numpy as np
 import pytest
@@ -67,7 +68,7 @@ from mitiq.mitiq_pyquil.compiler import (
 )
 
 
-def test_basic_compile_defgate():
+def test_basic_compile_defgate() -> None:
     p = Program()
     p.inst(RX(pi, 0))
     p.defgate("test", [[0, 1], [1, 0]])
@@ -77,14 +78,14 @@ def test_basic_compile_defgate():
     assert p == basic_compile(p)
 
 
-def test_CCNOT():
+def test_CCNOT() -> None:
     for perm in itertools.permutations([0, 1, 2]):
         u1 = program_unitary(Program(CCNOT(*perm)), n_qubits=3)
         u2 = program_unitary(_CCNOT(*perm), n_qubits=3)
         assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-def test_CNOT():
+def test_CNOT() -> None:
     u1 = program_unitary(Program(CNOT(0, 1)), n_qubits=2)
     u2 = program_unitary(_CNOT(0, 1), n_qubits=2)
     assert equal_up_to_global_phase(u1, u2, atol=1e-12)
@@ -94,7 +95,7 @@ def test_CNOT():
     assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-def test_CPHASE():
+def test_CPHASE() -> None:
     for theta in np.linspace(-2 * np.pi, 2 * np.pi):
         u1 = program_unitary(Program(CPHASE(theta, 0, 1)), n_qubits=2)
         u2 = program_unitary(_CPHASE(theta, 0, 1), n_qubits=2)
@@ -105,13 +106,13 @@ def test_CPHASE():
         assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-def test_H():
+def test_H() -> None:
     u1 = program_unitary(Program(H(0)), n_qubits=1)
     u2 = program_unitary(_H(0), n_qubits=1)
     assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-def test_ISWAP():
+def test_ISWAP() -> None:
     u1 = program_unitary(Program(ISWAP(0, 1)), n_qubits=2)
     u2 = program_unitary(_ISWAP(0, 1), n_qubits=2)
     assert equal_up_to_global_phase(u1, u2, atol=1e-12)
@@ -121,7 +122,7 @@ def test_ISWAP():
     assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-def test_RX():
+def test_RX() -> None:
     for theta in np.linspace(-2 * np.pi, 2 * np.pi):
         p = Program(RX(theta, 0))
         u1 = program_unitary(p, n_qubits=1)
@@ -129,20 +130,20 @@ def test_RX():
         assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-def test_RY():
+def test_RY() -> None:
     for theta in np.linspace(-2 * np.pi, 2 * np.pi):
         u1 = program_unitary(Program(RY(theta, 0)), n_qubits=1)
         u2 = program_unitary(_RY(theta, 0), n_qubits=1)
         assert equal_up_to_global_phase(u1, u2)
 
 
-def test_S():
+def test_S() -> None:
     u1 = program_unitary(Program(S(0)), n_qubits=1)
     u2 = program_unitary(_S(0), n_qubits=1)
     assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-def test_SWAP():
+def test_SWAP() -> None:
     u1 = program_unitary(Program(SWAP(0, 1)), n_qubits=2)
     u2 = program_unitary(_SWAP(0, 1), n_qubits=2)
     assert equal_up_to_global_phase(u1, u2, atol=1e-12)
@@ -152,19 +153,19 @@ def test_SWAP():
     assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-def test_T():
+def test_T() -> None:
     u1 = program_unitary(Program(T(0)), n_qubits=1)
     u2 = program_unitary(_T(0), n_qubits=1)
     assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-def test_X():
+def test_X() -> None:
     u1 = program_unitary(Program(X(0)), n_qubits=1)
     u2 = program_unitary(_X(0), n_qubits=1)
     assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-def test_XY():
+def test_XY() -> None:
     for theta in np.linspace(-2 * np.pi, 2 * np.pi):
         p = Program(XY(theta, 0, 1))
         u1 = program_unitary(p, n_qubits=2)
@@ -177,13 +178,13 @@ def test_XY():
         assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-def test_Y():
+def test_Y() -> None:
     u1 = program_unitary(Program(Y(0)), n_qubits=1)
     u2 = program_unitary(_Y(0), n_qubits=1)
     assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-def test_Z():
+def test_Z() -> None:
     u1 = program_unitary(Program(Z(0)), n_qubits=1)
     u2 = program_unitary(_Z(0), n_qubits=1)
     assert equal_up_to_global_phase(u1, u2, atol=1e-12)
@@ -216,7 +217,7 @@ QUANTUM_GATES = {
 }
 
 
-def _generate_random_program(n_qubits, length):
+def _generate_random_program(n_qubits: int, length: int) -> Program:
     """Randomly sample gates and arguments (qubits, angles)"""
     if n_qubits < 3:
         raise ValueError(
@@ -249,9 +250,9 @@ def _generate_random_program(n_qubits, length):
             elif param == "angle":
                 # TODO: support rx(theta)
                 if gate == RX:
-                    param_val = random.choice([-1, -0.5, 0, 0.5, 1]) * pi
+                    param_val  = float(random.choice([-1, -0.5, 0, 0.5, 1]) * pi)
                 else:
-                    param_val = random.uniform(-2 * pi, 2 * pi)
+                    param_val = float(random.uniform(-2 * pi, 2 * pi))
             else:
                 raise ValueError("Unknown gate parameter {}".format(param))
 
@@ -263,16 +264,16 @@ def _generate_random_program(n_qubits, length):
 
 
 @pytest.fixture(params=list(range(3, 5)))
-def n_qubits(request):
+def n_qubits(request: pytest.FixtureRequest) -> List[int]:
     return request.param
 
 
 @pytest.fixture(params=[2, 50, 67])
-def prog_length(request):
+def prog_length(request: pytest.FixtureRequest) -> List[int]:
     return request.param
 
 
-def test_random_progs(n_qubits, prog_length):
+def test_random_progs(n_qubits: int, prog_length: int) -> None:
     for repeat_i in range(10):
         prog = _generate_random_program(n_qubits=n_qubits, length=prog_length)
         u1 = program_unitary(prog, n_qubits=n_qubits)
@@ -280,11 +281,11 @@ def test_random_progs(n_qubits, prog_length):
         assert equal_up_to_global_phase(u1, u2, atol=1e-12)
 
 
-def test_unsupported_gate():
+def test_unsupported_gate() -> None:
     with pytest.raises(ValueError):
         basic_compile(Program(CSWAP(0, 1, 2)))
 
 
-def test_other_instructions():
+def test_other_instructions() -> None:
     p = Program("DECLARE ro BIT[2]")
     assert p == basic_compile(p)

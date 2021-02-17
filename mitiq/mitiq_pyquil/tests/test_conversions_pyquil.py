@@ -21,7 +21,7 @@ from pyquil.gates import CNOT, CZ, H, RZ, X, Y, Z
 from mitiq.mitiq_pyquil.conversions import from_pyquil, to_pyquil
 
 
-def test_to_pyquil_from_pyquil_simple():
+def test_to_pyquil_from_pyquil_simple() -> None:
     p = Program()
     p += X(0)
     p += Y(1)
@@ -57,7 +57,7 @@ def maxcut_qaoa_program(gamma: float) -> Program:
     return p
 
 
-def test_to_pyquil_from_pyquil_parameterized():
+def test_to_pyquil_from_pyquil_parameterized() -> None:
     p = maxcut_qaoa_program(np.pi)
     assert p.out() == to_pyquil(from_pyquil(p)).out()
 
@@ -87,7 +87,7 @@ CSWAP 0 1 2
 """
 
 
-def test_to_pyquil_from_pyquil_almost_all_gates():
+def test_to_pyquil_from_pyquil_almost_all_gates() -> None:
     """PHASE, PSWAP, S, T, declaration, and measurement don't convert back
     and forth perfectly (in terms of labels -- the program unitaries and
     number of measurements are equivalent)."""
@@ -95,7 +95,7 @@ def test_to_pyquil_from_pyquil_almost_all_gates():
     assert p.out() == to_pyquil(from_pyquil(p)).out()
 
 
-def test_to_pyquil_from_pyquil_not_starting_at_zero():
+def test_to_pyquil_from_pyquil_not_starting_at_zero() -> None:
     p = Program()
     p += X(10)
     p += Y(11)

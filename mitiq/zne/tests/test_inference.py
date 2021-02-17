@@ -27,7 +27,7 @@ import cirq
 from mitiq.zne.inference import (
     ExtrapolationError,
     ExtrapolationWarning,
-    ConvergenceWarning,
+    ConvergenceWarning, Factory,
     RichardsonFactory,
     FakeNodesFactory,
     LinearFactory,
@@ -150,7 +150,7 @@ def test_noise_seeding(test_f: Callable[[float], float]):
         PolyExpFactory,
     ),
 )
-def test_get_scale_factors_static_factories(factory):
+def test_get_scale_factors_static_factories(factory: Callable) -> None:
     scale_factors = np.linspace(1.0, 10.0, num=20)
     if factory is PolyFactory or factory is PolyExpFactory:
         fac = factory(scale_factors=scale_factors, order=2)
@@ -167,7 +167,7 @@ def test_get_scale_factors_static_factories(factory):
 
 
 @mark.parametrize("factory", (AdaExpFactory,))
-def test_get_scale_factors_adaptive_factories(factory):
+def test_get_scale_factors_adaptive_factories(factory: Callable) -> None:
     num_steps = 8
     fac = AdaExpFactory(steps=num_steps, scale_factor=2.0, asymptote=None)
 
@@ -207,7 +207,7 @@ def test_get_scale_factors_adaptive_factories(factory):
         PolyExpFactory,
     ),
 )
-def test_get_expectation_values_static_factories(factory):
+def test_get_expectation_values_static_factories(factory: Callable) -> None:
     scale_factors = np.linspace(1.0, 10.0, num=20)
     executor = apply_seed_to_func(f_lin, seed=1)
     expectation_values = np.array([executor(scale) for scale in scale_factors])
@@ -230,7 +230,7 @@ def test_get_expectation_values_static_factories(factory):
 
 
 @mark.parametrize("factory", (AdaExpFactory,))
-def test_get_expectation_values_adaptive_factories(factory):
+def test_get_expectation_values_adaptive_factories(factory: Callable) -> None:
     num_steps = 8
     fac = AdaExpFactory(steps=num_steps, scale_factor=2.0, asymptote=None)
     executor = apply_seed_to_func(f_exp_up, seed=1)
@@ -319,7 +319,7 @@ def test_run_sequential_and_batched(factory, batched):
         PolyExpFactory,
     ),
 )
-def test_run_batched_with_keyword_args_list(factory):
+def test_run_batched_with_keyword_args_list(factory: Callable) -> None:
     scale_factors = np.linspace(1.0, 10.0, num=20)
     shot_list = [int(scale) for scale in scale_factors]
 
@@ -360,7 +360,7 @@ def test_richardson_extr(test_f: Callable[[float], float]):
     assert np.isclose(fac._opt_params[-1], zne_value)
 
 
-def test_fake_nodes_factory():
+def test_fake_nodes_factory() -> None:
     """Test FakeNodesFactory in a specific regime in which the fake nodes
     interpolation method works well.
     """
@@ -373,7 +373,7 @@ def test_fake_nodes_factory():
     assert np.isclose(fac._opt_params[-1], zne_value)
 
 
-def test_fake_nodes_extrapolation():
+def test_fake_nodes_extrapolation() -> None:
     """Test that there exists a regime in which FakeNodesFactory
     is better than RichardsonFactory.
     Note: in many cases RichardsonFactory is better.
@@ -387,7 +387,7 @@ def test_fake_nodes_extrapolation():
     assert 500 * abs_err_runge < abs_err_richard
 
 
-def test_linear_extr():
+def test_linear_extr() -> None:
     """Tests extrapolation with a LinearFactory."""
     seeded_f = apply_seed_to_func(f_lin, SEED)
     fac = LinearFactory(X_VALS)
@@ -397,7 +397,7 @@ def test_linear_extr():
     assert np.allclose(fac._opt_params, [B, A], atol=CLOSE_TOL)
 
 
-def test_poly_extr():
+def test_poly_extr() -> None:
     """Test of polynomial extrapolator."""
     # test (order=1)
     fac = PolyFactory(X_VALS, order=1)
@@ -416,7 +416,7 @@ def test_poly_extr():
 
 
 @mark.parametrize("order", [2, 3, 4, 5])
-def test_opt_params_poly_factory(order):
+def test_opt_params_poly_factory(order: int) ->None:
     """Tests that optimal parameters are stored after calling the reduce
     method.
     """
@@ -444,7 +444,7 @@ def test_exp_factory_with_asympt(
     assert len(fac._opt_params) == 3
 
 
-def test_exp_factory_bad_asympt():
+def test_exp_factory_bad_asympt() -> None:
     with raises(ValueError, match="must be either a float or None"):
         ExpFactory(X_VALS, asymptote=1j)
 
@@ -556,7 +556,7 @@ def test_ada_exp_factory_no_asympt_more_steps(
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
 
 
-def test_ada_exp_factory_bad_arguments():
+def test_ada_exp_factory_bad_arguments() -> None:
     with raises(ValueError, match="must be an integer greater or equal to 3"):
         AdaExpFactory(steps=2.5)
 
@@ -570,7 +570,7 @@ def test_ada_exp_factory_bad_arguments():
         AdaExpFactory(steps=10, asymptote=1j)
 
 
-def test_avoid_log_keyword():
+def test_avoid_log_keyword() -> None:
     """Test that avoid_log=True and avoid_log=False give different results."""
     fac = ExpFactory(X_VALS, asymptote=A, avoid_log=False)
     fac.run_classical(f_exp_down)
@@ -583,19 +583,19 @@ def test_avoid_log_keyword():
 @mark.parametrize(
     "factory", (LinearFactory, RichardsonFactory, FakeNodesFactory)
 )
-def test_too_few_scale_factors(factory):
+def test_too_few_scale_factors(factory: Callable) -> None:
     """Test less than 2 scale_factors."""
     with raises(ValueError, match=r"At least 2 scale factors are necessary"):
         _ = factory([1])
 
 
-def test_order_is_too_high_for_scale_factors():
+def test_order_is_too_high_for_scale_factors() -> None:
     """Test that a wrong initialization error is raised."""
     with raises(ValueError, match=r"The extrapolation order cannot exceed"):
         _ = PolyFactory(X_VALS, order=10)
 
 
-def test_too_few_points_for_polyfit_warning():
+def test_too_few_points_for_polyfit_warning() -> None:
     """Test that the correct warning is raised if data is not enough to fit."""
     fac = PolyFactory(X_VALS, order=2)
     fac._instack = [
@@ -616,7 +616,7 @@ def test_too_few_points_for_polyfit_warning():
         PolyFactory.extrapolate([1.0, 2.0], [1.0, 2.0], order=2)
 
 
-def test_failing_fit_error():
+def test_failing_fit_error() -> None:
     """Test error handling for a failing fit."""
     fac = ExpFactory(X_VALS, asymptote=None)
     fac._instack = [{"scale_factor": x} for x in X_VALS]
@@ -633,7 +633,7 @@ def test_failing_fit_error():
 
 
 @mark.parametrize("fac", [LinearFactory([1, 1, 1]), ExpFactory([1, 1, 1])])
-def test_failing_fit_warnings(fac):
+def test_failing_fit_warnings(fac: Callable) -> None:
     """Test that the correct warning is raised for an ill-conditioned fit."""
     fac._instack = [{"scale_factor": 1.0} for _ in range(4)]
     fac._outstack = [1, 1, 1, 1]
@@ -650,7 +650,7 @@ def test_failing_fit_warnings(fac):
         fac.extrapolate([1, 1, 1, 1], [1.0, 1.0, 1.0, 1.0])
 
 
-def test_adaptive_factory_max_iteration_warnings():
+def test_adaptive_factory_max_iteration_warnings() -> None:
     """Test that the correct warning is raised beyond the iteration limit."""
     fac = AdaExpFactory(steps=10)
     with warns(
@@ -661,7 +661,7 @@ def test_adaptive_factory_max_iteration_warnings():
 
 
 @mark.parametrize("factory", [LinearFactory, ExpFactory])
-def test_equal_simple(factory):
+def test_equal_simple(factory: Callable) -> None:
     fac = factory(scale_factors=[1, 2, 3])
     assert fac != 1
 
@@ -681,7 +681,7 @@ def test_equal_simple(factory):
     "factory",
     (LinearFactory, RichardsonFactory, FakeNodesFactory, PolyFactory),
 )
-def test_equal(factory):
+def test_equal(factory: Callable) -> None:
     for run_classical in (True, False):
         if factory is PolyFactory:
             fac = factory(
@@ -707,7 +707,7 @@ def test_equal(factory):
 
 
 @mark.parametrize("fac_class", [LinearFactory, RichardsonFactory])
-def test_iterate_with_shot_list(fac_class):
+def test_iterate_with_shot_list(fac_class: Callable) -> None:
     """Tests factories with (and without) the "shot_list" argument."""
     # first test without shot_list
     fac = fac_class(X_VALS)
@@ -733,7 +733,7 @@ def test_iterate_with_shot_list(fac_class):
         assert fac._outstack[j] != f_lin_shot(X_VALS[j])
 
 
-def test_shot_list_errors():
+def test_shot_list_errors() -> None:
     """Tests errors related to the "shot_lists" argument."""
     with raises(IndexError, match=r"must have the same length."):
         PolyFactory(X_VALS, order=2, shot_list=[1, 2])
@@ -741,7 +741,7 @@ def test_shot_list_errors():
         PolyFactory(X_VALS, order=2, shot_list=[1.0, 2])
 
 
-def test_push_after_already_reduced_warning():
+def test_push_after_already_reduced_warning() -> None:
     """Tests a warning is raised if new data is pushed in a factory
     which was already reduced."""
     fac = LinearFactory([1, 2])
@@ -760,7 +760,7 @@ def test_push_after_already_reduced_warning():
     assert np.isclose(3.0, fac.reduce())
 
 
-def test_full_output_keyword():
+def test_full_output_keyword() -> None:
     """Tests the full_output keyword in extrapolate method."""
     zne_limit = LinearFactory.extrapolate([1, 2], [1, 2])
     assert np.isclose(zne_limit, 0.0)
@@ -782,7 +782,7 @@ def test_full_output_keyword():
     assert np.isclose(zne_curve(2), 2.0)
 
 
-def test_full_output_keyword_cov_std():
+def test_full_output_keyword_cov_std() -> None:
     """Tests the full_output keyword in extrapolate method."""
     zne_limit = PolyFactory.extrapolate([1, 2, 3], [1, 4, 9], order=2)
     assert np.isclose(zne_limit, 0.0)
@@ -807,7 +807,7 @@ def test_full_output_keyword_cov_std():
     assert np.isclose(zne_curve(3), 9.0)
 
 
-def test_params_cov_and_zne_std():
+def test_params_cov_and_zne_std() -> None:
     """Tests the variance of the parametes and of the zne are produced."""
     x_values = [0, 0, 1]
     y_values = [-1, 1, 0]
@@ -833,7 +833,7 @@ def test_params_cov_and_zne_std():
 @mark.parametrize(
     "factory", [LinearFactory, RichardsonFactory, FakeNodesFactory]
 )
-def test_execute_with_zne_fit_fail(factory):
+def test_execute_with_zne_fit_fail(factory: Callable) -> None:
     """Tests errors are raised when asking for fitting parameters that can't
     be calculated.
     """
@@ -849,7 +849,7 @@ def test_execute_with_zne_fit_fail(factory):
         factory([1.0, 2.0]).get_extrapolation_curve()
 
 
-def test_get_methods_of_factories():
+def test_get_methods_of_factories() -> None:
     """Tests the get methods of a factory"""
     x_values = [0, 0, 1]
     y_values = [-1, 1, 0]
@@ -876,7 +876,7 @@ def test_get_methods_of_factories():
 @mark.parametrize(
     "factory", (LinearFactory, RichardsonFactory, PolyFactory,),
 )
-def test_plot_data(factory):
+def test_plot_data(factory: Callable) -> None:
     """Test that plot_data() outputs the correct x and y values."""
     if factory is PolyFactory:
         fac = factory(scale_factors=X_VALS, order=3)
@@ -892,7 +892,7 @@ def test_plot_data(factory):
 
 
 @mark.parametrize("factory", (ExpFactory, PolyExpFactory))
-def test_plot_data_exp_factory(factory):
+def test_plot_data_exp_factory(factory: Callable) -> None:
     """Test that plot_data() outputs the correct x and y values
     for ExpFactory and PolyExpFactory.
     """
@@ -912,7 +912,7 @@ def test_plot_data_exp_factory(factory):
 @mark.parametrize(
     "factory", (LinearFactory, RichardsonFactory, PolyFactory,),
 )
-def test_plot_fit(factory):
+def test_plot_fit(factory: Callable) -> None:
     """Test that plot_fit() outputs the correct x and y values."""
     if factory is PolyFactory or factory is PolyExpFactory:
         fac = factory(scale_factors=X_VALS, order=2)
@@ -928,7 +928,7 @@ def test_plot_fit(factory):
 
 
 @mark.parametrize("factory", (ExpFactory, PolyExpFactory))
-def test_plot_fit_exp_factory(factory):
+def test_plot_fit_exp_factory(factory: Callable) -> None:
     """Test that plot_fit() outputs the correct x and y values
     for ExpFactory and PolyExpFactory.
     """
@@ -945,7 +945,7 @@ def test_plot_fit_exp_factory(factory):
     np.allclose(y_data, zne_curve(x_data))
 
 
-def test__fakenodes_scale_factors_equally_spaced():
+def test__fakenodes_scale_factors_equally_spaced() -> None:
     """FakeNodesFactory should only accept equally spaced scale factors."""
     y_vals = [0.5, 1.0, 1.5]
     with raises(
@@ -954,7 +954,7 @@ def test__fakenodes_scale_factors_equally_spaced():
         _ = FakeNodesFactory(X_VALS).extrapolate(X_VALS, y_vals)
 
 
-def test_map_to_fakenodes():
+def test_map_to_fakenodes() -> None:
     """Test the fake nodes map in FakeNodesFactory."""
     fac = FakeNodesFactory(UNIFORM_X)
     test_argument = 1.0

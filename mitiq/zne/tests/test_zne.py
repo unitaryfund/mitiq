@@ -100,7 +100,7 @@ def test_averaging_improves_zne_value_with_fake_noise(factory, fold_method):
         assert abs(zne_value_averaging) <= abs(zne_value_no_averaging)
 
 
-def test_execute_with_zne_bad_arguments():
+def test_execute_with_zne_bad_arguments() -> None:
     """Tests errors are raised when execute_with_zne is called with bad
     arguments.
     """
@@ -116,7 +116,7 @@ def test_execute_with_zne_bad_arguments():
         execute_with_zne(circ, executor, scale_noise=None)
 
 
-def test_error_zne_decorator():
+def test_error_zne_decorator() -> None:
     """Tests that the proper error is raised if the decorator is
     used without parenthesis.
     """
@@ -127,7 +127,7 @@ def test_error_zne_decorator():
             return 0
 
 
-def test_doc_is_preserved():
+def test_doc_is_preserved() -> None:
     """Tests that the doc of the original executor is preserved."""
 
     def first_executor(circuit):

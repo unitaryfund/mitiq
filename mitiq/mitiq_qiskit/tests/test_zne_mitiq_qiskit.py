@@ -28,7 +28,7 @@ BASE_NOISE = 0.007
 TEST_DEPTH = 30
 
 
-def measure(circuit, qid) -> QuantumCircuit:
+def measure(circuit: QuantumCircuit, qid: int) -> QuantumCircuit:
     """Apply the measure method on the first qubit of a quantum circuit
     given a classical register.
 
@@ -56,7 +56,7 @@ def decorated_executor(qp: QPROGRAM) -> float:
     return qiskit_executor(qp)
 
 
-def test_execute_with_zne():
+def test_execute_with_zne() -> None:
     true_zne_value = 1.0
 
     for _ in range(10):
@@ -69,7 +69,7 @@ def test_execute_with_zne():
         assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
 
 
-def test_mitigate_executor():
+def test_mitigate_executor() -> None:
     true_zne_value = 1.0
 
     for _ in range(10):
@@ -83,7 +83,7 @@ def test_mitigate_executor():
         assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
 
 
-def test_zne_decorator():
+def test_zne_decorator() -> None:
     true_zne_value = 1.0
 
     for _ in range(10):
@@ -96,7 +96,7 @@ def test_zne_decorator():
         assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
 
 
-def test_run_factory_with_number_of_shots():
+def test_run_factory_with_number_of_shots() -> None:
     true_zne_value = 1.0
 
     scale_factors = [1.0, 2.0, 3.0]
@@ -126,7 +126,7 @@ def test_run_factory_with_number_of_shots():
             }
 
 
-def test_mitigate_executor_with_shot_list():
+def test_mitigate_executor_with_shot_list() -> None:
     true_zne_value = 1.0
 
     scale_factors = [1.0, 2.0, 3.0]

@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for conversions between Mitiq circuits and Qiskit circuits."""
+from typing import List
 import pytest
 
 import cirq
@@ -30,7 +31,7 @@ from mitiq.mitiq_qiskit.conversions import (
 )
 
 
-def test_bell_state_to_from_circuits():
+def test_bell_state_to_from_circuits() -> None:
     """Tests cirq.Circuit --> qiskit.QuantumCircuit --> cirq.Circuit
     with a Bell state circuit.
     """
@@ -43,7 +44,7 @@ def test_bell_state_to_from_circuits():
     assert _equal(cirq_circuit, circuit_cirq)
 
 
-def test_bell_state_to_from_qasm():
+def test_bell_state_to_from_qasm() -> None:
     """Tests cirq.Circuit --> QASM string --> cirq.Circuit
     with a Bell state circuit.
     """
@@ -56,7 +57,7 @@ def test_bell_state_to_from_qasm():
     assert _equal(cirq_circuit, circuit_cirq)
 
 
-def test_random_circuit_to_from_circuits():
+def test_random_circuit_to_from_circuits() -> None:
     """Tests cirq.Circuit --> qiskit.QuantumCircuit --> cirq.Circuit
     with a random two-qubit circuit.
     """
@@ -70,7 +71,7 @@ def test_random_circuit_to_from_circuits():
     )
 
 
-def test_random_circuit_to_from_qasm():
+def test_random_circuit_to_from_qasm() -> None:
     """Tests cirq.Circuit --> QASM string --> cirq.Circuit
     with a random one-qubit circuit.
     """
@@ -85,7 +86,7 @@ def test_random_circuit_to_from_qasm():
 
 
 @pytest.mark.parametrize("as_qasm", (True, False))
-def test_convert_with_barrier(as_qasm):
+def test_convert_with_barrier(as_qasm: bool) -> None:
     """Tests converting a Qiskit circuit with a barrier to a Cirq circuit."""
     n = 5
     qiskit_circuit = qiskit.QuantumCircuit(qiskit.QuantumRegister(n))
@@ -100,7 +101,7 @@ def test_convert_with_barrier(as_qasm):
 
 
 @pytest.mark.parametrize("as_qasm", (True, False))
-def test_convert_with_multiple_barriers(as_qasm):
+def test_convert_with_multiple_barriers(as_qasm: bool) -> None:
     """Tests converting a Qiskit circuit with barriers to a Cirq circuit."""
     n = 1
     num_ops = 10
@@ -122,7 +123,7 @@ def test_convert_with_multiple_barriers(as_qasm):
 
 
 @pytest.mark.parametrize("qreg_sizes", [[1], [1, 2], [2, 1], [1, 1, 1]])
-def test_to_qiskit_assign_qregs(qreg_sizes):
+def test_to_qiskit_assign_qregs(qreg_sizes: List[int]) -> None:
     nbits = sum(qreg_sizes)
     cirq_circuit = cirq.testing.random_circuit(
         nbits, n_moments=5, op_density=1, random_state=10
@@ -143,7 +144,7 @@ def test_to_qiskit_assign_qregs(qreg_sizes):
 @pytest.mark.parametrize("qreg_sizes", [[2], [1, 3, 2], [2, 1], [1, 1, 1]])
 @pytest.mark.parametrize("measure", [True, False])
 @pytest.mark.parametrize("flip_creg", [True, False])
-def test_to_qiskit_assign_qregs_and_cregs(qreg_sizes, measure, flip_creg):
+def test_to_qiskit_assign_qregs_and_cregs(qreg_sizes: List[int], measure: bool, flip_creg: bool) -> None:
     nbits = sum(qreg_sizes)
     cirq_circuit = cirq.testing.random_circuit(
         nbits, n_moments=5, op_density=1, random_state=10
@@ -169,7 +170,7 @@ def test_to_qiskit_assign_qregs_and_cregs(qreg_sizes, measure, flip_creg):
 
 
 @pytest.mark.parametrize("reg_sizes", [[2, 4, 1, 6], [5, 4, 2], [6]])
-def test_map_bit_index(reg_sizes):
+def test_map_bit_index(reg_sizes: List[int]) -> None:
     expected_register_index = 0
     expected_mapped_index = 0
     for bit_index in range(sum(reg_sizes)):
@@ -187,7 +188,7 @@ def test_map_bit_index(reg_sizes):
 @pytest.mark.parametrize("nqubits", [1, 5])
 @pytest.mark.parametrize("with_ops", [True, False])
 @pytest.mark.parametrize("measure", [True, False])
-def test_transform_qregs_one_qubit_ops(nqubits, with_ops, measure):
+def test_transform_qregs_one_qubit_ops(nqubits: int, with_ops: bool, measure: bool) -> None:
     qreg = qiskit.QuantumRegister(nqubits)
     circ = qiskit.QuantumCircuit(qreg)
     if with_ops:
@@ -208,7 +209,7 @@ def test_transform_qregs_one_qubit_ops(nqubits, with_ops, measure):
 
 
 @pytest.mark.parametrize("new_reg_sizes", [[1], [1, 2], [2, 1], [1, 1, 1]])
-def test_transform_qregs_two_qubit_ops(new_reg_sizes):
+def test_transform_qregs_two_qubit_ops(new_reg_sizes: List[int]) -> None:
     nqubits = sum(new_reg_sizes)
     circ = to_qiskit(
         cirq.testing.random_circuit(
@@ -228,7 +229,7 @@ def test_transform_qregs_two_qubit_ops(new_reg_sizes):
 @pytest.mark.parametrize("nbits", [1, 5])
 @pytest.mark.parametrize("with_ops", [True, False])
 @pytest.mark.parametrize("measure", [True, False])
-def test_transform_cregs(nbits, with_ops, measure):
+def test_transform_cregs(nbits: int, with_ops: bool, measure: bool) -> None:
     qreg = qiskit.QuantumRegister(nbits)
     creg = qiskit.ClassicalRegister(nbits)
     circ = qiskit.QuantumCircuit(qreg, creg)
@@ -249,7 +250,7 @@ def test_transform_cregs(nbits, with_ops, measure):
 
 @pytest.mark.parametrize("new_reg_sizes", [[1], [1, 2], [2, 1], [1, 1, 1]])
 @pytest.mark.parametrize("measure", [True, False])
-def test_transform_qregs_and_cregs_random_circuit(new_reg_sizes, measure):
+def test_transform_qregs_and_cregs_random_circuit(new_reg_sizes, measure) -> None:
     nbits = sum(new_reg_sizes)
     circ = to_qiskit(
         cirq.testing.random_circuit(
@@ -271,7 +272,7 @@ def test_transform_qregs_and_cregs_random_circuit(new_reg_sizes, measure):
     assert _equal(from_qiskit(circ), from_qiskit(orig))
 
 
-def test_transform_registers_wrong_bit_number():
+def test_transform_registers_wrong_bit_number() -> None:
     nqubits = 2
     circ = qiskit.QuantumCircuit(qiskit.QuantumRegister(nqubits))
     new_qregs = [qiskit.QuantumRegister(1) for _ in range(2 * nqubits)]
