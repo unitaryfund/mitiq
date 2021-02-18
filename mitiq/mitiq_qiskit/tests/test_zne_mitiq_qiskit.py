@@ -60,11 +60,11 @@ def qiskit_executor(qp: QPROGRAM, shots: int = 500) -> float:
 
 
 def get_counts(circuit: QuantumCircuit):
-    return execute(
-        circuit,
-        Aer.get_backend("qasm_simulator"),
-        shots=100
-    ).result().get_counts()
+    return (
+        execute(circuit, Aer.get_backend("qasm_simulator"), shots=100)
+        .result()
+        .get_counts()
+    )
 
 
 @zne.zne_decorator()
@@ -191,7 +191,7 @@ def test_measurement_order_is_preserved_two_registers():
     of counts is the same as the original circuit on a noiseless simulator.
     """
     n = 4
-    qreg= QuantumRegister(n)
+    qreg = QuantumRegister(n)
     creg1, creg2 = ClassicalRegister(n // 2), ClassicalRegister(n // 2)
     circuit = QuantumCircuit(qreg, creg1, creg2)
 
