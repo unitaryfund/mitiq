@@ -128,6 +128,33 @@ def _map_bits(
     return [Bit(new_registers[i], j) for i, j in mapped_indices]
 
 
+def _measurement_order(circuit: qiskit.QuantumCircuit):
+    """Returns the left-to-right measurement order in the circuit.
+
+    The "measurement order" is a list of tuples (qubit, bit) involved in
+    measurements ordered as they appear going left-to-right through the circuit
+    (i.e., iterating through circuit.data). The purpose of this is to be able
+    to do
+
+    >>> for (qubit, bit) in _measurement_order(circuit):
+    >>>     other_circuit.measure(qubit, bit)
+
+    which ensures ``other_circuit`` has the same measurement order as
+    ``circuit``, assuming ``other_circuit`` has the same register(s) as
+    ``circuit``.
+
+    Args:
+        circuit: Qiskit circuit to get the measurement order of.
+    """
+    order = []
+    for (gate, qubits, cbits) in circuit.data:
+        if isinstance(gate, qiskit.circuit.Measure):
+            # TODO: Is it guaranteed that a measurement gate only has one qubit
+            #  and one cbit in Qiskit?
+            order.append((*qubits, *cbits))
+    return order
+
+
 def _transform_registers(
     circuit: qiskit.QuantumCircuit,
     new_qregs: Optional[List[qiskit.QuantumRegister]] = None,

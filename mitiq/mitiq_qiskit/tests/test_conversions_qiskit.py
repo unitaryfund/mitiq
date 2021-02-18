@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for conversions between Mitiq circuits and Qiskit circuits."""
+import numpy as np
 import pytest
 
 import cirq
@@ -27,6 +28,7 @@ from mitiq.mitiq_qiskit.conversions import (
     from_qiskit,
     _map_bit_index,
     _transform_registers,
+    _measurement_order,
 )
 
 
@@ -285,3 +287,16 @@ def test_transform_registers_wrong_bit_number():
 
     with pytest.raises(ValueError):
         _transform_registers(circ, new_qregs, new_cregs)
+
+
+@pytest.mark.parametrize("size", [5])
+def test_measurement_order(size):
+    q, c = qiskit.QuantumRegister(size), qiskit.ClassicalRegister(size)
+    circuit = qiskit.QuantumCircuit(q, c)
+
+    index_order = np.random.RandomState(1).permutation(size)
+    for i in index_order:
+        circuit.measure(q[i], c[i])
+
+    order = _measurement_order(circuit)
+    assert order == [(q[i], c[i]) for i in index_order]
