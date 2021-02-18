@@ -154,7 +154,10 @@ def converter(
 
         # Keep the same register structure and measurement order with Qiskit.
         if input_circuit_type == "qiskit":
-            from mitiq.mitiq_qiskit.conversions import _transform_registers, _measurement_order
+            from mitiq.mitiq_qiskit.conversions import (
+                _transform_registers,
+                _measurement_order,
+            )
 
             scaled_circuit.remove_final_measurements()
             _transform_registers(
