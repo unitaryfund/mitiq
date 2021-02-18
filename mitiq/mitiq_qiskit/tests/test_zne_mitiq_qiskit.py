@@ -14,7 +14,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tests for zero-noise extrapolation with Qiskit front-ends and back-ends."""
-from qiskit import ClassicalRegister, QuantumCircuit
+import pytest
+
+from qiskit import (
+    Aer,
+    ClassicalRegister,
+    QuantumCircuit,
+    QuantumRegister,
+    execute,
+)
 
 from mitiq import zne
 from mitiq._typing import QPROGRAM
@@ -49,6 +57,14 @@ def measure(circuit, qid) -> QuantumCircuit:
 
 def qiskit_executor(qp: QPROGRAM, shots: int = 500) -> float:
     return run_with_noise(qp, noise=BASE_NOISE, shots=shots, seed=1)
+
+
+def get_counts(circuit: QuantumCircuit):
+    return execute(
+        circuit,
+        Aer.get_backend("qasm_simulator"),
+        shots=100
+    ).result().get_counts()
 
 
 @zne.zne_decorator()
@@ -151,3 +167,43 @@ def test_mitigate_executor_with_shot_list():
                 "scale_factor": scale_factors[i],
                 "shots": shot_list[i],
             }
+
+
+@pytest.mark.parametrize("order", [(0, 1), (1, 0), (0, 1, 2), (1, 2, 0)])
+def test_measurement_order_is_preserved_single_register(order):
+    """Tests measurement order is preserved when folding, i.e., the dictionary
+    of counts is the same as the original circuit on a noiseless simulator.
+    """
+    qreg, creg = QuantumRegister(len(order)), ClassicalRegister(len(order))
+    circuit = QuantumCircuit(qreg, creg)
+
+    circuit.x(qreg[0])
+    for i in order:
+        circuit.measure(qreg[i], creg[i])
+
+    folded = zne.scaling.fold_gates_at_random(circuit, scale_factor=1.0)
+
+    assert get_counts(folded) == get_counts(circuit)
+
+
+def test_measurement_order_is_preserved_two_registers():
+    """Tests measurement order is preserved when folding, i.e., the dictionary
+    of counts is the same as the original circuit on a noiseless simulator.
+    """
+    n = 4
+    qreg= QuantumRegister(n)
+    creg1, creg2 = ClassicalRegister(n // 2), ClassicalRegister(n // 2)
+    circuit = QuantumCircuit(qreg, creg1, creg2)
+
+    circuit.x(qreg[0])
+    circuit.x(qreg[2])
+
+    # Some order of measurements.
+    circuit.measure(qreg[0], creg2[1])
+    circuit.measure(qreg[1], creg1[0])
+    circuit.measure(qreg[2], creg1[1])
+    circuit.measure(qreg[3], creg2[1])
+
+    folded = zne.scaling.fold_gates_at_random(circuit, scale_factor=1.0)
+
+    assert get_counts(folded) == get_counts(circuit)
