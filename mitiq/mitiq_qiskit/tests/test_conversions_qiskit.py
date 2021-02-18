@@ -294,7 +294,7 @@ def test_measurement_order(size):
     q, c = qiskit.QuantumRegister(size), qiskit.ClassicalRegister(size)
     circuit = qiskit.QuantumCircuit(q, c)
 
-    index_order = np.random.RandomState(1).permutation(size)
+    index_order = [int(i) for i in np.random.RandomState(1).permutation(size)]
     for i in index_order:
         circuit.measure(q[i], c[i])
 
