@@ -4,7 +4,8 @@ import numpy as np
 from mitiq._typing import QPROGRAM
 
 # Global variable of Clifford angles in Rz gates:
-CLIFFORD_ANGLES = (0, np.pi/2, np.pi, 3/2*(np.pi))
+CLIFFORD_ANGLES = (0.0, np.pi/2, np.pi, (3/2)*(np.pi))
+
 
 def generate_training_circuits(
     circuit: cirq.circuits.Circuit,
@@ -62,12 +63,14 @@ def generate_training_circuits(
 
     # find all the non-Clifford gates:
     all_cliff = np.column_stack((not_rz_circ_data, rz_cliff))
-
+    angles_original_list = []
+    angles_replaced_list = []
     for n in range(num_training_circuits):
         # Convert data arry into cirq circuit and append it to the storage
         #  array:
         if additional_options:
-            projected_circuit = _map_to_near_clifford(
+            (projected_circuit, angles_original,
+                angles_replaced) = _map_to_near_clifford(
                 rz_non_cliff, all_cliff,
                 empty_circuit,
                 total_non_cliff,
@@ -77,16 +80,21 @@ def generate_training_circuits(
                 additional_options=additional_options.get(
                     'additional_options'))
         else:
-            projected_circuit = _map_to_near_clifford(rz_non_cliff, all_cliff,
-                                                      empty_circuit,
-                                                      total_non_cliff,
-                                                      fraction_non_clifford,
-                                                      method_select,
-                                                      method_replace)
+            (projected_circuit, angles_original,
+                angles_replaced) = _map_to_near_clifford(rz_non_cliff,
+                                                         all_cliff,
+                                                         empty_circuit,
+                                                         total_non_cliff,
+                                                         fraction_non_clifford,
+                                                         method_select,
+                                                         method_replace)
 
         circuits_list.append(projected_circuit)
-
-    return circuits_list
+        # this information is to make sure the probabilistic methods are
+        #  working as expected:
+        angles_original_list.append(angles_original)
+        angles_replaced_list.append(angles_replaced)
+    return circuits_list, angles_original_list, angles_replaced_list
 
 
 def _map_to_near_clifford(
@@ -173,6 +181,8 @@ def _map_to_near_clifford(
     rz_non_cliff_copy = np.delete(rz_non_cliff_copy, columns_to_change, axis=1)
     # Now the non Clifford gates have been selected, we need to decide which
     # Clifford gate to replace them with.
+    # to store original angles replaced:
+    angles_original = rz_non_cliff_selected[2, :].copy()
     if method_replace == 'closest':
         rz_non_cliff_selected[2, :] = _closest_clifford(
             rz_non_cliff_selected[2, :])
@@ -188,6 +198,8 @@ def _map_to_near_clifford(
     else:
         raise Exception(
             'method_replace must = "closest", "random", "probabilistic"')
+    # to store replaced angles:
+    angles_replaced = rz_non_cliff_selected[2, :].copy()
     # Add back into rest of data and re-order instructions:
     new_circ = np.column_stack((all_cliff, rz_non_cliff_selected))
     new_circ = np.column_stack((new_circ, rz_non_cliff_copy))
@@ -196,7 +208,7 @@ def _map_to_near_clifford(
     projected_circuit = _array_to_circuit(
         projected_circuit_data, empty_circuit_copy)
 
-    return projected_circuit
+    return projected_circuit, angles_original, angles_replaced
 
 
 def count_non_cliffords(
@@ -305,13 +317,13 @@ def _array_to_circuit(
     data: np.ndarray,
     empty_circuit: QPROGRAM
 ) -> QPROGRAM:
-    ''' Function that takes the data array containing all the circuit data \
+    ''' Function that takes the data array containing all the circuit data
         and turns it into a quantum circuit.
 
     Args:
-        data: array containing circuit data np.array([order], [names], \
+        data: array containing circuit data np.array([order], [names],
               [parameters], [qubits], [operations]).
-        empty_cricuit: cirq object containing circuit structure.\
+        empty_cricuit: cirq object containing circuit structure.
                        (empty circuit object)
 
     Returns:
@@ -351,15 +363,15 @@ def _is_clifford_angle(
     ang: float,
     tol: float = 10 ** -5,
 ) -> bool:
-    CLIFFORD_ANGLES = (np.pi / 2, np.pi, np.pi * 3 / 2, 2 * np.pi, 0)
     '''Function to check if a given angle is Clifford.
     Args:
         ang: rotation angle in the Rz gate.
     Returns:
         bool: True / False for Clifford or not.
     '''
-    closest_clifford = _closest_clifford(ang)
-    if abs(closest_clifford - ang) < tol:
+    ang = ang % (2*np.pi)
+    closest_clifford_angle = _closest_clifford(ang)
+    if abs(closest_clifford_angle - ang) < tol:
         return True
     else:
         return False
@@ -372,7 +384,7 @@ _is_clifford_angle = np.vectorize(_is_clifford_angle)
 def _closest_clifford(
     ang: float
 ) -> float:
-    '''Function to take angle and return the nearest Clifford angle note the \
+    '''Function to take angle and return the nearest Clifford angle note the
        usage of this function is vectorized so it takes and returns arrays.
 
     Args:
@@ -381,15 +393,19 @@ def _closest_clifford(
     Returns:
         Clifford angle: closest clifford angle.
     '''
-    ang_scaled = ang%(2*np.pi)/(np.pi/2)
+    ang = ang % (2*np.pi)
+    ang_scaled = ang/(np.pi/2)
     # if just one min value, return the corresponding nearest cliff.
-    if ang_scaled/0.5 !=(1,3,5) :
-        return (CLIFFORD_ANGLES[ang_scaled])
+    if (abs((ang_scaled/0.5) - 1) > 10**(-6) and abs((
+        ang_scaled/0.5) - 3) > 10**(-6) and (abs((ang_scaled/0.5) - 5)
+                                             > 10**(-6))):
+        index = int(np.round(ang_scaled)) % 4
+        return CLIFFORD_ANGLES[index]
     # if two min values (ie two cliff gates equidistant) randomly choose the
     # cliff gate to return.
     else:
-        index_list = [ang_scaled/0.5, ang_scaled/0.5 -1]
-        index = choice(index_list)
+        index_list = [ang_scaled - 0.5, ang_scaled + 0.5]
+        index = int(choice(index_list))
         return CLIFFORD_ANGLES[index]
 
 
@@ -400,7 +416,7 @@ _closest_clifford = np.vectorize(_closest_clifford)
 def _random_clifford(
     ang: float
 ) -> float:
-    '''Function to take angle and return the random Clifford angle note the \
+    '''Function to take angle and return the random Clifford angle note the
        usage of this function is vectorized so it takes and returns arrays.
 
     Args:
@@ -410,7 +426,8 @@ def _random_clifford(
         Clifford angle: closest clifford angle.
     '''
     random_index = randint(0, 3)
-    return CLIFFORD_ANGLES[random_index]
+    clifford_angle = CLIFFORD_ANGLES[random_index]
+    return clifford_angle
 
 
 # vectorize so function can take array:
@@ -421,20 +438,23 @@ def _angle_to_probabilities(
     angle: float,
     sigma: float
 ) -> float:
-    """Function to return probability disribtuion based on distance from \
+    """Function to return probability disribtuion based on distance from
        angles to Clifford gates.
 
     Args:
         angle: angle to form probability distribution.
     Returns:
-        discrete value of probability distribution calucalted from \
-        Prob_project = exp(-(dist/sigma)^2) where dist = sum(dists) is the \
+        discrete value of probability distribution calucalted from
+        Prob_project = exp(-(dist/sigma)^2) where dist = sum(dists) is the
         sum of distances from each Clifford gate.
     """
+    angle = angle % (2*np.pi)
     S = np.array([[1, 0.0], [0.0, 1j]])
     Rz = np.array([[1, 0.0], [0.0, np.exp(angle*1j)]])
     dists = []
     for i in range(4):
+        if i == 0:
+            i = 4
         diff = np.linalg.norm(Rz - S ** (i))
         dists.append(np.exp(-(diff / sigma) ** 2))
     return sum(dists)
@@ -448,13 +468,13 @@ def _probabilistic_angle_to_clifford(
     ang: float,
     sigma: float,
 ) -> float:
-    '''Function to take angle and return the Clifford angle according to the \
+    '''Function to take angle and return the Clifford angle according to the
        probability distirbution:
 
                         prob = exp(-(dist/sigma)^2)
 
-    where dist is the frobenius norm from the 4 clifford angles and the gate \
-    of interest. Note the usage of this function is vectorized so it takes \
+    where dist is the frobenius norm from the 4 clifford angles and the gate
+    of interest. Note the usage of this function is vectorized so it takes
     and returns arrays.
 
     Args:
@@ -462,13 +482,16 @@ def _probabilistic_angle_to_clifford(
         sigma: width of probability distribution.
 
     Returns:
-        Clifford angle: clifford angle to replace gate angle, calculated \
+        Clifford angle: clifford angle to replace gate angle, calculated
         probabilistically.
     '''
+    ang = ang % (2*np.pi)
     S = np.array([[1, 0.0], [0.0, 1j]])
     Rz = np.array([[1, 0.0], [0.0, np.exp(ang*1j)]])
     dists = []
     for i in range(4):
+        if i == 0:
+            i = 4
         diff = np.linalg.norm(Rz - S ** (i))
         dists.append(np.exp(-(diff/sigma) ** 2))
     prob_gate = [i/sum(dists) for i in dists]

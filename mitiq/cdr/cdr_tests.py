@@ -2,15 +2,15 @@ import cirq
 from mitiq.mitiq_qiskit.conversions import to_qiskit, from_qiskit
 from mitiq._typing import QPROGRAM
 from qiskit import QuantumCircuit, compiler
-from clifford_training_data import count_non_cliffords, \
-    generate_training_circuits
+from clifford_training_data import (count_non_cliffords,
+                                    generate_training_circuits)
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def random_circuit(
     qubits: int,
     depth: int,
-    measure: bool,
 ) -> QPROGRAM:
     '''Function to generate a random quantum circuit in cirq. The circuit is \
        based on the hardware efficient ansatz,
@@ -19,7 +19,6 @@ def random_circuit(
     Args:
         qubits: number of qubits in circuit.
         depth: depth of the RQC.
-        measure: measurements or not.
     Returns:
         cirquit: a random quantum circuit of specified depth.
     '''
@@ -30,8 +29,7 @@ def random_circuit(
         cirq.experiments.\
         random_rotations_between_grid_interaction_layers_circuit(
             qubits=qubits, depth=depth, seed=0)
-    if measure:
-        circuit.append(cirq.measure(*qubits, key='z'))
+    circuit.append(cirq.measure(*qubits, key='z'))
     return(circuit)
 
 
@@ -45,37 +43,28 @@ def qiskit_circuit_transplation(
     Returns:
         circ_new: new circuite compiled and decomposed into the above gate set.
     """
-    # this decomposes the circuit into u3 and cnot gates:
-    circ = compiler.transpile(
-        circ, basis_gates=['sx', 'rz', 'cx', 'x'], optimization_level=3)
-    # print(circ.draw())
-    # now for each U3(theta, phi, lambda), this can be converted into
-    # Rz(phi+pi)Rx(pi/2)Rz(theta+pi)Rx(pi/2)Rz(lambda)
-    try:
-        circ_new = QuantumCircuit(len(circ.qubits), len(circ.clbits))
-    except Exception:
-        circ_new = QuantumCircuit(len(circ.qubits))
+    circ = compiler.transpile(circ, basis_gates=['u3', 'cx'],
+                              optimization_level=3)
+    circ_new = QuantumCircuit(len(circ.qubits), len(circ.clbits))
     for i in range(len(circ.data)):
         # get information for the gate
         gate = circ.data[i][0]
         name = gate.name
         if name == 'cx':
             qubit = [circ.data[i][1][0].index, circ.data[i][1][1].index]
-            parameters = []
             circ_new.cx(qubit[0], qubit[1])
-        if name == 'rz':
-            parameters = (float(gate.params[0])) % (2 * np.pi)
-            # leave out empty Rz gates:
-            if parameters != 0:
-                qubit = circ.data[i][1][0].index
-                circ_new.rz(parameters, qubit)
-        if name == 'sx':
-            parameters = np.pi/2
+        elif name == 'u3':
             qubit = circ.data[i][1][0].index
-            circ_new.rx(parameters, qubit)
-        if name == 'x':
-            qubit = circ.data[i][1][0].index
-            circ_new.x(qubit)
+            parameters = gate.params
+            # doing the decompostion of u3 gate here:
+            theta = parameters[0]
+            phi = parameters[1]
+            lamda = parameters[2]
+            circ_new.rz(phi+np.pi, qubit)
+            circ_new.rx(np.pi/2, qubit)
+            circ_new.rz(theta+np.pi, qubit)
+            circ_new.rx(np.pi/2, qubit)
+            circ_new.rz(lamda, qubit)
         elif name == 'measure':
             qubit = circ.data[i][1][0].index
             cbit = circ.data[i][2][0].index
@@ -83,27 +72,63 @@ def qiskit_circuit_transplation(
     return(circ_new)
 
 
-num_qubits = 4
-layers = 1
-measure = True
-num_training_circuits = 2
-fraction_non_clifford = 0.5
-circuit = cirq.circuits.Circuit(random_circuit(num_qubits, layers, measure))
-circuit = from_qiskit(qiskit_circuit_transplation(to_qiskit(circuit)))
+def uniform_circuit(
+) -> QPROGRAM:
+    """Returns a single qubit circuit with a uniform distribution of theta
+    rotations about the z axis.
+    Returns:
+        circ: qiskit quantum circuit object.
+    """
+    circ = QuantumCircuit(1, 1)
+    for i in range(2001):
+        angle = (i*np.pi*4)/(2000)
+        circ.rz(angle, 0)
+    circ.measure(0, 0)
+    return(circ)
+
+
+num_training_circuits = 10
+fraction_non_clifford = 0.90
+# num_qubits = 8
+# layers = 8
+# circuit = cirq.circuits.Circuit(random_circuit(num_qubits, layers))
+# circuit = from_qiskit(qiskit_circuit_transplation(to_qiskit(circuit)))
+circuit = from_qiskit(uniform_circuit())
 non_cliffords = count_non_cliffords(circuit)
 print('number of non Clifford gates ORIG = ', non_cliffords)
-# additional_options = {'sigma_replace': 0.1 }
+additional_options = {'sigma_replace': 0.5, 'sigma_select': 0.5}
 # print(additional_options)
-training_circuits = generate_training_circuits(
-    circuit, num_training_circuits, fraction_non_clifford,
-    method_select='random', method_replace='probabilistic')
+(training_circuits, angles_original_list,
+ angles_replaced_list) = generate_training_circuits(
+                                        circuit,
+                                        num_training_circuits,
+                                        fraction_non_clifford,
+                                        method_select='probabilistic',
+                                        method_replace='probabilistic',
+                                        additional_options=additional_options)
 
 # testing circuits look good. Note that a figure is saved with every circuit
 # in the trianing set for visual inspection
-for i, training_circuit in enumerate(training_circuits):
-    non_cliffords = count_non_cliffords(training_circuit)
-    print('number of non Clifford gates = ', non_cliffords)
-    training_circuit = to_qiskit(training_circuit)
-    training_circuit.draw(output='mpl', filename='my_circuit_%s.png' % (i))
+angles_selected = np.array(angles_original_list).flatten()
+angles_replaced = np.array(angles_replaced_list).flatten()
 
-to_qiskit(circuit).draw(output='mpl', filename='my_circuit_orig.png')
+
+def plot_histogram_of_angles():
+    plt.figure(1)
+    plt.hist(abs(angles_selected), bins=100)
+    plt.ylabel('counts')
+    plt.xlabel('angle')
+    plt.show()
+
+
+def plot_circuits():
+    for i, training_circuit in enumerate(training_circuits):
+        non_cliffords = count_non_cliffords(training_circuit)
+        print('number of non Clifford gates = ', non_cliffords)
+        training_circuit = to_qiskit(training_circuit)
+        training_circuit.draw(output='mpl', filename='my_circuit_%s.png' % (i))
+
+    to_qiskit(circuit).draw(output='mpl', filename='my_circuit_orig.png')
+
+
+plot_histogram_of_angles()
