@@ -149,8 +149,14 @@ def _measurement_order(circuit: qiskit.QuantumCircuit):
     order = []
     for (gate, qubits, cbits) in circuit.data:
         if isinstance(gate, qiskit.circuit.Measure):
-            # TODO: Is it guaranteed that a measurement gate only has one qubit
-            #  and one cbit in Qiskit?
+            if len(qubits) != 1 or len(cbits) != 1:
+                raise ValueError(
+                    f"Only measurements with one qubit and one bit are "
+                    f"supported, but this measurement has {len(qubits)} "
+                    f"qubit(s) and {len(cbits)} bit(s). If you think this "
+                    f"should be supported and is a bug, please open an issue "
+                    f"at https://github.com/unitaryfund/mitiq."
+                )
             order.append((*qubits, *cbits))
     return order
 
