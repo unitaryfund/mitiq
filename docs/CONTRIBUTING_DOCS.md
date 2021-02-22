@@ -26,12 +26,6 @@ Alternately, you can use the docker image provided in the repo and all requireme
 
 You can check that Sphinx is installed with `sphinx-build --version`.
 
-In addition, there are two requirements, `tensorflow` and `tensorflow-quantum`,
-which are used solely in `guide/guide-executors.rst`. They can be installed via:
-
-```bash
-pip install -r docs/requirements.txt
-```
 
 If they are not installed, the test that uses them will be skipped. We do this because
 `tensorflow-quantum` has incompatibility issues -- version `0.4.0` works on `py38` but

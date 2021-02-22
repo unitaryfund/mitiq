@@ -519,16 +519,12 @@ Tensorflow evaluates faster than the exact density matrix simulation using ``Cir
 Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
 
 .. testcode::
+    :skipif: True
 
     import numpy as np
     import sympy
-    # tensorflow-quantum 0.4.0 is unavailable on Windows
-    try:
-        import tensorflow as tf
-        import tensorflow_quantum as tfq
-        tfq_exists = True
-    except ImportError:
-        tfq_exists = False
+    import tensorflow as tf
+    import tensorflow_quantum as tfq
     from cirq import Circuit
 
 
@@ -578,15 +574,15 @@ Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
 
 .. testcode::
     :hide:
+    :skipif: True
 
-    if tfq_exists:
-        import cirq
-        from mitiq.benchmarks import generate_rb_circuits
+    import cirq
+    from mitiq.benchmarks import generate_rb_circuits
 
-        circ = generate_rb_circuits(1, 20, 1)[0]
+    circ = generate_rb_circuits(1, 20, 1)[0]
 
-        # Need to make sure the qubits are cirq.GridQubit
-        circ = circ.transform_qubits(lambda q: cirq.GridQubit.rect(1, 1)[0])
+    # Need to make sure the qubits are cirq.GridQubit
+    circ = circ.transform_qubits(lambda q: cirq.GridQubit.rect(1, 1)[0])
 
-        out = stochastic_bit_flip_simulation(circ, 0.001)
-        assert 0.5 < out < 1
+    out = stochastic_bit_flip_simulation(circ, 0.001)
+    assert 0.5 < out < 1
