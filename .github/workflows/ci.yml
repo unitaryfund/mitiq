@@ -63,13 +63,13 @@ jobs:
       - name: Lint with flake8
         run: make check-style
 
-  # runs all the unit tests (on Ubuntu, py37/38/39) and measures code coverage
+  # runs all the unit tests (on Ubuntu, py37/38) and measures code coverage
   test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.7, 3.8]
 
     steps:
       - name: Check out mitiq
