@@ -9,7 +9,7 @@ the Python toolkit for implementing error mitigation on quantum computers.
 ## Requirements
 Our documentation is generated with
 [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html).
-The necessary packages can be installed, from the root `mitiq` directory
+The necessary packages can be installed, from the root Mitiq directory
 ```bash
 pip install -e .
 pip install -r dev_requirements.txt
@@ -92,7 +92,7 @@ where `file.md` is the one to be added. For more information on including files 
 ### Adding files to the user guide
 
 To add information in the guide, it is recommended to add markdown (`.md`) or MyST markdown files (`.myst`) to the `docs/guide/` directory.
-Remember to add any files you add to the `docs/guide/` directory to the guide TOC file {doc}`docs/source/guide/guide.myst` 
+Remember to add any files you add to the `docs/guide/` directory to the guide TOC file `docs/source/guide/guide.myst`.
 
 ### Adding code examples
 
@@ -115,11 +115,11 @@ New modules, classes and functions can be added by listing them
 in the appropriate `.md or `*.myst` file (such as `apidoc.myst` or a child), e.g.,
 
 ```
-## Factories
-```{automodule} mitiq.factories
+## New Module
+```{automodule} mitiq.new_module
    :members:
 ```
-will add all elements of the `mitiq.factories` module with a Factories subtitle. 
+will add all elements of the `mitiq.new_module` module with a subtitle "New Module." 
 You can hand-pick classes and functions to add, to comment them, as well as exclude them.
 
 ```{tip}
@@ -207,7 +207,7 @@ If you have code blocks you want to run, but not be displayed, use the
 ```
 ````
 ### IPython code blocks
-There is also the `doctest` directive, which allows to include interactive
+There is also the `doctest` directive, which allows you to include interactive
 Python blocks. These need to be given this way:
 
 ````md

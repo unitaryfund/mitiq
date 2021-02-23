@@ -152,10 +152,14 @@ def converter(
         # Base conversion back to input type.
         scaled_circuit = convert_from_mitiq(scaled_circuit, input_circuit_type)
 
-        # Keep the same register structure in Qiskit circuits.
+        # Keep the same register structure and measurement order with Qiskit.
         if input_circuit_type == "qiskit":
-            from mitiq.mitiq_qiskit.conversions import _transform_registers
+            from mitiq.mitiq_qiskit.conversions import (
+                _transform_registers,
+                _measurement_order,
+            )
 
+            scaled_circuit.remove_final_measurements()
             _transform_registers(
                 scaled_circuit,
                 new_qregs=circuit.qregs,
@@ -163,6 +167,9 @@ def converter(
             )
             if circuit.cregs and not scaled_circuit.cregs:
                 scaled_circuit.add_register(*circuit.cregs)
+
+            for q, c in _measurement_order(circuit):
+                scaled_circuit.measure(q, c)
 
         return scaled_circuit
 

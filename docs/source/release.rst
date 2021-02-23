@@ -7,7 +7,7 @@ Releasing a new version of Mitiq
 ================================
 
 .. note::
-    These instructions are aimed at the maintainers of the ``mitiq`` library.
+    These instructions are for Mitiq maintainers.
 
 When the time is ready for a new release, follow the checklist and
 instructions of this document to go through all the steps below:
@@ -114,10 +114,10 @@ is good practice to upload it on the test channel TestPyPI.
 
 .. note::
     You need to be a registered user on TestPyPI and a maintainer of the
-    ``mitiq`` project in order to be able to upload the package.
+    Mitiq project in order to be able to upload the package.
 
 Upload the package. In order to upload it, you need to have ``twine``,
-which can be installed with ``pip install twine``. Go to the ``mitiq``
+which can be installed with ``pip install twine``. Go to the Mitiq
 directory, after having created the source distribution version ``sdist``,
 and simply run:
 
@@ -145,12 +145,12 @@ Release the new version on PyPI
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. note::
-    You need to be a registered user on PyPI and a maintainer of the ``mitiq``
+    You need to be a registered user on PyPI and a maintainer of the Mitiq
     project in order to be able to upload the package.
 
 If you already created the source distribution and wheels and tested it on
 TestPyPI, then you need to just run the following from the top-level directory
-of the ``mitiq`` repository:
+of the Mitiq repository:
 
 .. code-block:: shell-session
 
@@ -164,7 +164,7 @@ Release the new version on Github
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. note::
-    You need to have write access to the ``mitiq`` Github repository to make
+    You need to have write access to the Mitiq Github repository to make
     a new release.
 
 Make a new release on Github

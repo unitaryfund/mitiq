@@ -36,9 +36,9 @@ def sample_sequence(
     input ideal operation & returns this sequence as well as its sign and norm.
 
     For example, if the ideal operation is U with representation U = a A + b B,
-    then this function returns A with probability |a| / (|a| + |b|) and B with
-    probability |b| / (|a| + |b|). Also returns sign(A) (sign(B)) and |a| + |b|
-    if A (B) is sampled.
+    then this function returns A with probability :math:`|a| / (|a| + |b|)` and
+    B with probability :math:`|b| / (|a| + |b|)`. Also returns sign(a)
+    (sign(b)) and :math:`|a| + |b|` if A (B) is sampled.
 
     Note that the ideal operation can be a sequence of operations (circuit),
     for instance U = V W, as long as a representation is known. Similarly, A
