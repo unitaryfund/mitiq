@@ -5,7 +5,7 @@
 maxdepth: 2 
 ---
 ibmq-backends.rst
-qaoa-landscape.rst
 hamiltonians.rst
-test
+maxcut-demo.md
+test.myst
 ```
