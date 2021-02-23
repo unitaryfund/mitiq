@@ -53,8 +53,32 @@ setup(
     ],
     license="GPL v3.0",
     url="https://unitary.fund",
+    python_requires='>=3.7',
 )
 
 # restore _version.py to its previous state
 with open("mitiq/_version.py", "w") as f:
     f.write(version_file_source)
+name='numpy',
+        maintainer="NumPy Developers",
+        maintainer_email="numpy-discussion@python.org",
+        description=DOCLINES[0],
+        long_description="\n".join(DOCLINES[2:]),
+        url="https://www.numpy.org",
+        author="Travis E. Oliphant et al.",
+        download_url="https://pypi.python.org/pypi/numpy",
+        project_urls={
+            "Bug Tracker": "https://github.com/numpy/numpy/issues",
+            "Documentation": get_docs_url(),
+            "Source Code": "https://github.com/numpy/numpy",
+        },
+        license='BSD',
+        classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
+        platforms=["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
+        test_suite='pytest',
+        version=versioneer.get_version(),
+        cmdclass=cmdclass,
+        python_requires='>=3.7',
+        zip_safe=False,
+        entry_points={
+            'console_scripts': f2py_cmds
