@@ -14,6 +14,7 @@ from clifford_training_data import (_array_to_circuit, _circuit_to_array,
 from qiskit import compiler, QuantumCircuit
 from mitiq.mitiq_qiskit.conversions import to_qiskit, from_qiskit
 
+
 """Tests for training circuits generation for Clifford data regression.
 """
 CLIFFORD_ANGLES = (0.0, np.pi/2, np.pi, (3/2)*(np.pi))
@@ -23,7 +24,7 @@ def random_circuit(
     qubits: int,
     depth: int,
 ) -> QPROGRAM:
-    '''Function to generate a random quantum circuit in cirq. The circuit is
+    """Function to generate a random quantum circuit in cirq. The circuit is
        based on the hardware efficient ansatz,
     with alternating CNOT layers with randomly selected single qubit gates in
     between.
@@ -32,21 +33,20 @@ def random_circuit(
         depth: depth of the RQC.
     Returns:
         cirquit: a random quantum circuit of specified depth.
-    '''
+    """
     # Get a rectangular grid of qubits.
     qubits = cirq.GridQubit.rect(qubits, 1)
     # Generates a random circuit on the provided qubits.
-    circuit = \
-        cirq.experiments.\
+    circuit = cirq.experiments.\
         random_rotations_between_grid_interaction_layers_circuit(
             qubits=qubits, depth=depth, seed=0)
     circuit.append(cirq.measure(*qubits, key='z'))
     return(circuit)
 
 
-def qiskit_circuit_transplation(
+def qiskit_circuit_transpilation(
     circ: QPROGRAM,
-) -> QPROGRAM:
+) -> QuantumCircuit:
     """Decomposes qiskit circuit object into Rz, Rx(pi/2) (sx), X and CNOT
        gates.
     Args:
@@ -57,15 +57,14 @@ def qiskit_circuit_transplation(
     circ = compiler.transpile(circ, basis_gates=['u3', 'cx'],
                               optimization_level=3)
     circ_new = QuantumCircuit(len(circ.qubits), len(circ.clbits))
-    for i in range(len(circ.data)):
+    for (gate, qubits, cbits) in circ.data:
         # get information for the gate
-        gate = circ.data[i][0]
         name = gate.name
         if name == 'cx':
-            qubit = [circ.data[i][1][0].index, circ.data[i][1][1].index]
+            qubit = [qubits[0].index, qubits[1].index]
             circ_new.cx(qubit[0], qubit[1])
         elif name == 'u3':
-            qubit = circ.data[i][1][0].index
+            qubit = qubits[0].index
             parameters = gate.params
             # doing the decompostion of u3 gate here:
             theta = parameters[0]
@@ -77,8 +76,8 @@ def qiskit_circuit_transplation(
             circ_new.rx(np.pi/2, qubit)
             circ_new.rz(lamda, qubit)
         elif name == 'measure':
-            qubit = circ.data[i][1][0].index
-            cbit = circ.data[i][2][0].index
+            qubit = qubits[0].index
+            cbit = cbits[0].index
             circ_new.measure(qubit, cbit)
     return(circ_new)
 
@@ -89,14 +88,14 @@ num_training_circuits = 10
 fraction_non_clifford = 0.3
 circuit = cirq.circuits.Circuit(
     random_circuit(num_qubits, layers))
-circuit = from_qiskit(qiskit_circuit_transplation(to_qiskit(circuit)))
+circuit = from_qiskit(qiskit_circuit_transpilation(to_qiskit(circuit)))
 non_cliffords = count_non_cliffords(circuit)
 
 
 def test_generate_training_circuits():
-    '''Test that generate_training_circuits function is working properly with
+    """Test that generate_training_circuits function is working properly with
        the random projrection method.
-    '''
+    """
     method_select_options_list = ['random', 'probabilistic']
     method_replace_options_list = ['random', 'probabilistic', 'closest']
     additional_options = {'sigma_select': 0.5, 'sigma_replace': 0.5}

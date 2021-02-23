@@ -1,21 +1,24 @@
 import cirq
+from cirq.circuits import Circuit
 from random import sample, choice, randint
 import numpy as np
 from mitiq._typing import QPROGRAM
+from typing import List
+
 
 # Global variable of Clifford angles in Rz gates:
 CLIFFORD_ANGLES = (0.0, np.pi/2, np.pi, (3/2)*(np.pi))
 
 
 def generate_training_circuits(
-    circuit: cirq.circuits.Circuit,
+    circuit: Circuit,
     num_training_circuits: int,
     fraction_non_clifford: float,
     method_select: str = 'random',
     method_replace: str = 'nearest',
     **additional_options: dict
-) -> list:
-    '''Function to return a list of near-Clifford circuits to create the
+) -> (List[QPROGRAM], List[List[float]], List[List[float]]):
+    """Function to return a list of near-Clifford circuits to create the
     training data.
 
     Args:
@@ -43,9 +46,13 @@ def generate_training_circuits(
                                      non-Clifford with, only has an impact if
                                      method_replace = 'probabilistic'.
     Returns:
-        list of near-Clifford circuits constructed from the circuits of
-        interest.
-    '''
+        List[circ.Circuits]: list of near-Clifford circuits constructed from
+                             the circuits of interest.
+        List[List[float]]: list of list of angles that were replaced in each
+                           training circuit.
+        List[List[float]]: list of list of angles that were inserted in each
+                           training circuit.
+    """
     circuits_list = []
     # First turn circuit into an data array which is easier to deal with,
     # empty circuit is used to store qubit layout:
@@ -100,14 +107,14 @@ def generate_training_circuits(
 def _map_to_near_clifford(
     rz_non_cliff: np.ndarray,
     all_cliff: np.ndarray,
-    empty_circuit: cirq.circuits.Circuit,
+    empty_circuit: Circuit,
     total_non_cliff: int,
     fraction_non_clifford: float,
     method_select: str = 'random',
     method_replace: str = 'closest',
     **additional_options: dict
-) -> cirq.circuits.Circuit:
-    ''' Function to take the information in some circuit of interest and
+) -> (Circuit, List[float], List[float]):
+    """ Function to take the information in some circuit of interest and
         return a near-Clifford circuit as constructed according to
         some user defined methods.
     Args:
@@ -132,8 +139,12 @@ def _map_to_near_clifford(
                        of selected non-Clifford gates, only has effect if
                        method_replace = 'probabilistic'.
         Returns:
-            Near-Clifford projected circuit.
-    '''
+            Circuit: Near-Clifford projected circuit.
+            List[float]: list of angles replaced that were replaced in the
+                         training circuit.
+            List[float]: list of angles that were inserted in the training
+                         circuit.
+    """
     defult_sigma_select = 0.5
     defult_sigma_replace = 0.5
     N = int(fraction_non_clifford * total_non_cliff)
@@ -214,7 +225,7 @@ def _map_to_near_clifford(
 def count_non_cliffords(
     circuit: QPROGRAM,
 ) -> float:
-    '''Function to check how many non-Clifford gates are in a give circuit.
+    """Function to check how many non-Clifford gates are in a give circuit.
 
     Args:
         circuit: some quantum circuit already decomposed into the basis
@@ -222,7 +233,7 @@ def count_non_cliffords(
 
     Returns:
         number of non-Clifford gates in the given circuit.
-    '''
+    """
     data, _ = _circuit_to_array(circuit)
     mask_rz = data[1, :] == 'rz'
     rz_circ_data = data[:, mask_rz]
@@ -235,7 +246,7 @@ def count_non_cliffords(
 def _circuit_to_array(
     circuit: QPROGRAM
 ) -> (np.ndarray, QPROGRAM):
-    '''Function to return the order of gates, their names and paramters in a
+    """Function to return the order of gates, their names and paramters in a
        more managable data structure than a Qiskit
     quantum circuit.
 
@@ -249,9 +260,8 @@ def _circuit_to_array(
                            parameters are the paramters specifying the
                            gates and qubits and cbits are the qubits and
                            classical bits on which they act.
-        qubits (int): number of qubits.
         QPROGRAM: empty circuit with same qubit layout as original.
-    '''
+    """
     order = []
     gates_list = []
     qubits_list = []
@@ -317,7 +327,7 @@ def _array_to_circuit(
     data: np.ndarray,
     empty_circuit: QPROGRAM
 ) -> QPROGRAM:
-    ''' Function that takes the data array containing all the circuit data
+    """ Function that takes the data array containing all the circuit data
         and turns it into a quantum circuit.
 
     Args:
@@ -329,7 +339,7 @@ def _array_to_circuit(
     Returns:
         circ: QPROGRAM (cirq quantum circuit)
 
-    '''
+    """
     name_list = data[1]
     parameters_list = data[2]
     qubits_list = data[3]
@@ -363,12 +373,12 @@ def _is_clifford_angle(
     ang: float,
     tol: float = 10 ** -5,
 ) -> bool:
-    '''Function to check if a given angle is Clifford.
+    """Function to check if a given angle is Clifford.
     Args:
         ang: rotation angle in the Rz gate.
     Returns:
         bool: True / False for Clifford or not.
-    '''
+    """
     ang = ang % (2*np.pi)
     closest_clifford_angle = _closest_clifford(ang)
     if abs(closest_clifford_angle - ang) < tol:
@@ -384,7 +394,7 @@ _is_clifford_angle = np.vectorize(_is_clifford_angle)
 def _closest_clifford(
     ang: float
 ) -> float:
-    '''Function to take angle and return the nearest Clifford angle note the
+    """Function to take angle and return the nearest Clifford angle note the
        usage of this function is vectorized so it takes and returns arrays.
 
     Args:
@@ -392,7 +402,7 @@ def _closest_clifford(
 
     Returns:
         Clifford angle: closest clifford angle.
-    '''
+    """
     ang = ang % (2*np.pi)
     ang_scaled = ang/(np.pi/2)
     # if just one min value, return the corresponding nearest cliff.
@@ -416,7 +426,7 @@ _closest_clifford = np.vectorize(_closest_clifford)
 def _random_clifford(
     ang: float
 ) -> float:
-    '''Function to take angle and return the random Clifford angle note the
+    """Function to take angle and return the random Clifford angle note the
        usage of this function is vectorized so it takes and returns arrays.
 
     Args:
@@ -424,7 +434,7 @@ def _random_clifford(
 
     Returns:
         Clifford angle: closest clifford angle.
-    '''
+    """
     random_index = randint(0, 3)
     clifford_angle = CLIFFORD_ANGLES[random_index]
     return clifford_angle
@@ -468,7 +478,7 @@ def _probabilistic_angle_to_clifford(
     ang: float,
     sigma: float,
 ) -> float:
-    '''Function to take angle and return the Clifford angle according to the
+    """Function to take angle and return the Clifford angle according to the
        probability distirbution:
 
                         prob = exp(-(dist/sigma)^2)
@@ -484,7 +494,7 @@ def _probabilistic_angle_to_clifford(
     Returns:
         Clifford angle: clifford angle to replace gate angle, calculated
         probabilistically.
-    '''
+    """
     ang = ang % (2*np.pi)
     S = np.array([[1, 0.0], [0.0, 1j]])
     Rz = np.array([[1, 0.0], [0.0, np.exp(ang*1j)]])
