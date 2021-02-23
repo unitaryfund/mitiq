@@ -26,12 +26,6 @@ Alternately, you can use the docker image provided in the repo and all requireme
 
 You can check that Sphinx is installed with `sphinx-build --version`.
 
-
-If they are not installed, the test that uses them will be skipped. We do this because
-`tensorflow-quantum` has incompatibility issues -- version `0.4.0` works on `py38` but
-not Windows, and version `0.3.1` works on Windows but not `py38`. Therefore, these two
-requirements cannot be installed on Windows. See [gh-419](https://github.com/unitaryfund/mitiq/issues/419) for more information.
-
 ### The configuration file
 Since the documentation is already created, you need not to generate a
 configuration file from scratch (this is done with `sphinx-quickstart`).
