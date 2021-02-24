@@ -2,7 +2,6 @@ import cirq
 from cirq.circuits import Circuit
 from random import sample, choice, randint
 import numpy as np
-from mitiq._typing import QPROGRAM
 from typing import List
 
 
@@ -17,7 +16,7 @@ def generate_training_circuits(
     method_select: str = 'random',
     method_replace: str = 'nearest',
     **additional_options: dict
-) -> (List[QPROGRAM], List[List[float]], List[List[float]]):
+) -> (List[Circuit], List[List[float]], List[List[float]]):
     """Function to return a list of near-Clifford circuits to create the
     training data.
 
@@ -223,7 +222,7 @@ def _map_to_near_clifford(
 
 
 def count_non_cliffords(
-    circuit: QPROGRAM,
+    circuit: Circuit,
 ) -> float:
     """Function to check how many non-Clifford gates are in a give circuit.
 
@@ -244,14 +243,14 @@ def count_non_cliffords(
 
 
 def _circuit_to_array(
-    circuit: QPROGRAM
-) -> (np.ndarray, QPROGRAM):
+    circuit: Circuit
+) -> (np.ndarray, Circuit):
     """Function to return the order of gates, their names and paramters in a
        more managable data structure than a Qiskit
     quantum circuit.
 
     Args:
-        circ (QPROGRAM): cirq circuit (decomposed).
+        circ (Circuit): cirq circuit (decomposed).
 
     Returns:
         data (np.ndarray): np.array([order], [names], [parameters], [qubits])
@@ -260,7 +259,7 @@ def _circuit_to_array(
                            parameters are the paramters specifying the
                            gates and qubits and cbits are the qubits and
                            classical bits on which they act.
-        QPROGRAM: empty circuit with same qubit layout as original.
+        Circuit: empty circuit with same qubit layout as original.
     """
     order = []
     gates_list = []
@@ -325,8 +324,8 @@ def _circuit_to_array(
 
 def _array_to_circuit(
     data: np.ndarray,
-    empty_circuit: QPROGRAM
-) -> QPROGRAM:
+    empty_circuit: Circuit
+) -> Circuit:
     """ Function that takes the data array containing all the circuit data
         and turns it into a quantum circuit.
 
@@ -337,7 +336,7 @@ def _array_to_circuit(
                        (empty circuit object)
 
     Returns:
-        circ: QPROGRAM (cirq quantum circuit)
+        circ: Circuit (cirq quantum circuit)
 
     """
     name_list = data[1]
