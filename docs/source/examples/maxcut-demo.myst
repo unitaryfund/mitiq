@@ -1,8 +1,7 @@
 ---
 jupytext:
-  formats: ipynb,md:myst
   text_representation:
-    extension: .md
+    extension: .myst
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.10.2
@@ -16,7 +15,8 @@ kernelspec:
 
 +++
 
-In this notebook we solve a simple _MaxCut_ problem with the _Quantum Approximate Optimization Algorithm_ (QAOA) [[Farhi, Goldstone, Gutmann, arXiv:1411.4028]](https://arxiv.org/abs/1411.4028) executed on a simulated noisy backend. 
+In this notebook we solve a simple _MaxCut_ problem with the _Quantum Approximate Optimization Algorithm_ (QAOA)
+[[Farhi, Goldstone, Gutmann, arXiv:1411.4028]](https://arxiv.org/abs/1411.4028) executed on a simulated noisy backend. 
 In particular we are interested in investigating how _Mitiq_ can help reduce errors and improve the results.
 
 +++
@@ -25,20 +25,24 @@ In particular we are interested in investigating how _Mitiq_ can help reduce err
 
 +++
 
-A **graph**, is a mathematical object characterized by a set $V$ of **vertices (or nodes)** that we can number with integers $V=\{0, 1, 2, \dots, n-1\}$ and a set $E$ of **edges** (pairs of nodes) which can be defined as $E=\{(a_1, b_1), (a_2, b_2), ...., (a_m, b_m)\}$, where $a_j\neq b_j$ and  $a_j, b_j \in V$.
+A **graph**, is a mathematical object characterized by a set $V$ of **vertices (or nodes)** that we can
+number with integers $V=\{0, 1, 2, \dots, n-1\}$ and a set $E$ of **edges** (pairs of nodes) which can be defined as
+$E=\{(a_1, b_1), (a_2, b_2), ...., (a_m, b_m)\}$, where $a_j\neq b_j$ and  $a_j, b_j \in V$.
 
 
-**Note:** If we are not interested in isolated nodes (not connected to any edge), the set of edges $E$ completely determine the graph $G=(V, E)$.
+**Note:** If we are not interested in isolated nodes (not connected to any edge), the set of edges $E$ completely
+determine the graph $G=(V, E)$.
 
-Therefore, in Python, we can represent a graph without isolated nodes as a list **list of tuples**, where each tuple is a **pair of integers**.
-For example a **square graph** can be expressed as:
+Therefore, in Python, we can represent a graph without isolated nodes as a list **list of tuples**, where each
+tuple is a **pair of integers**. For example a **square graph** can be expressed as:
 
 ```{code-cell} ipython3
 # Square graph
 square_graph = [(0, 1), (1, 2), (2, 3), (3, 0)]
 ```
 
-Given a graph $(V, E)$, the **MaxCut problem** is to divide the nodes $V$ into two disjoint subsets $V_A$ and $V_B$, such that the number of cuts (edges with one vertex in $V_A$ and one vertex in $V_B$) is maximized.
+Given a graph $(V, E)$, the **MaxCut problem** is to divide the nodes $V$ into two disjoint subsets
+$V_A$ and $V_B$, such that the number of cuts (edges with one vertex in $V_A$ and one vertex in $V_B$) is maximized.
 
 ```{code-cell} ipython3
 from typing import List, Tuple
@@ -54,7 +58,8 @@ def count_cuts(graph: List[Tuple[int]], set_a: set, set_b: set):
     return num_cuts       
 ```
 
-For example, for the square graph previously defined, the maximum number of cuts is $4$ which can be achieved by multiple solutions. For example one of the two optimal solutions is:
+For example, for the square graph previously defined, the maximum number of cuts is $4$ which can be
+achieved by multiple solutions. For example one of the two optimal solutions is:
 
 ```{code-cell} ipython3
 set_a = {0, 2}
@@ -79,7 +84,9 @@ count_cuts(square_graph, set_a, set_b)
 
 +++
 
-A handy way of representing a candidate solution of the MaxCut problem, is to use a bitstring $s_n \cdots s_2s_1$ in which each bit $s_j$ is associated to the $j_{\rm th}$ node of the graph. The value of each bit, $0$ or $1$, can be used to represent the corresponding subset, $V_A$ or $V_B$, to which the node belongs.
+A handy way of representing a candidate solution of the MaxCut problem, is to use a bitstring $s_n \cdots s_2s_1$
+in which each bit $s_j$ is associated to the $j_{\rm th}$ node of the graph. The value of each bit, $0$ or $1$,
+can be used to represent the corresponding subset, $V_A$ or $V_B$, to which the node belongs.
 
 For example, using a big-endian convention, the previous optimal and sub-optimal solutions can be represented as:
 
@@ -88,7 +95,8 @@ optimal_string = "1010"
 sub_optimal_string = "1110"
 ```
 
-The corresponding function to count the number of graph cuts can be written in the following way wich is very similar to the quantum cost function that we will define in the next section.
+The corresponding function to count the number of graph cuts can be written in the following way wich is very
+similar to the quantum cost function that we will define in the next section.
 
 ```{code-cell} ipython3
 def count_cuts_from_string(graph: List[Tuple[int]], bitstring: str):
@@ -113,9 +121,13 @@ count_cuts_from_string(square_graph, optimal_string)
 count_cuts_from_string(square_graph, sub_optimal_string)
 ```
 
-The MaxCut problem is **NP-hard**. This means that it is computationally very hard (at least as hard as any NP problem). It is widely suspected that NP-hard problems will never admit a polynomial algorithm even if we had at disposal an ideal quantum computer.
+The MaxCut problem is **NP-hard**. This means that it is computationally very hard (at least as hard
+as any NP problem). It is widely suspected that NP-hard problems will never admit a polynomial algorithm
+even if we had at disposal an ideal quantum computer.
 
-However, for practical applications, it is often possible to obtain good **approximations** of the optimal exact solution. In this notebook we are interested in using the _Quantum Approximate Optimization Algorithm_ (QAOA) to get an approximate solution the MaxCut problem for a given graph.
+However, for practical applications, it is often possible to obtain good **approximations** of the
+optimal exact solution. In this notebook we are interested in using the _Quantum Approximate Optimization
+Algorithm_ (QAOA) to get an approximate solution the MaxCut problem for a given graph.
 
 +++
 
@@ -123,22 +135,27 @@ However, for practical applications, it is often possible to obtain good **appro
 
 +++
 
-Given a graph $G=(V,E)$ with $n=|V|$ nodes and $m=|E|$ edges, one can define the following Hamiltonian acting on a system of $n$ qubits:
+Given a graph $G=(V,E)$ with $n=|V|$ nodes and $m=|E|$ edges, one can define the following Hamiltonian
+acting on a system of $n$ qubits:
 
 $$H = \sum_{(i,\, j) \in E}  \frac{1}{2} (1 - Z_i Z_j),$$
 
-where $Z_k$ is the Pauli-Z operator applied to the qubit $k$, such that $Z_k |0>_k = +|0 \rangle_k$ and $Z_k |1>_k = - |1 \rangle_k$.
+where $Z_k$ is the Pauli-Z operator applied to the qubit $k$, such that $Z_k |0>_k = +|0 \rangle_k$ and
+$Z_k |1>_k = - |1 \rangle_k$.
 
-Now we can associate each qubit of the system to a vertex of the graph. A potential solution of the MaxCut problem  (i.e., the partition $(V_A, V_B)$) can be represented by a quantum product state: 
+Now we can associate each qubit of the system to a vertex of the graph. A potential solution of the MaxCut
+problem  (i.e., the partition $(V_A, V_B)$) can be represented by a quantum product state: 
 
 $$|\psi \rangle = |s_n \rangle \cdots |s_2 \rangle |s_1\rangle, $$
 where $s_j=0$ if $j \in V_A$, while $s_j=1$ if $j \in V_B$. 
 
-In this case it is easy to check that the corresponding number of cuts is given by the opposite of the expectation value of the Hamiltonian $H$:
+In this case it is easy to check that the corresponding number of cuts is given by the opposite of the
+expectation value of the Hamiltonian $H$:
 
 $$ \text{number of cuts } =  - \langle \psi | H | \psi \rangle .$$
 
-In this physical picture, the MaxCut problem corresponds to the problem of finding the ground state of $H$ and the maximum number of cuts is equal to minus the ground state energy.
+In this physical picture, the MaxCut problem corresponds to the problem of finding the ground state of $H$
+and the maximum number of cuts is equal to minus the ground state energy.
 
 +++
 
@@ -192,12 +209,16 @@ Which indeed correspond to the 2 optimal bipartitions of the original MaxCut pro
 
 +++
 
-The size of the previously introduced Hamiltonian is $2^n \times 2^n$. So, when the graph has many nodes, finding  the eigenvalues and or the eigenstates as we did above becomes exponentially hard.
+The size of the previously introduced Hamiltonian is $2^n \times 2^n$. So, when the graph has many nodes,
+finding  the eigenvalues and or the eigenstates as we did above becomes exponentially hard.
 
-**Is there a way of finding the ground state of a Hamiltonian using a NISQ quantum computer?**
+**Is there a way of finding the ground state of a Hamiltonian using a near-term quantum computer?**
 
-Here comes into play the so called  Quantum Approximate Optimization Algorithm (QAOA) [[Farhi, Goldstone, Gutmann, arXiv:1411.4028]](https://arxiv.org/abs/1411.4028).
-This method consists of generating a potential solution state through a variational circuit $U_{\vec \alpha, \vec \beta}$ which depends on two vectors of $p$ real parameters $\vec \alpha = (\alpha_1, .... \alpha_p)$, $\vec \beta= (\beta_1, .... \beta_p)$ and has the following structure:
+Here comes into play the so called  Quantum Approximate Optimization Algorithm (QAOA)
+[[Farhi, Goldstone, Gutmann, arXiv:1411.4028]](https://arxiv.org/abs/1411.4028).
+This method consists of generating a potential solution state through a variational circuit
+$U_{\vec \alpha, \vec \beta}$ which depends on two vectors of $p$ real parameters
+$\vec \alpha = (\alpha_1, .... \alpha_p)$, $\vec \beta= (\beta_1, .... \beta_p)$ and has the following structure:
  
 $$|\psi(\vec \alpha, \vec \beta) \rangle = U_{\vec \alpha, \vec \beta}|+\rangle ^{\otimes n} 
 = R_{\alpha_p} W_{\beta_p} \cdots R_{\alpha_1} W_{\beta_1} |+\rangle ^{\otimes n},$$
@@ -205,17 +226,22 @@ $$|\psi(\vec \alpha, \vec \beta) \rangle = U_{\vec \alpha, \vec \beta}|+\rangle 
 where $|+> = (|0\rangle + |1\rangle)/\sqrt{2}$ and
 
 $$W_{\beta} = e^{i \beta H }, \quad R_{\alpha} = e^{i \alpha \sum_{j=1}^n X_j },$$
-corresponding to the time evolution generated by system Hamiltonian $H$ and by a mixing Hamiltonian $H_{\rm mix}= \sum_j X_j$, respectively.
+corresponding to the time evolution generated by system Hamiltonian $H$ and by a mixing Hamiltonian
+$H_{\rm mix}= \sum_j X_j$, respectively.
 
-After applying the circuit to generate $|\psi(\vec \alpha, \vec \beta) \rangle$, one can easily measure the energy of the final state
+After applying the circuit to generate $|\psi(\vec \alpha, \vec \beta) \rangle$, one can easily measure
+the energy of the final state
 
 $$E(\vec \alpha, \vec \beta) =  \langle \psi(\vec \alpha, \vec \beta) | H |\psi(\vec \alpha, \vec \beta)\rangle,$$
 
-via simple measurements in the computational basis of the qubits. Repeating this procedures for many steps and minimizing the **cost function** $E(\vec \alpha, \vec \beta)$ with respect to the parameters $\vec \alpha$ and $\vec \beta$ one can approximate the ground state of $H$.
+via simple measurements in the computational basis of the qubits. Repeating this procedures for many
+steps and minimizing the **cost function** $E(\vec \alpha, \vec \beta)$ with respect to the parameters
+$\vec \alpha$ and $\vec \beta$ one can approximate the ground state of $H$.
 
 The maximum number of cuts for the original graph will be given by the opposite of the optimal cost: $- E(\vec \alpha, \vec \beta)^*$.
 
-The corresponding state will be a superposition of one or more optimal solution states $|s_1 \rangle |s_2 \rangle \cdots |s_n\rangle$ representing optimal bipartitions $(V_A, V_B)$ of the MaxCut problem.
+The corresponding state will be a superposition of one or more optimal solution states
+$|s_1 \rangle |s_2 \rangle \cdots |s_n\rangle$ representing optimal bipartitions $(V_A, V_B)$ of the MaxCut problem.
 
 +++
 
@@ -264,7 +290,8 @@ qaoa_ansatz(square_graph, params)
 
 ### Defining an "executor" function to run or simulate the experiment
 
-QAOA requires the evaluation of quantum expectation values. Therefore, we define a function which inputs a generic  circuit and returns the expectation value of a generic observable.
+QAOA requires the evaluation of quantum expectation values. Therefore, we define a function which inputs
+a generic  circuit and returns the expectation value of a generic observable.
 
 ```{code-cell} ipython3
 from cirq import depolarize, DensityMatrixSimulator
@@ -412,17 +439,15 @@ This can be done by simply wrapping the noisy executor into a mitigated executor
 ```{code-cell} ipython3
 import mitiq
 from mitiq.zne import mitigate_executor
+from functools import partial
 
 # Choose a noise scaling method
 scaling_method = mitiq.zne.scaling.fold_global
 
 # Initialize an inference method (i.e. a Mitiq Factory)
 inference_factory = mitiq.zne.inference.LinearFactory(scale_factors=[1.0, 3.0])
-```
 
-```{code-cell} ipython3
-from functools import partial
-
+# Define the cost function
 def qaoa_mitigated_cost(params: np.array) -> float:
     """Cost function of the QAOA problem using error mitigation."""
     qaoa_circuit = qaoa_ansatz(graph, params)
@@ -431,6 +456,7 @@ def qaoa_mitigated_cost(params: np.array) -> float:
     mitigated_executor = mitigate_executor(noisy_executor, inference_factory, scaling_method)
     return mitigated_executor(qaoa_circuit)
 
+# Minimize the cost function
 mitig_opt_cost, mitig_opt_params, mitig_traj = minimize_cost(qaoa_mitigated_cost, init_params)
 ```
 
@@ -443,11 +469,12 @@ print("Ideal cost evaluated at mitigated parameters: ", np.round(qaoa_ideal_cost
 print("Ideal cost: ", np.round(ideal_opt_cost, 4))
 ```
 
-The previous results are clearly enhanced by the application of zero-noise extrapolation. However the execution time is increased too.
-The practical advantage of any error mitigation methods always depends on the trade-off between the accuracy of the results and the execution time.
-
-+++
-
+:::{note}
+The results are clearly enhanced by the application of zero-noise extrapolation.
+However the execution time is increased too.
+The practical advantage of any error mitigation methods always depends on the trade-off between
+the accuracy of the results and the execution time.
+:::
 
 ```{code-cell} ipython3
 mitiq.about()
