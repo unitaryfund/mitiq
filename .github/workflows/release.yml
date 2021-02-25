@@ -12,12 +12,7 @@ on:
     #types: [opened, reopened, synchronize]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-
-
-  update_release_draft:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Generate version number
