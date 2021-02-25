@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# Mitigating the energy landscape of a variational circuit
+# Mitigating the energy landscape of a variational circuit with Mitiq
 
 +++
 

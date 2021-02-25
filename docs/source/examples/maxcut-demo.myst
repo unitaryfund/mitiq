@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# Solving MaxCut with QAOA improved by zero-noise extrapolation
+# Solving MaxCut with QAOA improved with Mitiq
 
 +++
 
