@@ -15,3 +15,8 @@ library with a long-term vision to be useful for quantum programmers using any q
 framework and any quantum backend. Today we support `Cirq <https://cirq.readthedocs.io/en/stable/>`_,
 `Qiskit <https://qiskit.org/>`_, and `PyQuil <https://pyquil-docs.rigetti.com/en/stable/>`_
 frontends and backends.
+
+The guide contains information of how :ref:`zero noise extrapolation <guide_zne>` can be implemented with the software and examples of how it can be applied to any simulator or quantum processor running :ref:`Back-end Plug-ins <guide-executors>`.
+
+A brief overview with more information about error mitigation techniques from the research literature can be found :ref:`here <guide_qem>` (instead, the :ref:`examples` section shows how Mitiq can be used in your :ref:`research`.)
+

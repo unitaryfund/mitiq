@@ -1,5 +1,7 @@
 .. mitiq documentation file
 
+.. _guide_zne:
+
 *********************************************
 Zero Noise Extrapolation
 *********************************************
