@@ -1,4 +1,4 @@
-.. mitiq documentation file
+.. pec:
 
 *********************************************
 Zero Noise Extrapolation
