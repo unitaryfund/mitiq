@@ -12,6 +12,7 @@
 ## Version 0.6.0 (In Development)
 
 ### All Changes
+- Add minimal section on PEC to documentation (@nathanshammah, gh-564)
 
 
 ## Version 0.5.0 (February 8th, 2021)
@@ -19,7 +20,7 @@
 ### Summary
 
 The implementation of Probabilistic Error Cancellation is now multi-platform and
-documented in the docs (for the moment only in the *Getting Started* section). 
+documented in the docs (for the moment only in the *Getting Started* section).
 A new infrastructure based on [MyST](https://myst-parser.readthedocs.io/en/stable/)
 can now be used for writing the documentation and, in particular, for adding new examples
 in the *Mitiq Examples* section.
