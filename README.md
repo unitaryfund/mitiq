@@ -139,11 +139,11 @@ If you use Mitiq in your research, please reference the [Mitiq preprint][arxiv] 
 }
 ```
 
-A list of papers citing Mitiq can be found here.
+A list of papers citing Mitiq can be found [here][papers_with_mitiq].
 
 [arxiv]: https://arxiv.org/abs/2009.04417
 
-[here]: https://mitiq.readthedocs.io/en/stable/research.html#papers-citing-or-using-mitiq
+[papers_with_mitiq]: https://mitiq.readthedocs.io/en/stable/research.html#papers-citing-or-using-mitiq
 
 ## License
 
