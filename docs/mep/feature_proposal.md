@@ -1,11 +1,9 @@
 ---
 name: Feature proposal
 about: Propose a great new feature for Mitiq
-title: ''
-labels: 'enhancement'
-assignees: ''
-
 ---
+https://github.com/numpy/numpy/blob/1245f9da021d65789a3332f0e046ca30d518e9c8/doc/neps/nep-0000.rst#id2
+
 ## Pre-Request Checklist
 
 - [ ] I checked to make sure that this feature has not already been requested
