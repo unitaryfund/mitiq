@@ -7,35 +7,42 @@ Research
 ========
 Mitiq is designed in order to aid researchers in quantum computing and quantum error mitigation. Given the quick growth of the techniques for quantum error mitigation, it is natural  to update the toolchain with new techniques and features. If you'd like to propose a new feature, please open an issue with the `feature request <https://github.com/unitaryfund/mitiq/issues/new/choose>`_ template on Github.
 
+.. _contributing_research_features:
 
-
+-------------------------
+Contributing new features
+-------------------------
 If you have some code or have a plan to add it to Mitiq, discuss it in an issue and once ready to upload the code, review the `contributing <contributing.html>`_ guidelines for the steps to take.
 
 
+.. _contributing_research_examples:
 
-If you have an example of use of Mitiq with other software packages, or on a specific problem, we'd be glad to add it to the Examples section of the documentation: please review the `contributing to the documentation <contributing_docs.html>`_ instructions.
+----------------------------
+Research examples with Mitiq
+----------------------------
+If you have an example of use of Mitiq with other software packages, or on a specific problem, we'd be glad to add it to the `Examples <examples/examples.html>`_ section of the documentation: please review the `contributing to the documentation <contributing_docs.html>`_ instructions.
 
 
 
 .. _citing:
 
-------
-Citing
-------
+------------
+Citing Mitiq
+------------
 
 If you are using ``Mitiq`` for your research, please cite the related `white paper <https://arxiv.org/abs/2009.04417>`_:
 
 
 .. code-block::
 
-@misc{larose2020mitiq,
-      title={Mitiq: A software package for error mitigation on noisy quantum computers},
-      author={Ryan LaRose and Andrea Mari and Peter J. Karalekas and Nathan Shammah and William J. Zeng},
-      year={2020},
-      eprint={2009.04417},
-      archivePrefix={arXiv},
-      primaryClass={quant-ph}
-}
+	@misc{larose2020mitiq,
+	      title={Mitiq: A software package for error mitigation on noisy quantum computers},
+	      author={Ryan LaRose and Andrea Mari and Peter J. Karalekas and Nathan Shammah and William J. Zeng},
+	      year={2020},
+	      eprint={2009.04417},
+	      archivePrefix={arXiv},
+	      primaryClass={quant-ph}}
+
 
 You can download the :download:`bibtex file <mitiq.bib>`.
 
