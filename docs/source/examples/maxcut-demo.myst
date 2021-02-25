@@ -214,8 +214,8 @@ finding  the eigenvalues and or the eigenstates as we did above becomes exponent
 
 **Is there a way of finding the ground state of a Hamiltonian using a near-term quantum computer?**
 
-Here comes into play the so called  Quantum Approximate Optimization Algorithm (QAOA)
-[[Farhi, Goldstone, Gutmann, arXiv:1411.4028]](https://arxiv.org/abs/1411.4028).
+This is where Quantum Approximate Optimization Algorithm (QAOA)
+[[Farhi, Goldstone, Gutmann, arXiv:1411.4028]](https://arxiv.org/abs/1411.4028) comes into play.
 This method consists of generating a potential solution state through a variational circuit
 $U_{\vec \alpha, \vec \beta}$ which depends on two vectors of $p$ real parameters
 $\vec \alpha = (\alpha_1, .... \alpha_p)$, $\vec \beta= (\beta_1, .... \beta_p)$ and has the following structure:
