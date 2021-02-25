@@ -1,6 +1,7 @@
 .. mitiq documentation file
 
 .. _research:
+
 ========
 Research
 ========
@@ -17,22 +18,24 @@ If you have an example of use of Mitiq with other software packages, or on a spe
 
 
 .. _citing:
+
 ------
 Citing
 ------
-If you are using ``Mitiq`` for your research, please cite it:
+
+If you are using ``Mitiq`` for your research, please cite the related `white paper <https://arxiv.org/abs/2009.04417>`_:
 
 
 .. code-block::
 
-	@misc{Mitiq,
-	  author={
-	  LaRose, Ryan and Mari, Andrea and Shammah, Nathan and Karalekas, Peter and Zeng, Will},
-	  title = {Mitiq: A software package for error mitigation on near-term quantum computers},
-	  howpublished = {\url{https://github.com/unitaryfund/mitiq}},
-	  year={2020}
-	}
-
+@misc{larose2020mitiq,
+      title={Mitiq: A software package for error mitigation on noisy quantum computers},
+      author={Ryan LaRose and Andrea Mari and Peter J. Karalekas and Nathan Shammah and William J. Zeng},
+      year={2020},
+      eprint={2009.04417},
+      archivePrefix={arXiv},
+      primaryClass={quant-ph}
+}
 
 You can download the :download:`bibtex file <mitiq.bib>`.
 
@@ -40,6 +43,7 @@ You can download the :download:`bibtex file <mitiq.bib>`.
 If you have developed new features for error mitigation, or found bugs in ``mitiq``, please consider `contributing <contributing.html>`_ your code.
 
 .. _cited_by:
+
 ----------------------------
 Papers citing or using Mitiq
 ----------------------------
