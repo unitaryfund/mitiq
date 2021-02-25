@@ -5,7 +5,7 @@
 ========
 Research
 ========
-Mitiq is designed in order to aid researchers in quantum computing and quantum error mitigation. Given the quick growth of the techniques for quantum error mitigation, it is natural  to update the toolchain with new techniques and features. If you'd like to propose a new feature, please open an issue with the `feature request <https://github.com/unitaryfund/mitiq/issues/new/choose>`_ template on Github.
+Mitiq is designed in order to aid researchers in quantum computing and quantum error mitigation. Given the quick growth of the techniques for quantum error mitigation (you can read an overview in the `Users Guide <https://mitiq.readthedocs.io/en/stable/guide/guide-error-mitigation.html>`_ ), it is natural to update the toolchain with new techniques and features. If you'd like to propose a new feature, please open an issue with the `feature request <https://github.com/unitaryfund/mitiq/issues/new/choose>`_ template on Github.
 
 .. _contributing_research_features:
 
