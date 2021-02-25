@@ -9,7 +9,7 @@ the Python toolkit for implementing error mitigation on quantum computers.
 ## Requirements
 Our documentation is generated with
 [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html).
-The necessary packages can be installed, from the root `mitiq` directory
+The necessary packages can be installed, from the root Mitiq directory
 ```bash
 pip install -e .
 pip install -r dev_requirements.txt
@@ -25,18 +25,6 @@ Alternately, you can use the docker image provided in the repo and all requireme
 - [`sphinx-autodoc-typehints`](https://pypi.org/project/sphinx-autodoc-typehints/) allows to control how annotations are displayed in the API-doc part of the documentation, integrating with  [`sphinx-autodoc`](https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html) and [`sphinx-napoleon`](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/) which handle specific styling requirements for the API documentation comments.
 
 You can check that Sphinx is installed with `sphinx-build --version`.
-
-In addition, there are two requirements, `tensorflow` and `tensorflow-quantum`,
-which are used solely in `guide/guide-executors.rst`. They can be installed via:
-
-```bash
-pip install -r docs/requirements.txt
-```
-
-If they are not installed, the test that uses them will be skipped. We do this because
-`tensorflow-quantum` has incompatibility issues -- version `0.4.0` works on `py38` but
-not Windows, and version `0.3.1` works on Windows but not `py38`. Therefore, these two
-requirements cannot be installed on Windows. See [gh-419](https://github.com/unitaryfund/mitiq/issues/419) for more information.
 
 ### The configuration file
 Since the documentation is already created, you need not to generate a
@@ -104,7 +92,7 @@ where `file.md` is the one to be added. For more information on including files 
 ### Adding files to the user guide
 
 To add information in the guide, it is recommended to add markdown (`.md`) or MyST markdown files (`.myst`) to the `docs/guide/` directory.
-Remember to add any files you add to the `docs/guide/` directory to the guide TOC file {doc}`docs/source/guide/guide.myst` 
+Remember to add any files you add to the `docs/guide/` directory to the guide TOC file `docs/source/guide/guide.myst`.
 
 ### Adding code examples
 
@@ -127,11 +115,11 @@ New modules, classes and functions can be added by listing them
 in the appropriate `.md or `*.myst` file (such as `apidoc.myst` or a child), e.g.,
 
 ```
-## Factories
-```{automodule} mitiq.factories
+## New Module
+```{automodule} mitiq.new_module
    :members:
 ```
-will add all elements of the `mitiq.factories` module with a Factories subtitle. 
+will add all elements of the `mitiq.new_module` module with a subtitle "New Module." 
 You can hand-pick classes and functions to add, to comment them, as well as exclude them.
 
 ```{tip}
@@ -143,6 +131,10 @@ source code, and to the API page `apidoc.rst`.
 The easiest way to build the docs is to just run `make docs` from the project 
 root directory in bash, which by default builds the html docs output.
 You can also use from root `make pdf` to generate the PDF version.
+
+```{tip}
+If you want to remove previous builds and make the HTML docs fresh, try `make docs-clean`!
+```
 
 If you want to call sphinx directly, you can from bash move to the `docs` 
 folder and run
@@ -215,7 +207,7 @@ If you have code blocks you want to run, but not be displayed, use the
 ```
 ````
 ### IPython code blocks
-There is also the `doctest` directive, which allows to include interactive
+There is also the `doctest` directive, which allows you to include interactive
 Python blocks. These need to be given this way:
 
 ````md

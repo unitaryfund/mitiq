@@ -14,10 +14,6 @@ COPY dev_requirements.txt /tmp/pip-tmp/
 RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/dev_requirements.txt \
    && rm -rf /tmp/pip-tmp
 
-COPY docs/requirements.txt /tmp/pip-tmp/docs/
-RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/docs/requirements.txt \
-   && rm -rf /tmp/pip-tmp
-
 # [Optional] Uncomment this section to install additional OS packages.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends pandoc
@@ -28,7 +24,6 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 USER root
 RUN python -m pip install --upgrade pip
 #RUN pip install -r requirements.txt
-#RUN pip install -r docs/requirements.txt
 
 
 # Make sure the contents of our repo are in ${HOME}.

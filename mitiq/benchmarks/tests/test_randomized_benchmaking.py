@@ -18,7 +18,7 @@ import pytest
 from itertools import product
 import numpy as np
 
-from mitiq.benchmarks.randomized_benchmarking import rb_circuits
+from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 from mitiq.zne.inference import (
     LinearFactory,
     RichardsonFactory,
@@ -51,21 +51,15 @@ FACTORIES = [
 ]
 
 
-def test_rb_circuits():
-    depths = range(2, 10, 2)
+@pytest.mark.parametrize("n_qubits", (1, 2))
+def test_rb_circuits(n_qubits):
+    depth = 10
 
     # test single qubit RB
     for trials in [2, 3]:
-        circuits = rb_circuits(n_qubits=1, num_cliffords=depths, trials=trials)
-        for qc in circuits:
-            # we check the ground state population to ignore any global phase
-            wvf = qc.final_wavefunction()
-            zero_prob = abs(wvf[0] ** 2)
-            assert np.isclose(zero_prob, 1)
-
-    # test two qubit RB
-    for trials in [2, 3]:
-        circuits = rb_circuits(n_qubits=2, num_cliffords=depths, trials=trials)
+        circuits = generate_rb_circuits(
+            n_qubits=n_qubits, num_cliffords=depth, trials=trials
+        )
         for qc in circuits:
             # we check the ground state population to ignore any global phase
             wvf = qc.final_wavefunction()
@@ -77,9 +71,8 @@ def test_rb_circuits():
     ["scale_noise", "fac"], product(SCALE_FUNCTIONS, FACTORIES)
 )
 def test_random_benchmarks(scale_noise, fac):
-    depths = [2, 4]
     trials = 3
-    circuits = rb_circuits(n_qubits=2, num_cliffords=depths, trials=trials)
+    circuits = generate_rb_circuits(n_qubits=2, num_cliffords=4, trials=trials)
     noise = 0.01
     obs = np.diag([1, 0, 0, 0])
 

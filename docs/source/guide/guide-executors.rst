@@ -4,15 +4,15 @@
 Back-end Plug-ins: Executor Examples
 *********************************************
 
-``Mitiq`` uses ``executor`` functions to abstract different backends.
-``Executors`` always accept a quantum program, sometimes accept other
+Mitiq uses "executor" functions to abstract different backends.
+Executors always accept a quantum program, sometimes accept other
 arguments, and always return an expectation value as a float. If your
 quantum programming interface of choice can be used
-to make a Python function with this type, then it can be used with mitiq.
+to make a Python function with this type, then it can be used with Mitiq.
 
 These example executors as especially flexible as they
 accept an arbitrary observable. You can instead hardcode your choice of
-observable in any way you like. All that matters from ``mitiq``'s perspective
+observable in any way you like. All that matters from Mitiq's perspective
 is that your executor accepts a quantum program and returns a float.
 
 
@@ -20,20 +20,21 @@ Cirq Executors
 ======================================
 
 This section includes noisy and noiseless simulator executor examples using
-``cirq``.
+Cirq.
 
 Cirq: Wavefunction Simulation
 ---------------------------------
+
 This executor can be used for noiseless simulation. Note that this executor
 can be :ref:`wrapped using partial function application <partial-note>`
-to be used in ``mitiq``.
+to be used in Mitiq.
 
 .. testcode::
 
     import numpy as np
     from cirq import Circuit
 
-    def wvf_sim(circ: Circuit, obs: np.ndarray) -> float:
+    def execute(circ: Circuit, obs: np.ndarray) -> float:
         """Simulates noiseless wavefunction evolution and returns the
         expectation value of some observable.
 
@@ -56,7 +57,7 @@ to be used in ``mitiq``.
     qc = Circuit()
     qc += [cirq.X(LineQubit(0)), cirq.CNOT(LineQubit(0), LineQubit(1))]
 
-    print(wvf_sim(qc, obs=np.diag([1, 0, 0, 0])))
+    print(execute(qc, obs=np.diag([1, 0, 0, 0])))
 
 .. testoutput::
    :hide:
@@ -66,7 +67,7 @@ to be used in ``mitiq``.
 .. testcode::
     :hide:
 
-    print(wvf_sim(qc, obs=np.diag([0, 0, 0, 1])))
+    print(execute(qc, obs=np.diag([0, 0, 0, 1])))
 
 .. testoutput::
     :hide:
@@ -75,14 +76,15 @@ to be used in ``mitiq``.
 
 Cirq: Wavefunction Simulation with Sampling
 -----------------------------------------------
+
 We can add in functionality that takes into account some finite number of
-samples (aka shots). Here we will use ``cirq``'s `PauliString` methods to
-construct our observable. You can read more about these methods in the ``cirq``
-documentation `here <https://cirq.readthedocs.io/en/master/generated/cirq.PauliString.html?highlight=paulistring>`_.
+samples (aka shots). Here we will use Cirq's ``PauliString`` methods to
+construct our observable. You can read more about these methods in the Cirq
+documentation `here <https://quantumai.google/reference/python/cirq/ops/PauliString>`_.
 
 .. testcode::
 
-    def wvf_sampling_sim(circ: Circuit, obs: cirq.PauliString, shots: int) -> float:
+    def execute(circ: Circuit, obs: cirq.PauliString, shots: int) -> float:
         """Simulates noiseless wavefunction evolution and returns the
         expectation value of a PauliString observable.
 
@@ -109,11 +111,12 @@ documentation `here <https://cirq.readthedocs.io/en/master/generated/cirq.PauliS
     qc = Circuit()
     qc += [cirq.X(LineQubit(0)), cirq.CNOT(LineQubit(0), LineQubit(1))]
 
-    assert np.isclose(wvf_sampling_sim(qc, ham, 10000), 1.0)
+    assert np.isclose(execute(qc, ham, 10000), 1.0)
 
 
 Cirq: Density-matrix Simulation with Depolarizing Noise
 ------------------------------------------------------------
+
 This executor can be used for noisy depolarizing simulation.
 
 .. testcode::
@@ -124,7 +127,7 @@ This executor can be used for noisy depolarizing simulation.
 
     SIMULATOR = DensityMatrixSimulator()
 
-    def noisy_sim(circ: Circuit, obs: np.ndarray, noise: float) -> float:
+    def execute(circ: Circuit, obs: np.ndarray, noise: float) -> float:
         """Simulates a circuit with depolarizing noise at level noise.
 
         Args:
@@ -147,17 +150,18 @@ This executor can be used for noisy depolarizing simulation.
     for _ in range(100):
         qc += cirq.X(LineQubit(0))
 
-    assert noisy_sim(qc, np.diag([0, 1]), 0.0) == 0.0
-    assert np.isclose(noisy_sim(qc, np.diag([0, 1]), 0.5), 0.5)
-    assert np.isclose(noisy_sim(qc, np.diag([0, 1]), 0.001), 0.062452)
+    assert execute(qc, np.diag([0, 1]), 0.0) == 0.0
+    assert np.isclose(execute(qc, np.diag([0, 1]), 0.5), 0.5)
+    assert np.isclose(execute(qc, np.diag([0, 1]), 0.001), 0.062452)
 
 Other noise models can be used by substituting the ``depolarize`` channel with
-any other channel available in ``cirq``, for example ``cirq.amplitude_damp``.
-More details can be found in the ``cirq``
-`noise documentation <https://cirq.readthedocs.io/en/stable/noise.html>`__
+any other channel available in Cirq, for example ``cirq.amplitude_damp``.
+More details can be found in the Cirq
+`noise documentation <https://quantumai.google/cirq/noise>`__
 
 Cirq: Density-matrix Simulation with Depolarizing Noise and Sampling
 ------------------------------------------------------------------------
+
 You can also include both noise models and finite sampling in your executor.
 
 .. testcode::
@@ -168,7 +172,7 @@ You can also include both noise models and finite sampling in your executor.
 
     SIMULATOR = DensityMatrixSimulator()
 
-    def noisy_sample_sim(circ: Circuit, obs: cirq.PauliString, noise: float, shots: int) -> float:
+    def execute(circ: Circuit, obs: cirq.PauliString, noise: float, shots: int) -> float:
         """Simulates a circuit with depolarizing noise at level noise.
 
         Args:
@@ -199,9 +203,9 @@ You can also include both noise models and finite sampling in your executor.
     qc += cirq.measure(LineQubit(0))
     qc = qc.with_noise(depolarize(p=0.02))
     ham = cirq.PauliString(cirq.ops.Z.on(LineQubit(0)))
-    noisy_output = noisy_sample_sim(qc, ham, 0.01, 200)
-    assert noisy_output < 1.0
-    assert noisy_output > 0.5
+    noisy_output = execute(qc, ham, 0.01, 200)
+    assert 0.5 < noisy_output < 1.0
+
 
 .. _pyquil_executors:
 
@@ -214,11 +218,12 @@ PyQuil: Quantum Cloud Services
 ------------------------------
 
 This executor can be used to run on `Quantum Cloud Services <https://arxiv.org/abs/2001.04449>`__
-(QCS), the hardware platform provided by Rigetti Computing. Requires a QCS account and
+(QCS), the hardware platform provided by Rigetti Computing, and requires a QCS account and
 reservation on a quantum processor (QPU).
 
-In addition, ``mitiq_pyquil/executors.py`` has a function ``generate_qcs_executor`` for
-easily generating a QCS executor of this form from a template.
+.. note::
+    The module :mod:`mitiq.mitiq_pyquil` has a function ``generate_qcs_executor`` for
+    easily generating a QCS executor of this form.
 
 Note that you will have to replace the string in ``get_qc`` with the name of an actual
 Rigetti QPU, and will need to have a QCS account and reservation, in order to run on
@@ -235,7 +240,7 @@ real quantum hardware.
     # replace with qpu = get_qc("Aspen-8") to run on the Aspen-8 QPU
     qpu = get_qc("2q-pyqvm")
 
-    def executor(program: Program, shots: int = 1000) -> float:
+    def execute(program: Program, shots: int = 1000) -> float:
         p = Program()
 
         # add reset
@@ -274,12 +279,12 @@ real quantum hardware.
     program += X(1)
 
     # should give 0.0 with a noiseless backend
-    executor(program)
+    execute(program)
 
 .. testcode::
     :hide:
 
-    assert executor(program) == 0.0
+    assert execute(program) == 0.0
 
 .. _qiskit_executors:
 
@@ -287,14 +292,14 @@ Qiskit Executors
 ======================================
 
 This section includes noisy and noiseless simulator executor examples using
-``qiskit``.
-
+Qiskit.
 
 Qiskit: Wavefunction Simulation
 ---------------------------------
+
 This executor can be used for noiseless simulation. Note that this executor
 can be :ref:`wrapped using partial function application <partial-note>`
-to be used in ``mitiq``.
+to be used in Mitiq.
 
 .. testcode::
 
@@ -304,7 +309,7 @@ to be used in ``mitiq``.
 
     wvf_simulator = qiskit.Aer.get_backend('statevector_simulator')
 
-    def qs_wvf_sim(circ: QuantumCircuit, obs: np.ndarray) -> float:
+    def execute(circ: QuantumCircuit, obs: np.ndarray) -> float:
         """Simulates noiseless wavefunction evolution and returns the
         expectation value of some observable.
 
@@ -325,20 +330,21 @@ to be used in ``mitiq``.
     qc = QuantumCircuit(2)
     qc.x(0)
     qc.cnot(0, 1)
-    assert np.isclose(qs_wvf_sim(qc, obs=np.diag([1, 0, 0, 0])), 0.0)
-    assert np.isclose(qs_wvf_sim(qc, obs=np.diag([0, 0, 0, 1])), 1.0)
+    assert np.isclose(execute(qc, obs=np.diag([1, 0, 0, 0])), 0.0)
+    assert np.isclose(execute(qc, obs=np.diag([0, 0, 0, 1])), 1.0)
 
 
 Qiskit: Wavefunction Simulation with Sampling
 -----------------------------------------------
+
 The above executor can be modified to still perform exact wavefunction simulation,
 but to also include finite sampling of measurements. Note that this executor
 can be :ref:`wrapped using partial function application <partial-note>`
-to be used in ``mitiq``.
+to be used in Mitiq.
 
 Note that this executor implementation measures arbitrary observables by using
-a change of basis into the computational basis. More information about the math
-behind how this example is available `here <https://quantumcomputing.stackexchange.com/a/6944>`__.
+a change of basis into the computational basis. More information behind the math
+in this example can be found `here <https://quantumcomputing.stackexchange.com/a/6944>`__.
 
 .. testcode::
 
@@ -346,7 +352,7 @@ behind how this example is available `here <https://quantumcomputing.stackexchan
 
     QISKIT_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
 
-    def qs_wvf_sampling_sim(circ: QuantumCircuit, obs: np.ndarray, shots: int) -> float:
+    def execute(circ: QuantumCircuit, obs: np.ndarray, shots: int) -> float:
         """Simulates the evolution of the circuit and returns
         the expectation value of the observable.
 
@@ -366,7 +372,7 @@ behind how this example is available `here <https://quantumcomputing.stackexchan
         # we need to modify the circuit to measure obs in its eigenbasis
         # we do this by appending a unitary operation
         eigvals, U = np.linalg.eigh(obs) # obtains a U s.t. obs = U diag(eigvals) U^dag
-        circ.unitary(np.linalg.inv(U), qubits=range(circ.n_qubits))
+        circ.unitary(np.linalg.inv(U), qubits=range(circ.num_qubits))
 
         circ.measure_all()
 
@@ -395,13 +401,13 @@ behind how this example is available `here <https://quantumcomputing.stackexchan
     qc = QuantumCircuit(2)
     qc.h(0)
     qc.cnot(0, 1)
-    out = qs_wvf_sampling_sim(qc, obs=np.diag([0, 0, 0, 1]), shots=50)
+    out = execute(qc, obs=np.diag([0, 0, 0, 1]), shots=50)
     assert 0.0 < out < 1.0
-    out = qs_wvf_sampling_sim(qc, obs=np.diag([0, 0, 0, 1]), shots=int(1e5))
+    out = execute(qc, obs=np.diag([0, 0, 0, 1]), shots=int(1e5))
     assert abs(out - 0.5) < 0.1
 
     qc_zero = QuantumCircuit(1)
-    out = qs_wvf_sampling_sim(qc_zero, obs=np.diag([1, 0]), shots=50)
+    out = execute(qc_zero, obs=np.diag([1, 0]), shots=50)
     assert np.isclose(out, 1.0)
 
 
@@ -411,6 +417,7 @@ Qiskit: Density-matrix Simulation with Depolarizing Noise
 
 Qiskit: Density-matrix Simulation with Depolarizing Noise and Sampling
 ------------------------------------------------------------------------
+
 This executor can be used for noisy depolarizing simulation.
 
 .. testcode::
@@ -426,7 +433,7 @@ This executor can be used for noisy depolarizing simulation.
 
     QISKIT_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
 
-    def qs_noisy_sampling_sim(circ: QuantumCircuit, obs: np.ndarray, noise: float, shots: int) -> float:
+    def execute(circ: QuantumCircuit, obs: np.ndarray, noise: float, shots: int) -> float:
         """Simulates the evolution of the noisy circuit and returns
         the expectation value of the observable.
 
@@ -446,7 +453,7 @@ This executor can be used for noisy depolarizing simulation.
         # we need to modify the circuit to measure obs in its eigenbasis
         # we do this by appending a unitary operation
         eigvals, U = np.linalg.eigh(obs) # obtains a U s.t. obs = U diag(eigvals) U^dag
-        circ.unitary(np.linalg.inv(U), qubits=range(circ.n_qubits))
+        circ.unitary(np.linalg.inv(U), qubits=range(circ.num_qubits))
 
         circ.measure_all()
 
@@ -485,108 +492,20 @@ This executor can be used for noisy depolarizing simulation.
     qc = QuantumCircuit(1)
     for _ in range(10):
         qc.u1(0, 0)
-    assert 0.1 < qs_noisy_sampling_sim(qc, np.diag([1, 0]), 0.02, 1000) < 1.0
+    assert 0.1 < execute(qc, np.diag([1, 0]), 0.02, 1000) < 1.0
 
     qc_zero = QuantumCircuit(2)
-    out = qs_noisy_sampling_sim(qc_zero, obs=np.diag([1, 0, 0, 0]), noise=0.0, shots=10)
+    out = execute(qc_zero, obs=np.diag([1, 0, 0, 0]), noise=0.0, shots=10)
     assert np.isclose(out, 1.0)
-    out = qs_noisy_sampling_sim(qc_zero, obs=np.diag([1, 0, 0, 0]), noise=1.0, shots=10 ** 5)
+    out = execute(qc_zero, obs=np.diag([1, 0, 0, 0]), noise=1.0, shots=10 ** 5)
     assert np.isclose(out, 0.25, atol=0.1)
 
-Other noise models can be defined using any functionality available in ``qiskit``.
-More details can be found in the ``qiskit``
-`simulator documentation <https://qiskit.org/documentation/tutorials/simulators/index.html>`__
+Other noise models can be defined using any functionality available in Qiskit.
+More details can be found in the
+`Qiskit simulator documentation <https://qiskit.org/documentation/tutorials/simulators/index.html>`__
 
 Qiskit: Hardware
 ------------------------------------------------------------
+
 An example of an executor that runs on IBMQ hardware is given
 :ref:`here <high_level_usage>`.
-
-.. _tfq_executors:
-
-TensorFlow Quantum Executors
-==========================================
-
-This section provides an example of how to use `TensorFlow Quantum <https://github.com/tensorflow/quantum>`__
-as an executor. Note that at the time of this writing, TensorFlow Quantum is limited to
-
-  1. ``Cirq`` ``Circuits`` that use  ``Cirq`` ``GridQubit`` instances
-  2. Unitary circuits only, so non-unitary errors need to use Monte Carlo simulations
-
-Despite this latter limitation, there is a crossover point where Monte Carlo using
-Tensorflow evaluates faster than the exact density matrix simulation using ``Cirq``.
-
-Below is an example to use TensorFlow Quantum to simulate a bit-flip channel:
-
-.. testcode::
-
-    import numpy as np
-    import sympy
-    # tensorflow-quantum 0.4.0 is unavailable on Windows
-    try:
-        import tensorflow as tf
-        import tensorflow_quantum as tfq
-        tfq_exists = True
-    except ImportError:
-        tfq_exists = False
-    from cirq import Circuit
-
-
-    def stochastic_bit_flip_simulation(circ: Circuit, p: float, num_monte_carlo: int = 100) -> float:
-        """
-        Simulates a circuit with random bit flip (X(\pi)) errors
-        Args:
-            circ: The quantum program as a cirq object
-            p: probability of an X(\pi) gate on each qubit after each gate in circ
-            num_monte_carlo: number of random trajectories to average over
-        Returns:
-            The expectation value of the 0 state as a float
-        """
-        nM = len(circ.moments)
-        nQ = len(circ.all_qubits())
-
-        # Create array of symbolic variables and reshape to natural circuit parameterization
-        h = sympy.symbols(''.join(['h_{0} '.format(i) for i in range(nM * nQ)]), positive=True)
-        h_array = np.asarray(h).reshape((nQ, nM))
-
-        # Symbolicly add X gates to the input circuit
-        noisy_circuit = Circuit()
-        for i, moment in enumerate(circ.moments):
-            noisy_circuit.append(moment)
-            for j, q in enumerate(circ.all_qubits()):
-                noisy_circuit.append(cirq.rx(h_array[j, i]).on(q))
-
-        # rotations will be pi w/ prob p, 0 w/ prob 1-p
-        vals = [np.reshape((np.random.rand(nQ, nM) < p) * np.pi, (1, nQ * nM)) for _ in range(num_monte_carlo)]
-
-        # needs to be a rank 2 tensor
-        vals = np.squeeze(vals)
-        if num_monte_carlo == 1:
-            vals = [vals]
-
-        # Instantiate tfq layer for computing state vector
-        state = tfq.layers.State()
-
-        # Execute monte carlo sim with symbolic values specified by vals
-        out = state(noisy_circuit, symbol_names=h, symbol_values=vals).to_tensor()
-
-        # Fancy way of computing and summing individual density operators, follwed by averaging
-        dm = tf.tensordot(tf.transpose(out), tf.math.conj(out), axes=[[1], [0]]).numpy() / num_monte_carlo
-
-        # return measurement of 0 state
-        return np.real(dm[0, 0])
-
-.. testcode::
-    :hide:
-
-    if tfq_exists:
-        import cirq
-        from mitiq.benchmarks import randomized_benchmarking
-
-        circ = randomized_benchmarking.rb_circuits(1, [20], 1)[0]
-
-        # Need to make sure the qubits are cirq.GridQubit
-        circ=circ.transform_qubits(lambda q: cirq.GridQubit.rect(1, 1)[0])
-
-        out = stochastic_bit_flip_simulation(circ, 0.001)
-        assert 0.5 < out < 1

@@ -66,7 +66,7 @@ We can visualize the circuit for a particular :math:`\gamma` as follows.
 Defining the executor
 #####################
 
-To interface with ``mitiq``, we now define an executor function which adds noise to the circuit and computes the
+To interface with Mitiq, we now define an executor function which adds noise to the circuit and computes the
 expectation value of the usual QAOA observable :math:`Z \otimes Z`, i.e., Pauli-:math:`Z` on each qubit. The code block
 below first creates this observable, then sets a noise value, then defines the executor.
 
@@ -141,7 +141,7 @@ The plot is shown below.
 Computing the mitigated landscape
 #################################
 
-We now do the same task but use ``mitiq`` to mitigate the energy landscape.
+We now do the same task but use Mitiq to mitigate the energy landscape.
 
 We do so by first getting a mitigated executor as follows.
 

@@ -1721,3 +1721,13 @@ def test_fold_fidelity_large_scale_factor_only_twoq_gates(fold_method, scale):
     )
     correct = Circuit(ops.H(qreg[0]), [ops.CNOT(*qreg)] * scale)
     assert _equal(folded, correct)
+
+
+def test_folding_keeps_measurement_order_with_qiskit():
+    qreg, creg = QuantumRegister(2), ClassicalRegister(2)
+    circuit = QuantumCircuit(qreg, creg)
+    circuit.h(qreg[0])
+    circuit.measure(qreg, creg)
+
+    folded = fold_gates_at_random(circuit, scale_factor=1.0)
+    assert folded == circuit
