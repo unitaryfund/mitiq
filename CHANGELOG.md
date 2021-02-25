@@ -12,7 +12,7 @@
 ## Version 0.6.0 (In Development)
 
 ### All Changes
-
+- Adding a Mitiq Enhancement Proposal template and process (@crazy4pi314. gh-563).
 
 ## Version 0.5.0 (February 8th, 2021)
 
