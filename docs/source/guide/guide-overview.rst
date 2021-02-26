@@ -7,7 +7,8 @@ Overview of Mitiq
 
 Quantum computers are noisy, and executed quantum programs have errors.
 Mitiq is an open-source Python library for mitigating errors when executing
-quantum programs. For an introduction to the error mitigation techniques implemented in Mitiq, see the :ref:`Getting Started <guide-getting-started>` guide (the :ref:`examples` section shows how Mitiq can be used in your :ref:`research`.)
+quantum programs. For an introduction to the error mitigation techniques implemented in Mitiq, see the
+:ref:`Getting Started <guide-getting-started>` guide.
 
 Developed by `Unitary Fund <https://unitary.fund/>`_, Mitiq is a framework agnostic
 library with a long-term vision to be useful for quantum programmers using any quantum programming
