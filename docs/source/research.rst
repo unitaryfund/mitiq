@@ -30,7 +30,7 @@ If you have an example of use of Mitiq with other software packages, or on a spe
 Citing Mitiq
 ------------
 
-If you are using ``Mitiq`` for your research, please cite the related `white paper <https://arxiv.org/abs/2009.04417>`_:
+If you are using Mitiq for your research, please cite the related `white paper <https://arxiv.org/abs/2009.04417>`_:
 
 
 .. code-block::
@@ -47,7 +47,7 @@ If you are using ``Mitiq`` for your research, please cite the related `white pap
 You can download the :download:`bibtex file <mitiq.bib>`.
 
 
-If you have developed new features for error mitigation, or found bugs in ``mitiq``, please consider `contributing <contributing.html>`_ your code.
+If you have developed new features for error mitigation, or found bugs in Mitiq, please consider `contributing <contributing.html>`_ your code.
 
 .. _cited_by:
 
