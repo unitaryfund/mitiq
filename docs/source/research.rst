@@ -12,7 +12,7 @@ Mitiq is designed to aid researchers in quantum computing and quantum error miti
 -------------------------
 Contributing new features
 -------------------------
-If you have some code or have a plan to add it to Mitiq, discuss it in an issue and once ready to upload the code, review the `contributing <contributing.html>`_ guidelines for the steps to take.
+If you'd like to contribute new features to Mitiq, discuss it in an issue and once ready to upload the code, review the `contributing <contributing.html>`_ guidelines for the steps to take.
 
 
 .. _contributing_research_examples:
