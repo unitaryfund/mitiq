@@ -31,3 +31,20 @@ jobs:
       run: |
         python setup.py sdist bdist_wheel
         twine upload dist/*
+  
+  # TODO: Need a way to get the version number from previous step
+  # download-test:
+    # runs-on: ubuntu-latest
+    # steps:
+    # - name: Check out mitiq
+      # uses: actions/checkout@v2
+    # - name: Set up Python
+      # uses: actions/setup-python@v2
+      # with:
+        # python-version: 3.8
+    # - name: Install Mitiq
+    # The ``--extra-index-url`` is necessary since otherwise ``TestPyPI``  would be
+    # looking for the required dependencies therein, but we want it to install them
+    # from the real PyPI channel.
+    #   run: |
+    #     pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.python.org/simple/ mitiq==x.y.z
