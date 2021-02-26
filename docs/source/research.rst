@@ -8,7 +8,7 @@ Research
 
 Mitiq is designed to aid researchers in quantum computing and quantum error mitigation. Given the quick growth of the techniques for quantum error mitigation (you can read an overview in the `Users Guide <https://mitiq.readthedocs.io/en/stable/guide/guide-error-mitigation.html>`_ ), it is natural to update the toolchain with new techniques and features.
 
-If you'd like to contribute new features to Mitiq, discuss it in an issue and once ready to upload the code, review the `contributing <contributing.html>`_ guidelines for the steps to take. If you have an example of use of Mitiq with other software packages, or on a specific problem, we'd be glad to add it to the `Examples <examples/examples.html>`_ section of the documentation: please review the `contributing to the documentation <contributing_docs.html>`_ instructions.
+If you'd like to contribute new features to Mitiq, discuss it in an issue and once ready to upload the code, review the `contributing <contributing.html>`_ guidelines for the steps to take. If you have an example of using Mitiq with other software packages, or on a specific problem, we'd be glad to add it to the `Examples <examples/examples.html>`_ section of the documentation: please review the `contributing to the documentation <contributing_docs.html>`_ instructions.
 
 
 .. _citing:
