@@ -25,7 +25,7 @@ In particular we are interested in investigating how Mitiq can help reduce error
 
 +++
 
-A **graph**, is a mathematical object characterized by a set $V$ of **vertices (or nodes)** that we can
+A **graph** is a mathematical object characterized by a set $V$ of **vertices (or nodes)** that we can
 number with integers $V=\{0, 1, 2, \dots, n-1\}$ and a set $E$ of **edges** (pairs of nodes) which can be defined as
 $E=\{(a_1, b_1), (a_2, b_2), ...., (a_m, b_m)\}$, where $a_j\neq b_j$ and  $a_j, b_j \in V$.
 
