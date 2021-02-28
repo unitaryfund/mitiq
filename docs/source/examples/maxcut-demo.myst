@@ -238,7 +238,7 @@ via simple measurements in the computational basis of the qubits. Repeating this
 steps and minimizing the **cost function** $E(\vec \alpha, \vec \beta)$ with respect to the parameters
 $\vec \alpha$ and $\vec \beta$ one can approximate the ground state of $H$.
 
-The maximum number of cuts for the original graph will be given by the opposite of the optimal cost: $- E(\vec \alpha, \vec \beta)^*$.
+The maximum number of cuts for the original graph will be given by the opposite of the optimal cost: $- \min[ E(\vec \alpha, \vec \beta)]$.
 
 The corresponding state will be a superposition of one or more optimal solution states
 $|s_1 \rangle |s_2 \rangle \cdots |s_n\rangle$ representing optimal bipartitions $(V_A, V_B)$ of the MaxCut problem.
