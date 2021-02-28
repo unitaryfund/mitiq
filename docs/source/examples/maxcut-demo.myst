@@ -252,6 +252,16 @@ from cirq import H, X
 from typing import List, Tuple
     
 def qaoa_ansatz(graph: List[Tuple[float]], params: List[float]) -> Circuit:
+    """Generates a QAOA circuit associated to the input graph, for 
+    a specific choice of variational parameters.
+    
+    Args:
+        graph: The input graph.
+        params: The variational parameters.
+        
+    Returns:
+        The QAOA circuit.
+    """
 
     # Get the list of unique nodes from the list of edges
     nodes = list({node for edge in graph for node in edge})
