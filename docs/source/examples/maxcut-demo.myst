@@ -234,7 +234,7 @@ the energy of the final state
 
 $$E(\vec \alpha, \vec \beta) =  \langle \psi(\vec \alpha, \vec \beta) | H |\psi(\vec \alpha, \vec \beta)\rangle,$$
 
-via simple measurements in the computational basis of the qubits. Repeating this procedures for many
+via simple measurements in the computational basis of the qubits. Repeating this procedure over many
 steps and minimizing the **cost function** $E(\vec \alpha, \vec \beta)$ with respect to the parameters
 $\vec \alpha$ and $\vec \beta$ one can approximate the ground state of $H$.
 
