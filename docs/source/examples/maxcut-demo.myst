@@ -33,7 +33,7 @@ $E=\{(a_1, b_1), (a_2, b_2), ...., (a_m, b_m)\}$, where $a_j\neq b_j$ and  $a_j,
 **Note:** If we are not interested in isolated nodes (not connected to any edge), the set of edges $E$ completely
 determine the graph $G=(V, E)$.
 
-Therefore, in Python, we can represent a graph without isolated nodes as a list **list of tuples**, where each
+Therefore, in Python, we can represent a graph without isolated nodes as a **list of tuples**, where each
 tuple is a **pair of integers**. For example a **square graph** can be expressed as:
 
 ```{code-cell} ipython3
