@@ -12,7 +12,8 @@
 ## Version 0.6.0 (In Development)
 
 ### All Changes
-
+    
+- Added a new tutorial where MaxCut is solved with a mitigated QAOA (@andreamari, gh-562).
 
 ## Version 0.5.0 (February 8th, 2021)
 
