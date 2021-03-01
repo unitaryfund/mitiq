@@ -45,7 +45,7 @@ Make a PR from Master to Release
 The start of any release is drafting a PR from the master branch to the 
 release branch. This will trigger a complete round of tests to make sure the
 code for the release passes them 
- If you have to update the changelog and the version number, do so as a 
+If you have to update the changelog and the version number, do so as a 
 part of this PR.
 
 ^^^^^^^^^^^^^^^^^^^^
