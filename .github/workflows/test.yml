@@ -21,7 +21,7 @@ jobs:
           make install requirements
 
       # Not checking types until #556 fixes errors 
-      # - name: Check types with MyPy
+      # - name: Check types with mypy
       #   run: make check-types
 
       - name: Check code style with Black
