@@ -5,7 +5,7 @@ on:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
-  #generate_artifiacts:
+  #generate_artifacts:
   # TODO: make docs pdf and tarball
   create_release:
     runs-on: ubuntu-latest

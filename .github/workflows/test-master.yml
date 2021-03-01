@@ -26,5 +26,5 @@ jobs:
           run: |
             python -m pip install --upgrade pip
             make install requirements
-        - name: Run the mitiq unit tests via pytest
+        - name: Run the Mitiq unit tests via PyTest
           run: make test
