@@ -53,6 +53,7 @@ setup(
     ],
     license="GPL v3.0",
     url="https://unitary.fund",
+    python_requires='>=3.7',
 )
 
 # restore _version.py to its previous state
