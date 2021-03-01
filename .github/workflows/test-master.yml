@@ -1,4 +1,4 @@
-name: build (master only)
+name: test (master only)
 
 on:
   push:
@@ -26,5 +26,5 @@ jobs:
           run: |
             python -m pip install --upgrade pip
             make install requirements
-        - name: Run the mitiq unit tests via pytest
+        - name: Run the Mitiq unit tests via pytest
           run: make test

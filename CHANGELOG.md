@@ -13,6 +13,7 @@
 
 ### All Changes
 
+- Improve CI and release/patch workflow and documentation (@crazy4pi314 gh-566).
 - Adding a Mitiq Enhancement Proposal template and process (@crazy4pi314. gh-563).
 - Add to the documentation papers citing Mitiq, close gh-424 (@nathanshammah gh-560).
 - Added a new tutorial where MaxCut is solved with a mitigated QAOA (@andreamari, gh-562).
