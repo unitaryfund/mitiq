@@ -2,14 +2,14 @@
 
 ```{toctree}
 ---
-maxdepth: 2 
+maxdepth: 2
 caption: Contents
 ---
 readme.myst
 guide/guide.rst
 examples/examples.rst
 apidoc.rst
-citing.rst
+research.rst
 toc_contributing.myst
 changelog.myst
 zz_bibliography.rst
