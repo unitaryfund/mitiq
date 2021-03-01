@@ -30,7 +30,7 @@ jobs:
         TWINE_PASSWORD: ${{ secrets.TESTPYPI_PASSWORD }}
       run: |
         python setup.py sdist bdist_wheel
-        twine upload dist/*
+        twine upload --repository testpypi dist/*
   
   # TODO: Need a way to get the version number from previous step
   # download-test:
