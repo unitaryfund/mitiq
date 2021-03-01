@@ -1,17 +1,12 @@
-name: build
+name: test
 
 on:
   pull_request:
     branches:
       - master
-  push:
-    branches:
-      - master
 
 jobs:
-
-  # builds & tests the docs on py38
-  docs:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - name: Check out mitiq
@@ -24,53 +19,31 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           make install requirements
-          pip install -r docs/requirements.txt
+
+      # Not checking types until #556 fixes errors 
+      # - name: Check types with mypy
+      #   run: make check-types
+
+      - name: Check code style with Black
+        run: make check-format || echo "run make format to resolve issues"
+
+      - name: Lint with flake8
+        run: make check-style
+
       - name: Build and test Sphinx docs
         run: |
           make docs
           make doctest
 
-  # checks code style with Black & reports diff
-  format:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out mitiq
-        uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          make install requirements
-      - name: Check code style with Black
-        run: make check-format || echo "run make format to resolve issues"
-
-  # runs flake8 style checks on py38
-  style:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out mitiq
-        uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          make install requirements
-      - name: Lint with flake8
-        run: make check-style
-
-  # runs all the unit tests (on Ubuntu, py36/37/38) and measures code coverage
   test:
+    # Reduces running tests if the validation dosen't pass
+    # https://stackoverflow.com/a/65698892/10022996
+    needs: validate
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.7, 3.8]
 
     steps:
       - name: Check out mitiq
