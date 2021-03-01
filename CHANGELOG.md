@@ -9,15 +9,24 @@
 % # " - Fix the bug."
 
 
-## Version 0.6.0 (In Development)
+## Version 0.6.0 (March 1st, 2021)
 
+### Summary
+
+The automated workflows for builds and releases are improved and PyPI releases are now automated.
+We have more documentation on PEC and have a new tutorial on QAOA with Mitiq, as well as some miscellaneous bug fixes.
 ### All Changes
 
 - Improve CI and release/patch workflow and documentation (@crazy4pi314 gh-566).
-- Adding a Mitiq Enhancement Proposal template and process (@crazy4pi314. gh-563).
+- Adding a Mitiq Enhancement Proposal template and process (@crazy4pi314 gh-563).
 - Add to the documentation papers citing Mitiq, close gh-424 (@nathanshammah gh-560).
 - Added a new tutorial where MaxCut is solved with a mitigated QAOA (@andreamari, gh-562).
-
+- Bumping the version of Qiskit version in `dev_requirements` (@andreamari gh-554)
+- Retain measurement order when folding Qiskit circuits (@rmlarose gh-557)
+- Standardize and touch up docs (@rmlarose gh-553)
+- Adding make doc-clean command (@crazy4pi314 gh-549)
+- Fix and refactor RB circuits function (@rmlarose gh-539)
+- Improve GateOperation simplification in exponents (@rmlarose gh-541)
 ## Version 0.5.0 (February 8th, 2021)
 
 ### Summary
