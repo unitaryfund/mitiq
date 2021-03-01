@@ -2,6 +2,20 @@
 
 .. _release:
 
+==============
+Mitiq Git flow
+==============
+
+The basic development workflow for Mitiq is done in units of milestones.
+These are tracked in the GitHub milestone feature and all issues that are planned to be addressed in the current milestone should be tagged with the proper milestone.
+
+The main steps of our git flow are as follows:
+- Feature work and bug fixes are done on branches (external contributors should fork and then work on branches)
+- Once work is ready for review and inclusion in a release, make a PR from the branch/fork to master on the Mitiq repo.
+- PRs are then reviewed by the team and the community and then merged into master as appropriate. This means that this feature/fix will be included in the next release.
+- When it is time to make a release, a PR is made from the master branch to the release branch and final automatic testing and manual review is done to make sure it is good to be released.
+- Once the code is ready to be released, the PR from Master to release is approved and a tag is created on release for the appropriate semantic version number.
+
 ================================
 Releasing a new version of Mitiq
 ================================
@@ -50,9 +64,9 @@ file which is the single source of truth for version information. We try to
 follow SemVer, so typically a release will involve changing the version
 ``vX.Y.Z`` to ``vX.(Y+1).Z``, constituting a MINOR version increase.
 
-^^^^^^^^^^^^^^^^
+----------------
 Create a new tag
-^^^^^^^^^^^^^^^^
+----------------
 
 Tag the new commit to release (using ``git tag``) with a tag that matches the
 number ``VERSION.txt`` (with a preceding "v", so ``0.1.0`` is ``v0.1.0``) and
@@ -77,10 +91,16 @@ There should be a new draft release created by the tag you made in the previous 
     of the documentation. So, no additional steps are needed for updating RTD. You can
     verify changes have been updating by viewing `<https://mitiq.readthedocs.io/>`__.
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------------------------------
 Update the changelog for new development version
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------------------------------
 
 Add a new section to the ``CHANGELOG.md`` to track changes in the following
 release, meaning that if ``vX.Y.Z`` was just released, then there should be
 a section for ``vX.(Y+1).Z`` that is marked "In Development".
+
+=========================
+Releasing a version patch
+=========================
+
+The steps for the patch should be basically identical to a release other than cherry-picking from master which commits to make part of the PR from master to release, and the version number selected.
