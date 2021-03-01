@@ -7,7 +7,14 @@ Mitiq Git flow
 ==============
 
 The basic development workflow for Mitiq is done in units of milestones.
-These are tracked in the GitHub milestone feature and all issues that are planned to be addressed in the current milestone should be tagged with the proper milestone.
+These are tracked in the GitHub milestone feature and all issues that are 
+planned to be addressed in the current milestone should be tagged with the 
+proper milestone.
+
+All releases for Mitiq are recorded on the ``release`` branch with tags for 
+the version number of the release.
+Development work is done on separate branches and forks that get merged into
+``master`` when they are ready to be included in the next release.
 
 The main steps of our git flow are as follows:
 - Feature work and bug fixes are done on branches (external contributors should fork and then work on branches)
@@ -68,9 +75,10 @@ follow SemVer, so typically a release will involve changing the version
 Create a new tag
 ----------------
 
-Tag the new commit to release (using ``git tag``) with a tag that matches the
-number ``VERSION.txt`` (with a preceding "v", so ``0.1.0`` is ``v0.1.0``) and
-push this tag to the Github repository.
+Once the PR to ``release`` is approved, tag the new commit on release 
+(using ``git tag``) with a tag that matches the number ``VERSION.txt`` 
+(with a preceding "v", so ``0.1.0`` is ``v0.1.0``) and push this tag to the 
+Github repository.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Release the new version on Github
@@ -81,7 +89,8 @@ Release the new version on Github
     a new release.
 
 There should be a new draft release created by the tag you made in the previous step
-`here <https://github.com/unitaryfund/mitiq/releases>`__.
+`here <https://github.com/unitaryfund/mitiq/releases>`__. You will need to
+review it and publish the release.
 
     - Github will create compressed files with the repository. 
 
