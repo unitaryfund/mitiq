@@ -8,6 +8,9 @@
 % # " - [Bug Fix]"
 % # " - Fix the bug."
 
+## Version 0.7.0 (In Development)
+
+### All Changes
 
 ## Version 0.6.0 (March 1st, 2021)
 
