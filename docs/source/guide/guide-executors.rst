@@ -446,13 +446,7 @@ simulation.
         if len(circ.clbits) > 0:
             raise ValueError("This executor only works on programs with no classical bits.")
 
-        circ = copy.deepcopy(circ)
-        # we need to modify the circuit to measure obs in its eigenbasis
-        # we do this by appending a unitary operation
-        eigvals, U = np.linalg.eigh(obs) # obtains a U s.t. obs = U diag(eigvals) U^dag
-        circ.unitary(np.linalg.inv(U), qubits=range(circ.num_qubits))
         circ.snapshot_density_matrix('final')
-        circ.measure_all()
 
         # initialize a qiskit noise model
         noise_model = NoiseModel()
@@ -494,7 +488,7 @@ simulation.
 
     assert execute(qc, np.diag([0, 1]), 0.0) == 0.0
     assert np.isclose(execute(qc, np.diag([0, 1]), 0.5), 0.5)
-    assert np.isclose(execute(qc, np.diag([0, 1]), 0.001), 0.0480563)
+    assert np.isclose(execute(qc, np.diag([0, 1]), 0.001), 0.0476039)
 
 Qiskit: Density-matrix Simulation with Depolarizing Noise and Sampling
 ------------------------------------------------------------------------
