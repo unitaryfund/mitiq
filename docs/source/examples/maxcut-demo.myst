@@ -21,15 +21,6 @@ In particular we are interested in investigating how Mitiq can help reduce error
 
 +++
 
-```{code-cell} ipython3
----
-tags: [hide-cell]
----
-# This cell allows to run the notebook from the mitiq git repository even if mitiq is not installed with pip.
-# If mitiq is installed, this cell can be removed.
-import sys, os
-sys.path.insert(0, os.path.abspath("../../../"))
-```
 
 ## The MaxCut problem
 

@@ -18,20 +18,12 @@ kernelspec:
 This tutorial shows an example in which the energy landscape for a two-qubit variational 
 circuit is explored with and without error mitigation.
 
-```{code-cell} ipython3
----
-tags: [hide-cell]
----
-# This cell allows to run the notebook from the mitiq git repository even if mitiq is not installed with pip.
-# If mitiq is installed, this cell can be removed.
-import sys, os
-sys.path.insert(0, os.path.abspath("../../../"))
-```
 
 ```{code-cell} ipython3
 import matplotlib.pyplot as plt
 import numpy as np
 from cirq import Circuit, H, rx, CNOT, DensityMatrixSimulator, LineQubit, depolarize
+import mitiq
 from mitiq.zne import mitigate_executor
 
 SIMULATOR = DensityMatrixSimulator()
@@ -39,7 +31,6 @@ SIMULATOR = DensityMatrixSimulator()
 
 ## Defining the ideal variational circuit
 We define a function which returns a two-qubit circuit at a specified variational angle $\gamma$.
-
 
 ```{code-cell} ipython3
 def variational_circuit(gamma: float) -> Circuit:
