@@ -19,6 +19,9 @@ This tutorial shows an example in which the energy landscape for a two-qubit var
 circuit is explored with and without error mitigation.
 
 ```{code-cell} ipython3
+---
+tags: [hide-cell]
+---
 # This cell allows to run the notebook from the mitiq git repository even if mitiq is not installed with pip.
 # If mitiq is installed, this cell can be removed.
 import sys, os
