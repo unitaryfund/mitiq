@@ -12,12 +12,15 @@
 
 ### All Changes
 
+- Add qiskit executor example for exact density matrix simulation with depolarizing noise (@aaron-robertson gh-269)
+
 ## Version 0.6.0 (March 1st, 2021)
 
 ### Summary
 
 The automated workflows for builds and releases are improved and PyPI releases are now automated.
 We have more documentation on PEC and have a new tutorial on QAOA with Mitiq, as well as some miscellaneous bug fixes.
+
 ### All Changes
 
 - Improve CI and release/patch workflow and documentation (@crazy4pi314 gh-566).
@@ -30,6 +33,7 @@ We have more documentation on PEC and have a new tutorial on QAOA with Mitiq, as
 - Adding make doc-clean command (@crazy4pi314 gh-549)
 - Fix and refactor RB circuits function (@rmlarose gh-539)
 - Improve GateOperation simplification in exponents (@rmlarose gh-541)
+
 ## Version 0.5.0 (February 8th, 2021)
 
 ### Summary
