@@ -14,6 +14,8 @@
 
 ## Version 0.6.0 (March 1st, 2021)
 
+- [Bug Fix] Examples (notebooks) in the online documentation now have output code cells. (@andreamari, gh-576).
+
 ### Summary
 
 The automated workflows for builds and releases are improved and PyPI releases are now automated.
