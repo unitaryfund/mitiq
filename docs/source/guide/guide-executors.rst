@@ -414,8 +414,8 @@ in this example can be found `here <https://quantumcomputing.stackexchange.com/a
 Qiskit: Density-matrix Simulation with Depolarizing Noise
 -----------------------------------------------------------
 
-Analogous to the Cirq implementation, this executor can be used for noisy depolarizing
-simulation.
+This executor can be used to simulate a circuit with depolarizing noise and to return the exact
+expectation value of an observable (without the shot noise typical of a real experiment).
 
 .. testcode::
 
@@ -479,11 +479,6 @@ simulation.
 
     qc = QuantumCircuit(1)
     for _ in range(100):
-        qc.u1(0, 0)
-    assert 0.1 < execute(qc, np.diag([1, 0]), 0.02) < 1.0
-
-    qc = QuantumCircuit(1)
-    for _ in range(100):
         qc.x(0)
 
     assert execute(qc, np.diag([0, 1]), 0.0) == 0.0
@@ -493,7 +488,8 @@ simulation.
 Qiskit: Density-matrix Simulation with Depolarizing Noise and Sampling
 ------------------------------------------------------------------------
 
-You can also include both noise models and finite sampling in your executor.
+This executor can be used to simulate a circuit with depolarizing noise. The expectation value is
+estimated with a finite number of measurements and so it is affected by statistical noise.
 
 .. testcode::
 
