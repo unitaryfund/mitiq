@@ -413,12 +413,83 @@ in this example can be found `here <https://quantumcomputing.stackexchange.com/a
 
 Qiskit: Density-matrix Simulation with Depolarizing Noise
 -----------------------------------------------------------
-    TODO
+
+This executor can be used to simulate a circuit with depolarizing noise and to return the exact
+expectation value of an observable (without the shot noise typical of a real experiment).
+
+.. testcode::
+
+    import qiskit
+    from qiskit import QuantumCircuit
+    import numpy as np
+    import copy
+
+    # Noise simulation packages
+    from qiskit.providers.aer.noise import NoiseModel
+    from qiskit.providers.aer.noise.errors.standard_errors import depolarizing_error
+    from qiskit.providers.aer.extensions import snapshot_density_matrix
+
+    QISKIT_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
+
+    def execute(circ: QuantumCircuit, obs: np.ndarray, noise: float) -> float:
+        """Simulates the evolution of the noisy circuit and returns
+        the expectation value of the observable.
+
+        Args:
+            circ: The input Cirq circuit.
+            obs: The observable to measure as a NumPy array.
+            noise: The depolarizing noise strength as a float, i.e. 0.001 is 0.1%.
+
+        Returns:
+            The expectation value of obs as a float.
+        """
+        if len(circ.clbits) > 0:
+            raise ValueError("This executor only works on programs with no classical bits.")
+
+        circ.snapshot_density_matrix('final')
+
+        # initialize a qiskit noise model
+        noise_model = NoiseModel()
+
+        # we assume the same depolarizing error for each
+        # gate of the standard IBM basis
+        noise_model.add_all_qubit_quantum_error(depolarizing_error(noise, 1), ["u1", "u2", "u3"])
+        noise_model.add_all_qubit_quantum_error(depolarizing_error(noise, 2), ["cx"])
+
+        # execution of the experiment
+        job = qiskit.execute(
+            circ,
+            backend=QISKIT_SIMULATOR,
+            backend_options={'method':'density_matrix'},
+            noise_model=noise_model,
+            # we want all gates to be actually applied,
+            # so we skip any circuit optimization
+            basis_gates=noise_model.basis_gates,
+            optimization_level=0,
+            shots=1,
+        )
+        result = job.result()
+        rho = result.data()['snapshots']['density_matrix']['final'][0]['value']
+
+        expectation = np.real(np.trace(rho @ obs))
+        return expectation
+
+.. testcode::
+    :hide:
+
+    qc = QuantumCircuit(1)
+    for _ in range(100):
+        qc.x(0)
+
+    assert execute(qc, np.diag([0, 1]), 0.0) == 0.0
+    assert np.isclose(execute(qc, np.diag([0, 1]), 0.5), 0.5)
+    assert np.isclose(execute(qc, np.diag([0, 1]), 0.001), 0.0476039)
 
 Qiskit: Density-matrix Simulation with Depolarizing Noise and Sampling
 ------------------------------------------------------------------------
 
-This executor can be used for noisy depolarizing simulation.
+This executor can be used to simulate a circuit with depolarizing noise. The expectation value is
+estimated with a finite number of measurements and so it is affected by statistical noise.
 
 .. testcode::
 
