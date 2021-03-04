@@ -36,7 +36,6 @@ from scipy.optimize import curve_fit, OptimizeWarning
 
 from mitiq import QPROGRAM
 from mitiq.collector import Collector
-from mitiq.utils import _are_close_dict
 
 
 class ExtrapolationError(Exception):

@@ -16,7 +16,6 @@
 """Tests for zero-noise inference and extrapolation methods (factories) with
 classically generated data.
 """
-from copy import copy, deepcopy
 from typing import Callable, List
 from pytest import mark, raises, warns
 
