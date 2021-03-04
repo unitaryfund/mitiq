@@ -478,10 +478,19 @@ def test_poly_exp_factory_with_asympt(
     fac = PolyExpFactory(X_VALS, order=2, asymptote=A, avoid_log=avoid_log)
     fac.run_classical(seeded_f)
     assert not fac._opt_params
-    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=POLYEXP_TOL)
+
+    zne_value = fac.reduce()
+    assert np.isclose(zne_value, seeded_f(0, err=0), atol=POLYEXP_TOL)
 
     # There are four parameters to fit for the PolyExpFactory of order 1
     assert len(fac._opt_params) == 4
+
+    exp_values = [test_f(x) for x in X_VALS]
+    assert np.isclose(
+        PolyExpFactory.extrapolate(
+            X_VALS, exp_values, order=2, asymptote=A, avoid_log=avoid_log
+        ), zne_value, atol=POLYEXP_TOL
+    )
 
 
 @mark.parametrize("test_f", [f_poly_exp_down, f_poly_exp_up])
