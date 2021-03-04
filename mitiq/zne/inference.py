@@ -394,18 +394,6 @@ class Factory(ABC):
         self._already_reduced = False
         return self
 
-    def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, Factory):
-            return False
-        if self._already_reduced != other._already_reduced:
-            return False
-        if len(self._instack) != len(other._instack):
-            return False
-        for dict_a, dict_b in zip(self._instack, other._instack):
-            if not _are_close_dict(dict_a, dict_b):
-                return False
-        return np.allclose(self._outstack, other._outstack)
-
 
 class BatchedFactory(Factory, ABC):
     """Abstract class of a non-adaptive Factory initialized with a
@@ -627,11 +615,6 @@ class BatchedFactory(Factory, ABC):
         # Repeat each keyword num_to_average times
         return [k for k in params for _ in range(num_to_average)]
 
-    def __eq__(self, other: Any) -> bool:
-        return Factory.__eq__(self, other) and np.allclose(
-            self._scale_factors, other._scale_factors
-        )
-
 
 class AdaptiveFactory(Factory, ABC):
     """Abstract class designed to adaptively produce a new noise scaling
@@ -844,12 +827,6 @@ class PolyFactory(BatchedFactory):
             return np.polyval(opt_params, scale_factor)
 
         return zne_limit, zne_error, opt_params, params_cov, zne_curve
-
-    def __eq__(self, other: Any) -> bool:
-        return (
-            BatchedFactory.__eq__(self, other)
-            and self._options["order"] == other._options["order"]
-        )
 
 
 class RichardsonFactory(BatchedFactory):
@@ -1226,32 +1203,6 @@ class ExpFactory(BatchedFactory):
             full_output=full_output,
         )
 
-    def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, ExpFactory):
-            return False
-        if (
-            self._options["asymptote"]
-            and other._options["asymptote"] is None
-            or self._options["asymptote"] is None
-            and other._options["asymptote"]
-        ):
-            return False
-        if (
-            self._options["asymptote"] is None
-            and other._options["asymptote"] is None
-        ):
-            return (
-                BatchedFactory.__eq__(self, other)
-                and self._options["avoid_log"] == other._options["avoid_log"]
-            )
-        return (
-            BatchedFactory.__eq__(self, other)
-            and np.isclose(
-                self._options["asymptote"], other._options["asymptote"],
-            )
-            and self._options["avoid_log"] == other._options["avoid_log"]
-        )
-
 
 class PolyExpFactory(BatchedFactory):
     """
@@ -1522,17 +1473,6 @@ class PolyExpFactory(BatchedFactory):
             return zero_limit, zne_error, opt_params, params_cov, _zne_curve
         return zne_limit
 
-    def __eq__(self, other: Any) -> bool:
-        return (
-            BatchedFactory.__eq__(self, other)
-            and isinstance(other, PolyExpFactory)
-            and np.isclose(
-                self._options["asymptote"], other._options["asymptote"],
-            )
-            and self._options["avoid_log"] == other._options["avoid_log"]
-            and self._options["order"] == other._options["order"]
-        )
-
 
 # Keep a log of the optimization process storing:
 # noise value(s), expectation value(s), parameters, and zero limit
@@ -1749,14 +1689,3 @@ class AdaExpFactory(AdaptiveFactory):
         )
         self._already_reduced = True
         return self._zne_limit
-
-    def __eq__(self, other: Any) -> bool:
-        return (
-            Factory.__eq__(self, other)
-            and isinstance(other, AdaExpFactory)
-            and self._steps == other._steps
-            and self._scale_factor == other._scale_factor
-            and np.isclose(self.asymptote, other.asymptote)
-            and self.avoid_log == other.avoid_log
-            and np.allclose(self.history, other.history)
-        )
