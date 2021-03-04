@@ -1452,7 +1452,7 @@ class PolyExpFactory(BatchedFactory):
             weights=np.sqrt(np.abs(shifted_y)),
         )
         # The zero noise limit is ansatz(0)
-        zero_limit = asymptote + sign * np.exp(z_coefficients[-1])
+        zne_limit = asymptote + sign * np.exp(z_coefficients[-1])
 
         def _zne_curve(scale_factor: float) -> float:
             return asymptote + sign * np.exp(
@@ -1470,7 +1470,7 @@ class PolyExpFactory(BatchedFactory):
         opt_params = [asymptote] + list(z_coefficients[::-1])
 
         if full_output:
-            return zero_limit, zne_error, opt_params, params_cov, _zne_curve
+            return zne_limit, zne_error, opt_params, params_cov, _zne_curve
         return zne_limit
 
 
