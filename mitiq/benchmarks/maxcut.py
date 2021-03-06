@@ -13,36 +13,37 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""This module contains methods for benchmarking mitiq error extrapolation
-against a standard QAOA for MAXCUT.
-"""
+"""Methods for benchmarking zero-noise extrapolation on MaxCut-QAOA."""
 from typing import Callable, List, Optional, Tuple
+
 import numpy as np
-
-from cirq import Circuit, NamedQubit, X, ZZ, H, DensityMatrixSimulator
-from cirq import identity_each as id
-
 from scipy.optimize import minimize
 
-from mitiq import execute_with_zne, QPROGRAM
+from cirq import (
+    Circuit,
+    DensityMatrixSimulator,
+    identity_each,
+    NamedQubit,
+    X,
+    ZZ,
+    H,
+)
+from mitiq.zne import execute_with_zne
 from mitiq.zne.inference import Factory
 from mitiq.benchmarks.utils import noisy_simulation
+
 
 SIMULATOR = DensityMatrixSimulator()
 
 
-def make_noisy_backend(
+def _make_noisy_backend(
     noise: float, obs: np.ndarray
 ) -> Callable[[Circuit], float]:
-    """Helper function to match mitiq's backend type signature.
+    """Returns a (noisy) execute function for Cirq circuits.
 
     Args:
         noise: The level of depolarizing noise.
         obs: The observable that the backend should measure.
-
-    Returns:
-        A mitiq backend function.
-
     """
 
     def noisy_backend(circ: Circuit) -> float:
@@ -54,7 +55,7 @@ def make_noisy_backend(
 def make_maxcut(
     graph: List[Tuple[int, int]],
     noise: float = 0,
-    scale_noise: Optional[Callable[[QPROGRAM, float], QPROGRAM]] = None,
+    scale_noise: Optional[Callable[[Circuit, float], Circuit]] = None,
     factory: Optional[Factory] = None,
 ) -> Tuple[
     Callable[[np.ndarray], float], Callable[[np.ndarray], Circuit], np.ndarray
@@ -85,12 +86,10 @@ def make_maxcut(
     qreg = [NamedQubit(str(nn)) for nn in nodes]
 
     def cost_step(beta: float) -> Circuit:
-        return Circuit(ZZ(qreg[u], qreg[v]) ** (beta) for u, v in graph)
+        return Circuit(ZZ(qreg[u], qreg[v]) ** beta for u, v in graph)
 
     def mix_step(gamma: float) -> Circuit:
         return Circuit(X(qq) ** gamma for qq in qreg)
-
-    init_state_prog = Circuit(H.on_each(qreg))
 
     def qaoa_ansatz(params: np.ndarray) -> Circuit:
         half = int(len(params) / 2)
@@ -102,15 +101,16 @@ def make_maxcut(
             ],
             Circuit(),
         )
-        return init_state_prog + qaoa_steps
+        return Circuit(H.on_each(qreg)) + qaoa_steps
 
     # make the cost observable
-    identity = np.eye(2 ** len(nodes))
+    identity_matrix = np.eye(2 ** len(nodes))
     cost_mat = -0.5 * sum(
-        identity - Circuit([id(*qreg), ZZ(qreg[i], qreg[j])]).unitary()
+        identity_matrix
+        - Circuit([identity_each(*qreg), ZZ(qreg[i], qreg[j])]).unitary()
         for i, j in graph
     )
-    noisy_backend = make_noisy_backend(noise, cost_mat)
+    noisy_backend = _make_noisy_backend(noise, cost_mat)
 
     # must have this function signature to work with scipy minimize
     def qaoa_cost(params: np.ndarray) -> float:
@@ -133,21 +133,22 @@ def run_maxcut(
     graph: List[Tuple[int, int]],
     x0: np.ndarray,
     noise: float = 0,
-    scale_noise: Optional[Callable[[QPROGRAM, float], QPROGRAM]] = None,
+    scale_noise: Optional[Callable[[Circuit, float], Circuit]] = None,
     factory: Optional[Factory] = None,
-    verbose: bool = True,
+    optimizer: str = "Nelder-Mead",
+    verbose: bool = False,
 ) -> Tuple[float, np.ndarray, List[float]]:
-    """Solves MAXCUT using QAOA on a cirq wavefunction simulator using a
-       Nelder-Mead optimizer.
+    """Optimizes MaxCut cost function on the given graph using QAOA.
 
     Args:
         graph: The MAXCUT graph as a list of edges with integer labelled nodes.
-        x0: The initial parameters for QAOA [betas, gammas].
-            The size of x0 determines the number of p steps.
-        noise: The level of depolarizing noise.
+        x0: The initial parameters for QAOA [betas, gammas]. The size of x0
+            determines the number of steps.
+        noise: Depolarizing noise strength.
         scale_noise: The noise scaling method for ZNE.
         factory: The factory to use for ZNE.
-        verbose: An option to pass to minimize.
+        optimizer: Scipy optimization method to use.
+        verbose: An option to pass to scipy.minimize.
 
     Returns:
         A triple of the minimum cost, the values of beta and gamma that
@@ -158,14 +159,14 @@ def run_maxcut(
         gammas = [1.4, 0.7] on a graph with four edges and four nodes.
 
         >>> graph = [(0, 1), (1, 2), (2, 3), (3, 0)]
-        >>> fun,x,traj = run_maxcut(graph, x0=[1.0, 1.1, 1.4, 0.7])
+        >>> x0 = [1.0, 1.1, 1.4, 0.7]
+        >>> fun, x, traj = run_maxcut(graph, x0, verbose=True)
         Optimization terminated successfully.
                  Current function value: -4.000000
                  Iterations: 108
                  Function evaluations: 188
-
     """
-    qaoa_cost, _, _ = make_maxcut(graph, noise, scale_noise, factory)
+    qaoa_cost, *_ = make_maxcut(graph, noise, scale_noise, factory)
 
     # store the optimization trajectories
     traj = []
@@ -177,7 +178,7 @@ def run_maxcut(
     res = minimize(
         qaoa_cost,
         x0=x0,
-        method="Nelder-Mead",
+        method=optimizer,
         callback=callback,
         options={"disp": verbose},
     )
