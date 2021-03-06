@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Contains methods used for testing mitiq's performance on random circuits."""
+"""Contains methods used for testing Mitiq's performance on random circuits."""
 from typing import Tuple, Callable, Union, Optional
 import numpy as np
 
@@ -35,7 +35,7 @@ def sample_projector(
     Args:
         n_qubits: A number of qubits
         seed: Optional seed for random number generator.
-              It can be an integer or a numpy.random.RandomState object.
+
     Returns:
         A random computational basis projector on n_qubits. E.g., for two
         qubits this could be ``np.diag([0, 0, 0, 1])``, corresponding to the
@@ -109,7 +109,7 @@ def rand_circuit_zne(
             random_state=rnd_state,
         )
 
-        wvf = qc.final_wavefunction()
+        wvf = qc.final_state_vector()
 
         # calculate the exact
         obs = sample_projector(n_qubits, seed=rnd_state)
