@@ -138,20 +138,28 @@ def test_gate_type():
 
 
 def test_parameter_calibration():
+    def noiseless_executor_mock(circuit):
+        return 1
     # Perfect executor should have sigma = 0
-    executor_mock = lambda circuit: 1
     qubit = LineQubit.range(1)
     gate = ops.H.on(qubit[0]).gate
-    sigma = _parameter_calibration(executor_mock, gate, qubit[0], depth = 10)
+    sigma = _parameter_calibration(noiseless_executor_mock,
+                                   gate,
+                                   qubit[0],
+                                   depth=10)
     assert sigma == 0
 
     # Perfectly imperfect executor should have sigma = inf
-    executor_mock = lambda circuit: 0.5
+    def noisy_executor_mock(circuit):
+        return 0.5
     qubit = LineQubit.range(1)
     gate = ops.H.on(qubit[0]).gate
     with pytest.warns(RuntimeWarning):
         # Runtime warning for divide by zero
-        sigma = _parameter_calibration(executor_mock, gate, qubit[0], depth = 10)
+        sigma = _parameter_calibration(noisy_executor_mock,
+                                       gate,
+                                       qubit[0],
+                                       depth=10)
     assert sigma == math.inf
 
 
