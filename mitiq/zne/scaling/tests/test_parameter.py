@@ -18,6 +18,7 @@ from copy import deepcopy
 
 import pytest
 import numpy as np
+import math
 from cirq import Circuit, LineQubit, ops, CSWAP, ZPowGate
 
 
@@ -26,7 +27,8 @@ from mitiq.zne.scaling.parameter import (
     scale_parameters,
     _get_base_gate,
     GateTypeException,
-    _generate_parameter_calibration_circuit
+    _generate_parameter_calibration_circuit,
+    _parameter_calibration
 )
 
 
@@ -133,6 +135,24 @@ def test_gate_type():
     with pytest.raises(GateTypeException):
         forbidden_op = CSWAP(qreg[0], qreg[1], qreg[2])
         _get_base_gate(forbidden_op)
+
+
+def test_parameter_calibration():
+    # Perfect executor should have sigma = 0
+    executor_mock = lambda circuit: 1
+    qubit = LineQubit.range(1)
+    gate = ops.H.on(qubit[0]).gate
+    sigma = _parameter_calibration(executor_mock, gate, qubit[0], depth = 10)
+    assert sigma == 0
+
+    # Perfectly imperfect executor should have sigma = inf
+    executor_mock = lambda circuit: 0.5
+    qubit = LineQubit.range(1)
+    gate = ops.H.on(qubit[0]).gate
+    with pytest.warns(RuntimeWarning):
+        # Runtime warning for divide by zero
+        sigma = _parameter_calibration(executor_mock, gate, qubit[0], depth = 10)
+    assert sigma == math.inf
 
 
 def test_generate_parameter_calibration_circuit():
