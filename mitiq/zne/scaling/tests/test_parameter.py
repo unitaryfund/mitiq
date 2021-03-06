@@ -18,7 +18,8 @@ from copy import deepcopy
 
 import pytest
 import numpy as np
-from cirq import Circuit, LineQubit, ops, CSWAP
+from cirq import Circuit, LineQubit, ops, CSWAP, ZPowGate
+
 
 from mitiq.utils import _equal
 from mitiq.zne.scaling.parameter import (

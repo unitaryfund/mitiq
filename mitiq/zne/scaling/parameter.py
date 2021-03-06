@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Optional
+from typing import Optional, Callable, Iterable
 import numpy as np
 
 import copy
@@ -27,6 +27,8 @@ from cirq import (
     CXPowGate,
     CZPowGate,
     MeasurementGate,
+    Gate,
+    Qid
 )
 from mitiq.conversions import converter
 
@@ -46,6 +48,7 @@ def _get_base_gate(gate: EigenGate) -> EigenGate:
         "Your gate {} may not be supported".format(gate)
     )
 
+
 class CircuitMismatchException(Exception):
     pass
 
@@ -57,37 +60,35 @@ def _generate_parameter_calibration_circuit(
     """
     Generates a circuit which should be the identity. Given a rotation
     gate R(param), it applies R(2 * pi / depth) depth times, resulting
-    in R(2*pi)
+    in R(2*pi). Requires that the gate is periodic in 2*pi.
 
     Args:
         qubits: a list of qubits
         depth: the length of the circuit to create
-        gate: the base gate to apply several times
+        gate: the base gate to apply several times, must be periodic
+                in 2*pi
     Returns:
-        circuit: a pc circuit that can be used for profiling
+        circuit: a parameter calibration circuit that can be
+                used for profiling
     """
-    rotation_angle = 2*np.pi / depth
-    moments: List[ops.Moment] = []
-    for _ in range(depth):
-        operations = []
-        num_qubits = gate().num_qubits()
-        if num_qubits != len(qubits):
-            raise CircuitMismatchException(
-                "Number of qubits does not match domain size of gate.")
-        operations.append(gate(exponent=rotation_angle)(*qubits))
-        moments.append(ops.Moment(operations))
-    return Circuit(moments)
+    num_qubits = gate().num_qubits()
+    if num_qubits != len(qubits):
+        raise CircuitMismatchException(
+            "Number of qubits does not match domain size of gate.")
+    return Circuit(gate(exponent=2 * np.pi / depth).on(*qubits)
+                   for _ in range(depth))
 
 
 def _parameter_calibration(
         executor: Callable[..., float],
         gate: Gate,
-        qubit: int,
+        qubit: Qid,
         depth: int = 100) -> float:
     """
     Given an executor and a gate, determines the effective
     variance in the control parameter
     that can be used for parameter noise scaling later on.
+    Only works for one qubit gates for now.
 
     Args:
         executor: a function that takes in a quantum circuit and returns
@@ -102,11 +103,14 @@ def _parameter_calibration(
     """
 
     base_gate = _get_base_gate(gate)
-    circuit = _generate_pc_circuit([qubit], depth, base_gate)
+    circuit = _generate_parameter_calibration_circuit([qubit],
+                                                      depth,
+                                                      base_gate)
     expectation = executor(circuit)
     Q = (1 - np.power(2*expectation-1, 1/depth))/2
     sigma = -0.5*np.log(1 - 2*Q)
     return sigma
+
 
 @converter
 def scale_parameters(

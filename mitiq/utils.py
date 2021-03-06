@@ -15,7 +15,7 @@
 
 """Utility functions."""
 from copy import deepcopy
-from typing import cast, Any, Dict, Callable, Iterable, List
+from typing import cast, Any, Dict
 
 import numpy as np
 
@@ -27,14 +27,12 @@ from cirq import (
     Gate,
     GateOperation,
     Moment,
-    ops,
     CNOT,
     H,
     DensityMatrixSimulator,
     OP_TREE,
 )
 from cirq.ops.measurement_gate import MeasurementGate
-from mitiq.zne.scaling.parameter import _get_base_gate
 
 
 def _simplify_gate_exponent(gate: EigenGate) -> EigenGate:

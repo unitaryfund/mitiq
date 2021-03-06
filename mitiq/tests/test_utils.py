@@ -30,7 +30,6 @@ from cirq import (
     S,
     T,
     MeasurementGate,
-    ZPowGate,
     depolarize,
 )
 
