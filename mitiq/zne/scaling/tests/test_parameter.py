@@ -25,6 +25,7 @@ from mitiq.zne.scaling.parameter import (
     scale_parameters,
     _get_base_gate,
     GateTypeException,
+    _generate_parameter_calibration_circuit
 )
 
 
@@ -131,3 +132,26 @@ def test_gate_type():
     with pytest.raises(GateTypeException):
         forbidden_op = CSWAP(qreg[0], qreg[1], qreg[2])
         _get_base_gate(forbidden_op)
+
+
+def test_generate_parameter_calibration_circuit():
+    """Tests generating a simple Parameter Calibration circuit"""
+    n_qubits = 1
+    qubits = LineQubit.range(n_qubits)
+    depth = 10
+    circuit = _generate_parameter_calibration_circuit(qubits, depth, ZPowGate)
+    assert len(circuit) == depth
+    # Make sure the exponents in the
+    for i in range(len(circuit)):
+        assert circuit[i].operations[0].gate.exponent == 2*np.pi/depth
+
+
+def test_generate_parameter_calibration_circuit_failure():
+    """Tests that parameter calibration circuit generation fails because there
+    are too many qubits"""
+    n_qubits = 3
+    qubits = LineQubit.range(n_qubits)
+    depth = 10
+    # Should raise exception because too many qubits
+    with pytest.raises(Exception):
+        _generate_parameter_calibration_circuit(qubits, depth, ZPowGate)

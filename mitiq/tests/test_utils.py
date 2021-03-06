@@ -39,7 +39,6 @@ from mitiq.utils import (
     _equal,
     _simplify_gate_exponent,
     _simplify_circuit_exponents,
-    _generate_pc_circuit,
     _max_ent_state_circuit,
     _circuit_to_choi,
     _operation_to_choi,
@@ -292,29 +291,6 @@ def test_are_close_dict():
     dict2 = {"a": 1, "b": 0.0, "c": 1}
     assert not _are_close_dict(dict1, dict2)
     assert not _are_close_dict(dict2, dict1)
-
-
-def test_generate_pc_circuit():
-    """Tests generating a simple Parameter Calibration circuit"""
-    n_qubits = 1
-    qubits = LineQubit.range(n_qubits)
-    depth = 10
-    circuit = _generate_pc_circuit(qubits, depth, ZPowGate)
-    assert len(circuit) == depth
-    # Make sure the exponents in the
-    for i in range(len(circuit)):
-        assert circuit[i].operations[0].gate.exponent == 2*np.pi/depth
-
-
-def test_generate_pc_circuit_failure():
-    """Tests that parameter calibration circuit generation fails because there
-    are too many qubits"""
-    n_qubits = 3
-    qubits = LineQubit.range(n_qubits)
-    depth = 10
-    # Should raise exception because too many qubits
-    with pytest.raises(Exception):
-        _generate_pc_circuit(qubits, depth, ZPowGate)
 
 
 def test_max_ent_state_circuit():

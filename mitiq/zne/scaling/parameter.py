@@ -46,6 +46,67 @@ def _get_base_gate(gate: EigenGate) -> EigenGate:
         "Your gate {} may not be supported".format(gate)
     )
 
+class CircuitMismatchException(Exception):
+    pass
+
+
+def _generate_parameter_calibration_circuit(
+        qubits: Iterable,
+        depth: int,
+        gate: EigenGate) -> Circuit:
+    """
+    Generates a circuit which should be the identity. Given a rotation
+    gate R(param), it applies R(2 * pi / depth) depth times, resulting
+    in R(2*pi)
+
+    Args:
+        qubits: a list of qubits
+        depth: the length of the circuit to create
+        gate: the base gate to apply several times
+    Returns:
+        circuit: a pc circuit that can be used for profiling
+    """
+    rotation_angle = 2*np.pi / depth
+    moments: List[ops.Moment] = []
+    for _ in range(depth):
+        operations = []
+        num_qubits = gate().num_qubits()
+        if num_qubits != len(qubits):
+            raise CircuitMismatchException(
+                "Number of qubits does not match domain size of gate.")
+        operations.append(gate(exponent=rotation_angle)(*qubits))
+        moments.append(ops.Moment(operations))
+    return Circuit(moments)
+
+
+def _parameter_calibration(
+        executor: Callable[..., float],
+        gate: Gate,
+        qubit: int,
+        depth: int = 100) -> float:
+    """
+    Given an executor and a gate, determines the effective
+    variance in the control parameter
+    that can be used for parameter noise scaling later on.
+
+    Args:
+        executor: a function that takes in a quantum circuit and returns
+            an expectation value
+        gate: the quantum gate that you wish to profile
+        qubit: the index of the qubit you wish to profile
+        depth: the number of operations you would like to use to profile
+            your gate.
+    Returns:
+        sigma: a float representing the standard deviation of the error
+            of your gate
+    """
+
+    base_gate = _get_base_gate(gate)
+    circuit = _generate_pc_circuit([qubit], depth, base_gate)
+    expectation = executor(circuit)
+    Q = (1 - np.power(2*expectation-1, 1/depth))/2
+    sigma = -0.5*np.log(1 - 2*Q)
+    return sigma
 
 @converter
 def scale_parameters(
