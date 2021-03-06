@@ -31,7 +31,7 @@ def test_triangle():
     graph = [(0, 1), (1, 2), (2, 0)]
     opt_energy = -2.0
 
-    x0 = np.array([0.0, 0.5])
+    x0 = [0.0, 0.5]
     energy, *_ = run_maxcut(graph, x0)
     assert np.isclose(energy, opt_energy)
 

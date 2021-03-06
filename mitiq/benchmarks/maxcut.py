@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Methods for benchmarking zero-noise extrapolation on MaxCut-QAOA."""
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, Iterable, List, Optional, Tuple
 
 import numpy as np
 from scipy.optimize import minimize
@@ -131,7 +131,7 @@ def make_maxcut(
 
 def run_maxcut(
     graph: List[Tuple[int, int]],
-    x0: np.ndarray,
+    x0: Iterable[float],
     noise: float = 0,
     scale_noise: Optional[Callable[[Circuit, float], Circuit]] = None,
     factory: Optional[Factory] = None,
@@ -177,7 +177,7 @@ def run_maxcut(
 
     res = minimize(
         qaoa_cost,
-        x0=x0,
+        x0=np.array(x0),
         method=optimizer,
         callback=callback,
         options={"disp": verbose},
