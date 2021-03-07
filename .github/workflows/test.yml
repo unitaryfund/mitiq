@@ -50,9 +50,6 @@ jobs:
           make doctest
 
   test:
-    # Reduces running tests if the validation dosen't pass
-    # https://stackoverflow.com/a/65698892/10022996
-    needs: validate
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
