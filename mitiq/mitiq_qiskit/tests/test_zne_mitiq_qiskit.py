@@ -115,9 +115,7 @@ def test_run_factory_with_number_of_shots():
     )
     base = qiskit_executor(circuit)
     zne_value = fac.run(
-        circuit,
-        qiskit_executor,
-        scale_noise=zne.scaling.fold_gates_at_random,
+        circuit, qiskit_executor, scale_noise=zne.scaling.fold_gates_at_random,
     ).reduce()
 
     assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)

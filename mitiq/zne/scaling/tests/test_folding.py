@@ -1609,9 +1609,7 @@ def test_all_gates_folded_at_max_scale_with_fidelities(fold_method, qiskit):
         assert folded.qregs == circ.qregs
         assert folded.cregs == circ.cregs
         folded, _ = convert_to_mitiq(folded)
-        assert equal_up_to_global_phase(
-            folded.unitary(), correct.unitary()
-        )
+        assert equal_up_to_global_phase(folded.unitary(), correct.unitary())
     else:
         assert _equal(folded, correct)
         assert len(list(folded.all_operations())) == 3 * ngates
