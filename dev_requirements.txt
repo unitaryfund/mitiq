@@ -3,8 +3,8 @@ qiskit
 pyquil
 
 # Unit tests, coverage, and formatting/style.
-pytest~=5.4.1
-pytest-cov~=2.8.1
+pytest-xdist[psutil]~=2.2.1
+pytest-cov~=2.11.1
 flake8~=3.7.9
 black~=19.10b0
 
