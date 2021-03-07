@@ -40,9 +40,9 @@ jobs:
         with:
           python-version: 3.8
       - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        make install requirements
+        run: |
+          python -m pip install --upgrade pip
+          make install requirements
 
       - name: Build and test Sphinx docs
         run: |
