@@ -1,4 +1,4 @@
 [flake8]
 max-line-length = 79
-ignore = E203
+ignore = E203, E231, W503
 exclude = __init__.py, build, docs/build
