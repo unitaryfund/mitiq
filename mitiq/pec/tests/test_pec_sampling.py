@@ -48,7 +48,7 @@ def test_sample_sequence_cirq():
         },
     )
 
-    for _ in range(50):
+    for _ in range(5):
         seq, sign, norm = sample_sequence(circuit, representations=[rep])
         assert isinstance(seq, cirq.Circuit)
         assert sign in {1, -1}
@@ -73,7 +73,7 @@ def test_sample_sequence_qiskit():
         ideal=circuit, basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
     )
 
-    for _ in range(50):
+    for _ in range(5):
         seq, sign, norm = sample_sequence(circuit, representations=[rep])
         assert isinstance(seq, qiskit.QuantumCircuit)
         assert sign in {1, -1}

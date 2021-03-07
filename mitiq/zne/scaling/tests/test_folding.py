@@ -1451,7 +1451,7 @@ def test_fold_and_squash_random_circuits_random_stretches(fold_method):
     moments in the un-squashed circuit.
     """
     rng = np.random.RandomState(seed=1)
-    for _ in range(100):
+    for _ in range(5):
         circuit = testing.random_circuit(
             qubits=8, n_moments=8, op_density=0.75
         )
@@ -1589,33 +1589,32 @@ def test_all_gates_folded_at_max_scale_with_fidelities(fold_method, qiskit):
     if qiskit:
         circ = convert_from_mitiq(circ, "qiskit")
 
-    for _ in range(10):
-        folded = fold_method(
-            circ,
-            scale_factor=3.0,
-            fidelities={
-                "H": rng.rand(),
-                "T": rng.rand(),
-                "CNOT": rng.rand(),
-                "TOFFOLI": rng.rand(),
-            },
+    folded = fold_method(
+        circ,
+        scale_factor=3.0,
+        fidelities={
+            "H": rng.rand(),
+            "T": rng.rand(),
+            "CNOT": rng.rand(),
+            "TOFFOLI": rng.rand(),
+        },
+    )
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+        [ops.T.on(qreg[2]), ops.T.on(qreg[2]) ** -1, ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3,
+    )
+    if qiskit:
+        assert folded.qregs == circ.qregs
+        assert folded.cregs == circ.cregs
+        folded, _ = convert_to_mitiq(folded)
+        assert equal_up_to_global_phase(
+            folded.unitary(), correct.unitary()
         )
-        correct = Circuit(
-            [ops.H.on_each(*qreg)] * 3,
-            [ops.CNOT.on(qreg[0], qreg[1])] * 3,
-            [ops.T.on(qreg[2]), ops.T.on(qreg[2]) ** -1, ops.T.on(qreg[2])],
-            [ops.TOFFOLI.on(*qreg)] * 3,
-        )
-        if qiskit:
-            assert folded.qregs == circ.qregs
-            assert folded.cregs == circ.cregs
-            folded, _ = convert_to_mitiq(folded)
-            assert equal_up_to_global_phase(
-                folded.unitary(), correct.unitary()
-            )
-        else:
-            assert _equal(folded, correct)
-            assert len(list(folded.all_operations())) == 3 * ngates
+    else:
+        assert _equal(folded, correct)
+        assert len(list(folded.all_operations())) == 3 * ngates
 
 
 @pytest.mark.parametrize(
