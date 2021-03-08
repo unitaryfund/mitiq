@@ -1,6 +1,6 @@
 # Third-party integration.
-qiskit
-pyquil
+qiskit~=0.24.0
+pyquil~=2.28.0
 
 # Unit tests, coverage, and formatting/style.
 pytest-xdist[psutil]~=2.2.1
