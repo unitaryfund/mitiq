@@ -436,7 +436,7 @@ expectation value of an observable (without the shot noise typical of a real exp
         the expectation value of the observable.
 
         Args:
-            circ: The input Cirq circuit.
+            circ: The input Qiskit circuit.
             obs: The observable to measure as a NumPy array.
             noise: The depolarizing noise strength as a float, i.e. 0.001 is 0.1%.
 
@@ -509,7 +509,7 @@ estimated with a finite number of measurements and so it is affected by statisti
         the expectation value of the observable.
 
         Args:
-            circ: The input Cirq circuit.
+            circ: The input Qiskit circuit.
             obs: The observable to measure as a NumPy array.
             noise: The depolarizing noise strength as a float, i.e. 0.001 is 0.1%.
             shots: The number of measurements.

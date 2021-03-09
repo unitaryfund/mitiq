@@ -16,20 +16,22 @@
 """Qiskit utility functions."""
 import numpy as np
 import copy
+import qiskit
 from typing import Optional
-from qiskit import Aer, execute, QuantumCircuit
+from qiskit import QuantumCircuit
 
 # Noise simulation packages
 from qiskit.providers.aer.noise import NoiseModel
 from qiskit.providers.aer.noise.errors.standard_errors import (
     depolarizing_error,
 )
+from qiskit.providers.aer.extensions import snapshot_density_matrix
 
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 from mitiq.mitiq_qiskit.conversions import to_qiskit
 
-BACKEND = Aer.get_backend("qasm_simulator")
-WVF_SIMULATOR = Aer.get_backend("statevector_simulator")
+QASM_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
+WVF_SIMULATOR = qiskit.Aer.get_backend("statevector_simulator")
 
 
 def random_one_qubit_identity_circuit(num_cliffords: int) -> QuantumCircuit:
@@ -55,13 +57,11 @@ def run_with_noise(
     seed: Optional[int] = None,
 ) -> float:
     """Runs the quantum circuit with a depolarizing channel noise model.
-
     Args:
         circuit: Ideal quantum circuit.
         noise: Noise constant going into `depolarizing_error`.
         shots: The Number of shots to run the circuit on the back-end.
         seed: Optional seed for qiskit simulator.
-
     Returns:
         expval: expected values.
     """
@@ -75,9 +75,9 @@ def run_with_noise(
     )
 
     # execution of the experiment
-    job = execute(
+    job = qiskit.execute(
         circuit,
-        backend=BACKEND,
+        backend=QASM_SIMULATOR,
         basis_gates=["u1", "u2", "u3"],
         # we want all gates to be actually applied,
         # so we skip any circuit optimization
@@ -92,10 +92,7 @@ def run_with_noise(
     return expval
 
 
-def qs_wvf_sim(
-    circ: QuantumCircuit,
-    obs: np.ndarray
-) -> float:
+def execute(circ: QuantumCircuit, obs: np.ndarray) -> float:
     """Simulates noiseless wavefunction evolution and returns the
     expectation value of some observable.
 
@@ -106,15 +103,13 @@ def qs_wvf_sim(
     Returns:
         The expectation value of obs as a float.
     """
-    result = execute(circ, WVF_SIMULATOR).result()
+    result = qiskit.execute(circ, WVF_SIMULATOR).result()
     final_wvf = result.get_statevector()
     return np.real(final_wvf.conj().T @ obs @ final_wvf)
 
 
-def qs_wvf_sampling_sim(
-    circ: QuantumCircuit,
-    obs: np.ndarray,
-    shots: int
+def execute_with_shots(
+    circ: QuantumCircuit, obs: np.ndarray, shots: int
 ) -> float:
     """Simulates the evolution of the circuit and returns
     the expectation value of the observable.
@@ -131,25 +126,26 @@ def qs_wvf_sampling_sim(
     if len(circ.clbits) > 0:
         raise ValueError(
             "This executor only works on programs with "
-            f"no classical bits.")
+            "no classical bits."
+        )
 
     circ = copy.deepcopy(circ)
     # we need to modify the circuit to measure obs in its eigenbasis
     # we do this by appending a unitary operation
     # obtains a U s.t. obs = U diag(eigvals) U^dag
     eigvals, U = np.linalg.eigh(obs)
-    circ.unitary(np.linalg.inv(U), qubits=range(circ.n_qubits))
+    circ.unitary(np.linalg.inv(U), qubits=range(circ.num_qubits))
 
     circ.measure_all()
 
     # execution of the experiment
-    job = execute(
+    job = qiskit.execute(
         circ,
-        backend=BACKEND,
+        backend=QASM_SIMULATOR,
         # we want all gates to be actually applied,
         # so we skip any circuit optimization
         optimization_level=0,
-        shots=shots
+        shots=shots,
     )
     results = job.result()
     counts = results.get_counts()
@@ -161,17 +157,67 @@ def qs_wvf_sampling_sim(
     return expectation
 
 
-def qs_noisy_sampling_sim(
-    circ: QuantumCircuit,
-    obs: np.ndarray,
-    noise: float,
-    shots: int
+def execute_with_depolarizing_noise(
+    circ: QuantumCircuit, obs: np.ndarray, noise: float
 ) -> float:
     """Simulates the evolution of the noisy circuit and returns
     the expectation value of the observable.
 
     Args:
-        circ: The input Cirq circuit.
+        circ: The input Qiskit circuit.
+        obs: The observable to measure as a NumPy array.
+        noise: The depolarizing noise strength as a float, i.e. 0.001 is 0.1%.
+
+    Returns:
+        The expectation value of obs as a float.
+    """
+    if len(circ.clbits) > 0:
+        raise ValueError(
+            "This executor only works on programs with "
+            "no classical bits."
+        )
+
+    circ.snapshot_density_matrix("final")
+
+    # initialize a qiskit noise model
+    noise_model = NoiseModel()
+
+    # we assume the same depolarizing error for each
+    # gate of the standard IBM basis
+    noise_model.add_all_qubit_quantum_error(
+        depolarizing_error(noise, 1), ["u1", "u2", "u3"]
+    )
+    noise_model.add_all_qubit_quantum_error(
+        depolarizing_error(noise, 2), ["cx"]
+    )
+
+    # execution of the experiment
+    job = qiskit.execute(
+        circ,
+        backend=QASM_SIMULATOR,
+        backend_options={"method": "density_matrix"},
+        noise_model=noise_model,
+        # we want all gates to be actually applied,
+        # so we skip any circuit optimization
+        basis_gates=noise_model.basis_gates,
+        optimization_level=0,
+        shots=1,
+    )
+    result = job.result()
+    rho = result.data()["snapshots"]["density_matrix"]["final"][0]["value"]
+
+    expectation = np.real(np.trace(rho @ obs))
+    return expectation
+
+
+def execute_with_shots_and_depolarizing_noise(
+    circ: QuantumCircuit, obs: np.ndarray, noise: float, shots: int,
+) -> float:
+    """Simulates the evolution of the noisy circuit and returns
+    the expectation value of the observable.
+
+    Args:
+        circ: The input Qiskit circuit.
         obs: The observable to measure as a NumPy array.
         noise: The depolarizing noise strength as a float,
                i.e. 0.001 is 0.1%.
@@ -182,15 +228,16 @@ def qs_noisy_sampling_sim(
     """
     if len(circ.clbits) > 0:
         raise ValueError(
-            "This executor only works on programs "
-            f"with no classical bits.")
+            "This executor only works on programs with "
+            "no classical bits."
+        )
 
     circ = copy.deepcopy(circ)
     # we need to modify the circuit to measure obs in its eigenbasis
     # we do this by appending a unitary operation
     # obtains a U s.t. obs = U diag(eigvals) U^dag
     eigvals, U = np.linalg.eigh(obs)
-    circ.unitary(np.linalg.inv(U), qubits=range(circ.n_qubits))
+    circ.unitary(np.linalg.inv(U), qubits=range(circ.num_qubits))
 
     circ.measure_all()
 
@@ -207,10 +254,10 @@ def qs_noisy_sampling_sim(
     )
 
     # execution of the experiment
-    job = execute(
+    job = qiskit.execute(
         circ,
-        backend=BACKEND,
-        backend_options={'method': 'density_matrix'},
+        backend=QASM_SIMULATOR,
+        backend_options={"method": "density_matrix"},
         noise_model=noise_model,
         # we want all gates to be actually applied,
         # so we skip any circuit optimization
@@ -218,8 +265,7 @@ def qs_noisy_sampling_sim(
         optimization_level=0,
         shots=shots,
     )
-    results = job.result()
-    counts = results.get_counts()
+    counts = job.result().get_counts()
     expectation = 0
     # classical bits are included in bitstrings with a space
     # this is what breaks if you have them
