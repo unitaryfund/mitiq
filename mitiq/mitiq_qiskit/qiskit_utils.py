@@ -25,7 +25,6 @@ from qiskit.providers.aer.noise import NoiseModel
 from qiskit.providers.aer.noise.errors.standard_errors import (
     depolarizing_error,
 )
-from qiskit.providers.aer.extensions import snapshot_density_matrix
 
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 from mitiq.mitiq_qiskit.conversions import to_qiskit
@@ -125,8 +124,7 @@ def execute_with_shots(
     """
     if len(circ.clbits) > 0:
         raise ValueError(
-            "This executor only works on programs with "
-            "no classical bits."
+            "This executor only works on programs with no classical bits."
         )
 
     circ = copy.deepcopy(circ)
@@ -173,11 +171,10 @@ def execute_with_depolarizing_noise(
     """
     if len(circ.clbits) > 0:
         raise ValueError(
-            "This executor only works on programs with "
-            "no classical bits."
+            "This executor only works on programs with no classical bits."
         )
 
-    circ.snapshot_density_matrix("final")
+    circ.snapshot("final", snapshot_type="density_matrix")
 
     # initialize a qiskit noise model
     noise_model = NoiseModel()
@@ -228,8 +225,7 @@ def execute_with_shots_and_depolarizing_noise(
     """
     if len(circ.clbits) > 0:
         raise ValueError(
-            "This executor only works on programs with "
-            "no classical bits."
+            "This executor only works on programs with no classical bits."
         )
 
     circ = copy.deepcopy(circ)
