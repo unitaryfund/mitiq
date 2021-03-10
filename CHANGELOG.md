@@ -22,6 +22,7 @@ The automated workflows for builds and releases are improved and PyPI releases a
 We have more documentation on PEC and have a new tutorial on QAOA with Mitiq, as well as some miscellaneous bug fixes.
 
 ### All Changes
+- Add minimal section on PEC to documentation (@nathanshammah, gh-564)
 
 - Improve CI and release/patch workflow and documentation (@crazy4pi314 gh-566).
 - Adding a Mitiq Enhancement Proposal template and process (@crazy4pi314 gh-563).
