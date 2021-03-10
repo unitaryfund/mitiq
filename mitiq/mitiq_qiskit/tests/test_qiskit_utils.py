@@ -126,8 +126,8 @@ def test_execute_with_depolarizing_noise_error():
         ValueError,
         match="This executor only works on programs with no classical bits.",
     ):
-        execute_with_shots_and_depolarizing_noise(
-            circ=circ, obs=OBSERVABLE, noise=0.01, shots=SHOTS
+        execute_with_depolarizing_noise(
+            circ=circ, obs=OBSERVABLE, noise=0.01
         )
 
 
