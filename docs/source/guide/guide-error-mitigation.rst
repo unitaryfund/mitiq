@@ -89,7 +89,7 @@ final mixed state :math:`\rho_f`. Then, by measuring the observable :math:`X`, s
 :math:`\gamma_{\text{tot}} := \prod_{i}^L \gamma_i` and
 :math:`\sigma_{\text{tot}} = \prod_{i=1}^L \sigma_i(\alpha)`, we can obtain an unbiased
 estimate of the ideal expectation value as
-:math:`\langleX\rangle_{\text{ideal}} =  \mathbb E \left[ \gamma_{\text{tot}} \sigma_{\text{tot}} X_{\rm noisy} \right]`,
+:math:`\langle X\rangle_{\text{ideal}} =  \mathbb E \left[ \gamma_{\text{tot}} \sigma_{\text{tot}} X_{\rm noisy} \right]`,
 where :math:`X_{\rm noisy}` is the experimental estimate of :math:`{\rm tr}[\rho_f X]`
 and :math:`\mathbb E` is the sample average over many repetitions of the previous procedure.
 
