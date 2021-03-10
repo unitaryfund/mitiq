@@ -13,6 +13,8 @@
 ### All Changes
 
 - Add qiskit executor example for exact density matrix simulation with depolarizing noise (@aaron-robertson gh-269)
+- Add qiskit and cirq executor examples gifs to readme (@nathanshammah, gh-587)
+
 
 ## Version 0.6.0 (March 1st, 2021)
 
