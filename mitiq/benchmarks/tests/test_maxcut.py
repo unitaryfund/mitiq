@@ -13,29 +13,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Unit tests for maxcut benchmark."""
+"""Unit tests for MaxCut benchmark."""
 import numpy as np
 
 from mitiq.benchmarks.maxcut import run_maxcut
 
 
-def test_square():
-    graph = [(0, 1), (1, 2), (2, 3), (3, 0)]
-    x0 = np.asarray([0.0, 0.5, 0.75, 1.0])
-    out, _, _ = run_maxcut(graph, x0)
-    assert np.isclose(out, -4.0)
-
-
 def test_barbell():
     graph = [(0, 1), (1, 0)]
-    x0 = np.asarray([0.0, 0.3])
-    out, _, _ = run_maxcut(graph, x0)
-    assert np.isclose(out, -2.0)
+    opt_energy = -2.0
+
+    energy, *_ = run_maxcut(graph, x0=[0.0, 0.3])
+    assert np.isclose(energy, opt_energy)
 
 
-def test_noisy_square():
-    graph = [(0, 1), (1, 2), (2, 3), (3, 0)]
-    x0 = np.asarray([0.0, 0.5, 0.75, 1.0])
-    out, _, _ = run_maxcut(graph, x0, noise=0.4)
-    # When there is noise the solution should be worse.
-    assert out > -4.0
+def test_triangle():
+    graph = [(0, 1), (1, 2), (2, 0)]
+    opt_energy = -2.0
+
+    x0 = [0.0, 0.5]
+    energy, *_ = run_maxcut(graph, x0)
+    assert np.isclose(energy, opt_energy)
+
+    energy_with_noise, *_ = run_maxcut(graph, x0, noise=0.4)
+    assert energy_with_noise > opt_energy
