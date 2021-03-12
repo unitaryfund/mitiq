@@ -1,4 +1,4 @@
-# Copyright (C) 2020 Unitary Fund
+# Copyright (C) 2021 Unitary Fund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,68 +14,55 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for qiskit executors (qiskit_utils.py)."""
-import pytest
 import numpy as np
 from qiskit import QuantumCircuit
 
 from mitiq.mitiq_qiskit.qiskit_utils import (
     execute,
     execute_with_shots,
-    execute_with_depolarizing_noise,
-    execute_with_shots_and_depolarizing_noise,
+    execute_with_noise,
+    execute_with_shots_and_noise,
+    initialized_depolarizing_noise,
 )
 
-OBSERVABLE = np.array([[1, 0], [0, 0]])
-TWO_QUBIT_OBSERVABLE = np.diag([1, 0, 0, 0])
-SHOTS = 1000
+NOISE = 0.007
+ONE_QUBIT_GS_PROJECTOR = np.array([[1, 0], [0, 0]])
+TWO_QUBIT_GS_PROJECTOR = np.diag([1, 0, 0, 0])
+SHOTS = 1_000
 
 
 def test_execute():
-    """ Tests the Qiskit waveform simulation executor returns
-    appropriate expectation value given an observable
+    """ Tests the Qiskit wavefunction simulation executor returns
+    appropriate expectation value given an observable.
     """
 
     circ = QuantumCircuit(1)
-    expected_value = execute(circ, obs=OBSERVABLE)
-    assert 1.0 == expected_value
+    expected_value = execute(circ, obs=ONE_QUBIT_GS_PROJECTOR)
+    assert expected_value == 1.0
 
     second_circ = QuantumCircuit(1)
     second_circ.x(0)
-    expected_value = execute(second_circ, obs=OBSERVABLE)
-    assert 0.0 == expected_value
+    expected_value = execute(second_circ, obs=ONE_QUBIT_GS_PROJECTOR)
+    assert expected_value == 0.0
 
 
 def test_execute_with_shots():
-    """ Tests the Qiskit waveform sampling simulation executor returns
-    appropriate expectation value given an observable
+    """ Tests the Qiskit wavefunction sampling simulation executor returns
+    appropriate expectation value given an observable.
     """
 
-    circ = QuantumCircuit(1)
+    circ = QuantumCircuit(1, 1)
     expectation_value = execute_with_shots(
-        circ=circ, obs=OBSERVABLE, shots=SHOTS
+        circ=circ, obs=ONE_QUBIT_GS_PROJECTOR, shots=SHOTS
     )
     assert expectation_value == 1.0
 
     second_circ = QuantumCircuit(1)
     second_circ.x(0)
     expectation_value = execute_with_shots(
-        circ=second_circ, obs=OBSERVABLE, shots=SHOTS
+        circ=second_circ, obs=ONE_QUBIT_GS_PROJECTOR, shots=SHOTS
     )
     assert expectation_value == 0.0
-
-
-def test_execute_with_shots_error():
-    """ Tests that an error is raised when a classical register
-    is present in a Qiskit circuit for the "execute_with_shots"
-    executor
-    """
-
-    circ = QuantumCircuit(1, 1)
-    with pytest.raises(
-        ValueError,
-        match="This executor only works on programs with no classical bits.",
-    ):
-        execute_with_shots(circ=circ, obs=OBSERVABLE, shots=SHOTS)
 
 
 def test_execute_with_depolarizing_noise_single_qubit():
@@ -88,18 +75,19 @@ def test_execute_with_depolarizing_noise_single_qubit():
 
     noiseless_exp_value = 1.0
 
-    for noise in [0.01, 0.1, 0.2, 1.0]:
-        expectation_value = execute_with_depolarizing_noise(
-            circ=single_qubit_circ, obs=OBSERVABLE, noise=noise,
-        )
-        # anticipate that the expectation value will be less than
-        # the noiseless simulation of the same circuit
-        assert expectation_value < noiseless_exp_value
+    expectation_value = execute_with_noise(
+        circ=single_qubit_circ,
+        obs=ONE_QUBIT_GS_PROJECTOR,
+        noise_model=initialized_depolarizing_noise(NOISE),
+    )
+    # anticipate that the expectation value will be less than
+    # the noiseless simulation of the same circuit
+    assert expectation_value < noiseless_exp_value
 
 
 def test_execute_with_depolarizing_noise_two_qubit():
     """ Tests the noisy sampling executor across increasing levels of
-    two qubit gate noise
+    two qubit gate noise.
     """
 
     two_qubit_circ = QuantumCircuit(2)
@@ -107,81 +95,53 @@ def test_execute_with_depolarizing_noise_two_qubit():
 
     noiseless_exp_value = 1.0
 
-    for noise in [0.01, 0.1, 0.2, 1.0]:
-        expectation_value = execute_with_depolarizing_noise(
-            circ=two_qubit_circ, obs=TWO_QUBIT_OBSERVABLE, noise=noise,
-        )
-        # anticipate that the expectation value will be less than
-        # the noiseless simulation of the same circuit
-        assert expectation_value < noiseless_exp_value
-
-
-def test_execute_with_depolarizing_noise_error():
-    """ Tests that an error is raised when a classical
-    register is present in a Qiskit circuit for the
-    "execute_with_depolarizing_noise" executor
-    """
-    circ = QuantumCircuit(1, 1)
-    with pytest.raises(
-        ValueError,
-        match="This executor only works on programs with no classical bits.",
-    ):
-        execute_with_depolarizing_noise(
-            circ=circ, obs=OBSERVABLE, noise=0.01
-        )
+    expectation_value = execute_with_noise(
+        circ=two_qubit_circ,
+        obs=TWO_QUBIT_GS_PROJECTOR,
+        noise_model=initialized_depolarizing_noise(NOISE),
+    )
+    # anticipate that the expectation value will be less than
+    # the noiseless simulation of the same circuit
+    assert expectation_value < noiseless_exp_value
 
 
 def test_execute_with_shots_and_depolarizing_noise_single_qubit():
     """ Tests the noisy sampling executor across increasing levels
-    of single qubit gate noise
+    of single qubit gate noise.
     """
 
-    single_qubit_circ = QuantumCircuit(1)
+    single_qubit_circ = QuantumCircuit(1, 1)
     single_qubit_circ.z(0)
 
     noiseless_exp_value = 1.0
 
-    for noise in [0.01, 0.1, 0.2, 1.0]:
-        expectation_value = execute_with_shots_and_depolarizing_noise(
-            circ=single_qubit_circ, obs=OBSERVABLE, noise=noise, shots=SHOTS,
-        )
-        # anticipate that the expectation value will be less than
-        # the noiseless simulation of the same circuit
-        assert expectation_value < noiseless_exp_value
+    expectation_value = execute_with_shots_and_noise(
+        circ=single_qubit_circ,
+        obs=ONE_QUBIT_GS_PROJECTOR,
+        noise_model=initialized_depolarizing_noise(NOISE),
+        shots=SHOTS,
+    )
+    # anticipate that the expectation value will be less than
+    # the noiseless simulation of the same circuit
+    assert expectation_value < noiseless_exp_value
 
 
 def test_execute_with_shots_and_depolarizing_noise_two_qubit():
     """ Tests the noisy sampling executor across increasing levels of
-    two qubit gate noise
+    two qubit gate noise.
     """
 
-    two_qubit_circ = QuantumCircuit(2)
+    two_qubit_circ = QuantumCircuit(2, 2)
     two_qubit_circ.cx(0, 1)
 
     noiseless_exp_value = 1.0
 
-    for noise in [0.01, 0.1, 0.2, 1.0]:
-        expectation_value = execute_with_shots_and_depolarizing_noise(
-            circ=two_qubit_circ,
-            obs=TWO_QUBIT_OBSERVABLE,
-            noise=noise,
-            shots=SHOTS,
-        )
-        # anticipate that the expectation value will be less than
-        # the noiseless simulation of the same circuit
-        assert expectation_value < noiseless_exp_value
-
-
-def test_execute_with_shots_and_depolarizing_noise_error():
-    """ Tests that an error is raised when a classical
-    register is present in a Qiskit circuit for the
-    "execute_with_shots_and_depolarizing_noise" executor
-    """
-    circ = QuantumCircuit(1, 1)
-    with pytest.raises(
-        ValueError,
-        match="This executor only works on programs with no classical bits.",
-    ):
-        execute_with_shots_and_depolarizing_noise(
-            circ=circ, obs=OBSERVABLE, noise=0.01, shots=SHOTS
-        )
+    expectation_value = execute_with_shots_and_noise(
+        circ=two_qubit_circ,
+        obs=TWO_QUBIT_GS_PROJECTOR,
+        noise_model=initialized_depolarizing_noise(NOISE),
+        shots=SHOTS,
+    )
+    # anticipate that the expectation value will be less than
+    # the noiseless simulation of the same circuit
+    assert expectation_value < noiseless_exp_value

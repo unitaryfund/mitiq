@@ -20,10 +20,9 @@ from mitiq.mitiq_qiskit.conversions import (
     to_qiskit,
 )
 from mitiq.mitiq_qiskit.qiskit_utils import (
-    random_one_qubit_identity_circuit,
-    run_with_noise,
     execute,
     execute_with_shots,
-    execute_with_depolarizing_noise,
-    execute_with_shots_and_depolarizing_noise,
+    execute_with_noise,
+    execute_with_shots_and_noise,
+    initialized_depolarizing_noise,
 )
