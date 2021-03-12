@@ -28,7 +28,7 @@ from mitiq.zne.scaling.parameter import (
     _get_base_gate,
     GateTypeException,
     _generate_parameter_calibration_circuit,
-    _parameter_calibration
+    _parameter_calibration,
 )
 
 
@@ -140,26 +140,26 @@ def test_gate_type():
 def test_parameter_calibration():
     def noiseless_executor_mock(circuit):
         return 1
+
     # Perfect executor should have sigma = 0
     qubit = LineQubit.range(1)
     gate = ops.H.on(qubit[0]).gate
-    sigma = _parameter_calibration(noiseless_executor_mock,
-                                   gate,
-                                   qubit[0],
-                                   depth=10)
+    sigma = _parameter_calibration(
+        noiseless_executor_mock, gate, qubit[0], depth=10
+    )
     assert sigma == 0
 
     # Perfectly imperfect executor should have sigma = inf
     def noisy_executor_mock(circuit):
         return 0.5
+
     qubit = LineQubit.range(1)
     gate = ops.H.on(qubit[0]).gate
     with pytest.warns(RuntimeWarning):
         # Runtime warning for divide by zero
-        sigma = _parameter_calibration(noisy_executor_mock,
-                                       gate,
-                                       qubit[0],
-                                       depth=10)
+        sigma = _parameter_calibration(
+            noisy_executor_mock, gate, qubit[0], depth=10
+        )
     assert sigma == math.inf
 
 
@@ -172,7 +172,7 @@ def test_generate_parameter_calibration_circuit():
     assert len(circuit) == depth
     # Make sure the exponents in the
     for i in range(len(circuit)):
-        assert circuit[i].operations[0].gate.exponent == 2*np.pi/depth
+        assert circuit[i].operations[0].gate.exponent == 2 * np.pi / depth
 
 
 def test_generate_parameter_calibration_circuit_failure():

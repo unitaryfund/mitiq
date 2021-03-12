@@ -28,7 +28,7 @@ from cirq import (
     CZPowGate,
     MeasurementGate,
     Gate,
-    Qid
+    Qid,
 )
 from mitiq.conversions import converter
 
@@ -54,9 +54,8 @@ class CircuitMismatchException(Exception):
 
 
 def _generate_parameter_calibration_circuit(
-        qubits: Iterable,
-        depth: int,
-        gate: EigenGate) -> Circuit:
+    qubits: Iterable, depth: int, gate: EigenGate
+) -> Circuit:
     """
     Generates a circuit which should be the identity. Given a rotation
     gate R(param), it applies R(2 * pi / depth) depth times, resulting
@@ -74,16 +73,16 @@ def _generate_parameter_calibration_circuit(
     num_qubits = gate().num_qubits()
     if num_qubits != len(qubits):
         raise CircuitMismatchException(
-            "Number of qubits does not match domain size of gate.")
-    return Circuit(gate(exponent=2 * np.pi / depth).on(*qubits)
-                   for _ in range(depth))
+            "Number of qubits does not match domain size of gate."
+        )
+    return Circuit(
+        gate(exponent=2 * np.pi / depth).on(*qubits) for _ in range(depth)
+    )
 
 
 def _parameter_calibration(
-        executor: Callable[..., float],
-        gate: Gate,
-        qubit: Qid,
-        depth: int = 100) -> float:
+    executor: Callable[..., float], gate: Gate, qubit: Qid, depth: int = 100
+) -> float:
     """
     Given an executor and a gate, determines the effective
     variance in the control parameter
@@ -103,12 +102,12 @@ def _parameter_calibration(
     """
 
     base_gate = _get_base_gate(gate)
-    circuit = _generate_parameter_calibration_circuit([qubit],
-                                                      depth,
-                                                      base_gate)
+    circuit = _generate_parameter_calibration_circuit(
+        [qubit], depth, base_gate
+    )
     expectation = executor(circuit)
-    Q = (1 - np.power(2*expectation-1, 1/depth))/2
-    sigma = -0.5*np.log(1 - 2*Q)
+    Q = (1 - np.power(2 * expectation - 1, 1 / depth)) / 2
+    sigma = -0.5 * np.log(1 - 2 * Q)
     return sigma
 
 
