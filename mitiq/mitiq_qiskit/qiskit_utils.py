@@ -23,7 +23,7 @@ from qiskit.providers.aer.noise.errors.standard_errors import (
     depolarizing_error,
 )
 
-from mitiq.benchmarks.randomized_benchmarking import rb_circuits
+from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 from mitiq.mitiq_qiskit.conversions import to_qiskit
 
 BACKEND = Aer.get_backend("qasm_simulator")
@@ -39,7 +39,9 @@ def random_one_qubit_identity_circuit(num_cliffords: int) -> QuantumCircuit:
         circuit: Quantum circuit as a :class:`qiskit.QuantumCircuit` object.
     """
     return to_qiskit(
-        rb_circuits(n_qubits=1, num_cliffords=[num_cliffords], trials=1)[0]
+        *generate_rb_circuits(
+            n_qubits=1, num_cliffords=num_cliffords, trials=1
+        )
     )
 
 

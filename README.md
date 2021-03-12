@@ -1,6 +1,6 @@
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
-[![Documentation Status](https://readthedocs.org/projects/mitiq/badge/?version=latest)](https://mitiq.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/mitiq/badge/?version=stable)](https://mitiq.readthedocs.io/en/stable/)
 [![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
 [![arXiv](https://img.shields.io/badge/arXiv-2009.04417-<COLOR>.svg)](https://arxiv.org/abs/2009.04417)
 [![Downloads](https://static.pepy.tech/personalized-badge/mitiq?period=total&units=international_system&left_color=black&right_color=green&left_text=Downloads)](https://pepy.tech/project/mitiq)
@@ -9,11 +9,11 @@
 
 # Mitiq
 
-Mitiq is a Python toolkit for implementing error mitigation techniques on quantum computers. 
+Mitiq is a Python toolkit for implementing error mitigation techniques on quantum computers.
 
 Current quantum computers
 are noisy due to interactions with the environment, imperfect gate applications, state preparation and measurement
-errors, etc. Error mitigation seeks to reduce these effects at the software level by compiling quantum programs in 
+errors, etc. Error mitigation seeks to reduce these effects at the software level by compiling quantum programs in
 clever ways.
 
 Want to know more? Check out our [documentation](https://mitiq.readthedocs.io/en/stable/guide/guide-overview.html).
@@ -41,11 +41,11 @@ If you'd prefer to clone and install from source, our would like to develop Miti
 
 ### Supported quantum programming libraries
 
-Mitiq can currently interface with
+Mitiq can currently interface with:
 
-* [Cirq](https://github.com/quantumlib/Cirq) >= 0.9.0, 
-* [Qiskit](https://qiskit.org/) >= 0.19.0, and 
-* [pyQuil](https://github.com/rigetti/pyquil) >= 2.18.0. 
+* [Cirq](https://github.com/quantumlib/Cirq),
+* [Qiskit](https://qiskit.org/),
+* [pyQuil](https://github.com/rigetti/pyquil).
 
 Cirq is a core requirement of Mitiq and is automatically installed. To use Mitiq with other quantum programming
 libraries, install the optional package(s) following the instructions linked above.
@@ -96,14 +96,27 @@ Error in simulation (w/o  mitigation): 0.0506
 Error in simulation (with mitigation): 0.000519
 ```
 
+### Example with Qiskit
+
+![Alt Text](assets/qiskit.gif)
+
+
+### Example with Cirq
+
+![Alt Text](assets/cirq.gif)
+
+
 ## Error mitigation techniques
 
-Mitiq currently implements [zero-noise extrapolation](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html) and 
-is designed to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
+Mitiq currently implements:
+* [Zero-Noise Extrapolation](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html),
+* [Probabilistic Error Cancellation](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#error-mitigation-with-probabilistic-error-cancellation),
+
+and is designed to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
 
 ## Documentation
 
-Mitiq's documentation is hosted at [mitiq.readthedocs.io](https://mitiq.readthedocs.io). A PDF version of the latest 
+Mitiq's documentation is hosted at [mitiq.readthedocs.io](https://mitiq.readthedocs.io). A PDF version of the latest
 release can be found [here](https://mitiq.readthedocs.io/_/downloads/en/latest/pdf/).
 
 ## Developer information
@@ -116,7 +129,11 @@ To contribute to the documentation, please see these [documentation guidelines](
 
 An up-to-date list of authors can be found [here](https://github.com/unitaryfund/mitiq/graphs/contributors).
 
-## Citation
+## Research
+
+We are looking forward to adding new features to Mitiq. If you have a proposal for implementing a new quantum error mitigation technique, or adding an example used in your research, please read our [guidelines](https://mitiq.readthedocs.io/en/stable/research.html) for contributing.
+
+### Citing Mitiq
 
 If you use Mitiq in your research, please reference the [Mitiq preprint][arxiv] as follows:
 
@@ -132,8 +149,12 @@ If you use Mitiq in your research, please reference the [Mitiq preprint][arxiv] 
 }
 ```
 
+A list of papers citing Mitiq can be found [here][papers_with_mitiq].
+
 [arxiv]: https://arxiv.org/abs/2009.04417
+
+[papers_with_mitiq]: https://mitiq.readthedocs.io/en/stable/research.html#papers-citing-or-using-mitiq
 
 ## License
 
-[GNU GPL v.3.0.](LICENSE)
+[GNU GPL v.3.0.](https://github.com/unitaryfund/mitiq/blob/master/LICENSE)

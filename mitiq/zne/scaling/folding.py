@@ -314,7 +314,7 @@ def fold_gates_from_left(
             fidelity of 0.99**n where n is the number of qubits the gates act
             on.
 
-            Supported gate keys are listed in the following table.
+            Supported gate keys are listed in the following table.::
 
                 Gate key    | Gate
                 -------------------------
@@ -346,6 +346,7 @@ def fold_gates_from_left(
 
     Returns:
         folded: The folded quantum circuit as a QPROGRAM.
+
     """
     # Check inputs and handle keyword arguments
     _check_foldable(circuit)
@@ -436,7 +437,7 @@ def fold_gates_from_right(
             fidelity of 0.99**n where n is the number of qubits the gates act
             on.
 
-            Supported gate keys are listed in the following table.
+            Supported gate keys are listed in the following table.::
 
                 Gate key    | Gate
                 -------------------------
@@ -468,6 +469,7 @@ def fold_gates_from_right(
 
     Returns:
         folded: The folded quantum circuit as a QPROGRAM.
+
     """
     # Check inputs and handle keyword arguments
     _check_foldable(circuit)
@@ -545,7 +547,6 @@ def fold_gates_at_random(
         scale_factor: Factor to scale the circuit by. Any real number >= 1.
         seed: [Optional] Integer seed for random number generator.
 
-
     Keyword Args:
         fidelities (Dict[str, float]): Dictionary of gate fidelities. Each key
             is a string which specifies the gate and each value is the
@@ -556,7 +557,7 @@ def fold_gates_at_random(
             fidelity of 0.99**n where n is the number of qubits the gates act
             on.
 
-            Supported gate keys are listed in the following table.
+            Supported gate keys are listed in the following table.::
 
                 Gate key    | Gate
                 -------------------------
@@ -588,6 +589,7 @@ def fold_gates_at_random(
 
     Returns:
         folded: The folded quantum circuit as a QPROGRAM.
+
     """
     # Check inputs and handle keyword arguments
     _check_foldable(circuit)
@@ -740,10 +742,19 @@ def _fold_local(
         this_stretch = 3.0 if scale_factor > 3.0 else scale_factor
         if fold_method_args:
             folded = fold_method(
-                folded, this_stretch, *fold_method_args, squash_moments=False
+                folded,
+                this_stretch,
+                *fold_method_args,
+                squash_moments=False,
+                **{k: v for k, v in kwargs.items() if k != "squash_moments"},
             )
         else:
-            folded = fold_method(folded, this_stretch, squash_moments=False)
+            folded = fold_method(
+                folded,
+                this_stretch,
+                squash_moments=False,
+                **{k: v for k, v in kwargs.items() if k != "squash_moments"},
+            )
         scale_factor /= 3.0
 
     if not (kwargs.get("squash_moments") is False):
