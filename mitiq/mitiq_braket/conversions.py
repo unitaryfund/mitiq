@@ -197,8 +197,6 @@ def _translate_two_qubit_braket_instruction_to_cirq_operation(instr):
     # Two-qubit parameterized gates.
     elif isinstance(gate, braket_gates.PSwap):
         raise ValueError  # TODO.
-    elif isinstance(gate, braket_gates.XY):
-        raise ValueError  # TODO
     elif isinstance(gate, braket_gates.CPhaseShift):
         yield cirq_ops.CZ.on(*qubits) ** (gate.angle / np.pi)
     elif isinstance(gate, braket_gates.CPhaseShift00):
@@ -208,14 +206,19 @@ def _translate_two_qubit_braket_instruction_to_cirq_operation(instr):
     elif isinstance(gate, braket_gates.CPhaseShift10):
         raise ValueError  # TODO.
     elif isinstance(gate, braket_gates.XX):
-        raise ValueError  # TODO.
-    # yield cirq_ops.XXPowGate(exponent=gate.angle / np.pi).on(*qubits)
+        yield cirq_ops.XXPowGate(
+            exponent=gate.angle / np.pi, global_shift=-0.5
+        ).on(*qubits)
     elif isinstance(gate, braket_gates.YY):
-        raise ValueError  # TODO.
-    # yield cirq_ops.YYPowGate(exponent=gate.angle / np.pi).on(*qubits)
+        yield cirq_ops.YYPowGate(
+            exponent=gate.angle / np.pi, global_shift=-0.5
+        ).on(*qubits)
     elif isinstance(gate, braket_gates.ZZ):
-        raise ValueError  # TODO.
-        # yield cirq_ops.ZZPowGate(exponent=gate.angle / np.pi).on(*qubits)
+        yield cirq_ops.ZZPowGate(
+            exponent=gate.angle / np.pi, global_shift=-0.5
+        ).on(*qubits)
+    elif isinstance(gate, braket_gates.XY):
+        yield cirq_ops.ISwapPowGate(exponent=gate.angle / np.pi).on(*qubits)
 
 
 def _translate_one_qubit_cirq_operation_to_braket_instruction(
@@ -334,7 +337,7 @@ def _translate_two_qubit_cirq_operation_to_braket_instruction(
     # Translate qubit indices.
     q1, q2 = [qubit.x for qubit in op.qubits]
 
-    # TODO: Check common two-qubit unitaries.
+    # Check common two-qubit unitaries.
     if isinstance(op.gate, cirq_ops.CNotPowGate) and np.isclose(
         abs(op.gate.exponent), 1.0
     ):

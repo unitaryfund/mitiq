@@ -144,6 +144,10 @@ def test_from_braket_parameterized_two_qubit_gates():
     # TODO: Add all two-qubit parameterized gates once translated.
     pgates = [
         braket_gates.CPhaseShift,
+        braket_gates.XX,
+        braket_gates.YY,
+        braket_gates.ZZ,
+        braket_gates.XY,
     ]
     angles = np.random.RandomState(2).random(len(pgates))
     instructions = [
