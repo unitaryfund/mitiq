@@ -18,23 +18,23 @@ import numpy as np
 
 from braket.circuits import (
     Circuit as BKCircuit,
-    gates as braket_gates,
     Instruction,
+    gates as braket_gates,
 )
-from cirq import Circuit, LineQubit, ops, unitary
+from cirq import Circuit, LineQubit, ops, protocols, testing
 
-from mitiq.mitiq_braket.conversions import from_braket
+from mitiq.mitiq_braket.conversions import from_braket, to_braket
 from mitiq.utils import _equal
 
 
-def test_from_braket_bell_circuit():
-    braket_circuit = BKCircuit().h(0).cnot(0, 1)
-    cirq_circuit = from_braket(braket_circuit)
-
-    expected_cirq_circuit = Circuit(
-        ops.H(LineQubit(0)), ops.CNOT(*LineQubit.range(2))
-    )
-    assert _equal(cirq_circuit, expected_cirq_circuit)
+@pytest.mark.parametrize(
+    "qreg", (LineQubit.range(2), [LineQubit(1), LineQubit(6)])
+)
+def test_to_from_braket_bell_circuit(qreg):
+    cirq_circuit = Circuit(ops.H(qreg[0]), ops.CNOT(*qreg))
+    test_circuit = from_braket(to_braket(cirq_circuit))
+    testing.assert_allclose_up_to_global_phase(protocols.unitary(test_circuit), protocols.unitary(cirq_circuit), atol=1e-7)
+    assert _equal(test_circuit, cirq_circuit, require_qubit_equality=True)
 
 
 def test_from_braket_non_parameterized_single_qubit_gates():
@@ -57,7 +57,7 @@ def test_from_braket_non_parameterized_single_qubit_gates():
     cirq_circuit = from_braket(braket_circuit)
 
     for i, op in enumerate(cirq_circuit.all_operations()):
-        assert np.allclose(instructions[i].operator.to_matrix(), unitary(op))
+        assert np.allclose(instructions[i].operator.to_matrix(), protocols.unitary(op))
 
     qreg = LineQubit.range(4)
     expected_cirq_circuit = Circuit(
@@ -95,7 +95,7 @@ def test_from_braket_parameterized_single_qubit_gates(qubit_index):
     cirq_circuit = from_braket(braket_circuit)
 
     for i, op in enumerate(cirq_circuit.all_operations()):
-        assert np.allclose(instructions[i].operator.to_matrix(), unitary(op))
+        assert np.allclose(instructions[i].operator.to_matrix(), protocols.unitary(op))
 
     qubit = LineQubit(qubit_index)
     expected_cirq_circuit = Circuit(
@@ -130,7 +130,25 @@ def test_from_braket_non_parameterized_two_qubit_gates():
         ops.CZ(*qreg[1:]),
         ops.ControlledGate(ops.Y).on(*qreg[:2]),
     )
-    assert np.allclose(unitary(cirq_circuit), unitary(expected_cirq_circuit))
+    assert np.allclose(protocols.unitary(cirq_circuit), protocols.unitary(expected_cirq_circuit))
+
+
+def test_from_braket_parameterized_two_qubit_gates():
+    braket_circuit = BKCircuit()
+    # TODO: Add all two-qubit parameterized gates once translated.
+    pgates = [
+        braket_gates.CPhaseShift,
+    ]
+    angles = np.random.RandomState(2).random(len(pgates))
+    instructions = [
+        Instruction(rot(a), target=[0, 1]) for rot, a in zip(pgates, angles)
+    ]
+    for instr in instructions:
+        braket_circuit.add_instruction(instr)
+    cirq_circuit = from_braket(braket_circuit)
+
+    for i, op in enumerate(cirq_circuit.all_operations()):
+        assert np.allclose(instructions[i].operator.to_matrix(), protocols.unitary(op))
 
 
 def test_from_braket_three_qubit_gates():
@@ -145,4 +163,44 @@ def test_from_braket_three_qubit_gates():
 
     qreg = LineQubit.range(1, 4)
     expected_cirq_circuit = Circuit(ops.TOFFOLI(*qreg), ops.FREDKIN(*qreg))
-    assert np.allclose(unitary(cirq_circuit), unitary(expected_cirq_circuit))
+    assert np.allclose(protocols.unitary(cirq_circuit), protocols.unitary(expected_cirq_circuit))
+
+
+def test_to_from_braket_common_one_qubit_gates():
+    rots = [ops.rx, ops.ry, ops.rz]
+    angles = [1/5, 3/5, 4/5]
+    qubit = LineQubit(0)
+    cirq_circuit = Circuit(
+        # Paulis.
+        ops.X(qubit), ops.Y(qubit), ops.Z(qubit),
+        # Single-qubit rotations.
+        [rot(angle).on(qubit) for rot, angle in zip(rots, angles)],
+        # Rz alter egos.
+        ops.T(qubit), ops.T(qubit) ** -1,
+        ops.S(qubit), ops.S(qubit) ** -1,
+        # Rx alter egos.
+        ops.X(qubit) ** 0.5, ops.X(qubit) ** -0.5,
+    )
+
+    test_circuit = from_braket(to_braket(cirq_circuit))
+    assert _equal(test_circuit, cirq_circuit, require_qubit_equality=True)
+
+
+@pytest.mark.parametrize("uncommon_gate", [ops.HPowGate(exponent=-1 / 14)])
+def test_to_from_braket_uncommon_one_qubit_gates(uncommon_gate):
+    cirq_circuit = Circuit(uncommon_gate.on(LineQubit(0)))
+    test_circuit = from_braket(to_braket(cirq_circuit))
+    testing.assert_allclose_up_to_global_phase(protocols.unitary(test_circuit),
+                                               protocols.unitary(cirq_circuit),
+                                               atol=1e-7)
+
+
+def test_to_from_braket_common_two_qubit_gates():
+    qubits = LineQubit.range(2)
+    cirq_circuit = Circuit(
+        ops.CNOT(*qubits),
+        ops.CZ(*qubits),
+    )
+
+    test_circuit = from_braket(to_braket(cirq_circuit))
+    assert _equal(test_circuit, cirq_circuit, require_qubit_equality=True)
