@@ -13,13 +13,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import List, Optional, Union,TYPE_CHECKING
+from typing import List, Optional, Union, TYPE_CHECKING
 
 import numpy as np
 
-from cirq import Circuit, Gate as CirqGate, LineQubit, ops as cirq_ops, protocols
-from cirq.linalg.decompositions import deconstruct_single_qubit_matrix_into_angles, kak_decomposition
-from braket.circuits import gates as braket_gates, Circuit as BKCircuit, Instruction
+from cirq import Circuit, LineQubit, ops as cirq_ops, protocols
+from cirq.linalg.decompositions import (
+    deconstruct_single_qubit_matrix_into_angles,
+    kak_decomposition,
+)
+from braket.circuits import (
+    gates as braket_gates,
+    Circuit as BKCircuit,
+    Instruction,
+)
 
 if TYPE_CHECKING:
     import cirq
@@ -63,96 +70,27 @@ def _translate_braket_instruction_to_cirq_operation(instr):
     Raises:
         ValueError: If the instruction cannot be converted to Cirq.
     """
-    qubits = [LineQubit(int(qubit)) for qubit in instr.target]
-    gate = instr.operator
+    nqubits = len(instr.target)
 
-    # One-qubit non-parameterized gates.
-    if isinstance(gate, braket_gates.I):
-        yield cirq_ops.I.on(*qubits)
-    elif isinstance(gate, braket_gates.X):
-        yield cirq_ops.X.on(*qubits)
-    elif isinstance(gate, braket_gates.Y):
-        yield cirq_ops.Y.on(*qubits)
-    elif isinstance(gate, braket_gates.Z):
-        yield cirq_ops.Z.on(*qubits)
-    elif isinstance(gate, braket_gates.H):
-        yield cirq_ops.H.on(*qubits)
-    elif isinstance(gate, braket_gates.S):
-        yield cirq_ops.S.on(*qubits)
-    elif isinstance(gate, braket_gates.Si):
-        yield cirq_ops.S.on(*qubits) ** -1.0
-    elif isinstance(gate, braket_gates.T):
-        yield cirq_ops.T.on(*qubits)
-    elif isinstance(gate, braket_gates.Ti):
-        yield cirq_ops.T.on(*qubits) ** -1.0
-    elif isinstance(gate, braket_gates.V):
-        yield cirq_ops.X.on(*qubits) ** 0.5
-    elif isinstance(gate, braket_gates.Vi):
-        yield cirq_ops.X.on(*qubits) ** -0.5
+    if nqubits == 1:
+        yield _translate_one_qubit_braket_instruction_to_cirq_operation(instr)
 
-    # One-qubit parameterized gates.
-    elif isinstance(gate, braket_gates.Rx):
-        yield cirq_ops.rx(gate.angle).on(*qubits)
-    elif isinstance(gate, braket_gates.Ry):
-        yield cirq_ops.ry(gate.angle).on(*qubits)
-    elif isinstance(gate, braket_gates.Rz):
-        yield cirq_ops.rz(gate.angle).on(*qubits)
-    elif isinstance(gate, braket_gates.PhaseShift):
-        yield cirq_ops.Z.on(*qubits) ** (gate.angle / np.pi)
+    elif nqubits == 2:
+        yield _translate_two_qubit_braket_instruction_to_cirq_operation(instr)
 
-    # Two-qubit non-parameterized gates.
-    elif isinstance(gate, braket_gates.CNot):
-        yield cirq_ops.CNOT.on(*qubits)
-    elif isinstance(gate, braket_gates.Swap):
-        yield cirq_ops.SWAP.on(*qubits)
-    elif isinstance(gate, braket_gates.ISwap):
-        yield cirq_ops.ISWAP.on(*qubits)
-    elif isinstance(gate, braket_gates.CZ):
-        yield cirq_ops.CZ.on(*qubits)
-    elif isinstance(gate, braket_gates.CY):
-        yield cirq_ops.S.on(qubits[1]) ** -1
-        yield cirq_ops.CNOT.on(*qubits)
-        yield cirq_ops.S.on(qubits[1])
+    elif nqubits == 3:
+        qubits = [LineQubit(int(qubit)) for qubit in instr.target]
+        if isinstance(instr.operator, braket_gates.CCNot):
+            yield cirq_ops.TOFFOLI.on(*qubits)
+        elif isinstance(instr.operator, braket_gates.CSwap):
+            yield cirq_ops.FREDKIN.on(*qubits)
 
-    # Two-qubit parameterized gates.
-    elif isinstance(gate, braket_gates.PSwap):
-        raise ValueError  # TODO.
-    elif isinstance(gate, braket_gates.XY):
-        raise ValueError  # TODO
-    elif isinstance(gate, braket_gates.CPhaseShift):
-        yield cirq_ops.CZ.on(*qubits) ** (gate.angle / np.pi)
-    elif isinstance(gate, braket_gates.CPhaseShift00):
-        raise ValueError  # TODO.
-    elif isinstance(gate, braket_gates.CPhaseShift01):
-        raise ValueError  # TODO.
-    elif isinstance(gate, braket_gates.CPhaseShift10):
-        raise ValueError  # TODO.
-    elif isinstance(gate, braket_gates.XX):
-        raise ValueError  # TODO.
-        # yield cirq_ops.XXPowGate(exponent=gate.angle / np.pi).on(*qubits)
-    elif isinstance(gate, braket_gates.YY):
-        raise ValueError  # TODO.
-        # yield cirq_ops.YYPowGate(exponent=gate.angle / np.pi).on(*qubits)
-    elif isinstance(gate, braket_gates.ZZ):
-        raise ValueError  # TODO.
-        # yield cirq_ops.ZZPowGate(exponent=gate.angle / np.pi).on(*qubits)
-
-    # Three-qubit non-parameterized gates.
-    elif isinstance(gate, braket_gates.CCNot):
-        yield cirq_ops.TOFFOLI.on(*qubits)
-    elif isinstance(gate, braket_gates.CSwap):
-        yield cirq_ops.FREDKIN.on(*qubits)
-
-    # Custom gates.
-    elif isinstance(gate, braket_gates.Unitary):
-        yield _map_custom_braket_gate_to_custom_cirq_gate(gate).on(*qubits)
-
-    # Unknown gates.
+    # Unknown instructions.
     else:
         raise ValueError(
-            f"Unable to convert the gate {gate} to Cirq. If you think this"
-            " is a bug, you can open an issue on the Mitiq GitHub at"
-            " https://github.com/unitaryfund/mitiq."
+            f"Unable to convert the instruction {instr} to Cirq. If you think "
+            "this is a bug, you can open an issue on the Mitiq GitHub at "
+            "https://github.com/unitaryfund/mitiq."
         )
 
 
@@ -190,6 +128,96 @@ def _translate_cirq_operation_to_braket_instruction(op: cirq_ops.Operation):
         )
 
 
+def _translate_one_qubit_braket_instruction_to_cirq_operation(instr):
+    """Converts the one-qubit braket instruction to Cirq.
+
+    Args:
+        instr: One-qubit Braket instruction to convert.
+
+    Raises:
+        ValueError: If the instruction cannot be converted to Cirq.
+    """
+    qubits = [LineQubit(int(qubit)) for qubit in instr.target]
+    gate = instr.operator
+
+    # One-qubit non-parameterized gates.
+    if isinstance(gate, braket_gates.I):
+        yield cirq_ops.I.on(*qubits)
+    elif isinstance(gate, braket_gates.X):
+        yield cirq_ops.X.on(*qubits)
+    elif isinstance(gate, braket_gates.Y):
+        yield cirq_ops.Y.on(*qubits)
+    elif isinstance(gate, braket_gates.Z):
+        yield cirq_ops.Z.on(*qubits)
+    elif isinstance(gate, braket_gates.H):
+        yield cirq_ops.H.on(*qubits)
+    elif isinstance(gate, braket_gates.S):
+        yield cirq_ops.S.on(*qubits)
+    elif isinstance(gate, braket_gates.Si):
+        yield cirq_ops.S.on(*qubits) ** -1.0
+    elif isinstance(gate, braket_gates.T):
+        yield cirq_ops.T.on(*qubits)
+    elif isinstance(gate, braket_gates.Ti):
+        yield cirq_ops.T.on(*qubits) ** -1.0
+    elif isinstance(gate, braket_gates.V):
+        yield cirq_ops.X.on(*qubits) ** 0.5
+    elif isinstance(gate, braket_gates.Vi):
+        yield cirq_ops.X.on(*qubits) ** -0.5
+
+    # One-qubit parameterized gates.
+    elif isinstance(gate, braket_gates.Rx):
+        yield cirq_ops.rx(gate.angle).on(*qubits)
+    elif isinstance(gate, braket_gates.Ry):
+        yield cirq_ops.ry(gate.angle).on(*qubits)
+    elif isinstance(gate, braket_gates.Rz):
+        yield cirq_ops.rz(gate.angle).on(*qubits)
+    elif isinstance(gate, braket_gates.PhaseShift):
+        yield cirq_ops.Z.on(*qubits) ** (gate.angle / np.pi)
+
+
+def _translate_two_qubit_braket_instruction_to_cirq_operation(instr):
+    qubits = [LineQubit(int(qubit)) for qubit in instr.target]
+    gate = instr.operator
+
+    # Two-qubit non-parameterized gates.
+    if isinstance(gate, braket_gates.CNot):
+        yield cirq_ops.CNOT.on(*qubits)
+
+    elif isinstance(gate, braket_gates.Swap):
+        yield cirq_ops.SWAP.on(*qubits)
+    elif isinstance(gate, braket_gates.ISwap):
+        yield cirq_ops.ISWAP.on(*qubits)
+    elif isinstance(gate, braket_gates.CZ):
+        yield cirq_ops.CZ.on(*qubits)
+    elif isinstance(gate, braket_gates.CY):
+        yield cirq_ops.S.on(qubits[1]) ** -1
+        yield cirq_ops.CNOT.on(*qubits)
+        yield cirq_ops.S.on(qubits[1])
+
+    # Two-qubit parameterized gates.
+    elif isinstance(gate, braket_gates.PSwap):
+        raise ValueError  # TODO.
+    elif isinstance(gate, braket_gates.XY):
+        raise ValueError  # TODO
+    elif isinstance(gate, braket_gates.CPhaseShift):
+        yield cirq_ops.CZ.on(*qubits) ** (gate.angle / np.pi)
+    elif isinstance(gate, braket_gates.CPhaseShift00):
+        raise ValueError  # TODO.
+    elif isinstance(gate, braket_gates.CPhaseShift01):
+        raise ValueError  # TODO.
+    elif isinstance(gate, braket_gates.CPhaseShift10):
+        raise ValueError  # TODO.
+    elif isinstance(gate, braket_gates.XX):
+        raise ValueError  # TODO.
+    # yield cirq_ops.XXPowGate(exponent=gate.angle / np.pi).on(*qubits)
+    elif isinstance(gate, braket_gates.YY):
+        raise ValueError  # TODO.
+    # yield cirq_ops.YYPowGate(exponent=gate.angle / np.pi).on(*qubits)
+    elif isinstance(gate, braket_gates.ZZ):
+        raise ValueError  # TODO.
+        # yield cirq_ops.ZZPowGate(exponent=gate.angle / np.pi).on(*qubits)
+
+
 def _translate_one_qubit_cirq_operation_to_braket_instruction(
     op: Union[np.ndarray, "cirq.Operation"], target: Optional[int] = None,
 ) -> List[Instruction]:
@@ -205,7 +233,8 @@ def _translate_one_qubit_cirq_operation_to_braket_instruction(
 
     Args:
         op: One-qubit Cirq operation to translate.
-        target: Optional
+        target: Qubit index for the op to act on. Must be specified and if only
+            if `op` is given as a numpy array.
     """
     # Translate qubit index.
     if not isinstance(op, np.ndarray):
@@ -253,12 +282,16 @@ def _translate_one_qubit_cirq_operation_to_braket_instruction(
 
         return [Instruction(braket_gates.Rz(exponent * np.pi), target=target)]
 
-    elif isinstance(op.gate, cirq_ops.HPowGate) and np.isclose(abs(op.gate.exponent), 1.0):
+    elif isinstance(op.gate, cirq_ops.HPowGate) and np.isclose(
+        abs(op.gate.exponent), 1.0
+    ):
         return [Instruction(braket_gates.H(), target=target)]
 
     # Arbitrary single-qubit unitary decomposition.
     # TODO: This does not account for global phase.
-    a, b, c = deconstruct_single_qubit_matrix_into_angles(protocols.unitary(op))
+    a, b, c = deconstruct_single_qubit_matrix_into_angles(
+        protocols.unitary(op)
+    )
     return [
         Instruction(braket_gates.Rz(a), target=target),
         Instruction(braket_gates.Ry(b), target=target),
@@ -292,9 +325,13 @@ def _translate_two_qubit_cirq_operation_to_braket_instruction(
     q1, q2 = [qubit.x for qubit in op.qubits]
 
     # TODO: Check common two-qubit unitaries.
-    if isinstance(op.gate, cirq_ops.CNotPowGate) and np.isclose(abs(op.gate.exponent), 1.0):
+    if isinstance(op.gate, cirq_ops.CNotPowGate) and np.isclose(
+        abs(op.gate.exponent), 1.0
+    ):
         return [Instruction(braket_gates.CNot(), target=[q1, q2])]
-    elif isinstance(op.gate, cirq_ops.CZPowGate) and np.isclose(abs(op.gate.exponent), 1.0):
+    elif isinstance(op.gate, cirq_ops.CZPowGate) and np.isclose(
+        abs(op.gate.exponent), 1.0
+    ):
         return [Instruction(braket_gates.CZ(), target=[q1, q2])]
 
     # Arbitrary two-qubit unitary decomposition.
@@ -309,8 +346,12 @@ def _translate_two_qubit_cirq_operation_to_braket_instruction(
     B1, B2 = kak.single_qubit_operations_after
 
     return [
-        *_translate_one_qubit_cirq_operation_to_braket_instruction(A1, target=q1),
-        *_translate_one_qubit_cirq_operation_to_braket_instruction(A2, target=q2),
+        *_translate_one_qubit_cirq_operation_to_braket_instruction(
+            A1, target=q1
+        ),
+        *_translate_one_qubit_cirq_operation_to_braket_instruction(
+            A2, target=q2
+        ),
         Instruction(braket_gates.Rx(0.5 / np.pi), target=q1),
         Instruction(braket_gates.CNot(), target=[q1, q2]),
         Instruction(braket_gates.Rx(a / np.pi), target=q1),
@@ -319,28 +360,10 @@ def _translate_two_qubit_cirq_operation_to_braket_instruction(
         Instruction(braket_gates.Rx(-0.5 / np.pi), target=q2),
         Instruction(braket_gates.Rz(c / np.pi), target=q2),
         Instruction(braket_gates.CNot(), target=[q1, q2]),
-        *_translate_one_qubit_cirq_operation_to_braket_instruction(B1, target=q1),
-        *_translate_one_qubit_cirq_operation_to_braket_instruction(B2, target=q2),
+        *_translate_one_qubit_cirq_operation_to_braket_instruction(
+            B1, target=q1
+        ),
+        *_translate_one_qubit_cirq_operation_to_braket_instruction(
+            B2, target=q2
+        ),
     ]
-
-
-def _map_custom_braket_gate_to_custom_cirq_gate(gate) -> "cirq.Gate":
-    """Returns a custom Cirq gate equivalent to the input Braket Unitary gate.
-
-    Args:
-        gate: Braket Unitary gate defined by a matrix.
-    """
-    unitary = gate.to_matrix()
-    nqubits = int(np.log2(unitary.shape[0]))
-
-    class CustomGate(CirqGate):
-        def __init__(self):
-            super(CustomGate, self)
-
-        def _num_qubits_(self):
-            return nqubits
-
-        def _unitary_(self):
-            return unitary
-
-    return CustomGate()
