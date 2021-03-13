@@ -18,7 +18,6 @@ from copy import deepcopy
 
 import pytest
 import numpy as np
-import math
 from cirq import Circuit, LineQubit, ops, CSWAP, ZPowGate
 
 
@@ -26,6 +25,7 @@ from mitiq.utils import _equal
 from mitiq.zne.scaling.parameter import (
     scale_parameters,
     _get_base_gate,
+    CircuitMismatchException,
     GateTypeException,
     _generate_parameter_calibration_circuit,
     _parameter_calibration,
@@ -142,7 +142,7 @@ def test_parameter_calibration():
         return 1
 
     # Perfect executor should have sigma = 0
-    qubit = LineQubit.range(1)
+    qubit = LineQubit(0)
     gate = ops.H.on(qubit[0]).gate
     sigma = _parameter_calibration(
         noiseless_executor_mock, gate, qubit[0], depth=10
@@ -160,7 +160,7 @@ def test_parameter_calibration():
         sigma = _parameter_calibration(
             noisy_executor_mock, gate, qubit[0], depth=10
         )
-    assert sigma == math.inf
+    assert sigma == np.inf
 
 
 def test_generate_parameter_calibration_circuit():
@@ -182,5 +182,5 @@ def test_generate_parameter_calibration_circuit_failure():
     qubits = LineQubit.range(n_qubits)
     depth = 10
     # Should raise exception because too many qubits
-    with pytest.raises(Exception):
+    with pytest.raises(CircuitMismatchException):
         _generate_parameter_calibration_circuit(qubits, depth, ZPowGate)
