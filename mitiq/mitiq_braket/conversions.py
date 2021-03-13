@@ -115,9 +115,9 @@ def _translate_cirq_operation_to_braket_instruction(op: cirq_ops.Operation):
     elif nqubits == 3:
         qubits = [q.x for q in op.qubits]
         if isinstance(op.gate, cirq_ops.TOFFOLI):
-            return [Instruction(braket_gates.CCNot(), target=qubits)]
+            return [Instruction(braket_gates.CCNot(), qubits)]
         elif isinstance(op.gate, cirq_ops.FREDKIN):
-            return [Instruction(braket_gates.CSwap(), target=qubits)]
+            return [Instruction(braket_gates.CSwap(), qubits)]
 
     # Unsupported gates.
     else:
@@ -246,56 +246,66 @@ def _translate_one_qubit_cirq_operation_to_braket_instruction(
         )
 
     # Check common single-qubit unitaries.
-    if isinstance(op.gate, cirq_ops.XPowGate):
-        exponent = op.gate.exponent
+    if isinstance(op, cirq_ops.Operation):
+        if isinstance(op.gate, cirq_ops.XPowGate):
+            exponent = op.gate.exponent
 
-        if np.isclose(exponent, 1.0) or np.isclose(exponent, -1.0):
-            return [Instruction(braket_gates.X(), target=target)]
-        elif np.isclose(exponent, 0.5):
-            return [Instruction(braket_gates.V(), target=target)]
-        elif np.isclose(exponent, -0.5):
-            return [Instruction(braket_gates.Vi(), target=target)]
+            if np.isclose(exponent, 1.0) or np.isclose(exponent, -1.0):
+                return [Instruction(braket_gates.X(), target)]
+            elif np.isclose(exponent, 0.5):
+                return [Instruction(braket_gates.V(), target)]
+            elif np.isclose(exponent, -0.5):
+                return [Instruction(braket_gates.Vi(), target)]
 
-        return [Instruction(braket_gates.Rx(exponent * np.pi), target=target)]
+            return [
+                Instruction(braket_gates.Rx(exponent * np.pi), target)
+            ]
 
-    elif isinstance(op.gate, cirq_ops.YPowGate):
-        exponent = op.gate.exponent
+        elif isinstance(op.gate, cirq_ops.YPowGate):
+            exponent = op.gate.exponent
 
-        if np.isclose(exponent, 1.0) or np.isclose(exponent, -1.0):
-            return [Instruction(braket_gates.Y(), target=target)]
+            if np.isclose(exponent, 1.0) or np.isclose(exponent, -1.0):
+                return [Instruction(braket_gates.Y(), target)]
 
-        return [Instruction(braket_gates.Ry(exponent * np.pi), target=target)]
+            return [
+                Instruction(braket_gates.Ry(exponent * np.pi), target)
+            ]
 
-    elif isinstance(op.gate, cirq_ops.ZPowGate):
-        exponent = op.gate.exponent
+        elif isinstance(op.gate, cirq_ops.ZPowGate):
+            exponent = op.gate.exponent
 
-        if np.isclose(exponent, 1.0) or np.isclose(exponent, -1.0):
-            return [Instruction(braket_gates.Z(), target=target)]
-        elif np.isclose(exponent, 0.5):
-            return [Instruction(braket_gates.S(), target=target)]
-        elif np.isclose(exponent, -0.5):
-            return [Instruction(braket_gates.Si(), target=target)]
-        elif np.isclose(exponent, 0.25):
-            return [Instruction(braket_gates.T(), target=target)]
-        elif np.isclose(exponent, -0.25):
-            return [Instruction(braket_gates.Ti(), target=target)]
+            if np.isclose(exponent, 1.0) or np.isclose(exponent, -1.0):
+                return [Instruction(braket_gates.Z(), target)]
+            elif np.isclose(exponent, 0.5):
+                return [Instruction(braket_gates.S(), target)]
+            elif np.isclose(exponent, -0.5):
+                return [Instruction(braket_gates.Si(), target)]
+            elif np.isclose(exponent, 0.25):
+                return [Instruction(braket_gates.T(), target)]
+            elif np.isclose(exponent, -0.25):
+                return [Instruction(braket_gates.Ti(), target)]
 
-        return [Instruction(braket_gates.Rz(exponent * np.pi), target=target)]
+            return [
+                Instruction(braket_gates.Rz(exponent * np.pi), target)
+            ]
 
-    elif isinstance(op.gate, cirq_ops.HPowGate) and np.isclose(
-        abs(op.gate.exponent), 1.0
-    ):
-        return [Instruction(braket_gates.H(), target=target)]
+        elif isinstance(op.gate, cirq_ops.HPowGate) and np.isclose(
+            abs(op.gate.exponent), 1.0
+        ):
+            return [Instruction(braket_gates.H(), target)]
 
     # Arbitrary single-qubit unitary decomposition.
     # TODO: This does not account for global phase.
-    a, b, c = deconstruct_single_qubit_matrix_into_angles(
-        protocols.unitary(op)
-    )
+    if isinstance(op, cirq_ops.Operation):
+        unitary_matrix = protocols.unitary(op)
+    else:
+        unitary_matrix = op
+
+    a, b, c = deconstruct_single_qubit_matrix_into_angles(unitary_matrix)
     return [
-        Instruction(braket_gates.Rz(a), target=target),
-        Instruction(braket_gates.Ry(b), target=target),
-        Instruction(braket_gates.Rz(c), target=target),
+        Instruction(braket_gates.Rz(a), target),
+        Instruction(braket_gates.Ry(b), target),
+        Instruction(braket_gates.Rz(c), target),
     ]
 
 
@@ -328,11 +338,11 @@ def _translate_two_qubit_cirq_operation_to_braket_instruction(
     if isinstance(op.gate, cirq_ops.CNotPowGate) and np.isclose(
         abs(op.gate.exponent), 1.0
     ):
-        return [Instruction(braket_gates.CNot(), target=[q1, q2])]
+        return [Instruction(braket_gates.CNot(), [q1, q2])]
     elif isinstance(op.gate, cirq_ops.CZPowGate) and np.isclose(
         abs(op.gate.exponent), 1.0
     ):
-        return [Instruction(braket_gates.CZ(), target=[q1, q2])]
+        return [Instruction(braket_gates.CZ(), [q1, q2])]
 
     # Arbitrary two-qubit unitary decomposition.
     kak = kak_decomposition(protocols.unitary(op))
@@ -346,24 +356,16 @@ def _translate_two_qubit_cirq_operation_to_braket_instruction(
     B1, B2 = kak.single_qubit_operations_after
 
     return [
-        *_translate_one_qubit_cirq_operation_to_braket_instruction(
-            A1, target=q1
-        ),
-        *_translate_one_qubit_cirq_operation_to_braket_instruction(
-            A2, target=q2
-        ),
-        Instruction(braket_gates.Rx(0.5 / np.pi), target=q1),
-        Instruction(braket_gates.CNot(), target=[q1, q2]),
-        Instruction(braket_gates.Rx(a / np.pi), target=q1),
-        Instruction(braket_gates.Ry(b / np.pi), target=q2),
-        Instruction(braket_gates.CNot(), target=[q2, q1]),
-        Instruction(braket_gates.Rx(-0.5 / np.pi), target=q2),
-        Instruction(braket_gates.Rz(c / np.pi), target=q2),
-        Instruction(braket_gates.CNot(), target=[q1, q2]),
-        *_translate_one_qubit_cirq_operation_to_braket_instruction(
-            B1, target=q1
-        ),
-        *_translate_one_qubit_cirq_operation_to_braket_instruction(
-            B2, target=q2
-        ),
+        *_translate_one_qubit_cirq_operation_to_braket_instruction(A1, q1),
+        *_translate_one_qubit_cirq_operation_to_braket_instruction(A2, q2),
+        Instruction(braket_gates.Rx(0.5 * np.pi), q1),
+        Instruction(braket_gates.CNot(), [q1, q2]),
+        Instruction(braket_gates.Rx(a * np.pi), q1),
+        Instruction(braket_gates.Ry(b * np.pi), q2),
+        Instruction(braket_gates.CNot(), [q2, q1]),
+        Instruction(braket_gates.Rx(-0.5 * np.pi), q2),
+        Instruction(braket_gates.Rz(c * np.pi), q2),
+        Instruction(braket_gates.CNot(), [q1, q2]),
+        *_translate_one_qubit_cirq_operation_to_braket_instruction(B1, q1),
+        *_translate_one_qubit_cirq_operation_to_braket_instruction(B2, q2),
     ]

@@ -213,9 +213,23 @@ def test_to_from_braket_uncommon_one_qubit_gates(uncommon_gate):
     )
 
 
-def test_to_from_braket_common_two_qubit_gates():
-    qubits = LineQubit.range(2)
-    cirq_circuit = Circuit(ops.CNOT(*qubits), ops.CZ(*qubits),)
-
+@pytest.mark.parametrize("common_gate", [ops.CNOT, ops.CZ])
+def test_to_from_braket_common_two_qubit_gates(common_gate):
+    cirq_circuit = Circuit(common_gate.on(*LineQubit.range(2)))
     test_circuit = from_braket(to_braket(cirq_circuit))
     assert _equal(test_circuit, cirq_circuit, require_qubit_equality=True)
+
+
+@pytest.mark.parametrize(
+    "uncommon_gate",
+    [ops.CNotPowGate(exponent=-1 / 17), ops.CZPowGate(exponent=2 / 7)],
+)
+def test_to_from_braket_uncommon_two_qubit_gates(uncommon_gate):
+    cirq_circuit = Circuit(uncommon_gate.on(*LineQubit.range(2)))
+    test_circuit = from_braket(to_braket(cirq_circuit))
+
+    testing.assert_allclose_up_to_global_phase(
+        protocols.unitary(test_circuit),
+        protocols.unitary(cirq_circuit),
+        atol=1e-7,
+    )
