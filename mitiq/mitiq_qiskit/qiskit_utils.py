@@ -18,6 +18,7 @@ import numpy as np
 import copy
 import qiskit
 from qiskit import QuantumCircuit
+from typing import Optional
 
 # Noise simulation packages
 from qiskit.providers.aer.noise import NoiseModel
@@ -99,7 +100,7 @@ def execute_with_shots(
 
     for bitstring, count in counts.items():
         expectation += (
-            eigvals[int(bitstring[0:circ.num_qubits], 2)] * count / shots
+            eigvals[int(bitstring[0 : circ.num_qubits], 2)] * count / shots
         )
     return expectation
 
@@ -113,7 +114,7 @@ def execute_with_noise(
     Args:
         circ: The input Qiskit circuit.
         obs: The observable to measure as a NumPy array.
-        noise: The depolarizing noise strength as a float, i.e. 0.001 is 0.1%.
+        noise_model: The input Qiskit noise model.
 
     Returns:
         The expectation value of obs as a float.
@@ -140,7 +141,11 @@ def execute_with_noise(
 
 
 def execute_with_shots_and_noise(
-    circ: QuantumCircuit, obs: np.ndarray, noise_model: NoiseModel, shots: int,
+    circ: QuantumCircuit,
+    obs: np.ndarray,
+    noise_model: NoiseModel,
+    shots: int,
+    seed: Optional[int] = None,
 ) -> float:
     """Simulates the evolution of the noisy circuit and returns
     the expectation value of the observable.
@@ -148,9 +153,9 @@ def execute_with_shots_and_noise(
     Args:
         circ: The input Qiskit circuit.
         obs: The observable to measure as a NumPy array.
-        noise: The depolarizing noise strength as a float,
-               i.e. 0.001 is 0.1%.
+        noise: The input Qiskit noise model.
         shots: The number of measurements.
+        seed: Optional seed for qiskit simulator.
 
     Returns:
         The expectation value of obs as a float.
@@ -175,12 +180,13 @@ def execute_with_shots_and_noise(
         basis_gates=noise_model.basis_gates,
         optimization_level=0,
         shots=shots,
+        seed_simulator=seed,
     )
     counts = job.result().get_counts()
     expectation = 0
 
     for bitstring, count in counts.items():
         expectation += (
-            eigvals[int(bitstring[0:circ.num_qubits], 2)] * count / shots
+            eigvals[int(bitstring[0 : circ.num_qubits], 2)] * count / shots
         )
     return expectation

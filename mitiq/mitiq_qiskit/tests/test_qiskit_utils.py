@@ -71,6 +71,8 @@ def test_execute_with_depolarizing_noise_single_qubit():
     """
 
     single_qubit_circ = QuantumCircuit(1)
+    # noise model is defined on gates so include the gate to
+    # demonstrate noise
     single_qubit_circ.z(0)
 
     noiseless_exp_value = 1.0
@@ -91,6 +93,8 @@ def test_execute_with_depolarizing_noise_two_qubit():
     """
 
     two_qubit_circ = QuantumCircuit(2)
+    # noise model is defined on gates so include the gate to
+    # demonstrate noise
     two_qubit_circ.cx(0, 1)
 
     noiseless_exp_value = 1.0
@@ -111,6 +115,8 @@ def test_execute_with_shots_and_depolarizing_noise_single_qubit():
     """
 
     single_qubit_circ = QuantumCircuit(1, 1)
+    # noise model is defined on gates so include the gate to
+    # demonstrate noise
     single_qubit_circ.z(0)
 
     noiseless_exp_value = 1.0
@@ -132,6 +138,8 @@ def test_execute_with_shots_and_depolarizing_noise_two_qubit():
     """
 
     two_qubit_circ = QuantumCircuit(2, 2)
+    # noise model is defined on gates so include the gate to
+    # demonstrate noise
     two_qubit_circ.cx(0, 1)
 
     noiseless_exp_value = 1.0

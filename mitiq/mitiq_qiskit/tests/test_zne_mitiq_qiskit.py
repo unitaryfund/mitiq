@@ -129,15 +129,24 @@ def qiskit_executor(qp: QPROGRAM, shots: int = 500) -> float:
 
 
 # TODO: Troubleshoot the problems in this executor.
-#       Causes test failures and time increase to 40+ mins
+#       Causes test time increase to 40+ mins
 # def qiskit_executor(qp: QPROGRAM, shots: int = 500) -> float:
-#   expectation = execute_with_shots_and_noise(
+#       # initialize a qiskit noise model
+#     noise_model = NoiseModel()
+
+#     # we assume a depolarizing error for each gate of the standard IBM basis
+#     # set (u1, u2, u3)
+#     noise_model.add_all_qubit_quantum_error(
+#         depolarizing_error(BASE_NOISE, 1), ["u1", "u2", "u3"]
+#     )
+#     expectation = execute_with_shots_and_noise(
 #         qp,
 #         shots=shots,
 #         obs=ONE_QUBIT_GS_PROJECTOR,
-#         noise_model=initialized_depolarizing_noise(BASE_NOISE)
+#         noise_model=noise_model,
+#         seed=1,
 #     )
-#   return expectation
+#     return expectation
 
 
 def get_counts(circuit: QuantumCircuit):
