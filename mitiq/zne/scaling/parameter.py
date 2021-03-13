@@ -66,6 +66,7 @@ def _generate_parameter_calibration_circuit(
         depth: the length of the circuit to create
         gate: the base gate to apply several times, must be periodic
                 in 2*pi
+                
     Returns:
         circuit: a parameter calibration circuit that can be
                 used for profiling
@@ -96,6 +97,7 @@ def _parameter_calibration(
         qubit: the index of the qubit you wish to profile
         depth: the number of operations you would like to use to profile
             your gate.
+            
     Returns:
         sigma: a float representing the standard deviation of the error
             of your gate
