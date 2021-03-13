@@ -331,7 +331,7 @@ mitiq_qiskit.qiskit_utils.execute_with_shots_and_noise:
 This executor can be used to simulate a circuit with depolarizing noise. The expectation value is
 estimated with a finite number of measurements and so it is affected by statistical noise.
 
-Other noise models can be defined using any functionality available in Qiskit.
+Noise models can be defined using any functionality available in Qiskit.
 More details can be found in the
 `Qiskit simulator documentation <https://qiskit.org/documentation/tutorials/simulators/index.html>`__
 
