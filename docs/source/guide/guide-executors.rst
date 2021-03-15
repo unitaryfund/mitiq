@@ -289,7 +289,7 @@ real quantum hardware.
 .. _qiskit_executors:
 
 Qiskit Executors
-================
+======================================
 See  :py:mod:`mitiq.mitiq_qiskit.qiskit_utils`.
 
 This section includes noisy and noiseless simulator executor examples you can use on Qiskit circuits.
