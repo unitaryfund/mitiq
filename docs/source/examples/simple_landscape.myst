@@ -156,8 +156,3 @@ print(f"Theoretical groud state energy: {min(np.linalg.eigvals(hamiltonian))}")
 ## Acknowledgements
 
 Most of the code for this example was written by Peter Karalekas.
-
-```{code-cell} ipython3
-import mitiq
-mitiq.about()
-```
