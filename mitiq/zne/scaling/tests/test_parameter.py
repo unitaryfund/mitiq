@@ -1,3 +1,6 @@
+
+
+
 # Copyright (C) 2020 Unitary Fund
 #
 # This program is free software: you can redistribute it and/or modify
@@ -143,9 +146,9 @@ def test_parameter_calibration():
 
     # Perfect executor should have sigma = 0
     qubit = LineQubit(0)
-    gate = ops.H.on(qubit[0]).gate
+    gate = ops.H.on(qubit).gate
     sigma = _parameter_calibration(
-        noiseless_executor_mock, gate, qubit[0], depth=10
+        noiseless_executor_mock, gate, qubit, depth=10
     )
     assert sigma == 0
 
@@ -153,12 +156,12 @@ def test_parameter_calibration():
     def noisy_executor_mock(circuit):
         return 0.5
 
-    qubit = LineQubit.range(1)
-    gate = ops.H.on(qubit[0]).gate
+    qubit = LineQubit(0)
+    gate = ops.H.on(qubit).gate
     with pytest.warns(RuntimeWarning):
         # Runtime warning for divide by zero
         sigma = _parameter_calibration(
-            noisy_executor_mock, gate, qubit[0], depth=10
+            noisy_executor_mock, gate, qubit, depth=10
         )
     assert sigma == np.inf
 
