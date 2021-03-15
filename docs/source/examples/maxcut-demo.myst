@@ -499,8 +499,3 @@ the accuracy of the results and the execution time.
 [4] [MaxCut tutorial in PyQuil.](https://grove-docs.readthedocs.io/en/latest/qaoa.html)
 
 [5] [MaxCut tuturial in Cirq.](https://quantumai.google/cirq/tutorials/qaoa)
-
-
-```{code-cell} ipython3
-mitiq.about()
-```
