@@ -2,15 +2,18 @@ import cirq
 from cirq.circuits import Circuit
 from random import randint, uniform
 import numpy as np
-from clifford_training_data import (_array_to_circuit, _circuit_to_array,
-                                    _is_clifford_angle,
+from clifford_training_data import (_is_clifford_angle,
                                     _map_to_near_clifford,
                                     _closest_clifford,
                                     _random_clifford,
                                     _angle_to_probabilities,
                                     _probabilistic_angle_to_clifford,
                                     count_non_cliffords,
-                                    generate_training_circuits)
+                                    generate_training_circuits,
+                                    _replace,
+                                    _select,
+                                    _get_arguments,
+                                    _get_gates)
 from qiskit import compiler, QuantumCircuit
 from mitiq.mitiq_qiskit.conversions import to_qiskit, from_qiskit
 
@@ -45,39 +48,47 @@ def random_circuit(
 
 
 def qiskit_circuit_transpilation(
-    circ: Circuit,
+    circ: QuantumCircuit,
 ) -> QuantumCircuit:
-    """Decomposes qiskit circuit object into Rz, Rx(pi/2) (sx), X and CNOT
+    """Decomposes qiskit circuit object into Rz, Rx(pi/2) (sx), X and CNOT \
        gates.
     Args:
         circ: original circuit of interest assumed to be qiskit circuit object.
     Returns:
         circ_new: new circuite compiled and decomposed into the above gate set.
     """
-    circ = compiler.transpile(circ, basis_gates=['u3', 'cx'],
+    # this decomposes the circuit into u3 and cnot gates:
+    circ = compiler.transpile(circ,
+                              basis_gates=['sx', 'rz', 'cx', 'x'],
                               optimization_level=3)
+    # print(circ.draw())
+    # now for each U3(theta, phi, lambda), this can be converted into
+    # Rz(phi+pi)Rx(pi/2)Rz(theta+pi)Rx(pi/2)Rz(lambda)
     circ_new = QuantumCircuit(len(circ.qubits), len(circ.clbits))
-    for (gate, qubits, cbits) in circ.data:
+    for i in range(len(circ.data)):
         # get information for the gate
+        gate = circ.data[i][0]
         name = gate.name
         if name == 'cx':
-            qubit = [qubits[0].index, qubits[1].index]
+            qubit = [circ.data[i][1][0].index, circ.data[i][1][1].index]
+            parameters = []
             circ_new.cx(qubit[0], qubit[1])
-        elif name == 'u3':
-            qubit = qubits[0].index
-            parameters = gate.params
-            # doing the decompostion of u3 gate here:
-            theta = parameters[0]
-            phi = parameters[1]
-            lamda = parameters[2]
-            circ_new.rz(phi+np.pi, qubit)
-            circ_new.rx(np.pi/2, qubit)
-            circ_new.rz(theta+np.pi, qubit)
-            circ_new.rx(np.pi/2, qubit)
-            circ_new.rz(lamda, qubit)
+        if name == 'rz':
+            parameters = (float(gate.params[0])) % (2 * np.pi)
+            # leave out empty Rz gates:
+            if parameters != 0:
+                qubit = circ.data[i][1][0].index
+                circ_new.rz(parameters, qubit)
+        if name == 'sx':
+            parameters = np.pi / 2
+            qubit = circ.data[i][1][0].index
+            circ_new.rx(parameters, qubit)
+        if name == 'x':
+            qubit = circ.data[i][1][0].index
+            circ_new.x(qubit)
         elif name == 'measure':
-            qubit = qubits[0].index
-            cbit = cbits[0].index
+            qubit = circ.data[i][1][0].index
+            cbit = circ.data[i][2][0].index
             circ_new.measure(qubit, cbit)
     return(circ_new)
 
@@ -100,6 +111,7 @@ def test_generate_training_circuits():
     method_replace_options_list = ['random', 'probabilistic', 'closest']
     additional_options = {'sigma_select': 0.5, 'sigma_replace': 0.5}
     non_cliffords = count_non_cliffords(circuit)
+    random_state = 13
     for method_select in method_select_options_list:
         for method_replace in method_replace_options_list:
             test_training_set_circuits = generate_training_circuits(
@@ -109,7 +121,8 @@ def test_generate_training_circuits():
                 generate_training_circuits(
                     circuit, num_training_circuits,
                     fraction_non_clifford, method_select,
-                    method_replace, additional_options=additional_options))[0]
+                    method_replace, random_state,
+                    additional_options=additional_options))[0]
             assert len(test_training_set_circuits) == num_training_circuits
 
             assert (len(
@@ -136,29 +149,15 @@ def test_map_to_near_cliffords():
     method_select_options_list = ['random', 'probabilistic']
     method_replace_options_list = ['random', 'probabilistic', 'closest']
     additional_options = {'sigma_select': 0.5, 'sigma_replace': 0.5}
-    data, empty_circuit = _circuit_to_array(circuit)
-    mask_rz = data[1, :] == 'rz'
-    rz_circ_data = data[:, mask_rz]
-    mask_not_rz = data[1, :] != 'rz'
-    not_rz_circ_data = data[:, mask_not_rz]
-    mask_non_cliff = _is_clifford_angle(rz_circ_data[2, :])
-    mask_non_cliff = ~mask_non_cliff
-    rz_non_cliff = rz_circ_data[:, mask_non_cliff]
-    mask_cliff = _is_clifford_angle(rz_circ_data[2, :])
-    rz_cliff = rz_circ_data[:, mask_cliff]
-    total_non_cliff = len(rz_non_cliff[0])
-    # find all the non-Clifford gates:
-    all_cliff = np.column_stack((not_rz_circ_data, rz_cliff))
     non_cliffords = count_non_cliffords(circuit)
     for method_select in method_select_options_list:
         for method_replace in method_replace_options_list:
             projected_circuit = _map_to_near_clifford(
-                rz_non_cliff, all_cliff, empty_circuit, total_non_cliff,
-                fraction_non_clifford, method_select, method_replace)[0]
-
+                circuit, fraction_non_clifford, 1,
+                method_select, method_replace)[0]
             projected_circuit_with_options = _map_to_near_clifford(
-                rz_non_cliff, all_cliff, empty_circuit, total_non_cliff,
-                fraction_non_clifford, method_select, method_replace,
+                circuit, fraction_non_clifford, 1, method_select,
+                method_replace,
                 additional_options=additional_options)[0]
             assert count_non_cliffords(projected_circuit) == int(
                 fraction_non_clifford*non_cliffords)
@@ -170,6 +169,76 @@ def test_map_to_near_cliffords():
             assert len(projected_circuit_with_options) == len(circuit)
             assert len(projected_circuit_with_options.all_qubits()
                        ) == len(circuit.all_qubits())
+
+
+def test_select():
+    method_select_options_list = ['random', 'probabilistic']
+    additional_options = {'sigma_select': 0.5, 'sigma_replace': 0.5}
+    non_cliffords = count_non_cliffords(circuit)
+    operations = np.array(list(circuit.all_operations()))
+    gates = _get_gates(operations)
+    mask = np.array(
+        [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates])
+    r_z_gates = operations[mask]
+    angles = _get_arguments(r_z_gates)
+    mask_non_cliff = ~_is_clifford_angle(angles)
+    rz_non_cliff = angles[mask_non_cliff]
+    rz_non_cliff_copy = rz_non_cliff.copy()
+    sigma_select = additional_options.setdefault("sigma_select", 0.5)
+    for method_select in method_select_options_list:
+        columns_to_change = _select(rz_non_cliff_copy,
+                                    fraction_non_clifford,
+                                    method_select, sigma_select, 1)
+        assert len(columns_to_change) == (
+            non_cliffords - int(non_cliffords*fraction_non_clifford))
+
+
+def test_replace():
+    method_select_options_list = ['random', 'probabilistic']
+    method_replace_options_list = ['random', 'probabilistic', 'closest']
+    additional_options = {'sigma_select': 0.5, 'sigma_replace': 0.5}
+    non_cliffords = count_non_cliffords(circuit)
+    operations = np.array(list(circuit.all_operations()))
+    gates = _get_gates(operations)
+    mask = np.array(
+        [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates])
+    r_z_gates = operations[mask]
+    angles = _get_arguments(r_z_gates)
+    mask_non_cliff = ~_is_clifford_angle(angles)
+    rz_non_cliff = angles[mask_non_cliff]
+    rz_non_cliff_copy = rz_non_cliff.copy()
+    sigma_select = additional_options.setdefault("sigma_select", 0.5)
+    sigma_replace = additional_options.setdefault("sigma_replace", 0.5)
+    for method_select in method_select_options_list:
+        for method_replace in method_replace_options_list:
+            columns_to_change = _select(rz_non_cliff_copy,
+                                        fraction_non_clifford,
+                                        method_select, sigma_select, 1)
+            rz_non_cliff_selected = rz_non_cliff_copy[columns_to_change]
+            rz_non_cliff_selected = _replace(rz_non_cliff_selected,
+                                             method_replace,
+                                             sigma_select, sigma_replace, 1)
+            assert _is_clifford_angle(rz_non_cliff_selected.all())
+            assert len(rz_non_cliff_selected) == (
+                non_cliffords - int(non_cliffords*fraction_non_clifford))
+
+
+def test_get_gates():
+    operations = np.array(list(circuit.all_operations()))
+    gates = _get_gates(operations)
+    for g, gate in enumerate(gates):
+        assert gate == operations[g].gate
+
+
+def test_get_argument():
+    operations = np.array(list(circuit.all_operations()))
+    gates = _get_gates(operations)
+    mask = np.array(
+        [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates])
+    r_z_gates = operations[mask]
+    args = _get_arguments(r_z_gates)
+    for arg in args:
+        assert type(arg) == np.float64
 
 
 def test_count_non_cliffords():
@@ -186,24 +255,6 @@ def test_count_non_cliffords():
         example_circuit = from_qiskit(example_circuit)
         assert count_non_cliffords(example_circuit) == number_non_cliffords
         example_circuit = to_qiskit(example_circuit)
-
-
-def test_circuit_to_array():
-    array = _circuit_to_array(circuit)
-    empty_circuit = array[1]
-    array = array[0]
-    assert len(array[0, :]) == len(array[1, :])
-    assert len(array[0, :]) == len(array[2, :])
-    assert len(array[0, :]) == len(array[3, :])
-    assert len(array[0, :]) == len(array[4, :])
-    assert isinstance(empty_circuit, cirq.circuits.circuit.Circuit)
-
-
-def test_array_to_circuit():
-    data, empty_circuit = _circuit_to_array(circuit)
-    circuit_2 = _array_to_circuit(data, empty_circuit)
-    for s in range(len(circuit_2)):
-        assert circuit_2[s] == circuit[s]
 
 
 def test_is_clifford_angle():
