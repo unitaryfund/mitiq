@@ -34,7 +34,6 @@ from mitiq._typing import QPROGRAM
 
 # from mitiq.mitiq_qiskit.qiskit_utils import (
 #     execute_with_shots_and_noise,
-#     initialized_depolarizing_noise,
 # )
 
 from qiskit.providers.aer.noise import depolarizing_error
@@ -82,6 +81,28 @@ def measure(circuit, qid) -> QuantumCircuit:
     return circuit
 
 
+# TODO: Troubleshoot the problems in this executor.
+#       Causes test time increase to 40+ mins
+# def qiskit_executor(qp: QPROGRAM, shots: int = 500) -> float:
+#     # initialize a qiskit noise model
+#     noise_model = NoiseModel()
+
+#     # we assume a depolarizing error for each gate of the standard IBM basis
+#     # set (u1, u2, u3)
+#     noise_model.add_all_qubit_quantum_error(
+#         depolarizing_error(BASE_NOISE, 1), ["u1", "u2", "u3"]
+#     )
+#     expectation = execute_with_shots_and_noise(
+#         qp,
+#         shots=shots,
+#         obs=ONE_QUBIT_GS_PROJECTOR,
+#         noise_model=noise_model,
+#         seed=1,
+#     )
+#     return expectation
+
+
+# TODO: Delete and replace with above.
 def run_with_noise(
     circuit: QuantumCircuit,
     noise: float,
@@ -124,29 +145,9 @@ def run_with_noise(
     return expval
 
 
+# TODO: Replace run_with_noise() with qiskit_executor().
 def qiskit_executor(qp: QPROGRAM, shots: int = 500) -> float:
     return run_with_noise(qp, noise=BASE_NOISE, shots=shots, seed=1)
-
-
-# TODO: Troubleshoot the problems in this executor.
-#       Causes test time increase to 40+ mins
-# def qiskit_executor(qp: QPROGRAM, shots: int = 500) -> float:
-#       # initialize a qiskit noise model
-#     noise_model = NoiseModel()
-
-#     # we assume a depolarizing error for each gate of the standard IBM basis
-#     # set (u1, u2, u3)
-#     noise_model.add_all_qubit_quantum_error(
-#         depolarizing_error(BASE_NOISE, 1), ["u1", "u2", "u3"]
-#     )
-#     expectation = execute_with_shots_and_noise(
-#         qp,
-#         shots=shots,
-#         obs=ONE_QUBIT_GS_PROJECTOR,
-#         noise_model=noise_model,
-#         seed=1,
-#     )
-#     return expectation
 
 
 def get_counts(circuit: QuantumCircuit):

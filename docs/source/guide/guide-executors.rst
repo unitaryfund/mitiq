@@ -289,25 +289,23 @@ real quantum hardware.
 .. _qiskit_executors:
 
 Qiskit Executors
-======================================
+================
+See  :py:mod:`mitiq.mitiq_qiskit.qiskit_utils`.
 
-This section includes noisy and noiseless simulator executor examples using
-Qiskit.
-
-See mitiq_qiskit.qiskit_utils for example executors you can use on Qiskit circuits.
+This section includes noisy and noiseless simulator executor examples you can use on Qiskit circuits.
 
 Qiskit: Wavefunction Simulation
 ---------------------------------
+See :py:func:`mitiq.mitiq_qiskit.qiskit_utils.execute`.
 
-mitiq_qiskit.qiskit_utils.execute:
 This executor can be used for noiseless simulation. Note that this executor
 can be :ref:`wrapped using partial function application <partial-note>`
 to be used in Mitiq.
 
 Qiskit: Wavefunction Simulation with Sampling
 -----------------------------------------------
+See :py:func:`mitiq.mitiq_qiskit.qiskit_utils.execute_with_shots`.
 
-mitiq_qiskit.qiskit_utils.execute_with_shots:
 The noiseless simulation executor can be modified to still perform exact wavefunction
 simulation, but to also include finite sampling of measurements. Note that this executor
 can be :ref:`wrapped using partial function application <partial-note>`
@@ -317,23 +315,26 @@ Note that this executor implementation measures arbitrary observables by using
 a change of basis into the computational basis. More information behind the math
 in this example can be found `here <https://quantumcomputing.stackexchange.com/a/6944>`__.
 
-Qiskit: Density-matrix Simulation with Depolarizing Noise
+Qiskit: Density-matrix Simulation with Noise
 -----------------------------------------------------------
+See :py:func:`mitiq.mitiq_qiskit.qiskit_utils.execute_with_noise`.
 
-mitiq_qiskit.qiskit_utils.execute_with_noise:
-This executor can be used to simulate a circuit with depolarizing noise and to return the exact
-expectation value of an observable (without the shot noise typical of a real experiment).
+This executor can be used to simulate a circuit with noise and to return the exact expectation
+value of an observable (without the shot noise typical of a real experiment).
 
-Qiskit: Density-matrix Simulation with Depolarizing Noise and Sampling
+See :py:func:`mitiq.mitiq_qiskit.qiskit_utils.initialized_depolarizing_noise` for an example depolarizing noise
+model you can use.
+
+Qiskit: Density-matrix Simulation with Noise and Sampling
 ------------------------------------------------------------------------
+See :py:func:`mitiq.mitiq_qiskit.qiskit_utils.execute_with_shots_and_noise`.
 
-mitiq_qiskit.qiskit_utils.execute_with_shots_and_noise:
-This executor can be used to simulate a circuit with depolarizing noise. The expectation value is
-estimated with a finite number of measurements and so it is affected by statistical noise.
+This executor can be used to simulate a circuit with noise. The expectation value is estimated
+with a finite number of measurements and so it is affected by statistical noise.
 
 Noise models can be defined using any functionality available in Qiskit.
 More details can be found in the
-`Qiskit simulator documentation <https://qiskit.org/documentation/tutorials/simulators/index.html>`__
+`Qiskit simulator documentation <https://qiskit.org/documentation/tutorials/simulators/index.html>`__.
 
 Qiskit: Hardware
 ------------------------------------------------------------

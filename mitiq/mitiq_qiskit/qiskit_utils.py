@@ -31,6 +31,14 @@ WVF_SIMULATOR = qiskit.Aer.get_backend("statevector_simulator")
 
 
 def initialized_depolarizing_noise(noise: float) -> NoiseModel:
+    """Initializes a depolarizing noise Qiskit NoiseModel.
+
+    Args:
+        noise: The depolarizing noise strength as a float, i.e. 0.001 is 0.1%.
+
+    Returns:
+        A Qiskit depolarizing NoiseModel.
+    """
     # initialize a qiskit noise model
     noise_model = NoiseModel()
 
