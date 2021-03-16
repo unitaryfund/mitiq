@@ -11,7 +11,7 @@ resolution: <url> (required for Accepted | Rejected | Withdrawn)
 ## Abstract
 ---
 
-Add symmetry-based quantum error mitigation methods, which have appeared in the literature, such as
+Add a subpackpage with symmetry-based quantum error mitigation methods, which have appeared in the recent literature, enabling also new techniques to be devised with Mitiq.
 
 
 ## Motivation and Scope
