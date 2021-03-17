@@ -1,76 +1,74 @@
 ---
-author: Purva Thakre
-status: Draft
-type: <Standards Track | Process>
-created: <date created on, in yyyy-mm-dd format>
-resolution: <url> (required for Accepted | Rejected | Withdrawn)
+Author: Purva Thakre
+Status: <**Draft** | Active | Accepted | Deferred | Rejected | Withdrawn | Final | Superseded>
+Type: <Standards Track | Process>
+Created: 2021-03-16
+Resolution: <url> (required for Accepted | Rejected | Withdrawn)
 ---
 
-# Mitiq Enhancement Proposal 0001 — Full Twirling and Reduced Twirling
+# Mitiq Enhancement Proposal 0002 — Full Twirling and Reduced Twirling
 
 ## Abstract
 ---
+#### Checklist before submission
+- [ ] Short description of what is proposed
 
-The abstract should be a short description of what the MEP will achieve.
-
-Note that the — in the title is an elongated dash, not -.
+Pauli Twirling or Clifford Twirling is used to convert a known error channel into Pauli error channel. Full twirling uses entire set of error operators whereas reduced twirling is based in finding generators of error operator set.
 
 ## Motivation and Scope
 ---
+#### Checklist before submission
+- [ ] Describe the need for proposed change - Gottesman-Knill Theorem
+- [ ] Proposed change describes the existing problem
+- [ ] What does the change affect
+- [ ] What is the change trying to solve
+- [ ] Address scope and key requirements for
+the proposed change
 
-This section describes the need for the proposed change. It should describe
-the existing problem, who it affects, what it is trying to solve, and why.
-This section should explicitly address the scope of and key requirements for
-the proposed change.
+#### Full Twirling
 
-### Full Twirling
-
-### Reduced Twirling
+#### Reduced Twirling
 
 ## Usage and Impact
 ---
+#### Checklist before submission
+- [ ] How Mitiq users will use proposed features
+- [ ] Code examples that would not be possible without these proposed changes.
+- [ ] What impact will proposed changes have on the Mitiq ecosystem
+- [ ] Write users perspective
+  - [ ] How do users benefit from this new addition ?
+- [ ] Include imple details to improve functionality
 
-This section describes how users of Mitiq will use features described in this
-MEP. It should be comprised mainly of code examples that wouldn't be possible
-without acceptance and implementation of this MEP, as well as the impact the
-proposed changes would have on the ecosystem. This section should be written
-from the perspective of the users of Mitiq, and the benefits it will provide
-them; and as such, it should include implementation details only if
-necessary to explain the functionality.
 
-### Full Twirling
+#### Full Twirling
 
-### Reduced Twirling
+#### Reduced Twirling
 
 ## Backward compatibility
 ---
+#### Checklist before submission
+- [ ] Describe how this breaks backward compatibility usage and impact
 
-This section describes the ways in which the MEP breaks backward compatibility.
+#### Full Twirling
 
-The mailing list post will contain the MEP up to and including this section.
-Its purpose is to provide a high-level summary to users who are not interested
-in detailed technical discussion, but may have opinions around, e.g., usage and
-impact.
-
-### Full Twirling
-
-### Reduced Twirling
+#### Reduced Twirling
 
 
 ## Detailed description
 ---
+#### Checklist before submission
+- [ ] Detailed description of the proposed change
+- [ ] Examples of how new functionality can be used, intended use-cases and pseudo-code illustrating its use
 
-This section should provide a detailed description of the proposed change.
-It should include examples of how the new functionality would be used,
-intended use-cases and pseudo-code illustrating its use.
-### Full Twirling
+#### Full Twirling
 
-### Reduced Twirling
+#### Reduced Twirling
 
 
 ### Examples
 
-Give concrete examples for syntax and behavior to illustrate the implementation suggestions above.
+#### Checklist before submission
+- [ ] Give concrete examples for syntax and behavior to illustrate the implementation suggestions above.
 
 #### Example 1:
 
@@ -90,27 +88,27 @@ prior and relevant art.
 
 ## Implementation
 ---
+#### Checklist before submission
+- [ ] List the major steps required to implement the MEP
+- [ ] Note where one step is dependent on another
+- [ ] Note which steps could be omitted
 
-This section lists the major steps required to implement the MEP.  Where
-possible, it should be noted where one step is dependent on another, and which
-steps may be optionally omitted.  Where it makes sense, each step should
-include a link to related pull requests as the implementation progresses.
 
 Any pull requests or development branches containing work on this MEP should
 be linked to from here.  (A MEP does not need to be implemented in a single
 pull request if it makes sense to implement it in discrete phases).
-### Full Twirling
+#### Full Twirling
 
-### Reduced Twirling
+#### Reduced Twirling
 
 ## Alternatives
 ---
 
 If there were any alternative solutions to solving the same problem, they should
 be discussed here, along with a justification for the chosen approach.
-### Full Twirling
+#### Full Twirling
 
-### Reduced Twirling
+#### Reduced Twirling
 
 ## Discussion
 ---
