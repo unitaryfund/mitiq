@@ -74,6 +74,8 @@ def execute_with_depolarizing_noise(
     circuit = circ.with_noise(cirq.depolarize(p=noise))
     simulator = cirq.DensityMatrixSimulator()
     rho = simulator.simulate(circuit).final_density_matrix
+    # final_density_matrix and simulate belong to same module as
+    # DensityMatrixSimulator
     expectation = np.real(np.trace(rho @ obs))
     return expectation
 
@@ -86,7 +88,7 @@ def execute_with_shots_and_depolarizing_noise(
         Args:
             circ: The input Cirq circuit.
             obs: The observable to measure as a NumPy array.
-            noise: The depolarizing noise strength as a float, i.e. 0.001 is 0.1%.
+            noise: The depolarizing noise strength as a float (0.001 is 0.1%)
             shots: The number of measurements.
 
         Returns:

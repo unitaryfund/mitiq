@@ -76,27 +76,47 @@ def test_execute_with_depolarizing_noise():
     for _ in range(100):
         qc += cirq.X(cirq.LineQubit(0))
 
-    assert execute_with_depolarizing_noise(qc, np.diag([0, 1]), 0.0) == 0.0
-    assert np.isclose(
-        execute_with_depolarizing_noise(qc, np.diag([0, 1]), 0.5), 0.5
+    observable = np.diag([0, 1])
+    # Test 1
+    noise1 = 0.0
+    observable_exp_value = execute_with_depolarizing_noise(
+        qc, observable, noise1
     )
-    assert np.isclose(
-        execute_with_depolarizing_noise(qc, np.diag([0, 1]), 0.001), 0.062452
+    assert 0.0 == observable_exp_value
+
+    # Test 2
+    noise2 = 0.5
+    observable_exp_value = execute_with_depolarizing_noise(
+        qc, observable, noise2
     )
+    assert np.isclose(observable_exp_value, 0.5)
+
+    # Test 3
+    noise3 = 0.001
+    observable_exp_value = execute_with_depolarizing_noise(
+        qc, observable, noise3
+    )
+    assert np.isclose(observable_exp_value, 0.062452)
 
 
 def test_execute_with_shots_and_depolarizing_noise():
     """Tests if executor function for Cirq returns a proper expectation
     value when used for noisy depoalrizing simulation and a finite number of
     samples (aka shots)."""
+    shots = 200
 
     qc = cirq.Circuit()
     for _ in range(4):
         qc += cirq.X(cirq.LineQubit(0))
     qc += cirq.measure(cirq.LineQubit(0))
+
+    # introduce noise in the circuit
     qc = qc.with_noise(cirq.depolarize(p=0.02))
-    ham = cirq.PauliString(cirq.ops.Z.on(cirq.LineQubit(0)))
-    noisy_output = execute_with_shots_and_depolarizing_noise(
-        qc, ham, 0.01, 200
+
+    observable = cirq.PauliString(cirq.ops.Z.on(cirq.LineQubit(0)))
+
+    p_d = 0.01  # depolarizing noise strength
+    observable_exp_value = execute_with_shots_and_depolarizing_noise(
+        qc, observable, p_d, shots
     )
-    assert 0.5 < noisy_output < 1.0
+    assert 0.5 <= observable_exp_value <= 1.0
