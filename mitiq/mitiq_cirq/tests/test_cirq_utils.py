@@ -27,4 +27,9 @@ def test_execute():
     qc = Circuit()
     qc += [cirq.X(LineQubit(0)), cirq.CNOT(LineQubit(0), LineQubit(1))]
     observable_exp_value = execute(qc, obs=np.diag([1, 0, 0, 0]))
-    assert 0.0 = observable_exp_value
+    assert 0.0 == observable_exp_value
+
+    new_qc = = Circuit()
+    new_qc += [cirq.X(LineQubit(0)), cirq.CNOT(LineQubit(0), LineQubit(1))]
+    observable_exp_value = execute(qc, obs=np.diag([0, 0, 0, 1]))
+    assert 1.0 == observable_exp_value
