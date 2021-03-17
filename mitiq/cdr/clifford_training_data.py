@@ -282,9 +282,9 @@ def _replace(
     sigma_replace: float,
     random_state: Union[int, np.random.RandomState],
 ) -> np.ndarray:
-    """Function that takes the non-Clifford angles and replacement and selection
-    specifications, returning the projected angles according to a specific
-    method.
+    """Function that takes the non-Clifford angles and replacement and
+    selection specifications, returning the projected angles according to a
+    specific method.
 
     Args:
         rz_non_cliff_selected: array of non-Clifford angles.
