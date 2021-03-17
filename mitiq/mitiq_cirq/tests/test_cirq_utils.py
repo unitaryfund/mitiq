@@ -18,7 +18,8 @@ import numpy as np
 import cirq
 
 
-from mitiq.mitiq_cirq.cirq_utils import (execute)
+from mitiq.mitiq_cirq.cirq_utils import execute
+
 
 def test_execute():
     """Tests if the executor function for Cirq returns a proper
@@ -26,14 +27,20 @@ def test_execute():
 
     # Test 1 using an observable
     qc = cirq.Circuit()
-    qc += [cirq.X(cirq.LineQubit(0)), cirq.CNOT(cirq.LineQubit(0), cirq.LineQubit(1))]
+    qc += [
+        cirq.X(cirq.LineQubit(0)),
+        cirq.CNOT(cirq.LineQubit(0), cirq.LineQubit(1)),
+    ]
     observable1 = np.diag([1, 0, 0, 0])
     observable_exp_value = execute(qc, obs=observable1)
     assert 0.0 == observable_exp_value
 
     # Test 2 using another observable
     new_qc = cirq.Circuit()
-    new_qc += [cirq.X(cirq.LineQubit(0)), cirq.CNOT(cirq.LineQubit(0), cirq.LineQubit(1))]
+    new_qc += [
+        cirq.X(cirq.LineQubit(0)),
+        cirq.CNOT(cirq.LineQubit(0), cirq.LineQubit(1)),
+    ]
     observable2 = np.diag([0, 0, 0, 1])
     observable_exp_value = execute(qc, obs=observable2)
     assert 1.0 == observable_exp_value
