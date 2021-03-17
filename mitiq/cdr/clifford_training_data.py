@@ -6,17 +6,17 @@ from typing import List, Tuple, Optional, Union
 
 
 # Global variable of Clifford angles in Rz gates:
-CLIFFORD_ANGLES = (0.0, np.pi/2, np.pi, (3/2)*(np.pi))
+CLIFFORD_ANGLES = (0.0, np.pi / 2, np.pi, (3 / 2) * (np.pi))
 
 
 def generate_training_circuits(
     circuit: Circuit,
     num_training_circuits: int,
     fraction_non_clifford: float,
-    method_select: str = 'random',
-    method_replace: str = 'closest',
+    method_select: str = "random",
+    method_replace: str = "closest",
     random_state: Optional[Union[int, np.random.RandomState]] = None,
-    **additional_options: dict
+    **additional_options: dict,
 ) -> Tuple[List[Circuit], List[List[float]], List[List[float]]]:
     """Function to return a list of near-Clifford circuits to create the
     training data.
@@ -63,32 +63,43 @@ def generate_training_circuits(
     if isinstance(random_state, int):
         np.random.seed = random_state
     else:
-        random_state = randint(10**(8))
+        random_state = randint(10 ** (8))
         np.random.seed = random_state
     # generating a list of seeds used for each trianing circuit construction:
-    random_states = np.random.randint(10000*num_training_circuits,
-                                      size=num_training_circuits)
+    random_states = np.random.randint(
+        10000 * num_training_circuits, size=num_training_circuits
+    )
     for n in range(num_training_circuits):
         random_state = random_states[n]
         # Convert data arry into cirq circuit and append it to the storage
         #  array:
         if additional_options:
-            (projected_circuit, angles_original,
-                angles_replaced) = _map_to_near_clifford(
+            (
+                projected_circuit,
+                angles_original,
+                angles_replaced,
+            ) = _map_to_near_clifford(
                 circuit,
                 fraction_non_clifford,
                 random_state,
                 method_select,
                 method_replace,
                 additional_options=additional_options.get(
-                    'additional_options'))
+                    "additional_options"
+                ),
+            )
         else:
-            (projected_circuit, angles_original,
-                angles_replaced) = _map_to_near_clifford(circuit,
-                                                         fraction_non_clifford,
-                                                         random_state,
-                                                         method_select,
-                                                         method_replace)
+            (
+                projected_circuit,
+                angles_original,
+                angles_replaced,
+            ) = _map_to_near_clifford(
+                circuit,
+                fraction_non_clifford,
+                random_state,
+                method_select,
+                method_replace,
+            )
 
         circuits_list.append(projected_circuit)
         # this information is to make sure the probabilistic methods are
@@ -102,11 +113,11 @@ def _map_to_near_clifford(
     circuit: Circuit,
     fraction_non_clifford: float,
     random_state: Union[int, np.random.RandomState],
-    method_select: str = 'random',
-    method_replace: str = 'closest',
-    **additional_options: dict
+    method_select: str = "random",
+    method_replace: str = "closest",
+    **additional_options: dict,
 ) -> Tuple[Circuit, List[float], List[float]]:
-    """ Function to take the information in some circuit of interest and
+    """Function to take the information in some circuit of interest and
         return a near-Clifford circuit as constructed according to
         some user defined methods.
     Args:
@@ -140,14 +151,14 @@ def _map_to_near_clifford(
     """
     # set the seed for sampling, for replacement and selection:
     np.random.seed = random_state
-    (random_state_select, random_state_replace) = randint(10**(8),
-                                                          size=2)
+    (random_state_select, random_state_replace) = randint(10 ** (8), size=2)
     # get the operations from the circuit and find the non-cliff angles:
     operations = np.array(list(circuit.all_operations()))
     positions = np.linspace(1, len(operations), len(operations))
     gates = _get_gates(operations)
     mask = np.array(
-        [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates])
+        [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
+    )
     r_z_gates = operations[mask]
     r_z_positions = positions[mask]
     angles = _get_arguments(r_z_gates)
@@ -157,32 +168,44 @@ def _map_to_near_clifford(
     rz_non_cliff_copy = rz_non_cliff.copy()
     sigma_select = additional_options.setdefault("sigma_select", 0.5)
     sigma_replace = additional_options.setdefault("sigma_replace", 0.5)
-    if ('sigma_select' not in additional_options
-            and 'sigma_replace' not in additional_options):
-        raise Exception('additional options must be dicitonary with \
-                        keys containing one or both of '
-                        '"sigma_select" and "sigma_replace" both \
-                        equal to some positive float')
+    if (
+        "sigma_select" not in additional_options
+        and "sigma_replace" not in additional_options
+    ):
+        raise Exception(
+            "additional options must be dicitonary with \
+                        keys containing one or both of "
+            '"sigma_select" and "sigma_replace" both \
+                        equal to some positive float'
+        )
     # Choose non Clifford gates to change according to selection methods:
-    columns_to_change = _select(rz_non_cliff_copy, fraction_non_clifford,
-                                method_select, sigma_select,
-                                random_state_select)
+    columns_to_change = _select(
+        rz_non_cliff_copy,
+        fraction_non_clifford,
+        method_select,
+        sigma_select,
+        random_state_select,
+    )
     rz_non_cliff_selected = rz_non_cliff_copy[columns_to_change]
     pos_selected = pos_non_cliff[columns_to_change]
     # Now the non Clifford gates have been selected, we need to decide which
     # Clifford gate to replace them with.
     # to store original angles replaced:
     angles_original = rz_non_cliff_selected.copy()
-    rz_non_cliff_selected = _replace(rz_non_cliff_selected, method_replace,
-                                     sigma_select, sigma_replace,
-                                     random_state_replace)
+    rz_non_cliff_selected = _replace(
+        rz_non_cliff_selected,
+        method_replace,
+        sigma_select,
+        sigma_replace,
+        random_state_replace,
+    )
     # to store replaced angles:
     angles_replaced = rz_non_cliff_selected.copy()
     # build projected cirucit:
     projected_circuit = circuit.copy()[0:0]
     count = 0
     for o, op in enumerate(operations):
-        if (o+1) in pos_selected:
+        if (o + 1) in pos_selected:
             qubit = op.qubits[0]
             parameter = rz_non_cliff_selected[count]
             operation = cirq.ops.rz(parameter)
@@ -193,26 +216,22 @@ def _map_to_near_clifford(
     return projected_circuit, angles_original, angles_replaced
 
 
-def _get_gates(
-    operation: cirq.ops.GateOperation
-) -> float:
-    """ Takes a cirq GateOperation object and returns the gate.
+def _get_gates(operation: cirq.ops.GateOperation) -> float:
+    """Takes a cirq GateOperation object and returns the gate.
 
     Args:
         operation: a cirq GateOperation.
 
     Returns:
         operation.gate: cirq.ops.GateOperation.gate"""
-    return(operation.gate)
+    return operation.gate
 
 
 _get_gates = np.vectorize(_get_gates)
 
 
-def _get_arguments(
-    operation: cirq.ops.GateOperation
-) -> float:
-    """ Takes a cirq GateOperation object and returns the exponent multiplied
+def _get_arguments(operation: cirq.ops.GateOperation) -> float:
+    """Takes a cirq GateOperation object and returns the exponent multiplied
     by pi. This corresponds to the angle of a rotation gate.
 
     Args:
@@ -220,7 +239,7 @@ def _get_arguments(
 
     Returns:
         operation.gate.exponent*pi: cirq.ops.GateOperation.gate.exponent*pi"""
-    return(operation.gate.exponent*np.pi)
+    return operation.gate.exponent * np.pi
 
 
 _get_arguments = np.vectorize(_get_arguments)
@@ -231,7 +250,7 @@ def _select(
     fraction_non_clifford: float,
     method_select: str,
     sigma_select: float,
-    random_state: Union[int, np.random.RandomState]
+    random_state: Union[int, np.random.RandomState],
 ) -> np.ndarray:
     """Function to select the non-Clifford gates to be replace for a given set
     of  non-Clifford gates.
@@ -256,21 +275,28 @@ def _select(
     np.random.seed = random_state
     total_non_cliff = len(rz_non_cliff)
     N = int(fraction_non_clifford * total_non_cliff)
-    if method_select == 'random':
+    if method_select == "random":
         columns_to_change = choice(
-            np.arange(0, total_non_cliff, 1).tolist(), total_non_cliff-N,
-            replace=False)
-    elif method_select == 'probabilistic':
+            np.arange(0, total_non_cliff, 1).tolist(),
+            total_non_cliff - N,
+            replace=False,
+        )
+    elif method_select == "probabilistic":
         non_cliff_angles = rz_non_cliff
         # form a probability distribution:
         probabilities = _angle_to_probabilities(non_cliff_angles, sigma_select)
         prob_choose_gate = [k / sum(probabilities) for k in probabilities]
         columns_to_change = choice(
             np.arange(0, total_non_cliff, 1).tolist(),
-            total_non_cliff - N, replace=False, p=prob_choose_gate)
+            total_non_cliff - N,
+            replace=False,
+            p=prob_choose_gate,
+        )
     else:
-        raise Exception(f"Arg `method_select` must be 'random', or \
-            'probabilistic' but was {method_select}")
+        raise Exception(
+            f"Arg `method_select` must be 'random', or \
+            'probabilistic' but was {method_select}"
+        )
     columns_to_change.sort()
     return columns_to_change
 
@@ -307,22 +333,22 @@ def _replace(
     """
     # seeding:
     np.random.seed = random_state
-    if method_replace == 'closest':
-        rz_non_cliff_selected = _closest_clifford(
-            rz_non_cliff_selected)
+    if method_replace == "closest":
+        rz_non_cliff_selected = _closest_clifford(rz_non_cliff_selected)
 
-    elif method_replace == 'random':
-        rz_non_cliff_selected = _random_clifford(
-            rz_non_cliff_selected)
+    elif method_replace == "random":
+        rz_non_cliff_selected = _random_clifford(rz_non_cliff_selected)
 
-    elif method_replace == 'probabilistic':
+    elif method_replace == "probabilistic":
         rz_non_cliff_selected = _probabilistic_angle_to_clifford(
-            rz_non_cliff_selected, sigma_replace)
+            rz_non_cliff_selected, sigma_replace
+        )
 
     else:
         raise Exception(
             f"Arg `method_replace` must be 'closest', 'random', or \
-                'probabilistic' but was {method_replace}")
+                'probabilistic' but was {method_replace}"
+        )
 
     return rz_non_cliff_selected
 
@@ -342,7 +368,8 @@ def count_non_cliffords(
     operations = np.array(list(circuit.all_operations()))
     gates = _get_gates(operations)
     mask = np.array(
-        [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates])
+        [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
+    )
     r_z_gates = operations[mask]
     angles = _get_arguments(r_z_gates)
     mask_non_cliff = ~_is_clifford_angle(angles)
@@ -360,7 +387,7 @@ def _is_clifford_angle(
     Returns:
         bool: True / False for Clifford or not.
     """
-    ang = ang % (2*np.pi)
+    ang = ang % (2 * np.pi)
     closest_clifford_angle = _closest_clifford(ang)
     if abs(closest_clifford_angle - ang) < tol:
         return True
@@ -372,9 +399,7 @@ def _is_clifford_angle(
 _is_clifford_angle = np.vectorize(_is_clifford_angle)
 
 
-def _closest_clifford(
-    ang: float
-) -> float:
+def _closest_clifford(ang: float) -> float:
     """Function to take angle and return the nearest Clifford angle note the
        usage of this function is vectorized so it takes and returns arrays.
 
@@ -384,12 +409,14 @@ def _closest_clifford(
     Returns:
         Clifford angle: closest clifford angle.
     """
-    ang = ang % (2*np.pi)
-    ang_scaled = ang/(np.pi/2)
+    ang = ang % (2 * np.pi)
+    ang_scaled = ang / (np.pi / 2)
     # if just one min value, return the corresponding nearest cliff.
-    if (abs((ang_scaled/0.5) - 1) > 10**(-6) and abs((
-        ang_scaled/0.5) - 3) > 10**(-6) and (abs((ang_scaled/0.5) - 5)
-                                             > 10**(-6))):
+    if (
+        abs((ang_scaled / 0.5) - 1) > 10 ** (-6)
+        and abs((ang_scaled / 0.5) - 3) > 10 ** (-6)
+        and (abs((ang_scaled / 0.5) - 5) > 10 ** (-6))
+    ):
         index = int(np.round(ang_scaled)) % 4
         return CLIFFORD_ANGLES[index]
     # if two min values (ie two cliff gates equidistant) randomly choose the
@@ -404,9 +431,7 @@ def _closest_clifford(
 _closest_clifford = np.vectorize(_closest_clifford)
 
 
-def _random_clifford(
-    ang: float
-) -> float:
+def _random_clifford(ang: float) -> float:
     """Function to take angle and return the random Clifford angle note the
        usage of this function is vectorized so it takes and returns arrays.
 
@@ -425,10 +450,7 @@ def _random_clifford(
 _random_clifford = np.vectorize(_random_clifford)
 
 
-def _angle_to_probabilities(
-    angle: float,
-    sigma: float
-) -> float:
+def _angle_to_probabilities(angle: float, sigma: float) -> float:
     """Function to return probability disribtuion based on distance from
        angles to Clifford gates.
 
@@ -439,15 +461,15 @@ def _angle_to_probabilities(
         Prob_project = exp(-(dist/sigma)^2) where dist = sum(dists) is the
         sum of distances from each Clifford gate.
     """
-    angle = angle % (2*np.pi)
+    angle = angle % (2 * np.pi)
     S = np.array([[1, 0.0], [0.0, 1j]])
-    Rz = np.array([[1, 0.0], [0.0, np.exp(angle*1j)]])
+    Rz = np.array([[1, 0.0], [0.0, np.exp(angle * 1j)]])
     dists = []
     for i in range(4):
         if i == 0:
             i = 4
         diff = np.linalg.norm(Rz - S ** (i))
-        dists.append(np.exp(-(diff / sigma) ** 2))
+        dists.append(np.exp(-((diff / sigma) ** 2)))
     return sum(dists)
 
 
@@ -476,21 +498,23 @@ def _probabilistic_angle_to_clifford(
         Clifford angle: clifford angle to replace gate angle, calculated
         probabilistically.
     """
-    ang = ang % (2*np.pi)
+    ang = ang % (2 * np.pi)
     S = np.array([[1, 0.0], [0.0, 1j]])
-    Rz = np.array([[1, 0.0], [0.0, np.exp(ang*1j)]])
+    Rz = np.array([[1, 0.0], [0.0, np.exp(ang * 1j)]])
     dists = []
     for i in range(4):
         if i == 0:
             i = 4
         diff = np.linalg.norm(Rz - S ** (i))
-        dists.append(np.exp(-(diff/sigma) ** 2))
-    prob_gate = [i/sum(dists) for i in dists]
+        dists.append(np.exp(-((diff / sigma) ** 2)))
+    prob_gate = [i / sum(dists) for i in dists]
     cliff_ang = np.random.choice(
-        CLIFFORD_ANGLES, 1, replace=False, p=prob_gate)
+        CLIFFORD_ANGLES, 1, replace=False, p=prob_gate
+    )
     return cliff_ang
 
 
 # vectorize so function can take array of angles.
 _probabilistic_angle_to_clifford = np.vectorize(
-    _probabilistic_angle_to_clifford)
+    _probabilistic_angle_to_clifford
+)

@@ -2,7 +2,7 @@ import cirq
 from cirq.circuits import Circuit
 from random import randint, uniform
 import numpy as np
-from .clifford_training_data import (
+from clifford_training_data import (
     _is_clifford_angle,
     _map_to_near_clifford,
     _closest_clifford,
@@ -42,9 +42,10 @@ def random_circuit(
     # Get a rectangular grid of qubits.
     qubits = cirq.GridQubit.rect(qubits, 1)
     # Generates a random circuit on the provided qubits.
-    circuit = cirq.experiments.random_rotations_between_grid_interaction_layers_circuit(
-        qubits=qubits, depth=depth, seed=0
-    )
+    circuit = cirq.experiments.\
+        random_rotations_between_grid_interaction_layers_circuit(
+            qubits=qubits, depth=depth, seed=0
+            )
     circuit.append(cirq.measure(*qubits, key="z"))
     return circuit
 
