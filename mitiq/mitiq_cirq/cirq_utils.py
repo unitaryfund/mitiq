@@ -76,3 +76,29 @@ def execute_with_depolarizing_noise(
     rho = simulator.simulate(circuit).final_density_matrix
     expectation = np.real(np.trace(rho @ obs))
     return expectation
+
+
+def execute_with_shots_and_depolarizing_noise(
+    circ: cirq.Circuit, obs: cirq.PauliString, noise: float, shots: int
+) -> float:
+    """Simulates a circuit with depolarizing noise at level noise.
+
+        Args:
+            circ: The input Cirq circuit.
+            obs: The observable to measure as a NumPy array.
+            noise: The depolarizing noise strength as a float, i.e. 0.001 is 0.1%.
+            shots: The number of measurements.
+
+        Returns:
+            The expectation value of obs as a float.
+        """
+    # add the noise
+    noisy = circ.with_noise(cirq.depolarize(p=noise))
+
+    # Do the sampling
+    psum = cirq.PauliSumCollector(noisy, obs, samples_per_term=shots)
+    psum.collect(sampler=cirq.DensityMatrixSimulator())
+
+    # Return the expectation value
+    # Here, estimated_energy is a method of PauliSumCollector
+    return psum.estimated_energy()
