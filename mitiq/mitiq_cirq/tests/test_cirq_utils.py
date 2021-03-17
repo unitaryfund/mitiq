@@ -18,9 +18,7 @@ import numpy as np
 import cirq
 
 
-from mitiq.mitiq_cirq.cirq_utils import (
-execute,
-execute_with_shots)
+from mitiq.mitiq_cirq.cirq_utils import execute, execute_with_shots
 
 
 def test_execute():
@@ -47,13 +45,19 @@ def test_execute():
     observable_exp_value = execute(qc, obs=observable2)
     assert 1.0 == observable_exp_value
 
+
 def test_execute_with_shots():
     """Tests if executor function for Cirq returns a proper expectation
     value when considering finite number of samples (aka shots)."""
 
     shots = 1000
-    observable = cirq.PauliString(cirq.ops.Z.on(cirq.LineQubit(0)), cirq.ops.Z.on(cirq.LineQubit(1)))
-    qc = Circuit()
-    qc += [cirq.X(cirq.LineQubit(0)), cirq.CNOT(cirq.LineQubit(0), cirq.LineQubit(1))]
-    observable_exp_value = execute(qc, observable, 10000)
+    observable = cirq.PauliString(
+        cirq.ops.Z.on(cirq.LineQubit(0)), cirq.ops.Z.on(cirq.LineQubit(1))
+    )
+    qc = cirq.Circuit()
+    qc += [
+        cirq.X(cirq.LineQubit(0)),
+        cirq.CNOT(cirq.LineQubit(0), cirq.LineQubit(1)),
+    ]
+    observable_exp_value = execute_with_shots(qc, observable, shots)
     assert 1.0 == observable_exp_value

@@ -34,8 +34,10 @@ def execute(circ: cirq.Circuit, obs: np.ndarray) -> float:
     return np.real(final_wvf.conj().T @ obs @ final_wvf)
 
 
-def execute_with_shots(circ: cirq.Circuit, obs: cirq.PauliString, shots: int) -> float:
-        """Simulates noiseless wavefunction evolution and returns the
+def execute_with_shots(
+    circ: cirq.Circuit, obs: cirq.PauliString, shots: int
+) -> float:
+    """Simulates noiseless wavefunction evolution and returns the
         expectation value of a PauliString observable.
 
         Args:
@@ -47,9 +49,9 @@ def execute_with_shots(circ: cirq.Circuit, obs: cirq.PauliString, shots: int) ->
             The expectation value of obs as a float.
         """
 
-        # Do the sampling
-        psum = cirq.PauliSumCollector(circ, obs, samples_per_term=shots)
-        psum.collect(sampler=cirq.Simulator())
+    # Do the sampling
+    psum = cirq.PauliSumCollector(circ, obs, samples_per_term=shots)
+    psum.collect(sampler=cirq.Simulator())
 
-        # Return the expectation value
-        return psum.estimated_energy()
+    # Return the expectation value
+    return psum.estimated_energy()
