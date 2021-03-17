@@ -18,7 +18,11 @@ import numpy as np
 import cirq
 
 
-from mitiq.mitiq_cirq.cirq_utils import execute, execute_with_shots
+from mitiq.mitiq_cirq.cirq_utils import (
+    execute,
+    execute_with_shots,
+    execute_with_depolarizing_noise,
+)
 
 
 def test_execute():
@@ -61,3 +65,20 @@ def test_execute_with_shots():
     ]
     observable_exp_value = execute_with_shots(qc, observable, shots)
     assert 1.0 == observable_exp_value
+
+
+def test_execute_with_depolarizing_noise():
+    """Tests if executor function for Cirq returns a proper expectation
+    value when used for noisy depoalrizing simulation."""
+
+    qc = cirq.Circuit()
+    for _ in range(100):
+        qc += cirq.X(cirq.LineQubit(0))
+
+    assert execute_with_depolarizing_noise(qc, np.diag([0, 1]), 0.0) == 0.0
+    assert np.isclose(
+        execute_with_depolarizing_noise(qc, np.diag([0, 1]), 0.5), 0.5
+    )
+    assert np.isclose(
+        execute_with_depolarizing_noise(qc, np.diag([0, 1]), 0.001), 0.062452
+    )

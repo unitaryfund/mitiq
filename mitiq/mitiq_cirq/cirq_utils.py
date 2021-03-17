@@ -56,3 +56,23 @@ def execute_with_shots(
     # Return the expectation value
     # Here, estimated_energy is a method of PauliSumCollector
     return psum.estimated_energy()
+
+
+def execute_with_depolarizing_noise(
+    circ: cirq.Circuit, obs: np.ndarray, noise: float
+) -> float:
+    """Simulates a circuit with depolarizing noise at level noise.
+
+        Args:
+            circ: The input Cirq circuit.
+            obs: The observable to measure as a NumPy array.
+            noise: The depolarizing noise as a float, i.e. 0.001 is 0.1% noise.
+
+        Returns:
+            The expectation value of obs as a float.
+        """
+    circuit = circ.with_noise(cirq.depolarize(p=noise))
+    simulator = cirq.DensityMatrixSimulator()
+    rho = simulator.simulate(circuit).final_density_matrix
+    expectation = np.real(np.trace(rho @ obs))
+    return expectation
