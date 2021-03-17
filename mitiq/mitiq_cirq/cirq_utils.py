@@ -14,12 +14,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Cirq utility functions."""
 
+
 import numpy as np
 import cirq
-from cirq import Circuit
 
 
-def execute(circ: Circuit, obs: np.ndarray) -> float:
+def execute(circ: cirq.Circuit, obs: np.ndarray) -> float:
     """Simulates noiseless wavefunction evolution and returns the
         expectation value of some observable.
 
