@@ -70,6 +70,9 @@ test-pyquil:
 test-qiskit:
 	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/mitiq_qiskit
 
+.PHONY: test-cirq
+test-cirq:
+		pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/mitiq_cirq
 .PHONY: test-all
 test-all:
 	pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml
