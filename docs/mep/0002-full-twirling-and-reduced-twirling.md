@@ -37,7 +37,7 @@ the proposed change
 - [ ] What impact will proposed changes have on the Mitiq ecosystem
 - [ ] Write users perspective
   - [ ] How do users benefit from this new addition ?
-- [ ] Include imple details to improve functionality
+- [ ] Include ample details to improve functionality
 
 
 #### Full Twirling
@@ -59,6 +59,37 @@ the proposed change
 #### Checklist before submission
 - [ ] Detailed description of the proposed change
 - [ ] Examples of how new functionality can be used, intended use-cases and pseudo-code illustrating its use
+
+:heavy_exclamation_mark: **Propsed functions from previous rough sketch** :heavy_exclamation_mark:
+
+1. A group G defining n-qubit Pauli operators
+2. Fidelities of the elements in group G
+3. Commutator function defined over group G based on commutator and anticommutator relationships of the group elements.
+  - A defined inverse of the commutator function
+  - A commutator table defined as a numpy array ? -- ASCII table as print output
+  - A generator table defined as a numpy array ? (Table II in the paper.) -- ASCII table as print output
+4. _is_measurement, _pop_measurement and _append_measurement can be used to move measurements in the circuit towards the end.
+5. Convert noise operator’s basis into Pauli basis using group G.
+  - Since the noise operator has to be known, a function to check if the decomposition is  a valid error channel with unitary noise operators i.e. check if the twirling process could be done or not.
+6. Full Pauli Twirling Function
+  - Check if the noise operator’s Pauli basis (V) list has any repeated elements -then remove one of these elements.
+  - Act on the state with V and conjugated V’s - check if process failed or not
+7. Reduced Pauli Twirling Function
+  - Check if the noise operator’s Pauli basis (V) list has any repeated elements -then remove one of these elements.
+  - Reduced twirling set - depends on identifying a composition relation in V. Not sure how to identify a composition relation except for:
+    - Commutator function of the generating set element and an element of V should be equal to 0.
+    - Non-generating set elements could be discarded by iterating over elements of V and calculating the commutator function value.
+    - Function to find size (N) of new generating set based on whole set V and generating set size.
+    - New generator table (numpy array) based on generating set and function N. -- ASCII table as print output
+      - Generating set elements are mapped to the new twirling set - check composition relation.
+      - Elements not in the generating set or not calculated from composition relation are also mapped to the new twirling set.
+    - Check and selectively discard repeated generator elements. This will give a new twirling set.
+8. Define functions for exact twirling (iterate over the whole twirling set) and random twirling (choose random twirling set elements). Check if the error channel is a Pauli error channel or not.
+
+
+
+
+
 
 #### Full Twirling
 
