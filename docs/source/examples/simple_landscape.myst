@@ -154,6 +154,7 @@ print(f"Theoretical groud state energy: {min(np.linalg.eigvals(hamiltonian))}")
 ```
 
 In order to show version information 
+
 ```{code-cell} ipython3
 import mitiq
 mitiq.about()
