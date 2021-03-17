@@ -486,6 +486,14 @@ The practical advantage of any error mitigation methods always depends on the tr
 the accuracy of the results and the execution time.
 :::
 
+
+In order to show version information 
+
+```{code-cell} ipython3
+import mitiq
+mitiq.about()
+```
+
 +++
 
 ## References
