@@ -39,9 +39,10 @@ def random_circuit(qubits: int, depth: int,) -> Circuit:
     # Get a rectangular grid of qubits.
     qubits = cirq.GridQubit.rect(qubits, 1)
     # Generates a random circuit on the provided qubits.
-    circuit = cirq.experiments.random_rotations_between_grid_interaction_layers_circuit(
-        qubits=qubits, depth=depth, seed=0
-    )
+    circuit = cirq.experiments.\
+        random_rotations_between_grid_interaction_layers_circuit(
+            qubits=qubits, depth=depth, seed=0
+        )
     circuit.append(cirq.measure(*qubits, key="z"))
     return circuit
 
