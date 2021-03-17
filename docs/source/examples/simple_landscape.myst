@@ -153,6 +153,12 @@ We also observe that the minimum of mitigated energy approximates well the theor
 print(f"Theoretical groud state energy: {min(np.linalg.eigvals(hamiltonian))}")
 ```
 
+In order to show version information 
+```{code-cell} ipython3
+import mitiq
+mitiq.about()
+```
+
 ## Acknowledgements
 
 Most of the code for this example was written by Peter Karalekas.
