@@ -25,10 +25,7 @@ from mitiq.mitiq_qiskit.conversions import to_qiskit, from_qiskit
 CLIFFORD_ANGLES = (0.0, np.pi / 2, np.pi, (3 / 2) * (np.pi))
 
 
-def random_circuit(
-    qubits: int,
-    depth: int,
-) -> Circuit:
+def random_circuit(qubits: int, depth: int,) -> Circuit:
     """Function to generate a random quantum circuit in cirq. The circuit is
        based on the hardware efficient ansatz,
     with alternating CNOT layers with randomly selected single qubit gates in
@@ -42,17 +39,14 @@ def random_circuit(
     # Get a rectangular grid of qubits.
     qubits = cirq.GridQubit.rect(qubits, 1)
     # Generates a random circuit on the provided qubits.
-    circuit = cirq.experiments.\
-        random_rotations_between_grid_interaction_layers_circuit(
-            qubits=qubits, depth=depth, seed=0
-            )
+    circuit = cirq.experiments.random_rotations_between_grid_interaction_layers_circuit(
+        qubits=qubits, depth=depth, seed=0
+    )
     circuit.append(cirq.measure(*qubits, key="z"))
     return circuit
 
 
-def qiskit_circuit_transpilation(
-    circ: QuantumCircuit,
-) -> QuantumCircuit:
+def qiskit_circuit_transpilation(circ: QuantumCircuit,) -> QuantumCircuit:
     """Decomposes qiskit circuit object into Rz, Rx(pi/2) (sx), X and CNOT \
        gates.
     Args:
