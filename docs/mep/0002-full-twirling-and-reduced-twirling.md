@@ -158,6 +158,11 @@ regarding the MEP:
 
 - _Open Publication License: https://www.opencontent.org/openpub/_
 
+[1] Gottesman, D. The heisenberg representation of quantum computers. arXiv preprint quant-ph/9807006 (1998) https://arxiv.org/abs/quant-ph/9807006
+
+[2] Aaronson, S. & Gottesman, D. Improved simulation of stabilizer circuits. Phys. Rev. A 70, 052328 (2004) https://doi.org/10.1103/PhysRevA.70.052328
+
+[3] Cai, Z., Benjamin, S. Constructing Smaller Pauli Twirling Sets for Arbitrary Error Channels. Sci Rep 9, 11281 (2019). https://doi.org/10.1038/s41598-019-46722-7
 
 #### Copyright
 
