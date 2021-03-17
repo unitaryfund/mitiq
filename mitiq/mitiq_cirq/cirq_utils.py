@@ -54,4 +54,5 @@ def execute_with_shots(
     psum.collect(sampler=cirq.Simulator())
 
     # Return the expectation value
+    # Here, estimated_energy is a method of PauliSumCollector
     return psum.estimated_energy()
