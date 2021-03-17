@@ -12,3 +12,22 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""Cirq utility functions."""
+
+import numpy as np
+import cirq
+from cirq import Circuit
+
+def execute(circ: Circuit, obs: np.ndarray) -> float:
+        """Simulates noiseless wavefunction evolution and returns the
+        expectation value of some observable.
+
+        Args:
+            circ: The input Cirq circuit.
+            obs: The observable to measure as a NumPy array.
+
+        Returns:
+            The expectation value of obs as a float.
+        """
+        final_wvf = circ.final_state_vector()
+        return np.real(final_wvf.conj().T @ obs @ final_wvf)

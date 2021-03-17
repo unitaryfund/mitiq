@@ -12,3 +12,19 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+""" Tests for Cirq executors defined in cirq_utils.py"""
+
+import numpy as np
+import cirq
+from cirq import LineQubit
+
+from mitiq.mitiq_cirq.cirq_utils import (execute)
+
+def test_execute():
+    """Tests if the simulation executor function for Cirq returns a property
+    expectation value when an observable is provided."""
+
+    qc = Circuit()
+    qc += [cirq.X(LineQubit(0)), cirq.CNOT(LineQubit(0), LineQubit(1))]
+    observable_exp_value = execute(qc, obs=np.diag([1, 0, 0, 0]))
+    assert 0.0 = observable_exp_value
