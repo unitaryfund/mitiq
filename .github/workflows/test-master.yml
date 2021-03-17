@@ -1,4 +1,4 @@
-name: build (master only)
+name: test (master only)
 
 on:
   push:
@@ -7,13 +7,13 @@ on:
 
 jobs:
 
-    # runs just the main & benchmarking tests on py36/37/38 and mac/windows
+    # runs just the main & benchmarking tests on py37/38 and mac/windows
     test:
       runs-on: ${{ matrix.os }}
       strategy:
         matrix:
           os: [macos-latest, windows-latest]
-          python-version: [3.6, 3.7, 3.8]
+          python-version: [3.7, 3.8]
 
       steps:
         - name: Check out mitiq
@@ -26,5 +26,5 @@ jobs:
           run: |
             python -m pip install --upgrade pip
             make install requirements
-        - name: Run the mitiq unit tests via pytest
+        - name: Run the Mitiq unit tests via pytest
           run: make test

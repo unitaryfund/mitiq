@@ -2,11 +2,12 @@
 
 ```{toctree}
 ---
-maxdepth: 2 
+maxdepth: 2
 ---
 guide-overview.rst
 guide-getting-started.rst
 guide-executors.rst
 guide-zne.rst
+guide-pec.rst
 guide-error-mitigation.rst
 ```

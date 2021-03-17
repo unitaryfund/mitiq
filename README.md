@@ -9,11 +9,11 @@
 
 # Mitiq
 
-Mitiq is a Python toolkit for implementing error mitigation techniques on quantum computers. 
+Mitiq is a Python toolkit for implementing error mitigation techniques on quantum computers.
 
 Current quantum computers
 are noisy due to interactions with the environment, imperfect gate applications, state preparation and measurement
-errors, etc. Error mitigation seeks to reduce these effects at the software level by compiling quantum programs in 
+errors, etc. Error mitigation seeks to reduce these effects at the software level by compiling quantum programs in
 clever ways.
 
 Want to know more? Check out our [documentation](https://mitiq.readthedocs.io/en/stable/guide/guide-overview.html).
@@ -96,17 +96,27 @@ Error in simulation (w/o  mitigation): 0.0506
 Error in simulation (with mitigation): 0.000519
 ```
 
+### Example with Qiskit
+
+![Alt Text](assets/qiskit.gif)
+
+
+### Example with Cirq
+
+![Alt Text](assets/cirq.gif)
+
+
 ## Error mitigation techniques
 
 Mitiq currently implements:
 * [Zero-Noise Extrapolation](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html),
 * [Probabilistic Error Cancellation](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#error-mitigation-with-probabilistic-error-cancellation),
- 
+
 and is designed to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
 
 ## Documentation
 
-Mitiq's documentation is hosted at [mitiq.readthedocs.io](https://mitiq.readthedocs.io). A PDF version of the latest 
+Mitiq's documentation is hosted at [mitiq.readthedocs.io](https://mitiq.readthedocs.io). A PDF version of the latest
 release can be found [here](https://mitiq.readthedocs.io/_/downloads/en/latest/pdf/).
 
 ## Developer information
@@ -119,7 +129,11 @@ To contribute to the documentation, please see these [documentation guidelines](
 
 An up-to-date list of authors can be found [here](https://github.com/unitaryfund/mitiq/graphs/contributors).
 
-## Citation
+## Research
+
+We are looking forward to adding new features to Mitiq. If you have a proposal for implementing a new quantum error mitigation technique, or adding an example used in your research, please read our [guidelines](https://mitiq.readthedocs.io/en/stable/research.html) for contributing.
+
+### Citing Mitiq
 
 If you use Mitiq in your research, please reference the [Mitiq preprint][arxiv] as follows:
 
@@ -135,7 +149,11 @@ If you use Mitiq in your research, please reference the [Mitiq preprint][arxiv] 
 }
 ```
 
+A list of papers citing Mitiq can be found [here][papers_with_mitiq].
+
 [arxiv]: https://arxiv.org/abs/2009.04417
+
+[papers_with_mitiq]: https://mitiq.readthedocs.io/en/stable/research.html#papers-citing-or-using-mitiq
 
 ## License
 

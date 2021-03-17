@@ -13,7 +13,3 @@ updates:
     directory: "dev_requirements.txt" # Location of package manifests
     schedule:
       interval: "daily"
-  - package-ecosystem: "pip" # See documentation for possible values
-    directory: "docs/requirements.txt" # Location of package manifests
-    schedule:
-      interval: "daily"

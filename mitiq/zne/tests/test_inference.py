@@ -16,7 +16,6 @@
 """Tests for zero-noise inference and extrapolation methods (factories) with
 classically generated data.
 """
-from copy import copy, deepcopy
 from typing import Callable, List
 from pytest import mark, raises, warns
 
@@ -358,6 +357,11 @@ def test_richardson_extr(test_f: Callable[[float], float]):
     assert np.isclose(zne_value, seeded_f(0, err=0), atol=CLOSE_TOL)
     assert len(fac._opt_params) == len(X_VALS)
     assert np.isclose(fac._opt_params[-1], zne_value)
+    exp_vals = fac.get_expectation_values()
+    assert np.isclose(fac.extrapolate(X_VALS, exp_vals), zne_value)
+    assert np.isclose(
+        fac.extrapolate(X_VALS, exp_vals, full_output=True)[0], zne_value,
+    )
 
 
 def test_fake_nodes_factory():
@@ -371,6 +375,14 @@ def test_fake_nodes_factory():
     assert np.isclose(zne_value, f_runge(0.0), atol=LARGE_TOL)
     assert len(fac._opt_params) == len(UNIFORM_X)
     assert np.isclose(fac._opt_params[-1], zne_value)
+    assert np.isclose(
+        fac.extrapolate(UNIFORM_X, f_runge(UNIFORM_X)), zne_value
+    )
+    exp_vals = fac.get_expectation_values()
+    assert np.isclose(fac.extrapolate(UNIFORM_X, exp_vals), zne_value)
+    assert np.isclose(
+        fac.extrapolate(UNIFORM_X, exp_vals, full_output=True)[0], zne_value,
+    )
 
 
 def test_fake_nodes_extrapolation():
@@ -393,8 +405,14 @@ def test_linear_extr():
     fac = LinearFactory(X_VALS)
     assert not fac._opt_params
     fac.run_classical(seeded_f)
-    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+    zne_value = fac.reduce()
+    assert np.isclose(zne_value, seeded_f(0, err=0), atol=CLOSE_TOL)
     assert np.allclose(fac._opt_params, [B, A], atol=CLOSE_TOL)
+    exp_vals = fac.get_expectation_values()
+    assert np.isclose(fac.extrapolate(X_VALS, exp_vals), zne_value)
+    assert np.isclose(
+        fac.extrapolate(X_VALS, exp_vals, full_output=True)[0], zne_value,
+    )
 
 
 def test_poly_extr():
@@ -412,7 +430,14 @@ def test_poly_extr():
     seeded_f = apply_seed_to_func(f_non_lin, SEED)
     fac = PolyFactory(X_VALS, order=2)
     fac.run_classical(seeded_f)
+    zne_value = fac.reduce()
     assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+    exp_vals = fac.get_expectation_values()
+    assert np.isclose(fac.extrapolate(X_VALS, exp_vals, order=2), zne_value)
+    assert np.isclose(
+        fac.extrapolate(X_VALS, exp_vals, order=2, full_output=True)[0],
+        zne_value,
+    )
 
 
 @mark.parametrize("order", [2, 3, 4, 5])
@@ -438,10 +463,25 @@ def test_exp_factory_with_asympt(
     fac = ExpFactory(X_VALS, asymptote=A, avoid_log=avoid_log)
     fac.run_classical(seeded_f)
     assert not fac._opt_params
-    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
-
-    # There are three parameters to fit in the exponential ansatz
+    zne_value = fac.reduce()
+    assert np.isclose(zne_value, seeded_f(0, err=0), atol=CLOSE_TOL)
+    # There are three parameters in the exponential ansatz
     assert len(fac._opt_params) == 3
+    exp_vals = fac.get_expectation_values()
+    assert np.isclose(
+        fac.extrapolate(X_VALS, exp_vals, asymptote=A, avoid_log=avoid_log),
+        zne_value,
+    )
+    assert np.isclose(
+        fac.extrapolate(
+            X_VALS,
+            exp_vals,
+            asymptote=A,
+            avoid_log=avoid_log,
+            full_output=True,
+        )[0],
+        zne_value,
+    )
 
 
 def test_exp_factory_bad_asympt():
@@ -456,10 +496,15 @@ def test_exp_factory_no_asympt(test_f: Callable[[float], float]):
     fac = ExpFactory(X_VALS, asymptote=None)
     fac.run_classical(seeded_f)
     assert not fac._opt_params
-    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
-
-    # There are three parameters to fit in the exponential ansatz
+    zne_value = fac.reduce()
+    assert np.isclose(zne_value, seeded_f(0, err=0), atol=CLOSE_TOL)
+    # There are three parameters in the exponential ansatz
     assert len(fac._opt_params) == 3
+    exp_vals = fac.get_expectation_values()
+    assert np.isclose(fac.extrapolate(X_VALS, exp_vals), zne_value)
+    assert np.isclose(
+        fac.extrapolate(X_VALS, exp_vals, full_output=True)[0], zne_value,
+    )
 
 
 @mark.parametrize("avoid_log", [False, True])
@@ -478,10 +523,21 @@ def test_poly_exp_factory_with_asympt(
     fac = PolyExpFactory(X_VALS, order=2, asymptote=A, avoid_log=avoid_log)
     fac.run_classical(seeded_f)
     assert not fac._opt_params
-    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=POLYEXP_TOL)
+
+    zne_value = fac.reduce()
+    assert np.isclose(zne_value, seeded_f(0, err=0), atol=POLYEXP_TOL)
 
     # There are four parameters to fit for the PolyExpFactory of order 1
     assert len(fac._opt_params) == 4
+
+    exp_values = [test_f(x) for x in X_VALS]
+    assert np.isclose(
+        PolyExpFactory.extrapolate(
+            X_VALS, exp_values, order=2, asymptote=A, avoid_log=avoid_log
+        ),
+        zne_value,
+        atol=POLYEXP_TOL,
+    )
 
 
 @mark.parametrize("test_f", [f_poly_exp_down, f_poly_exp_up])
@@ -496,7 +552,15 @@ def test_poly_exp_factory_no_asympt(test_f: Callable[[float], float]):
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = PolyExpFactory(X_VALS, order=2, asymptote=None)
     fac.run_classical(seeded_f)
-    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=POLYEXP_TOL)
+    zne_value = fac.reduce()
+    assert np.isclose(zne_value, seeded_f(0, err=0), atol=POLYEXP_TOL)
+
+    exp_vals = fac.get_expectation_values()
+    assert np.isclose(fac.extrapolate(X_VALS, exp_vals, order=2), zne_value)
+    assert np.isclose(
+        fac.extrapolate(X_VALS, exp_vals, order=2, full_output=True,)[0],
+        zne_value,
+    )
 
 
 @mark.parametrize("avoid_log", [False, True])
@@ -542,7 +606,8 @@ def test_ada_exp_factory_no_asympt(test_f: Callable[[float], float]):
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = AdaExpFactory(steps=4, scale_factor=2.0, asymptote=None)
     fac.run_classical(seeded_f)
-    assert np.isclose(fac.reduce(), seeded_f(0, err=0), atol=CLOSE_TOL)
+    zne_value = fac.reduce()
+    assert np.isclose(zne_value, seeded_f(0, err=0), atol=CLOSE_TOL)
 
 
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
@@ -658,52 +723,6 @@ def test_adaptive_factory_max_iteration_warnings():
         match=r"Factory iteration loop stopped before convergence.",
     ):
         fac.run_classical(lambda scale_factor: 1.0, max_iterations=3)
-
-
-@mark.parametrize("factory", [LinearFactory, ExpFactory])
-def test_equal_simple(factory):
-    fac = factory(scale_factors=[1, 2, 3])
-    assert fac != 1
-
-    copied_fac = copy(fac)
-    assert copied_fac == fac
-    copied_fac._already_reduced = True
-    assert copied_fac != fac
-
-    fac._instack = [{"scale_factor": 1, "shots": 100}]
-    copied_fac = deepcopy(fac)
-    assert copied_fac == fac
-    copied_fac._instack[0].update({"shots": 101})
-    assert copied_fac != fac
-
-
-@mark.parametrize(
-    "factory",
-    (LinearFactory, RichardsonFactory, FakeNodesFactory, PolyFactory),
-)
-def test_equal(factory):
-    for run_classical in (True, False):
-        if factory is PolyFactory:
-            fac = factory(
-                scale_factors=[1, 2, 3], order=2, shot_list=[1, 2, 3]
-            )
-        else:
-            fac = factory(scale_factors=[1, 2, 3], shot_list=[1, 2, 3])
-        if run_classical:
-            fac.run_classical(
-                scale_factor_to_expectation_value=lambda x, shots: np.exp(x)
-                + 0.5
-            )
-
-        copied_factory = copy(fac)
-        assert copied_factory == fac
-        assert copied_factory is not fac
-
-        if run_classical:
-            fac.reduce()
-            copied_factory = copy(fac)
-            assert copied_factory == fac
-            assert copied_factory is not fac
 
 
 @mark.parametrize("fac_class", [LinearFactory, RichardsonFactory])

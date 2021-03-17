@@ -4,70 +4,57 @@
 Getting Started
 *********************************************
 
-Improving the performance of your quantum programs is only a few lines of
-code away.
-
-This getting started shows examples using
-`Cirq <https://cirq.readthedocs.io/en/stable/index.html>`_ and
-`Qiskit <https://qiskit.org/>`_. We'll first test Mitiq by running
-against the noisy simulator built into Cirq. The Qiskit example works
-similarly as you will see in :ref:`Zero-Noise Extrapolation with Qiskit <qiskit_getting_started>`.
-
+This guide shows short examples of two error mitigation techniques in Mitiq:
+zero-noise extrapolation and probabilistic error cancellation.
+First, we highlight the general workflow of both methods.
 
 .. _multi_platform_framework:
 
-Multi-platform Framework
-------------------------
+General workflow: Front-ends, backends, and executors
+-----------------------------------------------------
 
-In Mitiq, a "back-end" is a function that executes quantum programs. A
-"front-end" is a library/language that constructs quantum programs. Mitiq
-lets you mix and match these. For example, you could write a quantum program in
-Qiskit and then execute it using a Cirq backend, or vice versa.
+We refer to a library/language that constructs quantum programs as a "front-end,"
+and a quantum computer or quantum computer simulator as a "backend." Mitiq currently
+supports Cirq, Qiskit, and pyQuil front-ends, and is backend agnostic - as long as you
+can run a supported quantum program on a backend, you can use that backend with Mitiq.
 
-Back-ends are abstracted to user-defined functions called *executors* that
-always accept a quantum program, sometimes accept other arguments, and always
-return an expectation value as a float. You can see some examples of different
-executors for common packages :ref:`here <guide-executors>` and in this
-getting started. If your quantum programming interface of choice can be used
-to make a Python function with this type, then it can be used with Mitiq.
-
-Let us define a simple ``executor`` function which simulates a Cirq circuit
-with depolarizing noise and returns the expectation value of
-:math:`|00...\rangle \langle00...|`.
+We refer to a user-defined function that inputs a quantum program and executes it on a backend
+as an *executor*. Such functions always accept a quantum program, sometimes accept other arguments,
+and always return an expectation value as a float. As an example, below we define a simple executor
+function which inputs a Cirq circuit, executes it on a noisy simulator, and returns the
+probability of the ground state.
 
 .. testcode::
 
     import numpy as np
-    from cirq import Circuit, depolarize, DensityMatrixSimulator
-
-    SIMULATOR = DensityMatrixSimulator()
-    # 1% depolarizing noise
-    NOISE_LEVEL = 0.01
+    import cirq
 
     def executor(circ: Circuit) -> float:
-        """ Simulates a circuit with depolarizing noise at level NOISE_LEVEL.
+        """Simulates a circuit with depolarizing noise.
+
         Args:
             circ: The quantum program as a Cirq object.
 
         Returns:
             The expectation value of the ground state projector.
         """
-        circuit = circ.with_noise(depolarize(p=NOISE_LEVEL))
-        rho = SIMULATOR.simulate(circuit).final_density_matrix
-        return np.real(rho[0,0])
+        circuit = circ.with_noise(cirq.depolarize(p=0.01))
+        result = cirq.DensityMatrixSimulator().simulate(circuit)
+        return np.real(result.final_density_matrix[0, 0])
 
 Now we consider a simple example: a single-qubit circuit with an even
-number of X gates. By construction, the ideal expectation value should be
+number of Pauli-X gates. By construction, the ideal expectation value should be
 1, but the noisy expectation value will be slightly different.
 
 .. testcode::
 
-    from cirq import Circuit, LineQubit, X
+    circuit = cirq.Circuit(
+        cirq.X(cirq.LineQubit(0)) for _ in range(6)
+    )
 
-    qubit = LineQubit(0)
-    circuit = Circuit(X(qubit) for _ in range(6))
+    exact_result = 1.0
     noisy_result = executor(circuit)
-    exact_result = 1
+
     print(f"Error in noisy simulation: {abs(exact_result - noisy_result):.{3}}")
 
 .. testoutput::
@@ -77,18 +64,18 @@ number of X gates. By construction, the ideal expectation value should be
 This shows the impact of noise on the final expectation value (without error mitigation).
 Now let's use Mitiq to improve this performance.
 
-Error Mitigation with Zero-Noise Extrapolation
-----------------------------------------------
+Zero-Noise Extrapolation
+------------------------
 
-Zero-noise extrapolation can be easily implemented by importing the function
-:func:`~mitiq.zne.zne.execute_with_zne` from the :mod:`~mitiq.zne.zne` module.
+Zero-noise extrapolation can be easily implemented with the function
+:func:`mitiq.zne.zne.execute_with_zne`.
 
 .. testcode::
 
-    from mitiq import execute_with_zne
+    from mitiq import zne
 
-    mitigated_result = execute_with_zne(circuit, executor)
-    
+    mitigated_result = zne.execute_with_zne(circuit, executor)
+
     print(f"Error without mitigation: {abs(exact_result - noisy_result):.{3}}")
     print(f"Error with mitigation (ZNE): {abs(exact_result - mitigated_result):.{3}}")
 
@@ -103,10 +90,10 @@ error-mitigated version.
 
 .. testcode::
 
-    from mitiq import mitigate_executor
+    from mitiq.zne import mitigate_executor
 
-    run_mitigated = mitigate_executor(executor)
-    mitigated_result = run_mitigated(circuit)
+    mitigated_executor = mitigate_executor(executor)
+    mitigated_result = mitigated_executor(circuit)
     print(round(mitigated_result, 5))
 
 .. testoutput::
@@ -137,21 +124,18 @@ error-mitigated version.
    `here <https://docs.python.org/3/library/functools.html#functools.partial>`_.
 
 
-The default implementation uses Richardson extrapolation to extrapolate the
-expectation value to the zero noise limit :cite:`Temme_2017_PRL`. Mitiq
-comes equipped with other extrapolation methods as well. Different methods of
+By default, :func:`mitiq.zne.zne.execute_with_zne` uses Richardson extrapolation
+to extrapolate the expectation value to the zero noise limit :cite:`Temme_2017_PRL`.
+Mitiq comes equipped with other extrapolation methods as well. Different methods of
 extrapolation are packaged into :class:`~mitiq.zne.inference.Factory` objects.
 It is easy to try different ones.
 
 .. testcode::
 
-    from mitiq import execute_with_zne
-    from mitiq.zne.inference import LinearFactory
-
-    fac = LinearFactory(scale_factors=[1.0, 2.0, 2.5])
-    linear_zne_result = execute_with_zne(circuit, executor, factory=fac)
-    abs_error = abs(exact_result - linear_zne_result)
-    print(f"Mitigated error with linear ZNE: {abs_error:.{3}}")
+    fac = zne.inference.LinearFactory(scale_factors=[1.0, 2.0, 2.5])
+    linear_zne_result = zne.execute_with_zne(circuit, executor, factory=fac)
+    error = abs(exact_result - linear_zne_result)
+    print(f"Mitigated error with linear ZNE: {error:.{3}}")
 
 .. testoutput::
 
@@ -174,7 +158,7 @@ and how to create your own :ref:`here <guide_zne_factory>`.
 
 Another key step in zero-noise extrapolation is to choose how your circuit is
 transformed to scale the noise. You can read more about the noise scaling
-methods built into ``mitiq`` and how to create your
+methods built into Mitiq and how to create your
 own :ref:`here <guide_zne_folding>`.
 
 .. _qiskit_getting_started:
@@ -191,43 +175,36 @@ but you could also use a QPU.
 .. testcode::
 
     import qiskit
-    from qiskit import QuantumCircuit
 
-    # Noise simulation packages
+    # For noisy simulation.
     from qiskit.providers.aer.noise import NoiseModel
     from qiskit.providers.aer.noise.errors.standard_errors import depolarizing_error
 
-    # 0.1% depolarizing noise
-    QISKIT_NOISE = 0.001
 
-    QISKIT_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
+    backend = qiskit.Aer.get_backend("qasm_simulator")
 
-    def qs_noisy_simulation(circuit: QuantumCircuit, shots: int = 4096) -> float:
+    def qiskit_executor(circuit: qiskit.QuantumCircuit, shots: int = 4096) -> float:
         """Runs the quantum circuit with a depolarizing channel noise model at
         level NOISE.
 
         Args:
-            circuit (qiskit.QuantumCircuit): Ideal quantum circuit.
-            shots (int): Number of shots to run the circuit
-                         on the back-end.
+            circuit: Single-qubit quantum circuit to execute.
+            shots: Number of shots to run the circuit on the back-end.
 
         Returns:
-            expval: expected values.
+            The ground state probability of the single-qubit circuit.
         """
-        # initialize a qiskit noise model
+        # Use a depolarizing noise model.
         noise_model = NoiseModel()
-
-        # we assume a depolarizing error for each
-        # gate of the standard IBM basis
         noise_model.add_all_qubit_quantum_error(
-            depolarizing_error(QISKIT_NOISE, 1),
+            depolarizing_error(0.001, 1),
             ["u1", "u2", "u3"],
         )
 
         # execution of the experiment
         job = qiskit.execute(
             circuit,
-            backend=QISKIT_SIMULATOR,
+            backend,
             basis_gates=["u1", "u2", "u3"],
             # we want all gates to be actually applied,
             # so we skip any circuit optimization
@@ -255,27 +232,29 @@ We can then use this backend for our mitigation.
     _ = circ.measure(0, 0)
 
     exact = 1
-    unmitigated = qs_noisy_simulation(circ)
-    mitigated = execute_with_zne(circ, qs_noisy_simulation)
+    unmitigated = qiskit_executor(circ)
+    mitigated = execute_with_zne(circ, qiskit_executor)
 
     # The mitigation should improve the result.
     assert abs(exact - mitigated) < abs(exact - unmitigated)
 
-Note that we don't need to even redefine factories for different stacks. Once
-you have a :class:`~mitiq.zne.inference.Factory` it can be used with different front and backends.
+Note that :class:`~mitiq.zne.inference.Factory`'s are only used for fitting
+classical data and are completely frontend/backend agnostic.
 
-Error Mitigation with Probabilistic Error Cancellation
-------------------------------------------------------
+.. _pec_getting_started:
 
-In *Mitiq*, it is very easy to switch between different error mitigation methods.
+Probabilistic Error Cancellation
+--------------------------------
 
-For example, we can implement Probabilistic Error Cancellation (PEC) by using the same execution function (``executor``)
-and the same Cirq circuit (``circuit``) that we have already defined in the section
-:ref:`Multi-platform Framework <multi_platform_framework>`.
+The workflow for probabilistic error cancellation is very similar to that of zero-noise extrapolation.
+In particular, we can use Probabilistic Error Cancellation (PEC) with the
+same execution function (``executor``) and the same Cirq circuit (``circuit``) that
+we have already defined in the :ref:`General Workflow <multi_platform_framework>` section.
 
-PEC requires a good knowledge of the noise model and of the noise strength acting on the system.
-In particular for each operation of the circuit, we need to build a quasi-probability representation of the 
-ideal unitary gate expanded in a basis of noisy implementable operations. For more details behind the theory of PEC see
+PEC requires a good knowledge of the noise model and of the noise strength acting
+on the system. In particular for each operation of the circuit, we need to build
+a quasi-probability representation of the ideal unitary gate expanded in a basis
+of noisy implementable operations. For more details behind the theory of PEC see
 the :ref:`Probabilistic Error Cancellation <guide_qem_pec>` section.
 
 In our simple case, ``circuit`` corresponds to the repetition of the same X gate,
@@ -286,8 +265,8 @@ whose representation in the presence of depolarizing noise can be obtained as fo
     from mitiq.pec import represent_operation_with_local_depolarizing_noise
 
     x_representation = represent_operation_with_local_depolarizing_noise(
-        ideal_operation=Circuit(X(qubit)), 
-        noise_level=NOISE_LEVEL,
+        ideal_operation=cirq.Circuit(cirq.X(cirq.LineQubit(0))),
+        noise_level=0.01,
     )
 
     print(x_representation)
@@ -296,25 +275,33 @@ whose representation in the presence of depolarizing noise can be obtained as fo
 
     0: ───X─── = 1.010*0: ───X───-0.003*0: ───X───X───-0.003*0: ───X───Y───-0.003*0: ───X───Z───
 
+.. note::
+
+    Note that we use the same ``noise_level`` in the call to
+    ``represent_operation_with_local_depolarizing_noise`` that we use for the
+    noisy simulator (i.e., in the ``execute`` function). For this method of getting
+    operation representations, it is important to provide a good estimate of
+    the noise level so the representations are faithful.
+
+
 The result above is an :class:`~mitiq.pec.types.types.OperationRepresentation` object which contains
 the information for representing the ideal operation X (left-hand-side of the printed output)
-as a linear combination of noisy operations (right-hand-side of the printed output). 
+as a linear combination of noisy operations (right-hand-side of the printed output).
 
-We can now implement PEC by importing the function :func:`~mitiq.pec.pec.execute_with_pec` from the 
+We can now implement PEC by importing the function :func:`~mitiq.pec.pec.execute_with_pec` from the
 :mod:`~mitiq.pec.pec` module.
 
 .. testcode::
 
-    from mitiq.pec import execute_with_pec
+    from mitiq import pec
 
-    SEED = 0
     exact_result = 1
     noisy_result = executor(circuit)
-    pec_result = execute_with_pec(
+    pec_result = pec.execute_with_pec(
         circuit,
         executor,
         representations=[x_representation],
-        random_state=SEED,
+        random_state=0,
     )
 
     print(f"Error without mitigation: {abs(exact_result - noisy_result):.{3}}")

@@ -108,7 +108,16 @@ saves a lot of time by removing the need for style nitpicks in PR review. We onl
 default behavior in one category: we choose to use a line length of 79 rather than the Black
 default of 88 (this is configured in the [`pyproject.toml`](https://github.com/unitaryfund/mitiq/blob/master/pyproject.toml) file).
 
-### Code of conduct
+## Proposing a new feature to Mitiq
+
+If you are interested in adding a larger new feature or functionality to Mitiq, please check out our
+Mitq enhancement proposal (MEP) template `docs/mep/0000-feature-proposal-TEMPLATE.md`. To help facilitate
+discussion about the feature you would like to add, make a copy of the template and increment the proposal
+number and change `feature-proposal-TEMPLATE` to a short description of what you are proposing.
+Please fill out any relevant sections of that template as best you can and we can discuss in 
+both PR threads as well as on the [discord](https://discord.unitary.fund).
+
+## Code of conduct
 Mitiq development abides to the [Contributors' Covenant](https://mitiq.readthedocs.io/en/latest/code_of_conduct.html).
 
 [makefile]: https://github.com/unitaryfund/mitiq/blob/master/Makefile

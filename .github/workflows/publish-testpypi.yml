@@ -1,0 +1,50 @@
+# This workflow will upload a Python Package using Twine when a release is created
+# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
+
+name: Nightly Upload to Test PyPI
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out mitiq
+      uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        make install requirements
+        pip install setuptools wheel twine
+    - name: Build and publish
+      env:
+        TWINE_USERNAME: ${{ secrets.TESTPYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.TESTPYPI_PASSWORD }}
+      run: |
+        python setup.py sdist bdist_wheel
+        twine upload --repository testpypi dist/*
+  
+  # TODO: Need a way to get the version number from previous step
+  # download-test:
+    # runs-on: ubuntu-latest
+    # steps:
+    # - name: Check out mitiq
+      # uses: actions/checkout@v2
+    # - name: Set up Python
+      # uses: actions/setup-python@v2
+      # with:
+        # python-version: 3.8
+    # - name: Install Mitiq
+    # The ``--extra-index-url`` is necessary since otherwise ``TestPyPI``  would be
+    # looking for the required dependencies therein, but we want it to install them
+    # from the real PyPI channel.
+    #   run: |
+    #     pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.python.org/simple/ mitiq==x.y.z
