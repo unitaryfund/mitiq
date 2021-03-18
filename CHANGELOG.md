@@ -12,8 +12,8 @@
 
 ### All Changes
 
-- Replace Qiskit utils with Qiskit executors from docs  (@pchung39 & @aaron-robertson, gh-379)
-- Add qiskit executor example for exact density matrix simulation with depolarizing noise (@aaron-robertson gh-269)
+- Add qiskit executor example for exact density matrix simulation with depolarizing noise (@aaron-robertson, gh-574)
+- Replace Qiskit utils with Qiskit executors from docs  (@pchung39, @aaron-robertson, gh-584)
 
 ## Version 0.6.0 (March 1st, 2021)
 
