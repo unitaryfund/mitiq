@@ -21,6 +21,7 @@ In particular we are interested in investigating how Mitiq can help reduce error
 
 +++
 
+
 ## The MaxCut problem
 
 +++
@@ -507,3 +508,9 @@ mitiq.about()
 [4] [MaxCut tutorial in PyQuil.](https://grove-docs.readthedocs.io/en/latest/qaoa.html)
 
 [5] [MaxCut tuturial in Cirq.](https://quantumai.google/cirq/tutorials/qaoa)
+
+
+```{code-cell} ipython3
+mitiq.about()
+```
+

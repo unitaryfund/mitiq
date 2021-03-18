@@ -14,12 +14,13 @@
 
 - Add qiskit executor example for exact density matrix simulation with depolarizing noise (@aaron-robertson gh-269)
 - Add qiskit and cirq executor examples gifs to readme (@nathanshammah, gh-587)
+- Fix mitiq.about() qiskit version (@aaron-robertson, gh-595)
 - Correct minor typo in documentation of error mitigation guide (@purva-thakre, gh-585)
 - Add comment for version information code cell in docs (@purva-thakre, gh-596)
 
-
-
 ## Version 0.6.0 (March 1st, 2021)
+
+- [Bug Fix] Examples (notebooks) in the online documentation now have output code cells. (@andreamari, gh-576).
 
 ### Summary
 
