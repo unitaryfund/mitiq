@@ -1,19 +1,78 @@
 # Changelog
 
-[//]: # " ## Development 0.X.Ydev (Month DDth, YYYY)"
-[//]: # " ## (Future) Version 0.1.1 (Date)"
-[//]: # " ### Changes"
-[//]: # " - **MAJOR FEATURE**: New integration."
-[//]: # " - Improve something."
-[//]: # " - [Bug Fix]"
-[//]: # " - Fix the bug."
+% # " ## Development 0.X.Ydev (Month DDth, YYYY)"
+% # " ## (Future) Version 0.1.1 (Date)"
+% # " ### Changes"
+% # " - **MAJOR FEATURE**: New integration."
+% # " - Improve something."
+% # " - [Bug Fix]"
+% # " - Fix the bug."
 
-## Version 0.5.0 (In Development)
+## Version 0.7.0 (In Development)
 
 ### All Changes
+
+- Add qiskit executor example for exact density matrix simulation with depolarizing noise (@aaron-robertson gh-269)
+- Add qiskit and cirq executor examples gifs to readme (@nathanshammah, gh-587)
+- Fix mitiq.about() qiskit version (@aaron-robertson, gh-595)
+
+## Version 0.6.0 (March 1st, 2021)
+
+- [Bug Fix] Examples (notebooks) in the online documentation now have output code cells. (@andreamari, gh-576).
+
+### Summary
+
+The automated workflows for builds and releases are improved and PyPI releases are now automated.
+We have more documentation on PEC and have a new tutorial on QAOA with Mitiq, as well as some miscellaneous bug fixes.
+
+### All Changes
+- Add minimal section on PEC to documentation (@nathanshammah, gh-564)
+
+- Improve CI and release/patch workflow and documentation (@crazy4pi314 gh-566).
+- Adding a Mitiq Enhancement Proposal template and process (@crazy4pi314 gh-563).
+- Add to the documentation papers citing Mitiq, close gh-424 (@nathanshammah gh-560).
+- Added a new tutorial where MaxCut is solved with a mitigated QAOA (@andreamari, gh-562).
+- Bumping the version of Qiskit version in `dev_requirements` (@andreamari gh-554)
+- Retain measurement order when folding Qiskit circuits (@rmlarose gh-557)
+- Standardize and touch up docs (@rmlarose gh-553)
+- Adding make doc-clean command (@crazy4pi314 gh-549)
+- Fix and refactor RB circuits function (@rmlarose gh-539)
+- Improve GateOperation simplification in exponents (@rmlarose gh-541)
+
+## Version 0.5.0 (February 8th, 2021)
+
+### Summary
+
+The implementation of Probabilistic Error Cancellation is now multi-platform and
+documented in the docs (for the moment only in the *Getting Started* section).
+A new infrastructure based on [MyST](https://myst-parser.readthedocs.io/en/stable/)
+can now be used for writing the documentation and, in particular, for adding new examples
+in the *Mitiq Examples* section.
+
+### All Changes
+
+- Adding documentation section for examples, support for Jyupyter notebooks (@crazy4pi314, gh-509).
+- Add minimal documentation for PEC in the Getting Started (@andreamari, gh-532).
+- Optionally return a dictionary with all pec data in execute_with_pec (@andreamari, gh-518).
+- Added local_depolarizing_representations and Choi-based tests (@andreamari, gh-502).
+- Add multi-platform support for PEC (@rmlarose, gh-500).
+- Added new `plot_data` and `plot_fit` methods for factories(@crazy4pi314 @elmandouh, gh-333).
+- Fixes random failure of PEC sampling test(@rmlarose, gh-481).
+- Exact copying of shell commands, update make target for pdf and update development version(@rmlarose, gh-469).
 - Add a new FakeNodesFactory class based on an alternative interpolation method (@elmandouh, gh-444).
+- Add parameter calibration method to find base noise for parameter noise (@yhindy, gh-411).
 - Remove duplication of the reduce method in every (non-adaptive) factory (@elmandouh, gh-470).
 - Add a new ExpBayesFactory class based on Bayesian Inference (@elmandouh, gh-471).
+
+## Version 0.4.1 (January 12th, 2021)
+
+### Summary
+
+This release fixes a bug in the docs.
+
+### All Changes
+
+- [Bug Fix] Ensure code is tested in IBMQ guide and adds a doctest target in Makefile(@rmlarose, gh-488)
 
 ## Version 0.4.0 (December 6th, 2020)
 

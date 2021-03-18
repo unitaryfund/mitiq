@@ -64,11 +64,16 @@ def _simplify_circuit_exponents(circuit: Circuit) -> None:
         simplified_operations = []
         # Iterate over operations in moment
         for op in moment:
-            assert isinstance(op, GateOperation)
+
+            if not isinstance(op, GateOperation):
+                simplified_operations.append(op)
+                continue
+
             if isinstance(op.gate, EigenGate):
                 simplified_gate: Gate = _simplify_gate_exponent(op.gate)
             else:
                 simplified_gate = op.gate
+
             simplified_operation = op.with_gate(simplified_gate)
             simplified_operations.append(simplified_operation)
         # Mutate the input circuit

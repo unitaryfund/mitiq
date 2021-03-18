@@ -33,6 +33,11 @@ dist:
 docs:
 	make -C docs html
 
+.PHONY: docs-clean
+docs-clean:
+	make -C docs clean
+	make -C docs html
+
 .PHONY: doctest
 doctest:
 	make -C docs doctest
@@ -43,7 +48,7 @@ format:
 
 .PHONY: install
 install:
-	pip install -e .
+	pip install -e .[development]
 
 .PHONY: pdf
 pdf:
@@ -55,7 +60,7 @@ requirements: requirements.txt
 
 .PHONY: test
 test:
-	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/benchmarks mitiq/pec mitiq/tests mitiq/zne
+	pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/benchmarks mitiq/pec mitiq/tests mitiq/zne
 
 .PHONY: test-pyquil
 test-pyquil:
@@ -67,4 +72,4 @@ test-qiskit:
 
 .PHONY: test-all
 test-all:
-	pytest --cov=mitiq --cov-report=term --cov-report=xml
+	pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml

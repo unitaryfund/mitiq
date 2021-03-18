@@ -15,14 +15,13 @@
 
 """High-level probabilistic error cancellation tools."""
 
-from typing import Optional, Callable, Union, Tuple
+from typing import Optional, Callable, List, Union, Tuple, Dict, Any
 import warnings
 
 import numpy as np
 
 from mitiq import generate_collected_executor, QPROGRAM
-from mitiq.pec.utils import DecompositionDict
-from mitiq.pec.sampling import sample_circuit
+from mitiq.pec import sample_circuit, OperationRepresentation
 
 
 class LargeSampleWarning(Warning):
@@ -41,14 +40,14 @@ _LARGE_SAMPLE_WARN = (
 def execute_with_pec(
     circuit: QPROGRAM,
     executor: Callable,
-    decomposition_dict: DecompositionDict,
+    representations: List[OperationRepresentation],
     precision: float = 0.03,
     num_samples: Optional[int] = None,
     force_run_all: bool = True,
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
-) -> Union[float, Tuple[float, float]]:
-    """Evaluates the expectation value associated to the input circuit
+) -> Union[float, Tuple[float, Dict[str, Any]]]:
+    r"""Evaluates the expectation value associated to the input circuit
     using probabilistic error cancellation (PEC) [Temme2017]_ [Endo2018]_.
 
     This function implements PEC by:
@@ -64,9 +63,8 @@ def execute_with_pec(
         circuit: The input circuit to execute with error-mitigation.
         executor: A function which executes a circuit (sequence of circuits)
             and returns an expectation value (sequence of expectation values).
-        decomposition_dict: The decomposition dictionary containing the
-            quasi-probability representation of the ideal operations (those
-            which are part of the input circuit).
+        representations: Representations (basis expansions) of each operation
+            in the input circuit.
         precision: The desired estimation precision (assuming the observable
             is bounded by 1). The number of samples is deduced according
             to the formula (one_norm / precision) ** 2, where 'one_norm'
@@ -79,22 +77,17 @@ def execute_with_pec(
             uniqueness, else a minimal unique set is executed.
         random_state: Seed for sampling circuits.
         full_output: If False only the average PEC value is returned.
-            If True an estimate of the associated error is returned too.
+            If True a dictionary containing all PEC data is returned too.
 
     Returns:
         pec_value: The PEC estimate of the ideal expectation value associated
             to the input circuit.
-        pec_error: The estimated error between the mitigated 'pec_value' and
-            the actual ideal expectation value. This is estimated as the ratio
-            pec_std / sqrt(num_samples), where 'pec_std' is the
-            standard deviation of the PEC samples, i.e., the square root of
-            the mean squared deviation of the sampled values from 'pec_value'.
-            This is returned only if 'full_output' is True.
-
-    .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
-        "Error mitigation for short-depth quantum circuits,"
-        *Phys. Rev. Lett.* **119**, 180509 (2017),
-        (https://arxiv.org/abs/1612.02058).
+        pec_data: A dictionary which contains all the raw data involved in the
+            PEC process (including the PEC estimation error). The error is
+            estimated as pec_std / sqrt(num_samples), where 'pec_std' is the
+            standard deviation of the PEC samples, i.e., the square root of the
+            mean squared deviation of the sampled values from 'pec_value'.
+            This is returned only if ``full_output`` is ``True``.
 
     .. [Endo2018] : Suguru Endo, Simon C. Benjamin, Ying Li,
         "Practical Quantum Error Mitigation for Near-Future Applications"
@@ -108,14 +101,14 @@ def execute_with_pec(
     if isinstance(random_state, int):
         random_state = np.random.RandomState(random_state)
 
-    # Get the 1-norm of the circuit quasi-probability representation
-    _, _, norm = sample_circuit(circuit, decomposition_dict)
-
     if not (0 < precision <= 1):
         raise ValueError(
             "The value of 'precision' should be within the interval (0, 1],"
             f" but precision is {precision}."
         )
+
+    # Get the 1-norm of the circuit quasi-probability representation
+    _, _, norm = sample_circuit(circuit, representations)
 
     # Deduce the number of samples (if not given by the user)
     if not isinstance(num_samples, int):
@@ -130,7 +123,7 @@ def execute_with_pec(
 
     for _ in range(num_samples):
         sampled_circuit, sign, _ = sample_circuit(
-            circuit, decomposition_dict, random_state
+            circuit, representations, random_state
         )
         sampled_circuits.append(sampled_circuit)
         signs.append(sign)
@@ -146,8 +139,20 @@ def execute_with_pec(
 
     pec_value = np.average(unbiased_estimators)
 
-    if full_output:
-        pec_error = np.std(unbiased_estimators) / np.sqrt(num_samples)
-        return pec_value, pec_error
+    if not full_output:
+        return pec_value
 
-    return pec_value
+    # Build dictionary with additional results and data
+    pec_data: Dict[str, Any] = {}
+
+    pec_data = {
+        "num_samples": num_samples,
+        "precision": precision,
+        "pec_value": pec_value,
+        "pec_error": np.std(unbiased_estimators) / np.sqrt(num_samples),
+        "unbiased_estimators": unbiased_estimators,
+        "measured_expectation_values": exp_values,
+        "sampled_circuits": sampled_circuits,
+    }
+
+    return pec_value, pec_data

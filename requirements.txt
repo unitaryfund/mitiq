@@ -1,4 +1,4 @@
-numpy~=1.18.1
+numpy~=1.20.1
 scipy~=1.4.1
 cirq==0.10.0.dev20201203012958
 pymc3~=3.9.3
@@ -28,3 +28,4 @@ sphinx-autodoc-typehints~=1.10.3
 m2r~=0.2.1
 pybtex~=0.22.2
 pydata-sphinx-theme~=0.3.1
+cirq~=0.10.0
