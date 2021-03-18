@@ -1717,38 +1717,49 @@ class ExpBayesFactory(BatchedFactory):
             data of an instantiated Factory object, the bound method
             ".reduce()" should be called instead.
         """
+
         with pm.Model():
             """
-            We assumme that the priors for the model parameters is a uniform
-            distribution with an upper limit 1 and a lower limit 0,
-            except for b with a lower limit -1.
+            We assumme that the priors for the model parameters are normally
+            distributed, while the standard deviation is half normal.
             """
-            a = pm.Uniform('a', 0, 1)
-            b = pm.Uniform('b', -1, 1)
-            c = pm.Uniform('c', 0, 1)
-
-            # Noise parameter
-            eps = pm.Uniform('eps', 0, 0.5)
+            a = pm.Normal('a', 0, 5)
+            b = pm.Normal('b', 0, 5)
+            c = pm.Normal('c', 0, 5)
+            sd = pm.HalfNormal('sd', 10)
 
             pm.Normal(
                 'expval',
                 mu=ExpBayesFactory._exp_ansatz(a, b, c, scale_factors),
-                sd=eps,
+                sd=sd,
                 observed=exp_values,
             )
 
-            trace = pm.sample(target_accept=0.95)
+            trace = pm.sample(target_accept=0.95, return_inferencedata=True)
+
+        def zne_curve(scale_factor: float) -> float:
+            samples = []
+            n_samples = len(trace['a'])
+
+            for i in range(n_samples):
+                sample = ExpBayesFactory._exp_ansatz(
+                    trace['a'][i],
+                    trace['b'][i],
+                    trace['c'][i],
+                    scale_factor,
+                )
+
+                samples.append(sample)
+
+            return np.mean(samples)
 
         # Optimal model parameters:
         a = trace['a'].mean()
         b = trace['b'].mean()
         c = trace['c'].mean()
-        opt_params, zne_error = [a, b, c], trace['eps'].mean()
+        opt_params, zne_error = [a, b, c], trace['sd'].mean()
 
-        def zne_curve(scale_factor: float) -> float:
-            return ExpBayesFactory._exp_ansatz(a, b, c, scale_factor)
-
-        zne_limit = ExpBayesFactory._exp_ansatz(a, b, c, 0.0)
+        zne_limit = zne_curve(0)
         if not full_output:
             return zne_limit
 
