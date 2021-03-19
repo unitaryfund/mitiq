@@ -355,9 +355,7 @@ def _replace(
     return rz_non_cliff_selected
 
 
-def count_non_cliffords(
-    circuit: Circuit,
-) -> float:
+def count_non_cliffords(circuit: Circuit,) -> float:
     """Function to check how many non-Clifford gates are in a give circuit.
 
     Args:
@@ -379,10 +377,7 @@ def count_non_cliffords(
     return len(rz_non_cliff)
 
 
-def _is_clifford_angle(
-    ang: float,
-    tol: float = 10 ** -5,
-) -> bool:
+def _is_clifford_angle(ang: float, tol: float = 10 ** -5,) -> bool:
     """Function to check if a given angle is Clifford.
     Args:
         ang: rotation angle in the Rz gate.
