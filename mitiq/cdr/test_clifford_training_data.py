@@ -16,6 +16,9 @@ from clifford_training_data import (
     _get_arguments,
     _get_gates,
 )
+from cirq.experiments import (
+    random_rotations_between_grid_interaction_layers_circuit,
+)
 from qiskit import compiler, QuantumCircuit
 from mitiq.mitiq_qiskit.conversions import to_qiskit, from_qiskit
 
@@ -25,7 +28,10 @@ from mitiq.mitiq_qiskit.conversions import to_qiskit, from_qiskit
 CLIFFORD_ANGLES = (0.0, np.pi / 2, np.pi, (3 / 2) * (np.pi))
 
 
-def random_circuit(qubits: int, depth: int,) -> Circuit:
+def random_circuit(
+    qubits: int,
+    depth: int,
+) -> Circuit:
     """Function to generate a random quantum circuit in cirq. The circuit is
        based on the hardware efficient ansatz,
     with alternating CNOT layers with randomly selected single qubit gates in
@@ -39,15 +45,16 @@ def random_circuit(qubits: int, depth: int,) -> Circuit:
     # Get a rectangular grid of qubits.
     qubits = cirq.GridQubit.rect(qubits, 1)
     # Generates a random circuit on the provided qubits.
-    circuit = cirq.experiments.\
-        random_rotations_between_grid_interaction_layers_circuit(
-            qubits=qubits, depth=depth, seed=0
-        )
+    circuit = random_rotations_between_grid_interaction_layers_circuit(
+        qubits=qubits, depth=depth, seed=0
+    )
     circuit.append(cirq.measure(*qubits, key="z"))
     return circuit
 
 
-def qiskit_circuit_transpilation(circ: QuantumCircuit,) -> QuantumCircuit:
+def qiskit_circuit_transpilation(
+    circ: QuantumCircuit,
+) -> QuantumCircuit:
     """Decomposes qiskit circuit object into Rz, Rx(pi/2) (sx), X and CNOT \
        gates.
     Args:
@@ -160,19 +167,20 @@ def test_map_to_near_cliffords():
     method_replace_options_list = ["random", "probabilistic", "closest"]
     additional_options = {"sigma_select": 0.5, "sigma_replace": 0.5}
     non_cliffords = count_non_cliffords(circuit)
+    random_state = np.random.RandomState(1)
     for method_select in method_select_options_list:
         for method_replace in method_replace_options_list:
             projected_circuit = _map_to_near_clifford(
                 circuit,
                 fraction_non_clifford,
-                1,
+                random_state,
                 method_select,
                 method_replace,
             )[0]
             projected_circuit_with_options = _map_to_near_clifford(
                 circuit,
                 fraction_non_clifford,
-                1,
+                random_state,
                 method_select,
                 method_replace,
                 additional_options=additional_options,
@@ -208,13 +216,14 @@ def test_select():
     rz_non_cliff = angles[mask_non_cliff]
     rz_non_cliff_copy = rz_non_cliff.copy()
     sigma_select = additional_options.setdefault("sigma_select", 0.5)
+    random_state = np.random.RandomState(1)
     for method_select in method_select_options_list:
         columns_to_change = _select(
             rz_non_cliff_copy,
             fraction_non_clifford,
             method_select,
             sigma_select,
-            1,
+            random_state,
         )
         assert len(columns_to_change) == (
             non_cliffords - int(non_cliffords * fraction_non_clifford)
@@ -238,6 +247,7 @@ def test_replace():
     rz_non_cliff_copy = rz_non_cliff.copy()
     sigma_select = additional_options.setdefault("sigma_select", 0.5)
     sigma_replace = additional_options.setdefault("sigma_replace", 0.5)
+    random_state = np.random.RandomState(1)
     for method_select in method_select_options_list:
         for method_replace in method_replace_options_list:
             columns_to_change = _select(
@@ -245,7 +255,7 @@ def test_replace():
                 fraction_non_clifford,
                 method_select,
                 sigma_select,
-                1,
+                random_state,
             )
             rz_non_cliff_selected = rz_non_cliff_copy[columns_to_change]
             rz_non_cliff_selected = _replace(
@@ -253,7 +263,7 @@ def test_replace():
                 method_replace,
                 sigma_select,
                 sigma_replace,
-                1,
+                random_state,
             )
             assert _is_clifford_angle(rz_non_cliff_selected.all())
             assert len(rz_non_cliff_selected) == (
@@ -313,8 +323,12 @@ def test_closest_clifford():
 
 
 def test_random_clifford():
+    random_state = np.random.RandomState(1)
     for ang in CLIFFORD_ANGLES:
-        assert _random_clifford(ang) in np.array(CLIFFORD_ANGLES).tolist()
+        assert (
+            _random_clifford(ang, random_state)
+            in np.array(CLIFFORD_ANGLES).tolist()
+        )
 
 
 def test_angle_to_probabilities():
@@ -325,8 +339,11 @@ def test_angle_to_probabilities():
 
 
 def test_probabilistic_angles_to_clifford():
+    random_state = np.random.RandomState(1)
     for sigma in np.linspace(0.1, 2, 20):
-        a = _probabilistic_angle_to_clifford(CLIFFORD_ANGLES, sigma)
+        a = _probabilistic_angle_to_clifford(
+            CLIFFORD_ANGLES, sigma, random_state
+        )
         for ang in a:
             for cliff in CLIFFORD_ANGLES:
                 if ang == cliff:
