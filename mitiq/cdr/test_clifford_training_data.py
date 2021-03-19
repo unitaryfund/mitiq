@@ -2,7 +2,7 @@ import cirq
 from cirq.circuits import Circuit
 from random import randint, uniform
 import numpy as np
-from .clifford_training_data import (
+from clifford_training_data import (
     _is_clifford_angle,
     _map_to_near_clifford,
     _closest_clifford,
