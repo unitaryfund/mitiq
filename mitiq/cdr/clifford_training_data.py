@@ -1,3 +1,17 @@
+# Copyright (C) 2020 Unitary Fund
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import cirq
 from cirq.circuits import Circuit
 from numpy.random import choice, randint
@@ -22,10 +36,9 @@ def generate_training_circuits(
     training data.
 
     Args:
-        circuit: A circuit of interest.
-        num_training_circuits: Number of circuits in the returned training set,
-                               assumes already compiled into gate set
-                               (Rz, Rx, Z, X, CNOT)
+        circuit: A circuit of interest, assumes already compiled into gate set
+                               (Rz, Rx, Z, X, CNOT).
+        num_training_circuits: Number of circuits in the returned training set.
         fraction_non_clifford: The (approximate) fraction of non-Clifford
                                gates in each returned circuit.
         method_select: option to define the way in which the non-Clifford
@@ -35,8 +48,8 @@ def generate_training_circuits(
                               gates are replace with a Clifford gate can take
                               strings 'random', 'probabilistic' or 'closest'.
         random_state: Seed for sampling.
-        additional_options: dictionary with the following keys and values:
-            'sigma_select': float -  postitive variable which defines the width of
+        additional_options: sequence of key = value pairs with keys defined as:
+            'sigma_select': float -  postitive variable definined width of
                                      probability distribution used in choosing
                                      which non-Cliffords to replace, only has
                                      an impact if
@@ -159,7 +172,7 @@ def _map_to_near_clifford(
     # get the operations from the circuit and find the non-cliff angles:
     operations = np.array(list(circuit.all_operations()))
     positions = np.linspace(1, len(operations), len(operations))
-    gates = _get_gates(operations)
+    gates = np.array([op.gate for op in operations])
     mask = np.array(
         [isinstance(gate, cirq.ops.common_gates.ZPowGate) for gate in gates]
     )
@@ -366,7 +379,7 @@ def count_non_cliffords(circuit: Circuit,) -> float:
         number of non-Clifford gates in the given circuit.
     """
     operations = np.array(list(circuit.all_operations()))
-    gates = _get_gates(operations)
+    gates = np.array([op.gate for op in operations])
     mask = np.array(
         [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
     )
