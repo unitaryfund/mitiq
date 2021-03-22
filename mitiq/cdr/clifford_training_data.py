@@ -29,8 +29,8 @@ def generate_training_circuits(
         fraction_non_clifford: The (approximate) fraction of non-Clifford
                                gates in each returned circuit.
         method_select: option to define the way in which the non-Clifford
-                              gates to replace with Cliffords are chosen can
-                              take strings 'random' or 'probabilistic'.
+                              gates to replace with Cliffords are chosen.
+                              Options are 'random' or 'probabilistic'.
         method_replace: str = option to define the way the chosen non-Clifford
                               gates are replace with a Clifford gate can take
                               strings 'random', 'probabilistic' or 'closest'.
