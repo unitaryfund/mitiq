@@ -36,7 +36,7 @@ def generate_training_circuits(
                               strings 'random', 'probabilistic' or 'closest'.
         random_state: Seed for sampling.
         additional_options: dictionary with the following keys and values:
-            'sigma_select': float -  postitive variable definined width of
+            'sigma_select': float -  postitive variable which defines the width of
                                      probability distribution used in choosing
                                      which non-Cliffords to replace, only has
                                      an impact if
