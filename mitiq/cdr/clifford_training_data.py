@@ -41,7 +41,7 @@ def generate_training_circuits(
                                      which non-Cliffords to replace, only has
                                      an impact if
                                      method_select = 'probabilistic'.
-            'sigma_replace': float - positive variable definined width of
+            'sigma_replace': float - positive variable which defines the width of
                                      probability distribution used in choosing
                                      which Clifford to replace the
                                      non-Clifford with, only has an impact if
