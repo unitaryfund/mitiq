@@ -161,7 +161,7 @@ def _map_to_near_clifford(
     positions = np.linspace(1, len(operations), len(operations))
     gates = _get_gates(operations)
     mask = np.array(
-        [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
+        [isinstance(gate, cirq.ops.common_gates.ZPowGate) for gate in gates]
     )
     r_z_gates = operations[mask]
     r_z_positions = positions[mask]
