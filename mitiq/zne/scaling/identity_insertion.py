@@ -33,17 +33,18 @@ from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary
 
 # Import functions from different parts of return_mitiq
 
-# add comment about what QPORGRAM does
+# typing is used to specify what should be imprted based on installed packages
+# QPROGRAM is used to specify the type of input circuit - cirq, pyquil or qiskit
 from mitiq._typing import QPROGRAM
 
-# add comment about what converter does
+# converter is a decorator used to convert a circuit to a different type
 from mitiq.conversions import converter
 
-# import function defined for unitary folding
+# import functions defined for unitary folding
 from mitiq.zne.scaling.folding import (
-    _is_measurement,
-    _pop_measurements,
-    _append_measurements,
+    _is_measurement, # checks if a gate is a measurement gate
+    _pop_measurements, # a measurement gate is removed from the circuit
+    _append_measurements, # measurement gate is moved to the end of the circuit
     _cirq_gates_to_string_keys,
 )
 
