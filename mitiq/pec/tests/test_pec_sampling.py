@@ -278,13 +278,9 @@ def test_sample_circuit_choi():
     ideal_choi = _circuit_to_choi(ideal_circ)
     noisy_choi = _operation_to_choi(noisy_circuit)
 
-    rep_list = []
-    for op in ideal_circ.all_operations():
-        rep_list.append(
-            represent_operation_with_local_depolarizing_noise(
-                cirq.Circuit(op), BASE_NOISE,
-            )
-        )
+    rep_list = represent_operations_in_circuit_with_local_depolarizing_noise(
+        ideal_circuit=ideal_circ, noise_level=BASE_NOISE,
+    )
 
     choi_unbiased_estimates = []
     rng = np.random.RandomState(1)

@@ -262,8 +262,7 @@ def represent_operations_in_circuit_with_global_depolarizing_noise(
             continue
         representations.append(
             represent_operation_with_global_depolarizing_noise(
-                Circuit(op),
-                noise_level,
+                Circuit(op), noise_level,
             )
         )
     # TODO: if gh-516 will be fixed we may return native representations.
@@ -305,8 +304,7 @@ def represent_operations_in_circuit_with_local_depolarizing_noise(
             continue
         representations.append(
             represent_operation_with_local_depolarizing_noise(
-                Circuit(op),
-                noise_level,
+                Circuit(op), noise_level,
             )
         )
     # TODO: if gh-516 will be fixed we may return native representations.

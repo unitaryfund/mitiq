@@ -37,8 +37,7 @@ from mitiq.pec.representations import (
 
 # Noisy representations of Pauli and CNOT operations for testing.
 def get_pauli_and_cnot_representations(
-    base_noise: float,
-    qubits: Optional[List[cirq.Qid]] = None,
+    base_noise: float, qubits: Optional[List[cirq.Qid]] = None,
 ) -> List[OperationRepresentation]:
 
     if qubits is None:
@@ -59,8 +58,7 @@ def get_pauli_and_cnot_representations(
 
     # Generate all representations
     return represent_operations_in_circuit_with_local_depolarizing_noise(
-        ideal_circuit=cirq.Circuit(ideal_operations),
-        noise_level=base_noise,
+        ideal_circuit=cirq.Circuit(ideal_operations), noise_level=base_noise,
     )
 
 
