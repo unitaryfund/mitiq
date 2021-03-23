@@ -11,7 +11,7 @@ jobs:
   deploy:
 
     runs-on: ubuntu-latest
-
+    if: github.repository_owner == 'unitaryfund'
     steps:
     - name: Check out mitiq
       uses: actions/checkout@v2

@@ -11,7 +11,7 @@ jobs:
   deploy:
 
     runs-on: ubuntu-latest
-
+    if: github.repository_owner == 'unitaryfund'
     steps:
     - name: Check out mitiq
       uses: actions/checkout@v2
@@ -31,7 +31,7 @@ jobs:
       run: |
         python setup.py sdist bdist_wheel
         twine upload --repository testpypi dist/*
-  
+
   # TODO: Need a way to get the version number from previous step
   # download-test:
     # runs-on: ubuntu-latest
