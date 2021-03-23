@@ -1,9 +1,8 @@
 ---
 Author: Purva Thakre
-Status: <**Draft** | Active | Accepted | Deferred | Rejected | Withdrawn | Final | Superseded>
-Type: <Standards Track | Process>
+Status: Draft
 Created: 2021-03-16
-Resolution: <url> (required for Accepted | Rejected | Withdrawn)
+Resolution: <url>
 ---
 
 # Mitiq Enhancement Proposal 0002 — Full Twirling and Reduced Twirling
