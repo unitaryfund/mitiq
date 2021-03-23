@@ -47,6 +47,11 @@ from mitiq.zne.scaling.folding import (
     _append_measurements,
     # measurement gate is moved to the end of the circuit
     _cirq_gates_to_string_keys,
+    _default_weight,
+    # if weight of a gate is not specified, default value specifies it
+    _get_weight_for_gate,
+    # checks if gate weight is specified, if not then a default value is given
+    _compute_weight, # calculates weight of a circuit
 )
 
 # Define empty class when identity scaling cannot be performed on  a gate
@@ -83,3 +88,16 @@ def _check_scalable(circuit: Circuit) -> None:
             "Circuit contains non-unitary channels which are not terminal "
             "measurements and cannot be scaled by inserting identity gates."
         )
+
+# Note - this function has identical code to get_num_to_scale. Equation
+# for value being returned is changed in order to account for only 1 Identity
+# being inserted instead of a gate and its hermitian.
+def _get_num_to_scale(scale_factor: float, ngates: int) -> int:
+    """Returns the number of gates to insert to achieve the desired
+    (approximate) scale factor.
+
+    Args:
+        scale_factor: Floating point value to scale the circuit by.
+        ngates: Number of gates in the circuit to fold.
+    """
+    return int(round(ngates * (scale_factor - 1.0)))
