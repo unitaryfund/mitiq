@@ -42,9 +42,10 @@ from mitiq.conversions import converter
 
 # import functions defined for unitary folding
 from mitiq.zne.scaling.folding import (
-    _is_measurement, # checks if a gate is a measurement gate
-    _pop_measurements, # a measurement gate is removed from the circuit
-    _append_measurements, # measurement gate is moved to the end of the circuit
+    _is_measurement,  # checks if a gate is a measurement gate
+    _pop_measurements,  # a measurement gate is removed from the circuit
+    _append_measurements,
+    # measurement gate is moved to the end of the circuit
     _cirq_gates_to_string_keys,
 )
 
@@ -56,3 +57,29 @@ class UnscalableGateError(Exception):
 # Define empty class when identity scaling cannot be performed on  a circuit
 class UnscalableCircuitError(Exception):
     pass
+
+# Note - this function has identical code to check_foldable. Error messages
+# have been edited to raise error for identity insertion.
+def _check_scalable(circuit: Circuit) -> None:
+    """Raises an error if identity gates cannot be inserted.
+
+    Args:
+        circuit: Checks whether this circuit is able to be scaled by identity.
+
+    Raises:
+        UnscalableCircuitError:
+            * If the circuit has intermediate measurements.
+            * If the circuit has non-unitary channels which are not terminal
+              measurements.
+    """
+    if not circuit.are_all_measurements_terminal():
+        raise UnscalableCircuitError(
+            "Circuit contains intermediate measurements and cannot be scaled "
+            "by inserting identity gates."
+        )
+
+    if not has_unitary(circuit):
+        raise UnscalableCircuitError(
+            "Circuit contains non-unitary channels which are not terminal "
+            "measurements and cannot be scaled by inserting identity gates."
+        )
