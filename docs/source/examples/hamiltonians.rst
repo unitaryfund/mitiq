@@ -5,7 +5,7 @@ Defining Hamiltonians as Linear Combinations of Pauli Strings
 *************************************************************
 
 This tutorial shows an example of using Hamiltonians defined as :class:`~cirq.PauliSum` objects or similar objects in other
-supported frontends. The usage of these Hamiltonian-like objects does not change the interface with ``mitiq``, but we
+supported frontends. The usage of these Hamiltonian-like objects does not change the interface with Mitiq, but we
 show an example for users who prefer these constructions.
 
 Specifically, in this tutorial we will mitigate the expectation value of the Hamiltonian
@@ -63,7 +63,7 @@ Note that we could have created the Hamiltonian by directly defining a :class:`~
 Using the Hamiltonian in the executor
 #####################################
 
-To interface with ``mitiq``, we define an ``executor`` function which maps an input (noisy) circuit to an expectation
+To interface with Mitiq, we define an ``executor`` function which maps an input (noisy) circuit to an expectation
 value. In the code block below, we show how to define this function and return the expectation of the Hamiltonian above.
 
 .. testcode:: python
@@ -95,7 +95,7 @@ value. In the code block below, we show how to define this function and return t
 This executor inputs a Hamiltonian as well as a noise value, adds noise, then uses the
 :meth:`cirq.PauliSum.expectation_from_density_matrix` method to return the expectation value.
 
-The remaining interface is as usual with ``mitiq``. For the sake of example, we show an application mitigating the
+The remaining interface is as usual with Mitiq. For the sake of example, we show an application mitigating the
 expectation value of :math:`H` with an example ansatz at different noise levels.
 
 Example usage

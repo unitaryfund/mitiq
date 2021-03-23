@@ -42,13 +42,14 @@ def test_sample_sequence_cirq():
     circuit.append(cirq.measure(cirq.LineQubit(0)))
 
     rep = OperationRepresentation(
-        ideal=circuit, basis_expansion={
+        ideal=circuit,
+        basis_expansion={
             NoisyOperation.from_cirq(ideal=cirq.X): 0.5,
-            NoisyOperation.from_cirq(ideal=cirq.Z): -0.5
-        }
+            NoisyOperation.from_cirq(ideal=cirq.Z): -0.5,
+        },
     )
 
-    for _ in range(50):
+    for _ in range(5):
         seq, sign, norm = sample_sequence(circuit, representations=[rep])
         assert isinstance(seq, cirq.Circuit)
         assert sign in {1, -1}
@@ -73,7 +74,7 @@ def test_sample_sequence_qiskit():
         ideal=circuit, basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
     )
 
-    for _ in range(50):
+    for _ in range(5):
         seq, sign, norm = sample_sequence(circuit, representations=[rep])
         assert isinstance(seq, qiskit.QuantumCircuit)
         assert sign in {1, -1}
@@ -237,16 +238,13 @@ def test_sample_sequence_choi(gate: cirq.Gate):
     qreg = cirq.LineQubit.range(gate.num_qubits())
     ideal_op = gate.on(*qreg)
     ideal_circ = cirq.Circuit(ideal_op)
-    noisy_op_tree = (
-        [ideal_op] + [cirq.depolarize(BASE_NOISE)(q) for q in qreg]
-    )
+    noisy_op_tree = [ideal_op] + [cirq.depolarize(BASE_NOISE)(q) for q in qreg]
 
     ideal_choi = _operation_to_choi(ideal_op)
     noisy_choi = _operation_to_choi(noisy_op_tree)
 
     representation = represent_operation_with_local_depolarizing_noise(
-        ideal_operation=ideal_circ,
-        noise_level=BASE_NOISE,
+        ideal_circ, BASE_NOISE,
     )
 
     choi_unbiased_estimates = []
@@ -280,10 +278,13 @@ def test_sample_circuit_choi():
     ideal_choi = _circuit_to_choi(ideal_circ)
     noisy_choi = _operation_to_choi(noisy_circuit)
 
-    rep_list = represent_operations_in_circuit_with_local_depolarizing_noise(
-        ideal_circuit=ideal_circ,
-        noise_level=BASE_NOISE,
-    )
+    rep_list = []
+    for op in ideal_circ.all_operations():
+        rep_list.append(
+            represent_operation_with_local_depolarizing_noise(
+                cirq.Circuit(op), BASE_NOISE,
+            )
+        )
 
     choi_unbiased_estimates = []
     rng = np.random.RandomState(1)

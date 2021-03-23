@@ -13,22 +13,22 @@ Benchmarks
 ----------
 
 MaxCut
-^^^^^^^^^^
+^^^^^^
 .. automodule:: mitiq.benchmarks.maxcut
    :members:
 
 Random Circuits
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
 .. automodule:: mitiq.benchmarks.random_circuits
    :members:
 
 Randomized Benchmarking
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.benchmarks.randomized_benchmarking
    :members:
 
 Utils
-^^^^^^^^^^
+^^^^^
 .. automodule:: mitiq.benchmarks.utils
    :members:
 
@@ -45,7 +45,7 @@ Mitiq - Qiskit
 --------------
 
 Conversions
-^^^^^^^^^^^^
+^^^^^^^^^^^
 .. automodule:: mitiq.mitiq_qiskit.conversions
    :members:
 
@@ -72,15 +72,11 @@ Sampling from a Noisy Decomposition of an Ideal Operation
 .. automodule:: mitiq.pec.sampling
    :members:
 
-Probabilistic Error Cancellation (Utilities)
+Probabilistic Error Cancellation Types
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. automodule:: mitiq.pec.utils
+.. automodule:: mitiq.pec.types.types
    :members:
 
-Utils
------
-.. automodule:: mitiq.utils
-   :members:
 
 Zero Noise Extrapolation
 ------------------------
@@ -98,4 +94,9 @@ Inference and Extrapolation: Factories
 Noise Scaling: Unitary Folding
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.zne.scaling.folding
+   :members:
+
+Noise Scaling: Parametric Calibration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.zne.scaling.parameter
    :members:

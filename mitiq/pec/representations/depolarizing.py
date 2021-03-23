@@ -82,16 +82,6 @@ def represent_operation_with_global_depolarizing_noise(
         This is possible as long as the unitary associated to the input
         QPROGRAM, followed by a single final depolarizing channel, is
         physically implementable.
-
-
-    .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
-        "Error mitigation for short-depth quantum circuits,"
-        *Phys. Rev. Lett.* **119**, 180509 (2017),
-        (https://arxiv.org/abs/1612.02058).
-
-    .. [Takagi2020] : Ryuji Takagi,
-        "Optimal resource cost for error mitigation,"
-        (https://arxiv.org/abs/2006.12509).
     """
     circ, in_type = convert_to_mitiq(ideal_operation)
 
@@ -192,8 +182,7 @@ def represent_operation_with_local_depolarizing_noise(
 
     if len(qubits) == 1:
         return represent_operation_with_global_depolarizing_noise(
-            ideal_operation,
-            noise_level,
+            ideal_operation, noise_level,
         )
 
     # The two-qubit case: tensor product of two depolarizing channels.

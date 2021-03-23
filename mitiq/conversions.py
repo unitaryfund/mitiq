@@ -129,7 +129,7 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
 def converter(
     noise_scaling_function: Callable[..., Any]
 ) -> Callable[..., Any]:
-    """Decorator for handling conversions.
+    """Decorator for handling conversions with noise scaling functions.
 
     Args:
         noise_scaling_function: Function which inputs a cirq.Circuit, modifies
@@ -140,12 +140,37 @@ def converter(
     def new_scaling_function(
         circuit: QPROGRAM, *args: Any, **kwargs: Any
     ) -> QPROGRAM:
+        # Convert to Mitiq representation.
         mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
+
+        # Scale the noise in the circuit.
+        scaled_circuit = noise_scaling_function(mitiq_circuit, *args, **kwargs)
+
         if kwargs.get("return_mitiq") is True:
-            return noise_scaling_function(mitiq_circuit, *args, **kwargs)
-        return convert_from_mitiq(
-            noise_scaling_function(mitiq_circuit, *args, **kwargs),
-            input_circuit_type,
-        )
+            return scaled_circuit
+
+        # Base conversion back to input type.
+        scaled_circuit = convert_from_mitiq(scaled_circuit, input_circuit_type)
+
+        # Keep the same register structure and measurement order with Qiskit.
+        if input_circuit_type == "qiskit":
+            from mitiq.mitiq_qiskit.conversions import (
+                _transform_registers,
+                _measurement_order,
+            )
+
+            scaled_circuit.remove_final_measurements()
+            _transform_registers(
+                scaled_circuit,
+                new_qregs=circuit.qregs,
+                new_cregs=circuit.cregs if scaled_circuit.cregs else None,
+            )
+            if circuit.cregs and not scaled_circuit.cregs:
+                scaled_circuit.add_register(*circuit.cregs)
+
+            for q, c in _measurement_order(circuit):
+                scaled_circuit.measure(q, c)
+
+        return scaled_circuit
 
     return new_scaling_function

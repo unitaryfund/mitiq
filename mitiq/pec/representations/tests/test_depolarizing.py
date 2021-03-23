@@ -97,8 +97,7 @@ def test_single_qubit_representation_norm(gate: Gate, noise: float):
     q = LineQubit(0)
     optimal_norm = single_qubit_depolarizing_overhead(noise)
     norm = represent_operation_with_global_depolarizing_noise(
-        Circuit(gate(q)),
-        noise,
+        Circuit(gate(q)), noise,
     ).norm
     assert np.isclose(optimal_norm, norm)
 
@@ -109,8 +108,7 @@ def test_two_qubit_representation_norm(gate: Gate, noise: float):
     qreg = LineQubit.range(2)
     optimal_norm = two_qubit_depolarizing_overhead(noise)
     norm = represent_operation_with_global_depolarizing_noise(
-        Circuit(gate(*qreg)),
-        noise,
+        Circuit(gate(*qreg)), noise,
     ).norm
     assert np.isclose(optimal_norm, norm)
 
@@ -119,8 +117,7 @@ def test_three_qubit_depolarizing_representation_error():
     q0, q1, q2 = LineQubit.range(3)
     with pytest.raises(ValueError):
         represent_operation_with_global_depolarizing_noise(
-            Circuit(CCNOT(q0, q1, q2)),
-            0.05,
+            Circuit(CCNOT(q0, q1, q2)), 0.05,
         )
 
 
@@ -131,8 +128,7 @@ def test_depolarizing_representation_with_choi(gate: Gate, noise: float):
     qreg = LineQubit.range(gate.num_qubits())
     ideal_choi = _operation_to_choi(gate.on(*qreg))
     op_rep = represent_operation_with_global_depolarizing_noise(
-        Circuit(gate.on(*qreg)),
-        noise,
+        Circuit(gate.on(*qreg)), noise,
     )
     choi_components = []
     for noisy_op, coeff in op_rep.basis_expansion.items():
@@ -149,15 +145,12 @@ def test_depolarizing_representation_with_choi(gate: Gate, noise: float):
 
 @pytest.mark.parametrize("noise", [0, 0.1, 0.7])
 @pytest.mark.parametrize("gate", [X, Y, Z, H, CZ, CNOT, ISWAP, SWAP])
-def test_local_depolarizing_representation_with_choi(
-    gate: Gate, noise: float
-):
+def test_local_depolarizing_representation_with_choi(gate: Gate, noise: float):
     """Tests the representation by comparing exact Choi matrices."""
     qreg = LineQubit.range(gate.num_qubits())
     ideal_choi = _operation_to_choi(gate.on(*qreg))
     op_rep = represent_operation_with_local_depolarizing_noise(
-        Circuit(gate.on(*qreg)),
-        noise,
+        Circuit(gate.on(*qreg)), noise,
     )
     choi_components = []
     for noisy_op, coeff in op_rep.basis_expansion.items():
@@ -177,8 +170,7 @@ def test_three_qubit_local_depolarizing_representation_error():
     q0, q1, q2 = LineQubit.range(3)
     with pytest.raises(ValueError):
         represent_operation_with_local_depolarizing_noise(
-            Circuit(CCNOT(q0, q1, q2)),
-            0.05,
+            Circuit(CCNOT(q0, q1, q2)), 0.05,
         )
 
 
