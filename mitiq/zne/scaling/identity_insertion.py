@@ -93,7 +93,7 @@ def _check_scalable(circuit: Circuit) -> None:
 # for value being returned is changed in order to account for only 1 Identity
 # being inserted instead of a gate and its hermitian.
 def _get_num_to_scale(scale_factor: float, ngates: int) -> int:
-    """Returns the number of gates to insert to achieve the desired
+    """Returns the number of identity gates to insert to achieve the desired
     (approximate) scale factor.
 
     Args:
