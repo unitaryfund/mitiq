@@ -252,6 +252,10 @@ def represent_operations_in_circuit_with_global_depolarizing_noise(
 
     .. note::
         Measurement gates are ignored (not represented).
+
+    .. note::
+        The returned representations are always defined in terms of
+        Cirq circuits, even if the input is not a ``cirq.Circuit``.
     """
 
     circ, _ = convert_to_mitiq(ideal_circuit)
@@ -265,7 +269,6 @@ def represent_operations_in_circuit_with_global_depolarizing_noise(
                 Circuit(op), noise_level,
             )
         )
-    # TODO: if gh-516 will be fixed we may return native representations.
     return representations
 
 
@@ -295,6 +298,10 @@ def represent_operations_in_circuit_with_local_depolarizing_noise(
 
     .. note::
         Measurement gates are ignored (not represented).
+
+    .. note::
+        The returned representations are always defined in terms of
+        Cirq circuits, even if the input is not a ``cirq.Circuit``.
     """
     circ, _ = convert_to_mitiq(ideal_circuit)
 
@@ -307,5 +314,4 @@ def represent_operations_in_circuit_with_local_depolarizing_noise(
                 Circuit(op), noise_level,
             )
         )
-    # TODO: if gh-516 will be fixed we may return native representations.
     return representations
