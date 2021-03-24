@@ -1,7 +1,7 @@
 ---
 Author: Purva Thakre
 Status: Draft
-Created: 2021-03-16
+Created:
 Resolution: <url>
 ---
 
