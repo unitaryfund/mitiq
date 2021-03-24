@@ -59,7 +59,7 @@ the proposed change
 - [ ] Detailed description of the proposed change
 - [ ] Examples of how new functionality can be used, intended use-cases and pseudo-code illustrating its use
 
-:heavy_exclamation_mark: **Propsed functions from previous rough sketch** :heavy_exclamation_mark:
+:heavy_exclamation_mark: **Proposed functions from previous rough sketch** :heavy_exclamation_mark:
 
 1. A group G defining n-qubit Pauli operators
 2. Fidelities of the elements in group G
