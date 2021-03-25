@@ -180,7 +180,7 @@ def test_represent_operations_in_circuit_global(circuit_type: str):
     qreg = LineQubit.range(2)
     circ_mitiq = Circuit([CNOT(*qreg), H(qreg[0]), Y(qreg[1]), CNOT(*qreg)])
     circ = convert_from_mitiq(circ_mitiq, circuit_type)
-    
+
     reps = represent_operations_in_circuit_with_global_depolarizing_noise(
         ideal_circuit=circ, noise_level=0.1,
     )
