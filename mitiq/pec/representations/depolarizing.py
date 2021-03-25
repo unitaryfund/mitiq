@@ -16,7 +16,7 @@
 from typing import List
 from itertools import product
 
-from cirq import Operation, X, Y, Z, Circuit
+from cirq import Operation, X, Y, Z, Circuit, is_measurement
 from mitiq import QPROGRAM
 from mitiq.pec.types import OperationRepresentation, NoisyOperation
 from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
@@ -30,7 +30,7 @@ def represent_operation_with_global_depolarizing_noise(
     representation, which is a linear combination of noisy implementable
     operations :math:`\sum_\alpha \eta_{\alpha} \mathcal{O}_{\alpha}`.
 
-    This function assumes a depolarizing noise model, and more precicely,
+    This function assumes a depolarizing noise model and, more precicely,
     that the following noisy operations are implementable
     :math:`\mathcal{O}_{\alpha} = \mathcal{D} \circ \mathcal P_\alpha
     \circ \mathcal{U}`, where :math:`\mathcal{U}` is the unitary associated
@@ -153,9 +153,9 @@ def represent_operation_with_local_depolarizing_noise(
     single-qubit depolarizing channel (:math:`\epsilon` is a simple function
     of ``noise_level``).
 
-    More information about the quasi-probability representation of depolarizing
-    noise can be found in the docstring of
-    ``represent_operation_with_global_depolarizing_noise``.
+    More information about the quasi-probability representation for a
+    depolarizing noise channel can be found in:
+    :func:`represent_operation_with_global_depolarizing_noise`.
 
     Args:
         ideal_operation: The ideal operation (as a QPROGRAM) to represent.
@@ -225,3 +225,93 @@ def represent_operation_with_local_depolarizing_noise(
     expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}
 
     return OperationRepresentation(ideal_operation, expansion)
+
+
+def represent_operations_in_circuit_with_global_depolarizing_noise(
+    ideal_circuit: QPROGRAM, noise_level: float
+) -> List[OperationRepresentation]:
+    """Iterates over all unique operations of the input ``ideal_circuit`` and,
+    for each of them, generates the corresponding quasi-probability
+    representation (linear combination of implementable noisy operations).
+
+    This function assumes that the same depolarizing noise channel of strength
+    ``noise_level`` affects each implemented operation.
+
+    This function internally calls
+    :func:`represent_operation_with_global_depolarizing_noise` (more details
+    about the quasi-probability representation can be found in its docstring).
+
+    Args:
+        ideal_circuit: The ideal circuit, whose ideal operations should be
+            represented.
+        noise_level: The (gate-independent) depolarizing noise level.
+
+    Returns:
+        The list of quasi-probability representations associated to
+        the operations of the input ``ideal_circuit``.
+
+    .. note::
+        Measurement gates are ignored (not represented).
+
+    .. note::
+        The returned representations are always defined in terms of
+        Cirq circuits, even if the input is not a ``cirq.Circuit``.
+    """
+
+    circ, _ = convert_to_mitiq(ideal_circuit)
+
+    representations = []
+    for op in set(circ.all_operations()):
+        if is_measurement(op):
+            continue
+        representations.append(
+            represent_operation_with_global_depolarizing_noise(
+                Circuit(op), noise_level,
+            )
+        )
+    return representations
+
+
+def represent_operations_in_circuit_with_local_depolarizing_noise(
+    ideal_circuit: QPROGRAM, noise_level: float
+) -> List[OperationRepresentation]:
+    """Iterates over all unique operations of the input ``ideal_circuit`` and,
+    for each of them, generates the corresponding quasi-probability
+    representation (linear combination of implementable noisy operations).
+
+    This function assumes that the tensor product of ``k`` single-qubit
+    depolarizing channels affects each implemented operation, where
+    ``k`` is the number of qubits associated to the operation.
+
+    This function internally calls
+    :func:`represent_operation_with_local_depolarizing_noise` (more details
+    about the quasi-probability representation can be found in its docstring).
+
+    Args:
+        ideal_circuit: The ideal circuit, whose ideal operations should be
+            represented.
+        noise_level: The (gate-independent) depolarizing noise level.
+
+    Returns:
+        The list of quasi-probability representations associated to
+        the operations of the input ``ideal_circuit``.
+
+    .. note::
+        Measurement gates are ignored (not represented).
+
+    .. note::
+        The returned representations are always defined in terms of
+        Cirq circuits, even if the input is not a ``cirq.Circuit``.
+    """
+    circ, _ = convert_to_mitiq(ideal_circuit)
+
+    representations = []
+    for op in set(circ.all_operations()):
+        if is_measurement(op):
+            continue
+        representations.append(
+            represent_operation_with_local_depolarizing_noise(
+                Circuit(op), noise_level,
+            )
+        )
+    return representations

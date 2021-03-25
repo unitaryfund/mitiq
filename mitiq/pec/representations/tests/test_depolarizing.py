@@ -31,14 +31,19 @@ from cirq import (
     Circuit,
     AsymmetricDepolarizingChannel,
     DepolarizingChannel,
+    MeasurementGate,
 )
 
 from mitiq.pec.representations import (
     represent_operation_with_global_depolarizing_noise,
     represent_operation_with_local_depolarizing_noise,
+    represent_operations_in_circuit_with_global_depolarizing_noise,
+    represent_operations_in_circuit_with_local_depolarizing_noise,
 )
 
 from mitiq.pec.utils import _operation_to_choi, _circuit_to_choi
+from mitiq.utils import _equal
+from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 
 
 def my_depolarizing_channel(p: float, n_qubits: int):
@@ -167,3 +172,85 @@ def test_three_qubit_local_depolarizing_representation_error():
         represent_operation_with_local_depolarizing_noise(
             Circuit(CCNOT(q0, q1, q2)), 0.05,
         )
+
+
+@pytest.mark.parametrize("circuit_type", ["cirq", "qiskit", "pyquil"])
+def test_represent_operations_in_circuit_global(circuit_type: str):
+    """Tests all operation representations are created."""
+    qreg = LineQubit.range(2)
+    circ_mitiq = Circuit([CNOT(*qreg), H(qreg[0]), Y(qreg[1]), CNOT(*qreg)])
+    circ = convert_from_mitiq(circ_mitiq, circuit_type)
+
+    reps = represent_operations_in_circuit_with_global_depolarizing_noise(
+        ideal_circuit=circ, noise_level=0.1,
+    )
+
+    # For each operation in circ we should find its representation
+    for op in convert_to_mitiq(circ)[0].all_operations():
+        found = False
+        for rep in reps:
+            if _equal(rep.ideal, Circuit(op), require_qubit_equality=True):
+                found = True
+        assert found
+
+    # The number of reps. should match the number of unique operations
+    assert len(reps) == 3
+
+
+@pytest.mark.parametrize("circuit_type", ["cirq", "qiskit", "pyquil"])
+def test_represent_operations_in_circuit_local(circuit_type: str):
+    """Tests all operation representations are created."""
+    qreg = LineQubit.range(2)
+    circ_mitiq = Circuit([CNOT(*qreg), H(qreg[0]), Y(qreg[1]), CNOT(*qreg)])
+    circ = convert_from_mitiq(circ_mitiq, circuit_type)
+
+    reps = represent_operations_in_circuit_with_local_depolarizing_noise(
+        ideal_circuit=circ, noise_level=0.1,
+    )
+
+    for op in convert_to_mitiq(circ)[0].all_operations():
+        found = False
+        for rep in reps:
+            if _equal(rep.ideal, Circuit(op), require_qubit_equality=True):
+                found = True
+        assert found
+
+    # The number of reps. should match the number of unique operations
+    assert len(reps) == 3
+
+
+@pytest.mark.parametrize(
+    "rep_function",
+    [
+        represent_operations_in_circuit_with_local_depolarizing_noise,
+        represent_operations_in_circuit_with_global_depolarizing_noise,
+    ],
+)
+@pytest.mark.parametrize("circuit_type", ["cirq", "qiskit", "pyquil"])
+def test_represent_operations_in_circuit_with_measurements(
+    circuit_type: str, rep_function,
+):
+    """Tests measurements in circuit are ignored (not represented)."""
+    q0, q1 = LineQubit.range(2)
+    circ_mitiq = Circuit(
+        X(q1),
+        MeasurementGate(num_qubits=1)(q0),
+        X(q1),
+        MeasurementGate(num_qubits=1)(q0),
+    )
+    circ = convert_from_mitiq(circ_mitiq, circuit_type)
+
+    reps = rep_function(ideal_circuit=circ, noise_level=0.1)
+
+    for op in convert_to_mitiq(circ)[0].all_operations():
+        found = False
+        for rep in reps:
+            if _equal(rep.ideal, Circuit(op), require_qubit_equality=True):
+                found = True
+        if isinstance(op.gate, MeasurementGate):
+            assert not found
+        else:
+            assert found
+
+    # Number of unique gates excluding measurement gates
+    assert len(reps) == 1
