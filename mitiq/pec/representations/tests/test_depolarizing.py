@@ -247,7 +247,9 @@ def test_represent_operations_in_circuit_with_measurements(
         for rep in reps:
             if _equal(rep.ideal, Circuit(op), require_qubit_equality=True):
                 found = True
-        if not isinstance(op.gate, MeasurementGate):
+        if isinstance(op.gate, MeasurementGate):
+            assert not found
+        else:
             assert found
 
     # Number of unique gates excluding measurement gates
