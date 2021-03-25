@@ -178,12 +178,15 @@ def test_three_qubit_local_depolarizing_representation_error():
 def test_represent_operations_in_circuit_global(circuit_type: str):
     """Tests all operation representations are created."""
     qreg = LineQubit.range(2)
-    circ = Circuit([CNOT(*qreg), H(qreg[0]), Y(qreg[1]), CNOT(*qreg)])
+    circ_mitiq = Circuit([CNOT(*qreg), H(qreg[0]), Y(qreg[1]), CNOT(*qreg)])
+    circ = convert_from_mitiq(circ_mitiq, circuit_type)
+    
     reps = represent_operations_in_circuit_with_global_depolarizing_noise(
         ideal_circuit=circ, noise_level=0.1,
     )
+
     # For each operation in circ we should find its representation
-    for op in circ.all_operations():
+    for op in convert_to_mitiq(circ)[0].all_operations():
         found = False
         for rep in reps:
             if _equal(rep.ideal, Circuit(op), require_qubit_equality=True):
