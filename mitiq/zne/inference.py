@@ -1506,10 +1506,7 @@ class ExpBayesFactory(BatchedFactory):
 
     @staticmethod
     def _exp_ansatz(
-        a: float,
-        b: float,
-        c: float,
-        scale_factor: float
+        a: float, b: float, c: float, scale_factor: float
     ) -> float:
         """
         Calculates the expecation given a scale factor and model
@@ -1534,7 +1531,6 @@ class ExpBayesFactory(BatchedFactory):
         exp_values: Sequence[float],
         full_output: bool = False,
     ) -> Union[
-
         float,
     ]:
         """Static method which evaluates an exponential extrapolation to the
@@ -1566,13 +1562,13 @@ class ExpBayesFactory(BatchedFactory):
             We assumme that the priors for the model parameters are normally
             distributed, while the standard deviation is half normal.
             """
-            a = pm.Normal('a', 0, 5)
-            b = pm.Normal('b', 0, 5)
-            c = pm.Normal('c', 0, 5)
-            sd = pm.HalfNormal('sd', 10)
+            a = pm.Normal("a", 0, 5)
+            b = pm.Normal("b", 0, 5)
+            c = pm.Normal("c", 0, 5)
+            sd = pm.HalfNormal("sd", 10)
 
             pm.Normal(
-                'expval',
+                "expval",
                 mu=ExpBayesFactory._exp_ansatz(a, b, c, scale_factors),
                 sd=sd,
                 observed=exp_values,
@@ -1582,14 +1578,11 @@ class ExpBayesFactory(BatchedFactory):
 
         def zne_curve(scale_factor: float) -> float:
             samples = []
-            n_samples = len(trace['a'])
+            n_samples = len(trace["a"])
 
             for i in range(n_samples):
                 sample = ExpBayesFactory._exp_ansatz(
-                    trace['a'][i],
-                    trace['b'][i],
-                    trace['c'][i],
-                    scale_factor,
+                    trace["a"][i], trace["b"][i], trace["c"][i], scale_factor,
                 )
 
                 samples.append(sample)
@@ -1597,10 +1590,10 @@ class ExpBayesFactory(BatchedFactory):
             return np.mean(samples)
 
         # Optimal model parameters:
-        a = trace['a'].mean()
-        b = trace['b'].mean()
-        c = trace['c'].mean()
-        opt_params, zne_error = [a, b, c], trace['sd'].mean()
+        a = trace["a"].mean()
+        b = trace["b"].mean()
+        c = trace["c"].mean()
+        opt_params, zne_error = [a, b, c], trace["sd"].mean()
 
         zne_limit = zne_curve(0)
         if not full_output:

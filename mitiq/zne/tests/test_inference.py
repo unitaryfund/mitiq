@@ -671,12 +671,7 @@ def test_avoid_log_keyword():
 
 @mark.parametrize(
     "factory",
-    (
-        LinearFactory,
-        RichardsonFactory,
-        FakeNodesFactory,
-        ExpBayesFactory,
-    )
+    (LinearFactory, RichardsonFactory, FakeNodesFactory, ExpBayesFactory,),
 )
 def test_too_few_scale_factors(factory):
     """Test less than 2 scale_factors."""
@@ -933,12 +928,7 @@ def test_params_cov_and_zne_std():
 
 @mark.parametrize(
     "factory",
-    [
-        LinearFactory,
-        RichardsonFactory,
-        FakeNodesFactory,
-        ExpBayesFactory,
-    ]
+    [LinearFactory, RichardsonFactory, FakeNodesFactory, ExpBayesFactory,],
 )
 def test_execute_with_zne_fit_fail(factory):
     """Tests errors are raised when asking for fitting parameters that can't
