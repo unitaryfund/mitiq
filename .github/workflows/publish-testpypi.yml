@@ -6,12 +6,13 @@ name: Nightly Upload to Test PyPI
 on:
   schedule:
     - cron: '0 0 * * *'
+    
 
 jobs:
   deploy:
 
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'unitaryfund'
+    # if: github.repository_owner == 'unitaryfund'
     steps:
     - name: Check out mitiq
       uses: actions/checkout@v2
