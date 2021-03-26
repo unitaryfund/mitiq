@@ -18,6 +18,7 @@ classically generated data.
 """
 from typing import Callable, List
 from pytest import mark, raises, warns
+from copy import copy, deepcopy
 
 import numpy as np
 from numpy.random import RandomState
