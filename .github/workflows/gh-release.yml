@@ -11,6 +11,7 @@ jobs:
   # TODO: make docs pdf and tarball
   create_release:
     runs-on: ubuntu-latest
+    if: github.repository_owner == 'unitaryfund'
     steps:
       - name: Check out Mitiq
         uses: actions/checkout@v2
