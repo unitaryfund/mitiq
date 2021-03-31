@@ -12,13 +12,10 @@ jobs:
   deploy:
 
     runs-on: ubuntu-latest
-    # if: github.repository_owner == 'unitaryfund'
-    # above condition is made a comment until needed to specify main repo even when master has been specified for release branch. 
+    if: github.repository_owner == 'unitaryfund'
     steps:
     - name: Check out mitiq
       uses: actions/checkout@v2
-      with:
-        ref: 'release'
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
