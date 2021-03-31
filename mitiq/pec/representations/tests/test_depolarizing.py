@@ -46,7 +46,6 @@ from mitiq.utils import _equal
 from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 
 
-
 def single_qubit_depolarizing_overhead(noise_level: float) -> float:
     """See [Temme2017]_ for more information.
 
