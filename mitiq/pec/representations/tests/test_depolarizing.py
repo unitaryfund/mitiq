@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import itertools
 import numpy as np
 import pytest
 from cirq import (
@@ -29,7 +28,6 @@ from cirq import (
     Gate,
     LineQubit,
     Circuit,
-    AsymmetricDepolarizingChannel,
     DepolarizingChannel,
     MeasurementGate,
 )
