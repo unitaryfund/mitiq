@@ -46,26 +46,6 @@ from mitiq.utils import _equal
 from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 
 
-def my_depolarizing_channel(p: float, n_qubits: int):
-    """Build a depolarizing channel from cirq.AsymmetricDepolarizingChannel
-    since cirq.DepolarizingChannel is buggy when n_qubits is larger than 1."""
-    # Link to GitHub issue: https://github.com/quantumlib/Cirq/issues/3685
-
-    error_probabilities = {}
-    p_depol = p / (4 ** n_qubits - 1)
-    p_identity = 1.0 - p
-    for pauli_tuple in itertools.product(
-        ["I", "X", "Y", "Z"], repeat=n_qubits
-    ):
-        pauli_string = "".join(pauli_tuple)
-        if pauli_string == "I" * n_qubits:
-            error_probabilities[pauli_string] = p_identity
-        else:
-            error_probabilities[pauli_string] = p_depol
-    return AsymmetricDepolarizingChannel(
-        error_probabilities=error_probabilities
-    )
-
 
 def single_qubit_depolarizing_overhead(noise_level: float) -> float:
     """See [Temme2017]_ for more information.
