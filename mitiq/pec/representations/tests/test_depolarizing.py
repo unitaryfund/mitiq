@@ -135,7 +135,7 @@ def test_depolarizing_representation_with_choi(gate: Gate, noise: float):
         implementable_circ = noisy_op.ideal_circuit()
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.
-        depolarizing_op = my_depolarizing_channel(noise, len(qreg))(*qreg)
+        depolarizing_op = DepolarizingChannel(noise, len(qreg))(*qreg)
         implementable_circ.append(depolarizing_op)
         sequence_choi = _circuit_to_choi(implementable_circ)
         choi_components.append(coeff * sequence_choi)
