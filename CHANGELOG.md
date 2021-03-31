@@ -17,9 +17,10 @@
 - Add qiskit and cirq executor examples gifs to readme (@nathanshammah, gh-587)
 - Fix mitiq.about() qiskit version (@aaron-robertson, gh-595)
 - Fix typo in ZNE documentation (@purva-thakre, gh-602)
+
 - Adds link for MEP in docs (@purva-thakre, gh-610)
 - Add comment for code coverage to ignore some lines (@purva-thakre, gh-606)
-- Specify qiskit packages for installations (@purva-thakre, gh-614) 
+- Specify qiskit packages for installations (@purva-thakre, gh-614)
 
 ## Version 0.6.0 (March 1st, 2021)
 
