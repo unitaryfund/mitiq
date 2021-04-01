@@ -1491,12 +1491,12 @@ class ExpBayesFactory(BatchedFactory):
 
     Args:
         scale_factors: Sequence of noise scale factors at which
-                       expectation values should be measured.
+            expectation values should be measured.
         shot_list: Optional sequence of integers corresponding to the number
-                   of samples taken for each expectation value. If this
-                   argument is explicitly passed to the factory, it must have
-                   the same length of scale_factors and the executor function
-                   must accept "shots" as a valid keyword argument.
+            of samples taken for each expectation value. If this
+            argument is explicitly passed to the factory, it must have
+            the same length of scale_factors and the executor function
+            must accept "shots" as a valid keyword argument.
 
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
@@ -1506,7 +1506,10 @@ class ExpBayesFactory(BatchedFactory):
 
     @staticmethod
     def _exp_ansatz(
-        a: float, b: float, c: float, scale_factor: float
+        a: float,
+        b: float,
+        c: float,
+        scale_factor: float
     ) -> float:
         """
         Calculates the expecation given a scale factor and model
@@ -1531,6 +1534,7 @@ class ExpBayesFactory(BatchedFactory):
         exp_values: Sequence[float],
         full_output: bool = False,
     ) -> Union[
+
         float,
     ]:
         """Static method which evaluates an exponential extrapolation to the
@@ -1574,15 +1578,18 @@ class ExpBayesFactory(BatchedFactory):
                 observed=exp_values,
             )
 
-            trace = pm.sample(target_accept=0.95, return_inferencedata=True)
+            trace = pm.sample(target_accept=0.95, return_inferencedata=False)
 
         def zne_curve(scale_factor: float) -> float:
             samples = []
             n_samples = len(trace["a"])
 
-            for i in range(n_samples):
+            for i in range(1000, n_samples):
                 sample = ExpBayesFactory._exp_ansatz(
-                    trace["a"][i], trace["b"][i], trace["c"][i], scale_factor,
+                    trace["a"][i],
+                    trace["b"][i],
+                    trace["c"][i],
+                    scale_factor,
                 )
 
                 samples.append(sample)
