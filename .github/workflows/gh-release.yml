@@ -12,7 +12,6 @@ jobs:
   create_release:
     if: github.repository_owner == 'unitaryfund'
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'unitaryfund'
     steps:
       - name: Check out Mitiq
         uses: actions/checkout@v2
