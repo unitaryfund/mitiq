@@ -1506,10 +1506,7 @@ class ExpBayesFactory(BatchedFactory):
 
     @staticmethod
     def _exp_ansatz(
-        a: float,
-        b: float,
-        c: float,
-        scale_factor: float
+        a: float, b: float, c: float, scale_factor: float
     ) -> float:
         """
         Calculates the expecation given a scale factor and model
@@ -1586,10 +1583,7 @@ class ExpBayesFactory(BatchedFactory):
 
             for i in range(1000, n_samples):
                 sample = ExpBayesFactory._exp_ansatz(
-                    trace["a"][i],
-                    trace["b"][i],
-                    trace["c"][i],
-                    scale_factor,
+                    trace["a"][i], trace["b"][i], trace["c"][i], scale_factor,
                 )
 
                 samples.append(sample)
