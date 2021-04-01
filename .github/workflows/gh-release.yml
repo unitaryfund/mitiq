@@ -10,6 +10,7 @@ jobs:
   #generate_artifacts:
   # TODO: make docs pdf and tarball
   create_release:
+    if: github.repository_owner == 'unitaryfund'
     runs-on: ubuntu-latest
     if: github.repository_owner == 'unitaryfund'
     steps:
