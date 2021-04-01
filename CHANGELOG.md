@@ -17,6 +17,7 @@
 - Add qiskit and cirq executor examples gifs to readme (@nathanshammah, gh-587)
 - Fix mitiq.about() qiskit version (@aaron-robertson, gh-595)
 - Fix typo in ZNE documentation (@purva-thakre, gh-602)
+- Change custom depolarizing channel in PEC test (@purva-thakre, gh-615)
 
 ## Version 0.6.0 (March 1st, 2021)
 
