@@ -290,13 +290,13 @@ real quantum hardware.
 
 Qiskit Executors
 ======================================
-See  :py:mod:`mitiq.mitiq_qiskit.qiskit_utils`.
+See  :py:mod:`~mitiq.mitiq_qiskit.qiskit_utils`.
 
 This section includes noisy and noiseless simulator executor examples you can use on Qiskit circuits.
 
 Qiskit: Wavefunction Simulation
 ---------------------------------
-See :py:func:`mitiq.mitiq_qiskit.qiskit_utils.execute`.
+See :py:func:`~mitiq.mitiq_qiskit.qiskit_utils.execute` in :py:mod:`~mitiq.mitiq_qiskit.qiskit_utils`.
 
 This executor can be used for noiseless simulation. Note that this executor
 can be :ref:`wrapped using partial function application <partial-note>`
@@ -304,7 +304,7 @@ to be used in Mitiq.
 
 Qiskit: Wavefunction Simulation with Sampling
 -----------------------------------------------
-See :py:func:`mitiq.mitiq_qiskit.qiskit_utils.execute_with_shots`.
+See :py:func:`~mitiq.mitiq_qiskit.qiskit_utils.execute_with_shots` in :py:mod:`~mitiq.mitiq_qiskit.qiskit_utils`.
 
 The noiseless simulation executor can be modified to still perform exact wavefunction
 simulation, but to also include finite sampling of measurements. Note that this executor
@@ -317,17 +317,17 @@ in this example can be found `here <https://quantumcomputing.stackexchange.com/a
 
 Qiskit: Density-matrix Simulation with Noise
 -----------------------------------------------------------
-See :py:func:`mitiq.mitiq_qiskit.qiskit_utils.execute_with_noise`.
+See :py:func:`~mitiq.mitiq_qiskit.qiskit_utils.execute_with_noise` in :py:mod:`~mitiq.mitiq_qiskit.qiskit_utils`.
 
 This executor can be used to simulate a circuit with noise and to return the exact expectation
 value of an observable (without the shot noise typical of a real experiment).
 
-See :py:func:`mitiq.mitiq_qiskit.qiskit_utils.initialized_depolarizing_noise` for an example depolarizing noise
+See :py:func:`~mitiq.mitiq_qiskit.qiskit_utils.initialized_depolarizing_noise` for an example depolarizing noise
 model you can use.
 
 Qiskit: Density-matrix Simulation with Noise and Sampling
 ------------------------------------------------------------------------
-See :py:func:`mitiq.mitiq_qiskit.qiskit_utils.execute_with_shots_and_noise`.
+See :py:func:`~mitiq.mitiq_qiskit.qiskit_utils.execute_with_shots_and_noise` in :py:mod:`~mitiq.mitiq_qiskit.qiskit_utils`.
 
 This executor can be used to simulate a circuit with noise. The expectation value is estimated
 with a finite number of measurements and so it is affected by statistical noise.
