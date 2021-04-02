@@ -19,6 +19,10 @@
 - Fix typo in ZNE documentation (@purva-thakre, gh-602)
 - [Bug Fix] Examples (notebooks) in the online documentation now have output code cells (@andreamari, gh-576)
 
+
+
+- Change custom depolarizing channel in PEC test (@purva-thakre, gh-615)
+
 ## Version 0.6.0 (March 1st, 2021)
 
 ### Summary
