@@ -35,7 +35,9 @@ def generate_training_circuits(
 
     """Function to return a list of near-Clifford circuits from one circuit of
     interest. Data generated from these circuits is used as a training set to
-    learn the effect of noise.   Args:
+    learn the effect of noise.
+
+    Args:
         circuit: A circuit of interest, assumes already compiled into gate set
                                (Rz, Rx, Z, X, CNOT).
         num_training_circuits: Number of circuits in the returned training set.
@@ -50,15 +52,15 @@ def generate_training_circuits(
         random_state: Seed for sampling.
         additional_options: sequence of key = value pairs with keys defined as:
             'sigma_select': float -  postitive variable definined width of
-                                     probability distribution used in choosing
-                                     which non-Cliffords to replace, only has
-                                     an impact if
-                                     method_select = 'gaussian'.
+            probability distribution used in choosing
+            which non-Cliffords to replace, only has
+            an impact if method_select = 'gaussian'.
             'sigma_replace': float - positive variable which defines the width
-                                     of probability distribution used in
-                                     choosing which Clifford to replace the
-                                     non-Clifford with, only has an impact if
-                                     method_replace = 'gaussian'.
+            of probability distribution used in
+            choosing which Clifford to replace the
+            non-Clifford with, only has an impact if
+            method_replace = 'gaussian'.
+
     Returns:
         List[circ.Circuit]: list of near-Clifford circuits constructed from
                              the circuits of interest.
