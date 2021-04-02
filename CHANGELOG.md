@@ -63,6 +63,7 @@ in the *Mitiq Examples* section.
 - Add a new FakeNodesFactory class based on an alternative interpolation method (@elmandouh, gh-444).
 - Add parameter calibration method to find base noise for parameter noise (@yhindy, gh-411).
 - Remove duplication of the reduce method in every (non-adaptive) factory (@elmandouh, gh-470).
+- Add a new ExpBayesFactory class based on Bayesian Inference (@elmandouh, gh-471).
 
 ## Version 0.4.1 (January 12th, 2021)
 
