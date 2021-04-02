@@ -1484,8 +1484,8 @@ OptimizationHistory = List[
 
 class ExpBayesFactory(BatchedFactory):
     """Factory object implementing a zero-noise extrapolation algorithm based on
-    Bayesian Inference. The exponential ansatz for the expecation value:
-        E(lambda) = a + b * e**(-c*lambda),
+    Bayesian Inference. The exponential ansatz for the expectation value:
+    E(lambda) = a + b * e**(-c*lambda),
     where a, b and c are model parameters that need to be estimated,
     while lambda is the noise scale factor.
 
@@ -1509,7 +1509,7 @@ class ExpBayesFactory(BatchedFactory):
         a: float, b: float, c: float, scale_factor: float
     ) -> float:
         """
-        Calculates the expecation given a scale factor and model
+        Calculates the expectation given a scale factor and model
         parameters.
 
         Args:
@@ -1531,7 +1531,6 @@ class ExpBayesFactory(BatchedFactory):
         exp_values: Sequence[float],
         full_output: bool = False,
     ) -> Union[
-
         float,
     ]:
         """Static method which evaluates an exponential extrapolation to the
@@ -1560,7 +1559,7 @@ class ExpBayesFactory(BatchedFactory):
 
         with pm.Model():
             """
-            We assumme that the priors for the model parameters are normally
+            We assume that the priors for the model parameters are normally
             distributed, while the standard deviation is half normal.
             """
             a = pm.Normal("a", 0, 5)

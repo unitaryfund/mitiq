@@ -751,58 +751,6 @@ def test_adaptive_factory_max_iteration_warnings():
         fac.run_classical(lambda scale_factor: 1.0, max_iterations=3)
 
 
-@mark.parametrize("factory", [LinearFactory, ExpFactory])
-def test_equal_simple(factory):
-    fac = factory(scale_factors=[1, 2, 3])
-    assert fac != 1
-
-    copied_fac = copy(fac)
-    assert copied_fac == fac
-    copied_fac._already_reduced = True
-    assert copied_fac != fac
-
-    fac._instack = [{"scale_factor": 1, "shots": 100}]
-    copied_fac = deepcopy(fac)
-    assert copied_fac == fac
-    copied_fac._instack[0].update({"shots": 101})
-    assert copied_fac != fac
-
-
-@mark.parametrize(
-    "factory",
-    (
-        LinearFactory,
-        RichardsonFactory,
-        FakeNodesFactory,
-        PolyFactory,
-        ExpBayesFactory,
-    ),
-)
-def test_equal(factory):
-    for run_classical in (True, False):
-        if factory is PolyFactory:
-            fac = factory(
-                scale_factors=[1, 2, 3], order=2, shot_list=[1, 2, 3]
-            )
-        else:
-            fac = factory(scale_factors=[1, 2, 3], shot_list=[1, 2, 3])
-        if run_classical:
-            fac.run_classical(
-                scale_factor_to_expectation_value=lambda x, shots: np.exp(x)
-                + 0.5
-            )
-
-        copied_factory = copy(fac)
-        assert copied_factory == fac
-        assert copied_factory is not fac
-
-        if run_classical:
-            fac.reduce()
-            copied_factory = copy(fac)
-            assert copied_factory == fac
-            assert copied_factory is not fac
-
-
 @mark.parametrize("fac_class", [LinearFactory, RichardsonFactory])
 def test_iterate_with_shot_list(fac_class):
     """Tests factories with (and without) the "shot_list" argument."""
