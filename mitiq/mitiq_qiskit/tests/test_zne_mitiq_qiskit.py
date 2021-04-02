@@ -25,13 +25,10 @@ from qiskit import (
     QuantumRegister,
     execute,
 )
-from qiskit.providers.aer.noise import NoiseModel
 
-from typing import Optional
 
 from mitiq import zne
 from mitiq._typing import QPROGRAM
-from qiskit.providers.aer.noise import depolarizing_error
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 from mitiq.mitiq_qiskit.conversions import to_qiskit
 from mitiq.mitiq_qiskit import (
