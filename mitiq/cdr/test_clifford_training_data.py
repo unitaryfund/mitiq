@@ -211,16 +211,16 @@ def test_map_to_near_cliffords():
     r_z_positions = positions[zgatesmask]
     r_z_qubits = qubits[zgatesmask]
     angles = _get_arguments(r_z_gates)
-    mask_non_cliff = ~_is_clifford_angle(angles)
-    rz_non_cliff = angles[mask_non_cliff]
-    pos_non_cliff = r_z_positions[mask_non_cliff]
-    qubits_non_cliff = r_z_qubits[mask_non_cliff]
+    mask_non_clifford = ~_is_clifford_angle(angles)
+    rz_non_clifford = angles[mask_non_clifford]
+    position_non_clifford = r_z_positions[mask_non_clifford]
+    qubits_non_cliff = r_z_qubits[mask_non_clifford]
     for method_select in method_select_options_list:
         for method_replace in method_replace_options_list:
             projected_circuit = _map_to_near_clifford(
                 operations.copy(),
-                rz_non_cliff.copy(),
-                pos_non_cliff.copy(),
+                rz_non_clifford.copy(),
+                position_non_clifford.copy(),
                 qubits_non_cliff.copy(),
                 fraction_non_clifford,
                 random_state,
@@ -229,8 +229,8 @@ def test_map_to_near_cliffords():
             )
             projected_circuit_with_options = _map_to_near_clifford(
                 operations.copy(),
-                rz_non_cliff.copy(),
-                pos_non_cliff.copy(),
+                rz_non_clifford.copy(),
+                position_non_clifford.copy(),
                 qubits_non_cliff.copy(),
                 fraction_non_clifford,
                 random_state,
@@ -264,9 +264,9 @@ def test_select():
     )
     r_z_gates = operations[rzgatemask]
     angles = _get_arguments(r_z_gates)
-    mask_non_cliff = ~_is_clifford_angle(angles)
-    rz_non_cliff = angles[mask_non_cliff]
-    rz_non_cliff_copy = rz_non_cliff.copy()
+    mask_non_clifford = ~_is_clifford_angle(angles)
+    rz_non_clifford = angles[mask_non_clifford]
+    rz_non_cliff_copy = rz_non_clifford.copy()
     random_state = np.random.RandomState(1)
     sigma_select = 0.5
     for method_select in method_select_options_list:
@@ -293,9 +293,9 @@ def test_replace():
     )
     r_z_gates = operations[mask]
     angles = _get_arguments(r_z_gates)
-    mask_non_cliff = ~_is_clifford_angle(angles)
-    rz_non_cliff = angles[mask_non_cliff]
-    rz_non_cliff_copy = rz_non_cliff.copy()
+    mask_non_clifford = ~_is_clifford_angle(angles)
+    rz_non_clifford = angles[mask_non_clifford]
+    rz_non_cliff_copy = rz_non_clifford.copy()
     sigma_select = 0.5
     sigma_replace = 0.5
     random_state = np.random.RandomState(1)
