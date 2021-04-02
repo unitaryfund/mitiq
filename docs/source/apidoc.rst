@@ -95,3 +95,8 @@ Noise Scaling: Unitary Folding
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.zne.scaling.folding
    :members:
+
+Noise Scaling: Parametric Calibration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.zne.scaling.parameter
+   :members:

@@ -18,7 +18,6 @@ from copy import deepcopy
 import pytest
 
 import numpy as np
-
 import cirq
 from cirq import (
     LineQubit,

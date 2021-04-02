@@ -18,13 +18,17 @@ from copy import deepcopy
 
 import pytest
 import numpy as np
-from cirq import Circuit, LineQubit, ops, CSWAP
+from cirq import Circuit, LineQubit, ops, CSWAP, ZPowGate
+
 
 from mitiq.utils import _equal
 from mitiq.zne.scaling.parameter import (
     scale_parameters,
     _get_base_gate,
+    CircuitMismatchException,
     GateTypeException,
+    _generate_parameter_calibration_circuit,
+    _parameter_calibration,
 )
 
 
@@ -131,3 +135,52 @@ def test_gate_type():
     with pytest.raises(GateTypeException):
         forbidden_op = CSWAP(qreg[0], qreg[1], qreg[2])
         _get_base_gate(forbidden_op)
+
+
+def test_parameter_calibration():
+    def noiseless_executor_mock(circuit):
+        return 1
+
+    # Perfect executor should have sigma = 0
+    qubit = LineQubit(0)
+    gate = ops.H.on(qubit).gate
+    sigma = _parameter_calibration(
+        noiseless_executor_mock, gate, qubit, depth=10
+    )
+    assert sigma == 0
+
+    # Perfectly imperfect executor should have sigma = inf
+    def noisy_executor_mock(circuit):
+        return 0.5
+
+    qubit = LineQubit(0)
+    gate = ops.H.on(qubit).gate
+    with pytest.warns(RuntimeWarning):
+        # Runtime warning for divide by zero
+        sigma = _parameter_calibration(
+            noisy_executor_mock, gate, qubit, depth=10
+        )
+    assert sigma == np.inf
+
+
+def test_generate_parameter_calibration_circuit():
+    """Tests generating a simple Parameter Calibration circuit"""
+    n_qubits = 1
+    qubits = LineQubit.range(n_qubits)
+    depth = 10
+    circuit = _generate_parameter_calibration_circuit(qubits, depth, ZPowGate)
+    assert len(circuit) == depth
+    # Make sure the exponents in the
+    for i in range(len(circuit)):
+        assert circuit[i].operations[0].gate.exponent == 2 * np.pi / depth
+
+
+def test_generate_parameter_calibration_circuit_failure():
+    """Tests that parameter calibration circuit generation fails because there
+    are too many qubits"""
+    n_qubits = 3
+    qubits = LineQubit.range(n_qubits)
+    depth = 10
+    # Should raise exception because too many qubits
+    with pytest.raises(CircuitMismatchException):
+        _generate_parameter_calibration_circuit(qubits, depth, ZPowGate)

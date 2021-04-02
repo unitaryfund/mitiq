@@ -25,10 +25,24 @@ jobs:
       #   run: make check-types
 
       - name: Check code style with Black
-        run: make check-format || echo "run make format to resolve issues"
+        run: make check-format
 
       - name: Lint with flake8
         run: make check-style
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out mitiq
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          make install requirements
 
       - name: Build and test Sphinx docs
         run: |
@@ -36,9 +50,6 @@ jobs:
           make doctest
 
   test:
-    # Reduces running tests if the validation dosen't pass
-    # https://stackoverflow.com/a/65698892/10022996
-    needs: validate
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -48,6 +59,9 @@ jobs:
     steps:
       - name: Check out mitiq
         uses: actions/checkout@v2
+        # Increase fetch depth to work around Codecov issue (https://github.com/codecov/codecov-action/issues/190).
+        with:
+          fetch-depth: 2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -63,8 +77,8 @@ jobs:
       - name: Run all the unit tests & generate coverage report with pytest
         run: make test-all
       - name: Submit coverage report to Codecov
-        # only submit to Codecov once
+        # Only submit to Codecov once.
         if: ${{ matrix.python-version == 3.8 }}
-        uses: codecov/codecov-action@v1.0.12
+        uses: codecov/codecov-action@v1.3.1
         with:
           fail_ci_if_error: true

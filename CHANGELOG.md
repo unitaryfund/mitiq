@@ -14,6 +14,11 @@
 
 - Add qiskit executor example for exact density matrix simulation with depolarizing noise (@aaron-robertson, gh-574)
 - Replace Qiskit utils with Qiskit executors from docs  (@pchung39, @aaron-robertson, gh-584)
+- Add ``represent_operations_in_circuit_...`` functions for PEC (@andreamari, gh-515)
+- Add qiskit and cirq executor examples gifs to readme (@nathanshammah, gh-587)
+- Fix mitiq.about() qiskit version (@aaron-robertson, gh-595)
+- Fix typo in ZNE documentation (@purva-thakre, gh-602)
+- [Bug Fix] Examples (notebooks) in the online documentation now have output code cells (@andreamari, gh-576)
 
 ## Version 0.6.0 (March 1st, 2021)
 
@@ -23,6 +28,7 @@ The automated workflows for builds and releases are improved and PyPI releases a
 We have more documentation on PEC and have a new tutorial on QAOA with Mitiq, as well as some miscellaneous bug fixes.
 
 ### All Changes
+- Add minimal section on PEC to documentation (@nathanshammah, gh-564)
 
 - Improve CI and release/patch workflow and documentation (@crazy4pi314 gh-566).
 - Adding a Mitiq Enhancement Proposal template and process (@crazy4pi314 gh-563).
@@ -56,7 +62,9 @@ in the *Mitiq Examples* section.
 - Fixes random failure of PEC sampling test(@rmlarose, gh-481).
 - Exact copying of shell commands, update make target for pdf and update development version(@rmlarose, gh-469).
 - Add a new FakeNodesFactory class based on an alternative interpolation method (@elmandouh, gh-444).
+- Add parameter calibration method to find base noise for parameter noise (@yhindy, gh-411).
 - Remove duplication of the reduce method in every (non-adaptive) factory (@elmandouh, gh-470).
+- Add a new ExpBayesFactory class based on Bayesian Inference (@elmandouh, gh-471).
 
 ## Version 0.4.1 (January 12th, 2021)
 

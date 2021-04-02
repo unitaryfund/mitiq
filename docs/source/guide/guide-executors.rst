@@ -45,7 +45,7 @@ to be used in Mitiq.
         Returns:
             The expectation value of obs as a float.
         """
-        final_wvf = circ.final_wavefunction()
+        final_wvf = circ.final_state_vector()
         return np.real(final_wvf.conj().T @ obs @ final_wvf)
 
 .. testcode::

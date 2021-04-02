@@ -62,7 +62,7 @@ def test_rb_circuits(n_qubits):
         )
         for qc in circuits:
             # we check the ground state population to ignore any global phase
-            wvf = qc.final_wavefunction()
+            wvf = qc.final_state_vector()
             zero_prob = abs(wvf[0] ** 2)
             assert np.isclose(zero_prob, 1)
 

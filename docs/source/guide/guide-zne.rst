@@ -1,4 +1,4 @@
-.. mitiq documentation file
+.. zne:
 
 .. _guide_zne:
 
