@@ -6,8 +6,7 @@ Describe your pull request (PR) here. Thank you for contributing to Mitiq! 🙂
 Checklist
 -----------
 
-Check off the following once complete (or if not applicable). The PR will be reviewed once this
-checklist is complete and all tests are passing.
+Check off the following once complete (or if not applicable). The PR will be reviewed once this checklist is complete and all tests are passing.
 
 - [ ] I added unit tests for new code.
 - [ ] I used [type hints](https://www.python.org/dev/peps/pep-0484/) in function signatures.
@@ -21,8 +20,6 @@ Tips
 ----
 
 - If the validation check fails:
-  1. Run `make check-style` (from the root directory
-  of the repository) and fix any [flake8](http://flake8.pycqa.org) errors.
-  2. Run `make format` to format your code with the [black](https://black.readthedocs.io/en/stable/index.html)
-  autoformatter.
+  1. Run `make check-style` (from the root directory of the repository) and fix any [flake8](http://flake8.pycqa.org) errors.
+  2. Run `make format` to format your code with the [black](https://black.readthedocs.io/en/stable/index.html) autoformatter.
 - Write "Fixes #XYZ" in the description if this PR fixes Issue #XYZ.
