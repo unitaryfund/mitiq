@@ -36,7 +36,7 @@ mitiq.about()
 This prints out version information about core requirements and optional quantum software packages which Mitiq can
 interface with.
 
-If you'd prefer to clone and install from source, our would like to develop Mitiq, check out the
+If you'd prefer to clone and install from source, or would like to develop Mitiq, check out the
 [contribution guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) for more information.
 
 ### Supported quantum programming libraries

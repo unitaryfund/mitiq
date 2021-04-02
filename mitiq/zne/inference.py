@@ -1208,8 +1208,7 @@ class ExpFactory(BatchedFactory):
 class PolyExpFactory(BatchedFactory):
     """
     Factory object implementing a zero-noise extrapolation algorithm assuming
-    an (almost) exponential ansatz with a non linear exponent, i.e.:
-
+    an (almost) exponential ansatz with a non linear exponent
     y(x) = a + sign * exp(z(x)), where z(x) is a polynomial of a given order.
 
     The parameter "sign" is a sign variable which can be either 1 or -1,
@@ -1544,11 +1543,11 @@ class ExpBayesFactory(BatchedFactory):
                 extrapolated limit is returned too.
 
         Returns:
-            zne_limit: The extrapolated zero-noise limit. If "full_output"
-                is False (default value), only this parameter is returned.
+            zne_limit: The extrapolated zero-noise limit. If "full_output" is\
+                False (default value), only this parameter is returned.
             opt_params: The parameter array of the best fitting model.
-            zne_curve: The callable function which best fit the input data.
-                It maps a real noise scale factor to a real expectation value.
+            zne_curve: The callable function which best fit the input data.\
+                It maps a real noise scale factor to a real expectation value.\
                 It is equal "zne_limit" when evaluated at zero.
 
         Note:
