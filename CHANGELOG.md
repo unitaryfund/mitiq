@@ -12,13 +12,18 @@
 
 ### All Changes
 
+- Add ``represent_operations_in_circuit_...`` functions for PEC (@andreamari, gh-515)
 - Add qiskit executor example for exact density matrix simulation with depolarizing noise (@aaron-robertson gh-269)
 - Add qiskit and cirq executor examples gifs to readme (@nathanshammah, gh-587)
 - Fix mitiq.about() qiskit version (@aaron-robertson, gh-595)
+- Fix typo in ZNE documentation (@purva-thakre, gh-602)
+- [Bug Fix] Examples (notebooks) in the online documentation now have output code cells (@andreamari, gh-576)
+
+
+
+- Change custom depolarizing channel in PEC test (@purva-thakre, gh-615)
 
 ## Version 0.6.0 (March 1st, 2021)
-
-- [Bug Fix] Examples (notebooks) in the online documentation now have output code cells. (@andreamari, gh-576).
 
 ### Summary
 
@@ -62,6 +67,7 @@ in the *Mitiq Examples* section.
 - Add a new FakeNodesFactory class based on an alternative interpolation method (@elmandouh, gh-444).
 - Add parameter calibration method to find base noise for parameter noise (@yhindy, gh-411).
 - Remove duplication of the reduce method in every (non-adaptive) factory (@elmandouh, gh-470).
+- Add a new ExpBayesFactory class based on Bayesian Inference (@elmandouh, gh-471).
 
 ## Version 0.4.1 (January 12th, 2021)
 
