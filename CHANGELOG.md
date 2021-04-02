@@ -12,8 +12,9 @@
 
 ### All Changes
 
+- Add qiskit executor example for exact density matrix simulation with depolarizing noise (@aaron-robertson, gh-574)
+- Replace Qiskit utils with Qiskit executors from docs  (@pchung39, @aaron-robertson, gh-584)
 - Add ``represent_operations_in_circuit_...`` functions for PEC (@andreamari, gh-515)
-- Add qiskit executor example for exact density matrix simulation with depolarizing noise (@aaron-robertson gh-269)
 - Add qiskit and cirq executor examples gifs to readme (@nathanshammah, gh-587)
 - Fix mitiq.about() qiskit version (@aaron-robertson, gh-595)
 - Fix typo in ZNE documentation (@purva-thakre, gh-602)
