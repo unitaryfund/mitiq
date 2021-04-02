@@ -1541,13 +1541,13 @@ class ExpBayesFactory(BatchedFactory):
             full_output: If False (default), only the zero-noise limit is
                 returned. If True, additional information about the
                 extrapolated limit is returned too.
-                
+
         Returns:
-            zne_limit: The extrapolated zero-noise limit. If "full_output"
-                is False (default value), only this parameter is returned.
+            zne_limit: The extrapolated zero-noise limit. If "full_output" is\
+                False (default value), only this parameter is returned.
             opt_params: The parameter array of the best fitting model.
-            zne_curve: The callable function which best fit the input data.
-                It maps a real noise scale factor to a real expectation value.
+            zne_curve: The callable function which best fit the input data.\
+                It maps a real noise scale factor to a real expectation value.\
                 It is equal "zne_limit" when evaluated at zero.
 
         Note:
