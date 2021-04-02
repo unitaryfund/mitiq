@@ -31,43 +31,7 @@ def generate_training_circuits(
     method_replace: str = "closest",
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     **additional_options: dict,
-) -> Tuple[List[Circuit], List[List[float]], List[List[float]]]:
-    """Function to return a list of near-Clifford circuits from one circuit of
-    interest. Data generated from these circuits is used as a training set to
-    learn the effect of noise.
-
-    Args:
-        circuit: A circuit of interest, assumes already compiled into gate set
-                               (Rz, Rx, Z, X, CNOT).
-        num_training_circuits: Number of circuits in the returned training set.
-        fraction_non_clifford: The (approximate) fraction of non-Clifford
-                               gates in each returned circuit.
-        method_select: option to define the way in which the non-Clifford
-                              gates to replace with Cliffords are chosen.
-                              Options are 'uniform' or 'gaussian'.
-        method_replace: str = option to define the way the chosen non-Clifford
-                              gates are replace with a Clifford gate can take
-                              strings 'uniform', 'gaussian' or 'closest'.
-        random_state: Seed for sampling.
-        additional_options: sequence of key = value pairs with keys defined as:
-            'sigma_select': float -  postitive variable definined width of
-                                     probability distribution used in choosing
-                                     which non-Cliffords to replace, only has
-                                     an impact if
-                                     method_select = 'gaussian'.
-            'sigma_replace': float - positive variable which defines the width
-                                     of probability distribution used in
-                                     choosing which Clifford to replace the
-                                     non-Clifford with, only has an impact if
-                                     method_replace = 'gaussian'.
-    Returns:
-        List[circ.Circuit]: list of near-Clifford circuits constructed from
-                             the circuits of interest.
-        List[List[float]]: list of list of angles that were replaced in each
-                           training circuit.
-        List[List[float]]: list of list of angles that were inserted in each
-                           training circuit.
-    """
+    ) -> Tuple[List[Circuit], List[List[float]], List[List[float]]]:
     circuits_list = []
     # setting the seed:
     if isinstance(random_state, int):

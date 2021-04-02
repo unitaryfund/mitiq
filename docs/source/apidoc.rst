@@ -101,11 +101,12 @@ Noise Scaling: Parametric Calibration
 .. automodule:: mitiq.zne.scaling.parameter
    :members:
 
-   Probabilistic Error Cancellation
+Probabilistic Error Cancellation
 --------------------------------
 
 Clifford Training Data
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------
 .. automodule:: mitiq.cdr.clifford_training_data
    :members:
-   :cite:`czarnik2020error`
+
+See Ref. :cite:`Czarnik_2020_arXiv` for more details on these methods.
