@@ -42,10 +42,7 @@ from mitiq.mitiq_qiskit.conversions import to_qiskit, from_qiskit
 CLIFFORD_ANGLES = (0.0, np.pi / 2, np.pi, (3 / 2) * (np.pi))
 
 
-def random_circuit(
-    qubits: int,
-    depth: int,
-) -> Circuit:
+def random_circuit(qubits: int, depth: int,) -> Circuit:
     """Function to generate a random quantum circuit in cirq. The circuit is
        based on the hardware efficient ansatz,
     with alternating CNOT layers with randomly selected single qubit gates in
@@ -66,9 +63,7 @@ def random_circuit(
     return circuit
 
 
-def qiskit_circuit_transpilation(
-    circ: QuantumCircuit,
-) -> QuantumCircuit:
+def qiskit_circuit_transpilation(circ: QuantumCircuit,) -> QuantumCircuit:
     """Decomposes qiskit circuit object into Rz, Rx(pi/2) (sx), X and CNOT \
        gates.
     Args:
@@ -112,39 +107,13 @@ def qiskit_circuit_transpilation(
     return circ_new
 
 
-num_qubits = 2
-layers = 1
-num_training_circuits = 1
+num_qubits = 4
+layers = 10
+num_training_circuits = 40
 fraction_non_clifford = 0.5
 circuit = cirq.circuits.Circuit(random_circuit(num_qubits, layers))
 circuit = from_qiskit(qiskit_circuit_transpilation(to_qiskit(circuit)))
 non_cliffords = count_non_cliffords(circuit)
-
-
-def Exception_2(method_select):
-    """Function that takes the method_select string and returns the
-    Exception associated with that string.
-
-    Args:
-        method_select: string specifying the method.
-
-    Returns the
-    """
-    Exception_2 = Exception(
-        f"Arg `method_select` must be 'uniform', or \
-                'gaussian' but was {method_select}"
-    )
-    return Exception_2
-
-
-def Exception_3(method_replace):
-    """Function that takes the method_select string and returns the
-    Exception associated with that string."""
-    Exception_3 = Exception(
-        f"Arg `method_replace` must be 'closest', 'uniform', or \
-                'gaussian' but was {method_replace}"
-    )
-    return Exception_3
 
 
 def test_generate_training_circuits():
@@ -190,21 +159,19 @@ def test_generate_training_circuits():
                 method_select,
                 method_replace,
             )
-            test_training_set_circuits_with_options = (
-                generate_training_circuits(
-                    circuit,
-                    num_training_circuits,
-                    fraction_non_clifford,
-                    method_select,
-                    method_replace,
-                    random_state,
-                    additional_options=additional_options,
-                )
+            test_training_circuits_with_options = generate_training_circuits(
+                circuit,
+                num_training_circuits,
+                fraction_non_clifford,
+                method_select,
+                method_replace,
+                random_state,
+                additional_options=additional_options,
             )
             assert len(test_training_set_circuits) == num_training_circuits
 
             assert (
-                len(test_training_set_circuits_with_options)
+                len(test_training_circuits_with_options)
                 == num_training_circuits
             )
 
@@ -217,13 +184,13 @@ def test_generate_training_circuits():
                     circuit.all_qubits()
                 )
                 assert count_non_cliffords(
-                    test_training_set_circuits_with_options[i]
+                    test_training_circuits_with_options[i]
                 ) == int(fraction_non_clifford * non_cliffords)
-                assert len(test_training_set_circuits_with_options[i]) == len(
+                assert len(test_training_circuits_with_options[i]) == len(
                     circuit
                 )
                 assert len(
-                    test_training_set_circuits_with_options[i].all_qubits()
+                    test_training_circuits_with_options[i].all_qubits()
                 ) == len(circuit.all_qubits())
 
 
@@ -289,7 +256,6 @@ def test_map_to_near_cliffords():
 
 def test_select():
     method_select_options_list = ["uniform", "gaussian"]
-    additional_options = {"sigma_select": 0.5, "sigma_replace": 0.5}
     non_cliffords = count_non_cliffords(circuit)
     operations = np.array(list(circuit.all_operations()))
     gates = np.array([op.gate for op in operations])
@@ -301,8 +267,8 @@ def test_select():
     mask_non_cliff = ~_is_clifford_angle(angles)
     rz_non_cliff = angles[mask_non_cliff]
     rz_non_cliff_copy = rz_non_cliff.copy()
-    sigma_select = additional_options.setdefault("sigma_select", 0.5)
     random_state = np.random.RandomState(1)
+    sigma_select = 0.5
     for method_select in method_select_options_list:
         columns_to_change = _select(
             rz_non_cliff_copy,
@@ -319,7 +285,6 @@ def test_select():
 def test_replace():
     method_select_options_list = ["uniform", "gaussian"]
     method_replace_options_list = ["uniform", "gaussian", "closest"]
-    additional_options = {"sigma_select": 0.5, "sigma_replace": 0.5}
     non_cliffords = count_non_cliffords(circuit)
     operations = np.array(list(circuit.all_operations()))
     gates = np.array([op.gate for op in operations])
@@ -331,8 +296,8 @@ def test_replace():
     mask_non_cliff = ~_is_clifford_angle(angles)
     rz_non_cliff = angles[mask_non_cliff]
     rz_non_cliff_copy = rz_non_cliff.copy()
-    sigma_select = additional_options.setdefault("sigma_select", 0.5)
-    sigma_replace = additional_options.setdefault("sigma_replace", 0.5)
+    sigma_select = 0.5
+    sigma_replace = 0.5
     random_state = np.random.RandomState(1)
     for method_select in method_select_options_list:
         for method_replace in method_replace_options_list:
@@ -344,15 +309,15 @@ def test_replace():
                 random_state,
             )
             rz_non_cliff_selected = rz_non_cliff_copy[columns_to_change]
-            rz_non_cliff_selected = _replace(
+            rz_non_cliff_replaced = _replace(
                 rz_non_cliff_selected,
                 method_replace,
                 sigma_select,
                 sigma_replace,
                 random_state,
             )
-            assert _is_clifford_angle(rz_non_cliff_selected.all())
-            assert len(rz_non_cliff_selected) == (
+            assert _is_clifford_angle(rz_non_cliff_replaced.all())
+            assert len(rz_non_cliff_replaced) == (
                 non_cliffords - int(non_cliffords * fraction_non_clifford)
             )
 

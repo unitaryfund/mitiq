@@ -309,15 +309,15 @@ def _replace(
         'uniform' or 'gaussian'.
     """
     if method_replace == "closest":
-        rz_non_cliff_selected = _closest_clifford(rz_non_cliff_selected)
+        rz_non_cliff_replaced = _closest_clifford(rz_non_cliff_selected)
 
     elif method_replace == "uniform":
-        rz_non_cliff_selected = _random_clifford(
+        rz_non_cliff_replaced = _random_clifford(
             rz_non_cliff_selected, random_state
         )
 
     elif method_replace == "gaussian":
-        rz_non_cliff_selected = _probabilistic_angle_to_clifford(
+        rz_non_cliff_replaced = _probabilistic_angle_to_clifford(
             rz_non_cliff_selected, sigma_replace, random_state
         )
     else:
@@ -325,13 +325,10 @@ def _replace(
             f"Arg `method_replace` must be 'closest', 'uniform', or \
                 'gaussian' but was {method_replace}"
         )
+    return rz_non_cliff_replaced
 
-    return rz_non_cliff_selected
 
-
-def count_non_cliffords(
-    circuit: Circuit,
-) -> float:
+def count_non_cliffords(circuit: Circuit,) -> float:
     """Function to check how many non-Clifford gates are in a give circuit.
 
     Args:
@@ -353,10 +350,7 @@ def count_non_cliffords(
     return len(rz_non_cliff)
 
 
-def _is_clifford_angle(
-    ang: float,
-    tol: float = 10 ** -5,
-) -> bool:
+def _is_clifford_angle(ang: float, tol: float = 10 ** -5,) -> bool:
     """Function to check if a given angle is Clifford.
     Args:
         ang: rotation angle in the Rz gate.
