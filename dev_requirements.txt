@@ -1,5 +1,5 @@
 # Third-party integration.
-# qiskit-terra is not specified because it is a dependency for aer
+qiskit-terra ~= 0.16.4
 qiskit-aer~=0.8
 qiskit-ibmq-provider~=0.12.2
 pyquil~=2.28.0
