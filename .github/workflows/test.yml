@@ -59,6 +59,8 @@ jobs:
     steps:
       - name: Check out mitiq
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -78,5 +80,4 @@ jobs:
         if: ${{ matrix.python-version == 3.8 }}
         uses: codecov/codecov-action@v1.0.12
         with:
-          fetch-depth: 2
           fail_ci_if_error: true
