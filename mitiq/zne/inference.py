@@ -1208,8 +1208,7 @@ class ExpFactory(BatchedFactory):
 class PolyExpFactory(BatchedFactory):
     """
     Factory object implementing a zero-noise extrapolation algorithm assuming
-    an (almost) exponential ansatz with a non linear exponent, i.e.:
-
+    an (almost) exponential ansatz with a non linear exponent
     y(x) = a + sign * exp(z(x)), where z(x) is a polynomial of a given order.
 
     The parameter "sign" is a sign variable which can be either 1 or -1,
