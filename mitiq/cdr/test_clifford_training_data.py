@@ -16,6 +16,7 @@ import cirq
 from cirq.circuits import Circuit
 from random import randint, uniform
 import numpy as np
+from pytest import raises
 from clifford_training_data import (
     _is_clifford_angle,
     _map_to_near_clifford,
@@ -28,7 +29,6 @@ from clifford_training_data import (
     _replace,
     _select,
     _get_arguments,
-    _get_gates,
 )
 from cirq.experiments import (
     random_rotations_between_grid_interaction_layers_circuit,
@@ -42,7 +42,10 @@ from mitiq.mitiq_qiskit.conversions import to_qiskit, from_qiskit
 CLIFFORD_ANGLES = (0.0, np.pi / 2, np.pi, (3 / 2) * (np.pi))
 
 
-def random_circuit(qubits: int, depth: int,) -> Circuit:
+def random_circuit(
+    qubits: int,
+    depth: int,
+) -> Circuit:
     """Function to generate a random quantum circuit in cirq. The circuit is
        based on the hardware efficient ansatz,
     with alternating CNOT layers with randomly selected single qubit gates in
@@ -63,7 +66,9 @@ def random_circuit(qubits: int, depth: int,) -> Circuit:
     return circuit
 
 
-def qiskit_circuit_transpilation(circ: QuantumCircuit,) -> QuantumCircuit:
+def qiskit_circuit_transpilation(
+    circ: QuantumCircuit,
+) -> QuantumCircuit:
     """Decomposes qiskit circuit object into Rz, Rx(pi/2) (sx), X and CNOT \
        gates.
     Args:
@@ -107,24 +112,75 @@ def qiskit_circuit_transpilation(circ: QuantumCircuit,) -> QuantumCircuit:
     return circ_new
 
 
-num_qubits = 4
-layers = 10
-num_training_circuits = 10
-fraction_non_clifford = 0.3
+num_qubits = 2
+layers = 1
+num_training_circuits = 1
+fraction_non_clifford = 0.5
 circuit = cirq.circuits.Circuit(random_circuit(num_qubits, layers))
 circuit = from_qiskit(qiskit_circuit_transpilation(to_qiskit(circuit)))
 non_cliffords = count_non_cliffords(circuit)
+
+
+def Exception_2(method_select):
+    """Function that takes the method_select string and returns the
+    Exception associated with that string.
+
+    Args:
+        method_select: string specifying the method.
+
+    Returns the
+    """
+    Exception_2 = Exception(
+        f"Arg `method_select` must be 'uniform', or \
+                'gaussian' but was {method_select}"
+    )
+    return Exception_2
+
+
+def Exception_3(method_replace):
+    """Function that takes the method_select string and returns the
+    Exception associated with that string."""
+    Exception_3 = Exception(
+        f"Arg `method_replace` must be 'closest', 'uniform', or \
+                'gaussian' but was {method_replace}"
+    )
+    return Exception_3
 
 
 def test_generate_training_circuits():
     """Test that generate_training_circuits function is working properly with
     the random projrection method.
     """
-    method_select_options_list = ["random", "probabilistic"]
-    method_replace_options_list = ["random", "probabilistic", "closest"]
+    method_select_options_list = ["uniform", "gaussian"]
+    method_replace_options_list = ["uniform", "gaussian", "closest"]
     additional_options = {"sigma_select": 0.5, "sigma_replace": 0.5}
     non_cliffords = count_non_cliffords(circuit)
     random_state = 13
+    method_select = "uniform"
+    method_replace = "uniform"
+    method_select_2 = "uni"
+    method_replace_2 = "uni"
+    assert raises(
+        Exception,
+        generate_training_circuits,
+        circuit,
+        num_training_circuits,
+        fraction_non_clifford,
+        method_select_2,
+        method_replace,
+        random_state,
+    )
+
+    assert raises(
+        Exception,
+        generate_training_circuits,
+        circuit,
+        num_training_circuits,
+        fraction_non_clifford,
+        method_select,
+        method_replace_2,
+        random_state,
+    )
     for method_select in method_select_options_list:
         for method_replace in method_replace_options_list:
             test_training_set_circuits = generate_training_circuits(
@@ -133,7 +189,7 @@ def test_generate_training_circuits():
                 fraction_non_clifford,
                 method_select,
                 method_replace,
-            )[0]
+            )
             test_training_set_circuits_with_options = (
                 generate_training_circuits(
                     circuit,
@@ -144,7 +200,7 @@ def test_generate_training_circuits():
                     random_state,
                     additional_options=additional_options,
                 )
-            )[0]
+            )
             assert len(test_training_set_circuits) == num_training_circuits
 
             assert (
@@ -172,28 +228,49 @@ def test_generate_training_circuits():
 
 
 def test_map_to_near_cliffords():
-    method_select_options_list = ["random", "probabilistic"]
-    method_replace_options_list = ["random", "probabilistic", "closest"]
+    method_select_options_list = ["uniform", "gaussian"]
+    method_replace_options_list = ["uniform", "gaussian", "closest"]
     additional_options = {"sigma_select": 0.5, "sigma_replace": 0.5}
     non_cliffords = count_non_cliffords(circuit)
     random_state = np.random.RandomState(1)
+    operations = np.array(list(circuit.all_operations()))
+    gates = np.array([op.gate for op in operations])
+    qubits = np.array([op.qubits[0] for op in operations])
+    positions = np.array(range(0, len(gates)))
+    zgatesmask = np.array(
+        [isinstance(gate, cirq.ops.common_gates.ZPowGate) for gate in gates]
+    )
+    r_z_gates = operations[zgatesmask]
+    r_z_positions = positions[zgatesmask]
+    r_z_qubits = qubits[zgatesmask]
+    angles = _get_arguments(r_z_gates)
+    mask_non_cliff = ~_is_clifford_angle(angles)
+    rz_non_cliff = angles[mask_non_cliff]
+    pos_non_cliff = r_z_positions[mask_non_cliff]
+    qubits_non_cliff = r_z_qubits[mask_non_cliff]
     for method_select in method_select_options_list:
         for method_replace in method_replace_options_list:
             projected_circuit = _map_to_near_clifford(
-                circuit,
+                operations.copy(),
+                rz_non_cliff.copy(),
+                pos_non_cliff.copy(),
+                qubits_non_cliff.copy(),
                 fraction_non_clifford,
                 random_state,
                 method_select,
                 method_replace,
-            )[0]
+            )
             projected_circuit_with_options = _map_to_near_clifford(
-                circuit,
+                operations.copy(),
+                rz_non_cliff.copy(),
+                pos_non_cliff.copy(),
+                qubits_non_cliff.copy(),
                 fraction_non_clifford,
                 random_state,
                 method_select,
                 method_replace,
                 additional_options=additional_options,
-            )[0]
+            )
             assert count_non_cliffords(projected_circuit) == int(
                 fraction_non_clifford * non_cliffords
             )
@@ -211,15 +288,15 @@ def test_map_to_near_cliffords():
 
 
 def test_select():
-    method_select_options_list = ["random", "probabilistic"]
+    method_select_options_list = ["uniform", "gaussian"]
     additional_options = {"sigma_select": 0.5, "sigma_replace": 0.5}
     non_cliffords = count_non_cliffords(circuit)
     operations = np.array(list(circuit.all_operations()))
-    gates = _get_gates(operations)
-    mask = np.array(
+    gates = np.array([op.gate for op in operations])
+    rzgatemask = np.array(
         [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
     )
-    r_z_gates = operations[mask]
+    r_z_gates = operations[rzgatemask]
     angles = _get_arguments(r_z_gates)
     mask_non_cliff = ~_is_clifford_angle(angles)
     rz_non_cliff = angles[mask_non_cliff]
@@ -240,12 +317,12 @@ def test_select():
 
 
 def test_replace():
-    method_select_options_list = ["random", "probabilistic"]
-    method_replace_options_list = ["random", "probabilistic", "closest"]
+    method_select_options_list = ["uniform", "gaussian"]
+    method_replace_options_list = ["uniform", "gaussian", "closest"]
     additional_options = {"sigma_select": 0.5, "sigma_replace": 0.5}
     non_cliffords = count_non_cliffords(circuit)
     operations = np.array(list(circuit.all_operations()))
-    gates = _get_gates(operations)
+    gates = np.array([op.gate for op in operations])
     mask = np.array(
         [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
     )
@@ -280,16 +357,9 @@ def test_replace():
             )
 
 
-def test_get_gates():
-    operations = np.array(list(circuit.all_operations()))
-    gates = _get_gates(operations)
-    for g, gate in enumerate(gates):
-        assert gate == operations[g].gate
-
-
 def test_get_argument():
     operations = np.array(list(circuit.all_operations()))
-    gates = _get_gates(operations)
+    gates = np.array([op.gate for op in operations])
     mask = np.array(
         [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
     )
