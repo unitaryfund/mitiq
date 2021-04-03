@@ -97,7 +97,7 @@ Mitiq code is developed according the best practices of Python development.
 * Use annotations for type hints in the objects' signature.
 * Write [google-style docstrings](https://google.github.io/styleguide/pyguide.html#doc-function-args).
 
-A code block [can be created](https://docs.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks) using triple backticks ([or indenting with four spaces or one tab](https://www.markdownguide.org/basic-syntax#code-blocks))  before and after the code with a language identifier for code syntax highlighting. 
+A code block [can be created](https://docs.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks) using triple backticks ([or indenting with either four spaces or a tab](https://www.markdownguide.org/basic-syntax#code-blocks))  before and after the code with a language identifier for code syntax highlighting.
 
 We use [Black](https://black.readthedocs.io/en/stable/index.html) and `flake8` to automatically
 lint the code and enforce style requirements as part of the CI pipeline. You can run these style
@@ -110,10 +110,17 @@ saves a lot of time by removing the need for style nitpicks in PR review. We onl
 default behavior in one category: we choose to use a line length of 79 rather than the Black
 default of 88 (this is configured in the [`pyproject.toml`](https://github.com/unitaryfund/mitiq/blob/master/pyproject.toml) file).
 
-#### Possible issues with `Black`
+#### Some possible issues with `Black`
+Below is a summarized list of some issues leading to errors. A more detailed discussion can be found [in the documentation](https://black.readthedocs.io/en/stable/the_black_code_style.html#parentheses). 
 - In general, `Black` strives for one expression or statement per line with uniform vertical and horizontal whitespace. This is described as `Black` doing everything to keep "[`pycodestyle` happy](https://black.readthedocs.io/en/stable/the_black_code_style.html#how-black-wraps-lines)". A list of errors due to `pycodestyle` can be found [here](https://pycodestyle.pycqa.org/en/latest/intro.html#error-codes).
+- When a statement or expression is moved to its own line, a [trailing comma](https://black.readthedocs.io/en/stable/the_black_code_style.html#trailing-commas) will be added.
 - Because uniform vertical whitespace is enforced, empty lines are only allowed in a [handful of scenarios](https://black.readthedocs.io/en/stable/the_black_code_style.html#empty-lines) like inside, before and after function definitions etc.
 - [Default line length](https://black.readthedocs.io/en/stable/the_black_code_style.html#line-length) for `Black` is 88 characters per line. This number can be adjusted to have fewer or more characters as needed. As stated above, default length for `Mitiq` is 79 characters.
+- If an expression or a statement can be fit in one line, trailing comma introduced before a line break will be removed along with the [parentheses](https://black.readthedocs.io/en/stable/the_black_code_style.html#parentheses).
+- If backslashes are used for line breaks, these will be replaced with parentheses in keeping with [PEP 8 style guide](https://www.python.org/dev/peps/pep-0008/#maximum-line-length).
+- To obey [PEP 8 style guide for improving readability](https://www.python.org/dev/peps/pep-0008/#should-a-line-break-before-or-after-a-binary-operator), a line break will be introduced before a binary operator.
+- Use double quotes for [strings](https://black.readthedocs.io/en/stable/the_black_code_style.html#strings).
+
 
 ## Proposing a new feature to Mitiq
 
