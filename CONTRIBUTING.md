@@ -111,7 +111,7 @@ default behavior in one category: we choose to use a line length of 79 rather th
 default of 88 (this is configured in the [`pyproject.toml`](https://github.com/unitaryfund/mitiq/blob/master/pyproject.toml) file).
 
 #### Some possible issues with `Black`
-Below is a summarized list of some issues leading to errors. A more detailed discussion can be found [in the documentation](https://black.readthedocs.io/en/stable/the_black_code_style.html#parentheses).
+Below is a summarized list of some issues leading to errors. A more detailed discussion can be found [in the documentation](https://black.readthedocs.io/en/stable/the_black_code_style.html#the-black-code-style).
 - In general, `Black` strives for one expression or statement per line with uniform vertical and horizontal whitespace. This is described as `Black` doing everything to keep "[`pycodestyle` happy](https://black.readthedocs.io/en/stable/the_black_code_style.html#how-black-wraps-lines)". A list of errors due to `pycodestyle` can be found [here](https://pycodestyle.pycqa.org/en/latest/intro.html#error-codes).
 - When a statement or expression is moved to its own line, a [trailing comma](https://black.readthedocs.io/en/stable/the_black_code_style.html#trailing-commas) will be added.
 - Because uniform vertical whitespace is enforced, empty lines are only allowed in a [handful of scenarios](https://black.readthedocs.io/en/stable/the_black_code_style.html#empty-lines) like inside, before and after function definitions etc.
