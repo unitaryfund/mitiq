@@ -130,7 +130,7 @@ Mitq enhancement proposal (MEP) template [`docs/mep/0000-feature-proposal-TEMPLA
 discussion about the feature you would like to add, make a copy of the template and increment the proposal
 number and change `feature-proposal-TEMPLATE` to a short description of what you are proposing.
 Please fill out any relevant sections of that template as best you can and we can discuss in
-both PR threads as well as on the Discord server. To access Discord, copy and paste (`discord.unitary.fund`) in your web browser's address bar.
+both PR threads as well as on the [discord](http://discord.unitary.fund).
 
 ## Code of conduct
 Mitiq development abides to the [Contributors' Covenant](https://mitiq.readthedocs.io/en/latest/code_of_conduct.html).
