@@ -1,5 +1,5 @@
 # Third-party integration.
-qiskit-terra ~= 0.16.4
+qiskit-terra~=0.16.4
 qiskit-aer~=0.7.6
 qiskit-ibmq-provider~=0.12.2
 pyquil~=2.28.0
@@ -22,13 +22,13 @@ pydata-sphinx-theme~=0.3.1
 notebook~=6.1.5
 
 # Packages needed for individual qiskit install
-yfinance ~=0.1.59
-threadpoolctl ~=2.1.0
-scikit-learn ~=0.24.1
-Quandl ~=3.6.1
-multitasking ~=0.0.9
-lxml ~=4.6.3
-h5py ~=3.2.1
+yfinance~=0.1.59
+threadpoolctl~=2.1.0
+scikit-learn~=0.24.1
+Quandl~=3.6.1
+multitasking~=0.0.9
+lxml~=4.6.3
+h5py~=3.2.1
 fastdtw~=0.3.4
 e~=1.4.5
 dlx~=1.0.4
