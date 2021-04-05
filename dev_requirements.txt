@@ -11,7 +11,8 @@ flake8~=3.7.9
 black~=19.10b0
 
 # Documentation and examples.
-sphinx~=2.4.4
+sphinx~=3.5.3
+docutils==0.16
 sphinxcontrib-bibtex~=1.0.0
 sphinx-copybutton~=0.2.11
 sphinx-autodoc-typehints~=1.10.3
