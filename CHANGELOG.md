@@ -8,22 +8,21 @@
 % # " - [Bug Fix]"
 % # " - Fix the bug."
 
-## Version 0.7.0 (April 2nd, 2021)
+## Version 0.7.0 (April 6th, 2021)
 
 ### Summary
 
 This release focuses on contributions from the community.
-Many thanks @yhindi for adding a method to parametrically scale noise in circuit,
-to @elmahmoud for adding a factory for zero noise extrapolation  based on Bayesian inference, to @aaron-robertson and @pchung39 for adding Qiskit executors with depolarizing noise to the utils,
-to @purva-thakre for several fixes and improvements. Thanks also to @BobinMathew and @marwahaha for typo corrections.
+Many thanks @yhindi for adding a method to parametrically scale noise in circuit, to @aaron-robertson and @pchung39 for adding Qiskit executors with depolarizing noise to the utils,
+to @purva-thakre for several bug fixes and improvements. Thanks also to @BobinMathew and @marwahaha for typo corrections.
 
 
 ### All Changes
 
+- Pin `docutils` version to solve CI issues (@purva-thakre, gh-626)
 - Add qiskit executor example for exact density matrix simulation with depolarizing noise (@aaron-robertson, gh-574)
 - Replace Qiskit utils with Qiskit executors from docs (@pchung39, @aaron-robertson, gh-584)
 - Change custom depolarizing channel in PEC (@purva-thakre, gh-615)
-- Adds new Bayesian Inference based factory, `BayesFactory` (@elmandouh, gh-471)
 - Document codecov fetch depth change and increase codecov action version (@grmlarose, gh-618)
 - Fix spelling typo (@marwahaha, gh-616)
 - Add link for MEP (@purva-thakre, gh-610)
