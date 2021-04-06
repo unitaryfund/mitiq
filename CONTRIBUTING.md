@@ -100,11 +100,24 @@ Mitiq code is developed according the best practices of Python development.
 
 We use [Black](https://black.readthedocs.io/en/stable/index.html) and `flake8` to automatically
 lint the code and enforce style requirements as part of the CI pipeline. You can run these style
-tests yourself locally by running `make check-style` (to check for violations of the `flake8` rules)
-and `make check-format` (to see if `black` would reformat the code) in the top-level directory of
-the repository. If you aren't presented with any errors, then that means your code is good enough
-for the linter (`flake8`) and formatter (`black`). If `make check-format` fails, it will present
-you with a diff, which you can resolve by running `make format`. Black is very opinionated, but
+tests yourself locally in the top-level directory of
+the repository.
+
+You can check for violations of the `flake8` rules with
+```bash
+(myenv) make check-style
+```
+In order to check if `black` would reformat the code, use
+```bash
+(myenv) make check-format
+```
+If above format check fails then you will be presented with a [diff](https://black.readthedocs.io/en/stable/installation_and_usage.html#command-line-options) which can be resolved by running
+```bash
+(myenv) make format
+```
+
+ If you aren't presented with any errors, then that means your code is good enough
+for the linter (`flake8`) and formatter (`black`). Black is very opinionated, but
 saves a lot of time by removing the need for style nitpicks in PR review. We only deviate from its
 default behavior in one category: we choose to use a line length of 79 rather than the Black
 default of 88 (this is configured in the [`pyproject.toml`](https://github.com/unitaryfund/mitiq/blob/master/pyproject.toml) file).
