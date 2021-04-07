@@ -36,7 +36,7 @@ mitiq.about()
 This prints out version information about core requirements and optional quantum software packages which Mitiq can
 interface with.
 
-If you'd prefer to clone and install from source, our would like to develop Mitiq, check out the
+If you'd prefer to clone and install from source, or would like to develop Mitiq, check out the
 [contribution guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) for more information.
 
 ### Supported quantum programming libraries
@@ -95,6 +95,16 @@ Sample output:
 Error in simulation (w/o  mitigation): 0.0506
 Error in simulation (with mitigation): 0.000519
 ```
+
+### Example with Qiskit
+
+![Alt Text](assets/qiskit.gif)
+
+
+### Example with Cirq
+
+![Alt Text](assets/cirq.gif)
+
 
 ## Error mitigation techniques
 

@@ -40,7 +40,7 @@ circ = cirq.Circuit(cirq.ops.H.on_each(*qreg), cirq.measure_each(*qreg))
 
 # Default executor for unit tests
 def executor(circuit) -> float:
-    wavefunction = circuit.final_wavefunction()
+    wavefunction = circuit.final_state_vector()
     return np.real(wavefunction.conj().T @ np.kron(npX, npZ) @ wavefunction)
 
 

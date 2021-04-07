@@ -27,8 +27,8 @@ Unlike software bugs affecting code in usual computers, the errors which we
 attempt to reduce with mitigation are due to the hardware.
 
 Quantum error mitigation techniques try to *reduce* the impact of noise in
-quantum computations. They generally do not completely remove it. Alternative 
-nomenclature refers to error mitigation as (approximate) error suppression or 
+quantum computations. They generally do not completely remove it. Alternative
+nomenclature refers to error mitigation as (approximate) error suppression or
 approximate quantum error correction, but it is worth noting that error mitigation
 is distinctly different from :ref:`error correction <guide_qem_qec>`. Two leading
 error mitigation techniques implemented in Mitiq are zero-noise extrapolation
@@ -89,7 +89,7 @@ final mixed state :math:`\rho_f`. Then, by measuring the observable :math:`X`, s
 :math:`\gamma_{\text{tot}} := \prod_{i}^L \gamma_i` and
 :math:`\sigma_{\text{tot}} = \prod_{i=1}^L \sigma_i(\alpha)`, we can obtain an unbiased
 estimate of the ideal expectation value as
-:math:`\langleX\rangle_{\text{ideal}} =  \mathbb E \left[ \gamma_{\text{tot}} \sigma_{\text{tot}} X_{\rm noisy} \right]`,
+:math:`\langle X\rangle_{\text{ideal}} =  \mathbb E \left[ \gamma_{\text{tot}} \sigma_{\text{tot}} X_{\rm noisy} \right]`,
 where :math:`X_{\rm noisy}` is the experimental estimate of :math:`{\rm tr}[\rho_f X]`
 and :math:`\mathbb E` is the sample average over many repetitions of the previous procedure.
 
@@ -105,7 +105,7 @@ by :math:`\gamma_{\text{tot}}` which grows exponentially in the number of gates.
 It is then crucial to find a linear decomposition that minimizes :math:`\gamma_{\text{tot}}`.
 In addition, a full characterization of the noisy operations up to a good precision
 is required, which can be costly depending on the implementation.
- 
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Other error mitigation techniques
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -240,7 +240,7 @@ A list of research articles academic resources on error mitigation:
 - On **zero-noise extrapolation**:
    - Theory, Y. Li and S. Benjamin, *Phys. Rev. X*, 2017 :cite:`Li_2017_PRX` and K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
    - Experiment on superconducting circuit chip, A. Kandala *et al.*, *Nature*, 2019 :cite:`Kandala_2019_Nature`
-   
+
 - On **probabilistic error cancellation**:
    - Theory, Y. Li and S. Benjamin, *Phys. Rev. X*, 2017 :cite:`Li_2017_PRX` and K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
    - Resource analysis for probabilistic error cancellation, Ryuji Takagi, arxiv, 2020 :cite:`Takagi2020optimal`

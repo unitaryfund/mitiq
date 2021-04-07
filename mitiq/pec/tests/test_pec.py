@@ -15,7 +15,6 @@
 
 """Unit tests for PEC."""
 
-from itertools import product
 from typing import List, Optional
 from functools import partial
 import pytest
@@ -32,12 +31,12 @@ from mitiq.benchmarks.utils import noisy_simulation
 from mitiq.pec import execute_with_pec, NoisyOperation, OperationRepresentation
 from mitiq.pec.pec import LargeSampleWarning
 from mitiq.pec.representations import (
-    represent_operation_with_local_depolarizing_noise,
+    represent_operations_in_circuit_with_local_depolarizing_noise,
 )
 
 
-# Noisy representations of Pauli operations for testing.
-def get_pauli_representations(
+# Noisy representations of Pauli and CNOT operations for testing.
+def get_pauli_and_cnot_representations(
     base_noise: float, qubits: Optional[List[cirq.Qid]] = None,
 ) -> List[OperationRepresentation]:
 
@@ -52,30 +51,20 @@ def get_pauli_representations(
 
     for gate in pauli_gates:
         for qubit in qreg:
-            ideal_operations.append(cirq.Circuit(gate(qubit)))
+            ideal_operations.append(gate(qubit))
 
-    # Generate all ideal 2-qubit Pauli operations
-    for gate_a, gate_b in product(pauli_gates, repeat=2):
-        ideal_operations.append(
-            cirq.Circuit([gate_a(qreg[0]), gate_b(qreg[1])])
-        )
-
-    # Add CNOT too
-    ideal_operations.append(cirq.Circuit(cirq.CNOT(*qreg)))
+    # Add CNOT operation too
+    ideal_operations.append(cirq.CNOT(*qreg))
 
     # Generate all representations
-    reps = []
-    for op in ideal_operations:
-        reps.append(
-            represent_operation_with_local_depolarizing_noise(op, base_noise,)
-        )
-
-    return reps
+    return represent_operations_in_circuit_with_local_depolarizing_noise(
+        ideal_circuit=cirq.Circuit(ideal_operations), noise_level=base_noise,
+    )
 
 
 BASE_NOISE = 0.02
-pauli_representations = get_pauli_representations(base_noise=BASE_NOISE)
-noiseless_pauli_representations = get_pauli_representations(base_noise=0.0)
+pauli_representations = get_pauli_and_cnot_representations(BASE_NOISE)
+noiseless_pauli_representations = get_pauli_and_cnot_representations(0.0)
 
 
 def serial_executor(circuit: QPROGRAM, noise: float = BASE_NOISE) -> float:
@@ -123,8 +112,7 @@ def test_execute_with_pec_cirq_trivial_decomposition():
         circuit,
         serial_executor,
         representations=[rep],
-        force_run_all=False,
-        num_samples=100,
+        num_samples=10,
         random_state=1,
     )
 
@@ -142,8 +130,7 @@ def test_execute_with_pec_pyquil_trivial_decomposition():
         circuit,
         serial_executor,
         representations=[rep],
-        num_samples=100,
-        force_run_all=False,
+        num_samples=10,
         random_state=1,
     )
 
@@ -163,8 +150,7 @@ def test_execute_with_pec_qiskit_trivial_decomposition():
         circuit,
         serial_executor,
         representations=[rep],
-        num_samples=100,
-        force_run_all=False,
+        num_samples=10,
         random_state=1,
     )
 
@@ -179,15 +165,14 @@ def test_execute_with_pec_cirq_noiseless_decomposition(circuit):
         circuit,
         noiseless_serial_executor,
         representations=noiseless_pauli_representations,
-        force_run_all=False,
-        num_samples=100,
+        num_samples=10,
         random_state=1,
     )
 
     assert np.isclose(unmitigated, mitigated)
 
 
-@pytest.mark.parametrize("nqubits", [1, 2, 5])
+@pytest.mark.parametrize("nqubits", [1, 2])
 def test_pyquil_noiseless_decomposition_multiqubit(nqubits):
     circuit = pyquil.Program(pyquil.gates.H(q) for q in range(nqubits))
 
@@ -268,7 +253,7 @@ def test_execute_with_pec_mitigates_noise(circuit, executor, circuit_type):
 
     if circuit_type == "qiskit":
         # Note this is an important subtlety necessary because of conversions.
-        reps = get_pauli_representations(
+        reps = get_pauli_and_cnot_representations(
             base_noise=BASE_NOISE,
             qubits=[cirq.NamedQubit(name) for name in ("q_0", "q_1")],
         )
@@ -282,6 +267,7 @@ def test_execute_with_pec_mitigates_noise(circuit, executor, circuit_type):
         circuit,
         executor,
         representations=reps,
+        num_samples=100,
         force_run_all=False,
         random_state=101,
     )
@@ -298,32 +284,25 @@ def test_execute_with_pec_with_different_samples(circuit, seed):
     """Tests that, on average, the error decreases as the number of samples is
     increased.
     """
-    errors_few_samples = []
-    errors_more_samples = []
-    for _ in range(10):
+    small_sample_number = 10
+    large_sample_number = 100
+
+    errors = []
+    for num_samples in (small_sample_number, large_sample_number):
         mitigated = execute_with_pec(
             circuit,
             serial_executor,
             representations=pauli_representations,
-            num_samples=10,
+            num_samples=num_samples,
             force_run_all=True,
             random_state=seed,
         )
-        errors_few_samples.append(abs(mitigated - 1.0))
-        mitigated = execute_with_pec(
-            circuit,
-            serial_executor,
-            representations=pauli_representations,
-            num_samples=100,
-            force_run_all=True,
-            random_state=seed,
-        )
-        errors_more_samples.append(abs(mitigated - 1.0))
+        errors.append(abs(mitigated - 1.0))
 
-    assert np.average(errors_more_samples) < np.average(errors_few_samples)
+    assert np.average(errors[1]) < np.average(errors[0])
 
 
-@pytest.mark.parametrize("num_samples", [100, 1000])
+@pytest.mark.parametrize("num_samples", [100, 500])
 def test_execute_with_pec_error_scaling(num_samples: int):
     """Tests that the error associated to the PEC value scales as
     1/sqrt(num_samples).
@@ -341,7 +320,7 @@ def test_execute_with_pec_error_scaling(num_samples: int):
     assert np.isclose(normalized_error, 1.0, atol=0.1)
 
 
-@pytest.mark.parametrize("precision", [0.1, 0.05])
+@pytest.mark.parametrize("precision", [0.2, 0.1])
 def test_precision_option_in_execute_with_pec(precision: float):
     """Tests that the 'precision' argument is used to deduce num_samples."""
     # For a noiseless circuit we expect num_samples = 1/precision^2:
@@ -352,23 +331,23 @@ def test_precision_option_in_execute_with_pec(precision: float):
         precision=precision,
         force_run_all=True,
         full_output=True,
+        random_state=1,
     )
     # The error should scale as precision
-    assert np.isclose(pec_data["pec_error"] / precision, 1.0, atol=0.1)
+    print(pec_data["pec_error"] / precision)
+    assert np.isclose(pec_data["pec_error"] / precision, 1.0, atol=0.15)
 
-    # If num_samples is given, precision is ignored.
-    nsamples = 1000
+    # Check precision is ignored when num_samples is given.
+    num_samples = 1
     _, pec_data = execute_with_pec(
         oneq_circ,
         partial(fake_executor, random_state=np.random.RandomState(0)),
         representations=pauli_representations,
         precision=precision,
-        num_samples=nsamples,
+        num_samples=num_samples,
         full_output=True,
     )
-    # The error should scale as 1/sqrt(num_samples)
-    assert not np.isclose(pec_data["pec_error"] / precision, 1.0, atol=0.1)
-    assert np.isclose(pec_data["pec_error"] * np.sqrt(nsamples), 1.0, atol=0.1)
+    assert pec_data["num_samples"] == num_samples
 
 
 @pytest.mark.parametrize("bad_value", (0, -1, 2))
@@ -403,7 +382,7 @@ def test_pec_data_with_full_output():
     """Tests that execute_with_pec mitigates the error of a noisy
     expectation value.
     """
-    precision = 0.1
+    precision = 0.5
     pec_value, pec_data = execute_with_pec(
         twoq_circ,
         serial_executor,

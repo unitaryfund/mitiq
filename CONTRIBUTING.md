@@ -111,7 +111,7 @@ default of 88 (this is configured in the [`pyproject.toml`](https://github.com/u
 ## Proposing a new feature to Mitiq
 
 If you are interested in adding a larger new feature or functionality to Mitiq, please check out our
-Mitq enhancement proposal (MEP) template `docs/mep/0000-feature-proposal-TEMPLATE.md`. To help facilitate
+Mitq enhancement proposal (MEP) template [`docs/mep/0000-feature-proposal-TEMPLATE.md`](https://github.com/unitaryfund/mitiq/blob/master/docs/mep/0000-feature-proposal-TEMPLATE.md). To help facilitate
 discussion about the feature you would like to add, make a copy of the template and increment the proposal
 number and change `feature-proposal-TEMPLATE` to a short description of what you are proposing.
 Please fill out any relevant sections of that template as best you can and we can discuss in 

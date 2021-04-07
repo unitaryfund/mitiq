@@ -15,7 +15,9 @@
 
 """Tests for zero-noise extrapolation with Qiskit front-ends and back-ends."""
 import pytest
+import numpy as np
 
+import qiskit
 from qiskit import (
     Aer,
     ClassicalRegister,
@@ -23,36 +25,88 @@ from qiskit import (
     QuantumRegister,
     execute,
 )
+from qiskit.providers.aer.noise import NoiseModel
+
+from typing import Optional
 
 from mitiq import zne
 from mitiq._typing import QPROGRAM
-from mitiq.mitiq_qiskit.qiskit_utils import (
-    random_one_qubit_identity_circuit,
-    run_with_noise,
-)
-
+from qiskit.providers.aer.noise import depolarizing_error
+from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
+from mitiq.mitiq_qiskit.conversions import to_qiskit
 
 BASE_NOISE = 0.007
 TEST_DEPTH = 30
+ONE_QUBIT_GS_PROJECTOR = np.array([[1, 0], [0, 0]])
+QASM_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
+
+
+def random_one_qubit_identity_circuit(num_cliffords: int) -> QuantumCircuit:
+    """Returns a single-qubit identity circuit.
+
+    Args:
+        num_cliffords (int): Number of cliffords used to generate the circuit.
+
+    Returns:
+        circuit: Quantum circuit as a :class:`qiskit.QuantumCircuit` object.
+    """
+    return to_qiskit(
+        *generate_rb_circuits(
+            n_qubits=1, num_cliffords=num_cliffords, trials=1
+        )
+    )
 
 
 def measure(circuit, qid) -> QuantumCircuit:
-    """Apply the measure method on the first qubit of a quantum circuit
-    given a classical register.
-
-    Args:
-        circuit: Quantum circuit.
-        qid: classical register.
-
-    Returns:
-        circuit: circuit after the measurement.
-    """
+    """Helper function to measure one qubit."""
     # Ensure that we have a classical register of enough size available
     if len(circuit.clbits) == 0:
         reg = ClassicalRegister(qid + 1, "cbits")
         circuit.add_register(reg)
     circuit.measure(0, qid)
     return circuit
+
+
+def run_with_noise(
+    circuit: QuantumCircuit,
+    noise: float,
+    shots: int,
+    seed: Optional[int] = None,
+) -> float:
+    """Runs the quantum circuit with a depolarizing channel noise model.
+    Args:
+        circuit: Ideal quantum circuit.
+        noise: Noise constant going into `depolarizing_error`.
+        shots: The Number of shots to run the circuit on the back-end.
+        seed: Optional seed for qiskit simulator.
+    Returns:
+        expval: expected values.
+    """
+    # initialize a qiskit noise model
+    noise_model = NoiseModel()
+
+    # we assume a depolarizing error for each gate of the standard IBM basis
+    # set (u1, u2, u3)
+    noise_model.add_all_qubit_quantum_error(
+        depolarizing_error(noise, 1), ["u1", "u2", "u3"]
+    )
+
+    # execution of the experiment
+    job = qiskit.execute(
+        circuit,
+        backend=QASM_SIMULATOR,
+        basis_gates=["u1", "u2", "u3"],
+        # we want all gates to be actually applied,
+        # so we skip any circuit optimization
+        optimization_level=0,
+        noise_model=noise_model,
+        shots=shots,
+        seed_simulator=seed,
+    )
+    results = job.result()
+    counts = results.get_counts()
+    expval = counts["0"] / shots
+    return expval
 
 
 def qiskit_executor(qp: QPROGRAM, shots: int = 500) -> float:
@@ -75,98 +129,91 @@ def decorated_executor(qp: QPROGRAM) -> float:
 def test_execute_with_zne():
     true_zne_value = 1.0
 
-    for _ in range(10):
-        circuit = measure(
-            random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH), 0
-        )
-        base = qiskit_executor(circuit)
-        zne_value = zne.execute_with_zne(circuit, qiskit_executor)
+    circuit = measure(
+        random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH), 0
+    )
+    base = qiskit_executor(circuit)
+    zne_value = zne.execute_with_zne(circuit, qiskit_executor)
 
-        assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
+    assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
 
 
 def test_mitigate_executor():
     true_zne_value = 1.0
 
-    for _ in range(10):
-        circuit = measure(
-            random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH), 0
-        )
-        base = qiskit_executor(circuit)
+    circuit = measure(
+        random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH), 0
+    )
+    base = qiskit_executor(circuit)
 
-        mitigated_executor = zne.mitigate_executor(qiskit_executor)
-        zne_value = mitigated_executor(circuit)
-        assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
+    mitigated_executor = zne.mitigate_executor(qiskit_executor)
+    zne_value = mitigated_executor(circuit)
+    assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
 
 
 def test_zne_decorator():
     true_zne_value = 1.0
 
-    for _ in range(10):
-        circuit = measure(
-            random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH), 0
-        )
-        base = qiskit_executor(circuit)
+    circuit = measure(
+        random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH), 0
+    )
+    base = qiskit_executor(circuit)
 
-        zne_value = decorated_executor(circuit)
-        assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
+    zne_value = decorated_executor(circuit)
+    assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
 
 
 def test_run_factory_with_number_of_shots():
     true_zne_value = 1.0
 
     scale_factors = [1.0, 2.0, 3.0]
-    shot_list = [10 ** 4, 10 ** 5, 10 ** 6]
+    shot_list = [1_000, 2_000, 3_000]
 
     fac = zne.inference.ExpFactory(
         scale_factors=scale_factors, shot_list=shot_list
     )
 
-    for _ in range(10):
-        circuit = measure(
-            random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH), 0
-        )
-        base = qiskit_executor(circuit)
-        zne_value = fac.run(
-            circuit,
-            qiskit_executor,
-            scale_noise=zne.scaling.fold_gates_at_random,
-        ).reduce()
+    circuit = measure(
+        random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH), 0
+    )
+    base = qiskit_executor(circuit)
+    zne_value = fac.run(
+        circuit, qiskit_executor, scale_noise=zne.scaling.fold_gates_at_random,
+    ).reduce()
 
-        assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
+    assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
 
-        for i in range(len(fac._instack)):
-            assert fac._instack[i] == {
-                "scale_factor": scale_factors[i],
-                "shots": shot_list[i],
-            }
+    for i in range(len(fac._instack)):
+        assert fac._instack[i] == {
+            "scale_factor": scale_factors[i],
+            "shots": shot_list[i],
+        }
 
 
 def test_mitigate_executor_with_shot_list():
     true_zne_value = 1.0
 
     scale_factors = [1.0, 2.0, 3.0]
-    shot_list = [10 ** 4, 10 ** 5, 10 ** 6]
+    shot_list = [1_000, 2_000, 3_000]
 
     fac = zne.inference.ExpFactory(
         scale_factors=scale_factors, shot_list=shot_list
     )
     mitigated_executor = zne.mitigate_executor(qiskit_executor, fac)
 
-    for _ in range(10):
-        circuit = measure(
-            random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH), 0
-        )
-        base = qiskit_executor(circuit)
-        zne_value = mitigated_executor(circuit)
+    circuit = measure(
+        random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH), 0
+    )
+    base = qiskit_executor(circuit)
+    zne_value = mitigated_executor(circuit)
 
-        assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
+    assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
 
-        for i in range(len(fac._instack)):
-            assert fac._instack[i] == {
-                "scale_factor": scale_factors[i],
-                "shots": shot_list[i],
-            }
+    for i in range(len(fac._instack)):
+        assert fac._instack[i] == {
+            "scale_factor": scale_factors[i],
+            "shots": shot_list[i],
+        }
 
 
 @pytest.mark.parametrize("order", [(0, 1), (1, 0), (0, 1, 2), (1, 2, 0)])

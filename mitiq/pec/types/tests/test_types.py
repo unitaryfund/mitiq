@@ -661,7 +661,7 @@ def test_print_cirq_operation_representation():
     )
 
     decomp = OperationRepresentation(
-        ideal=ideal, basis_expansion={noisy_xop: 0.5, noisy_zop: 0.5, },
+        ideal=ideal, basis_expansion={noisy_xop: 0.5, noisy_zop: 0.5,},
     )
 
     expected = r"0: ───H─── = 0.500*0: ───X───+0.500*0: ───Z───"

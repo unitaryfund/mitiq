@@ -75,7 +75,7 @@ Zero-noise extrapolation can be easily implemented with the function
     from mitiq import zne
 
     mitigated_result = zne.execute_with_zne(circuit, executor)
-    
+
     print(f"Error without mitigation: {abs(exact_result - noisy_result):.{3}}")
     print(f"Error with mitigation (ZNE): {abs(exact_result - mitigated_result):.{3}}")
 
@@ -241,6 +241,8 @@ We can then use this backend for our mitigation.
 Note that :class:`~mitiq.zne.inference.Factory`'s are only used for fitting
 classical data and are completely frontend/backend agnostic.
 
+.. _pec_getting_started:
+
 Probabilistic Error Cancellation
 --------------------------------
 
@@ -284,7 +286,7 @@ whose representation in the presence of depolarizing noise can be obtained as fo
 
 The result above is an :class:`~mitiq.pec.types.types.OperationRepresentation` object which contains
 the information for representing the ideal operation X (left-hand-side of the printed output)
-as a linear combination of noisy operations (right-hand-side of the printed output). 
+as a linear combination of noisy operations (right-hand-side of the printed output).
 
 We can now implement PEC by importing the function :func:`~mitiq.pec.pec.execute_with_pec` from the
 :mod:`~mitiq.pec.pec` module.
