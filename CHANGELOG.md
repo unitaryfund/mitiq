@@ -8,7 +8,7 @@
 % # " - [Bug Fix]"
 % # " - Fix the bug."
 
-## Version 0.7.0 (April 6th, 2021)
+## Version 0.7.0 (April 7th, 2021)
 
 ### Summary
 
