@@ -62,8 +62,10 @@ def test_pauli_measure_in_circuit(support, circuit_type):
     base_circuit = cirq.Circuit(cirq.H.on_each(qreg))
 
     if circuit_type == "cirq":
+
         def convert(circ):
             return circ
+
     elif circuit_type == "qiskit":
         convert = mitiq_qiskit.to_qiskit
     elif circuit_type == "pyquil":
