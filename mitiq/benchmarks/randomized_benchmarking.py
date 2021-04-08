@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Functions for generating randomized benchmarking circuits."""
-from typing import List
+from typing import List, Optional
 
 from cirq.experiments.qubit_characterizations import (
     _single_qubit_cliffords,
@@ -24,6 +24,8 @@ from cirq.experiments.qubit_characterizations import (
     _two_qubit_clifford_matrices,
 )
 from cirq import LineQubit, Circuit
+from mitiq import QPROGRAM
+from mitiq.conversions import convert_from_mitiq
 
 
 def generate_rb_circuits(
@@ -71,3 +73,53 @@ def generate_rb_circuits(
         )
         for _ in range(trials)
     ]
+
+
+def generate_converted_rb_circuits(
+    n_qubits: int,
+    num_cliffords: int,
+    trials: int = 1,
+    return_type: Optional[str] = None,
+) -> List[QPROGRAM]:
+    """Returns a list of randomized benchmarking circuits, i.e. circuits that
+    are equivalent to the identity.
+
+    Args:
+        n_qubits: The number of qubits. Can be either 1 or 2
+        num_cliffords: The number of Clifford group elements in the
+            random circuits. This is proportional to the depth per circuit.
+        trials: The number of random circuits at each num_cfd.
+        return_type: String specifier for the converted circuit type.
+
+    Returns:
+        A list of randomized benchmarking circuits.
+    """
+    mitiq_circuits = generate_rb_circuits(
+        n_qubits=n_qubits, num_cliffords=num_cliffords, trials=trials
+    )
+    if len(mitiq_circuits) == 1:
+        return convert_from_mitiq(*mitiq_circuits, return_type)
+    else:
+        return [
+            convert_from_mitiq(circuit, return_type)
+            for circuit in mitiq_circuits
+        ]
+
+
+def random_one_qubit_identity_circuit(
+    num_cliffords: int, return_type: Optional[str] = None
+) -> QPROGRAM:
+    """Returns a single-qubit identity circuit.
+
+    Args:
+        num_cliffords (int): Number of cliffords used to generate the circuit.
+
+    Returns:
+        circuit: Quantum circuit object.
+    """
+    return generate_converted_rb_circuits(
+        n_qubits=1,
+        num_cliffords=num_cliffords,
+        trials=1,
+        return_type=return_type,
+    )

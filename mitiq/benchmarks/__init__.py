@@ -13,4 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
+from mitiq.benchmarks.randomized_benchmarking import (
+    generate_rb_circuits,
+    generate_converted_rb_circuits,
+    random_one_qubit_identity_circuit,
+)
