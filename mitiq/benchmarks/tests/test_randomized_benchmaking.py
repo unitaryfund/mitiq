@@ -148,6 +148,7 @@ def test_converted_random_benchmarks(scale_noise, fac, return_type):
     for circuit in circuits:
         assert return_type in circuit.__module__
 
+
 @pytest.mark.parametrize("num_cliffords", (10, 30, 60))
 @pytest.mark.parametrize("return_type", ("cirq", "pyquil", "qiskit"))
 def test_converted_random_one_qubit_identity(num_cliffords, return_type):
