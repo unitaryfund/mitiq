@@ -83,5 +83,5 @@ def test_zne_decorator():
         n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
     )
 
-    result = decorated_executor(qp)
+    result = decorated_executor(*qp)
     assert np.isclose(result, 1.0, atol=1e-5)

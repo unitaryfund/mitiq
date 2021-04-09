@@ -8,12 +8,6 @@
 % # " - [Bug Fix]"
 % # " - Fix the bug."
 
-## Version 0.8.0 (May 15th, 2021)
-
-### All Changes
-
-- Group benchmarks (@aaron-robertson, gh-632)
-
 ## Version 0.7.0 (April 7th, 2021)
 
 ### Summary
