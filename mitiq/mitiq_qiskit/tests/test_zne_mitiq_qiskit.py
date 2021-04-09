@@ -32,9 +32,7 @@ from typing import Optional
 from mitiq import zne
 from mitiq._typing import QPROGRAM
 from qiskit.providers.aer.noise import depolarizing_error
-from mitiq.benchmarks.randomized_benchmarking import (
-    random_one_qubit_identity_circuit,
-)
+from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 
 BASE_NOISE = 0.007
 TEST_DEPTH = 30
@@ -115,8 +113,11 @@ def test_execute_with_zne():
     true_zne_value = 1.0
 
     circuit = measure(
-        random_one_qubit_identity_circuit(
-            num_cliffords=TEST_DEPTH, return_type="qiskit"
+        *generate_rb_circuits(
+            n_qubits=1,
+            num_cliffords=TEST_DEPTH,
+            trials=1,
+            return_type="qiskit",
         ),
         0,
     )
@@ -130,8 +131,11 @@ def test_mitigate_executor():
     true_zne_value = 1.0
 
     circuit = measure(
-        random_one_qubit_identity_circuit(
-            num_cliffords=TEST_DEPTH, return_type="qiskit"
+        *generate_rb_circuits(
+            n_qubits=1,
+            num_cliffords=TEST_DEPTH,
+            trials=1,
+            return_type="qiskit",
         ),
         0,
     )
@@ -146,8 +150,11 @@ def test_zne_decorator():
     true_zne_value = 1.0
 
     circuit = measure(
-        random_one_qubit_identity_circuit(
-            num_cliffords=TEST_DEPTH, return_type="qiskit"
+        *generate_rb_circuits(
+            n_qubits=1,
+            num_cliffords=TEST_DEPTH,
+            trials=1,
+            return_type="qiskit",
         ),
         0,
     )
@@ -168,8 +175,11 @@ def test_run_factory_with_number_of_shots():
     )
 
     circuit = measure(
-        random_one_qubit_identity_circuit(
-            num_cliffords=TEST_DEPTH, return_type="qiskit"
+        *generate_rb_circuits(
+            n_qubits=1,
+            num_cliffords=TEST_DEPTH,
+            trials=1,
+            return_type="qiskit",
         ),
         0,
     )
@@ -199,8 +209,11 @@ def test_mitigate_executor_with_shot_list():
     mitigated_executor = zne.mitigate_executor(qiskit_executor, fac)
 
     circuit = measure(
-        random_one_qubit_identity_circuit(
-            num_cliffords=TEST_DEPTH, return_type="qiskit"
+        *generate_rb_circuits(
+            n_qubits=1,
+            num_cliffords=TEST_DEPTH,
+            trials=1,
+            return_type="qiskit",
         ),
         0,
     )
