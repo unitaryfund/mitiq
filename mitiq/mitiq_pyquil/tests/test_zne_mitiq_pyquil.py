@@ -50,7 +50,7 @@ def test_run_factory():
 
     fac = inference.RichardsonFactory([1.0, 2.0, 3.0])
 
-    fac.run(qp, noiseless_executor, scale_noise=scaling.fold_gates_at_random)
+    fac.run(*qp, noiseless_executor, scale_noise=scaling.fold_gates_at_random)
     result = fac.reduce()
     assert np.isclose(result, 1.0, atol=1e-5)
 
@@ -59,7 +59,7 @@ def test_execute_with_zne():
     qp = generate_rb_circuits(
         n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
     )
-    result = execute_with_zne(qp, noiseless_executor)
+    result = execute_with_zne(*qp, noiseless_executor)
     assert np.isclose(result, 1.0, atol=1e-5)
 
 
@@ -69,7 +69,7 @@ def test_mitigate_executor():
     )
 
     new_executor = mitigate_executor(noiseless_executor)
-    result = new_executor(qp)
+    result = new_executor(*qp)
     assert np.isclose(result, 1.0, atol=1e-5)
 
 
