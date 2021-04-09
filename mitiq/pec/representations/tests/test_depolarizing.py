@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import itertools
 import numpy as np
 import pytest
 from cirq import (
@@ -29,7 +28,6 @@ from cirq import (
     Gate,
     LineQubit,
     Circuit,
-    AsymmetricDepolarizingChannel,
     DepolarizingChannel,
     MeasurementGate,
 )
@@ -44,27 +42,6 @@ from mitiq.pec.representations import (
 from mitiq.pec.utils import _operation_to_choi, _circuit_to_choi
 from mitiq.utils import _equal
 from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
-
-
-def my_depolarizing_channel(p: float, n_qubits: int):
-    """Build a depolarizing channel from cirq.AsymmetricDepolarizingChannel
-    since cirq.DepolarizingChannel is buggy when n_qubits is larger than 1."""
-    # Link to GitHub issue: https://github.com/quantumlib/Cirq/issues/3685
-
-    error_probabilities = {}
-    p_depol = p / (4 ** n_qubits - 1)
-    p_identity = 1.0 - p
-    for pauli_tuple in itertools.product(
-        ["I", "X", "Y", "Z"], repeat=n_qubits
-    ):
-        pauli_string = "".join(pauli_tuple)
-        if pauli_string == "I" * n_qubits:
-            error_probabilities[pauli_string] = p_identity
-        else:
-            error_probabilities[pauli_string] = p_depol
-    return AsymmetricDepolarizingChannel(
-        error_probabilities=error_probabilities
-    )
 
 
 def single_qubit_depolarizing_overhead(noise_level: float) -> float:
@@ -135,7 +112,7 @@ def test_depolarizing_representation_with_choi(gate: Gate, noise: float):
         implementable_circ = noisy_op.ideal_circuit()
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.
-        depolarizing_op = my_depolarizing_channel(noise, len(qreg))(*qreg)
+        depolarizing_op = DepolarizingChannel(noise, len(qreg))(*qreg)
         implementable_circ.append(depolarizing_op)
         sequence_choi = _circuit_to_choi(implementable_circ)
         choi_components.append(coeff * sequence_choi)
