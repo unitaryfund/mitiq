@@ -44,7 +44,7 @@ noiseless_executor = generate_qcs_executor(
 
 
 def test_run_factory():
-    qp = *generate_rb_circuits(
+    qp = generate_rb_circuits(
         n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
     )
 
@@ -56,7 +56,7 @@ def test_run_factory():
 
 
 def test_execute_with_zne():
-    qp = *generate_rb_circuits(
+    qp = generate_rb_circuits(
         n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
     )
     result = execute_with_zne(qp, noiseless_executor)
@@ -64,7 +64,7 @@ def test_execute_with_zne():
 
 
 def test_mitigate_executor():
-    qp = *generate_rb_circuits(
+    qp = generate_rb_circuits(
         n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
     )
 
@@ -79,7 +79,7 @@ def decorated_executor(qp: QPROGRAM) -> float:
 
 
 def test_zne_decorator():
-    qp = *generate_rb_circuits(
+    qp = generate_rb_circuits(
         n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
     )
 
