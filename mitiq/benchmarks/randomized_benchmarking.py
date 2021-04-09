@@ -42,7 +42,8 @@ def generate_rb_circuits(
         num_cliffords: The number of Clifford group elements in the
             random circuits. This is proportional to the depth per circuit.
         trials: The number of random circuits at each num_cfd.
-        return_type: String specifier for Mitiq-supported circuit type conversion.
+        return_type: String specifier for Mitiq-supported circuit type
+            conversion.
 
     Returns:
         A list of randomized benchmarking circuits.
