@@ -42,8 +42,9 @@ def generate_rb_circuits(
         num_cliffords: The number of Clifford group elements in the
             random circuits. This is proportional to the depth per circuit.
         trials: The number of random circuits at each num_cfd.
-        return_type: String specifier for Mitiq-supported circuit type
-            conversion.
+        return_type: return_type: String which specifies the type of the
+            returned circuits. See the keys of ``mitiq.QPROGRAM`` for options.
+            If ``None``, the returned circuits are ``cirq.Circuit``s.
 
     Returns:
         A list of randomized benchmarking circuits.
@@ -57,47 +58,25 @@ def generate_rb_circuits(
     cliffords = _single_qubit_cliffords()
 
     if n_qubits == 1:
-
         c1 = cliffords.c1_in_xy
         cfd_mat_1q = [_gate_seq_to_mats(gates) for gates in c1]
-
-        if return_type is not None:
-            return [
-                convert_from_mitiq(
-                    _random_single_q_clifford(
-                        *qubits, num_cliffords, c1, cfd_mat_1q
-                    ),
-                    return_type,
-                )
-                for _ in range(trials)
-            ]
-        return [
+        circuits = [
             _random_single_q_clifford(*qubits, num_cliffords, c1, cfd_mat_1q)
             for _ in range(trials)
         ]
-
-    cfd_matrices = _two_qubit_clifford_matrices(
-        *qubits, cliffords,  # type: ignore
-    )
-    if return_type is not None:
-        return [
-            convert_from_mitiq(
-                _random_two_q_clifford(
-                    *qubits,  # type: ignore
-                    num_cliffords,
-                    cfd_matrices,
-                    cliffords,
-                ),
-                return_type,
+    else:
+        cfd_matrices = _two_qubit_clifford_matrices(
+            *qubits, cliffords,  # type: ignore
+        )
+        circuits = [
+            _random_two_q_clifford(
+                *qubits,  # type: ignore
+                num_cliffords,
+                cfd_matrices,
+                cliffords,
             )
             for _ in range(trials)
         ]
-    return [
-        _random_two_q_clifford(
-            *qubits,  # type: ignore
-            num_cliffords,
-            cfd_matrices,
-            cliffords,
-        )
-        for _ in range(trials)
-    ]
+    if return_type is None or return_type == "cirq":
+        return circuits
+    return [convert_from_mitiq(circuit, return_type) for circuit in circuits]
