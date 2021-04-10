@@ -25,15 +25,16 @@ from qiskit import (
     QuantumRegister,
     execute,
 )
-from qiskit.providers.aer.noise import NoiseModel
 
-from typing import Optional
 
 from mitiq import zne
 from mitiq._typing import QPROGRAM
-from qiskit.providers.aer.noise import depolarizing_error
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 from mitiq.mitiq_qiskit.conversions import to_qiskit
+from mitiq.mitiq_qiskit import (
+    execute_with_shots_and_noise,
+    initialized_depolarizing_noise,
+)
 
 BASE_NOISE = 0.007
 TEST_DEPTH = 30
@@ -67,50 +68,16 @@ def measure(circuit, qid) -> QuantumCircuit:
     return circuit
 
 
-def run_with_noise(
-    circuit: QuantumCircuit,
-    noise: float,
-    shots: int,
-    seed: Optional[int] = None,
-) -> float:
-    """Runs the quantum circuit with a depolarizing channel noise model.
-    Args:
-        circuit: Ideal quantum circuit.
-        noise: Noise constant going into `depolarizing_error`.
-        shots: The Number of shots to run the circuit on the back-end.
-        seed: Optional seed for qiskit simulator.
-    Returns:
-        expval: expected values.
-    """
-    # initialize a qiskit noise model
-    noise_model = NoiseModel()
-
-    # we assume a depolarizing error for each gate of the standard IBM basis
-    # set (u1, u2, u3)
-    noise_model.add_all_qubit_quantum_error(
-        depolarizing_error(noise, 1), ["u1", "u2", "u3"]
-    )
-
-    # execution of the experiment
-    job = qiskit.execute(
-        circuit,
-        backend=QASM_SIMULATOR,
-        basis_gates=["u1", "u2", "u3"],
-        # we want all gates to be actually applied,
-        # so we skip any circuit optimization
-        optimization_level=0,
-        noise_model=noise_model,
-        shots=shots,
-        seed_simulator=seed,
-    )
-    results = job.result()
-    counts = results.get_counts()
-    expval = counts["0"] / shots
-    return expval
-
-
 def qiskit_executor(qp: QPROGRAM, shots: int = 500) -> float:
-    return run_with_noise(qp, noise=BASE_NOISE, shots=shots, seed=1)
+    # initialize a qiskit noise model
+    expectation = execute_with_shots_and_noise(
+        qp,
+        shots=shots,
+        obs=ONE_QUBIT_GS_PROJECTOR,
+        noise_model=initialized_depolarizing_noise(BASE_NOISE),
+        seed=1,
+    )
+    return expectation
 
 
 def get_counts(circuit: QuantumCircuit):
