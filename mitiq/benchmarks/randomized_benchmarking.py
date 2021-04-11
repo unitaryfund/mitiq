@@ -38,13 +38,13 @@ def generate_rb_circuits(
     are equivalent to the identity.
 
     Args:
-        n_qubits: The number of qubits. Can be either 1 or 2
+        n_qubits: The number of qubits. Can be either 1 or 2.
         num_cliffords: The number of Clifford group elements in the
             random circuits. This is proportional to the depth per circuit.
         trials: The number of random circuits at each num_cfd.
-        return_type: return_type: String which specifies the type of the
+        return_type: String which specifies the type of the
             returned circuits. See the keys of ``mitiq.QPROGRAM`` for options.
-            If ``None``, the returned circuits are ``cirq.Circuit``s.
+            If ``None``, the returned circuits are type ``cirq.Circuit``.
 
     Returns:
         A list of randomized benchmarking circuits.
