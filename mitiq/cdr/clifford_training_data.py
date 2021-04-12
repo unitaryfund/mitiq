@@ -237,7 +237,7 @@ def _select(
     sigma_select: float,
     random_state: np.random.RandomState,
 ) -> np.ndarray:
-    """Function to select the non-Clifford gates to be replace for a given set
+    """Function to select the non-Clifford gates to be replaced for a given set
     of  non-Clifford gates.
 
     Args:
