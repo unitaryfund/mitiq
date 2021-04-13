@@ -30,7 +30,7 @@ def generate_training_circuits(
     method_replace: str = "closest",
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     **additional_options: dict,
-    ) -> Tuple[List[Circuit], List[List[float]], List[List[float]]]:
+) -> Tuple[List[Circuit], List[List[float]], List[List[float]]]:
 
     """Function to return a list of near-Clifford circuits from one circuit of
     interest. Data generated from these circuits is used as a training set to
