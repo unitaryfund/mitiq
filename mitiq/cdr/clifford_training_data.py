@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import cirq
 from cirq.circuits import Circuit
-from numpy.random import choice, randint
 import numpy as np
 from typing import List, Tuple, Optional, Union
 
@@ -74,7 +73,7 @@ def generate_training_circuits(
     if isinstance(random_state, int):
         random_state = np.random.RandomState(random_state)
     else:
-        random_state = randint(10 ** (8))
+        random_state = np.random.ranint(10 ** (8))
         random_state = np.random.RandomState(random_state)
     # generating a list of seeds used for each training circuit construction:
     random_states = random_state.randint(
@@ -399,7 +398,7 @@ def _closest_clifford(ang: float) -> float:
     # cliff gate to return.
     else:
         index_list = [ang_scaled - 0.5, ang_scaled + 0.5]
-        index = int(choice(index_list))
+        index = int(np.random.choice(index_list))
         return CLIFFORD_ANGLES[index]
 
 
