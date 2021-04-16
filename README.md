@@ -159,3 +159,7 @@ A list of papers citing Mitiq can be found [here][papers_with_mitiq].
 ## License
 
 [GNU GPL v.3.0.](https://github.com/unitaryfund/mitiq/blob/master/LICENSE)
+
+### unitaryHACK
+
+Mitiq is participating in [unitaryHACK](http://hack2021.unitary.fund/), check out and contribute on open issues labeled [`unitaryhack`](https://github.com/unitaryfund/mitiq/labels/unitaryhack)!
