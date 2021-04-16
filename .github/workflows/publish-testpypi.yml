@@ -6,7 +6,6 @@ name: Nightly Upload to Test PyPI
 on:
   schedule:
     - cron: '0 0 * * *'
-    
 
 jobs:
   deploy:
