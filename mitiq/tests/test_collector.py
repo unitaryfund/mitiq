@@ -56,50 +56,6 @@ def executor_pyquil_batched(programs) -> List[float]:
     return [0.0] * len(programs)
 
 
-def test_collector_simple():
-    collector = Collector(executor=executor_batched, max_batch_size=10)
-    assert collector.can_batch
-    assert collector._max_batch_size == 10
-    assert collector.calls_to_executor == 0
-
-
-def test_collector_is_batched_executor():
-    assert Collector.is_batched_executor(executor=executor_batched)
-    assert not Collector.is_batched_executor(executor=executor_serial_typed)
-    assert not Collector.is_batched_executor(executor=executor_serial)
-
-
-@pytest.mark.parametrize("ncircuits", (5, 10, 25))
-@pytest.mark.parametrize("executor", (executor_batched, executor_serial))
-def test_run_collector_identical_circuits_batched(ncircuits, executor):
-    collector = Collector(executor=executor, max_batch_size=10)
-    circuits = [cirq.Circuit(cirq.H(cirq.LineQubit(0)))] * ncircuits
-    results = collector.run(circuits)
-
-    assert np.allclose(results, np.zeros(ncircuits))
-    assert collector.calls_to_executor == 1
-
-
-@pytest.mark.parametrize("batch_size", (1, 2, 10))
-def test_run_collector_nonidentical_pyquil_programs(batch_size):
-    collector = Collector(
-        executor=executor_pyquil_batched, max_batch_size=batch_size
-    )
-    assert collector.can_batch
-
-    circuits = [
-        pyquil.Program(pyquil.gates.X(0)),
-        pyquil.Program(pyquil.gates.H(0)),
-    ] * 10
-    results = collector.run(circuits)
-
-    assert np.allclose(results, np.zeros(len(circuits)))
-    if batch_size == 1:
-        assert collector.calls_to_executor == 2
-    else:
-        assert collector.calls_to_executor == 1
-
-
 @pytest.mark.parametrize("ncircuits", (10, 11, 23))
 @pytest.mark.parametrize("batch_size", (1, 2, 5, 50))
 def test_run_collector_all_unique(ncircuits, batch_size):
@@ -165,8 +121,3 @@ def test_generate_collected_executor(executor, ncircuits, rval):
     print(rval)
     print(expvals)
     assert np.allclose(expvals, np.full(shape=(ncircuits,), fill_value=rval))
-
-
-def test_generate_collected_executor_not_callable():
-    with pytest.raises(ValueError, match="must be callable"):
-        generate_collected_executor(None)
