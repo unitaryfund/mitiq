@@ -36,6 +36,7 @@ jobs:
       filterByMilestone: true
       author: true
       unreleasedOnly: true
+      output: CHANGELOG.md
     - name: Commit changes to changelog.md
       uses: stefanzweifel/git-auto-commit-action@v4
       commit_message: Commit changes with info about a push to master
