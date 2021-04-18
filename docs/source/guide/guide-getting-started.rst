@@ -141,7 +141,7 @@ It is easy to try different ones.
 
     Mitigated error with linear ZNE: 0.00769
 
-You can use bult-in methods from factories like :meth:`~mitiq.zne.inference.Factory.plot_data`
+You can use built-in methods from factories like :meth:`~mitiq.zne.inference.Factory.plot_data`
 and :meth:`~mitiq.zne.inference.Factory.plot_fit` to plot the noise scale factors v. the expectation
 value returned by the executor.
 
