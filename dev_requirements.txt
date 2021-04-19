@@ -1,5 +1,7 @@
 # Third-party integration.
-qiskit~=0.24.0
+qiskit-terra~=0.16.4
+qiskit-aer~=0.7.6
+qiskit-ibmq-provider~=0.12.2
 pyquil~=2.28.0
 
 # Unit tests, coverage, and formatting/style.
@@ -9,7 +11,7 @@ flake8~=3.7.9
 black~=19.10b0
 
 # Documentation and examples.
-sphinx~=2.4.4
+sphinx~=3.5.3
 docutils==0.16
 sphinxcontrib-bibtex~=1.0.0
 sphinx-copybutton~=0.2.11
