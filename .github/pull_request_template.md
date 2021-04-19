@@ -26,6 +26,6 @@ Tips
     2. Run `make format` to format your code with the [black](https://black.readthedocs.io/en/stable/index.html)
   autoformatter.
 
-  Check [style guidelines](https://mitiq.readthedocs.io/en/stable/contributing.html#style-guidelines) for Mitiq.
+  For more information, check the [style guidelines](https://mitiq.readthedocs.io/en/stable/contributing.html#style-guidelines) for Mitiq.
   
 - Write "Fixes #XYZ" in the description if this PR fixes Issue #XYZ.
