@@ -43,7 +43,6 @@ development of the library, from your local clone of the fork, run
 
 ```bash
 (myenv) pip install -e .
-(myenv) pip install -r requirements.txt
 (myenv) pip install -r dev_requirements.txt
 ```
 
