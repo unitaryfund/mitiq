@@ -53,7 +53,7 @@ def _remove_qasm_barriers(qasm: QASMType) -> QASMType:
     """
     lines = []
     for line in qasm.splitlines():
-        if not line.startswith("barrier"):
+        if not line.strip().startswith("barrier"):
             lines.append(line)
     return "\n".join(lines)
 
