@@ -1,5 +1,7 @@
 on:
   push:
+    branches: # specify branch to Mitiq release, not running from forks
+      - release
     # Sequence of patterns matched against refs/tags
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
@@ -8,6 +10,7 @@ jobs:
   #generate_artifacts:
   # TODO: make docs pdf and tarball
   create_release:
+    if: github.repository_owner == 'unitaryfund'
     runs-on: ubuntu-latest
     steps:
       - name: Check out Mitiq

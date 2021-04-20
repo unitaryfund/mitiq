@@ -1,4 +1,4 @@
-# Copyright (C) 2020 Unitary Fund
+# Copyright (C) 2021 Unitary Fund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,11 +13,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Reads in version information.
-Note: This file will be overwritten by the packaging process."""
-import os
-
-directory_of_this_file = os.path.dirname(os.path.abspath(__file__))
-
-with open(f"{directory_of_this_file}/../VERSION.txt", "r") as f:
-    __version__ = f.read().strip()
+from mitiq.observable.pauli import PauliString
