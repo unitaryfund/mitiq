@@ -17,6 +17,7 @@
 Qiskit's circuit representation.
 """
 from typing import List, Optional, Tuple, Union
+import re
 
 import numpy as np
 
@@ -50,12 +51,15 @@ def _remove_qasm_barriers(qasm: QASMType) -> QASMType:
 
     Args:
         qasm: QASM to remove barriers from.
+
+    Note:
+        According to the OpenQASM 2.X language specification
+        (https://arxiv.org/pdf/1707.03429v2.pdf), "Statements are separated by
+        semicolons. Whitespace is ignored. The language is case sensitive.
+        Comments begin with a pair of forward slashes and end with a new line."
     """
-    lines = []
-    for line in qasm.splitlines():
-        if not line.startswith("barrier"):
-            lines.append(line)
-    return "\n".join(lines)
+    # The inside regex removes comments, the outside regex removes barriers
+    return re.sub(";\s*barrier[^;]*;", ";", re.sub("\/\/[^\n]*\n", "", qasm))
 
 
 def _map_bit_index(
