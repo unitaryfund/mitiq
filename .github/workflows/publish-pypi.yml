@@ -1,7 +1,7 @@
 # This workflow will upload a Python Package using Twine when a release is created
 # For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
 
-name: Upload Python Package to Test PyPI
+name: Upload Release Package to PyPI
 
 on:
   release:
@@ -9,9 +9,8 @@ on:
 
 jobs:
   deploy:
-
+    if: github.repository_owner == 'unitaryfund'
     runs-on: ubuntu-latest
-
     steps:
     - name: Check out mitiq
       uses: actions/checkout@v2
