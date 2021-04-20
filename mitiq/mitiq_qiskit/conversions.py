@@ -16,7 +16,7 @@
 """Functions to convert between Mitiq's internal circuit representation and
 Qiskit's circuit representation.
 """
-
+import functools
 from typing import List, Optional, Tuple, Union
 
 import numpy as np
@@ -44,6 +44,19 @@ def _remove_barriers(circuit: qiskit.QuantumCircuit) -> qiskit.QuantumCircuit:
         if isinstance(gate, Barrier):
             copy.data.remove(instr)
     return copy
+
+
+def _remove_qasm_barriers(qasm: QASMType):
+    """Returns a copy of the input QASM with all barriers removed.
+
+    Args:
+        qasm: QASM to remove barriers from.
+    """
+    lines = []
+    for line in qasm.splitlines():
+        if not line.startswith('barrier'):
+            lines.append(line)
+    return '\n'.join(lines)
 
 
 def _map_bit_index(
@@ -321,5 +334,5 @@ def from_qasm(qasm: QASMType) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input QASM string.
     """
-    qasm = _remove_barriers(qiskit.QuantumCircuit.from_qasm_str(qasm)).qasm()
+    qasm = _remove_qasm_barriers(qasm)
     return circuit_from_qasm(qasm)
