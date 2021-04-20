@@ -31,7 +31,7 @@ import numpy as np
 from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary
 
 from mitiq._typing import QPROGRAM
-from mitiq.conversions import converter
+from mitiq.conversions import noise_scaling_converter
 
 
 class UnfoldableGateError(Exception):
@@ -289,7 +289,7 @@ def _get_num_to_fold(scale_factor: float, ngates: int) -> int:
 
 
 # Local folding functions
-@converter
+@noise_scaling_converter
 def fold_gates_from_left(
     circuit: QPROGRAM, scale_factor: float, **kwargs: Any
 ) -> QPROGRAM:
@@ -412,7 +412,7 @@ def fold_gates_from_left(
     return folded
 
 
-@converter
+@noise_scaling_converter
 def fold_gates_from_right(
     circuit: QPROGRAM, scale_factor: float, **kwargs: Any
 ) -> Circuit:
@@ -529,7 +529,7 @@ def _update_moment_indices(
     return moment_indices
 
 
-@converter
+@noise_scaling_converter
 def fold_gates_at_random(
     circuit: QPROGRAM,
     scale_factor: float,
@@ -763,7 +763,7 @@ def _fold_local(
 
 
 # Global folding function
-@converter
+@noise_scaling_converter
 def fold_global(
     circuit: QPROGRAM, scale_factor: float, **kwargs: Any
 ) -> QPROGRAM:
