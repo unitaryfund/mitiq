@@ -59,9 +59,7 @@ def _remove_qasm_barriers(qasm: QASMType) -> QASMType:
         Comments begin with a pair of forward slashes and end with a new line."
     """
     # The inside regex removes comments, the outside regex removes barriers
-    return re.sub(
-        ";\\s*barrier[^;]*;", ";", re.sub("\\/\\/[^\n]*\n", "", qasm)
-    )
+    return re.sub(r";\s*barrier[^;]*;", ";", re.sub(r"\/\/[^\n]*\n", "", qasm))
 
 
 def _map_bit_index(
