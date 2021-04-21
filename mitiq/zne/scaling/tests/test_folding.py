@@ -487,9 +487,9 @@ def test_fold_moments():
     assert _equal(circ, correct)
 
 
-@pytest.mark.parametrize("num_folds", (1, 2, 3))
+@pytest.mark.parametrize("scale_factor", (1, 3, 5))
 @pytest.mark.parametrize("with_measurements", (True, False))
-def test_fold_all(num_folds, with_measurements):
+def test_fold_all(scale_factor, with_measurements):
     # Test circuit
     # 0: ───H───@───@───
     #           │   │
@@ -506,13 +506,13 @@ def test_fold_all(num_folds, with_measurements):
     if with_measurements:
         circ.append(ops.measure_each(*qreg))
 
-    folded = fold_all(circ, num_folds=num_folds)
+    folded = fold_all(circ, scale_factor=scale_factor)
 
     correct = Circuit(
-        [ops.H.on_each(*qreg)] * (2 * num_folds + 1),
-        [ops.CNOT.on(qreg[0], qreg[1])] * (2 * num_folds + 1),
-        [ops.X.on(qreg[2])] * (2 * num_folds + 1),
-        [ops.TOFFOLI.on(*qreg)] * (2 * num_folds + 1),
+        [ops.H.on_each(*qreg)] * scale_factor,
+        [ops.CNOT.on(qreg[0], qreg[1])] * scale_factor,
+        [ops.X.on(qreg[2])] * scale_factor,
+        [ops.TOFFOLI.on(*qreg)] * scale_factor,
     )
     if with_measurements:
         correct.append(ops.measure_each(*qreg))
@@ -526,7 +526,7 @@ def test_fold_all_exclude_with_gates():
         [ops.TOFFOLI(*LineQubit.range(3))],
     )
 
-    folded = fold_all(circuit, exclude={ops.H})
+    folded = fold_all(circuit, scale_factor=3.0, exclude={ops.H})
     correct = Circuit(
         [ops.H(LineQubit(0))],
         [ops.CNOT(*LineQubit.range(2))] * 3,
@@ -534,7 +534,7 @@ def test_fold_all_exclude_with_gates():
     )
     assert _equal(folded, correct, require_qubit_equality=True)
 
-    folded = fold_all(circuit, exclude={ops.CNOT})
+    folded = fold_all(circuit, scale_factor=3.0, exclude={ops.CNOT})
     correct = Circuit(
         [ops.H(LineQubit(0))] * 3,
         [ops.CNOT(*LineQubit.range(2))],
@@ -542,7 +542,7 @@ def test_fold_all_exclude_with_gates():
     )
     assert _equal(folded, correct, require_qubit_equality=True)
 
-    folded = fold_all(circuit, num_folds=2, exclude={ops.H, ops.TOFFOLI})
+    folded = fold_all(circuit, scale_factor=5.0, exclude={ops.H, ops.TOFFOLI})
     correct = Circuit(
         [ops.H(LineQubit(0))],
         [ops.CNOT(*LineQubit.range(2))] * 5,
@@ -558,7 +558,7 @@ def test_fold_all_exclude_with_strings():
         [ops.TOFFOLI(*LineQubit.range(3))],
     )
 
-    folded = fold_all(circuit, exclude={"single"})
+    folded = fold_all(circuit, scale_factor=3.0, exclude={"single"})
     correct = Circuit(
         [ops.H(LineQubit(0))],
         [ops.CNOT(*LineQubit.range(2))] * 3,
@@ -566,7 +566,7 @@ def test_fold_all_exclude_with_strings():
     )
     assert _equal(folded, correct, require_qubit_equality=True)
 
-    folded = fold_all(circuit, exclude={"double"})
+    folded = fold_all(circuit, scale_factor=3.0, exclude={"double"})
     correct = Circuit(
         [ops.H(LineQubit(0))] * 3,
         [ops.CNOT(*LineQubit.range(2))],
@@ -574,7 +574,7 @@ def test_fold_all_exclude_with_strings():
     )
     assert _equal(folded, correct, require_qubit_equality=True)
 
-    folded = fold_all(circuit, num_folds=2, exclude={"single", "triple"})
+    folded = fold_all(circuit, scale_factor=5.0, exclude={"single", "triple"})
     correct = Circuit(
         [ops.H(LineQubit(0))],
         [ops.CNOT(*LineQubit.range(2))] * 5,
@@ -603,16 +603,20 @@ def test_fold_all_skip_moments(skip):
 
 
 def test_fold_all_bad_num_folds():
-    with pytest.raises(ValueError, match="Arg `num_folds` must"):
-        fold_all(Circuit(), num_folds=-1)
+    with pytest.raises(ValueError, match="Requires scale_factor >= 1"):
+        fold_all(Circuit(), scale_factor=0.0)
 
 
 def test_fold_all_bad_exclude():
     with pytest.raises(ValueError, match="Do not know how to parse"):
-        fold_all(Circuit(), exclude=frozenset(("not a gate name",)))
+        fold_all(
+            Circuit(),
+            scale_factor=1.0,
+            exclude=frozenset(("not a gate name",))
+        )
 
     with pytest.raises(ValueError, match="Do not know how to exclude"):
-        fold_all(Circuit(), exclude=frozenset((7,)))
+        fold_all(Circuit(), scale_factor=1.0, exclude=frozenset((7,)))
 
 
 def test_fold_from_left_two_qubits():

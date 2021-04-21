@@ -248,13 +248,15 @@ def _fold_all(
 
     Args:
         circuit: Circuit to fold.
-        num_folds: Number of times to add G G^dag for each gate G.
+        num_folds: Number of times to add G G^dag for each gate G. If not an
+            integer, this gets rounded to the nearest integer.
         exclude: Do not fold these gates.
         skip_moments: Do not fold these moments.
     """
-    if num_folds < 1 or not isinstance(num_folds, int):
+    num_folds = round(num_folds)
+    if num_folds < 0:
         raise ValueError(
-            f"Arg `num_folds` must be a positive integer but was {num_folds}."
+            f"Arg `num_folds` must be positive but was {num_folds}."
         )
 
     # Parse the exclude argument.
@@ -370,14 +372,23 @@ def _get_num_to_fold(scale_factor: float, ngates: int) -> int:
 @noise_scaling_converter
 def fold_all(
     circuit: QPROGRAM,
-    num_folds: int = 1,
+    scale_factor: float,
     exclude: FrozenSet[Any] = frozenset(),
 ) -> QPROGRAM:
     """Returns a circuit with all gates folded locally.
 
     Args:
         circuit: Circuit to fold.
-        num_folds: Number of times to add G^dag G after each gate G.
+        scale_factor: Approximate factor by which noise is scaled in the
+            circuit. Each gate is folded round((scale_factor - 1.0) / 2.0)
+            times. For example::
+
+                scale_factor | num_folds
+                ------------------------
+                1.0          | 0
+                3.0          | 1
+                5.0          | 2
+
         exclude: Do not fold these gates. Supported gate keys are listed in
             the following table.::
 
@@ -395,12 +406,16 @@ def fold_all(
                 "double"    | All two-qubit gates
                 "triple"    | All three-qubit gates
     """
+    if not 1.0 <= scale_factor:
+        raise ValueError(
+            f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
+        )
     _check_foldable(circuit)
 
     folded = deepcopy(circuit)
     measurements = _pop_measurements(folded)
 
-    folded = _fold_all(folded, num_folds, exclude)
+    folded = _fold_all(folded, round((scale_factor - 1.0) / 2.0), exclude)
 
     _append_measurements(folded, measurements)
     return folded
