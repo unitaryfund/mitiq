@@ -543,7 +543,7 @@ def test_fold_from_left_scale_factor_larger_than_three():
     """Tests folding from left with a scale_factor larger than three."""
     qreg = LineQubit.range(2)
     circuit = Circuit([ops.SWAP.on(*qreg)], [ops.CNOT.on(*qreg)])
-    folded = fold_gates_from_left(circuit, scale_factor=6.0)
+    folded = fold_gates_from_left(circuit, scale_factor=5.0)
     correct = Circuit([ops.SWAP.on(*qreg)] * 5, [ops.CNOT.on(*qreg)] * 5)
     assert _equal(folded, correct)
 
@@ -552,7 +552,7 @@ def test_fold_from_right_scale_factor_larger_than_three():
     """Tests folding from right with a scale_factor larger than three."""
     qreg = LineQubit.range(2)
     circuit = Circuit([ops.SWAP.on(*qreg)], [ops.CNOT.on(*qreg)])
-    folded = fold_gates_from_right(circuit, scale_factor=6.0)
+    folded = fold_gates_from_right(circuit, scale_factor=5.0)
     correct = Circuit([ops.SWAP.on(*qreg)] * 5, [ops.CNOT.on(*qreg)] * 5)
     assert _equal(folded, correct)
 
@@ -1492,8 +1492,6 @@ def test_fold_local_with_fidelities(fold_method, qiskit):
         [ops.T.on(qreg[2])],
         [ops.TOFFOLI.on(*qreg)] * 3,
     )
-    print(folded)
-    print(correct)
     if qiskit:
         folded, _ = convert_to_mitiq(folded)
         assert equal_up_to_global_phase(folded.unitary(), correct.unitary())

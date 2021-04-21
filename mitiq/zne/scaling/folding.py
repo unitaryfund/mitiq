@@ -15,6 +15,7 @@
 
 """Functions for local and global unitary folding on supported circuits."""
 from copy import deepcopy
+import math
 from typing import (
     Any,
     Callable,
@@ -299,7 +300,7 @@ def _fold_all(
             folded.append(op, strategy=InsertStrategy.EARLIEST)
             if op.gate not in to_exclude:
                 folded.append(
-                    [op, inverse(op)] * num_folds,
+                    [inverse(op), op] * num_folds,
                     strategy=InsertStrategy.EARLIEST,
                 )
 
@@ -453,16 +454,11 @@ def fold_gates_from_left(
     if fidelities and not all(0.0 < f <= 1.0 for f in fidelities.values()):
         raise ValueError("Fidelities should be in the interval (0, 1].")
 
-    # Copy the circuit and remove measurements
+    # Copy the circuit and remove measurements.
     folded = deepcopy(circuit)
     measurements = _pop_measurements(folded)
 
-    # Determine the stopping condition for folding
-    scale_factor, integer_num_folds = (
-        scale_factor % 3.0 + float(scale_factor > 3.0),
-        int(scale_factor // 3.0),
-    )
-
+    # Determine the stopping condition.
     ngates = len(list(folded.all_operations()))
     weights: Optional[Dict[str, float]]
     if fidelities:
@@ -472,14 +468,15 @@ def fold_gates_from_left(
         weights = None
         total_weight = ngates
 
-    stop = total_weight * (scale_factor - 1.0) / 2.0
+    fraction_to_fold = (scale_factor - 1.0) / 2.0
+    fraction_to_fold, integer_num_folds = math.modf(fraction_to_fold)
+    stop = total_weight * fraction_to_fold
 
-    # Fold gates from left to reach scale_factor % 3.
+    # Do the fractional folding (i.e., fold some but not all gates).
     tot = 0.0
     moment_shift = 0
     virtual_moments: List[int] = []
     for (moment_index, moment) in enumerate(circuit):
-        # TODO: This is ugly. Refactor so the stopping condition isn't duplicated.
         if tot >= stop:
             break
 
@@ -503,16 +500,17 @@ def fold_gates_from_left(
             if tot >= stop:
                 break
 
-    # Fold all gates to reach scale_factor // 3.
-    # TODO: This needs to account for fidelities, in particular perfect fidelity gates.
+    # Do the integer folding (i.e., fold all gates an equal number of times).
+    if not weights:
+        weights = dict()
+    exclude = frozenset(k for k, v in weights.items() if v == 0.0)
+
     if integer_num_folds > 0:
-        folded_moments = range(len(folded))
-        _fold_moments(
+        folded = _fold_all(
             folded,
-            moment_indices=[
-                i for i in folded_moments if i not in virtual_moments
-            ],
-            num_folds=integer_num_folds,
+            num_folds=int(integer_num_folds),
+            exclude=exclude,
+            skip_moments=frozenset(virtual_moments),
         )
 
     _append_measurements(folded, measurements)
