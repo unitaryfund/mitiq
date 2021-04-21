@@ -998,35 +998,6 @@ def test_fold_local_stretch_three_from_left():
     assert _equal(folded, fold_gates_from_left(circ, scale_factor=3))
 
 
-@pytest.mark.parametrize("squash", [True, False])
-def test_fold_local_big_stretch_from_left(squash: bool):
-    """Test for local folding with scale > 3."""
-    qreg = LineQubit.range(3)
-    circ = Circuit(
-        [
-            ops.H.on_each(*qreg),
-            ops.CNOT.on(qreg[0], qreg[1]),
-            ops.T.on(qreg[2]),
-            ops.TOFFOLI.on(*qreg),
-        ]
-    )
-    folded = _fold_local(
-        circ,
-        scale_factor=4,
-        fold_method=fold_gates_from_left,
-        squash_moments=squash,
-    )
-    correct = Circuit(
-        [ops.H.on(qreg[0])] * 7,
-        [ops.H.on(qreg[1])] * 5,
-        [ops.H.on(qreg[2])] * 3,
-        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
-        [ops.T.on(qreg[2]), ops.T.on(qreg[2]) ** -1, ops.T.on(qreg[2])],
-        [ops.TOFFOLI.on(*qreg)] * 3,
-    )
-    assert _equal(folded, correct)
-
-
 def test_global_fold_min_stretch():
     """Tests that global fold with scale = 1 is the same circuit."""
     # Test circuit
