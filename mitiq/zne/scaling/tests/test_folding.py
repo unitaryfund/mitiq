@@ -612,7 +612,7 @@ def test_fold_all_bad_exclude():
         fold_all(
             Circuit(),
             scale_factor=1.0,
-            exclude=frozenset(("not a gate name",))
+            exclude=frozenset(("not a gate name",)),
         )
 
     with pytest.raises(ValueError, match="Do not know how to exclude"):
