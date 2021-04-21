@@ -858,7 +858,6 @@ def _create_fold_mask(
         )
         [2, 2, 1, 0]
     """
-
     # Find the maximum odd integer smaller or equal to scale_factor
     num_uniform_folds = int((scale_factor - 1.0) / 2.0)
     odd_integer_scale_factor = 2 * num_uniform_folds + 1
@@ -875,7 +874,6 @@ def _create_fold_mask(
     if np.isclose(odd_integer_scale_factor, scale_factor):
 
         return num_folds_mask
-
     # If necessary, fold a subset of gates to approximate the scale_factor
     input_circuit_weight = sum(weight_mask)
     output_circuit_weight = odd_integer_scale_factor * input_circuit_weight
@@ -884,14 +882,11 @@ def _create_fold_mask(
     folding_order = list(range(len(weight_mask)))
     if folding_method == "from_left":
         pass
-
     elif folding_method == "from_right":
         folding_order.reverse()
-
     elif folding_method == "at_random":
         # TODO: add seed.
         np.random.shuffle(folding_order)
-
     else:
         raise ValueError(
             "The option 'folding_method' is not valid."
@@ -900,16 +895,12 @@ def _create_fold_mask(
 
     # Fold gates until the input scale_factor is approximated (from below)
     for idx in folding_order:
-
         if np.isclose(weight_mask[idx], 0.0):
             continue
-
         output_circuit_weight += 2 * weight_mask[idx]
-
         # If the scaling is exceeded, break without folding.
         if output_circuit_weight > scale_factor * input_circuit_weight:
             break
-
         num_folds_mask[idx] += 1
 
     return num_folds_mask
@@ -929,18 +920,12 @@ def _apply_fold_mask(circuit: Circuit, num_folds_mask: List[int],) -> Circuit:
 
     Returns: The folded quantum circuit.
     """
-
     _check_foldable(circuit)
-
     input_copy = deepcopy(circuit)
-
     measurements = _pop_measurements(input_copy)
-
     folded_circuit = input_copy[:0]
-
     for op, num_folds in zip(input_copy.all_operations(), num_folds_mask):
         folded_circuit.append([op] + num_folds * [inverse(op), op])
-
     _append_measurements(folded_circuit, measurements)
 
     return folded_circuit
