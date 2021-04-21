@@ -254,7 +254,7 @@ def _fold_all(
     """
     if num_folds < 1 or not isinstance(num_folds, int):
         raise ValueError(
-            f"Arg num_folds must be a positive integer but was {num_folds}"
+            f"Arg `num_folds` must be a positive integer but was {num_folds}."
         )
 
     # Parse the exclude argument.
@@ -279,7 +279,7 @@ def _fold_all(
                     )
                 else:
                     raise ValueError(
-                        f"Do not know how to parse item {item} in `exclude`. "
+                        f"Do not know how to parse item '{item}' in exclude. "
                         f"Valid items are Cirq gates, string keys specifying"
                         f"gates, and 'single', 'double', or 'triple'."
                     )
@@ -377,10 +377,33 @@ def fold_all(
 
     Args:
         circuit: Circuit to fold.
-        num_folds: Number of times to add G G^dag for each gate G.
-        exclude: Do not fold these gates.
+        num_folds: Number of times to add G^dag G after each gate G.
+        exclude: Do not fold these gates. Supported gate keys are listed in
+            the following table.::
+
+                Gate key    | Gate
+                -------------------------
+                "H"         | Hadamard
+                "X"         | Pauli X
+                "Y"         | Pauli Y
+                "Z"         | Pauli Z
+                "I"         | Identity
+                "CNOT"      | CNOT
+                "CZ"        | CZ gate
+                "TOFFOLI"   | Toffoli gate
+                "single"    | All single qubit gates
+                "double"    | All two-qubit gates
+                "triple"    | All three-qubit gates
     """
-    return _fold_all(circuit, num_folds, exclude)
+    _check_foldable(circuit)
+
+    folded = deepcopy(circuit)
+    measurements = _pop_measurements(folded)
+
+    folded = _fold_all(folded, num_folds, exclude)
+
+    _append_measurements(folded, measurements)
+    return folded
 
 
 @noise_scaling_converter
