@@ -553,7 +553,7 @@ def test_fold_from_right_scale_factor_larger_than_three():
     qreg = LineQubit.range(2)
     circuit = Circuit([ops.SWAP.on(*qreg)], [ops.CNOT.on(*qreg)])
     folded = fold_gates_from_right(circuit, scale_factor=6.0)
-    correct = Circuit([ops.SWAP.on(*qreg)] * 3, [ops.CNOT.on(*qreg)] * 9)
+    correct = Circuit([ops.SWAP.on(*qreg)] * 5, [ops.CNOT.on(*qreg)] * 5)
     assert _equal(folded, correct)
 
 
