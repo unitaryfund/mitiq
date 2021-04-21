@@ -586,8 +586,11 @@ def test_fold_all_exclude_with_strings():
 @pytest.mark.parametrize("skip", (frozenset((0, 1)), frozenset((0, 3, 7))))
 def test_fold_all_skip_moments(skip):
     circuit = testing.random_circuit(
-        qubits=3, n_moments=7, op_density=1,
-        random_state=1, gate_domain={ops.H: 1, ops.X: 1, ops.CNOT: 2},
+        qubits=3,
+        n_moments=7,
+        op_density=1,
+        random_state=1,
+        gate_domain={ops.H: 1, ops.X: 1, ops.CNOT: 2},
     )
     folded = _fold_all(circuit, skip_moments=skip)
 
@@ -1533,16 +1536,17 @@ def test_fold_and_squash_max_stretch(fold_method):
     circuit = Circuit()
     for i in range(d):
         circuit.insert(0, ops.H.on(qreg[i % 2]), strategy=InsertStrategy.NEW)
-    folded_not_squashed = fold_method(
-        circuit, scale_factor=3.0, squash_moments=False
-    )
+    # TODO: fold_[left|right] currently uses fold_all which always squashes.
+    # folded_not_squashed = fold_method(
+    #     circuit, scale_factor=3.0, squash_moments=False
+    # )
     folded_and_squashed = fold_method(
         circuit, scale_factor=3.0, squash_moments=True
     )
     folded_with_squash_moments_not_specified = fold_method(
         circuit, scale_factor=3.0
     )  # Checks that the default is to squash moments
-    # TODO: fold_[left|right] currently uses fold_all which always squashes.
+    # TODO: See above.
     # assert len(folded_not_squashed) == 30
     assert len(folded_and_squashed) == 15
     assert len(folded_with_squash_moments_not_specified) == 15
