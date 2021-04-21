@@ -214,19 +214,20 @@ def _fold_gates(
     return folded
 
 
-def _fold_moments(circuit: Circuit, moment_indices: List[int]) -> None:
+def _fold_moments(circuit: Circuit, moment_indices: List[int], num_folds: int = 1) -> None:
     """Folds specified moments in the circuit in place.
 
     Args:
         circuit: Circuit to fold.
         moment_indices: Indices of moments to fold in the circuit.
+        num_folds: Number of times to fold each moment.
     """
     shift = 0
     for i in moment_indices:
         circuit.insert(
-            i + shift, [circuit[i + shift], inverse(circuit[i + shift])]
+            i + shift, [circuit[i + shift], inverse(circuit[i + shift])] * num_folds
         )
-        shift += 2
+        shift += 2 * num_folds
 
 
 # Helper functions for folding by fidelity
@@ -341,7 +342,7 @@ def fold_gates_from_left(
             are created for folded gates. This option only applies to QPROGRAM
             types which have a "moment" or "time" structure. Default is True.
 
-        return_mitiq (bool): If True, returns a mitiq circuit instead of
+        return_mitiq (bool): If True, returns a Mitiq circuit instead of
             the input circuit type (if different). Default is False.
 
     Returns:
@@ -360,55 +361,63 @@ def fold_gates_from_left(
     if fidelities and not all(0.0 < f <= 1.0 for f in fidelities.values()):
         raise ValueError("Fidelities should be in the interval (0, 1].")
 
-    if scale_factor > 3.0:
-        return _fold_local(
-            circuit, scale_factor, fold_method=fold_gates_from_left, **kwargs
-        )
-
     # Copy the circuit and remove measurements
     folded = deepcopy(circuit)
     measurements = _pop_measurements(folded)
 
     # Determine the stopping condition for folding
+    scale_factor, integer_num_folds = scale_factor % 3.0 + float(scale_factor > 3.0), int(scale_factor // 3.0)
+
     ngates = len(list(folded.all_operations()))
     weights: Optional[Dict[str, float]]
     if fidelities:
         weights = {k: 1.0 - f for k, f in fidelities.items()}
         total_weight = _compute_weight(folded, weights)
-        stop = total_weight * (scale_factor - 1.0) / 2.0
     else:
         weights = None
-        stop = _get_num_to_fold(scale_factor, ngates)
+        total_weight = ngates
 
-    # Fold gates from left until the stopping condition is met
-    if np.isclose(stop, 0.0):
-        _append_measurements(folded, measurements)
-        return folded
+    stop = total_weight * (scale_factor - 1.0) / 2.0
 
+    # Fold gates from left to reach scale_factor % 3.
     tot = 0.0
     moment_shift = 0
-    # Get weight at particular moment and gate index then fold gate
+    virtual_moments: List[int] = []
     for (moment_index, moment) in enumerate(circuit):
+        # TODO: This is ugly. Refactor so the stopping condition isn't duplicated.
+        if tot >= stop:
+            break
+
         for gate_index in range(len(moment)):
             op = folded[moment_index + moment_shift].operations[gate_index]
-            if weights:
-                weight = _get_weight_for_gate(weights, op)
-            else:
-                weight = 1
+            weight = _get_weight_for_gate(weights, op) if weights else 1.0
+
             # Fold the gate
             if weight > 0.0:
                 _fold_gate_at_index_in_moment(
                     folded, moment_index + moment_shift, gate_index
                 )
+                virtual_moments += [moment_index + moment_shift + 1, moment_index + moment_shift + 2]
                 moment_shift += 2
                 tot += weight
-            # Append measurements after stop condition is satisfied
-            if tot >= stop:
-                _append_measurements(folded, measurements)
-                if not (kwargs.get("squash_moments") is False):
-                    folded = squash_moments(folded)
-                return folded
 
+            # Stopping condition.
+            if tot >= stop:
+                break
+
+    # Fold all gates to reach scale_factor // 3.
+    # TODO: This needs to account for fidelities, in particular perfect fidelity gates.
+    if integer_num_folds > 0:
+        folded_moments = range(len(folded))
+        _fold_moments(
+            folded,
+            moment_indices=[i for i in folded_moments if i not in virtual_moments],
+            num_folds=integer_num_folds
+        )
+
+    _append_measurements(folded, measurements)
+    if not (kwargs.get("squash_moments") is False):
+        folded = squash_moments(folded)
     return folded
 
 
