@@ -816,3 +816,100 @@ def fold_global(
     if not (kwargs.get("squash_moments") is False):
         folded = squash_moments(folded)
     return folded
+
+
+def _create_fold_mask(
+    weight_mask: List[float],
+    scale_factor: float,
+    folding_method: str = "at_random",
+) -> List[float]:
+    r"""Returns a list of integers determining how many times each gate a
+    circuit should be folded to realize the desired input scale_factor.
+
+    More precicely, the j_th element of the returned list is associated
+    to the j_th gate G_j of a circuit that we want to scale and determines
+    how many times G_j^\dag G_j should be applied after G_j.
+
+    The returned list is built such that the total weight of the
+    folded circuit is approximately equal to scale_factor times the
+    total weight of the input circuit.
+
+    For equal weights, this function reproduces the local unitary folding
+    method defined in equation (2) of [Giurgica_Tiron_2020_arXiv]_.
+
+    Args:
+        weight_mask: The weights of all the gates of the circuit to fold.
+            Highly noisy gates should have a corresponding high weight.
+            Gates with zero weight are assumed to be ideal and are not folded.
+        scale_factor: The effective noise scale factor.
+        folding_method: A string equal to "at_random", or "from_left", or
+            "from_right". Determines the partial folding method described in
+            [Giurgica_Tiron_2020_arXiv]_. If scale_factor is an odd integer,
+            all methods are equivalent and this option is irrelevant.
+
+    Returns: The list of integers determining to how many times one should
+        fold the j_th gate of the circuit to be scaled.
+
+    Example:
+        >>>_create_fold_mask(
+            weight_mask=[1.0, 0.5, 2.0, 0.0],
+            scale_factor=4,
+            folding_method="from_left",
+        )
+        [2, 2, 1, 0]
+    """
+
+    # Find the maximum odd integer smaller or equal to scale_factor
+    num_uniform_folds = int((scale_factor - 1.0) / 2.0)
+    odd_integer_scale_factor = 2 * num_uniform_folds + 1
+
+    # Uniformly folding all gates to reach odd_integer_scale_factor
+    num_folds_mask = []
+    for w in weight_mask:
+        if np.isclose(w, 0.0):
+            num_folds_mask.append(0)
+        else:
+            num_folds_mask.append(num_uniform_folds)
+
+    # If the scale_factor is an odd integer, we are done.
+    if np.isclose(odd_integer_scale_factor, scale_factor):
+
+        return num_folds_mask
+
+    # If necessary, fold a subset of gates to approximate the scale_factor
+    input_circuit_weight = sum(weight_mask)
+    output_circuit_weight = odd_integer_scale_factor * input_circuit_weight
+
+    # Express folding order through a list of indices
+    folding_order = list(range(len(weight_mask)))
+    if folding_method == "from_left":
+        pass
+
+    elif folding_method == "from_right":
+        folding_order.reverse()
+
+    elif folding_method == "at_random":
+        # TODO: add seed.
+        np.random.shuffle(folding_order)
+
+    else:
+        raise ValueError(
+            "The option 'folding_method' is not valid."
+            "It must be 'at_random', or 'from_left', or 'from_right'."
+        )
+
+    # Fold gates until the input scale_factor is approximated (from below)
+    for idx in folding_order:
+
+        if np.isclose(weight_mask[idx], 0.0):
+            continue
+
+        output_circuit_weight += 2 * weight_mask[idx]
+
+        # If the scaling is exceeded, break without folding.
+        if output_circuit_weight > scale_factor * input_circuit_weight:
+            break
+
+        num_folds_mask[idx] += 1
+
+    return num_folds_mask
