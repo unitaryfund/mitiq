@@ -1492,6 +1492,8 @@ def test_fold_local_with_fidelities(fold_method, qiskit):
         [ops.T.on(qreg[2])],
         [ops.TOFFOLI.on(*qreg)] * 3,
     )
+    print(folded)
+    print(correct)
     if qiskit:
         folded, _ = convert_to_mitiq(folded)
         assert equal_up_to_global_phase(folded.unitary(), correct.unitary())

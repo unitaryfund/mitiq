@@ -20,6 +20,7 @@ from typing import (
     Callable,
     Collection,
     Dict,
+    FrozenSet,
     Iterable,
     List,
     Optional,
@@ -53,6 +54,9 @@ _cirq_gates_to_string_keys = {
     ops.CZ: "CZ",
     ops.TOFFOLI: "TOFFOLI",
 }
+_string_keys_to_cirq_gates = dict(
+    zip(_cirq_gates_to_string_keys.values(), _cirq_gates_to_string_keys.keys())
+)
 
 
 # Helper functions
@@ -214,7 +218,9 @@ def _fold_gates(
     return folded
 
 
-def _fold_moments(circuit: Circuit, moment_indices: List[int], num_folds: int = 1) -> None:
+def _fold_moments(
+    circuit: Circuit, moment_indices: List[int], num_folds: int = 1
+) -> None:
     """Folds specified moments in the circuit in place.
 
     Args:
@@ -225,9 +231,79 @@ def _fold_moments(circuit: Circuit, moment_indices: List[int], num_folds: int = 
     shift = 0
     for i in moment_indices:
         circuit.insert(
-            i + shift, [circuit[i + shift], inverse(circuit[i + shift])] * num_folds
+            i + shift,
+            [circuit[i + shift], inverse(circuit[i + shift])] * num_folds,
         )
         shift += 2 * num_folds
+
+
+def _fold_all(
+    circuit: Circuit,
+    num_folds: int = 1,
+    exclude: FrozenSet[Any] = frozenset(),
+    skip_moments: FrozenSet[int] = frozenset(),
+) -> Circuit:
+    """Returns a circuit with all gates folded locally.
+
+    Args:
+        circuit: Circuit to fold.
+        num_folds: Number of times to add G G^dag for each gate G.
+        exclude: Do not fold these gates.
+        skip_moments: Do not fold these moments.
+    """
+    if num_folds < 1 or not isinstance(num_folds, int):
+        raise ValueError(
+            f"Arg num_folds must be a positive integer but was {num_folds}"
+        )
+
+    # Parse the exclude argument.
+    all_gates = set(op.gate for op in circuit.all_operations())
+    to_exclude = set()
+    for item in exclude:
+        if isinstance(item, str):
+            try:
+                to_exclude.add(_string_keys_to_cirq_gates[item])
+            except KeyError:
+                if item == "single":
+                    to_exclude.update(
+                        gate for gate in all_gates if gate.num_qubits() == 1
+                    )
+                elif item == "double":
+                    to_exclude.update(
+                        gate for gate in all_gates if gate.num_qubits() == 2
+                    )
+                elif item == "triple":
+                    to_exclude.update(
+                        gate for gate in all_gates if gate.num_qubits() == 3
+                    )
+                else:
+                    raise ValueError(
+                        f"Do not know how to parse item {item} in `exclude`. "
+                        f"Valid items are Cirq gates, string keys specifying"
+                        f"gates, and 'single', 'double', or 'triple'."
+                    )
+        elif isinstance(item, ops.Gate):
+            to_exclude.add(item)
+        else:
+            raise ValueError(
+                f"Do not know how to exclude {item} of type {type(item)}."
+            )
+
+    folded = deepcopy(circuit)[:0]
+    for (i, moment) in enumerate(circuit):
+        if i in skip_moments:
+            folded.append(moment, strategy=InsertStrategy.EARLIEST)
+            continue
+
+        for op in moment:
+            folded.append(op, strategy=InsertStrategy.EARLIEST)
+            if op.gate not in to_exclude:
+                folded.append(
+                    [op, inverse(op)] * num_folds,
+                    strategy=InsertStrategy.EARLIEST,
+                )
+
+    return folded
 
 
 # Helper functions for folding by fidelity
@@ -290,6 +366,22 @@ def _get_num_to_fold(scale_factor: float, ngates: int) -> int:
 
 
 # Local folding functions
+@noise_scaling_converter
+def fold_all(
+    circuit: QPROGRAM,
+    num_folds: int = 1,
+    exclude: FrozenSet[Any] = frozenset(),
+) -> QPROGRAM:
+    """Returns a circuit with all gates folded locally.
+
+    Args:
+        circuit: Circuit to fold.
+        num_folds: Number of times to add G G^dag for each gate G.
+        exclude: Do not fold these gates.
+    """
+    return _fold_all(circuit, num_folds, exclude)
+
+
 @noise_scaling_converter
 def fold_gates_from_left(
     circuit: QPROGRAM, scale_factor: float, **kwargs: Any
@@ -366,7 +458,10 @@ def fold_gates_from_left(
     measurements = _pop_measurements(folded)
 
     # Determine the stopping condition for folding
-    scale_factor, integer_num_folds = scale_factor % 3.0 + float(scale_factor > 3.0), int(scale_factor // 3.0)
+    scale_factor, integer_num_folds = (
+        scale_factor % 3.0 + float(scale_factor > 3.0),
+        int(scale_factor // 3.0),
+    )
 
     ngates = len(list(folded.all_operations()))
     weights: Optional[Dict[str, float]]
@@ -397,7 +492,10 @@ def fold_gates_from_left(
                 _fold_gate_at_index_in_moment(
                     folded, moment_index + moment_shift, gate_index
                 )
-                virtual_moments += [moment_index + moment_shift + 1, moment_index + moment_shift + 2]
+                virtual_moments += [
+                    moment_index + moment_shift + 1,
+                    moment_index + moment_shift + 2,
+                ]
                 moment_shift += 2
                 tot += weight
 
@@ -411,8 +509,10 @@ def fold_gates_from_left(
         folded_moments = range(len(folded))
         _fold_moments(
             folded,
-            moment_indices=[i for i in folded_moments if i not in virtual_moments],
-            num_folds=integer_num_folds
+            moment_indices=[
+                i for i in folded_moments if i not in virtual_moments
+            ],
+            num_folds=integer_num_folds,
         )
 
     _append_measurements(folded, measurements)
