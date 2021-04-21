@@ -913,3 +913,34 @@ def _create_fold_mask(
         num_folds_mask[idx] += 1
 
     return num_folds_mask
+
+
+def _apply_fold_mask(circuit: Circuit, num_folds_mask: List[int],) -> Circuit:
+    r"""Applies local unitary folding to the gates of the input circuit
+    according to the input num_folds_mask.
+
+    More precicely, G_j^\dag G_j is applied after the j_th gate G_j of
+    the input circuit an integer number of times given by num_folds_mask[j].
+
+    Args:
+        circuit: The quantum circuit to fold.
+        num_folds_mask: The list of integers indicating how many times
+            the corresponding gates of 'circuit' should be folded.
+
+    Returns: The folded quantum circuit.
+    """
+
+    _check_foldable(circuit)
+
+    input_copy = deepcopy(circuit)
+
+    measurements = _pop_measurements(input_copy)
+
+    folded_circuit = input_copy[:0]
+
+    for op, num_folds in zip(input_copy.all_operations(), num_folds_mask):
+        folded_circuit.append([op] + num_folds * [inverse(op), op])
+
+    _append_measurements(folded_circuit, measurements)
+
+    return folded_circuit
