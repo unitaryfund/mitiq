@@ -912,6 +912,19 @@ def test_fold_right_retains_terminal_measurements_in_input_circuit():
     assert _equal(circ, folded)
 
 
+def test_fold_left_and_fold_right_match_on_odd_scale_factors():
+    circuit = testing.random_circuit(
+        qubits=3, n_moments=5, op_density=1.0, random_state=11
+    )
+    for s in (3, 7, 15):
+        assert _equal(
+            fold_gates_from_left(circuit, s),
+            fold_gates_from_right(circuit, s),
+            require_qubit_equality=True,
+            require_measurement_equality=True,
+        )
+
+
 def test_fold_gates_at_random_no_stretch():
     """Tests folded circuit is identical for a scale factor of one."""
     circuit = testing.random_circuit(qubits=3, n_moments=10, op_density=0.99)
