@@ -233,7 +233,7 @@ def _select(
     rz_non_clifford: np.ndarray,
     fraction_non_clifford: float,
     method_select: str,
-    sigma_select: float,
+    sigma: float,
     random_state: np.random.RandomState,
 ) -> np.ndarray:
     """Function to select the non-Clifford gates to be replaced for a given set
@@ -245,7 +245,7 @@ def _select(
         fration_non_clifford: fraction of non-Clifford gates to change.
         method: {'uniform', 'gaussian'} method to use to select Clifford gates
                 to replace.
-        sigma_select: width of probability distribution used in selection
+        sigma: width of probability distribution used in selection
                       of non-Clifford gates to replace, only has effect if
                       method_select = 'gaussian'.
         random_state: Seed for sampling.
@@ -267,7 +267,7 @@ def _select(
     elif method_select == "gaussian":
         non_cliff_angles = rz_non_clifford
         # form a probability distribution:
-        probabilities = _angle_to_probabilities(non_cliff_angles, sigma_select)
+        probabilities = _angle_to_probabilities(non_cliff_angles, sigma)
         prob_choose_gate = [k / sum(probabilities) for k in probabilities]
         columns_to_change = random_state.choice(
             np.arange(0, total_non_cliff, 1).tolist(),
@@ -299,10 +299,7 @@ def _replace(
         rz_non_clifford_selected: array of non-Clifford angles.
         method_replace: {'uniform', 'gaussian', 'closest'} method to use
                         to replace selected non-Clifford gates.
-        sigma_select: width of probability distribution used in selection
-                      of non-Clifford gates to replace, only has effect if
-                      method_select = 'gaussian'
-        sigma_replace: width of probability distribution used in replacement
+        sigma: width of probability distribution used in replacement
                        of selected non-Clifford gates, only has effect if
                        method_replace = 'gaussian'.
         random_state: Seed for sampling.
@@ -324,7 +321,7 @@ def _replace(
 
     elif method_replace == "gaussian":
         rz_non_clifford_replaced = _probabilistic_angle_to_clifford(
-            rz_non_clifford_selected, sigma_replace, random_state
+            rz_non_clifford_selected, sigma, random_state
         )
     else:
         raise Exception(
