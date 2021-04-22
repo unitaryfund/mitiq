@@ -815,8 +815,8 @@ def test_fold_from_right_basic():
     # Intermediate scale factor
     folded = fold_gates_from_right(circ, scale_factor=2.5)
     correct = Circuit(
-        [ops.H.on(qreg[0])] * 3,
-        [ops.H.on(qreg[1])],
+        [ops.H.on(qreg[0])],
+        [ops.H.on(qreg[1])] * 3,
         [ops.CNOT.on(*qreg)] * 3,
         [ops.T.on(qreg[1]), ops.T.on(qreg[1]) ** -1, ops.T.on(qreg[1])],
     )

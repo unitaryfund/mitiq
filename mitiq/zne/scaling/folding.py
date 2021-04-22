@@ -422,7 +422,7 @@ def fold_all(
 
 
 @noise_scaling_converter
-def fold_gates_from_left(
+def _old_fold_gates_from_left(
     circuit: QPROGRAM, scale_factor: float, **kwargs: Any
 ) -> QPROGRAM:
     """Returns a new folded circuit by applying the map G -> G G^dag G to a
@@ -676,7 +676,7 @@ def _update_moment_indices(
 
 
 @noise_scaling_converter
-def fold_gates_at_random(
+def _old_fold_gates_at_random(
     circuit: QPROGRAM,
     scale_factor: float,
     seed: Optional[int] = None,
@@ -1334,4 +1334,7 @@ def new_fold_gates_at_random(
     return _apply_fold_mask(circuit, num_fold_mask)
 
 
-fold_gates_from_right = _old_fold_gates_from_right
+fold_gates_from_right = new_fold_gates_from_right
+fold_gates_from_left = new_fold_gates_from_left
+# TODO: need to seed fold_gates_at_random to pass tests
+fold_gates_at_random = _old_fold_gates_at_random
