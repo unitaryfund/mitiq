@@ -29,7 +29,7 @@ from clifford_training_data import (
     _replace,
     _select,
     _get_arguments,
-    CLIFFORD_ANGLES
+    CLIFFORD_ANGLES,
 )
 from cirq.experiments import (
     random_rotations_between_grid_interaction_layers_circuit,
