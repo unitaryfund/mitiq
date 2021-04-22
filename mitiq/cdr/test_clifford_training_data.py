@@ -312,7 +312,6 @@ def test_replace():
             rz_non_cliff_replaced = _replace(
                 rz_non_cliff_selected,
                 method_replace,
-                sigma_select,
                 sigma_replace,
                 random_state,
             )

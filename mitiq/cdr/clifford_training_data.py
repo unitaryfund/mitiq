@@ -197,7 +197,6 @@ def _map_to_near_clifford(
     rz_non_clifford_replaced = _replace(
         rz_non_clifford_selected,
         method_replace,
-        sigma_select,
         sigma_replace,
         random_state_replace,
     )
