@@ -819,15 +819,15 @@ def fold_global(
 
 
 def _create_weight_mask(
-    circuit: Circuit,
-    fidelities: Dict[str, float],
+    circuit: Circuit, fidelities: Optional[Dict[str, float]],
 ) -> List[float]:
     """Returns a list of weights associated to each gate if the input
     circuit.
 
     Args:
         circuit: The circuit from which a weight mask is created.
-        fidelities: The dictionary of gate fidelities. See the
+        fidelities: The dictionary of gate fidelities.
+            If None, default fidelities will be used. See the
             docstring of local folding function for mode details.
 
     Returns: The list of weights associated to all the gates.
@@ -955,6 +955,7 @@ def _apply_fold_mask(circuit: Circuit, num_folds_mask: List[int],) -> Circuit:
     _append_measurements(folded_circuit, measurements)
 
     return folded_circuit
+
 
 # TODO: draft of new folding functions.
 # If working they could replace the existing functions.
