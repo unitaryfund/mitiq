@@ -24,26 +24,11 @@ import numpy as np
 import cirq
 from cirq.contrib.qasm_import import circuit_from_qasm
 import qiskit
-from qiskit.extensions import Barrier
 
 from mitiq.utils import _simplify_circuit_exponents
 
 
 QASMType = str
-
-
-def _remove_barriers(circuit: qiskit.QuantumCircuit) -> qiskit.QuantumCircuit:
-    """Returns a copy of the input circuit with all barriers removed.
-
-    Args:
-        circuit: Qiskit circuit to remove barriers from.
-    """
-    copy = circuit.copy()
-    for instr in copy.data:
-        gate = instr[0]
-        if isinstance(gate, Barrier):
-            copy.data.remove(instr)
-    return copy
 
 
 def _remove_qasm_barriers(qasm: QASMType) -> QASMType:
@@ -58,8 +43,15 @@ def _remove_qasm_barriers(qasm: QASMType) -> QASMType:
         semicolons. Whitespace is ignored. The language is case sensitive.
         Comments begin with a pair of forward slashes and end with a new line."
     """
-    # The inside regex removes comments, the outside regex removes barriers
-    return re.sub(r"barrier[^;]*;\s*", "", re.sub(r"//[^\n]*\n", "", qasm))
+    quoted_re = r"(?:\"[^\"]*?\")"
+    statement_re = r"((?:[^;{}/\"]*?" + quoted_re + r"?)*[;{}])?"
+    comment_re = r"(\n?//[^\n]*(?:\n|$))?"
+    statements_comments = re.findall(statement_re + comment_re, qasm)
+    lines = []
+    for statement, comment in statements_comments:
+        if re.match(r"^\s*barrier(?:(?:\s+)|(?:;))", statement) is None:
+            lines.append(statement + comment)
+    return "".join(lines)
 
 
 def _map_bit_index(
