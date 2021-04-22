@@ -121,10 +121,10 @@ def execute_with_pec(
 
     sampled_circuits = []
     signs = []
-    converted_circut, _ = convert_to_mitiq(circuit)
+    converted_circuit, _ = convert_to_mitiq(circuit)
     for _ in range(num_samples):
         sampled_circuit, sign, _ = sample_circuit(
-            converted_circut, representations, random_state
+            converted_circuit, representations, random_state
         )
         sampled_circuits.append(sampled_circuit)
         signs.append(sign)
