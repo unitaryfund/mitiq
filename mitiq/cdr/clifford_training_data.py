@@ -61,7 +61,7 @@ def generate_training_circuits(
             method_replace = 'gaussian'.
 
     Returns:
-        List[circ.Circuit]: list of near-Clifford circuits constructed from
+        List[cirq.Circuit]: list of near-Clifford circuits constructed from
                              the circuits of interest.
         List[List[float]]: list of list of angles that were replaced in each
                            training circuit.
@@ -73,7 +73,7 @@ def generate_training_circuits(
     if isinstance(random_state, int):
         random_state = np.random.RandomState(random_state)
     else:
-        random_state = np.random.ranint(10 ** (8))
+        random_state = np.random.randint(10 ** (8))
         random_state = np.random.RandomState(random_state)
     # generating a list of seeds used for each training circuit construction:
     random_states = random_state.randint(

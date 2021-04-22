@@ -29,6 +29,7 @@ from clifford_training_data import (
     _replace,
     _select,
     _get_arguments,
+    CLIFFORD_ANGLES
 )
 from cirq.experiments import (
     random_rotations_between_grid_interaction_layers_circuit,
@@ -39,7 +40,6 @@ from mitiq.mitiq_qiskit.conversions import to_qiskit, from_qiskit
 
 """Tests for training circuits generation for Clifford data regression.
 """
-CLIFFORD_ANGLES = (0.0, np.pi / 2, np.pi, (3 / 2) * (np.pi))
 
 
 def random_circuit(qubits: int, depth: int,) -> Circuit:
