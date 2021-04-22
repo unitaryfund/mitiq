@@ -348,6 +348,7 @@ def fold_gates_from_left(
         folded: The folded quantum circuit as a QPROGRAM.
 
     """
+
     # Check inputs and handle keyword arguments
     _check_foldable(circuit)
 
@@ -413,7 +414,7 @@ def fold_gates_from_left(
 
 
 @noise_scaling_converter
-def fold_gates_from_right(
+def _old_fold_gates_from_right(
     circuit: QPROGRAM, scale_factor: float, **kwargs: Any
 ) -> Circuit:
     """Returns a new folded circuit by applying the map G -> G G^dag G
@@ -919,20 +920,33 @@ def _create_fold_mask(
             "It must be 'at_random', or 'from_left', or 'from_right'."
         )
 
-    # Fold gates until the input scale_factor is approximated (from below)
-    for idx in folding_order:
-        if np.isclose(weight_mask[idx], 0.0):
+    # Fold gates until the input scale_factor is better approximated
+    approx_error = np.abs(
+        output_circuit_weight - scale_factor * input_circuit_weight
+    )
+    for j in folding_order:
+        # Skip gates with 0 weight
+        if np.isclose(weight_mask[j], 0.0):
             continue
-        output_circuit_weight += 2 * weight_mask[idx]
-        # If the scaling is exceeded, break without folding.
-        if output_circuit_weight > scale_factor * input_circuit_weight:
+
+        # Compute the approx error if a new fold would be applied
+        new_output_circuit_weight = output_circuit_weight + 2 * weight_mask[j]
+        new_approx_error = np.abs(
+            new_output_circuit_weight - scale_factor * input_circuit_weight
+        )
+        # Fold the candidate gate only if it helps improving the approximation
+        if new_approx_error < approx_error:
+            approx_error = new_approx_error
+            output_circuit_weight = new_output_circuit_weight
+            num_folds_mask[j] += 1
+        # TODO: decide if removing next else case to get better approximations
+        else:
             break
-        num_folds_mask[idx] += 1
 
     return num_folds_mask
 
 
-def _apply_fold_mask(circuit: Circuit, num_folds_mask: List[int],) -> Circuit:
+def _apply_fold_mask(circuit: Circuit, num_folds_mask: List[int]) -> Circuit:
     r"""Applies local unitary folding to the gates of the input circuit
     according to the input num_folds_mask.
 
@@ -1173,3 +1187,6 @@ def new_fold_gates_at_random(
     num_fold_mask = _create_fold_mask(weight_mask, scale_factor, "at_random")
 
     return _apply_fold_mask(circuit, num_fold_mask)
+
+
+fold_gates_from_right = _old_fold_gates_from_right
