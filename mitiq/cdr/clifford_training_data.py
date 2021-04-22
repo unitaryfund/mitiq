@@ -287,8 +287,7 @@ def _select(
 def _replace(
     rz_non_clifford_selected: np.ndarray,
     method_replace: str,
-    sigma_select: float,
-    sigma_replace: float,
+    sigma: float,
     random_state: np.random.RandomState,
 ) -> np.ndarray:
     """Function that takes the non-Clifford angles and replacement and
