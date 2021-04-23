@@ -85,7 +85,7 @@ def generate_training_circuits(
     r_z_gates = operations[zgatesmask]
     r_z_positions = positions[zgatesmask]
     r_z_qubits = qubits[zgatesmask]
-    angles = _get_arguments(r_z_gates)
+    angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
     mask_non_clifford = ~_is_clifford_angle(angles)
     rz_non_clifford = angles[mask_non_clifford]
     position_non_clifford = r_z_positions[mask_non_clifford]
@@ -179,21 +179,6 @@ def _map_to_near_clifford(
 
     operations[[int(i) for i in position_selected]] = new_operations
     return Circuit(operations)
-
-
-def _get_arguments(operation: cirq.ops.GateOperation) -> float:
-    """Takes a cirq GateOperation object and returns the exponent multiplied
-    by pi. This corresponds to the angle of a rotation gate.
-
-    Args:
-        operation: a cirq GateOperation.
-
-    Returns:
-        operation.gate.exponent*pi: cirq.ops.GateOperation.gate.exponent*pi"""
-    return operation.gate.exponent * np.pi
-
-
-_get_arguments = np.vectorize(_get_arguments)
 
 
 def _select(
@@ -313,7 +298,7 @@ def count_non_cliffords(circuit: Circuit,) -> float:
         [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
     )
     r_z_gates = operations[mask]
-    angles = _get_arguments(r_z_gates)
+    angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
     mask_non_clifford = ~_is_clifford_angle(angles)
     rz_non_clifford = angles[mask_non_clifford]
     return len(rz_non_clifford)

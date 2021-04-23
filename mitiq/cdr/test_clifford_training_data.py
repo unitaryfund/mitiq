@@ -28,7 +28,6 @@ from clifford_training_data import (
     generate_training_circuits,
     _replace,
     _select,
-    _get_arguments,
     _CLIFFORD_ANGLES,
 )
 from cirq.experiments import (
@@ -210,7 +209,7 @@ def test_map_to_near_cliffords():
     r_z_gates = operations[zgatesmask]
     r_z_positions = positions[zgatesmask]
     r_z_qubits = qubits[zgatesmask]
-    angles = _get_arguments(r_z_gates)
+    angles = angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
     mask_non_clifford = ~_is_clifford_angle(angles)
     rz_non_clifford = angles[mask_non_clifford]
     position_non_clifford = r_z_positions[mask_non_clifford]
@@ -263,7 +262,7 @@ def test_select():
         [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
     )
     r_z_gates = operations[rzgatemask]
-    angles = _get_arguments(r_z_gates)
+    angles = angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
     mask_non_clifford = ~_is_clifford_angle(angles)
     rz_non_clifford = angles[mask_non_clifford]
     rz_non_cliff_copy = rz_non_clifford.copy()
@@ -292,7 +291,7 @@ def test_replace():
         [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
     )
     r_z_gates = operations[mask]
-    angles = _get_arguments(r_z_gates)
+    angles = angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
     mask_non_clifford = ~_is_clifford_angle(angles)
     rz_non_clifford = angles[mask_non_clifford]
     rz_non_cliff_copy = rz_non_clifford.copy()
@@ -328,7 +327,7 @@ def test_get_argument():
         [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
     )
     r_z_gates = operations[mask]
-    args = _get_arguments(r_z_gates)
+    args = angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
     for arg in args:
         assert type(arg) == np.float64
 
