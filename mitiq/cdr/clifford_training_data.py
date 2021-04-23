@@ -174,7 +174,7 @@ def _map_to_near_clifford(
     )
     # TODO: Why do the qubits get removed at all? This isn't necessary.
     new_operations = [
-        cirq.ops.rz(parameter).on(qubits) for parameter, qubits in zip(rz_non_clifford_replaced, qubits_selected)
+        cirq.ops.rz(parameter).on(qubits) for parameter, qubits in zip(list(rz_non_clifford_replaced), qubits_selected)
     ]
 
     operations[[int(i) for i in position_selected]] = new_operations
@@ -194,7 +194,7 @@ def _select(
     Args:
         rz_non_clifford: array of non-Clifford angles for a circuit of
                          interest.
-        fration_non_clifford: fraction of non-Clifford gates to change.
+        fraction_non_clifford: fraction of non-Clifford gates to change.
         method: {'uniform', 'gaussian'} method to use to select Clifford gates
                 to replace.
         sigma: width of probability distribution used in selection
@@ -267,7 +267,7 @@ def _replace(
 
     elif method_replace == "uniform":
         rz_non_clifford_replaced = _random_clifford(
-            rz_non_clifford_selected, random_state
+            len(rz_non_clifford_selected), random_state
         )
 
     elif method_replace == "gaussian":
@@ -354,23 +354,19 @@ def _closest_clifford(ang: float) -> float:
 _closest_clifford = np.vectorize(_closest_clifford)
 
 
-def _random_clifford(ang: float, random_state: np.random.RandomState) -> float:
-    """Function to take angle and return the random Clifford angle note the
-       usage of this function is vectorized so it takes and returns arrays.
+def _random_clifford(
+    num_angles: int,
+    random_state: np.random.RandomState
+) -> np.ndarray:
+    """Returns an array of Clifford angles chosen uniformly at random.
 
     Args:
-        random_state: np.random.RandomState
-
-    Returns:
-        Clifford angle: closest clifford angle.
+        num_angles: Number of Clifford angles to return in array.
+        random_state: Random state for sampling.
     """
-    random_index = random_state.randint(0, 3)
-    clifford_angle = _CLIFFORD_ANGLES[random_index]
-    return clifford_angle
-
-
-# vectorize so function can take array:
-_random_clifford = np.vectorize(_random_clifford)
+    return np.array(
+        [random_state.choice(_CLIFFORD_ANGLES) for _ in range(num_angles)]
+    )
 
 
 def _angle_to_probabilities(angle: float, sigma: float) -> float:

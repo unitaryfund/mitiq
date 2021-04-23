@@ -262,7 +262,7 @@ def test_select():
         [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
     )
     r_z_gates = operations[rzgatemask]
-    angles = angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
+    angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
     mask_non_clifford = ~_is_clifford_angle(angles)
     rz_non_clifford = angles[mask_non_clifford]
     rz_non_cliff_copy = rz_non_clifford.copy()
@@ -291,7 +291,7 @@ def test_replace():
         [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
     )
     r_z_gates = operations[mask]
-    angles = angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
+    angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
     mask_non_clifford = ~_is_clifford_angle(angles)
     rz_non_clifford = angles[mask_non_clifford]
     rz_non_cliff_copy = rz_non_clifford.copy()
@@ -327,7 +327,7 @@ def test_get_argument():
         [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
     )
     r_z_gates = operations[mask]
-    args = angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
+    args = np.array([op.gate.exponent * np.pi for op in r_z_gates])
     for arg in args:
         assert type(arg) == np.float64
 
@@ -365,12 +365,9 @@ def test_closest_clifford():
 
 
 def test_random_clifford():
-    random_state = np.random.RandomState(1)
-    for ang in _CLIFFORD_ANGLES:
-        assert (
-            _random_clifford(ang, random_state)
-            in np.array(_CLIFFORD_ANGLES).tolist()
-        )
+    assert set(
+        _random_clifford(20, np.random.RandomState(1))
+    ).issubset(_CLIFFORD_ANGLES)
 
 
 def test_angle_to_probabilities():
