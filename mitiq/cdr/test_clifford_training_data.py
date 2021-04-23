@@ -236,7 +236,7 @@ def test_map_to_near_cliffords():
                 random_state,
                 method_select,
                 method_replace,
-                additional_options=additional_options,
+                kwargs=additional_options,
             )
             assert count_non_cliffords(projected_circuit) == int(
                 fraction_non_clifford * non_cliffords

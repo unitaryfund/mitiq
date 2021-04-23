@@ -62,14 +62,6 @@ def generate_training_circuits(
                 ``method_select='gaussian'``.
             sigma_replace (float): Width of the Gaussian distribution used for
                 ``method_replace='gaussian'``.
-
-    Returns:
-        List[cirq.Circuit]: list of near-Clifford circuits constructed from
-                             the circuits of interest.
-        List[List[float]]: list of list of angles that were replaced in each
-                           training circuit.
-        List[List[float]]: list of list of angles that were inserted in each
-                           training circuit.
     """
     if isinstance(random_state, int):
         random_state = np.random.RandomState(random_state)
@@ -124,51 +116,44 @@ def _map_to_near_clifford(
     random_state: np.random.RandomState,
     method_select: str = "uniform",
     method_replace: str = "closest",
-    **additional_options: dict,
-) -> Tuple[Circuit, List[float], List[float]]:
-    """Function to take the information in some circuit of interest and
-        return a near-Clifford circuit as constructed according to
-        some user defined methods.
+    **kwargs: dict,
+) -> Circuit:
+    """Maps the input operation list to a (near) Clifford circuit and returns
+    this circuit.
+
     Args:
         operations: Cirq operations that make up the circuit of interest.
-        rz_non_clifford: non-Clifford Rz gates in the circuit of interest.
-        position_non_clifford: non-Clifford positions for circuit of interest.
-        qubits_non_clifford: qubits that non-Clifford gates act on in circuit
-                             of interest.
-        fraction_non_clifford: the fraction of non-Clifford gates to replace
-                               in the circuit of interest.
-        method_select: {'uniform', 'gaussian'} method to use to select
-                       non-Clifford gates to replace.
-        method_replace: {'uniform', 'gaussian', 'closest'} method to use to
-                        replace selected non-Clifford.
+        rz_non_clifford: [Indices of??] Non-Clifford Rz gates in the circuit.
+        position_non_clifford: [Indices of??] non-Clifford positions for
+            circuit.
+        qubits_non_clifford: [Indices of??] qubits that non-Clifford gates act
+            on in circuit.
+        fraction_non_clifford: The (approximate) fraction of non-Clifford
+            gates in each returned circuit.
+        method_select: The way in which the non-Clifford gates are selected to
+            be replaced by Clifford gates. Options are 'uniform' or 'gaussian'.
+        method_replace: The way in which selected non-Clifford gates are
+            replaced by Clifford gates. Options are 'uniform', 'gaussian' or
+            'closest'.
         random_state: Seed for sampling.
-        sigma_select: width of probability distribution used in selection
-                      of non-Clifford gates to replace, only has effect if
-                      method_select = 'gaussian'
-        sigma_replace: width of probability distribution used in replacement
-                       of selected non-Clifford gates, only has effect if
-                       method_replace = 'gaussian'.
+        kwargs: Available keyword arguments are:
+            sigma_select (float): Width of the Gaussian distribution used for
+                ``method_select='gaussian'``.
+            sigma_replace (float): Width of the Gaussian distribution used for
+                ``method_replace='gaussian'``.
         Returns:
             Circuit: Near-Clifford projected circuit.
     """
-    additional_options = additional_options.get("additional_options")
-    # testing the dictionary exists:
-    if bool(additional_options):
-        sigma_select = additional_options.setdefault("sigma_select", 0.5)
-        sigma_replace = additional_options.setdefault("sigma_replace", 0.5)
-    else:
-        additional_options = {}
-        sigma_select = additional_options.setdefault("sigma_select", 0.5)
-        sigma_replace = additional_options.setdefault("sigma_replace", 0.5)
-    sigma_select = additional_options.get("sigma_select")
-    sigma_replace = additional_options.get("sigma_replace")
-    # set the seed for sampling, for replacement and selection:
+    sigma_select = kwargs.get("sigma_select", 0.5)
+    sigma_replace = kwargs.get("sigma_replace", 0.5)
+
     (random_state_select, random_state_replace) = random_state.randint(
-        10 ** (8), size=2
+        1e8, size=2
     )
     random_state_select = np.random.RandomState(random_state_select)
     random_state_replace = np.random.RandomState(random_state_replace)
-    # Choose non Clifford gates to change according to selection methods:
+
+    # Choose non Clifford gates to replace.
     columns_to_change = _select(
         rz_non_clifford,
         fraction_non_clifford,
@@ -179,25 +164,21 @@ def _map_to_near_clifford(
     rz_non_clifford_selected = rz_non_clifford[columns_to_change]
     position_selected = position_non_clifford[columns_to_change]
     qubits_selected = qubits_non_clifford[columns_to_change]
-    # Now the non Clifford gates have been selected, we need to decide which
-    # Clifford gate to replace them with.
+
+    # Replace the selected non-Clifford gates by Clifford gates.
     rz_non_clifford_replaced = _replace(
         rz_non_clifford_selected,
         method_replace,
         sigma_replace,
         random_state_replace,
     )
-    new_gates = [
-        cirq.ops.rz(parameter) for parameter in rz_non_clifford_replaced
+    # TODO: Why do the qubits get removed at all? This isn't necessary.
+    new_operations = [
+        cirq.ops.rz(parameter).on(qubits) for parameter, qubits in zip(rz_non_clifford_replaced, qubits_selected)
     ]
-    # rebulding the operations:
-    new_operations = []
-    for i, gate in enumerate(new_gates):
-        qubit = qubits_selected[i]
-        new_operations.append(gate(qubit))
+
     operations[[int(i) for i in position_selected]] = new_operations
-    projected_circuit = Circuit(operations)
-    return projected_circuit
+    return Circuit(operations)
 
 
 def _get_arguments(operation: cirq.ops.GateOperation) -> float:
