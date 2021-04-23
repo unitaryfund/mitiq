@@ -86,6 +86,7 @@ def generate_training_circuits(
     r_z_positions = positions[zgatesmask]
     r_z_qubits = qubits[zgatesmask]
     angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
+
     mask_non_clifford = ~_is_clifford_angle(angles)
     rz_non_clifford = angles[mask_non_clifford]
     position_non_clifford = r_z_positions[mask_non_clifford]
@@ -105,6 +106,17 @@ def generate_training_circuits(
             **kwargs,
         ) for random_state in random_states
     ]
+
+
+def _is_clifford(op: cirq.ops.Operation) -> bool:
+    if isinstance(op.gate, cirq.ops.XPowGate):
+        return True
+    if isinstance(op.gate, cirq.ops.CNotPowGate) and op.gate.exponent == 1.0:
+        return True
+    if isinstance(op.gate, cirq.ops.ZPowGate) and op.gate.exponent % 2 in {0.0, 0.5, 1.0, 1.5, 2.0}:
+        return True
+    # TODO: Could add additional logic here.
+    return False
 
 
 def _map_to_near_clifford(
@@ -209,11 +221,12 @@ def _select(
                    'gaussian'.
     """
     total_non_cliff = len(rz_non_clifford)
-    N = int(fraction_non_clifford * total_non_cliff)
+    num_to_replace = int(fraction_non_clifford * total_non_cliff)
+
     if method_select == "uniform":
         columns_to_change = random_state.choice(
             np.arange(0, total_non_cliff, 1).tolist(),
-            total_non_cliff - N,
+            total_non_cliff - num_to_replace,
             replace=False,
         )
     elif method_select == "gaussian":
@@ -223,12 +236,12 @@ def _select(
         prob_choose_gate = [k / sum(probabilities) for k in probabilities]
         columns_to_change = random_state.choice(
             np.arange(0, total_non_cliff, 1).tolist(),
-            total_non_cliff - N,
+            total_non_cliff - num_to_replace,
             replace=False,
             p=prob_choose_gate,
         )
     else:
-        raise Exception(
+        raise ValueError(
             f"Arg `method_select` must be 'uniform', or \
             'gaussian' but was {method_select}"
         )
@@ -282,46 +295,6 @@ def _replace(
     return rz_non_clifford_replaced
 
 
-def count_non_cliffords(circuit: Circuit,) -> float:
-    """Function to check how many non-Clifford gates are in a give circuit.
-
-    Args:
-        circuit: cirq.Circuit object already decomposed into the basis
-                 {Rz, Rx(pi/2), CNOT, X}
-
-    Returns:
-        number of non-Clifford gates in the given circuit.
-    """
-    operations = np.array(list(circuit.all_operations()))
-    gates = np.array([op.gate for op in operations])
-    mask = np.array(
-        [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
-    )
-    r_z_gates = operations[mask]
-    angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
-    mask_non_clifford = ~_is_clifford_angle(angles)
-    rz_non_clifford = angles[mask_non_clifford]
-    return len(rz_non_clifford)
-
-
-def _is_clifford_angle(ang: float, tol: float = 10 ** -5,) -> bool:
-    """Function to check if a given angle is Clifford.
-    Args:
-        ang: rotation angle in the Rz gate.
-    Returns:
-        bool: True / False for Clifford or not.
-    """
-    ang = ang % (2 * np.pi)
-    closest_clifford_angle = _closest_clifford(ang)
-    if abs(closest_clifford_angle - ang) < tol:
-        return True
-    return False
-
-
-# Vectorize function so it can take arrays of angles as its input.
-_is_clifford_angle = np.vectorize(_is_clifford_angle)
-
-
 def _closest_clifford(ang: float) -> float:
     """Function to take angle and return the nearest Clifford angle note the
        usage of this function is vectorized so it takes and returns arrays.
@@ -367,6 +340,53 @@ def _random_clifford(
     return np.array(
         [random_state.choice(_CLIFFORD_ANGLES) for _ in range(num_angles)]
     )
+
+
+
+
+
+
+
+
+
+def count_non_cliffords(circuit: Circuit,) -> float:
+    """Function to check how many non-Clifford gates are in a give circuit.
+
+    Args:
+        circuit: cirq.Circuit object already decomposed into the basis
+                 {Rz, Rx(pi/2), CNOT, X}
+
+    Returns:
+        number of non-Clifford gates in the given circuit.
+    """
+    operations = np.array(list(circuit.all_operations()))
+    gates = np.array([op.gate for op in operations])
+    mask = np.array(
+        [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
+    )
+    r_z_gates = operations[mask]
+    angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
+    mask_non_clifford = ~_is_clifford_angle(angles)
+    rz_non_clifford = angles[mask_non_clifford]
+    return len(rz_non_clifford)
+
+
+def _is_clifford_angle(ang: float, tol: float = 10 ** -5,) -> bool:
+    """Function to check if a given angle is Clifford.
+    Args:
+        ang: rotation angle in the Rz gate.
+    Returns:
+        bool: True / False for Clifford or not.
+    """
+    ang = ang % (2 * np.pi)
+    closest_clifford_angle = _closest_clifford(ang)
+    if abs(closest_clifford_angle - ang) < tol:
+        return True
+    return False
+
+
+# Vectorize function so it can take arrays of angles as its input.
+_is_clifford_angle = np.vectorize(_is_clifford_angle)
 
 
 def _angle_to_probabilities(angle: float, sigma: float) -> float:
