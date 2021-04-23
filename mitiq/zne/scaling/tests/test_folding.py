@@ -1908,14 +1908,14 @@ def test_create_fold_mask_with_real_scale_factors_from_left():
     assert fold_mask == [1, 0, 0, 0]
 
     fold_mask = _create_fold_mask(
-        weight_mask=[1, 1, 1, 1],
+        weight_mask=[1.0, 1.0, 1.0, 1.0],
         scale_factor=2,
         folding_method="from_left",
     )
-    assert fold_mask == [1, 1, 0, 0]
+    assert fold_mask == [1.0, 1.0, 0.0, 0.0]
 
     fold_mask = _create_fold_mask(
-        weight_mask=[1, 1, 1, 1],
+        weight_mask=[1.0, 1.0, 1.0, 1.0],
         scale_factor=3.9,
         folding_method="from_left",
     )
@@ -1940,14 +1940,14 @@ def test_create_fold_mask_with_real_scale_factors_from_right():
     assert fold_mask == [0, 0, 0, 1]
 
     fold_mask = _create_fold_mask(
-        weight_mask=[1, 1, 1, 1],
+        weight_mask=[1.0, 1.0, 1.0, 1.0],
         scale_factor=2,
         folding_method="from_right",
     )
-    assert fold_mask == [0, 0, 1, 1]
+    assert fold_mask == [0.0, 0.0, 1.0, 1.0]
 
     fold_mask = _create_fold_mask(
-        weight_mask=[1, 1, 1, 1],
+        weight_mask=[1.0, 1.0, 1.0, 1.0],
         scale_factor=3.9,
         folding_method="from_right",
     )
@@ -1994,7 +1994,7 @@ def test_create_fold_mask_with_real_scale_factors_at_random():
 def test_create_fold_mask_approximates_well(method):
     """Check _create_fold_mask well approximates the scale factor."""
     rnd_state = np.random.RandomState(seed=0)
-    for scale_factor in [1, 1.5, 1,7, 2.7, 6.7, 18.7, 19.0, 31]:
+    for scale_factor in [1, 1.5, 1.7, 2.7, 6.7, 18.7, 19.0, 31]:
         weight_mask = [rnd_state.rand() for _ in range(100)]
         seed = rnd_state.randint(100)
         fold_mask = _create_fold_mask(
