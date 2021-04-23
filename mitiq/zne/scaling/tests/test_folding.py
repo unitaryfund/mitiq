@@ -61,6 +61,8 @@ from mitiq.zne.scaling.folding import (
     fold_gates_at_random,
     _fold_local,
     fold_global,
+    _create_weight_mask,
+    _create_fold_mask,
 )
 
 
@@ -1654,8 +1656,7 @@ def test_fold_local_with_fidelities(fold_method, qiskit):
 )
 @pytest.mark.parametrize("qiskit", [True, False])
 def test_fold_local_with_single_qubit_gates_fidelity_one(fold_method, qiskit):
-    """Tests folding only two-qubit gates by using
-    fidelities = {"single": 1.}.
+    """Tests folding only two-qubit gates by using fidelities = {"single": 1.}.
     """
     qreg = LineQubit.range(3)
     circ = Circuit(
@@ -1848,3 +1849,120 @@ def test_folding_keeps_measurement_order_with_qiskit():
 
     folded = fold_gates_at_random(circuit, scale_factor=1.0)
     assert folded == circuit
+
+
+def test_create_weight_mask_with_fidelities():
+    """Check the correct weight mask is created."""
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        ops.H.on_each(*qreg),
+        ops.CNOT.on(qreg[0], qreg[1]),
+        ops.T.on(qreg[2]),
+        ops.TOFFOLI.on(*qreg),
+        ops.measure_each(*qreg),
+    )
+    # Measurement gates should be ignored
+    fidelities = {"H": 0.9, "CNOT": 0.8, "T": 0.7, "TOFFOLI": 0.6}
+    weight_mask = _create_weight_mask(circ, fidelities)
+    assert np.allclose(weight_mask, [0.1, 0.1, 0.1, 0.2, 0.3, 0.4])
+
+    fidelities = {"single": 1.0, "double": 0.5, "triple": 0.1}
+    weight_mask = _create_weight_mask(circ, fidelities)
+    assert np.allclose(weight_mask, [0.0, 0.0, 0.0, 0.5, 0.0, 0.9])
+
+    fidelities = {"single": 1.0, "H": 0.1, "CNOT": 0.2, "TOFFOLI": 0.3}
+    weight_mask = _create_weight_mask(circ, fidelities)
+    assert np.allclose(weight_mask, [0.9, 0.9, 0.9, 0.8, 0.0, 0.7])
+
+
+@pytest.mark.parametrize(
+    "weight_mask",
+    ([0.1, 0.2, 0.3, 0.0], [0.3, 0.5, 0.7, 0.0], [1.0, 1.0, 1.0, 0.0]),
+)
+@pytest.mark.parametrize("scale_factor", (1, 3, 5, 7, 9, 11))
+@pytest.mark.parametrize("method", ("at_random", "from_left", "from_right"))
+def test_create_fold_mask_with_odd_scale_factors(
+    weight_mask, scale_factor, method,
+):
+    """Check _create_fold_mask works as expected"""
+    fold_mask = _create_fold_mask(weight_mask, scale_factor, method)
+    num_folds = int((scale_factor - 1) / 2)
+    assert fold_mask == [num_folds, num_folds, num_folds, 0]
+
+
+def test_create_fold_mask_with_real_scale_factors_from_left():
+    """Check _create_fold_mask works as expected"""
+
+    fold_mask = _create_fold_mask(
+        weight_mask=[0.1, 0.2, 0.3, 0.0],
+        scale_factor=1.0,
+        folding_method="from_left",
+    )
+    assert fold_mask == [0, 0, 0, 0]
+
+    fold_mask = _create_fold_mask(
+        weight_mask=[0.1, 0.1, 0.1, 0.1],
+        scale_factor=1.5,
+        folding_method="from_left",
+    )
+    assert fold_mask == [1, 0, 0, 0]
+
+    fold_mask = _create_fold_mask(
+        weight_mask=[1, 1, 1, 1],
+        scale_factor=2,
+        folding_method="from_left",
+    )
+    assert fold_mask == [1, 1, 0, 0]
+
+    fold_mask = _create_fold_mask(
+        weight_mask=[1, 1, 1, 1],
+        scale_factor=3.9,
+        folding_method="from_left",
+    )
+    assert fold_mask == [2, 2, 1, 1]
+
+def test_create_fold_mask_with_real_scale_factors_from_right():
+    """Check _create_fold_mask works as expected"""
+
+    fold_mask = _create_fold_mask(
+        weight_mask=[0.1, 0.2, 0.3, 0.0],
+        scale_factor=1.0,
+        folding_method="from_right",
+    )
+    assert fold_mask == [0, 0, 0, 0]
+
+    fold_mask = _create_fold_mask(
+        weight_mask=[0.1, 0.1, 0.1, 0.1],
+        scale_factor=1.5,
+        folding_method="from_right",
+    )
+    assert fold_mask == [0, 0, 0, 1]
+
+    fold_mask = _create_fold_mask(
+        weight_mask=[1, 1, 1, 1],
+        scale_factor=2,
+        folding_method="from_right",
+    )
+    assert fold_mask == [0, 0, 1, 1]
+
+    fold_mask = _create_fold_mask(
+        weight_mask=[1, 1, 1, 1],
+        scale_factor=3.9,
+        folding_method="from_right",
+    )
+    assert fold_mask == [1, 1, 2, 2]
+
+@pytest.mark.parametrize("method", ("at_random", "from_left", "from_right"))
+def test_create_fold_mask_approximates_well(method):
+    """Check _create_fold_mask well approximates the scale factor."""
+    rnd_state = np.random.RandomState(seed=0)
+    for scale_factor in [1, 1.5, 1,7, 2.7, 6.7, 18.7, 19.0, 31]:
+        weight_mask = [rnd_state.rand() for _ in range(100)]
+        seed = rnd_state.randint(100)
+        fold_mask = _create_fold_mask(
+            weight_mask, scale_factor, folding_method=method, seed=seed,
+        )
+        out_weights = [w + 2 * n * w for w, n in zip(weight_mask, fold_mask)]
+        actual_scale = sum(out_weights) / sum(weight_mask)
+        # Less than 1% error
+        assert np.isclose(scale_factor / actual_scale, 1.0, atol=0.01)

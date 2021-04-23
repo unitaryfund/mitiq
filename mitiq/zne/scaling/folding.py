@@ -15,7 +15,6 @@
 
 """Functions for local and global unitary folding on supported circuits."""
 from copy import deepcopy
-import math
 from typing import (
     Any,
     Callable,
@@ -421,224 +420,6 @@ def fold_all(
     return folded
 
 
-@noise_scaling_converter
-def _old_fold_gates_from_left(
-    circuit: QPROGRAM, scale_factor: float, **kwargs: Any
-) -> QPROGRAM:
-    """Returns a new folded circuit by applying the map G -> G G^dag G to a
-    subset of gates of the input circuit, starting with gates at the
-    left (beginning) of the circuit.
-
-    The folded circuit has a number of gates approximately equal to
-    scale_factor * n where n is the number of gates in the input circuit.
-
-    Args:
-        circuit: Circuit to fold.
-        scale_factor: Factor to scale the circuit by. Any real number >= 1.
-
-    Keyword Args:
-        fidelities (Dict[str, float]): Dictionary of gate fidelities. Each key
-            is a string which specifies the gate and each value is the
-            fidelity of that gate. When this argument is provided, folded
-            gates contribute an amount proportional to their infidelity
-            (1 - fidelity) to the total noise scaling. Fidelity values must be
-            in the interval (0, 1]. Gates not specified have a default
-            fidelity of 0.99**n where n is the number of qubits the gates act
-            on.
-
-            Supported gate keys are listed in the following table.::
-
-                Gate key    | Gate
-                -------------------------
-                "H"         | Hadamard
-                "X"         | Pauli X
-                "Y"         | Pauli Y
-                "Z"         | Pauli Z
-                "I"         | Identity
-                "CNOT"      | CNOT
-                "CZ"        | CZ gate
-                "TOFFOLI"   | Toffoli gate
-                "single"    | All single qubit gates
-                "double"    | All two-qubit gates
-                "triple"    | All three-qubit gates
-
-            Keys for specific gates override values set by "single", "double",
-            and "triple".
-
-            For example, `fidelities = {"single": 1.0, "H", 0.99}` sets all
-            single-qubit gates except Hadamard to have fidelity one.
-
-        squash_moments (bool): If True, all gates (including folded gates) are
-            placed as early as possible in the circuit. If False, new moments
-            are created for folded gates. This option only applies to QPROGRAM
-            types which have a "moment" or "time" structure. Default is True.
-
-        return_mitiq (bool): If True, returns a Mitiq circuit instead of
-            the input circuit type (if different). Default is False.
-
-    Returns:
-        folded: The folded quantum circuit as a QPROGRAM.
-
-    """
-
-    # Check inputs and handle keyword arguments
-    _check_foldable(circuit)
-
-    if not 1.0 <= scale_factor:
-        raise ValueError(
-            f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
-        )
-
-    fidelities = kwargs.get("fidelities")
-    if fidelities and not all(0.0 < f <= 1.0 for f in fidelities.values()):
-        raise ValueError("Fidelities should be in the interval (0, 1].")
-
-    # Copy the circuit and remove measurements.
-    folded = deepcopy(circuit)
-    measurements = _pop_measurements(folded)
-
-    # Determine the stopping condition.
-    ngates = len(list(folded.all_operations()))
-    weights: Optional[Dict[str, float]]
-    if fidelities:
-        weights = {k: 1.0 - f for k, f in fidelities.items()}
-        total_weight = _compute_weight(folded, weights)
-    else:
-        weights = None
-        total_weight = ngates
-
-    fraction_to_fold = (scale_factor - 1.0) / 2.0
-    fraction_to_fold, integer_num_folds = math.modf(fraction_to_fold)
-    stop = total_weight * fraction_to_fold
-
-    # Do the fractional folding (i.e., fold some but not all gates).
-    tot = 0.0
-    moment_shift = 0
-    virtual_moments: List[int] = []
-    for (moment_index, moment) in enumerate(circuit):
-        if tot >= stop:
-            break
-
-        for gate_index in range(len(moment)):
-            op = folded[moment_index + moment_shift].operations[gate_index]
-            weight = _get_weight_for_gate(weights, op) if weights else 1.0
-
-            # Fold the gate
-            if weight > 0.0:
-                _fold_gate_at_index_in_moment(
-                    folded, moment_index + moment_shift, gate_index
-                )
-                virtual_moments += [
-                    moment_index + moment_shift + 1,
-                    moment_index + moment_shift + 2,
-                ]
-                moment_shift += 2
-                tot += weight
-
-            # Stopping condition.
-            if tot >= stop:
-                break
-
-    # Do the integer folding (i.e., fold all gates an equal number of times).
-    if not weights:
-        weights = dict()
-    exclude = frozenset(k for k, v in weights.items() if v == 0.0)
-
-    if integer_num_folds > 0:
-        folded = _fold_all(
-            folded,
-            num_folds=int(integer_num_folds),
-            exclude=exclude,
-            skip_moments=frozenset(virtual_moments),
-        )
-
-    _append_measurements(folded, measurements)
-    if not (kwargs.get("squash_moments") is False):
-        folded = squash_moments(folded)
-    return folded
-
-
-@noise_scaling_converter
-def _old_fold_gates_from_right(
-    circuit: QPROGRAM, scale_factor: float, **kwargs: Any
-) -> Circuit:
-    """Returns a new folded circuit by applying the map G -> G G^dag G
-    to a subset of gates of the input circuit, starting with gates at
-    the right (end) of the circuit.
-
-    The folded circuit has a number of gates approximately equal to
-    scale_factor * n where n is the number of gates in the input circuit.
-
-    Args:
-        circuit: Circuit to fold.
-        scale_factor: Factor to scale the circuit by. Any real number >= 1.
-
-    Keyword Args:
-        fidelities (Dict[str, float]): Dictionary of gate fidelities. Each key
-            is a string which specifies the gate and each value is the
-            fidelity of that gate. When this argument is provided, folded
-            gates contribute an amount proportional to their infidelity
-            (1 - fidelity) to the total noise scaling. Fidelity values must be
-            in the interval (0, 1]. Gates not specified have a default
-            fidelity of 0.99**n where n is the number of qubits the gates act
-            on.
-
-            Supported gate keys are listed in the following table.::
-
-                Gate key    | Gate
-                -------------------------
-                "H"         | Hadamard
-                "X"         | Pauli X
-                "Y"         | Pauli Y
-                "Z"         | Pauli Z
-                "I"         | Identity
-                "CNOT"      | CNOT
-                "CZ"        | CZ gate
-                "TOFFOLI"   | Toffoli gate
-                "single"    | All single qubit gates
-                "double"    | All two-qubit gates
-                "triple"    | All three-qubit gates
-
-            Keys for specific gates override values set by "single", "double",
-            and "triple".
-
-            For example, `fidelities = {"single": 1.0, "H", 0.99}` sets all
-            single-qubit gates except Hadamard to have fidelity one.
-
-        squash_moments (bool): If True, all gates (including folded gates) are
-            placed as early as possible in the circuit. If False, new moments
-            are created for folded gates. This option only applies to QPROGRAM
-            types which have a "moment" or "time" structure. Default is True.
-
-        return_mitiq (bool): If True, returns a mitiq circuit instead of
-            the input circuit type (if different). Default is False.
-
-    Returns:
-        folded: The folded quantum circuit as a QPROGRAM.
-
-    """
-    # Check inputs and handle keyword arguments
-    _check_foldable(circuit)
-    # Copy the circuit and remove measurements
-    circuit = deepcopy(circuit)
-    measurements = _pop_measurements(circuit)
-    # Gates are folded from left after iteration order is reversed
-    reversed_circuit = Circuit(reversed(circuit.moments))
-    reversed_folded_circuit = fold_gates_from_left(
-        reversed_circuit,
-        scale_factor,
-        fidelities=kwargs.get("fidelities"),
-        squash_moments=False,
-    )
-    # Correct reversed iteration
-    folded = Circuit(reversed(reversed_folded_circuit))
-
-    _append_measurements(folded, measurements)
-    if not (kwargs.get("squash_moments") is False):
-        folded = squash_moments(folded)
-    return folded
-
-
 def _update_moment_indices(
     moment_indices: Dict[int, int], moment_index_where_gate_was_folded: int
 ) -> Dict[int, int]:
@@ -673,165 +454,6 @@ def _update_moment_indices(
     for i in moment_indices.keys():
         moment_indices[i] += 2 * int(i >= moment_index_where_gate_was_folded)
     return moment_indices
-
-
-@noise_scaling_converter
-def _old_fold_gates_at_random(
-    circuit: QPROGRAM,
-    scale_factor: float,
-    seed: Optional[int] = None,
-    **kwargs: Any,
-) -> QPROGRAM:
-    """Returns a folded circuit by applying the map G -> G G^dag G to a random
-    subset of gates in the input circuit.
-
-    The folded circuit has a number of gates approximately equal to
-    scale_factor * n where n is the number of gates in the input circuit.
-
-    Args:
-        circuit: Circuit to fold.
-        scale_factor: Factor to scale the circuit by. Any real number >= 1.
-        seed: [Optional] Integer seed for random number generator.
-
-    Keyword Args:
-        fidelities (Dict[str, float]): Dictionary of gate fidelities. Each key
-            is a string which specifies the gate and each value is the
-            fidelity of that gate. When this argument is provided, folded
-            gates contribute an amount proportional to their infidelity
-            (1 - fidelity) to the total noise scaling. Fidelity values must be
-            in the interval (0, 1]. Gates not specified have a default
-            fidelity of 0.99**n where n is the number of qubits the gates act
-            on.
-
-            Supported gate keys are listed in the following table.::
-
-                Gate key    | Gate
-                -------------------------
-                "H"         | Hadamard
-                "X"         | Pauli X
-                "Y"         | Pauli Y
-                "Z"         | Pauli Z
-                "I"         | Identity
-                "CNOT"      | CNOT
-                "CZ"        | CZ gate
-                "TOFFOLI"   | Toffoli gate
-                "single"    | All single qubit gates
-                "double"    | All two-qubit gates
-                "triple"    | All three-qubit gates
-
-            Keys for specific gates override values set by "single", "double",
-            and "triple".
-
-            For example, `fidelities = {"single": 1.0, "H", 0.99}` sets all
-            single-qubit gates except Hadamard to have fidelity one.
-
-        squash_moments (bool): If True, all gates (including folded gates) are
-            placed as early as possible in the circuit. If False, new moments
-            are created for folded gates. This option only applies to QPROGRAM
-            types which have a "moment" or "time" structure. Default is True.
-
-        return_mitiq (bool): If True, returns a mitiq circuit instead of
-            the input circuit type (if different). Default is False.
-
-    Returns:
-        folded: The folded quantum circuit as a QPROGRAM.
-
-    """
-    # Check inputs and handle keyword arguments
-    _check_foldable(circuit)
-
-    if not 1.0 <= scale_factor:
-        raise ValueError(
-            f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
-        )
-
-    fidelities = kwargs.get("fidelities")
-    if fidelities and not all(0.0 < f <= 1.0 for f in fidelities.values()):
-        raise ValueError("Fidelities should be in the interval (0, 1].")
-
-    if scale_factor > 3.0:
-        return _fold_local(
-            circuit,
-            scale_factor,
-            fold_method=fold_gates_at_random,
-            fold_method_args=(seed,),
-            **kwargs,
-        )
-
-    # Copy the circuit and remove measurements
-    folded = deepcopy(circuit)
-    measurements = _pop_measurements(folded)
-
-    # Seed the random number generator
-    rnd_state = np.random.RandomState(seed)
-
-    # Determine the stopping condition for folding
-    ngates = len(list(folded.all_operations()))
-    weights: Optional[Dict[str, float]]
-    if fidelities:
-        weights = {k: 1.0 - f for k, f in fidelities.items()}
-        total_weight = _compute_weight(folded, weights)
-        stop = total_weight * (scale_factor - 1.0) / 2.0
-    else:
-        weights = None
-        stop = _get_num_to_fold(scale_factor, ngates)
-
-    if np.isclose(stop, 0.0):
-        _append_measurements(folded, measurements)
-        return folded
-
-    # Keep track of where moments are in the folded circuit
-    moment_indices = {i: i for i in range(len(folded))}
-
-    # Keep track of which gates we can fold in each moment
-    remaining_gate_indices = {
-        moment: list(range(len(folded[moment])))
-        for moment in range(len(folded))
-        if len(folded[moment]) > 0
-    }
-
-    # Any moment with at least one gate is fair game
-    remaining_moment_indices = [
-        i for i in remaining_gate_indices.keys() if remaining_gate_indices[i]
-    ]
-
-    tot = 0.0
-    while remaining_moment_indices:
-        # Get a moment index and gate index from the remaining set
-        moment_index = rnd_state.choice(remaining_moment_indices)
-        gate_index = rnd_state.choice(remaining_gate_indices[moment_index])
-
-        # Get the weight of the gate at this moment index and gate index
-        op = folded[moment_indices[moment_index]].operations[gate_index]
-        if weights:
-            weight = _get_weight_for_gate(weights, op)
-        else:
-            weight = 1
-
-        # Do the fold
-        if weight > 0.0:
-            _fold_gate_at_index_in_moment(
-                folded, moment_indices[moment_index], gate_index
-            )
-            tot += weight
-
-            # Update the moment indices for the folded circuit
-            _update_moment_indices(moment_indices, moment_index)
-
-        # Remove the current gate from the remaining set of gates to fold
-        remaining_gate_indices[moment_index].remove(gate_index)
-
-        # If there are no gates left in this moment, remove the moment
-        if not remaining_gate_indices[moment_index]:
-            remaining_moment_indices.remove(moment_index)
-
-        if tot >= stop:
-            break
-
-    _append_measurements(folded, measurements)
-    if not (kwargs.get("squash_moments") is False):
-        folded = squash_moments(folded)
-    return folded
 
 
 def _fold_local(
@@ -968,7 +590,7 @@ def _create_weight_mask(
     circuit: Circuit, fidelities: Optional[Dict[str, float]],
 ) -> List[float]:
     """Returns a list of weights associated to each gate if the input
-    circuit.
+    circuit. Measurement gates are ignored.
 
     Args:
         circuit: The circuit from which a weight mask is created.
@@ -980,20 +602,24 @@ def _create_weight_mask(
     """
     if fidelities and not all(0.0 < f <= 1.0 for f in fidelities.values()):
         raise ValueError("Fidelities should be in the interval (0, 1].")
-    # Convert fidelities to weights
     weights = None
     if fidelities:
-        weights = {k: 1.0 - f for k, f in fidelities.items()}
+        # Round to avoid ugly numbers like 0.09999999999999998 instead of 0.1
+        # https://docs.python.org/2/tutorial/floatingpoint.html
+        weights = {k: round(1.0 - f, 12) for k, f in fidelities.items()}
+
     # Build mask with weights of each gate
     return [
-        _get_weight_for_gate(weights, op) for op in circuit.all_operations()
+        _get_weight_for_gate(weights, op)
+        for op in circuit.all_operations()
+        if not _is_measurement(op)
     ]
 
 
 def _create_fold_mask(
     weight_mask: List[float],
     scale_factor: float,
-    folding_method: str = "at_random",
+    folding_method: str,
     seed: Optional[int] = None,
 ) -> List[float]:
     r"""Returns a list of integers determining how many times each gate a
@@ -1033,6 +659,11 @@ def _create_fold_mask(
         )
         [2, 2, 1, 0]
     """
+    
+    if not 1.0 <= scale_factor:
+        raise ValueError(
+            f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
+        )
 
     # Find the maximum odd integer smaller or equal to scale_factor
     num_uniform_folds = int((scale_factor - 1.0) / 2.0)
@@ -1186,11 +817,6 @@ def fold_gates_from_left(
 
     """
 
-    if not 1.0 <= scale_factor:
-        raise ValueError(
-            f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
-        )
-
     weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities"))
 
     num_fold_mask = _create_fold_mask(
@@ -1261,11 +887,6 @@ def fold_gates_from_right(
         folded: The folded quantum circuit as a QPROGRAM.
 
     """
-
-    if not 1.0 <= scale_factor:
-        raise ValueError(
-            f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
-        )
 
     weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities"))
 
@@ -1341,11 +962,6 @@ def fold_gates_at_random(
         folded: The folded quantum circuit as a QPROGRAM.
 
     """
-
-    if not 1.0 <= scale_factor:
-        raise ValueError(
-            f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
-        )
 
     weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities"))
 
