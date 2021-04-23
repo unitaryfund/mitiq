@@ -659,7 +659,7 @@ def _create_fold_mask(
         )
         [2, 2, 1, 0]
     """
-    
+
     if not 1.0 <= scale_factor:
         raise ValueError(
             f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
