@@ -44,7 +44,7 @@ def _remove_qasm_barriers(qasm: QASMType) -> QASMType:
         Comments begin with a pair of forward slashes and end with a new line."
     """
     quoted_re = r"(?:\"[^\"]*?\")"
-    statement_re = r"((?:[^;{}/\"]*?" + quoted_re + r"?)*[;{}])?"
+    statement_re = r"((?:[^;{}\"]*?" + quoted_re + r"?)*[;{}])?"
     comment_re = r"(\n?//[^\n]*(?:\n|$))?"
     statements_comments = re.findall(statement_re + comment_re, qasm)
     lines = []
