@@ -994,6 +994,7 @@ def _create_fold_mask(
     weight_mask: List[float],
     scale_factor: float,
     folding_method: str = "at_random",
+    seed: Optional[int] = None,
 ) -> List[float]:
     r"""Returns a list of integers determining how many times each gate a
     circuit should be folded to realize the desired input scale_factor.
@@ -1007,7 +1008,7 @@ def _create_fold_mask(
     total weight of the input circuit.
 
     For equal weights, this function reproduces the local unitary folding
-    method defined in equation (2) of [Giurgica_Tiron_2020_arXiv]_.
+    method defined in equation (5) of [Giurgica_Tiron_2020_arXiv]_.
 
     Args:
         weight_mask: The weights of all the gates of the circuit to fold.
@@ -1018,6 +1019,8 @@ def _create_fold_mask(
             "from_right". Determines the partial folding method described in
             [Giurgica_Tiron_2020_arXiv]_. If scale_factor is an odd integer,
             all methods are equivalent and this option is irrelevant.
+        seed: A seed for the random number generator. This is used only when
+            folding_method is "at_random".
 
     Returns: The list of integers determining to how many times one should
         fold the j_th gate of the circuit to be scaled.
@@ -1030,6 +1033,7 @@ def _create_fold_mask(
         )
         [2, 2, 1, 0]
     """
+
     # Find the maximum odd integer smaller or equal to scale_factor
     num_uniform_folds = int((scale_factor - 1.0) / 2.0)
     odd_integer_scale_factor = 2 * num_uniform_folds + 1
@@ -1046,6 +1050,7 @@ def _create_fold_mask(
     if np.isclose(odd_integer_scale_factor, scale_factor):
 
         return num_folds_mask
+
     # If necessary, fold a subset of gates to approximate the scale_factor
     input_circuit_weight = sum(weight_mask)
     output_circuit_weight = odd_integer_scale_factor * input_circuit_weight
@@ -1057,8 +1062,8 @@ def _create_fold_mask(
     elif folding_method == "from_right":
         folding_order.reverse()
     elif folding_method == "at_random":
-        # TODO: add seed.
-        np.random.shuffle(folding_order)
+        rnd_state = np.random.RandomState(seed)
+        rnd_state.shuffle(folding_order)
     else:
         raise ValueError(
             "The option 'folding_method' is not valid."
@@ -1119,7 +1124,7 @@ def _apply_fold_mask(circuit: Circuit, num_folds_mask: List[int]) -> Circuit:
 # TODO: draft of new folding functions.
 # If working they could replace the existing functions.
 @noise_scaling_converter
-def new_fold_gates_from_left(
+def fold_gates_from_left(
     circuit: QPROGRAM, scale_factor: float, **kwargs: Any
 ) -> QPROGRAM:
     """Returns a new folded circuit by applying the map G -> G G^dag G to a
@@ -1129,6 +1134,9 @@ def new_fold_gates_from_left(
     The folded circuit has a number of gates approximately equal to
     scale_factor * n where n is the number of gates in the input circuit.
 
+    For equal gate fidelities, this function reproduces the local unitary
+    folding method defined in equation (5) of [Giurgica_Tiron_2020_arXiv]_.
+
     Args:
         circuit: Circuit to fold.
         scale_factor: Factor to scale the circuit by. Any real number >= 1.
@@ -1185,22 +1193,26 @@ def new_fold_gates_from_left(
 
     weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities"))
 
-    num_fold_mask = _create_fold_mask(weight_mask, scale_factor, "from_left")
-
+    num_fold_mask = _create_fold_mask(
+        weight_mask, scale_factor, folding_method="from_left"
+    )
     return _apply_fold_mask(circuit, num_fold_mask)
 
 
 @noise_scaling_converter
-def new_fold_gates_from_right(
+def fold_gates_from_right(
     circuit: QPROGRAM, scale_factor: float, **kwargs: Any
 ) -> QPROGRAM:
-    """Returns a new folded circuit by applying the map G -> G G^dag G to a
+    r"""Returns a new folded circuit by applying the map G -> G G^dag G to a
     subset of gates of the input circuit, starting with gates at the
     right (end) of the circuit.
 
     The folded circuit has a number of gates approximately equal to
     scale_factor * n where n is the number of gates in the input circuit.
 
+    For equal gate fidelities, this function reproduces the local unitary
+    folding method defined in equation (5) of [Giurgica_Tiron_2020_arXiv]_.
+
     Args:
         circuit: Circuit to fold.
         scale_factor: Factor to scale the circuit by. Any real number >= 1.
@@ -1257,25 +1269,33 @@ def new_fold_gates_from_right(
 
     weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities"))
 
-    num_fold_mask = _create_fold_mask(weight_mask, scale_factor, "from_right")
+    num_fold_mask = _create_fold_mask(
+        weight_mask, scale_factor, folding_method="from_right"
+    )
 
     return _apply_fold_mask(circuit, num_fold_mask)
 
 
 @noise_scaling_converter
-def new_fold_gates_at_random(
-    circuit: QPROGRAM, scale_factor: float, **kwargs: Any
+def fold_gates_at_random(
+    circuit: QPROGRAM,
+    scale_factor: float,
+    seed: Optional[int] = None,
+    **kwargs: Any,
 ) -> QPROGRAM:
-    """Returns a folded circuit by applying the map G -> G G^dag G to a random
-    subset of gates in the input circuit.
+    r"""Returns a new folded circuit by applying the map G -> G G^dag G to a
+    subset of gates of the input circuit, starting with gates at the
+    right (end) of the circuit.
 
     The folded circuit has a number of gates approximately equal to
     scale_factor * n where n is the number of gates in the input circuit.
 
+    For equal gate fidelities, this function reproduces the local unitary
+    folding method defined in equation (5) of [Giurgica_Tiron_2020_arXiv]_.
+
     Args:
         circuit: Circuit to fold.
         scale_factor: Factor to scale the circuit by. Any real number >= 1.
-        seed: [Optional] Integer seed for random number generator.
 
     Keyword Args:
         fidelities (Dict[str, float]): Dictionary of gate fidelities. Each key
@@ -1329,12 +1349,8 @@ def new_fold_gates_at_random(
 
     weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities"))
 
-    num_fold_mask = _create_fold_mask(weight_mask, scale_factor, "at_random")
+    num_fold_mask = _create_fold_mask(
+        weight_mask, scale_factor, folding_method="at_random", seed=seed,
+    )
 
     return _apply_fold_mask(circuit, num_fold_mask)
-
-
-fold_gates_from_right = new_fold_gates_from_right
-fold_gates_from_left = new_fold_gates_from_left
-# TODO: need to seed fold_gates_at_random to pass tests
-fold_gates_at_random = _old_fold_gates_at_random

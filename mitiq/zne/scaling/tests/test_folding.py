@@ -946,21 +946,21 @@ def test_fold_gates_at_random_seed_one_qubit():
     qubit = LineQubit(0)
     circuit = Circuit([ops.X.on(qubit), ops.Y.on(qubit), ops.Z.on(qubit)])
     # Small scale
-    folded = fold_gates_at_random(circuit, scale_factor=1.4, seed=1)
+    folded = fold_gates_at_random(circuit, scale_factor=1.4, seed=3)
     correct = Circuit(
         [ops.X.on(qubit)], [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)]
     )
     assert _equal(folded, correct)
 
     # Medium scale, fold two gates
-    folded = fold_gates_at_random(circuit, scale_factor=2.5, seed=1)
+    folded = fold_gates_at_random(circuit, scale_factor=2.5, seed=2)
     correct = Circuit(
         [ops.X.on(qubit)], [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)] * 3,
     )
     assert _equal(folded, correct)
 
     # Max scale, fold three gates
-    folded = fold_gates_at_random(circuit, scale_factor=3, seed=1)
+    folded = fold_gates_at_random(circuit, scale_factor=3, seed=3)
     correct = Circuit(
         [ops.X.on(qubit)] * 3, [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)] * 3,
     )
@@ -1022,7 +1022,7 @@ def test_fold_random_scale_factor_larger_than_three():
     """Folds at random with a scale_factor larger than three."""
     qreg = LineQubit.range(2)
     circuit = Circuit([ops.SWAP.on(*qreg)], [ops.CNOT.on(*qreg)])
-    folded = fold_gates_at_random(circuit, scale_factor=6.0, seed=1)
+    folded = fold_gates_at_random(circuit, scale_factor=6.0, seed=0)
     correct = Circuit([ops.SWAP.on(*qreg)] * 5, [ops.CNOT.on(*qreg)] * 7)
     assert len(folded) == 12
     assert _equal(folded, correct)
@@ -1571,16 +1571,16 @@ def test_fold_and_squash_random_circuits_random_stretches(fold_method):
     moments in the un-squashed circuit.
     """
     rng = np.random.RandomState(seed=1)
-    for _ in range(5):
+    for trial in range(5):
         circuit = testing.random_circuit(
             qubits=8, n_moments=8, op_density=0.75
         )
         scale = 2 * rng.random() + 1
         folded_not_squashed = fold_method(
-            circuit, scale_factor=scale, squash_moments=False
+            circuit, scale_factor=scale, squash_moments=False, seed=trial,
         )
         folded_and_squashed = fold_method(
-            circuit, scale_factor=scale, squash_moments=True
+            circuit, scale_factor=scale, squash_moments=True, seed=trial,
         )
         assert len(folded_and_squashed) <= len(folded_not_squashed)
 
