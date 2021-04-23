@@ -29,7 +29,7 @@ from clifford_training_data import (
     _replace,
     _select,
     _get_arguments,
-    CLIFFORD_ANGLES,
+    _CLIFFORD_ANGLES,
 )
 from cirq.experiments import (
     random_rotations_between_grid_interaction_layers_circuit,
@@ -166,7 +166,7 @@ def test_generate_training_circuits():
                 method_select,
                 method_replace,
                 random_state,
-                additional_options=additional_options,
+                kwargs=additional_options,
             )
             assert len(test_training_set_circuits) == num_training_circuits
 
@@ -340,7 +340,7 @@ def test_count_non_cliffords():
         rand = randint(1, 2)
         rand2 = randint(1, 4) - 1
         if rand % 2 == 0:
-            example_circuit.rz(CLIFFORD_ANGLES[rand2], 0)
+            example_circuit.rz(_CLIFFORD_ANGLES[rand2], 0)
         else:
             example_circuit.rz(uniform(0, 2 * np.pi), 0)
             number_non_cliffords += 1
@@ -350,7 +350,7 @@ def test_count_non_cliffords():
 
 
 def test_is_clifford_angle():
-    cliff_angs = np.array(CLIFFORD_ANGLES)
+    cliff_angs = np.array(_CLIFFORD_ANGLES)
 
     for i in range(15):
         assert _is_clifford_angle(int(i) * cliff_angs).all()
@@ -359,7 +359,7 @@ def test_is_clifford_angle():
 
 
 def test_closest_clifford():
-    for ang in CLIFFORD_ANGLES:
+    for ang in _CLIFFORD_ANGLES:
         angs = np.linspace(ang - np.pi / 4 + 0.01, ang + np.pi / 4 - 0.01)
         for a in angs:
             assert _closest_clifford(a) == ang
@@ -367,16 +367,16 @@ def test_closest_clifford():
 
 def test_random_clifford():
     random_state = np.random.RandomState(1)
-    for ang in CLIFFORD_ANGLES:
+    for ang in _CLIFFORD_ANGLES:
         assert (
             _random_clifford(ang, random_state)
-            in np.array(CLIFFORD_ANGLES).tolist()
+            in np.array(_CLIFFORD_ANGLES).tolist()
         )
 
 
 def test_angle_to_probabilities():
     for sigma in np.linspace(0.1, 2, 20):
-        a = _angle_to_probabilities(CLIFFORD_ANGLES, sigma)
+        a = _angle_to_probabilities(_CLIFFORD_ANGLES, sigma)
         for probs in a:
             assert isinstance(probs, float)
 
@@ -385,10 +385,10 @@ def test_probabilistic_angles_to_clifford():
     random_state = np.random.RandomState(1)
     for sigma in np.linspace(0.1, 2, 20):
         a = _probabilistic_angle_to_clifford(
-            CLIFFORD_ANGLES, sigma, random_state
+            _CLIFFORD_ANGLES, sigma, random_state
         )
         for ang in a:
-            for cliff in CLIFFORD_ANGLES:
+            for cliff in _CLIFFORD_ANGLES:
                 if ang == cliff:
                     check = True
             assert check
