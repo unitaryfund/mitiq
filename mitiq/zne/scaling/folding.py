@@ -17,11 +17,8 @@
 from copy import deepcopy
 from typing import (
     Any,
-    Callable,
-    Collection,
     Dict,
     FrozenSet,
-    Iterable,
     List,
     Optional,
     Tuple,
@@ -33,10 +30,6 @@ from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary
 
 from mitiq._typing import QPROGRAM
 from mitiq.conversions import noise_scaling_converter
-
-
-class UnfoldableGateError(Exception):
-    pass
 
 
 class UnfoldableCircuitError(Exception):
@@ -135,106 +128,6 @@ def squash_moments(circuit: Circuit) -> Circuit:
         strategy=InsertStrategy.EARLIEST,
         device=circuit.device,
     )
-
-
-# Gate level folding
-def _fold_gate_at_index_in_moment(
-    circuit: Circuit, moment_index: int, gate_index: int
-) -> None:
-    """Replaces the gate G at (moment, index) with G G^dagger G, modifying the
-    circuit in place. Inserts two new moments into the circuit for G^dagger
-    and G.
-
-    Args:
-        circuit: Circuit with gates to fold.
-        moment_index: Moment in which the gate to be folded sits in the
-            circuit.
-        gate_index: Index of the gate to be folded within the specified
-            moment.
-    """
-    moment = circuit[moment_index]
-    op = moment.operations[gate_index]
-    try:
-        inverse_op = inverse(op)
-    except TypeError:
-        raise UnfoldableGateError(
-            f"Operation {op} does not have a defined "
-            f"inverse and cannot be folded."
-        )
-    circuit.insert(moment_index, [op, inverse_op], strategy=InsertStrategy.NEW)
-
-
-def _fold_gates_in_moment(
-    circuit: Circuit, moment_index: int, gate_indices: Iterable[int]
-) -> None:
-    """Modifies the input circuit by applying the map G -> G G^dag G to all
-    gates specified by the input moment index and gate indices.
-
-     Args:
-         circuit: Circuit to fold.
-         moment_index: Index of moment to fold gates in.
-         gate_indices: Indices of gates within the moments to fold.
-    """
-    for (i, gate_index) in enumerate(gate_indices):
-        _fold_gate_at_index_in_moment(
-            circuit, moment_index + 2 * i, gate_index
-        )  # Each fold adds two moments
-
-
-def _fold_gates(
-    circuit: Circuit,
-    moment_indices: Iterable[int],
-    gate_indices: List[Collection[int]],
-) -> Circuit:
-    """Returns a new circuit with specified gates folded.
-
-    Args:
-        circuit: Circuit to fold.
-        moment_indices: Indices of moments with gates to be folded.
-        gate_indices: Specifies which gates within each moment to fold.
-
-    Returns:
-        folded: the folded quantum circuit as a cirq.Circuit.
-
-    Examples:
-        (1) Folds the first three gates in moment two.
-        >>> _fold_gates(circuit, moment_indices=[1], gate_indices=[(0, 1, 2)])
-
-        (2) Folds gates with indices 1, 4, and 5 in moment 0,
-            and gates with indices 0, 1, and 2 in moment 1.
-        >>> _fold_gates(circuit,
-        >>>             moment_indices=[0, 3],
-        >>>             gate_indices=[(1, 4, 5), (0, 1, 2)])
-    """
-    folded = deepcopy(circuit)
-    moment_index_shift = 0
-    for (i, moment_index) in enumerate(moment_indices):
-        _fold_gates_in_moment(
-            folded, moment_index + moment_index_shift, gate_indices[i]
-        )
-        moment_index_shift += 2 * len(
-            gate_indices[i]
-        )  # Folding gates adds moments
-    return folded
-
-
-def _fold_moments(
-    circuit: Circuit, moment_indices: List[int], num_folds: int = 1
-) -> None:
-    """Folds specified moments in the circuit in place.
-
-    Args:
-        circuit: Circuit to fold.
-        moment_indices: Indices of moments to fold in the circuit.
-        num_folds: Number of times to fold each moment.
-    """
-    shift = 0
-    for i in moment_indices:
-        circuit.insert(
-            i + shift,
-            [circuit[i + shift], inverse(circuit[i + shift])] * num_folds,
-        )
-        shift += 2 * num_folds
 
 
 def _fold_all(
@@ -343,30 +236,6 @@ def _get_weight_for_gate(
     return weight
 
 
-def _compute_weight(circuit: Circuit, weights: Dict[str, float]) -> float:
-    """Returns the weight of the circuit as the sum of weights of individual
-    gates. Gates not defined have a default weight of one.
-
-    Args:
-        circuit: Circuit to compute the weight of.
-        weights: Dictionary mapping string keys of gates to weights.
-    """
-    return sum(
-        _get_weight_for_gate(weights, op) for op in circuit.all_operations()
-    )
-
-
-def _get_num_to_fold(scale_factor: float, ngates: int) -> int:
-    """Returns the number of gates to fold to achieve the desired
-    (approximate) scale factor.
-
-    Args:
-        scale_factor: Floating point value to scale the circuit by.
-        ngates: Number of gates in the circuit to fold.
-    """
-    return int(round(ngates * (scale_factor - 1.0) / 2.0))
-
-
 # Local folding functions
 @noise_scaling_converter
 def fold_all(
@@ -417,116 +286,6 @@ def fold_all(
     folded = _fold_all(folded, round((scale_factor - 1.0) / 2.0), exclude)
 
     _append_measurements(folded, measurements)
-    return folded
-
-
-def _update_moment_indices(
-    moment_indices: Dict[int, int], moment_index_where_gate_was_folded: int
-) -> Dict[int, int]:
-    """Updates moment indices to keep track of an original circuit
-    throughout folding.
-
-    Args:
-        moment_indices: A dictionary in the format
-                        {index of moment in original circuit: index of moment
-                        in folded circuit}
-
-        moment_index_where_gate_was_folded: Index of the moment
-        in which a gate was folded.
-
-    Returns:
-        moment_indices: dictionary with updated moments.
-
-    Note:
-        `moment_indices` should start out as
-        {0: 0, 1: 1, ..., M - 1: M - 1} where M is the # of moments in the
-        original circuit. As the circuit is folded, moment indices change.
-
-        If a gate in the last moment is folded, moment_indices gets updates to
-        {0: 0, 1: 1, ..., M - 1:, M + 1} since two moments are created in the
-        process of folding the gate in the last moment.
-    """
-    if moment_index_where_gate_was_folded not in moment_indices.keys():
-        raise ValueError(
-            f"Moment index {moment_index_where_gate_was_folded} not in moment"
-            " indices."
-        )
-    for i in moment_indices.keys():
-        moment_indices[i] += 2 * int(i >= moment_index_where_gate_was_folded)
-    return moment_indices
-
-
-def _fold_local(
-    circuit: Circuit,
-    scale_factor: float,
-    fold_method: Callable[..., Circuit],
-    fold_method_args: Optional[Tuple[Any]] = None,
-    **kwargs: Any,
-) -> Circuit:
-    """Helper function for implementing a local folding method (which nominally
-    requires 1 <= scale_factor <= 3) at any scale_factor >= 1. Returns a folded
-    circuit by folding gates according to the input fold method.
-
-    Args:
-        circuit: Circuit to fold.
-        scale_factor: Factor to scale the circuit by.
-        fold_method: Function which defines the method for folding gates.
-        fold_method_args: Any additional input arguments for the fold_method.
-            The method is called with
-            fold_method(circuit, scale_factor, *fold_method_args).
-
-    Keyword Args:
-        squash_moments (bool): If True, all gates (including folded gates) are
-            placed as early as possible in the circuit. If False, new moments
-            are created for folded gates. This option only applies to QPROGRAM
-            types which have a "moment" or "time" structure. Default is True.
-
-    Returns:
-        folded: The folded quantum circuit as a Cirq Circuit.
-
-    Note:
-        `fold_method` defines the strategy for folding gates, which could be
-        folding gates at random, from the left of the circuit,
-        or custom strategies.
-
-        The signature of `fold_method` must be
-            ```
-            def fold_method(circuit: Circuit, scale_factor: float,**kwargs):
-                ...
-            ```
-        and return a circuit.
-    """
-    folded = deepcopy(circuit)
-
-    if np.isclose(scale_factor, 1.0, atol=1e-2):
-        return folded
-
-    if not 1 <= scale_factor:
-        raise ValueError(
-            "The scale factor must be a real number greater than 1."
-        )
-
-    while scale_factor > 1.0:
-        this_stretch = 3.0 if scale_factor > 3.0 else scale_factor
-        if fold_method_args:
-            folded = fold_method(
-                folded,
-                this_stretch,
-                *fold_method_args,
-                squash_moments=False,
-                **{k: v for k, v in kwargs.items() if k != "squash_moments"},
-            )
-        else:
-            folded = fold_method(
-                folded,
-                this_stretch,
-                squash_moments=False,
-                **{k: v for k, v in kwargs.items() if k != "squash_moments"},
-            )
-        scale_factor /= 3.0
-
-    if not (kwargs.get("squash_moments") is False):
-        folded = squash_moments(folded)
     return folded
 
 
