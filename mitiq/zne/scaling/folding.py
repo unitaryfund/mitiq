@@ -309,7 +309,7 @@ def fold_global(
             placed as early as possible in the circuit. If False, new moments
             are created for folded gates. This option only applies to QPROGRAM
             types which have a "moment" or "time" structure. Default is True.
-        return_mitiq (bool): If True, returns a mitiq circuit instead of
+        return_mitiq (bool): If True, returns a Mitiq circuit instead of
             the input circuit type (if different). Default is False.
 
     Returns:
@@ -600,7 +600,7 @@ def fold_gates_from_left(
             are created for folded gates. This option only applies to QPROGRAM
             types which have a "moment" or "time" structure. Default is True.
 
-        return_mitiq (bool): If True, returns a mitiq circuit instead of
+        return_mitiq (bool): If True, returns a Mitiq circuit instead of
             the input circuit type (if different). Default is False.
 
     Returns:
@@ -674,7 +674,7 @@ def fold_gates_from_right(
             are created for folded gates. This option only applies to QPROGRAM
             types which have a "moment" or "time" structure. Default is True.
 
-        return_mitiq (bool): If True, returns a mitiq circuit instead of
+        return_mitiq (bool): If True, returns a Mitiq circuit instead of
             the input circuit type (if different). Default is False.
 
     Returns:
@@ -751,7 +751,7 @@ def fold_gates_at_random(
             are created for folded gates. This option only applies to QPROGRAM
             types which have a "moment" or "time" structure. Default is True.
 
-        return_mitiq (bool): If True, returns a mitiq circuit instead of
+        return_mitiq (bool): If True, returns a Mitiq circuit instead of
             the input circuit type (if different). Default is False.
 
     Returns:
