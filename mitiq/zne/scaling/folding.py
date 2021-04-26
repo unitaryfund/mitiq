@@ -727,7 +727,11 @@ def _create_fold_mask(
     return num_folds_mask
 
 
-def _apply_fold_mask(circuit: Circuit, num_folds_mask: List[int]) -> Circuit:
+def _apply_fold_mask(
+    circuit: Circuit,
+    num_folds_mask: List[int],
+    squash_moments: Optional[bool] = True,
+) -> Circuit:
     r"""Applies local unitary folding to the gates of the input circuit
     according to the input num_folds_mask.
 
@@ -738,15 +742,19 @@ def _apply_fold_mask(circuit: Circuit, num_folds_mask: List[int]) -> Circuit:
         circuit: The quantum circuit to fold.
         num_folds_mask: The list of integers indicating how many times
             the corresponding gates of 'circuit' should be folded.
+        squash_moments: If True or None, all gates (including folded gates) are
+            placed as early as possible in the circuit. If False, new moments
+            are created for folded gates. This option only applies to QPROGRAM
+            types which have a "moment" or "time" structure. Default is True.
 
     Returns: The folded quantum circuit.
     """
 
     _check_foldable(circuit)
-    input_copy = deepcopy(circuit)
-    measurements = _pop_measurements(input_copy)
+    circ_copy = deepcopy(circuit)
+    measurements = _pop_measurements(circ_copy)
 
-    num_gates = len(list(input_copy.all_operations()))
+    num_gates = len(list(circ_copy.all_operations()))
     if num_gates != len(num_folds_mask):
         raise ValueError(
             "The circuit and the folding mask have incompatible sizes."
@@ -754,11 +762,31 @@ def _apply_fold_mask(circuit: Circuit, num_folds_mask: List[int]) -> Circuit:
             f" but len(num_folds_mask) is {len(num_folds_mask)}."
         )
 
-    folded_circuit = input_copy[:0]
-    for op, num_folds in zip(input_copy.all_operations(), num_folds_mask):
-        folded_circuit.append([op] + num_folds * [inverse(op), op])
-    _append_measurements(folded_circuit, measurements)
+    folded_circuit = circ_copy[:0]
+    
 
+    if squash_moments is False:
+       pass
+    else:
+        squash_moments = True
+
+    if squash_moments:
+        for op, num_folds in zip(circ_copy.all_operations(), num_folds_mask):
+            folded_circuit.append([op] + num_folds * [inverse(op), op])
+    else:
+        index = 0
+        for moment in circ_copy:
+            folded_moment = Circuit(moment)
+            for op in moment:
+                num_folds = num_folds_mask[index]
+                folded_moment.append(num_folds * [inverse(op), op])
+                index += 1
+            # New folded gates are only squashed with respect to folded_moment
+            # while folded_circuit is not squashed.
+            folded_circuit.append(folded_moment)
+
+
+    _append_measurements(folded_circuit, measurements)
     return folded_circuit
 
 
@@ -827,10 +855,13 @@ def fold_gates_from_left(
 
     weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities"))
 
-    num_fold_mask = _create_fold_mask(
+    num_folds_mask = _create_fold_mask(
         weight_mask, scale_factor, folding_method="from_left"
     )
-    return _apply_fold_mask(circuit, num_fold_mask)
+
+    return _apply_fold_mask(
+        circuit, num_folds_mask, squash_moments=kwargs.get("squash_moments"),
+    )
 
 
 @noise_scaling_converter
@@ -898,11 +929,13 @@ def fold_gates_from_right(
 
     weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities"))
 
-    num_fold_mask = _create_fold_mask(
+    num_folds_mask = _create_fold_mask(
         weight_mask, scale_factor, folding_method="from_right"
     )
 
-    return _apply_fold_mask(circuit, num_fold_mask)
+    return _apply_fold_mask(
+        circuit, num_folds_mask, squash_moments=kwargs.get("squash_moments"),
+    )
 
 
 @noise_scaling_converter
@@ -973,8 +1006,10 @@ def fold_gates_at_random(
 
     weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities"))
 
-    num_fold_mask = _create_fold_mask(
+    num_folds_mask = _create_fold_mask(
         weight_mask, scale_factor, folding_method="at_random", seed=seed,
     )
 
-    return _apply_fold_mask(circuit, num_fold_mask)
+    return _apply_fold_mask(
+        circuit, num_folds_mask, squash_moments=kwargs.get("squash_moments"),
+    )

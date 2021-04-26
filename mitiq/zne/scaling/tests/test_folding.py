@@ -2051,8 +2051,6 @@ def test_apply_fold_mask():
         [ops.TOFFOLI.on(*qreg)] * 3,
         [ops.measure_each(*qreg)],
     )
-    print(folded)
-    print(correct)
     assert _equal(folded, correct)
 
 
@@ -2061,3 +2059,53 @@ def test_apply_fold_mask_wrong_size():
     circ = Circuit(ops.H(qreg))
     with pytest.raises(ValueError, match="have incompatible sizes"):
         _ = _apply_fold_mask(circ, [1, 1])
+
+def test_apply_fold_mask_squash_moments():
+    """Test squash_moment option in _apply_fold_mask works as expected."""
+    # Test circuit:
+    # 0: ───T────────
+    #
+    # 1: ───T────H───
+    q = LineQubit.range(2)
+    circ = Circuit(
+        [ops.T.on_each(*q), ops.H(q[1])],
+    )
+    
+    folded = _apply_fold_mask(circ, [1, 0, 0], squash_moments=False)
+    # 0: ───T───T^-1───T───────
+    #
+    # 1: ───T──────────────H───
+    correct = Circuit(
+        [ops.T.on_each(*q), inverse(ops.T(q[0])), ops.T(q[0])],
+    ) + Circuit(ops.H(q[1]))
+    assert _equal(folded, correct)
+
+    # If 2 gates of the same moment are folded,
+    # only 2 moments should be created and not 4.
+    folded = _apply_fold_mask(circ, [1, 1, 0], squash_moments=False)
+    # 0: ───T───T^-1───T───────
+    #
+    # 1: ───T───T^-1───T────H───
+    correct = Circuit(
+        [
+            ops.T.on_each(*q),
+            inverse(ops.T.on_each(*q)),
+            ops.T.on_each(*q), 
+            ops.H(q[1]),
+        ],
+    )
+    assert _equal(folded, correct)
+
+    folded = _apply_fold_mask(circ, [1, 0, 0], squash_moments=True)
+    # 0: ───T───T^-1───T───
+    #
+    # 1: ───T───H──────────
+    correct = Circuit(
+        [
+            ops.T.on_each(*q),
+            inverse(ops.T(q[0])),
+            ops.T(q[0]), 
+            ops.H(q[1]),
+        ],
+    )
+    assert _equal(folded, correct)
