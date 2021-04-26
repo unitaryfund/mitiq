@@ -63,6 +63,7 @@ from mitiq.zne.scaling.folding import (
     fold_global,
     _create_weight_mask,
     _create_fold_mask,
+    _apply_fold_mask,
 )
 
 
@@ -1966,12 +1967,12 @@ def test_create_fold_mask_with_real_scale_factors_at_random():
     assert fold_mask == [0, 0, 0, 0]
 
     fold_mask = _create_fold_mask(
-        weight_mask=[0.1, 0.1, 0.1, 0.1],
+        weight_mask=[0.1, 0.1, 0.1, 0.1, 0.0],
         scale_factor=1.5,
         folding_method="at_random",
         seed=2,
     )
-    assert fold_mask == [0, 0, 1, 0]
+    assert fold_mask == [0, 0, 1, 0, 0]
 
     fold_mask = _create_fold_mask(
         weight_mask=[1, 1, 1, 1],
@@ -2004,3 +2005,59 @@ def test_create_fold_mask_approximates_well(method):
         actual_scale = sum(out_weights) / sum(weight_mask)
         # Less than 1% error
         assert np.isclose(scale_factor / actual_scale, 1.0, atol=0.01)
+
+
+def test_apply_fold_mask():
+    """Check that circuits are properly folded according to a fold mask."""
+    # Test circuit
+    # 0: ───H───@───@───M───
+    #           │   │
+    # 1: ───H───X───@───M───
+    #               │
+    # 2: ───H───T───X───M───
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+        [ops.measure_each(*qreg)],
+    )
+
+    folded = _apply_fold_mask(circ, [0, 0, 0, 0, 0, 0])
+    assert _equal(folded, circ)
+
+    folded = _apply_fold_mask(circ, [1, 1, 1, 0, 0, 0])
+    correct = Circuit([ops.H.on_each(*qreg)] * 2) + circ
+    assert _equal(folded, correct)
+
+    folded = _apply_fold_mask(circ, [0, 0, 0, 0, 0, 2])
+    correct = circ[:-1] + Circuit([ops.TOFFOLI.on(*qreg)] * 4) + circ[-1]
+    assert _equal(folded, correct)
+
+    folded = _apply_fold_mask(circ, [0, 3, 0, 0, 0, 0])
+    correct = Circuit([ops.H.on(qreg[1])] * 6) + circ
+    assert _equal(folded, correct)
+
+    folded = _apply_fold_mask(circ, [0, 0, 1, 0, 0, 0])
+    correct = Circuit([ops.H.on(qreg[2])] * 2) + circ
+    assert _equal(folded, correct)
+
+    folded = _apply_fold_mask(circ, [1, 1, 1, 1, 1, 1])
+    correct = Circuit(
+        [ops.H.on_each(*qreg)] * 3,
+        [ops.CNOT.on(qreg[0], qreg[1])] * 3,
+        [ops.T.on(qreg[2]), inverse(ops.T.on(qreg[2])), ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)] * 3,
+        [ops.measure_each(*qreg)],
+    )
+    print(folded)
+    print(correct)
+    assert _equal(folded, correct)
+
+
+def test_apply_fold_mask_wrong_size():
+    qreg = LineQubit(0)
+    circ = Circuit(ops.H(qreg))
+    with pytest.raises(ValueError, match="have incompatible sizes"):
+        _ = _apply_fold_mask(circ, [1, 1])

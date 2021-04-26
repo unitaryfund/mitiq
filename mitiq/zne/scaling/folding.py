@@ -741,9 +741,19 @@ def _apply_fold_mask(circuit: Circuit, num_folds_mask: List[int]) -> Circuit:
 
     Returns: The folded quantum circuit.
     """
+
     _check_foldable(circuit)
     input_copy = deepcopy(circuit)
     measurements = _pop_measurements(input_copy)
+
+    num_gates = len(list(input_copy.all_operations()))
+    if num_gates != len(num_folds_mask):
+        raise ValueError(
+            "The circuit and the folding mask have incompatible sizes."
+            f" The number of gates is {num_gates}"
+            f" but len(num_folds_mask) is {len(num_folds_mask)}."
+        )
+
     folded_circuit = input_copy[:0]
     for op, num_folds in zip(input_copy.all_operations(), num_folds_mask):
         folded_circuit.append([op] + num_folds * [inverse(op), op])
@@ -752,8 +762,6 @@ def _apply_fold_mask(circuit: Circuit, num_folds_mask: List[int]) -> Circuit:
     return folded_circuit
 
 
-# TODO: draft of new folding functions.
-# If working they could replace the existing functions.
 @noise_scaling_converter
 def fold_gates_from_left(
     circuit: QPROGRAM, scale_factor: float, **kwargs: Any
