@@ -1543,18 +1543,18 @@ def test_fold_and_squash_max_stretch(fold_method):
     circuit = Circuit()
     for i in range(d):
         circuit.insert(0, ops.H.on(qreg[i % 2]), strategy=InsertStrategy.NEW)
-    # TODO: fold_[left|right] currently uses fold_all which always squashes.
-    # folded_not_squashed = fold_method(
-    #     circuit, scale_factor=3.0, squash_moments=False
-    # )
+
+    folded_not_squashed = fold_method(
+        circuit, scale_factor=3.0, squash_moments=False
+    )
     folded_and_squashed = fold_method(
         circuit, scale_factor=3.0, squash_moments=True
     )
     folded_with_squash_moments_not_specified = fold_method(
         circuit, scale_factor=3.0
     )  # Checks that the default is to squash moments
-    # TODO: See above.
-    # assert len(folded_not_squashed) == 30
+
+    assert len(folded_not_squashed) == 30
     assert len(folded_and_squashed) == 15
     assert len(folded_with_squash_moments_not_specified) == 15
 
@@ -2060,6 +2060,7 @@ def test_apply_fold_mask_wrong_size():
     with pytest.raises(ValueError, match="have incompatible sizes"):
         _ = _apply_fold_mask(circ, [1, 1])
 
+
 def test_apply_fold_mask_squash_moments():
     """Test squash_moment option in _apply_fold_mask works as expected."""
     # Test circuit:
@@ -2067,10 +2068,7 @@ def test_apply_fold_mask_squash_moments():
     #
     # 1: ───T────H───
     q = LineQubit.range(2)
-    circ = Circuit(
-        [ops.T.on_each(*q), ops.H(q[1])],
-    )
-    
+    circ = Circuit([ops.T.on_each(*q), ops.H(q[1])],)
     folded = _apply_fold_mask(circ, [1, 0, 0], squash_moments=False)
     # 0: ───T───T^-1───T───────
     #
@@ -2090,7 +2088,7 @@ def test_apply_fold_mask_squash_moments():
         [
             ops.T.on_each(*q),
             inverse(ops.T.on_each(*q)),
-            ops.T.on_each(*q), 
+            ops.T.on_each(*q),
             ops.H(q[1]),
         ],
     )
@@ -2101,11 +2099,6 @@ def test_apply_fold_mask_squash_moments():
     #
     # 1: ───T───H──────────
     correct = Circuit(
-        [
-            ops.T.on_each(*q),
-            inverse(ops.T(q[0])),
-            ops.T(q[0]), 
-            ops.H(q[1]),
-        ],
+        [ops.T.on_each(*q), inverse(ops.T(q[0])), ops.T(q[0]), ops.H(q[1])],
     )
     assert _equal(folded, correct)

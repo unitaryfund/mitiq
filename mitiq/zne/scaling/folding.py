@@ -749,6 +749,10 @@ def _apply_fold_mask(
 
     Returns: The folded quantum circuit.
     """
+    if squash_moments is False:
+        pass
+    else:
+        squash_moments = True
 
     _check_foldable(circuit)
     circ_copy = deepcopy(circuit)
@@ -763,13 +767,6 @@ def _apply_fold_mask(
         )
 
     folded_circuit = circ_copy[:0]
-    
-
-    if squash_moments is False:
-       pass
-    else:
-        squash_moments = True
-
     if squash_moments:
         for op, num_folds in zip(circ_copy.all_operations(), num_folds_mask):
             folded_circuit.append([op] + num_folds * [inverse(op), op])
@@ -784,7 +781,6 @@ def _apply_fold_mask(
             # New folded gates are only squashed with respect to folded_moment
             # while folded_circuit is not squashed.
             folded_circuit.append(folded_moment)
-
 
     _append_measurements(folded_circuit, measurements)
     return folded_circuit
