@@ -12,6 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import pytest
+
 import cirq
 from cirq.circuits import Circuit
 from random import randint, uniform
@@ -20,7 +23,10 @@ from pytest import raises
 from clifford_training_data import (
     _is_clifford_angle,
     _is_clifford,
-    _map_to_near_clifford,
+    _map_to_near_clifford_new,
+    _select_new,
+    _replace_new,
+    _project_to_closest_clifford,
     _closest_clifford,
     _random_clifford,
     _angle_to_probabilities,
@@ -116,17 +122,27 @@ circuit = from_qiskit(qiskit_circuit_transpilation(to_qiskit(circuit)))
 non_cliffords = count_non_cliffords(circuit)
 
 
-def test_something():
+
+def random_x_z_cnot_circuit(qubits, n_moments, random_state) -> Circuit:
     angles = np.linspace(0.0, 2 * np.pi, 8)
-    oneq_gates = [gate(a) for a in angles for gate in (cirq.ops.rx, cirq.ops.rz)]
+    oneq_gates = [gate(a) for a in angles for gate in
+                  (cirq.ops.rx, cirq.ops.rz)]
     gate_domain = {oneq_gate: 1 for oneq_gate in oneq_gates}
     gate_domain.update({cirq.ops.CNOT: 2})
 
-    circuit = cirq.testing.random_circuit(
-        qubits=cirq.LineQubit.range(5),
-        n_moments=10,
+    return cirq.testing.random_circuit(
+        qubits=qubits,
+        n_moments=n_moments,
         op_density=1.0,
         gate_domain=gate_domain,
+        random_state=random_state,
+    )
+
+
+def test_something():
+    circuit = random_x_z_cnot_circuit(
+        qubits=cirq.LineQubit.range(5),
+        n_moments=10,
         random_state=np.random.RandomState(1)
     )
     print(circuit)
@@ -167,6 +183,61 @@ def test_something():
 
     assert False
 
+
+# def test_project_to_closest_clifford_with_clifford_ops():
+#     ops = [cirq.ops.rz(a).on(cirq.LineQubit(0)) for a in (0, 0.5, 1.0, 1.5)]
+#     clifford_ops = _project_to_closest_clifford(ops)
+#     print(clifford_ops)
+#     assert False
+
+
+@pytest.mark.parametrize("method", ("uniform", "gaussian"))
+def test_select_all(method):
+    q = cirq.LineQubit(0)
+    ops = [cirq.ops.rz(0.01).on(q), cirq.ops.rz(-0.77).on(q)]
+    indices = _select_new(ops, 0.0, method=method, random_state=np.random.RandomState(1))
+    assert np.allclose(indices, np.array(list(range(len(ops)))))
+
+
+@pytest.mark.parametrize("method", ("uniform", "gaussian"))
+def test_select_some(method):
+    n = 10  # Number to select.
+    q = cirq.GridQubit(1, 1)
+    ops = [cirq.ops.rz(a).on(q) for a in np.random.randn(n)]
+    indices = _select_new(ops, fraction_non_clifford=0.5, method=method)
+    assert len(indices) == n // 2
+
+
+def test_select_bad_method():
+    with pytest.raises(ValueError, match="Arg `method_select` must be"):
+        _select_new([], fraction_non_clifford=0.0, method="unknown method")
+
+
+@pytest.mark.parametrize("method", ("closest", "uniform", "gaussian"))
+def test_replace(method):
+    q = cirq.LineQubit(0)
+    ops = [cirq.ops.rz(0.01).on(q), cirq.ops.rz(-0.77).on(q)]
+
+    new_ops = _replace_new(non_clifford_ops=ops, method=method, random_state=np.random.RandomState(1))
+
+    assert len(new_ops) == len(ops)
+    assert all(_is_clifford(op) for op in new_ops)
+
+
+def test_map_to_near_clifford():
+    q = cirq.LineQubit(0)
+    ops = [cirq.ops.rz(0.01).on(q), cirq.ops.rz(-0.77).on(q)]
+
+    new_ops = _map_to_near_clifford_new(
+        ops,
+        fraction_non_clifford=0.0,
+        method_select="uniform",
+        method_replace="uniform",
+        seed=1,
+    )
+    print(new_ops)
+
+    assert False
 
 #
 # def test_generate_training_circuits():
