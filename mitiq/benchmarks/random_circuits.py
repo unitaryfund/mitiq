@@ -28,7 +28,8 @@ from mitiq.benchmarks.utils import noisy_simulation
 
 
 def sample_projector(
-    n_qubits: int, seed: Union[None, int, np.random.RandomState] = None,
+    n_qubits: int,
+    seed: Optional[Union[int, np.random.RandomState]] = None,
 ) -> np.ndarray:
     """Constructs a projector on a random computational basis state of n_qubits.
 

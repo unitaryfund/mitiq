@@ -316,7 +316,7 @@ def _default_weight(op: ops.Operation) -> float:
 
 
 def _get_weight_for_gate(
-    weights: Union[Dict[str, float], None], op: ops.Operation
+    weights: Optional[Dict[str, float]], op: ops.Operation
 ) -> float:
     """Returns the weight for a given gate, using a default value of 1.0 if
     weights is None or if the weight is not specified.
