@@ -292,13 +292,9 @@ def test_generate_training_circuits_mega(method_select, method_replace, kwargs):
 #
 
 def test_probabilistic_angles_to_clifford():
-    random_state = np.random.RandomState(1)
-    for sigma in np.linspace(0.1, 2, 20):
-        a = _probabilistic_angle_to_clifford(
-            _CLIFFORD_ANGLES, sigma, random_state
+    for sigma in np.linspace(0.1, 2, 10):
+        angles = _probabilistic_angle_to_clifford(
+            _CLIFFORD_ANGLES, sigma, np.random.RandomState(1)
         )
-        for ang in a:
-            for cliff in _CLIFFORD_ANGLES:
-                if ang == cliff:
-                    check = True
-            assert check
+        assert all(a in _CLIFFORD_ANGLES for a in angles)
+
