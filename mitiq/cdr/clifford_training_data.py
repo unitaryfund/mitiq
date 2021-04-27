@@ -14,8 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Functions for mapping circuits to near-Clifford circuits."""
-from copy import deepcopy
-from typing import Iterable, List, Optional, Sequence, Union
+from typing import List, Optional, Sequence, Union
 
 import numpy as np
 
@@ -115,7 +114,7 @@ def _map_to_near_clifford(
     circuit.
 
     Args:
-        non_clifford_ops: Non-Clifford operations to map to Clifford operations.
+        non_clifford_ops: Non-Clifford ops to map to Clifford operations.
         fraction_non_clifford: The (approximate) fraction of non-Clifford
             operations in each returned circuit.
         method_select: The way in which the non-Clifford gates are selected to
@@ -168,11 +167,9 @@ def _select(
     method: str = "uniform",
     sigma: Optional[float] = 1.0,
     random_state: Optional[np.random.RandomState] = None,
-) -> np.ndarray:
-    """Returns indices of selected operations.
-
-    Operations are selected by a strategy determined by the ``method``
-    argument.
+) -> List[int]:
+    """Returns indices of non-Clifford operations selected (to be replaced)
+    according to some method.
 
     Args:
         non_clifford_ops: Sequence of non-Clifford operations.
@@ -213,13 +210,13 @@ def _select(
         )
 
     # Select (indices of) non-Clifford operations to replace.
-    indices = range(num_non_cliff)
     selected_indices = random_state.choice(
-        indices, num_non_cliff - num_to_replace, replace=False, p=distribution,
+        range(num_non_cliff),
+        num_non_cliff - num_to_replace,
+        replace=False,
+        p=distribution,
     )
-    # TODO: Select in a way that sorting isn't required.
-    selected_indices.sort()
-    return selected_indices
+    return [int(i) for i in sorted(selected_indices)]
 
 
 def _replace(
