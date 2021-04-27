@@ -21,7 +21,7 @@ import cirq
 from cirq.circuits import Circuit
 from random import randint, uniform
 
-from clifford_training_data import (
+from mitiq.cdr.clifford_training_data import (
     _is_clifford_angle,
     _is_clifford,
     is_clifford,
