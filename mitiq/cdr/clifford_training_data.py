@@ -39,10 +39,10 @@ def generate_training_circuits(
 ) -> List[Circuit]:
     """Returns a list of (near) Clifford circuits obtained by replacing (some)
     non-Clifford gates in the input circuit by Clifford gates.
-    
+
     The way in which non-Clifford gates are selected to be replaced / replaced
     is determined by ``method_select`` and ``method_replace``.
-    
+
     In the Clifford Data Regression (CDR) method [TODO: Cite paper], data
     generated from these circuits is used as a training set to learn the
     effect of noise.
@@ -56,7 +56,7 @@ def generate_training_circuits(
         method_select: Method by which non-Clifford gates are selected to be
             replaced by Clifford gates. Options are 'uniform' or 'gaussian'.
         method_replace: Method by which selected non-Clifford gates are
-            replaced by Clifford gates. Options are 'uniform', 'gaussian' or 
+            replaced by Clifford gates. Options are 'uniform', 'gaussian' or
             'closest'.
         random_state: Seed for sampling.
         kwargs: Available keyword arguments are:
@@ -337,7 +337,7 @@ def _closest_clifford(angles: np.ndarray) -> float:
 
 
 @np.vectorize
-def _is_clifford_angle(angles: np.ndarray, tol: float = 10 ** -5, ) -> bool:
+def _is_clifford_angle(angles: np.ndarray, tol: float = 10 ** -5,) -> bool:
     """Function to check if a given angle is Clifford.
 
     Args:
