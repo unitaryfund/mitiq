@@ -18,4 +18,8 @@
 TODO: Add reference + more information.
 """
 
-from mitiq.cdr.clifford_training_data import generate_training_circuits
+from mitiq.cdr.clifford_training_data import (
+    count_non_cliffords,
+    is_clifford,
+    generate_training_circuits,
+)

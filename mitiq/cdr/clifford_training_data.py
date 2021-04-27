@@ -22,11 +22,12 @@ import cirq
 from cirq.circuits import Circuit
 
 
-# Z rotation gates with these angles are Clifford gates.
+# Z gates with these angles/exponents are Clifford gates.
 _CLIFFORD_ANGLES = (0.0, np.pi / 2, np.pi, (3 / 2) * np.pi)
 _CLIFFORD_EXPONENTS = np.array([0.0, 0.5, 1.0, 1.5])
 
 
+# TODO: Accept any QPROGRAM.
 def generate_training_circuits(
     circuit: Circuit,
     num_training_circuits: int,
@@ -102,6 +103,32 @@ def generate_training_circuits(
     return near_clifford_circuits
 
 
+# TODO: Accept any QPROGRAM.
+def is_clifford(op_like: cirq.ops.OP_TREE) -> bool:
+    """Returns True if the input argument is Clifford, else False.
+
+    Args:
+        op_like: A single operation, list of operations, or circuit.
+    """
+    try:
+        circuit = cirq.Circuit(op_like)
+    except TypeError:
+        raise ValueError("Could not convert `op_like` to a circuit.")
+
+    return all(_is_clifford(op) for op in circuit.all_operations())
+
+
+# TODO: Accept any QPROGRAM.
+def count_non_cliffords(circuit: Circuit) -> int:
+    """Returns the number of non-Clifford operations in the circuit. Assumes
+    the circuit consists of only Rz, Rx, and CNOT operations.
+
+    Args:
+        circuit: Circuit to count the number of non-Clifford operations in.
+    """
+    return sum(not _is_clifford(op) for op in circuit.all_operations())
+
+
 def _map_to_near_clifford(
     non_clifford_ops: Sequence[cirq.ops.Operation],
     fraction_non_clifford: float,
@@ -110,13 +137,13 @@ def _map_to_near_clifford(
     seed: Optional[int] = None,
     **kwargs: dict,
 ) -> Sequence[cirq.ops.Operation]:
-    """Maps the input operations to a (near) Clifford circuit and returns this
-    circuit.
+    """Returns the list of non-Clifford operations with some of these replaced
+    by Clifford operations.
 
     Args:
-        non_clifford_ops: Non-Clifford ops to map to Clifford operations.
+        non_clifford_ops: A sequence of non-Clifford operations.
         fraction_non_clifford: The (approximate) fraction of non-Clifford
-            operations in each returned circuit.
+            operations in the returned list.
         method_select: The way in which the non-Clifford gates are selected to
             be replaced by Clifford gates. Options are 'uniform' or 'gaussian'.
         method_replace: The way in which selected non-Clifford gates are
@@ -180,12 +207,6 @@ def _select(
                       of non-Clifford gates to replace, only has effect if
                       method_select = 'gaussian'.
         random_state: Random state for sampling.
-    Returns:
-        list of indices that identify rotation angles to change.
-
-    Raises:
-        Exception: If argument 'method_select' is neither 'uniform' nor
-                   'gaussian'.
     """
     if random_state is None:
         random_state = np.random
@@ -277,36 +298,18 @@ def _replace(
     ]
 
 
-def is_clifford(op_like: cirq.ops.OP_TREE) -> bool:
-    """Returns True if the input argument is Clifford, else False.
+def _random_clifford(
+    num_angles: int, random_state: np.random.RandomState
+) -> np.ndarray:
+    """Returns an array of Clifford angles chosen uniformly at random.
 
     Args:
-        op_like: A single operation, list of operations, or circuit.
+        num_angles: Number of Clifford angles to return in array.
+        random_state: Random state for sampling.
     """
-    try:
-        circuit = cirq.Circuit(op_like)
-    except TypeError:
-        raise ValueError("Could not convert `op_like` to a circuit.")
-
-    return all(_is_clifford(op) for op in circuit.all_operations())
-
-
-def _is_clifford(op: cirq.ops.Operation) -> bool:
-    if isinstance(op.gate, cirq.ops.XPowGate):
-        return True
-    if isinstance(op.gate, cirq.ops.CNotPowGate) and op.gate.exponent == 1.0:
-        return True
-    if (
-        isinstance(op.gate, cirq.ops.ZPowGate)
-        and op.gate.exponent % 2 in _CLIFFORD_EXPONENTS
-    ):
-        return True
-
-    # Ignore measurements.
-    if isinstance(op.gate, cirq.ops.MeasurementGate):
-        return True
-    # TODO: Could add additional logic here.
-    return False
+    return np.array(
+        [random_state.choice(_CLIFFORD_ANGLES) for _ in range(num_angles)]
+    )
 
 
 @np.vectorize
@@ -331,30 +334,6 @@ def _closest_clifford(angles: np.ndarray) -> float:
         index_list = [ang_scaled - 0.5, ang_scaled + 0.5]
         index = int(np.random.choice(index_list))
         return _CLIFFORD_ANGLES[index]
-
-
-def _random_clifford(
-    num_angles: int, random_state: np.random.RandomState
-) -> np.ndarray:
-    """Returns an array of Clifford angles chosen uniformly at random.
-
-    Args:
-        num_angles: Number of Clifford angles to return in array.
-        random_state: Random state for sampling.
-    """
-    return np.array(
-        [random_state.choice(_CLIFFORD_ANGLES) for _ in range(num_angles)]
-    )
-
-
-def count_non_cliffords(circuit: Circuit) -> int:
-    """Returns the number of non-Clifford gates in the circuit. Assumes the
-    circuit consists of only Rz, Rx, and CNOT operations.
-
-    Args:
-        circuit: Circuit to count the number of non-Clifford gates of.
-    """
-    return sum(not _is_clifford(op) for op in circuit.all_operations())
 
 
 @np.vectorize
@@ -399,15 +378,14 @@ def _angle_to_probabilities(angle: np.ndarray, sigma: float) -> float:
 
 @np.vectorize
 def _probabilistic_angle_to_clifford(
-    angles: float, sigma: float, random_state: np.random.RandomState
+    angles: np.ndarray, sigma: float, random_state: np.random.RandomState
 ) -> float:
     """Returns a Clifford angle sampled from the distribution
 
                         prob = exp(-(dist/sigma)^2)
 
     where dist is the Frobenius norm from the 4 clifford angles and the gate
-    of interest. Note the usage of this function is vectorized so it takes
-    and returns arrays.
+    of interest.
 
     Args:
         angles: Angle in Rz gate.
@@ -429,3 +407,21 @@ def _probabilistic_angle_to_clifford(
         _CLIFFORD_ANGLES, 1, replace=False, p=np.array(dists) / np.sum(dists)
     )
     return cliff_ang
+
+
+def _is_clifford(op: cirq.ops.Operation) -> bool:
+    if isinstance(op.gate, cirq.ops.XPowGate):
+        return True
+    if isinstance(op.gate, cirq.ops.CNotPowGate) and op.gate.exponent == 1.0:
+        return True
+    if (
+        isinstance(op.gate, cirq.ops.ZPowGate)
+        and op.gate.exponent % 2 in _CLIFFORD_EXPONENTS
+    ):
+        return True
+
+    # Ignore measurements.
+    if isinstance(op.gate, cirq.ops.MeasurementGate):
+        return True
+    # TODO: Could add additional logic here.
+    return False
