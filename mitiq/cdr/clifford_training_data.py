@@ -95,7 +95,7 @@ def generate_training_circuits(
             method_select,
             method_replace,
             rng,
-            **kwargs
+            **kwargs,
         )
         operations[non_clifford_indices] = new_ops
         near_clifford_circuits.append(Circuit(operations))
@@ -129,11 +129,7 @@ def _map_to_near_clifford(
                 ``method_select='gaussian'``.
             sigma_replace (float): Width of the Gaussian distribution used for
                 ``method_replace='gaussian'``.
-
-        Returns:
-            Circuit: Near-Clifford projected circuit.
     """
-    print("In map to near clifford...")
     sigma_select = kwargs.get("sigma_select", 0.5)
     sigma_replace = kwargs.get("sigma_replace", 0.5)
 
@@ -151,12 +147,6 @@ def _map_to_near_clifford(
         random_state_select,
     )
 
-    print("Just selected ops to replace, the indices are:")
-    print(indices_of_selected_ops)
-
-    print("The ops are:")
-    print(*[non_clifford_ops[i] for i in indices_of_selected_ops], sep="\n")
-
     # Replace selected operations.
     clifford_ops = _replace(
         [non_clifford_ops[i] for i in indices_of_selected_ops],
@@ -164,9 +154,6 @@ def _map_to_near_clifford(
         sigma_replace,
         random_state_replace,
     )
-
-    print("\nThe new ops are:")
-    print(*clifford_ops, sep="\n")
 
     # Return sequence of (near) Clifford operations.
     return [
@@ -224,7 +211,6 @@ def _select(
             f"Arg `method_select` must be 'uniform' or 'gaussian' but was "
             f"{method}."
         )
-    print("Prob distribution to select gates:", distribution)
 
     # Select (indices of) non-Clifford operations to replace.
     indices = range(num_non_cliff)
@@ -253,7 +239,7 @@ def _replace(
         sigma: width of probability distribution used in replacement
                        of selected non-Clifford gates, only has effect if
                        method_replace = 'gaussian'.
-        seed: Seed for sampling.
+        random_state: Seed for sampling.
     Returns:
         rz_non_clifford_replaced: the selected non-Clifford gates replaced by a
                                Clifford according to some method.
@@ -290,8 +276,7 @@ def _replace(
     return [
         cirq.ops.rz(a).on(*q)
         for (a, q) in zip(
-            clifford_angles,
-            [op.qubits for op in non_clifford_ops],
+            clifford_angles, [op.qubits for op in non_clifford_ops],
         )
     ]
 
@@ -328,6 +313,7 @@ def _is_clifford(op: cirq.ops.Operation) -> bool:
     return False
 
 
+@np.vectorize
 def _closest_clifford(ang: float) -> float:
     """Function to take angle and return the nearest Clifford angle note the
        usage of this function is vectorized so it takes and returns arrays.
@@ -356,10 +342,6 @@ def _closest_clifford(ang: float) -> float:
         return _CLIFFORD_ANGLES[index]
 
 
-# vectorize so function can take array of angles.
-_closest_clifford = np.vectorize(_closest_clifford)
-
-
 def _random_clifford(
     num_angles: int, random_state: np.random.RandomState
 ) -> np.ndarray:
@@ -384,6 +366,7 @@ def count_non_cliffords(circuit: Circuit) -> int:
     return sum(not _is_clifford(op) for op in circuit.all_operations())
 
 
+@np.vectorize
 def _is_clifford_angle(ang: float, tol: float = 10 ** -5,) -> bool:
     """Function to check if a given angle is Clifford.
     Args:
@@ -398,10 +381,7 @@ def _is_clifford_angle(ang: float, tol: float = 10 ** -5,) -> bool:
     return False
 
 
-# Vectorize function so it can take arrays of angles as its input.
-_is_clifford_angle = np.vectorize(_is_clifford_angle)
-
-
+@np.vectorize
 def _angle_to_probabilities(angle: float, sigma: float) -> float:
     """Function to return probability distribution based on distance from
        angles to Clifford gates.
@@ -427,10 +407,7 @@ def _angle_to_probabilities(angle: float, sigma: float) -> float:
     return sum(dists)
 
 
-# Vectorize so function can take array of angles.
-_angle_to_probabilities = np.vectorize(_angle_to_probabilities)
-
-
+@np.vectorize
 def _probabilistic_angle_to_clifford(
     ang: float, sigma: float, random_state: np.random.RandomState
 ) -> float:
@@ -461,9 +438,3 @@ def _probabilistic_angle_to_clifford(
         _CLIFFORD_ANGLES, 1, replace=False, p=np.array(dists) / np.sum(dists)
     )
     return cliff_ang
-
-
-# Vectorize so function can take array of angles.
-_probabilistic_angle_to_clifford = np.vectorize(
-    _probabilistic_angle_to_clifford
-)

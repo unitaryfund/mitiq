@@ -40,8 +40,9 @@ from mitiq.cdr.clifford_training_data import (
 
 def random_x_z_cnot_circuit(qubits, n_moments, random_state) -> Circuit:
     angles = np.linspace(0.0, 2 * np.pi, 8)
-    oneq_gates = [gate(a) for a in angles for gate in
-                  (cirq.ops.rx, cirq.ops.rz)]
+    oneq_gates = [
+        gate(a) for a in angles for gate in (cirq.ops.rx, cirq.ops.rz)
+    ]
     gate_domain = {oneq_gate: 1 for oneq_gate in oneq_gates}
     gate_domain.update({cirq.ops.CNOT: 2})
 
@@ -60,7 +61,7 @@ def test_generate_training_circuits():
     )
     assert not is_clifford(circuit)
 
-    clifford_circuit, = generate_training_circuits(
+    (clifford_circuit,) = generate_training_circuits(
         circuit, num_training_circuits=1, fraction_non_clifford=0.0
     )
     assert is_clifford(clifford_circuit)
@@ -70,7 +71,9 @@ def test_generate_training_circuits():
 def test_select_all(method):
     q = cirq.LineQubit(0)
     ops = [cirq.ops.rz(0.01).on(q), cirq.ops.rz(-0.77).on(q)]
-    indices = _select(ops, 0.0, method=method, random_state=np.random.RandomState(1))
+    indices = _select(
+        ops, 0.0, method=method, random_state=np.random.RandomState(1)
+    )
     assert np.allclose(indices, np.array(list(range(len(ops)))))
 
 
@@ -93,7 +96,11 @@ def test_replace(method):
     q = cirq.LineQubit(0)
     ops = [cirq.ops.rz(0.01).on(q), cirq.ops.rz(-0.77).on(q)]
 
-    new_ops = _replace(non_clifford_ops=ops, method=method, random_state=np.random.RandomState(1))
+    new_ops = _replace(
+        non_clifford_ops=ops,
+        method=method,
+        random_state=np.random.RandomState(1),
+    )
 
     assert len(new_ops) == len(ops)
     assert all(_is_clifford(op) for op in new_ops)
@@ -120,7 +127,7 @@ def test_generate_training_circuits_bad_methods():
             Circuit(cirq.ops.rx(0.5).on(cirq.LineQubit(0))),
             num_training_circuits=1,
             fraction_non_clifford=0.0,
-            method_select="unknown select method"
+            method_select="unknown select method",
         )
 
     with pytest.raises(ValueError):
@@ -128,7 +135,7 @@ def test_generate_training_circuits_bad_methods():
             Circuit(cirq.ops.rx(0.5).on(cirq.LineQubit(0))),
             num_training_circuits=1,
             fraction_non_clifford=0.0,
-            method_replace="unknown replace method"
+            method_replace="unknown replace method",
         )
 
 
@@ -143,8 +150,12 @@ def test_generate_training_circuits_with_clifford_circuit():
 
 @pytest.mark.parametrize("method_select", ["uniform", "gaussian"])
 @pytest.mark.parametrize("method_replace", ["uniform", "gaussian", "closest"])
-@pytest.mark.parametrize("kwargs", [{}, {"sigma_select": 0.5, "sigma_replace": 0.5}])
-def test_generate_training_circuits_mega(method_select, method_replace, kwargs):
+@pytest.mark.parametrize(
+    "kwargs", [{}, {"sigma_select": 0.5, "sigma_replace": 0.5}]
+)
+def test_generate_training_circuits_mega(
+    method_select, method_replace, kwargs
+):
     circuit = random_x_z_cnot_circuit(qubits=4, n_moments=10, random_state=1)
     num_train = 10
     fraction_non_clifford = 0.1
@@ -156,15 +167,15 @@ def test_generate_training_circuits_mega(method_select, method_replace, kwargs):
         random_state=np.random.RandomState(13),
         method_select=method_select,
         method_replace=method_replace,
-        **kwargs
+        **kwargs,
     )
     assert len(train_circuits) == num_train
 
     for train_circuit in train_circuits:
         assert set(train_circuit.all_qubits()) == set(circuit.all_qubits())
-        assert count_non_cliffords(
-            train_circuit
-        ) == int(fraction_non_clifford * count_non_cliffords(circuit))
+        assert count_non_cliffords(train_circuit) == int(
+            fraction_non_clifford * count_non_cliffords(circuit)
+        )
 
 
 # def test_select():
@@ -234,18 +245,8 @@ def test_generate_training_circuits_mega(method_select, method_replace, kwargs):
 #             )
 #
 #
-# def test_get_argument():
-#     operations = np.array(list(circuit.all_operations()))
-#     gates = np.array([op.gate for op in operations])
-#     mask = np.array(
-#         [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
-#     )
-#     r_z_gates = operations[mask]
-#     args = np.array([op.gate.exponent * np.pi for op in r_z_gates])
-#     for arg in args:
-#         assert type(arg) == np.float64
-#
-#
+
+
 def test_count_non_cliffords():
     a, b = cirq.LineQubit.range(2)
     circuit = Circuit(
@@ -258,7 +259,7 @@ def test_count_non_cliffords():
     assert count_non_cliffords(circuit) == 1
 
 
-def test_count_non_cliffords_empty():
+def test_count_non_cliffords_empty_circuit():
     assert count_non_cliffords(Circuit()) == 0
 
 
@@ -277,9 +278,9 @@ def test_closest_clifford():
 
 
 def test_random_clifford():
-    assert set(
-        _random_clifford(20, np.random.RandomState(1))
-    ).issubset(_CLIFFORD_ANGLES)
+    assert set(_random_clifford(20, np.random.RandomState(1))).issubset(
+        _CLIFFORD_ANGLES
+    )
 
 
 def test_angle_to_probabilities():
@@ -294,4 +295,3 @@ def test_probabilistic_angles_to_clifford():
             _CLIFFORD_ANGLES, sigma, np.random.RandomState(1)
         )
         assert all(a in _CLIFFORD_ANGLES for a in angles)
-
