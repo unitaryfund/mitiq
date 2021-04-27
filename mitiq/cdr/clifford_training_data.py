@@ -80,6 +80,9 @@ def generate_training_circuits(
     non_clifford_indices_and_ops = np.array(
         [[i, op] for i, op in enumerate(operations) if not _is_clifford(op)]
     )
+    if len(non_clifford_indices_and_ops) == 0:
+        raise ValueError("Circuit is already Clifford.")
+
     non_clifford_indices = np.int32(non_clifford_indices_and_ops[:, 0])
     non_clifford_ops = non_clifford_indices_and_ops[:, 1]
 

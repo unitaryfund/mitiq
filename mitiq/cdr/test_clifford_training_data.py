@@ -205,41 +205,43 @@ def test_map_to_near_clifford():
 
     assert False
 
-#
-# def test_generate_training_circuits():
+
+def test_generate_training_circuits_bad_methods():
+    with pytest.raises(ValueError):
+        generate_training_circuits(
+            Circuit(cirq.ops.rx(0.5).on(cirq.LineQubit(0))),
+            num_training_circuits=1,
+            fraction_non_clifford=0.0,
+            method_select="unknown select method"
+        )
+
+    with pytest.raises(ValueError):
+        generate_training_circuits(
+            Circuit(cirq.ops.rx(0.5).on(cirq.LineQubit(0))),
+            num_training_circuits=1,
+            fraction_non_clifford=0.0,
+            method_replace="unknown replace method"
+        )
+
+
+def test_generate_training_circuits_with_clifford_circuit():
+    with pytest.raises(ValueError, match="Circuit is already Clifford."):
+        generate_training_circuits(
+            Circuit(cirq.ops.rx(0.0).on(cirq.LineQubit(0))),
+            num_training_circuits=1,
+            fraction_non_clifford=0.0,
+        )
+
+# def test_generate_training_circuits_mega():
 #     """Test that generate_training_circuits function is working properly with
-#     the random projrection method.
+#     the random projection method.
 #     """
 #     method_select_options_list = ["uniform", "gaussian"]
 #     method_replace_options_list = ["uniform", "gaussian", "closest"]
 #     additional_options = {"sigma_select": 0.5, "sigma_replace": 0.5}
 #     non_cliffords = count_non_cliffords(circuit)
 #     random_state = 13
-#     method_select = "uniform"
-#     method_replace = "uniform"
-#     method_select_2 = "uni"
-#     method_replace_2 = "uni"
-#     assert raises(
-#         Exception,
-#         generate_training_circuits,
-#         circuit,
-#         num_training_circuits,
-#         fraction_non_clifford,
-#         method_select_2,
-#         method_replace,
-#         random_state,
-#     )
 #
-#     assert raises(
-#         Exception,
-#         generate_training_circuits,
-#         circuit,
-#         num_training_circuits,
-#         fraction_non_clifford,
-#         method_select,
-#         method_replace_2,
-#         random_state,
-#     )
 #     for method_select in method_select_options_list:
 #         for method_replace in method_replace_options_list:
 #             test_training_set_circuits = generate_training_circuits(
@@ -282,7 +284,7 @@ def test_map_to_near_clifford():
 #                 assert len(
 #                     test_training_circuits_with_options[i].all_qubits()
 #                 ) == len(circuit.all_qubits())
-#
+
 #
 # def test_map_to_near_cliffords():
 #     method_select_options_list = ["uniform", "gaussian"]
