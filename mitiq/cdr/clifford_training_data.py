@@ -63,8 +63,8 @@ def generate_training_circuits(
         kwargs: Available keyword arguments are:
             - sigma_select (float): Width of the Gaussian distribution used for
             ``method_select='gaussian'``.
-            - sigma_replace (float): Width of the Gaussian distribution used for
-            ``method_replace='gaussian'``.
+            - sigma_replace (float): Width of the Gaussian distribution used
+            for ``method_replace='gaussian'``.
 
     .. [Czarnik2020] : Piotr Czarnik, Andrew Arramsmith, Parick Coles,
         Lukasz Cincio, "Error mitigation with Clifford quantum circuit
