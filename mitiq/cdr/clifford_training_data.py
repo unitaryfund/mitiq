@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Functions for mapping circuits to near-Clifford circuits."""
+"""Functions for mapping circuits to (near) Clifford circuits."""
 from typing import List, Optional, Sequence, Union
 
 import numpy as np
@@ -201,8 +201,7 @@ def _select(
             [op.gate.exponent * np.pi for op in non_clifford_ops]
         )
         probabilities = _angle_to_probabilities(non_clifford_angles, sigma)
-        norm = sum(probabilities)
-        distribution = [k / norm for k in probabilities]
+        distribution = [k / sum(probabilities) for k in probabilities]
     else:
         raise ValueError(
             f"Arg `method_select` must be 'uniform' or 'gaussian' but was "
@@ -311,18 +310,14 @@ def _is_clifford(op: cirq.ops.Operation) -> bool:
 
 
 @np.vectorize
-def _closest_clifford(ang: float) -> float:
-    """Function to take angle and return the nearest Clifford angle note the
-       usage of this function is vectorized so it takes and returns arrays.
+def _closest_clifford(angles: np.ndarray) -> float:
+    """Returns the nearest Clifford angles to the input angles.
 
     Args:
-        ang: angle in Rz gate.
-
-    Returns:
-        Clifford angle: closest clifford angle.
+        angles: Angles in Rz gates.
     """
-    ang = ang % (2 * np.pi)
-    ang_scaled = ang / (np.pi / 2)
+    angles = angles % (2 * np.pi)
+    ang_scaled = angles / (np.pi / 2)
     # if just one min value, return the corresponding nearest cliff.
     if (
         abs((ang_scaled / 0.5) - 1) > 10 ** (-6)
@@ -331,8 +326,7 @@ def _closest_clifford(ang: float) -> float:
     ):
         index = int(np.round(ang_scaled)) % 4
         return _CLIFFORD_ANGLES[index]
-    # if two min values (ie two cliff gates equidistant) randomly choose the
-    # cliff gate to return.
+    # If equidistant between two Clifford angles, randomly choose one.
     else:
         index_list = [ang_scaled - 0.5, ang_scaled + 0.5]
         index = int(np.random.choice(index_list))
@@ -364,31 +358,30 @@ def count_non_cliffords(circuit: Circuit) -> int:
 
 
 @np.vectorize
-def _is_clifford_angle(ang: float, tol: float = 10 ** -5,) -> bool:
+def _is_clifford_angle(angles: np.ndarray, tol: float = 10 ** -5, ) -> bool:
     """Function to check if a given angle is Clifford.
+
     Args:
-        ang: rotation angle in the Rz gate.
-    Returns:
-        bool: True / False for Clifford or not.
+        angles: rotation angle in the Rz gate.
     """
-    ang = ang % (2 * np.pi)
-    closest_clifford_angle = _closest_clifford(ang)
-    if abs(closest_clifford_angle - ang) < tol:
+    angles = angles % (2 * np.pi)
+    closest_clifford_angle = _closest_clifford(angles)
+    if abs(closest_clifford_angle - angles) < tol:
         return True
     return False
 
 
 @np.vectorize
-def _angle_to_probabilities(angle: float, sigma: float) -> float:
-    """Function to return probability distribution based on distance from
-       angles to Clifford gates.
+def _angle_to_probabilities(angle: np.ndarray, sigma: float) -> float:
+    """Returns probability distribution based on distance from angles to
+    Clifford gates.
 
     Args:
         angle: angle to form probability distribution.
 
     Returns:
-        discrete value of probability distribution calucalted from
-        Prob_project = exp(-(dist/sigma)^2) where dist = sum(dists) is the
+        discrete value of probability distribution calculated from
+        exp(-(dist/sigma)^2) where dist = sum(dists) is the
         sum of distances from each Clifford gate.
     """
     # TODO: Code duplication with function below.
@@ -406,7 +399,7 @@ def _angle_to_probabilities(angle: float, sigma: float) -> float:
 
 @np.vectorize
 def _probabilistic_angle_to_clifford(
-    ang: float, sigma: float, random_state: np.random.RandomState
+    angles: float, sigma: float, random_state: np.random.RandomState
 ) -> float:
     """Returns a Clifford angle sampled from the distribution
 
@@ -417,11 +410,12 @@ def _probabilistic_angle_to_clifford(
     and returns arrays.
 
     Args:
-        ang: Angle in Rz gate.
+        angles: Angle in Rz gate.
         sigma: Width of probability distribution.
     """
+    # TODO: Code duplication with function above.
     s_matrix = cirq.unitary(cirq.S)
-    rz_matrix = cirq.unitary(cirq.rz(ang % (2 * np.pi)))
+    rz_matrix = cirq.unitary(cirq.rz(angles % (2 * np.pi)))
 
     dists = []
     # TODO: Update loop / if.

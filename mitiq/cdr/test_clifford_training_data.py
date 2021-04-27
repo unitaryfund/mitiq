@@ -19,7 +19,6 @@ import numpy as np
 
 import cirq
 from cirq.circuits import Circuit
-from random import randint, uniform
 
 from mitiq.cdr.clifford_training_data import (
     _is_clifford_angle,
@@ -194,7 +193,9 @@ def test_select(method):
         random_state=np.random.RandomState(1),
     )
     assert all(isinstance(index, int) for index in indices)
-    assert len(indices) == int((1.0 - fraction_non_clifford) * len(non_clifford_ops))
+    assert len(indices) == int(
+        (1.0 - fraction_non_clifford) * len(non_clifford_ops)
+    )
 
 
 def test_count_non_cliffords():
