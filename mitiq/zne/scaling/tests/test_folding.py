@@ -45,7 +45,7 @@ from mitiq.zne.scaling.folding import (
     _is_measurement,
     _pop_measurements,
     _append_measurements,
-    squash_moments,
+    _squash_moments,
     _default_weight,
     _fold_all,
     fold_all,
@@ -120,7 +120,7 @@ def test_squash_moments_two_qubits():
     assert len(circuit) == d
 
     # Squash the moments
-    squashed = squash_moments(circuit)
+    squashed = _squash_moments(circuit)
     assert len(squashed) == d // 2
 
 
@@ -130,7 +130,7 @@ def test_squash_moments_returns_new_circuit_and_doesnt_modify_input_circuit():
     """
     qbit = GridQubit(0, 0)
     circ = Circuit(ops.H.on(qbit))
-    squashed = squash_moments(circ)
+    squashed = _squash_moments(circ)
     assert len(squashed) == 1
     assert circ is not squashed
     assert _equal(circ, Circuit(ops.H.on(qbit)))
@@ -141,7 +141,7 @@ def test_squash_moments_retains_device():
     as the input circuit.
     """
     circuit = Circuit(device=Sycamore)
-    squashed = squash_moments(circuit)
+    squashed = _squash_moments(circuit)
     assert squashed.device == Sycamore
 
 
@@ -153,7 +153,7 @@ def test_squash_moments_never_increases_moments():
         circuit = testing.random_circuit(
             qubits=5, n_moments=8, op_density=0.75
         )
-        squashed = squash_moments(circuit)
+        squashed = _squash_moments(circuit)
         assert len(squashed) <= len(circuit)
 
 

@@ -116,7 +116,7 @@ def _check_foldable(circuit: Circuit) -> None:
         )
 
 
-def squash_moments(circuit: Circuit) -> Circuit:
+def _squash_moments(circuit: Circuit) -> Circuit:
     """Returns a copy of the input circuit with all gates squashed into as few
     moments as possible.
 
@@ -341,7 +341,7 @@ def fold_global(
 
     _append_measurements(folded, measurements)
     if not (kwargs.get("squash_moments") is False):
-        folded = squash_moments(folded)
+        folded = _squash_moments(folded)
     return folded
 
 
