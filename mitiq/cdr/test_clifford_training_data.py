@@ -197,47 +197,6 @@ def test_select(method):
     assert len(indices) == int((1.0 - fraction_non_clifford) * len(non_clifford_ops))
 
 
-# def test_replace():
-#     method_select_options_list = ["uniform", "gaussian"]
-#     method_replace_options_list = ["uniform", "gaussian", "closest"]
-#     non_cliffords = count_non_cliffords(circuit)
-#     operations = np.array(list(circuit.all_operations()))
-#     gates = np.array([op.gate for op in operations])
-#     mask = np.array(
-#         [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
-#     )
-#     r_z_gates = operations[mask]
-#     angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
-#     mask_non_clifford = ~_is_clifford_angle(angles)
-#     rz_non_clifford = angles[mask_non_clifford]
-#     rz_non_cliff_copy = rz_non_clifford.copy()
-#     sigma_select = 0.5
-#     sigma_replace = 0.5
-#     random_state = np.random.RandomState(1)
-#     for method_select in method_select_options_list:
-#         for method_replace in method_replace_options_list:
-#             columns_to_change = _select(
-#                 rz_non_cliff_copy,
-#                 fraction_non_clifford,
-#                 method_select,
-#                 sigma_select,
-#                 random_state,
-#             )
-#             rz_non_cliff_selected = rz_non_cliff_copy[columns_to_change]
-#             rz_non_cliff_replaced = _replace(
-#                 rz_non_cliff_selected,
-#                 method_replace,
-#                 sigma_replace,
-#                 random_state,
-#             )
-#             assert _is_clifford_angle(rz_non_cliff_replaced.all())
-#             assert len(rz_non_cliff_replaced) == (
-#                 non_cliffords - int(non_cliffords * fraction_non_clifford)
-#             )
-#
-#
-
-
 def test_count_non_cliffords():
     a, b = cirq.LineQubit.range(2)
     circuit = Circuit(
