@@ -34,7 +34,6 @@ from mitiq.zne.inference import (
     ExpFactory,
     PolyExpFactory,
     AdaExpFactory,
-    ExpBayesFactory,
 )
 
 
@@ -127,13 +126,6 @@ def f_runge(x: float) -> float:
     return 1.0 / ((x - 2) ** 2 + 1.0)
 
 
-def f_exp_bayes(
-    x: float, err: float = STAT_NOISE, rnd_state: RandomState = np.random
-) -> float:
-    """Exponential decay with with parameters suiting BayesFactroy."""
-    return 0.5 + 0.5 * np.exp(-0.5 * x) + rnd_state.normal(scale=err)
-
-
 @mark.parametrize("test_f", [f_lin, f_non_lin])
 def test_noise_seeding(test_f: Callable[[float], float]):
     """Check that seeding works as expected."""
@@ -155,7 +147,6 @@ def test_noise_seeding(test_f: Callable[[float], float]):
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
-        ExpBayesFactory,
     ),
 )
 def test_get_scale_factors_static_factories(factory):
@@ -213,7 +204,6 @@ def test_get_scale_factors_adaptive_factories(factory):
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
-        ExpBayesFactory,
     ),
 )
 def test_get_expectation_values_static_factories(factory):
@@ -283,7 +273,6 @@ def test_get_expectation_values_adaptive_factories(factory):
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
-        ExpBayesFactory,
     ),
 )
 @mark.parametrize("batched", (True, False))
@@ -327,7 +316,6 @@ def test_run_sequential_and_batched(factory, batched):
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
-        ExpBayesFactory,
     ),
 )
 def test_run_batched_with_keyword_args_list(factory):
@@ -450,18 +438,6 @@ def test_poly_extr():
         fac.extrapolate(X_VALS, exp_vals, order=2, full_output=True)[0],
         zne_value,
     )
-
-
-def test_exp_bayes_extr():
-    """Test of the ExpBayesFactory's extrapolator."""
-    x_vals = np.linspace(1.0, 5.0, 20)
-    seeded_f = apply_seed_to_func(f_exp_bayes, SEED)
-    fac = ExpBayesFactory(scale_factors=x_vals)
-    assert not fac._opt_params
-    fac.run_classical(seeded_f)
-    zne_value = fac.reduce()
-    assert np.isclose(zne_value, seeded_f(0, err=0), atol=CLOSE_TOL)
-    assert np.isclose(fac._zne_curve(0), seeded_f(0, err=0), atol=CLOSE_TOL)
 
 
 @mark.parametrize("order", [2, 3, 4, 5])
@@ -670,8 +646,7 @@ def test_avoid_log_keyword():
 
 
 @mark.parametrize(
-    "factory",
-    (LinearFactory, RichardsonFactory, FakeNodesFactory, ExpBayesFactory,),
+    "factory", (LinearFactory, RichardsonFactory, FakeNodesFactory)
 )
 def test_too_few_scale_factors(factory):
     """Test less than 2 scale_factors."""
@@ -875,8 +850,7 @@ def test_params_cov_and_zne_std():
 
 
 @mark.parametrize(
-    "factory",
-    [LinearFactory, RichardsonFactory, FakeNodesFactory, ExpBayesFactory,],
+    "factory", [LinearFactory, RichardsonFactory, FakeNodesFactory]
 )
 def test_execute_with_zne_fit_fail(factory):
     """Tests errors are raised when asking for fitting parameters that can't
