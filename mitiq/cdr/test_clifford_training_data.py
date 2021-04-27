@@ -44,27 +44,6 @@ from qiskit import compiler, QuantumCircuit
 from mitiq.mitiq_qiskit.conversions import to_qiskit, from_qiskit
 
 
-def random_circuit(qubits: int, depth: int,) -> Circuit:
-    """Function to generate a random quantum circuit in cirq. The circuit is
-       based on the hardware efficient ansatz,
-    with alternating CNOT layers with randomly selected single qubit gates in
-    between.
-    Args:
-        qubits: number of qubits in circuit.
-        depth: depth of the RQC.
-    Returns:
-        cirquit: a random quantum circuit of specified depth.
-    """
-    # Get a rectangular grid of qubits.
-    qubits = cirq.GridQubit.rect(qubits, 1)
-    # Generates a random circuit on the provided qubits.
-    circuit = random_rotations_between_grid_interaction_layers_circuit(
-        qubits=qubits, depth=depth, seed=0
-    )
-    circuit.append(cirq.measure(*qubits, key="z"))
-    return circuit
-
-
 def qiskit_circuit_transpilation(circ: QuantumCircuit,) -> QuantumCircuit:
     """Decomposes qiskit circuit object into Rz, Rx(pi/2) (sx), X and CNOT \
        gates.
@@ -107,15 +86,6 @@ def qiskit_circuit_transpilation(circ: QuantumCircuit,) -> QuantumCircuit:
             cbit = circ.data[i][2][0].index
             circ_new.measure(qubit, cbit)
     return circ_new
-
-
-num_qubits = 4
-layers = 10
-num_training_circuits = 40
-fraction_non_clifford = 0.5
-circuit = cirq.circuits.Circuit(random_circuit(num_qubits, layers))
-circuit = from_qiskit(qiskit_circuit_transpilation(to_qiskit(circuit)))
-non_cliffords = count_non_cliffords(circuit)
 
 
 def random_x_z_cnot_circuit(qubits, n_moments, random_state) -> Circuit:
@@ -234,24 +204,26 @@ def test_generate_training_circuits_with_clifford_circuit():
 @pytest.mark.parametrize("method_replace", ["uniform", "gaussian", "closest"])
 @pytest.mark.parametrize("kwargs", [{}, {"sigma_select": 0.5, "sigma_replace": 0.5}])
 def test_generate_training_circuits_mega(method_select, method_replace, kwargs):
-    non_cliffords = count_non_cliffords(circuit)
+    circuit = random_x_z_cnot_circuit(qubits=4, n_moments=10, random_state=1)
+    num_train = 10
+    fraction_non_clifford = 0.1
 
     train_circuits = generate_training_circuits(
         circuit,
-        num_training_circuits,
-        fraction_non_clifford,
-        method_select,
-        method_replace,
+        num_training_circuits=num_train,
+        fraction_non_clifford=0.1,
         random_state=np.random.RandomState(13),
+        method_select=method_select,
+        method_replace=method_replace,
         **kwargs
     )
-    assert len(train_circuits) == num_training_circuits
+    assert len(train_circuits) == num_train
 
     for train_circuit in train_circuits:
         assert set(train_circuit.all_qubits()) == set(circuit.all_qubits())
         assert count_non_cliffords(
             train_circuit
-        ) == int(fraction_non_clifford * non_cliffords)
+        ) == int(fraction_non_clifford * count_non_cliffords(circuit))
 
 #
 # def test_map_to_near_cliffords():
