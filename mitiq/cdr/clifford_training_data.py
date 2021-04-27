@@ -444,40 +444,36 @@ _angle_to_probabilities = np.vectorize(_angle_to_probabilities)
 def _probabilistic_angle_to_clifford(
     ang: float, sigma: float, random_state: np.random.RandomState
 ) -> float:
-    """Function to take angle and return the Clifford angle according to the
-       probability distirbution:
+    """Returns a Clifford angle sampled from the distribution
 
                         prob = exp(-(dist/sigma)^2)
 
-    where dist is the frobenius norm from the 4 clifford angles and the gate
+    where dist is the Frobenius norm from the 4 clifford angles and the gate
     of interest. Note the usage of this function is vectorized so it takes
     and returns arrays.
 
     Args:
-        ang: angle in Rz gate.
-        sigma: width of probability distribution.
-
-    Returns:
-        Clifford angle: clifford angle to replace gate angle, calculated
-        probabilistically.
+        ang: Angle in Rz gate.
+        sigma: Width of probability distribution.
     """
-    ang = ang % (2 * np.pi)
-    S = np.array([[1, 0.0], [0.0, 1j]])
-    Rz = np.array([[1, 0.0], [0.0, np.exp(ang * 1j)]])
+    s_matrix = cirq.unitary(cirq.S)
+    rz_matrix = cirq.unitary(cirq.rz(ang % (2 * np.pi)))
+
     dists = []
-    for i in range(4):
-        if i == 0:
-            i = 4
-        diff = np.linalg.norm(Rz - S ** (i))
+    # TODO: Update loop / if.
+    for exponent in range(4):
+        if exponent == 0:
+            exponent = 4
+        diff = np.linalg.norm(rz_matrix - s_matrix ** exponent)
         dists.append(np.exp(-((diff / sigma) ** 2)))
-    prob_gate = [i / sum(dists) for i in dists]
+
     cliff_ang = random_state.choice(
-        _CLIFFORD_ANGLES, 1, replace=False, p=prob_gate
+        _CLIFFORD_ANGLES, 1, replace=False, p=np.array(dists) / np.sum(dists)
     )
     return cliff_ang
 
 
-# vectorize so function can take array of angles.
+# Vectorize so function can take array of angles.
 _probabilistic_angle_to_clifford = np.vectorize(
     _probabilistic_angle_to_clifford
 )

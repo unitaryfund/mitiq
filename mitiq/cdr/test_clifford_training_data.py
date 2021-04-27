@@ -167,7 +167,6 @@ def test_generate_training_circuits_mega(method_select, method_replace, kwargs):
         ) == int(fraction_non_clifford * count_non_cliffords(circuit))
 
 
-#
 # def test_select():
 #     method_select_options_list = ["uniform", "gaussian"]
 #     non_cliffords = count_non_cliffords(circuit)
@@ -194,7 +193,7 @@ def test_generate_training_circuits_mega(method_select, method_replace, kwargs):
 #         assert len(columns_to_change) == (
 #             non_cliffords - int(non_cliffords * fraction_non_clifford)
 #         )
-#
+
 #
 # def test_replace():
 #     method_select_options_list = ["uniform", "gaussian"]
@@ -291,15 +290,15 @@ def test_generate_training_circuits_mega(method_select, method_replace, kwargs):
 #         for probs in a:
 #             assert isinstance(probs, float)
 #
-#
-# def test_probabilistic_angles_to_clifford():
-#     random_state = np.random.RandomState(1)
-#     for sigma in np.linspace(0.1, 2, 20):
-#         a = _probabilistic_angle_to_clifford(
-#             _CLIFFORD_ANGLES, sigma, random_state
-#         )
-#         for ang in a:
-#             for cliff in _CLIFFORD_ANGLES:
-#                 if ang == cliff:
-#                     check = True
-#             assert check
+
+def test_probabilistic_angles_to_clifford():
+    random_state = np.random.RandomState(1)
+    for sigma in np.linspace(0.1, 2, 20):
+        a = _probabilistic_angle_to_clifford(
+            _CLIFFORD_ANGLES, sigma, random_state
+        )
+        for ang in a:
+            for cliff in _CLIFFORD_ANGLES:
+                if ang == cliff:
+                    check = True
+            assert check
