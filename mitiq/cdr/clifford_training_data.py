@@ -13,9 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Functions for mapping circuits to near-Clifford circuits for creating
-training data.
-"""
+"""Functions for mapping circuits to near-Clifford circuits."""
 from copy import deepcopy
 from typing import Iterable, List, Optional, Sequence, Union
 
@@ -55,9 +53,9 @@ def generate_training_circuits(
         num_training_circuits: Number of circuits in the returned training set.
         fraction_non_clifford: The (approximate) fraction of non-Clifford
             gates in each returned circuit.
-        method_select: The way in which the non-Clifford gates are selected to 
-            be replaced by Clifford gates. Options are 'uniform' or 'gaussian'.
-        method_replace: The way in which selected non-Clifford gates are 
+        method_select: Method by which non-Clifford gates are selected to be
+            replaced by Clifford gates. Options are 'uniform' or 'gaussian'.
+        method_replace: Method by which selected non-Clifford gates are
             replaced by Clifford gates. Options are 'uniform', 'gaussian' or 
             'closest'.
         random_state: Seed for sampling.
@@ -85,20 +83,19 @@ def generate_training_circuits(
     non_clifford_indices = non_clifford_indices_and_ops[:, 0]
     non_clifford_ops = non_clifford_indices_and_ops[:, 1]
 
+    # Replace (some of) the non-Clifford operations.
     near_clifford_circuits = []
-
-    for random_state in random_states:
+    for rng in random_states:
         new_ops = _map_to_near_clifford_new(
             non_clifford_ops,
             fraction_non_clifford,
             method_select,
             method_replace,
-            random_state,
+            rng,
             **kwargs
         )
-
-    # TODO: Replace operations[non_clifford_indices] <- new_ops.
-    #  Create a circuit from this and add that circuit to near_clifford_circuits.
+        operations[[int(i) for i in non_clifford_indices]] = new_ops
+        near_clifford_circuits.append(Circuit(operations))
 
     return near_clifford_circuits
 
@@ -170,7 +167,8 @@ def _map_to_near_clifford_new(
 
     # Return sequence of (near) Clifford operations.
     return [
-        clifford_ops.pop(0) if i in indices_of_selected_ops else op for (i, op) in enumerate(non_clifford_ops)
+        clifford_ops.pop(0) if i in indices_of_selected_ops else op
+        for (i, op) in enumerate(non_clifford_ops)
     ]
 
 
@@ -293,6 +291,24 @@ def _replace_new(
             [op.qubits for op in non_clifford_ops],
         )
     ]
+
+
+def is_clifford(op_like: cirq.ops.OP_TREE) -> bool:
+    """Returns True if the input argument is Clifford, else False.
+
+    Args:
+        op_like: A single operation, list of operations, or circuit.
+    """
+    try:
+        circuit = cirq.Circuit(op_like)
+    except TypeError:
+        raise ValueError("Could not convert `op_like` to a circuit.")
+
+    for op in circuit.all_operations():
+        if not _is_clifford(op):
+            return False
+
+    return True
 
 
 def _is_clifford(op: cirq.ops.Operation) -> bool:

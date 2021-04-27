@@ -23,6 +23,7 @@ from pytest import raises
 from clifford_training_data import (
     _is_clifford_angle,
     _is_clifford,
+    is_clifford,
     _map_to_near_clifford_new,
     _select_new,
     _replace_new,
@@ -33,8 +34,6 @@ from clifford_training_data import (
     _probabilistic_angle_to_clifford,
     count_non_cliffords,
     generate_training_circuits,
-    _replace,
-    _select,
     _CLIFFORD_ANGLES,
 )
 from cirq.experiments import (
@@ -122,7 +121,6 @@ circuit = from_qiskit(qiskit_circuit_transpilation(to_qiskit(circuit)))
 non_cliffords = count_non_cliffords(circuit)
 
 
-
 def random_x_z_cnot_circuit(qubits, n_moments, random_state) -> Circuit:
     angles = np.linspace(0.0, 2 * np.pi, 8)
     oneq_gates = [gate(a) for a in angles for gate in
@@ -139,49 +137,17 @@ def random_x_z_cnot_circuit(qubits, n_moments, random_state) -> Circuit:
     )
 
 
-def test_something():
+def test_generate_training_circuits():
     circuit = random_x_z_cnot_circuit(
-        qubits=cirq.LineQubit.range(5),
-        n_moments=10,
-        random_state=np.random.RandomState(1)
+        cirq.LineQubit.range(3), n_moments=5, random_state=1
     )
-    print(circuit)
+    assert not is_clifford(circuit)
 
-    operations = np.array(list(circuit.all_operations()))
-    gates = np.array([op.gate for op in operations])
-    qubits = np.array([op.qubits[0] for op in operations])
-    positions = np.array(range(len(gates)))
-
-    zgatesmask = np.array(
-        [isinstance(gate, cirq.ops.common_gates.ZPowGate) for gate in gates]
+    clifford_circuit, = generate_training_circuits(
+        circuit, num_training_circuits=1, fraction_non_clifford=0.0
     )
+    assert is_clifford(clifford_circuit)
 
-    print(zgatesmask)
-
-    r_z_gates = operations[zgatesmask]
-    r_z_positions = positions[zgatesmask]
-    r_z_qubits = qubits[zgatesmask]
-
-    angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
-
-    mask_non_clifford = ~_is_clifford_angle(angles)
-    rz_non_clifford = angles[mask_non_clifford]
-    position_non_clifford = r_z_positions[mask_non_clifford]
-    qubits_non_clifford = r_z_qubits[mask_non_clifford]
-
-    print(rz_non_clifford)
-    print(position_non_clifford)
-
-    non_clifford_indices_and_ops = np.array(
-        [[i, op] for i, op in enumerate(operations) if not _is_clifford(op)]
-    )
-    non_clifford_indices = non_clifford_indices_and_ops[:, 0]
-    non_clifford_ops = non_clifford_indices_and_ops[:, 1]
-
-    print(non_clifford_indices)
-    print(non_clifford_ops)
-
-    assert False
 
 
 # def test_project_to_closest_clifford_with_clifford_ops():
