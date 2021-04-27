@@ -13,13 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""Tests for training circuits generation for Clifford data regression.
+"""
 import pytest
 
 import cirq
 from cirq.circuits import Circuit
 from random import randint, uniform
 import numpy as np
-from pytest import raises
 from clifford_training_data import (
     _is_clifford_angle,
     _is_clifford,
@@ -41,10 +42,6 @@ from cirq.experiments import (
 )
 from qiskit import compiler, QuantumCircuit
 from mitiq.mitiq_qiskit.conversions import to_qiskit, from_qiskit
-
-
-"""Tests for training circuits generation for Clifford data regression.
-"""
 
 
 def random_circuit(qubits: int, depth: int,) -> Circuit:
@@ -251,7 +248,6 @@ def test_generate_training_circuits_mega(method_select, method_replace, kwargs):
     assert len(train_circuits) == num_training_circuits
 
     for train_circuit in train_circuits:
-        assert len(train_circuit) == len(circuit)
         assert set(train_circuit.all_qubits()) == set(circuit.all_qubits())
         assert count_non_cliffords(
             train_circuit
