@@ -272,9 +272,26 @@ def test_fold_all_skip_moments(skip):
     assert _equal(folded, correct, require_qubit_equality=True)
 
 
-def test_fold_all_bad_num_folds():
-    with pytest.raises(ValueError, match="Requires scale_factor >= 1"):
-        fold_all(Circuit(), scale_factor=0.0)
+def test_folding_with_bad_scale_factor():
+    for fold_function in (
+        fold_all,
+        fold_gates_at_random,
+        fold_gates_from_left,
+        fold_gates_from_right,
+    ):
+        with pytest.raises(ValueError, match="Requires scale_factor >= 1"):
+            fold_function(Circuit(), scale_factor=0.0)
+
+
+def test_create_mask_with_bad_scale_factor():
+    for method in ("at_random", "from_right", "from_left"):
+        with pytest.raises(ValueError, match="Requires scale_factor >= 1"):
+            _create_fold_mask([1], scale_factor=0.999, folding_method=method)
+
+
+def test_create_mask_with_bad_folding_method():
+    with pytest.raises(ValueError, match="'folding_method' is not valid."):
+        _create_fold_mask([1], scale_factor=1.5, folding_method=None)
 
 
 def test_fold_all_bad_exclude():
