@@ -13,14 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Tests for training circuits generation for Clifford data regression.
-"""
+"""Tests for generating (near) Clifford circuits."""
 import pytest
+import numpy as np
 
 import cirq
 from cirq.circuits import Circuit
 from random import randint, uniform
-import numpy as np
+
 from clifford_training_data import (
     _is_clifford_angle,
     _is_clifford,
@@ -37,55 +37,6 @@ from clifford_training_data import (
     generate_training_circuits,
     _CLIFFORD_ANGLES,
 )
-from cirq.experiments import (
-    random_rotations_between_grid_interaction_layers_circuit,
-)
-from qiskit import compiler, QuantumCircuit
-from mitiq.mitiq_qiskit.conversions import to_qiskit, from_qiskit
-
-
-def qiskit_circuit_transpilation(circ: QuantumCircuit,) -> QuantumCircuit:
-    """Decomposes qiskit circuit object into Rz, Rx(pi/2) (sx), X and CNOT \
-       gates.
-    Args:
-        circ: original circuit of interest assumed to be qiskit circuit object.
-    Returns:
-        circ_new: new circuite compiled and decomposed into the above gate set.
-    """
-    # this decomposes the circuit into u3 and cnot gates:
-    circ = compiler.transpile(
-        circ, basis_gates=["sx", "rz", "cx", "x"], optimization_level=3
-    )
-    # print(circ.draw())
-    # now for each U3(theta, phi, lambda), this can be converted into
-    # Rz(phi+pi)Rx(pi/2)Rz(theta+pi)Rx(pi/2)Rz(lambda)
-    circ_new = QuantumCircuit(len(circ.qubits), len(circ.clbits))
-    for i in range(len(circ.data)):
-        # get information for the gate
-        gate = circ.data[i][0]
-        name = gate.name
-        if name == "cx":
-            qubit = [circ.data[i][1][0].index, circ.data[i][1][1].index]
-            parameters = []
-            circ_new.cx(qubit[0], qubit[1])
-        if name == "rz":
-            parameters = (float(gate.params[0])) % (2 * np.pi)
-            # leave out empty Rz gates:
-            if parameters != 0:
-                qubit = circ.data[i][1][0].index
-                circ_new.rz(parameters, qubit)
-        if name == "sx":
-            parameters = np.pi / 2
-            qubit = circ.data[i][1][0].index
-            circ_new.rx(parameters, qubit)
-        if name == "x":
-            qubit = circ.data[i][1][0].index
-            circ_new.x(qubit)
-        elif name == "measure":
-            qubit = circ.data[i][1][0].index
-            cbit = circ.data[i][2][0].index
-            circ_new.measure(qubit, cbit)
-    return circ_new
 
 
 def random_x_z_cnot_circuit(qubits, n_moments, random_state) -> Circuit:
