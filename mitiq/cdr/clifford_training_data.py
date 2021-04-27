@@ -67,7 +67,7 @@ def generate_training_circuits(
                 ``method_replace='gaussian'``.
 
     .. [Czarnik2020] : Piotr Czarnik, Andrew Arramsmith, Parick Coles,
-        Lukasz Cincio, "Error mitigation with Clifford quantum circuit 
+        Lukasz Cincio, "Error mitigation with Clifford quantum circuit
         data," (https://arxiv.org/abs/2005.10189).
     """
     if isinstance(random_state, int):
