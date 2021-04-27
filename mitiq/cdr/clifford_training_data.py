@@ -374,26 +374,14 @@ def _random_clifford(
     )
 
 
-def count_non_cliffords(circuit: Circuit,) -> float:
-    """Function to check how many non-Clifford gates are in a give circuit.
+def count_non_cliffords(circuit: Circuit) -> int:
+    """Returns the number of non-Clifford gates in the circuit. Assumes the
+    circuit consists of only Rz, Rx, and CNOT operations.
 
     Args:
-        circuit: cirq.Circuit object already decomposed into the basis
-                 {Rz, Rx(pi/2), CNOT, X}
-
-    Returns:
-        number of non-Clifford gates in the given circuit.
+        circuit: Circuit to count the number of non-Clifford gates of.
     """
-    operations = np.array(list(circuit.all_operations()))
-    gates = np.array([op.gate for op in operations])
-    mask = np.array(
-        [isinstance(i, cirq.ops.common_gates.ZPowGate) for i in gates]
-    )
-    r_z_gates = operations[mask]
-    angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
-    mask_non_clifford = ~_is_clifford_angle(angles)
-    rz_non_clifford = angles[mask_non_clifford]
-    return len(rz_non_clifford)
+    return sum(not _is_clifford(op) for op in circuit.all_operations())
 
 
 def _is_clifford_angle(ang: float, tol: float = 10 ** -5,) -> bool:

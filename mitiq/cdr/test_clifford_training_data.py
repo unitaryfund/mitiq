@@ -246,42 +246,40 @@ def test_generate_training_circuits_mega(method_select, method_replace, kwargs):
 #         assert type(arg) == np.float64
 #
 #
-# def test_count_non_cliffords():
-#     number_non_cliffords = 0
-#     example_circuit = QuantumCircuit(1)
-#     for i in range(100):
-#         rand = randint(1, 2)
-#         rand2 = randint(1, 4) - 1
-#         if rand % 2 == 0:
-#             example_circuit.rz(_CLIFFORD_ANGLES[rand2], 0)
-#         else:
-#             example_circuit.rz(uniform(0, 2 * np.pi), 0)
-#             number_non_cliffords += 1
-#         example_circuit = from_qiskit(example_circuit)
-#         assert count_non_cliffords(example_circuit) == number_non_cliffords
-#         example_circuit = to_qiskit(example_circuit)
-#
-#
-# def test_is_clifford_angle():
-#     cliff_angs = np.array(_CLIFFORD_ANGLES)
-#
-#     for i in range(15):
-#         assert _is_clifford_angle(int(i) * cliff_angs).all()
-#         ang = uniform(0, 2 * np.pi)
-#         assert not _is_clifford_angle(ang)
-#
-#
-# def test_closest_clifford():
-#     for ang in _CLIFFORD_ANGLES:
-#         angs = np.linspace(ang - np.pi / 4 + 0.01, ang + np.pi / 4 - 0.01)
-#         for a in angs:
-#             assert _closest_clifford(a) == ang
-#
-#
-# def test_random_clifford():
-#     assert set(
-#         _random_clifford(20, np.random.RandomState(1))
-#     ).issubset(_CLIFFORD_ANGLES)
+def test_count_non_cliffords():
+    a, b = cirq.LineQubit.range(2)
+    circuit = Circuit(
+        cirq.ops.rz(0.0).on(a),  # Clifford.
+        cirq.ops.rx(0.1).on(b),  # Clifford.
+        cirq.ops.rz(0.4).on(b),  # Non-Clifford.
+        cirq.ops.CNOT.on(a, b),  # Clifford.
+    )
+
+    assert count_non_cliffords(circuit) == 1
+
+
+def test_count_non_cliffords_empty():
+    assert count_non_cliffords(Circuit()) == 0
+
+
+def test_is_clifford_angle():
+    for p in range(4):
+        assert _is_clifford_angle(p * np.array(_CLIFFORD_ANGLES)).all()
+
+    assert not _is_clifford_angle(-0.17)
+
+
+def test_closest_clifford():
+    for ang in _CLIFFORD_ANGLES:
+        angs = np.linspace(ang - np.pi / 4 + 0.01, ang + np.pi / 4 - 0.01)
+        for a in angs:
+            assert _closest_clifford(a) == ang
+
+
+def test_random_clifford():
+    assert set(
+        _random_clifford(20, np.random.RandomState(1))
+    ).issubset(_CLIFFORD_ANGLES)
 
 
 def test_angle_to_probabilities():
