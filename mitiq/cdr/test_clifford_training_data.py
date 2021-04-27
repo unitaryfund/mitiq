@@ -232,58 +232,58 @@ def test_generate_training_circuits_with_clifford_circuit():
             fraction_non_clifford=0.0,
         )
 
-# def test_generate_training_circuits_mega():
-#     """Test that generate_training_circuits function is working properly with
-#     the random projection method.
-#     """
-#     method_select_options_list = ["uniform", "gaussian"]
-#     method_replace_options_list = ["uniform", "gaussian", "closest"]
-#     additional_options = {"sigma_select": 0.5, "sigma_replace": 0.5}
-#     non_cliffords = count_non_cliffords(circuit)
-#     random_state = 13
-#
-#     for method_select in method_select_options_list:
-#         for method_replace in method_replace_options_list:
-#             test_training_set_circuits = generate_training_circuits(
-#                 circuit,
-#                 num_training_circuits,
-#                 fraction_non_clifford,
-#                 method_select,
-#                 method_replace,
-#             )
-#             test_training_circuits_with_options = generate_training_circuits(
-#                 circuit,
-#                 num_training_circuits,
-#                 fraction_non_clifford,
-#                 method_select,
-#                 method_replace,
-#                 random_state,
-#                 kwargs=additional_options,
-#             )
-#             assert len(test_training_set_circuits) == num_training_circuits
-#
-#             assert (
-#                 len(test_training_circuits_with_options)
-#                 == num_training_circuits
-#             )
-#
-#             for i in range(num_training_circuits):
-#                 assert count_non_cliffords(
-#                     test_training_set_circuits[i]
-#                 ) == int(fraction_non_clifford * non_cliffords)
-#                 assert len(test_training_set_circuits[i]) == len(circuit)
-#                 assert len(test_training_set_circuits[i].all_qubits()) == len(
-#                     circuit.all_qubits()
-#                 )
-#                 assert count_non_cliffords(
-#                     test_training_circuits_with_options[i]
-#                 ) == int(fraction_non_clifford * non_cliffords)
-#                 assert len(test_training_circuits_with_options[i]) == len(
-#                     circuit
-#                 )
-#                 assert len(
-#                     test_training_circuits_with_options[i].all_qubits()
-#                 ) == len(circuit.all_qubits())
+def test_generate_training_circuits_mega():
+    """Test that generate_training_circuits function is working properly with
+    the random projection method.
+    """
+    method_select_options_list = ["uniform", "gaussian"]
+    method_replace_options_list = ["uniform", "gaussian", "closest"]
+    additional_options = {"sigma_select": 0.5, "sigma_replace": 0.5}
+    non_cliffords = count_non_cliffords(circuit)
+    random_state = 13
+
+    for method_select in method_select_options_list:
+        for method_replace in method_replace_options_list:
+            test_training_set_circuits = generate_training_circuits(
+                circuit,
+                num_training_circuits,
+                fraction_non_clifford,
+                method_select,
+                method_replace,
+            )
+            test_training_circuits_with_options = generate_training_circuits(
+                circuit,
+                num_training_circuits,
+                fraction_non_clifford,
+                method_select,
+                method_replace,
+                random_state,
+                kwargs=additional_options,
+            )
+            assert len(test_training_set_circuits) == num_training_circuits
+
+            assert (
+                len(test_training_circuits_with_options)
+                == num_training_circuits
+            )
+
+            for i in range(num_training_circuits):
+                assert count_non_cliffords(
+                    test_training_set_circuits[i]
+                ) == int(fraction_non_clifford * non_cliffords)
+                assert len(test_training_set_circuits[i]) == len(circuit)
+                assert len(test_training_set_circuits[i].all_qubits()) == len(
+                    circuit.all_qubits()
+                )
+                assert count_non_cliffords(
+                    test_training_circuits_with_options[i]
+                ) == int(fraction_non_clifford * non_cliffords)
+                assert len(test_training_circuits_with_options[i]) == len(
+                    circuit
+                )
+                assert len(
+                    test_training_circuits_with_options[i].all_qubits()
+                ) == len(circuit.all_qubits())
 
 #
 # def test_map_to_near_cliffords():

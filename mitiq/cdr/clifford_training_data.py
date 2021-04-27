@@ -320,6 +320,10 @@ def _is_clifford(op: cirq.ops.Operation) -> bool:
         and op.gate.exponent % 2 in _CLIFFORD_EXPONENTS
     ):
         return True
+
+    # Ignore measurements.
+    if isinstance(op.gate, cirq.ops.MeasurementGate):
+        return True
     # TODO: Could add additional logic here.
     return False
 
