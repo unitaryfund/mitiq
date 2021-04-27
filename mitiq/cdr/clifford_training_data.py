@@ -197,7 +197,7 @@ def _select(
                       method_select = 'gaussian'.
         random_state: Random state for sampling.
     Returns:
-        list of indicies that identify rotation angles to change.
+        list of indices that identify rotation angles to change.
 
     Raises:
         Exception: If argument 'method_select' is neither 'uniform' nor
@@ -326,20 +326,6 @@ def _is_clifford(op: cirq.ops.Operation) -> bool:
         return True
     # TODO: Could add additional logic here.
     return False
-
-
-def _project_to_closest_clifford(
-    ops: Iterable[cirq.ops.Operation],
-) -> List[cirq.ops.Operation]:
-    clifford_ops = []
-    for op in ops:
-        new_exponent = _CLIFFORD_EXPONENTS[
-            np.argmin(np.abs(op.gate.exponent - _CLIFFORD_EXPONENTS))
-        ]
-        new_op = deepcopy(op)
-        new_op.gate._exponent = new_exponent
-        clifford_ops.append(new_op)
-    return clifford_ops
 
 
 def _closest_clifford(ang: float) -> float:

@@ -28,7 +28,6 @@ from mitiq.cdr.clifford_training_data import (
     _map_to_near_clifford,
     _select,
     _replace,
-    _project_to_closest_clifford,
     _closest_clifford,
     _random_clifford,
     _angle_to_probabilities,
@@ -67,14 +66,6 @@ def test_generate_training_circuits():
     assert is_clifford(clifford_circuit)
 
 
-
-# def test_project_to_closest_clifford_with_clifford_ops():
-#     ops = [cirq.ops.rz(a).on(cirq.LineQubit(0)) for a in (0, 0.5, 1.0, 1.5)]
-#     clifford_ops = _project_to_closest_clifford(ops)
-#     print(clifford_ops)
-#     assert False
-
-
 @pytest.mark.parametrize("method", ("uniform", "gaussian"))
 def test_select_all(method):
     q = cirq.LineQubit(0)
@@ -110,7 +101,7 @@ def test_replace(method):
 
 def test_map_to_near_clifford():
     q = cirq.LineQubit(0)
-    ops = [cirq.ops.rz(0.01).on(q), cirq.ops.rz(-0.77).on(q)]
+    ops = [cirq.ops.rz(np.pi / 2.0 + 0.01).on(q), cirq.ops.rz(-0.22).on(q)]
 
     new_ops = _map_to_near_clifford(
         ops,
@@ -119,9 +110,8 @@ def test_map_to_near_clifford():
         method_replace="uniform",
         seed=1,
     )
-    print(new_ops)
-
-    assert False
+    expected_ops = [cirq.rz(np.pi * 0.5).on(q), cirq.rz(0.0).on(q)]
+    assert new_ops == expected_ops
 
 
 def test_generate_training_circuits_bad_methods():
@@ -176,66 +166,7 @@ def test_generate_training_circuits_mega(method_select, method_replace, kwargs):
             train_circuit
         ) == int(fraction_non_clifford * count_non_cliffords(circuit))
 
-#
-# def test_map_to_near_cliffords():
-#     method_select_options_list = ["uniform", "gaussian"]
-#     method_replace_options_list = ["uniform", "gaussian", "closest"]
-#     additional_options = {"sigma_select": 0.5, "sigma_replace": 0.5}
-#     non_cliffords = count_non_cliffords(circuit)
-#     random_state = np.random.RandomState(1)
-#     operations = np.array(list(circuit.all_operations()))
-#     gates = np.array([op.gate for op in operations])
-#     qubits = np.array([op.qubits[0] for op in operations])
-#     positions = np.array(range(0, len(gates)))
-#     zgatesmask = np.array(
-#         [isinstance(gate, cirq.ops.common_gates.ZPowGate) for gate in gates]
-#     )
-#     r_z_gates = operations[zgatesmask]
-#     r_z_positions = positions[zgatesmask]
-#     r_z_qubits = qubits[zgatesmask]
-#     angles = angles = np.array([op.gate.exponent * np.pi for op in r_z_gates])
-#     mask_non_clifford = ~_is_clifford_angle(angles)
-#     rz_non_clifford = angles[mask_non_clifford]
-#     position_non_clifford = r_z_positions[mask_non_clifford]
-#     qubits_non_cliff = r_z_qubits[mask_non_clifford]
-#     for method_select in method_select_options_list:
-#         for method_replace in method_replace_options_list:
-#             projected_circuit = _map_to_near_clifford(
-#                 operations.copy(),
-#                 rz_non_clifford.copy(),
-#                 position_non_clifford.copy(),
-#                 qubits_non_cliff.copy(),
-#                 fraction_non_clifford,
-#                 random_state,
-#                 method_select,
-#                 method_replace,
-#             )
-#             projected_circuit_with_options = _map_to_near_clifford(
-#                 operations.copy(),
-#                 rz_non_clifford.copy(),
-#                 position_non_clifford.copy(),
-#                 qubits_non_cliff.copy(),
-#                 fraction_non_clifford,
-#                 random_state,
-#                 method_select,
-#                 method_replace,
-#                 kwargs=additional_options,
-#             )
-#             assert count_non_cliffords(projected_circuit) == int(
-#                 fraction_non_clifford * non_cliffords
-#             )
-#             assert len(projected_circuit) == len(circuit)
-#             assert len(projected_circuit.all_qubits()) == len(
-#                 circuit.all_qubits()
-#             )
-#             assert count_non_cliffords(projected_circuit_with_options) == int(
-#                 fraction_non_clifford * non_cliffords
-#             )
-#             assert len(projected_circuit_with_options) == len(circuit)
-#             assert len(projected_circuit_with_options.all_qubits()) == len(
-#                 circuit.all_qubits()
-#             )
-#
+
 #
 # def test_select():
 #     method_select_options_list = ["uniform", "gaussian"]
