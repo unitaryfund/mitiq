@@ -80,13 +80,13 @@ def generate_training_circuits(
     non_clifford_indices_and_ops = np.array(
         [[i, op] for i, op in enumerate(operations) if not _is_clifford(op)]
     )
-    non_clifford_indices = non_clifford_indices_and_ops[:, 0]
+    non_clifford_indices = np.int32(non_clifford_indices_and_ops[:, 0])
     non_clifford_ops = non_clifford_indices_and_ops[:, 1]
 
     # Replace (some of) the non-Clifford operations.
     near_clifford_circuits = []
     for rng in random_states:
-        new_ops = _map_to_near_clifford_new(
+        new_ops = _map_to_near_clifford(
             non_clifford_ops,
             fraction_non_clifford,
             method_select,
@@ -94,13 +94,13 @@ def generate_training_circuits(
             rng,
             **kwargs
         )
-        operations[[int(i) for i in non_clifford_indices]] = new_ops
+        operations[non_clifford_indices] = new_ops
         near_clifford_circuits.append(Circuit(operations))
 
     return near_clifford_circuits
 
 
-def _map_to_near_clifford_new(
+def _map_to_near_clifford(
     non_clifford_ops: Sequence[cirq.ops.Operation],
     fraction_non_clifford: float,
     method_select: str = "uniform",
@@ -140,7 +140,7 @@ def _map_to_near_clifford_new(
     random_state_replace = np.random.RandomState(seed_replace)
 
     # Select (indices of) operations to replace.
-    indices_of_selected_ops = _select_new(
+    indices_of_selected_ops = _select(
         non_clifford_ops,
         fraction_non_clifford,
         method_select,
@@ -155,7 +155,7 @@ def _map_to_near_clifford_new(
     print(*[non_clifford_ops[i] for i in indices_of_selected_ops], sep="\n")
 
     # Replace selected operations.
-    clifford_ops = _replace_new(
+    clifford_ops = _replace(
         [non_clifford_ops[i] for i in indices_of_selected_ops],
         method_replace,
         sigma_replace,
@@ -172,7 +172,7 @@ def _map_to_near_clifford_new(
     ]
 
 
-def _select_new(
+def _select(
     non_clifford_ops: Sequence[cirq.ops.Operation],
     fraction_non_clifford: float,
     method: str = "uniform",
@@ -233,7 +233,7 @@ def _select_new(
     return selected_indices
 
 
-def _replace_new(
+def _replace(
     non_clifford_ops: Sequence[cirq.ops.Operation],
     method: str = "uniform",
     sigma: float = 1.0,
@@ -304,11 +304,7 @@ def is_clifford(op_like: cirq.ops.OP_TREE) -> bool:
     except TypeError:
         raise ValueError("Could not convert `op_like` to a circuit.")
 
-    for op in circuit.all_operations():
-        if not _is_clifford(op):
-            return False
-
-    return True
+    return all(_is_clifford(op) for op in circuit.all_operations())
 
 
 def _is_clifford(op: cirq.ops.Operation) -> bool:

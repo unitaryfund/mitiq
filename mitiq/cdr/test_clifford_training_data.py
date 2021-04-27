@@ -24,9 +24,9 @@ from clifford_training_data import (
     _is_clifford_angle,
     _is_clifford,
     is_clifford,
-    _map_to_near_clifford_new,
-    _select_new,
-    _replace_new,
+    _map_to_near_clifford,
+    _select,
+    _replace,
     _project_to_closest_clifford,
     _closest_clifford,
     _random_clifford,
@@ -161,7 +161,7 @@ def test_generate_training_circuits():
 def test_select_all(method):
     q = cirq.LineQubit(0)
     ops = [cirq.ops.rz(0.01).on(q), cirq.ops.rz(-0.77).on(q)]
-    indices = _select_new(ops, 0.0, method=method, random_state=np.random.RandomState(1))
+    indices = _select(ops, 0.0, method=method, random_state=np.random.RandomState(1))
     assert np.allclose(indices, np.array(list(range(len(ops)))))
 
 
@@ -170,13 +170,13 @@ def test_select_some(method):
     n = 10  # Number to select.
     q = cirq.GridQubit(1, 1)
     ops = [cirq.ops.rz(a).on(q) for a in np.random.randn(n)]
-    indices = _select_new(ops, fraction_non_clifford=0.5, method=method)
+    indices = _select(ops, fraction_non_clifford=0.5, method=method)
     assert len(indices) == n // 2
 
 
 def test_select_bad_method():
     with pytest.raises(ValueError, match="Arg `method_select` must be"):
-        _select_new([], fraction_non_clifford=0.0, method="unknown method")
+        _select([], fraction_non_clifford=0.0, method="unknown method")
 
 
 @pytest.mark.parametrize("method", ("closest", "uniform", "gaussian"))
@@ -184,7 +184,7 @@ def test_replace(method):
     q = cirq.LineQubit(0)
     ops = [cirq.ops.rz(0.01).on(q), cirq.ops.rz(-0.77).on(q)]
 
-    new_ops = _replace_new(non_clifford_ops=ops, method=method, random_state=np.random.RandomState(1))
+    new_ops = _replace(non_clifford_ops=ops, method=method, random_state=np.random.RandomState(1))
 
     assert len(new_ops) == len(ops)
     assert all(_is_clifford(op) for op in new_ops)
@@ -194,7 +194,7 @@ def test_map_to_near_clifford():
     q = cirq.LineQubit(0)
     ops = [cirq.ops.rz(0.01).on(q), cirq.ops.rz(-0.77).on(q)]
 
-    new_ops = _map_to_near_clifford_new(
+    new_ops = _map_to_near_clifford(
         ops,
         fraction_non_clifford=0.0,
         method_select="uniform",
