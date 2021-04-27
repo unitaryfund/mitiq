@@ -420,24 +420,26 @@ def _angle_to_probabilities(angle: float, sigma: float) -> float:
 
     Args:
         angle: angle to form probability distribution.
+
     Returns:
         discrete value of probability distribution calucalted from
         Prob_project = exp(-(dist/sigma)^2) where dist = sum(dists) is the
         sum of distances from each Clifford gate.
     """
-    angle = angle % (2 * np.pi)
-    S = np.array([[1, 0.0], [0.0, 1j]])
-    Rz = np.array([[1, 0.0], [0.0, np.exp(angle * 1j)]])
+    # TODO: Code duplication with function below.
+    s_matrix = cirq.unitary(cirq.S)
+    rz_matrix = cirq.unitary(cirq.rz(angle % (2 * np.pi)))
+
     dists = []
-    for i in range(4):
-        if i == 0:
-            i = 4
-        diff = np.linalg.norm(Rz - S ** (i))
+    for exponent in range(4):
+        if exponent == 0:
+            exponent = 4
+        diff = np.linalg.norm(rz_matrix - s_matrix ** exponent)
         dists.append(np.exp(-((diff / sigma) ** 2)))
     return sum(dists)
 
 
-# vectorize so function can take array of angles.
+# Vectorize so function can take array of angles.
 _angle_to_probabilities = np.vectorize(_angle_to_probabilities)
 
 

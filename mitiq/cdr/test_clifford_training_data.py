@@ -282,14 +282,13 @@ def test_generate_training_circuits_mega(method_select, method_replace, kwargs):
 #     assert set(
 #         _random_clifford(20, np.random.RandomState(1))
 #     ).issubset(_CLIFFORD_ANGLES)
-#
-#
-# def test_angle_to_probabilities():
-#     for sigma in np.linspace(0.1, 2, 20):
-#         a = _angle_to_probabilities(_CLIFFORD_ANGLES, sigma)
-#         for probs in a:
-#             assert isinstance(probs, float)
-#
+
+
+def test_angle_to_probabilities():
+    for sigma in np.linspace(0.1, 2, 10):
+        probabilities = _angle_to_probabilities(_CLIFFORD_ANGLES, sigma)
+        assert all(isinstance(p, float) for p in probabilities)
+
 
 def test_probabilistic_angles_to_clifford():
     for sigma in np.linspace(0.1, 2, 10):
