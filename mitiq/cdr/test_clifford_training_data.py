@@ -234,6 +234,12 @@ def test_random_clifford():
     )
 
 
+def test_make_probability_distribution():
+    for sigma in np.linspace(0.1, 2, 10):
+        probabilities = _angle_to_probabilities(_CLIFFORD_ANGLES, sigma)
+        assert all(isinstance(p, float) for p in probabilities)
+
+
 def test_angle_to_probabilities():
     for sigma in np.linspace(0.1, 2, 10):
         probabilities = _angle_to_probabilities(_CLIFFORD_ANGLES, sigma)
