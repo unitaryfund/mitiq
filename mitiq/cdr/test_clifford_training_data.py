@@ -174,7 +174,7 @@ def test_generate_training_circuits_mega(
     for train_circuit in train_circuits:
         assert set(train_circuit.all_qubits()) == set(circuit.all_qubits())
         assert count_non_cliffords(train_circuit) == int(
-            fraction_non_clifford * count_non_cliffords(circuit)
+            round(fraction_non_clifford * count_non_cliffords(circuit))
         )
 
 
