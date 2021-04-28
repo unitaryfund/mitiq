@@ -40,7 +40,7 @@ def generate_training_circuits(
     r"""Returns a list of (near) Clifford circuits obtained by replacing (some)
     non-Clifford gates in the input circuit by Clifford gates.
 
-    The way in which non-Clifford gates are selected to be replaced
+    The way in which non-Clifford gates are selected to be replaced / replaced
     is determined by ``method_select`` and ``method_replace``.
 
     In the Clifford Data Regression (CDR) method [Czarnik2020]_, data
@@ -49,7 +49,7 @@ def generate_training_circuits(
 
     Args:
         circuit: A circuit of interest assumed to be compiled into the gate
-            set {Rz, X^(1/2), CNOT}, or such that all the non-Clifford gates
+            set {Rz, sqrt(X), CNOT}, or such that all the non-Clifford gates
             are contained in the Rz rotations.
         num_training_circuits: Number of circuits in the returned training set.
         fraction_non_clifford: The (approximate) fraction of non-Clifford
@@ -61,10 +61,10 @@ def generate_training_circuits(
             'closest'.
         random_state: Seed for sampling.
         kwargs: Available keyword arguments are:
-            - sigma_select (float): Width of the Gaussian distribution used for
-            ``method_select='gaussian'``.
-            - sigma_replace (float): Width of the Gaussian distribution used
-            for ``method_replace='gaussian'``.
+            sigma_select (float): Width of the Gaussian distribution used for
+                ``method_select='gaussian'``.
+            sigma_replace (float): Width of the Gaussian distribution used for
+                ``method_replace='gaussian'``.
 
     .. [Czarnik2020] : Piotr Czarnik, Andrew Arramsmith, Parick Coles,
         Lukasz Cincio, "Error mitigation with Clifford quantum circuit
@@ -72,11 +72,6 @@ def generate_training_circuits(
     """
     if random_state is None or isinstance(random_state, int):
         random_state = np.random.RandomState(random_state)
-
-    # Seeds used for each training circuit construction.
-    random_states = random_state.randint(
-        10_000 * num_training_circuits, size=num_training_circuits
-    )
 
     # Find the non-Clifford operations in the circuit.
     operations = np.array(list(circuit.all_operations()))
@@ -91,13 +86,13 @@ def generate_training_circuits(
 
     # Replace (some of) the non-Clifford operations.
     near_clifford_circuits = []
-    for rng in random_states:
+    for _ in range(num_training_circuits):
         new_ops = _map_to_near_clifford(
             non_clifford_ops,
             fraction_non_clifford,
             method_select,
             method_replace,
-            rng,
+            random_state,
             **kwargs,
         )
         operations[non_clifford_indices] = new_ops
@@ -137,7 +132,7 @@ def _map_to_near_clifford(
     fraction_non_clifford: float,
     method_select: str = "uniform",
     method_replace: str = "closest",
-    seed: Optional[int] = None,
+    random_state: Optional[np.random.RandomState] = None,
     **kwargs: dict,
 ) -> Sequence[cirq.ops.Operation]:
     """Returns the list of non-Clifford operations with some of these replaced
@@ -152,7 +147,7 @@ def _map_to_near_clifford(
         method_replace: The way in which selected non-Clifford gates are
             replaced by Clifford gates. Options are 'uniform', 'gaussian' or
             'closest'.
-        seed: Seed for sampling.
+        random_state: Seed for sampling.
         kwargs: Additional options for selection / replacement methods.
             sigma_select (float): Width of the Gaussian distribution used for
                 ``method_select='gaussian'``.
@@ -162,18 +157,13 @@ def _map_to_near_clifford(
     sigma_select = kwargs.get("sigma_select", 0.5)
     sigma_replace = kwargs.get("sigma_replace", 0.5)
 
-    state = np.random.RandomState(seed)
-    seed_select, seed_replace = state.randint(1e8, size=2,)
-    random_state_select = np.random.RandomState(seed_select)
-    random_state_replace = np.random.RandomState(seed_replace)
-
     # Select (indices of) operations to replace.
     indices_of_selected_ops = _select(
         non_clifford_ops,
         fraction_non_clifford,
         method_select,
         sigma_select,
-        random_state_select,
+        random_state,
     )
 
     # Replace selected operations.
@@ -181,7 +171,7 @@ def _map_to_near_clifford(
         [non_clifford_ops[i] for i in indices_of_selected_ops],
         method_replace,
         sigma_replace,
-        random_state_replace,
+        random_state,
     )
 
     # Return sequence of (near) Clifford operations.
@@ -215,7 +205,7 @@ def _select(
         random_state = np.random
 
     num_non_cliff = len(non_clifford_ops)
-    num_to_replace = int(round(fraction_non_clifford * num_non_cliff))
+    num_to_replace = int(fraction_non_clifford * num_non_cliff)
 
     # Get the distribution for how to select operations.
     if method == "uniform":
@@ -224,7 +214,7 @@ def _select(
         non_clifford_angles = np.array(
             [op.gate.exponent * np.pi for op in non_clifford_ops]
         )
-        probabilities = _angle_to_probabilities(non_clifford_angles, sigma)
+        probabilities = _angle_to_proximity(non_clifford_angles, sigma)
         distribution = [k / sum(probabilities) for k in probabilities]
     else:
         raise ValueError(
@@ -354,10 +344,7 @@ def _is_clifford_angle(angles: np.ndarray, tol: float = 10 ** -5,) -> bool:
     return False
 
 
-@np.vectorize
-def _make_probability_distribution(
-    angle: np.ndarray, sigma: float
-) -> np.ndarray:
+def _angle_to_proximities(angle: np.ndarray, sigma: float) -> np.ndarray:
     """Returns probability distribution based on distance from angles to
     Clifford gates.
 
@@ -382,7 +369,7 @@ def _make_probability_distribution(
 
 
 @np.vectorize
-def _angle_to_probabilities(angle: np.ndarray, sigma: float) -> float:
+def _angle_to_proximity(angle: np.ndarray, sigma: float) -> float:
     """Returns probability distribution based on distance from angles to
     Clifford gates.
 
@@ -394,8 +381,8 @@ def _angle_to_probabilities(angle: np.ndarray, sigma: float) -> float:
         exp(-(dist/sigma)^2) where dist = sum(dists) is the
         sum of distances from each Clifford gate.
     """
-    dists = _make_probability_distribution(angle, sigma)
-    return sum(dists)
+    dists = _angle_to_proximities(angle, sigma)
+    return np.max(dists)
 
 
 @np.vectorize
@@ -414,7 +401,7 @@ def _probabilistic_angle_to_clifford(
         sigma: Width of probability distribution.
     """
 
-    dists = _make_probability_distribution(angles, sigma)
+    dists = _angle_to_proximities(angles, sigma)
 
     cliff_ang = random_state.choice(
         _CLIFFORD_ANGLES, 1, replace=False, p=np.array(dists) / np.sum(dists)

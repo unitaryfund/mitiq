@@ -29,7 +29,8 @@ from mitiq.cdr.clifford_training_data import (
     _replace,
     _closest_clifford,
     _random_clifford,
-    _angle_to_probabilities,
+    _angle_to_proximity,
+    _angle_to_proximities,
     _probabilistic_angle_to_clifford,
     count_non_cliffords,
     generate_training_circuits,
@@ -80,8 +81,7 @@ def test_select_all(method):
 def test_select_some(method):
     n = 10  # Number to select.
     q = cirq.GridQubit(1, 1)
-    rnd_state = np.random.RandomState(1)
-    ops = [cirq.ops.rz(a).on(q) for a in rnd_state.randn(n)]
+    ops = [cirq.ops.rz(a).on(q) for a in np.random.randn(n)]
     indices = _select(ops, fraction_non_clifford=0.5, method=method)
     assert len(indices) == n // 2
 
@@ -115,9 +115,9 @@ def test_map_to_near_clifford():
         fraction_non_clifford=0.0,
         method_select="uniform",
         method_replace="uniform",
-        seed=1,
+        random_state=np.random.RandomState(2),
     )
-    expected_ops = [cirq.rz(np.pi * 0.5).on(q), cirq.rz(0.0).on(q)]
+    expected_ops = [cirq.rz(np.pi * 1).on(q), cirq.rz(np.pi * 1.5).on(q)]
     assert new_ops == expected_ops
 
 
@@ -174,7 +174,7 @@ def test_generate_training_circuits_mega(
     for train_circuit in train_circuits:
         assert set(train_circuit.all_qubits()) == set(circuit.all_qubits())
         assert count_non_cliffords(train_circuit) == int(
-            round(fraction_non_clifford * count_non_cliffords(circuit))
+            fraction_non_clifford * count_non_cliffords(circuit)
         )
 
 
@@ -195,7 +195,7 @@ def test_select(method):
     )
     assert all(isinstance(index, int) for index in indices)
     assert len(indices) == int(
-        round((1.0 - fraction_non_clifford) * len(non_clifford_ops))
+        (1.0 - fraction_non_clifford) * len(non_clifford_ops)
     )
 
 
@@ -235,15 +235,16 @@ def test_random_clifford():
     )
 
 
-def test_make_probability_distribution():
+def test_angle_to_proximities():
     for sigma in np.linspace(0.1, 2, 10):
-        probabilities = _angle_to_probabilities(_CLIFFORD_ANGLES, sigma)
-        assert all(isinstance(p, float) for p in probabilities)
+        for ang in _CLIFFORD_ANGLES:
+            probabilities = _angle_to_proximities(ang, sigma)
+            assert (isinstance(p, float) for p in probabilities)
 
 
-def test_angle_to_probabilities():
+def test_angle_to_proximity():
     for sigma in np.linspace(0.1, 2, 10):
-        probabilities = _angle_to_probabilities(_CLIFFORD_ANGLES, sigma)
+        probabilities = _angle_to_proximity(_CLIFFORD_ANGLES, sigma)
         assert all(isinstance(p, float) for p in probabilities)
 
 
