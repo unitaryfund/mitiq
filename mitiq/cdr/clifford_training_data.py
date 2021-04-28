@@ -40,7 +40,7 @@ def generate_training_circuits(
     r"""Returns a list of (near) Clifford circuits obtained by replacing (some)
     non-Clifford gates in the input circuit by Clifford gates.
 
-    The way in which non-Clifford gates are selected to be replaced / replaced
+    The way in which non-Clifford gates are selected to be replaced
     is determined by ``method_select`` and ``method_replace``.
 
     In the Clifford Data Regression (CDR) method [Czarnik2020]_, data
