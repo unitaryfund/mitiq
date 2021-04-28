@@ -195,7 +195,7 @@ def test_select(method):
     )
     assert all(isinstance(index, int) for index in indices)
     assert len(indices) == int(
-        (1.0 - fraction_non_clifford) * len(non_clifford_ops)
+        round((1.0 - fraction_non_clifford) * len(non_clifford_ops))
     )
 
 
