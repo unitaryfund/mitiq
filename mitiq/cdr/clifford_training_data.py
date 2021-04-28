@@ -70,10 +70,8 @@ def generate_training_circuits(
         Lukasz Cincio, "Error mitigation with Clifford quantum circuit
         data," (https://arxiv.org/abs/2005.10189).
     """
-    if isinstance(random_state, int):
+    if random_state is None or isinstance(random_state, int):
         random_state = np.random.RandomState(random_state)
-    else:
-        random_state = np.random.RandomState(np.random.randint(1e8))
 
     # Seeds used for each training circuit construction.
     random_states = random_state.randint(
