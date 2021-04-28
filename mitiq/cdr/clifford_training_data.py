@@ -217,7 +217,7 @@ def _select(
         random_state = np.random
 
     num_non_cliff = len(non_clifford_ops)
-    num_to_replace = int(fraction_non_clifford * num_non_cliff)
+    num_to_replace = int(round(fraction_non_clifford * num_non_cliff))
 
     # Get the distribution for how to select operations.
     if method == "uniform":
