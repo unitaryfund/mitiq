@@ -698,9 +698,8 @@ and clips the result if it falls outside its physical domain.
          
          if full_output:
             # In this case "result" is a tuple of extrapolation data
-            zne_limit, zne_error, opt_params, params_cov, zne_curve = result
-            zne_limit = np.clip(zne_limit, min_expval, max_expval)
-            return zne_limit, zne_error, opt_params, params_cov, zne_curve
+            zne_limit = np.clip(result[0], min_expval, max_expval)
+            return (zne_limit, *result[1:])
 
 
 .. testcleanup::
