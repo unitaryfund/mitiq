@@ -40,8 +40,8 @@ def generate_training_circuits(
     r"""Returns a list of (near) Clifford circuits obtained by replacing (some)
     non-Clifford gates in the input circuit by Clifford gates.
 
-    The way in which non-Clifford gates are selected to be replaced / replaced
-    is determined by ``method_select`` and ``method_replace``.
+    The way in which non-Clifford gates are selected to be replaced is
+    determined by ``method_select`` and ``method_replace``.
 
     In the Clifford Data Regression (CDR) method [Czarnik2020]_, data
     generated from these circuits is used as a training set to learn the
@@ -61,13 +61,13 @@ def generate_training_circuits(
             'closest'.
         random_state: Seed for sampling.
         kwargs: Available keyword arguments are:
-            sigma_select (float): Width of the Gaussian distribution used for
-                ``method_select='gaussian'``.
-            sigma_replace (float): Width of the Gaussian distribution used for
-                ``method_replace='gaussian'``.
+            - sigma_select (float): Width of the Gaussian distribution used for
+            ``method_select='gaussian'``.
+            - sigma_replace (float): Width of the Gaussian distribution used
+            for ``method_replace='gaussian'``.
 
         .. [Czarnik2020] : Piotr Czarnik, Andrew Arramsmith, Parick Coles,
-        Lukasz Cincio, "Error mitigation with Clifford quantum circuitdata,"
+        Lukasz Cincio, "Error mitigation with Clifford quantum circuit data,"
         (https://arxiv.org/abs/2005.10189).
     """
     if random_state is None or isinstance(random_state, int):
@@ -205,7 +205,7 @@ def _select(
         random_state = np.random
 
     num_non_cliff = len(non_clifford_ops)
-    num_to_replace = int(fraction_non_clifford * num_non_cliff)
+    num_to_replace = int(round(fraction_non_clifford * num_non_cliff))
 
     # Get the distribution for how to select operations.
     if method == "uniform":
