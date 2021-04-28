@@ -80,7 +80,8 @@ def test_select_all(method):
 def test_select_some(method):
     n = 10  # Number to select.
     q = cirq.GridQubit(1, 1)
-    ops = [cirq.ops.rz(a).on(q) for a in np.random.randn(n)]
+    rnd_state = np.random.RandomState(1)
+    ops = [cirq.ops.rz(a).on(q) for a in rnd_state.randn(n)]
     indices = _select(ops, fraction_non_clifford=0.5, method=method)
     assert len(indices) == n // 2
 
