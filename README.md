@@ -4,8 +4,9 @@
 [![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
 [![arXiv](https://img.shields.io/badge/arXiv-2009.04417-<COLOR>.svg)](https://arxiv.org/abs/2009.04417)
 [![Downloads](https://static.pepy.tech/personalized-badge/mitiq?period=total&units=international_system&left_color=black&right_color=green&left_text=Downloads)](https://pepy.tech/project/mitiq)
-[![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
+[![Repository](https://img.shields.io/badge/GitHub-5C5C5C.svg?logo=github)](https://github.com/unitaryfund/mitiq)
 
+[![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
 
 # Mitiq
 
@@ -36,7 +37,7 @@ mitiq.about()
 This prints out version information about core requirements and optional quantum software packages which Mitiq can
 interface with.
 
-If you'd prefer to clone and install from source, our would like to develop Mitiq, check out the
+If you'd prefer to clone and install from source, or would like to develop Mitiq, check out the
 [contribution guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) for more information.
 
 ### Supported quantum programming libraries
@@ -158,3 +159,7 @@ A list of papers citing Mitiq can be found [here][papers_with_mitiq].
 ## License
 
 [GNU GPL v.3.0.](https://github.com/unitaryfund/mitiq/blob/master/LICENSE)
+
+### unitaryHACK
+
+Mitiq is participating in [unitaryHACK](http://hack2021.unitary.fund/), check out and contribute on open issues labeled [`unitaryhack`](https://github.com/unitaryfund/mitiq/labels/unitaryhack)!

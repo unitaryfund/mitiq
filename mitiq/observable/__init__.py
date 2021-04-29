@@ -1,4 +1,4 @@
-# Copyright (C) 2020 Unitary Fund
+# Copyright (C) 2021 Unitary Fund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,13 +13,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from mitiq.pec.types import NoisyOperation, NoisyBasis, OperationRepresentation
-from mitiq.pec.sampling import sample_sequence, sample_circuit
-from mitiq.pec.pec import execute_with_pec
-
-from mitiq.pec.representations import (
-    represent_operation_with_global_depolarizing_noise,
-    represent_operation_with_local_depolarizing_noise,
-    represent_operations_in_circuit_with_global_depolarizing_noise,
-    represent_operations_in_circuit_with_local_depolarizing_noise,
-)
+from mitiq.observable.pauli import PauliString

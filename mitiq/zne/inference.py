@@ -134,7 +134,7 @@ def mitiq_polyfit(
     exp_values: Sequence[float],
     deg: int,
     weights: Optional[Sequence[float]] = None,
-) -> Tuple[List[float], Union[np.ndarray, None]]:
+) -> Tuple[List[float], Optional[np.ndarray]]:
     """Fits the ansatz to the (scale factor, expectation value) data using
     ``numpy.polyfit``, returning the optimal parameters and covariance matrix
     of the parameters.
@@ -196,11 +196,11 @@ class Factory(ABC):
     def __init__(self) -> None:
         self._instack: List[Dict[str, float]] = []
         self._outstack: List[float] = []
-        self._opt_params: Union[List[float], None] = None
-        self._params_cov: Union[np.ndarray, None] = None
-        self._zne_limit: Union[float, None] = None
-        self._zne_error: Union[float, None] = None
-        self._zne_curve: Union[Callable[[float], float], None] = None
+        self._opt_params: Optional[List[float]] = None
+        self._params_cov: Optional[np.ndarray] = None
+        self._zne_limit: Optional[float] = None
+        self._zne_error: Optional[float] = None
+        self._zne_curve: Optional[Callable[[float], float]] = None
         self._already_reduced = False
         self._options: Dict[str, float] = {}
 
@@ -773,9 +773,9 @@ class PolyFactory(BatchedFactory):
         float,
         Tuple[
             float,
-            Union[float, None],
+            Optional[float],
             List[float],
-            Union[np.ndarray, None],
+            Optional[np.ndarray],
             Callable[[float], float],
         ],
     ]:
@@ -854,9 +854,9 @@ class RichardsonFactory(BatchedFactory):
         float,
         Tuple[
             float,
-            Union[float, None],
+            Optional[float],
             List[float],
-            Union[np.ndarray, None],
+            Optional[np.ndarray],
             Callable[[float], float],
         ],
     ]:
@@ -931,9 +931,9 @@ class FakeNodesFactory(BatchedFactory):
         float,
         Tuple[
             float,
-            Union[float, None],
+            Optional[float],
             List[float],
-            Union[np.ndarray, None],
+            Optional[np.ndarray],
             Callable[[float], float],
         ],
     ]:
@@ -1047,9 +1047,9 @@ class LinearFactory(BatchedFactory):
         float,
         Tuple[
             float,
-            Union[float, None],
+            Optional[float],
             List[float],
-            Union[np.ndarray, None],
+            Optional[np.ndarray],
             Callable[[float], float],
         ],
     ]:
@@ -1144,9 +1144,9 @@ class ExpFactory(BatchedFactory):
         float,
         Tuple[
             float,
-            Union[float, None],
+            Optional[float],
             List[float],
-            Union[np.ndarray, None],
+            Optional[np.ndarray],
             Callable[[float], float],
         ],
     ]:
@@ -1206,8 +1206,7 @@ class ExpFactory(BatchedFactory):
 class PolyExpFactory(BatchedFactory):
     """
     Factory object implementing a zero-noise extrapolation algorithm assuming
-    an (almost) exponential ansatz with a non linear exponent, i.e.:
-
+    an (almost) exponential ansatz with a non linear exponent
     y(x) = a + sign * exp(z(x)), where z(x) is a polynomial of a given order.
 
     The parameter "sign" is a sign variable which can be either 1 or -1,
@@ -1276,9 +1275,9 @@ class PolyExpFactory(BatchedFactory):
         float,
         Tuple[
             float,
-            Union[float, None],
+            Optional[float],
             List[float],
-            Union[np.ndarray, None],
+            Optional[np.ndarray],
             Callable[[float], float],
         ],
     ]:
@@ -1606,9 +1605,9 @@ class AdaExpFactory(AdaptiveFactory):
         float,
         Tuple[
             float,
-            Union[float, None],
+            Optional[float],
             List[float],
-            Union[np.ndarray, None],
+            Optional[np.ndarray],
             Callable[[float], float],
         ],
     ]:

@@ -112,7 +112,7 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
     else:
         raise UnsupportedCircuitError(
             f"Conversion to circuit of type {conversion_type} is unsupported."
-            f"\nCircuit types supported by mitiq = {SUPPORTED_PROGRAM_TYPES}"
+            f"\nCircuit types supported by Mitiq = {SUPPORTED_PROGRAM_TYPES}"
         )
 
     try:
@@ -126,7 +126,39 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
     return converted_circuit
 
 
-def converter(
+def atomic_converter(
+    cirq_circuit_modifier: Callable[..., Any]
+) -> Callable[..., Any]:
+    """Decorator which allows for a function which inputs and returns a Cirq
+    circuit to input and return any QPROGRAM.
+
+    Args:
+        cirq_circuit_modifier: Function which inputs a Cirq circuit and returns
+            a (potentially modified) Cirq circuit.
+    """
+
+    @wraps(cirq_circuit_modifier)
+    def qprogram_modifier(
+        circuit: QPROGRAM, *args: Any, **kwargs: Any
+    ) -> QPROGRAM:
+        # Convert to Mitiq representation.
+        mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
+
+        # Modify the Cirq circuit.
+        scaled_circuit = cirq_circuit_modifier(mitiq_circuit, *args, **kwargs)
+
+        if kwargs.get("return_mitiq") is True:
+            return scaled_circuit
+
+        # Base conversion back to input type.
+        scaled_circuit = convert_from_mitiq(scaled_circuit, input_circuit_type)
+
+        return scaled_circuit
+
+    return qprogram_modifier
+
+
+def noise_scaling_converter(
     noise_scaling_function: Callable[..., Any]
 ) -> Callable[..., Any]:
     """Decorator for handling conversions with noise scaling functions.
@@ -140,20 +172,12 @@ def converter(
     def new_scaling_function(
         circuit: QPROGRAM, *args: Any, **kwargs: Any
     ) -> QPROGRAM:
-        # Convert to Mitiq representation.
-        mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
-
-        # Scale the noise in the circuit.
-        scaled_circuit = noise_scaling_function(mitiq_circuit, *args, **kwargs)
-
-        if kwargs.get("return_mitiq") is True:
-            return scaled_circuit
-
-        # Base conversion back to input type.
-        scaled_circuit = convert_from_mitiq(scaled_circuit, input_circuit_type)
+        scaled_circuit = atomic_converter(noise_scaling_function)(
+            circuit, *args, **kwargs
+        )
 
         # Keep the same register structure and measurement order with Qiskit.
-        if input_circuit_type == "qiskit":
+        if "qiskit" in scaled_circuit.__module__:
             from mitiq.mitiq_qiskit.conversions import (
                 _transform_registers,
                 _measurement_order,
