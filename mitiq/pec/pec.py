@@ -22,6 +22,7 @@ import numpy as np
 
 from mitiq import generate_collected_executor, QPROGRAM
 from mitiq.pec import sample_circuit, OperationRepresentation
+from mitiq.conversions import convert_to_mitiq
 
 
 class LargeSampleWarning(Warning):
@@ -120,10 +121,10 @@ def execute_with_pec(
 
     sampled_circuits = []
     signs = []
-
+    converted_circuit, _ = convert_to_mitiq(circuit)
     for _ in range(num_samples):
         sampled_circuit, sign, _ = sample_circuit(
-            circuit, representations, random_state
+            converted_circuit, representations, random_state
         )
         sampled_circuits.append(sampled_circuit)
         signs.append(sign)
