@@ -91,7 +91,7 @@ def execute_with_shots_and_depolarizing_noise(
         Returns:
             The expectation value of obs as a float.
         """
-    # add the noise
+    # Add noise
     noisy = circ.with_noise(cirq.depolarize(p=noise))
 
     # Do the sampling
