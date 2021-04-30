@@ -41,11 +41,6 @@ def test_execute():
     assert 0.0 == observable_exp_value
 
     # Test 2 using another observable
-    new_qc = cirq.Circuit()
-    new_qc += [
-        cirq.X(cirq.LineQubit(0)),
-        cirq.CNOT(cirq.LineQubit(0), cirq.LineQubit(1)),
-    ]
     observable2 = np.diag([0, 0, 0, 1])
     observable_exp_value = execute(qc, obs=observable2)
     assert 1.0 == observable_exp_value
