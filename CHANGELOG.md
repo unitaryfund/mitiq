@@ -8,13 +8,38 @@
 % # " - [Bug Fix]"
 % # " - Fix the bug."
 
-## Version 0.7.0 (In Development)
+## Version 0.7.0 (April 7th, 2021)
+
+### Summary
+
+This release focuses on contributions from the community.
+Many thanks @yhindi for adding a method to parametrically scale noise in circuit, to @aaron-robertson and @pchung39 for adding Qiskit executors with depolarizing noise to the utils,
+to @purva-thakre for several bug fixes and improvements. Thanks also to @BobinMathew and @marwahaha for typo corrections.
+
 
 ### All Changes
 
-- Add qiskit executor example for exact density matrix simulation with depolarizing noise (@aaron-robertson gh-269)
+- Pin `docutils` version to solve CI issues (@purva-thakre, gh-626)
+- Add qiskit executor example for exact density matrix simulation with depolarizing noise (@aaron-robertson, gh-574)
+- Replace Qiskit utils with Qiskit executors from docs (@pchung39, @aaron-robertson, gh-584)
+- Change custom depolarizing channel in PEC (@purva-thakre, gh-615)
+- Document codecov fetch depth change and increase codecov action version (@grmlarose, gh-618)
+- Fix spelling typo (@marwahaha, gh-616)
+- Add link for MEP (@purva-thakre, gh-610)
+- Correct a typo in the readme (@BobinMathew, gh-609)
+- Add ``represent_operations_in_circuit_...`` functions for PEC (@andreamari, gh-515)
 - Add qiskit and cirq executor examples gifs to readme (@nathanshammah, gh-587)
+- Add parametrized scaling (@yhindyYousef, gh-411)
+- Fix mitiq.about() qiskit version (@aaron-robertson, gh-598)
+- Fix typo in ZNE documentation (@purva-thakre, gh-602)
+- Add minimal section on PEC to documentation (@nathanshammah @andreamari, gh-564)
+- Various improvements to CI and testing (@rmlarose, gh-583)
+- Corrects typo in docs of error mitigation guide (@purva-thakre, gh-585)
+- Remove factory equality and fix bug in `PolyExpFactory.extrapolate` (@rmlarose, gh-580)
+- [Bug Fix] Examples (notebooks) in the online documentation now have output code cells (@Aaron-Robertson, gh-576)
+- Update version to dev (@andreamari, gh-572)
 
+- Change custom depolarizing channel in PEC test (@purva-thakre, gh-615)
 
 ## Version 0.6.0 (March 1st, 2021)
 
@@ -58,6 +83,7 @@ in the *Mitiq Examples* section.
 - Fixes random failure of PEC sampling test(@rmlarose, gh-481).
 - Exact copying of shell commands, update make target for pdf and update development version(@rmlarose, gh-469).
 - Add a new FakeNodesFactory class based on an alternative interpolation method (@elmandouh, gh-444).
+- Add parameter calibration method to find base noise for parameter noise (@yhindy, gh-411).
 - Remove duplication of the reduce method in every (non-adaptive) factory (@elmandouh, gh-470).
 
 ## Version 0.4.1 (January 12th, 2021)

@@ -15,7 +15,9 @@
 
 """Tests for zero-noise extrapolation with Qiskit front-ends and back-ends."""
 import pytest
+import numpy as np
 
+import qiskit
 from qiskit import (
     Aer,
     ClassicalRegister,
@@ -24,16 +26,19 @@ from qiskit import (
     execute,
 )
 
+
 from mitiq import zne
 from mitiq._typing import QPROGRAM
-from mitiq.mitiq_qiskit.qiskit_utils import (
-    random_one_qubit_identity_circuit,
-    run_with_noise,
+from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
+from mitiq.mitiq_qiskit import (
+    execute_with_shots_and_noise,
+    initialized_depolarizing_noise,
 )
-
 
 BASE_NOISE = 0.007
 TEST_DEPTH = 30
+ONE_QUBIT_GS_PROJECTOR = np.array([[1, 0], [0, 0]])
+QASM_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
 
 
 def measure(circuit, qid) -> QuantumCircuit:
@@ -47,7 +52,15 @@ def measure(circuit, qid) -> QuantumCircuit:
 
 
 def qiskit_executor(qp: QPROGRAM, shots: int = 500) -> float:
-    return run_with_noise(qp, noise=BASE_NOISE, shots=shots, seed=1)
+    # initialize a qiskit noise model
+    expectation = execute_with_shots_and_noise(
+        qp,
+        shots=shots,
+        obs=ONE_QUBIT_GS_PROJECTOR,
+        noise_model=initialized_depolarizing_noise(BASE_NOISE),
+        seed=1,
+    )
+    return expectation
 
 
 def get_counts(circuit: QuantumCircuit):
@@ -67,7 +80,13 @@ def test_execute_with_zne():
     true_zne_value = 1.0
 
     circuit = measure(
-        random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH), 0
+        *generate_rb_circuits(
+            n_qubits=1,
+            num_cliffords=TEST_DEPTH,
+            trials=1,
+            return_type="qiskit",
+        ),
+        0,
     )
     base = qiskit_executor(circuit)
     zne_value = zne.execute_with_zne(circuit, qiskit_executor)
@@ -79,7 +98,13 @@ def test_mitigate_executor():
     true_zne_value = 1.0
 
     circuit = measure(
-        random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH), 0
+        *generate_rb_circuits(
+            n_qubits=1,
+            num_cliffords=TEST_DEPTH,
+            trials=1,
+            return_type="qiskit",
+        ),
+        0,
     )
     base = qiskit_executor(circuit)
 
@@ -92,7 +117,13 @@ def test_zne_decorator():
     true_zne_value = 1.0
 
     circuit = measure(
-        random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH), 0
+        *generate_rb_circuits(
+            n_qubits=1,
+            num_cliffords=TEST_DEPTH,
+            trials=1,
+            return_type="qiskit",
+        ),
+        0,
     )
     base = qiskit_executor(circuit)
 
@@ -111,7 +142,13 @@ def test_run_factory_with_number_of_shots():
     )
 
     circuit = measure(
-        random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH), 0
+        *generate_rb_circuits(
+            n_qubits=1,
+            num_cliffords=TEST_DEPTH,
+            trials=1,
+            return_type="qiskit",
+        ),
+        0,
     )
     base = qiskit_executor(circuit)
     zne_value = fac.run(
@@ -139,7 +176,13 @@ def test_mitigate_executor_with_shot_list():
     mitigated_executor = zne.mitigate_executor(qiskit_executor, fac)
 
     circuit = measure(
-        random_one_qubit_identity_circuit(num_cliffords=TEST_DEPTH), 0
+        *generate_rb_circuits(
+            n_qubits=1,
+            num_cliffords=TEST_DEPTH,
+            trials=1,
+            return_type="qiskit",
+        ),
+        0,
     )
     base = qiskit_executor(circuit)
     zne_value = mitigated_executor(circuit)

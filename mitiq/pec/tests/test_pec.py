@@ -15,7 +15,6 @@
 
 """Unit tests for PEC."""
 
-from itertools import product
 from typing import List, Optional
 from functools import partial
 import pytest
@@ -32,12 +31,12 @@ from mitiq.benchmarks.utils import noisy_simulation
 from mitiq.pec import execute_with_pec, NoisyOperation, OperationRepresentation
 from mitiq.pec.pec import LargeSampleWarning
 from mitiq.pec.representations import (
-    represent_operation_with_local_depolarizing_noise,
+    represent_operations_in_circuit_with_local_depolarizing_noise,
 )
 
 
-# Noisy representations of Pauli operations for testing.
-def get_pauli_representations(
+# Noisy representations of Pauli and CNOT operations for testing.
+def get_pauli_and_cnot_representations(
     base_noise: float, qubits: Optional[List[cirq.Qid]] = None,
 ) -> List[OperationRepresentation]:
 
@@ -52,30 +51,20 @@ def get_pauli_representations(
 
     for gate in pauli_gates:
         for qubit in qreg:
-            ideal_operations.append(cirq.Circuit(gate(qubit)))
+            ideal_operations.append(gate(qubit))
 
-    # Generate all ideal 2-qubit Pauli operations
-    for gate_a, gate_b in product(pauli_gates, repeat=2):
-        ideal_operations.append(
-            cirq.Circuit([gate_a(qreg[0]), gate_b(qreg[1])])
-        )
-
-    # Add CNOT too
-    ideal_operations.append(cirq.Circuit(cirq.CNOT(*qreg)))
+    # Add CNOT operation too
+    ideal_operations.append(cirq.CNOT(*qreg))
 
     # Generate all representations
-    reps = []
-    for op in ideal_operations:
-        reps.append(
-            represent_operation_with_local_depolarizing_noise(op, base_noise,)
-        )
-
-    return reps
+    return represent_operations_in_circuit_with_local_depolarizing_noise(
+        ideal_circuit=cirq.Circuit(ideal_operations), noise_level=base_noise,
+    )
 
 
 BASE_NOISE = 0.02
-pauli_representations = get_pauli_representations(base_noise=BASE_NOISE)
-noiseless_pauli_representations = get_pauli_representations(base_noise=0.0)
+pauli_representations = get_pauli_and_cnot_representations(BASE_NOISE)
+noiseless_pauli_representations = get_pauli_and_cnot_representations(0.0)
 
 
 def serial_executor(circuit: QPROGRAM, noise: float = BASE_NOISE) -> float:
@@ -210,7 +199,6 @@ def test_pyquil_noiseless_decomposition_multiqubit(nqubits):
     assert np.isclose(pec_value, exact, atol=0.1)
 
 
-@pytest.mark.skip(reason="Slow test.")
 @pytest.mark.parametrize("nqubits", [1, 2])
 def test_qiskit_noiseless_decomposition_multiqubit(nqubits):
     qreg = [qiskit.QuantumRegister(1) for _ in range(nqubits)]
@@ -264,7 +252,7 @@ def test_execute_with_pec_mitigates_noise(circuit, executor, circuit_type):
 
     if circuit_type == "qiskit":
         # Note this is an important subtlety necessary because of conversions.
-        reps = get_pauli_representations(
+        reps = get_pauli_and_cnot_representations(
             base_noise=BASE_NOISE,
             qubits=[cirq.NamedQubit(name) for name in ("q_0", "q_1")],
         )

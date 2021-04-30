@@ -16,15 +16,14 @@
 """Functions to convert between Mitiq's internal circuit representation and
 Qiskit's circuit representation.
 """
-
 from typing import List, Optional, Tuple, Union
+import re
 
 import numpy as np
 
 import cirq
 from cirq.contrib.qasm_import import circuit_from_qasm
 import qiskit
-from qiskit.extensions import Barrier
 
 from mitiq.utils import _simplify_circuit_exponents
 
@@ -32,18 +31,27 @@ from mitiq.utils import _simplify_circuit_exponents
 QASMType = str
 
 
-def _remove_barriers(circuit: qiskit.QuantumCircuit) -> qiskit.QuantumCircuit:
-    """Returns a copy of the input circuit with all barriers removed.
+def _remove_qasm_barriers(qasm: QASMType) -> QASMType:
+    """Returns a copy of the input QASM with all barriers removed.
 
     Args:
-        circuit: Qiskit circuit to remove barriers from.
+        qasm: QASM to remove barriers from.
+
+    Note:
+        According to the OpenQASM 2.X language specification
+        (https://arxiv.org/pdf/1707.03429v2.pdf), "Statements are separated by
+        semicolons. Whitespace is ignored. The language is case sensitive.
+        Comments begin with a pair of forward slashes and end with a new line."
     """
-    copy = circuit.copy()
-    for instr in copy.data:
-        gate = instr[0]
-        if isinstance(gate, Barrier):
-            copy.data.remove(instr)
-    return copy
+    quoted_re = r"(?:\"[^\"]*?\")"
+    statement_re = r"((?:[^;{}\"]*?" + quoted_re + r"?)*[;{}])?"
+    comment_re = r"(\n?//[^\n]*(?:\n|$))?"
+    statements_comments = re.findall(statement_re + comment_re, qasm)
+    lines = []
+    for statement, comment in statements_comments:
+        if re.match(r"^\s*barrier(?:(?:\s+)|(?:;))", statement) is None:
+            lines.append(statement + comment)
+    return "".join(lines)
 
 
 def _map_bit_index(
@@ -321,5 +329,5 @@ def from_qasm(qasm: QASMType) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input QASM string.
     """
-    qasm = _remove_barriers(qiskit.QuantumCircuit.from_qasm_str(qasm)).qasm()
+    qasm = _remove_qasm_barriers(qasm)
     return circuit_from_qasm(qasm)

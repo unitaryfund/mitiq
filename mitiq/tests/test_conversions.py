@@ -28,7 +28,7 @@ from braket.circuits import (
 from mitiq.conversions import (
     convert_to_mitiq,
     convert_from_mitiq,
-    converter,
+    noise_scaling_converter,
     UnsupportedCircuitError,
 )
 from mitiq.utils import _equal
@@ -63,7 +63,7 @@ circuit_types = {
 }
 
 
-@converter
+@noise_scaling_converter
 def scaling_function(circ: cirq.Circuit, *args, **kwargs) -> cirq.Circuit:
     return circ
 

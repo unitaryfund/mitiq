@@ -32,6 +32,13 @@ Utils
 .. automodule:: mitiq.benchmarks.utils
    :members:
 
+Clifford Training Data
+----------------------
+.. automodule:: mitiq.cdr.clifford_training_data
+   :members:
+
+See Ref. :cite:`Czarnik_2020_arXiv` for more details on these methods.
+
 
 Mitiq - PyQuil
 --------------
@@ -94,4 +101,9 @@ Inference and Extrapolation: Factories
 Noise Scaling: Unitary Folding
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.zne.scaling.folding
+   :members:
+
+Noise Scaling: Parametric Calibration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.zne.scaling.parameter
    :members:

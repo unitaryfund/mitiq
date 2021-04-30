@@ -91,3 +91,18 @@ def test_random_benchmarks(scale_noise, fac):
     mit_err = np.abs(1.0 - np.asarray(mitigated))
 
     assert np.average(unmit_err) >= np.average(mit_err)
+
+
+@pytest.mark.parametrize("n_qubits", (1, 2))
+@pytest.mark.parametrize("return_type", ("cirq", "pyquil", "qiskit"))
+def test_rb_conversion(n_qubits, return_type):
+    depth = 10
+    for trials in [2, 3]:
+        circuits = generate_rb_circuits(
+            n_qubits=n_qubits,
+            num_cliffords=depth,
+            trials=trials,
+            return_type=return_type,
+        )
+        for qc in circuits:
+            assert return_type in qc.__module__
