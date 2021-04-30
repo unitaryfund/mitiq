@@ -99,5 +99,4 @@ def execute_with_shots_and_depolarizing_noise(
     psum.collect(sampler=cirq.DensityMatrixSimulator())
 
     # Return the expectation value
-    # Here, estimated_energy is a method of PauliSumCollector
     return psum.estimated_energy()
