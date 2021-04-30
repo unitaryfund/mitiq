@@ -19,7 +19,6 @@ is that your executor accepts a quantum program and returns a float.
 Cirq Executors
 ======================================
 
-This section includes noisy and noiseless simulator executor examples using
 Cirq. For more, see module :mod:`mitiq_cirq.cirq_utils` for examples of Cirq executors. 
 
 
