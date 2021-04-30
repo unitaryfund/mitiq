@@ -19,7 +19,7 @@ is that your executor accepts a quantum program and returns a float.
 Cirq Executors
 ======================================
 
-Cirq. For more, see module :mod:`mitiq_cirq.cirq_utils` for examples of Cirq executors. 
+See :mod:`mitiq_cirq.cirq_utils` for several Cirq executor functions.
 
 
 .. _pyquil_executors:
