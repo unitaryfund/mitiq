@@ -29,6 +29,7 @@ to @purva-thakre for several bug fixes and improvements. Thanks also to @BobinMa
 - Correct a typo in the readme (@BobinMathew, gh-609)
 - Add ``represent_operations_in_circuit_...`` functions for PEC (@andreamari, gh-515)
 - Add qiskit and cirq executor examples gifs to readme (@nathanshammah, gh-587)
+- Move Cirq executors in docs to cirq_utils (@purva-thakre, gh-603)
 - Add parametrized scaling (@yhindyYousef, gh-411)
 - Fix mitiq.about() qiskit version (@aaron-robertson, gh-598)
 - Fix typo in ZNE documentation (@purva-thakre, gh-602)
@@ -38,7 +39,6 @@ to @purva-thakre for several bug fixes and improvements. Thanks also to @BobinMa
 - Remove factory equality and fix bug in `PolyExpFactory.extrapolate` (@rmlarose, gh-580)
 - [Bug Fix] Examples (notebooks) in the online documentation now have output code cells (@Aaron-Robertson, gh-576)
 - Update version to dev (@andreamari, gh-572)
-
 - Change custom depolarizing channel in PEC test (@purva-thakre, gh-615)
 
 ## Version 0.6.0 (March 1st, 2021)
