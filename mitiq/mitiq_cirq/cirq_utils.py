@@ -73,8 +73,6 @@ def execute_with_depolarizing_noise(
     circuit = circ.with_noise(cirq.depolarize(p=noise))
     simulator = cirq.DensityMatrixSimulator()
     rho = simulator.simulate(circuit).final_density_matrix
-    # final_density_matrix and simulate belong to same module as
-    # DensityMatrixSimulator
     expectation = np.real(np.trace(rho @ obs))
     return expectation
 
