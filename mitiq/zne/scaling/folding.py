@@ -449,10 +449,6 @@ def _create_fold_mask(
     if np.isclose(odd_integer_scale_factor, scale_factor):
         return num_folds_mask
 
-    # If necessary, fold a subset of gates to approximate the scale_factor
-    input_circuit_weight = sum(weight_mask)
-    output_circuit_weight = odd_integer_scale_factor * input_circuit_weight
-
     # Express folding order through a list of indices
     folding_order = list(range(len(weight_mask)))
     if folding_method == "from_left":
@@ -469,6 +465,8 @@ def _create_fold_mask(
         )
 
     # Fold gates until the input scale_factor is better approximated
+    input_circuit_weight = sum(weight_mask)
+    output_circuit_weight = odd_integer_scale_factor * input_circuit_weight
     approx_error = np.abs(
         output_circuit_weight - scale_factor * input_circuit_weight
     )
