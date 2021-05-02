@@ -528,13 +528,13 @@ def _apply_fold_mask(
         for op, num_folds in zip(circ_copy.all_operations(), num_folds_mask):
             folded_circuit.append([op] + num_folds * [inverse(op), op])
     else:
-        index = 0
+        mask_index = 0
         for moment in circ_copy:
             folded_moment = Circuit(moment)
             for op in moment:
-                num_folds = num_folds_mask[index]
+                num_folds = num_folds_mask[mask_index]
                 folded_moment.append(num_folds * [inverse(op), op])
-                index += 1
+                mask_index += 1
             # New folded gates are only squashed with respect to folded_moment
             # while folded_circuit is not squashed.
             folded_circuit.append(folded_moment)
