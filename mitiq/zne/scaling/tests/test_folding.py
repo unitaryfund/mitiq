@@ -1485,7 +1485,6 @@ def test_folding_keeps_measurement_order_with_qiskit():
 
 
 def test_create_weight_mask_with_fidelities():
-    """Check the correct weight mask is created."""
     qreg = LineQubit.range(3)
     circ = Circuit(
         ops.H.on_each(*qreg),
@@ -1517,15 +1516,12 @@ def test_create_weight_mask_with_fidelities():
 def test_create_fold_mask_with_odd_scale_factors(
     weight_mask, scale_factor, method,
 ):
-    """Check _create_fold_mask works as expected"""
     fold_mask = _create_fold_mask(weight_mask, scale_factor, method)
     num_folds = int((scale_factor - 1) / 2)
     assert fold_mask == [num_folds, num_folds, num_folds, 0]
 
 
 def test_create_fold_mask_with_real_scale_factors_from_left():
-    """Check _create_fold_mask works as expected"""
-
     fold_mask = _create_fold_mask(
         weight_mask=[0.1, 0.2, 0.3, 0.0],
         scale_factor=1.0,
@@ -1556,8 +1552,6 @@ def test_create_fold_mask_with_real_scale_factors_from_left():
 
 
 def test_create_fold_mask_with_real_scale_factors_from_right():
-    """Check _create_fold_mask works as expected"""
-
     fold_mask = _create_fold_mask(
         weight_mask=[0.1, 0.2, 0.3, 0.0],
         scale_factor=1.0,
@@ -1588,8 +1582,6 @@ def test_create_fold_mask_with_real_scale_factors_from_right():
 
 
 def test_create_fold_mask_with_real_scale_factors_at_random():
-    """Check _create_fold_mask works as expected"""
-
     fold_mask = _create_fold_mask(
         weight_mask=[0.1, 0.2, 0.3, 0.0],
         scale_factor=1.0,
@@ -1640,7 +1632,6 @@ def test_create_fold_mask_approximates_well(method):
 
 
 def test_apply_fold_mask():
-    """Check that circuits are properly folded according to a fold mask."""
     # Test circuit
     # 0: ───H───@───@───M───
     #           │   │
@@ -1693,8 +1684,7 @@ def test_apply_fold_mask_wrong_size():
         _ = _apply_fold_mask(circ, [1, 1])
 
 
-def test_apply_fold_mask_squash_moments():
-    """Test squash_moment option in _apply_fold_mask works as expected."""
+def test_apply_fold_mask_with_squash_moments_option():
     # Test circuit:
     # 0: ───T────────
     #

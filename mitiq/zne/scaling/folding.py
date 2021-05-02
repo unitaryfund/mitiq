@@ -474,20 +474,17 @@ def _create_fold_mask(
         # Skip gates with 0 weight
         if np.isclose(weight_mask[j], 0.0):
             continue
-
         # Compute the approx error if a new fold would be applied
         new_output_circuit_weight = output_circuit_weight + 2 * weight_mask[j]
         new_approx_error = np.abs(
             new_output_circuit_weight - scale_factor * input_circuit_weight
         )
         # Fold the candidate gate only if it helps improving the approximation
-        if new_approx_error < approx_error:
-            approx_error = new_approx_error
-            output_circuit_weight = new_output_circuit_weight
-            num_folds_mask[j] += 1
-        # TODO: decide if removing next else case to get better approximations
-        else:
+        if new_approx_error >= approx_error:
             break
+        approx_error = new_approx_error
+        output_circuit_weight = new_output_circuit_weight
+        num_folds_mask[j] += 1
 
     return num_folds_mask
 
