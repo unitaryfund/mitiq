@@ -16,6 +16,7 @@
 """High-level probabilistic error cancellation tools."""
 
 from typing import Optional, Callable, List, Union, Tuple, Dict, Any
+from functools import wraps
 import warnings
 
 import numpy as np
@@ -157,3 +158,25 @@ def execute_with_pec(
     }
 
     return pec_value, pec_data
+
+
+def pec_executor(
+    executor: Callable,
+    representations: List[OperationRepresentation],
+    precision: float = 0.03,
+    num_samples: Optional[int] = None,
+    force_run_all: bool = True,
+    random_state: Optional[Union[int, np.random.RandomState]] = None,
+    full_output: bool = False,
+) -> Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]:
+    """
+    To be written...
+    """
+
+    @wraps(executor)
+    def new_executor(qp: QPROGRAM) -> Union[float, Tuple[float, Dict[str, Any]]]:
+        return execute_with_pec(
+            qp, executor, representations, precision, num_samples, force_run_all, random_state, full_output
+        )
+
+    return new_executor
