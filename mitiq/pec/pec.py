@@ -174,9 +174,30 @@ def pec_executor(
     """
 
     @wraps(executor)
-    def new_executor(qp: QPROGRAM) -> Union[float, Tuple[float, Dict[str, Any]]]:
+    def new_executor(circuit: QPROGRAM) -> Union[float, Tuple[float, Dict[str, Any]]]:
         return execute_with_pec(
-            qp, executor, representations, precision, num_samples, force_run_all, random_state, full_output
+            circuit, executor, representations, precision, num_samples, force_run_all, random_state, full_output
         )
 
     return new_executor
+
+
+def pec_decorator(
+    representations: List[OperationRepresentation],
+    precision: float = 0.03,
+    num_samples: Optional[int] = None,
+    force_run_all: bool = True,
+    random_state: Optional[Union[int, np.random.RandomState]] = None,
+    full_output: bool = False,
+):
+    """
+    To be written...
+    """
+    def decorator(
+            executor: Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]
+    ) -> Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]:
+        return pec_executor(
+            executor, representations, precision, num_samples, force_run_all, random_state, full_output
+        )
+
+    return decorator
