@@ -364,7 +364,6 @@ def _create_weight_mask(
     weights = None
     if fidelities:
         # Round to avoid ugly numbers like 0.09999999999999998 instead of 0.1
-        # https://docs.python.org/2/tutorial/floatingpoint.html
         weights = {k: round(1.0 - f, 12) for k, f in fidelities.items()}
 
     # Build mask with weights of each gate
