@@ -516,7 +516,6 @@ def _apply_fold_mask(
 
     Returns: The folded quantum circuit.
     """
-    print(squash_moments)
     _check_foldable(circuit)
     circ_copy = deepcopy(circuit)
     measurements = _pop_measurements(circ_copy)
