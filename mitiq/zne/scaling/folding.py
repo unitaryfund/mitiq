@@ -438,7 +438,6 @@ def _create_fold_mask(
 
     # If the scale_factor is an odd integer, we are done.
     if np.isclose(odd_integer_scale_factor, scale_factor):
-
         return num_folds_mask
 
     # If necessary, fold a subset of gates to approximate the scale_factor
