@@ -516,11 +516,7 @@ def _apply_fold_mask(
 
     Returns: The folded quantum circuit.
     """
-    if squash_moments is False:
-        pass
-    else:
-        squash_moments = True
-
+    print(squash_moments)
     _check_foldable(circuit)
     circ_copy = deepcopy(circuit)
     measurements = _pop_measurements(circ_copy)
@@ -623,7 +619,9 @@ def fold_gates_from_left(
     )
 
     return _apply_fold_mask(
-        circuit, num_folds_mask, squash_moments=kwargs.get("squash_moments"),
+        circuit,
+        num_folds_mask,
+        squash_moments=kwargs.get("squash_moments", True),
     )
 
 
@@ -697,7 +695,9 @@ def fold_gates_from_right(
     )
 
     return _apply_fold_mask(
-        circuit, num_folds_mask, squash_moments=kwargs.get("squash_moments"),
+        circuit,
+        num_folds_mask,
+        squash_moments=kwargs.get("squash_moments", True),
     )
 
 
@@ -774,5 +774,7 @@ def fold_gates_at_random(
     )
 
     return _apply_fold_mask(
-        circuit, num_folds_mask, squash_moments=kwargs.get("squash_moments"),
+        circuit,
+        num_folds_mask,
+        squash_moments=kwargs.get("squash_moments", True),
     )
