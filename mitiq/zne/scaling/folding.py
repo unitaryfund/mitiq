@@ -351,6 +351,11 @@ def _create_weight_mask(
     """Returns a list of weights associated to each gate if the input
     circuit. Measurement gates are ignored.
 
+    The gate ordering is equal to the one used in the `all_operations()`
+    method of the :class:`cirq.Circuit` class: gates from earlier moments
+    come first and gates within the same moment follow the order in which
+    they were given to the moment's constructor.
+
     Args:
         circuit: The circuit from which a weight mask is created.
         fidelities: The dictionary of gate fidelities.
@@ -386,6 +391,11 @@ def _create_fold_mask(
     More precicely, the j_th element of the returned list is associated
     to the j_th gate G_j of a circuit that we want to scale and determines
     how many times G_j^\dag G_j should be applied after G_j.
+
+    The gate ordering is equal to the one used in the `all_operations()`
+    method of the :class:`cirq.Circuit` class: gates from earlier moments
+    come first and gates within the same moment follow the order in which
+    they were given to the moment's constructor.
 
     The returned list is built such that the total weight of the
     folded circuit is approximately equal to scale_factor times the
@@ -494,6 +504,11 @@ def _apply_fold_mask(
 
     More precicely, G_j^\dag G_j is applied after the j_th gate G_j of
     the input circuit an integer number of times given by num_folds_mask[j].
+
+    The gate ordering is equal to the one used in the `all_operations()`
+    method of the :class:`cirq.Circuit` class: gates from earlier moments
+    come first and gates within the same moment follow the order in which
+    they were given to the moment's constructor.
 
     Args:
         circuit: The quantum circuit to fold.
