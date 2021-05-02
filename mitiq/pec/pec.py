@@ -40,14 +40,14 @@ _LARGE_SAMPLE_WARN = (
 
 
 def execute_with_pec(
-        circuit: QPROGRAM,
-        executor: Callable,
-        representations: List[OperationRepresentation],
-        precision: float = 0.03,
-        num_samples: Optional[int] = None,
-        force_run_all: bool = True,
-        random_state: Optional[Union[int, np.random.RandomState]] = None,
-        full_output: bool = False,
+    circuit: QPROGRAM,
+    executor: Callable,
+    representations: List[OperationRepresentation],
+    precision: float = 0.03,
+    num_samples: Optional[int] = None,
+    force_run_all: bool = True,
+    random_state: Optional[Union[int, np.random.RandomState]] = None,
+    full_output: bool = False,
 ) -> Union[float, Tuple[float, Dict[str, Any]]]:
     r"""Evaluates the expectation value associated to the input circuit
     using probabilistic error cancellation (PEC) [Temme2017]_ [Endo2018]_.
