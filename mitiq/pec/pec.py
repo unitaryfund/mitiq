@@ -160,7 +160,7 @@ def execute_with_pec(
     return pec_value, pec_data
 
 
-def pec_executor(
+def mitigate_executor(
         executor: Callable,
         representations: List[OperationRepresentation],
         precision: float = 0.03,
@@ -275,7 +275,7 @@ def pec_decorator(
                 [QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]
             ]
     ) -> Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]:
-        return pec_executor(
+        return mitigate_executor(
             executor,
             representations,
             precision,
