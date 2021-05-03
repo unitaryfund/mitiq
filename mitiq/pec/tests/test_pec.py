@@ -462,24 +462,22 @@ def test_pec_decorator_qiskit():
 
 
 def test_mitigate_executor_cirq():
-    # Normal test - trivial decomposition
-    # circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
-    # rep = OperationRepresentation(
-    #     circuit, basis_expansion={NoisyOperation(circuit): 1.0}
-    # )
-    #
-    # unmitigated = serial_executor(circuit)
-    # mitigated = execute_with_pec(
-    #     circuit,
-    #     serial_executor,
-    #     representations=[rep],
-    #     num_samples=10,
-    #     random_state=1,
-    # )
-    #
-    # assert np.isclose(unmitigated, mitigated)
+    # Tested with trivial decomposition
+    circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
+    rep = OperationRepresentation(
+        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+    )
+    unmitigated = serial_executor(circuit)
 
-    return
+    mitigated_executor = mitigate_executor(
+        serial_executor,
+        representations=[rep],
+        num_samples=10,
+        random_state=1,
+    )
+    mitigated = mitigated_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
 
 
 def test_mitigate_executor_pyquil():
