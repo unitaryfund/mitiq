@@ -170,7 +170,7 @@ def mitigate_executor(
     full_output: bool = False,
 ) -> Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]:
     """Returns a probabilistic error cancellation (PEC) mitigated version of
-    the input 'executor' [Temme2017]_ [Endo2018]_.
+    the input 'executor'.
 
     The input `executor` executes a circuit with an arbitrary backend and
     produces an expectation value (without any error mitigation). The returned
@@ -197,15 +197,6 @@ def mitigate_executor(
         random_state: Seed for sampling circuits.
         full_output: If False only the average PEC value is returned.
             If True a dictionary containing all PEC data is returned too.
-
-    .. [Endo2018] : Suguru Endo, Simon C. Benjamin, Ying Li,
-        "Practical Quantum Error Mitigation for Near-Future Applications"
-        *Phys. Rev. **X 8**, 031027 (2018),
-        (https://arxiv.org/abs/1712.09271).
-
-    .. [Takagi2020] : Ryuji Takagi,
-        "Optimal resource cost for error mitigation,"
-        (https://arxiv.org/abs/2006.12509).
     """
 
     @wraps(executor)
@@ -241,8 +232,7 @@ def pec_decorator(
     to an executor function, i.e., a function which executes a quantum circuit
     with an arbitrary backend and returns the PEC estimate of the ideal
     expectation value associated to the input circuit as well as A dictionary
-    which contains all the raw data involved in the PEC process. [Temme2017]_
-    [Endo2018]_
+    which contains all the raw data involved in the PEC process.
 
     Args:
         representations: Representations (basis expansions) of each operation
@@ -260,15 +250,6 @@ def pec_decorator(
         random_state: Seed for sampling circuits.
         full_output: If False only the average PEC value is returned.
             If True a dictionary containing all PEC data is returned too.
-
-    .. [Endo2018] : Suguru Endo, Simon C. Benjamin, Ying Li,
-        "Practical Quantum Error Mitigation for Near-Future Applications"
-        *Phys. Rev. **X 8**, 031027 (2018),
-        (https://arxiv.org/abs/1712.09271).
-
-    .. [Takagi2020] : Ryuji Takagi,
-        "Optimal resource cost for error mitigation,"
-        (https://arxiv.org/abs/2006.12509).
     """
 
     def decorator(
