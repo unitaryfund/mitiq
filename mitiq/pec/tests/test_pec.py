@@ -29,6 +29,7 @@ from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 from mitiq.benchmarks.utils import noisy_simulation
 
 from mitiq.pec import execute_with_pec, NoisyOperation, OperationRepresentation
+from mitiq.pec import mitigate_executor, pec_decorator
 from mitiq.pec.pec import LargeSampleWarning
 from mitiq.pec.representations import (
     represent_operations_in_circuit_with_local_depolarizing_noise,
@@ -410,3 +411,47 @@ def test_pec_data_with_full_output():
     )
     assert np.isclose(np.average(pec_data["unbiased_estimators"]), pec_value)
     assert np.allclose(pec_data["measured_expectation_values"], exp_values)
+
+
+def test_mitigate_executor_cirq():
+    return
+
+
+def test_mitigate_executor_qiskit():
+    return
+
+
+def test_mitigate_executor_pyquil():
+    return
+
+
+def test_mitigate_decorator_cirq():
+    return
+
+
+def test_mitigate_decorator_qiskit():
+    return
+
+
+def test_mitigate_decorator_pyquil():
+    return
+
+
+def test_doc_is_preserved():
+    """Tests that the doc of the original executor is preserved."""
+
+    representations = get_pauli_and_cnot_representations(0)
+
+    def first_executor(circuit):
+        """Doc of the original executor."""
+        return 0
+
+    mit_executor = mitigate_executor(first_executor, representations)
+    assert mit_executor.__doc__ == first_executor.__doc__
+
+    @pec_decorator(representations)
+    def second_executor(circuit):
+        """Doc of the original executor."""
+        return 0
+
+    assert second_executor.__doc__ == first_executor.__doc__
