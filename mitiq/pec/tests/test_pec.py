@@ -511,7 +511,14 @@ def test_mitigate_executor_pyquil():
 
 
 def test_pec_decorator_pyquil():
-    return
+    # Tested with trivial decomposition
+    circuit = pyquil.Program(pyquil.gates.H(0))
+
+    unmitigated = serial_executor(circuit)
+
+    mitigated = decorated_serial_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
 
 
 def test_doc_is_preserved():
