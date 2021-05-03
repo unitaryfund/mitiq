@@ -412,10 +412,12 @@ def test_pec_data_with_full_output():
     assert np.isclose(np.average(pec_data["unbiased_estimators"]), pec_value)
     assert np.allclose(pec_data["measured_expectation_values"], exp_values)
 
-#######################################################################
-
 
 def decorated_serial_executor(circuit: QPROGRAM) -> float:
+    """Returns a decorated serial executor for use with other tests. The serial
+    executor is decorated with the same representations as those that are used
+    in the tests for trivial decomposition.
+    """
     rep = OperationRepresentation(
         circuit, basis_expansion={NoisyOperation(circuit): 1.0}
     )
@@ -428,7 +430,10 @@ def decorated_serial_executor(circuit: QPROGRAM) -> float:
 
 
 def test_mitigate_executor_qiskit():
-    # Tested with trivial decomposition
+    """Performs the same test as
+    test_execute_with_pec_qiskit_trivial_decomposition(), but using
+    mitigate_executor() instead of execute_with_pec().
+    """
     qreg = qiskit.QuantumRegister(1)
     circuit = qiskit.QuantumCircuit(qreg)
     _ = circuit.x(qreg)
@@ -449,7 +454,9 @@ def test_mitigate_executor_qiskit():
 
 
 def test_pec_decorator_qiskit():
-    # Tested with trivial decomposition
+    """Performs the same test as test_mitigate_executor_qiskit(), but using
+    pec_decorator() instead of mitigate_executor().
+    """
     qreg = qiskit.QuantumRegister(1)
     circuit = qiskit.QuantumCircuit(qreg)
     _ = circuit.x(qreg)
@@ -462,7 +469,10 @@ def test_pec_decorator_qiskit():
 
 
 def test_mitigate_executor_cirq():
-    # Tested with trivial decomposition
+    """Performs the same test as
+    test_execute_with_pec_cirq_trivial_decomposition(), but using
+    mitigate_executor() instead of execute_with_pec().
+    """
     circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
     rep = OperationRepresentation(
         circuit, basis_expansion={NoisyOperation(circuit): 1.0}
@@ -481,7 +491,9 @@ def test_mitigate_executor_cirq():
 
 
 def test_pec_decorator_cirq():
-    # Tested with trivial decomposition
+    """Performs the same test as test_mitigate_executor_cirq(), but using
+    pec_decorator() instead of mitigate_executor().
+    """
     circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
 
     unmitigated = serial_executor(circuit)
@@ -492,7 +504,10 @@ def test_pec_decorator_cirq():
 
 
 def test_mitigate_executor_pyquil():
-    # Normal test - trivial decomposition
+    """Performs the same test as
+    test_execute_with_pec_pyquil_trivial_decomposition(), but using
+    mitigate_executor() instead of execute_with_pec().
+    """
     circuit = pyquil.Program(pyquil.gates.H(0))
     rep = OperationRepresentation(
         circuit, basis_expansion={NoisyOperation(circuit): 1.0}
@@ -511,7 +526,9 @@ def test_mitigate_executor_pyquil():
 
 
 def test_pec_decorator_pyquil():
-    # Tested with trivial decomposition
+    """Performs the same test as test_mitigate_executor_pyquil(), but using
+    pec_decorator() instead of mitigate_executor().
+    """
     circuit = pyquil.Program(pyquil.gates.H(0))
 
     unmitigated = serial_executor(circuit)
