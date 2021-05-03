@@ -161,13 +161,13 @@ def execute_with_pec(
 
 
 def mitigate_executor(
-        executor: Callable,
-        representations: List[OperationRepresentation],
-        precision: float = 0.03,
-        num_samples: Optional[int] = None,
-        force_run_all: bool = True,
-        random_state: Optional[Union[int, np.random.RandomState]] = None,
-        full_output: bool = False,
+    executor: Callable,
+    representations: List[OperationRepresentation],
+    precision: float = 0.03,
+    num_samples: Optional[int] = None,
+    force_run_all: bool = True,
+    random_state: Optional[Union[int, np.random.RandomState]] = None,
+    full_output: bool = False,
 ) -> Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]:
     """Returns a probabilistic error cancellation (PEC) mitigated version of the
     input 'executor' [Temme2017]_ [Endo2018]_.
@@ -209,8 +209,9 @@ def mitigate_executor(
     """
 
     @wraps(executor)
-    def new_executor(circuit: QPROGRAM) -> \
-            Union[float, Tuple[float, Dict[str, Any]]]:
+    def new_executor(
+        circuit: QPROGRAM,
+    ) -> Union[float, Tuple[float, Dict[str, Any]]]:
         return execute_with_pec(
             circuit,
             executor,
@@ -219,22 +220,22 @@ def mitigate_executor(
             num_samples,
             force_run_all,
             random_state,
-            full_output
+            full_output,
         )
 
     return new_executor
 
 
 def pec_decorator(
-        representations: List[OperationRepresentation],
-        precision: float = 0.03,
-        num_samples: Optional[int] = None,
-        force_run_all: bool = True,
-        random_state: Optional[Union[int, np.random.RandomState]] = None,
-        full_output: bool = False,
+    representations: List[OperationRepresentation],
+    precision: float = 0.03,
+    num_samples: Optional[int] = None,
+    force_run_all: bool = True,
+    random_state: Optional[Union[int, np.random.RandomState]] = None,
+    full_output: bool = False,
 ) -> Callable[
     [Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]],
-    Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]
+    Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]],
 ]:
     """Decorator which adds probabilistic error cancellation (PEC) mitigation
     to an executor function, i.e., a function which executes a quantum circuit
@@ -271,9 +272,9 @@ def pec_decorator(
     """
 
     def decorator(
-            executor: Callable[
-                [QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]
-            ]
+        executor: Callable[
+            [QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]
+        ]
     ) -> Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]:
         return mitigate_executor(
             executor,
@@ -282,7 +283,7 @@ def pec_decorator(
             num_samples,
             force_run_all,
             random_state,
-            full_output
+            full_output,
         )
 
     return decorator

@@ -443,10 +443,7 @@ def test_mitigate_executor_qiskit():
     unmitigated = serial_executor(circuit)
 
     mitigated_executor = mitigate_executor(
-        serial_executor,
-        representations=[rep],
-        num_samples=10,
-        random_state=1,
+        serial_executor, representations=[rep], num_samples=10, random_state=1,
     )
     mitigated = mitigated_executor(circuit)
 
@@ -480,10 +477,7 @@ def test_mitigate_executor_cirq():
     unmitigated = serial_executor(circuit)
 
     mitigated_executor = mitigate_executor(
-        serial_executor,
-        representations=[rep],
-        num_samples=10,
-        random_state=1,
+        serial_executor, representations=[rep], num_samples=10, random_state=1,
     )
     mitigated = mitigated_executor(circuit)
 
@@ -515,10 +509,7 @@ def test_mitigate_executor_pyquil():
     unmitigated = serial_executor(circuit)
 
     mitigated_executor = mitigate_executor(
-        serial_executor,
-        representations=[rep],
-        num_samples=10,
-        random_state=1,
+        serial_executor, representations=[rep], num_samples=10, random_state=1,
     )
     mitigated = mitigated_executor(circuit)
 
