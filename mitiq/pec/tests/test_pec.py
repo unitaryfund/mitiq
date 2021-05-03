@@ -480,6 +480,17 @@ def test_mitigate_executor_cirq():
     assert np.isclose(unmitigated, mitigated)
 
 
+def test_pec_decorator_cirq():
+    # Tested with trivial decomposition
+    circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
+
+    unmitigated = serial_executor(circuit)
+
+    mitigated = decorated_serial_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
+
+
 def test_mitigate_executor_pyquil():
     # Normal test - trivial decomposition
     # circuit = pyquil.Program(pyquil.gates.H(0))
@@ -501,11 +512,7 @@ def test_mitigate_executor_pyquil():
     return
 
 
-def test_mitigate_decorator_cirq():
-    return
-
-
-def test_mitigate_decorator_pyquil():
+def test_pec_decorator_pyquil():
     return
 
 
