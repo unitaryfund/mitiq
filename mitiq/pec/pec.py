@@ -169,8 +169,8 @@ def mitigate_executor(
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
 ) -> Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]:
-    """Returns a probabilistic error cancellation (PEC) mitigated version of the
-    input 'executor' [Temme2017]_ [Endo2018]_.
+    """Returns a probabilistic error cancellation (PEC) mitigated version of
+    the input 'executor' [Temme2017]_ [Endo2018]_.
 
     The input `executor` executes a circuit with an arbitrary backend and
     produces an expectation value (without any error mitigation). The returned
