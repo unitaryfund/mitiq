@@ -24,6 +24,11 @@ import cirq
 import pyquil
 import qiskit
 
+from mitiq.mitiq_qiskit import (
+    execute_with_shots_and_noise,
+    initialized_depolarizing_noise,
+)
+
 from mitiq import QPROGRAM
 from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 from mitiq.benchmarks.utils import noisy_simulation
@@ -412,24 +417,77 @@ def test_pec_data_with_full_output():
     assert np.isclose(np.average(pec_data["unbiased_estimators"]), pec_value)
     assert np.allclose(pec_data["measured_expectation_values"], exp_values)
 
-
-def test_mitigate_executor_cirq():
-    return
+#######################################################################
 
 
 def test_mitigate_executor_qiskit():
+    # Tested with trivial decomposition
+    qreg = qiskit.QuantumRegister(1)
+    circuit = qiskit.QuantumCircuit(qreg)
+    _ = circuit.x(qreg)
+    rep = OperationRepresentation(
+        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+    )
+    unmitigated = serial_executor(circuit)
+
+    mitigated_executor = mitigate_executor(
+        serial_executor,
+        representations=[rep],
+        num_samples=10,
+        random_state=1,
+    )
+    mitigated = mitigated_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+def test_mitigate_decorator_qiskit():
+    return
+
+
+def test_mitigate_executor_cirq():
+    # Normal test - trivial decomposition
+    # circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
+    # rep = OperationRepresentation(
+    #     circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+    # )
+    #
+    # unmitigated = serial_executor(circuit)
+    # mitigated = execute_with_pec(
+    #     circuit,
+    #     serial_executor,
+    #     representations=[rep],
+    #     num_samples=10,
+    #     random_state=1,
+    # )
+    #
+    # assert np.isclose(unmitigated, mitigated)
+
     return
 
 
 def test_mitigate_executor_pyquil():
+    # Normal test - trivial decomposition
+    # circuit = pyquil.Program(pyquil.gates.H(0))
+    # rep = OperationRepresentation(
+    #     circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+    # )
+    # unmitigated = serial_executor(circuit)
+    #
+    # mitigated = execute_with_pec(
+    #     circuit,
+    #     serial_executor,
+    #     representations=[rep],
+    #     num_samples=10,
+    #     random_state=1,
+    # )
+    #
+    # assert np.isclose(unmitigated, mitigated)
+
     return
 
 
 def test_mitigate_decorator_cirq():
-    return
-
-
-def test_mitigate_decorator_qiskit():
     return
 
 
