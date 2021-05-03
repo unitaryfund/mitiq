@@ -24,11 +24,6 @@ import cirq
 import pyquil
 import qiskit
 
-from mitiq.mitiq_qiskit import (
-    execute_with_shots_and_noise,
-    initialized_depolarizing_noise,
-)
-
 from mitiq import QPROGRAM
 from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 from mitiq.benchmarks.utils import noisy_simulation
@@ -420,6 +415,18 @@ def test_pec_data_with_full_output():
 #######################################################################
 
 
+def decorated_serial_executor(circuit: QPROGRAM) -> float:
+    rep = OperationRepresentation(
+        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+    )
+
+    @pec_decorator([rep])
+    def decorated_executor(qp):
+        return serial_executor(qp)
+
+    return decorated_executor(circuit)
+
+
 def test_mitigate_executor_qiskit():
     # Tested with trivial decomposition
     qreg = qiskit.QuantumRegister(1)
@@ -441,8 +448,17 @@ def test_mitigate_executor_qiskit():
     assert np.isclose(unmitigated, mitigated)
 
 
-def test_mitigate_decorator_qiskit():
-    return
+def test_pec_decorator_qiskit():
+    # Tested with trivial decomposition
+    qreg = qiskit.QuantumRegister(1)
+    circuit = qiskit.QuantumCircuit(qreg)
+    _ = circuit.x(qreg)
+
+    unmitigated = serial_executor(circuit)
+
+    mitigated = decorated_serial_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
 
 
 def test_mitigate_executor_cirq():
