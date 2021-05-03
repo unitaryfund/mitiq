@@ -224,7 +224,7 @@ We can then use this backend for our mitigation.
 .. testcode::
 
     from qiskit import QuantumCircuit
-    from mitiq import execute_with_zne
+    from mitiq.zne import execute_with_zne
 
     circ = QuantumCircuit(1, 1)
     for _ in range(100):
