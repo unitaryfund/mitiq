@@ -1,0 +1,46 @@
+# Changelog is updated after a PR is pushed on master
+# Uses https://github.com/marketplace/actions/generate-changelog
+
+name : Automate changelog update
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - v*
+
+# To do for later - add a template separating issues  by topics.
+
+jobs:
+  changelog:
+    name: Automated changelog update
+    if: github.repository_owner == 'unitaryfund'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out mitiq
+        uses: actions/checkout@v2
+        with:
+            ref: master
+      - name: Get current version/tag number
+        run: |
+            export VERSION=${GITHUB_TAG/refs\/tags\/v/}
+            echo "{Version}={VERSION}" >> $GITHUB_ENV
+        env:
+            GITHUB_REF: $
+        run: echo "${{ env.Version}}"
+      - name: Update changelog for current version
+        uses: heinrichreimer/github-changelog-generator-action@v2.1.1
+        issues: true
+        issuesWoLabels: true
+        pullRequests: true
+        prWoLabels: true
+        filterByMilestone: true
+        author: true
+        unreleasedOnly: true
+        output: CHANGELOG.md
+      - name: Commit changes to changelog.md
+        uses: stefanzweifel/git-auto-commit-action@v4
+        commit_message: Commit changes with info about a push to master
+        file_pattern: CHANGELOG.md
+        # To do : Check what default for author, issue number etc. is
