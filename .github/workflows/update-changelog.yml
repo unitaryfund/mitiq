@@ -4,8 +4,6 @@
 name : Automate changelog update
 
 on : workflow_dispatch
-    branches:
-      - master
 #on:
 #  push:
 #    branches:
