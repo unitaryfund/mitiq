@@ -3,8 +3,7 @@
 
 name : Automate changelog update
 
-on : push
-  workflow_dispatch :
+on : workflow_dispatch
     branches:
       - master
 #on:
