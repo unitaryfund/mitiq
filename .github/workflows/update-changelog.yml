@@ -1,0 +1,38 @@
+name: Automate changelog update on push
+
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - v*
+
+
+jobs:
+  changelog:
+    name: Automated changelog update
+    if: github.repository_owner == 'unitaryfund'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out mitiq
+        uses: actions/checkout@v2
+        with:
+            ref: master
+      - name: Update changelog for current version
+        uses: heinrichreimer/github-changelog-generator-action@v2.1.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sinceTag: 0.8.0
+          pullRequests: true
+          prWoLabels: true
+          author: true
+          unreleasedOnly: true
+          base: HISTORY.md
+          output: CHANGELOG.md
+      - name: Commit changes to changelog.md
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Commit changes with info about a push to master
+          file_pattern: CHANGELOG.md
+        # To do : Check what default for author, issue number etc. i
