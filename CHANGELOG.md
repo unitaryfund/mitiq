@@ -29,6 +29,7 @@ Special thanks to all contributors - @purva-thakre, @Aaron-Robertson, @andre-a-a
 
 ### All Changes
 
+- Remove docs/pdf in favor of RTD (@rmlarose, gh-662).
 - Redefine and re-implement local folding functions (@andreamari, gh-649).
 - Move Cirq executors from docs to utilities (@purva-thakre, gh-603).
 - Add functionality for the training portion of Clifford Data Regression (@L-P-B, gh-601).
