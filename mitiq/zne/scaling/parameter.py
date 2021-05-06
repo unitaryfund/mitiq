@@ -30,7 +30,7 @@ from cirq import (
     Gate,
     Qid,
 )
-from mitiq.conversions import converter
+from mitiq.conversions import noise_scaling_converter
 
 
 class GateTypeException(Exception):
@@ -113,7 +113,7 @@ def _parameter_calibration(
     return sigma
 
 
-@converter
+@noise_scaling_converter
 def scale_parameters(
     circ: Circuit,
     scale_factor: float,

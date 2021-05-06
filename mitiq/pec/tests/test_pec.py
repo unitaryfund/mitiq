@@ -199,7 +199,6 @@ def test_pyquil_noiseless_decomposition_multiqubit(nqubits):
     assert np.isclose(pec_value, exact, atol=0.1)
 
 
-@pytest.mark.skip(reason="Slow test.")
 @pytest.mark.parametrize("nqubits", [1, 2])
 def test_qiskit_noiseless_decomposition_multiqubit(nqubits):
     qreg = [qiskit.QuantumRegister(1) for _ in range(nqubits)]

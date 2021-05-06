@@ -1,4 +1,4 @@
-# Copyright (C) 2020 Unitary Fund
+# Copyright (C) 2021 Unitary Fund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,13 +12,3 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-"""Methods for scaling noise in circuits by adding or modifying gates."""
-from mitiq.zne.scaling.folding import (
-    fold_all,
-    fold_gates_from_left,
-    fold_gates_from_right,
-    fold_gates_at_random,
-    fold_global,
-)
-from mitiq.zne.scaling.parameter import scale_parameters
