@@ -1,9 +1,6 @@
-# This is a basic workflow that is manually triggered
-
 name: Automate changelog update on push
 
-# Controls when the action will run. Workflow runs when manually triggered using the UI
-# or API.
+
 on:
   push:
     branches:
@@ -15,29 +12,24 @@ on:
 jobs:
   changelog:
     name: Automated changelog update
-    #if: github.repository_owner == 'unitaryfund'
+    if: github.repository_owner == 'unitaryfund'
     runs-on: ubuntu-latest
     steps:
       - name: Check out mitiq
         uses: actions/checkout@v2
         with:
             ref: master
-      - name: Get current version/tag number
-        run: |
-            export VERSION=${GITHUB_TAG/refs\/tags\/v/}
-            echo "{Version}={VERSION}" >> $GITHUB_ENV
-        env:
-            GITHUB_REF: $
       - name: Update changelog for current version
         uses: heinrichreimer/github-changelog-generator-action@v2.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          sinceTag: 0.8.0
           pullRequests: true
           prWoLabels: true
           author: true
           unreleasedOnly: true
-          verbose: true
-          simpleList: true
+          base: HISTORY.md
+          output: CHANGELOG.md
       - name: Commit changes to changelog.md
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
