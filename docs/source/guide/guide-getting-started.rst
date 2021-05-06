@@ -224,7 +224,7 @@ We can then use this backend for our mitigation.
 .. testcode::
 
     from qiskit import QuantumCircuit
-    from mitiq import execute_with_zne
+    from mitiq.zne import execute_with_zne
 
     circ = QuantumCircuit(1, 1)
     for _ in range(100):
@@ -311,3 +311,7 @@ We can now implement PEC by importing the function :func:`~mitiq.pec.pec.execute
 
     Error without mitigation: 0.0387
     Error with mitigation (PEC): 0.00364
+
+In addition to :func:`~mitiq.pec.pec.execute_with_pec`, you can also use Mitiq to wrap your
+backend execution function into an error-mitigated version like you can with zero-noise
+extrapolation.

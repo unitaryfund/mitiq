@@ -272,7 +272,7 @@ This function can then be used with ``mitiq.zne.execute_with_zne`` as an option 
 .. doctest:: python
 
     # Variables circ and scale are a circuit to fold and a scale factor, respectively
-    zne = mitiq.execute_with_zne(circuit, executor, scale_noise=my_custom_folding_function)
+    zne = mitiq.zne.execute_with_zne(circuit, executor, scale_noise=my_custom_folding_function)
 
 
 .. _guide_zne_factory:

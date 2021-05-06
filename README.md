@@ -65,7 +65,7 @@ a quick preview, check out the following snippet for a simple example of Mitiq i
 ```python
 import numpy as np
 from cirq import depolarize, Circuit, DensityMatrixSimulator, LineQubit, X
-from mitiq import execute_with_zne
+from mitiq.zne import execute_with_zne
 
 def noisy_simulation(circ: Circuit) -> float:
     """Simulates a circuit with depolarizing noise.
