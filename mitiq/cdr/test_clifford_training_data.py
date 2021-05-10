@@ -208,7 +208,6 @@ def test_count_non_cliffords():
         cirq.ops.rz(0.4 * np.pi).on(b),  # Non-Clifford.
         cirq.ops.rz(0.5 * np.pi).on(b),  # Clifford.
         cirq.ops.CNOT.on(a, b),  # Clifford.
-        cirq.ops.rx(0.5 * np.pi).on(b),  # Clifford.
     )
 
     assert count_non_cliffords(circuit) == 2
