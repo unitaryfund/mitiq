@@ -22,6 +22,7 @@ from cirq.circuits import Circuit
 
 from mitiq.cdr.clifford_training_data import (
     _is_clifford_angle,
+    _is_clifford,
     is_clifford,
     _map_to_near_clifford,
     _select,
@@ -102,7 +103,7 @@ def test_replace(method):
     )
 
     assert len(new_ops) == len(ops)
-    assert all(cirq.protocols.has_stabilizer_effect(op) for op in new_ops)
+    assert all(_is_clifford(op) for op in new_ops)
 
 
 def test_map_to_near_clifford():
@@ -202,9 +203,12 @@ def test_count_non_cliffords():
     a, b = cirq.LineQubit.range(2)
     circuit = Circuit(
         cirq.ops.rz(0.0).on(a),  # Clifford.
-        cirq.ops.rx(0.1).on(b),  # Non-Clifford.
-        cirq.ops.rz(0.4).on(b),  # Non-Clifford.
+        cirq.ops.rx(0.1 * np.pi).on(b),  # Non-Clifford.
+        cirq.ops.rx(0.5 * np.pi).on(b),  # Clifford
+        cirq.ops.rz(0.4 * np.pi).on(b),  # Non-Clifford.
+        cirq.ops.rz(0.5 * np.pi).on(b),  # Clifford.
         cirq.ops.CNOT.on(a, b),  # Clifford.
+        cirq.ops.rx(0.5 * np.pi).on(b),  # Clifford.
     )
 
     assert count_non_cliffords(circuit) == 2
