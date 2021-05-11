@@ -274,6 +274,33 @@ This function can then be used with ``mitiq.zne.execute_with_zne`` as an option 
     # Variables circ and scale are a circuit to fold and a scale factor, respectively
     zne = mitiq.execute_with_zne(circuit, executor, scale_noise=my_custom_folding_function)
 
+.. _guide_zne_scaling:
+
+=================================
+Noise scaling by identity scaling
+=================================
+
+Note : This module is under construction
+
+---------------------
+Local scaling methods
+---------------------
+Scaling from left, right and at random.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Scaling gates by fidelity
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Note : This module is under construction
+--------------
+Global scaling
+--------------
+Note : This module is under construction
+----------------------
+Custom scaling methods
+----------------------
+Note : This module is under construction
+
 
 .. _guide_zne_factory:
 
