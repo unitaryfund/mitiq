@@ -13,14 +13,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""Catches deprecated import statements."""
+
 
 def raise_deprecation_warning(version: str, method: str, module: str):
     """Raises an import error for attempts to import modules that could be called
     directly from Mitiq but must now be imported from one of Mitiq's modules.
     """
-    raise ImportError("As of version " + version + ", " + method + " must " +
-                      "be imported from " + module + " instead of directly" +
-                      " from mitiq. Please update your code accordingly.")
+    raise ImportError(
+        "As of version "
+        + version
+        + ", "
+        + method
+        + " must be imported from "
+        + module
+        + " instead of directly from mitiq. Please update your code "
+        + "accordingly."
+    )
 
 
 def execute_with_zne():
