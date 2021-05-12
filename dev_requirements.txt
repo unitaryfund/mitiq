@@ -2,7 +2,7 @@
 qiskit-terra~=0.16.4
 qiskit-aer~=0.7.6
 qiskit-ibmq-provider~=0.12.2
-pyquil
+pyquil==2.28.0
 
 # Unit tests, coverage, and formatting/style.
 pytest-xdist[psutil]~=2.2.1
@@ -11,13 +11,8 @@ flake8~=3.7.9
 black~=19.10b0
 
 # Documentation and examples.
-sphinx
-docutils
 sphinxcontrib-bibtex
 sphinx-copybutton
 sphinx-autodoc-typehints
 myst-nb
-myst-parser
-pybtex
 pydata-sphinx-theme
-notebook
