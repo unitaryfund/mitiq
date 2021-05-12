@@ -2,7 +2,7 @@
 qiskit-terra~=0.16.4
 qiskit-aer~=0.7.6
 qiskit-ibmq-provider~=0.12.2
-pyquil~=2.28.0
+pyquil
 
 # Unit tests, coverage, and formatting/style.
 pytest-xdist[psutil]~=2.2.1
