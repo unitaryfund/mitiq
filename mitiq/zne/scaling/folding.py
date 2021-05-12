@@ -401,7 +401,7 @@ def _create_fold_mask(
     total weight of the input circuit.
 
     For equal weights, this function reproduces the local unitary folding
-    method defined in equation (5) of [Giurgica_Tiron_2020_arXiv]_.
+    method defined in equation (5) of :cite:`Giurgica_Tiron_2020_arXiv`.
 
     Args:
         weight_mask: The weights of all the gates of the circuit to fold.
