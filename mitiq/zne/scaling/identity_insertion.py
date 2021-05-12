@@ -14,3 +14,46 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Functions for identity scaling on supported circuits."""
+from copy import deepcopy
+from typing import (
+    Any,
+    Dict,
+    FrozenSet,
+    List,
+    Optional,
+    Tuple,
+)
+
+import numpy as np
+from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary
+
+from mitiq._typing import QPROGRAM
+from mitiq.conversions import noise_scaling_converter
+
+from mitiq.zne.scaling.folding import ( _string_keys_to_cirq_gates,
+_cirq_gates_to_string_keys, _is_measurement, _pop_measurements, _append_measurements,
+_squash_moments)
+
+class UnscalableCircuitError(Exception):
+    pass
+
+def _check_scalable(circuit: Circuit) -> None:
+    """Raises an error if the input circuit cannot be scaled.
+    Args:
+        circuit: Checks whether this circuit is able to be scaled.
+    Raises:
+        UnfoldableCircuitError:
+            * If the circuit has intermediate measurements.
+            * If the circuit has non-unitary channels which are not terminal
+              measurements.
+    """
+    if not circuit.are_all_measurements_terminal():
+        raise UnscalableCircuitError(
+            "Circuit contains intermediate measurements and cannot be scaled."
+        )
+
+    if not has_unitary(circuit):
+        raise UnscalableCircuitError(
+            "Circuit contains non-unitary channels which are not terminal "
+            "measurements and cannot be scaled."
+        )
