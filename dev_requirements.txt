@@ -1,5 +1,4 @@
 # Third-party integration.
-cirq_google
 qiskit-terra~=0.16.4
 qiskit-aer~=0.7.6
 qiskit-ibmq-provider~=0.12.2
