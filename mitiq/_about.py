@@ -44,9 +44,9 @@ def about() -> None:
         from qiskit import __qiskit_version__  # pragma: no cover
 
         qiskit_version = __qiskit_version__["qiskit"]  # pragma: no cover
-        terra_version = __qiskit_version__['qiskit-terra']
+        terra_version = __qiskit_version__["qiskit-terra"]
         aer_version = __qiskit_version__["qiskit-aer"]
-        ibmq_provider_version=__qiskit_version__["qiskit-ibmq-provider"]
+        ibmq_provider_version = __qiskit_version__["qiskit-ibmq-provider"]
     except ImportError:
         qiskit_version = "Not installed"
 
