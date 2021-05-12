@@ -164,7 +164,6 @@ def _measurement_order(circuit: qiskit.QuantumCircuit):
 def _transform_registers(
     circuit: qiskit.QuantumCircuit,
     new_qregs: Optional[List[qiskit.QuantumRegister]] = None,
-    new_cregs: Optional[List[qiskit.ClassicalRegister]] = None,
 ) -> None:
     """Transforms the registers in the circuit to the new registers.
 
@@ -174,7 +173,6 @@ def _transform_registers(
             * One single classical register of n bits, or
             * n single-bit classical registers.
         new_qregs: The new quantum registers for the circuit.
-        new_cregs: The new classical registers for the circuit.
 
     Raises:
         ValueError:
@@ -186,14 +184,11 @@ def _transform_registers(
             * If the number of bits in the new classical registers does not
             match the number of bits in the circuit.
     """
-    if new_qregs is None and new_cregs is None:
+    if new_qregs is None:
         return
 
     if new_qregs is None:
         new_qregs = []
-
-    if new_cregs is None:
-        new_cregs = []
 
     qreg_sizes = [qreg.size for qreg in new_qregs]
     old_qregs = circuit.qregs
@@ -211,7 +206,6 @@ def _transform_registers(
             f"quantum registers have {sum(qreg_sizes)} qubits."
         )
 
-    creg_sizes = [creg.size for creg in new_cregs]
     old_cregs = circuit.cregs
     nbits_in_circuit = sum(creg.size for creg in old_cregs)
 
@@ -222,17 +216,9 @@ def _transform_registers(
             f"registers."
         )
 
-    if len(creg_sizes) and sum(creg_sizes) != nbits_in_circuit:
-        raise ValueError(
-            f"The circuit has {nbits_in_circuit} bits, but the provided "
-            f"classical registers have {sum(creg_sizes)} bits."
-        )
-
     # Assign the new registers.
     if len(qreg_sizes):
         circuit.qregs = list(new_qregs)
-    if len(creg_sizes):
-        circuit.cregs = list(new_cregs)
 
     # Map the (qu)bits in operations to the new (qu)bits.
     new_ops = []
@@ -240,11 +226,11 @@ def _transform_registers(
         gate, qubits, cbits = op
 
         new_qubits = _map_bits(qubits, old_qregs, qreg_sizes, new_qregs)
-        new_cbits = _map_bits(cbits, old_cregs, creg_sizes, new_cregs)
 
-        new_ops.append((gate, new_qubits, new_cbits))
+        new_ops.append((gate, new_qubits, cbits))
 
     circuit.data = new_ops
+    circuit.cregs = old_cregs
 
 
 def to_qasm(circuit: cirq.Circuit) -> QASMType:
@@ -290,12 +276,10 @@ def to_qiskit(
     # Assign register structure.
     # Note: Output qiskit_circuit has one quantum register and n classical
     # registers of 1 bit where n is the total number of classical bits.
-    if len(qiskit_circuit.cregs) > 0:
-        _transform_registers(qiskit_circuit, new_qregs=qregs, new_cregs=cregs)
-    else:
-        _transform_registers(qiskit_circuit, new_qregs=qregs)
-        if cregs and add_cregs_if_cannot_transform:
-            qiskit_circuit.add_register(*cregs)
+    _transform_registers(qiskit_circuit, new_qregs=qregs)
+    if cregs and add_cregs_if_cannot_transform:
+        qiskit_circuit.cregs = []
+        qiskit_circuit.add_register(*cregs)
 
     return qiskit_circuit
 

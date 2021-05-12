@@ -187,7 +187,6 @@ def noise_scaling_converter(
             _transform_registers(
                 scaled_circuit,
                 new_qregs=circuit.qregs,
-                new_cregs=circuit.cregs if scaled_circuit.cregs else None,
             )
             if circuit.cregs and not scaled_circuit.cregs:
                 scaled_circuit.add_register(*circuit.cregs)
