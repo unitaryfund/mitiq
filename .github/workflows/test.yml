@@ -49,8 +49,8 @@ jobs:
 
       - name: Build and test Sphinx docs
         run: |
-          make docs
           make doctest
+          make docs
 
   test:
     runs-on: ${{ matrix.os }}
