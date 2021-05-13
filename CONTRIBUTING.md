@@ -56,6 +56,10 @@ Follow these [instructions for contributing to the documentation](https://mitiq.
 
 You can check that tests run with `pytest`. The [Makefile][makefile] contains
 some commands for running different collections of tests for the repository.
+Please note pyQuil and Qiskit must be installed, and a pyQuil QVM server must
+be running for some tests to run successfully. Information about running a
+local QVM server can be found
+[here](https://pyquil-docs.rigetti.com/en/v2.7.0/qvm.html).
 
 To run just the tests contained in `mitiq/tests` and `mitiq/benchmarks/tests` run
 
@@ -63,8 +67,7 @@ To run just the tests contained in `mitiq/tests` and `mitiq/benchmarks/tests` ru
 (myenv) make test
 ```
 
-To run the tests for the pyQuil and Qiskit plugins (which of course require for
-pyQuil and Qiskit to be installed) run
+To run the tests for the pyQuil and Qiskit plugins, run
 
 ```bash
 (myenv) make test-pyquil
