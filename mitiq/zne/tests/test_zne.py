@@ -177,10 +177,7 @@ def test_doc_is_preserved():
     assert second_executor.__doc__ == first_executor.__doc__
 
 
-"""Tests for zero-noise extrapolation with Qiskit front-ends and back-ends."""
-
-
-def measure(circuit, qid) -> qiskit.QuantumCircuit:
+def qiskit_measure(circuit, qid) -> qiskit.QuantumCircuit:
     """Helper function to measure one qubit."""
     # Ensure that we have a classical register of enough size available
     if len(circuit.clbits) == 0:
@@ -215,7 +212,7 @@ def get_counts(circuit: qiskit.QuantumCircuit):
 def test_qiskit_execute_with_zne():
     true_zne_value = 1.0
 
-    circuit = measure(
+    circuit = qiskit_measure(
         *generate_rb_circuits(
             n_qubits=1,
             num_cliffords=TEST_DEPTH,
@@ -238,7 +235,7 @@ def qiskit_decorated_executor(qp: QPROGRAM) -> float:
 def test_qiskit_mitigate_executor():
     true_zne_value = 1.0
 
-    circuit = measure(
+    circuit = qiskit_measure(
         *generate_rb_circuits(
             n_qubits=1,
             num_cliffords=TEST_DEPTH,
@@ -257,7 +254,7 @@ def test_qiskit_mitigate_executor():
 def test_qiskit_zne_decorator():
     true_zne_value = 1.0
 
-    circuit = measure(
+    circuit = qiskit_measure(
         *generate_rb_circuits(
             n_qubits=1,
             num_cliffords=TEST_DEPTH,
@@ -282,7 +279,7 @@ def test_qiskit_run_factory_with_number_of_shots():
         scale_factors=scale_factors, shot_list=shot_list
     )
 
-    circuit = measure(
+    circuit = qiskit_measure(
         *generate_rb_circuits(
             n_qubits=1,
             num_cliffords=TEST_DEPTH,
@@ -316,7 +313,7 @@ def test_qiskit_mitigate_executor_with_shot_list():
     )
     mitigated_executor = mitigate_executor(qiskit_executor, fac)
 
-    circuit = measure(
+    circuit = qiskit_measure(
         *generate_rb_circuits(
             n_qubits=1,
             num_cliffords=TEST_DEPTH,
@@ -381,9 +378,6 @@ def test_qiskit_measurement_order_is_preserved_two_registers():
     folded = scaling.fold_gates_at_random(circuit, scale_factor=1.0)
 
     assert get_counts(folded) == get_counts(circuit)
-
-
-"""Pyquil"""
 
 
 def test_pyquil_run_factory():
