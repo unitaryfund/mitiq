@@ -16,38 +16,48 @@
 """Unit tests for zero-noise extrapolation."""
 import numpy as np
 import pytest
-
 import cirq
 import qiskit
-from qiskit import (
-    Aer,
-    ClassicalRegister,
-    QuantumCircuit,
-    QuantumRegister,
-    execute,
-)
+import pyquil
 
+
+from mitiq.zne import (
+    inference,
+    scaling,
+    execute_with_zne,
+    mitigate_executor,
+    zne_decorator,
+)
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import (
     fold_gates_from_left,
     fold_gates_from_right,
     fold_gates_at_random,
 )
-from mitiq.zne import execute_with_zne, mitigate_executor, zne_decorator
-# QISKIT
-from mitiq import zne
 from mitiq._typing import QPROGRAM
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
+
 from mitiq.mitiq_qiskit import (
     execute_with_shots_and_noise,
     initialized_depolarizing_noise,
 )
 
-# Qiskit
+from mitiq.mitiq_pyquil.pyquil_utils import (
+    generate_qcs_executor,
+    ground_state_expectation,
+)
+
 BASE_NOISE = 0.007
 TEST_DEPTH = 30
 ONE_QUBIT_GS_PROJECTOR = np.array([[1, 0], [0, 0]])
 QASM_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
+QVM = pyquil.get_qc("1q-qvm")
+QVM.qam.random_seed = 1337
+noiseless_executor = generate_qcs_executor(
+    qc=pyquil.get_qc("1q-qvm"),
+    expectation_fn=ground_state_expectation,
+    shots=1_000,
+)
 
 npX = np.array([[0, 1], [1, 0]])
 """Defines the sigma_x Pauli matrix in SU(2) algebra as a (2,2) `np.array`."""
@@ -170,11 +180,11 @@ def test_doc_is_preserved():
 """Tests for zero-noise extrapolation with Qiskit front-ends and back-ends."""
 
 
-def measure(circuit, qid) -> QuantumCircuit:
+def measure(circuit, qid) -> qiskit.QuantumCircuit:
     """Helper function to measure one qubit."""
     # Ensure that we have a classical register of enough size available
     if len(circuit.clbits) == 0:
-        reg = ClassicalRegister(qid + 1, "cbits")
+        reg = qiskit.ClassicalRegister(qid + 1, "cbits")
         circuit.add_register(reg)
     circuit.measure(0, qid)
     return circuit
@@ -192,20 +202,16 @@ def qiskit_executor(qp: QPROGRAM, shots: int = 500) -> float:
     return expectation
 
 
-def get_counts(circuit: QuantumCircuit):
+def get_counts(circuit: qiskit.QuantumCircuit):
     return (
-        execute(circuit, Aer.get_backend("qasm_simulator"), shots=100)
+        qiskit
+        .execute(circuit, qiskit.Aer.get_backend("qasm_simulator"), shots=100)
         .result()
         .get_counts()
     )
 
 
-@zne.zne_decorator()
-def decorated_executor(qp: QPROGRAM) -> float:
-    return qiskit_executor(qp)
-
-
-def test_execute_with_zne():
+def test_qiskit_execute_with_zne():
     true_zne_value = 1.0
 
     circuit = measure(
@@ -218,12 +224,17 @@ def test_execute_with_zne():
         0,
     )
     base = qiskit_executor(circuit)
-    zne_value = zne.execute_with_zne(circuit, qiskit_executor)
+    zne_value = execute_with_zne(circuit, qiskit_executor)
 
     assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
 
 
-def test_mitigate_executor():
+@zne_decorator()
+def qiskit_decorated_executor(qp: QPROGRAM) -> float:
+    return qiskit_executor(qp)
+
+
+def test_qiskit_mitigate_executor():
     true_zne_value = 1.0
 
     circuit = measure(
@@ -237,12 +248,12 @@ def test_mitigate_executor():
     )
     base = qiskit_executor(circuit)
 
-    mitigated_executor = zne.mitigate_executor(qiskit_executor)
+    mitigated_executor = mitigate_executor(qiskit_executor)
     zne_value = mitigated_executor(circuit)
     assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
 
 
-def test_zne_decorator():
+def test_qiskit_zne_decorator():
     true_zne_value = 1.0
 
     circuit = measure(
@@ -256,17 +267,17 @@ def test_zne_decorator():
     )
     base = qiskit_executor(circuit)
 
-    zne_value = decorated_executor(circuit)
+    zne_value = qiskit_decorated_executor(circuit)
     assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
 
 
-def test_run_factory_with_number_of_shots():
+def test_qiskit_run_factory_with_number_of_shots():
     true_zne_value = 1.0
 
     scale_factors = [1.0, 2.0, 3.0]
     shot_list = [1_000, 2_000, 3_000]
 
-    fac = zne.inference.ExpFactory(
+    fac = inference.ExpFactory(
         scale_factors=scale_factors, shot_list=shot_list
     )
 
@@ -281,7 +292,7 @@ def test_run_factory_with_number_of_shots():
     )
     base = qiskit_executor(circuit)
     zne_value = fac.run(
-        circuit, qiskit_executor, scale_noise=zne.scaling.fold_gates_at_random,
+        circuit, qiskit_executor, scale_noise=scaling.fold_gates_at_random,
     ).reduce()
 
     assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
@@ -293,16 +304,16 @@ def test_run_factory_with_number_of_shots():
         }
 
 
-def test_mitigate_executor_with_shot_list():
+def test_qiskit_mitigate_executor_with_shot_list():
     true_zne_value = 1.0
 
     scale_factors = [1.0, 2.0, 3.0]
     shot_list = [1_000, 2_000, 3_000]
 
-    fac = zne.inference.ExpFactory(
+    fac = inference.ExpFactory(
         scale_factors=scale_factors, shot_list=shot_list
     )
-    mitigated_executor = zne.mitigate_executor(qiskit_executor, fac)
+    mitigated_executor = mitigate_executor(qiskit_executor, fac)
 
     circuit = measure(
         *generate_rb_circuits(
@@ -326,30 +337,30 @@ def test_mitigate_executor_with_shot_list():
 
 
 @pytest.mark.parametrize("order", [(0, 1), (1, 0), (0, 1, 2), (1, 2, 0)])
-def test_measurement_order_is_preserved_single_register(order):
+def test_qiskit_measurement_order_is_preserved_single_register(order):
     """Tests measurement order is preserved when folding, i.e., the dictionary
     of counts is the same as the original circuit on a noiseless simulator.
     """
-    qreg, creg = QuantumRegister(len(order)), ClassicalRegister(len(order))
-    circuit = QuantumCircuit(qreg, creg)
+    qreg, creg = qiskit.QuantumRegister(len(order)), qiskit.ClassicalRegister(len(order))
+    circuit = qiskit.QuantumCircuit(qreg, creg)
 
     circuit.x(qreg[0])
     for i in order:
         circuit.measure(qreg[i], creg[i])
 
-    folded = zne.scaling.fold_gates_at_random(circuit, scale_factor=1.0)
+    folded = scaling.fold_gates_at_random(circuit, scale_factor=1.0)
 
     assert get_counts(folded) == get_counts(circuit)
 
 
-def test_measurement_order_is_preserved_two_registers():
+def test_qiskit_measurement_order_is_preserved_two_registers():
     """Tests measurement order is preserved when folding, i.e., the dictionary
     of counts is the same as the original circuit on a noiseless simulator.
     """
     n = 4
-    qreg = QuantumRegister(n)
-    creg1, creg2 = ClassicalRegister(n // 2), ClassicalRegister(n // 2)
-    circuit = QuantumCircuit(qreg, creg1, creg2)
+    qreg = qiskit.QuantumRegister(n)
+    creg1, creg2 = qiskit.ClassicalRegister(n // 2), qiskit.ClassicalRegister(n // 2)
+    circuit = qiskit.QuantumCircuit(qreg, creg1, creg2)
 
     circuit.x(qreg[0])
     circuit.x(qreg[2])
@@ -360,6 +371,53 @@ def test_measurement_order_is_preserved_two_registers():
     circuit.measure(qreg[2], creg1[1])
     circuit.measure(qreg[3], creg2[1])
 
-    folded = zne.scaling.fold_gates_at_random(circuit, scale_factor=1.0)
+    folded = scaling.fold_gates_at_random(circuit, scale_factor=1.0)
 
     assert get_counts(folded) == get_counts(circuit)
+
+
+"""Pyquil"""
+
+
+def test_pyquil_run_factory():
+    qp = generate_rb_circuits(
+        n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
+    )
+
+    fac = inference.RichardsonFactory([1.0, 2.0, 3.0])
+
+    fac.run(*qp, noiseless_executor, scale_noise=scaling.fold_gates_at_random)
+    result = fac.reduce()
+    assert np.isclose(result, 1.0, atol=1e-5)
+
+
+def test_pyquil_execute_with_zne():
+    qp = generate_rb_circuits(
+        n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
+    )
+    result = execute_with_zne(*qp, noiseless_executor)
+    assert np.isclose(result, 1.0, atol=1e-5)
+
+
+def test_pyquil_mitigate_executor():
+    qp = generate_rb_circuits(
+        n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
+    )
+
+    new_executor = mitigate_executor(noiseless_executor)
+    result = new_executor(*qp)
+    assert np.isclose(result, 1.0, atol=1e-5)
+
+
+@zne_decorator(scale_noise=scaling.fold_gates_at_random)
+def pyquil_decorated_executor(qp: QPROGRAM) -> float:
+    return noiseless_executor(qp)
+
+
+def test_pyquil_zne_decorator():
+    qp = generate_rb_circuits(
+        n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
+    )
+
+    result = pyquil_decorated_executor(*qp)
+    assert np.isclose(result, 1.0, atol=1e-5)
