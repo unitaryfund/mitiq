@@ -119,7 +119,7 @@ def calculate_observable(
         observable: array of diagonal elements of observable to be measured,
                     which is a diagonal matrix.
     """
-    Q = int(np.log2(np.shape(observable)[0]))
+    Q = int(np.log2(len(observable)))
     if isinstance(state, np.ndarray):
         observable_values = [
             observable[i] * abs(np.conjugate(state[i]) * state[i])
