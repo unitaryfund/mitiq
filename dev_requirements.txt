@@ -12,13 +12,8 @@ flake8~=3.7.9
 black~=19.10b0
 
 # Documentation and examples.
-sphinx~=3.5.3
-docutils==0.16
-sphinxcontrib-bibtex~=1.0.0
-sphinx-copybutton~=0.2.11
-sphinx-autodoc-typehints~=1.10.3
-myst-nb~=0.11.1
-myst-parser~=0.13.3
-pybtex~=0.22.2
-pydata-sphinx-theme~=0.3.1
-notebook~=6.1.5
+sphinxcontrib-bibtex~=2.2.0
+sphinx-copybutton~=0.3.0
+sphinx-autodoc-typehints~=1.12.0
+myst-nb~=0.12.3
+pydata-sphinx-theme~=0.6.3

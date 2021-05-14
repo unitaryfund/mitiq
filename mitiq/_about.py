@@ -44,6 +44,11 @@ def about() -> None:
         from qiskit import __qiskit_version__  # pragma: no cover
 
         qiskit_version = __qiskit_version__["qiskit"]  # pragma: no cover
+        terra_version = __qiskit_version__["qiskit-terra"]  # pragma: no cover
+        aer_version = __qiskit_version__["qiskit-aer"]  # pragma: no cover
+        ibmq_provider_version = __qiskit_version__[
+            "qiskit-ibmq-provider"
+        ]  # pragma: no cover
     except ImportError:
         qiskit_version = "Not installed"
 
@@ -63,7 +68,11 @@ SciPy Version:\t{scipy_version}
 Optional Dependencies
 ---------------------
 PyQuil Version:\t{pyquil_version}
-Qiskit Version:\t{qiskit_version}
+Qiskit Version: {qiskit_version}
+    Qiskit Elements:
+        Terra : {terra_version}
+        Aer : {aer_version}
+        IBMQ-Provider : {ibmq_provider_version}
 
 Python Version:\t{PYTHON_VERSION[0]}.{PYTHON_VERSION[1]}.{PYTHON_VERSION[2]}
 Platform Info:\t{platform.system()} ({platform.machine()})"""

@@ -76,7 +76,11 @@ def generate_training_circuits(
     # Find the non-Clifford operations in the circuit.
     operations = np.array(list(circuit.all_operations()))
     non_clifford_indices_and_ops = np.array(
-        [[i, op] for i, op in enumerate(operations) if not _is_clifford(op)]
+        [
+            [i, op]
+            for i, op in enumerate(operations)
+            if not cirq.has_stabilizer_effect(op)
+        ]
     )
     if len(non_clifford_indices_and_ops) == 0:
         raise ValueError("Circuit is already Clifford.")
@@ -113,7 +117,9 @@ def is_clifford(op_like: cirq.ops.OP_TREE) -> bool:
     except TypeError:
         raise ValueError("Could not convert `op_like` to a circuit.")
 
-    return all(_is_clifford(op) for op in circuit.all_operations())
+    return all(
+        cirq.has_stabilizer_effect(op) for op in circuit.all_operations()
+    )
 
 
 # TODO: Accept any QPROGRAM.
@@ -124,7 +130,9 @@ def count_non_cliffords(circuit: Circuit) -> int:
     Args:
         circuit: Circuit to count the number of non-Clifford operations in.
     """
-    return sum(not _is_clifford(op) for op in circuit.all_operations())
+    return sum(
+        not cirq.has_stabilizer_effect(op) for op in circuit.all_operations()
+    )
 
 
 def _map_to_near_clifford(
@@ -407,21 +415,3 @@ def _probabilistic_angle_to_clifford(
         _CLIFFORD_ANGLES, 1, replace=False, p=np.array(dists) / np.sum(dists)
     )
     return cliff_ang
-
-
-def _is_clifford(op: cirq.ops.Operation) -> bool:
-    if isinstance(op.gate, cirq.ops.XPowGate):
-        return True
-    if isinstance(op.gate, cirq.ops.CNotPowGate) and op.gate.exponent == 1.0:
-        return True
-    if (
-        isinstance(op.gate, cirq.ops.ZPowGate)
-        and op.gate.exponent % 2 in _CLIFFORD_EXPONENTS
-    ):
-        return True
-
-    # Ignore measurements.
-    if isinstance(op.gate, cirq.ops.MeasurementGate):
-        return True
-    # TODO: Could add additional logic here.
-    return False
