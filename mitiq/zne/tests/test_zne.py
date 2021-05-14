@@ -18,8 +18,6 @@ import numpy as np
 import pytest
 import cirq
 import qiskit
-import pyquil
-
 
 from mitiq.zne import (
     inference,
@@ -42,22 +40,10 @@ from mitiq.mitiq_qiskit import (
     initialized_depolarizing_noise,
 )
 
-from mitiq.mitiq_pyquil.pyquil_utils import (
-    generate_qcs_executor,
-    ground_state_expectation,
-)
-
 BASE_NOISE = 0.007
 TEST_DEPTH = 30
 ONE_QUBIT_GS_PROJECTOR = np.array([[1, 0], [0, 0]])
 QASM_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
-QVM = pyquil.get_qc("1q-qvm")
-QVM.qam.random_seed = 1337
-noiseless_executor = generate_qcs_executor(
-    qc=pyquil.get_qc("1q-qvm"),
-    expectation_fn=ground_state_expectation,
-    shots=1_000,
-)
 
 npX = np.array([[0, 1], [1, 0]])
 """Defines the sigma_x Pauli matrix in SU(2) algebra as a (2,2) `np.array`."""
@@ -378,47 +364,3 @@ def test_qiskit_measurement_order_is_preserved_two_registers():
     folded = scaling.fold_gates_at_random(circuit, scale_factor=1.0)
 
     assert get_counts(folded) == get_counts(circuit)
-
-
-def test_pyquil_run_factory():
-    qp = generate_rb_circuits(
-        n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
-    )
-
-    fac = inference.RichardsonFactory([1.0, 2.0, 3.0])
-
-    fac.run(*qp, noiseless_executor, scale_noise=scaling.fold_gates_at_random)
-    result = fac.reduce()
-    assert np.isclose(result, 1.0, atol=1e-5)
-
-
-def test_pyquil_execute_with_zne():
-    qp = generate_rb_circuits(
-        n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
-    )
-    result = execute_with_zne(*qp, noiseless_executor)
-    assert np.isclose(result, 1.0, atol=1e-5)
-
-
-def test_pyquil_mitigate_executor():
-    qp = generate_rb_circuits(
-        n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
-    )
-
-    new_executor = mitigate_executor(noiseless_executor)
-    result = new_executor(*qp)
-    assert np.isclose(result, 1.0, atol=1e-5)
-
-
-@zne_decorator(scale_noise=scaling.fold_gates_at_random)
-def pyquil_decorated_executor(qp: QPROGRAM) -> float:
-    return noiseless_executor(qp)
-
-
-def test_pyquil_zne_decorator():
-    qp = generate_rb_circuits(
-        n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
-    )
-
-    result = pyquil_decorated_executor(*qp)
-    assert np.isclose(result, 1.0, atol=1e-5)
