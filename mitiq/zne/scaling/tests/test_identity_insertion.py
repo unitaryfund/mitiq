@@ -69,7 +69,7 @@ def test_scale_from_left_no_stretch(scale_method):
     """Unit test for scaling gates from left for a scale factor of 0 i.e
     no identity gates are inserted."""
     circuit = testing.random_circuit(qubits=2, n_moments=10, op_density=0.99)
-    scaled = scale_method(circuit, scale_factor=0,seed=None)
+    scaled = scale_method(circuit, scale_factor=0, seed=None)
     assert _equal(scaled, circuit)
     assert not (scaled is circuit)
 
@@ -202,7 +202,7 @@ def test_scale_from_left_and_right_three_qubits(scale_method):
         ]
     )
 
-    scaled = scale_method(circ, scale_factor=2,seed=3 )
+    scaled = scale_method(circ, scale_factor=2, seed=3)
     correct = Circuit(
         [
             ops.H.on_each(*qreg),
@@ -343,7 +343,7 @@ def test_scale_with_channels_raises_error(scale_method):
 
 @pytest.mark.parametrize(
     "scale_method",
-    [scale_gates_from_left, scale_gates_from_right, scale_gates_at_random]
+    [scale_gates_from_left, scale_gates_from_right, scale_gates_at_random],
 )
 def test_scale_no_repeats(scale_method):
     """Tests scaling at random to ensure that no gates are folded twice and
