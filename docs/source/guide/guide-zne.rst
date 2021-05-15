@@ -280,26 +280,15 @@ This function can then be used with ``mitiq.zne.execute_with_zne`` as an option 
 Noise scaling by identity scaling
 =================================
 
-Note : This module is under construction
+.. note::
+    This module is currently a WIP. To be added soon are examples for additional
+    methods - Scaling gates by fidelity, Global scaling, Custom scaling methods.
 
 ---------------------
 Local scaling methods
 ---------------------
 Scaling from left, right and at random.
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Scaling gates by fidelity
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Note : This module is under construction
---------------
-Global scaling
---------------
-Note : This module is under construction
-----------------------
-Custom scaling methods
-----------------------
-Note : This module is under construction
 
 
 .. _guide_zne_factory:
@@ -722,7 +711,7 @@ and clips the result if it falls outside its physical domain.
          # Return the clipped zero-noise extrapolation.
          if not full_output:
             return np.clip(result, min_expval, max_expval)
-         
+
          if full_output:
             # In this case "result" is a tuple of extrapolation data
             zne_limit = np.clip(result[0], min_expval, max_expval)
