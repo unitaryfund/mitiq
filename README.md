@@ -27,6 +27,16 @@ Mitiq can be installed from PyPi via
 pip install mitiq
 ```
 
+Installation from source (within a virtual environment) can be done via
+
+```bash
+git clone https://github.com/unitaryfund/mitiq.git
+cd mitiq/
+python3 -m venv myenv
+source ./myenv/bin/activate
+(myenv) pip install -e .
+```
+
 To test installation, run
 
 ```python
@@ -44,9 +54,9 @@ If you'd prefer to clone and install from source, or would like to develop Mitiq
 
 Mitiq can currently interface with:
 
-* [Cirq](https://github.com/quantumlib/Cirq),
-* [Qiskit](https://qiskit.org/),
-* [pyQuil](https://github.com/rigetti/pyquil).
+* [Cirq](https://github.com/quantumlib/Cirq)
+* [Qiskit](https://qiskit.org/)
+* [pyQuil](https://github.com/rigetti/pyquil)
 
 Cirq is a core requirement of Mitiq and is automatically installed. To use Mitiq with other quantum programming
 libraries, install the optional package(s) following the instructions linked above.
