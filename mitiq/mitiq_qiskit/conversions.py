@@ -259,7 +259,6 @@ def to_qiskit(
     circuit: cirq.Circuit,
     qregs: Optional[List[qiskit.QuantumRegister]] = None,
     cregs: Optional[List[qiskit.ClassicalRegister]] = None,
-    add_cregs_if_cannot_transform: bool = True,
 ) -> qiskit.QuantumCircuit:
     """Returns a Qiskit circuit equivalent to the input Mitiq circuit.
 
@@ -271,9 +270,6 @@ def to_qiskit(
             that the original circuit has classical registers and
             ``add_cregs_if_cannot_transform`` is True. If none are provided, a
             single default register is used.
-        add_cregs_if_cannot_transform: If True, the provided ``cregs`` are
-            added to the circuit if there are no classical registers in the
-            original ``circuit``.
 
     Returns:
         Qiskit.QuantumCircuit object equivalent to the input Mitiq circuit.
@@ -281,13 +277,19 @@ def to_qiskit(
     # Base conversion.
     qiskit_circuit = qiskit.QuantumCircuit.from_qasm_str(to_qasm(circuit))
 
+    measurements = _measurement_order(qiskit_circuit)
+    if qiskit_circuit.cregs and not cregs:
+        cregs = qiskit_circuit.cregs
     # Assign register structure.
     # Note: Output qiskit_circuit has one quantum register and n classical
     # registers of 1 bit where n is the total number of classical bits.
+    qiskit_circuit.remove_final_measurements()
+    
     _transform_registers(qiskit_circuit, new_qregs=qregs)
-    if cregs and add_cregs_if_cannot_transform:
-        qiskit_circuit.cregs = []
+    if cregs:
         qiskit_circuit.add_register(*cregs)
+    for q, c in measurements:
+        qiskit_circuit.measure(q, c)
 
     return qiskit_circuit
 
