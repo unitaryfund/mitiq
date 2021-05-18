@@ -204,7 +204,7 @@ def _transform_registers(
         new_cregs = []
 
     qreg_sizes = [qreg.size for qreg in new_qregs]
-    old_qregs = circuit.qregs
+    old_qregs = circuit.qregs.copy()
     nqubits_in_circuit = sum(qreg.size for qreg in old_qregs)
 
     if len(old_qregs) > 1:
@@ -220,7 +220,7 @@ def _transform_registers(
         )
 
     creg_sizes = [creg.size for creg in new_cregs]
-    old_cregs = circuit.cregs
+    old_cregs = circuit.cregs.copy()
     nbits_in_circuit = sum(creg.size for creg in old_cregs)
 
     if len(old_cregs) not in (0, 1, nbits_in_circuit):
@@ -237,18 +237,35 @@ def _transform_registers(
         )
 
     # Assign the new registers.
-    if len(qreg_sizes):
-        circuit.qregs = list(new_qregs)
-    if len(creg_sizes):
-        circuit.cregs = list(new_cregs)
+    circuit.cregs = new_cregs
+    circuit.qregs = new_qregs
+
+    circuit._qubits = _map_bits(
+        circuit._qubits, old_qregs, qreg_sizes, new_qregs
+    )
+    circuit._clbits = _map_bits(
+        circuit._clbits, old_cregs, creg_sizes, new_cregs
+    )
+    circuit._qubit_set = set(circuit._qubits)
+    circuit._clbit_set = set(circuit._clbits)
 
     # Map the (qu)bits in operations to the new (qu)bits.
     new_ops = []
     for op in circuit.data:
         gate, qubits, cbits = op
 
-        new_qubits = _map_bits(qubits, old_qregs, qreg_sizes, new_qregs)
-        new_cbits = _map_bits(cbits, old_cregs, creg_sizes, new_cregs)
+        new_qubits = [
+            new_bit
+            for new_bit in circuit._qubits
+            for old_bit in qubits
+            if new_bit.index == old_bit.index
+        ]
+        new_cbits = [
+            new_bit
+            for new_bit in circuit._clbits
+            for old_bit in cbits
+            if new_bit.index == old_bit.index
+        ]
 
         new_ops.append((gate, new_qubits, new_cbits))
 
