@@ -13,11 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-""" Functions for using near-Clifford training data for error mitiaiton"""
+""" Functions for using near-Clifford training data for error mitigation"""
 from typing import List, Union, Callable, Dict
 
 import numpy as np
-from mitiq._typing import QPROGRAM
 
 from cirq.circuits import Circuit
 
@@ -50,8 +49,8 @@ def scale_noise_in_circuits(
 
 def execute_training_circuits(
     all_training_circuits: List[Circuit],
-    executor: Callable[[QPROGRAM], Dict],
-    simulator: Callable[[QPROGRAM], Union[Dict, np.ndarray]],
+    executor: Callable[[Circuit], Dict],
+    simulator: Callable[[Circuit], Union[Dict, np.ndarray]],
     noise_levels: int = 1,
 ) -> (List[Dict], List[Dict]):
     """Returns two list of dictionaries of different sizes. One list of
@@ -59,9 +58,10 @@ def execute_training_circuits(
     training circuits and the other contains the exact counts.
 
     Args:
-        all_training_circuits: list of all training.
+        all_training_circuits: list of all training circuits at all noise
+                               levels.
         executor: user defined executor function.
-        simulator: user definied simulator function either returns counts or
+        simulator: user defined simulator function either returns counts or
                    a statevector.
         noise_levels: number of noise levels to be used in the regression.
     """
@@ -75,18 +75,18 @@ def execute_training_circuits(
         training_circuits_raw_data.append(training_circuit_raw_result)
         # runs the circuits with no increased noise in the simulator:
         if i < number_of_training_circuits:
-            training_circuit_simualted_result = simulator(training_circuit)
+            training_circuit_simulated_result = simulator(training_circuit)
             training_circuits_simulated_data.append(
-                training_circuit_simualted_result
+                training_circuit_simulated_result
             )
     return (training_circuits_raw_data, training_circuits_simulated_data)
 
 
-# TODO: this function below is not really neccesary, but is quite useful and
+# TODO: this function below is not really necessary, but is quite useful and
 # follows the structure of the above format.
 def execute_circuit_of_interest(
     circuits: Union[List[Circuit], Circuit],
-    executor: Callable[[QPROGRAM], Dict],
+    executor: Callable[[Circuit], Dict],
 ) -> List[Dict]:
     """Function to run circuit of interest at different noise levels. Returns
     list of dictionaries of counts at different noise levels. Output to be
@@ -127,7 +127,7 @@ def calculate_observable(
         ]
     elif isinstance(state, Dict):
         # order the counts and add zeros:
-        state = state_counts(state, Q)
+        state = dictionary_to_state_counts(state, Q)
         values = list(state.values())
         observable_values = [
             (observable[i] * values[i]) for i in range(2 ** Q)
@@ -145,7 +145,7 @@ def construct_training_data_floats(
     training_data: List[Dict], observable: np.ndarray, noise_levels: int = 1,
 ) -> (np.ndarray, np.ndarray):
     """Returns training data now as two arrays of floats to be used in the
-    regression (raw_training_data, simualated_training_data)
+    regression (raw_training_data, simulated_training_data)
     Args:
         training_data: list of dictionary of counts for all training circuits
                        and all noise levels. In the form:
@@ -158,13 +158,13 @@ def construct_training_data_floats(
         noise_levels: number of noise levels to be used in the regression.
     """
     training_circuits_raw_data = training_data[0]
-    training_circuits_simualted_data = training_data[1]
-    number_of_training_circuits = len(training_circuits_simualted_data)
+    training_circuits_simulated_data = training_data[1]
+    number_of_training_circuits = len(training_circuits_simulated_data)
     # first need to sort the training data, then will do a regression.
     X_data = np.zeros((number_of_training_circuits, noise_levels))
     Y_data = np.zeros((number_of_training_circuits))
     for count in range(len(training_circuits_raw_data)):
-        i = count % number_of_training_circuits  # row: training cirucit
+        i = count % number_of_training_circuits  # row: training circuit
         j = int(count / number_of_training_circuits)  # column: noise levels
         training_circ_raw_data = training_circuits_raw_data[count]
         training_obs_raw = calculate_observable(
@@ -172,7 +172,7 @@ def construct_training_data_floats(
         )
         X_data[i, j] = training_obs_raw
         if count < number_of_training_circuits:
-            training_circ_simulated_data = training_circuits_simualted_data[
+            training_circ_simulated_data = training_circuits_simulated_data[
                 count
             ]
             training_obs_sim = calculate_observable(
@@ -182,7 +182,7 @@ def construct_training_data_floats(
     return (X_data, Y_data)
 
 
-# TODO: again this function below is not really neccesary, but is quite useful
+# TODO: again this function below is not really necessary, but is quite useful
 #  and follows the structure of the above format.
 
 
@@ -190,7 +190,7 @@ def construct_circuit_data_floats(
     circuit_data: List[Dict], observable: np.ndarray, noise_levels: int = 1,
 ) -> np.ndarray:
     """Returns training data now as two arrays of floats to be used in the
-    regression (raw_training_data, simualated_training_data)
+    regression (raw_training_data, simulated_training_data)
     Args:
         circuit_data: list of dictionary of counts for circuit of interest
                       and all noise levels.
@@ -209,7 +209,7 @@ def construct_circuit_data_floats(
 def find_optimal_parameters(
     X_data: np.ndarray, y_data: np.ndarray, intercept: bool = True
 ):
-    """Returns the optimal parameters calculcated by computing a regression
+    """Returns the optimal parameters calculated by computing a regression
     on the training data.
     Args:
         X_data: array of noisy observables at various noise levels.
@@ -266,10 +266,10 @@ def wrapper_fit_func(x, noise_levels, *args, intercept: bool = True):
 
 
 # TODO: Discuss if this format for converting shots makes sense in general.
-def state_counts(counts: Dict, Q: int) -> Dict:
+def dictionary_to_state_counts(counts: Dict, Q: int) -> Dict:
     """Expresses the result of the simulation in the form of a dictionary
     whose values are the modulus squared of the components of the final state.
-    The return probabilities are normalised by the number of counts.
+    The return probabilities are normalized by the number of counts.
     Args:
         counts: Dictionary of counts with binary keys identifying the state.
         Q: Number of qubits in the system.

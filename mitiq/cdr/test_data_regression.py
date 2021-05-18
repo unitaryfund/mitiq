@@ -36,7 +36,7 @@ from mitiq.cdr.data_regression import (
     f,
     calculate_observable,
     wrapper_fit_func,
-    state_counts,
+    dictionary_to_state_counts,
 )
 
 from mitiq.zne.scaling import (
@@ -88,8 +88,8 @@ def executor(circuit: Circuit) -> Dict:
     return dict_counts
 
 
-# Defines a function (which could be user definied) that converts a python
-# Counte object which is returned by cirq into a dictionary of counts.
+# Defines a function (which could be user defined) that converts a python
+# Counter object which is returned by cirq into a dictionary of counts.
 def counter_to_dict(counts: Counter) -> Dict:
     """ Returns a dictionary of counts. Takes cirq output 'Counter' object to
     binary counts. I assume this is the format which we will be working with
@@ -201,7 +201,10 @@ def test_execute_training_circuits(training_circuits, simulator):
 
 def test_exectue_circuit_of_interest():
     assert len(results_circuit_of_interest) == 2
-    assert len(results_circuit_of_interest_one_noise_level) == 1
+    assert (
+        len(execute_circuit_of_interest(all_circuits_of_interest[0], executor))
+        == 1
+    )
 
 
 def test_calculate_observable():
@@ -283,10 +286,10 @@ def test_wrapper_fit_func(intercept):
         assert point == 6
 
 
-def test_state_counts():
+def test_dictionary_to_state_counts():
     Q = 1
     sim_counts = simulator_counts(circuit)
-    state = state_counts(sim_counts, Q)
+    state = dictionary_to_state_counts(sim_counts, Q)
     assert bin(0) in state.keys()
     assert bin(1) in state.keys()
     assert (isinstance(i, float) for i in list(state.values()))
