@@ -61,13 +61,16 @@ def _generate_parameter_calibration_circuit(
     Generates a circuit which should be the identity. Given a rotation
     gate R(param), it applies R(2 * pi / depth) depth times, resulting
     in R(2*pi). Requires that the gate is periodic in 2*pi.
+
     Args:
         qubits: A list of qubits.
         depth: The length of the circuit to create.
         gate: The base gate to apply several times, must be periodic
             in 2*pi.
-    Returns: A parameter calibration circuit that can be used for
-        profiling.
+
+    Returns:
+        A parameter calibration circuit that can be used for estimating
+        the parameter noise of the input gate.
     """
     num_qubits = gate().num_qubits()
     if num_qubits != len(qubits):
@@ -87,6 +90,7 @@ def _parameter_calibration(
     variance in the control parameter
     that can be used for parameter noise scaling later on.
     Only works for one qubit gates for now.
+
     Args:
         executor: A function that takes in a quantum circuit and returns
             an expectation value.
@@ -94,7 +98,9 @@ def _parameter_calibration(
         qubit: The index of the qubit you wish to profile.
         depth: The number of operations you would like to use to profile
             your gate.
-    Returns: the estimated variance of the control parameter.
+
+    Returns:
+        The estimated variance of the control parameter.
     """
 
     base_gate = _get_base_gate(gate)
@@ -116,6 +122,7 @@ def scale_parameters(
 ) -> Circuit:
     """Applies parameter-noise scaling to the input circuit,
     assuming that each gate has the same base level of noise.
+
     Args:
         circuit: The circuit to scale as a QPROGRAM. All measurements
             should be in the last moment of the circuit.
@@ -123,7 +130,9 @@ def scale_parameters(
         base_variance: The base level (variance) of parameter noise,
             assumed to be the same for each gate of the circuit.
         seed: Optional seed for random number generator.
-    Returns: The (parameter) noise scaled circuit.
+
+    Returns:
+        The parameter noise scaled circuit.
     """
     final_moments = []
     noise = (scale_factor - 1) * base_variance
