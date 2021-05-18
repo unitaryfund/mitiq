@@ -38,7 +38,7 @@ def test_identity_scale_1q():
     """
     qreg = LineQubit.range(3)
     circ = Circuit([ops.X.on_each(qreg)], [ops.Y.on(qreg[0])])
-    scaled = scale_parameters(circ, scale_factor=1, sigma=0.001)
+    scaled = scale_parameters(circ, scale_factor=1, base_variance=0.001)
     assert _equal(circ, scaled)
 
 
@@ -59,7 +59,7 @@ def test_non_identity_scale_1q():
     np.random.seed(42)
 
     scaled = scale_parameters(
-        circ, scale_factor=stretch, sigma=base_noise, seed=42
+        circ, scale_factor=stretch, base_variance=base_noise, seed=42
     )
     result = []
     for moment in scaled:
@@ -76,7 +76,7 @@ def test_identity_scale_2q():
     """
     qreg = LineQubit.range(2)
     circ = Circuit([ops.CNOT.on(qreg[0], qreg[1])])
-    scaled = scale_parameters(circ, scale_factor=1, sigma=0.001)
+    scaled = scale_parameters(circ, scale_factor=1, base_variance=0.001)
     assert _equal(circ, scaled)
 
 
@@ -94,7 +94,7 @@ def test_non_identity_scale_2q():
     )
     np.random.seed(42)
     scaled = scale_parameters(
-        circ, scale_factor=stretch, sigma=base_noise, seed=42
+        circ, scale_factor=stretch, base_variance=base_noise, seed=42
     )
     result = []
     for moment in scaled:
@@ -124,7 +124,7 @@ def test_scale_with_measurement():
         [ops.CNOT.on(qreg[0], qreg[2])],
         [ops.measure(qreg[0], qreg[2])],
     )
-    scaled = scale_parameters(circ, scale_factor=1, sigma=0.001)
+    scaled = scale_parameters(circ, scale_factor=1, base_variance=0.001)
     assert _equal(circ, scaled)
 
 
