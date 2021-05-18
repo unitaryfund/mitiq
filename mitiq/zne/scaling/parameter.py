@@ -60,11 +60,13 @@ def _generate_parameter_calibration_circuit(
     Generates a circuit which should be the identity. Given a rotation
     gate R(param), it applies R(2 * pi / depth) depth times, resulting
     in R(2*pi). Requires that the gate is periodic in 2*pi.
+
     Args:
         qubits: a list of qubits
         depth: the length of the circuit to create
         gate: the base gate to apply several times, must be periodic
                 in 2*pi
+
     Returns:
         circuit: a parameter calibration circuit that can be
                 used for profiling
@@ -87,6 +89,7 @@ def _parameter_calibration(
     variance in the control parameter
     that can be used for parameter noise scaling later on.
     Only works for one qubit gates for now.
+
     Args:
         executor: a function that takes in a quantum circuit and returns
             an expectation value
@@ -94,6 +97,7 @@ def _parameter_calibration(
         qubit: the index of the qubit you wish to profile
         depth: the number of operations you would like to use to profile
             your gate.
+
     Returns:
         sigma: a float representing the standard deviation of the error
             of your gate
@@ -119,14 +123,17 @@ def scale_parameters(
     """Adds parameter noise to a circuit with level noise.
     This adds noise to the actual parameter instead of
     adding an parameter channel.
+
     Args:
         circ: The quantum program as a Cirq circuit object. All measurements
             should be in the last moment of the circuit.
         scale_factor: Amount to scale the base noise level of parameters by.
         sigma: Base noise level (variance) in parameter rotations
         seed: random seed
+
     Returns:
         The input circuit with scaled rotation angles
+
     """
     final_moments = []
     noise = (scale_factor - 1) * sigma
