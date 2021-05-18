@@ -8,6 +8,47 @@
 % # " - [Bug Fix]"
 % # " - Fix the bug."
 
+## Version 0.8.0 (May 6th, 2021)
+
+### Summary
+
+This release has the following major components:
+
+- Re-implements local folding functions (`zne.scaling.fold_gates_from_left`, `zne.scaling.fold_gates_from_right` and `zne.scaling.fold_gates_at_random`) to make them more uniform at large scale factors and match how they were defined in [Digital zero-noise extrapolation for quantum error mitigation](https://arxiv.org/abs/2005.10921).
+- Adds a new noise scaling method, `zne.scaling.fold_all`, which locally folds all gates. This can be used, e.g., to "square CNOTs," a common literature technique, by calling `fold_all` and excluding single-qubit gates.
+- Adds functionality for the training portion of [Clifford data regression](https://arxiv.org/abs/2005.10189), specifically to map an input (pre-compiled) circuit to a set of (near) Clifford circuits which are used as training data for the method. The full CDR technique is still in development and will be complete with the addition of regression methods.
+- Improves the (sampling) performance of PEC (by a lot!) via fewer circuit conversions.
+- Adds `PauliString` object, the first change of several in the generalization of executors. This object is not yet used in any error mitigation pipelines but can be used as a stand-alone.
+
+Additionally, this release 
+
+- Fixes some CI components including uploading coverage from master and suppressing nightly Test PyPI uploads on forks.
+- Adds links to GitHub on README and RTD.
+
+Special thanks to all contributors - @purva-thakre, @Aaron-Robertson, @andre-a-alves, @mstechly, @ckissane, @HaoTy, @briancylui, and @L-P-B - for your work on this release! 
+
+### All Changes
+
+- Remove docs/pdf in favor of RTD (@rmlarose, gh-662).
+- Redefine and re-implement local folding functions (@andreamari, gh-649).
+- Move Cirq executors from docs to utilities (@purva-thakre, gh-603).
+- Add functionality for the training portion of Clifford Data Regression (@L-P-B, gh-601).
+- Fix custom factory example in docs (@andreamari, gh-601).
+- Improves PEC sampling speed via fewer conversions (@ckissane, @HaoTy, @briancylui, gh-647).
+- Minor typing fixes (@mstechly, gh-652).
+- Add new `fold_all` scaling method (@rmlarose, gh-648).
+- Add `PauliString` (@rmlarose, gh-633).
+- Update information about formatting in RTD (@purva-thakre, gh-622).
+- Fix typo in getting started guide (@andre-a-alves, gh-640).
+- Suppress Test PyPI nightly upload on forks (@purva-thakre, gh-597).
+- Add link to GitHub in README and add octocat link to GitHub on RTD (@andre-a-alves, gh-637).
+- Move all benchmark circuit generation to `mitiq.benchmarks`, adding option for converions (@Aaron-Robertson, gh-632).
+- Use `execute_with_shots_and_noise` in Qiskit utils test (@Aaron-Robertson, gh-621).
+- Install only the Qiskit packages we need (@purva-thakre, gh-614).
+- Update PR template (@rmlarose, gh-634).
+- Add blurb about unitaryHACK (@nathanshammah).
+
+
 ## Version 0.7.0 (April 7th, 2021)
 
 ### Summary
@@ -29,6 +70,7 @@ to @purva-thakre for several bug fixes and improvements. Thanks also to @BobinMa
 - Correct a typo in the readme (@BobinMathew, gh-609)
 - Add ``represent_operations_in_circuit_...`` functions for PEC (@andreamari, gh-515)
 - Add qiskit and cirq executor examples gifs to readme (@nathanshammah, gh-587)
+- Move Cirq executors in docs to cirq_utils (@purva-thakre, gh-603)
 - Add parametrized scaling (@yhindyYousef, gh-411)
 - Fix mitiq.about() qiskit version (@aaron-robertson, gh-598)
 - Fix typo in ZNE documentation (@purva-thakre, gh-602)
@@ -38,7 +80,6 @@ to @purva-thakre for several bug fixes and improvements. Thanks also to @BobinMa
 - Remove factory equality and fix bug in `PolyExpFactory.extrapolate` (@rmlarose, gh-580)
 - [Bug Fix] Examples (notebooks) in the online documentation now have output code cells (@Aaron-Robertson, gh-576)
 - Update version to dev (@andreamari, gh-572)
-
 - Change custom depolarizing channel in PEC test (@purva-thakre, gh-615)
 
 ## Version 0.6.0 (March 1st, 2021)

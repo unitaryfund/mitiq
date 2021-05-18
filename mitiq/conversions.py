@@ -63,6 +63,11 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
 
         input_circuit_type = "pyquil"
         conversion_function = from_pyquil
+    elif "braket" in package:
+        from mitiq.mitiq_braket.conversions import from_braket
+
+        input_circuit_type = "braket"
+        conversion_function = from_braket
     elif isinstance(circuit, Circuit):
         input_circuit_type = "cirq"
 
@@ -104,6 +109,10 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
         from mitiq.mitiq_pyquil.conversions import to_pyquil
 
         conversion_function = to_pyquil
+    elif conversion_type == "braket":
+        from mitiq.mitiq_braket.conversions import to_braket
+
+        conversion_function = to_braket
     elif conversion_type == "cirq":
 
         def conversion_function(circ: Circuit) -> Circuit:
