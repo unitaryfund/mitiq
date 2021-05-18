@@ -31,7 +31,6 @@ from cirq import (
     Qid,
 )
 from mitiq.conversions import noise_scaling_converter
-from mitiq import QPROGRAM
 
 
 class GateTypeException(Exception):
@@ -61,15 +60,14 @@ def _generate_parameter_calibration_circuit(
     Generates a circuit which should be the identity. Given a rotation
     gate R(param), it applies R(2 * pi / depth) depth times, resulting
     in R(2*pi). Requires that the gate is periodic in 2*pi.
-
     Args:
-        qubits: A list of qubits.
-        depth: The length of the circuit to create.
-        gate: The base gate to apply several times, must be periodic
-            in 2*pi.
-
-    Returns: A parameter calibration circuit that can be used for
-        profiling.
+        qubits: a list of qubits
+        depth: the length of the circuit to create
+        gate: the base gate to apply several times, must be periodic
+                in 2*pi
+    Returns:
+        circuit: a parameter calibration circuit that can be
+                used for profiling
     """
     num_qubits = gate().num_qubits()
     if num_qubits != len(qubits):
@@ -89,16 +87,16 @@ def _parameter_calibration(
     variance in the control parameter
     that can be used for parameter noise scaling later on.
     Only works for one qubit gates for now.
-
     Args:
-        executor: A function that takes in a quantum circuit and returns
-            an expectation value.
-        gate: The quantum gate that you wish to profile.
-        qubit: The index of the qubit you wish to profile.
-        depth: The number of operations you would like to use to profile
+        executor: a function that takes in a quantum circuit and returns
+            an expectation value
+        gate: the quantum gate that you wish to profile
+        qubit: the index of the qubit you wish to profile
+        depth: the number of operations you would like to use to profile
             your gate.
-
-    Returns: the estimated variance of the control parameter.
+    Returns:
+        sigma: a float representing the standard deviation of the error
+            of your gate
     """
 
     base_gate = _get_base_gate(gate)
@@ -106,35 +104,34 @@ def _parameter_calibration(
         [qubit], depth, base_gate
     )
     expectation = executor(circuit)
-    error_prob = (1 - np.power(2 * expectation - 1, 1 / depth)) / 2
-    variance = -0.5 * np.log(1 - 2 * error_prob)
-    return variance
+    Q = (1 - np.power(2 * expectation - 1, 1 / depth)) / 2
+    sigma = -0.5 * np.log(1 - 2 * Q)
+    return sigma
 
 
 @noise_scaling_converter
 def scale_parameters(
-    circuit: QPROGRAM,
+    circ: Circuit,
     scale_factor: float,
-    base_variance: float,
+    sigma: float,
     seed: Optional[int] = None,
 ) -> Circuit:
-    """Applies parameter-noise scaling to the input circuit,
-    assuming that each gate has the same base level of noise.
-
+    """Adds parameter noise to a circuit with level noise.
+    This adds noise to the actual parameter instead of
+    adding an parameter channel.
     Args:
-        circuit: The circuit to scale as a QPROGRAM. All measurements
+        circ: The quantum program as a Cirq circuit object. All measurements
             should be in the last moment of the circuit.
-        scale_factor: The amount to scale the base noise level by.
-        base_variance: The base level (variance) of parameter noise,
-            assumed to be the same for each gate of the circuit.
-        seed: Optional seed for random number generator.
-
-    Returns: The (parameter) noise scaled circuit.
+        scale_factor: Amount to scale the base noise level of parameters by.
+        sigma: Base noise level (variance) in parameter rotations
+        seed: random seed
+    Returns:
+        The input circuit with scaled rotation angles
     """
     final_moments = []
-    noise = (scale_factor - 1) * base_variance
+    noise = (scale_factor - 1) * sigma
     rng = np.random.RandomState(seed)
-    for moment in circuit:
+    for moment in circ:
         curr_moment = []
         for op in moment.operations:
             gate = copy.deepcopy(op.gate)
