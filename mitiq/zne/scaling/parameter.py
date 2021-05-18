@@ -31,6 +31,7 @@ from cirq import (
     Qid,
 )
 from mitiq.conversions import noise_scaling_converter
+from mitiq import QPROGRAM
 
 
 class GateTypeException(Exception):
@@ -62,14 +63,14 @@ def _generate_parameter_calibration_circuit(
     in R(2*pi). Requires that the gate is periodic in 2*pi.
 
     Args:
-        qubits: a list of qubits
-        depth: the length of the circuit to create
-        gate: the base gate to apply several times, must be periodic
-                in 2*pi
+        qubits: A list of qubits.
+        depth: The length of the circuit to create.
+        gate: The base gate to apply several times, must be periodic
+            in 2*pi.
 
     Returns:
-        circuit: a parameter calibration circuit that can be
-                used for profiling
+        A parameter calibration circuit that can be used for estimating
+        the parameter noise of the input gate.
     """
     num_qubits = gate().num_qubits()
     if num_qubits != len(qubits):
@@ -91,16 +92,15 @@ def _parameter_calibration(
     Only works for one qubit gates for now.
 
     Args:
-        executor: a function that takes in a quantum circuit and returns
-            an expectation value
-        gate: the quantum gate that you wish to profile
-        qubit: the index of the qubit you wish to profile
-        depth: the number of operations you would like to use to profile
+        executor: A function that takes in a quantum circuit and returns
+            an expectation value.
+        gate: The quantum gate that you wish to profile.
+        qubit: The index of the qubit you wish to profile.
+        depth: The number of operations you would like to use to profile
             your gate.
 
     Returns:
-        sigma: a float representing the standard deviation of the error
-            of your gate
+        The estimated variance of the control parameter.
     """
 
     base_gate = _get_base_gate(gate)
@@ -108,37 +108,36 @@ def _parameter_calibration(
         [qubit], depth, base_gate
     )
     expectation = executor(circuit)
-    Q = (1 - np.power(2 * expectation - 1, 1 / depth)) / 2
-    sigma = -0.5 * np.log(1 - 2 * Q)
-    return sigma
+    error_prob = (1 - np.power(2 * expectation - 1, 1 / depth)) / 2
+    variance = -0.5 * np.log(1 - 2 * error_prob)
+    return variance
 
 
 @noise_scaling_converter
 def scale_parameters(
-    circ: Circuit,
+    circuit: QPROGRAM,
     scale_factor: float,
-    sigma: float,
+    base_variance: float,
     seed: Optional[int] = None,
 ) -> Circuit:
-    """Adds parameter noise to a circuit with level noise.
-    This adds noise to the actual parameter instead of
-    adding an parameter channel.
+    """Applies parameter-noise scaling to the input circuit,
+    assuming that each gate has the same base level of noise.
 
     Args:
-        circ: The quantum program as a Cirq circuit object. All measurements
+        circuit: The circuit to scale as a QPROGRAM. All measurements
             should be in the last moment of the circuit.
-        scale_factor: Amount to scale the base noise level of parameters by.
-        sigma: Base noise level (variance) in parameter rotations
-        seed: random seed
+        scale_factor: The amount to scale the base noise level by.
+        base_variance: The base level (variance) of parameter noise,
+            assumed to be the same for each gate of the circuit.
+        seed: Optional seed for random number generator.
 
     Returns:
-        The input circuit with scaled rotation angles
-
+        The parameter noise scaled circuit.
     """
     final_moments = []
-    noise = (scale_factor - 1) * sigma
+    noise = (scale_factor - 1) * base_variance
     rng = np.random.RandomState(seed)
-    for moment in circ:
+    for moment in circuit:
         curr_moment = []
         for op in moment.operations:
             gate = copy.deepcopy(op.gate)
