@@ -101,14 +101,14 @@ def _create_scale_mask(
         [2, 2, 1, 0]
     """
 
-    if not 0.0 <= scale_factor:
+    if not 1.0 <= scale_factor:
         raise ValueError(
-            f"Requires scale_factor >= 0.0 but scale_factor = {scale_factor}."
+            f"Requires scale_factor >= 1.0 but scale_factor = {scale_factor}."
         )
 
     # Find the maximum odd integer smaller or equal to scale_factor
     num_uniform_folds = int(scale_factor - 1.0)
-    odd_integer_scale_factor = num_uniform_folds - 1.0
+    odd_integer_scale_factor = np.abs(num_uniform_folds - 1)
 
     # Uniformly scaling all gates to reach odd_integer_scale_factor
     num_inserts_mask = []
@@ -119,7 +119,7 @@ def _create_scale_mask(
             num_inserts_mask.append(num_uniform_folds)
 
     # If the scale_factor is an odd integer, we are done.
-    if np.isclose(odd_integer_scale_factor, scale_factor):
+    if np.isclose(odd_integer_scale_factor, scale_factor, atol=0.01):
         return num_inserts_mask
 
     # Express scaling order through a list of indices
