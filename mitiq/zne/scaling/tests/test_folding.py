@@ -28,7 +28,6 @@ from cirq import (
     InsertStrategy,
     testing,
 )
-from cirq.google import Sycamore
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 from qiskit.quantum_info.operators import Operator
 from pyquil import Program
@@ -134,15 +133,6 @@ def test_squash_moments_returns_new_circuit_and_doesnt_modify_input_circuit():
     assert len(squashed) == 1
     assert circ is not squashed
     assert _equal(circ, Circuit(ops.H.on(qbit)))
-
-
-def test_squash_moments_retains_device():
-    """Tests that the returned circuit from squash_moments has the same device
-    as the input circuit.
-    """
-    circuit = Circuit(device=Sycamore)
-    squashed = _squash_moments(circuit)
-    assert squashed.device == Sycamore
 
 
 def test_squash_moments_never_increases_moments():
