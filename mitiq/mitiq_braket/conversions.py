@@ -88,14 +88,12 @@ def _translate_braket_instruction_to_cirq_operation(
             return [cirq_ops.TOFFOLI.on(*qubits)]
         elif isinstance(instr.operator, braket_gates.CSwap):
             return [cirq_ops.FREDKIN.on(*qubits)]
+        else:
+            _raise_braket_to_cirq_error(instr)
 
     # Unknown instructions.
     else:
-        raise ValueError(
-            f"Unable to convert the instruction {instr} to Cirq. If you think "
-            "this is a bug, you can open an issue on the Mitiq GitHub at "
-            "https://github.com/unitaryfund/mitiq."
-        )
+        _raise_braket_to_cirq_error(instr)
 
 
 def _translate_cirq_operation_to_braket_instruction(
@@ -125,14 +123,11 @@ def _translate_cirq_operation_to_braket_instruction(
             return [Instruction(braket_gates.CCNot(), qubits)]
         elif isinstance(op.gate, cirq_ops.FREDKIN):
             return [Instruction(braket_gates.CSwap(), qubits)]
-
+        else:
+            _raise_cirq_to_braket_error(op)
     # Unsupported gates.
     else:
-        raise ValueError(
-            f"Unable to convert {op} to Braket. If you think this is a bug, "
-            "you can open an issue on the Mitiq GitHub at"
-            " https://github.com/unitaryfund/mitiq."
-        )
+        _raise_cirq_to_braket_error(op)
 
 
 def _translate_one_qubit_braket_instruction_to_cirq_operation(
@@ -184,11 +179,7 @@ def _translate_one_qubit_braket_instruction_to_cirq_operation(
         return [cirq_ops.Z.on(*qubits) ** (gate.angle / np.pi)]
 
     else:
-        raise ValueError(
-            f"Unable to convert the instruction {instr} to Cirq. If you think "
-            "this is a bug, you can open an issue on the Mitiq GitHub at "
-            "https://github.com/unitaryfund/mitiq."
-        )
+        _raise_braket_to_cirq_error(instr)
 
 
 def _translate_two_qubit_braket_instruction_to_cirq_operation(
@@ -269,11 +260,7 @@ def _translate_two_qubit_braket_instruction_to_cirq_operation(
         return [cirq_ops.ISwapPowGate(exponent=gate.angle / np.pi).on(*qubits)]
 
     else:
-        raise ValueError(
-            f"Unable to convert the instruction {instr} to Cirq. If you think "
-            "this is a bug, you can open an issue on the Mitiq GitHub at "
-            "https://github.com/unitaryfund/mitiq."
-        )
+        _raise_braket_to_cirq_error(instr)
 
 
 def _translate_one_qubit_cirq_operation_to_braket_instruction(
@@ -438,3 +425,18 @@ def _translate_two_qubit_cirq_operation_to_braket_instruction(
         *_translate_one_qubit_cirq_operation_to_braket_instruction(B1, q1),
         *_translate_one_qubit_cirq_operation_to_braket_instruction(B2, q2),
     ]
+
+def _raise_braket_to_cirq_error(instr):
+    raise ValueError(
+        f"Unable to convert the instruction {instr} to Cirq. If you think "
+        "this is a bug, you can open an issue on the Mitiq GitHub at "
+        "https://github.com/unitaryfund/mitiq."
+    )
+
+def _raise_cirq_to_braket_error(op):
+    raise ValueError(
+        f"Unable to convert {op} to Braket. If you think this is a bug, "
+        "you can open an issue on the Mitiq GitHub at"
+        " https://github.com/unitaryfund/mitiq."
+    )
+
