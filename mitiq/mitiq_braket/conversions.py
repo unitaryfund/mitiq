@@ -223,16 +223,30 @@ def _translate_two_qubit_braket_instruction_to_cirq_operation(
         ]
 
     # Two-qubit parameterized gates.
-    elif isinstance(gate, braket_gates.PSwap):
-        raise ValueError  # TODO.
     elif isinstance(gate, braket_gates.CPhaseShift):
         return [cirq_ops.CZ.on(*qubits) ** (gate.angle / np.pi)]
     elif isinstance(gate, braket_gates.CPhaseShift00):
-        raise ValueError  # TODO.
+        return [
+            cirq_ops.CZ.on(*qubits) ** (gate.angle / np.pi),
+            cirq_ops.XX.on(*qubits),
+        ]
     elif isinstance(gate, braket_gates.CPhaseShift01):
-        raise ValueError  # TODO.
+        return [
+            cirq_ops.CZ.on(*qubits) ** (gate.angle / np.pi),
+            cirq_ops.X.on(qubits[0]),
+        ]
     elif isinstance(gate, braket_gates.CPhaseShift10):
-        raise ValueError  # TODO.
+        return [
+            cirq_ops.CZ.on(*qubits) ** (gate.angle / np.pi),
+            cirq_ops.X.on(qubits[1]),
+        ]
+    elif isinstance(gate, braket_gates.PSwap):
+        return [
+            cirq_ops.SWAP.on(*qubits),
+            cirq_ops.CNOT.on(*qubits),
+            cirq_ops.Z.on(*qubits) ** (gate.angle / np.pi),
+            cirq_ops.CNOT.on(*qubits),
+        ]
     elif isinstance(gate, braket_gates.XX):
         return [
             cirq_ops.XXPowGate(
@@ -263,7 +277,8 @@ def _translate_two_qubit_braket_instruction_to_cirq_operation(
 
 
 def _translate_one_qubit_cirq_operation_to_braket_instruction(
-    op: Union[np.ndarray, "cirq.Operation"], target: Optional[int] = None,
+    op: Union[np.ndarray, "cirq.Operation"],
+    target: Optional[int] = None,
 ) -> List[Instruction]:
     """Translates a one-qubit Cirq operation to a (sequence of) Braket
     instruction(s) according to the following rules:
