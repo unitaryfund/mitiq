@@ -15,7 +15,7 @@ General workflow: Front-ends, backends, and executors
 
 We refer to a library/language that constructs quantum programs as a "front-end,"
 and a quantum computer or quantum computer simulator as a "backend." Mitiq currently
-supports Cirq, Qiskit, and pyQuil front-ends, and is backend agnostic - as long as you
+supports Cirq, Qiskit, PyQuil and Braket front-ends, and is backend agnostic - as long as you
 can run a supported quantum program on a backend, you can use that backend with Mitiq.
 
 We refer to a user-defined function that inputs a quantum program and executes it on a backend
