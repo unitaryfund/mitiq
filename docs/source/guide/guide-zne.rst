@@ -284,10 +284,26 @@ Noise scaling by identity scaling
     This module is currently a WIP. To be added soon are examples for additional
     methods - Scaling gates by fidelity, Global scaling, Custom scaling methods.
 
+Similar to unitary folding, identity insertion scaling is a method applied to
+quantum circuits at the gate level to amplify noise. The depth of the circuit is
+increased by inserting multiple identity gates as described by the scale factor
+
+.. math::
+  G \mapsto G I .
+
 ---------------------
 Local scaling methods
 ---------------------
-Scaling from left, right and at random.
+For local identity insertion scaling, there is a degree of freedom for which gates to fold first.
+The order in which gates are folded can have an important effect on how the noise is scaled.
+As such, Mitiq defines several local folding methods.
+
+    1. :func:`mitiq.zne.scaling.identity_insertion.scale_gates_from_left`
+    2. :func:`mitiq.zne.scaling.identity_insertion.scale_gates_from_right`
+    3. :func:`mitiq.zne.scaling.identity_insertion.scale_gates_at_random`
+
+The function ``fold_gates_from_left`` will fold gates from the left (or start) of the circuit
+until the desired scale factor is reached.
 
 
 
