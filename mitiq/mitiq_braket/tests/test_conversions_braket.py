@@ -140,10 +140,12 @@ def test_from_braket_non_parameterized_two_qubit_gates():
 
 
 def test_from_braket_parameterized_two_qubit_gates():
-    braket_circuit = BKCircuit()
-    # TODO: Add all two-qubit parameterized gates once translated.
     pgates = [
         braket_gates.CPhaseShift,
+        braket_gates.CPhaseShift00,
+        braket_gates.CPhaseShift01,
+        braket_gates.CPhaseShift10,
+        braket_gates.PSwap,
         braket_gates.XX,
         braket_gates.YY,
         braket_gates.ZZ,
@@ -153,15 +155,18 @@ def test_from_braket_parameterized_two_qubit_gates():
     instructions = [
         Instruction(rot(a), target=[0, 1]) for rot, a in zip(pgates, angles)
     ]
+
+    cirq_circuits = list()
     for instr in instructions:
+        braket_circuit = BKCircuit()
         braket_circuit.add_instruction(instr)
-    cirq_circuit = from_braket(braket_circuit)
+        cirq_circuits.append(from_braket(braket_circuit))
 
-    for i, op in enumerate(cirq_circuit.all_operations()):
+    for instr, cirq_circuit in zip(instructions, cirq_circuits):
+        print(cirq_circuit.unitary())
         assert np.allclose(
-            instructions[i].operator.to_matrix(), protocols.unitary(op)
+            instr.operator.to_matrix(), cirq_circuit.unitary()
         )
-
 
 def test_from_braket_three_qubit_gates():
     braket_circuit = BKCircuit()
