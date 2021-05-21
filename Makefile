@@ -60,19 +60,11 @@ requirements: requirements.txt
 
 .PHONY: test
 test:
-	pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/benchmarks mitiq/pec mitiq/tests mitiq/zne
+	pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml --ignore=mitiq/mitiq_pyquil
 
 .PHONY: test-pyquil
 test-pyquil:
 	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/mitiq_pyquil
-
-.PHONY: test-qiskit
-test-qiskit:
-	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/mitiq_qiskit
-
-.PHONY: test-cirq
-test-cirq:
-	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/mitiq_cirq
 
 .PHONY: test-all
 test-all:

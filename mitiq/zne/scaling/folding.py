@@ -401,7 +401,7 @@ def _create_fold_mask(
     total weight of the input circuit.
 
     For equal weights, this function reproduces the local unitary folding
-    method defined in equation (5) of [Giurgica_Tiron_2020_arXiv]_.
+    method defined in equation (5) of :cite:`Giurgica_Tiron_2020_arXiv`.
 
     Args:
         weight_mask: The weights of all the gates of the circuit to fold.
@@ -410,8 +410,8 @@ def _create_fold_mask(
         scale_factor: The effective noise scale factor.
         folding_method: A string equal to "at_random", or "from_left", or
             "from_right". Determines the partial folding method described in
-            [Giurgica_Tiron_2020_arXiv]_. If scale_factor is an odd integer,
-            all methods are equivalent and this option is irrelevant.
+            :cite:`Giurgica_Tiron_2020_arXiv`. If scale_factor is an odd
+            integer, all methods are equivalent and this option is irrelevant.
         seed: A seed for the random number generator. This is used only when
             folding_method is "at_random".
 
@@ -559,7 +559,8 @@ def fold_gates_from_left(
     scale_factor * n where n is the number of gates in the input circuit.
 
     For equal gate fidelities, this function reproduces the local unitary
-    folding method defined in equation (5) of [Giurgica_Tiron_2020_arXiv]_.
+    folding method defined in equation (5) of
+    :cite:`Giurgica_Tiron_2020_arXiv`.
 
     Args:
         circuit: Circuit to fold.
@@ -635,7 +636,8 @@ def fold_gates_from_right(
     scale_factor * n where n is the number of gates in the input circuit.
 
     For equal gate fidelities, this function reproduces the local unitary
-    folding method defined in equation (5) of [Giurgica_Tiron_2020_arXiv]_.
+    folding method defined in equation (5) of
+    :cite:`Giurgica_Tiron_2020_arXiv`.
 
     Args:
         circuit: Circuit to fold.
@@ -714,7 +716,8 @@ def fold_gates_at_random(
     scale_factor * n where n is the number of gates in the input circuit.
 
     For equal gate fidelities, this function reproduces the local unitary
-    folding method defined in equation (5) of [Giurgica_Tiron_2020_arXiv]_.
+    folding method defined in equation (5) of
+    :cite:`Giurgica_Tiron_2020_arXiv`.
 
     Args:
         circuit: Circuit to fold.
