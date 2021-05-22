@@ -55,8 +55,11 @@ This is due to `asyncio` changing their default event loop beginning in Python 3
     * Original Code  
 
           if sys.platform == 'win32':  # pragma: no cover
-            from .windows_events import *
-            __all__ += windows_events.__all__
+              from .windows_events import *
+              __all__ += windows_events.__all__
+          else:
+              from .unix_events import *  # pragma: no cover
+              __all__ += unix_events.__all__
   
     * Replacement Code  
 
@@ -64,6 +67,9 @@ This is due to `asyncio` changing their default event loop beginning in Python 3
               from .windows_events import *
               asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
               __all__ += windows_events.__all__
+          else:
+              from .unix_events import *  # pragma: no cover
+              __all__ += unix_events.__all__
   
 
 ### Adding tests
