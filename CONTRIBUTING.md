@@ -49,7 +49,7 @@ development of the library, from your local clone of the fork, run
 #### Special Note for Windows Users Using Python 3.8:
 To prevent errors when running `make docs` and `make doctest`, Windows developers using Pythong 3.8 will also need to edit \_\_init\_\_.py in their environment's asyncio directory.
 This is due to `asyncio` changing their default event loop beginning in Python 3.8, and the default event loop will not support Unix-style APIs used by some dependencies.
-1. Locate your environment directory (likely C:\Users\{username}\anaconda3\envs\{your_env}), and open {env_dir}/Lib/asyncio/\_\_init\_\_.py.
+1. Locate your environment directory (likely C:\Users\{username}\anaconda3\envs\\{your_env}), and open {env_dir}/Lib/asyncio/\_\_init\_\_.py.
 2. Add `import asyncio` to the file's import statements.
 3. Find the block of code below and replace it with the provided replacement.
     * Original Code  
