@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import List, Optional, Union, TYPE_CHECKING
+from typing import List, Optional, Union, cast, TYPE_CHECKING
 
 import numpy as np
 
@@ -26,6 +26,7 @@ from braket.circuits import (
     gates as braket_gates,
     Circuit as BKCircuit,
     Instruction,
+    qubit as bq
 )
 
 if TYPE_CHECKING:
@@ -41,10 +42,9 @@ def from_braket(circuit: BKCircuit) -> "cirq.Circuit":
     Args:
         circuit: Braket circuit to convert to a Cirq circuit.
     """
-    return Circuit(
-        _translate_braket_instruction_to_cirq_operation(instr)
-        for instr in circuit.instructions
-    )
+    return Circuit(cast(List[cirq.Operation],
+                   _translate_braket_instruction_to_cirq_operation(instr))
+                   for instr in circuit.instructions)
 
 
 def to_braket(circuit: "cirq.Circuit") -> BKCircuit:
@@ -62,8 +62,8 @@ def to_braket(circuit: "cirq.Circuit") -> BKCircuit:
 
 
 def _translate_braket_instruction_to_cirq_operation(
-    instr: Instruction,
-) -> List["cirq.Operation"]:
+    instr: Instruction
+) -> Optional[List[cirq.Operation]]:
     """Converts the braket instruction to an equivalent Cirq operation or list
     of Cirq operations.
 
@@ -90,17 +90,16 @@ def _translate_braket_instruction_to_cirq_operation(
             return [cirq_ops.FREDKIN.on(*qubits)]
 
     # Unknown instructions.
-    else:
-        raise ValueError(
-            f"Unable to convert the instruction {instr} to Cirq. If you think "
-            "this is a bug, you can open an issue on the Mitiq GitHub at "
-            "https://github.com/unitaryfund/mitiq."
-        )
+    raise ValueError(
+        f"Unable to convert the instruction {instr} to Cirq. If you think "
+        "this is a bug, you can open an issue on the Mitiq GitHub at "
+        "https://github.com/unitaryfund/mitiq."
+    )
 
 
 def _translate_cirq_operation_to_braket_instruction(
     op: cirq_ops.Operation,
-) -> List[Instruction]:
+) -> Optional[List[Instruction]]:
     """Converts the Cirq operation to an equivalent Braket instruction or list
     of instructions.
 
@@ -119,20 +118,19 @@ def _translate_cirq_operation_to_braket_instruction(
         return _translate_two_qubit_cirq_operation_to_braket_instruction(op)
 
     elif nqubits == 3:
-        qubits = [q.x for q in op.qubits]
+        qubits = [bq.new(q) for q in op.qubits]
 
-        if isinstance(op.gate, cirq_ops.TOFFOLI):
+        if isinstance(op.gate, cirq_ops.TOFFOLI):  # type: ignore
             return [Instruction(braket_gates.CCNot(), qubits)]
-        elif isinstance(op.gate, cirq_ops.FREDKIN):
+        elif isinstance(op.gate, cirq_ops.FREDKIN):  # type: ignore
             return [Instruction(braket_gates.CSwap(), qubits)]
 
     # Unsupported gates.
-    else:
-        raise ValueError(
-            f"Unable to convert {op} to Braket. If you think this is a bug, "
-            "you can open an issue on the Mitiq GitHub at"
-            " https://github.com/unitaryfund/mitiq."
-        )
+    raise ValueError(
+        f"Unable to convert {op} to Braket. If you think this is a bug, "
+        "you can open an issue on the Mitiq GitHub at"
+        " https://github.com/unitaryfund/mitiq."
+    )
 
 
 def _translate_one_qubit_braket_instruction_to_cirq_operation(
@@ -163,11 +161,11 @@ def _translate_one_qubit_braket_instruction_to_cirq_operation(
     elif isinstance(gate, braket_gates.S):
         return [cirq_ops.S.on(*qubits)]
     elif isinstance(gate, braket_gates.Si):
-        return [cirq_ops.S.on(*qubits) ** -1.0]
+        return [cirq.inverse(cirq_ops.S.on(*qubits))]
     elif isinstance(gate, braket_gates.T):
         return [cirq_ops.T.on(*qubits)]
     elif isinstance(gate, braket_gates.Ti):
-        return [cirq_ops.T.on(*qubits) ** -1.0]
+        return [cirq.inverse(cirq_ops.T.on(*qubits))]
     elif isinstance(gate, braket_gates.V):
         return [cirq_ops.X.on(*qubits) ** 0.5]
     elif isinstance(gate, braket_gates.Vi):
@@ -217,7 +215,7 @@ def _translate_two_qubit_braket_instruction_to_cirq_operation(
         return [cirq_ops.CZ.on(*qubits)]
     elif isinstance(gate, braket_gates.CY):
         return [
-            cirq_ops.S.on(qubits[1]) ** -1,
+            cirq.inverse(cirq_ops.S.on(qubits[1])),
             cirq_ops.CNOT.on(*qubits),
             cirq_ops.S.on(qubits[1]),
         ]
@@ -282,7 +280,7 @@ def _translate_one_qubit_cirq_operation_to_braket_instruction(
     """
     # Translate qubit index.
     if not isinstance(op, np.ndarray):
-        target = op.qubits[0].x
+        target = bq.new(op.qubits[0])
 
     if target is None:
         raise ValueError(
@@ -370,7 +368,7 @@ def _translate_two_qubit_cirq_operation_to_braket_instruction(
         op: Two-qubit Cirq operation to translate.
     """
     # Translate qubit indices.
-    q1, q2 = [qubit.x for qubit in op.qubits]
+    q1, q2 = [bq.new(qubit) for qubit in op.qubits]
 
     # Check common two-qubit gates.
     if isinstance(op.gate, cirq_ops.CNotPowGate) and np.isclose(
