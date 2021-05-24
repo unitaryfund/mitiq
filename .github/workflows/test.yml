@@ -22,10 +22,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           make install requirements
-
-      # Not checking types until #556 fixes errors 
-      # - name: Check types with mypy
-      #   run: make check-types
+ 
+      - name: Check types with mypy
+        run: make check-types
 
       - name: Check code style with Black
         run: make check-format
