@@ -46,7 +46,8 @@ Mitiq can currently interface with:
 
 * [Cirq](https://github.com/quantumlib/Cirq),
 * [Qiskit](https://qiskit.org/),
-* [pyQuil](https://github.com/rigetti/pyquil).
+* [pyQuil](https://github.com/rigetti/pyquil),
+* [Braket](https://github.com/aws/amazon-braket-sdk-python).
 
 Cirq is a core requirement of Mitiq and is automatically installed. To use Mitiq with other quantum programming
 libraries, install the optional package(s) following the instructions linked above.
