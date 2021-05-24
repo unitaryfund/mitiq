@@ -16,7 +16,7 @@
 """Catches deprecated import statements."""
 
 
-def raise_deprecation_warning(version: str, method: str, module: str):
+def raise_deprecation_warning(version: str, method: str, module: str) -> None:
     """Raises an import error for attempts to import modules that could be called
     directly from Mitiq but must now be imported from one of Mitiq's modules.
     """
@@ -32,13 +32,13 @@ def raise_deprecation_warning(version: str, method: str, module: str):
     )
 
 
-def execute_with_zne():
+def execute_with_zne() -> None:
     raise_deprecation_warning("0.9", "execute_with_zne", "mitiq.zne")
 
 
-def mitigate_executor():
+def mitigate_executor() -> None:
     raise_deprecation_warning("0.9", "mitigate_executor", "mitiq.zne")
 
 
-def zne_decorator():
+def zne_decorator() -> None:
     raise_deprecation_warning("0.9", "zne_decorator", "mitiq.zne")
