@@ -443,5 +443,3 @@ def _translate_two_qubit_cirq_operation_to_braket_instruction(
         *_translate_one_qubit_cirq_operation_to_braket_instruction(B1, q1),
         *_translate_one_qubit_cirq_operation_to_braket_instruction(B2, q2),
     ]
-
-
