@@ -163,10 +163,8 @@ def test_from_braket_parameterized_two_qubit_gates():
         cirq_circuits.append(from_braket(braket_circuit))
 
     for instr, cirq_circuit in zip(instructions, cirq_circuits):
-        print(cirq_circuit.unitary())
-        assert np.allclose(
-            instr.operator.to_matrix(), cirq_circuit.unitary()
-        )
+        assert np.allclose(instr.operator.to_matrix(), cirq_circuit.unitary())
+
 
 def test_from_braket_three_qubit_gates():
     braket_circuit = BKCircuit()
