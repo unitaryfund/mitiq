@@ -32,6 +32,22 @@ if TYPE_CHECKING:
     import cirq
 
 
+def _raise_braket_to_cirq_error(instr):
+    raise ValueError(
+        f"Unable to convert the instruction {instr} to Cirq. If you think "
+        "this is a bug, you can open an issue on the Mitiq GitHub at "
+        "https://github.com/unitaryfund/mitiq."
+    )
+
+
+def _raise_cirq_to_braket_error(op):
+    raise ValueError(
+        f"Unable to convert {op} to Braket. If you think this is a bug, "
+        "you can open an issue on the Mitiq GitHub at"
+        " https://github.com/unitaryfund/mitiq."
+    )
+
+
 def from_braket(circuit: BKCircuit) -> "cirq.Circuit":
     """Returns a Cirq circuit equivalent to the input Braket circuit.
 
@@ -267,8 +283,7 @@ def _translate_two_qubit_braket_instruction_to_cirq_operation(
 
 
 def _translate_one_qubit_cirq_operation_to_braket_instruction(
-    op: Union[np.ndarray, "cirq.Operation"],
-    target: Optional[int] = None,
+    op: Union[np.ndarray, "cirq.Operation"], target: Optional[int] = None,
 ) -> List[Instruction]:
     """Translates a one-qubit Cirq operation to a (sequence of) Braket
     instruction(s) according to the following rules:
@@ -429,17 +444,4 @@ def _translate_two_qubit_cirq_operation_to_braket_instruction(
         *_translate_one_qubit_cirq_operation_to_braket_instruction(B2, q2),
     ]
 
-def _raise_braket_to_cirq_error(instr):
-    raise ValueError(
-        f"Unable to convert the instruction {instr} to Cirq. If you think "
-        "this is a bug, you can open an issue on the Mitiq GitHub at "
-        "https://github.com/unitaryfund/mitiq."
-    )
-
-def _raise_cirq_to_braket_error(op):
-    raise ValueError(
-        f"Unable to convert {op} to Braket. If you think this is a bug, "
-        "you can open an issue on the Mitiq GitHub at"
-        " https://github.com/unitaryfund/mitiq."
-    )
 
