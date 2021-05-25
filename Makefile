@@ -66,18 +66,6 @@ test:
 test-pyquil:
 	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/mitiq_pyquil
 
-.PHONY: test-qiskit
-test-qiskit:
-	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/mitiq_qiskit
-
-.PHONY: test-cirq
-test-cirq:
-	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/mitiq_cirq
-
-.PHONY: test-braket
-test-braket:
-	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/mitiq_braket
-
 .PHONY: test-all
 test-all:
 	pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml
