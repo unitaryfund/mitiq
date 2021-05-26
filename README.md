@@ -134,9 +134,9 @@ release can be found [here](https://mitiq.readthedocs.io/_/downloads/en/latest/p
 ## Developer information
 
 We welcome contributions to Mitiq including bug fixes, feature requests, etc.
-Please see the  [contribution
+Please see the [contribution
 guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) for
-more details.  To contribute to the documentation, please see these
+more details. To contribute to the documentation, please see these
 [documentation
 guidelines](https://mitiq.readthedocs.io/en/stable/contributing_docs.html).
 
