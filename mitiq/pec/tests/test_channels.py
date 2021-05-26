@@ -38,6 +38,7 @@ from mitiq.pec.channels import (
     kraus_to_super,
     choi_to_super,
     super_to_choi,
+    kraus_to_choi,
 )
 
 
@@ -177,3 +178,11 @@ def test_choi_to_super():
         rand_mat = np.random.rand(dim ** 2, dim ** 2)
         assert np.allclose(super_to_choi(choi_to_super(rand_mat)), rand_mat)
         assert np.allclose(choi_to_super(super_to_choi(rand_mat)), rand_mat)
+
+
+def test_kraus_to_choi():
+    for dim in (2, 4, 8, 16):
+        rand_kraus_ops = [np.random.rand(dim, dim) for _ in range(7)]
+        super_op = kraus_to_super(rand_kraus_ops)
+        expected_choi = super_to_choi(super_op)
+        assert np.allclose(kraus_to_choi(rand_kraus_ops), expected_choi)

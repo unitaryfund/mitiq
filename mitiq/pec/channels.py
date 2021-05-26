@@ -210,3 +210,10 @@ def super_to_choi(super_operator: np.ndarray) -> np.ndarray:
     dim_squared = super_operator.shape[0]
     # We use that a transposition is a self-inverse operation
     return choi_to_super(super_operator) / dim_squared
+
+
+def kraus_to_choi(kraus_ops: List[np.ndarray]) -> np.ndarray:
+    """Returns the normalized choi state corresponding to
+    the channel defined by the input kraus operators.
+    """
+    return super_to_choi(kraus_to_super(kraus_ops))
