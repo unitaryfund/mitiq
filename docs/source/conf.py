@@ -63,13 +63,13 @@ extensions = [
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3.7", None),
-    "numpy": ("https://docs.scipy.org/doc/numpy/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
     # Cirq is no longer using sphinx docs so interlinking is not possible.
     # "cirq": ("https://quantumai.google/cirq", None),
     "pyquil": ("https://pyquil-docs.rigetti.com/en/stable/", None),
     "qiskit": ("https://qiskit.org/documentation/", None),
-    "qutip": ("http://qutip.org/docs/latest/", None),
+    "qutip": ("https://qutip.org/docs/latest/", None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
