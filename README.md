@@ -27,7 +27,7 @@ Mitiq can be installed from PyPi via
 pip install mitiq
 ```
 
-Installation from source (within a virtual environment) can be done via
+To build from source, check out the [installation instructions](https://mitiq.readthedocs.io/en/latest/contributing.html#development-install) for more information.
 
 ```bash
 git clone https://github.com/unitaryfund/mitiq.git
