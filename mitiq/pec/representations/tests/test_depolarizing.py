@@ -39,7 +39,7 @@ from mitiq.pec.representations import (
     represent_operations_in_circuit_with_local_depolarizing_noise,
 )
 
-from mitiq.pec.utils import _operation_to_choi, _circuit_to_choi
+from mitiq.pec.channels import _operation_to_choi, _circuit_to_choi
 from mitiq.utils import _equal
 from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 

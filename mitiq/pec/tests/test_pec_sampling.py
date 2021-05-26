@@ -33,7 +33,7 @@ from mitiq.pec.representations import (
     represent_operation_with_local_depolarizing_noise,
     represent_operations_in_circuit_with_local_depolarizing_noise,
 )
-from mitiq.pec.utils import _operation_to_choi, _circuit_to_choi
+from mitiq.pec.channels import _operation_to_choi, _circuit_to_choi
 
 
 def test_sample_sequence_cirq():

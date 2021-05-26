@@ -15,13 +15,29 @@
 
 """Tests related to mitiq.pec.utils functions."""
 
-from pytest import raises
+from pytest import raises, mark
 import numpy as np
-from cirq import LineQubit, depolarize, Circuit
-from mitiq.pec.utils import (
+from cirq import (
+    LineQubit,
+    depolarize,
+    Circuit,
+    channel,
+    AmplitudeDampingChannel,
+    Y,
+)
+
+from mitiq.pec.channels import (
     _max_ent_state_circuit,
     _operation_to_choi,
     _circuit_to_choi,
+    global_depolarizing_kraus,
+    local_depolarizing_kraus,
+    amplitude_damping_kraus,
+    vector_to_matrix,
+    matrix_to_vector,
+    kraus_to_super,
+    choi_to_super,
+    super_to_choi,
 )
 
 
@@ -86,3 +102,78 @@ def test_circuit_to_choi():
         _operation_to_choi(noisy_sequence),
         _circuit_to_choi(Circuit(noisy_sequence)),
     )
+
+
+@mark.parametrize(
+    "kraus_function",
+    [
+        global_depolarizing_kraus,
+        local_depolarizing_kraus,
+        amplitude_damping_kraus,
+    ],
+)
+def test_kraus_functions(kraus_function):
+    """Test that the output is a valid physical channel."""
+    for num_qubits in (1, 2, 3):
+        for noise_level in (0, 0.1, 1):
+            kraus_ops = kraus_function(noise_level, num_qubits)
+            conj_sum = sum([k.conj().T @ k for k in kraus_ops])
+            assert np.allclose(conj_sum, np.eye(2 ** num_qubits))
+
+
+def test_matrix_to_vector():
+    for d in [1, 2, 3, 4]:
+        mat = np.random.rand(d, d)
+        assert matrix_to_vector(mat).shape == (d ** 2,)
+        assert (vector_to_matrix(matrix_to_vector(mat)) == mat).all
+
+
+def test_vector_to_matrix():
+    for d in [1, 2, 3, 4]:
+        vec = np.random.rand(d ** 2)
+        assert vector_to_matrix(vec).shape == (d, d)
+        assert (matrix_to_vector(vector_to_matrix(vec)) == vec).all
+
+
+def test_kraus_to_super():
+    """Tests the function on random channels acting on random states.
+    Channels and states are non-physical, but this is irrelevant for the test.
+    """
+    for num_qubits in (1, 2, 3, 4, 5):
+        d = 2 ** num_qubits
+        fake_kraus_ops = [
+            np.random.rand(d, d) + 1.0j * np.random.rand(d, d)
+            for _ in range(7)
+        ]
+        super_op = kraus_to_super(fake_kraus_ops)
+        fake_state = np.random.rand(d, d) + 1.0j * np.random.rand(d, d)
+        result_with_kraus = sum(
+            [k @ fake_state @ k.conj().T for k in fake_kraus_ops]
+        )
+        result_with_super = vector_to_matrix(
+            super_op @ matrix_to_vector(fake_state)
+        )
+        assert np.allclose(result_with_kraus, result_with_super)
+
+
+def test_super_to_choi():
+    for noise_level in [0, 0.3, 1]:
+        super_damping = kraus_to_super(amplitude_damping_kraus(noise_level, 1))
+        # Apply Pauli Y to get some complex numbers
+        super_op = np.kron(channel(Y)[0], channel(Y)[0].conj()) @ super_damping
+        choi_state = super_to_choi(super_op)
+        # expected result
+        q = LineQubit(0)
+        choi_expected = _operation_to_choi(
+            [AmplitudeDampingChannel(noise_level)(q), Y(q)]
+        )
+        assert np.allclose(choi_state, choi_expected)
+
+
+def test_choi_to_super():
+    # Note: up to normalization, choi_to_super is equal to super_to_choi
+    # and therefore we just run the following consistency test.
+    for dim in (2, 4, 8, 16):
+        rand_mat = np.random.rand(dim ** 2, dim ** 2)
+        assert np.allclose(super_to_choi(choi_to_super(rand_mat)), rand_mat)
+        assert np.allclose(choi_to_super(super_to_choi(rand_mat)), rand_mat)
