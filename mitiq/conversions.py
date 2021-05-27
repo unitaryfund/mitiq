@@ -15,11 +15,14 @@
 
 """Functions for converting to/from Mitiq's internal circuit representation."""
 from functools import wraps
-from typing import Any, Callable, Tuple
+from typing import Any, Callable, Tuple, cast, TYPE_CHECKING
 
 from cirq import Circuit
 
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES, QPROGRAM
+
+if TYPE_CHECKING:
+    from qiskit import QuantumCircuit as qc
 
 
 class UnsupportedCircuitError(Exception):
@@ -195,11 +198,12 @@ def noise_scaling_converter(
             scaled_circuit.remove_final_measurements()
             _transform_registers(
                 scaled_circuit,
-                new_qregs=circuit.qregs,
-                new_cregs=circuit.cregs if scaled_circuit.cregs else None,
+                new_qregs=cast(qc, circuit).qregs,
+                new_cregs=cast(qc, circuit).cregs if scaled_circuit.cregs
+                else None,
             )
-            if circuit.cregs and not scaled_circuit.cregs:
-                scaled_circuit.add_register(*circuit.cregs)
+            if cast(qc, circuit).cregs and not scaled_circuit.cregs:
+                scaled_circuit.add_register(*cast(qc, circuit).cregs)
 
             for q, c in _measurement_order(circuit):
                 scaled_circuit.measure(q, c)
