@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 from typing import List, Optional, Union, TYPE_CHECKING
 
 import numpy as np
@@ -61,8 +60,6 @@ def from_braket(circuit: BKCircuit) -> "cirq.Circuit":
         _translate_braket_instruction_to_cirq_operation(instr)
         for instr in circuit.instructions
     )
-
-
 def to_braket(circuit: "cirq.Circuit") -> BKCircuit:
     """Returns a Braket circuit equivalent to the input Cirq circuit.
 
@@ -134,10 +131,11 @@ def _translate_cirq_operation_to_braket_instruction(
 
     elif nqubits == 3:
         qubits = [q.x for q in op.qubits]
-
-        if isinstance(op.gate, cirq_ops.TOFFOLI):
+    
+        
+        if op == cirq_ops.TOFFOLI.on(*op.qubits):
             return [Instruction(braket_gates.CCNot(), qubits)]
-        elif isinstance(op.gate, cirq_ops.FREDKIN):
+        elif op == cirq_ops.FREDKIN.on(*op.qubits):
             return [Instruction(braket_gates.CSwap(), qubits)]
         else:
             _raise_cirq_to_braket_error(op)
