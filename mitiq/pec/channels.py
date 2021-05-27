@@ -107,7 +107,7 @@ def _operation_to_choi(operation_tree: OP_TREE) -> np.ndarray:
 
 
 def tensor_product(*args: np.ndarray) -> np.ndarray:
-    """Returns the Kronecker product of the input arguments (NumPy objects).
+    """Returns the Kronecker product of the input array-like arguments.
     This is a generalization of the binary function
     ``numpy.kron(arg_a, arg_b)`` to the case of an arbitrary number of
     arguments.

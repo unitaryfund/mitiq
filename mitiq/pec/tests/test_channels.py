@@ -200,7 +200,10 @@ def test_tensor_product():
     terms = [np.random.rand(dim, dim) for dim in range(1, 4)]
     expected = np.kron(np.kron(terms[0], terms[1]), terms[2])
     assert np.allclose(tensor_product(*terms), expected)
+    # Check limit cases
     one_term = np.random.rand(5, 5)
     assert np.allclose(tensor_product(one_term), one_term)
+    assert np.allclose(tensor_product(2.0, one_term), 2.0 * one_term)
+    assert np.allclose(tensor_product(3.0, 4.0), 12.0)
     with raises(TypeError, match="requires at least one argument"):
         assert np.allclose(tensor_product(), one_term)
