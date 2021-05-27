@@ -33,6 +33,22 @@ if TYPE_CHECKING:
     import cirq
 
 
+def _raise_braket_to_cirq_error(instr):
+    raise ValueError(
+        f"Unable to convert the instruction {instr} to Cirq. If you think "
+        "this is a bug, you can open an issue on the Mitiq GitHub at "
+        "https://github.com/unitaryfund/mitiq."
+    )
+
+
+def _raise_cirq_to_braket_error(op):
+    raise ValueError(
+        f"Unable to convert {op} to Braket. If you think this is a bug, "
+        "you can open an issue on the Mitiq GitHub at"
+        " https://github.com/unitaryfund/mitiq."
+    )
+
+
 def from_braket(circuit: BKCircuit) -> "cirq.Circuit":
     """Returns a Cirq circuit equivalent to the input Braket circuit.
 
@@ -88,13 +104,12 @@ def _translate_braket_instruction_to_cirq_operation(
             return [cirq_ops.TOFFOLI.on(*qubits)]
         elif isinstance(instr.operator, braket_gates.CSwap):
             return [cirq_ops.FREDKIN.on(*qubits)]
+        else:
+            _raise_braket_to_cirq_error(instr)
 
     # Unknown instructions.
-    raise ValueError(
-        f"Unable to convert the instruction {instr} to Cirq. If you think "
-        "this is a bug, you can open an issue on the Mitiq GitHub at "
-        "https://github.com/unitaryfund/mitiq."
-    )
+    else:
+        _raise_braket_to_cirq_error(instr)
 
 
 def _translate_cirq_operation_to_braket_instruction(
@@ -120,17 +135,16 @@ def _translate_cirq_operation_to_braket_instruction(
     elif nqubits == 3:
         qubits = [bq.new(q) for q in op.qubits]
 
-        if isinstance(op.gate, cirq_ops.TOFFOLI):  # type: ignore
-            return [Instruction(braket_gates.CCNot(), qubits)]
-        elif isinstance(op.gate, cirq_ops.FREDKIN):  # type: ignore
-            return [Instruction(braket_gates.CSwap(), qubits)]
 
+        if op == cirq_ops.TOFFOLI.on(*op.qubits):
+            return [Instruction(braket_gates.CCNot(), qubits)]
+        elif op == cirq_ops.FREDKIN.on(*op.qubits):
+            return [Instruction(braket_gates.CSwap(), qubits)]
+        else:
+            _raise_cirq_to_braket_error(op)
     # Unsupported gates.
-    raise ValueError(
-        f"Unable to convert {op} to Braket. If you think this is a bug, "
-        "you can open an issue on the Mitiq GitHub at"
-        " https://github.com/unitaryfund/mitiq."
-    )
+    else:
+        _raise_cirq_to_braket_error(op)
 
 
 def _translate_one_qubit_braket_instruction_to_cirq_operation(
@@ -182,11 +196,7 @@ def _translate_one_qubit_braket_instruction_to_cirq_operation(
         return [cirq_ops.Z.on(*qubits) ** (gate.angle / np.pi)]
 
     else:
-        raise ValueError(
-            f"Unable to convert the instruction {instr} to Cirq. If you think "
-            "this is a bug, you can open an issue on the Mitiq GitHub at "
-            "https://github.com/unitaryfund/mitiq."
-        )
+        _raise_braket_to_cirq_error(instr)
 
 
 def _translate_two_qubit_braket_instruction_to_cirq_operation(
@@ -221,16 +231,33 @@ def _translate_two_qubit_braket_instruction_to_cirq_operation(
         ]
 
     # Two-qubit parameterized gates.
-    elif isinstance(gate, braket_gates.PSwap):
-        raise ValueError  # TODO.
     elif isinstance(gate, braket_gates.CPhaseShift):
         return [cirq_ops.CZ.on(*qubits) ** (gate.angle / np.pi)]
     elif isinstance(gate, braket_gates.CPhaseShift00):
-        raise ValueError  # TODO.
+        return [
+            cirq_ops.XX(*qubits),
+            cirq_ops.CZ.on(*qubits) ** (gate.angle / np.pi),
+            cirq_ops.XX(*qubits),
+        ]
     elif isinstance(gate, braket_gates.CPhaseShift01):
-        raise ValueError  # TODO.
+        return [
+            cirq_ops.X(qubits[0]),
+            cirq_ops.CZ.on(*qubits) ** (gate.angle / np.pi),
+            cirq_ops.X(qubits[0]),
+        ]
     elif isinstance(gate, braket_gates.CPhaseShift10):
-        raise ValueError  # TODO.
+        return [
+            cirq_ops.X(qubits[1]),
+            cirq_ops.CZ.on(*qubits) ** (gate.angle / np.pi),
+            cirq_ops.X(qubits[1]),
+        ]
+    elif isinstance(gate, braket_gates.PSwap):
+        return [
+            cirq_ops.SWAP.on(*qubits),
+            cirq_ops.CNOT.on(*qubits),
+            cirq_ops.Z.on(qubits[1]) ** (gate.angle / np.pi),
+            cirq_ops.CNOT.on(*qubits),
+        ]
     elif isinstance(gate, braket_gates.XX):
         return [
             cirq_ops.XXPowGate(
@@ -253,11 +280,7 @@ def _translate_two_qubit_braket_instruction_to_cirq_operation(
         return [cirq_ops.ISwapPowGate(exponent=gate.angle / np.pi).on(*qubits)]
 
     else:
-        raise ValueError(
-            f"Unable to convert the instruction {instr} to Cirq. If you think "
-            "this is a bug, you can open an issue on the Mitiq GitHub at "
-            "https://github.com/unitaryfund/mitiq."
-        )
+        _raise_braket_to_cirq_error(instr)
 
 
 def _translate_one_qubit_cirq_operation_to_braket_instruction(
