@@ -11,14 +11,16 @@
 
 <img  src="assets/mitiq-logo.png" width="80%" style="  display: block;margin-left: auto;margin-right: auto;">
 
-Mitiq is a Python toolkit for implementing error mitigation techniques on quantum computers.
+Mitiq is a Python toolkit for implementing error mitigation techniques on
+quantum computers.
 
-Current quantum computers
-are noisy due to interactions with the environment, imperfect gate applications, state preparation and measurement
-errors, etc. Error mitigation seeks to reduce these effects at the software level by compiling quantum programs in
-clever ways.
+Current quantum computers are noisy due to interactions with the environment,
+imperfect gate applications, state preparation and measurement errors, etc.
+Error mitigation seeks to reduce these effects at the software level by
+compiling quantum programs in clever ways.
 
-Want to know more? Check out our [documentation](https://mitiq.readthedocs.io/en/stable/guide/guide-overview.html).
+Want to know more? Check out our
+[documentation](https://mitiq.readthedocs.io/en/stable/guide/guide-overview.html).
 
 ## Installation
 
@@ -28,6 +30,10 @@ Mitiq can be installed from PyPi via
 pip install mitiq
 ```
 
+To build from source, check out the [installation
+instructions](https://mitiq.readthedocs.io/en/latest/contributing.html#development-install)
+for more information.
+
 To test installation, run
 
 ```python
@@ -35,11 +41,12 @@ import mitiq
 mitiq.about()
 ```
 
-This prints out version information about core requirements and optional quantum software packages which Mitiq can
-interface with.
+This prints out version information about core requirements and optional
+quantum software packages which Mitiq can interface with.
 
-If you'd prefer to clone and install from source, or would like to develop Mitiq, check out the
-[contribution guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) for more information.
+If you would like to develop Mitiq, check out the [contribution
+guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) for
+more information.
 
 ### Supported quantum programming libraries
 
@@ -50,19 +57,22 @@ Mitiq can currently interface with:
 * [pyQuil](https://github.com/rigetti/pyquil),
 * [Braket](https://github.com/aws/amazon-braket-sdk-python).
 
-Cirq is a core requirement of Mitiq and is automatically installed. To use Mitiq with other quantum programming
-libraries, install the optional package(s) following the instructions linked above.
+Cirq is a core requirement of Mitiq and is automatically installed. To use
+Mitiq with other quantum programming libraries, install the optional package(s)
+following the instructions linked above.
 
 ### Supported quantum processors
 
-Mitiq can be used on any quantum processor which can be accessed by supported quantum programming libraries and is
-available to the user.
+Mitiq can be used on any quantum processor which can be accessed by supported
+quantum programming libraries and is available to the user.
 
 ## Getting started
 
-See the [getting started](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html) guide in
-[Mitiq's documentation](https://mitiq.readthedocs.io) for a complete walkthrough of how to use mitiq. For
-a quick preview, check out the following snippet for a simple example of Mitiq in action:
+See the [getting
+started](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html)
+guide in [Mitiq's documentation](https://mitiq.readthedocs.io) for a complete
+walkthrough of how to use mitiq. For a quick preview, check out the following
+snippet for a simple example of Mitiq in action:
 
 ```python
 import numpy as np
@@ -125,20 +135,29 @@ release can be found [here](https://mitiq.readthedocs.io/_/downloads/en/latest/p
 ## Developer information
 
 We welcome contributions to Mitiq including bug fixes, feature requests, etc.
-Please see the  [contribution guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) for more details.
-To contribute to the documentation, please see these [documentation guidelines](https://mitiq.readthedocs.io/en/stable/contributing_docs.html).
+Please see the [contribution
+guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) for
+more details. To contribute to the documentation, please see these
+[documentation
+guidelines](https://mitiq.readthedocs.io/en/stable/contributing_docs.html).
 
 ## Authors
 
-An up-to-date list of authors can be found [here](https://github.com/unitaryfund/mitiq/graphs/contributors).
+An up-to-date list of authors can be found
+[here](https://github.com/unitaryfund/mitiq/graphs/contributors).
 
 ## Research
 
-We are looking forward to adding new features to Mitiq. If you have a proposal for implementing a new quantum error mitigation technique, or adding an example used in your research, please read our [guidelines](https://mitiq.readthedocs.io/en/stable/research.html) for contributing.
+We are looking forward to adding new features to Mitiq. If you have a proposal
+for implementing a new quantum error mitigation technique, or adding an example
+used in your research, please read our
+[guidelines](https://mitiq.readthedocs.io/en/stable/research.html) for
+contributing.
 
 ### Citing Mitiq
 
-If you use Mitiq in your research, please reference the [Mitiq preprint][arxiv] as follows:
+If you use Mitiq in your research, please reference the [Mitiq preprint][arxiv]
+as follows:
 
 ```bibtex
 @misc{larose2020mitiq,
@@ -164,4 +183,6 @@ A list of papers citing Mitiq can be found [here][papers_with_mitiq].
 
 ### unitaryHACK
 
-Mitiq is participating in [unitaryHACK](http://hack2021.unitary.fund/), check out and contribute on open issues labeled [`unitaryhack`](https://github.com/unitaryfund/mitiq/labels/unitaryhack)!
+Mitiq is participating in [unitaryHACK](http://hack2021.unitary.fund/), check
+out and contribute on open issues labeled
+[`unitaryhack`](https://github.com/unitaryfund/mitiq/labels/unitaryhack)!
