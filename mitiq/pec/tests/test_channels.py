@@ -39,6 +39,7 @@ from mitiq.pec.channels import (
     choi_to_super,
     super_to_choi,
     kraus_to_choi,
+    tensor_product,
 )
 
 
@@ -186,3 +187,9 @@ def test_kraus_to_choi():
         super_op = kraus_to_super(rand_kraus_ops)
         expected_choi = super_to_choi(super_op)
         assert np.allclose(kraus_to_choi(rand_kraus_ops), expected_choi)
+
+
+def test_tensor_product():
+    terms = [np.random.rand(dim, dim) for dim in range(1, 4)]
+    expected = np.kron(np.kron(terms[0], terms[1]), terms[2])
+    assert np.allclose(tensor_product(*terms), expected)

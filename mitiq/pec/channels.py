@@ -106,20 +106,15 @@ def _operation_to_choi(operation_tree: OP_TREE) -> np.ndarray:
     return _circuit_to_choi(circuit)
 
 
-def _tensor_product_kraus(
-    local_kraus: List[np.ndarray], num_channels: int
-) -> List[np.ndarray]:
-    """Given the a local channel (defined by its kraus operators),
-    this functions returns the Kraus operators corresponding to tensor
-    product of "num_channels" copies of the input channel.
+def tensor_product(*args: np.ndarray) -> np.ndarray:
+    """Returns the Kronecker product of the input arguments (NumPy objects).
+    This is a generalization of the binary operation numpy.kron(arg[0], arg[1])
+    to the case of an arbitrary number of arguments.
     """
-    tensored_kraus = []
-    for kraus_tuple in product(local_kraus, repeat=num_channels):
-        kraus_product = np.eye(1)
-        for kraus in kraus_tuple:
-            kraus_product = np.kron(kraus_product, kraus)
-        tensored_kraus.append(kraus_product)
-    return tensored_kraus
+    val = args[0]
+    for term in args[1:]:
+        val = np.kron(val, term)
+    return val
 
 
 def global_depolarizing_kraus(
@@ -139,7 +134,9 @@ def local_depolarizing_kraus(
     depolarizing channels acting on each qubit.
     """
     local_kraus = global_depolarizing_kraus(noise_level, num_qubits=1)
-    return _tensor_product_kraus(local_kraus, num_channels=num_qubits)
+    return [
+        tensor_product(*tup) for tup in product(local_kraus, repeat=num_qubits)
+    ]
 
 
 def amplitude_damping_kraus(
@@ -152,7 +149,9 @@ def amplitude_damping_kraus(
     """
     noisy_op = AmplitudeDampingChannel(noise_level)
     local_kraus = list(channel(noisy_op))
-    return _tensor_product_kraus(local_kraus, num_channels=num_qubits)
+    return [
+        tensor_product(*tup) for tup in product(local_kraus, repeat=num_qubits)
+    ]
 
 
 def matrix_to_vector(density_matrix: np.ndarray) -> np.array:
