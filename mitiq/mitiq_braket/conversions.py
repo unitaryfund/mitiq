@@ -136,8 +136,6 @@ def _translate_cirq_operation_to_braket_instruction(
 
     elif nqubits == 3:
         qubits = [bq.new(q) for q in op.qubits]
-
-
         if op == cirq_ops.TOFFOLI.on(*op.qubits):
             return [Instruction(braket_gates.CCNot(), qubits)]
         elif op == cirq_ops.FREDKIN.on(*op.qubits):
