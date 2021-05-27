@@ -22,6 +22,7 @@ from typing import (
     List,
     Optional,
     Tuple,
+    cast
 )
 
 import numpy as np
@@ -151,7 +152,7 @@ def _fold_all(
         )
 
     # Parse the exclude argument.
-    all_gates = set(op.gate for op in circuit.all_operations())
+    all_gates = set(cast(ops.Gate, op.gate) for op in circuit.all_operations())
     to_exclude = set()
     for item in exclude:
         if isinstance(item, str):
@@ -383,7 +384,7 @@ def _create_fold_mask(
     scale_factor: float,
     folding_method: str,
     seed: Optional[int] = None,
-) -> List[float]:
+) -> List[int]:
     r"""Returns a list of integers determining how many times each gate a
     circuit should be folded to realize the desired input scale_factor.
 
