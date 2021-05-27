@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Tests related to mitiq.pec.utils functions."""
+"""Tests related to the functions contained in `mitiq.pec.channels`."""
 
 from pytest import raises, mark
 import numpy as np

@@ -17,7 +17,7 @@
 #  Some of them could be moved in future new sub-modules of PEC
 #  (e.g. decomposition, tomo, etc.)
 
-"""Utilities related to probabilistic error cancellation."""
+"""Utilities for manipulating matrix representations of quantum channels."""
 
 from typing import List
 from itertools import product
@@ -108,8 +108,9 @@ def _operation_to_choi(operation_tree: OP_TREE) -> np.ndarray:
 
 def tensor_product(*args: np.ndarray) -> np.ndarray:
     """Returns the Kronecker product of the input arguments (NumPy objects).
-    This is a generalization of the binary operation numpy.kron(arg[0], arg[1])
-    to the case of an arbitrary number of arguments.
+    This is a generalization of the binary function
+    ``numpy.kron(arg_a, arg_b)`` to the case of an arbitrary number of
+    arguments.
     """
     val = args[0]
     for term in args[1:]:
@@ -143,7 +144,7 @@ def amplitude_damping_kraus(
     noise_level: float, num_qubits: int
 ) -> List[np.ndarray]:
     """Returns the Kraus operators of an amplitude damping
-    channel at a given noise level. If num_qubits > 1, the Kraus operators
+    channel at a given noise level. If ``num_qubits > 1``, the Kraus operators
     corresponding to tensor product of many single-qubit amplitude damping
     channels are returned.
     """
@@ -154,34 +155,38 @@ def amplitude_damping_kraus(
     ]
 
 
-def matrix_to_vector(density_matrix: np.ndarray) -> np.array:
-    """Reshapes a density matrix into a vector, according to the rule:
-    |i><j| --> |i,j>.
+def matrix_to_vector(density_matrix: np.ndarray) -> np.ndarray:
+    r"""Reshapes a :math:`d \times d` density matrix into a 
+    :math:`d^2`-dimensional state vector, according to the rule:
+    :math:`|i \rangle\langle j| \rightarrow |i,j \rangle`.
     """
     return density_matrix.flatten()
 
 
-def vector_to_matrix(vector: np.ndarray) -> np.array:
-    """Reshapes a vector to a density matrix, according to the rule:
-    |i,j> --> |i><j|.
+def vector_to_matrix(vector: np.ndarray) -> np.ndarray:
+    r"""Reshapes a :math:`d^2`-dimensional state vector into a 
+    :math:`d \times d` density matrix, according to the rule:
+    :math:`|i,j \rangle \rightarrow |i \rangle\langle j|`.
     """
     dim = int(np.round(np.sqrt(vector.size)))
     return vector.reshape(dim, dim)
 
 
 def kraus_to_super(kraus_ops: List[np.ndarray]) -> np.ndarray:
-    """Maps a set of Kraus operators into a single superoperator
-    matrix "S" acting by matrix multiplication on vectorized
+    r"""Maps a set of Kraus operators into a single superoperator
+    matrix acting by matrix multiplication on vectorized
     density matrices.
 
-    The returned matrix "S" is obtained with the formula:
+    The returned matrix :math:`S` is obtained with the formula:
+    
+    .. math::
+        S = \sum_j K_j \otimes K_j^*,
 
-    S = \\sum_j K_j \\otimes K_j^*,
-
-    where K_j are the superoperators.
+    where :math:`\{K_j\}` are the superoperators.
     The mapping is based on the following isomorphism:
 
-    A|i><j|B  <=>  (A \\otimes B^T) |i>|j>.
+    .. math::
+        A|i \rangle\langle  j|B  <=>  (A \otimes B^T) |i\rangle|j\rangle.
     """
     return sum([np.kron(k, k.conj()) for k in kraus_ops])
 
