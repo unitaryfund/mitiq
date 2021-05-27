@@ -112,6 +112,9 @@ def tensor_product(*args: np.ndarray) -> np.ndarray:
     ``numpy.kron(arg_a, arg_b)`` to the case of an arbitrary number of
     arguments.
     """
+    if args is ():
+        raise TypeError("tensor_product() requires at least one argument.")
+
     val = args[0]
     for term in args[1:]:
         val = np.kron(val, term)
@@ -163,15 +166,14 @@ def matrix_to_vector(density_matrix: np.ndarray) -> np.ndarray:
     return density_matrix.flatten()
 
 
-def _safe_sqrt(perfect_square: int) -> int:
+def _safe_sqrt(
+    perfect_square: int, error_str: str = "The input must be a square number.",
+) -> int:
     """Takes the square root of the input integer and
     raises an error if the input is not a perfect square."""
     square_root = int(np.round(np.sqrt(perfect_square)))
     if square_root ** 2 != perfect_square:
-        raise ValueError(
-            "The expected dimension of the input matrix (or array) must be a"
-            " square number but dimension is {perfect_square}."
-        )
+        raise ValueError(error_str)
     return square_root
 
 
@@ -180,7 +182,11 @@ def vector_to_matrix(vector: np.ndarray) -> np.ndarray:
     :math:`d \times d` density matrix, according to the rule:
     :math:`|i,j \rangle \rightarrow |i \rangle\langle j|`.
     """
-    dim = _safe_sqrt(vector.size)
+    error_str = (
+        "The expected dimension of the input vector must be a"
+        f" square number but is {vector.size}."
+    )
+    dim = _safe_sqrt(vector.size, error_str)
     return vector.reshape(dim, dim)
 
 
@@ -209,7 +215,12 @@ def choi_to_super(choi_state: np.ndarray) -> np.ndarray:
 
     Up to normalization, this is just a tensor transposition.
     """
-    dim = _safe_sqrt(choi_state.shape[0])
+    error_str = (
+        "The expected dimension of the input matrix must be a"
+        f" square number but is {choi_state.shape[0]}."
+    )
+    dim = _safe_sqrt(choi_state.shape[0], error_str)
+
     choi_kl_ij = choi_state.reshape(dim, dim, dim, dim)
     choi_ki_lj = choi_kl_ij.transpose(0, 2, 1, 3)
     super_not_normalized = choi_ki_lj.reshape(dim ** 2, dim ** 2)

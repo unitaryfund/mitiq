@@ -141,7 +141,7 @@ def test_non_squared_dimension():
     with raises(ValueError, match="must be a square number"):
         vector_to_matrix(np.random.rand(7))
     with raises(ValueError, match="must be a square number"):
-        choi_to_super(np.random.rand(7))
+        choi_to_super(np.random.rand(7, 7))
 
 
 def test_kraus_to_super():
@@ -200,3 +200,7 @@ def test_tensor_product():
     terms = [np.random.rand(dim, dim) for dim in range(1, 4)]
     expected = np.kron(np.kron(terms[0], terms[1]), terms[2])
     assert np.allclose(tensor_product(*terms), expected)
+    one_term = np.random.rand(5, 5)
+    assert np.allclose(tensor_product(one_term), one_term)
+    with raises(TypeError, match="requires at least one argument"):
+        assert np.allclose(tensor_product(), one_term)
