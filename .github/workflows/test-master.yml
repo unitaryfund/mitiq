@@ -30,3 +30,4 @@ jobs:
           run: make test
         - name: Run the type checker
           run: make check-types
+          
