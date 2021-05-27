@@ -194,7 +194,7 @@ def kraus_to_super(kraus_ops: List[np.ndarray]) -> np.ndarray:
     .. math::
         S = \sum_j K_j \otimes K_j^*,
 
-    where :math:`\{K_j\}` are the superoperators.
+    where :math:`\{K_j\}` are the Kraus operators.
     The mapping is based on the following isomorphism:
 
     .. math::
