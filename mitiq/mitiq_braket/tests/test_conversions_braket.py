@@ -140,10 +140,12 @@ def test_from_braket_non_parameterized_two_qubit_gates():
 
 
 def test_from_braket_parameterized_two_qubit_gates():
-    braket_circuit = BKCircuit()
-    # TODO: Add all two-qubit parameterized gates once translated.
     pgates = [
         braket_gates.CPhaseShift,
+        braket_gates.CPhaseShift00,
+        braket_gates.CPhaseShift01,
+        braket_gates.CPhaseShift10,
+        braket_gates.PSwap,
         braket_gates.XX,
         braket_gates.YY,
         braket_gates.ZZ,
@@ -153,14 +155,15 @@ def test_from_braket_parameterized_two_qubit_gates():
     instructions = [
         Instruction(rot(a), target=[0, 1]) for rot, a in zip(pgates, angles)
     ]
-    for instr in instructions:
-        braket_circuit.add_instruction(instr)
-    cirq_circuit = from_braket(braket_circuit)
 
-    for i, op in enumerate(cirq_circuit.all_operations()):
-        assert np.allclose(
-            instructions[i].operator.to_matrix(), protocols.unitary(op)
-        )
+    cirq_circuits = list()
+    for instr in instructions:
+        braket_circuit = BKCircuit()
+        braket_circuit.add_instruction(instr)
+        cirq_circuits.append(from_braket(braket_circuit))
+
+    for instr, cirq_circuit in zip(instructions, cirq_circuits):
+        assert np.allclose(instr.operator.to_matrix(), cirq_circuit.unitary())
 
 
 def test_from_braket_three_qubit_gates():
@@ -179,6 +182,37 @@ def test_from_braket_three_qubit_gates():
         protocols.unitary(cirq_circuit),
         protocols.unitary(expected_cirq_circuit),
     )
+
+
+def _rotation_of_pi_over_7(num_qubits):
+    matrix = np.identity(2 ** num_qubits)
+    matrix[0:2, 0:2] = [
+        [np.cos(np.pi / 7), np.sin(np.pi / 7)],
+        [-np.sin(np.pi / 7), np.cos(np.pi / 7)],
+    ]
+    return matrix
+
+
+def test_from_braket_raises_on_unsupported_gates():
+    for num_qubits in range(1, 5):
+        braket_circuit = BKCircuit()
+        instr = Instruction(
+            braket_gates.Unitary(_rotation_of_pi_over_7(num_qubits)),
+            target=list(range(num_qubits)),
+        )
+        braket_circuit.add_instruction(instr)
+        with pytest.raises(ValueError):
+            from_braket(braket_circuit)
+
+
+def test_to_braket_raises_on_unsupported_gates():
+    for num_qubits in range(3, 5):
+        print(num_qubits)
+        qubits = [LineQubit(int(qubit)) for qubit in range(num_qubits)]
+        op = ops.MatrixGate(_rotation_of_pi_over_7(num_qubits)).on(*qubits)
+        circuit = Circuit(op)
+        with pytest.raises(ValueError):
+            to_braket(circuit)
 
 
 def test_to_from_braket_common_one_qubit_gates():
@@ -270,3 +304,21 @@ def test_to_from_braket_uncommon_two_qubit_gates(uncommon_gate):
         protocols.unitary(cirq_circuit),
         atol=1e-7,
     )
+
+
+@pytest.mark.parametrize(
+    "common_gate", [ops.TOFFOLI, ops.FREDKIN,],
+)
+def test_to_from_braket_common_three_qubit_gates(common_gate):
+    """These gates should stay the same (i.e., not get decomposed) when
+    converting Cirq -> Braket -> Cirq.
+    """
+    cirq_circuit = Circuit(common_gate.on(*LineQubit.range(3)))
+    test_circuit = from_braket(to_braket(cirq_circuit))
+    testing.assert_allclose_up_to_global_phase(
+        protocols.unitary(test_circuit),
+        protocols.unitary(cirq_circuit),
+        atol=1e-7,
+    )
+
+    assert _equal(test_circuit, cirq_circuit, require_qubit_equality=True)
