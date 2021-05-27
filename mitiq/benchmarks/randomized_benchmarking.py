@@ -61,16 +61,16 @@ def generate_rb_circuits(
         c1 = cliffords.c1_in_xy
         cfd_mat_1q = [_gate_seq_to_mats(gates) for gates in c1]
         circuits = [
-            _random_single_q_clifford(*qubits, num_cliffords, c1, cfd_mat_1q)
+            _random_single_q_clifford(qubits[0], num_cliffords, c1, cfd_mat_1q)
             for _ in range(trials)
         ]
     else:
         cfd_matrices = _two_qubit_clifford_matrices(
-            *qubits, cliffords,  # type: ignore
+            qubits[0], qubits[1], cliffords,
         )
         circuits = [
             _random_two_q_clifford(
-                *qubits,  # type: ignore
+                qubits[0], qubits[1],
                 num_cliffords,
                 cfd_matrices,
                 cliffords,
