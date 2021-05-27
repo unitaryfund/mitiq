@@ -156,19 +156,31 @@ def amplitude_damping_kraus(
 
 
 def matrix_to_vector(density_matrix: np.ndarray) -> np.ndarray:
-    r"""Reshapes a :math:`d \times d` density matrix into a 
+    r"""Reshapes a :math:`d \times d` density matrix into a
     :math:`d^2`-dimensional state vector, according to the rule:
     :math:`|i \rangle\langle j| \rightarrow |i,j \rangle`.
     """
     return density_matrix.flatten()
 
 
+def _safe_sqrt(perfect_square: int) -> int:
+    """Takes the square root of the input integer and
+    raises an error if the input is not a perfect square."""
+    square_root = int(np.round(np.sqrt(perfect_square)))
+    if square_root ** 2 != perfect_square:
+        raise ValueError(
+            "The expected dimension of the input matrix (or array) must be a"
+            " square number but dimension is {perfect_square}."
+        )
+    return square_root
+
+
 def vector_to_matrix(vector: np.ndarray) -> np.ndarray:
-    r"""Reshapes a :math:`d^2`-dimensional state vector into a 
+    r"""Reshapes a :math:`d^2`-dimensional state vector into a
     :math:`d \times d` density matrix, according to the rule:
     :math:`|i,j \rangle \rightarrow |i \rangle\langle j|`.
     """
-    dim = int(np.round(np.sqrt(vector.size)))
+    dim = _safe_sqrt(vector.size)
     return vector.reshape(dim, dim)
 
 
@@ -178,7 +190,7 @@ def kraus_to_super(kraus_ops: List[np.ndarray]) -> np.ndarray:
     density matrices.
 
     The returned matrix :math:`S` is obtained with the formula:
-    
+
     .. math::
         S = \sum_j K_j \otimes K_j^*,
 
@@ -197,7 +209,7 @@ def choi_to_super(choi_state: np.ndarray) -> np.ndarray:
 
     Up to normalization, this is just a tensor transposition.
     """
-    dim = int(np.round(np.sqrt(choi_state.shape[0])))
+    dim = _safe_sqrt(choi_state.shape[0])
     choi_kl_ij = choi_state.reshape(dim, dim, dim, dim)
     choi_ki_lj = choi_kl_ij.transpose(0, 2, 1, 3)
     super_not_normalized = choi_ki_lj.reshape(dim ** 2, dim ** 2)

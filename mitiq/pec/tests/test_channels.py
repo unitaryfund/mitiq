@@ -137,6 +137,13 @@ def test_vector_to_matrix():
         assert (matrix_to_vector(vector_to_matrix(vec)) == vec).all
 
 
+def test_non_squared_dimension():
+    with raises(ValueError, match="must be a square number"):
+        vector_to_matrix(np.random.rand(7))
+    with raises(ValueError, match="must be a square number"):
+        choi_to_super(np.random.rand(7))
+
+
 def test_kraus_to_super():
     """Tests the function on random channels acting on random states.
     Channels and states are non-physical, but this is irrelevant for the test.
