@@ -184,8 +184,7 @@ def kraus_to_super(kraus_ops: List[np.ndarray]) -> np.ndarray:
 
     A|i><j|B  <=>  (A \\otimes B^T) |i>|j>.
     """
-    terms_to_sum = [np.kron(k, k.conj()) for k in kraus_ops]
-    return sum(terms_to_sum)
+    return sum([np.kron(k, k.conj()) for k in kraus_ops])
 
 
 def choi_to_super(choi_state: np.ndarray) -> np.ndarray:
