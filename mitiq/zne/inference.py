@@ -392,6 +392,14 @@ class Factory(ABC):
         self._zne_error = None
         self._already_reduced = False
         return self
+        
+    def reduce(self) -> Optional[float]:
+        """Evaluates the zero-noise limit found by fitting according to
+        the factory's extrapolation method.
+        Returns:
+            The zero-noise limit.
+        """
+        pass
 
 
 class BatchedFactory(Factory, ABC):
