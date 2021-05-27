@@ -204,6 +204,7 @@ def test_from_braket_raises_on_unsupported_gates():
         with pytest.raises(ValueError):
             from_braket(braket_circuit)
 
+
 def test_to_braket_raises_on_unsupported_gates():
     for num_qubits in range(3, 5):
         print(num_qubits)
@@ -306,11 +307,7 @@ def test_to_from_braket_uncommon_two_qubit_gates(uncommon_gate):
 
 
 @pytest.mark.parametrize(
-    "common_gate",
-    [
-        ops.TOFFOLI,
-        ops.FREDKIN,
-    ],
+    "common_gate", [ops.TOFFOLI, ops.FREDKIN,],
 )
 def test_to_from_braket_common_three_qubit_gates(common_gate):
     """These gates should stay the same (i.e., not get decomposed) when
@@ -325,4 +322,3 @@ def test_to_from_braket_common_three_qubit_gates(common_gate):
     )
 
     assert _equal(test_circuit, cirq_circuit, require_qubit_equality=True)
-

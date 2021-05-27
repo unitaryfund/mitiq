@@ -60,6 +60,8 @@ def from_braket(circuit: BKCircuit) -> "cirq.Circuit":
         _translate_braket_instruction_to_cirq_operation(instr)
         for instr in circuit.instructions
     )
+
+
 def to_braket(circuit: "cirq.Circuit") -> BKCircuit:
     """Returns a Braket circuit equivalent to the input Cirq circuit.
 
@@ -131,8 +133,7 @@ def _translate_cirq_operation_to_braket_instruction(
 
     elif nqubits == 3:
         qubits = [q.x for q in op.qubits]
-    
-        
+
         if op == cirq_ops.TOFFOLI.on(*op.qubits):
             return [Instruction(braket_gates.CCNot(), qubits)]
         elif op == cirq_ops.FREDKIN.on(*op.qubits):
