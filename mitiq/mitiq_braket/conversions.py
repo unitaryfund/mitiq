@@ -33,7 +33,7 @@ if TYPE_CHECKING:
     import cirq
 
 
-def _raise_braket_to_cirq_error(instr):
+def _raise_braket_to_cirq_error(instr: Instruction) -> None:
     raise ValueError(
         f"Unable to convert the instruction {instr} to Cirq. If you think "
         "this is a bug, you can open an issue on the Mitiq GitHub at "
@@ -41,7 +41,7 @@ def _raise_braket_to_cirq_error(instr):
     )
 
 
-def _raise_cirq_to_braket_error(op):
+def _raise_cirq_to_braket_error(op: cirq_ops.Operation) -> None:
     raise ValueError(
         f"Unable to convert {op} to Braket. If you think this is a bug, "
         "you can open an issue on the Mitiq GitHub at"
@@ -111,6 +111,8 @@ def _translate_braket_instruction_to_cirq_operation(
     else:
         _raise_braket_to_cirq_error(instr)
 
+    return None
+
 
 def _translate_cirq_operation_to_braket_instruction(
     op: cirq_ops.Operation,
@@ -146,10 +148,12 @@ def _translate_cirq_operation_to_braket_instruction(
     else:
         _raise_cirq_to_braket_error(op)
 
+    return None
+
 
 def _translate_one_qubit_braket_instruction_to_cirq_operation(
     instr: Instruction,
-) -> List["cirq.Operation"]:
+) -> Optional[List["cirq.Operation"]]:
     """Converts the one-qubit braket instruction to Cirq.
 
     Args:
@@ -198,10 +202,12 @@ def _translate_one_qubit_braket_instruction_to_cirq_operation(
     else:
         _raise_braket_to_cirq_error(instr)
 
+    return None
+
 
 def _translate_two_qubit_braket_instruction_to_cirq_operation(
     instr: Instruction,
-) -> List["cirq.Operation"]:
+) -> Optional[List["cirq.Operation"]]:
     """Converts the two-qubit braket instruction to Cirq.
 
     Args:
@@ -281,6 +287,8 @@ def _translate_two_qubit_braket_instruction_to_cirq_operation(
 
     else:
         _raise_braket_to_cirq_error(instr)
+
+    return None
 
 
 def _translate_one_qubit_cirq_operation_to_braket_instruction(
