@@ -32,8 +32,8 @@ Utils
 .. automodule:: mitiq.benchmarks.utils
    :members:
 
-Clifford Training Data
-----------------------
+Clifford Data Regression
+------------------------
 .. automodule:: mitiq.cdr.clifford_training_data
    :members:
 
@@ -82,6 +82,11 @@ Sampling from a Noisy Decomposition of an Ideal Operation
 Probabilistic Error Cancellation Types
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.pec.types.types
+   :members:
+
+Utilities for Quantum Channels
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.pec.channels
    :members:
 
 
