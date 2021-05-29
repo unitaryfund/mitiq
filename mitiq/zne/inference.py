@@ -529,9 +529,11 @@ class BatchedFactory(Factory, ABC):
             new_depth = len(list(circ.all_operations()))
             new_scale_factor = new_depth / original_depth
             if new_scale_factor < scale_factors[num_circ]:
-                warnings.warn("The circuit has very few gates. "
-                              f"The input scale factor {scale_factors[num_circ]} "
-                              f"was changed to {new_scale_factor:.2g}")
+                warnings.warn(
+                    "The circuit has very few gates. "
+                    f"Input scale factor {scale_factors[num_circ]} "
+                    f"was changed to {new_scale_factor:.2g}"
+                )
 
         # Get the list of keywords associated to each circuit in "to_run"
         kwargs_list = self._get_keyword_args(num_to_average)
@@ -745,10 +747,11 @@ class AdaptiveFactory(Factory, ABC):
             new_depth = len(list(circ.all_operations()))
             new_scale_factor = new_depth / original_depth
             if new_scale_factor < scale_factors[num_circ]:
-                warnings.warn("The circuit has very few gates. "
-                              f"The input scale factor {scale_factors[num_circ]} "
-                              f"was changed to {new_scale_factor:.2g}")
-
+                warnings.warn(
+                    "The circuit has very few gates. "
+                    f"Input scale factor {scale_factors[num_circ]} "
+                    f"was changed to {new_scale_factor:.2g}"
+                )
 
         return self.run_classical(
             scale_factor_to_expectation_value, max_iterations
