@@ -519,6 +519,20 @@ class BatchedFactory(Factory, ABC):
         # Get all noise-scaled circuits to run
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
 
+        scale_factors = self.get_scale_factors()
+        original_depth = len(list(qp.all_operations()))
+        for num_circ, circ in enumerate(
+            self._generate_circuits(
+                qp, scale_noise, num_to_average=num_to_average
+            )
+        ):
+            new_depth = len(list(circ.all_operations()))
+            new_scale_factor = new_depth / original_depth
+            if new_scale_factor < scale_factors[num_circ]:
+                warnings.warn("The circuit has very few gates. "
+                              f"The input scale factor {scale_factors[num_circ]} "
+                              f"was changed to {new_scale_factor:.2g}")
+
         # Get the list of keywords associated to each circuit in "to_run"
         kwargs_list = self._get_keyword_args(num_to_average)
 
@@ -720,6 +734,21 @@ class AdaptiveFactory(Factory, ABC):
                 scaled_qp = scale_noise(qp, scale_factor)
                 expectation_values.append(executor(scaled_qp, **exec_params))
             return np.average(expectation_values)
+
+        scale_factors = self.get_scale_factors()
+        original_depth = len(list(qp.all_operations()))
+        for num_circ, circ in enumerate(
+            self._generate_circuits(
+                qp, scale_noise, num_to_average=num_to_average
+            )
+        ):
+            new_depth = len(list(circ.all_operations()))
+            new_scale_factor = new_depth / original_depth
+            if new_scale_factor < scale_factors[num_circ]:
+                warnings.warn("The circuit has very few gates. "
+                              f"The input scale factor {scale_factors[num_circ]} "
+                              f"was changed to {new_scale_factor:.2g}")
+
 
         return self.run_classical(
             scale_factor_to_expectation_value, max_iterations
