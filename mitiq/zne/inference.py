@@ -528,7 +528,7 @@ class BatchedFactory(Factory, ABC):
         ):
             new_depth = len(list(circ.all_operations()))
             new_scale_factor = new_depth / original_depth
-            if new_scale_factor < scale_factors[num_circ]:
+            if new_scale_factor != scale_factors[num_circ]:
                 warnings.warn(
                     "The circuit has very few gates. "
                     f"Input scale factor {scale_factors[num_circ]} "
