@@ -35,7 +35,7 @@ from mitiq.zne.inference import (
     PolyExpFactory,
     AdaExpFactory,
 )
-
+from mitiq.zne.scaling.folding import fold_gates_at_random
 
 # Constant parameters for test functions:
 A = 0.5
@@ -978,3 +978,23 @@ def test_map_to_fakenodes():
     fac = FakeNodesFactory(UNIFORM_X)
     test_argument = 1.0
     assert np.isclose(fac._map_to_fake_nodes(1.0, 2.0, test_argument), 1.0,)
+
+
+def too_few_gates_warning(factory):
+    def executor(circ: Circuit) -> float:
+       """Executes a circuit with depolarizing noise and
+       returns the expectation value of the projector |0><0|."""
+       circuit = circ.with_noise(depolarize(p=NOISE))
+       rho = SIMULATOR.simulate(circuit).final_density_matrix
+       obs = np.diag([1, 0])
+       expectation = np.real(np.trace(rho @ obs))
+       return expectation
+
+    factory = RichardsonFactory(scale_factors=[1.0, 2.0, 3.0])
+    circuit = cirq.Circuit(X(qubit), H(qubit), X(qubit))
+
+    with warns(
+        UserWarning,
+        match=r"The circuit has very few gates.",
+    ):
+        factory.run(circuit, executor, fold_gates_at_random, num_to_average=1)
