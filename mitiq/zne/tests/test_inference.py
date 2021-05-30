@@ -993,6 +993,7 @@ def test_map_to_fakenodes():
     ),
 )
 def test_short_circuit_warning(factory):
+    """Tests a warning is raised if the input circuit has very few gates."""
     scale_factors = np.linspace(1.0, 10.0, num=20)
 
     def executor(circuits) -> List[float]:
