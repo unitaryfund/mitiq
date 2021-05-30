@@ -36,7 +36,7 @@ from mitiq.zne.inference import (
     AdaExpFactory,
 )
 from mitiq.zne.scaling.folding import fold_gates_at_random
-from cirq import Circuit, depolarize, DensityMatrixSimulator
+from cirq import LineQubit, X, H
 
 # Constant parameters for test functions:
 A = 0.5
@@ -981,25 +981,32 @@ def test_map_to_fakenodes():
     assert np.isclose(fac._map_to_fake_nodes(1.0, 2.0, test_argument), 1.0,)
 
 
-def too_few_gates_warning(factory):
-    # Initialize a backend
-    SIMULATOR = DensityMatrixSimulator()
-    # 5% depolarizing noise
-    NOISE = 0.05
+@mark.parametrize(
+    "factory",
+    (
+        LinearFactory,
+        RichardsonFactory,
+        FakeNodesFactory,
+        PolyFactory,
+        ExpFactory,
+        PolyExpFactory,
+    ),
+)
+def test_short_circuit_warning(factory):
+    scale_factors = np.linspace(1.0, 10.0, num=20)
 
-    def executor(circ: Circuit) -> float:
-        """Executes a circuit with depolarizing noise and
-       returns the expectation value of the projector |0><0|."""
-        circuit = circ.with_noise(depolarize(p=NOISE))
-        rho = SIMULATOR.simulate(circuit).final_density_matrix
-        obs = np.diag([1, 0])
-        expectation = np.real(np.trace(rho @ obs))
-        return expectation
+    def executor(circuits) -> List[float]:
+        return [1.0] * len(circuits)
 
-    factory = RichardsonFactory(scale_factors=[1.0, 2.0, 3.0])
+    if factory is PolyFactory or factory is PolyExpFactory:
+        fac = factory(scale_factors=scale_factors, order=2)
+    else:
+        fac = factory(scale_factors=scale_factors)
+
+    qubit = LineQubit(0)
     circuit = cirq.Circuit(X(qubit), H(qubit), X(qubit))
 
     with warns(
-        UserWarning, match=r"The circuit has very few gates.",
+        UserWarning, match=r"The input circuit is very short.",
     ):
-        factory.run(circuit, executor, fold_gates_at_random, num_to_average=1)
+        fac.run(circuit, executor, scale_noise=lambda circ, _: circ)
