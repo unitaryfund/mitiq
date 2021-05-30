@@ -35,7 +35,6 @@ from mitiq.zne.inference import (
     PolyExpFactory,
     AdaExpFactory,
 )
-from mitiq.zne.scaling.folding import fold_gates_at_random
 from cirq import LineQubit, X, H
 
 # Constant parameters for test functions:
