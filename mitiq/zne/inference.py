@@ -520,13 +520,9 @@ class BatchedFactory(Factory, ABC):
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
 
         scale_factors = self.get_scale_factors()
-        original_depth = len(list(qp.all_operations()))
-        for num_circ, circ in enumerate(
-            self._generate_circuits(
-                qp, scale_noise, num_to_average=num_to_average
-            )
-        ):
-            new_depth = len(list(circ.all_operations()))
+        original_depth = len(qp)
+        for num_circ, circ in enumerate(to_run):
+            new_depth = len(circ)
             new_scale_factor = new_depth / original_depth
             if new_scale_factor != scale_factors[num_circ]:
                 warnings.warn(
@@ -738,13 +734,13 @@ class AdaptiveFactory(Factory, ABC):
             return np.average(expectation_values)
 
         scale_factors = self.get_scale_factors()
-        original_depth = len(list(qp.all_operations()))
+        original_depth = len(qp)
         for num_circ, circ in enumerate(
             self._generate_circuits(
                 qp, scale_noise, num_to_average=num_to_average
             )
         ):
-            new_depth = len(list(circ.all_operations()))
+            new_depth = len(circ)
             new_scale_factor = new_depth / original_depth
             if new_scale_factor < scale_factors[num_circ]:
                 warnings.warn(
