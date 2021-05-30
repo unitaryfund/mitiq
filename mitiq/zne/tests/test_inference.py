@@ -989,6 +989,7 @@ def test_map_to_fakenodes():
         PolyFactory,
         ExpFactory,
         PolyExpFactory,
+        AdaExpFactory,
     ),
 )
 def test_short_circuit_warning(factory):
@@ -1000,6 +1001,8 @@ def test_short_circuit_warning(factory):
 
     if factory is PolyFactory or factory is PolyExpFactory:
         fac = factory(scale_factors=scale_factors, order=2)
+    elif factory is AdaExpFactory:
+        fac = factory(steps=4)
     else:
         fac = factory(scale_factors=scale_factors)
 
