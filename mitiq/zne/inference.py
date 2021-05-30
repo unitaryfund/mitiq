@@ -521,7 +521,8 @@ class BatchedFactory(Factory, ABC):
 
         if len(qp) < 5:
             warnings.warn(
-                "The input circuit is very short. This may reduce the accuracy of noise scaling."
+                "The input circuit is very short. "
+                "This may reduce the accuracy of noise scaling."
             )
 
         # Get the list of keywords associated to each circuit in "to_run"
@@ -728,7 +729,8 @@ class AdaptiveFactory(Factory, ABC):
 
         if len(qp) < 5:
             warnings.warn(
-                "The input circuit is very short. This may reduce the accuracy of noise scaling."
+                "The input circuit is very short. "
+                "This may reduce the accuracy of noise scaling."
             )
 
         return self.run_classical(
