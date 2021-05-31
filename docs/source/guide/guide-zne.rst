@@ -344,7 +344,7 @@ In the following code, we use the ``scale_gates_from_right`` function on the sam
 
     # Scale the circuit
     >>> scale = scale_gates_from_right(circ, scale_factor=2.)
-    >>> print("Folded circuit:", scaled, sep="\n")
+    >>> print("Scaled circuit:", scaled, sep="\n")
     Scaled circuit:
     0: ───H───I───I───@───I───I───
                       │   │   │
