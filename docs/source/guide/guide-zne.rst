@@ -350,7 +350,8 @@ In the following code, we use the ``scale_gates_from_right`` function on the sam
                       │   │   │
     1: ───────────────X───I───I───
 
-We see the original circuit is scaled
+We see the original circuit is scaled by inserting two identity gates after
+each gate in the original circuit. This helps achieve desired scale factor. 
 
 Finally, we mention ``scale_gates_at_random`` which scales gates according to the following rules.
 
