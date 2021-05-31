@@ -302,7 +302,7 @@ As such, Mitiq defines several local folding methods.
     2. :func:`mitiq.zne.scaling.identity_insertion.scale_gates_from_right`
     3. :func:`mitiq.zne.scaling.identity_insertion.scale_gates_at_random`
 
-The function ``fold_gates_from_left`` will fold gates from the left (or start) of the circuit
+The function ``scale_gates_from_left`` will fold gates from the left (or start) of the circuit
 until the desired scale factor is reached.
 
 
