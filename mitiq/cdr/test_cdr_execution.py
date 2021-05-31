@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Test code for execution code in Clifford data regression."""
-import pytest
-
 import numpy as np
 
 import cirq
@@ -23,13 +21,9 @@ from cirq import Simulator
 from cirq import depolarize
 from cirq import DensityMatrixSimulator
 
-from cdr_execution import execute_with_CDR
+from mitiq.cdr.cdr_execution import execute_with_CDR
 
-from mitiq.zne.scaling import (
-    fold_gates_from_left,
-    fold_gates_from_right,
-    fold_gates_at_random,
-)
+from mitiq.zne.scaling import fold_gates_from_left
 
 from mitiq.cdr.data_regression import calculate_observable
 
@@ -64,7 +58,7 @@ def executor(circuit: Circuit) -> dict:
         circuit_copy.append(cirq.measure(qid))
     simulator = DensityMatrixSimulator()
     shots = 8192
-    noise = 0.1
+    noise = 0.5
     circuit_with_noise = circuit_copy.with_noise(depolarize(p=noise))
     result = simulator.run(circuit_with_noise, repetitions=shots)
     counts = result.multi_measurement_histogram(
@@ -98,45 +92,63 @@ def simulator_statevector(circuit: Circuit) -> np.ndarray:
     return statevector
 
 
-def simulator_counts(circuit: Circuit) -> dict:
-    circuit_copy = circuit.copy()
-    for qid in list(Circuit.all_qubits(circuit_copy)):
-        circuit_copy.append(cirq.measure(qid))
-    simulator = DensityMatrixSimulator()
-    shots = 8192
-    result = simulator.run(circuit_copy, repetitions=shots)
-    counts = result.multi_measurement_histogram(
-        keys=Circuit.all_qubits(circuit_copy)
-    )
-    dict_counts = counter_to_dict(counts)
-    return dict_counts
-
-
 # circuit used for unit tests:
 circuit = random_x_z_circuit(
-    cirq.LineQubit.range(4), n_moments=8, random_state=1
+    cirq.LineQubit.range(2), n_moments=2, random_state=1
 )
 
+# define observables for testing
 sigma_z = np.diag([1, -1])
-obs = np.kron(np.identity((8)), sigma_z)
-obs = np.diag(obs)
+obs = np.kron(np.identity((2)), sigma_z)
+obs2 = np.kron(sigma_z, sigma_z)
+obs_list = [np.diag(obs), np.diag(obs2)]
 
-results = execute_with_CDR(
-    circuit,
-    executor,
-    simulator_statevector,
-    obs,
-    4,
-    0.5,
-    scale_noise=fold_gates_from_left,
-    noise_scaling_factors=3,
-)
-
-exact_soln = calculate_observable(
-    simulator_statevector(circuit), observable=obs
-)
+# get exact solution:
+exact_solution = []
+for obs in obs_list:
+    exact_solution.append(
+        calculate_observable(simulator_statevector(circuit), observable=obs)
+    )
 
 
-print("Noisy", results[0][0])
-print("Mitigated", results[1])
-print("exact", exact_soln)
+# example fit function used in testing:
+def linear_fit_function_no_intercept(X_data, params) -> float:
+    return sum(a * x for a, x in zip(params, X_data))
+
+
+def test_execute_with_cdr():
+    kwargs = {
+        "method_select": "gaussian",
+        "method_replace": "gaussian",
+        "sigma_select": 0.5,
+        "sigma_replace": 0.5,
+        "random_state": 1,
+    }
+    num_circuits = 4
+    frac_non_cliff = 0.5
+    results0 = execute_with_CDR(
+        circuit,
+        executor,
+        simulator_statevector,
+        obs_list,
+        num_circuits,
+        frac_non_cliff,
+    )
+    results1 = execute_with_CDR(
+        circuit,
+        executor,
+        simulator_statevector,
+        obs_list,
+        num_circuits,
+        frac_non_cliff,
+        ansatz=linear_fit_function_no_intercept,
+        num_parameters=2,
+        scale_noise=fold_gates_from_left,
+        scale_factors=[3, 5],
+        **kwargs,
+    )
+    for results in [results0, results1]:
+        for i in range(len(results[1])):
+            assert abs(results[0][i][0] - exact_solution[i]) > abs(
+                results[1][i] - exact_solution[i]
+            )
