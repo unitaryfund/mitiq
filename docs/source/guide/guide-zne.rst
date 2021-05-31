@@ -302,10 +302,63 @@ As such, Mitiq defines several local folding methods.
     2. :func:`mitiq.zne.scaling.identity_insertion.scale_gates_from_right`
     3. :func:`mitiq.zne.scaling.identity_insertion.scale_gates_at_random`
 
+We use the same example circuits as unitary folding.
 The function ``scale_gates_from_left`` will fold gates from the left (or start) of the circuit
 until the desired scale factor is reached.
 
+.. doctest:: python
 
+    >>> import cirq
+    >>> from mitiq.zne.scaling.identity_insertion import scale_gates_from_left
+
+    # Get a circuit to fold
+    >>> qreg = cirq.LineQubit.range(2)
+    >>> circ = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1]))
+    >>> print("Original circuit:", circ, sep="\n")
+    Original circuit:
+    0: ───H───@───
+              │
+    1: ───────X───
+
+    # Scale the circuit
+    >>> scaled = scale_gates_from_left(circ, scale_factor=2.)
+    >>> print("Scaled circuit:", scaled, sep="\n")
+    Scaled circuit:
+    0: ───H───I───I───@───I───I───
+                      │   │   │
+    1: ───────────────X───I───I───
+
+In this example, we see that the scaled circuit has 2 identity gates inserted
+after both gates in the circuit to reach the desired scale factor.
+
+
+.. note::
+    Mitiq scaling functions do not modify the input circuit.
+
+Because input circuits are not modified, we can reuse this circuit for the next example.
+In the following code, we use the ``scale_gates_from_right`` function on the same input circuit.
+
+.. doctest:: python
+
+    >>> from mitiq.zne.scaling.identity_insertion import scale_gates_from_right
+
+    # Scale the circuit
+    >>> scale = scale_gates_from_right(circ, scale_factor=2.)
+    >>> print("Folded circuit:", scaled, sep="\n")
+    Scaled circuit:
+    0: ───H───I───I───@───I───I───
+                      │   │   │
+    1: ───────────────X───I───I───
+
+We see the original circuit is scaled
+
+Finally, we mention ``scale_gates_at_random`` which scales gates according to the following rules.
+
+    1. Gates are selected at random and scaled by inserting identity gates until the input scale factor is reached.
+    2. No gate is scaled more than once for any ``scale_factor <= 2``.
+    3. "Virtual gates" (i.e., identity gates appearing from scaling) are never scaled.
+
+All of these local scaling methods can be called with any ``scale_factor >= 1``.
 
 .. _guide_zne_factory:
 
