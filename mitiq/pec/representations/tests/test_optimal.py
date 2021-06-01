@@ -307,8 +307,7 @@ def test_find_optimal_representation_single_qubit_depolarizing(circ_type):
         assert _equivalent_representations(rep, expected_rep)
 
 
-# If conversions for the "reset" gate will be supported,
-# other circuit types could be added.
+# After fixing the GitHub issue gh-702, other circuit types could be added.
 @mark.parametrize("circ_type", ["cirq"])
 def test_find_optimal_representation_single_qubit_amp_damping(circ_type):
     """Test optimal representation of agrees with a known analytic result."""

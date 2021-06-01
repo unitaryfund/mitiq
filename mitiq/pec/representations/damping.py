@@ -28,6 +28,7 @@ from cirq import (
 from mitiq.pec.types import OperationRepresentation, NoisyOperation
 
 
+# TODO: this may be extended to an arbitrary QPROGRAM (GitHub issue gh-702).
 def _represent_operation_with_amplitude_damping_noise(
     ideal_operation: Circuit, noise_level: float,
 ) -> OperationRepresentation:
