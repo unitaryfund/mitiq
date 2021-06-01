@@ -12,11 +12,25 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""Functions related to representations with depolarizing noise."""
+
 
 from typing import List
 from itertools import product
+import numpy as np
 
-from cirq import Operation, X, Y, Z, Circuit, is_measurement
+from cirq import (
+    Operation,
+    X,
+    Y,
+    Z,
+    Circuit,
+    is_measurement,
+    DepolarizingChannel,
+    channel,
+    AmplitudeDampingChannel,
+)
+
 from mitiq import QPROGRAM
 from mitiq.pec.types import OperationRepresentation, NoisyOperation
 from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
@@ -315,3 +329,42 @@ def represent_operations_in_circuit_with_local_depolarizing_noise(
             )
         )
     return representations
+
+
+def global_depolarizing_kraus(
+    noise_level: float, num_qubits: int,
+) -> List[np.ndarray]:
+    """Returns the kraus operators of a global depolarizing channel at a
+    given noise level.
+    """
+    noisy_op = DepolarizingChannel(noise_level, num_qubits)
+    return list(channel(noisy_op))
+
+
+def local_depolarizing_kraus(
+    noise_level: float, num_qubits: int,
+) -> List[np.ndarray]:
+    """Returns the kraus operators of the tensor product of local
+    depolarizing channels acting on each qubit.
+    """
+    local_kraus = global_depolarizing_kraus(noise_level, num_qubits=1)
+    tensored_kraus = []
+    # Compute the tensor product of all the local kraus operators
+    for kraus_string in product(local_kraus, repeat=num_qubits):
+        kraus_product = np.eye(1)
+        for k_th_kraus in kraus_string:
+            kraus_product = np.kron(kraus_product, k_th_kraus)
+        tensored_kraus.append(kraus_product)
+    return tensored_kraus
+
+
+def amplitude_damping_kraus(
+    noise_level: float, num_qubits: int
+) -> List[np.ndarray]:
+    """Returns the kraus operators of the tensor product of local
+    depolarizing channels acting on each qubit.
+    """
+    if num_qubits == 1:
+        noisy_op = AmplitudeDampingChannel(noise_level)
+        return list(channel(noisy_op))
+    raise NotImplementedError()
