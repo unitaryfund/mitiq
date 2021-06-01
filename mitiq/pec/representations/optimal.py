@@ -36,26 +36,20 @@ def minimize_one_norm(
     the following representation of the input ``ideal_matrix`` holds:
 
     .. math::
-        ideal_matrix = x_0 A_0 + x_1 A_1 + ...,
+        \text{ideal_matrix} = x_0 A_0 + x_1 A_1 + ...,
 
     where :math:`\{A_j\}` are the basis matrices, i.e., the elements of
-    the input basis_matrices.
+    the input ``basis_matrices``.
 
-    This function is used to compute the optimal representation
+    This function can be used to compute the optimal representation
     of an ideal superoperator (or Choi state) as a linear
     combination of real noisy superoperators (or Choi states).
-
-    If linear_method is True, the representation is expressed as
-    a linear constraint. Otherwise, it is expressed as a non-linear
-    contraint. In principle both methods should give the same
-    result. However the numerical stability of the optimization may
-    depend on this option.
 
     Args:
         ideal_matrix: The ideal matrix to represent.
         basis_matrices: The list of basis matrices.
-        tol: The representation precision for each matrix element
-            of the ideal_matrix.
+        tol: The error tolerance for each matrix element
+            of the represented matrix.
 
     Returns:
         The list of optimal coefficients :math:`[x_0, x_1, \dots]`.
@@ -97,19 +91,20 @@ def find_optimal_representation(
     which minimizes the one-norm of the associated quasi-probability
     distribution.
 
-    More precicely, it solve the following optimization problem.
+    More precicely, it solve the following optimization problem:
 
     .. math::
-        \min_{{\_eta_\alpha}} = \sum_\alpha |eta_\alpha|
-        \text{such that} \mathcal G = \sum_\alpha eta_\alpha \mathcal O_\alpha
+        \min_{{\eta_\alpha}} = \sum_\alpha |\eta_\alpha|,
+        \text{ such that }
+        \mathcal G = \sum_\alpha \eta_\alpha \mathcal O_\alpha,
 
     where :math:`\{\mathcal O_j\}` is the input basis of noisy operations.
 
     Args:
         ideal_operation: The ideal operation to represent.
-        noisy_basis: The `NoisyBasis`` in which the ``ideal_operation``
-            should be represented. It must contain NoisyOperation objects which
-            are initialized with a numerical superoperator matrix.
+        noisy_basis: The ``NoisyBasis`` in which the ``ideal_operation``
+            should be represented. It must contain ``NoisyOperation`` objects
+            which are initialized with a numerical superoperator matrix.
         tol: The error tolerance for each matrix element
             of the represented operation.
     """
