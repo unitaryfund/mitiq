@@ -120,22 +120,6 @@ def simulator_counts(circuit: Circuit) -> dict:
     return dict_counts
 
 
-# function used in testing to calculate list of dictionaries of training data:
-def execute_training_circuits(executor, simulator, training_circuits_list):
-    training_circuits_raw_data = [
-        [] for i in range(len(training_circuits_list))
-    ]
-    # list to store simulated training circuits:
-    training_circuits_simulated_data = []
-    for i, training_circuits in enumerate(training_circuits_list):
-        for j, circuit in enumerate(training_circuits):
-            training_circuits_raw_data[i].append(executor(circuit))
-            # runs the circuits with no increased noise in the simulator:
-            if i == 0:
-                training_circuits_simulated_data.append(simulator(circuit))
-    return (training_circuits_raw_data, training_circuits_simulated_data)
-
-
 # circuit used for unit tests:
 circuit = random_x_z_circuit(
     cirq.LineQubit.range(1), n_moments=6, random_state=1

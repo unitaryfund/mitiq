@@ -147,7 +147,16 @@ def test_execute_with_cdr():
         scale_factors=[3, 5],
         **kwargs,
     )
-    for results in [results0, results1]:
+    results2 = execute_with_CDR(
+        circuit,
+        executor,
+        simulator_statevector,
+        obs_list,
+        num_circuits,
+        frac_non_cliff,
+        scale_factors=[3]
+    )
+    for results in [results0, results1, results2]:
         for i in range(len(results[1])):
             assert abs(results[0][i][0] - exact_solution[i]) > abs(
                 results[1][i] - exact_solution[i]
