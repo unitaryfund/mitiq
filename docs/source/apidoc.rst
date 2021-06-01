@@ -61,7 +61,7 @@ Qiskit Utils
 .. automodule:: mitiq.mitiq_qiskit.qiskit_utils
    :members:
 
-Probabilistic Error Cancellation 
+Probabilistic Error Cancellation
 --------------------------------
 
 Probabilistic Error Cancellation (High-Level Tools)

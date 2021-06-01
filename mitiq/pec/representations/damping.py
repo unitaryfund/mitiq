@@ -77,7 +77,9 @@ def _represent_operation_with_amplitude_damping_noise(
         post_ops = [[], Z(q), reset(q)]
 
     else:
-        raise ValueError("Only single-qubit operations are supported.")
+        raise ValueError(  # pragma: no cover
+            "Only single-qubit operations are supported."  # pragma: no cover
+        )  # pragma: no cover
 
     # Basis of implementable operations as circuits
     imp_op_circuits = [ideal_operation + Circuit(op) for op in post_ops]

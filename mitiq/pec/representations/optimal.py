@@ -114,11 +114,14 @@ def find_optimal_representation(
 
     try:
         basis_matrices = [noisy_op.real_matrix for noisy_op in basis_set]
-    except ValueError("Real matrix is unknown."):
-        raise ValueError(
-            "The input noisy_basis should contain NoisyOperation objects which"
-            " are initialized with a numerical superoperator matrix."
-        )
+    except ValueError as err:
+        if str(err) == "Real matrix is unknown.":
+            raise ValueError(
+                "The input noisy_basis should contain NoisyOperation objects"
+                " which are initialized with a numerical superoperator matrix."
+            )
+        else:
+            raise err  # pragma no cover
 
     # Run numerical optimization problem
     quasi_prob_dist = minimize_one_norm(ideal_matrix, basis_matrices, tol=tol)

@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from pytest import mark
+from pytest import mark, raises
 import numpy as np
 from itertools import product
 
@@ -90,6 +90,13 @@ def _equivalent_representations(
         if not np.isclose(rep_a.coeff_of(op_a), rep_b.coeff_of(op_b)):
             return False
     return True
+
+
+def test_minimize_one_norm_failure_error():
+    ideal_matrix = np.random.rand(2, 2)
+    basis_matrices = [np.random.rand(2, 2)]
+    with raises(RuntimeError, match="optimal representation failed"):
+        minimize_one_norm(ideal_matrix, basis_matrices)
 
 
 def test_minimize_one_norm_with_depolarized_choi():
@@ -344,3 +351,12 @@ def test_find_optimal_representation_single_qubit_amp_damping(circ_type):
         )
         assert np.allclose(np.sort(rep.coeffs), np.sort(expected_rep.coeffs))
         assert _equivalent_representations(rep, expected_rep)
+
+
+def test_find_optimal_representation_no_superoperator_error():
+    q = LineQubit(0)
+    # Define noisy operation without superoperator matrix
+    noisy_op = NoisyOperation(Circuit(X(q)))
+    noisy_basis = NoisyBasis(noisy_op)
+    with raises(ValueError, match="numerical superoperator matrix"):
+        find_optimal_representation(Circuit(X(q)), noisy_basis)
