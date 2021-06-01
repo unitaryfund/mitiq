@@ -17,21 +17,19 @@
 
 import numpy as np
 
+from scipy.optimize import curve_fit
+
 from cirq.circuits import Circuit
 
 from typing import List, Union, Callable, Optional
 
-from clifford_training_data import generate_training_circuits
+from mitiq.cdr.clifford_training_data import generate_training_circuits
 
-from data_regression import (
+from mitiq.cdr.data_regression import (
     scale_noise_in_circuits,
-    execute_training_circuits,
-    execute_circuit_of_interest,
     construct_training_data_floats,
     construct_circuit_data_floats,
-    find_optimal_parameters,
-    wrapper_fit_func,
-    calculate_observable,
+    linear_fit_function,
 )
 
 
@@ -39,13 +37,15 @@ def execute_with_CDR(
     circuit: Circuit,
     executor: Callable[[Circuit], dict],
     simulator: Callable[[Circuit], Union[dict, np.ndarray]],
-    observable: Union[List[np.ndarray], np.ndarray],
+    observables: List[np.ndarray],
     num_training_circuits: int,
     fraction_non_clifford: float,
+    ansatz: Callable[[np.ndarray, List], List] = linear_fit_function,
+    num_parameters: int = None,
     scale_noise: Optional[Callable[[Circuit, float], Circuit]] = None,
-    noise_scaling_factors: Optional[Union[float, List[float]]] = None,
+    scale_factors: Optional[List[float]] = None,
     **kwargs: dict,
-) -> (Union[float, List], Union[float, List]):
+) -> (List[List], List[List]):
     """Function for the calculation of an observable from some circuit of
     interest to be mitigated with CDR (or vnCDR) based on [Czarnik2020]_ and
     [Lowe2020]_.
@@ -59,7 +59,8 @@ def execute_with_CDR(
     these observables MUST be diagonal in z-basis measurements corresponding to
     the circuit of interest.
 
-    Returns raw observables (at many noise levels) and mitigated observables.
+    Returns list of raw observables (at many noise levels) and mitigated
+    observables.
 
     This function returns the mitigated observable/s.
     Args:
@@ -69,7 +70,7 @@ def execute_with_CDR(
         simulator: user defined function taking a cirq Circuit object and
                    returning either a simulated dictionary of counts or an
                    np.ndarray representing the state vector.
-        observable: array of list of arrays containing the diagonal elements of
+        observable: list of arrays containing the diagonal elements of
                     observable/s of interest to be mitigated. If a list is
                     passed all these observables will be mitigates with the
                     same training set.
@@ -79,10 +80,13 @@ def execute_with_CDR(
                                subsituted in the training circuits. The higher
                                this fraction the more costly the simulations,
                                but more successful the mitigation.
+        ansatz: the function to map noisy to exact data. Takes array of noisy
+                and data and parameters returning a float.
+        num_parameters: the number of paramters the ansatz takes.
         scale_noise: optional argument containing a user defined function on
                      how to increase the noise. If this argument is given then
                      the mitigation method will be vnCDR.
-        noise_scaling_factors: factors by which to scale the noise, should not
+        scale_factors: factors by which to scale the noise, should not
                                include 1 as this is just the original circuit.
         kwargs: Available keyword arguments are:
 
@@ -104,14 +108,10 @@ def execute_with_CDR(
             - sigma_replace (float): Width of the Gaussian distribution used
                                      for ``method_replace='gaussian'``.
             - random_state (int): seed for sampling.
+    Returns: The tuple (raw_expectations, mitigated_expectations)
+             corresponding to the many raw expectation values (at different
+             noise levels) and the associated mitigated values.
 
-            FITTING OPTIONS:
-
-            - include_intercept (Bool): whether or not to include an intercept
-                                        in the function mapping noisy to exact
-                                        expectation values. Defult is True as
-                                        in most cases it makes for a better
-                                        mitigation.
     .. [Czarnik2020] : Piotr Czarnik, Andrew Arramsmith, Patrick Coles,
         Lukasz Cincio, "Error mitigation with Clifford quantum circuit
         data," (https://arxiv.org/abs/2005.10189).
@@ -123,7 +123,6 @@ def execute_with_CDR(
     method_select = kwargs.get("method_select", "uniform")
     method_replace = kwargs.get("method_replace", "closest")
     random_state = kwargs.get("random_state", None)
-    intercept = kwargs.get("include_intercept", True)
     training_set_generation_kwargs_keys = ["sigma_select", "sigma_replace"]
     kwargs_for_training_set_generation = {
         key: kwargs.get(key) for key in training_set_generation_kwargs_keys
@@ -140,69 +139,64 @@ def execute_with_CDR(
     # If specified scale the noise in the circuit of interest and training
     # circuits:
     if scale_noise:
-        # identify number of noise levels:
-        if isinstance(noise_scaling_factors, float) or isinstance(
-            noise_scaling_factors, int
-        ):
-            noise_levels = 2
-        else:
-            noise_levels = len(noise_scaling_factors) + 1
-
+        # to define number of paramters in defult linear model:
+        if not num_parameters:
+            num_parameters = len(scale_factors) + 1
         training_circuits_list = scale_noise_in_circuits(
-            training_circuits_list, scale_noise, noise_scaling_factors
+            training_circuits_list, scale_noise, scale_factors
         )
         # redefine circuit as a list of circuits with scaled noise:
         circuits = scale_noise_in_circuits(
-            circuit, scale_noise, noise_scaling_factors
+            [circuit], scale_noise, scale_factors
         )
     else:
-        noise_levels = 1
-    
-    #print(len(circuits))
-    # run the training circuits in the desired backend and simulator:
-    results_dict_training_circuits = execute_training_circuits(
-        training_circuits_list,
-        executor,
-        simulator,
-        noise_levels,
-    )
-    # run the circuit of interest in the desired backend:
-    results_dict_circuit_of_interest = execute_circuit_of_interest(
-        circuits, executor
-    )
-
-    if isinstance(observable, list):
-        #print('here')
-        mitigated_observables = []
-        raw_observables = []
-        for obs in observable:
-            circuit_data = construct_circuit_data_floats(
-                results_dict_circuit_of_interest, obs, noise_levels
-            )
-            train_data = construct_training_data_floats(
-                results_dict_training_circuits, obs, noise_levels
-            )
-            params = find_optimal_parameters(
-                train_data[0], train_data[1], intercept=intercept
-            )
-            mitigated_observables.append(
-                wrapper_fit_func(circuit_data, noise_levels, params, intercept)
-            )
-            raw_observables.append(circuit_data)
-    else:
+        # to define number of parameters in defult linear model:
+        if not num_parameters:
+            num_parameters = 2
+        # both need to be list of lists of circuits:
+        circuits = [[circuit]]
+        training_circuits_list = [training_circuits_list]
+    # execute the training circuits and the circuit of interest:
+    # list to store training circuits executed with hardware:
+    training_circuits_raw_data = [
+        [] for i in range(len(training_circuits_list))
+    ]
+    # list to store simulated training circuits:
+    training_circuits_simulated_data = []
+    for i, training_circuits in enumerate(training_circuits_list):
+        for j, circuit in enumerate(training_circuits):
+            training_circuits_raw_data[i].append(executor(circuit))
+            # runs the circuits with no increased noise in the simulator:
+            if i == 0:
+                training_circuits_simulated_data.append(simulator(circuit))
+    results_dict_training_circuits = [
+        training_circuits_raw_data,
+        training_circuits_simulated_data,
+    ]
+    # circuit of interest execution:
+    results_dict_circuit_of_interest = []
+    for circuit in circuits:
+        circuit_raw_result = executor(circuit[0])
+        results_dict_circuit_of_interest.append(circuit_raw_result)
+    # Now the regression:
+    mitigated_observables = []
+    raw_observables = []
+    for obs in observables:
         circuit_data = construct_circuit_data_floats(
-            results_dict_circuit_of_interest, observable, noise_levels
+            results_dict_circuit_of_interest, obs
         )
         train_data = construct_training_data_floats(
-            results_dict_training_circuits, observable, noise_levels
+            results_dict_training_circuits, obs
         )
-        params = find_optimal_parameters(
-            train_data[0], train_data[1], intercept=intercept
+        # going to add general regression section here:
+        initial_params = np.zeros((num_parameters))
+        fitted_params, _ = curve_fit(
+            lambda x, *params: ansatz(x, params),
+            train_data[0].T,
+            train_data[1],
+            p0=initial_params,
         )
-        mitigated_observables = wrapper_fit_func(
-            circuit_data, noise_levels, params, intercept
-        )
-        raw_observables = circuit_data
-    #print(circuit_data)
+        mitigated_observables.append(ansatz(circuit_data, fitted_params))
+        raw_observables.append(circuit_data)
 
     return raw_observables, mitigated_observables
