@@ -28,7 +28,6 @@ from cirq import (
     is_measurement,
     DepolarizingChannel,
     channel,
-    AmplitudeDampingChannel,
 )
 
 from mitiq import QPROGRAM
@@ -356,15 +355,3 @@ def local_depolarizing_kraus(
             kraus_product = np.kron(kraus_product, k_th_kraus)
         tensored_kraus.append(kraus_product)
     return tensored_kraus
-
-
-def amplitude_damping_kraus(
-    noise_level: float, num_qubits: int
-) -> List[np.ndarray]:
-    """Returns the kraus operators of the tensor product of local
-    depolarizing channels acting on each qubit.
-    """
-    if num_qubits == 1:
-        noisy_op = AmplitudeDampingChannel(noise_level)
-        return list(channel(noisy_op))
-    raise NotImplementedError()
