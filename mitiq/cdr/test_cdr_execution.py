@@ -154,7 +154,7 @@ def test_execute_with_cdr():
         obs_list,
         num_circuits,
         frac_non_cliff,
-        scale_factors=[3]
+        scale_factors=[3],
     )
     for results in [results0, results1, results2]:
         for i in range(len(results[1])):
