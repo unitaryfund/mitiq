@@ -13,26 +13,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-""" Functions for execution of CDR mitigation on circuit of interest"""
+"""API for using Clifford Data Regression (CDR) error mitigation."""
+
+from typing import List, Union, Callable, Sequence
 
 import numpy as np
-
 from scipy.optimize import curve_fit
 
 from cirq.circuits import Circuit
 
-from typing import List, Union, Callable, Optional
-
 from mitiq.cdr.clifford_training_data import generate_training_circuits
-
 from mitiq.cdr.data_regression import (
-    scale_noise_in_circuits,
     construct_training_data_floats,
     construct_circuit_data_floats,
     linear_fit_function,
 )
+from mitiq.zne.scaling import fold_gates_at_random
 
 
+# TODO: Allow for any QPROGRAM, not just a cirq.Circuit.
 def execute_with_CDR(
     circuit: Circuit,
     executor: Callable[[Circuit], dict],
@@ -42,8 +41,8 @@ def execute_with_CDR(
     fraction_non_clifford: float,
     ansatz: Callable[[np.ndarray, List], List] = linear_fit_function,
     num_parameters: int = None,
-    scale_noise: Optional[Callable[[Circuit, float], Circuit]] = None,
-    scale_factors: Optional[List[float]] = None,
+    scale_factors: Sequence[float] = (1,),
+    scale_noise: Callable[[Circuit, float], Circuit] = fold_gates_at_random,
     **kwargs: dict,
 ) -> (List[List], List[List]):
     """Function for the calculation of an observable from some circuit of
@@ -70,7 +69,7 @@ def execute_with_CDR(
         simulator: user defined function taking a cirq Circuit object and
                    returning either a simulated dictionary of counts or an
                    np.ndarray representing the state vector.
-        observable: list of arrays containing the diagonal elements of
+        observables: list of arrays containing the diagonal elements of
                     observable/s of interest to be mitigated. If a list is
                     passed all these observables will be mitigates with the
                     same training set.
@@ -108,6 +107,7 @@ def execute_with_CDR(
             - sigma_replace (float): Width of the Gaussian distribution used
                                      for ``method_replace='gaussian'``.
             - random_state (int): seed for sampling.
+
     Returns: The tuple (raw_expectations, mitigated_expectations)
              corresponding to the many raw expectation values (at different
              noise levels) and the associated mitigated values.
@@ -118,8 +118,9 @@ def execute_with_CDR(
     .. [Lowe2020] : Angus Lowe, Max Hunter Gordon, Piotr Czarnik,
         Andrew Arramsmith, Patrick Coles, Lukasz Cincio,
         "Unified approach to data-driven error mitigation,"
-        (https://arxiv.org/abs/2011.01157)."""
-    # Extracting kwargs:
+        (https://arxiv.org/abs/2011.01157).
+    """
+    # Handle keyword arguments for generating training circuits.
     method_select = kwargs.get("method_select", "uniform")
     method_replace = kwargs.get("method_replace", "closest")
     random_state = kwargs.get("random_state", None)
@@ -127,7 +128,9 @@ def execute_with_CDR(
     kwargs_for_training_set_generation = {
         key: kwargs.get(key) for key in training_set_generation_kwargs_keys
     }
-    training_circuits_list = generate_training_circuits(
+
+    # Generate training circuits.
+    training_circuits = generate_training_circuits(
         circuit,
         num_training_circuits,
         fraction_non_clifford,
@@ -136,48 +139,23 @@ def execute_with_CDR(
         random_state,
         kwargs=kwargs_for_training_set_generation,
     )
-    # If specified scale the noise in the circuit of interest and training
-    # circuits:
-    if scale_noise:
-        # to define number of paramters in defult linear model:
-        if not num_parameters:
-            num_parameters = len(scale_factors) + 1
-        training_circuits_list = scale_noise_in_circuits(
-            training_circuits_list, scale_noise, scale_factors
-        )
-        # redefine circuit as a list of circuits with scaled noise:
-        circuits = scale_noise_in_circuits(
-            [circuit], scale_noise, scale_factors
-        )
-    else:
-        # to define number of parameters in defult linear model:
-        if not num_parameters:
-            num_parameters = 2
-        # both need to be list of lists of circuits:
-        circuits = [[circuit]]
-        training_circuits_list = [training_circuits_list]
-    # execute the training circuits and the circuit of interest:
-    # list to store training circuits executed with hardware:
-    training_circuits_raw_data = [
-        [] for i in range(len(training_circuits_list))
+
+    # [Optionally] Scale noise in circuits.
+    all_circuits = [
+        [scale_noise(c, s) for s in scale_factors]
+        for c in [circuit] + training_circuits
     ]
-    # list to store simulated training circuits:
-    training_circuits_simulated_data = []
-    for i, training_circuits in enumerate(training_circuits_list):
-        for j, circuit in enumerate(training_circuits):
-            training_circuits_raw_data[i].append(executor(circuit))
-            # runs the circuits with no increased noise in the simulator:
-            if i == 0:
-                training_circuits_simulated_data.append(simulator(circuit))
-    results_dict_training_circuits = [
-        training_circuits_raw_data,
-        training_circuits_simulated_data,
-    ]
-    # circuit of interest execution:
-    results_dict_circuit_of_interest = []
-    for circuit in circuits:
-        circuit_raw_result = executor(circuit[0])
-        results_dict_circuit_of_interest.append(circuit_raw_result)
+
+    # Execute all circuits. TODO: Allow for batching.
+    executor_data = np.array(
+        [[executor(circ) for circ in circuits] for circuits in all_circuits]
+    )
+    simulator_data = np.array([simulator(circ) for circ in all_circuits[0]])
+
+    # Do the regression.
+    results_dict_training_circuits = [executor_data, simulator_data]
+    results_dict_circuit_of_interest = executor_data[:, 0]
+
     # Now the regression:
     mitigated_observables = []
     raw_observables = []
@@ -189,12 +167,11 @@ def execute_with_CDR(
             results_dict_training_circuits, obs
         )
         # going to add general regression section here:
-        initial_params = np.zeros((num_parameters))
         fitted_params, _ = curve_fit(
             lambda x, *params: ansatz(x, params),
             train_data[0].T,
             train_data[1],
-            p0=initial_params,
+            p0=np.zeros(num_parameters),
         )
         mitigated_observables.append(ansatz(circuit_data, fitted_params))
         raw_observables.append(circuit_data)
