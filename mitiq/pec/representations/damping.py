@@ -15,6 +15,8 @@
 """Functions related to representations with amplitude damping noise."""
 
 from typing import List
+from itertools import product
+
 import numpy as np
 
 from cirq import (
@@ -26,6 +28,8 @@ from cirq import (
 )
 
 from mitiq.pec.types import OperationRepresentation, NoisyOperation
+
+from mitiq.pec.channels import tensor_product
 
 
 # TODO: this may be extended to an arbitrary QPROGRAM (GitHub issue gh-702).
@@ -97,7 +101,9 @@ def amplitude_damping_kraus(
     """Returns the kraus operators of the tensor product of local
     depolarizing channels acting on each qubit.
     """
-    if num_qubits == 1:
-        noisy_op = AmplitudeDampingChannel(noise_level)
-        return list(channel(noisy_op))
-    raise NotImplementedError()
+    local_noisy_op = AmplitudeDampingChannel(noise_level)
+    local_kraus = list(channel(local_noisy_op))
+    return [
+        tensor_product(*kraus_string)
+        for kraus_string in product(local_kraus, repeat=num_qubits)
+    ]

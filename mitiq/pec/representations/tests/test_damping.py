@@ -84,7 +84,7 @@ def test_damping_kraus():
     ]
     assert np.allclose(amplitude_damping_kraus(0.5, 1), expected)
     # Test normalization of kraus operators
-    for num_qubits in (1,):
+    for num_qubits in (1, 2, 3):
         for noise_level in (0.1, 1):
             kraus_ops = amplitude_damping_kraus(noise_level, num_qubits)
             dual_channel = sum([k.conj().T @ k for k in kraus_ops])

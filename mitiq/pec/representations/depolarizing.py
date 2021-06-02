@@ -34,6 +34,8 @@ from mitiq import QPROGRAM
 from mitiq.pec.types import OperationRepresentation, NoisyOperation
 from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 
+from mitiq.pec.channels import tensor_product
+
 
 def represent_operation_with_global_depolarizing_noise(
     ideal_operation: QPROGRAM, noise_level: float
@@ -347,11 +349,7 @@ def local_depolarizing_kraus(
     depolarizing channels acting on each qubit.
     """
     local_kraus = global_depolarizing_kraus(noise_level, num_qubits=1)
-    tensored_kraus = []
-    # Compute the tensor product of all the local kraus operators
-    for kraus_string in product(local_kraus, repeat=num_qubits):
-        kraus_product = np.eye(1)
-        for k_th_kraus in kraus_string:
-            kraus_product = np.kron(kraus_product, k_th_kraus)
-        tensored_kraus.append(kraus_product)
-    return tensored_kraus
+    return [
+        tensor_product(*kraus_string)
+        for kraus_string in product(local_kraus, repeat=num_qubits)
+    ]
