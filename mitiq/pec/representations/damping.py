@@ -49,7 +49,7 @@ def _represent_operation_with_amplitude_damping_noise(
 
     Args:
         ideal_operation: The ideal operation (as a QPROGRAM) to represent.
-        noise_level: The noise level of each depolarizing channel.
+        noise_level: The noise level of each amplitude damping channel.
 
     Returns:
         The quasi-probability representation of the ``ideal_operation``.
