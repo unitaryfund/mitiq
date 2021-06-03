@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from copy import deepcopy
 import numpy as np
 import pytest
 
@@ -666,3 +667,48 @@ def test_print_cirq_operation_representation():
 
     expected = r"0: ───H─── = 0.500*0: ───X───+0.500*0: ───Z───"
     assert str(decomp) == expected
+
+
+def test_equal_method_of_representations():
+    q = cirq.LineQubit(0)
+    ideal = cirq.Circuit(cirq.H(q))
+    noisy_xop_a = NoisyOperation.from_cirq(
+        ideal=cirq.Circuit(cirq.X(q)), real=np.zeros(shape=(4, 4))
+    )
+    noisy_zop_a = NoisyOperation.from_cirq(
+        ideal=cirq.Circuit(cirq.Z(q)), real=np.zeros(shape=(4, 4))
+    )
+    rep_a = OperationRepresentation(
+        ideal=ideal, basis_expansion={noisy_xop_a: 0.5, noisy_zop_a: 0.5},
+    )
+    rep_b = deepcopy(rep_a)
+    assert rep_a == rep_b
+    # different ideal
+    ideal_b = cirq.Circuit(cirq.X(q))
+    rep_b = OperationRepresentation(
+        ideal=ideal_b, basis_expansion={noisy_xop_a: 0.5, noisy_zop_a: 0.5},
+    )
+    assert rep_a != rep_b
+    # Different type
+    q = qiskit.QuantumRegister(1)
+    ideal_b = qiskit.QuantumCircuit(q)
+    ideal_b.x(q)
+    rep_b = OperationRepresentation(
+        ideal=ideal_b, basis_expansion={noisy_xop_a: 0.5, noisy_zop_a: 0.5},
+    )
+    assert rep_a != rep_b
+    # Different length
+    rep_b = OperationRepresentation(
+        ideal=ideal, basis_expansion={noisy_xop_a: 0.5},
+    )
+    assert rep_a != rep_b
+    # Different operations
+    rep_b = OperationRepresentation(
+        ideal=ideal, basis_expansion={noisy_xop_a: 0.5, noisy_xop_a: 0.5},
+    )
+    assert rep_a != rep_b
+    # Different coefficients
+    rep_b = OperationRepresentation(
+        ideal=ideal, basis_expansion={noisy_xop_a: 0.7, noisy_zop_a: 0.5},
+    )
+    assert rep_a != rep_b

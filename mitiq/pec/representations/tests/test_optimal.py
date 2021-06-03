@@ -58,38 +58,8 @@ from mitiq.pec.channels import (
     choi_to_super,
 )
 
-from mitiq.pec.types import OperationRepresentation, NoisyBasis, NoisyOperation
+from mitiq.pec.types import NoisyBasis, NoisyOperation
 from mitiq.conversions import convert_from_mitiq
-
-from mitiq.utils import _equal
-
-
-def _equivalent_representations(
-    rep_a: OperationRepresentation, rep_b: OperationRepresentation,
-) -> bool:
-    """Checks if the input representations are equivalent.
-    This function return True if the representations have the
-    same coefficients and equivalent NoisyOperation(s) (same
-    ideal gates but not necessarily same real matrix representations
-    since real matrices are optional).
-    """
-    if rep_a._native_type != rep_b._native_type:
-        return False
-    noisy_ops_a = rep_a.noisy_operations
-    noisy_ops_b = rep_b.noisy_operations
-    if len(noisy_ops_a) != len(noisy_ops_b):
-        return False
-    for op_a in noisy_ops_a:
-        found = False
-        for op_b in noisy_ops_b:
-            if _equal(op_a._ideal, op_b._ideal):
-                found = True
-                break
-        if not found:
-            return False
-        if not np.isclose(rep_a.coeff_of(op_a), rep_b.coeff_of(op_b)):
-            return False
-    return True
 
 
 def test_minimize_one_norm_failure_error():
@@ -261,7 +231,7 @@ def test_find_optimal_representation_depolarizing_two_qubit_gates(circ_type):
             ideal_op_native, noise_level,
         )
         assert np.allclose(np.sort(rep.coeffs), np.sort(expected_rep.coeffs))
-        assert _equivalent_representations(rep, expected_rep)
+        assert rep == expected_rep
 
 
 @mark.parametrize("circ_type", ["cirq", "qiskit", "pyquil", "braket"])
@@ -304,7 +274,7 @@ def test_find_optimal_representation_single_qubit_depolarizing(circ_type):
             ideal_op_native, noise_level,
         )
         assert np.allclose(np.sort(rep.coeffs), np.sort(expected_rep.coeffs))
-        assert _equivalent_representations(rep, expected_rep)
+        assert rep == expected_rep
 
 
 # After fixing the GitHub issue gh-702, other circuit types could be added.
@@ -349,7 +319,7 @@ def test_find_optimal_representation_single_qubit_amp_damping(circ_type):
             ideal_op_native, noise_level,
         )
         assert np.allclose(np.sort(rep.coeffs), np.sort(expected_rep.coeffs))
-        assert _equivalent_representations(rep, expected_rep)
+        assert rep == expected_rep
 
 
 def test_find_optimal_representation_no_superoperator_error():
