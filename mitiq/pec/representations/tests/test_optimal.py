@@ -39,20 +39,16 @@ from mitiq.pec.representations.optimal import (
     find_optimal_representation,
 )
 
-from mitiq.pec.representations.depolarizing import (
+from mitiq.pec.representations import (
     represent_operation_with_local_depolarizing_noise,
-)
-
-from mitiq.pec.representations.damping import (
+    global_depolarizing_kraus,
+    amplitude_damping_kraus,
     _represent_operation_with_amplitude_damping_noise,
 )
-
 
 from mitiq.pec.channels import (
     _operation_to_choi,
     _circuit_to_choi,
-    global_depolarizing_kraus,
-    amplitude_damping_kraus,
     kraus_to_super,
     kraus_to_choi,
     choi_to_super,

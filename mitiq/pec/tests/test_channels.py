@@ -15,7 +15,7 @@
 
 """Tests related to the functions contained in `mitiq.pec.channels`."""
 
-from pytest import raises, mark
+from pytest import raises
 import numpy as np
 from cirq import (
     LineQubit,
@@ -30,9 +30,6 @@ from mitiq.pec.channels import (
     _max_ent_state_circuit,
     _operation_to_choi,
     _circuit_to_choi,
-    global_depolarizing_kraus,
-    local_depolarizing_kraus,
-    amplitude_damping_kraus,
     vector_to_matrix,
     matrix_to_vector,
     kraus_to_super,
@@ -41,6 +38,8 @@ from mitiq.pec.channels import (
     kraus_to_choi,
     tensor_product,
 )
+
+from mitiq.pec.representations.damping import amplitude_damping_kraus
 
 
 def test_max_ent_state_circuit():
@@ -104,23 +103,6 @@ def test_circuit_to_choi():
         _operation_to_choi(noisy_sequence),
         _circuit_to_choi(Circuit(noisy_sequence)),
     )
-
-
-@mark.parametrize(
-    "kraus_function",
-    [
-        global_depolarizing_kraus,
-        local_depolarizing_kraus,
-        amplitude_damping_kraus,
-    ],
-)
-def test_kraus_functions(kraus_function):
-    """Test that the output is a valid physical channel."""
-    for num_qubits in (1, 2, 3):
-        for noise_level in (0, 0.1, 1):
-            kraus_ops = kraus_function(noise_level, num_qubits)
-            conj_sum = sum([k.conj().T @ k for k in kraus_ops])
-            assert np.allclose(conj_sum, np.eye(2 ** num_qubits))
 
 
 def test_matrix_to_vector():
