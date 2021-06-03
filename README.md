@@ -11,7 +11,7 @@
 
 [![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
 
-<img  src="assets/mitiq-logo.png" width="80%" style="  display: block;margin-left: auto;margin-right: auto;">
+<img  src="docs/assets/mitiq-logo.png" width="80%" style="  display: block;margin-left: auto;margin-right: auto;">
 
 Mitiq is a Python toolkit for implementing error mitigation techniques on
 quantum computers.
@@ -113,12 +113,12 @@ Error in simulation (with mitigation): 0.000519
 
 ### Example with Qiskit
 
-![Alt Text](assets/qiskit.gif)
+![Alt Text](docs/assets/qiskit.gif)
 
 
 ### Example with Cirq
 
-![Alt Text](assets/cirq.gif)
+![Alt Text](docs/assets/cirq.gif)
 
 
 ## Error mitigation techniques
