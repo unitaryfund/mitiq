@@ -16,13 +16,16 @@
 """Functions for finding optimal representations given a noisy basis."""
 
 from typing import List
-from mitiq import QPROGRAM
-from mitiq.pec.types import NoisyBasis, OperationRepresentation
+
 import numpy as np
 from scipy.optimize import minimize, LinearConstraint
-from mitiq.pec.channels import matrix_to_vector, kraus_to_super
+
 from cirq import channel
+
+from mitiq import QPROGRAM
 from mitiq.conversions import convert_to_mitiq
+from mitiq.pec.types import NoisyBasis, OperationRepresentation
+from mitiq.pec.channels import matrix_to_vector, kraus_to_super
 
 
 def minimize_one_norm(
