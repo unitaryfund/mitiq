@@ -329,3 +329,31 @@ def test_find_optimal_representation_no_superoperator_error():
     noisy_basis = NoisyBasis(noisy_op)
     with raises(ValueError, match="numerical superoperator matrix"):
         find_optimal_representation(Circuit(X(q)), noisy_basis)
+
+
+def test_initial_guess_in_minimize_one_norm():
+    for noise_level in [0.7, 0.9]:
+        depo_kraus = global_depolarizing_kraus(noise_level, num_qubits=1)
+        depo_super = kraus_to_super(depo_kraus)
+        ideal_matrix = kraus_to_super(channel(H))
+        basis_matrices = [
+            depo_super @ kraus_to_super(channel(gate)) @ ideal_matrix
+            for gate in [I, X, Y, Z, H]
+        ]
+        optimal_coeffs = minimize_one_norm(
+            ideal_matrix,
+            basis_matrices,
+            initial_guess=[1.0, 1.0, 1.0, 1.0, 1.0],
+        )
+        represented_mat = sum(
+            [eta * mat for eta, mat in zip(optimal_coeffs, basis_matrices)]
+        )
+        assert np.allclose(ideal_matrix, represented_mat)
+
+        # With a very bad guess it should fail
+        with raises(RuntimeError, match="optimal representation failed"):
+            minimize_one_norm(
+                ideal_matrix,
+                basis_matrices,
+                initial_guess=[-1.0e9, 1.0e9, -1.0e9, +1.0e9, -1.0e9],
+            )

@@ -15,7 +15,7 @@
 
 """Functions for finding optimal representations given a noisy basis."""
 
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 from scipy.optimize import minimize, LinearConstraint
@@ -32,7 +32,8 @@ def minimize_one_norm(
     ideal_matrix: np.ndarray,
     basis_matrices: List[np.ndarray],
     tol: float = 1.0e-8,
-) -> List[float]:
+    initial_guess: Optional[np.ndarray] = None,
+) -> np.ndarray:
     r"""
     Returns the list of real coefficients :math:`[x_0, x_1, \dots]`,
     which minimizes :math:`\sum_j |x_j|` with the contraint that
@@ -53,6 +54,8 @@ def minimize_one_norm(
         basis_matrices: The list of basis matrices.
         tol: The error tolerance for each matrix element
             of the represented matrix.
+        initial_guess: Optional initial guess for the coefficients
+            :math:`[x_0, x_1, \dots]`.
 
     Returns:
         The list of optimal coefficients :math:`[x_0, x_1, \dots]`.
@@ -78,7 +81,9 @@ def minimize_one_norm(
     def one_norm(x):
         return np.linalg.norm(x, 1)
 
-    initial_guess = np.zeros(len(basis_matrices))
+    if initial_guess is None:
+        initial_guess = np.zeros(len(basis_matrices))
+
     result = minimize(one_norm, x0=initial_guess, constraints=constraint)
 
     if not result.success:
@@ -88,7 +93,10 @@ def minimize_one_norm(
 
 
 def find_optimal_representation(
-    ideal_operation: QPROGRAM, noisy_basis: NoisyBasis, tol: float = 1.0e-7,
+    ideal_operation: QPROGRAM,
+    noisy_basis: NoisyBasis,
+    tol: float = 1.0e-8,
+    initial_guess: Optional[np.ndarray] = None,
 ) -> OperationRepresentation:
     r"""Returns the ``OperationRepresentaiton`` of the input ideal operation
     which minimizes the one-norm of the associated quasi-probability
@@ -110,6 +118,10 @@ def find_optimal_representation(
             which are initialized with a numerical superoperator matrix.
         tol: The error tolerance for each matrix element
             of the represented operation.
+        initial_guess: Optional initial guess for the coefficients
+            :math:`\{ \eta_\alpha \}``.
+
+    Returns: The optimal OperationRepresentation.
     """
     ideal_cirq, _ = convert_to_mitiq(ideal_operation)
     ideal_matrix = kraus_to_super(channel(ideal_cirq))
@@ -127,7 +139,9 @@ def find_optimal_representation(
             raise err  # pragma no cover
 
     # Run numerical optimization problem
-    quasi_prob_dist = minimize_one_norm(ideal_matrix, basis_matrices, tol=tol)
+    quasi_prob_dist = minimize_one_norm(
+        ideal_matrix, basis_matrices, tol=tol, initial_guess=initial_guess,
+    )
 
     basis_expansion = {op: eta for op, eta in zip(basis_set, quasi_prob_dist)}
     return OperationRepresentation(ideal_operation, basis_expansion)
