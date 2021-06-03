@@ -98,7 +98,7 @@ def _represent_operation_with_amplitude_damping_noise(
 def amplitude_damping_kraus(
     noise_level: float, num_qubits: int,
 ) -> List[np.ndarray]:
-    """Returns the kraus operators of the tensor product of local
+    """Returns the Kraus operators of the tensor product of local
     depolarizing channels acting on each qubit.
     """
     local_noisy_op = AmplitudeDampingChannel(noise_level)
