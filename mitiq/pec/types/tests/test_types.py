@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from copy import deepcopy
 import numpy as np
 import pytest
 
@@ -672,43 +671,53 @@ def test_print_cirq_operation_representation():
 def test_equal_method_of_representations():
     q = cirq.LineQubit(0)
     ideal = cirq.Circuit(cirq.H(q))
-    noisy_xop_a = NoisyOperation.from_cirq(
-        ideal=cirq.Circuit(cirq.X(q)), real=np.zeros(shape=(4, 4))
+    noisy_xop_a = NoisyOperation(
+        ideal=cirq.Circuit(cirq.X(q)), real=np.zeros(shape=(4, 4)),
     )
-    noisy_zop_a = NoisyOperation.from_cirq(
-        ideal=cirq.Circuit(cirq.Z(q)), real=np.zeros(shape=(4, 4))
+    noisy_zop_a = NoisyOperation(
+        ideal=cirq.Circuit(cirq.Z(q)), real=np.zeros(shape=(4, 4)),
     )
     rep_a = OperationRepresentation(
         ideal=ideal, basis_expansion={noisy_xop_a: 0.5, noisy_zop_a: 0.5},
     )
-    rep_b = deepcopy(rep_a)
+    noisy_xop_b = NoisyOperation(
+        ideal=cirq.Circuit(cirq.X(q)), real=np.ones(shape=(4, 4)),
+    )
+    noisy_zop_b = NoisyOperation(
+        ideal=cirq.Circuit(cirq.Z(q)), real=np.ones(shape=(4, 4)),
+    )
+    rep_b = OperationRepresentation(
+        ideal=ideal, basis_expansion={noisy_xop_b: 0.5, noisy_zop_b: 0.5},
+    )
+    # Equal representation up to real superoperators
     assert rep_a == rep_b
-    # different ideal
+    # Different ideal
     ideal_b = cirq.Circuit(cirq.X(q))
     rep_b = OperationRepresentation(
-        ideal=ideal_b, basis_expansion={noisy_xop_a: 0.5, noisy_zop_a: 0.5},
+        ideal=ideal_b, basis_expansion={noisy_xop_b: 0.5, noisy_zop_b: 0.5},
     )
     assert rep_a != rep_b
     # Different type
-    q = qiskit.QuantumRegister(1)
-    ideal_b = qiskit.QuantumCircuit(q)
-    ideal_b.x(q)
+    q_b = qiskit.QuantumRegister(1)
+    ideal_b = qiskit.QuantumCircuit(q_b)
+    ideal_b.x(q_b)
     rep_b = OperationRepresentation(
-        ideal=ideal_b, basis_expansion={noisy_xop_a: 0.5, noisy_zop_a: 0.5},
+        ideal=ideal_b, basis_expansion={noisy_xop_b: 0.5, noisy_zop_b: 0.5},
     )
     assert rep_a != rep_b
     # Different length
     rep_b = OperationRepresentation(
-        ideal=ideal, basis_expansion={noisy_xop_a: 0.5},
+        ideal=ideal, basis_expansion={noisy_xop_b: 0.5},
     )
     assert rep_a != rep_b
     # Different operations
+    noisy_diff = NoisyOperation(ideal=cirq.Circuit(cirq.H(q)))
     rep_b = OperationRepresentation(
-        ideal=ideal, basis_expansion={noisy_xop_a: 0.5, noisy_xop_a: 0.5},
+        ideal=ideal, basis_expansion={noisy_xop_b: 0.5, noisy_diff: 0.5},
     )
     assert rep_a != rep_b
     # Different coefficients
     rep_b = OperationRepresentation(
-        ideal=ideal, basis_expansion={noisy_xop_a: 0.7, noisy_zop_a: 0.5},
+        ideal=ideal, basis_expansion={noisy_xop_b: 0.7, noisy_zop_b: 0.5},
     )
     assert rep_a != rep_b
