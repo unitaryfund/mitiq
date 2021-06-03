@@ -266,7 +266,7 @@ def test_find_optimal_representation_depolarizing_two_qubit_gates(circ_type):
 
 @mark.parametrize("circ_type", ["cirq", "qiskit", "pyquil", "braket"])
 def test_find_optimal_representation_single_qubit_depolarizing(circ_type):
-    """Test optimal representation of agrees with a known analytic result."""
+    """Test optimal representation agrees with a known analytic result."""
     for ideal_gate, noise_level in product([X, Y, H], [0.1, 0.3]):
         q = LineQubit(0)
 
