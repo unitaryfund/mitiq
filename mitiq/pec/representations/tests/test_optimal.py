@@ -218,7 +218,7 @@ def test_minimize_one_norm_tolerance():
 
 @mark.parametrize("circ_type", ["cirq", "qiskit", "pyquil", "braket"])
 def test_find_optimal_representation_depolarizing_two_qubit_gates(circ_type):
-    """Test optimal representation of agrees with a known analytic result."""
+    """Test optimal representation agrees with a known analytic result."""
     for ideal_gate, noise_level in product([CNOT, CZ], [0.1, 0.5]):
         q = LineQubit.range(2)
         ideal_op = Circuit(ideal_gate(*q))
