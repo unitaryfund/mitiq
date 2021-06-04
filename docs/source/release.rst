@@ -119,6 +119,29 @@ release, meaning that if ``vX.Y.Z`` was just released, then there should be
 a section for ``vX.(Y+1).Z`` that is marked "In Development". Also, change the
 version in the ``VERSION.txt`` file from ``vX.Y.Z`` to ``vX.(Y+1).Zdev``.
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Release the new version on PyPI
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+    There is a GitHub action in the ``.github`` folder to automatically upload Mitiq
+    to PyPI. You can check the release status [here](https://pypi.org/project/mitiq/#history).
+
+In case the action for the automatic release on PyPI fails, the commands to release Mitiq are
+
+```
+        python -m pip install --upgrade pip
+        make install requirements
+        pip install setuptools wheel twine
+        python setup.py sdist bdist_wheel
+        twine upload dist/*
+```
+
+
+.. note::
+    You need to be a registered maintainer of Mitiq project on PyPI to upload
+    a new release on PyPI from your local machine.
+
 =========================
 Releasing a version patch
 =========================
