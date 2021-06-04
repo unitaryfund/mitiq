@@ -27,9 +27,6 @@ from braket.circuits import (
     Instruction,
 )
 
-if TYPE_CHECKING:
-    import cirq
-
 
 def _raise_braket_to_cirq_error(instr):
     raise ValueError(
@@ -47,7 +44,7 @@ def _raise_cirq_to_braket_error(op):
     )
 
 
-def from_braket(circuit: BKCircuit) -> "cirq.Circuit":
+def from_braket(circuit: BKCircuit) -> Circuit:
     """Returns a Cirq circuit equivalent to the input Braket circuit.
 
     Note: The returned Cirq circuit acts on cirq.LineQubit's with indices equal
@@ -62,7 +59,7 @@ def from_braket(circuit: BKCircuit) -> "cirq.Circuit":
     )
 
 
-def to_braket(circuit: "cirq.Circuit") -> BKCircuit:
+def to_braket(circuit: Circuit) -> BKCircuit:
     """Returns a Braket circuit equivalent to the input Cirq circuit.
 
     Args:
@@ -78,7 +75,7 @@ def to_braket(circuit: "cirq.Circuit") -> BKCircuit:
 
 def _translate_braket_instruction_to_cirq_operation(
     instr: Instruction,
-) -> List["cirq.Operation"]:
+) -> List[cirq_ops.Operation]:
     """Converts the braket instruction to an equivalent Cirq operation or list
     of Cirq operations.
 
@@ -199,7 +196,7 @@ def _translate_one_qubit_braket_instruction_to_cirq_operation(
 
 def _translate_two_qubit_braket_instruction_to_cirq_operation(
     instr: Instruction,
-) -> List["cirq.Operation"]:
+) -> List[cirq_ops.Operation]:
     """Converts the two-qubit braket instruction to Cirq.
 
     Args:
@@ -282,7 +279,7 @@ def _translate_two_qubit_braket_instruction_to_cirq_operation(
 
 
 def _translate_one_qubit_cirq_operation_to_braket_instruction(
-    op: Union[np.ndarray, "cirq.Operation"], target: Optional[int] = None,
+    op: Union[np.ndarray, cirq_ops.Operation], target: Optional[int] = None,
 ) -> List[Instruction]:
     """Translates a one-qubit Cirq operation to a (sequence of) Braket
     instruction(s) according to the following rules:
@@ -367,7 +364,7 @@ def _translate_one_qubit_cirq_operation_to_braket_instruction(
 
 
 def _translate_two_qubit_cirq_operation_to_braket_instruction(
-    op: "cirq.Operation",
+    op: cirq_ops.Operation,
 ) -> List[Instruction]:
     """Translates a two-qubit Cirq operation to a (sequence of) Braket
     instruction(s) according to the following rules:
