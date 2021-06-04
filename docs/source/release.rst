@@ -125,17 +125,17 @@ Release the new version on PyPI
 
 .. note::
     There is a GitHub action in the ``.github`` folder to automatically upload Mitiq
-    to PyPI. You can check the release status [here](https://pypi.org/project/mitiq/#history).
+    to PyPI. You can check the release status `here <https://pypi.org/project/mitiq/#history>`__.
 
 In case the action for the automatic release on PyPI fails, the commands to release Mitiq are
 
-```
-        python -m pip install --upgrade pip
-        make install requirements
-        pip install setuptools wheel twine
-        python setup.py sdist bdist_wheel
-        twine upload dist/*
-```
+.. code-block:: bash
+
+    python -m pip install --upgrade pip
+    make install requirements
+    pip install setuptools wheel twine
+    python setup.py sdist bdist_wheel
+    twine upload dist/*
 
 
 .. note::
