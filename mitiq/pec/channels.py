@@ -20,7 +20,6 @@
 """Utilities for manipulating matrix representations of quantum channels."""
 
 from typing import List
-from itertools import product
 from copy import deepcopy
 import numpy as np
 
@@ -31,9 +30,6 @@ from cirq import (
     CNOT,
     LineQubit,
     DensityMatrixSimulator,
-    DepolarizingChannel,
-    AmplitudeDampingChannel,
-    channel,
 )
 
 
@@ -119,43 +115,6 @@ def tensor_product(*args: np.ndarray) -> np.ndarray:
     for term in args[1:]:
         val = np.kron(val, term)
     return val
-
-
-def global_depolarizing_kraus(
-    noise_level: float, num_qubits: int
-) -> List[np.ndarray]:
-    """Returns the kraus operators of a global depolarizing channel
-    at a given noise level.
-    """
-    noisy_op = DepolarizingChannel(noise_level, num_qubits)
-    return list(channel(noisy_op))
-
-
-def local_depolarizing_kraus(
-    noise_level: float, num_qubits: int
-) -> List[np.ndarray]:
-    """Returns the Kraus operators of the tensor product of local
-    depolarizing channels acting on each qubit.
-    """
-    local_kraus = global_depolarizing_kraus(noise_level, num_qubits=1)
-    return [
-        tensor_product(*tup) for tup in product(local_kraus, repeat=num_qubits)
-    ]
-
-
-def amplitude_damping_kraus(
-    noise_level: float, num_qubits: int
-) -> List[np.ndarray]:
-    """Returns the Kraus operators of an amplitude damping
-    channel at a given noise level. If ``num_qubits > 1``, the Kraus operators
-    corresponding to tensor product of many single-qubit amplitude damping
-    channels are returned.
-    """
-    noisy_op = AmplitudeDampingChannel(noise_level)
-    local_kraus = list(channel(noisy_op))
-    return [
-        tensor_product(*tup) for tup in product(local_kraus, repeat=num_qubits)
-    ]
 
 
 def matrix_to_vector(density_matrix: np.ndarray) -> np.ndarray:

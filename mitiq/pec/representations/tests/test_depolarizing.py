@@ -39,6 +39,11 @@ from mitiq.pec.representations import (
     represent_operations_in_circuit_with_local_depolarizing_noise,
 )
 
+from mitiq.pec.representations.depolarizing import (
+    global_depolarizing_kraus,
+    local_depolarizing_kraus,
+)
+
 from mitiq.pec.channels import _operation_to_choi, _circuit_to_choi
 from mitiq.utils import _equal
 from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
@@ -231,3 +236,22 @@ def test_represent_operations_in_circuit_with_measurements(
 
     # Number of unique gates excluding measurement gates
     assert len(reps) == 1
+
+
+@pytest.mark.parametrize(
+    "kraus_function", [global_depolarizing_kraus, local_depolarizing_kraus],
+)
+def test_depolarizing_kraus(kraus_function):
+    expected = [
+        [[0.5, 0.0], [0.0, 0.5]],
+        [[0.0 + 0.0j, 0.5 + 0.0j], [0.5 + 0.0j, 0.0 + 0.0j]],
+        [[0.0 + 0.0j, 0.0 - 0.5j], [0.0 + 0.5j, 0.0 + 0.0j]],
+        [[0.5 + 0.0j, 0.0 + 0.0j], [0.0 + 0.0j, -0.5 + 0.0j]],
+    ]
+    assert np.allclose(kraus_function(3 / 4, 1), expected)
+    # Test normalization of kraus operators
+    for num_qubits in (1, 2, 3):
+        for noise_level in (0.1, 1):
+            kraus_ops = kraus_function(noise_level, num_qubits)
+            dual_channel = sum([k.conj().T @ k for k in kraus_ops])
+            assert np.allclose(dual_channel, np.eye(2 ** num_qubits))
