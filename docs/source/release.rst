@@ -102,13 +102,22 @@ review it and publish the release.
     of the documentation. So, no additional steps are needed for updating RTD. You can
     verify changes have been updating by viewing `<https://mitiq.readthedocs.io/>`__.
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Release the new version on Github
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+    You need to have write access to the Mitiq Github repository to make
+    a new release.
+
 ------------------------------------------------
-Update the changelog for new development version
+Update the new development version
 ------------------------------------------------
 
 Add a new section to the ``CHANGELOG.md`` to track changes in the following
 release, meaning that if ``vX.Y.Z`` was just released, then there should be
-a section for ``vX.(Y+1).Z`` that is marked "In Development".
+a section for ``vX.(Y+1).Z`` that is marked "In Development". Also, change the
+version in the ``VERSION.txt`` file from ``vX.Y.Z`` to ``vX.(Y+1).Zdev``.
 
 =========================
 Releasing a version patch
