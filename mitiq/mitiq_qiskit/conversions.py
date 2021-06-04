@@ -16,7 +16,7 @@
 """Functions to convert between Mitiq's internal circuit representation and
 Qiskit's circuit representation.
 """
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple
 import re
 
 import numpy as np
@@ -96,9 +96,7 @@ def _map_bits(
     bits: List[qiskit.circuit.Qubit],
     registers: List[qiskit.QuantumRegister],
     new_register_sizes: List[int],
-    new_registers: List[
-        Union[qiskit.QuantumRegister]
-    ],
+    new_registers: List[qiskit.QuantumRegister],
 ) -> List[qiskit.circuit.Qubit]:
     """Maps qubits to new registers. Assumes the input ``qubits`` come from
     a single register or n registers, where n is the number of qubits.
@@ -284,7 +282,7 @@ def to_qiskit(
     # Note: Output qiskit_circuit has one quantum register and n classical
     # registers of 1 bit where n is the total number of classical bits.
     qiskit_circuit.remove_final_measurements()
-    
+
     _transform_registers(qiskit_circuit, new_qregs=qregs)
     if cregs:
         qiskit_circuit.add_register(*cregs)
