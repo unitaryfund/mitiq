@@ -149,7 +149,7 @@ Now, we simply add a line to our executor function which converts from a Cirq ci
 
 .. testcode:: python
 
-    from mitiq.mitiq_qiskit.conversions import to_qiskit
+    from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
 
     def cirq_armonk_executor(cirq_circuit: cirq.Circuit, shots: int = 1024) -> float:
         qiskit_circuit = to_qiskit(cirq_circuit)
