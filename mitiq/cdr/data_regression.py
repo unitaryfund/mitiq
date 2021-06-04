@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """ Functions for using near-Clifford training data for error mitigation"""
-from typing import List, Union, Callable
+from typing import List, Union, Callable, Dict
 
 import numpy as np
 
@@ -89,7 +89,7 @@ def construct_training_data_floats(
         training_data: list of dictionary of counts for all training circuits
                        and all noise levels. In the form:
 
-          ([List[List[dict]] (real circuit data), List[dict] (simulated data)])
+        ([List[dict] (simulated data), [List[List[dict]] (real circuit data)])
 
         observable: option to be passed to use defined observable function that
                     defines how to calculate the value of an observable from
@@ -97,8 +97,8 @@ def construct_training_data_floats(
     Returns: tuple of np.ndarray of dimensions
             (num_training_circuits x noise_levels) and (num_training_circuits).
     """
-    training_circuits_raw_data = training_data[0]
-    training_circuits_simulated_data = training_data[1]
+    training_circuits_raw_data = training_data[1]
+    training_circuits_simulated_data = training_data[0]
     noise_levels = len(training_circuits_raw_data)
     number_of_training_circuits = len(training_circuits_simulated_data)
     # first need to sort the training data, then will do a regression.
@@ -150,8 +150,9 @@ def linear_fit_function(X_data: np.ndarray, params: List) -> float:
     return sum(a * x for a, x in zip(params, X_data)) + params[-1]
 
 
-# TODO: Discuss if this format for converting shots makes sense in general.
-def dictionary_to_probabilities(counts: dict, nqubits: int) -> dict:
+def dictionary_to_probabilities(
+    counts: Dict[str, int], nqubits: int,
+) -> Dict[str, float]:
     """Expresses the result of the simulation in the form of a dictionary
     whose values are the modulus squared of the components of the final state.
     The return probabilities are normalized by the number of counts.
@@ -163,17 +164,10 @@ def dictionary_to_probabilities(counts: dict, nqubits: int) -> dict:
         system and whose values are the modulus of the corresponding squared
         amplitudes.
     """
-    basis = {i: bin(i) for i in range(2 ** nqubits)}
-    counts_order = np.array([i for i in range(2 ** nqubits)])
-    for i in range(len(basis)):
-        key = list(basis.values())[i]
-        if key not in counts:
-            counts[key] = 0
-        for j in range(len(counts)):
-            if list(basis.values())[i] == list(counts.keys())[j]:
-                counts_order[i] = list(counts.values())[j]
-    state = {
-        list(basis.values())[i]: (counts_order[i] / sum(counts_order))
-        for i in range(2 ** nqubits)
-    }
+    total_counts = sum(counts.values())
+    # Initialize probabilities to 0.0
+    state = {bin(j): 0.0 for j in range(2 ** nqubits)}
+    # Update with normalized counts
+    for key, value in counts.items():
+        state[key] = value / total_counts
     return state

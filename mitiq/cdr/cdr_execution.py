@@ -89,7 +89,7 @@ def execute_with_CDR(
                                include 1 as this is just the original circuit.
         kwargs: Available keyword arguments are:
 
-            TRAINING SET CONSTRUCTION OPTIONS:
+        TRAINING SET CONSTRUCTION OPTIONS:
 
             - method_select (string): specifies the method used to select the
                                       non-Clifford gates to replace when
@@ -124,9 +124,9 @@ def execute_with_CDR(
     method_select = kwargs.get("method_select", "uniform")
     method_replace = kwargs.get("method_replace", "closest")
     random_state = kwargs.get("random_state", None)
-    training_set_generation_kwargs_keys = ["sigma_select", "sigma_replace"]
     kwargs_for_training_set_generation = {
-        key: kwargs.get(key) for key in training_set_generation_kwargs_keys
+        "sigma_select": kwargs.get("sigma_select"),
+        "sigma_replace": kwargs.get("sigma_replace"),
     }
 
     # Generate training circuits.
@@ -153,7 +153,7 @@ def execute_with_CDR(
     simulator_data = np.array([simulator(circ) for circ in all_circuits[0]])
 
     # Do the regression.
-    results_dict_training_circuits = [executor_data, simulator_data]
+    results_dict_training_circuits = [simulator_data, executor_data]
     results_dict_circuit_of_interest = executor_data[:, 0]
 
     # Now the regression:

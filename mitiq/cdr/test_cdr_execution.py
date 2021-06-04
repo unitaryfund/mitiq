@@ -52,7 +52,6 @@ def random_x_z_circuit(qubits, n_moments, random_state) -> Circuit:
 
 def executor(circuit: Circuit) -> dict:
     """ executor for unit tests. """
-    # print(circuit)
     circuit_copy = circuit.copy()
     for qid in list(Circuit.all_qubits(circuit_copy)):
         circuit_copy.append(cirq.measure(qid))
@@ -142,21 +141,12 @@ def test_execute_with_cdr():
         num_circuits,
         frac_non_cliff,
         ansatz=linear_fit_function_no_intercept,
-        num_parameters=2,
+        num_parameters=1,
         scale_noise=fold_gates_from_left,
-        scale_factors=[3, 5],
+        scale_factors=[3],
         **kwargs,
     )
-    results2 = execute_with_CDR(
-        circuit,
-        executor,
-        simulator_statevector,
-        obs_list,
-        num_circuits,
-        frac_non_cliff,
-        scale_factors=[3],
-    )
-    for results in [results0, results1, results2]:
+    for results in [results0, results1]:
         for i in range(len(results[1])):
             assert abs(results[0][i][0] - exact_solution[i]) > abs(
                 results[1][i] - exact_solution[i]

@@ -148,13 +148,13 @@ for i, training_circuits in enumerate(all_training_circuits_list):
             )
 
 results_training_circuits = (
-    training_circuits_raw_data,
     training_circuits_simulated_data,
+    training_circuits_raw_data,
 )
 
 results_training_circuits_one_noise_level = (
-    [training_circuits_raw_data[0]],
     training_circuits_simulated_data,
+    [training_circuits_raw_data[0]],
 )
 
 all_circuits_of_interest = scale_noise_in_circuits(
