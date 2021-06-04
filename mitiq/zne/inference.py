@@ -519,6 +519,12 @@ class BatchedFactory(Factory, ABC):
         # Get all noise-scaled circuits to run
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
 
+        if len(qp) < 5:
+            warnings.warn(
+                "The input circuit is very short. "
+                "This may reduce the accuracy of noise scaling."
+            )
+
         # Get the list of keywords associated to each circuit in "to_run"
         kwargs_list = self._get_keyword_args(num_to_average)
 
@@ -720,6 +726,12 @@ class AdaptiveFactory(Factory, ABC):
                 scaled_qp = scale_noise(qp, scale_factor)
                 expectation_values.append(executor(scaled_qp, **exec_params))
             return np.average(expectation_values)
+
+        if len(qp) < 5:
+            warnings.warn(
+                "The input circuit is very short. "
+                "This may reduce the accuracy of noise scaling."
+            )
 
         return self.run_classical(
             scale_factor_to_expectation_value, max_iterations
