@@ -13,4 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from mitiq.mitiq_braket.conversions import from_braket, to_braket
+from mitiq.interface import (
+    mitiq_braket,
+    mitiq_cirq,
+    mitiq_pyquil,
+    mitiq_qiskit,
+)

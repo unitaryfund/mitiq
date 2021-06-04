@@ -17,7 +17,7 @@
 import numpy as np
 from qiskit import QuantumCircuit
 
-from mitiq.mitiq_qiskit.qiskit_utils import (
+from mitiq.interface.mitiq_qiskit.qiskit_utils import (
     execute,
     execute_with_shots,
     execute_with_noise,

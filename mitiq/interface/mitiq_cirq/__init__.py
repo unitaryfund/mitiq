@@ -1,4 +1,4 @@
-# Copyright (C) 2020 Unitary Fund
+# Copyright (C) 2021 Unitary Fund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from mitiq.mitiq_pyquil.conversions import (
-    from_pyquil,
-    from_quil,
-    to_pyquil,
-    to_quil,
+from mitiq.interface.mitiq_cirq.cirq_utils import (
+    execute,
+    execute_with_shots,
+    execute_with_depolarizing_noise,
+    execute_with_shots_and_depolarizing_noise,
 )

@@ -35,7 +35,7 @@ from mitiq.zne.scaling import (
 from mitiq._typing import QPROGRAM
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 
-from mitiq.mitiq_qiskit import (
+from mitiq.interface.mitiq_qiskit import (
     execute_with_shots_and_noise,
     initialized_depolarizing_noise,
 )

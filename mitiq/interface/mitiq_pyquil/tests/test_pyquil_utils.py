@@ -17,7 +17,7 @@
 from pyquil import get_qc, Program
 from pyquil.gates import X
 
-from mitiq.mitiq_pyquil.pyquil_utils import (
+from mitiq.interface.mitiq_pyquil.pyquil_utils import (
     generate_qcs_executor,
     ground_state_expectation,
 )

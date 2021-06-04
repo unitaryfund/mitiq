@@ -50,7 +50,7 @@ from pyquil.gates import (
 from pyquil.quil import Program
 from pyquil.simulation.tools import program_unitary
 
-from mitiq.mitiq_pyquil.compiler import (
+from mitiq.interface.mitiq_pyquil.compiler import (
     basic_compile,
     _CCNOT,
     _CNOT,
