@@ -93,27 +93,27 @@ def _map_bit_index(
 
 
 def _map_bits(
-    bits: List[Union[qiskit.circuit.Qubit, qiskit.circuit.Clbit]],
-    registers: List[Union[qiskit.QuantumRegister, qiskit.ClassicalRegister]],
+    bits: List[qiskit.circuit.Qubit],
+    registers: List[qiskit.QuantumRegister],
     new_register_sizes: List[int],
     new_registers: List[
-        Union[qiskit.QuantumRegister, qiskit.ClassicalRegister]
+        Union[qiskit.QuantumRegister]
     ],
-) -> List[Union[qiskit.circuit.Qubit, qiskit.circuit.Clbit]]:
-    """Maps (qu)bits to new registers. Assumes the input ``bits`` come from
-    a single register or n registers, where n is the number of bits.
+) -> List[qiskit.circuit.Qubit]:
+    """Maps qubits to new registers. Assumes the input ``qubits`` come from
+    a single register or n registers, where n is the number of qubits.
 
     Args:
-        bits: A list of (qu)bits to map.
-        registers: The registers that the ``bits`` come from.
+        bits: A list of qubits to map.
+        registers: The registers that the ``qubits`` come from.
         new_register_sizes: The size(s) of the new registers to map to.
             Note: These can be determined from ``new_registers``, but this
             helper function is only called from ``_map_bits`` where the sizes
             are already computed.
-        new_registers: The new registers to map the ``bits`` to .
+        new_registers: The new registers to map the ``qubits`` to.
 
     Returns:
-        The input ``bits`` mapped to the ``new_registers``.
+        The input ``qubits`` mapped to the ``new_registers``.
     """
     if len(new_registers) == 0:
         return bits
