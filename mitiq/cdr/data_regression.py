@@ -28,10 +28,10 @@ def scale_noise_in_circuits(
 ) -> List[List[Circuit]]:
     """Function to scale the noise in a list of circuits.
     Args:
-        circuits: list of training circuits.
-        scale_factor: factor by which to scale the circuits.
-        scale_noise: method to use to fold the circuits.
-    Returns: List os lists containing the original circuits followed by the
+        circuits: List of training circuits.
+        scale_factor: Factor by which to scale the circuits.
+        scale_noise: Method to use to fold the circuits.
+    Returns: List of lists containing the original circuits followed by the
              folded circuits: [[circuits], [folded_circuits], ...].
     """
     all_folded_circuits = [circuits]
@@ -52,11 +52,11 @@ def calculate_observable(
     value from the counts passed into the function (counts could be simulated
     or from raw data).
     Args:
-        state: the state represented in raw or simulated counts with which to
+        state: The state represented in raw or simulated counts with which to
                extract the observable or as a statevector.
-        observable: array of diagonal elements of observable to be measured,
+        observable: Array of diagonal elements of observable to be measured,
                     which is a diagonal matrix.
-    Returns: observable calculated from dictionaries or statevectors.
+    Returns: Observable calculated from dictionaries or statevectors.
     """
     nqubits = int(np.log2(len(observable)))
     if isinstance(state, np.ndarray):
@@ -86,15 +86,15 @@ def construct_training_data_floats(
     """Function to calculate training data now as two arrays of floats to be
     used in the regression (raw_training_data, simulated_training_data).
     Args:
-        training_data: list of dictionary of counts for all training circuits
+        training_data: List of dictionary of counts for all training circuits
                        and all noise levels. In the form:
 
         ([List[dict] (simulated data), [List[List[dict]] (real circuit data)])
 
-        observable: option to be passed to use defined observable function that
+        observable: Option to be passed to use defined observable function that
                     defines how to calculate the value of an observable from
                     the counts.
-    Returns: tuple of np.ndarray of dimensions
+    Returns: Tuple of np.ndarray of dimensions
             (num_training_circuits x noise_levels) and (num_training_circuits).
     """
     training_circuits_raw_data = training_data[1]
@@ -126,12 +126,12 @@ def construct_circuit_data_floats(
 ) -> np.ndarray:
     """Returns circuit of interest now as two arrays of floats.
     Args:
-        circuit_data: list of dictionary of counts for circuit of interest
+        circuit_data: List of dictionary of counts for circuit of interest
                       and all noise levels.
-        observable: option to be passed to use defined observable function that
+        observable: Option to be passed to use defined observable function that
                     defines how to calculate the value of an observable from
                     the counts.
-    Returns: array of floats for observable calculated from input data.
+    Returns: Array of floats for observable calculated from input data.
     """
     circuit_data_floats = []
     for result in circuit_data:
@@ -144,8 +144,8 @@ def linear_fit_function(X_data: np.ndarray, params: List) -> float:
     """ Function used to map noisy to exact expectation values. Fitted using
     data from the training circuits.
     Args:
-        X_data: array of noisy observables at various noise levels.
-        *params: parameters of function.
+        X_data: Array of noisy observables at various noise levels.
+        *params: Parameters of function.
     """
     return sum(a * x for a, x in zip(params, X_data)) + params[-1]
 

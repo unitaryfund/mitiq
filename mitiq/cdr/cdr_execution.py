@@ -58,45 +58,45 @@ def execute_with_CDR(
     these observables MUST be diagonal in z-basis measurements corresponding to
     the circuit of interest.
 
-    Returns list of raw observables (at many noise levels) and mitigated
+    Returns list of raw observables (at noise scale factors) and mitigated
     observables.
 
     This function returns the mitigated observable/s.
     Args:
-        circuit: circuit of interest compiled in the correct basis.
-        executor: user defined function taking a cirq Circuit object and
+        circuit: Circuit of interest compiled in the correct basis.
+        executor: User defined function taking a cirq Circuit object and
                   returning a dictionary of counts.
-        simulator: user defined function taking a cirq Circuit object and
+        simulator: User defined function taking a cirq Circuit object and
                    returning either a simulated dictionary of counts or an
                    np.ndarray representing the state vector.
-        observables: list of arrays containing the diagonal elements of
+        observables: List of arrays containing the diagonal elements of
                     observable/s of interest to be mitigated. If a list is
                     passed all these observables will be mitigates with the
                     same training set.
-        num_training_circuits: number of training circuits to be used in the
+        num_training_circuits: Number of training circuits to be used in the
                                mitigation.
-        fraction_non_clifford: the fraction of non-Clifford gates to be
+        fraction_non_clifford: The fraction of non-Clifford gates to be
                                subsituted in the training circuits. The higher
                                this fraction the more costly the simulations,
                                but more successful the mitigation.
-        ansatz: the function to map noisy to exact data. Takes array of noisy
+        ansatz: The function to map noisy to exact data. Takes array of noisy
                 and data and parameters returning a float.
-        num_parameters: the number of paramters the ansatz takes.
-        scale_noise: optional argument containing a user defined function on
+        num_parameters: The number of paramters the ansatz takes.
+        scale_noise: Optional argument containing a user defined function on
                      how to increase the noise. If this argument is given then
                      the mitigation method will be vnCDR.
-        scale_factors: factors by which to scale the noise, should not
+        scale_factors: Factors by which to scale the noise, should not
                                include 1 as this is just the original circuit.
         kwargs: Available keyword arguments are:
 
         TRAINING SET CONSTRUCTION OPTIONS:
 
-            - method_select (string): specifies the method used to select the
+            - method_select (string): Specifies the method used to select the
                                       non-Clifford gates to replace when
                                       constructing the near-Clifford training
                                       circuits. Available options are:
                                             ['uniform', 'gaussian']
-            - method_replace (string): specifies the method used to replace the
+            - method_replace (string): Specifies the method used to replace the
                                       selected non-Clifford gates with a
                                       Clifford when constructing the
                                       near-Clifford training circuits.
@@ -106,7 +106,7 @@ def execute_with_CDR(
                                     ``method_select='gaussian'``.
             - sigma_replace (float): Width of the Gaussian distribution used
                                      for ``method_replace='gaussian'``.
-            - random_state (int): seed for sampling.
+            - random_state (int): Seed for sampling.
 
     Returns: The tuple (raw_expectations, mitigated_expectations)
              corresponding to the many raw expectation values (at different
