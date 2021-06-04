@@ -111,6 +111,7 @@ myst_enable_extensions = [
     "dollarmath",
     "html_image",
     "smartquotes",
+    "html_image"
 ]
 
 # Tells MyST to treat URIs beginning with these prefixes as external links.
