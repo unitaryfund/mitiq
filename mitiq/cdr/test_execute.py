@@ -129,12 +129,20 @@ for circuit_ in all_circuits_of_interest:
 results_circuit_of_interest_one_noise_level = [results_circuit_of_interest[0]]
 
 
-def test_calculate_observable():
-    sim_state = simulator_statevector(test_circuit)
-    sim_counts = simulator(test_circuit)
-    obs_state = calculate_observable(sim_state, sigma_z)
-    obs_counts = calculate_observable(sim_counts, sigma_z)
-    assert abs(obs_state - obs_counts) <= 0.015
+@pytest.mark.parametrize("op_and_expectation_value", ((cirq.I, 1.0), (cirq.H, 0.0), (cirq.X, -1.0)))
+def test_calculate_observable_sigmaz(op_and_expectation_value):
+    """Tests <psi|Z|psi> is correct for |psi> \in {|0>, |+>, |1>}."""
+    op, expected = op_and_expectation_value
+    circuit = cirq.Circuit(op.on(cirq.LineQubit(0)))
+    assert np.isclose(
+        calculate_observable(simulator_statevector(circuit), sigma_z), expected,
+        atol=1e-7
+    )
+
+    assert np.isclose(
+        calculate_observable(simulator(circuit, shots=10_000), sigma_z), expected,
+        atol=1e-2
+    )
 
 
 @pytest.mark.parametrize("noise_levels", [1, 2])
@@ -145,6 +153,8 @@ def test_construct_training_data_floats(noise_levels):
         else results_training_circuits
     )
     train_data = construct_training_data_floats(results, sigma_z)
+    print(train_data)
+    # assert False
     assert len(train_data[0][0]) == noise_levels
 
 
@@ -156,6 +166,9 @@ def test_construct_circuit_data_floats(noise_levels):
         else results_circuit_of_interest
     )
     data = construct_circuit_data_floats(results, sigma_z)
+    print(data)
+    print(np.array(data).shape)
+    # assert False
     assert len(data) == noise_levels
 
 
