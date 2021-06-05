@@ -38,7 +38,18 @@ sigma_z = np.diag(np.diag([1, -1]))
 def executor(
     circuit: cirq.Circuit, noise_level: float = 0.1, shots: int = 8192
 ) -> Dict[bin, int]:
-    """ executor for unit tests. """
+    """Returns computational basis measurements after executing the circuit
+    with depolarizing noise.
+
+    Args:
+        circuit: Circuit to execute.
+        noise_level: Probability of depolarizing noise after each moment.
+        shots: Number of samples to take.
+
+    Returns:
+        Dictionary where each key is a bitstring (binary int) and each value
+        is the number of times that bitstring was measured.
+    """
     circuit = circuit.with_noise(cirq.depolarize(p=noise_level))
     circuit.append(cirq.measure(*circuit.all_qubits(), key="z"))
 
@@ -47,25 +58,38 @@ def executor(
 
 
 def simulator(circuit: cirq.Circuit, shots: int = 8192) -> dict:
+    """Returns computational basis measurements after executing the circuit
+    (without noise).
+
+    Args:
+        circuit: Circuit to simulate.
+        shots: Number of samples to take.
+
+    Returns:
+        Dictionary where each key is a bitstring (binary int) and each value
+        is the number of times that bitstring was measured.
+    """
     return executor(circuit, noise_level=0.0, shots=shots)
 
 
 def simulator_statevector(circuit: cirq.Circuit) -> np.ndarray:
+    """Returns the final wavefunction (as a numpy array) of the circuit.
+
+    Args:
+        circuit: Circuit to simulate.
+    """
     return cirq.Simulator().simulate(circuit).final_state_vector
 
 
-# circuit used for unit tests:
+# Test circuit.
 test_circuit = random_x_z_circuit(
     cirq.LineQubit.range(1), n_moments=6, random_state=1
 )
-
-
-# training set used for unit tests:
-training_circuits_list = generate_training_circuits(test_circuit, 3, 0.3)
+training_circuits = generate_training_circuits(test_circuit, 3, 0.3)
 
 # some example data used in following tests:
 all_training_circuits_list = [
-    [fold_gates_from_left(c, s) for c in training_circuits_list]
+    [fold_gates_from_left(c, s) for c in training_circuits]
     for s in (1, 3)
 ]
 
@@ -74,8 +98,8 @@ training_circuits_raw_data = [
 ]
 # list to store simulated training circuits:
 training_circuits_simulated_data = []
-for i, training_circuits in enumerate(all_training_circuits_list):
-    for j, test_circuit in enumerate(training_circuits):
+for i, tc in enumerate(all_training_circuits_list):
+    for j, test_circuit in enumerate(tc):
         training_circuits_raw_data[i].append(executor(test_circuit))
         # runs the circuits with no increased noise in the simulator:
         if i == 0:
@@ -104,7 +128,6 @@ for circuit_ in all_circuits_of_interest:
 
 results_circuit_of_interest_one_noise_level = [results_circuit_of_interest[0]]
 
-# assert False
 
 def test_calculate_observable():
     sim_state = simulator_statevector(test_circuit)
