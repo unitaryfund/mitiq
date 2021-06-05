@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tests for the data regression portion of Clifford data regression."""
-from collections import Counter
+from typing import Dict
 import pytest
 import numpy as np
 
@@ -30,40 +30,28 @@ from mitiq.cdr._testing import random_x_z_circuit
 from mitiq.cdr.clifford_training_data import generate_training_circuits
 from mitiq.zne.scaling import fold_gates_from_left
 
-
-# Defines a function (which could be user defined) that converts a python
-# Counter object which is returned by cirq into a dictionary of counts.
-def counter_to_dict(counts: Counter) -> dict:
-    """ Returns a dictionary of counts. Takes cirq output 'Counter' object to
-    binary counts. I assume this is the format which we will be working with
-    from now on.
-    Args:
-        counts: Counter object returned by cirq with the results of a circuit.
-    """
-    counts_dict = {}
-    for key, value in counts.items():
-        key2 = bin(int("".join(str(ele) for ele in key), 2))
-        counts_dict[key2] = value
-    return counts_dict
+# Observables.
+sigma_z = np.diag(np.diag([1, -1]))
 
 
 # Executors.
-def executor(circuit: cirq.Circuit, noise_level: float = 0.1, shots: int = 8192) -> dict:
+def executor(
+    circuit: cirq.Circuit, noise_level: float = 0.1, shots: int = 8192
+) -> Dict[bin, int]:
     """ executor for unit tests. """
     circuit = circuit.with_noise(cirq.depolarize(p=noise_level))
-    circuit.append(cirq.measure(*circuit.all_qubits()))
+    circuit.append(cirq.measure(*circuit.all_qubits(), key="z"))
 
     result = cirq.DensityMatrixSimulator().run(circuit, repetitions=shots)
-    counts = result.multi_measurement_histogram(keys=circuit.all_qubits())
-    return counter_to_dict(counts)
-
-
-def simulator_statevector(circuit: cirq.Circuit) -> np.ndarray:
-    return cirq.Simulator().simulate(circuit).final_state_vector
+    return {bin(k): v for k, v in result.histogram(key="z").items()}
 
 
 def simulator(circuit: cirq.Circuit, shots: int = 8192) -> dict:
     return executor(circuit, noise_level=0.0, shots=shots)
+
+
+def simulator_statevector(circuit: cirq.Circuit) -> np.ndarray:
+    return cirq.Simulator().simulate(circuit).final_state_vector
 
 
 # circuit used for unit tests:
@@ -106,8 +94,7 @@ results_training_circuits_one_noise_level = (
 )
 
 all_circuits_of_interest = [
-    [fold_gates_from_left(c, s) for c in [test_circuit]]
-    for s in (1, 3)
+    [fold_gates_from_left(c, s) for c in [test_circuit]] for s in (1, 3)
 ]
 
 results_circuit_of_interest = []
@@ -117,9 +104,7 @@ for circuit_ in all_circuits_of_interest:
 
 results_circuit_of_interest_one_noise_level = [results_circuit_of_interest[0]]
 
-sigma_z = np.diag([1, -1])
-sigma_z = np.diag(sigma_z)
-
+# assert False
 
 def test_calculate_observable():
     sim_state = simulator_statevector(test_circuit)
@@ -131,14 +116,22 @@ def test_calculate_observable():
 
 @pytest.mark.parametrize("noise_levels", [1, 2])
 def test_construct_training_data_floats(noise_levels):
-    results = results_training_circuits_one_noise_level if noise_levels == 1 else results_training_circuits
+    results = (
+        results_training_circuits_one_noise_level
+        if noise_levels == 1
+        else results_training_circuits
+    )
     train_data = construct_training_data_floats(results, sigma_z)
     assert len(train_data[0][0]) == noise_levels
 
 
 @pytest.mark.parametrize("noise_levels", [1, 2])
 def test_construct_circuit_data_floats(noise_levels):
-    results = results_circuit_of_interest_one_noise_level if noise_levels == 1 else results_circuit_of_interest
+    results = (
+        results_circuit_of_interest_one_noise_level
+        if noise_levels == 1
+        else results_circuit_of_interest
+    )
     data = construct_circuit_data_floats(results, sigma_z)
     assert len(data) == noise_levels
 
