@@ -23,10 +23,10 @@ from scipy.optimize import curve_fit
 from cirq.circuits import Circuit
 
 from mitiq.cdr.clifford_training_data import generate_training_circuits
-from mitiq.cdr.data_regression import (
+from mitiq.cdr.data_regression import linear_fit_function
+from mitiq.cdr.execute import (
     construct_training_data_floats,
     construct_circuit_data_floats,
-    linear_fit_function,
 )
 from mitiq.zne.scaling import fold_gates_at_random
 
@@ -39,7 +39,7 @@ def execute_with_CDR(
     observables: List[np.ndarray],
     num_training_circuits: int,
     fraction_non_clifford: float,
-    ansatz: Callable[[np.ndarray, List], List] = linear_fit_function,
+    ansatz: Callable[..., float] = linear_fit_function,
     num_parameters: int = None,
     scale_factors: Sequence[float] = (1,),
     scale_noise: Callable[[Circuit, float], Circuit] = fold_gates_at_random,

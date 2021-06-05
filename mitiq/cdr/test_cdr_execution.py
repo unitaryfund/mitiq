@@ -12,33 +12,28 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""Test code for execution code in Clifford data regression."""
+
+"""Tests for the Clifford data regression top-level API."""
+from collections import Counter
+
 import numpy as np
 
-import cirq
-from cirq.circuits import Circuit
-from cirq import Simulator
-from cirq import depolarize
-from cirq import DensityMatrixSimulator
+from cirq import (Circuit, depolarize, DensityMatrixSimulator, ops, testing, Simulator, LineQubit)
 
 from mitiq.cdr.cdr_execution import execute_with_CDR
-
 from mitiq.zne.scaling import fold_gates_from_left
-
-from mitiq.cdr.data_regression import calculate_observable
-
-from collections import Counter
+from mitiq.cdr.execute import calculate_observable
 
 # Defines circuit used in unit tests:
 
 
 def random_x_z_circuit(qubits, n_moments, random_state) -> Circuit:
     angles = np.linspace(0.0, 2 * np.pi, 6)
-    oneq_gates = [cirq.ops.rz(a) for a in angles]
-    oneq_gates.append(cirq.ops.rx(np.pi / 2))
+    oneq_gates = [ops.rz(a) for a in angles]
+    oneq_gates.append(ops.rx(np.pi / 2))
     gate_domain = {oneq_gate: 1 for oneq_gate in oneq_gates}
 
-    return cirq.testing.random_circuit(
+    return testing.random_circuit(
         qubits=qubits,
         n_moments=n_moments,
         op_density=1.0,
@@ -54,12 +49,10 @@ def executor(circuit: Circuit) -> dict:
     """ executor for unit tests. """
     circuit_copy = circuit.copy()
     for qid in list(Circuit.all_qubits(circuit_copy)):
-        circuit_copy.append(cirq.measure(qid))
+        circuit_copy.append(ops.measure(qid))
     simulator = DensityMatrixSimulator()
-    shots = 8192
-    noise = 0.5
-    circuit_with_noise = circuit_copy.with_noise(depolarize(p=noise))
-    result = simulator.run(circuit_with_noise, repetitions=shots)
+    circuit_with_noise = circuit_copy.with_noise(depolarize(p=0.5))
+    result = simulator.run(circuit_with_noise, repetitions=8192)
     counts = result.multi_measurement_histogram(
         keys=Circuit.all_qubits(circuit_with_noise)
     )
@@ -93,7 +86,7 @@ def simulator_statevector(circuit: Circuit) -> np.ndarray:
 
 # circuit used for unit tests:
 circuit = random_x_z_circuit(
-    cirq.LineQubit.range(2), n_moments=2, random_state=1
+    LineQubit.range(2), n_moments=2, random_state=1
 )
 
 # define observables for testing
