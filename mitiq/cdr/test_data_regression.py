@@ -176,27 +176,15 @@ def test_calculate_observable():
 
 @pytest.mark.parametrize("noise_levels", [1, 2])
 def test_construct_training_data_floats(noise_levels):
-    if noise_levels == 1:
-        train_data = construct_training_data_floats(
-            results_training_circuits_one_noise_level, sigma_z
-        )
-    elif noise_levels == 2:
-        train_data = construct_training_data_floats(
-            results_training_circuits, sigma_z
-        )
+    circuits = results_training_circuits_one_noise_level if noise_levels == 1 else results_training_circuits
+    train_data = construct_training_data_floats(circuits, sigma_z)
     assert len(train_data[0][0]) == noise_levels
 
 
 @pytest.mark.parametrize("noise_levels", [1, 2])
 def test_construct_circuit_data_floats(noise_levels):
-    if noise_levels == 1:
-        data = construct_circuit_data_floats(
-            results_circuit_of_interest_one_noise_level, sigma_z
-        )
-    elif noise_levels == 2:
-        data = construct_circuit_data_floats(
-            results_circuit_of_interest, sigma_z
-        )
+    circuits = results_training_circuits_one_noise_level if noise_levels == 1 else results_training_circuits
+    data = construct_circuit_data_floats(circuits, sigma_z)
     assert len(data) == noise_levels
 
 
