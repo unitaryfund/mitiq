@@ -19,10 +19,6 @@ import pytest
 import numpy as np
 
 import cirq
-from cirq.circuits import Circuit
-from cirq import Simulator
-from cirq import depolarize
-from cirq import DensityMatrixSimulator
 
 from mitiq.cdr.execute import (
     construct_training_data_floats,
@@ -51,54 +47,33 @@ def counter_to_dict(counts: Counter) -> dict:
     return counts_dict
 
 
-# Executors. TODO: Why aren't these imported from mitiq.mitiq_cirq.cirq_utils?
-def executor(circuit: Circuit) -> dict:
+# Executors.
+def executor(circuit: cirq.Circuit, noise_level: float = 0.1, shots: int = 8192) -> dict:
     """ executor for unit tests. """
-    circuit_copy = circuit.copy()
-    for qid in list(Circuit.all_qubits(circuit_copy)):
-        circuit_copy.append(cirq.measure(qid))
-    simulator = DensityMatrixSimulator()
-    shots = 8192
-    noise = 0.1
-    circuit_with_noise = circuit_copy.with_noise(depolarize(p=noise))
-    result = simulator.run(circuit_with_noise, repetitions=shots)
-    counts = result.multi_measurement_histogram(
-        keys=Circuit.all_qubits(circuit_with_noise)
-    )
-    dict_counts = counter_to_dict(counts)
-    return dict_counts
+    circuit = circuit.with_noise(cirq.depolarize(p=noise_level))
+    circuit.append(cirq.measure(*circuit.all_qubits()))
+
+    result = cirq.DensityMatrixSimulator().run(circuit, repetitions=shots)
+    counts = result.multi_measurement_histogram(keys=circuit.all_qubits())
+    return counter_to_dict(counts)
 
 
-def simulator_statevector(circuit: Circuit) -> np.ndarray:
-    circuit_copy = circuit.copy()
-    simulator = Simulator()
-    result = simulator.simulate(circuit_copy)
-    statevector = result.final_state_vector
-    return statevector
+def simulator_statevector(circuit: cirq.Circuit) -> np.ndarray:
+    return cirq.Simulator().simulate(circuit).final_state_vector
 
 
-def simulator_counts(circuit: Circuit) -> dict:
-    circuit_copy = circuit.copy()
-    for qid in list(Circuit.all_qubits(circuit_copy)):
-        circuit_copy.append(cirq.measure(qid))
-    simulator = DensityMatrixSimulator()
-    shots = 8192
-    result = simulator.run(circuit_copy, repetitions=shots)
-    counts = result.multi_measurement_histogram(
-        keys=Circuit.all_qubits(circuit_copy)
-    )
-    dict_counts = counter_to_dict(counts)
-    return dict_counts
+def simulator(circuit: cirq.Circuit, shots: int = 8192) -> dict:
+    return executor(circuit, noise_level=0.0, shots=shots)
 
 
 # circuit used for unit tests:
-circuit = random_x_z_circuit(
+test_circuit = random_x_z_circuit(
     cirq.LineQubit.range(1), n_moments=6, random_state=1
 )
 
 
 # training set used for unit tests:
-training_circuits_list = generate_training_circuits(circuit, 3, 0.3)
+training_circuits_list = generate_training_circuits(test_circuit, 3, 0.3)
 
 # some example data used in following tests:
 all_training_circuits_list = [
@@ -112,12 +87,12 @@ training_circuits_raw_data = [
 # list to store simulated training circuits:
 training_circuits_simulated_data = []
 for i, training_circuits in enumerate(all_training_circuits_list):
-    for j, circuit in enumerate(training_circuits):
-        training_circuits_raw_data[i].append(executor(circuit))
+    for j, test_circuit in enumerate(training_circuits):
+        training_circuits_raw_data[i].append(executor(test_circuit))
         # runs the circuits with no increased noise in the simulator:
         if i == 0:
             training_circuits_simulated_data.append(
-                simulator_statevector(circuit)
+                simulator_statevector(test_circuit)
             )
 
 results_training_circuits = (
@@ -131,7 +106,7 @@ results_training_circuits_one_noise_level = (
 )
 
 all_circuits_of_interest = [
-    [fold_gates_from_left(c, s) for c in [circuit]]
+    [fold_gates_from_left(c, s) for c in [test_circuit]]
     for s in (1, 3)
 ]
 
@@ -147,8 +122,8 @@ sigma_z = np.diag(sigma_z)
 
 
 def test_calculate_observable():
-    sim_state = simulator_statevector(circuit)
-    sim_counts = simulator_counts(circuit)
+    sim_state = simulator_statevector(test_circuit)
+    sim_counts = simulator(test_circuit)
     obs_state = calculate_observable(sim_state, sigma_z)
     obs_counts = calculate_observable(sim_counts, sigma_z)
     assert abs(obs_state - obs_counts) <= 0.015
@@ -169,7 +144,7 @@ def test_construct_circuit_data_floats(noise_levels):
 
 
 def test_dictionary_to_probabilities():
-    sim_counts = simulator_counts(circuit)
+    sim_counts = simulator(test_circuit)
     state = dictionary_to_probabilities(sim_counts, nqubits=1)
     assert bin(0) in state.keys()
     assert bin(1) in state.keys()
