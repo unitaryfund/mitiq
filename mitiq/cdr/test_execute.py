@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tests for the data regression portion of Clifford data regression."""
+from collections import Counter
 import pytest
 import numpy as np
 
@@ -29,27 +30,9 @@ from mitiq.cdr.execute import (
     calculate_observable,
     dictionary_to_probabilities,
 )
-
-from mitiq.zne.scaling import fold_gates_from_left
-
+from mitiq.cdr._testing import random_x_z_circuit
 from mitiq.cdr.clifford_training_data import generate_training_circuits
-
-from collections import Counter
-
-
-def random_x_z_circuit(qubits, n_moments, random_state) -> Circuit:
-    angles = np.linspace(0.0, 2 * np.pi, 6)
-    oneq_gates = [cirq.ops.rz(a) for a in angles]
-    oneq_gates.append(cirq.ops.rx(np.pi / 2))
-    gate_domain = {oneq_gate: 1 for oneq_gate in oneq_gates}
-
-    return cirq.testing.random_circuit(
-        qubits=qubits,
-        n_moments=n_moments,
-        op_density=1.0,
-        gate_domain=gate_domain,
-        random_state=random_state,
-    )
+from mitiq.zne.scaling import fold_gates_from_left
 
 
 # Defines a function (which could be user defined) that converts a python

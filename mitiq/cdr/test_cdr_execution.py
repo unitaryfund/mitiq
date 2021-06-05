@@ -18,33 +18,15 @@ from collections import Counter
 
 import numpy as np
 
-from cirq import (Circuit, depolarize, DensityMatrixSimulator, ops, testing, Simulator, LineQubit)
+from cirq import (Circuit, depolarize, DensityMatrixSimulator, ops, Simulator, LineQubit)
 
 from mitiq.cdr.cdr_execution import execute_with_CDR
 from mitiq.zne.scaling import fold_gates_from_left
 from mitiq.cdr.execute import calculate_observable
-
-# Defines circuit used in unit tests:
-
-
-def random_x_z_circuit(qubits, n_moments, random_state) -> Circuit:
-    angles = np.linspace(0.0, 2 * np.pi, 6)
-    oneq_gates = [ops.rz(a) for a in angles]
-    oneq_gates.append(ops.rx(np.pi / 2))
-    gate_domain = {oneq_gate: 1 for oneq_gate in oneq_gates}
-
-    return testing.random_circuit(
-        qubits=qubits,
-        n_moments=n_moments,
-        op_density=1.0,
-        gate_domain=gate_domain,
-        random_state=random_state,
-    )
+from mitiq.cdr._testing import random_x_z_circuit
 
 
 # Defines executor used in circuit tests:
-
-
 def executor(circuit: Circuit) -> dict:
     """ executor for unit tests. """
     circuit_copy = circuit.copy()
@@ -91,7 +73,7 @@ circuit = random_x_z_circuit(
 
 # define observables for testing
 sigma_z = np.diag([1, -1])
-obs = np.kron(np.identity((2)), sigma_z)
+obs = np.kron(np.identity(2), sigma_z)
 obs2 = np.kron(sigma_z, sigma_z)
 obs_list = [np.diag(obs), np.diag(obs2)]
 
