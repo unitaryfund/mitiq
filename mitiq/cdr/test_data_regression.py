@@ -14,8 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tests for data regression code in Clifford data regression."""
-from typing import List
-
 import pytest
 import numpy as np
 
@@ -26,7 +24,6 @@ from cirq import depolarize
 from cirq import DensityMatrixSimulator
 
 from mitiq.cdr.data_regression import (
-    scale_noise_in_circuits,
     construct_training_data_floats,
     construct_circuit_data_floats,
     linear_fit_function,
@@ -34,17 +31,11 @@ from mitiq.cdr.data_regression import (
     dictionary_to_probabilities,
 )
 
-from mitiq.zne.scaling import (
-    fold_gates_from_left,
-    fold_gates_from_right,
-    fold_gates_at_random,
-)
+from mitiq.zne.scaling import fold_gates_from_left
 
 from mitiq.cdr.clifford_training_data import generate_training_circuits
 
 from collections import Counter
-
-# Defines circuit used in unit tests:
 
 
 def random_x_z_circuit(qubits, n_moments, random_state) -> Circuit:
@@ -130,9 +121,11 @@ circuit = random_x_z_circuit(
 training_circuits_list = generate_training_circuits(circuit, 3, 0.3)
 
 # some example data used in following tests:
-all_training_circuits_list = scale_noise_in_circuits(
-    training_circuits_list, fold_gates_from_left, 3
-)
+all_training_circuits_list = [
+    [fold_gates_from_left(c, s) for c in training_circuits_list]
+    for s in (1, 3)
+]
+
 training_circuits_raw_data = [
     [] for i in range(len(all_training_circuits_list))
 ]
@@ -157,9 +150,10 @@ results_training_circuits_one_noise_level = (
     [training_circuits_raw_data[0]],
 )
 
-all_circuits_of_interest = scale_noise_in_circuits(
-    [circuit], fold_gates_from_left, 3
-)
+all_circuits_of_interest = [
+    [fold_gates_from_left(c, s) for c in [circuit]]
+    for s in (1, 3)
+]
 
 results_circuit_of_interest = []
 for circuit_ in all_circuits_of_interest:
@@ -170,21 +164,6 @@ results_circuit_of_interest_one_noise_level = [results_circuit_of_interest[0]]
 
 sigma_z = np.diag([1, -1])
 sigma_z = np.diag(sigma_z)
-
-
-@pytest.mark.parametrize(
-    "fold_method",
-    [fold_gates_from_left, fold_gates_from_right, fold_gates_at_random],
-)
-@pytest.mark.parametrize("scale_factors", [[3, 5], 3])
-def test_scale_noise_in_circuits(fold_method, scale_factors):
-    circuits = training_circuits_list
-    folded_circuit = scale_noise_in_circuits(
-        circuits, fold_method, scale_factors
-    )
-    if isinstance(circuits, List):
-        assert len(folded_circuit[0]) == len(circuits)
-        assert len(folded_circuit[1][0]) > len(folded_circuit[0][0])
 
 
 def test_calculate_observable():
