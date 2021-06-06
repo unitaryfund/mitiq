@@ -29,3 +29,14 @@ def linear_fit_function(x_data: np.ndarray, params: Sequence[float]) -> float:
             parameter is the intercept of the fit.
     """
     return sum(a * x for a, x in zip(params, x_data)) + params[-1]
+
+
+def linear_fit_function_no_intercept(x_data: np.ndarray, params: Sequence[float]) -> float:
+    """Returns y(x) = a_1 x_1 + ... + a_n x_n.
+
+    Args:
+        x_data: The independent variables x_1, ..., x_n. In CDR, these are
+            nominally the noisy expectation values to perform regression on.
+        params: Parameters a_1, ..., a_n of the linear fit.
+    """
+    return sum(a * x for a, x in zip(params, x_data))

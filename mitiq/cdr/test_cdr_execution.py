@@ -21,6 +21,7 @@ import numpy as np
 from cirq import LineQubit
 
 from mitiq.cdr.cdr_execution import execute_with_CDR
+from mitiq.cdr.data_regression import linear_fit_function_no_intercept
 from mitiq.zne.scaling import fold_gates_from_left
 from mitiq.cdr.execute import calculate_observable
 from mitiq.cdr._testing import random_x_z_circuit, executor, simulator_statevector
@@ -46,11 +47,6 @@ for obs in obs_list:
     exact_solution.append(
         calculate_observable(simulator_statevector(circuit), observable=obs)
     )
-
-
-# example fit function used in testing:
-def linear_fit_function_no_intercept(X_data, params) -> float:
-    return sum(a * x for a, x in zip(params, X_data))
 
 
 def test_execute_with_cdr():

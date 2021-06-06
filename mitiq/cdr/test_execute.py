@@ -24,7 +24,7 @@ from mitiq.cdr.execute import (
     construct_training_data_floats,
     construct_circuit_data_floats,
     calculate_observable,
-    dictionary_to_probabilities,
+    measurements_to_probabilities,
 )
 from mitiq.cdr._testing import random_x_z_circuit
 from mitiq.cdr.clifford_training_data import generate_training_circuits
@@ -173,8 +173,14 @@ def test_construct_circuit_data_floats(noise_levels):
 
 
 def test_dictionary_to_probabilities():
+    counts = {bin(0): 2, bin(1): 3}
+    normalized_counts = measurements_to_probabilities(counts, nqubits=1)
+    assert normalized_counts == {bin(0): 2 / 5, bin(1): 3 / 5}
+
+
+def test_dictionary_to_probabilities_1():
     sim_counts = simulator(test_circuit)
-    state = dictionary_to_probabilities(sim_counts, nqubits=1)
+    state = measurements_to_probabilities(sim_counts, nqubits=1)
     assert bin(0) in state.keys()
     assert bin(1) in state.keys()
     assert (isinstance(i, float) for i in list(state.values()))
