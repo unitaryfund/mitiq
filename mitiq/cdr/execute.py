@@ -13,11 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Counter, Dict, Union
+from collections import Counter
+from typing import Counter as CounterType, Dict, Union
 
 import numpy as np
 
-MeasurementResult = Union[Dict[bin, int], Counter[bin]]
+MeasurementResult = Union[Dict[bin, int], CounterType[bin]]
 
 
 def calculate_observable(
@@ -42,27 +43,25 @@ def calculate_observable(
             for i in range(2 ** nqubits)
         ]
     elif isinstance(state_or_measurements, (dict, Counter)):
-        # order the counts and add zeros:
-        state_or_measurements = measurements_to_probabilities(state_or_measurements, nqubits)
-        values = list(state_or_measurements.values())
+        probs = normalize_measurements(state_or_measurements)
         observable_values = [
-            (observable[i] * values[i]) for i in range(2 ** nqubits)
+            observable[i] * probs.get(bin(i), 0.0) for i in range(2 ** nqubits)
         ]
     else:
         raise ValueError(
-            f"Provided state has type {type(state_or_measurements)} but must be a numpy "
-            f"array or dictionary of counts."
+            f"Provided state has type {type(state_or_measurements)} but must "
+            f"be a numpy array, Dict[bin, int], or Counter[int]."
         )
 
     return sum(np.real(observable_values))
 
 
-def measurements_to_probabilities(
-    counts: MeasurementResult, nqubits: int,
-) -> MeasurementResult:
-    """Normalizes the counts and inserts 0 where counts are missing."""
+def normalize_measurements(counts: MeasurementResult) -> Dict[bin, float]:
+    """Normalizes the values of the MeasurementResult to get probabilities.
+
+    Args:
+        counts: Dictionary/Counter of measurements. Each key is a binary int
+            and each value is an int.
+    """
     total_counts = sum(counts.values())
-    state = {bin(j): 0.0 for j in range(2 ** nqubits)}
-    for key, value in counts.items():
-        state[key] = value / total_counts
-    return state
+    return {bitstring: count / total_counts for bitstring, count in counts.items()}

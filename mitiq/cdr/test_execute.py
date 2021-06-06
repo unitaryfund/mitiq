@@ -19,7 +19,7 @@ import numpy as np
 
 import cirq
 
-from mitiq.cdr.execute import (calculate_observable, measurements_to_probabilities)
+from mitiq.cdr.execute import calculate_observable, normalize_measurements
 from mitiq.cdr._testing import simulator_statevector, simulator
 
 # Observables.
@@ -44,5 +44,5 @@ def test_calculate_observable_sigmaz(op_and_expectation_value):
 
 def test_dictionary_to_probabilities():
     counts = {bin(0): 2, bin(1): 3}
-    normalized_counts = measurements_to_probabilities(counts, nqubits=1)
+    normalized_counts = normalize_measurements(counts)
     assert normalized_counts == {bin(0): 2 / 5, bin(1): 3 / 5}
