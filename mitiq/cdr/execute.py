@@ -13,13 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Dict, List, Union
+from typing import Counter, Dict, List, Union
 
 import numpy as np
 
+MeasurementResult = Union[Dict[bin, int], Counter[bin]]
+
 
 def calculate_observable(
-    state_or_measurements: Union[Dict[bin, int], np.ndarray], observable: np.ndarray
+    state_or_measurements: Union[MeasurementResult, np.ndarray], observable: np.ndarray
 ) -> float:
     """Returns (estimate of) ⟨𝛹| O |𝛹⟩ for diagonal observable O and quantum
      state |𝛹⟩.
@@ -41,7 +43,7 @@ def calculate_observable(
         ]
     elif isinstance(state_or_measurements, dict):
         # order the counts and add zeros:
-        state_or_measurements = dictionary_to_probabilities(state_or_measurements, nqubits)
+        state_or_measurements = measurements_to_probabilities(state_or_measurements, nqubits)
         values = list(state_or_measurements.values())
         observable_values = [
             (observable[i] * values[i]) for i in range(2 ** nqubits)
@@ -56,7 +58,7 @@ def calculate_observable(
 
 
 def construct_training_data_floats(
-    training_data: List[dict], observable: np.ndarray,
+    training_data: List[MeasurementResult], observable: np.ndarray,
 ) -> (np.ndarray, np.ndarray):
     """Function to calculate training data now as two arrays of floats to be
     used in the regression (raw_training_data, simulated_training_data).
@@ -98,7 +100,7 @@ def construct_training_data_floats(
 
 
 def construct_circuit_data_floats(
-    circuit_data: List[dict], observable: np.ndarray
+    circuit_data: List[MeasurementResult], observable: np.ndarray
 ) -> np.ndarray:
     """Returns circuit of interest now as two arrays of floats.
     Args:
@@ -116,24 +118,12 @@ def construct_circuit_data_floats(
     return circuit_data_floats
 
 
-def dictionary_to_probabilities(
-    counts: Dict[str, int], nqubits: int,
-) -> Dict[str, float]:
-    """Expresses the result of the simulation in the form of a dictionary
-    whose values are the modulus squared of the components of the final state.
-    The return probabilities are normalized by the number of counts.
-    Args:
-        counts: Dictionary of counts with binary keys identifying the state.
-        nqubits: Number of qubits in the system.
-    Returns:
-        state: Dictionary whose keys are the base elements of the nqubits qubit
-        system and whose values are the modulus of the corresponding squared
-        amplitudes.
-    """
+def measurements_to_probabilities(
+    counts: MeasurementResult, nqubits: int,
+) -> MeasurementResult:
+    """Normalizes the counts and inserts 0 where counts are missing."""
     total_counts = sum(counts.values())
-    # Initialize probabilities to 0.0
     state = {bin(j): 0.0 for j in range(2 ** nqubits)}
-    # Update with normalized counts
     for key, value in counts.items():
         state[key] = value / total_counts
     return state

@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Dict
-
 import numpy as np
 import cirq
+
+from mitiq.cdr.execute import MeasurementResult
 
 
 def random_x_z_circuit(qubits, n_moments, random_state) -> cirq.Circuit:
@@ -51,10 +51,9 @@ def random_x_z_cnot_circuit(qubits, n_moments, random_state) -> cirq.Circuit:
     )
 
 
-# Executors.
 def executor(
     circuit: cirq.Circuit, noise_level: float = 0.1, shots: int = 8192
-) -> Dict[bin, int]:
+) -> MeasurementResult:
     """Returns computational basis measurements after executing the circuit
     with depolarizing noise.
 
@@ -74,7 +73,7 @@ def executor(
     return {bin(k): v for k, v in result.histogram(key="z").items()}
 
 
-def simulator(circuit: cirq.Circuit, shots: int = 8192) -> dict:
+def simulator(circuit: cirq.Circuit, shots: int = 8192) -> MeasurementResult:
     """Returns computational basis measurements after executing the circuit
     (without noise).
 

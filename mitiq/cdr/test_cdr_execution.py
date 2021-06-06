@@ -14,12 +14,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tests for the Clifford data regression top-level API."""
-from collections import Counter
 from functools import partial
 
 import numpy as np
 
-from cirq import (Circuit, depolarize, DensityMatrixSimulator, ops, Simulator, LineQubit)
+from cirq import LineQubit
 
 from mitiq.cdr.cdr_execution import execute_with_CDR
 from mitiq.zne.scaling import fold_gates_from_left
