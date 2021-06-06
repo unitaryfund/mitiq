@@ -43,7 +43,7 @@ def test_calculate_observable_sigmaz(op_and_expectation_value):
     assert np.isclose(
         calculate_observable(simulator(circuit, shots=10_000), sigma_z),
         expected,
-        atol=1e-2,
+        atol=1e-1,
     )
 
 

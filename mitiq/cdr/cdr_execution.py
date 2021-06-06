@@ -15,7 +15,7 @@
 
 """API for using Clifford Data Regression (CDR) error mitigation."""
 
-from typing import List, Union, Callable, Sequence
+from typing import List, Union, Callable, Sequence, Tuple
 
 import numpy as np
 from scipy.optimize import curve_fit
@@ -41,7 +41,7 @@ def execute_with_cdr(
     scale_factors: Sequence[float] = (1,),
     scale_noise: Callable[[Circuit, float], Circuit] = fold_gates_at_random,
     **kwargs: dict,
-) -> (List[List], List[List]):
+) -> Tuple[List[np.ndarray], List[float]]:
     """Function for the calculation of an observable from some circuit of
     interest to be mitigated with CDR (or vnCDR) based on [Czarnik2020]_ and
     [Lowe2020]_.
@@ -149,7 +149,7 @@ def execute_with_cdr(
     )
     ideal_counts = np.array([simulator(circ) for circ in all_circuits[0]])
 
-    # Do the regression.
+    # TODO: What is this used for?
     results_dict_circuit_of_interest = noisy_counts[:, 0]
 
     mitigated_observables = []
@@ -157,9 +157,7 @@ def execute_with_cdr(
     for obs in observables:
         circuit_data = np.array(
             [
-                calculate_observable(
-                    state_or_measurements=measurements, observable=obs
-                )
+                calculate_observable(measurements, obs)
                 for measurements in results_dict_circuit_of_interest
             ]
         )
@@ -168,9 +166,7 @@ def execute_with_cdr(
         noisy_expectation_values = np.array(
             [
                 [
-                    calculate_observable(
-                        state_or_measurements=measurements, observable=obs
-                    )
+                    calculate_observable(measurements, obs)
                     for measurements in row
                 ]
                 for row in noisy_counts
@@ -197,4 +193,5 @@ def execute_with_cdr(
         mitigated_observables.append(ansatz(circuit_data, fitted_params))
         raw_observables.append(circuit_data)
 
+    # TODO: Why return raw observables?
     return raw_observables, mitigated_observables
