@@ -22,7 +22,8 @@ MeasurementResult = Union[Dict[bin, int], CounterType[bin]]
 
 
 def calculate_observable(
-    state_or_measurements: Union[MeasurementResult, np.ndarray], observable: np.ndarray
+    state_or_measurements: Union[MeasurementResult, np.ndarray],
+    observable: np.ndarray,
 ) -> float:
     """Returns (estimate of) ⟨𝛹| O |𝛹⟩ for diagonal observable O and quantum
      state |𝛹⟩.
@@ -39,7 +40,11 @@ def calculate_observable(
 
     if isinstance(state_or_measurements, np.ndarray):
         observable_values = [
-            observable[i] * abs(np.conjugate(state_or_measurements[i]) * state_or_measurements[i])
+            observable[i]
+            * abs(
+                np.conjugate(state_or_measurements[i])
+                * state_or_measurements[i]
+            )
             for i in range(2 ** nqubits)
         ]
     elif isinstance(state_or_measurements, (dict, Counter)):
@@ -64,4 +69,6 @@ def normalize_measurements(counts: MeasurementResult) -> Dict[bin, float]:
             and each value is an int.
     """
     total_counts = sum(counts.values())
-    return {bitstring: count / total_counts for bitstring, count in counts.items()}
+    return {
+        bitstring: count / total_counts for bitstring, count in counts.items()
+    }

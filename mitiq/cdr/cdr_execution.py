@@ -155,21 +155,37 @@ def execute_with_cdr(
     mitigated_observables = []
     raw_observables = []
     for obs in observables:
-        circuit_data = np.array([
-            calculate_observable(state_or_measurements=measurements, observable=obs)
-            for measurements in results_dict_circuit_of_interest
-        ])
+        circuit_data = np.array(
+            [
+                calculate_observable(
+                    state_or_measurements=measurements, observable=obs
+                )
+                for measurements in results_dict_circuit_of_interest
+            ]
+        )
 
         # Get the noisy ⟨𝛹| O |𝛹⟩ from the noisy (executor) counts.
-        noisy_expectation_values = np.array([
-            [calculate_observable(state_or_measurements=measurements, observable=obs) for measurements in row]
-            for row in noisy_counts
-        ])
+        noisy_expectation_values = np.array(
+            [
+                [
+                    calculate_observable(
+                        state_or_measurements=measurements, observable=obs
+                    )
+                    for measurements in row
+                ]
+                for row in noisy_counts
+            ]
+        )
 
         # Get the exact ⟨𝛹| O |𝛹⟩ from the exact (simulator) counts.
-        ideal_expectation_values = np.array([
-            calculate_observable(state_or_measurements=measurements, observable=obs) for measurements in ideal_counts
-        ])
+        ideal_expectation_values = np.array(
+            [
+                calculate_observable(
+                    state_or_measurements=measurements, observable=obs
+                )
+                for measurements in ideal_counts
+            ]
+        )
 
         # Do the regression.
         fitted_params, _ = curve_fit(

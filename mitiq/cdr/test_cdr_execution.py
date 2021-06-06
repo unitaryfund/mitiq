@@ -24,16 +24,18 @@ from mitiq.cdr.cdr_execution import execute_with_cdr
 from mitiq.cdr.data_regression import linear_fit_function_no_intercept
 from mitiq.zne.scaling import fold_gates_from_left
 from mitiq.cdr.execute import calculate_observable
-from mitiq.cdr._testing import random_x_z_circuit, executor, simulator_statevector
+from mitiq.cdr._testing import (
+    random_x_z_circuit,
+    executor,
+    simulator_statevector,
+)
 
 
 executor = partial(executor, noise_level=0.5)
 
 
 # circuit used for unit tests:
-circuit = random_x_z_circuit(
-    LineQubit.range(2), n_moments=2, random_state=1
-)
+circuit = random_x_z_circuit(LineQubit.range(2), n_moments=2, random_state=1)
 
 # define observables for testing
 sigma_z = np.diag([1, -1])

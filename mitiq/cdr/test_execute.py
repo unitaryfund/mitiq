@@ -27,19 +27,23 @@ from mitiq.cdr._testing import simulator_statevector, simulator
 sigma_z = np.diag(np.diag([1, -1]))
 
 
-@pytest.mark.parametrize("op_and_expectation_value", ((cirq.I, 1.0), (cirq.H, 0.0), (cirq.X, -1.0)))
+@pytest.mark.parametrize(
+    "op_and_expectation_value", ((cirq.I, 1.0), (cirq.H, 0.0), (cirq.X, -1.0))
+)
 def test_calculate_observable_sigmaz(op_and_expectation_value):
     """Tests <psi|Z|psi> is correct for |psi> \in {|0>, |+>, |1>}."""
     op, expected = op_and_expectation_value
     circuit = cirq.Circuit(op.on(cirq.LineQubit(0)))
     assert np.isclose(
-        calculate_observable(simulator_statevector(circuit), sigma_z), expected,
-        atol=1e-7
+        calculate_observable(simulator_statevector(circuit), sigma_z),
+        expected,
+        atol=1e-7,
     )
 
     assert np.isclose(
-        calculate_observable(simulator(circuit, shots=10_000), sigma_z), expected,
-        atol=1e-2
+        calculate_observable(simulator(circuit, shots=10_000), sigma_z),
+        expected,
+        atol=1e-2,
     )
 
 
