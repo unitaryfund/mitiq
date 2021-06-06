@@ -111,11 +111,10 @@ def construct_circuit_data_floats(
                     the counts.
     Returns: Array of floats for observable calculated from input data.
     """
-    circuit_data_floats = []
-    for result in circuit_data:
-        obs_raw = calculate_observable(result, observable)
-        circuit_data_floats.append(obs_raw)
-    return circuit_data_floats
+    return np.array([
+        calculate_observable(state_or_measurements=measurements, observable=observable)
+        for measurements in circuit_data
+    ])
 
 
 def measurements_to_probabilities(
