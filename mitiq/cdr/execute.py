@@ -99,24 +99,6 @@ def construct_training_data_floats(
     return (X_data, Y_data)
 
 
-def construct_circuit_data_floats(
-    circuit_data: List[MeasurementResult], observable: np.ndarray
-) -> np.ndarray:
-    """Returns circuit of interest now as two arrays of floats.
-    Args:
-        circuit_data: List of dictionary of counts for circuit of interest
-                      and all noise levels.
-        observable: Option to be passed to use defined observable function that
-                    defines how to calculate the value of an observable from
-                    the counts.
-    Returns: Array of floats for observable calculated from input data.
-    """
-    return np.array([
-        calculate_observable(state_or_measurements=measurements, observable=observable)
-        for measurements in circuit_data
-    ])
-
-
 def measurements_to_probabilities(
     counts: MeasurementResult, nqubits: int,
 ) -> MeasurementResult:

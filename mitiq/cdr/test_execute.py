@@ -22,7 +22,6 @@ import cirq
 
 from mitiq.cdr.execute import (
     construct_training_data_floats,
-    construct_circuit_data_floats,
     calculate_observable,
     measurements_to_probabilities,
 )
@@ -156,20 +155,6 @@ def test_construct_training_data_floats(noise_levels):
     print(train_data)
     # assert False
     assert len(train_data[0][0]) == noise_levels
-
-
-@pytest.mark.parametrize("noise_levels", [1, 2])
-def test_construct_circuit_data_floats(noise_levels):
-    results = (
-        results_circuit_of_interest_one_noise_level
-        if noise_levels == 1
-        else results_circuit_of_interest
-    )
-    data = construct_circuit_data_floats(results, sigma_z)
-    print(data)
-    print(np.array(data).shape)
-    # assert False
-    assert len(data) == noise_levels
 
 
 def test_dictionary_to_probabilities():

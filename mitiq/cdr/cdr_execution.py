@@ -26,7 +26,7 @@ from mitiq.cdr.clifford_training_data import generate_training_circuits
 from mitiq.cdr.data_regression import linear_fit_function
 from mitiq.cdr.execute import (
     construct_training_data_floats,
-    construct_circuit_data_floats,
+    calculate_observable,
 )
 from mitiq.zne.scaling import fold_gates_at_random
 
@@ -160,9 +160,10 @@ def execute_with_CDR(
     mitigated_observables = []
     raw_observables = []
     for obs in observables:
-        circuit_data = construct_circuit_data_floats(
-            results_dict_circuit_of_interest, obs
-        )
+        circuit_data = np.array([
+            calculate_observable(state_or_measurements=measurements, observable=obs)
+            for measurements in results_dict_circuit_of_interest
+        ])
         train_data = construct_training_data_floats(
             results_dict_training_circuits, obs
         )
