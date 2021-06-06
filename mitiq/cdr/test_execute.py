@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tests for the data regression portion of Clifford data regression."""
-from typing import Dict
 import pytest
 import numpy as np
 
@@ -25,59 +24,12 @@ from mitiq.cdr.execute import (
     calculate_observable,
     measurements_to_probabilities,
 )
-from mitiq.cdr._testing import random_x_z_circuit
+from mitiq.cdr._testing import random_x_z_circuit, executor, simulator_statevector, simulator
 from mitiq.cdr.clifford_training_data import generate_training_circuits
 from mitiq.zne.scaling import fold_gates_from_left
 
 # Observables.
 sigma_z = np.diag(np.diag([1, -1]))
-
-
-# Executors.
-def executor(
-    circuit: cirq.Circuit, noise_level: float = 0.1, shots: int = 8192
-) -> Dict[bin, int]:
-    """Returns computational basis measurements after executing the circuit
-    with depolarizing noise.
-
-    Args:
-        circuit: Circuit to execute.
-        noise_level: Probability of depolarizing noise after each moment.
-        shots: Number of samples to take.
-
-    Returns:
-        Dictionary where each key is a bitstring (binary int) and each value
-        is the number of times that bitstring was measured.
-    """
-    circuit = circuit.with_noise(cirq.depolarize(p=noise_level))
-    circuit.append(cirq.measure(*circuit.all_qubits(), key="z"))
-
-    result = cirq.DensityMatrixSimulator().run(circuit, repetitions=shots)
-    return {bin(k): v for k, v in result.histogram(key="z").items()}
-
-
-def simulator(circuit: cirq.Circuit, shots: int = 8192) -> dict:
-    """Returns computational basis measurements after executing the circuit
-    (without noise).
-
-    Args:
-        circuit: Circuit to simulate.
-        shots: Number of samples to take.
-
-    Returns:
-        Dictionary where each key is a bitstring (binary int) and each value
-        is the number of times that bitstring was measured.
-    """
-    return executor(circuit, noise_level=0.0, shots=shots)
-
-
-def simulator_statevector(circuit: cirq.Circuit) -> np.ndarray:
-    """Returns the final wavefunction (as a numpy array) of the circuit.
-
-    Args:
-        circuit: Circuit to simulate.
-    """
-    return cirq.Simulator().simulate(circuit).final_state_vector
 
 
 # Test circuit.
