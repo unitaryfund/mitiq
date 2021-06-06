@@ -14,9 +14,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tests for the data regression portion of Clifford data regression."""
+from collections import Counter
 import pytest
-import numpy as np
 
+import numpy as np
 import cirq
 
 from mitiq.cdr.execute import calculate_observable, normalize_measurements
@@ -42,7 +43,15 @@ def test_calculate_observable_sigmaz(op_and_expectation_value):
     )
 
 
-def test_dictionary_to_probabilities():
-    counts = {bin(0): 2, bin(1): 3}
+@pytest.mark.parametrize("measurements_type", ("Counter", "Dict"))
+def test_dictionary_to_probabilities(measurements_type):
+    counts = {bin(0): 2, bin(10): 3}
+    if measurements_type == "Counter":
+        counts = Counter(counts)
+
     normalized_counts = normalize_measurements(counts)
-    assert normalized_counts == {bin(0): 2 / 5, bin(1): 3 / 5}
+    assert normalized_counts == {bin(0): 2 / 5, bin(10): 3 / 5}
+
+
+def test_normalize_measurements_empty_dict():
+    assert normalize_measurements({}) == {}
