@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from typing import Dict
+
 import numpy as np
 import cirq
 
@@ -47,3 +49,50 @@ def random_x_z_cnot_circuit(qubits, n_moments, random_state) -> cirq.Circuit:
         gate_domain=gate_domain,
         random_state=random_state,
     )
+
+
+# Executors.
+def executor(
+    circuit: cirq.Circuit, noise_level: float = 0.1, shots: int = 8192
+) -> Dict[bin, int]:
+    """Returns computational basis measurements after executing the circuit
+    with depolarizing noise.
+
+    Args:
+        circuit: Circuit to execute.
+        noise_level: Probability of depolarizing noise after each moment.
+        shots: Number of samples to take.
+
+    Returns:
+        Dictionary where each key is a bitstring (binary int) and each value
+        is the number of times that bitstring was measured.
+    """
+    circuit = circuit.with_noise(cirq.depolarize(p=noise_level))
+    circuit.append(cirq.measure(*circuit.all_qubits(), key="z"))
+
+    result = cirq.DensityMatrixSimulator().run(circuit, repetitions=shots)
+    return {bin(k): v for k, v in result.histogram(key="z").items()}
+
+
+def simulator(circuit: cirq.Circuit, shots: int = 8192) -> dict:
+    """Returns computational basis measurements after executing the circuit
+    (without noise).
+
+    Args:
+        circuit: Circuit to simulate.
+        shots: Number of samples to take.
+
+    Returns:
+        Dictionary where each key is a bitstring (binary int) and each value
+        is the number of times that bitstring was measured.
+    """
+    return executor(circuit, noise_level=0.0, shots=shots)
+
+
+def simulator_statevector(circuit: cirq.Circuit) -> np.ndarray:
+    """Returns the final wavefunction (as a numpy array) of the circuit.
+
+    Args:
+        circuit: Circuit to simulate.
+    """
+    return cirq.Simulator().simulate(circuit).final_state_vector

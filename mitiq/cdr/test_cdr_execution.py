@@ -15,6 +15,7 @@
 
 """Tests for the Clifford data regression top-level API."""
 from collections import Counter
+from functools import partial
 
 import numpy as np
 
@@ -23,47 +24,10 @@ from cirq import (Circuit, depolarize, DensityMatrixSimulator, ops, Simulator, L
 from mitiq.cdr.cdr_execution import execute_with_CDR
 from mitiq.zne.scaling import fold_gates_from_left
 from mitiq.cdr.execute import calculate_observable
-from mitiq.cdr._testing import random_x_z_circuit
+from mitiq.cdr._testing import random_x_z_circuit, executor, simulator_statevector
 
 
-# Defines executor used in circuit tests:
-def executor(circuit: Circuit) -> dict:
-    """ executor for unit tests. """
-    circuit_copy = circuit.copy()
-    for qid in list(Circuit.all_qubits(circuit_copy)):
-        circuit_copy.append(ops.measure(qid))
-    simulator = DensityMatrixSimulator()
-    circuit_with_noise = circuit_copy.with_noise(depolarize(p=0.5))
-    result = simulator.run(circuit_with_noise, repetitions=8192)
-    counts = result.multi_measurement_histogram(
-        keys=Circuit.all_qubits(circuit_with_noise)
-    )
-    dict_counts = counter_to_dict(counts)
-    return dict_counts
-
-
-# Defines a function (which could be user defined) that converts a python
-# Counter object which is returned by cirq into a dictionary of counts.
-def counter_to_dict(counts: Counter) -> dict:
-    """ Returns a dictionary of counts. Takes cirq output 'Counter' object to
-    binary counts. I assume this is the format which we will be working with
-    from now on.
-    Args:
-        counts: Counter object returned by cirq with the results of a circuit.
-    """
-    counts_dict = {}
-    for key, value in counts.items():
-        key2 = bin(int("".join(str(ele) for ele in key), 2))
-        counts_dict[key2] = value
-    return counts_dict
-
-
-def simulator_statevector(circuit: Circuit) -> np.ndarray:
-    circuit_copy = circuit.copy()
-    simulator = Simulator()
-    result = simulator.simulate(circuit_copy)
-    statevector = result.final_state_vector
-    return statevector
+executor = partial(executor, noise_level=0.5)
 
 
 # circuit used for unit tests:
