@@ -1,14 +1,17 @@
+# Mitiq
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
 [![Documentation Status](https://readthedocs.org/projects/mitiq/badge/?version=stable)](https://mitiq.readthedocs.io/en/stable/)
 [![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
 [![arXiv](https://img.shields.io/badge/arXiv-2009.04417-<COLOR>.svg)](https://arxiv.org/abs/2009.04417)
 [![Downloads](https://static.pepy.tech/personalized-badge/mitiq?period=total&units=international_system&left_color=black&right_color=green&left_text=Downloads)](https://pepy.tech/project/mitiq)
-[![Repository](https://img.shields.io/badge/GitHub-5C5C5C.svg?logo=github)](https://github.com/unitaryfund/mitiq)
+[![Repository](https://img.shields.io/badge/GitHub-5C5C5C.svg?logo=github
+)](https://github.com/unitaryfund/mitiq)
+
 
 [![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
 
-# Mitiq
+![logo](docs/assets/mitiq-logo.png)
 
 Mitiq is a Python toolkit for implementing error mitigation techniques on
 quantum computers.
@@ -110,12 +113,12 @@ Error in simulation (with mitigation): 0.000519
 
 ### Example with Qiskit
 
-![Alt Text](assets/qiskit.gif)
+![Alt Text](docs/assets/qiskit.gif)
 
 
 ### Example with Cirq
 
-![Alt Text](assets/cirq.gif)
+![Alt Text](docs/assets/cirq.gif)
 
 
 ## Error mitigation techniques
