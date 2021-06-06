@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Counter, Dict, List, Union
+from typing import Counter, Dict, Union
 
 import numpy as np
 
@@ -41,7 +41,7 @@ def calculate_observable(
             observable[i] * abs(np.conjugate(state_or_measurements[i]) * state_or_measurements[i])
             for i in range(2 ** nqubits)
         ]
-    elif isinstance(state_or_measurements, dict):
+    elif isinstance(state_or_measurements, (dict, Counter)):
         # order the counts and add zeros:
         state_or_measurements = measurements_to_probabilities(state_or_measurements, nqubits)
         values = list(state_or_measurements.values())
@@ -55,48 +55,6 @@ def calculate_observable(
         )
 
     return sum(np.real(observable_values))
-
-
-def construct_training_data_floats(
-    training_data: List[MeasurementResult], observable: np.ndarray,
-) -> (np.ndarray, np.ndarray):
-    """Function to calculate training data now as two arrays of floats to be
-    used in the regression (raw_training_data, simulated_training_data).
-    Args:
-        training_data: List of dictionary of counts for all training circuits
-                       and all noise levels. In the form:
-
-        ([List[dict] (simulated data), [List[List[dict]] (real circuit data)])
-
-        observable: Option to be passed to use defined observable function that
-                    defines how to calculate the value of an observable from
-                    the counts.
-    Returns: Tuple of np.ndarray of dimensions
-            (num_training_circuits x noise_levels) and (num_training_circuits).
-    """
-    training_circuits_raw_data = training_data[1]
-    training_circuits_simulated_data = training_data[0]
-    noise_levels = len(training_circuits_raw_data)
-    number_of_training_circuits = len(training_circuits_simulated_data)
-
-    # first need to sort the training data, then will do a regression.
-    X_data = np.zeros((number_of_training_circuits, noise_levels))
-    Y_data = np.zeros(number_of_training_circuits)
-    for i, training_circuit_raw_data_one_noise_level in enumerate(
-        training_circuits_raw_data
-    ):
-        for j, training_circuit_dict in enumerate(
-            training_circuit_raw_data_one_noise_level
-        ):
-            training_obs_raw = calculate_observable(
-                training_circuit_dict, observable
-            )
-            X_data[j, i] = training_obs_raw
-            if i == 0:
-                Y_data[j] = calculate_observable(
-                    training_circuits_simulated_data[j], observable
-                )
-    return (X_data, Y_data)
 
 
 def measurements_to_probabilities(

@@ -19,11 +19,7 @@ import numpy as np
 
 import cirq
 
-from mitiq.cdr.execute import (
-    construct_training_data_floats,
-    calculate_observable,
-    measurements_to_probabilities,
-)
+from mitiq.cdr.execute import (calculate_observable, measurements_to_probabilities)
 from mitiq.cdr._testing import random_x_z_circuit, executor, simulator_statevector, simulator
 from mitiq.cdr.clifford_training_data import generate_training_circuits
 from mitiq.zne.scaling import fold_gates_from_left
@@ -94,19 +90,6 @@ def test_calculate_observable_sigmaz(op_and_expectation_value):
         calculate_observable(simulator(circuit, shots=10_000), sigma_z), expected,
         atol=1e-2
     )
-
-
-@pytest.mark.parametrize("noise_levels", [1, 2])
-def test_construct_training_data_floats(noise_levels):
-    results = (
-        results_training_circuits_one_noise_level
-        if noise_levels == 1
-        else results_training_circuits
-    )
-    train_data = construct_training_data_floats(results, sigma_z)
-    print(train_data)
-    # assert False
-    assert len(train_data[0][0]) == noise_levels
 
 
 def test_dictionary_to_probabilities():

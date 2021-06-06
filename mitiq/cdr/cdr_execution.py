@@ -24,10 +24,7 @@ from cirq.circuits import Circuit
 
 from mitiq.cdr.clifford_training_data import generate_training_circuits
 from mitiq.cdr.data_regression import linear_fit_function
-from mitiq.cdr.execute import (
-    construct_training_data_floats,
-    calculate_observable,
-)
+from mitiq.cdr.execute import calculate_observable
 from mitiq.zne.scaling import fold_gates_at_random
 
 
@@ -146,17 +143,15 @@ def execute_with_CDR(
         for c in [circuit] + training_circuits
     ]
 
-    # Execute all circuits. TODO: Allow for batching.
-    executor_data = np.array(
+    # Execute all circuits to get MeasurementResult's. TODO: Allow batching.
+    noisy_counts = np.array(
         [[executor(circ) for circ in circuits] for circuits in all_circuits]
     )
-    simulator_data = np.array([simulator(circ) for circ in all_circuits[0]])
+    ideal_counts = np.array([simulator(circ) for circ in all_circuits[0]])
 
     # Do the regression.
-    results_dict_training_circuits = [simulator_data, executor_data]
-    results_dict_circuit_of_interest = executor_data[:, 0]
+    results_dict_circuit_of_interest = noisy_counts[:, 0]
 
-    # Now the regression:
     mitigated_observables = []
     raw_observables = []
     for obs in observables:
@@ -164,14 +159,23 @@ def execute_with_CDR(
             calculate_observable(state_or_measurements=measurements, observable=obs)
             for measurements in results_dict_circuit_of_interest
         ])
-        train_data = construct_training_data_floats(
-            results_dict_training_circuits, obs
-        )
-        # going to add general regression section here:
+
+        # Get the noisy ⟨𝛹| O |𝛹⟩ from the noisy (executor) counts.
+        noisy_expectation_values = np.array([
+            [calculate_observable(state_or_measurements=measurements, observable=obs) for measurements in row]
+            for row in noisy_counts
+        ])
+
+        # Get the exact ⟨𝛹| O |𝛹⟩ from the exact (simulator) counts.
+        ideal_expectation_values = np.array([
+            calculate_observable(state_or_measurements=measurements, observable=obs) for measurements in ideal_counts
+        ])
+
+        # Do the regression.
         fitted_params, _ = curve_fit(
             lambda x, *params: ansatz(x, params),
-            train_data[0].T,
-            train_data[1],
+            noisy_expectation_values,
+            ideal_expectation_values,
             p0=np.zeros(num_parameters),
         )
         mitigated_observables.append(ansatz(circuit_data, fitted_params))
