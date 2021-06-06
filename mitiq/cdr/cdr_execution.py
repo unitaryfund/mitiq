@@ -24,18 +24,18 @@ from cirq.circuits import Circuit
 
 from mitiq.cdr.clifford_training_data import generate_training_circuits
 from mitiq.cdr.data_regression import linear_fit_function
-from mitiq.cdr.execute import calculate_observable
+from mitiq.cdr.execute import calculate_observable, MeasurementResult
 from mitiq.zne.scaling import fold_gates_at_random
 
 
 # TODO: Allow for any QPROGRAM, not just a cirq.Circuit.
 def execute_with_cdr(
     circuit: Circuit,
-    executor: Callable[[Circuit], dict],
-    simulator: Callable[[Circuit], Union[dict, np.ndarray]],
+    executor: Callable[[Circuit], MeasurementResult],
+    simulator: Callable[[Circuit], Union[MeasurementResult, np.ndarray]],
     observables: List[np.ndarray],
-    num_training_circuits: int,
-    fraction_non_clifford: float,
+    num_training_circuits: int = 10,
+    fraction_non_clifford: float = 0.1,
     ansatz: Callable[..., float] = linear_fit_function,
     num_parameters: int = None,
     scale_factors: Sequence[float] = (1,),
