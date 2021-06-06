@@ -20,7 +20,7 @@ import numpy as np
 
 from cirq import LineQubit
 
-from mitiq.cdr.cdr_execution import execute_with_cdr
+from mitiq.cdr.cdr import execute_with_cdr
 from mitiq.cdr.data_regression import linear_fit_function_no_intercept
 from mitiq.zne.scaling import fold_gates_from_left
 from mitiq.cdr.execute import calculate_observable
