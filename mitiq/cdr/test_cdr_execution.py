@@ -20,7 +20,7 @@ import numpy as np
 
 from cirq import LineQubit
 
-from mitiq.cdr.cdr_execution import execute_with_CDR
+from mitiq.cdr.cdr_execution import execute_with_cdr
 from mitiq.cdr.data_regression import linear_fit_function_no_intercept
 from mitiq.zne.scaling import fold_gates_from_left
 from mitiq.cdr.execute import calculate_observable
@@ -59,7 +59,7 @@ def test_execute_with_cdr():
     }
     num_circuits = 4
     frac_non_cliff = 0.5
-    results0 = execute_with_CDR(
+    results0 = execute_with_cdr(
         circuit,
         executor,
         simulator_statevector,
@@ -67,7 +67,7 @@ def test_execute_with_cdr():
         num_circuits,
         frac_non_cliff,
     )
-    results1 = execute_with_CDR(
+    results1 = execute_with_cdr(
         circuit,
         executor,
         simulator_statevector,

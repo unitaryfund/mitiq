@@ -29,7 +29,7 @@ from mitiq.zne.scaling import fold_gates_at_random
 
 
 # TODO: Allow for any QPROGRAM, not just a cirq.Circuit.
-def execute_with_CDR(
+def execute_with_cdr(
     circuit: Circuit,
     executor: Callable[[Circuit], dict],
     simulator: Callable[[Circuit], Union[dict, np.ndarray]],
