@@ -19,4 +19,16 @@ from mitiq.pec.representations.depolarizing import (
     represent_operation_with_local_depolarizing_noise,
     represent_operations_in_circuit_with_global_depolarizing_noise,
     represent_operations_in_circuit_with_local_depolarizing_noise,
+    global_depolarizing_kraus,
+    local_depolarizing_kraus,
+)
+
+from mitiq.pec.representations.damping import (
+    _represent_operation_with_amplitude_damping_noise,
+    amplitude_damping_kraus,
+)
+
+from mitiq.pec.representations.optimal import (
+    minimize_one_norm,
+    find_optimal_representation,
 )

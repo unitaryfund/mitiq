@@ -29,6 +29,7 @@ from mitiq.conversions import (
     CircuitConversionError,
     UnsupportedCircuitError,
 )
+from mitiq.utils import _equal
 
 
 class NoisyOperation:
@@ -488,3 +489,30 @@ class OperationRepresentation:
         # TODO: This works well for one-qubit representations, but doesn't
         #  display nicely in general.
         return str(self._ideal) + " = " + str(self.basis_expansion)
+
+    def __eq__(self, other) -> bool:
+        """Checks if two representations are equivalent. This function return
+        True if the representations have the same ideal operation, the same
+        coefficients and equivalent NoisyOperation(s) (same gates but not
+        necessarily same real matrix representations since real matrices are
+        optional).
+        """
+        if self._native_type != other._native_type:
+            return False
+        if not _equal(self.ideal, other.ideal):
+            return False
+        noisy_ops_a = self.noisy_operations
+        noisy_ops_b = other.noisy_operations
+        if len(noisy_ops_a) != len(noisy_ops_b):
+            return False
+        for op_a in noisy_ops_a:
+            found = False
+            for op_b in noisy_ops_b:
+                if _equal(op_a._ideal, op_b._ideal):
+                    found = True
+                    break
+            if not found:
+                return False
+            if not np.isclose(self.coeff_of(op_a), other.coeff_of(op_b)):
+                return False
+        return True
