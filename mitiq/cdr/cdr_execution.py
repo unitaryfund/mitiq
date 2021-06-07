@@ -32,14 +32,14 @@ from mitiq.zne.scaling import fold_gates_at_random
 
 
 # TODO: Allow for any QPROGRAM, not just a cirq.Circuit.
-def execute_with_CDR(
+def execute_with_cdr(
     circuit: Circuit,
     executor: Callable[[Circuit], dict],
     simulator: Callable[[Circuit], Union[dict, np.ndarray]],
     observables: List[np.ndarray],
     num_training_circuits: int,
     fraction_non_clifford: float,
-    ansatz: Callable[[np.ndarray, List], List] = linear_fit_function,
+    fit_function: Callable[[np.ndarray, List], List] = linear_fit_function,
     num_parameters: int = None,
     scale_factors: Sequence[float] = (1,),
     scale_noise: Callable[[Circuit, float], Circuit] = fold_gates_at_random,
@@ -79,9 +79,9 @@ def execute_with_CDR(
                                subsituted in the training circuits. The higher
                                this fraction the more costly the simulations,
                                but more successful the mitigation.
-        ansatz: The function to map noisy to exact data. Takes array of noisy
-                and data and parameters returning a float.
-        num_parameters: The number of paramters the ansatz takes.
+        fit_function: The function to map noisy to exact data. Takes array of
+                      noisy and data and parameters returning a float.
+        num_parameters: The number of paramters the fit_function takes.
         scale_noise: Optional argument containing a user defined function on
                      how to increase the noise. If this argument is given then
                      the mitigation method will be vnCDR.
@@ -108,9 +108,9 @@ def execute_with_CDR(
                                      for ``method_replace='gaussian'``.
             - random_state (int): Seed for sampling.
 
-    Returns: The tuple (raw_expectations, mitigated_expectations)
-             corresponding to the many raw expectation values (at different
-             noise levels) and the associated mitigated values.
+    Returns: The tuple (cdr_values, cdr_raw_data) corresponding
+             to the mitigated expectation values and to the raw expectation
+             values (at different noise levels).
 
     .. [Czarnik2020] : Piotr Czarnik, Andrew Arramsmith, Patrick Coles,
         Lukasz Cincio, "Error mitigation with Clifford quantum circuit
@@ -168,12 +168,12 @@ def execute_with_CDR(
         )
         # going to add general regression section here:
         fitted_params, _ = curve_fit(
-            lambda x, *params: ansatz(x, params),
+            lambda x, *params: fit_function(x, params),
             train_data[0].T,
             train_data[1],
             p0=np.zeros(num_parameters),
         )
-        mitigated_observables.append(ansatz(circuit_data, fitted_params))
+        mitigated_observables.append(fit_function(circuit_data, fitted_params))
         raw_observables.append(circuit_data)
 
-    return raw_observables, mitigated_observables
+    return mitigated_observables, raw_observables

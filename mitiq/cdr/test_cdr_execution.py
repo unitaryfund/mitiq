@@ -21,7 +21,7 @@ from cirq import Simulator
 from cirq import depolarize
 from cirq import DensityMatrixSimulator
 
-from mitiq.cdr.cdr_execution import execute_with_CDR
+from mitiq.cdr.cdr_execution import execute_with_cdr
 
 from mitiq.zne.scaling import fold_gates_from_left
 
@@ -125,7 +125,7 @@ def test_execute_with_cdr():
     }
     num_circuits = 4
     frac_non_cliff = 0.5
-    results0 = execute_with_CDR(
+    results0 = execute_with_cdr(
         circuit,
         executor,
         simulator_statevector,
@@ -133,7 +133,7 @@ def test_execute_with_cdr():
         num_circuits,
         frac_non_cliff,
     )
-    results1 = execute_with_CDR(
+    results1 = execute_with_cdr(
         circuit,
         executor,
         simulator_statevector,
@@ -148,6 +148,6 @@ def test_execute_with_cdr():
     )
     for results in [results0, results1]:
         for i in range(len(results[1])):
-            assert abs(results[0][i][0] - exact_solution[i]) > abs(
-                results[1][i] - exact_solution[i]
+            assert abs(results[1][i][0] - exact_solution[i]) > abs(
+                results[0][i] - exact_solution[i]
             )
