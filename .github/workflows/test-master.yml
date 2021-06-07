@@ -28,6 +28,3 @@ jobs:
             make install requirements
         - name: Run the Mitiq unit tests via pytest
           run: make test
-        - name: Run the type checker
-          run: make check-types
-          
