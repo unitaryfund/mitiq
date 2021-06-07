@@ -12,6 +12,6 @@ quantum programs. For an introduction to the error mitigation techniques impleme
 
 Developed by `Unitary Fund <https://unitary.fund/>`_, Mitiq is a framework agnostic
 library with a long-term vision to be useful for quantum programmers using any quantum programming
-framework and any quantum backend. Today we support `Cirq <https://cirq.readthedocs.io/en/stable/>`_,
+framework and any quantum backend. Today we support `Cirq <https://quantumai.google/cirq/>`_,
 `Qiskit <https://qiskit.org/>`_, and `PyQuil <https://pyquil-docs.rigetti.com/en/stable/>`_
 frontends and backends.
