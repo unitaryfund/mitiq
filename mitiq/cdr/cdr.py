@@ -34,15 +34,9 @@ def execute_with_cdr(
     executor: Callable[[Circuit], MeasurementResult],
     simulator: Callable[[Circuit], Union[MeasurementResult, np.ndarray]],
     observables: List[np.ndarray],
-<<<<<<< HEAD:mitiq/cdr/cdr_execution.py
-    num_training_circuits: int,
-    fraction_non_clifford: float,
-    fit_function: Callable[[np.ndarray, List], List] = linear_fit_function,
-=======
     num_training_circuits: int = 10,
     fraction_non_clifford: float = 0.1,
-    ansatz: Callable[..., float] = linear_fit_function,
->>>>>>> f39c3f96eb655d44cab5faa3abac1cbec94a48db:mitiq/cdr/cdr.py
+    fit_function: Callable[..., float] = linear_fit_function,
     num_parameters: int = None,
     scale_factors: Sequence[float] = (1,),
     scale_noise: Callable[[Circuit, float], Circuit] = fold_gates_at_random,
@@ -61,8 +55,8 @@ def execute_with_cdr(
     these observables MUST be diagonal in z-basis measurements corresponding to
     the circuit of interest.
 
-    Returns list of raw observables (at noise scale factors) and mitigated
-    observables.
+    Returns mitigated observables list of raw observables (at noise scale
+    factors).
 
     This function returns the mitigated observable/s.
     Args:
@@ -191,23 +185,13 @@ def execute_with_cdr(
 
         # Do the regression.
         fitted_params, _ = curve_fit(
-<<<<<<< HEAD:mitiq/cdr/cdr_execution.py
             lambda x, *params: fit_function(x, params),
-            train_data[0].T,
-            train_data[1],
-=======
-            lambda x, *params: ansatz(x, params),
             noisy_expectation_values,
             ideal_expectation_values,
->>>>>>> f39c3f96eb655d44cab5faa3abac1cbec94a48db:mitiq/cdr/cdr.py
             p0=np.zeros(num_parameters),
         )
         mitigated_observables.append(fit_function(circuit_data, fitted_params))
         raw_observables.append(circuit_data)
 
-<<<<<<< HEAD:mitiq/cdr/cdr_execution.py
-    return mitigated_observables, raw_observables
-=======
     # TODO: Why return raw observables?
-    return raw_observables, mitigated_observables
->>>>>>> f39c3f96eb655d44cab5faa3abac1cbec94a48db:mitiq/cdr/cdr.py
+    return mitigated_observables, raw_observables
