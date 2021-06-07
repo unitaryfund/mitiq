@@ -15,7 +15,7 @@
 
 """API for using Clifford Data Regression (CDR) error mitigation."""
 
-from typing import List, Union, Callable, Sequence
+from typing import List, Union, Callable, Sequence, Tuple
 
 import numpy as np
 from scipy.optimize import curve_fit
@@ -23,28 +23,31 @@ from scipy.optimize import curve_fit
 from cirq.circuits import Circuit
 
 from mitiq.cdr.clifford_training_data import generate_training_circuits
-from mitiq.cdr.data_regression import (
-    construct_training_data_floats,
-    construct_circuit_data_floats,
-    linear_fit_function,
-)
+from mitiq.cdr.data_regression import linear_fit_function
+from mitiq.cdr.execute import calculate_observable, MeasurementResult
 from mitiq.zne.scaling import fold_gates_at_random
 
 
 # TODO: Allow for any QPROGRAM, not just a cirq.Circuit.
 def execute_with_cdr(
     circuit: Circuit,
-    executor: Callable[[Circuit], dict],
-    simulator: Callable[[Circuit], Union[dict, np.ndarray]],
+    executor: Callable[[Circuit], MeasurementResult],
+    simulator: Callable[[Circuit], Union[MeasurementResult, np.ndarray]],
     observables: List[np.ndarray],
+<<<<<<< HEAD:mitiq/cdr/cdr_execution.py
     num_training_circuits: int,
     fraction_non_clifford: float,
     fit_function: Callable[[np.ndarray, List], List] = linear_fit_function,
+=======
+    num_training_circuits: int = 10,
+    fraction_non_clifford: float = 0.1,
+    ansatz: Callable[..., float] = linear_fit_function,
+>>>>>>> f39c3f96eb655d44cab5faa3abac1cbec94a48db:mitiq/cdr/cdr.py
     num_parameters: int = None,
     scale_factors: Sequence[float] = (1,),
     scale_noise: Callable[[Circuit, float], Circuit] = fold_gates_at_random,
     **kwargs: dict,
-) -> (List[List], List[List]):
+) -> Tuple[List[np.ndarray], List[float]]:
     """Function for the calculation of an observable from some circuit of
     interest to be mitigated with CDR (or vnCDR) based on [Czarnik2020]_ and
     [Lowe2020]_.
@@ -146,34 +149,65 @@ def execute_with_cdr(
         for c in [circuit] + training_circuits
     ]
 
-    # Execute all circuits. TODO: Allow for batching.
-    executor_data = np.array(
+    # Execute all circuits to get MeasurementResult's. TODO: Allow batching.
+    noisy_counts = np.array(
         [[executor(circ) for circ in circuits] for circuits in all_circuits]
     )
-    simulator_data = np.array([simulator(circ) for circ in all_circuits[0]])
+    ideal_counts = np.array([simulator(circ) for circ in all_circuits[0]])
 
-    # Do the regression.
-    results_dict_training_circuits = [simulator_data, executor_data]
-    results_dict_circuit_of_interest = executor_data[:, 0]
+    # TODO: What is this used for?
+    results_dict_circuit_of_interest = noisy_counts[:, 0]
 
-    # Now the regression:
     mitigated_observables = []
     raw_observables = []
     for obs in observables:
-        circuit_data = construct_circuit_data_floats(
-            results_dict_circuit_of_interest, obs
+        circuit_data = np.array(
+            [
+                calculate_observable(measurements, obs)
+                for measurements in results_dict_circuit_of_interest
+            ]
         )
-        train_data = construct_training_data_floats(
-            results_dict_training_circuits, obs
+
+        # Get the noisy ⟨𝛹| O |𝛹⟩ from the noisy (executor) counts.
+        noisy_expectation_values = np.array(
+            [
+                [
+                    calculate_observable(measurements, obs)
+                    for measurements in row
+                ]
+                for row in noisy_counts
+            ]
         )
-        # going to add general regression section here:
+
+        # Get the exact ⟨𝛹| O |𝛹⟩ from the exact (simulator) counts.
+        ideal_expectation_values = np.array(
+            [
+                calculate_observable(
+                    state_or_measurements=measurements, observable=obs
+                )
+                for measurements in ideal_counts
+            ]
+        )
+
+        # Do the regression.
         fitted_params, _ = curve_fit(
+<<<<<<< HEAD:mitiq/cdr/cdr_execution.py
             lambda x, *params: fit_function(x, params),
             train_data[0].T,
             train_data[1],
+=======
+            lambda x, *params: ansatz(x, params),
+            noisy_expectation_values,
+            ideal_expectation_values,
+>>>>>>> f39c3f96eb655d44cab5faa3abac1cbec94a48db:mitiq/cdr/cdr.py
             p0=np.zeros(num_parameters),
         )
         mitigated_observables.append(fit_function(circuit_data, fitted_params))
         raw_observables.append(circuit_data)
 
+<<<<<<< HEAD:mitiq/cdr/cdr_execution.py
     return mitigated_observables, raw_observables
+=======
+    # TODO: Why return raw observables?
+    return raw_observables, mitigated_observables
+>>>>>>> f39c3f96eb655d44cab5faa3abac1cbec94a48db:mitiq/cdr/cdr.py
