@@ -167,7 +167,7 @@ from cirq import NamedQubit, Circuit, identity_each, ZZ
 import numpy as np
 
 def qaoa_hamiltonian(graph: List[Tuple[float]]) -> np.ndarray:
-    """Returns the cost Hamiltonian assocated to the input graph.
+    """Returns the cost Hamiltonian associated to the input graph.
     """
     # Get all the nodes of the graph
     nodes = list({node for edge in graph for node in edge})

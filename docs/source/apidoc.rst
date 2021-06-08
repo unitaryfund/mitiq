@@ -32,6 +32,13 @@ Utils
 .. automodule:: mitiq.benchmarks.utils
    :members:
 
+Clifford Data Regression
+------------------------
+.. automodule:: mitiq.cdr.clifford_training_data
+   :members:
+
+See Ref. :cite:`Czarnik_2020_arXiv` for more details on these methods.
+
 
 Mitiq - PyQuil
 --------------
@@ -57,14 +64,20 @@ Qiskit Utils
 Probabilistic Error Cancellation
 --------------------------------
 
-Quasi-Probability Representations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. automodule:: mitiq.pec.representations.depolarizing
-   :members:
-
 Probabilistic Error Cancellation (High-Level Tools)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.pec.pec
+   :members:
+
+Quasi-Probability Representations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.pec.representations.optimal
+   :members:
+
+.. automodule:: mitiq.pec.representations.damping
+   :members:
+
+.. automodule:: mitiq.pec.representations.depolarizing
    :members:
 
 Sampling from a Noisy Decomposition of an Ideal Operation
@@ -75,6 +88,11 @@ Sampling from a Noisy Decomposition of an Ideal Operation
 Probabilistic Error Cancellation Types
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.pec.types.types
+   :members:
+
+Utilities for Quantum Channels
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.pec.channels
    :members:
 
 

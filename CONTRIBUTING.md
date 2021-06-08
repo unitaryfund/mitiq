@@ -46,29 +46,62 @@ development of the library, from your local clone of the fork, run
 (myenv) pip install -r dev_requirements.txt
 ```
 
+#### Special Note for Windows Users Using Python 3.8:
+To prevent errors when running `make docs` and `make doctest`, Windows developers using Python 3.8 will also need to edit `__init__.py` in their environment's asyncio directory.
+This is due to Python changing `asyncio`'s [default event loop in Windows beginning in Python 3.8](https://docs.python.org/3/library/asyncio-policy.html#asyncio.DefaultEventLoopPolicy).
+The new default event loop will not support Unix-style APIs used by some dependencies.
+1. Locate your environment directory (likely `C:\Users\{username}\anaconda3\envs\{your_env}`), and open `{env_dir}/Lib/asyncio/__init__.py`.
+2. Add `import asyncio` to the file's import statements.
+3. Find the block of code below and replace it with the provided replacement.
+    * Original Code  
+
+          if sys.platform == 'win32':  # pragma: no cover
+              from .windows_events import *
+              __all__ += windows_events.__all__
+          else:
+              from .unix_events import *  # pragma: no cover
+              __all__ += unix_events.__all__
+  
+    * Replacement Code  
+
+          if sys.platform == 'win32':  # pragma: no cover
+              from .windows_events import *
+              asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+              __all__ += windows_events.__all__
+          else:
+              from .unix_events import *  # pragma: no cover
+              __all__ += unix_events.__all__
+  
+
 ### Adding tests
 If you add new features to a function or class, it is required to add tests for such object. Mitiq uses a nested structure for packaging tests in directories named `tests` at the same level of each module.
+The only except to this is that any tests requiring a QVM should be placed in the mitiq_pyquil/tests folder.
 
 ### Updating the documentation
 Follow these [instructions for contributing to the documentation](https://mitiq.readthedocs.io/en/latest/contributing_docs.html) which include guidelines about updating the API-doc list of modules and writing examples in the users guide.
 
-### Checking local tests
+### Running local tests
 
+After making changes, please ensure your changes still pass all the existing tests.
 You can check that tests run with `pytest`. The [Makefile][makefile] contains
 some commands for running different collections of tests for the repository.
 
-To run just the tests contained in `mitiq/tests` and `mitiq/benchmarks/tests` run
+To only run tests that do not require a pyQuil QVM running, run
 
 ```bash
 (myenv) make test
 ```
 
-To run the tests for the pyQuil and Qiskit plugins (which of course require for
-pyQuil and Qiskit to be installed) run
+To run the tests for the pyQuil plugins, run
 
 ```bash
 (myenv) make test-pyquil
-(myenv) make test-qiskit
+```
+
+To run all tests, run
+
+```bash
+(myenv) make test-all
 ```
 
 *NOTE*: For the pyQuil tests to run, you will need to have QVM & quilc servers
@@ -79,15 +112,13 @@ docker run --rm -idt -p 5000:5000 rigetti/qvm -S
 docker run --rm -idt -p 5555:5555 rigetti/quilc -R
 ```
 
-You can also check that all tests run also in the documentation examples and
+Please also remember to check that all tests run also in the documentation examples and
 docstrings with
 
 ```bash
-(myenv) make docs
+(myenv) make doctest
 ```
-
-If you add new `/tests` directories, you will need to update the `Makefile`
-so that they will be included as part of continuous integration.
+You may need to run `make docs` before you are able to run `make doctest`. 
 
 ### Style Guidelines
 

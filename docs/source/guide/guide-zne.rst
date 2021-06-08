@@ -272,7 +272,7 @@ This function can then be used with ``mitiq.zne.execute_with_zne`` as an option 
 .. doctest:: python
 
     # Variables circ and scale are a circuit to fold and a scale factor, respectively
-    zne = mitiq.execute_with_zne(circuit, executor, scale_noise=my_custom_folding_function)
+    zne = mitiq.zne.execute_with_zne(circuit, executor, scale_noise=my_custom_folding_function)
 
 
 .. _guide_zne_factory:
@@ -660,8 +660,7 @@ and clips the result if it falls outside its physical domain.
 
 .. testcode::
 
-   from typing import Iterable
-   from mitiq.zne.inference import BatchedFactory, mitiq_polyfit
+   from mitiq.zne.inference import BatchedFactory, LinearFactory
    import numpy as np
 
    class MyFactory(BatchedFactory):
@@ -671,12 +670,7 @@ and clips the result if it falls outside its physical domain.
       interval, its value is clipped.
       """
 
-      def __init__(
-            self,
-            scale_factors: Iterable[float],
-            min_expval: float,
-            max_expval: float,
-         ) -> None:
+      def __init__(self, scale_factors, min_expval, max_expval):
          """
          Args:
             scale_factors: The noise scale factors at which
@@ -685,56 +679,51 @@ and clips the result if it falls outside its physical domain.
             min_expval: The upper bound for the expectation value.
          """
          super(MyFactory, self).__init__(scale_factors)
-         self.min_expval = min_expval
-         self.max_expval = max_expval
+         self._options = {"min_expval": min_expval, "max_expval": max_expval}
 
       @staticmethod
       def extrapolate(
-         scale_factors,
-         exp_values,
-         min_expval,
-         max_expval,
-      ) -> float:
-         """
-         Fit a linear model and clip its zero-noise limit.
+         scale_factors, exp_values, min_expval, max_expval, full_output = False,
+      ):
+         """Fit a linear model and clip its zero-noise limit."""
 
-         Returns:
-            The clipped extrapolation to the zero-noise limit.
-         """
-         # Fit a line and get the optimal parameters (slope, intercept)
-         opt_params, _ = mitiq_polyfit(
-            scale_factors, exp_values, deg=1
-        )
+         # Perform standard linear extrapolation
+         result = LinearFactory.extrapolate(
+            scale_factors, exp_values, full_output,
+         )
 
          # Return the clipped zero-noise extrapolation.
-         return np.clip(opt_params[-1], min_expval, max_expval)
+         if not full_output:
+            return np.clip(result, min_expval, max_expval)
+         
+         if full_output:
+            # In this case "result" is a tuple of extrapolation data
+            zne_limit = np.clip(result[0], min_expval, max_expval)
+            return (zne_limit, *result[1:])
 
 
 .. testcleanup::
 
    fac = MyFactory([1, 2, 3], min_expval=0.0, max_expval=2.0)
    fac.run_classical(noise_to_expval)
-   assert np.isclose(
-      fac.extrapolate(
-         fac.get_scale_factors(),
-         fac.get_expectation_values(),
-         fac.min_expval,
-         fac.max_expval
-      ),
-      1.0, atol=0.1
-   )
+   assert np.isclose(fac.reduce(), 1.0, atol=0.1)
+
    # Linear model with a large zero-noise limit
    noise_to_large_expval = lambda x : noise_to_expval(x) + 10.0
    fac.run_classical(noise_to_large_expval)
    # assert the output is clipped to 2.0
-   assert np.isclose(
-      fac.extrapolate(
-         fac.get_scale_factors(),
-         fac.get_expectation_values(),
-         fac.min_expval,
-         fac.max_expval
-      ), 2.0
-   )
+   assert np.isclose(fac.reduce(), 2.0)
+
+   # Check other methods of the factory work
+   fac.get_expectation_values()
+   fac.get_extrapolation_curve()
+   fac.get_optimal_parameters()
+   fac.get_parameters_covariance()
+   fac.get_scale_factors()
+   fac.get_zero_noise_limit()
+   fac.get_zero_noise_limit_error()
+   fac.plot_fit()
+
 
 This custom factory can be used in exactly the same way as we have
 shown in the previous section. By simply replacing ``LinearFactory``

@@ -15,7 +15,7 @@ General workflow: Front-ends, backends, and executors
 
 We refer to a library/language that constructs quantum programs as a "front-end,"
 and a quantum computer or quantum computer simulator as a "backend." Mitiq currently
-supports Cirq, Qiskit, and pyQuil front-ends, and is backend agnostic - as long as you
+supports Cirq, Qiskit, PyQuil and Braket front-ends, and is backend agnostic - as long as you
 can run a supported quantum program on a backend, you can use that backend with Mitiq.
 
 We refer to a user-defined function that inputs a quantum program and executes it on a backend
@@ -224,7 +224,7 @@ We can then use this backend for our mitigation.
 .. testcode::
 
     from qiskit import QuantumCircuit
-    from mitiq import execute_with_zne
+    from mitiq.zne import execute_with_zne
 
     circ = QuantumCircuit(1, 1)
     for _ in range(100):
@@ -311,3 +311,7 @@ We can now implement PEC by importing the function :func:`~mitiq.pec.pec.execute
 
     Error without mitigation: 0.0387
     Error with mitigation (PEC): 0.00364
+
+In addition to :func:`~mitiq.pec.pec.execute_with_pec`, you can also use Mitiq to wrap your
+backend execution function into an error-mitigated version like you can with zero-noise
+extrapolation.

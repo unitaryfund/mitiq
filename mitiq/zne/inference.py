@@ -136,7 +136,7 @@ def mitiq_polyfit(
     exp_values: Sequence[float],
     deg: int,
     weights: Optional[Sequence[float]] = None,
-) -> Tuple[List[float], Union[np.ndarray, None]]:
+) -> Tuple[List[float], Optional[np.ndarray]]:
     """Fits the ansatz to the (scale factor, expectation value) data using
     ``numpy.polyfit``, returning the optimal parameters and covariance matrix
     of the parameters.
@@ -198,11 +198,11 @@ class Factory(ABC):
     def __init__(self) -> None:
         self._instack: List[Dict[str, float]] = []
         self._outstack: List[float] = []
-        self._opt_params: Union[List[float], None] = None
-        self._params_cov: Union[np.ndarray, None] = None
-        self._zne_limit: Union[float, None] = None
-        self._zne_error: Union[float, None] = None
-        self._zne_curve: Union[Callable[[float], float], None] = None
+        self._opt_params: Optional[List[float]] = None
+        self._params_cov: Optional[np.ndarray] = None
+        self._zne_limit: Optional[float] = None
+        self._zne_error: Optional[float] = None
+        self._zne_curve: Optional[Callable[[float], float]] = None
         self._already_reduced = False
         self._options: Dict[str, float] = {}
 
@@ -521,6 +521,12 @@ class BatchedFactory(Factory, ABC):
         # Get all noise-scaled circuits to run
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
 
+        if len(qp) < 5:
+            warnings.warn(
+                "The input circuit is very short. "
+                "This may reduce the accuracy of noise scaling."
+            )
+
         # Get the list of keywords associated to each circuit in "to_run"
         kwargs_list = self._get_keyword_args(num_to_average)
 
@@ -723,6 +729,12 @@ class AdaptiveFactory(Factory, ABC):
                 expectation_values.append(executor(scaled_qp, **exec_params))
             return np.average(expectation_values)
 
+        if len(qp) < 5:
+            warnings.warn(
+                "The input circuit is very short. "
+                "This may reduce the accuracy of noise scaling."
+            )
+
         return self.run_classical(
             scale_factor_to_expectation_value, max_iterations
         )
@@ -775,9 +787,9 @@ class PolyFactory(BatchedFactory):
         float,
         Tuple[
             float,
-            Union[float, None],
+            Optional[float],
             List[float],
-            Union[np.ndarray, None],
+            Optional[np.ndarray],
             Callable[[float], float],
         ],
     ]:
@@ -856,9 +868,9 @@ class RichardsonFactory(BatchedFactory):
         float,
         Tuple[
             float,
-            Union[float, None],
+            Optional[float],
             List[float],
-            Union[np.ndarray, None],
+            Optional[np.ndarray],
             Callable[[float], float],
         ],
     ]:
@@ -933,9 +945,9 @@ class FakeNodesFactory(BatchedFactory):
         float,
         Tuple[
             float,
-            Union[float, None],
+            Optional[float],
             List[float],
-            Union[np.ndarray, None],
+            Optional[np.ndarray],
             Callable[[float], float],
         ],
     ]:
@@ -1049,9 +1061,9 @@ class LinearFactory(BatchedFactory):
         float,
         Tuple[
             float,
-            Union[float, None],
+            Optional[float],
             List[float],
-            Union[np.ndarray, None],
+            Optional[np.ndarray],
             Callable[[float], float],
         ],
     ]:
@@ -1146,9 +1158,9 @@ class ExpFactory(BatchedFactory):
         float,
         Tuple[
             float,
-            Union[float, None],
+            Optional[float],
             List[float],
-            Union[np.ndarray, None],
+            Optional[np.ndarray],
             Callable[[float], float],
         ],
     ]:
@@ -1277,9 +1289,9 @@ class PolyExpFactory(BatchedFactory):
         float,
         Tuple[
             float,
-            Union[float, None],
+            Optional[float],
             List[float],
-            Union[np.ndarray, None],
+            Optional[np.ndarray],
             Callable[[float], float],
         ],
     ]:
@@ -1747,9 +1759,9 @@ class AdaExpFactory(AdaptiveFactory):
         float,
         Tuple[
             float,
-            Union[float, None],
+            Optional[float],
             List[float],
-            Union[np.ndarray, None],
+            Optional[np.ndarray],
             Callable[[float], float],
         ],
     ]:

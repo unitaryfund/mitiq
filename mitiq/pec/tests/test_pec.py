@@ -29,6 +29,7 @@ from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
 from mitiq.benchmarks.utils import noisy_simulation
 
 from mitiq.pec import execute_with_pec, NoisyOperation, OperationRepresentation
+from mitiq.pec import mitigate_executor, pec_decorator
 from mitiq.pec.pec import LargeSampleWarning
 from mitiq.pec.representations import (
     represent_operations_in_circuit_with_local_depolarizing_noise,
@@ -199,7 +200,6 @@ def test_pyquil_noiseless_decomposition_multiqubit(nqubits):
     assert np.isclose(pec_value, exact, atol=0.1)
 
 
-@pytest.mark.skip(reason="Slow test.")
 @pytest.mark.parametrize("nqubits", [1, 2])
 def test_qiskit_noiseless_decomposition_multiqubit(nqubits):
     qreg = [qiskit.QuantumRegister(1) for _ in range(nqubits)]
@@ -411,3 +411,139 @@ def test_pec_data_with_full_output():
     )
     assert np.isclose(np.average(pec_data["unbiased_estimators"]), pec_value)
     assert np.allclose(pec_data["measured_expectation_values"], exp_values)
+
+
+def decorated_serial_executor(circuit: QPROGRAM) -> float:
+    """Returns a decorated serial executor for use with other tests. The serial
+    executor is decorated with the same representations as those that are used
+    in the tests for trivial decomposition.
+    """
+    rep = OperationRepresentation(
+        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+    )
+
+    @pec_decorator([rep])
+    def decorated_executor(qp):
+        return serial_executor(qp)
+
+    return decorated_executor(circuit)
+
+
+def test_mitigate_executor_qiskit():
+    """Performs the same test as
+    test_execute_with_pec_qiskit_trivial_decomposition(), but using
+    mitigate_executor() instead of execute_with_pec().
+    """
+    qreg = qiskit.QuantumRegister(1)
+    circuit = qiskit.QuantumCircuit(qreg)
+    _ = circuit.x(qreg)
+    rep = OperationRepresentation(
+        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+    )
+    unmitigated = serial_executor(circuit)
+
+    mitigated_executor = mitigate_executor(
+        serial_executor, representations=[rep], num_samples=10, random_state=1,
+    )
+    mitigated = mitigated_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+def test_pec_decorator_qiskit():
+    """Performs the same test as test_mitigate_executor_qiskit(), but using
+    pec_decorator() instead of mitigate_executor().
+    """
+    qreg = qiskit.QuantumRegister(1)
+    circuit = qiskit.QuantumCircuit(qreg)
+    _ = circuit.x(qreg)
+
+    unmitigated = serial_executor(circuit)
+
+    mitigated = decorated_serial_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+def test_mitigate_executor_cirq():
+    """Performs the same test as
+    test_execute_with_pec_cirq_trivial_decomposition(), but using
+    mitigate_executor() instead of execute_with_pec().
+    """
+    circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
+    rep = OperationRepresentation(
+        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+    )
+    unmitigated = serial_executor(circuit)
+
+    mitigated_executor = mitigate_executor(
+        serial_executor, representations=[rep], num_samples=10, random_state=1,
+    )
+    mitigated = mitigated_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+def test_pec_decorator_cirq():
+    """Performs the same test as test_mitigate_executor_cirq(), but using
+    pec_decorator() instead of mitigate_executor().
+    """
+    circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
+
+    unmitigated = serial_executor(circuit)
+
+    mitigated = decorated_serial_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+def test_mitigate_executor_pyquil():
+    """Performs the same test as
+    test_execute_with_pec_pyquil_trivial_decomposition(), but using
+    mitigate_executor() instead of execute_with_pec().
+    """
+    circuit = pyquil.Program(pyquil.gates.H(0))
+    rep = OperationRepresentation(
+        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+    )
+    unmitigated = serial_executor(circuit)
+
+    mitigated_executor = mitigate_executor(
+        serial_executor, representations=[rep], num_samples=10, random_state=1,
+    )
+    mitigated = mitigated_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+def test_pec_decorator_pyquil():
+    """Performs the same test as test_mitigate_executor_pyquil(), but using
+    pec_decorator() instead of mitigate_executor().
+    """
+    circuit = pyquil.Program(pyquil.gates.H(0))
+
+    unmitigated = serial_executor(circuit)
+
+    mitigated = decorated_serial_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+def test_doc_is_preserved():
+    """Tests that the doc of the original executor is preserved."""
+
+    representations = get_pauli_and_cnot_representations(0)
+
+    def first_executor(circuit):
+        """Doc of the original executor."""
+        return 0
+
+    mit_executor = mitigate_executor(first_executor, representations)
+    assert mit_executor.__doc__ == first_executor.__doc__
+
+    @pec_decorator(representations)
+    def second_executor(circuit):
+        """Doc of the original executor."""
+        return 0
+
+    assert second_executor.__doc__ == first_executor.__doc__
