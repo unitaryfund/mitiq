@@ -123,7 +123,7 @@ def variational_classifier(var, angles, mitigate):
 def cost(weights, features, labels, mitigate):
     predictions = [
         variational_classifier(weights, f, mitigate) for f in features
-        ]
+    ]
     return square_loss(labels, predictions)
 
 
@@ -310,7 +310,7 @@ features_grid = np.array(
 
 predictions_grid = [
     variational_classifier(var, f, mitigation) for f in features_grid
-    ]
+]
 Z = np.reshape(predictions_grid, xx.shape)
 
 # plot decision regions
