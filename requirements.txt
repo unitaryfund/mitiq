@@ -1,4 +1,4 @@
 numpy~=1.20.1
 scipy~=1.4.1
-pymc3~=3.11.2
+pymc3 @ git+git://github.com/pymc-devs/pymc3.git@4de95c3e8e65d8897ee48017f735418e8181c416
 cirq-core~=0.11.0
