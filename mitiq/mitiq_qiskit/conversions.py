@@ -187,8 +187,6 @@ def _transform_registers(
             match the number of qubits in the circuit.
             * If the input circuit has a classical register with more than one
             bit.
-            * If the number of bits in the new classical registers does not
-            match the number of bits in the circuit.
     """
     if new_qregs is None:
         return

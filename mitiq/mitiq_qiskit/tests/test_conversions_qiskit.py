@@ -315,6 +315,16 @@ def test_transform_registers_wrong_bit_number():
         _transform_registers(circ, new_qregs=new_qregs)
 
 
+def test_transform_registers_wrong_reg_number():
+    nqubits = 2
+    circ = qiskit.QuantumCircuit(qiskit.QuantumRegister(nqubits))
+    new_qregs = [qiskit.QuantumRegister(1) for _ in range(2 * nqubits)]
+    circ.add_register(*new_qregs)
+
+    with pytest.raises(ValueError):
+        _transform_registers(circ, new_qregs=new_qregs)
+
+
 @pytest.mark.parametrize("size", [5])
 def test_measurement_order(size):
     q, c = qiskit.QuantumRegister(size), qiskit.ClassicalRegister(size)
