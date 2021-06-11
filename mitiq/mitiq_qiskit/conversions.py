@@ -275,20 +275,6 @@ def to_qiskit(
     # Base conversion.
     qiskit_circuit = qiskit.QuantumCircuit.from_qasm_str(to_qasm(circuit))
 
-    measurements = _measurement_order(qiskit_circuit)
-    if qiskit_circuit.cregs and not cregs:
-        cregs = qiskit_circuit.cregs
-    # Assign register structure.
-    # Note: Output qiskit_circuit has one quantum register and n classical
-    # registers of 1 bit where n is the total number of classical bits.
-    qiskit_circuit.remove_final_measurements()
-
-    _transform_registers(qiskit_circuit, new_qregs=qregs)
-    if cregs:
-        qiskit_circuit.add_register(*cregs)
-    for q, c in measurements:
-        qiskit_circuit.measure(q, c)
-
     return qiskit_circuit
 
 
