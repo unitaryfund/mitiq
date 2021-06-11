@@ -255,19 +255,12 @@ def to_qasm(circuit: cirq.Circuit) -> QASMType:
 
 def to_qiskit(
     circuit: cirq.Circuit,
-    qregs: Optional[List[qiskit.QuantumRegister]] = None,
-    cregs: Optional[List[qiskit.ClassicalRegister]] = None,
 ) -> qiskit.QuantumCircuit:
-    """Returns a Qiskit circuit equivalent to the input Mitiq circuit.
+    """Returns a Qiskit circuit equivalent to the input Mitiq circuit. Note
+    that the output circuit register names do not match the input.
 
     Args:
         circuit: Mitiq circuit to convert to a Qiskit circuit.
-        qregs: Quantum registers of the returned Qiskit circuit. If none are
-            provided, a single default register is used.
-        cregs: Classical registers of the returned Qiskit circuit, provided
-            that the original circuit has classical registers and
-            ``add_cregs_if_cannot_transform`` is True. If none are provided, a
-            single default register is used.
 
     Returns:
         Qiskit.QuantumCircuit object equivalent to the input Mitiq circuit.
