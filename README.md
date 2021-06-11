@@ -1,14 +1,17 @@
+# Mitiq
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
 [![Documentation Status](https://readthedocs.org/projects/mitiq/badge/?version=stable)](https://mitiq.readthedocs.io/en/stable/)
 [![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
 [![arXiv](https://img.shields.io/badge/arXiv-2009.04417-<COLOR>.svg)](https://arxiv.org/abs/2009.04417)
 [![Downloads](https://static.pepy.tech/personalized-badge/mitiq?period=total&units=international_system&left_color=black&right_color=green&left_text=Downloads)](https://pepy.tech/project/mitiq)
-[![Repository](https://img.shields.io/badge/GitHub-5C5C5C.svg?logo=github)](https://github.com/unitaryfund/mitiq)
+[![Repository](https://img.shields.io/badge/GitHub-5C5C5C.svg?logo=github
+)](https://github.com/unitaryfund/mitiq)
+
 
 [![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
 
-# Mitiq
+![logo](docs/source/img/mitiq-logo.png)
 
 Mitiq is a Python toolkit for implementing error mitigation techniques on
 quantum computers.
@@ -29,11 +32,8 @@ Mitiq can be installed from PyPi via
 pip install mitiq
 ```
 
-To build from source, check out the [installation
-instructions](https://mitiq.readthedocs.io/en/latest/contributing.html#development-install)
-for more information.
-
-To test installation, run
+To build from source, see these [installation
+instructions](https://mitiq.readthedocs.io/en/latest/contributing.html#development-install). To test installation, run
 
 ```python
 import mitiq
@@ -43,7 +43,7 @@ mitiq.about()
 This prints out version information about core requirements and optional
 quantum software packages which Mitiq can interface with.
 
-If you would like to develop Mitiq, check out the [contribution
+If you would like to contribute to Mitiq, check out the [contribution
 guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) for
 more information.
 
@@ -70,8 +70,8 @@ quantum programming libraries and is available to the user.
 See the [getting
 started](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html)
 guide in [Mitiq's documentation](https://mitiq.readthedocs.io) for a complete
-walkthrough of how to use mitiq. For a quick preview, check out the following
-snippet for a simple example of Mitiq in action:
+walkthrough of how to use Mitiq. For a quick preview, check out the following
+snippet:
 
 ```python
 import numpy as np
@@ -110,12 +110,12 @@ Error in simulation (with mitigation): 0.000519
 
 ### Example with Qiskit
 
-![Alt Text](assets/qiskit.gif)
+![Alt Text](docs/source/img/qiskit.gif)
 
 
 ### Example with Cirq
 
-![Alt Text](assets/cirq.gif)
+![Alt Text](docs/source/img/cirq.gif)
 
 
 ## Error mitigation techniques
@@ -128,8 +128,7 @@ and is designed to support [additional techniques](https://github.com/unitaryfun
 
 ## Documentation
 
-Mitiq's documentation is hosted at [mitiq.readthedocs.io](https://mitiq.readthedocs.io). A PDF version of the latest
-release can be found [here](https://mitiq.readthedocs.io/_/downloads/en/latest/pdf/).
+Mitiq's documentation is hosted at [mitiq.readthedocs.io](https://mitiq.readthedocs.io).
 
 ## Developer information
 
@@ -147,7 +146,7 @@ An up-to-date list of authors can be found
 
 ## Research
 
-We are looking forward to adding new features to Mitiq. If you have a proposal
+We look forward to adding new features to Mitiq. If you have a proposal
 for implementing a new quantum error mitigation technique, or adding an example
 used in your research, please read our
 [guidelines](https://mitiq.readthedocs.io/en/stable/research.html) for
