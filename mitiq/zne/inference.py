@@ -39,6 +39,18 @@ from mitiq import QPROGRAM
 from mitiq.collector import Collector
 
 
+ExtrapolationResult = Union[
+    float,  # The zero-noise value.
+    Tuple[
+        float,  # The zero-noise value.
+        Optional[float],  # The (estimated) error on the zero-noise value.
+        List[float],  # Optimal parameters found during fitting.
+        Optional[np.ndarray],  # Covariance of fitting parameters.
+        Callable[[float], float],  # Function that was fit.
+    ],
+]
+
+
 class ExtrapolationError(Exception):
     """Error raised by :class:`.Factory` objects when
     the extrapolation fit fails.
@@ -303,16 +315,6 @@ class Factory(ABC):
         """
         raise NotImplementedError
 
-    def iterate(
-        self, noise_to_expval: Callable[..., float], max_iterations: int = 100
-    ) -> "Factory":
-        warnings.warn(
-            "The `iterate` method is deprecated in v0.3.0 and will be removed "
-            "in v0.4.0. Use `run_classical` instead.",
-            DeprecationWarning,
-        )
-        return self.run_classical(noise_to_expval)
-
     def push(
         self, instack_val: Dict[str, float], outstack_val: float
     ) -> "Factory":
@@ -456,7 +458,7 @@ class BatchedFactory(Factory, ABC):
 
     @staticmethod
     @abstractmethod
-    def extrapolate(*args: Any, **kwargs: Any) -> float:
+    def extrapolate(*args: Any, **kwargs: Any) -> ExtrapolationResult:
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
 
@@ -791,16 +793,7 @@ class PolyFactory(BatchedFactory):
         exp_values: Sequence[float],
         order: int,
         full_output: bool = False,
-    ) -> Union[
-        float,
-        Tuple[
-            float,
-            Optional[float],
-            List[float],
-            Optional[np.ndarray],
-            Callable[[float], float],
-        ],
-    ]:
+    ) -> ExtrapolationResult:
         """Static method which evaluates a polynomial extrapolation to the
         zero-noise limit.
 
@@ -872,16 +865,7 @@ class RichardsonFactory(BatchedFactory):
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
-    ) -> Union[
-        float,
-        Tuple[
-            float,
-            Optional[float],
-            List[float],
-            Optional[np.ndarray],
-            Callable[[float], float],
-        ],
-    ]:
+    ) -> ExtrapolationResult:
         """Static method which evaluates the Richardson extrapolation to the
          zero-noise limit.
 
@@ -949,16 +933,7 @@ class FakeNodesFactory(BatchedFactory):
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
-    ) -> Union[
-        float,
-        Tuple[
-            float,
-            Optional[float],
-            List[float],
-            Optional[np.ndarray],
-            Callable[[float], float],
-        ],
-    ]:
+    ) -> ExtrapolationResult:
 
         if not FakeNodesFactory._is_equally_spaced(scale_factors):
             raise ValueError("The scale factors must be equally spaced.")
@@ -1066,16 +1041,7 @@ class LinearFactory(BatchedFactory):
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
-    ) -> Union[
-        float,
-        Tuple[
-            float,
-            Optional[float],
-            List[float],
-            Optional[np.ndarray],
-            Callable[[float], float],
-        ],
-    ]:
+    ) -> ExtrapolationResult:
         """Static method which evaluates the linear extrapolation to the
         zero-noise limit.
 
@@ -1163,16 +1129,7 @@ class ExpFactory(BatchedFactory):
         avoid_log: bool = False,
         eps: float = 1.0e-6,
         full_output: bool = False,
-    ) -> Union[
-        float,
-        Tuple[
-            float,
-            Optional[float],
-            List[float],
-            Optional[np.ndarray],
-            Callable[[float], float],
-        ],
-    ]:
+    ) -> ExtrapolationResult:
         """Static method which evaluates the extrapolation to the zero-noise
         limit assuming an exponential ansatz y(x) = a + b * exp(-c * x),
         with c > 0.
@@ -1294,16 +1251,7 @@ class PolyExpFactory(BatchedFactory):
         avoid_log: bool = False,
         eps: float = 1.0e-6,
         full_output: bool = False,
-    ) -> Union[
-        float,
-        Tuple[
-            float,
-            Optional[float],
-            List[float],
-            Optional[np.ndarray],
-            Callable[[float], float],
-        ],
-    ]:
+    ) -> ExtrapolationResult:
         """Static method which evaluates the extrapolation to the
         zero-noise limit with an exponential ansatz (whose exponent
         is a polynomial of degree "order").
@@ -1624,16 +1572,7 @@ class AdaExpFactory(AdaptiveFactory):
         avoid_log: bool = False,
         eps: float = 1.0e-6,
         full_output: bool = False,
-    ) -> Union[
-        float,
-        Tuple[
-            float,
-            Optional[float],
-            List[float],
-            Optional[np.ndarray],
-            Callable[[float], float],
-        ],
-    ]:
+    ) -> ExtrapolationResult:
         """Static method which evaluates the extrapolation to the zero-noise
         limit assuming an exponential ansatz y(x) = a + b * exp(-c * x),
         with c > 0.

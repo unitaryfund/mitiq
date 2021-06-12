@@ -35,23 +35,7 @@ from mitiq.cdr.clifford_training_data import (
     generate_training_circuits,
     _CLIFFORD_ANGLES,
 )
-
-
-def random_x_z_cnot_circuit(qubits, n_moments, random_state) -> Circuit:
-    angles = np.linspace(0.0, 2 * np.pi, 8)
-    oneq_gates = [
-        gate(a) for a in angles for gate in (cirq.ops.rx, cirq.ops.rz)
-    ]
-    gate_domain = {oneq_gate: 1 for oneq_gate in oneq_gates}
-    gate_domain.update({cirq.ops.CNOT: 2})
-
-    return cirq.testing.random_circuit(
-        qubits=qubits,
-        n_moments=n_moments,
-        op_density=1.0,
-        gate_domain=gate_domain,
-        random_state=random_state,
-    )
+from mitiq.cdr._testing import random_x_z_cnot_circuit
 
 
 def test_generate_training_circuits():
