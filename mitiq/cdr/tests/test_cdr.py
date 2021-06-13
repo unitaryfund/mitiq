@@ -15,11 +15,14 @@
 
 """Tests for the Clifford data regression top-level API."""
 from functools import partial
+import pytest
 
 import numpy as np
 
 from cirq import LineQubit
 
+from mitiq.conversions import convert_from_mitiq
+from mitiq._typing import SUPPORTED_PROGRAM_TYPES
 from mitiq.cdr.cdr import execute_with_cdr
 from mitiq.cdr.data_regression import linear_fit_function_no_intercept
 from mitiq.zne.scaling import fold_gates_from_left
@@ -30,28 +33,27 @@ from mitiq.cdr._testing import (
     simulator_statevector,
 )
 
-
-executor = partial(executor, noise_level=0.5)
-
-
-# circuit used for unit tests:
-circuit = random_x_z_circuit(LineQubit.range(2), n_moments=2, random_state=1)
-
-# define observables for testing
-sigma_z = np.diag([1, -1])
-obs = np.kron(np.identity(2), sigma_z)
-obs2 = np.kron(sigma_z, sigma_z)
-obs_list = [np.diag(obs), np.diag(obs2)]
-
-# get exact solution:
-exact_solution = []
-for obs in obs_list:
-    exact_solution.append(
-        calculate_observable(simulator_statevector(circuit), observable=obs)
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_execute_with_cdr(circuit_type):
+    circuit = random_x_z_circuit(
+        LineQubit.range(2), n_moments=2, random_state=1
     )
+    circuit = convert_from_mitiq(circuit, circuit_type)
 
+    # define observables for testing
+    sigma_z = np.diag([1, -1])
+    obs = np.kron(np.identity(2), sigma_z)
+    obs2 = np.kron(sigma_z, sigma_z)
+    obs_list = [np.diag(obs), np.diag(obs2)]
 
-def test_execute_with_cdr():
+    # get exact solution:
+    exact_solution = []
+    for obs in obs_list:
+        exact_solution.append(
+            calculate_observable(simulator_statevector(circuit),
+                                 observable=obs)
+        )
+
     kwargs = {
         "method_select": "gaussian",
         "method_replace": "gaussian",
@@ -61,9 +63,10 @@ def test_execute_with_cdr():
     }
     num_circuits = 4
     frac_non_cliff = 0.5
+    noisy_executor = partial(executor, noise_level=0.5)
     results0 = execute_with_cdr(
         circuit,
-        executor,
+        noisy_executor,
         simulator_statevector,
         obs_list,
         num_circuits,
@@ -71,7 +74,7 @@ def test_execute_with_cdr():
     )
     results1 = execute_with_cdr(
         circuit,
-        executor,
+        noisy_executor,
         simulator_statevector,
         obs_list,
         num_circuits,

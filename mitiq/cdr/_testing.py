@@ -16,6 +16,8 @@
 import numpy as np
 import cirq
 
+from mitiq import QPROGRAM
+from mitiq.conversions import accept_any_qprogram_as_input
 from mitiq.cdr.execute import MeasurementResult
 
 
@@ -51,8 +53,9 @@ def random_x_z_cnot_circuit(qubits, n_moments, random_state) -> cirq.Circuit:
     )
 
 
+@accept_any_qprogram_as_input
 def executor(
-    circuit: cirq.Circuit, noise_level: float = 0.1, shots: int = 8192
+    circuit: QPROGRAM, noise_level: float = 0.1, shots: int = 8192
 ) -> MeasurementResult:
     """Returns computational basis measurements after executing the circuit
     with depolarizing noise.
@@ -73,7 +76,7 @@ def executor(
     return {bin(k): v for k, v in result.histogram(key="z").items()}
 
 
-def simulator(circuit: cirq.Circuit, shots: int = 8192) -> MeasurementResult:
+def simulator(circuit: QPROGRAM, shots: int = 8192) -> MeasurementResult:
     """Returns computational basis measurements after executing the circuit
     (without noise).
 
@@ -88,7 +91,8 @@ def simulator(circuit: cirq.Circuit, shots: int = 8192) -> MeasurementResult:
     return executor(circuit, noise_level=0.0, shots=shots)
 
 
-def simulator_statevector(circuit: cirq.Circuit) -> np.ndarray:
+@accept_any_qprogram_as_input
+def simulator_statevector(circuit: QPROGRAM) -> np.ndarray:
     """Returns the final wavefunction (as a numpy array) of the circuit.
 
     Args:

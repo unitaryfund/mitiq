@@ -22,15 +22,17 @@ from scipy.optimize import curve_fit
 
 from cirq.circuits import Circuit
 
+from mitiq import QPROGRAM
+from mitiq.conversions import accept_any_qprogram_as_input
 from mitiq.cdr.clifford_training_data import generate_training_circuits
 from mitiq.cdr.data_regression import linear_fit_function
 from mitiq.cdr.execute import calculate_observable, MeasurementResult
 from mitiq.zne.scaling import fold_gates_at_random
 
 
-# TODO: Allow for any QPROGRAM, not just a cirq.Circuit.
+@accept_any_qprogram_as_input
 def execute_with_cdr(
-    circuit: Circuit,
+    circuit: QPROGRAM,
     executor: Callable[[Circuit], MeasurementResult],
     simulator: Callable[[Circuit], Union[MeasurementResult, np.ndarray]],
     observables: List[np.ndarray],
