@@ -138,10 +138,9 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
 def accept_any_qprogram_as_input(
     accept_cirq_circuit_function: Callable[[Circuit], Any]
 ) -> Callable[[QPROGRAM], Any]:
-
     @wraps(accept_cirq_circuit_function)
     def accept_any_qprogram_function(
-            circuit: QPROGRAM, *args: Any, **kwargs: Any
+        circuit: QPROGRAM, *args: Any, **kwargs: Any
     ) -> Any:
         cirq_circuit, _ = convert_to_mitiq(circuit)
         return accept_cirq_circuit_function(cirq_circuit, *args, **kwargs)

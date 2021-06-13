@@ -33,6 +33,7 @@ from mitiq.cdr._testing import (
     simulator_statevector,
 )
 
+
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
 def test_execute_with_cdr(circuit_type):
     circuit = random_x_z_circuit(
@@ -50,8 +51,9 @@ def test_execute_with_cdr(circuit_type):
     exact_solution = []
     for obs in obs_list:
         exact_solution.append(
-            calculate_observable(simulator_statevector(circuit),
-                                 observable=obs)
+            calculate_observable(
+                simulator_statevector(circuit), observable=obs
+            )
         )
 
     kwargs = {

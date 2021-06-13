@@ -22,7 +22,10 @@ import cirq
 from cirq.circuits import Circuit
 
 from mitiq import QPROGRAM
-from mitiq.conversions import accept_any_qprogram_as_input, atomic_one_to_many_converter
+from mitiq.conversions import (
+    accept_any_qprogram_as_input,
+    atomic_one_to_many_converter,
+)
 
 # Z gates with these angles/exponents are Clifford gates.
 _CLIFFORD_EXPONENTS = np.array([0.0, 0.5, 1.0, 1.5])

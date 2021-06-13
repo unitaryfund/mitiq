@@ -43,7 +43,7 @@ def execute_with_cdr(
     scale_factors: Sequence[float] = (1,),
     scale_noise: Callable[[Circuit, float], Circuit] = fold_gates_at_random,
     **kwargs: dict,
-) -> Tuple[List[np.ndarray], List[float]]:
+) -> Tuple[List[float], List[np.ndarray]]:
     """Function for the calculation of an observable from some circuit of
     interest to be mitigated with CDR (or vnCDR) based on [Czarnik2020]_ and
     [Lowe2020]_.

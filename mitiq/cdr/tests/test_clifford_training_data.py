@@ -18,7 +18,6 @@ import pytest
 import numpy as np
 
 import cirq
-import qiskit
 from cirq.circuits import Circuit
 
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES
@@ -49,7 +48,6 @@ def test_is_clifford_with_clifford(circuit_type):
     assert is_clifford(circuit)
 
 
-
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
 def test_is_clifford_with_nonclifford(circuit_type):
     circuit = convert_from_mitiq(
@@ -64,7 +62,7 @@ def test_generate_training_circuits():
     )
     assert not is_clifford(circuit)
 
-    clifford_circuit, = generate_training_circuits(
+    (clifford_circuit,) = generate_training_circuits(
         circuit, num_training_circuits=1, fraction_non_clifford=0.0
     )
     assert is_clifford(clifford_circuit)
@@ -77,7 +75,7 @@ def test_generate_training_circuits_any_qprogram(circuit_type):
     )
     circuit = convert_from_mitiq(circuit, circuit_type)
 
-    clifford_circuit, = generate_training_circuits(
+    (clifford_circuit,) = generate_training_circuits(
         circuit, num_training_circuits=1, fraction_non_clifford=0.0
     )
     assert is_clifford(clifford_circuit)
@@ -219,12 +217,12 @@ def test_select(method):
 def test_count_non_cliffords(circuit_type):
     a, b = cirq.LineQubit.range(2)
     circuit = Circuit(
-        cirq.rz(0.0).on(a),          # Clifford.
+        cirq.rz(0.0).on(a),  # Clifford.
         cirq.rx(0.1 * np.pi).on(b),  # Non-Clifford.
         cirq.rx(0.5 * np.pi).on(b),  # Clifford
         cirq.rz(0.4 * np.pi).on(b),  # Non-Clifford.
         cirq.rz(0.5 * np.pi).on(b),  # Clifford.
-        cirq.CNOT.on(a, b),          # Clifford.
+        cirq.CNOT.on(a, b),  # Clifford.
     )
     circuit = convert_from_mitiq(circuit, circuit_type)
 

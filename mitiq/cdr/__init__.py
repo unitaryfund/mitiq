@@ -18,6 +18,11 @@
 TODO: Add reference + more information.
 """
 
+from mitiq.cdr.cdr import execute_with_cdr
+from mitiq.cdr.data_regression import (
+    linear_fit_function,
+    linear_fit_function_no_intercept,
+)
 from mitiq.cdr.clifford_training_data import (
     count_non_cliffords,
     is_clifford,
