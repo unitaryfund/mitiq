@@ -32,6 +32,7 @@ from mitiq.conversions import (
     convert_to_mitiq,
     convert_from_mitiq,
     accept_any_qprogram_as_input,
+    atomic_one_to_many_converter,
     noise_scaling_converter,
     UnsupportedCircuitError,
 )
@@ -76,6 +77,11 @@ def scaling_function(circ: cirq.Circuit, *args, **kwargs) -> cirq.Circuit:
 @accept_any_qprogram_as_input
 def get_wavefunction(circ: cirq.Circuit) -> np.ndarray:
     return circ.final_state_vector()
+
+
+@atomic_one_to_many_converter
+def returns_several_circuits(circ: cirq.Circuit):
+    return [circ] * 5
 
 
 @pytest.mark.parametrize(
@@ -155,3 +161,11 @@ def test_converter_keeps_register_structure_qiskit(nbits, measure):
     assert scaled.qregs == circ.qregs
     assert scaled.cregs == circ.cregs
     assert scaled == circ
+
+
+@pytest.mark.parametrize("to_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_atomic_one_to_many_converter(to_type):
+    circuit = convert_from_mitiq(cirq_circuit, to_type)
+    circuits = returns_several_circuits(circuit)
+    for circuit in circuits:
+        assert isinstance(circuit, circuit_types[to_type])
