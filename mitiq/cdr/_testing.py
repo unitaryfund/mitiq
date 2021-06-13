@@ -23,8 +23,7 @@ from mitiq.cdr.execute import MeasurementResult
 
 def random_x_z_circuit(qubits, n_moments, random_state) -> cirq.Circuit:
     angles = np.linspace(0.0, 2 * np.pi, 6)
-    oneq_gates = [cirq.ops.rz(a) for a in angles]
-    oneq_gates.append(cirq.ops.rx(np.pi / 2))
+    oneq_gates = [cirq.ops.rz(a) for a in angles] + [cirq.ops.rx(np.pi / 2)]
     gate_domain = {oneq_gate: 1 for oneq_gate in oneq_gates}
 
     return cirq.testing.random_circuit(

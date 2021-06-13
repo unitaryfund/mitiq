@@ -21,17 +21,16 @@ import numpy as np
 
 from cirq import LineQubit
 
-from mitiq.conversions import convert_from_mitiq
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES
-from mitiq.cdr.cdr import execute_with_cdr
-from mitiq.cdr.data_regression import linear_fit_function_no_intercept
-from mitiq.zne.scaling import fold_gates_from_left
+from mitiq.conversions import convert_from_mitiq
+from mitiq.cdr import execute_with_cdr, linear_fit_function_no_intercept
 from mitiq.cdr.execute import calculate_observable
 from mitiq.cdr._testing import (
     random_x_z_circuit,
     executor,
     simulator_statevector,
 )
+from mitiq.zne.scaling import fold_gates_from_left
 
 
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
@@ -82,7 +81,7 @@ def test_execute_with_cdr(circuit_type):
         num_circuits,
         frac_non_cliff,
         ansatz=linear_fit_function_no_intercept,
-        num_parameters=1,
+        num_fit_parameters=1,
         scale_noise=fold_gates_from_left,
         scale_factors=[3],
         **kwargs,
