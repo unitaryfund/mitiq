@@ -23,7 +23,6 @@ from cirq.circuits import Circuit
 
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES
 from mitiq.conversions import convert_from_mitiq
-from mitiq.mitiq_qiskit import to_qiskit
 from mitiq.cdr.clifford_training_data import (
     _is_clifford_angle,
     is_clifford,
@@ -71,16 +70,17 @@ def test_generate_training_circuits():
     assert is_clifford(clifford_circuit)
 
 
-def test_generate_training_circuits_any_qprogram():
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_generate_training_circuits_any_qprogram(circuit_type):
     circuit = random_x_z_cnot_circuit(
         cirq.LineQubit.range(3), n_moments=5, random_state=1
     )
-    circuit = to_qiskit(circuit)
+    circuit = convert_from_mitiq(circuit, circuit_type)
 
     clifford_circuit, = generate_training_circuits(
         circuit, num_training_circuits=1, fraction_non_clifford=0.0
     )
-    assert isinstance(clifford_circuit, qiskit.QuantumCircuit)
+    assert is_clifford(clifford_circuit)
 
 
 @pytest.mark.parametrize("method", ("uniform", "gaussian"))
