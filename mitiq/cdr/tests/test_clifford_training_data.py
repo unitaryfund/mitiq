@@ -18,8 +18,10 @@ import pytest
 import numpy as np
 
 import cirq
+import qiskit
 from cirq.circuits import Circuit
 
+from mitiq.mitiq_qiskit import to_qiskit
 from mitiq.cdr.clifford_training_data import (
     _is_clifford_angle,
     is_clifford,
@@ -44,10 +46,22 @@ def test_generate_training_circuits():
     )
     assert not is_clifford(circuit)
 
-    (clifford_circuit,) = generate_training_circuits(
+    clifford_circuit, = generate_training_circuits(
         circuit, num_training_circuits=1, fraction_non_clifford=0.0
     )
     assert is_clifford(clifford_circuit)
+
+
+def test_generate_training_circuits_any_qprogram():
+    circuit = random_x_z_cnot_circuit(
+        cirq.LineQubit.range(3), n_moments=5, random_state=1
+    )
+    circuit = to_qiskit(circuit)
+
+    clifford_circuit, = generate_training_circuits(
+        circuit, num_training_circuits=1, fraction_non_clifford=0.0
+    )
+    assert isinstance(clifford_circuit, qiskit.QuantumCircuit)
 
 
 @pytest.mark.parametrize("method", ("uniform", "gaussian"))

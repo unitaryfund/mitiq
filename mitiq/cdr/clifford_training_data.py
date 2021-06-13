@@ -21,13 +21,14 @@ import numpy as np
 import cirq
 from cirq.circuits import Circuit
 
+from mitiq.conversions import atomic_one_to_many_converter
 
 # Z gates with these angles/exponents are Clifford gates.
 _CLIFFORD_EXPONENTS = np.array([0.0, 0.5, 1.0, 1.5])
 _CLIFFORD_ANGLES = [exponent * np.pi for exponent in _CLIFFORD_EXPONENTS]
 
 
-# TODO: Accept any QPROGRAM.
+@atomic_one_to_many_converter
 def generate_training_circuits(
     circuit: Circuit,
     num_training_circuits: int,
