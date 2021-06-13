@@ -21,7 +21,8 @@ import numpy as np
 import cirq
 from cirq.circuits import Circuit
 
-from mitiq.conversions import atomic_one_to_many_converter
+from mitiq import QPROGRAM
+from mitiq.conversions import accept_any_qprogram_as_input, atomic_one_to_many_converter
 
 # Z gates with these angles/exponents are Clifford gates.
 _CLIFFORD_EXPONENTS = np.array([0.0, 0.5, 1.0, 1.5])
@@ -30,14 +31,14 @@ _CLIFFORD_ANGLES = [exponent * np.pi for exponent in _CLIFFORD_EXPONENTS]
 
 @atomic_one_to_many_converter
 def generate_training_circuits(
-    circuit: Circuit,
+    circuit: QPROGRAM,
     num_training_circuits: int,
     fraction_non_clifford: float,
     method_select: str = "uniform",
     method_replace: str = "closest",
     random_state: Optional[Union[int, np.random.RandomState]] = None,
-    **kwargs: dict,
-) -> List[Circuit]:
+    **kwargs,
+) -> List[QPROGRAM]:
     r"""Returns a list of (near) Clifford circuits obtained by replacing (some)
     non-Clifford gates in the input circuit by Clifford gates.
 
@@ -106,18 +107,13 @@ def generate_training_circuits(
     return near_clifford_circuits
 
 
-# TODO: Accept any QPROGRAM.
-def is_clifford(op_like: cirq.ops.OP_TREE) -> bool:
+@accept_any_qprogram_as_input
+def is_clifford(circuit: QPROGRAM) -> bool:
     """Returns True if the input argument is Clifford, else False.
 
     Args:
-        op_like: A single operation, list of operations, or circuit.
+        circuit: A single operation, list of operations, or circuit.
     """
-    try:
-        circuit = cirq.Circuit(op_like)
-    except TypeError:
-        raise ValueError("Could not convert `op_like` to a circuit.")
-
     return all(
         cirq.has_stabilizer_effect(op) for op in circuit.all_operations()
     )
