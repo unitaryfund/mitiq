@@ -16,6 +16,8 @@
 """Tests for circuit conversions."""
 import pytest
 
+import numpy as np
+
 import cirq
 from pyquil import Program, gates
 import qiskit
@@ -25,9 +27,11 @@ from braket.circuits import (
     Instruction,
 )
 
+from mitiq._typing import SUPPORTED_PROGRAM_TYPES
 from mitiq.conversions import (
     convert_to_mitiq,
     convert_from_mitiq,
+    accept_any_qprogram_as_input,
     noise_scaling_converter,
     UnsupportedCircuitError,
 )
@@ -57,6 +61,7 @@ braket_circuit = BKCircuit(
 )
 
 circuit_types = {
+    "cirq": cirq.Circuit,
     "qiskit": qiskit.QuantumCircuit,
     "pyquil": Program,
     "braket": BKCircuit,
@@ -66,6 +71,11 @@ circuit_types = {
 @noise_scaling_converter
 def scaling_function(circ: cirq.Circuit, *args, **kwargs) -> cirq.Circuit:
     return circ
+
+
+@accept_any_qprogram_as_input
+def get_wavefunction(circ: cirq.Circuit) -> np.ndarray:
+    return circ.final_state_vector()
 
 
 @pytest.mark.parametrize(
@@ -86,12 +96,26 @@ def test_to_mitiq_bad_types(item):
         convert_to_mitiq(item)
 
 
-@pytest.mark.parametrize("to_type", ("qiskit", "pyquil", "braket"))
+@pytest.mark.parametrize("to_type", SUPPORTED_PROGRAM_TYPES.keys())
 def test_from_mitiq(to_type):
     converted_circuit = convert_from_mitiq(cirq_circuit, to_type)
     circuit, input_type = convert_to_mitiq(converted_circuit)
     assert _equal(circuit, cirq_circuit)
     assert input_type == to_type
+
+
+@pytest.mark.parametrize(
+    "circuit_and_expected",
+    [
+        (cirq.Circuit(cirq.I.on(cirq.LineQubit(0))), np.array([1, 0])),
+        (cirq_circuit, np.array([1, 0, 0, 1]) / np.sqrt(2)),
+    ],
+)
+@pytest.mark.parametrize("to_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_accept_any_qprogram_as_input(circuit_and_expected, to_type):
+    circuit, expected = circuit_and_expected
+    wavefunction = get_wavefunction(convert_from_mitiq(circuit, to_type))
+    assert np.allclose(wavefunction, expected)
 
 
 @pytest.mark.parametrize(
