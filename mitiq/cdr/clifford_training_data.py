@@ -23,8 +23,8 @@ from cirq.circuits import Circuit
 
 
 # Z gates with these angles/exponents are Clifford gates.
-_CLIFFORD_ANGLES = (0.0, np.pi / 2, np.pi, (3 / 2) * np.pi)
 _CLIFFORD_EXPONENTS = np.array([0.0, 0.5, 1.0, 1.5])
+_CLIFFORD_ANGLES = [exponent * np.pi for exponent in _CLIFFORD_EXPONENTS]
 
 
 # TODO: Accept any QPROGRAM.
