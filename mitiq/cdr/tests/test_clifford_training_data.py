@@ -215,16 +215,18 @@ def test_select(method):
     )
 
 
-def test_count_non_cliffords():
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_count_non_cliffords(circuit_type):
     a, b = cirq.LineQubit.range(2)
     circuit = Circuit(
-        cirq.rz(0.0).on(a),  # Clifford.
+        cirq.rz(0.0).on(a),          # Clifford.
         cirq.rx(0.1 * np.pi).on(b),  # Non-Clifford.
         cirq.rx(0.5 * np.pi).on(b),  # Clifford
         cirq.rz(0.4 * np.pi).on(b),  # Non-Clifford.
         cirq.rz(0.5 * np.pi).on(b),  # Clifford.
-        cirq.CNOT.on(a, b),  # Clifford.
+        cirq.CNOT.on(a, b),          # Clifford.
     )
+    circuit = convert_from_mitiq(circuit, circuit_type)
 
     assert count_non_cliffords(circuit) == 2
 

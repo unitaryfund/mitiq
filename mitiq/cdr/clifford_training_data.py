@@ -119,8 +119,8 @@ def is_clifford(circuit: QPROGRAM) -> bool:
     )
 
 
-# TODO: Accept any QPROGRAM.
-def count_non_cliffords(circuit: Circuit) -> int:
+@accept_any_qprogram_as_input
+def count_non_cliffords(circuit: QPROGRAM) -> int:
     """Returns the number of non-Clifford operations in the circuit. Assumes
     the circuit consists of only Rz, Rx, and CNOT operations.
 
