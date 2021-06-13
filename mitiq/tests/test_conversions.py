@@ -80,7 +80,7 @@ def get_wavefunction(circ: cirq.Circuit) -> np.ndarray:
 
 
 @atomic_one_to_many_converter
-def returns_several_circuits(circ: cirq.Circuit):
+def returns_several_circuits(circ: cirq.Circuit, *args, **kwargs):
     return [circ] * 5
 
 
@@ -169,3 +169,7 @@ def test_atomic_one_to_many_converter(to_type):
     circuits = returns_several_circuits(circuit)
     for circuit in circuits:
         assert isinstance(circuit, circuit_types[to_type])
+
+    circuits = returns_several_circuits(circuit, return_mitiq=True)
+    for circuit in circuits:
+        assert isinstance(circuit, cirq.Circuit)
