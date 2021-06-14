@@ -248,7 +248,8 @@ def to_qasm(circuit: cirq.Circuit) -> QASMType:
 
 def to_qiskit(circuit: cirq.Circuit) -> qiskit.QuantumCircuit:
     """Returns a Qiskit circuit equivalent to the input Mitiq circuit. Note
-    that the output circuit registers may not match the input circuit registers.
+    that the output circuit registers may not match the input circuit
+    registers.
 
     Args:
         circuit: Mitiq circuit to convert to a Qiskit circuit.
