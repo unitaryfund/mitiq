@@ -42,8 +42,9 @@ def execute_with_cdr(
     num_fit_parameters: Optional[int] = None,
     scale_factors: Sequence[float] = (1,),
     scale_noise: Callable[[Circuit, float], Circuit] = fold_gates_at_random,
-    **kwargs: dict,
-) -> Tuple[List[float], List[np.ndarray]]:
+    full_output: bool = False,
+    **kwargs,
+) -> Union[List[float], Tuple[List[float], np.ndarray]]:
     """Function for the calculation of an observable from some circuit of
     interest to be mitigated with CDR (or vnCDR) based on [Czarnik2020]_ and
     [Lowe2020]_.
@@ -75,41 +76,39 @@ def execute_with_cdr(
         num_training_circuits: Number of training circuits to be used in the
                                mitigation.
         fraction_non_clifford: The fraction of non-Clifford gates to be
-                               subsituted in the training circuits. The higher
+                               substituted in the training circuits. The higher
                                this fraction the more costly the simulations,
                                but more successful the mitigation.
         fit_function: The function to map noisy to exact data. Takes array of
                       noisy and data and parameters returning a float.
-        num_fit_parameters: The number of paramters the fit_function takes.
+        num_fit_parameters: The number of parameters the fit_function takes.
         scale_noise: Optional argument containing a user defined function on
                      how to increase the noise. If this argument is given then
                      the mitigation method will be vnCDR.
         scale_factors: Factors by which to scale the noise, should not
                                include 1 as this is just the original circuit.
+        full_output: If True, returns ⟨𝛹| O |𝛹⟩ for each training circuit
+            |𝛹⟩ (including the original circuit) and each observable O. The
+            ith row of this 2d array corresponds to the ith observable, and
+            the jth column corresponds to the jth training circuit.
         kwargs: Available keyword arguments are:
-
-        TRAINING SET CONSTRUCTION OPTIONS:
-
             - method_select (string): Specifies the method used to select the
-                                      non-Clifford gates to replace when
-                                      constructing the near-Clifford training
-                                      circuits. Available options are:
-                                            ['uniform', 'gaussian']
-            - method_replace (string): Specifies the method used to replace the
-                                      selected non-Clifford gates with a
-                                      Clifford when constructing the
-                                      near-Clifford training circuits.
-                                      Available options are:
-                                        ['uniform', 'gaussian', 'closest']
+                non-Clifford gates to replace when constructing the
+                near-Clifford training circuits. Can be 'uniform' or
+                'gaussian'.
+            - method_replace (string): Specifies the method used to replace
+                the selected non-Clifford gates with a Clifford when
+                constructing the near-Clifford training circuits. Can be
+                'uniform', 'gaussian', or 'closest'.
             - sigma_select (float): Width of the Gaussian distribution used for
-                                    ``method_select='gaussian'``.
+                ``method_select='gaussian'``.
             - sigma_replace (float): Width of the Gaussian distribution used
-                                     for ``method_replace='gaussian'``.
+                for ``method_replace='gaussian'``.
             - random_state (int): Seed for sampling.
 
-    Returns: The tuple (cdr_values, cdr_raw_data) corresponding
-             to the mitigated expectation values and to the raw expectation
-             values (at different noise levels).
+    Returns: A list of error mitigated observable expectation values. If
+        full_output is True, also returns the observable expectation values
+        for each training circuit (see above).
 
     .. [Czarnik2020] : Piotr Czarnik, Andrew Arramsmith, Patrick Coles,
         Lukasz Cincio, "Error mitigation with Clifford quantum circuit
@@ -151,7 +150,6 @@ def execute_with_cdr(
     )
     ideal_counts = np.array([simulator(circ) for circ in all_circuits[0]])
 
-    # TODO: What is this used for?
     results_dict_circuit_of_interest = noisy_counts[:, 0]
 
     mitigated_observables = []
@@ -163,6 +161,7 @@ def execute_with_cdr(
                 for measurements in results_dict_circuit_of_interest
             ]
         )
+        raw_observables.append(list(circuit_data))
 
         # Get the noisy ⟨𝛹| O |𝛹⟩ from the noisy (executor) counts.
         noisy_expectation_values = np.array(
@@ -193,7 +192,7 @@ def execute_with_cdr(
             p0=np.zeros(num_fit_parameters),
         )
         mitigated_observables.append(fit_function(circuit_data, fitted_params))
-        raw_observables.append(circuit_data)
 
-    # TODO: Why return raw observables?
-    return mitigated_observables, raw_observables
+    if not full_output:
+        return mitigated_observables
+    return mitigated_observables, np.array(raw_observables)
