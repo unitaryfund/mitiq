@@ -306,6 +306,13 @@ def test_transform_qregs_random_circuit(new_reg_sizes, measure):
     assert _equal(from_qiskit(circ), from_qiskit(orig))
 
 
+def test_transform_qregs_no_new_qregs():
+    qreg = qiskit.QuantumRegister(5)
+    circ = qiskit.QuantumCircuit(qreg)
+    _transform_registers(circ, new_qregs=None)
+    assert circ.qregs == [qreg]
+
+
 def test_transform_registers_wrong_bit_number():
     nqubits = 2
     circ = qiskit.QuantumCircuit(qiskit.QuantumRegister(nqubits))
