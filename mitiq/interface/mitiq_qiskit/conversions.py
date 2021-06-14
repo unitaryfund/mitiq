@@ -94,16 +94,13 @@ def _map_bit_index(
 
 def _map_qubits(
     qubits: List[qiskit.circuit.Qubit],
-    registers: List[qiskit.QuantumRegister],
     new_register_sizes: List[int],
     new_registers: List[qiskit.QuantumRegister],
 ) -> List[qiskit.circuit.Qubit]:
-    """Maps qubits to new registers. Assumes the input ``qubits`` come from
-    a single register or n registers, where n is the number of qubits.
+    """Maps qubits to new registers.
 
     Args:
         qubits: A list of qubits to map.
-        registers: The registers that the ``qubits`` come from.
         new_register_sizes: The size(s) of the new registers to map to.
             Note: These can be determined from ``new_registers``, but this
             helper function is only called from ``_map_qubits`` where the sizes
@@ -116,20 +113,11 @@ def _map_qubits(
     if len(new_registers) == 0:
         return qubits
 
-    # Only two support cases:
-    if len(registers) == 1:
-        # Case where there are n bits in a single register.
-        indices = [bit.index for bit in qubits]
-    else:
-        # Case where there are n single-bit registers.
-        indices = [registers.index(bit.register) for bit in qubits]
-
+    indices = [bit.index for bit in qubits]
     mapped_indices = [_map_bit_index(i, new_register_sizes) for i in indices]
-
-    if isinstance(new_registers[0], qiskit.QuantumRegister):
-        Bit = qiskit.circuit.Qubit
-
-    return [Bit(new_registers[i], j) for i, j in mapped_indices]
+    return [
+        qiskit.circuit.Qubit(new_registers[i], j) for i, j in mapped_indices
+    ]
 
 
 def _measurement_order(circuit: qiskit.QuantumCircuit):
@@ -184,15 +172,14 @@ def _transform_registers(
     if new_qregs is None:
         return
 
-    qreg_sizes = [qreg.size for qreg in new_qregs]
-    old_qregs = circuit.qregs
-    nqubits_in_circuit = sum(qreg.size for qreg in old_qregs)
-
-    if len(old_qregs) > 1:
+    if len(circuit.qregs) > 1:
         raise ValueError(
             "Input circuit is required to have <= 1 quantum register but has "
             f"{len(circuit.qregs)} quantum registers."
         )
+
+    qreg_sizes = [qreg.size for qreg in new_qregs]
+    nqubits_in_circuit = sum(qreg.size for qreg in circuit.qregs)
 
     if len(qreg_sizes) and sum(qreg_sizes) != nqubits_in_circuit:
         raise ValueError(
@@ -204,13 +191,11 @@ def _transform_registers(
     if len(qreg_sizes):
         circuit.qregs = list(new_qregs)
 
-    # Map the (qu)bits in operations to the new (qu)bits.
+    # Map the qubits in operations to the new qubits.
     new_ops = []
     for op in circuit.data:
         gate, qubits, cbits = op
-
-        new_qubits = _map_qubits(qubits, old_qregs, qreg_sizes, new_qregs)
-
+        new_qubits = _map_qubits(qubits, qreg_sizes, new_qregs)
         new_ops.append((gate, new_qubits, cbits))
 
     circuit.data = new_ops
@@ -241,10 +226,7 @@ def to_qiskit(circuit: cirq.Circuit) -> qiskit.QuantumCircuit:
     Returns:
         Qiskit.QuantumCircuit object equivalent to the input Mitiq circuit.
     """
-    # Base conversion.
-    qiskit_circuit = qiskit.QuantumCircuit.from_qasm_str(to_qasm(circuit))
-
-    return qiskit_circuit
+    return qiskit.QuantumCircuit.from_qasm_str(to_qasm(circuit))
 
 
 def from_qiskit(circuit: qiskit.QuantumCircuit) -> cirq.Circuit:
