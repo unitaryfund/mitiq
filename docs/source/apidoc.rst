@@ -83,14 +83,20 @@ Qiskit Utils
 Probabilistic Error Cancellation
 --------------------------------
 
-Quasi-Probability Representations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. automodule:: mitiq.pec.representations.depolarizing
-   :members:
-
 Probabilistic Error Cancellation (High-Level Tools)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.pec.pec
+   :members:
+
+Quasi-Probability Representations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.pec.representations.optimal
+   :members:
+
+.. automodule:: mitiq.pec.representations.damping
+   :members:
+
+.. automodule:: mitiq.pec.representations.depolarizing
    :members:
 
 Sampling from a Noisy Decomposition of an Ideal Operation

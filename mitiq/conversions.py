@@ -15,7 +15,7 @@
 
 """Functions for converting to/from Mitiq's internal circuit representation."""
 from functools import wraps
-from typing import Any, Callable, Tuple
+from typing import Any, Iterable, Callable, Tuple
 
 from cirq import Circuit
 
@@ -135,6 +135,19 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
     return converted_circuit
 
 
+def accept_any_qprogram_as_input(
+    accept_cirq_circuit_function: Callable[[Circuit], Any]
+) -> Callable[[QPROGRAM], Any]:
+    @wraps(accept_cirq_circuit_function)
+    def accept_any_qprogram_function(
+        circuit: QPROGRAM, *args: Any, **kwargs: Any
+    ) -> Any:
+        cirq_circuit, _ = convert_to_mitiq(circuit)
+        return accept_cirq_circuit_function(cirq_circuit, *args, **kwargs)
+
+    return accept_any_qprogram_function
+
+
 def atomic_converter(
     cirq_circuit_modifier: Callable[..., Any]
 ) -> Callable[..., Any]:
@@ -163,6 +176,30 @@ def atomic_converter(
         scaled_circuit = convert_from_mitiq(scaled_circuit, input_circuit_type)
 
         return scaled_circuit
+
+    return qprogram_modifier
+
+
+def atomic_one_to_many_converter(
+    cirq_circuit_modifier: Callable[..., Iterable[Circuit]]
+) -> Callable[..., Iterable[QPROGRAM]]:
+    @wraps(cirq_circuit_modifier)
+    def qprogram_modifier(
+        circuit: QPROGRAM, *args: Any, **kwargs: Any
+    ) -> Iterable[QPROGRAM]:
+        mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
+
+        modified_circuits: Iterable[Circuit] = cirq_circuit_modifier(
+            mitiq_circuit, *args, **kwargs
+        )
+
+        if kwargs.get("return_mitiq") is True:
+            return modified_circuits
+
+        return [
+            convert_from_mitiq(modified_circuit, input_circuit_type)
+            for modified_circuit in modified_circuits
+        ]
 
     return qprogram_modifier
 

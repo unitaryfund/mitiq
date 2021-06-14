@@ -7,11 +7,11 @@ Mitiq Git flow
 ==============
 
 The basic development workflow for Mitiq is done in units of milestones.
-These are tracked in the GitHub milestone feature and all issues that are 
-planned to be addressed in the current milestone should be tagged with the 
+These are tracked in the GitHub milestone feature and all issues that are
+planned to be addressed in the current milestone should be tagged with the
 proper milestone.
 
-All releases for Mitiq are recorded on the ``release`` branch with tags for 
+All releases for Mitiq are recorded on the ``release`` branch with tags for
 the version number of the release.
 Development work is done on separate branches and forks that get merged into
 ``master`` when they are ready to be included in the next release.
@@ -42,10 +42,10 @@ instructions of this document to go through all the steps below:
 Make a PR from Master to Release
 --------------------------------
 
-The start of any release is drafting a PR from the master branch to the 
+The start of any release is drafting a PR from the master branch to the
 release branch. This will trigger a complete round of tests to make sure the
-code for the release passes them 
-If you have to update the changelog and the version number, do so as a 
+code for the release passes them
+If you have to update the changelog and the version number, do so as a
 part of this PR.
 
 ^^^^^^^^^^^^^^^^^^^^
@@ -53,13 +53,13 @@ Verify the changelog
 ^^^^^^^^^^^^^^^^^^^^
 
 This task has two parts:
-1. Make sure that ``CHANGELOG.md`` has an entry for each pull request (PR) 
+1. Make sure that ``CHANGELOG.md`` has an entry for each pull request (PR)
 since the last release (PRs). These entries should contain a short description
-of the PR, as well as the author username and PR number in the form 
-(@username, gh-xxx). 
+of the PR, as well as the author username and PR number in the form
+(@username, gh-xxx).
 2. The release author should add a "Summary" section with a couple sentences
 describing the latest release, and then update the title of the release
-section to include the release date and remove the "In Development" 
+section to include the release date and remove the "In Development"
 designation.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -68,16 +68,18 @@ Bump version in VERSION.txt
 
 When releasing a new version, one must of course update the ``VERSION.txt``
 file which is the single source of truth for version information. We try to
-follow SemVer, so typically a release will involve changing the version
-``vX.Y.Z`` to ``vX.(Y+1).Z``, constituting a MINOR version increase.
+follow SemVer, so typically a release will involve changing the version from
+``vX.Y.Zdev`` (development) to ``vX.Y.Z`` (released). This will be reflected as
+a change in stable release versions from ``vX.(Y-1).Z`` to ``vX.Y.Z``,
+in the case of a MINOR version increase.
 
 ----------------
 Create a new tag
 ----------------
 
-Once the PR to ``release`` is approved, tag the new commit on release 
-(using ``git tag``) with a tag that matches the number ``VERSION.txt`` 
-(with a preceding "v", so ``0.1.0`` is ``v0.1.0``) and push this tag to the 
+Once the PR to ``release`` is approved, tag the new commit on release
+(using ``git tag``) with a tag that matches the number ``VERSION.txt``
+(with a preceding "v", so ``0.1.0`` is ``v0.1.0``) and push this tag to the
 Github repository.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -92,7 +94,7 @@ There should be a new draft release created by the tag you made in the previous 
 `here <https://github.com/unitaryfund/mitiq/releases>`__. You will need to
 review it and publish the release.
 
-    - Github will create compressed files with the repository. 
+    - Github will create compressed files with the repository.
 
 .. note::
     If all the above steps have been successfully completed,
@@ -100,13 +102,45 @@ review it and publish the release.
     of the documentation. So, no additional steps are needed for updating RTD. You can
     verify changes have been updating by viewing `<https://mitiq.readthedocs.io/>`__.
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Release the new version on Github
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+    You need to have write access to the Mitiq Github repository to make
+    a new release.
+
 ------------------------------------------------
-Update the changelog for new development version
+Update the new development version
 ------------------------------------------------
 
 Add a new section to the ``CHANGELOG.md`` to track changes in the following
 release, meaning that if ``vX.Y.Z`` was just released, then there should be
-a section for ``vX.(Y+1).Z`` that is marked "In Development".
+a section for ``vX.(Y+1).Z`` that is marked "In Development". Also, change the
+version in the ``VERSION.txt`` file from ``vX.Y.Z`` to ``vX.(Y+1).Zdev``.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Release the new version on PyPI
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+    There is a GitHub action in the ``.github`` folder to automatically upload Mitiq
+    to PyPI. You can check the release status `here <https://pypi.org/project/mitiq/#history>`__.
+
+In case the action for the automatic release on PyPI fails, the commands to release Mitiq are
+
+.. code-block:: bash
+
+    python -m pip install --upgrade pip
+    make install requirements
+    pip install setuptools wheel twine
+    python setup.py sdist bdist_wheel
+    twine upload dist/*
+
+
+.. note::
+    You need to be a registered maintainer of Mitiq project on PyPI to upload
+    a new release on PyPI from your local machine.
 
 =========================
 Releasing a version patch

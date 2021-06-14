@@ -1,4 +1,4 @@
-# Copyright (C) 2020 Unitary Fund
+# Copyright (C) 2021 Unitary Fund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,22 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""Tests for the data regression portion of Clifford data regression."""
+import pytest
+import numpy as np
 
-from mitiq.pec.representations.depolarizing import (
-    represent_operation_with_global_depolarizing_noise,
-    represent_operation_with_local_depolarizing_noise,
-    represent_operations_in_circuit_with_global_depolarizing_noise,
-    represent_operations_in_circuit_with_local_depolarizing_noise,
-    global_depolarizing_kraus,
-    local_depolarizing_kraus,
-)
+from mitiq.cdr.data_regression import linear_fit_function
 
-from mitiq.pec.representations.damping import (
-    _represent_operation_with_amplitude_damping_noise,
-    amplitude_damping_kraus,
-)
 
-from mitiq.pec.representations.optimal import (
-    minimize_one_norm,
-    find_optimal_representation,
-)
+@pytest.mark.parametrize("nvariables", [1, 3])
+def test_linear_fit_function(nvariables):
+    a = np.random.RandomState(1).rand(nvariables)
+    b = np.ones(nvariables + 1)
+    assert linear_fit_function(a, b) == sum(a) + 1
