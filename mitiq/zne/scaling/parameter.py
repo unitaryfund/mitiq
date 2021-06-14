@@ -30,7 +30,7 @@ from cirq import (
     Gate,
     Qid,
 )
-from mitiq.conversions import noise_scaling_converter
+from mitiq.interface import noise_scaling_converter
 from mitiq import QPROGRAM
 
 

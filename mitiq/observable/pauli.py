@@ -19,7 +19,7 @@ import numpy as np
 import cirq
 
 from mitiq import QPROGRAM
-from mitiq.conversions import atomic_converter
+from mitiq.interface import atomic_converter
 
 
 class PauliString:

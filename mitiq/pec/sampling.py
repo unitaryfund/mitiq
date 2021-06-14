@@ -23,7 +23,7 @@ import cirq
 
 from mitiq import QPROGRAM
 from mitiq.utils import _equal
-from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
+from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 from mitiq.pec.types import OperationRepresentation
 
 

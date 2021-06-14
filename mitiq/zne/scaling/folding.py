@@ -28,7 +28,7 @@ import numpy as np
 from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary
 
 from mitiq._typing import QPROGRAM
-from mitiq.conversions import noise_scaling_converter
+from mitiq.interface import noise_scaling_converter
 
 
 class UnfoldableCircuitError(Exception):

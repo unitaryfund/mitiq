@@ -46,7 +46,7 @@ from mitiq.pec.representations.depolarizing import (
 
 from mitiq.pec.channels import _operation_to_choi, _circuit_to_choi
 from mitiq.utils import _equal
-from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
+from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 
 
 def single_qubit_depolarizing_overhead(noise_level: float) -> float:

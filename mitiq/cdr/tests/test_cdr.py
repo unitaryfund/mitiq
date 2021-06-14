@@ -22,7 +22,7 @@ import numpy as np
 from cirq import LineQubit
 
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES
-from mitiq.conversions import convert_from_mitiq
+from mitiq.interface import convert_from_mitiq
 from mitiq.cdr import execute_with_cdr, linear_fit_function_no_intercept
 from mitiq.cdr.execute import calculate_observable
 from mitiq.cdr._testing import (

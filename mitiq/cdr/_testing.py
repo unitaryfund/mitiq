@@ -17,7 +17,7 @@ import numpy as np
 import cirq
 
 from mitiq import QPROGRAM
-from mitiq.conversions import accept_any_qprogram_as_input
+from mitiq.interface import accept_any_qprogram_as_input
 from mitiq.cdr.execute import MeasurementResult
 
 
