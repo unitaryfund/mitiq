@@ -106,7 +106,7 @@ def _map_qubits(
         registers: The registers that the ``qubits`` come from.
         new_register_sizes: The size(s) of the new registers to map to.
             Note: These can be determined from ``new_registers``, but this
-            helper function is only called from ``_map_bits`` where the sizes
+            helper function is only called from ``_map_qubits`` where the sizes
             are already computed.
         new_registers: The new registers to map the ``qubits`` to.
 
@@ -224,7 +224,7 @@ def _transform_registers(
     for op in circuit.data:
         gate, qubits, cbits = op
 
-        new_qubits = _map_bits(qubits, old_qregs, qreg_sizes, new_qregs)
+        new_qubits = _map_qubits(qubits, old_qregs, qreg_sizes, new_qregs)
 
         new_ops.append((gate, new_qubits, cbits))
 
