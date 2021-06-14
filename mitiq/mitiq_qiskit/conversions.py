@@ -92,7 +92,7 @@ def _map_bit_index(
     )
 
 
-def _map_bits(
+def _map_qubits(
     bits: List[qiskit.circuit.Qubit],
     registers: List[qiskit.QuantumRegister],
     new_register_sizes: List[int],
