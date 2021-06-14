@@ -40,20 +40,16 @@ def test_execute_with_cdr(circuit_type):
     )
     circuit = convert_from_mitiq(circuit, circuit_type)
 
-    # define observables for testing
+    # Define observables for testing.
     sigma_z = np.diag([1, -1])
     obs = np.kron(np.identity(2), sigma_z)
     obs2 = np.kron(sigma_z, sigma_z)
     obs_list = [np.diag(obs), np.diag(obs2)]
 
-    # get exact solution:
-    exact_solution = []
-    for obs in obs_list:
-        exact_solution.append(
-            calculate_observable(
-                simulator_statevector(circuit), observable=obs
-            )
-        )
+    exact_solution = [calculate_observable(
+            simulator_statevector(circuit), observable=obs
+        ) for obs in obs_list
+    ]
 
     kwargs = {
         "method_select": "gaussian",
@@ -72,6 +68,7 @@ def test_execute_with_cdr(circuit_type):
         obs_list,
         num_circuits,
         frac_non_cliff,
+        full_output=True,
     )
     results1 = execute_with_cdr(
         circuit,
@@ -84,6 +81,7 @@ def test_execute_with_cdr(circuit_type):
         num_fit_parameters=1,
         scale_noise=fold_gates_from_left,
         scale_factors=[3],
+        full_output=True,
         **kwargs,
     )
     for results in [results0, results1]:
