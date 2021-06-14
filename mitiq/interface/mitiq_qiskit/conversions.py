@@ -93,7 +93,7 @@ def _map_bit_index(
 
 
 def _map_qubits(
-    bits: List[qiskit.circuit.Qubit],
+    qubits: List[qiskit.circuit.Qubit],
     registers: List[qiskit.QuantumRegister],
     new_register_sizes: List[int],
     new_registers: List[qiskit.QuantumRegister],
@@ -102,7 +102,7 @@ def _map_qubits(
     a single register or n registers, where n is the number of qubits.
 
     Args:
-        bits: A list of qubits to map.
+        qubits: A list of qubits to map.
         registers: The registers that the ``qubits`` come from.
         new_register_sizes: The size(s) of the new registers to map to.
             Note: These can be determined from ``new_registers``, but this
@@ -114,15 +114,15 @@ def _map_qubits(
         The input ``qubits`` mapped to the ``new_registers``.
     """
     if len(new_registers) == 0:
-        return bits
+        return qubits
 
     # Only two support cases:
     if len(registers) == 1:
         # Case where there are n bits in a single register.
-        indices = [bit.index for bit in bits]
+        indices = [bit.index for bit in qubits]
     else:
         # Case where there are n single-bit registers.
-        indices = [registers.index(bit.register) for bit in bits]
+        indices = [registers.index(bit.register) for bit in qubits]
 
     mapped_indices = [_map_bit_index(i, new_register_sizes) for i in indices]
 
@@ -172,10 +172,7 @@ def _transform_registers(
     """Transforms the registers in the circuit to the new registers.
 
     Args:
-        circuit: Qiskit circuit with one quantum register and either
-            * No classical registers, or
-            * One single classical register of n bits, or
-            * n single-bit classical registers.
+        circuit: Qiskit circuit with at most one quantum register.
         new_qregs: The new quantum registers for the circuit.
 
     Raises:
@@ -183,8 +180,6 @@ def _transform_registers(
             * If the input circuit has more than one quantum register.
             * If the number of qubits in the new quantum registers does not
             match the number of qubits in the circuit.
-            * If the input circuit has a classical register with more than one
-            bit.
     """
     if new_qregs is None:
         return
@@ -205,16 +200,6 @@ def _transform_registers(
             f"quantum registers have {sum(qreg_sizes)} qubits."
         )
 
-    old_cregs = circuit.cregs
-    nbits_in_circuit = sum(creg.size for creg in old_cregs)
-
-    if len(old_cregs) not in (0, 1, nbits_in_circuit):
-        raise ValueError(
-            f"Input circuit is required to have 0, 1, or {nbits_in_circuit} "
-            f"classical registers but has {len(circuit.cregs)} classical "
-            f"registers."
-        )
-
     # Assign the new registers.
     if len(qreg_sizes):
         circuit.qregs = list(new_qregs)
@@ -229,7 +214,6 @@ def _transform_registers(
         new_ops.append((gate, new_qubits, cbits))
 
     circuit.data = new_ops
-    circuit.cregs = old_cregs
 
 
 def to_qasm(circuit: cirq.Circuit) -> QASMType:
