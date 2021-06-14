@@ -108,7 +108,7 @@ def tensor_product(*args: np.ndarray) -> np.ndarray:
     ``numpy.kron(arg_a, arg_b)`` to the case of an arbitrary number of
     arguments.
     """
-    if args is ():
+    if args == ():
         raise TypeError("tensor_product() requires at least one argument.")
 
     val = args[0]

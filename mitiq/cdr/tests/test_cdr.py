@@ -88,6 +88,6 @@ def test_execute_with_cdr(circuit_type):
     )
     for results in [results0, results1]:
         for i in range(len(results[1])):
-            assert abs(results[1][i][0] - exact_solution[i]) > abs(
+            assert abs(results[1][i][0] - exact_solution[i]) >= abs(
                 results[0][i] - exact_solution[i]
             )
