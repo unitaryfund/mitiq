@@ -13,6 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from mitiq.interface import (
+    mitiq_braket,
+    mitiq_cirq,
+    mitiq_pyquil,
+    mitiq_qiskit,
+)
 from mitiq.interface.conversions import (
     accept_any_qprogram_as_input,
     atomic_converter,
@@ -22,10 +28,4 @@ from mitiq.interface.conversions import (
     noise_scaling_converter,
     CircuitConversionError,
     UnsupportedCircuitError,
-)
-from mitiq.interface import (
-    mitiq_braket,
-    mitiq_cirq,
-    mitiq_pyquil,
-    mitiq_qiskit,
 )
