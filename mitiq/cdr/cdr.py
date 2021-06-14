@@ -15,33 +15,35 @@
 
 """API for using Clifford Data Regression (CDR) error mitigation."""
 
-from typing import List, Union, Callable, Sequence, Tuple
+from typing import Callable, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from scipy.optimize import curve_fit
 
-from cirq.circuits import Circuit
+from cirq import Circuit
 
-from mitiq.cdr.clifford_training_data import generate_training_circuits
-from mitiq.cdr.data_regression import linear_fit_function
+from mitiq import QPROGRAM
+from mitiq.conversions import accept_any_qprogram_as_input
+
+from mitiq.cdr import generate_training_circuits, linear_fit_function
 from mitiq.cdr.execute import calculate_observable, MeasurementResult
 from mitiq.zne.scaling import fold_gates_at_random
 
 
-# TODO: Allow for any QPROGRAM, not just a cirq.Circuit.
+@accept_any_qprogram_as_input
 def execute_with_cdr(
-    circuit: Circuit,
+    circuit: QPROGRAM,
     executor: Callable[[Circuit], MeasurementResult],
     simulator: Callable[[Circuit], Union[MeasurementResult, np.ndarray]],
     observables: List[np.ndarray],
     num_training_circuits: int = 10,
     fraction_non_clifford: float = 0.1,
     fit_function: Callable[..., float] = linear_fit_function,
-    num_parameters: int = None,
+    num_fit_parameters: Optional[int] = None,
     scale_factors: Sequence[float] = (1,),
     scale_noise: Callable[[Circuit, float], Circuit] = fold_gates_at_random,
     **kwargs: dict,
-) -> Tuple[List[np.ndarray], List[float]]:
+) -> Tuple[List[float], List[np.ndarray]]:
     """Function for the calculation of an observable from some circuit of
     interest to be mitigated with CDR (or vnCDR) based on [Czarnik2020]_ and
     [Lowe2020]_.
@@ -78,7 +80,7 @@ def execute_with_cdr(
                                but more successful the mitigation.
         fit_function: The function to map noisy to exact data. Takes array of
                       noisy and data and parameters returning a float.
-        num_parameters: The number of paramters the fit_function takes.
+        num_fit_parameters: The number of paramters the fit_function takes.
         scale_noise: Optional argument containing a user defined function on
                      how to increase the noise. If this argument is given then
                      the mitigation method will be vnCDR.
@@ -188,7 +190,7 @@ def execute_with_cdr(
             lambda x, *params: fit_function(x, params),
             noisy_expectation_values,
             ideal_expectation_values,
-            p0=np.zeros(num_parameters),
+            p0=np.zeros(num_fit_parameters),
         )
         mitigated_observables.append(fit_function(circuit_data, fitted_params))
         raw_observables.append(circuit_data)

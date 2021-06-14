@@ -20,6 +20,8 @@ import numpy as np
 import cirq
 from cirq.circuits import Circuit
 
+from mitiq._typing import SUPPORTED_PROGRAM_TYPES
+from mitiq.conversions import convert_from_mitiq
 from mitiq.cdr.clifford_training_data import (
     _is_clifford_angle,
     is_clifford,
@@ -38,11 +40,40 @@ from mitiq.cdr.clifford_training_data import (
 from mitiq.cdr._testing import random_x_z_cnot_circuit
 
 
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_is_clifford_with_clifford(circuit_type):
+    circuit = convert_from_mitiq(
+        cirq.Circuit(cirq.Z.on(cirq.LineQubit(0))), circuit_type
+    )
+    assert is_clifford(circuit)
+
+
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_is_clifford_with_nonclifford(circuit_type):
+    circuit = convert_from_mitiq(
+        cirq.Circuit(cirq.T.on(cirq.LineQubit(0))), circuit_type
+    )
+    assert not is_clifford(circuit)
+
+
 def test_generate_training_circuits():
     circuit = random_x_z_cnot_circuit(
         cirq.LineQubit.range(3), n_moments=5, random_state=1
     )
     assert not is_clifford(circuit)
+
+    (clifford_circuit,) = generate_training_circuits(
+        circuit, num_training_circuits=1, fraction_non_clifford=0.0
+    )
+    assert is_clifford(clifford_circuit)
+
+
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_generate_training_circuits_any_qprogram(circuit_type):
+    circuit = random_x_z_cnot_circuit(
+        cirq.LineQubit.range(3), n_moments=5, random_state=1
+    )
+    circuit = convert_from_mitiq(circuit, circuit_type)
 
     (clifford_circuit,) = generate_training_circuits(
         circuit, num_training_circuits=1, fraction_non_clifford=0.0
@@ -182,7 +213,8 @@ def test_select(method):
     )
 
 
-def test_count_non_cliffords():
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_count_non_cliffords(circuit_type):
     a, b = cirq.LineQubit.range(2)
     circuit = Circuit(
         cirq.rz(0.0).on(a),  # Clifford.
@@ -192,6 +224,7 @@ def test_count_non_cliffords():
         cirq.rz(0.5 * np.pi).on(b),  # Clifford.
         cirq.CNOT.on(a, b),  # Clifford.
     )
+    circuit = convert_from_mitiq(circuit, circuit_type)
 
     assert count_non_cliffords(circuit) == 2
 
