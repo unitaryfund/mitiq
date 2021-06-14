@@ -110,9 +110,6 @@ def _map_qubits(
     Returns:
         The input ``qubits`` mapped to the ``new_registers``.
     """
-    if len(new_registers) == 0:
-        return qubits
-
     indices = [bit.index for bit in qubits]
     mapped_indices = [_map_bit_index(i, new_register_sizes) for i in indices]
     return [
