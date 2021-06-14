@@ -128,8 +128,6 @@ def _map_bits(
 
     if isinstance(new_registers[0], qiskit.QuantumRegister):
         Bit = qiskit.circuit.Qubit
-    else:
-        Bit = qiskit.circuit.Clbit
 
     return [Bit(new_registers[i], j) for i, j in mapped_indices]
 
@@ -190,9 +188,6 @@ def _transform_registers(
     """
     if new_qregs is None:
         return
-
-    if new_qregs is None:
-        new_qregs = []
 
     qreg_sizes = [qreg.size for qreg in new_qregs]
     old_qregs = circuit.qregs
