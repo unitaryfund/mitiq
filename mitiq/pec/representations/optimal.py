@@ -23,7 +23,7 @@ from scipy.optimize import minimize, LinearConstraint
 from cirq import channel
 
 from mitiq import QPROGRAM
-from mitiq.conversions import convert_to_mitiq
+from mitiq.interface import convert_to_mitiq
 from mitiq.pec.types import NoisyBasis, OperationRepresentation
 from mitiq.pec.channels import matrix_to_vector, kraus_to_super
 

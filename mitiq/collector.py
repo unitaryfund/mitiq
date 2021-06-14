@@ -23,7 +23,7 @@ from typing import Any, Callable, Iterable, List, Sequence, Tuple, Union
 import numpy as np
 
 from mitiq import QPROGRAM
-from mitiq.conversions import (
+from mitiq.interface import (
     convert_from_mitiq,
     convert_to_mitiq,
 )

@@ -32,7 +32,7 @@ from cirq import (
 
 from mitiq import QPROGRAM
 from mitiq.pec.types import OperationRepresentation, NoisyOperation
-from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
+from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 
 from mitiq.pec.channels import tensor_product
 

@@ -18,7 +18,7 @@ import numpy as np
 import cirq
 
 
-from mitiq.mitiq_cirq.cirq_utils import (
+from mitiq.interface.mitiq_cirq.cirq_utils import (
     execute,
     execute_with_shots,
     execute_with_depolarizing_noise,

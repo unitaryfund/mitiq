@@ -15,7 +15,7 @@
 
 """Functions for converting to/from Mitiq's internal circuit representation."""
 from functools import wraps
-from typing import Any, Callable, Tuple
+from typing import Any, Iterable, Callable, Tuple
 
 from cirq import Circuit
 
@@ -54,17 +54,17 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
         )
 
     if "qiskit" in package:
-        from mitiq.mitiq_qiskit.conversions import from_qiskit
+        from mitiq.interface.mitiq_qiskit.conversions import from_qiskit
 
         input_circuit_type = "qiskit"
         conversion_function = from_qiskit
     elif "pyquil" in package:
-        from mitiq.mitiq_pyquil.conversions import from_pyquil
+        from mitiq.interface.mitiq_pyquil.conversions import from_pyquil
 
         input_circuit_type = "pyquil"
         conversion_function = from_pyquil
     elif "braket" in package:
-        from mitiq.mitiq_braket.conversions import from_braket
+        from mitiq.interface.mitiq_braket.conversions import from_braket
 
         input_circuit_type = "braket"
         conversion_function = from_braket
@@ -102,15 +102,15 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
     """
     conversion_function: Callable[[Circuit], QPROGRAM]
     if conversion_type == "qiskit":
-        from mitiq.mitiq_qiskit.conversions import to_qiskit
+        from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
 
         conversion_function = to_qiskit
     elif conversion_type == "pyquil":
-        from mitiq.mitiq_pyquil.conversions import to_pyquil
+        from mitiq.interface.mitiq_pyquil.conversions import to_pyquil
 
         conversion_function = to_pyquil
     elif conversion_type == "braket":
-        from mitiq.mitiq_braket.conversions import to_braket
+        from mitiq.interface.mitiq_braket.conversions import to_braket
 
         conversion_function = to_braket
     elif conversion_type == "cirq":
@@ -133,6 +133,19 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
         )
 
     return converted_circuit
+
+
+def accept_any_qprogram_as_input(
+    accept_cirq_circuit_function: Callable[[Circuit], Any]
+) -> Callable[[QPROGRAM], Any]:
+    @wraps(accept_cirq_circuit_function)
+    def accept_any_qprogram_function(
+        circuit: QPROGRAM, *args: Any, **kwargs: Any
+    ) -> Any:
+        cirq_circuit, _ = convert_to_mitiq(circuit)
+        return accept_cirq_circuit_function(cirq_circuit, *args, **kwargs)
+
+    return accept_any_qprogram_function
 
 
 def atomic_converter(
@@ -167,6 +180,30 @@ def atomic_converter(
     return qprogram_modifier
 
 
+def atomic_one_to_many_converter(
+    cirq_circuit_modifier: Callable[..., Iterable[Circuit]]
+) -> Callable[..., Iterable[QPROGRAM]]:
+    @wraps(cirq_circuit_modifier)
+    def qprogram_modifier(
+        circuit: QPROGRAM, *args: Any, **kwargs: Any
+    ) -> Iterable[QPROGRAM]:
+        mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
+
+        modified_circuits: Iterable[Circuit] = cirq_circuit_modifier(
+            mitiq_circuit, *args, **kwargs
+        )
+
+        if kwargs.get("return_mitiq") is True:
+            return modified_circuits
+
+        return [
+            convert_from_mitiq(modified_circuit, input_circuit_type)
+            for modified_circuit in modified_circuits
+        ]
+
+    return qprogram_modifier
+
+
 def noise_scaling_converter(
     noise_scaling_function: Callable[..., Any]
 ) -> Callable[..., Any]:
@@ -187,7 +224,7 @@ def noise_scaling_converter(
 
         # Keep the same register structure and measurement order with Qiskit.
         if "qiskit" in scaled_circuit.__module__:
-            from mitiq.mitiq_qiskit.conversions import (
+            from mitiq.interface.mitiq_qiskit.conversions import (
                 _transform_registers,
                 _measurement_order,
             )

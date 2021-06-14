@@ -34,7 +34,7 @@ from pyquil import Program
 from pyquil.quilbase import Pragma
 
 from mitiq.utils import _equal
-from mitiq.conversions import (
+from mitiq.interface import (
     CircuitConversionError,
     convert_to_mitiq,
     convert_from_mitiq,

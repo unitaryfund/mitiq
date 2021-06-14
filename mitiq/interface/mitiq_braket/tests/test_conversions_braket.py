@@ -23,7 +23,7 @@ from braket.circuits import (
 )
 from cirq import Circuit, LineQubit, ops, protocols, testing
 
-from mitiq.mitiq_braket.conversions import from_braket, to_braket
+from mitiq.interface.mitiq_braket.conversions import from_braket, to_braket
 from mitiq.utils import _equal
 
 

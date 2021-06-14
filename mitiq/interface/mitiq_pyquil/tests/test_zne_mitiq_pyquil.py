@@ -26,7 +26,7 @@ from mitiq.zne import (
     mitigate_executor,
     zne_decorator,
 )
-from mitiq.mitiq_pyquil.pyquil_utils import (
+from mitiq.interface.mitiq_pyquil.pyquil_utils import (
     generate_qcs_executor,
     ground_state_expectation,
 )

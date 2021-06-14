@@ -55,7 +55,7 @@ from mitiq.pec.channels import (
 )
 
 from mitiq.pec.types import NoisyBasis, NoisyOperation
-from mitiq.conversions import convert_from_mitiq
+from mitiq.interface import convert_from_mitiq
 
 
 def test_minimize_one_norm_failure_error():

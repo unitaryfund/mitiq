@@ -13,9 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from mitiq.mitiq_pyquil.conversions import (
-    from_pyquil,
-    from_quil,
-    to_pyquil,
-    to_quil,
+from mitiq.interface.mitiq_qiskit.conversions import (
+    from_qasm,
+    from_qiskit,
+    to_qasm,
+    to_qiskit,
+)
+from mitiq.interface.mitiq_qiskit.qiskit_utils import (
+    execute,
+    execute_with_shots,
+    execute_with_noise,
+    execute_with_shots_and_noise,
+    initialized_depolarizing_noise,
 )
