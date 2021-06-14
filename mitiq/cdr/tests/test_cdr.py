@@ -46,9 +46,9 @@ def test_execute_with_cdr(circuit_type):
     obs2 = np.kron(sigma_z, sigma_z)
     obs_list = [np.diag(obs), np.diag(obs2)]
 
-    exact_solution = [calculate_observable(
-            simulator_statevector(circuit), observable=obs
-        ) for obs in obs_list
+    exact_solution = [
+        calculate_observable(simulator_statevector(circuit), observable=obs)
+        for obs in obs_list
     ]
 
     kwargs = {
