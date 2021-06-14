@@ -23,7 +23,7 @@ from scipy.optimize import curve_fit
 from cirq import Circuit
 
 from mitiq import QPROGRAM
-from mitiq.conversions import accept_any_qprogram_as_input
+from mitiq.interface import accept_any_qprogram_as_input
 
 from mitiq.cdr import generate_training_circuits, linear_fit_function
 from mitiq.cdr.execute import calculate_observable, MeasurementResult

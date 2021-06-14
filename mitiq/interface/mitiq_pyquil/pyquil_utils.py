@@ -21,7 +21,7 @@ from pyquil import Program
 from pyquil.api import QuantumComputer
 from pyquil.gates import MEASURE, RESET
 
-from mitiq.mitiq_pyquil.compiler import basic_compile
+from mitiq.interface.mitiq_pyquil.compiler import basic_compile
 
 
 def generate_qcs_executor(

@@ -19,7 +19,7 @@ import numpy as np
 import cirq
 
 from mitiq.observable import PauliString
-from mitiq import mitiq_qiskit, mitiq_pyquil
+from mitiq.interface import mitiq_qiskit, mitiq_pyquil
 from mitiq.utils import _equal
 
 

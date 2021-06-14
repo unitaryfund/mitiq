@@ -32,7 +32,7 @@ from mitiq.pec.representations.damping import (
 )
 
 from mitiq.pec.channels import _operation_to_choi, _circuit_to_choi
-from mitiq.conversions import convert_from_mitiq
+from mitiq.interface import convert_from_mitiq
 
 
 @pytest.mark.parametrize("noise", [0, 0.1, 0.7])

@@ -22,7 +22,7 @@ import cirq
 from cirq.circuits import Circuit
 
 from mitiq import QPROGRAM
-from mitiq.conversions import (
+from mitiq.interface import (
     accept_any_qprogram_as_input,
     atomic_one_to_many_converter,
 )

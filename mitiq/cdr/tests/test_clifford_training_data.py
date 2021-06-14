@@ -21,7 +21,7 @@ import cirq
 from cirq.circuits import Circuit
 
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES
-from mitiq.conversions import convert_from_mitiq
+from mitiq.interface import convert_from_mitiq
 from mitiq.cdr.clifford_training_data import (
     _is_clifford_angle,
     is_clifford,

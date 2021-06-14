@@ -23,7 +23,7 @@ import numpy as np
 import cirq
 
 from mitiq import QPROGRAM
-from mitiq.conversions import (
+from mitiq.interface import (
     convert_from_mitiq,
     convert_to_mitiq,
     CircuitConversionError,

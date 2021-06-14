@@ -54,17 +54,17 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
         )
 
     if "qiskit" in package:
-        from mitiq.mitiq_qiskit.conversions import from_qiskit
+        from mitiq.interface.mitiq_qiskit.conversions import from_qiskit
 
         input_circuit_type = "qiskit"
         conversion_function = from_qiskit
     elif "pyquil" in package:
-        from mitiq.mitiq_pyquil.conversions import from_pyquil
+        from mitiq.interface.mitiq_pyquil.conversions import from_pyquil
 
         input_circuit_type = "pyquil"
         conversion_function = from_pyquil
     elif "braket" in package:
-        from mitiq.mitiq_braket.conversions import from_braket
+        from mitiq.interface.mitiq_braket.conversions import from_braket
 
         input_circuit_type = "braket"
         conversion_function = from_braket
@@ -102,15 +102,15 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
     """
     conversion_function: Callable[[Circuit], QPROGRAM]
     if conversion_type == "qiskit":
-        from mitiq.mitiq_qiskit.conversions import to_qiskit
+        from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
 
         conversion_function = to_qiskit
     elif conversion_type == "pyquil":
-        from mitiq.mitiq_pyquil.conversions import to_pyquil
+        from mitiq.interface.mitiq_pyquil.conversions import to_pyquil
 
         conversion_function = to_pyquil
     elif conversion_type == "braket":
-        from mitiq.mitiq_braket.conversions import to_braket
+        from mitiq.interface.mitiq_braket.conversions import to_braket
 
         conversion_function = to_braket
     elif conversion_type == "cirq":
@@ -224,7 +224,7 @@ def noise_scaling_converter(
 
         # Keep the same register structure and measurement order with Qiskit.
         if "qiskit" in scaled_circuit.__module__:
-            from mitiq.mitiq_qiskit.conversions import (
+            from mitiq.interface.mitiq_qiskit.conversions import (
                 _transform_registers,
                 _measurement_order,
             )

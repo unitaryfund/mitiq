@@ -21,7 +21,7 @@ import cirq
 import qiskit
 
 from mitiq.utils import _equal
-from mitiq.mitiq_qiskit.conversions import (
+from mitiq.interface.mitiq_qiskit.conversions import (
     to_qasm,
     to_qiskit,
     from_qasm,

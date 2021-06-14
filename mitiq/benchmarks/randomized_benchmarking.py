@@ -25,7 +25,7 @@ from cirq.experiments.qubit_characterizations import (
 )
 from cirq import LineQubit
 from mitiq import QPROGRAM
-from mitiq.conversions import convert_from_mitiq
+from mitiq.interface import convert_from_mitiq
 
 
 def generate_rb_circuits(

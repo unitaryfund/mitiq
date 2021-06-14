@@ -28,7 +28,7 @@ from braket.circuits import (
 )
 
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES
-from mitiq.conversions import (
+from mitiq.interface import (
     convert_to_mitiq,
     convert_from_mitiq,
     accept_any_qprogram_as_input,
