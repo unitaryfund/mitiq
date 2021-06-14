@@ -227,53 +227,6 @@ def test_convert_with_multiple_barriers(as_qasm):
     assert _equal(cirq_circuit, correct)
 
 
-@pytest.mark.parametrize("qreg_sizes", [[1], [1, 2], [2, 1], [1, 1, 1]])
-def test_to_qiskit_assign_qregs(qreg_sizes):
-    nbits = sum(qreg_sizes)
-    cirq_circuit = cirq.testing.random_circuit(
-        nbits, n_moments=5, op_density=1, random_state=10
-    )
-
-    qregs = [qiskit.QuantumRegister(s) for s in qreg_sizes]
-    qiskit_circuit = to_qiskit(cirq_circuit, qregs=qregs)
-
-    assert qiskit_circuit.qregs == qregs
-    assert qiskit_circuit.cregs == []
-    cirq.testing.assert_allclose_up_to_global_phase(
-        cirq.unitary(from_qiskit(qiskit_circuit)),
-        cirq.unitary(cirq_circuit),
-        atol=1e-5,
-    )
-
-
-@pytest.mark.parametrize("qreg_sizes", [[2], [1, 3, 2], [2, 1], [1, 1, 1]])
-@pytest.mark.parametrize("measure", [True, False])
-@pytest.mark.parametrize("flip_creg", [True, False])
-def test_to_qiskit_assign_qregs_and_cregs(qreg_sizes, measure, flip_creg):
-    nbits = sum(qreg_sizes)
-    cirq_circuit = cirq.testing.random_circuit(
-        nbits, n_moments=5, op_density=1, random_state=10
-    )
-    if measure:
-        cirq_circuit.append(cirq.measure_each(*cirq_circuit.all_qubits()))
-
-    qregs = [qiskit.QuantumRegister(s) for s in qreg_sizes]
-    cregs = [qiskit.ClassicalRegister(s) for s in qreg_sizes]
-    if flip_creg:
-        cregs = cregs[::-1]
-
-    qiskit_circuit = to_qiskit(cirq_circuit, qregs=qregs, cregs=cregs)
-
-    assert qiskit_circuit.qregs == qregs
-    assert qiskit_circuit.cregs == cregs
-
-    cirq.testing.assert_allclose_up_to_global_phase(
-        cirq.unitary(from_qiskit(qiskit_circuit)),
-        cirq.unitary(cirq_circuit),
-        atol=1e-5,
-    )
-
-
 @pytest.mark.parametrize("reg_sizes", [[2, 4, 1, 6], [5, 4, 2], [6]])
 def test_map_bit_index(reg_sizes):
     expected_register_index = 0
@@ -331,31 +284,9 @@ def test_transform_qregs_two_qubit_ops(new_reg_sizes):
     assert _equal(from_qiskit(circ), from_qiskit(orig))
 
 
-@pytest.mark.parametrize("nbits", [1, 5])
-@pytest.mark.parametrize("with_ops", [True, False])
-@pytest.mark.parametrize("measure", [True, False])
-def test_transform_cregs(nbits, with_ops, measure):
-    qreg = qiskit.QuantumRegister(nbits)
-    creg = qiskit.ClassicalRegister(nbits)
-    circ = qiskit.QuantumCircuit(qreg, creg)
-    if with_ops:
-        circ.h(qreg)
-    if measure:
-        circ.measure(qreg, creg)
-
-    orig = circ.copy()
-
-    new_cregs = [qiskit.ClassicalRegister(1) for _ in range(nbits)]
-    _transform_registers(circ, new_cregs=new_cregs)
-
-    assert circ.cregs == new_cregs
-    assert circ.qregs == orig.qregs
-    assert _equal(from_qiskit(circ), from_qiskit(orig))
-
-
 @pytest.mark.parametrize("new_reg_sizes", [[1], [1, 2], [2, 1], [1, 1, 1]])
 @pytest.mark.parametrize("measure", [True, False])
-def test_transform_qregs_and_cregs_random_circuit(new_reg_sizes, measure):
+def test_transform_qregs_random_circuit(new_reg_sizes, measure):
     nbits = sum(new_reg_sizes)
     circ = to_qiskit(
         cirq.testing.random_circuit(
@@ -369,11 +300,9 @@ def test_transform_qregs_and_cregs_random_circuit(new_reg_sizes, measure):
     orig = circ.copy()
 
     new_qregs = [qiskit.QuantumRegister(s) for s in new_reg_sizes]
-    new_cregs = [qiskit.ClassicalRegister(s) for s in new_reg_sizes]
-    _transform_registers(circ, new_qregs=new_qregs, new_cregs=new_cregs)
+    _transform_registers(circ, new_qregs=new_qregs)
 
     assert circ.qregs == new_qregs
-    assert circ.cregs == new_cregs
     assert _equal(from_qiskit(circ), from_qiskit(orig))
 
 
@@ -385,12 +314,15 @@ def test_transform_registers_wrong_bit_number():
     with pytest.raises(ValueError):
         _transform_registers(circ, new_qregs=new_qregs)
 
-    new_cregs = [qiskit.ClassicalRegister(1)]
-    with pytest.raises(ValueError):
-        _transform_registers(circ, new_cregs=new_cregs)
+
+def test_transform_registers_wrong_reg_number():
+    nqubits = 2
+    circ = qiskit.QuantumCircuit(qiskit.QuantumRegister(nqubits))
+    new_qregs = [qiskit.QuantumRegister(1) for _ in range(2 * nqubits)]
+    circ.add_register(*new_qregs)
 
     with pytest.raises(ValueError):
-        _transform_registers(circ, new_qregs, new_cregs)
+        _transform_registers(circ, new_qregs=new_qregs)
 
 
 @pytest.mark.parametrize("size", [5])

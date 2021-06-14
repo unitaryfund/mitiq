@@ -16,7 +16,7 @@
 """Functions to convert between Mitiq's internal circuit representation and
 Qiskit's circuit representation.
 """
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple
 import re
 
 import numpy as np
@@ -92,28 +92,26 @@ def _map_bit_index(
     )
 
 
-def _map_bits(
-    bits: List[Union[qiskit.circuit.Qubit, qiskit.circuit.Clbit]],
-    registers: List[Union[qiskit.QuantumRegister, qiskit.ClassicalRegister]],
+def _map_qubits(
+    bits: List[qiskit.circuit.Qubit],
+    registers: List[qiskit.QuantumRegister],
     new_register_sizes: List[int],
-    new_registers: List[
-        Union[qiskit.QuantumRegister, qiskit.ClassicalRegister]
-    ],
-) -> List[Union[qiskit.circuit.Qubit, qiskit.circuit.Clbit]]:
-    """Maps (qu)bits to new registers. Assumes the input ``bits`` come from
-    a single register or n registers, where n is the number of bits.
+    new_registers: List[qiskit.QuantumRegister],
+) -> List[qiskit.circuit.Qubit]:
+    """Maps qubits to new registers. Assumes the input ``qubits`` come from
+    a single register or n registers, where n is the number of qubits.
 
     Args:
-        bits: A list of (qu)bits to map.
-        registers: The registers that the ``bits`` come from.
+        bits: A list of qubits to map.
+        registers: The registers that the ``qubits`` come from.
         new_register_sizes: The size(s) of the new registers to map to.
             Note: These can be determined from ``new_registers``, but this
-            helper function is only called from ``_map_bits`` where the sizes
+            helper function is only called from ``_map_qubits`` where the sizes
             are already computed.
-        new_registers: The new registers to map the ``bits`` to .
+        new_registers: The new registers to map the ``qubits`` to.
 
     Returns:
-        The input ``bits`` mapped to the ``new_registers``.
+        The input ``qubits`` mapped to the ``new_registers``.
     """
     if len(new_registers) == 0:
         return bits
@@ -130,8 +128,6 @@ def _map_bits(
 
     if isinstance(new_registers[0], qiskit.QuantumRegister):
         Bit = qiskit.circuit.Qubit
-    else:
-        Bit = qiskit.circuit.Clbit
 
     return [Bit(new_registers[i], j) for i, j in mapped_indices]
 
@@ -172,7 +168,6 @@ def _measurement_order(circuit: qiskit.QuantumCircuit):
 def _transform_registers(
     circuit: qiskit.QuantumCircuit,
     new_qregs: Optional[List[qiskit.QuantumRegister]] = None,
-    new_cregs: Optional[List[qiskit.ClassicalRegister]] = None,
 ) -> None:
     """Transforms the registers in the circuit to the new registers.
 
@@ -182,7 +177,6 @@ def _transform_registers(
             * One single classical register of n bits, or
             * n single-bit classical registers.
         new_qregs: The new quantum registers for the circuit.
-        new_cregs: The new classical registers for the circuit.
 
     Raises:
         ValueError:
@@ -191,17 +185,9 @@ def _transform_registers(
             match the number of qubits in the circuit.
             * If the input circuit has a classical register with more than one
             bit.
-            * If the number of bits in the new classical registers does not
-            match the number of bits in the circuit.
     """
-    if new_qregs is None and new_cregs is None:
-        return
-
     if new_qregs is None:
-        new_qregs = []
-
-    if new_cregs is None:
-        new_cregs = []
+        return
 
     qreg_sizes = [qreg.size for qreg in new_qregs]
     old_qregs = circuit.qregs
@@ -219,7 +205,6 @@ def _transform_registers(
             f"quantum registers have {sum(qreg_sizes)} qubits."
         )
 
-    creg_sizes = [creg.size for creg in new_cregs]
     old_cregs = circuit.cregs
     nbits_in_circuit = sum(creg.size for creg in old_cregs)
 
@@ -230,29 +215,21 @@ def _transform_registers(
             f"registers."
         )
 
-    if len(creg_sizes) and sum(creg_sizes) != nbits_in_circuit:
-        raise ValueError(
-            f"The circuit has {nbits_in_circuit} bits, but the provided "
-            f"classical registers have {sum(creg_sizes)} bits."
-        )
-
     # Assign the new registers.
     if len(qreg_sizes):
         circuit.qregs = list(new_qregs)
-    if len(creg_sizes):
-        circuit.cregs = list(new_cregs)
 
     # Map the (qu)bits in operations to the new (qu)bits.
     new_ops = []
     for op in circuit.data:
         gate, qubits, cbits = op
 
-        new_qubits = _map_bits(qubits, old_qregs, qreg_sizes, new_qregs)
-        new_cbits = _map_bits(cbits, old_cregs, creg_sizes, new_cregs)
+        new_qubits = _map_qubits(qubits, old_qregs, qreg_sizes, new_qregs)
 
-        new_ops.append((gate, new_qubits, new_cbits))
+        new_ops.append((gate, new_qubits, cbits))
 
     circuit.data = new_ops
+    circuit.cregs = old_cregs
 
 
 def to_qasm(circuit: cirq.Circuit) -> QASMType:
@@ -269,41 +246,19 @@ def to_qasm(circuit: cirq.Circuit) -> QASMType:
     return circuit.to_qasm()
 
 
-def to_qiskit(
-    circuit: cirq.Circuit,
-    qregs: Optional[List[qiskit.QuantumRegister]] = None,
-    cregs: Optional[List[qiskit.ClassicalRegister]] = None,
-    add_cregs_if_cannot_transform: bool = True,
-) -> qiskit.QuantumCircuit:
-    """Returns a Qiskit circuit equivalent to the input Mitiq circuit.
+def to_qiskit(circuit: cirq.Circuit) -> qiskit.QuantumCircuit:
+    """Returns a Qiskit circuit equivalent to the input Mitiq circuit. Note
+    that the output circuit registers may not match the input circuit
+    registers.
 
     Args:
         circuit: Mitiq circuit to convert to a Qiskit circuit.
-        qregs: Quantum registers of the returned Qiskit circuit. If none are
-            provided, a single default register is used.
-        cregs: Classical registers of the returned Qiskit circuit, provided
-            that the original circuit has classical registers and
-            ``add_cregs_if_cannot_transform`` is True. If none are provided, a
-            single default register is used.
-        add_cregs_if_cannot_transform: If True, the provided ``cregs`` are
-            added to the circuit if there are no classical registers in the
-            original ``circuit``.
 
     Returns:
         Qiskit.QuantumCircuit object equivalent to the input Mitiq circuit.
     """
     # Base conversion.
     qiskit_circuit = qiskit.QuantumCircuit.from_qasm_str(to_qasm(circuit))
-
-    # Assign register structure.
-    # Note: Output qiskit_circuit has one quantum register and n classical
-    # registers of 1 bit where n is the total number of classical bits.
-    if len(qiskit_circuit.cregs) > 0:
-        _transform_registers(qiskit_circuit, new_qregs=qregs, new_cregs=cregs)
-    else:
-        _transform_registers(qiskit_circuit, new_qregs=qregs)
-        if cregs and add_cregs_if_cannot_transform:
-            qiskit_circuit.add_register(*cregs)
 
     return qiskit_circuit
 
