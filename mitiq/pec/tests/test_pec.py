@@ -183,8 +183,8 @@ def test_pyquil_noiseless_decomposition_multiqubit(nqubits):
         representation = OperationRepresentation(
             ideal=pyquil.Program(pyquil.gates.H(q)),
             basis_expansion={
-                NoisyOperation(ideal=pyquil.Program(pyquil.gates.X(q))): 0.5,
-                NoisyOperation(ideal=pyquil.Program(pyquil.gates.Z(q))): 0.5,
+                NoisyOperation(circuit=pyquil.Program(pyquil.gates.X(q))): 0.5,
+                NoisyOperation(circuit=pyquil.Program(pyquil.gates.Z(q))): 0.5,
             },
         )
         representations.append(representation)
@@ -222,8 +222,8 @@ def test_qiskit_noiseless_decomposition_multiqubit(nqubits):
         representation = OperationRepresentation(
             ideal=opcircuit,
             basis_expansion={
-                NoisyOperation(ideal=xcircuit): 0.5,
-                NoisyOperation(ideal=zcircuit): 0.5,
+                NoisyOperation(circuit=xcircuit): 0.5,
+                NoisyOperation(circuit=zcircuit): 0.5,
             },
         )
         representations.append(representation)
