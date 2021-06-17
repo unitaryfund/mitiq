@@ -8,6 +8,52 @@
 % # " - [Bug Fix]"
 % # " - Fix the bug."
 
+## Version 0.9.0 (June 17th, 2021)
+
+### Summary
+
+The main addition introduced in this release is the implementation of a new error mitigation technique: (variable-noise) Clifford data regression ([arXiv:2005.10189](https://arxiv.org/abs/2005.10189), [arXiv:2011.01157](https://arxiv.org/abs/2011.01157)). This is structured as
+a Mitiq module called `mitiq.cdr`.
+
+Another important change is the integration with Amazon Braket, such that Mitiq is now compatible with circuits of type `braket.circuits.Circuit`. Moreover all the existing Mitiq integrations are now organized into unique module called `mitiq.interface`.
+
+In the context of probabilistic error cancellation, the sub-module `mitiq.pec.representations` has been significantly improved. Now one can easily compute the optimal quasi-probabiliy representation of an ideal gate as a linear combination of `NoisyOperation` objects.
+
+Thanks to all contributors (@L-P-B, @Aaron-Robertson, @francespoblete, @LaurentAjdnik, @maxtremblay, @andre-a-alves, @paniash, @purva-thakre) and in particular to the participants of [unitaryHACK](https://unitaryfund.github.io/unitaryhack/)!
+
+### All Changes
+
+- New notation NoisyOperation(circuit, channel_matrix) (@andreamari, gh-725).
+- Update docs for transforming Qiskit registers (@rmlarose, gh-724).
+- Remove classical register transformations in Qiskit conversions (@Aaron-Robertson, gh-672).
+- Change return format for `execute_with_cdr` (@rmlarose, gh-722).
+- Organize supported packages in `mitiq.interface` (@rmlarose, gh-706).
+- Change requirements to Cirq 0.10 (@andreamari, gh-717).
+- Make CDR work with any `QPROGRAM` (@rmlarose, gh-718).
+- Clearer return type for extrapolate and remove deprecated method (@rmlarose, gh-714).
+- Update feature request template (@rmlarose, gh-713).
+- CDR part two - Clifford data regression functions to fit training data (@L-P-B gh-677).
+- Consolidate images, update README. (@rmlarose, gh-709).
+- New logo for readme (@crazy4pi314, @francespoblete,  gh-709).
+- Update Guidelines for Release (@nathanshammah, gh-707).
+- Add action to close stale issues/pr #698 (@crazy4pi314, gh-699).
+- Optimal quasi-probability representations (@andreamari, gh-701).
+- Update links to Cirq documentation (@LaurentAjdnik, gh-704).
+- Warning for short programs [unitaryHACK] (@Yash-10, gh-700).
+- Preparing for optimal representations: Helper functions for channel manipulation. (@andreamari, gh-694).
+- [UnitaryHACK] Improve conversion from braket to cirq (@maxtremblay, gh-688).
+- [unitaryHack] Add instructions to solve make docs error for Windows/3.8 users (@andre-a-alves, gh-691).
+- Add link to docs for source installation in README (@paniash, gh-682).
+- Mention Braket in the README (@andreamari, gh-687).
+- [UnitaryHACK] ZNE-PEC uniformity (@andre-a-alves, gh-656).
+- Minor update of parameter noise scaling (@andreamari, gh-684).
+- Add braket support via rudimentary translator (@rmlarose, gh-590).
+- Specify qiskit elements in output of about.py (@purva-thakre, gh-674).
+- Depend only on cirq-core (@rmlarose, gh-673). This was reverted in gh-717.
+- Fix docs build (@rmlarose, gh-671).
+- Fix is_clifford logic for Clifford Data Regression (@L-P-B gh-669).
+
+
 ## Version 0.8.0 (May 6th, 2021)
 
 ### Summary
