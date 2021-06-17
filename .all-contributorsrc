@@ -1,0 +1,25 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "Yash-10",
+      "name": "Yash-10",
+      "avatar_url": "https://avatars.githubusercontent.com/u/68844397?v=4",
+      "profile": "https://github.com/Yash-10",
+      "contributions": [
+        "test",
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "mitiq",
+  "projectOwner": "unitaryfund",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
