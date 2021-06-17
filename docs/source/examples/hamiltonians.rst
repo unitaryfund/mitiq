@@ -28,7 +28,7 @@ First we import libraries for this example.
     import numpy as np
 
     import cirq
-    from mitiq import execute_with_zne
+    from mitiq.zne import execute_with_zne
     from mitiq.zne.inference import LinearFactory
 
 Defining the Hamiltonian

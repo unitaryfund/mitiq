@@ -40,10 +40,16 @@ try:
 except ImportError:  # pragma: no cover
     _QuantumCircuit = _Circuit
 
-QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit]
+try:
+    from braket import Circuit as _BKCircuit
+except ImportError:
+    _BKCircuit = _Circuit
+
+QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit, _BKCircuit]
 
 SUPPORTED_PROGRAM_TYPES = {
     "cirq": "Circuit",
     "pyquil": "Program",
     "qiskit": "QuantumCircuit",
+    "braket": "Circuit",
 }

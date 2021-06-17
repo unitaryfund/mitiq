@@ -1,0 +1,15 @@
+name: Tag and close stale PRs
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs: {}
+    
+jobs:
+  check-stale:
+    if: github.repository_owner == 'unitaryfund'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close Stale Issues
+        uses: actions/stale@v3.0.19

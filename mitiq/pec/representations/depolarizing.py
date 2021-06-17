@@ -12,14 +12,29 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""Functions related to representations with depolarizing noise."""
+
 
 from typing import List
 from itertools import product
+import numpy as np
 
-from cirq import Operation, X, Y, Z, Circuit, is_measurement
+from cirq import (
+    Operation,
+    X,
+    Y,
+    Z,
+    Circuit,
+    is_measurement,
+    DepolarizingChannel,
+    channel,
+)
+
 from mitiq import QPROGRAM
 from mitiq.pec.types import OperationRepresentation, NoisyOperation
-from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
+from mitiq.interface import convert_to_mitiq, convert_from_mitiq
+
+from mitiq.pec.channels import tensor_product
 
 
 def represent_operation_with_global_depolarizing_noise(
@@ -315,3 +330,26 @@ def represent_operations_in_circuit_with_local_depolarizing_noise(
             )
         )
     return representations
+
+
+def global_depolarizing_kraus(
+    noise_level: float, num_qubits: int,
+) -> List[np.ndarray]:
+    """Returns the kraus operators of a global depolarizing channel at a
+    given noise level.
+    """
+    noisy_op = DepolarizingChannel(noise_level, num_qubits)
+    return list(channel(noisy_op))
+
+
+def local_depolarizing_kraus(
+    noise_level: float, num_qubits: int,
+) -> List[np.ndarray]:
+    """Returns the kraus operators of the tensor product of local
+    depolarizing channels acting on each qubit.
+    """
+    local_kraus = global_depolarizing_kraus(noise_level, num_qubits=1)
+    return [
+        tensor_product(*kraus_string)
+        for kraus_string in product(local_kraus, repeat=num_qubits)
+    ]

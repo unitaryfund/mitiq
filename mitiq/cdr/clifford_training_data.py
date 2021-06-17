@@ -21,22 +21,27 @@ import numpy as np
 import cirq
 from cirq.circuits import Circuit
 
+from mitiq import QPROGRAM
+from mitiq.interface import (
+    accept_any_qprogram_as_input,
+    atomic_one_to_many_converter,
+)
 
 # Z gates with these angles/exponents are Clifford gates.
-_CLIFFORD_ANGLES = (0.0, np.pi / 2, np.pi, (3 / 2) * np.pi)
 _CLIFFORD_EXPONENTS = np.array([0.0, 0.5, 1.0, 1.5])
+_CLIFFORD_ANGLES = [exponent * np.pi for exponent in _CLIFFORD_EXPONENTS]
 
 
-# TODO: Accept any QPROGRAM.
+@atomic_one_to_many_converter
 def generate_training_circuits(
-    circuit: Circuit,
+    circuit: QPROGRAM,
     num_training_circuits: int,
     fraction_non_clifford: float,
     method_select: str = "uniform",
     method_replace: str = "closest",
     random_state: Optional[Union[int, np.random.RandomState]] = None,
-    **kwargs: dict,
-) -> List[Circuit]:
+    **kwargs,
+) -> List[QPROGRAM]:
     r"""Returns a list of (near) Clifford circuits obtained by replacing (some)
     non-Clifford gates in the input circuit by Clifford gates.
 
@@ -66,7 +71,7 @@ def generate_training_circuits(
             - sigma_replace (float): Width of the Gaussian distribution used
             for ``method_replace='gaussian'``.
 
-    .. [Czarnik2020] : Piotr Czarnik, Andrew Arramsmith, Parick Coles,
+    .. [Czarnik2020] : Piotr Czarnik, Andrew Arramsmith, Patrick Coles,
         Lukasz Cincio, "Error mitigation with Clifford quantum circuit
         data," (https://arxiv.org/abs/2005.10189).
     """
@@ -76,7 +81,11 @@ def generate_training_circuits(
     # Find the non-Clifford operations in the circuit.
     operations = np.array(list(circuit.all_operations()))
     non_clifford_indices_and_ops = np.array(
-        [[i, op] for i, op in enumerate(operations) if not _is_clifford(op)]
+        [
+            [i, op]
+            for i, op in enumerate(operations)
+            if not cirq.has_stabilizer_effect(op)
+        ]
     )
     if len(non_clifford_indices_and_ops) == 0:
         raise ValueError("Circuit is already Clifford.")
@@ -101,30 +110,29 @@ def generate_training_circuits(
     return near_clifford_circuits
 
 
-# TODO: Accept any QPROGRAM.
-def is_clifford(op_like: cirq.ops.OP_TREE) -> bool:
+@accept_any_qprogram_as_input
+def is_clifford(circuit: QPROGRAM) -> bool:
     """Returns True if the input argument is Clifford, else False.
 
     Args:
-        op_like: A single operation, list of operations, or circuit.
+        circuit: A single operation, list of operations, or circuit.
     """
-    try:
-        circuit = cirq.Circuit(op_like)
-    except TypeError:
-        raise ValueError("Could not convert `op_like` to a circuit.")
-
-    return all(_is_clifford(op) for op in circuit.all_operations())
+    return all(
+        cirq.has_stabilizer_effect(op) for op in circuit.all_operations()
+    )
 
 
-# TODO: Accept any QPROGRAM.
-def count_non_cliffords(circuit: Circuit) -> int:
+@accept_any_qprogram_as_input
+def count_non_cliffords(circuit: QPROGRAM) -> int:
     """Returns the number of non-Clifford operations in the circuit. Assumes
     the circuit consists of only Rz, Rx, and CNOT operations.
 
     Args:
         circuit: Circuit to count the number of non-Clifford operations in.
     """
-    return sum(not _is_clifford(op) for op in circuit.all_operations())
+    return sum(
+        not cirq.has_stabilizer_effect(op) for op in circuit.all_operations()
+    )
 
 
 def _map_to_near_clifford(
@@ -407,21 +415,3 @@ def _probabilistic_angle_to_clifford(
         _CLIFFORD_ANGLES, 1, replace=False, p=np.array(dists) / np.sum(dists)
     )
     return cliff_ang
-
-
-def _is_clifford(op: cirq.ops.Operation) -> bool:
-    if isinstance(op.gate, cirq.ops.XPowGate):
-        return True
-    if isinstance(op.gate, cirq.ops.CNotPowGate) and op.gate.exponent == 1.0:
-        return True
-    if (
-        isinstance(op.gate, cirq.ops.ZPowGate)
-        and op.gate.exponent % 2 in _CLIFFORD_EXPONENTS
-    ):
-        return True
-
-    # Ignore measurements.
-    if isinstance(op.gate, cirq.ops.MeasurementGate):
-        return True
-    # TODO: Could add additional logic here.
-    return False
