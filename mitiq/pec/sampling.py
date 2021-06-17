@@ -76,7 +76,7 @@ def sample_sequence(
 
     # Sample from this representation.
     noisy_operation, sign, _ = operation_representation.sample(random_state)
-    return noisy_operation.ideal_circuit(), sign, operation_representation.norm
+    return noisy_operation.circuit(), sign, operation_representation.norm
 
 
 def sample_circuit(

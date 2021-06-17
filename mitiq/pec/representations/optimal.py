@@ -128,9 +128,9 @@ def find_optimal_representation(
     basis_set = noisy_basis.elements
 
     try:
-        basis_matrices = [noisy_op.real_matrix for noisy_op in basis_set]
+        basis_matrices = [noisy_op.channel_matrix for noisy_op in basis_set]
     except ValueError as err:
-        if str(err) == "Real matrix is unknown.":
+        if str(err) == "The channel matrix is unknown.":
             raise ValueError(
                 "The input noisy_basis should contain NoisyOperation objects"
                 " which are initialized with a numerical superoperator matrix."

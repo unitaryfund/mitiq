@@ -44,8 +44,8 @@ def test_sample_sequence_cirq():
     rep = OperationRepresentation(
         ideal=circuit,
         basis_expansion={
-            NoisyOperation.from_cirq(ideal=cirq.X): 0.5,
-            NoisyOperation.from_cirq(ideal=cirq.Z): -0.5,
+            NoisyOperation.from_cirq(circuit=cirq.X): 0.5,
+            NoisyOperation.from_cirq(circuit=cirq.Z): -0.5,
         },
     )
 
@@ -104,8 +104,8 @@ def test_sample_sequence_cirq_random_state(seed):
     rep = OperationRepresentation(
         ideal=circuit,
         basis_expansion={
-            NoisyOperation.from_cirq(ideal=cirq.X): 0.5,
-            NoisyOperation.from_cirq(ideal=cirq.Z): -0.5,
+            NoisyOperation.from_cirq(circuit=cirq.X): 0.5,
+            NoisyOperation.from_cirq(circuit=cirq.Z): -0.5,
         },
     )
 
@@ -134,16 +134,16 @@ def test_sample_circuit_cirq(measure):
     h_rep = OperationRepresentation(
         ideal=circuit[:1],
         basis_expansion={
-            NoisyOperation.from_cirq(ideal=cirq.X): 0.6,
-            NoisyOperation.from_cirq(ideal=cirq.Z): -0.6,
+            NoisyOperation.from_cirq(circuit=cirq.X): 0.6,
+            NoisyOperation.from_cirq(circuit=cirq.Z): -0.6,
         },
     )
 
     cnot_rep = OperationRepresentation(
         ideal=circuit[1:2],
         basis_expansion={
-            NoisyOperation.from_cirq(ideal=cirq.CNOT): 0.7,
-            NoisyOperation.from_cirq(ideal=cirq.CZ): -0.7,
+            NoisyOperation.from_cirq(circuit=cirq.CNOT): 0.7,
+            NoisyOperation.from_cirq(circuit=cirq.CZ): -0.7,
         },
     )
 
