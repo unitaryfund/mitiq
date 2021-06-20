@@ -8,8 +8,9 @@
 % # " - [Bug Fix]"
 % # " - Fix the bug."
 
-## Version 0.10.0 (In Development)
+## Version 0.9.1 (June 21st, 2021)
 
+This is a patch release fixing two bugs (gh-736, gh-737) related to the integration with optional packages.
 
 ## Version 0.9.0 (June 17th, 2021)
 
