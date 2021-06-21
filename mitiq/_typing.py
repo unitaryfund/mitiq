@@ -41,8 +41,8 @@ except ImportError:  # pragma: no cover
     _QuantumCircuit = _Circuit
 
 try:
-    from braket import Circuit as _BKCircuit
-except ImportError:
+    from braket.circuits import Circuit as _BKCircuit
+except ImportError:  # pragma: no cover
     _BKCircuit = _Circuit
 
 QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit, _BKCircuit]
