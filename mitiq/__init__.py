@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from mitiq._typing import SUPPORTED_PROGRAM_TYPES, QPROGRAM
 from mitiq._about import about
-from mitiq._typing import QPROGRAM
-from mitiq._version import __version__
 from mitiq.collector import generate_collected_executor
+from mitiq._version import __version__

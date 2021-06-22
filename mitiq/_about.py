@@ -14,22 +14,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Information about Mitiq and dependencies."""
-__all__ = ["about"]
-
-import inspect
 import platform
-import sys
 
 from cirq import __version__ as cirq_version
 from numpy import __version__ as numpy_version
 from scipy import __version__ as scipy_version
 
 import mitiq
-
-MITIQ_SOURCE_FILE = inspect.getsourcefile(mitiq)
-assert MITIQ_SOURCE_FILE
-
-PYTHON_VERSION = sys.version_info[0:3]
 
 
 def about() -> None:
@@ -70,7 +61,7 @@ PyQuil Version:\t{pyquil_version}
 Qiskit Version:\t{qiskit_version}
 Braket Version:\t{braket_version}
 
-Python Version:\t{PYTHON_VERSION[0]}.{PYTHON_VERSION[1]}.{PYTHON_VERSION[2]}
+Python Version:\t{platform.python_version()}
 Platform Info:\t{platform.system()} ({platform.machine()})"""
     print(about_str)
 
