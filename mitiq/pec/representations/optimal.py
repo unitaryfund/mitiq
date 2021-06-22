@@ -40,10 +40,12 @@ def minimize_one_norm(
     the following representation of the input ``ideal_matrix`` holds:
 
     .. math::
-        M = x_0 A_0 + x_1 A_1 + ...,
+        :nowrap:
 
-    where :math:`\{A_j\}` are the basis matrices (i.e., the elements of the
-    input ``basis_matrices``), while :math:`M` is the input ``ideal_matrix``.
+        \text{ideal_matrix} = x_0 A_0 + x_1 A_1 + ...,
+
+    where :math:`\{A_j\}` are the basis matrices, i.e., the elements of
+    the input ``basis_matrices``.
 
     This function can be used to compute the optimal representation
     of an ideal superoperator (or Choi state) as a linear
