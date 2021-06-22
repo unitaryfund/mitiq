@@ -91,7 +91,7 @@ Probabilistic Error Cancellation (High-Level Tools)
 Quasi-Probability Representations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.pec.representations.optimal
-      :members:
+   :members:
 
 .. automodule:: mitiq.pec.representations.damping
    :members:
