@@ -21,7 +21,7 @@ circuit is explored with and without error mitigation.
 ```{code-cell} ipython3
 import matplotlib.pyplot as plt
 import numpy as np
-from cirq import Circuit, X, rx, CNOT, DensityMatrixSimulator, LineQubit, depolarize
+from cirq import Circuit, rx, CNOT, DensityMatrixSimulator, LineQubit, depolarize
 
 from mitiq.zne import mitigate_executor
 from mitiq.zne.inference import RichardsonFactory
@@ -45,7 +45,7 @@ def variational_circuit(gamma: float) -> Circuit:
         
     q0, q1 = LineQubit.range(2)
         
-    return Circuit([X(q1), CNOT(q0, q1), rx(gamma)(q1), CNOT(q0, q1), X(q1)])
+    return Circuit([rx(gamma)(q0), CNOT(q0, q1), rx(gamma)(q1), CNOT(q0, q1), rx(gamma)(q0)])
    
 ```
 
@@ -99,7 +99,7 @@ We now compute the unmitigated energy landscape $\langle H \rangle(\gamma) =\lan
 in the following code block.
 
 ```{code-cell} ipython3
-gammas = np.linspace(-2 * np.pi, 2 * np.pi, 50)
+gammas = np.linspace(0, 2 * np.pi, 50)
 expectations = [executor(variational_circuit(g)) for g in gammas]
 ```
 
