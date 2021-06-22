@@ -18,19 +18,19 @@ kernelspec:
 This tutorial shows an example in which the energy landscape for a two-qubit variational 
 circuit is explored with and without error mitigation.
 
-
 ```{code-cell} ipython3
 import matplotlib.pyplot as plt
 import numpy as np
-from cirq import Circuit, H, rx, CNOT, DensityMatrixSimulator, LineQubit, depolarize
-import mitiq
+from cirq import Circuit, rx, CNOT, DensityMatrixSimulator, LineQubit, depolarize
+
 from mitiq.zne import mitigate_executor
+from mitiq.zne.inference import RichardsonFactory
 
 SIMULATOR = DensityMatrixSimulator()
 ```
 
 ## Defining the ideal variational circuit
-We define a function which returns a two-qubit circuit at a specified variational angle $\gamma$.
+We define a function which returns a simple two-qubit variational circuit depending on a single parameter  $\gamma$.
 
 ```{code-cell} ipython3
 def variational_circuit(gamma: float) -> Circuit:
@@ -45,7 +45,7 @@ def variational_circuit(gamma: float) -> Circuit:
         
     q0, q1 = LineQubit.range(2)
         
-    return Circuit([CNOT(q0, q1), rx(gamma)(q1), CNOT(q0, q1)])
+    return Circuit([rx(gamma)(q0), CNOT(q0, q1), rx(gamma)(q1), CNOT(q0, q1), rx(gamma)(q0)])
    
 ```
 
@@ -66,7 +66,7 @@ z = np.diag([1, -1])
 hamiltonian = np.kron(z, z)
 
 # Strength of noise channel
-p = 0.1
+p = 0.04
 
 def executor(circ: Circuit) -> float:
     """Simulates the execution of a circuit with depolarizing noise.
@@ -99,7 +99,7 @@ We now compute the unmitigated energy landscape $\langle H \rangle(\gamma) =\lan
 in the following code block.
 
 ```{code-cell} ipython3
-gammas = np.linspace(-2 * np.pi, 2 * np.pi, 50)
+gammas = np.linspace(0, 2 * np.pi, 50)
 expectations = [executor(variational_circuit(g)) for g in gammas]
 ```
 
@@ -118,10 +118,11 @@ plt.show()
 
 ## Computing the mitigated landscape
 We now repeat the same task but use Mitiq to mitigate errors.
-We do so by first getting a mitigated executor as follows.
+We initialize a RichardsonFactory with scale factors `[1, 3, 5]` and we get a mitigated executor as follows.
 
 ```{code-cell} ipython3
-mitigated_executor = mitigate_executor(executor)
+fac = RichardsonFactory(scale_factors=[1, 3, 5])
+mitigated_executor = mitigate_executor(executor, factory=fac)
 ```
 
 We then run the same code above to compute the energy landscape, but this time use the ``mitigated_executor`` instead of just the executor.
@@ -151,6 +152,8 @@ which is required in most variational algorithms such as VQE or QAOA.
 We also observe that the minimum of mitigated energy approximates well the theoretical ground state which is equal to $-1$. Indeed:
 
 ```{code-cell} ipython3
+print(f"Minimum of the noisy landscape: {round(min(expectations), 3)}")
+print(f"Minimum of the mitigated landscape: {round(min(mitigated_expectations), 3)}")
 print(f"Theoretical groud state energy: {min(np.linalg.eigvals(hamiltonian))}")
 ```
 
