@@ -40,6 +40,8 @@ def minimize_one_norm(
     the following representation of the input ``ideal_matrix`` holds:
 
     .. math::
+        :nowrap:
+
         \text{ideal_matrix} = x_0 A_0 + x_1 A_1 + ...,
 
     where :math:`\{A_j\}` are the basis matrices, i.e., the elements of
