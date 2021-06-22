@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "LaurentAjdnik",
+      "name": "Laurent AJDNIK",
+      "avatar_url": "https://avatars.githubusercontent.com/u/83899250?v=4",
+      "profile": "https://github.com/LaurentAjdnik",
+      "contributions": [
+        "doc"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "mitiq",
+  "projectOwner": "unitaryfund",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
