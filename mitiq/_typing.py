@@ -32,17 +32,17 @@ SUPPORTED_PROGRAM_TYPES = {
 
 try:
     from pyquil import Program as _Program
-except ImportError:
+except ImportError:  # pragma: no cover
     _Program = _Circuit
 
 try:
     from qiskit import QuantumCircuit as _QuantumCircuit
-except ImportError:
+except ImportError:  # pragma: no cover
     _QuantumCircuit = _Circuit
 
 try:
     from braket.circuits import Circuit as _BKCircuit
-except ImportError:
+except ImportError:  # pragma: no cover
     _BKCircuit = _Circuit
 
 QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit, _BKCircuit]
