@@ -5,6 +5,10 @@ jupytext:
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.3
+kernelspec:
+  display_name: envwhyisthisneeded
+  language: python
+  name: envwhyisthisneeded
 ---
 
 # Clifford data regression API
