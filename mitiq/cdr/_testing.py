@@ -72,7 +72,7 @@ def executor(
     circuit.append(cirq.measure(*circuit.all_qubits(), key="z"))
 
     result = cirq.DensityMatrixSimulator().run(circuit, repetitions=shots)
-    return {bin(k): v for k, v in result.histogram(key="z").items()}
+    return result.histogram(key="z")
 
 
 def simulator(circuit: QPROGRAM, shots: int = 8192) -> MeasurementResult:
