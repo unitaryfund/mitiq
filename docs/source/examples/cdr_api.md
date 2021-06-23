@@ -6,9 +6,9 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.11.3
 kernelspec:
-  display_name: envwhyisthisneeded
+  display_name: Python 3
   language: python
-  name: envwhyisthisneeded
+  name: python3
 ---
 
 # Clifford data regression API
