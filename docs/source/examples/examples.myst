@@ -8,5 +8,6 @@ ibmq-backends.rst
 hamiltonians.rst
 simple_landscape.rst
 maxcut-demo.myst
+cdr-api.md
 test.myst
 ```
