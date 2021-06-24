@@ -4,7 +4,7 @@ jupytext:
     extension: .myst
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.10.2
+    jupytext_version: 1.11.3
 kernelspec:
   display_name: Python 3
   language: python
@@ -17,7 +17,6 @@ kernelspec:
 
 This tutorial shows an example in which the energy landscape for a two-qubit variational 
 circuit is explored with and without error mitigation.
-
 
 ```{code-cell} ipython3
 import matplotlib.pyplot as plt
