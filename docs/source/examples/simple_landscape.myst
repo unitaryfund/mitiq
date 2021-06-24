@@ -4,7 +4,7 @@ jupytext:
     extension: .myst
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.10.2
+    jupytext_version: 1.11.3
 kernelspec:
   display_name: Python 3
   language: python
@@ -22,9 +22,9 @@ circuit is explored with and without error mitigation.
 import matplotlib.pyplot as plt
 import numpy as np
 from cirq import Circuit, rx, CNOT, DensityMatrixSimulator, LineQubit, depolarize
-
+import mitiq
 from mitiq.zne import mitigate_executor
-from mitiq.zne.inference import RichardsonFactory
+from mitiq.zne.inference import FakeNodesFactory
 
 SIMULATOR = DensityMatrixSimulator()
 ```
@@ -55,20 +55,34 @@ We can visualize the circuit for a particular $\gamma$ as follows.
 print(variational_circuit(gamma=np.pi))
 ```
 
-## Defining the noisy executor
-To interface with Mitiq, we now define an executor function which adds noise to the circuit and computes the
-expectation value of a simple Hamiltonian $H=Z \otimes Z$, i.e., Pauli-$Z$ on each qubit. The code block
-below first creates this observable, then sets a noise value, then defines the executor.
+## Defining the executor functions with and without noise
+To interface with Mitiq, we now define a noiseless executor function, and a executor with noise function which compute the expctation value of a simple Hamiltonian $H=Z \otimes Z$, i.e., Pauli-$Z$ on each qubit without and with noise respectively. The code block below first creates this observable, then defines the noiseless executor, then sets a noise value, then defines the executor with noise function.
 
 ```{code-cell} ipython3
 # Observable to measure
 z = np.diag([1, -1])
 hamiltonian = np.kron(z, z)
 
-# Strength of noise channel
-p = 0.04
+def noiseless_executor(circ: Circuit) -> float:
+    """Simulates the execution of a circuit without noise.
 
-def executor(circ: Circuit) -> float:
+    Args:
+        circ: The input circuit.
+
+    Returns:
+        The expectation value of the ZZ observable.
+    """
+    # Get the final density matrix of the circuit
+    SIMULATOR = DensityMatrixSimulator()
+    rho = SIMULATOR.simulate(circ).final_density_matrix
+    # Evaluate the ZZ expectation value
+    expectation = np.real(np.trace(rho @ hamiltonian))
+    return expectation
+
+# Strength of noise channel
+p = 0.1
+
+def executor_with_noise(circ: Circuit) -> float:
     """Simulates the execution of a circuit with depolarizing noise.
 
     Args:
@@ -79,8 +93,10 @@ def executor(circ: Circuit) -> float:
     """
     # Add depolarizing noise to the circuit
     circuit = circ.with_noise(depolarize(p))
+    
 
     # Get the final density matrix of the circuit
+    SIMULATOR = DensityMatrixSimulator()
     rho = SIMULATOR.simulate(circuit).final_density_matrix
 
     # Evaluate the ZZ expectation value
@@ -94,13 +110,34 @@ The above code block uses depolarizing noise, but any Cirq channel can be substi
 
 +++
 
+## Computing the landscape without noise
+We now compute the energy lanscape $\langle H \rangle(\gamma) =\langle Z \otimes Z \rangle(\gamma)$ with no error in the following code block
+
+```{code-cell} ipython3
+gammas = np.linspace(0, 2 * np.pi, 50)
+noiseless_expectations = [noiseless_executor(variational_circuit(g)) for g in gammas]
+```
+
+The following code plots the values for visualization
+
+```{code-cell} ipython3
+plt.figure(figsize=(8, 6))
+plt.scatter(gammas, noiseless_expectations, color="g", label="Noiseless")
+plt.title(rf"Energy landscape", fontsize=16)
+plt.xlabel(r"Ansatz angle $\gamma$", fontsize=16)
+plt.ylabel(r"$\langle H \rangle(\gamma)$", fontsize=16)
+plt.legend(fontsize=14)
+plt.ylim(-1, 1);
+plt.show()
+```
+
 ## Computing the unmitigated landscape
 We now compute the unmitigated energy landscape $\langle H \rangle(\gamma) =\langle Z \otimes Z \rangle(\gamma)$
 in the following code block.
 
 ```{code-cell} ipython3
 gammas = np.linspace(0, 2 * np.pi, 50)
-expectations = [executor(variational_circuit(g)) for g in gammas]
+expectations = [executor_with_noise(variational_circuit(g)) for g in gammas]
 ```
 
 The following code plots these values for visualization.
@@ -118,11 +155,12 @@ plt.show()
 
 ## Computing the mitigated landscape
 We now repeat the same task but use Mitiq to mitigate errors.
-We initialize a RichardsonFactory with scale factors `[1, 3, 5]` and we get a mitigated executor as follows.
+We do so by first creating a mitigated executor as follows. We use a Fake Nodes factory and fold all noise scaling for better results.
 
 ```{code-cell} ipython3
-fac = RichardsonFactory(scale_factors=[1, 3, 5])
-mitigated_executor = mitigate_executor(executor, factory=fac)
+fac = FakeNodesFactory(scale_factors = [1.0, 1.5, 2.0, 2.5, 3.0])
+folding = mitiq.zne.scaling.fold_all
+mitigated_executor = mitigate_executor(executor_with_noise, factory = fac, scale_noise = folding)
 ```
 
 We then run the same code above to compute the energy landscape, but this time use the ``mitigated_executor`` instead of just the executor.
@@ -131,10 +169,11 @@ We then run the same code above to compute the energy landscape, but this time u
 mitigated_expectations = [mitigated_executor(variational_circuit(g)) for g in gammas]
 ```
 
-Let us visualize the mitigated landscape alongside the unmitigated landscape.
+Let us visualize the mitigated landscape alongside the unmitigated and noiseless landscapes.
 
 ```{code-cell} ipython3
 plt.figure(figsize=(8, 6))
+plt.scatter(gammas, noiseless_expectations, color="g", label="Noiseless")
 plt.scatter(gammas, expectations, color="r", label="Unmitigated")
 plt.scatter(gammas, mitigated_expectations, color="b", label="Mitigated")
 plt.title(rf"Energy landscape", fontsize=16)
