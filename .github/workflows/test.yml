@@ -52,6 +52,27 @@ jobs:
           make docs
           make doctest
 
+  # This is to make sure Mitiq works without optional 3rd party packages like Qiskit, pyQuil, etc.
+  # E.g., if we accidentally `import qiskit` in Mitiq where we shouldn't, this test will catch that.
+  core:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out mitiq
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install Mitiq
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+
+      - name: Test without 3rd party packages
+        run: |
+          pip install pytest
+          pytest mitiq/tests/test_without_third_party_packages.py
+
   test:
     runs-on: ${{ matrix.os }}
     strategy:
