@@ -277,6 +277,12 @@ def fold_all(
         raise ValueError(
             f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
         )
+        
+    if scale_factor % 2 == 0:
+        raise ValueError(
+            f"Requires scale_factor to be an odd number but {scale_factor} is even."
+        )
+        
     _check_foldable(circuit)
 
     folded = deepcopy(circuit)
