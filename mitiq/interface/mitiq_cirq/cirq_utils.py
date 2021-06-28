@@ -43,13 +43,7 @@ def execute_with_shots(
 
         Args:
             circ: The input Cirq circuit.
-            obs: The observable to measure as a cirq.PauliSumLike = Union[
-                                int,
-                                float,
-                                complex,
-                                cirq.ops.PauliString,
-                                ForwardRef('PauliSum'),
-                                cirq.ops.SingleQubitPauliStringGateOperation]
+            obs: The observable to measure.
             shots: The number of measurements.
 
         Returns:
