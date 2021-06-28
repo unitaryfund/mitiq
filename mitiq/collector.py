@@ -113,7 +113,7 @@ class Collector:
         self,
         circuits: Sequence[QPROGRAM],
         force_run_all: bool = False,
-        **kwargs: Any,
+        **kwargs,
     ) -> List[float]:
         """Runs all input circuits using the least number of possible calls to
         the executor.
@@ -168,7 +168,7 @@ class Collector:
         Args:
             to_run: Circuit(s) to run.
         """
-        result = self._executor(to_run)
+        result = self._executor(to_run, **kwargs)
         self._calls_to_executor += 1
 
         try:
