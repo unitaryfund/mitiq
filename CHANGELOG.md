@@ -8,9 +8,21 @@
 % # " - [Bug Fix]"
 % # " - Fix the bug."
 
-## Version 0.9.1 (In Development)
+
+## Version 0.10.0  (In Development)
+
+
+## Version 0.9.1  (June 24th, 2021)
 
 This is a patch release to fix two bugs (gh-736, gh-737) related to the integration with optional packages.
+It also fixes other minor problems (see the list of changes below).
+
+### All Changes
+
+- Patch 0.9.0 (@rmlarose, gh-739).
+- Make readthedocs succeed in building the pdf with pdflatex (@andreamari, gh-743).
+- Update energy landscape example in docs (@andreamari, gh-742).
+- Remove old deprecation warnings (@rmlarose, gh-744).
 
 ## Version 0.9.0 (June 17th, 2021)
 
