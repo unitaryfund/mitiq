@@ -14,36 +14,35 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Cirq utility functions."""
 
-from typing import Union, cast
 
 import numpy as np
 import cirq
 
 
-def execute(circ: cirq.Circuit, obs: np.ndarray) -> float:
+def execute(circuit: cirq.Circuit, obs: np.ndarray) -> float:
     """Simulates noiseless wavefunction evolution and returns the
-        expectation value of some observable.
+    expectation value of some observable.
 
-        Args:
-            circ: The input Cirq circuit.
-            obs: The observable to measure as a NumPy array.
+    Args:
+        circuit: The input Cirq circuit.
+        obs: The observable to measure as a NumPy array.
 
-        Returns:
-            The expectation value of obs as a float.
-        """
-    final_wvf = circ.final_state_vector()
+    Returns:
+        The expectation value of obs as a float.
+    """
+    final_wvf = circuit.final_state_vector()
     return np.real(final_wvf.conj().T @ obs @ final_wvf)
 
 
 def execute_with_shots(
-    circ: cirq.Circuit, obs: cirq.PauliString, shots: int
-) -> Union[float, complex]:
+    circuit: cirq.Circuit, obs: cirq.PauliString, shots: int
+) -> float:
     """Simulates noiseless wavefunction evolution and returns the
-    expectation value of a PauliSumLike observable.
+    expectation value of a PauliString observable.
 
     Args:
-        circ: The input Cirq circuit.
-        obs: The observable to measure.
+        circuit: The input Cirq circuit.
+        obs: The observable to measure as a cirq.PauliString.
         shots: The number of measurements.
 
     Returns:
@@ -51,7 +50,7 @@ def execute_with_shots(
     """
 
     # Do the sampling
-    psum = cirq.PauliSumCollector(circ, obs, samples_per_term=shots)
+    psum = cirq.PauliSumCollector(circuit, obs, samples_per_term=shots)
     psum.collect(sampler=cirq.Simulator())
 
     # Return the expectation value
@@ -59,24 +58,19 @@ def execute_with_shots(
 
 
 def execute_with_depolarizing_noise(
-    circ: cirq.Circuit, obs: np.ndarray, noise: float
+    circuit: cirq.Circuit, obs: np.ndarray, noise: float
 ) -> float:
     """Simulates a circuit with depolarizing noise at level noise.
 
-        Args:
-            circ: The input Cirq circuit.
-            obs: The observable to measure as a NumPy array.
-            noise: The depolarizing noise as a float, i.e. 0.001 is 0.1% noise.
+    Args:
+        circuit: The input Cirq circuit.
+        obs: The observable to measure as a NumPy array.
+        noise: The depolarizing noise as a float, i.e. 0.001 is 0.1% noise.
 
-        Returns:
-            The expectation value of obs as a float.
-        """
-    circuit = circ.with_noise(
-        cast(
-            Union[None, cirq.NoiseModel, cirq.SingleQubitGate],
-            cirq.depolarize(p=noise),
-        )
-    )
+    Returns:
+        The expectation value of obs as a float.
+    """
+    circuit = circuit.with_noise(cirq.depolarize(p=noise))
     simulator = cirq.DensityMatrixSimulator()
     rho = simulator.simulate(circuit).final_density_matrix
     expectation = np.real(np.trace(rho @ obs))
@@ -84,26 +78,21 @@ def execute_with_depolarizing_noise(
 
 
 def execute_with_shots_and_depolarizing_noise(
-    circ: cirq.Circuit, obs: cirq.PauliSumLike, noise: float, shots: int
-) -> Union[float, complex]:
+    circuit: cirq.Circuit, obs: cirq.PauliString, noise: float, shots: int
+) -> float:
     """Simulates a circuit with depolarizing noise at level noise.
 
-        Args:
-            circ: The input Cirq circuit.
-            obs: The observable to measure as a NumPy array.
-            noise: The depolarizing noise strength as a float (0.001 is 0.1%)
-            shots: The number of measurements.
+    Args:
+        circuit: The input Cirq circuit.
+        obs: The observable to measure as a NumPy array.
+        noise: The depolarizing noise strength as a float (0.001 is 0.1%)
+        shots: The number of measurements.
 
-        Returns:
-            The expectation value of obs as a float.
-        """
+    Returns:
+        The expectation value of obs as a float.
+    """
     # Add noise
-    noisy = circ.with_noise(
-        cast(
-            Union[None, cirq.NoiseModel, cirq.SingleQubitGate],
-            cirq.depolarize(p=noise),
-        )
-    )
+    noisy = circuit.with_noise(cirq.depolarize(p=noise))
 
     # Do the sampling
     psum = cirq.PauliSumCollector(noisy, obs, samples_per_term=shots)
