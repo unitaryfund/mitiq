@@ -36,19 +36,19 @@ def execute(circ: cirq.Circuit, obs: np.ndarray) -> float:
 
 
 def execute_with_shots(
-    circ: cirq.Circuit, obs: cirq.PauliSumLike, shots: int
+    circ: cirq.Circuit, obs: cirq.PauliString, shots: int
 ) -> Union[float, complex]:
     """Simulates noiseless wavefunction evolution and returns the
-        expectation value of a PauliSumLike observable.
+    expectation value of a PauliSumLike observable.
 
-        Args:
-            circ: The input Cirq circuit.
-            obs: The observable to measure.
-            shots: The number of measurements.
+    Args:
+        circ: The input Cirq circuit.
+        obs: The observable to measure.
+        shots: The number of measurements.
 
-        Returns:
-            The expectation value of obs as a float.
-        """
+    Returns:
+        The expectation value of obs as a float.
+    """
 
     # Do the sampling
     psum = cirq.PauliSumCollector(circ, obs, samples_per_term=shots)
