@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Functions for mapping circuits to (near) Clifford circuits."""
-from typing import List, Optional, Sequence, Union
+from typing import List, Optional, Sequence, Union, Any, cast
 
 import numpy as np
 
@@ -141,7 +141,7 @@ def _map_to_near_clifford(
     method_select: str = "uniform",
     method_replace: str = "closest",
     random_state: Optional[np.random.RandomState] = None,
-    **kwargs: dict,
+    **kwargs: Any,
 ) -> Sequence[cirq.ops.Operation]:
     """Returns the list of non-Clifford operations with some of these replaced
     by Clifford operations.
@@ -162,8 +162,8 @@ def _map_to_near_clifford(
             sigma_replace (float): Width of the Gaussian distribution used for
                 ``method_replace='gaussian'``.
     """
-    sigma_select = kwargs.get("sigma_select", 0.5)
-    sigma_replace = kwargs.get("sigma_replace", 0.5)
+    sigma_select: float = kwargs.get("sigma_select", 0.5)
+    sigma_replace: float = kwargs.get("sigma_replace", 0.5)
 
     # Select (indices of) operations to replace.
     indices_of_selected_ops = _select(
@@ -175,7 +175,7 @@ def _map_to_near_clifford(
     )
 
     # Replace selected operations.
-    clifford_ops = _replace(
+    clifford_ops: Sequence[cirq.ops.Operation] = _replace(
         [non_clifford_ops[i] for i in indices_of_selected_ops],
         method_replace,
         sigma_replace,
@@ -184,8 +184,9 @@ def _map_to_near_clifford(
 
     # Return sequence of (near) Clifford operations.
     return [
-        clifford_ops.pop(0) if i in indices_of_selected_ops else op
-        for (i, op) in enumerate(non_clifford_ops)
+        cast(List[cirq.ops.Operation], clifford_ops).pop(0)
+        if i in indices_of_selected_ops
+        else op for (i, op) in enumerate(non_clifford_ops)
     ]
 
 
@@ -220,7 +221,8 @@ def _select(
         distribution = 1.0 / num_non_cliff * np.ones(shape=(num_non_cliff,))
     elif method == "gaussian":
         non_clifford_angles = np.array(
-            [op.gate.exponent * np.pi for op in non_clifford_ops]
+            [op.gate.exponent * np.pi  # type: ignore
+             for op in non_clifford_ops]
         )
         probabilities = _angle_to_proximity(non_clifford_angles, sigma)
         distribution = [k / sum(probabilities) for k in probabilities]
@@ -231,7 +233,7 @@ def _select(
         )
 
     # Select (indices of) non-Clifford operations to replace.
-    selected_indices = random_state.choice(
+    selected_indices = cast(np.random.RandomState, random_state).choice(
         range(num_non_cliff),
         num_non_cliff - num_to_replace,
         replace=False,
@@ -271,7 +273,7 @@ def _replace(
 
     # TODO: Update these functions to act on operations instead of angles.
     non_clifford_angles = np.array(
-        [op.gate.exponent * np.pi for op in non_clifford_ops]
+        [op.gate.exponent * np.pi for op in non_clifford_ops]  # type: ignore
     )
     if method == "closest":
         clifford_angles = _closest_clifford(non_clifford_angles)
@@ -352,7 +354,7 @@ def _is_clifford_angle(angles: np.ndarray, tol: float = 10 ** -5,) -> bool:
     return False
 
 
-def _angle_to_proximities(angle: np.ndarray, sigma: float) -> np.ndarray:
+def _angle_to_proximities(angle: np.ndarray, sigma: float) -> List[float]:
     """Returns probability distribution based on distance from angles to
     Clifford gates.
 

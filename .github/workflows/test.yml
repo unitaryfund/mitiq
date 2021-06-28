@@ -23,7 +23,7 @@ jobs:
           python -m pip install --upgrade pip
           make install requirements
 
-      # Not checking types until #556 fixes errors 
+      # TODO: https://github.com/unitaryfund/mitiq/issues/489
       # - name: Check types with mypy
       #   run: make check-types
 

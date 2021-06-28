@@ -16,7 +16,7 @@
 """Types used in probabilistic error cancellation."""
 from copy import deepcopy
 from itertools import product
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import Any, List, Optional, Sequence, Set, Tuple, Union, cast
 
 import numpy as np
 
@@ -164,7 +164,7 @@ class NoisyOperation:
             )
 
         if all(isinstance(q, cirq.Qid) for q in qubits):
-            qubits = [[q] for q in qubits]
+            qubits = cast(Sequence[List[cirq.Qid]], [[q] for q in qubits])
 
         if not all(len(qreg) == num_qubits_needed for qreg in qubits):
             raise ValueError(
@@ -200,7 +200,7 @@ class NoisyOperation:
 
     @staticmethod
     def from_noise_model(
-        circuit: cirq.CIRCUIT_LIKE, noise_model
+        circuit: cirq.CIRCUIT_LIKE, noise_model: Any
     ) -> "NoisyOperation":
         raise NotImplementedError
 
@@ -217,7 +217,7 @@ class NoisyOperation:
         return convert_from_mitiq(self._circuit, return_type)
 
     @property
-    def qubits(self) -> Tuple[cirq.Qid]:
+    def qubits(self) -> Tuple[cirq.Qid, ...]:
         return self._qubits
 
     @property
@@ -251,9 +251,9 @@ class NoisyOperation:
                 of the noisy operation.
         """
         try:
-            qubits = list(iter(qubits))
+            qubits = list(iter(cast(Sequence[cirq.Qid], qubits)))
         except TypeError:
-            qubits = [qubits]
+            qubits = [cast(cirq.Qid, qubits)]
 
         if len(qubits) != self._num_qubits:
             raise ValueError(
@@ -332,7 +332,7 @@ class NoisyBasis:
             qubits.update(set(noisy_op.qubits))
         return qubits
 
-    def add(self, *basis_elements) -> None:
+    def add(self, *basis_elements: Sequence['NoisyOperation']) -> None:
         """Add elements to the NoisyBasis.
 
         Args:
@@ -386,7 +386,7 @@ class NoisyBasis:
     def represent(self, circuit: QPROGRAM):
         raise NotImplementedError
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._basis_elements)
 
 
@@ -422,23 +422,24 @@ class OperationRepresentation:
 
         self._basis_expansion = cirq.LinearDict(basis_expansion)
         self._norm = sum(abs(coeff) for coeff in self.coeffs)
-        self._distribution = np.array(list(map(abs, self.coeffs))) / self.norm
+        self._distribution = np.array(list(map(abs,  # type: ignore
+                                               self.coeffs))) / self.norm
 
     @property
     def ideal(self) -> QPROGRAM:
         return self._ideal
 
     @property
-    def basis_expansion(self) -> cirq.LinearDict:
+    def basis_expansion(self) -> cirq.LinearDict[NoisyOperation]:
         return self._basis_expansion
 
     @property
-    def noisy_operations(self) -> Tuple[NoisyOperation]:
+    def noisy_operations(self) -> Tuple[NoisyOperation, ...]:
         return tuple(self._basis_expansion.keys())
 
     @property
-    def coeffs(self) -> Tuple[float]:
-        return tuple(self._basis_expansion.values())
+    def coeffs(self) -> Tuple[float, ...]:
+        return tuple(cast(List[float], self._basis_expansion.values()))
 
     @property
     def norm(self) -> float:
@@ -466,7 +467,7 @@ class OperationRepresentation:
             raise ValueError(
                 "Arg `noisy_op` does not appear in the basis expansion."
             )
-        return self._basis_expansion.get(noisy_op)
+        return cast(float, self._basis_expansion.get(noisy_op))
 
     def sign_of(self, noisy_op: NoisyOperation) -> float:
         """Returns the sign of the noisy operation in the basis expansion.
@@ -500,7 +501,7 @@ class OperationRepresentation:
         noisy_op = rng.choice(self.noisy_operations, p=self.distribution())
         return noisy_op, int(self.sign_of(noisy_op)), self.coeff_of(noisy_op)
 
-    def __str__(self):
+    def __str__(self) -> str:
         # TODO: This works well for one-qubit representations, but doesn't
         #  display nicely in general.
         return str(self._ideal) + " = " + str(self.basis_expansion)

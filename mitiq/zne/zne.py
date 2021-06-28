@@ -28,7 +28,7 @@ def execute_with_zne(
     factory: Optional[Factory] = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
-) -> float:
+) -> Optional[float]:
     """Returns the zero-noise extrapolated expectation value that is computed
     by running the quantum program `qp` with the executor function.
 
@@ -67,7 +67,7 @@ def mitigate_executor(
     factory: Optional[Factory] = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
-) -> Callable[[QPROGRAM], float]:
+) -> Callable[[QPROGRAM], Optional[float]]:
     """Returns an error-mitigated version of the input `executor`.
 
     The input `executor` executes a circuit with an arbitrary backend and
@@ -85,7 +85,7 @@ def mitigate_executor(
     """
 
     @wraps(executor)
-    def new_executor(qp: QPROGRAM) -> float:
+    def new_executor(qp: QPROGRAM) -> Optional[float]:
         return execute_with_zne(
             qp, executor, factory, scale_noise, num_to_average
         )
@@ -97,7 +97,8 @@ def zne_decorator(
     factory: Optional[Factory] = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
-) -> Callable[[Callable[[QPROGRAM], float]], Callable[[QPROGRAM], float]]:
+) -> Callable[[Callable[[QPROGRAM], float]], Callable[[QPROGRAM],
+              Optional[float]]]:
     """Decorator which adds error mitigation to an executor function, i.e., a
     function which executes a quantum circuit with an arbitrary backend and
     returns an expectation value.
@@ -118,7 +119,7 @@ def zne_decorator(
 
     def decorator(
         executor: Callable[[QPROGRAM], float]
-    ) -> Callable[[QPROGRAM], float]:
+    ) -> Callable[[QPROGRAM], Optional[float]]:
         return mitigate_executor(
             executor, factory, scale_noise, num_to_average
         )
