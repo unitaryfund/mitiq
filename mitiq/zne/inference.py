@@ -16,8 +16,16 @@
 """Classes corresponding to different zero-noise extrapolation methods."""
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from collections.abc import Sequence, Iterable
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 import warnings
 
 from matplotlib.figure import Figure
@@ -236,7 +244,7 @@ class Factory(ABC):
             raise ValueError(DATA_MISSING_ERR)
         return np.array(self._params_cov)
 
-    def get_zero_noise_limit(self) -> Optional[float]:
+    def get_zero_noise_limit(self) -> float:
         """Returns the last evaluation of the zero-noise limit
         computed by the factory. To re-evaluate
         its value, the method 'reduce' should be called first.
@@ -388,14 +396,6 @@ class Factory(ABC):
         self._already_reduced = False
         return self
 
-    def reduce(self) -> Optional[float]:
-        """Evaluates the zero-noise limit found by fitting according to
-        the factory's extrapolation method.
-        Returns:
-            The zero-noise limit.
-        """
-        pass
-
 
 class BatchedFactory(Factory, ABC):
     """Abstract class of a non-adaptive Factory initialized with a
@@ -455,7 +455,7 @@ class BatchedFactory(Factory, ABC):
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
 
-    def reduce(self) -> Optional[float]:
+    def reduce(self) -> float:
         """Evaluates the zero-noise limit found by fitting according to
         the factory's extrapolation method.
 
@@ -518,8 +518,6 @@ class BatchedFactory(Factory, ABC):
         """
         self.reset()
         self._batch_populate_instack()
-
-        res: Union[float, List[float], np.ndarray]
 
         # Get all noise-scaled circuits to run
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
@@ -649,7 +647,7 @@ class AdaptiveFactory(Factory, ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def reduce(self) -> Optional[float]:
+    def reduce(self) -> float:
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
 
@@ -781,7 +779,7 @@ class PolyFactory(BatchedFactory):
         self._options = {"order": order}
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         order: int,
@@ -854,7 +852,7 @@ class RichardsonFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
@@ -922,7 +920,7 @@ class FakeNodesFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
@@ -941,10 +939,13 @@ class FakeNodesFactory(BatchedFactory):
         if not full_output:
             return RichardsonFactory.extrapolate(fake_nodes, exp_values)
 
-        (zne_limit, zne_error, opt_params, params_cov, zne_curve,) = cast(
-            Iterable[Any],
-            RichardsonFactory.extrapolate(fake_nodes, exp_values, True),
-        )
+        (
+            zne_limit,
+            zne_error,
+            opt_params,
+            params_cov,
+            zne_curve,
+        ) = RichardsonFactory.extrapolate(fake_nodes, exp_values, True)
 
         # Convert zne_curve from the "fake node space" to the real space.
         # Note: since a=0.0, this conversion is not necessary for zne_limit.
@@ -984,7 +985,7 @@ class FakeNodesFactory(BatchedFactory):
         """
 
         # The mapping function
-        def S(x: float) -> Sequence[float]:
+        def S(x):
             return (a - b) / 2 * np.cos(np.pi * (x - a) / (b - a)) + (
                 a + b
             ) / 2
@@ -992,7 +993,7 @@ class FakeNodesFactory(BatchedFactory):
         if isinstance(x, float):
             return S(x)
 
-        return cast(Sequence[float], np.array([S(y) for y in x]))
+        return np.array([S(y) for y in x])
 
     @staticmethod
     def _is_equally_spaced(arr: Sequence[float]) -> bool:
@@ -1026,7 +1027,7 @@ class LinearFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
@@ -1111,7 +1112,7 @@ class ExpFactory(BatchedFactory):
         }
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         asymptote: Optional[float] = None,
@@ -1232,7 +1233,7 @@ class PolyExpFactory(BatchedFactory):
         }
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         order: int,
@@ -1612,7 +1613,7 @@ class AdaExpFactory(AdaptiveFactory):
             full_output=full_output,
         )
 
-    def reduce(self) -> Optional[float]:
+    def reduce(self) -> float:
         """Returns the zero-noise limit found by fitting an exponential
         model to the internal data stored in the factory.
 
@@ -1626,8 +1627,8 @@ class AdaExpFactory(AdaptiveFactory):
             self._params_cov,
             self._zne_curve,
         ) = self.extrapolate(  # type: ignore
-            cast(Sequence[float], self.get_scale_factors()),
-            cast(Sequence[float], self.get_expectation_values()),
+            self.get_scale_factors(),
+            self.get_expectation_values(),
             asymptote=self.asymptote,
             avoid_log=self.avoid_log,
             full_output=True,
