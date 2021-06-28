@@ -117,8 +117,9 @@ def _map_qubits(
     ]
 
 
-def _measurement_order(circuit: qiskit.QuantumCircuit
-                       ) -> List[Tuple[Any, ...]]:
+def _measurement_order(
+    circuit: qiskit.QuantumCircuit,
+) -> List[Tuple[Any, ...]]:
     """Returns the left-to-right measurement order in the circuit.
 
     The "measurement order" is a list of tuples (qubit, bit) involved in

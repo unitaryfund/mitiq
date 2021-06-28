@@ -15,15 +15,7 @@
 
 """Functions for local and global unitary folding on supported circuits."""
 from copy import deepcopy
-from typing import (
-    Any,
-    Dict,
-    FrozenSet,
-    List,
-    Optional,
-    Tuple,
-    cast
-)
+from typing import Any, Dict, FrozenSet, List, Optional, Tuple, cast
 
 import numpy as np
 from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary

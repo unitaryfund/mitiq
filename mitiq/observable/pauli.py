@@ -74,8 +74,9 @@ class PauliString:
 
     def measure_in(self, circuit: QPROGRAM) -> QPROGRAM:
         @atomic_converter
-        def _measure_in(circuit: cirq.Circuit, pauli: cirq.PauliString[Any]
-                        ) -> cirq.ops.raw_types.TSelf:
+        def _measure_in(
+            circuit: cirq.Circuit, pauli: cirq.PauliString[Any]
+        ) -> cirq.ops.raw_types.TSelf:
             # Transform circuit to canonical qubit layout.
             qubit_map = dict(
                 zip(

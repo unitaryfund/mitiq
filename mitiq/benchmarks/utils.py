@@ -23,7 +23,7 @@ from cirq import (
     depolarize,
     DensityMatrixSimulator,
     NoiseModel,
-    SingleQubitGate
+    SingleQubitGate,
 )
 
 SIMULATOR = DensityMatrixSimulator()
@@ -40,8 +40,9 @@ def noisy_simulation(circ: Circuit, noise: float, obs: np.ndarray) -> float:
     Returns:
         The observable's expectation value.
     """
-    circuit = circ.with_noise(cast(Union[None, NoiseModel, SingleQubitGate],
-                              depolarize(p=noise)))
+    circuit = circ.with_noise(
+        cast(Union[None, NoiseModel, SingleQubitGate], depolarize(p=noise))
+    )
     result = SIMULATOR.simulate(circuit)
     rho = result.final_density_matrix
     # measure the expectation by taking the trace of the density matrix

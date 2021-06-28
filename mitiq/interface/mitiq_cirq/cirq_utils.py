@@ -77,9 +77,12 @@ def execute_with_depolarizing_noise(
         Returns:
             The expectation value of obs as a float.
         """
-    circuit = circ.with_noise(cast(Union[None, cirq.NoiseModel,
-                              cirq.SingleQubitGate],
-                              cirq.depolarize(p=noise)))
+    circuit = circ.with_noise(
+        cast(
+            Union[None, cirq.NoiseModel, cirq.SingleQubitGate],
+            cirq.depolarize(p=noise),
+        )
+    )
     simulator = cirq.DensityMatrixSimulator()
     rho = simulator.simulate(circuit).final_density_matrix
     expectation = np.real(np.trace(rho @ obs))
@@ -101,9 +104,12 @@ def execute_with_shots_and_depolarizing_noise(
             The expectation value of obs as a float.
         """
     # Add noise
-    noisy = circ.with_noise(cast(Union[None, cirq.NoiseModel,
-                            cirq.SingleQubitGate],
-                            cirq.depolarize(p=noise)))
+    noisy = circ.with_noise(
+        cast(
+            Union[None, cirq.NoiseModel, cirq.SingleQubitGate],
+            cirq.depolarize(p=noise),
+        )
+    )
 
     # Do the sampling
     psum = cirq.PauliSumCollector(noisy, obs, samples_per_term=shots)

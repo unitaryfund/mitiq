@@ -61,8 +61,9 @@ def generate_rb_circuits(
 
     if n_qubits == 1:
         c1 = cliffords.c1_in_xy
-        cfd_mat_1q = cast(np.ndarray, [_gate_seq_to_mats(gates)
-                          for gates in c1])
+        cfd_mat_1q = cast(
+            np.ndarray, [_gate_seq_to_mats(gates) for gates in c1]
+        )
         circuits = [
             _random_single_q_clifford(qubits[0], num_cliffords, c1, cfd_mat_1q)
             for _ in range(trials)
@@ -73,10 +74,7 @@ def generate_rb_circuits(
         )
         circuits = [
             _random_two_q_clifford(
-                qubits[0], qubits[1],
-                num_cliffords,
-                cfd_matrices,
-                cliffords,
+                qubits[0], qubits[1], num_cliffords, cfd_matrices, cliffords,
             )
             for _ in range(trials)
         ]

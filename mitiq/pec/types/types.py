@@ -16,7 +16,7 @@
 """Types used in probabilistic error cancellation."""
 from copy import deepcopy
 from itertools import product
-from typing import Any, List, Optional, Sequence, Set, Tuple, Union, cast
+from typing import Any, cast, Dict, List, Optional, Sequence, Set, Tuple, Union
 
 import numpy as np
 
@@ -332,7 +332,7 @@ class NoisyBasis:
             qubits.update(set(noisy_op.qubits))
         return qubits
 
-    def add(self, *basis_elements: Sequence['NoisyOperation']) -> None:
+    def add(self, *basis_elements: Sequence["NoisyOperation"]) -> None:
         """Add elements to the NoisyBasis.
 
         Args:
@@ -422,8 +422,17 @@ class OperationRepresentation:
 
         self._basis_expansion = cirq.LinearDict(basis_expansion)
         self._norm = sum(abs(coeff) for coeff in self.coeffs)
-        self._distribution = np.array(list(map(abs,  # type: ignore
-                                               self.coeffs))) / self.norm
+        self._distribution = (
+            np.array(
+                list(
+                    map(
+                        abs,  # type: ignore
+                        self.coeffs,
+                    )
+                )
+            )
+            / self.norm
+        )
 
     @property
     def ideal(self) -> QPROGRAM:

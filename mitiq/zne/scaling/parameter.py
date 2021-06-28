@@ -82,8 +82,10 @@ def _generate_parameter_calibration_circuit(
 
 
 def _parameter_calibration(
-    executor: Callable[..., float], gate: EigenGate, qubit: Qid,
-    depth: int = 100
+    executor: Callable[..., float],
+    gate: EigenGate,
+    qubit: Qid,
+    depth: int = 100,
 ) -> float:
     """
     Given an executor and a gate, determines the effective

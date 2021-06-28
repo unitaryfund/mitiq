@@ -17,16 +17,7 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from collections.abc import Sequence, Iterable
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Union,
-    cast
-)
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 import warnings
 
 from matplotlib.figure import Figure
@@ -369,8 +360,10 @@ class Factory(ABC):
         fig = self.plot_data()
 
         smooth_scale_factors = np.linspace(0, self.get_scale_factors()[-1], 20)
-        smooth_expectations = [self.get_extrapolation_curve()(scale_factor)
-                               for scale_factor in smooth_scale_factors]
+        smooth_expectations = [
+            self.get_extrapolation_curve()(scale_factor)
+            for scale_factor in smooth_scale_factors
+        ]
         plt.xlim(left=0)
         fig.axes[0].plot(
             smooth_scale_factors,
@@ -394,7 +387,7 @@ class Factory(ABC):
         self._zne_error = None
         self._already_reduced = False
         return self
-        
+
     def reduce(self) -> Optional[float]:
         """Evaluates the zero-noise limit found by fitting according to
         the factory's extrapolation method.
@@ -948,14 +941,10 @@ class FakeNodesFactory(BatchedFactory):
         if not full_output:
             return RichardsonFactory.extrapolate(fake_nodes, exp_values)
 
-        (
-            zne_limit,
-            zne_error,
-            opt_params,
-            params_cov,
-            zne_curve,
-        ) = cast(Iterable[Any], RichardsonFactory.extrapolate(fake_nodes,
-                 exp_values, True))
+        (zne_limit, zne_error, opt_params, params_cov, zne_curve,) = cast(
+            Iterable[Any],
+            RichardsonFactory.extrapolate(fake_nodes, exp_values, True),
+        )
 
         # Convert zne_curve from the "fake node space" to the real space.
         # Note: since a=0.0, this conversion is not necessary for zne_limit.

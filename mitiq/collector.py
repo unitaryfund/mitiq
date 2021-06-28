@@ -78,8 +78,11 @@ class Collector:
     collecting the results.
     """
 
-    def __init__(self, executor: Callable[[Union[QPROGRAM,
-                 Sequence[QPROGRAM]]], Any], max_batch_size: int = 75) -> None:
+    def __init__(
+        self,
+        executor: Callable[[Union[QPROGRAM, Sequence[QPROGRAM]]], Any],
+        max_batch_size: int = 75,
+    ) -> None:
         """Initializes a Collector.
 
         Args:
@@ -177,8 +180,9 @@ class Collector:
             self._executed_circuits.append(to_run)
 
     @staticmethod
-    def is_batched_executor(executor: Callable[[Union[QPROGRAM,
-                            Sequence[QPROGRAM]]], Any]) -> bool:
+    def is_batched_executor(
+        executor: Callable[[Union[QPROGRAM, Sequence[QPROGRAM]]], Any]
+    ) -> bool:
         """Returns True if the input function is recognized as a "batched
         executor", else False.
 

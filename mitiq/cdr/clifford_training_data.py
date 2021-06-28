@@ -186,7 +186,8 @@ def _map_to_near_clifford(
     return [
         cast(List[cirq.ops.Operation], clifford_ops).pop(0)
         if i in indices_of_selected_ops
-        else op for (i, op) in enumerate(non_clifford_ops)
+        else op
+        for (i, op) in enumerate(non_clifford_ops)
     ]
 
 
@@ -221,8 +222,10 @@ def _select(
         distribution = 1.0 / num_non_cliff * np.ones(shape=(num_non_cliff,))
     elif method == "gaussian":
         non_clifford_angles = np.array(
-            [op.gate.exponent * np.pi  # type: ignore
-             for op in non_clifford_ops]
+            [
+                op.gate.exponent * np.pi  # type: ignore
+                for op in non_clifford_ops
+            ]
         )
         probabilities = _angle_to_proximity(non_clifford_angles, sigma)
         distribution = [k / sum(probabilities) for k in probabilities]

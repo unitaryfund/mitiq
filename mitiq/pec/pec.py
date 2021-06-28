@@ -224,9 +224,13 @@ def pec_decorator(
     force_run_all: bool = True,
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
-) -> Callable[[Callable[[Union[QPROGRAM, Any, Any, Any]], float]],
-              Callable[[Union[QPROGRAM, Any, Any, Any]],
-              Union[float, Tuple[float, Dict[str, Any]]]]]:
+) -> Callable[
+    [Callable[[Union[QPROGRAM, Any, Any, Any]], float]],
+    Callable[
+        [Union[QPROGRAM, Any, Any, Any]],
+        Union[float, Tuple[float, Dict[str, Any]]],
+    ],
+]:
     """Decorator which adds probabilistic error cancellation (PEC) mitigation
     to an executor function, i.e., a function which executes a quantum circuit
     with an arbitrary backend and returns the PEC estimate of the ideal

@@ -59,7 +59,8 @@ def make_maxcut(
     factory: Optional[Factory] = None,
 ) -> Tuple[
     Callable[[np.ndarray], Optional[float]],
-    Callable[[np.ndarray], Circuit], float
+    Callable[[np.ndarray], Circuit],
+    float,
 ]:
     """Makes an executor that evaluates the QAOA ansatz at a given beta
     and gamma parameters.
