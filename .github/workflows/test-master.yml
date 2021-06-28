@@ -1,9 +1,6 @@
 name: test (master only)
 
 on:
-  pull_request:
-    branches:
-      - master
   push:
     branches:
       - master
