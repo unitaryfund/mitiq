@@ -17,7 +17,7 @@ check-style:
 
 .PHONY: check-types
 check-types:
-	mypy .
+	mypy mitiq
 
 .PHONY: clean
 clean:
