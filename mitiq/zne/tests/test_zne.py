@@ -40,7 +40,7 @@ from mitiq.interface.mitiq_qiskit import (
     initialized_depolarizing_noise,
 )
 
-from mitiq import SUPPORTED_PROGRAM_TYPES
+from mitiq._typing import SUPPORTED_PROGRAM_TYPES
 from mitiq.interface import convert_from_mitiq, accept_any_qprogram_as_input
 
 
