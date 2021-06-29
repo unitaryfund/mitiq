@@ -40,6 +40,10 @@ from mitiq.interface.mitiq_qiskit import (
     initialized_depolarizing_noise,
 )
 
+from mitiq import SUPPORTED_PROGRAM_TYPES
+from mitiq.interface import convert_from_mitiq, accept_any_qprogram_as_input
+
+
 BASE_NOISE = 0.007
 TEST_DEPTH = 30
 ONE_QUBIT_GS_PROJECTOR = np.array([[1, 0], [0, 0]])
@@ -54,6 +58,15 @@ npZ = np.array([[1, 0], [0, -1]])
 # Default qubit register and circuit for unit tests
 qreg = cirq.GridQubit.rect(2, 1)
 circ = cirq.Circuit(cirq.ops.H.on_each(*qreg), cirq.measure_each(*qreg))
+
+
+@accept_any_qprogram_as_input
+def generic_executor(circuit, noise_level: float = 0.1) -> float:
+    """Executor that simulates a circuit of any type and returns
+    the expectation value of the ground state projector."""
+    noisy_circuit = circuit.with_noise(cirq.depolarize(p=noise_level))
+    result = cirq.DensityMatrixSimulator().simulate(noisy_circuit)
+    return result.final_density_matrix[0, 0].real
 
 
 # Default executor for unit tests
@@ -364,3 +377,24 @@ def test_qiskit_measurement_order_is_preserved_two_registers():
     folded = scaling.fold_gates_at_random(circuit, scale_factor=1.0)
 
     assert get_counts(folded) == get_counts(circuit)
+
+
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_execute_with_zne_with_supported_circuits(circuit_type):
+    # Define a circuit equivalent to the identity
+    qreg = cirq.LineQubit.range(2)
+    cirq_circuit = cirq.Circuit(
+        cirq.H.on_each(qreg),
+        cirq.CNOT(*qreg),
+        cirq.CNOT(*qreg),
+        cirq.H.on_each(qreg),
+    )
+    # Convert to one of the supported program types
+    circuit = convert_from_mitiq(cirq_circuit, circuit_type)
+    expected = generic_executor(circuit, noise_level=0.0)
+    unmitigated = generic_executor(circuit)
+    # Use odd scale factors for deterministic results
+    fac = RichardsonFactory([1.0, 3.0, 5.0])
+    zne_value = execute_with_zne(circuit, generic_executor, factory=fac)
+    # Test zero noise limit is better than unmitigated expectation value
+    assert abs(unmitigated - expected) > abs(zne_value - expected)
