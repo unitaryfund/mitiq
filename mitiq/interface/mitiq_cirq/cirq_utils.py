@@ -36,7 +36,7 @@ def execute(circuit: cirq.Circuit, obs: np.ndarray) -> float:
 
 
 def execute_with_shots(
-    circuit: cirq.Circuit, obs: cirq.PauliSumLike, shots: int
+    circuit: cirq.Circuit, obs: cirq.PauliString, shots: int
 ) -> Union[float, complex]:
     """Simulates noiseless wavefunction evolution and returns the
     expectation value of a PauliString observable.
@@ -79,7 +79,7 @@ def execute_with_depolarizing_noise(
 
 
 def execute_with_shots_and_depolarizing_noise(
-    circuit: cirq.Circuit, obs: cirq.PauliSumLike, noise: float, shots: int
+    circuit: cirq.Circuit, obs: cirq.PauliString, noise: float, shots: int
 ) -> Union[float, complex]:
     """Simulates a circuit with depolarizing noise at level noise.
 
