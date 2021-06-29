@@ -20,10 +20,6 @@ import numpy as np
 import cirq
 
 
-def two():
-    return 2
-
-
 # Note: This is the same as cirq.PauliSumLike but without a typing.ForwardRef
 # which causes Sphinx errors.
 PauliSumLike = Union[
