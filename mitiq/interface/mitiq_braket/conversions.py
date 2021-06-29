@@ -66,10 +66,8 @@ def to_braket(circuit: Circuit) -> BKCircuit:
         circuit: Cirq circuit to convert to a Braket circuit.
     """
     return BKCircuit(
-        [
-            _translate_cirq_operation_to_braket_instruction(op)
-            for op in circuit.all_operations()
-        ]
+        _translate_cirq_operation_to_braket_instruction(op)
+        for op in circuit.all_operations()
     )
 
 
@@ -107,6 +105,8 @@ def _translate_braket_instruction_to_cirq_operation(
     else:
         _raise_braket_to_cirq_error(instr)
 
+    return None  # type: ignore[return-value]
+
 
 def _translate_cirq_operation_to_braket_instruction(
     op: cirq_ops.Operation,
@@ -140,6 +140,8 @@ def _translate_cirq_operation_to_braket_instruction(
     # Unsupported gates.
     else:
         _raise_cirq_to_braket_error(op)
+
+    return None  # type: ignore[return-value]
 
 
 def _translate_one_qubit_braket_instruction_to_cirq_operation(
@@ -192,6 +194,8 @@ def _translate_one_qubit_braket_instruction_to_cirq_operation(
 
     else:
         _raise_braket_to_cirq_error(instr)
+
+    return None  # type: ignore[return-value]
 
 
 def _translate_two_qubit_braket_instruction_to_cirq_operation(
@@ -276,6 +280,8 @@ def _translate_two_qubit_braket_instruction_to_cirq_operation(
 
     else:
         _raise_braket_to_cirq_error(instr)
+
+    return None  # type: ignore[return-value]
 
 
 def _translate_one_qubit_cirq_operation_to_braket_instruction(

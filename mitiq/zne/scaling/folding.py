@@ -20,7 +20,6 @@ from typing import Any, Dict, FrozenSet, List, Optional, Tuple, cast
 import numpy as np
 from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary
 
-from mitiq._typing import QPROGRAM
 from mitiq.interface import noise_scaling_converter
 
 

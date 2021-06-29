@@ -784,7 +784,7 @@ class PolyFactory(BatchedFactory):
         self._options = {"order": order}
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         order: int,
@@ -857,7 +857,7 @@ class RichardsonFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
@@ -925,7 +925,7 @@ class FakeNodesFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
@@ -1029,7 +1029,7 @@ class LinearFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
@@ -1114,7 +1114,7 @@ class ExpFactory(BatchedFactory):
         }
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         asymptote: Optional[float] = None,
@@ -1235,7 +1235,7 @@ class PolyExpFactory(BatchedFactory):
         }
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         order: int,
@@ -1557,7 +1557,7 @@ class AdaExpFactory(AdaptiveFactory):
         return len(self._outstack) == self._steps
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         asymptote: Optional[float] = None,

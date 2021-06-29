@@ -17,7 +17,7 @@ check-style:
 
 .PHONY: check-types
 check-types:
-	mypy mitiq
+	mypy mitiq --show-error-codes
 
 .PHONY: clean
 clean:
