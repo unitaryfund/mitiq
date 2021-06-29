@@ -14,7 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Functions for generating randomized benchmarking circuits."""
-from typing import List, Optional
+from typing import List, Optional, cast
+
+import numpy as np
 
 from cirq.experiments.qubit_characterizations import (
     _single_qubit_cliffords,
@@ -59,24 +61,23 @@ def generate_rb_circuits(
 
     if n_qubits == 1:
         c1 = cliffords.c1_in_xy
-        cfd_mat_1q = [_gate_seq_to_mats(gates) for gates in c1]
+        cfd_mat_1q = cast(
+            np.ndarray, [_gate_seq_to_mats(gates) for gates in c1]
+        )
         circuits = [
-            _random_single_q_clifford(*qubits, num_cliffords, c1, cfd_mat_1q)
+            _random_single_q_clifford(qubits[0], num_cliffords, c1, cfd_mat_1q)
             for _ in range(trials)
         ]
     else:
         cfd_matrices = _two_qubit_clifford_matrices(
-            *qubits, cliffords,  # type: ignore
+            qubits[0], qubits[1], cliffords,
         )
         circuits = [
             _random_two_q_clifford(
-                *qubits,  # type: ignore
-                num_cliffords,
-                cfd_matrices,
-                cliffords,
+                qubits[0], qubits[1], num_cliffords, cfd_matrices, cliffords,
             )
             for _ in range(trials)
         ]
-    if return_type is None or return_type == "cirq":
-        return circuits
+
+    return_type = "cirq" if not return_type else return_type
     return [convert_from_mitiq(circuit, return_type) for circuit in circuits]

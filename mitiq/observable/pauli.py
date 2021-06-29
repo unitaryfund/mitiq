@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Any
 
 import numpy as np
 import cirq
@@ -60,7 +60,7 @@ class PauliString:
         else:
             support = range(len(spec))
 
-        self._pauli = cirq.PauliString(
+        self._pauli: cirq.PauliString[Any] = cirq.PauliString(
             coeff,
             (
                 self._string_to_gate_map[s].on(cirq.LineQubit(i))
@@ -74,7 +74,9 @@ class PauliString:
 
     def measure_in(self, circuit: QPROGRAM) -> QPROGRAM:
         @atomic_converter
-        def _measure_in(circuit: cirq.Circuit, pauli: cirq.PauliString):
+        def _measure_in(
+            circuit: cirq.Circuit, pauli: cirq.PauliString[Any]
+        ) -> cirq.ops.raw_types.TSelf:
             # Transform circuit to canonical qubit layout.
             qubit_map = dict(
                 zip(
@@ -88,8 +90,8 @@ class PauliString:
             if not set(pauli).issubset(set(circuit.all_qubits())):
                 raise ValueError(
                     f"Qubit mismatch. The PauliString {self} acts on qubits "
-                    f"{[q.x for q in pauli.qubits]} but the circuit has qubit "
-                    f"indices {sorted([q.x for q in circuit.all_qubits()])}."
+                    f"{[q for q in pauli.qubits]} but the circuit has qubit "
+                    f"indices {sorted([q for q in circuit.all_qubits()])}."
                 )
             measured = (
                 circuit + pauli.to_z_basis_ops() + cirq.measure(*pauli.qubits)

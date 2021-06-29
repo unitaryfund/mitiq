@@ -261,6 +261,17 @@ def test_add_bad_type():
         noisy_op + ideal
 
 
+def test_add_noisy_operation_no_channel_matrix():
+    noisy_op1 = NoisyOperation(cirq.Circuit([cirq.X.on(cirq.NamedQubit("Q"))]))
+    noisy_op2 = NoisyOperation(
+        cirq.Circuit([cirq.X.on(cirq.NamedQubit("Q"))]),
+        channel_matrix=np.random.rand(4, 4),
+    )
+
+    with pytest.raises(ValueError):
+        (noisy_op1 + noisy_op2).channel_matrix
+
+
 @pytest.mark.parametrize(
     "qreg",
     (

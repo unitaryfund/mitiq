@@ -16,7 +16,7 @@
 """Functions to convert between Mitiq's internal circuit representation and
 Qiskit's circuit representation.
 """
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Any
 import re
 
 import numpy as np
@@ -117,7 +117,9 @@ def _map_qubits(
     ]
 
 
-def _measurement_order(circuit: qiskit.QuantumCircuit):
+def _measurement_order(
+    circuit: qiskit.QuantumCircuit,
+) -> List[Tuple[Any, ...]]:
     """Returns the left-to-right measurement order in the circuit.
 
     The "measurement order" is a list of tuples (qubit, bit) involved in

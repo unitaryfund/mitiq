@@ -64,7 +64,7 @@ def sample_sequence(
     ideal, _ = convert_to_mitiq(ideal_operation)
     operation_representation = None
     for representation in representations:
-        if _equal(representation.ideal, ideal, require_qubit_equality=True):
+        if _equal(representation._ideal, ideal, require_qubit_equality=True):
             operation_representation = representation
             break
 

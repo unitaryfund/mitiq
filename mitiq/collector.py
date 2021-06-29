@@ -33,8 +33,8 @@ def generate_collected_executor(
     executor: Callable[[Union[QPROGRAM, Sequence[QPROGRAM]]], Any],
     max_batch_size: int = 75,
     force_run_all: bool = False,
-    **kwargs,
-) -> Callable:
+    **kwargs: Any,
+) -> Callable[[Any], List[float]]:
     """Returns a new executor function which efficiently collects expectation
     values by detecting identical circuits and calling the executor as few
     times as possible.
@@ -65,7 +65,7 @@ def generate_collected_executor(
     if not callable(executor):
         raise ValueError("Arg `executor` must be callable.")
 
-    def collected(circuits: Any):
+    def collected(circuits: Any) -> List[float]:
         return Collector(executor, max_batch_size).run(
             circuits, force_run_all=force_run_all, **kwargs
         )
@@ -78,7 +78,11 @@ class Collector:
     collecting the results.
     """
 
-    def __init__(self, executor: Callable, max_batch_size: int = 75) -> None:
+    def __init__(
+        self,
+        executor: Callable[[Union[QPROGRAM, Sequence[QPROGRAM]]], Any],
+        max_batch_size: int = 75,
+    ) -> None:
         """Initializes a Collector.
 
         Args:
@@ -109,7 +113,7 @@ class Collector:
         self,
         circuits: Sequence[QPROGRAM],
         force_run_all: bool = False,
-        **kwargs,
+        **kwargs: Any,
     ) -> List[float]:
         """Runs all input circuits using the least number of possible calls to
         the executor.
@@ -157,14 +161,14 @@ class Collector:
         return results
 
     def _call_executor(
-        self, to_run: Union[QPROGRAM, Sequence[QPROGRAM]], **kwargs
+        self, to_run: Union[QPROGRAM, Sequence[QPROGRAM]], **kwargs: Any
     ) -> None:
         """Calls the executor on the input circuit(s) to run.
 
         Args:
             to_run: Circuit(s) to run.
         """
-        result = self._executor(to_run, **kwargs)
+        result = self._executor(to_run, **kwargs)  # type: ignore
         self._calls_to_executor += 1
 
         try:
@@ -176,7 +180,9 @@ class Collector:
             self._executed_circuits.append(to_run)
 
     @staticmethod
-    def is_batched_executor(executor: Callable) -> bool:
+    def is_batched_executor(
+        executor: Callable[[Union[QPROGRAM, Sequence[QPROGRAM]]], Any]
+    ) -> bool:
         """Returns True if the input function is recognized as a "batched
         executor", else False.
 

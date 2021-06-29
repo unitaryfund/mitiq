@@ -19,6 +19,7 @@ from copy import deepcopy
 from typing import (
     Any,
     Callable,
+    cast,
     Dict,
     List,
     Optional,
@@ -226,7 +227,7 @@ class Factory(ABC):
         self._zne_error: Optional[float] = None
         self._zne_curve: Optional[Callable[[float], float]] = None
         self._already_reduced = False
-        self._options: Dict[str, float] = {}
+        self._options: Dict[str, Optional[float]] = {}
 
     def get_scale_factors(self) -> np.ndarray:
         """Returns the scale factors at which the factory has computed
@@ -326,6 +327,10 @@ class Factory(ABC):
         """
         raise NotImplementedError
 
+    @abstractmethod
+    def reduce(self) -> float:
+        raise NotImplementedError
+
     def push(
         self, instack_val: Dict[str, float], outstack_val: float
     ) -> "Factory":
@@ -380,9 +385,10 @@ class Factory(ABC):
         fig = self.plot_data()
 
         smooth_scale_factors = np.linspace(0, self.get_scale_factors()[-1], 20)
-        smooth_expectations = (self.get_extrapolation_curve())(
-            smooth_scale_factors
-        )
+        smooth_expectations = [
+            self.get_extrapolation_curve()(scale_factor)
+            for scale_factor in smooth_scale_factors
+        ]
         plt.xlim(left=0)
         fig.axes[0].plot(
             smooth_scale_factors,
@@ -462,7 +468,7 @@ class BatchedFactory(Factory, ABC):
 
     @staticmethod
     @abstractmethod
-    def extrapolate(*args, **kwargs) -> ExtrapolationResult:
+    def extrapolate(*args: Any, **kwargs: Any) -> ExtrapolationResult:
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
 
@@ -550,10 +556,10 @@ class BatchedFactory(Factory, ABC):
             ]
 
         # Reshape "res" to have "num_to_average" columns
-        res = np.array(res).reshape((-1, num_to_average))
+        reshaped = np.array(res).reshape((-1, num_to_average))
 
         # Average the "num_to_average" columns
-        self._outstack = np.average(res, axis=1)
+        self._outstack = np.average(reshaped, axis=1)
 
         return self
 
@@ -782,7 +788,7 @@ class PolyFactory(BatchedFactory):
         self._options = {"order": order}
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         order: int,
@@ -855,7 +861,7 @@ class RichardsonFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
@@ -923,7 +929,7 @@ class FakeNodesFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
@@ -948,21 +954,23 @@ class FakeNodesFactory(BatchedFactory):
             opt_params,
             params_cov,
             zne_curve,
-        ) = RichardsonFactory.extrapolate(fake_nodes, exp_values, True)
+        ) = RichardsonFactory.extrapolate(  # type: ignore[misc]
+            fake_nodes, exp_values, True
+        )
 
         # Convert zne_curve from the "fake node space" to the real space.
         # Note: since a=0.0, this conversion is not necessary for zne_limit.
         def new_curve(scale_factor: float) -> float:
-            """Get real zne_cruve from the curve based on fake nodes."""
+            """Get real zne_curve from the curve based on fake nodes."""
             return zne_curve(
-                FakeNodesFactory._map_to_fake_nodes(scale_factor, a, b)
+                FakeNodesFactory._map_to_fake_nodes([scale_factor], a, b)[0]
             )
 
-        return zne_limit, zne_error, opt_params, params_cov, zne_curve
+        return zne_limit, zne_error, opt_params, params_cov, new_curve
 
     @staticmethod
     def _map_to_fake_nodes(
-        x: Union[Sequence[float], float], a: float, b: float
+        x: Union[Sequence[float]], a: float, b: float
     ) -> Sequence[float]:
         """
         A function that maps inputs to Chebyshev-Lobatto points. Based on
@@ -972,11 +980,9 @@ class FakeNodesFactory(BatchedFactory):
         we are mapping to.
 
         Args:
-            x:
-                Sequence[float]: Set of values to be mapped to CL points.
-                float: A single value to be mapped to a CL point.
-            a: A float representing the interval starting at a
-            b: A float representing the interval ending at b
+            x: Sequence[float]: Set of values to be mapped to CL points.
+            a: A float representing the interval starting at a.
+            b: A float representing the interval ending at b.
         Returns:
             A new sequence of fake nodes (Chebyshev-Lobatto points).
 
@@ -988,15 +994,12 @@ class FakeNodesFactory(BatchedFactory):
         """
 
         # The mapping function
-        def S(x):
-            return (a - b) / 2 * np.cos(np.pi * (x - a) / (b - a)) + (
+        def mapping(_x: float) -> float:
+            return (a - b) / 2 * np.cos(np.pi * (_x - a) / (b - a)) + (
                 a + b
             ) / 2
 
-        if isinstance(x, float):
-            return S(x)
-
-        return np.array([S(y) for y in x])
+        return [mapping(y) for y in x]
 
     @staticmethod
     def _is_equally_spaced(arr: Sequence[float]) -> bool:
@@ -1030,7 +1033,7 @@ class LinearFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
@@ -1115,7 +1118,7 @@ class ExpFactory(BatchedFactory):
         }
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         asymptote: Optional[float] = None,
@@ -1236,7 +1239,7 @@ class PolyExpFactory(BatchedFactory):
         }
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         order: int,
@@ -1558,7 +1561,7 @@ class AdaExpFactory(AdaptiveFactory):
         return len(self._outstack) == self._steps
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         asymptote: Optional[float] = None,
@@ -1630,8 +1633,8 @@ class AdaExpFactory(AdaptiveFactory):
             self._params_cov,
             self._zne_curve,
         ) = self.extrapolate(  # type: ignore
-            self.get_scale_factors(),
-            self.get_expectation_values(),
+            cast(Sequence[float], self.get_scale_factors()),
+            cast(Sequence[float], self.get_expectation_values()),
             asymptote=self.asymptote,
             avoid_log=self.avoid_log,
             full_output=True,

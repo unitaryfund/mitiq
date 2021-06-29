@@ -15,7 +15,7 @@
 
 """Functions for finding optimal representations given a noisy basis."""
 
-from typing import List, Optional
+from typing import cast, List, Optional
 
 import numpy as np
 from scipy.optimize import minimize, LinearConstraint
@@ -80,7 +80,7 @@ def minimize_one_norm(
 
     constraint = LinearConstraint(matrix_a, lb=array_b - tol, ub=array_b + tol)
 
-    def one_norm(x):
+    def one_norm(x: np.ndarray) -> float:
         return np.linalg.norm(x, 1)
 
     if initial_guess is None:
@@ -125,8 +125,10 @@ def find_optimal_representation(
 
     Returns: The optimal OperationRepresentation.
     """
-    ideal_cirq, _ = convert_to_mitiq(ideal_operation)
-    ideal_matrix = kraus_to_super(channel(ideal_cirq))
+    ideal_cirq_circuit, _ = convert_to_mitiq(ideal_operation)
+    ideal_matrix = kraus_to_super(
+        cast(List[np.ndarray], channel(ideal_cirq_circuit))
+    )
     basis_set = noisy_basis.elements
 
     try:

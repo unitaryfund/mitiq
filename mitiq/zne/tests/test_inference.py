@@ -964,7 +964,7 @@ def test_plot_fit_exp_factory(factory):
     np.allclose(y_data, zne_curve(x_data))
 
 
-def test__fakenodes_scale_factors_equally_spaced():
+def test_fakenodes_scale_factors_equally_spaced():
     """FakeNodesFactory should only accept equally spaced scale factors."""
     y_vals = [0.5, 1.0, 1.5]
     with raises(
@@ -977,7 +977,9 @@ def test_map_to_fakenodes():
     """Test the fake nodes map in FakeNodesFactory."""
     fac = FakeNodesFactory(UNIFORM_X)
     test_argument = 1.0
-    assert np.isclose(fac._map_to_fake_nodes(1.0, 2.0, test_argument), 1.0,)
+    assert np.isclose(
+        fac._map_to_fake_nodes([1.0], 2.0, test_argument), [1.0],
+    )
 
 
 @mark.parametrize(
