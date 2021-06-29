@@ -20,6 +20,18 @@ import numpy as np
 import cirq
 
 
+# Note: This is the same as cirq.PauliSumLike but without a typing.ForwardRef
+# which causes Sphinx errors.
+PauliSumLike = Union[
+    int,
+    float,
+    complex,
+    cirq.PauliString,
+    cirq.PauliSum,
+    cirq.SingleQubitPauliStringGateOperation,
+]
+
+
 def execute(circuit: cirq.Circuit, obs: np.ndarray) -> float:
     """Simulates noiseless wavefunction evolution and returns the
     expectation value of some observable.
@@ -36,7 +48,7 @@ def execute(circuit: cirq.Circuit, obs: np.ndarray) -> float:
 
 
 def execute_with_shots(
-    circuit: cirq.Circuit, obs: cirq.PauliString, shots: int
+    circuit: cirq.Circuit, obs: PauliSumLike, shots: int
 ) -> Union[float, complex]:
     """Simulates noiseless wavefunction evolution and returns the
     expectation value of a PauliString observable.
@@ -79,7 +91,7 @@ def execute_with_depolarizing_noise(
 
 
 def execute_with_shots_and_depolarizing_noise(
-    circuit: cirq.Circuit, obs: cirq.PauliString, noise: float, shots: int
+    circuit: cirq.Circuit, obs: PauliSumLike, noise: float, shots: int
 ) -> Union[float, complex]:
     """Simulates a circuit with depolarizing noise at level noise.
 
