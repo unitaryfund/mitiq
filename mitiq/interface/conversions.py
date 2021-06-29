@@ -143,7 +143,9 @@ def accept_any_qprogram_as_input(
         circuit: QPROGRAM, *args: Any, **kwargs: Any
     ) -> Any:
         cirq_circuit, _ = convert_to_mitiq(circuit)
-        return accept_cirq_circuit_function(cirq_circuit, *args, **kwargs)  # type: ignore
+        return accept_cirq_circuit_function(  # type: ignore
+            cirq_circuit, *args, **kwargs
+        )
 
     return accept_any_qprogram_function
 
