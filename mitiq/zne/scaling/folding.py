@@ -231,10 +231,10 @@ def _get_weight_for_gate(
 # Local folding functions
 @noise_scaling_converter
 def fold_all(
-    circuit: QPROGRAM,
+    circuit: Circuit,
     scale_factor: float,
     exclude: FrozenSet[Any] = frozenset(),
-) -> QPROGRAM:
+) -> Circuit:
     """Returns a circuit with all gates folded locally.
 
     Args:
@@ -284,8 +284,8 @@ def fold_all(
 # Global folding function
 @noise_scaling_converter
 def fold_global(
-    circuit: QPROGRAM, scale_factor: float, **kwargs: Any
-) -> QPROGRAM:
+    circuit: Circuit, scale_factor: float, **kwargs: Any
+) -> Circuit:
     """Returns a new circuit obtained by folding the global unitary of the
     input circuit.
 
@@ -542,8 +542,8 @@ def _apply_fold_mask(
 
 @noise_scaling_converter
 def fold_gates_from_left(
-    circuit: QPROGRAM, scale_factor: float, **kwargs: Any
-) -> QPROGRAM:
+    circuit: Circuit, scale_factor: float, **kwargs: Any
+) -> Circuit:
     """Returns a new folded circuit by applying the map G -> G G^dag G to a
     subset of gates of the input circuit, starting with gates at the
     left (beginning) of the circuit.
@@ -619,8 +619,8 @@ def fold_gates_from_left(
 
 @noise_scaling_converter
 def fold_gates_from_right(
-    circuit: QPROGRAM, scale_factor: float, **kwargs: Any
-) -> QPROGRAM:
+    circuit: Circuit, scale_factor: float, **kwargs: Any
+) -> Circuit:
     r"""Returns a new folded circuit by applying the map G -> G G^dag G to a
     subset of gates of the input circuit, starting with gates at the
     right (end) of the circuit.
@@ -696,11 +696,11 @@ def fold_gates_from_right(
 
 @noise_scaling_converter
 def fold_gates_at_random(
-    circuit: QPROGRAM,
+    circuit: Circuit,
     scale_factor: float,
     seed: Optional[int] = None,
     **kwargs: Any,
-) -> QPROGRAM:
+) -> Circuit:
     r"""Returns a new folded circuit by applying the map G -> G G^dag G to a
     subset of gates of the input circuit, starting with gates at the
     right (end) of the circuit.
@@ -715,6 +715,7 @@ def fold_gates_at_random(
     Args:
         circuit: Circuit to fold.
         scale_factor: Factor to scale the circuit by. Any real number >= 1.
+        seed: Seed for random number generator.
 
     Keyword Args:
         fidelities (Dict[str, float]): Dictionary of gate fidelities. Each key
