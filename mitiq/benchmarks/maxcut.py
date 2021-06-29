@@ -123,8 +123,8 @@ def make_maxcut(
             assert scale_noise is not None
             return execute_with_zne(
                 qaoa_prog,
-                executor=noisy_backend,
-                scale_noise=scale_noise,
+                executor=noisy_backend,  # type: ignore
+                scale_noise=scale_noise,  # type: ignore
                 factory=factory,
             )
 
