@@ -23,14 +23,14 @@ jobs:
           python -m pip install --upgrade pip
           make install requirements
 
-      - name: Check types with mypy
-        run: make check-types
+      - name: Lint with flake8
+        run: make check-style
 
       - name: Check code style with Black
         run: make check-format
 
-      - name: Lint with flake8
-        run: make check-style
+      - name: Check types with mypy
+        run: make check-types
 
   docs:
     runs-on: ubuntu-latest
