@@ -105,7 +105,7 @@ def _translate_braket_instruction_to_cirq_operation(
     else:
         _raise_braket_to_cirq_error(instr)
 
-    return None  # type: ignore[return-value]
+    return None  # type: ignore[return-value]  # pragma: no cover
 
 
 def _translate_cirq_operation_to_braket_instruction(
@@ -141,7 +141,7 @@ def _translate_cirq_operation_to_braket_instruction(
     else:
         _raise_cirq_to_braket_error(op)
 
-    return None  # type: ignore[return-value]
+    return None  # type: ignore[return-value]  # pragma: no cover
 
 
 def _translate_one_qubit_braket_instruction_to_cirq_operation(
@@ -195,7 +195,7 @@ def _translate_one_qubit_braket_instruction_to_cirq_operation(
     else:
         _raise_braket_to_cirq_error(instr)
 
-    return None  # type: ignore[return-value]
+    return None  # type: ignore[return-value]  # pragma: no cover
 
 
 def _translate_two_qubit_braket_instruction_to_cirq_operation(
@@ -281,7 +281,7 @@ def _translate_two_qubit_braket_instruction_to_cirq_operation(
     else:
         _raise_braket_to_cirq_error(instr)
 
-    return None  # type: ignore[return-value]
+    return None  # type: ignore[return-value]  # pragma: no cover
 
 
 def _translate_one_qubit_cirq_operation_to_braket_instruction(
