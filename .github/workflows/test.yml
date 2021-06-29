@@ -23,8 +23,8 @@ jobs:
           python -m pip install --upgrade pip
           make install requirements
 
-       - name: Check types with mypy
-         run: make check-types
+      - name: Check types with mypy
+        run: make check-types
 
       - name: Check code style with Black
         run: make check-format
