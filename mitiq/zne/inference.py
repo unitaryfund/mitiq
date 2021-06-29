@@ -950,9 +950,9 @@ class FakeNodesFactory(BatchedFactory):
             opt_params,
             params_cov,
             zne_curve,
-        ) = RichardsonFactory.extrapolate(
+        ) = RichardsonFactory.extrapolate(  # type: ignore[misc]
             fake_nodes, exp_values, True
-        )  # type: ignore
+        )
 
         # Convert zne_curve from the "fake node space" to the real space.
         # Note: since a=0.0, this conversion is not necessary for zne_limit.

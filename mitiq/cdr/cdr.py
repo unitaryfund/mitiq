@@ -15,6 +15,7 @@
 
 """API for using Clifford Data Regression (CDR) error mitigation."""
 
+from functools import wraps
 from typing import Any, Callable, cast, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
@@ -33,7 +34,7 @@ from mitiq.cdr.execute import calculate_observable, MeasurementResult
 from mitiq.zne.scaling import fold_gates_at_random
 
 
-@accept_any_qprogram_as_input
+@wraps(accept_any_qprogram_as_input)
 def execute_with_cdr(
     circuit: Circuit,
     executor: Callable[[Circuit], MeasurementResult],

@@ -21,7 +21,7 @@ and modified to support a larger gateset (e.g. CPHASE).
 """
 
 from math import pi
-from typing import Any, Union
+from typing import Any, cast, Union
 
 import numpy as np
 
@@ -222,9 +222,9 @@ def is_magic_angle(angle: AngleLike) -> bool:
     Checks to see if an angle is 0, +/-pi/2, or +/-pi.
     """
     return bool(
-        np.isclose(np.abs(angle), pi / 2)
-        or np.isclose(np.abs(angle), pi)
-        or np.isclose(angle, 0.0)
+        np.isclose(np.abs(cast(float, angle)), pi / 2)
+        or np.isclose(np.abs(cast(float, angle)), pi)
+        or np.isclose(cast(float, angle), 0.0)
     )
 
 
@@ -303,7 +303,7 @@ def basic_compile(program: Program) -> Program:
         else:
             new_prog += inst
 
-    new_prog.native_quil_metadata = {
+    new_prog.native_quil_metadata = {  # type: ignore[assignment]
         "final_rewiring": None,
         "gate_depth": None,
         "gate_volume": None,
