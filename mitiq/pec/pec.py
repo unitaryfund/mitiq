@@ -41,7 +41,7 @@ _LARGE_SAMPLE_WARN = (
 
 def execute_with_pec(
     circuit: QPROGRAM,
-    executor: Callable,
+    executor: Callable[[QPROGRAM], float],
     representations: List[OperationRepresentation],
     precision: float = 0.03,
     num_samples: Optional[int] = None,
@@ -161,7 +161,7 @@ def execute_with_pec(
 
 
 def mitigate_executor(
-    executor: Callable,
+    executor: Callable[[QPROGRAM], float],
     representations: List[OperationRepresentation],
     precision: float = 0.03,
     num_samples: Optional[int] = None,
@@ -225,8 +225,11 @@ def pec_decorator(
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
 ) -> Callable[
-    [Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]],
-    Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]],
+    [Callable[[Union[QPROGRAM, Any, Any, Any]], float]],
+    Callable[
+        [Union[QPROGRAM, Any, Any, Any]],
+        Union[float, Tuple[float, Dict[str, Any]]],
+    ],
 ]:
     """Decorator which adds probabilistic error cancellation (PEC) mitigation
     to an executor function, i.e., a function which executes a quantum circuit
@@ -253,9 +256,7 @@ def pec_decorator(
     """
 
     def decorator(
-        executor: Callable[
-            [QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]
-        ]
+        executor: Callable[[QPROGRAM], float]
     ) -> Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]:
         return mitigate_executor(
             executor,

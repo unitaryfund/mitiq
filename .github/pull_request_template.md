@@ -20,9 +20,11 @@ Tips
 
 - If the validation check fails:
 
-    1. Run `make check-style` (from the root directory of the repository) and fix any [flake8](http://flake8.pycqa.org) errors.
+    1. Run `make check-types` (from the root directory of the repository) and fix any [mypy](https://mypy.readthedocs.io/en/stable/) errors.
 
-    2. Run `make format` to format your code with the [black](https://black.readthedocs.io/en/stable/index.html) autoformatter.
+    2. Run `make check-style` and fix any [flake8](http://flake8.pycqa.org) errors.
+
+    3. Run `make format` to format your code with the [black](https://black.readthedocs.io/en/stable/index.html) autoformatter.
 
   For more information, check the [Mitiq style guidelines](https://mitiq.readthedocs.io/en/stable/contributing.html#style-guidelines).
   

@@ -33,7 +33,7 @@ SUPPORTED_PROGRAM_TYPES = {
 try:
     from pyquil import Program as _Program
 except ImportError:  # pragma: no cover
-    _Program = _Circuit
+    _Program = _Circuit  # type: ignore
 
 try:
     from qiskit import QuantumCircuit as _QuantumCircuit

@@ -15,24 +15,28 @@
 
 """API for using Clifford Data Regression (CDR) error mitigation."""
 
-from typing import Callable, List, Optional, Sequence, Tuple, Union
+from functools import wraps
+from typing import Any, Callable, cast, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from scipy.optimize import curve_fit
 
 from cirq import Circuit
 
-from mitiq import QPROGRAM
 from mitiq.interface import accept_any_qprogram_as_input
 
-from mitiq.cdr import generate_training_circuits, linear_fit_function
+from mitiq.cdr import (
+    generate_training_circuits,
+    linear_fit_function,
+    linear_fit_function_no_intercept,
+)
 from mitiq.cdr.execute import calculate_observable, MeasurementResult
 from mitiq.zne.scaling import fold_gates_at_random
 
 
-@accept_any_qprogram_as_input
+@wraps(accept_any_qprogram_as_input)
 def execute_with_cdr(
-    circuit: QPROGRAM,
+    circuit: Circuit,
     executor: Callable[[Circuit], MeasurementResult],
     simulator: Callable[[Circuit], Union[MeasurementResult, np.ndarray]],
     observables: List[np.ndarray],
@@ -43,7 +47,7 @@ def execute_with_cdr(
     scale_factors: Sequence[float] = (1,),
     scale_noise: Callable[[Circuit, float], Circuit] = fold_gates_at_random,
     full_output: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ) -> Union[List[float], Tuple[List[float], np.ndarray]]:
     """Function for the calculation of an observable from some circuit of
     interest to be mitigated with CDR (or vnCDR) based on [Czarnik2020]_ and
@@ -127,6 +131,15 @@ def execute_with_cdr(
         "sigma_replace": kwargs.get("sigma_replace"),
     }
 
+    if num_fit_parameters is None and fit_function not in (
+        linear_fit_function,
+        linear_fit_function_no_intercept,
+    ):
+        raise ValueError(
+            "Must provide arg `num_fit_parameters` for custom fit function."
+        )
+    num_fit_parameters = cast(int, num_fit_parameters)
+
     # Generate training circuits.
     training_circuits = generate_training_circuits(
         circuit,
@@ -141,7 +154,7 @@ def execute_with_cdr(
     # [Optionally] Scale noise in circuits.
     all_circuits = [
         [scale_noise(c, s) for s in scale_factors]
-        for c in [circuit] + training_circuits
+        for c in [circuit] + training_circuits  # type: ignore
     ]
 
     # Execute all circuits to get MeasurementResult's. TODO: Allow batching.

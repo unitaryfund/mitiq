@@ -21,15 +21,20 @@ and modified to support a larger gateset (e.g. CPHASE).
 """
 
 from math import pi
+from typing import Any, cast, Union
 
 import numpy as np
 
 from pyquil.gates import RX, RZ, CZ, I, XY
-from pyquil.quil import Program
-from pyquil.quilbase import Gate
+from pyquil.quil import Program, Qubit, QubitPlaceholder, FormalArgument
+from pyquil.quilbase import Gate, Expression
 
 
-def _CCNOT(q0: int, q1: int, q2: int) -> Program:
+QubitLike = Union[Qubit, QubitPlaceholder, FormalArgument]
+AngleLike = Union[Expression, Any, complex]
+
+
+def _CCNOT(q0: QubitLike, q1: QubitLike, q2: QubitLike) -> Program:
     """
     A CCNOT in terms of RX(+-pi/2), RZ(theta), and CZ
 
@@ -57,7 +62,7 @@ def _CCNOT(q0: int, q1: int, q2: int) -> Program:
     return p
 
 
-def _CNOT(q0: int, q1: int) -> Program:
+def _CNOT(q0: QubitLike, q1: QubitLike) -> Program:
     """
     A CNOT in terms of RX(+-pi/2), RZ(theta), and CZ
 
@@ -72,7 +77,7 @@ def _CNOT(q0: int, q1: int) -> Program:
     return p
 
 
-def _CPHASE(angle: float, q0: int, q1: int) -> Program:
+def _CPHASE(angle: AngleLike, q0: QubitLike, q1: QubitLike) -> Program:
     """
     from quilc:
 
@@ -92,7 +97,7 @@ def _CPHASE(angle: float, q0: int, q1: int) -> Program:
     return p
 
 
-def _H(q: int) -> Program:
+def _H(q: QubitLike) -> Program:
     """
     A Hadamard in terms of RX(+-pi/2) and RZ(theta)
 
@@ -105,7 +110,7 @@ def _H(q: int) -> Program:
     return p
 
 
-def _ISWAP(q0: int, q1: int) -> Program:
+def _ISWAP(q0: QubitLike, q1: QubitLike) -> Program:
     """
     An ISWAP as an XY(pi). Of course, assumes XY is available.
     """
@@ -114,7 +119,7 @@ def _ISWAP(q0: int, q1: int) -> Program:
     return p
 
 
-def _PHASE(angle: float, q: int) -> Program:
+def _PHASE(angle: AngleLike, q: QubitLike) -> Program:
     """
     from quilc:
 
@@ -126,7 +131,7 @@ def _PHASE(angle: float, q: int) -> Program:
     return p
 
 
-def _RX(angle: float, q: int) -> Program:
+def _RX(angle: AngleLike, q: QubitLike) -> Program:
     """
     A RX in terms of native RX(+-pi/2) and RZ gates.
     """
@@ -139,7 +144,7 @@ def _RX(angle: float, q: int) -> Program:
     return p
 
 
-def _RY(angle: float, q: int) -> Program:
+def _RY(angle: AngleLike, q: QubitLike) -> Program:
     """
     A RY in terms of RX(+-pi/2) and RZ(theta)
     """
@@ -150,14 +155,14 @@ def _RY(angle: float, q: int) -> Program:
     return p
 
 
-def _S(q: int) -> Program:
+def _S(q: QubitLike) -> Program:
     """
     An S in terms of RZ(theta)
     """
     return Program(RZ(np.pi / 2, q))
 
 
-def _SWAP(q0: int, q1: int) -> Program:
+def _SWAP(q0: QubitLike, q1: QubitLike) -> Program:
     """
     A SWAP in terms of _CNOT
 
@@ -172,7 +177,7 @@ def _SWAP(q0: int, q1: int) -> Program:
     return p
 
 
-def _T(q: int, dagger: bool = False) -> Program:
+def _T(q: QubitLike, dagger: bool = False) -> Program:
     """
     A T in terms of RZ(theta)
     """
@@ -182,7 +187,7 @@ def _T(q: int, dagger: bool = False) -> Program:
         return Program(RZ(np.pi / 4, q))
 
 
-def _X(q: int) -> Program:
+def _X(q: QubitLike) -> Program:
     """
     An X in terms of RX(pi)
 
@@ -194,7 +199,7 @@ def _X(q: int) -> Program:
     return p
 
 
-def _Y(q: int) -> Program:
+def _Y(q: QubitLike) -> Program:
     """
     A Y in terms of _RY
     """
@@ -203,7 +208,7 @@ def _Y(q: int) -> Program:
     return p
 
 
-def _Z(q: int) -> Program:
+def _Z(q: QubitLike) -> Program:
     """
     A Z in terms of RZ
     """
@@ -212,14 +217,14 @@ def _Z(q: int) -> Program:
     return p
 
 
-def is_magic_angle(angle: float) -> bool:
+def is_magic_angle(angle: AngleLike) -> bool:
     """
     Checks to see if an angle is 0, +/-pi/2, or +/-pi.
     """
     return bool(
-        np.isclose(np.abs(angle), pi / 2)
-        or np.isclose(np.abs(angle), pi)
-        or np.isclose(angle, 0.0)
+        np.isclose(np.abs(cast(float, angle)), pi / 2)
+        or np.isclose(np.abs(cast(float, angle)), pi)
+        or np.isclose(cast(float, angle), 0.0)
     )
 
 
@@ -298,7 +303,7 @@ def basic_compile(program: Program) -> Program:
         else:
             new_prog += inst
 
-    new_prog.native_quil_metadata = {
+    new_prog.native_quil_metadata = {  # type: ignore[assignment]
         "final_rewiring": None,
         "gate_depth": None,
         "gate_volume": None,
