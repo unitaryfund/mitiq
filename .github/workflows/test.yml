@@ -23,9 +23,8 @@ jobs:
           python -m pip install --upgrade pip
           make install requirements
 
-      # TODO: https://github.com/unitaryfund/mitiq/issues/489
-      # - name: Check types with mypy
-      #   run: make check-types
+       - name: Check types with mypy
+         run: make check-types
 
       - name: Check code style with Black
         run: make check-format
