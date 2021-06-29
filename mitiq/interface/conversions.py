@@ -44,7 +44,7 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
         circuit: Mitiq circuit equivalent to input circuit.
         input_circuit_type: Type of input circuit represented by a string.
     """
-    conversion_function: Callable[[QPROGRAM], Circuit]
+    conversion_function: Callable[[Any], Circuit]
 
     try:
         package = circuit.__module__
@@ -143,7 +143,7 @@ def accept_any_qprogram_as_input(
         circuit: QPROGRAM, *args: Any, **kwargs: Any
     ) -> Any:
         cirq_circuit, _ = convert_to_mitiq(circuit)
-        return accept_cirq_circuit_function(cirq_circuit, *args, **kwargs)
+        return accept_cirq_circuit_function(cirq_circuit, *args, **kwargs)  # type: ignore
 
     return accept_any_qprogram_function
 
@@ -231,10 +231,10 @@ def noise_scaling_converter(
 
             scaled_circuit.remove_final_measurements()
             _transform_registers(
-                scaled_circuit, new_qregs=circuit.qregs,
+                scaled_circuit, new_qregs=circuit.qregs,  # type: ignore
             )
-            if circuit.cregs and not scaled_circuit.cregs:
-                scaled_circuit.add_register(*circuit.cregs)
+            if circuit.cregs and not scaled_circuit.cregs:  # type: ignore
+                scaled_circuit.add_register(*circuit.cregs)  # type: ignore
 
             for q, c in _measurement_order(circuit):
                 scaled_circuit.measure(q, c)
