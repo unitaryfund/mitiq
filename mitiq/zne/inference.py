@@ -962,7 +962,7 @@ class FakeNodesFactory(BatchedFactory):
                 FakeNodesFactory._map_to_fake_nodes([scale_factor], a, b)[0]
             )
 
-        return zne_limit, zne_error, opt_params, params_cov, zne_curve
+        return zne_limit, zne_error, opt_params, params_cov, new_curve
 
     @staticmethod
     def _map_to_fake_nodes(
