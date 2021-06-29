@@ -21,7 +21,6 @@ import numpy as np
 import cirq
 from cirq.circuits import Circuit
 
-from mitiq import QPROGRAM
 from mitiq.interface import (
     accept_any_qprogram_as_input,
     atomic_one_to_many_converter,
@@ -34,14 +33,14 @@ _CLIFFORD_ANGLES = [exponent * np.pi for exponent in _CLIFFORD_EXPONENTS]
 
 @atomic_one_to_many_converter
 def generate_training_circuits(
-    circuit: QPROGRAM,
+    circuit: Circuit,
     num_training_circuits: int,
     fraction_non_clifford: float,
     method_select: str = "uniform",
     method_replace: str = "closest",
     random_state: Optional[Union[int, np.random.RandomState]] = None,
-    **kwargs,
-) -> List[QPROGRAM]:
+    **kwargs: Any,
+) -> List[Circuit]:
     r"""Returns a list of (near) Clifford circuits obtained by replacing (some)
     non-Clifford gates in the input circuit by Clifford gates.
 
@@ -111,7 +110,7 @@ def generate_training_circuits(
 
 
 @accept_any_qprogram_as_input
-def is_clifford(circuit: QPROGRAM) -> bool:
+def is_clifford(circuit: Circuit) -> bool:
     """Returns True if the input argument is Clifford, else False.
 
     Args:
@@ -123,7 +122,7 @@ def is_clifford(circuit: QPROGRAM) -> bool:
 
 
 @accept_any_qprogram_as_input
-def count_non_cliffords(circuit: QPROGRAM) -> int:
+def count_non_cliffords(circuit: Circuit) -> int:
     """Returns the number of non-Clifford operations in the circuit. Assumes
     the circuit consists of only Rz, Rx, and CNOT operations.
 
