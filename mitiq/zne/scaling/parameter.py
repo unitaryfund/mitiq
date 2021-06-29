@@ -141,7 +141,7 @@ def scale_parameters(
     rng = np.random.RandomState(seed)
     for moment in circuit:
         curr_moment = []
-        for op in moment.operations:
+        for op in moment.operations:  # type: ignore
             gate = copy.deepcopy(op.gate)
             qubits = op.qubits
             if isinstance(gate, MeasurementGate):
