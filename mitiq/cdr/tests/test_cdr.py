@@ -89,3 +89,18 @@ def test_execute_with_cdr(circuit_type):
             assert abs(results[1][i][0] - exact_solution[i]) >= abs(
                 results[0][i] - exact_solution[i]
             )
+
+
+def test_no_num_fit_parameters_with_custom_fit_raises_error():
+    with pytest.raises(
+        ValueError, match="Must provide arg `num_fit_parameters`"
+    ):
+        execute_with_cdr(
+            random_x_z_circuit(
+                LineQubit.range(2), n_moments=2, random_state=1
+            ),
+            executor,
+            simulator_statevector,
+            observables=[np.array([1, 0])],
+            fit_function=lambda _: 1,
+        )
