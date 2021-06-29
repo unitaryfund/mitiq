@@ -315,6 +315,10 @@ class Factory(ABC):
         """
         raise NotImplementedError
 
+    @abstractmethod
+    def reduce(self) -> float:
+        raise NotImplementedError
+
     def push(
         self, instack_val: Dict[str, float], outstack_val: float
     ) -> "Factory":

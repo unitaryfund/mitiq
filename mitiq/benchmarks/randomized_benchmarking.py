@@ -78,6 +78,6 @@ def generate_rb_circuits(
             )
             for _ in range(trials)
         ]
-    if return_type is None or return_type == "cirq":
-        return circuits
+
+    return_type = "cirq" if not return_type else return_type
     return [convert_from_mitiq(circuit, return_type) for circuit in circuits]
