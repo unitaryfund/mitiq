@@ -24,7 +24,7 @@ from mitiq.cdr.execute import calculate_observable, normalize_measurements
 from mitiq.cdr._testing import simulator_statevector, simulator
 
 # Observables.
-sigma_z = np.diag(np.diag([1, -1]))
+sigma_z = np.array([1, -1])
 
 
 @pytest.mark.parametrize(

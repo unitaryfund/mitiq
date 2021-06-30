@@ -18,7 +18,7 @@ from typing import Counter as CounterType, Dict, Union
 
 import numpy as np
 
-MeasurementResult = Union[Dict[bin, int], CounterType[bin]]
+MeasurementResult = Union[Dict[int, int], CounterType[int]]
 
 
 def calculate_observable(
@@ -50,7 +50,7 @@ def calculate_observable(
     elif isinstance(state_or_measurements, (dict, Counter)):
         probs = normalize_measurements(state_or_measurements)
         observable_values = [
-            observable[i] * probs.get(bin(i), 0.0) for i in range(2 ** nqubits)
+            observable[i] * probs.get(i, 0.0) for i in range(2 ** nqubits)
         ]
     else:
         raise ValueError(
@@ -61,7 +61,7 @@ def calculate_observable(
     return sum(np.real(observable_values))
 
 
-def normalize_measurements(counts: MeasurementResult) -> Dict[bin, float]:
+def normalize_measurements(counts: MeasurementResult) -> Dict[int, float]:
     """Normalizes the values of the MeasurementResult to get probabilities.
 
     Args:

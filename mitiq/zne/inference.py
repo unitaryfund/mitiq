@@ -33,9 +33,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
+from cirq import Circuit
 
 from mitiq import QPROGRAM
 from mitiq.collector import Collector
+from mitiq.interface import accept_any_qprogram_as_input
 
 
 ExtrapolationResult = Union[
@@ -92,6 +94,16 @@ class ConvergenceWarning(Warning):
     """
 
     pass
+
+
+@accept_any_qprogram_as_input
+def _check_circuit_length(circuit: Circuit) -> None:
+    """Raises a warning if the circuit is too short."""
+    if len(list(circuit.all_operations())) < 5:
+        warnings.warn(
+            "The input circuit is very short. "
+            "This may reduce the accuracy of noise scaling."
+        )
 
 
 def mitiq_curve_fit(
@@ -518,14 +530,10 @@ class BatchedFactory(Factory, ABC):
         self.reset()
         self._batch_populate_instack()
 
+        _check_circuit_length(qp)
+
         # Get all noise-scaled circuits to run
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
-
-        if len(qp) < 5:
-            warnings.warn(
-                "The input circuit is very short. "
-                "This may reduce the accuracy of noise scaling."
-            )
 
         # Get the list of keywords associated to each circuit in "to_run"
         kwargs_list = self._get_keyword_args(num_to_average)
@@ -718,6 +726,8 @@ class AdaptiveFactory(Factory, ABC):
             max_iterations: Maximum number of iterations (optional).
         """
 
+        _check_circuit_length(qp)
+
         def scale_factor_to_expectation_value(
             scale_factor: float, **exec_params: Any
         ) -> float:
@@ -728,12 +738,6 @@ class AdaptiveFactory(Factory, ABC):
                 scaled_qp = scale_noise(qp, scale_factor)
                 expectation_values.append(executor(scaled_qp, **exec_params))
             return np.average(expectation_values)
-
-        if len(qp) < 5:
-            warnings.warn(
-                "The input circuit is very short. "
-                "This may reduce the accuracy of noise scaling."
-            )
 
         return self.run_classical(
             scale_factor_to_expectation_value, max_iterations

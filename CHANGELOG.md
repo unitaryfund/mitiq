@@ -8,6 +8,17 @@
 % # " - [Bug Fix]"
 % # " - Fix the bug."
 
+## Version 0.9.2  (June 30th, 2021)
+
+This patch release fixes a Braket integration bug (gh-767).
+It also adds an example about Clifford data regression in the documentation.
+
+### All Changes
+
+- Ensure short circuit warning is multi-platform (@andreamari gh-769).
+- Add CDR example to docs + small change to `cdr.calculate_observable` (@rmlarose, gh-750).
+
+
 ## Version 0.9.1  (June 23rd, 2021)
 
 This is a patch release to fix two bugs (gh-736, gh-737) related to the integration with optional packages.
