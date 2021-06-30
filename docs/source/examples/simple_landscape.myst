@@ -92,16 +92,9 @@ def executor_with_noise(circ: Circuit) -> float:
         The expectation value of the ZZ observable.
     """
     # Add depolarizing noise to the circuit
-    circuit = circ.with_noise(depolarize(p))
-    
-
-    # Get the final density matrix of the circuit
-    SIMULATOR = DensityMatrixSimulator()
-    rho = SIMULATOR.simulate(circuit).final_density_matrix
-
-    # Evaluate the ZZ expectation value
-    expectation = np.real(np.trace(rho @ hamiltonian))
-    return expectation
+    noisy_circuit = circ.with_noise(depolarize(p))
+    # Use the noiseless_executor function to return the expectation value of the ZZ observable for the noisy circuit
+    return noiseless_executor(noisy_circuit)
 ```
 
 :::{note}
