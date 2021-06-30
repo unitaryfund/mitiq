@@ -1,3 +1,16 @@
+---
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: '0.8'
+    jupytext_version: '1.4.1'
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
+---
+
 # Variational Quantum Eigensolver improved with Mitiq
 In this example we investigate how Mitiq can help reduce errors 
 and improve convergence of a simple VQE problem executed 
@@ -207,7 +220,6 @@ min_zne = minimize(objective_zne, initial_angle, args = (program),
                    options = {'disp': True, 'maxiter': 100, 'xatol': 1.0e-2})
 ```
 
-+++
 
 ## References
 [1] [VQE tutorial in PyQuil.] 
