@@ -13,15 +13,25 @@
       "contributions": [
         "test",
         "code"
-        ]
-     },
-     {
+      ]
+    },
+    {
       "login": "LaurentAjdnik",
       "name": "Laurent AJDNIK",
       "avatar_url": "https://avatars.githubusercontent.com/u/83899250?v=4",
       "profile": "https://github.com/LaurentAjdnik",
       "contributions": [
         "doc"
+      ]
+    },
+    {
+      "login": "HaoTy",
+      "name": "Tianyi Hao",
+      "avatar_url": "https://avatars.githubusercontent.com/u/36152061?v=4",
+      "profile": "https://github.com/HaoTy",
+      "contributions": [
+        "code",
+        "bug"
       ]
     }
   ],
