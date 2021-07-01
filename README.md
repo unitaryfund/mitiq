@@ -54,7 +54,7 @@ more information.
 
 Mitiq can currently interface with:
 
-* [Cirq](https://github.com/quantumlib/Cirq),
+* [Cirq](https://quantumai.google/cirq),
 * [Qiskit](https://qiskit.org/),
 * [pyQuil](https://github.com/rigetti/pyquil),
 * [Braket](https://github.com/aws/amazon-braket-sdk-python).
@@ -124,8 +124,10 @@ Error in simulation (with mitigation): 0.000519
 ## Error mitigation techniques
 
 Mitiq currently implements:
+
 * [Zero-Noise Extrapolation](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html),
 * [Probabilistic Error Cancellation](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#error-mitigation-with-probabilistic-error-cancellation),
+* [(Variable noise) Clifford data regression](https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html),
 
 and is designed to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
 
