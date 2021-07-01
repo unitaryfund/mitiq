@@ -127,7 +127,7 @@ Mitiq currently implements:
 
 * [Zero-Noise Extrapolation](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html),
 * [Probabilistic Error Cancellation](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#error-mitigation-with-probabilistic-error-cancellation),
-* [(Variable noise) Clifford data regression](https://mitiq.readthedocs.io/en/stable/examples/examples.html),
+* [(Variable noise) Clifford data regression](https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html),
 
 and is designed to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
 
