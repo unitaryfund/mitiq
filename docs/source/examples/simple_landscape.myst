@@ -56,7 +56,7 @@ print(variational_circuit(gamma=np.pi))
 ```
 
 ## Defining the executor functions with and without noise
-To interface with Mitiq, we now define a noiseless executor function, and a executor with noise function which compute the expctation value of a simple Hamiltonian $H=Z \otimes Z$, i.e., Pauli-$Z$ on each qubit without and with noise respectively. The code block below first creates this observable, then defines the noiseless executor, then sets a noise value, then defines the executor with noise function.
+To use error mitigation methods in Mitiq, we define an executor function which computes the expectation value of a simple Hamiltonian $H=Z \otimes Z$, i.e., Pauli-$Z$ on each qubit. To compare to the noiseless result, we define both a noiseless and a noisy executor below.
 
 ```{code-cell} ipython3
 # Observable to measure
@@ -104,19 +104,19 @@ The above code block uses depolarizing noise, but any Cirq channel can be substi
 +++
 
 ## Computing the landscape without noise
-We now compute the energy lanscape $\langle H \rangle(\gamma) =\langle Z \otimes Z \rangle(\gamma)$ with no error in the following code block
+We now compute the energy landscape $\langle H \rangle(\gamma) =\langle Z \otimes Z \rangle(\gamma)$ on the noiseless simulator.
 
 ```{code-cell} ipython3
 gammas = np.linspace(0, 2 * np.pi, 50)
 noiseless_expectations = [noiseless_executor(variational_circuit(g)) for g in gammas]
 ```
 
-The following code plots the values for visualization
+The following code plots the values for visualization.
 
 ```{code-cell} ipython3
 plt.figure(figsize=(8, 6))
 plt.plot(gammas, noiseless_expectations, color="g", linewidth=3, label="Noiseless")
-plt.title(rf"Energy landscape", fontsize=16)
+plt.title("Energy landscape", fontsize=16)
 plt.xlabel(r"Ansatz angle $\gamma$", fontsize=16)
 plt.ylabel(r"$\langle H \rangle(\gamma)$", fontsize=16)
 plt.legend(fontsize=14)
@@ -187,13 +187,4 @@ We also observe that the minimum of mitigated energy approximates well the theor
 print(f"Minimum of the noisy landscape: {round(min(expectations), 3)}")
 print(f"Minimum of the mitigated landscape: {round(min(mitigated_expectations), 3)}")
 print(f"Theoretical groud state energy: {min(np.linalg.eigvals(hamiltonian))}")
-```
-
-## Acknowledgements
-
-Most of the code for this example was written by Peter Karalekas.
-
-```{code-cell} ipython3
-import mitiq
-mitiq.about()
 ```
