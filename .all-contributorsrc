@@ -88,6 +88,16 @@
       "contributions": [
         "example"
       ]
+    },
+    {
+      "login": "sid1993",
+      "name": "sid1993",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4842078?v=4",
+      "profile": "https://github.com/sid1993",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
