@@ -60,6 +60,15 @@
       "contributions": [
         "example"
       ]
+    },
+    {
+      "login": "BobinMathew",
+      "name": "Bobin Mathew",
+      "avatar_url": "https://avatars.githubusercontent.com/u/32351527?v=4",
+      "profile": "http://www.linkedin.com/in/bobin-mathew",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
