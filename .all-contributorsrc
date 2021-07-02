@@ -212,6 +212,19 @@
         "infra",
         "ideas"
       ]
+    },
+    {
+      "login": "willzeng",
+      "name": "Will Zeng",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5214594?v=4",
+      "profile": "http://willzeng.com",
+      "contributions": [
+        "maintenance",
+        "code",
+        "doc",
+        "infra",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
