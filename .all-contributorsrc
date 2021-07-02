@@ -131,6 +131,15 @@
         "test",
         "bug"
       ]
+    },
+    {
+      "login": "paniash",
+      "name": "Ashish Panigrahi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/59497618?v=4",
+      "profile": "https://ashishpanigrahi.me",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
