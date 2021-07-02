@@ -161,6 +161,18 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "purva-thakre",
+      "name": "Purva Thakre",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66048318?v=4",
+      "profile": "https://github.com/purva-thakre",
+      "contributions": [
+        "doc",
+        "infra",
+        "code",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
