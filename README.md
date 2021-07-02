@@ -1,6 +1,6 @@
 # Mitiq
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-15-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-16-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
@@ -218,6 +218,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/maxtremblay"><img src="https://avatars.githubusercontent.com/u/52462375?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Maxime Tremblay</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=maxtremblay" title="Code">💻</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=maxtremblay" title="Documentation">📖</a> <a href="#ideas-maxtremblay" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/andre-a-alves"><img src="https://avatars.githubusercontent.com/u/20098360?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Andre</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=andre-a-alves" title="Documentation">📖</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=andre-a-alves" title="Tests">⚠️</a></td>
   </tr>
 </table>
 
