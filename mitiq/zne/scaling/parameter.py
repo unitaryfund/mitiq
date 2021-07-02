@@ -57,8 +57,7 @@ class CircuitMismatchException(Exception):
 def _generate_parameter_calibration_circuit(
     qubits: Iterable, depth: int, gate: EigenGate
 ) -> Circuit:
-    """
-    Generates a circuit which should be the identity. Given a rotation
+    """Generates a circuit which should be the identity. Given a rotation
     gate R(param), it applies R(2 * pi / depth) depth times, resulting
     in R(2*pi). Requires that the gate is periodic in 2*pi.
 
@@ -82,14 +81,17 @@ def _generate_parameter_calibration_circuit(
     )
 
 
-def _parameter_calibration(
-    executor: Callable[..., float], gate: Gate, qubit: Qid, depth: int = 100
+def compute_parameter_variance(
+    executor: Callable[..., float],
+    gate: EigenGate,
+    qubit: Qid,
+    depth: int = 100,
 ) -> float:
-    """
-    Given an executor and a gate, determines the effective
-    variance in the control parameter
-    that can be used for parameter noise scaling later on.
-    Only works for one qubit gates for now.
+    """Given an executor and a gate, determines the effective variance in the
+    control parameter that can be used as the ``base_variance`` argument in
+    ``mitiq.zne.scaling.scale_parameters``.
+
+    Note: Only works for one qubit gates for now.
 
     Args:
         executor: A function that takes in a quantum circuit and returns
