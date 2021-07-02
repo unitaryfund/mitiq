@@ -41,7 +41,7 @@ You can find the raw data supporting the plots in the Mitiq paper in the Github 
 
 
 
-You can find the code snippets for the codeblocks present in the Mitiq paper in the `Examples <examples/examples.html>`_ section of the documentation.
+You can find the code snippets for the codeblocks present in the Mitiq paper in the `Examples` section of the documentation relative to the Mitiq `paper <examples/mitiq-paper/mitiq-paper-codeblocks.html>`_ section of the documentation.
 
 
 .. _cited_by:
