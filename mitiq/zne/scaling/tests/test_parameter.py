@@ -28,7 +28,7 @@ from mitiq.zne.scaling.parameter import (
     CircuitMismatchException,
     GateTypeException,
     _generate_parameter_calibration_circuit,
-    _parameter_calibration,
+    compute_parameter_variance,
 )
 
 
@@ -137,14 +137,14 @@ def test_gate_type():
         _get_base_gate(forbidden_op)
 
 
-def test_parameter_calibration():
+def test_compute_parameter_variance():
     def noiseless_executor_mock(circuit):
         return 1
 
     # Perfect executor should have sigma = 0
     qubit = LineQubit(0)
     gate = ops.H.on(qubit).gate
-    sigma = _parameter_calibration(
+    sigma = compute_parameter_variance(
         noiseless_executor_mock, gate, qubit, depth=10
     )
     assert sigma == 0
@@ -157,7 +157,7 @@ def test_parameter_calibration():
     gate = ops.H.on(qubit).gate
     with pytest.warns(RuntimeWarning):
         # Runtime warning for divide by zero
-        sigma = _parameter_calibration(
+        sigma = compute_parameter_variance(
             noisy_executor_mock, gate, qubit, depth=10
         )
     assert sigma == np.inf
