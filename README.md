@@ -1,6 +1,6 @@
 # Mitiq
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
@@ -206,6 +206,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://kunalmarwaha.com"><img src="https://avatars.githubusercontent.com/u/2541209?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kunal Marwaha</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=marwahaha" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/k-m-schultz"><img src="https://avatars.githubusercontent.com/u/15523976?v=4?s=100" width="100px;" alt=""/><br /><sub><b>k-m-schultz</b></sub></a><br /><a href="#example-k-m-schultz" title="Examples">💡</a></td>
     <td align="center"><a href="http://www.linkedin.com/in/bobin-mathew"><img src="https://avatars.githubusercontent.com/u/32351527?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Bobin Mathew</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=BobinMathew" title="Documentation">📖</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/LogMoss"><img src="https://avatars.githubusercontent.com/u/61593765?v=4?s=100" width="100px;" alt=""/><br /><sub><b>LogMoss</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=LogMoss" title="Documentation">📖</a> <a href="https://github.com/unitaryfund/mitiq/issues?q=author%3ALogMoss" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
