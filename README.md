@@ -1,6 +1,6 @@
 # Mitiq
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
@@ -213,6 +213,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/sid1993"><img src="https://avatars.githubusercontent.com/u/4842078?v=4?s=100" width="100px;" alt=""/><br /><sub><b>sid1993</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=sid1993" title="Code">💻</a> <a href="https://github.com/unitaryfund/mitiq/issues?q=author%3Asid1993" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/yhindy"><img src="https://avatars.githubusercontent.com/u/11757328?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Yousef Hindy</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=yhindy" title="Code">💻</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=yhindy" title="Tests">⚠️</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=yhindy" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/elmandouh"><img src="https://avatars.githubusercontent.com/u/73552047?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mohamed El Mandouh</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=elmandouh" title="Code">💻</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=elmandouh" title="Tests">⚠️</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=elmandouh" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/Aaron-Robertson"><img src="https://avatars.githubusercontent.com/u/58564008?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Aaron Robertson</b></sub></a><br /><a href="#example-Aaron-Robertson" title="Examples">💡</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=Aaron-Robertson" title="Tests">⚠️</a> <a href="https://github.com/unitaryfund/mitiq/issues?q=author%3AAaron-Robertson" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
