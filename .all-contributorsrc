@@ -186,6 +186,19 @@
         "infra",
         "ideas"
       ]
+    },
+    {
+      "login": "crazy4pi314",
+      "name": "Sarah Kaiser",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6486256?v=4",
+      "profile": "https://www.sckaiser.com",
+      "contributions": [
+        "maintenance",
+        "code",
+        "doc",
+        "infra",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
