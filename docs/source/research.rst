@@ -36,6 +36,14 @@ You can download the :download:`bibtex file <mitiq.bib>`.
 
 If you have developed new features for error mitigation, or found bugs in Mitiq, please consider `contributing <contributing.html>`_ your code.
 
+
+You can find the raw data supporting the plots in the Mitiq paper in the Github repository, in the `data <https://github.com/unitaryfund/mitiq/tree/master/docs/source/examples>`_ folder.
+
+
+
+You can find the code snippets for the codeblocks present in the Mitiq paper in the `Examples <examples/examples.html>`_ section of the documentation.
+
+
 .. _cited_by:
 
 ----------------------------
