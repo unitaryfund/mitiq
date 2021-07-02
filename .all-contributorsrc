@@ -79,6 +79,15 @@
         "doc",
         "bug"
       ]
+    },
+    {
+      "login": "DSamuel1",
+      "name": "DSamuel1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/40476737?v=4",
+      "profile": "https://github.com/DSamuel1",
+      "contributions": [
+        "example"
+      ]
     }
   ],
   "contributorsPerLine": 7,
