@@ -51,6 +51,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "k-m-schultz",
+      "name": "k-m-schultz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/15523976?v=4",
+      "profile": "https://github.com/k-m-schultz",
+      "contributions": [
+        "example"
+      ]
     }
   ],
   "contributorsPerLine": 7,
