@@ -1,6 +1,6 @@
 # Mitiq
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-14-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-15-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
@@ -215,6 +215,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/elmandouh"><img src="https://avatars.githubusercontent.com/u/73552047?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mohamed El Mandouh</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=elmandouh" title="Code">💻</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=elmandouh" title="Tests">⚠️</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=elmandouh" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/Aaron-Robertson"><img src="https://avatars.githubusercontent.com/u/58564008?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Aaron Robertson</b></sub></a><br /><a href="#example-Aaron-Robertson" title="Examples">💡</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=Aaron-Robertson" title="Tests">⚠️</a> <a href="https://github.com/unitaryfund/mitiq/issues?q=author%3AAaron-Robertson" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://ashishpanigrahi.me"><img src="https://avatars.githubusercontent.com/u/59497618?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ashish Panigrahi</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=paniash" title="Documentation">📖</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/maxtremblay"><img src="https://avatars.githubusercontent.com/u/52462375?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Maxime Tremblay</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=maxtremblay" title="Code">💻</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=maxtremblay" title="Documentation">📖</a> <a href="#ideas-maxtremblay" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
