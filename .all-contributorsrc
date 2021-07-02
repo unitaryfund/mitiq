@@ -120,6 +120,17 @@
         "test",
         "doc"
       ]
+    },
+    {
+      "login": "Aaron-Robertson",
+      "name": "Aaron Robertson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/58564008?v=4",
+      "profile": "https://github.com/Aaron-Robertson",
+      "contributions": [
+        "example",
+        "test",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
