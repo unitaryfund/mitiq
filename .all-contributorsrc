@@ -151,6 +151,16 @@
         "doc",
         "ideas"
       ]
+    },
+    {
+      "login": "andre-a-alves",
+      "name": "Andre",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20098360?v=4",
+      "profile": "https://github.com/andre-a-alves",
+      "contributions": [
+        "doc",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
