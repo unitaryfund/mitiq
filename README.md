@@ -1,6 +1,6 @@
 # Mitiq
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
@@ -202,6 +202,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/Yash-10"><img src="https://avatars.githubusercontent.com/u/68844397?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Yash-10</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=Yash-10" title="Tests">⚠️</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=Yash-10" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/LaurentAjdnik"><img src="https://avatars.githubusercontent.com/u/83899250?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Laurent AJDNIK</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=LaurentAjdnik" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/ckissane"><img src="https://avatars.githubusercontent.com/u/9607290?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Cole Kissane</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=ckissane" title="Code">💻</a> <a href="https://github.com/unitaryfund/mitiq/issues?q=author%3Ackissane" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="http://www.mustythoughts.com"><img src="https://avatars.githubusercontent.com/u/7314136?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Michał Stęchły</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=mstechly" title="Code">💻</a></td>
   </tr>
 </table>
 
