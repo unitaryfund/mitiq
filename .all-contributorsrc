@@ -109,6 +109,17 @@
         "test",
         "doc"
       ]
+    },
+    {
+      "login": "elmandouh",
+      "name": "Mohamed El Mandouh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/73552047?v=4",
+      "profile": "https://github.com/elmandouh",
+      "contributions": [
+        "code",
+        "test",
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
