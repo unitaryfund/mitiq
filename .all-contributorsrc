@@ -140,6 +140,17 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "maxtremblay",
+      "name": "Maxime Tremblay",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52462375?v=4",
+      "profile": "https://github.com/maxtremblay",
+      "contributions": [
+        "code",
+        "doc",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
