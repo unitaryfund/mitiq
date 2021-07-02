@@ -199,6 +199,19 @@
         "infra",
         "ideas"
       ]
+    },
+    {
+      "login": "andreamari",
+      "name": "Andrea Mari",
+      "avatar_url": "https://avatars.githubusercontent.com/u/46054446?v=4",
+      "profile": "https://sites.google.com/site/andreamari84/home",
+      "contributions": [
+        "maintenance",
+        "code",
+        "doc",
+        "infra",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
