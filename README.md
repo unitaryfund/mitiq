@@ -1,6 +1,6 @@
 # Mitiq
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-24-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-25-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
@@ -229,6 +229,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.nathanshammah.com"><img src="https://avatars.githubusercontent.com/u/14573436?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nathan Shammah</b></sub></a><br /><a href="#maintenance-nathanshammah" title="Maintenance">🚧</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=nathanshammah" title="Code">💻</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=nathanshammah" title="Documentation">📖</a> <a href="#infra-nathanshammah" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#ideas-nathanshammah" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="http://ryanlarose.com"><img src="https://avatars.githubusercontent.com/u/32416820?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ryan LaRose</b></sub></a><br /><a href="#maintenance-rmlarose" title="Maintenance">🚧</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=rmlarose" title="Code">💻</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=rmlarose" title="Documentation">📖</a> <a href="#infra-rmlarose" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#ideas-rmlarose" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/francespoblete"><img src="https://avatars.githubusercontent.com/u/65167390?v=4?s=100" width="100px;" alt=""/><br /><sub><b>francespoblete</b></sub></a><br /><a href="#design-francespoblete" title="Design">🎨</a></td>
+    <td align="center"><a href="https://github.com/briancylui"><img src="https://avatars.githubusercontent.com/u/18178086?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Brian Lui</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=briancylui" title="Code">💻</a> <a href="https://github.com/unitaryfund/mitiq/issues?q=author%3Abriancylui" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
