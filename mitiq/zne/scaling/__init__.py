@@ -21,4 +21,7 @@ from mitiq.zne.scaling.folding import (
     fold_gates_at_random,
     fold_global,
 )
-from mitiq.zne.scaling.parameter import scale_parameters
+from mitiq.zne.scaling.parameter import (
+    scale_parameters,
+    compute_parameter_variance,
+)
