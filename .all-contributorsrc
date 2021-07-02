@@ -173,6 +173,19 @@
         "code",
         "ideas"
       ]
+    },
+    {
+      "login": "karalekas",
+      "name": "Peter Karalekas",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3578739?v=4",
+      "profile": "http://karalekas.com",
+      "contributions": [
+        "maintenance",
+        "code",
+        "doc",
+        "infra",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
