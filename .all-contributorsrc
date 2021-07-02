@@ -238,6 +238,19 @@
         "infra",
         "ideas"
       ]
+    },
+    {
+      "login": "rmlarose",
+      "name": "Ryan LaRose",
+      "avatar_url": "https://avatars.githubusercontent.com/u/32416820?v=4",
+      "profile": "http://ryanlarose.com",
+      "contributions": [
+        "maintenance",
+        "code",
+        "doc",
+        "infra",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
