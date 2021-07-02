@@ -225,6 +225,19 @@
         "infra",
         "ideas"
       ]
+    },
+    {
+      "login": "nathanshammah",
+      "name": "Nathan Shammah",
+      "avatar_url": "https://avatars.githubusercontent.com/u/14573436?v=4",
+      "profile": "https://www.nathanshammah.com",
+      "contributions": [
+        "maintenance",
+        "code",
+        "doc",
+        "infra",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,

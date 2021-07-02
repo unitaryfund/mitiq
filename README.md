@@ -1,6 +1,6 @@
 # Mitiq
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-21-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-22-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
@@ -224,6 +224,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.sckaiser.com"><img src="https://avatars.githubusercontent.com/u/6486256?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Sarah Kaiser</b></sub></a><br /><a href="#maintenance-crazy4pi314" title="Maintenance">🚧</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=crazy4pi314" title="Code">💻</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=crazy4pi314" title="Documentation">📖</a> <a href="#infra-crazy4pi314" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#ideas-crazy4pi314" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://sites.google.com/site/andreamari84/home"><img src="https://avatars.githubusercontent.com/u/46054446?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Andrea Mari</b></sub></a><br /><a href="#maintenance-andreamari" title="Maintenance">🚧</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=andreamari" title="Code">💻</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=andreamari" title="Documentation">📖</a> <a href="#infra-andreamari" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#ideas-andreamari" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="http://willzeng.com"><img src="https://avatars.githubusercontent.com/u/5214594?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Will Zeng</b></sub></a><br /><a href="#maintenance-willzeng" title="Maintenance">🚧</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=willzeng" title="Code">💻</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=willzeng" title="Documentation">📖</a> <a href="#infra-willzeng" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#ideas-willzeng" title="Ideas, Planning, & Feedback">🤔</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://www.nathanshammah.com"><img src="https://avatars.githubusercontent.com/u/14573436?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nathan Shammah</b></sub></a><br /><a href="#maintenance-nathanshammah" title="Maintenance">🚧</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=nathanshammah" title="Code">💻</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=nathanshammah" title="Documentation">📖</a> <a href="#infra-nathanshammah" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#ideas-nathanshammah" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
