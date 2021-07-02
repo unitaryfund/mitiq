@@ -1,6 +1,6 @@
 # Mitiq
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
@@ -204,6 +204,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/ckissane"><img src="https://avatars.githubusercontent.com/u/9607290?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Cole Kissane</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=ckissane" title="Code">💻</a> <a href="https://github.com/unitaryfund/mitiq/issues?q=author%3Ackissane" title="Bug reports">🐛</a></td>
     <td align="center"><a href="http://www.mustythoughts.com"><img src="https://avatars.githubusercontent.com/u/7314136?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Michał Stęchły</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=mstechly" title="Code">💻</a></td>
     <td align="center"><a href="http://kunalmarwaha.com"><img src="https://avatars.githubusercontent.com/u/2541209?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kunal Marwaha</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=marwahaha" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/k-m-schultz"><img src="https://avatars.githubusercontent.com/u/15523976?v=4?s=100" width="100px;" alt=""/><br /><sub><b>k-m-schultz</b></sub></a><br /><a href="#example-k-m-schultz" title="Examples">💡</a></td>
   </tr>
 </table>
 
