@@ -37,11 +37,19 @@ You can download the :download:`bibtex file <mitiq.bib>`.
 If you have developed new features for error mitigation, or found bugs in Mitiq, please consider `contributing <contributing.html>`_ your code.
 
 
-You can find the raw data supporting the plots in the Mitiq paper in the Github repository, in the `data <https://github.com/unitaryfund/mitiq/tree/master/docs/source/examples>`_ folder.
+.. _code_data_mitiq_paper:
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Data and code supporting the Mitiq paper
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+The `mitiq-paper` folder contains the data used in the ZNE plots of the Mitiq `white paper <https://arxiv.org/abs/2009.04417>`_.
 
 You can find the code snippets for the codeblocks present in the Mitiq paper in the `Examples` section of the documentation relative to the Mitiq `paper <examples/mitiq-paper/mitiq-paper-codeblocks.html>`_ section of the documentation.
+
+
+You can find the raw data supporting the plots in the Mitiq paper in the Github repository, in the `data <https://github.com/unitaryfund/mitiq/tree/master/docs/source/examples>`_ folder. The `raw` folder contains runs from the IBM Q London processor, while the
+`qcs-aspen-8-32-33-rb.csv` file contains data from the Rigetti Aspen-8 processor.
 
 
 .. _cited_by:
