@@ -171,9 +171,6 @@ def _transform_registers(
     if new_qregs is None:
         return
 
-    print("In transform_registers, input circuit is:")
-    print(circuit)
-
     if len(circuit.qregs) > 1:
         raise ValueError(
             "Input circuit is required to have <= 1 quantum register but has "
