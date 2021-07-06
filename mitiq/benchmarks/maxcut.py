@@ -160,6 +160,7 @@ def run_maxcut(
         Run MAXCUT with 2 steps such that betas = [1.0, 1.1] and
         gammas = [1.4, 0.7] on a graph with four edges and four nodes.
 
+        >>> from mitiq.benchmarks.maxcut import run_maxcut
         >>> graph = [(0, 1), (1, 2), (2, 3), (3, 0)]
         >>> x0 = [1.0, 1.1, 1.4, 0.7]
         >>> fun, x, traj = run_maxcut(graph, x0, verbose=True)
