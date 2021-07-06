@@ -167,6 +167,12 @@ from cirq import LineQubit, X, DensityMatrixSimulator
 ```
 
 ```{testcode}
+# TODO: Remove imports (temp fix).
+import numpy as np
+from cirq import Circuit, depolarize
+from cirq import LineQubit, X, DensityMatrixSimulator
+
+
 SIMULATOR = DensityMatrixSimulator()
 # 0.1% depolarizing noise
 qbit = LineQubit(0)
