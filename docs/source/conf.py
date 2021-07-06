@@ -153,20 +153,6 @@ execution_timeout = 600
 # re-run for a subsequent docs build.
 jupyter_execute_notebooks = "cache"
 
-# -- Options for doctest -----------------------------------------------------
-doctest_global_setup = """
-try:
-  from mitiq import *
-  from mitiq.zne.inference import *
-  from mitiq.benchmarks.maxcut import *
-except:
-  pass
-try:
-  from cirq import *
-except:
-  pass
-"""
-
 # -- Options for autodoc -----------------------------------------------------
 napoleon_google_docstring = True
 napoleon_use_ivar = True
