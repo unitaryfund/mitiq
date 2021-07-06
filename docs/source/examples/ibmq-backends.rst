@@ -91,7 +91,7 @@ We define this function in the following code block. Because we are using IBMQ b
 At this point, the circuit can be executed to return a mitigated expectation value by running ``mitiq.zne.execute_with_zne``,
 as follows.
 
-.. testcode:: python
+.. testcode::
 
     mitigated = mitiq.zne.execute_with_zne(circuit, ibmq_executor)
 
