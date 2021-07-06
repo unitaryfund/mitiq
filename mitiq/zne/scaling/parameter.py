@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Optional, Callable, Iterable
+from typing import Optional, Callable, List, cast
 import numpy as np
 
 import copy
@@ -27,7 +27,6 @@ from cirq import (
     CXPowGate,
     CZPowGate,
     MeasurementGate,
-    Gate,
     Qid,
 )
 from mitiq.interface import noise_scaling_converter
@@ -43,7 +42,7 @@ def _get_base_gate(gate: EigenGate) -> EigenGate:
 
     for base_gate in BASE_GATES:
         if isinstance(gate, base_gate):
-            return base_gate
+            return cast(EigenGate, base_gate)
     raise GateTypeException(
         "Must have circuit be made of rotation gates. "
         "Your gate {} may not be supported".format(gate)
@@ -55,7 +54,7 @@ class CircuitMismatchException(Exception):
 
 
 def _generate_parameter_calibration_circuit(
-    qubits: Iterable, depth: int, gate: EigenGate
+    qubits: List[Qid], depth: int, gate: EigenGate
 ) -> Circuit:
     """Generates a circuit which should be the identity. Given a rotation
     gate R(param), it applies R(2 * pi / depth) depth times, resulting
@@ -141,7 +140,7 @@ def scale_parameters(
     rng = np.random.RandomState(seed)
     for moment in circuit:
         curr_moment = []
-        for op in moment.operations:
+        for op in moment.operations:  # type: ignore
             gate = copy.deepcopy(op.gate)
             qubits = op.qubits
             if isinstance(gate, MeasurementGate):
