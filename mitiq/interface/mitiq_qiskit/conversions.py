@@ -178,10 +178,10 @@ def _transform_registers(
     qreg_sizes = [qreg.size for qreg in new_qregs]
     nqubits_in_circuit = sum(qreg.size for qreg in circuit.qregs)
 
-    if len(qreg_sizes) and sum(qreg_sizes) != nqubits_in_circuit:
+    if len(qreg_sizes) and sum(qreg_sizes) < nqubits_in_circuit:
         raise ValueError(
-            f"The circuit has {nqubits_in_circuit} qubits, but the provided "
-            f"quantum registers have {sum(qreg_sizes)} qubits."
+            f"The circuit has {nqubits_in_circuit} qubit(s), but the provided "
+            f"quantum registers have {sum(qreg_sizes)} qubit(s)."
         )
 
     # Assign the new registers.
