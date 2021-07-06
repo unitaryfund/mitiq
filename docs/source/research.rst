@@ -34,7 +34,7 @@ If you are using Mitiq for your research, please cite the related `white paper <
 You can download the :download:`bibtex file <mitiq.bib>`.
 
 
-If you have developed new features for error mitigation, or found bugs in Mitiq, please consider `contributing <contributing.html>`_ your code.
+If you are considering implementing a new feature or bug fix for Mitiq, please check out some tips in `contributing <contributing.html>`_  to help make the contribution process easier.
 
 
 .. _code_data_mitiq_paper:
@@ -72,4 +72,3 @@ The following papers use or cite Mitiq:
 
 An up-to-date list of papers citing the Mitiq paper can be found on `Semantic Scholar <https://www.semanticscholar.org/paper/Mitiq%3A-A-software-package-for-error-mitigation-on-LaRose-Mari/dc55b366d5b2212c6df8cd5c0bf05bab13104bd7#citing-papers>`_
 and on `Google Scholar <https://scholar.google.com/scholar?cites=12810395086731011605>`_.
-
