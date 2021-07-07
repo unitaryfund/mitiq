@@ -8,6 +8,16 @@
 % # " - [Bug Fix]"
 % # " - Fix the bug."
 
+## Version 0.9.3  (July 7th, 2021)
+
+This primary reason for this patch release is to fix a bug interfacing with Qiskit circuits (gh-802).
+
+### All Changes
+
+- [Docs] Add CDR to README and braket to Overview (@rmlarose, gh-778).
+- Rename parameter calibration function and make it visible (@rmlarose, gh-780).
+- Allow adding qubits when transforming registers in a Qiskit circuit (@rmlarose, gh-803).
+
 ## Version 0.9.2  (June 30th, 2021)
 
 This patch release fixes a Braket integration bug (gh-767).

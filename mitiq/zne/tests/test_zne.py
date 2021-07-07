@@ -398,3 +398,32 @@ def test_execute_with_zne_with_supported_circuits(circuit_type):
     zne_value = execute_with_zne(circuit, generic_executor, factory=fac)
     # Test zero noise limit is better than unmitigated expectation value
     assert abs(unmitigated - expected) > abs(zne_value - expected)
+
+
+def test_execute_with_zne_transpiled_qiskit_circuit():
+    """Tests ZNE when transpiling to a Qiskit device. Note transpiling can
+    introduce idle (unused) qubits to the circuit.
+    """
+    from qiskit.test.mock import FakeSantiago
+
+    backend = FakeSantiago()
+
+    def execute(circuit: qiskit.QuantumCircuit, shots: int = 8192) -> float:
+        job = qiskit.execute(circuit, backend, shots=shots)
+        return job.result().get_counts().get("00", 0.0) / shots
+
+    qreg = qiskit.QuantumRegister(2)
+    creg = qiskit.ClassicalRegister(2)
+    circuit = qiskit.QuantumCircuit(qreg, creg)
+    for _ in range(10):
+        circuit.x(qreg)
+
+    circuit.measure(qreg, creg)
+    circuit = qiskit.transpile(circuit, backend, optimization_level=0)
+
+    true_value = 1.0
+    zne_value = execute_with_zne(circuit, execute)
+
+    # Note: Unmitigated value is also (usually) within 10% of the true value.
+    # This is more to test usage than effectiveness.
+    assert abs(zne_value - true_value) < 0.1
