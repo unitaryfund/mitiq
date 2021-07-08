@@ -205,7 +205,7 @@ def test_unknown_channel_matrix():
 def test_add_simple():
     circuit1 = cirq.Circuit([cirq.X.on(cirq.NamedQubit("Q"))])
     circuit2 = cirq.Circuit([cirq.Y.on(cirq.NamedQubit("Q"))])
-    
+
     super_op1 = np.random.rand(4, 4)
     super_op2 = np.random.rand(4, 4)
 
