@@ -86,7 +86,7 @@ Calculates the parity of elements at indexes in marked_qubits
    
 ```{code-cell} 
 def parity_even_p(state, marked_qubits):
-"""
+    """
     Parity is relative to the binary representation of the integer state.
 
     :param state: The wavefunction index that corresponds to this state.
