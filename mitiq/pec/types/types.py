@@ -295,7 +295,7 @@ class NoisyOperation:
         if self._channel_matrix is None or other._channel_matrix is None:
             matrix = None
         else:
-            matrix = self._channel_matrix @ other._channel_matrix
+            matrix = other._channel_matrix @ self._channel_matrix
 
         return NoisyOperation(self._circuit + other._circuit, matrix)
 
