@@ -203,18 +203,23 @@ def test_unknown_channel_matrix():
 
 
 def test_add_simple():
-    ideal = cirq.Circuit([cirq.X.on(cirq.NamedQubit("Q"))])
-    real = np.random.rand(4, 4)
+    circuit1 = cirq.Circuit([cirq.X.on(cirq.NamedQubit("Q"))])
+    circuit2 = cirq.Circuit([cirq.Y.on(cirq.NamedQubit("Q"))])
+    
+    super_op1 = np.random.rand(4, 4)
+    super_op2 = np.random.rand(4, 4)
 
-    noisy_op1 = NoisyOperation(ideal, real)
-    noisy_op2 = NoisyOperation(ideal, real)
+    noisy_op1 = NoisyOperation(circuit1, super_op1)
+    noisy_op2 = NoisyOperation(circuit2, super_op2)
 
     noisy_op = noisy_op1 + noisy_op2
 
-    correct = cirq.Circuit([cirq.X.on(cirq.NamedQubit("Q"))] * 2)
+    correct = cirq.Circuit(
+        [cirq.X.on(cirq.NamedQubit("Q")), cirq.Y.on(cirq.NamedQubit("Q"))],
+    )
 
     assert _equal(noisy_op._circuit, correct, require_qubit_equality=True)
-    assert np.allclose(noisy_op.channel_matrix, real @ real)
+    assert np.allclose(noisy_op.channel_matrix, super_op2 @ super_op1)
 
 
 def test_add_pyquil_noisy_operations():
