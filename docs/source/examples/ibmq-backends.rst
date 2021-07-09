@@ -20,14 +20,14 @@ Setup: Defining a circuit
 
 First we import Qiskit and Mitiq.
 
-.. testcode:: python
+.. testcode::
 
     import qiskit
     from mitiq import zne
 
 For simplicity, we'll use a random single-qubit circuit with ten gates that compiles to the identity, defined below.
 
-.. testcode:: python
+.. testcode::
 
     qreg, creg = qiskit.QuantumRegister(1), qiskit.ClassicalRegister(1)
     circuit = qiskit.QuantumCircuit(qreg, creg)
@@ -56,7 +56,7 @@ We define this function in the following code block. Because we are using IBMQ b
     Using an IBM quantum computer requires a valid IBMQ account. See https://quantum-computing.ibm.com/
     for instructions to create an account, save credentials, and see online quantum computers.
 
-.. testcode:: python
+.. testcode::
 
     if qiskit.IBMQ.stored_account():
         provider = qiskit.IBMQ.load_account()
@@ -110,17 +110,17 @@ By default, noise is scaled by locally folding gates at random, and the default 
 To specify a different extrapolation technique, we can pass a different ``Factory`` object to ``execute_with_zne``. The
 following code block shows an example of using linear extrapolation with five different (noise) scale factors.
 
-.. testcode:: python
+.. testcode::
 
-    linear_factory = mitiq.zne.inference.LinearFactory(scale_factors=[1.0, 1.5, 2.0, 2.5, 3.0])
-    mitigated = mitiq.zne.execute_with_zne(circuit, ibmq_executor, factory=linear_factory)
+    linear_factory = zne.inference.LinearFactory(scale_factors=[1.0, 1.5, 2.0, 2.5, 3.0])
+    mitigated = zne.execute_with_zne(circuit, ibmq_executor, factory=linear_factory)
 
 To specify a different noise scaling method, we can pass a different function for the argument ``scale_noise``. This
 function should input a circuit and scale factor and return a circuit. The following code block shows an example of
 scaling noise by folding gates starting from the left (instead of at random, the default behavior for
 ``mitiq.zne.execute_with_zne``).
 
-.. testcode:: python
+.. testcode::
 
     mitigated = zne.execute_with_zne(circuit, ibmq_executor, scale_noise=mitiq.zne.scaling.fold_gates_from_left)
 
@@ -138,7 +138,7 @@ IBMQ backend.
 
 First, we define the Cirq circuit.
 
-.. testcode:: python
+.. testcode::
 
     import cirq
 
@@ -147,7 +147,7 @@ First, we define the Cirq circuit.
 
 Now, we simply add a line to our executor function which converts from a Cirq circuit to a Qiskit circuit.
 
-.. testcode:: python
+.. testcode::
 
     from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
 
@@ -157,7 +157,7 @@ Now, we simply add a line to our executor function which converts from a Cirq ci
 
 After this, we can use ``mitiq.zne.execute_with_zne`` in the same way as above.
 
-.. testcode:: python
+.. testcode::
 
     mitigated = zne.execute_with_zne(cirq_circuit, cirq_armonk_executor)
 
@@ -175,7 +175,7 @@ example explains the code in the previous section in more detail.
 First, we define factors to scale the circuit length by and fold the circuit using the ``fold_gates_at_random``
 local folding method.
 
-.. testcode:: python
+.. testcode::
 
     scale_factors = [1., 1.5, 2., 2.5, 3.]
     folded_circuits = [
@@ -191,7 +191,7 @@ a curve, we can extrapolate to the zero-noise limit and obtain a better estimate
 
 Below we execute the folded circuits using the ``backend`` defined at the start of this example.
 
-.. testcode:: python
+.. testcode::
 
     shots = 8192
     backend_name = "ibmq_armonk"
@@ -211,7 +211,7 @@ Below we execute the folded circuits using the ``backend`` defined at the start 
 Once the job has finished executing, we can convert the raw measurement statistics to observable values by running the
 following code block.
 
-.. testcode:: python
+.. testcode::
 
     all_counts = [job.result().get_counts(i) for i in range(len(folded_circuits))]
     expectation_values = [counts.get("0") / shots for counts in all_counts]
