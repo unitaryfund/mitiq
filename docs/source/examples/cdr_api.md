@@ -18,7 +18,6 @@ kernelspec:
 This example shows how to use Clifford data regression (CDR) by means of a simple example.
 
 ```{code-cell} ipython3
-assert False
 import warnings
 warnings.filterwarnings("ignore")
 
