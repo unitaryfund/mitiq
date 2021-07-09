@@ -23,7 +23,7 @@ First we import Qiskit and Mitiq.
 .. testcode:: python
 
     import qiskit
-    import mitiq
+    from mitiq import zne
 
 For simplicity, we'll use a random single-qubit circuit with ten gates that compiles to the identity, defined below.
 
@@ -93,7 +93,7 @@ as follows.
 
 .. testcode::
 
-    mitigated = mitiq.zne.execute_with_zne(circuit, ibmq_executor)
+    mitigated = zne.execute_with_zne(circuit, ibmq_executor)
 
 
 As long as a circuit and a function for executing the circuit are defined, the ``mitiq.zne.execute_with_zne`` function can
@@ -122,7 +122,7 @@ scaling noise by folding gates starting from the left (instead of at random, the
 
 .. testcode:: python
 
-    mitigated = mitiq.zne.execute_with_zne(circuit, ibmq_executor, scale_noise=mitiq.zne.scaling.fold_gates_from_left)
+    mitigated = zne.execute_with_zne(circuit, ibmq_executor, scale_noise=mitiq.zne.scaling.fold_gates_from_left)
 
 Any different combination of noise scaling and extrapolation technique can be passed as arguments to
 ``mitiq.zne.execute_with_zne``.
@@ -159,7 +159,7 @@ After this, we can use ``mitiq.zne.execute_with_zne`` in the same way as above.
 
 .. testcode:: python
 
-    mitigated = mitiq.zne.execute_with_zne(cirq_circuit, cirq_armonk_executor)
+    mitigated = zne.execute_with_zne(cirq_circuit, cirq_armonk_executor)
 
 As above, different noise scaling or extrapolation methods can be used.
 
@@ -179,7 +179,7 @@ local folding method.
 
     scale_factors = [1., 1.5, 2., 2.5, 3.]
     folded_circuits = [
-            mitiq.zne.scaling.fold_gates_at_random(circuit, scale)
+            zne.scaling.fold_gates_at_random(circuit, scale)
             for scale in scale_factors
     ]
 
@@ -229,7 +229,7 @@ a linear fit (order one polynomial fit) and print out the extrapolated zero-nois
 
 .. code-block:: python
 
-    >>> fac = mitiq.zne.inference.LinearFactory(scale_factors)
+    >>> fac = zne.inference.LinearFactory(scale_factors)
     >>> fac.instack, fac.outstack = scale_factors, expectation_values
     >>> zero_noise_value = fac.reduce()
     >>> print(f"Extrapolated zero-noise value:", round(zero_noise_value, 3))
