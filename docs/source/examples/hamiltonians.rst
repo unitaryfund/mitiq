@@ -52,7 +52,7 @@ taking a linear combination of these to create the Hamiltonian above.
 
 By printing the Hamiltonian we see:
 
-.. doctest:: python
+.. doctest::
 
     >>> print(ham)
     1.500*X(0)*Z(1)-0.700*Y(1)
@@ -115,7 +115,7 @@ Below we create an example ansatz parameterized by one angle :math:`\gamma`.
 
 For the angle :math:`\gamma = \pi`, this ansatz has the following structure:
 
-.. doctest:: python
+.. doctest::
 
     >>> print(ansatz(gamma=np.pi))
     0: ───Ry(π)───@───Rx(0.5π)───

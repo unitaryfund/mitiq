@@ -219,7 +219,7 @@ following code block.
 We can now see the unmitigated observable value by printing the first element of ``expectation_values``. (This value
 corresponds to a circuit with scale factor one, i.e., the original circuit.)
 
-.. code-block:: python
+.. code-block::
 
     >>> print("Unmitigated expectation value:", round(expectation_values[0], 3))
     Unmitigated expectation value: 0.945
@@ -227,7 +227,7 @@ corresponds to a circuit with scale factor one, i.e., the original circuit.)
 Now we can use the ``reduce`` method of ``zne.inference.Factory`` objects to extrapolate to the zero-noise limit. Below we use
 a linear fit (order one polynomial fit) and print out the extrapolated zero-noise value.
 
-.. code-block:: python
+.. code-block::
 
     >>> fac = zne.inference.LinearFactory(scale_factors)
     >>> fac.instack, fac.outstack = scale_factors, expectation_values
