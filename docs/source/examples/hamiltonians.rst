@@ -20,7 +20,7 @@ Setup
 
 First we import libraries for this example.
 
-.. testcode:: python
+.. testcode::
 
     from functools import partial
 
@@ -37,7 +37,7 @@ Defining the Hamiltonian
 Now we define the Hamiltonian as a :class:`~cirq.PauliSum` by defining the Pauli strings :math:`X_1 Z_2` and :math:`Y_1` then
 taking a linear combination of these to create the Hamiltonian above.
 
-.. testcode:: python
+.. testcode::
 
     # Qubit register
     qreg = cirq.LineQubit.range(2)
@@ -66,7 +66,7 @@ Using the Hamiltonian in the executor
 To interface with Mitiq, we define an ``executor`` function which maps an input (noisy) circuit to an expectation
 value. In the code block below, we show how to define this function and return the expectation of the Hamiltonian above.
 
-.. testcode:: python
+.. testcode::
 
     def executor(
         circuit: cirq.Circuit,
@@ -103,7 +103,7 @@ Example usage
 
 Below we create an example ansatz parameterized by one angle :math:`\gamma`.
 
-.. testcode:: python
+.. testcode::
 
     def ansatz(gamma: float) -> cirq.Circuit:
         """Returns the ansatz circuit."""
@@ -124,7 +124,7 @@ For the angle :math:`\gamma = \pi`, this ansatz has the following structure:
 
 We now compute expectation values of :math:`H` using the ``executor`` as follows.
 
-.. testcode:: python
+.. testcode::
 
     pvals = np.linspace(0, 0.01, 20)
     expvals = [executor(ansatz(gamma=np.pi), ham, p) for p in pvals]
@@ -133,7 +133,7 @@ We can compute mitigated expectation values at these same noise levels by runnin
 :class:`.LinearFactory` and use the ``partial`` function to update the ``executor`` for each noise value. The latter point
 ensures ``this_executor`` has the correct signature (input circuit, output float) to use with :func:`.execute_with_zne`.
 
-.. testcode:: python
+.. testcode::
 
     fac = LinearFactory(scale_factors=list(range(1, 6)))
     mitigated_expvals = []
@@ -146,7 +146,7 @@ ensures ``this_executor`` has the correct signature (input circuit, output float
 
 We can now visualize the effect that error mitigation has by running the following code for plotting.
 
-.. testcode:: python
+.. testcode::
 
     plt.rcParams.update({"font.family": "serif", "font.size": 16})
     plt.figure(figsize=(9, 5))
@@ -175,7 +175,7 @@ Sampling
 Finally, we note that :math:`\langle H \rangle` can be estimated by sampling using the :class:`cirq.PauliSumCollector`. An
 example of a ``sampling_executor`` which uses this is shown below.
 
-.. testcode:: python
+.. testcode::
 
     def sampling_executor(
         circuit: cirq.Circuit,
