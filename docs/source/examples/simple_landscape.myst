@@ -160,7 +160,6 @@ We then run the same code above to compute the energy landscape, but this time u
 
 ```{code-cell} ipython3
 mitigated_expectations = [mitigated_executor(variational_circuit(g)) for g in gammas]
-assert False
 ```
 
 Let us visualize the mitigated landscape alongside the unmitigated and noiseless landscapes.
