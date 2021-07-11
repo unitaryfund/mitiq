@@ -82,8 +82,8 @@ def serial_executor(circuit: QPROGRAM, noise: float = BASE_NOISE) -> float:
     return noisy_simulation(circuit, noise, obs)
 
 
-def batched_executor(circuits) -> np.ndarray:
-    return np.array([serial_executor(circuit) for circuit in circuits])
+def batched_executor(circuits) -> List[float]:
+    return [serial_executor(circuit) for circuit in circuits]
 
 
 def noiseless_serial_executor(circuit: QPROGRAM) -> float:
