@@ -61,7 +61,6 @@ def generate_collected_executor(
             * List[float]
             * Sequence[float]
             * Tuple[float]
-            * numpy.ndarray
 
         max_batch_size: The maximum number of circuits which can be processed
             with one call to the executor. If the executor is serial, this
