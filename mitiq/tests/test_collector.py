@@ -179,8 +179,6 @@ def test_generate_collected_executor(executor, ncircuits, rval):
         executor, return_value=rval
     )
     expvals = collected_executor([cirq.Circuit()] * ncircuits)
-    print(rval)
-    print(expvals)
     assert np.allclose(expvals, np.full(shape=(ncircuits,), fill_value=rval))
 
 

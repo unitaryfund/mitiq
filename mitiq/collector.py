@@ -43,7 +43,7 @@ def generate_collected_executor(
     max_batch_size: int = 75,
     force_run_all: bool = False,
     **kwargs: Any,
-) -> Callable[[Any], List[float]]:
+) -> Callable[[Any], List[QuantumResult]]:
     """Returns a new executor function which efficiently collects expectation
     values by detecting identical circuits and calling the executor as few
     times as possible.
@@ -73,7 +73,7 @@ def generate_collected_executor(
     if not callable(executor):
         raise ValueError("Arg `executor` must be callable.")
 
-    def collected(circuits: Any) -> List[float]:
+    def collected(circuits: Any) -> List[QuantumResult]:
         return Collector(executor, max_batch_size).run(
             circuits, force_run_all=force_run_all, **kwargs
         )
@@ -225,7 +225,7 @@ class Collector:
         executor_annotation = inspect.getfullargspec(executor).annotations
 
         return executor_annotation.get("return") in (
-            BatchedType[T]
+            BatchedType[T]  # type: ignore[index]
             for BatchedType in [Iterable, List, Sequence, Tuple]
-            for T in QuantumResult.__args__
+            for T in QuantumResult.__args__  # type: ignore[attr-defined]
         )
