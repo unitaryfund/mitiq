@@ -136,10 +136,6 @@ def execute_with_pec(
     )
     results = collected_executor(sampled_circuits)
 
-    # TODO: Remove when all executors are supported.
-    if not all(isinstance(result, float) for result in results):
-        raise ValueError("PEC requires an executor which returns floats.")
-
     # Evaluate unbiased estimators [Temme2017] [Endo2018] [Takagi2020]
     unbiased_estimators = [
         norm * s * val  # type: ignore[operator]
