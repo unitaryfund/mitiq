@@ -124,53 +124,13 @@ Error in simulation (with mitigation): 0.000519
 ## Error mitigation techniques
 
 Error mitigation techniques that Mitiq implements or plans to support in the future:
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
-.tg th{border-style:solid;border-width:1px;overflow:hidden;padding:10px 5px;word-break:normal;font-weight:bold;text-align:left;vertical-align:top}
-.tg td{border-style:solid;border-width:1px;overflow:hidden;padding:10px 5px;word-break:normal;text-align:left;vertical-align:top}
-.tg .done{background-color:#7cf38e;}
-</style>
-<table class="tg">
-<thead>
-  <tr>
-    <th> Technique</th>
-    <th> Mitiq module</th>
-    <th> Docs </th>
-    <th> Reference</th>
-    <th> Date completed</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td class="done">Zero-noise extrapolation</td>
-    <td class="done"><a href="https://github.com/unitaryfund/mitiq/tree/master/mitiq/zne">mitiq.zne</a></td>
-    <td class="done"><a href="https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html">ZNE</a></td>
-    <td class="done"><a href="https://arxiv.org/abs/1612.02058">Paper</a></td>
-    <td class="done">July 2020</td>
-  </tr>
-  <tr>
-    <td class="done">Probabilistic error cancellation</td>
-    <td class="done"><a href="https://github.com/unitaryfund/mitiq/tree/master/mitiq/pec">mitiq.pec</a></td>
-    <td class="done"><a href="https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#error-mitigation-with-probabilistic-error-cancellation">PEC</a></td>
-    <td class="done"><a href="https://arxiv.org/abs/1612.02058">Paper</a></td>
-    <td class="done">Jan 2021</td>
-  </tr>
-  <tr>
-    <td class="done">(Variable noise) Clifford data regression</td>
-    <td class="done"><a href="https://github.com/unitaryfund/mitiq/tree/master/mitiq/cdr">mitiq.cdr</a> </td>
-    <td class="done"><a href="https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html">CDR</a></td>
-    <td class="done"><a href="https://arxiv.org/abs/2005.10189">Paper 1</a><br><a href="https://arxiv.org/abs/2011.01157">Paper 2</a></td>
-    <td class="done">June 2021</td>
-  </tr>
-  <tr>
-    <td>Dynamical decoupling</td>
-    <td></td>
-    <td></td>
-    <td><a href="https://arxiv.org/abs/quant-ph/9803057">Paper1</a><br><a href="https://arxiv.org/abs/1807.08768">Paper2</a></td>
-    <td></td>
-  </tr>
-</tbody>
-</table>
+
+| Technique                                 | Docs                                                                                                                                  | Mitiq module                                                            | Paper Reference                                                                                     | Date Completed |
+|-------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|----------------|
+| Zero-noise extrapolation                  | [ZNE](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html)                                                                    | [mitiq.zne](https://github.com/unitaryfund/mitiq/tree/master/mitiq/zne) | [1612.02058](https://arxiv.org/abs/1612.02058)                                                      | July 2020      |
+| Probabilistic error cancellation          | [PEC](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#error-mitigation-with-probabilistic-error-cancellation) | [mitiq.pec](https://github.com/unitaryfund/mitiq/tree/master/mitiq/pec) | [1612.02058](https://arxiv.org/abs/1612.02058)                                                      | Jan 2021       |
+| (Variable noise) Clifford data regression | [CDR](https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html)                                                                   | [mitiq.cdr](https://github.com/unitaryfund/mitiq/tree/master/mitiq/cdr) | [2005.10189](https://arxiv.org/abs/2005.10189)<br>[2011.01157](https://arxiv.org/abs/2011.01157)    | June 2021      |
+| Dynamical decoupling                      |                                                                                                                                       |                                                                         | [9803057](https://arxiv.org/abs/quant-ph/9803057)<br>[1807.08768](https://arxiv.org/abs/1807.08768) |                |
 
 Mitiq is designed to support additional error mitigation techniques, take a look at the [roadmap](https://github.com/unitaryfund/mitiq/projects/5) for what is currently being considered. If there is a technique you are looking for, please file a [feature request](https://github.com/unitaryfund/mitiq/issues/new?assignees=&labels=feature-request&template=feature_request.md&title=), and we will add it to consideration.
 
