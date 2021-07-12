@@ -29,7 +29,7 @@ probability of the ground state.
     import numpy as np
     import cirq
 
-    def executor(circ: Circuit) -> float:
+    def executor(circ: cirq.Circuit) -> float:
         """Simulates a circuit with depolarizing noise.
 
         Args:

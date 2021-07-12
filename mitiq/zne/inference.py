@@ -1026,10 +1026,6 @@ class LinearFactory(BatchedFactory):
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
-
-    Example:
-        >>> NOISE_LEVELS = [1.0, 2.0, 3.0]
-        >>> fac = LinearFactory(NOISE_LEVELS)
     """
 
     @staticmethod
