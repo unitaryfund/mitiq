@@ -123,13 +123,12 @@ Error in simulation (with mitigation): 0.000519
 
 ## Error mitigation techniques
 
-Mitiq currently implements:
+Error mitigation techniques that Mitiq implements or plans to support in the future:
 <style type="text/css">
 .tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
 .tg th{border-style:solid;border-width:1px;overflow:hidden;padding:10px 5px;word-break:normal;font-weight:bold;text-align:left;vertical-align:top}
 .tg td{border-style:solid;border-width:1px;overflow:hidden;padding:10px 5px;word-break:normal;text-align:left;vertical-align:top}
 .tg .done{background-color:#7cf38e;}
-
 </style>
 <table class="tg">
 <thead>
@@ -138,7 +137,7 @@ Mitiq currently implements:
     <th> Mitiq module</th>
     <th> Docs </th>
     <th> Reference</th>
-    <th> Date</th>
+    <th> Date completed</th>
   </tr>
 </thead>
 <tbody>
