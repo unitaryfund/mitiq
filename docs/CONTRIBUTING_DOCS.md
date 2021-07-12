@@ -59,7 +59,7 @@ the extended MyST syntax. Just add the file to `source` directory and a TOC some
 
 ```{warning}
 Currently, `.rst` is supported for any of the files in the docs, but the current migration plan is to move everything to MyST serialization, to make it easier to include Jupyter notebooks and more consistent with documentation in the project root.
-If you want a good intro to MyST and how it compares to `.rst` see [this guide](https://myst-parser.readthedocs.io/en/latest/using/intro.html#intro-writing).
+If you want a good intro to MyST and how it compares to `.rst` see [this guide](https://myst-parser.readthedocs.io/en/latest/sphinx/intro.html#intro-writing).
 ```
 
 The main table of contents (TOC) file for the docs is `index.myst`. It includes `guide\guide.myst` and `apidoc.myst`, among other files. To add a new file to the base TOC, make sure it gets listed in the `toctree` directive like this:
@@ -87,7 +87,7 @@ To include `.md` files outside of the documentation `source` directory, you can 
 ```
 ````
 
-where `file.md` is the one to be added. For more information on including files external to the docs, see the [MyST docs](https://myst-parser.readthedocs.io/en/latest/using/howto.html#include-a-file-from-outside-the-docs-folder-like-readme-md).
+where `file.md` is the one to be added. For more information on including files external to the docs, see the [MyST docs](https://myst-parser.readthedocs.io/en/latest/).
 
 ### Adding files to the user guide
 

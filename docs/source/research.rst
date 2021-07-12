@@ -8,7 +8,7 @@ Research
 
 Mitiq is designed to aid researchers in quantum computing and quantum error mitigation. Given the quick growth of the techniques for quantum error mitigation (you can read an overview in the `Users Guide <https://mitiq.readthedocs.io/en/stable/guide/guide-error-mitigation.html>`_ ), it is natural to update the toolchain with new techniques and features.
 
-If you'd like to contribute new features to Mitiq, discuss it in an issue and once ready to upload the code, review the `contributing <contributing.html>`_ guidelines for the steps to take. If you have an example of using Mitiq with other software packages, or on a specific problem, we'd be glad to add it to the `Examples <examples/examples.html>`_ section of the documentation: please review the `contributing to the documentation <contributing_docs.html>`_ instructions.
+If you'd like to contribute new features to Mitiq, discuss it in an issue and once ready to upload the code, review the `contributing <https://mitiq.readthedocs.io/en/stable/contributing.html>`_ guidelines for the steps to take. If you have an example of using Mitiq with other software packages, or on a specific problem, we'd be glad to add it to the `Examples <https://mitiq.readthedocs.io/en/stable/examples/examples.html>`_ section of the documentation: please review the `contributing to the documentation <https://mitiq.readthedocs.io/en/stable/contributing_docs.html>`_ instructions.
 
 
 .. _citing:
@@ -34,7 +34,7 @@ If you are using Mitiq for your research, please cite the related `white paper <
 You can download the :download:`bibtex file <mitiq.bib>`.
 
 
-If you have developed new features for error mitigation, or found bugs in Mitiq, please consider `contributing <contributing.html>`_ your code.
+If you have developed new features for error mitigation, or found bugs in Mitiq, please consider `contributing <https://mitiq.readthedocs.io/en/stable/contributing.html>`_ your code.
 
 .. _cited_by:
 
@@ -56,4 +56,3 @@ The following papers use or cite Mitiq:
 
 An up-to-date list of papers citing the Mitiq paper can be found on `Semantic Scholar <https://www.semanticscholar.org/paper/Mitiq%3A-A-software-package-for-error-mitigation-on-LaRose-Mari/dc55b366d5b2212c6df8cd5c0bf05bab13104bd7#citing-papers>`_
 and on `Google Scholar <https://scholar.google.com/scholar?cites=12810395086731011605>`_.
-
