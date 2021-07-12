@@ -106,7 +106,7 @@ Using the paired notebooks you can continue your development in the notebooks as
 You can even add this tool as a [git pre-commit hook](https://jupytext.readthedocs.io/en/latest/using-pre-commit.html) if you want!
 
 ```{tip}
-There is a sample markdown formatted notebook in the `examples` directory for you to take a look at as you write your own!
+There is a [sample markdown formatted notebook in the `examples` directory](./examples/template.myst) for you to take a look at as you write your own!
 ```
 
 ### Automatically add information from the API docs

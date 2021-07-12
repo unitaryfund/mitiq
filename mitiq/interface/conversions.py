@@ -86,8 +86,11 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
         raise CircuitConversionError(
             "Circuit could not be converted to an internal Mitiq circuit. "
             "This may be because the circuit contains custom gates or Pragmas "
-            "(pyQuil). If you think this is a bug, you can open an issue at "
-            "https://github.com/unitaryfund/mitiq."
+            "(pyQuil). If you think this is a bug or that this circuit should "
+            "be supported, you can open an issue at "
+            "https://github.com/unitaryfund/mitiq. \n\nProvided circuit has "
+            f"type {type(circuit)} and is:\n\n{circuit}\n\nCircuit types "
+            f"supported by Mitiq are \n{SUPPORTED_PROGRAM_TYPES}."
         )
 
     return mitiq_circuit, input_circuit_type
