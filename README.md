@@ -163,22 +163,7 @@ contributing.
 
 ### Citing Mitiq
 
-If you use Mitiq in your research, please reference the [Mitiq preprint][arxiv]
-as follows:
-
-```bibtex
-@misc{larose2020mitiq,
-    title={Mitiq: A software package for error mitigation on noisy quantum computers},
-    author={Ryan LaRose and Andrea Mari and Peter J. Karalekas
-            and Nathan Shammah and William J. Zeng},
-    year={2020},
-    eprint={2009.04417},
-    archivePrefix={arXiv},
-    primaryClass={quant-ph}
-}
-```
-
-A list of papers citing Mitiq can be found [here][papers_with_mitiq].
+If you use Mitiq in your research, please reference the [Mitiq preprint][arxiv] ([bibtex](https://arxiv2bibtex.org/?q=2009.04417&format=bibtex)). A list of papers citing Mitiq can be found [here][papers_with_mitiq].
 
 [arxiv]: https://arxiv.org/abs/2009.04417
 
