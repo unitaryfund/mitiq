@@ -42,6 +42,10 @@ docs-clean:
 doctest:
 	make -C docs doctest
 
+.PHONY: linkcheck
+linkcheck:
+	make -C docs linkcheck
+
 .PHONY: format
 format:
 	black mitiq

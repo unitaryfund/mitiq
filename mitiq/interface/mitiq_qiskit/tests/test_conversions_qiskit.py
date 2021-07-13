@@ -14,6 +14,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for conversions between Mitiq circuits and Qiskit circuits."""
+import copy
+
 import numpy as np
 import pytest
 
@@ -313,13 +315,33 @@ def test_transform_qregs_no_new_qregs():
     assert circ.qregs == [qreg]
 
 
-def test_transform_registers_wrong_bit_number():
-    nqubits = 2
-    circ = qiskit.QuantumCircuit(qiskit.QuantumRegister(nqubits))
-    new_qregs = [qiskit.QuantumRegister(1) for _ in range(2 * nqubits)]
+def test_transform_registers_too_few_qubits():
+    circ = qiskit.QuantumCircuit(qiskit.QuantumRegister(2))
+    new_qregs = [qiskit.QuantumRegister(1)]
 
     with pytest.raises(ValueError):
         _transform_registers(circ, new_qregs=new_qregs)
+
+
+def test_transform_registers_adds_idle_qubits():
+    """Tests transforming registers in a circuit with n qubits to a circuit
+    with m > n qubits.
+    """
+    qreg = qiskit.QuantumRegister(1)
+    creg = qiskit.ClassicalRegister(1)
+    circuit = qiskit.QuantumCircuit(qreg, creg)
+    circuit.x(qreg[0])
+    circuit.measure(qreg[0], creg[0])
+
+    assert len(circuit.qregs) == 1
+    assert circuit.num_qubits == 1
+    old_data = copy.deepcopy(circuit.data)
+
+    _transform_registers(circuit, new_qregs=[qreg, qiskit.QuantumRegister(4)])
+
+    assert len(circuit.qregs) == 2
+    assert circuit.num_qubits == 5
+    assert circuit.data == old_data
 
 
 def test_transform_registers_wrong_reg_number():

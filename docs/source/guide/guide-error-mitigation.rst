@@ -306,4 +306,4 @@ can be found `here`_ and on `Unitary Fund`_'s list of supported projects.
 
 .. _here: https://github.com/qosf/awesome-quantum-software
 
-.. _Unitary Fund: https://unitary.fund#grants-made
+.. _Unitary Fund: https://unitary.fund/grants.html

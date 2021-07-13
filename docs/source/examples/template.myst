@@ -47,7 +47,7 @@ For example, here's the MyST-NB logo:
 
 ![myst-nb logo](../img/unitary_fund_logo.png)
 
-By adding `"html_image"` to the `myst_enable_extensions` list in the sphinx configuration ([see here](https://myst-parser.readthedocs.io/en/latest/using/syntax-optional.html#images)), you can even add HTML `img` tags with attributes:
+By adding `"html_image"` to the `myst_enable_extensions` list in the sphinx configuration ([see here](https://myst-parser.readthedocs.io/en/latest/syntax/optional.html#images)), you can even add HTML `img` tags with attributes:
 
 ```html
 <img src="../img/unitary_fund_logo.png" alt="logo" width="200px" class="shadow mb-2">
@@ -60,7 +60,7 @@ For example, here's a note admonition block:
 
 :::::{note}
 **Wow**, a note!
-It was generated with this code ([as explained here](https://myst-parser.readthedocs.io/en/latest/using/syntax-optional.html#html-admonitions)):
+It was generated with this code ([as explained here](https://myst-parser.readthedocs.io/en/latest/syntax/optional.html#html-admonitions)):
 
 ````md
 :::{note}
@@ -71,7 +71,7 @@ It was generated with this code ([as explained here](https://myst-parser.readthe
 :::::
 
 If you wish to use "bare" LaTeX equations, then you should add `"amsmath"` to the `myst_enable_extensions` list in the sphinx configuration.
-This is [explained here](https://myst-parser.readthedocs.io/en/latest/using/syntax-optional.html#direct-latex-math), and works as such:
+This is [explained here](https://myst-parser.readthedocs.io/en/latest/syntax/optional.html#direct-latex-math), and works as such:
 
 ```latex
 \begin{equation}
@@ -104,7 +104,7 @@ $$e^{i\pi} + 1 = 0$$ (euler)
 Euler's identity, equation {math:numref}`euler`, was elected one of the
 most beautiful mathematical formulas.
 
-You can see the syntax used for this example [here in the MyST documentation](https://myst-parser.readthedocs.io/en/latest/using/syntax.html#math-shortcuts).
+You can see the syntax used for this example [here in the MyST documentation](https://myst-parser.readthedocs.io/en/latest/syntax/syntax.html#roles-an-in-line-extension-point).
 
 ## Code cells and outputs
 
@@ -159,7 +159,7 @@ ax.scatter(*data, c=data[2])
 ### Testing
 The following cells setup a test (which won't be rendered in the notebook), the test code and the test output cell:
 
-```{testsetup} python
+```{testsetup}
 # this block is not rendered in the html or pdf
 import numpy as np
 from cirq import Circuit, depolarize
