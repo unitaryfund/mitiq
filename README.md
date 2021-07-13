@@ -123,13 +123,17 @@ Error in simulation (with mitigation): 0.000519
 
 ## Error mitigation techniques
 
-Mitiq currently implements:
+Error mitigation techniques that Mitiq implements or plans to support in the future:
 
-* [Zero-Noise Extrapolation](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html),
-* [Probabilistic Error Cancellation](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#probabilistic-error-cancellation),
-* [(Variable noise) Clifford data regression](https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html),
+| Technique                                 | Docs                                                                                                                                  | Mitiq module                                                            | Paper Reference                                                                                     | Date Completed |
+|-------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|----------------|
+| Zero-noise extrapolation                  | [ZNE](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html)                                                                    | [mitiq.zne](https://github.com/unitaryfund/mitiq/tree/master/mitiq/zne) | [1612.02058](https://arxiv.org/abs/1612.02058)                                                      | July 2020      |
+| Probabilistic error cancellation          | [PEC](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#probabilistic-error-cancellation) | [mitiq.pec](https://github.com/unitaryfund/mitiq/tree/master/mitiq/pec) | [1612.02058](https://arxiv.org/abs/1612.02058)                                                      | Jan 2021       |
+| (Variable noise) Clifford data regression | [CDR](https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html)                                                                   | [mitiq.cdr](https://github.com/unitaryfund/mitiq/tree/master/mitiq/cdr) | [2005.10189](https://arxiv.org/abs/2005.10189)<br>[2011.01157](https://arxiv.org/abs/2011.01157)    | June 2021      |
+| Dynamical decoupling                      |                                                                                                                                       |                                                                         | [9803057](https://arxiv.org/abs/quant-ph/9803057)<br>[1807.08768](https://arxiv.org/abs/1807.08768) |                |
 
-and is designed to support [additional techniques](https://github.com/unitaryfund/mitiq/wiki).
+Mitiq is designed to support additional error mitigation techniques, take a look at the [roadmap](https://github.com/unitaryfund/mitiq/projects/5) for what is currently being considered. If there is a technique you are looking for, please file a [feature request](https://github.com/unitaryfund/mitiq/issues/new?assignees=&labels=feature-request&template=feature_request.md&title=), and we will add it to consideration.
+
 
 ## Documentation
 
