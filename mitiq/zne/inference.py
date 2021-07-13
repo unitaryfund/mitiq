@@ -19,6 +19,7 @@ from copy import deepcopy
 from typing import (
     Any,
     Callable,
+    cast,
     Dict,
     List,
     Optional,
@@ -33,9 +34,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
+from cirq import Circuit
 
 from mitiq import QPROGRAM
 from mitiq.collector import Collector
+from mitiq.interface import accept_any_qprogram_as_input
+
+
+ExtrapolationResult = Union[
+    float,  # The zero-noise value.
+    Tuple[
+        float,  # The zero-noise value.
+        Optional[float],  # The (estimated) error on the zero-noise value.
+        List[float],  # Optimal parameters found during fitting.
+        Optional[np.ndarray],  # Covariance of fitting parameters.
+        Callable[[float], float],  # Function that was fit.
+    ],
+]
 
 
 class ExtrapolationError(Exception):
@@ -80,6 +95,16 @@ class ConvergenceWarning(Warning):
     """
 
     pass
+
+
+@accept_any_qprogram_as_input
+def _check_circuit_length(circuit: Circuit) -> None:
+    """Raises a warning if the circuit is too short."""
+    if len(list(circuit.all_operations())) < 5:
+        warnings.warn(
+            "The input circuit is very short. "
+            "This may reduce the accuracy of noise scaling."
+        )
 
 
 def mitiq_curve_fit(
@@ -202,7 +227,7 @@ class Factory(ABC):
         self._zne_error: Optional[float] = None
         self._zne_curve: Optional[Callable[[float], float]] = None
         self._already_reduced = False
-        self._options: Dict[str, float] = {}
+        self._options: Dict[str, Optional[float]] = {}
 
     def get_scale_factors(self) -> np.ndarray:
         """Returns the scale factors at which the factory has computed
@@ -302,15 +327,9 @@ class Factory(ABC):
         """
         raise NotImplementedError
 
-    def iterate(
-        self, noise_to_expval: Callable[..., float], max_iterations: int = 100
-    ) -> "Factory":
-        warnings.warn(
-            "The `iterate` method is deprecated in v0.3.0 and will be removed "
-            "in v0.4.0. Use `run_classical` instead.",
-            DeprecationWarning,
-        )
-        return self.run_classical(noise_to_expval)
+    @abstractmethod
+    def reduce(self) -> float:
+        raise NotImplementedError
 
     def push(
         self, instack_val: Dict[str, float], outstack_val: float
@@ -366,9 +385,10 @@ class Factory(ABC):
         fig = self.plot_data()
 
         smooth_scale_factors = np.linspace(0, self.get_scale_factors()[-1], 20)
-        smooth_expectations = (self.get_extrapolation_curve())(
-            smooth_scale_factors
-        )
+        smooth_expectations = [
+            self.get_extrapolation_curve()(scale_factor)
+            for scale_factor in smooth_scale_factors
+        ]
         plt.xlim(left=0)
         fig.axes[0].plot(
             smooth_scale_factors,
@@ -448,7 +468,7 @@ class BatchedFactory(Factory, ABC):
 
     @staticmethod
     @abstractmethod
-    def extrapolate(*args, **kwargs) -> float:
+    def extrapolate(*args: Any, **kwargs: Any) -> ExtrapolationResult:
         """Returns the extrapolation to the zero-noise limit."""
         raise NotImplementedError
 
@@ -516,6 +536,8 @@ class BatchedFactory(Factory, ABC):
         self.reset()
         self._batch_populate_instack()
 
+        _check_circuit_length(qp)
+
         # Get all noise-scaled circuits to run
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
 
@@ -534,10 +556,10 @@ class BatchedFactory(Factory, ABC):
             ]
 
         # Reshape "res" to have "num_to_average" columns
-        res = np.array(res).reshape((-1, num_to_average))
+        reshaped = np.array(res).reshape((-1, num_to_average))
 
         # Average the "num_to_average" columns
-        self._outstack = np.average(res, axis=1)
+        self._outstack = np.average(reshaped, axis=1)
 
         return self
 
@@ -710,6 +732,8 @@ class AdaptiveFactory(Factory, ABC):
             max_iterations: Maximum number of iterations (optional).
         """
 
+        _check_circuit_length(qp)
+
         def scale_factor_to_expectation_value(
             scale_factor: float, **exec_params: Any
         ) -> float:
@@ -764,21 +788,12 @@ class PolyFactory(BatchedFactory):
         self._options = {"order": order}
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         order: int,
         full_output: bool = False,
-    ) -> Union[
-        float,
-        Tuple[
-            float,
-            Optional[float],
-            List[float],
-            Optional[np.ndarray],
-            Callable[[float], float],
-        ],
-    ]:
+    ) -> ExtrapolationResult:
         """Static method which evaluates a polynomial extrapolation to the
         zero-noise limit.
 
@@ -846,20 +861,11 @@ class RichardsonFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
-    ) -> Union[
-        float,
-        Tuple[
-            float,
-            Optional[float],
-            List[float],
-            Optional[np.ndarray],
-            Callable[[float], float],
-        ],
-    ]:
+    ) -> ExtrapolationResult:
         """Static method which evaluates the Richardson extrapolation to the
          zero-noise limit.
 
@@ -923,20 +929,11 @@ class FakeNodesFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
-    ) -> Union[
-        float,
-        Tuple[
-            float,
-            Optional[float],
-            List[float],
-            Optional[np.ndarray],
-            Callable[[float], float],
-        ],
-    ]:
+    ) -> ExtrapolationResult:
 
         if not FakeNodesFactory._is_equally_spaced(scale_factors):
             raise ValueError("The scale factors must be equally spaced.")
@@ -957,21 +954,23 @@ class FakeNodesFactory(BatchedFactory):
             opt_params,
             params_cov,
             zne_curve,
-        ) = RichardsonFactory.extrapolate(fake_nodes, exp_values, True)
+        ) = RichardsonFactory.extrapolate(  # type: ignore[misc]
+            fake_nodes, exp_values, True
+        )
 
         # Convert zne_curve from the "fake node space" to the real space.
         # Note: since a=0.0, this conversion is not necessary for zne_limit.
         def new_curve(scale_factor: float) -> float:
-            """Get real zne_cruve from the curve based on fake nodes."""
+            """Get real zne_curve from the curve based on fake nodes."""
             return zne_curve(
-                FakeNodesFactory._map_to_fake_nodes(scale_factor, a, b)
+                FakeNodesFactory._map_to_fake_nodes([scale_factor], a, b)[0]
             )
 
-        return zne_limit, zne_error, opt_params, params_cov, zne_curve
+        return zne_limit, zne_error, opt_params, params_cov, new_curve
 
     @staticmethod
     def _map_to_fake_nodes(
-        x: Union[Sequence[float], float], a: float, b: float
+        x: Union[Sequence[float]], a: float, b: float
     ) -> Sequence[float]:
         """
         A function that maps inputs to Chebyshev-Lobatto points. Based on
@@ -981,11 +980,9 @@ class FakeNodesFactory(BatchedFactory):
         we are mapping to.
 
         Args:
-            x:
-                Sequence[float]: Set of values to be mapped to CL points.
-                float: A single value to be mapped to a CL point.
-            a: A float representing the interval starting at a
-            b: A float representing the interval ending at b
+            x: Sequence[float]: Set of values to be mapped to CL points.
+            a: A float representing the interval starting at a.
+            b: A float representing the interval ending at b.
         Returns:
             A new sequence of fake nodes (Chebyshev-Lobatto points).
 
@@ -997,15 +994,12 @@ class FakeNodesFactory(BatchedFactory):
         """
 
         # The mapping function
-        def S(x):
-            return (a - b) / 2 * np.cos(np.pi * (x - a) / (b - a)) + (
+        def mapping(_x: float) -> float:
+            return (a - b) / 2 * np.cos(np.pi * (_x - a) / (b - a)) + (
                 a + b
             ) / 2
 
-        if isinstance(x, float):
-            return S(x)
-
-        return np.array([S(y) for y in x])
+        return [mapping(y) for y in x]
 
     @staticmethod
     def _is_equally_spaced(arr: Sequence[float]) -> bool:
@@ -1032,27 +1026,14 @@ class LinearFactory(BatchedFactory):
     Raises:
         ValueError: If data is not consistent with the extrapolation model.
         ExtrapolationWarning: If the extrapolation fit is ill-conditioned.
-
-    Example:
-        >>> NOISE_LEVELS = [1.0, 2.0, 3.0]
-        >>> fac = LinearFactory(NOISE_LEVELS)
     """
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
-    ) -> Union[
-        float,
-        Tuple[
-            float,
-            Optional[float],
-            List[float],
-            Optional[np.ndarray],
-            Callable[[float], float],
-        ],
-    ]:
+    ) -> ExtrapolationResult:
         """Static method which evaluates the linear extrapolation to the
         zero-noise limit.
 
@@ -1133,23 +1114,14 @@ class ExpFactory(BatchedFactory):
         }
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         asymptote: Optional[float] = None,
         avoid_log: bool = False,
         eps: float = 1.0e-6,
         full_output: bool = False,
-    ) -> Union[
-        float,
-        Tuple[
-            float,
-            Optional[float],
-            List[float],
-            Optional[np.ndarray],
-            Callable[[float], float],
-        ],
-    ]:
+    ) -> ExtrapolationResult:
         """Static method which evaluates the extrapolation to the zero-noise
         limit assuming an exponential ansatz y(x) = a + b * exp(-c * x),
         with c > 0.
@@ -1263,7 +1235,7 @@ class PolyExpFactory(BatchedFactory):
         }
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         order: int,
@@ -1271,16 +1243,7 @@ class PolyExpFactory(BatchedFactory):
         avoid_log: bool = False,
         eps: float = 1.0e-6,
         full_output: bool = False,
-    ) -> Union[
-        float,
-        Tuple[
-            float,
-            Optional[float],
-            List[float],
-            Optional[np.ndarray],
-            Callable[[float], float],
-        ],
-    ]:
+    ) -> ExtrapolationResult:
         """Static method which evaluates the extrapolation to the
         zero-noise limit with an exponential ansatz (whose exponent
         is a polynomial of degree "order").
@@ -1594,23 +1557,14 @@ class AdaExpFactory(AdaptiveFactory):
         return len(self._outstack) == self._steps
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         asymptote: Optional[float] = None,
         avoid_log: bool = False,
         eps: float = 1.0e-6,
         full_output: bool = False,
-    ) -> Union[
-        float,
-        Tuple[
-            float,
-            Optional[float],
-            List[float],
-            Optional[np.ndarray],
-            Callable[[float], float],
-        ],
-    ]:
+    ) -> ExtrapolationResult:
         """Static method which evaluates the extrapolation to the zero-noise
         limit assuming an exponential ansatz y(x) = a + b * exp(-c * x),
         with c > 0.
@@ -1675,8 +1629,8 @@ class AdaExpFactory(AdaptiveFactory):
             self._params_cov,
             self._zne_curve,
         ) = self.extrapolate(  # type: ignore
-            self.get_scale_factors(),
-            self.get_expectation_values(),
+            cast(Sequence[float], self.get_scale_factors()),
+            cast(Sequence[float], self.get_expectation_values()),
             asymptote=self.asymptote,
             avoid_log=self.avoid_log,
             full_output=True,

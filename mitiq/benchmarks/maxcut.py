@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Methods for benchmarking zero-noise extrapolation on MaxCut-QAOA."""
-from typing import Callable, Iterable, List, Optional, Tuple
+from typing import Callable, Iterable, List, Optional, Tuple, Union, cast
 
 import numpy as np
 from scipy.optimize import minimize
@@ -37,7 +37,7 @@ SIMULATOR = DensityMatrixSimulator()
 
 
 def _make_noisy_backend(
-    noise: float, obs: np.ndarray
+    noise: float, obs: Union[np.ndarray, float]
 ) -> Callable[[Circuit], float]:
     """Returns a (noisy) execute function for Cirq circuits.
 
@@ -47,7 +47,7 @@ def _make_noisy_backend(
     """
 
     def noisy_backend(circ: Circuit) -> float:
-        return noisy_simulation(circ, noise, obs)
+        return noisy_simulation(circ, noise, cast(np.ndarray, obs))
 
     return noisy_backend
 
@@ -58,7 +58,9 @@ def make_maxcut(
     scale_noise: Optional[Callable[[Circuit, float], Circuit]] = None,
     factory: Optional[Factory] = None,
 ) -> Tuple[
-    Callable[[np.ndarray], float], Callable[[np.ndarray], Circuit], np.ndarray
+    Callable[[np.ndarray], Optional[float]],
+    Callable[[np.ndarray], Circuit],
+    float,
 ]:
     """Makes an executor that evaluates the QAOA ansatz at a given beta
     and gamma parameters.
@@ -113,7 +115,7 @@ def make_maxcut(
     noisy_backend = _make_noisy_backend(noise, cost_mat)
 
     # must have this function signature to work with scipy minimize
-    def qaoa_cost(params: np.ndarray) -> float:
+    def qaoa_cost(params: np.ndarray) -> Optional[float]:
         qaoa_prog = qaoa_ansatz(params)
         if scale_noise is None and factory is None:
             return noisy_backend(qaoa_prog)
@@ -121,8 +123,8 @@ def make_maxcut(
             assert scale_noise is not None
             return execute_with_zne(
                 qaoa_prog,
-                executor=noisy_backend,
-                scale_noise=scale_noise,
+                executor=noisy_backend,  # type: ignore
+                scale_noise=scale_noise,  # type: ignore
                 factory=factory,
             )
 
@@ -137,7 +139,7 @@ def run_maxcut(
     factory: Optional[Factory] = None,
     optimizer: str = "Nelder-Mead",
     verbose: bool = False,
-) -> Tuple[float, np.ndarray, List[float]]:
+) -> Tuple[float, np.ndarray, List[Optional[float]]]:
     """Optimizes MaxCut cost function on the given graph using QAOA.
 
     Args:
@@ -158,6 +160,7 @@ def run_maxcut(
         Run MAXCUT with 2 steps such that betas = [1.0, 1.1] and
         gammas = [1.4, 0.7] on a graph with four edges and four nodes.
 
+        >>> from mitiq.benchmarks.maxcut import run_maxcut
         >>> graph = [(0, 1), (1, 2), (2, 3), (3, 0)]
         >>> x0 = [1.0, 1.1, 1.4, 0.7]
         >>> fun, x, traj = run_maxcut(graph, x0, verbose=True)

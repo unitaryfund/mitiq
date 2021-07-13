@@ -10,6 +10,7 @@ pytest-xdist[psutil]~=2.2.1
 pytest-cov~=2.11.1
 flake8~=3.7.9
 black~=19.10b0
+mypy~=0.812
 
 # Documentation and examples.
 sphinxcontrib-bibtex~=2.2.0

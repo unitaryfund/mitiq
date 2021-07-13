@@ -20,7 +20,7 @@ import numpy as np
 from cirq.testing import random_circuit
 from cirq import NamedQubit, Circuit
 
-from mitiq import execute_with_zne
+from mitiq.zne import execute_with_zne
 from mitiq._typing import QPROGRAM
 from mitiq.zne.inference import Factory
 from mitiq.zne.scaling import fold_gates_at_random
@@ -129,7 +129,10 @@ def rand_circuit_zne(
         unmitigated = obs_sim(qc)
         # evaluate the ZNE answer
         mitigated = execute_with_zne(
-            qp=qc, executor=obs_sim, scale_noise=scale_noise, factory=fac
+            qp=qc,
+            executor=obs_sim,  # type: ignore
+            scale_noise=scale_noise,
+            factory=fac,
         )
         exacts.append(exact)
         unmitigateds.append(unmitigated)

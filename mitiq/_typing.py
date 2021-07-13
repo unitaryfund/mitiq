@@ -13,39 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""This file is used to optionally import what program types should be allowed
-by mitiq based on what packages are installed in the environment.
-
-Supported program types:
-    cirq.Circuit
-    pyquil.Program
-    qiskit.QuantumCircuit
-
-When pyquil or qiskit are not available for import, we take advantage of a
-clever hack in the except ImportError block, setting the type alias
-corresponding to the class that we failed to import equal to cirq.Circuit,
-which is then handled gracefully by the Union type.
+"""Defines SUPPORTED_PROGRAM_TYPES - all supported packages / circuits which
+Mitiq can interface with - and QPROGRAM - all supported packages / circuits
+which are installed in the environment Mitiq is run in.
 """
 from typing import Union
 
 from cirq import Circuit as _Circuit
 
-try:
-    from pyquil import Program as _Program
-except ImportError:  # pragma: no cover
-    _Program = _Circuit
-
-try:
-    from qiskit import QuantumCircuit as _QuantumCircuit
-except ImportError:  # pragma: no cover
-    _QuantumCircuit = _Circuit
-
-try:
-    from braket import Circuit as _BKCircuit
-except ImportError:
-    _BKCircuit = _Circuit
-
-QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit, _BKCircuit]
 
 SUPPORTED_PROGRAM_TYPES = {
     "cirq": "Circuit",
@@ -53,3 +28,21 @@ SUPPORTED_PROGRAM_TYPES = {
     "qiskit": "QuantumCircuit",
     "braket": "Circuit",
 }
+
+
+try:
+    from pyquil import Program as _Program
+except ImportError:  # pragma: no cover
+    _Program = _Circuit  # type: ignore
+
+try:
+    from qiskit import QuantumCircuit as _QuantumCircuit
+except ImportError:  # pragma: no cover
+    _QuantumCircuit = _Circuit
+
+try:
+    from braket.circuits import Circuit as _BKCircuit
+except ImportError:  # pragma: no cover
+    _BKCircuit = _Circuit
+
+QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit, _BKCircuit]

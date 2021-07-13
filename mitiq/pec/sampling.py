@@ -23,7 +23,7 @@ import cirq
 
 from mitiq import QPROGRAM
 from mitiq.utils import _equal
-from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
+from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 from mitiq.pec.types import OperationRepresentation
 
 
@@ -64,7 +64,7 @@ def sample_sequence(
     ideal, _ = convert_to_mitiq(ideal_operation)
     operation_representation = None
     for representation in representations:
-        if _equal(representation.ideal, ideal, require_qubit_equality=True):
+        if _equal(representation._ideal, ideal, require_qubit_equality=True):
             operation_representation = representation
             break
 
@@ -76,7 +76,7 @@ def sample_sequence(
 
     # Sample from this representation.
     noisy_operation, sign, _ = operation_representation.sample(random_state)
-    return noisy_operation.ideal_circuit(), sign, operation_representation.norm
+    return noisy_operation.circuit(), sign, operation_representation.norm
 
 
 def sample_circuit(

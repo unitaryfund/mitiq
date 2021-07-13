@@ -37,7 +37,7 @@ This executor can be used to run on `Quantum Cloud Services <https://arxiv.org/a
 reservation on a quantum processor (QPU).
 
 .. note::
-    The module :mod:`mitiq.mitiq_pyquil` has a function ``generate_qcs_executor`` for
+    The module :mod:`mitiq.interface.mitiq_pyquil` has a function ``generate_qcs_executor`` for
     easily generating a QCS executor of this form.
 
 Note that you will have to replace the string in ``get_qc`` with the name of an actual
@@ -49,8 +49,8 @@ real quantum hardware.
     from pyquil import Program, get_qc
     from pyquil.gates import MEASURE, RESET, X
 
-    from mitiq.mitiq_pyquil.compiler import basic_compile
-    from mitiq.mitiq_pyquil.pyquil_utils import ground_state_expectation
+    from mitiq.interface.mitiq_pyquil.compiler import basic_compile
+    from mitiq.interface.mitiq_pyquil.pyquil_utils import ground_state_expectation
 
     # replace with qpu = get_qc("Aspen-8") to run on the Aspen-8 QPU
     qpu = get_qc("2q-pyqvm")
@@ -105,13 +105,13 @@ real quantum hardware.
 
 Qiskit Executors
 ======================================
-See  :py:mod:`~mitiq.mitiq_qiskit.qiskit_utils`.
+See  :py:mod:`~mitiq.interface.mitiq_qiskit.qiskit_utils`.
 
 This section includes noisy and noiseless simulator executor examples you can use on Qiskit circuits.
 
 Qiskit: Wavefunction Simulation
 ---------------------------------
-See :py:func:`~mitiq.mitiq_qiskit.qiskit_utils.execute` in :py:mod:`~mitiq.mitiq_qiskit.qiskit_utils`.
+See :py:func:`~mitiq.interface.mitiq_qiskit.qiskit_utils.execute`.
 
 This executor can be used for noiseless simulation. Note that this executor
 can be :ref:`wrapped using partial function application <partial-note>`
@@ -119,7 +119,7 @@ to be used in Mitiq.
 
 Qiskit: Wavefunction Simulation with Sampling
 -----------------------------------------------
-See :py:func:`~mitiq.mitiq_qiskit.qiskit_utils.execute_with_shots` in :py:mod:`~mitiq.mitiq_qiskit.qiskit_utils`.
+See :py:func:`~mitiq.interface.mitiq_qiskit.qiskit_utils.execute_with_shots`.
 
 The noiseless simulation executor can be modified to still perform exact wavefunction
 simulation, but to also include finite sampling of measurements. Note that this executor
@@ -132,17 +132,17 @@ in this example can be found `here <https://quantumcomputing.stackexchange.com/a
 
 Qiskit: Density-matrix Simulation with Noise
 -----------------------------------------------------------
-See :py:func:`~mitiq.mitiq_qiskit.qiskit_utils.execute_with_noise` in :py:mod:`~mitiq.mitiq_qiskit.qiskit_utils`.
+See :py:func:`~mitiq.interface.mitiq_qiskit.qiskit_utils.execute_with_noise`.
 
 This executor can be used to simulate a circuit with noise and to return the exact expectation
 value of an observable (without the shot noise typical of a real experiment).
 
-See :py:func:`~mitiq.mitiq_qiskit.qiskit_utils.initialized_depolarizing_noise` for an example depolarizing noise
+See :py:func:`~mitiq.interface.mitiq_qiskit.qiskit_utils.initialized_depolarizing_noise` for an example depolarizing noise
 model you can use.
 
 Qiskit: Density-matrix Simulation with Noise and Sampling
 ------------------------------------------------------------------------
-See :py:func:`~mitiq.mitiq_qiskit.qiskit_utils.execute_with_shots_and_noise` in :py:mod:`~mitiq.mitiq_qiskit.qiskit_utils`.
+See :py:func:`~mitiq.interface.mitiq_qiskit.qiskit_utils.execute_with_shots_and_noise`.
 
 This executor can be used to simulate a circuit with noise. The expectation value is estimated
 with a finite number of measurements and so it is affected by statistical noise.

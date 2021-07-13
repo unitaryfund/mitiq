@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for PEC."""
-
+import warnings
 from typing import List, Optional
 from functools import partial
 import pytest
@@ -24,12 +24,12 @@ import cirq
 import pyquil
 import qiskit
 
-from mitiq import QPROGRAM
-from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
+from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
+from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 from mitiq.benchmarks.utils import noisy_simulation
 
 from mitiq.pec import execute_with_pec, NoisyOperation, OperationRepresentation
-from mitiq.pec.pec import LargeSampleWarning
+from mitiq.pec import mitigate_executor, pec_decorator
 from mitiq.pec.representations import (
     represent_operations_in_circuit_with_local_depolarizing_noise,
 )
@@ -182,8 +182,8 @@ def test_pyquil_noiseless_decomposition_multiqubit(nqubits):
         representation = OperationRepresentation(
             ideal=pyquil.Program(pyquil.gates.H(q)),
             basis_expansion={
-                NoisyOperation(ideal=pyquil.Program(pyquil.gates.X(q))): 0.5,
-                NoisyOperation(ideal=pyquil.Program(pyquil.gates.Z(q))): 0.5,
+                NoisyOperation(circuit=pyquil.Program(pyquil.gates.X(q))): 0.5,
+                NoisyOperation(circuit=pyquil.Program(pyquil.gates.Z(q))): 0.5,
             },
         )
         representations.append(representation)
@@ -221,8 +221,8 @@ def test_qiskit_noiseless_decomposition_multiqubit(nqubits):
         representation = OperationRepresentation(
             ideal=opcircuit,
             basis_expansion={
-                NoisyOperation(ideal=xcircuit): 0.5,
-                NoisyOperation(ideal=zcircuit): 0.5,
+                NoisyOperation(circuit=xcircuit): 0.5,
+                NoisyOperation(circuit=zcircuit): 0.5,
             },
         )
         representations.append(representation)
@@ -240,7 +240,7 @@ def test_qiskit_noiseless_decomposition_multiqubit(nqubits):
 
 @pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
 @pytest.mark.parametrize("executor", [serial_executor, batched_executor])
-@pytest.mark.parametrize("circuit_type", ["cirq", "qiskit", "pyquil"])
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
 def test_execute_with_pec_mitigates_noise(circuit, executor, circuit_type):
     """Tests that execute_with_pec mitigates the error of a noisy
     expectation value.
@@ -361,13 +361,13 @@ def test_bad_precision_argument(bad_value: float):
         )
 
 
-@pytest.mark.skip(reason="Slow test.")
 def test_large_sample_size_warning():
     """Tests whether a warning is raised when PEC sample size
     is greater than 10 ** 5.
     """
-    with pytest.warns(
-        LargeSampleWarning, match=r"The number of PEC samples is very large.",
+    warnings.simplefilter("error")
+    with pytest.raises(
+        Warning, match="The number of PEC samples is very large.",
     ):
         execute_with_pec(
             oneq_circ,
@@ -410,3 +410,139 @@ def test_pec_data_with_full_output():
     )
     assert np.isclose(np.average(pec_data["unbiased_estimators"]), pec_value)
     assert np.allclose(pec_data["measured_expectation_values"], exp_values)
+
+
+def decorated_serial_executor(circuit: QPROGRAM) -> float:
+    """Returns a decorated serial executor for use with other tests. The serial
+    executor is decorated with the same representations as those that are used
+    in the tests for trivial decomposition.
+    """
+    rep = OperationRepresentation(
+        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+    )
+
+    @pec_decorator([rep])
+    def decorated_executor(qp):
+        return serial_executor(qp)
+
+    return decorated_executor(circuit)
+
+
+def test_mitigate_executor_qiskit():
+    """Performs the same test as
+    test_execute_with_pec_qiskit_trivial_decomposition(), but using
+    mitigate_executor() instead of execute_with_pec().
+    """
+    qreg = qiskit.QuantumRegister(1)
+    circuit = qiskit.QuantumCircuit(qreg)
+    _ = circuit.x(qreg)
+    rep = OperationRepresentation(
+        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+    )
+    unmitigated = serial_executor(circuit)
+
+    mitigated_executor = mitigate_executor(
+        serial_executor, representations=[rep], num_samples=10, random_state=1,
+    )
+    mitigated = mitigated_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+def test_pec_decorator_qiskit():
+    """Performs the same test as test_mitigate_executor_qiskit(), but using
+    pec_decorator() instead of mitigate_executor().
+    """
+    qreg = qiskit.QuantumRegister(1)
+    circuit = qiskit.QuantumCircuit(qreg)
+    _ = circuit.x(qreg)
+
+    unmitigated = serial_executor(circuit)
+
+    mitigated = decorated_serial_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+def test_mitigate_executor_cirq():
+    """Performs the same test as
+    test_execute_with_pec_cirq_trivial_decomposition(), but using
+    mitigate_executor() instead of execute_with_pec().
+    """
+    circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
+    rep = OperationRepresentation(
+        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+    )
+    unmitigated = serial_executor(circuit)
+
+    mitigated_executor = mitigate_executor(
+        serial_executor, representations=[rep], num_samples=10, random_state=1,
+    )
+    mitigated = mitigated_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+def test_pec_decorator_cirq():
+    """Performs the same test as test_mitigate_executor_cirq(), but using
+    pec_decorator() instead of mitigate_executor().
+    """
+    circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
+
+    unmitigated = serial_executor(circuit)
+
+    mitigated = decorated_serial_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+def test_mitigate_executor_pyquil():
+    """Performs the same test as
+    test_execute_with_pec_pyquil_trivial_decomposition(), but using
+    mitigate_executor() instead of execute_with_pec().
+    """
+    circuit = pyquil.Program(pyquil.gates.H(0))
+    rep = OperationRepresentation(
+        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+    )
+    unmitigated = serial_executor(circuit)
+
+    mitigated_executor = mitigate_executor(
+        serial_executor, representations=[rep], num_samples=10, random_state=1,
+    )
+    mitigated = mitigated_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+def test_pec_decorator_pyquil():
+    """Performs the same test as test_mitigate_executor_pyquil(), but using
+    pec_decorator() instead of mitigate_executor().
+    """
+    circuit = pyquil.Program(pyquil.gates.H(0))
+
+    unmitigated = serial_executor(circuit)
+
+    mitigated = decorated_serial_executor(circuit)
+
+    assert np.isclose(unmitigated, mitigated)
+
+
+def test_doc_is_preserved():
+    """Tests that the doc of the original executor is preserved."""
+
+    representations = get_pauli_and_cnot_representations(0)
+
+    def first_executor(circuit):
+        """Doc of the original executor."""
+        return 0
+
+    mit_executor = mitigate_executor(first_executor, representations)
+    assert mit_executor.__doc__ == first_executor.__doc__
+
+    @pec_decorator(representations)
+    def second_executor(circuit):
+        """Doc of the original executor."""
+        return 0
+
+    assert second_executor.__doc__ == first_executor.__doc__

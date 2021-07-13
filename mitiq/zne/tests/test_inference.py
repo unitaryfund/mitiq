@@ -35,7 +35,7 @@ from mitiq.zne.inference import (
     PolyExpFactory,
     AdaExpFactory,
 )
-
+from cirq import LineQubit, X, H
 
 # Constant parameters for test functions:
 A = 0.5
@@ -964,7 +964,7 @@ def test_plot_fit_exp_factory(factory):
     np.allclose(y_data, zne_curve(x_data))
 
 
-def test__fakenodes_scale_factors_equally_spaced():
+def test_fakenodes_scale_factors_equally_spaced():
     """FakeNodesFactory should only accept equally spaced scale factors."""
     y_vals = [0.5, 1.0, 1.5]
     with raises(
@@ -977,4 +977,41 @@ def test_map_to_fakenodes():
     """Test the fake nodes map in FakeNodesFactory."""
     fac = FakeNodesFactory(UNIFORM_X)
     test_argument = 1.0
-    assert np.isclose(fac._map_to_fake_nodes(1.0, 2.0, test_argument), 1.0,)
+    assert np.isclose(
+        fac._map_to_fake_nodes([1.0], 2.0, test_argument), [1.0],
+    )
+
+
+@mark.parametrize(
+    "factory",
+    (
+        LinearFactory,
+        RichardsonFactory,
+        FakeNodesFactory,
+        PolyFactory,
+        ExpFactory,
+        PolyExpFactory,
+        AdaExpFactory,
+    ),
+)
+def test_short_circuit_warning(factory):
+    """Tests a warning is raised if the input circuit has very few gates."""
+    scale_factors = np.linspace(1.0, 10.0, num=20)
+
+    def executor(circuits) -> List[float]:
+        return [1.0] * len(circuits)
+
+    if factory is PolyFactory or factory is PolyExpFactory:
+        fac = factory(scale_factors=scale_factors, order=2)
+    elif factory is AdaExpFactory:
+        fac = factory(steps=4)
+    else:
+        fac = factory(scale_factors=scale_factors)
+
+    qubit = LineQubit(0)
+    circuit = cirq.Circuit(X(qubit), H(qubit), X(qubit))
+
+    with warns(
+        UserWarning, match=r"The input circuit is very short.",
+    ):
+        fac.run(circuit, executor, scale_noise=lambda circ, _: circ)
