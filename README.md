@@ -79,7 +79,7 @@ See our [roadmap](https://github.com/unitaryfund/mitiq/projects/5) for additiona
 
 ### Interface
 
-We refer to any quantum programming language you can write circuits in as a *frontend*, and any program you can simulate circuits in as a *backend*.
+We refer to any programming language you can write quantum circuits in as a *frontend*, and any quantum computer / simulator you can simulate circuits in as a *backend*.
 
 #### Supported frontends
 
@@ -89,7 +89,7 @@ We refer to any quantum programming language you can write circuits in as a *fro
 
 Note: Cirq is a core requirement of Mitiq and is installed when you `pip install mitiq`.
 
-### Supported backends
+#### Supported backends
 
 You can use Mitiq with any backend you have access to that can interface with supported frontends.
 
