@@ -163,11 +163,7 @@ contributing.
 
 ### Citing Mitiq
 
-If you use Mitiq in your research, please reference the [Mitiq preprint][arxiv] ([bibtex](https://arxiv2bibtex.org/?q=2009.04417&format=bibtex)). A list of papers citing Mitiq can be found [here][papers_with_mitiq].
-
-[arxiv]: https://arxiv.org/abs/2009.04417
-
-[papers_with_mitiq]: https://mitiq.readthedocs.io/en/stable/research.html#papers-citing-or-using-mitiq
+If you use Mitiq in your research, please reference the [Mitiq preprint](https://arxiv.org/abs/2009.04417) ([bibtex](https://arxiv2bibtex.org/?q=2009.04417&format=bibtex)). A list of papers citing Mitiq can be found on [Google Scholar](https://scholar.google.com/scholar?cites=12810395086731011605) / [Semantic Scholar](https://www.semanticscholar.org/paper/Mitiq%3A-A-software-package-for-error-mitigation-on-LaRose-Mari/dc55b366d5b2212c6df8cd5c0bf05bab13104bd7#citing-papers).
 
 ## License
 
