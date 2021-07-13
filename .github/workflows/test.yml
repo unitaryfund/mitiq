@@ -50,6 +50,7 @@ jobs:
         run: |
           make docs
           make doctest
+          make linkcheck
 
   # This is to make sure Mitiq works without optional 3rd party packages like Qiskit, pyQuil, etc.
   # E.g., if we accidentally `import qiskit` in Mitiq where we shouldn't, this test will catch that.
