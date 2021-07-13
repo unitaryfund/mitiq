@@ -68,7 +68,7 @@ See the [Getting Started Guide](https://mitiq.readthedocs.io/en/stable/guide/gui
 
 ### Error mitigation techniques
 
-Error mitigation techniques that Mitiq implements or plans to support in the future:
+Error mitigation techniques that Mitiq implements or plans to implement in the future:
 
 | Technique                                 | Docs                                                                                                                                  | Mitiq module                                                            | Paper Reference                                                                                     | Date Completed |
 |-------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|----------------|
