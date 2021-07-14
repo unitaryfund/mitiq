@@ -97,8 +97,8 @@ def sample_circuit(
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     num_samples: int = 1,
 ) -> Tuple[List[QPROGRAM], List[int], float]:
-    """Samples a list of implementable circuits from the PEC representation of the
-    input ideal circuit.
+    """Samples a list of implementable circuits from the quasi-probability
+    representation of the input ideal circuit.
     Returns the list of circuits, the corresponding list of signs and the
     one-norm of the quasi-probability representation (of the full circuit).
 
@@ -108,7 +108,6 @@ def sample_circuit(
         representations: List of representations of every operation in the
             input circuit. If a representation cannot be found for an operation
             in the circuit, a ValueError is raised.
-        num_samples: The number of samples.
         random_state: Seed for sampling.
         num_samples: The number of samples.
 
@@ -153,6 +152,6 @@ def sample_circuit(
             cirq_seq, _ = convert_to_mitiq(sequences[j])
             sampled_circuits[j].append(cirq_seq.all_operations())
 
-    native_circuits = [convert_from_mitiq(c, rtype) for c in sampled_circuits]
+    sampled_circuits = [convert_from_mitiq(c, rtype) for c in sampled_circuits]
 
-    return native_circuits, sampled_signs, norm
+    return sampled_circuits, sampled_signs, norm
