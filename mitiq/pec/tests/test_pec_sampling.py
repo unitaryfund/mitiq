@@ -50,9 +50,9 @@ def test_sample_sequence_cirq():
     )
 
     for _ in range(5):
-        seq, sign, norm = sample_sequence(circuit, representations=[rep])
-        assert isinstance(seq, cirq.Circuit)
-        assert sign in {1, -1}
+        seqs, signs, norm = sample_sequence(circuit, representations=[rep])
+        assert isinstance(seqs[0], cirq.Circuit)
+        assert signs[0] in {1, -1}
         assert norm == 1.0
 
 
@@ -75,9 +75,9 @@ def test_sample_sequence_qiskit():
     )
 
     for _ in range(5):
-        seq, sign, norm = sample_sequence(circuit, representations=[rep])
-        assert isinstance(seq, qiskit.QuantumCircuit)
-        assert sign in {1, -1}
+        seqs, signs, norm = sample_sequence(circuit, representations=[rep])
+        assert isinstance(seqs[0], qiskit.QuantumCircuit)
+        assert signs[0] in {1, -1}
         assert norm == 1.0
 
 
@@ -92,9 +92,9 @@ def test_sample_sequence_pyquil():
     )
 
     for _ in range(50):
-        seq, sign, norm = sample_sequence(circuit, representations=[rep])
-        assert isinstance(seq, pyquil.Program)
-        assert sign in {1, -1}
+        seqs, signs, norm = sample_sequence(circuit, representations=[rep])
+        assert isinstance(seqs[0], pyquil.Program)
+        assert signs[0] in {1, -1}
         assert norm == 1.0
 
 
@@ -109,16 +109,16 @@ def test_sample_sequence_cirq_random_state(seed):
         },
     )
 
-    sequence, sign, norm = sample_sequence(
+    sequences, signs, norm = sample_sequence(
         circuit, [rep], random_state=np.random.RandomState(seed)
     )
 
     for _ in range(20):
-        new_sequence, new_sign, new_norm = sample_sequence(
+        new_sequences, new_signs, new_norm = sample_sequence(
             circuit, [rep], random_state=np.random.RandomState(seed)
         )
-        assert _equal(new_sequence, sequence)
-        assert new_sign == sign
+        assert _equal(new_sequences[0], sequences[0])
+        assert new_signs[0] == signs[0]
         assert np.isclose(new_norm, norm)
 
 
@@ -148,13 +148,13 @@ def test_sample_circuit_cirq(measure):
     )
 
     for _ in range(50):
-        sampled_circuit, sign, norm = sample_circuit(
+        sampled_circuits, signs, norm = sample_circuit(
             circuit, representations=[h_rep, cnot_rep]
         )
 
-        assert isinstance(sampled_circuit, cirq.Circuit)
-        assert len(sampled_circuit) == 2
-        assert sign in (-1, 1)
+        assert isinstance(sampled_circuits[0], cirq.Circuit)
+        assert len(sampled_circuits[0]) == 2
+        assert signs[0] in (-1, 1)
         assert norm >= 1
 
 
@@ -178,13 +178,13 @@ def test_sample_circuit_pyquil():
     )
 
     for _ in range(50):
-        sampled_circuit, sign, norm = sample_circuit(
+        sampled_circuits, signs, norm = sample_circuit(
             circuit, representations=[h_rep, cnot_rep]
         )
 
-        assert isinstance(sampled_circuit, pyquil.Program)
-        assert len(sampled_circuit) == 2
-        assert sign in (-1, 1)
+        assert isinstance(sampled_circuits[0], pyquil.Program)
+        assert len(sampled_circuits[0]) == 2
+        assert signs[0] in (-1, 1)
         assert norm >= 1
 
 
@@ -198,19 +198,19 @@ def test_sample_circuit_with_seed():
         },
     )
 
-    expected_circuit, expected_sign, expected_norm = sample_circuit(
+    expected_circuits, expected_signs, expected_norm = sample_circuit(
         circ, [rep], random_state=4
     )
 
     # Check we're not sampling the same operation every call to sample_sequence
-    assert len(set(expected_circuit.all_operations())) > 1
+    assert len(set(expected_circuits[0].all_operations())) > 1
 
     for _ in range(10):
-        sampled_circuit, sampled_sign, sampled_norm = sample_circuit(
+        sampled_circuits, sampled_signs, sampled_norm = sample_circuit(
             circ, [rep], random_state=4
         )
-        assert _equal(sampled_circuit, expected_circuit)
-        assert sampled_sign == expected_sign
+        assert _equal(sampled_circuits[0], expected_circuits[0])
+        assert sampled_signs[0] == expected_signs[0]
         assert sampled_norm == expected_norm
 
 
@@ -220,11 +220,11 @@ def test_sample_circuit_trivial_decomposition():
         ideal=circuit, basis_expansion={NoisyOperation(circuit): 1.0}
     )
 
-    sampled_circuit, sign, norm = sample_circuit(
+    sampled_circuits, signs, norm = sample_circuit(
         circuit, [rep], random_state=1
     )
-    assert _equal(sampled_circuit, circuit)
-    assert sign == 1
+    assert _equal(sampled_circuits[0], circuit)
+    assert signs[0] == 1
     assert np.isclose(norm, 1)
 
 
@@ -250,12 +250,12 @@ def test_sample_sequence_choi(gate: cirq.Gate):
     choi_unbiased_estimates = []
     rng = np.random.RandomState(1)
     for _ in range(500):
-        imp_seq, sign, norm = sample_sequence(
+        imp_seqs, signs, norm = sample_sequence(
             ideal_circ, [representation], random_state=rng
         )
-        noisy_sequence = imp_seq.with_noise(cirq.depolarize(BASE_NOISE))
+        noisy_sequence = imp_seqs[0].with_noise(cirq.depolarize(BASE_NOISE))
         sequence_choi = _circuit_to_choi(noisy_sequence)
-        choi_unbiased_estimates.append(norm * sign * sequence_choi)
+        choi_unbiased_estimates.append(norm * signs[0] * sequence_choi)
 
     choi_pec_estimate = np.average(choi_unbiased_estimates, axis=0)
     noise_error = np.linalg.norm(ideal_choi - noisy_choi)
@@ -285,12 +285,12 @@ def test_sample_circuit_choi():
     choi_unbiased_estimates = []
     rng = np.random.RandomState(1)
     for _ in range(500):
-        imp_circ, sign, norm = sample_circuit(
+        imp_circs, signs, norm = sample_circuit(
             ideal_circ, rep_list, random_state=rng
         )
-        noisy_imp_circ = imp_circ.with_noise(cirq.depolarize(BASE_NOISE))
+        noisy_imp_circ = imp_circs[0].with_noise(cirq.depolarize(BASE_NOISE))
         sequence_choi = _circuit_to_choi(noisy_imp_circ)
-        choi_unbiased_estimates.append(norm * sign * sequence_choi)
+        choi_unbiased_estimates.append(norm * signs[0] * sequence_choi)
 
     choi_pec_estimate = np.average(choi_unbiased_estimates, axis=0)
     noise_error = np.linalg.norm(ideal_choi - noisy_choi)

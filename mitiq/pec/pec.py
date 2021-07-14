@@ -109,8 +109,12 @@ def execute_with_pec(
             f" but precision is {precision}."
         )
 
+    converted_circuit, _ = convert_to_mitiq(circuit)
+
     # Get the 1-norm of the circuit quasi-probability representation
-    _, _, norm = sample_circuit(circuit, representations)
+    _, _, norm = sample_circuit(
+        converted_circuit, representations, num_samples=1,
+    )
 
     # Deduce the number of samples (if not given by the user)
     if not isinstance(num_samples, int):
@@ -120,15 +124,13 @@ def execute_with_pec(
     if num_samples > 10 ** 5:
         warnings.warn(_LARGE_SAMPLE_WARN, LargeSampleWarning)
 
-    sampled_circuits = []
-    signs = []
-    converted_circuit, _ = convert_to_mitiq(circuit)
-    for _ in range(num_samples):
-        sampled_circuit, sign, _ = sample_circuit(
-            converted_circuit, representations, random_state
-        )
-        sampled_circuits.append(sampled_circuit)
-        signs.append(sign)
+    # Sample all the circuits
+    sampled_circuits, signs, _ = sample_circuit(
+        converted_circuit,
+        representations,
+        random_state=random_state,
+        num_samples=num_samples,
+    )
 
     # Execute all sampled circuits
     collected_executor = generate_collected_executor(
