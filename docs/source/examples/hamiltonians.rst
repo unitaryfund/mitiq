@@ -110,7 +110,8 @@ Below we create an example ansatz parameterized by one angle :math:`\gamma`.
         return cirq.Circuit(
             cirq.ops.ry(gamma).on(qreg[0]),
             cirq.ops.CNOT.on(*qreg),
-            cirq.ops.rx(gamma / 2).on_each(qreg)
+            cirq.ops.rx(gamma / 2).on_each(qreg),
+            cirq.ops.CNOT.on(*qreg),
         )
 
 For the angle :math:`\gamma = \pi`, this ansatz has the following structure:
@@ -118,9 +119,9 @@ For the angle :math:`\gamma = \pi`, this ansatz has the following structure:
 .. doctest::
 
     >>> print(ansatz(gamma=np.pi))
-    0: ───Ry(π)───@───Rx(0.5π)───
-                  │
-    1: ───────────X───Rx(0.5π)───
+    0: ───Ry(π)───@───Rx(0.5π)───@───
+                  │              │
+    1: ───────────X───Rx(0.5π)───X───
 
 We now compute expectation values of :math:`H` using the ``executor`` as follows.
 

@@ -6,7 +6,12 @@
 Zero Noise Extrapolation
 *********************************************
 
-Zero noise extrapolation has two main components: noise scaling and extrapolation.
+Zero noise extrapolation is an error mitigation technique in which an expectation
+value is computed at different noise levels and, as a second step, the ideal expectation
+value is inferred extrapolating the measured results to the zero-noise limit. 
+
+Both steps---noise scaling and extrapolation---can be applied with Mitiq. The corresponding
+sub-modules are :mod:`mitiq.zne.scaling` and :mod:`mitiq.zne.inference`.
 
 .. _guide_zne_folding:
 
@@ -361,8 +366,8 @@ We also define a simple quantum circuit whose ideal expectation value is by cons
 
    from cirq import LineQubit, X, H
 
-   qubit = LineQubit(0)
-   circuit = Circuit(X(qubit), H(qubit), H(qubit), X(qubit))
+   q = LineQubit(0)
+   circuit = Circuit(H(q), X(q), H(q), H(q), X(q), H(q))
    expval = executor(circuit)
    exact = 1.0
    print(f"The ideal result should be {exact}")
@@ -372,8 +377,8 @@ We also define a simple quantum circuit whose ideal expectation value is by cons
 .. testoutput::
 
    The ideal result should be 1.0
-   The real result is 0.8794
-   The abslute error is 0.1206
+   The real result is 0.8305
+   The abslute error is 0.1695
 
 
 Now we are going to initialize three factory objects, each one encapsulating a different
@@ -410,9 +415,9 @@ in ``mitiq.zne``. For example:
 
 .. testoutput::
 
-   Error with linear_fac: 0.0291
-   Error with richardson_fac: 0.0070
-   Error with poly_fac: 0.0110
+   Error with linear_fac: 0.0575
+   Error with richardson_fac: 0.0195
+   Error with poly_fac: 0.0291
 
 We can also specify the number of shots to use for each noise-scaled circuit.
 
@@ -489,9 +494,9 @@ corresponds to a statistical inference based on the measured data.
 
 .. testoutput::
 
-   Error with linear_fac: 0.0291
-   Error with richardson_fac: 0.0070
-   Error with poly_fac: 0.0110
+   Error with linear_fac: 0.0575
+   Error with richardson_fac: 0.0195
+   Error with poly_fac: 0.0291
 
 Behind the scenes, a factory object collects different expectation values at different scale factors.
 After running a factory, this information can be accessed with appropriate *get* methods. For example:
@@ -506,7 +511,7 @@ After running a factory, this information can be accessed with appropriate *get*
 .. testoutput::
 
    Scale factors: [1. 2. 3. 4.]
-   Expectation values: [0.88 0.79 0.72 0.67]
+   Expectation values: [0.83 0.72 0.64 0.6 ]
 
 If the user has manually evaluated a list of expectation values associated to a list of scale factors, the
 simplest way to estimate the corresponding zero-noise limit is to directly call the static `extrapolate` method of the
@@ -519,7 +524,7 @@ desired factory class (in this case initializing a factory object is unnecessary
 
 .. testoutput::
 
-   Error with PolyFactory.extrapolate method: 0.0110
+   Error with PolyFactory.extrapolate method: 0.0291
 
 Beyond the zero-noise limit, additional information about the fit (e.g., optimal parameters, errors, extrapolation curve, etc.)
 can be returned from `extrapolate` by specifying `full_output = True`.
@@ -541,12 +546,12 @@ There are also a number of methods to get additional information calculated by t
 
 .. testoutput::
 
-   Zero-noise limit: 0.9562
-   Fit error on zero-noise limit: 0.0138
-   Covariance of fitted model parameters: [[ 4.0e-05 -8.0e-05]
-    [-8.0e-05  1.9e-04]]
-   Fitted model parameters: [-0.0805  0.9562]
-   Extrapolation curve evaluated at zero: 0.9562
+   Zero-noise limit: 0.9172
+   Fit error on zero-noise limit: 0.0237
+   Covariance of fitted model parameters: [[ 0.00012 -0.00024]
+    [-0.00024  0.00056]]
+   Fitted model parameters: [-0.093   0.9172]
+   Extrapolation curve evaluated at zero: 0.9172
 
 
 ---------------------------------------------
@@ -614,9 +619,9 @@ noise levels, so one can view ``self.run_classical`` as the classical counterpar
 
 .. testoutput::
 
-   Error with linear_fac: 0.0291
-   Error with richardson_fac: 0.0070
-   Error with poly_fac: 0.0110
+   Error with linear_fac: 0.0575
+   Error with richardson_fac: 0.0195
+   Error with poly_fac: 0.0291
 
 .. note::
    With respect to ``self.run``, the ``self.run_classical`` method is much more flexible and
