@@ -152,6 +152,6 @@ def sample_circuit(
             cirq_seq, _ = convert_to_mitiq(sequences[j])
             sampled_circuits[j].append(cirq_seq.all_operations())
 
-    sampled_circuits = [convert_from_mitiq(c, rtype) for c in sampled_circuits]
+    native_circuits = [convert_from_mitiq(c, rtype) for c in sampled_circuits]
 
-    return sampled_circuits, sampled_signs, norm
+    return native_circuits, sampled_signs, norm
