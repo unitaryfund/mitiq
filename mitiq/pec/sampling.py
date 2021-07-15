@@ -57,7 +57,7 @@ def sample_sequence(
         num_samples: The number of samples.
 
     Returns:
-        The tuple (``sequences``, ``signs``, norm) where
+        The tuple (``sequences``, ``signs``, ``norm``) where
         ``sequences`` are the sampled sequences,
         ``signs`` are the signs associated to the sampled ``sequences`` and
         ``norm`` is the one-norm of the quasi-probability distribution.
