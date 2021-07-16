@@ -1,21 +1,16 @@
-# Mitiq
+<a href="https://github.com/unitaryfund/mitiq"><img src="https://github.com/unitaryfund/mitiq/blob/master/docs/source/img/mitiq-logo.png?raw=true" alt="Mitiq logo" width="350"/></a>
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-25-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
-[![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
 [![Documentation Status](https://readthedocs.org/projects/mitiq/badge/?version=stable)](https://mitiq.readthedocs.io/en/stable/)
+[![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
 [![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
 [![arXiv](https://img.shields.io/badge/arXiv-2009.04417-<COLOR>.svg)](https://arxiv.org/abs/2009.04417)
 [![Downloads](https://static.pepy.tech/personalized-badge/mitiq?period=total&units=international_system&left_color=black&right_color=green&left_text=Downloads)](https://pepy.tech/project/mitiq)
-[![Repository](https://img.shields.io/badge/GitHub-5C5C5C.svg?logo=github
-)](https://github.com/unitaryfund/mitiq)
-
-
-[![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
-
-![logo](docs/source/img/mitiq-logo.png)
+[![Repository](https://img.shields.io/badge/GitHub-5C5C5C.svg?logo=github)](https://github.com/unitaryfund/mitiq)
+[![Discord Chat](https://img.shields.io/badge/dynamic/json?color=green&label=Discord&query=approximate_presence_count&suffix=%20online.&url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2FJqVGmpkP96%3Fwith_counts%3Dtrue)](https://discord.unitary.fund)  
 
 Mitiq is a Python toolkit for implementing error mitigation techniques on
 quantum computers.
@@ -38,7 +33,7 @@ pip install mitiq
 
 ### Example
 
-Define a function which returns an expectation value you want to compute, then use Mitiq to mitigate errors.
+Define a function which inputs a circuit returns an expectation value you want to compute, then use Mitiq to mitigate errors.
 
 ```python
 import cirq
