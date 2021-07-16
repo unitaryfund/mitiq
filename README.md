@@ -38,9 +38,12 @@ pip install mitiq
 
 ### Example
 
+Define a function which returns an expectation value you want to compute, then use Mitiq to mitigate errors.
+
 ```python
 import cirq
 from mitiq import zne, benchmarks
+
 
 def execute(circuit: cirq.Circuit, noise_level: float = 0.001) -> float:
     """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit with depolarizing noise."""
@@ -54,16 +57,16 @@ true_value = execute(circuit, noise_level=0.0)       # Ideal quantum computer.
 noisy_value = execute(circuit)                       # Noisy quantum computer.
 zne_value = zne.execute_with_zne(circuit, execute)   # Noisy quantum computer + Mitiq.
 
-print(f"Error (w/o  Mitiq): {abs(true_value - noisy_value):.{3}}")
-print(f"Error (with Mitiq): {abs(true_value - zne_value):.{3}}")
+print(f"Error (w/o  Mitiq): %0.4f" %abs((true_value - noisy_value) / true_value))
+print(f"Error (with Mitiq): %0.4f" %abs((true_value - zne_value) / true_value))
 ```
 Sample output:
 ```
 Error (w/o  Mitiq): 0.0688
-Error (with Mitiq): 0.000181
+Error (with Mitiq): 0.0002
 ```
 
-See the [Getting Started Guide](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html) in [Mitiq's documentation](https://mitiq.readthedocs.io) for a complete walkthrough of how to use Mitiq.
+See our [guides](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html) and [examples](https://mitiq.readthedocs.io) for more explanation, techniques, and benchmarks.
 
 ## Quick Tour
 
@@ -73,7 +76,7 @@ See the [Getting Started Guide](https://mitiq.readthedocs.io/en/stable/guide/gui
 |-------------------------------------------|-----------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|---------------------|
 | Zero-noise extrapolation                  | [ZNE](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html)                                              | [mitiq.zne](https://github.com/unitaryfund/mitiq/tree/master/mitiq/zne) | [1612.02058](https://arxiv.org/abs/1612.02058)                                                      | July 2020           |
 | Probabilistic error cancellation          | [PEC](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#probabilistic-error-cancellation) | [mitiq.pec](https://github.com/unitaryfund/mitiq/tree/master/mitiq/pec) | [1612.02058](https://arxiv.org/abs/1612.02058)                                                      | Jan 2021            |
-| (Variable noise) Clifford data regression | [CDR](https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html)                                             | [mitiq.cdr](https://github.com/unitaryfund/mitiq/tree/master/mitiq/cdr) | [2005.10189](https://arxiv.org/abs/2005.10189)<br>[2011.01157](https://arxiv.org/abs/2011.01157)    | June 2021           |
+| (Variable-noise) Clifford data regression | [CDR](https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html)                                             | [mitiq.cdr](https://github.com/unitaryfund/mitiq/tree/master/mitiq/cdr) | [2005.10189](https://arxiv.org/abs/2005.10189)<br>[2011.01157](https://arxiv.org/abs/2011.01157)    | June 2021           |
 | Dynamical decoupling                      |                                                                                                                 |                                                                         | [9803057](https://arxiv.org/abs/quant-ph/9803057)<br>[1807.08768](https://arxiv.org/abs/1807.08768) | (In progress)       |
 
 See our [roadmap](https://github.com/unitaryfund/mitiq/projects/5) for additional candidate techniques to implement. If there is a technique you are looking for, please file a [feature request](https://github.com/unitaryfund/mitiq/issues/new?assignees=&labels=feature-request&template=feature_request.md&title=).
@@ -104,7 +107,7 @@ If you use Mitiq in your research, please reference the [Mitiq preprint](https:/
 
 ## Contributing
 
-We welcome contributions to Mitiq including bug fixes, feature requests, etc. To get started, check out the [contribution
+We welcome contributions to Mitiq including bug fixes, feature requests, etc. To get started, check out our [contribution
 guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) and/or [documentation guidelines](https://mitiq.readthedocs.io/en/stable/contributing_docs.html). 
 An up-to-date list of contributors can be found [here](https://github.com/unitaryfund/mitiq/graphs/contributors) and below.
 
