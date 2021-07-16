@@ -21,7 +21,7 @@ Error mitigation seeks to reduce these effects at the software level by
 compiling quantum programs in clever ways.
 
 Want to know more? Check out our
-[documentation](https://mitiq.readthedocs.io/en/stable/guide/guide-overview.html).
+[documentation](https://mitiq.readthedocs.io/en/stable/guide/guide-overview.html) and chat with us on [Discord](https://discord.unitary.fund).
 
 ## Quickstart
 
