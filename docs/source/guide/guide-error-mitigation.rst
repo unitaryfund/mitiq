@@ -276,11 +276,11 @@ Software
 Here is a (non-comprehensive) list of open-source software libraries related to
 quantum computing, noisy quantum dynamics and error mitigation:
 
-- **IBM Q**'s `Qiskit`_ provides a stack for quantum computing simulation and execution on real devices from the cloud. In particular, ``qiskit.Aer`` contains the :class:`~qiskit.providers.aer.noise.NoiseModel` object, integrated with Mitiq tools. Qiskit's OpenPulse provides pulse-level control of qubit operations in some of the superconducting circuit devices. Mitiq is integrated with ``qiskit``, in the :mod:`~mitiq.mitiq_qiskit.qiskit_utils` and :mod:`~mitiq.mitiq_qiskit.conversions` modules.
+- **IBM Q**'s `Qiskit`_ provides a stack for quantum computing simulation and execution on real devices from the cloud. In particular, ``qiskit.Aer`` contains the :class:`~qiskit.providers.aer.noise.NoiseModel` object, integrated with Mitiq tools. Qiskit's OpenPulse provides pulse-level control of qubit operations in some of the superconducting circuit devices. Mitiq can integrate with Qiskit via conversions in :mod:`~mitiq.interface.mitiq_qiskit`.
 
 - **Google AI Quantum**'s `Cirq`_ offers quantum simulation of quantum circuits. The :class:`cirq.Circuit` object is integrated in Mitiq algorithms as the default circuit.
 
-- **Rigetti Computing**'s `PyQuil`_ is a library for quantum programming. Rigetti's stack offers the execution of quantum circuits on superconducting circuits devices from the cloud, as well as their simulation on a quantum virtual machine (QVM), integrated with Mitiq tools in the :mod:`~mitiq.mitiq_pyquil.pyquil_utils` module.
+- **Rigetti Computing**'s `PyQuil`_ is a library for quantum programming. Rigetti's stack offers the execution of quantum circuits on superconducting circuits devices from the cloud, as well as their simulation on a quantum virtual machine (QVM), integrated with Mitiq tools in the :mod:`~mitiq.interface.mitiq_pyquil.pyquil_utils` module.
 
 - `QuTiP`_, the quantum toolbox in Python, contains a quantum information processing module that allows to simulate quantum circuits, their implementation on devices, as well as the simulation of pulse-level control and time-dependent density matrix evolution with the :class:`qutip.Qobj` object and the :class:`~qutip.qip.device.Processor` object in the ``qutip.qip`` module.
 
@@ -306,4 +306,4 @@ can be found `here`_ and on `Unitary Fund`_'s list of supported projects.
 
 .. _here: https://github.com/qosf/awesome-quantum-software
 
-.. _Unitary Fund: https://unitary.fund#grants-made
+.. _Unitary Fund: https://unitary.fund/grants.html

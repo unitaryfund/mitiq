@@ -25,11 +25,15 @@ import pyquil
 from mitiq.collector import Collector, generate_collected_executor
 
 
-def executor_batched(circuits, **kwargs) -> np.ndarray:
-    return np.full(
-        shape=(len(circuits),),
-        fill_value=kwargs.setdefault("return_value", 0.0),
-    )
+# Serial / batched executors which return floats.
+def executor_batched(circuits, **kwargs) -> List[float]:
+    return [
+        float(v)
+        for v in np.full(
+            shape=(len(circuits),),
+            fill_value=kwargs.setdefault("return_value", 0.0),
+        )
+    ]
 
 
 def executor_batched_unique(circuits) -> List[float]:
@@ -56,6 +60,17 @@ def executor_pyquil_batched(programs) -> List[float]:
     return [0.0] * len(programs)
 
 
+# Serial / batched executors which return measurements.
+def executor_serial_measurements(circuit) -> cirq.Result:
+    return cirq.Simulator().run(circuit, repetitions=10)
+
+
+def executor_batched_measurements(circuits) -> List[cirq.Result]:
+    return [
+        cirq.Simulator().run(circuit, repetitions=10) for circuit in circuits
+    ]
+
+
 def test_collector_simple():
     collector = Collector(executor=executor_batched, max_batch_size=10)
     assert collector.can_batch
@@ -64,9 +79,11 @@ def test_collector_simple():
 
 
 def test_collector_is_batched_executor():
-    assert Collector.is_batched_executor(executor=executor_batched)
-    assert not Collector.is_batched_executor(executor=executor_serial_typed)
-    assert not Collector.is_batched_executor(executor=executor_serial)
+    assert Collector.is_batched_executor(executor_batched)
+    assert not Collector.is_batched_executor(executor_serial_typed)
+    assert not Collector.is_batched_executor(executor_serial)
+    assert not Collector.is_batched_executor(executor_serial_measurements)
+    assert Collector.is_batched_executor(executor_batched_measurements)
 
 
 @pytest.mark.parametrize("ncircuits", (5, 10, 25))
@@ -162,8 +179,6 @@ def test_generate_collected_executor(executor, ncircuits, rval):
         executor, return_value=rval
     )
     expvals = collected_executor([cirq.Circuit()] * ncircuits)
-    print(rval)
-    print(expvals)
     assert np.allclose(expvals, np.full(shape=(ncircuits,), fill_value=rval))
 
 

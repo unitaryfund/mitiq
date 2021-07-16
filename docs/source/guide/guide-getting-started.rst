@@ -29,7 +29,7 @@ probability of the ground state.
     import numpy as np
     import cirq
 
-    def executor(circ: Circuit) -> float:
+    def executor(circ: cirq.Circuit) -> float:
         """Simulates a circuit with depolarizing noise.
 
         Args:
@@ -310,7 +310,7 @@ We can now implement PEC by importing the function :func:`~mitiq.pec.pec.execute
 .. testoutput::
 
     Error without mitigation: 0.0387
-    Error with mitigation (PEC): 0.00364
+    Error with mitigation (PEC): 0.00363
 
 In addition to :func:`~mitiq.pec.pec.execute_with_pec`, you can also use Mitiq to wrap your
 backend execution function into an error-mitigated version like you can with zero-noise

@@ -108,7 +108,7 @@ def tensor_product(*args: np.ndarray) -> np.ndarray:
     ``numpy.kron(arg_a, arg_b)`` to the case of an arbitrary number of
     arguments.
     """
-    if args is ():
+    if args == ():
         raise TypeError("tensor_product() requires at least one argument.")
 
     val = args[0]
@@ -165,7 +165,7 @@ def kraus_to_super(kraus_ops: List[np.ndarray]) -> np.ndarray:
     .. math::
         A|i \rangle\langle  j|B  <=>  (A \otimes B^T) |i\rangle|j\rangle.
     """
-    return sum([np.kron(k, k.conj()) for k in kraus_ops])
+    return np.array(sum(np.kron(k, k.conj()) for k in kraus_ops))
 
 
 def choi_to_super(choi_state: np.ndarray) -> np.ndarray:

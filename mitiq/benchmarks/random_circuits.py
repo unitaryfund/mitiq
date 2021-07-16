@@ -129,7 +129,10 @@ def rand_circuit_zne(
         unmitigated = obs_sim(qc)
         # evaluate the ZNE answer
         mitigated = execute_with_zne(
-            qp=qc, executor=obs_sim, scale_noise=scale_noise, factory=fac
+            qp=qc,
+            executor=obs_sim,  # type: ignore
+            scale_noise=scale_noise,
+            factory=fac,
         )
         exacts.append(exact)
         unmitigateds.append(unmitigated)

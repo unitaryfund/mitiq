@@ -32,7 +32,7 @@ from cirq import (
 
 from mitiq import QPROGRAM
 from mitiq.pec.types import OperationRepresentation, NoisyOperation
-from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
+from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 
 from mitiq.pec.channels import tensor_product
 
@@ -88,7 +88,7 @@ def represent_operation_with_global_depolarizing_noise(
     .. note::
         This representation is based on the ideal assumption that one
         can append Pauli gates to a noisy operation without introducing
-        additional noise. For a beckend which violates this assumption,
+        additional noise. For a backend which violates this assumption,
         it remains a good approximation for small values of ``noise_level``.
 
     .. note::
@@ -137,13 +137,13 @@ def represent_operation_with_global_depolarizing_noise(
             "Consider pre-compiling your circuit."
         )
 
-    # Basis of implementable operations as circuits
+    # Basis of implementable operations as circuits.
     imp_op_circuits = [circ + Circuit(op) for op in post_ops]
 
-    # Convert back to input type
+    # Convert back to input type.
     imp_op_circuits = [convert_from_mitiq(c, in_type) for c in imp_op_circuits]
 
-    # Build basis_expantion
+    # Build basis expansion.
     expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}
 
     return OperationRepresentation(ideal_operation, expansion)
@@ -233,11 +233,11 @@ def represent_operation_with_local_depolarizing_noise(
             "Consider pre-compiling your circuit."
         )
 
-    # Convert back to input type
-    imp_op_circuits = [convert_from_mitiq(c, in_type) for c in imp_op_circuits]
+    # Convert back to input type.
+    circuits = [convert_from_mitiq(c, in_type) for c in imp_op_circuits]
 
-    # Build basis_expantion
-    expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}
+    # Build basis expansion.
+    expansion = {NoisyOperation(c): a for c, a in zip(circuits, alphas)}
 
     return OperationRepresentation(ideal_operation, expansion)
 

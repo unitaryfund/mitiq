@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for PEC."""
-
+import warnings
 from typing import List, Optional
 from functools import partial
 import pytest
@@ -24,13 +24,12 @@ import cirq
 import pyquil
 import qiskit
 
-from mitiq import QPROGRAM
-from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
+from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
+from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 from mitiq.benchmarks.utils import noisy_simulation
 
 from mitiq.pec import execute_with_pec, NoisyOperation, OperationRepresentation
 from mitiq.pec import mitigate_executor, pec_decorator
-from mitiq.pec.pec import LargeSampleWarning
 from mitiq.pec.representations import (
     represent_operations_in_circuit_with_local_depolarizing_noise,
 )
@@ -83,8 +82,8 @@ def serial_executor(circuit: QPROGRAM, noise: float = BASE_NOISE) -> float:
     return noisy_simulation(circuit, noise, obs)
 
 
-def batched_executor(circuits) -> np.ndarray:
-    return np.array([serial_executor(circuit) for circuit in circuits])
+def batched_executor(circuits) -> List[float]:
+    return [serial_executor(circuit) for circuit in circuits]
 
 
 def noiseless_serial_executor(circuit: QPROGRAM) -> float:
@@ -183,8 +182,8 @@ def test_pyquil_noiseless_decomposition_multiqubit(nqubits):
         representation = OperationRepresentation(
             ideal=pyquil.Program(pyquil.gates.H(q)),
             basis_expansion={
-                NoisyOperation(ideal=pyquil.Program(pyquil.gates.X(q))): 0.5,
-                NoisyOperation(ideal=pyquil.Program(pyquil.gates.Z(q))): 0.5,
+                NoisyOperation(circuit=pyquil.Program(pyquil.gates.X(q))): 0.5,
+                NoisyOperation(circuit=pyquil.Program(pyquil.gates.Z(q))): 0.5,
             },
         )
         representations.append(representation)
@@ -222,8 +221,8 @@ def test_qiskit_noiseless_decomposition_multiqubit(nqubits):
         representation = OperationRepresentation(
             ideal=opcircuit,
             basis_expansion={
-                NoisyOperation(ideal=xcircuit): 0.5,
-                NoisyOperation(ideal=zcircuit): 0.5,
+                NoisyOperation(circuit=xcircuit): 0.5,
+                NoisyOperation(circuit=zcircuit): 0.5,
             },
         )
         representations.append(representation)
@@ -241,7 +240,7 @@ def test_qiskit_noiseless_decomposition_multiqubit(nqubits):
 
 @pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
 @pytest.mark.parametrize("executor", [serial_executor, batched_executor])
-@pytest.mark.parametrize("circuit_type", ["cirq", "qiskit", "pyquil"])
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
 def test_execute_with_pec_mitigates_noise(circuit, executor, circuit_type):
     """Tests that execute_with_pec mitigates the error of a noisy
     expectation value.
@@ -362,13 +361,13 @@ def test_bad_precision_argument(bad_value: float):
         )
 
 
-@pytest.mark.skip(reason="Slow test.")
 def test_large_sample_size_warning():
     """Tests whether a warning is raised when PEC sample size
     is greater than 10 ** 5.
     """
-    with pytest.warns(
-        LargeSampleWarning, match=r"The number of PEC samples is very large.",
+    warnings.simplefilter("error")
+    with pytest.raises(
+        Warning, match="The number of PEC samples is very large.",
     ):
         execute_with_pec(
             oneq_circ,

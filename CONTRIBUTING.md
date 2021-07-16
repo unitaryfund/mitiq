@@ -141,7 +141,7 @@ In order to check if `black` would reformat the code, use
 ```bash
 (myenv) make check-format
 ```
-If above format check fails then you will be presented with a [diff](https://black.readthedocs.io/en/stable/installation_and_usage.html#command-line-options) which can be resolved by running
+If above format check fails then you will be presented with a [diff](https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#diffs) which can be resolved by running
 ```bash
 (myenv) make format
 ```

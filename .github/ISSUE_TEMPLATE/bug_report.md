@@ -2,7 +2,7 @@
 name: Bug report
 about: Create a report to help us improve mitiq
 title: ''
-labels: 'bug'
+labels: bug
 assignees: ''
 
 ---
@@ -53,4 +53,3 @@ Additional Python Environment Details (`pip freeze` or `conda list`):
 ```
 Copy and paste the output of `pip freeze` or `conda list` here.
 ```
-

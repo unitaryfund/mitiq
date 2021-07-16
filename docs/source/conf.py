@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.abspath("../../"))
 
 # -- Project information -----------------------------------------------------
 
-project = "mitiq"
+project = "Mitiq"
 copyright = "2020, Tech Team @ Unitary Fund"
 author = "Tech Team @ Unitary Fund"
 
@@ -152,20 +152,6 @@ execution_timeout = 600
 # By default, if nothing has changed in the source, a notebook won't be
 # re-run for a subsequent docs build.
 jupyter_execute_notebooks = "cache"
-
-# -- Options for doctest -----------------------------------------------------
-doctest_global_setup = """
-try:
-  from mitiq import *
-  from mitiq.zne.inference import *
-  from mitiq.benchmarks.maxcut import *
-except:
-  pass
-try:
-  from cirq import *
-except:
-  pass
-"""
 
 # -- Options for autodoc -----------------------------------------------------
 napoleon_google_docstring = True

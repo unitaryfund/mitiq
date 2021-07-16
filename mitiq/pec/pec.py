@@ -23,7 +23,7 @@ import numpy as np
 
 from mitiq import generate_collected_executor, QPROGRAM
 from mitiq.pec import sample_circuit, OperationRepresentation
-from mitiq.conversions import convert_to_mitiq
+from mitiq.interface import convert_to_mitiq
 
 
 class LargeSampleWarning(Warning):
@@ -41,7 +41,7 @@ _LARGE_SAMPLE_WARN = (
 
 def execute_with_pec(
     circuit: QPROGRAM,
-    executor: Callable,
+    executor: Callable[[QPROGRAM], float],
     representations: List[OperationRepresentation],
     precision: float = 0.03,
     num_samples: Optional[int] = None,
@@ -109,8 +109,12 @@ def execute_with_pec(
             f" but precision is {precision}."
         )
 
+    converted_circuit, _ = convert_to_mitiq(circuit)
+
     # Get the 1-norm of the circuit quasi-probability representation
-    _, _, norm = sample_circuit(circuit, representations)
+    _, _, norm = sample_circuit(
+        converted_circuit, representations, num_samples=1,
+    )
 
     # Deduce the number of samples (if not given by the user)
     if not isinstance(num_samples, int):
@@ -120,24 +124,25 @@ def execute_with_pec(
     if num_samples > 10 ** 5:
         warnings.warn(_LARGE_SAMPLE_WARN, LargeSampleWarning)
 
-    sampled_circuits = []
-    signs = []
-    converted_circuit, _ = convert_to_mitiq(circuit)
-    for _ in range(num_samples):
-        sampled_circuit, sign, _ = sample_circuit(
-            converted_circuit, representations, random_state
-        )
-        sampled_circuits.append(sampled_circuit)
-        signs.append(sign)
+    # Sample all the circuits
+    sampled_circuits, signs, _ = sample_circuit(
+        converted_circuit,
+        representations,
+        random_state=random_state,
+        num_samples=num_samples,
+    )
 
     # Execute all sampled circuits
     collected_executor = generate_collected_executor(
         executor, force_run_all=force_run_all
     )
-    exp_values = collected_executor(sampled_circuits)
+    results = collected_executor(sampled_circuits)
 
     # Evaluate unbiased estimators [Temme2017] [Endo2018] [Takagi2020]
-    unbiased_estimators = [norm * s * val for s, val in zip(signs, exp_values)]
+    unbiased_estimators = [
+        norm * s * val  # type: ignore[operator]
+        for s, val in zip(signs, results)
+    ]
 
     pec_value = np.average(unbiased_estimators)
 
@@ -153,7 +158,7 @@ def execute_with_pec(
         "pec_value": pec_value,
         "pec_error": np.std(unbiased_estimators) / np.sqrt(num_samples),
         "unbiased_estimators": unbiased_estimators,
-        "measured_expectation_values": exp_values,
+        "measured_expectation_values": results,
         "sampled_circuits": sampled_circuits,
     }
 
@@ -161,7 +166,7 @@ def execute_with_pec(
 
 
 def mitigate_executor(
-    executor: Callable,
+    executor: Callable[[QPROGRAM], float],
     representations: List[OperationRepresentation],
     precision: float = 0.03,
     num_samples: Optional[int] = None,
@@ -225,8 +230,11 @@ def pec_decorator(
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
 ) -> Callable[
-    [Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]],
-    Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]],
+    [Callable[[Union[QPROGRAM, Any, Any, Any]], float]],
+    Callable[
+        [Union[QPROGRAM, Any, Any, Any]],
+        Union[float, Tuple[float, Dict[str, Any]]],
+    ],
 ]:
     """Decorator which adds probabilistic error cancellation (PEC) mitigation
     to an executor function, i.e., a function which executes a quantum circuit
@@ -253,9 +261,7 @@ def pec_decorator(
     """
 
     def decorator(
-        executor: Callable[
-            [QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]
-        ]
+        executor: Callable[[QPROGRAM], float]
     ) -> Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]:
         return mitigate_executor(
             executor,

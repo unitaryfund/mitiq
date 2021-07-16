@@ -16,14 +16,14 @@
 """Types used in probabilistic error cancellation."""
 from copy import deepcopy
 from itertools import product
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Union
+from typing import Any, cast, Dict, List, Optional, Sequence, Set, Tuple, Union
 
 import numpy as np
 
 import cirq
 
 from mitiq import QPROGRAM
-from mitiq.conversions import (
+from mitiq.interface import (
     convert_from_mitiq,
     convert_to_mitiq,
     CircuitConversionError,
@@ -33,105 +33,117 @@ from mitiq.utils import _equal
 
 
 class NoisyOperation:
-    """An operation (or sequence of operations) which a quantum computer can
-     actually implement.
-     """
+    """An operation (or sequence of operations) which a noisy quantum computer
+    can actually implement.
+    """
 
     def __init__(
-        self, ideal: QPROGRAM, real: Optional[np.ndarray] = None
+        self, circuit: QPROGRAM, channel_matrix: Optional[np.ndarray] = None
     ) -> None:
         """Initializes a NoisyOperation.
 
         Args:
-            ideal: The operation a noiseless quantum computer would implement.
-            real: Superoperator representation of the actual operation
-                implemented on a noisy quantum computer, if known.
+            circuit: A short circuit which, when executed on a given noisy
+                quantum computer, generates a noisy channel. It typically
+                contains a single-gate or a short sequence of gates.
+            channel_matrix: Superoperator representation of the noisy channel
+                which is generated when executing the input ``circuit`` on the
+                noisy quantum computer.
 
         Raises:
-            TypeError: If ideal is not a QPROGRAM.
+            TypeError: If ``ideal`` is not a ``QPROGRAM``.
         """
-        self._native_ideal = ideal
+        self._native_circuit = circuit
 
         try:
-            ideal_cirq, self._native_type = convert_to_mitiq(ideal)
+            ideal_cirq, self._native_type = convert_to_mitiq(circuit)
         except (CircuitConversionError, UnsupportedCircuitError):
             raise TypeError(
-                f"Arg `ideal` must be one of {QPROGRAM} but was {type(ideal)}."
+                f"Arg `circuit` must be one of {QPROGRAM} but"
+                f" was {type(circuit)}."
             )
 
-        self._init_from_cirq(ideal_cirq, real)
+        self._init_from_cirq(ideal_cirq, channel_matrix)
 
     @staticmethod
     def from_cirq(
-        ideal: cirq.CIRCUIT_LIKE, real: Optional[np.ndarray] = None
+        circuit: cirq.CIRCUIT_LIKE, channel_matrix: Optional[np.ndarray] = None
     ) -> "NoisyOperation":
-        if isinstance(ideal, cirq.Gate):
-            qubits = tuple(cirq.LineQubit.range(ideal.num_qubits()))
-            ideal = cirq.Circuit(ideal.on(*qubits))
+        if isinstance(circuit, cirq.Gate):
+            qubits = tuple(cirq.LineQubit.range(circuit.num_qubits()))
+            circuit = cirq.Circuit(circuit.on(*qubits))
 
-        elif isinstance(ideal, cirq.Operation):
-            ideal = cirq.Circuit(ideal)
+        elif isinstance(circuit, cirq.Operation):
+            circuit = cirq.Circuit(circuit)
 
-        elif isinstance(ideal, cirq.Circuit):
-            ideal = deepcopy(ideal)
+        elif isinstance(circuit, cirq.Circuit):
+            circuit = deepcopy(circuit)
 
         else:
             try:
-                ideal = cirq.Circuit(ideal)
+                circuit = cirq.Circuit(circuit)
             except Exception:
                 raise ValueError(
-                    f"Arg `ideal` must be cirq.CIRCUIT_LIKE "
-                    f"but was {type(ideal)}."
+                    f"Arg `circuit` must be cirq.CIRCUIT_LIKE "
+                    f"but was {type(circuit)}."
                 )
-        return NoisyOperation(ideal, real)
+        return NoisyOperation(circuit, channel_matrix)
 
     def _init_from_cirq(
-        self, ideal: cirq.Circuit, real: Optional[np.ndarray] = None
+        self,
+        circuit: cirq.Circuit,
+        channel_matrix: Optional[np.ndarray] = None,
     ) -> None:
         """Initializes a noisy operation expressed as a Cirq circuit.
 
         Args:
-            ideal: An ideal (noiseless) circuit.
-            real: Superoperator of the ideal circuit performed when
-                implemented on a quantum processor.
+            circuit: A circuit which, when executed on a given noisy quantum
+                computer, generates a noisy channel.
+            channel_matrix: Superoperator representation of the noisy channel
+                which is generated when executing the input ``circuit`` on the
+                noisy quantum computer.
 
         Raises:
-            ValueError:
-                * If the shape of `real` does not match the expected shape
-                    from `ideal`.
+            ValueError: If the shape of `channel_matrix` does not match the
+            shape expected from the size of `circuit`.
         """
-        self._ideal = deepcopy(ideal)
+        self._circuit = deepcopy(circuit)
 
-        self._qubits = tuple(self._ideal.all_qubits())
+        self._qubits = tuple(self._circuit.all_qubits())
         self._num_qubits = len(self._qubits)
         self._dimension = 2 ** self._num_qubits
 
-        if real is None:
-            self._real = None
+        if channel_matrix is None:
+            self._channel_matrix = None
             return
 
-        if real.shape != (self._dimension ** 2, self._dimension ** 2):
+        if channel_matrix.shape != (
+            self._dimension ** 2,
+            self._dimension ** 2,
+        ):
             raise ValueError(
-                f"Arg `real` has shape {real.shape} but `ideal` has shape"
+                f"Arg `channel_matrix` has shape {channel_matrix.shape}"
+                " but the expected shape is"
                 f" {self._dimension ** 2, self._dimension ** 2}."
             )
-        # TODO: Check if real is a valid superoperator.
-        self._real = deepcopy(real)
+        # TODO: Check if channel_matrix is a valid superoperator.
+        self._channel_matrix = deepcopy(channel_matrix)
 
     @staticmethod
     def on_each(
-        ideal: cirq.CIRCUIT_LIKE,
+        circuit: cirq.CIRCUIT_LIKE,
         qubits: Sequence[List[cirq.Qid]],
-        real: Optional[np.ndarray] = None,
+        channel_matrix: Optional[np.ndarray] = None,
     ) -> List["NoisyOperation"]:
-        """Returns a NoisyOperation(ideal, real) on each qubit in qubits.
+        """Returns a NoisyOperation(circuit, channel_matrix) on each
+        qubit in qubits.
 
         Args:
-            ideal: An ideal (noiseless) gate, operation, sequence of
-                operations, or circuit.
-            real: Superoperator of the ideal operation performed when
-                implemented on a quantum processor.
-            qubits: The qubits to implement `ideal` on.
+            circuit: A gate, operation, sequence of operations, or circuit.
+            channel_matrix: Superoperator representation of the noisy channel
+                which is generated when executing the input ``circuit`` on the
+                noisy quantum computer.
+            qubits: The qubits to implement ``circuit`` on.
 
         Raises:
             TypeError:
@@ -145,14 +157,14 @@ class NoisyOperation:
             raise TypeError("Argument `qubits` must be iterable.")
 
         try:
-            num_qubits_needed = cirq.num_qubits(ideal)
+            num_qubits_needed = cirq.num_qubits(circuit)
         except TypeError:
             raise ValueError(
-                "Could not deduce number of qubits needed by `ideal`."
+                "Could not deduce number of qubits needed by `circuit`."
             )
 
         if all(isinstance(q, cirq.Qid) for q in qubits):
-            qubits = [[q] for q in qubits]
+            qubits = cast(Sequence[List[cirq.Qid]], [[q] for q in qubits])
 
         if not all(len(qreg) == num_qubits_needed for qreg in qubits):
             raise ValueError(
@@ -161,7 +173,9 @@ class NoisyOperation:
             )
 
         noisy_ops = []  # type: List[NoisyOperation]
-        base_circuit = NoisyOperation.from_cirq(ideal, real).ideal_circuit()
+        base_circuit = NoisyOperation.from_cirq(
+            circuit, channel_matrix,
+        )._circuit
         base_qubits = list(base_circuit.all_qubits())
 
         for new_qubits in qubits:
@@ -173,23 +187,25 @@ class NoisyOperation:
             qubit_map = dict(zip(base_qubits, new_qubits))
             new_circuit = base_circuit.transform_qubits(lambda q: qubit_map[q])
 
-            noisy_ops.append(NoisyOperation(new_circuit, real))
+            noisy_ops.append(NoisyOperation(new_circuit, channel_matrix))
 
         return noisy_ops
 
     def extend_to(
         self, qubits: Sequence[List[cirq.Qid]]
     ) -> Sequence["NoisyOperation"]:
-        return [self] + NoisyOperation.on_each(self._ideal, qubits, self._real)
+        return [self] + NoisyOperation.on_each(
+            self._circuit, qubits, self._channel_matrix,
+        )
 
     @staticmethod
     def from_noise_model(
-        ideal: cirq.CIRCUIT_LIKE, noise_model
+        circuit: cirq.CIRCUIT_LIKE, noise_model: Any
     ) -> "NoisyOperation":
         raise NotImplementedError
 
-    def ideal_circuit(self, return_type: Optional[str] = None) -> cirq.Circuit:
-        """Returns the ideal circuit of the NoisyOperation.
+    def circuit(self, return_type: Optional[str] = None) -> QPROGRAM:
+        """Returns the circuit of the NoisyOperation.
 
         Args:
             return_type: Type of the circuit to return.
@@ -197,11 +213,11 @@ class NoisyOperation:
                 circuit used to initialize the NoisyOperation.
         """
         if not return_type:
-            return self._native_ideal
-        return convert_from_mitiq(self._ideal, return_type)
+            return self._native_circuit
+        return convert_from_mitiq(self._circuit, return_type)
 
     @property
-    def qubits(self) -> Tuple[cirq.Qid]:
+    def qubits(self) -> Tuple[cirq.Qid, ...]:
         return self._qubits
 
     @property
@@ -210,17 +226,17 @@ class NoisyOperation:
 
     @property
     def ideal_unitary(self) -> np.ndarray:
-        return cirq.unitary(self._ideal)
+        return cirq.unitary(self._circuit)
 
     @property
-    def ideal_matrix(self) -> np.ndarray:
+    def ideal_channel_matrix(self) -> np.ndarray:
         raise NotImplementedError
 
     @property
-    def real_matrix(self) -> np.ndarray:
-        if self._real is None:
-            raise ValueError("Real matrix is unknown.")
-        return deepcopy(self._real)
+    def channel_matrix(self) -> np.ndarray:
+        if self._channel_matrix is None:
+            raise ValueError("The channel matrix is unknown.")
+        return deepcopy(self._channel_matrix)
 
     def transform_qubits(
         self, qubits: Union[cirq.Qid, Sequence[cirq.Qid]]
@@ -235,9 +251,9 @@ class NoisyOperation:
                 of the noisy operation.
         """
         try:
-            qubits = list(iter(qubits))
+            qubits = list(iter(cast(Sequence[cirq.Qid], qubits)))
         except TypeError:
-            qubits = [qubits]
+            qubits = [cast(cirq.Qid, qubits)]
 
         if len(qubits) != self._num_qubits:
             raise ValueError(
@@ -246,7 +262,7 @@ class NoisyOperation:
             )
 
         qubit_map = dict(zip(self._qubits, qubits))
-        self._ideal = self._ideal.transform_qubits(lambda q: qubit_map[q])
+        self._circuit = self._circuit.transform_qubits(lambda q: qubit_map[q])
         self._qubits = tuple(qubits)
 
     def with_qubits(self, qubits: Sequence[cirq.Qid]) -> "NoisyOperation":
@@ -265,7 +281,7 @@ class NoisyOperation:
 
     def copy(self) -> "NoisyOperation":
         """Returns a copy of the NoisyOperation."""
-        return NoisyOperation(self._ideal, self._real)
+        return NoisyOperation(self._circuit, self._channel_matrix)
 
     def __add__(self, other: Any) -> "NoisyOperation":
         if not isinstance(other, NoisyOperation):
@@ -276,12 +292,15 @@ class NoisyOperation:
         if self.qubits != other.qubits:
             raise NotImplementedError
 
-        return NoisyOperation(
-            self._ideal + other._ideal, self._real @ other._real
-        )
+        if self._channel_matrix is None or other._channel_matrix is None:
+            matrix = None
+        else:
+            matrix = other._channel_matrix @ self._channel_matrix
+
+        return NoisyOperation(self._circuit + other._circuit, matrix)
 
     def __str__(self) -> str:
-        return self._ideal.__str__()
+        return self._circuit.__str__()
 
 
 class NoisyBasis:
@@ -315,7 +334,7 @@ class NoisyBasis:
             qubits.update(set(noisy_op.qubits))
         return qubits
 
-    def add(self, *basis_elements) -> None:
+    def add(self, *basis_elements: Sequence["NoisyOperation"]) -> None:
         """Add elements to the NoisyBasis.
 
         Args:
@@ -339,9 +358,9 @@ class NoisyBasis:
             self._basis_elements.update(
                 set(
                     NoisyOperation.on_each(
-                        noisy_op.ideal_circuit(return_type="cirq"),
+                        noisy_op.circuit(return_type="cirq"),  # type: ignore
                         qubits,
-                        noisy_op.real_matrix,
+                        noisy_op.channel_matrix,
                     )
                 )
             )
@@ -366,10 +385,10 @@ class NoisyBasis:
             sequences.append(this_sequence)
         return sequences
 
-    def represent(self, ideal: QPROGRAM):
+    def represent(self, circuit: QPROGRAM) -> None:
         raise NotImplementedError
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._basis_elements)
 
 
@@ -405,23 +424,33 @@ class OperationRepresentation:
 
         self._basis_expansion = cirq.LinearDict(basis_expansion)
         self._norm = sum(abs(coeff) for coeff in self.coeffs)
-        self._distribution = np.array(list(map(abs, self.coeffs))) / self.norm
+        self._distribution = (
+            np.array(
+                list(
+                    map(
+                        abs,  # type: ignore
+                        self.coeffs,
+                    )
+                )
+            )
+            / self.norm
+        )
 
     @property
     def ideal(self) -> QPROGRAM:
         return self._ideal
 
     @property
-    def basis_expansion(self) -> cirq.LinearDict:
+    def basis_expansion(self) -> cirq.LinearDict[NoisyOperation]:
         return self._basis_expansion
 
     @property
-    def noisy_operations(self) -> Tuple[NoisyOperation]:
+    def noisy_operations(self) -> Tuple[NoisyOperation, ...]:
         return tuple(self._basis_expansion.keys())
 
     @property
-    def coeffs(self) -> Tuple[float]:
-        return tuple(self._basis_expansion.values())
+    def coeffs(self) -> Tuple[float, ...]:
+        return tuple(cast(List[float], self._basis_expansion.values()))
 
     @property
     def norm(self) -> float:
@@ -449,7 +478,7 @@ class OperationRepresentation:
             raise ValueError(
                 "Arg `noisy_op` does not appear in the basis expansion."
             )
-        return self._basis_expansion.get(noisy_op)
+        return cast(float, self._basis_expansion.get(noisy_op))
 
     def sign_of(self, noisy_op: NoisyOperation) -> float:
         """Returns the sign of the noisy operation in the basis expansion.
@@ -483,30 +512,33 @@ class OperationRepresentation:
         noisy_op = rng.choice(self.noisy_operations, p=self.distribution())
         return noisy_op, int(self.sign_of(noisy_op)), self.coeff_of(noisy_op)
 
-    def __str__(self):
+    def __str__(self) -> str:
         # TODO: This works well for one-qubit representations, but doesn't
         #  display nicely in general.
         return str(self._ideal) + " = " + str(self.basis_expansion)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Checks if two representations are equivalent. This function return
         True if the representations have the same ideal operation, the same
         coefficients and equivalent NoisyOperation(s) (same gates but not
-        necessarily same real matrix representations since real matrices are
-        optional).
+        necessarily same channel_matrix matrix representations since
+        channel_matrix matrices are optional).
         """
         if self._native_type != other._native_type:
             return False
-        if not _equal(self.ideal, other.ideal):
+
+        if not _equal(self._ideal, other._ideal):
             return False
+
         noisy_ops_a = self.noisy_operations
         noisy_ops_b = other.noisy_operations
         if len(noisy_ops_a) != len(noisy_ops_b):
             return False
+
         for op_a in noisy_ops_a:
             found = False
             for op_b in noisy_ops_b:
-                if _equal(op_a._ideal, op_b._ideal):
+                if _equal(op_a._circuit, op_b._circuit):
                     found = True
                     break
             if not found:

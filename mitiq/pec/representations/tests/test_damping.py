@@ -32,7 +32,7 @@ from mitiq.pec.representations.damping import (
 )
 
 from mitiq.pec.channels import _operation_to_choi, _circuit_to_choi
-from mitiq.conversions import convert_from_mitiq
+from mitiq.interface import convert_from_mitiq
 
 
 @pytest.mark.parametrize("noise", [0, 0.1, 0.7])
@@ -63,7 +63,7 @@ def test_amplitude_damping_representation_with_choi(
     )
     choi_components = []
     for noisy_op, coeff in op_rep.basis_expansion.items():
-        implementable_circ = noisy_op.ideal_circuit()
+        implementable_circ = noisy_op.circuit()
         depolarizing_op = AmplitudeDampingChannel(noise).on(q)
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.

@@ -15,7 +15,7 @@
 
 """Functions for finding optimal representations given a noisy basis."""
 
-from typing import List, Optional
+from typing import cast, List, Optional
 
 import numpy as np
 from scipy.optimize import minimize, LinearConstraint
@@ -23,7 +23,7 @@ from scipy.optimize import minimize, LinearConstraint
 from cirq import channel
 
 from mitiq import QPROGRAM
-from mitiq.conversions import convert_to_mitiq
+from mitiq.interface import convert_to_mitiq
 from mitiq.pec.types import NoisyBasis, OperationRepresentation
 from mitiq.pec.channels import matrix_to_vector, kraus_to_super
 
@@ -40,6 +40,8 @@ def minimize_one_norm(
     the following representation of the input ``ideal_matrix`` holds:
 
     .. math::
+        :nowrap:
+
         \text{ideal_matrix} = x_0 A_0 + x_1 A_1 + ...,
 
     where :math:`\{A_j\}` are the basis matrices, i.e., the elements of
@@ -78,7 +80,7 @@ def minimize_one_norm(
 
     constraint = LinearConstraint(matrix_a, lb=array_b - tol, ub=array_b + tol)
 
-    def one_norm(x):
+    def one_norm(x: np.ndarray) -> float:
         return np.linalg.norm(x, 1)
 
     if initial_guess is None:
@@ -123,14 +125,16 @@ def find_optimal_representation(
 
     Returns: The optimal OperationRepresentation.
     """
-    ideal_cirq, _ = convert_to_mitiq(ideal_operation)
-    ideal_matrix = kraus_to_super(channel(ideal_cirq))
+    ideal_cirq_circuit, _ = convert_to_mitiq(ideal_operation)
+    ideal_matrix = kraus_to_super(
+        cast(List[np.ndarray], channel(ideal_cirq_circuit))
+    )
     basis_set = noisy_basis.elements
 
     try:
-        basis_matrices = [noisy_op.real_matrix for noisy_op in basis_set]
+        basis_matrices = [noisy_op.channel_matrix for noisy_op in basis_set]
     except ValueError as err:
-        if str(err) == "Real matrix is unknown.":
+        if str(err) == "The channel matrix is unknown.":
             raise ValueError(
                 "The input noisy_basis should contain NoisyOperation objects"
                 " which are initialized with a numerical superoperator matrix."

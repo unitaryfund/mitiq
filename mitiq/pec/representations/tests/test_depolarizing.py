@@ -46,7 +46,7 @@ from mitiq.pec.representations.depolarizing import (
 
 from mitiq.pec.channels import _operation_to_choi, _circuit_to_choi
 from mitiq.utils import _equal
-from mitiq.conversions import convert_to_mitiq, convert_from_mitiq
+from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 
 
 def single_qubit_depolarizing_overhead(noise_level: float) -> float:
@@ -114,7 +114,7 @@ def test_depolarizing_representation_with_choi(gate: Gate, noise: float):
     )
     choi_components = []
     for noisy_op, coeff in op_rep.basis_expansion.items():
-        implementable_circ = noisy_op.ideal_circuit()
+        implementable_circ = noisy_op.circuit()
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.
         depolarizing_op = DepolarizingChannel(noise, len(qreg))(*qreg)
@@ -136,7 +136,7 @@ def test_local_depolarizing_representation_with_choi(gate: Gate, noise: float):
     )
     choi_components = []
     for noisy_op, coeff in op_rep.basis_expansion.items():
-        implementable_circ = noisy_op.ideal_circuit()
+        implementable_circ = noisy_op.circuit()
         # The representation assume local noise on each qubit.
         depolarizing_op = DepolarizingChannel(noise).on_each(*qreg)
         # Apply noise after each sequence.
