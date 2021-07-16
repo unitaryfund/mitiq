@@ -33,7 +33,7 @@ pip install mitiq
 
 ### Example
 
-Define a function which inputs a circuit returns an expectation value you want to compute, then use Mitiq to mitigate errors.
+Define a function which inputs a circuit and returns an expectation value you want to compute, then use Mitiq to mitigate errors.
 
 ```python
 import cirq
