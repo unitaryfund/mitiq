@@ -12,30 +12,31 @@ kernelspec:
 ---
 
 # Variational Quantum Eigensolver improved with Mitiq
-In this example we investigate how Mitiq can help reduce errors 
-and improve convergence of a simple VQE problem executed 
-on a simulated noisy backend. 
+In this example we investigate how Mitiq can help reduce errors
+and improve convergence of a simple VQE problem executed
+on a simulated noisy backend.
 
 
-The PyQuil VQE example shown here is adapted from 
+The PyQuil VQE example shown here is adapted from
 https://grove-docs.readthedocs.io/en/latest/vqe.html#
 and the VQE function in Grove.
 
-```{code-cell} 
+```{code-cell}
 from pyquil import get_qc, Program
 from pyquil.gates import RX, RY, MEASURE, RESET
 from typing import List, Union
 from collections import Counter
 import numpy as np
 import mitiq
-from mitiq import zne, execute_with_zne
+from mitiq import zne
+from mitiq.zne import execute_with_zne
 from pyquil.paulis import PauliTerm, PauliSum
 ```
 +++
 
 Use the get_qc command to initialize the simulated noisy device where the PyQuil program will run
 
-```{code-cell} 
+```{code-cell}
 # initialize quantum device
 qpu = get_qc("2q-noisy-qvm")
 
@@ -45,11 +46,11 @@ def ansatz(params):
 ```
 
 +++
- 
+
  Compute expectation value of the Hamiltonian over the over the distribution generated from the quantum program
-```{code-cell} 
-def expectation(qc, samples: int, 
-                pauli_sum: Union[PauliSum, PauliTerm, np.ndarray], 
+```{code-cell}
+def expectation(qc, samples: int,
+                pauli_sum: Union[PauliSum, PauliTerm, np.ndarray],
                 pyquil_prog: Program) -> float:
     """
     Compute the expectation value of pauli_sum over the distribution generated from pyquil_prog.
@@ -57,11 +58,11 @@ def expectation(qc, samples: int,
     :param pyquil_prog: The state preparation Program to calculate the expectation value of.
     :param pauli_sum: PauliSum representing the operator of which to calculate the expectation
             value
-    :param samples: The number of samples used to calculate the expectation value. 
+    :param samples: The number of samples used to calculate the expectation value.
     :param qc: The QuantumComputer object.
     :return: A float representing the expectation value of pauli_sum given the distribution
             generated from quil_prog.
-        """ 
+        """
     expectation = 0.0
     pauli_sum = PauliSum([pauli_sum])
     for j, term in enumerate(pauli_sum.terms):
@@ -83,8 +84,8 @@ def expectation(qc, samples: int,
 +++
 
 Calculates the parity of elements at indexes in marked_qubits
-   
-```{code-cell} 
+
+```{code-cell}
 def parity_even_p(state, marked_qubits):
     """
     Parity is relative to the binary representation of the integer state.
@@ -102,7 +103,7 @@ def parity_even_p(state, marked_qubits):
 +++
 
 calculate the expectation value of the Zi operator at marked_qubits
-```{code-cell} 
+```{code-cell}
 def expectation_from_sampling(pyquil_program: Program,
                               marked_qubits: List[int], qc,
                               samples: int) -> float:
@@ -122,7 +123,7 @@ def expectation_from_sampling(pyquil_program: Program,
     program = Program()
     ro = program.declare('ro', 'BIT', max(marked_qubits) + 1)
     program += pyquil_program
-    program += [MEASURE(qubit, r) 
+    program += [MEASURE(qubit, r)
                 for qubit, r in zip(list(range(max(marked_qubits) + 1)), ro)]
     program.wrap_in_numshots_loop(samples)
     executable = qc.compile(program)
@@ -145,32 +146,32 @@ def expectation_from_sampling(pyquil_program: Program,
 
 Hamiltonian in this example is just sigma_z on the zeroth qubit
 
-```{code-cell} 
+```{code-cell}
 from pyquil.paulis import sZ
 hamiltonian = sZ(0)
 ```
 +++
 
 define objective function mapping the set of experimental parameters to the expectation value
-```{code-cell} 
+```{code-cell}
 def objective(params, program):
-   
+
     program += ansatz(params)
-    samples = 10000 
+    samples = 10000
     return expectation(qpu, samples, hamiltonian, program)
 ```
 
 +++
 
 run VQE routine without noise mitigation
-```{code-cell} 
+```{code-cell}
 from scipy.optimize import minimize
 ```
 
 +++
 
 define initial experimental parameters
-```{code-cell} 
+```{code-cell}
 initial_angle = [0.000, 0.000]
 program = Program()
 ```
@@ -178,16 +179,16 @@ program = Program()
 +++
 
 calculate expectation value from initial parameters
-```{code-cell} 
+```{code-cell}
 print(objective(initial_angle, program))
 ```
 
 +++
 
-use the Nelder-Mead method in scipy minimizer to find the minimimum of the expectation value 
+use the Nelder-Mead method in scipy minimizer to find the minimimum of the expectation value
 ```{code-cell}
 minimum = minimize(
-          objective, initial_angle, args = (program), 
+          objective, initial_angle, args = (program),
           method = 'Nelder-Mead',  options = {'disp': True, 'maxiter': 100,'xatol': 1.0e-2})
 ```
 
@@ -195,34 +196,34 @@ minimum = minimize(
 
 re-run VQE, with noise mitigation technique Zero Noise Extrapolation
 ```{code-cell}
-# add noise scaling 
-fac = zne.inference.LinearFactory(scale_factors = [1.0, 7.0]) 
+# add noise scaling
+fac = zne.inference.LinearFactory(scale_factors = [1.0, 7.0])
 
-# re-initialize program 
+# re-initialize program
 program = Program()
 ```
 
 +++
 
 update objective function to calculate expecation value w/ noise mitigation
-```{code-cell} 
+```{code-cell}
 from functools import partial
 def objective_zne(params, program):
-    program += ansatz(params)    
+    program += ansatz(params)
     samples = 10000
-    return execute_with_zne(program, 
-                            partial(expectation, qpu, samples, hamiltonian), 
+    return execute_with_zne(program,
+                            partial(expectation, qpu, samples, hamiltonian),
                             fac)
-    
+
 print(objective_zne(initial_angle, program))
-min_zne = minimize(objective_zne, initial_angle, args = (program), 
-                   method = 'Nelder-Mead', 
+min_zne = minimize(objective_zne, initial_angle, args = (program),
+                   method = 'Nelder-Mead',
                    options = {'disp': True, 'maxiter': 100, 'xatol': 1.0e-2})
 ```
 
 
 ## References
-[1] [VQE tutorial in PyQuil.] 
+[1] [VQE tutorial in PyQuil.]
 https://grove-docs.readthedocs.io/en/latest/vqe.html#
 
 [2] Rigetti Computing (2018) Grove (Version 1.7.0) [Source code].https://github.com/rigetti/grove
@@ -231,6 +232,6 @@ https://grove-docs.readthedocs.io/en/latest/vqe.html#
 +++
 
 display information about Mitiq, packages, and Python version/platform
-```{code-cell} 
+```{code-cell}
 mitiq.about()
 ```

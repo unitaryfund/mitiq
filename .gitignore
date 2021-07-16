@@ -6,6 +6,7 @@
 *.dat
 *.ipynp
 *.ipynb_checkpoints
+*.jupyter_cache
 _build
 __pycache__/
 docs/build/
