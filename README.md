@@ -50,16 +50,17 @@ def execute(circuit: cirq.Circuit, noise_level: float = 0.001) -> float:
 
 circuit: cirq.Circuit = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=50)[0]
 
-noisy_value = execute(circuit)
-print(f"Error (w/o  mitigation): {abs(1.0 - noisy_value):.{3}}")
+true_value = execute(circuit, noise_level=0.0)       # Ideal quantum computer.
+noisy_value = execute(circuit)                       # Noisy quantum computer.
+zne_value = zne.execute_with_zne(circuit, execute)   # Noisy quantum computer + Mitiq.
 
-zne_value = zne.execute_with_zne(circuit, execute)
-print(f"Error (with mitigation): {abs(1.0 - zne_value):.{3}}")
+print(f"Error (w/o  Mitiq): {abs(true_value - noisy_value):.{3}}")
+print(f"Error (with Mitiq): {abs(true_value - zne_value):.{3}}")
 ```
 Sample output:
 ```
-Error (w/o  mitigation): 0.0688
-Error (with mitigation): 0.000181
+Error (w/o  Mitiq): 0.0688
+Error (with Mitiq): 0.000181
 ```
 
 See the [Getting Started Guide](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html) in [Mitiq's documentation](https://mitiq.readthedocs.io) for a complete walkthrough of how to use Mitiq.
