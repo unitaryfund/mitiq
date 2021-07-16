@@ -136,10 +136,13 @@ def execute_with_pec(
     collected_executor = generate_collected_executor(
         executor, force_run_all=force_run_all
     )
-    exp_values = collected_executor(sampled_circuits)
+    results = collected_executor(sampled_circuits)
 
     # Evaluate unbiased estimators [Temme2017] [Endo2018] [Takagi2020]
-    unbiased_estimators = [norm * s * val for s, val in zip(signs, exp_values)]
+    unbiased_estimators = [
+        norm * s * val  # type: ignore[operator]
+        for s, val in zip(signs, results)
+    ]
 
     pec_value = np.average(unbiased_estimators)
 
@@ -155,7 +158,7 @@ def execute_with_pec(
         "pec_value": pec_value,
         "pec_error": np.std(unbiased_estimators) / np.sqrt(num_samples),
         "unbiased_estimators": unbiased_estimators,
-        "measured_expectation_values": exp_values,
+        "measured_expectation_values": results,
         "sampled_circuits": sampled_circuits,
     }
 
