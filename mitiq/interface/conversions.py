@@ -233,7 +233,11 @@ def noise_scaling_converter(
 
             scaled_circuit = (
                 Program(
-                    [d for d in cast(Program, circuit).declarations.values()]
+                    [
+                        v
+                        for k, v in cast(Program, circuit).declarations.items()
+                        if k != "ro"
+                    ]
                 )
                 + scaled_circuit
             )
