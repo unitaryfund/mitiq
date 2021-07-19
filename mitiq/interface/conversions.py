@@ -15,7 +15,7 @@
 
 """Functions for converting to/from Mitiq's internal circuit representation."""
 from functools import wraps
-from typing import Any, Iterable, Callable, Tuple
+from typing import Any, Callable, cast, Iterable, Tuple
 
 from cirq import Circuit
 
@@ -232,7 +232,9 @@ def noise_scaling_converter(
             from pyquil import Program
 
             scaled_circuit = (
-                Program([d for d in circuit.declarations.values()])
+                Program(
+                    [d for d in cast(Program, circuit).declarations.values()]
+                )
                 + scaled_circuit
             )
 
