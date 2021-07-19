@@ -1,20 +1,17 @@
-# Mitiq
+# <a href="https://github.com/unitaryfund/mitiq"><img src="https://github.com/unitaryfund/mitiq/blob/master/docs/source/img/mitiq-logo.png?raw=true" alt="Mitiq logo" width="350"/></a>
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-25-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
-[![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
 [![Documentation Status](https://readthedocs.org/projects/mitiq/badge/?version=stable)](https://mitiq.readthedocs.io/en/stable/)
+[![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
 [![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
 [![arXiv](https://img.shields.io/badge/arXiv-2009.04417-<COLOR>.svg)](https://arxiv.org/abs/2009.04417)
 [![Downloads](https://static.pepy.tech/personalized-badge/mitiq?period=total&units=international_system&left_color=black&right_color=green&left_text=Downloads)](https://pepy.tech/project/mitiq)
-[![Repository](https://img.shields.io/badge/GitHub-5C5C5C.svg?logo=github
-)](https://github.com/unitaryfund/mitiq)
-
-
-[![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
-
-![logo](docs/source/img/mitiq-logo.png)
+[![Repository](https://img.shields.io/badge/GitHub-5C5C5C.svg?logo=github)](https://github.com/unitaryfund/mitiq)
+[![Unitary Fund](https://img.shields.io/badge/Supported%20By-Unitary%20Fund-FFFF00.svg)](http://unitary.fund)
+[![Discord Chat](https://img.shields.io/badge/dynamic/json?color=blue&label=Discord&query=approximate_presence_count&suffix=%20online.&url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2FJqVGmpkP96%3Fwith_counts%3Dtrue)](http://discord.unitary.fund)
 
 Mitiq is a Python toolkit for implementing error mitigation techniques on
 quantum computers.
@@ -25,174 +22,90 @@ Error mitigation seeks to reduce these effects at the software level by
 compiling quantum programs in clever ways.
 
 Want to know more? Check out our
-[documentation](https://mitiq.readthedocs.io/en/stable/guide/guide-overview.html).
+[documentation](https://mitiq.readthedocs.io/en/stable/guide/guide-overview.html) and chat with us on [Discord](http://discord.unitary.fund).
 
-## Installation
+## Quickstart
 
-Mitiq can be installed from PyPi via
+### Installation
 
 ```bash
 pip install mitiq
 ```
 
-To build from source, see these [installation
-instructions](https://mitiq.readthedocs.io/en/latest/contributing.html#development-install). To test installation, run
+### Example
+
+Define a function which inputs a circuit and returns an expectation value you want to compute, then use Mitiq to mitigate errors.
 
 ```python
-import mitiq
-mitiq.about()
-```
+import cirq
+from mitiq import zne, benchmarks
 
-This prints out version information about core requirements and optional
-quantum software packages which Mitiq can interface with.
 
-If you would like to contribute to Mitiq, check out the [contribution
-guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) for
-more information.
+def execute(circuit: cirq.Circuit, noise_level: float = 0.001) -> float:
+    """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit with depolarizing noise."""
+    noisy_circuit = circuit.with_noise(cirq.depolarize(p=noise_level))
+    return cirq.DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix[0, 0].real
 
-### Supported quantum programming libraries
 
-Mitiq can currently interface with:
+circuit: cirq.Circuit = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=50)[0]
 
-* [Cirq](https://quantumai.google/cirq),
-* [Qiskit](https://qiskit.org/),
-* [pyQuil](https://github.com/rigetti/pyquil),
-* [Braket](https://github.com/aws/amazon-braket-sdk-python).
+true_value = execute(circuit, noise_level=0.0)       # Ideal quantum computer.
+noisy_value = execute(circuit)                       # Noisy quantum computer.
+zne_value = zne.execute_with_zne(circuit, execute)   # Noisy quantum computer + Mitiq.
 
-Cirq is a core requirement of Mitiq and is automatically installed. To use
-Mitiq with other quantum programming libraries, install the optional package(s)
-following the instructions linked above.
-
-### Supported quantum processors
-
-Mitiq can be used on any quantum processor which can be accessed by supported
-quantum programming libraries and is available to the user.
-
-## Getting started
-
-See the [getting
-started](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html)
-guide in [Mitiq's documentation](https://mitiq.readthedocs.io) for a complete
-walkthrough of how to use Mitiq. For a quick preview, check out the following
-snippet:
-
-```python
-import numpy as np
-from cirq import depolarize, Circuit, DensityMatrixSimulator, LineQubit, X
-from mitiq.zne import execute_with_zne
-
-def noisy_simulation(circ: Circuit) -> float:
-    """Simulates a circuit with depolarizing noise.
-
-    Args:
-        circ: The quantum program as a Cirq Circuit.
-
-    Returns:
-        The expectation value of the |0><0| observable.
-    """
-    circuit = circ.with_noise(depolarize(p=0.001))
-    rho = DensityMatrixSimulator().simulate(circuit).final_density_matrix
-    return np.real(np.trace(rho @ np.diag([1, 0])))
-
-# simple circuit that should compose to the identity when noiseless
-circ = Circuit(X(LineQubit(0)) for _ in range(80))
-
-# run the circuit using a density matrix simulator with depolarizing noise
-unmitigated = noisy_simulation(circ)
-print(f"Error in simulation (w/o  mitigation): {1.0 - unmitigated:.{3}}")
-
-# run again, but using mitiq's zero-noise extrapolation to mitigate errors
-mitigated = execute_with_zne(circ, noisy_simulation)
-print(f"Error in simulation (with mitigation): {1.0 - mitigated:.{3}}")
+print(f"Error (w/o  Mitiq): %0.4f" %abs((true_value - noisy_value) / true_value))
+print(f"Error (with Mitiq): %0.4f" %abs((true_value - zne_value) / true_value))
 ```
 Sample output:
 ```
-Error in simulation (w/o  mitigation): 0.0506
-Error in simulation (with mitigation): 0.000519
+Error (w/o  Mitiq): 0.0688
+Error (with Mitiq): 0.0002
 ```
 
-### Example with Qiskit
+See our [guides](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html) and [examples](https://mitiq.readthedocs.io) for more explanation, techniques, and benchmarks.
 
-![Alt Text](docs/source/img/qiskit.gif)
+## Quick Tour
 
+### Error mitigation techniques
 
-### Example with Cirq
+| Technique                                 | Documentation                                                                                                   | Mitiq module                                                            | Paper Reference(s)                                                                                  |
+|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
+| Zero-noise extrapolation                  | [ZNE](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html)                                              | [mitiq.zne](https://github.com/unitaryfund/mitiq/tree/master/mitiq/zne) | [1612.02058](https://arxiv.org/abs/1612.02058)                                                      |
+| Probabilistic error cancellation          | [PEC](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#probabilistic-error-cancellation) | [mitiq.pec](https://github.com/unitaryfund/mitiq/tree/master/mitiq/pec) | [1612.02058](https://arxiv.org/abs/1612.02058)                                                      |
+| (Variable-noise) Clifford data regression | [CDR](https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html)                                             | [mitiq.cdr](https://github.com/unitaryfund/mitiq/tree/master/mitiq/cdr) | [2005.10189](https://arxiv.org/abs/2005.10189)<br>[2011.01157](https://arxiv.org/abs/2011.01157)    |
+| Dynamical decoupling                      | (In progress)                                                                                                   | (In progress)                                                           | [9803057](https://arxiv.org/abs/quant-ph/9803057)<br>[1807.08768](https://arxiv.org/abs/1807.08768) |
 
-![Alt Text](docs/source/img/cirq.gif)
+See our [roadmap](https://github.com/unitaryfund/mitiq/projects/5) for additional candidate techniques to implement. If there is a technique you are looking for, please file a [feature request](https://github.com/unitaryfund/mitiq/issues/new?assignees=&labels=feature-request&template=feature_request.md&title=).
 
+### Interface
 
-## Error mitigation techniques
+We refer to any programming language you can write quantum circuits in as a *frontend*, and any quantum computer / simulator you can simulate circuits in as a *backend*.
 
-Error mitigation techniques that Mitiq implements or plans to support in the future:
+#### Supported frontends
 
-| Technique                                 | Docs                                                                                                                                  | Mitiq module                                                            | Paper Reference                                                                                     | Date Completed |
-|-------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|----------------|
-| Zero-noise extrapolation                  | [ZNE](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html)                                                                    | [mitiq.zne](https://github.com/unitaryfund/mitiq/tree/master/mitiq/zne) | [1612.02058](https://arxiv.org/abs/1612.02058)                                                      | July 2020      |
-| Probabilistic error cancellation          | [PEC](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#probabilistic-error-cancellation) | [mitiq.pec](https://github.com/unitaryfund/mitiq/tree/master/mitiq/pec) | [1612.02058](https://arxiv.org/abs/1612.02058)                                                      | Jan 2021       |
-| (Variable noise) Clifford data regression | [CDR](https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html)                                                                   | [mitiq.cdr](https://github.com/unitaryfund/mitiq/tree/master/mitiq/cdr) | [2005.10189](https://arxiv.org/abs/2005.10189)<br>[2011.01157](https://arxiv.org/abs/2011.01157)    | June 2021      |
-| Dynamical decoupling                      |                                                                                                                                       |                                                                         | [9803057](https://arxiv.org/abs/quant-ph/9803057)<br>[1807.08768](https://arxiv.org/abs/1807.08768) |                |
+| [Cirq](https://quantumai.google/cirq)                                                                                                                                         | [Qiskit](https://qiskit.org/)                                                                                          | [pyQuil](https://github.com/rigetti/pyquil)                                                                                                             | [Braket](https://github.com/aws/amazon-braket-sdk-python)                                                                                                                         |
+|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| <a href="https://quantumai.google/cirq"><img src="https://raw.githubusercontent.com/quantumlib/Cirq/master/docs/images/Cirq_logo_color.png" alt="Cirq logo" width="150"/></a> | <a href="https://qiskit.org/"><img src="https://qiskit.org/images/qiskit-logo.png" alt="Qiskit logo" width="100"/></a> | <a href="https://github.com/rigetti/pyquil"><img src="https://www.rigetti.com/uploads/Logos/logo-rigetti-gray.jpg" alt="Rigetti logo" width="150"/></a> | <a href="https://github.com/aws/amazon-braket-sdk-python"><img src="https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png" alt="AWS logo" width="150"/></a> |
 
-Mitiq is designed to support additional error mitigation techniques, take a look at the [roadmap](https://github.com/unitaryfund/mitiq/projects/5) for what is currently being considered. If there is a technique you are looking for, please file a [feature request](https://github.com/unitaryfund/mitiq/issues/new?assignees=&labels=feature-request&template=feature_request.md&title=), and we will add it to consideration.
+Note: Cirq is a core requirement of Mitiq and is installed when you `pip install mitiq`.
 
+#### Supported backends
 
-## Documentation
-
-Mitiq's documentation is hosted at [mitiq.readthedocs.io](https://mitiq.readthedocs.io).
-
-## Developer information
-
-We welcome contributions to Mitiq including bug fixes, feature requests, etc.
-Please see the [contribution
-guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) for
-more details. To contribute to the documentation, please see these
-[documentation
-guidelines](https://mitiq.readthedocs.io/en/stable/contributing_docs.html).
-
-## Authors
-
-An up-to-date list of authors can be found
-[here](https://github.com/unitaryfund/mitiq/graphs/contributors).
-
-## Research
-
-We look forward to adding new features to Mitiq. If you have a proposal
-for implementing a new quantum error mitigation technique, or adding an example
-used in your research, please read our
-[guidelines](https://mitiq.readthedocs.io/en/stable/research.html) for
-contributing.
+You can use Mitiq with any backend you have access to that can interface with supported frontends.
 
 ### Citing Mitiq
 
-If you use Mitiq in your research, please reference the [Mitiq preprint][arxiv]
-as follows:
-
-```bibtex
-@misc{larose2020mitiq,
-    title={Mitiq: A software package for error mitigation on noisy quantum computers},
-    author={Ryan LaRose and Andrea Mari and Peter J. Karalekas
-            and Nathan Shammah and William J. Zeng},
-    year={2020},
-    eprint={2009.04417},
-    archivePrefix={arXiv},
-    primaryClass={quant-ph}
-}
-```
-
-A list of papers citing Mitiq can be found [here][papers_with_mitiq].
-
-[arxiv]: https://arxiv.org/abs/2009.04417
-
-[papers_with_mitiq]: https://mitiq.readthedocs.io/en/stable/research.html#papers-citing-or-using-mitiq
+If you use Mitiq in your research, please reference the [Mitiq preprint](https://arxiv.org/abs/2009.04417) ([bibtex](https://arxiv2bibtex.org/?q=2009.04417&format=bibtex)). A list of papers citing Mitiq can be found on [Google Scholar](https://scholar.google.com/scholar?cites=12810395086731011605) / [Semantic Scholar](https://www.semanticscholar.org/paper/Mitiq%3A-A-software-package-for-error-mitigation-on-LaRose-Mari/dc55b366d5b2212c6df8cd5c0bf05bab13104bd7#citing-papers).
 
 ## License
 
 [GNU GPL v.3.0.](https://github.com/unitaryfund/mitiq/blob/master/LICENSE)
 
-### unitaryHACK
+## Contributing
 
-Mitiq is participating in [unitaryHACK](http://hack2021.unitary.fund/), check
-out and contribute on open issues labeled
-[`unitaryhack`](https://github.com/unitaryfund/mitiq/labels/unitaryhack)!
+We welcome contributions to Mitiq including bug fixes, feature requests, etc. To get started, check out our [contribution
+guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) and/or [documentation guidelines](https://mitiq.readthedocs.io/en/stable/contributing_docs.html). 
+An up-to-date list of contributors can be found [here](https://github.com/unitaryfund/mitiq/graphs/contributors) and below.
 
 ## Contributors ✨
 
