@@ -227,6 +227,15 @@ def noise_scaling_converter(
             circuit, *args, **kwargs
         )
 
+        # Add back declarations (e.g., memory references) for PyQuil Programs.
+        if "pyquil" in scaled_circuit.__module__:
+            from pyquil import Program
+
+            scaled_circuit = (
+                Program([d for d in circuit.declarations.values()])
+                + scaled_circuit
+            )
+
         # Keep the same register structure and measurement order with Qiskit.
         if "qiskit" in scaled_circuit.__module__:
             from mitiq.interface.mitiq_qiskit.conversions import (
