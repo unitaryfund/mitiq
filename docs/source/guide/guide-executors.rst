@@ -42,6 +42,8 @@ real quantum hardware.
 
 .. testcode::
 
+    import numpy as np
+
     from pyquil import Program, get_qc
     from pyquil.gates import MEASURE, RESET, X
 
