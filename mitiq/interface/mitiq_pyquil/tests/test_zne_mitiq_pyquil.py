@@ -18,70 +18,67 @@ import numpy as np
 
 import pyquil
 
-from mitiq import QPROGRAM
-from mitiq.zne import (
-    inference,
-    scaling,
-    execute_with_zne,
-    mitigate_executor,
-    zne_decorator,
-)
-from mitiq.interface.mitiq_pyquil.pyquil_utils import (
-    generate_qcs_executor,
-    ground_state_expectation,
-)
-from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
+from mitiq import benchmarks, zne
+from mitiq.interface.mitiq_pyquil.compiler import basic_compile
 
 TEST_DEPTH = 30
-
 QVM = pyquil.get_qc("1q-qvm")
 QVM.qam.random_seed = 1337
-noiseless_executor = generate_qcs_executor(
-    qc=pyquil.get_qc("1q-qvm"),
-    expectation_fn=ground_state_expectation,
-    shots=1_000,
-)
+
+
+def noiseless_executor(program: pyquil.Program) -> float:
+    program.num_shots = 1_000
+    program = basic_compile(program)
+    executable = QVM.compiler.native_quil_to_executable(program)
+    results = QVM.run(executable)
+
+    num_shots = len(results)
+    return (
+        num_shots - np.count_nonzero(np.count_nonzero(results, axis=1))
+    ) / num_shots
 
 
 def test_run_factory():
-    qp = generate_rb_circuits(
+    (qp,) = benchmarks.generate_rb_circuits(
         n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
     )
 
-    fac = inference.RichardsonFactory([1.0, 2.0, 3.0])
+    fac = zne.inference.RichardsonFactory([1.0, 2.0, 3.0])
 
-    fac.run(*qp, noiseless_executor, scale_noise=scaling.fold_gates_at_random)
+    fac.run(
+        qp, noiseless_executor, scale_noise=zne.scaling.fold_gates_at_random
+    )
     result = fac.reduce()
     assert np.isclose(result, 1.0, atol=1e-5)
 
 
 def test_execute_with_zne():
-    qp = generate_rb_circuits(
+    (qp,) = benchmarks.generate_rb_circuits(
         n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
     )
-    result = execute_with_zne(*qp, noiseless_executor)
+    result = zne.execute_with_zne(qp, noiseless_executor)
     assert np.isclose(result, 1.0, atol=1e-5)
 
 
 def test_mitigate_executor():
-    qp = generate_rb_circuits(
+    (qp,) = benchmarks.generate_rb_circuits(
         n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
     )
 
-    new_executor = mitigate_executor(noiseless_executor)
-    result = new_executor(*qp)
+    new_executor = zne.mitigate_executor(noiseless_executor)
+    result = new_executor(qp)
     assert np.isclose(result, 1.0, atol=1e-5)
 
 
-@zne_decorator(scale_noise=scaling.fold_gates_at_random)
-def decorated_executor(qp: QPROGRAM) -> float:
+@zne.zne_decorator(scale_noise=zne.scaling.fold_gates_at_random)
+def decorated_executor(qp: pyquil.Program) -> float:
     return noiseless_executor(qp)
 
 
 def test_zne_decorator():
-    qp = generate_rb_circuits(
+    (qp,) = benchmarks.generate_rb_circuits(
         n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
     )
 
-    result = decorated_executor(*qp)
+    result = decorated_executor(qp)
     assert np.isclose(result, 1.0, atol=1e-5)

@@ -62,11 +62,6 @@ Conversions
 .. automodule:: mitiq.interface.mitiq_pyquil.conversions
    :members:
 
-PyQuil Utils
-^^^^^^^^^^^^
-.. automodule:: mitiq.interface.mitiq_pyquil.pyquil_utils
-   :members:
-
 Mitiq - Qiskit
 --------------
 

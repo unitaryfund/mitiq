@@ -280,7 +280,7 @@ quantum computing, noisy quantum dynamics and error mitigation:
 
 - **Google AI Quantum**'s `Cirq`_ offers quantum simulation of quantum circuits. The :class:`cirq.Circuit` object is integrated in Mitiq algorithms as the default circuit.
 
-- **Rigetti Computing**'s `PyQuil`_ is a library for quantum programming. Rigetti's stack offers the execution of quantum circuits on superconducting circuits devices from the cloud, as well as their simulation on a quantum virtual machine (QVM), integrated with Mitiq tools in the :mod:`~mitiq.interface.mitiq_pyquil.pyquil_utils` module.
+- **Rigetti Computing**'s `PyQuil`_ is a library for quantum programming. Rigetti's stack offers the execution of quantum circuits on superconducting circuits devices from the cloud, as well as their simulation on a quantum virtual machine (QVM), integrated with Mitiq tools in the :mod:`~mitiq.interface.mitiq_pyquil` module.
 
 - `QuTiP`_, the quantum toolbox in Python, contains a quantum information processing module that allows to simulate quantum circuits, their implementation on devices, as well as the simulation of pulse-level control and time-dependent density matrix evolution with the :class:`qutip.Qobj` object and the :class:`~qutip.qip.device.Processor` object in the ``qutip.qip`` module.
 

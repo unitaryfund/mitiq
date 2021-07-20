@@ -30,7 +30,7 @@ from cirq import (
 )
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 from qiskit.quantum_info.operators import Operator
-from pyquil import Program
+from pyquil import Program, gates
 from pyquil.quilbase import Pragma
 
 from mitiq.utils import _equal
@@ -1714,3 +1714,22 @@ def test_apply_fold_mask_with_squash_moments_option():
         [ops.T.on_each(*q), inverse(ops.T(q[0])), ops.T(q[0]), ops.H(q[1])],
     )
     assert _equal(folded, correct)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    (
+        fold_gates_from_left,
+        fold_gates_from_right,
+        fold_gates_at_random,
+        fold_global,
+    ),
+)
+def test_scaling_with_pyquil_retains_declarations(fold_method):
+    program = Program()
+    theta = program.declare("theta", memory_type="REAL")
+    _ = program.declare("beta", memory_type="REAL")
+    program += gates.RY(theta, 0)
+
+    scaled = fold_method(program, 1)
+    assert scaled.declarations == program.declarations
