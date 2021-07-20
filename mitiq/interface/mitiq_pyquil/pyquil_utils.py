@@ -19,7 +19,7 @@ from typing import Callable
 
 from pyquil import Program
 from pyquil.api import QuantumComputer
-from pyquil.gates import MEASURE, RESET
+from pyquil.gates import RESET
 
 from mitiq.interface.mitiq_pyquil.compiler import basic_compile
 
@@ -53,14 +53,6 @@ def generate_qcs_executor(
 
         # add main body program
         p += program.copy()
-
-        # add memory declaration
-        qubits = p.get_qubits()
-        ro = p.declare("ro", "BIT", len(qubits))
-
-        # add measurements
-        for idx, q in enumerate(qubits):
-            p += MEASURE(q, ro[idx])
 
         # add numshots
         p.wrap_in_numshots_loop(shots)
