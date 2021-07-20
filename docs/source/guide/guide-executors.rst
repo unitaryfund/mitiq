@@ -36,10 +36,6 @@ This executor can be used to run on `Quantum Cloud Services <https://arxiv.org/a
 (QCS), the hardware platform provided by Rigetti Computing, and requires a QCS account and
 reservation on a quantum processor (QPU).
 
-.. note::
-    The module :mod:`mitiq.interface.mitiq_pyquil` has a function ``generate_qcs_executor`` for
-    easily generating a QCS executor of this form.
-
 Note that you will have to replace the string in ``get_qc`` with the name of an actual
 Rigetti QPU, and will need to have a QCS account and reservation, in order to run on
 real quantum hardware.
@@ -50,7 +46,6 @@ real quantum hardware.
     from pyquil.gates import MEASURE, RESET, X
 
     from mitiq.interface.mitiq_pyquil.compiler import basic_compile
-    from mitiq.interface.mitiq_pyquil.pyquil_utils import ground_state_expectation
 
     # replace with qpu = get_qc("Aspen-8") to run on the Aspen-8 QPU
     qpu = get_qc("2q-pyqvm")
@@ -86,7 +81,9 @@ real quantum hardware.
         results = qpu.run(b)
 
         # compute ground state expectation value
-        return ground_state_expectation(results)
+        return (
+            shots - np.count_nonzero(np.count_nonzero(results, axis=1))
+        ) / shots
 
     # prepare state |11>
     program = Program()
