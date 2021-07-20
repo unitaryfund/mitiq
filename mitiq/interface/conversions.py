@@ -230,16 +230,33 @@ def noise_scaling_converter(
         # Add back declarations (e.g., memory references) for PyQuil Programs.
         if "pyquil" in scaled_circuit.__module__:
             from pyquil import Program
+            from pyquil.quilbase import Declare, Measurement
 
-            scaled_circuit = (
-                Program(
-                    [
-                        v
-                        for k, v in cast(Program, circuit).declarations.items()
-                        if k != "ro"
-                    ]
-                )
-                + scaled_circuit
+            # Grab all measurements from the input circuit.
+            measurements = [
+                instr
+                for instr in circuit.instructions
+                if isinstance(instr, Measurement)
+            ]
+
+            # Remove memory declarations added from Cirq -> pyQuil conversion.
+            new_declarations = {
+                k: v
+                for k, v in scaled_circuit.declarations.items()
+                if k == "ro" or v.memory_type != "BIT"
+            }
+            new_declarations.update(circuit.declarations)
+
+            # Delete all declarations and measurements from the scaled circuit.
+            instructions = [
+                instr
+                for instr in scaled_circuit.instructions
+                if not (isinstance(instr, (Declare, Measurement)))
+            ]
+
+            # Add back original declarations and measurements.
+            scaled_circuit = Program(
+                list(new_declarations.values()) + instructions + measurements
             )
 
         # Keep the same register structure and measurement order with Qiskit.
