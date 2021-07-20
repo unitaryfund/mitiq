@@ -259,6 +259,9 @@ def noise_scaling_converter(
                 list(new_declarations.values()) + instructions + measurements
             )
 
+            # Set the number of shots to the input circuit.
+            scaled_circuit.num_shots = circuit.num_shots
+
         # Keep the same register structure and measurement order with Qiskit.
         if "qiskit" in scaled_circuit.__module__:
             from mitiq.interface.mitiq_qiskit.conversions import (
