@@ -18,7 +18,7 @@ import numpy as np
 
 import pyquil
 
-from mitiq import benchmarks, QPROGRAM, zne
+from mitiq import benchmarks, zne
 from mitiq.interface.mitiq_pyquil.compiler import basic_compile
 
 TEST_DEPTH = 30
@@ -71,7 +71,7 @@ def test_mitigate_executor():
 
 
 @zne.zne_decorator(scale_noise=zne.scaling.fold_gates_at_random)
-def decorated_executor(qp: QPROGRAM) -> float:
+def decorated_executor(qp: pyquil.Program) -> float:
     return noiseless_executor(qp)
 
 
