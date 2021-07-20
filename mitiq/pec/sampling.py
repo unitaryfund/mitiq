@@ -31,9 +31,12 @@ def sample_sequence(
     ideal_operation: QPROGRAM,
     representations: List[OperationRepresentation],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
-) -> Tuple[QPROGRAM, int, float]:
-    """Samples an implementable sequence from the PEC representation of the
-    input ideal operation & returns this sequence as well as its sign and norm.
+    num_samples: int = 1,
+) -> Tuple[List[QPROGRAM], List[int], float]:
+    """Samples a list of implementable sequences from the quasi-probability
+    representation of the input ideal operation.
+    Returns the list of sequences, the corresponding list of signs and the
+    one-norm of the quasi-probability representation (of the input operation).
 
     For example, if the ideal operation is U with representation U = a A + b B,
     then this function returns A with probability :math:`|a| / (|a| + |b|)` and
@@ -51,11 +54,13 @@ def sample_sequence(
             noisy basis. If no representation is found for `ideal_operation`,
             a ValueError is raised.
         random_state: Seed for sampling.
+        num_samples: The number of samples.
 
     Returns:
-        imp_seq: The sampled implementable sequence as QPROGRAM.
-        sign: The sign associated to sampled sequence.
-        norm: The one-norm of the decomposition coefficients.
+        The tuple (``sequences``, ``signs``, ``norm``) where
+        ``sequences`` are the sampled sequences,
+        ``signs`` are the signs associated to the sampled ``sequences`` and
+        ``norm`` is the one-norm of the quasi-probability distribution.
 
     Raises:
         ValueError: If no representation is found for `ideal_operation`.
@@ -75,21 +80,27 @@ def sample_sequence(
         )
 
     # Sample from this representation.
-    noisy_operation, sign, _ = operation_representation.sample(random_state)
-    return noisy_operation.circuit(), sign, operation_representation.norm
+    norm = operation_representation.norm
+    sequences = []
+    signs = []
+    for _ in range(num_samples):
+        noisy_op, sign, _ = operation_representation.sample(random_state)
+        sequences.append(noisy_op.circuit())
+        signs.append(sign)
+
+    return sequences, signs, norm
 
 
 def sample_circuit(
     ideal_circuit: QPROGRAM,
     representations: List[OperationRepresentation],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
-) -> Tuple[QPROGRAM, int, float]:
-    """Samples an implementable circuit from the PEC representation of the
-    input ideal circuit & returns this circuit as well as its sign and norm.
-
-    This function iterates through each operation in the circuit and samples
-    an implementable sequence. The returned sign (norm) is the product of signs
-    (norms) sampled for each operation.
+    num_samples: int = 1,
+) -> Tuple[List[QPROGRAM], List[int], float]:
+    """Samples a list of implementable circuits from the quasi-probability
+    representation of the input ideal circuit.
+    Returns the list of circuits, the corresponding list of signs and the
+    one-norm of the quasi-probability representation (of the full circuit).
 
     Args:
         ideal_circuit: The ideal circuit from which an implementable circuit
@@ -98,11 +109,13 @@ def sample_circuit(
             input circuit. If a representation cannot be found for an operation
             in the circuit, a ValueError is raised.
         random_state: Seed for sampling.
+        num_samples: The number of samples.
 
     Returns:
-        imp_circuit: The sampled implementable circuit.
-        sign: The sign associated to sampled_circuit.
-        norm: The one norm of the PEC coefficients of the circuit.
+        The tuple (``sampled_circuits``, ``signs``, ``norm``) where
+        ``sampled_circuits`` are the sampled implementable circuits,
+        ``signs`` are the signs associated to sampled_circuits and
+        ``norm`` is the one-norm of the circuit representation.
 
     Raises:
         ValueError:
@@ -116,22 +129,29 @@ def sample_circuit(
     ideal, rtype = convert_to_mitiq(ideal_circuit)
 
     # copy and remove all moments
-    sampled_circuit = deepcopy(ideal)[0:0]
-
-    # Iterate over all operations
-    sign = 1
+    sampled_circuits = [deepcopy(ideal)[0:0] for _ in range(num_samples)]
+    sampled_signs = [1 for _ in range(num_samples)]
     norm = 1.0
+
     for op in ideal.all_operations():
         # Ignore all measurements.
         if cirq.is_measurement(op):
             continue
 
-        imp_seq, loc_sign, loc_norm = sample_sequence(
-            cirq.Circuit(op), representations, random_state
+        sequences, loc_signs, loc_norm = sample_sequence(
+            cirq.Circuit(op),
+            representations,
+            num_samples=num_samples,
+            random_state=random_state,
         )
-        cirq_seq, _ = convert_to_mitiq(imp_seq)
-        sign *= loc_sign
-        norm *= loc_norm
-        sampled_circuit.append(cirq_seq.all_operations())
 
-    return convert_from_mitiq(sampled_circuit, rtype), sign, norm
+        norm *= loc_norm
+
+        for j in range(num_samples):
+            sampled_signs[j] *= loc_signs[j]
+            cirq_seq, _ = convert_to_mitiq(sequences[j])
+            sampled_circuits[j].append(cirq_seq.all_operations())
+
+    native_circuits = [convert_from_mitiq(c, rtype) for c in sampled_circuits]
+
+    return native_circuits, sampled_signs, norm

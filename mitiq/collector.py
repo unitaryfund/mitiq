@@ -21,12 +21,21 @@ import inspect
 from typing import Any, Callable, Iterable, List, Sequence, Tuple, Union
 
 import numpy as np
+from cirq import Result as MeasurementResult  # TODO: Generalize frontend.
 
 from mitiq import QPROGRAM
-from mitiq.interface import (
-    convert_from_mitiq,
-    convert_to_mitiq,
-)
+from mitiq.interface import convert_from_mitiq, convert_to_mitiq
+
+# An `executor` function inputs a quantum program and outputs an object from
+# which expectation values can be computed. Explicitly, this object can be one
+# of the following types:
+QuantumResult = Union[
+    float,  # The expectation value itself.
+    MeasurementResult,  # Sampled bitstrings.
+    # TODO: Support the following:
+    # np.ndarray,  # Density matrix.
+    # Sequence[np.ndarray],  # Wavefunctions sampled via quantum trajectories.
+]
 
 
 def generate_collected_executor(
@@ -34,7 +43,7 @@ def generate_collected_executor(
     max_batch_size: int = 75,
     force_run_all: bool = False,
     **kwargs: Any,
-) -> Callable[[Any], List[float]]:
+) -> Callable[[Any], List[QuantumResult]]:
     """Returns a new executor function which efficiently collects expectation
     values by detecting identical circuits and calling the executor as few
     times as possible.
@@ -52,7 +61,6 @@ def generate_collected_executor(
             * List[float]
             * Sequence[float]
             * Tuple[float]
-            * numpy.ndarray
 
         max_batch_size: The maximum number of circuits which can be processed
             with one call to the executor. If the executor is serial, this
@@ -65,7 +73,7 @@ def generate_collected_executor(
     if not callable(executor):
         raise ValueError("Arg `executor` must be callable.")
 
-    def collected(circuits: Any) -> List[float]:
+    def collected(circuits: Any) -> List[QuantumResult]:
         return Collector(executor, max_batch_size).run(
             circuits, force_run_all=force_run_all, **kwargs
         )
@@ -97,7 +105,7 @@ class Collector:
         self._max_batch_size = max_batch_size
 
         self._executed_circuits: List[QPROGRAM] = []
-        self._computed_results: List[float] = []
+        self._computed_results: List[QuantumResult] = []
 
         self._calls_to_executor: int = 0
 
@@ -114,9 +122,10 @@ class Collector:
         circuits: Sequence[QPROGRAM],
         force_run_all: bool = False,
         **kwargs: Any,
-    ) -> List[float]:
+    ) -> List[QuantumResult]:
         """Runs all input circuits using the least number of possible calls to
         the executor.
+
         Args:
             circuits: Sequence of circuits to execute using the executor.
             force_run_all: If True, force every circuit in the input sequence
@@ -155,15 +164,17 @@ class Collector:
         if force_run_all:
             return self._computed_results
 
-        expval_dict = dict(zip(collection.keys(), self._computed_results))
-        results = [expval_dict[key] for key in hashable_circuits]
+        results_dict = dict(zip(collection.keys(), self._computed_results))
+        results = [results_dict[key] for key in hashable_circuits]
 
         return results
 
     def _call_executor(
         self, to_run: Union[QPROGRAM, Sequence[QPROGRAM]], **kwargs: Any
     ) -> None:
-        """Calls the executor on the input circuit(s) to run.
+        """Calls the executor on the input circuit(s) to run. Stores the
+        executed circuits in ``self._executed_circuits`` and the computed
+        results in ``self._computed_results``.
 
         Args:
             to_run: Circuit(s) to run.
@@ -189,11 +200,13 @@ class Collector:
         The executor is detected as "batched" if and only if it is annotated
         with a return type that is one of the following:
 
-            * Iterable[float]
-            * List[float]
-            * Sequence[float]
-            * Tuple[float]
-            * numpy.ndarray
+            * ``Iterable[QuantumResult]``
+            * ``List[QuantumResult]``
+            * ``Sequence[QuantumResult]``
+            * ``Tuple[QuantumResult]``
+
+        where a ``QuantumResult`` is a ``float`` or a ``cirq.Result``.
+        Otherwise, it is considered "serial".
 
         Batched executors can run several quantum programs in a single call.
         See below.
@@ -201,10 +214,10 @@ class Collector:
         Args:
             executor: A "serial executor" (1) or a "batched executor" (2).
 
-                (1) A function which inputs a single `QPROGRAM` and outputs a
-                single expectation value as a float.
-                (2) A function which inputs a list of `QPROGRAM`s and outputs a
-                list of expectation values (one for each `QPROGRAM`).
+                (1) A function which inputs a single ``QPROGRAM`` and outputs a
+                single ``QuantumResult``.
+                (2) A function which inputs a list of ``QPROGRAM``s and outputs
+                a list of ``QuantumResult``s (one for each ``QPROGRAM``).
 
         Returns:
             True if the executor is detected as batched, else False.
@@ -212,9 +225,7 @@ class Collector:
         executor_annotation = inspect.getfullargspec(executor).annotations
 
         return executor_annotation.get("return") in (
-            List[float],
-            Sequence[float],
-            Tuple[float],
-            Iterable[float],
-            np.ndarray,
+            BatchedType[T]  # type: ignore[index]
+            for BatchedType in [Iterable, List, Sequence, Tuple]
+            for T in QuantumResult.__args__  # type: ignore[attr-defined]
         )

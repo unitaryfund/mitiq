@@ -310,7 +310,7 @@ We can now implement PEC by importing the function :func:`~mitiq.pec.pec.execute
 .. testoutput::
 
     Error without mitigation: 0.0387
-    Error with mitigation (PEC): 0.00364
+    Error with mitigation (PEC): 0.00363
 
 In addition to :func:`~mitiq.pec.pec.execute_with_pec`, you can also use Mitiq to wrap your
 backend execution function into an error-mitigated version like you can with zero-noise

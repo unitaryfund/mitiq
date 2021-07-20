@@ -9,7 +9,6 @@ readme.myst
 guide/guide.rst
 examples/examples.rst
 apidoc.rst
-research.rst
 toc_contributing.myst
 changelog.myst
 zz_bibliography.rst
