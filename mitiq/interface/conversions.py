@@ -232,6 +232,8 @@ def noise_scaling_converter(
             from pyquil import Program
             from pyquil.quilbase import Declare, Measurement
 
+            circuit = cast(Program, circuit)
+
             # Grab all measurements from the input circuit.
             measurements = [
                 instr
