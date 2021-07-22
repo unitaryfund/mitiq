@@ -21,4 +21,5 @@ RUN python -m pip install --upgrade pip
 # COPY . ${HOME}
 # RUN chown -R ${USER} ${HOME}
 # Drop back down to user permissions for things that don't need it.
+
 USER ${USER}

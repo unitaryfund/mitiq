@@ -9,6 +9,5 @@ hamiltonians.rst
 simple_landscape.rst
 maxcut-demo.myst
 vqe-demo.myst
-test.myst
 cdr_api.md
 ```
