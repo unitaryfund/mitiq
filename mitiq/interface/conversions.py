@@ -15,7 +15,7 @@
 
 """Functions for converting to/from Mitiq's internal circuit representation."""
 from functools import wraps
-from typing import Any, Iterable, Callable, Tuple
+from typing import Any, Callable, cast, Iterable, Tuple
 
 from cirq import Circuit
 
@@ -227,7 +227,44 @@ def noise_scaling_converter(
             circuit, *args, **kwargs
         )
 
-        # Keep the same register structure and measurement order with Qiskit.
+        # PyQuil: Restore declarations, measurements, and metadata.
+        if "pyquil" in scaled_circuit.__module__:
+            from pyquil import Program
+            from pyquil.quilbase import Declare, Measurement
+
+            circuit = cast(Program, circuit)
+
+            # Grab all measurements from the input circuit.
+            measurements = [
+                instr
+                for instr in circuit.instructions
+                if isinstance(instr, Measurement)
+            ]
+
+            # Remove memory declarations added from Cirq -> pyQuil conversion.
+            new_declarations = {
+                k: v
+                for k, v in scaled_circuit.declarations.items()
+                if k == "ro" or v.memory_type != "BIT"
+            }
+            new_declarations.update(circuit.declarations)
+
+            # Delete all declarations and measurements from the scaled circuit.
+            instructions = [
+                instr
+                for instr in scaled_circuit.instructions
+                if not (isinstance(instr, (Declare, Measurement)))
+            ]
+
+            # Add back original declarations and measurements.
+            scaled_circuit = Program(
+                list(new_declarations.values()) + instructions + measurements
+            )
+
+            # Set the number of shots to the input circuit.
+            scaled_circuit.num_shots = circuit.num_shots
+
+        # Qiskit: Keep the same register structure and measurement order.
         if "qiskit" in scaled_circuit.__module__:
             from mitiq.interface.mitiq_qiskit.conversions import (
                 _transform_registers,
