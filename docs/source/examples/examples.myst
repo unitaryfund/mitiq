@@ -2,11 +2,12 @@
 
 ```{toctree}
 ---
-maxdepth: 2 
+maxdepth: 2
 ---
 ibmq-backends.rst
 hamiltonians.rst
 simple_landscape.rst
 maxcut-demo.myst
 cdr_api.md
+mitiq-paper/mitiq-paper-codeblocks
 ```
