@@ -12,7 +12,7 @@
 [![Repository](https://img.shields.io/badge/GitHub-5C5C5C.svg?logo=github)](https://github.com/unitaryfund/mitiq)
 [![Unitary Fund](https://img.shields.io/badge/Supported%20By-Unitary%20Fund-FFFF00.svg)](http://unitary.fund)
 [![Discord Chat](https://img.shields.io/badge/dynamic/json?color=blue&label=Discord&query=approximate_presence_count&suffix=%20online.&url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2FJqVGmpkP96%3Fwith_counts%3Dtrue)](http://discord.unitary.fund)
-
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/unitaryfund/mitiq/master?filepath=%2Fdocs%2Fsource%2Fexamples%2Fexamples.myst)
 Mitiq is a Python toolkit for implementing error mitigation techniques on
 quantum computers.
 
@@ -62,7 +62,7 @@ Error (w/o  Mitiq): 0.0688
 Error (with Mitiq): 0.0002
 ```
 
-See our [guides](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html) and [examples](https://mitiq.readthedocs.io) for more explanation, techniques, and benchmarks.
+See our [guides](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html) and [examples](https://mitiq.readthedocs.io) for more explanation, techniques, and benchmarks. The examples and other notebooks can be run interactively on the cloud with [Binder](https://mybinder.org/v2/gh/unitaryfund/mitiq/master?filepath=%2Fdocs%2Fsource%2Fexamples%2Fexamples.myst).
 
 ## Quick Tour
 
@@ -104,7 +104,7 @@ If you use Mitiq in your research, please reference the [Mitiq preprint](https:/
 ## Contributing
 
 We welcome contributions to Mitiq including bug fixes, feature requests, etc. To get started, check out our [contribution
-guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) and/or [documentation guidelines](https://mitiq.readthedocs.io/en/stable/contributing_docs.html). 
+guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) and/or [documentation guidelines](https://mitiq.readthedocs.io/en/stable/contributing_docs.html).
 An up-to-date list of contributors can be found [here](https://github.com/unitaryfund/mitiq/graphs/contributors) and below.
 
 ## Contributors ✨
