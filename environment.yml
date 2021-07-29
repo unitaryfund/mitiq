@@ -1,0 +1,25 @@
+name: mitiq-mybinder-environment
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - pip
+  - pip:
+    - numpy~=1.20.1
+    - scipy~=1.4.1
+    - cirq~=0.10.0
+    - qiskit-terra~=0.16.4
+    - qiskit-aer~=0.7.6
+    - qiskit-ibmq-provider~=0.12.2
+    - pyquil~=2.28.0
+    - amazon-braket-sdk~=1.5.10
+    - pytest-xdist[psutil]~=2.2.1
+    - pytest-cov~=2.11.1
+    - flake8~=3.7.9
+    - black~=19.10b0
+    - mypy~=0.812
+    - sphinxcontrib-bibtex~=2.2.0
+    - sphinx-copybutton~=0.3.0
+    - sphinx-autodoc-typehints~=1.12.0
+    - myst-nb~=0.12.3
+    - pydata-sphinx-theme~=0.6.3
