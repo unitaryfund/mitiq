@@ -23,3 +23,4 @@ dependencies:
     - sphinx-autodoc-typehints~=1.12.0
     - myst-nb~=0.12.3
     - pydata-sphinx-theme~=0.6.3
+    - jupytext
