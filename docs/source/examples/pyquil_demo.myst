@@ -14,7 +14,7 @@ kernelspec:
 # Zero Noise Extrapolation with pyQuil and parametric compilation
 In this example we demonstrate how to use Zero Noise Extrapolation (ZNE) in Mitiq with a parametrically compiled program in pyQuil. Parametric compilation saves time by compiling the program ansatz once, instead of compiling each time the parameters are updated. In pyQuil 2.28.1, a `memory_map` argument is used to substitute in values for previously-declared Quil variables in the pre-compiled executable. 
 
-When adding the noise mitigation function `zne.execute_w_zne` the `memory map` is still passed to the executor function and the circuit parameters are updated without the need for repeated compilation. 
+When adding the noise mitigation function `zne.execute_with_zne` the `memory_map` is still passed to the executor function and the circuit parameters are updated without the need for repeated compilation. 
 
 The PyQuil parametric compilation example shown here is adapted from https://pyquil-docs.rigetti.com/en/v2.28.1/migration3-declare.html
 
