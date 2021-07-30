@@ -56,7 +56,7 @@ def ansatz():
 ```
 +++
 
-Mitiq's `zne.execute_w_zne` function takes a quantum program (e.g. PyQuil program) 
+Mitiq's `zne.execute_with_zne` function takes a quantum program (e.g. PyQuil program) 
 and an executor function as arguments. The executor function must output the expectation value
 resulting from running the quantum program. 
 
