@@ -40,19 +40,18 @@ qc = get_qc("2q-noisy-qvm")
 Set up the quantum circuit
 
 ```{code-cell}
-def ansatz():
-    program = Program()
-    theta = program.declare("theta", memory_type="REAL")
-    ro = program.declare("ro", memory_type="BIT", memory_size=1)
-    program += RX(theta, 0)
-    program += RY(theta, 0) 
-    program += RX(theta, 1)
-    program += RY(theta, 1)
-    program += H(0)
-    program += CNOT(1,0)
-    program += H(0)
-    program += MEASURE(0, ro[0])
-    return program
+program = Program()
+theta = program.declare("theta", memory_type="REAL")
+ro = program.declare("ro", memory_type="BIT", memory_size=1)
+program += RX(theta, 0)
+program += RY(theta, 0) 
+program += RX(theta, 1)
+program += RY(theta, 1)
+program += H(0)
+program += CNOT(1,0)
+program += H(0)
+program += MEASURE(0, ro[0])
+    
 ```
 +++
 
@@ -83,7 +82,6 @@ def expectation(thetas, executable: Program) -> float:
 Run the parameter scan without noise mitigation
 
 ```{code-cell}
-program = ansatz()
 program.wrap_in_numshots_loop(1000)
 quil_prog = qc.compiler.quil_to_native_quil(program, protoquil=True)
 
