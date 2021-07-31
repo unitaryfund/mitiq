@@ -99,7 +99,7 @@ plt.figure(1)
 plt.plot(thetas, results, 'o-')
 plt.xlabel(r'$\theta$', fontsize=18)
 _ = plt.ylabel(r'$\langle \Psi(\theta) | \frac{1 - Z}{2} | \Psi(\theta) \rangle$', fontsize=18)    
-plt.title('Noisy Energy Landscape')
+plt.title('Noisy Energy Landscape');
 ```
 +++
 
