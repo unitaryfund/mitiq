@@ -153,8 +153,7 @@ print(res_zne)
 +++
 
 ## References
-[1] [Parametric compilation tutorial in pyQuil.]
-https://pyquil-docs.rigetti.com/en/v2.28.1/migration3-declare.html
+[1] [Parametric compilation tutorial in pyQuil.](https://pyquil-docs.rigetti.com/en/v2.28.1/migration3-declare.html)
 
 
 +++
