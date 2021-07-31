@@ -59,19 +59,8 @@ Mitiq's `zne.execute_with_zne` function takes a quantum program (e.g. PyQuil pro
 and an executor function as arguments. The executor function must output the expectation value
 resulting from running the quantum program. 
 
-Here we define two functions, one for a parameter scan used to compute the energy landscape 
-and one for the optimization routine to find the best parameters.
  
 ```{code-cell}
-# define the expecation function used in the parameter scan
-def expectation_fn(theta, executable: Program) -> float:
-    bitstrings = qc.run(executable, memory_map={"theta": [theta]})
-    return np.mean(bitstrings[:, 0])
-```
-+++
-
-```{code-cell}
-# define the expecation function used in the optimization routine
 def expectation(thetas, executable: Program) -> float:
     bitstrings = qc.run(executable, memory_map={'theta': thetas})
     result = np.mean(bitstrings[:, 0])
@@ -88,18 +77,19 @@ quil_prog = qc.compiler.quil_to_native_quil(program, protoquil=True)
 thetas = np.linspace(0, 2 * np.pi, 21)
 results = []
 for theta in thetas:
-    results.append(expectation_fn(theta, quil_prog))
+    results.append(-1.0 * expectation(theta, quil_prog))
 ```
 +++
 
 Plot the energy landscape without noise mitigation
 ```{code-cell}
 from matplotlib import pyplot as plt
-plt.figure(1)
-plt.plot(thetas, results, 'o-')
-plt.xlabel(r'$\theta$', fontsize=18)
+_ = plt.figure(1)
+_ = plt.plot(thetas, results, 'o-')
+_ = plt.xlabel(r'$\theta$', fontsize=18)
 _ = plt.ylabel(r'$\langle \Psi(\theta) | \frac{1 - Z}{2} | \Psi(\theta) \rangle$', fontsize=18)    
-plt.title('Noisy Energy Landscape');
+_ = plt.title('Noisy Energy Landscape')
+plt.show()
 ```
 +++
 
@@ -123,7 +113,7 @@ results_zne = []
 fac = mitiq.zne.inference.LinearFactory(scale_factors=[1.0, 3.0])
 for theta in thetas:
     results_zne.append(
-        zne.execute_with_zne(quil_prog, lambda p: expectation_fn(theta, p), fac)
+        zne.execute_with_zne(quil_prog, lambda p: -1.0 * expectation(theta, p), fac)
     )
 ```
 +++
@@ -131,11 +121,12 @@ for theta in thetas:
 Plot the energy landscape with ZNE
 
 ```{code-cell}
-plt.figure(2)
-plt.plot(thetas, results_zne, 'o-')
-plt.xlabel(r'$\theta$', fontsize=18)
+_ = plt.figure(2)
+_ = plt.plot(thetas, results_zne, 'o-')
+_ = plt.xlabel(r'$\theta$', fontsize=18)
 _ = plt.ylabel(r'$\langle \Psi(\theta) | \frac{1 - Z}{2} | \Psi(\theta) \rangle$', fontsize=18)    
-plt.title('Mitigated Energy Landscape');
+_ = plt.title('Mitigated Energy Landscape')
+plt.show()
 ```
 +++
 
@@ -159,13 +150,9 @@ print(res_zne)
 +++
 
 display information about Mitiq, packages, and Python version/platform
+
 ```{code-cell}
 mitiq.about()
 ```
 
-+++
-
-```{code-cell}
-plt.show()
-```
 +++
