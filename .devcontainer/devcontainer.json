@@ -1,8 +1,16 @@
 {
 	"name": "mitiq",
-	"dockerComposeFile": "docker-compose.yml",
-	"service": "main",
-	"workspaceFolder": "/workspace",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": "..",
+		"args": { 
+			// Update 'VARIANT' to pick a Python version: 3, 3.6, 3.7, 3.8, 3.9
+			"VARIANT": "3.8",
+			// Options
+			"INSTALL_NODE": "false",
+			"NODE_VERSION": "lts/*"
+		}
+	},
 
 	// Set *default* container specific settings.json values on container create.
 	"settings": { 
