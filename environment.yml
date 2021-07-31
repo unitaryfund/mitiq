@@ -1,8 +1,0 @@
-name: mitiq-dev
-channels:
-- conda-forge
-dependencies:
-- pywin32
-- pip
-- pip:
-  - -r file:dev_requirements.txt
