@@ -135,7 +135,7 @@ plt.figure(2)
 plt.plot(thetas, results_zne, 'o-')
 plt.xlabel(r'$\theta$', fontsize=18)
 _ = plt.ylabel(r'$\langle \Psi(\theta) | \frac{1 - Z}{2} | \Psi(\theta) \rangle$', fontsize=18)    
-plt.title('Mitigated Energy Landscape')
+plt.title('Mitigated Energy Landscape');
 ```
 +++
 
