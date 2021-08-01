@@ -41,7 +41,7 @@ def test_from_pennylane_with_expvals():
 
 def test_from_pennylane():
     with qml.tape.QuantumTape() as tape:
-            qml.CNOT(wires=[0, "a"])
+        qml.CNOT(wires=[0, "a"])
 
     circuit = from_pennylane(tape)
     correct = cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2)))

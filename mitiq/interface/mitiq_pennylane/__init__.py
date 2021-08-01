@@ -14,5 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from mitiq.interface.mitiq_pennylane.conversions import (
-    from_pennylane, to_pennylane
+    from_pennylane,
+    to_pennylane,
 )
