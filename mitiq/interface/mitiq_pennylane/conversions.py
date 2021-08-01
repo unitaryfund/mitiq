@@ -17,41 +17,32 @@
 Pennylane's circuit representation.
 """
 
-from typing import Optional, List
-
 from cirq import Circuit
 from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm, to_qasm
 from pennylane.wires import Wires
-from pennylane.measure import MeasurementProcess
 from pennylane.tape import QuantumTape
 
 from pennylane import from_qasm as pennylane_from_qasm
 
 
-def from_pennylane(circuit: QuantumTape) -> Circuit:
+def from_pennylane(tape: QuantumTape) -> Circuit:
     """Returns a Cirq circuit equivalent to the input QuantumTape.
 
     Args:
-        circuit: Pennylane QuantumTape to convert to a Cirq circuit.
+        tape: Pennylane QuantumTape to convert to a Cirq circuit.
     """
-    return cirq_from_qasm(circuit.to_openqasm(rotations=False))
+    return cirq_from_qasm(tape.to_openqasm(rotations=True))
 
 
-def to_pennylane(
-    circuit: Circuit,
-    target_wires: Optional[Wires] = None,
-) -> QuantumTape:
+def to_pennylane(circuit: Circuit) -> QuantumTape:
     """Returns a QuantumTape equivalent to the input Cirq circuit.
 
     Args:
         circuit: Cirq circuit to convert to a Pennylane QuantumTape.
     """
-    if target_wires is None:
-        target_wires = Wires(range(len(circuit.all_qubits())))
-
     qfunc = pennylane_from_qasm(to_qasm(circuit))
 
     with QuantumTape() as tape:
-        qfunc(wires=target_wires)
+        qfunc(wires=Wires(range(len(circuit.all_qubits()))))
 
     return tape
