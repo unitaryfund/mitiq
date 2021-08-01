@@ -8,6 +8,7 @@ ibmq-backends.rst
 hamiltonians.rst
 simple_landscape.rst
 maxcut-demo.myst
+pyquil_demo.myst
 cdr_api.md
 mitiq-paper/mitiq-paper-codeblocks
 ```
