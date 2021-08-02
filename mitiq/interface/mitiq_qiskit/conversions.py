@@ -187,8 +187,9 @@ def _transform_registers(
         )
 
     # Assign the new registers.
-    if len(qreg_sizes):
-        circuit.qregs = list(new_qregs)
+    circuit._qubits = []
+    circuit.qregs = []
+    circuit.add_register(*new_qregs)
 
     # Map the qubits in operations to the new qubits.
     new_ops = []
