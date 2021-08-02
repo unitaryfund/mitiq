@@ -27,8 +27,7 @@ def post_select(
 
     Args:
         measurement_result: List of bitstrings.
-        hamming_weight: Hamming weight of each returned bitstring (possibly
-            none).
+        hamming_weight: Hamming weight of each returned bitstring (if any).
         inverted: If True, 0s count towards the Hamming weight instead of 1s.
             E.g., the inverted Hamming weight of ``[1, 0, 1]`` is 1 whereas the
             "regular" Hamming weight of this bitstring is 2.
