@@ -22,20 +22,8 @@ from typing import Any, Callable, Iterable, List, Sequence, Tuple, Union
 
 import numpy as np
 
-from mitiq import QPROGRAM
+from mitiq._typing import QPROGRAM, QuantumResult
 from mitiq.interface import convert_from_mitiq, convert_to_mitiq
-
-# An `executor` function inputs a quantum program and outputs an object from
-# which expectation values can be computed. Explicitly, this object can be one
-# of the following types:
-Bitstring = List[int]
-QuantumResult = Union[
-    float,  # The expectation value itself.
-    List[Bitstring],  # Sampled bitstrings.
-    # TODO: Support the following:
-    # np.ndarray,  # Density matrix.
-    # Sequence[np.ndarray],  # Wavefunctions sampled via quantum trajectories.
-]
 
 
 def generate_collected_executor(
