@@ -57,13 +57,14 @@ QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit, _BKCircuit]
 
 # Supported measurement results.
 Bitstring = List[int]
+MeasurementResult = List[Bitstring]
 
 # An `executor` function inputs a quantum program and outputs an object from
 # which expectation values can be computed. Explicitly, this object can be one
 # of the following types:
 QuantumResult = Union[
     float,  # The expectation value itself.
-    List[Bitstring],  # Sampled bitstrings.
+    MeasurementResult,  # Sampled bitstrings.
     # TODO: Support the following:
     # np.ndarray,  # Density matrix.
     # Sequence[np.ndarray],  # Wavefunctions sampled via quantum trajectories.
