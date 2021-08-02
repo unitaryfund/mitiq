@@ -66,12 +66,8 @@ def executor_serial_measurements(circuit) -> List[List[int]]:
     assert len(circuit.all_measurement_keys()) == 1
 
     key = circuit.all_measurement_keys().pop()
-    return (
-        cirq.Simulator()
-        .run(circuit, repetitions=10)
-        .measurements[key]
-        .tolist()
-    )
+    backend = cirq.Simulator()
+    return backend.run(circuit, repetitions=10).measurements[key].tolist()
 
 
 def executor_batched_measurements(circuits) -> List[List[List[int]]]:
