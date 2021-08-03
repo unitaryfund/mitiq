@@ -16,6 +16,7 @@
 """Functions to convert between Mitiq's internal circuit representation and
 Qiskit's circuit representation.
 """
+import copy
 from typing import List, Optional, Tuple, Any
 import re
 
@@ -186,19 +187,24 @@ def _transform_registers(
             f"quantum registers have {sum(qreg_sizes)} qubit(s)."
         )
 
-    # Assign the new registers.
+    # Copy the circuit data.
+    data = copy.deepcopy(circuit._data)
+
+    # Remove the old qubits and add the new ones.
     circuit._qubits = []
+    circuit._qubit_set = set()
     circuit.qregs = []
+    circuit._data = []
     circuit.add_register(*new_qregs)
 
     # Map the qubits in operations to the new qubits.
     new_ops = []
-    for op in circuit.data:
+    for op in data:
         gate, qubits, cbits = op
         new_qubits = _map_qubits(qubits, qreg_sizes, new_qregs)
         new_ops.append((gate, new_qubits, cbits))
 
-    circuit.data = new_ops
+    circuit._data = new_ops
 
 
 def to_qasm(circuit: cirq.Circuit) -> QASMType:
