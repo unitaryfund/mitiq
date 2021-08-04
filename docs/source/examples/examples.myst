@@ -4,9 +4,9 @@
 ---
 maxdepth: 2
 ---
-ibmq-backends.rst
-hamiltonians.rst
-simple_landscape.rst
+ibmq-backends.myst
+hamiltonians.md
+simple_landscape.myst
 maxcut-demo.myst
 cdr_api.md
 mitiq-paper/mitiq-paper-codeblocks
@@ -14,11 +14,11 @@ mitiq-paper/mitiq-paper-codeblocks
 
 ## Links to the examples for My Binder
 
-[Error mitigation on IBMQ backends](ibmq-backends.rst)
+[Error mitigation on IBMQ backends](ibmq-backends.myst)
 
-[Defining Hamiltonians as Linear Combinations of Pauli Strings](hamiltonians.rst)
+[Defining Hamiltonians as Linear Combinations of Pauli Strings](hamiltonians.md)
 
-[Mitigating the energy landscape of a variational circuit with Mitiq](simple_landscape.rst)
+[Mitigating the energy landscape of a variational circuit with Mitiq](simple_landscape.myst)
 
 [Solving MaxCut with QAOA improved with Mitiq](maxcut-demo.myst)
 
