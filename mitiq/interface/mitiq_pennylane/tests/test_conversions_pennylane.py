@@ -49,7 +49,8 @@ def test_from_pennylane():
     # TODO: from_pennylane adds measurements even if there is not measurements
     #  in the tape. This is because tape.to_openqasm(...) measures all qubits
     #  even if there are no measurements in the tape.
-    circuit = circuit[:1]  # Temp patch: Manually remove measurements.
+    #  Temp patch: Manually remove measurements.
+    circuit = circuit[:-1]
 
     assert _equal(circuit, correct, require_qubit_equality=False)
 
@@ -61,9 +62,11 @@ def test_to_from_pennylane():
 
     converted = from_pennylane(to_pennylane(circuit))
 
-    print(circuit)
-    print(converted)
+    # TODO: from_pennylane adds measurements even if there is not measurements
+    #  in the tape. This is because tape.to_openqasm(...) measures all qubits
+    #  even if there are no measurements in the tape.
+    #  Temp patch: Manually remove measurements.
+    cirq.SynchronizeTerminalMeasurements().optimize_circuit(converted)
+    converted = converted[:-1]
 
-    assert cirq.testing.assert_allclose_up_to_global_phase(
-        cirq.unitary(converted), cirq.unitary(circuit), atol=1e-7,
-    )
+    assert _equal(converted, circuit, require_qubit_equality=False)
