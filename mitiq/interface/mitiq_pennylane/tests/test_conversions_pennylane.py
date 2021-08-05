@@ -13,6 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""Unit tests for Pennylane <-> Cirq conversions."""
+
+import pytest
+
 import cirq
 import pennylane as qml
 from mitiq.interface.mitiq_pennylane import from_pennylane, to_pennylane
@@ -55,18 +59,15 @@ def test_from_pennylane():
     assert _equal(circuit, correct, require_qubit_equality=False)
 
 
-def test_to_from_pennylane():
+@pytest.mark.parametrize("random_state", range(10))
+def test_to_from_pennylane(random_state):
     circuit = cirq.testing.random_circuit(
-        qubits=4, n_moments=2, op_density=1, random_state=1
+        qubits=4, n_moments=2, op_density=1, random_state=random_state
     )
 
     converted = from_pennylane(to_pennylane(circuit))
-
-    # TODO: from_pennylane adds measurements even if there is not measurements
-    #  in the tape. This is because tape.to_openqasm(...) measures all qubits
-    #  even if there are no measurements in the tape.
-    #  Temp patch: Manually remove measurements.
-    cirq.SynchronizeTerminalMeasurements().optimize_circuit(converted)
-    converted = converted[:-1]
-
-    assert _equal(converted, circuit, require_qubit_equality=False)
+    # Gates (e.g. iSWAP) aren't guaranteed to be preserved. Check unitary
+    # instead of circuit equality.
+    cirq.testing.assert_allclose_up_to_global_phase(
+        cirq.unitary(converted), cirq.unitary(circuit), atol=1e-7
+    )
