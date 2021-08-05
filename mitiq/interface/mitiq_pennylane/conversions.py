@@ -31,7 +31,14 @@ def from_pennylane(tape: QuantumTape) -> Circuit:
     Args:
         tape: Pennylane QuantumTape to convert to a Cirq circuit.
     """
-    return cirq_from_qasm(tape.to_openqasm(rotations=True))
+    try:
+        wires = sorted(tape.wires)
+    except TypeError:
+        raise ValueError(
+            "Unsupported QuantumTape. The wires of the tape must be sortable."
+        )
+
+    return cirq_from_qasm(tape.to_openqasm(rotations=True, wires=wires))
 
 
 def to_pennylane(circuit: Circuit) -> QuantumTape:
