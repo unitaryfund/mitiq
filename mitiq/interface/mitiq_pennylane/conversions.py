@@ -25,6 +25,10 @@ from pennylane.tape import QuantumTape
 from pennylane import from_qasm as pennylane_from_qasm
 
 
+class UnsupportedQuantumTapeError(Exception):
+    pass
+
+
 def from_pennylane(tape: QuantumTape) -> Circuit:
     """Returns a Cirq circuit equivalent to the input QuantumTape.
 
@@ -34,8 +38,9 @@ def from_pennylane(tape: QuantumTape) -> Circuit:
     try:
         wires = sorted(tape.wires)
     except TypeError:
-        raise ValueError(
-            "Unsupported QuantumTape. The wires of the tape must be sortable."
+        raise UnsupportedQuantumTapeError(
+            f"The wires of the tape must be sortable, but could not sort "
+            f"{tape.wires}."
         )
 
     return cirq_from_qasm(tape.to_openqasm(rotations=True, wires=wires))

@@ -19,7 +19,11 @@ import pytest
 
 import cirq
 import pennylane as qml
-from mitiq.interface.mitiq_pennylane import from_pennylane, to_pennylane
+from mitiq.interface.mitiq_pennylane import (
+    from_pennylane,
+    to_pennylane,
+    UnsupportedQuantumTapeError,
+)
 from mitiq.utils import _equal
 
 
@@ -57,6 +61,14 @@ def test_from_pennylane():
     circuit = circuit[:-1]
 
     assert _equal(circuit, correct, require_qubit_equality=False)
+
+
+def test_from_pennylane_unsupported_tapes():
+    with qml.tape.QuantumTape() as tape:
+        qml.CZ(wires=[0, "a"])
+
+    with pytest.raises(UnsupportedQuantumTapeError, match="could not sort"):
+        from_pennylane(tape)
 
 
 @pytest.mark.parametrize("random_state", range(10))

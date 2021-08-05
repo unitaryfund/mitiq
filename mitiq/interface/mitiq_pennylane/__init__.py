@@ -16,4 +16,5 @@
 from mitiq.interface.mitiq_pennylane.conversions import (
     from_pennylane,
     to_pennylane,
+    UnsupportedQuantumTapeError,
 )
