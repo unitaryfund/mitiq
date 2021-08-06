@@ -13,13 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Optional, Sequence, Any
+import copy
+from typing import Any, FrozenSet, List, Optional, Sequence, Set
 
 import numpy as np
 import cirq
 
 from mitiq import QPROGRAM
 from mitiq.interface import atomic_converter
+from mitiq.utils import (
+    find_all_qubits_with_terminal_measurements,
+    _pop_measurements,
+)
 
 
 class PauliString:
@@ -72,7 +77,9 @@ class PauliString:
         """Returns the (potentially very large) matrix of the PauliString."""
         return self._pauli.matrix()
 
-    def measure_in(self, circuit: QPROGRAM) -> QPROGRAM:
+    def measure_in(
+        self, circuit: QPROGRAM, error_on_overlapping_measurements: bool = True
+    ) -> QPROGRAM:
         @atomic_converter
         def _measure_in(
             circuit: cirq.Circuit, pauli: cirq.PauliString[Any]
@@ -86,15 +93,45 @@ class PauliString:
             )
             circuit = circuit.transform_qubits(lambda q: qubit_map[q])
 
-            # Measure the Paulis.
             if not set(pauli).issubset(set(circuit.all_qubits())):
                 raise ValueError(
                     f"Qubit mismatch. The PauliString {self} acts on qubits "
                     f"{[q for q in pauli.qubits]} but the circuit has qubit "
                     f"indices {sorted([q for q in circuit.all_qubits()])}."
                 )
+
+            # Option to error on overlapping measurements.
+            term_measured_qubits = find_all_qubits_with_terminal_measurements(
+                circuit
+            )
+            supported_qubits = set(pauli.qubits)
+
+            if (
+                error_on_overlapping_measurements
+                and not supported_qubits.isdisjoint(term_measured_qubits)
+            ):
+                raise ValueError(
+                    "Circuit has terminal measurements in the support of the "
+                    "PauliString. If this is intentional, you can call "
+                    "`PauliString.measure_in` with "
+                    "`error_on_overlapping_measurements=False`."
+                )
+            # Note: Measurements are removed then re-added to have one n-qubit
+            # `cirq.MeasurementGate` instead of individual
+            # `cirq.MeasurementGate`s.
+            _ = _pop_measurements(circuit)
+            qubits_to_measure = supported_qubits.union(term_measured_qubits)
+
+            # Add single-qubit basis rotations & measurements.
+            z_basis_ops = [
+                op
+                for op in pauli.to_z_basis_ops()
+                if op.gate != cirq.SingleQubitCliffordGate.I
+            ]
             measured = (
-                circuit + pauli.to_z_basis_ops() + cirq.measure(*pauli.qubits)
+                circuit
+                + z_basis_ops
+                + cirq.measure(*sorted(qubits_to_measure))
             )
 
             # Transform circuit back to original qubits.
@@ -128,3 +165,48 @@ class PauliString:
 
     def __str__(self) -> str:
         return str(self._pauli)
+
+    def __repr__(self) -> str:
+        return repr(self._pauli)
+
+
+class Observable:
+    def __init__(self, *paulis: PauliString) -> None:
+        self._paulis = set(paulis)
+
+    def partition(self) -> Set[FrozenSet[PauliString]]:
+        plists: List[List[PauliString]] = []
+        paulis = copy.deepcopy(self._paulis)
+
+        while paulis:
+            pauli = paulis.pop()
+            added = False
+            for (i, plist) in enumerate(plists):
+                if all(pauli.can_be_measured_with(p) for p in plist):
+                    plists[i].append(pauli)
+                    added = True
+                    break
+
+            if not added:
+                plists.append([pauli])
+
+        return set([frozenset(plist) for plist in plists])
+
+    def measure_in(self, circuit: QPROGRAM) -> List[QPROGRAM]:
+        circuits: List[QPROGRAM] = []
+
+        for pset in self.partition():
+            current = copy.deepcopy(circuit)
+            for pauli in pset:
+                # Ignore overlapping measurements since these are guaranteed to
+                # be simultaneously measurable.
+                current = pauli.measure_in(
+                    current, error_on_overlapping_measurements=False,
+                )
+            circuits.append(current)
+
+        return circuits
+
+    def matrix(self) -> np.ndarray:
+        """Returns the (potentially very large) matrix of the Observable."""
+        raise NotImplementedError

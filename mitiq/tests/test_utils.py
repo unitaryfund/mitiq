@@ -31,17 +31,22 @@ from cirq import (
     S,
     T,
     MeasurementGate,
+    ops,
     depolarize,
 )
 
 from mitiq.utils import (
+    _append_measurements,
     _are_close_dict,
     _equal,
+    _is_measurement,
+    find_all_qubits_with_terminal_measurements,
     _simplify_gate_exponent,
     _simplify_circuit_exponents,
     _max_ent_state_circuit,
     _circuit_to_choi,
     _operation_to_choi,
+    _pop_measurements,
 )
 
 
@@ -207,6 +212,84 @@ def test_circuit_equality_equal_measurement_keys_nonterminal_measurements(
     assert _equal(
         circ1, circ2, require_measurement_equality=require_measurement_equality
     )
+
+
+def test_is_measurement():
+    """Tests for checking if operations are measurements."""
+    # Test circuit:
+    # 0: ───H───X───Z───
+    qbit = LineQubit(0)
+    circ = Circuit(
+        [ops.H.on(qbit), ops.X.on(qbit), ops.Z.on(qbit), ops.measure(qbit)]
+    )
+    for (i, op) in enumerate(circ.all_operations()):
+        if i == 3:
+            assert _is_measurement(op)
+        else:
+            assert not _is_measurement(op)
+
+
+def test_pop_measurements_and_add_measurements():
+    """Tests popping measurements from a circuit.."""
+    # Test circuit:
+    # 0: ───H───T───@───M───
+    #               │   │
+    # 1: ───H───M───┼───┼───
+    #               │   │
+    # 2: ───H───────X───M───
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(qreg)],
+        [ops.T.on(qreg[0])],
+        [ops.measure(qreg[1])],
+        [ops.CNOT.on(qreg[0], qreg[2])],
+        [ops.measure(qreg[0], qreg[2])],
+    )
+    copy = deepcopy(circ)
+    measurements = _pop_measurements(copy)
+    correct = Circuit(
+        [ops.H.on_each(qreg)],
+        [ops.T.on(qreg[0])],
+        [ops.CNOT.on(qreg[0], qreg[2])],
+    )
+    assert _equal(copy, correct)
+    _append_measurements(copy, measurements)
+    assert _equal(copy, circ)
+
+
+def test_find_all_qubits_with_terminal_measurements_simple():
+    a, b, c = cirq.LineQubit.range(3)
+
+    circuit = Circuit()
+    assert find_all_qubits_with_terminal_measurements(circuit) == set()
+
+    circuit = Circuit(cirq.measure(a, b))
+    assert find_all_qubits_with_terminal_measurements(circuit) == {a, b}
+
+    circuit = Circuit(cirq.measure_each(a, b))
+    assert find_all_qubits_with_terminal_measurements(circuit) == {a, b}
+
+    circuit = Circuit(cirq.measure(a, b), cirq.I(c))
+    assert find_all_qubits_with_terminal_measurements(circuit) == {a, b}
+
+
+def test_find_all_qubits_with_terminal_measurements_nonterminal_measurements():
+    a, b, c = cirq.LineQubit.range(3)
+    circuit = Circuit(
+        cirq.measure(a),  # Non-terminal measurement.
+        cirq.I(a),
+        cirq.measure(b, c),  # Terminal measurements.
+    )
+    assert find_all_qubits_with_terminal_measurements(circuit) == {b, c}
+
+
+def test_find_all_qubits_with_terminal_measurements_3():
+    a, b, c = cirq.LineQubit.range(3)
+    circuit = Circuit(cirq.measure(a, b), cirq.measure(b, c),)
+    assert find_all_qubits_with_terminal_measurements(circuit) == {b, c}
+
+    circuit = Circuit(cirq.measure_each(a, b), cirq.measure_each(b, c),)
+    assert find_all_qubits_with_terminal_measurements(circuit) == {a, b, c}
 
 
 @pytest.mark.parametrize("gate", [X ** 3, Y ** -3, Z ** -1, H ** -1])

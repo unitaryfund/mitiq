@@ -18,9 +18,14 @@ import pytest
 import numpy as np
 import cirq
 
-from mitiq.observable import PauliString
+from mitiq.observable import PauliString, Observable
 from mitiq.interface import mitiq_qiskit, mitiq_pyquil
 from mitiq.utils import _equal
+
+
+# Basis rotations to measure Pauli X and Y.
+xrotation = cirq.SingleQubitCliffordGate.Y_nsqrt
+yrotation = cirq.SingleQubitCliffordGate.X_sqrt
 
 
 def test_pauli_init():
@@ -79,15 +84,16 @@ def test_pauli_measure_in_circuit(support, circuit_type):
         # Original circuit.
         base_circuit.all_operations(),
         # Basis rotations.
-        cirq.SingleQubitCliffordGate.Y_nsqrt.on(qreg[support[0]]),
-        cirq.SingleQubitCliffordGate.X_sqrt.on(qreg[support[1]]),
-        cirq.SingleQubitCliffordGate.I.on(qreg[support[2]]),
+        xrotation.on(qreg[support[0]]),
+        yrotation.on(qreg[support[1]]),
         # Measurements.
         cirq.measure(*[qreg[s] for s in support]),
     )
     if circuit_type == "cirq":
         assert _equal(measured, expected, require_qubit_equality=True)
     else:
+        print(measured)
+        print(convert(expected))
         assert measured == convert(expected)
 
 
@@ -138,3 +144,97 @@ def test_weight():
     assert PauliString(spec="X" * n).weight() == n
     assert PauliString(spec="IX" * n).weight() == n
     assert PauliString(spec="ZX" * n).weight() == 2 * n
+
+
+def test_observable_partition_one_set():
+    pauli1 = PauliString(spec="ZI")
+    pauli2 = PauliString(spec="IZ")
+    pauli3 = PauliString(spec="ZZ")
+    obs = Observable(pauli1, pauli2, pauli3)
+
+    sets = obs.partition()
+    expected = {frozenset([pauli1, pauli2, pauli3])}
+
+    assert len(sets) == 1
+    # assert sets == expected
+
+
+def test_observable_partition_single_qubit_paulis():
+    x = PauliString(spec="X")
+    y = PauliString(spec="Y")
+    z = PauliString(spec="Z")
+    obs = Observable(x, y, z)
+
+    sets = obs.partition()
+    expected = {frozenset([p]) for p in (x, y, z)}
+
+    assert len(sets) == 3
+    # assert sets == expected
+
+
+def test_observable_measure_in_needs_one_circuit_z():
+    pauli1 = PauliString(spec="ZI")
+    pauli2 = PauliString(spec="IZ")
+    pauli3 = PauliString(spec="ZZ")
+    obs = Observable(pauli1, pauli2, pauli3)
+
+    qubits = cirq.LineQubit.range(2)
+    circuit = cirq.testing.random_circuit(qubits, 3, 1, random_state=1)
+
+    measures_obs_circuits = obs.measure_in(circuit)
+    assert len(measures_obs_circuits) == 1
+
+    expected = circuit + cirq.measure(*qubits)
+    assert _equal(
+        measures_obs_circuits[0],
+        expected,
+        require_qubit_equality=True,
+        require_measurement_equality=True,
+    )
+
+
+# def test_observable_measure_in_needs_one_circuit_x():
+#     pauli1 = PauliString(spec="XI")
+#     pauli2 = PauliString(spec="IX")
+#     pauli3 = PauliString(spec="XX")
+#     obs = Observable(pauli1, pauli2, pauli3)
+#
+#     qubits = cirq.LineQubit.range(2)
+#     circuit = cirq.testing.random_circuit(qubits, 3, 1, random_state=1)
+#
+#     measures_obs_circuits = obs.measure_in(circuit)
+#     assert len(measures_obs_circuits) == 1
+#
+#     expected = circuit + xrotation.on_each(*qubits) + cirq.measure(*qubits)
+#     print(measures_obs_circuits[0])
+#     print(expected)
+#     assert _equal(
+#         measures_obs_circuits[0],
+#         expected,
+#         require_qubit_equality=True,
+#         require_measurement_equality=True,
+#     )
+
+
+# def test_observable_measure_in_needs_two_circuits():
+#     obs = Observable(PauliString(spec="X"), PauliString(spec="Z"))
+#
+#     q = cirq.LineQubit(0)
+#     circuit = cirq.Circuit(cirq.H.on(q))
+#
+#     measures_obs_circuits = sorted(obs.measure_in(circuit), key=len)
+#     assert len(measures_obs_circuits) == 2
+#
+#     expected_circuits = [
+#         circuit + cirq.measure(q),
+#         circuit + xrotation.on(q) + cirq.measure(q)
+#     ]
+#     for expected, measured in zip(expected_circuits, measures_obs_circuits):
+#         print(measured)
+#         print(expected)
+#         assert _equal(
+#             measured,
+#             expected,
+#             require_qubit_equality=True,
+#             require_measurement_equality=True,
+#         )
