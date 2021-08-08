@@ -15,7 +15,7 @@
 
 """Utility functions."""
 from copy import deepcopy
-from typing import cast, Any, Dict, List, Set, Tuple
+from typing import cast, Any, Dict, List, Tuple
 
 import numpy as np
 
@@ -32,7 +32,6 @@ from cirq import (
     DensityMatrixSimulator,
     ops,
     OP_TREE,
-    Qid,
 )
 from cirq.ops.measurement_gate import MeasurementGate
 
