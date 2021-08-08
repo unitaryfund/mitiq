@@ -214,25 +214,23 @@ def test_observable_measure_in_needs_one_circuit_x():
     )
 
 
-# def test_observable_measure_in_needs_two_circuits():
-#     obs = Observable(PauliString(spec="X"), PauliString(spec="Z"))
-#
-#     q = cirq.LineQubit(0)
-#     circuit = cirq.Circuit(cirq.H.on(q))
-#
-#     measures_obs_circuits = sorted(obs._measure_in(circuit), key=len)
-#     assert len(measures_obs_circuits) == 2
-#
-#     expected_circuits = [
-#         circuit + cirq.measure(q),
-#         circuit + xrotation.on(q) + cirq.measure(q)
-#     ]
-#     for expected, measured in zip(expected_circuits, measures_obs_circuits):
-#         print(measured)
-#         print(expected)
-#         assert _equal(
-#             measured,
-#             expected,
-#             require_qubit_equality=True,
-#             require_measurement_equality=True,
-#         )
+def test_observable_measure_in_needs_two_circuits():
+    obs = Observable(PauliString(spec="X"), PauliString(spec="Z"))
+
+    q = cirq.LineQubit(0)
+    circuit = cirq.Circuit(cirq.H.on(q))
+
+    measures_obs_circuits = sorted(obs._measure_in(circuit), key=len)
+    assert len(measures_obs_circuits) == 2
+
+    expected_circuits = [
+        circuit + cirq.measure(q),
+        circuit + xrotation.on(q) + cirq.measure(q)
+    ]
+    for expected, measured in zip(expected_circuits, measures_obs_circuits):
+        assert _equal(
+            measured,
+            expected,
+            require_qubit_equality=True,
+            require_measurement_equality=True,
+        )
