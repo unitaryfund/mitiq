@@ -151,7 +151,7 @@ def test_observable_partition_one_set():
     obs = Observable(pauli1, pauli2, pauli3)
 
     sets = obs.partition()
-    expected = {frozenset([pauli1, pauli2, pauli3])}
+    # expected = {frozenset([pauli1, pauli2, pauli3])}
 
     assert len(sets) == 1
     # assert sets == expected
@@ -164,7 +164,7 @@ def test_observable_partition_single_qubit_paulis():
     obs = Observable(x, y, z)
 
     sets = obs.partition()
-    expected = {frozenset([p]) for p in (x, y, z)}
+    # expected = {frozenset([p]) for p in (x, y, z)}
 
     assert len(sets) == 3
     # assert sets == expected
@@ -223,7 +223,7 @@ def test_observable_measure_in_needs_two_circuits():
 
     expected_circuits = [
         circuit + cirq.measure(q),
-        circuit + xrotation.on(q) + cirq.measure(q)
+        circuit + xrotation.on(q) + cirq.measure(q),
     ]
     for expected, measured in zip(expected_circuits, measures_obs_circuits):
         assert _equal(

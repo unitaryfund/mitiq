@@ -21,10 +21,6 @@ import cirq
 
 from mitiq import QPROGRAM
 from mitiq.interface import atomic_converter
-from mitiq.utils import (
-    find_all_qubits_with_terminal_measurements,
-    _pop_measurements,
-)
 
 
 class PauliString:
@@ -90,7 +86,9 @@ class PauliString:
 
     @staticmethod
     @atomic_converter
-    def _measure_in(circuit: cirq.Circuit, pauli: 'PauliString') -> cirq.Circuit:
+    def _measure_in(
+        circuit: cirq.Circuit, pauli: "PauliString"
+    ) -> cirq.Circuit:
         # Transform circuit to canonical qubit layout.
         qubit_map = dict(
             zip(
@@ -108,7 +106,11 @@ class PauliString:
                 f"{sorted([q for q in circuit.all_qubits()])}."
             )
 
-        measured = circuit + pauli._basis_rotations() + cirq.measure(*sorted(pauli._qubits_to_measure()))
+        measured = (
+            circuit
+            + pauli._basis_rotations()
+            + cirq.measure(*sorted(pauli._qubits_to_measure()))
+        )
 
         # Transform circuit back to original qubits.
         reverse_qubit_map = dict(zip(qubit_map.values(), qubit_map.keys()))
@@ -180,7 +182,9 @@ class Observable:
                 basis_rotations.update(pauli._basis_rotations())
                 qubits_to_measure.update(pauli._qubits_to_measure())
             circuits.append(
-                base_circuit + basis_rotations + cirq.measure(*sorted(qubits_to_measure))
+                base_circuit
+                + basis_rotations
+                + cirq.measure(*sorted(qubits_to_measure))
             )
 
         return circuits
