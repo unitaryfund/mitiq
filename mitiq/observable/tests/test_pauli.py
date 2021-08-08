@@ -27,6 +27,11 @@ from mitiq.utils import _equal
 xrotation = cirq.SingleQubitCliffordGate.Y_nsqrt
 yrotation = cirq.SingleQubitCliffordGate.X_sqrt
 
+# Matrices.
+imat = np.identity(2)
+xmat = cirq.unitary(cirq.X)
+zmat = cirq.unitary(cirq.Z)
+
 
 def test_pauli_init():
     pauli = PauliString(spec="IZXYI", coeff=1.0)
@@ -48,9 +53,6 @@ def test_pauli_init_with_support():
 
 
 def test_matrix():
-    xmat = cirq.unitary(cirq.X)
-    zmat = cirq.unitary(cirq.Z)
-
     assert np.allclose(PauliString(spec="X").matrix(), xmat)
     assert np.allclose(PauliString(spec="Z", coeff=-0.5).matrix(), -0.5 * zmat)
     assert np.allclose(PauliString(spec="ZZ").matrix(), np.kron(zmat, zmat))
@@ -58,8 +60,6 @@ def test_matrix():
 
 
 def test_pauli_matrix_include_qubits():
-    imat = np.identity(2)
-    xmat = cirq.unitary(cirq.X)
     pauli = PauliString(spec="X")
 
     assert np.allclose(pauli.matrix(), xmat)
@@ -168,9 +168,6 @@ def test_observable():
     assert obs.qubit_indices == [0, 1]
     assert obs.nterms == 2
 
-    imat = np.identity(2)
-    xmat = cirq.unitary(cirq.X)
-    zmat = cirq.unitary(cirq.Z)
     correct_matrix = -1.0 * np.kron(xmat, imat) + 2.0 * np.kron(imat, zmat)
     assert np.allclose(obs.matrix(), correct_matrix)
 
