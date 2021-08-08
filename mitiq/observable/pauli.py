@@ -152,6 +152,11 @@ class PauliString:
 class Observable:
     def __init__(self, *paulis: PauliString) -> None:
         self._paulis = set(paulis)
+        self._nterms = len(self._paulis)
+
+    @property
+    def nterms(self) -> int:
+        return self._nterms
 
     def partition(self) -> Set[FrozenSet[PauliString]]:
         plists: List[List[PauliString]] = []

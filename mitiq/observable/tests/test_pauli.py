@@ -149,6 +149,7 @@ def test_observable_partition_one_set():
     pauli2 = PauliString(spec="IZ")
     pauli3 = PauliString(spec="ZZ")
     obs = Observable(pauli1, pauli2, pauli3)
+    assert obs.nterms == 3
 
     sets = obs.partition()
     # expected = {frozenset([pauli1, pauli2, pauli3])}
@@ -162,12 +163,39 @@ def test_observable_partition_single_qubit_paulis():
     y = PauliString(spec="Y")
     z = PauliString(spec="Z")
     obs = Observable(x, y, z)
+    assert obs.nterms == 3
 
     sets = obs.partition()
     # expected = {frozenset([p]) for p in (x, y, z)}
 
     assert len(sets) == 3
     # assert sets == expected
+
+
+def test_observable_partition_can_be_measured_with():
+    n = 10
+    nterms = 50
+    rng = np.random.RandomState(seed=1)
+    obs = Observable(
+        *[
+            PauliString(
+                spec=rng.choice(
+                    ("I", "X", "Y", "Z"),
+                    size=n,
+                    replace=True,
+                    p=(0.7, 0.1, 0.1, 0.1),
+                )
+            )
+            for _ in range(nterms)
+        ]
+    )
+    assert obs.nterms == nterms
+
+    for pset in obs.partition():
+        pset = list(pset)
+        for i in range(len(pset) - 1):
+            for j in range(i, len(pset)):
+                assert pset[i].can_be_measured_with(pset[j])
 
 
 def test_observable_measure_in_needs_one_circuit_z():
