@@ -57,6 +57,21 @@ def test_matrix():
     assert np.allclose(PauliString(spec="XZ").matrix(), np.kron(xmat, zmat))
 
 
+def test_pauli_matrix_include_qubits():
+    imat = np.identity(2)
+    xmat = cirq.unitary(cirq.X)
+    pauli = PauliString(spec="X")
+
+    assert np.allclose(pauli.matrix(), xmat)
+    assert np.allclose(
+        pauli.matrix(qubit_indices_to_include=[0, 1]), np.kron(xmat, imat)
+    )
+    assert np.allclose(
+        pauli.matrix(qubit_indices_to_include=[0, 1, 2]),
+        np.kron(np.kron(xmat, imat), imat),
+    )
+
+
 @pytest.mark.parametrize("support", [range(3), range(1, 4)])
 @pytest.mark.parametrize("circuit_type", ("cirq", "qiskit", "pyquil"))
 def test_pauli_measure_in_circuit(support, circuit_type):
@@ -142,6 +157,22 @@ def test_weight():
     assert PauliString(spec="X" * n).weight() == n
     assert PauliString(spec="IX" * n).weight() == n
     assert PauliString(spec="ZX" * n).weight() == 2 * n
+
+
+def test_observable():
+    pauli1 = PauliString(spec="XI", coeff=-1.0)
+    pauli2 = PauliString(spec="IZ", coeff=2.0)
+    obs = Observable(pauli1, pauli2)
+
+    assert obs.nqubits == 2
+    assert obs.qubit_indices == [0, 1]
+    assert obs.nterms == 2
+
+    imat = np.identity(2)
+    xmat = cirq.unitary(cirq.X)
+    zmat = cirq.unitary(cirq.Z)
+    correct_matrix = -1.0 * np.kron(xmat, imat) + 2.0 * np.kron(imat, zmat)
+    assert np.allclose(obs.matrix(), correct_matrix)
 
 
 def test_observable_partition_one_set():

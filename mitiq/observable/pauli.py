@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
-from typing import Any, FrozenSet, List, Optional, Sequence, Set
+from typing import Any, cast, FrozenSet, List, Optional, Sequence, Set
 
 import numpy as np
 import cirq
@@ -69,9 +69,18 @@ class PauliString:
             ),
         )
 
-    def matrix(self) -> np.ndarray:
+    def matrix(
+        self,
+        qubit_indices_to_include: Optional[List[int]] = None,
+        dtype: type = np.complex128,
+    ) -> np.ndarray:
         """Returns the (potentially very large) matrix of the PauliString."""
-        return self._pauli.matrix()
+        qubits = (
+            [cirq.LineQubit(x) for x in qubit_indices_to_include]
+            if qubit_indices_to_include
+            else self._pauli.qubits
+        )
+        return self._pauli.matrix(qubits=qubits).astype(dtype=dtype)
 
     def _basis_rotations(self) -> List[cirq.Operation]:
         """Returns the basis rotations needed to measure the PauliString."""
@@ -158,6 +167,18 @@ class Observable:
     def nterms(self) -> int:
         return self._nterms
 
+    def _qubits(self) -> Set[cirq.Qid]:
+        """Returns all qubits acted on by the Observable."""
+        return {q for pauli in self._paulis for q in pauli._pauli.qubits}
+
+    @property
+    def qubit_indices(self) -> List[int]:
+        return [cast(cirq.LineQubit, q).x for q in sorted(self._qubits())]
+
+    @property
+    def nqubits(self) -> int:
+        return len(self.qubit_indices)
+
     def partition(self) -> Set[FrozenSet[PauliString]]:
         plists: List[List[PauliString]] = []
         paulis = copy.deepcopy(self._paulis)
@@ -194,6 +215,15 @@ class Observable:
 
         return circuits
 
-    def matrix(self) -> np.ndarray:
+    def matrix(self, dtype: type = np.complex128) -> np.ndarray:
         """Returns the (potentially very large) matrix of the Observable."""
-        raise NotImplementedError
+        qubit_indices = self.qubit_indices
+        n = self.nqubits
+
+        matrix = np.zeros(shape=(2 ** n, 2 ** n), dtype=dtype)
+        for pauli in self._paulis:
+            matrix += pauli.matrix(
+                qubit_indices_to_include=qubit_indices
+            ).astype(dtype=dtype)
+
+        return matrix
