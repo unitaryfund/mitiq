@@ -40,7 +40,6 @@ from mitiq.utils import (
     _are_close_dict,
     _equal,
     _is_measurement,
-    find_all_qubits_with_terminal_measurements,
     _simplify_gate_exponent,
     _simplify_circuit_exponents,
     _max_ent_state_circuit,
@@ -255,41 +254,6 @@ def test_pop_measurements_and_add_measurements():
     assert _equal(copy, correct)
     _append_measurements(copy, measurements)
     assert _equal(copy, circ)
-
-
-def test_find_all_qubits_with_terminal_measurements_simple():
-    a, b, c = cirq.LineQubit.range(3)
-
-    circuit = Circuit()
-    assert find_all_qubits_with_terminal_measurements(circuit) == set()
-
-    circuit = Circuit(cirq.measure(a, b))
-    assert find_all_qubits_with_terminal_measurements(circuit) == {a, b}
-
-    circuit = Circuit(cirq.measure_each(a, b))
-    assert find_all_qubits_with_terminal_measurements(circuit) == {a, b}
-
-    circuit = Circuit(cirq.measure(a, b), cirq.I(c))
-    assert find_all_qubits_with_terminal_measurements(circuit) == {a, b}
-
-
-def test_find_all_qubits_with_terminal_measurements_nonterminal_measurements():
-    a, b, c = cirq.LineQubit.range(3)
-    circuit = Circuit(
-        cirq.measure(a),  # Non-terminal measurement.
-        cirq.I(a),
-        cirq.measure(b, c),  # Terminal measurements.
-    )
-    assert find_all_qubits_with_terminal_measurements(circuit) == {b, c}
-
-
-def test_find_all_qubits_with_terminal_measurements_3():
-    a, b, c = cirq.LineQubit.range(3)
-    circuit = Circuit(cirq.measure(a, b), cirq.measure(b, c),)
-    assert find_all_qubits_with_terminal_measurements(circuit) == {b, c}
-
-    circuit = Circuit(cirq.measure_each(a, b), cirq.measure_each(b, c),)
-    assert find_all_qubits_with_terminal_measurements(circuit) == {a, b, c}
 
 
 @pytest.mark.parametrize("gate", [X ** 3, Y ** -3, Z ** -1, H ** -1])

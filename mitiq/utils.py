@@ -121,14 +121,6 @@ def _append_measurements(
     circuit.batch_insert(new_measurements)
 
 
-def find_all_qubits_with_terminal_measurements(circuit: Circuit) -> Set[Qid]:
-    terminally_measured_qubits: Set[Qid] = set()
-    for _, m, _ in circuit.findall_operations_with_gate_type(MeasurementGate):
-        if circuit.are_any_matches_terminal(lambda op: op == m):
-            terminally_measured_qubits.update(m.qubits)
-    return terminally_measured_qubits
-
-
 def _equal(
     circuit_one: Circuit,
     circuit_two: Circuit,
