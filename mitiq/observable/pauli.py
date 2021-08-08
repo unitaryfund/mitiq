@@ -77,6 +77,17 @@ class PauliString:
         """Returns the (potentially very large) matrix of the PauliString."""
         return self._pauli.matrix()
 
+    def _basis_rotations(self) -> List[cirq.Operation]:
+        """Returns the basis rotations needed to measure the PauliString."""
+        return [
+            op
+            for op in self._pauli.to_z_basis_ops()
+            if op.gate != cirq.SingleQubitCliffordGate.I
+        ]
+
+    def _qubits_to_measure(self) -> Set[cirq.Qid]:
+        return set(self._pauli.qubits)
+
     def measure_in(
         self, circuit: QPROGRAM, error_on_overlapping_measurements: bool = True
     ) -> QPROGRAM:
@@ -113,7 +124,7 @@ class PauliString:
                 raise ValueError(
                     "Circuit has terminal measurements in the support of the "
                     "PauliString. If this is intentional, you can call "
-                    "`PauliString.measure_in` with "
+                    "`PauliString._measure_in` with "
                     "`error_on_overlapping_measurements=False`."
                 )
             # Note: Measurements are removed then re-added to have one n-qubit
@@ -192,18 +203,19 @@ class Observable:
 
         return set([frozenset(plist) for plist in plists])
 
-    def measure_in(self, circuit: QPROGRAM) -> List[QPROGRAM]:
-        circuits: List[QPROGRAM] = []
+    def _measure_in(self, circuit: cirq.Circuit) -> List[cirq.Circuit]:
+        circuits: List[cirq.Circuit] = []
+        base_circuit = copy.deepcopy(circuit)
 
         for pset in self.partition():
-            current = copy.deepcopy(circuit)
+            basis_rotations = set()
+            qubits_to_measure = set()
             for pauli in pset:
-                # Ignore overlapping measurements since these are guaranteed to
-                # be simultaneously measurable.
-                current = pauli.measure_in(
-                    current, error_on_overlapping_measurements=False,
-                )
-            circuits.append(current)
+                basis_rotations.update(pauli._basis_rotations())
+                qubits_to_measure.update(pauli._qubits_to_measure())
+            circuits.append(
+                base_circuit + basis_rotations + cirq.measure(*qubits_to_measure)
+            )
 
         return circuits
 

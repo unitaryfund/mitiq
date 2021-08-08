@@ -181,7 +181,7 @@ def test_observable_measure_in_needs_one_circuit_z():
     qubits = cirq.LineQubit.range(2)
     circuit = cirq.testing.random_circuit(qubits, 3, 1, random_state=1)
 
-    measures_obs_circuits = obs.measure_in(circuit)
+    measures_obs_circuits = obs._measure_in(circuit)
     assert len(measures_obs_circuits) == 1
 
     expected = circuit + cirq.measure(*qubits)
@@ -193,27 +193,25 @@ def test_observable_measure_in_needs_one_circuit_z():
     )
 
 
-# def test_observable_measure_in_needs_one_circuit_x():
-#     pauli1 = PauliString(spec="XI")
-#     pauli2 = PauliString(spec="IX")
-#     pauli3 = PauliString(spec="XX")
-#     obs = Observable(pauli1, pauli2, pauli3)
-#
-#     qubits = cirq.LineQubit.range(2)
-#     circuit = cirq.testing.random_circuit(qubits, 3, 1, random_state=1)
-#
-#     measures_obs_circuits = obs.measure_in(circuit)
-#     assert len(measures_obs_circuits) == 1
-#
-#     expected = circuit + xrotation.on_each(*qubits) + cirq.measure(*qubits)
-#     print(measures_obs_circuits[0])
-#     print(expected)
-#     assert _equal(
-#         measures_obs_circuits[0],
-#         expected,
-#         require_qubit_equality=True,
-#         require_measurement_equality=True,
-#     )
+def test_observable_measure_in_needs_one_circuit_x():
+    pauli1 = PauliString(spec="XI")
+    pauli2 = PauliString(spec="IX")
+    pauli3 = PauliString(spec="XX")
+    obs = Observable(pauli1, pauli2, pauli3)
+
+    qubits = cirq.LineQubit.range(2)
+    circuit = cirq.testing.random_circuit(qubits, 3, 1, random_state=1)
+
+    measures_obs_circuits = obs._measure_in(circuit)
+    assert len(measures_obs_circuits) == 1
+
+    expected = circuit + xrotation.on_each(*qubits) + cirq.measure(*qubits)
+    assert _equal(
+        measures_obs_circuits[0],
+        expected,
+        require_qubit_equality=True,
+        require_measurement_equality=True,
+    )
 
 
 # def test_observable_measure_in_needs_two_circuits():
@@ -222,7 +220,7 @@ def test_observable_measure_in_needs_one_circuit_z():
 #     q = cirq.LineQubit(0)
 #     circuit = cirq.Circuit(cirq.H.on(q))
 #
-#     measures_obs_circuits = sorted(obs.measure_in(circuit), key=len)
+#     measures_obs_circuits = sorted(obs._measure_in(circuit), key=len)
 #     assert len(measures_obs_circuits) == 2
 #
 #     expected_circuits = [
