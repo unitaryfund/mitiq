@@ -180,7 +180,7 @@ class Observable:
                 basis_rotations.update(pauli._basis_rotations())
                 qubits_to_measure.update(pauli._qubits_to_measure())
             circuits.append(
-                base_circuit + basis_rotations + cirq.measure(*qubits_to_measure)
+                base_circuit + basis_rotations + cirq.measure(*sorted(qubits_to_measure))
             )
 
         return circuits
