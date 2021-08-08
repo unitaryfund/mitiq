@@ -88,68 +88,34 @@ class PauliString:
     def _qubits_to_measure(self) -> Set[cirq.Qid]:
         return set(self._pauli.qubits)
 
-    def measure_in(
-        self, circuit: QPROGRAM, error_on_overlapping_measurements: bool = True
-    ) -> QPROGRAM:
-        @atomic_converter
-        def _measure_in(
-            circuit: cirq.Circuit, pauli: cirq.PauliString[Any]
-        ) -> cirq.ops.raw_types.TSelf:
-            # Transform circuit to canonical qubit layout.
-            qubit_map = dict(
-                zip(
-                    sorted(circuit.all_qubits()),
-                    cirq.LineQubit.range(len(circuit.all_qubits())),
-                )
+    @staticmethod
+    @atomic_converter
+    def _measure_in(circuit: cirq.Circuit, pauli: 'PauliString') -> cirq.Circuit:
+        # Transform circuit to canonical qubit layout.
+        qubit_map = dict(
+            zip(
+                sorted(circuit.all_qubits()),
+                cirq.LineQubit.range(len(circuit.all_qubits())),
             )
-            circuit = circuit.transform_qubits(lambda q: qubit_map[q])
+        )
+        circuit = circuit.transform_qubits(lambda q: qubit_map[q])
 
-            if not set(pauli).issubset(set(circuit.all_qubits())):
-                raise ValueError(
-                    f"Qubit mismatch. The PauliString {self} acts on qubits "
-                    f"{[q for q in pauli.qubits]} but the circuit has qubit "
-                    f"indices {sorted([q for q in circuit.all_qubits()])}."
-                )
-
-            # Option to error on overlapping measurements.
-            term_measured_qubits = find_all_qubits_with_terminal_measurements(
-                circuit
-            )
-            supported_qubits = set(pauli.qubits)
-
-            if (
-                error_on_overlapping_measurements
-                and not supported_qubits.isdisjoint(term_measured_qubits)
-            ):
-                raise ValueError(
-                    "Circuit has terminal measurements in the support of the "
-                    "PauliString. If this is intentional, you can call "
-                    "`PauliString._measure_in` with "
-                    "`error_on_overlapping_measurements=False`."
-                )
-            # Note: Measurements are removed then re-added to have one n-qubit
-            # `cirq.MeasurementGate` instead of individual
-            # `cirq.MeasurementGate`s.
-            _ = _pop_measurements(circuit)
-            qubits_to_measure = supported_qubits.union(term_measured_qubits)
-
-            # Add single-qubit basis rotations & measurements.
-            z_basis_ops = [
-                op
-                for op in pauli.to_z_basis_ops()
-                if op.gate != cirq.SingleQubitCliffordGate.I
-            ]
-            measured = (
-                circuit
-                + z_basis_ops
-                + cirq.measure(*sorted(qubits_to_measure))
+        if not set(pauli._pauli).issubset(set(circuit.all_qubits())):
+            raise ValueError(
+                f"Qubit mismatch. The PauliString {pauli._pauli} acts on "
+                f"qubits {[q for q in pauli._pauli.qubits]} but the circuit "
+                f"has qubit indices "
+                f"{sorted([q for q in circuit.all_qubits()])}."
             )
 
-            # Transform circuit back to original qubits.
-            reverse_qubit_map = dict(zip(qubit_map.values(), qubit_map.keys()))
-            return measured.transform_qubits(lambda q: reverse_qubit_map[q])
+        measured = circuit + pauli._basis_rotations() + cirq.measure(*sorted(pauli._qubits_to_measure()))
 
-        return _measure_in(circuit, self._pauli)
+        # Transform circuit back to original qubits.
+        reverse_qubit_map = dict(zip(qubit_map.values(), qubit_map.keys()))
+        return measured.transform_qubits(lambda q: reverse_qubit_map[q])
+
+    def measure_in(self, circuit: QPROGRAM) -> QPROGRAM:
+        return self._measure_in(circuit, self)
 
     def can_be_measured_with(self, other: "PauliString") -> bool:
         """Returns True if the expectation value of the PauliString can be

@@ -92,8 +92,6 @@ def test_pauli_measure_in_circuit(support, circuit_type):
     if circuit_type == "cirq":
         assert _equal(measured, expected, require_qubit_equality=True)
     else:
-        print(measured)
-        print(convert(expected))
         assert measured == convert(expected)
 
 
