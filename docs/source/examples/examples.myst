@@ -4,7 +4,7 @@
 ---
 maxdepth: 2
 ---
-ibmq-backends.myst
+ibmq-backends.md
 hamiltonians.md
 simple_landscape.myst
 maxcut-demo.myst
@@ -14,7 +14,7 @@ mitiq-paper/mitiq-paper-codeblocks
 
 ## Links to the examples for My Binder
 
-[Error mitigation on IBMQ backends](ibmq-backends.myst)
+[Error mitigation on IBMQ backends](ibmq-backends.md)
 
 [Defining Hamiltonians as Linear Combinations of Pauli Strings](hamiltonians.md)
 
@@ -24,4 +24,4 @@ mitiq-paper/mitiq-paper-codeblocks
 
 [CLifford data regression API](cdr_api.md)
 
-[Mitiq paper codeblocks](mitiq-paper/mitiq-paper-codeblocks.md)
+[Mitiq paper codeblocks](mitiq-paper/mitiq-paper-codeblocks)
