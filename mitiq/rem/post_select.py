@@ -13,33 +13,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from mitiq._typing import MeasurementResult
+from typing import Callable
+
+from mitiq._typing import Bitstring, MeasurementResult
 
 
 def post_select(
     measurement_result: MeasurementResult,
-    hamming_weight: int,
+    selector: Callable[[Bitstring], bool],
     inverted: bool = False,
 ) -> MeasurementResult:
-    """Discards bitstrings which do not satisfy the provided Hamming weight
-    (i.e., number of 1s in the bitstring) and returns this new
-    ``MeasurementResult``.
+    """Returns only the bitstrings which satisfy the predicate in ``selector``.
 
     Args:
         measurement_result: List of bitstrings.
-        hamming_weight: Hamming weight of each returned bitstring (if any).
-        inverted: If True, 0s count towards the Hamming weight instead of 1s.
-            E.g., the inverted Hamming weight of ``[1, 0, 1]`` is 1 whereas the
-            "regular" Hamming weight of this bitstring is 2.
+        selector: Predicate for which bitstrings to select. Examples:
 
-            Note: If ``inverted`` is True, the first bitstring in
-            ``measurement_result`` is used to determine the new target weight,
-            so this assumes all bitstrings have the same length.
+            * ``selector = lambda bitstring: sum(bitstring) == k``
+              - Select all bitstrings of Hamming weight ``k``.
+            * ``selector = lambda bitstring: sum(bitstring) <= k``
+              - Select all bitstrings of Hamming weight at most ``k``.
+            * ``selector = lambda bitstring: bitstring[0] == 1``
+              - Select all bitstrings such that the the first bit is 1.
+
+        inverted: Invert the selector predicate so that bitstrings which obey
+            ``selector(bitstring) == False`` are selected and returned.
     """
-    if len(measurement_result) == 0:
-        return []
-
-    if inverted:
-        hamming_weight = len(measurement_result[0]) - hamming_weight
-
-    return [bits for bits in measurement_result if sum(bits) == hamming_weight]
+    return [bits for bits in measurement_result if selector(bits) != inverted]

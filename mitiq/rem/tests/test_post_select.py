@@ -20,31 +20,47 @@ from mitiq.rem import post_select
 
 
 def test_post_select():
-    measurement = [[0, 1, 1], [1, 1, 0], [0, 0, 0], [0, 0, 1], [1, 1, 1]]
+    res = [[0, 1, 1], [1, 1, 0], [0, 0, 0], [0, 0, 1], [1, 1, 1]]
 
-    assert post_select(measurement, hamming_weight=3) == [[1, 1, 1]]
-    assert post_select(measurement, hamming_weight=2) == [[0, 1, 1], [1, 1, 0]]
-    assert post_select(measurement, hamming_weight=1) == [[0, 0, 1]]
-    assert post_select(measurement, hamming_weight=0) == [[0, 0, 0]]
+    assert post_select(res, lambda bits: sum(bits) == 3) == [[1, 1, 1]]
+    assert post_select(res, lambda b: sum(b) == 2) == [[0, 1, 1], [1, 1, 0]]
+    assert post_select(res, lambda bits: sum(bits) == 1) == [[0, 0, 1]]
+    assert post_select(res, lambda bits: sum(bits) == 0) == [[0, 0, 0]]
 
 
 def test_post_select_inverted():
     res = [[0, 0, 1], [1, 1, 0], [0, 0, 0]]
 
-    assert post_select(res, hamming_weight=1) == [[0, 0, 1]]
-    assert post_select(res, hamming_weight=1, inverted=True) == [[1, 1, 0]]
+    assert post_select(res, lambda bits: sum(bits) == 1) == [[0, 0, 1]]
+    assert post_select(res, lambda bits: sum(bits) == 1, inverted=True) == [
+        [1, 1, 0],
+        [0, 0, 0],
+    ]
 
-    assert post_select(res, hamming_weight=3) == []
-    assert post_select(res, hamming_weight=3, inverted=True) == [[0, 0, 0]]
+    assert post_select(res, lambda bits: sum(bits) == 3) == []
+    assert post_select(res, lambda bits: sum(bits) == 3, inverted=True) == res
 
 
 @pytest.mark.parametrize("inverted", (True, False))
 def test_post_select_empty_measurement_result(inverted):
-    assert post_select([], hamming_weight=3, inverted=inverted) == []
+    assert post_select([], lambda bits: sum(bits) == 3, inverted) == []
+
+
+def test_post_select_hamming_weight_less_than():
+    res = [[0, 1, 1], [1, 1, 0], [0, 0, 0], [0, 0, 1], [1, 1, 1]]
+
+    assert post_select(res, lambda bits: sum(bits) < 1) == [[0, 0, 0]]
+    assert post_select(res, lambda b: sum(b) < 2) == [[0, 0, 0], [0, 0, 1]]
+
+
+def test_post_select_hamming_weight_specific_bit():
+    res = [[0, 1, 1], [1, 1, 0], [0, 0, 0], [0, 0, 1], [1, 1, 1]]
+
+    assert post_select(res, lambda b: b[1] == 0) == [[0, 0, 0], [0, 0, 1]]
 
 
 def test_post_select_edge_cases():
     samples = [[1], [0], [1], [0], [0], [1], [1], [1]]
 
-    assert post_select(samples, hamming_weight=-1) == []
-    assert post_select(samples, hamming_weight=23) == []
+    assert post_select(samples, lambda bits: sum(bits) == -1) == []
+    assert post_select(samples, lambda bits: sum(bits) == 23) == []
