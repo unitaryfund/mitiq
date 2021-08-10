@@ -18,7 +18,7 @@ import pytest
 import numpy as np
 import cirq
 
-from mitiq.observable import PauliString, Observable
+from mitiq.observable import PauliString
 from mitiq.interface import mitiq_qiskit, mitiq_pyquil
 from mitiq.utils import _equal
 
