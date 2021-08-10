@@ -137,6 +137,12 @@ class Collector:
                 for circ in collection.keys()
             ]
 
+        print("IN COLLECTOR.RUN, to_run is:")
+        for c in to_run:
+            print(c)
+
+        print(self._can_batch)
+
         if not self._can_batch:
             for circuit in to_run:
                 self._call_executor(circuit, **kwargs)
@@ -167,11 +173,24 @@ class Collector:
         Args:
             to_run: Circuit(s) to run.
         """
+        print("In _call_executor, running:")
+        print(to_run)
         result = self._executor(to_run, **kwargs)  # type: ignore
+        print(result)
         self._calls_to_executor += 1
+
+        # TODO: This doesn't work with measurement executors. There needs to
+        #  be a better check for if this is a single atomic result or several
+        #  atomic results.
+        #  Hack for now:
+        if True:
+            self._computed_results.append(result)
+            self._executed_circuits.append(to_run)
+            return
 
         try:
             result = list(result)
+            print("HERE")
             self._computed_results += result
             self._executed_circuits += to_run
         except TypeError:

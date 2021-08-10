@@ -18,7 +18,7 @@ from typing import Any, List, Optional, Sequence, Set
 import numpy as np
 import cirq
 
-from mitiq import QPROGRAM
+from mitiq._typing import QPROGRAM, MeasurementResult
 from mitiq.interface import atomic_converter
 
 
@@ -149,6 +149,11 @@ class PauliString:
         non-identity terms in the PauliString.
         """
         return sum(gate != cirq.I for gate in self._pauli.values())
+
+    def _expectation_from_measurements(self, measurements: MeasurementResult) -> float:
+        bitstrings = np.array(measurements)[:, [q.x for q in self._pauli.qubits]]
+        value = np.average([(-1) ** np.sum(bits) for bits in bitstrings])
+        return self._pauli.coefficient * value
 
     def __str__(self) -> str:
         return str(self._pauli)

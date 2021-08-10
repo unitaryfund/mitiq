@@ -18,7 +18,7 @@ import pytest
 import numpy as np
 import cirq
 
-from mitiq.observable import PauliString, Observable
+from mitiq.observable import PauliString
 from mitiq.interface import mitiq_qiskit, mitiq_pyquil
 from mitiq.utils import _equal
 
@@ -159,132 +159,55 @@ def test_weight():
     assert PauliString(spec="ZX" * n).weight() == 2 * n
 
 
-def test_observable():
-    pauli1 = PauliString(spec="XI", coeff=-1.0)
-    pauli2 = PauliString(spec="IZ", coeff=2.0)
-    obs = Observable(pauli1, pauli2)
-
-    assert obs.nqubits == 2
-    assert obs.qubit_indices == [0, 1]
-    assert obs.nterms == 2
-
-    correct_matrix = -1.0 * np.kron(xmat, imat) + 2.0 * np.kron(imat, zmat)
-    assert np.allclose(obs.matrix(), correct_matrix)
+# Note: For testing `PauliString._expectation_from_measurements`, it makes no
+# difference whether the Pauli is X, Y, or Z. This is because we assume
+# measurements are obtained by single-qubit basis rotations. So it only matters
+# whether the Pauli is I (identity) or X, Y, Z (not identity). For consistency
+# we just use Z for not identity below.
 
 
-def test_observable_partition_one_set():
-    pauli1 = PauliString(spec="ZI")
-    pauli2 = PauliString(spec="IZ")
-    pauli3 = PauliString(spec="ZZ")
-    obs = Observable(pauli1, pauli2, pauli3)
-    assert obs.nterms == 3
+@pytest.mark.parametrize("seed", range(5))
+@pytest.mark.parametrize("nqubits", [1, 2, 5])
+def test_expectation_from_measurements_identity(seed, nqubits):
+    """For P = cI, asserts ⟨P⟩ = c."""
+    rng = np.random.RandomState(seed)
+    coeff = rng.random()
+    pauli = PauliString(spec="I", coeff=coeff)
 
-    sets = obs.partition()
-    # expected = {frozenset([pauli1, pauli2, pauli3])}
-
-    assert len(sets) == 1
-    # assert sets == expected
-
-
-def test_observable_partition_single_qubit_paulis():
-    x = PauliString(spec="X")
-    y = PauliString(spec="Y")
-    z = PauliString(spec="Z")
-    obs = Observable(x, y, z)
-    assert obs.nterms == 3
-
-    sets = obs.partition()
-    # expected = {frozenset([p]) for p in (x, y, z)}
-
-    assert len(sets) == 3
-    # assert sets == expected
-
-
-def test_observable_partition_can_be_measured_with():
-    n = 10
-    nterms = 50
-    rng = np.random.RandomState(seed=1)
-    obs = Observable(
-        *[
-            PauliString(
-                spec=rng.choice(
-                    ("I", "X", "Y", "Z"),
-                    size=n,
-                    replace=True,
-                    p=(0.7, 0.1, 0.1, 0.1),
-                )
-            )
-            for _ in range(nterms)
-        ]
-    )
-    assert obs.nterms == nterms
-
-    for pset in obs.partition():
-        pset = list(pset)
-        for i in range(len(pset) - 1):
-            for j in range(i, len(pset)):
-                assert pset[i].can_be_measured_with(pset[j])
-
-
-def test_observable_measure_in_needs_one_circuit_z():
-    pauli1 = PauliString(spec="ZI")
-    pauli2 = PauliString(spec="IZ")
-    pauli3 = PauliString(spec="ZZ")
-    obs = Observable(pauli1, pauli2, pauli3)
-
-    qubits = cirq.LineQubit.range(2)
-    circuit = cirq.testing.random_circuit(qubits, 3, 1, random_state=1)
-
-    measures_obs_circuits = obs._measure_in(circuit)
-    assert len(measures_obs_circuits) == 1
-
-    expected = circuit + cirq.measure(*qubits)
-    assert _equal(
-        measures_obs_circuits[0],
-        expected,
-        require_qubit_equality=True,
-        require_measurement_equality=True,
+    measurements = rng.randint(low=0, high=1 + 1, size=(100, nqubits)).tolist()
+    assert np.isclose(
+        pauli._expectation_from_measurements(measurements),
+        coeff,
     )
 
 
-def test_observable_measure_in_needs_one_circuit_x():
-    pauli1 = PauliString(spec="XI")
-    pauli2 = PauliString(spec="IX")
-    pauli3 = PauliString(spec="XX")
-    obs = Observable(pauli1, pauli2, pauli3)
+def test_expectation_from_measurements_two_qubits():
+    measurements = [[0, 1] * 1_000]
 
-    qubits = cirq.LineQubit.range(2)
-    circuit = cirq.testing.random_circuit(qubits, 3, 1, random_state=1)
-
-    measures_obs_circuits = obs._measure_in(circuit)
-    assert len(measures_obs_circuits) == 1
-
-    expected = circuit + xrotation.on_each(*qubits) + cirq.measure(*qubits)
-    assert _equal(
-        measures_obs_circuits[0],
-        expected,
-        require_qubit_equality=True,
-        require_measurement_equality=True,
+    z0 = PauliString(spec="Z", support=(0,))
+    assert np.isclose(
+        z0._expectation_from_measurements(measurements),
+        1.0,
+    )
+    zi = PauliString(spec="ZI")
+    assert np.isclose(
+        zi._expectation_from_measurements(measurements),
+        1.0,
     )
 
+    z1 = PauliString(spec="Z", support=(1,))
+    assert np.isclose(
+        z1._expectation_from_measurements(measurements),
+        -1.0,
+    )
+    iz = PauliString(spec="IZ")
+    assert np.isclose(
+        iz._expectation_from_measurements(measurements),
+        -1.0,
+    )
 
-def test_observable_measure_in_needs_two_circuits():
-    obs = Observable(PauliString(spec="X"), PauliString(spec="Z"))
-
-    q = cirq.LineQubit(0)
-    circuit = cirq.Circuit(cirq.H.on(q))
-
-    measures_obs_circuits = sorted(obs._measure_in(circuit), key=len)
-    assert len(measures_obs_circuits) == 2
-
-    expected_circuits = [
-        circuit + cirq.measure(q),
-        circuit + xrotation.on(q) + cirq.measure(q),
-    ]
-    for expected, measured in zip(expected_circuits, measures_obs_circuits):
-        assert _equal(
-            measured,
-            expected,
-            require_qubit_equality=True,
-            require_measurement_equality=True,
-        )
+    zz = PauliString(spec="ZZ")
+    assert np.isclose(
+        zz._expectation_from_measurements(measurements),
+        -1.0,
+    )

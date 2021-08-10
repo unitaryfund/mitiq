@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from typing import List
+
 import numpy as np
 import cirq
 
@@ -162,3 +164,40 @@ def test_observable_measure_in_needs_two_circuits():
             require_qubit_equality=True,
             require_measurement_equality=True,
         )
+
+
+def test_observable_expectation_from_measurements_one_pauli_string():
+    obs = Observable(PauliString(spec="Z"))
+
+    measurements = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
+    expectation = obs._expectation_from_measurements([measurements])
+    assert np.isclose(expectation, 1.0)
+
+    measurements = [[1], [1], [1], [1], [1], [1], [1], [1], [1], [1]]
+    expectation = obs._expectation_from_measurements([measurements])
+    assert np.isclose(expectation, -1.0)
+
+    measurements = [[0], [1], [0], [1], [0], [1], [0], [1], [0], [1]]
+    expectation = obs._expectation_from_measurements([measurements])
+    assert np.isclose(expectation, 0.0)
+
+
+def test_observable_expectation_from_measurements_two_pauli_strings():
+    obs = Observable(PauliString(spec="Z", coeff=2.5), PauliString(spec="Z"))
+
+    bits = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
+    expectation = obs._expectation_from_measurements([bits, bits])
+    assert np.isclose(expectation, 3.5)
+
+
+def test_observable_expectation():
+    obs = Observable(PauliString(spec="Z"), PauliString(spec="Z"))
+    assert obs.ngroups == 1
+
+    q = cirq.LineQubit(0)
+    circuit = cirq.Circuit(cirq.I(q))
+
+    def execute(circuit: cirq.Circuit) -> List[List[int]]:
+        return cirq.Simulator().run(circuit, repetitions=1000).measurements["z"]
+
+    assert np.isclose(obs.expectation(circuit, executor=execute), 2.0)
