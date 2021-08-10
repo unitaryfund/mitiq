@@ -150,6 +150,12 @@ class PauliString:
         """
         return sum(gate != cirq.I for gate in self._pauli.values())
 
+    def __eq__(self, other: Any) -> bool:
+        return self._pauli == other._pauli
+
+    def __hash__(self) -> int:
+        return self._pauli.__hash__()
+
     def __str__(self) -> str:
         return str(self._pauli)
 

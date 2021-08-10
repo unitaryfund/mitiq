@@ -52,6 +52,21 @@ def test_pauli_init_with_support():
     assert str(pauli) == f"X({support[0]})*Z({support[1]})"
 
 
+def test_pauli_eq():
+    assert PauliString(spec="Z") == PauliString(spec="Z")
+    assert PauliString(spec="X") != PauliString(spec="Z")
+
+    assert PauliString(spec="Z", support=(0,)) != PauliString(
+        spec="Z", support=(1,)
+    )
+    assert PauliString(spec="IZ") == PauliString(spec="Z", support=(1,))
+    assert PauliString(spec="XY") == PauliString(spec="YX", support=(1, 0))
+
+    assert {PauliString(spec="Z"), PauliString(spec="Z")} == {
+        PauliString(spec="Z")
+    }
+
+
 def test_matrix():
     assert np.allclose(PauliString(spec="X").matrix(), xmat)
     assert np.allclose(PauliString(spec="Z", coeff=-0.5).matrix(), -0.5 * zmat)
