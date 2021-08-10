@@ -2,7 +2,7 @@
 jupytext:
   formats: md:myst
   text_representation:
-    extension: .myst
+    extension: .md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.10.3
@@ -507,7 +507,6 @@ colab:
 id: vWUzgR6EMi9n
 outputId: f2f56f66-9d37-4a17-f923-18c47a12ac5e
 ---
-
 !pip install qiskit==0.24.0 --quiet
 ```
 
@@ -544,7 +543,6 @@ colab:
 id: BJHEuASKQp4T
 outputId: 3e5597ec-470f-48a9-cf3a-9e6fe551a06d
 ---
-
 # Example usage.
 qreg = qiskit.QuantumRegister(2)
 creg = qiskit.ClassicalRegister(2)

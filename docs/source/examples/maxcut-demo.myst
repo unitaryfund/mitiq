@@ -4,7 +4,7 @@ jupytext:
     extension: .myst
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.10.2
+    jupytext_version: 1.10.3
 kernelspec:
   display_name: Python 3
   language: python
@@ -20,7 +20,6 @@ _Quantum Approximate Optimization Algorithm_ (QAOA) [[1-5]](#References) execute
 In particular we are interested in investigating how Mitiq can help reduce errors and improve the results.
 
 +++
-
 
 ## The MaxCut problem
 
