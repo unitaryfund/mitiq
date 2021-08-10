@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
-from typing import cast, FrozenSet, List, Set
+from typing import cast, List, Optional, Set
 
 import numpy as np
 import cirq
@@ -24,8 +24,9 @@ from mitiq.observable.pauli import PauliString
 
 class Observable:
     def __init__(self, *paulis: PauliString) -> None:
-        self._paulis = set(paulis)
-        self._groups: List[FrozenSet[PauliString]]
+        # TODO: Add option to Combine duplicates. E.g. [Z(0, Z(0)] -> [2*Z(0)].
+        self._paulis = list(paulis)
+        self._groups: List[List[PauliString]]
         self._ngroups: int
         self.partition()
 
@@ -46,16 +47,19 @@ class Observable:
         return len(self.qubit_indices)
 
     @property
-    def groups(self) -> List[FrozenSet[PauliString]]:
+    def groups(self) -> List[List[PauliString]]:
         return self._groups
 
     @property
     def ngroups(self) -> int:
         return self._ngroups
 
-    def partition(self) -> None:
+    def partition(self, seed: Optional[int] = None) -> None:
+        rng = np.random.RandomState(seed)
+
         plists: List[List[PauliString]] = []
         paulis = copy.deepcopy(self._paulis)
+        rng.shuffle(paulis)
 
         while paulis:
             pauli = paulis.pop()
@@ -69,7 +73,7 @@ class Observable:
             if not added:
                 plists.append([pauli])
 
-        self._groups = [frozenset(plist) for plist in plists]
+        self._groups = plists
         self._ngroups = len(self._groups)
 
     def _measure_in(self, circuit: cirq.Circuit) -> List[cirq.Circuit]:

@@ -54,9 +54,8 @@ def test_observable_partition_one_set():
     obs = Observable(pauli1, pauli2, pauli3)
     assert obs.nterms == 3
 
-    # expected = {frozenset([pauli1, pauli2, pauli3])}
     assert obs.ngroups == 1
-    # assert sets == expected
+    assert set(obs.groups[0]) == {pauli1, pauli2, pauli3}
 
 
 def test_observable_partition_single_qubit_paulis():
@@ -66,10 +65,8 @@ def test_observable_partition_single_qubit_paulis():
     obs = Observable(x, y, z)
     assert obs.nterms == 3
 
-    # expected = {frozenset([p]) for p in (x, y, z)}
-
-    assert obs.ngroups == 3
-    # assert sets == expected
+    obs.partition(seed=2)
+    assert obs.groups == [[x], [y], [z]]
 
 
 def test_observable_partition_can_be_measured_with():
@@ -91,6 +88,7 @@ def test_observable_partition_can_be_measured_with():
     )
     assert obs.nqubits == n
     assert obs.nterms == nterms
+    assert obs.ngroups <= nterms
 
     for pauli_list in obs.groups:
         pauli_list = list(pauli_list)
