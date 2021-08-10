@@ -25,11 +25,13 @@ from mitiq.observable.pauli import PauliString
 class Observable:
     def __init__(self, *paulis: PauliString) -> None:
         self._paulis = set(paulis)
-        self._nterms = len(self._paulis)
+        self._groups: List[FrozenSet[PauliString]]
+        self._ngroups: int
+        self.partition()
 
     @property
     def nterms(self) -> int:
-        return self._nterms
+        return len(self._paulis)
 
     def _qubits(self) -> Set[cirq.Qid]:
         """Returns all qubits acted on by the Observable."""
@@ -43,7 +45,15 @@ class Observable:
     def nqubits(self) -> int:
         return len(self.qubit_indices)
 
-    def partition(self) -> Set[FrozenSet[PauliString]]:
+    @property
+    def groups(self) -> List[FrozenSet[PauliString]]:
+        return self._groups
+
+    @property
+    def ngroups(self) -> int:
+        return self._ngroups
+
+    def partition(self) -> None:
         plists: List[List[PauliString]] = []
         paulis = copy.deepcopy(self._paulis)
 
@@ -59,13 +69,14 @@ class Observable:
             if not added:
                 plists.append([pauli])
 
-        return set([frozenset(plist) for plist in plists])
+        self._groups = [frozenset(plist) for plist in plists]
+        self._ngroups = len(self._groups)
 
     def _measure_in(self, circuit: cirq.Circuit) -> List[cirq.Circuit]:
         circuits: List[cirq.Circuit] = []
         base_circuit = copy.deepcopy(circuit)
 
-        for pset in self.partition():
+        for pset in self._groups:
             basis_rotations = set()
             qubits_to_measure = set()
             for pauli in pset:

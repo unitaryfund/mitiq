@@ -38,6 +38,7 @@ def test_observable():
     assert obs.nqubits == 2
     assert obs.qubit_indices == [0, 1]
     assert obs.nterms == 2
+    assert obs.ngroups == 1
 
     imat = np.identity(2)
     xmat = cirq.unitary(cirq.X)
@@ -53,10 +54,8 @@ def test_observable_partition_one_set():
     obs = Observable(pauli1, pauli2, pauli3)
     assert obs.nterms == 3
 
-    sets = obs.partition()
     # expected = {frozenset([pauli1, pauli2, pauli3])}
-
-    assert len(sets) == 1
+    assert obs.ngroups == 1
     # assert sets == expected
 
 
@@ -67,10 +66,9 @@ def test_observable_partition_single_qubit_paulis():
     obs = Observable(x, y, z)
     assert obs.nterms == 3
 
-    sets = obs.partition()
     # expected = {frozenset([p]) for p in (x, y, z)}
 
-    assert len(sets) == 3
+    assert obs.ngroups == 3
     # assert sets == expected
 
 
@@ -91,13 +89,14 @@ def test_observable_partition_can_be_measured_with():
             for _ in range(nterms)
         ]
     )
+    assert obs.nqubits == n
     assert obs.nterms == nterms
 
-    for pset in obs.partition():
-        pset = list(pset)
-        for i in range(len(pset) - 1):
-            for j in range(i, len(pset)):
-                assert pset[i].can_be_measured_with(pset[j])
+    for pauli_list in obs.groups:
+        pauli_list = list(pauli_list)
+        for i in range(len(pauli_list) - 1):
+            for j in range(i, len(pauli_list)):
+                assert pauli_list[i].can_be_measured_with(pauli_list[j])
 
 
 def test_observable_measure_in_needs_one_circuit_z():
