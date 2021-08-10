@@ -55,6 +55,7 @@ def test_pauli_init_with_support():
 def test_pauli_eq():
     assert PauliString(spec="Z") == PauliString(spec="Z")
     assert PauliString(spec="X") != PauliString(spec="Z")
+    assert PauliString(spec="Z") != PauliString(spec="Z", coeff=-1.0)
 
     assert PauliString(spec="Z", support=(0,)) != PauliString(
         spec="Z", support=(1,)
