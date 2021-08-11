@@ -17,10 +17,10 @@ kernelspec:
 This tutorial shows an example of how to mitigate noise on IBMQ
 backends, broken down in the following steps.
 
--   `setup`
--   `high_level_usage`
--   `cirq_frontend`
--   `low_level_usage`
+-   [Setup: Defining a circuit](#Setup:-Defining-a-circuit)
+-   [High level usage](#High-level-usage)
+-   [Cirq front end](#Cirq-front-end)
+-   [Low level usage](#Low-level-usage)
 
 ## Setup: Defining a circuit
 
