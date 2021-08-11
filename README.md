@@ -24,6 +24,8 @@ compiling quantum programs in clever ways.
 Want to know more? Check out our
 [documentation](https://mitiq.readthedocs.io/en/stable/guide/guide-overview.html) and chat with us on [Discord](http://discord.unitary.fund).
 
+> Do you use near-term quantum hardware? Have you tried Mitiq? Either way, take our survey and help make Mitiq better! [bit.ly/mitiq-survey](bit.ly/mitiq-survey)
+
 ## Quickstart
 
 ### Installation
