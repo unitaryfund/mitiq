@@ -14,7 +14,7 @@ mitiq-paper/mitiq-paper-codeblocks
 
 ## Links to the examples for My Binder
 
-[Error mitigation on IBMQ backends](ibmq-backends.md)
+[Error mitigation on IBMQ backends](ibmq-backends.myst)
 
 [Defining Hamiltonians as Linear Combinations of Pauli Strings](hamiltonians.md)
 
