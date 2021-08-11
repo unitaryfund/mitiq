@@ -510,7 +510,7 @@ the statistical distribution of the corresponding results (see e.g. the numerica
 
 +++
 
-# References
+## References
 
 1. K. Temme, S. Bravyi, J. M. Gambetta, _Error Mitigation for Short-Depth Quantum Circuits_, [arXiv:1612.02058](https://arxiv.org/abs/1612.02058).
 
@@ -528,10 +528,14 @@ the statistical distribution of the corresponding results (see e.g. the numerica
 
 +++
 
-### This notebook was executed with following Mitiq version:
+This notebook was executed with following version of Mitiq:
 
 ```{code-cell} ipython3
 import mitiq
 
 mitiq.about()
+```
+
+```{code-cell} ipython3
+
 ```
