@@ -17,7 +17,6 @@ jupyter:
 # Error mitigation on IBMQ backends¶
 
 
-::: {.cell .markdown}
 This tutorial shows an example of how to mitigate noise on IBMQ
 backends, broken down in the following steps.
 
@@ -134,24 +133,32 @@ an IBMQ backend.
 
 First, we define the Cirq circuit.
 
-import cirq
+```{eval-rst}
+.. testcode::
 
-qbit = cirq.LineQubit(0) cirq_circuit = cirq.Circuit(\[cirq.X(qbit)\] \*
-10, cirq.measure(qbit))
+  import cirq
 
-Now, we simply add a line to our executor function which converts from a
-Cirq circuit to a Qiskit circuit.
+  qbit = cirq.LineQubit(0) cirq_circuit = cirq.Circuit(\[cirq.X(qbit)\] \*
+  10, cirq.measure(qbit))
 
-from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
+  Now, we simply add a line to our executor function which converts from a
+  Cirq circuit to a Qiskit circuit.
 
-def cirq_armonk_executor(cirq_circuit: cirq.Circuit, shots: int = 1024) -\> float:\
-qiskit_circuit = to_qiskit(cirq_circuit) return
-ibmq_executor(qiskit_circuit, shots)
+  from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
 
+  def cirq_armonk_executor(cirq_circuit: cirq.Circuit, shots: int = 1024) -\> float:\
+  qiskit_circuit = to_qiskit(cirq_circuit) return
+  ibmq_executor(qiskit_circuit, shots)
+
+```
 After this, we can use `zne.execute_with_zne` in the same way as above.
 
-mitigated = zne.execute_with_zne(cirq_circuit, cirq_armonk_executor)
+```{eval-rst}
+.. testcode::
 
+  mitigated = zne.execute_with_zne(cirq_circuit, cirq_armonk_executor)
+
+```
 As above, different noise scaling or extrapolation methods can be used.
 
 ## Lower-level usage
@@ -203,21 +210,25 @@ We can now see the unmitigated observable value by printing the first
 element of `expectation_values`. (This value corresponds to a circuit
 with scale factor one, i.e., the original circuit.)
 
-``` {.{.}}
->>> print("Unmitigated expectation value:", round(expectation_values[0], 3))
-Unmitigated expectation value: 0.945
+```{eval-rst}
+.. doctest::
+
+  >>> print("Unmitigated expectation value:", round(expectation_values[0], 3))
+  Unmitigated expectation value: 0.945
 ```
 
 Now we can use the `reduce` method of `zne.inference.Factory` objects to
 extrapolate to the zero-noise limit. Below we use a linear fit (order
 one polynomial fit) and print out the extrapolated zero-noise value.
 
-``` {.{.}}
->>> fac = zne.inference.LinearFactory(scale_factors)
->>> fac.instack, fac.outstack = scale_factors, expectation_values
->>> zero_noise_value = fac.reduce()
->>> print(f"Extrapolated zero-noise value:", round(zero_noise_value, 3))
-Extrapolated zero-noise value: 0.961
+```{eval-rst}
+.. doctest::
+
+  >>> fac = zne.inference.LinearFactory(scale_factors)
+  >>> fac.instack, fac.outstack = scale_factors, expectation_values
+  >>> zero_noise_value = fac.reduce()
+  >>> print(f"Extrapolated zero-noise value:", round(zero_noise_value, 3))
+  Extrapolated zero-noise value: 0.961
 ```
 
 For this example, we indeed see that the extrapolated zero-noise value
