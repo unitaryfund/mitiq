@@ -29,14 +29,24 @@ backends, broken down in the following steps.
 
 First we import Qiskit and Mitiq.
 
-import qiskit from mitiq import zne
+```{eval-rst}
+.. testcode::
+
+  import qiskit from mitiq import zne
+
+```
 
 For simplicity, we\'ll use a random single-qubit circuit with ten gates
 that compiles to the identity, defined below.
 
-qreg, creg = qiskit.QuantumRegister(1), qiskit.ClassicalRegister(1)
-circuit = qiskit.QuantumCircuit(qreg, creg) for \_ in range(10):
-circuit.x(qreg) circuit.measure(qreg, creg)
+```{eval-rst}
+.. testcode::
+
+  qreg, creg = qiskit.QuantumRegister(1), qiskit.ClassicalRegister(1)
+  circuit = qiskit.QuantumCircuit(qreg, creg) for \_ in range(10):
+  circuit.x(qreg) circuit.measure(qreg, creg)
+
+```
 
 We will use the probability of the ground state as our observable to
 mitigate, the expectation value of which should evaluate to one in the
@@ -62,34 +72,51 @@ Using an IBM quantum computer requires a valid IBMQ account. See
 <https://quantum-computing.ibm.com/> for instructions to create an
 account, save credentials, and see online quantum computers.
 
-if qiskit.IBMQ.stored_account():\
-provider = qiskit.IBMQ.load_account() backend =
-provider.get_backend(\"ibmq_qasm_simulator\") \# Set quantum
-computer here!
 
-else:\
-\# Default to a simulator. backend = qiskit.BasicAer.backends()\[0\]
+```{eval-rst}
+.. testcode::
 
-def ibmq_executor(circuit: qiskit.QuantumCircuit, shots: int = 1024) -\> float:\
-\"\"\"Returns the expectation value to be mitigated.
+  if qiskit.IBMQ.stored_account():
+      provider = qiskit.IBMQ.load_account()
+      backend = provider.get_backend("ibmq_qasm_simulator")  # Set quantum computer here!
+  else:
+      # Default to a simulator.
+      backend = qiskit.BasicAer.backends()[0]
 
-Args:\
-circuit: Circuit to run. shots: Number of times to execute the
-circuit to compute the expectation value.
+  def ibmq_executor(circuit: qiskit.QuantumCircuit, shots: int = 1024) -> float:
+      """Returns the expectation value to be mitigated.
 
-\"\"\" \# Run the circuit job = qiskit.execute( experiments=circuit,
-backend=backend, optimization_level=0, \# Important to preserve
-folded gates. shots=shots )
+      Args:
+          circuit: Circuit to run.
+          shots: Number of times to execute the circuit to compute the expectation value.
+      """
+      # Run the circuit
+      job = qiskit.execute(
+          experiments=circuit,
+          backend=backend,
+          optimization_level=0,  # Important to preserve folded gates.
+          shots=shots
+      )
 
-\# Convert from raw measurement counts to the expectation value
-counts = job.result().get_counts() if counts.get(\"0\") is None:
-expectation_value = 0. else: expectation_value = counts.get(\"0\") /
-shots return expectation_value
+      # Convert from raw measurement counts to the expectation value
+      counts = job.result().get_counts()
+      if counts.get("0") is None:
+          expectation_value = 0.
+      else:
+          expectation_value = counts.get("0") / shots
+      return expectation_value
+
+```
 
 At this point, the circuit can be executed to return a mitigated
 expectation value by running `zne.execute_with_zne`, as follows.
 
-mitigated = zne.execute_with_zne(circuit, ibmq_executor)
+```{eval-rst}
+.. testcode::
+
+  mitigated = zne.execute_with_zne(circuit, ibmq_executor)
+
+```
 
 As long as a circuit and a function for executing the circuit are
 defined, the `zne.execute_with_zne` function can be called as above to
@@ -118,8 +145,13 @@ shows an example of scaling noise by folding gates starting from the
 left (instead of at random, the default behavior for
 `zne.execute_with_zne`).
 
-mitigated = zne.execute_with_zne(circuit, ibmq_executor,
-scale_noise=zne.scaling.fold_gates_from_left)
+```{eval-rst}
+.. testcode::
+
+  mitigated = zne.execute_with_zne(circuit, ibmq_executor,
+  scale_noise=zne.scaling.fold_gates_from_left)
+
+```
 
 Any different combination of noise scaling and extrapolation technique
 can be passed as arguments to `zne.execute_with_zne`.
