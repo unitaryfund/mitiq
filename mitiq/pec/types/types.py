@@ -21,6 +21,7 @@ from typing import Any, cast, Dict, List, Optional, Sequence, Set, Tuple, Union
 import numpy as np
 
 import cirq
+from cirq.value.linear_dict import _format_coefficient
 
 from mitiq import QPROGRAM
 from mitiq.interface import (
@@ -513,9 +514,33 @@ class OperationRepresentation:
         return noisy_op, int(self.sign_of(noisy_op)), self.coeff_of(noisy_op)
 
     def __str__(self) -> str:
-        # TODO: This works well for one-qubit representations, but doesn't
-        #  display nicely in general.
-        return str(self._ideal) + " = " + str(self.basis_expansion)
+
+        lhs = str(self._ideal) + " = "
+        rhs = ""
+  
+        for c, circ in zip(self.coeffs, self.noisy_operations):
+            c_str = _format_coefficient(".3f", c)
+            # Handle special cases as in cirq.value.linear_dict._format_term()
+            if not c_str:
+                rhs += c_str
+            else:
+                if c_str[0] not in ["+", "-"]:
+                    c_str = "+" + c_str
+                if len(self._ideal.all_qubits()) == 1:
+                    # Print single-qubit circuits horizontally
+                    rhs += f'{c_str}*{circ!s}'
+                else:
+                    # Print multi-qubit circuits vertically
+                    rhs += "\n" + f"{c_str}*\n{circ!s}"
+        # Handle special cases as in cirq.value.linear_dict._format_terms()
+        if not rhs:
+            rhs = f"{0:.3f}"
+        if rhs[0] == '+':
+            rhs = rhs[1:]
+        if rhs[0:2] == '\n+':
+            rhs = "\n" + rhs[2:]
+
+        return lhs + rhs
 
     def __eq__(self, other: Any) -> bool:
         """Checks if two representations are equivalent. This function return
