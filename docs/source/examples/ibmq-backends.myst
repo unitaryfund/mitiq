@@ -11,92 +11,14 @@ kernelspec:
   name: python3
 ---
 
-# Error mitigation on IBMQ backends¶
+# Error mitigation on IBMQ backends
 
 
 This tutorial shows an example of how to mitigate noise on IBMQ
 backends, broken down in the following steps.
 
--   [Setup: Defining a circuit](#Setup:-Defining-a-circuit)
--   [High level usage](#High-level-usage)
--   [Cirq front end](#Cirq-front-end)
--   [Low level usage](#Low-level-usage)
+[comment]: <> (-   [Setup: Defining a circuit](#Setup:-Defining-a-circuit))
+[comment]: <> (-   [High level usage](#High-level-usage))
+[comment]: <> (-   [Cirq front end](#Cirq-front-end))
+[comment]: <> (-   [Low level usage](#Low-level-usage))
 
-## Setup: Defining a circuit
-
-First we import Qiskit and Mitiq.
-
-```{code-cell} ipython3
-import qiskit
-from mitiq import zne
-```
-
-For simplicity, we\'ll use a random single-qubit circuit with ten gates
-that compiles to the identity, defined below.
-
-```{code-cell} ipython3
-qreg, creg = qiskit.QuantumRegister(1), qiskit.ClassicalRegister(1)
-circuit = qiskit.QuantumCircuit(qreg, creg)
-for _ in range(10):
-    circuit.x(qreg) 
-    circuit.measure(qreg, creg)
-```
-
-We will use the probability of the ground state as our observable to
-mitigate, the expectation value of which should evaluate to one in the
-noiseless setting.
-
-## High-level usage
-
-To use Mitiq with just a few lines of code, we simply need to define a
-function which inputs a circuit and outputs the expectation value to
-mitigate. This function will:
-
-1.  \[Optionally\] Add measurement(s) to the circuit.
-2.  Run the circuit.
-3.  Convert from raw measurement statistics (or a different output
-    format) to an expectation value.
-
-We define this function in the following code block. Because we are
-using IBMQ backends, we first load our account.
-
-Note
-
-Using an IBM quantum computer requires a valid IBMQ account. See
-<https://quantum-computing.ibm.com/> for instructions to create an
-account, save credentials, and see online quantum computers.
-
-```{code-cell} ipython3
-if qiskit.IBMQ.stored_account():
-    provider = qiskit.IBMQ.load_account()
-    backend = provider.get_backend("ibmq_qasm_simulator")  # Set quantum computer here!
-else:
-    # Default to a simulator.
-    backend = qiskit.BasicAer.backends()[0]
-
-def ibmq_executor(circuit: qiskit.QuantumCircuit, shots: int = 1024) -> float:
-    """Returns the expectation value to be mitigated.
-
-    Args:
-        circuit: Circuit to run.
-        shots: Number of times to execute the circuit to compute the expectation value.
-    """
-    # Run the circuit
-    job = qiskit.execute(
-        experiments=circuit,
-        backend=backend,
-        optimization_level=0,  # Important to preserve folded gates.
-        shots=shots
-    )
-
-    # Convert from raw measurement counts to the expectation value
-    counts = job.result().get_counts()
-    if counts.get("0") is None:
-        expectation_value = 0.
-    else:
-        expectation_value = counts.get("0") / shots
-    return expectation_value
-```
-
-At this point, the circuit can be executed to return a mitigated
-expectation value by running `zne.execute_with_zne`, as follows.
