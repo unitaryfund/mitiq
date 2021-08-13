@@ -25,6 +25,8 @@ compiling quantum programs in clever ways.
 Want to know more? Check out our
 [documentation](https://mitiq.readthedocs.io/en/stable/guide/guide-overview.html) and chat with us on [Discord](http://discord.unitary.fund).
 
+> Do you use near-term quantum hardware? Have you tried Mitiq? Either way, take our survey and help make Mitiq better! [bit.ly/mitiq-survey](bit.ly/mitiq-survey)
+
 ## Quickstart
 
 ### Installation
@@ -72,8 +74,8 @@ The examples and other notebooks can be run interactively on the cloud with [Bin
 
 | Technique                                 | Documentation                                                                                                   | Mitiq module                                                            | Paper Reference(s)                                                                                  |
 |-------------------------------------------|-----------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| Zero-noise extrapolation                  | [ZNE](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html)                                              | [mitiq.zne](https://github.com/unitaryfund/mitiq/tree/master/mitiq/zne) | [1612.02058](https://arxiv.org/abs/1612.02058)                                                      |
-| Probabilistic error cancellation          | [PEC](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#probabilistic-error-cancellation) | [mitiq.pec](https://github.com/unitaryfund/mitiq/tree/master/mitiq/pec) | [1612.02058](https://arxiv.org/abs/1612.02058)                                                      |
+| Zero-noise extrapolation                  | [ZNE](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html)                                              | [mitiq.zne](https://github.com/unitaryfund/mitiq/tree/master/mitiq/zne) | [1611.09301](https://arxiv.org/abs/1611.09301)<br>[1612.02058](https://arxiv.org/abs/1612.02058)<br>[1805.04492](https://arxiv.org/abs/1805.04492)|
+| Probabilistic error cancellation          | [PEC](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#probabilistic-error-cancellation) | [mitiq.pec](https://github.com/unitaryfund/mitiq/tree/master/mitiq/pec) | [1612.02058](https://arxiv.org/abs/1612.02058)<br>[1712.09271](https://arxiv.org/abs/1712.09271)<br>[1905.10135](https://arxiv.org/abs/1905.10135)|
 | (Variable-noise) Clifford data regression | [CDR](https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html)                                             | [mitiq.cdr](https://github.com/unitaryfund/mitiq/tree/master/mitiq/cdr) | [2005.10189](https://arxiv.org/abs/2005.10189)<br>[2011.01157](https://arxiv.org/abs/2011.01157)    |
 | Dynamical decoupling                      | (In progress)                                                                                                   | (In progress)                                                           | [9803057](https://arxiv.org/abs/quant-ph/9803057)<br>[1807.08768](https://arxiv.org/abs/1807.08768) |
 
