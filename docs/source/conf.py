@@ -59,6 +59,8 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinxcontrib.bibtex",
     "sphinx_copybutton",
+    'nbsphinx',
+    'sphinx_gallery.load_style'
 ]
 
 intersphinx_mapping = {
@@ -316,3 +318,10 @@ html_theme = "pydata_sphinx_theme"  # 'alabaster', 'sphinx_rtd_theme'
 
 # display logo on top-left of html pages
 html_logo = "img/unitary_fund_logo.png"
+
+myst_update_mathjax = False
+
+nbsphinx_custom_formats = {
+    '.mystnb': ['jupytext.reads', {'fmt': 'mystnb'}],
+}
+nbsphinx_execute = 'always'
