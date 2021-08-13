@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+  main:
+    build:
+      dockerfile: .devcontainer/Dockerfile
+      context: ..
+      args: 
+        "VARIANT": "3.8"
+        "INSTALL_NODE": "false"
+        "NODE_VERSION": "lts/*"
+    volumes:
+      # Mounts the project folder to '/workspace'. The target path inside the container
+      # should match what your application expects. In this case, the compose file is
+      # in a sub-folder, so you will mount '..'. You would then reference this path as the
+      # 'workspaceFolder' in '.devcontainer/devcontainer.json' so VS Code starts here.
+      - ..:/workspace:cached
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+  quilc:
+    image: "rigetti/quilc"
+    command: -S -P --safe-include-directory /inc/
+    ports:
+    - '5555:5555'
+    volumes:
+      - ./inc:/inc
+  qvm:
+    image: "rigetti/qvm"
+    command: -S
+    ports:
+    - '5000:5000'
