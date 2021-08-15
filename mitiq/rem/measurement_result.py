@@ -16,7 +16,7 @@
 """Defines MeasurementResult, a result obtained by measuring qubits on a
 quantum computer."""
 from dataclasses import dataclass
-from typing import List, Union
+from typing import List
 
 import numpy as np
 
@@ -26,7 +26,7 @@ Bitstring = List[int]
 
 @dataclass
 class MeasurementResult:
-    result: Union[List[Bitstring], np.ndarray]
+    result: List[Bitstring]
 
     def __post_init__(self) -> None:
         self._bitstrings = np.array(self.result)
@@ -39,5 +39,12 @@ class MeasurementResult:
     def nqubits(self) -> int:
         return self._bitstrings.shape[1] if len(self._bitstrings.shape) >= 2 else 0
 
+    @property
+    def asarray(self) -> np.ndarray:
+        return self._bitstrings
+
     def __getitem__(self, indices: List[int]) -> np.ndarray:
         return self._bitstrings[:, indices]
+
+    def __iter__(self):
+        yield from self.result

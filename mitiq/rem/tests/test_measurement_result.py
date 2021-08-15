@@ -13,24 +13,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import pytest
 
 import numpy as np
 from mitiq.rem.measurement_result import MeasurementResult
 
 
-@pytest.mark.parametrize("asarray", (True, False))
-def test_measurement_result(asarray):
+def test_measurement_result():
     bitstrings = [[0, 0], [0, 1], [1, 0]]
-    if asarray:
-        bitstrings = np.array(bitstrings)
-
     result = MeasurementResult(bitstrings)
     assert result.nqubits == 2
     assert result.shots == 3
+    assert result.result == bitstrings
 
 
-def test_measurement_result_getitem():
+def test_getitem():
     result = MeasurementResult([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
     assert np.allclose(result[[0]], np.array([[0], [0], [1]]))
     assert np.allclose(result[[1]], np.array([[0], [1], [0]]))
@@ -43,8 +39,23 @@ def test_measurement_result_getitem():
     assert np.allclose(result[:], result._bitstrings)
 
 
-def test_measurement_result_empty():
+def test_empty():
     result = MeasurementResult([])
     assert result.nqubits == 0
     assert result.shots == 0
     assert result.result == []
+
+
+def test_iter():
+    bitstrings = [[0, 1, 1], [0, 1, 0], [1, 0, 0]]
+
+    for m, bits in zip(MeasurementResult(bitstrings), bitstrings):
+        assert m == bits
+
+
+def test_convert_to_array():
+    bitstrings = [[0, 0], [0, 1], [1, 0]]
+    result = MeasurementResult(bitstrings)
+    assert np.allclose(result.asarray, np.array(bitstrings))
+
+    assert np.allclose(MeasurementResult([]).asarray, np.array([]))
