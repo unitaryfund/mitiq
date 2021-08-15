@@ -24,6 +24,7 @@ def test_measurement_result():
     assert result.nqubits == 2
     assert result.shots == 3
     assert result.result == bitstrings
+    assert repr(result) == "MeasurementResult(result=[[0, 0], [0, 1], [1, 0]])"
 
 
 def test_getitem():
