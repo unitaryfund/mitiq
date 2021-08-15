@@ -18,8 +18,9 @@ import pytest
 import numpy as np
 import cirq
 
-from mitiq.observable import PauliString
 from mitiq.interface import mitiq_qiskit, mitiq_pyquil
+from mitiq.observable import PauliString
+from mitiq.rem import MeasurementResult
 from mitiq.utils import _equal
 
 
@@ -190,7 +191,9 @@ def test_expectation_from_measurements_identity(seed, nqubits):
     coeff = rng.random()
     pauli = PauliString(spec="I", coeff=coeff)
 
-    measurements = rng.randint(low=0, high=1 + 1, size=(100, nqubits)).tolist()
+    measurements = MeasurementResult(
+        rng.randint(low=0, high=1 + 1, size=(100, nqubits)).tolist()
+    )
     assert np.isclose(
         pauli._expectation_from_measurements(measurements),
         coeff,
@@ -198,7 +201,7 @@ def test_expectation_from_measurements_identity(seed, nqubits):
 
 
 def test_expectation_from_measurements_two_qubits():
-    measurements = [[0, 1] * 1_000]
+    measurements = MeasurementResult([[0, 1] * 1_000])
 
     z0 = PauliString(spec="Z", support=(0,))
     assert np.isclose(

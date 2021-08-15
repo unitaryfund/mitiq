@@ -151,7 +151,7 @@ class PauliString:
         return sum(gate != cirq.I for gate in self._pauli.values())
 
     def _expectation_from_measurements(self, measurements: MeasurementResult) -> float:
-        bitstrings = np.array(measurements)[:, [q.x for q in self._pauli.qubits]]
+        bitstrings = measurements[[q.x for q in self._pauli.qubits]]
         value = np.average([(-1) ** np.sum(bits) for bits in bitstrings])
         return self._pauli.coefficient * value
 
