@@ -13,11 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-<<<<<<< HEAD
 from typing import List
 
-=======
->>>>>>> 809c0ca5ed96feca9e2b7392a9ced6a587f3cb09
 import numpy as np
 import cirq
 
@@ -98,7 +95,6 @@ def test_observable_partition_can_be_measured_with():
         for i in range(len(pauli_list) - 1):
             for j in range(i, len(pauli_list)):
                 assert pauli_list[i].can_be_measured_with(pauli_list[j])
-
 
 
 def test_observable_measure_in_needs_one_circuit_z():
