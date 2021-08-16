@@ -218,5 +218,13 @@ def test_expectation_from_measurements_two_qubits():
 
 def test_pstringset_expectation_from_measurements():
     measurements = MeasurementResult([[0, 0], [0, 0], [0, 1], [0, 1]])
-    pset = PauliStringSet(PauliString(spec="ZI"), PauliString(spec="IZ"))
-    assert np.isclose(pset._expectation_from_measurements(measurements), 1.0)
+    pset = PauliStringSet(
+        PauliString(spec="ZI", coeff=-2.0), PauliString(spec="IZ", coeff=5.0)
+    )
+    assert np.isclose(pset._expectation_from_measurements(measurements), -2.0)
+
+    measurements = MeasurementResult([[1, 0], [1, 0], [0, 1], [0, 1]])
+    pset = PauliStringSet(
+        PauliString(spec="ZI", coeff=-2.0), PauliString(spec="IZ", coeff=5.0)
+    )
+    assert np.isclose(pset._expectation_from_measurements(measurements), 0.0)

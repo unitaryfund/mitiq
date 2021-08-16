@@ -135,9 +135,7 @@ class Observable:
     def _expectation_from_measurements(
         self, measurements: List[MeasurementResult]
     ) -> float:
-        expectation = 0.0
-
-        for (pset, bitstrings) in zip(self._groups, measurements):
-            expectation += pset._expectation_from_measurements(bitstrings)
-
-        return expectation
+        return sum(
+            pset._expectation_from_measurements(bitstrings)
+            for (pset, bitstrings) in zip(self._groups, measurements)
+        )
