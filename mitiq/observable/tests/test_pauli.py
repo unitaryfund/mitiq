@@ -18,7 +18,7 @@ import pytest
 import numpy as np
 import cirq
 
-from mitiq.interface import mitiq_qiskit, mitiq_pyquil
+from mitiq.interface import convert_to_mitiq, mitiq_qiskit, mitiq_pyquil
 from mitiq.observable import PauliString
 from mitiq.rem import MeasurementResult
 from mitiq.utils import _equal
@@ -195,8 +195,7 @@ def test_expectation_from_measurements_identity(seed, nqubits):
         rng.randint(low=0, high=1 + 1, size=(100, nqubits)).tolist()
     )
     assert np.isclose(
-        pauli._expectation_from_measurements(measurements),
-        coeff,
+        pauli._expectation_from_measurements(measurements), coeff,
     )
 
 
@@ -204,29 +203,14 @@ def test_expectation_from_measurements_two_qubits():
     measurements = MeasurementResult([[0, 1] * 1_000])
 
     z0 = PauliString(spec="Z", support=(0,))
-    assert np.isclose(
-        z0._expectation_from_measurements(measurements),
-        1.0,
-    )
+    assert np.isclose(z0._expectation_from_measurements(measurements), 1.0,)
     zi = PauliString(spec="ZI")
-    assert np.isclose(
-        zi._expectation_from_measurements(measurements),
-        1.0,
-    )
+    assert np.isclose(zi._expectation_from_measurements(measurements), 1.0,)
 
     z1 = PauliString(spec="Z", support=(1,))
-    assert np.isclose(
-        z1._expectation_from_measurements(measurements),
-        -1.0,
-    )
+    assert np.isclose(z1._expectation_from_measurements(measurements), -1.0,)
     iz = PauliString(spec="IZ")
-    assert np.isclose(
-        iz._expectation_from_measurements(measurements),
-        -1.0,
-    )
+    assert np.isclose(iz._expectation_from_measurements(measurements), -1.0,)
 
     zz = PauliString(spec="ZZ")
-    assert np.isclose(
-        zz._expectation_from_measurements(measurements),
-        -1.0,
-    )
+    assert np.isclose(zz._expectation_from_measurements(measurements), -1.0,)

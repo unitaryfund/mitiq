@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Any, List, Optional, Sequence, Set
+from typing import Any, Dict, List, Optional, Sequence, Set
 
 import numpy as np
 import cirq
@@ -92,40 +92,8 @@ class PauliString:
     def _qubits_to_measure(self) -> Set[cirq.Qid]:
         return set(self._pauli.qubits)
 
-    @staticmethod
-    @atomic_converter
-    def _measure_in(
-        circuit: cirq.Circuit, pauli: "PauliString"
-    ) -> cirq.Circuit:
-        # Transform circuit to canonical qubit layout.
-        qubit_map = dict(
-            zip(
-                sorted(circuit.all_qubits()),
-                cirq.LineQubit.range(len(circuit.all_qubits())),
-            )
-        )
-        circuit = circuit.transform_qubits(lambda q: qubit_map[q])
-
-        if not set(pauli._pauli).issubset(set(circuit.all_qubits())):
-            raise ValueError(
-                f"Qubit mismatch. The PauliString {pauli._pauli} acts on "
-                f"qubits {[q for q in pauli._pauli.qubits]} but the circuit "
-                f"has qubit indices "
-                f"{sorted([q for q in circuit.all_qubits()])}."
-            )
-
-        measured = (
-            circuit
-            + pauli._basis_rotations()
-            + cirq.measure(*sorted(pauli._qubits_to_measure()))
-        )
-
-        # Transform circuit back to original qubits.
-        reverse_qubit_map = dict(zip(qubit_map.values(), qubit_map.keys()))
-        return measured.transform_qubits(lambda q: reverse_qubit_map[q])
-
     def measure_in(self, circuit: QPROGRAM) -> QPROGRAM:
-        return self._measure_in(circuit, self)
+        return PauliStringSet(self).measure_in(circuit)
 
     def can_be_measured_with(self, other: "PauliString") -> bool:
         """Returns True if the expectation value of the PauliString can be
@@ -144,13 +112,18 @@ class PauliString:
                 return False
         return True
 
+    def support(self) -> Set[int]:
+        return {q.x for q in self._pauli.qubits}
+
     def weight(self) -> int:
         """Returns the weight of the PauliString, i.e., the number of
         non-identity terms in the PauliString.
         """
         return sum(gate != cirq.I for gate in self._pauli.values())
 
-    def _expectation_from_measurements(self, measurements: MeasurementResult) -> float:
+    def _expectation_from_measurements(
+        self, measurements: MeasurementResult
+    ) -> float:
         bitstrings = measurements[[q.x for q in self._pauli.qubits]]
         value = np.average([(-1) ** np.sum(bits) for bits in bitstrings])
         return self._pauli.coefficient * value
@@ -166,3 +139,100 @@ class PauliString:
 
     def __repr__(self) -> str:
         return repr(self._pauli)
+
+
+class PauliStringSet:
+    def __init__(
+        self, *paulis: PauliString, check_precondition: bool = True
+    ) -> None:
+        """Initializes a ``PauliStringSet``, a set of ``PauliString``s which
+        qubit-wise commute and so can be measured with a single circuit.
+
+        Args:
+            paulis: PauliStrings to add to the set.
+            check_precondition: If True, raises an error if some of the
+                ``PauliString``s do not qubit-wise commute.
+        """
+        self._paulis: Dict[int, Set[PauliString]] = dict()
+        self.add(*paulis, check_precondition=check_precondition)
+
+    def can_add(self, pauli: PauliString) -> bool:
+        return all(pauli.can_be_measured_with(p) for p in self.elements)
+
+    def add(
+        self, *paulis: PauliString, check_precondition: bool = True
+    ) -> None:
+        for pauli in paulis:
+            if check_precondition and not self.can_add(pauli):
+                raise ValueError(
+                    f"Cannot add PauliString {pauli} to PauliStringSet."
+                )
+            weight = pauli.weight()
+            if self._paulis.get(weight) is None:
+                self._paulis[weight] = {pauli}
+            else:
+                self._paulis[weight].add(pauli)
+
+    @property
+    def elements(self) -> Set[PauliString]:
+        return {pauli for pset in self._paulis.values() for pauli in pset}
+
+    @property
+    def elements_by_weight(self) -> Dict[int, Set[PauliString]]:
+        return self._paulis
+
+    def support(self) -> Set[int]:
+        return {qubit.x for qubit in self._qubits_to_measure()}
+
+    def weight(self) -> int:
+        return len(self.support())
+
+    def max_weight(self) -> int:
+        return min(self._paulis.keys())
+
+    def min_weight(self) -> int:
+        return max(self._paulis.keys())
+
+    def _qubits_to_measure(self) -> Set[cirq.Qid]:
+        qubits = set()
+        for pauli in self.elements:
+            qubits.update(pauli._pauli.qubits)
+        return qubits
+
+    def measure_in(self, circuit: QPROGRAM) -> QPROGRAM:
+        return self._measure_in(circuit, self)
+
+    @staticmethod
+    @atomic_converter
+    def _measure_in(
+        circuit: cirq.Circuit, pauliset: "PauliStringSet"
+    ) -> cirq.Circuit:
+        # Transform circuit to canonical qubit layout.
+        qubit_map = dict(
+            zip(
+                sorted(circuit.all_qubits()),
+                cirq.LineQubit.range(len(circuit.all_qubits())),
+            )
+        )
+        circuit = circuit.transform_qubits(lambda q: qubit_map[q])
+
+        if not pauliset._qubits_to_measure().issubset(set(circuit.all_qubits())):
+            raise ValueError(
+                f"Qubit mismatch. The PauliString(s) act on qubits "
+                f"{pauliset.support()} but the circuit has qubit indices "
+                f"{sorted([q for q in circuit.all_qubits()])}."
+            )
+
+        basis_rotations = set()
+        support = set()
+        for pauli in pauliset.elements:
+            basis_rotations.update(pauli._basis_rotations())
+            support.update(pauli._qubits_to_measure())
+        measured = circuit + basis_rotations + cirq.measure(*sorted(support))
+
+        # Transform circuit back to original qubits.
+        reverse_qubit_map = dict(zip(qubit_map.values(), qubit_map.keys()))
+        return measured.transform_qubits(lambda q: reverse_qubit_map[q])
+
+    def __len__(self) -> int:
+        return len(self.elements)
