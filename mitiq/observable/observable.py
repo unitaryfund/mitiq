@@ -137,8 +137,7 @@ class Observable:
     ) -> float:
         expectation = 0.0
 
-        for (group, bitstrings) in zip(self._groups, measurements):
-            for pauli in group:
-                expectation += pauli._expectation_from_measurements(bitstrings)
+        for (pset, bitstrings) in zip(self._groups, measurements):
+            expectation += pset._expectation_from_measurements(bitstrings)
 
         return expectation

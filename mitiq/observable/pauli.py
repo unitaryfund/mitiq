@@ -68,6 +68,10 @@ class PauliString:
             ),
         )
 
+    @property
+    def coeff(self) -> complex:
+        return self._pauli.coefficient
+
     def matrix(
         self,
         qubit_indices_to_include: Optional[List[int]] = None,
@@ -124,9 +128,7 @@ class PauliString:
     def _expectation_from_measurements(
         self, measurements: MeasurementResult
     ) -> float:
-        bitstrings = measurements[[q.x for q in self._pauli.qubits]]
-        value = np.average([(-1) ** np.sum(bits) for bits in bitstrings])
-        return self._pauli.coefficient * value
+        return PauliStringSet(self)._expectation_from_measurements(measurements)
 
     def __eq__(self, other: Any) -> bool:
         return self._pauli == other._pauli
@@ -233,6 +235,16 @@ class PauliStringSet:
         # Transform circuit back to original qubits.
         reverse_qubit_map = dict(zip(qubit_map.values(), qubit_map.keys()))
         return measured.transform_qubits(lambda q: reverse_qubit_map[q])
+
+    def _expectation_from_measurements(
+        self, measurements: MeasurementResult
+    ) -> float:
+        total = 0.0
+        for pauli in self.elements:
+            bitstrings = measurements[[q.x for q in pauli._pauli.qubits]]
+            value = np.average([(-1) ** np.sum(bits) for bits in bitstrings])
+            total += pauli.coeff * value
+        return total
 
     def __eq__(self, other: any) -> bool:
         return self.elements == other.elements

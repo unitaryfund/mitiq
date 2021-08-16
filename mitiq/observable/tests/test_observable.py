@@ -164,7 +164,7 @@ def test_observable_measure_in_needs_two_circuits():
 # def test_observable_expectation_from_measurements_one_pauli_string():
 #     obs = Observable(PauliString(spec="Z"))
 #
-#     measurements = [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
+#     measurements = MeasurementResult([[0], [0], [0], [0], [0], [0], [0], [0], [0], [0]])
 #     expectation = obs._expectation_from_measurements([measurements])
 #     assert np.isclose(expectation, 1.0)
 #
@@ -175,7 +175,7 @@ def test_observable_measure_in_needs_two_circuits():
 #     measurements = [[0], [1], [0], [1], [0], [1], [0], [1], [0], [1]]
 #     expectation = obs._expectation_from_measurements([measurements])
 #     assert np.isclose(expectation, 0.0)
-#
+
 #
 # def test_observable_expectation_from_measurements_two_pauli_strings():
 #     obs = Observable(PauliString(spec="Z", coeff=2.5), PauliString(spec="Z"))

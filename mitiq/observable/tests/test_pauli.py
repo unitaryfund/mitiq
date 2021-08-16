@@ -18,8 +18,8 @@ import pytest
 import numpy as np
 import cirq
 
-from mitiq.interface import convert_to_mitiq, mitiq_qiskit, mitiq_pyquil
-from mitiq.observable import PauliString
+from mitiq.interface import mitiq_qiskit, mitiq_pyquil
+from mitiq.observable.pauli import PauliString, PauliStringSet
 from mitiq.rem import MeasurementResult
 from mitiq.utils import _equal
 
@@ -214,3 +214,9 @@ def test_expectation_from_measurements_two_qubits():
 
     zz = PauliString(spec="ZZ")
     assert np.isclose(zz._expectation_from_measurements(measurements), -1.0,)
+
+
+def test_pstringset_expectation_from_measurements():
+    measurements = MeasurementResult([[0, 0], [0, 0], [0, 1], [0, 1]])
+    pset = PauliStringSet(PauliString(spec="ZI"), PauliString(spec="IZ"))
+    assert np.isclose(pset._expectation_from_measurements(measurements), 1.0)
