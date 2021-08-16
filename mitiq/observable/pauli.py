@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Optional, Sequence, Any
+from typing import Any, List, Optional, Sequence, Set
 
 import numpy as np
 import cirq
@@ -68,40 +68,64 @@ class PauliString:
             ),
         )
 
-    def matrix(self) -> np.ndarray:
+    def matrix(
+        self,
+        qubit_indices_to_include: Optional[List[int]] = None,
+        dtype: type = np.complex128,
+    ) -> np.ndarray:
         """Returns the (potentially very large) matrix of the PauliString."""
-        return self._pauli.matrix()
+        qubits = (
+            [cirq.LineQubit(x) for x in qubit_indices_to_include]
+            if qubit_indices_to_include
+            else self._pauli.qubits
+        )
+        return self._pauli.matrix(qubits=qubits).astype(dtype=dtype)
+
+    def _basis_rotations(self) -> List[cirq.Operation]:
+        """Returns the basis rotations needed to measure the PauliString."""
+        return [
+            op
+            for op in self._pauli.to_z_basis_ops()
+            if op.gate != cirq.SingleQubitCliffordGate.I
+        ]
+
+    def _qubits_to_measure(self) -> Set[cirq.Qid]:
+        return set(self._pauli.qubits)
+
+    @staticmethod
+    @atomic_converter
+    def _measure_in(
+        circuit: cirq.Circuit, pauli: "PauliString"
+    ) -> cirq.Circuit:
+        # Transform circuit to canonical qubit layout.
+        qubit_map = dict(
+            zip(
+                sorted(circuit.all_qubits()),
+                cirq.LineQubit.range(len(circuit.all_qubits())),
+            )
+        )
+        circuit = circuit.transform_qubits(lambda q: qubit_map[q])
+
+        if not set(pauli._pauli).issubset(set(circuit.all_qubits())):
+            raise ValueError(
+                f"Qubit mismatch. The PauliString {pauli._pauli} acts on "
+                f"qubits {[q for q in pauli._pauli.qubits]} but the circuit "
+                f"has qubit indices "
+                f"{sorted([q for q in circuit.all_qubits()])}."
+            )
+
+        measured = (
+            circuit
+            + pauli._basis_rotations()
+            + cirq.measure(*sorted(pauli._qubits_to_measure()))
+        )
+
+        # Transform circuit back to original qubits.
+        reverse_qubit_map = dict(zip(qubit_map.values(), qubit_map.keys()))
+        return measured.transform_qubits(lambda q: reverse_qubit_map[q])
 
     def measure_in(self, circuit: QPROGRAM) -> QPROGRAM:
-        @atomic_converter
-        def _measure_in(
-            circuit: cirq.Circuit, pauli: cirq.PauliString[Any]
-        ) -> cirq.ops.raw_types.TSelf:
-            # Transform circuit to canonical qubit layout.
-            qubit_map = dict(
-                zip(
-                    sorted(circuit.all_qubits()),
-                    cirq.LineQubit.range(len(circuit.all_qubits())),
-                )
-            )
-            circuit = circuit.transform_qubits(lambda q: qubit_map[q])
-
-            # Measure the Paulis.
-            if not set(pauli).issubset(set(circuit.all_qubits())):
-                raise ValueError(
-                    f"Qubit mismatch. The PauliString {self} acts on qubits "
-                    f"{[q for q in pauli.qubits]} but the circuit has qubit "
-                    f"indices {sorted([q for q in circuit.all_qubits()])}."
-                )
-            measured = (
-                circuit + pauli.to_z_basis_ops() + cirq.measure(*pauli.qubits)
-            )
-
-            # Transform circuit back to original qubits.
-            reverse_qubit_map = dict(zip(qubit_map.values(), qubit_map.keys()))
-            return measured.transform_qubits(lambda q: reverse_qubit_map[q])
-
-        return _measure_in(circuit, self._pauli)
+        return self._measure_in(circuit, self)
 
     def can_be_measured_with(self, other: "PauliString") -> bool:
         """Returns True if the expectation value of the PauliString can be
@@ -126,5 +150,14 @@ class PauliString:
         """
         return sum(gate != cirq.I for gate in self._pauli.values())
 
+    def __eq__(self, other: Any) -> bool:
+        return self._pauli == other._pauli
+
+    def __hash__(self) -> int:
+        return self._pauli.__hash__()
+
     def __str__(self) -> str:
         return str(self._pauli)
+
+    def __repr__(self) -> str:
+        return repr(self._pauli)
