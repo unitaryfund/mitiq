@@ -19,7 +19,7 @@ from typing import Callable, cast, List, Optional, Set
 import numpy as np
 import cirq
 
-from mitiq.observable.pauli import PauliString
+from mitiq.observable.pauli import PauliString, PauliStringSet
 from mitiq._typing import MeasurementResult, QuantumResult, QPROGRAM
 from mitiq.collector import Collector
 
@@ -28,7 +28,7 @@ class Observable:
     def __init__(self, *paulis: PauliString) -> None:
         # TODO: Add option to Combine duplicates. E.g. [Z(0, Z(0)] -> [2*Z(0)].
         self._paulis = list(paulis)
-        self._groups: List[List[PauliString]]
+        self._groups: List[PauliStringSet]
         self._ngroups: int
         self.partition()
 
@@ -49,7 +49,7 @@ class Observable:
         return len(self.qubit_indices)
 
     @property
-    def groups(self) -> List[List[PauliString]]:
+    def groups(self) -> List[PauliStringSet]:
         return self._groups
 
     @property
@@ -59,42 +59,27 @@ class Observable:
     def partition(self, seed: Optional[int] = None) -> None:
         rng = np.random.RandomState(seed)
 
-        plists: List[List[PauliString]] = []
+        psets: List[PauliStringSet] = []
         paulis = copy.deepcopy(self._paulis)
         rng.shuffle(paulis)
 
         while paulis:
             pauli = paulis.pop()
             added = False
-            for (i, plist) in enumerate(plists):
-                if all(pauli.can_be_measured_with(p) for p in plist):
-                    plists[i].append(pauli)
+            for (i, pset) in enumerate(psets):
+                if pset.can_add(pauli):
+                    pset.add(pauli)
                     added = True
                     break
 
             if not added:
-                plists.append([pauli])
+                psets.append(PauliStringSet(pauli))
 
-        self._groups = plists
+        self._groups = psets
         self._ngroups = len(self._groups)
 
     def _measure_in(self, circuit: cirq.Circuit) -> List[cirq.Circuit]:
-        circuits: List[cirq.Circuit] = []
-        base_circuit = copy.deepcopy(circuit)
-
-        for pset in self._groups:
-            basis_rotations = set()
-            qubits_to_measure = set()
-            for pauli in pset:
-                basis_rotations.update(pauli._basis_rotations())
-                qubits_to_measure.update(pauli._qubits_to_measure())
-            circuits.append(
-                base_circuit
-                + basis_rotations
-                + cirq.measure(*sorted(qubits_to_measure))
-            )
-
-        return circuits
+        return [pset.measure_in(circuit) for pset in self._groups]
 
     def matrix(self, dtype: type = np.complex128) -> np.ndarray:
         """Returns the (potentially very large) matrix of the Observable."""
@@ -109,7 +94,9 @@ class Observable:
 
         return matrix
 
-    def expectation(self, circuit: QPROGRAM, executor: Callable[[QPROGRAM], QuantumResult]) -> float:
+    def expectation(
+        self, circuit: QPROGRAM, executor: Callable[[QPROGRAM], QuantumResult]
+    ) -> float:
         collector = Collector(executor=executor)
         to_run = self._measure_in(circuit=circuit)
         print("IN EXPECTATION, circuits to run are:")
@@ -128,16 +115,26 @@ class Observable:
         # else:
         #     raise NotImplementedError
 
-    def _expectation_from_wavefunction(self, wavefunction: np.ndarray) -> float:
+    def _expectation_from_wavefunction(
+        self, wavefunction: np.ndarray
+    ) -> float:
         return wavefunction.conj().T @ self.matrix() @ wavefunction
 
-    def _expectation_from_trajectories(self, wavefunctions: List[np.ndarray]) -> float:
-        return np.sum([self._expectation_from_wavefunction(wf) for wf in wavefunctions]) / len(wavefunctions)
+    def _expectation_from_trajectories(
+        self, wavefunctions: List[np.ndarray]
+    ) -> float:
+        return np.sum(
+            [self._expectation_from_wavefunction(wf) for wf in wavefunctions]
+        ) / len(wavefunctions)
 
-    def _expectation_from_density_matrix(self, density_matrix: np.ndarray) -> float:
+    def _expectation_from_density_matrix(
+        self, density_matrix: np.ndarray
+    ) -> float:
         return np.trace(density_matrix @ self.matrix()).real
 
-    def _expectation_from_measurements(self, measurements: List[MeasurementResult]) -> float:
+    def _expectation_from_measurements(
+        self, measurements: List[MeasurementResult]
+    ) -> float:
         expectation = 0.0
 
         for (group, bitstrings) in zip(self._groups, measurements):

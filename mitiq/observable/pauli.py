@@ -234,5 +234,8 @@ class PauliStringSet:
         reverse_qubit_map = dict(zip(qubit_map.values(), qubit_map.keys()))
         return measured.transform_qubits(lambda q: reverse_qubit_map[q])
 
+    def __eq__(self, other: any) -> bool:
+        return self.elements == other.elements
+
     def __len__(self) -> int:
         return len(self.elements)
