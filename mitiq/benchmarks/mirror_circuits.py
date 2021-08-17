@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
+# %%
 
-# In[ ]:
+# %%
 
 
 import cirq
@@ -12,38 +13,38 @@ from typing import Optional
 from cirq.experiments.qubit_characterizations import _single_qubit_cliffords
 
 
-# In[ ]:
+# %%
+paulis = [cirq.X, cirq.Y, cirq.Z, cirq.I]
 
-
-def random_paulis(nqubits: int, seed: Optional[int] = None) -> cirq.Circuit:
+def random_paulis(nqubits: int) -> cirq.Circuit:
     """Returns a circuit with a random pauli gate applied to each qubit
 
     Args:
     nqubits: The number of qubits in the circuit
     """
     random.seed(seed)
-    paulis = [cirq.X, cirq.Y, cirq.Z, cirq.I]
     circuit = cirq.Circuit()
     circuit.append((paulis[random.randint(4)](cirq.LineQubit(x)) for x in range(nqubits)))
     return circuit
 
 
-# In[ ]:
+# %%
 
 
-def edge_grab(xi: float, nqubits: int, connectivity_graph_: nx.Graph, seed: Optional[int] = None) -> nx.Graph:
+def edge_grab(xi: float, connectivity_graph_: nx.Graph) -> nx.Graph:
     """Returns a set of edges for which two qubit gates are to be applied given a two qubit gate density, xi,
     and the connectivity graph that must be satisfied
 
     Args:
         xi: Two qubit gate density
-        nqubits: The number of qubits in the circuit
         connectivity_graph_: The connectivity graph for the backend on which the circuit will be run
     """
     connectivity_graph = nx.Graph()
     connectivity_graph.add_nodes_from(connectivity_graph_)
     connectivity_graph.add_edges_from(connectivity_graph_.edges)
     candidate_edges = nx.Graph()
+    
+    nqubits = connectivity_graph.number_of_nodes()
     
     random.seed(seed)
 
@@ -64,23 +65,16 @@ def edge_grab(xi: float, nqubits: int, connectivity_graph_: nx.Graph, seed: Opti
     return final_edges
 
 
-# In[ ]:
-
-
-def two_q_clifford(a,b):
-    return cirq.CNOT(a,b)
-
-
-# In[ ]:
+# %%
 
 
 single_q_cliffords = _single_qubit_cliffords()
 
 
-# In[ ]:
+# %%
 
 
-def random_cliffords(nqubits: int, edges: list, seed: Optional[int] = None) -> cirq.Circuit:
+def random_cliffords(nqubits: int, edges: list) -> cirq.Circuit:
     """Returns a circuit with a two qubit clifford gate applied to each edge in edges, and a random single qubit
     clifford gate applied to every other qubit
 
@@ -90,9 +84,7 @@ def random_cliffords(nqubits: int, edges: list, seed: Optional[int] = None) -> c
     """
     cliffords = single_q_cliffords.c1_in_xy
 
-    # One-line this:
-    # gates = [two_q_clifford(cirq.LineQubit(a),cirq.LineQubit(b)) for a, b in edges]
-    gates = [two_q_clifford(cirq.LineQubit(a), cirq.LineQubit(b)) for a,b in edges]
+    gates = [cirq.CNOT(cirq.LineQubit(a), cirq.LineQubit(b)) for a,b in edges]
 
     for x in range (nqubits):
         notEdge = True
@@ -106,11 +98,11 @@ def random_cliffords(nqubits: int, edges: list, seed: Optional[int] = None) -> c
     return cirq.Circuit(gates)
 
 
-# In[ ]:
+# %%
 
 
 def random_single_cliffords(nqubits: int) -> cirq.Circuit:
-    """Returns a layer with a random single qubit clifford gates applied on each qubit
+    """Returns a layer with a random single qubit clifford gate applied on each qubit
     
     Args:
         nqubits: The number of qubits in the circuit
@@ -128,22 +120,23 @@ def random_single_cliffords(nqubits: int) -> cirq.Circuit:
     return circuit
 
 
-# In[ ]:
+# %%
 
 
-def mirror_circuit(nqubits: int, depth: int, xi: float, connectivity_graph: Optional[nx.Graph] = None) -> cirq.Circuit:
+def mirror_circuit(depth: int, xi: float, connectivity_graph: nx.Graph, ) -> cirq.Circuit:
     """Returns a randomized mirror circuit
     
     Args:
-        nqubits: Number of qubits, or width of the mirror circuit
         depth: The number of random clifford and pauli layers in the mirror circuit including the inverse layers,
           but excluding the central pauli layer and the initial clifford layer and its inverse
         xi: Expected two-qubit gate density of the mirror circuit
-        connectivity_graph: The connectivity graph of the backend on which the mirror circuit will be run. 
-          If no graph is given, it will be assumed that all qubits are connected to all other qubits
+        connectivity_graph: The connectivity graph of the backend on which the mirror circuit will be run. This is
+            used to make sure 2 qubit gates are only run on connected qubits
       """
-    if connectivity_graph is None:
-        connectivity_graph = nx.complete_graph(nqubits)
+    if not 0 <= xi <= 1:
+        raise ValueError("xi should be between 0 and 1")
+        
+    nqubits = connectivity_graph.number_of_nodes()
 
     single_qubit_cliffords = cirq.Circuit()
     single_qubit_cliffords.append(random_single_cliffords(nqubits))
@@ -156,7 +149,7 @@ def mirror_circuit(nqubits: int, depth: int, xi: float, connectivity_graph: Opti
     for _ in range(int(depth/4)):
         forward_circuit.append(random_paulis(nqubits))
 
-        selected_edges = edge_grab(xi, nqubits, connectivity_graph)
+        selected_edges = edge_grab(xi, connectivity_graph)
             
         circ = random_cliffords(nqubits, list(selected_edges.edges))
         forward_circuit.append(circ)
