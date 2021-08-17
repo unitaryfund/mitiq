@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
+# %%
 
-# In[1]:
+# %%
 
 
 from mitiq.benchmarks import mirror_circuits
@@ -12,7 +13,7 @@ import pytest
 from cirq.experiments.qubit_characterizations import _single_qubit_cliffords
 
 
-# In[ ]:
+# %%
 
 
 paulis = [cirq.X, cirq.Y, cirq.Z, cirq.I]
@@ -26,19 +27,19 @@ cliffords = single_cliffords
 cliffords.append(cirq.CNOT)
 
 
-# In[2]:
+# %%
 
 
-@pytest.mark.parameterize("n", (0, 5))
+@pytest.mark.parametrize("n", (0, 5))
 def test_random_paulis(n):
-    circuit = mirror_circuits.random_paulis(nqubits=n, seed=1)
+    circuit = mirror_circuits.random_paulis(nqubits=n)
     assert isinstance(circuit, cirq.Circuit)
     assert len(circuit.all_qubits()) == n
     assert len(list(circuit.all_operations())) == n
     assert set(op.gate for op in circuit.all_operations()).issubset(paulis)
 
 
-# In[3]:
+# %%
 
 
 def test_edge_grab():
@@ -58,7 +59,7 @@ def test_edge_grab():
             assert len(list(selected_edges.neighbors(node))) == 1
 
 
-# In[4]:
+# %%
 
 
 def test_random_cliffords():
@@ -75,10 +76,10 @@ def test_random_cliffords():
         assert set(op.gate for op in circuit.all_operations()).issubset(cliffords)
 
 
-# In[5]:
+# %%
 
 
-@pytest.mark.parameterize("n", (5, 10))
+@pytest.mark.parametrize("n", (5, 10))
 def test_random_single_cliffords(n):
     circuit = mirror_circuits.random_single_cliffords(nqubits=n)
     assert isinstance(circuit, cirq.Circuit)
@@ -86,13 +87,13 @@ def test_random_single_cliffords(n):
     assert set(op.gate for op in circuit.all_operations()).issubset(single_cliffords)
 
 
-# In[27]:
+# %%
 
 
 all_gates = paulis + cliffords
 all_gates.append(cirq.measure)
 def test_mirror_circuit():
-    parameters = [(16,13,nx.complete_graph(3)), (20,0.4, nx.complete_graph(4)), (24,0.5, nx.complete_graph(5))]
+    parameters = [(16,0.3,nx.complete_graph(3)), (20,0.4, nx.complete_graph(4)), (24,0.5, nx.complete_graph(5))]
     for depth,xi,connectivity_graph in parameters:
         n = connectivity_graph.number_of_nodes()
         circ = mirror_circuits.mirror_circuit(depth,xi,connectivity_graph)
