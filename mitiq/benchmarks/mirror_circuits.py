@@ -22,7 +22,6 @@ def random_paulis(nqubits: int) -> cirq.Circuit:
     Args:
     nqubits: The number of qubits in the circuit
     """
-    random.seed(seed)
     circuit = cirq.Circuit()
     circuit.append((paulis[random.randint(4)](cirq.LineQubit(x)) for x in range(nqubits)))
     return circuit
@@ -45,8 +44,6 @@ def edge_grab(xi: float, connectivity_graph_: nx.Graph) -> nx.Graph:
     candidate_edges = nx.Graph()
     
     nqubits = connectivity_graph.number_of_nodes()
-    
-    random.seed(seed)
 
     while(len(list(connectivity_graph.edges))>0):
         num = random.randint(connectivity_graph.size())
@@ -123,7 +120,7 @@ def random_single_cliffords(nqubits: int) -> cirq.Circuit:
 # %%
 
 
-def mirror_circuit(depth: int, xi: float, connectivity_graph: nx.Graph, ) -> cirq.Circuit:
+def mirror_circuit(depth: int, xi: float, connectivity_graph: nx.Graph) -> cirq.Circuit:
     """Returns a randomized mirror circuit
     
     Args:
@@ -135,6 +132,9 @@ def mirror_circuit(depth: int, xi: float, connectivity_graph: nx.Graph, ) -> cir
       """
     if not 0 <= xi <= 1:
         raise ValueError("xi should be between 0 and 1")
+    
+    if not depth%4 == 0:
+        raise ValueError("depth must be a multiple of 4")
         
     nqubits = connectivity_graph.number_of_nodes()
 
