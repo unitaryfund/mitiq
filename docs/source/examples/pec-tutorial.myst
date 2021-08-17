@@ -15,7 +15,7 @@ kernelspec:
 
 +++
 
-This is set-by-sep tutorial on how to use the Mitiq toolchain for implementing **probabilistc error cancellation (PEC)** [[1-3]](#References).
+This is step-by-step tutorial on how to use the Mitiq toolchain for implementing **probabilistic error cancellation (PEC)** [[1-3]](#References).
 We use the [Cirq](https://github.com/quantumlib/cirq) library, but other frontends could be used in a similar way. 
 
 If you are only interested in **applying** PEC with Mitiq, the quick start is given at
