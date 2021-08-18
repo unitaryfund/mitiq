@@ -18,7 +18,5 @@ jobs:
           days-before-close: 7
           stale-issue-message: This issue had no activity for **2 months**, and will be closed in **one week** unless there is new activity. Cheers!
           stale-issue-label: stale
-          exempt-issue-labels: priority/p0,priority/p1,priority/p2
           stale-pr-message: This pull request had no activity for **2 months**, and will be closed in **one week** unless there is new activity. Cheers!
           stale-pr-label: stale
-          exempt-pr-labels: priority/p0,priority/p1,priority/p2
