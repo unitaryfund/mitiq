@@ -128,9 +128,9 @@ class PauliString:
     def _expectation_from_measurements(
         self, measurements: MeasurementResult
     ) -> float:
-        return PauliStringSet(
-            self
-        )._expectation_from_measurements(measurements)
+        return PauliStringSet(self)._expectation_from_measurements(
+            measurements
+        )
 
     def __eq__(self, other: Any) -> bool:
         return self._pauli == other._pauli
@@ -220,7 +220,9 @@ class PauliStringSet:
         )
         circuit = circuit.transform_qubits(lambda q: qubit_map[q])
 
-        if not pauliset._qubits_to_measure().issubset(set(circuit.all_qubits())):
+        if not pauliset._qubits_to_measure().issubset(
+            set(circuit.all_qubits())
+        ):
             raise ValueError(
                 f"Qubit mismatch. The PauliString(s) act on qubits "
                 f"{pauliset.support()} but the circuit has qubit indices "

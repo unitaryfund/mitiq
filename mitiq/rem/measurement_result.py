@@ -37,7 +37,11 @@ class MeasurementResult:
 
     @property
     def nqubits(self) -> int:
-        return self._bitstrings.shape[1] if len(self._bitstrings.shape) >= 2 else 0
+        return (
+            self._bitstrings.shape[1]
+            if len(self._bitstrings.shape) >= 2
+            else 0
+        )
 
     @property
     def asarray(self) -> np.ndarray:
