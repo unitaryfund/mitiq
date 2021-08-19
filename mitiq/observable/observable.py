@@ -21,7 +21,6 @@ import cirq
 
 from mitiq.observable.pauli import PauliString, PauliStringSet
 from mitiq._typing import MeasurementResult, QuantumResult, QPROGRAM
-from mitiq.collector import Collector
 
 
 class Observable:
