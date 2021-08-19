@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Any, Dict, List, Optional, Sequence, Set
+from typing import Any, cast, Dict, List, Optional, Sequence, Set
 
 import numpy as np
 import cirq
@@ -128,7 +128,9 @@ class PauliString:
     def _expectation_from_measurements(
         self, measurements: MeasurementResult
     ) -> float:
-        return PauliStringSet(self)._expectation_from_measurements(measurements)
+        return PauliStringSet(
+            self
+        )._expectation_from_measurements(measurements)
 
     def __eq__(self, other: Any) -> bool:
         return self._pauli == other._pauli
@@ -184,7 +186,7 @@ class PauliStringSet:
         return self._paulis
 
     def support(self) -> Set[int]:
-        return {qubit.x for qubit in self._qubits_to_measure()}
+        return {cast(cirq.LineQubit, q).x for q in self._qubits_to_measure()}
 
     def weight(self) -> int:
         return len(self.support())
@@ -196,7 +198,7 @@ class PauliStringSet:
         return max(self._paulis.keys())
 
     def _qubits_to_measure(self) -> Set[cirq.Qid]:
-        qubits = set()
+        qubits: Set[cirq.Qid] = set()
         for pauli in self.elements:
             qubits.update(pauli._pauli.qubits)
         return qubits
@@ -246,7 +248,7 @@ class PauliStringSet:
             total += pauli.coeff * value
         return total
 
-    def __eq__(self, other: any) -> bool:
+    def __eq__(self, other: Any) -> bool:
         return self.elements == other.elements
 
     def __len__(self) -> int:

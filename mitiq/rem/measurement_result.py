@@ -16,7 +16,7 @@
 """Defines MeasurementResult, a result obtained by measuring qubits on a
 quantum computer."""
 from dataclasses import dataclass
-from typing import List
+from typing import Iterable, List
 
 import numpy as np
 
@@ -46,5 +46,5 @@ class MeasurementResult:
     def __getitem__(self, indices: List[int]) -> np.ndarray:
         return self._bitstrings[:, indices]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable[Bitstring]:
         yield from self.result

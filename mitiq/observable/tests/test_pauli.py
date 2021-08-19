@@ -179,8 +179,8 @@ def test_weight():
 # Note: For testing `PauliString._expectation_from_measurements`, it makes no
 # difference whether the Pauli is X, Y, or Z. This is because we assume
 # measurements are obtained by single-qubit basis rotations. So it only matters
-# whether the Pauli is I (identity) or X, Y, Z (not identity). For consistency
-# we just use Z for not identity below.
+# whether the Pauli is I (identity) or X, Y, Z (not identity). We just use Z
+# for "not identity" below.
 
 
 @pytest.mark.parametrize("seed", range(5))

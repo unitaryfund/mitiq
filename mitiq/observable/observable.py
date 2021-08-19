@@ -79,7 +79,7 @@ class Observable:
         self._ngroups = len(self._groups)
 
     def _measure_in(self, circuit: cirq.Circuit) -> List[cirq.Circuit]:
-        return [pset.measure_in(circuit) for pset in self._groups]
+        return [pset._measure_in(circuit) for pset in self._groups]
 
     def matrix(self, dtype: type = np.complex128) -> np.ndarray:
         """Returns the (potentially very large) matrix of the Observable."""
@@ -97,23 +97,22 @@ class Observable:
     def expectation(
         self, circuit: QPROGRAM, executor: Callable[[QPROGRAM], QuantumResult]
     ) -> float:
-        collector = Collector(executor=executor)
-        to_run = self._measure_in(circuit=circuit)
-        print("IN EXPECTATION, circuits to run are:")
-        for c in to_run:
-            print(c)
-        quantum_results = collector.run(circuits=to_run)
-        print("JUST RAN, results are:")
-        print(quantum_results)
-        return self.expectation_from(quantum_results=quantum_results)
+        # TODO: Implement. Pass circuits from self._measure_in(circuit=circuit)
+        #  to Collector(executor) to get QuantumResults, then return
+        #  self.expectation_from(quantum_results=quantum_results)
+        raise NotImplementedError
 
     def expectation_from(self, quantum_results: List[QuantumResult]) -> float:
         # TODO: Dispatch to correct function based on type of quantum result.
-        result = quantum_results[0]
-        # if isinstance(result, MeasurementResult):
-        return self._expectation_from_measurements(quantum_results)
-        # else:
-        #     raise NotImplementedError
+        raise NotImplementedError
+
+    def _expectation_from_measurements(
+        self, measurements: List[MeasurementResult]
+    ) -> float:
+        return sum(
+            pset._expectation_from_measurements(bitstrings)
+            for (pset, bitstrings) in zip(self._groups, measurements)
+        )
 
     def _expectation_from_wavefunction(
         self, wavefunction: np.ndarray
@@ -131,11 +130,3 @@ class Observable:
         self, density_matrix: np.ndarray
     ) -> float:
         return np.trace(density_matrix @ self.matrix()).real
-
-    def _expectation_from_measurements(
-        self, measurements: List[MeasurementResult]
-    ) -> float:
-        return sum(
-            pset._expectation_from_measurements(bitstrings)
-            for (pset, bitstrings) in zip(self._groups, measurements)
-        )
