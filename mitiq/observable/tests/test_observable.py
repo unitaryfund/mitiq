@@ -107,7 +107,7 @@ def test_observable_measure_in_needs_one_circuit_z():
     qubits = cirq.LineQubit.range(2)
     circuit = cirq.testing.random_circuit(qubits, 3, 1, random_state=1)
 
-    measures_obs_circuits = obs._measure_in(circuit)
+    measures_obs_circuits = obs.measure_in(circuit)
     assert len(measures_obs_circuits) == 1
 
     expected = circuit + cirq.measure(*qubits)
@@ -128,7 +128,7 @@ def test_observable_measure_in_needs_one_circuit_x():
     qubits = cirq.LineQubit.range(2)
     circuit = cirq.testing.random_circuit(qubits, 3, 1, random_state=1)
 
-    measures_obs_circuits = obs._measure_in(circuit)
+    measures_obs_circuits = obs.measure_in(circuit)
     assert len(measures_obs_circuits) == 1
 
     expected = circuit + xrotation.on_each(*qubits) + cirq.measure(*qubits)
@@ -146,7 +146,7 @@ def test_observable_measure_in_needs_two_circuits():
     q = cirq.LineQubit(0)
     circuit = cirq.Circuit(cirq.H.on(q))
 
-    measures_obs_circuits = sorted(obs._measure_in(circuit), key=len)
+    measures_obs_circuits = sorted(obs.measure_in(circuit), key=len)
     assert len(measures_obs_circuits) == 2
 
     expected_circuits = [

@@ -77,8 +77,8 @@ class Observable:
         self._groups = psets
         self._ngroups = len(self._groups)
 
-    def _measure_in(self, circuit: cirq.Circuit) -> List[cirq.Circuit]:
-        return [pset._measure_in(circuit) for pset in self._groups]
+    def measure_in(self, circuit: QPROGRAM) -> List[QPROGRAM]:
+        return [pset.measure_in(circuit) for pset in self._groups]
 
     def matrix(self, dtype: type = np.complex128) -> np.ndarray:
         """Returns the (potentially very large) matrix of the Observable."""
@@ -96,7 +96,7 @@ class Observable:
     def expectation(
         self, circuit: QPROGRAM, executor: Callable[[QPROGRAM], QuantumResult]
     ) -> float:
-        # TODO: Implement. Pass circuits from self._measure_in(circuit=circuit)
+        # TODO: Implement. Pass circuits from self.measure_in(circuit=circuit)
         #  to Collector(executor) to get QuantumResults, then return
         #  self.expectation_from(quantum_results=quantum_results)
         raise NotImplementedError
