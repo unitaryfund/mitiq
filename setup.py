@@ -46,12 +46,6 @@ setup(
     long_description_content_type="text/markdown",
     author="Unitary Fund",
     author_email="info@unitary.fund",
-    url="https://github.com/unitaryfund/mitiq",
-    project_urls={
-        "Bug Tracker": "https://github.com/unitaryfund/mitiq/issues",
-        "Documentation": "https://mitiq.readthedocs.io/en/latest/",
-        "Source": "https://github.com/pypa/sampleproject/"
-    },
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Programming Language :: Python :: 3",
@@ -63,6 +57,11 @@ setup(
     ],
     license="GPL v3.0",
     url="https://unitary.fund",
+    project_urls={
+        "Bug Tracker": "https://github.com/unitaryfund/mitiq/issues",
+        "Documentation": "https://mitiq.readthedocs.io/en/latest/",
+        "Source": "https://github.com/pypa/sampleproject/"
+    },
     python_requires='>=3.7',
 )
 
