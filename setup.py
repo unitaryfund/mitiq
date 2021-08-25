@@ -41,7 +41,7 @@ setup(
     include_package_data=True,
     description="Mitiq is an open source toolkit for implementing error"
         "mitigation techniques on most current intermediate-scale quantum "
-        "computers."
+        "computers.",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     author="Unitary Fund",
