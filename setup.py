@@ -41,7 +41,7 @@ setup(
     },
     packages=find_packages(),
     include_package_data=True,
-    description="Mitiq is an open source toolkit for implementing error"
+    description="Mitiq is an open source toolkit for implementing error "
     "mitigation techniques on most current intermediate-scale quantum "
     "computers.",
     long_description=open("README.md", encoding="utf-8").read(),
@@ -60,9 +60,9 @@ setup(
     license="GPL v3.0",
     url="https://unitary.fund",
     project_urls={
-        "Bug Tracker": "https://github.com/unitaryfund/mitiq/issues",
+        "Bug Tracker": "https://github.com/unitaryfund/mitiq/issues/",
         "Documentation": "https://mitiq.readthedocs.io/en/latest/",
-        "Source": "https://github.com/pypa/sampleproject/",
+        "Source": "https://github.com/unitaryfund/mitiq/",
     },
     python_requires=">=3.7",
 )
