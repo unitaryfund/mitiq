@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright (C) 2021 Unitary Fund
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,17 +17,15 @@ from mitiq.benchmarks import mirror_circuits
 import networkx as nx
 import cirq
 import pytest
-from cirq.experiments.qubit_characterizations import _single_qubit_cliffords
 
-paulis = [cirq.X, cirq.Y, cirq.Z, cirq.I]
-single_q_cliffords = _single_qubit_cliffords().c1_in_xy
+paulis = mirror_circuits.paulis
+cliffords = mirror_circuits.cliffords
 single_cliffords = []
-for gates in single_q_cliffords:
-    for gate in gates:
-        single_cliffords.append(gate)
-cliffords = single_cliffords
-cliffords.append(cirq.CNOT)
-all_gates = paulis + cliffords
+for c in cliffords:
+    single_cliffords.extend(c)
+all_cliffords = single_cliffords.copy()
+all_cliffords.append(cirq.CNOT)
+all_gates = paulis + all_cliffords
 all_gates.append(cirq.measure)
 
 
@@ -46,7 +43,7 @@ def test_edge_grab():
     graphs = []
     for qubits in nqubits:
         graphs.append(nx.complete_graph(qubits))
-    removed_edges = [
+    edges_to_remove = [
         [(1, 2), (4, 7), (3, 5)],
         [(2, 4), (5, 6), (7, 8)],
         [(3, 4), (5, 6), (8, 9)],
@@ -54,14 +51,13 @@ def test_edge_grab():
 
     for x in range(3):
         graph = graphs[x]
-        for edge in removed_edges[x]:
+        for edge in edges_to_remove[x]:
             graph.remove_edge(*edge)
         selected_edges = mirror_circuits.edge_grab(0.3, graph)
         assert set(selected_edges.edges()).issubset(graph.edges())
         assert selected_edges.number_of_nodes() == nqubits[x]
         for node in selected_edges.nodes:
-            neighbors = len(list(selected_edges.neighbors(node)))
-            assert neighbors == 1 or neighbors == 0
+            assert len(list(selected_edges.neighbors(node))) in (0, 1)
 
 
 def test_random_cliffords():
@@ -83,7 +79,7 @@ def test_random_cliffords():
             two_q_gates.add(cirq.CNOT(cirq.LineQubit(a), cirq.LineQubit(b)))
         assert two_q_gates.issubset(circuit.all_operations())
         assert set(op.gate for op in circuit.all_operations()).issubset(
-            cliffords
+            all_cliffords
         )
 
 
@@ -101,34 +97,35 @@ def test_random_single_cliffords():
         )
 
 
-def test_mirror_circuit():
-    parameters = [
+@pytest.mark.parametrize(
+    "depth_twoqprob_graph",
+    [
         (16, 0.3, nx.complete_graph(3)),
         (20, 0.4, nx.complete_graph(4)),
         (24, 0.5, nx.complete_graph(5)),
-    ]
-    for depth, xi, connectivity_graph in parameters:
-        n = connectivity_graph.number_of_nodes()
-        circ = mirror_circuits.generate_mirror_circuit(
-            depth, xi, connectivity_graph
+    ],
+)
+def test_generate_mirror_circuit(depth_twoqprob_graph):
+    depth, xi, connectivity_graph = depth_twoqprob_graph
+    n = connectivity_graph.number_of_nodes()
+    circ = mirror_circuits.generate_mirror_circuit(
+        depth, xi, connectivity_graph
+    )
+    assert isinstance(circ, cirq.Circuit)
+    assert len(circ.all_qubits()) == n
+    result = (
+        cirq.Simulator()
+        .run(circ, repetitions=1_000)
+        .multi_measurement_histogram(keys=circ.all_measurement_keys())
+    )
+    assert (
+        len(result.keys()) == 1
+    )  # checks that the circuit only outputs one bitstring
+    for moment in circ[: len(circ) - 1]:
+        temp_circ = cirq.Circuit()
+        temp_circ.append(moment)
+        assert set(op.gate for op in temp_circ.all_operations()).issubset(
+            all_gates
         )
-        assert isinstance(circ, cirq.Circuit)
-        assert len(circ.all_qubits()) == n
-        result = (
-            cirq.Simulator()
-            .run(circ, repetitions=1_000)
-            .multi_measurement_histogram(keys=circ.all_measurement_keys())
-        )
-        assert len(result.keys()) == 1
-        meas_circ = cirq.Circuit()
-        for qubit in range(n):
-            meas_circ.append(cirq.measure(cirq.LineQubit(qubit)))
-        for moment in circ:
-            temp_circ = cirq.Circuit()
-            temp_circ.append(moment)
-            if temp_circ != meas_circ:
-                assert set(
-                    op.gate for op in temp_circ.all_operations()
-                ).issubset(all_gates)
-        assert circ.has_measurements()
-        assert circ.are_all_measurements_terminal()
+    assert circ.has_measurements()
+    assert circ.are_all_measurements_terminal()

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright (C) 2021 Unitary Fund
 #
 # This program is free software: you can redistribute it and/or modify
@@ -37,10 +36,10 @@ def random_paulis(nqubits: int) -> cirq.Circuit:
 
 
 def edge_grab(
-    two_qubit_gate_prob: float, connectivity_graph_: nx.Graph
+    two_qubit_gate_prob: float, connectivity_graph: nx.Graph
 ) -> nx.Graph:
     """Returns a set of edges for which two qubit gates
-    are to be applied given a two qubit gate density, xi,
+    are to be applied given a two qubit gate density
     and the connectivity graph that must be satisfied.
 
     Args:
@@ -49,8 +48,11 @@ def edge_grab(
             connectivity_graph_: The connectivity graph for the backend
             on which the circuit will be run.
     """
-    connectivity_graph = connectivity_graph_.copy()
+    connectivity_graph = connectivity_graph.copy()
     candidate_edges = nx.Graph()
+
+    final_edges = nx.Graph()
+    final_edges.add_nodes_from(connectivity_graph)
 
     while connectivity_graph.edges:
         num = random.randint(connectivity_graph.size())
@@ -59,16 +61,13 @@ def edge_grab(
         candidate_edges.add_edge(*curr_edge)
         connectivity_graph.remove_nodes_from(curr_edge)
 
-    prob = two_qubit_gate_prob
-    final_edges = nx.Graph()
-    final_edges.add_nodes_from(connectivity_graph_)
     for edge in candidate_edges.edges:
-        if random.random() < prob:
+        if random.random() < two_qubit_gate_prob:
             final_edges.add_edge(*edge)
     return final_edges
 
 
-def random_cliffords(edges: nx.Graph) -> cirq.Circuit:
+def random_cliffords(connectivity_graph: nx.Graph) -> cirq.Circuit:
     """Returns a circuit with a two-qubit Clifford gate applied
     to each edge in edges, and a random single-qubit
     Clifford gate applied to every other qubit.
@@ -77,32 +76,29 @@ def random_cliffords(edges: nx.Graph) -> cirq.Circuit:
         edges: A graph with the edges for which the
             two-qubit Clifford gate is to be applied.
     """
-    gates = []
-    gates.append(
-        cirq.CNOT(cirq.LineQubit(a), cirq.LineQubit(b)) for a, b in edges.edges
-    )
-    circuit = cirq.Circuit(gates)
+    gates = [
+        cirq.CNOT(cirq.LineQubit(a), cirq.LineQubit(b))
+        for a, b in list(connectivity_graph.edges)
+    ]
     qubits = nx.Graph()
-    qubits.add_nodes_from(nx.isolates(edges))
-    circuit.append(random_single_cliffords(qubits))
-    return circuit
+    qubits.add_nodes_from(nx.isolates(connectivity_graph))
+    gates.append(random_single_cliffords(qubits))
+    return cirq.Circuit(gates)
 
 
-def random_single_cliffords(qubits: nx.Graph) -> cirq.Circuit:
+def random_single_cliffords(connectivity_graph: nx.Graph) -> cirq.Circuit:
     """Returns a circuit with a random single-qubit Clifford gate
     applied on each given qubit.
 
     Args:
         qubits: A graph with each node representing a qubit for
             which a random single-qubit Clifford gate is to be applied.
-
     """
     gates: List[cirq.Operation] = []
-    for qubit in qubits.nodes:
+    for qubit in connectivity_graph.nodes:
         num = random.randint(len(cliffords))
-        gates.extend(
-            clifford.on(cirq.LineQubit(qubit)) for clifford in cliffords[num]
-        )
+        for clifford_gate in cliffords[num]:
+            gates.append(clifford_gate(cirq.LineQubit(qubit)))
     return cirq.Circuit(gates)
 
 
@@ -153,10 +149,12 @@ def generate_mirror_circuit(
 
     rand_paulis = cirq.Circuit()
     rand_paulis.append(random_paulis(nqubits))
-
-    circuit = single_qubit_cliffords + forward_circuit
-    +rand_paulis + quasi_inversion_circuit
-    +cirq.inverse(single_qubit_cliffords)
-    for x in range(nqubits):
-        circuit.append(cirq.measure(cirq.LineQubit(x)))
+    circuit = (
+        single_qubit_cliffords
+        + forward_circuit
+        + rand_paulis
+        + quasi_inversion_circuit
+        + cirq.inverse(single_qubit_cliffords)
+        + cirq.measure(*cirq.LineQubit.range(nqubits))
+    )
     return circuit
