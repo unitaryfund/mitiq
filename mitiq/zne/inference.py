@@ -1466,7 +1466,7 @@ class ExpBayesFactory(BatchedFactory):
 
     @staticmethod
     def _exp_ansatz(
-        a: float, b: float, c: float, scale_factor: float
+        a: float, b: float, c: float, scale_factor: Sequence[float]
     ) -> float:
         """
         Calculates the expectation given a scale factor and model
@@ -1490,9 +1490,7 @@ class ExpBayesFactory(BatchedFactory):
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
-    ) -> Union[
-        float,
-    ]:
+    ) -> ExtrapolationResult:
         """Static method which evaluates an exponential extrapolation to the
         zero-noise limit using Bayesian inference.
 
@@ -1537,7 +1535,7 @@ class ExpBayesFactory(BatchedFactory):
 
             trace = pm.sample(target_accept=0.95, return_inferencedata=False)
 
-        def zne_curve(scale_factor: float) -> float:
+        def zne_curve(scale_factor: Sequence[float]) -> float:
             samples = []
             n_samples = len(trace["a"])
 
