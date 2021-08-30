@@ -124,7 +124,11 @@ def test_pauli_measure_in_circuit(support, circuit_type):
     if circuit_type == "cirq":
         assert _equal(measured, expected, require_qubit_equality=True)
     else:
-        assert measured == convert(expected)
+        expected = convert(expected)
+        if circuit_type == "pyquil":  # Special case with basis rotation order.
+            assert set(measured) == set(expected)
+        else:
+            assert measured == expected
 
 
 def test_pauli_measure_in_bad_qubits_error():
