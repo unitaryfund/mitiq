@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from mitiq.benchmarks import mirror_circuits
+from numpy import random
 import networkx as nx
 import cirq
 import pytest
@@ -31,7 +32,9 @@ all_gates.append(cirq.measure)
 
 @pytest.mark.parametrize("n", (0, 5))
 def test_random_paulis(n):
-    circuit = mirror_circuits.random_paulis(nqubits=n)
+    circuit = mirror_circuits.random_paulis(
+        nqubits=n, random_state=random.RandomState()
+    )
     assert isinstance(circuit, cirq.Circuit)
     assert len(circuit.all_qubits()) == n
     assert len(list(circuit.all_operations())) == n
@@ -53,7 +56,9 @@ def test_edge_grab():
         graph = graphs[x]
         for edge in edges_to_remove[x]:
             graph.remove_edge(*edge)
-        selected_edges = mirror_circuits.edge_grab(0.3, graph)
+        selected_edges = mirror_circuits.edge_grab(
+            0.3, graph, random_state=random.RandomState()
+        )
         assert set(selected_edges.edges()).issubset(graph.edges())
         assert selected_edges.number_of_nodes() == nqubits[x]
         for node in selected_edges.nodes:
@@ -71,7 +76,9 @@ def test_random_cliffords():
         graph = nx.Graph()
         graph.add_nodes_from(range(nqubits[x]))
         graph.add_edges_from(edges[x])
-        circuit = mirror_circuits.random_cliffords(graph)
+        circuit = mirror_circuits.random_cliffords(
+            graph, random_state=random.RandomState()
+        )
         assert isinstance(circuit, cirq.Circuit)
         assert len(circuit.all_qubits()) == nqubits[x]
         two_q_gates = set()
@@ -88,7 +95,9 @@ def test_random_single_cliffords():
     for x in range(3):
         graph = nx.Graph()
         graph.add_nodes_from(qubits[x])
-        circuit = mirror_circuits.random_single_cliffords(graph)
+        circuit = mirror_circuits.random_single_cliffords(
+            graph, random_state=random.RandomState()
+        )
         assert isinstance(circuit, cirq.Circuit)
         assert set(circuit.all_qubits()).issubset
         ([cirq.LineQubit(qubit) for qubit in qubits[x]])

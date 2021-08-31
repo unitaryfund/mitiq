@@ -26,13 +26,14 @@ cliffords = single_q_cliffords.c1_in_xy
 paulis = [cirq.X, cirq.Y, cirq.Z, cirq.I]
 
 
-def random_paulis(nqubits: int, seed: Optional[int] = None) -> cirq.Circuit:
+def random_paulis(
+    nqubits: int, random_state: random.RandomState
+) -> cirq.Circuit:
     """Returns a circuit with a random pauli gate applied to each qubit.
 
     Args:
         nqubits: The number of qubits in the circuit.
     """
-    random_state = random.RandomState(seed)
     return cirq.Circuit(
         paulis[random_state.randint(len(paulis))](cirq.LineQubit(x))
         for x in range(nqubits)
@@ -42,7 +43,7 @@ def random_paulis(nqubits: int, seed: Optional[int] = None) -> cirq.Circuit:
 def edge_grab(
     two_qubit_gate_prob: float,
     connectivity_graph: nx.Graph,
-    seed: Optional[int] = None,
+    random_state: random.RandomState,
 ) -> nx.Graph:
     """Returns a set of edges for which two qubit gates
     are to be applied given a two qubit gate density
@@ -54,7 +55,6 @@ def edge_grab(
         connectivity_graph: The connectivity graph for the backend
             on which the circuit will be run.
     """
-    random_state = random.RandomState(seed)
     connectivity_graph = connectivity_graph.copy()
     candidate_edges = nx.Graph()
 
@@ -75,7 +75,7 @@ def edge_grab(
 
 
 def random_cliffords(
-    connectivity_graph: nx.Graph, seed: Optional[int] = None
+    connectivity_graph: nx.Graph, random_state: random.RandomState
 ) -> cirq.Circuit:
     """Returns a circuit with a two-qubit Clifford gate applied
     to each edge in edges, and a random single-qubit
@@ -91,12 +91,12 @@ def random_cliffords(
     ]
     qubits = nx.Graph()
     qubits.add_nodes_from(nx.isolates(connectivity_graph))
-    gates.append(random_single_cliffords(qubits, seed=seed))
+    gates.append(random_single_cliffords(qubits, random_state))
     return cirq.Circuit(gates)
 
 
 def random_single_cliffords(
-    connectivity_graph: nx.Graph, seed: Optional[int] = None
+    connectivity_graph: nx.Graph, random_state: random.RandomState
 ) -> cirq.Circuit:
     """Returns a circuit with a random single-qubit Clifford gate
     applied on each given qubit.
@@ -105,7 +105,6 @@ def random_single_cliffords(
         qubits: A graph with each node representing a qubit for
             which a random single-qubit Clifford gate is to be applied.
     """
-    random_state = random.RandomState(seed)
     gates: List[cirq.Operation] = []
     for qubit in connectivity_graph.nodes:
         num = random_state.randint(len(cliffords))
@@ -132,9 +131,10 @@ def generate_mirror_circuit(
     if not 0 <= two_qubit_gate_prob <= 1:
         raise ValueError("two_qubit_gate_prob must be between 0 and 1")
 
+    random_state = random.RandomState(seed)
     nqubits = connectivity_graph.number_of_nodes()
     single_qubit_cliffords = random_single_cliffords(
-        connectivity_graph, seed=seed
+        connectivity_graph, random_state=random_state
     )
 
     forward_circuit = cirq.Circuit()
@@ -143,22 +143,22 @@ def generate_mirror_circuit(
     quasi_inverse_gates = []
 
     for _ in range(nlayers):
-        forward_circuit.append(random_paulis(nqubits))
+        forward_circuit.append(random_paulis(nqubits, random_state))
 
         selected_edges = edge_grab(
-            two_qubit_gate_prob, connectivity_graph, seed=seed
+            two_qubit_gate_prob, connectivity_graph, random_state
         )
-        circ = random_cliffords(selected_edges, seed=seed)
+        circ = random_cliffords(selected_edges, random_state)
         forward_circuit.append(circ)
 
-        quasi_inverse_gates.append(random_paulis(nqubits, seed=seed))
+        quasi_inverse_gates.append(random_paulis(nqubits, random_state))
         quasi_inverse_gates.append(cirq.inverse(circ))
 
     quasi_inversion_circuit.append(
         gate for gate in reversed(quasi_inverse_gates)
     )
 
-    rand_paulis = cirq.Circuit(random_paulis(nqubits, seed=seed))
+    rand_paulis = cirq.Circuit(random_paulis(nqubits, random_state))
     return (
         single_qubit_cliffords
         + forward_circuit
