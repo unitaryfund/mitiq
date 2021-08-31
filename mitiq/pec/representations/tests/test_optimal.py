@@ -326,7 +326,7 @@ def test_find_optimal_representation_no_superoperator_error():
     with raises(ValueError, match="numerical superoperator matrix"):
         find_optimal_representation(Circuit(X(q)), noisy_basis)
 
-
+@mark.skip(reason="SciPy minimize not deterministic")
 def test_initial_guess_in_minimize_one_norm():
     for noise_level in [0.7, 0.9]:
         depo_kraus = global_depolarizing_kraus(noise_level, num_qubits=1)
