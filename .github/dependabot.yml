@@ -6,10 +6,17 @@
 version: 2
 updates:
   - package-ecosystem: "pip" # See documentation for possible values
-    directory: "requirements.txt" # Location of package manifests
+    directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
-  - package-ecosystem: "pip" # See documentation for possible values
-    directory: "dev_requirements.txt" # Location of package manifests
+    allow:
+      - dependency-type: "all"
+    # Allow up to 10 open pull requests for pip dependencies
+    open-pull-requests-limit: 10
+    labels:
+      - "infrastructure"
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
+      # Check for updates to GitHub Actions every weekday
       interval: "daily"
