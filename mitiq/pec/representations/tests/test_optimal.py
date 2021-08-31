@@ -351,5 +351,5 @@ def test_initial_guess_in_minimize_one_norm():
             minimize_one_norm(
                 ideal_matrix,
                 basis_matrices,
-                initial_guess=[-1.0e9, 1.0e9, -1.0e9, +1.0e9, -1.0e9],
+                initial_guess=[-1.0e11, 1.0e11, -1.0e11, +1.0e11, -1.0e11],
             )
