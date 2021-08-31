@@ -41,7 +41,8 @@ def test_single_qubit_representation_norm(gate: Gate, noise: float):
     q = LineQubit(0)
     optimal_norm = (1 + noise) / (1 - noise)
     norm = _represent_operation_with_amplitude_damping_noise(
-        Circuit(gate(q)), noise,
+        Circuit(gate(q)),
+        noise,
     ).norm
     assert np.isclose(optimal_norm, norm)
 
@@ -52,14 +53,17 @@ def test_single_qubit_representation_norm(gate: Gate, noise: float):
 @pytest.mark.parametrize("noise", [0, 0.1, 0.7])
 @pytest.mark.parametrize("gate", [X, Y, Z, H])
 def test_amplitude_damping_representation_with_choi(
-    gate: Gate, noise: float, circuit_type: str,
+    gate: Gate,
+    noise: float,
+    circuit_type: str,
 ):
     """Tests the representation by comparing exact Choi matrices."""
     q = LineQubit(0)
     ideal_circuit = convert_from_mitiq(Circuit(gate.on(q)), circuit_type)
     ideal_choi = _circuit_to_choi(Circuit(gate.on(q)))
     op_rep = _represent_operation_with_amplitude_damping_noise(
-        ideal_circuit, noise,
+        ideal_circuit,
+        noise,
     )
     choi_components = []
     for noisy_op, coeff in op_rep.basis_expansion.items():

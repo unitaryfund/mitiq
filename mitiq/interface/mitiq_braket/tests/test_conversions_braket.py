@@ -307,7 +307,11 @@ def test_to_from_braket_uncommon_two_qubit_gates(uncommon_gate):
 
 
 @pytest.mark.parametrize(
-    "common_gate", [ops.TOFFOLI, ops.FREDKIN,],
+    "common_gate",
+    [
+        ops.TOFFOLI,
+        ops.FREDKIN,
+    ],
 )
 def test_to_from_braket_common_three_qubit_gates(common_gate):
     """These gates should stay the same (i.e., not get decomposed) when

@@ -360,7 +360,8 @@ def test_richardson_extr(test_f: Callable[[float], float]):
     exp_vals = fac.get_expectation_values()
     assert np.isclose(fac.extrapolate(X_VALS, exp_vals), zne_value)
     assert np.isclose(
-        fac.extrapolate(X_VALS, exp_vals, full_output=True)[0], zne_value,
+        fac.extrapolate(X_VALS, exp_vals, full_output=True)[0],
+        zne_value,
     )
 
 
@@ -381,7 +382,8 @@ def test_fake_nodes_factory():
     exp_vals = fac.get_expectation_values()
     assert np.isclose(fac.extrapolate(UNIFORM_X, exp_vals), zne_value)
     assert np.isclose(
-        fac.extrapolate(UNIFORM_X, exp_vals, full_output=True)[0], zne_value,
+        fac.extrapolate(UNIFORM_X, exp_vals, full_output=True)[0],
+        zne_value,
     )
 
 
@@ -411,7 +413,8 @@ def test_linear_extr():
     exp_vals = fac.get_expectation_values()
     assert np.isclose(fac.extrapolate(X_VALS, exp_vals), zne_value)
     assert np.isclose(
-        fac.extrapolate(X_VALS, exp_vals, full_output=True)[0], zne_value,
+        fac.extrapolate(X_VALS, exp_vals, full_output=True)[0],
+        zne_value,
     )
 
 
@@ -503,7 +506,8 @@ def test_exp_factory_no_asympt(test_f: Callable[[float], float]):
     exp_vals = fac.get_expectation_values()
     assert np.isclose(fac.extrapolate(X_VALS, exp_vals), zne_value)
     assert np.isclose(
-        fac.extrapolate(X_VALS, exp_vals, full_output=True)[0], zne_value,
+        fac.extrapolate(X_VALS, exp_vals, full_output=True)[0],
+        zne_value,
     )
 
 
@@ -558,7 +562,12 @@ def test_poly_exp_factory_no_asympt(test_f: Callable[[float], float]):
     exp_vals = fac.get_expectation_values()
     assert np.isclose(fac.extrapolate(X_VALS, exp_vals, order=2), zne_value)
     assert np.isclose(
-        fac.extrapolate(X_VALS, exp_vals, order=2, full_output=True,)[0],
+        fac.extrapolate(
+            X_VALS,
+            exp_vals,
+            order=2,
+            full_output=True,
+        )[0],
         zne_value,
     )
 
@@ -590,8 +599,7 @@ def test_ada_exp_factory_with_asympt(
 def test_ada_exp_fac_with_asympt_more_steps(
     test_f: Callable[[float], float], avoid_log: bool
 ):
-    """Test of the adaptive exponential extrapolator with more steps.
-    """
+    """Test of the adaptive exponential extrapolator with more steps."""
     seeded_f = apply_seed_to_func(test_f, SEED)
     fac = AdaExpFactory(
         steps=6, scale_factor=2.0, asymptote=A, avoid_log=avoid_log
@@ -893,7 +901,12 @@ def test_get_methods_of_factories():
 
 
 @mark.parametrize(
-    "factory", (LinearFactory, RichardsonFactory, PolyFactory,),
+    "factory",
+    (
+        LinearFactory,
+        RichardsonFactory,
+        PolyFactory,
+    ),
 )
 def test_plot_data(factory):
     """Test that plot_data() outputs the correct x and y values."""
@@ -929,7 +942,12 @@ def test_plot_data_exp_factory(factory):
 
 
 @mark.parametrize(
-    "factory", (LinearFactory, RichardsonFactory, PolyFactory,),
+    "factory",
+    (
+        LinearFactory,
+        RichardsonFactory,
+        PolyFactory,
+    ),
 )
 def test_plot_fit(factory):
     """Test that plot_fit() outputs the correct x and y values."""
@@ -978,7 +996,8 @@ def test_map_to_fakenodes():
     fac = FakeNodesFactory(UNIFORM_X)
     test_argument = 1.0
     assert np.isclose(
-        fac._map_to_fake_nodes([1.0], 2.0, test_argument), [1.0],
+        fac._map_to_fake_nodes([1.0], 2.0, test_argument),
+        [1.0],
     )
 
 
@@ -1012,6 +1031,7 @@ def test_short_circuit_warning(factory):
     circuit = cirq.Circuit(X(qubit), H(qubit), X(qubit))
 
     with warns(
-        UserWarning, match=r"The input circuit is very short.",
+        UserWarning,
+        match=r"The input circuit is very short.",
     ):
         fac.run(circuit, executor, scale_noise=lambda circ, _: circ)

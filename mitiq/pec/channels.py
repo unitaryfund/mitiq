@@ -126,7 +126,8 @@ def matrix_to_vector(density_matrix: np.ndarray) -> np.ndarray:
 
 
 def _safe_sqrt(
-    perfect_square: int, error_str: str = "The input must be a square number.",
+    perfect_square: int,
+    error_str: str = "The input must be a square number.",
 ) -> int:
     """Takes the square root of the input integer and
     raises an error if the input is not a perfect square."""

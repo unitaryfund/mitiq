@@ -300,7 +300,8 @@ def _replace(
     return [
         cirq.ops.rz(a).on(*q)
         for (a, q) in zip(
-            clifford_angles, [op.qubits for op in non_clifford_ops],
+            clifford_angles,
+            [op.qubits for op in non_clifford_ops],
         )
     ]
 
@@ -343,7 +344,10 @@ def _closest_clifford(angles: np.ndarray) -> float:
 
 
 @np.vectorize
-def _is_clifford_angle(angles: np.ndarray, tol: float = 10 ** -5,) -> bool:
+def _is_clifford_angle(
+    angles: np.ndarray,
+    tol: float = 10 ** -5,
+) -> bool:
     """Function to check if a given angle is Clifford.
 
     Args:
@@ -399,7 +403,9 @@ def _angle_to_proximity(angle: np.ndarray, sigma: float) -> float:
 
 @np.vectorize
 def _probabilistic_angle_to_clifford(
-    angles: np.ndarray, sigma: float, random_state: np.random.RandomState,
+    angles: np.ndarray,
+    sigma: float,
+    random_state: np.random.RandomState,
 ) -> float:
     """Returns a Clifford angle sampled from the distribution
 

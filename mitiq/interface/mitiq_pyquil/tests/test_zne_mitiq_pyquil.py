@@ -40,7 +40,10 @@ def noiseless_executor(program: pyquil.Program) -> float:
 
 def test_run_factory():
     (qp,) = benchmarks.generate_rb_circuits(
-        n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
+        n_qubits=1,
+        num_cliffords=TEST_DEPTH,
+        trials=1,
+        return_type="pyquil",
     )
 
     fac = zne.inference.RichardsonFactory([1.0, 2.0, 3.0])
@@ -54,7 +57,10 @@ def test_run_factory():
 
 def test_execute_with_zne():
     (qp,) = benchmarks.generate_rb_circuits(
-        n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
+        n_qubits=1,
+        num_cliffords=TEST_DEPTH,
+        trials=1,
+        return_type="pyquil",
     )
     result = zne.execute_with_zne(qp, noiseless_executor)
     assert np.isclose(result, 1.0, atol=1e-5)
@@ -62,7 +68,10 @@ def test_execute_with_zne():
 
 def test_mitigate_executor():
     (qp,) = benchmarks.generate_rb_circuits(
-        n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
+        n_qubits=1,
+        num_cliffords=TEST_DEPTH,
+        trials=1,
+        return_type="pyquil",
     )
 
     new_executor = zne.mitigate_executor(noiseless_executor)
@@ -77,7 +86,10 @@ def decorated_executor(qp: pyquil.Program) -> float:
 
 def test_zne_decorator():
     (qp,) = benchmarks.generate_rb_circuits(
-        n_qubits=1, num_cliffords=TEST_DEPTH, trials=1, return_type="pyquil",
+        n_qubits=1,
+        num_cliffords=TEST_DEPTH,
+        trials=1,
+        return_type="pyquil",
     )
 
     result = decorated_executor(qp)

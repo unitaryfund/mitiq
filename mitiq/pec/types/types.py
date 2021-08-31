@@ -174,7 +174,8 @@ class NoisyOperation:
 
         noisy_ops = []  # type: List[NoisyOperation]
         base_circuit = NoisyOperation.from_cirq(
-            circuit, channel_matrix,
+            circuit,
+            channel_matrix,
         )._circuit
         base_qubits = list(base_circuit.all_qubits())
 
@@ -195,7 +196,9 @@ class NoisyOperation:
         self, qubits: Sequence[List[cirq.Qid]]
     ) -> Sequence["NoisyOperation"]:
         return [self] + NoisyOperation.on_each(
-            self._circuit, qubits, self._channel_matrix,
+            self._circuit,
+            qubits,
+            self._channel_matrix,
         )
 
     @staticmethod

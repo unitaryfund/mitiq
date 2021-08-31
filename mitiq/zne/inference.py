@@ -314,7 +314,8 @@ class Factory(ABC):
 
     @abstractmethod
     def run_classical(
-        self, scale_factor_to_expectation_value: Callable[..., float],
+        self,
+        scale_factor_to_expectation_value: Callable[..., float],
     ) -> "Factory":
         """Calls the function scale_factor_to_expectation_value at each scale
         factor of the factory, and stores the results.

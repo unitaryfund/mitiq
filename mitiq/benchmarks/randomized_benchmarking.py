@@ -70,11 +70,17 @@ def generate_rb_circuits(
         ]
     else:
         cfd_matrices = _two_qubit_clifford_matrices(
-            qubits[0], qubits[1], cliffords,
+            qubits[0],
+            qubits[1],
+            cliffords,
         )
         circuits = [
             _random_two_q_clifford(
-                qubits[0], qubits[1], num_cliffords, cfd_matrices, cliffords,
+                qubits[0],
+                qubits[1],
+                num_cliffords,
+                cfd_matrices,
+                cliffords,
             )
             for _ in range(trials)
         ]

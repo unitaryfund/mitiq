@@ -144,7 +144,10 @@ def find_optimal_representation(
 
     # Run numerical optimization problem
     quasi_prob_dist = minimize_one_norm(
-        ideal_matrix, basis_matrices, tol=tol, initial_guess=initial_guess,
+        ideal_matrix,
+        basis_matrices,
+        tol=tol,
+        initial_guess=initial_guess,
     )
 
     basis_expansion = {op: eta for op, eta in zip(basis_set, quasi_prob_dist)}

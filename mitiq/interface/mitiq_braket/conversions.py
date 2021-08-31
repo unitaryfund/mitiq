@@ -285,7 +285,8 @@ def _translate_two_qubit_braket_instruction_to_cirq_operation(
 
 
 def _translate_one_qubit_cirq_operation_to_braket_instruction(
-    op: Union[np.ndarray, cirq_ops.Operation], target: Optional[int] = None,
+    op: Union[np.ndarray, cirq_ops.Operation],
+    target: Optional[int] = None,
 ) -> List[Instruction]:
     """Translates a one-qubit Cirq operation to a (sequence of) Braket
     instruction(s) according to the following rules:
