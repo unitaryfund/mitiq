@@ -245,7 +245,7 @@ class PauliStringSet:
     ) -> float:
         total = 0.0
         for pauli in self.elements:
-            bitstrings = measurements[[q.x for q in pauli._pauli.qubits]]
+            bitstrings = measurements[sorted(pauli.support())]
             value = np.average([(-1) ** np.sum(bits) for bits in bitstrings])
             total += pauli.coeff * value
         return total
