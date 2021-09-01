@@ -33,7 +33,8 @@ def random_paulis(
 
     Args:
         nqubits: The number of qubits in the circuit.
-        random_state: Random state to select Paulis I, X, Y, Z
+        random_state: Random state to select Paulis I, X, Y, Z uniformly at
+            random.
     """
     return cirq.Circuit(
         paulis[random_state.randint(len(paulis))](cirq.LineQubit(x))
