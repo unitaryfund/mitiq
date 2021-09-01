@@ -129,8 +129,8 @@ def generate_mirror_circuit(
         nlayers: The number of random Clifford layers to be generated.
         two_qubit_gate_prob: Probability of a two-qubit gate being applied.
         connectivity_graph: The connectivity graph of the backend
-        on which the mirror circuit will be run. This is used
-        to make sure 2-qubit gates are only run on connected qubits.
+            on which the mirror circuit will be run. This is used
+            to make sure 2-qubit gates are only applied to connected qubits.
         seed: Seed for generating randomized mirror circuit.
     """
     if not 0 <= two_qubit_gate_prob <= 1:
