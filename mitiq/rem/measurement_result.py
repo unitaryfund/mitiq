@@ -42,6 +42,11 @@ class MeasurementResult:
     result: List[Bitstring]
 
     def __post_init__(self) -> None:
+        if not set(b for bits in self.result for b in bits).issubset({0, 1}):
+            raise ValueError(
+                "MeasurementResult contains elements which are not (0, 1)."
+            )
+
         self._bitstrings = np.array(self.result)
         if isinstance(self.result, np.ndarray):
             self.result = cast(List[Bitstring], self.result.tolist())

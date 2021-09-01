@@ -33,6 +33,14 @@ def test_measurement_result(asarray):
     assert repr(result) == "MeasurementResult(result=[[0, 0], [0, 1], [1, 0]])"
 
 
+def test_measurement_result_not_bits():
+    with pytest.raises(ValueError, match="contains elements"):
+        MeasurementResult(result=[[2]])
+
+    with pytest.raises(ValueError, match="contains elements"):
+        MeasurementResult(result=[[0, 0], [0, 1], [-1, 0]])
+
+
 def test_getitem():
     result = MeasurementResult([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
     assert np.allclose(result[[0]], np.array([[0], [0], [1]]))
