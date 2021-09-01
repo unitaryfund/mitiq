@@ -61,7 +61,7 @@ setup(
     url="https://unitary.fund",
     project_urls={
         "Bug Tracker": "https://github.com/unitaryfund/mitiq/issues/",
-        "Documentation": "https://mitiq.readthedocs.io/en/latest/",
+        "Documentation": "https://mitiq.readthedocs.io/en/stable/",
         "Source": "https://github.com/unitaryfund/mitiq/",
     },
     python_requires=">=3.7",
