@@ -250,6 +250,17 @@ def test_pstring_collection_empty():
     assert len(pauli_collection) == 0
 
 
+def test_pstring_collection_str():
+    x = PauliString(spec="X")
+    iz = PauliString(spec="IZ")
+    pcol = PauliStringCollection(x, iz)
+    assert str(pcol) == "X(0) + Z(1)"
+
+    xz = PauliString(spec="XZ", coeff=-2.4)
+    pcol.add(xz)
+    assert str(pcol) == "X(0) + Z(1) + (-2.4+0j)*X(0)*Z(1)"
+
+
 def test_pstring_collection_add():
     pcol = PauliStringCollection()
 

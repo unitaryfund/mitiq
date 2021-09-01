@@ -167,6 +167,22 @@ class PauliStringCollection:
             paulis: PauliStrings to add to the collection.
             check_precondition: If True, raises an error if some of the
                 ``PauliString``s do not qubit-wise commute.
+
+        Example:
+            >>> pcol = PauliStringCollection(
+            >>>     PauliString(spec="X"),
+            >>>     PauliString(spec="IZ", coeff=-2.2)
+            >>> )
+            >>> print(pcol)  # X(0) + (-2.2+0j)*Z(1)
+            >>> print(pcol.support())  # {0, 1}
+            >>>
+            >>> # XZ qubit-wise commutes with X(0) and Z(1), so can be added.
+            >>> print(pcol.can_add(PauliString(spec="XZ")))  # True.
+            >>> pcol.add(PauliString(spec="XZ"))
+            >>> print(pcol)  # X(0) + (-2.2+0j)*Z(1) + X(0)*Z(1)
+            >>>
+            >>> # Z(0) doesn't qubit-wise commute with X(0), so can't be added.
+            >>> print(pcol.can_add(PauliString(spec="Z")))  # False.
         """
         self._paulis_by_weight: Dict[int, TCounter[PauliString]] = dict()
         self.add(*paulis, check_precondition=check_precondition)
@@ -265,3 +281,6 @@ class PauliStringCollection:
 
     def __len__(self) -> int:
         return len(self.elements)
+
+    def __str__(self) -> str:
+        return " + ".join(map(str, self.elements))
