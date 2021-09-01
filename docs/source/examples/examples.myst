@@ -8,8 +8,10 @@ ibmq-backends.myst
 hamiltonians.md
 simple_landscape.myst
 maxcut-demo.myst
+pyquil_demo.myst
 cdr_api.md
 mitiq-paper/mitiq-paper-codeblocks
+pec-tutorial.myst
 ```
 
 ## Links to the examples for My Binder

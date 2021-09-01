@@ -13,5 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from mitiq.observable.pauli import PauliString
-from mitiq.observable.observable import Observable
+"""Readout error mitigation (REM) techniques."""
+
+from mitiq.rem.post_select import post_select

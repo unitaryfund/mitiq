@@ -14,8 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for scaling noise by unitary folding."""
-from copy import deepcopy
-
 import numpy as np
 import pytest
 from cirq import (
@@ -41,9 +39,6 @@ from mitiq.interface import (
 )
 from mitiq.zne.scaling.folding import (
     UnfoldableCircuitError,
-    _is_measurement,
-    _pop_measurements,
-    _append_measurements,
     _squash_moments,
     _default_weight,
     _fold_all,
@@ -56,49 +51,6 @@ from mitiq.zne.scaling.folding import (
     _create_fold_mask,
     _apply_fold_mask,
 )
-
-
-def test_is_measurement():
-    """Tests for checking if operations are measurements."""
-    # Test circuit:
-    # 0: ───H───X───Z───
-    qbit = LineQubit(0)
-    circ = Circuit(
-        [ops.H.on(qbit), ops.X.on(qbit), ops.Z.on(qbit), ops.measure(qbit)]
-    )
-    for (i, op) in enumerate(circ.all_operations()):
-        if i == 3:
-            assert _is_measurement(op)
-        else:
-            assert not _is_measurement(op)
-
-
-def test_pop_measurements_and_add_measurements():
-    """Tests popping measurements from a circuit.."""
-    # Test circuit:
-    # 0: ───H───T───@───M───
-    #               │   │
-    # 1: ───H───M───┼───┼───
-    #               │   │
-    # 2: ───H───────X───M───
-    qreg = LineQubit.range(3)
-    circ = Circuit(
-        [ops.H.on_each(qreg)],
-        [ops.T.on(qreg[0])],
-        [ops.measure(qreg[1])],
-        [ops.CNOT.on(qreg[0], qreg[2])],
-        [ops.measure(qreg[0], qreg[2])],
-    )
-    copy = deepcopy(circ)
-    measurements = _pop_measurements(copy)
-    correct = Circuit(
-        [ops.H.on_each(qreg)],
-        [ops.T.on(qreg[0])],
-        [ops.CNOT.on(qreg[0], qreg[2])],
-    )
-    assert _equal(copy, correct)
-    _append_measurements(copy, measurements)
-    assert _equal(copy, circ)
 
 
 def test_squash_moments_two_qubits():

@@ -23,6 +23,16 @@ from mitiq.interface import mitiq_qiskit, mitiq_pyquil
 from mitiq.utils import _equal
 
 
+# Basis rotations to measure Pauli X and Y.
+xrotation = cirq.SingleQubitCliffordGate.Y_nsqrt
+yrotation = cirq.SingleQubitCliffordGate.X_sqrt
+
+# Matrices.
+imat = np.identity(2)
+xmat = cirq.unitary(cirq.X)
+zmat = cirq.unitary(cirq.Z)
+
+
 def test_pauli_init():
     pauli = PauliString(spec="IZXYI", coeff=1.0)
     a, b, c = cirq.LineQubit.range(1, 4)
@@ -42,14 +52,40 @@ def test_pauli_init_with_support():
     assert str(pauli) == f"X({support[0]})*Z({support[1]})"
 
 
-def test_matrix():
-    xmat = cirq.unitary(cirq.X)
-    zmat = cirq.unitary(cirq.Z)
+def test_pauli_eq():
+    assert PauliString(spec="Z") == PauliString(spec="Z")
+    assert PauliString(spec="X") != PauliString(spec="Z")
+    assert PauliString(spec="Z") != PauliString(spec="Z", coeff=-1.0)
 
+    assert PauliString(spec="Z", support=(0,)) != PauliString(
+        spec="Z", support=(1,)
+    )
+    assert PauliString(spec="IZ") == PauliString(spec="Z", support=(1,))
+    assert PauliString(spec="XY") == PauliString(spec="YX", support=(1, 0))
+
+    assert {PauliString(spec="Z"), PauliString(spec="Z")} == {
+        PauliString(spec="Z")
+    }
+
+
+def test_matrix():
     assert np.allclose(PauliString(spec="X").matrix(), xmat)
     assert np.allclose(PauliString(spec="Z", coeff=-0.5).matrix(), -0.5 * zmat)
     assert np.allclose(PauliString(spec="ZZ").matrix(), np.kron(zmat, zmat))
     assert np.allclose(PauliString(spec="XZ").matrix(), np.kron(xmat, zmat))
+
+
+def test_pauli_matrix_include_qubits():
+    pauli = PauliString(spec="X")
+
+    assert np.allclose(pauli.matrix(), xmat)
+    assert np.allclose(
+        pauli.matrix(qubit_indices_to_include=[0, 1]), np.kron(xmat, imat)
+    )
+    assert np.allclose(
+        pauli.matrix(qubit_indices_to_include=[0, 1, 2]),
+        np.kron(np.kron(xmat, imat), imat),
+    )
 
 
 @pytest.mark.parametrize("support", [range(3), range(1, 4)])
@@ -79,9 +115,8 @@ def test_pauli_measure_in_circuit(support, circuit_type):
         # Original circuit.
         base_circuit.all_operations(),
         # Basis rotations.
-        cirq.SingleQubitCliffordGate.Y_nsqrt.on(qreg[support[0]]),
-        cirq.SingleQubitCliffordGate.X_sqrt.on(qreg[support[1]]),
-        cirq.SingleQubitCliffordGate.I.on(qreg[support[2]]),
+        xrotation.on(qreg[support[0]]),
+        yrotation.on(qreg[support[1]]),
         # Measurements.
         cirq.measure(*[qreg[s] for s in support]),
     )
