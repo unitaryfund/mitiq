@@ -112,20 +112,3 @@ class Observable:
             pset._expectation_from_measurements(bitstrings)
             for (pset, bitstrings) in zip(self._groups, measurements)
         )
-
-    def _expectation_from_wavefunction(
-        self, wavefunction: np.ndarray
-    ) -> float:
-        return wavefunction.conj().T @ self.matrix() @ wavefunction
-
-    def _expectation_from_trajectories(
-        self, wavefunctions: List[np.ndarray]
-    ) -> float:
-        return np.sum(
-            [self._expectation_from_wavefunction(wf) for wf in wavefunctions]
-        ) / len(wavefunctions)
-
-    def _expectation_from_density_matrix(
-        self, density_matrix: np.ndarray
-    ) -> float:
-        return np.trace(density_matrix @ self.matrix()).real
