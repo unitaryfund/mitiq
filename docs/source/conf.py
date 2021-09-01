@@ -333,5 +333,6 @@ nbsphinx_thumbnails = {
     'examples/maxcut-demo': '_images/maxcut-demo_48_1.png',
     'examples/pyquil_demo': '_images/pyquil_demo_11_0.png',
     'examples/cdr_api': '_images/unitary_fund_logo.png',
-    'examples/mitiq-paper/mitiq-paper-codeblocks': '_images/unitary_fund_logo.png',
+    'examples/mitiq-paper/mitiq-paper-codeblocks':
+        '_images/unitary_fund_logo.png',
 }
