@@ -155,7 +155,7 @@ class PauliStringCollection:
         a single circuit.
 
         Args:
-            paulis: PauliStrings to add to the set.
+            paulis: PauliStrings to add to the collection.
             check_precondition: If True, raises an error if some of the
                 ``PauliString``s do not qubit-wise commute.
         """
@@ -171,7 +171,7 @@ class PauliStringCollection:
         for pauli in paulis:
             if check_precondition and not self.can_add(pauli):
                 raise ValueError(
-                    f"Cannot add PauliString {pauli} to PauliStringSet."
+                    f"Cannot add PauliString {pauli} to PauliStringCollection."
                 )
             weight = pauli.weight()
             if self._paulis_by_weight.get(weight) is None:
@@ -190,14 +190,11 @@ class PauliStringCollection:
     def support(self) -> Set[int]:
         return {cast(cirq.LineQubit, q).x for q in self._qubits_to_measure()}
 
-    def weight(self) -> int:
-        return len(self.support())
-
     def max_weight(self) -> int:
-        return max(self._paulis_by_weight.keys())
+        return max(self._paulis_by_weight.keys(), default=0)
 
     def min_weight(self) -> int:
-        return min(self._paulis_by_weight.keys())
+        return min(self._paulis_by_weight.keys(), default=0)
 
     def _qubits_to_measure(self) -> Set[cirq.Qid]:
         qubits: Set[cirq.Qid] = set()

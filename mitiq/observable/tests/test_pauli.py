@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from collections import Counter
 import pytest
 
 import numpy as np
@@ -220,7 +221,82 @@ def test_expectation_from_measurements_two_qubits():
     assert np.isclose(zz._expectation_from_measurements(measurements), -1.0,)
 
 
-def test_pstringset_expectation_from_measurements():
+def test_pstringcollection():
+    x = PauliString(spec="X")
+    iz = PauliString(spec="IZ")
+    xz = PauliString(spec="XZ")
+    xzixx = PauliString(spec="XZIXX")
+    pauli_collection = PauliStringCollection(x, iz, xz, xzixx)
+
+    assert pauli_collection.elements == [x, iz, xz, xzixx]
+    assert pauli_collection.elements_by_weight == {
+        1: Counter((x, iz)),
+        2: Counter((xz,)),
+        4: Counter((xzixx,))
+    }
+    assert pauli_collection.min_weight() == 1
+    assert pauli_collection.max_weight() == 4
+    assert pauli_collection.support() == {0, 1, 3, 4}
+    assert len(pauli_collection) == 4
+
+
+def test_pstring_collection_empty():
+    pauli_collection = PauliStringCollection()
+
+    assert pauli_collection.elements == []
+    assert pauli_collection.elements_by_weight == {}
+    assert pauli_collection.min_weight() == 0
+    assert pauli_collection.support() == set()
+    assert len(pauli_collection) == 0
+
+
+def test_pstring_collection_add():
+    pcol = PauliStringCollection()
+
+    a = PauliString(spec="ZZ")
+    assert pcol.can_add(a)
+    pcol.add(a)
+    assert pcol.elements == [a]
+
+    b = PauliString(spec="ZIXZ")
+    assert pcol.can_add(b)
+    pcol.add(b)
+    assert pcol.elements == [a, b]
+
+    assert pcol.can_add(a)
+    pcol.add(a)
+    assert pcol.elements == [a, a, b]
+
+    c = PauliString(spec="YY")
+    assert not pcol.can_add(c)
+    with pytest.raises(ValueError, match="Cannot add PauliString"):
+        pcol.add(c)
+
+
+def test_pstring_collection_len():
+    x = PauliString(spec="X", support=(0,))
+    y = PauliString(spec="Y", support=(1,))
+    z = PauliString(spec="Z", support=(2,))
+    assert len(PauliStringCollection(x, y, z)) == 3
+    assert len(PauliStringCollection(x, x, x)) == 3
+    assert len(PauliStringCollection(x, y)) == 2
+    assert len(PauliStringCollection(x)) == 1
+    assert len(PauliStringCollection()) == 0
+
+
+def test_pstring_collection_eq():
+    x = PauliString(spec="X")
+    z = PauliString(spec="IZ")
+    xz = PauliString(spec="XZ")
+    xzz = PauliString(spec="IIIXZZ")
+
+    assert PauliStringCollection(x, xzz) == PauliStringCollection(xzz, x)
+    assert PauliStringCollection(x, z) != PauliStringCollection(x, xz)
+    assert PauliStringCollection(x, z, xz) == PauliStringCollection(z, xz, x)
+    assert PauliStringCollection() == PauliStringCollection()
+
+
+def test_pstringcollection_expectation_from_measurements():
     measurements = MeasurementResult([[0, 0], [0, 0], [0, 1], [0, 1]])
     pset = PauliStringCollection(
         PauliString(spec="ZI", coeff=-2.0), PauliString(spec="IZ", coeff=5.0)
