@@ -67,7 +67,7 @@ circuit_types = {
     "qiskit": qiskit.QuantumCircuit,
     "pyquil": Program,
     "braket": BKCircuit,
-    "pennylane": qml.tape.QuantumTape
+    "pennylane": qml.tape.QuantumTape,
 }
 
 
