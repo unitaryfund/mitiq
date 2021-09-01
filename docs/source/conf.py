@@ -325,3 +325,13 @@ nbsphinx_custom_formats = {
     '.mystnb': ['jupytext.reads', {'fmt': 'mystnb'}],
 }
 nbsphinx_execute = 'always'
+
+# nbsphinx_thumbnails = {
+#     'gallery/thumbnail-from-conf-py': 'gallery/a-local-file.png',
+#     'gallery/*-rst': 'images/notebook_icon.png',
+# }
+
+sphinx_gallery_conf = {
+    'default_thumb_file': 'docs/source/img/mitiq-logo-padded.png',
+}
+
