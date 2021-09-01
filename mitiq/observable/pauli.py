@@ -98,7 +98,7 @@ class PauliString:
         return set(self._pauli.qubits)
 
     def measure_in(self, circuit: QPROGRAM) -> QPROGRAM:
-        return PauliStringSet(self).measure_in(circuit)
+        return PauliStringCollection(self).measure_in(circuit)
 
     def can_be_measured_with(self, other: "PauliString") -> bool:
         """Returns True if the expectation value of the PauliString can be
@@ -129,7 +129,7 @@ class PauliString:
     def _expectation_from_measurements(
         self, measurements: MeasurementResult
     ) -> float:
-        return PauliStringSet(self)._expectation_from_measurements(
+        return PauliStringCollection(self)._expectation_from_measurements(
             measurements
         )
 
@@ -146,19 +146,20 @@ class PauliString:
         return repr(self._pauli)
 
 
-class PauliStringSet:
+class PauliStringCollection:
     def __init__(
         self, *paulis: PauliString, check_precondition: bool = True
     ) -> None:
-        """Initializes a ``PauliStringSet``, a set of ``PauliString``s which
-        qubit-wise commute and so can be measured with a single circuit.
+        """Initializes a ``PauliStringCollection``, a collection of
+        ``PauliString``s which qubit-wise commute and so can be measured with
+        a single circuit.
 
         Args:
             paulis: PauliStrings to add to the set.
             check_precondition: If True, raises an error if some of the
                 ``PauliString``s do not qubit-wise commute.
         """
-        self._paulis: Dict[int, TCounter[PauliString]] = dict()
+        self._paulis_by_weight: Dict[int, TCounter[PauliString]] = dict()
         self.add(*paulis, check_precondition=check_precondition)
 
     def can_add(self, pauli: PauliString) -> bool:
@@ -173,18 +174,18 @@ class PauliStringSet:
                     f"Cannot add PauliString {pauli} to PauliStringSet."
                 )
             weight = pauli.weight()
-            if self._paulis.get(weight) is None:
-                self._paulis[weight] = Counter({pauli})
+            if self._paulis_by_weight.get(weight) is None:
+                self._paulis_by_weight[weight] = Counter({pauli})
             else:
-                self._paulis[weight].update({pauli})
+                self._paulis_by_weight[weight].update({pauli})
 
     @property
     def elements(self) -> List[PauliString]:
-        return [pauli for paulis in self._paulis.values() for pauli in paulis.elements()]
+        return [pauli for paulis in self._paulis_by_weight.values() for pauli in paulis.elements()]
 
     @property
     def elements_by_weight(self) -> Dict[int, TCounter[PauliString]]:
-        return self._paulis
+        return self._paulis_by_weight
 
     def support(self) -> Set[int]:
         return {cast(cirq.LineQubit, q).x for q in self._qubits_to_measure()}
@@ -193,10 +194,10 @@ class PauliStringSet:
         return len(self.support())
 
     def max_weight(self) -> int:
-        return max(self._paulis.keys())
+        return max(self._paulis_by_weight.keys())
 
     def min_weight(self) -> int:
-        return min(self._paulis.keys())
+        return min(self._paulis_by_weight.keys())
 
     def _qubits_to_measure(self) -> Set[cirq.Qid]:
         qubits: Set[cirq.Qid] = set()
@@ -210,7 +211,7 @@ class PauliStringSet:
     @staticmethod
     @atomic_converter
     def _measure_in(
-        circuit: cirq.Circuit, pauliset: "PauliStringSet"
+        circuit: cirq.Circuit, paulis: "PauliStringCollection"
     ) -> cirq.Circuit:
         # Transform circuit to canonical qubit layout.
         qubit_map = dict(
@@ -221,18 +222,18 @@ class PauliStringSet:
         )
         circuit = circuit.transform_qubits(lambda q: qubit_map[q])
 
-        if not pauliset._qubits_to_measure().issubset(
+        if not paulis._qubits_to_measure().issubset(
             set(circuit.all_qubits())
         ):
             raise ValueError(
                 f"Qubit mismatch. The PauliString(s) act on qubits "
-                f"{pauliset.support()} but the circuit has qubit indices "
+                f"{paulis.support()} but the circuit has qubit indices "
                 f"{sorted([q for q in circuit.all_qubits()])}."
             )
 
         basis_rotations = set()
         support = set()
-        for pauli in pauliset.elements:
+        for pauli in paulis.elements:
             basis_rotations.update(pauli._basis_rotations())
             support.update(pauli._qubits_to_measure())
         measured = circuit + basis_rotations + cirq.measure(*sorted(support))
@@ -252,7 +253,7 @@ class PauliStringSet:
         return total
 
     def __eq__(self, other: Any) -> bool:
-        return self._paulis == other._paulis
+        return self._paulis_by_weight == other._paulis_by_weight
 
     def __len__(self) -> int:
         return len(self.elements)

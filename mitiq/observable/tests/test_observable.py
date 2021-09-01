@@ -17,7 +17,7 @@ import numpy as np
 import cirq
 
 from mitiq.observable.observable import Observable
-from mitiq.observable.pauli import PauliString, PauliStringSet
+from mitiq.observable.pauli import PauliString, PauliStringCollection
 from mitiq.rem.measurement_result import MeasurementResult
 from mitiq.utils import _equal
 
@@ -54,7 +54,7 @@ def test_observable_partition_one_set():
     assert obs.nterms == 3
 
     assert obs.ngroups == 1
-    assert obs.groups[0] == PauliStringSet(pauli1, pauli2, pauli3)
+    assert obs.groups[0] == PauliStringCollection(pauli1, pauli2, pauli3)
 
 
 def test_observable_partition_single_qubit_paulis():
@@ -65,7 +65,7 @@ def test_observable_partition_single_qubit_paulis():
     assert obs.nterms == 3
 
     obs.partition(seed=2)
-    expected_groups = [PauliStringSet(x), PauliStringSet(y), PauliStringSet(z)]
+    expected_groups = [PauliStringCollection(x), PauliStringCollection(y), PauliStringCollection(z)]
     assert obs.groups == expected_groups
 
 

@@ -19,7 +19,7 @@ from typing import Callable, cast, List, Optional, Set
 import numpy as np
 import cirq
 
-from mitiq.observable.pauli import PauliString, PauliStringSet
+from mitiq.observable.pauli import PauliString, PauliStringCollection
 from mitiq._typing import MeasurementResult, QuantumResult, QPROGRAM
 
 
@@ -27,7 +27,7 @@ class Observable:
     def __init__(self, *paulis: PauliString) -> None:
         # TODO: Add option to Combine duplicates. E.g. [Z(0, Z(0)] -> [2*Z(0)].
         self._paulis = list(paulis)
-        self._groups: List[PauliStringSet]
+        self._groups: List[PauliStringCollection]
         self._ngroups: int
         self.partition()
 
@@ -48,7 +48,7 @@ class Observable:
         return len(self.qubit_indices)
 
     @property
-    def groups(self) -> List[PauliStringSet]:
+    def groups(self) -> List[PauliStringCollection]:
         return self._groups
 
     @property
@@ -58,7 +58,7 @@ class Observable:
     def partition(self, seed: Optional[int] = None) -> None:
         rng = np.random.RandomState(seed)
 
-        psets: List[PauliStringSet] = []
+        psets: List[PauliStringCollection] = []
         paulis = copy.deepcopy(self._paulis)
         rng.shuffle(paulis)
 
@@ -72,7 +72,7 @@ class Observable:
                     break
 
             if not added:
-                psets.append(PauliStringSet(pauli))
+                psets.append(PauliStringCollection(pauli))
 
         self._groups = psets
         self._ngroups = len(self._groups)
