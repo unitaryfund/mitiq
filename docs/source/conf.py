@@ -326,12 +326,12 @@ nbsphinx_custom_formats = {
 }
 nbsphinx_execute = 'always'
 
-# nbsphinx_thumbnails = {
-#     'gallery/thumbnail-from-conf-py': 'gallery/a-local-file.png',
-#     'gallery/*-rst': 'images/notebook_icon.png',
-# }
-
-sphinx_gallery_conf = {
-    'default_thumb_file': 'docs/source/img/mitiq-logo-padded.png',
+nbsphinx_thumbnails = {
+    'examples/ibmq-backends': '_images/unitary_fund_logo.png',
+    'examples/hamiltonians': '_images/vqe-cirq-pauli-sum-mitigation-plot.png',
+    'examples/simple_landscape': '_images/simple_landscape_13_0.png',
+    'examples/maxcut-demo': '_images/maxcut-demo_48_1.png',
+    'examples/pyquil_demo': '_images/pyquil_demo_11_0.png',
+    'examples/cdr_api': '_images/unitary_fund_logo.png',
+    'examples/mitiq-paper/mitiq-paper-codeblocks': '_images/unitary_fund_logo.png',
 }
-
