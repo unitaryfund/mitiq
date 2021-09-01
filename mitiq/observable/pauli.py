@@ -14,7 +14,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from collections import Counter
-from typing import Any, cast, Counter as TCounter, Dict, List, Optional, Sequence, Set
+from typing import (
+    Any,
+    cast,
+    Counter as TCounter,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Set,
+)
 
 import numpy as np
 import cirq
@@ -181,7 +190,11 @@ class PauliStringCollection:
 
     @property
     def elements(self) -> List[PauliString]:
-        return [pauli for paulis in self._paulis_by_weight.values() for pauli in paulis.elements()]
+        return [
+            pauli
+            for paulis in self._paulis_by_weight.values()
+            for pauli in paulis.elements()
+        ]
 
     @property
     def elements_by_weight(self) -> Dict[int, TCounter[PauliString]]:
@@ -219,9 +232,7 @@ class PauliStringCollection:
         )
         circuit = circuit.transform_qubits(lambda q: qubit_map[q])
 
-        if not paulis._qubits_to_measure().issubset(
-            set(circuit.all_qubits())
-        ):
+        if not paulis._qubits_to_measure().issubset(set(circuit.all_qubits())):
             raise ValueError(
                 f"Qubit mismatch. The PauliString(s) act on qubits "
                 f"{paulis.support()} but the circuit has qubit indices "

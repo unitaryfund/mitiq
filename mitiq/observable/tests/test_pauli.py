@@ -232,7 +232,7 @@ def test_pstringcollection():
     assert pauli_collection.elements_by_weight == {
         1: Counter((x, iz)),
         2: Counter((xz,)),
-        4: Counter((xzixx,))
+        4: Counter((xzixx,)),
     }
     assert pauli_collection.min_weight() == 1
     assert pauli_collection.max_weight() == 4

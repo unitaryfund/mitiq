@@ -65,7 +65,11 @@ def test_observable_partition_single_qubit_paulis():
     assert obs.nterms == 3
 
     obs.partition(seed=2)
-    expected_groups = [PauliStringCollection(x), PauliStringCollection(y), PauliStringCollection(z)]
+    expected_groups = [
+        PauliStringCollection(x),
+        PauliStringCollection(y),
+        PauliStringCollection(z),
+    ]
     assert obs.groups == expected_groups
 
 
