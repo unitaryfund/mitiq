@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Any, cast, Dict, List, Optional, Sequence, Set
+from collections import Counter
+from typing import Any, cast, Counter as TCounter, Dict, List, Optional, Sequence, Set
 
 import numpy as np
 import cirq
@@ -157,7 +158,7 @@ class PauliStringSet:
             check_precondition: If True, raises an error if some of the
                 ``PauliString``s do not qubit-wise commute.
         """
-        self._paulis: Dict[int, Set[PauliString]] = dict()
+        self._paulis: Dict[int, TCounter[PauliString]] = dict()
         self.add(*paulis, check_precondition=check_precondition)
 
     def can_add(self, pauli: PauliString) -> bool:
@@ -173,16 +174,16 @@ class PauliStringSet:
                 )
             weight = pauli.weight()
             if self._paulis.get(weight) is None:
-                self._paulis[weight] = {pauli}
+                self._paulis[weight] = Counter({pauli})
             else:
-                self._paulis[weight].add(pauli)
+                self._paulis[weight].update({pauli})
 
     @property
-    def elements(self) -> Set[PauliString]:
-        return {pauli for pset in self._paulis.values() for pauli in pset}
+    def elements(self) -> List[PauliString]:
+        return [pauli for paulis in self._paulis.values() for pauli in paulis.elements()]
 
     @property
-    def elements_by_weight(self) -> Dict[int, Set[PauliString]]:
+    def elements_by_weight(self) -> Dict[int, TCounter[PauliString]]:
         return self._paulis
 
     def support(self) -> Set[int]:
@@ -251,7 +252,7 @@ class PauliStringSet:
         return total
 
     def __eq__(self, other: Any) -> bool:
-        return self.elements == other.elements
+        return self._paulis == other._paulis
 
     def __len__(self) -> int:
         return len(self.elements)
