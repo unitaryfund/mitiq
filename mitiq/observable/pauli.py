@@ -192,10 +192,10 @@ class PauliStringSet:
         return len(self.support())
 
     def max_weight(self) -> int:
-        return min(self._paulis.keys())
+        return max(self._paulis.keys())
 
     def min_weight(self) -> int:
-        return max(self._paulis.keys())
+        return min(self._paulis.keys())
 
     def _qubits_to_measure(self) -> Set[cirq.Qid]:
         qubits: Set[cirq.Qid] = set()
