@@ -17,20 +17,22 @@ and improve convergence of a simple VQE problem executed
 on a simulated noisy backend.
 
 
-The PyQuil VQE example shown here is adapted from
-https://grove-docs.readthedocs.io/en/latest/vqe.html#
+The pyQuil VQE example shown here is adapted from
+https://grove-docs.readthedocs.io/en/latest/vqe.html#, 
 and the VQE function in Grove.
 
 ```{code-cell}
+import numpy as np
 from pyquil import get_qc, Program
-from pyquil.gates import RX, RY, MEASURE, RESET
+from pyquil.gates import RX, S, T, Z, CNOT, MEASURE
 from typing import List, Union
 from collections import Counter
-import numpy as np
 import mitiq
 from mitiq import zne
-from mitiq.zne import execute_with_zne
-from pyquil.paulis import PauliTerm, PauliSum
+from scipy import optimize
+from pyquil.paulis import PauliTerm, PauliSum, sZ
+from pyquil.noise import pauli_kraus_map
+from matplotlib import pyplot as plt
 ```
 +++
 
@@ -38,18 +40,62 @@ Use the get_qc command to initialize the simulated noisy device where the PyQuil
 
 ```{code-cell}
 # initialize quantum device
-qpu = get_qc("2q-noisy-qvm")
-
-# set up quantum circuit
-def ansatz(params):
-    return Program(RX(params[0], 0), RX(params[1], 0))
+qc = get_qc("2q-noisy-qvm")
 ```
 
 +++
 
- Compute expectation value of the Hamiltonian over the over the distribution generated from the quantum program
+Example ansatz
+
 ```{code-cell}
-def expectation(qc, samples: int,
+
+def ansatz():
+    program = Program()
+    theta = program.declare("theta", memory_type="REAL")
+    program += RX(theta, 0)
+    program += T(0)
+    program += CNOT(1,0)
+    program += S(0)
+    program += Z(0)
+    return program
+```
+
++++
+
+ Hamiltonian in this example is just sigma_z on the zeroth qubit
+```{code-cell}
+program = ansatz()
+hamiltonian = sZ(0)
+samples = 4000
+pauli_sum = PauliSum([hamiltonian])
+
+# apply the Hamiltonian
+for j, term in enumerate(pauli_sum.terms):
+    meas_basis_change = Program()
+    marked_qubits = []
+    for index, gate in term:
+        marked_qubits.append(index)
+        if gate == 'X':
+            meas_basis_change.inst(RY(-np.pi / 2, index))
+        elif gate == 'Y':
+            meas_basis_change.inst(RX(np.pi / 2, index))
+        program += meas_basis_change
+    # Memory declaration for readout "ro"
+    ro = program.declare('ro', 'BIT', max(marked_qubits) + 1)
+    program += [MEASURE(qubit, r)
+        for qubit, r in zip(list(range(max(marked_qubits) + 1)), ro)]
+program.wrap_in_numshots_loop(samples)
+quil_prog = qc.compiler.quil_to_native_quil(program, protoquil=True)
+```
+
++++
+
+Set up the VQE: 
+
+Compute expectation value of the Hamiltonian over the over the distribution generated from the quantum program
+
+```{code-cell}
+def expectation(thetas, qc, ro, samples: int,
                 pauli_sum: Union[PauliSum, PauliTerm, np.ndarray],
                 pyquil_prog: Program) -> float:
     """
@@ -59,31 +105,62 @@ def expectation(qc, samples: int,
     :param pauli_sum: PauliSum representing the operator of which to calculate the expectation
             value
     :param samples: The number of samples used to calculate the expectation value.
-    :param qc: The QuantumComputer object.
     :return: A float representing the expectation value of pauli_sum given the distribution
             generated from quil_prog.
         """
     expectation = 0.0
     pauli_sum = PauliSum([pauli_sum])
     for j, term in enumerate(pauli_sum.terms):
-        meas_basis_change = Program()
         qubits_to_measure = []
         for index, gate in term:
-            qubits_to_measure.append(index)
-            if gate == 'X':
-               meas_basis_change.inst(RY(-np.pi / 2, index))
-            elif gate == 'Y':
-               meas_basis_change.inst(RX(np.pi / 2, index))
+            qubits_to_measure.append(index)    
             meas_outcome = expectation_from_sampling(
-                                program + meas_basis_change,
-                                qubits_to_measure, qc, samples)
+                            thetas, pyquil_prog, qubits_to_measure, 
+                            qc, samples)
             expectation += term.coefficient * meas_outcome
     return expectation.real
 ```
 
 +++
 
-Calculates the parity of elements at indexes in marked_qubits
+
+Calculate the expectation value of the Zi operator at marked_qubits
+
+```{code-cell}
+def expectation_from_sampling(thetas, executable: Program,
+                              marked_qubits: List[int], qc,
+                              samples: int) -> float:
+    """
+
+    Given a wavefunction, this calculates the expectation value of the Zi
+    operator where i ranges over all the qubits given in marked_qubits.
+
+    :param pyquil_program: pyQuil program generating some state
+    :param marked_qubits: The qubits within the support of the Z pauli
+                          operator whose expectation value is being calculated
+    :param qc: A QuantumComputer object.
+    :param samples: Number of bitstrings collected to calculate expectation
+                    from sampling.
+    :returns: The expectation value as a float.
+    """
+    bitstring_samples = qc.run(executable, memory_map={'theta': thetas})
+    bitstring_tuples = list(map(tuple, bitstring_samples))
+
+    freq = Counter(bitstring_tuples)
+
+    # perform weighted average
+    exp_val = 0
+    for bitstring, count in freq.items():
+        bitstring_int = int("".join([str(x) for x in bitstring[::-1]]), 2)
+        if parity_even_p(bitstring_int, marked_qubits):
+            exp_val += float(count) / samples
+        else:
+            exp_val -= float(count) / samples
+    return exp_val
+```
++++
+
+Calculate the parity of elements at indexes in marked_qubits
 
 ```{code-cell}
 def parity_even_p(state, marked_qubits):
@@ -102,124 +179,89 @@ def parity_even_p(state, marked_qubits):
 
 +++
 
-calculate the expectation value of the Zi operator at marked_qubits
+
+Scan over the parameter theta and plot energy expecation, without mitigation 
 ```{code-cell}
-def expectation_from_sampling(pyquil_program: Program,
-                              marked_qubits: List[int], qc,
-                              samples: int) -> float:
-    """
+thetas = np.linspace(0, 2 * np.pi, 101)
+results = []
+ 
+for theta in thetas:
+    results.append(expectation(theta, qc, ro, samples, hamiltonian, quil_prog))
 
-    Given a wavefunctions, this calculates the expectation value of the Zi
-    operator where i ranges over all the qubits given in marked_qubits.
-
-    :param pyquil_program: pyQuil program generating some state
-    :param marked_qubits: The qubits within the support of the Z pauli
-                          operator whose expectation value is being calculated
-    :param qc: A QuantumComputer object.
-    :param samples: Number of bitstrings collected to calculate expectation
-                    from sampling.
-    :returns: The expectation value as a float.
-    """
-    program = Program()
-    ro = program.declare('ro', 'BIT', max(marked_qubits) + 1)
-    program += pyquil_program
-    program += [MEASURE(qubit, r)
-                for qubit, r in zip(list(range(max(marked_qubits) + 1)), ro)]
-    program.wrap_in_numshots_loop(samples)
-    executable = qc.compile(program)
-    bitstring_samples = qc.run(executable)
-    bitstring_tuples = list(map(tuple, bitstring_samples))
-
-    freq = Counter(bitstring_tuples)
-
-    # perform weighted average
-    expectation = 0
-    for bitstring, count in freq.items():
-        bitstring_int = int("".join([str(x) for x in bitstring[::-1]]), 2)
-        if parity_even_p(bitstring_int, marked_qubits):
-            expectation += float(count) / samples
-        else:
-            expectation -= float(count) / samples
-    return expectation
-```
-+++
-
-Hamiltonian in this example is just sigma_z on the zeroth qubit
-
-```{code-cell}
-from pyquil.paulis import sZ
-hamiltonian = sZ(0)
-```
-+++
-
-define objective function mapping the set of experimental parameters to the expectation value
-```{code-cell}
-def objective(params, program):
-
-    program += ansatz(params)
-    samples = 10000
-    return expectation(qpu, samples, hamiltonian, program)
+_ = plt.figure(1)
+_ = plt.plot(thetas, results, 'o-')
+_ = plt.xlabel(r'$\theta$', fontsize=18)
+_ = plt.ylabel(r'$\langle \Psi(\theta) | Z | \Psi(\theta) \rangle$', fontsize=18)    
+_ = plt.title('Noisy Energy Landscape')
+plt.show()
 ```
 
 +++
 
-run VQE routine without noise mitigation
+
+Run VQE routine without noise mitigation
+
 ```{code-cell}
-from scipy.optimize import minimize
+init_angle = [1.0]
+# use the Nelder-Mead method in `scipy minimizer` to find the minimimum of the expectation value
+res = optimize.minimize(expectation, init_angle, args=(qc, ro, samples, hamiltonian, quil_prog),    
+                        method='Nelder-Mead', options={ 'xatol': 1.0e-3, 'fatol': 1.0e-2})
+print(res)
 ```
 
 +++
 
-define initial experimental parameters
+
+Now introduce noise mitigation technique Zero Noise Extrapolation
+
+Create new objective function to calculate expecation value w/ noise mitigation
+
 ```{code-cell}
-initial_angle = [0.000, 0.000]
-program = Program()
+def mitigated_expectation(thetas, qc, ro, samples, 
+                          pauli_sum, executable: Program, factory) -> float:
+    mitigated_exp =  zne.execute_with_zne(executable, lambda p: expectation(
+                        thetas, qc, ro, samples, pauli_sum, p), factory)
+    return mitigated_exp
 ```
 
 +++
 
-calculate expectation value from initial parameters
 ```{code-cell}
-print(objective(initial_angle, program))
+# here we use a linear extrapolation technique 
+fac = mitiq.zne.inference.LinearFactory(scale_factors=[1.0, 8.0])
 ```
 
 +++
 
-use the Nelder-Mead method in scipy minimizer to find the minimimum of the expectation value
+Scan over the parameter theta and plot energy expecation with noise mitigation 
+
 ```{code-cell}
-minimum = minimize(
-          objective, initial_angle, args = (program),
-          method = 'Nelder-Mead',  options = {'disp': True, 'maxiter': 100,'xatol': 1.0e-2})
+results_zne = []
+for theta in thetas:
+    results_zne.append(
+        mitigated_expectation(theta, qc, ro, samples, hamiltonian, quil_prog, fac)
+    )
+
+_ = plt.figure(2)
+_ = plt.plot(thetas, results_zne, 'o-')
+_ = plt.xlabel(r'$\theta$', fontsize=18)
+_ = plt.ylabel(r'$\langle \Psi(\theta) | Z | \Psi(\theta) \rangle$', fontsize=18)    
+_ = plt.title('Mitigated Energy Landscape')
+plt.show()
 ```
 
 +++
 
-re-run VQE, with noise mitigation technique Zero Noise Extrapolation
-```{code-cell}
-# add noise scaling
-fac = zne.inference.LinearFactory(scale_factors = [1.0, 7.0])
+Run VQE routine with noise mitigation
 
-# re-initialize program
-program = Program()
+```{code-cell}
+res_zne = optimize.minimize(mitigated_expectation, init_angle, args=(
+                             qc, ro, samples, hamiltonian, quil_prog, fac), 
+                             method='Nelder-Mead', options={ 
+                            'xatol': 1.0e-3, 'fatol': 1.0e-2})
+print(res_zne)
 ```
 
-+++
-
-update objective function to calculate expecation value w/ noise mitigation
-```{code-cell}
-from functools import partial
-def objective_zne(params, program):
-    program += ansatz(params)
-    samples = 10000
-    return execute_with_zne(program,
-                            partial(expectation, qpu, samples, hamiltonian),
-                            fac)
-
-print(objective_zne(initial_angle, program))
-min_zne = minimize(objective_zne, initial_angle, args = (program),
-                   method = 'Nelder-Mead',
-                   options = {'disp': True, 'maxiter': 100, 'xatol': 1.0e-2})
-```
 
 
 ## References
