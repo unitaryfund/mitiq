@@ -13,17 +13,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""Unit tests for measurement results."""
+import pytest
 
 import numpy as np
 from mitiq.rem.measurement_result import MeasurementResult
 
 
-def test_measurement_result():
+@pytest.mark.parametrize("asarray", (True, False))
+def test_measurement_result(asarray):
     bitstrings = [[0, 0], [0, 1], [1, 0]]
+    if asarray:
+        bitstrings = np.array(bitstrings)
     result = MeasurementResult(bitstrings)
+
     assert result.nqubits == 2
     assert result.shots == 3
-    assert result.result == bitstrings
+    assert np.allclose(result.result, bitstrings)
     assert repr(result) == "MeasurementResult(result=[[0, 0], [0, 1], [1, 0]])"
 
 

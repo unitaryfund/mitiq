@@ -16,7 +16,7 @@
 """Defines MeasurementResult, a result obtained by measuring qubits on a
 quantum computer."""
 from dataclasses import dataclass
-from typing import Iterable, List
+from typing import cast, Iterable, List
 
 import numpy as np
 
@@ -30,6 +30,8 @@ class MeasurementResult:
 
     def __post_init__(self) -> None:
         self._bitstrings = np.array(self.result)
+        if isinstance(self.result, np.ndarray):
+            self.result = cast(List[Bitstring], self.result.tolist())
 
     @property
     def shots(self) -> int:
