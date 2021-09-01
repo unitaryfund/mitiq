@@ -39,6 +39,7 @@ class MeasurementResult:
         >>> print(result)
         >>> # MeasurementResult(result=[[0, 1, 0], [0, 0, 1]])
     """
+
     result: List[Bitstring]
 
     def __post_init__(self) -> None:
