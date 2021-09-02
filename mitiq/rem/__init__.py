@@ -15,4 +15,5 @@
 
 """Readout error mitigation (REM) techniques."""
 
+from mitiq.rem.measurement_result import MeasurementResult
 from mitiq.rem.post_select import post_select
