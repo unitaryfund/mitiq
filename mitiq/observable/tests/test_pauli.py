@@ -319,3 +319,18 @@ def test_pstringcollection_expectation_from_measurements():
         PauliString(spec="ZI", coeff=-2.0), PauliString(spec="IZ", coeff=5.0)
     )
     assert np.isclose(pset._expectation_from_measurements(measurements), 0.0)
+
+
+def test_pstringcollection_expectation_from_measurements_qubit_indices():
+    measurements = MeasurementResult(
+        [[0, 0], [0, 0], [0, 1], [0, 1]], qubit_indices=(1, 5)
+    )
+    pset = PauliStringCollection(
+        PauliString(spec="Z", coeff=-2.0, support=(1,))
+    )
+    assert np.isclose(pset._expectation_from_measurements(measurements), -2.0)
+
+    pset = PauliStringCollection(
+        PauliString(spec="Z", coeff=-2.0, support=(5,))
+    )
+    assert np.isclose(pset._expectation_from_measurements(measurements), 0.0)
