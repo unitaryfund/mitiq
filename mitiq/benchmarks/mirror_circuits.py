@@ -119,7 +119,7 @@ def generate_mirror_circuit(
     two_qubit_gate_prob: float,
     connectivity_graph: nx.Graph,
     seed: Optional[int] = None,
-    return_type: Optional[str] = None
+    return_type: Optional[str] = None,
 ) -> cirq.Circuit:
     """Returns a randomized mirror circuit.
 
@@ -167,8 +167,8 @@ def generate_mirror_circuit(
         + rand_paulis
         + quasi_inversion_circuit
         + cirq.inverse(single_qubit_cliffords)
-        )
+    )
 
-    return_type = "cirq" if not return_type else return_type 
+    return_type = "cirq" if not return_type else return_type
     print(circuit)
-    return convert_from_mitiq(circuit, return_type) 
+    return convert_from_mitiq(circuit, return_type)
