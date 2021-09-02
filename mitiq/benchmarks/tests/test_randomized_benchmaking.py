@@ -35,6 +35,7 @@ from mitiq.zne.scaling import (
 from mitiq.benchmarks.utils import noisy_simulation
 from mitiq.zne import mitigate_executor
 
+
 SCALE_FUNCTIONS = [
     fold_gates_at_random,
     fold_gates_from_left,

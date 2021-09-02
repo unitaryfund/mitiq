@@ -14,6 +14,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from mitiq.benchmarks import mirror_circuits
+from mitiq._typing import SUPPORTED_PROGRAM_TYPES
+from mitiq.utils import _equal
 from numpy import random
 import networkx as nx
 import cirq
@@ -122,6 +124,10 @@ def test_generate_mirror_circuit(depth_twoqprob_graph):
     )
     assert isinstance(circ, cirq.Circuit)
     assert len(circ.all_qubits()) == n
+    assert set(op.gate for op in circ.all_operations()).issubset(
+            all_gates
+        )
+    circ.append(cirq.measure(*cirq.LineQubit.range(n)))
     result = (
         cirq.Simulator()
         .run(circ, repetitions=1_000)
@@ -130,11 +136,23 @@ def test_generate_mirror_circuit(depth_twoqprob_graph):
     assert (
         len(result.keys()) == 1
     )  # checks that the circuit only outputs one bitstring
-    for moment in circ[: len(circ) - 1]:
-        temp_circ = cirq.Circuit()
-        temp_circ.append(moment)
-        assert set(op.gate for op in temp_circ.all_operations()).issubset(
-            all_gates
-        )
-    assert circ.has_measurements()
-    assert circ.are_all_measurements_terminal()
+
+
+@pytest.mark.parametrize("seed",(0,3))
+def test_mirror_circuit_seeding(seed):
+    nlayers = 5
+    two_qubit_gate_prob = 0.4
+    connectivity_graph = nx.complete_graph(5)
+    circuit = mirror_circuits.generate_mirror_circuit(nlayers, two_qubit_gate_prob, connectivity_graph, seed = seed)
+    for _ in range(5):
+        circ = mirror_circuits.generate_mirror_circuit(nlayers, two_qubit_gate_prob, connectivity_graph, seed = seed)
+        assert _equal(circuit, circ, require_qubit_equality = True, require_measurement_equality = True)
+
+
+@pytest.mark.parametrize("return_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_mirror_circuits_conversions(return_type):
+    nlayers = 5
+    two_qubit_gate_prob = 0.4
+    connectivity_graph = nx.complete_graph(5)
+    circuit = mirror_circuits.generate_mirror_circuit(nlayers, two_qubit_gate_prob, connectivity_graph, return_type = return_type)
+    assert return_type in circuit.__module__

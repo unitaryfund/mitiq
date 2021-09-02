@@ -20,6 +20,7 @@ from numpy import random
 import networkx as nx
 import cirq
 from cirq.experiments.qubit_characterizations import _single_qubit_cliffords
+from mitiq.interface import convert_from_mitiq
 
 single_q_cliffords = _single_qubit_cliffords()
 cliffords = single_q_cliffords.c1_in_xy
@@ -118,6 +119,7 @@ def generate_mirror_circuit(
     two_qubit_gate_prob: float,
     connectivity_graph: nx.Graph,
     seed: Optional[int] = None,
+    return_type: Optional[str] = None
 ) -> cirq.Circuit:
     """Returns a randomized mirror circuit.
 
@@ -159,11 +161,14 @@ def generate_mirror_circuit(
     )
 
     rand_paulis = cirq.Circuit(random_paulis(nqubits, random_state))
-    return (
+    circuit = (
         single_qubit_cliffords
         + forward_circuit
         + rand_paulis
         + quasi_inversion_circuit
         + cirq.inverse(single_qubit_cliffords)
-        + cirq.measure(*cirq.LineQubit.range(nqubits))
-    )
+        )
+
+    return_type = "cirq" if not return_type else return_type 
+    print(circuit)
+    return convert_from_mitiq(circuit, return_type) 
