@@ -331,7 +331,7 @@ nbsphinx_thumbnails = {
     'examples/hamiltonians': '_images/vqe-cirq-pauli-sum-mitigation-plot.png',
     'examples/simple_landscape': '_images/simple_landscape_13_0.png',
     'examples/maxcut-demo': '_images/maxcut-demo_48_1.png',
-    'examples/pyquil_demo': '_images/pyquil_demo_11_0.png',
+    'examples/pyquil_demo': '_images/unitary_fund_logo.png',
     'examples/cdr_api': '_images/unitary_fund_logo.png',
     'examples/mitiq-paper/mitiq-paper-codeblocks':
         '_images/unitary_fund_logo.png',
