@@ -29,7 +29,7 @@ class MeasurementResult:
     """Bitstrings sampled from a quantum computer.
 
     Example:
-        # Sample result of measuring three qubits twice.
+        >>> # Sample result of measuring three qubits twice.
         >>> result = MeasurementResult([[0, 1, 0], [0, 0, 1]])
         >>> print(result.nqubits)  # 3
         >>> print(result.shots)  # 2
