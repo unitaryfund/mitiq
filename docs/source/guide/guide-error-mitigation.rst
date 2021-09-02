@@ -292,7 +292,7 @@ This is just a selection of open-source projects related to quantum error
 mitigation. A more comprehensinve collection of software on quantum computing
 can be found `here`_ and on `Unitary Fund`_'s list of supported projects.
 
-.. _QuTiP: http://qutip.org
+.. _QuTiP: https://qutip.org
 
 .. _Qiskit: https://qiskit.org
 
