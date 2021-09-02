@@ -16,7 +16,7 @@
 """Defines MeasurementResult, a result obtained by measuring qubits on a
 quantum computer."""
 from dataclasses import dataclass
-from typing import cast, Iterable, List
+from typing import cast, Iterable, List, Optional, Tuple
 
 import numpy as np
 
@@ -26,21 +26,10 @@ Bitstring = List[int]
 
 @dataclass
 class MeasurementResult:
-    """Bitstrings sampled from a quantum computer.
-
-    Example:
-        >>> # Sample result of measuring three qubits twice.
-        >>> result = MeasurementResult([[0, 1, 0], [0, 0, 1]])
-        >>> print(result.nqubits)  # 3
-        >>> print(result.shots)  # 2
-        >>> print(result.asarray)
-        >>> # [[0 1 0]
-        >>> #  [0 0 1]]
-        >>> print(result)
-        >>> # MeasurementResult(result=[[0, 1, 0], [0, 0, 1]])
-    """
+    """Bitstrings sampled from a quantum computer."""
 
     result: List[Bitstring]
+    qubit_indices: Optional[Tuple[int, ...]] = None
 
     def __post_init__(self) -> None:
         if not set(b for bits in self.result for b in bits).issubset({0, 1}):
@@ -51,6 +40,16 @@ class MeasurementResult:
         self._bitstrings = np.array(self.result)
         if isinstance(self.result, np.ndarray):
             self.result = cast(List[Bitstring], self.result.tolist())
+
+        if not self.qubit_indices:
+            self.qubit_indices = tuple(range(self.nqubits))
+        else:
+            if len(self.qubit_indices) != self.nqubits:
+                raise ValueError(
+                    f"MeasurementResult has {self.nqubits} qubit(s) but there "
+                    f"are {len(self.qubit_indices)} `qubit_indices`."
+                )
+        self._measurements = dict(zip(self.qubit_indices, self._bitstrings.T))
 
     @property
     def shots(self) -> int:
@@ -69,7 +68,7 @@ class MeasurementResult:
         return self._bitstrings
 
     def __getitem__(self, indices: List[int]) -> np.ndarray:
-        return self._bitstrings[:, indices]
+        return np.array([self._measurements[i] for i in indices]).T
 
     def __iter__(self) -> Iterable[Bitstring]:
         yield from self.result

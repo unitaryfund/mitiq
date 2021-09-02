@@ -272,7 +272,11 @@ class PauliStringCollection:
         total = 0.0
         for pauli in self.elements:
             bitstrings = measurements[sorted(pauli.support())]
-            value = np.average([(-1) ** np.sum(bits) for bits in bitstrings])
+            value = (
+                np.average([(-1) ** np.sum(bits) for bits in bitstrings])
+                if len(bitstrings) > 0
+                else 1.0
+            )
             total += pauli.coeff * value
         return total
 
