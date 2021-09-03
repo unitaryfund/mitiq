@@ -23,9 +23,10 @@
        a quantum program from which expectation values to be mitigated can be
        computed. Note this includes expectation values themselves.
 """
-from typing import List, Union
+from typing import Union
 
 from cirq import Circuit as _Circuit
+from mitiq.rem.measurement_result import MeasurementResult
 
 
 # Supported quantum programs.
@@ -55,9 +56,6 @@ except ImportError:  # pragma: no cover
 # Supported + installed quantum programs.
 QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit, _BKCircuit]
 
-# Supported measurement results.
-Bitstring = List[int]
-MeasurementResult = List[Bitstring]
 
 # An `executor` function inputs a quantum program and outputs an object from
 # which expectation values can be computed. Explicitly, this object can be one
