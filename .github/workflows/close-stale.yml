@@ -12,4 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Close Stale Issues
-        uses: actions/stale@v3.0.19
+        uses: actions/stale@v4
+        with:
+          days-before-stale: 60
+          days-before-close: 7
+          stale-issue-message: This issue had no activity for **2 months**, and will be closed in **one week** unless there is new activity. Cheers!
+          stale-issue-label: stale
+          stale-pr-message: This pull request had no activity for **2 months**, and will be closed in **one week** unless there is new activity. Cheers!
+          stale-pr-label: stale

@@ -15,7 +15,7 @@
 
 """Utility functions."""
 from copy import deepcopy
-from typing import cast, Any, Dict
+from typing import cast, Any, Dict, List, Tuple
 
 import numpy as np
 
@@ -30,6 +30,7 @@ from cirq import (
     CNOT,
     H,
     DensityMatrixSimulator,
+    ops,
     OP_TREE,
 )
 from cirq.ops.measurement_gate import MeasurementGate
@@ -78,6 +79,45 @@ def _simplify_circuit_exponents(circuit: Circuit) -> None:
             simplified_operations.append(simplified_operation)
         # Mutate the input circuit
         circuit[moment_idx] = Moment(simplified_operations)
+
+
+def _is_measurement(op: ops.Operation) -> bool:
+    """Returns true if the operation's gate is a measurement, else False.
+
+    Args:
+        op: Gate operation.
+    """
+    return isinstance(op.gate, ops.measurement_gate.MeasurementGate)
+
+
+def _pop_measurements(circuit: Circuit,) -> List[Tuple[int, ops.Operation]]:
+    """Removes all measurements from a circuit.
+
+    Args:
+        circuit: A quantum circuit as a :class:`cirq.Circuit` object.
+
+    Returns:
+        measurements: List of measurements in the circuit.
+    """
+    measurements = list(circuit.findall_operations(_is_measurement))
+    circuit.batch_remove(measurements)
+    return measurements
+
+
+def _append_measurements(
+    circuit: Circuit, measurements: List[Tuple[int, ops.Operation]]
+) -> None:
+    """Appends all measurements into the final moment of the circuit.
+
+    Args:
+        circuit: a quantum circuit as a :class:`cirq.Circuit`.
+        measurements: measurements to perform.
+    """
+    new_measurements: List[Tuple[int, ops.Operation]] = []
+    for i in range(len(measurements)):
+        # Make sure the moment to insert into is the last in the circuit
+        new_measurements.append((len(circuit) + 1, measurements[i][1]))
+    circuit.batch_insert(new_measurements)
 
 
 def _equal(
