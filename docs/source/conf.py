@@ -175,6 +175,12 @@ pybtex.style.formatting.unsrt.date = pybtex.style.template.words(sep="")[
 ]
 bibtex_bibfiles = ["refs.bib"]
 
+# Links matching with the following regular expressions will be ignored
+linkcheck_ignore = [
+    r'https://doi.org/10.1088/0034-4885/74/10/104401',
+    r'https://doi.org/10.1088/1367-2630/12/7/075008',
+]
+
 
 class ApsStyle(pybtex.style.formatting.unsrt.Style):
     """Style that mimicks APS journals."""
