@@ -21,6 +21,7 @@ import networkx as nx
 import cirq
 from cirq.experiments.qubit_characterizations import _single_qubit_cliffords
 from mitiq.interface import convert_from_mitiq
+from mitiq import QPROGRAM
 
 single_q_cliffords = _single_qubit_cliffords()
 cliffords = single_q_cliffords.c1_in_xy
@@ -120,7 +121,7 @@ def generate_mirror_circuit(
     connectivity_graph: nx.Graph,
     seed: Optional[int] = None,
     return_type: Optional[str] = None,
-) -> cirq.Circuit:
+) -> QPROGRAM:
     """Returns a randomized mirror circuit.
 
     Args:
@@ -170,5 +171,4 @@ def generate_mirror_circuit(
     )
 
     return_type = "cirq" if not return_type else return_type
-    print(circuit)
     return convert_from_mitiq(circuit, return_type)
