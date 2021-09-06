@@ -49,6 +49,10 @@ def execute(circuit: cirq.Circuit, shots: int = 8192) -> MeasurementResult:
     )
 
 
+def execute_density_matrix(circuit: cirq.Circuit) -> np.ndarray:
+    return cirq.DensityMatrixSimulator().simulate(circuit).final_density_matrix
+
+
 def test_observable():
     pauli1 = PauliString(spec="XI", coeff=-1.0)
     pauli2 = PauliString(spec="IZ", coeff=2.0)
@@ -216,39 +220,42 @@ def test_observable_expectation_from_measurements_two_pauli_strings():
 
 
 @pytest.mark.parametrize("n", range(1, 3 + 1))
-def test_observable_expectation_one_circuit(n):
+@pytest.mark.parametrize("executor", (execute, execute_density_matrix))
+def test_observable_expectation_one_circuit(n, executor):
     qubits = cirq.LineQubit.range(n)
     obs = Observable(PauliString(spec="X" * n))
     circuit = cirq.Circuit(cirq.H.on_each(qubits))
 
-    expectation = obs.expectation(circuit, execute)
+    expectation = obs.expectation(circuit, executor)
     assert np.isclose(expectation, 1.0)
 
 
 @pytest.mark.parametrize("n", range(1, 3 + 1))
-def test_observable_expectation_two_circuits(n):
+@pytest.mark.parametrize("executor", (execute, execute_density_matrix))
+def test_observable_expectation_two_circuits(n, executor):
     obs = Observable(
         PauliString(spec="X" * n, coeff=-2.0), PauliString(spec="Z" * n)
     )
     qubits = cirq.LineQubit.range(n)
     circuit = cirq.Circuit(cirq.H.on_each(qubits))
 
-    expectation = obs.expectation(circuit, execute)
+    expectation = obs.expectation(circuit, executor)
     assert np.isclose(expectation, -2.0, atol=1e-1)
 
 
-def test_observable_expectation_supported_qubits():
+@pytest.mark.parametrize("executor", (execute,))
+def test_observable_expectation_supported_qubits(executor):
     a, b, c = cirq.LineQubit.range(3)
     circuit = cirq.Circuit(cirq.I(a), cirq.X.on(b), cirq.H.on(c))
 
     # <Z0> = 1.
     obs = Observable(PauliString(spec="Z", support=(0,)))
-    assert np.isclose(obs.expectation(circuit, execute), 1.0)
+    assert np.isclose(obs.expectation(circuit, executor), 1.0)
 
     # <Z1> = -1.
     obs = Observable(PauliString(spec="Z", support=(1,)))
-    assert np.isclose(obs.expectation(circuit, execute), -1.0)
+    assert np.isclose(obs.expectation(circuit, executor), -1.0)
 
     # <Z2> = 0.
     obs = Observable(PauliString(spec="Z", support=(2,)))
-    assert np.isclose(obs.expectation(circuit, execute), 0.0, atol=2e-2)
+    assert np.isclose(obs.expectation(circuit, executor), 0.0, atol=2e-2)

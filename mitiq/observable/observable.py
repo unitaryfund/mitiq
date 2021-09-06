@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
+import inspect
 from typing import Callable, cast, List, Optional, Set
 
 import numpy as np
@@ -97,15 +98,15 @@ class Observable:
     def expectation(
         self, circuit: QPROGRAM, execute: Callable[[QPROGRAM], QuantumResult]
     ) -> float:
-        return self.expectation_from(
-            Executor(execute).run(self.measure_in(circuit))
-        )
-
-    def expectation_from(self, results: List[QuantumResult]) -> float:
-        result_type = type(results[0])
+        result_type = inspect.getfullargspec(execute).annotations.get("return")
 
         if result_type is MeasurementResult:
-            return self._expectation_from_measurements(results)
+            return self._expectation_from_measurements(
+                Executor(execute).run(self.measure_in(circuit))
+            )
+        elif result_type is np.ndarray:
+            density_matrix = execute(circuit)
+            return np.trace(density_matrix @ self.matrix())
         else:
             raise NotImplementedError
 
