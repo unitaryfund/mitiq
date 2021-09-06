@@ -11,17 +11,3 @@ maxcut-demo.myst
 cdr_api.md
 mitiq-paper/mitiq-paper-codeblocks
 ```
-
-## Links to the examples for My Binder
-
-[Error mitigation on IBMQ backends](ibmq-backends.myst)
-
-[Defining Hamiltonians as Linear Combinations of Pauli Strings](hamiltonians.md)
-
-[Mitigating the energy landscape of a variational circuit with Mitiq](simple_landscape.myst)
-
-[Solving MaxCut with QAOA improved with Mitiq](maxcut-demo.myst)
-
-[CLifford data regression API](cdr_api.md)
-
-[Mitiq paper codeblocks](mitiq-paper/mitiq-paper-codeblocks.md)
