@@ -1,2 +1,3 @@
--r ../requirements-dev.txt
+-r ../dev_requirements.txt
+-r ../requirements.txt
 .
