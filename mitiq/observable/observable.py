@@ -21,7 +21,7 @@ import cirq
 
 from mitiq.observable.pauli import PauliString, PauliStringCollection
 from mitiq._typing import MeasurementResult, QuantumResult, QPROGRAM
-from mitiq.collector import Collector
+from mitiq.executor import Executor
 
 
 class Observable:
@@ -95,10 +95,10 @@ class Observable:
         return matrix
 
     def expectation(
-        self, circuit: QPROGRAM, executor: Callable[[QPROGRAM], QuantumResult]
+        self, circuit: QPROGRAM, execute: Callable[[QPROGRAM], QuantumResult]
     ) -> float:
         return self.expectation_from(
-            Collector(executor).run(self.measure_in(circuit))
+            Executor(execute).run(self.measure_in(circuit))
         )
 
     def expectation_from(self, results: List[QuantumResult]) -> float:
