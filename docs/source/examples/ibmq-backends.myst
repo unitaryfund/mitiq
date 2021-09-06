@@ -117,7 +117,7 @@ be called as above to return zero-noise extrapolated expectation value(s).
 .. _options:
 ```
 
-#### Options
+### Options
 
 
 Different options for noise scaling and extrapolation can be passed into the ``zne.execute_with_zne`` function.
