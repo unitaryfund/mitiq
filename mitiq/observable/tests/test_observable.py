@@ -258,4 +258,4 @@ def test_observable_expectation_supported_qubits(executor):
 
     # <Z2> = 0.
     obs = Observable(PauliString(spec="Z", support=(2,)))
-    assert np.isclose(obs.expectation(circuit, executor), 0.0, atol=2e-2)
+    assert np.isclose(obs.expectation(circuit, executor), 0.0, atol=3e-2)
