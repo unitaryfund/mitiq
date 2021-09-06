@@ -101,11 +101,13 @@ class Observable:
         result_type = inspect.getfullargspec(execute).annotations.get("return")
 
         if result_type is MeasurementResult:
+            to_run = self.measure_in(circuit)
+            results = Executor(execute).run(to_run)
             return self._expectation_from_measurements(
-                Executor(execute).run(self.measure_in(circuit))
+                cast(List[MeasurementResult], results)
             )
         elif result_type is np.ndarray:
-            density_matrix = execute(circuit)
+            density_matrix = cast(np.ndarray, execute(circuit))
             return np.trace(density_matrix @ self.matrix())
         else:
             raise NotImplementedError
