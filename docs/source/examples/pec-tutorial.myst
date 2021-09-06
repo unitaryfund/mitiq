@@ -1,0 +1,549 @@
+---
+jupytext:
+  text_representation:
+    extension: .myst
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.11.4
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
+---
+
+# Probabilistic Error Cancellation (PEC) with Mitiq
+
++++
+
+This is step-by-step tutorial on how to use the Mitiq toolchain for implementing **probabilistic error cancellation (PEC)** [[1-3]](#references).
+We use the [Cirq](https://github.com/quantumlib/cirq) library, but other frontends could be used in a similar way. 
+
+If you are only interested in **applying** PEC with Mitiq, see the quick start
+[here](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#probabilistic-error-cancellation).
+
+In this notebook instead we present the full workflow of PEC, with more details and with a lower level of abstraction.
+In a practical use case it is not necessary to implement all the steps presented in this notebook, but they may still be useful for **understanding** PEC
+and how Mitiq works behind the scenes.
+
+Furthermore, this notebook reproduces the results of the PEC example reported in *Figure 5* of the
+Mitiq [white paper](https://arxiv.org/abs/2009.04417) [[7]](#references).
+
++++
+
+## Outline
+
+**Probabilistic error cancellation** (PEC) is an error mitigation method [[1-3]](#references).
+Its practical implementation can be divided in the following 4 tasks:
+
+ - **[Task 1](#task1): Expanding an ideal gate as linear combination of implementable noisy gates;**
+ - **[Task 2](#task2): Sampling an implementable gate from the quasi-probability representation of an ideal gate;**
+ - **[Task 3](#task3): Sampling an implementable circuit from the quasi-probability representation of an ideal circuit;**
+ - **[Task 4](#task4): Infer an ideal expectation value from the noisy execution of the sampled circuits.**
+
++++
+
+## Importing packages
+
+```{code-cell} ipython3
+from IPython.display import display as ipython_display
+from matplotlib import pyplot as plt
+import numpy as np
+
+from cirq import LineQubit, NamedQubit, Circuit, X, Y, Z, channel, H, CNOT, depolarize, DensityMatrixSimulator
+
+from mitiq import pec
+from mitiq.pec import NoisyOperation, OperationRepresentation
+from mitiq.pec.representations.depolarizing import local_depolarizing_kraus
+from mitiq.pec.channels import kraus_to_super
+from mitiq.utils import _circuit_to_choi
+```
+
+## Task 1: Representing an ideal gate as linear combination of implementable noisy gates
+<a id='task1'></a>
+
++++
+
+The first task we need to solve is to represent an arbitrary ideal unitary gate $\mathcal G$ as a linear combination of implementable (noisy) gates [[1-3]](#references):
+
+$$\mathcal G = \eta_1 \tilde{\mathcal  G}_1  + \eta_2 \tilde{\mathcal  G}_2 + \dots,$$
+
+where $\{\eta_j\}$ are real coefficients and $\{\tilde{\mathcal  G}_j\}$ are the implementable noisy gates, i.e., those which can be actually applied by a noisy quantum computer.
+
++++
+
+>**Note:** _This representation depends on the particular noise model._
+
++++
+
+### Example: representing an idea single-qubit gate in a noisy basis with depolarizing noise
+
++++
+
+For example, if the implementable gates are equal to any single-qubit unitary followed by a depolarizing channel [[4]](#references):
+
+$$ \tilde{\mathcal G} =\mathcal E \circ \mathcal G  \quad 
+\text{where,}\quad \mathcal E(\rho) =  (1 - \epsilon ) \rho   + \epsilon I/2 ,$$
+
+then, it is easy to show [[1][4][6]](#references) that the following representation holds **for any single-qubit gate $\mathcal G$**:
+
+$$ \mathcal G= \eta_1 \tilde{\mathcal G}_1  + \eta_2 \tilde{\mathcal G}_2 + \eta_3 \tilde{\mathcal G}_3 + \eta_4 \tilde{\mathcal G}_4, $$
+
+where,
+
+$$\eta_1 =\left(1 + \frac{3}{4} \frac{\epsilon}{1- \epsilon} \right ), \qquad  \tilde{\mathcal G}_1 = \mathcal E \circ  \mathcal G, \quad$$
+
+$$\eta_2 =- \frac{1}{4}\frac{\epsilon}{1- \epsilon} , \qquad \qquad \tilde{\mathcal G}_2 = \mathcal E \circ  \mathcal X \circ \mathcal G,$$
+
+$$\eta_3 =-\frac{1}{4}\frac{\epsilon}{1- \epsilon} , \qquad  \qquad \tilde{\mathcal G}_3 = \mathcal E \circ  \mathcal Y \circ \mathcal G,$$
+
+$$\eta_4 =- \frac{1}{4}\frac{\epsilon}{1- \epsilon} , \qquad \qquad  \tilde{\mathcal G}_4 = \mathcal E \circ  \mathcal Z \circ \mathcal G.$$
+
+Here and in what follows, we use the same notation of [[6]](#references) where calligraphic symbols stand for super-operators acting on the
+density matrix $\rho$ of the qubits as $\mathcal G(\rho)= G \rho G^\dagger$.
+
++++
+
+### Using the `mitiq.pec.representations` sub-module
+
++++
+
+Assume that we want to represent the ideal bit-flip gate $\mathcal G=\mathcal X$ in the presence of depolarizing noise with $p=0.1$,
+where $p$ is the error probability. For a single-qubit depolarizing channel the error probability is related to the parameter $\epsilon$
+introduced above by the formula $\epsilon=(4/3)p$ [[4]](#reference) .
+
+```{code-cell} ipython3
+# Set the level of depolarizing noise
+BASE_NOISE = 0.1
+eps = 4 / 3 * BASE_NOISE
+
+# Set the ideal operation to represent a noisy basis
+q = NamedQubit("q0")
+ideal_operation = Circuit(X(q))
+
+# Kraus operators for a single-qubit depolarizing channel
+depo_kraus = local_depolarizing_kraus(BASE_NOISE, num_qubits=1)
+
+# Super-operator for a single-qubit depolarizing channel
+depo_super = kraus_to_super(depo_kraus)
+```
+
+We can now apply the analytic formula that we presented above. We first define the coefficients $\{\eta_j\}$:
+
+```{code-cell} ipython3
+eta_neg = (1 / 4) * eps / (1 - eps)
+etas = [1 + 3 * eta_neg, -eta_neg, -eta_neg, -eta_neg]
+
+# Assert that this is a noramlized quasi-probability distribution
+assert np.isclose(sum(etas), 1)
+```
+
+Now we define the corresponding noisy operations $\{\tilde G_j\}$. We'll use the `NoisyOperation` class of Mitiq.
+
+```{code-cell} ipython3
+basis_circuits = [
+    ideal_operation,
+    ideal_operation + Circuit(X(q)),
+    ideal_operation + Circuit(Y(q)),
+    ideal_operation + Circuit(Z(q)),
+]
+
+basis_matrices = [depo_super @ kraus_to_super(channel(c)) for c in basis_circuits]
+
+noisy_operations = [NoisyOperation(circuit=c, channel_matrix=m) for c, m in zip(basis_circuits, basis_matrices)]
+```
+
+> **Note**: A `NoisyOperation` can also be initialized without a `channel_matrix`. Indeed the explicit superoperator matrix is used only for (optional) numerical optimizations.
+
++++
+
+We are ready to define quasi-probability representation of the ideal gate. We'll use the `OperationRepresentation` class of Mitiq.
+
+```{code-cell} ipython3
+basis_expansion = dict(zip(noisy_operations, etas))
+x_rep = OperationRepresentation(ideal=ideal_operation, basis_expansion=basis_expansion)
+
+print(
+    f"This is the representation of the ideal operation {ideal_operation}, "
+    "assuming a basis of implementable operations\n" 
+    f"with depolarizing noise of strength p={BASE_NOISE}:\n\n",
+    x_rep
+)
+```
+
+The meaning of the above equation is the following: the left hand side executed on a **noiseless** device is equivalent
+to the right hand side **executed** on a device with depolarizing noise $p$=`BASE_NOISE`.
+
++++
+
+### Built-in representations for simple noise models
+Since building representations of ideal gates with depolarizing (or amplitude damping) noise is a very common scenario,
+in Mitiq there are some built-in functions for this task. All the code in the previous cells can be replaced by the following:
+
+```{code-cell} ipython3
+x_rep_direct = pec.represent_operation_with_local_depolarizing_noise(
+    ideal_operation = ideal_operation,
+    noise_level=BASE_NOISE,
+)
+# Test that x_rep_direct is equal to the representation manually defined in the previous cells.
+assert x_rep_direct == x_rep
+```
+
+### Numerically finding optimal representations with arbitrary noise models
+For a general noise model, there are no built-in functions for generating quasi-probability representations.
+Moreover, usually, there are no analytical formulas that can be applied to get a representation. 
+In this general case, given a set of `NoisyOperation(s)` initialized with the associated numerical super-operator
+(_i.e._, with the `channel_matrix` argument), one can numerically find a quasi-probability representation of an arbitrary ideal gate.
+In general, the representation is not unique and the optimal choice is the one minimizing the one-norm of the quasi-probability $\gamma=\sum_j |\eta_j|$.
+
+```{code-cell} ipython3
+noisy_basis = pec.NoisyBasis(*noisy_operations)
+opt_rep = pec.representations.find_optimal_representation(
+    ideal_operation=ideal_operation,
+    noisy_basis=noisy_basis,
+)
+
+# Test that the numerical representation is equal to the previous analytical result.
+assert opt_rep == x_rep
+```
+
+> **Note:** _Each `NoisyOperation` must be passed as an individual argument to `NoisyBasis`._ Hence the unpacking operator `*`.
+
++++
+
+## Task 2: Sampling from the quasi-probability representation of an ideal gate
+<a id='task2'></a>
+
+In the previous section, we represented an ideal gate as a linear combination of noisy gates.
+This is an **exact** formula that links the the noisy gates to the ideal gate.
+
+To improve the computation efficiency, instead of using the exact formula, in PEC a probabilistic approximation is used.
+Basically, one can use a Monte Carlo importance sampling estimation of the exact sum $\sum_j \eta_j \tilde{\mathcal G}_j $,
+in such a way that more weight (_importance_) is given to the coefficients $\eta_j$ with larger magnitude.
+
+This can be obtained via the probability distribution $p(j):=|\eta_j|/ \gamma$, where $\gamma=\sum_j |\eta_j|$.
+An ideal gate can be re-written as 
+
+$$\mathcal G = \sum_j \eta_j \tilde{\mathcal G}_j = \gamma  \sum_ j p(j)\, \text{sign}(\eta_j)\, \tilde{\mathcal G}_j.$$
+
+If we sample $j$ from $p(j)$, we obtain a statistical random variable $\hat j$. The key fact at the basis of the  PEC technique is that,
+given the random variable $\hat j$, the probabilistic super-operator operator
+
+$$
+\hat{\mathcal G} = \gamma \, \text{sign}(\eta_{\hat j}) \tilde{\mathcal G}_{\hat j},
+$$
+
+is an **unbiased estimator** for the ideal gate $\mathcal G$. That is to say, in the limit of infinite samples,
+the sampling average of $\hat{\mathcal G}$ converges exactly to $\mathcal G$.
+
++++
+
+> **Note:** _An introduction to Monte Carlo sampling of quantum gates and quantum circuits can be found in [[5]](#references).
+This technique was applied to error mitigation in [[1-2]](#references)._
+
++++
+
+### Sampling from a gate representation with Mitiq
+
++++
+
+In practice, taking a sample of the estimator $\hat{\mathcal G}$ corresponds to sampling a tuple of objects
+$(\tilde G_j,  \text{sign}(\eta_j), \eta_j)$ corresponding to an index $j$,  that can be used to experimentally evaluate $\hat{\mathcal G}$.
+In Mitiq one can use the `sample()` method of an `OperationRepresentation` as follows.
+
+```{code-cell} ipython3
+# Set a seed for reproducibility
+rnd_state = np.random.RandomState(12)
+
+# Take 10 samples from the quasi-probability representation x_rep
+print("Sampled operation | sign  |  eta_j")
+print("-------------------------------------")
+for _ in range(10):
+    sampled_tuple = x_rep.sample(random_state=rnd_state)
+    print(f"{sampled_tuple[0].__str__().ljust(18)}| {sampled_tuple[1]:3}   | {sampled_tuple[2]:7.4f}")
+```
+
+By running the sampled operations in the presence of depolarizing noise, re-scaling by their sign by the representation norm,
+one gets an unbiased approximation of the ideal gate. We can test this fact, by comparing the super-operator matrices of the ideal gate
+$\mathcal G$ and of $\langle \hat{\mathcal G} \rangle_{\rm samples}$.
+
+```{code-cell} ipython3
+ideal_operation_matrix = kraus_to_super(channel(ideal_operation))
+noisy_operation_matrix = depo_super @ ideal_operation_matrix
+
+# Take samples
+rnd_state = np.random.RandomState(3)
+samples = [x_rep.sample(random_state=rnd_state) for _ in range(1000)]
+
+gamma = x_rep.norm
+# Build unmbiased super-operator matrices
+# Below s[0] is the sampled NoisyOperation, s[1] is the associated sign. 
+unbiased_matrices =[gamma * s[1] * s[0].channel_matrix for s in samples]
+pec_matrix = np.average(unbiased_matrices, axis=0)
+
+print(
+    "Error between the ideal and the noisy super-operator matrices:",
+    round(np.linalg.norm(ideal_operation_matrix - noisy_operation_matrix), 5),
+)
+print(
+    "Error between the ideal and the PEC super-operator matrices:",
+    round(np.linalg.norm(ideal_operation_matrix - pec_matrix), 5),
+)
+```
+
+The above test shows how PEC is able to reduce the noise of an **individual gate**. In the next section we
+extend this technique to a circuit composed of many gates.
+
++++
+
+## Task 3: Sampling from the quasi-probability representation of an ideal circuit
+<a id='task3'></a>
+
++++
+
+In this section we extend the previous sampling approach to an ideal circuit which is composed of multiple ideal gates.
+In practice we need to apply the following steps:
+
+* sample from the quasi-probability representation of each ideal gate of the circuit (**Task 2**):
+* multiply the `sign` of each sampled gate to obtain the global `sign` associated to the full circuit.
+* multiply the `gamma` of each sampled gate to obtain the global `gamma` associated to the full circuit.
+
+> **NOTE:** The fact that one can reduce the **global sampling** into a (Markov) chain of independent **local sampling**
+is a consequence of the Monte Carlo approach. See, e.g., [[1]](#references) or [[5]](#references).
+
+The result of this procedure will produce an **unbiased estimator**
+$\hat{\mathcal U} = \hat{\mathcal G}_t \circ \dots  \circ \hat{\mathcal G}_2 \circ \hat{\mathcal G}_1$ of the ideal circuit
+$\mathcal U = \mathcal G_t \circ \dots  \circ \mathcal G_2 \circ \mathcal G_1$. Similarly to the previous case of a single-gate estimator,
+the sampling average of the circuit estimator $\hat{\mathcal U}$ converges (in the limit of many samples) to the ideal circuit $\mathcal U$.
+
++++
+
+### Sampling from a circuit representation with Mitiq
+
++++
+
+Let us first define a simple 2-qubit circuit:
+
+```{code-cell} ipython3
+from cirq import X, H, CNOT
+
+seed = np.random.RandomState(0)
+q0 = NamedQubit("q0")
+q1 = NamedQubit("q1")
+ideal_circuit = Circuit(X(q0), H(q1), CNOT(q0, q1))
+ideal_circuit
+```
+
+The corresponding noisy circuit, assuming a local depolarizing noise model, is:
+
+```{code-cell} ipython3
+noisy_circuit = Circuit([[layer, depolarize(BASE_NOISE).on_each((q0, q1))] for layer in ideal_circuit])
+noisy_circuit
+```
+
+We need to build a quasi-probability representation for all the ideal gates of the circuit.
+We can employ a helper function from `mitiq.pec.representations`.
+
+```{code-cell} ipython3
+representations = pec.representations.represent_operations_in_circuit_with_local_depolarizing_noise( 
+    ideal_circuit=ideal_circuit, 
+    noise_level=BASE_NOISE,
+)
+
+print(f"{len(representations)} quasi-probability representations created.")
+print("One for each gate of the input ideal circuit.\n")
+```
+
+We can use the Mitiq function `pec.sampling.sample_circuit()`, to sample from the quasi-probability distribution of the full circuit.
+
+```{code-cell} ipython3
+rnd_state = np.random.RandomState(4)
+
+sampled_circuits, signs, gamma = pec.sampling.sample_circuit(
+    ideal_circuit, representations, num_samples=1000, random_state = rnd_state,
+)
+```
+
+The function `sample_circuit` returns a tuple `Tuple[List[QPROGRAM], List[int], float]`, corrsponding to:
+- A list of `num_samples` circuits sampled from the representation of the ideal circuit;
+- The associated list of signs;
+- The 1-norm (`gamma`) of the quasi-distribution of the full circuit.
+
++++
+
+By running the sampled circuits in the presence of depolarizing noise, re-scaling by the sign and by $\gamma$,
+one obtains an unbiased approximation of the ideal circuit. We can test this, by comparing the Choi states associated
+to the ideal circuit $\mathcal U$ and to $\langle \hat{\mathcal U} \rangle_{\rm samples}$.
+
+```{code-cell} ipython3
+ideal_circuit_choi = _circuit_to_choi(ideal_circuit)
+
+noisy_circuit_choi = _circuit_to_choi(noisy_circuit)
+
+
+# Get the Choi sates associated to many umbiased samples of the PEC estimator
+unbiased_samples_chois =[
+   gamma * s * _circuit_to_choi(c.with_noise(depolarize(BASE_NOISE))) for c, s in zip(sampled_circuits, signs)
+]
+
+pec_estimated_choi = np.average(unbiased_samples_chois, axis=0)
+
+print(
+    "Error between the Choi state of ideal circuit and the Choi state of the noisy circuit:",
+    round(np.linalg.norm(ideal_circuit_choi - noisy_circuit_choi), 5),
+)
+print(
+    "Error between the Choi state of ideal circuit and the Choi state of the PEC circuit:",
+    round(np.linalg.norm(ideal_circuit_choi - pec_estimated_choi), 5),
+)
+```
+
+The above test shows how PEC is able to reduce the noise of the **global channel** induced by a noisy circuit.
+In a real-world scenario however, reconstructing the matrix representation of the channel is in general unfeasible.
+In practice, one can use PEC for estimating specific expectation values as linear combination of measurable expectation values,
+as shown in the next section.
+
++++
+
+## Task 4: Infer an error-mitigated expectation value with PEC
+<a id='task4'></a>
+
++++
+
+Let us define a function which executes a circuit with depolarizing noise and returns an expectation value of some observable
+of interest $\mathcal A$. In this particular example, we take as observable the projector on the _zero_ state, _i.e._,
+$\mathcal A = |00 \dots \rangle \langle 00\dots|$).
+
+```{code-cell} ipython3
+SIMULATOR = DensityMatrixSimulator()
+
+def noisy_executor(circ: Circuit, noise_level=BASE_NOISE) -> float:
+    """Simulates a circuit with depolarizing noise and returns the expectation value
+    of the projector on the ground state |00...><00...|.
+    """
+    noisy_circuit = circ.with_noise(depolarize(noise_level))
+    rho = SIMULATOR.simulate(noisy_circuit).final_density_matrix
+    return np.real(rho[0, 0])
+
+def ideal_executor(circ: Circuit) -> float:
+    return noisy_executor(circ, noise_level=0)
+
+print("Ideal expectation value:", ideal_executor(ideal_circuit))
+print("Noisy expectation value:", noisy_executor(ideal_circuit, BASE_NOISE))
+```
+
+Now, in order to obtain a mitigated estimate the ideal expectation value, one should:
+- **sample** many circuits from the quasi-probability representation of the ideal circuit as shown in the previous section;
+- **execute** all the samples with the `noisy_executor` and get a list of noisy expectation values;
+- **average** with suitable weights (signs and $\gamma$) to estimate the ideal expectation value.
+
+Instead of manually implementing all these steps, we'll use the `execute_with_pec` function of the `mitiq.pec` module.
+Mitiq will take care of all the necessary steps (sampling, executing, averaging) behind the scenes and will directly
+provide an error mitigated expectation value to the user.
+
++++
+
+### Using the `mitiq.pec.execute_with_pec()` function
+
++++
+
+If not already done, one must define an `OperationRepresentation` for each operation of the ideal circuit.
+
+```{code-cell} ipython3
+representations = pec.representations.represent_operations_in_circuit_with_local_depolarizing_noise(
+    ideal_circuit=ideal_circuit,
+    noise_level=BASE_NOISE,
+)
+```
+
+Given the `noisy_executor` and the list of representations (`representations`) one can apply PEC with a few lines of code.
+
+```{code-cell} ipython3
+ideal_expectation_value = ideal_executor(ideal_circuit)
+
+unmitigated_expectation_value = noisy_executor(ideal_circuit)
+
+pec_value, pec_data = pec.execute_with_pec(
+    circuit=ideal_circuit,
+    executor=noisy_executor,
+    representations=representations,
+    num_samples = 1000,
+    full_output=True,
+    random_state = np.random.RandomState(7),
+)
+
+print("Error without PEC:", abs(ideal_expectation_value - unmitigated_expectation_value))
+print("Error with PEC:", abs(ideal_expectation_value - pec_value))
+```
+
+All the raw data related to the PEC process are recorded in `pec_data`.
+For example, we can extract the PEC statistical error (due to a finite number of Monte Carlo samples).
+This can be quantified by the square root of the mean squared deviation of the raw unbiased samples.
+It can be extracted form `pec_data` as follows.
+
+```{code-cell} ipython3
+print(f"The statistical error associated to the PEC estimate is: {pec_data['pec_error']:.5f}")
+```
+
+### Visualizing the histogram of PEC samples
+
++++
+
+We can also visualize the histogram of the raw Monte Carlo samples (`pec_data["unbiased_estimators"]`).
+The mean of the histogram is shown with a green line and corresponds to the final error-mitigated result.
+This is closer to the ideal expectation value (zero in this example) compared to the unmitigated expectation value (red dotted line).
+
+```{code-cell} ipython3
+data = np.round(pec_data["unbiased_estimators"]- pec_value, 5)
+
+y_limit = 0.8 * len(data)
+binwidth = 0.1
+fig = plt.figure(figsize=(8, 4))
+plt.hist(data, label="PEC samples", color="lightgray", bins=np.arange(min(data), max(data) + binwidth, binwidth))
+plt.vlines(pec_value, 0, y_limit, "green", label="PEC value", linewidth=2.5)
+# plt.vlines(ideal_expectation_value, 0, y_limit, "black", linestyle="dotted", label="Ideal Expectation Value", linewidth=3.0)
+plt.vlines(unmitigated_expectation_value, 0, y_limit, "red", linestyle="dashed", label="Unmitigated Value", linewidth=2.5)
+plt.xlabel('Expectation Value', fontsize=14)
+plt.ylabel('Counts', fontsize=14)
+plt.legend(fontsize=12)
+plt.show()
+# Uncomment next line to save the figure
+# fig.savefig('pec_hist.pdf')
+```
+
+>**Note:** _The histogram is very clustered because of the particular choice of noise model (depolarizing)
+and because the `noisy_executor` is based on an exact simulation of the density matrix without shot noise.
+A more regular histogram could be obtained sub-dividing all the samples into independent batches and evaluating
+the statistical distribution of the corresponding results (see e.g. the numerical analysis in Figure 3 of [[6]](#references))._
+
++++
+
+## References
+<a id='references'></a>
+
+1. K. Temme, S. Bravyi, J. M. Gambetta, _Error Mitigation for Short-Depth Quantum Circuits_, [arXiv:1612.02058](https://arxiv.org/abs/1612.02058).
+
+2. S. Endo, S. C. Benjamin, Y. Li, _Practical Quantum Error Mitigation for Near-Future Applications_, [arXiv:1712.09271](https://arxiv.org/abs/1712.09271).
+
+3. S. Zhang, Y. Lu, K. Zhang, W. Chen, Y. Li, J.-N Zhang, K. Kim, _Error-Mitigated Quantum Gates Exceeding Physical Fidelities in a Trapped-Ion System_, [arXiv:1905.10135](https://arxiv.org/abs/1905.10135).
+
+4. R. Takagi, _Optimal resource cost for error mitigation_, [arXiv:2006.12509](https://arxiv.org/abs/2006.12509).
+
+5. H. Pashayan, J. J. Wallman, S. D. Bartlett, _Estimating outcome probabilities of quantum circuits using quasiprobabilities_, [arXiv:1503.07525](https://arxiv.org/abs/1503.07525).
+
+6. A. Mari, N. Shammah, W. J. Zeng, _Extending quantum probabilistic error cancellation by noise scaling_, [arXiv:2108.02237](https://arxiv.org/abs/2108.02237).
+
+7. R. LaRose, A. Mari, S. Kaiser, P. J. Karalekas, A. A. Alves, P. Czarnik, M. El Mandouh, M. H. Gordon, Y. Hindy, A. Robertson, P. Thakre, N. Shammah, W. J. Zeng, _Mitiq: A software package for error mitigation on noisy quantum computers_, [arXiv:2009.04417](https://arxiv.org/abs/2009.04417).
+
++++
+
+This notebook was executed with following version of Mitiq:
+
+```{code-cell} ipython3
+import mitiq
+
+mitiq.about()
+```
+
+```{code-cell} ipython3
+
+```

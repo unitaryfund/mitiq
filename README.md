@@ -11,8 +11,7 @@
 [![Downloads](https://static.pepy.tech/personalized-badge/mitiq?period=total&units=international_system&left_color=black&right_color=green&left_text=Downloads)](https://pepy.tech/project/mitiq)
 [![Repository](https://img.shields.io/badge/GitHub-5C5C5C.svg?logo=github)](https://github.com/unitaryfund/mitiq)
 [![Unitary Fund](https://img.shields.io/badge/Supported%20By-Unitary%20Fund-FFFF00.svg)](http://unitary.fund)
-[![Discord Chat](https://img.shields.io/badge/dynamic/json?color=blue&label=Discord&query=approximate_presence_count&suffix=%20online.&url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2FJqVGmpkP96%
-[comment] <> (3Fwith_counts%3Dtrue)](http://discord.unitary.fund)
+[![Discord Chat](https://img.shields.io/badge/dynamic/json?color=blue&label=Discord&query=approximate_presence_count&suffix=%20online.&url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2FJqVGmpkP96%3Fwith_counts%3Dtrue)](http://discord.unitary.fund)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/unitaryfund/mitiq/master?filepath=%2Fdocs%2Fsource%2Fexamples)
 Mitiq is a )Python toolkit for implementing error mitigation techniques on
 quantum computers.
@@ -24,6 +23,8 @@ compiling quantum programs in clever ways.
 
 Want to know more? Check out our
 [documentation](https://mitiq.readthedocs.io/en/stable/guide/guide-overview.html) and chat with us on [Discord](http://discord.unitary.fund).
+
+> Do you use near-term quantum hardware? Have you tried Mitiq? Either way, take our survey and help make Mitiq better! [bit.ly/mitiq-survey](https://bit.ly/mitiq-survey)
 
 ## Quickstart
 
@@ -72,8 +73,8 @@ The examples and other notebooks can be run interactively on the cloud with [Bin
 
 | Technique                                 | Documentation                                                                                                   | Mitiq module                                                            | Paper Reference(s)                                                                                  |
 |-------------------------------------------|-----------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| Zero-noise extrapolation                  | [ZNE](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html)                                              | [mitiq.zne](https://github.com/unitaryfund/mitiq/tree/master/mitiq/zne) | [1612.02058](https://arxiv.org/abs/1612.02058)                                                      |
-| Probabilistic error cancellation          | [PEC](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#probabilistic-error-cancellation) | [mitiq.pec](https://github.com/unitaryfund/mitiq/tree/master/mitiq/pec) | [1612.02058](https://arxiv.org/abs/1612.02058)                                                      |
+| Zero-noise extrapolation                  | [ZNE](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html)                                              | [mitiq.zne](https://github.com/unitaryfund/mitiq/tree/master/mitiq/zne) | [1611.09301](https://arxiv.org/abs/1611.09301)<br>[1612.02058](https://arxiv.org/abs/1612.02058)<br>[1805.04492](https://arxiv.org/abs/1805.04492)|
+| Probabilistic error cancellation          | [PEC](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#probabilistic-error-cancellation) | [mitiq.pec](https://github.com/unitaryfund/mitiq/tree/master/mitiq/pec) | [1612.02058](https://arxiv.org/abs/1612.02058)<br>[1712.09271](https://arxiv.org/abs/1712.09271)<br>[1905.10135](https://arxiv.org/abs/1905.10135)|
 | (Variable-noise) Clifford data regression | [CDR](https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html)                                             | [mitiq.cdr](https://github.com/unitaryfund/mitiq/tree/master/mitiq/cdr) | [2005.10189](https://arxiv.org/abs/2005.10189)<br>[2011.01157](https://arxiv.org/abs/2011.01157)    |
 | Dynamical decoupling                      | (In progress)                                                                                                   | (In progress)                                                           | [9803057](https://arxiv.org/abs/quant-ph/9803057)<br>[1807.08768](https://arxiv.org/abs/1807.08768) |
 
