@@ -17,12 +17,12 @@ kernelspec:
 This tutorial shows an example of how to mitigate noise on IBMQ
 backends, broken down in the following steps.
 
-[comment]: <> (-   [Setup: Defining a circuit](#Setup:-Defining-a-circuit))
-[comment]: <> (-   [High level usage](#High-level-usage))
-[comment]: <> (-   [Cirq front end](#Cirq-front-end))
-[comment]: <> (-   [Low level usage](#Low-level-usage))
+-   [Setup: Defining a circuit](#Setup:-Defining-a-circuit)
+-   [High level usage](#High-level-usage)
+-   [Cirq front end](#Cirq-front-end)
+-   [Low level usage](#Lower-level-usage)
 
-### Setup: Defining a circuit
+## Setup: Defining a circuit
 
 First we import Qiskit and Mitiq.
 
@@ -50,7 +50,7 @@ evaluate to one in the noiseless setting.
 .. _high_level_usage:
 ```
 
-### High-level usage
+## High-level usage
 
 
 To use Mitiq with just a few lines of code, we simply need to define a function which inputs a circuit and outputs
@@ -149,7 +149,7 @@ Any different combination of noise scaling and extrapolation technique can be pa
 
 .. _cirq_frontend:
 
-#### Cirq frontend
+### Cirq frontend
 
 It isn't necessary to use Qiskit frontends (circuits) to run on IBM backends. We can use conversions in
 Mitiq to use any supported frontend with any supported backend. Below, we show how to run a Cirq circuit on an
@@ -192,7 +192,7 @@ As above, different noise scaling or extrapolation methods can be used.
 .. _low_level_usage:
 ```
 
-### Lower-level usage
+## Lower-level usage
 
 Here, we give more detailed usage of the Mitiq library which mimics what happens in the call to
 ``zne.execute_with_zne`` in the previous example. In addition to showing more of the Mitiq library, this
