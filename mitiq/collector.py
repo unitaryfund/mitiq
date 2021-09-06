@@ -170,11 +170,10 @@ class Collector:
         result = self._executor(to_run, **kwargs)  # type: ignore
         self._calls_to_executor += 1
 
-        try:
-            result = list(result)
-            self._computed_results += result
-            self._executed_circuits += to_run
-        except TypeError:
+        if self.can_batch:
+            self._computed_results.extend(result)
+            self._executed_circuits.extend(to_run)
+        else:
             self._computed_results.append(result)
             self._executed_circuits.append(to_run)
 
