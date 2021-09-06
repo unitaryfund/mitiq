@@ -104,9 +104,7 @@ class Observable:
     def expectation_from(self, results: List[QuantumResult]) -> float:
         result_type = type(results[0])
 
-        if result_type is float:
-            return sum(results)
-        elif result_type is MeasurementResult:
+        if result_type is MeasurementResult:
             return self._expectation_from_measurements(results)
         else:
             raise NotImplementedError
