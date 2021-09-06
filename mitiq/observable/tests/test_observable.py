@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import pytest
+
 import numpy as np
 import cirq
 
@@ -30,6 +32,21 @@ yrotation = cirq.SingleQubitCliffordGate.X_sqrt
 imat = np.identity(2)
 xmat = cirq.unitary(cirq.X)
 zmat = cirq.unitary(cirq.Z)
+
+
+# Executors.
+def execute(circuit: cirq.Circuit, shots: int = 8192) -> MeasurementResult:
+    result = cirq.Simulator().run(circuit, repetitions=shots)
+
+    n = sum(result._measurement_shape()[1].values())
+    bitstrings = [
+        list(map(int, np.binary_repr(value[0], width=n)))
+        for value in result.data.to_numpy()
+    ]
+    return MeasurementResult(
+        bitstrings,
+        qubit_indices=tuple(int(i) for i in result.data.columns[0].split(",")),
+    )
 
 
 def test_observable():
@@ -196,3 +213,42 @@ def test_observable_expectation_from_measurements_two_pauli_strings():
     )
     expectation = obs._expectation_from_measurements([bits, bits])
     assert np.isclose(expectation, 3.5)
+
+
+@pytest.mark.parametrize("n", range(1, 3 + 1))
+def test_observable_expectation_one_circuit(n):
+    qubits = cirq.LineQubit.range(n)
+    obs = Observable(PauliString(spec="X" * n))
+    circuit = cirq.Circuit(cirq.H.on_each(qubits))
+
+    expectation = obs.expectation(circuit, execute)
+    assert np.isclose(expectation, 1.0)
+
+
+@pytest.mark.parametrize("n", range(1, 3 + 1))
+def test_observable_expectation_two_circuits(n):
+    obs = Observable(
+        PauliString(spec="X" * n, coeff=-2.0), PauliString(spec="Z" * n)
+    )
+    qubits = cirq.LineQubit.range(n)
+    circuit = cirq.Circuit(cirq.H.on_each(qubits))
+
+    expectation = obs.expectation(circuit, execute)
+    assert np.isclose(expectation, -2.0, atol=1e-1)
+
+
+def test_observable_expectation_supported_qubits():
+    a, b, c = cirq.LineQubit.range(3)
+    circuit = cirq.Circuit(cirq.I(a), cirq.X.on(b), cirq.H.on(c))
+
+    # <Z0> = 1.
+    obs = Observable(PauliString(spec="Z", support=(0,)))
+    assert np.isclose(obs.expectation(circuit, execute), 1.0)
+
+    # <Z1> = -1.
+    obs = Observable(PauliString(spec="Z", support=(1,)))
+    assert np.isclose(obs.expectation(circuit, execute), -1.0)
+
+    # <Z2> = 0.
+    obs = Observable(PauliString(spec="Z", support=(2,)))
+    assert np.isclose(obs.expectation(circuit, execute), 0.0, atol=2e-2)

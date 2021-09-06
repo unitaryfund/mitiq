@@ -21,6 +21,7 @@ import cirq
 
 from mitiq.observable.pauli import PauliString, PauliStringCollection
 from mitiq._typing import MeasurementResult, QuantumResult, QPROGRAM
+from mitiq.collector import Collector
 
 
 class Observable:
@@ -96,14 +97,19 @@ class Observable:
     def expectation(
         self, circuit: QPROGRAM, executor: Callable[[QPROGRAM], QuantumResult]
     ) -> float:
-        # TODO: Implement. Pass circuits from self.measure_in(circuit=circuit)
-        #  to Collector(executor) to get QuantumResults, then return
-        #  self.expectation_from(quantum_results=quantum_results)
-        raise NotImplementedError
+        return self.expectation_from(
+            Collector(executor).run(self.measure_in(circuit))
+        )
 
-    def expectation_from(self, quantum_results: List[QuantumResult]) -> float:
-        # TODO: Dispatch to correct function based on type of quantum result.
-        raise NotImplementedError
+    def expectation_from(self, results: List[QuantumResult]) -> float:
+        result_type = type(results[0])
+
+        if result_type is float:
+            return sum(results)
+        elif result_type is MeasurementResult:
+            return self._expectation_from_measurements(results)
+        else:
+            raise NotImplementedError
 
     def _expectation_from_measurements(
         self, measurements: List[MeasurementResult]
