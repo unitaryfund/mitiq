@@ -19,3 +19,6 @@ python:
    install:
    - requirements: requirements.txt
    - requirements: dev_requirements.txt
+   # Install Mitiq with "pip install ."
+   - method: pip
+     path: .
