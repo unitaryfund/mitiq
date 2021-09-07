@@ -323,7 +323,7 @@ html_theme = "pydata_sphinx_theme"  # 'alabaster', 'sphinx_rtd_theme'
 # html_static_path = ['_static']
 
 # display logo on top-left of html pages
-html_logo = "img/unitary_fund_logo.png"
+html_logo = "img/mitiq-logo.png"
 
 myst_update_mathjax = False
 
@@ -333,12 +333,9 @@ nbsphinx_custom_formats = {
 nbsphinx_execute = 'always'
 
 nbsphinx_thumbnails = {
-    'examples/ibmq-backends': '_images/unitary_fund_logo.png',
     'examples/hamiltonians': '_images/vqe-cirq-pauli-sum-mitigation-plot.png',
     'examples/simple_landscape': '_images/simple_landscape_13_0.png',
     'examples/maxcut-demo': '_images/maxcut-demo_48_1.png',
-    'examples/pyquil_demo': '_images/unitary_fund_logo.png',
-    'examples/cdr_api': '_images/unitary_fund_logo.png',
-    'examples/mitiq-paper/mitiq-paper-codeblocks':
-        '_images/unitary_fund_logo.png',
+    'examples/*': '_static/mitiq-logo.png',
+    'examples/mitiq-paper/*': '_static/mitiq-logo.png'
 }
