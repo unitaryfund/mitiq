@@ -186,7 +186,7 @@ Simulate depolarizing noise on the static gates
 
 ```{code-cell}
 def noise_sim(quil_prog): 
-    prob = 0.9
+    prob = 0.8
     num_qubits = 1
     d = 4**num_qubits
     d_sq = d**2
@@ -226,7 +226,7 @@ for theta in thetas:
 Run VQE routine without noise mitigation
 
 ```{code-cell}
-init_angle = [1.0]
+init_angle = [3.0]
 # use the Nelder-Mead method in `scipy minimizer` to find the minimimum of the expectation value
 res = optimize.minimize(executor, init_angle, args=(qc, ro, samples, hamiltonian, program),    
                         method='Nelder-Mead', options={ 'xatol': 1.0e-3, 'fatol': 1.0e-2})
@@ -252,7 +252,7 @@ def mitigated_expectation(thetas, qc, ro, samples,
 
 ```{code-cell}
 # here we use a linear extrapolation technique 
-fac = mitiq.zne.inference.LinearFactory(scale_factors=[1.0, 8.0])
+fac = mitiq.zne.inference.LinearFactory(scale_factors=[1.0, 3.0])
 ```
 
 +++
