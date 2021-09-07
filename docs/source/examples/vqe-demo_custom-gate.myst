@@ -186,7 +186,7 @@ Simulate depolarizing noise on the static gates
 
 ```{code-cell}
 def noise_sim(quil_prog): 
-    prob = 0.85
+    prob = 0.9
     num_qubits = 1
     d = 4**num_qubits
     d_sq = d**2
