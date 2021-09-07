@@ -336,6 +336,9 @@ nbsphinx_thumbnails = {
     'examples/hamiltonians': '_images/vqe-cirq-pauli-sum-mitigation-plot.png',
     'examples/simple_landscape': '_images/simple_landscape_13_0.png',
     'examples/maxcut-demo': '_images/maxcut-demo_48_1.png',
+    'examples/pyquil-demo': '_images/pyquil_demo_11_0.png',
+    'examples/pec-tutorial': '_images/pec-tutorial_62_0.png',
+    # default images if no thumbnail is specified
     'examples/*': '_static/mitiq-logo.png',
     'examples/mitiq-paper/*': '_static/mitiq-logo.png'
 }
