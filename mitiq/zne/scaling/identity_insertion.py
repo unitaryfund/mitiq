@@ -139,7 +139,7 @@ def _create_scale_mask(
 
     # Fold gates until the input scale_factor is better approximated
     input_circuit_weight = sum(weight_mask)
-    output_circuit_weight = odd_integer_scale_factor * input_circuit_weight
+    output_circuit_weight = integer_scale_factor * input_circuit_weight
     approx_error = np.abs(
         output_circuit_weight - scale_factor * input_circuit_weight
     )
