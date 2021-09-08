@@ -21,6 +21,7 @@ from cirq import Circuit
 from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm, to_qasm
 from pennylane.wires import Wires
 from pennylane.tape import QuantumTape
+from pennylane.operation import Expectation
 
 from pennylane import from_qasm as pennylane_from_qasm
 
