@@ -71,6 +71,15 @@ def test_from_pennylane_unsupported_tapes():
         from_pennylane(tape)
 
 
+def test_no_variance():
+    with qml.tape.QuantumTape() as tape:
+        qml.CNOT(wires=[0, 1])
+        qml.var(qml.PauliZ(0))
+
+    with pytest.raises(UnsupportedQuantumTapeError, match="Only expectation value measurements"):
+        from_pennylane(tape)
+
+
 @pytest.mark.parametrize("random_state", range(10))
 def test_to_from_pennylane(random_state):
     circuit = cirq.testing.random_circuit(
