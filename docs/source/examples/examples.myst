@@ -1,7 +1,7 @@
 # Mitiq Examples
 
 ```{nbgallery}
-Defining an Mitiq executor with a hamiltonian <hamiltonians.rst>
+Defining a Mitiq executor with a hamiltonian <hamiltonians.rst>
 Variational circuit mitigation with zero noise extrapolation  <simple_landscape.rst>
 maxcut-demo.myst
 Understanding probabilistic error cancellation (PEC) <pec-tutorial.myst>
