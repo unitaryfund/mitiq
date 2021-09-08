@@ -106,20 +106,20 @@ def _create_scale_mask(
             f"Requires scale_factor >= 1.0 but scale_factor = {scale_factor}."
         )
 
-    # Find the maximum odd integer smaller or equal to scale_factor
-    num_uniform_folds = int(scale_factor - 1.0)
-    odd_integer_scale_factor = np.abs(num_uniform_folds - 1)
+    # Find the maximum integer smaller or equal to scale_factor
+    num_uniform_inserts = int(scale_factor - 1.0)
+    integer_scale_factor = num_uniform_inserts + 1
 
-    # Uniformly scaling all gates to reach odd_integer_scale_factor
+    # Uniformly scaling all gates to reach integer_scale_factor
     num_inserts_mask = []
     for w in weight_mask:
         if np.isclose(w, 0.0):
             num_inserts_mask.append(0)
         else:
-            num_inserts_mask.append(num_uniform_folds)
+            num_inserts_mask.append(num_uniform_inserts)
 
-    # If the scale_factor is an odd integer, we are done.
-    if np.isclose(odd_integer_scale_factor, scale_factor, atol=0.01):
+    # If the scale_factor is an integer, we are done.
+    if np.isclose(integer_scale_factor, scale_factor, atol=0.01):
         return num_inserts_mask
 
     # Express scaling order through a list of indices
