@@ -6,6 +6,6 @@ Variational circuit mitigation with zero noise extrapolation  <simple_landscape.
 maxcut-demo.myst
 Understanding probabilistic error cancellation (PEC) <pec-tutorial.myst>
 Zero noise extrapolation on IBMQ backends<ibmq-backends.rst>
-Zero noise extrapolation on pyQuil parametric programs <pyquil_demo.myst>
+Zero noise extrapolation on PyQuil parametric programs <pyquil_demo.myst>
 cdr_api.md
 mitiq-paper/mitiq-paper-codeblocks
