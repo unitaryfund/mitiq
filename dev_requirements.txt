@@ -13,7 +13,7 @@ black~=19.10b0
 mypy~=0.910
 
 # Documentation and examples.
-jupytext
+jupytext~=1.11.5
 sphinxcontrib-bibtex~=2.3.0
 sphinx-copybutton~=0.3.0
 sphinx-autodoc-typehints~=1.12.0
