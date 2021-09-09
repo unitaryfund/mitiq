@@ -27,6 +27,7 @@ from pyquil import get_qc, Program
 from pyquil.gates import RX, RY, S, T, Z, CNOT, MEASURE
 from pyquil.paulis import PauliTerm, PauliSum, sZ
 from pyquil.noise import pauli_kraus_map, append_kraus_to_gate
+from grove.pyvqe.vqe import parity_even_p
 from typing import List, Union
 from collections import Counter
 from matplotlib import pyplot as plt
@@ -183,23 +184,6 @@ def expectation_from_sampling(
         else:
             exp_val -= float(count) / samples
     return exp_val
-```
-
-Calculate the parity of elements at indexes in marked_qubits
-
-```{code-cell} ipython3
-def parity_even_p(state, marked_qubits):
-    """
-    Parity is relative to the binary representation of the integer state.
-
-    :param state: The wavefunction index that corresponds to this state.
-    :param marked_qubits: The indexes to be considered in the parity sum.
-    :returns: A boolean corresponding to the parity.
-    """
-    mask = 0
-    for q in marked_qubits:
-        mask |= 1 << q
-    return bin(mask & state).count("1") % 2 == 0
 ```
 
 Scan over the parameter theta and plot energy expecation, without mitigation
