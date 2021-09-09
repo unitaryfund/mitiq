@@ -37,15 +37,11 @@ zmat = cirq.unitary(cirq.Z)
 # Executors.
 def execute(circuit: cirq.Circuit, shots: int = 8192) -> MeasurementResult:
     result = cirq.Simulator().run(circuit, repetitions=shots)
-
-    n = sum(result._measurement_shape()[1].values())
-    bitstrings = [
-        list(map(int, np.binary_repr(value[0], width=n)))
-        for value in result.data.to_numpy()
-    ]
     return MeasurementResult(
-        bitstrings,
-        qubit_indices=tuple(int(i) for i in result.data.columns[0].split(",")),
+        result=np.column_stack(list(result.measurements.values())),
+        qubit_indices=tuple(
+            int(q) for k in result.measurements.keys() for q in k.split(",")
+        ),
     )
 
 
