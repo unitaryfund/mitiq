@@ -1442,6 +1442,7 @@ OptimizationHistory = List[
     Tuple[List[Dict[str, float]], List[float], List[float], float]
 ]
 
+
 class ExpBayesFactory(BatchedFactory):
     """Factory object implementing a zero-noise extrapolation algorithm based on
     Bayesian Inference. The exponential ansatz for the expectation value:
@@ -1466,7 +1467,7 @@ class ExpBayesFactory(BatchedFactory):
 
     @staticmethod
     def _exp_ansatz(
-        a: float, b: float, c: float, scale_factor: Sequence[float]
+        a: float, b: float, c: float, scale_factor: float
     ) -> float:
         """
         Calculates the expectation given a scale factor and model
@@ -1476,7 +1477,7 @@ class ExpBayesFactory(BatchedFactory):
             a: Model parameter.
             b: Model parameter.
             c: Model parameter.
-            scale_factors: The array of noise scale factors.
+            scale_factor: The noise scale factors.
 
         Returns:
             The expected value according to the model parameters and
@@ -1486,10 +1487,10 @@ class ExpBayesFactory(BatchedFactory):
         return a + b * np.exp(-1.0 * c * scale_factor)
 
     @staticmethod
-    def extrapolate(
+    def extrapolate(  # type: ignore
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
-        full_output: bool = False,
+        full_output: Any = False,
     ) -> ExtrapolationResult:
         """Static method which evaluates an exponential extrapolation to the
         zero-noise limit using Bayesian inference.
@@ -1500,7 +1501,7 @@ class ExpBayesFactory(BatchedFactory):
             full_output: If False (default), only the zero-noise limit is
                 returned. If True, additional information about the
                 extrapolated limit is returned too.
-                
+
         Returns:
             zne_limit: The extrapolated zero-noise limit. If "full_output" is\
                 False (default value), only this parameter is returned.
@@ -1528,14 +1529,17 @@ class ExpBayesFactory(BatchedFactory):
 
             pm.Normal(
                 "expval",
-                mu=ExpBayesFactory._exp_ansatz(a, b, c, scale_factors),
+                mu=[
+                    ExpBayesFactory._exp_ansatz(a, b, c, s)
+                    for s in scale_factors
+                ],
                 sd=sd,
                 observed=exp_values,
             )
 
             trace = pm.sample(target_accept=0.95, return_inferencedata=False)
 
-        def zne_curve(scale_factor: Sequence[float]) -> float:
+        def zne_curve(scale_factor: float) -> float:
             samples = []
             n_samples = len(trace["a"])
 
@@ -1546,15 +1550,15 @@ class ExpBayesFactory(BatchedFactory):
 
                 samples.append(sample)
 
-            return np.mean(samples)
+            return float(np.mean(samples))
 
         # Optimal model parameters:
-        a = trace["a"].mean()
-        b = trace["b"].mean()
-        c = trace["c"].mean()
-        opt_params, zne_error = [a, b, c], trace["sd"].mean()
+        a = float(trace["a"].mean())
+        b = float(trace["b"].mean())
+        c = float(trace["c"].mean())
+        opt_params, zne_error = [a, b, c], float(trace["sd"].mean())
 
-        zne_limit = zne_curve(0)
+        zne_limit = zne_curve(0.0)
         if not full_output:
             return zne_limit
 
@@ -1569,8 +1573,8 @@ class ExpBayesFactory(BatchedFactory):
             self._params_cov,
             self._zne_curve,
         ) = self.extrapolate(  # type: ignore
-            self.get_scale_factors(),
-            self.get_expectation_values(),
+            self.get_scale_factors(),  # type: ignore
+            self.get_expectation_values(),  # type: ignore
             full_output=True,
         )
         self._already_reduced = True
@@ -1578,6 +1582,7 @@ class ExpBayesFactory(BatchedFactory):
 
     def __eq__(self, other: Any) -> bool:
         return BatchedFactory.__eq__(self, other)
+
 
 class AdaExpFactory(AdaptiveFactory):
     """Factory object implementing an adaptive zero-noise extrapolation

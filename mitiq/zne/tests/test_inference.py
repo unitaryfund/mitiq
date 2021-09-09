@@ -1018,7 +1018,7 @@ def test_map_to_fakenodes():
         ExpFactory,
         PolyExpFactory,
         AdaExpFactory,
-        ExpBayesFactory
+        ExpBayesFactory,
     ),
 )
 def test_short_circuit_warning(factory):

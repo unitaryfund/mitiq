@@ -122,7 +122,7 @@ class Observable:
                     keep_indices=self.qubit_indices,
                 ).reshape(observable_matrix.shape)
 
-            return np.trace(density_matrix @ self.matrix())
+            return float(np.trace(density_matrix @ self.matrix()))
         else:
             raise ValueError(
                 f"Arg `execute` must be a function with annotated return type "
