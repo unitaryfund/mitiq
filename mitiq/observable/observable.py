@@ -82,7 +82,11 @@ class Observable:
     def measure_in(self, circuit: QPROGRAM) -> List[QPROGRAM]:
         return [pset.measure_in(circuit) for pset in self._groups]
 
-    def matrix(self, qubit_indices: Optional[List[int]] = None, dtype: type = np.complex128) -> np.ndarray:
+    def matrix(
+        self,
+        qubit_indices: Optional[List[int]] = None,
+        dtype: type = np.complex128,
+    ) -> np.ndarray:
         """Returns the (potentially very large) matrix of the Observable."""
         if qubit_indices is None:
             qubit_indices = self.qubit_indices
