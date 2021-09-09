@@ -11,7 +11,6 @@ kernelspec:
   name: python3
 ---
 
-
 # Variational Quantum Eigensolver improved with Mitiq
 In this example we investigate how Mitiq can help reduce errors
 and improve convergence of a simple VQE problem executed
@@ -54,6 +53,33 @@ program += T(0)
 program += CNOT(1, 0)
 program += S(0)
 program += Z(0)
+```
+
+Simulate depolarizing noise on the static gates
+
+```{code-cell} ipython3
+def add_noise_to_circuit(quil_prog):
+    prob = 0.8
+    num_qubits = 1
+    d = 4 ** num_qubits
+    d_sq = d ** 2
+    kraus_list = [(1 - prob) / d] * d
+    kraus_list[0] += prob
+    kraus_ops = pauli_kraus_map(kraus_list)
+    k_list = [(1 - prob) / d_sq] * d_sq
+    k_list[0] += prob
+    k_ops = pauli_kraus_map(k_list)
+    T_gate = np.array([[1, 0], [0, np.exp(1j * np.pi / 4)]])
+    CN_gate = np.block(
+        [[np.eye(2), np.zeros((2, 2))], [np.zeros((2, 2)), np.flip(np.eye(2), 1)]]
+    )
+    S_gate = np.array([[1, 0], [0, 1j]])
+    Z_gate = np.array([[1, 0], [0, -1]])
+    quil_prog.define_noisy_gate("T", [0], append_kraus_to_gate(kraus_ops, T_gate))
+    quil_prog.define_noisy_gate("CNOT", [1, 0], append_kraus_to_gate(k_ops, CN_gate))
+    quil_prog.define_noisy_gate("S", [0], append_kraus_to_gate(kraus_ops, S_gate))
+    quil_prog.define_noisy_gate("Z", [0], append_kraus_to_gate(kraus_ops, Z_gate))
+    return quil_prog
 ```
 
  Hamiltonian in this example is just sigma_z on the zeroth qubit
@@ -110,7 +136,7 @@ def executor(
     noisy += [
         MEASURE(qubit, r) for qubit, r in zip(list(range(max(marked_qubits) + 1)), ro)
     ]
-    noisy = noise_sim(noisy)
+    noisy = add_noise_to_circuit(noisy)
     expectation = 0.0
     pauli_sum = PauliSum([pauli_sum])
     for j, term in enumerate(pauli_sum.terms):
@@ -174,33 +200,6 @@ def parity_even_p(state, marked_qubits):
     for q in marked_qubits:
         mask |= 1 << q
     return bin(mask & state).count("1") % 2 == 0
-```
-
-Simulate depolarizing noise on the static gates
-
-```{code-cell} ipython3
-def noise_sim(quil_prog):
-    prob = 0.8
-    num_qubits = 1
-    d = 4 ** num_qubits
-    d_sq = d ** 2
-    kraus_list = [(1 - prob) / d] * d
-    kraus_list[0] += prob
-    kraus_ops = pauli_kraus_map(kraus_list)
-    k_list = [(1 - prob) / d_sq] * d_sq
-    k_list[0] += prob
-    k_ops = pauli_kraus_map(k_list)
-    T_gate = np.array([[1, 0], [0, np.exp(1j * np.pi / 4)]])
-    CN_gate = np.block(
-        [[np.eye(2), np.zeros((2, 2))], [np.zeros((2, 2)), np.flip(np.eye(2), 1)]]
-    )
-    S_gate = np.array([[1, 0], [0, 1j]])
-    Z_gate = np.array([[1, 0], [0, -1]])
-    quil_prog.define_noisy_gate("T", [0], append_kraus_to_gate(kraus_ops, T_gate))
-    quil_prog.define_noisy_gate("CNOT", [1, 0], append_kraus_to_gate(k_ops, CN_gate))
-    quil_prog.define_noisy_gate("S", [0], append_kraus_to_gate(kraus_ops, S_gate))
-    quil_prog.define_noisy_gate("Z", [0], append_kraus_to_gate(kraus_ops, Z_gate))
-    return quil_prog
 ```
 
 Scan over the parameter theta and plot energy expecation, without mitigation
