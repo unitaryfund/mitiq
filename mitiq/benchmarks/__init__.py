@@ -14,3 +14,4 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
+from mitiq.benchmarks.mirror_circuits import generate_mirror_circuit

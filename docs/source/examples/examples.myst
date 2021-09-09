@@ -1,15 +1,12 @@
 # Mitiq Examples
 
-```{toctree}
----
-maxdepth: 2
----
-ibmq-backends.rst
-hamiltonians.rst
-simple_landscape.rst
+```{nbgallery}
+Defining a Mitiq executor with a hamiltonian <hamiltonians.md>
+Variational circuit mitigation with zero noise extrapolation  <simple_landscape.myst>
 maxcut-demo.myst
+Understanding probabilistic error cancellation (PEC) <pec-tutorial.myst>
+Zero noise extrapolation on IBMQ backends<ibmq-backends.myst>
+Zero noise extrapolation on PyQuil parametric programs <pyquil_demo.myst>
 vqe-demo_custom-gate.myst
-pyquil_demo.myst
 cdr_api.md
 mitiq-paper/mitiq-paper-codeblocks
-```

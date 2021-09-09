@@ -36,12 +36,18 @@ setup(
     name="mitiq",
     version=__version__,
     install_requires=requirements,
-    extras_require={"development": set(dev_requirements), },
+    extras_require={
+        "development": set(dev_requirements),
+    },
     packages=find_packages(),
     include_package_data=True,
+    description="Mitiq is an open source toolkit for implementing error "
+    "mitigation techniques on most current intermediate-scale quantum "
+    "computers.",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     author="Unitary Fund",
+    author_email="info@unitary.fund",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Programming Language :: Python :: 3",
@@ -53,7 +59,12 @@ setup(
     ],
     license="GPL v3.0",
     url="https://unitary.fund",
-    python_requires='>=3.7',
+    project_urls={
+        "Bug Tracker": "https://github.com/unitaryfund/mitiq/issues/",
+        "Documentation": "https://mitiq.readthedocs.io/en/stable/",
+        "Source": "https://github.com/unitaryfund/mitiq/",
+    },
+    python_requires=">=3.7",
 )
 
 # restore _version.py to its previous state

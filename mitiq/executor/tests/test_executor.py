@@ -22,7 +22,8 @@ import numpy as np
 import cirq
 import pyquil
 
-from mitiq.collector import Collector, generate_collected_executor
+from mitiq.executor.executor import Executor, generate_collected_executor
+from mitiq.rem import MeasurementResult
 
 
 # Serial / batched executors which return floats.
@@ -61,35 +62,40 @@ def executor_pyquil_batched(programs) -> List[float]:
 
 
 # Serial / batched executors which return measurements.
-def executor_serial_measurements(circuit) -> cirq.Result:
-    return cirq.Simulator().run(circuit, repetitions=10)
+def executor_serial_measurements(circuit) -> MeasurementResult:
+    # Assume there is only one measurement key in the circuit.
+    assert len(circuit.all_measurement_keys()) == 1
+
+    key = circuit.all_measurement_keys().pop()
+    backend = cirq.Simulator()
+    return MeasurementResult(
+        backend.run(circuit, repetitions=10).measurements[key].tolist()
+    )
 
 
-def executor_batched_measurements(circuits) -> List[cirq.Result]:
-    return [
-        cirq.Simulator().run(circuit, repetitions=10) for circuit in circuits
-    ]
+def executor_batched_measurements(circuits) -> List[MeasurementResult]:
+    return [executor_serial_measurements(circuit) for circuit in circuits]
 
 
 def test_collector_simple():
-    collector = Collector(executor=executor_batched, max_batch_size=10)
+    collector = Executor(executor=executor_batched, max_batch_size=10)
     assert collector.can_batch
     assert collector._max_batch_size == 10
     assert collector.calls_to_executor == 0
 
 
 def test_collector_is_batched_executor():
-    assert Collector.is_batched_executor(executor_batched)
-    assert not Collector.is_batched_executor(executor_serial_typed)
-    assert not Collector.is_batched_executor(executor_serial)
-    assert not Collector.is_batched_executor(executor_serial_measurements)
-    assert Collector.is_batched_executor(executor_batched_measurements)
+    assert Executor.is_batched_executor(executor_batched)
+    assert not Executor.is_batched_executor(executor_serial_typed)
+    assert not Executor.is_batched_executor(executor_serial)
+    assert not Executor.is_batched_executor(executor_serial_measurements)
+    # assert Collector.is_batched_executor(executor_batched_measurements)
 
 
 @pytest.mark.parametrize("ncircuits", (5, 10, 25))
 @pytest.mark.parametrize("executor", (executor_batched, executor_serial))
 def test_run_collector_identical_circuits_batched(ncircuits, executor):
-    collector = Collector(executor=executor, max_batch_size=10)
+    collector = Executor(executor=executor, max_batch_size=10)
     circuits = [cirq.Circuit(cirq.H(cirq.LineQubit(0)))] * ncircuits
     results = collector.run(circuits)
 
@@ -99,7 +105,7 @@ def test_run_collector_identical_circuits_batched(ncircuits, executor):
 
 @pytest.mark.parametrize("batch_size", (1, 2, 10))
 def test_run_collector_nonidentical_pyquil_programs(batch_size):
-    collector = Collector(
+    collector = Executor(
         executor=executor_pyquil_batched, max_batch_size=batch_size
     )
     assert collector.can_batch
@@ -120,7 +126,7 @@ def test_run_collector_nonidentical_pyquil_programs(batch_size):
 @pytest.mark.parametrize("ncircuits", (10, 11, 23))
 @pytest.mark.parametrize("batch_size", (1, 2, 5, 50))
 def test_run_collector_all_unique(ncircuits, batch_size):
-    collector = Collector(executor=executor_batched, max_batch_size=batch_size)
+    collector = Executor(executor=executor_batched, max_batch_size=batch_size)
     assert collector.can_batch
 
     random_state = np.random.RandomState(seed=1)
@@ -141,7 +147,7 @@ def test_run_collector_all_unique(ncircuits, batch_size):
 def test_run_collector_force_run_all_serial_executor_identical_circuits(
     ncircuits, force_run_all
 ):
-    collector = Collector(executor=executor_serial)
+    collector = Executor(executor=executor_serial)
     assert not collector.can_batch
 
     circuits = [cirq.Circuit(cirq.H(cirq.LineQubit(0)))] * ncircuits
@@ -159,7 +165,7 @@ def test_run_collector_force_run_all_serial_executor_identical_circuits(
 def test_run_collector_preserves_order(s, b):
     rng = np.random.RandomState(1)
 
-    collector = Collector(executor=executor_batched_unique, max_batch_size=b)
+    collector = Executor(executor=executor_batched_unique, max_batch_size=b)
     assert collector.can_batch
 
     circuits = [

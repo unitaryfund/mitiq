@@ -21,7 +21,8 @@ import warnings
 
 import numpy as np
 
-from mitiq import generate_collected_executor, QPROGRAM
+from mitiq import QPROGRAM
+from mitiq.executor import generate_collected_executor
 from mitiq.pec import sample_circuit, OperationRepresentation
 from mitiq.interface import convert_to_mitiq
 

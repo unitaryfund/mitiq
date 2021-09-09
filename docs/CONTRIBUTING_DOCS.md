@@ -4,7 +4,7 @@ the Python toolkit for implementing error mitigation on quantum computers.
 
 ![Python Build](https://github.com/unitaryfund/mitiq/workflows/Python%20Build/badge.svg?branch=master)
 [![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
-[![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](http://unitary.fund)
+[![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](https://unitary.fund)
 
 ## Requirements
 Our documentation is generated with
@@ -241,7 +241,7 @@ from the root directory.
 
 This command tests the code examples in the documentation files, as well as testing the docstrings, since these are imported with the `autodoc` extension.
 
-One can also use various `doctest` [features](http://doc.pytest.org/en/latest/doctest.html#using-doctest-options) by configuring them in the
+One can also use various `doctest` [features](https://doc.pytest.org/en/latest/how-to/doctest.html#using-doctest-options) by configuring them in the
 `docs/pytest.ini` file.
 
 ## Additional information

@@ -4,23 +4,22 @@ jupytext:
     extension: .myst
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.10.2
+    jupytext_version: 1.11.4
 kernelspec:
   display_name: Python 3
   language: python
   name: python3
 ---
 
-# Solving MaxCut with QAOA improved with Mitiq
+# Solving MaxCut with Mitiq-improved QAOA
 
 +++
 
 In this notebook we solve a simple [_MaxCut_ problem](https://en.wikipedia.org/wiki/Maximum_cut) with the
-_Quantum Approximate Optimization Algorithm_ (QAOA) [[1-5]](#References) executed on a simulated noisy backend. 
+_Quantum Approximate Optimization Algorithm_ (QAOA) [[1-5]](#References) executed on a simulated noisy backend.
 In particular we are interested in investigating how Mitiq can help reduce errors and improve the results.
 
 +++
-
 
 ## The MaxCut problem
 
@@ -56,7 +55,7 @@ def count_cuts(graph: List[Tuple[int]], set_a: set, set_b: set):
             num_cuts += 1
         if edge[0] in set_b and edge[1] in set_a:
             num_cuts += 1
-    return num_cuts       
+    return num_cuts
 ```
 
 For example, for the square graph previously defined, the maximum number of cuts is $4$ which can be
@@ -101,7 +100,7 @@ similar to the quantum cost function that we will define in the next section.
 
 ```{code-cell} ipython3
 def count_cuts_from_string(graph: List[Tuple[int]], bitstring: str):
-    """Counts the number of cuts of a graph bipartition represented as a (big-endian) bitstring. 
+    """Counts the number of cuts of a graph bipartition represented as a (big-endian) bitstring.
     """
     cost = 0
     for i, j in graph:
@@ -145,10 +144,10 @@ where $Z_k$ is the Pauli-Z operator applied to the qubit $k$, such that $Z_k |0>
 $Z_k |1>_k = - |1 \rangle_k$.
 
 Now we can associate each qubit of the system to a vertex of the graph. A potential solution of the MaxCut
-problem  (i.e., the partition $(V_A, V_B)$) can be represented by a quantum product state: 
+problem  (i.e., the partition $(V_A, V_B)$) can be represented by a quantum product state:
 
 $$|\psi \rangle = |s_n \rangle \cdots |s_2 \rangle |s_1\rangle, $$
-where $s_j=0$ if $j \in V_A$, while $s_j=1$ if $j \in V_B$. 
+where $s_j=0$ if $j \in V_A$, while $s_j=1$ if $j \in V_B$.
 
 In this case it is easy to check that the corresponding number of cuts is given by the opposite of the
 expectation value of the Hamiltonian $H$:
@@ -178,7 +177,7 @@ def qaoa_hamiltonian(graph: List[Tuple[float]]) -> np.ndarray:
     zz_terms = np.real([Circuit([identity_each(*qreg), ZZ(qreg[i], qreg[j])]).unitary() for i, j in graph])
     local_terms = [-0.5 * (np_identity - zz_term) for zz_term in zz_terms]
     return sum(local_terms)
-    
+
 ```
 
 Since it is diagonal in the computational basis, we can get the ground state energy as follows:
@@ -220,8 +219,8 @@ This is where Quantum Approximate Optimization Algorithm (QAOA)
 This method consists of generating a potential solution state through a variational circuit
 $U_{\vec \alpha, \vec \beta}$ which depends on two vectors of $p$ real parameters
 $\vec \alpha = (\alpha_1, .... \alpha_p)$, $\vec \beta= (\beta_1, .... \beta_p)$ and has the following structure:
- 
-$$|\psi(\vec \alpha, \vec \beta) \rangle = U_{\vec \alpha, \vec \beta}|+\rangle ^{\otimes n} 
+
+$$|\psi(\vec \alpha, \vec \beta) \rangle = U_{\vec \alpha, \vec \beta}|+\rangle ^{\otimes n}
 = R_{\alpha_p} W_{\beta_p} \cdots R_{\alpha_1} W_{\beta_1} |+\rangle ^{\otimes n},$$
 
 where $|+> = (|0\rangle + |1\rangle)/\sqrt{2}$ and
@@ -251,15 +250,15 @@ $|s_1 \rangle |s_2 \rangle \cdots |s_n\rangle$ representing optimal bipartitions
 ```{code-cell} ipython3
 from cirq import H, X
 from typing import List, Tuple
-    
+
 def qaoa_ansatz(graph: List[Tuple[float]], params: List[float]) -> Circuit:
-    """Generates a QAOA circuit associated to the input graph, for 
+    """Generates a QAOA circuit associated to the input graph, for
     a specific choice of variational parameters.
-    
+
     Args:
         graph: The input graph.
         params: The variational parameters.
-        
+
     Returns:
         The QAOA circuit.
     """
@@ -277,16 +276,16 @@ def qaoa_ansatz(graph: List[Tuple[float]], params: List[float]) -> Circuit:
     # Define the mixing evolution (up to an additive and a multiplicative constant)
     def mix_step(gamma: float) -> Circuit:
         return Circuit(X(qq) ** gamma for qq in qreg)
-    
+
     # State preparation layer
     circ = Circuit(H.on_each(qreg))
-    
+
     # Apply QAOA steps
     num_steps = len(params) // 2
     betas, alphas = params[:num_steps], params[num_steps:]
     for beta, alpha in zip(betas, alphas):
-        circ.append([h_step(beta) + mix_step(alpha)]) 
-    
+        circ.append([h_step(beta) + mix_step(alpha)])
+
     return circ
 ```
 
@@ -339,7 +338,7 @@ Let us define a function which can be used for running the QAOA optimization.
 from typing import Callable
 from scipy.optimize import minimize
 
- 
+
 def minimize_cost(
     cost_function: Callable[[np.array], float],
     init_params: np.array,
@@ -353,8 +352,8 @@ def minimize_cost(
     Returns:
         A triple of the minimum cost, the optimal parameters and a list of costs at each iteration steps.
     """
-   
-    
+
+
     # store the optimization trajectory
     traj = []
 
@@ -431,7 +430,7 @@ def qaoa_noisy_cost(params: np.array) -> float:
 noisy_opt_cost, noisy_opt_params, noisy_traj = minimize_cost(qaoa_noisy_cost, init_params)
 ```
 
-Because of noise, the QAOA optimization is not able to converge to the optimal solution. 
+Because of noise, the QAOA optimization is not able to converge to the optimal solution.
 
 Indeed the variational parameters optimized with noise do not minimize the ideal cost.
 
