@@ -20,6 +20,8 @@ from numpy import random
 import networkx as nx
 import cirq
 from cirq.experiments.qubit_characterizations import _single_qubit_cliffords
+from mitiq.interface import convert_from_mitiq
+from mitiq import QPROGRAM
 
 single_q_cliffords = _single_qubit_cliffords()
 cliffords = single_q_cliffords.c1_in_xy
@@ -29,10 +31,12 @@ paulis = [cirq.X, cirq.Y, cirq.Z, cirq.I]
 def random_paulis(
     nqubits: int, random_state: random.RandomState
 ) -> cirq.Circuit:
-    """Returns a circuit with a random pauli gate applied to each qubit.
+    """Returns a circuit with randomly selected Pauli gates on each qubit.
 
     Args:
         nqubits: The number of qubits in the circuit.
+        random_state: Random state to select Paulis I, X, Y, Z uniformly at
+            random.
     """
     return cirq.Circuit(
         paulis[random_state.randint(len(paulis))](cirq.LineQubit(x))
@@ -54,6 +58,7 @@ def edge_grab(
             from the set of candidate edges.
         connectivity_graph: The connectivity graph for the backend
             on which the circuit will be run.
+        random_state: Random state to select edges (uniformly at random).
     """
     connectivity_graph = connectivity_graph.copy()
     candidate_edges = nx.Graph()
@@ -82,8 +87,9 @@ def random_cliffords(
     Clifford gate applied to every other qubit.
 
     Args:
-        edges: A graph with the edges for which the
+        connectivity_graph: A graph with the edges for which the
             two-qubit Clifford gate is to be applied.
+        random_state: Random state to choose Cliffords (uniformly at random).
     """
     gates = [
         cirq.CNOT(cirq.LineQubit(a), cirq.LineQubit(b))
@@ -102,8 +108,9 @@ def random_single_cliffords(
     applied on each given qubit.
 
     Args:
-        qubits: A graph with each node representing a qubit for
+        connectivity_graph: A graph with each node representing a qubit for
             which a random single-qubit Clifford gate is to be applied.
+        random_state: Random state to choose Cliffords (uniformly at random).
     """
     gates: List[cirq.Operation] = []
     for qubit in connectivity_graph.nodes:
@@ -118,15 +125,17 @@ def generate_mirror_circuit(
     two_qubit_gate_prob: float,
     connectivity_graph: nx.Graph,
     seed: Optional[int] = None,
-) -> cirq.Circuit:
+    return_type: Optional[str] = None,
+) -> QPROGRAM:
     """Returns a randomized mirror circuit.
 
     Args:
         nlayers: The number of random Clifford layers to be generated.
         two_qubit_gate_prob: Probability of a two-qubit gate being applied.
         connectivity_graph: The connectivity graph of the backend
-        on which the mirror circuit will be run. This is used
-        to make sure 2-qubit gates are only run on connected qubits.
+            on which the mirror circuit will be run. This is used
+            to make sure 2-qubit gates are only applied to connected qubits.
+        seed: Seed for generating randomized mirror circuit.
     """
     if not 0 <= two_qubit_gate_prob <= 1:
         raise ValueError("two_qubit_gate_prob must be between 0 and 1")
@@ -159,11 +168,13 @@ def generate_mirror_circuit(
     )
 
     rand_paulis = cirq.Circuit(random_paulis(nqubits, random_state))
-    return (
+    circuit = (
         single_qubit_cliffords
         + forward_circuit
         + rand_paulis
         + quasi_inversion_circuit
         + cirq.inverse(single_qubit_cliffords)
-        + cirq.measure(*cirq.LineQubit.range(nqubits))
     )
+
+    return_type = "cirq" if not return_type else return_type
+    return convert_from_mitiq(circuit, return_type)

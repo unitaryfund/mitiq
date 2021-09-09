@@ -13,13 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from collections import Counter
 import pytest
 
 import numpy as np
 import cirq
 
-from mitiq.observable import PauliString
 from mitiq.interface import mitiq_qiskit, mitiq_pyquil
+from mitiq.observable.pauli import PauliString, PauliStringCollection
+from mitiq.rem import MeasurementResult
 from mitiq.utils import _equal
 
 
@@ -123,7 +125,11 @@ def test_pauli_measure_in_circuit(support, circuit_type):
     if circuit_type == "cirq":
         assert _equal(measured, expected, require_qubit_equality=True)
     else:
-        assert measured == convert(expected)
+        expected = convert(expected)
+        if circuit_type == "pyquil":  # Special case with basis rotation order.
+            assert set(measured) == set(expected)
+        else:
+            assert measured == expected
 
 
 def test_pauli_measure_in_bad_qubits_error():
@@ -173,3 +179,158 @@ def test_weight():
     assert PauliString(spec="X" * n).weight() == n
     assert PauliString(spec="IX" * n).weight() == n
     assert PauliString(spec="ZX" * n).weight() == 2 * n
+
+
+# Note: For testing `PauliString._expectation_from_measurements`, it makes no
+# difference whether the Pauli is X, Y, or Z. This is because we assume
+# measurements are obtained by single-qubit basis rotations. So it only matters
+# whether the Pauli is I (identity) or X, Y, Z (not identity). We just use Z
+# for "not identity" below.
+
+
+@pytest.mark.parametrize("seed", range(5))
+@pytest.mark.parametrize("nqubits", [1, 2, 5])
+def test_expectation_from_measurements_identity(seed, nqubits):
+    """For P = cI, asserts ⟨P⟩ = c."""
+    rng = np.random.RandomState(seed)
+    coeff = rng.random()
+    pauli = PauliString(spec="I", coeff=coeff)
+
+    measurements = MeasurementResult(
+        rng.randint(low=0, high=1 + 1, size=(100, nqubits)).tolist()
+    )
+    assert np.isclose(
+        pauli._expectation_from_measurements(measurements), coeff,
+    )
+
+
+def test_expectation_from_measurements_two_qubits():
+    measurements = MeasurementResult([[0, 1] * 1_000])
+
+    z0 = PauliString(spec="Z", support=(0,))
+    assert np.isclose(z0._expectation_from_measurements(measurements), 1.0,)
+    zi = PauliString(spec="ZI")
+    assert np.isclose(zi._expectation_from_measurements(measurements), 1.0,)
+
+    z1 = PauliString(spec="Z", support=(1,))
+    assert np.isclose(z1._expectation_from_measurements(measurements), -1.0,)
+    iz = PauliString(spec="IZ")
+    assert np.isclose(iz._expectation_from_measurements(measurements), -1.0,)
+
+    zz = PauliString(spec="ZZ")
+    assert np.isclose(zz._expectation_from_measurements(measurements), -1.0,)
+
+
+def test_pstringcollection():
+    x = PauliString(spec="X")
+    iz = PauliString(spec="IZ")
+    xz = PauliString(spec="XZ")
+    xzixx = PauliString(spec="XZIXX")
+    pauli_collection = PauliStringCollection(x, iz, xz, xzixx)
+
+    assert pauli_collection.elements == [x, iz, xz, xzixx]
+    assert pauli_collection.elements_by_weight == {
+        1: Counter((x, iz)),
+        2: Counter((xz,)),
+        4: Counter((xzixx,)),
+    }
+    assert pauli_collection.min_weight() == 1
+    assert pauli_collection.max_weight() == 4
+    assert pauli_collection.support() == {0, 1, 3, 4}
+    assert len(pauli_collection) == 4
+
+
+def test_pstring_collection_empty():
+    pauli_collection = PauliStringCollection()
+
+    assert pauli_collection.elements == []
+    assert pauli_collection.elements_by_weight == {}
+    assert pauli_collection.min_weight() == 0
+    assert pauli_collection.support() == set()
+    assert len(pauli_collection) == 0
+
+
+def test_pstring_collection_str():
+    x = PauliString(spec="X")
+    iz = PauliString(spec="IZ")
+    pcol = PauliStringCollection(x, iz)
+    assert str(pcol) == "X(0) + Z(1)"
+
+    xz = PauliString(spec="XZ", coeff=-2.4)
+    pcol.add(xz)
+    assert str(pcol) == "X(0) + Z(1) + (-2.4+0j)*X(0)*Z(1)"
+
+
+def test_pstring_collection_add():
+    pcol = PauliStringCollection()
+
+    a = PauliString(spec="ZZ")
+    assert pcol.can_add(a)
+    pcol.add(a)
+    assert pcol.elements == [a]
+
+    b = PauliString(spec="ZIXZ")
+    assert pcol.can_add(b)
+    pcol.add(b)
+    assert pcol.elements == [a, b]
+
+    assert pcol.can_add(a)
+    pcol.add(a)
+    assert pcol.elements == [a, a, b]
+
+    c = PauliString(spec="YY")
+    assert not pcol.can_add(c)
+    with pytest.raises(ValueError, match="Cannot add PauliString"):
+        pcol.add(c)
+
+
+def test_pstring_collection_len():
+    x = PauliString(spec="X", support=(0,))
+    y = PauliString(spec="Y", support=(1,))
+    z = PauliString(spec="Z", support=(2,))
+    assert len(PauliStringCollection(x, y, z)) == 3
+    assert len(PauliStringCollection(x, x, x)) == 3
+    assert len(PauliStringCollection(x, y)) == 2
+    assert len(PauliStringCollection(x)) == 1
+    assert len(PauliStringCollection()) == 0
+
+
+def test_pstring_collection_eq():
+    x = PauliString(spec="X")
+    z = PauliString(spec="IZ")
+    xz = PauliString(spec="XZ")
+    xzz = PauliString(spec="IIIXZZ")
+
+    assert PauliStringCollection(x, xzz) == PauliStringCollection(xzz, x)
+    assert PauliStringCollection(x, z) != PauliStringCollection(x, xz)
+    assert PauliStringCollection(x, z, xz) == PauliStringCollection(z, xz, x)
+    assert PauliStringCollection() == PauliStringCollection()
+
+
+def test_pstringcollection_expectation_from_measurements():
+    measurements = MeasurementResult([[0, 0], [0, 0], [0, 1], [0, 1]])
+    pset = PauliStringCollection(
+        PauliString(spec="ZI", coeff=-2.0), PauliString(spec="IZ", coeff=5.0)
+    )
+    assert np.isclose(pset._expectation_from_measurements(measurements), -2.0)
+
+    measurements = MeasurementResult([[1, 0], [1, 0], [0, 1], [0, 1]])
+    pset = PauliStringCollection(
+        PauliString(spec="ZI", coeff=-2.0), PauliString(spec="IZ", coeff=5.0)
+    )
+    assert np.isclose(pset._expectation_from_measurements(measurements), 0.0)
+
+
+def test_pstringcollection_expectation_from_measurements_qubit_indices():
+    measurements = MeasurementResult(
+        [[0, 0], [0, 0], [0, 1], [0, 1]], qubit_indices=(1, 5)
+    )
+    pset = PauliStringCollection(
+        PauliString(spec="Z", coeff=-2.0, support=(1,))
+    )
+    assert np.isclose(pset._expectation_from_measurements(measurements), -2.0)
+
+    pset = PauliStringCollection(
+        PauliString(spec="Z", coeff=-2.0, support=(5,))
+    )
+    assert np.isclose(pset._expectation_from_measurements(measurements), 0.0)

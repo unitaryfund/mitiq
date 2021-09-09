@@ -17,5 +17,6 @@ formats:
 python:
    version: 3.7
    install:
-   - requirements: requirements.txt
-   - requirements: dev_requirements.txt
+   # Install Mitiq with "pip install .[development]"
+   - method: pip
+     path: .[development]

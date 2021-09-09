@@ -15,18 +15,18 @@
 
 from typing import Callable
 
-from mitiq._typing import Bitstring, MeasurementResult
+from mitiq.rem.measurement_result import Bitstring, MeasurementResult
 
 
 def post_select(
-    measurement_result: MeasurementResult,
+    result: MeasurementResult,
     selector: Callable[[Bitstring], bool],
     inverted: bool = False,
 ) -> MeasurementResult:
     """Returns only the bitstrings which satisfy the predicate in ``selector``.
 
     Args:
-        measurement_result: List of bitstrings.
+        result: List of bitstrings.
         selector: Predicate for which bitstrings to select. Examples:
 
             * ``selector = lambda bitstring: sum(bitstring) == k``
@@ -39,4 +39,6 @@ def post_select(
         inverted: Invert the selector predicate so that bitstrings which obey
             ``selector(bitstring) == False`` are selected and returned.
     """
-    return [bits for bits in measurement_result if selector(bits) != inverted]
+    return MeasurementResult(
+        [bits for bits in result.result if selector(bits) != inverted]
+    )

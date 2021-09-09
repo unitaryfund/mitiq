@@ -1,25 +1,34 @@
-.. mitiq documentation file
+---
+jupytext:
+  text_representation:
+    extension: .myst
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.11.4
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
+---
+# Defining Hamiltonians as Linear Combinations of Pauli Strings
 
-*************************************************************
-Defining Hamiltonians as Linear Combinations of Pauli Strings
-*************************************************************
-
-This tutorial shows an example of using Hamiltonians defined as :class:`~cirq.PauliSum` objects or similar objects in other
+This tutorial shows an example of using Hamiltonians defined as {class}`~cirq.PauliSum` objects or similar objects in other
 supported frontends. The usage of these Hamiltonian-like objects does not change the interface with Mitiq, but we
 show an example for users who prefer these constructions.
 
 Specifically, in this tutorial we will mitigate the expectation value of the Hamiltonian
 
-.. math::
-  H := 1.5 X_1 Z_2 - 0.7 Y_1
+$$
+H := 1.5 X_1 Z_2 - 0.7 Y_1
+$$
 
 on two qubits.
 
-Setup
-#####
+## Setup
 
 First we import libraries for this example.
 
+```{eval-rst}
 .. testcode::
 
     from functools import partial
@@ -30,13 +39,14 @@ First we import libraries for this example.
     import cirq
     from mitiq.zne import execute_with_zne
     from mitiq.zne.inference import LinearFactory
+```
 
-Defining the Hamiltonian
-########################
+## Defining the Hamiltonian
 
-Now we define the Hamiltonian as a :class:`~cirq.PauliSum` by defining the Pauli strings :math:`X_1 Z_2` and :math:`Y_1` then
+Now we define the Hamiltonian as a {class}`~cirq.PauliSum` by defining the Pauli strings $X_1 Z_2$ and $Y_1$ then
 taking a linear combination of these to create the Hamiltonian above.
 
+```{eval-rst}
 .. testcode::
 
     # Qubit register
@@ -49,23 +59,25 @@ taking a linear combination of these to create the Hamiltonian above.
     # Hamiltonian
     ham = 1.5 * string1 - 0.7 * string2
 
+```
 
 By printing the Hamiltonian we see:
 
+```{eval-rst}
 .. doctest::
 
     >>> print(ham)
     1.500*X(0)*Z(1)-0.700*Y(1)
+```
 
-Note that we could have created the Hamiltonian by directly defining a :class:`~cirq.PauliSum` with the coefficients.
+Note that we could have created the Hamiltonian by directly defining a {class}`~cirq.PauliSum` with the coefficients.
 
+## Using the Hamiltonian in the executor
 
-Using the Hamiltonian in the executor
-#####################################
-
-To interface with Mitiq, we define an ``executor`` function which maps an input (noisy) circuit to an expectation
+To interface with Mitiq, we define an `executor` function which maps an input (noisy) circuit to an expectation
 value. In the code block below, we show how to define this function and return the expectation of the Hamiltonian above.
 
+```{eval-rst}
 .. testcode::
 
     def executor(
@@ -91,18 +103,19 @@ value. In the code block below, we show how to define this function and return t
             dmat,
             qubit_map={ham.qubits[i]: i for i in range(len(ham.qubits))}
         ).real
+```
 
 This executor inputs a Hamiltonian as well as a noise value, adds noise, then uses the
-:meth:`cirq.PauliSum.expectation_from_density_matrix` method to return the expectation value.
+{meth}`cirq.PauliSum.expectation_from_density_matrix` method to return the expectation value.
 
 The remaining interface is as usual with Mitiq. For the sake of example, we show an application mitigating the
-expectation value of :math:`H` with an example ansatz at different noise levels.
+expectation value of $H$ with an example ansatz at different noise levels.
 
-Example usage
-#############
+## Example usage
 
-Below we create an example ansatz parameterized by one angle :math:`\gamma`.
+Below we create an example ansatz parameterized by one angle $\gamma$.
 
+```{eval-rst}
 .. testcode::
 
     def ansatz(gamma: float) -> cirq.Circuit:
@@ -113,27 +126,33 @@ Below we create an example ansatz parameterized by one angle :math:`\gamma`.
             cirq.ops.rx(gamma / 2).on_each(qreg),
             cirq.ops.CNOT.on(*qreg),
         )
+```
 
-For the angle :math:`\gamma = \pi`, this ansatz has the following structure:
+For the angle $\gamma = \pi$, this ansatz has the following structure:
 
+```{eval-rst}
 .. doctest::
 
     >>> print(ansatz(gamma=np.pi))
     0: ───Ry(π)───@───Rx(0.5π)───@───
                   │              │
     1: ───────────X───Rx(0.5π)───X───
+```
 
-We now compute expectation values of :math:`H` using the ``executor`` as follows.
+We now compute expectation values of $H$ using the `executor` as follows.
 
+```{eval-rst}
 .. testcode::
 
     pvals = np.linspace(0, 0.01, 20)
     expvals = [executor(ansatz(gamma=np.pi), ham, p) for p in pvals]
+```
 
 We can compute mitigated expectation values at these same noise levels by running the following. Here, we use a
-:class:`.LinearFactory` and use the ``partial`` function to update the ``executor`` for each noise value. The latter point
-ensures ``this_executor`` has the correct signature (input circuit, output float) to use with :func:`.execute_with_zne`.
+{class}`.LinearFactory` and use the `partial` function to update the `executor` for each noise value. The latter point
+ensures `this_executor` has the correct signature (input circuit, output float) to use with {func}`.execute_with_zne`.
 
+```{eval-rst}
 .. testcode::
 
     fac = LinearFactory(scale_factors=list(range(1, 6)))
@@ -144,9 +163,11 @@ ensures ``this_executor`` has the correct signature (input circuit, output float
         mitigated_expvals.append(
             execute_with_zne(ansatz(gamma=np.pi), this_executor, factory=fac)
         )
+```
 
 We can now visualize the effect that error mitigation has by running the following code for plotting.
 
+```{eval-rst}
 .. testcode::
 
     plt.rcParams.update({"font.family": "serif", "font.size": 16})
@@ -160,22 +181,24 @@ We can now visualize the effect that error mitigation has by running the followi
     plt.ylabel(r"$\langle H \rangle$")
     plt.legend()
     plt.show()
+```
 
-This produces a plot of expectation value (unmitigated and mitigated) :math:`\langle H \rangle` vs. noise strength
-:math:`p`. We include the true (noiseless) expectation value on the plot for comparison.
+This produces a plot of expectation value (unmitigated and mitigated) $\langle H \rangle$ vs. noise strength
+$p$. We include the true (noiseless) expectation value on the plot for comparison.
 
-.. image:: ../img/vqe-cirq-pauli-sum-mitigation-plot.png
-    :width: 400
-    :alt: Mitigated vs unmitigated expectation values at different noise strengths.
+```{image} ../img/vqe-cirq-pauli-sum-mitigation-plot.png
+:alt: Mitigated vs unmitigated expectation values at different noise strengths.
+:width: 400
+```
 
 As we can see, the mitigated expectation values are closer, on average, to the true expectation value.
 
-Sampling
-########
+## Sampling
 
-Finally, we note that :math:`\langle H \rangle` can be estimated by sampling using the :class:`cirq.PauliSumCollector`. An
-example of a ``sampling_executor`` which uses this is shown below.
+Finally, we note that $\langle H \rangle$ can be estimated by sampling using the {class}`cirq.PauliSumCollector`. An
+example of a `sampling_executor` which uses this is shown below.
 
+```{eval-rst}
 .. testcode::
 
     def sampling_executor(
@@ -201,6 +224,7 @@ example of a ``sampling_executor`` which uses this is shown below.
 
         # Return the expectation value
         return psum.estimated_energy()
+```
 
-This executor can be used in the same way as the previously defined ``executor`` which used a density matrix simulation
-to evaluate :math:`\langle H \rangle`.
+This executor can be used in the same way as the previously defined `executor` which used a density matrix simulation
+to evaluate $\langle H \rangle$.
