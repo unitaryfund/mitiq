@@ -239,7 +239,7 @@ def test_observable_expectation_two_circuits(n, executor):
     assert np.isclose(expectation, -2.0, atol=1e-1)
 
 
-@pytest.mark.parametrize("executor", (execute,))
+@pytest.mark.parametrize("executor", (execute, execute_density_matrix))
 def test_observable_expectation_supported_qubits(executor):
     a, b, c = cirq.LineQubit.range(3)
     circuit = cirq.Circuit(cirq.I(a), cirq.X.on(b), cirq.H.on(c))

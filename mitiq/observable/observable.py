@@ -82,10 +82,11 @@ class Observable:
     def measure_in(self, circuit: QPROGRAM) -> List[QPROGRAM]:
         return [pset.measure_in(circuit) for pset in self._groups]
 
-    def matrix(self, dtype: type = np.complex128) -> np.ndarray:
+    def matrix(self, qubit_indices: Optional[List[int]] = None, dtype: type = np.complex128) -> np.ndarray:
         """Returns the (potentially very large) matrix of the Observable."""
-        qubit_indices = self.qubit_indices
-        n = self.nqubits
+        if qubit_indices is None:
+            qubit_indices = self.qubit_indices
+        n = len(qubit_indices)
 
         matrix = np.zeros(shape=(2 ** n, 2 ** n), dtype=dtype)
         for pauli in self._paulis:
@@ -108,6 +109,15 @@ class Observable:
             )
         elif result_type is np.ndarray:
             density_matrix = cast(np.ndarray, execute(circuit))
+            observable_matrix = self.matrix()
+
+            if density_matrix.shape != observable_matrix.shape:
+                nqubits = int(np.log2(density_matrix.shape[0]))
+                density_matrix = cirq.partial_trace(
+                    np.reshape(density_matrix, newshape=[2, 2] * nqubits),
+                    keep_indices=self.qubit_indices,
+                ).reshape(observable_matrix.shape)
+
             return np.trace(density_matrix @ self.matrix())
         else:
             raise NotImplementedError
