@@ -120,7 +120,11 @@ class Observable:
 
             return np.trace(density_matrix @ self.matrix())
         else:
-            raise NotImplementedError
+            raise ValueError(
+                f"Arg `execute` must be a function with annotated return type "
+                f"that is either mitiq.MeasurementResult or np.ndarray but "
+                f"was {result_type}."
+            )
 
     def _expectation_from_measurements(
         self, measurements: List[MeasurementResult]
