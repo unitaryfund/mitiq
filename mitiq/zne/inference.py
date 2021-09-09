@@ -37,7 +37,7 @@ from scipy.optimize import curve_fit, OptimizeWarning
 from cirq import Circuit
 
 from mitiq import QPROGRAM
-from mitiq.collector import Collector
+from mitiq.executor import Executor
 from mitiq.interface import accept_any_qprogram_as_input
 
 
@@ -544,7 +544,7 @@ class BatchedFactory(Factory, ABC):
         # Get the list of keywords associated to each circuit in "to_run"
         kwargs_list = self._get_keyword_args(num_to_average)
 
-        if Collector.is_batched_executor(executor):
+        if Executor.is_batched_executor(executor):
             if all([kwargs == {} for kwargs in kwargs_list]):
                 res = executor(to_run)
             else:
