@@ -87,7 +87,7 @@ def add_noise_to_circuit(quil_prog):
     return quil_prog
 ```
 
- Hamiltonian in this example is just sigma_z on the zeroth qubit
+ Hamiltonian in this example is just `sigma_z` on the zeroth qubit
 
 ```{code-cell} ipython3
 hamiltonian = sZ(0)
