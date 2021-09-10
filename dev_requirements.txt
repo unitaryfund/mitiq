@@ -3,7 +3,7 @@ qiskit-terra~=0.18.1
 qiskit-aer~=0.8.2
 qiskit-ibmq-provider~=0.16.0
 pyquil~=2.28.0
-amazon-braket-sdk~=1.8.0
+amazon-braket-sdk~=1.9.0
 
 # Unit tests, coverage, and formatting/style.
 pytest-xdist[psutil]~=2.3.0
