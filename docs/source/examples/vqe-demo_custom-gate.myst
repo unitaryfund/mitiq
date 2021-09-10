@@ -176,14 +176,11 @@ def expectation_from_sampling(
 ```
 
 Calculate the parity of elements at indexes in marked_qubits
-The function is a modified version of `parity_even_p`
-from https://github.com/rigetti/grove/blob/master/grove/pyvqe/vqe.py. 
+The function is a modified version of `parity_even_p` from 
+https://github.com/rigetti/grove/blob/master/grove/pyvqe/vqe.py.
 
 ```{code-cell} ipython3
 def parity_even_p(state, marked_qubits):
-    """
-    
-    """
     mask = 0
     for q in marked_qubits:
         mask |= 1 << q
