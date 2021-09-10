@@ -235,7 +235,7 @@ Here we use a linear technique for the Zero Noise Extrapolation
 fac = mitiq.zne.inference.LinearFactory(scale_factors=[1.0, 3.0])
 ```
 
-Scan over the parameter theta and plot energy expecation with noise mitigation
+Scan over the parameter `theta` and plot the energy expectation with error mitigation
 
 ```{code-cell} ipython3
 results_zne = []
