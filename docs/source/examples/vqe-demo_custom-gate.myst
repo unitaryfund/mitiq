@@ -214,7 +214,7 @@ print(res)
 
 Now we introduce as quantum error  mitigation technique, Zero Noise Extrapolation.
 
-Create new objective function to calculate expecation value w/ noise mitigation
+We first create a new objective function to calculate the expectation value with noise mitigation
 
 ```{code-cell} ipython3
 def mitigated_expectation(
