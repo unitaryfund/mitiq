@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# Variational Quantum Eigensolver improved with Mitiq
+# Variational Quantum Eigensolver improved with Zero Noise Extrapolation
 In this example we investigate how Mitiq can help reduce errors
 and improve convergence of a simple VQE problem executed
 on a simulated noisy backend.
