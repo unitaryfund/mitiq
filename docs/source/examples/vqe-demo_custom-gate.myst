@@ -36,7 +36,7 @@ from mitiq import zne
 from mitiq.zne.scaling.folding import fold_gates_from_right
 ```
 
-Use the get_qc command to initialize the simulated backend 
+Use the `get_qc` command to initialize the simulated backend 
 where the pyQuil program will run
 
 ```{code-cell} ipython3
