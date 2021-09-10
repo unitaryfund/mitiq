@@ -41,7 +41,7 @@ Use the get_qc command to initialize the simulated backend
 where the pyQuil program will run
 
 ```{code-cell} ipython3
-backend = get_qc("2q-qvm")
+qc = get_qc("2q-qvm")
 ```
 
 Example ansatz
@@ -104,7 +104,7 @@ for j, term in enumerate(pauli_sum.terms):
         elif gate == "Y":
             meas_basis_change.inst(RX(np.pi / 2, index))
         program += meas_basis_change
-    readout_qubit = program.declare("readout_qubit", "BIT", max(marked_qubits) + 1)
+    ro = program.declare("ro", "BIT", max(marked_qubits) + 1)
 
 samples = 3000
 program.wrap_in_numshots_loop(samples)
@@ -121,8 +121,8 @@ does not fold custom gates.
 ```{code-cell} ipython3
 def executor(
     thetas,
-    backend,
-    readout_qubit,
+    qc,
+    ro,
     samples: int,
     pauli_sum: Union[PauliSum, PauliTerm, np.ndarray],
     pyquil_prog: Program,
@@ -133,7 +133,7 @@ def executor(
     """
     noisy = pyquil_prog.copy()
     noisy += [
-        MEASURE(qubit, r) for qubit, r in zip(list(range(max(marked_qubits) + 1)), readout_qubit)
+        MEASURE(qubit, r) for qubit, r in zip(list(range(max(marked_qubits) + 1)), ro)
     ]
     noisy = add_noise_to_circuit(noisy)
     expectation = 0.0
@@ -143,7 +143,7 @@ def executor(
         for index, gate in term:
             qubits_to_measure.append(index)
             meas_outcome = expectation_from_sampling(
-                thetas, noisy, qubits_to_measure, backend, samples
+                thetas, noisy, qubits_to_measure, qc, samples
             )
             expectation += term.coefficient * meas_outcome
     return expectation.real
@@ -156,12 +156,12 @@ It is modified to follow pyQuil conventions for defining custom gates.
 
 ```{code-cell} ipython3
 def expectation_from_sampling(
-    thetas, executable: Program, marked_qubits: List[int], backend, samples: int
+    thetas, executable: Program, marked_qubits: List[int], qc, samples: int
 ) -> float:
     """Calculate the expectation value of the Zi operator where i ranges over all 
     qubits given in marked_qubits.
     """
-    bitstring_samples = backend.run(executable, memory_map={"theta": thetas})
+    bitstring_samples = qc.run(executable, memory_map={"theta": thetas})
     bitstring_tuples = list(map(tuple, bitstring_samples))
 
     freq = Counter(bitstring_tuples)
@@ -184,7 +184,7 @@ thetas = np.linspace(0, 2 * np.pi, 51)
 results = []
 
 for theta in thetas:
-    results.append(executor(theta, backend, readout_qubit, samples, hamiltonian, program))
+    results.append(executor(theta, qc, ro, samples, hamiltonian, program))
 ```
 
 Run VQE routine without noise mitigation
@@ -195,7 +195,7 @@ init_angle = [3.0]
 res = optimize.minimize(
     executor,
     init_angle,
-    args=(backend, readout_qubit, samples, hamiltonian, program),
+    args=(qc, ro, samples, hamiltonian, program),
     method="Nelder-Mead",
     options={"xatol": 1.0e-3, "fatol": 1.0e-2},
 )
@@ -208,11 +208,11 @@ Create new objective function to calculate expecation value w/ noise mitigation
 
 ```{code-cell} ipython3
 def mitigated_expectation(
-    thetas, backend, readout_qubit, samples, pauli_sum, executable: Program, factory
+    thetas, qc, ro, samples, pauli_sum, executable: Program, factory
 ) -> float:
     mitigated_exp = zne.execute_with_zne(
         executable,
-        lambda p: executor(thetas, backend, readout_qubit, samples, pauli_sum, p),
+        lambda p: executor(thetas, qc, ro, samples, pauli_sum, p),
         factory,
         fold_gates_from_right,
     )
@@ -230,7 +230,7 @@ Scan over the parameter theta and plot energy expecation with noise mitigation
 results_zne = []
 for theta in thetas:
     results_zne.append(
-        mitigated_expectation(theta, backend, readout_qubit, samples, hamiltonian, program, fac)
+        mitigated_expectation(theta, qc, ro, samples, hamiltonian, program, fac)
     )
 
 _ = plt.figure()
@@ -248,7 +248,7 @@ Run VQE routine with noise mitigation
 res_zne = optimize.minimize(
     mitigated_expectation,
     init_angle,
-    args=(backend, readout_qubit, samples, hamiltonian, program, fac),
+    args=(qc, ro, samples, hamiltonian, program, fac),
     method="Nelder-Mead",
     options={"xatol": 1.0e-3, "fatol": 1.0e-2},
 )
