@@ -275,7 +275,7 @@ https://grove-docs.readthedocs.io/en/latest/vqe.html#
 
 +++
 
-display information about Mitiq, packages, and Python version/platform
+This final blog displays information about Mitiq, installed packages, and Python version/platform
 
 ```{code-cell} ipython3
 mitiq.about()
