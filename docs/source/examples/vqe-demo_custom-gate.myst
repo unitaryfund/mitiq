@@ -212,7 +212,7 @@ res = optimize.minimize(
 print(res)
 ```
 
-Now introduce noise mitigation technique Zero Noise Extrapolation
+Now we introduce as quantum error  mitigation technique, Zero Noise Extrapolation.
 
 Create new objective function to calculate expecation value w/ noise mitigation
 
