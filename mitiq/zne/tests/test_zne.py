@@ -42,6 +42,8 @@ from mitiq.interface.mitiq_qiskit import (
 
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES
 from mitiq.interface import convert_from_mitiq, accept_any_qprogram_as_input
+from mitiq.interface.mitiq_cirq import sample_bitstrings
+from mitiq.observable import Observable, PauliString
 
 
 BASE_NOISE = 0.007
@@ -73,6 +75,22 @@ def generic_executor(circuit, noise_level: float = 0.1) -> float:
 def executor(circuit) -> float:
     wavefunction = circuit.final_state_vector()
     return np.real(wavefunction.conj().T @ np.kron(npX, npZ) @ wavefunction)
+
+
+def test_with_observable():
+    observable = Observable(PauliString(spec="Z"))
+    circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
+
+    noisy_value = observable.expectation(circuit, sample_bitstrings)
+    zne_value = execute_with_zne(
+        circuit,
+        executor=sample_bitstrings,
+        observable=observable,
+        factory=LinearFactory(scale_factors=[1, 3, 5])
+    )
+    true_value = 0.0
+
+    assert abs(zne_value - true_value) < abs(noisy_value - true_value)
 
 
 @pytest.mark.parametrize(

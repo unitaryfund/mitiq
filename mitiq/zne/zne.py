@@ -17,14 +17,16 @@
 from typing import Callable, Optional
 from functools import wraps
 
-from mitiq._typing import QPROGRAM
+from mitiq._typing import QPROGRAM, QuantumResult
 from mitiq.zne.inference import Factory, RichardsonFactory
+from mitiq.observable import Observable
 from mitiq.zne.scaling import fold_gates_at_random
 
 
 def execute_with_zne(
     qp: QPROGRAM,
-    executor: Callable[[QPROGRAM], float],
+    executor: Callable[[QPROGRAM], QuantumResult],
+    observable: Optional[Observable] = None,
     factory: Optional[Factory] = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
@@ -34,7 +36,11 @@ def execute_with_zne(
 
     Args:
         qp: Quantum program to execute with error mitigation.
-        executor: Executes a circuit and returns an expectation value.
+        executor: Executes a circuit and returns a `QuantumResult`.
+        observable: Observable to compute expectation value of. If None,
+            the `executor` must return an expectation value. Otherwise,
+            the `QuantumResult` returned by `executor` is used to compute the
+            expectation of the observable.
         factory: Factory object that determines the zero-noise extrapolation
             method.
         scale_noise: Function for scaling the noise of a quantum circuit.
@@ -59,11 +65,12 @@ def execute_with_zne(
     if num_to_average < 1:
         raise ValueError("Argument `num_to_average` must be a positive int.")
 
-    return factory.run(qp, executor, scale_noise, int(num_to_average)).reduce()
+    return factory.run(qp, executor, observable, scale_noise, int(num_to_average)).reduce()
 
 
 def mitigate_executor(
-    executor: Callable[[QPROGRAM], float],
+    executor: Callable[[QPROGRAM], QuantumResult],
+    observable: Optional[Observable] = None,
     factory: Optional[Factory] = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
@@ -76,7 +83,11 @@ def mitigate_executor(
     extrapolation to produce a mitigated expectation value.
 
     Args:
-        executor: Executes a circuit and returns an expectation value.
+        executor: Executes a circuit and returns a `QuantumResult`.
+        observable: Observable to compute expectation value of. If None,
+            the `executor` must return an expectation value. Otherwise,
+            the `QuantumResult` returned by `executor` is used to compute the
+            expectation of the observable.
         factory: Factory object determining the zero-noise extrapolation
             method.
         scale_noise: Function for scaling the noise of a quantum circuit.
@@ -87,7 +98,7 @@ def mitigate_executor(
     @wraps(executor)
     def new_executor(qp: QPROGRAM) -> float:
         return execute_with_zne(
-            qp, executor, factory, scale_noise, num_to_average
+            qp, executor, observable, factory, scale_noise, num_to_average
         )
 
     return new_executor
@@ -120,7 +131,7 @@ def zne_decorator(
         executor: Callable[[QPROGRAM], float]
     ) -> Callable[[QPROGRAM], float]:
         return mitigate_executor(
-            executor, factory, scale_noise, num_to_average
+            executor, factory, None, scale_noise, num_to_average
         )
 
     return decorator

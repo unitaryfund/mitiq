@@ -37,7 +37,9 @@ from scipy.optimize import curve_fit, OptimizeWarning
 from cirq import Circuit
 
 from mitiq import QPROGRAM
+from mitiq.observable import Observable
 from mitiq.executor import Executor
+from mitiq.zne.scaling import fold_gates_at_random
 from mitiq.interface import accept_any_qprogram_as_input
 
 
@@ -499,7 +501,8 @@ class BatchedFactory(Factory, ABC):
         self,
         qp: QPROGRAM,
         executor: Union[Callable[..., float], Callable[..., List[float]]],
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        observable: Optional[Observable] = None,
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
         num_to_average: int = 1,
     ) -> "BatchedFactory":
         """Computes the expectation values at each scale factor and stores them
@@ -541,19 +544,23 @@ class BatchedFactory(Factory, ABC):
         # Get all noise-scaled circuits to run
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
 
-        # Get the list of keywords associated to each circuit in "to_run"
-        kwargs_list = self._get_keyword_args(num_to_average)
-
-        if Executor.is_batched_executor(executor):
-            if all([kwargs == {} for kwargs in kwargs_list]):
-                res = executor(to_run)
-            else:
-                res = executor(to_run, kwargs_list=kwargs_list)
+        if observable is not None:
+            res = [observable.expectation(circuit, executor) for circuit in to_run]
         else:
-            res = [
-                executor(circ, **kwargs)  # type: ignore
-                for circ, kwargs in zip(to_run, kwargs_list)
-            ]
+            # TODO: Just call Executor(executor).run(...) here.
+            # Get the list of keywords associated to each circuit in "to_run"
+            kwargs_list = self._get_keyword_args(num_to_average)
+
+            if Executor.is_batched_executor(executor):
+                if all([kwargs == {} for kwargs in kwargs_list]):
+                    res = executor(to_run)
+                else:
+                    res = executor(to_run, kwargs_list=kwargs_list)
+            else:
+                res = [
+                    executor(circ, **kwargs)  # type: ignore
+                    for circ, kwargs in zip(to_run, kwargs_list)
+                ]
 
         # Reshape "res" to have "num_to_average" columns
         reshaped = np.array(res).reshape((-1, num_to_average))
