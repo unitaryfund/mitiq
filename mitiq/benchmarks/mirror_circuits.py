@@ -99,7 +99,9 @@ def random_cliffords(
     ]
     qubits = nx.Graph()
     qubits.add_nodes_from(nx.isolates(connectivity_graph))
-    gates.append(random_single_cliffords(qubits, random_state))
+    gates.extend(
+        list(random_single_cliffords(qubits, random_state).all_operations())
+    )
     return cirq.Circuit(gates)
 
 
