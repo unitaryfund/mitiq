@@ -12,14 +12,13 @@ kernelspec:
 ---
 
 # Variational Quantum Eigensolver improved with Zero Noise Extrapolation
-In this example we investigate how Mitiq can help reduce errors
+In this example we investigate how ZNE can help reduce errors
 and improve convergence of a simple VQE problem executed
 on a simulated noisy backend.
 
 
-The pyQuil VQE example shown here is adapted from
-https://grove-docs.readthedocs.io/en/latest/vqe.html#, 
-and the VQE function in Grove.
+The VQE example shown here is adapted from the `VQE` function in Grove and the Grove VQE tutorial at \
+https://grove-docs.readthedocs.io/en/latest/vqe.html#.
 
 ```{code-cell} ipython3
 import numpy as np
@@ -35,6 +34,8 @@ import mitiq
 from mitiq import zne
 from mitiq.zne.scaling.folding import fold_gates_from_right
 ```
+
+## Set up the problem: initialize backend, generate noisy circuit
 
 Use the `get_qc` command to initialize the simulated backend 
 where the pyQuil program will run
@@ -87,6 +88,9 @@ def add_noise_to_circuit(quil_prog):
     return quil_prog
 ```
 
+## Set up VQE: define Hamiltonian and functions to calculate energy expectation value
+
+
  Hamiltonian in this example is just `sigma_z` on the zeroth qubit
 
 ```{code-cell} ipython3
@@ -109,11 +113,9 @@ samples = 3000
 program.wrap_in_numshots_loop(samples)
 ```
 
-Set up the VQE: 
-
 Compute expectation value of the Hamiltonian over the over the distribution 
 generated from the quantum program. The following function is a modified version 
-of `expectation' from https://github.com/rigetti/grove/blob/master/grove/pyvqe/vqe.py. 
+of `expectation` from https://github.com/rigetti/grove/blob/master/grove/pyvqe/vqe.py. 
 Here the noisy gates are defined inside the executor function, since Mitiq 
 does not fold custom gates.
 
@@ -148,7 +150,7 @@ def executor(
     return expectation.real
 ```
 
-The following function is a modified version of `expectation_from_sampling' 
+The following function is a modified version of `expectation_from_sampling` 
 from https://github.com/rigetti/grove/blob/master/grove/pyvqe/vqe.py. 
 It is modified to follow pyQuil conventions for defining custom gates.
 
@@ -175,9 +177,8 @@ def expectation_from_sampling(
     return exp_val
 ```
 
-Calculate the parity of elements at indexes in marked_qubits
-The function is a modified version of `parity_even_p` from 
-https://github.com/rigetti/grove/blob/master/grove/pyvqe/vqe.py.
+Calculate the parity of elements at indexes in marked_qubits. The function is a modified version of 
+`parity_even_p` from https://github.com/rigetti/grove/blob/master/grove/pyvqe/vqe.py.
 
 ```{code-cell} ipython3
 def parity_even_p(state, marked_qubits):
@@ -187,7 +188,9 @@ def parity_even_p(state, marked_qubits):
     return bin(mask & state).count("1") % 2 == 0
 ```
 
-Scan over the parameter theta and plot energy expecation, without mitigation
+## Run VQE first without error mitigation and then with ZNE, and compare results
+
+Scan over the parameter theta and plot energy expecation, without mitigation:
 
 ```{code-cell} ipython3
 thetas = np.linspace(0, 2 * np.pi, 51)
@@ -197,7 +200,7 @@ for theta in thetas:
     results.append(executor(theta, backend, readout_qubit, samples, hamiltonian, program))
 ```
 
-Run VQE routine without noise mitigation
+Optimization routine without mitigation:
 
 ```{code-cell} ipython3
 init_angle = [3.0]
@@ -212,9 +215,9 @@ res = optimize.minimize(
 print(res)
 ```
 
-Now we introduce as quantum error  mitigation technique, Zero Noise Extrapolation.
+### Now we introduce as quantum error mitigation technique, Zero Noise Extrapolation.
 
-We first create a new objective function to calculate the expectation value with noise mitigation
+We first create a new objective function to calculate the expectation value:
 
 ```{code-cell} ipython3
 def mitigated_expectation(
@@ -229,7 +232,9 @@ def mitigated_expectation(
     return mitigated_exp
 ```
 
-Here we use a linear technique for the Zero Noise Extrapolation
+Here we use a linear technique for the Zero Noise Extrapolation. 
+See the section on factory objects in the Mitiq user guide for more information: 
+https://mitiq.readthedocs.io/en/latest/guide/guide-zne.html#classical-fitting-and-extrapolation-factory-objects
 
 ```{code-cell} ipython3
 fac = mitiq.zne.inference.LinearFactory(scale_factors=[1.0, 3.0])
