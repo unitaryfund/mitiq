@@ -29,18 +29,18 @@ paulis = [cirq.X, cirq.Y, cirq.Z, cirq.I]
 
 
 def random_paulis(
-    nqubits: int, random_state: random.RandomState
+    connectivity_graph: nx.Graph, random_state: random.RandomState
 ) -> cirq.Circuit:
     """Returns a circuit with randomly selected Pauli gates on each qubit.
 
     Args:
-        nqubits: The number of qubits in the circuit.
+        connectivity_graph: Connectivity graph of device to run circuit on.
         random_state: Random state to select Paulis I, X, Y, Z uniformly at
             random.
     """
     return cirq.Circuit(
         paulis[random_state.randint(len(paulis))](cirq.LineQubit(x))
-        for x in range(nqubits)
+        for x in connectivity_graph.nodes
     )
 
 
@@ -141,7 +141,7 @@ def generate_mirror_circuit(
         raise ValueError("two_qubit_gate_prob must be between 0 and 1")
 
     random_state = random.RandomState(seed)
-    nqubits = connectivity_graph.number_of_nodes()
+    # nqubits = connectivity_graph.number_of_nodes()
     single_qubit_cliffords = random_single_cliffords(
         connectivity_graph, random_state=random_state
     )
@@ -152,7 +152,7 @@ def generate_mirror_circuit(
     quasi_inverse_gates = []
 
     for _ in range(nlayers):
-        forward_circuit.append(random_paulis(nqubits, random_state))
+        forward_circuit.append(random_paulis(connectivity_graph, random_state))
 
         selected_edges = edge_grab(
             two_qubit_gate_prob, connectivity_graph, random_state
@@ -160,14 +160,16 @@ def generate_mirror_circuit(
         circ = random_cliffords(selected_edges, random_state)
         forward_circuit.append(circ)
 
-        quasi_inverse_gates.append(random_paulis(nqubits, random_state))
+        quasi_inverse_gates.append(
+            random_paulis(connectivity_graph, random_state)
+        )
         quasi_inverse_gates.append(cirq.inverse(circ))
 
     quasi_inversion_circuit.append(
         gate for gate in reversed(quasi_inverse_gates)
     )
 
-    rand_paulis = cirq.Circuit(random_paulis(nqubits, random_state))
+    rand_paulis = cirq.Circuit(random_paulis(connectivity_graph, random_state))
     circuit = (
         single_qubit_cliffords
         + forward_circuit
