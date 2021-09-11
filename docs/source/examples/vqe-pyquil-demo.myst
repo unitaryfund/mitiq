@@ -274,7 +274,7 @@ print(res_zne)
 [1] Rigetti Computing (2018) Grove (Version 1.7.0) 
 [[Source code].](https://github.com/rigetti/grove/blob/master/grove/pyvqe/vqe.py)
 
-[2] [[VQE tutorial in pyQuil].](https://grove-docs.readthedocs.io/en/latest/vqe.html)
+[2] [[VQE tutorial in pyQuil / Grove].](https://grove-docs.readthedocs.io/en/latest/vqe.html)
 
 +++
 
