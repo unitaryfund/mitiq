@@ -32,24 +32,14 @@ all_gates = paulis + all_cliffords
 all_gates.append(cirq.measure)
 
 
-@pytest.mark.parametrize(
-    "graph",
-    [
-        nx.Graph({3: (4,), 4: (3, 6), 5: (6,)}),
-        nx.Graph({0: (99,), 10: (20,), 5: (6,)}),
-    ],
-)
-def test_random_paulis(graph):
-    print(graph.nodes)
-    print(graph.edges)
+@pytest.mark.parametrize("n", (0, 5))
+def test_random_paulis(n):
     circuit = mirror_circuits.random_paulis(
-        connectivity_graph=graph, random_state=random.RandomState()
+        nqubits=n, random_state=random.RandomState()
     )
     assert isinstance(circuit, cirq.Circuit)
-    assert len(circuit.all_qubits()) == len(graph.nodes)
-    for qubit in circuit.all_qubits():
-        assert qubit.x in graph.nodes
-    assert len(list(circuit.all_operations())) == len(graph.nodes)
+    assert len(circuit.all_qubits()) == n
+    assert len(list(circuit.all_operations())) == n
     assert set(op.gate for op in circuit.all_operations()).issubset(paulis)
 
 
