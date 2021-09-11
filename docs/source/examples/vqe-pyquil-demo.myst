@@ -17,8 +17,8 @@ and improve convergence of a simple VQE problem executed
 on a simulated noisy backend.
 
 
-The VQE example shown here is adapted from the `VQE` function in Grove and the Grove VQE tutorial at \
-https://grove-docs.readthedocs.io/en/latest/vqe.html#.
+The VQE example shown here is adapted from the `VQE` function in Grove [[1]](#References) and the 
+pyQuil / Grove VQE tutorial [[2]](#References).
 
 ```{code-cell} ipython3
 import numpy as np
@@ -88,7 +88,7 @@ def add_noise_to_circuit(quil_prog):
     return quil_prog
 ```
 
-## Set up VQE: define Hamiltonian and functions to calculate energy expectation value
+## Set up VQE: define Hamiltonian and energy expectation functions
 
 
  Hamiltonian in this example is just `sigma_z` on the zeroth qubit
@@ -115,9 +115,8 @@ program.wrap_in_numshots_loop(samples)
 
 Compute expectation value of the Hamiltonian over the over the distribution 
 generated from the quantum program. The following function is a modified version 
-of `expectation` from https://github.com/rigetti/grove/blob/master/grove/pyvqe/vqe.py. 
-Here the noisy gates are defined inside the executor function, since Mitiq 
-does not fold custom gates.
+of `expectation` from the `VQE` function in Grove [[1]](#References). Here the noisy 
+gates are defined inside the executor function, since Mitiq does not fold custom gates.
 
 ```{code-cell} ipython3
 def executor(
@@ -151,8 +150,8 @@ def executor(
 ```
 
 The following function is a modified version of `expectation_from_sampling` 
-from https://github.com/rigetti/grove/blob/master/grove/pyvqe/vqe.py. 
-It is modified to follow pyQuil conventions for defining custom gates.
+from the `VQE` function in Grove [[1]](#References). It is modified to follow pyQuil 
+conventions for defining custom gates.
 
 ```{code-cell} ipython3
 def expectation_from_sampling(
@@ -177,8 +176,8 @@ def expectation_from_sampling(
     return exp_val
 ```
 
-Calculate the parity of elements at indexes in marked_qubits. The function is a modified version of 
-`parity_even_p` from https://github.com/rigetti/grove/blob/master/grove/pyvqe/vqe.py.
+Calculate the parity of elements at indexes in marked_qubits. The function is a 
+modified version of `parity_even_p` from the `VQE` function in Grove [[1]](#References).
 
 ```{code-cell} ipython3
 def parity_even_p(state, marked_qubits):
@@ -233,7 +232,7 @@ def mitigated_expectation(
 ```
 
 Here we use a linear technique for the Zero Noise Extrapolation. 
-See the section on factory objects in the Mitiq user guide for more information: 
+See the section on Factory Objects in the Mitiq user guide for more information: 
 https://mitiq.readthedocs.io/en/latest/guide/guide-zne.html#classical-fitting-and-extrapolation-factory-objects
 
 ```{code-cell} ipython3
@@ -272,15 +271,14 @@ print(res_zne)
 ```
 
 ## References
-[1] [VQE tutorial in PyQuil.]
-https://grove-docs.readthedocs.io/en/latest/vqe.html#
+[1] Rigetti Computing (2018) Grove (Version 1.7.0) 
+[[Source code].](https://github.com/rigetti/grove/blob/master/grove/pyvqe/vqe.py)
 
-[2] Rigetti Computing (2018) Grove (Version 1.7.0) 
-[Source code].https://github.com/rigetti/grove
+[2] [[VQE tutorial in pyQuil].](https://grove-docs.readthedocs.io/en/latest/vqe.html)
 
 +++
 
-This final blog displays information about Mitiq, installed packages, and Python version/platform
+This final block displays information about Mitiq, installed packages, and Python version/platform
 
 ```{code-cell} ipython3
 mitiq.about()
