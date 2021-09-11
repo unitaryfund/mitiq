@@ -168,3 +168,27 @@ def test_mirror_circuits_conversions(return_type):
         return_type=return_type,
     )
     assert return_type in circuit.__module__
+
+
+@pytest.mark.parametrize(
+    "twoq_name_and_gate", [("CNOT", cirq.CNOT), ("CZ", cirq.CZ)]
+)
+def test_two_qubit_gate(twoq_name_and_gate):
+    twoq_name, twoq_gate = twoq_name_and_gate
+    circuit = mirror_circuits.generate_mirror_circuit(
+        nlayers=2,
+        two_qubit_gate_prob=1.0,
+        connectivity_graph=nx.complete_graph(5),
+        two_qubit_gate_name=twoq_name,
+    )
+    two_qubit_gates = {
+        op.gate for op in circuit.all_operations() if len(op.qubits) == 2
+    }
+    assert two_qubit_gates == {twoq_gate}
+
+
+def test_two_qubit_gate_unsupported():
+    with pytest.raises(ValueError, match="Supported two-qubit gate names are"):
+        mirror_circuits.generate_mirror_circuit(
+            1, 1.0, nx.complete_graph(2), two_qubit_gate_name="bad_gate_name"
+        )
