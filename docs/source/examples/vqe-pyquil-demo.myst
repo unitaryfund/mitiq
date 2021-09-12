@@ -12,13 +12,32 @@ kernelspec:
 ---
 
 # Variational Quantum Eigensolver improved with Zero Noise Extrapolation
-In this example we investigate how ZNE can help reduce errors
-and improve convergence of a simple VQE problem executed
-on a simulated noisy backend.
+
+In this example we investigate how Zero Noise Extrapolation (ZNE) can improve 
+convergence when applied to a variational problem. ZNE works by computing the 
+observable of interest at increased noise levels, i.e. beyond the minimum noise 
+strength in the computer, and then extrapolating back to the zero-noise limit. 
+The two main components of ZNE are noise scaling and extrapolation. Read more about 
+ZNE in the [[Mitiq User Guide]]
+(https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html#noise-scaling-by-unitary-folding).\
+\
+
+The Variational Quantum Eigensolver (VQE) is a hybrid quantum-classical algorithm used to
+solve eigenvalue and optimization problems. The VQE algorithm consists of a quantum 
+subroutine run inside of a classical optimization loop. In this example, the goal of the 
+optimization is to find the smallest eigenvalue of a matix H, which is the Hamiltonian 
+of a simple quantum system. The quantum subroutine prepares the quantum state 
+|Ψ(vec(θ))⟩ and measures the expectation value ⟨Ψ(vec(θ))|H|Ψ(vec(θ))⟩. By the 
+variational principle, ⟨Ψ(vec(θ))|H|Ψ(vec(θ))⟩ is always greater than the smallest 
+eigenvalue of H, which means a classical optimization loop can be used to find this 
+eigenvalue. \
+\
+
+The VQE example shown here is adapted from the `VQE` function in Grove 
+[[1]](#References) and the pyQuil / Grove VQE tutorial [[2]](#References). 
 
 
-The VQE example shown here is adapted from the `VQE` function in Grove [[1]](#References) and the 
-pyQuil / Grove VQE tutorial [[2]](#References).
+## Defining the quantum system using pyQuil
 
 ```{code-cell} ipython3
 import numpy as np
@@ -35,8 +54,6 @@ from mitiq import zne
 from mitiq.zne.scaling.folding import fold_gates_from_right
 ```
 
-## Set up the problem: initialize backend, generate noisy circuit
-
 Use the `get_qc` command to initialize the simulated backend 
 where the pyQuil program will run
 
@@ -44,7 +61,7 @@ where the pyQuil program will run
 backend = get_qc("2q-qvm")
 ```
 
-Example ansatz
+Define example ansatz, consisting of a rotation by angle `theta` and a layer of static gates: 
 
 ```{code-cell} ipython3
 program = Program()
@@ -56,7 +73,7 @@ program += S(0)
 program += Z(0)
 ```
 
-Simulate depolarizing noise on the static gates
+Simulate depolarizing noise on the static gates:
 
 ```{code-cell} ipython3
 def add_noise_to_circuit(quil_prog):
@@ -116,7 +133,8 @@ program.wrap_in_numshots_loop(samples)
 Compute expectation value of the Hamiltonian over the over the distribution 
 generated from the quantum program. The following function is a modified version 
 of `expectation` from the `VQE` function in Grove [[1]](#References). Here the noisy 
-gates are defined inside the executor function, since Mitiq does not fold custom gates.
+gates are defined inside the executor function via `add_noise_to_circuit`, since 
+pyQuil custom gates cannot be folded in Mitiq.
 
 ```{code-cell} ipython3
 def executor(
@@ -189,7 +207,7 @@ def parity_even_p(state, marked_qubits):
 
 ## Run VQE first without error mitigation and then with ZNE, and compare results
 
-Scan over the parameter theta and plot energy expecation, without mitigation:
+Scan over the parameter `theta` and plot energy expecation, without mitigation:
 
 ```{code-cell} ipython3
 thetas = np.linspace(0, 2 * np.pi, 51)
@@ -231,7 +249,7 @@ def mitigated_expectation(
     return mitigated_exp
 ```
 
-Here we use a linear technique for the Zero Noise Extrapolation. 
+Here we use a linear inference for the Zero Noise Extrapolation. 
 See the section on Factory Objects in the Mitiq user guide for more information: 
 https://mitiq.readthedocs.io/en/latest/guide/guide-zne.html#classical-fitting-and-extrapolation-factory-objects
 
@@ -269,6 +287,15 @@ res_zne = optimize.minimize(
 )
 print(res_zne)
 ```
+
+While the VQE algorithm is generally considered to be robust to noise 
+[[2]](#References), at the noise level modeled in this example, the 
+accumluation of errors results in loss of accuracy and additional iterations 
+required to reach convergence. Adding ZNE then improves the accuracy of the 
+calculation and reduces the number of iterations required to reach the 
+minimum energy. The result is also demonstrated in the energy landscape plot, 
+where the noisy landscape is noticeably flatter than the landscape generated with ZNE.
+
 
 ## References
 [1] Rigetti Computing (2018) Grove (Version 1.7.0) 
