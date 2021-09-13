@@ -18,9 +18,8 @@ convergence when applied to a variational problem. ZNE works by computing the
 observable of interest at increased noise levels, i.e. beyond the minimum noise 
 strength in the computer, and then extrapolating back to the zero-noise limit. 
 The two main components of ZNE are noise scaling and extrapolation. Read more about 
-ZNE in the [[Mitiq User Guide]]
-(https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html#noise-scaling-by-unitary-folding).\
-\
+ZNE in the [[Mitiq User Guide]](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html#noise-scaling-by-unitary-folding).
+
 
 The Variational Quantum Eigensolver (VQE) is a hybrid quantum-classical algorithm used to
 solve eigenvalue and optimization problems. The VQE algorithm consists of a quantum 
@@ -30,8 +29,8 @@ of a simple quantum system. The quantum subroutine prepares the quantum state
 |Ψ(vec(θ))⟩ and measures the expectation value ⟨Ψ(vec(θ))|H|Ψ(vec(θ))⟩. By the 
 variational principle, ⟨Ψ(vec(θ))|H|Ψ(vec(θ))⟩ is always greater than the smallest 
 eigenvalue of H, which means a classical optimization loop can be used to find this 
-eigenvalue. \
-\
+eigenvalue. 
+
 
 The VQE example shown here is adapted from the `VQE` function in Grove 
 [[1]](#References) and the pyQuil / Grove VQE tutorial [[2]](#References). 
@@ -61,7 +60,7 @@ where the pyQuil program will run
 backend = get_qc("2q-qvm")
 ```
 
-Define example ansatz, consisting of a rotation by angle `theta` and a layer of static gates: 
+Define example ansatz, consisting of a rotation by angle `theta` and a layer of static gates:
 
 ```{code-cell} ipython3
 program = Program()
@@ -207,7 +206,9 @@ def parity_even_p(state, marked_qubits):
 
 ## Run VQE first without error mitigation and then with ZNE, and compare results
 
-Scan over the parameter `theta` and plot energy expecation, without mitigation:
+Scan over the parameter `theta` and calculate energy expectation, without mitigation. 
+In a later section we will plot these results and compare them with the results from 
+ZNE.
 
 ```{code-cell} ipython3
 thetas = np.linspace(0, 2 * np.pi, 51)
@@ -232,9 +233,17 @@ res = optimize.minimize(
 print(res)
 ```
 
-### Now we introduce as quantum error mitigation technique, Zero Noise Extrapolation.
+The result on the unmitigated noisy circuit result in loss of accuracy (relative to 
+the ideal expectation value of -1.0) and additional iterations required to reach 
+convergence. 
 
-We first create a new objective function to calculate the expectation value:
+
+### Now we introduce ZNE and compare results.
+
+This is done by wrapping the noisy executor into a mitigated executor. 
+We will fold the gates from the right and apply a linear inference (using a Linear 
+Factory object) to implement ZNE. Read more about noise scaling by unitary folding 
+in the [Mitiq user guide]
 
 ```{code-cell} ipython3
 def mitigated_expectation(
@@ -249,9 +258,9 @@ def mitigated_expectation(
     return mitigated_exp
 ```
 
-Here we use a linear inference for the Zero Noise Extrapolation. 
-See the section on Factory Objects in the Mitiq user guide for more information: 
-https://mitiq.readthedocs.io/en/latest/guide/guide-zne.html#classical-fitting-and-extrapolation-factory-objects
+Here we use a linear inference for the extrapolation. 
+See the section on Factory Objects in the [Mitiq user guide] (https://mitiq.readthedocs.io/en/latest/guide/guide-zne.html#classical-fitting-and-extrapolation-factory-objects) 
+for more information:
 
 ```{code-cell} ipython3
 fac = mitiq.zne.inference.LinearFactory(scale_factors=[1.0, 3.0])
@@ -267,15 +276,21 @@ for theta in thetas:
     )
 
 _ = plt.figure()
+_ = plt.plot(thetas, np.cos(thetas), "o-", label="Ideal landscape")
 _ = plt.plot(thetas, results, "o-", label="Noisy landscape")
 _ = plt.plot(thetas, results_zne, "o-", label="Mitigated landscape")
 _ = plt.xlabel(r"$\theta$", fontsize=18)
 _ = plt.ylabel(r"$\langle \Psi(\theta) | Z | \Psi(\theta) \rangle$", fontsize=18)
+_ = plt.legend()
 _ = plt.title("Mitigated Energy Landscape")
 plt.show()
 ```
 
-Run VQE routine with noise mitigation
+In the energy landscape plot, we can see that the noise has flattened the unmitigated 
+landscape and with error mitigation it has become peaked again. Therefore, we expect 
+the optimization loop to have better convergence with ZNE applied.
+
+Run VQE routine with ZNE
 
 ```{code-cell} ipython3
 res_zne = optimize.minimize(
@@ -288,13 +303,22 @@ res_zne = optimize.minimize(
 print(res_zne)
 ```
 
+We can see that the convergence to the minimum energy is enhanced by applying ZNE.
+
+
+## Conclusion
+
 While the VQE algorithm is generally considered to be robust to noise 
 [[2]](#References), at the noise level modeled in this example, the 
 accumluation of errors results in loss of accuracy and additional iterations 
-required to reach convergence. Adding ZNE then improves the accuracy of the 
-calculation and reduces the number of iterations required to reach the 
-minimum energy. The result is also demonstrated in the energy landscape plot, 
-where the noisy landscape is noticeably flatter than the landscape generated with ZNE.
+required to reach convergence. Adding ZNE then improves the convergence of the 
+algorithm to the minimum energy. The result is also demonstrated in the energy 
+landscape plot, where the noisy landscape is noticeably flatter than the landscape 
+generated with ZNE.
+
+Note: In this example, a small ansatz was used to keep the runtime within acceptable 
+limits. ZNE generally performs better on longer circuits, but there is a tradeoff with 
+execution time.
 
 
 ## References
