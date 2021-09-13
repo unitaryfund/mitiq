@@ -7,5 +7,6 @@ maxcut-demo.myst
 Understanding probabilistic error cancellation (PEC) <pec-tutorial.myst>
 Zero noise extrapolation on IBMQ backends<ibmq-backends.myst>
 Zero noise extrapolation on PyQuil parametric programs <pyquil_demo.myst>
+Variational Quantum Eigensolver improved with Zero Noise Extrapolation <vqe-pyquil-demo.myst>
 cdr_api.md
 mitiq-paper/mitiq-paper-codeblocks
