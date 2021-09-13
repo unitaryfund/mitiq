@@ -11,6 +11,9 @@ updates:
       interval: "daily"
     allow:
       - dependency-type: "all"
+    ignore:
+      - dependency-name: "*pytest*", "flake8", "black", "mypy", "*sphinx*", "myst*", "jupytext"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
     # Allow up to 10 open pull requests for pip dependencies
     open-pull-requests-limit: 10
     labels:
