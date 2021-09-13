@@ -255,6 +255,9 @@ def mitigated_expectation(
         factory,
         fold_gates_from_right,
     )
+    """This function is the ZNE-wrapped executor, which returns the mitigated 
+    expectation value.    
+    """
     return mitigated_exp
 ```
 
