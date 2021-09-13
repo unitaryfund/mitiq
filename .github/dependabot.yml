@@ -17,7 +17,7 @@ updates:
       - dependency-name: "flake8"
         update-types: ["version-update:semver-minor", "version-update:semver-patch"]
       - dependency-name: "black"
-        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+        update-types: ["version-update:semver-major", "version-update:semver-minor", "version-update:semver-patch"]
       - dependency-name: "mypy"
         update-types: ["version-update:semver-minor", "version-update:semver-patch"]
       - dependency-name: "*sphinx*"
