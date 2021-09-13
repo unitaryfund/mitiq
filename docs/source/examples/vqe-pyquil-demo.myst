@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# Variational Quantum Eigensolver improved with Zero Noise Extrapolation
+# Variational Quantum Eigensolver improved with Zero Noise Extrapolation 
 
 In this example we investigate how Zero Noise Extrapolation (ZNE) can improve 
 convergence when applied to a variational problem. ZNE works by computing the 
