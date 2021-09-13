@@ -80,6 +80,12 @@ def add_noise_to_circuit(quil_prog):
         1. Generate Kraus operators at given survival probability
         2. Append Kraus operators to the gate matrices
         3. Add custom gates to circuit
+
+    Args:
+      quil_prog: the pyQuil quantum program to which the noise model will be added
+      
+    Returns:
+      A quantum program with depolarizing noise on the static gates.
     """
     prob = 0.8
     num_qubits = 1
@@ -255,8 +261,21 @@ def mitigated_expectation(
         factory,
         fold_gates_from_right,
     )
-    """This function is the ZNE-wrapped executor, which returns the mitigated 
-    expectation value.    
+    """
+    This function is the ZNE-wrapped executor, which outputs the error-mitigated 
+    expectation value. 
+
+    Args:
+      thetas: the input parameter for the optimization
+      backend: the quantum computer that runs the quantum program
+      readout_qubit: declared memory for the readout
+      samples: number of times the experiment (or simulation) will be run
+      pauli_sum: the Hamiltonian expressed as 
+      executable: the pyQuil quantum program
+      factory: factory object containing the type of inference and scaling parameters
+
+    Returns:
+      The error-mitigated expectation value as a float.
     """
     return mitigated_exp
 ```
