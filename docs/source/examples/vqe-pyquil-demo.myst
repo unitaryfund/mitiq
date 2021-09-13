@@ -92,13 +92,13 @@ def add_noise_to_circuit(quil_prog):
     k_list[0] += prob
     k_ops = pauli_kraus_map(k_list)
     T_gate = np.array([[1, 0], [0, np.exp(1j * np.pi / 4)]])
-    CN_gate = np.block(
+    CNOT_gate = np.block(
         [[np.eye(2), np.zeros((2, 2))], [np.zeros((2, 2)), np.flip(np.eye(2), 1)]]
     )
     S_gate = np.array([[1, 0], [0, 1j]])
     Z_gate = np.array([[1, 0], [0, -1]])
     quil_prog.define_noisy_gate("T", [0], append_kraus_to_gate(kraus_ops, T_gate))
-    quil_prog.define_noisy_gate("CNOT", [1, 0], append_kraus_to_gate(k_ops, CN_gate))
+    quil_prog.define_noisy_gate("CNOT", [1, 0], append_kraus_to_gate(k_ops, CNOT_gate))
     quil_prog.define_noisy_gate("S", [0], append_kraus_to_gate(kraus_ops, S_gate))
     quil_prog.define_noisy_gate("Z", [0], append_kraus_to_gate(kraus_ops, Z_gate))
     return quil_prog
