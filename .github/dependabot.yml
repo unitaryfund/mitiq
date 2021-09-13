@@ -12,7 +12,19 @@ updates:
     allow:
       - dependency-type: "all"
     ignore:
-      - dependency-name: "*pytest*", "flake8", "black", "mypy", "*sphinx*", "myst*", "jupytext"
+      - dependency-name: "*pytest*"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+      - dependency-name: "flake8"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+      - dependency-name: "black"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+      - dependency-name: "mypy"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+      - dependency-name: "*sphinx*"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+      - dependency-name: "myst*"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+      - dependency-name: "jupytext"
         update-types: ["version-update:semver-minor", "version-update:semver-patch"]
     # Allow up to 10 open pull requests for pip dependencies
     open-pull-requests-limit: 10
