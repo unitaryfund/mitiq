@@ -9,7 +9,7 @@ amazon-braket-sdk~=1.8.0
 pytest-xdist[psutil]~=2.3.0
 pytest-cov~=2.12.1
 flake8~=3.9.2
-black~=19.10b0
+black~=20.8b1
 mypy~=0.910
 
 # Documentation and examples.
