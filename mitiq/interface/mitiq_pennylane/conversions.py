@@ -48,7 +48,9 @@ def from_pennylane(tape: QuantumTape) -> Circuit:
         )
 
     if not all(m.return_type is Expectation for m in tape.measurements):
-        raise UnsupportedQuantumTapeError("Only expectation value measurements are supported.")
+        raise UnsupportedQuantumTapeError(
+            "Only expectation value measurements are supported."
+        )
     return cirq_from_qasm(tape.to_openqasm(rotations=True, wires=wires))
 
 

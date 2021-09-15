@@ -76,7 +76,10 @@ def test_no_variance():
         qml.CNOT(wires=[0, 1])
         qml.var(qml.PauliZ(0))
 
-    with pytest.raises(UnsupportedQuantumTapeError, match="Only expectation value measurements"):
+    with pytest.raises(
+        UnsupportedQuantumTapeError,
+        match="Only expectation value measurements",
+    ):
         from_pennylane(tape)
 
 
