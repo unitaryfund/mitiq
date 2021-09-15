@@ -32,9 +32,9 @@ def noiseless_executor(program: pyquil.Program) -> float:
     executable = QVM.compiler.native_quil_to_executable(program)
     results = QVM.run(executable)
 
-    num_shots = len(results)
+    num_shots = len(results.readout_data.get('ro'))
     return (
-        num_shots - np.count_nonzero(np.count_nonzero(results, axis=1))
+        num_shots - np.count_nonzero(np.count_nonzero(results.readout_data.get('ro'), axis=1))
     ) / num_shots
 
 
