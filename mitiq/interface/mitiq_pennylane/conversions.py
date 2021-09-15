@@ -31,10 +31,13 @@ class UnsupportedQuantumTapeError(Exception):
 
 
 def from_pennylane(tape: QuantumTape) -> Circuit:
-    """Returns a Cirq circuit equivalent to the input QuantumTape.
+    """Returns a Mitiq circuit equivalent to the input QuantumTape.
 
     Args:
-        tape: Pennylane QuantumTape to convert to a Cirq circuit.
+        tape: Pennylane QuantumTape to convert to a Mitiq circuit.
+
+    Returns:
+        Mitiq circuit representation equivalent to the input QuantumTape.
     """
     try:
         wires = sorted(tape.wires)
@@ -50,10 +53,13 @@ def from_pennylane(tape: QuantumTape) -> Circuit:
 
 
 def to_pennylane(circuit: Circuit) -> QuantumTape:
-    """Returns a QuantumTape equivalent to the input Cirq circuit.
+    """Returns a QuantumTape equivalent to the input Mitiq circuit.
 
     Args:
-        circuit: Cirq circuit to convert to a Pennylane QuantumTape.
+        circuit: Mitiq circuit to convert to a Pennylane QuantumTape.
+
+    Returns:
+        QuantumTape object equivalent to the input Mitiq circuit.
     """
     qfunc = pennylane_from_qasm(to_qasm(circuit))
 
