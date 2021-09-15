@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
+import inspect
 from typing import Callable, cast, List, Optional, Set
 
 import numpy as np
@@ -21,6 +22,7 @@ import cirq
 
 from mitiq.observable.pauli import PauliString, PauliStringCollection
 from mitiq._typing import MeasurementResult, QuantumResult, QPROGRAM
+from mitiq.executor import Executor
 
 
 class Observable:
@@ -80,10 +82,15 @@ class Observable:
     def measure_in(self, circuit: QPROGRAM) -> List[QPROGRAM]:
         return [pset.measure_in(circuit) for pset in self._groups]
 
-    def matrix(self, dtype: type = np.complex128) -> np.ndarray:
+    def matrix(
+        self,
+        qubit_indices: Optional[List[int]] = None,
+        dtype: type = np.complex128,
+    ) -> np.ndarray:
         """Returns the (potentially very large) matrix of the Observable."""
-        qubit_indices = self.qubit_indices
-        n = self.nqubits
+        if qubit_indices is None:
+            qubit_indices = self.qubit_indices
+        n = len(qubit_indices)
 
         matrix = np.zeros(shape=(2 ** n, 2 ** n), dtype=dtype)
         for pauli in self._paulis:
@@ -94,16 +101,34 @@ class Observable:
         return matrix
 
     def expectation(
-        self, circuit: QPROGRAM, executor: Callable[[QPROGRAM], QuantumResult]
+        self, circuit: QPROGRAM, execute: Callable[[QPROGRAM], QuantumResult]
     ) -> float:
-        # TODO: Implement. Pass circuits from self.measure_in(circuit=circuit)
-        #  to Collector(executor) to get QuantumResults, then return
-        #  self.expectation_from(quantum_results=quantum_results)
-        raise NotImplementedError
+        result_type = inspect.getfullargspec(execute).annotations.get("return")
 
-    def expectation_from(self, quantum_results: List[QuantumResult]) -> float:
-        # TODO: Dispatch to correct function based on type of quantum result.
-        raise NotImplementedError
+        if result_type is MeasurementResult:
+            to_run = self.measure_in(circuit)
+            results = Executor(execute).run(to_run)
+            return self._expectation_from_measurements(
+                cast(List[MeasurementResult], results)
+            )
+        elif result_type is np.ndarray:
+            density_matrix = cast(np.ndarray, execute(circuit))
+            observable_matrix = self.matrix()
+
+            if density_matrix.shape != observable_matrix.shape:
+                nqubits = int(np.log2(density_matrix.shape[0]))
+                density_matrix = cirq.partial_trace(
+                    np.reshape(density_matrix, newshape=[2, 2] * nqubits),
+                    keep_indices=self.qubit_indices,
+                ).reshape(observable_matrix.shape)
+
+            return np.trace(density_matrix @ self.matrix())
+        else:
+            raise ValueError(
+                f"Arg `execute` must be a function with annotated return type "
+                f"that is either mitiq.MeasurementResult or np.ndarray but "
+                f"was {result_type}."
+            )
 
     def _expectation_from_measurements(
         self, measurements: List[MeasurementResult]

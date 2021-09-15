@@ -25,6 +25,8 @@
 """
 from typing import Union
 
+import numpy as np
+
 from cirq import Circuit as _Circuit
 from mitiq.rem.measurement_result import MeasurementResult
 
@@ -63,7 +65,7 @@ QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit, _BKCircuit]
 QuantumResult = Union[
     float,  # The expectation value itself.
     MeasurementResult,  # Sampled bitstrings.
+    np.ndarray,  # Density matrix.
     # TODO: Support the following:
-    # np.ndarray,  # Density matrix.
     # Sequence[np.ndarray],  # Wavefunctions sampled via quantum trajectories.
 ]

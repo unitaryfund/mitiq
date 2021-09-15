@@ -62,14 +62,14 @@ def generate_collected_executor(
         raise ValueError("Arg `executor` must be callable.")
 
     def collected(circuits: Any) -> List[QuantumResult]:
-        return Collector(executor, max_batch_size).run(
+        return Executor(executor, max_batch_size).run(
             circuits, force_run_all=force_run_all, **kwargs
         )
 
     return collected
 
 
-class Collector:
+class Executor:
     """Tool for efficiently scheduling/executing quantum programs and
     collecting the results.
     """
@@ -89,7 +89,7 @@ class Collector:
                 single batch (if the executor is batched).
         """
         self._executor = executor
-        self._can_batch = Collector.is_batched_executor(executor)
+        self._can_batch = Executor.is_batched_executor(executor)
         self._max_batch_size = max_batch_size
 
         self._executed_circuits: List[QPROGRAM] = []
@@ -170,11 +170,10 @@ class Collector:
         result = self._executor(to_run, **kwargs)  # type: ignore
         self._calls_to_executor += 1
 
-        try:
-            result = list(result)
-            self._computed_results += result
-            self._executed_circuits += to_run
-        except TypeError:
+        if self.can_batch:
+            self._computed_results.extend(result)
+            self._executed_circuits.extend(to_run)
+        else:
             self._computed_results.append(result)
             self._executed_circuits.append(to_run)
 

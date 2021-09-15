@@ -153,5 +153,4 @@ More details can be found in the
 Qiskit: Hardware
 ------------------------------------------------------------
 
-An example of an executor that runs on IBMQ hardware is given
-:ref:`here <high_level_usage>`.
+An example of an executor that runs on IBMQ hardware is given in the examples.
