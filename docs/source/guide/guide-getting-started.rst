@@ -273,7 +273,7 @@ whose representation in the presence of depolarizing noise can be obtained as fo
 
 .. testoutput::
 
-    0: ───X─── = 1.010*(0: ───X───)-0.003*(0: ───X───X───)-0.003*(0: ───X───Y───)-0.003*(0: ───X───Z───)
+    0: ───X─── = 1.010(0: ───X───)-0.003(0: ───X───X───)-0.003(0: ───X───Y───)-0.003(0: ───X───Z───)
 
 .. note::
 
