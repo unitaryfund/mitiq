@@ -2,12 +2,12 @@
 
 ```{nbgallery}
 Defining a Mitiq executor with a hamiltonian <hamiltonians.md>
-Variational circuit mitigation with zero noise extrapolation  <simple_landscape.myst>
-maxcut-demo.myst
+Variational circuit mitigation with zero-noise extrapolation <simple_landscape.myst>
+MaxCut benchmark <maxcut-demo.myst>
 Understanding probabilistic error cancellation (PEC) <pec-tutorial.myst>
-Zero noise extrapolation on IBMQ backends<ibmq-backends.myst>
-Zero noise extrapolation on PyQuil parametric programs <pyquil_demo.myst>
-Variational Quantum Eigensolver improved with Zero Noise Extrapolation <vqe-pyquil-demo.myst>
-cdr_api.md
+Zero-noise extrapolation on IBMQ backends<ibmq-backends.myst>
+Zero-noise extrapolation on PyQuil parametric programs <pyquil_demo.myst>
+Variational quantum eigensolver improved with zero-noise extrapolation <vqe-pyquil-demo.myst>
+Clifford data regression API <cdr_api.md>
 Mirror circuit benchmark improved with zero-noise extrapolation on AWS Braket <braket_mirror_circuit.md>
-mitiq-paper/mitiq-paper-codeblocks
+Mitiq paper codeblocks <mitiq-paper/mitiq-paper-codeblocks>
