@@ -526,17 +526,17 @@ class OperationRepresentation:
                     c_str = "+" + c_str
                 if len(self._ideal.all_qubits()) == 1:
                     # Print single-qubit circuits horizontally
-                    rhs += f"{c_str}*{circ!s}"
+                    rhs += f"{c_str}({circ!s})"
                 else:
                     # Print multi-qubit circuits vertically
-                    rhs += "\n" + f"{c_str}*\n{circ!s}"
+                    rhs += "\n\n" + f"{c_str}\n{circ!s}"
         # Handle special cases as in cirq.value.linear_dict._format_terms()
         if not rhs:
             rhs = f"{0:.3f}"
         if rhs[0] == "+":
             rhs = rhs[1:]
-        if rhs[0:2] == "\n+":
-            rhs = "\n" + rhs[2:]
+        if rhs[0:3] == "\n\n+":
+            rhs = "\n\n" + rhs[3:]
         return lhs + rhs
 
     def __eq__(self, other: Any) -> bool:
