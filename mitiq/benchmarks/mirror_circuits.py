@@ -12,16 +12,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 """Functions for creating mirror circuits
 as defined in https://arxiv.org/abs/2008.11294 for
 benchmarking quantum computers (with error mitigation)."""
-from typing import Optional, List
+from typing import List, Optional, Tuple
+
 from numpy import random
 import networkx as nx
+
 import cirq
 from cirq.experiments.qubit_characterizations import _single_qubit_cliffords
 from mitiq.interface import convert_from_mitiq
 from mitiq import QPROGRAM
+from mitiq.rem.measurement_result import Bitstring
+
 
 single_q_cliffords = _single_qubit_cliffords()
 cliffords = single_q_cliffords.c1_in_xy
@@ -132,7 +137,7 @@ def generate_mirror_circuit(
     two_qubit_gate_name: str = "CNOT",
     seed: Optional[int] = None,
     return_type: Optional[str] = None,
-) -> QPROGRAM:
+) -> Tuple[QPROGRAM, Bitstring]:
     """Returns a randomized mirror circuit.
 
     Args:
@@ -199,5 +204,9 @@ def generate_mirror_circuit(
         + cirq.inverse(single_qubit_cliffords)
     )
 
+    # Compute the bitstring this circuit should sample.
+    res = cirq.Simulator().run(circuit + cirq.measure(*circuit.all_qubits()))
+    bitstring = list(res.measurements.values())[0][0].tolist()
+
     return_type = "cirq" if not return_type else return_type
-    return convert_from_mitiq(circuit, return_type)
+    return convert_from_mitiq(circuit, return_type), bitstring

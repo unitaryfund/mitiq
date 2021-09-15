@@ -127,7 +127,7 @@ def test_random_single_cliffords():
 def test_generate_mirror_circuit(depth_twoqprob_graph):
     depth, xi, connectivity_graph = depth_twoqprob_graph
     n = connectivity_graph.number_of_nodes()
-    circ = mirror_circuits.generate_mirror_circuit(
+    circ, _ = mirror_circuits.generate_mirror_circuit(
         depth, xi, connectivity_graph
     )
     assert isinstance(circ, cirq.Circuit)
@@ -149,11 +149,11 @@ def test_mirror_circuit_seeding(seed):
     nlayers = 5
     two_qubit_gate_prob = 0.4
     connectivity_graph = nx.complete_graph(5)
-    circuit = mirror_circuits.generate_mirror_circuit(
+    circuit, _ = mirror_circuits.generate_mirror_circuit(
         nlayers, two_qubit_gate_prob, connectivity_graph, seed=seed
     )
     for _ in range(5):
-        circ = mirror_circuits.generate_mirror_circuit(
+        circ, _ = mirror_circuits.generate_mirror_circuit(
             nlayers, two_qubit_gate_prob, connectivity_graph, seed=seed
         )
         assert _equal(
@@ -169,7 +169,7 @@ def test_mirror_circuits_conversions(return_type):
     nlayers = 5
     two_qubit_gate_prob = 0.4
     connectivity_graph = nx.complete_graph(5)
-    circuit = mirror_circuits.generate_mirror_circuit(
+    circuit, _ = mirror_circuits.generate_mirror_circuit(
         nlayers,
         two_qubit_gate_prob,
         connectivity_graph,
@@ -183,7 +183,7 @@ def test_mirror_circuits_conversions(return_type):
 )
 def test_two_qubit_gate(twoq_name_and_gate):
     twoq_name, twoq_gate = twoq_name_and_gate
-    circuit = mirror_circuits.generate_mirror_circuit(
+    circuit, _ = mirror_circuits.generate_mirror_circuit(
         nlayers=2,
         two_qubit_gate_prob=1.0,
         connectivity_graph=nx.complete_graph(5),
