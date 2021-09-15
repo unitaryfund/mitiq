@@ -47,7 +47,7 @@ def generate_rb_circuits(
         return_type: String which specifies the type of the
             returned circuits. See the keys of
             ``mitiq.SUPPORTED_PROGRAM_TYPES`` for options. If ``None``, the
-            returned circuits are ``cirq.Circuit``s.
+            returned circuits have type ``cirq.Circuit``.
 
     Returns:
         A list of randomized benchmarking circuits.
