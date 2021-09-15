@@ -79,7 +79,8 @@ To pick good qubits, we pull the latest calibration report in the next two cells
 ```{code-cell} ipython3
 if on_aws:
     twoq_data = pd.DataFrame.from_dict(aws_device.properties.provider.specs["2Q"]).T
-    twoq_data.sort_values(by=["fCZ"], ascending=False).head()
+    
+twoq_data.sort_values(by=["fCZ"], ascending=False).head() if on_aws else print()
 ```
 
 And the next cell shows single-qubit calibration data sorted by best readout (RO) fidelity.
@@ -87,7 +88,8 @@ And the next cell shows single-qubit calibration data sorted by best readout (RO
 ```{code-cell} ipython3
 if on_aws:
     oneq_data = pd.DataFrame.from_dict(aws_device.properties.provider.specs["1Q"]).T
-    oneq_data.sort_values(by=["fRO"], ascending=False).head()
+    
+oneq_data.sort_values(by=["fRO"], ascending=False).head() if on_aws else print()
 ```
 
 Using this calibration data as a guide, we pick good qubits and visualize the device subgraph that we will run on.
