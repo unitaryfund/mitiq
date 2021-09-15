@@ -12,16 +12,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 """Functions for creating mirror circuits
 as defined in https://arxiv.org/abs/2008.11294 for
 benchmarking quantum computers (with error mitigation)."""
-from typing import Optional, List
+from typing import List, Optional, Tuple
+
 from numpy import random
 import networkx as nx
+
 import cirq
 from cirq.experiments.qubit_characterizations import _single_qubit_cliffords
 from mitiq.interface import convert_from_mitiq
 from mitiq import QPROGRAM
+from mitiq.rem.measurement_result import Bitstring
+
 
 single_q_cliffords = _single_qubit_cliffords()
 cliffords = single_q_cliffords.c1_in_xy
@@ -29,18 +34,18 @@ paulis = [cirq.X, cirq.Y, cirq.Z, cirq.I]
 
 
 def random_paulis(
-    nqubits: int, random_state: random.RandomState
+    connectivity_graph: nx.Graph, random_state: random.RandomState
 ) -> cirq.Circuit:
     """Returns a circuit with randomly selected Pauli gates on each qubit.
 
     Args:
-        nqubits: The number of qubits in the circuit.
+        connectivity_graph: Connectivity graph of device to run circuit on.
         random_state: Random state to select Paulis I, X, Y, Z uniformly at
             random.
     """
     return cirq.Circuit(
         paulis[random_state.randint(len(paulis))](cirq.LineQubit(x))
-        for x in range(nqubits)
+        for x in connectivity_graph.nodes
     )
 
 
@@ -80,7 +85,9 @@ def edge_grab(
 
 
 def random_cliffords(
-    connectivity_graph: nx.Graph, random_state: random.RandomState
+    connectivity_graph: nx.Graph,
+    random_state: random.RandomState,
+    two_qubit_gate: cirq.Gate = cirq.CNOT,
 ) -> cirq.Circuit:
     """Returns a circuit with a two-qubit Clifford gate applied
     to each edge in edges, and a random single-qubit
@@ -90,14 +97,17 @@ def random_cliffords(
         connectivity_graph: A graph with the edges for which the
             two-qubit Clifford gate is to be applied.
         random_state: Random state to choose Cliffords (uniformly at random).
+        two_qubit_gate: Two-qubit gate to use.
     """
     gates = [
-        cirq.CNOT(cirq.LineQubit(a), cirq.LineQubit(b))
+        two_qubit_gate.on(cirq.LineQubit(a), cirq.LineQubit(b))
         for a, b in list(connectivity_graph.edges)
     ]
     qubits = nx.Graph()
     qubits.add_nodes_from(nx.isolates(connectivity_graph))
-    gates.append(random_single_cliffords(qubits, random_state))
+    gates.extend(
+        list(random_single_cliffords(qubits, random_state).all_operations())
+    )
     return cirq.Circuit(gates)
 
 
@@ -124,9 +134,10 @@ def generate_mirror_circuit(
     nlayers: int,
     two_qubit_gate_prob: float,
     connectivity_graph: nx.Graph,
+    two_qubit_gate_name: str = "CNOT",
     seed: Optional[int] = None,
     return_type: Optional[str] = None,
-) -> QPROGRAM:
+) -> Tuple[QPROGRAM, Bitstring]:
     """Returns a randomized mirror circuit.
 
     Args:
@@ -135,13 +146,28 @@ def generate_mirror_circuit(
         connectivity_graph: The connectivity graph of the backend
             on which the mirror circuit will be run. This is used
             to make sure 2-qubit gates are only applied to connected qubits.
+        two_qubit_gate_name: Name of two-qubit gate to use. Options are "CNOT"
+            and "CZ".
         seed: Seed for generating randomized mirror circuit.
+        return_type: String which specifies the type of the
+            returned circuit. See the keys of ``mitiq.SUPPORTED_PROGRAM_TYPES``
+            for options. If ``None``, the returned circuit is a
+            ``cirq.Circuit``.
     """
     if not 0 <= two_qubit_gate_prob <= 1:
         raise ValueError("two_qubit_gate_prob must be between 0 and 1")
 
+    supported_two_qubit_gates = {"CZ": cirq.CZ, "CNOT": cirq.CNOT}
+    if two_qubit_gate_name not in supported_two_qubit_gates.keys():
+        raise ValueError(
+            f"Supported two-qubit gate names are "
+            f"{tuple(supported_two_qubit_gates.keys())} but "
+            f"{two_qubit_gate_name} was provided for `two_qubit_gate_name`."
+        )
+    two_qubit_gate = supported_two_qubit_gates[two_qubit_gate_name]
+
     random_state = random.RandomState(seed)
-    nqubits = connectivity_graph.number_of_nodes()
+
     single_qubit_cliffords = random_single_cliffords(
         connectivity_graph, random_state=random_state
     )
@@ -152,22 +178,24 @@ def generate_mirror_circuit(
     quasi_inverse_gates = []
 
     for _ in range(nlayers):
-        forward_circuit.append(random_paulis(nqubits, random_state))
+        forward_circuit.append(random_paulis(connectivity_graph, random_state))
 
         selected_edges = edge_grab(
             two_qubit_gate_prob, connectivity_graph, random_state
         )
-        circ = random_cliffords(selected_edges, random_state)
+        circ = random_cliffords(selected_edges, random_state, two_qubit_gate)
         forward_circuit.append(circ)
 
-        quasi_inverse_gates.append(random_paulis(nqubits, random_state))
+        quasi_inverse_gates.append(
+            random_paulis(connectivity_graph, random_state)
+        )
         quasi_inverse_gates.append(cirq.inverse(circ))
 
     quasi_inversion_circuit.append(
         gate for gate in reversed(quasi_inverse_gates)
     )
 
-    rand_paulis = cirq.Circuit(random_paulis(nqubits, random_state))
+    rand_paulis = cirq.Circuit(random_paulis(connectivity_graph, random_state))
     circuit = (
         single_qubit_cliffords
         + forward_circuit
@@ -176,5 +204,9 @@ def generate_mirror_circuit(
         + cirq.inverse(single_qubit_cliffords)
     )
 
+    # Compute the bitstring this circuit should sample.
+    res = cirq.Simulator().run(circuit + cirq.measure(*circuit.all_qubits()))
+    bitstring = list(res.measurements.values())[0][0].tolist()
+
     return_type = "cirq" if not return_type else return_type
-    return convert_from_mitiq(circuit, return_type)
+    return convert_from_mitiq(circuit, return_type), bitstring
