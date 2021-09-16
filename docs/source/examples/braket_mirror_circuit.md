@@ -216,7 +216,6 @@ zne_values = []
 # Run the experiment and store results.
 for nlayers in nlayers_values:
     for i in range(ntrials):
-        print("\r", f"Status: nlayers = {nlayers}, trial = {i + 1}.", end="")
         circuit, correct_bitstring = benchmarks.generate_mirror_circuit(
             nlayers=nlayers, 
             two_qubit_gate_prob=1.0,
