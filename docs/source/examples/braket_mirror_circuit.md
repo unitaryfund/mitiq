@@ -15,7 +15,7 @@ kernelspec:
 
 This notebook shows improved performance on a mirror circuit benchmark with zero-noise extrapolation on Rigetti Aspen-9 via Amazon Braket.
 
-> Note: This notebook is intended to be run through the Amazon Web Services (AWS) console - that is, by uploading the `.ipynb` file to https://console.aws.amazon.com/braket/ and running from there. This requires an AWS account. **Without an AWS account, you can still run the notebook on a simulator, but results will be noiseless and so zero-noise extrapolation will have no effect**.
+> Note: This notebook is intended to be run through the Amazon Web Services (AWS) console - that is, by uploading the `.ipynb` file to https://console.aws.amazon.com/braket/ and running from there. This requires an AWS account. **Without an AWS account, you can still run the notebook on a noisy simulator**.
 
 ## Setup
 
@@ -51,9 +51,9 @@ try:
 except:
     from braket.devices import LocalSimulator
 
-    aws_device = LocalSimulator()
+    aws_device = LocalSimulator("braket_dm")
 
-on_aws = aws_device.name != "StateVectorSimulator"
+on_aws = aws_device.name != "DensityMatrixSimulator"
 ```
 
 ## Define the circuit
@@ -169,9 +169,10 @@ def execute(
     # Run the circuit and return the frequency of sampling the correct bitstring.
     if on_aws:
         aws_task = aws_device.run(circuit, s3_folder, disable_qubit_rewiring=True, shots=shots)
+        return aws_task.result().measurement_probabilities.get("".join(map(str, correct_bitstring)), 0.0)
     else:
-        aws_task = aws_device.run(circuit, shots=shots)
-    return aws_task.result().measurement_probabilities.get("".join(map(str, correct_bitstring)), 0.0)
+        aws_task = aws_device.run(circuit.copy().apply_gate_noise(Noise.Depolarizing(probability=0.01)), shots=shots)
+        return aws_task.result().measurement_probabilities.get("".join(map(str, correct_bitstring[::-1])), 0.0)
 ```
 
 ## Noisy value
@@ -215,7 +216,7 @@ zne_values = []
 # Run the experiment and store results.
 for nlayers in nlayers_values:
     for i in range(ntrials):
-        print(f"Status: nlayers = {nlayers}, trial = {i + 1}.", end="\r")
+        print("\r", f"Status: nlayers = {nlayers}, trial = {i + 1}.", end="")
         circuit, correct_bitstring = benchmarks.generate_mirror_circuit(
             nlayers=nlayers, 
             two_qubit_gate_prob=1.0,
