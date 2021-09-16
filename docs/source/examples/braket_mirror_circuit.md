@@ -35,7 +35,7 @@ import numpy as np
 import pandas as pd
 
 from braket.aws import AwsDevice
-from braket.circuits import Circuit, gates
+from braket.circuits import Circuit, gates, Noise
 from mitiq import benchmarks, zne
 ```
 
