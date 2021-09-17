@@ -35,7 +35,7 @@ def test_from_pennylane_with_expvals():
 
     circuit = from_pennylane(tape)
     q = cirq.LineQubit(0)
-    correct = cirq.Circuit(cirq.H.on(q), cirq.measure(q))
+    correct = cirq.Circuit(cirq.H.on(q))
     assert _equal(circuit, correct, require_qubit_equality=False)
 
     # <Z>
@@ -43,7 +43,7 @@ def test_from_pennylane_with_expvals():
         qml.expval(qml.PauliZ(wires=[0]))
 
     circuit = from_pennylane(tape)
-    correct = cirq.Circuit(cirq.measure(q))
+    correct = cirq.Circuit()
     assert _equal(circuit, correct, require_qubit_equality=False)
 
 
@@ -53,12 +53,6 @@ def test_from_pennylane():
 
     circuit = from_pennylane(tape)
     correct = cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2)))
-
-    # TODO: from_pennylane adds measurements even if there is not measurements
-    #  in the tape. This is because tape.to_openqasm(...) measures all qubits
-    #  even if there are no measurements in the tape.
-    #  Temp patch: Manually remove measurements.
-    circuit = circuit[:-1]
 
     assert _equal(circuit, correct, require_qubit_equality=False)
 
@@ -95,3 +89,22 @@ def test_to_from_pennylane(random_state):
     cirq.testing.assert_allclose_up_to_global_phase(
         cirq.unitary(converted), cirq.unitary(circuit), atol=1e-7
     )
+
+
+def test_to_from_pennylane_cnot_same_gates():
+    qreg = cirq.LineQubit.range(2)
+    circuit = cirq.Circuit(cirq.CNOT(*qreg))
+    converted = from_pennylane(to_pennylane(circuit))
+    assert _equal(circuit, converted, require_qubit_equality=False)
+
+
+def test_to_from_pennylane_identity():
+    q = cirq.LineQubit(0)
+    # Empty circuit
+    circuit = cirq.Circuit()
+    converted = from_pennylane(to_pennylane(circuit))
+    assert _equal(circuit, converted, require_qubit_equality=False)
+    circuit = cirq.Circuit(cirq.I(q))
+    # Identity gate
+    converted = from_pennylane(to_pennylane(circuit))
+    assert _equal(circuit, converted, require_qubit_equality=False)

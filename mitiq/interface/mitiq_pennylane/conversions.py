@@ -17,8 +17,11 @@
 Pennylane's circuit representation.
 """
 
-from cirq import Circuit
+from cirq import Circuit, Moment
+
 from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm, to_qasm
+from mitiq.utils import _pop_measurements
+
 from pennylane.wires import Wires
 from pennylane.tape import QuantumTape
 from pennylane.operation import Expectation
@@ -51,7 +54,13 @@ def from_pennylane(tape: QuantumTape) -> Circuit:
         raise UnsupportedQuantumTapeError(
             "Only expectation value measurements are supported."
         )
-    return cirq_from_qasm(tape.to_openqasm(rotations=True, wires=wires))
+    output = cirq_from_qasm(tape.to_openqasm(rotations=True, wires=wires))
+    # tape.to_openqasm always introduces measurements that we remove
+    measurements = _pop_measurements(output)
+    # Remove final empty moment if present
+    if measurements and output[-1] == Moment():
+        return output[:-1]
+    return output
 
 
 def to_pennylane(circuit: Circuit) -> QuantumTape:
