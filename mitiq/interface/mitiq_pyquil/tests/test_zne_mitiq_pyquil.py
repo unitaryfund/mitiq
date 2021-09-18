@@ -22,7 +22,7 @@ from mitiq import benchmarks, zne
 from mitiq.interface.mitiq_pyquil.compiler import basic_compile
 
 TEST_DEPTH = 30
-QVM = pyquil.get_qc("1q-qvm")
+QVM = pyquil.compatibility.v2.get_qc("1q-qvm")
 QVM.qam.random_seed = 1337
 
 
@@ -32,9 +32,9 @@ def noiseless_executor(program: pyquil.Program) -> float:
     executable = QVM.compiler.native_quil_to_executable(program)
     results = QVM.run(executable)
 
-    num_shots = len(results.readout_data.get('ro'))
+    num_shots = len(results)
     return (
-        num_shots - np.count_nonzero(np.count_nonzero(results.readout_data.get('ro'), axis=1))
+        num_shots - np.count_nonzero(np.count_nonzero(results, axis=1))
     ) / num_shots
 
 
