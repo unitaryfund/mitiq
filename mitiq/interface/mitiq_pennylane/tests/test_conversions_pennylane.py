@@ -16,9 +16,11 @@
 """Unit tests for Pennylane <-> Cirq conversions."""
 
 import pytest
+import numpy as np
 
 import cirq
 import pennylane as qml
+
 from mitiq.interface.mitiq_pennylane import (
     from_pennylane,
     to_pennylane,
@@ -107,4 +109,6 @@ def test_to_from_pennylane_identity():
     circuit = cirq.Circuit(cirq.I(q))
     # Identity gate
     converted = from_pennylane(to_pennylane(circuit))
-    assert _equal(circuit, converted, require_qubit_equality=False)
+    # TODO: test circuit equality after Identity operation will be added
+    # to PennyLane (https://github.com/PennyLaneAI/pennylane/issues/1632)
+    assert np.allclose(cirq.unitary(circuit), cirq.unitary(converted))
