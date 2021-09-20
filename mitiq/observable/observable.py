@@ -14,19 +14,22 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
-from typing import cast, List, Optional, Set
+import inspect
+from typing import Callable, cast, List, Optional, Set
 
 import numpy as np
 import cirq
 
-from mitiq.observable.pauli import PauliString
+from mitiq.observable.pauli import PauliString, PauliStringCollection
+from mitiq._typing import MeasurementResult, QuantumResult, QPROGRAM
+from mitiq.executor import Executor
 
 
 class Observable:
     def __init__(self, *paulis: PauliString) -> None:
         # TODO: Add option to Combine duplicates. E.g. [Z(0, Z(0)] -> [2*Z(0)].
         self._paulis = list(paulis)
-        self._groups: List[List[PauliString]]
+        self._groups: List[PauliStringCollection]
         self._ngroups: int
         self.partition()
 
@@ -47,7 +50,7 @@ class Observable:
         return len(self.qubit_indices)
 
     @property
-    def groups(self) -> List[List[PauliString]]:
+    def groups(self) -> List[PauliStringCollection]:
         return self._groups
 
     @property
@@ -57,47 +60,37 @@ class Observable:
     def partition(self, seed: Optional[int] = None) -> None:
         rng = np.random.RandomState(seed)
 
-        plists: List[List[PauliString]] = []
+        psets: List[PauliStringCollection] = []
         paulis = copy.deepcopy(self._paulis)
         rng.shuffle(paulis)
 
         while paulis:
             pauli = paulis.pop()
             added = False
-            for (i, plist) in enumerate(plists):
-                if all(pauli.can_be_measured_with(p) for p in plist):
-                    plists[i].append(pauli)
+            for (i, pset) in enumerate(psets):
+                if pset.can_add(pauli):
+                    pset.add(pauli)
                     added = True
                     break
 
             if not added:
-                plists.append([pauli])
+                psets.append(PauliStringCollection(pauli))
 
-        self._groups = plists
+        self._groups = psets
         self._ngroups = len(self._groups)
 
-    def _measure_in(self, circuit: cirq.Circuit) -> List[cirq.Circuit]:
-        circuits: List[cirq.Circuit] = []
-        base_circuit = copy.deepcopy(circuit)
+    def measure_in(self, circuit: QPROGRAM) -> List[QPROGRAM]:
+        return [pset.measure_in(circuit) for pset in self._groups]
 
-        for pset in self._groups:
-            basis_rotations = set()
-            qubits_to_measure = set()
-            for pauli in pset:
-                basis_rotations.update(pauli._basis_rotations())
-                qubits_to_measure.update(pauli._qubits_to_measure())
-            circuits.append(
-                base_circuit
-                + basis_rotations
-                + cirq.measure(*sorted(qubits_to_measure))
-            )
-
-        return circuits
-
-    def matrix(self, dtype: type = np.complex128) -> np.ndarray:
+    def matrix(
+        self,
+        qubit_indices: Optional[List[int]] = None,
+        dtype: type = np.complex128,
+    ) -> np.ndarray:
         """Returns the (potentially very large) matrix of the Observable."""
-        qubit_indices = self.qubit_indices
-        n = self.nqubits
+        if qubit_indices is None:
+            qubit_indices = self.qubit_indices
+        n = len(qubit_indices)
 
         matrix = np.zeros(shape=(2 ** n, 2 ** n), dtype=dtype)
         for pauli in self._paulis:
@@ -106,3 +99,41 @@ class Observable:
             ).astype(dtype=dtype)
 
         return matrix
+
+    def expectation(
+        self, circuit: QPROGRAM, execute: Callable[[QPROGRAM], QuantumResult]
+    ) -> float:
+        result_type = inspect.getfullargspec(execute).annotations.get("return")
+
+        if result_type is MeasurementResult:
+            to_run = self.measure_in(circuit)
+            results = Executor(execute).run(to_run)
+            return self._expectation_from_measurements(
+                cast(List[MeasurementResult], results)
+            )
+        elif result_type is np.ndarray:
+            density_matrix = cast(np.ndarray, execute(circuit))
+            observable_matrix = self.matrix()
+
+            if density_matrix.shape != observable_matrix.shape:
+                nqubits = int(np.log2(density_matrix.shape[0]))
+                density_matrix = cirq.partial_trace(
+                    np.reshape(density_matrix, newshape=[2, 2] * nqubits),
+                    keep_indices=self.qubit_indices,
+                ).reshape(observable_matrix.shape)
+
+            return np.trace(density_matrix @ self.matrix())
+        else:
+            raise ValueError(
+                f"Arg `execute` must be a function with annotated return type "
+                f"that is either mitiq.MeasurementResult or np.ndarray but "
+                f"was {result_type}."
+            )
+
+    def _expectation_from_measurements(
+        self, measurements: List[MeasurementResult]
+    ) -> float:
+        return sum(
+            pset._expectation_from_measurements(bitstrings)
+            for (pset, bitstrings) in zip(self._groups, measurements)
+        )

@@ -4,7 +4,7 @@ jupytext:
     extension: .myst
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.10.2
+    jupytext_version: 1.11.4
 kernelspec:
   display_name: Python 3
   language: python
@@ -15,7 +15,7 @@ kernelspec:
 
 +++
 
-This is step-by-step tutorial on how to use the Mitiq toolchain for implementing **probabilistic error cancellation (PEC)** [[1-3]](#References).
+This is step-by-step tutorial on how to use the Mitiq toolchain for implementing **probabilistic error cancellation (PEC)** [[1-3]](#references).
 We use the [Cirq](https://github.com/quantumlib/cirq) library, but other frontends could be used in a similar way. 
 
 If you are only interested in **applying** PEC with Mitiq, see the quick start
@@ -26,19 +26,19 @@ In a practical use case it is not necessary to implement all the steps presented
 and how Mitiq works behind the scenes.
 
 Furthermore, this notebook reproduces the results of the PEC example reported in *Figure 5* of the
-Mitiq [white paper](https://arxiv.org/abs/2009.04417) [[7]](#References).
+Mitiq [white paper](https://arxiv.org/abs/2009.04417) [[7]](#references).
 
 +++
 
 ## Outline
 
-**Probabilistic error cancellation** (PEC) is an error mitigation method [[1-3]](#References).
+**Probabilistic error cancellation** (PEC) is an error mitigation method [[1-3]](#references).
 Its practical implementation can be divided in the following 4 tasks:
 
- - **[Task 1](#Task-1:-Representing-an-ideal-gate-as-linear-combination-of-implementable-noisy-gates): Expanding an ideal gate as linear combination of implementable noisy gates;**
- - **[Task 2](#Task-2:-Sampling-from-the-quasi-probability-representation-of-an-ideal-gate): Sampling an implementable gate from the quasi-probability representation of an ideal gate;**
- - **[Task 3](#Task-3:-Sampling-from-the-quasi-probability-representation-of-an-ideal-circuit): Sampling an implementable circuit from the quasi-probability representation of an ideal circuit;**
- - **[Task 4](#Task-4:-Infer-an-error-mitigated-expectation-value-with-PEC): Infer an ideal expectation value from the noisy execution of the sampled circuits.**
+ - **[Task 1](#task1): Expanding an ideal gate as linear combination of implementable noisy gates;**
+ - **[Task 2](#task2): Sampling an implementable gate from the quasi-probability representation of an ideal gate;**
+ - **[Task 3](#task3): Sampling an implementable circuit from the quasi-probability representation of an ideal circuit;**
+ - **[Task 4](#task4): Infer an ideal expectation value from the noisy execution of the sampled circuits.**
 
 +++
 
@@ -59,10 +59,11 @@ from mitiq.utils import _circuit_to_choi
 ```
 
 ## Task 1: Representing an ideal gate as linear combination of implementable noisy gates
+<a id='task1'></a>
 
 +++
 
-The first task we need to solve is to represent an arbitrary ideal unitary gate $\mathcal G$ as a linear combination of implementable (noisy) gates [[1-3]](#References):
+The first task we need to solve is to represent an arbitrary ideal unitary gate $\mathcal G$ as a linear combination of implementable (noisy) gates [[1-3]](#references):
 
 $$\mathcal G = \eta_1 \tilde{\mathcal  G}_1  + \eta_2 \tilde{\mathcal  G}_2 + \dots,$$
 
@@ -78,16 +79,17 @@ where $\{\eta_j\}$ are real coefficients and $\{\tilde{\mathcal  G}_j\}$ are the
 
 +++
 
-For example, if the implementable gates are equal to any single-qubit unitary followed by a depolarizing channel [[4]](#References):
+For example, if the implementable gates are equal to any single-qubit unitary followed by a depolarizing channel [[4]](#references):
 
 $$ \tilde{\mathcal G} =\mathcal E \circ \mathcal G  \quad 
 \text{where,}\quad \mathcal E(\rho) =  (1 - \epsilon ) \rho   + \epsilon I/2 ,$$
 
-then, it is easy to show [[1][4][6]](#References) that the following representation holds **for any single-qubit gate $\mathcal G$**:
+then, it is easy to show [[1][4][6]](#references) that the following representation holds **for any single-qubit gate $\mathcal G$**:
 
 $$ \mathcal G= \eta_1 \tilde{\mathcal G}_1  + \eta_2 \tilde{\mathcal G}_2 + \eta_3 \tilde{\mathcal G}_3 + \eta_4 \tilde{\mathcal G}_4, $$
 
 where,
+
 $$\eta_1 =\left(1 + \frac{3}{4} \frac{\epsilon}{1- \epsilon} \right ), \qquad  \tilde{\mathcal G}_1 = \mathcal E \circ  \mathcal G, \quad$$
 
 $$\eta_2 =- \frac{1}{4}\frac{\epsilon}{1- \epsilon} , \qquad \qquad \tilde{\mathcal G}_2 = \mathcal E \circ  \mathcal X \circ \mathcal G,$$
@@ -96,7 +98,7 @@ $$\eta_3 =-\frac{1}{4}\frac{\epsilon}{1- \epsilon} , \qquad  \qquad \tilde{\math
 
 $$\eta_4 =- \frac{1}{4}\frac{\epsilon}{1- \epsilon} , \qquad \qquad  \tilde{\mathcal G}_4 = \mathcal E \circ  \mathcal Z \circ \mathcal G.$$
 
-Here and in what follows, we use the same notation of [[6]](#References) where calligraphic symbols stand for super-operators acting on the
+Here and in what follows, we use the same notation of [[6]](#references) where calligraphic symbols stand for super-operators acting on the
 density matrix $\rho$ of the qubits as $\mathcal G(\rho)= G \rho G^\dagger$.
 
 +++
@@ -107,7 +109,7 @@ density matrix $\rho$ of the qubits as $\mathcal G(\rho)= G \rho G^\dagger$.
 
 Assume that we want to represent the ideal bit-flip gate $\mathcal G=\mathcal X$ in the presence of depolarizing noise with $p=0.1$,
 where $p$ is the error probability. For a single-qubit depolarizing channel the error probability is related to the parameter $\epsilon$
-introduced above by the formula $\epsilon=(4/3)p$ [[4]](#Reference) .
+introduced above by the formula $\epsilon=(4/3)p$ [[4]](#reference) .
 
 ```{code-cell} ipython3
 # Set the level of depolarizing noise
@@ -209,6 +211,7 @@ assert opt_rep == x_rep
 +++
 
 ## Task 2: Sampling from the quasi-probability representation of an ideal gate
+<a id='task2'></a>
 
 In the previous section, we represented an ideal gate as a linear combination of noisy gates.
 This is an **exact** formula that links the the noisy gates to the ideal gate.
@@ -224,16 +227,18 @@ $$\mathcal G = \sum_j \eta_j \tilde{\mathcal G}_j = \gamma  \sum_ j p(j)\, \text
 
 If we sample $j$ from $p(j)$, we obtain a statistical random variable $\hat j$. The key fact at the basis of the  PEC technique is that,
 given the random variable $\hat j$, the probabilistic super-operator operator
+
 $$
 \hat{\mathcal G} = \gamma \, \text{sign}(\eta_{\hat j}) \tilde{\mathcal G}_{\hat j},
 $$
+
 is an **unbiased estimator** for the ideal gate $\mathcal G$. That is to say, in the limit of infinite samples,
 the sampling average of $\hat{\mathcal G}$ converges exactly to $\mathcal G$.
 
 +++
 
-> **Note:** _An introduction to Monte Carlo sampling of quantum gates and quantum circuits can be found in [[5]](#References).
-This technique was applied to error mitigation in [[1-2]](#References)._
+> **Note:** _An introduction to Monte Carlo sampling of quantum gates and quantum circuits can be found in [[5]](#references).
+This technique was applied to error mitigation in [[1-2]](#references)._
 
 +++
 
@@ -291,6 +296,7 @@ extend this technique to a circuit composed of many gates.
 +++
 
 ## Task 3: Sampling from the quasi-probability representation of an ideal circuit
+<a id='task3'></a>
 
 +++
 
@@ -302,7 +308,7 @@ In practice we need to apply the following steps:
 * multiply the `gamma` of each sampled gate to obtain the global `gamma` associated to the full circuit.
 
 > **NOTE:** The fact that one can reduce the **global sampling** into a (Markov) chain of independent **local sampling**
-is a consequence of the Monte Carlo approach. See, e.g., [[1]](#References) or [[5]](#References).
+is a consequence of the Monte Carlo approach. See, e.g., [[1]](#references) or [[5]](#references).
 
 The result of this procedure will produce an **unbiased estimator**
 $\hat{\mathcal U} = \hat{\mathcal G}_t \circ \dots  \circ \hat{\mathcal G}_2 \circ \hat{\mathcal G}_1$ of the ideal circuit
@@ -399,6 +405,7 @@ as shown in the next section.
 +++
 
 ## Task 4: Infer an error-mitigated expectation value with PEC
+<a id='task4'></a>
 
 +++
 
@@ -506,11 +513,12 @@ plt.show()
 >**Note:** _The histogram is very clustered because of the particular choice of noise model (depolarizing)
 and because the `noisy_executor` is based on an exact simulation of the density matrix without shot noise.
 A more regular histogram could be obtained sub-dividing all the samples into independent batches and evaluating
-the statistical distribution of the corresponding results (see e.g. the numerical analysis in Figure 3 of [[6]](#References))._
+the statistical distribution of the corresponding results (see e.g. the numerical analysis in Figure 3 of [[6]](#references))._
 
 +++
 
 ## References
+<a id='references'></a>
 
 1. K. Temme, S. Bravyi, J. M. Gambetta, _Error Mitigation for Short-Depth Quantum Circuits_, [arXiv:1612.02058](https://arxiv.org/abs/1612.02058).
 

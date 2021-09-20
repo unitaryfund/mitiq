@@ -45,8 +45,9 @@ def generate_rb_circuits(
             random circuits. This is proportional to the depth per circuit.
         trials: The number of random circuits at each num_cfd.
         return_type: String which specifies the type of the
-            returned circuits. See the keys of ``mitiq.QPROGRAM`` for options.
-            If ``None``, the returned circuits are type ``cirq.Circuit``.
+            returned circuits. See the keys of
+            ``mitiq.SUPPORTED_PROGRAM_TYPES`` for options. If ``None``, the
+            returned circuits have type ``cirq.Circuit``.
 
     Returns:
         A list of randomized benchmarking circuits.

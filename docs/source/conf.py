@@ -59,6 +59,8 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinxcontrib.bibtex",
     "sphinx_copybutton",
+    'nbsphinx',
+    'sphinx_gallery.load_style'
 ]
 
 intersphinx_mapping = {
@@ -172,6 +174,12 @@ pybtex.style.formatting.unsrt.date = pybtex.style.template.words(sep="")[
     "(", pybtex.style.template.field("year"), ")"
 ]
 bibtex_bibfiles = ["refs.bib"]
+
+# Links matching with the following regular expressions will be ignored
+linkcheck_ignore = [
+    r'https://doi.org/10.1088/0034-4885/74/10/104401',
+    r'https://doi.org/10.1088/1367-2630/12/7/075008',
+]
 
 
 class ApsStyle(pybtex.style.formatting.unsrt.Style):
@@ -315,4 +323,22 @@ html_theme = "pydata_sphinx_theme"  # 'alabaster', 'sphinx_rtd_theme'
 # html_static_path = ['_static']
 
 # display logo on top-left of html pages
-html_logo = "img/unitary_fund_logo.png"
+html_logo = "img/mitiq-logo.png"
+
+myst_update_mathjax = False
+
+nbsphinx_custom_formats = {
+    '.mystnb': ['jupytext.reads', {'fmt': 'mystnb'}],
+}
+nbsphinx_execute = 'always'
+
+nbsphinx_thumbnails = {
+    'examples/hamiltonians': '_images/vqe-cirq-pauli-sum-mitigation-plot.png',
+    'examples/simple_landscape': '_images/simple_landscape_13_0.png',
+    'examples/maxcut-demo': '_images/maxcut-demo_48_1.png',
+    'examples/pyquil-demo': '_images/pyquil_demo_11_0.png',
+    'examples/pec-tutorial': '_images/pec-tutorial_62_0.png',
+    # default images if no thumbnail is specified
+    'examples/*': '_static/mitiq-logo.png',
+    'examples/mitiq-paper/*': '_static/mitiq-logo.png'
+}

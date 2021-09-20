@@ -34,6 +34,7 @@ from mitiq.zne.scaling import (
 )
 from mitiq.benchmarks.utils import noisy_simulation
 from mitiq.zne import mitigate_executor
+from mitiq._typing import SUPPORTED_PROGRAM_TYPES
 
 SCALE_FUNCTIONS = [
     fold_gates_at_random,
@@ -94,7 +95,7 @@ def test_random_benchmarks(scale_noise, fac):
 
 
 @pytest.mark.parametrize("n_qubits", (1, 2))
-@pytest.mark.parametrize("return_type", ("cirq", "pyquil", "qiskit"))
+@pytest.mark.parametrize("return_type", SUPPORTED_PROGRAM_TYPES.keys())
 def test_rb_conversion(n_qubits, return_type):
     depth = 10
     for trials in [2, 3]:
