@@ -522,7 +522,7 @@ class OperationRepresentation:
                 c_str = "+" + c_str
             if len(self._ideal.all_qubits()) == 1:
                 # Print single-qubit circuits horizontally
-                rhs += f"{c_str}({circ!s})"
+                rhs += f"{c_str}*({circ!s})"
             else:
                 # Print multi-qubit circuits vertically
                 rhs += "\n\n" + f"{c_str}\n{circ!s}"

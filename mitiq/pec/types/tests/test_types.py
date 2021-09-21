@@ -719,13 +719,13 @@ def test_print_cirq_operation_representation():
     decomp = OperationRepresentation(
         ideal=ideal, basis_expansion={noisy_xop: 0.5, noisy_zop: 0.5,},
     )
-    expected = r"0: ───H─── = 0.500(0: ───X───)+0.500(0: ───Z───)"
+    expected = r"0: ───H─── = 0.500*(0: ───X───)+0.500*(0: ───Z───)"
     assert str(decomp) == expected
     # Negative first coefficient
     decomp = OperationRepresentation(
         ideal=ideal, basis_expansion={noisy_xop: -0.5, noisy_zop: 1.5,},
     )
-    expected = r"0: ───H─── = -0.500(0: ───X───)+1.500(0: ───Z───)"
+    expected = r"0: ───H─── = -0.500*(0: ───X───)+1.500*(0: ───Z───)"
     assert str(decomp) == expected
     # Empty representation
     decomp = OperationRepresentation(ideal=ideal, basis_expansion={})
