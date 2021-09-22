@@ -407,14 +407,14 @@ def test_fold_with_intermediate_measurements_raises_error(fold_method):
 )
 def test_fold_with_channels_raises_error(fold_method):
     """Tests local folding functions raise an error on circuits with
-    non-unitary channels (which are not measurements).
+    non-invertible channels (which are not measurements).
     """
     qbit = LineQubit(0)
     circ = Circuit(
         ops.H.on(qbit), ops.depolarize(p=0.1).on(qbit), ops.measure(qbit)
     )
     with pytest.raises(
-        UnfoldableCircuitError, match="Circuit contains non-unitary channels"
+        UnfoldableCircuitError, match="Circuit contains non-invertible"
     ):
         fold_method(circ, scale_factor=3.0)
 
