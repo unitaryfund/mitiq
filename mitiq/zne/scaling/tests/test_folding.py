@@ -24,7 +24,8 @@ from cirq import (
     inverse,
     equal_up_to_global_phase,
     InsertStrategy,
-    testing, ry
+    testing,
+    ry,
 )
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 from qiskit.quantum_info.operators import Operator
@@ -436,9 +437,8 @@ def test_parametrized_circuit_folding(fold_method):
     theta = Symbol("theta")
     q = LineQubit(0)
     ansatz_circ = Circuit(ry(theta).on(q))
-    folded_circ = fold_method(ansatz_circ, scale_factor=3.)
-    expected_circ = Circuit(ry(theta).on(q), ry(-theta).on(q),
-                            ry(theta).on(q))
+    folded_circ = fold_method(ansatz_circ, scale_factor=3.0)
+    expected_circ = Circuit(ry(theta).on(q), ry(-theta).on(q), ry(theta).on(q))
     assert _equal(folded_circ, expected_circ)
 
 
