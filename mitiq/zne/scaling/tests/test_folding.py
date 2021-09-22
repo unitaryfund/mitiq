@@ -24,7 +24,7 @@ from cirq import (
     inverse,
     equal_up_to_global_phase,
     InsertStrategy,
-    testing,
+    testing, ry
 )
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 from qiskit.quantum_info.operators import Operator
@@ -51,6 +51,7 @@ from mitiq.zne.scaling.folding import (
     _create_fold_mask,
     _apply_fold_mask,
 )
+from sympy import Symbol
 
 
 def test_squash_moments_two_qubits():
@@ -417,6 +418,28 @@ def test_fold_with_channels_raises_error(fold_method):
         UnfoldableCircuitError, match="Circuit contains non-invertible"
     ):
         fold_method(circ, scale_factor=3.0)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [
+        fold_gates_from_left,
+        fold_gates_from_right,
+        fold_gates_at_random,
+        fold_global,
+    ],
+)
+def test_parametrized_circuit_folding(fold_method):
+    """Checks if the circuit is folded as expected when the circuit operations
+    have a valid inverse.
+    """
+    theta = Symbol("theta")
+    q = LineQubit(0)
+    ansatz_circ = Circuit(ry(theta).on(q))
+    folded_circ = fold_method(ansatz_circ, scale_factor=3.)
+    expected_circ = Circuit(ry(theta).on(q), ry(-theta).on(q),
+                            ry(theta).on(q))
+    assert _equal(folded_circ, expected_circ)
 
 
 def test_fold_from_right_basic():
