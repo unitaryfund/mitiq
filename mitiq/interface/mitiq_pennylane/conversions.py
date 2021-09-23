@@ -50,6 +50,13 @@ def from_pennylane(tape: QuantumTape) -> Circuit:
             f"{tape.wires}."
         )
 
+    for i in range(len(wires)):
+        if wires[i] != i:
+            raise UnsupportedQuantumTapeError(
+                "The wire labels of the tape must contiguously pack 0 "
+                "to n-1, for n wires."
+            )
+
     if not all(m.return_type is Expectation for m in tape.measurements):
         raise UnsupportedQuantumTapeError(
             "Only expectation value measurements are supported."

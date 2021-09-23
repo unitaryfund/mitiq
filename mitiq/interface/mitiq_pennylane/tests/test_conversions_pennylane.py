@@ -112,3 +112,14 @@ def test_to_from_pennylane_identity():
     # TODO: test circuit equality after Identity operation will be added
     # to PennyLane (https://github.com/PennyLaneAI/pennylane/issues/1632)
     assert np.allclose(cirq.unitary(circuit), cirq.unitary(converted))
+
+
+def test_non_consecutive_wires_error():
+    with qml.tape.QuantumTape() as tape:
+        qml.CNOT(wires=[0, 2])
+
+    with pytest.raises(
+        UnsupportedQuantumTapeError,
+        match="contiguously pack",
+    ):
+        from_pennylane(tape)
