@@ -200,3 +200,20 @@ def test_two_qubit_gate_unsupported():
         mirror_circuits.generate_mirror_circuit(
             1, 1.0, nx.complete_graph(2), two_qubit_gate_name="bad_gate_name"
         )
+
+
+def test_deterministic_correct_bitstrings():
+    """For a fixed seed, correct bitstrings should be deterministic."""
+    expected_correct_bitstrings = (
+        [[0, 0], [1, 1], [0, 0], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0]]
+        + [[0, 0], [1, 1], [1, 1], [0, 1], [0, 1], [0, 1], [1, 0], [0, 1]]
+        + [[1, 1], [1, 0], [1, 0], [1, 0], [0, 0], [1, 1], [0, 0], [0, 1]]
+    )
+    for j, expected in enumerate(expected_correct_bitstrings):
+        _, bitstring = mirror_circuits.generate_mirror_circuit(
+            nlayers=1,
+            two_qubit_gate_prob=1.0,
+            connectivity_graph=nx.complete_graph(2),
+            seed=j,
+        )
+        assert bitstring == expected
