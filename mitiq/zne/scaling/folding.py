@@ -67,7 +67,7 @@ def _check_foldable(circuit: Circuit) -> None:
         )
 
     if not has_unitary(circuit):
-        if inverse(circuit, None) is None:
+        if inverse(circuit, default=None) is None:
             raise UnfoldableCircuitError(
                 "Circuit contains non-invertible channels which are not"
                 "terminal measurements and cannot be folded."
