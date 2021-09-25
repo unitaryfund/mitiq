@@ -78,10 +78,17 @@ Do the release
 Create a new tag
 ^^^^^^^^^^^^^^^^
 
-Once the PR to ``release`` is approved, tag the new commit on master
-(using ``git tag``) with a tag that matches the number ``VERSION.txt``
+Once the the changelog and `version.txt` are ready, checkout and pull the
+latest on the master branch. Then once you are up to date, tag the most recent
+commit on master (using ``git tag``) with a tag that matches the number ``VERSION.txt``
 (with a preceding "v", so ``0.1.0`` is ``v0.1.0``) and push this tag to the
 Github repository.
+
+.. code-block:: bash
+
+    git tag v0.1.0
+    git push origin v0.1.0
+
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Release the new version on Github
@@ -107,11 +114,12 @@ review it and publish the release.
 Release the new version on PyPI
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Once the GitHub release is published, the release is also published on PyPI.
+If it seems like it didn't push a new version to PyPI, you can trigger it manually.
 Go to `<https://github.com/unitaryfund/mitiq/actions/workflows/publish-pypi.yml>`__ and use
-the "Run Workflow" button to publish the new version on PyPI. Make sure to
-enter the version number for this release.
+the "Run Workflow" button to publish the new version on PyPI.
 
-In case the action for the automatic release on PyPI fails, the commands to release Mitiq are
+In case the action for releasing on PyPI fails, the Python commands to release Mitiq are:
 
 .. code-block:: bash
 
@@ -141,7 +149,7 @@ Update the new development version
 Add a new section to the ``CHANGELOG.md`` to track changes in the following
 release, meaning that if ``vX.Y.Z`` was just released, then there should be
 a section for ``vX.(Y+1).Z`` that is marked "In Development". Also, change the
-version in the ``VERSION.txt`` file from ``vX.Y.Z`` to ``vX.(Y+1).Zdev``.
+version in the ``VERSION.txt`` file from ``vX.Y.Z`` to ``vX.(Y+1).0dev``.
 
 =========================
 Releasing a version patch
