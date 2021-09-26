@@ -65,7 +65,9 @@ def execute_with_zne(
     if num_to_average < 1:
         raise ValueError("Argument `num_to_average` must be a positive int.")
 
-    return factory.run(qp, executor, observable, scale_noise, int(num_to_average)).reduce()
+    return factory.run(
+        qp, executor, observable, scale_noise, int(num_to_average)
+    ).reduce()
 
 
 def mitigate_executor(

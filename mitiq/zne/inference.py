@@ -16,6 +16,7 @@
 """Classes corresponding to different zero-noise extrapolation methods."""
 from abc import ABC, abstractmethod
 from copy import deepcopy
+import functools
 from typing import (
     Any,
     Callable,
@@ -298,7 +299,9 @@ class Factory(ABC):
         qp: QPROGRAM,
         executor: Callable[..., QuantumResult],
         observable: Optional[Observable] = None,
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
+        scale_noise: Callable[
+            [QPROGRAM, float], QPROGRAM
+        ] = fold_gates_at_random,
         num_to_average: int = 1,
     ) -> "Factory":
         """Calls the executor function on noise-scaled quantum circuit and
@@ -507,7 +510,9 @@ class BatchedFactory(Factory, ABC):
         qp: QPROGRAM,
         executor: Union[Callable[..., float], Callable[..., List[float]]],
         observable: Optional[Observable] = None,
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
+        scale_noise: Callable[
+            [QPROGRAM, float], QPROGRAM
+        ] = fold_gates_at_random,
         num_to_average: int = 1,
     ) -> "BatchedFactory":
         """Computes the expectation values at each scale factor and stores them
@@ -554,7 +559,9 @@ class BatchedFactory(Factory, ABC):
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
 
         if observable is not None:
-            res = [observable.expectation(circuit, executor) for circuit in to_run]
+            res = [
+                observable.expectation(circuit, executor) for circuit in to_run
+            ]
         else:
             # TODO: Just call Executor(executor).run(...) here.
             # Get the list of keywords associated to each circuit in "to_run"
@@ -729,7 +736,9 @@ class AdaptiveFactory(Factory, ABC):
         qp: QPROGRAM,
         executor: Callable[..., float],
         observable: Optional[Observable] = None,
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
+        scale_noise: Callable[
+            [QPROGRAM, float], QPROGRAM
+        ] = fold_gates_at_random,
         num_to_average: int = 1,
         max_iterations: int = 100,
     ) -> "AdaptiveFactory":
@@ -761,9 +770,23 @@ class AdaptiveFactory(Factory, ABC):
             """Evaluates the quantum expectation value for a given
             scale_factor and other executor parameters."""
             expectation_values = []
+
+            # TODO: Averaging over `num_to_average` should use batching.
             for _ in range(num_to_average):
                 scaled_qp = scale_noise(qp, scale_factor)
-                expectation_values.append(executor(scaled_qp, **exec_params))
+
+                if observable is not None:
+                    expectation_values.append(
+                        observable.expectation(
+                            scaled_qp,
+                            functools.partial(executor, **exec_params),
+                        )
+                    )
+                else:
+                    expectation_values.append(
+                        executor(scaled_qp, **exec_params)
+                    )
+
             return np.average(expectation_values)
 
         return self.run_classical(
@@ -1333,6 +1356,12 @@ class PolyExpFactory(BatchedFactory):
                 "The order cannot exceed the number"
                 f" of data points minus {1 + shift}."
             )
+        if not np.allclose(np.real(exp_values), exp_values):
+            raise ValueError(
+                f"Cannot extrapolate: Some expectation values in {exp_values} "
+                f"have non-zero imaginary part."
+            )
+        exp_values = np.real(exp_values)
 
         # Initialize default errors
         zne_error = None

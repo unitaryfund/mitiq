@@ -21,7 +21,10 @@ import cirq
 from mitiq.observable.observable import Observable
 from mitiq.observable.pauli import PauliString, PauliStringCollection
 from mitiq.rem.measurement_result import MeasurementResult
-from mitiq.interface.mitiq_cirq.cirq_utils import sample_bitstrings
+from mitiq.interface.mitiq_cirq.cirq_utils import (
+    sample_bitstrings,
+    compute_density_matrix,
+)
 from mitiq.utils import _equal
 
 
@@ -33,10 +36,6 @@ yrotation = cirq.SingleQubitCliffordGate.X_sqrt
 imat = np.identity(2)
 xmat = cirq.unitary(cirq.X)
 zmat = cirq.unitary(cirq.Z)
-
-
-def compute_density_matrix(circuit: cirq.Circuit) -> np.ndarray:
-    return cirq.DensityMatrixSimulator().simulate(circuit).final_density_matrix
 
 
 def test_observable():
@@ -206,7 +205,9 @@ def test_observable_expectation_from_measurements_two_pauli_strings():
 
 
 @pytest.mark.parametrize("n", range(1, 3 + 1))
-@pytest.mark.parametrize("executor", (sample_bitstrings, compute_density_matrix))
+@pytest.mark.parametrize(
+    "executor", (sample_bitstrings, compute_density_matrix)
+)
 def test_observable_expectation_one_circuit(n, executor):
     qubits = cirq.LineQubit.range(n)
     obs = Observable(PauliString(spec="X" * n))
@@ -217,7 +218,9 @@ def test_observable_expectation_one_circuit(n, executor):
 
 
 @pytest.mark.parametrize("n", range(1, 3 + 1))
-@pytest.mark.parametrize("executor", (sample_bitstrings, compute_density_matrix))
+@pytest.mark.parametrize(
+    "executor", (sample_bitstrings, compute_density_matrix)
+)
 def test_observable_expectation_two_circuits(n, executor):
     obs = Observable(
         PauliString(spec="X" * n, coeff=-2.0), PauliString(spec="Z" * n)
@@ -229,7 +232,9 @@ def test_observable_expectation_two_circuits(n, executor):
     assert np.isclose(expectation, -2.0, atol=1e-1)
 
 
-@pytest.mark.parametrize("executor", (sample_bitstrings, compute_density_matrix))
+@pytest.mark.parametrize(
+    "executor", (sample_bitstrings, compute_density_matrix)
+)
 def test_observable_expectation_supported_qubits(executor):
     a, b, c = cirq.LineQubit.range(3)
     circuit = cirq.Circuit(cirq.I(a), cirq.X.on(b), cirq.H.on(c))

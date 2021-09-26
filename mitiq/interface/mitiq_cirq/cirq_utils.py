@@ -53,6 +53,17 @@ def sample_bitstrings(
     )
 
 
+def compute_density_matrix(
+    circuit: cirq.Circuit,
+    noise_model: cirq.NOISE_MODEL_LIKE = cirq.amplitude_damp,
+    noise_level: Tuple[float] = (0.01,),
+) -> np.ndarray:
+    if sum(noise_level) > 0:
+        circuit = circuit.with_noise(noise_model(*noise_level))
+
+    return cirq.DensityMatrixSimulator().simulate(circuit).final_density_matrix
+
+
 def execute(circuit: cirq.Circuit, obs: np.ndarray) -> float:
     """Simulates noiseless wavefunction evolution and returns the
     expectation value of some observable.
