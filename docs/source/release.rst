@@ -28,7 +28,7 @@ Releasing a new version of Mitiq
 ================================
 
 .. note::
-    These instructions are for Mitiq maintainers. Nigtly builds of the Mitiq
+    These instructions are for Mitiq maintainers. Nightly builds of the Mitiq
     package are uploaded to TestPyPI automatically.
 
 When the time is ready for a new release, follow the checklist and
@@ -38,15 +38,12 @@ instructions of this document to go through all the steps below:
    :local:
    :depth: 3
 
---------------------------------
-Make a PR from Master to Release
---------------------------------
+-------------------------
+Prepare the master branch
+-------------------------
 
-The start of any release is drafting a PR from the master branch to the
-release branch. This will trigger a complete round of tests to make sure the
-code for the release passes them
-If you have to update the changelog and the version number, do so as a
-part of this PR.
+The start of any release is drafting the changelog and bumping the version
+number.
 
 ^^^^^^^^^^^^^^^^^^^^
 Verify the changelog
@@ -73,11 +70,15 @@ follow SemVer, so typically a release will involve changing the version from
 a change in stable release versions from ``vX.(Y-1).Z`` to ``vX.Y.Z``,
 in the case of a MINOR version increase.
 
-----------------
-Create a new tag
-----------------
+--------------
+Do the release
+--------------
 
-Once the PR to ``release`` is approved, tag the new commit on release
+^^^^^^^^^^^^^^^^
+Create a new tag
+^^^^^^^^^^^^^^^^
+
+Once the PR to ``release`` is approved, tag the new commit on master
 (using ``git tag``) with a tag that matches the number ``VERSION.txt``
 (with a preceding "v", so ``0.1.0`` is ``v0.1.0``) and push this tag to the
 Github repository.
@@ -103,29 +104,12 @@ review it and publish the release.
     verify changes have been updating by viewing `<https://mitiq.readthedocs.io/>`__.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Release the new version on Github
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. note::
-    You need to have write access to the Mitiq Github repository to make
-    a new release.
-
-------------------------------------------------
-Update the new development version
-------------------------------------------------
-
-Add a new section to the ``CHANGELOG.md`` to track changes in the following
-release, meaning that if ``vX.Y.Z`` was just released, then there should be
-a section for ``vX.(Y+1).Z`` that is marked "In Development". Also, change the
-version in the ``VERSION.txt`` file from ``vX.Y.Z`` to ``vX.(Y+1).Zdev``.
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Release the new version on PyPI
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. note::
-    There is a GitHub action in the ``.github`` folder to automatically upload Mitiq
-    to PyPI. You can check the release status `here <https://pypi.org/project/mitiq/#history>`__.
+Go to `<https://github.com/unitaryfund/mitiq/actions/workflows/publish-pypi.yml>`__ and use
+the "Run Workflow" button to publish the new version on PyPI. Make sure to
+enter the version number for this release.
 
 In case the action for the automatic release on PyPI fails, the commands to release Mitiq are
 
@@ -141,6 +125,23 @@ In case the action for the automatic release on PyPI fails, the commands to rele
 .. note::
     You need to be a registered maintainer of Mitiq project on PyPI to upload
     a new release on PyPI from your local machine.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Start the new version on Github
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+    You need to have write access to the Mitiq Github repository to make
+    a new release.
+
+------------------------------------------------
+Update the new development version
+------------------------------------------------
+
+Add a new section to the ``CHANGELOG.md`` to track changes in the following
+release, meaning that if ``vX.Y.Z`` was just released, then there should be
+a section for ``vX.(Y+1).Z`` that is marked "In Development". Also, change the
+version in the ``VERSION.txt`` file from ``vX.Y.Z`` to ``vX.(Y+1).Zdev``.
 
 =========================
 Releasing a version patch

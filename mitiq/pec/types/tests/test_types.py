@@ -715,12 +715,91 @@ def test_print_cirq_operation_representation():
     noisy_zop = NoisyOperation.from_cirq(
         circuit=cirq.Z, channel_matrix=np.zeros(shape=(4, 4))
     )
-
+    # Positive first coefficient
     decomp = OperationRepresentation(
         ideal=ideal, basis_expansion={noisy_xop: 0.5, noisy_zop: 0.5,},
     )
+    expected = r"0: ───H─── = 0.500*(0: ───X───)+0.500*(0: ───Z───)"
+    assert str(decomp) == expected
+    # Negative first coefficient
+    decomp = OperationRepresentation(
+        ideal=ideal, basis_expansion={noisy_xop: -0.5, noisy_zop: 1.5,},
+    )
+    expected = r"0: ───H─── = -0.500*(0: ───X───)+1.500*(0: ───Z───)"
+    assert str(decomp) == expected
+    # Empty representation
+    decomp = OperationRepresentation(ideal=ideal, basis_expansion={})
+    expected = r"0: ───H─── = 0.000"
+    assert str(decomp) == expected
 
-    expected = r"0: ───H─── = 0.500*0: ───X───+0.500*0: ───Z───"
+
+def test_print_operation_representation_two_qubits():
+    qreg = cirq.LineQubit.range(2)
+    ideal = cirq.Circuit(cirq.CNOT(*qreg))
+
+    noisy_a = NoisyOperation.from_cirq(
+        circuit=cirq.Circuit(
+            cirq.H.on_each(qreg), cirq.CNOT(*qreg), cirq.H.on_each(qreg)
+        )
+    )
+    noisy_b = NoisyOperation.from_cirq(
+        circuit=cirq.Circuit(
+            cirq.Z.on_each(qreg), cirq.CNOT(*qreg), cirq.Z.on_each(qreg),
+        )
+    )
+    decomp = OperationRepresentation(
+        ideal=ideal, basis_expansion={noisy_a: 0.5, noisy_b: 0.5,},
+    )
+    print(str(decomp))
+    expected = f"""
+0: ───@───
+      │
+1: ───X─── ={" "}
+
+0.500
+0: ───H───@───H───
+          │
+1: ───H───X───H───
+
++0.500
+0: ───Z───@───Z───
+          │
+1: ───Z───X───Z───"""
+    # Remove initial newline
+    expected = expected[1:]
+    assert str(decomp) == expected
+
+
+def test_print_operation_representation_two_qubits_neg():
+    qreg = cirq.LineQubit.range(2)
+    ideal = cirq.Circuit(cirq.CNOT(*qreg))
+
+    noisy_a = NoisyOperation.from_cirq(
+        circuit=cirq.Circuit(
+            cirq.H.on_each(qreg[0]), cirq.CNOT(*qreg), cirq.H.on_each(qreg[1])
+        )
+    )
+    noisy_b = NoisyOperation.from_cirq(
+        circuit=cirq.Circuit(cirq.Z.on_each(qreg[1]))
+    )
+    decomp = OperationRepresentation(
+        ideal=ideal, basis_expansion={noisy_a: -0.5, noisy_b: 1.5,},
+    )
+    print(str(decomp))
+    expected = f"""
+0: ───@───
+      │
+1: ───X─── ={" "}
+
+-0.500
+0: ───H───@───────
+          │
+1: ───────X───H───
+
++1.500
+1: ───Z───"""
+    # Remove initial newline
+    expected = expected[1:]
     assert str(decomp) == expected
 
 
