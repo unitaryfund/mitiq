@@ -80,7 +80,7 @@ def test_random_benchmarks(scale_noise, fac):
     def executor(qc):
         return noisy_simulation(qc, noise=noise, obs=obs)
 
-    mit_executor = mitigate_executor(executor, fac, scale_noise)
+    mit_executor = mitigate_executor(executor, factory=fac, scale_noise=scale_noise)
 
     unmitigated = []
     mitigated = []

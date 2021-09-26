@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import functools
 import pytest
 
 import numpy as np
@@ -209,6 +210,8 @@ def test_observable_expectation_from_measurements_two_pauli_strings():
     "executor", (sample_bitstrings, compute_density_matrix)
 )
 def test_observable_expectation_one_circuit(n, executor):
+    executor = functools.partial(executor, noise_level=(0,))
+
     qubits = cirq.LineQubit.range(n)
     obs = Observable(PauliString(spec="X" * n))
     circuit = cirq.Circuit(cirq.H.on_each(qubits))
@@ -222,6 +225,8 @@ def test_observable_expectation_one_circuit(n, executor):
     "executor", (sample_bitstrings, compute_density_matrix)
 )
 def test_observable_expectation_two_circuits(n, executor):
+    executor = functools.partial(executor, noise_level=(0,))
+
     obs = Observable(
         PauliString(spec="X" * n, coeff=-2.0), PauliString(spec="Z" * n)
     )
@@ -236,6 +241,8 @@ def test_observable_expectation_two_circuits(n, executor):
     "executor", (sample_bitstrings, compute_density_matrix)
 )
 def test_observable_expectation_supported_qubits(executor):
+    executor = functools.partial(executor, noise_level=(0,))
+
     a, b, c = cirq.LineQubit.range(3)
     circuit = cirq.Circuit(cirq.I(a), cirq.X.on(b), cirq.H.on(c))
 
