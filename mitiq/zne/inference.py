@@ -572,8 +572,7 @@ class BatchedFactory(Factory, ABC):
                     res = executor(to_run)  # type: ignore[assignment]
                 else:
                     res = executor(  # type: ignore[assignment]
-                        to_run,
-                        kwargs_list=kwargs_list
+                        to_run, kwargs_list=kwargs_list
                     )
             else:
                 res = [
