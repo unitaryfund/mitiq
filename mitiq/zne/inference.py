@@ -36,7 +36,7 @@ from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
 from cirq import Circuit
 
-from mitiq import QPROGRAM
+from mitiq._typing import QPROGRAM, QuantumResult
 from mitiq.observable import Observable
 from mitiq.executor import Executor
 from mitiq.zne.scaling import fold_gates_at_random
@@ -296,8 +296,9 @@ class Factory(ABC):
     def run(
         self,
         qp: QPROGRAM,
-        executor: Callable[..., float],
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        executor: Callable[..., QuantumResult],
+        observable: Optional[Observable] = None,
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
         num_to_average: int = 1,
     ) -> "Factory":
         """Calls the executor function on noise-scaled quantum circuit and
@@ -307,6 +308,10 @@ class Factory(ABC):
             qp: Quantum circuit to scale noise in.
             executor: Function which inputs a (list of) quantum circuits and
                 outputs a (list of) expectation values.
+            observable: Observable to compute expectation value of. If None,
+                the `executor` must return an expectation value. Otherwise,
+                the `QuantumResult` returned by `executor` is used to compute
+                the expectation of the observable.
             scale_noise: Function which inputs a quantum circuit and outputs
                 a noise-scaled quantum circuit.
             num_to_average: Number of times the executor function is called
@@ -530,6 +535,10 @@ class BatchedFactory(Factory, ABC):
                 set a list of keyword arguments (one for each circuit). This
                 is necessary only if the factory is initialized using the
                 optional "shot_list" parameter.
+            observable: Observable to compute expectation value of. If None,
+                the `executor` must return an expectation value. Otherwise,
+                the `QuantumResult` returned by `executor` is used to compute
+                the expectation of the observable.
             scale_noise: Noise scaling function.
             num_to_average: The number of circuits executed for each noise
                 scale factor. This parameter can be used to increase the
@@ -719,7 +728,8 @@ class AdaptiveFactory(Factory, ABC):
         self,
         qp: QPROGRAM,
         executor: Callable[..., float],
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        observable: Optional[Observable] = None,
+        scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
         num_to_average: int = 1,
         max_iterations: int = 100,
     ) -> "AdaptiveFactory":
@@ -732,6 +742,10 @@ class AdaptiveFactory(Factory, ABC):
             executor: Function executing a circuit; returns an expectation
                 value. If shot_list is not None, then "shot" must be
                 an additional argument of the executor.
+            observable: Observable to compute expectation value of. If None,
+                the `executor` must return an expectation value. Otherwise,
+                the `QuantumResult` returned by `executor` is used to compute
+                the expectation of the observable.
             scale_noise: Function that scales the noise level of a quantum
                 circuit.
             num_to_average: Number of times expectation values are computed by

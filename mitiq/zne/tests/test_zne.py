@@ -328,7 +328,7 @@ def test_qiskit_mitigate_executor_with_shot_list():
     fac = inference.ExpFactory(
         scale_factors=scale_factors, shot_list=shot_list
     )
-    mitigated_executor = mitigate_executor(qiskit_executor, fac)
+    mitigated_executor = mitigate_executor(qiskit_executor, factory=fac)
 
     circuit = qiskit_measure(
         *generate_rb_circuits(
