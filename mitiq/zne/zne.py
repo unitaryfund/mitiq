@@ -133,7 +133,10 @@ def zne_decorator(
         executor: Callable[[QPROGRAM], float]
     ) -> Callable[[QPROGRAM], float]:
         return mitigate_executor(
-            executor, factory, None, scale_noise, num_to_average
+            executor=executor,
+            factory=factory,
+            scale_noise=scale_noise,
+            num_to_average=num_to_average,
         )
 
     return decorator

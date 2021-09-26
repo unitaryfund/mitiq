@@ -36,13 +36,13 @@ PauliSumLike = Union[
 # Executors.
 def sample_bitstrings(
     circuit: cirq.Circuit,
-    noise_model: cirq.NOISE_MODEL_LIKE = cirq.amplitude_damp,
+    noise_model: cirq.NOISE_MODEL_LIKE = cirq.amplitude_damp,  # type: ignore
     noise_level: Tuple[float] = (0.01,),
     sampler: cirq.Sampler = cirq.DensityMatrixSimulator(),
     shots: int = 8192,
 ) -> MeasurementResult:
     if sum(noise_level) > 0:
-        circuit = circuit.with_noise(noise_model(*noise_level))
+        circuit = circuit.with_noise(noise_model(*noise_level))  # type: ignore
 
     result = sampler.run(circuit, repetitions=shots)
     return MeasurementResult(
@@ -55,11 +55,11 @@ def sample_bitstrings(
 
 def compute_density_matrix(
     circuit: cirq.Circuit,
-    noise_model: cirq.NOISE_MODEL_LIKE = cirq.amplitude_damp,
+    noise_model: cirq.NOISE_MODEL_LIKE = cirq.amplitude_damp,  # type: ignore
     noise_level: Tuple[float] = (0.01,),
 ) -> np.ndarray:
     if sum(noise_level) > 0:
-        circuit = circuit.with_noise(noise_model(*noise_level))
+        circuit = circuit.with_noise(noise_model(*noise_level))  # type: ignore
 
     return cirq.DensityMatrixSimulator().simulate(circuit).final_density_matrix
 

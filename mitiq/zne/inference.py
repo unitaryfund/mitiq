@@ -508,7 +508,7 @@ class BatchedFactory(Factory, ABC):
     def run(
         self,
         qp: QPROGRAM,
-        executor: Union[Callable[..., float], Callable[..., List[float]]],
+        executor: Callable[..., QuantumResult],
         observable: Optional[Observable] = None,
         scale_noise: Callable[
             [QPROGRAM, float], QPROGRAM
@@ -569,9 +569,12 @@ class BatchedFactory(Factory, ABC):
 
             if Executor.is_batched_executor(executor):
                 if all([kwargs == {} for kwargs in kwargs_list]):
-                    res = executor(to_run)
+                    res = executor(to_run)  # type: ignore[assignment]
                 else:
-                    res = executor(to_run, kwargs_list=kwargs_list)
+                    res = executor(  # type: ignore[assignment]
+                        to_run,
+                        kwargs_list=kwargs_list
+                    )
             else:
                 res = [
                     executor(circ, **kwargs)  # type: ignore
@@ -734,7 +737,7 @@ class AdaptiveFactory(Factory, ABC):
     def run(
         self,
         qp: QPROGRAM,
-        executor: Callable[..., float],
+        executor: Callable[..., QuantumResult],
         observable: Optional[Observable] = None,
         scale_noise: Callable[
             [QPROGRAM, float], QPROGRAM
@@ -769,7 +772,7 @@ class AdaptiveFactory(Factory, ABC):
         ) -> float:
             """Evaluates the quantum expectation value for a given
             scale_factor and other executor parameters."""
-            expectation_values = []
+            expectation_values: List[QuantumResult] = []
 
             # TODO: Averaging over `num_to_average` should use batching.
             for _ in range(num_to_average):
