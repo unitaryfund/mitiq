@@ -753,7 +753,7 @@ class AdaptiveFactory(Factory, ABC):
             executor: Function executing a circuit; returns an expectation
                 value. If shot_list is not None, then "shot" must be
                 an additional argument of the executor.
-            observable: Observable to compute expectation value of. If None,
+            observable: Observable to compute the expectation value of. If None,
                 the `executor` must return an expectation value. Otherwise,
                 the `QuantumResult` returned by `executor` is used to compute
                 the expectation of the observable.
