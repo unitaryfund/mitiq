@@ -540,7 +540,7 @@ class BatchedFactory(Factory, ABC):
                 set a list of keyword arguments (one for each circuit). This
                 is necessary only if the factory is initialized using the
                 optional "shot_list" parameter.
-            observable: Observable to compute expectation value of. If None,
+            observable: Observable to compute the expectation value of. If None,
                 the `executor` must return an expectation value. Otherwise,
                 the `QuantumResult` returned by `executor` is used to compute
                 the expectation of the observable.
