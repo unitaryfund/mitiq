@@ -125,7 +125,7 @@ class Observable:
             return np.trace(density_matrix @ self.matrix())
         else:
             # TODO: Support batched executors.
-            raise ValueError(
+            raise ValueError(  # pragma: no cover
                 f"Arg `execute` must be a function with annotated return type "
                 f"that is either mitiq.MeasurementResult or np.ndarray but "
                 f"was {result_type}."
