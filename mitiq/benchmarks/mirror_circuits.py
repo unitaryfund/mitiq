@@ -205,7 +205,9 @@ def generate_mirror_circuit(
     )
 
     # Compute the bitstring this circuit should sample.
-    res = cirq.Simulator().run(circuit + cirq.measure(*circuit.all_qubits()))
+    res = cirq.Simulator().run(
+        circuit + cirq.measure(*sorted(circuit.all_qubits()))
+    )
     bitstring = list(res.measurements.values())[0][0].tolist()
 
     return_type = "cirq" if not return_type else return_type

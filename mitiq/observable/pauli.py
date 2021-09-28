@@ -37,8 +37,7 @@ class PauliString:
 
     def __init__(
         self,
-        *,
-        spec: str,
+        spec: str = "",
         coeff: complex = 1.0,
         support: Optional[Sequence[int]] = None,
     ) -> None:
@@ -141,6 +140,11 @@ class PauliString:
         return PauliStringCollection(self)._expectation_from_measurements(
             measurements
         )
+
+    def __mul__(self, other: "PauliString") -> "PauliString":
+        result = PauliString()
+        result._pauli = self._pauli * other._pauli
+        return result
 
     def __eq__(self, other: Any) -> bool:
         return self._pauli == other._pauli

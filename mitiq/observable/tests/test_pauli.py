@@ -44,6 +44,13 @@ def test_pauli_init():
     assert str(pauli) == "Z(1)*X(2)*Y(3)"
 
 
+def test_pauli_init_empty():
+    pauli = PauliString()
+    assert pauli.support() == set()
+    assert pauli.weight() == 0
+    assert np.allclose(pauli.matrix(), [[1]])
+
+
 def test_pauli_init_with_support():
     support = (2, 37)
     pauli = PauliString(spec="XZ", support=support)
@@ -179,6 +186,21 @@ def test_weight():
     assert PauliString(spec="X" * n).weight() == n
     assert PauliString(spec="IX" * n).weight() == n
     assert PauliString(spec="ZX" * n).weight() == 2 * n
+
+
+def test_multiplication():
+    Pauli = PauliString
+    assert Pauli("X") * Pauli("I") == Pauli("X")
+    assert Pauli("X") * Pauli("Y") == Pauli("Z", coeff=1j)
+    assert Pauli("X") * Pauli("Y", support=(1,)) == Pauli("XY")
+    assert Pauli("ZI", coeff=2) * Pauli("IZ", coeff=3) == Pauli("ZZ", coeff=6)
+
+    zz_mult = Pauli("ZI") * Pauli("IZ")
+    zz_expected = Pauli("ZZ")
+    assert zz_mult.support() == zz_expected.support()
+    assert np.allclose(zz_mult.matrix(), zz_expected.matrix())
+    assert str(zz_mult) == str(zz_expected)
+    assert zz_mult.weight() == zz_expected.weight()
 
 
 # Note: For testing `PauliString._expectation_from_measurements`, it makes no
