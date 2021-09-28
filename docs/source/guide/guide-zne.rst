@@ -8,10 +8,15 @@ Zero Noise Extrapolation
 
 Zero noise extrapolation is an error mitigation technique in which an expectation
 value is computed at different noise levels and, as a second step, the ideal expectation
-value is inferred extrapolating the measured results to the zero-noise limit. 
+value is inferred extrapolating the measured results to the zero-noise limit.
 
-Both steps---noise scaling and extrapolation---can be applied with Mitiq. The corresponding
-sub-modules are :mod:`mitiq.zne.scaling` and :mod:`mitiq.zne.inference`.
+Both steps---noise scaling and extrapolation---can be applied with Mitiq as shown in the Figure below. The corresponding
+sub-modules are :mod:`mitiq.zne.scaling.folding` and :mod:`mitiq.zne.inference`.
+
+
+.. figure:: ../img/zne_workflow2_steps.png
+  :width: 400
+  :name: figzne
 
 .. _guide_zne_folding:
 
@@ -700,7 +705,7 @@ and clips the result if it falls outside its physical domain.
          # Return the clipped zero-noise extrapolation.
          if not full_output:
             return np.clip(result, min_expval, max_expval)
-         
+
          if full_output:
             # In this case "result" is a tuple of extrapolation data
             zne_limit = np.clip(result[0], min_expval, max_expval)
