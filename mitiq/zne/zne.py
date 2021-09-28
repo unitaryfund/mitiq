@@ -37,7 +37,7 @@ def execute_with_zne(
     Args:
         qp: Quantum program to execute with error mitigation.
         executor: Executes a circuit and returns a `QuantumResult`.
-        observable: Observable to compute expectation value of. If None,
+        observable: Observable to compute the expectation value of. If None,
             the `executor` must return an expectation value. Otherwise,
             the `QuantumResult` returned by `executor` is used to compute the
             expectation of the observable.
@@ -86,7 +86,7 @@ def mitigate_executor(
 
     Args:
         executor: Executes a circuit and returns a `QuantumResult`.
-        observable: Observable to compute expectation value of. If None,
+        observable: Observable to compute the expectation value of. If None,
             the `executor` must return an expectation value. Otherwise,
             the `QuantumResult` returned by `executor` is used to compute the
             expectation of the observable.
