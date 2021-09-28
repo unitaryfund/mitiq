@@ -10,6 +10,8 @@ the :ref:`About Error Mitigation <guide_qem_pec>` section.
 
 A figure of the typical workflow for PEC in Mitiq is shown in the figure below.
 
-.. image:: ../img/pec_workflow2_steps.png
+.. figure:: ../img/pec_workflow2_steps.png
   :width: 400
-  :alt: PEC workflow in Mitiq.
+  :alt: The PEC workflow in Mitiq is divided in two steps: Generating circuits and then performing the inference to obtain a noise mitigated expectation value.
+    :figclass: align-center
+    	The PEC workflow in Mitiq is divided in two steps: Generating circuits and then performing the inference to obtain a noise mitigated expectation value.
