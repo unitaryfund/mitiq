@@ -310,7 +310,7 @@ class Factory(ABC):
         Args:
             qp: Quantum circuit to scale noise in.
             executor: Function which inputs a (list of) quantum circuits and
-                outputs a (list of) expectation values.
+                outputs a (list of) ``mitiq.QuantumResult`` s.
             observable: Observable to compute the expectation value of. If
                 None, the `executor` must return an expectation value.
                 Otherwise, the `QuantumResult` returned by `executor` is used
@@ -533,13 +533,13 @@ class BatchedFactory(Factory, ABC):
             qp: Quantum circuit to run.
             executor: A "single executor" (1) or a "batched executor" (2).
                 (1) A function which inputs a single circuit and outputs a
-                single expectation value of interest.
+                single ``mitiq.QuantumResult``.
                 (2) A function which inputs a list of circuits and outputs a
-                list of expectation values (one for each circuit). A batched
-                executor can also take an optional "kwargs_list" argument to
-                set a list of keyword arguments (one for each circuit). This
-                is necessary only if the factory is initialized using the
-                optional "shot_list" parameter.
+                list of ``mitiq.QuantumResult`` s (one for each circuit). A
+                batched executor can also take an optional "kwargs_list"
+                argument to set a list of keyword arguments (one for each
+                circuit). This is necessary only if the factory is initialized
+                using the optional "shot_list" parameter.
             observable: Observable to compute the expectation value of. If
                 None, the `executor` must return an expectation value.
                 Otherwise, the `QuantumResult` returned by `executor` is used
@@ -750,9 +750,10 @@ class AdaptiveFactory(Factory, ABC):
 
         Args:
             qp: Circuit to mitigate.
-            executor: Function executing a circuit; returns an expectation
-                value. If shot_list is not None, then "shot" must be
-                an additional argument of the executor.
+            executor: executor: Function which executes a circuit and returns a
+                ``mitiq.QuantumResult``. If the factory was initialized with a
+                ``shot_list``, then "shot" must be an additional argument of
+                the executor.
             observable: Observable to compute the expectation value of. If
                 None, the `executor` must return an expectation value.
                 Otherwise, the `QuantumResult` returned by `executor` is used
