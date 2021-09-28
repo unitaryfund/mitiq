@@ -8,11 +8,107 @@
 % # " - [Bug Fix]"
 % # " - Fix the bug."
 
+## Version 0.10.0  (September 17, 2021)
 
-## Version 0.10.0  (In Development)
+### Summary
 
+This release adds a ton of new stuff, both error mitigation tools as well as infrastructure upgrades.
+Some highlights:
+
+- New integration with [AWS Braket](https://aws.amazon.com/braket/)
+- A new pyQuil example by @Misty-W and lots of pyQuil debugging.
+- Support for mirror circuits by @DSamuel1.
+- Dependabot is now helping us keep our dependencies up to date.
+- Lots of documentation fixes and features like a gallery view of the examples and mybinder.org support.
+- New `Observable` and `MeasurementResult` dataclass.
+  
+Thanks to @Misty-W and @DSamuel1 for their great contributions this release! 🎉
+
+### All Changes
+
+- Reduce noise in braket example (@andreamari, gh-933)
+- Add ZNE example on AWS Braket (@rmlarose, gh-929)
+- A few changes / fixes to mirror circuits (@rmlarose, gh-928)
+- Change Binder link from jupyterlab to classic view (@andreamari, gh-925)
+- Dependabot settings patch: one dependancy per line (@rmlarose, gh-921)
+- Dependabot settings (@rmlarose, gh-920)
+- Update sphinxcontrib-bibtex requirement from ~=2.3.0 to ~=2.4.1 (@dependabot, gh-919)
+- Rename Mitiq Examples -> Examples (@nathanshammah, gh-916)
+- Update qiskit-terra requirement from ~=0.18.1 to ~=0.18.2 (@dependabot, gh-912)
+- Add `Observable.expectation` with support for measurement results and density matrices; Refactor `Collector` -> `Executor` (@rmlarose, gh-904)
+- Install mitiq in readthedocs to avoid mitiq.py files (@andreamari, gh-903)
+- Crazy4pi314/example gallery (@crazy4pi314, gh-902)
+- Import mirror circuits (@rmlarose, gh-900)
+- Mirror Circuits Update: Resolves #890 and #891 (@DSamuel1, gh-895)
+- Fix html rendering problems of the PEC example (@andreamari, gh-894)
+- Add `qubit_indices` to `MeasurementResult` (@rmlarose, gh-892)
+- Update mirror circuits docstrings (@rmlarose, gh-889)
+- Update flake8 requirement from ~=3.7.9 to ~=3.9.2 (@dependabot, gh-887)
+- Update pytest-cov requirement from ~=2.11.1 to ~=2.12.1 (@dependabot, gh-885)
+- Update sphinx-copybutton requirement from ~=0.3.0 to ~=0.4.0 (@dependabot, gh-884)
+- Update mypy requirement from ~=0.812 to ~=0.910 (@dependabot, gh-883)
+- Update pytest-xdist[psutil] requirement from ~=2.2.1 to ~=2.3.0 (@dependabot, gh-880)
+- Update sphinxcontrib-bibtex requirement from ~=2.2.0 to ~=2.3.0 (@dependabot, gh-879)
+- Update amazon-braket-sdk requirement from ~=1.5.10 to ~=1.8.0 (@dependabot, gh-878)
+- Bump codecov/codecov-action from 1.3.1 to 2.0.3 (@dependabot, gh-875)
+- Bump actions/stale from 3.0.19 to 4 (@dependabot, gh-874)
+- Updating pinned Scipy version (@crazy4pi314, gh-871)
+- Add some missing package metadata causing problems (@crazy4pi314, gh-870)
+- Fixing syntax for dependabot to make it work correctly (@crazy4pi314, gh-866)
+- Make `MeasurementResult` a dataclass; Add expectation from measurements (@rmlarose, gh-860)
+- Mirror circuits (@DSamuel1, gh-859)
+- Fix link in README (@andreamari, gh-856)
+- Add step-by-sep tutorial on PEC (@andreamari, gh-854)
+- Adding mitiq survey to readme (@crazy4pi314, gh-853)
+- Add `Observable` (@rmlarose, gh-852)
+- Manual PyPI deployment trigger (@crazy4pi314, gh-851)
+- Make sure stale marking of issues happens (@crazy4pi314, gh-849)
+- Fix invisible output in mitiq codeblocks (@andreamari, gh-847)
+- update references in README (@andreamari, gh-846)
+- Update to latest Qiskit (@rmlarose, gh-845)
+- Set measurement result type and add post-selection (@rmlarose, gh-844)
+- pyQuil parametric compilation example (@Misty-W, gh-843)
+- Add My Binder (@nathanshammah, gh-841)
+- Show output of Mitiq paper code blocks in example on RTD (@nathanshammah, gh-840)
+- Add code blocks from the paper (@nathanshammah, gh-838)
+- Make ZNE (more) usable with PyQuil (@rmlarose, gh-835)
+- Improve PEC efficiency with batched sampling (@andreamari, gh-833)
+- Fix warnings in docs log output during build (@andreamari, gh-832)
+- Update readme and remove research.rst (@rmlarose, gh-831)
+- Add linkcheck to docs build and fix broken links (@rmlarose, gh-827)
+- Initial support for executors which return measurement results: part 1/2 (@rmlarose, gh-826)
+- Adding table of techniques to readme (@crazy4pi314, gh-825)
+- Move example/template notebook to contributing TOC (@rmlarose, gh-814)
+- Fix multiplication order when adding NoisyOperations (@andreamari, gh-811)
+- Better error message for `CircuitConversionError`s (@rmlarose, gh-809)
+- Fix some documentation not being tested & remove global imports in docs config (@rmlarose, gh-804)
+## Version 0.9.3  (July 7th, 2021)
+
+### Summary
+
+This primary reason for this patch release is to fix a bug interfacing with Qiskit circuits (gh-802).
+
+### All Changes
+
+- [Docs] Add CDR to README and braket to Overview (@rmlarose, gh-778).
+- Rename parameter calibration function and make it visible (@rmlarose, gh-780).
+- Allow adding qubits when transforming registers in a Qiskit circuit (@rmlarose, gh-803).
+
+## Version 0.9.2  (June 30th, 2021)
+
+### Summary
+
+This patch release fixes a Braket integration bug (gh-767).
+It also adds an example about Clifford data regression in the documentation.
+
+### All Changes
+
+- Ensure short circuit warning is multi-platform (@andreamari gh-769).
+- Add CDR example to docs + small change to `cdr.calculate_observable` (@rmlarose, gh-750).
 
 ## Version 0.9.1  (June 24th, 2021)
+
+### Summary
 
 This is a patch release to fix two bugs (gh-736, gh-737) related to the integration with optional packages.
 It also fixes other minor problems (see the list of changes below).

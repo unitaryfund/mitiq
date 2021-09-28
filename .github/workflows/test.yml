@@ -109,6 +109,6 @@ jobs:
       - name: Submit coverage report to Codecov
         # Only submit to Codecov once.
         if: ${{ matrix.python-version == 3.8 }}
-        uses: codecov/codecov-action@v2.0.3
+        uses: codecov/codecov-action@v2.1.0
         with:
           fail_ci_if_error: true
