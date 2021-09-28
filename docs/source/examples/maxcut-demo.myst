@@ -463,7 +463,7 @@ def qaoa_mitigated_cost(params: np.array) -> float:
     qaoa_circuit = qaoa_ansatz(graph, params)
     qaoa_obs = qaoa_hamiltonian(graph)
     noisy_executor = partial(executor, obs=qaoa_obs, noise=BASE_NOISE)
-    mitigated_executor = mitigate_executor(noisy_executor, inference_factory, scaling_method)
+    mitigated_executor = mitigate_executor(noisy_executor, factory=inference_factory, scale_noise=scaling_method)
     return mitigated_executor(qaoa_circuit)
 
 # Minimize the cost function

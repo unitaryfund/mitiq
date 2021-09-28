@@ -258,8 +258,8 @@ def mitigated_expectation(
     mitigated_exp = zne.execute_with_zne(
         executable,
         lambda p: executor(thetas, backend, readout_qubit, samples, pauli_sum, p),
-        factory,
-        fold_gates_from_right,
+        factory=factory,
+        scale_noise=fold_gates_from_right,
     )
     """
     This function is the ZNE-wrapped executor, which outputs the error-mitigated 
