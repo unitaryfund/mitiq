@@ -558,15 +558,19 @@ class BatchedFactory(Factory, ABC):
         # Get all noise-scaled circuits to run
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
 
+        # Get the list of keywords associated to each circuit in "to_run"
+        kwargs_list = self._get_keyword_args(num_to_average)
+
         if observable is not None:
+            if not all([kwargs == {} for kwargs in kwargs_list]):
+                # TODO: Triage & fix.
+                #  See https://github.com/unitaryfund/mitiq/issues/952
+                raise NotImplementedError  # pragma: no cover
             res = [
                 observable.expectation(circuit, executor) for circuit in to_run
             ]
         else:
             # TODO: Just call Executor(executor).run(...) here.
-            # Get the list of keywords associated to each circuit in "to_run"
-            kwargs_list = self._get_keyword_args(num_to_average)
-
             if Executor.is_batched_executor(executor):
                 if all([kwargs == {} for kwargs in kwargs_list]):
                     res = executor(to_run)  # type: ignore[assignment]
