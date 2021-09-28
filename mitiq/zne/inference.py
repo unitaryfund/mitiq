@@ -311,10 +311,10 @@ class Factory(ABC):
             qp: Quantum circuit to scale noise in.
             executor: Function which inputs a (list of) quantum circuits and
                 outputs a (list of) expectation values.
-            observable: Observable to compute the expectation value of. If None,
-                the `executor` must return an expectation value. Otherwise,
-                the `QuantumResult` returned by `executor` is used to compute
-                the expectation of the observable.
+            observable: Observable to compute the expectation value of. If
+                None, the `executor` must return an expectation value.
+                Otherwise, the `QuantumResult` returned by `executor` is used
+                to compute the expectation of the observable.
             scale_noise: Function which inputs a quantum circuit and outputs
                 a noise-scaled quantum circuit.
             num_to_average: Number of times the executor function is called
@@ -540,10 +540,10 @@ class BatchedFactory(Factory, ABC):
                 set a list of keyword arguments (one for each circuit). This
                 is necessary only if the factory is initialized using the
                 optional "shot_list" parameter.
-            observable: Observable to compute the expectation value of. If None,
-                the `executor` must return an expectation value. Otherwise,
-                the `QuantumResult` returned by `executor` is used to compute
-                the expectation of the observable.
+            observable: Observable to compute the expectation value of. If
+                None, the `executor` must return an expectation value.
+                Otherwise, the `QuantumResult` returned by `executor` is used
+                to compute the expectation of the observable.
             scale_noise: Noise scaling function.
             num_to_average: The number of circuits executed for each noise
                 scale factor. This parameter can be used to increase the
@@ -753,10 +753,10 @@ class AdaptiveFactory(Factory, ABC):
             executor: Function executing a circuit; returns an expectation
                 value. If shot_list is not None, then "shot" must be
                 an additional argument of the executor.
-            observable: Observable to compute the expectation value of. If None,
-                the `executor` must return an expectation value. Otherwise,
-                the `QuantumResult` returned by `executor` is used to compute
-                the expectation of the observable.
+            observable: Observable to compute the expectation value of. If
+                None, the `executor` must return an expectation value.
+                Otherwise, the `QuantumResult` returned by `executor` is used
+                to compute the expectation of the observable.
             scale_noise: Function that scales the noise level of a quantum
                 circuit.
             num_to_average: Number of times expectation values are computed by
