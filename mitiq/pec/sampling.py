@@ -74,10 +74,7 @@ def sample_sequence(
             break
 
     if operation_representation is None:
-        raise ValueError(
-            f"Representation of ideal operation \n\n{ideal_operation}\n\n not "
-            "found in provided representations."
-        )
+        return [ideal_operation] * num_samples, [1] * num_samples, 1.0
 
     # Sample from this representation.
     norm = operation_representation.norm

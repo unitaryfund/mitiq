@@ -278,20 +278,16 @@ def test_execute_with_pec_mitigates_noise(circuit, executor, circuit_type):
 
 
 def test_execute_with_pec_with_observable():
-    """Tests that execute_with_pec mitigates the error of a noisy
-    expectation value.
-    """
     circuit = twoq_circ
-    true_value = 1.0
     obs = Observable(PauliString("ZZ"))
     executor = partial(
         mitiq_cirq.compute_density_matrix,
         noise_model=cirq.depolarize,
         noise_level=(BASE_NOISE,),
     )
+    true_value = 1.0
 
     noisy_value = obs.expectation(circuit, mitiq_cirq.compute_density_matrix)
-
     pec_value = execute_with_pec(
         circuit,
         executor,
@@ -303,6 +299,26 @@ def test_execute_with_pec_with_observable():
     )
     assert abs(pec_value - true_value) < abs(noisy_value - true_value)
     assert np.isclose(pec_value, true_value, atol=0.1)
+
+
+def test_execute_with_pec_partial_representations():
+    # Only use the CNOT representation.
+    reps = [pauli_representations[-1]]
+
+    pec_value = execute_with_pec(
+        twoq_circ,
+        executor=partial(
+            mitiq_cirq.compute_density_matrix,
+            noise_model=cirq.depolarize,
+            noise_level=(BASE_NOISE,),
+        ),
+        observable=Observable(PauliString("ZZ")),
+        representations=reps,
+        num_samples=100,
+        force_run_all=False,
+        random_state=101,
+    )
+    assert isinstance(pec_value, complex)
 
 
 @pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
@@ -565,7 +581,7 @@ def test_doc_is_preserved():
         """Doc of the original executor."""
         return 0
 
-    mit_executor = mitigate_executor(first_executor, representations)
+    mit_executor = mitigate_executor(first_executor, representations=representations)
     assert mit_executor.__doc__ == first_executor.__doc__
 
     @pec_decorator(representations)
