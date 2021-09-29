@@ -563,8 +563,7 @@ class BatchedFactory(Factory, ABC):
 
         if observable is not None:
             if not all([kwargs == {} for kwargs in kwargs_list]):
-                # TODO: Triage & fix.
-                #  See https://github.com/unitaryfund/mitiq/issues/952
+                # TODO: Support this case.
                 raise NotImplementedError  # pragma: no cover
             res = [
                 observable.expectation(circuit, executor) for circuit in to_run
