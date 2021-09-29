@@ -284,7 +284,11 @@ def test_execute_with_pec_with_observable():
     circuit = twoq_circ
     true_value = 1.0
     obs = Observable(PauliString("ZZ"))
-    executor = partial(mitiq_cirq.compute_density_matrix, noise_model=cirq.depolarize, noise_level=(BASE_NOISE,))
+    executor = partial(
+        mitiq_cirq.compute_density_matrix,
+        noise_model=cirq.depolarize,
+        noise_level=(BASE_NOISE,),
+    )
 
     noisy_value = obs.expectation(circuit, mitiq_cirq.compute_density_matrix)
 

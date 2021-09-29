@@ -66,8 +66,11 @@ def execute_with_pec(
 
     Args:
         circuit: The input circuit to execute with error-mitigation.
-        executor: A function which executes a circuit (sequence of circuits)
-            and returns an expectation value (sequence of expectation values).
+        executor: Executes a circuit and returns a `QuantumResult`.
+        observable: Observable to compute the expectation value of. If None,
+            the `executor` must return an expectation value. Otherwise,
+            the `QuantumResult` returned by `executor` is used to compute the
+            expectation of the observable.
         representations: Representations (basis expansions) of each operation
             in the input circuit.
         precision: The desired estimation precision (assuming the observable
@@ -138,7 +141,10 @@ def execute_with_pec(
     # Execute all sampled circuits
     if observable is not None:
         # TODO: Use batching.
-        results = [observable.expectation(circuit, executor) for circuit in sampled_circuits]
+        results = [
+            observable.expectation(circuit, executor)
+            for circuit in sampled_circuits
+        ]
     else:
         collected_executor = generate_collected_executor(
             executor, force_run_all=force_run_all
@@ -191,16 +197,19 @@ def mitigate_executor(
     contains all the raw data involved in the PEC process.
 
     Args:
-        executor: A function which executes a circuit (sequence of circuits)
-            and returns an expectation value (sequence of expectation values).
+        executor: Executes a circuit and returns a `QuantumResult`.
+        observable: Observable to compute the expectation value of. If None,
+            the `executor` must return an expectation value. Otherwise,
+            the `QuantumResult` returned by `executor` is used to compute the
+            expectation of the observable.
         representations: Representations (basis expansions) of each operation
             in the input circuit.
         precision: The desired estimation precision (assuming the observable
             is bounded by 1). The number of samples is deduced according
             to the formula (one_norm / precision) ** 2, where 'one_norm'
             is related to the negativity of the quasi-probability
-            representation [Temme2017]_. If 'num_samples' is explicitly set
-            by the user, 'precision' is ignored and has no effect.
+            representation [Temme2017]_. If 'num_samples' is explicitly set,
+            'precision' is ignored and has no effect.
         num_samples: The number of noisy circuits to be sampled for PEC.
             If not given, this is deduced from the argument 'precision'.
         force_run_all: If True, all sampled circuits are executed regardless of
