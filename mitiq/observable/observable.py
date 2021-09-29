@@ -124,7 +124,8 @@ class Observable:
 
             return np.trace(density_matrix @ self.matrix())
         else:
-            raise ValueError(
+            # TODO: Support batched executors.
+            raise ValueError(  # pragma: no cover
                 f"Arg `execute` must be a function with annotated return type "
                 f"that is either mitiq.MeasurementResult or np.ndarray but "
                 f"was {result_type}."
@@ -137,3 +138,6 @@ class Observable:
             pset._expectation_from_measurements(bitstrings)
             for (pset, bitstrings) in zip(self._groups, measurements)
         )
+
+    def __str__(self) -> str:
+        return " + ".join(map(str, self._paulis))

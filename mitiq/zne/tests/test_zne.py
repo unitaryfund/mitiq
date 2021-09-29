@@ -14,6 +14,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for zero-noise extrapolation."""
+import functools
+
 import numpy as np
 import pytest
 import cirq
@@ -26,7 +28,12 @@ from mitiq.zne import (
     mitigate_executor,
     zne_decorator,
 )
-from mitiq.zne.inference import LinearFactory, RichardsonFactory
+from mitiq.zne.inference import (
+    AdaExpFactory,
+    LinearFactory,
+    PolyFactory,
+    RichardsonFactory,
+)
 from mitiq.zne.scaling import (
     fold_gates_from_left,
     fold_gates_from_right,
@@ -42,6 +49,11 @@ from mitiq.interface.mitiq_qiskit import (
 
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES
 from mitiq.interface import convert_from_mitiq, accept_any_qprogram_as_input
+from mitiq.interface.mitiq_cirq import (
+    sample_bitstrings,
+    compute_density_matrix,
+)
+from mitiq.observable import Observable, PauliString
 
 
 BASE_NOISE = 0.007
@@ -73,6 +85,74 @@ def generic_executor(circuit, noise_level: float = 0.1) -> float:
 def executor(circuit) -> float:
     wavefunction = circuit.final_state_vector()
     return np.real(wavefunction.conj().T @ np.kron(npX, npZ) @ wavefunction)
+
+
+@pytest.mark.parametrize(
+    "executor", (sample_bitstrings, compute_density_matrix)
+)
+def test_with_observable_batched_factory(executor):
+    observable = Observable(PauliString(spec="Z"))
+    circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0))) * 20
+
+    noisy_value = observable.expectation(circuit, sample_bitstrings)
+    zne_value = execute_with_zne(
+        circuit,
+        executor=functools.partial(executor, noise_model=cirq.depolarize),
+        observable=observable,
+        factory=PolyFactory(scale_factors=[1, 3, 5], order=2),
+    )
+    true_value = observable.expectation(
+        circuit, functools.partial(compute_density_matrix, noise_level=(0,))
+    )
+
+    assert abs(zne_value - true_value) <= abs(noisy_value - true_value)
+
+
+@pytest.mark.parametrize(
+    "executor", (sample_bitstrings, compute_density_matrix)
+)
+def test_with_observable_adaptive_factory(executor):
+    observable = Observable(PauliString(spec="Z"))
+    circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0))) * 20
+
+    noisy_value = observable.expectation(circuit, sample_bitstrings)
+    zne_value = execute_with_zne(
+        circuit,
+        executor=functools.partial(executor, noise_model=cirq.amplitude_damp),
+        observable=observable,
+        factory=AdaExpFactory(steps=4, asymptote=0.5),
+    )
+    true_value = observable.expectation(
+        circuit, functools.partial(compute_density_matrix, noise_level=(0,))
+    )
+
+    assert abs(zne_value - true_value) <= abs(noisy_value - true_value)
+
+
+@pytest.mark.parametrize(
+    "executor", (sample_bitstrings, compute_density_matrix)
+)
+def test_with_observable_two_qubits(executor):
+    observable = Observable(
+        PauliString(spec="XX", coeff=-1.21), PauliString(spec="ZZ", coeff=0.7)
+    )
+    circuit = cirq.Circuit(
+        cirq.H.on(cirq.LineQubit(0)), cirq.CNOT.on(*cirq.LineQubit.range(2))
+    )
+    circuit += [circuit, cirq.inverse(circuit)] * 20
+
+    noisy_value = observable.expectation(circuit, sample_bitstrings)
+    zne_value = execute_with_zne(
+        circuit,
+        executor=functools.partial(executor, noise_model=cirq.depolarize),
+        observable=observable,
+        factory=PolyFactory(scale_factors=[1, 3, 5], order=2),
+    )
+    true_value = observable.expectation(
+        circuit, functools.partial(compute_density_matrix, noise_level=(0,))
+    )
+
+    assert abs(zne_value - true_value) <= 3 * abs(noisy_value - true_value)
 
 
 @pytest.mark.parametrize(
@@ -310,7 +390,7 @@ def test_qiskit_mitigate_executor_with_shot_list():
     fac = inference.ExpFactory(
         scale_factors=scale_factors, shot_list=shot_list
     )
-    mitigated_executor = mitigate_executor(qiskit_executor, fac)
+    mitigated_executor = mitigate_executor(qiskit_executor, factory=fac)
 
     circuit = qiskit_measure(
         *generate_rb_circuits(

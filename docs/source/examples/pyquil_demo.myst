@@ -113,7 +113,7 @@ results_zne = []
 fac = mitiq.zne.inference.LinearFactory(scale_factors=[1.0, 3.0])
 for theta in thetas:
     results_zne.append(
-        zne.execute_with_zne(quil_prog, lambda p: -1.0 * expectation(theta, p), fac)
+        zne.execute_with_zne(quil_prog, lambda p: -1.0 * expectation(theta, p), factory=fac)
     )
 ```
 +++
@@ -134,7 +134,7 @@ Run optimization with ZNE
 
 ```{code-cell}
 def mitigated_expectation(thetas, executable: Program, factory) -> float:
-    mitigated_exp =  zne.execute_with_zne(quil_prog, lambda p: expectation(thetas, p), factory)
+    mitigated_exp =  zne.execute_with_zne(quil_prog, lambda p: expectation(thetas, p), factory=factory)
     return mitigated_exp
 
 quil_prog = qc.compiler.quil_to_native_quil(program, protoquil=True)
