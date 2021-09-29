@@ -372,7 +372,7 @@ def test_large_sample_size_warning():
         execute_with_pec(
             oneq_circ,
             partial(fake_executor, random_state=np.random.RandomState(0)),
-            pauli_representations,
+            representations=pauli_representations,
             num_samples=100001,
         )
 

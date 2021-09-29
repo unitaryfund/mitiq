@@ -21,7 +21,8 @@ import warnings
 
 import numpy as np
 
-from mitiq import QPROGRAM
+from mitiq import QPROGRAM, Observable
+from mitiq._typing import QuantumResult
 from mitiq.executor import generate_collected_executor
 from mitiq.pec import sample_circuit, OperationRepresentation
 from mitiq.interface import convert_to_mitiq
@@ -42,8 +43,9 @@ _LARGE_SAMPLE_WARN = (
 
 def execute_with_pec(
     circuit: QPROGRAM,
-    executor: Callable[[QPROGRAM], float],
-    representations: List[OperationRepresentation],
+    executor: Callable[[QPROGRAM], QuantumResult],
+    observable: Optional[Observable] = None,
+    representations: Optional[List[OperationRepresentation]] = None,
     precision: float = 0.03,
     num_samples: Optional[int] = None,
     force_run_all: bool = True,
@@ -134,10 +136,13 @@ def execute_with_pec(
     )
 
     # Execute all sampled circuits
-    collected_executor = generate_collected_executor(
-        executor, force_run_all=force_run_all
-    )
-    results = collected_executor(sampled_circuits)
+    if observable is not None:
+        results = [observable.expectation(circuit, executor) for circuit in sampled_circuits]
+    else:
+        collected_executor = generate_collected_executor(
+            executor, force_run_all=force_run_all
+        )
+        results = collected_executor(sampled_circuits)
 
     # Evaluate unbiased estimators [Temme2017] [Endo2018] [Takagi2020]
     unbiased_estimators = [
@@ -151,9 +156,7 @@ def execute_with_pec(
         return pec_value
 
     # Build dictionary with additional results and data
-    pec_data: Dict[str, Any] = {}
-
-    pec_data = {
+    pec_data: Dict[str, Any] = {
         "num_samples": num_samples,
         "precision": precision,
         "pec_value": pec_value,
@@ -167,8 +170,9 @@ def execute_with_pec(
 
 
 def mitigate_executor(
-    executor: Callable[[QPROGRAM], float],
-    representations: List[OperationRepresentation],
+    executor: Callable[[QPROGRAM], QuantumResult],
+    observable: Optional[Observable] = None,
+    representations: Optional[List[OperationRepresentation]] = None,
     precision: float = 0.03,
     num_samples: Optional[int] = None,
     force_run_all: bool = True,
@@ -212,6 +216,7 @@ def mitigate_executor(
         return execute_with_pec(
             circuit,
             executor,
+            observable,
             representations,
             precision,
             num_samples,
@@ -266,6 +271,7 @@ def pec_decorator(
     ) -> Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]:
         return mitigate_executor(
             executor,
+            None,
             representations,
             precision,
             num_samples,
