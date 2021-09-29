@@ -581,7 +581,9 @@ def test_doc_is_preserved():
         """Doc of the original executor."""
         return 0
 
-    mit_executor = mitigate_executor(first_executor, representations=representations)
+    mit_executor = mitigate_executor(
+        first_executor, representations=representations
+    )
     assert mit_executor.__doc__ == first_executor.__doc__
 
     @pec_decorator(representations)

@@ -15,7 +15,7 @@
 
 """High-level probabilistic error cancellation tools."""
 
-from typing import Optional, Callable, List, Union, Tuple, Dict, Any
+from typing import cast, Optional, Callable, List, Union, Tuple, Dict, Any
 from functools import wraps
 import warnings
 
@@ -149,7 +149,7 @@ def execute_with_pec(
         collected_executor = generate_collected_executor(
             executor, force_run_all=force_run_all
         )
-        results = collected_executor(sampled_circuits)
+        results = cast(List[float], collected_executor(sampled_circuits))
 
     # Evaluate unbiased estimators [Temme2017] [Endo2018] [Takagi2020]
     unbiased_estimators = [
