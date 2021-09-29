@@ -24,8 +24,8 @@ import cirq
 import pyquil
 import qiskit
 
-from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
-from mitiq.interface import convert_to_mitiq, convert_from_mitiq
+from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES, PauliString, Observable
+from mitiq.interface import convert_to_mitiq, convert_from_mitiq, mitiq_cirq
 from mitiq.benchmarks.utils import noisy_simulation
 
 from mitiq.pec import execute_with_pec, NoisyOperation, OperationRepresentation
@@ -277,6 +277,30 @@ def test_execute_with_pec_mitigates_noise(circuit, executor, circuit_type):
     assert np.isclose(mitigated, true_noiseless_value, atol=0.1)
 
 
+def test_execute_with_pec_with_observable():
+    """Tests that execute_with_pec mitigates the error of a noisy
+    expectation value.
+    """
+    circuit = twoq_circ
+    true_value = 1.0
+    obs = Observable(PauliString("ZZ"))
+    executor = partial(mitiq_cirq.compute_density_matrix, noise_model=cirq.depolarize, noise_level=(BASE_NOISE,))
+
+    noisy_value = obs.expectation(circuit, mitiq_cirq.compute_density_matrix)
+
+    pec_value = execute_with_pec(
+        circuit,
+        executor,
+        observable=obs,
+        representations=pauli_representations,
+        num_samples=100,
+        force_run_all=False,
+        random_state=101,
+    )
+    assert abs(pec_value - true_value) < abs(noisy_value - true_value)
+    assert np.isclose(pec_value, true_value, atol=0.1)
+
+
 @pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])
 @pytest.mark.parametrize("seed", (2, 3))
 def test_execute_with_pec_with_different_samples(circuit, seed):
@@ -356,7 +380,7 @@ def test_bad_precision_argument(bad_value: float):
         execute_with_pec(
             oneq_circ,
             serial_executor,
-            pauli_representations,
+            representations=pauli_representations,
             precision=bad_value,
         )
 

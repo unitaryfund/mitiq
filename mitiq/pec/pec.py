@@ -137,6 +137,7 @@ def execute_with_pec(
 
     # Execute all sampled circuits
     if observable is not None:
+        # TODO: Use batching.
         results = [observable.expectation(circuit, executor) for circuit in sampled_circuits]
     else:
         collected_executor = generate_collected_executor(
