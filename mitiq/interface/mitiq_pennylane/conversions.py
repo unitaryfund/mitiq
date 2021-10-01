@@ -57,10 +57,12 @@ def from_pennylane(tape: QuantumTape) -> Circuit:
                 "to n-1, for n wires."
             )
 
-    if not all(m.return_type is Expectation for m in tape.measurements):
+    if len(tape.measurements) > 0:
         raise UnsupportedQuantumTapeError(
-            "Only expectation value measurements are supported."
+            "Measurements are not supported on the input tape. They should be subsequently added by"
+            "the executor."
         )
+
     output = cirq_from_qasm(tape.to_openqasm(rotations=True, wires=wires))
     # tape.to_openqasm always introduces measurements that we remove
     measurements = _pop_measurements(output)
