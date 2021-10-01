@@ -28,6 +28,12 @@ from pennylane.operation import Expectation
 
 from pennylane import from_qasm as pennylane_from_qasm
 
+from pennylane_qiskit.qiskit_device import QISKIT_OPERATION_MAP
+
+SUPPORTED_PL = set(QISKIT_OPERATION_MAP.keys())
+UNSUPPORTED = {"CRX", "CRY", "CRZ", "S", "T"}
+SUPPORTED = SUPPORTED_PL - UNSUPPORTED
+
 
 class UnsupportedQuantumTapeError(Exception):
     pass
