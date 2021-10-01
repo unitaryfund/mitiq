@@ -52,11 +52,11 @@ def test_from_pennylane_unsupported_tapes():
 def test_no_variance():
     with qml.tape.QuantumTape() as tape:
         qml.CNOT(wires=[0, 1])
-        qml.var(qml.PauliZ(0))
+        qml.expval(qml.PauliZ(0))
 
     with pytest.raises(
         UnsupportedQuantumTapeError,
-        match="Only expectation value measurements",
+        match="Measurements are not supported on the input tape.",
     ):
         from_pennylane(tape)
 
