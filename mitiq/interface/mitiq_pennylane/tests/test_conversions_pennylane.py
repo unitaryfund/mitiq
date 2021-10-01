@@ -29,8 +29,6 @@ from mitiq.interface.mitiq_pennylane import (
 from mitiq.utils import _equal
 
 
-
-
 def test_from_pennylane():
     with qml.tape.QuantumTape() as tape:
         qml.CNOT(wires=[0, 1])
@@ -140,12 +138,14 @@ def test_integration():
         for gates in gates_per_layers:
             for gate in gates:
                 params = list(np.pi * np.random.rand(gate.num_params))
-                rnd_wires = np.random.choice(range(n_wires), size=gate.num_wires, replace=False)
+                rnd_wires = np.random.choice(
+                    range(n_wires), size=gate.num_wires, replace=False
+                )
                 gate(
                     *params,
                     wires=[
                         int(w) for w in rnd_wires
-                    ]  # make sure we do not address wires as 0-d arrays
+                    ],  # make sure we do not address wires as 0-d arrays
                 )
 
     base_circ = from_pennylane(tape)
@@ -156,4 +156,3 @@ def test_integration():
     u_2 = cirq.unitary(circ_recovered)
 
     assert np.allclose(u_1, u_2)
-

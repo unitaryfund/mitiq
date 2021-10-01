@@ -69,7 +69,7 @@ def from_pennylane(tape: QuantumTape) -> Circuit:
         )
 
     tape = tape.expand(stop_at=lambda obj: obj.name in SUPPORTED)
-    
+
     output = cirq_from_qasm(tape.to_openqasm(rotations=True, wires=wires))
     # tape.to_openqasm always introduces measurements that we remove
     measurements = _pop_measurements(output)
