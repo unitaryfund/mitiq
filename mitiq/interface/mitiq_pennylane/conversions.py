@@ -17,17 +17,15 @@
 Pennylane's circuit representation.
 """
 
-from cirq import Circuit, Moment
-
-from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm, to_qasm
-from mitiq.utils import _pop_measurements
+from cirq import Circuit
 
 from pennylane.wires import Wires
 from pennylane.tape import QuantumTape
-
 from pennylane import from_qasm as pennylane_from_qasm
-
 from pennylane_qiskit.qiskit_device import QISKIT_OPERATION_MAP
+
+from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm, to_qasm
+
 
 SUPPORTED_PL = set(QISKIT_OPERATION_MAP.keys())
 UNSUPPORTED = {"CRX", "CRY", "CRZ", "S", "T"}
@@ -69,14 +67,9 @@ def from_pennylane(tape: QuantumTape) -> Circuit:
         )
 
     tape = tape.expand(stop_at=lambda obj: obj.name in SUPPORTED)
+    qasm = tape.to_openqasm(rotations=False, wires=wires, measure_all=False)
 
-    output = cirq_from_qasm(tape.to_openqasm(rotations=True, wires=wires))
-    # tape.to_openqasm always introduces measurements that we remove
-    measurements = _pop_measurements(output)
-    # Remove final empty moment if present
-    if measurements and output[-1] == Moment():
-        return output[:-1]
-    return output
+    return cirq_from_qasm(qasm)
 
 
 def to_pennylane(circuit: Circuit) -> QuantumTape:
