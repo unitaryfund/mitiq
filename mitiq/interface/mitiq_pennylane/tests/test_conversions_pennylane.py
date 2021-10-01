@@ -29,24 +29,6 @@ from mitiq.interface.mitiq_pennylane import (
 from mitiq.utils import _equal
 
 
-def test_from_pennylane_with_expvals():
-    """Tests converting Pennylane expectation values."""
-    # <X>
-    with qml.tape.QuantumTape() as tape:
-        qml.expval(qml.PauliX(wires=[0]))
-
-    circuit = from_pennylane(tape)
-    q = cirq.LineQubit(0)
-    correct = cirq.Circuit(cirq.H.on(q))
-    assert _equal(circuit, correct, require_qubit_equality=False)
-
-    # <Z>
-    with qml.tape.QuantumTape() as tape:
-        qml.expval(qml.PauliZ(wires=[0]))
-
-    circuit = from_pennylane(tape)
-    correct = cirq.Circuit()
-    assert _equal(circuit, correct, require_qubit_equality=False)
 
 
 def test_from_pennylane():
