@@ -24,7 +24,6 @@ from mitiq.utils import _pop_measurements
 
 from pennylane.wires import Wires
 from pennylane.tape import QuantumTape
-from pennylane.operation import Expectation
 
 from pennylane import from_qasm as pennylane_from_qasm
 
