@@ -64,8 +64,8 @@ def from_pennylane(tape: QuantumTape) -> Circuit:
 
     if len(tape.measurements) > 0:
         raise UnsupportedQuantumTapeError(
-            "Measurements are not supported on the input tape. They should be subsequently added by"
-            "the executor."
+            "Measurements are not supported on the input tape. "
+            "They should be subsequently added by the executor."
         )
 
     tape = tape.expand(stop_at=lambda obj: obj.name in SUPPORTED)
