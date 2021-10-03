@@ -16,7 +16,7 @@ In this example we demonstrate how to use Zero Noise Extrapolation (ZNE) in Miti
 
 When adding the noise mitigation function `zne.execute_with_zne` the `memory_map` is still passed to the executor function and the circuit parameters are updated without the need for repeated compilation. 
 
-The PyQuil parametric compilation example shown here is adapted from https://pyquil-docs.rigetti.com/en/v2.28.1/migration3-declare.html
+The example shown here is adapted from the [pyQuil parametric compilation tutorial](https://pyquil-docs.rigetti.com/en/v2.28.1/migration3-declare.html).
 
 
 ```{code-cell}
