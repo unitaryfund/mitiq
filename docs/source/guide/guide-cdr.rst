@@ -4,7 +4,7 @@
 Clifford Data Regression
 ************************
 
-Clifford Data Regression (CDR) is a learning-based quantum error mitigation technique. It is based on the
+Clifford Data Regression (CDR) is a learning-based quantum error mitigation technique.
 
 
 A figure of the typical workflow for CDR in Mitiq is shown in the figure below.
