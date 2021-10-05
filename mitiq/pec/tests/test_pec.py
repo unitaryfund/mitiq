@@ -465,7 +465,7 @@ def decorated_serial_executor(circuit: QPROGRAM) -> float:
         circuit, basis_expansion={NoisyOperation(circuit): 1.0}
     )
 
-    @pec_decorator([rep])
+    @pec_decorator(representations=[rep])
     def decorated_executor(qp):
         return serial_executor(qp)
 
@@ -586,7 +586,7 @@ def test_doc_is_preserved():
     )
     assert mit_executor.__doc__ == first_executor.__doc__
 
-    @pec_decorator(representations)
+    @pec_decorator(representations=representations)
     def second_executor(circuit):
         """Doc of the original executor."""
         return 0

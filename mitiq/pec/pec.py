@@ -239,14 +239,15 @@ def mitigate_executor(
 
 
 def pec_decorator(
-    representations: List[OperationRepresentation],
+    observable: Optional[Observable] = None,
+    representations: Optional[List[OperationRepresentation]] = None,
     precision: float = 0.03,
     num_samples: Optional[int] = None,
     force_run_all: bool = True,
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
 ) -> Callable[
-    [Callable[[Union[QPROGRAM, Any, Any, Any]], float]],
+    [Callable[[Union[QPROGRAM, Any, Any, Any]], QuantumResult]],
     Callable[
         [Union[QPROGRAM, Any, Any, Any]],
         Union[float, Tuple[float, Dict[str, Any]]],
@@ -259,6 +260,10 @@ def pec_decorator(
     which contains all the raw data involved in the PEC process.
 
     Args:
+        observable: Observable to compute the expectation value of. If None,
+            the `executor` function being decorated must return an expectation
+            value. Otherwise, the `QuantumResult` returned by this `executor`
+            is used to compute the expectation of the observable.
         representations: Representations (basis expansions) of each operation
             in the input circuit.
         precision: The desired estimation precision (assuming the observable
@@ -281,7 +286,7 @@ def pec_decorator(
     ) -> Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]:
         return mitigate_executor(
             executor,
-            None,
+            observable,
             representations,
             precision,
             num_samples,
