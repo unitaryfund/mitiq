@@ -17,6 +17,8 @@
 
 from typing import List, Optional, Tuple, Union
 from copy import deepcopy
+import warnings
+
 import numpy as np
 
 import cirq
@@ -71,6 +73,7 @@ def sample_sequence(
         1.0,
     )
     if representations is None:
+        warnings.warn(UserWarning(f"No representation found for \n\n{ideal_operation}."))
         return no_representation_return_value
 
     # Grab the representation for the given ideal operation.
@@ -82,6 +85,7 @@ def sample_sequence(
             break
 
     if operation_representation is None:
+        warnings.warn(UserWarning(f"No representation found for \n\n{ideal_operation}."))
         return no_representation_return_value
 
     # Sample from this representation.
