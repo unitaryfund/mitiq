@@ -107,15 +107,22 @@ def mitigate_executor(
 
 
 def zne_decorator(
+    observable: Optional[Observable] = None,
     factory: Optional[Factory] = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
-) -> Callable[[Callable[[QPROGRAM], float]], Callable[[QPROGRAM], float]]:
+) -> Callable[
+    [Callable[[QPROGRAM], QuantumResult]], Callable[[QPROGRAM], float]
+]:
     """Decorator which adds error mitigation to an executor function, i.e., a
     function which executes a quantum circuit with an arbitrary backend and
     returns an expectation value.
 
     Args:
+        observable: Observable to compute the expectation value of. If None,
+            the `executor` being decorated must return an expectation value.
+            Otherwise, the `QuantumResult` returned by the `executor` is used
+            to compute the expectation of the observable.
         factory: Factory object determining the zero-noise extrapolation
             method.
         scale_noise: Function for scaling the noise of a quantum circuit.
@@ -123,17 +130,18 @@ def zne_decorator(
             the executor after each call to scale_noise, then averaged.
     """
     # Raise an error if the decorator is used without parenthesis
-    if callable(factory):
+    if callable(observable):
         raise TypeError(
             "Decorator must be used with parentheses (i.e., @zne_decorator()) "
             "even if no explicit arguments are passed."
         )
 
     def decorator(
-        executor: Callable[[QPROGRAM], float]
+        executor: Callable[[QPROGRAM], QuantumResult]
     ) -> Callable[[QPROGRAM], float]:
         return mitigate_executor(
             executor=executor,
+            observable=observable,
             factory=factory,
             scale_noise=scale_noise,
             num_to_average=num_to_average,
