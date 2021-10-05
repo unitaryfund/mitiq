@@ -17,6 +17,8 @@
 
 from typing import List, Optional, Tuple, Union
 from copy import deepcopy
+import warnings
+
 import numpy as np
 
 import cirq
@@ -29,7 +31,7 @@ from mitiq.pec.types import OperationRepresentation
 
 def sample_sequence(
     ideal_operation: QPROGRAM,
-    representations: List[OperationRepresentation],
+    representations: Tuple[OperationRepresentation, ...] = (),
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     num_samples: int = 1,
 ) -> Tuple[List[QPROGRAM], List[int], float]:
@@ -74,9 +76,13 @@ def sample_sequence(
             break
 
     if operation_representation is None:
-        raise ValueError(
-            f"Representation of ideal operation \n\n{ideal_operation}\n\n not "
-            "found in provided representations."
+        warnings.warn(
+            UserWarning(f"No representation found for \n\n{ideal_operation}.")
+        )
+        return (
+            [ideal_operation] * num_samples,
+            [1] * num_samples,
+            1.0,
         )
 
     # Sample from this representation.
@@ -93,7 +99,7 @@ def sample_sequence(
 
 def sample_circuit(
     ideal_circuit: QPROGRAM,
-    representations: List[OperationRepresentation],
+    representations: Tuple[OperationRepresentation, ...] = (),
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     num_samples: int = 1,
 ) -> Tuple[List[QPROGRAM], List[int], float]:
