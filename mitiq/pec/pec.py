@@ -45,7 +45,7 @@ def execute_with_pec(
     circuit: QPROGRAM,
     executor: Callable[[QPROGRAM], QuantumResult],
     observable: Optional[Observable] = None,
-    representations: Optional[List[OperationRepresentation]] = None,
+    representations: Tuple[OperationRepresentation, ...] = (),
     precision: float = 0.03,
     num_samples: Optional[int] = None,
     force_run_all: bool = True,
@@ -179,7 +179,7 @@ def execute_with_pec(
 def mitigate_executor(
     executor: Callable[[QPROGRAM], QuantumResult],
     observable: Optional[Observable] = None,
-    representations: Optional[List[OperationRepresentation]] = None,
+    representations: Tuple[OperationRepresentation, ...] = (),
     precision: float = 0.03,
     num_samples: Optional[int] = None,
     force_run_all: bool = True,
@@ -240,7 +240,7 @@ def mitigate_executor(
 
 def pec_decorator(
     observable: Optional[Observable] = None,
-    representations: Optional[List[OperationRepresentation]] = None,
+    representations: Tuple[OperationRepresentation, ...] = (),
     precision: float = 0.03,
     num_samples: Optional[int] = None,
     force_run_all: bool = True,
@@ -282,7 +282,7 @@ def pec_decorator(
     """
 
     def decorator(
-        executor: Callable[[QPROGRAM], float]
+        executor: Callable[[QPROGRAM], QuantumResult]
     ) -> Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]:
         return mitigate_executor(
             executor,

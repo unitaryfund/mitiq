@@ -31,7 +31,7 @@ from mitiq.pec.types import OperationRepresentation
 
 def sample_sequence(
     ideal_operation: QPROGRAM,
-    representations: Optional[List[OperationRepresentation]] = None,
+    representations: Tuple[OperationRepresentation, ...] = (),
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     num_samples: int = 1,
 ) -> Tuple[List[QPROGRAM], List[int], float]:
@@ -67,15 +67,6 @@ def sample_sequence(
     Raises:
         ValueError: If no representation is found for `ideal_operation`.
     """
-    no_representation_return_value = (
-        [ideal_operation] * num_samples,
-        [1] * num_samples,
-        1.0,
-    )
-    if representations is None:
-        warnings.warn(UserWarning(f"No representation found for \n\n{ideal_operation}."))
-        return no_representation_return_value
-
     # Grab the representation for the given ideal operation.
     ideal, _ = convert_to_mitiq(ideal_operation)
     operation_representation = None
@@ -85,8 +76,14 @@ def sample_sequence(
             break
 
     if operation_representation is None:
-        warnings.warn(UserWarning(f"No representation found for \n\n{ideal_operation}."))
-        return no_representation_return_value
+        warnings.warn(
+            UserWarning(f"No representation found for \n\n{ideal_operation}.")
+        )
+        return (
+            [ideal_operation] * num_samples,
+            [1] * num_samples,
+            1.0,
+        )
 
     # Sample from this representation.
     norm = operation_representation.norm
@@ -102,7 +99,7 @@ def sample_sequence(
 
 def sample_circuit(
     ideal_circuit: QPROGRAM,
-    representations: Optional[List[OperationRepresentation]] = None,
+    representations: Tuple[OperationRepresentation, ...] = (),
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     num_samples: int = 1,
 ) -> Tuple[List[QPROGRAM], List[int], float]:
