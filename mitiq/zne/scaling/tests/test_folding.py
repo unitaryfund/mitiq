@@ -26,6 +26,7 @@ from cirq import (
     InsertStrategy,
     testing,
     ry,
+    rz,
 )
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 from qiskit.quantum_info.operators import Operator
@@ -440,6 +441,61 @@ def test_parametrized_circuit_folding(fold_method):
     folded_circ = fold_method(ansatz_circ, scale_factor=3.0)
     expected_circ = Circuit(ry(theta).on(q), ry(-theta).on(q), ry(theta).on(q))
     assert _equal(folded_circ, expected_circ)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [
+        fold_gates_from_left,
+        fold_gates_from_right,
+        fold_gates_at_random,
+        fold_global,
+    ],
+)
+def test_parametrized_circuit_folding_terminal_measurement(fold_method):
+    """Checks if the circuit with a terminal measurement is folded as expected
+    when the circuit operations have a valid inverse.
+    """
+    theta = Symbol("theta")
+    q = LineQubit(0)
+    ansatz_circ = Circuit(ry(theta).on(q), ops.measure(q))
+    folded_circ = fold_method(ansatz_circ, scale_factor=3.0)
+    expected_circ = Circuit(
+        ry(theta).on(q), ry(-theta).on(q), ry(theta).on(q), ops.measure(q)
+    )
+    assert _equal(folded_circ, expected_circ)
+
+
+@pytest.mark.parametrize(
+    "fold_method",
+    [
+        fold_gates_from_left,
+        fold_gates_from_right,
+        fold_gates_at_random,
+        fold_global,
+    ],
+)
+def test_errors_raised_parametrized_circuits(fold_method):
+    """Checks if proper error is raised in a symbolic circuit when it cannot
+    be folded.
+    """
+    theta = Symbol("theta")
+    q = LineQubit(0)
+    ansatz_circ = Circuit(ry(theta).on(q), ops.measure(q), rz(theta).on(q))
+    with pytest.raises(
+        UnfoldableCircuitError,
+        match="Circuit contains intermediate measurements",
+    ):
+        fold_method(ansatz_circ, scale_factor=3.0)
+
+    qbit = LineQubit(0)
+    circ = Circuit(
+        ry(theta).on(q), ops.depolarize(p=0.1).on(qbit), ops.measure(qbit)
+    )
+    with pytest.raises(
+        UnfoldableCircuitError, match="Circuit contains non-invertible"
+    ):
+        fold_method(circ, scale_factor=3.0)
 
 
 def test_fold_from_right_basic():
