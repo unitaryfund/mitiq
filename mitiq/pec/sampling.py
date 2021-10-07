@@ -15,7 +15,7 @@
 
 """Tools for sampling from the noisy representations of ideal operations."""
 
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Sequence, Union
 from copy import deepcopy
 import warnings
 
@@ -31,7 +31,7 @@ from mitiq.pec.types import OperationRepresentation
 
 def sample_sequence(
     ideal_operation: QPROGRAM,
-    representations: Tuple[OperationRepresentation, ...] = (),
+    representations: Sequence[OperationRepresentation],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     num_samples: int = 1,
 ) -> Tuple[List[QPROGRAM], List[int], float]:
@@ -99,7 +99,7 @@ def sample_sequence(
 
 def sample_circuit(
     ideal_circuit: QPROGRAM,
-    representations: Tuple[OperationRepresentation, ...] = (),
+    representations: Sequence[OperationRepresentation],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     num_samples: int = 1,
 ) -> Tuple[List[QPROGRAM], List[int], float]:

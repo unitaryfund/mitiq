@@ -27,6 +27,7 @@ def execute_with_zne(
     qp: QPROGRAM,
     executor: Callable[[QPROGRAM], QuantumResult],
     observable: Optional[Observable] = None,
+    *,
     factory: Optional[Factory] = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
@@ -73,6 +74,7 @@ def execute_with_zne(
 def mitigate_executor(
     executor: Callable[[QPROGRAM], QuantumResult],
     observable: Optional[Observable] = None,
+    *,
     factory: Optional[Factory] = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
@@ -100,7 +102,12 @@ def mitigate_executor(
     @wraps(executor)
     def new_executor(qp: QPROGRAM) -> float:
         return execute_with_zne(
-            qp, executor, observable, factory, scale_noise, num_to_average
+            qp,
+            executor,
+            observable,
+            factory=factory,
+            scale_noise=scale_noise,
+            num_to_average=num_to_average,
         )
 
     return new_executor
@@ -108,6 +115,7 @@ def mitigate_executor(
 
 def zne_decorator(
     observable: Optional[Observable] = None,
+    *,
     factory: Optional[Factory] = None,
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
@@ -140,8 +148,8 @@ def zne_decorator(
         executor: Callable[[QPROGRAM], QuantumResult]
     ) -> Callable[[QPROGRAM], float]:
         return mitigate_executor(
-            executor=executor,
-            observable=observable,
+            executor,
+            observable,
             factory=factory,
             scale_noise=scale_noise,
             num_to_average=num_to_average,
