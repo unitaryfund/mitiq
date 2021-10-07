@@ -26,6 +26,7 @@ from braket.circuits import (
     gates as braket_gates,
     Instruction,
 )
+import pennylane as qml
 
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES
 from mitiq.interface import (
@@ -66,6 +67,7 @@ circuit_types = {
     "qiskit": qiskit.QuantumCircuit,
     "pyquil": Program,
     "braket": BKCircuit,
+    "pennylane": qml.tape.QuantumTape,
 }
 
 
@@ -113,7 +115,7 @@ def test_from_mitiq(to_type):
 @pytest.mark.parametrize(
     "circuit_and_expected",
     [
-        (cirq.Circuit(cirq.I.on(cirq.LineQubit(0))), np.array([1, 0])),
+        (cirq.Circuit(cirq.X.on(cirq.LineQubit(0))), np.array([0, 1])),
         (cirq_circuit, np.array([1, 0, 0, 1]) / np.sqrt(2)),
     ],
 )

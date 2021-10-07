@@ -387,7 +387,4 @@ def test_circuit_to_choi_and_operation_to_choi():
     noisy_circuit = Circuit(noisy_operation)
     noisy_circuit_twice = Circuit(noisy_sequence)
     assert np.allclose(choi, _circuit_to_choi(noisy_circuit))
-    print(noisy_circuit_twice)
-    print(_circuit_to_choi(noisy_circuit_twice))
-    print(choi_twice)
     assert np.allclose(choi_twice, _circuit_to_choi(noisy_circuit_twice))
