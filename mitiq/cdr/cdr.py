@@ -38,8 +38,9 @@ from mitiq.zne.scaling import fold_gates_at_random
 def execute_with_cdr(
     circuit: Circuit,
     executor: Callable[[Circuit], MeasurementResult],
-    simulator: Callable[[Circuit], Union[MeasurementResult, np.ndarray]],
     observables: List[np.ndarray],
+    *,
+    simulator: Callable[[Circuit], Union[MeasurementResult, np.ndarray]],
     num_training_circuits: int = 10,
     fraction_non_clifford: float = 0.1,
     fit_function: Callable[..., float] = linear_fit_function,
@@ -70,13 +71,13 @@ def execute_with_cdr(
         circuit: Circuit of interest compiled in the correct basis.
         executor: User defined function taking a cirq Circuit object and
                   returning a dictionary of counts.
+        observables: List of arrays containing the diagonal elements of
+            observable/s of interest to be mitigated. If a list is
+            passed all these observables will be mitigates with the
+            same training set.
         simulator: User defined function taking a cirq Circuit object and
                    returning either a simulated dictionary of counts or an
                    np.ndarray representing the state vector.
-        observables: List of arrays containing the diagonal elements of
-                    observable/s of interest to be mitigated. If a list is
-                    passed all these observables will be mitigates with the
-                    same training set.
         num_training_circuits: Number of training circuits to be used in the
                                mitigation.
         fraction_non_clifford: The fraction of non-Clifford gates to be

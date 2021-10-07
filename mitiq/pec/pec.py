@@ -15,7 +15,17 @@
 
 """High-level probabilistic error cancellation tools."""
 
-from typing import cast, Optional, Callable, List, Union, Tuple, Dict, Any
+from typing import (
+    cast,
+    Optional,
+    Callable,
+    List,
+    Union,
+    Sequence,
+    Tuple,
+    Dict,
+    Any,
+)
 from functools import wraps
 import warnings
 
@@ -45,7 +55,8 @@ def execute_with_pec(
     circuit: QPROGRAM,
     executor: Callable[[QPROGRAM], QuantumResult],
     observable: Optional[Observable] = None,
-    representations: Tuple[OperationRepresentation, ...] = (),
+    *,
+    representations: Sequence[OperationRepresentation],
     precision: float = 0.03,
     num_samples: Optional[int] = None,
     force_run_all: bool = True,
@@ -179,7 +190,8 @@ def execute_with_pec(
 def mitigate_executor(
     executor: Callable[[QPROGRAM], QuantumResult],
     observable: Optional[Observable] = None,
-    representations: Tuple[OperationRepresentation, ...] = (),
+    *,
+    representations: Sequence[OperationRepresentation],
     precision: float = 0.03,
     num_samples: Optional[int] = None,
     force_run_all: bool = True,
@@ -227,12 +239,12 @@ def mitigate_executor(
             circuit,
             executor,
             observable,
-            representations,
-            precision,
-            num_samples,
-            force_run_all,
-            random_state,
-            full_output,
+            representations=representations,
+            precision=precision,
+            num_samples=num_samples,
+            force_run_all=force_run_all,
+            random_state=random_state,
+            full_output=full_output,
         )
 
     return new_executor
@@ -240,7 +252,8 @@ def mitigate_executor(
 
 def pec_decorator(
     observable: Optional[Observable] = None,
-    representations: Tuple[OperationRepresentation, ...] = (),
+    *,
+    representations: Sequence[OperationRepresentation],
     precision: float = 0.03,
     num_samples: Optional[int] = None,
     force_run_all: bool = True,
@@ -287,12 +300,12 @@ def pec_decorator(
         return mitigate_executor(
             executor,
             observable,
-            representations,
-            precision,
-            num_samples,
-            force_run_all,
-            random_state,
-            full_output,
+            representations=representations,
+            precision=precision,
+            num_samples=num_samples,
+            force_run_all=force_run_all,
+            random_state=random_state,
+            full_output=full_output,
         )
 
     return decorator

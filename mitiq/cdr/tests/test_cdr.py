@@ -64,19 +64,19 @@ def test_execute_with_cdr(circuit_type):
     results0 = execute_with_cdr(
         circuit,
         noisy_executor,
-        simulator_statevector,
         obs_list,
-        num_circuits,
-        frac_non_cliff,
+        simulator=simulator_statevector,
+        num_training_circuits=num_circuits,
+        fraction_non_clifford=frac_non_cliff,
         full_output=True,
     )
     results1 = execute_with_cdr(
         circuit,
         noisy_executor,
-        simulator_statevector,
         obs_list,
-        num_circuits,
-        frac_non_cliff,
+        simulator=simulator_statevector,
+        num_training_circuits=num_circuits,
+        fraction_non_clifford=frac_non_cliff,
         ansatz=linear_fit_function_no_intercept,
         num_fit_parameters=1,
         scale_noise=fold_gates_from_left,
@@ -100,7 +100,7 @@ def test_no_num_fit_parameters_with_custom_fit_raises_error():
                 LineQubit.range(2), n_moments=2, random_state=1
             ),
             executor,
-            simulator_statevector,
             observables=[np.array([1, 0])],
+            simulator=simulator_statevector,
             fit_function=lambda _: 1,
         )
