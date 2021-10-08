@@ -731,6 +731,23 @@ def test_print_cirq_operation_representation():
     decomp = OperationRepresentation(ideal=ideal, basis_expansion={})
     expected = r"0: ───H─── = 0.000"
     assert str(decomp) == expected
+    # Small coefficient approximation
+    decomp = OperationRepresentation(
+        ideal=ideal, basis_expansion={noisy_xop: 1.00001, noisy_zop: 0.00001},
+    )
+    expected = r"0: ───H─── = 1.000*(0: ───X───)"
+    assert str(decomp) == expected
+    # Small coefficient approximation different position
+    decomp = OperationRepresentation(
+        ideal=ideal, basis_expansion={noisy_xop: 0.00001, noisy_zop: 1.00001},
+    )
+    expected = r"0: ───H─── = 1.000*(0: ───Z───)"
+    # Small coefficient approximation different position
+    decomp = OperationRepresentation(
+        ideal=ideal, basis_expansion={noisy_xop: 0.00001},
+    )
+    expected = r"0: ───H─── = 0.000"
+    assert str(decomp) == expected
 
 
 def test_print_operation_representation_two_qubits():
