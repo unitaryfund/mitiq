@@ -1,4 +1,4 @@
-# Third-party integration.
+# Third-party integration. 
 qiskit-terra~=0.18.3
 qiskit-aer~=0.8.2
 qiskit-ibmq-provider~=0.17.0
