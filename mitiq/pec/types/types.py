@@ -518,14 +518,15 @@ class OperationRepresentation:
         rhs = ""
         for c, circ in zip(self.coeffs, self.noisy_operations):
             c_str = _format_coefficient(".3f", c)
-            if c_str[0] not in ["+", "-"]:
-                c_str = "+" + c_str
-            if len(self._ideal.all_qubits()) == 1:
-                # Print single-qubit circuits horizontally
-                rhs += f"{c_str}*({circ!s})"
-            else:
-                # Print multi-qubit circuits vertically
-                rhs += "\n\n" + f"{c_str}\n{circ!s}"
+            if c_str:
+                if c_str[0] not in ["+", "-"]:
+                    c_str = "+" + c_str
+                if len(self._ideal.all_qubits()) == 1:
+                    # Print single-qubit circuits horizontally
+                    rhs += f"{c_str}*({circ!s})"
+                else:
+                    # Print multi-qubit circuits vertically
+                    rhs += "\n\n" + f"{c_str}\n{circ!s}"
         # Handle special cases as in cirq.value.linear_dict._format_terms()
         if not rhs:
             rhs = f"{0:.3f}"
