@@ -12,6 +12,18 @@ updates:
     allow:
       - dependency-type: "all"
     ignore:
+      # Ignore patch releases in "supported frontend/backend" packages.
+      - dependency-name: "cirq"
+        update-types: ["version-update:semver-patch"]
+      - dependency-name: "*qiskit*"
+        update-types: ["version-update:semver-patch"]
+      - dependency-name: "amazon-braket-sdk"
+        update-types: ["version-update:semver-patch"]
+      - dependency-name: "pyquil"
+        update-types: ["version-update:semver-patch"]
+      - dependency-name: "*pennylane*"
+        update-types: ["version-update:semver-patch"]
+      # Ignore minor and patch releases in other dev requirements.
       - dependency-name: "*pytest*"
         update-types: ["version-update:semver-minor", "version-update:semver-patch"]
       - dependency-name: "flake8"
