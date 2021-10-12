@@ -4,11 +4,11 @@ jupytext:
     extension: .myst
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.12.0
+    jupytext_version: 1.11.4
 kernelspec:
-  display_name: mitiq
+  display_name: Python 3
   language: python
-  name: mitiq
+  name: python3
 ---
 
 # Clifford data regression API
