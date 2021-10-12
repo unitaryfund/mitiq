@@ -21,8 +21,6 @@ from typing import Any, Callable, cast, Optional, Sequence
 import numpy as np
 from scipy.optimize import curve_fit
 
-from cirq import Circuit
-
 from mitiq.interface import accept_any_qprogram_as_input
 
 from mitiq.cdr import (
@@ -31,24 +29,24 @@ from mitiq.cdr import (
     linear_fit_function_no_intercept,
 )
 
-from mitiq import Observable
+from mitiq import Observable, QPROGRAM
 from mitiq._typing import QuantumResult
 from mitiq.zne.scaling import fold_gates_at_random
 
 
 @wraps(accept_any_qprogram_as_input)
 def execute_with_cdr(
-    circuit: Circuit,
-    executor: Callable[[Circuit], QuantumResult],
+    circuit: QPROGRAM,
+    executor: Callable[[QPROGRAM], QuantumResult],
     observable: Optional[Observable] = None,
     *,
-    simulator: Callable[[Circuit], QuantumResult],
+    simulator: Callable[[QPROGRAM], QuantumResult],
     num_training_circuits: int = 10,
     fraction_non_clifford: float = 0.1,
     fit_function: Callable[..., float] = linear_fit_function,
     num_fit_parameters: Optional[int] = None,
     scale_factors: Sequence[float] = (1,),
-    scale_noise: Callable[[Circuit, float], Circuit] = fold_gates_at_random,
+    scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     **kwargs: Any,
 ) -> float:
     """Function for the calculation of an observable from some circuit of
