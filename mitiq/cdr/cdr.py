@@ -69,30 +69,29 @@ def execute_with_cdr(
 
     This function returns the mitigated observable/s.
     Args:
-        circuit: Circuit of interest compiled in the correct basis.
-        executor: User defined function taking a cirq Circuit object and
-                  returning a dictionary of counts.
+        circuit: Quantum program to execute with error mitigation.
+        executor: Executes a circuit and returns a `QuantumResult`.
         observable: Observable to compute the expectation value of. If None,
             the `executor` must return an expectation value. Otherwise,
             the `QuantumResult` returned by `executor` is used to compute the
             expectation of the observable.
-        simulator: User defined function taking a cirq Circuit object and
-                   returning either a simulated dictionary of counts or an
-                   np.ndarray representing the state vector.
+        simulator: Executes a circuit without noise and returns a
+            `QuantumResult`. For CDR to be efficient, the simulator must
+            be able to efficiently simulate near-Clifford circuits.
         num_training_circuits: Number of training circuits to be used in the
-                               mitigation.
+            mitigation.
         fraction_non_clifford: The fraction of non-Clifford gates to be
-                               substituted in the training circuits. The higher
-                               this fraction the more costly the simulations,
-                               but more successful the mitigation.
+            substituted in the training circuits.
         fit_function: The function to map noisy to exact data. Takes array of
-                      noisy and data and parameters returning a float.
+            noisy and data and parameters returning a float. See
+            ``cdr.linear_fit_function`` for an example.
         num_fit_parameters: The number of parameters the fit_function takes.
-        scale_noise: Optional argument containing a user defined function on
-                     how to increase the noise. If this argument is given then
-                     the mitigation method will be vnCDR.
+        scale_noise: scale_noise: Function for scaling the noise of a quantum
+            circuit.
         scale_factors: Factors by which to scale the noise, should not
-                               include 1 as this is just the original circuit.
+            include 1 as this is just the original circuit. Note: When
+            scale_factors is provided, the method is known as "variable-noise
+            Clifford data regression."
         kwargs: Available keyword arguments are:
             - method_select (string): Specifies the method used to select the
                 non-Clifford gates to replace when constructing the
@@ -107,10 +106,6 @@ def execute_with_cdr(
             - sigma_replace (float): Width of the Gaussian distribution used
                 for ``method_replace='gaussian'``.
             - random_state (int): Seed for sampling.
-
-    Returns: A list of error mitigated observable expectation values. If
-        full_output is True, also returns the observable expectation values
-        for each training circuit (see above).
 
     .. [Czarnik2020] : Piotr Czarnik, Andrew Arramsmith, Patrick Coles,
         Lukasz Cincio, "Error mitigation with Clifford quantum circuit
