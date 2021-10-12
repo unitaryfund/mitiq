@@ -4,11 +4,11 @@ jupytext:
     extension: .myst
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.4
+    jupytext_version: 1.12.0
 kernelspec:
-  display_name: Python 3
+  display_name: mitiq
   language: python
-  name: python3
+  name: mitiq
 ---
 
 # Clifford data regression API
@@ -24,18 +24,18 @@ warnings.filterwarnings("ignore")
 import numpy as np
 
 import cirq
-from mitiq import cdr
+from mitiq import cdr, Observable, PauliString
 ```
 
 ## Setup
 
 +++
 
-To use CDR, we call `cdr.execute_with_cdr` with four necessary "ingredients":
+To use CDR, we call `cdr.execute_with_cdr` with four "ingredients":
 
 1. A quantum circuit to prepare a state $\rho$.
-1. A quantum computer or noisy simulator to sample bitstrings from $\rho$.
-1. One or more observables $O$ which specify what we wish to compute: $\text{Tr} [ \rho O ]$.
+1. A quantum computer or noisy simulator to return a `mitiq.QuantumResult` from $\rho$.
+1. An observable $O$ which specifies what we wish to compute via $\text{Tr} [ \rho O ]$.
 1. A near-Clifford (classical) circuit simulator.
 
 +++
@@ -58,7 +58,6 @@ circuit = cirq.Circuit(
     cirq.rz(-0.23).on(a),
     cirq.CNOT.on(b, a),
     cirq.rx(-0.112).on(a),
-    cirq.measure(a, b, key="z"),
 )
 circuit
 ```
@@ -67,50 +66,40 @@ circuit
 
 +++
 
-The executor inputs a circuit and returns a dictionary or counter of computational basis measurements. **The return type must be `Dict[int, int]` or `Counter[int]`.** 
-
-Typically this function will send the circuit to a quantum computer and wait for the results. Here for sake of example we use a noisy simulator.
+The executor inputs a circuit and returns a `mitiq.QuantumResult`. Typically this function will send the circuit to a quantum computer and wait for the results. Here for sake of example we use a simulator that adds single-qubit depolarizing noise after each moment and returns the final density matrix.
 
 ```{code-cell} ipython3
-from typing import Counter
+from mitiq.interface.mitiq_cirq import compute_density_matrix
 
-
-def sample_bitstrings(circ: cirq.Circuit, shots: int = 1000, noise: float = 0.01) -> Counter[int]:
-    # Add depolarizing noise to emulate a noisy quantum processor!
-    circuit = circ.with_noise(cirq.depolarize(noise))
-    
-    return cirq.DensityMatrixSimulator().run(circuit, repetitions=shots).histogram(key="z")
+compute_density_matrix(circuit).round(3)
 ```
 
-An example of calling this function is shown below.
-
-```{code-cell} ipython3
-sample_bitstrings(circuit)
-```
-
-### (3) Observable(s)
+### (3) Observable
 
 +++
 
-The observables $O$ indicate what we wish to compute via $\text{Tr} [ \rho O ]$ and **must be specified as "diagonal" (one-dimensional) NumPy arrays.**
+The observables $O$ indicates what we wish to compute via $\text{Tr} [ \rho O ]$.
 
 ```{code-cell} ipython3
-# Observable(s) to measure.
-z = np.diag([1, -1])
-obs = np.diag(np.kron(z, z))
+# Observable to measure.
+obs = Observable(PauliString("ZZ"), PauliString("X", coeff=-1.75))
+print(obs)
 ```
 
 ### (4) (Near-clifford) Simulator
 
 +++
 
-The CDR method creates a set of "training circuits" which are related to the input circuit and are efficiently simulable. These circuits are simulated on a classical (noiseless) simulator to collect data for regression. **The simulator return type must be the same as the executor return type.**
+The CDR method creates a set of "training circuits" which are related to the input circuit and are efficiently simulable. These circuits are simulated on a classical (noiseless) simulator to collect data for regression. The simulator should also return a `QuantumResult`.
 
-To use CDR at scale, an efficient near-Clifford circuit simulator must be specified. In this example, the circuit is small enough to use any classical simulator.
+To use CDR at scale, an efficient near-Clifford circuit simulator must be specified. In this example, the circuit is small enough to use any classical simulator, and we use the same density matrix simulator as above but without noise.
 
 ```{code-cell} ipython3
-def sample_bitstrings_simulator(circuit, shots: int = 1000) -> Counter:
-    return sample_bitstrings(circuit, shots=shots, noise=0.0)
+def simulate(circuit: cirq.Circuit) -> np.ndarray:
+    return compute_density_matrix(circuit, noise_level=(0.0,))
+
+
+simulate(circuit).round(3)
 ```
 
 ## Results
@@ -124,30 +113,24 @@ Now we can run CDR. We first compute the noiseless result then the noisy result 
 ### The noiseless result
 
 ```{code-cell} ipython3
-cdr.execute.calculate_observable(
-    state_or_measurements=sample_bitstrings_simulator(circuit),
-    observable=obs,
-)
+obs.expectation(circuit, simulate).real
 ```
 
 ### The noisy result
 
 ```{code-cell} ipython3
-cdr.execute.calculate_observable(
-    state_or_measurements=sample_bitstrings(circuit),
-    observable=obs,
-)
+obs.expectation(circuit, compute_density_matrix).real
 ```
 
 ### The mitigated result
 
 ```{code-cell} ipython3
 cdr.execute_with_cdr(
-    circuit=circuit,
-    executor=sample_bitstrings,
-    observables=[obs],
-    simulator=sample_bitstrings_simulator,
-)
+    circuit,
+    compute_density_matrix,
+    observable=obs,
+    simulator=simulate,
+).real
 ```
 
 ## Additional options
@@ -166,12 +149,12 @@ One option is how many circuits are in the training set (default is 10). This ca
 
 ```{code-cell} ipython3
 cdr.execute_with_cdr(
-    circuit=circuit,
-    executor=sample_bitstrings,
-    observables=[obs],
-    simulator=sample_bitstrings_simulator,
-    num_training_circuits=5,
-)
+    circuit,
+    compute_density_matrix,
+    observable=obs,
+    simulator=simulate,
+    num_training_circuits=20,
+).real
 ```
 
 Another option is which fit function to use for regresstion (default is `cdr.linear_fit_function`).
@@ -182,29 +165,28 @@ Another option is which fit function to use for regresstion (default is `cdr.lin
 
 ```{code-cell} ipython3
 cdr.execute_with_cdr(
-    circuit=circuit,
-    executor=sample_bitstrings,
-    observables=[obs],
-    simulator=sample_bitstrings_simulator,
+    circuit,
+    compute_density_matrix,
+    observable=obs,
+    simulator=simulate,
     fit_function=cdr.linear_fit_function_no_intercept,
-)
+).real
 ```
 
 ### Variable noise CDR
 
 +++
 
-The circuit + training circuits can also be run at different noise scale factors to implement [Variable noise Clifford data regression](https://arxiv.org/abs/2011.01157).
+The circuit + training circuits can also be run at different noise scale factors to implement [variable noise Clifford data regression](https://arxiv.org/abs/2011.01157).
 
 ```{code-cell} ipython3
 from mitiq.zne import scaling
 
 cdr.execute_with_cdr(
-    circuit=circuit,
-    executor=sample_bitstrings,
-    observables=[obs],
-    simulator=sample_bitstrings_simulator,
-    scale_factors=(1, 3),
-    scale_noise=scaling.fold_gates_at_random,
-)
+    circuit,
+    compute_density_matrix,
+    observable=obs,
+    simulator=simulate,
+    scale_factors=(3,),
+).real
 ```

@@ -62,12 +62,13 @@ def simulate(circuit: QPROGRAM) -> np.ndarray:
         },
     ],
 )
-def test_execute_with_cdr(circuit_type, fit_function, kwargs):
+@pytest.mark.parametrize("random_state", [1, 2, 3, 4, 5])
+def test_execute_with_cdr(circuit_type, fit_function, kwargs, random_state):
     circuit = random_x_z_cnot_circuit(
-        LineQubit.range(2), n_moments=5, random_state=1
+        LineQubit.range(2), n_moments=5, random_state=random_state,
     )
     circuit = convert_from_mitiq(circuit, circuit_type)
-    obs = Observable(PauliString("IZ"), PauliString("ZZ"))
+    obs = Observable(PauliString("XZ"), PauliString("YY"))
 
     true_value = obs.expectation(circuit, simulate)
     noisy_value = obs.expectation(circuit, execute)
@@ -81,7 +82,7 @@ def test_execute_with_cdr(circuit_type, fit_function, kwargs):
         fit_function=fit_function,
         kwargs=kwargs,
     )
-    assert abs(cdr_value - true_value) < abs(noisy_value - true_value)
+    assert abs(cdr_value - true_value) <= abs(noisy_value - true_value)
 
 
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
@@ -103,7 +104,7 @@ def test_execute_with_variable_noise_cdr(circuit_type):
         fraction_non_clifford=0.5,
         scale_factors=[3],
     )
-    assert abs(vncdr_value - true_value) < abs(noisy_value - true_value)
+    assert abs(vncdr_value - true_value) <= abs(noisy_value - true_value)
 
 
 def test_no_num_fit_parameters_with_custom_fit_raises_error():
