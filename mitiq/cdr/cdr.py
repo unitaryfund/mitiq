@@ -16,7 +16,7 @@
 """API for using Clifford Data Regression (CDR) error mitigation."""
 
 from functools import wraps
-from typing import Any, Callable, cast, List, Optional, Sequence, Tuple, Union
+from typing import Any, Callable, cast, Optional, Sequence
 
 import numpy as np
 from scipy.optimize import curve_fit
@@ -30,26 +30,27 @@ from mitiq.cdr import (
     linear_fit_function,
     linear_fit_function_no_intercept,
 )
-from mitiq.cdr.execute import calculate_observable, MeasurementResult
+
+from mitiq import Observable
+from mitiq._typing import QuantumResult
 from mitiq.zne.scaling import fold_gates_at_random
 
 
 @wraps(accept_any_qprogram_as_input)
 def execute_with_cdr(
     circuit: Circuit,
-    executor: Callable[[Circuit], MeasurementResult],
-    observables: List[np.ndarray],
+    executor: Callable[[Circuit], QuantumResult],
+    observable: Optional[Observable] = None,
     *,
-    simulator: Callable[[Circuit], Union[MeasurementResult, np.ndarray]],
+    simulator: Callable[[Circuit], QuantumResult],
     num_training_circuits: int = 10,
     fraction_non_clifford: float = 0.1,
     fit_function: Callable[..., float] = linear_fit_function,
     num_fit_parameters: Optional[int] = None,
     scale_factors: Sequence[float] = (1,),
     scale_noise: Callable[[Circuit, float], Circuit] = fold_gates_at_random,
-    full_output: bool = False,
     **kwargs: Any,
-) -> Union[List[float], Tuple[List[float], np.ndarray]]:
+) -> float:
     """Function for the calculation of an observable from some circuit of
     interest to be mitigated with CDR (or vnCDR) based on [Czarnik2020]_ and
     [Lowe2020]_.
@@ -71,10 +72,10 @@ def execute_with_cdr(
         circuit: Circuit of interest compiled in the correct basis.
         executor: User defined function taking a cirq Circuit object and
                   returning a dictionary of counts.
-        observables: List of arrays containing the diagonal elements of
-            observable/s of interest to be mitigated. If a list is
-            passed all these observables will be mitigates with the
-            same training set.
+        observable: Observable to compute the expectation value of. If None,
+            the `executor` must return an expectation value. Otherwise,
+            the `QuantumResult` returned by `executor` is used to compute the
+            expectation of the observable.
         simulator: User defined function taking a cirq Circuit object and
                    returning either a simulated dictionary of counts or an
                    np.ndarray representing the state vector.
@@ -92,10 +93,6 @@ def execute_with_cdr(
                      the mitigation method will be vnCDR.
         scale_factors: Factors by which to scale the noise, should not
                                include 1 as this is just the original circuit.
-        full_output: If True, returns ⟨𝛹| O |𝛹⟩ for each training circuit
-            |𝛹⟩ (including the original circuit) and each observable O. The
-            ith row of this 2d array corresponds to the ith observable, and
-            the jth column corresponds to the jth training circuit.
         kwargs: Available keyword arguments are:
             - method_select (string): Specifies the method used to select the
                 non-Clifford gates to replace when constructing the
@@ -158,55 +155,39 @@ def execute_with_cdr(
         for c in [circuit] + training_circuits  # type: ignore
     ]
 
-    # Execute all circuits to get MeasurementResult's. TODO: Allow batching.
-    noisy_counts = np.array(
-        [[executor(circ) for circ in circuits] for circuits in all_circuits]
-    )
-    ideal_counts = np.array([simulator(circ) for circ in all_circuits[0]])
-
-    results_dict_circuit_of_interest = noisy_counts[:, 0]
-
-    mitigated_observables = []
-    raw_observables = []
-    for obs in observables:
-        circuit_data = np.array(
+    # Execute all circuits. TODO: Allow batching.
+    if observable is None:
+        noisy_results = np.array(
             [
-                calculate_observable(measurements, obs)
-                for measurements in results_dict_circuit_of_interest
+                [executor(circuit) for circuit in circuits]
+                for circuits in all_circuits
             ]
         )
-        raw_observables.append(list(circuit_data))
-
-        # Get the noisy ⟨𝛹| O |𝛹⟩ from the noisy (executor) counts.
-        noisy_expectation_values = np.array(
+        ideal_results = np.array(
+            [simulator(circuit) for circuit in all_circuits[0]]
+        )
+    else:
+        noisy_results = np.array(
             [
                 [
-                    calculate_observable(measurements, obs)
-                    for measurements in row
+                    observable.expectation(circuit, executor)
+                    for circuit in circuits
                 ]
-                for row in noisy_counts
+                for circuits in all_circuits
             ]
         )
-
-        # Get the exact ⟨𝛹| O |𝛹⟩ from the exact (simulator) counts.
-        ideal_expectation_values = np.array(
+        ideal_results = np.array(
             [
-                calculate_observable(
-                    state_or_measurements=measurements, observable=obs
-                )
-                for measurements in ideal_counts
+                observable.expectation(circuit, simulator)
+                for circuit in all_circuits[0]
             ]
         )
 
-        # Do the regression.
-        fitted_params, _ = curve_fit(
-            lambda x, *params: fit_function(x, params),
-            noisy_expectation_values,
-            ideal_expectation_values,
-            p0=np.zeros(num_fit_parameters),
-        )
-        mitigated_observables.append(fit_function(circuit_data, fitted_params))
-
-    if not full_output:
-        return mitigated_observables
-    return mitigated_observables, np.array(raw_observables)
+    # Do the regression.
+    fitted_params, _ = curve_fit(
+        lambda x, *params: fit_function(x, params),
+        noisy_results,
+        ideal_results,
+        p0=np.zeros(num_fit_parameters),
+    )
+    return fit_function(noisy_results[:, 0], fitted_params)
