@@ -21,16 +21,13 @@ from typing import Any, Callable, cast, Optional, Sequence
 import numpy as np
 from scipy.optimize import curve_fit
 
+from mitiq import Observable, QPROGRAM, QuantumResult
 from mitiq.interface import accept_any_qprogram_as_input
-
 from mitiq.cdr import (
     generate_training_circuits,
     linear_fit_function,
     linear_fit_function_no_intercept,
 )
-
-from mitiq import Observable, QPROGRAM
-from mitiq._typing import QuantumResult
 from mitiq.zne.scaling import fold_gates_at_random
 
 
