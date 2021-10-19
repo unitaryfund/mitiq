@@ -79,8 +79,7 @@ real quantum hardware.
         b = qpu.compiler.native_quil_to_executable(p)
 
         # run the circuit, collect bitstrings
-        qpu.reset()
-        results = qpu.run(b)
+        results = qpu.run(b).readout_data.get("ro")
 
         # compute ground state expectation value
         return (
