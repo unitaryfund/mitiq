@@ -27,7 +27,7 @@ from cirq import (
     Circuit,
     is_measurement,
     DepolarizingChannel,
-    channel,
+    kraus,
 )
 
 from mitiq import QPROGRAM
@@ -339,7 +339,7 @@ def global_depolarizing_kraus(
     given noise level.
     """
     noisy_op = DepolarizingChannel(noise_level, num_qubits)
-    return list(channel(noisy_op))
+    return list(kraus(noisy_op))
 
 
 def local_depolarizing_kraus(

@@ -49,7 +49,7 @@ from IPython.display import display as ipython_display
 from matplotlib import pyplot as plt
 import numpy as np
 
-from cirq import LineQubit, NamedQubit, Circuit, X, Y, Z, channel, H, CNOT, depolarize, DensityMatrixSimulator
+from cirq import LineQubit, NamedQubit, Circuit, X, Y, Z, kraus, H, CNOT, depolarize, DensityMatrixSimulator
 
 from mitiq import pec
 from mitiq.pec import NoisyOperation, OperationRepresentation
