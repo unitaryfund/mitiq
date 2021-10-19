@@ -183,7 +183,9 @@ def expectation_from_sampling(
     """Calculate the expectation value of the Zi operator where i ranges over all 
     qubits given in marked_qubits.
     """
-    bitstring_samples = backend.run(executable, memory_map={"theta": thetas})
+    bitstring_samples = backend.run(
+        executable.write_memory(region_name="theta", value=theta)
+    ).readout_data.get("ro")
     bitstring_tuples = list(map(tuple, bitstring_samples))
 
     freq = Counter(bitstring_tuples)
@@ -255,12 +257,6 @@ in the Mitiq user guide.
 def mitigated_expectation(
     thetas, backend, readout_qubit, samples, pauli_sum, executable: Program, factory
 ) -> float:
-    mitigated_exp = zne.execute_with_zne(
-        executable,
-        lambda p: executor(thetas, backend, readout_qubit, samples, pauli_sum, p),
-        factory=factory,
-        scale_noise=fold_gates_from_right,
-    )
     """
     This function is the ZNE-wrapped executor, which outputs the error-mitigated 
     expectation value. 
@@ -277,6 +273,12 @@ def mitigated_expectation(
     Returns:
       The error-mitigated expectation value as a float.
     """
+    mitigated_exp = zne.execute_with_zne(
+        executable,
+        lambda p: executor(thetas, backend, readout_qubit, samples, pauli_sum, p),
+        factory=factory,
+        scale_noise=fold_gates_from_right,
+    )
     return mitigated_exp
 ```
 
