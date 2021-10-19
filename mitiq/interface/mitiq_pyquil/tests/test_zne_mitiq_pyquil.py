@@ -27,10 +27,11 @@ QVM.qam.random_seed = 1337
 
 
 def noiseless_executor(program: pyquil.Program) -> float:
+    program.measure_all()
     program.num_shots = 1_000
     program = basic_compile(program)
     executable = QVM.compiler.native_quil_to_executable(program)
-    results = QVM.run(executable)
+    results = QVM.run(executable).readout_data.get("ro")
 
     num_shots = len(results)
     return (

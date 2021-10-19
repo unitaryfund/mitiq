@@ -51,7 +51,6 @@ program += H(0)
 program += CNOT(1,0)
 program += H(0)
 program += MEASURE(0, ro[0])
-    
 ```
 +++
 
@@ -61,8 +60,10 @@ resulting from running the quantum program.
 
  
 ```{code-cell}
-def expectation(thetas, executable: Program) -> float:
-    bitstrings = qc.run(executable, memory_map={'theta': thetas})
+def expectation(theta, executable: Program) -> float:
+    bitstrings = qc.run(
+        executable.write_memory(region_name="theta", value=theta)
+    ).readout_data.get("ro")
     result = np.mean(bitstrings[:, 0])
     return -result
 ```
