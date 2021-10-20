@@ -28,6 +28,7 @@ from qiskit.providers.aer.noise.errors.standard_errors import (
 
 QASM_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
 WVF_SIMULATOR = qiskit.Aer.get_backend("statevector_simulator")
+DM_SIMULATOR = qiskit.Aer.get_backend("aer_simulator_density_matrix")
 
 
 def initialized_depolarizing_noise(noise: float) -> NoiseModel:
@@ -127,22 +128,20 @@ def execute_with_noise(
     Returns:
         The expectation value of obs as a float.
     """
-    circ.snapshot("final", snapshot_type="density_matrix")
+    circ.save_density_matrix()
 
     # execution of the experiment
     job = qiskit.execute(
         circ,
-        backend=QASM_SIMULATOR,
-        backend_options={"method": "density_matrix"},
+        backend=DM_SIMULATOR,
         noise_model=noise_model,
         # we want all gates to be actually applied,
         # so we skip any circuit optimization
-        basis_gates=noise_model.basis_gates,
+        basis_gates=noise_model.basis_gates + ['save_density_matrix'],
         optimization_level=0,
         shots=1,
     )
-    result = job.result()
-    rho = result.data()["snapshots"]["density_matrix"]["final"][0]["value"]
+    rho = job.result().data()["density_matrix"]
 
     expectation = np.real(np.trace(rho @ obs))
     return expectation
