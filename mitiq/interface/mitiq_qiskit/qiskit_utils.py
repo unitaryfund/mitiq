@@ -137,7 +137,7 @@ def execute_with_noise(
         noise_model=noise_model,
         # we want all gates to be actually applied,
         # so we skip any circuit optimization
-        basis_gates=noise_model.basis_gates + ['save_density_matrix'],
+        basis_gates=noise_model.basis_gates + ["save_density_matrix"],
         optimization_level=0,
         shots=1,
     )
