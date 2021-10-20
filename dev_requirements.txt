@@ -1,7 +1,5 @@
 # Third-party integration.
-qiskit-terra~=0.18.2
-qiskit-aer~=0.8.2
-qiskit-ibmq-provider~=0.16.0
+qiskit
 pyquil~=3.0.0
 pennylane-qiskit~=0.18.0
 pennylane~=0.18.0
