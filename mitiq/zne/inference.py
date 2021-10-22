@@ -16,6 +16,7 @@
 """Classes corresponding to different zero-noise extrapolation methods."""
 from abc import ABC, abstractmethod
 from copy import deepcopy
+import functools
 from typing import (
     Any,
     Callable,
@@ -36,8 +37,10 @@ from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
 from cirq import Circuit
 
-from mitiq import QPROGRAM
+from mitiq._typing import QPROGRAM, QuantumResult
+from mitiq.observable import Observable
 from mitiq.executor import Executor
+from mitiq.zne.scaling import fold_gates_at_random
 from mitiq.interface import accept_any_qprogram_as_input
 
 
@@ -294,8 +297,11 @@ class Factory(ABC):
     def run(
         self,
         qp: QPROGRAM,
-        executor: Callable[..., float],
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        executor: Callable[..., QuantumResult],
+        observable: Optional[Observable] = None,
+        scale_noise: Callable[
+            [QPROGRAM, float], QPROGRAM
+        ] = fold_gates_at_random,
         num_to_average: int = 1,
     ) -> "Factory":
         """Calls the executor function on noise-scaled quantum circuit and
@@ -304,7 +310,11 @@ class Factory(ABC):
         Args:
             qp: Quantum circuit to scale noise in.
             executor: Function which inputs a (list of) quantum circuits and
-                outputs a (list of) expectation values.
+                outputs a (list of) ``mitiq.QuantumResult`` s.
+            observable: Observable to compute the expectation value of. If
+                None, the `executor` must return an expectation value.
+                Otherwise, the `QuantumResult` returned by `executor` is used
+                to compute the expectation of the observable.
             scale_noise: Function which inputs a quantum circuit and outputs
                 a noise-scaled quantum circuit.
             num_to_average: Number of times the executor function is called
@@ -498,8 +508,11 @@ class BatchedFactory(Factory, ABC):
     def run(
         self,
         qp: QPROGRAM,
-        executor: Union[Callable[..., float], Callable[..., List[float]]],
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        executor: Callable[..., QuantumResult],
+        observable: Optional[Observable] = None,
+        scale_noise: Callable[
+            [QPROGRAM, float], QPROGRAM
+        ] = fold_gates_at_random,
         num_to_average: int = 1,
     ) -> "BatchedFactory":
         """Computes the expectation values at each scale factor and stores them
@@ -520,13 +533,17 @@ class BatchedFactory(Factory, ABC):
             qp: Quantum circuit to run.
             executor: A "single executor" (1) or a "batched executor" (2).
                 (1) A function which inputs a single circuit and outputs a
-                single expectation value of interest.
+                single ``mitiq.QuantumResult``.
                 (2) A function which inputs a list of circuits and outputs a
-                list of expectation values (one for each circuit). A batched
-                executor can also take an optional "kwargs_list" argument to
-                set a list of keyword arguments (one for each circuit). This
-                is necessary only if the factory is initialized using the
-                optional "shot_list" parameter.
+                list of ``mitiq.QuantumResult`` s (one for each circuit). A
+                batched executor can also take an optional "kwargs_list"
+                argument to set a list of keyword arguments (one for each
+                circuit). This is necessary only if the factory is initialized
+                using the optional "shot_list" parameter.
+            observable: Observable to compute the expectation value of. If
+                None, the `executor` must return an expectation value.
+                Otherwise, the `QuantumResult` returned by `executor` is used
+                to compute the expectation of the observable.
             scale_noise: Noise scaling function.
             num_to_average: The number of circuits executed for each noise
                 scale factor. This parameter can be used to increase the
@@ -544,16 +561,27 @@ class BatchedFactory(Factory, ABC):
         # Get the list of keywords associated to each circuit in "to_run"
         kwargs_list = self._get_keyword_args(num_to_average)
 
-        if Executor.is_batched_executor(executor):
-            if all([kwargs == {} for kwargs in kwargs_list]):
-                res = executor(to_run)
-            else:
-                res = executor(to_run, kwargs_list=kwargs_list)
-        else:
+        if observable is not None:
+            if not all([kwargs == {} for kwargs in kwargs_list]):
+                # TODO: Support this case.
+                raise NotImplementedError  # pragma: no cover
             res = [
-                executor(circ, **kwargs)  # type: ignore
-                for circ, kwargs in zip(to_run, kwargs_list)
+                observable.expectation(circuit, executor) for circuit in to_run
             ]
+        else:
+            # TODO: Just call Executor(executor).run(...) here.
+            if Executor.is_batched_executor(executor):
+                if all([kwargs == {} for kwargs in kwargs_list]):
+                    res = executor(to_run)  # type: ignore[assignment]
+                else:
+                    res = executor(  # type: ignore[assignment]
+                        to_run, kwargs_list=kwargs_list
+                    )
+            else:
+                res = [
+                    executor(circ, **kwargs)  # type: ignore
+                    for circ, kwargs in zip(to_run, kwargs_list)
+                ]
 
         # Reshape "res" to have "num_to_average" columns
         reshaped = np.array(res).reshape((-1, num_to_average))
@@ -711,8 +739,11 @@ class AdaptiveFactory(Factory, ABC):
     def run(
         self,
         qp: QPROGRAM,
-        executor: Callable[..., float],
-        scale_noise: Callable[[QPROGRAM, float], QPROGRAM],
+        executor: Callable[..., QuantumResult],
+        observable: Optional[Observable] = None,
+        scale_noise: Callable[
+            [QPROGRAM, float], QPROGRAM
+        ] = fold_gates_at_random,
         num_to_average: int = 1,
         max_iterations: int = 100,
     ) -> "AdaptiveFactory":
@@ -722,9 +753,14 @@ class AdaptiveFactory(Factory, ABC):
 
         Args:
             qp: Circuit to mitigate.
-            executor: Function executing a circuit; returns an expectation
-                value. If shot_list is not None, then "shot" must be
-                an additional argument of the executor.
+            executor: executor: Function which executes a circuit and returns a
+                ``mitiq.QuantumResult``. If the factory was initialized with a
+                ``shot_list``, then "shot" must be an additional argument of
+                the executor.
+            observable: Observable to compute the expectation value of. If
+                None, the `executor` must return an expectation value.
+                Otherwise, the `QuantumResult` returned by `executor` is used
+                to compute the expectation of the observable.
             scale_noise: Function that scales the noise level of a quantum
                 circuit.
             num_to_average: Number of times expectation values are computed by
@@ -739,10 +775,24 @@ class AdaptiveFactory(Factory, ABC):
         ) -> float:
             """Evaluates the quantum expectation value for a given
             scale_factor and other executor parameters."""
-            expectation_values = []
+            expectation_values: List[float] = []
+
+            # TODO: Averaging over `num_to_average` should use batching.
             for _ in range(num_to_average):
                 scaled_qp = scale_noise(qp, scale_factor)
-                expectation_values.append(executor(scaled_qp, **exec_params))
+
+                if observable is not None:
+                    expectation_values.append(
+                        observable.expectation(
+                            scaled_qp,
+                            functools.partial(executor, **exec_params),
+                        )
+                    )
+                else:
+                    expectation_values.append(
+                        cast(float, executor(scaled_qp, **exec_params))
+                    )
+
             return np.average(expectation_values)
 
         return self.run_classical(
@@ -1312,6 +1362,12 @@ class PolyExpFactory(BatchedFactory):
                 "The order cannot exceed the number"
                 f" of data points minus {1 + shift}."
             )
+        if not np.allclose(np.real(exp_values), exp_values):
+            raise ValueError(
+                f"Cannot extrapolate: Some expectation values in {exp_values} "
+                f"have non-zero imaginary part."
+            )
+        exp_values = np.real(exp_values)
 
         # Initialize default errors
         zne_error = None

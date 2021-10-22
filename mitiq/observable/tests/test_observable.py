@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import functools
 import pytest
 
 import numpy as np
@@ -21,6 +22,10 @@ import cirq
 from mitiq.observable.observable import Observable
 from mitiq.observable.pauli import PauliString, PauliStringCollection
 from mitiq.rem.measurement_result import MeasurementResult
+from mitiq.interface.mitiq_cirq.cirq_utils import (
+    sample_bitstrings,
+    compute_density_matrix,
+)
 from mitiq.utils import _equal
 
 
@@ -34,21 +39,6 @@ xmat = cirq.unitary(cirq.X)
 zmat = cirq.unitary(cirq.Z)
 
 
-# Executors.
-def execute(circuit: cirq.Circuit, shots: int = 8192) -> MeasurementResult:
-    result = cirq.Simulator().run(circuit, repetitions=shots)
-    return MeasurementResult(
-        result=np.column_stack(list(result.measurements.values())),
-        qubit_indices=tuple(
-            int(q) for k in result.measurements.keys() for q in k.split(",")
-        ),
-    )
-
-
-def execute_density_matrix(circuit: cirq.Circuit) -> np.ndarray:
-    return cirq.DensityMatrixSimulator().simulate(circuit).final_density_matrix
-
-
 def test_observable():
     pauli1 = PauliString(spec="XI", coeff=-1.0)
     pauli2 = PauliString(spec="IZ", coeff=2.0)
@@ -58,6 +48,8 @@ def test_observable():
     assert obs.qubit_indices == [0, 1]
     assert obs.nterms == 2
     assert obs.ngroups == 1
+
+    assert str(obs) == "-X(0) + (2+0j)*Z(1)"
 
     correct_matrix = -1.0 * np.kron(xmat, imat) + 2.0 * np.kron(imat, zmat)
     assert np.allclose(obs.matrix(), correct_matrix)
@@ -216,8 +208,12 @@ def test_observable_expectation_from_measurements_two_pauli_strings():
 
 
 @pytest.mark.parametrize("n", range(1, 3 + 1))
-@pytest.mark.parametrize("executor", (execute, execute_density_matrix))
+@pytest.mark.parametrize(
+    "executor", (sample_bitstrings, compute_density_matrix)
+)
 def test_observable_expectation_one_circuit(n, executor):
+    executor = functools.partial(executor, noise_level=(0,))
+
     qubits = cirq.LineQubit.range(n)
     obs = Observable(PauliString(spec="X" * n))
     circuit = cirq.Circuit(cirq.H.on_each(qubits))
@@ -227,8 +223,12 @@ def test_observable_expectation_one_circuit(n, executor):
 
 
 @pytest.mark.parametrize("n", range(1, 3 + 1))
-@pytest.mark.parametrize("executor", (execute, execute_density_matrix))
+@pytest.mark.parametrize(
+    "executor", (sample_bitstrings, compute_density_matrix)
+)
 def test_observable_expectation_two_circuits(n, executor):
+    executor = functools.partial(executor, noise_level=(0,))
+
     obs = Observable(
         PauliString(spec="X" * n, coeff=-2.0), PauliString(spec="Z" * n)
     )
@@ -239,8 +239,12 @@ def test_observable_expectation_two_circuits(n, executor):
     assert np.isclose(expectation, -2.0, atol=1e-1)
 
 
-@pytest.mark.parametrize("executor", (execute, execute_density_matrix))
+@pytest.mark.parametrize(
+    "executor", (sample_bitstrings, compute_density_matrix)
+)
 def test_observable_expectation_supported_qubits(executor):
+    executor = functools.partial(executor, noise_level=(0,))
+
     a, b, c = cirq.LineQubit.range(3)
     circuit = cirq.Circuit(cirq.I(a), cirq.X.on(b), cirq.H.on(c))
 
@@ -254,4 +258,4 @@ def test_observable_expectation_supported_qubits(executor):
 
     # <Z2> = 0.
     obs = Observable(PauliString(spec="Z", support=(2,)))
-    assert np.isclose(obs.expectation(circuit, executor), 0.0, atol=3e-2)
+    assert np.isclose(obs.expectation(circuit, executor), 0.0, atol=5e-2)

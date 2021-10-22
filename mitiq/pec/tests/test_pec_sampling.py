@@ -122,6 +122,16 @@ def test_sample_sequence_cirq_random_state(seed):
         assert np.isclose(new_norm, norm)
 
 
+def test_sample_sequence_no_representation():
+    circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
+
+    with pytest.warns(UserWarning, match="No representation found for"):
+        sequences, signs, norm = sample_sequence(circuit, [])
+        assert _equal(sequences[0], circuit, require_qubit_equality=True)
+        assert signs == [1]
+        assert norm == 1
+
+
 @pytest.mark.parametrize("measure", [True, False])
 def test_sample_circuit_cirq(measure):
     circuit = cirq.Circuit(
@@ -156,6 +166,31 @@ def test_sample_circuit_cirq(measure):
         assert len(sampled_circuits[0]) == 2
         assert signs[0] in (-1, 1)
         assert norm >= 1
+
+
+def test_sample_circuit_partial_representations():
+    circuit = cirq.Circuit(
+        cirq.ops.H.on(cirq.LineQubit(0)),
+        cirq.ops.CNOT.on(*cirq.LineQubit.range(2)),
+    )
+
+    cnot_rep = OperationRepresentation(
+        ideal=circuit[1:2],
+        basis_expansion={
+            NoisyOperation.from_cirq(circuit=cirq.CNOT): 0.7,
+            NoisyOperation.from_cirq(circuit=cirq.CZ): -0.7,
+        },
+    )
+
+    for _ in range(10):
+        with pytest.warns(UserWarning, match="No representation found for"):
+            sampled_circuits, signs, norm = sample_circuit(
+                circuit, representations=[cnot_rep]
+            )
+            assert isinstance(sampled_circuits[0], cirq.Circuit)
+            assert len(sampled_circuits[0]) == 2
+            assert signs[0] in (-1, 1)
+            assert norm >= 1
 
 
 def test_sample_circuit_pyquil():

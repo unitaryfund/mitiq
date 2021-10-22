@@ -148,10 +148,10 @@ class Executor:
                 batch = to_run[i * step : (i + 1) * step]
                 self._call_executor(batch, **kwargs)
 
-        # Expand computed results to all results using counts.
         if force_run_all:
             return self._computed_results
 
+        # Expand computed results to all results using counts.
         results_dict = dict(zip(collection.keys(), self._computed_results))
         results = [results_dict[key] for key in hashable_circuits]
 

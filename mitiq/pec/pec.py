@@ -15,13 +15,24 @@
 
 """High-level probabilistic error cancellation tools."""
 
-from typing import Optional, Callable, List, Union, Tuple, Dict, Any
+from typing import (
+    cast,
+    Optional,
+    Callable,
+    List,
+    Union,
+    Sequence,
+    Tuple,
+    Dict,
+    Any,
+)
 from functools import wraps
 import warnings
 
 import numpy as np
 
-from mitiq import QPROGRAM
+from mitiq import QPROGRAM, Observable
+from mitiq._typing import QuantumResult
 from mitiq.executor import generate_collected_executor
 from mitiq.pec import sample_circuit, OperationRepresentation
 from mitiq.interface import convert_to_mitiq
@@ -42,8 +53,10 @@ _LARGE_SAMPLE_WARN = (
 
 def execute_with_pec(
     circuit: QPROGRAM,
-    executor: Callable[[QPROGRAM], float],
-    representations: List[OperationRepresentation],
+    executor: Callable[[QPROGRAM], QuantumResult],
+    observable: Optional[Observable] = None,
+    *,
+    representations: Sequence[OperationRepresentation],
     precision: float = 0.03,
     num_samples: Optional[int] = None,
     force_run_all: bool = True,
@@ -64,8 +77,11 @@ def execute_with_pec(
 
     Args:
         circuit: The input circuit to execute with error-mitigation.
-        executor: A function which executes a circuit (sequence of circuits)
-            and returns an expectation value (sequence of expectation values).
+        executor: Executes a circuit and returns a `QuantumResult`.
+        observable: Observable to compute the expectation value of. If None,
+            the `executor` must return an expectation value. Otherwise,
+            the `QuantumResult` returned by `executor` is used to compute the
+            expectation of the observable.
         representations: Representations (basis expansions) of each operation
             in the input circuit.
         precision: The desired estimation precision (assuming the observable
@@ -134,10 +150,17 @@ def execute_with_pec(
     )
 
     # Execute all sampled circuits
-    collected_executor = generate_collected_executor(
-        executor, force_run_all=force_run_all
-    )
-    results = collected_executor(sampled_circuits)
+    if observable is not None:
+        # TODO: Use batching.
+        results = [
+            observable.expectation(circuit, executor)
+            for circuit in sampled_circuits
+        ]
+    else:
+        collected_executor = generate_collected_executor(
+            executor, force_run_all=force_run_all
+        )
+        results = cast(List[float], collected_executor(sampled_circuits))
 
     # Evaluate unbiased estimators [Temme2017] [Endo2018] [Takagi2020]
     unbiased_estimators = [
@@ -151,9 +174,7 @@ def execute_with_pec(
         return pec_value
 
     # Build dictionary with additional results and data
-    pec_data: Dict[str, Any] = {}
-
-    pec_data = {
+    pec_data: Dict[str, Any] = {
         "num_samples": num_samples,
         "precision": precision,
         "pec_value": pec_value,
@@ -167,8 +188,10 @@ def execute_with_pec(
 
 
 def mitigate_executor(
-    executor: Callable[[QPROGRAM], float],
-    representations: List[OperationRepresentation],
+    executor: Callable[[QPROGRAM], QuantumResult],
+    observable: Optional[Observable] = None,
+    *,
+    representations: Sequence[OperationRepresentation],
     precision: float = 0.03,
     num_samples: Optional[int] = None,
     force_run_all: bool = True,
@@ -186,16 +209,19 @@ def mitigate_executor(
     contains all the raw data involved in the PEC process.
 
     Args:
-        executor: A function which executes a circuit (sequence of circuits)
-            and returns an expectation value (sequence of expectation values).
+        executor: Executes a circuit and returns a `QuantumResult`.
+        observable: Observable to compute the expectation value of. If None,
+            the `executor` must return an expectation value. Otherwise,
+            the `QuantumResult` returned by `executor` is used to compute the
+            expectation of the observable.
         representations: Representations (basis expansions) of each operation
             in the input circuit.
         precision: The desired estimation precision (assuming the observable
             is bounded by 1). The number of samples is deduced according
             to the formula (one_norm / precision) ** 2, where 'one_norm'
             is related to the negativity of the quasi-probability
-            representation [Temme2017]_. If 'num_samples' is explicitly set
-            by the user, 'precision' is ignored and has no effect.
+            representation [Temme2017]_. If 'num_samples' is explicitly set,
+            'precision' is ignored and has no effect.
         num_samples: The number of noisy circuits to be sampled for PEC.
             If not given, this is deduced from the argument 'precision'.
         force_run_all: If True, all sampled circuits are executed regardless of
@@ -212,26 +238,29 @@ def mitigate_executor(
         return execute_with_pec(
             circuit,
             executor,
-            representations,
-            precision,
-            num_samples,
-            force_run_all,
-            random_state,
-            full_output,
+            observable,
+            representations=representations,
+            precision=precision,
+            num_samples=num_samples,
+            force_run_all=force_run_all,
+            random_state=random_state,
+            full_output=full_output,
         )
 
     return new_executor
 
 
 def pec_decorator(
-    representations: List[OperationRepresentation],
+    observable: Optional[Observable] = None,
+    *,
+    representations: Sequence[OperationRepresentation],
     precision: float = 0.03,
     num_samples: Optional[int] = None,
     force_run_all: bool = True,
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
 ) -> Callable[
-    [Callable[[Union[QPROGRAM, Any, Any, Any]], float]],
+    [Callable[[Union[QPROGRAM, Any, Any, Any]], QuantumResult]],
     Callable[
         [Union[QPROGRAM, Any, Any, Any]],
         Union[float, Tuple[float, Dict[str, Any]]],
@@ -244,6 +273,10 @@ def pec_decorator(
     which contains all the raw data involved in the PEC process.
 
     Args:
+        observable: Observable to compute the expectation value of. If None,
+            the `executor` function being decorated must return an expectation
+            value. Otherwise, the `QuantumResult` returned by this `executor`
+            is used to compute the expectation of the observable.
         representations: Representations (basis expansions) of each operation
             in the input circuit.
         precision: The desired estimation precision (assuming the observable
@@ -262,16 +295,17 @@ def pec_decorator(
     """
 
     def decorator(
-        executor: Callable[[QPROGRAM], float]
+        executor: Callable[[QPROGRAM], QuantumResult]
     ) -> Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]:
         return mitigate_executor(
             executor,
-            representations,
-            precision,
-            num_samples,
-            force_run_all,
-            random_state,
-            full_output,
+            observable,
+            representations=representations,
+            precision=precision,
+            num_samples=num_samples,
+            force_run_all=force_run_all,
+            random_state=random_state,
+            full_output=full_output,
         )
 
     return decorator

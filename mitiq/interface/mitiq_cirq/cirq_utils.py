@@ -14,10 +14,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Cirq utility functions."""
 
-from typing import Union
+from typing import Tuple, Union
 
 import numpy as np
 import cirq
+from mitiq.rem import MeasurementResult
 
 
 # Note: This is the same as cirq.PauliSumLike but without a typing.ForwardRef
@@ -30,6 +31,37 @@ PauliSumLike = Union[
     cirq.PauliSum,
     cirq.SingleQubitPauliStringGateOperation,
 ]
+
+
+# Executors.
+def sample_bitstrings(
+    circuit: cirq.Circuit,
+    noise_model: cirq.NOISE_MODEL_LIKE = cirq.amplitude_damp,  # type: ignore
+    noise_level: Tuple[float] = (0.01,),
+    sampler: cirq.Sampler = cirq.DensityMatrixSimulator(),
+    shots: int = 8192,
+) -> MeasurementResult:
+    if sum(noise_level) > 0:
+        circuit = circuit.with_noise(noise_model(*noise_level))  # type: ignore
+
+    result = sampler.run(circuit, repetitions=shots)
+    return MeasurementResult(
+        result=np.column_stack(list(result.measurements.values())),
+        qubit_indices=tuple(
+            int(q) for k in result.measurements.keys() for q in k.split(",")
+        ),
+    )
+
+
+def compute_density_matrix(
+    circuit: cirq.Circuit,
+    noise_model: cirq.NOISE_MODEL_LIKE = cirq.amplitude_damp,  # type: ignore
+    noise_level: Tuple[float] = (0.01,),
+) -> np.ndarray:
+    if sum(noise_level) > 0:
+        circuit = circuit.with_noise(noise_model(*noise_level))  # type: ignore
+
+    return cirq.DensityMatrixSimulator().simulate(circuit).final_density_matrix
 
 
 def execute(circuit: cirq.Circuit, obs: np.ndarray) -> float:

@@ -37,6 +37,7 @@ SUPPORTED_PROGRAM_TYPES = {
     "pyquil": "Program",
     "qiskit": "QuantumCircuit",
     "braket": "Circuit",
+    "pennylane": "QuantumTape",
 }
 
 
@@ -55,8 +56,14 @@ try:
 except ImportError:  # pragma: no cover
     _BKCircuit = _Circuit
 
+try:
+    from pennylane.tape import QuantumTape as _QuantumTape
+except ImportError:  # pragma: no cover
+    _QuantumTape = _Circuit
+
+
 # Supported + installed quantum programs.
-QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit, _BKCircuit]
+QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit, _BKCircuit, _QuantumTape]
 
 
 # An `executor` function inputs a quantum program and outputs an object from

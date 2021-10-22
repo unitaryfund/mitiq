@@ -4,11 +4,10 @@
 name: Upload Release Package to PyPI
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
-    inputs:
-      release_version:
-        description: 'The semantic version number of the release (v[0-9].[0-9]+.[0-9]+)'
-        required: true
+    inputs: {}
 
 jobs:
   deploy:
@@ -18,7 +17,7 @@ jobs:
     - name: Check out mitiq
       uses: actions/checkout@v2
       with:
-        ref: ${{ github.event.inputs.release_version }}
+        ref: ${{ github.ref }}
     - name: Set up Python
       uses: actions/setup-python@v2
       with:

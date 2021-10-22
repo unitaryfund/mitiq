@@ -10,6 +10,8 @@
 
 ## Version 0.10.0  (September 17, 2021)
 
+### Summary
+
 This release adds a ton of new stuff, both error mitigation tools as well as infrastructure upgrades.
 Some highlights:
 
@@ -80,8 +82,33 @@ Thanks to @Misty-W and @DSamuel1 for their great contributions this release! ðŸŽ
 - Fix multiplication order when adding NoisyOperations (@andreamari, gh-811)
 - Better error message for `CircuitConversionError`s (@rmlarose, gh-809)
 - Fix some documentation not being tested & remove global imports in docs config (@rmlarose, gh-804)
+## Version 0.9.3  (July 7th, 2021)
+
+### Summary
+
+This primary reason for this patch release is to fix a bug interfacing with Qiskit circuits (gh-802).
+
+### All Changes
+
+- [Docs] Add CDR to README and braket to Overview (@rmlarose, gh-778).
+- Rename parameter calibration function and make it visible (@rmlarose, gh-780).
+- Allow adding qubits when transforming registers in a Qiskit circuit (@rmlarose, gh-803).
+
+## Version 0.9.2  (June 30th, 2021)
+
+### Summary
+
+This patch release fixes a Braket integration bug (gh-767).
+It also adds an example about Clifford data regression in the documentation.
+
+### All Changes
+
+- Ensure short circuit warning is multi-platform (@andreamari gh-769).
+- Add CDR example to docs + small change to `cdr.calculate_observable` (@rmlarose, gh-750).
 
 ## Version 0.9.1  (June 24th, 2021)
+
+### Summary
 
 This is a patch release to fix two bugs (gh-736, gh-737) related to the integration with optional packages.
 It also fixes other minor problems (see the list of changes below).

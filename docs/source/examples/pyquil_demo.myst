@@ -16,7 +16,7 @@ In this example we demonstrate how to use Zero Noise Extrapolation (ZNE) in Miti
 
 When adding the noise mitigation function `zne.execute_with_zne` the `memory_map` is still passed to the executor function and the circuit parameters are updated without the need for repeated compilation. 
 
-The PyQuil parametric compilation example shown here is adapted from https://pyquil-docs.rigetti.com/en/v2.28.1/migration3-declare.html
+The example shown here is adapted from the [pyQuil parametric compilation tutorial](https://pyquil-docs.rigetti.com/en/v2.28.1/migration3-declare.html).
 
 
 ```{code-cell}
@@ -51,7 +51,6 @@ program += H(0)
 program += CNOT(1,0)
 program += H(0)
 program += MEASURE(0, ro[0])
-    
 ```
 +++
 
@@ -61,8 +60,10 @@ resulting from running the quantum program.
 
  
 ```{code-cell}
-def expectation(thetas, executable: Program) -> float:
-    bitstrings = qc.run(executable, memory_map={'theta': thetas})
+def expectation(theta, executable: Program) -> float:
+    bitstrings = qc.run(
+        executable.write_memory(region_name="theta", value=theta)
+    ).readout_data.get("ro")
     result = np.mean(bitstrings[:, 0])
     return -result
 ```
@@ -113,7 +114,7 @@ results_zne = []
 fac = mitiq.zne.inference.LinearFactory(scale_factors=[1.0, 3.0])
 for theta in thetas:
     results_zne.append(
-        zne.execute_with_zne(quil_prog, lambda p: -1.0 * expectation(theta, p), fac)
+        zne.execute_with_zne(quil_prog, lambda p: -1.0 * expectation(theta, p), factory=fac)
     )
 ```
 +++
@@ -134,7 +135,7 @@ Run optimization with ZNE
 
 ```{code-cell}
 def mitigated_expectation(thetas, executable: Program, factory) -> float:
-    mitigated_exp =  zne.execute_with_zne(quil_prog, lambda p: expectation(thetas, p), factory)
+    mitigated_exp =  zne.execute_with_zne(quil_prog, lambda p: expectation(thetas, p), factory=factory)
     return mitigated_exp
 
 quil_prog = qc.compiler.quil_to_native_quil(program, protoquil=True)
