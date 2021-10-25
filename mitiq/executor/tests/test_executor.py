@@ -94,7 +94,7 @@ def test_executor_is_batched_executor():
     assert not Executor.is_batched_executor(executor_serial_typed)
     assert not Executor.is_batched_executor(executor_serial)
     assert not Executor.is_batched_executor(executor_measurements)
-    # assert Collector.is_batched_executor(executor_measurements_batched)
+    assert Executor.is_batched_executor(executor_measurements_batched)
 
 
 @pytest.mark.parametrize("ncircuits", (5, 10, 25))
