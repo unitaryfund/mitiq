@@ -18,55 +18,44 @@ by error mitigation techniques to compute expectation values."""
 
 from collections import Counter
 import inspect
-from typing import Any, Callable, Iterable, List, Sequence, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import numpy as np
 
-from mitiq._typing import QPROGRAM, QuantumResult
+from cirq.linalg import partial_trace
+from mitiq import QPROGRAM, QuantumResult
+
+from mitiq.observable.observable import Observable
+from mitiq.rem.measurement_result import MeasurementResult
 from mitiq.interface import convert_from_mitiq, convert_to_mitiq
 
 
-def generate_collected_executor(
-    executor: Callable[[Union[QPROGRAM, Sequence[QPROGRAM]]], Any],
-    max_batch_size: int = 75,
-    force_run_all: bool = False,
-    **kwargs: Any,
-) -> Callable[[Any], List[QuantumResult]]:
-    """Returns a new executor function which efficiently collects expectation
-    values by detecting identical circuits and calling the executor as few
-    times as possible.
-
-    Args:
-        executor: A serial or batched executor. A serial executor inputs one
-            quantum circuit and outputs one expectation value. A batched
-            executor inputs a list of quantum circuits and outputs a list of
-            expectation values (one for each circuit).
-
-            An executor is detected as batched if and only if it is annotated
-            with a return type that is one of the following:
-
-            * Iterable[float]
-            * List[float]
-            * Sequence[float]
-            * Tuple[float]
-
-        max_batch_size: The maximum number of circuits which can be processed
-            with one call to the executor. If the executor is serial, this
-            argument can be ignored and defaults to one.
-        force_run_all: If True, all circuits are run by the executor even if
-            some circuits are identical. Otherwise, the set of unique circuits
-            is found and only this set is run by the executor.
-        kwargs: Keyword arguments to provide to the executor at each call.
-    """
-    if not callable(executor):
-        raise ValueError("Arg `executor` must be callable.")
-
-    def collected(circuits: Any) -> List[QuantumResult]:
-        return Executor(executor, max_batch_size).run(
-            circuits, force_run_all=force_run_all, **kwargs
-        )
-
-    return collected
+DensityMatrixLike = [
+    np.ndarray,
+    Iterable[np.ndarray],
+    List[np.ndarray],
+    Sequence[np.ndarray],
+    Tuple[np.ndarray],
+]
+FloatLike = [
+    float, Iterable[float], List[float], Sequence[float], Tuple[float]
+]
+MeasurementResultLike = [
+    MeasurementResult,
+    Iterable[MeasurementResult],
+    List[MeasurementResult],
+    Sequence[MeasurementResult],
+    Tuple[MeasurementResult],
+]
 
 
 class Executor:
@@ -79,7 +68,7 @@ class Executor:
         executor: Callable[[Union[QPROGRAM, Sequence[QPROGRAM]]], Any],
         max_batch_size: int = 75,
     ) -> None:
-        """Initializes a Collector.
+        """Initializes an Executor.
 
         Args:
             executor: A function which inputs a program and outputs a float,
@@ -89,7 +78,9 @@ class Executor:
                 single batch (if the executor is batched).
         """
         self._executor = executor
-        self._can_batch = Executor.is_batched_executor(executor)
+
+        executor_annotation = inspect.getfullargspec(executor).annotations
+        self._executor_return_type = executor_annotation.get("return")
         self._max_batch_size = max_batch_size
 
         self._executed_circuits: List[QPROGRAM] = []
@@ -99,13 +90,83 @@ class Executor:
 
     @property
     def can_batch(self) -> bool:
-        return self._can_batch
+        return self._executor_return_type in (
+            BatchedType[T]  # type: ignore[index]
+            for BatchedType in [Iterable, List, Sequence, Tuple]
+            for T in QuantumResult.__args__  # type: ignore[attr-defined]
+        )
+
+    @property
+    def executed_circuits(self) -> List[QPROGRAM]:
+        return self._executed_circuits
+
+    @property
+    def computed_results(self) -> List[QuantumResult]:
+        return self._computed_results
 
     @property
     def calls_to_executor(self) -> int:
         return self._calls_to_executor
 
-    def run(
+    def evaluate(
+        self,
+        circuits: Union[QPROGRAM, List[QPROGRAM]],
+        observable: Optional[Observable] = None,
+        force_run_all: bool = False,
+        **kwargs: Any,
+    ) -> List[complex]:
+        if not isinstance(circuits, List):
+            circuits = [circuits]
+
+        # Get all required circuits to run.
+        if (
+            observable is not None
+            and self._executor_return_type is MeasurementResultLike
+        ):
+            all_circuits = [
+                circuit_with_measurements
+                for circuit in circuits
+                for circuit_with_measurements in observable.measure_in(circuit)
+            ]
+            result_step = observable.ngroups
+        else:
+            all_circuits = circuits
+            result_step = 1
+
+        # Run all required circuits.
+        all_results = self._run(all_circuits, force_run_all, **kwargs)
+
+        # Parse the results.
+        if self._executor_return_type in FloatLike:
+            results = all_results
+        elif self._executor_return_type in DensityMatrixLike:
+            results = []
+
+            # TODO: Make the following codeblock a function somewhere.
+            for density_matrix in all_results:
+                observable_matrix = observable.matrix()
+
+                if density_matrix.shape != observable_matrix.shape:
+                    nqubits = int(np.log2(density_matrix.shape[0]))
+                    density_matrix = partial_trace(
+                        np.reshape(density_matrix, newshape=[2, 2] * nqubits),
+                        keep_indices=observable.qubit_indices,
+                    ).reshape(observable_matrix.shape)
+
+                results.append(np.trace(density_matrix @ observable_matrix))
+        elif self._executor_return_type in MeasurementResultLike:
+            results = [
+                observable._expectation_from_measurements(
+                    all_results[i : i + result_step]
+                )
+                for i in range(len(all_results) // result_step)
+            ]
+        else:
+            raise ValueError
+
+        return results
+
+    def _run(
         self,
         circuits: Sequence[QPROGRAM],
         force_run_all: bool = False,
@@ -137,7 +198,7 @@ class Executor:
                 for circ in collection.keys()
             ]
 
-        if not self._can_batch:
+        if not self.can_batch:
             for circuit in to_run:
                 self._call_executor(circuit, **kwargs)
 
@@ -160,12 +221,12 @@ class Executor:
     def _call_executor(
         self, to_run: Union[QPROGRAM, Sequence[QPROGRAM]], **kwargs: Any
     ) -> None:
-        """Calls the executor on the input circuit(s) to run. Stores the
+        """Calls the executor on the input circuit(s) to _run. Stores the
         executed circuits in ``self._executed_circuits`` and the computed
         results in ``self._computed_results``.
 
         Args:
-            to_run: Circuit(s) to run.
+            to_run: Circuit(s) to _run.
         """
         result = self._executor(to_run, **kwargs)  # type: ignore
         self._calls_to_executor += 1
@@ -192,10 +253,9 @@ class Executor:
             * ``Sequence[QuantumResult]``
             * ``Tuple[QuantumResult]``
 
-        where a ``QuantumResult`` is a ``float`` or a ``cirq.Result``.
         Otherwise, it is considered "serial".
 
-        Batched executors can run several quantum programs in a single call.
+        Batched executors can _run several quantum programs in a single call.
         See below.
 
         Args:

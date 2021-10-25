@@ -31,9 +31,8 @@ import warnings
 
 import numpy as np
 
-from mitiq import QPROGRAM, Observable
-from mitiq._typing import QuantumResult
-from mitiq.executor import generate_collected_executor
+from mitiq import Executor, Observable, QPROGRAM, QuantumResult
+
 from mitiq.pec import sample_circuit, OperationRepresentation
 from mitiq.interface import convert_to_mitiq
 

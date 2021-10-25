@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
-import inspect
 from typing import Callable, cast, List, Optional, Set
 
 import numpy as np
@@ -22,7 +21,6 @@ import cirq
 
 from mitiq.observable.pauli import PauliString, PauliStringCollection
 from mitiq._typing import MeasurementResult, QuantumResult, QPROGRAM
-from mitiq.executor import Executor
 
 
 class Observable:
@@ -103,11 +101,17 @@ class Observable:
     def expectation(
         self, circuit: QPROGRAM, execute: Callable[[QPROGRAM], QuantumResult]
     ) -> float:
+        # Avoid circular import.
+        from mitiq.executor import Executor
+        import inspect
+
+        # return Executor(execute).evaluate(circuit, observable=self)[0].real
+
         result_type = inspect.getfullargspec(execute).annotations.get("return")
 
         if result_type is MeasurementResult:
             to_run = self.measure_in(circuit)
-            results = Executor(execute).run(to_run)
+            results = Executor(execute)._run(to_run)
             return self._expectation_from_measurements(
                 cast(List[MeasurementResult], results)
             )

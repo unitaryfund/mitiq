@@ -13,12 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# Quantum computer input/output.
+from mitiq._typing import SUPPORTED_PROGRAM_TYPES, QPROGRAM, QuantumResult
+from mitiq.rem.measurement_result import MeasurementResult
+
 # Executors and observables.
 from mitiq.executor import Executor
 from mitiq.observable import PauliString, Observable
-
-# Quantum computer input/output.
-from mitiq._typing import SUPPORTED_PROGRAM_TYPES, QPROGRAM, QuantumResult
 
 # Interface between Cirq circuits and supported frontends.
 from mitiq import interface
