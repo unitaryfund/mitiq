@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for Collector."""
-import functools
 import pytest
 from typing import List
 
@@ -182,16 +181,23 @@ def test_run_executor_preserves_order(s, b):
     assert np.allclose(collector._run(batch), executor_batched_unique(batch))
 
 
-def test_executor_evaluate_measurements():
+@pytest.mark.parametrize("execute", [executor_measurements, executor_measurements_batched])
+def test_executor_evaluate_measurements(execute):
     obs = Observable(PauliString("Z"))
 
     q = cirq.LineQubit(0)
     circuits = [cirq.Circuit(cirq.I.on(q)), cirq.Circuit(cirq.X.on(q))]
 
-    executor = Executor(executor_measurements)
+    executor = Executor(execute)
 
     results = executor.evaluate(circuits, obs)
     assert np.allclose(results, [1, -1])
+
+    if execute is executor_measurements:
+        assert executor.calls_to_executor == 2
+    else:
+        assert executor.calls_to_executor == 1
+
     assert executor.executed_circuits[0] == circuits[0] + cirq.measure(q)
     assert executor.executed_circuits[1] == circuits[1] + cirq.measure(q)
     assert executor.quantum_results[0] == executor_measurements(circuits[0] + cirq.measure(q))
@@ -199,16 +205,23 @@ def test_executor_evaluate_measurements():
     assert len(executor.quantum_results) == len(circuits)
 
 
-def test_executor_evaluate_density_matrix():
+@pytest.mark.parametrize("execute", [executor_density_matrix, executor_density_matrix_batched])
+def test_executor_evaluate_density_matrix(execute):
     obs = Observable(PauliString("Z"))
 
     q = cirq.LineQubit(0)
     circuits = [cirq.Circuit(cirq.I.on(q)), cirq.Circuit(cirq.X.on(q))]
 
-    executor = Executor(executor_density_matrix)
+    executor = Executor(execute)
 
     results = executor.evaluate(circuits, obs)
     assert np.allclose(results, [1, -1])
+
+    if execute is executor_density_matrix:
+        assert executor.calls_to_executor == 2
+    else:
+        assert executor.calls_to_executor == 1
+
     assert executor.executed_circuits == circuits
     assert np.allclose(executor.quantum_results[0], executor_density_matrix(circuits[0]))
     assert np.allclose(executor.quantum_results[1], executor_density_matrix(circuits[1]))
