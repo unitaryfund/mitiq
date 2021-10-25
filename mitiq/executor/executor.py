@@ -21,7 +21,7 @@ import inspect
 from typing import (
     Any,
     Callable,
-    Dict,
+    cast,
     Iterable,
     List,
     Optional,
@@ -145,11 +145,15 @@ class Executor:
         if self._executor_return_type in FloatLike:
             results = all_results
         elif self._executor_return_type in DensityMatrixLike:
+            observable = cast(Observable, observable)
+            all_results = cast(List[np.ndarray], all_results)
             results = [
                 observable._expectation_from_density_matrix(density_matrix)
                 for density_matrix in all_results
             ]
         elif self._executor_return_type in MeasurementResultLike:
+            observable = cast(Observable, observable)
+            all_results = cast(List[MeasurementResult], all_results)
             results = [
                 observable._expectation_from_measurements(
                     all_results[i : i + result_step]
@@ -162,14 +166,14 @@ class Executor:
                 f" {self._executor_return_type}."
             )
 
-        return results
+        return results  # type: ignore[return-value]
 
     def _run(
         self,
         circuits: Sequence[QPROGRAM],
         force_run_all: bool = False,
         **kwargs: Any,
-    ) -> List[QuantumResult]:
+    ) -> Sequence[QuantumResult]:
         """Runs all input circuits using the least number of possible calls to
         the executor.
 
