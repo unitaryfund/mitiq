@@ -16,7 +16,7 @@
 """API for using Clifford Data Regression (CDR) error mitigation."""
 
 from functools import wraps
-from typing import Any, Callable, cast, Optional, Sequence
+from typing import Any, Callable, cast, Optional, Sequence, Union
 
 import numpy as np
 from scipy.optimize import curve_fit
@@ -34,10 +34,10 @@ from mitiq.zne.scaling import fold_gates_at_random
 @wraps(accept_any_qprogram_as_input)
 def execute_with_cdr(
     circuit: QPROGRAM,
-    executor: Callable[[QPROGRAM], QuantumResult],
+    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     observable: Optional[Observable] = None,
     *,
-    simulator: Callable[[QPROGRAM], QuantumResult],
+    simulator: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     num_training_circuits: int = 10,
     fraction_non_clifford: float = 0.1,
     fit_function: Callable[..., float] = linear_fit_function,
@@ -155,11 +155,11 @@ def execute_with_cdr(
     to_run = [circuit for circuits in all_circuits for circuit in circuits]
     all_circuits_shape = (len(all_circuits), len(all_circuits[0]))
 
-    noisy_results = executor.evaluate(to_run, observable)
-    noisy_results = np.array(noisy_results).reshape(all_circuits_shape)
+    results = executor.evaluate(to_run, observable)
+    noisy_results = np.array(results).reshape(all_circuits_shape)
 
-    ideal_results = simulator.evaluate(all_circuits[0], observable)
-    ideal_results = np.array(ideal_results)
+    results = simulator.evaluate(all_circuits[0], observable)
+    ideal_results = np.array(results)
 
     # Do the regression.
     fitted_params, _ = curve_fit(
