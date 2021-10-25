@@ -26,7 +26,7 @@ import pyquil
 from mitiq.executor.executor import Executor
 from mitiq.rem import MeasurementResult
 from mitiq.observable import Observable, PauliString
-from mitiq.interface.mitiq_cirq import compute_density_matrix
+from mitiq.interface.mitiq_cirq import compute_density_matrix, sample_bitstrings
 
 
 # Serial / batched executors which return floats.
@@ -65,19 +65,21 @@ def executor_pyquil_batched(programs) -> List[float]:
 
 
 # Serial / batched executors which return measurements.
-def executor_serial_measurements(circuit) -> MeasurementResult:
-    # Assume there is only one measurement key in the circuit.
-    assert len(circuit.all_measurement_keys()) == 1
-
-    key = circuit.all_measurement_keys().pop()
-    backend = cirq.Simulator()
-    return MeasurementResult(
-        backend.run(circuit, repetitions=10).measurements[key].tolist()
-    )
+def executor_measurements(circuit) -> MeasurementResult:
+    return sample_bitstrings(circuit, noise_level=(0,))
 
 
-def executor_batched_measurements(circuits) -> List[MeasurementResult]:
-    return [executor_serial_measurements(circuit) for circuit in circuits]
+def executor_measurements_batched(circuits) -> List[MeasurementResult]:
+    return [executor_measurements(circuit) for circuit in circuits]
+
+
+# Serial / batched executors which return density matrices.
+def executor_density_matrix(circuit) -> np.ndarray:
+    return compute_density_matrix(circuit, noise_level=(0,))
+
+
+def executor_density_matrix_batched(circuits) -> List[np.ndarray]:
+    return [executor_density_matrix(circuit) for circuit in circuits]
 
 
 def test_executor_simple():
@@ -91,8 +93,8 @@ def test_executor_is_batched_executor():
     assert Executor.is_batched_executor(executor_batched)
     assert not Executor.is_batched_executor(executor_serial_typed)
     assert not Executor.is_batched_executor(executor_serial)
-    assert not Executor.is_batched_executor(executor_serial_measurements)
-    # assert Collector.is_batched_executor(executor_batched_measurements)
+    assert not Executor.is_batched_executor(executor_measurements)
+    # assert Collector.is_batched_executor(executor_measurements_batched)
 
 
 @pytest.mark.parametrize("ncircuits", (5, 10, 25))
@@ -180,38 +182,34 @@ def test_run_executor_preserves_order(s, b):
     assert np.allclose(collector._run(batch), executor_batched_unique(batch))
 
 
+def test_executor_evaluate_measurements():
+    obs = Observable(PauliString("Z"))
+
+    q = cirq.LineQubit(0)
+    circuits = [cirq.Circuit(cirq.I.on(q)), cirq.Circuit(cirq.X.on(q))]
+
+    executor = Executor(executor_measurements)
+
+    results = executor.evaluate(circuits, obs)
+    assert np.allclose(results, [1, -1])
+    assert executor.executed_circuits[0] == circuits[0] + cirq.measure(q)
+    assert executor.executed_circuits[1] == circuits[1] + cirq.measure(q)
+    assert executor.quantum_results[0] == executor_measurements(circuits[0] + cirq.measure(q))
+    assert executor.quantum_results[1] == executor_measurements(circuits[1] + cirq.measure(q))
+    assert len(executor.quantum_results) == len(circuits)
+
+
 def test_executor_evaluate_density_matrix():
     obs = Observable(PauliString("Z"))
 
     q = cirq.LineQubit(0)
     circuits = [cirq.Circuit(cirq.I.on(q)), cirq.Circuit(cirq.X.on(q))]
 
-    compute_dm = functools.partial(compute_density_matrix, noise_level=(0,))
-    executor = Executor(compute_dm)
+    executor = Executor(executor_density_matrix)
 
     results = executor.evaluate(circuits, obs)
     assert np.allclose(results, [1, -1])
     assert executor.executed_circuits == circuits
-    assert np.allclose(executor.quantum_results[0], compute_dm(circuits[0]))
-    assert np.allclose(executor.quantum_results[1], compute_dm(circuits[1]))
-    assert len(executor.quantum_results) == len(circuits)
-
-
-def test_executor_evaluate_bitstrings():
-    from mitiq.interface.mitiq_cirq import sample_bitstrings
-
-    obs = Observable(PauliString("Z"))
-
-    q = cirq.LineQubit(0)
-    circuits = [cirq.Circuit(cirq.I.on(q)), cirq.Circuit(cirq.X.on(q))]
-
-    sample_bitstrings = functools.partial(sample_bitstrings, noise_level=(0,))
-    executor = Executor(sample_bitstrings)
-
-    results = executor.evaluate(circuits, obs)
-    assert np.allclose(results, [1, -1])
-    assert executor.executed_circuits[0] == circuits[0] + cirq.measure(q)
-    assert executor.executed_circuits[1] == circuits[1] + cirq.measure(q)
-    assert executor.quantum_results[0] == sample_bitstrings(circuits[0] + cirq.measure(q))
-    assert executor.quantum_results[1] == sample_bitstrings(circuits[1] + cirq.measure(q))
+    assert np.allclose(executor.quantum_results[0], executor_density_matrix(circuits[0]))
+    assert np.allclose(executor.quantum_results[1], executor_density_matrix(circuits[1]))
     assert len(executor.quantum_results) == len(circuits)
