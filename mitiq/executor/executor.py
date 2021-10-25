@@ -157,20 +157,7 @@ class Executor:
         if self._executor_return_type in FloatLike:
             results = all_results
         elif self._executor_return_type in DensityMatrixLike:
-            results = []
-
-            for density_matrix in all_results:
-                # TODO: Make the following codeblock a function somewhere.
-                observable_matrix = observable.matrix()
-
-                if density_matrix.shape != observable_matrix.shape:
-                    nqubits = int(np.log2(density_matrix.shape[0]))
-                    density_matrix = partial_trace(
-                        np.reshape(density_matrix, newshape=[2, 2] * nqubits),
-                        keep_indices=observable.qubit_indices,
-                    ).reshape(observable_matrix.shape)
-
-                results.append(np.trace(density_matrix @ observable_matrix))
+            results = [observable._expectation_from_density_matrix(density_matrix) for density_matrix in all_results]
         elif self._executor_return_type in MeasurementResultLike:
             results = [
                 observable._expectation_from_measurements(
@@ -179,7 +166,7 @@ class Executor:
                 for i in range(len(all_results) // result_step)
             ]
         else:
-            raise ValueError
+            raise ValueError(f"Could not parse executed results from executor with type {self._executor_return_type}.")
 
         return results
 
