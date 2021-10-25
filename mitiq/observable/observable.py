@@ -100,40 +100,11 @@ class Observable:
 
     def expectation(
         self, circuit: QPROGRAM, execute: Callable[[QPROGRAM], QuantumResult]
-    ) -> float:
+    ) -> complex:
         # Avoid circular import.
         from mitiq.executor import Executor
-        import inspect
 
-        # return Executor(execute).evaluate(circuit, observable=self)[0].real
-
-        result_type = inspect.getfullargspec(execute).annotations.get("return")
-
-        if result_type is MeasurementResult:
-            to_run = self.measure_in(circuit)
-            results = Executor(execute)._run(to_run)
-            return self._expectation_from_measurements(
-                cast(List[MeasurementResult], results)
-            )
-        elif result_type is np.ndarray:
-            density_matrix = cast(np.ndarray, execute(circuit))
-            observable_matrix = self.matrix()
-
-            if density_matrix.shape != observable_matrix.shape:
-                nqubits = int(np.log2(density_matrix.shape[0]))
-                density_matrix = cirq.partial_trace(
-                    np.reshape(density_matrix, newshape=[2, 2] * nqubits),
-                    keep_indices=self.qubit_indices,
-                ).reshape(observable_matrix.shape)
-
-            return np.trace(density_matrix @ self.matrix())
-        else:
-            # TODO: Support batched executors.
-            raise ValueError(  # pragma: no cover
-                f"Arg `execute` must be a function with annotated return type "
-                f"that is either mitiq.MeasurementResult or np.ndarray but "
-                f"was {result_type}."
-            )
+        return Executor(execute).evaluate(circuit, observable=self)[0]
 
     def _expectation_from_measurements(
         self, measurements: List[MeasurementResult]
