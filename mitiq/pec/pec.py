@@ -16,10 +16,8 @@
 """High-level probabilistic error cancellation tools."""
 
 from typing import (
-    cast,
     Optional,
     Callable,
-    List,
     Union,
     Sequence,
     Tuple,
@@ -52,7 +50,7 @@ _LARGE_SAMPLE_WARN = (
 
 def execute_with_pec(
     circuit: QPROGRAM,
-    executor: Callable[[QPROGRAM], QuantumResult],
+    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     observable: Optional[Observable] = None,
     *,
     representations: Sequence[OperationRepresentation],
@@ -149,17 +147,10 @@ def execute_with_pec(
     )
 
     # Execute all sampled circuits
-    if observable is not None:
-        # TODO: Use batching.
-        results = [
-            observable.expectation(circuit, executor)
-            for circuit in sampled_circuits
-        ]
-    else:
-        collected_executor = generate_collected_executor(
-            executor, force_run_all=force_run_all
-        )
-        results = cast(List[float], collected_executor(sampled_circuits))
+    if not isinstance(executor, Executor):
+        executor = Executor(executor)
+
+    results = executor.evaluate(sampled_circuits, observable, force_run_all)
 
     # Evaluate unbiased estimators [Temme2017] [Endo2018] [Takagi2020]
     unbiased_estimators = [
