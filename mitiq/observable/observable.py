@@ -101,8 +101,7 @@ class Observable:
     def expectation(
         self, circuit: QPROGRAM, execute: Callable[[QPROGRAM], QuantumResult]
     ) -> complex:
-        # Avoid circular import.
-        from mitiq.executor import Executor
+        from mitiq.executor import Executor  # Avoid circular import.
 
         return Executor(execute).evaluate(circuit, observable=self)[0]
 

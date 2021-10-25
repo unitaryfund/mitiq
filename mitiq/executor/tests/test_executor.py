@@ -25,7 +25,10 @@ import pyquil
 from mitiq.executor.executor import Executor
 from mitiq.rem import MeasurementResult
 from mitiq.observable import Observable, PauliString
-from mitiq.interface.mitiq_cirq import compute_density_matrix, sample_bitstrings
+from mitiq.interface.mitiq_cirq import (
+    compute_density_matrix,
+    sample_bitstrings,
+)
 
 
 # Serial / batched executors which return floats.
@@ -181,7 +184,9 @@ def test_run_executor_preserves_order(s, b):
     assert np.allclose(collector._run(batch), executor_batched_unique(batch))
 
 
-@pytest.mark.parametrize("execute", [executor_serial_unique, executor_batched_unique])
+@pytest.mark.parametrize(
+    "execute", [executor_serial_unique, executor_batched_unique]
+)
 def test_executor_evaluate_float(execute):
     q = cirq.LineQubit(0)
     circuits = [cirq.Circuit(cirq.X(q)), cirq.Circuit(cirq.H(q), cirq.Z(q))]
@@ -200,7 +205,9 @@ def test_executor_evaluate_float(execute):
     assert executor.quantum_results == [1, 2]
 
 
-@pytest.mark.parametrize("execute", [executor_measurements, executor_measurements_batched])
+@pytest.mark.parametrize(
+    "execute", [executor_measurements, executor_measurements_batched]
+)
 def test_executor_evaluate_measurements(execute):
     obs = Observable(PauliString("Z"))
 
@@ -219,12 +226,18 @@ def test_executor_evaluate_measurements(execute):
 
     assert executor.executed_circuits[0] == circuits[0] + cirq.measure(q)
     assert executor.executed_circuits[1] == circuits[1] + cirq.measure(q)
-    assert executor.quantum_results[0] == executor_measurements(circuits[0] + cirq.measure(q))
-    assert executor.quantum_results[1] == executor_measurements(circuits[1] + cirq.measure(q))
+    assert executor.quantum_results[0] == executor_measurements(
+        circuits[0] + cirq.measure(q)
+    )
+    assert executor.quantum_results[1] == executor_measurements(
+        circuits[1] + cirq.measure(q)
+    )
     assert len(executor.quantum_results) == len(circuits)
 
 
-@pytest.mark.parametrize("execute", [executor_density_matrix, executor_density_matrix_batched])
+@pytest.mark.parametrize(
+    "execute", [executor_density_matrix, executor_density_matrix_batched]
+)
 def test_executor_evaluate_density_matrix(execute):
     obs = Observable(PauliString("Z"))
 
@@ -242,6 +255,10 @@ def test_executor_evaluate_density_matrix(execute):
         assert executor.calls_to_executor == 1
 
     assert executor.executed_circuits == circuits
-    assert np.allclose(executor.quantum_results[0], executor_density_matrix(circuits[0]))
-    assert np.allclose(executor.quantum_results[1], executor_density_matrix(circuits[1]))
+    assert np.allclose(
+        executor.quantum_results[0], executor_density_matrix(circuits[0])
+    )
+    assert np.allclose(
+        executor.quantum_results[1], executor_density_matrix(circuits[1])
+    )
     assert len(executor.quantum_results) == len(circuits)

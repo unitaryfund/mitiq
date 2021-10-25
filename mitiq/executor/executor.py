@@ -17,7 +17,6 @@
 by error mitigation techniques to compute expectation values."""
 
 from collections import Counter
-from dataclasses import dataclass
 import inspect
 from typing import (
     Any,
@@ -33,7 +32,6 @@ from typing import (
 
 import numpy as np
 
-from cirq.linalg import partial_trace
 from mitiq import QPROGRAM, QuantumResult
 
 from mitiq.observable.observable import Observable
@@ -65,15 +63,6 @@ MeasurementResultLike = [
 ]
 
 
-@dataclass(frozen=True)
-class ExecutedResult:
-    target_circuit: QPROGRAM
-    observable: Observable
-    executed_circuits: List[QPROGRAM]
-    quantum_results: List[QuantumResult]
-    computed_result: float
-
-
 class Executor:
     """Tool for efficiently scheduling/executing quantum programs and
     collecting the results.
@@ -101,7 +90,6 @@ class Executor:
 
         self._executed_circuits: List[QPROGRAM] = []
         self._quantum_results: List[QuantumResult] = []
-        self._executed_results: Dict[int, ExecutedResult]
 
         self._calls_to_executor: int = 0
 
@@ -157,7 +145,10 @@ class Executor:
         if self._executor_return_type in FloatLike:
             results = all_results
         elif self._executor_return_type in DensityMatrixLike:
-            results = [observable._expectation_from_density_matrix(density_matrix) for density_matrix in all_results]
+            results = [
+                observable._expectation_from_density_matrix(density_matrix)
+                for density_matrix in all_results
+            ]
         elif self._executor_return_type in MeasurementResultLike:
             results = [
                 observable._expectation_from_measurements(
@@ -166,7 +157,10 @@ class Executor:
                 for i in range(len(all_results) // result_step)
             ]
         else:
-            raise ValueError(f"Could not parse executed results from executor with type {self._executor_return_type}.")
+            raise ValueError(
+                f"Could not parse executed results from executor with type"
+                f" {self._executor_return_type}."
+            )
 
         return results
 
@@ -230,7 +224,7 @@ class Executor:
         results in ``self._quantum_results``.
 
         Args:
-            to_run: Circuit(s) to _run.
+            to_run: Circuit(s) to run.
         """
         result = self._executor(to_run, **kwargs)  # type: ignore
         self._calls_to_executor += 1
