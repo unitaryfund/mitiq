@@ -775,7 +775,7 @@ class AdaptiveFactory(Factory, ABC):
         ) -> float:
             """Evaluates the quantum expectation value for a given
             scale_factor and other executor parameters."""
-            expectation_values: List[float] = []
+            expectation_values: List[complex] = []
 
             # TODO: Averaging over `num_to_average` should use batching.
             for _ in range(num_to_average):
