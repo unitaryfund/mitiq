@@ -49,7 +49,12 @@ DensityMatrixLike = [
     Tuple[np.ndarray],
 ]
 FloatLike = [
-    float, Iterable[float], List[float], Sequence[float], Tuple[float]
+    None,  # Untyped executors are assumed to return floats.
+    float,
+    Iterable[float],
+    List[float],
+    Sequence[float],
+    Tuple[float],
 ]
 MeasurementResultLike = [
     MeasurementResult,

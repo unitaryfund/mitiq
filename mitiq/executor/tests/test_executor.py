@@ -181,6 +181,25 @@ def test_run_executor_preserves_order(s, b):
     assert np.allclose(collector._run(batch), executor_batched_unique(batch))
 
 
+@pytest.mark.parametrize("execute", [executor_serial_unique, executor_batched_unique])
+def test_executor_evaluate_float(execute):
+    q = cirq.LineQubit(0)
+    circuits = [cirq.Circuit(cirq.X(q)), cirq.Circuit(cirq.H(q), cirq.Z(q))]
+
+    executor = Executor(execute)
+
+    results = executor.evaluate(circuits)
+    assert np.allclose(results, [1, 2])
+
+    if execute is executor_serial_unique:
+        assert executor.calls_to_executor == 2
+    else:
+        assert executor.calls_to_executor == 1
+
+    assert executor.executed_circuits == circuits
+    assert executor.quantum_results == [1, 2]
+
+
 @pytest.mark.parametrize("execute", [executor_measurements, executor_measurements_batched])
 def test_executor_evaluate_measurements(execute):
     obs = Observable(PauliString("Z"))
