@@ -17,10 +17,12 @@
 by error mitigation techniques to compute expectation values."""
 
 from collections import Counter
+from dataclasses import dataclass
 import inspect
 from typing import (
     Any,
     Callable,
+    Dict,
     Iterable,
     List,
     Optional,
@@ -58,6 +60,15 @@ MeasurementResultLike = [
 ]
 
 
+@dataclass(frozen=True)
+class ExecutedResult:
+    target_circuit: QPROGRAM
+    observable: Observable
+    executed_circuits: List[QPROGRAM]
+    quantum_results: List[QuantumResult]
+    computed_result: float
+
+
 class Executor:
     """Tool for efficiently scheduling/executing quantum programs and
     collecting the results.
@@ -84,7 +95,8 @@ class Executor:
         self._max_batch_size = max_batch_size
 
         self._executed_circuits: List[QPROGRAM] = []
-        self._computed_results: List[QuantumResult] = []
+        self._quantum_results: List[QuantumResult] = []
+        self._executed_results: Dict[int, ExecutedResult]
 
         self._calls_to_executor: int = 0
 
@@ -101,8 +113,8 @@ class Executor:
         return self._executed_circuits
 
     @property
-    def computed_results(self) -> List[QuantumResult]:
-        return self._computed_results
+    def quantum_results(self) -> List[QuantumResult]:
+        return self._quantum_results
 
     @property
     def calls_to_executor(self) -> int:
@@ -121,7 +133,7 @@ class Executor:
         # Get all required circuits to run.
         if (
             observable is not None
-            and self._executor_return_type is MeasurementResultLike
+            and self._executor_return_type in MeasurementResultLike
         ):
             all_circuits = [
                 circuit_with_measurements
@@ -142,8 +154,8 @@ class Executor:
         elif self._executor_return_type in DensityMatrixLike:
             results = []
 
-            # TODO: Make the following codeblock a function somewhere.
             for density_matrix in all_results:
+                # TODO: Make the following codeblock a function somewhere.
                 observable_matrix = observable.matrix()
 
                 if density_matrix.shape != observable_matrix.shape:
@@ -210,10 +222,10 @@ class Executor:
                 self._call_executor(batch, **kwargs)
 
         if force_run_all:
-            return self._computed_results
+            return self._quantum_results
 
         # Expand computed results to all results using counts.
-        results_dict = dict(zip(collection.keys(), self._computed_results))
+        results_dict = dict(zip(collection.keys(), self._quantum_results))
         results = [results_dict[key] for key in hashable_circuits]
 
         return results
@@ -221,9 +233,9 @@ class Executor:
     def _call_executor(
         self, to_run: Union[QPROGRAM, Sequence[QPROGRAM]], **kwargs: Any
     ) -> None:
-        """Calls the executor on the input circuit(s) to _run. Stores the
-        executed circuits in ``self._executed_circuits`` and the computed
-        results in ``self._computed_results``.
+        """Calls the executor on the input circuit(s) to run. Stores the
+        executed circuits in ``self._executed_circuits`` and the quantum
+        results in ``self._quantum_results``.
 
         Args:
             to_run: Circuit(s) to _run.
@@ -232,10 +244,10 @@ class Executor:
         self._calls_to_executor += 1
 
         if self.can_batch:
-            self._computed_results.extend(result)
+            self._quantum_results.extend(result)
             self._executed_circuits.extend(to_run)
         else:
-            self._computed_results.append(result)
+            self._quantum_results.append(result)
             self._executed_circuits.append(to_run)
 
     @staticmethod

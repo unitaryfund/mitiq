@@ -26,7 +26,7 @@ import pyquil
 from mitiq.executor.executor import Executor
 from mitiq.rem import MeasurementResult
 from mitiq.observable import Observable, PauliString
-from mitiq.interface.mitiq_cirq import compute_density_matrix, sample_bitstrings
+from mitiq.interface.mitiq_cirq import compute_density_matrix
 
 
 # Serial / batched executors which return floats.
@@ -180,7 +180,7 @@ def test_run_executor_preserves_order(s, b):
     assert np.allclose(collector._run(batch), executor_batched_unique(batch))
 
 
-def test_executor_evaluate():
+def test_executor_evaluate_density_matrix():
     obs = Observable(PauliString("Z"))
 
     q = cirq.LineQubit(0)
@@ -192,6 +192,26 @@ def test_executor_evaluate():
     results = executor.evaluate(circuits, obs)
     assert np.allclose(results, [1, -1])
     assert executor.executed_circuits == circuits
-    assert np.allclose(executor.computed_results[0], compute_dm(circuits[0]))
-    assert np.allclose(executor.computed_results[1], compute_dm(circuits[1]))
-    assert len(executor.computed_results) == len(circuits)
+    assert np.allclose(executor.quantum_results[0], compute_dm(circuits[0]))
+    assert np.allclose(executor.quantum_results[1], compute_dm(circuits[1]))
+    assert len(executor.quantum_results) == len(circuits)
+
+
+def test_executor_evaluate_bitstrings():
+    from mitiq.interface.mitiq_cirq import sample_bitstrings
+
+    obs = Observable(PauliString("Z"))
+
+    q = cirq.LineQubit(0)
+    circuits = [cirq.Circuit(cirq.I.on(q)), cirq.Circuit(cirq.X.on(q))]
+
+    sample_bitstrings = functools.partial(sample_bitstrings, noise_level=(0,))
+    executor = Executor(sample_bitstrings)
+
+    results = executor.evaluate(circuits, obs)
+    assert np.allclose(results, [1, -1])
+    assert executor.executed_circuits[0] == circuits[0] + cirq.measure(q)
+    assert executor.executed_circuits[1] == circuits[1] + cirq.measure(q)
+    assert executor.quantum_results[0] == sample_bitstrings(circuits[0] + cirq.measure(q))
+    assert executor.quantum_results[1] == sample_bitstrings(circuits[1] + cirq.measure(q))
+    assert len(executor.quantum_results) == len(circuits)
