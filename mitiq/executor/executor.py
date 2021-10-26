@@ -64,8 +64,8 @@ MeasurementResultLike = [
 
 
 class Executor:
-    """Tool for efficiently scheduling/executing quantum programs and
-    collecting the results.
+    """Tool for efficiently scheduling/executing quantum programs and storing
+    the results.
     """
 
     def __init__(
@@ -76,9 +76,9 @@ class Executor:
         """Initializes an Executor.
 
         Args:
-            executor: A function which inputs a program and outputs a float,
-                or inputs a sequence of programs and outputs a sequence of
-                floats.
+            executor: A function which inputs a program and outputs a
+                ``mitiq.QuantumResult``, or inputs a sequence of programs and
+                outputs a sequence of ``mitiq.QuantumResult`` s.
             max_batch_size: Maximum number of programs that can be sent in a
                 single batch (if the executor is batched).
         """
@@ -120,6 +120,23 @@ class Executor:
         force_run_all: bool = False,
         **kwargs: Any,
     ) -> List[complex]:
+        """Returns the expectation value Tr[ρ O] for each circuit in
+        ``circuits`` where O is the observable provided or implicitly defined
+        by the ``executor``. (The observable is implicitly defined when the
+        ``executor`` returns float(s).)
+
+        All executed circuits are stored in ``self.executed_circuits``, and all
+        quantum results are stored in ``self.quantum_results``.
+
+        Args:
+             circuits: A single circuit of list of circuits.
+             observable: Observable O in the expression Tr[ρ O]. If None,
+                the ``executor`` must return a float (which corresponds to
+                Tr[ρ O] for a specific, fixed observable O).
+            force_run_all: If True, force every circuit in the input sequence
+                to be executed (if some are identical). Else, detects identical
+                circuits and runs a minimal set.
+        """
         if not isinstance(circuits, List):
             circuits = [circuits]
 
@@ -144,6 +161,7 @@ class Executor:
         # Parse the results.
         if self._executor_return_type in FloatLike:
             results = all_results
+
         elif self._executor_return_type in DensityMatrixLike:
             observable = cast(Observable, observable)
             all_results = cast(List[np.ndarray], all_results)
@@ -151,6 +169,7 @@ class Executor:
                 observable._expectation_from_density_matrix(density_matrix)
                 for density_matrix in all_results
             ]
+
         elif self._executor_return_type in MeasurementResultLike:
             observable = cast(Observable, observable)
             all_results = cast(List[MeasurementResult], all_results)
@@ -160,6 +179,7 @@ class Executor:
                 )
                 for i in range(len(all_results) // result_step)
             ]
+
         else:
             raise ValueError(
                 f"Could not parse executed results from executor with type"
