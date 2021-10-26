@@ -102,7 +102,7 @@ def execute_with_noise(
     circ.save_density_matrix()
 
     if noise_model is None:
-        basis_gates = None,
+        basis_gates = None
     else:
         basis_gates = noise_model.basis_gates + ["save_density_matrix"]
 
@@ -153,7 +153,7 @@ def execute_with_shots_and_noise(
     circ.measure_all()
 
     if noise_model is None:
-        basis_gates = None,
+        basis_gates = None
     else:
         basis_gates = noise_model.basis_gates
 
