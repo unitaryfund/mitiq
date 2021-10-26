@@ -59,7 +59,6 @@ from mitiq.observable import Observable, PauliString
 BASE_NOISE = 0.007
 TEST_DEPTH = 30
 ONE_QUBIT_GS_PROJECTOR = np.array([[1, 0], [0, 0]])
-QASM_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
 
 npX = np.array([[0, 1], [1, 0]])
 """Defines the sigma_x Pauli matrix in SU(2) algebra as a (2,2) `np.array`."""
@@ -281,7 +280,7 @@ def qiskit_executor(qp: QPROGRAM, shots: int = 500) -> float:
 def get_counts(circuit: qiskit.QuantumCircuit):
     return (
         qiskit.execute(
-            circuit, qiskit.Aer.get_backend("qasm_simulator"), shots=100
+            circuit, qiskit.Aer.get_backend("aer_simulator"), shots=100
         )
         .result()
         .get_counts()
@@ -486,7 +485,8 @@ def test_execute_with_zne_transpiled_qiskit_circuit():
     """
     from qiskit.test.mock import FakeSantiago
 
-    backend = FakeSantiago()
+    santiago = FakeSantiago()
+    backend = qiskit.providers.aer.AerSimulator.from_backend(santiago)
 
     def execute(circuit: qiskit.QuantumCircuit, shots: int = 8192) -> float:
         job = qiskit.execute(circuit, backend, shots=shots)
