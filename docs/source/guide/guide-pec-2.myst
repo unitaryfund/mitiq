@@ -1,0 +1,18 @@
+# When should I use PEC?
+
+## Advantages
+
+The main advantage of PEC is that, assuming perfect gate tomography,
+it produces unbiased estimations of expectation values.
+This means that, in the limit of many samples, the error mitigated expectation values
+converge to the ideal expectation values.
+
+## Disadvantages
+
+PEC is a noisy-aware technique that can be applied only if
+one has the full tomographic knowledge of the hardware gate set. Indeed, in order to represent
+ideal gates as linear combination of noisy gates, one needs to know the superoperator
+matrices (or the Choi matrices) of the noisy gates.
+
+A technical problem of PEC is that it requires the execution of many different circuits.
+This typically requires more clock time compared to the repeated execution of equal circuits.

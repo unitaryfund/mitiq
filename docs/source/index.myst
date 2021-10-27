@@ -6,7 +6,7 @@ maxdepth: 2
 caption: Contents
 ---
 readme.myst
-guide/guide.rst
+guide/guide.myst
 examples/examples.rst
 apidoc.rst
 toc_contributing.myst

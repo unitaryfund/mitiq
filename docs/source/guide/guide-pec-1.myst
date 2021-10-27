@@ -1,0 +1,142 @@
+---
+jupytext:
+  text_representation:
+    extension: .myst
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.11.1
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
+---
+
+# How do I use PEC?
+
+Probabilistic Error Cancellation (PEC) is an error mitigation technique for improving the estimation
+of expectation values (see #). In order to apply this technique, one must know how to represent ideal
+gates as linear combinations of noisy implementable gates. This knowledge is exploited by Mitiq
+to probabilistically remove the bias error from the unmitigated expectation values.
+
++++
+
+## Select a frontend
+
+```{code-cell} ipython3
+# frontend = "cirq"
+frontend = "qiskit"
+# frontend = "pyquil"
+# frontend = "braket"
+# frontend = "pennylane"
+```
+
+## Define the circuit of interest
+
++++
+
+We first define the circuit of interest. For simplicity, in this example we use
+a randomized-benchmarking circuit whose ideal execution is equivalent to the
+identity operation.
+
+```{code-cell} ipython3
+from mitiq import benchmarks
+
+circuit = benchmarks.generate_rb_circuits(
+  n_qubits=1, num_cliffords=2, return_type = frontend,
+)[0]
+
+print(circuit)
+```
+
+## Define a noisy executor
+
++++
+
+To interface generic frontends and backends with Mitiq, we must define an `executor`.
+In the simplest case, an `executor` is Python function that takes as input a quantum
+circuit and returns the noisy expectation value of some observable.
+
++++
+
+**Note:** The body of this function is supposed to be written by the user depending on the used
+frontend and backend. Here, for simplicity, we first convert the input circuit to the Mitiq internal
+representation (Cirq) and then simulate it.
+
+```{code-cell} ipython3
+from cirq import DensityMatrixSimulator, depolarize
+from mitiq.interface import convert_to_mitiq
+
+def executor(circuit, noise_level=0.01):
+    """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit
+    executed with depolarizing noise.
+    """
+    # Replace with code based on your frontend and backend.
+    mitiq_circuit, _ = convert_to_mitiq(circuit)
+    noisy_circuit = mitiq_circuit.with_noise(depolarize(p=noise_level))
+    rho = DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix
+    return rho[0, 0].real
+```
+
+The `executor` can be used to evaluate noisy (unmitigated) expectation values.
+
+```{code-cell} ipython3
+noisy_value = executor(circuit)
+ideal_value = executor(circuit, noise_level=0.0)      
+print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.5f}")
+```
+
+The aim of PEC is reducing this error.
+
++++
+
+## Represent ideal gates as linear combinations of noisy gates
+
++++
+
+Before applying PEC, we need to represent the gates of the ideal `circuit` as a linear combinations 
+of noisy gates. In Mitiq, one can express a gate representation via an `OperationRepresentation`
+object which depends on the specific noise model of the backend.
+
++++
+
+In this example, we assume that local depolarizing noise of some fixed `noise_level` is acting after
+the application of any gate. For this simple noise model, one can easily obtain the necessary representations as follows:
+
+```{code-cell} ipython3
+from mitiq.pec.representations.depolarizing import represent_operations_in_circuit_with_local_depolarizing_noise
+
+noise_level = 0.01
+reps = represent_operations_in_circuit_with_local_depolarizing_noise(circuit, noise_level)
+print(
+    f"{len(reps)} OperationRepresentation objects produced "
+    f"assuming depolarizing noise of strength p={noise_level}."
+)
+```
+
+As an example, we print the first `OperationRepresentation` in `reps`, showing how an ideal
+gate of `circuit` can be expressed as a linear combination of noisy gates:
+
+```{code-cell} ipython3
+print(reps[0])
+```
+
+**IMPORTANT NOTE:** for PEC to work properly, the noise model and the `noise_level`
+associated to the executor must be equal to those used when defining the
+`OperationRepresentation` objects.
+
++++
+
+## Apply PEC
+
++++
+
+Probabilistic error cancellation can be applied as follows.
+
+```{code-cell} ipython3
+from mitiq import pec
+
+pec_value = pec.execute_with_pec(circuit, executor, representations=reps)
+
+print(f"Error w/o  PEC: {abs(ideal_value - noisy_value) :.5f}")
+print(f"Error with PEC: {abs(ideal_value - pec_value) :.5f}")
+```
