@@ -22,8 +22,13 @@ import numpy as np
 import cirq
 import pyquil
 
-from mitiq.executor.executor import Executor, generate_collected_executor
+from mitiq.executor.executor import Executor
 from mitiq.rem import MeasurementResult
+from mitiq.observable import Observable, PauliString
+from mitiq.interface.mitiq_cirq import (
+    compute_density_matrix,
+    sample_bitstrings,
+)
 
 
 # Serial / batched executors which return floats.
@@ -62,49 +67,51 @@ def executor_pyquil_batched(programs) -> List[float]:
 
 
 # Serial / batched executors which return measurements.
-def executor_serial_measurements(circuit) -> MeasurementResult:
-    # Assume there is only one measurement key in the circuit.
-    assert len(circuit.all_measurement_keys()) == 1
-
-    key = circuit.all_measurement_keys().pop()
-    backend = cirq.Simulator()
-    return MeasurementResult(
-        backend.run(circuit, repetitions=10).measurements[key].tolist()
-    )
+def executor_measurements(circuit) -> MeasurementResult:
+    return sample_bitstrings(circuit, noise_level=(0,))
 
 
-def executor_batched_measurements(circuits) -> List[MeasurementResult]:
-    return [executor_serial_measurements(circuit) for circuit in circuits]
+def executor_measurements_batched(circuits) -> List[MeasurementResult]:
+    return [executor_measurements(circuit) for circuit in circuits]
 
 
-def test_collector_simple():
+# Serial / batched executors which return density matrices.
+def executor_density_matrix(circuit) -> np.ndarray:
+    return compute_density_matrix(circuit, noise_level=(0,))
+
+
+def executor_density_matrix_batched(circuits) -> List[np.ndarray]:
+    return [executor_density_matrix(circuit) for circuit in circuits]
+
+
+def test_executor_simple():
     collector = Executor(executor=executor_batched, max_batch_size=10)
     assert collector.can_batch
     assert collector._max_batch_size == 10
     assert collector.calls_to_executor == 0
 
 
-def test_collector_is_batched_executor():
+def test_executor_is_batched_executor():
     assert Executor.is_batched_executor(executor_batched)
     assert not Executor.is_batched_executor(executor_serial_typed)
     assert not Executor.is_batched_executor(executor_serial)
-    assert not Executor.is_batched_executor(executor_serial_measurements)
-    # assert Collector.is_batched_executor(executor_batched_measurements)
+    assert not Executor.is_batched_executor(executor_measurements)
+    assert Executor.is_batched_executor(executor_measurements_batched)
 
 
 @pytest.mark.parametrize("ncircuits", (5, 10, 25))
 @pytest.mark.parametrize("executor", (executor_batched, executor_serial))
-def test_run_collector_identical_circuits_batched(ncircuits, executor):
+def test_run_executor_identical_circuits_batched(ncircuits, executor):
     collector = Executor(executor=executor, max_batch_size=10)
     circuits = [cirq.Circuit(cirq.H(cirq.LineQubit(0)))] * ncircuits
-    results = collector.run(circuits)
+    results = collector._run(circuits)
 
     assert np.allclose(results, np.zeros(ncircuits))
     assert collector.calls_to_executor == 1
 
 
 @pytest.mark.parametrize("batch_size", (1, 2, 10))
-def test_run_collector_nonidentical_pyquil_programs(batch_size):
+def test_run_executor_nonidentical_pyquil_programs(batch_size):
     collector = Executor(
         executor=executor_pyquil_batched, max_batch_size=batch_size
     )
@@ -114,7 +121,7 @@ def test_run_collector_nonidentical_pyquil_programs(batch_size):
         pyquil.Program(pyquil.gates.X(0)),
         pyquil.Program(pyquil.gates.H(0)),
     ] * 10
-    results = collector.run(circuits)
+    results = collector._run(circuits)
 
     assert np.allclose(results, np.zeros(len(circuits)))
     if batch_size == 1:
@@ -125,7 +132,7 @@ def test_run_collector_nonidentical_pyquil_programs(batch_size):
 
 @pytest.mark.parametrize("ncircuits", (10, 11, 23))
 @pytest.mark.parametrize("batch_size", (1, 2, 5, 50))
-def test_run_collector_all_unique(ncircuits, batch_size):
+def test_run_executor_all_unique(ncircuits, batch_size):
     collector = Executor(executor=executor_batched, max_batch_size=batch_size)
     assert collector.can_batch
 
@@ -136,7 +143,7 @@ def test_run_collector_all_unique(ncircuits, batch_size):
         )
         for _ in range(ncircuits)
     ]
-    results = collector.run(circuits)
+    results = collector._run(circuits)
 
     assert np.allclose(results, np.zeros(ncircuits))
     assert collector.calls_to_executor == np.ceil(ncircuits / batch_size)
@@ -144,14 +151,14 @@ def test_run_collector_all_unique(ncircuits, batch_size):
 
 @pytest.mark.parametrize("ncircuits", (5, 21))
 @pytest.mark.parametrize("force_run_all", (True, False))
-def test_run_collector_force_run_all_serial_executor_identical_circuits(
+def test_run_executor_force_run_all_serial_executor_identical_circuits(
     ncircuits, force_run_all
 ):
     collector = Executor(executor=executor_serial)
     assert not collector.can_batch
 
     circuits = [cirq.Circuit(cirq.H(cirq.LineQubit(0)))] * ncircuits
-    results = collector.run(circuits, force_run_all=force_run_all)
+    results = collector._run(circuits, force_run_all=force_run_all)
 
     assert np.allclose(results, np.zeros(ncircuits))
     if force_run_all:
@@ -162,7 +169,7 @@ def test_run_collector_force_run_all_serial_executor_identical_circuits(
 
 @pytest.mark.parametrize("s", (50, 100, 150))
 @pytest.mark.parametrize("b", (1, 2, 100))
-def test_run_collector_preserves_order(s, b):
+def test_run_executor_preserves_order(s, b):
     rng = np.random.RandomState(1)
 
     collector = Executor(executor=executor_batched_unique, max_batch_size=b)
@@ -174,20 +181,84 @@ def test_run_collector_preserves_order(s, b):
     ]
     batch = [circuits[i] for i in rng.random_integers(low=0, high=1, size=s)]
 
-    assert np.allclose(collector.run(batch), executor_batched_unique(batch))
+    assert np.allclose(collector._run(batch), executor_batched_unique(batch))
 
 
-@pytest.mark.parametrize("executor", (executor_serial, executor_batched))
-@pytest.mark.parametrize("ncircuits", (10, 25))
-@pytest.mark.parametrize("rval", (0.0, 1.0))
-def test_generate_collected_executor(executor, ncircuits, rval):
-    collected_executor = generate_collected_executor(
-        executor, return_value=rval
+@pytest.mark.parametrize(
+    "execute", [executor_serial_unique, executor_batched_unique]
+)
+def test_executor_evaluate_float(execute):
+    q = cirq.LineQubit(0)
+    circuits = [cirq.Circuit(cirq.X(q)), cirq.Circuit(cirq.H(q), cirq.Z(q))]
+
+    executor = Executor(execute)
+
+    results = executor.evaluate(circuits)
+    assert np.allclose(results, [1, 2])
+
+    if execute is executor_serial_unique:
+        assert executor.calls_to_executor == 2
+    else:
+        assert executor.calls_to_executor == 1
+
+    assert executor.executed_circuits == circuits
+    assert executor.quantum_results == [1, 2]
+
+
+@pytest.mark.parametrize(
+    "execute", [executor_measurements, executor_measurements_batched]
+)
+def test_executor_evaluate_measurements(execute):
+    obs = Observable(PauliString("Z"))
+
+    q = cirq.LineQubit(0)
+    circuits = [cirq.Circuit(cirq.I.on(q)), cirq.Circuit(cirq.X.on(q))]
+
+    executor = Executor(execute)
+
+    results = executor.evaluate(circuits, obs)
+    assert np.allclose(results, [1, -1])
+
+    if execute is executor_measurements:
+        assert executor.calls_to_executor == 2
+    else:
+        assert executor.calls_to_executor == 1
+
+    assert executor.executed_circuits[0] == circuits[0] + cirq.measure(q)
+    assert executor.executed_circuits[1] == circuits[1] + cirq.measure(q)
+    assert executor.quantum_results[0] == executor_measurements(
+        circuits[0] + cirq.measure(q)
     )
-    expvals = collected_executor([cirq.Circuit()] * ncircuits)
-    assert np.allclose(expvals, np.full(shape=(ncircuits,), fill_value=rval))
+    assert executor.quantum_results[1] == executor_measurements(
+        circuits[1] + cirq.measure(q)
+    )
+    assert len(executor.quantum_results) == len(circuits)
 
 
-def test_generate_collected_executor_not_callable():
-    with pytest.raises(ValueError, match="must be callable"):
-        generate_collected_executor(None)
+@pytest.mark.parametrize(
+    "execute", [executor_density_matrix, executor_density_matrix_batched]
+)
+def test_executor_evaluate_density_matrix(execute):
+    obs = Observable(PauliString("Z"))
+
+    q = cirq.LineQubit(0)
+    circuits = [cirq.Circuit(cirq.I.on(q)), cirq.Circuit(cirq.X.on(q))]
+
+    executor = Executor(execute)
+
+    results = executor.evaluate(circuits, obs)
+    assert np.allclose(results, [1, -1])
+
+    if execute is executor_density_matrix:
+        assert executor.calls_to_executor == 2
+    else:
+        assert executor.calls_to_executor == 1
+
+    assert executor.executed_circuits == circuits
+    assert np.allclose(
+        executor.quantum_results[0], executor_density_matrix(circuits[0])
+    )
+    assert np.allclose(
+        executor.quantum_results[1], executor_density_matrix(circuits[1])
+    )
+    assert len(executor.quantum_results) == len(circuits)

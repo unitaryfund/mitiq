@@ -16,31 +16,28 @@
 """API for using Clifford Data Regression (CDR) error mitigation."""
 
 from functools import wraps
-from typing import Any, Callable, cast, Optional, Sequence
+from typing import Any, Callable, cast, Optional, Sequence, Union
 
 import numpy as np
 from scipy.optimize import curve_fit
 
+from mitiq import Executor, Observable, QPROGRAM, QuantumResult
 from mitiq.interface import accept_any_qprogram_as_input
-
 from mitiq.cdr import (
     generate_training_circuits,
     linear_fit_function,
     linear_fit_function_no_intercept,
 )
-
-from mitiq import Observable, QPROGRAM
-from mitiq._typing import QuantumResult
 from mitiq.zne.scaling import fold_gates_at_random
 
 
 @wraps(accept_any_qprogram_as_input)
 def execute_with_cdr(
     circuit: QPROGRAM,
-    executor: Callable[[QPROGRAM], QuantumResult],
+    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     observable: Optional[Observable] = None,
     *,
-    simulator: Callable[[QPROGRAM], QuantumResult],
+    simulator: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     num_training_circuits: int = 10,
     fraction_non_clifford: float = 0.1,
     fit_function: Callable[..., float] = linear_fit_function,
@@ -148,33 +145,21 @@ def execute_with_cdr(
         for c in [circuit] + training_circuits  # type: ignore
     ]
 
-    # Execute all circuits. TODO: Allow batching.
-    if observable is None:
-        noisy_results = np.array(
-            [
-                [executor(circuit) for circuit in circuits]
-                for circuits in all_circuits
-            ]
-        )
-        ideal_results = np.array(
-            [simulator(circuit) for circuit in all_circuits[0]]
-        )
-    else:
-        noisy_results = np.array(
-            [
-                [
-                    observable.expectation(circuit, executor)
-                    for circuit in circuits
-                ]
-                for circuits in all_circuits
-            ]
-        )
-        ideal_results = np.array(
-            [
-                observable.expectation(circuit, simulator)
-                for circuit in all_circuits[0]
-            ]
-        )
+    # Execute all circuits.
+    if not isinstance(executor, Executor):
+        executor = Executor(executor)
+
+    if not isinstance(simulator, Executor):
+        simulator = Executor(simulator)
+
+    to_run = [circuit for circuits in all_circuits for circuit in circuits]
+    all_circuits_shape = (len(all_circuits), len(all_circuits[0]))
+
+    results = executor.evaluate(to_run, observable)
+    noisy_results = np.array(results).reshape(all_circuits_shape)
+
+    results = simulator.evaluate(all_circuits[0], observable)
+    ideal_results = np.array(results)
 
     # Do the regression.
     fitted_params, _ = curve_fit(

@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
-import inspect
 from typing import Callable, cast, List, Optional, Set
 
 import numpy as np
@@ -22,7 +21,6 @@ import cirq
 
 from mitiq.observable.pauli import PauliString, PauliStringCollection
 from mitiq._typing import MeasurementResult, QuantumResult, QPROGRAM
-from mitiq.executor import Executor
 
 
 class Observable:
@@ -102,34 +100,10 @@ class Observable:
 
     def expectation(
         self, circuit: QPROGRAM, execute: Callable[[QPROGRAM], QuantumResult]
-    ) -> float:
-        result_type = inspect.getfullargspec(execute).annotations.get("return")
+    ) -> complex:
+        from mitiq.executor import Executor  # Avoid circular import.
 
-        if result_type is MeasurementResult:
-            to_run = self.measure_in(circuit)
-            results = Executor(execute).run(to_run)
-            return self._expectation_from_measurements(
-                cast(List[MeasurementResult], results)
-            )
-        elif result_type is np.ndarray:
-            density_matrix = cast(np.ndarray, execute(circuit))
-            observable_matrix = self.matrix()
-
-            if density_matrix.shape != observable_matrix.shape:
-                nqubits = int(np.log2(density_matrix.shape[0]))
-                density_matrix = cirq.partial_trace(
-                    np.reshape(density_matrix, newshape=[2, 2] * nqubits),
-                    keep_indices=self.qubit_indices,
-                ).reshape(observable_matrix.shape)
-
-            return np.trace(density_matrix @ self.matrix())
-        else:
-            # TODO: Support batched executors.
-            raise ValueError(  # pragma: no cover
-                f"Arg `execute` must be a function with annotated return type "
-                f"that is either mitiq.MeasurementResult or np.ndarray but "
-                f"was {result_type}."
-            )
+        return Executor(execute).evaluate(circuit, observable=self)[0]
 
     def _expectation_from_measurements(
         self, measurements: List[MeasurementResult]
@@ -138,6 +112,20 @@ class Observable:
             pset._expectation_from_measurements(bitstrings)
             for (pset, bitstrings) in zip(self._groups, measurements)
         )
+
+    def _expectation_from_density_matrix(
+        self, density_matrix: np.ndarray
+    ) -> float:
+        observable_matrix = self.matrix()
+
+        if density_matrix.shape != observable_matrix.shape:
+            nqubits = int(np.log2(density_matrix.shape[0]))
+            density_matrix = cirq.partial_trace(
+                np.reshape(density_matrix, newshape=[2, 2] * nqubits),
+                keep_indices=self.qubit_indices,
+            ).reshape(observable_matrix.shape)
+
+        return cast(float, np.trace(density_matrix @ observable_matrix))
 
     def __str__(self) -> str:
         return " + ".join(map(str, self._paulis))
