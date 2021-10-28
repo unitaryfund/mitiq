@@ -10,13 +10,14 @@ Zero noise extrapolation is an error mitigation technique in which an expectatio
 value is computed at different noise levels and, as a second step, the ideal expectation
 value is inferred extrapolating the measured results to the zero-noise limit.
 
-Both steps---noise scaling and extrapolation---can be applied with Mitiq as shown in the Figure below. The corresponding
-sub-modules are :mod:`mitiq.zne.scaling.folding` and :mod:`mitiq.zne.inference`.
+Both steps---noise scaling and extrapolation---can be applied with Mitiq as shown in the Figure below. The corresponding sub-modules are :mod:`mitiq.zne.scaling.folding` and :mod:`mitiq.zne.inference`.
 
 
 .. figure:: ../img/zne_workflow2_steps.png
   :width: 400
   :name: figzne
+
+  The diagram shows the workflow of the zero noise extrapolation (ZNE) techniques in Mitiq. The first step involves generating quantum circuits for noise scaling. The second step involves inferring the zero-noise value from the noisy circuit measurements.
 
 .. _guide_zne_folding:
 

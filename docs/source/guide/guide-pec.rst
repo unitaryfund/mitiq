@@ -8,12 +8,12 @@ Probabilistic error cancellation (PEC) capabilities are currently included in Mi
 the :ref:`About Error Mitigation <guide_qem_pec>` section.
 
 
-A figure of the typical workflow for PEC in Mitiq is shown in the figure below.
-
 .. figure:: ../img/pec_workflow2_steps.png
   :width: 400
   :alt: The PEC workflow in Mitiq is divided in two steps: Generating circuits and then performing the inference to obtain a noise mitigated expectation value.
   :name: figpec
+
+  The diagram illustrates the typical workflow for probabilistic error cancellation (PEC) in Mitiq. The PEC workflow in Mitiq is divided in two steps: Generating circuits and then performing the inference to obtain a noise mitigated expectation value.
 
 
 As visible in :ref:`the PEC workflow Figure<figpec>`, the application of PEC in Mitiq is divided in two main steps, similarly to ZNE: The first one involves generating circuits, while the second one involves performing the inference to obtain a noise mitigated expectation value. Through the application of :py:mod:`~mitiq.pec.pec`'s :py:func:`~mitiq.pec.pec.execute_with_pec`, the user thus effectively launches on the quantum hardware (or simulator) a batch of probabilistically sampled circuits. The noisy results from this execution are then used to infer an unbiased estimate of the mitigated expectation value. Differently from the :ref:`ZNE <guide_zne>` techniques, PEC on one hand does not require noise scaling, on the other hand requires knowledge of the noise model (or the tomography of the gates), for the correct representation on the noisy basis.
