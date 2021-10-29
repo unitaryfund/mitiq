@@ -215,11 +215,6 @@ def test_execute_with_zne_bad_arguments():
     """Tests errors are raised when execute_with_zne is called with bad
     arguments.
     """
-    with pytest.raises(
-        TypeError, match="Argument `executor` must be callable"
-    ):
-        execute_with_zne(circ, None)
-
     with pytest.raises(TypeError, match="Argument `factory` must be of type"):
         execute_with_zne(circ, executor, factory=RichardsonFactory)
 
