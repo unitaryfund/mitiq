@@ -297,7 +297,7 @@ class Factory(ABC):
     def run(
         self,
         qp: QPROGRAM,
-        executor: Callable[..., QuantumResult],
+        executor: Union[Executor, Callable[..., QuantumResult]],
         observable: Optional[Observable] = None,
         scale_noise: Callable[
             [QPROGRAM, float], QPROGRAM
@@ -309,8 +309,9 @@ class Factory(ABC):
 
         Args:
             qp: Quantum circuit to scale noise in.
-            executor: Function which inputs a (list of) quantum circuits and
-                outputs a (list of) ``mitiq.QuantumResult`` s.
+            executor: A ``mitiq.Executor`` or a function which inputs a (list
+                of) quantum circuits and outputs a (list of)
+                ``mitiq.QuantumResult`` s.
             observable: Observable to compute the expectation value of. If
                 None, the `executor` must return an expectation value.
                 Otherwise, the `QuantumResult` returned by `executor` is used
@@ -508,7 +509,7 @@ class BatchedFactory(Factory, ABC):
     def run(
         self,
         qp: QPROGRAM,
-        executor: Callable[..., QuantumResult],
+        executor: Union[Executor, Callable[..., QuantumResult]],
         observable: Optional[Observable] = None,
         scale_noise: Callable[
             [QPROGRAM, float], QPROGRAM
@@ -531,15 +532,9 @@ class BatchedFactory(Factory, ABC):
 
         Args:
             qp: Quantum circuit to run.
-            executor: A "single executor" (1) or a "batched executor" (2).
-                (1) A function which inputs a single circuit and outputs a
-                single ``mitiq.QuantumResult``.
-                (2) A function which inputs a list of circuits and outputs a
-                list of ``mitiq.QuantumResult`` s (one for each circuit). A
-                batched executor can also take an optional "kwargs_list"
-                argument to set a list of keyword arguments (one for each
-                circuit). This is necessary only if the factory is initialized
-                using the optional "shot_list" parameter.
+            executor: A ``mitiq.Executor`` or a function which inputs a (list
+                of) quantum circuits and outputs a (list of)
+                ``mitiq.QuantumResult`` s.
             observable: Observable to compute the expectation value of. If
                 None, the `executor` must return an expectation value.
                 Otherwise, the `QuantumResult` returned by `executor` is used
@@ -555,33 +550,35 @@ class BatchedFactory(Factory, ABC):
 
         _check_circuit_length(qp)
 
-        # Get all noise-scaled circuits to run
+        # Get all noise-scaled circuits to run.
         to_run = self._generate_circuits(qp, scale_noise, num_to_average)
 
-        # Get the list of keywords associated to each circuit in "to_run"
+        # Run all circuits.
+        if not isinstance(executor, Executor):
+            executor = Executor(executor)
+
+        # Get the list of keywords associated to each circuit in "to_run".
         kwargs_list = self._get_keyword_args(num_to_average)
 
-        if observable is not None:
-            if not all([kwargs == {} for kwargs in kwargs_list]):
-                # TODO: Support this case.
-                raise NotImplementedError  # pragma: no cover
-            res = [
-                observable.expectation(circuit, executor) for circuit in to_run
-            ]
-        else:
-            # TODO: Just call Executor(executor).run(...) here.
-            if Executor.is_batched_executor(executor):
-                if all([kwargs == {} for kwargs in kwargs_list]):
-                    res = executor(to_run)  # type: ignore[assignment]
-                else:
-                    res = executor(  # type: ignore[assignment]
-                        to_run, kwargs_list=kwargs_list
+        # If there are different keyword args, run each circuit individually.
+        # https://stackoverflow.com/questions/1151658/python-hashable-dicts.
+        class HashableDict(dict):
+            def __hash__(self):
+                return hash(tuple(sorted(self.items())))
+
+        if len(set(HashableDict(kwargs) for kwargs in kwargs_list)) != 1:
+            res = []
+            for circuit, kwargs in zip(to_run, kwargs_list):
+                res.extend(
+                    executor.evaluate(
+                        circuit, observable, force_run_all=True, **kwargs
                     )
-            else:
-                res = [
-                    executor(circ, **kwargs)  # type: ignore
-                    for circ, kwargs in zip(to_run, kwargs_list)
-                ]
+                )
+        else:
+            # Else, run all circuits.
+            res = executor.evaluate(
+                to_run, observable, force_run_all=True, **kwargs_list[0]
+            )
 
         # Reshape "res" to have "num_to_average" columns
         reshaped = np.array(res).reshape((-1, num_to_average))
@@ -739,7 +736,7 @@ class AdaptiveFactory(Factory, ABC):
     def run(
         self,
         qp: QPROGRAM,
-        executor: Callable[..., QuantumResult],
+        executor: Union[Executor, Callable[..., QuantumResult]],
         observable: Optional[Observable] = None,
         scale_noise: Callable[
             [QPROGRAM, float], QPROGRAM
@@ -753,10 +750,9 @@ class AdaptiveFactory(Factory, ABC):
 
         Args:
             qp: Circuit to mitigate.
-            executor: executor: Function which executes a circuit and returns a
-                ``mitiq.QuantumResult``. If the factory was initialized with a
-                ``shot_list``, then "shot" must be an additional argument of
-                the executor.
+            executor: A ``mitiq.Executor`` or a function which inputs a (list
+                of) quantum circuits and outputs a (list of)
+                ``mitiq.QuantumResult`` s.
             observable: Observable to compute the expectation value of. If
                 None, the `executor` must return an expectation value.
                 Otherwise, the `QuantumResult` returned by `executor` is used
