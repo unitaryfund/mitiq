@@ -766,29 +766,20 @@ class AdaptiveFactory(Factory, ABC):
 
         _check_circuit_length(qp)
 
+        if not isinstance(executor, Executor):
+            executor = Executor(executor)
+
         def scale_factor_to_expectation_value(
             scale_factor: float, **exec_params: Any
         ) -> float:
             """Evaluates the quantum expectation value for a given
             scale_factor and other executor parameters."""
-            expectation_values: List[complex] = []
-
-            # TODO: Averaging over `num_to_average` should use batching.
-            for _ in range(num_to_average):
-                scaled_qp = scale_noise(qp, scale_factor)
-
-                if observable is not None:
-                    expectation_values.append(
-                        observable.expectation(
-                            scaled_qp,
-                            functools.partial(executor, **exec_params),
-                        )
-                    )
-                else:
-                    expectation_values.append(
-                        cast(float, executor(scaled_qp, **exec_params))
-                    )
-
+            to_run = [
+                scale_noise(qp, scale_factor) for _ in range(num_to_average)
+            ]
+            expectation_values = executor.evaluate(
+                to_run, observable, force_run_all=True, **exec_params
+            )
             return np.average(expectation_values)
 
         return self.run_classical(
