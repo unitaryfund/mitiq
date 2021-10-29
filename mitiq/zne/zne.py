@@ -70,7 +70,7 @@ def execute_with_zne(
 
 
 def mitigate_executor(
-    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
+    executor: Callable[[QPROGRAM], QuantumResult],
     observable: Optional[Observable] = None,
     *,
     factory: Optional[Factory] = None,

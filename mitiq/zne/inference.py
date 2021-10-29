@@ -562,8 +562,8 @@ class BatchedFactory(Factory, ABC):
 
         # If there are different keyword args, run each circuit individually.
         # https://stackoverflow.com/questions/1151658/python-hashable-dicts.
-        class HashableDict(dict):
-            def __hash__(self):
+        class HashableDict(Dict[Any, Any]):
+            def __hash__(self) -> int:  # type: ignore[override]
                 return hash(tuple(sorted(self.items())))
 
         if len(set(HashableDict(kwargs) for kwargs in kwargs_list)) != 1:
@@ -777,7 +777,7 @@ class AdaptiveFactory(Factory, ABC):
             to_run = [
                 scale_noise(qp, scale_factor) for _ in range(num_to_average)
             ]
-            expectation_values = executor.evaluate(
+            expectation_values = executor.evaluate(  # type: ignore[union-attr]
                 to_run, observable, force_run_all=True, **exec_params
             )
             return np.average(expectation_values)
