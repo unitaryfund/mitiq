@@ -16,7 +16,6 @@
 """Classes corresponding to different zero-noise extrapolation methods."""
 from abc import ABC, abstractmethod
 from copy import deepcopy
-import functools
 from typing import (
     Any,
     Callable,
