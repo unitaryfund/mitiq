@@ -139,10 +139,6 @@ class Executor:
         """
         if not isinstance(circuits, List):
             circuits = [circuits]
-        #
-        # print(f"RECEIVED {len(circuits)} CIRCUITS:")
-        # for circuit in circuits:
-        #     print(circuit)
 
         # Get all required circuits to run.
         if (
@@ -158,16 +154,9 @@ class Executor:
         else:
             all_circuits = circuits
             result_step = 1
-        #
-        # print(f"ALL {len(all_circuits)} CIRCUITS TO RUN:")
-        # for c in all_circuits:
-        #     print(c)
 
         # Run all required circuits.
         all_results = self._run(all_circuits, force_run_all, **kwargs)
-        #
-        # print("ALL RESULTS")
-        # print(all_results)
 
         # Parse the results.
         if self._executor_return_type in FloatLike:
