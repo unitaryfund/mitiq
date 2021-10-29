@@ -14,18 +14,17 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """High-level zero-noise extrapolation tools."""
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 from functools import wraps
 
-from mitiq._typing import QPROGRAM, QuantumResult
+from mitiq import Executor, Observable, QPROGRAM, QuantumResult
 from mitiq.zne.inference import Factory, RichardsonFactory
-from mitiq.observable import Observable
 from mitiq.zne.scaling import fold_gates_at_random
 
 
 def execute_with_zne(
     qp: QPROGRAM,
-    executor: Callable[[QPROGRAM], QuantumResult],
+    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     observable: Optional[Observable] = None,
     *,
     factory: Optional[Factory] = None,
@@ -37,7 +36,9 @@ def execute_with_zne(
 
     Args:
         qp: Quantum program to execute with error mitigation.
-        executor: Executes a circuit and returns a `QuantumResult`.
+        executor: A ``mitiq.Executor`` or a function which inputs a (list
+            of) quantum circuits and outputs a (list of)
+            ``mitiq.QuantumResult`` s.
         observable: Observable to compute the expectation value of. If None,
             the `executor` must return an expectation value. Otherwise,
             the `QuantumResult` returned by `executor` is used to compute the
@@ -50,9 +51,6 @@ def execute_with_zne(
     """
     if not factory:
         factory = RichardsonFactory(scale_factors=[1.0, 2.0, 3.0])
-
-    if not callable(executor):
-        raise TypeError("Argument `executor` must be callable.")
 
     if not isinstance(factory, Factory):
         raise TypeError(

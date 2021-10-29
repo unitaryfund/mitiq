@@ -203,11 +203,18 @@ class Executor:
             to be executed (if some are identical). Else, detects identical
             circuits and runs a minimal set.
         """
+        start_result_index = len(self._quantum_results)
+
         if force_run_all:
             to_run = circuits
         else:
             # Make circuits hashable.
             # Note: Assumes all circuits are the same type.
+            # TODO: Bug! These conversions to/from Mitiq are not safe in that,
+            #  e.g., they do not preserve classical register structure in
+            #  Qiskit circuits, potentially causing executed results to be
+            #  incorrect. Safe conversions should follow the logic in
+            #  mitiq.interface.noise_scaling_converter.
             _, conversion_type = convert_to_mitiq(circuits[0])
             hashable_circuits = [
                 convert_to_mitiq(circ)[0].freeze() for circ in circuits
@@ -231,11 +238,13 @@ class Executor:
                 batch = to_run[i * step : (i + 1) * step]
                 self._call_executor(batch, **kwargs)
 
+        these_results = self._quantum_results[start_result_index:]
+
         if force_run_all:
-            return self._quantum_results
+            return these_results
 
         # Expand computed results to all results using counts.
-        results_dict = dict(zip(collection.keys(), self._quantum_results))
+        results_dict = dict(zip(collection.keys(), these_results))
         results = [results_dict[key] for key in hashable_circuits]
 
         return results
