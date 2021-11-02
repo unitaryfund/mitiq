@@ -31,6 +31,20 @@ class Observable:
         self._ngroups: int
         self.partition()
 
+    @staticmethod
+    def from_pauli_string_collections(
+        *pauli_string_collections: PauliStringCollection,
+    ) -> "Observable":
+        obs = Observable()
+        obs._groups = list(pauli_string_collections)
+        obs._ngroups = len(pauli_string_collections)
+        obs._paulis = [
+            pauli
+            for pauli_string_collection in pauli_string_collections
+            for pauli in pauli_string_collection.elements
+        ]
+        return obs
+
     @property
     def nterms(self) -> int:
         return len(self._paulis)

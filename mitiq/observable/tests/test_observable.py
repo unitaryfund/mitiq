@@ -55,6 +55,21 @@ def test_observable():
     assert np.allclose(obs.matrix(), correct_matrix)
 
 
+def test_observable_from_pauli_string_collections():
+    z = PauliString("Z")
+    zz = PauliString("ZZ")
+    pcol1 = PauliStringCollection(z, zz)
+    x = PauliString("X")
+    xx = PauliString("XX")
+    pcol2 = PauliStringCollection(x, xx)
+
+    obs = Observable.from_pauli_string_collections(pcol1, pcol2)
+    assert obs.ngroups == 2
+    assert obs.groups[0] == pcol1
+    assert obs.groups[1] == pcol2
+    assert obs.nterms == 4
+
+
 def test_observable_partition_one_set():
     pauli1 = PauliString(spec="ZI")
     pauli2 = PauliString(spec="IZ")
