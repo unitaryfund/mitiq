@@ -88,7 +88,7 @@ results = executor.evaluate(circuit, obs)
 print("Results:", results)
 ```
 
-The `executor` has now been called and has results in memory.
+The `executor` has now been called and has results in memory. Note that `mitiq_cirq.compute_density_matrix` simulates the circuit with noise by default, so the resulting state (density matrix) is noisy.
 
 ```{code-cell} ipython3
 print("Calls to executor:", executor.calls_to_executor)
@@ -170,8 +170,12 @@ from mitiq import zne
 ```{code-cell} ipython3
 batched_executor = Executor(batch_compute_density_matrix, max_batch_size=10)
 
-zne_value = zne.execute_with_zne(cirq.Circuit(cirq.H.on(q) for _ in range(4)), batched_executor, obs)
-print("ZNE value:", zne_value)
+zne_value = zne.execute_with_zne(
+    cirq.Circuit(cirq.H.on(q) for _ in range(6)), 
+    executor=batched_executor, 
+    observable=obs
+)
+print(f"ZNE value: {zne_value :g}")
 ```
 
 ```{code-cell} ipython3
