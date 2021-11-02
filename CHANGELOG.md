@@ -46,7 +46,6 @@ execute_with_pec(circuit, executor, observable, representations)
 ```
 
 The latter will raise `# TypeError: execute_with_pec() missing 1 required keyword-only argument: 'representations'`.
-The main reason for this is that
 
 - The first argument of `execute_with_zne` is now `circuit` instead of `qp` to match signatures of other 
 `execute_with_xxx` functions.
