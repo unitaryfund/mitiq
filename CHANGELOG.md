@@ -53,11 +53,12 @@ The main reason for this is that
 
 ### All Changes
 
-- Add Observable documentation and `Observable.from_pauli_string_collections` method (@rmlarose, gh-1007)
+- Refactor `qp` to `circuit` in `execute_with_zne` (@rmlarose, gh-1009)
+- Add `Observable` documentation and `Observable.from_pauli_string_collections` method (@rmlarose, gh-1007)
 - Executor docs (@rmlarose, gh-1008)
 - Bump qiskit to version 0.31 and pin it explicitly in dev requirements (@andreamari, gh-993)
-- Use Executor.evaluate for batching in ZNE (@rmlarose, gh-1005)
-- Add Executor.evaluate and use for batched execution (@rmlarose, gh-1001)
+- Use `Executor.evaluate` for batching in ZNE (@rmlarose, gh-1005)
+- Add `Executor.evaluate` and use for batched execution (@rmlarose, gh-1001)
 - Bump PyQuil (@rmlarose, gh-992)
 - CDR with Observables (@rmlarose, gh-985)
 - Fix bug in OperationRepresentation printing (@andreamari, gh-975)
