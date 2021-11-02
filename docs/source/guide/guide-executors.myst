@@ -170,7 +170,7 @@ from mitiq import zne
 ```{code-cell} ipython3
 batched_executor = Executor(batch_compute_density_matrix, max_batch_size=10)
 
-zne_value = zne.execute_with_zne(cirq.Circuit(cirq.H.on(q) for _ in range(5)), batched_executor, obs)
+zne_value = zne.execute_with_zne(cirq.Circuit(cirq.H.on(q) for _ in range(4)), batched_executor, obs)
 print("ZNE value:", zne_value)
 ```
 
