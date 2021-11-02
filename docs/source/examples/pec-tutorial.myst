@@ -11,10 +11,6 @@ kernelspec:
   name: python3
 ---
 
----
-label: PEC-tutorial
----
-
 # Probabilistic Error Cancellation (PEC) with Mitiq
 
 +++
