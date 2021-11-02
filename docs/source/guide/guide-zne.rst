@@ -19,6 +19,10 @@ Both steps---noise scaling and extrapolation---can be applied with Mitiq as show
 
   The diagram shows the workflow of the zero noise extrapolation (ZNE) techniques in Mitiq. The first step involves generating quantum circuits for noise scaling. The second step involves inferring the zero-noise value from the noisy circuit measurements.
 
+If you wish to directly have a look at a tutorial with code on ZNE you can read here_.
+
+.. _here: ../examples/ibmq-backends.html
+
 .. _guide_zne_folding:
 
 ================================
