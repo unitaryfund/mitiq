@@ -4,7 +4,8 @@
 
 ### Summary
 
-This release introduces `Observable`s as a major new feature to the Mitiq workflow and a few breaking changes.
+This release introduces `Observable`s as a major new feature to the Mitiq workflow and a few breaking changes. Support
+for Pennylane has been added by adding `pennylane.QuantumTape`s to `mitiq.QPROGRAM`.
 
 **New features**
 
@@ -17,6 +18,15 @@ This release introduces `Observable`s as a major new feature to the Mitiq workfl
 
 - All error mitigation techniques can now use batching with the same interface.
 
+- PEC can be run with only a subset of representations of the gates in a circuit. In other words, if the circuit has 
+  two gates, `H` and `CNOT`, you can run `execute_with_pec` by only providing an `OperationRepresentation` for, e.g.,
+  the `CNOT`.
+  - Before, you had to provide all representations or an error would be raised.
+  - Performance of PEC may be better by providing all `OperationRepresentation`s. This change is only with respect to
+    usability and not performance.
+
+- Circuits written in `Pennylane` (as `QuantumTape`s) are now recognized and suppported by Mitiq.
+
 **Breaking changes**
 
 - Signatures of `execute_with_xxx` error-mitigation techniques have changed to include `Observable`s. The default value
@@ -26,14 +36,14 @@ change to keyword-only arguments (see below) may require you to make updates.
 - You must now use provide keywords for technique-specific arguments in error mitigation techniques. Example:
 
 ```python
-# New usage. Do this.
+# Example new usage of providing keyword arguments. Do this.
 execute_with_pec(circuit, executor, observable, representations=representations)
 ```
 
 instead of
 
 ```python
-# Old usage. Don't do this.
+# Old usage. Don't do this. Technique-specific arguments like `representations` are now keyword-only.
 execute_with_pec(circuit, executor, observable, representations)
 ```
 
@@ -81,8 +91,8 @@ The latter will raise `# TypeError: execute_with_pec() missing 1 required keywor
 - Improve OperationRepresentation printing (@andreamari, gh-901)
 - Updating release process (@crazy4pi314, gh-936)
 
-Huge thanks to all contributors on this release! @Misty-W, @AkashNarayanan, @purva-thakre, @trbromley, @crazy4pi314,
-@andreamari, and @rmlarose.
+Huge thanks to all contributors on this release! @Misty-W, @AkashNarayanan, @purva-thakre, @trbromley, @nathanshammah,
+@crazy4pi314, @andreamari, and @rmlarose.
 
 ## Version 0.10.0  (September 17, 2021)
 
