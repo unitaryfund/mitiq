@@ -135,7 +135,7 @@ from mitiq import zne
 executor = Executor(mitiq_cirq.compute_density_matrix)
 
 zne_value = zne.execute_with_zne(circuit, executor, obs)
-print("ZNE value:", zne_value)
+print(f"ZNE value: {zne_value :g}")
 ```
 
 If you do not provide an observable, the `executor` must compute and return the expectation value to mitigate.
