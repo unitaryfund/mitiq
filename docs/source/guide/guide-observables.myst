@@ -15,7 +15,7 @@ kernelspec:
 
 +++
 
-The `mitiq.Observable` class is a way to represent an observable as a linear combination of Pauli strings. This class is used to compute expectation values which are mitigated by techniques in Mitiq.
+The `mitiq.Observable` class is a way to represent an observable as a linear combination of Pauli strings. This class can be used to compute expectation values which are mitigated by techniques in Mitiq.
 
 ```{code-cell} ipython3
 from mitiq import Executor, Observable, PauliString
