@@ -23,7 +23,7 @@ from mitiq.zne.scaling import fold_gates_at_random
 
 
 def execute_with_zne(
-    qp: QPROGRAM,
+    circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     observable: Optional[Observable] = None,
     *,
@@ -35,7 +35,7 @@ def execute_with_zne(
     by running the quantum program `qp` with the executor function.
 
     Args:
-        qp: Quantum program to execute with error mitigation.
+        circuit: Quantum program to execute with error mitigation.
         executor: A ``mitiq.Executor`` or a function which inputs a (list
             of) quantum circuits and outputs a (list of)
             ``mitiq.QuantumResult`` s.
@@ -65,7 +65,7 @@ def execute_with_zne(
         raise ValueError("Argument `num_to_average` must be a positive int.")
 
     return factory.run(
-        qp, executor, observable, scale_noise, int(num_to_average)
+        circuit, executor, observable, scale_noise, int(num_to_average)
     ).reduce()
 
 
