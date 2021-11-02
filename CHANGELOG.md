@@ -1,13 +1,5 @@
 # Changelog
 
-% # " ## Development 0.X.Ydev (Month DDth, YYYY)"
-% # " ## (Future) Version 0.1.1 (Date)"
-% # " ### Changes"
-% # " - **MAJOR FEATURE**: New integration."
-% # " - Improve something."
-% # " - [Bug Fix]"
-% # " - Fix the bug."
-
 ## Version 0.11.0  (November 3rd, 2021)
 
 ### Summary
