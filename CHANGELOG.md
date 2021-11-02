@@ -8,6 +8,53 @@
 % # " - [Bug Fix]"
 % # " - Fix the bug."
 
+## Version 0.11.0  (November 3rd, 2021)
+
+### Summary
+
+This release introduces `Observable`s as a major new feature to the Mitiq workflow and a few breaking changes.
+
+**New features**
+
+- Specify and use a `mitiq.Observable` in any error-mitigation technique.
+  - This means the `executor` function does not have to return the expectation value as a `float` anymore, but rather 
+    can return a `mitiq.QuantumResult` - i.e., an object from which the expectation value can be computed provided 
+    an observable.
+  - The `executor` function can still return a `float`, in which case the `Observable` does not need to be specified
+    (and should not be specified).
+
+- All error mitigation techniques can now use batching with the same interface.
+
+**Breaking changes**
+
+- Signatures of `execute_with_xxx` error-mitigation techniques have changed to include `Observable`s. The default value
+is `None`, meaning that the `executor` should return a `float` as in the old usage, but the additional argument and
+change to keyword-only arguments (see below) may require you to make updates.
+
+- You must now use provide keywords for technique-specific arguments in error mitigation techniques. Example:
+
+```python
+# New usage. Do this.
+execute_with_pec(circuit, executor, observable, representations=representations)
+```
+
+instead of
+
+```python
+# Old usage. Don't do this.
+execute_with_pec(circuit, executor, observable, representations)
+```
+
+The latter will raise `# TypeError: execute_with_pec() missing 1 required keyword-only argument: 'representations'`.
+The main reason for this is that
+
+- The first argument of `execute_with_zne` is now `circuit` instead of `qp` to match signatures of other 
+`execute_with_xxx` functions.
+
+### All Changes
+
+- 
+
 ## Version 0.10.0  (September 17, 2021)
 
 ### Summary
@@ -82,6 +129,7 @@ Thanks to @Misty-W and @DSamuel1 for their great contributions this release! ðŸŽ
 - Fix multiplication order when adding NoisyOperations (@andreamari, gh-811)
 - Better error message for `CircuitConversionError`s (@rmlarose, gh-809)
 - Fix some documentation not being tested & remove global imports in docs config (@rmlarose, gh-804)
+
 ## Version 0.9.3  (July 7th, 2021)
 
 ### Summary
