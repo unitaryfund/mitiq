@@ -72,7 +72,7 @@ group2 = PauliStringCollection(pauli2, pauli3)
 obs = Observable.from_pauli_string_collections(group1, group2)
 ```
 
-To see the matrix of the observable:
+To see the (potentially very large) matrix representation of the observable:
 
 ```{code-cell} ipython3
 obs.matrix()
