@@ -21,7 +21,7 @@ Both steps---noise scaling and extrapolation---can be applied with Mitiq as show
 
 If you wish to directly have a look at a tutorial with code on ZNE you can read here_.
 
-.. _here: ../examples/ibmq-backends.html
+.. _here: https://mitiq.readthedocs.io/en/stable/examples/pec-tutorial.html
 
 .. _guide_zne_folding:
 

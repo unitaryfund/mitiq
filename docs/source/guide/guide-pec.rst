@@ -20,4 +20,4 @@ As visible in :ref:`the PEC workflow Figure<figpec>`, the application of PEC in 
 
 A tutorial on PEC, divided in four easy tasks to tackle, is available here_.
 
-.. _here: ../examples/pec-tutorial.html
+.. _here: https://mitiq.readthedocs.io/en/stable/examples/pec-tutorial.html

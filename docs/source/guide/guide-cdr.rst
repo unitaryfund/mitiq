@@ -30,4 +30,4 @@ The :ref:`CDR workflow Figure<figcdr>` above shows a schema of the implementatio
 
 A simple hands-on tutorial on CDR can be found here_.
 
-.. _here: ../examples/cdr_api.html
+.. _here: https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html
