@@ -28,6 +28,5 @@ The :ref:`CDR workflow Figure<figcdr>` above shows a schema of the implementatio
   Near-Clifford approximations of the actual circuit are simulated, without noise, on a classical simulator (circuits can be efficiently simulated classically) and executed on the noisy quantum computer (or a noisy simulator). These results are used as training data to infer the zero-noise expectation value of the error miitigated original circuit, that is finally run on the quantum computer (or noisy simulator).
 
 
-A simple hands-on tutorial on CDR can be found here_.
+A simple hands-on tutorial on CDR can be found :ref:`here<label-cdr-example>`.
 
-.. _here: https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html
