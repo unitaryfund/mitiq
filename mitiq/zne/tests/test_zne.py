@@ -260,7 +260,7 @@ def qiskit_measure(circuit, qid) -> qiskit.QuantumCircuit:
     return circuit
 
 
-def qiskit_executor(qp: QPROGRAM, shots: int = 500) -> float:
+def qiskit_executor(qp: QPROGRAM, shots: int = 10000) -> float:
     # initialize a qiskit noise model
     expectation = execute_with_shots_and_noise(
         qp,
@@ -296,7 +296,8 @@ def test_qiskit_execute_with_zne():
     )
     base = qiskit_executor(circuit)
     zne_value = execute_with_zne(circuit, qiskit_executor)
-
+    print(true_zne_value - zne_value)
+    print(true_zne_value - base)
     assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
 
 
