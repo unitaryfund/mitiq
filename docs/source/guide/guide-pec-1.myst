@@ -20,14 +20,10 @@ to probabilistically remove the bias error from the unmitigated expectation valu
 
 +++
 
-## Select a frontend
+The following code is compatible with the multiple forntends. The next code cell can be used for selecting one of them.
 
 ```{code-cell} ipython3
-# frontend = "cirq"
-frontend = "qiskit"
-# frontend = "pyquil"
-# frontend = "braket"
-# frontend = "pennylane"
+frontend = "qiskit"  # Supported: "cirq", "qiskit", "pyquil", "braket", "pennylane".
 ```
 
 ## Define the circuit of interest
@@ -58,7 +54,7 @@ circuit and returns the noisy expectation value of some observable.
 
 +++
 
-**Note:** The body of this function is supposed to be written by the user depending on the used
+**Note:** The body of this function is supposed to be written by the user and depends on the
 frontend and backend. Here, for simplicity, we first convert the input circuit to the Mitiq internal
 representation (Cirq) and then simulate it.
 
@@ -85,7 +81,7 @@ ideal_value = executor(circuit, noise_level=0.0)
 print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.5f}")
 ```
 
-The aim of PEC is reducing this error.
+The aim of PEC is to reduce this error.
 
 +++
 

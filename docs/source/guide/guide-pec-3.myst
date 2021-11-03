@@ -1,3 +1,118 @@
+---
+jupytext:
+  text_representation:
+    extension: .myst
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.11.1
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
+---
+
 # What additional options are available?
 
-TODO add options.
++++
+
+The application of probabilistic error cancellation (PEC) with Mitiq requires two main steps:
+
+1. Building `OperationRepresentation` objects expressing ideal gates as linear combinations of noisy gates;
+2. Estimating expectation values with PEC, making use of the representations obtained in the previous point.
+
+Both steps can be achieved with Mitiq in different ways and with different options.
+
++++
+
+In the following code we use Qiskit as a frontend, but the workflow is the same other frontends as well.
+
+```{code-cell} ipython3
+import qiskit # Frontend library
+from mitiq import pec  # Probabilistic error cancellation module
+```
+
+## Building `OperationRepresentation` objects
+
++++
+
+Given the superoperator of an ideal gate $\mathcal G$, its quasi-probability representation is:
+
+$$\mathcal G = \eta_1 \tilde{\mathcal  G}_1  + \eta_2 \tilde{\mathcal  G}_2 + \dots,$$
+
+where $\{\eta_j\}$ are real coefficients and $\{\tilde{\mathcal  G}_j\}$ are the implementable noisy gates, i.e., those which can be actually applied by a noisy quantum computer.
+
++++
+
+### Defining `NoisyOperation` objects
+
+A noisy operation $\tilde{\mathcal G}$ can often be implemented by a single noisy gate. However, it is often useful to define a noisy operation as a small sequence of noisy gates. In order to have this flexibility, we associate to each noisy operation a generic `QPROGRAM`, i.e., a small quantum circuit expressed in any of the  supported frontends. For example a basis of noisy operations that are useful to represent the Hadamard gate in the presence of depolarizing noise is:
+
+```{code-cell} ipython3
+# Circuit for Hadamard
+basis_circuit_h = qiskit.QuantumCircuit(1)
+basis_circuit_h.h(0)
+# Circuit for Hadamard followed by X
+basis_circuit_hx = qiskit.QuantumCircuit(1)
+basis_circuit_hx.h(0)
+basis_circuit_hx.x(0)
+# Circuit for Hadamard followed by Y
+basis_circuit_hy = qiskit.QuantumCircuit(1)
+basis_circuit_hy.h(0)
+basis_circuit_hy.y(0)
+# Circuit for Hadamard followed by Z
+basis_circuit_hz = qiskit.QuantumCircuit(1)
+basis_circuit_hz.h(0)
+basis_circuit_hz.z(0)
+
+basis_circuits = [basis_circuit_h, basis_circuit_hx, basis_circuit_hy, basis_circuit_hz] 
+
+for c in basis_circuits:
+    print(c)
+```
+
+In this example the `basis_circuits` describe "how to physically implement" the noisy operations $\tilde {\mathcal G_j}$ on a noisy backend. To completely characterize a noisy operation we must also specify the actual quantum channel associated to it. In Mitiq, this can be done using `NoisyOperation` objects.
+
++++
+
+For example, assuming that each of the previous basis circuit applied on hardware is followed by a depolarizing
+channel, the following code cell generates the corresponding `NoisyOperation` objects: 
+
+```{code-cell} ipython3
+from mitiq.pec.representations import local_depolarizing_kraus
+from mitiq.pec.channels import kraus_to_super
+
+# Compute depolarizing superoperator
+BASE_NOISE = 0.1
+depo_kraus = kraus_to_super(local_depolarizing_kraus(BASE_NOISE, num_qubits=1))
+
+# Compute the superoperator matrices of each noisy operation
+super_matrices = [
+    depo_kraus @ kraus_to_super([qiskit.quantum_info.Operator(c).data]) 
+    for c in basis_circuits
+]
+
+# Define the NoisyOperation objects
+noisy_operations = [
+    pec.NoisyOperation(circuit=c, channel_matrix=m) for c, m in zip(basis_circuits, super_matrices)
+]
+
+print(f"{len(noisy_operations)} NoisyOperation objects defined.")
+```
+
+#### Note: 
+A `NoisyOperation` can also be instantiated with `channel_matrix=None`. In this case however,  `OperationRepresentation` objects must be manually defined instead of obtaining them from a numerical optimization.
+
+
++++
+
+### Finding optimal OperationRepresentation objects
+
+```{code-cell} ipython3
+
+```
+
+## TODO: Continue...
+
+```{code-cell} ipython3
+
+```
