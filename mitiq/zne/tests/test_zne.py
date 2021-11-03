@@ -296,8 +296,6 @@ def test_qiskit_execute_with_zne():
     )
     base = qiskit_executor(circuit)
     zne_value = execute_with_zne(circuit, qiskit_executor)
-    print(true_zne_value - zne_value)
-    print(true_zne_value - base)
     assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
 
 
