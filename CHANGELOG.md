@@ -54,6 +54,7 @@ The latter will raise `# TypeError: execute_with_pec() missing 1 required keywor
 
 ### All Changes
 
+- Increase shots in test_zne.py (@andreamari, gh-1011)
 - Refactor `qp` to `circuit` in `execute_with_zne` (@rmlarose, gh-1009)
 - Add `Observable` documentation and `Observable.from_pauli_string_collections` method (@rmlarose, gh-1007)
 - Executor docs (@rmlarose, gh-1008)
