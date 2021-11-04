@@ -1,15 +1,3 @@
----
-jupytext:
-  text_representation:
-    extension: .myst
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.11.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
 
 # When should I use PEC?
 
@@ -25,7 +13,9 @@ converge to the ideal expectation values.
 
 PEC is a noise-aware technique that can be applied only if
 the full tomographic knowledge of the hardware gate set is known. Indeed, in order to represent
-ideal gates as linear combination of noisy gates, one needs to know the exact noise model or the numerical matrix representation of the quantum channels induced by all the noisy gates.
+ideal gates as linear combination of noisy gates, one needs to know the exact noise model or the
+numerical matrix representation of the quantum channels induced by all the noisy gates.
 
-A technical problem of PEC is that it requires the execution of many different circuits.
-This typically requires more clock time compared to the repeated execution of equal circuits. Batched execution of circuits can alleviate this problem.
+A technical problem of PEC is that it involves the execution of many different circuits.
+This typically requires more clock time compared to the repeated execution of equal circuits.
+Batched execution of circuits can alleviate this problem.

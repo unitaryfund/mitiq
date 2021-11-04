@@ -24,7 +24,7 @@ Both steps can be achieved with Mitiq in different ways and with different optio
 
 +++
 
-In the following code we use Qiskit as a frontend, but the workflow is the same other frontends as well.
+In the following code we use Qiskit as a frontend, but the workflow is the same for other frontends.
 
 ```{code-cell} ipython3
 import qiskit # Frontend library
@@ -37,29 +37,39 @@ from mitiq import pec  # Probabilistic error cancellation module
 
 Given the superoperator of an ideal gate $\mathcal G$, its quasi-probability representation is:
 
-$$\mathcal G = \eta_1 \tilde{\mathcal  G}_1  + \eta_2 \tilde{\mathcal  G}_2 + \dots,$$
+$$\mathcal G = \sum_\alpha \eta_\alpha \mathcal O_\alpha$$
 
-where $\{\eta_j\}$ are real coefficients and $\{\tilde{\mathcal  G}_j\}$ are the implementable noisy gates, i.e., those which can be actually applied by a noisy quantum computer.
+where $\{\eta_\alpha\}$ are real coefficients and $\{\mathcal  O_\alpha\}$ are the implementable noisy gates,
+i.e., those which can be actually applied by a noisy quantum computer.
+
+For trace-preserving operations, the coefficients $\{\eta_\alpha\}$ form a quasi-probability distribution, i.e.:
+
+$$\sum_\alpha \eta_\alpha = 1, \quad  \gamma = \| \eta \|_1= \sum_\alpha   |\eta_\alpha| \ge 1$$
+
+The one-norm of the quasi-probability distribution $\gamma$ is related to the negative "volume" of the distribution and quantifies to the sampling cost of PEC. More precicely the sampling cost scales as $\gamma^2$. 
 
 +++
 
 ### Defining `NoisyOperation` objects
 
-A noisy operation $\tilde{\mathcal G}$ can often be implemented by a single noisy gate. However, it is often useful to define a noisy operation as a small sequence of noisy gates. In order to have this flexibility, we associate to each noisy operation a generic `QPROGRAM`, i.e., a small quantum circuit expressed in any of the  supported frontends. For example a basis of noisy operations that are useful to represent the Hadamard gate in the presence of depolarizing noise is:
+The noisy operations $\{\mathcal O_\alpha\}$ in the equation above can correspond to single noisy gates.
+However, it is often useful to define a noisy operation as a sequence multiple noisy gates.
+In order to have this flexibility, we associate to each noisy operation a small `QPROGRAM`,
+i.e., a quantum circuit expressed in any of the supported frontends. For example a basis
+of noisy operations that are useful to represent the Hadamard gate in the presence of depolarizing noise is:
 
 ```{code-cell} ipython3
-# Circuit for Hadamard
 basis_circuit_h = qiskit.QuantumCircuit(1)
 basis_circuit_h.h(0)
-# Circuit for Hadamard followed by X
+
 basis_circuit_hx = qiskit.QuantumCircuit(1)
 basis_circuit_hx.h(0)
 basis_circuit_hx.x(0)
-# Circuit for Hadamard followed by Y
+
 basis_circuit_hy = qiskit.QuantumCircuit(1)
 basis_circuit_hy.h(0)
 basis_circuit_hy.y(0)
-# Circuit for Hadamard followed by Z
+
 basis_circuit_hz = qiskit.QuantumCircuit(1)
 basis_circuit_hz.h(0)
 basis_circuit_hz.z(0)
@@ -70,12 +80,14 @@ for c in basis_circuits:
     print(c)
 ```
 
-In this example the `basis_circuits` describe "how to physically implement" the noisy operations $\tilde {\mathcal G_j}$ on a noisy backend. To completely characterize a noisy operation we must also specify the actual quantum channel associated to it. In Mitiq, this can be done using `NoisyOperation` objects.
+In this example the `basis_circuits` describe "how to physically implement" the noisy operations
+$\{ \mathcal O_\alpha \}$ on a noisy backend. To completely characterize a noisy operation we can also
+specify the actual (non-unitary) quantum channel associated to it. In Mitiq, this can be done using the `NoisyOperation` class.
 
 +++
 
 For example, assuming that each of the previous basis circuit applied on hardware is followed by a depolarizing
-channel, the following code cell generates the corresponding `NoisyOperation` objects: 
+channel, the following code cell generates the corresponding `NoisyOperation` objects.
 
 ```{code-cell} ipython3
 from mitiq.pec.representations import local_depolarizing_kraus
@@ -91,7 +103,7 @@ super_matrices = [
     for c in basis_circuits
 ]
 
-# Define the NoisyOperation objects
+# Define the NoisyOperation objects combining circuits with channel matrices
 noisy_operations = [
     pec.NoisyOperation(circuit=c, channel_matrix=m) for c, m in zip(basis_circuits, super_matrices)
 ]
@@ -99,19 +111,102 @@ noisy_operations = [
 print(f"{len(noisy_operations)} NoisyOperation objects defined.")
 ```
 
-#### Note: 
-A `NoisyOperation` can also be instantiated with `channel_matrix=None`. In this case however,  `OperationRepresentation` objects must be manually defined instead of obtaining them from a numerical optimization.
-
+***Note:*** *A `NoisyOperation` can also be instantiated with `channel_matrix=None`. In this case however, the quasi-probability distribution must be known to the user, since it is impossible to deduce it without knowing the quantum channels associated to the `NoisyOperation`s.*
 
 +++
 
-### Finding optimal OperationRepresentation objects
+### Finding an optimal `OperationRepresentation`
+
++++
+
+Combining the noisy operations defined above we can obtain a `NoisyBasis`.
 
 ```{code-cell} ipython3
-
+noisy_basis = pec.NoisyBasis(*noisy_operations)
 ```
 
-## TODO: Continue...
+Similarely to the `basis_circuits` defined before, we also define the `ideal_operation` that we aim to represent as a circuit. Assuming that we aim to represent the Hadamard gate, we have:
+
+```{code-cell} ipython3
+ideal_operation = qiskit.QuantumCircuit(1)
+ideal_operation.h(0)
+print(f"The ideal operation that we aim to represent is:\n{ideal_operation}")
+```
+
+The Mitiq function `mitiq.pec.representations.find_optimal_representation()` can be used to numerically obtain an  `OperationRepresentation` the `ideal_operation` in the basis of the noisy implementable gates (`noisy_basis`).
+
+```{code-cell} ipython3
+from mitiq.pec.representations import find_optimal_representation
+
+h_rep = find_optimal_representation(ideal_operation, noisy_basis)
+print(f"Optimal representation:\n{h_rep}")
+```
+
+The representation is optimal in the sense that, among all the possible representations, it minimizes the one-norm of the quasi-probability distribution. Behind the scenes, `find_optimal_representation()` solves the following optimization problem:
+
+$$\gamma^{\rm opt} = \min_{\substack{ \{ \eta_{\alpha} \}  \\ \{ \mathcal O_{ \alpha} \}}}
+\left[ \sum_\alpha |\eta_{\alpha}| \right], \quad \text{ such that} \quad \mathcal G = \sum_\alpha \eta_\alpha \mathcal O_\alpha \, .$$
+
++++
+
+### Manually defining an `OperationRepresentation`
+
++++
+
+Instead of solving the previous optimization problem, an `OperationRepresentation` can also be manually defined. This approach can be applied if the user already knows the quasi-probability distribution ${\eta_\alpha}$.
+
+```{code-cell} ipython3
+# We assume to know the quasi-distribution
+quasi_dist = h_rep.coeffs
+# Reorder noisy operations to match quasi_dist
+reordered_noisy_operations = h_rep.noisy_operations
+
+# Manual definition of the OperationRepresentation
+basis_expansion = dict(zip(reordered_noisy_operations, quasi_dist))
+h_rep_manual = pec.OperationRepresentation(
+    ideal=ideal_operation, basis_expansion=basis_expansion
+)
+
+assert h_rep_manual == h_rep
+```
+
+### Methods of the `OperationRepresentation` class
+
++++
+
+The main idea of PEC is to approximate the quasi-probability distribution via Monte Carlo sampling. This can be obtained rewriting $\mathcal G = \sum_\alpha \eta_\alpha \mathcal O_\alpha \$ as:
+
+$$\mathcal G = \gamma \sum_\alpha p(\alpha) \textrm{sign}(\eta_\alpha) \mathcal O_\alpha 
+\quad p(\alpha):= \eta_\alpha / \gamma,$$
+
+where $p(\alpha)$ is (positive) probability distribution. If we take a single sample from $p(\alpha)$, we obtain a noisy operation $\mathcal O_\alpha$ that should be multiplied by the sign of the associated coefficient $\eta_\alpha$. 
+
+The method `OperationRepresentation.sample()` can be used for this scope:
+
+```{code-cell} ipython3
+noisy_op, sign, coeff = h_rep.sample()
+print(f"The sampled noisy operation is: {noisy_op}. The sign of the associated coefficient {coeff:g} is {sign}.")
+```
+
+Other useful methods are:
+
+```{code-cell} ipython3
+# The one-norm "gamma" of the quasi-distribution
+h_rep.norm
+```
+
+```{code-cell} ipython3
+# The quasi-probability distribution
+print(h_rep.coeffs)
+assert sum([abs(eta) for eta in h_rep.coeffs]) == h_rep.norm
+```
+
+```{code-cell} ipython3
+# The positive and normalized distribution "p(alpha)"
+h_rep.distribution()
+```
+
+## Estimating expectation values with PEC
 
 ```{code-cell} ipython3
 
