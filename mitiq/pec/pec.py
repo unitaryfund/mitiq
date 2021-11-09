@@ -23,14 +23,15 @@ from typing import (
     Tuple,
     Dict,
     Any,
+    cast,
 )
 from functools import wraps
 import warnings
-
 import numpy as np
 
-from mitiq import Executor, Observable, QPROGRAM, QuantumResult
+from cirq import Circuit as CirqCircuit
 
+from mitiq import Executor, Observable, QPROGRAM, QuantumResult
 from mitiq.pec import sample_circuit, OperationRepresentation
 from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 
@@ -148,7 +149,8 @@ def execute_with_pec(
 
     # Convert back to the original type
     sampled_circuits = [
-        convert_from_mitiq(c, input_type) for c in sampled_circuits
+        convert_from_mitiq(cast(CirqCircuit, c), input_type)
+        for c in sampled_circuits
     ]
 
     # Execute all sampled circuits
