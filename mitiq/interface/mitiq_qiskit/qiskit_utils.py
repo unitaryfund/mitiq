@@ -98,8 +98,8 @@ def execute_with_noise(
     Returns:
         The expectation value of obs as a float.
     """
-    # Trigger bug
-    circ = circuit
+    # Avoid mutating circuit
+    circ = circuit.copy()
     circ.save_density_matrix()
 
     if noise_model is None:
