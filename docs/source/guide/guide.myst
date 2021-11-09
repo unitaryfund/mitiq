@@ -12,4 +12,9 @@ guide-zne.rst
 guide-pec.rst
 guide-cdr.rst
 guide-error-mitigation.rst
+zne-1-intro.myst
+zne-2-use-case.myst
+zne-3-options.myst
+zne-4-low-level.myst
+zne-5-theory.myst
 ```
