@@ -12,7 +12,7 @@ Please use `mitiq.about()` to document your dependencies and working environment
 You can open a [pull request](https://github.com/unitaryfund/mitiq/pulls) by pushing changes from a local branch, explaining the bug fix or new feature.
 
 ### Version control with git
-git is a language that helps keeping track of the changes made. Have a look at these guidelines for getting started with [git workflow](https://www.asmeurer.com/git-workflow/).
+git is a language that helps keeping track of the changes made. Have a look at these guidelines for getting started with [git workflow](https://github.com/asmeurer/git-workflow).
 Use short and explanatory comments to document the changes with frequent commits.
 
 ### Forking the repository
