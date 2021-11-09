@@ -46,7 +46,7 @@ For trace-preserving operations, the coefficients $\{\eta_\alpha\}$ form a quasi
 
 $$\sum_\alpha \eta_\alpha = 1, \quad  \gamma = \| \eta \|_1= \sum_\alpha   |\eta_\alpha| \ge 1$$
 
-The one-norm of the quasi-probability distribution $\gamma$ is related to the negative "volume" of the distribution and quantifies to the sampling cost of PEC. More precicely the sampling cost scales as $\gamma^2$. 
+The value of $\gamma$ is related to the negative "volume" of the distribution and quantifies to the sampling cost of PEC. More precicely, it can be shown [pec-theory](guide-pec-5.myst), that the sampling cost scales as $\gamma^2$.
 
 +++
 
@@ -80,13 +80,13 @@ for c in basis_circuits:
     print(c)
 ```
 
-In this example the `basis_circuits` describe "how to physically implement" the noisy operations
-$\{ \mathcal O_\alpha \}$ on a noisy backend. To completely characterize a noisy operation we can also
+Each element of `basis_circuits` describe "how to physically implement" a noisy operation 
+$\mathcal O_\alpha$ on a noisy backend. To completely characterize a noisy operation we can also
 specify the actual (non-unitary) quantum channel associated to it. In Mitiq, this can be done using the `NoisyOperation` class.
 
 +++
 
-For example, assuming that each of the previous basis circuit applied on hardware is followed by a depolarizing
+For example, assuming that each of the previous basis circuits is affected by a final depolarizing
 channel, the following code cell generates the corresponding `NoisyOperation` objects.
 
 ```{code-cell} ipython3
@@ -94,7 +94,7 @@ from mitiq.pec.representations import local_depolarizing_kraus
 from mitiq.pec.channels import kraus_to_super
 
 # Compute depolarizing superoperator
-BASE_NOISE = 0.1
+BASE_NOISE = 0.2
 depo_kraus = kraus_to_super(local_depolarizing_kraus(BASE_NOISE, num_qubits=1))
 
 # Compute the superoperator matrices of each noisy operation
@@ -111,7 +111,7 @@ noisy_operations = [
 print(f"{len(noisy_operations)} NoisyOperation objects defined.")
 ```
 
-***Note:*** *A `NoisyOperation` can also be instantiated with `channel_matrix=None`. In this case however, the quasi-probability distribution must be known to the user, since it is impossible to deduce it without knowing the quantum channels associated to the `NoisyOperation`s.*
+***Note:*** *A `NoisyOperation` can also be instantiated with `channel_matrix=None`. In this case however, the quasi-probability distribution must be known to the user. In fact it is impossible to derive it without knowing the quantum channels associated to each `NoisyOperation`.*
 
 +++
 
@@ -125,7 +125,7 @@ Combining the noisy operations defined above we can obtain a `NoisyBasis`.
 noisy_basis = pec.NoisyBasis(*noisy_operations)
 ```
 
-Similarely to the `basis_circuits` defined before, we also define the `ideal_operation` that we aim to represent as a circuit. Assuming that we aim to represent the Hadamard gate, we have:
+Similarely to what we did for `basis_circuits`, we also define the `ideal_operation` that we aim to represent as a circuit. Assuming that we aim to represent the Hadamard gate, we have:
 
 ```{code-cell} ipython3
 ideal_operation = qiskit.QuantumCircuit(1)
@@ -133,7 +133,7 @@ ideal_operation.h(0)
 print(f"The ideal operation that we aim to represent is:\n{ideal_operation}")
 ```
 
-The Mitiq function `mitiq.pec.representations.find_optimal_representation()` can be used to numerically obtain an  `OperationRepresentation` the `ideal_operation` in the basis of the noisy implementable gates (`noisy_basis`).
+The Mitiq function `mitiq.pec.representations.find_optimal_representation()` can be used to numerically obtain an  `OperationRepresentation` of the `ideal_operation` in the basis of the noisy implementable gates (`noisy_basis`).
 
 ```{code-cell} ipython3
 from mitiq.pec.representations import find_optimal_representation
@@ -158,7 +158,8 @@ Instead of solving the previous optimization problem, an `OperationRepresentatio
 ```{code-cell} ipython3
 # We assume to know the quasi-distribution
 quasi_dist = h_rep.coeffs
-# Reorder noisy operations to match quasi_dist
+
+# This is just a reordering of noisy_operations to match quasi_dist
 reordered_noisy_operations = h_rep.noisy_operations
 
 # Manual definition of the OperationRepresentation
@@ -167,7 +168,18 @@ h_rep_manual = pec.OperationRepresentation(
     ideal=ideal_operation, basis_expansion=basis_expansion
 )
 
+# Test that the manual definition is equivalent to h_rep
 assert h_rep_manual == h_rep
+```
+
+**Note:** *For the particular case of depolarizing noise, Mitiq can directly create the `OperationRepresentation` of an arbitrary `ideal_operation`, as shown in the next cell.*
+
+```{code-cell} ipython3
+from mitiq.pec.representations.depolarizing import represent_operation_with_local_depolarizing_noise
+
+built_in_rep = represent_operation_with_local_depolarizing_noise(ideal_operation, noise_level=BASE_NOISE)
+
+assert built_in_rep == h_rep
 ```
 
 ### Methods of the `OperationRepresentation` class
@@ -185,29 +197,159 @@ The method `OperationRepresentation.sample()` can be used for this scope:
 
 ```{code-cell} ipython3
 noisy_op, sign, coeff = h_rep.sample()
-print(f"The sampled noisy operation is: {noisy_op}. The sign of the associated coefficient {coeff:g} is {sign}.")
+print(f"The sampled noisy operation is: {noisy_op}. The associated coefficient {coeff:g}, whose sign is {sign}.")
 ```
 
-Other useful methods are:
+Hint: try re-executing the previous cell, to get different samples.
+
++++
+
+Other useful methods of `OperationRepresentation` are shown in the next cells.
 
 ```{code-cell} ipython3
-# The one-norm "gamma" of the quasi-distribution
+# One-norm "gamma" quantifying the mitigation cost
 h_rep.norm
 ```
 
 ```{code-cell} ipython3
-# The quasi-probability distribution
+# Quasi-probability distribution
 print(h_rep.coeffs)
 assert sum([abs(eta) for eta in h_rep.coeffs]) == h_rep.norm
 ```
 
 ```{code-cell} ipython3
-# The positive and normalized distribution "p(alpha)"
+# Positive and normalized distribution p(alpha)=|eta_alpha|/gamma
 h_rep.distribution()
 ```
 
 ## Estimating expectation values with PEC
 
-```{code-cell} ipython3
++++
 
+The second step of the PEC workflow is to make use of (pre-defined) `OperationRepresentation` objects to estimate
+expectation values with respect to a quantum state prepared by a circuit of interest. In the previous section we defined the representation of the Hadamard gate. So, for simplicity, we consider a circuit that contains only Hadamard gates:
+
++++
+
+### Defining circuit and executor
+
+```{code-cell} ipython3
+circuit = qiskit.QuantumCircuit(1)
+for _ in range(4):
+    circuit.h(0)
+print(circuit)
+```
+
+In this case, the list of `OpearationRepresentation` objects that we need for PEC is simply:
+
+```{code-cell} ipython3
+representations = [h_rep]
+```
+
+The executor must be defined by the user since it depends on the specific frontend and backend (see the [Executors](guide-executors.myst) section of the documentation). Here, for simplicity, we import the basic Qiskit `execute_with_noise` function from the utilities of Mitiq.
+
+```{code-cell} ipython3
+from mitiq import Executor
+from mitiq.interface.mitiq_qiskit import execute_with_noise, initialized_depolarizing_noise
+
+def execute(circuit):
+    """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit
+    executed with depolarizing noise.
+    """
+    circuit_copy = circuit.copy()    
+    noise_model = initialized_depolarizing_noise(BASE_NOISE)
+    projector_on_zero = [[1, 0], [0, 0]]
+    return execute_with_noise(circuit_copy, projector_on_zero, noise_model)
+
+# Wrap execute to Executor class to see execution histroy
+executor = Executor(execute)
+```
+
+### Options for estimating expectation values
+
++++
+
+In the ["How do I use PEC?"](guide-pec-1.myst) section, we have shown how to apply pec with the minimum amount of options, i.e.:  `pec.execute_with_pec(circuit, executor, representations = representations)`.
+
+In the next code-cell we show additional options that can be used:
+
+```{code-cell} ipython3
+pec_value, pec_data = pec.execute_with_pec(
+    circuit,
+    executor,
+    observable=None, # In this example, the observable is implicit in the executor.
+    representations=representations,
+    num_samples=5, # Number of PEC samples
+    random_state=0, # Seed for reproducibility of probabilistic sampling of circuits.
+    full_output=True, # Return pec_data in addition to pec_value
+)
+```
+
+Another option that can be used, instead of `num_samples`, is `precision`. Its default value is `0.03` and  quantifies the desired estimation accuracy. 
+
+For a bounded observable $\|A\|\le 1$, `precision` approximates $|\langle  A \rangle_{ \rm ideal} - \langle  A \rangle_{ \rm PEC}|$ (up to constant factors and up to statistical fluctuations).  In practice, `precision` is used by Mitiq to automatically determine `num_samples`, according to the formula: `num_samples` = $(\gamma /$ `precision`$)^2$, where $\gamma$ is the one-norm the circuit quasi-probability distribution.
+See the ["PEC-theory"](guide-pec-5.myst) section for more details.
+
+```{code-cell} ipython3
+# Optional Executor re-initialization to clean the history
+executor = Executor(execute)
+
+pec_value, pec_data = pec.execute_with_pec(
+    circuit,
+    executor,
+    observable=None, # In this example, the observable is implicit in the executor.
+    representations=representations,
+    precision=0.5, # The estimation accuracy.
+    random_state=0, # Seed for reproducibility of probabilistic sampling of circuits.
+    full_output=True, # Return pec_data in addition to pec_value
+)
+```
+
+### Analyzing the executed circuits
+
++++
+
+As discussed in the [Executors](guide-executors.myst) section, we can extract the execution history from `executor`. This is a way to see what Mitiq does behind the scenes which is independent from the error mitigation technique.
+
+```{code-cell} ipython3
+print(
+    f"During the previous PEC process, {len(executor.executed_circuits)} ",
+    "circuits have been executed."
+)
+print(f"The first 5 circuits are:")
+
+for c in executor.executed_circuits[:5]:
+    print(c)
+    
+print(f"The corresponding noisy expectation values are:")  
+for c in executor.quantum_results[:5]:
+    print(c)
+```
+
+### Analyzing data of the PEC process
+
++++
+
+Beyond the executed circuits, one may be interested in analyzing additional data related to the specifc PEC technique. Thanks to the `full_output=True` option, this data is returned in the dictionary `pec_data`.
+
+```{code-cell} ipython3
+print(pec_data.keys())
+```
+
+The above dictionary contains all the raw data involved in the PEC process.
+
+```{code-cell} ipython3
+print(pec_data["num_samples"], "noisy circuits have been sampled and executed.")
+```
+
+The unbiased raw results, whose average is equal to `pec_value`, are stored under the `unbiased_estimators` key.
+
+```{code-cell} ipython3
+print("The first 5 unnbiased estimates of the ideal expectation value are:\n", pec_data["unbiased_estimators"][:5])
+```
+
+The statistical error `pec_error` corresponds to `pec_std` / `sqrt(num_samples)`, where `pec_std` is the standard deviation of the unbiased samples, i.e., the square root of the mean squared deviation of the sampled values from `pec_value`.
+
+```{code-cell} ipython3
+pec_data["pec_error"]
 ```

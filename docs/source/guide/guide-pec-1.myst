@@ -59,8 +59,6 @@ representation (Cirq) and then simulate it.
 
 ```{code-cell} ipython3
 from cirq import DensityMatrixSimulator, depolarize
-
-from mitiq.executor import Executor
 from mitiq.interface import convert_to_mitiq
 
 def executor(circuit, noise_level=0.01):
@@ -72,7 +70,6 @@ def executor(circuit, noise_level=0.01):
     noisy_circuit = mitiq_circuit.with_noise(depolarize(p=noise_level))
     rho = DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix
     return rho[0, 0].real
-
 ```
 
 The `executor` can be used to evaluate noisy (unmitigated) expectation values.
