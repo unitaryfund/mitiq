@@ -593,6 +593,7 @@ def test_doc_is_preserved():
 
     assert second_executor.__doc__ == first_executor.__doc__
 
+
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
 def test_executed_circuits_have_the_expected_type(circuit_type):
 
@@ -601,7 +602,6 @@ def test_executed_circuits_have_the_expected_type(circuit_type):
 
     # Fake executor just for testing types
     def type_detecting_executor(circuit: QPROGRAM):
-        print(type(circuit))
         assert type(circuit) is circuit_type
         return 0.0
 
@@ -611,5 +611,4 @@ def test_executed_circuits_have_the_expected_type(circuit_type):
         representations=pauli_representations,
         num_samples=1,
     )
-    
     assert np.isclose(mitigated, 0.0)
