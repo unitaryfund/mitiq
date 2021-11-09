@@ -10,7 +10,7 @@ kernelspec:
   language: python
   name: python3
 ---
-
+(label-zne-example)=
 # Error mitigation on IBMQ backends
 
 

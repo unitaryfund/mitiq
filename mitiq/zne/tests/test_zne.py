@@ -59,7 +59,6 @@ from mitiq.observable import Observable, PauliString
 BASE_NOISE = 0.007
 TEST_DEPTH = 30
 ONE_QUBIT_GS_PROJECTOR = np.array([[1, 0], [0, 0]])
-QASM_SIMULATOR = qiskit.Aer.get_backend("qasm_simulator")
 
 npX = np.array([[0, 1], [1, 0]])
 """Defines the sigma_x Pauli matrix in SU(2) algebra as a (2,2) `np.array`."""
@@ -215,11 +214,6 @@ def test_execute_with_zne_bad_arguments():
     """Tests errors are raised when execute_with_zne is called with bad
     arguments.
     """
-    with pytest.raises(
-        TypeError, match="Argument `executor` must be callable"
-    ):
-        execute_with_zne(circ, None)
-
     with pytest.raises(TypeError, match="Argument `factory` must be of type"):
         execute_with_zne(circ, executor, factory=RichardsonFactory)
 
@@ -266,7 +260,7 @@ def qiskit_measure(circuit, qid) -> qiskit.QuantumCircuit:
     return circuit
 
 
-def qiskit_executor(qp: QPROGRAM, shots: int = 500) -> float:
+def qiskit_executor(qp: QPROGRAM, shots: int = 10000) -> float:
     # initialize a qiskit noise model
     expectation = execute_with_shots_and_noise(
         qp,
@@ -281,7 +275,7 @@ def qiskit_executor(qp: QPROGRAM, shots: int = 500) -> float:
 def get_counts(circuit: qiskit.QuantumCircuit):
     return (
         qiskit.execute(
-            circuit, qiskit.Aer.get_backend("qasm_simulator"), shots=100
+            circuit, qiskit.Aer.get_backend("aer_simulator"), shots=100
         )
         .result()
         .get_counts()
@@ -302,7 +296,6 @@ def test_qiskit_execute_with_zne():
     )
     base = qiskit_executor(circuit)
     zne_value = execute_with_zne(circuit, qiskit_executor)
-
     assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
 
 
@@ -486,7 +479,8 @@ def test_execute_with_zne_transpiled_qiskit_circuit():
     """
     from qiskit.test.mock import FakeSantiago
 
-    backend = FakeSantiago()
+    santiago = FakeSantiago()
+    backend = qiskit.providers.aer.AerSimulator.from_backend(santiago)
 
     def execute(circuit: qiskit.QuantumCircuit, shots: int = 8192) -> float:
         job = qiskit.execute(circuit, backend, shots=shots)

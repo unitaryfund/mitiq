@@ -14,8 +14,7 @@ kernelspec:
 # How do I use PEC?
 
 Probabilistic Error Cancellation (PEC) is an error mitigation technique for improving the estimation
-of expectation values (see #). In order to apply this technique, one must know how to represent ideal
-gates as linear combinations of noisy implementable gates. This knowledge is exploited by Mitiq
+of expectation values (see [pec-theory](guide-pec-5.myst)). In order to apply this technique, one must know how to represent ideal gates as linear combinations of noisy implementable gates. This knowledge is exploited by Mitiq
 to probabilistically remove the bias error from the unmitigated expectation values.
 
 +++
@@ -60,6 +59,8 @@ representation (Cirq) and then simulate it.
 
 ```{code-cell} ipython3
 from cirq import DensityMatrixSimulator, depolarize
+
+from mitiq.executor import Executor
 from mitiq.interface import convert_to_mitiq
 
 def executor(circuit, noise_level=0.01):
@@ -71,6 +72,7 @@ def executor(circuit, noise_level=0.01):
     noisy_circuit = mitiq_circuit.with_noise(depolarize(p=noise_level))
     rho = DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix
     return rho[0, 0].real
+
 ```
 
 The `executor` can be used to evaluate noisy (unmitigated) expectation values.

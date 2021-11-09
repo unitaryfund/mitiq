@@ -1,12 +1,99 @@
 # Changelog
 
-% # " ## Development 0.X.Ydev (Month DDth, YYYY)"
-% # " ## (Future) Version 0.1.1 (Date)"
-% # " ### Changes"
-% # " - **MAJOR FEATURE**: New integration."
-% # " - Improve something."
-% # " - [Bug Fix]"
-% # " - Fix the bug."
+## Version 0.11.0  (November 3rd, 2021)
+
+### Summary
+
+This release introduces `Observable`s as a major new feature to the Mitiq workflow and a few breaking changes. Support
+for Pennylane has been added by adding `pennylane.QuantumTape`s to `mitiq.QPROGRAM`.
+
+**New features**
+
+- Specify and use a `mitiq.Observable` in any error-mitigation technique.
+  - This means the `executor` function does not have to return the expectation value as a `float` anymore, but rather 
+    can return a `mitiq.QuantumResult` - i.e., an object from which the expectation value can be computed provided 
+    an observable.
+  - The `executor` function can still return a `float`, in which case the `Observable` does not need to be specified
+    (and should not be specified).
+
+- All error mitigation techniques can now use batching with the same interface.
+
+- PEC can be run with only a subset of representations of the gates in a circuit. In other words, if the circuit has 
+  two gates, `H` and `CNOT`, you can run `execute_with_pec` by only providing an `OperationRepresentation` for, e.g.,
+  the `CNOT`.
+  - Before, you had to provide all representations or an error would be raised.
+  - Performance of PEC may be better by providing all `OperationRepresentation`s. This change is only with respect to
+    usability and not performance.
+
+- Circuits written in `Pennylane` (as `QuantumTape`s) are now recognized and suppported by Mitiq.
+
+**Breaking changes**
+
+- Signatures of `execute_with_xxx` error-mitigation techniques have changed to include `Observable`s. The default value
+is `None`, meaning that the `executor` should return a `float` as in the old usage, but the additional argument and
+change to keyword-only arguments (see below) may require you to make updates.
+
+- You must now use provide keywords for technique-specific arguments in error mitigation techniques. Example:
+
+```python
+# Example new usage of providing keyword arguments. Do this.
+execute_with_pec(circuit, executor, observable, representations=representations)
+```
+
+instead of
+
+```python
+# Old usage. Don't do this. Technique-specific arguments like `representations` are now keyword-only.
+execute_with_pec(circuit, executor, observable, representations)
+```
+
+The latter will raise `# TypeError: execute_with_pec() missing 1 required keyword-only argument: 'representations'`.
+
+- The first argument of `execute_with_zne` is now `circuit` instead of `qp` to match signatures of other 
+`execute_with_xxx` functions.
+
+### All Changes
+
+- Increase shots in test_zne.py (@andreamari, gh-1011)
+- Refactor `qp` to `circuit` in `execute_with_zne` (@rmlarose, gh-1009)
+- Add `Observable` documentation and `Observable.from_pauli_string_collections` method (@rmlarose, gh-1007)
+- Executor docs (@rmlarose, gh-1008)
+- Bump qiskit to version 0.31 and pin it explicitly in dev requirements (@andreamari, gh-993)
+- Use `Executor.evaluate` for batching in ZNE (@rmlarose, gh-1005)
+- Add `Executor.evaluate` and use for batched execution (@rmlarose, gh-1001)
+- Bump PyQuil (@rmlarose, gh-992)
+- CDR with Observables (@rmlarose, gh-985)
+- Fix bug in OperationRepresentation printing (@andreamari, gh-975)
+- Ignore patch releases in dependabot (@rmlarose, gh-981)
+- Update pydata-sphinx-theme requirement from ~=0.6.3 to ~=0.7.1 (@dependabot, gh-962)
+- Update flake8 requirement from ~=3.9.2 to ~=4.0.1 (@dependabot, gh-982)
+- Add PennyLane to frontend table in the readme (@andreamari, gh-973)
+- Update amazon-braket-sdk requirement from ~=1.9.1 to ~=1.9.5 (@dependabot, gh-970)
+- Update pytest-cov requirement from ~=2.12.1 to ~=3.0.0 (@dependabot, gh-963)
+- Fix pip package resolving problems (@andreamari, gh-976)
+- Add support for pennylane circuits (everybody and their grandmother, gh-836)
+- Keyword only arguments in execute_with_technique functions (@rmlarose, gh-971)
+- Foldability check includes a check for inverse (@purva-thakre, gh-939) 
+- Bump actions/github-script from 3 to 5 (@dependabot, gh-969) 
+- PEC with Observables & skip operations without known representations (@rmlarose, gh-954)
+- Update qiskit-terra requirement from ~=0.18.2 to ~=0.18.3 (@dependabot, gh-955) 
+- Add observable to zne_decorator (@rmlarose, gh-967)
+- Update qiskit-ibmq-provider requirement from ~=0.16.0 to ~=0.17.0 (@dependabot, gh-965) 
+- Binder badge workflow (@AkashNarayanan, gh-964)
+- Fix links and typos in vqe-pyquil-demo.myst and pyquil_demo.myst (@Misty-W, gh-959)
+- ZNE with Observables (@rmlarose, gh-948)
+- Add PauliString multiplication (@rmlarose, gh-949)
+- Update amazon-braket-sdk requirement from ~=1.9.0 to ~=1.9.1 (@dependabot, gh-950)
+- Fixing changelog and improving release documentation (@crazy4pi314, gh-946)
+- Update version to 0.11.0dev (@rmlarose, gh-947)
+- Update pytest-xdist[psutil] requirement from ~=2.3.0 to ~=2.4.0 (@dependabot, gh-938)
+- Fix AWS example by fixing a bug in mirror circuits (@andreamari, gh-940)
+- Bump codecov/codecov-action from 2.0.3 to 2.1.0 (@dependabot, gh-922)
+- Improve OperationRepresentation printing (@andreamari, gh-901)
+- Updating release process (@crazy4pi314, gh-936)
+
+Huge thanks to all contributors on this release! @Misty-W, @AkashNarayanan, @purva-thakre, @trbromley, @nathanshammah,
+@crazy4pi314, @andreamari, and @rmlarose.
 
 ## Version 0.10.0  (September 17, 2021)
 
@@ -82,6 +169,7 @@ Thanks to @Misty-W and @DSamuel1 for their great contributions this release! ðŸŽ
 - Fix multiplication order when adding NoisyOperations (@andreamari, gh-811)
 - Better error message for `CircuitConversionError`s (@rmlarose, gh-809)
 - Fix some documentation not being tested & remove global imports in docs config (@rmlarose, gh-804)
+
 ## Version 0.9.3  (July 7th, 2021)
 
 ### Summary
