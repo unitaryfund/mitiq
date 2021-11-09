@@ -344,11 +344,11 @@ def test_qiskit_zne_decorator():
 def test_qiskit_run_factory_with_number_of_shots():
     true_zne_value = 1.0
 
-    scale_factors = [1.0, 2.0, 3.0]
-    shot_list = [1_000, 2_000, 3_000]
+    scale_factors = [1.0, 3.0]
+    shot_list = [10_000, 30_000]
 
     fac = inference.ExpFactory(
-        scale_factors=scale_factors, shot_list=shot_list
+        scale_factors=scale_factors, shot_list=shot_list, asymptote=0.5,
     )
 
     circuit = qiskit_measure(
@@ -377,11 +377,11 @@ def test_qiskit_run_factory_with_number_of_shots():
 def test_qiskit_mitigate_executor_with_shot_list():
     true_zne_value = 1.0
 
-    scale_factors = [1.0, 2.0, 3.0]
-    shot_list = [1_000, 2_000, 3_000]
+    scale_factors = [1.0, 3.0]
+    shot_list = [10_000, 30_000]
 
     fac = inference.ExpFactory(
-        scale_factors=scale_factors, shot_list=shot_list
+        scale_factors=scale_factors, shot_list=shot_list, asymptote=0.5,
     )
     mitigated_executor = mitigate_executor(qiskit_executor, factory=fac)
 
