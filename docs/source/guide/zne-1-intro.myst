@@ -12,3 +12,41 @@ kernelspec:
 ---
 
 # How do I use ZNE?
+
+Zero noise extrapolation is an error mitigation technique in which an expectation value is computed at different noise levels and, as a second step, the ideal expectation value is inferred extrapolating the measured results to the zero-noise limit.
+
+Both steps—noise scaling and extrapolation—can be applied with Mitiq. The corresponding sub-modules are mitiq.zne.scaling and mitiq.zne.inference.
+
+The following code is compatible with the multiple frontends. The next code cell can be used for selecting one of them.
+
+```{code-cell} ipython3
+frontend = "cirq"  # Supported: "cirq", "qiskit", "pyquil", "braket", "pennylane".
+```
+## Define the circuit of interest
+```{code-cell} ipython3
+qreg = cirq.LineQubit.range(2)
+circ = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1]))
+print("Original circuit:", circ, sep="\n")
+```
+
+## Fold the circuit
+```{code-cell} ipython3
+folded = fold_gates_from_left(circ, scale_factor=2.)
+print("Folded circuit:", folded, sep="\n")
+```
+
+## Define the executor function
+
+
+
+Zero-noise extrapolation can be easily implemented with the function `mitiq.zne.zne.execute_with_zne(`).
+
+```{code-cell} ipython3
+from mitiq import zne
+
+mitigated_result = zne.execute_with_zne(circuit, executor)
+
+print(f"Error without mitigation: {abs(exact_result - noisy_result):.{3}}")
+print(f"Error with mitigation (ZNE): {abs(exact_result - mitigated_result):.{3}}")
+``` 
+
