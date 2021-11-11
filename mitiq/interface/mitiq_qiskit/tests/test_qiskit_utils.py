@@ -53,14 +53,14 @@ def test_execute_with_shots():
 
     circ = QuantumCircuit(1, 1)
     expectation_value = execute_with_shots(
-        circ=circ, obs=ONE_QUBIT_GS_PROJECTOR, shots=SHOTS
+        circuit=circ, obs=ONE_QUBIT_GS_PROJECTOR, shots=SHOTS
     )
     assert expectation_value == 1.0
 
     second_circ = QuantumCircuit(1)
     second_circ.x(0)
     expectation_value = execute_with_shots(
-        circ=second_circ, obs=ONE_QUBIT_GS_PROJECTOR, shots=SHOTS
+        circuit=second_circ, obs=ONE_QUBIT_GS_PROJECTOR, shots=SHOTS
     )
     assert expectation_value == 0.0
 
@@ -78,7 +78,7 @@ def test_execute_with_depolarizing_noise_single_qubit():
     noiseless_exp_value = 1.0
 
     expectation_value = execute_with_noise(
-        circ=single_qubit_circ,
+        circuit=single_qubit_circ,
         obs=ONE_QUBIT_GS_PROJECTOR,
         noise_model=initialized_depolarizing_noise(NOISE),
     )
@@ -100,7 +100,7 @@ def test_execute_with_depolarizing_noise_two_qubit():
     noiseless_exp_value = 1.0
 
     expectation_value = execute_with_noise(
-        circ=two_qubit_circ,
+        circuit=two_qubit_circ,
         obs=TWO_QUBIT_GS_PROJECTOR,
         noise_model=initialized_depolarizing_noise(NOISE),
     )
@@ -122,7 +122,7 @@ def test_execute_with_shots_and_depolarizing_noise_single_qubit():
     noiseless_exp_value = 1.0
 
     expectation_value = execute_with_shots_and_noise(
-        circ=single_qubit_circ,
+        circuit=single_qubit_circ,
         obs=ONE_QUBIT_GS_PROJECTOR,
         noise_model=initialized_depolarizing_noise(NOISE),
         shots=SHOTS,
@@ -145,7 +145,7 @@ def test_execute_with_shots_and_depolarizing_noise_two_qubit():
     noiseless_exp_value = 1.0
 
     expectation_value = execute_with_shots_and_noise(
-        circ=two_qubit_circ,
+        circuit=two_qubit_circ,
         obs=TWO_QUBIT_GS_PROJECTOR,
         noise_model=initialized_depolarizing_noise(NOISE),
         shots=SHOTS,
@@ -153,3 +153,24 @@ def test_execute_with_shots_and_depolarizing_noise_two_qubit():
     # anticipate that the expectation value will be less than
     # the noiseless simulation of the same circuit
     assert expectation_value < noiseless_exp_value
+
+
+def test_circuit_is_not_mutated_by_executors():
+    single_qubit_circ = QuantumCircuit(1, 1)
+    single_qubit_circ.z(0)
+    expected_circuit = single_qubit_circ.copy()
+    execute_with_shots_and_noise(
+        circuit=single_qubit_circ,
+        obs=ONE_QUBIT_GS_PROJECTOR,
+        noise_model=initialized_depolarizing_noise(NOISE),
+        shots=SHOTS,
+    )
+    assert single_qubit_circ.data == expected_circuit.data
+    assert single_qubit_circ == expected_circuit
+    execute_with_noise(
+        circuit=single_qubit_circ,
+        obs=ONE_QUBIT_GS_PROJECTOR,
+        noise_model=initialized_depolarizing_noise(NOISE),
+    )
+    assert single_qubit_circ.data == expected_circuit.data
+    assert single_qubit_circ == expected_circuit

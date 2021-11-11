@@ -592,3 +592,23 @@ def test_doc_is_preserved():
         return 0
 
     assert second_executor.__doc__ == first_executor.__doc__
+
+
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_executed_circuits_have_the_expected_type(circuit_type):
+
+    circuit = convert_from_mitiq(oneq_circ, circuit_type)
+    circuit_type = type(circuit)
+
+    # Fake executor just for testing types
+    def type_detecting_executor(circuit: QPROGRAM):
+        assert type(circuit) is circuit_type
+        return 0.0
+
+    mitigated = execute_with_pec(
+        circuit,
+        executor=type_detecting_executor,
+        representations=pauli_representations,
+        num_samples=1,
+    )
+    assert np.isclose(mitigated, 0.0)
