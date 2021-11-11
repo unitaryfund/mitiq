@@ -158,7 +158,7 @@ def execute_with_cdr(
     results = executor.evaluate(to_run, observable)
     noisy_results = np.array(results).reshape(all_circuits_shape)
 
-    results = simulator.evaluate(all_circuits[0], observable)
+    results = simulator.evaluate(training_circuits, observable)
     ideal_results = np.array(results)
 
     # Do the regression.
