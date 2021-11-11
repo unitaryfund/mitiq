@@ -46,7 +46,8 @@ For trace-preserving operations, the coefficients $\{\eta_\alpha\}$ form a quasi
 
 $$\sum_\alpha \eta_\alpha = 1, \quad  \gamma = \| \eta \|_1= \sum_\alpha   |\eta_\alpha| \ge 1$$
 
-The value of $\gamma$ is related to the negative "volume" of the distribution and quantifies to the sampling cost of PEC. More precicely, it can be shown [pec-theory](guide-pec-5.myst), that the sampling cost scales as $\gamma^2$.
+The value of $\gamma$ is related to the negative "volume" of the distribution and quantifies to the sampling cost of PEC.
+More precicely, it can be shown [pec-theory](pec-5-theory.myst), that the sampling cost scales as $\gamma^2$.
 
 +++
 
@@ -269,7 +270,7 @@ executor = Executor(execute)
 
 +++
 
-In the ["How do I use PEC?"](guide-pec-1.myst) section, we have shown how to apply pec with the minimum amount of options, i.e.:  `pec.execute_with_pec(circuit, executor, representations = representations)`.
+In the ["How do I use PEC?"](pec-1-intro.myst) section, we have shown how to apply pec with the minimum amount of options, i.e.:  `pec.execute_with_pec(circuit, executor, representations = representations)`.
 
 In the next code-cell we show additional options that can be used:
 
@@ -288,7 +289,7 @@ pec_value, pec_data = pec.execute_with_pec(
 Another option that can be used, instead of `num_samples`, is `precision`. Its default value is `0.03` and  quantifies the desired estimation accuracy. 
 
 For a bounded observable $\|A\|\le 1$, `precision` approximates $|\langle  A \rangle_{ \rm ideal} - \langle  A \rangle_{ \rm PEC}|$ (up to constant factors and up to statistical fluctuations).  In practice, `precision` is used by Mitiq to automatically determine `num_samples`, according to the formula: `num_samples` = $(\gamma /$ `precision`$)^2$, where $\gamma$ is the one-norm the circuit quasi-probability distribution.
-See the ["PEC-theory"](guide-pec-5.myst) section for more details.
+See the ["PEC-theory"](pec-5-theory.myst) section for more details.
 
 ```{code-cell} ipython3
 # Optional Executor re-initialization to clean the history

@@ -10,11 +10,11 @@ guide-executors.rst
 guide-observables.myst
 guide-zne.rst
 guide-pec.rst
-guide-pec-1.myst
-guide-pec-2.myst
-guide-pec-3.myst
-guide-pec-4.myst
-guide-pec-5.myst
+pec-1-intro.myst
+pec-2-use-case.myst
+pec-3-options.myst
+pec-4-low-level.myst
+pec-5-theory.myst
 guide-cdr.rst
 guide-error-mitigation.rst
 ```
