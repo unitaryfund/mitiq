@@ -164,7 +164,7 @@ def execute_with_cdr(
     # Do the regression.
     fitted_params, _ = curve_fit(
         lambda x, *params: fit_function(x, params),
-        noisy_results,
+        noisy_results[1:, :].T,
         ideal_results,
         p0=np.zeros(num_fit_parameters),
     )
