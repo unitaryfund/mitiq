@@ -42,12 +42,12 @@ jobs:
         with:
           python-version: 3.8
 
-  # We run "make install" twice. Seems necessary to build the docs after upgrading to qiskit>0.3.
+  # We run "pip install -U qiskit" twice. Seems necessary to build the docs after upgrading to qiskit>0.3.
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           make install
-          make install
+          pip install -U qiskit
           make requirements
 
       - name: Run the quilc & qvm Docker images
