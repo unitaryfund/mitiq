@@ -40,6 +40,7 @@ We refer to a user-defined function that inputs a quantum program and executes i
 Such functions always accept a quantum program, sometimes accept other arguments, and always return an expectation value as a float. 
 As an example, below we define a simple executor function which inputs a Cirq circuit, executes it on a noisy simulator, and returns the probability of the ground state.
 
+```{code-cell} ipython3
 import numpy as np
 from cirq import Circuit, depolarize, DensityMatrixSimulator
 
@@ -47,6 +48,8 @@ from cirq import Circuit, depolarize, DensityMatrixSimulator
 SIMULATOR = DensityMatrixSimulator()
 # 5% depolarizing noise
 NOISE = 0.05
+```
+
 
 def executor(circ: Circuit) -> float:
    """Executes a circuit with depolarizing noise and
