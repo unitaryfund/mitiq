@@ -36,7 +36,26 @@ print("Folded circuit:", folded, sep="\n")
 ```
 
 ## Define the executor function
+We refer to a user-defined function that inputs a quantum program and executes it on a backend as an executor. 
+Such functions always accept a quantum program, sometimes accept other arguments, and always return an expectation value as a float. 
+As an example, below we define a simple executor function which inputs a Cirq circuit, executes it on a noisy simulator, and returns the probability of the ground state.
 
+import numpy as np
+from cirq import Circuit, depolarize, DensityMatrixSimulator
+
+# initialize a backend
+SIMULATOR = DensityMatrixSimulator()
+# 5% depolarizing noise
+NOISE = 0.05
+
+def executor(circ: Circuit) -> float:
+   """Executes a circuit with depolarizing noise and
+   returns the expectation value of the projector |0><0|."""
+   circuit = circ.with_noise(depolarize(p=NOISE))
+   rho = SIMULATOR.simulate(circuit).final_density_matrix
+   obs = np.diag([1, 0])
+   expectation = np.real(np.trace(rho @ obs))
+   return expectation
 
 
 Zero-noise extrapolation can be easily implemented with the function `mitiq.zne.zne.execute_with_zne(`).
