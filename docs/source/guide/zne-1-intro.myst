@@ -48,8 +48,6 @@ from cirq import Circuit, depolarize, DensityMatrixSimulator
 SIMULATOR = DensityMatrixSimulator()
 # 5% depolarizing noise
 NOISE = 0.05
-```
-
 
 def executor(circ: Circuit) -> float:
    """Executes a circuit with depolarizing noise and
@@ -59,7 +57,7 @@ def executor(circ: Circuit) -> float:
    obs = np.diag([1, 0])
    expectation = np.real(np.trace(rho @ obs))
    return expectation
-
+```
 
 Zero-noise extrapolation can be easily implemented with the function `mitiq.zne.zne.execute_with_zne(`).
 
