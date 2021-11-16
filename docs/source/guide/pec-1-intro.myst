@@ -14,8 +14,10 @@ kernelspec:
 # How do I use PEC?
 
 Probabilistic Error Cancellation (PEC) is an error mitigation technique for improving the estimation
-of expectation values (see [pec-theory](pec-5-theory.myst)). In order to apply this technique, one must know how to represent ideal gates as linear combinations of noisy implementable gates. This knowledge is exploited by Mitiq
-to probabilistically remove the bias error from the unmitigated expectation values.
+of expectation values (see [What is the theory behind PEC?](pec-5-theory.myst)). To be applied, PEC requires the 
+full knowledge of the noise model. In particular, the user must must know how to represent ideal gates as linear 
+combinations of noisy implementable gates. This knowledge is exploited by Mitiq
+to probabilistically remove the bias error from noisy expectation values.
 
 +++
 
@@ -53,7 +55,7 @@ circuit and returns the noisy expectation value of some observable.
 
 +++
 
-**Note:** The body of this function is supposed to be written by the user and depends on the
+**Note:** The body of this function is supposed to be written by the user and depends on the specific 
 frontend and backend. Here, for simplicity, we first convert the input circuit to the Mitiq internal
 representation (Cirq) and then simulate it.
 
@@ -75,6 +77,7 @@ def executor(circuit, noise_level=0.01):
 The `executor` can be used to evaluate noisy (unmitigated) expectation values.
 
 ```{code-cell} ipython3
+# Compute the expectation value of the |0><0| observable.
 noisy_value = executor(circuit)
 ideal_value = executor(circuit, noise_level=0.0)      
 print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.5f}")
@@ -88,24 +91,22 @@ The aim of PEC is to reduce this error.
 
 +++
 
-Before applying PEC, we need to represent the gates of the ideal `circuit` as a linear combinations 
+Before applying PEC, we need to represent the gates of the ideal `circuit` as linear combinations 
 of noisy gates. In Mitiq, one can express a gate representation via an `OperationRepresentation`
-object which depends on the specific noise model of the backend.
+object, which depends on the specific noise model of the backend.
 
 +++
 
 In this example, we assume that local depolarizing noise of some fixed `noise_level` is acting after
-the application of any gate. For this simple noise model, one can easily obtain the necessary representations as follows:
+the application of each gate. For this simple noise model, one can easily obtain the necessary representations as follows:
 
 ```{code-cell} ipython3
 from mitiq.pec.representations.depolarizing import represent_operations_in_circuit_with_local_depolarizing_noise
 
 noise_level = 0.01
 reps = represent_operations_in_circuit_with_local_depolarizing_noise(circuit, noise_level)
-print(
-    f"{len(reps)} OperationRepresentation objects produced "
-    f"assuming depolarizing noise of strength p={noise_level}."
-)
+print(f"{len(reps)} OperationRepresentation objects produced,")
+print(f"assuming depolarizing noise of strength p={noise_level}.")
 ```
 
 As an example, we print the first `OperationRepresentation` in `reps`, showing how an ideal
@@ -115,8 +116,8 @@ gate of `circuit` can be expressed as a linear combination of noisy gates:
 print(reps[0])
 ```
 
-**IMPORTANT NOTE:** for PEC to work properly, the noise model and the `noise_level`
-associated to the executor must be equal to those used when defining the
+**IMPORTANT:** For PEC to work properly, the noise model and the `noise_level`
+associated to the `executor` must be equal to those used when defining the
 `OperationRepresentation` objects.
 
 +++
@@ -124,14 +125,13 @@ associated to the executor must be equal to those used when defining the
 ## Apply PEC
 
 +++
-
-Probabilistic error cancellation can be applied as follows.
+Once the necessary `OperationRepresentation`s have been defined, probabilistic error cancellation can be applied as follows:
 
 ```{code-cell} ipython3
 from mitiq import pec
 
 pec_value = pec.execute_with_pec(circuit, executor, representations=reps)
 
-print(f"Error w/o  PEC: {abs(ideal_value - noisy_value) :.5f}")
-print(f"Error with PEC: {abs(ideal_value - pec_value) :.5f}")
+print(f"Error without PEC: {abs(ideal_value - noisy_value) :.5f}")
+print(f"Error with PEC:    {abs(ideal_value - pec_value) :.5f}")
 ```

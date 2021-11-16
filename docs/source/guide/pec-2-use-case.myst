@@ -15,7 +15,7 @@ kernelspec:
 
 ## Advantages
 
-The main advantage of PEC is that, assuming perfect gate tomography,
+The main advantage of PEC is that, under the assumption of perfect gate tomography,
 it provides an unbiased estimation of expectation values.
 This means that, in the limit of many samples, the error mitigated expectation values
 converge to the ideal expectation values.
@@ -24,10 +24,10 @@ converge to the ideal expectation values.
 ## Disadvantages
 
 PEC is a noise-aware technique that can be applied only if
-the full tomographic knowledge of the hardware gate set is known. Indeed, in order to represent
-ideal gates as linear combination of noisy gates, one needs to know the exact noise model or the
-numerical matrix representation of the quantum channels induced by all the noisy gates.
+the **full tomographic knowledge** of the hardware gates is known. Indeed, in order to represent
+ideal gates as linear combination of noisy gates, one typically needs to know the super-operator
+matrix associated to each noisy gate.
 
-A technical problem of PEC is that it involves the execution of many different circuits.
+Another practical problem of PEC is that it involves the execution of many different circuits.
 This typically requires more clock time compared to the repeated execution of equal circuits.
 Batched execution of circuits can alleviate this problem.
