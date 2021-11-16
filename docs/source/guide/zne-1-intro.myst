@@ -4,9 +4,9 @@ jupytext:
     extension: .myst
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.4
+    jupytext_version: 1.10.3
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
@@ -15,23 +15,37 @@ kernelspec:
 
 Zero noise extrapolation is an error mitigation technique in which an expectation value is computed at different noise levels and, as a second step, the ideal expectation value is inferred extrapolating the measured results to the zero-noise limit.
 
-Both steps—noise scaling and extrapolation—can be applied with Mitiq. The corresponding sub-modules are mitiq.zne.scaling and mitiq.zne.inference.
+Both steps — noise scaling and extrapolation — can be applied with Mitiq. The corresponding sub-modules are `mitiq.zne.scaling` and `mitiq.zne.inference`.
 
 The following code is compatible with the multiple frontends. The next code cell can be used for selecting one of them.
 
 ```{code-cell} ipython3
 frontend = "cirq"  # Supported: "cirq", "qiskit", "pyquil", "braket", "pennylane".
 ```
+
 ## Define the circuit of interest
+
++++
+
+We first define the circuit of interest. For simplicity, in this example we use
+a randomized-benchmarking circuit whose ideal execution is equivalent to the
+identity operation.
+
 ```{code-cell} ipython3
-qreg = cirq.LineQubit.range(2)
-circ = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1]))
-print("Original circuit:", circ, sep="\n")
+from mitiq import benchmarks
+
+circuit = benchmarks.generate_rb_circuits(
+  n_qubits=1, num_cliffords=2, return_type = frontend,
+)[0]
+
+print(circuit)
 ```
 
 ## Fold the circuit
+
 ```{code-cell} ipython3
-folded = fold_gates_from_left(circ, scale_factor=2.)
+from mitiq.zne.scaling import fold_gates_from_left
+folded = fold_gates_from_left(circuit, scale_factor=2.)
 print("Folded circuit:", folded, sep="\n")
 ```
 
@@ -49,6 +63,9 @@ SIMULATOR = DensityMatrixSimulator()
 # 5% depolarizing noise
 NOISE = 0.05
 
+
+## Define executor function
+
 def executor(circ: Circuit) -> float:
    """Executes a circuit with depolarizing noise and
    returns the expectation value of the projector |0><0|."""
@@ -59,14 +76,29 @@ def executor(circ: Circuit) -> float:
    return expectation
 ```
 
+
+```{code-cell} ipython3
+# calculate the noisy result
+noisy_result = executor(circuit)
+```
+
+## Apply ZNE
 Zero-noise extrapolation can be easily implemented with the function `mitiq.zne.zne.execute_with_zne(`).
 
 ```{code-cell} ipython3
 from mitiq import zne
-
 mitigated_result = zne.execute_with_zne(circuit, executor)
+```
 
+```{code-cell} ipython3
+# calculate the exact result for comparison
+rho = SIMULATOR.simulate(circuit).final_density_matrix
+obs = np.diag([1, 0])
+exact_result = np.real(np.trace(rho @ obs))
+```
+
+
+```{code-cell} ipython3
 print(f"Error without mitigation: {abs(exact_result - noisy_result):.{3}}")
 print(f"Error with mitigation (ZNE): {abs(exact_result - mitigated_result):.{3}}")
-``` 
-
+```
