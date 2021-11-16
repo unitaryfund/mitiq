@@ -9,12 +9,7 @@ guide-getting-started.rst
 guide-executors.rst
 guide-observables.myst
 guide-zne.rst
-guide-pec.rst
-pec-1-intro.myst
-pec-2-use-case.myst
-pec-3-options.myst
-pec-4-low-level.myst
-pec-5-theory.myst
+pec.myst
 guide-cdr.rst
 guide-error-mitigation.rst
 ```

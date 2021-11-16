@@ -1,16 +1,18 @@
----
-jupytext:
-  text_representation:
-    extension: .myst
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.11.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
 
-# What happens when I use this technique?
 
-TODO: Add workflow with figure here.
+# What happens when I use PEC?
+
+The workflow of the Mitiq implementation of PEC is represented in the figure below.
+
+![pec_figure](../img/pec_workflow2_steps.png)
+
+- The user provides a `QProgram`, (i.e. a quantum circuit defined via any frontend supported in Mitiq).
+- Mitiq probabilistically generates a list of auxiliary circuits. This step depends on the quasi-probability representations provided by the user.
+- The generated circuits are executed via a user-defined [Executor](guide-executors.myst).
+- Mitiq infers an unbiased estimate of the ideal expectation value from a classical post-processing of the measured data.
+- The error mitigated expectation value is returned to the user.
+
+The workflow of PEC is similar to the workflow of ZNE. The main difference is that in ZNE the set of auxiliary circuits are obtained by noise scaling while
+in PEC they are probabilistically generated. As a consequence, also the inference step is different.
+
+

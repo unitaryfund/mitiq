@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# Who thought of this? Why does it work? And who’s using it?
+# What is the theory behind PEC?
 
 Probabilistic error cancellation (PEC) [[1-3]](#references) uses a quasi-probability 
 representation [[4]](#references) to express an ideal (unitary) quantum channel as a

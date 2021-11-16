@@ -10,7 +10,7 @@ kernelspec:
   language: python
   name: python3
 ---
-(label-pec-example)=
+
 # Probabilistic Error Cancellation (PEC) with Mitiq
 
 +++
