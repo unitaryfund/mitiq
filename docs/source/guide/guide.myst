@@ -4,7 +4,6 @@
 ---
 maxdepth: 2
 ---
-guide-overview.rst
 guide-getting-started.rst
 guide-executors.rst
 guide-observables.myst
