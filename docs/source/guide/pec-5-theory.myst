@@ -13,56 +13,119 @@ kernelspec:
 
 # What is the theory behind PEC?
 
-Probabilistic error cancellation (PEC) [[1-3]](#references) quasi-probability 
-representations [[4]](#references) to express ideal gates as a
-linear combination of noisy gates. 
 
-**Note:* In this section we follow the same formalism and notation of [[6]](#references).*
+Probabilistic error cancellation (PEC) [[1-3]](#references) is a noise-aware error mitigation technique which is
+based on two main ideas:
+
+- The first idea is to express ideal gates as linear combinations of implementable noisy gates.
+These linear combinations are called quasi-probability representations [[4]](#references);
+
+- The second idea to probabilistically sample from the previous quasi-probability representations to approximate
+quantum expectation values via a Monte Carlo average.
+
+**Note:* In this section we follow the same notation of [[6]](#references).*
+
+## Quasi-probability representations
+
+In PEC, each gate ideal gate $\mathcal G_i$ of a circuit of interest 
+$\mathcal U = {\mathcal G}_t \circ  \dots \circ {\mathcal G}_2 \circ {\mathcal G}_1 $
+is represented as a linear combination of noisy implementable operations ${\mathcal O_{i, \alpha}}$ (i.e., operations that 
+can be directly applied with a noisy backend):
+
+$$ 
+\mathcal G_i = \sum_\alpha \eta_{i, \alpha} \mathcal O_{i, \alpha}, 
+\quad  \eta_{i, \alpha} \in \mathbb R,
+$$
+
+where the calligraphic symbols ($\mathcal U$, $\mathcal G_i$, $\mathcal O_{i, \alpha}$) stand for super-operators acting
+on the density matrix of the qubits as linear quantum channels.
+
+The real coefficients ${\eta_{i,\alpha}}$ form a quasi-probability distribution [[4]](#references) with respect to the
+index $\alpha$. Their sum is normalized but, differently from standard probabilities, they can take negative values:
+ 
+ $$ \sum_\alpha \eta_{i,\alpha}=1,  \qquad  \gamma_i = \sum_\alpha |\eta_{i, \alpha}| \ge 1.$$
+
+The constant $\gamma_i$ quantifies the negativity of the quasi-probability distribution which is directly related
+to the error mitigation cost associated to the gate $\mathcal G_i$.
+
+***Note:** In principle, the gate index "$i$" in the noisy operations $\mathcal O_{i, \alpha}$ could be dropped.
+However, we keep it to explicitly define gate-dependent basis of implementable operations, consistently with 
+the  structure of the `OperationRepresentation` class discussed in [What additional options are
+available in PEC?](pec-3-options.myst).*
 
 
-Given a set of noisy but implementable operations $\{O_1, \dots, O_m\}$, an
-ideal unitary gate can be expressed as
+## Error cancellation
 
-$$ \mathcal{G} = \sum_{\alpha} \eta_{\alpha} \mathcal{O}_\alpha 
-= \gamma \sum_{\alpha} P(\alpha) \, {\rm sgn}(\eta_\alpha)\, \mathcal{O}_\alpha,$$
+The aim of PEC is estimating the ideal expectation value of some observable $A=A^\dagger$ with respect to 
+the quantum state prepared by an ideal circuit of interest $\mathcal U$ acting on some initial  reference 
+state $\rho_0$ (typically $\rho_0= |0\dots 0 \rangle \langle 0 \dots 0 |$).
 
-where $\eta_\alpha$ are real coefficients, $\gamma = \sum_{\alpha} |\eta_\alpha|$,
-$P(\alpha)=|\eta_\alpha | /\gamma$ is a probability distribution,
-and ${\rm sgn}(\eta_\alpha)$ is the sign of $\eta_\alpha$.
+Replacing each gate $\mathcal G_i$ with its noisy representation, we can express the ideal expectation
+value as a linear combination of noisy expectation values:
+
+$$
+\langle A \rangle_{\rm ideal}= {\rm tr}[A \mathcal U (\rho_0)] = 
+\sum_{\vec{\alpha}} \eta_{\vec{\alpha}} \langle A_{\vec{\alpha}}\rangle_{\rm noisy}
+$$ 
+
+where 
+
+$$ 
+\eta_{\vec{\alpha}} := \eta_{t, \alpha_t} \dots \eta_{2, \alpha_2} \eta_{1,\alpha_1}, 
+\quad  \langle A_{\vec{\alpha}}\rangle_{\rm noisy} :=  {\rm tr}[A \Phi_{\vec{\alpha}}(\rho_0)],
+\quad \Phi_{\vec{\alpha}} := \mathcal O_{t, \alpha_t} \circ \dots \circ \mathcal O_{2, \alpha_2} \circ \mathcal O_{1, \alpha_1}.
+$$
 
 
-The aim of PEC is estimating the ideal expectation value of some observable $A$ with respect to 
-the quantum state prepared by an ideal circuit 
-$\mathcal U = {\mathcal G}_L \circ  \dots \circ {\mathcal G}_2 \circ {\mathcal G}_1 $ applied to
-some initial reference state $\rho_0$ (typically $\rho_0 = |0...0\rangle \langle 0...|$). 
-More precisely, the quantity that we want to estimate is: 
+The coefficients $\{ \eta_{\vec{\alpha}} \}$ form a quasi-probability distribution
+for the global circuit over the noisy circuits. Indeed it is easy to check that, at the level of super-operators,
+we have:
 
-$$\langle A \rangle_{\rm ideal} = {\rm tr}[A \mathcal U (\rho_0)].$$
+$$ \mathcal U =  \sum_{\vec{\alpha}} \eta_{\vec{\alpha}} \Phi_{\vec{\alpha}}. $$
 
-The previous expectation value cannot be directly measured with a noisy backend but can be indirectly
-estimated with a probabilistic approach. We can sample a noisy operation
-$\mathcal{O}_{i, \alpha}$ for each ideal gate $\mathcal{G}_i$
-with probability $P_i(\alpha)$, obtaining a circuit of noisy operations
-$\Phi_{\vec{\alpha}} = \mathcal{O}_{L, \alpha_L} \circ  \dots \circ  \mathcal{O}_{2, \alpha_2} \circ \mathcal{O}_{2, \alpha_2}$
-whose execution produces the final mixed state $\Phi_{\vec{\alpha}}(\rho_0)$. 
-The corresponding expectation value is
+The one-norm $\gamma$ of the global quasi-probability distribution is the product of those of the gates:
 
-$$\langle A_{\vec{\alpha}}\rangle_{\rm noisy} = {\rm tr}[A \Phi_{\vec{\alpha}}(\rho_0)], $$
+$$
+\sum_{\vec \alpha} \eta_{\vec{\alpha}}=1,  \qquad  \gamma = \sum_{\vec{\alpha}} |\eta_{\vec \alpha}| = \Pi_{i=1}^{t} \gamma_i.
+$$
 
-and can be directly experimentally estimated with a noisy backend since it only involves
- implementable noisy gates.
+All the noisy expectation values $\langle A_{\vec{\alpha}}\rangle_{\rm noisy}$ can be directly measured with 
+a noisy backend since they only require circuits composed of implementable noisy operations.
+In principle, by combining all the noisy expectation values, one could compute the ideal result $\langle A \rangle_{\rm ideal}$.
+Unfortunately this approach requires the execution of an exponentially large number of circuits and 
+which is typically unfeasible. 
 
-Setting $\gamma := \prod_{i}^L \gamma_i$ and
-$\eta_{\vec{\alpha}} = \prod_{i=1}^L \eta_i(\alpha)$, we can obtain an unbiased
-estimate of the ideal expectation value as follows:
+An important fact at the basis of PEC is that, for weak noise, only a small number of noisy expectation values actually
+contribute to the linear combination because many of the coefficients $\eta_{\vec \alpha}$ are negligible.
+For this reason, it is more efficient to estimate $\langle A \rangle_{\rm ideal}$ using an
+ ([importance-sampling](https://en.wikipedia.org/wiki/Importance_sampling)) Monte Carlo approach as described in the next section.
+
+## Monte Carlo estimation
+
+To apply a Monte Carlo estimation, we need to replace quasi-probabilities with positive probabilities.
+This can be achieved as follows:
+
+$$ \mathcal{G_i} = \sum_{\alpha} \eta_{i, \alpha} \mathcal{O}_{i, \alpha} 
+= \gamma_i \sum_{\alpha} p_i(\alpha) \, {\rm sgn}(\eta_{i, \alpha})\, \mathcal{O}_{i, \alpha},$$
+
+where $p_{i}(\alpha)=|\eta_{i, \alpha}|/\gamma_i$ is a valid probability distribution with respect to $\alpha$.
+
+If for each gate $\mathcal G_i$ of the circuit we sample a value of $\alpha$ from $p_{i}(\alpha)$ and we apply the corresponding noisy operation
+$\mathcal O_{i, \alpha}$, we are effectively sampling a noisy circuit $\Phi_{\vec{\alpha}}$ from the
+global probability distribution $p(\vec{\alpha})= |\eta_{\vec{\alpha}}| / \gamma$.
+
+Therefore, at the level of quantum channels, we have:
+
+$$ \mathcal U = \gamma \mathbb E \left\{  {\rm sgn}(\eta_{i, \vec{\alpha}}) \Phi_{\vec{\alpha}} \right\},$$
+
+where $\mathbb E$ is the sample average over many repetitions of the previous probabilistic procedure and 
+${\rm sgn}(\eta_{\vec{ \alpha}}) = \Pi_i {\rm sgn}(\eta_{i, \alpha})$.
+As a direct consequence, we can express the ideal expectation value as follows:
 
 $$\langle A \rangle_{\text{ideal}} = \gamma\, 
-\mathbb E \left\{  {\rm sgn}(\eta_{\vec{\alpha}}) \langle A_{\vec{\alpha}}\rangle_{\rm noisy} \right\},$$
+\mathbb E \left\{  {\rm sgn}(\eta_{\vec{\alpha}}) \langle A_{\vec{\alpha}}\rangle_{\rm noisy} \right\}.$$
 
-where $\mathbb E$ is the statistical average over many repetitions of the previous procedure.
-
-The parameter $\gamma$ is the one-norm of the quasi-probability distribution $\{ \eta_{\vec{\alpha}} \}$ associated to the 
-full circuit and quantifies the error mitigation cost.
+By averaging a finite number $N$ of samples we obtain an unbiased estimate of $\langle A \rangle_{\text{ideal}}$.
 Assuming a bounded observable $|A|\le 1$, the number of samples $N$
 necessary to approximate $\langle A\rangle_{\text{ideal}}$ within an absolute error $\delta$,
 scales as [[5]](#references):

@@ -12,6 +12,6 @@ When applying PEC with Mitiq, the workflow of quantum and classical data is that
 - Mitiq infers an unbiased estimate of the ideal expectation value from a classical post-processing of the measured data.
 - The error mitigated expectation value is returned to the user.
 
-The workflow of PEC is similar to the workflow of ZNE. The main difference is that in ZNE the set of auxiliary circuits are obtained by noise scaling while
-in PEC they are probabilistically generated. As a consequence, also the final inference step is different.
+The general workflow of PEC is similar to the workflow of ZNE. The main difference is that in ZNE the auxiliary circuits are obtained by noise scaling while
+in PEC they are probabilistically generated. As a consequence, the final inference step is different too.
 
