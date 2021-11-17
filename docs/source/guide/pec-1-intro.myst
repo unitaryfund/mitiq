@@ -52,6 +52,8 @@ print(circuit)
 To interface generic frontends and backends with Mitiq, we must define an `executor`.
 In the simplest case, an `executor` is Python function that takes as input a quantum
 circuit and returns the noisy expectation value of some observable.
+See the [Executors](guide-executors.myst) section for more information on 
+how to define more advanced executors.
 
 +++
 
