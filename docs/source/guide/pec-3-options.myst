@@ -313,10 +313,16 @@ pec_value, pec_data = pec.execute_with_pec(
 )
 ```
 
+Similar to other error mitigation modules, `observable` is an optional argument of 
+`pec.execute_with_pec`. If `observable` is `None` the executor must return an expectation value,
+while if `observable` is a `mitiq.Observable` the executor must return raw bitstrings. 
+See the [Executors](guide-executors.myst) section for more details. 
+
+
 Another option that can be used, instead of `num_samples`, is `precision`. Its default value is `0.03` and  quantifies the desired estimation accuracy. 
 
 For a bounded observable $\|A\|\le 1$, `precision` approximates $|\langle  A \rangle_{ \rm ideal} - \langle  A \rangle_{ \rm PEC}|$ (up to constant factors and up to statistical fluctuations).  In practice, `precision` is used by Mitiq to automatically determine `num_samples`, according to the formula: `num_samples` = $(\gamma /$ `precision`$)^2$, where $\gamma$ is the one-norm the circuit quasi-probability distribution.
-See the ["PEC-theory"](pec-5-theory.myst) section for more details.
+See ["What is the theory behind PEC?"](pec-5-theory.myst) for more details on the sampling cost.
 
 ```{code-cell} ipython3
 # Optional Executor re-initialization to clean the history
@@ -332,6 +338,9 @@ pec_value, pec_data = pec.execute_with_pec(
     full_output=True, # Return pec_data in addition to pec_value
 )
 ```
+
+***Hint:** The value of `precision` used above is very large to reduce the execution 
+time. Try re-executing the previous cell with smaller values of `precision` to improve the result.*
 
 ### Analyzing the executed circuits
 
