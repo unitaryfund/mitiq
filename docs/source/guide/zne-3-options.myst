@@ -13,10 +13,10 @@ kernelspec:
 
 # What additional options are available when using ZNE?
 The goal of ZNE is to be able to estimate the noiseless expectation value of an
-observable. This value ($$E(0)$$) embodies an observable of a quantum circuit
+observable. This value ($E(0)$) embodies an observable of a quantum circuit
 implemented on noiseless hardware. Due to the current limitations of quantum
-architecture, $$E(0)$$ cannot be directly measured.
+architecture, $E(0)$ cannot be directly measured.
 
-We describe the expectation value $$E(\lambda)$$ as a function of scale factor
-($$\lambda$$). The scale factor is used to estimate the number of layers in
-circuit based on circuit depth (TO DO- Insert Link to Theory Discussion). 
+We describe the expectation value $E(\lambda)$ as a function of scale factor
+($\lambda$). The scale factor is used to estimate the number of layers in
+circuit based on circuit depth (TO DO- Insert Link to Theory Discussion).
