@@ -42,6 +42,18 @@ print(circuit)
 ```
 
 ## Fold the circuit
+In Mitiq, folding functions input a circuit and a scale factor, i.e., 
+a floating point value which corresponds to (approximately) how much the length 
+of the circuit is scaled. The minimum scale factor is one (which corresponds to folding no gates). 
+A scale factor of three corresponds to folding all gates locally. 
+Scale factors beyond three begin to fold gates more than once.
+
++++
+
+For local folding, there is a degree of freedom for which gates to fold first. 
+The order in which gates are folded can have an important effect on how the noise is scaled. 
+The function `fold_gates_from_left` will fold gates from the left (or start) of the 
+circuit until the desired scale factor is reached.
 
 ```{code-cell} ipython3
 from mitiq.zne.scaling import fold_gates_from_left
@@ -64,8 +76,6 @@ SIMULATOR = DensityMatrixSimulator()
 NOISE = 0.05
 
 
-## Define executor function
-
 def executor(circ: Circuit) -> float:
    """Executes a circuit with depolarizing noise and
    returns the expectation value of the projector |0><0|."""
@@ -76,27 +86,37 @@ def executor(circ: Circuit) -> float:
    return expectation
 ```
 
+Calculate the noisy result
 
 ```{code-cell} ipython3
-# calculate the noisy result
 noisy_result = executor(circuit)
 ```
 
+### Select noise extrapolation method 
+Define a `FactoryObject` to select noise extrapolation method and set scale factors.
+
+For example, scale noise by 1 and 2, then extrapolate linearly to the zero noise limit.
+
+```{code-cell} ipython3
+from mitiq.zne.inference import LinearFactory
+linear_fac = LinearFactory(scale_factors=[1.0, 2.0])
+```
+
 ## Apply ZNE
-Zero-noise extrapolation can be easily implemented with the function `mitiq.zne.zne.execute_with_zne(`).
+Zero-noise extrapolation can be easily implemented with the function `mitiq.zne.zne.execute_with_zne()`.
 
 ```{code-cell} ipython3
 from mitiq import zne
-mitigated_result = zne.execute_with_zne(circuit, executor)
+mitigated_result = zne.execute_with_zne(folded, executor, factory=linear_fac)
 ```
 
+### Calculate the exact result for comparison
+
 ```{code-cell} ipython3
-# calculate the exact result for comparison
 rho = SIMULATOR.simulate(circuit).final_density_matrix
 obs = np.diag([1, 0])
 exact_result = np.real(np.trace(rho @ obs))
 ```
-
 
 ```{code-cell} ipython3
 print(f"Error without mitigation: {abs(exact_result - noisy_result):.{3}}")
