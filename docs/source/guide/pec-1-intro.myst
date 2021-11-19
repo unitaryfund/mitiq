@@ -21,7 +21,7 @@ to probabilistically remove the bias error from noisy expectation values.
 
 +++
 
-The following code is compatible with the multiple forntends. The next code cell can be used for selecting one of them.
+The following code is compatible with the multiple frontends. The next code cell can be used for selecting one of them.
 
 ```{code-cell} ipython3
 frontend = "qiskit"  # Supported: "cirq", "qiskit", "pyquil", "braket", "pennylane".
