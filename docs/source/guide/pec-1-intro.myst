@@ -127,7 +127,7 @@ associated to the `executor` must be equal to those used when defining the
 ## Apply PEC
 
 +++
-Once the necessary `OperationRepresentation`s have been defined, probabilistic error cancellation can be applied as follows:
+Once the necessary `OperationRepresentation`s have been defined, probabilistic error cancellation can be applied through `execute_with_pec ` as follows:
 
 ```{code-cell} ipython3
 from mitiq import pec
