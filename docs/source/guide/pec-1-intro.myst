@@ -15,7 +15,7 @@ kernelspec:
 
 Probabilistic Error Cancellation (PEC) is an error mitigation technique for improving the estimation
 of expectation values (see [What is the theory behind PEC?](pec-5-theory.myst)). To be applied, PEC requires the 
-full knowledge of the noise model. In particular, the user must must know how to represent ideal gates as linear 
+full knowledge of the noise model. In particular, the user must know how to represent ideal gates as linear 
 combinations of noisy implementable gates. This knowledge is exploited by Mitiq
 to probabilistically remove the bias error from noisy expectation values.
 
