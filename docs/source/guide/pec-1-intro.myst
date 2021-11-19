@@ -32,7 +32,7 @@ frontend = "qiskit"  # Supported: "cirq", "qiskit", "pyquil", "braket", "pennyla
 +++
 
 We first define the circuit of interest. For simplicity, in this example we use
-a randomized-benchmarking circuit whose ideal execution is equivalent to the
+a single-qubit randomized-benchmarking circuit whose ideal execution is equivalent to the
 identity operation.
 
 ```{code-cell} ipython3
@@ -44,13 +44,15 @@ circuit = benchmarks.generate_rb_circuits(
 
 print(circuit)
 ```
+In the code cell above, we used the function {func}`~mitiq.benchmarks.randomized_benchmarking.generate_rb_circuits()`, in which `num_cliffords` is the 
+number of random Clifford group elements and is proportional to the depth of the circuit.
 
 ## Define a noisy executor
 
 +++
 
 To interface generic frontends and backends with Mitiq, we must define an `executor`.
-In the simplest case, an `executor` is Python function that takes as input a quantum
+In the simplest case, an `executor` is a Python function that takes as input a quantum
 circuit and returns the noisy expectation value of some observable.
 See the [Executors](guide-executors.myst) section for more information on 
 how to define more advanced executors.
@@ -94,7 +96,7 @@ The aim of PEC is to reduce this error.
 +++
 
 Before applying PEC, we need to represent the gates of the ideal `circuit` as linear combinations 
-of noisy gates. In Mitiq, one can express a gate representation via an `OperationRepresentation`
+of noisy gates. In Mitiq, one can express a gate representation via an {class}`~.OperationRepresentation`
 object, which depends on the specific noise model of the backend.
 
 +++
@@ -107,11 +109,10 @@ from mitiq.pec.representations.depolarizing import represent_operations_in_circu
 
 noise_level = 0.01
 reps = represent_operations_in_circuit_with_local_depolarizing_noise(circuit, noise_level)
-print(f"{len(reps)} OperationRepresentation objects produced,")
-print(f"assuming depolarizing noise of strength p={noise_level}.")
+print(f"{len(reps)} OperationRepresentation objects produced, assuming {100 * noise_level}% depolarizing noise.")
 ```
 
-As an example, we print the first `OperationRepresentation` in `reps`, showing how an ideal
+As an example, we print the first {class}`.OperationRepresentation` in `reps`, showing how an ideal
 gate of `circuit` can be expressed as a linear combination of noisy gates:
 
 ```{code-cell} ipython3
@@ -120,14 +121,15 @@ print(reps[0])
 
 **IMPORTANT:** For PEC to work properly, the noise model and the `noise_level`
 associated to the `executor` must be equal to those used when defining the
-`OperationRepresentation` objects.
+{class}`.OperationRepresentation` objects.
 
 +++
 
 ## Apply PEC
 
 +++
-Once the necessary `OperationRepresentation`s have been defined, probabilistic error cancellation can be applied through `execute_with_pec ` as follows:
+Once the necessary {class}`.OperationRepresentation`s have been defined,
+probabilistic error cancellation can be applied through {func}`.execute_with_pec` as follows:
 
 ```{code-cell} ipython3
 from mitiq import pec
@@ -137,3 +139,4 @@ pec_value = pec.execute_with_pec(circuit, executor, representations=reps)
 print(f"Error without PEC: {abs(ideal_value - noisy_value) :.5f}")
 print(f"Error with PEC:    {abs(ideal_value - pec_value) :.5f}")
 ```
+As printed above, PEC reduced the error compared to the unmitigated case.
