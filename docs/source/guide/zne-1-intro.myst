@@ -93,7 +93,7 @@ noisy_result = executor(circuit)
 ```
 
 ## Select noise extrapolation method 
-Define a `FactoryObject` to select noise extrapolation method and set scale factors.
+Define a `FactoryObject` to select the noise extrapolation method and set scale factors.
 For example, scale noise by 1 and 2, then extrapolate linearly to the zero noise limit.
 
 ```{code-cell} ipython3
