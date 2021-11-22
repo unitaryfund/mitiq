@@ -83,10 +83,10 @@ def execute_with_cdr(
         num_fit_parameters: The number of parameters the fit_function takes.
         scale_noise: scale_noise: Function for scaling the noise of a quantum
             circuit.
-        scale_factors: Factors by which to scale the noise, should not
-            include 1 as this is just the original circuit. Note: When
-            scale_factors is provided, the method is known as "variable-noise
-            Clifford data regression."
+        scale_factors: Factors by which to scale the noise.
+            - When 1.0 is the only scale factor, the method is known as CDR.
+            - Note: When scale factors larger than 1.0 are provided, the method
+                is known as "variable-noise CDR."
         kwargs: Available keyword arguments are:
             - method_select (string): Specifies the method used to select the
                 non-Clifford gates to replace when constructing the
