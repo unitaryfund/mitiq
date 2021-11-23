@@ -120,17 +120,14 @@ def execute_with_cdr(
     }
 
     if num_fit_parameters is None:
-        if fit_function not in (
-            linear_fit_function,
-            linear_fit_function_no_intercept,
-        ):
-            raise ValueError(
-                "Must provide arg `num_fit_parameters` for custom fit function."
-            )
         if fit_function is linear_fit_function:
             num_fit_parameters = 1 + len(scale_factors)
         elif fit_function is linear_fit_function_no_intercept:
             num_fit_parameters = len(scale_factors)
+        else:
+            raise ValueError(
+                "Must provide arg `num_fit_parameters` for custom fit function."
+            )
     else:
         num_fit_parameters = cast(int, num_fit_parameters)
 
