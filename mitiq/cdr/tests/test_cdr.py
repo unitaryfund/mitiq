@@ -111,9 +111,7 @@ def test_execute_with_variable_noise_cdr(circuit_type):
 
 
 def test_no_num_fit_parameters_with_custom_fit_raises_error():
-    with pytest.raises(
-        ValueError, match="Must provide `num_fit_parameters`"
-    ):
+    with pytest.raises(ValueError, match="Must provide `num_fit_parameters`"):
         execute_with_cdr(
             random_x_z_cnot_circuit(
                 LineQubit.range(2), n_moments=2, random_state=1
