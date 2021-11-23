@@ -81,7 +81,7 @@ for c in basis_circuits:
     print(c)
 ```
 
-Each element of `basis_circuits` describe "how to physically implement" a noisy operation 
+Each element of `basis_circuits` describes "how to physically implement" a noisy operation 
 $\mathcal O_\alpha$ on a noisy backend. To completely characterize a noisy operation we can also
 specify the actual (non-unitary) quantum channel associated to it.
 In Mitiq, this can be done using the {class}`.NoisyOperation` class.
