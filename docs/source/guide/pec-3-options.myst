@@ -273,10 +273,10 @@ representations = [h_rep]
 In general `representations` will contain as many representations as the number of ideal
 gates involved in `circuit`.
 
-**Note:** If a gate is in `circuit` but its {class}`.OperationRepresentation` is not listed in 
+**Note:** *If a gate is in `circuit` but its {class}`.OperationRepresentation` is not listed in 
 `representations`, Mitiq can still apply PEC. However, any errors associated to
 that gate will not be mitigated. In practice, all the gates without {class}`.OperationRepresentation`s 
-are treated by Mitiq as if they were noiseless.
+are treated by Mitiq as if they were noiseless.*
 
 The executor must be defined by the user since it depends on the specific frontend and backend
 (see the [Executors](guide-executors.myst) section).
