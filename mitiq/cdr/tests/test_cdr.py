@@ -58,13 +58,11 @@ def simulate(circuit: QPROGRAM) -> np.ndarray:
             "method_replace": "gaussian",
             "sigma_select": 0.5,
             "sigma_replace": 0.5,
-            "random_state": 1,
         },
     ],
 )
 @pytest.mark.parametrize("random_state", [1, 2, 3, 4, 5])
 def test_execute_with_cdr(circuit_type, fit_function, kwargs, random_state):
-    kwargs["random_state"] = random_state
     circuit = random_x_z_cnot_circuit(
         LineQubit.range(2), n_moments=5, random_state=random_state,
     )
@@ -82,7 +80,8 @@ def test_execute_with_cdr(circuit_type, fit_function, kwargs, random_state):
         num_training_circuits=20,
         fraction_non_clifford=0.5,
         fit_function=fit_function,
-        kwargs=kwargs,
+        random_state=random_state,
+        **kwargs,
     )
     assert abs(cdr_value - true_value) <= abs(noisy_value - true_value)
 
