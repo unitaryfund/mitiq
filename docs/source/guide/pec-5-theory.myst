@@ -20,7 +20,7 @@ based on two main ideas:
 - The first idea is to express ideal gates as linear combinations of implementable noisy gates.
 These linear combinations are called quasi-probability representations [[4]](#references);
 
-- The second idea to probabilistically sample from the previous quasi-probability representations to approximate
+- The second idea is to probabilistically sample from the previous quasi-probability representations to approximate
 quantum expectation values via a Monte Carlo average.
 
 **Note:* In this section we follow the same notation of [[6]](#references).*
