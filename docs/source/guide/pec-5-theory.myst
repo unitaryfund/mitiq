@@ -98,7 +98,7 @@ which is typically unfeasible.
 An important fact at the basis of PEC is that, for weak noise, only a small number of noisy expectation values actually
 contribute to the linear combination because many of the coefficients $\eta_{\vec \alpha}$ are negligible.
 For this reason, it is more efficient to estimate $\langle A \rangle_{\rm ideal}$ using an
- ([importance-sampling](https://en.wikipedia.org/wiki/Importance_sampling)) Monte Carlo approach as described in the next section.
+ [importance-sampling](https://en.wikipedia.org/wiki/Importance_sampling) Monte Carlo approach as described in the next section.
 
 ## Monte Carlo estimation
 
