@@ -203,7 +203,7 @@ assert depolarizing_h_rep == h_rep
 
 +++
 
-The main idea of PEC is to estimate the average with respect a 
+The main idea of PEC is to estimate the average with respect to a 
 quasi-probability distribution over noisy circuits with a probabilistic Monte-Carlo 
 approach.
 This can be obtained rewriting $\mathcal G = \sum_\alpha \eta_\alpha \mathcal O_\alpha \$ as:
