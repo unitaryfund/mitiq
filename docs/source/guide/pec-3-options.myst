@@ -352,7 +352,7 @@ pec_value, pec_data = pec.execute_with_pec(
 )
 ```
 
-***Hint:** The value of `precision` used above is very large to reduce the execution 
+***Hint:** The value of `precision` used above is very large, in order to reduce the execution 
 time. Try re-executing the previous cell with smaller values of `precision` to improve the result.*
 
 ### Analyzing the executed circuits
