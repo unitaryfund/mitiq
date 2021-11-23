@@ -16,7 +16,7 @@
 """API for using Clifford Data Regression (CDR) error mitigation."""
 
 from functools import wraps
-from typing import Any, Callable, cast, Optional, Sequence, Union
+from typing import Any, Callable, Optional, Sequence, Union
 
 import numpy as np
 from scipy.optimize import curve_fit
@@ -126,10 +126,8 @@ def execute_with_cdr(
             num_fit_parameters = len(scale_factors)
         else:
             raise ValueError(
-                "Must provide arg `num_fit_parameters` for custom fit function."
+                "Must provide `num_fit_parameters` for custom fit function."
             )
-    else:
-        num_fit_parameters = cast(int, num_fit_parameters)
 
     # Generate training circuits.
     training_circuits = generate_training_circuits(
