@@ -64,6 +64,8 @@ def simulate(circuit: QPROGRAM) -> np.ndarray:
 )
 @pytest.mark.parametrize("random_state", [1, 2, 3, 4, 5])
 def test_execute_with_cdr(circuit_type, fit_function, kwargs, random_state):
+    kwargs["random_state"] = random_state
+    
     circuit = random_x_z_cnot_circuit(
         LineQubit.range(2), n_moments=5, random_state=random_state,
     )
@@ -72,12 +74,13 @@ def test_execute_with_cdr(circuit_type, fit_function, kwargs, random_state):
 
     true_value = obs.expectation(circuit, simulate)
     noisy_value = obs.expectation(circuit, execute)
+    
     cdr_value = execute_with_cdr(
         circuit,
         execute,
         obs,
         simulator=simulate,
-        num_training_circuits=4,
+        num_training_circuits=20,
         fraction_non_clifford=0.5,
         fit_function=fit_function,
         kwargs=kwargs,
@@ -100,9 +103,10 @@ def test_execute_with_variable_noise_cdr(circuit_type):
         execute,
         obs,
         simulator=simulate,
-        num_training_circuits=4,
+        num_training_circuits=10,
         fraction_non_clifford=0.5,
-        scale_factors=[3],
+        scale_factors=[1, 3],
+        random_state=1,
     )
     assert abs(vncdr_value - true_value) <= abs(noisy_value - true_value)
 

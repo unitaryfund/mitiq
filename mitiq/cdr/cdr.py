@@ -119,14 +119,20 @@ def execute_with_cdr(
         "sigma_replace": kwargs.get("sigma_replace"),
     }
 
-    if num_fit_parameters is None and fit_function not in (
-        linear_fit_function,
-        linear_fit_function_no_intercept,
-    ):
-        raise ValueError(
-            "Must provide arg `num_fit_parameters` for custom fit function."
-        )
-    num_fit_parameters = cast(int, num_fit_parameters)
+    if num_fit_parameters is None:
+        if fit_function not in (
+            linear_fit_function,
+            linear_fit_function_no_intercept,
+        ):
+            raise ValueError(
+                "Must provide arg `num_fit_parameters` for custom fit function."
+            )
+        if fit_function is linear_fit_function:
+            num_fit_parameters = 1 + len(scale_factors)
+        elif fit_function is linear_fit_function_no_intercept:
+            num_fit_parameters = len(scale_factors)
+    else:
+        num_fit_parameters = cast(int, num_fit_parameters)
 
     # Generate training circuits.
     training_circuits = generate_training_circuits(
@@ -168,4 +174,4 @@ def execute_with_cdr(
         ideal_results,
         p0=np.zeros(num_fit_parameters),
     )
-    return fit_function(noisy_results[:, 0], fitted_params)
+    return fit_function(noisy_results[0, :], fitted_params)
