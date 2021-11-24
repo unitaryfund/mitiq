@@ -94,12 +94,11 @@ noisy_result = executor(circuit)
 
 ## Select noise extrapolation method 
 Define a `Factory` object to select the noise extrapolation method and the noise scale factors.
-For example, scale noise by 1 and 2, then extrapolate linearly to the zero noise limit.
+For example, a linear extrapolation method with scale factors 1 and 2, can be initialized as follows:
 
 ```{code-cell} ipython3
 from mitiq.zne.inference import LinearFactory
 linear_fac = LinearFactory(scale_factors=[1.0, 2.0])
-```
 
 ## Apply ZNE
 Zero-noise extrapolation can be easily implemented with the function `mitiq.zne.zne.execute_with_zne()`.
