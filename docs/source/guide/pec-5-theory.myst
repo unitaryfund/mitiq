@@ -14,16 +14,16 @@ kernelspec:
 # What is the theory behind PEC?
 
 
-Probabilistic error cancellation (PEC) [[1-3]](#references) is a noise-aware error mitigation technique which is
+Probabilistic error cancellation (PEC) {cite}`Temme_2017_PRL, Sun_2020_arXiv, Shuaining_2020_NatComm`  is a noise-aware error mitigation technique which is
 based on two main ideas:
 
 - The first idea is to express ideal gates as linear combinations of implementable noisy gates.
-These linear combinations are called quasi-probability representations [[4]](#references);
+These linear combinations are called quasi-probability representations {cite}`Pashayan_2015_PRL`;
 
 - The second idea is to probabilistically sample from the previous quasi-probability representations to approximate
 quantum expectation values via a Monte Carlo average.
 
-**Note:* In this section we follow the same notation of [[6]](#references).*
+**Note:* In this section we follow the same notation of {cite}`Mari_2021_PRA`.*
 
 ## Quasi-probability representations
 
@@ -40,7 +40,7 @@ $$
 where the calligraphic symbols ($\mathcal U$, $\mathcal G_i$, $\mathcal O_{i, \alpha}$) stand for super-operators acting
 on the density matrix of the qubits as linear quantum channels.
 
-The real coefficients ${\eta_{i,\alpha}}$ form a quasi-probability distribution [[4]](#references) with respect to the
+The real coefficients ${\eta_{i,\alpha}}$ form a quasi-probability distribution {cite}`Pashayan_2015_PRL` with respect to the
 index $\alpha$. Their sum is normalized but, differently from standard probabilities, they can take negative values:
  
  $$ \sum_\alpha \eta_{i,\alpha}=1,  \qquad  \gamma_i = \sum_\alpha |\eta_{i, \alpha}| \ge 1.$$
@@ -128,29 +128,6 @@ $$\langle A \rangle_{\text{ideal}} = \gamma\,
 By averaging a finite number $N$ of samples we obtain an unbiased estimate of $\langle A \rangle_{\text{ideal}}$.
 Assuming a bounded observable $|A|\le 1$, the number of samples $N$
 necessary to approximate $\langle A\rangle_{\text{ideal}}$ within an absolute error $\delta$,
-scales as [[5]](#references):
+scales as {cite}`Takagi_2020_PRR`:
 
 $$ N \propto \frac{\gamma^2}{\delta^2}. $$
-
-
-
-## References
-<a id='references'></a>
-
-1. K. Temme, S. Bravyi, J. M. Gambetta, _Error Mitigation for Short-Depth Quantum Circuits_,
-[arXiv:1612.02058](https://arxiv.org/abs/1612.02058).
-
-2. S. Endo, S. C. Benjamin, Y. Li, _Practical Quantum Error Mitigation for Near-Future Applications_,
-[arXiv:1712.09271](https://arxiv.org/abs/1712.09271).
-
-3. S. Zhang, Y. Lu, K. Zhang, W. Chen, Y. Li, J.-N Zhang, K. Kim, _Error-Mitigated Quantum Gates Exceeding Physical Fidelities in a Trapped-Ion System_,
-[arXiv:1905.10135](https://arxiv.org/abs/1905.10135).
-
-4. H. Pashayan, J. J. Wallman, S. D. Bartlett, _Estimating outcome probabilities of quantum circuits using quasiprobabilities_,
-[arXiv:1503.07525](https://arxiv.org/abs/1503.07525).
-
-5. R. Takagi, _Optimal resource cost for error mitigation_,
-[arXiv:2006.12509](https://arxiv.org/abs/2006.12509).
-
-6. A. Mari, N. Shammah, W. J. Zeng, _Extending quantum probabilistic error cancellation by noise scaling_,
-[arXiv:2108.02237](https://arxiv.org/abs/2108.02237).
