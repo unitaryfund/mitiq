@@ -120,5 +120,4 @@ exact_result = np.real(np.trace(rho @ obs))
 print(f"Error without mitigation: {abs(exact_result - noisy_result):.{3}}")
 print(f"Error with mitigation (ZNE): {abs(exact_result - mitigated_result):.{3}}")
 ```
-Here we observe that applying ZNE reduces the error in the calcuation when 
-compared to the result without mitigation.
+Here we observe that the application of ZNE reduces the estimation error when compared to the unmitigated result.
