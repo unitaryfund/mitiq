@@ -68,10 +68,10 @@ $$
 \sum_{\vec{\alpha}} \eta_{\vec{\alpha}} \langle A_{\vec{\alpha}}\rangle_{\rm noisy}
 $$ 
 
-where 
+where we introduced the multi-index $\vec{\alpha}=(\alpha_1, \alpha_2, \dots ,\alpha_t)$ and
 
 $$ 
-\eta_{\vec{\alpha}} := \eta_{t, \alpha_t} \dots \eta_{2, \alpha_2} \eta_{1,\alpha_1}, 
+\eta_{\vec{\alpha}} := \Pi_{i=1}^t \eta_{i, \alpha_i}, 
 \quad  \langle A_{\vec{\alpha}}\rangle_{\rm noisy} :=  {\rm tr}[A \Phi_{\vec{\alpha}}(\rho_0)],
 \quad \Phi_{\vec{\alpha}} := \mathcal O_{t, \alpha_t} \circ \dots \circ \mathcal O_{2, \alpha_2} \circ \mathcal O_{1, \alpha_1}.
 $$
@@ -131,3 +131,11 @@ necessary to approximate $\langle A\rangle_{\text{ideal}}$ within an absolute er
 scales as {cite}`Takagi_2020_PRR`:
 
 $$ N \propto \frac{\gamma^2}{\delta^2}. $$
+
+The term $\delta^2$ in the denominator is due to the stochastic nature of quantum measurements
+and is present even when directly estimating an expectation value without error mitigation.
+The $\gamma^2$ factor instead represents the sampling overhead associated to PEC. 
+For weak noise and short circuits, $\gamma$ is typically small and PEC is applicable with a reasonable
+cost.
+On the contrary, if a circuit is too noisy or too deep, the value of $\gamma$ can be so large that PEC becomes
+unfeasible.
