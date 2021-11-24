@@ -41,7 +41,7 @@ circuit = benchmarks.generate_rb_circuits(
 print(circuit)
 ```
 
-## Fold the circuit
+## Select noise scaling method
 In Mitiq, folding functions input a circuit and a scale factor, i.e., 
 a floating point value which corresponds to (approximately) how much the length 
 of the circuit is scaled. The minimum scale factor is one (which corresponds to folding no gates). 
