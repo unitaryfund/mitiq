@@ -41,7 +41,7 @@ circuit = benchmarks.generate_rb_circuits(
 print(circuit)
 ```
 
-## Fold the circuit
+## Select noise scaling method
 In Mitiq, folding functions input a circuit and a scale factor, i.e., 
 a floating point value which corresponds to (approximately) how much the length 
 of the circuit is scaled. The minimum scale factor is one (which corresponds to folding no gates). 
@@ -67,41 +67,45 @@ Such functions always accept a quantum program, sometimes accept other arguments
 As an example, below we define a simple executor function which inputs a Cirq circuit, executes it on a noisy simulator, and returns the probability of the ground state.
 
 ```{code-cell} ipython3
-def executor(circuit, noise_level=0.01):
-    """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit
-    executed with depolarizing noise.
-    """
-    # Replace with code based on your frontend and backend.
-    mitiq_circuit, _ = convert_to_mitiq(circuit)
-    noisy_circuit = mitiq_circuit.with_noise(depolarize(p=noise_level))
-    rho = DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix
-    return rho[0, 0].real
+import numpy as np
+from cirq import Circuit, depolarize, DensityMatrixSimulator
+
+# initialize a backend
+SIMULATOR = DensityMatrixSimulator()
+# 5% depolarizing noise
+NOISE = 0.05
+
+
+def executor(circ: Circuit) -> float:
+   """Executes a circuit with depolarizing noise and
+   returns the expectation value of the projector |0><0|."""
+   circuit = circ.with_noise(depolarize(p=NOISE))
+   rho = SIMULATOR.simulate(circuit).final_density_matrix
+   obs = np.diag([1, 0])
+   expectation = np.real(np.trace(rho @ obs))
+   return expectation
 ```
 
-The `executor` can be used to evaluate noisy (unmitigated) expectation values.
+Calculate the noisy result
 
 ```{code-cell} ipython3
-# Compute the expectation value of the |0><0| observable.
-noisy_value = executor(circuit)
-ideal_value = executor(circuit, noise_level=0.0)      
-print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.5f}")
+noisy_result = executor(circuit)
 ```
 
 ## Select noise extrapolation method 
-Define a `FactoryObject` to select noise extrapolation method and set scale factors.
-For example, scale noise by 1 and 2, then extrapolate linearly to the zero noise limit.
+Define a `Factory` object to select the noise extrapolation method and the noise scale factors.
+For example, a linear extrapolation method with scale factors 1 and 2, can be initialized as follows:
 
 ```{code-cell} ipython3
 from mitiq.zne.inference import LinearFactory
 linear_fac = LinearFactory(scale_factors=[1.0, 2.0])
-```
 
 ## Apply ZNE
-Zero-noise extrapolation can be easily implemented with the function {func}`mitiq.zne.zne.execute_with_zne()`.
+Zero-noise extrapolation can be easily implemented with the function `mitiq.zne.zne.execute_with_zne()`.
 
 ```{code-cell} ipython3
 from mitiq import zne
-mitigated_result = zne.execute_with_zne(folded, executor, factory=linear_fac)
+mitigated_result = zne.execute_with_zne(circuit, executor, factory=linear_fac, scale_noise=fold_gates_at_random)
 ```
 
 Compare with exact result
@@ -116,6 +120,4 @@ exact_result = np.real(np.trace(rho @ obs))
 print(f"Error without mitigation: {abs(exact_result - noisy_result):.{3}}")
 print(f"Error with mitigation (ZNE): {abs(exact_result - mitigated_result):.{3}}")
 ```
-
-Here we observe that applying ZNE reduces the error in the calcuation when 
-compared to the result without mitigation.
+Here we observe that the application of ZNE reduces the estimation error when compared to the unmitigated result.
