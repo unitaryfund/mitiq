@@ -56,8 +56,8 @@ The function `fold_gates_from_left` will fold gates from the left (or start) of 
 circuit until the desired scale factor is reached.
 
 ```{code-cell} ipython3
-from mitiq.zne.scaling import fold_gates_from_left
-folded = fold_gates_from_left(circuit, scale_factor=2.)
+from mitiq.zne.scaling import fold_gates_at_random
+folded = fold_gates_at_random(circuit, scale_factor=2.)
 print("Folded circuit:", folded, sep="\n")
 ```
 
@@ -99,6 +99,7 @@ For example, a linear extrapolation method with scale factors 1 and 2, can be in
 ```{code-cell} ipython3
 from mitiq.zne.inference import LinearFactory
 linear_fac = LinearFactory(scale_factors=[1.0, 2.0])
+```
 
 ## Apply ZNE
 Zero-noise extrapolation can be easily implemented with the function `mitiq.zne.zne.execute_with_zne()`.
@@ -120,4 +121,5 @@ exact_result = np.real(np.trace(rho @ obs))
 print(f"Error without mitigation: {abs(exact_result - noisy_result):.{3}}")
 print(f"Error with mitigation (ZNE): {abs(exact_result - mitigated_result):.{3}}")
 ```
+
 Here we observe that the application of ZNE reduces the estimation error when compared to the unmitigated result.
