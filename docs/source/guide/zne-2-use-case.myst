@@ -4,16 +4,29 @@ jupytext:
     extension: .myst
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.4
+    jupytext_version: 1.10.3
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
 
 # When should I use ZNE?
+ 
+## Advantages of Zero Noise Extrapolation
+ZNE is a good choice when tomography is too costly
+It generally works well for simple noise models or low depth circuits [1]. 
 
-## Zero Noise Extrapolation for mitigating errors in energy landscape of a two-qubit variational circuit
+## Disadvantages of Zero Noise Extrapolation
+(Bias in extrapolation even in the limit of (large number of) shots)
+Noise-scaling method, set of scale factors, and extrapolation method may not be known initially, and user may have to iterate to find optimal settings
+"Performance guarantees are difficult in general"
+In real devices lowest error points may be too noisy for the extrapolation to match the behavior in the zero-noise limit 
+
+
+## Example
+Here we examine a simple example in which ZNE reduces errors in the 
+### Zero Noise Extrapolation for mitigating errors in energy landscape of a two-qubit variational circuit
 
 ```{code-cell} ipython3
 import matplotlib.pyplot as plt
@@ -56,6 +69,7 @@ To use error mitigation methods in Mitiq, we define an executor function which c
 
 
 # Observable to measure
+
 ```{code-cell} ipython3
 z = np.diag([1, -1])
 hamiltonian = np.kron(z, z)
@@ -143,17 +157,20 @@ plt.show()
 
 Computing the mitigated landscape
 We now repeat the same task but use Mitiq to mitigate errors. We initialize a RichardsonFactory with scale factors [1, 3, 5] and we get a mitigated executor as follows.
+
 ```{code-cell} ipython3
 fac = RichardsonFactory(scale_factors=[1, 3, 5])
 mitigated_executor = mitigate_executor(executor_with_noise, factory=fac)
 ```
 
 We then run the same code above to compute the energy landscape, but this time use the mitigated_executor instead of just the executor.
+
 ```{code-cell} ipython3
 mitigated_expectations = [mitigated_executor(variational_circuit(g)) for g in gammas]
 ```
 
 Let us visualize the mitigated landscape alongside the unmitigated and noiseless landscapes.
+
 ```{code-cell} ipython3
 plt.figure(figsize=(8, 6))
 plt.plot(gammas, noiseless_expectations, color="g", linewidth=3, label="Noiseless")
@@ -170,6 +187,7 @@ plt.show()
 Noise usually tends to flatten expectation values towards a constant. Therefore error mitigation can be used to increase the visibility the landscape and this fact can simplify the energy minimization which is required in most variational algorithms such as VQE or QAOA.
 
 We also observe that the minimum of mitigated energy approximates well the theoretical ground state which is equal to −1. Indeed:
+
 ```{code-cell} ipython3
 print(f"Minimum of the noisy landscape: {round(min(expectations), 3)}")
 print(f"Minimum of the mitigated landscape: {round(min(mitigated_expectations), 3)}")
