@@ -41,26 +41,6 @@ circuit = benchmarks.generate_rb_circuits(
 print(circuit)
 ```
 
-## Select noise scaling method
-In Mitiq, folding functions input a circuit and a scale factor, i.e., 
-a floating point value which corresponds to (approximately) how much the length 
-of the circuit is scaled. The minimum scale factor is one (which corresponds to folding no gates). 
-A scale factor of three corresponds to folding all gates locally. 
-Scale factors beyond three begin to fold gates more than once.
-
-+++
-
-For local folding, there is a degree of freedom for which gates to fold first. 
-The order in which gates are folded can have an important effect on how the noise is scaled. 
-The function `fold_gates_from_left` will fold gates from the left (or start) of the 
-circuit until the desired scale factor is reached.
-
-```{code-cell} ipython3
-from mitiq.zne.scaling import fold_gates_at_random
-folded = fold_gates_at_random(circuit, scale_factor=2.)
-print("Folded circuit:", folded, sep="\n")
-```
-
 ## Define the executor function
 We refer to a user-defined function that inputs a quantum program and executes it on a backend as an executor. 
 Such functions always accept a quantum program, sometimes accept other arguments, and always return an expectation value as a float. 
@@ -91,7 +71,29 @@ ideal_value = executor(circuit, noise_level=0.0)
 print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.5f}")
 ```
 
-## Select noise extrapolation method 
+## Select a noise scaling method
+In Mitiq, folding functions input a circuit and a scale factor, i.e., 
+a floating point value which corresponds to (approximately) how much the length 
+of the circuit is scaled. The minimum scale factor is one (which corresponds to folding no gates). 
+A scale factor of three corresponds to folding all gates locally. 
+Scale factors beyond three begin to fold gates more than once.
+
++++
+
+For local folding, there is a degree of freedom for which gates to fold first. 
+The order in which gates are folded can have an important effect on how the noise is scaled. 
+The function `fold_gates_from_left` will fold gates from the left (or start) of the 
+circuit until the desired scale factor is reached.
+
+```{code-cell} ipython3
+from mitiq.zne.scaling import fold_gates_at_random
+folded = fold_gates_at_random(circuit, scale_factor=2.)
+print("Folded circuit:", folded, sep="\n")
+```
+
+
+
+## Select a noise extrapolation method 
 Define a `Factory` object to select the noise extrapolation method and the noise scale factors.
 For example, a linear extrapolation method with scale factors 1 and 2, can be initialized as follows:
 
@@ -105,7 +107,8 @@ Zero-noise extrapolation can be easily implemented with the function `mitiq.zne.
 
 ```{code-cell} ipython3
 from mitiq import zne
-mitigated_result = zne.execute_with_zne(circuit, executor, factory=linear_fac, scale_noise=fold_gates_at_random)
+mitigated_result = zne.execute_with_zne(circuit, executor, factory=linear_fac, 
+ scale_noise=fold_gates_at_random)
 ```
 
 ```{code-cell} ipython3
