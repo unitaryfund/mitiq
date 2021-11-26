@@ -68,28 +68,27 @@ As an example, below we define a simple executor function which inputs a Cirq ci
 
 ```{code-cell} ipython3
 import numpy as np
-from cirq import Circuit, depolarize, DensityMatrixSimulator
+from cirq import DensityMatrixSimulator, depolarize
+from mitiq.interface import convert_to_mitiq
 
-# initialize a backend
-SIMULATOR = DensityMatrixSimulator()
-# 5% depolarizing noise
-NOISE = 0.05
-
-
-def executor(circ: Circuit) -> float:
-   """Executes a circuit with depolarizing noise and
-   returns the expectation value of the projector |0><0|."""
-   circuit = circ.with_noise(depolarize(p=NOISE))
-   rho = SIMULATOR.simulate(circuit).final_density_matrix
-   obs = np.diag([1, 0])
-   expectation = np.real(np.trace(rho @ obs))
-   return expectation
+def executor(circuit, noise_level=0.01):
+    """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit
+    executed with depolarizing noise.
+    """
+    # Replace with code based on your frontend and backend.
+    mitiq_circuit, _ = convert_to_mitiq(circuit)
+    noisy_circuit = mitiq_circuit.with_noise(depolarize(p=noise_level))
+    rho = DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix
+    return rho[0, 0].real
 ```
 
-Calculate the noisy result
+The `executor` can be used to evaluate noisy (unmitigated) expectation values.
 
 ```{code-cell} ipython3
-noisy_result = executor(circuit)
+# Compute the expectation value of the |0><0| observable.
+noisy_value = executor(circuit)
+ideal_value = executor(circuit, noise_level=0.0)      
+print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.5f}")
 ```
 
 ## Select noise extrapolation method 
@@ -109,17 +108,8 @@ from mitiq import zne
 mitigated_result = zne.execute_with_zne(circuit, executor, factory=linear_fac, scale_noise=fold_gates_at_random)
 ```
 
-Compare with exact result
-
 ```{code-cell} ipython3
-rho = SIMULATOR.simulate(circuit).final_density_matrix
-obs = np.diag([1, 0])
-exact_result = np.real(np.trace(rho @ obs))
-```
-
-```{code-cell} ipython3
-print(f"Error without mitigation: {abs(exact_result - noisy_result):.{3}}")
-print(f"Error with mitigation (ZNE): {abs(exact_result - mitigated_result):.{3}}")
+print(f"Error with mitigation (ZNE): {abs(ideal_value - mitigated_result):.{3}}")
 ```
 
 Here we observe that the application of ZNE reduces the estimation error when compared to the unmitigated result.
