@@ -3,6 +3,8 @@
 ```{nbgallery}
 Mirror circuit benchmark improved with zero-noise extrapolation on AWS Braket <braket_mirror_circuit.md>
 Zero-noise extrapolation on IBMQ backends<ibmq-backends.myst>
+Zero-noise extrapolation on PyQuil parametric programs <pyquil_demo.myst>
+Variational quantum eigensolver improved with zero-noise extrapolation <vqe-pyquil-demo.myst>
 Variational circuit mitigation with zero-noise extrapolation <simple_landscape.myst>
 MaxCut benchmark with zero-noise extrapolation <maxcut-demo.myst>
 Understanding probabilistic error cancellation (PEC) <pec-tutorial.myst>
