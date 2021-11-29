@@ -13,11 +13,17 @@ kernelspec:
 
 # How do I use ZNE?
 
-Zero noise extrapolation is an error mitigation technique in which an expectation value is computed at different noise levels and, as a second step, the ideal expectation value is inferred extrapolating the measured results to the zero-noise limit.
+Zero noise extrapolation is an error mitigation technique in which an expectation value 
+is computed at different noise levels and, as a second step, the ideal expectation value 
+is inferred extrapolating the measured results to the zero-noise limit (see [What is the 
+theory behind ZNE?](zne-5-theory.myst)).
 
-Both steps — noise scaling and extrapolation — can be applied with Mitiq. The corresponding sub-modules are `mitiq.zne.scaling` and `mitiq.zne.inference`.
+Both steps — noise scaling and extrapolation — can be applied with Mitiq. The 
+corresponding sub-modules are [`mitiq.zne.scaling`](https://mitiq.readthedocs.io/en/latest/apidoc.html#module-mitiq.zne.scaling.folding) 
+and [`mitiq.zne.inference`](https://mitiq.readthedocs.io/en/latest/apidoc.html#module-mitiq.zne.inference).
 
-The following code is compatible with the multiple frontends. The next code cell can be used for selecting one of them.
+The following code is compatible with the multiple frontends. 
+The next code cell can be used for selecting one of them.
 
 ```{code-cell} ipython3
 frontend = "cirq"  # Supported: "cirq", "qiskit", "pyquil", "braket", "pennylane".
@@ -42,9 +48,13 @@ print(circuit)
 ```
 
 ## Define the executor function
-We refer to a user-defined function that inputs a quantum program and executes it on a backend as an executor. 
-Such functions always accept a quantum program, sometimes accept other arguments, and always return an expectation value as a float. 
-As an example, below we define a simple executor function which inputs a Cirq circuit, executes it on a noisy simulator, and returns the probability of the ground state.
+We refer to a user-defined function that inputs a quantum program and executes it on a 
+backend as an executor. Such functions always accept a quantum program, sometimes 
+accept other arguments, and always return an expectation value as a float. As an 
+example, below we define a simple executor function which inputs a Cirq circuit, 
+executes it on a noisy simulator, and returns the probability of the ground state. 
+See the [Executors](guide-executors.myst) section for more information on how to 
+define more advanced executors.
 
 ```{code-cell} ipython3
 import numpy as np
@@ -62,7 +72,7 @@ def executor(circuit, noise_level=0.01):
     return rho[0, 0].real
 ```
 
-The `executor` can be used to evaluate noisy (unmitigated) expectation values.
+The [`executor`](https://mitiq.readthedocs.io/en/latest/guide/guide-executors.html?highlight=mitiq.executor#executors) can be used to evaluate noisy (unmitigated) expectation values.
 
 ```{code-cell} ipython3
 # Compute the expectation value of the |0><0| observable.
@@ -74,16 +84,21 @@ print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.5f}")
 ## Select a noise scaling method
 In Mitiq, folding functions input a circuit and a scale factor, i.e., 
 a floating point value which corresponds to (approximately) how much the length 
-of the circuit is scaled. The minimum scale factor is one (which corresponds to folding no gates). 
-A scale factor of three corresponds to folding all gates locally. 
+of the circuit is scaled. The minimum scale factor is one (which corresponds to 
+folding no gates). A scale factor of three corresponds to folding all gates locally. 
 Scale factors beyond three begin to fold gates more than once.
 
 +++
 
 For local folding, there is a degree of freedom for which gates to fold first. 
-The order in which gates are folded can have an important effect on how the noise is scaled. 
-The function `fold_gates_from_left` will fold gates from the left (or start) of the 
-circuit until the desired scale factor is reached.
+The order in which gates are folded can have an important effect on how the noise is 
+scaled. The function [`mitiq.zne.scaling.folding.fold_gates_at_random()`](https://mitiq.readthedocs.io/en/latest/apidoc.html#mitiq.zne.scaling.folding.fold_gates_at_random)
+returns a new folded circuit by applying the map G -> G G^dag G to a subset of gates 
+of the input circuit, starting with gates at the right (end) of the circuit.
+
+The folded circuit has a number of gates approximately equal to scale_factor * n where 
+n is the number of gates in the input circuit. See the section on [noise scaling by 
+unitary folding](zne-5-theory.myst) for more details.
 
 ```{code-cell} ipython3
 from mitiq.zne.scaling import fold_gates_at_random
@@ -91,11 +106,13 @@ folded = fold_gates_at_random(circuit, scale_factor=2.)
 print("Folded circuit:", folded, sep="\n")
 ```
 
-
-
 ## Select a noise extrapolation method 
-Define a `Factory` object to select the noise extrapolation method and the noise scale factors.
-For example, a linear extrapolation method with scale factors 1 and 2, can be initialized as follows:
+Define a `Factory` object to select the noise extrapolation method and the noise scale 
+factors. The section on [`Factory Objects`](zne-3-options.myst) contains more details on the available 
+noise extrapolation methods in Mitiq. 
+
+For example, a linear extrapolation method with scale factors 1 and 2, can be 
+initialized as follows:
 
 ```{code-cell} ipython3
 from mitiq.zne.inference import LinearFactory
@@ -103,7 +120,8 @@ linear_fac = LinearFactory(scale_factors=[1.0, 2.0])
 ```
 
 ## Apply ZNE
-Zero-noise extrapolation can be easily implemented with the function `mitiq.zne.zne.execute_with_zne()`.
+Zero-noise extrapolation can be easily implemented with the function 
+[`mitiq.zne.zne.execute_with_zne()`](https://mitiq.readthedocs.io/en/latest/apidoc.html#mitiq.zne.zne.execute_with_zne).
 
 ```{code-cell} ipython3
 from mitiq import zne
@@ -115,4 +133,5 @@ mitigated_result = zne.execute_with_zne(circuit, executor, factory=linear_fac,
 print(f"Error with mitigation (ZNE): {abs(ideal_value - mitigated_result):.{3}}")
 ```
 
-Here we observe that the application of ZNE reduces the estimation error when compared to the unmitigated result.
+Here we observe that the application of ZNE reduces the estimation error when compared 
+to the unmitigated result.
