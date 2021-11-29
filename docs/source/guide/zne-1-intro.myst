@@ -49,8 +49,7 @@ print(circuit)
 
 ## Define the executor function
 We refer to a user-defined function that inputs a quantum program and executes it on a 
-backend as an executor. Such functions always accept a quantum program, sometimes 
-accept other arguments, and always return an expectation value as a float. As an 
+backend as an executor. As an 
 example, below we define a simple executor function which inputs a Cirq circuit, 
 executes it on a noisy simulator, and returns the probability of the ground state. 
 See the [Executors](guide-executors.myst) section for more information on how to 
