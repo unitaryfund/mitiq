@@ -6,10 +6,12 @@
 
 This patch release fixes two bugs:
 
-- PEC could only be used with Cirq circuits, not `mitiq.QPROGRAM`. Fixed in gh-1018.
-- CDR classically simulated the wrong circuits (to do the regression). Fixed in gh-1026.
+- Bug: PEC could only be used with `cirq.Circuit`s, not `mitiq.QPROGRAM`, due to a missing conversion.
+    - Fix: PEC can now be used with any `mitiq.QPROGRAM` (gh-1018).
+- Bug: CDR classically simulated the wrong circuits when doing regression. 
+    - Fix: The correct circuits are now classically simulated (gh-1026).
 
-A smaller bug preventing `mitiq.interface.mitiq_qiskit` from modifying circuits is also fixed.
+Also fixes a smaller bug where some tools in `mitiq.interface.mitiq_qiskit` modified `qiskit.QuantumCircuit`s when they shouldn't.
 
 ### All Changes
 
