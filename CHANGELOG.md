@@ -1,5 +1,31 @@
 # Changelog
 
+## Version 0.11.1  (November 30th, 2021)
+
+### Summary
+
+This patch release fixes two bugs:
+
+- PEC could only be used with Cirq circuits, not `mitiq.QPROGRAM`. Fixed in gh-1018.
+- CDR classically simulated the wrong circuits (to do the regression). Fixed in gh-1026.
+
+A smaller bug preventing `mitiq.interface.mitiq_qiskit` from modifying circuits is also fixed.
+
+### All Changes
+
+- Update scipy requirement from ~=1.7.1 to ~=1.7.2 (@dependabot, gh-1017)
+- CDR: Run the training circuits on the simulator (@rmlarose and @andreamari, gh-1026).
+- Update scipy requirement from ~=1.7.1 to ~=1.7.2 (@dependabot, gh-1017)
+- Update pydata-sphinx-theme requirement from ~=0.7.1 to ~=0.7.2 (@dependabot, gh-1024)
+- Update qiskit requirement from ~=0.31.0 to ~=0.32.0 (@dependabot, gh-1025)
+- Update pydata-sphinx-theme requirement from ~=0.7.1 to ~=0.7.2 (@dependabot, gh-1024)
+- [Bug fix] Avoid circuit mutation in qiskit executors (@andreamari, gh-1019)
+- [Bug fix] Add back-conversions in execute_with_pec (@andreamari, gh-1018) 
+- Increase shots in zne tests with shot_list (@andreamari, gh-1020)
+- Update pennylane requirement from ~=0.18.0 to ~=0.19.0 (@nathanshammah, gh-1022)
+- Add workflow figures and technique descriptions (@nathanshammah, gh-953)
+- Prepare to release 0.11.0 (@rmlarose, gh-1010)
+
 ## Version 0.11.0  (November 3rd, 2021)
 
 ### Summary
