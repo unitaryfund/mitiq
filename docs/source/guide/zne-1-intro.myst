@@ -81,23 +81,17 @@ print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.5f}")
 ```
 
 ## Select a noise scaling method
-In Mitiq, folding functions input a circuit and a scale factor, i.e., 
-a floating point value which corresponds to (approximately) how much the length 
-of the circuit is scaled. The minimum scale factor is one (which corresponds to 
-folding no gates). A scale factor of three corresponds to folding all gates locally. 
-Scale factors beyond three begin to fold gates more than once.
+In Mitiq, one can select a noise scaling method via *noise scaling functions*.
+A noise scaling function takes as input a circuit and a real scale factor and
+returns a new circuit. The returned circuit is equivalent to the input one (if executed on a noiseless backend),
+but is more sensitive to noise when executed on a real noisy backend. In practice, by applying a noise
+scaling function before the execution of a circuit, one can indirectly scale up the effect of noise. 
+See [What additional options are available in ZNE?](zne-3-options.myst) for more details.
 
-+++
-
-For local folding, there is a degree of freedom for which gates to fold first. 
-The order in which gates are folded can have an important effect on how the noise is 
-scaled. The function [`mitiq.zne.scaling.folding.fold_gates_at_random()`](https://mitiq.readthedocs.io/en/latest/apidoc.html#mitiq.zne.scaling.folding.fold_gates_at_random)
-returns a new folded circuit by applying the map G -> G G^dag G to a subset of gates 
-of the input circuit, starting with gates at the right (end) of the circuit.
-
-The folded circuit has a number of gates approximately equal to scale_factor * n where 
-n is the number of gates in the input circuit. See the section on [noise scaling by 
-unitary folding](zne-5-theory.myst) for more details.
+For example, the function {func}`.fold_gates_at_random()` applies the *unitary folding* map $G -> G G^\dagger G$
+to a random subset of gates of the input circuit.
+The folded circuit is more sensitive to gate errors since it has a number of gates approximately
+equal to `scale_factor * n`, where `n` is the number of gates in the input circuit. 
 
 ```{code-cell} ipython3
 from mitiq.zne.scaling import fold_gates_at_random
