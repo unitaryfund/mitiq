@@ -407,3 +407,8 @@ the standard deviation of the unbiased samples, i.e., the square root of the mea
 ```{code-cell} ipython3
 pec_data["pec_error"]
 ```
+Instead of the error printed above, one could use more advanced statistical techniques to estimate the
+uncertainty of the PEC result. For example, given the raw samples contained in  `pec_data["unbiased_estimators"]`,
+one can apply a [bootstrapping](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)) approach. Alternatively, 
+a simpler but computationally more expensive approach is to perform multiple PEC estimations of the same expectation
+value and compute the standard deviation of the results.
