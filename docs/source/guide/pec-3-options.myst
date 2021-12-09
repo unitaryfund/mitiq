@@ -249,7 +249,7 @@ h_rep.distribution()
 
 +++
 
-The second main step of the PEC is to make use of the previously defined {class}`.OperationRepresentation`s to estimate
+The second main step of PEC is to make use of the previously defined {class}`.OperationRepresentation`s to estimate
 expectation values with respect to a quantum state prepared by a circuit of interest.
 In the previous section we defined the representation of the Hadamard gate.
 So, for simplicity, we consider a circuit that contains only Hadamard gates.
