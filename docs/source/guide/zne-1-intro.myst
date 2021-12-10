@@ -95,6 +95,7 @@ equal to `scale_factor * n`, where `n` is the number of gates in the input circu
 
 ```{code-cell} ipython3
 from mitiq.zne.scaling import fold_gates_at_random
+
 folded = fold_gates_at_random(circuit, scale_factor=2.)
 print("Folded circuit:", folded, sep="\n")
 ```
