@@ -1,0 +1,96 @@
+---
+jupytext:
+  text_representation:
+    extension: .myst
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.11.1
+kernelspec:
+  display_name: Python 3 (ipykernel)
+  language: python
+  name: python3
+---
+
+# Compose Techniques
+
++++
+
+It is possible to stack different quantum error mitigation techniques to the same quantum program.
+
+
+## Composing Readout Error Mitigation and ZNE
+
+We can apply ZNE combined with readout error mitigation (REM). REM can be inserted between the noise-scaling and the inference part of ZNE.
+Firstly, one applies noise scaling and sends the circuit to the backend for execution.
+Secondly, post-selection can be applied to the readout bitstrings, using {func}`~rem.post_select.post_select` and {class}`~mitiq.rem.measurement_result.MeasurementResult`, to discard the bitstrings that do not have a given property, e.g., a given parity that is expected from running on an ideal device the quantum circuit, a parity that can itself be inherited from the symmetry of the problem (e.g., a given simulated Hamiltonian). Thirdly, we can then apply inference only to the selected bitstrings.
+
+
+## Composing PEC and ZNE
+
+ZNE can be applied after PEC with the use of decorators.
+
+```{code-cell} ipython3
+from mitiq import QPROGRAM
+from mitiq import pec
+from mitiq import zne
+from mitiq.zne import zne_decorator
+from mitiq.pec import pec_decorator
+import cirq
+import numpy as np
+```
+
+```{code-cell} ipython3
+q = cirq.LineQubit(0)
+
+circuit = cirq.Circuit([cirq.H.on(q)] * 5)
+print("Circuit:", circuit, sep="\n")
+```
+
+```{code-cell} ipython3
+noisy_x = pec.NoisyOperation(
+    circuit=cirq.Circuit(cirq.X.on(q)),
+    channel_matrix=np.random.randn(4, 4),
+)
+
+noisy_z = pec.NoisyOperation(
+    circuit=cirq.Circuit(cirq.Z.on(q)),
+    channel_matrix=np.random.randn(4, 4),
+)
+```
+
+```{code-cell} ipython3
+h_rep = pec.OperationRepresentation(
+    ideal=cirq.Circuit(cirq.H.on(q)),
+    basis_expansion = {noisy_x: 0.52, noisy_z: -0.48}
+)
+```
+
+```{code-cell} ipython3
+@pec.pec_decorator(representations=[h_rep], num_samples=10)
+@zne.zne_decorator(
+    factory=zne.inference.ExpFactory(scale_factors=[1, 3, 5, 7]),
+    scale_noise=zne.scaling.fold_gates_at_random
+)
+def execute(circuit: cirq.Circuit) -> float:
+    return cirq.DensityMatrixSimulator().simulate(
+        circuit.with_noise(cirq.depolarize(p=0.01))
+    ).final_density_matrix[0, 0].real
+
+
+zne_then_pec_value = execute(circuit)
+print("ZNE then PEC value:", zne_then_pec_value)
+```
+
+Note the example above does not turn out to be accurate (due to a bad representation for PEC).
+
+```{code-cell} ipython3
+from mitiq.pec.types import NoisyOperation
+```
+
+```{code-cell} ipython3
+help(NoisyOperation(circuit, channel_matrix=None))
+```
+
+```{code-cell} ipython3
+
+```
