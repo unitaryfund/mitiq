@@ -23,11 +23,15 @@ converge to the ideal expectation values.
 
 ## Disadvantages
 
-PEC is a noise-aware technique that can be applied only if
-the **full tomographic knowledge** of the hardware gates is known. Indeed, in order to represent
+PEC is a noise-aware technique that converges to the ideal noiseless results only if we have the full
+tomographic knowledge of the hardware gates. Indeed, in order to represent
 ideal gates as linear combination of noisy gates, one typically needs to know the super-operator
 matrix associated to each noisy gate.
 
 Another practical problem of PEC is that it involves the execution of many different circuits.
 This typically requires more clock time compared to the repeated execution of equal circuits.
-Batched execution of circuits can alleviate this problem.
+Batched execution of circuits, if supported by the hardware provider, can alleviate this problem to some extent.
+
+```{code-cell} ipython3
+
+```
