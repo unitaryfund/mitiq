@@ -83,14 +83,3 @@ print("ZNE then PEC value:", zne_then_pec_value)
 
 Note the example above does not turn out to be accurate (due to a bad representation for PEC).
 
-```{code-cell} ipython3
-from mitiq.pec.types import NoisyOperation
-```
-
-```{code-cell} ipython3
-help(NoisyOperation(circuit, channel_matrix=None))
-```
-
-```{code-cell} ipython3
-
-```
