@@ -50,7 +50,7 @@ print(circuit)
 ## Define the executor function
 We refer to a user-defined function that inputs a quantum program and executes it on a 
 backend as an executor. As an 
-example, below we define a simple executor function which inputs a Cirq circuit, 
+example, below we define a simple executor function which inputs a circuit, 
 executes it on a noisy simulator, and returns the probability of the ground state. 
 See the [Executors](guide-executors.myst) section for more information on how to 
 define more advanced executors.
