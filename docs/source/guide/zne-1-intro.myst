@@ -110,6 +110,7 @@ initialized as follows:
 
 ```{code-cell} ipython3
 from mitiq.zne.inference import LinearFactory
+
 linear_fac = LinearFactory(scale_factors=[1.0, 2.0])
 ```
 
