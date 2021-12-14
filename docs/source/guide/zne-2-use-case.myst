@@ -14,19 +14,26 @@ kernelspec:
 # When should I use ZNE?
  
 ## Advantages 
-ZNE generally works well for simple noise models or low depth circuits [32](https://mitiq.readthedocs.io/en/latest/zz_bibliography.html). The main 
-advantage of ZNE is that knowledge of the noise model is not required to apply this 
-technique, so it can be a good option in situations where tomography is impractical.
+
+ZNE generally works well for circuits that have low depth and/or noise that 
+can be described by a simple model 
+[32](https://mitiq.readthedocs.io/en/latest/zz_bibliography.html). 
+The main advantage of ZNE is that knowledge of the noise model is not required to 
+apply this technique, so it can be a good option in situations where tomography is 
+impractical.
   
 
 ## Disadvantages 
-(Bias in extrapolation even in the limit of (large number of) shots)
-Noise-scaling method, set of scale factors, and extrapolation method may not be known initially, and user may have to iterate to find optimal settings
-"Performance guarantees are difficult in general"
-In real devices lowest error points may be too noisy for the extrapolation to match the behavior in the zero-noise limit 
+
+In real devices, the lowest error points may be too noisy for the extrapolation to 
+match the behavior in the zero-noise limit. Also, the extrapolation can introduce a 
+large bias in the results. 
 
 
 ## Example
+
+For a simple example in which the application of ZNE reduces the estimation error when 
+compared to the unmitigated result, see:
 
 [Zero Noise Extrapolation for mitigating errors in energy landscape of a two-qubit 
 variational circuit](https://mitiq.readthedocs.io/en/latest/examples/simple_landscape.html)
