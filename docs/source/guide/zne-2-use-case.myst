@@ -4,11 +4,36 @@ jupytext:
     extension: .myst
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.4
+    jupytext_version: 1.10.3
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
 
 # When should I use ZNE?
+ 
+## Advantages 
+
+ZNE generally works well for circuits that have low depth and/or noise that 
+can be described by a simple model 
+[32](https://mitiq.readthedocs.io/en/latest/zz_bibliography.html). 
+The main advantage of ZNE is that knowledge of the noise model is not required to 
+apply this technique, so it can be a good option in situations where tomography is 
+impractical.
+  
+
+## Disadvantages 
+
+In real devices, the lowest error points may be too noisy for the extrapolation to 
+match the behavior in the zero-noise limit. Also, the extrapolation can introduce a 
+large bias in the results. 
+
+
+## Example
+
+For a simple example in which the application of ZNE reduces the estimation error when 
+compared to the unmitigated result, see:
+
+[Zero Noise Extrapolation for mitigating errors in energy landscape of a two-qubit 
+variational circuit](https://mitiq.readthedocs.io/en/latest/examples/simple_landscape.html)
