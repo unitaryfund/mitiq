@@ -1,11 +1,9 @@
 # Third-party integration.
-qiskit-terra~=0.18.2
-qiskit-aer~=0.8.2
-qiskit-ibmq-provider~=0.16.0
+qiskit~=0.32.1
 pyquil~=3.0.0
 pennylane-qiskit~=0.20.0
-pennylane~=0.18.0
-amazon-braket-sdk~=1.9.5
+pennylane~=0.19.1
+amazon-braket-sdk~=1.11.0
 
 # Unit tests, coverage, and formatting/style.
 pytest-xdist[psutil]~=2.4.0
@@ -19,7 +17,7 @@ sphinxcontrib-bibtex~=2.4.1
 sphinx-copybutton~=0.4.0
 sphinx-autodoc-typehints~=1.12.0
 myst-nb~=0.12.3
-pydata-sphinx-theme~=0.7.1
+pydata-sphinx-theme~=0.7.2
 jupytext==1.11.1
 sphinx-gallery
 nbsphinx

@@ -13,4 +13,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from mitiq.executor.executor import Executor, generate_collected_executor
+from mitiq.executor.executor import Executor

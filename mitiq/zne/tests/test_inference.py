@@ -307,45 +307,6 @@ def test_run_sequential_and_batched(factory, batched):
     )
 
 
-@mark.parametrize(
-    "factory",
-    (
-        LinearFactory,
-        RichardsonFactory,
-        FakeNodesFactory,
-        PolyFactory,
-        ExpFactory,
-        PolyExpFactory,
-    ),
-)
-def test_run_batched_with_keyword_args_list(factory):
-    scale_factors = np.linspace(1.0, 10.0, num=20)
-    shot_list = [int(scale) for scale in scale_factors]
-
-    if factory is PolyFactory or factory is PolyExpFactory:
-        fac = factory(
-            scale_factors=scale_factors, order=2, shot_list=shot_list
-        )
-    else:
-        fac = factory(scale_factors=scale_factors, shot_list=shot_list)
-
-    # Expectation values haven't been computed at any scale factors yet
-    assert isinstance(fac.get_expectation_values(), np.ndarray)
-    assert len(fac.get_expectation_values()) == 0
-
-    # Compute expectation values at all the scale factors
-    def executor(circuits, kwargs_list) -> List[float]:
-        assert len(circuits) == len(kwargs_list)
-        return [1.0] * len(circuits)
-
-    fac.run(cirq.Circuit(), executor, scale_noise=lambda circ, _: circ)
-
-    assert isinstance(fac.get_expectation_values(), np.ndarray)
-    assert np.allclose(
-        fac.get_expectation_values(), np.ones_like(scale_factors)
-    )
-
-
 @mark.parametrize("test_f", [f_lin, f_non_lin])
 def test_richardson_extr(test_f: Callable[[float], float]):
     """Test of the Richardson's extrapolator."""

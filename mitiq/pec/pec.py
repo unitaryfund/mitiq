@@ -16,26 +16,24 @@
 """High-level probabilistic error cancellation tools."""
 
 from typing import (
-    cast,
     Optional,
     Callable,
-    List,
     Union,
     Sequence,
     Tuple,
     Dict,
     Any,
+    cast,
 )
 from functools import wraps
 import warnings
-
 import numpy as np
 
-from mitiq import QPROGRAM, Observable
-from mitiq._typing import QuantumResult
-from mitiq.executor import generate_collected_executor
+from cirq import Circuit as CirqCircuit
+
+from mitiq import Executor, Observable, QPROGRAM, QuantumResult
 from mitiq.pec import sample_circuit, OperationRepresentation
-from mitiq.interface import convert_to_mitiq
+from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 
 
 class LargeSampleWarning(Warning):
@@ -53,7 +51,7 @@ _LARGE_SAMPLE_WARN = (
 
 def execute_with_pec(
     circuit: QPROGRAM,
-    executor: Callable[[QPROGRAM], QuantumResult],
+    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     observable: Optional[Observable] = None,
     *,
     representations: Sequence[OperationRepresentation],
@@ -126,7 +124,7 @@ def execute_with_pec(
             f" but precision is {precision}."
         )
 
-    converted_circuit, _ = convert_to_mitiq(circuit)
+    converted_circuit, input_type = convert_to_mitiq(circuit)
 
     # Get the 1-norm of the circuit quasi-probability representation
     _, _, norm = sample_circuit(
@@ -149,18 +147,17 @@ def execute_with_pec(
         num_samples=num_samples,
     )
 
+    # Convert back to the original type
+    sampled_circuits = [
+        convert_from_mitiq(cast(CirqCircuit, c), input_type)
+        for c in sampled_circuits
+    ]
+
     # Execute all sampled circuits
-    if observable is not None:
-        # TODO: Use batching.
-        results = [
-            observable.expectation(circuit, executor)
-            for circuit in sampled_circuits
-        ]
-    else:
-        collected_executor = generate_collected_executor(
-            executor, force_run_all=force_run_all
-        )
-        results = cast(List[float], collected_executor(sampled_circuits))
+    if not isinstance(executor, Executor):
+        executor = Executor(executor)
+
+    results = executor.evaluate(sampled_circuits, observable, force_run_all)
 
     # Evaluate unbiased estimators [Temme2017] [Endo2018] [Takagi2020]
     unbiased_estimators = [

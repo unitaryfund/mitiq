@@ -10,13 +10,13 @@ kernelspec:
   language: python
   name: python3
 ---
-
+(label-pec-example)=
 # Probabilistic Error Cancellation (PEC) with Mitiq
 
 +++
 
 This is step-by-step tutorial on how to use the Mitiq toolchain for implementing **probabilistic error cancellation (PEC)** [[1-3]](#references).
-We use the [Cirq](https://github.com/quantumlib/cirq) library, but other frontends could be used in a similar way. 
+We use the [Cirq](https://github.com/quantumlib/cirq) library, but other frontends could be used in a similar way.
 
 If you are only interested in **applying** PEC with Mitiq, see the quick start
 [here](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#probabilistic-error-cancellation).
@@ -81,7 +81,7 @@ where $\{\eta_j\}$ are real coefficients and $\{\tilde{\mathcal  G}_j\}$ are the
 
 For example, if the implementable gates are equal to any single-qubit unitary followed by a depolarizing channel [[4]](#references):
 
-$$ \tilde{\mathcal G} =\mathcal E \circ \mathcal G  \quad 
+$$ \tilde{\mathcal G} =\mathcal E \circ \mathcal G  \quad
 \text{where,}\quad \mathcal E(\rho) =  (1 - \epsilon ) \rho   + \epsilon I/2 ,$$
 
 then, it is easy to show [[1][4][6]](#references) that the following representation holds **for any single-qubit gate $\mathcal G$**:
@@ -164,7 +164,7 @@ x_rep = OperationRepresentation(ideal=ideal_operation, basis_expansion=basis_exp
 
 print(
     f"This is the representation of the ideal operation {ideal_operation}, "
-    "assuming a basis of implementable operations\n" 
+    "assuming a basis of implementable operations\n"
     f"with depolarizing noise of strength p={BASE_NOISE}:\n\n",
     x_rep
 )
@@ -190,7 +190,7 @@ assert x_rep_direct == x_rep
 
 ### Numerically finding optimal representations with arbitrary noise models
 For a general noise model, there are no built-in functions for generating quasi-probability representations.
-Moreover, usually, there are no analytical formulas that can be applied to get a representation. 
+Moreover, usually, there are no analytical formulas that can be applied to get a representation.
 In this general case, given a set of `NoisyOperation(s)` initialized with the associated numerical super-operator
 (_i.e._, with the `channel_matrix` argument), one can numerically find a quasi-probability representation of an arbitrary ideal gate.
 In general, the representation is not unique and the optimal choice is the one minimizing the one-norm of the quasi-probability $\gamma=\sum_j |\eta_j|$.
@@ -221,7 +221,7 @@ Basically, one can use a Monte Carlo importance sampling estimation of the exact
 in such a way that more weight (_importance_) is given to the coefficients $\eta_j$ with larger magnitude.
 
 This can be obtained via the probability distribution $p(j):=|\eta_j|/ \gamma$, where $\gamma=\sum_j |\eta_j|$.
-An ideal gate can be re-written as 
+An ideal gate can be re-written as
 
 $$\mathcal G = \sum_j \eta_j \tilde{\mathcal G}_j = \gamma  \sum_ j p(j)\, \text{sign}(\eta_j)\, \tilde{\mathcal G}_j.$$
 
@@ -276,7 +276,7 @@ samples = [x_rep.sample(random_state=rnd_state) for _ in range(1000)]
 
 gamma = x_rep.norm
 # Build unmbiased super-operator matrices
-# Below s[0] is the sampled NoisyOperation, s[1] is the associated sign. 
+# Below s[0] is the sampled NoisyOperation, s[1] is the associated sign.
 unbiased_matrices =[gamma * s[1] * s[0].channel_matrix for s in samples]
 pec_matrix = np.average(unbiased_matrices, axis=0)
 
@@ -344,8 +344,8 @@ We need to build a quasi-probability representation for all the ideal gates of t
 We can employ a helper function from `mitiq.pec.representations`.
 
 ```{code-cell} ipython3
-representations = pec.representations.represent_operations_in_circuit_with_local_depolarizing_noise( 
-    ideal_circuit=ideal_circuit, 
+representations = pec.representations.represent_operations_in_circuit_with_local_depolarizing_noise(
+    ideal_circuit=ideal_circuit,
     noise_level=BASE_NOISE,
 )
 

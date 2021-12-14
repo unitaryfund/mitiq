@@ -18,60 +18,54 @@ by error mitigation techniques to compute expectation values."""
 
 from collections import Counter
 import inspect
-from typing import Any, Callable, Iterable, List, Sequence, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    cast,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import numpy as np
 
-from mitiq._typing import QPROGRAM, QuantumResult
+from mitiq import QPROGRAM, QuantumResult
+
+from mitiq.observable.observable import Observable
+from mitiq.rem.measurement_result import MeasurementResult
 from mitiq.interface import convert_from_mitiq, convert_to_mitiq
 
 
-def generate_collected_executor(
-    executor: Callable[[Union[QPROGRAM, Sequence[QPROGRAM]]], Any],
-    max_batch_size: int = 75,
-    force_run_all: bool = False,
-    **kwargs: Any,
-) -> Callable[[Any], List[QuantumResult]]:
-    """Returns a new executor function which efficiently collects expectation
-    values by detecting identical circuits and calling the executor as few
-    times as possible.
-
-    Args:
-        executor: A serial or batched executor. A serial executor inputs one
-            quantum circuit and outputs one expectation value. A batched
-            executor inputs a list of quantum circuits and outputs a list of
-            expectation values (one for each circuit).
-
-            An executor is detected as batched if and only if it is annotated
-            with a return type that is one of the following:
-
-            * Iterable[float]
-            * List[float]
-            * Sequence[float]
-            * Tuple[float]
-
-        max_batch_size: The maximum number of circuits which can be processed
-            with one call to the executor. If the executor is serial, this
-            argument can be ignored and defaults to one.
-        force_run_all: If True, all circuits are run by the executor even if
-            some circuits are identical. Otherwise, the set of unique circuits
-            is found and only this set is run by the executor.
-        kwargs: Keyword arguments to provide to the executor at each call.
-    """
-    if not callable(executor):
-        raise ValueError("Arg `executor` must be callable.")
-
-    def collected(circuits: Any) -> List[QuantumResult]:
-        return Executor(executor, max_batch_size).run(
-            circuits, force_run_all=force_run_all, **kwargs
-        )
-
-    return collected
+DensityMatrixLike = [
+    np.ndarray,
+    Iterable[np.ndarray],
+    List[np.ndarray],
+    Sequence[np.ndarray],
+    Tuple[np.ndarray],
+]
+FloatLike = [
+    None,  # Untyped executors are assumed to return floats.
+    float,
+    Iterable[float],
+    List[float],
+    Sequence[float],
+    Tuple[float],
+]
+MeasurementResultLike = [
+    MeasurementResult,
+    Iterable[MeasurementResult],
+    List[MeasurementResult],
+    Sequence[MeasurementResult],
+    Tuple[MeasurementResult],
+]
 
 
 class Executor:
-    """Tool for efficiently scheduling/executing quantum programs and
-    collecting the results.
+    """Tool for efficiently scheduling/executing quantum programs and storing
+    the results.
     """
 
     def __init__(
@@ -79,38 +73,127 @@ class Executor:
         executor: Callable[[Union[QPROGRAM, Sequence[QPROGRAM]]], Any],
         max_batch_size: int = 75,
     ) -> None:
-        """Initializes a Collector.
+        """Initializes an Executor.
 
         Args:
-            executor: A function which inputs a program and outputs a float,
-                or inputs a sequence of programs and outputs a sequence of
-                floats.
+            executor: A function which inputs a program and outputs a
+                ``mitiq.QuantumResult``, or inputs a sequence of programs and
+                outputs a sequence of ``mitiq.QuantumResult`` s.
             max_batch_size: Maximum number of programs that can be sent in a
                 single batch (if the executor is batched).
         """
         self._executor = executor
-        self._can_batch = Executor.is_batched_executor(executor)
+
+        executor_annotation = inspect.getfullargspec(executor).annotations
+        self._executor_return_type = executor_annotation.get("return")
         self._max_batch_size = max_batch_size
 
         self._executed_circuits: List[QPROGRAM] = []
-        self._computed_results: List[QuantumResult] = []
+        self._quantum_results: List[QuantumResult] = []
 
         self._calls_to_executor: int = 0
 
     @property
     def can_batch(self) -> bool:
-        return self._can_batch
+        return self._executor_return_type in (
+            BatchedType[T]  # type: ignore[index]
+            for BatchedType in [Iterable, List, Sequence, Tuple]
+            for T in QuantumResult.__args__  # type: ignore[attr-defined]
+        )
+
+    @property
+    def executed_circuits(self) -> List[QPROGRAM]:
+        return self._executed_circuits
+
+    @property
+    def quantum_results(self) -> List[QuantumResult]:
+        return self._quantum_results
 
     @property
     def calls_to_executor(self) -> int:
         return self._calls_to_executor
 
-    def run(
+    def evaluate(
+        self,
+        circuits: Union[QPROGRAM, List[QPROGRAM]],
+        observable: Optional[Observable] = None,
+        force_run_all: bool = False,
+        **kwargs: Any,
+    ) -> List[complex]:
+        """Returns the expectation value Tr[ρ O] for each circuit in
+        ``circuits`` where O is the observable provided or implicitly defined
+        by the ``executor``. (The observable is implicitly defined when the
+        ``executor`` returns float(s).)
+
+        All executed circuits are stored in ``self.executed_circuits``, and all
+        quantum results are stored in ``self.quantum_results``.
+
+        Args:
+             circuits: A single circuit of list of circuits.
+             observable: Observable O in the expression Tr[ρ O]. If None,
+                the ``executor`` must return a float (which corresponds to
+                Tr[ρ O] for a specific, fixed observable O).
+            force_run_all: If True, force every circuit in the input sequence
+                to be executed (if some are identical). Else, detects identical
+                circuits and runs a minimal set.
+        """
+        if not isinstance(circuits, List):
+            circuits = [circuits]
+
+        # Get all required circuits to run.
+        if (
+            observable is not None
+            and self._executor_return_type in MeasurementResultLike
+        ):
+            all_circuits = [
+                circuit_with_measurements
+                for circuit in circuits
+                for circuit_with_measurements in observable.measure_in(circuit)
+            ]
+            result_step = observable.ngroups
+        else:
+            all_circuits = circuits
+            result_step = 1
+
+        # Run all required circuits.
+        all_results = self._run(all_circuits, force_run_all, **kwargs)
+
+        # Parse the results.
+        if self._executor_return_type in FloatLike:
+            results = all_results
+
+        elif self._executor_return_type in DensityMatrixLike:
+            observable = cast(Observable, observable)
+            all_results = cast(List[np.ndarray], all_results)
+            results = [
+                observable._expectation_from_density_matrix(density_matrix)
+                for density_matrix in all_results
+            ]
+
+        elif self._executor_return_type in MeasurementResultLike:
+            observable = cast(Observable, observable)
+            all_results = cast(List[MeasurementResult], all_results)
+            results = [
+                observable._expectation_from_measurements(
+                    all_results[i : i + result_step]
+                )
+                for i in range(len(all_results) // result_step)
+            ]
+
+        else:
+            raise ValueError(
+                f"Could not parse executed results from executor with type"
+                f" {self._executor_return_type}."
+            )
+
+        return results  # type: ignore[return-value]
+
+    def _run(
         self,
         circuits: Sequence[QPROGRAM],
         force_run_all: bool = False,
         **kwargs: Any,
-    ) -> List[QuantumResult]:
+    ) -> Sequence[QuantumResult]:
         """Runs all input circuits using the least number of possible calls to
         the executor.
 
@@ -120,11 +203,18 @@ class Executor:
             to be executed (if some are identical). Else, detects identical
             circuits and runs a minimal set.
         """
+        start_result_index = len(self._quantum_results)
+
         if force_run_all:
             to_run = circuits
         else:
             # Make circuits hashable.
             # Note: Assumes all circuits are the same type.
+            # TODO: Bug! These conversions to/from Mitiq are not safe in that,
+            #  e.g., they do not preserve classical register structure in
+            #  Qiskit circuits, potentially causing executed results to be
+            #  incorrect. Safe conversions should follow the logic in
+            #  mitiq.interface.noise_scaling_converter.
             _, conversion_type = convert_to_mitiq(circuits[0])
             hashable_circuits = [
                 convert_to_mitiq(circ)[0].freeze() for circ in circuits
@@ -137,7 +227,7 @@ class Executor:
                 for circ in collection.keys()
             ]
 
-        if not self._can_batch:
+        if not self.can_batch:
             for circuit in to_run:
                 self._call_executor(circuit, **kwargs)
 
@@ -148,11 +238,13 @@ class Executor:
                 batch = to_run[i * step : (i + 1) * step]
                 self._call_executor(batch, **kwargs)
 
+        these_results = self._quantum_results[start_result_index:]
+
         if force_run_all:
-            return self._computed_results
+            return these_results
 
         # Expand computed results to all results using counts.
-        results_dict = dict(zip(collection.keys(), self._computed_results))
+        results_dict = dict(zip(collection.keys(), these_results))
         results = [results_dict[key] for key in hashable_circuits]
 
         return results
@@ -161,8 +253,8 @@ class Executor:
         self, to_run: Union[QPROGRAM, Sequence[QPROGRAM]], **kwargs: Any
     ) -> None:
         """Calls the executor on the input circuit(s) to run. Stores the
-        executed circuits in ``self._executed_circuits`` and the computed
-        results in ``self._computed_results``.
+        executed circuits in ``self._executed_circuits`` and the quantum
+        results in ``self._quantum_results``.
 
         Args:
             to_run: Circuit(s) to run.
@@ -171,10 +263,10 @@ class Executor:
         self._calls_to_executor += 1
 
         if self.can_batch:
-            self._computed_results.extend(result)
+            self._quantum_results.extend(result)
             self._executed_circuits.extend(to_run)
         else:
-            self._computed_results.append(result)
+            self._quantum_results.append(result)
             self._executed_circuits.append(to_run)
 
     @staticmethod
@@ -192,10 +284,9 @@ class Executor:
             * ``Sequence[QuantumResult]``
             * ``Tuple[QuantumResult]``
 
-        where a ``QuantumResult`` is a ``float`` or a ``cirq.Result``.
         Otherwise, it is considered "serial".
 
-        Batched executors can run several quantum programs in a single call.
+        Batched executors can _run several quantum programs in a single call.
         See below.
 
         Args:
