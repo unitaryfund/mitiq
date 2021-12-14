@@ -31,5 +31,5 @@ from mitiq._version import __version__
 # Error mitigation modules.
 from mitiq import cdr, pec, rem, zne
 
-# Common interface for no error mitigation (for examples/benchmarking).
+# Parallel interface for no error mitigation (for examples/benchmarking).
 from mitiq import raw
