@@ -31,6 +31,7 @@ def test_raw():
     executor = Executor(mitiq_cirq.compute_density_matrix)
     raw_value = raw.execute(circuit, executor, observable)
 
+    assert isinstance(raw_value, complex)
     assert executor.executed_circuits == [circuit]
 
     compute_density_matrix_noiseless = functools.partial(
