@@ -112,7 +112,7 @@ Utilities for Quantum Channels
 Readout Error Mitigation
 ------------------------
 
-Result Measurement
+Measurement Result
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.rem.measurement_result
    :members:
