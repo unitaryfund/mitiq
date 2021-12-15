@@ -48,7 +48,7 @@ In particular, it could be useful to explicitly split the PEC process into the t
 
 +++
 
-We define the circuit of interest as we did in Section [How do I use PEC?](pec-1-intro.myst)
+We define the circuit of interest as we did in [How do I use PEC?](pec-1-intro.myst)
 
 ```{code-cell} ipython3
 import mitiq
