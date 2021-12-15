@@ -142,7 +142,7 @@ of the ideal expectation value from the noisy execution of the `sampled_circuits
 
 +++
 
-To execute the auxiliary circuits we define the same `executor` function that we used in the Section ["How do I use PEC?"](pec-1-intro.myst).
+To execute the auxiliary circuits we define the same `execute` function that we used in the Section ["How do I use PEC?"](pec-1-intro.myst).
 Actually, since we have a list of circuits to execute, we define a *batched* version of the function, i.e., a function that takes a list of
 circuits as input and returns a list of expectation values. More details on batched executors can be found in the ["Executors"](pec-1-intro.myst) section.
 
@@ -152,7 +152,7 @@ from typing import List
 from cirq import DensityMatrixSimulator, depolarize
 from mitiq.interface import convert_to_mitiq
 
-def batched_executor(circuits: List[mitiq.QPROGRAM], noise_level: float=0.01)->List[float]:
+def batched_execute(circuits: List[mitiq.QPROGRAM], noise_level: float=0.01)->List[float]:
     """Returns [Tr[ρ_1 |0⟩⟨0|], Tr[ρ_2 |0⟩⟨0|]... ] where ρ_j is the state prepared by the
     j_th circuit in the input argument "circuits".
     """
@@ -169,7 +169,7 @@ def batched_executor(circuits: List[mitiq.QPROGRAM], noise_level: float=0.01)->L
 We also initialize a Mitiq {class}`.Executor` object. This step is optional but recommended to store/access executed circuits and results.
 
 ```{code-cell} ipython3
-executor = mitiq.Executor(batched_executor, max_batch_size=100)
+executor = mitiq.Executor(batched_execute, max_batch_size=100)
 ```
 We execute all the auxiliary circuits generated in the previous section to obtain a list of noisy expectation values.
 
@@ -196,7 +196,7 @@ print(f"{len(noisy_expecation_values)} noisy expectation values efficiently eval
 Equivalently, but less efficiently, we could have done as follows:
 
 ```{code-cell} ipython3
-noisy_expecation_values_direct = batched_executor(sampled_circuits)
+noisy_expecation_values_direct = batched_execute(sampled_circuits)
 
 assert noisy_expecation_values_direct == noisy_expecation_values
 ```

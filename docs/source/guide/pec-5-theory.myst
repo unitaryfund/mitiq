@@ -27,7 +27,7 @@ quantum expectation values via a Monte Carlo average.
 
 ## Quasi-probability representations
 
-In PEC, each gate ideal gate $\mathcal G_i$ of a circuit of interest 
+In PEC, each ideal gate $\mathcal G_i$ of a circuit of interest 
 $\mathcal U = {\mathcal G}_t \circ  \dots \circ {\mathcal G}_2 \circ {\mathcal G}_1 $
 is represented as a linear combination of noisy implementable operations ${\mathcal O_{i, \alpha}}$ (i.e., operations that 
 can be directly applied with a noisy backend):
