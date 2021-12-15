@@ -107,7 +107,11 @@ Instead of manually applying all the previous steps, one can call the Mitiq func
 ```{code-cell} ipython3
 from mitiq import pec
 
-pec.sample_circuit(circuit, reps, num_samples=5)
+sampled_circuits, sampled_signs, one_norm = pec.sample_circuit(circuit, reps, num_samples=5, random_state=30)
+for circuit in sampled_circuits:
+    print(circuit)
+print("Signs:", sampled_signs)
+print("One-norm:", one_norm)
 ```
 
 The above result contains:
