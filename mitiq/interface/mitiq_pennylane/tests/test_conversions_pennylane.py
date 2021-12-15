@@ -137,16 +137,7 @@ def test_integration():
         np.random.seed(1967)
         for gates in gates_per_layers:
             for gate in gates:
-                params = list(np.pi * np.random.rand(gate.num_params))
-                rnd_wires = np.random.choice(
-                    range(n_wires), size=gate.num_wires, replace=False
-                )
-                gate(
-                    *params,
-                    wires=[
-                        int(w) for w in rnd_wires
-                    ],  # make sure we do not address wires as 0-d arrays
-                )
+                qml.apply(gate)
 
     base_circ = from_pennylane(tape)
     tape_recovered = to_pennylane(base_circ)
