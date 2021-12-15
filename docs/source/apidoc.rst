@@ -109,6 +109,18 @@ Utilities for Quantum Channels
 .. automodule:: mitiq.pec.channels
    :members:
 
+Readout Error Mitigation
+------------------------
+
+Result Measurement
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.rem.measurement_result
+   :members:
+
+Post-selection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.rem.post_select
+   :members:
 
 Zero Noise Extrapolation
 ------------------------
