@@ -11,5 +11,55 @@ kernelspec:
   name: python3
 ---
 
+
 # What is the theory behind ZNE?
-test
+
+
+Zero noise extrapolation (ZNE) {cite}`Giurgica_Tiron_2020_arXiv` is an error
+mitigation technique used to extrapolate the noiseless expectation value of an
+observable from a range of expectation value computed at different noise levels.
+In Mitiq, this process works in two steps:
+
+- **Step 1: Intentionally scale noise** by manually inserting gates in a manner
+that keeps the logic of input circuit unchanged. The number of gates inserted is
+dependent on the scale factor. Different scale factor values will calculate the
+expectation value at different noise leveles.
+
+- **Step 2: Extrapolate to the noiseless limit** by fitting a curve [via one of
+the various methods available in Mitiq](https://mitiq.readthedocs.io/en/stable/apidoc.html#module-mitiq.zne.inference)
+to the expectation values calculated at different noise levels to extrapolate the
+noiseless expectation value.
+
+## Unitary Folding
+
+This is one of the available methods in [Mitiq's ZNE module](https://mitiq.readthedocs.io/en/stable/apidoc.html#module-mitiq.zne.scaling.folding)
+to scale noise in circuits by mapping a gate or a group of gates $G$ as $G \mapsto G G^\dagger G$.
+Because of $GG^\dagger = I$ and $G^\dagger = G$, it can be observed that the logic
+of the input circuit remains unchanged even after scaling up the noise by
+inserting $G^\dagger$ and $G$ but the depth of the circuit has increased. *Global
+folding* is when all the gates in a circuit are mapped as discussed previously
+whereas if only a subset of gates in the circuit are mapped in the same manner,
+the process is *local folding*.
+
+
+By default, a scale factor of 1 will keep the input circuit unchanged (no unitary
+folding occurred). It can be observed that for each gate's mapping, 2 additional
+gates are inserted i.e. an odd integer scale factor symbolizes folding of all
+gates in group $G$. When the scale factor is neither 1 nor an odd integer, the gates
+in $G$ are folded until the ratio of total number of gates after and before folding
+approximates close to the intended scale factor.
+
+
+If $\lambda$ is describing the noise level parameter then $E(\lambda)$
+is the expectation value as a function of the noise parameter where $E(\lambda=0)$
+is the noiseless expectation value and E(λ=1) is the true value with inefficient
+hardware. Here, if $E(\lambda)$ is expanded using the Taylor series, $\lambda$ is
+the scale factor and $c_1, c_2, c_3,\dots,c_n$ are the coefficients of interest
+used to extrapolate the value of $c_0$.
+
+$$
+E(\lambda) = c_0 + c_1 \lambda^1 + c_2 \lambda^2 + \dots + c_n \lambda^n
+$$
+
+
+### Extrapolation via FactoryObjects
