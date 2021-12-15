@@ -92,7 +92,7 @@ $$
 All the noisy expectation values $\langle A_{\vec{\alpha}}\rangle_{\rm noisy}$ can be directly measured with 
 a noisy backend since they only require circuits composed of implementable noisy operations.
 In principle, by combining all the noisy expectation values, one could compute the ideal result $\langle A \rangle_{\rm ideal}$.
-Unfortunately this approach requires the execution of an exponentially large number of circuits and 
+Unfortunately this approach requires executing a number of circuits which grows exponentially with the circuit depth and 
 which is typically unfeasible. 
 
 An important fact at the basis of PEC is that, for weak noise, only a small number of noisy expectation values actually
