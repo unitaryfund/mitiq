@@ -33,6 +33,7 @@ from mitiq.interface import atomic_converter
 
 
 class PauliString:
+    """A Pauli string."""
     _string_to_gate_map = {"I": cirq.I, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
 
     def __init__(
