@@ -91,7 +91,7 @@ See [What additional options are available in ZNE?](zne-3-options.myst) for more
 For example, the function {func}`.fold_gates_at_random()` applies the *unitary folding* map $G -> G G^\dagger G$
 to a random subset of gates of the input circuit.
 The folded circuit is more sensitive to gate errors since it has a number of gates approximately
-equal to `scale_factor * n`, where `n` is the number of gates in the input circuit. 
+equal to `scale_factor * n`, where `n` is the number of gates in the input circuit.
 
 ```{code-cell} ipython3
 from mitiq.zne.scaling import fold_gates_at_random
