@@ -12,3 +12,14 @@ kernelspec:
 ---
 
 # What happens when I use ZNE?
+
+In Mitiq, ZNE is clearly divided into two steps, noise scaling and extrapolation. They are shown in the Figure below. As mentioned in the [introduction to ZNE](zne-1-intro.myst), the corresponding sub-modules in the codebase are :mod:`mitiq.zne.scaling.folding` and :mod:`mitiq.zne.inference`.
+
+
+.. figure:: ../img/zne_workflow2_steps.png
+  :width: 400
+  :name: figzne
+
+  The diagram shows the workflow of the zero noise extrapolation (ZNE) techniques in Mitiq. The first step involves generating quantum circuits for noise scaling. The second step involves inferring the zero-noise value from the noisy circuit measurements.
+
+If you wish to directly have a look at a tutorial with code on ZNE you can read :ref:`here<label-zne-example>`.
