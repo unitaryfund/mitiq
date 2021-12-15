@@ -15,17 +15,17 @@ kernelspec:
 # What is the theory behind ZNE?
 
 
-Zero noise extrapolation (ZNE) {cite} `Giurgica_Tiron_2020_arXiv` is an error
+Zero noise extrapolation (ZNE){cite} `Giurgica_Tiron_2020_arXiv` is an error
 mitigation technique used to extrapolate the noiseless expectation value of an
 observable from a range of expectation value computed at different noise levels.
-In Mitiq, this process works in two steps:#
+In Mitiq, this process works in two steps:
 
-- **Step 1:# Intentionally scale noise** by manually inserting gates in a manner
+- **Step 1: Intentionally scale noise** by manually inserting gates in a manner
 that keeps the logic of input circuit unchanged. The number of gates inserted is
 dependent on the scale factor. Different scale factor values will calculate the
 expectation value at different noise leveles.
 
-- **Step 2:# Extrapolate to the noiseless limit** by fitting a curve [via one of
+- **Step 2: Extrapolate to the noiseless limit** by fitting a curve [via one of
 the various methods available in Mitiq](https://mitiq.readthedocs.io/en/stable/apidoc.html#module-mitiq.zne.inference)
 to the expectation values calculated at different noise levels to extrapolate the
-noiseless expectation value. 
+noiseless expectation value.
