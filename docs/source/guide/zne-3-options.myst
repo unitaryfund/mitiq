@@ -80,14 +80,15 @@ The Mitiq functions for local folding are:
 - {func}`.fold_gates_from_right()`;
 - {func}`.fold_all()`.
 
-There are multiple functions for local folding since they can be applied to the gates of a circuit according to different orderings:
+There are multiple functions for local folding since it can be applied to the gates of a circuit according to different orderings:
 at random, from left (starting from the initial gates), from right (starting from the final gates), etc.. 
-For more details on folding functions, we suggest to click on the functions listed above, to open the associated API docs.
+For more details on folding functions, we suggest to click on the functions listed above and check the associated API docs.
+
 If not specified by the user, the default noise scaling method in Mitiq is {func}`.fold_gates_at_random()`.
 
 +++
 
-**Note:** *All folding functions can be applied to circuits defined in any supported frontend. For example, in the next code cells we use Cirq to define quantum circuits.*
+**Note:** *All folding functions can be applied to circuits defined in any supported frontend. For example, in the next code cells we use Cirq to represent quantum circuits.*
 
 +++
 
@@ -127,9 +128,9 @@ for scale_factor in [1, 3, 5, 7]:
     print(f"For scale_factor={scale_factor}, the number of gates was scaled by {scaled_num_gates / num_gates}")
 ```
 
-**Note:** When `scale_factor` is an odd integer, the number of gates is scaled exactly as dictated by the value of `scale_factor`.
+**Note:** *When `scale_factor` is an odd integer, the number of gates is scaled exactly as dictated by the value of `scale_factor`.
 In this case, since all gates are folded the same number of times, the three local folding functions 
-{func}`.fold_gates_at_random()`, {func}`.fold_gates_from_left()` and {func}`.fold_gates_from_right()` have the same deterministic action.
+{func}`.fold_gates_at_random()`, {func}`.fold_gates_from_left()` and {func}`.fold_gates_from_right()` have the same (deterministic) effect.*
 
 +++
 
@@ -138,7 +139,8 @@ In this case, since all gates are folded the same number of times, the three loc
 +++
 
 More generally, the `scale_factor` can be set to any real number larger or equal than one. In this case,
-Mitiq applies additional folding to a selection of gates (for local folding) or to a final fraction of the circuit (for global folding), such that the total number of gates is *approximately* scaled by `scale_factor`. For example:
+Mitiq applies additional folding to a selection of gates (for local folding) or to a final fraction of the circuit (for global folding),
+such that the total number of gates is *approximately* scaled by `scale_factor`. For example:
 
 ```{code-cell} ipython3
 num_gates = len(list(circuit.all_operations()))
@@ -148,8 +150,8 @@ for scale_factor in [1.2, 1.4, 1.6, 1.8, 2.0]:
     print(f"For scale_factor={scale_factor}, the number of gates was scaled by {scaled_num_gates / num_gates}")
 ```
 
-**Note:** As printed above, if `scale_factor` is not an odd integer and if the input circuit is very short, there can be a large error in the actual scaling of the number of gates.
-For this reason, when dealing with very short circuits, we suggest to use odd integer scale factors.
+**Note:** *As printed above, if `scale_factor` is not an odd integer and if the input circuit is very short, there can be a large error in the actual scaling of the number of gates.
+For this reason, when dealing with very short circuits, we suggest to use odd integer scale factors.*
 
 +++
 
@@ -167,7 +169,7 @@ for scale_factor in [1.2, 1.4, 1.6, 1.8, 2.0]:
 #### Folding gates by fidelity
 
 In local folding methods, gates can be folded according to custom fidelities by
-passing the keyword argument `fidelities` into a local folding method. This
+passing the keyword argument `fidelities` into a local folding functions. This
 argument should be a dictionary where each key is a string which specifies the
 gate and the value of the key is the fidelity of that gate. An example is shown
 below where we set the fidelity of all single qubit gates to be 1.0, meaning that
@@ -216,7 +218,7 @@ The typical tasks of a {class}`.Factory` are:
 
 The {class}`.Factory` class has two main abstract subclasses:
 
-- {class}`.BatchedFactory` representing non-adaptive extrapolation algorithms in which the noise scale factors are fixed and a batch of circuits corresponding different noise scale factors are measured together;
+- {class}`.BatchedFactory` representing non-adaptive extrapolation algorithms in which the noise scale factors are fixed and a batch of noise scaled circuits is measured;
 - {class}`.AdaptiveFactory` representing adaptive extrapolation algorithms in which the choice of the next noise scale factor depends on the history of the measured results.
 
 Specific classes derived from {class}`.BatchedFactory` or {class}`.AdaptiveFactory` represent different zero-noise extrapolation
@@ -261,7 +263,8 @@ exp_factory = zne.inference.ExpFactory(scale_factors=[1, 2, 3], asymptote=0.5)
 adaptive_factory = zne.inference.AdaExpFactory(steps=5, asymptote=0.5)
 ```
 
-**Note:** *Richardson extrapolation is equivalent to an exact polynomial interpolation. This means that a {class}`.RichardsonFactory` object is equivalent to a {class}`.PolyFactory` with `order=len(scale_factors) - 1`*
+**Note:** *Richardson extrapolation is equivalent to an exact polynomial interpolation.
+This means that a {class}`.RichardsonFactory` object is equivalent to a {class}`.PolyFactory` with `order=len(scale_factors) - 1`.*
 
 +++
 
@@ -304,25 +307,23 @@ executor = Executor(execute)
 ```
 
 In the next code cell we run ZNE with several advanced options: 
-- we seed the noise scaling function
-- we fold only CNOT gates using the `fidelity` option
-- we use a non-default extrapolation method (`ExpFactory`)
+- We seed the noise scaling function;
+- We fold only CNOT gates using the `fidelity` option;
+- We use a non-default extrapolation method ({class}`.ExpFactory`).
 
-**Note:** *The scope of the next code cell is not to define an optimal ZNE estimation, but to just showcase all the possible options.*
+**Note:** *The scope of the next code cell is not to define an optimal ZNE estimation, but to show a large number of options.*
 
 ```{code-cell} ipython3
 from functools import partial
 import numpy as np
 
-
 # Random local folding applied to two-qubit gates with a seeded random state 
 random_state = np.random.RandomState(0)
 noise_scaling_function = partial(
     zne.scaling.fold_gates_at_random,
-    fidelities = {"single": 1.0}, # Avoid folding single-qubit gates
-    random_state=random_state, # Useful to get reproducible results
+    fidelities = {"single": 1.0},  # Avoid folding single-qubit gates
+    random_state=random_state,  # Useful to get reproducible results
 )
-
 # Exponential fit with scale factors [1, 2, 3], assuming an infinite-noise limit of 0.5.
 factory = zne.inference.ExpFactory(scale_factors=[1, 2, 3], asymptote=0.25)
 
