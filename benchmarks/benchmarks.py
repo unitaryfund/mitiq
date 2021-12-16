@@ -20,7 +20,8 @@ import functools
 import networkx as nx
 import numpy as np
 
-from mitiq import benchmarks, raw, zne, Observable, PauliString
+import cirq
+from mitiq import benchmarks, pec, zne, Observable, PauliString
 from mitiq.interface import mitiq_cirq
 
 
@@ -71,11 +72,12 @@ def track_zne(
         observable: Observable to compute the expectation value of.
     """
     circuit = get_benchmark_circuit(circuit_type, nqubits, depth)
-    true_value = raw.execute(
-        circuit, compute_density_matrix_noiseless, observable
+
+    true_value = observable.expectation(
+        circuit, compute_density_matrix_noiseless
     )
-    raw_value = raw.execute(
-        circuit, mitiq_cirq.compute_density_matrix, observable
+    raw_value = observable.expectation(
+        circuit, mitiq_cirq.compute_density_matrix
     )
     zne_value = zne.execute_with_zne(
         circuit, mitiq_cirq.compute_density_matrix, observable,
@@ -93,6 +95,78 @@ track_zne.params = (
     benchmark_circuit_types,
     [2],
     [1, 2, 3, 4, 5],
-    [Observable(PauliString("ZZ"))],
+    [
+        Observable(PauliString("ZZ")),
+        Observable(PauliString("ZX")),
+        Observable(PauliString("XZ")),
+        Observable(PauliString("XX")),
+    ],
 )
 track_zne.unit = "Error mitigation factor"
+
+
+def track_pec(
+    circuit_type: str,
+    nqubits: int,
+    depth: int,
+    observable: Observable,
+    num_samples: int,
+) -> float:
+    """Returns the PEC error mitigation factor, i.e., the ratio
+
+    (error without PEC) / (error with PEC).
+
+    Args:
+        circuit_type: Type of benchmark circuit.
+        nqubits: Number of qubits in the benchmark circuit.
+        depth: Some proxy of depth in the benchmark circuit.
+        observable: Observable to compute the expectation value of.
+        num_samples: Number of circuits to sample/run.
+    """
+    circuit = get_benchmark_circuit(circuit_type, nqubits, depth)
+
+    noise_level = 0.01
+    reps = pec.represent_operations_in_circuit_with_local_depolarizing_noise(
+        circuit, noise_level
+    )
+
+    compute_density_matrix = functools.partial(
+        mitiq_cirq.compute_density_matrix,
+        noise_model=cirq.depolarize,
+        noise_level=(noise_level,),
+    )
+
+    true_value = observable.expectation(
+        circuit, compute_density_matrix_noiseless
+    )
+    raw_value = observable.expectation(circuit, compute_density_matrix)
+    pec_value = pec.execute_with_pec(
+        circuit,
+        compute_density_matrix,
+        observable,
+        representations=reps,
+        num_samples=num_samples,
+    )
+    return np.real(abs(true_value - raw_value) / abs(true_value - pec_value))
+
+
+track_pec.param_names = [
+    "circuit",
+    "nqubits",
+    "depth",
+    "observable",
+    "num_samples",
+]
+track_pec.params = (
+    benchmark_circuit_types,
+    [2],
+    [1, 2, 3, 4, 5],
+    [
+        Observable(PauliString("ZZ")),
+        Observable(PauliString("ZX")),
+        Observable(PauliString("XZ")),
+        Observable(PauliString("XX")),
+    ],
+    [100, 500],
+)
+track_pec.unit = "Error mitigation factor"
