@@ -24,7 +24,8 @@ from mitiq._typing import MeasurementResult, QuantumResult, QPROGRAM
 
 
 class Observable:
-    """A quantum observable typically used to compute its mitigated expectation value.
+    """A quantum observable typically used to compute its mitigated expectation
+     value.
 
     It can be defined on a selection of the total qubits in a quantum register.
     It can be initialized with :class:`.PauliString` objects.
