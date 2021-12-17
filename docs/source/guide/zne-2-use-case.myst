@@ -18,7 +18,7 @@ kernelspec:
 ZNE generally works well for circuits of low depth and/or those exhibiting noise 
 that can be described by a simple model 
 [[32](https://mitiq.readthedocs.io/en/latest/zz_bibliography.html)]. 
-The main advantage of ZNE is that the technique can be applied without knowledge of 
+The main advantage of ZNE is that the technique can be applied without a detailed knowledge of 
 the undelying noise model. Therefore it can be a good option in situations where 
 tomography is impractical.
   
