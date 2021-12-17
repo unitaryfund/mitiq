@@ -163,19 +163,19 @@ class PauliString:
 
 
 class PauliStringCollection:
-    """A collection of ``PauliString``s that qubit-wise commute and so can be
+    """A collection of PauliStrings that qubit-wise commute and so can be
     measured with a single circuit.
     """
 
     def __init__(
         self, *paulis: PauliString, check_precondition: bool = True
     ) -> None:
-        """Initializes a ``PauliStringCollection``.
+        """Initializes a `PauliStringCollection`.
 
         Args:
             paulis: PauliStrings to add to the collection.
             check_precondition: If True, raises an error if some of the
-                ``PauliString``s do not qubit-wise commute.
+                `PauliString`s do not qubit-wise commute.
 
         Example:
             >>> pcol = PauliStringCollection(
