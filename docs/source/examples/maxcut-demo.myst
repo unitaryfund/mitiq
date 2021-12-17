@@ -444,7 +444,7 @@ print("Ideal cost: ", np.round(ideal_opt_cost, 4))
 
 Now let's try to mitigate this noise using Mitiq.
 
-This can be done by simply wrapping the noisy executor into a mitigated executor. We will use global folding and a linear inference (using a {ref}`Linear Factory <guide_zne_factory>` object) to implement zero-noise extrapolation.
+This can be done by simply wrapping the noisy executor into a mitigated executor. We will use global folding and a linear inference (using a {class}`.Linear Factory` object) to implement zero-noise extrapolation.
 
 ```{code-cell} ipython3
 import mitiq
