@@ -167,7 +167,7 @@ the branch with the appropriate version tag and then review the auto-generated
 GitHub release.
 
 Now, there is history that is on this patch branch that is not on ``master``, 
-so it is up to the maintianers to make sure that history is merged back into
+so it is up to the maintainers to make sure that history is merged back into
 ``master``. This could be done by simply merging the branch back into ``master``,
 and then resolving any conflicts. Maybe the changes are only relevant for that
 version and are superseded by the next version, so only merging the changes in
