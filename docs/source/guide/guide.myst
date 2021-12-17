@@ -8,9 +8,8 @@ guide-overview.rst
 guide-getting-started.rst
 guide-executors.rst
 guide-observables.myst
-guide-zne.rst
+zne.myst
 guide-pec.rst
 guide-cdr.rst
 guide-error-mitigation.rst
-zne.myst
 ```
