@@ -90,11 +90,10 @@ numbers to real numbers.
 :::
 
 The function {func}`.noise_to_expval` encapsulate the "quantum part" of the problem. The "classical
-part" of the problem can be solved by passing {func}`noise_to_expval`
-to the {meth}`.run_classical` method of a factory.
+part" of the problem can be solved by passing {func}`noise_to_expval` to the {meth}`.Factory.run_classical` method of a factory.
 This method will repeatedly call `noise_to_expval` for different
 noise levels, so one can view `self.run_classical` as the classical counterpart of the quantum method
-`self.run`.
+`self.run`. This method is present also for {meth}`.AdaptiveFactory.run_classical` and {meth}`.BatchedFactory.run_classical`.
 
 ```{eval-rst}
 .. testcode::
@@ -114,13 +113,13 @@ noise levels, so one can view `self.run_classical` as the classical counterpart 
 
 
 :::{note}
-With respect to `self.run`, the `self.run_classical` method is much more flexible and
+With respect to `self.run`, the {meth}`.Factory.run_classical` method is much more flexible and
 can be applied whenever the user is able to autonomously scale the noise level associated
 to an expectation value. Indeed, the function `noise_to_expval` can represent any experiment
 or any simulation in which noise can be artificially increased. The scenario
 is therefore not restricted to quantum circuits but can be easily extended to
 annealing devices or to gates which are controllable at a pulse level. In principle,
-one could even use the `self.run_classical` method to mitigate experiments which are
+one could even use the {meth}`.Factory.run_classical` method to mitigate experiments which are
 unrelated to quantum computing.
 :::
 
@@ -129,7 +128,7 @@ unrelated to quantum computing.
 #### Defining a custom factory
 
 If necessary, the user can modify an existing extrapolation methods by subclassing
-one of the [built-in factories](zne-2-options)`.
+one of the [built-in factories](zne-3-options.myst#extrapolation-methods-factory-objects).
 
 Alternatively, a custom adaptive extrapolation method can be derived from the abstract class {class}`.AdaptiveFactory`.
 In this case its core methods must be implemented:
