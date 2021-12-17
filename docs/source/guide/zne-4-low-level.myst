@@ -75,6 +75,23 @@ This can be done by defining a function which maps a noise scale factor to the
 corresponding expectation value.
 
 ```{code-cell} ipython3
+import numpy as np
+from cirq import Circuit, depolarize, DensityMatrixSimulator
+
+# initialize a backend
+SIMULATOR = DensityMatrixSimulator()
+# 5% depolarizing noise
+NOISE = 0.05
+
+def executor(circ: Circuit) -> float:
+   """Executes a circuit with depolarizing noise and
+   returns the expectation value of the projector |0><0|."""
+   circuit = circ.with_noise(depolarize(p=NOISE))
+   rho = SIMULATOR.simulate(circuit).final_density_matrix
+   obs = np.diag([1, 0])
+   expectation = np.real(np.trace(rho @ obs))
+   return expectation
+
 def noise_to_expval(scale_factor: float) -> float:
     """Function returning an expectation value for a given scale_factor."""
     # apply noise scaling
@@ -95,22 +112,32 @@ This method will repeatedly call `noise_to_expval` for different
 noise levels, so one can view `self.run_classical` as the classical counterpart of the quantum method
 `self.run`. This method is present also for {meth}`.AdaptiveFactory.run_classical` and {meth}`.BatchedFactory.run_classical`.
 
-```{eval-rst}
-.. testcode::
+```{code-cell} ipython3
+from mitiq.zne.inference import LinearFactory, RichardsonFactory, PolyFactory
 
-   linear_fac.run_classical(noise_to_expval)
-   zne_expval = linear_fac.reduce()
-   print(f"Error with linear_fac: {abs(exact - zne_expval):.4f}")
+# method: scale noise by 1 and 2, then extrapolate linearly to the zero noise limit.
+linear_fac = LinearFactory(scale_factors=[1.0, 2.0])
 
-   richardson_fac.run_classical(noise_to_expval)
-   zne_expval = richardson_fac.reduce()
-   print(f"Error with richardson_fac: {abs(exact - zne_expval):.4f}")
+# method: scale noise by 1, 2 and 3, then evaluate the Richardson extrapolation.
+richardson_fac = RichardsonFactory(scale_factors=[1.0, 2.0, 3.0])
 
-   poly_fac.run_classical(noise_to_expval)
-   zne_expval = poly_fac.reduce()
-   print(f"Error with poly_fac: {abs(exact - zne_expval):.4f}")
+# method: scale noise by 1, 2, 3, and 4, then extrapolate quadratically to the zero noise limit.
+poly_fac = PolyFactory(scale_factors=[1.0, 2.0, 3.0, 4.0], order=2)
 ```
 
+```{code-cell} ipython3
+linear_fac.run_classical(noise_to_expval)
+zne_expval = linear_fac.reduce()
+print(f"Error with linear_fac: {abs(exact - zne_expval):.4f}")
+
+richardson_fac.run_classical(noise_to_expval)
+zne_expval = richardson_fac.reduce()
+print(f"Error with richardson_fac: {abs(exact - zne_expval):.4f}")
+
+poly_fac.run_classical(noise_to_expval)
+zne_expval = poly_fac.reduce()
+print(f"Error with poly_fac: {abs(exact - zne_expval):.4f}")
+```
 
 :::{note}
 With respect to `self.run`, the {meth}`.Factory.run_classical` method is much more flexible and
@@ -144,6 +171,7 @@ final zero-noise extrapolation, respectively.
 ```{code-cell} ipython3
 from mitiq.zne.inference import BatchedFactory, LinearFactory
 import numpy as np
+from mitiq.zne.scaling.folding import fold_gates_at_random
 
 class MyFactory(BatchedFactory):
   """Factory object implementing a linear extrapolation taking
@@ -182,6 +210,20 @@ class MyFactory(BatchedFactory):
         # In this case "result" is a tuple of extrapolation data
         zne_limit = np.clip(result[0], min_expval, max_expval)
         return (zne_limit, *result[1:])
+```
+
+```{code-cell} ipython3
+import numpy as np
+from cirq import Circuit, depolarize, DensityMatrixSimulator
+from cirq import LineQubit, X, H
+
+q = LineQubit(0)
+circuit = Circuit(H(q), X(q), H(q), H(q), X(q), H(q))
+expval = executor(circuit)
+exact = 1.0
+print(f"The ideal result should be {exact}")
+print(f"The real result is {expval:.4f}")
+print(f"The abslute error is {abs(exact - expval):.4f}")
 ```
 
 ```{code-cell} ipython3
