@@ -24,7 +24,11 @@ from mitiq._typing import MeasurementResult, QuantumResult, QPROGRAM
 
 
 class Observable:
-    """An observable."""
+    """A quantum observable typically used to compute its mitigated expectation value.
+
+    It can be defined on a selection of the total qubits in a quantum register.
+    It can be initialized with :class:`.PauliString` objects.
+    """
 
     def __init__(self, *paulis: PauliString) -> None:
         # TODO: Add option to Combine duplicates. E.g. [Z(0, Z(0)] -> [2*Z(0)].
