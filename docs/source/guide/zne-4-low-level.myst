@@ -100,6 +100,20 @@ def noise_to_expval(scale_factor: float) -> float:
     return executor(scaled_circuit)
 ```
 
+```{code-cell} ipython3
+import numpy as np
+from cirq import Circuit, depolarize, DensityMatrixSimulator
+from cirq import LineQubit, X, H
+
+q = LineQubit(0)
+circuit = Circuit(H(q), X(q), H(q), H(q), X(q), H(q))
+expval = executor(circuit)
+exact = 1.0
+print(f"The ideal result should be {exact}")
+print(f"The real result is {expval:.4f}")
+print(f"The abslute error is {abs(exact - expval):.4f}")
+```
+
 :::{note}
 The body of the previous function contains the execution of a quantum circuit.
 However, if we see it as a "black-box", it is just a classical function mapping real
@@ -210,20 +224,6 @@ class MyFactory(BatchedFactory):
         # In this case "result" is a tuple of extrapolation data
         zne_limit = np.clip(result[0], min_expval, max_expval)
         return (zne_limit, *result[1:])
-```
-
-```{code-cell} ipython3
-import numpy as np
-from cirq import Circuit, depolarize, DensityMatrixSimulator
-from cirq import LineQubit, X, H
-
-q = LineQubit(0)
-circuit = Circuit(H(q), X(q), H(q), H(q), X(q), H(q))
-expval = executor(circuit)
-exact = 1.0
-print(f"The ideal result should be {exact}")
-print(f"The real result is {expval:.4f}")
-print(f"The abslute error is {abs(exact - expval):.4f}")
 ```
 
 ```{code-cell} ipython3
