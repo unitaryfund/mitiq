@@ -162,8 +162,7 @@ class PauliString:
 
 
 class PauliStringCollection:
-    """A collection of ``PauliString``s that qubit-wise commute and so can be measured with
-        a single circuit.
+    """A collection of ``PauliString``s that qubit-wise commute and so can be measured with a single circuit.
     """
 
     def __init__(
