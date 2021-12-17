@@ -17,7 +17,7 @@ kernelspec:
 
 Zero noise extrapolation (ZNE) {cite}`Giurgica_Tiron_2020_arXiv` is an error
 mitigation technique used to extrapolate the noiseless expectation value of an
-observable from a range of expectation value computed at different noise levels.
+observable from a range of expectation values computed at different noise levels.
 In Mitiq, this process works in two steps:
 
 - **Step 1: Intentionally scale noise** by manually inserting gates in a manner
