@@ -28,7 +28,7 @@ In some instances the results of the extrapolation can exhibit a large bias
 polynomial curve obtained by fitting the noisy expectation values does not match the 
 zero-noise limit. When using circuits of less trivial depth on real devices, the 
 lowest error points may be too noisy for the extrapolation to show improvement over 
-the unmitigated result {cite}`Lowe_2021_PRR`. 
+the unmitigated result {cite}`PhysRevResearch.3.033098`. 
 
 ## Example
 
