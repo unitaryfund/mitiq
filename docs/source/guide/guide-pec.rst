@@ -4,8 +4,7 @@
 Probabilistic Error Cancellation
 *********************************************
 
-Probabilistic error cancellation (PEC) capabilities are currently included in Mitiq. The :py:mod:`~mitiq.pec.pec` sub-package contains the relative modules. A minimal example of the use of PEC in Mitiq can be found in the :ref:`Getting Started section <pec_getting_started>` of the guide, while more details on the theory and limitation of this technique can be found in
-the :ref:`About Error Mitigation <guide_qem_pec>` section.
+Probabilistic error cancellation (PEC) capabilities are currently included in Mitiq. The :py:mod:`~mitiq.pec.pec` sub-package contains the relative modules. A minimal example of the use of PEC in Mitiq can be found in the :ref:`Getting Started section <pec_getting_started>` of the guide, while more details on the theory and limitation of this technique can be found in the :ref:`About Error Mitigation <guide_qem_pec>` section.
 
 
 .. figure:: ../img/pec_workflow2_steps.png
