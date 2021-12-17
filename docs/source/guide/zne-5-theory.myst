@@ -17,7 +17,7 @@ kernelspec:
 
 Zero noise extrapolation (ZNE) {cite}`Giurgica_Tiron_2020_arXiv` is an error
 mitigation technique used to extrapolate the noiseless expectation value of an
-observable from a range of expectation value computed at different noise levels.
+observable from a range of expectation values computed at different noise levels.
 In Mitiq, this process works in two steps:
 
 - **Step 1: Intentionally scale noise** by manually inserting gates in a manner
@@ -34,7 +34,7 @@ noiseless expectation value.
 
 This is one of the available methods in [Mitiq's ZNE module](https://mitiq.readthedocs.io/en/stable/apidoc.html#module-mitiq.zne.scaling.folding)
 to scale noise in circuits by mapping a gate or a group of gates $G$ as $G \mapsto G G^\dagger G$.
-Because of $GG^\dagger = I$ and $G^\dagger = G$, it can be observed that the logic
+Because of $GG^\dagger = I$ and $G^\dagger = G^{-1}$, it can be observed that the logic
 of the input circuit remains unchanged even after scaling up the noise by
 inserting $G^\dagger$ and $G$ but the depth of the circuit has increased. *Global
 folding* is when all the gates in a circuit are mapped as discussed previously
