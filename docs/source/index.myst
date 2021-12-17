@@ -1,12 +1,12 @@
-# Welcome to mitiq's documentation!
 
 ```{toctree}
 ---
 maxdepth: 2
 caption: Contents
+hidden: true
 ---
 readme.myst
-guide/guide.rst
+guide/guide.myst
 examples/examples.rst
 apidoc.rst
 toc_contributing.myst
@@ -14,10 +14,5 @@ changelog.myst
 zz_bibliography.rst
 ```
 
-## Indices and tables
-
-```{eval-rst}
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+```{include} ./readme.myst
 ```

@@ -4,7 +4,7 @@ jupytext:
     extension: .md
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.4
+    jupytext_version: 1.11.1
 kernelspec:
   display_name: Python 3
   language: python
@@ -500,18 +500,7 @@ print("ZNE then PEC value:", zne_then_pec_value)  # Note this is not accurate (b
 **Codeblock 29**
 
 ```{code-cell} ipython3
----
-colab:
-  base_uri: https://localhost:8080/
-id: vWUzgR6EMi9n
-outputId: f2f56f66-9d37-4a17-f923-18c47a12ac5e
----
-!pip install qiskit==0.24.0 --quiet
-```
-
-```{code-cell} ipython3
 :id: dyk7Hj1nPB48
-
 
 import qiskit
 
@@ -558,11 +547,3 @@ execute(circ)
 ## References
 [1] *Mitiq: A software package for error mitigation on noisy quantum computers*,
 Ryan  LaRose, Andrea  Mari, Sarah  Kaiser, Peter  J.  Karalekas, Andre  A. Alves, Piotr Czarnik, Mohamed El Mandouh, Max H. Gordon, Yousef Hindy, Aaron Robertson, Purva Thakre, Nathan Shammah, and William J. Zeng, [https://arxiv.org/abs/2009.04417](https://arxiv.org/abs/2009.04417)
-
-```{code-cell} ipython3
-
-```
-
-```{code-cell} ipython3
-
-```
