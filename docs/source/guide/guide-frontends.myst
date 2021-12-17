@@ -1,0 +1,29 @@
+---
+jupytext:
+  text_representation:
+    extension: .myst
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.11.4
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
+---
+
+# Mitiq Frontends
+
+Mitiq can accept quantum circuit representations in a variety of formats from different tools or platforms.
+These input formats are referred to here as "frontends".
+The main four frameworks currently supported are Cirq, Qiskit, PyQuil, and Braket, with Cirq being used for the internal implementations of the mitigation methods.
+There is also frontend support for any circuit description that complies with the OpenQASM 2.0 standard.
+
+With any of these frontends (with the exception of Cirq), the circuit representation will be converted internally to a Cirq circuit object with the relevant conversion methods in `mitiq.interface` for each frontend.
+For example, you can use `mitiq.interface.mitiq_braket.conversions.from_braket()` to convert a Braket circuit to a Cirq circuit.
+
+Examples for using each of the frameworks to represent the input to a mitigation method are linked below.
+
+- Cirq: {ref}`<examples/ibmq-backends:cirq-frontend>`
+- Qiskit: {ref}`<examples/ibmq-backends:setup-defining-a-circuit>`
+- PyQuil: {ref}`<examples/pyquil_demo>`
+- Braket: {ref}`<examples/braket_mirror_circuit:define-the-circuit>`
