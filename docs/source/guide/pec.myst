@@ -1,0 +1,12 @@
+# Probabilistic error cancellation
+
+```{toctree}
+---
+maxdepth: 1
+---
+pec-1-intro.myst
+pec-2-use-case.myst
+pec-3-options.myst
+pec-4-low-level.myst
+pec-5-theory.myst
+```
