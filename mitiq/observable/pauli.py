@@ -165,6 +165,7 @@ class PauliStringCollection:
     """A collection of ``PauliString``s that qubit-wise commute and so can be measured with
         a single circuit.
     """
+
     def __init__(
         self, *paulis: PauliString, check_precondition: bool = True
     ) -> None:
