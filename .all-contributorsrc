@@ -25,7 +25,6 @@
       ]
     },
     {
-
       "login": "HaoTy",
       "name": "Tianyi Hao",
       "avatar_url": "https://avatars.githubusercontent.com/u/36152061?v=4",
@@ -280,6 +279,16 @@
       "profile": "https://github.com/francespoblete",
       "contributions": [
         "design"
+      ]
+    },
+    {
+      "login": "Misty-W",
+      "name": "Misty-W",
+      "avatar_url": "https://avatars.githubusercontent.com/u/82074193?v=4",
+      "profile": "https://github.com/Misty-W",
+      "contributions": [
+        "code",
+        "example"
       ]
     }
   ],
