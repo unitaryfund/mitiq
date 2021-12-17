@@ -38,7 +38,7 @@ zne_value = zne.execute_with_zne(
 The three main options are `scale_noise`, `factory` and `num_to_average`.
 - The option `scale_noise` can be used to select a noise scaling method.
     More details are explained below.
-- The option `factory` can be used to select a an extrapolation method.
+- The option `factory` can be used to select an extrapolation method.
     More details are explained below.
 - The option `num_to_average` can be used to average over multiple evaluations of each noise-scaled expectation value.
 
@@ -96,7 +96,7 @@ If not specified by the user, the default noise scaling method in Mitiq is {func
 
 +++
 
-Both local or global folding, if applied uniformly to all the gates of `circuit`, produce a `scaled_circuit` that has 3 times more gates than the input `circuit`.
+Both local and global folding, if applied uniformly to all the gates of `circuit`, produce a `scaled_circuit` that has 3 times more gates than the input `circuit`.
 This corresponds to the `scale_factor=3` setting. For example:
 
 ```{code-cell} ipython3
@@ -169,7 +169,7 @@ for scale_factor in [1.2, 1.4, 1.6, 1.8, 2.0]:
 #### Folding gates by fidelity
 
 In local folding methods, gates can be folded according to custom fidelities by
-passing the keyword argument `fidelities` into a local folding functions. This
+passing the keyword argument `fidelities`. This
 argument should be a dictionary where each key is a string which specifies the
 gate and the value of the key is the fidelity of that gate. An example is shown
 below where we set the fidelity of all single qubit gates to be 1.0, meaning that
