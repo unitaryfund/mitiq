@@ -24,13 +24,11 @@ tomography is impractical.
 ## Disadvantages 
 
 In some instances the results of the extrapolation can exhibit a large bias
-[[33](https://mitiq.readthedocs.io/en/latest/zz_bibliography.html)].
-ZNE may not be helpful in cases where a low degree polynomial curve obtained
-by fitting the noisy expectation values does not match the zero-noise limit. 
-When using circuits of less trivial depth on real devices, the lowest error 
-points may be too noisy for the extrapolation to show improvement over the 
-unmitigated result
-[[32](https://mitiq.readthedocs.io/en/latest/zz_bibliography.html)]. 
+{cite}PhysRevA.104.052607. ZNE may not be helpful in cases where a low degree 
+polynomial curve obtainedby fitting the noisy expectation values does not match the 
+zero-noise limit. When using circuits of less trivial depth on real devices, the 
+lowest error points may be too noisy for the extrapolation to show improvement over 
+the unmitigated result {cite}Lowe_2021_PRR. 
 
 ## Example
 
