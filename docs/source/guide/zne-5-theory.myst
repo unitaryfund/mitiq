@@ -30,36 +30,43 @@ the various methods available in Mitiq](https://mitiq.readthedocs.io/en/stable/a
 to the expectation values calculated at different noise levels to extrapolate the
 noiseless expectation value.
 
-## Unitary Folding
+## Scaling Noise by Unitary Folding
 
-This is one of the available methods in [Mitiq's ZNE module](https://mitiq.readthedocs.io/en/stable/apidoc.html#module-mitiq.zne.scaling.folding)
-to scale noise in circuits by mapping a gate or a group of gates $G$ as $G \mapsto G G^\dagger G$.
-Because of $GG^\dagger = I$ and $G^\dagger = G^{-1}$, it can be observed that the logic
-of the input circuit remains unchanged even after scaling up the noise by
-inserting $G^\dagger$ and $G$ but the depth of the circuit has increased. *Global
-folding* is when all the gates in a circuit are mapped as discussed previously
-whereas if only a subset of gates in the circuit are mapped in the same manner,
-the process is *local folding*.
+In ZNE, if a quantum circuit is implemented via gates, the circuit depth is increased
+for gates $G$ in the circuit by mapping as $G \mapsto G G^\dagger G$. Here, $G$
+can be a set of all the gates or a portion of gates in a quantum circuit. When all
+the gates are to be mapped as discussed previously, the process is known as global
+folding but if only some gates in the circuit are to be folded, the procedure implemented
+is known as local folding. Thus, in either case noise caused due to physical implementations
+of unitary gates on gate-model devices is scaled by inserting additional gates
+in the circuit.
 
+```{figure} ../img/zne_global_folding.png
+---
+width: 400
+name: figzne
+---
+The diagram demonstrates how gates are inserted in a circuit for ZNE when the goal is to fold the entire circuit.
+```
 
-By default, a scale factor of 1 will keep the input circuit unchanged (no unitary
-folding occurred). It can be observed that for each gate's mapping, 2 additional
-gates are inserted i.e. an odd integer scale factor symbolizes folding of all
-gates in group $G$. When the scale factor is neither 1 nor an odd integer, the gates
-in $G$ are folded until the ratio of total number of gates after and before folding
-approximates close to the intended scale factor.
+```{figure} ../img/zne_local_folding.png
+---
+width: 400
+name: figzne
+---
+The diagram demonstrates how gates are inserted in a circuit for ZNE when the goal is to fold some gates in the circuit.
+```
 
+The same idea applies to devices with pulse-level access for ZNE {cite}`Kandala_2019_Nature, Kandala_2019_Nature`.
+The noise of the device can be altered by increasing the time over which pulses
+are implemented but keeps the original circuit unchanged.
 
-If $\lambda$ is describing the noise level parameter then $E(\lambda)$
-is the expectation value as a function of the noise parameter where $E(\lambda=0)$
-is the noiseless expectation value and E(λ=1) is the true value with inefficient
-hardware. Here, if $E(\lambda)$ is expanded using the Taylor series, $\lambda$ is
-the scale factor and $c_1, c_2, c_3,\dots,c_n$ are the coefficients of interest
-used to extrapolate the value of $c_0$.
+```{figure} ../img/zne_pulse_stretching.png
+---
+width: 400
+name: figzne
+---
+The diagram demonstrates how pulse stretching is used to increase noise in a physical device.
+```
 
-$$
-E(\lambda) = c_0 + c_1 \lambda^1 + c_2 \lambda^2 + \dots + c_n \lambda^n
-$$
-
-
-### Extrapolation via FactoryObjects
+In both gate-model and pulse-model scenarios, when noise is increased
