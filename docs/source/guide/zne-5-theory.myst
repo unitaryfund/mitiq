@@ -43,18 +43,18 @@ in the circuit.
 
 ```{figure} ../img/zne_global_folding.png
 ---
-width: 400
-name: figzne
+width: 500
+name: figzne_global
 ---
-The diagram demonstrates how gates are inserted in a circuit for ZNE when the goal is to fold the entire circuit.
+The diagram demonstrates how gates are inserted in a circuit for ZNE when the goal is to scale noise by folding the entire circuit.
 ```
 
 ```{figure} ../img/zne_local_folding.png
 ---
-width: 400
-name: figzne
+width: 500
+name: figzne_local
 ---
-The diagram demonstrates how gates are inserted in a circuit for ZNE when the goal is to fold some gates in the circuit.
+The diagram demonstrates how gates are inserted in a circuit for ZNE when the goal is to fold some gates in the circuit to scale noise.
 ```
 
 The same idea applies to devices with pulse-level access for ZNE {cite}`Kandala_2019_Nature, Kandala_2019_Nature`.
@@ -63,10 +63,14 @@ are implemented but keeps the original circuit unchanged.
 
 ```{figure} ../img/zne_pulse_stretching.png
 ---
-width: 400
-name: figzne
+width: 500
+name: figzne_pulse
 ---
-The diagram demonstrates how pulse stretching is used to increase noise in a physical device.
+The diagram demonstrates how pulse stretching is used to increase noise in a physical device for ZNE.
 ```
 
-In both gate-model and pulse-model scenarios, when noise is increased
+In both gate-model and pulse-model scenarios, let $\tau$ be a parameter quantifying
+noise in the circuit. When scale factor $\lambda$ is used to increase the circuit noise,
+the noise parameter will also change dependent on $\lambda$ as $\tau^' = \lambda \tau$.
+It can be observed that by default, for $\lambda = 1$, the input circuit remains unchanged
+as the new noise parameter is same as original noise parameter $\tau^' = \tau$.
