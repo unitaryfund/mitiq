@@ -179,7 +179,7 @@ In this case its core methods must be implemented:
 Note that in general `self.__init__` methods of abstract factories, if present, must be overridden.
 
 A new non-adaptive method can instead be derived from the abstract {class}`.BatchedFactory` class.
-In this case it is usually sufficient to override only the [`BatchedFactory.__init__`](../_modules/mitiq/zne/inference.html#BatchedFactory) and
+In this case it is usually sufficient to override only the [`BatchedFactory.__init__`](https://mitiq.readthedocs.io/en/latest/_modules/mitiq/zne/inference.html#BatchedFactory) and
 the {meth}`.BatchedFactory.extrapolate` methods, which are responsible for the initialization and for the
 final zero-noise extrapolation, respectively.
 
