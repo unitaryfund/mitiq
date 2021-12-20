@@ -82,12 +82,26 @@ and $\rho$ be the state prepared by the quantum circuit of interest. The expecta
 value can be described as a function of noise parameter as following:
 
 $$
-\langle E(\tau^\prime) \rangle = \text{Tr}[\rho] E(\tau^\prime)
+\langle E(\tau^\prime) \rangle = \text{Tr}[\rho E(\tau^\prime)]
 $$
 
 We wish to estimate $\langle E(\tau=0) \rangle$ by calculating a range of different
 $\langle E(\tau^\prime) \rangle$ as dictated by different values of $\lambda$. In
 order to be consistent with [notation introduced previously in the documentation](https://mitiq.readthedocs.io/en/latest/guide/pec-5-theory.html#error-cancellation)
 $\langle E(\tau=0) \rangle$ could be re-labeled as $\langle E\rangle_{\rm ideal}$ and the noisy expectation
-values \langle E(\tau^\prime) \rangle could be re-labeled as
+values $\langle E(\tau^\prime) \rangle$ could be re-labeled as
 $\langle E(\tau) \rangle_{\rm noisy}$.
+
+The ideal expectation value can be extrapolated as shown below. $S$ is the set of
+chosen scale factors, $n_{\lambda}$ is a co-effecient dependent on the scale factor
+when noisy expectation value is calculated after scaling the noise in the circuit.
+$\Delta$ is the variance error caused by choosing some extrapolation model.
+
+$$
+\langle E\rangle_{\rm ideal} = \sum_{\lambda \in S} n_{\lambda} \langle E_{\lambda} \rangle_{\rm noisy} + \Delta
+$$
+
+
+Different extrapolation methods can be used for $\langle E\rangle_{\rm ideal}$. A
+detailed discussion about the extrapolation methods is skipped as it is [available
+here](https://mitiq--1021.org.readthedocs.build/en/1021/guide/zne-3-options.html#extrapolation-methods-factory-objects).
