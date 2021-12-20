@@ -71,6 +71,23 @@ The diagram demonstrates how pulse stretching is used to increase noise in a phy
 
 In both gate-model and pulse-model scenarios, let $\tau$ be a parameter quantifying
 noise in the circuit. When scale factor $\lambda$ is used to increase the circuit noise,
-the noise parameter will also change dependent on $\lambda$ as $\tau^' = \lambda \tau$.
+the noise parameter will also change dependent on $\lambda$ as $\tau^\prime = \lambda \tau$.
 It can be observed that by default, for $\lambda = 1$, the input circuit remains unchanged
-as the new noise parameter is same as original noise parameter $\tau^' = \tau$.
+as the new noise parameter is same as initial noise parameter $\tau^\prime = \tau$.
+Note that here initial noise parameter $\tau$ is the noise of the physical device without
+any scaling.
+
+Let $E(\tau)$ be some circuit observable described as a function of the noise parameter
+and $\rho$ be the state prepared by the quantum circuit of interest. The expectation
+value can be described as a function of noise parameter as following:
+
+$$
+\langle E(\tau^\prime) \rangle = \text{Tr}[\rho] E(\tau^\prime)
+$$
+
+We wish to estimate $\langle E(\tau=0) \rangle$ by calculating a range of different
+$\langle E(\tau^\prime) \rangle$ as dictated by different values of $\lambda$. In
+order to be consistent with [notation introduced previously in the documentation](https://mitiq.readthedocs.io/en/latest/guide/pec-5-theory.html#error-cancellation)
+$\langle E(\tau=0) \rangle$ could be re-labeled as $\langle E\rangle_{\rm ideal}$ and the noisy expectation
+values \langle E(\tau^\prime) \rangle could be re-labeled as
+$\langle E(\tau) \rangle_{\rm noisy}$.
