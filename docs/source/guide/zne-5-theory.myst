@@ -70,7 +70,7 @@ The diagram demonstrates how pulse stretching is used to increase noise in a phy
 ```
 
 In both gate-model and pulse-model scenarios, let $\tau$ be a parameter quantifying
-noise in the circuit. When scale factor $\lambda$ is used to increase the circuit noise,
+noise in the circuit. When the scale factor $\lambda$ is used to increase the circuit noise,
 the noise parameter will also change dependent on $\lambda$ as $\tau^\prime = \lambda \tau$.
 It can be observed that by default, for $\lambda = 1$, the input circuit remains unchanged
 as the new noise parameter is same as initial noise parameter $\tau^\prime = \tau$.
