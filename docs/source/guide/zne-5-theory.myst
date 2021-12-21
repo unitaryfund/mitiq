@@ -92,7 +92,13 @@ $\langle E(\tau=0) \rangle$ could be re-labeled as $\langle E\rangle_{\rm ideal}
 values $\langle E(\tau^\prime) \rangle$ could be re-labeled as
 $\langle E(\tau) \rangle_{\rm noisy}$.
 
-The ideal expectation value can be extrapolated as shown below. $S$ is the set of
+The ideal expectation value can be extrapolated as shown below, 
+
+$$
+\langle E\rangle_{\rm ideal} = \sum_{\lambda \in S} n_{\lambda} \langle E_{\lambda} \rangle_{\rm noisy} + \Delta
+$$
+ 
+where $S$ is the set of
 chosen scale factors, $n_{\lambda}$ is a coefficient dependent on the scale factor
 when the noisy expectation value is calculated after scaling the noise in the circuit.
 $\Delta$ is the variance error caused by choosing some extrapolation model.
