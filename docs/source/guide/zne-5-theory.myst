@@ -97,9 +97,6 @@ chosen scale factors, $n_{\lambda}$ is a coefficient dependent on the scale fact
 when the noisy expectation value is calculated after scaling the noise in the circuit.
 $\Delta$ is the variance error caused by choosing some extrapolation model.
 
-$$
-\langle E\rangle_{\rm ideal} = \sum_{\lambda \in S} n_{\lambda} \langle E_{\lambda} \rangle_{\rm noisy} + \Delta
-$$
 
 
 Different extrapolation methods can be used for $\langle E\rangle_{\rm ideal}$. A
