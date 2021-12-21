@@ -74,7 +74,7 @@ noise in the circuit. When the scale factor $\lambda$ is used to increase the ci
 the noise parameter will also change dependent on $\lambda$ as $\tau^\prime = \lambda \tau$.
 It can be observed that by default, for $\lambda = 1$, the input circuit remains unchanged
 as the new noise parameter is the same as the initial noise parameter $\tau^\prime = \tau$.
-Note that here initial noise parameter $\tau$ is the noise of the physical device without
+Note that here the initial noise parameter $\tau$ is the noise of the physical device without
 any scaling.
 
 Let $E(\tau)$ be some circuit observable described as a function of the noise parameter
