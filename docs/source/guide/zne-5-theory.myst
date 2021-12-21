@@ -93,7 +93,7 @@ values $\langle E(\tau^\prime) \rangle$ could be re-labeled as
 $\langle E(\tau) \rangle_{\rm noisy}$.
 
 The ideal expectation value can be extrapolated as shown below. $S$ is the set of
-chosen scale factors, $n_{\lambda}$ is a co-effecient dependent on the scale factor
+chosen scale factors, $n_{\lambda}$ is a coefficient dependent on the scale factor
 when noisy expectation value is calculated after scaling the noise in the circuit.
 $\Delta$ is the variance error caused by choosing some extrapolation model.
 
