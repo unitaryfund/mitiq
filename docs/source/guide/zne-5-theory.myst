@@ -15,38 +15,33 @@ kernelspec:
 # What is the theory behind ZNE?
 
 
-Zero noise extrapolation (ZNE) {cite}`Giurgica_Tiron_2020_arXiv` is an error
+Zero noise extrapolation (ZNE) {cite}`Li_2017_PRX, Temme_2017_PRL, Kandala_2019_Nature` is an error
 mitigation technique used to extrapolate the noiseless expectation value of an
 observable from a range of expectation values computed at different noise levels.
-In Mitiq, this process works in two steps:
+This process works in two steps:
 
-- **Step 1: Intentionally scale noise** by manually inserting gates in a manner
-that keeps the logic of input circuit unchanged. The number of gates inserted is
-dependent on the scale factor. Different scale factor values will calculate the
-expectation value at different noise leveles.
+- **Step 1: Intentionally scale noise**. This can be done with different methods.
+*Pulse-stretching* {cite}`Temme_2017_PRL` can be used to increase the noise level
+of a quantum computation. Similar results can be obtained, at a gate-level, with *unitary folding*
+{cite}`Li_2017_PRX, Giurgica_Tiron_2020_arXiv`.
 
 - **Step 2: Extrapolate to the noiseless limit** by fitting a curve [via one of
 the various methods available in Mitiq](https://mitiq.readthedocs.io/en/stable/apidoc.html#module-mitiq.zne.inference)
 to the expectation values calculated at different noise levels to extrapolate the
 noiseless expectation value.
 
-## Scaling Noise by Unitary Folding
+## Step 1: Intentionally scale noise.
 
-In ZNE, if a quantum circuit is implemented via gates, the circuit depth is increased
-for gates $G$ in the circuit by mapping as $G \mapsto G G^\dagger G$. Here, $G$
-can be a set of all the gates or a portion of gates in a quantum circuit. When all
-the gates are to be mapped as discussed previously, the process is known as *global
-folding*, while if only some gates in the circuit are to be folded, the procedure implemented
-is known as *local folding*. Thus, in either case noise caused due to physical implementations
-of unitary gates on gate-model devices is scaled by inserting additional gates
-in the circuit.
+A technique to increase the noise level of a circuit is to intentionally increase its depth.
+This can be obtained using the *unitary folding* mapping $G \mapsto G G^\dagger G$. 
+This mapping can be applied *globally* or *locally* as shown in the diagrams below.
 
 ```{figure} ../img/zne_global_folding.png
 ---
 width: 500
 name: figzne_global
 ---
-The diagram demonstrates how gates are inserted in a circuit for ZNE when the goal is to scale noise by folding the entire circuit (*global folding*).
+The diagram demonstrates how gates are inserted in a circuit when *global folding* is applied.
 ```
 
 ```{figure} ../img/zne_local_folding.png
@@ -54,12 +49,17 @@ The diagram demonstrates how gates are inserted in a circuit for ZNE when the go
 width: 500
 name: figzne_local
 ---
-The diagram demonstrates how gates are inserted in a circuit for ZNE when the goal is to fold some gates in the circuit to scale noise (*local folding*).
+The diagram demonstrates how gates are inserted in a circuit when *local folding* is applied.
 ```
 
-The same idea applies to devices with pulse-level access for ZNE {cite}`Kandala_2019_Nature, Kandala_2019_Nature`.
+More details on the theory of unitary folding can be found in {cite}`Giurgica_Tiron_2020_arXiv`.
+More details on its practical implementation in Mitiq can be found in 
+[What additional options are available for ZNE?](zne-3-options.myst).
+
+A noise scaling technique similar to unitary folding is *pulse-stretching*: a method that only applies to 
+devices with pulse-level access {cite}`Temme_2017_PRL, Kandala_2019_Nature`.
 The noise of the device can be altered by increasing the time over which pulses
-are implemented but keeps the original circuit unchanged.
+are implemented, as shown in the following diagram:
 
 ```{figure} ../img/zne_pulse_stretching.png
 ---
@@ -69,34 +69,42 @@ name: figzne_pulse
 The diagram demonstrates how pulse stretching is used to increase noise in a physical device for ZNE.
 ```
 
+## Step 2: Extrapolate to the noiseless limit
+
 In both gate-model and pulse-model scenarios, let $\tau$ be a parameter quantifying
-noise in the circuit. When the scale factor $\lambda$ is used to increase the circuit noise,
-the noise parameter will also change dependent on $\lambda$ as $\tau^\prime = \lambda \tau$.
-It can be observed that by default, for $\lambda = 1$, the input circuit remains unchanged
-as the new noise parameter is the same as the initial noise parameter $\tau^\prime = \tau$.
-Note that here the initial noise parameter $\tau$ is the noise of the physical device without
+noise level in the circuit and let $\tau^\prime = \lambda \tau$ the scaled noise level.
+
+For $\lambda = 1$, the input circuit remains unchanged
+since the noise level $\tau^\prime = \tau$ is the same as the noise of the physical device without
 any scaling.
 
-Let $E(\tau)$ be some circuit observable described as a function of the noise parameter
-and $\rho$ be the state prepared by the quantum circuit of interest. The expectation
-value can be described as a function of noise parameter as following:
+Let $\rho(\tau')$ be the state prepared by a noise scaled quantum circuit. The expectation
+value of an observable $A$ can be described as a function of the noise scaling parameter as follows:
 
 $$
-\langle E(\tau^\prime) \rangle = \text{Tr}[\rho E(\tau^\prime)]
+\langle E(\lambda) \rangle = \text{Tr}[\rho(\tau') A] = \text{Tr}[\rho(\lambda \tau) A]
 $$
 
-We wish to estimate $\langle E(\tau=0) \rangle$ by calculating a range of different
-$\langle E(\tau^\prime) \rangle$ as dictated by different values of $\lambda$. In
-order to be consistent with the [notation introduced previously in the documentation](https://mitiq.readthedocs.io/en/latest/guide/pec-5-theory.html#error-cancellation)
-$\langle E(\tau=0) \rangle$ could be re-labeled as $\langle E\rangle_{\rm ideal}$ and the noisy expectation
-values $\langle E(\tau^\prime) \rangle$ could be re-labeled as
-$\langle E(\tau) \rangle_{\rm noisy}$.
+The idea of ZNE is that one can estimate the ideal expectation value $\langle E(\lambda=0) \rangle$, by measuring a range of different
+expectation values $\langle E(\lambda) \rangle$ for different values of $\lambda \ge 1$ and extrapolating
+to the zero-noise limit.
 
-The ideal expectation value can be extrapolated as shown below, 
+In practice the extrapolation can be done as follows:
+  1) Assume $E(\lambda)\simeq f(\lambda; p_1, p_2, ... p_m)$, where $f$ is an *extrapolation model*, i.e., a function
+  of $\lambda$ depending on a set of real parameters $p_1, p_2, \dots, p_m$.
+  2) Fit the function $f$ to the measured noise-scaled expectation values, obtaining an optimal set of 
+  parameters $\tilde p_1, \tilde p_2, \dots \tilde p_m$.
+  3) Evaluate the corresponding zero-noise limit, i.e., $f(0; \tilde p_1, \tilde p_2, \dots \tilde p_m)$.
+
+Different choices of $f$, produce different extrapolations. Typical choices for $f$ are: a linear function, a polynomial, an exponential.
+For example, Richardson extrapolation, corresponds to the following polynomial model:
+
 
 $$
-\langle E\rangle_{\rm ideal} = \sum_{\lambda \in S} n_{\lambda} \langle E_{\lambda} \rangle_{\rm noisy} + \Delta
+f(\lambda; p_1, p_2, ... p_m) = p_1 + p_2 \lambda + p_3 \lambda^2 + \dots p_m \lambda^{m-1},
 $$
+
+where $m$ is equal to the number of data points in the fit (i.e. the number of noise scaled expectation values).
  
 where $S$ is the set of
 chosen scale factors, $n_{\lambda}$ is a coefficient dependent on the scale factor
