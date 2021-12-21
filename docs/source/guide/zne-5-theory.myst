@@ -46,7 +46,7 @@ in the circuit.
 width: 500
 name: figzne_global
 ---
-The diagram demonstrates how gates are inserted in a circuit for ZNE when the goal is to scale noise by folding the entire circuit.
+The diagram demonstrates how gates are inserted in a circuit for ZNE when the goal is to scale noise by folding the entire circuit (*global folding*).
 ```
 
 ```{figure} ../img/zne_local_folding.png
