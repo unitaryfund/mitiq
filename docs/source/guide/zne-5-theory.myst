@@ -35,9 +35,9 @@ noiseless expectation value.
 In ZNE, if a quantum circuit is implemented via gates, the circuit depth is increased
 for gates $G$ in the circuit by mapping as $G \mapsto G G^\dagger G$. Here, $G$
 can be a set of all the gates or a portion of gates in a quantum circuit. When all
-the gates are to be mapped as discussed previously, the process is known as global
-folding but if only some gates in the circuit are to be folded, the procedure implemented
-is known as local folding. Thus, in either case noise caused due to physical implementations
+the gates are to be mapped as discussed previously, the process is known as *global
+folding*, while if only some gates in the circuit are to be folded, the procedure implemented
+is known as *local folding*. Thus, in either case noise caused due to physical implementations
 of unitary gates on gate-model devices is scaled by inserting additional gates
 in the circuit.
 
