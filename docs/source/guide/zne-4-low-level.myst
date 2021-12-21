@@ -13,22 +13,39 @@ kernelspec:
 
 # What happens when I use ZNE?
 
-In Mitiq, ZNE is clearly divided into two steps, noise scaling and extrapolation. They are shown in the Figure below. As mentioned in the [introduction to ZNE](zne-1-intro.myst), the corresponding sub-modules in the codebase are {mod}`mitiq.zne.scaling.folding` and {mod}`mitiq.zne.inference`.
+In Mitiq, ZNE is clearly divided into two steps, noise scaling and extrapolation. They are shown in the Figure below. As mentioned in the [introduction to ZNE](zne-1-intro.myst),
+the corresponding sub-modules in the codebase are {mod}`mitiq.zne.scaling.folding` and {mod}`mitiq.zne.inference`.
 
 ```{figure} ../img/zne_workflow2_steps.png
 ---
 width: 400
 name: figzne
 ---
-The diagram shows the workflow of the zero noise extrapolation (ZNE) techniques in Mitiq. The first step involves generating quantum circuits for noise scaling. The second step involves inferring the zero-noise value from the noisy circuit measurements.
+The diagram shows the workflow of the zero noise extrapolation (ZNE) techniques in Mitiq. 
 ```
 
+**The first step** involves generating quantum circuits for noise scaling. 
+  - The user provides a `QPROGRAM`, (i.e. a quantum circuit defined via any of the supported frontends).
+  - Mitiq generates a scaled circuit via unitary folding. This step depends on the scale factor provided by the user as scale factor dictates the number of gates
+  inserted.
+  - The circuit is executed on a backend for different scale factors.
 
-The interested reader will find in the sections below content useful to understand how to customize noise scaling methods and how a factory object actually works at a deeper level.
+**The second step** involves inferring the zero-noise value from the noisy circuit measurements.
+  - Using a range of noisy expectation values calculated at different scale factors, user chosen classical extrapolation will infer an ideal noiseless expectation
+  value.
+  - The error mitigated expectation vaue is returned by Mitiq. 
+
+As demonstrated in [How do I use ZNE ?](zne-1-intro.myst), {func}`.execute_with_zne()` can be used for using methods defined in Mitiq. However, if one chooses to
+customize the process, an interested reader will find in the sections below content useful to understand how to customize noise scaling methods and how a
+factory object actually works at a deeper level.
 
 +++
 
 ## Custom folding methods
+
+If a user chooses to define a custom folding method, then an input circuit will have to be initialized as defined in [How do I use ZNE ?](zne-1-intro.myst). A user 
+can choose to define a custom inference method or use methods defined in Mitiq.
+
 Custom folding methods can be defined and used with Mitiq, e.g., with {py:func}`.zne.execute_with_zne`. The signature of this function must be as follows:
 
 ```{code-cell} ipython3
