@@ -25,10 +25,9 @@ This process works in two steps:
 of a quantum computation. Similar results can be obtained, at a gate-level, with *unitary folding*
 {cite}`Li_2017_PRX, Giurgica_Tiron_2020_arXiv`.
 
-- **Step 2: Extrapolate to the noiseless limit** by fitting a curve [via one of
-the various methods available in Mitiq](https://mitiq.readthedocs.io/en/stable/apidoc.html#module-mitiq.zne.inference)
-to the expectation values calculated at different noise levels to extrapolate the
-noiseless expectation value.
+- **Step 2: Extrapolate to the noiseless limit**. This can be done by
+fitting a curve (often called *extrapolation model*) to the expectation values measured at different noise levels
+to extrapolate the noiseless expectation value.
 
 ## Step 1: Intentionally scale noise.
 
