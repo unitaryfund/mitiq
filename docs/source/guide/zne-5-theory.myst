@@ -106,5 +106,5 @@ $\Delta$ is the variance error caused by choosing some extrapolation model.
 
 
 Different extrapolation methods can be used for $\langle E\rangle_{\rm ideal}$. A
-detailed discussion about the extrapolation methods is skipped as it is [available
+detailed discussion about the extrapolation methods is [available
 here](https://mitiq--1021.org.readthedocs.build/en/1021/guide/zne-3-options.html#extrapolation-methods-factory-objects).
