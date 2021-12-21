@@ -87,7 +87,7 @@ $$
 
 We wish to estimate $\langle E(\tau=0) \rangle$ by calculating a range of different
 $\langle E(\tau^\prime) \rangle$ as dictated by different values of $\lambda$. In
-order to be consistent with [notation introduced previously in the documentation](https://mitiq.readthedocs.io/en/latest/guide/pec-5-theory.html#error-cancellation)
+order to be consistent with the [notation introduced previously in the documentation](https://mitiq.readthedocs.io/en/latest/guide/pec-5-theory.html#error-cancellation)
 $\langle E(\tau=0) \rangle$ could be re-labeled as $\langle E\rangle_{\rm ideal}$ and the noisy expectation
 values $\langle E(\tau^\prime) \rangle$ could be re-labeled as
 $\langle E(\tau) \rangle_{\rm noisy}$.
