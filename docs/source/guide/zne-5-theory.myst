@@ -54,7 +54,7 @@ The diagram demonstrates how gates are inserted in a circuit for ZNE when the go
 width: 500
 name: figzne_local
 ---
-The diagram demonstrates how gates are inserted in a circuit for ZNE when the goal is to fold some gates in the circuit to scale noise.
+The diagram demonstrates how gates are inserted in a circuit for ZNE when the goal is to fold some gates in the circuit to scale noise (*local folding*).
 ```
 
 The same idea applies to devices with pulse-level access for ZNE {cite}`Kandala_2019_Nature, Kandala_2019_Nature`.
