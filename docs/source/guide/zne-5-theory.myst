@@ -105,13 +105,5 @@ $$
 
 where $m$ is equal to the number of data points in the fit (i.e. the number of noise scaled expectation values).
  
-where $S$ is the set of
-chosen scale factors, $n_{\lambda}$ is a coefficient dependent on the scale factor
-when the noisy expectation value is calculated after scaling the noise in the circuit.
-$\Delta$ is the variance error caused by choosing some extrapolation model.
-
-
-
-Different extrapolation methods can be used for $\langle E\rangle_{\rm ideal}$. A
-detailed discussion about the extrapolation methods is [available
-here](https://mitiq--1021.org.readthedocs.build/en/1021/guide/zne-3-options.html#extrapolation-methods-factory-objects).
+More details on how to apply different extrapolation methods with Mitiq can be found in [What additional options
+are available in ZNE?](zne-3-options.myst).
