@@ -28,10 +28,15 @@ class Observable:
      value.
 
     It can be defined on a selection of the total qubits in a quantum register.
-    It can be initialized with :class:`.PauliString` objects.
     """
 
     def __init__(self, *paulis: PauliString) -> None:
+        """Initializes an `Observable` with :class:`.PauliString` objects.
+
+        Args:
+            paulis: PauliStrings used to define the observable.
+
+        """
         # TODO: Add option to Combine duplicates. E.g. [Z(0, Z(0)] -> [2*Z(0)].
         self._paulis = list(paulis)
         self._groups: List[PauliStringCollection]
