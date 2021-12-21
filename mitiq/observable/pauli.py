@@ -33,8 +33,10 @@ from mitiq.interface import atomic_converter
 
 
 class PauliString:
-    """A sequence of Pauli operators defined on the space spanned by the qubits
-     in the qubit register of the quantum circuit."""
+    """A `PauliString` is a (tensor) product of single-qubit Pauli gates I, X,
+    Y, and Z, with a leading (real or complex) coefficient. `PauliString`s can
+    be measured in any `mitiq.QPROGRAM`.
+    """
 
     _string_to_gate_map = {"I": cirq.I, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
 
