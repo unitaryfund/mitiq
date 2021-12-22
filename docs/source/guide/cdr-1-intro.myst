@@ -12,3 +12,110 @@ kernelspec:
 ---
 
 # How do I use CDR?
+
+Here we show how to use the Clifford data regression (CDR) quantum error mitigation technique by means of a simple example.
+
+```{code-cell} ipython3
+import warnings
+warnings.filterwarnings("ignore")
+
+import numpy as np
+
+import cirq
+from mitiq import cdr, Observable, PauliString
+```
+
+# Applying CDR in four steps
+
+To use CDR, we call {func}`.cdr.execute_with_cdr` with four "ingredients":
+
+1. A quantum circuit to prepare a state $\rho$.
+1. A quantum computer or noisy simulator to return a {class}`.QuantumResult` from $\rho$.
+1. An observable $O$ which specifies what we wish to compute via $\text{Tr} [ \rho O ]$.
+1. A near-Clifford (classical) circuit simulator.
+
++++
+
+### 1. Define a quantum circuit
+
+The quantum circuit can be specified as any quantum circuit supported by Mitiq but **must be compiled into the gateset $\{ \sqrt{X}, Z, \text{CNOT}\}$.**
+
+```{code-cell} ipython3
+a, b = cirq.LineQubit.range(2)
+circuit = cirq.Circuit(
+    cirq.rx(0.1).on(a),
+    cirq.rx(-0.72).on(b),
+    cirq.rz(0.4).on(a),
+    cirq.rz(0.2).on(b),
+    cirq.CNOT.on(a, b),
+    cirq.rx(-0.1).on(b),
+    cirq.rz(-0.23).on(a),
+    cirq.CNOT.on(b, a),
+    cirq.rx(-0.112).on(a),
+)
+circuit
+```
+
+### 2. Define an executor
+The executor inputs a circuit and returns a {class}`.QuantumResult`. Typically this function will send the circuit to a quantum computer and wait for the results. Here for sake of example we use a simulator that adds single-qubit depolarizing noise after each moment and returns the final density matrix.
+
+```{code-cell} ipython3
+from mitiq.interface.mitiq_cirq import compute_density_matrix
+
+compute_density_matrix(circuit).round(3)
+```
+
+### 3. Observable
+The observables $O$ indicates what we wish to compute via $\text{Tr} [ \rho O ]$.
+
+```{code-cell} ipython3
+# Observable to measure.
+obs = Observable(PauliString("ZZ"), PauliString("X", coeff=-1.75))
+print(obs)
+```
+
+### 4. (Near-Clifford) Simulator
+The CDR method creates a set of "training circuits" which are related to the input circuit and are efficiently simulable. These circuits are simulated on a classical (noiseless) simulator to collect data for regression. The simulator should also return a `QuantumResult`.
+
+To use CDR at scale, an efficient near-Clifford circuit simulator must be specified. In this example, the circuit is small enough to use any classical simulator, and we use the same density matrix simulator as above but without noise.
+
+```{code-cell} ipython3
+def simulate(circuit: cirq.Circuit) -> np.ndarray:
+    return compute_density_matrix(circuit, noise_level=(0.0,))
+
+
+simulate(circuit).round(3)
+```
+
+## Results
+
+Now we can run CDR. We first compute the noiseless result then the noisy result to compare to the mitigated result from CDR.
+
++++
+
+### The noiseless result
+
+```{code-cell} ipython3
+obs.expectation(circuit, simulate).real
+```
+
+### The noisy result
+
+```{code-cell} ipython3
+obs.expectation(circuit, compute_density_matrix).real
+```
+
+### The mitigated result
+
+```{code-cell} ipython3
+cdr.execute_with_cdr(
+    circuit,
+    compute_density_matrix,
+    observable=obs,
+    simulator=simulate,
+).real
+```
+
+```{code-cell} ipython3
+
+```

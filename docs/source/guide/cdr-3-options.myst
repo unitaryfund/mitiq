@@ -12,3 +12,83 @@ kernelspec:
 ---
 
 # What additional options are available in CDR?
+
+In addition to the four necessary ingreedients shown in [How do I use CDR?](cdr-1-intro.myst), there are additional parameters in CDR.
+
+One option is how many circuits are in the training set (default is 10). This can be changed as follows.
+
+```{code-cell} ipython3
+import warnings
+warnings.filterwarnings("ignore")
+
+import numpy as np
+
+import cirq
+from mitiq import cdr, Observable, PauliString
+from mitiq.interface.mitiq_cirq import compute_density_matrix
+
+a, b = cirq.LineQubit.range(2)
+circuit = cirq.Circuit(
+    cirq.rx(0.1).on(a),
+    cirq.rx(-0.72).on(b),
+    cirq.rz(0.4).on(a),
+    cirq.rz(0.2).on(b),
+    cirq.CNOT.on(a, b),
+    cirq.rx(-0.1).on(b),
+    cirq.rz(-0.23).on(a),
+    cirq.CNOT.on(b, a),
+    cirq.rx(-0.112).on(a),
+)
+circuit
+
+obs = Observable(PauliString("ZZ"), PauliString("X", coeff=-1.75))
+
+def simulate(circuit: cirq.Circuit) -> np.ndarray:
+    return compute_density_matrix(circuit, noise_level=(0.0,))
+
+
+simulate(circuit).round(3)
+
+
+cdr.execute_with_cdr(
+    circuit,
+    compute_density_matrix,
+    observable=obs,
+    simulator=simulate,
+    num_training_circuits=20,
+).real
+```
+
+Another option is which fit function to use for regresstion (default is `cdr.linear_fit_function`).
+
++++
+
+### Fit function
+
+```{code-cell} ipython3
+cdr.execute_with_cdr(
+    circuit,
+    compute_density_matrix,
+    observable=obs,
+    simulator=simulate,
+    fit_function=cdr.linear_fit_function_no_intercept,
+).real
+```
+
+### Variable noise CDR
+
++++
+
+The circuit + training circuits can also be run at different noise scale factors to implement [variable noise Clifford data regression](https://arxiv.org/abs/2011.01157) {cite}`Lowe_2021_PRR`.
+
+```{code-cell} ipython3
+from mitiq.zne import scaling
+
+cdr.execute_with_cdr(
+    circuit,
+    compute_density_matrix,
+    observable=obs,
+    simulator=simulate,
+    scale_factors=(3,),
+).real
+```
