@@ -32,7 +32,7 @@ The inference step of PEC is based on the Monte Carlo estimation protocol discus
 
 As shown in the Section [How do I use PEC?](pec-1-intro.myst), the standard way of applying PEC in Mitiq is based
 on the function {func}`.execute_with_pec()`. However, one may be interested in applying PEC with a lower-level of
-abstraction for reasons of efficiency or for customization proposes. 
+abstraction for reasons of efficiency or for customization purposes. 
 In particular, it could be useful to explicitly split the PEC process into the two main steps shown in the figure above:
 
 - Step 1: Probabilistic generation of all the auxiliary circuits;
