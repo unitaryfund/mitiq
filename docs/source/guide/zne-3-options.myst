@@ -58,7 +58,7 @@ Mitiq achieves this task by *digital* noise scaling, i.e., with circuit manipula
 More details on digital ZNE can be found in [What is the theory behind ZNE?](zne-5-theory.myst)
 
 In Mitiq a noise scaling method is represented by a *noise scaling function* that takes as input a `circuit` and a real `scale_factor` and
-returns an `scaled_circuit`. For a noiseless backend, `scaled_circuit` has the same effect as `circuit`. For a noisy backend, 
+returns a `scaled_circuit`. For a noiseless backend, `scaled_circuit` has the same effect as `circuit`. For a noisy backend, 
 `scaled_circuit` is more sensitive to errors depending on the magnitude of `scale_factor`. 
 
 ### Unitary Folding 
