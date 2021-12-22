@@ -35,7 +35,7 @@ mitiq.SUPPORTED_PROGRAM_TYPES.keys()
 In the next cell you can select the frontend used in this tutorial. For example:
 
 ```{code-cell} ipython3
-frontend = "cirq"  # Supported: "cirq", "qiskit", "pyquil", "braket", "pennylane".
+frontend = "cirq" 
 ```
 
 ## Define the circuit of interest
