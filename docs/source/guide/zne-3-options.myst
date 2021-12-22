@@ -85,6 +85,8 @@ at random, from left (starting from the initial gates), from right (starting fro
 For more details on folding functions, we suggest to click on the functions listed above and check the associated API docs.
 
 If not specified by the user, the default noise scaling method in Mitiq is {func}`.fold_gates_at_random()`.
+Custom noise-scaling functions can also be defined by the user, as shown
+in [What happens when I use ZNE ?](zne-4-low-level.myst).
 
 +++
 
@@ -95,6 +97,9 @@ If not specified by the user, the default noise scaling method in Mitiq is {func
 #### The special case of odd integer scale factors
 
 +++
+
+For any noise scaling function, if `scale_factor` is equal to 1, the input circuit is unchanged
+and it is subject to the base noise of the backend.
 
 Both local and global folding, if applied uniformly to all the gates of `circuit`, produce a `scaled_circuit` that has 3 times more gates than the input `circuit`.
 This corresponds to the `scale_factor=3` setting. For example:
@@ -156,6 +161,8 @@ For this reason, when dealing with very short circuits, we suggest to use odd in
 +++
 
 For longer circuits, real scale factors are better approximated.
+Indeed, when `num_gates` and `scaled_num_gates` are large integers, their ratio
+can take values with a more fine-grained resolution.
 
 ```{code-cell} ipython3
 long_circuit = circuit * 5
@@ -224,7 +231,7 @@ The {class}`.Factory` class has two main abstract subclasses:
 Specific classes derived from {class}`.BatchedFactory` or {class}`.AdaptiveFactory` represent different zero-noise extrapolation
 methods. 
 
-Mitiq provides a number of built-in factories can be found in the module {mod}`mitiq.zne.inference` and are summarized in the following table.
+Mitiq provides a number of built-in factories, which can be found in the module {mod}`mitiq.zne.inference` and are summarized in the following table.
 
 ```{eval-rst}
 .. autosummary::
