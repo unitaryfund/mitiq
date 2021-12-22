@@ -54,7 +54,7 @@ and how they can be applied in practice.
 +++
 
 To apply ZNE, we need to effectively increase the noise acting in a quantum computation. Instead of directly controlling the physical backend,
-Mitiq achieves this task by *digital* noise scaling, i.e., with circuit manipulations that indirectly increase the effect of noise.
+Mitiq achieves this task by *digital* noise scaling, i.e., with circuit manipulations that indirectly increase the effect of noise but keep the circuit logic unchanged.
 More details on digital ZNE can be found in [What is the theory behind ZNE?](zne-5-theory.myst)
 
 In Mitiq a noise scaling method is represented by a *noise scaling function* that takes as input a `circuit` and a real `scale_factor` and
