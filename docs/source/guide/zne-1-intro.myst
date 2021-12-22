@@ -13,9 +13,9 @@ kernelspec:
 
 # How do I use ZNE?
 
-Zero noise extrapolation is an error mitigation technique in which an expectation 
+Zero-noise extrapolation (ZNE) is an error mitigation technique in which an expectation 
 value is computed at different noise levels and, as a second step, the ideal 
-expectation value is inferred extrapolating the measured results to the zero-noise 
+expectation value is inferred by extrapolating the measured results to the zero-noise 
 limit (see the section [What is the theory behind ZNE?](zne-5-theory.myst)).
 
 Both steps — noise scaling and extrapolation — can be applied with Mitiq. The 
