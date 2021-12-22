@@ -275,7 +275,6 @@ fac.run_classical(noise_to_expval)
 fac.reduce()
 ```
 
-The {meth}`.Factory.run_classical` can be used explicitly run ZNE 
-as fully classical inference problem. 
-Indeed, all quantum aspects of the problem (circuit, observable, backend, etc.) are
+The {meth}`.Factory.run_classical` applies ZNE as a fully classical inference problem.
+Indeed, all the quantum aspects of the problem (circuit, observable, backend, etc.) are
 wrapped into the `noise_to_expval()` function.
