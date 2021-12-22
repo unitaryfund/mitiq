@@ -138,7 +138,7 @@ In this case, since all gates are folded the same number of times, the three loc
 
 +++
 
-More generally, the `scale_factor` can be set to any real number larger or equal than one. In this case,
+More generally, the `scale_factor` can be set to any real number larger than or equal to one. In this case,
 Mitiq applies additional folding to a selection of gates (for local folding) or to a final fraction of the circuit (for global folding),
 such that the total number of gates is *approximately* scaled by `scale_factor`. For example:
 
