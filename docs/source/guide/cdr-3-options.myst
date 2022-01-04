@@ -63,7 +63,7 @@ Another option is which fit function to use for regresstion (default is `cdr.lin
 
 +++
 
-### Fit function
+## Fit function
 
 ```{code-cell} ipython3
 cdr.execute_with_cdr(
@@ -75,7 +75,7 @@ cdr.execute_with_cdr(
 ).real
 ```
 
-### Variable noise CDR
+## Variable noise CDR
 
 +++
 

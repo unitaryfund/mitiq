@@ -25,7 +25,7 @@ import cirq
 from mitiq import cdr, Observable, PauliString
 ```
 
-# Applying CDR in four steps
+## Applying CDR in four steps
 
 To use CDR, we call {func}`.cdr.execute_with_cdr` with four "ingredients":
 
@@ -114,8 +114,4 @@ cdr.execute_with_cdr(
     observable=obs,
     simulator=simulate,
 ).real
-```
-
-```{code-cell} ipython3
-
 ```
