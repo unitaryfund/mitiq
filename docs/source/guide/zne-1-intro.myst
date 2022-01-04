@@ -91,8 +91,7 @@ Zero-noise extrapolation can be easily implemented with the function
 ```{code-cell} ipython3
 from mitiq import zne
 
-mitigated_result = zne.execute_with_zne(
-     circuit, execute)
+mitigated_result = zne.execute_with_zne(circuit, execute)
 ```
 
 ```{code-cell} ipython3
