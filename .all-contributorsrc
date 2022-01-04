@@ -291,6 +291,15 @@
         "code",
         "example"
       ]
+    },
+    {
+      "login": "AkashNarayanan",
+      "name": "AkashNarayanan B",
+      "avatar_url": "https://avatars.githubusercontent.com/u/83135130?v=4",
+      "profile": "https://github.com/AkashNarayanan",
+      "contributions": [
+        "infra"
+      ]
     }
   ],
   "contributorsPerLine": 7,
