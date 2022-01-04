@@ -250,8 +250,7 @@ convergence.
 
 This is done by wrapping the noisy executor into a mitigated executor. 
 We will fold the gates from the right and apply a linear inference (using a Linear 
-Factory object) to implement ZNE. Read more about [noise scaling by unitary folding](https://mitiq--959.org.readthedocs.build/en/959/guide/guide-zne.html) 
-in the Mitiq user guide.
+Factory object) to implement ZNE. You can read more about noise scaling by unitary folding in the Mitiq user guide.
 
 ```{code-cell} ipython3
 def mitigated_expectation(
