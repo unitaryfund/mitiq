@@ -17,8 +17,8 @@ In this example we investigate how Zero Noise Extrapolation (ZNE) can improve
 convergence when applied to a variational problem. ZNE works by computing the 
 observable of interest at increased noise levels, i.e. beyond the minimum noise 
 strength in the computer, and then extrapolating back to the zero-noise limit. 
-The two main components of ZNE are noise scaling and extrapolation. Read more about 
-ZNE in the [Mitiq Users Guide](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html#noise-scaling-by-unitary-folding).
+The two main components of ZNE are noise scaling and extrapolation. You can read more about 
+ZNE in the Mitiq Users Guide.
 
 
 The Variational Quantum Eigensolver (VQE) is a hybrid quantum-classical algorithm used to
