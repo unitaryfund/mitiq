@@ -153,13 +153,12 @@ value returned by the executor.
     :width: 600
     :alt: factory data from executor.
 
-You can read more about the :class:`~mitiq.zne.inference.Factory` objects that are built into Mitiq
-and how to create your own :ref:`here <guide_zne_factory>`.
+You can read more about the :class:`~mitiq.zne.inference.Factory` objects that are built into Mitiq and how to create your own in the user guide.
 
 Another key step in zero-noise extrapolation is to choose how your circuit is
 transformed to scale the noise. You can read more about the noise scaling
 methods built into Mitiq and how to create your
-own :ref:`here <guide_zne_folding>`.
+own in the section on ZNE in the Users Guide.
 
 .. _qiskit_getting_started:
 
