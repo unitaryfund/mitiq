@@ -27,7 +27,6 @@ class Observable:
     """A quantum observable typically used to compute its mitigated expectation
      value.
 
-    It can be defined on a selection of the total qubits in a quantum register.
     """
 
     def __init__(self, *paulis: PauliString) -> None:
