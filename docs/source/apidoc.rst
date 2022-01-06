@@ -65,6 +65,24 @@ Qiskit Utils
 .. automodule:: mitiq.interface.mitiq_qiskit.qiskit_utils
    :members:
 
+Executors
+---------
+.. automodule:: mitiq.executor.executor
+   :members:
+
+Observables
+-----------
+
+Observable
+^^^^^^^^^^
+.. automodule:: mitiq.observable.observable
+   :members:
+
+Pauli
+^^^^^^^^^^^
+.. automodule:: mitiq.observable.pauli
+   :members:
+
 Probabilistic Error Cancellation
 --------------------------------
 
@@ -105,6 +123,18 @@ Raw
 Run experiments without error mitigation (raw results)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.raw.raw
+
+Readout Error Mitigation
+------------------------
+
+Measurement Result
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.rem.measurement_result
+   :members:
+
+Post-selection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.rem.post_select
    :members:
 
 Zero Noise Extrapolation

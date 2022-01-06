@@ -100,7 +100,7 @@ Limitations of probabilistic error cancellation
 The number of samples required to estimate the ideal expectation value with error
 :math:`\delta` and probability :math:`1-\epsilon` scales as
 :math:`\left(2 \gamma_{\text{tot}}^{2} / \delta^{2}\right) \log (2 / \epsilon)`
-:cite:`Takagi2020optimal`. Thus, the sampling overhead is determined
+:cite:`Takagi_2020_PRR`. Thus, the sampling overhead is determined
 by :math:`\gamma_{\text{tot}}` which grows exponentially in the number of gates.
 It is then crucial to find a linear decomposition that minimizes :math:`\gamma_{\text{tot}}`.
 In addition, a full characterization of the noisy operations up to a good precision
@@ -243,7 +243,7 @@ A list of research articles academic resources on error mitigation:
 
 - On **probabilistic error cancellation**:
    - Theory, Y. Li and S. Benjamin, *Phys. Rev. X*, 2017 :cite:`Li_2017_PRX` and K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
-   - Resource analysis for probabilistic error cancellation, Ryuji Takagi, arxiv, 2020 :cite:`Takagi2020optimal`
+   - Resource analysis for probabilistic error cancellation, Ryuji Takagi, arxiv, 2020 :cite:`Takagi_2020_PRR`
 
 - On **randomization methods**:
    - Randomized compiling with twirling gates, J. Wallman *et al.*, *Phys. Rev. A*, 2016 :cite:`Wallman_2016_PRA`

@@ -4,12 +4,11 @@
 ---
 maxdepth: 2
 ---
-guide-overview.rst
 guide-getting-started.rst
 guide-executors.rst
 guide-observables.myst
-guide-zne.rst
-guide-pec.rst
+zne.myst
+pec.myst
 guide-cdr.rst
 guide-error-mitigation.rst
 ```

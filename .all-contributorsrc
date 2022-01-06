@@ -25,7 +25,6 @@
       ]
     },
     {
-
       "login": "HaoTy",
       "name": "Tianyi Hao",
       "avatar_url": "https://avatars.githubusercontent.com/u/36152061?v=4",
@@ -107,7 +106,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/40476737?v=4",
       "profile": "https://github.com/DSamuel1",
       "contributions": [
-        "example"
+        "example",
+        "code"
       ]
     },
     {
@@ -280,6 +280,25 @@
       "profile": "https://github.com/francespoblete",
       "contributions": [
         "design"
+      ]
+    },
+    {
+      "login": "Misty-W",
+      "name": "Misty-W",
+      "avatar_url": "https://avatars.githubusercontent.com/u/82074193?v=4",
+      "profile": "https://github.com/Misty-W",
+      "contributions": [
+        "code",
+        "example"
+      ]
+    },
+    {
+      "login": "AkashNarayanan",
+      "name": "AkashNarayanan B",
+      "avatar_url": "https://avatars.githubusercontent.com/u/83135130?v=4",
+      "profile": "https://github.com/AkashNarayanan",
+      "contributions": [
+        "infra"
       ]
     }
   ],
