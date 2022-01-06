@@ -11,24 +11,14 @@ API-doc
 Benchmarks
 ----------
 
-MaxCut
-^^^^^^
-.. automodule:: mitiq.benchmarks.maxcut
-   :members:
-
-Random Circuits
+Mirror Circuits
 ^^^^^^^^^^^^^^^
-.. automodule:: mitiq.benchmarks.random_circuits
+.. automodule:: mitiq.benchmarks.mirror_circuits
    :members:
 
-Randomized Benchmarking
-^^^^^^^^^^^^^^^^^^^^^^^
+Randomized Benchmarking Circuits
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.benchmarks.randomized_benchmarking
-   :members:
-
-Utils
-^^^^^
-.. automodule:: mitiq.benchmarks.utils
    :members:
 
 Clifford Data Regression
