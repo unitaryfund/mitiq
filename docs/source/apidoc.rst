@@ -99,6 +99,13 @@ Utilities for Quantum Channels
 .. automodule:: mitiq.pec.channels
    :members:
 
+Raw
+---
+
+Run experiments without error mitigation (raw results)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.raw.raw
+   :members:
 
 Zero Noise Extrapolation
 ------------------------
