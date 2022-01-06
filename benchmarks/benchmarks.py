@@ -107,7 +107,6 @@ def track_pec(
     depth: int,
     observable: Observable,
     num_samples: int,
-    num_shots: int,
 ) -> float:
     """Returns the PEC error mitigation factor, i.e., the ratio
 
@@ -119,7 +118,6 @@ def track_pec(
         depth: Some proxy of depth in the benchmark circuit.
         observable: Observable to compute the expectation value of.
         num_samples: Number of circuits to sample/run.
-        num_shots: Number of shots per circuit execution.
     """
     circuit = get_benchmark_circuit(circuit_type, nqubits, depth)
 
@@ -134,18 +132,13 @@ def track_pec(
         noise_level=(noise_level,),
     )
 
-    sample = functools.partial(
-        mitiq_cirq.sample_bitstrings,
-        noise_model=cirq.depolarize,
-        noise_level=(noise_level,),
-        shots=num_shots
+    true_value = observable.expectation(
+        circuit, compute_density_matrix_noiseless
     )
-
-    true_value = observable.expectation(circuit, compute_density_matrix_noiseless)
     raw_value = observable.expectation(circuit, compute_density_matrix)
     pec_value = pec.execute_with_pec(
         circuit,
-        sample,
+        compute_density_matrix,
         observable,
         representations=reps,
         num_samples=num_samples,
@@ -159,15 +152,13 @@ track_pec.param_names = [
     "depth",
     "observable",
     "num_samples",
-    "num_shots",
 ]
 track_pec.params = (
     benchmark_circuit_types,
-    [2],
-    [1, 2, 3, 4, 5],
+    [1],
+    [1, 2, 3],
     [Observable(PauliString("ZZ"))],
-    [100],
-    [100, 1_000],
+    [10],
 )
 track_pec.unit = "Error mitigation factor"
 track_pec.timeout = 300
