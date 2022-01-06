@@ -32,7 +32,7 @@ from mitiq.zne.scaling import (
     fold_gates_from_right,
     fold_global,
 )
-from mitiq.benchmarks.utils import noisy_simulation
+from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.zne import mitigate_executor
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES
 
@@ -75,10 +75,9 @@ def test_random_benchmarks(scale_noise, fac):
     trials = 3
     circuits = generate_rb_circuits(n_qubits=2, num_cliffords=4, trials=trials)
     noise = 0.01
-    obs = np.diag([1, 0, 0, 0])
 
     def executor(qc):
-        return noisy_simulation(qc, noise=noise, obs=obs)
+        return compute_density_matrix(qc, noise_level=(noise,))[0, 0].real
 
     mit_executor = mitigate_executor(
         executor, factory=fac, scale_noise=scale_noise
