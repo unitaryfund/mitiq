@@ -97,9 +97,11 @@ jobs:
         run: |
           pip install asv
           asv machine --yes
-          asv run --quick --show-stderr --dry-run --python=same --verbose
-          echo $?
-          exit $?
+          result=$(asv dev)
+          if [[ $result == *"failed"* ]]; then
+            exit 1
+          fi
+          exit 0
 
   test:
     runs-on: ${{ matrix.os }}
