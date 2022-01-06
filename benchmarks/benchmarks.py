@@ -94,8 +94,8 @@ track_zne.param_names = [
 track_zne.params = (
     benchmark_circuit_types,
     [1],
-    [1, 2, 3],
-    [Observable(PauliString("ZZ"))],
+    [2, 3],
+    [Observable(PauliString("Z"))],
 )
 track_zne.unit = "Error mitigation factor"
 track_zne.timeout = 300
@@ -157,7 +157,7 @@ track_pec.params = (
     benchmark_circuit_types,
     [1],
     [1, 2, 3],
-    [Observable(PauliString("ZZ"))],
+    [Observable(PauliString("Z"))],
     [10],
 )
 track_pec.unit = "Error mitigation factor"
