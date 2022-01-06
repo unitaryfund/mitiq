@@ -98,7 +98,7 @@ jobs:
           pip install asv
           asv machine --yes
           result=$(asv dev)
-          echo $result
+          echo "${result}"
           if [[ $result == *"failed"* ]]; then
             exit 1
           fi
