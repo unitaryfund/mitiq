@@ -82,6 +82,7 @@ def track_zne(
     zne_value = zne.execute_with_zne(
         circuit, mitiq_cirq.compute_density_matrix, observable,
     )
+    assert False
     return np.real(abs(true_value - raw_value) / abs(true_value - zne_value))
 
 
