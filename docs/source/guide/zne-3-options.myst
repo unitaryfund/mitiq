@@ -123,7 +123,7 @@ print("Globally folded circuit:", scaled_circuit, sep="\n")
 ```
 
 The same trick can be generalized to any odd integer `scale_factor`.
-In this case, folding functions apply the mapping $G \longrightarrow G (G^\dagger G)^{(\text{scale_factor} - 1)/2}$. For example:
+In this case, folding functions apply the mapping $G \longrightarrow G (G^\dagger G)^{(\lambda - 1)/2}$. For example:
 
 ```{code-cell} ipython3
 num_gates = len(list(circuit.all_operations()))
