@@ -61,3 +61,33 @@ In Mitiq a noise scaling method is represented by a *noise scaling function* tha
 returns a `scaled_circuit`. For a noiseless backend, `scaled_circuit` has the same effect as `circuit`. For a noisy backend, 
 `scaled_circuit` is more sensitive to errors depending on the magnitude of `scale_factor`. 
 
+### Unitary Folding 
+
+Mitiq provides several noise scaling functions. Most of them are based on the repeated application of the *unitary folding* technique in
+which a unitary $G$ is mapped as follows:
+
+$$G \longrightarrow G G^\dagger G.$$
+
+If this is applied to individual gates of a `circuit`, we call it *local folding*. If $G$ is the entire `circuit`, we call it *global folding*.
+
+The Mitiq function for global folding is:
+
+- {func}`.fold_global()`.
+
+The Mitiq functions for local folding are: 
+- {func}`.fold_gates_at_random()`;
+- {func}`.fold_gates_from_left()`;
+- {func}`.fold_gates_from_right()`;
+- {func}`.fold_all()`.
+
+There are multiple functions for local folding since it can be applied to the gates of a circuit according to different orderings:
+at random, from left (starting from the initial gates), from right (starting from the final gates), etc.. 
+For more details on folding functions, we suggest to click on the functions listed above and check the associated API docs.
+
+If not specified by the user, the default noise scaling method in Mitiq is {func}`.fold_gates_at_random()`.
+Custom noise-scaling functions can also be defined by the user, as shown
+in [What happens when I use ZNE ?](zne-4-low-level.myst).
+
++++
+
+**Note:** *All folding functions can be applied to circuits defined in any supported frontend. For example, in the next code cells we use Cirq to represent quantum circuits.*
