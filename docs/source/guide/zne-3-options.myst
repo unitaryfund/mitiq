@@ -91,3 +91,50 @@ in [What happens when I use ZNE ?](zne-4-low-level.myst).
 +++
 
 **Note:** *All folding functions can be applied to circuits defined in any supported frontend. For example, in the next code cells we use Cirq to represent quantum circuits.*
+
++++
+
+#### The special case of odd integer scale factors
+
++++
+
+For any noise scaling function, if `scale_factor` is equal to 1, the input circuit is unchanged
+and it is subject to the base noise of the backend.
+
+Both local and global folding, if applied uniformly to all the gates of `circuit`, produce a `scaled_circuit` that has 3 times more gates than the input `circuit`.
+This corresponds to the `scale_factor=3` setting. For example:
+
+```{code-cell} ipython3
+import cirq
+from mitiq import zne
+
+# Get a circuit to fold
+qreg = cirq.LineQubit.range(2)
+circuit = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1]))
+print("Original circuit:", circuit, sep="\n")
+
+# Apply local folding
+scaled_circuit = zne.scaling.fold_gates_at_random(circuit, scale_factor=3)
+print("Locally folded circuit:", scaled_circuit, sep="\n")
+
+# Apply global folding
+scaled_circuit = zne.scaling.fold_global(circuit, scale_factor=3)
+print("Globally folded circuit:", scaled_circuit, sep="\n")
+```
+
+The same trick can be generalized to any odd integer `scale_factor`.
+In this case, folding functions apply the mapping $G \longrightarrow G (G^\dagger G)^{(\text{scale_factor} - 1)/2}$. For example:
+
+```{code-cell} ipython3
+num_gates = len(list(circuit.all_operations()))
+for scale_factor in [1, 3, 5, 7]:
+    scaled_circuit = zne.scaling.fold_global(circuit, scale_factor)
+    scaled_num_gates = len(list(scaled_circuit.all_operations()))
+    print(f"For scale_factor={scale_factor}, the number of gates was scaled by {scaled_num_gates / num_gates}")
+```
+
+**Note:** *When `scale_factor` is an odd integer, the number of gates is scaled exactly as dictated by the value of `scale_factor`.
+In this case, since all gates are folded the same number of times, the three local folding functions 
+{func}`.fold_gates_at_random()`, {func}`.fold_gates_from_left()` and {func}`.fold_gates_from_right()` have the same (deterministic) effect.*
+
++++
