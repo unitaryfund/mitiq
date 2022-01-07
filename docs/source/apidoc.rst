@@ -11,24 +11,14 @@ API-doc
 Benchmarks
 ----------
 
-MaxCut
-^^^^^^
-.. automodule:: mitiq.benchmarks.maxcut
-   :members:
-
-Random Circuits
+Mirror Circuits
 ^^^^^^^^^^^^^^^
-.. automodule:: mitiq.benchmarks.random_circuits
+.. automodule:: mitiq.benchmarks.mirror_circuits
    :members:
 
-Randomized Benchmarking
-^^^^^^^^^^^^^^^^^^^^^^^
+Randomized Benchmarking Circuits
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.benchmarks.randomized_benchmarking
-   :members:
-
-Utils
-^^^^^
-.. automodule:: mitiq.benchmarks.utils
    :members:
 
 Clifford Data Regression
@@ -75,6 +65,24 @@ Qiskit Utils
 .. automodule:: mitiq.interface.mitiq_qiskit.qiskit_utils
    :members:
 
+Executors
+---------
+.. automodule:: mitiq.executor.executor
+   :members:
+
+Observables
+-----------
+
+Observable
+^^^^^^^^^^
+.. automodule:: mitiq.observable.observable
+   :members:
+
+Pauli
+^^^^^^^^^^^
+.. automodule:: mitiq.observable.pauli
+   :members:
+
 Probabilistic Error Cancellation
 --------------------------------
 
@@ -109,6 +117,25 @@ Utilities for Quantum Channels
 .. automodule:: mitiq.pec.channels
    :members:
 
+Raw
+---
+
+Run experiments without error mitigation (raw results)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.raw.raw
+
+Readout Error Mitigation
+------------------------
+
+Measurement Result
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.rem.measurement_result
+   :members:
+
+Post-selection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.rem.post_select
+   :members:
 
 Zero Noise Extrapolation
 ------------------------

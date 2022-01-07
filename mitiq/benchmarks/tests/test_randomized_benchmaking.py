@@ -13,43 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Tests for randomized benchmarking with zero-noise extrapolation."""
+"""Tests for randomized benchmarking circuits."""
+
 import pytest
-from itertools import product
 import numpy as np
 
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
-from mitiq.zne.inference import (
-    LinearFactory,
-    RichardsonFactory,
-    PolyFactory,
-    ExpFactory,
-    AdaExpFactory,
-)
-from mitiq.zne.scaling import (
-    fold_gates_at_random,
-    fold_gates_from_left,
-    fold_gates_from_right,
-    fold_global,
-)
-from mitiq.benchmarks.utils import noisy_simulation
-from mitiq.zne import mitigate_executor
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES
-
-SCALE_FUNCTIONS = [
-    fold_gates_at_random,
-    fold_gates_from_left,
-    fold_gates_from_right,
-    fold_global,
-]
-
-FACTORIES = [
-    AdaExpFactory(steps=3, scale_factor=1.5, asymptote=0.25),
-    ExpFactory([1.0, 1.4, 2.1], asymptote=0.25),
-    RichardsonFactory([1.0, 1.4, 2.1]),
-    LinearFactory([1.0, 1.6]),
-    PolyFactory([1.0, 1.4, 2.1], order=2),
-]
 
 
 @pytest.mark.parametrize("n_qubits", (1, 2))
@@ -66,34 +36,6 @@ def test_rb_circuits(n_qubits):
             wvf = qc.final_state_vector()
             zero_prob = abs(wvf[0] ** 2)
             assert np.isclose(zero_prob, 1)
-
-
-@pytest.mark.parametrize(
-    ["scale_noise", "fac"], product(SCALE_FUNCTIONS, FACTORIES)
-)
-def test_random_benchmarks(scale_noise, fac):
-    trials = 3
-    circuits = generate_rb_circuits(n_qubits=2, num_cliffords=4, trials=trials)
-    noise = 0.01
-    obs = np.diag([1, 0, 0, 0])
-
-    def executor(qc):
-        return noisy_simulation(qc, noise=noise, obs=obs)
-
-    mit_executor = mitigate_executor(
-        executor, factory=fac, scale_noise=scale_noise
-    )
-
-    unmitigated = []
-    mitigated = []
-    for qc in circuits:
-        unmitigated.append(executor(qc))
-        mitigated.append(mit_executor(qc))
-
-    unmit_err = np.abs(1.0 - np.asarray(unmitigated))
-    mit_err = np.abs(1.0 - np.asarray(mitigated))
-
-    assert np.average(unmit_err) >= np.average(mit_err)
 
 
 @pytest.mark.parametrize("n_qubits", (1, 2))
