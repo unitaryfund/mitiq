@@ -145,7 +145,7 @@ zne.execute_with_zne(circuit, execute, scale_noise=my_custom_folding_function)
 +++
 
 If necessary, the user can modify existing extrapolation methods by subclassing
-one of the built-in factories.
+one of the [built-in factories](zne-3-options.myst#extrapolation-methods-factory-objects).
 
 Alternatively, a custom adaptive extrapolation method can be derived from the abstract class {class}`.AdaptiveFactory`.
 In this case its core methods must be implemented:
