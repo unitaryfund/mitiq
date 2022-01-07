@@ -13,7 +13,7 @@ kernelspec:
 
 # What happens when I use ZNE?
 
-In Mitiq, ZNE is clearly divided into two steps, noise scaling and extrapolation. They are shown in the Figure below. 
+In Mitiq, ZNE is clearly divided into two steps, noise scaling and extrapolation. They are shown in the Figure below.
 The corresponding sub-modules in the codebase are {mod}`mitiq.zne.scaling.folding` and {mod}`mitiq.zne.inference`.
 
 ```{figure} ../img/zne_workflow2_steps.png
@@ -21,10 +21,10 @@ The corresponding sub-modules in the codebase are {mod}`mitiq.zne.scaling.foldin
 width: 400
 name: figzne
 ---
-The diagram shows the workflow of the zero noise extrapolation (ZNE) technique in Mitiq. 
+The diagram shows the workflow of the zero noise extrapolation (ZNE) technique in Mitiq.
 ```
 
-**The first step** involves generating and executing noise-scaled quantum circuits. 
+**The first step** involves generating and executing noise-scaled quantum circuits.
   - The user provides a `QPROGRAM`, i.e., a quantum circuit defined via any of the supported frontends.
   - Mitiq generates a set of noise-scaled circuits by applying unitary folding with different scale factors.
   - The noise-scaled circuits are executed on the noisy backend obtaining a set of noise-scaled expectation values.
@@ -145,7 +145,7 @@ zne.execute_with_zne(circuit, execute, scale_noise=my_custom_folding_function)
 +++
 
 If necessary, the user can modify existing extrapolation methods by subclassing
-one of the [built-in factories](zne-3-options.myst#extrapolation-methods-factory-objects).
+one of the built-in factories.
 
 Alternatively, a custom adaptive extrapolation method can be derived from the abstract class {class}`.AdaptiveFactory`.
 In this case its core methods must be implemented:
@@ -180,7 +180,7 @@ class MyFactory(BatchedFactory):
        """
        super(MyFactory, self).__init__(scale_factors)
        self._options = {"min_expval": min_expval, "max_expval": max_expval}
-    
+
     @staticmethod
     def extrapolate(
        scale_factors, exp_values, min_expval, max_expval, full_output = False,
@@ -202,7 +202,7 @@ Using `MyFactory` as an option for {func}`.execute_with_zne`, the customized ext
 ```{code-cell} ipython3
 # Test MyFactory clips the result as expected
 fac = MyFactory([1, 2, 3], min_expval=0.0, max_expval=0.5)
-zne_limit_clipped = zne.execute_with_zne(circuit, execute, factory=fac) 
+zne_limit_clipped = zne.execute_with_zne(circuit, execute, factory=fac)
 assert zne_limit_clipped == 0.5
 ```
 
@@ -256,7 +256,7 @@ fac.reduce()
 
 ### The `run_classical` method.
 
-Instead of {meth}`.Factory.run`, the {meth}`.Factory.run_classical` method can be used if we have at disposal a function which directly 
+Instead of {meth}`.Factory.run`, the {meth}`.Factory.run_classical` method can be used if we have at disposal a function which directly
 maps a noise scale factor to the corresponding expectation value.
 
 ```{code-cell} ipython3
