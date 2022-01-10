@@ -123,7 +123,7 @@ print("Globally folded circuit:", scaled_circuit, sep="\n")
 ```
 
 The same trick can be generalized to any odd integer `scale_factor`.
-In this case, folding functions apply the mapping $G \longrightarrow G (G^\dagger G)^{(\text{scale_factor} - 1)/2}$. For example:
+In this case, folding functions apply the mapping $G \longrightarrow G (G^\dagger G)^{({\rm scale\_factor} - 1)/2}$. For example:
 
 ```{code-cell} ipython3
 num_gates = len(list(circuit.all_operations()))
@@ -350,7 +350,7 @@ zne_value
 
 +++
 
-Since we defined a `factory` with 3 scale factors and since `num_to_average=3`, we expect $3\times3=9$ circuit evaluations. Indeed:
+Since we defined a `factory` with 3 scale factors and since `num_to_average=3`, we expect $3 \times 3=9$ circuit evaluations. Indeed:
 
 ```{code-cell} ipython3
 executor.calls_to_executor
