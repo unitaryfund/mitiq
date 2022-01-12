@@ -12,3 +12,5 @@ kernelspec:
 ---
 
 # What is the theory behind CDR?
+
+Clifford data regression (CDR) is a quantum error mitigation technique that has been introduced in Ref. {cite}`Czarnik_2020_arXiv`
