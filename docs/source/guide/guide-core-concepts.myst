@@ -11,10 +11,13 @@ kernelspec:
   name: python3
 ---
 
-# Mitiq Frontends
+
+# Mitiq Core Concepts
+
+## Frontends
 
 Mitiq can accept quantum circuit representations in a variety of formats from different tools or platforms.
-These input formats are referred to here as "frontends".
+These input formats are referred to here as _frontends_.
 The frameworks currently supported are:
 
 ```{code-cell} ipython3
@@ -36,3 +39,18 @@ Examples for using each of the frameworks to represent the input to a mitigation
 - [Qiskit](../examples/ibmq-backends.myst)
 - [PyQuil](../examples/pyquil_demo.myst)
 - [Braket](../examples/braket_mirror_circuit.myst)
+
+## Backends
+
+A _backend_ is any simulator or hardware device that can be used to execute quantum circuits that are valid mitiq.QPROGRAM objects.
+These backends are usually installed separately as needed by the user.
+Backends are used by Mitiq in the `mitiq.Executor` class to run the mitigated `mitiq.QPROGRAM` objects.
+For more information on executors, see the [Executors](guide-executor.myst) section of this guide.
+
+## Executing circuits
+
+Executing programs: Functions with the signature mitiq.QPROGRAM -> mitiq.QuantumResult
+
+## Batch execution of circuits
+
+Batch executing programs: Functions with the signature T[mitiq.QPROGRAM] -> T[mitiq.QuantumResult] where T is one of the types here.
