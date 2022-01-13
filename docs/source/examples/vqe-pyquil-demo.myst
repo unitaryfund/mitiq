@@ -282,7 +282,7 @@ def mitigated_expectation(
 ```
 
 Here we use a linear inference for the extrapolation. 
-See the section on [Factory Objects](https://mitiq.readthedocs.io/en/latest/guide/guide-zne.html#classical-fitting-and-extrapolation-factory-objects) 
+See the section on [Factory Objects](../guide/zne-3-options.myst#extrapolation-methods-factory-objects) 
 in the Mitiq user guide for more information:
 
 ```{code-cell} ipython3

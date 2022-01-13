@@ -26,7 +26,7 @@ import qiskit
 
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES, PauliString, Observable
 from mitiq.interface import convert_to_mitiq, convert_from_mitiq, mitiq_cirq
-from mitiq.benchmarks.utils import noisy_simulation
+from mitiq.interface.mitiq_cirq import compute_density_matrix
 
 from mitiq.pec import execute_with_pec, NoisyOperation, OperationRepresentation
 from mitiq.pec import mitigate_executor, pec_decorator
@@ -73,13 +73,9 @@ def serial_executor(circuit: QPROGRAM, noise: float = BASE_NOISE) -> float:
     projector. Simulation will be slow for "large circuits" (> a few qubits).
     """
     circuit, _ = convert_to_mitiq(circuit)
-
-    # Ground state projector.
-    d = 2 ** len(circuit.all_qubits())
-    obs = np.zeros(shape=(d, d), dtype=np.float32)
-    obs[0, 0] = 1.0
-
-    return noisy_simulation(circuit, noise, obs)
+    return compute_density_matrix(
+        circuit, noise_model=cirq.depolarize, noise_level=(noise,)
+    )[0, 0].real
 
 
 def batched_executor(circuits) -> List[float]:
