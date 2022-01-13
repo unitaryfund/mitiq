@@ -28,7 +28,7 @@ from typing import Union
 import numpy as np
 
 from cirq import Circuit as _Circuit
-from mitiq.rem.measurement_result import MeasurementResult
+from mitiq.rem import MeasurementResult
 
 
 # Supported quantum programs.
