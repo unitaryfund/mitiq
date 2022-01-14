@@ -56,6 +56,7 @@ except:
 on_aws = aws_device.name != "DensityMatrixSimulator"
 ```
 
+(examples/braket_mirror_circuit/define-the-circuit)=
 ## Define the circuit
 
 We use mirror circuits to benchmark the performance of the device. Mirror circuits, introduced in https://arxiv.org/abs/2008.11294, are designed such that only one bitstring should be sampled. When run on a device, any other measured bitstrings are due to noise. The frequency of the correct bitstring is our target metric.

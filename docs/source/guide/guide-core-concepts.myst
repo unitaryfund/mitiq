@@ -14,6 +14,21 @@ kernelspec:
 
 # Mitiq Core Concepts
 
+## Mitiq-specific types
+
+There are a number of types that are specific to Mitiq defined in {doc}`..\mitiq\_typing`), the most important being `mitiq.QPROGRAM` and `mitiq.QuantumResult`.
+These types are both unions of a number of other types that make it easier to annotate other functions in Mitiq, independent of the user choice of frameworks.
+The Mitiq-defined type `mitiq.QPROGRAM` uses any of the program types from the supported platforms that are installed on the system.
+For example, if you haven't installed PyQuil, then even though Mitiq supports it, you will not be able to use PyQuil programs in Mitiq until it is installed.
+
+```{note}
+Mitiq only supports non-adaptive quantum programs without classical control flow or mid-circuit measurements. This class of programs is more commonly known as _circuits_ by many other tools and frameworks in quantum computing.
+```
+
+The Mitiq-defined type `mitiq.QuantumResult` is a union of the types defined in {doc}`..\mitiq\_typing`) that are used to represent the results of running a quantum program.
+For hardware, the results can only be binary values for each evaluation of the program.
+For simulators, more information can be made available like the resulting density matrices or state vectors, which will be valid values of the `mitiq.QuantumResult` type.
+
 ## Frontends
 
 Mitiq can accept quantum circuit representations in a variety of formats from different tools or platforms.
@@ -27,30 +42,35 @@ mitiq.SUPPORTED_PROGRAM_TYPES.keys()
 ```
 
 with Cirq being used for the internal implementations of the mitigation methods.
-There is also frontend support for any circuit description that complies with the OpenQASM 2.0 standard. The Mitiq-defined type `QPROGRAM` uses any of the program types from the supported platforms that are installed on the system.
-For example, if you haven't installed PyQuil, then even though Mitiq supports it, you will not be able to use PyQuil programs in Mitiq until it is installed.
+There is also frontend support for any circuit description that complies with the OpenQASM 2.0 standard. 
 
 With any of these frontends (with the exception of Cirq), the circuit representation will be converted internally to a Cirq circuit object with the relevant conversion methods in `mitiq.interface` for each frontend.
 For example, you can use {func}`mitiq.interface.mitiq_braket.conversions.from_braket()` to convert a Braket circuit to a Cirq circuit.
 
 Examples for using each of the frameworks to represent the input to a mitigation method are linked below.
 
-- [Cirq](../examples/ibmq-backends.myst)
-- [Qiskit](../examples/ibmq-backends.myst)
-- [PyQuil](../examples/pyquil_demo.myst)
-- [Braket](../examples/braket_mirror_circuit.myst)
+- {ref}`Cirq <examples/ibmq-backends/cirq-frontend>`
+- {ref}`Qiskit <examples/ibmq-backends/setup-defining-a-circuit>`
+- {ref}`PyQuil <examples/pyquil_demo>`
+- {ref}`Braket <examples/braket_mirror_circuit/define-the-circuit>`
 
 ## Backends
 
-A _backend_ is any simulator or hardware device that can be used to execute quantum circuits that are valid mitiq.QPROGRAM objects.
+A _backend_ is any simulator or hardware device that can be used to execute programs that are valid `mitiq.QPROGRAM` objects.
 These backends are usually installed separately as needed by the user.
 Backends are used by Mitiq in the `mitiq.Executor` class to run the mitigated `mitiq.QPROGRAM` objects.
-For more information on executors, see the [Executors](guide-executor.myst) section of this guide.
 
-## Executing circuits
+## Executing programs
 
-Executing programs: Functions with the signature mitiq.QPROGRAM -> mitiq.QuantumResult
+Once you have selected a frontend and backend combination that are compatible and the mitigation method, the next step is to run the mitigated program.
+The `mitiq.Executor` class is used to execute the mitigated program, and is constructed by providing a function with the following signature: `mitiq.QPROGRAM` -> `mitiq.QuantumResult`.
+For more information on executors, see the {doc}`Executors <guide-executor>` section of this guide.
 
-## Batch execution of circuits
+### Batch execution of programs
 
-Batch executing programs: Functions with the signature T[mitiq.QPROGRAM] -> T[mitiq.QuantumResult] where T is one of the types here.
+When you have a number of circuits that you want to execute with an error mitigation method, you can use the `mitiq.Executor` class to execute them all in one go.
+This is done by providing a list of `mitiq.QPROGRAM` objects to the `mitiq.Executor` constructor.
+The `mitiq.Executor` class will then execute all of the programs in parallel, and return a list of `mitiq.QuantumResult` objects.
+To perform batched execution, you can use the same mitiq.Executor class constructor and pass a function with the following signature: `T[mitiq.QPROGRAM] -> T[mitiq.QuantumResult]` where T is `Sequence`, `List`, `Tuple`, or `Iterable`.
+
+For more information on batched executors and example code, see the {doc}`Executors <guide-executor>` section of this guide.
