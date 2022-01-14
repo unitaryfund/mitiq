@@ -95,22 +95,39 @@ Now we can run CDR. We first compute the noiseless result then the noisy result 
 ### The noiseless result
 
 ```{code-cell} ipython3
-obs.expectation(circuit, simulate).real
+ideal_measurement = obs.expectation(circuit, simulate).real
+print("ideal_measurement = ",ideal_measurement)
 ```
 
 ### The noisy result
+We now generate the noisy result. Note that {func}`.compute_density_matrix` function by default runs a simulation with noise.
 
 ```{code-cell} ipython3
-obs.expectation(circuit, compute_density_matrix).real
+unmitigated_measurement = obs.expectation(circuit, compute_density_matrix).real
+print("unmitigated_measurement = ", unmitigated_measurement)
 ```
 
 ### The mitigated result
 
 ```{code-cell} ipython3
-cdr.execute_with_cdr(
+mitigated_measurement = cdr.execute_with_cdr(
     circuit,
     compute_density_matrix,
     observable=obs,
     simulator=simulate,
 ).real
+print("mitigated_measurement = ", mitigated_measurement)
+```
+
+```{code-cell} ipython3
+error_unmitigated = abs(unmitigated_measurement-ideal_measurement)
+error_mitigated = abs(mitigated_measurement-ideal_measurement)
+
+print("Error (unmitigated):", error_unmitigated)
+print("Error (mitigated with CDR):", error_mitigated)
+
+print("Relative error (unmitigated):", (error_unmitigated/ideal_measurement))
+print("Relative error (mitigated with CDR):", error_mitigated/ideal_measurement)
+
+print(f"Error reduction with CDR: {(error_unmitigated-error_mitigated)/error_unmitigated :.1%}.")
 ```
