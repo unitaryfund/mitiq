@@ -24,12 +24,18 @@ Randomized Benchmarking Circuits
 Clifford Data Regression
 ------------------------
 
+Clifford Data Regression (High-Level Tools)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.cdr.cdr
    :members:
 
+Clifford Training Data
+^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.cdr.clifford_training_data
    :members:
 
+Data Regression
+^^^^^^^^^^^^^^^
 .. automodule:: mitiq.cdr.data_regression
    :members:
 
