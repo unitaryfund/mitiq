@@ -38,7 +38,7 @@ import numpy as np
 from scipy.optimize import brute
 import cirq
 
-from mitiq import zne # Zero-noise extrapolation module
+from mitiq import zne  # Zero-noise extrapolation module
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 ```
 
@@ -62,7 +62,7 @@ Each coefficient $g_i$ is a function of the bond length $g_i = g_i(R)$.
 Their values are specified in the table below, extracted from Table 1 of Appendix C of {cite}`OMalley_2016_PRX`, in which the first column corresponds to the bond length $R$.
 
 ```{code-cell} ipython3
-# Data is organized as follow 
+# Data is organized as follow
 #   |   R   |   g0   |   g1   |   g2   |    g3  |   g4   |   g5   |
 table = np.array([
     [ 0.2   ,  2.8489,  0.5678, -1.4508,  0.6799,  0.0791,  0.0791],
@@ -89,12 +89,14 @@ We define a function that evaluates the expectation value of the Hamiltonian on 
 Here we use a Cirq density matrix simulator with a simple depolarizing noise model.
 
 ```{code-cell} ipython3
-def energy(ansatz: cirq.Circuit, radius_index: int, depo_noise_strength: float = 0.05) -> float:
+def energy(
+    ansatz: cirq.Circuit, radius_index: int, depo_noise_strength: float = 0.05
+) -> float:
     """Computes the energy at a given bond length (radius)."""
     npI = np.identity(2)
-    npX = np.array([[0., 1.], [1., 0.]])
-    npY = np.array([[0., -1j], [1j, 0.]])
-    npZ = np.array([[1., 0.], [0., -1.]])
+    npX = np.array([[0.0, 1.0], [1.0, 0.0]])
+    npY = np.array([[0.0, -1j], [1j, 0.0]])
+    npZ = np.array([[1.0, 0.0], [0.0, -1.0]])
     terms = [
         coeffs[radius_index][0] * np.kron(npI, npI),
         coeffs[radius_index][1] * np.kron(npZ, npI),
@@ -126,7 +128,7 @@ def ansatz(theta: float) -> cirq.Circuit:
         cirq.ops.rz(theta).on(qreg[1]),
         cirq.ops.CNOT.on(*qreg),
         cirq.ops.ry(-np.pi / 2).on(qreg[0]),
-        cirq.ops.rx(np.pi / 2).on(qreg[1])
+        cirq.ops.rx(np.pi / 2).on(qreg[1]),
     )
 ```
 
@@ -137,7 +139,7 @@ using different strengths $p$ of depolarizing noise.
 # Noise levels
 pvals = (0.00, 0.02, 0.04, 0.06)
 # Variational parameters
-thetas = np.linspace(0., 2. * np.pi, 20)
+thetas = np.linspace(0.0, 2.0 * np.pi, 20)
 
 all_energies = []
 for pval in pvals:
@@ -178,7 +180,11 @@ for p in pvals[1:]:
         execute = partial(energy, radius_index=0, depo_noise_strength=p)
         # Run ZNE
         zne_value = zne.execute_with_zne(
-            ansatz(theta), execute, factory=fac, scale_noise=scaling_function, num_to_average=num_to_average,
+            ansatz(theta),
+            execute,
+            factory=fac,
+            scale_noise=scaling_function,
+            num_to_average=num_to_average,
         )
         mitigated.append(zne_value)
     all_mitigated.append(mitigated)
@@ -198,45 +204,45 @@ plt.title("Unmitigated")
 for i in range(len(all_energies)):
     plt.plot(
         thetas,
-        all_energies[i], 
-        "--s", 
-        lw=3, 
+        all_energies[i],
+        "--s",
+        lw=3,
         markersize=10,
         markeredgecolor="black",
-        alpha=0.7, 
-        label=f"$p = {pvals[i]}$"
+        alpha=0.7,
+        label=f"$p = {pvals[i]}$",
     )
-plt.xlabel(r"$\theta$");
-plt.ylabel(r"$E(\theta)$");
-plt.legend();
+plt.xlabel(r"$\theta$")
+plt.ylabel(r"$E(\theta)$")
+plt.legend()
 plt.subplot(122)
 plt.title("Mitigated with ZNE")
 # Plot noiseless results
 plt.plot(
-        thetas,
-        all_energies[0], 
-        "--s", 
-        lw=3, 
-        markersize=10,
-        markeredgecolor="black",
-        alpha=0.7, 
-        label="$p = 0.0$",
-    )
+    thetas,
+    all_energies[0],
+    "--s",
+    lw=3,
+    markersize=10,
+    markeredgecolor="black",
+    alpha=0.7,
+    label="$p = 0.0$",
+)
 # Plot error-mitigated results
 for i in range(len(all_mitigated)):
     plt.plot(
         thetas,
-        all_mitigated[i], 
-        "--o", 
-        lw=3, 
+        all_mitigated[i],
+        "--o",
+        lw=3,
         markersize=10,
         markeredgecolor="black",
         alpha=0.7,
-        label=f"$p = {pvals[i + 1]}$"
+        label=f"$p = {pvals[i + 1]}$",
     )
-plt.xlabel(r"$\theta$");
-plt.legend();
-plt.tight_layout();
+plt.xlabel(r"$\theta$")
+plt.legend()
+plt.tight_layout()
 ```
 
 In the figure above, the error-mitigated energy landscapes (colored circles) are closer to the ideal noiseless limit
@@ -268,11 +274,11 @@ for pval in pvals:
         # Objective function to minimize
         def obj(theta):
             return energy(ansatz(theta), radius_index=i, depo_noise_strength=pval)
-        
+
         res = brute(obj, ranges=[(0, 2 * np.pi)], Ns=10, finish=None, full_output=True)
         these_thetas.append(res[0])
         these_energies.append(res[1])
-        
+
     best_thetas.append(these_thetas)
     best_energies.append(these_energies)
 ```
@@ -293,6 +299,7 @@ for pval in pvals[1:]:
     these_thetas = []
     these_energies = []
     for i in range(len(radii)):
+
         def objective_function(theta):
             return zne.execute_with_zne(
                 ansatz(theta),
@@ -301,11 +308,18 @@ for pval in pvals[1:]:
                 scale_noise=scaling_function,
                 num_to_average=num_to_average,
             )
+
         # Minimize energy with respect to "theta"
-        res = brute(objective_function, ranges=[(0, 2 * np.pi)], Ns=10, finish=None, full_output=True)
+        res = brute(
+            objective_function,
+            ranges=[(0, 2 * np.pi)],
+            Ns=10,
+            finish=None,
+            full_output=True,
+        )
         these_thetas.append(res[0])
         these_energies.append(res[1])
-        
+
     best_mitigated_thetas.append(these_thetas)
     best_mitigated_energies.append(these_energies)
 ```
@@ -322,36 +336,36 @@ plt.subplot(121)
 plt.title("Unmitigated")
 for pval, opt_energies in zip(pvals, best_energies):
     plt.plot(
-        radii, 
-        opt_energies, 
-        "--s", 
-        lw=2, 
+        radii,
+        opt_energies,
+        "--s",
+        lw=2,
         markersize=10,
         markeredgecolor="black",
         alpha=0.7,
-        label=f"$p = {pval}$"
+        label=f"$p = {pval}$",
     )
 plt.ylim(
-    min([np.min(best_energies), np.min(best_mitigated_energies)]) - 0.1, 
-    max([np.max(best_energies), np.max(best_mitigated_energies)]) + 0.1
+    min([np.min(best_energies), np.min(best_mitigated_energies)]) - 0.1,
+    max([np.max(best_energies), np.max(best_mitigated_energies)]) + 0.1,
 )
-plt.xlabel("Atomic distance (Angstroms)");
-plt.ylabel("Energy (Hartree)");
-plt.legend();
+plt.xlabel("Atomic distance (Angstroms)")
+plt.ylabel("Energy (Hartree)")
+plt.legend()
 # Plot noiseless results
 plt.subplot(122)
 plt.title("Mitigated with ZNE")
 plt.plot(
-        radii, 
-        best_energies[0], 
-        "-s", 
-        lw=2, 
-        markersize=10,
-        markeredgecolor="black",
-        alpha=0.7,
-        label=f"$p = 0.0$",
-        zorder=1
-    )
+    radii,
+    best_energies[0],
+    "-s",
+    lw=2,
+    markersize=10,
+    markeredgecolor="black",
+    alpha=0.7,
+    label=f"$p = 0.0$",
+    zorder=1,
+)
 # Plot error-mitigated results
 i = 0
 for pval, opt_energies in zip(pvals[1:], best_mitigated_energies):
@@ -365,15 +379,15 @@ for pval, opt_energies in zip(pvals[1:], best_mitigated_energies):
         markeredgecolor="black",
         alpha=0.7,
         label=f"$p = {pval}$",
-        zorder=0
+        zorder=0,
     )
 plt.ylim(
-    min([np.min(best_energies), np.min(best_mitigated_energies)]) - 0.1, 
-    max([np.max(best_energies), np.max(best_mitigated_energies)]) + 0.1
+    min([np.min(best_energies), np.min(best_mitigated_energies)]) - 0.1,
+    max([np.max(best_energies), np.max(best_mitigated_energies)]) + 0.1,
 )
-    
-plt.xlabel("Atomic distance (Angstroms)");
-plt.legend();
+
+plt.xlabel("Atomic distance (Angstroms)")
+plt.legend()
 ```
 
 In the figure above, the error-mitigated potential energy surfaces (colored circles) are closer to the ideal noiseless limit (blue squares)
