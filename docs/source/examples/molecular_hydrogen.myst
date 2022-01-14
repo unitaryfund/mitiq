@@ -15,14 +15,21 @@ kernelspec:
 
 +++
 
-In this example we apply zero-noise extrapolation (ZNE) to the estimation of the potential energy surface of molecular Hydrogen.
+In this example we apply zero-noise extrapolation (ZNE) to the estimation of the potential energy surface of molecular Hydrogen ($\rm H_2$).
+The variational algorithm used in this example is based on *O’Malley et al. PRX (2016)* {cite}`OMalley_2016_PRX`.
 
-With the appropriate options (see code comments in the ZNE subsection), this notebook can also be used to reproduce the results
+With the appropriate settings (see code comments in the ZNE subsection), this notebook reproduces the results
 shown in Figure 4 of the Mitiq white paper.
 
-+++
-
-<img src="https://images.squarespace-cdn.com/content/v1/5879c888e4fcb54334f8d43f/1505431013539-Z43BYVJZ1W76R0OSS0LL/ke17ZwdGBToddI8pDm48kCVj22j6z99UmGAHyGo4-JdZw-zPPgdn4jUwVcJE1ZvWEtT5uBSRWt4vQZAgTJucoTqqXjS3CfNDSuuf31e0tVEblefBqtfxdDDrp0JJb4DWuF9MfQrDE_Iw9yivfvu2YBur-lC0WofN0YB1wFg-ZW0/hydrogen+molecule.png" alt="H2">
+```{figure} https://calango.org/images/courses/27/528/3350/lewis-structures-and-covalent-bonding_1.jpg
+---
+height: 200px
+name: h2-figure
+---
+Figure 1: Pictorial representation of the $\rm H_2$ molecule.
+Extracted from [calango.org](https://calango.org/lessons/3350/learn/lewis-structures-and-covalent-bonding/).
+In this example, we variationally estimate the potential energy surface of the molecule as a function of the bond length $R$.
+```
 
 ```{code-cell} ipython3
 from functools import partial
@@ -35,25 +42,24 @@ from mitiq import zne # Zero-noise extrapolation module
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 ```
 
-## The Hamiltonian for $H_2$
+## The Hamiltonian for $\rm H_2$
 
 +++
 
-We can write down the Hamiltonian for $H_2$ in the following form [1]
+We can write down the Hamiltonian for $\rm H_2$ in the following form {cite}`OMalley_2016_PRX`
 
 \begin{equation}
     H = g_0 I + g_1 Z_0 + g_2 Z_1 + g_3 Z_0 Z_1 + g_4 X_0 X_1 + g_5 Y_0 Y_1
 \end{equation}
 
-where $g_i$ are numerical values that depend on the bond length $R$ between Hydrogren molecules. The above Hamiltonian:
+where $g_i$ are numerical values that depend on the bond length $R$. The above Hamiltonian:
 
 1. Uses the minimal [STO-6G basis](https://en.wikipedia.org/wiki/STO-nG_basis_sets),
 1. Uses the Bravyi-Kitaev transform, and
-1. Reduces resources (qubit number) by symmetry considerations (see [1] for more details).
+1. Reduces resources (qubit number) by symmetry considerations (see {cite}`OMalley_2016_PRX` for more details).
 
-Each coefficient $g_i$ is a function of bond length $g_i = g_i(R)$.
-
-These values are specified in the table below, extracted from Table 1 of Appendix C of [1], in which the first column corresponds to the bond length $R$.
+Each coefficient $g_i$ is a function of the bond length $g_i = g_i(R)$.
+Their values are specified in the table below, extracted from Table 1 of Appendix C of {cite}`OMalley_2016_PRX`, in which the first column corresponds to the bond length $R$.
 
 ```{code-cell} ipython3
 # Data is organized as follow 
@@ -80,6 +86,7 @@ coeffs = table[:, 1:]
 ```
 
 We define a function that evaluates the expectation value of the Hamiltonian on a noisy backend and for a given input circuit (ansatz).
+Here we use a Cirq density matrix simulator with a simple depolarizing noise model.
 
 ```{code-cell} ipython3
 def energy(ansatz: cirq.Circuit, radius_index: int, depo_noise_strength: float = 0.05) -> float:
@@ -105,7 +112,7 @@ def energy(ansatz: cirq.Circuit, radius_index: int, depo_noise_strength: float =
 
 +++
 
-We first define a function that returns a Cirq circuit based on the single-parameter variational ansatz shown in Fig. 1 of [1].
+We first define a function that returns single-parameter variational circuit. The ansatz is based on on Fig. 1 of {cite}`OMalley_2016_PRX`.
 
 ```{code-cell} ipython3
 def ansatz(theta: float) -> cirq.Circuit:
@@ -140,11 +147,15 @@ for pval in pvals:
     all_energies.append(energies)
 ```
 
+The unmitigated energy landscapes are now stored in the `all_energies` variable and will be visualized
+later.
+
 ### Applying zero-noise extrapolation to estimate $E(\theta, R)$
 
 +++
 
-We use zero-noise extrapolation to error-mitigate the energy landscape $E(\theta, R)$.
+We now use zero-noise extrapolation to error-mitigate the energy landscapes $E(\theta, R)$ for a fixed
+value of $R$ and for different levels of the noise.
 
 ```{code-cell} ipython3
 # Set noise scaling method
@@ -239,11 +250,12 @@ In the figure above, the error-mitigated energy landscapes (colored circles) are
 
 In the previous section we mitigated the energy landscape $E(\theta, R)$ for a particular value of $R$.
 Here instead we evaluate the potential energy surface, which can be defined as
+
 $$V(R) = \min_\theta(E(\theta, R)). $$
 
 +++
 
-In the next code cell we evaluate $V(R)$ without using error mitigation.
+We first evaluate $V(R)$ without using error mitigation.
 
 ```{code-cell} ipython3
 best_thetas = []
@@ -264,6 +276,10 @@ for pval in pvals:
     best_thetas.append(these_thetas)
     best_energies.append(these_energies)
 ```
+
+The unmitigated potential energy surfaces are now stored in the `best_energies` variable and will be visualized later.
+
+
 
 ### Applying zero-noise extrapolation to estimate $V(R)$
 
@@ -362,10 +378,3 @@ plt.legend();
 
 In the figure above, the error-mitigated potential energy surfaces (colored circles) are closer to the ideal noiseless limit (blue squares)
 when compared to the unmitigated results (colored squares).
-
-+++
-
-## References
-
-[1] P. J. J. O’Malley et al., “[Scalable Quantum Simulation of Molecular Energies](https://journals.aps.org/prx/pdf/10.1103/PhysRevX.6.031007),” 
-Physical Review X, vol. <b>6</b>, no. 3, Jul. 2016.
