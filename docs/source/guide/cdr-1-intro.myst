@@ -25,7 +25,7 @@ import cirq
 from mitiq import cdr, Observable, PauliString
 ```
 
-## Applying CDR in four steps
+## Problem setup
 
 To use CDR, we call {func}`.cdr.execute_with_cdr` with four "ingredients":
 
@@ -83,11 +83,10 @@ To use CDR at scale, an efficient near-Clifford circuit simulator must be specif
 def simulate(circuit: cirq.Circuit) -> np.ndarray:
     return compute_density_matrix(circuit, noise_level=(0.0,))
 
-
 simulate(circuit).round(3)
 ```
 
-## Results
+## Run CDR
 
 Now we can run CDR. We first compute the noiseless result then the noisy result to compare to the mitigated result from CDR.
 
