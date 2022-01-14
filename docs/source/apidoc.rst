@@ -23,10 +23,18 @@ Randomized Benchmarking Circuits
 
 Clifford Data Regression
 ------------------------
+
+.. automodule:: mitiq.cdr.cdr
+   :members:
+
 .. automodule:: mitiq.cdr.clifford_training_data
    :members:
 
+.. automodule:: mitiq.cdr.data_regression
+   :members:
+
 See Ref. :cite:`Czarnik_2020_arXiv` for more details on these methods.
+
 
 Mitiq - Braket
 --------------
