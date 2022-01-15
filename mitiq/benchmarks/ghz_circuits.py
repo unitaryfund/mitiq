@@ -15,7 +15,7 @@
 
 """Functions for creating GHZ circuits for benchmarking purposes."""
 
-#imports
+# imports
 from typing import Optional
 from mitiq import QPROGRAM
 import cirq
@@ -24,9 +24,8 @@ from mitiq.interface import convert_from_mitiq
 
 
 def generate_ghz_circuit(
-    n_qubits:int,
-    return_type: Optional[str] = None,
-    ) -> QPROGRAM:
+    n_qubits: int, return_type: Optional[str] = None,
+) -> QPROGRAM:
     """ Returns a GHZ circuit ie a circuit that prepares an n_qubits GHZ state.
 
         Args:
@@ -39,21 +38,23 @@ def generate_ghz_circuit(
         Returns:
             A GHZ circuit acting on n_qubits qubits.
     """
-    if n_qubits <=0:
-        raise ValueError("Cannot prepare a GHZ circuit with {} qubits",n_qubits)
+    if n_qubits <= 0:
+        raise ValueError(
+            "Cannot prepare a GHZ circuit with {} qubits", n_qubits
+        )
 
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = cirq.Circuit()
     circuit.append(cirq.H(qubits[0]))
-    for i in range (0,n_qubits-1):
-        circuit.append(cirq.CNOT(qubits[i],qubits[i+1]))
+    for i in range(0, n_qubits - 1):
+        circuit.append(cirq.CNOT(qubits[i], qubits[i + 1]))
 
-    #alternative structure of GHZ Circuit: 
+    # alternative structure of GHZ Circuit:
     # AltCircuit = cirq.Circuit()
     # AltCircuit.append(cirq.H(qubits[0]))
     # for i in range (1,n_qubits):
     #     AltCircuit.append(cirq.CNOT(0,qubits[i]))
 
     return_type = "cirq" if not return_type else return_type
-    
-    return convert_from_mitiq(circuit,return_type)
+
+    return convert_from_mitiq(circuit, return_type)
