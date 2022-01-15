@@ -16,6 +16,7 @@
 """Functions for creating ghz circuits for benchmarking purposes."""
 
 #imports
+from typing import Optional
 from mitiq import QPROGRAM
 import cirq
 
