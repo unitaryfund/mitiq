@@ -56,7 +56,7 @@ def get_benchmark_circuit(
             connectivity_graph=nx.complete_graph(nqubits),
         )
     elif circuit_type == "ghz":
-        circuit, _ = benchmarks.generate_ghz_circuit(depth=nqubits)
+        circuit, _ = benchmarks.generate_ghz_circuit(n_qubits=nqubits)
     return circuit
 
 
