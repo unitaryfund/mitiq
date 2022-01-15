@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Functions for creating ghz circuits for benchmarking purposes."""
+"""Functions for creating GHZ circuits for benchmarking purposes."""
 
 #imports
 from typing import Optional
