@@ -24,10 +24,11 @@ from mitiq._typing import SUPPORTED_PROGRAM_TYPES
 
 @pytest.mark.parametrize("nqubits", [1, 3, 5, 10])
 def test_ghz_circuits(nqubits):
-
+    print(nqubits)
     # test GHZ creation
     circuit = ghz_circuits.generate_ghz_circuit(nqubits)
-    # check that the state |0...0> and the state |1...1> both have probability close to 0.5
+    # check that the state |0...0> and the state |1...1>
+    # both have probability close to 0.5
     sv = circuit.final_state_vector()
     zero_prob = abs(sv[0]) ** 2
     one_prob = abs(sv[-1]) ** 2
