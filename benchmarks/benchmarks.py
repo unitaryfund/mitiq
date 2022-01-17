@@ -21,14 +21,14 @@ import networkx as nx
 import numpy as np
 
 import cirq
-from mitiq import benchmarks, pec, zne, Observable, PauliString
+from mitiq import benchmarks, raw, pec, zne, Observable, PauliString
 from mitiq.interface import mitiq_cirq
 
 
 compute_density_matrix_noiseless = functools.partial(
     mitiq_cirq.compute_density_matrix, noise_level=(0.0,)
 )
-benchmark_circuit_types = ("rb", "mirror", "ghz")
+benchmark_circuit_types = ("rb", "mirror")
 
 
 def get_benchmark_circuit(
@@ -55,8 +55,6 @@ def get_benchmark_circuit(
             two_qubit_gate_prob=1.0,
             connectivity_graph=nx.complete_graph(nqubits),
         )
-    elif circuit_type == "ghz":
-        circuit = benchmarks.generate_ghz_circuit(n_qubits=nqubits)
     return circuit
 
 
@@ -75,11 +73,11 @@ def track_zne(
     """
     circuit = get_benchmark_circuit(circuit_type, nqubits, depth)
 
-    true_value = observable.expectation(
-        circuit, compute_density_matrix_noiseless
+    true_value = raw.execute(
+        circuit, compute_density_matrix_noiseless, observable
     )
-    raw_value = observable.expectation(
-        circuit, mitiq_cirq.compute_density_matrix
+    raw_value = raw.execute(
+        circuit, mitiq_cirq.compute_density_matrix, observable
     )
     zne_value = zne.execute_with_zne(
         circuit, mitiq_cirq.compute_density_matrix, observable,
@@ -134,10 +132,10 @@ def track_pec(
         noise_level=(noise_level,),
     )
 
-    true_value = observable.expectation(
-        circuit, compute_density_matrix_noiseless
+    true_value = raw.execute(
+        circuit, compute_density_matrix_noiseless, observable
     )
-    raw_value = observable.expectation(circuit, compute_density_matrix)
+    raw_value = raw.execute(circuit, compute_density_matrix, observable)
     pec_value = pec.execute_with_pec(
         circuit,
         compute_density_matrix,
