@@ -28,7 +28,7 @@ from mitiq.interface import mitiq_cirq
 compute_density_matrix_noiseless = functools.partial(
     mitiq_cirq.compute_density_matrix, noise_level=(0.0,)
 )
-benchmark_circuit_types = ("rb", "mirror"," ghz")
+benchmark_circuit_types = ("rb", "mirror", "ghz")
 
 
 def get_benchmark_circuit(
@@ -56,7 +56,7 @@ def get_benchmark_circuit(
             connectivity_graph=nx.complete_graph(nqubits),
         )
     elif circuit_type == "ghz":
-        circuit, _ = benchmarks.generate_ghz_circuit(n_qubits=nqubits)
+        circuit = benchmarks.generate_ghz_circuit(n_qubits=nqubits)
     return circuit
 
 
