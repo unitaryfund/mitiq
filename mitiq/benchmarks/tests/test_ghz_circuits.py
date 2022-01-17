@@ -22,9 +22,8 @@ from mitiq.benchmarks import ghz_circuits
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES
 
 
-@pytest.mark.parametrize("nqubits", [1, 3, 5, 10])
+@pytest.mark.parametrize("nqubits", [1, 5])
 def test_ghz_circuits(nqubits):
-    print(nqubits)
     # test GHZ creation
     circuit = ghz_circuits.generate_ghz_circuit(nqubits)
     # check that the state |0...0> and the state |1...1>
@@ -36,8 +35,13 @@ def test_ghz_circuits(nqubits):
     assert np.isclose(one_prob, 0.5)
 
 
-@pytest.mark.parametrize("nqubits", [1, 3, 5, 7, 10])
+def test_ghz_value_error():
+    # test GHZ error raising
+    with pytest.raises(ValueError):
+        circuit = ghz_circuits.generate_ghz_circuit(0)  # noqa: F841
+
+
 @pytest.mark.parametrize("return_type", SUPPORTED_PROGRAM_TYPES.keys())
-def test_ghz_conversion(nqubits, return_type):
-    circuit = ghz_circuits.generate_ghz_circuit(nqubits, return_type)
+def test_ghz_conversion(return_type):
+    circuit = ghz_circuits.generate_ghz_circuit(3, return_type)
     assert return_type in circuit.__module__

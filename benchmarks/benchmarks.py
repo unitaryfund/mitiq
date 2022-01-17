@@ -28,7 +28,7 @@ from mitiq.interface import mitiq_cirq
 compute_density_matrix_noiseless = functools.partial(
     mitiq_cirq.compute_density_matrix, noise_level=(0.0,)
 )
-benchmark_circuit_types = ("rb", "mirror","ghz")
+benchmark_circuit_types = ("rb", "mirror"," ghz")
 
 
 def get_benchmark_circuit(
