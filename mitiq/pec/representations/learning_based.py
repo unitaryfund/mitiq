@@ -1,6 +1,6 @@
-from mitiq import pec
-from mitiq.pec.types import OperationRepresentation, NoisyOperation
-from mitiq.interface import convert_to_mitiq, convert_from_mitiq
+from typing import List
+import numpy as np
+from scipy import minimize
 
 from cirq import (
     X,
@@ -9,8 +9,10 @@ from cirq import (
     Circuit,
 )
 
-import numpy as np
-from typing import List
+from mitiq import pec
+from mitiq.pec.types import OperationRepresentation, NoisyOperation
+from mitiq.interface import convert_to_mitiq, convert_from_mitiq
+from mitiq.cdr import generate_training_circuits
 
 
 def learn_representations(operation, executor, observable,
@@ -39,7 +41,6 @@ def learn_representations(operation, executor, observable,
         The quasiprobability representation of the single (ideal) operation,
         learned from Clifford training circuit data
     """
-    from mitiq.cdr import generate_training_circuits
 
     # Generate the Clifford training data
     training_circuits = generate_training_circuits(
@@ -129,16 +130,16 @@ def learn_representations(operation, executor, observable,
                       ideal_values: List[np.ndarray]) -> float:
         r""" Loss function: optimize the quasiprobability representation using
         the method of least squares
-    Args:
+        Args:
         epsilon: the local noise strength, an optimization parameter
         eta: the noise bias between reduced dephasing and depolarizing
             channels, an optimization parameter
         qubits: list of qubits in the input circuit
         ideal_values: expectation values obtained by simulations run on the
                     Clifford training circuits
-    Returns: Square of the difference between the error-mitigated value and
+        Returns: Square of the difference between the error-mitigated value and
         the ideal value, over the training set
-    """
+        """
         representations = calculate_quasiprob_representations(epsilon,
                                                               eta, qubits)
         mitigated_value = pec.execute_with_pec(
@@ -151,7 +152,6 @@ def learn_representations(operation, executor, observable,
         return sum((mitigated_value * np.ones(num_train) - ideal_values) ** 2
                    ) / num_train
 
-    from scipy import minimize
     [epsilon_opt, eta_opt] = minimize(loss_function, [epsilon0, eta0],
                                       args=(qubits, ideal_values),
                                       method="BFGS")
