@@ -21,6 +21,11 @@ Randomized Benchmarking Circuits
 .. automodule:: mitiq.benchmarks.randomized_benchmarking
    :members:
 
+GHZ Circuits
+^^^^^^^^^^^^
+.. automodule:: mitiq.benchmarks.ghz_circuits
+   :members:
+
 Clifford Data Regression
 ------------------------
 .. automodule:: mitiq.cdr.clifford_training_data
