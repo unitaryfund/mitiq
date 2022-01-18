@@ -13,7 +13,7 @@ kernelspec:
 
 # What is the theory behind CDR?
 
-Clifford data regression (CDR) is a quantum error mitigation technique that has been introduced in Ref. {cite}`Czarnik_2021_Quantum`.
+Clifford data regression (CDR) is a quantum error mitigation technique that has been introduced in Ref. {cite}`Czarnik_2021_Quantum` and extended to variable-noise CDR in Ref. {cite}`Lowe_2021_PRR`.
 
 ```{code-cell} ipython3
 
