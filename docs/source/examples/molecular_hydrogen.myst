@@ -329,7 +329,7 @@ for pval in pvals[1:]:
 In the next figure we visualize the following results:
 1. The ideal noiseless potential energy surface $V(R)$ corresponding to `best_energies[0]`;
 2. The noisy (unmitigated) potential energy surfaces `best_energies`;
-3. The corresponding error-mitigated potential energy surfaces `all_mitigated`.
+3. The corresponding error-mitigated potential energy surfaces `best_mitigated_energies`.
 
 ```{code-cell} ipython3
 plt.figure(figsize=(15, 5))
