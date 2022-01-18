@@ -44,7 +44,8 @@ def execute_with_cdr(
     num_fit_parameters: Optional[int] = None,
     scale_factors: Sequence[float] = (1,),
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
-    **kwargs: Any,) -> float:
+    **kwargs: Any,
+) -> float:
     """Function for the calculation of an observable from some circuit of
     interest to be mitigated with CDR (or vnCDR) based on
     {cite}`Czarnik_2021_Quantum` and {cite}`Lowe_2021_PRR`.
