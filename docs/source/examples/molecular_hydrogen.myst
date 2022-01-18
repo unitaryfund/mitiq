@@ -137,9 +137,9 @@ using different strengths $p$ of depolarizing noise.
 
 ```{code-cell} ipython3
 # Noise levels
-pvals = (0.00, 0.02, 0.04, 0.06)
+pvals = (0.00, 0.02, 0.04)
 # Variational parameters
-thetas = np.linspace(0.0, 2.0 * np.pi, 20)
+thetas = np.linspace(0.0, 2.0 * np.pi, 10)
 
 all_energies = []
 for pval in pvals:
@@ -171,6 +171,8 @@ num_to_average = 1
 # scaling_function = zne.scaling.fold_gates_at_random
 # pfac = zne.inference.PolyFactory(order=3, scale_factors=[1., 1.5, 2., 2.5, 3., 3.5, 4., 4.5, 5., 5.5, 6.])
 # num_to_average = 5
+# pvals = (0.00, 0.02, 0.04, 0.06)
+# thetas = np.linspace(0.0, 2.0 * np.pi, 20)
 
 all_mitigated = []
 for p in pvals[1:]:
@@ -387,7 +389,7 @@ plt.ylim(
 )
 
 plt.xlabel("Atomic distance (Angstroms)")
-plt.legend()
+plt.legend();
 ```
 
 In the figure above, the error-mitigated potential energy surfaces (colored circles) are closer to the ideal noiseless limit (blue squares)
