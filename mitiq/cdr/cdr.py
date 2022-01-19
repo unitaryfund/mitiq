@@ -48,7 +48,7 @@ def execute_with_cdr(
 ) -> float:
     """Function for the calculation of an observable from some circuit of
     interest to be mitigated with CDR (or vnCDR) based on
-    {cite}`Czarnik_2021_Quantum` and {cite}`Lowe_2021_PRR`.
+    Ref. :cite:`Czarnik_2021_Quantum` and Ref. :cite:`Lowe_2021_PRR`.
 
     The circuit of interest must be compiled in the native basis of the IBM
     quantum computers, that is {Rz, sqrt(X), CNOT}, or such that all the
