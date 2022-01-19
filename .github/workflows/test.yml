@@ -58,6 +58,19 @@ jobs:
           make doctest
           make linkcheck
 
+      - name: Upload executed notebooks
+        uses: actions/upload-artifact@v2
+        with:
+          name: notebooks-for-${{ github.sha }}
+          path: docs\source\_build\jupyter_execute\examples
+
+      - name: Trigger RTDs build
+        uses: dfm/rtds-action@v1
+        with:
+          webhook_url: ${{ secrets.RTDS_WEBHOOK_URL }}
+          webhook_token: ${{ secrets.RTDS_WEBHOOK_TOKEN }}
+          commit_ref: ${{ github.ref }}
+          
   # This is to make sure Mitiq works without optional 3rd party packages like Qiskit, pyQuil, etc.
   # E.g., if we accidentally `import qiskit` in Mitiq where we shouldn't, this test will catch that.
   core:

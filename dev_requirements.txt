@@ -21,3 +21,4 @@ pydata-sphinx-theme~=0.7.2
 jupytext==1.11.1
 sphinx-gallery
 nbsphinx
+rtds-action
