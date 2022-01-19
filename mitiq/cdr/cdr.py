@@ -15,14 +15,12 @@
 
 """API for using Clifford Data Regression (CDR) error mitigation."""
 
-from functools import wraps
 from typing import Any, Callable, Optional, Sequence, Union
 
 import numpy as np
 from scipy.optimize import curve_fit
 
 from mitiq import Executor, Observable, QPROGRAM, QuantumResult
-from mitiq.interface import accept_any_qprogram_as_input
 from mitiq.cdr import (
     generate_training_circuits,
     linear_fit_function,
