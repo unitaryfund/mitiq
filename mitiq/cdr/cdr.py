@@ -31,7 +31,6 @@ from mitiq.cdr import (
 from mitiq.zne.scaling import fold_gates_at_random
 
 
-@accept_any_qprogram_as_input
 def execute_with_cdr(
     circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
