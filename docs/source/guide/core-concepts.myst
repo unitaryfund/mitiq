@@ -64,7 +64,7 @@ Backends are used by Mitiq in the {class}`.Executor` class to run the mitigated 
 
 Once you have selected a frontend and backend combination that are compatible and the mitigation method, the next step is to run the mitigated program.
 The {class}`.Executor` class is used to execute the mitigated program, and is constructed by providing a function with the following signature: `mitiq.QPROGRAM` -> {class}`.QuantumResult`.
-For more information on executors, see the {doc}`Executors <guide-executor>` section of this guide.
+For more information on executors, see the {doc}`Executors <executor>` section of this guide.
 
 ### Batch execution of programs
 
@@ -73,4 +73,4 @@ This is done by providing a list of `mitiq.QPROGRAM` objects to the {class}`.Exe
 The {class}`.Executor` class will then execute all of the programs in parallel, and return a list of {class}`.QuantumResult` objects.
 To perform batched execution, you can use the same mitiq.Executor class constructor and pass a function with the following signature: `T[mitiq.QPROGRAM] -> T[{class}".QuantumResult"]` where T is `Sequence`, `List`, `Tuple`, or `Iterable`.
 
-For more information on batched executors and example code, see the {doc}`Executors <guide-executor>` section of this guide.
+For more information on batched executors and example code, see the {doc}`Executors <executor>` section of this guide.
