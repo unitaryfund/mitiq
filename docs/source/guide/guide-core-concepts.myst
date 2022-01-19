@@ -25,7 +25,7 @@ For example, if you haven't installed PyQuil, then even though Mitiq supports it
 Mitiq only supports non-adaptive quantum programs without classical control flow or mid-circuit measurements. This class of programs is more commonly known as _circuits_ by many other tools and frameworks in quantum computing.
 ```
 
-The Mitiq-defined type `mitiq.QuantumResult` is a union of the types defined in {doc}`..\mitiq\_typing`) that are used to represent the results of running a quantum program.
+The Mitiq-defined type {class}`.QuantumResult` is a union of the types defined in {doc}`..\mitiq\_typing`) that are used to represent the results of running a quantum program.
 For hardware, the results can only be binary values for each evaluation of the program.
 For simulators, more information can be made available like the resulting density matrices or state vectors, which will be valid values of the `mitiq.QuantumResult` type.
 
