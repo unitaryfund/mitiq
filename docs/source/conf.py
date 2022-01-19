@@ -60,7 +60,7 @@ extensions = [
     "sphinxcontrib.bibtex",
     "sphinx_copybutton",
     'nbsphinx',
-    'sphinx_gallery.load_style'
+    'sphinx_gallery.load_style',
     "rtds_action"
 ]
 
