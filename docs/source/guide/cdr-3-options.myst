@@ -13,7 +13,7 @@ kernelspec:
 
 # What additional options are available in CDR?
 
-In addition to the four necessary ingreedients shown in [How do I use CDR?](cdr-1-intro.myst), there are additional parameters in CDR.
+In addition to the four necessary ingredients shown in [How do I use CDR?](cdr-1-intro.myst), there are additional parameters in CDR.
 
 One option is how many circuits are in the training set (default is 10). This can be changed as follows.
 
