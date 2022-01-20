@@ -16,10 +16,9 @@ kernelspec:
 Here we show how to use Clifford data regression (CDR) by means of a simple example. CDR is a learning-based quantum error mitigation technique that relies on the training of a classical simulator with quantum circuits that resemble the one that is the aim of the quantum error mitigation, but which are easier to simulate {cite}`Czarnik_2021_Quantum`. More information about this technique can be found in the section [What is the theory behind CDR?](cdr-5-theory.myst).
 
 ```{code-cell} ipython3
-import warnings
-warnings.filterwarnings("ignore")
-
 import numpy as np
+import warnings
+warnings.simplefilter("ignore", np.ComplexWarning)
 
 import cirq
 from mitiq import cdr, Observable, PauliString
