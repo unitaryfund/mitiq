@@ -130,6 +130,7 @@ mitigated_measurement = cdr.execute_with_cdr(
     compute_density_matrix,
     observable=obs,
     simulator=simulate,
+    seed=0,
 ).real
 print("mitigated_measurement = ", mitigated_measurement)
 ```
