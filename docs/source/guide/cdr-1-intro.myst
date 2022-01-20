@@ -68,7 +68,7 @@ circuit = 5 * circuit
 ```
 
 ### 2. Define an executor
-The executor inputs a circuit and returns a {class}`.QuantumResult`. Typically this function will send the circuit to a quantum computer and wait for the results. Here for sake of example we use a simulator that adds single-qubit depolarizing noise after each moment and returns the final density matrix.
+We define an [executor](guide-executors.myst) function which inputs a circuit and returns a {class}`.QuantumResult`. Here for sake of example we use a simulator that adds single-qubit depolarizing noise after each moment and returns the final density matrix.
 
 ```{code-cell} ipython3
 from mitiq.interface.mitiq_cirq import compute_density_matrix
