@@ -86,6 +86,7 @@ cdr.execute_with_cdr(
     compute_density_matrix,
     observable=obs,
     simulator=simulate,
-    scale_factors=(3,),
+    seed=0,
+    scale_factors=(1.0, 3.0),
 ).real
 ```
