@@ -51,6 +51,7 @@ cdr.execute_with_cdr(
     compute_density_matrix,
     observable=obs,
     simulator=simulate,
+    seed=0,
     num_training_circuits=20,
 ).real
 ```
