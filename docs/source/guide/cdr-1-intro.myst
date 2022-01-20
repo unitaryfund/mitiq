@@ -77,7 +77,7 @@ compute_density_matrix(circuit).round(3)
 ```
 
 ### 3. Observable
-The observables $O$ indicates what we wish to compute via $\text{Tr} [ \rho O ]$.
+As an example, assume that we wish to compute the expectation value $\text{Tr} [ \rho O ]$ of the following observable $O$:
 
 ```{code-cell} ipython3
 # Observable to measure.
