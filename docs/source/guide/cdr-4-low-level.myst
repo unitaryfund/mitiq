@@ -15,7 +15,6 @@ kernelspec:
 
 Clifford Data Regression (CDR) is a learning-based quantum error mitigation technique {cite}`Czarnik_2021_Quantum`.
 
-
 A figure of the typical workflow for CDR in Mitiq is shown in the figure below.
 
 ```{figure} ../img/cdr_workflow2_steps.png
