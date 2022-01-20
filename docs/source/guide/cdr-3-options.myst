@@ -59,7 +59,7 @@ cdr.execute_with_cdr(
 ).real
 ```
 
-Another option is which fit function to use for regresstion (default is `cdr.linear_fit_function`).
+Another option is which fit function to use for regression (default is {func}`cdr.linear_fit_function`).
 
 +++
 
