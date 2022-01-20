@@ -20,7 +20,7 @@ Clifford circuit data and using the resulting representations in
 import cirq
 from cirq import DensityMatrixSimulator, Circuit
 from mitiq import Observable, PauliString
-#from mitiq.pec.representations import learn_representations
+from mitiq.pec.representations import learn_representations
 ```
 
 
@@ -71,8 +71,8 @@ obs = Observable(PauliString("Z", support=(1,)))
 ```{code-cell} ipython3
 representations = []
 for operation in circuit:
-    print(operation)
-    #representations.append(learn_representations(operation, executor))
+    #print(operation)
+    representations.append(learn_representations(operation, executor))
 ```
 
 pec_value, pec_data = pec.execute_with_pec(
