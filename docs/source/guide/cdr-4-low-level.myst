@@ -27,7 +27,6 @@ name: cdr-workflow
 The CDR workflow in Mitiq is divided in two steps: Generating circuits, both for a classical simulator and on the intended backend, and then performing the inference from measurements to obtain a noise mitigated expectation value.
 ```
 
-
 The figure illustrates the Clifford data regression (CDR) workflow in Mitiq.
 
 The CDR workflow Figure above shows a schema of the implementation of CDR in Mitiq. Similarly to ZNE and PEC, also CDR in Mitiq is divided in two main stages: The first one of circuit generation and the second for inference of the mitigated value. However, in CDR, the generation of quantum circuits is more complex, as it involves first the generation of training data. The division of CDR into training, learning and prediction stages is shown in the figure below.
