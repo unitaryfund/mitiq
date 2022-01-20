@@ -37,7 +37,17 @@ To use CDR, we call {func}`.cdr.execute_with_cdr` with four "ingredients":
 
 ### 1. Define a quantum circuit
 
-The quantum circuit can be specified as any quantum circuit supported by Mitiq but **must be compiled into the gateset $\{ \sqrt{X}, Z, \text{CNOT}\}$.**
+The quantum circuit can be specified as any quantum circuit supported by Mitiq but
+**must be compiled into a gateset in which the only non-Clifford gates are
+single-qubit rotations around the $Z$ axis: $R_Z(\theta)$**.  For example:
+
+$$\{ \sqrt{X}, R_Z(\theta), \text{CNOT}\},$$
+$$\{{R_X(\pi/2)}, R_Z(\theta), \text{CZ}\},$$
+$$\{H, S, R_Z(\theta), \text{CNOT}\},$$
+$$ \dots$$
+
+In the next cell we define (as an example) a quantum circuit which contains some
+Clifford gates and some non-Clifford $R_Z(\theta)$ rotations.
 
 ```{code-cell} ipython3
 a, b = cirq.LineQubit.range(2)
