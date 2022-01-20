@@ -46,10 +46,6 @@ obs = Observable(PauliString("ZZ"), PauliString("X", coeff=-1.75))
 def simulate(circuit: cirq.Circuit) -> np.ndarray:
     return compute_density_matrix(circuit, noise_level=(0.0,))
 
-
-simulate(circuit).round(3)
-
-
 cdr.execute_with_cdr(
     circuit,
     compute_density_matrix,
