@@ -13,7 +13,6 @@ kernelspec:
 
 # What happens when I use CDR?
 
-
 Clifford Data Regression (CDR) is a learning-based quantum error mitigation technique {cite}`Czarnik_2021_Quantum`.
 
 
