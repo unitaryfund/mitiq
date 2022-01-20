@@ -56,12 +56,11 @@ cdr.execute_with_cdr(
 ).real
 ```
 
-Another option is which fit function to use for regression (default is {func}`cdr.linear_fit_function`).
-
 +++
 
 ## Fit function
 
+Another option is which fit function to use for regression (default is {func}`cdr.linear_fit_function`).
 ```{code-cell} ipython3
 cdr.execute_with_cdr(
     circuit,
