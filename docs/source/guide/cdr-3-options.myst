@@ -29,17 +29,17 @@ from mitiq.interface.mitiq_cirq import compute_density_matrix
 
 a, b = cirq.LineQubit.range(2)
 circuit = cirq.Circuit(
-    cirq.rx(0.1).on(a),
-    cirq.rx(-0.72).on(b),
-    cirq.rz(0.4).on(a),
-    cirq.rz(0.2).on(b),
-    cirq.CNOT.on(a, b),
-    cirq.rx(-0.1).on(b),
-    cirq.rz(-0.23).on(a),
-    cirq.CNOT.on(b, a),
-    cirq.rx(-0.112).on(a),
+    cirq.H.on(a), # Clifford
+    cirq.H.on(b), # Clifford
+    cirq.rz(1.75).on(a),
+    cirq.rz(2.31).on(b),
+    cirq.CNOT.on(a, b),  # Clifford
+    cirq.rz(-1.17).on(b),
+    cirq.rz(3.23).on(a),
+    cirq.rx(np.pi / 2).on(a),  # Clifford
+    cirq.rx(np.pi / 2).on(b),  # Clifford
 )
-circuit
+circuit = 5 * circuit
 
 obs = Observable(PauliString("ZZ"), PauliString("X", coeff=-1.75))
 
