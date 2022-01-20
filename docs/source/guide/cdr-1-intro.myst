@@ -85,7 +85,11 @@ obs = Observable(PauliString("ZZ"), PauliString("X", coeff=-1.75))
 print(obs)
 ```
 
-You can read more about this Mitiq object in the [documentation](guide-observables.myst).
+**Note:** To apply CDR the {class}`Observable` should be Hermitian, i.e., it should always produce real expectation values.
+
++++
+
+You can read more about the {class}`Observable` class in the [documentation](guide-observables.myst).
 
 +++
 
