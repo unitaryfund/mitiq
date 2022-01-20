@@ -76,7 +76,7 @@ cdr.execute_with_cdr(
 
 +++
 
-The circuit + training circuits can also be run at different noise scale factors to implement [variable noise Clifford data regression](https://arxiv.org/abs/2011.01157) {cite}`Lowe_2021_PRR`.
+The `circuit` and the associated training circuits can also be run at different noise scale factors to implement [variable noise Clifford data regression](https://arxiv.org/abs/2011.01157) {cite}`Lowe_2021_PRR`.
 
 ```{code-cell} ipython3
 from mitiq.zne import scaling
