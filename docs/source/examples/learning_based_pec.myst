@@ -1,0 +1,85 @@
+---
+jupytext:
+  text_representation:
+    extension: .myst
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.10.3
+kernelspec:
+  display_name: Python 3 (ipykernel)
+  language: python
+  name: python3
+---
+
+# Example demonstrating learning quasiprobability representations from
+Clifford circuit data and using the resulting representations in 
+`execute_w_pec`
+
+
+## Setup example circuit in Cirq:
+
+```{code-cell} ipython3
+import cirq
+from cirq import DensityMatrixSimulator, Circuit
+from mitiq import Observable, PauliString
+#from mitiq.pec.representations import learn_representations
+```
+
+```{code-cell} ipython3
+a, b = cirq.LineQubit.range(2)
+circuit = cirq.Circuit(
+    cirq.rx(0.1).on(a),
+    cirq.rx(-0.72).on(b),
+    cirq.rz(0.4).on(a),
+    cirq.rz(0.2).on(b),
+    cirq.CNOT.on(a, b),
+    cirq.rx(-0.1).on(b),
+    cirq.rz(-0.23).on(a),
+    cirq.CNOT.on(b, a),
+    cirq.rx(-0.112).on(a),
+)
+circuit
+```
+
+## Reusing PEC example executor
+
+```{code-cell} ipython3
+SIMULATOR = DensityMatrixSimulator()
+def noisy_executor(circ: Circuit, noise_level="BASE_NOISE") -> float:
+    """Simulates a circuit with depolarizing noise and returns the expectation value
+    of the projector on the ground state |00...><00...|.
+    """
+    noisy_circuit = circ.with_noise(depolarize(noise_level))
+    rho = SIMULATOR.simulate(noisy_circuit).final_density_matrix
+    return np.real(rho[0, 0])
+```
+
+```{code-cell} ipython3
+def ideal_executor(circ: Circuit) -> float:
+    return noisy_executor(circ, noise_level=0)  
+```
+
+## Define observable
+
+```{code-cell} ipython3
+obs = Observable(PauliString("Z", support=(1,)))
+```
+
+## New sub-module: Learning the representations for each operation
+
+```{code-cell} ipython3
+representations = []
+for operation in circuit:
+    print(operation)
+    #representations.append(learn_representations(operation, executor))
+```
+
+pec_value, pec_data = pec.execute_with_pec(
+    circuit=ideal_circuit,
+    observable=obs
+    executor=noisy_executor,
+    representations=representations,
+    num_samples = 1000,
+    full_output=True,
+    random_state = np.random.RandomState(7),
+)
