@@ -72,6 +72,9 @@ cdr.execute_with_cdr(
 ).real
 ```
 
+Beyond the built-in {func}`cdr.linear_fit_function` and {func}`cdr.linear_fit_function_no_intercept`,
+the user could also define other custom functions.
+
 ## Variable noise CDR
 
 +++
