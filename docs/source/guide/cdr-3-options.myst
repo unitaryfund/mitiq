@@ -68,6 +68,7 @@ cdr.execute_with_cdr(
     compute_density_matrix,
     observable=obs,
     simulator=simulate,
+    seed=0,
     fit_function=cdr.linear_fit_function_no_intercept,
 ).real
 ```
