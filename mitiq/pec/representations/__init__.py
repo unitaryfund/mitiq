@@ -32,3 +32,7 @@ from mitiq.pec.representations.optimal import (
     minimize_one_norm,
     find_optimal_representation,
 )
+
+from mitiq.pec.representations.learning_based import ( 
+    learn_representations
+    )

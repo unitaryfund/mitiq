@@ -15,14 +15,12 @@ kernelspec:
 Clifford circuit data and using the resulting representations in 
 `execute_w_pec`
 
-
 ```{code-cell} ipython3
 import cirq
 from cirq import DensityMatrixSimulator, Circuit
 from mitiq import Observable, PauliString
 from mitiq.pec.representations import learn_representations
 ```
-
 
 ## Set up example circuit in Cirq:
 
