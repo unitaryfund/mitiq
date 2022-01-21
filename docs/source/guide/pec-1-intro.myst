@@ -68,7 +68,7 @@ number of random Clifford group elements and is proportional to the depth of the
 
 +++
 
-We now define an [executor](guide-executors.myst) which simulates a backend with depolarizing noise and computes the survival probability of the $|00\rangle$ state.
+We now define an [executor](executors.myst) which simulates a backend with depolarizing noise and computes the survival probability of the $|00\rangle$ state.
 
 +++
 
