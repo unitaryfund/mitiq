@@ -65,7 +65,7 @@ Error (w/o  Mitiq): 0.0688
 Error (with Mitiq): 0.0002
 ```
 
-See our [guides](https://mitiq.readthedocs.io/en/stable/guide/getting-started.html) and [examples](https://mitiq.readthedocs.io) for more explanation, techniques, and benchmarks.
+See our [guides](https://mitiq.readthedocs.io/en/stable/guide/guide.html) and [examples](https://mitiq.readthedocs.io) for more explanation, techniques, and benchmarks.
 The examples and other notebooks can be run interactively on the cloud with [mybinder.org](https://mybinder.org/v2/gh/unitaryfund/mitiq/master?filepath=%2Fdocs%2Fsource%2Fexamples).
 
 ## Quick Tour
