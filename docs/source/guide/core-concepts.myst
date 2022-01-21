@@ -26,8 +26,8 @@ Mitiq only supports non-adaptive quantum programs without classical control flow
 ```
 
 The Mitiq-defined type {class}`.QuantumResult` is a union of the types defined in {doc}`..\mitiq\_typing`) that are used to represent the results of running a quantum program.
-For hardware, the results can only be binary values for each evaluation of the program.
-For simulators, more information can be made available like the resulting density matrices or state vectors, which will be valid values of the {class}`.QuantumResult` type.
+For example, for hardware, the result can be a list of bitstrings (representing raw measurements) or an expectation value expressed as a real number.
+For simulators, more information can be made available like the resulting density matrix, which is a valid object of the {class}`.QuantumResult` type.
 
 ## Frontends
 
@@ -62,15 +62,13 @@ Backends are used by Mitiq in the {class}`.Executor` class to run the mitigated 
 
 ## Executing programs
 
-Once you have selected a frontend and backend combination that are compatible and the mitigation method, the next step is to run the mitigated program.
-The {class}`.Executor` class is used to execute the mitigated program, and is constructed by providing a function with the following signature: `mitiq.QPROGRAM` -> {class}`.QuantumResult`.
+Once you have selected a frontend and backend combination that are compatible, the next step is to set up the execution of a quantum program.
+The {class}`.Executor` class is used to execute quantum programs, and is constructed by providing a function with the following signature: `mitiq.QPROGRAM` -> {class}`.QuantumResult`.
 For more information on executors, see the {doc}`Executors <executor>` section of this guide.
 
 ### Batch execution of programs
 
-When you have a number of circuits that you want to execute with an error mitigation method, you can use the {class}`.Executor` class to execute them all in one go.
-This is done by providing a list of `mitiq.QPROGRAM` objects to the {class}`.Executor` constructor.
-The {class}`.Executor` class will then execute all of the programs in parallel, and return a list of {class}`.QuantumResult` objects.
+You can also use the {class}`.Executor` class to execute a batch of quantum programs all in one go.
 To perform batched execution, you can use the same mitiq.Executor class constructor and pass a function with the following signature: `T[mitiq.QPROGRAM] -> T[{class}".QuantumResult"]` where T is `Sequence`, `List`, `Tuple`, or `Iterable`.
 
 For more information on batched executors and example code, see the {doc}`Executors <executor>` section of this guide.

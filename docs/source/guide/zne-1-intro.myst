@@ -75,7 +75,7 @@ def execute(circuit, noise_level=0.01):
     return rho[0, 0].real
 ```
 
-The [`executor`](https://mitiq.readthedocs.io/en/latest/guide/executors.html?highlight=mitiq.executor#executors) can be used to evaluate noisy (unmitigated) expectation values.
+The [executor](executors.myst) can be used to evaluate noisy (unmitigated) expectation values.
 
 ```{code-cell} ipython3
 # Compute the expectation value of the |0><0| observable.
