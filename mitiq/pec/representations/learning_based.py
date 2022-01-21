@@ -1,6 +1,6 @@
 from typing import List
 import numpy as np
-from scipy import minimize
+from scipy.optimize import minimize
 
 from cirq import (
     X,

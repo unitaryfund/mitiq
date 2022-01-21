@@ -19,7 +19,7 @@ Clifford circuit data and using the resulting representations in
 import cirq
 from cirq import DensityMatrixSimulator, Circuit
 from mitiq import Observable, PauliString
-from mitiq.pec.representations import learn_representations
+from mitiq.pec.representations.learning_based import learn_representations
 ```
 
 ## Set up example circuit in Cirq:
@@ -73,6 +73,7 @@ for operation in circuit:
     representations.append(learn_representations(operation, executor))
 ```
 
+```{code-cell} ipython3
 pec_value, pec_data = pec.execute_with_pec(
     circuit=ideal_circuit,
     observable=obs
@@ -82,3 +83,4 @@ pec_value, pec_data = pec.execute_with_pec(
     full_output=True,
     random_state = np.random.RandomState(7),
 )
+```
