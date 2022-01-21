@@ -8,7 +8,6 @@ This release contains a considerable overhaul of the documentation organization 
 
 - The guide is now divided into Core concepts and a new presentation of the quantum errror mitigation techniques (ZNE, PEC and CDR). Each technique contains subsections that explain with code snippets how to use them in Mitiq (gh-1021, gh-1004 gh-1031, gh-1099). Also the API doc has been extended and improved. Many thanks to @purvathakre @Misty-W for their help on rewriting the documentation and reviewing the pull requests.
 - An example on how to use ZNE to improve the calculations of the energy potential landscape of molecular Hydrogen using VQE was added by @andreamari.
-Many thanks to
 
 **New features**
 - GHZ circuits were added to the benchmark subpackage by @Rahul-Mistri.
