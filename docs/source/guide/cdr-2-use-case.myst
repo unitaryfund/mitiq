@@ -29,7 +29,7 @@ the coefficients of the linear combination are learned instead of being fixed by
 ## Disadvantages
 
 The main disadvantage of CDR is that the learning process is performed on a suite of test circuits which
-only _resemble_ the original circuit of interest, Indeed, test circuits are _near-Clifford approximations_
+only _resemble_ the original circuit of interest. Indeed, test circuits are _near-Clifford approximations_
 of the original one. Only when the approximation is justified, the application of CDR can produce meaningful
 results.
 Increasing the `fraction_non_clifford` option in {func}`.execute_with_cdr` can alleviate this problem
