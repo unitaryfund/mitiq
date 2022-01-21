@@ -4,16 +4,19 @@
 
 ### Summary
 
-This release contains a considerable overhaul of the documentation:
+This release contains a considerable overhaul of the documentation organization and content:
 
-- The guide is now divided into Core concepts and techniques (ZNE in gh-1021, PEC in gh-1004, and CDR in gh-1031 and gh-1099). Each technique contains subsections that explain with code snippets how to use them in Mitiq.
-- An example on how to use ZNE to improve the calculations of the energy potential landscape of molecular Hydrogen using VQE was added by @andreamari
+- The guide is now divided into Core concepts and a new presentation of the quantum errror mitigation techniques (ZNE, PEC and CDR). Each technique contains subsections that explain with code snippets how to use them in Mitiq (gh-1021, gh-1004 gh-1031, gh-1099). Also the API doc has been extended and improved. Many thanks to @purvathakre @Misty-W for their help on rewriting the documentation and reviewing the pull requests.
+- An example on how to use ZNE to improve the calculations of the energy potential landscape of molecular Hydrogen using VQE was added by @andreamari.
+Many thanks to
 
 **New features**
 - GHZ circuits were added to the benchmark subpackage by @Rahul-Mistri.
+- Airspeed-velocity (asv) has been added to the CI by @rmlarose.
 
 ### All Changes
 
+- Add core concepts guide page (@crazy4pi314, @nathanshammah, @andreamari, gh-1053)
 - Add cdr-2-use-case.myst (gh-1099) (@andreamari, @nathanshammah)
 - CDR documentation reorg (@nathanshammah, @andreamari, @crazy4pi314, gh-1031)
 - Add molecular Hydrogen example (@andreamari, gh-1087)
