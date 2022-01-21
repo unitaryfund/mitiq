@@ -1,5 +1,49 @@
 # Changelog
 
+## Version 0.12.0  (January 21st, 2022)
+
+### Summary
+
+This release contains a considerable overhaul of the documentation:
+
+- The guide is now divided into Core concepts and techniques (ZNE in gh-1021, PEC in gh-1004, and CDR in gh-1031 and gh-1099). Each technique contains subsections that explain with code snippets how to use them in Mitiq.
+- An example on how to use ZNE to improve the calculations of the energy potential landscape of molecular Hydrogen using VQE was added by @andreamari
+
+**New features**
+- GHZ circuits were added to the benchmark subpackage by @Rahul-Mistri.
+
+### All Changes
+
+- Add cdr-2-use-case.myst (gh-1099) (@andreamari, @nathanshammah)
+- CDR documentation reorg (@nathanshammah, @andreamari, @crazy4pi314, gh-1031)
+- Add molecular Hydrogen example (@andreamari, gh-1087)
+- Update pydata-sphinx-theme requirement from ~=0.7.2 to ~=0.8.0 (@dependabot, gh-1091)
+- Use raw.execute in asv benchmarks and remove GHZ circuits from asv (@rmlarose)
+- Added GHZ circuits to benchmark (@Rahul-Mistri, gh-1089)
+- Update scipy requirement from ~=1.7.2 to ~=1.7.3 (@dependabot
+, gh-1084)
+- PR to trigger CI and fix a broken link (@andreamari, gh-1082)
+- Fix readthedocs by changing a LaTex equation (@andreamari, @nathanshammah, gh-1077)
+- Add asv benchmarking framework (@rmlarose, gh-1047)
+- Update zne-3-options.myst (@andreamari, gh-1075)
+- Update API doc with REM, executors and observables (@nathanshammah, gh-1050)
+- ZNE Guide Reorg (@crazy4pi314, @Misty-W, @purva-thakre, @nathanshammah, @andreamari, gh-1021)
+- Fix broken link on master. (@andreamari, gh-1069)
+- Update mypy requirement from ~=0.910 to ~=0.930 (@dependabot, gh-1065)
+- Docs: add AkashNarayanan as a contributor for infra (@allcontributors, gh-1059)
+- Fixes #1034 release docs update (@crazy4pi314, @nathanshammah, gh-1054)
+- Docs: add DSamuel1 as a contributor for code (@allcontributors, @Misty-W, gh-1056)
+- Docs: add Misty-W as a contributor for code, example (@allcontributors, gh-1055)
+- Docs: update README.md (@allcontributors)
+- Update PEC docs (@andreamari, @nathanshammah, @rmlarose, gh-1004)
+- Revert "Update mypy requirement from ~=0.910 to ~=0.920 (@nathanshammah, gh-1052)
+- Update mypy requirement from ~=0.910 to ~=0.920 (@dependabot, gh-1051)
+- Update pytest-xdist[psutil] requirement from ~=2.4.0 to ~=2.5.0 (@dependabot, gh-1044)
+- Update amazon-braket-sdk requirement from ~=1.11.0 to ~=1.11.1 (@dependabot, gh-1042)
+- Update pennylane requirement from ~=0.19.0 to ~=0.19.1 (@dependabot, gh-1029)
+- Update amazon-braket-sdk requirement from ~=1.9.5 to ~=1.11.0 (@dependabot, gh-1038)
+
+
 ## Version 0.11.1  (November 29th, 2021)
 
 ### Summary
@@ -8,7 +52,7 @@ This patch release fixes two bugs:
 
 - Bug: PEC could only be used with `cirq.Circuit`s, not `mitiq.QPROGRAM`, due to a missing conversion.
     - Fix: PEC can now be used with any `mitiq.QPROGRAM` (gh-1018).
-- Bug: CDR classically simulated the wrong circuits when doing regression. 
+- Bug: CDR classically simulated the wrong circuits when doing regression.
     - Fix: The correct circuits are now classically simulated (gh-1026).
 
 Also fixes a smaller bug where some tools in `mitiq.interface.mitiq_qiskit` modified `qiskit.QuantumCircuit`s when they shouldn't.
@@ -22,7 +66,7 @@ Also fixes a smaller bug where some tools in `mitiq.interface.mitiq_qiskit` modi
 - Update qiskit requirement from ~=0.31.0 to ~=0.32.0 (@dependabot, gh-1025)
 - Update pydata-sphinx-theme requirement from ~=0.7.1 to ~=0.7.2 (@dependabot, gh-1024)
 - [Bug fix] Avoid circuit mutation in qiskit executors (@andreamari, gh-1019)
-- [Bug fix] Add back-conversions in execute_with_pec (@andreamari, gh-1018) 
+- [Bug fix] Add back-conversions in execute_with_pec (@andreamari, gh-1018)
 - Increase shots in zne tests with shot_list (@andreamari, gh-1020)
 - Update pennylane requirement from ~=0.18.0 to ~=0.19.0 (@nathanshammah, gh-1022)
 - Add workflow figures and technique descriptions (@nathanshammah, gh-953)
@@ -38,15 +82,15 @@ for Pennylane has been added by adding `pennylane.QuantumTape`s to `mitiq.QPROGR
 **New features**
 
 - Specify and use a `mitiq.Observable` in any error-mitigation technique.
-  - This means the `executor` function does not have to return the expectation value as a `float` anymore, but rather 
-    can return a `mitiq.QuantumResult` - i.e., an object from which the expectation value can be computed provided 
+  - This means the `executor` function does not have to return the expectation value as a `float` anymore, but rather
+    can return a `mitiq.QuantumResult` - i.e., an object from which the expectation value can be computed provided
     an observable.
   - The `executor` function can still return a `float`, in which case the `Observable` does not need to be specified
     (and should not be specified).
 
 - All error mitigation techniques can now use batching with the same interface.
 
-- PEC can be run with only a subset of representations of the gates in a circuit. In other words, if the circuit has 
+- PEC can be run with only a subset of representations of the gates in a circuit. In other words, if the circuit has
   two gates, `H` and `CNOT`, you can run `execute_with_pec` by only providing an `OperationRepresentation` for, e.g.,
   the `CNOT`.
   - Before, you had to provide all representations or an error would be raised.
@@ -77,7 +121,7 @@ execute_with_pec(circuit, executor, observable, representations)
 
 The latter will raise `# TypeError: execute_with_pec() missing 1 required keyword-only argument: 'representations'`.
 
-- The first argument of `execute_with_zne` is now `circuit` instead of `qp` to match signatures of other 
+- The first argument of `execute_with_zne` is now `circuit` instead of `qp` to match signatures of other
 `execute_with_xxx` functions.
 
 ### All Changes
@@ -101,12 +145,12 @@ The latter will raise `# TypeError: execute_with_pec() missing 1 required keywor
 - Fix pip package resolving problems (@andreamari, gh-976)
 - Add support for pennylane circuits (everybody and their grandmother, gh-836)
 - Keyword only arguments in execute_with_technique functions (@rmlarose, gh-971)
-- Foldability check includes a check for inverse (@purva-thakre, gh-939) 
-- Bump actions/github-script from 3 to 5 (@dependabot, gh-969) 
+- Foldability check includes a check for inverse (@purva-thakre, gh-939)
+- Bump actions/github-script from 3 to 5 (@dependabot, gh-969)
 - PEC with Observables & skip operations without known representations (@rmlarose, gh-954)
-- Update qiskit-terra requirement from ~=0.18.2 to ~=0.18.3 (@dependabot, gh-955) 
+- Update qiskit-terra requirement from ~=0.18.2 to ~=0.18.3 (@dependabot, gh-955)
 - Add observable to zne_decorator (@rmlarose, gh-967)
-- Update qiskit-ibmq-provider requirement from ~=0.16.0 to ~=0.17.0 (@dependabot, gh-965) 
+- Update qiskit-ibmq-provider requirement from ~=0.16.0 to ~=0.17.0 (@dependabot, gh-965)
 - Binder badge workflow (@AkashNarayanan, gh-964)
 - Fix links and typos in vqe-pyquil-demo.myst and pyquil_demo.myst (@Misty-W, gh-959)
 - ZNE with Observables (@rmlarose, gh-948)
@@ -136,7 +180,7 @@ Some highlights:
 - Dependabot is now helping us keep our dependencies up to date.
 - Lots of documentation fixes and features like a gallery view of the examples and mybinder.org support.
 - New `Observable` and `MeasurementResult` dataclass.
-  
+
 Thanks to @Misty-W and @DSamuel1 for their great contributions this release! 🎉
 
 ### All Changes
@@ -294,12 +338,12 @@ This release has the following major components:
 - Improves the (sampling) performance of PEC (by a lot!) via fewer circuit conversions.
 - Adds `PauliString` object, the first change of several in the generalization of executors. This object is not yet used in any error mitigation pipelines but can be used as a stand-alone.
 
-Additionally, this release 
+Additionally, this release
 
 - Fixes some CI components including uploading coverage from master and suppressing nightly Test PyPI uploads on forks.
 - Adds links to GitHub on README and RTD.
 
-Special thanks to all contributors - @purva-thakre, @Aaron-Robertson, @andre-a-alves, @mstechly, @ckissane, @HaoTy, @briancylui, and @L-P-B - for your work on this release! 
+Special thanks to all contributors - @purva-thakre, @Aaron-Robertson, @andre-a-alves, @mstechly, @ckissane, @HaoTy, @briancylui, and @L-P-B - for your work on this release!
 
 ### All Changes
 
