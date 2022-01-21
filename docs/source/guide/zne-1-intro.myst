@@ -56,7 +56,7 @@ print(circuit)
 As an example, below we define a simple executor function 
 which inputs a circuit, executes it on a noisy simulator, and returns the probability 
 of the ground state. 
-See the [Executors](guide-executors.myst) section for more information on how to 
+See the [Executors](executors.myst) section for more information on how to 
 define more advanced executors.
 
 ```{code-cell} ipython3
@@ -75,7 +75,7 @@ def execute(circuit, noise_level=0.01):
     return rho[0, 0].real
 ```
 
-The [`executor`](https://mitiq.readthedocs.io/en/latest/guide/guide-executors.html?highlight=mitiq.executor#executors) can be used to evaluate noisy (unmitigated) expectation values.
+The [executor](executors.myst) can be used to evaluate noisy (unmitigated) expectation values.
 
 ```{code-cell} ipython3
 # Compute the expectation value of the |0><0| observable.
