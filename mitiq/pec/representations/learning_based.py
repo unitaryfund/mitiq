@@ -1,6 +1,11 @@
-from typing import List
+from typing import (
+    Optional,
+    Callable,
+    List,
+)
 import numpy as np
 from scipy.optimize import minimize
+
 
 from cirq import (
     X,
@@ -9,13 +14,16 @@ from cirq import (
     Circuit,
 )
 
-from mitiq import pec
-from mitiq.pec.types import OperationRepresentation, NoisyOperation
+from mitiq import pec, QPROGRAM, Observable
+from mitiq._typing import QuantumResult
+from mitiq.pec import OperationRepresentation, NoisyOperation
 from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 from mitiq.cdr import generate_training_circuits
 
 
-def learn_representations(operation, executor, observable,
+def learn_representations(operation: QPROGRAM,
+                          executor: Callable[[QPROGRAM], QuantumResult],
+                          observable: Optional[Observable] = None,
                           num_training_circuits: int = 10,
                           epsilon0: float = 0,
                           eta0: float = 1
@@ -146,7 +154,7 @@ def learn_representations(operation, executor, observable,
             circuit=operation,
             observable=observable,
             executor=executor,
-            representations=representations)
+            representations=[representations])
 
         num_train = len(ideal_values)
         return sum((mitigated_value * np.ones(num_train) - ideal_values) ** 2

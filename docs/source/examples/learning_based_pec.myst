@@ -70,7 +70,7 @@ obs = Observable(PauliString("Z", support=(1,)))
 representations = []
 for operation in circuit:
     #print(operation)
-    representations.append(learn_representations(operation, executor))
+    representations.append(learn_representations(operation, noisy_executor))
 ```
 
 ```{code-cell} ipython3
