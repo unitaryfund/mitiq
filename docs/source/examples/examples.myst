@@ -7,6 +7,6 @@ Zero-noise extrapolation on PyQuil parametric programs <pyquil_demo.myst>
 Variational quantum eigensolver improved with zero-noise extrapolation <vqe-pyquil-demo.myst>
 Variational circuit mitigation with zero-noise extrapolation <simple_landscape.myst>
 MaxCut benchmark with zero-noise extrapolation <maxcut-demo.myst>
-Clifford data regression API <cdr_api.md>
 Defining a Mitiq executor with a hamiltonian <hamiltonians.md>
 Mitiq paper codeblocks <mitiq-paper/mitiq-paper-codeblocks>
+Estimating the potential energy surface of molecular Hydrogen with ZNE <molecular_hydrogen.myst>
