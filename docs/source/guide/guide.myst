@@ -4,9 +4,6 @@
 ---
 maxdepth: 2
 ---
-getting-started.rst
-executors.rst
-observables.myst
 core-concepts.myst
 zne.myst
 pec.myst
