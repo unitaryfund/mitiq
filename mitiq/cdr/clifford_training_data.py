@@ -86,8 +86,6 @@ def generate_training_circuits(
             if not cirq.has_stabilizer_effect(op)
         ]
     )
-    if len(non_clifford_indices_and_ops) == 0:
-        raise ValueError("Circuit is already Clifford.")
 
     non_clifford_indices = np.int32(non_clifford_indices_and_ops[:, 0])
     non_clifford_ops = non_clifford_indices_and_ops[:, 1]
