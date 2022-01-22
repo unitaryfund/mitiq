@@ -7,7 +7,7 @@ About Error Mitigation
 This is intended as a primer on quantum error mitigation, providing a
 collection of up-to-date resources from the academic literature, as well as
 other external links framing this topic in the open-source software ecosystem.
-This recent review article :cite:`Endo_2020_arXiv` summarizes the theory behind many error-mitigating
+This recent review article :cite:`Endo_2021_JPSJ` summarizes the theory behind many error-mitigating
 techniques.
 
 * :ref:`guide_qem_what`
@@ -100,7 +100,7 @@ Limitations of probabilistic error cancellation
 The number of samples required to estimate the ideal expectation value with error
 :math:`\delta` and probability :math:`1-\epsilon` scales as
 :math:`\left(2 \gamma_{\text{tot}}^{2} / \delta^{2}\right) \log (2 / \epsilon)`
-:cite:`Takagi2020optimal`. Thus, the sampling overhead is determined
+:cite:`Takagi_2020_PRR`. Thus, the sampling overhead is determined
 by :math:`\gamma_{\text{tot}}` which grows exponentially in the number of gates.
 It is then crucial to find a linear decomposition that minimizes :math:`\gamma_{\text{tot}}`.
 In addition, a full characterization of the noisy operations up to a good precision
@@ -243,14 +243,14 @@ A list of research articles academic resources on error mitigation:
 
 - On **probabilistic error cancellation**:
    - Theory, Y. Li and S. Benjamin, *Phys. Rev. X*, 2017 :cite:`Li_2017_PRX` and K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
-   - Resource analysis for probabilistic error cancellation, Ryuji Takagi, arxiv, 2020 :cite:`Takagi2020optimal`
+   - Resource analysis for probabilistic error cancellation, Ryuji Takagi, arxiv, 2020 :cite:`Takagi_2020_PRR`
 
 - On **randomization methods**:
    - Randomized compiling with twirling gates, J. Wallman *et al.*, *Phys. Rev. A*, 2016 :cite:`Wallman_2016_PRA`
    - Porbabilistic error correction, K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
    - Practical proposal, S. Endo *et al.*, *Phys. Rev. X*, 2018 :cite:`Endo_2018_PRX`
    - Experiment on trapped ions, S. Zhang  *et al.*, *Nature Comm.* 2020 :cite:`Zhang_2020_NatComm`
-   - Experiment with gate set tomography on a supeconducting circuit device, J. Sun *et al.*, 2019 arXiv :cite:`Sun_2020_arXiv`
+   - Experiment with gate set tomography on a supeconducting circuit device, J. Sun *et al.*, 2019 arXiv :cite:`Sun_2021_PRAppl`
 
 - On **subspace expansion**:
    - By hybrid quantum-classical hierarchy introduction, J. McClean *et al.*, *Phys. Rev. A*, 2017 :cite:`McClean_2017_PRA`
@@ -263,9 +263,9 @@ A list of research articles academic resources on error mitigation:
    - Approximate error-correcting codes in the generalized amplitude-damping channels, C. Cafaro *et al.*, *Phys. Rev. A*, 2014 :cite:`Cafaro_2014_PRA`:
    - Extending the variational quantum eigensolver (VQE) to excited states, R. M. Parrish *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Parrish_2019_PRL`
    - Quantum imaginary time evolution, M. Motta *et al.*, *Nat. Phys.*, 2020 :cite:`Motta_2020_NatPhys`
-   - Error mitigation for analog quantum simulation, J. Sun *et al.*, 2020, arXiv :cite:`Sun_2020_arXiv`
+   - Error mitigation for analog quantum simulation, J. Sun *et al.*, 2020, arXiv :cite:`Sun_2021_PRAppl`
 
-- For an extensive introduction: S. Endo, *Hybrid quantum-classical algorithms and error mitigation*, PhD Thesis, 2019, Oxford University (`Link`_), or :cite:`Endo_2020_arXiv`.
+- For an extensive introduction: S. Endo, *Hybrid quantum-classical algorithms and error mitigation*, PhD Thesis, 2019, Oxford University (`Link`_), or :cite:`Endo_2021_JPSJ`.
 
 .. _Link: https://ora.ox.ac.uk/objects/uuid:6733c0f6-1b19-4d12-a899-18946aa5df85
 

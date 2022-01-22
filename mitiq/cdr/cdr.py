@@ -15,14 +15,12 @@
 
 """API for using Clifford Data Regression (CDR) error mitigation."""
 
-from functools import wraps
 from typing import Any, Callable, Optional, Sequence, Union
 
 import numpy as np
 from scipy.optimize import curve_fit
 
 from mitiq import Executor, Observable, QPROGRAM, QuantumResult
-from mitiq.interface import accept_any_qprogram_as_input
 from mitiq.cdr import (
     generate_training_circuits,
     linear_fit_function,
@@ -31,7 +29,6 @@ from mitiq.cdr import (
 from mitiq.zne.scaling import fold_gates_at_random
 
 
-@wraps(accept_any_qprogram_as_input)
 def execute_with_cdr(
     circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
@@ -47,8 +44,8 @@ def execute_with_cdr(
     **kwargs: Any,
 ) -> float:
     """Function for the calculation of an observable from some circuit of
-    interest to be mitigated with CDR (or vnCDR) based on [Czarnik2020]_ and
-    [Lowe2020]_.
+    interest to be mitigated with CDR (or vnCDR) based on
+    Ref. :cite:`Czarnik_2021_Quantum` and Ref. :cite:`Lowe_2021_PRR`.
 
     The circuit of interest must be compiled in the native basis of the IBM
     quantum computers, that is {Rz, sqrt(X), CNOT}, or such that all the
@@ -63,11 +60,12 @@ def execute_with_cdr(
     factors).
 
     This function returns the mitigated observable/s.
+
     Args:
         circuit: Quantum program to execute with error mitigation.
         executor: Executes a circuit and returns a `QuantumResult`.
-        observable: Observable to compute the expectation value of. If None,
-            the `executor` must return an expectation value. Otherwise,
+            observable: Observable to compute the expectation value of.
+            If None, the `executor` must return an expectation value. Otherwise
             the `QuantumResult` returned by `executor` is used to compute the
             expectation of the observable.
         simulator: Executes a circuit without noise and returns a
@@ -86,31 +84,24 @@ def execute_with_cdr(
         scale_factors: Factors by which to scale the noise.
             - When 1.0 is the only scale factor, the method is known as CDR.
             - Note: When scale factors larger than 1.0 are provided, the method
-                is known as "variable-noise CDR."
+            is known as "variable-noise CDR."
         kwargs: Available keyword arguments are:
             - method_select (string): Specifies the method used to select the
-                non-Clifford gates to replace when constructing the
-                near-Clifford training circuits. Can be 'uniform' or
-                'gaussian'.
+            non-Clifford gates to replace when constructing the
+            near-Clifford training circuits. Can be 'uniform' or
+            'gaussian'.
             - method_replace (string): Specifies the method used to replace
-                the selected non-Clifford gates with a Clifford when
-                constructing the near-Clifford training circuits. Can be
-                'uniform', 'gaussian', or 'closest'.
+            the selected non-Clifford gates with a Clifford when
+            constructing the near-Clifford training circuits. Can be
+            'uniform', 'gaussian', or 'closest'.
             - sigma_select (float): Width of the Gaussian distribution used for
-                ``method_select='gaussian'``.
+            ``method_select='gaussian'``.
             - sigma_replace (float): Width of the Gaussian distribution used
-                for ``method_replace='gaussian'``.
+            for ``method_replace='gaussian'``.
             - random_state (int): Seed for sampling.
-
-    .. [Czarnik2020] : Piotr Czarnik, Andrew Arramsmith, Patrick Coles,
-        Lukasz Cincio, "Error mitigation with Clifford quantum circuit
-        data," (https://arxiv.org/abs/2005.10189).
-    .. [Lowe2020] : Angus Lowe, Max Hunter Gordon, Piotr Czarnik,
-        Andrew Arramsmith, Patrick Coles, Lukasz Cincio,
-        "Unified approach to data-driven error mitigation,"
-        (https://arxiv.org/abs/2011.01157).
     """
     # Handle keyword arguments for generating training circuits.
+
     method_select = kwargs.get("method_select", "uniform")
     method_replace = kwargs.get("method_replace", "closest")
     random_state = kwargs.get("random_state", None)
