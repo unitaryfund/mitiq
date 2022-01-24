@@ -42,7 +42,7 @@ circuit
 
 ## Reusing CDR example simulator
 
-Ideal simluator
+Ideal simulator
 
 ```{code-cell} ipython3
 def simulate(circuit: cirq.Circuit) -> np.ndarray:
@@ -52,7 +52,7 @@ def simulate(circuit: cirq.Circuit) -> np.ndarray:
 Noisy executor (noisy simluator in this example)
 
 ```{code-cell} ipython3
-def noisy_executor(circ: Circuit) -> float:
+def noisy_executor(circ: Circuit) -> np.ndarray:
     return mitiq_cirq.compute_density_matrix(circuit)
 ```
 
@@ -68,18 +68,20 @@ obs = Observable(PauliString("Z", support=(1,)))
 representations = []
 operations = convert_to_mitiq(circuit)
 for operation in operations:
-    #print(operation)
-    representations.append(learn_representations(operation, simulate, obs))
+    # print(operation)
+    representations.append(
+        learn_representations(operation, simulate, noisy_executor, obs)
+    )
 ```
 
 ```{code-cell} ipython3
 pec_value, pec_data = pec.execute_with_pec(
     circuit=ideal_circuit,
-    observable=obs
+    observable=obs,
     executor=noisy_executor,
     representations=representations,
     num_samples = 1000,
     full_output=True,
-    random_state = np.random.RandomState(7),
+    random_state = np.random.RandomState(7)
 )
 ```

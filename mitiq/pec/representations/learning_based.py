@@ -22,7 +22,8 @@ from mitiq.cdr import generate_training_circuits
 
 
 def learn_representations(operation: QPROGRAM,
-                          executor: Callable[[QPROGRAM], QuantumResult],
+                          ideal_executor: Callable[[QPROGRAM], QuantumResult],
+                          noisy_executor: Callable[[QPROGRAM], QuantumResult],
                           observable: Optional[Observable] = None,
                           num_training_circuits: int = 10,
                           epsilon0: float = 0,
@@ -62,7 +63,7 @@ def learn_representations(operation: QPROGRAM,
     ideal_values = []
     for training_circuit in training_circuits:
         ideal_values.append(observable.expectation(training_circuit,
-                                                   executor))
+                                                   ideal_executor).real)
 
     circ, in_type = convert_to_mitiq(operation)
     qubits = circ.all_qubits()
@@ -157,15 +158,15 @@ def learn_representations(operation: QPROGRAM,
         mitigated_value = pec.execute_with_pec(
             circuit=operation,
             observable=observable,
-            executor=executor,
+            executor=noisy_executor,
             representations=[representations])
 
         num_train = len(ideal_values)
         return sum((mitigated_value * np.ones(num_train) - ideal_values) ** 2
                    ) / num_train
-
-    x0 = [epsilon0, eta0]
-    result = minimize(loss_function, x0,args=(qubits, ideal_values),
+    
+    x0 = [epsilon0, eta0]  # initial parameter values for optimization
+    result = minimize(loss_function, x0, args=(qubits, ideal_values),
                       method="BFGS")
     x_result = result.x
     epsilon_opt = x_result[0]
