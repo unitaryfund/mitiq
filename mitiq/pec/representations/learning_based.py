@@ -61,7 +61,8 @@ def learn_representations(operation: QPROGRAM,
 
     ideal_values = []
     for training_circuit in training_circuits:
-        ideal_values.append(executor(training_circuit, observable))
+        ideal_values.append(observable.expectation(training_circuit,
+                                                   executor))
 
     circ, in_type = convert_to_mitiq(operation)
     qubits = circ.all_qubits()
@@ -134,7 +135,7 @@ def learn_representations(operation: QPROGRAM,
                                                           alphas)}
         return OperationRepresentation(operation, expansion)
 
-    def loss_function(epsilon: float, eta: float, qubits,
+    def loss_function(params, qubits,
                       ideal_values: List[np.ndarray]) -> float:
         r""" Loss function: optimize the quasiprobability representation using
         the method of least squares
@@ -148,6 +149,9 @@ def learn_representations(operation: QPROGRAM,
         Returns: Square of the difference between the error-mitigated value and
         the ideal value, over the training set
         """
+        epsilon = params[0]
+        eta = params[1]
+
         representations = calculate_quasiprob_representations(epsilon,
                                                               eta, qubits)
         mitigated_value = pec.execute_with_pec(
@@ -160,8 +164,10 @@ def learn_representations(operation: QPROGRAM,
         return sum((mitigated_value * np.ones(num_train) - ideal_values) ** 2
                    ) / num_train
 
-    [epsilon_opt, eta_opt] = minimize(loss_function, [epsilon0, eta0],
-                                      args=(qubits, ideal_values),
-                                      method="BFGS")
-
+    x0 = [epsilon0, eta0]
+    result = minimize(loss_function, x0,args=(qubits, ideal_values),
+                      method="BFGS")
+    x_result = result.x
+    epsilon_opt = x_result[0]
+    eta_opt = x_result[1]
     return calculate_quasiprob_representations(epsilon_opt, eta_opt, qubits)

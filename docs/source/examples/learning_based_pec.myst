@@ -11,14 +11,14 @@ kernelspec:
   name: python3
 ---
 
-# Example demonstrating learning quasiprobability representations from
-Clifford circuit data and using the resulting representations in 
-`execute_w_pec`
+# Example of learning quasiprobability representations from Clifford circuit data and using the resulting representations in `execute_w_pec`
 
 ```{code-cell} ipython3
+import numpy as np
 import cirq
 from cirq import DensityMatrixSimulator, Circuit
-from mitiq import Observable, PauliString
+from mitiq import Observable, PauliString, pec
+from mitiq.interface import convert_to_mitiq, mitiq_cirq
 from mitiq.pec.representations.learning_based import learn_representations
 ```
 
@@ -40,22 +40,20 @@ circuit = cirq.Circuit(
 circuit
 ```
 
-## Reusing PEC example executor
+## Reusing CDR example simulator
+
+Ideal simluator
 
 ```{code-cell} ipython3
-SIMULATOR = DensityMatrixSimulator()
-def noisy_executor(circ: Circuit, noise_level="BASE_NOISE") -> float:
-    """Simulates a circuit with depolarizing noise and returns the expectation value
-    of the projector on the ground state |00...><00...|.
-    """
-    noisy_circuit = circ.with_noise(depolarize(noise_level))
-    rho = SIMULATOR.simulate(noisy_circuit).final_density_matrix
-    return np.real(rho[0, 0])
+def simulate(circuit: cirq.Circuit) -> np.ndarray:
+    return mitiq_cirq.compute_density_matrix(circuit, noise_level=(0.0,))
 ```
 
+Noisy executor (noisy simluator in this example)
+
 ```{code-cell} ipython3
-def ideal_executor(circ: Circuit) -> float:
-    return noisy_executor(circ, noise_level=0)  
+def noisy_executor(circ: Circuit) -> float:
+    return mitiq_cirq.compute_density_matrix(circuit)
 ```
 
 ## Define observable
@@ -68,9 +66,10 @@ obs = Observable(PauliString("Z", support=(1,)))
 
 ```{code-cell} ipython3
 representations = []
-for operation in circuit:
+operations = convert_to_mitiq(circuit)
+for operation in operations:
     #print(operation)
-    representations.append(learn_representations(operation, noisy_executor))
+    representations.append(learn_representations(operation, simulate, obs))
 ```
 
 ```{code-cell} ipython3
