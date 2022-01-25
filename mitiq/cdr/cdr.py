@@ -125,7 +125,7 @@ def execute_with_cdr(
     if is_clifford(circuit):
         if not isinstance(simulator, Executor):
             simulator = Executor(simulator)
-        return simulator.evaluate(circuit, observable)
+        return simulator.evaluate(circuit, observable)[0].real
 
     # Generate training circuits.
     training_circuits = generate_training_circuits(
