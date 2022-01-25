@@ -52,7 +52,7 @@ def simulate(circuit: cirq.Circuit) -> np.ndarray:
 Noisy executor (noisy simluator in this example)
 
 ```{code-cell} ipython3
-def noisy_executor(circ: Circuit) -> np.ndarray:
+def noisy_executor(circ: cirq.Circuit) -> np.ndarray:
     return mitiq_cirq.compute_density_matrix(circuit)
 ```
 
@@ -76,7 +76,7 @@ for operation in operations:
 
 ```{code-cell} ipython3
 pec_value, pec_data = pec.execute_with_pec(
-    circuit=ideal_circuit,
+    circuit=circuit,
     observable=obs,
     executor=noisy_executor,
     representations=representations,
