@@ -69,23 +69,24 @@ def learn_representations(operation: QPROGRAM,
         ideal_values.append(observable.expectation(training_circuit,
                                                    ideal_executor).real)
 
-    def calculate_quasiprob_representations(circ: QPROGRAM, epsilon: float,
-                                            eta: float
+    def calculate_quasiprob_representations(params: List[np.ndarray],
+                                            circ: QPROGRAM
                                             ) -> OperationRepresentation:
-        r"""Compute quasi-probability representation by inverting local noise channel
-            and calculating basis expansion
+        r"""Compute quasi-probability representation by inverting local noise
+            channel and calculating basis expansion
         Args:
+            params: optimization parameters, the local noise strength epsilon
+                andthe noise bias between reduced dephasing and depolarizing
+                channels eta
             circ: single operation, converted to Mitiq circuit
-            epsilon: the local noise strength, an optimization parameter
-            eta: the noise bias between reduced dephasing and depolarizing
-                channels, an optimization parameter
-
         Returns:
             The quasiprobability representation of the single (ideal)
             operation, in terms of :math:`\epsilon` and the noise bias
             :math:`\eta`
         """
         qubits = circ.all_qubits()
+        epsilon = params[0]
+        eta = params[1]
         if len(qubits) == 1:
             q = tuple(qubits)[0]
 
@@ -145,20 +146,17 @@ def learn_representations(operation: QPROGRAM,
         r""" Loss function: optimize the quasiprobability representation using
         the method of least squares
         Args:
+        params: optimization parameters, the local noise strength epsilon and
+            the noise bias between reduced dephasing and depolarizing channels
+            eta
         circ: single operation, converted to Mitiq circuit
-        epsilon: the local noise strength, an optimization parameter
-        eta: the noise bias between reduced dephasing and depolarizing
-            channels, an optimization parameter
         ideal_values: expectation values obtained by simulations run on the
                     Clifford training circuits
         Returns: Square of the difference between the error-mitigated value and
         the ideal value, over the training set
         """
-        epsilon = params[0]
-        eta = params[1]
 
-        representations = calculate_quasiprob_representations(circ, epsilon,
-                                                              eta)
+        representations = calculate_quasiprob_representations(params, circ)
         mitigated_value = pec.execute_with_pec(
             circuit=circ,
             observable=observable,
@@ -172,7 +170,4 @@ def learn_representations(operation: QPROGRAM,
     x0 = [epsilon0, eta0]  # initial parameter values for optimization
     result = minimize(loss_function, x0, args=(circuit, ideal_values),
                       method="BFGS")
-    x_result = result.x
-    epsilon_opt = x_result[0]
-    eta_opt = x_result[1]
-    return calculate_quasiprob_representations(circuit, epsilon_opt, eta_opt)
+    return calculate_quasiprob_representations(result.x, circuit)
