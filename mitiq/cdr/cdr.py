@@ -120,12 +120,12 @@ def execute_with_cdr(
             raise ValueError(
                 "Must provide `num_fit_parameters` for custom fit function."
             )
-    
+
     # Check if circuit is already Clifford
     if is_clifford(circuit):
         if not isinstance(simulator, Executor):
             simulator = Executor(simulator)
-        return simulator.evaluate(circuit,observable)[0].real
+        return simulator.evaluate(circuit, observable)
 
     # Generate training circuits.
     training_circuits = generate_training_circuits(
