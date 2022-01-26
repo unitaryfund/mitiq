@@ -121,10 +121,15 @@ def execute_with_cdr(
                 "Must provide `num_fit_parameters` for custom fit function."
             )
 
+    # cast executor and simulator inputs to Executor type
+    if not isinstance(executor, Executor):
+        executor = Executor(executor)
+
+    if not isinstance(simulator, Executor):
+        simulator = Executor(simulator)
+
     # Check if circuit is already Clifford
     if is_clifford(circuit):
-        if not isinstance(simulator, Executor):
-            simulator = Executor(simulator)
         return simulator.evaluate(circuit, observable)[0].real
 
     # Generate training circuits.
@@ -143,13 +148,6 @@ def execute_with_cdr(
         [scale_noise(c, s) for s in scale_factors]
         for c in [circuit] + training_circuits  # type: ignore
     ]
-
-    # Execute all circuits.
-    if not isinstance(executor, Executor):
-        executor = Executor(executor)
-
-    if not isinstance(simulator, Executor):
-        simulator = Executor(simulator)
 
     to_run = [circuit for circuits in all_circuits for circuit in circuits]
     all_circuits_shape = (len(all_circuits), len(all_circuits[0]))

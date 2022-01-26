@@ -87,6 +87,9 @@ def generate_training_circuits(
         ]
     )
 
+    if len(non_clifford_indices_and_ops) == 0:
+        return [circuit] * num_training_circuits
+
     non_clifford_indices = np.int32(non_clifford_indices_and_ops[:, 0])
     non_clifford_ops = non_clifford_indices_and_ops[:, 1]
 
