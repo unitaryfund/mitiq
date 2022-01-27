@@ -18,6 +18,7 @@ import pytest
 
 import numpy as np
 
+import cirq
 from cirq import LineQubit
 
 from mitiq import PauliString, Observable, QPROGRAM
@@ -120,3 +121,13 @@ def test_no_num_fit_parameters_with_custom_fit_raises_error():
             simulator=simulate,
             fit_function=lambda _: 1,
         )
+
+
+def test_execute_with_cdr_using_clifford_circuit():
+    a, b = cirq.LineQubit.range(2)
+    clifCirc = cirq.Circuit(cirq.H.on(a), cirq.H.on(b),)
+    obs = Observable(PauliString("XZ"), PauliString("YY"))
+    cdr_value = execute_with_cdr(
+        clifCirc, observable=obs, executor=execute, simulator=simulate
+    )
+    assert obs.expectation(clifCirc, simulate) == cdr_value
