@@ -28,10 +28,10 @@ def generate_ghz_circuit(
 
         Args:
             n_qubits: The number of qubits in the circuit.
-            return_type: String which specifies the type of the
-            returned circuits. See the keys of
-            ``mitiq.SUPPORTED_PROGRAM_TYPES`` for options. If ``None``, the
-            returned circuits have type ``cirq.Circuit``.
+            return_type: String which specifies the type of the returned
+                circuits. See the keys of ``mitiq.SUPPORTED_PROGRAM_TYPES``
+                for options. If ``None``, the returned circuits have type
+                ``cirq.Circuit``.
 
         Returns:
             A GHZ circuit acting on ``n_qubits`` qubits.
