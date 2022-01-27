@@ -98,8 +98,7 @@ def test_non_consecutive_wires_error():
     with qml.tape.QuantumTape() as tape:
         qml.CNOT(wires=[0, 2])
     with pytest.raises(
-        UnsupportedQuantumTapeError,
-        match="contiguously pack",
+        UnsupportedQuantumTapeError, match="contiguously pack",
     ):
         from_pennylane(tape)
 
