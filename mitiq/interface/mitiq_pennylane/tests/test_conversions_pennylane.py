@@ -122,7 +122,7 @@ def test_integration():
         qml.U1(0.4, wires=0),
         qml.U2(0.4, 0.5, wires=0),
         qml.U3(0.4, 0.5, 0.6, wires=0),
-        qml.CRX(0, wires=(0, 1)),
+        qml.CRX(0.4, wires=(0, 1)),
         qml.CRY(0.4, wires=(0, 1)),
         qml.CRZ(0.4, wires=(0, 1)),
     ]
