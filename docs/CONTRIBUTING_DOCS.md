@@ -15,7 +15,7 @@ pip install -e .
 pip install -r dev_requirements.txt
 ```
 as they are included in the `dev_requirements.txt` file.
-Alternately, you can use the docker image provided in the repo and all requirements for working with the docs are already installed there.
+Alternatively, you can use the docker image provided in the repo and all requirements for working with the docs are already installed there.
 
 ### Sphinx extensions used to build the docs
 - [`myst-nb`](https://myst-nb.readthedocs.io/en/latest/) and [`myst-parser`](https://myst-parser.readthedocs.io/en/latest/) allow both markdown and jupyter notebooks to be included and run by the Sphinx build. Also adds support for [MyST markdown](https://myst-parser.readthedocs.io/en/latest/using/syntax.html) spec.
@@ -48,7 +48,7 @@ You need not to modify the `docs/build` folder, as it is automatically generated
 
 The documentation is divided into:
 -  a **guide**, whose content needs to be
-written from scratch, 
+written from scratch,
 - **examples** which can be either jupyter notebooks or MyST formatted notebooks, and
 - an **API-doc** part, which is (mostly)
 automatically generated.
@@ -66,7 +66,7 @@ The main table of contents (TOC) file for the docs is `index.myst`. It includes 
 ````
 ```{toctree}
 ---
-maxdepth: 2 
+maxdepth: 2
 caption: Contents
 ---
 file.myst
@@ -76,7 +76,7 @@ file.myst
 ```{tip}
 If you use VS Code as your text editor there is a nice extension that does syntax highlighting for MyST: [https://marketplace.visualstudio.com/items?itemName=ExecutableBookProject.myst-highlight](https://marketplace.visualstudio.com/items?itemName=ExecutableBookProject.myst-highlight)
 ```
-### Including other files in the docs 
+### Including other files in the docs
 
 To include `.md` files outside of the documentation `source` directory, you can add a stub `*.myst` file to the toctree inside the `docs\source` directory that contains:
 
@@ -119,7 +119,7 @@ in the appropriate `.md or `*.myst` file (such as `apidoc.myst` or a child), e.g
 ```{automodule} mitiq.new_module
    :members:
 ```
-will add all elements of the `mitiq.new_module` module with a subtitle "New Module." 
+will add all elements of the `mitiq.new_module` module with a subtitle "New Module."
 You can hand-pick classes and functions to add, to comment them, as well as exclude them.
 
 ```{tip}
@@ -128,7 +128,7 @@ source code, and to the API page `apidoc.rst`.
 ```
 
 ### Build the documentation locally
-The easiest way to build the docs is to just run `make docs` from the project 
+The easiest way to build the docs is to just run `make docs` from the project
 root directory in bash, which by default builds the html docs output.
 You can also use from root `make pdf` to generate the PDF version.
 
@@ -136,7 +136,7 @@ You can also use from root `make pdf` to generate the PDF version.
 If you want to remove previous builds and make the HTML docs fresh, try `make docs-clean`!
 ```
 
-If you want to call sphinx directly, you can from bash move to the `docs` 
+If you want to call sphinx directly, you can from bash move to the `docs`
 folder and run
 
 ```bash
@@ -151,10 +151,10 @@ The `html` and `latex` and `pdf` files will be automatically created in the
 `docs/build` folder.
 ```
 
-## Testing the Documentation 
+## Testing the Documentation
 
-When writing a new code example in the docs, you can use different directives 
-to include code blocks. 
+When writing a new code example in the docs, you can use different directives
+to include code blocks.
 
 ### Just the code, don't evaluate
 If you want to include a code snippet that doesn't get run (but has syntax
@@ -190,7 +190,7 @@ with no output and
 ```
 ````
 
-If you have code blocks you want to run, but not be displayed, use the 
+If you have code blocks you want to run, but not be displayed, use the
 `testsetup` directive:
 
 ````
@@ -237,7 +237,7 @@ Mitiq uses the `doctest` [extension](https://www.sphinx-doc.org/en/master/usage/
 ```bash
 make doctest
 ```
-from the root directory. 
+from the root directory.
 
 This command tests the code examples in the documentation files, as well as testing the docstrings, since these are imported with the `autodoc` extension.
 
