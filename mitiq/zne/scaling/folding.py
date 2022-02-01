@@ -301,8 +301,6 @@ def fold_global(
         )
 
     _append_measurements(folded, measurements)
-    if not (kwargs.get("squash_moments") is False):
-        folded = _squash_moments(folded)
     return folded
 
 

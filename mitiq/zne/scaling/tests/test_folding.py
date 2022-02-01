@@ -964,6 +964,49 @@ def test_global_fold_stretch_factor_eight_terminal_measurements():
     assert _equal(folded, correct)
 
 
+def test_global_fold_moment_structure_maintained():
+    """Tests global folding maintains the input circuit's moment structure.
+    """
+    # Test circuit 1
+    # 0: ───H───────────────
+
+    # 1: ───────Z───────────
+
+    # 2: ───────────S───────
+
+    # 3: ───────────────T───
+
+    qreg = LineQubit.range(4)
+
+    gate_list1 = [ops.H, ops.Z, ops.S, ops.T]
+    circuit1 = Circuit(gate_list1[0](qreg[0]))
+
+    for i in range(1, 4):
+        circuit1 += Circuit(gate_list1[i](qreg[i]))
+    folded = fold_global(circuit1, scale_factor=3)
+    correct = Circuit(circuit1, inverse(circuit1), circuit1,)
+    assert _equal(folded, correct)
+
+    # Test Circuit 2
+    # 0: ───H───@───────@───
+    #           │       |
+    # 1: ───H───X───────@───
+    #                   │
+    # 2: ───H───────T───X───
+    qreg = LineQubit.range(3)
+    gate_list = [
+        ops.CNOT.on(qreg[0], qreg[1]),
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+    ]
+    circ = Circuit([ops.H.on_each(*qreg)])
+    for i in range(len(gate_list)):
+        circ += Circuit(gate_list[i])
+    folded = fold_global(circ, scale_factor=3)
+    correct = Circuit(circ, inverse(circ), circ,)
+    assert _equal(folded, correct)
+
+
 def test_convert_to_from_mitiq_qiskit():
     """Basic test for converting a Qiskit circuit to a Cirq circuit."""
     # Test Qiskit circuit:
@@ -1200,12 +1243,7 @@ def test_fold_left_squash_moments():
 
 @pytest.mark.parametrize(
     "fold_method",
-    [
-        fold_gates_from_left,
-        fold_gates_from_right,
-        fold_gates_at_random,
-        fold_global,
-    ],
+    [fold_gates_from_left, fold_gates_from_right, fold_gates_at_random,],
 )
 def test_fold_and_squash_max_stretch(fold_method):
     """Tests folding and squashing a two-qubit circuit."""
@@ -1234,6 +1272,38 @@ def test_fold_and_squash_max_stretch(fold_method):
     assert len(folded_not_squashed) == 30
     assert len(folded_and_squashed) == 15
     assert len(folded_with_squash_moments_not_specified) == 15
+
+
+@pytest.mark.parametrize(
+    "fold_method", [fold_global,],
+)
+def test_fold_global_no_squash(fold_method):
+    """Tests folding and squashing a two-qubit circuit."""
+    # Test circuit:
+    # 0: ───────H───────H───────H───────H───────H───
+    #
+    # 1: ───H───────H───────H───────H───────H───────
+
+    # Get the test circuit
+    d = 10
+    qreg = LineQubit.range(2)
+    circuit = Circuit()
+    for i in range(d):
+        circuit.insert(0, ops.H.on(qreg[i % 2]), strategy=InsertStrategy.NEW)
+
+    folded_not_squashed = fold_method(
+        circuit, scale_factor=3.0, squash_moments=False
+    )
+    folded_and_squashed = fold_method(
+        circuit, scale_factor=3.0, squash_moments=True
+    )
+    folded_with_squash_moments_not_specified = fold_method(
+        circuit, scale_factor=3.0
+    )  # Checks that the default is to squash moments
+
+    assert len(folded_not_squashed) == 30
+    assert len(folded_and_squashed) == 30
+    assert len(folded_with_squash_moments_not_specified) == 30
 
 
 @pytest.mark.parametrize(
