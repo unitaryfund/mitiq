@@ -266,10 +266,6 @@ def fold_global(
         scale_factor: Factor to scale the circuit by.
 
     Keyword Args:
-        squash_moments (bool): If True, all gates (including folded gates) are
-            placed as early as possible in the circuit. If False, new moments
-            are created for folded gates. This option only applies to QPROGRAM
-            types which have a "moment" or "time" structure. Default is True.
         return_mitiq (bool): If True, returns a Mitiq circuit instead of
             the input circuit type (if different). Default is False.
 
