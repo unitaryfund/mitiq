@@ -223,7 +223,7 @@ class Factory(ABC):
 
     def __init__(self) -> None:
         self._instack: List[Dict[str, float]] = []
-        self._outstack: List[np.array] = []  # Change: Changed this list to accept np.array
+        self._outstack: List[Union[float, np.ndarray]] = []  # Change: Changed this list to accept np.array
         self._opt_params: Optional[List[float]] = None
         self._params_cov: Optional[np.ndarray] = None
         self._zne_limit: Optional[float] = None
@@ -581,7 +581,8 @@ class BatchedFactory(Factory, ABC):
             )
 
         if executor._executor_return_type in CountsLike:
-            self._outstack = res  # It is already the right shape then, because of executor
+            # The type in this case can only be np.ndarray
+            self._outstack = res  # type: ignore
         else:
             # Reshape "res" to have "num_to_average" columns
             reshaped = np.array(res).reshape((-1, num_to_average))
@@ -1483,7 +1484,7 @@ class PolyExpFactory(BatchedFactory):
 # Keep a log of the optimization process storing:
 # noise value(s), expectation value(s), parameters, and zero limit
 OptimizationHistory = List[
-    Tuple[List[Dict[str, float]], List[float], List[float], float]
+    Tuple[List[Dict[str, float]], List[Union[float, np.ndarray]], List[float], float]
 ]
 
 

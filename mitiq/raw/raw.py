@@ -15,6 +15,7 @@
 
 """Run experiments without error mitigation."""
 from typing import Callable, Optional, Union
+import numpy.ndarray
 
 from mitiq import Executor, Observable, QPROGRAM, QuantumResult
 
@@ -23,7 +24,7 @@ def execute(
     circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     observable: Optional[Observable] = None,
-) -> complex:
+) -> Union[complex, numpy.ndarray]:
     """Evaluates the expectation value associated to the input circuit
     without using error mitigation.
 

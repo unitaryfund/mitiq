@@ -127,7 +127,7 @@ class Executor:
         observable: Optional[Observable] = None,
         force_run_all: bool = False,
         **kwargs: Any,
-    ) -> List[complex]:
+    ) -> List[Union[complex, np.ndarray]]:
         """Returns the expectation value Tr[ρ O] for each circuit in
         ``circuits`` where O is the observable provided or implicitly defined
         by the ``executor``. (The observable is implicitly defined when the
@@ -190,6 +190,7 @@ class Executor:
 
         elif self._executor_return_type in CountsLike:  # NOTE: type Counts is a dict("byte": exp_value)
             observable = cast(Observable, observable)
+            all_results = cast(List[QiskitCounts], all_results)
             results = [0 for x in range(len(all_results))]
             index = 0
 

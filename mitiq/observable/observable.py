@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
-from typing import Callable, cast, List, Optional, Set, Tuple
+from typing import Callable, cast, List, Optional, Set, Tuple, Union
 
 import numpy as np
 import cirq
@@ -125,7 +125,7 @@ class Observable:
 
     def expectation(
         self, circuit: QPROGRAM, execute: Callable[[QPROGRAM], QuantumResult]
-    ) -> complex:
+    ) -> Union[complex, np.ndarray]:
         from mitiq.executor import Executor  # Avoid circular import.
 
         return Executor(execute).evaluate(circuit, observable=self)[0]
