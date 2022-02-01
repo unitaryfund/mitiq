@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
-from typing import Callable, cast, List, Optional, Set
+from typing import Callable, cast, List, Optional, Set, Tuple  # CHANGE: Added Dict
 
 import numpy as np
 import cirq

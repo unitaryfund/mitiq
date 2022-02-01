@@ -39,6 +39,7 @@ from cirq import Circuit
 from mitiq._typing import QPROGRAM, QuantumResult
 from mitiq.observable import Observable
 from mitiq.executor import Executor
+from mitiq.executor.executor import CountsLike  # CHANGE: Added this import
 from mitiq.zne.scaling import fold_gates_at_random
 from mitiq.interface import accept_any_qprogram_as_input
 
@@ -222,7 +223,7 @@ class Factory(ABC):
 
     def __init__(self) -> None:
         self._instack: List[Dict[str, float]] = []
-        self._outstack: List[float] = []
+        self._outstack: List[np.array] = []  # Change: Changed this list to accept np.array
         self._opt_params: Optional[List[float]] = None
         self._params_cov: Optional[np.ndarray] = None
         self._zne_limit: Optional[float] = None
@@ -569,7 +570,7 @@ class BatchedFactory(Factory, ABC):
             res = []
             for circuit, kwargs in zip(to_run, kwargs_list):
                 res.extend(
-                    executor.evaluate(
+                    executor.evaluate(  # NOTE: Here we spit the result
                         circuit, observable, force_run_all=True, **kwargs
                     )
                 )
@@ -579,12 +580,14 @@ class BatchedFactory(Factory, ABC):
                 to_run, observable, force_run_all=True, **kwargs_list[0]
             )
 
-        # Reshape "res" to have "num_to_average" columns
-        reshaped = np.array(res).reshape((-1, num_to_average))
+        if executor._executor_return_type in CountsLike:
+            self._outstack = res
+        else:
+            # Reshape "res" to have "num_to_average" columns
+            reshaped = np.array(res).reshape((-1, num_to_average))
 
-        # Average the "num_to_average" columns
-        self._outstack = np.average(reshaped, axis=1)
-
+            # Average the "num_to_average" columns
+            self._outstack = np.average(reshaped, axis=1)  #NOTE: Here is the output
         return self
 
     def run_classical(

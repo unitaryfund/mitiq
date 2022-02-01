@@ -21,6 +21,7 @@ import inspect
 from typing import (
     Any,
     Callable,
+    Dict,
     cast,
     Iterable,
     List,
@@ -28,6 +29,7 @@ from typing import (
     Sequence,
     Tuple,
     Union,
+    NewType
 )
 
 import numpy as np
@@ -61,7 +63,15 @@ MeasurementResultLike = [
     Sequence[MeasurementResult],
     Tuple[MeasurementResult],
 ]
-
+Key = NewType("Key", str)
+ExpVal = NewType("ExpVal", float)
+Counts = Dict[Key, ExpVal]
+CountsLike = [
+    Dict[Key, ExpVal],
+    Key,
+    ExpVal,
+    Dict[str, float]
+]  # CHANGE: added Counts type
 
 class Executor:
     """Tool for efficiently scheduling/executing quantum programs and storing
@@ -179,6 +189,22 @@ class Executor:
                 )
                 for i in range(len(all_results) // result_step)
             ]
+        # CHANGE: Added elif clause
+        elif self._executor_return_type in CountsLike:  # NOTE: type Counts is a dict("byte": exp_value)
+            observable = cast(Observable, observable)
+            results = [0 for x in range(len(all_results))]
+            index = 0
+            # CHANGE: Iterated through the counts to return a sorted matrix
+            for experiment in all_results:  # Looking through the results
+                bit_len = len(list(experiment.keys())[0])
+                exp_values = np.array([0 for x in range(2 ** bit_len)])
+                for elem in experiment.items():
+                    for i in range(2 ** bit_len):
+                        if i == int(elem[0], 2):
+                            exp_values[i] = elem[1]
+                            break
+                results[index] = exp_values  # The final result is of the form:
+                index += 1  # list( np.array(exp_val, ...), ... )
 
         else:
             raise ValueError(
