@@ -570,7 +570,7 @@ class BatchedFactory(Factory, ABC):
             res = []
             for circuit, kwargs in zip(to_run, kwargs_list):
                 res.extend(
-                    executor.evaluate(  # NOTE: Here we spit the result
+                    executor.evaluate(
                         circuit, observable, force_run_all=True, **kwargs
                     )
                 )
@@ -581,13 +581,13 @@ class BatchedFactory(Factory, ABC):
             )
 
         if executor._executor_return_type in CountsLike:
-            self._outstack = res
+            self._outstack = res  # It is already the right shape then, because of executor
         else:
             # Reshape "res" to have "num_to_average" columns
             reshaped = np.array(res).reshape((-1, num_to_average))
 
             # Average the "num_to_average" columns
-            self._outstack = np.average(reshaped, axis=1)  #NOTE: Here is the output
+            self._outstack = np.average(reshaped, axis=1)
         return self
 
     def run_classical(

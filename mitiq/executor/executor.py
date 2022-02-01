@@ -69,7 +69,7 @@ CountsLike = [
     Dict[Key, ExpVal],
     Dict[str, float],
     QiskitCounts
-]  # CHANGE: added Counts type
+]  # List of what could be interpreted as a count object
 
 class Executor:
     """Tool for efficiently scheduling/executing quantum programs and storing
@@ -187,18 +187,20 @@ class Executor:
                 )
                 for i in range(len(all_results) // result_step)
             ]
-        # CHANGE: Added elif clause
+
         elif self._executor_return_type in CountsLike:  # NOTE: type Counts is a dict("byte": exp_value)
             observable = cast(Observable, observable)
             results = [0 for x in range(len(all_results))]
             index = 0
-            # CHANGE: Iterated through the counts to return a sorted matrix
-            for experiment in all_results:  # Looking through the results
+
+            # Iterate through all_result to create the sorted matrix
+            for experiment in all_results:
                 bit_len = len(list(experiment.keys())[0])
+                # Empty matrix, if it's not in the dictionnary, then it's 0
                 exp_values = np.array([0 for x in range(2 ** bit_len)])
                 for elem in experiment.items():
                     for i in range(2 ** bit_len):
-                        if i == int(elem[0], 2):
+                        if i == int(elem[0], 2):  # If it exists, place it in our matrix
                             exp_values[i] = elem[1]
                             break
                 results[index] = exp_values  # The final result is of the form:
