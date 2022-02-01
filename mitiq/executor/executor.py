@@ -35,11 +35,11 @@ from typing import (
 import numpy as np
 
 from mitiq import QPROGRAM, QuantumResult
-
 from mitiq.observable.observable import Observable
 from mitiq.rem.measurement_result import MeasurementResult
 from mitiq.interface import convert_from_mitiq, convert_to_mitiq
 
+import qiskit.result.Counts as QiskitCounts
 
 DensityMatrixLike = [
     np.ndarray,
@@ -65,12 +65,10 @@ MeasurementResultLike = [
 ]
 Key = NewType("Key", str)
 ExpVal = NewType("ExpVal", float)
-Counts = Dict[Key, ExpVal]
 CountsLike = [
     Dict[Key, ExpVal],
-    Key,
-    ExpVal,
-    Dict[str, float]
+    Dict[str, float],
+    QiskitCounts
 ]  # CHANGE: added Counts type
 
 class Executor:
