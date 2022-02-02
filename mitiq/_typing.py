@@ -23,7 +23,7 @@
        a quantum program from which expectation values to be mitigated can be
        computed. Note this includes expectation values themselves.
 """
-from typing import Union
+from typing import Union, NewType, Dict
 
 import numpy as np
 
@@ -64,8 +64,7 @@ except ImportError:  # pragma: no cover
 
 # Supported + installed quantum programs.
 QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit, _BKCircuit, _QuantumTape]
-
-
+QiskitCounts = NewType("QiskitCounts", Dict[str, float])
 # An `executor` function inputs a quantum program and outputs an object from
 # which expectation values can be computed. Explicitly, this object can be one
 # of the following types:
@@ -73,6 +72,7 @@ QuantumResult = Union[
     float,  # The expectation value itself.
     MeasurementResult,  # Sampled bitstrings.
     np.ndarray,  # Density matrix.
+    QiskitCounts,  # Qiskit Counts Object
     # TODO: Support the following:
     # Sequence[np.ndarray],  # Wavefunctions sampled via quantum trajectories.
 ]

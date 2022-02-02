@@ -223,7 +223,7 @@ class Factory(ABC):
 
     def __init__(self) -> None:
         self._instack: List[Dict[str, float]] = []
-        self._outstack: List[Union[float, np.ndarray]] = []  # Change: Changed this list to accept np.array
+        self._outstack: List[Union[float, np.ndarray]] = []
         self._opt_params: Optional[List[float]] = None
         self._params_cov: Optional[np.ndarray] = None
         self._zne_limit: Optional[float] = None
@@ -1483,9 +1483,9 @@ class PolyExpFactory(BatchedFactory):
 
 # Keep a log of the optimization process storing:
 # noise value(s), expectation value(s), parameters, and zero limit
-OptimizationHistory = List[
-    Tuple[List[Dict[str, float]], List[Union[float, np.ndarray]], List[float], float]
-]
+OptimizationHistory = List[Tuple[List[Dict[str, float]],
+                           List[Union[float, np.ndarray]],
+                           List[float], float]]
 
 
 class AdaExpFactory(AdaptiveFactory):

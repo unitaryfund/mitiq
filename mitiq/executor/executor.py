@@ -28,18 +28,15 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
-    Union,
-    NewType
+    Union
 )
 
 import numpy as np
 
-from mitiq import QPROGRAM, QuantumResult
+from mitiq import QPROGRAM, QuantumResult, QiskitCounts
 from mitiq.observable.observable import Observable
 from mitiq.rem.measurement_result import MeasurementResult
 from mitiq.interface import convert_from_mitiq, convert_to_mitiq
-
-import qiskit.result.Counts as QiskitCounts
 
 DensityMatrixLike = [
     np.ndarray,
@@ -63,13 +60,11 @@ MeasurementResultLike = [
     Sequence[MeasurementResult],
     Tuple[MeasurementResult],
 ]
-Key = NewType("Key", str)
-ExpVal = NewType("ExpVal", float)
 CountsLike = [
-    Dict[Key, ExpVal],
     Dict[str, float],
     QiskitCounts
 ]  # List of what could be interpreted as a count object
+
 
 class Executor:
     """Tool for efficiently scheduling/executing quantum programs and storing
@@ -187,8 +182,8 @@ class Executor:
                 )
                 for i in range(len(all_results) // result_step)
             ]
-
-        elif self._executor_return_type in CountsLike:  # NOTE: type Counts is a dict("byte": exp_value)
+        # NOTE: type Counts is a dict("byte": exp_value)
+        elif self._executor_return_type in CountsLike:
             observable = cast(Observable, observable)
             all_results = cast(List[QiskitCounts], all_results)
             results = [0 for x in range(len(all_results))]
@@ -201,7 +196,8 @@ class Executor:
                 exp_values = np.array([0 for x in range(2 ** bit_len)])
                 for elem in experiment.items():
                     for i in range(2 ** bit_len):
-                        if i == int(elem[0], 2):  # If it exists, place it in our matrix
+                        # If it exists, place it in our matrix
+                        if i == int(elem[0], 2):
                             exp_values[i] = elem[1]
                             break
                 results[index] = exp_values  # The final result is of the form:

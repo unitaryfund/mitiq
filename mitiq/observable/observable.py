@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
-from typing import Callable, cast, List, Optional, Set, Tuple, Union
+from typing import Callable, cast, List, Optional, Set, Union
 
 import numpy as np
 import cirq
