@@ -139,7 +139,7 @@ def test_generate_mirror_circuit(depth_twoqprob_graph):
     result = (
         cirq.Simulator()
         .run(circ, repetitions=1_000)
-        .multi_measurement_histogram(keys=circ.all_measurement_keys())
+        .multi_measurement_histogram(keys=circ.all_measurement_key_names())
     )
     assert (
         len(result.keys()) == 1

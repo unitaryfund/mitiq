@@ -22,7 +22,7 @@ import numpy as np
 from cirq import (
     Circuit,
     Z,
-    channel,
+    kraus,
     AmplitudeDampingChannel,
     reset,
 )
@@ -102,7 +102,7 @@ def amplitude_damping_kraus(
     depolarizing channels acting on each qubit.
     """
     local_noisy_op = AmplitudeDampingChannel(noise_level)
-    local_kraus = list(channel(local_noisy_op))
+    local_kraus = list(kraus(local_noisy_op))
     return [
         tensor_product(*kraus_string)
         for kraus_string in product(local_kraus, repeat=num_qubits)
