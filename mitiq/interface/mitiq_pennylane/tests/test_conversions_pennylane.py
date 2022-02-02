@@ -104,29 +104,27 @@ def test_non_consecutive_wires_error():
 
 
 def test_integration():
-    n_wires = 4
-
     gates = [
-        qml.PauliX,
-        qml.PauliY,
-        qml.PauliZ,
-        qml.S,
-        qml.T,
-        qml.RX,
-        qml.RY,
-        qml.RZ,
-        qml.Hadamard,
-        qml.Rot,
-        qml.CRot,
-        qml.Toffoli,
-        qml.SWAP,
-        qml.CSWAP,
-        qml.U1,
-        qml.U2,
-        qml.U3,
-        qml.CRX,
-        qml.CRY,
-        qml.CRZ,
+        qml.PauliX(wires=0),
+        qml.PauliY(wires=0),
+        qml.PauliZ(wires=0),
+        qml.S(wires=0),
+        qml.T(wires=0),
+        qml.RX(0.4, wires=0),
+        qml.RY(0.4, wires=0),
+        qml.RZ(0.4, wires=0),
+        qml.Hadamard(wires=0),
+        qml.Rot(0.4, 0.5, 0.6, wires=1),
+        qml.CRot(0.4, 0.5, 0.6, wires=(0, 1)),
+        qml.Toffoli(wires=(0, 1, 2)),
+        qml.SWAP(wires=(0, 1)),
+        qml.CSWAP(wires=(0, 1, 2)),
+        qml.U1(0.4, wires=0),
+        qml.U2(0.4, 0.5, wires=0),
+        qml.U3(0.4, 0.5, 0.6, wires=0),
+        qml.CRX(0.4, wires=(0, 1)),
+        qml.CRY(0.4, wires=(0, 1)),
+        qml.CRZ(0.4, wires=(0, 1)),
     ]
 
     layers = 3
@@ -137,22 +135,11 @@ def test_integration():
         np.random.seed(1967)
         for gates in gates_per_layers:
             for gate in gates:
-                params = list(np.pi * np.random.rand(gate.num_params))
-                rnd_wires = np.random.choice(
-                    range(n_wires), size=gate.num_wires, replace=False
-                )
-                gate(
-                    *params,
-                    wires=[
-                        int(w) for w in rnd_wires
-                    ],  # make sure we do not address wires as 0-d arrays
-                )
+                qml.apply(gate)
 
     base_circ = from_pennylane(tape)
     tape_recovered = to_pennylane(base_circ)
     circ_recovered = from_pennylane(tape_recovered)
-
     u_1 = cirq.unitary(base_circ)
     u_2 = cirq.unitary(circ_recovered)
-
-    assert np.allclose(u_1, u_2)
+    cirq.testing.assert_allclose_up_to_global_phase(u_1, u_2, atol=0)
