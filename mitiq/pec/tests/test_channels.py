@@ -21,7 +21,7 @@ from cirq import (
     LineQubit,
     depolarize,
     Circuit,
-    channel,
+    kraus,
     AmplitudeDampingChannel,
     Y,
 )
@@ -151,7 +151,7 @@ def test_super_to_choi():
     for noise_level in [0, 0.3, 1]:
         super_damping = kraus_to_super(amplitude_damping_kraus(noise_level, 1))
         # Apply Pauli Y to get some complex numbers
-        super_op = np.kron(channel(Y)[0], channel(Y)[0].conj()) @ super_damping
+        super_op = np.kron(kraus(Y)[0], kraus(Y)[0].conj()) @ super_damping
         choi_state = super_to_choi(super_op)
         # expected result
         q = LineQubit(0)

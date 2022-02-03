@@ -25,6 +25,7 @@ from mitiq.cdr import (
     generate_training_circuits,
     linear_fit_function,
     linear_fit_function_no_intercept,
+    is_clifford,
 )
 from mitiq.zne.scaling import fold_gates_at_random
 
@@ -120,6 +121,17 @@ def execute_with_cdr(
                 "Must provide `num_fit_parameters` for custom fit function."
             )
 
+    # cast executor and simulator inputs to Executor type
+    if not isinstance(executor, Executor):
+        executor = Executor(executor)
+
+    if not isinstance(simulator, Executor):
+        simulator = Executor(simulator)
+
+    # Check if circuit is already Clifford
+    if is_clifford(circuit):
+        return simulator.evaluate(circuit, observable)[0].real
+
     # Generate training circuits.
     training_circuits = generate_training_circuits(
         circuit,
@@ -136,13 +148,6 @@ def execute_with_cdr(
         [scale_noise(c, s) for s in scale_factors]
         for c in [circuit] + training_circuits  # type: ignore
     ]
-
-    # Execute all circuits.
-    if not isinstance(executor, Executor):
-        executor = Executor(executor)
-
-    if not isinstance(simulator, Executor):
-        simulator = Executor(simulator)
 
     to_run = [circuit for circuits in all_circuits for circuit in circuits]
     all_circuits_shape = (len(all_circuits), len(all_circuits[0]))
