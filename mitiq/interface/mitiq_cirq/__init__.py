@@ -16,4 +16,5 @@
 from mitiq.interface.mitiq_cirq.cirq_utils import (
     sample_bitstrings,
     compute_density_matrix,
+    execute_with_depolarizing_noise,
 )
