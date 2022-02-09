@@ -19,6 +19,7 @@ import cirq
 
 from mitiq.interface.mitiq_cirq import execute_with_depolarizing_noise
 
+
 def test_execute_with_depolarizing_noise():
     """Tests if executor function for Cirq returns a proper expectation
     value when used for noisy depoalrizing simulation."""
