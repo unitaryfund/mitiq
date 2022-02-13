@@ -61,7 +61,6 @@ extensions = [
     "sphinx_copybutton",
     'nbsphinx',
     'sphinx_gallery.load_style',
-    "rtds_action"
 ]
 
 intersphinx_mapping = {
@@ -78,10 +77,9 @@ intersphinx_mapping = {
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
-import os
-
 # Set up RTD GitHub action
 if os.environ.get("READTHEDOCS"):
+    extensions.append("rtds_action")
     rtds_action_github_repo = "unitaryfund/mitiq"
     rtds_action_path = "mitiq/docs/source/examples"
     rtds_action_artifact_prefix = "notebooks-for-"
