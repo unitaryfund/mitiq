@@ -68,7 +68,7 @@ jobs:
         uses: dfm/rtds-action@v1
         with:
           webhook_url: ${{ secrets.RTDS_WEBHOOK_URL }}
-          webhook_token: ${{ secrets.RTDS_WEBHOOK_TOKEN }}
+          webhook_token: ${{ secrets.GITHUB_TOKEN }} # noqa: E999,E201,E202
           commit_ref: ${{ github.ref }}
           
   # This is to make sure Mitiq works without optional 3rd party packages like Qiskit, pyQuil, etc.
