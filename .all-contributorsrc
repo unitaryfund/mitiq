@@ -300,6 +300,16 @@
       "contributions": [
         "infra"
       ]
+    },
+    {
+      "login": "Rahul-Mistri",
+      "name": "Rahul Mistri",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52910775?v=4",
+      "profile": "https://github.com/Rahul-Mistri",
+      "contributions": [
+        "test",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
