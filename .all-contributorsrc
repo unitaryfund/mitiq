@@ -300,6 +300,16 @@
       "contributions": [
         "infra"
       ]
+    },
+    {
+      "login": "vtomole",
+      "name": "Victory Omole",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8405160?v=4",
+      "profile": "http://vtomole.com",
+      "contributions": [
+        "test",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
