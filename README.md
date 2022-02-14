@@ -1,7 +1,7 @@
 # <a href="https://github.com/unitaryfund/mitiq"><img src="https://github.com/unitaryfund/mitiq/blob/master/docs/source/img/mitiq-logo.png?raw=true" alt="Mitiq logo" width="350"/></a>
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-28-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-29-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![Documentation Status](https://readthedocs.org/projects/mitiq/badge/?version=stable)](https://mitiq.readthedocs.io/en/stable/)
@@ -154,6 +154,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/francespoblete"><img src="https://avatars.githubusercontent.com/u/65167390?v=4?s=100" width="100px;" alt=""/><br /><sub><b>francespoblete</b></sub></a><br /><a href="#design-francespoblete" title="Design">🎨</a></td>
     <td align="center"><a href="https://github.com/Misty-W"><img src="https://avatars.githubusercontent.com/u/82074193?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Misty-W</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=Misty-W" title="Code">💻</a> <a href="#example-Misty-W" title="Examples">💡</a></td>
     <td align="center"><a href="https://github.com/AkashNarayanan"><img src="https://avatars.githubusercontent.com/u/83135130?v=4?s=100" width="100px;" alt=""/><br /><sub><b>AkashNarayanan B</b></sub></a><br /><a href="#infra-AkashNarayanan" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/Rahul-Mistri"><img src="https://avatars.githubusercontent.com/u/52910775?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rahul Mistri</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=Rahul-Mistri" title="Tests">⚠️</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=Rahul-Mistri" title="Code">💻</a></td>
   </tr>
 </table>
 
