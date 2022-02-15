@@ -1,7 +1,7 @@
 # <a href="https://github.com/unitaryfund/mitiq"><img src="https://github.com/unitaryfund/mitiq/blob/master/docs/source/img/mitiq-logo.png?raw=true" alt="Mitiq logo" width="350"/></a>
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-29-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-31-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![Documentation Status](https://readthedocs.org/projects/mitiq/badge/?version=stable)](https://mitiq.readthedocs.io/en/stable/)
@@ -158,6 +158,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/L-P-B"><img src="https://avatars.githubusercontent.com/u/32333736?v=4?s=100" width="100px;" alt=""/><br /><sub><b>L-P-B</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=L-P-B" title="Tests">⚠️</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=L-P-B" title="Code">💻</a></td>                                    
     <td align="center"><a href="https://github.com/Rahul-Mistri"><img src="https://avatars.githubusercontent.com/u/52910775?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rahul Mistri</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=Rahul-Mistri" title="Tests">⚠️</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=Rahul-Mistri" title="Code">💻</a></td>
+    <td align="center"><a href="http://vtomole.com"><img src="https://avatars.githubusercontent.com/u/8405160?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Victory Omole</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=vtomole" title="Tests">⚠️</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=vtomole" title="Code">💻</a></td>
   </tr>
 </table>
 
