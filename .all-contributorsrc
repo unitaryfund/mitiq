@@ -300,6 +300,16 @@
       "contributions": [
         "infra"
       ]
+    },
+    {
+      "login": "L-P-B",
+      "name": "L-P-B",
+      "avatar_url": "https://avatars.githubusercontent.com/u/32333736?v=4",
+      "profile": "https://github.com/L-P-B",
+      "contributions": [
+        "test",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
