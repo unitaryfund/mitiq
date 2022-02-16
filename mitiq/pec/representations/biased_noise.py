@@ -25,8 +25,8 @@ def represent_operation_with_biased_noise(
         q = tuple(qubits)[0]
 
         alpha_1 = 1 + 3 * epsilon * (eta + 1) / (3 * (1 - epsilon)
-                                                   * (eta + 1) + epsilon
-                                                   * (3 * eta + 1))
+                                                 * (eta + 1) + epsilon
+                                                 * (3 * eta + 1))
         alpha_2 = - epsilon / (3 * (1 - epsilon) * (eta + 1)
                                + epsilon * (3 * eta + 1))
         alpha_3 = - epsilon * (3 * eta + 1) / (3 * (1 - epsilon) * (eta + 1)
@@ -53,8 +53,8 @@ def represent_operation_with_biased_noise(
         post_ops += [[P(q0)] for P in [X, Y, Z]]  # 1Q Paulis for q0
         post_ops += [[P(q1)] for P in [X, Y, Z]]  # 1Q Paulis for q1
         post_ops += [
-                [Pi(q0), Pj(q1)] for Pi in [X, Y, Z] for Pj in [X, Y, Z]
-            ]  # 2Q Paulis
+            [Pi(q0), Pj(q1)] for Pi in [X, Y, Z] for Pj in [X, Y, Z]
+        ]  # 2Q Paulis
 
     else:
         raise ValueError(

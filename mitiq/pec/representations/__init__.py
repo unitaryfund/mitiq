@@ -32,3 +32,7 @@ from mitiq.pec.representations.optimal import (
     minimize_one_norm,
     find_optimal_representation,
 )
+
+from mitiq.pec.representations.biased_noise import (
+    represent_operation_with_biased_noise
+)
