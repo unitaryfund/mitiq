@@ -1325,7 +1325,9 @@ def test_fold_local_with_fidelities(fold_method, qiskit):
 )
 @pytest.mark.parametrize("qiskit", [True, False])
 def test_fold_local_with_single_qubit_gates_fidelity_one(fold_method, qiskit):
-    """Tests folding only two-qubit gates by using fidelities = {"single": 1.}."""
+    """Tests folding only two-qubit gates by using
+    fidelities = {"single": 1.}.
+    """
     qreg = LineQubit.range(3)
     circ = Circuit(
         ops.H.on_each(*qreg),
