@@ -29,7 +29,6 @@ from cirq import (
     LineQubit,
     Circuit,
     DepolarizingChannel,
-    
     MeasurementGate,
 )
 
@@ -52,7 +51,7 @@ def single_qubit_biased_noise_overhead(noise_level: float) -> float:
         (https://arxiv.org/abs/1612.02058).
     """
     epsilon = 4 / 3 * noise_level  # Need to update this for biased noise
-    return (1 + epsilon / 2) / (1 - epsilon)  
+    return (1 + epsilon / 2) / (1 - epsilon)
 
 
 def two_qubit_biased_noise_overhead(noise_level: float) -> float:
@@ -64,7 +63,7 @@ def two_qubit_biased_noise_overhead(noise_level: float) -> float:
             (https://arxiv.org/abs/1612.02058).
     """
     epsilon = 16 / 15 * noise_level  # Need to update this for biased noise
-    return (1 + 7 * epsilon / 8) / (1 - epsilon) 
+    return (1 + 7 * epsilon / 8) / (1 - epsilon)
 
 
 @pytest.mark.parametrize("noise", [0, 0.1, 0.7])
@@ -111,7 +110,7 @@ def test_biased_noise_representation_with_choi(gate: Gate, noise: float):
         implementable_circ = noisy_op.circuit()
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.
-        biased_op = DepolarizingChannel(noise, len(qreg))(*qreg) # Replace with custom channel
+        biased_op = DepolarizingChannel(noise, len(qreg))(*qreg)  # Replace w/ custom channel
         implementable_circ.append(biased_op)
         sequence_choi = _circuit_to_choi(implementable_circ)
         choi_components.append(coeff * sequence_choi)
@@ -132,7 +131,7 @@ def test_local_depolarizing_representation_with_choi(gate: Gate, noise: float):
     for noisy_op, coeff in op_rep.basis_expansion.items():
         implementable_circ = noisy_op.circuit()
         # The representation assume local noise on each qubit.
-        depolarizing_op = DepolarizingChannel(noise).on_each(*qreg) 
+        depolarizing_op = DepolarizingChannel(noise).on_each(*qreg)
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.
         implementable_circ.append(depolarizing_op)
@@ -150,58 +149,6 @@ def test_three_qubit_local_depolarizing_representation_error():
         )
 
 
-@pytest.mark.parametrize("circuit_type", ["cirq", "qiskit", "pyquil"])
-def test_represent_operations_in_circuit_global(circuit_type: str):
-    """Tests all operation representations are created."""
-    qreg = LineQubit.range(2)
-    circ_mitiq = Circuit([CNOT(*qreg), H(qreg[0]), Y(qreg[1]), CNOT(*qreg)])
-    circ = convert_from_mitiq(circ_mitiq, circuit_type)
-
-    reps = represent_operations_in_circuit_with_global_depolarizing_noise(
-        ideal_circuit=circ, noise_level=0.1,
-    )
-
-    # For each operation in circ we should find its representation
-    for op in convert_to_mitiq(circ)[0].all_operations():
-        found = False
-        for rep in reps:
-            if _equal(rep.ideal, Circuit(op), require_qubit_equality=True):
-                found = True
-        assert found
-
-    # The number of reps. should match the number of unique operations
-    assert len(reps) == 3
-
-
-@pytest.mark.parametrize("circuit_type", ["cirq", "qiskit", "pyquil"])
-def test_represent_operations_in_circuit_local(circuit_type: str):
-    """Tests all operation representations are created."""
-    qreg = LineQubit.range(2)
-    circ_mitiq = Circuit([CNOT(*qreg), H(qreg[0]), Y(qreg[1]), CNOT(*qreg)])
-    circ = convert_from_mitiq(circ_mitiq, circuit_type)
-
-    reps = represent_operations_in_circuit_with_biased_noise(
-        ideal_circuit=circ, noise_level=0.1,
-    )
-
-    for op in convert_to_mitiq(circ)[0].all_operations():
-        found = False
-        for rep in reps:
-            if _equal(rep.ideal, Circuit(op), require_qubit_equality=True):
-                found = True
-        assert found
-
-    # The number of reps. should match the number of unique operations
-    assert len(reps) == 3
-
-
-@pytest.mark.parametrize(
-    "rep_function",
-    [
-        represent_operations_in_circuit_with_biased_noise,
-        
-    ],
-)
 @pytest.mark.parametrize("circuit_type", ["cirq", "qiskit", "pyquil"])
 def test_represent_operations_in_circuit_with_measurements(
     circuit_type: str, rep_function,
@@ -230,4 +177,3 @@ def test_represent_operations_in_circuit_with_measurements(
 
     # Number of unique gates excluding measurement gates
     assert len(reps) == 1
-
