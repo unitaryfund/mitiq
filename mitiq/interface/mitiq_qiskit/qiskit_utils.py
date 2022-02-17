@@ -80,7 +80,10 @@ def execute_with_shots(
     """
 
     return execute_with_shots_and_noise(
-        circuit, obs, noise_model=None, shots=shots,
+        circuit,
+        obs,
+        noise_model=None,
+        shots=shots,
     )
 
 

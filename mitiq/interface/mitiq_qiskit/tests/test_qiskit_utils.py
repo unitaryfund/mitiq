@@ -32,7 +32,7 @@ SHOTS = 1_000
 
 
 def test_execute():
-    """ Tests the Qiskit wavefunction simulation executor returns
+    """Tests the Qiskit wavefunction simulation executor returns
     appropriate expectation value given an observable.
     """
 
@@ -47,7 +47,7 @@ def test_execute():
 
 
 def test_execute_with_shots():
-    """ Tests the Qiskit wavefunction sampling simulation executor returns
+    """Tests the Qiskit wavefunction sampling simulation executor returns
     appropriate expectation value given an observable.
     """
 
@@ -66,7 +66,7 @@ def test_execute_with_shots():
 
 
 def test_execute_with_depolarizing_noise_single_qubit():
-    """ Tests the noisy sampling executor across increasing levels
+    """Tests the noisy sampling executor across increasing levels
     of single qubit gate noise
     """
 
@@ -88,7 +88,7 @@ def test_execute_with_depolarizing_noise_single_qubit():
 
 
 def test_execute_with_depolarizing_noise_two_qubit():
-    """ Tests the noisy sampling executor across increasing levels of
+    """Tests the noisy sampling executor across increasing levels of
     two qubit gate noise.
     """
 
@@ -110,7 +110,7 @@ def test_execute_with_depolarizing_noise_two_qubit():
 
 
 def test_execute_with_shots_and_depolarizing_noise_single_qubit():
-    """ Tests the noisy sampling executor across increasing levels
+    """Tests the noisy sampling executor across increasing levels
     of single qubit gate noise.
     """
 
@@ -133,7 +133,7 @@ def test_execute_with_shots_and_depolarizing_noise_single_qubit():
 
 
 def test_execute_with_shots_and_depolarizing_noise_two_qubit():
-    """ Tests the noisy sampling executor across increasing levels of
+    """Tests the noisy sampling executor across increasing levels of
     two qubit gate noise.
     """
 
