@@ -37,7 +37,8 @@ from mitiq.pec.representations import (
 
 # Noisy representations of Pauli and CNOT operations for testing.
 def get_pauli_and_cnot_representations(
-    base_noise: float, qubits: Optional[List[cirq.Qid]] = None,
+    base_noise: float,
+    qubits: Optional[List[cirq.Qid]] = None,
 ) -> List[OperationRepresentation]:
 
     if qubits is None:
@@ -58,7 +59,8 @@ def get_pauli_and_cnot_representations(
 
     # Generate all representations
     return represent_operations_in_circuit_with_local_depolarizing_noise(
-        ideal_circuit=cirq.Circuit(ideal_operations), noise_level=base_noise,
+        ideal_circuit=cirq.Circuit(ideal_operations),
+        noise_level=base_noise,
     )
 
 
@@ -407,7 +409,8 @@ def test_large_sample_size_warning():
     """
     warnings.simplefilter("error")
     with pytest.raises(
-        Warning, match="The number of PEC samples is very large.",
+        Warning,
+        match="The number of PEC samples is very large.",
     ):
         execute_with_pec(
             oneq_circ,
@@ -482,7 +485,10 @@ def test_mitigate_executor_qiskit():
     unmitigated = serial_executor(circuit)
 
     mitigated_executor = mitigate_executor(
-        serial_executor, representations=[rep], num_samples=10, random_state=1,
+        serial_executor,
+        representations=[rep],
+        num_samples=10,
+        random_state=1,
     )
     mitigated = mitigated_executor(circuit)
 
@@ -516,7 +522,10 @@ def test_mitigate_executor_cirq():
     unmitigated = serial_executor(circuit)
 
     mitigated_executor = mitigate_executor(
-        serial_executor, representations=[rep], num_samples=10, random_state=1,
+        serial_executor,
+        representations=[rep],
+        num_samples=10,
+        random_state=1,
     )
     mitigated = mitigated_executor(circuit)
 
@@ -548,7 +557,10 @@ def test_mitigate_executor_pyquil():
     unmitigated = serial_executor(circuit)
 
     mitigated_executor = mitigate_executor(
-        serial_executor, representations=[rep], num_samples=10, random_state=1,
+        serial_executor,
+        representations=[rep],
+        num_samples=10,
+        random_state=1,
     )
     mitigated = mitigated_executor(circuit)
 

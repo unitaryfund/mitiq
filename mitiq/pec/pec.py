@@ -37,8 +37,7 @@ from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 
 
 class LargeSampleWarning(Warning):
-    """Warning is raised when PEC sample size is greater than 10 ** 5
-    """
+    """Warning is raised when PEC sample size is greater than 10 ** 5"""
 
     pass
 
@@ -128,7 +127,9 @@ def execute_with_pec(
 
     # Get the 1-norm of the circuit quasi-probability representation
     _, _, norm = sample_circuit(
-        converted_circuit, representations, num_samples=1,
+        converted_circuit,
+        representations,
+        num_samples=1,
     )
 
     # Deduce the number of samples (if not given by the user)
@@ -136,7 +137,7 @@ def execute_with_pec(
         num_samples = int((norm / precision) ** 2)
 
     # Issue warning for very large sample size
-    if num_samples > 10 ** 5:
+    if num_samples > 10**5:
         warnings.warn(_LARGE_SAMPLE_WARN, LargeSampleWarning)
 
     # Sample all the circuits

@@ -224,7 +224,8 @@ def test_find_optimal_representation_depolarizing_two_qubit_gates(circ_type):
         )
         # Expected analytical result
         expected_rep = represent_operation_with_local_depolarizing_noise(
-            ideal_op_native, noise_level,
+            ideal_op_native,
+            noise_level,
         )
         assert np.allclose(np.sort(rep.coeffs), np.sort(expected_rep.coeffs))
         assert rep == expected_rep
@@ -267,7 +268,8 @@ def test_find_optimal_representation_single_qubit_depolarizing(circ_type):
         )
         # Expected analytical result
         expected_rep = represent_operation_with_local_depolarizing_noise(
-            ideal_op_native, noise_level,
+            ideal_op_native,
+            noise_level,
         )
         assert np.allclose(np.sort(rep.coeffs), np.sort(expected_rep.coeffs))
         assert rep == expected_rep
@@ -312,7 +314,8 @@ def test_find_optimal_representation_single_qubit_amp_damping(circ_type):
         )
         # Expected analytical result
         expected_rep = _represent_operation_with_amplitude_damping_noise(
-            ideal_op_native, noise_level,
+            ideal_op_native,
+            noise_level,
         )
         assert np.allclose(np.sort(rep.coeffs), np.sort(expected_rep.coeffs))
         assert rep == expected_rep

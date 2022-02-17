@@ -65,7 +65,9 @@ def simulate(circuit: QPROGRAM) -> np.ndarray:
 @pytest.mark.parametrize("random_state", [1, 2, 3, 4, 5])
 def test_execute_with_cdr(circuit_type, fit_function, kwargs, random_state):
     circuit = random_x_z_cnot_circuit(
-        LineQubit.range(2), n_moments=5, random_state=random_state,
+        LineQubit.range(2),
+        n_moments=5,
+        random_state=random_state,
     )
     circuit = convert_from_mitiq(circuit, circuit_type)
     obs = Observable(PauliString("XZ"), PauliString("YY"))
@@ -125,7 +127,10 @@ def test_no_num_fit_parameters_with_custom_fit_raises_error():
 
 def test_execute_with_cdr_using_clifford_circuit():
     a, b = cirq.LineQubit.range(2)
-    clifCirc = cirq.Circuit(cirq.H.on(a), cirq.H.on(b),)
+    clifCirc = cirq.Circuit(
+        cirq.H.on(a),
+        cirq.H.on(b),
+    )
     obs = Observable(PauliString("XZ"), PauliString("YY"))
     cdr_value = execute_with_cdr(
         clifCirc, observable=obs, executor=execute, simulator=simulate
