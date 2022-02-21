@@ -29,7 +29,6 @@ from cirq import (
     LineQubit,
     Circuit,
     DepolarizingChannel,
-    MeasurementGate,
 )
 
 
@@ -38,52 +37,62 @@ from mitiq.pec.representations.biased_noise import (
 )
 
 from mitiq.pec.channels import _operation_to_choi, _circuit_to_choi
-from mitiq.utils import _equal
-from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 
 
-def single_qubit_biased_noise_overhead(noise_level: float) -> float:
-    """See [Temme2017]_ for more information.
-
-    .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
-        "Error mitigation for short-depth quantum circuits,"
-        *Phys. Rev. Lett.* **119**, 180509 (2017),
-        (https://arxiv.org/abs/1612.02058).
+def single_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
     """
-    epsilon = 4 / 3 * noise_level  # Need to update this for biased noise
-    return (1 + epsilon / 2) / (1 - epsilon)
-
-
-def two_qubit_biased_noise_overhead(noise_level: float) -> float:
-    """See [Temme2017]_ for more information.
-
-        .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
-            "Error mitigation for short-depth quantum circuits,"
-            *Phys. Rev. Lett.* **119**, 180509 (2017),
-            (https://arxiv.org/abs/1612.02058).
     """
-    epsilon = 16 / 15 * noise_level  # Need to update this for biased noise
-    return (1 + 7 * epsilon / 8) / (1 - epsilon)
+    eta1 = 1 + 3 * epsilon * (eta + 1) / (3 * (1 - epsilon)
+                                          * (eta + 1) + epsilon
+                                          * (3 * eta + 1))
+    eta2 = epsilon / (3 * (1 - epsilon) * (eta + 1)
+                      + epsilon * (3 * eta + 1))
+    eta3 = epsilon * (3 * eta + 1) / (3 * (1 - epsilon) * (eta + 1)
+                                      + epsilon * (3 * eta + 1))
+    return (eta1 + 2 * eta2 + eta3)
 
 
-@pytest.mark.parametrize("noise", [0, 0.1, 0.7])
+def two_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
+    """
+    """
+    eta1 = 1 + 15 * epsilon * (eta + 1) / (15 * (1 - epsilon)
+                                           * (eta + 1) + epsilon
+                                           * (5 * eta + 1))
+    eta2 = epsilon / (15 * (1 - epsilon) * (eta + 1)
+                      + epsilon * (5 * eta + 1))
+    eta3 = epsilon * (5 * eta + 1) / (15 * (1 - epsilon) * (eta + 1)
+                                      + epsilon * (5 * eta + 1))
+    return (eta1 + 12 * eta2 + 3 * eta3)
+
+
+@pytest.mark.parametrize("epsilon", [0, 0.1, 0.7])
+@pytest.mark.parametrize("eta", [0, 1, 1000])
 @pytest.mark.parametrize("gate", [X, Y, Z, H])
-def test_single_qubit_representation_norm(gate: Gate, noise: float):
+def test_single_qubit_representation_norm(
+    gate: Gate,
+    epsilon: float,
+    eta: float
+):
     q = LineQubit(0)
-    optimal_norm = single_qubit_biased_noise_overhead(noise)
+    optimal_norm = single_qubit_biased_noise_overhead(epsilon, eta)
     norm = represent_operation_with_biased_noise(
-        Circuit(gate(q)), noise,
+        Circuit(gate(q)), epsilon, eta
     ).norm
     assert np.isclose(optimal_norm, norm)
 
 
-@pytest.mark.parametrize("noise", [0, 0.1, 0.7])
+@pytest.mark.parametrize("epsilon", [0, 0.1, 0.7])
+@pytest.mark.parametrize("eta", [0, 1, 1000])
 @pytest.mark.parametrize("gate", (CZ, CNOT, ISWAP, SWAP))
-def test_two_qubit_representation_norm(gate: Gate, noise: float):
+def test_two_qubit_representation_norm(
+    gate: Gate,
+    epsilon: float,
+    eta: float
+):
     qreg = LineQubit.range(2)
-    optimal_norm = two_qubit_biased_noise_overhead(noise)
+    optimal_norm = two_qubit_biased_noise_overhead(epsilon, eta)
     norm = represent_operation_with_biased_noise(
-        Circuit(gate(*qreg)), noise,
+        Circuit(gate(*qreg)), epsilon, eta
     ).norm
     assert np.isclose(optimal_norm, norm)
 
@@ -98,12 +107,16 @@ def test_three_qubit_biased_noise_representation_error():
 
 @pytest.mark.parametrize("noise", [0, 0.1, 0.7])
 @pytest.mark.parametrize("gate", [X, Y, Z, H, CZ, CNOT, ISWAP, SWAP])
-def test_biased_noise_representation_with_choi(gate: Gate, noise: float):
+def test_biased_noise_representation_with_choi(
+    gate: Gate,
+    epsilon: float,
+    eta: float
+):
     """Tests the representation by comparing exact Choi matrices."""
     qreg = LineQubit.range(gate.num_qubits())
     ideal_choi = _operation_to_choi(gate.on(*qreg))
     op_rep = represent_operation_with_biased_noise(
-        Circuit(gate.on(*qreg)), noise,
+        Circuit(gate.on(*qreg)), epsilon, eta
     )
     choi_components = []
     for noisy_op, coeff in op_rep.basis_expansion.items():
@@ -116,33 +129,3 @@ def test_biased_noise_representation_with_choi(gate: Gate, noise: float):
         choi_components.append(coeff * sequence_choi)
     combination_choi = np.sum(choi_components, axis=0)
     assert np.allclose(ideal_choi, combination_choi, atol=10 ** -6)
-
-
-@pytest.mark.parametrize("circuit_type", ["cirq", "qiskit", "pyquil"])
-def test_represent_operations_in_circuit_with_measurements(
-    circuit_type: str, rep_function,
-):
-    """Tests measurements in circuit are ignored (not represented)."""
-    q0, q1 = LineQubit.range(2)
-    circ_mitiq = Circuit(
-        X(q1),
-        MeasurementGate(num_qubits=1)(q0),
-        X(q1),
-        MeasurementGate(num_qubits=1)(q0),
-    )
-    circ = convert_from_mitiq(circ_mitiq, circuit_type)
-
-    reps = rep_function(ideal_circuit=circ, noise_level=0.1)
-
-    for op in convert_to_mitiq(circ)[0].all_operations():
-        found = False
-        for rep in reps:
-            if _equal(rep.ideal, Circuit(op), require_qubit_equality=True):
-                found = True
-        if isinstance(op.gate, MeasurementGate):
-            assert not found
-        else:
-            assert found
-
-    # Number of unique gates excluding measurement gates
-    assert len(reps) == 1

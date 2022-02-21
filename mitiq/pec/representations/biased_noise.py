@@ -32,7 +32,7 @@ def represent_operation_with_biased_noise(
         alpha_3 = - epsilon * (3 * eta + 1) / (3 * (1 - epsilon) * (eta + 1)
                                                + epsilon * (3 * eta + 1))
 
-        alphas = [alpha_1] + 12 * [alpha_2] + 3 * [alpha_3]
+        alphas = [alpha_1] + 2 * [alpha_2] + [alpha_3]
         post_ops = [[]]  # for eta_1, we do nothing, rather than I
         post_ops += [[P(q)] for P in [X, Y, Z]]  # 1Q Paulis
 
@@ -48,7 +48,7 @@ def represent_operation_with_biased_noise(
         alpha_3 = - epsilon * (5 * eta + 1) / (15 * (1 - epsilon) * (eta + 1)
                                                + epsilon * (5 * eta + 1))
 
-        alphas = [alpha_1] + 15 * [alpha_2] + 3 * [alpha_3]
+        alphas = [alpha_1] + 12 * [alpha_2] + 3 * [alpha_3]
         post_ops = [[]]  # for eta_1, we do nothing, rather than I x I
         post_ops += [[P(q0)] for P in [X, Y, Z]]  # 1Q Paulis for q0
         post_ops += [[P(q1)] for P in [X, Y, Z]]  # 1Q Paulis for q1
