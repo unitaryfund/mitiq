@@ -34,5 +34,5 @@ from mitiq.pec.representations.optimal import (
 )
 
 from mitiq.pec.representations.biased_noise import (
-    represent_operation_with_biased_noise
+    represent_operation_with_biased_noise,
 )
