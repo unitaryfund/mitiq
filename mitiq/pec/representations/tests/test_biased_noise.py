@@ -123,7 +123,8 @@ def test_biased_noise_representation_with_choi(
         implementable_circ = noisy_op.circuit()
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.
-        biased_op = DepolarizingChannel(noise, len(qreg))(*qreg)  # Replace w/ custom channel
+        # Replace w/ custom channel:
+        biased_op = DepolarizingChannel(epsilon, len(qreg))(*qreg)
         implementable_circ.append(biased_op)
         sequence_choi = _circuit_to_choi(implementable_circ)
         choi_components.append(coeff * sequence_choi)
