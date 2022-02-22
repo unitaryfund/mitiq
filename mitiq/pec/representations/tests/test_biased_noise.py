@@ -102,7 +102,8 @@ def test_three_qubit_biased_noise_representation_error():
         )
 
 
-@pytest.mark.parametrize("noise", [0, 0.1, 0.7])
+@pytest.mark.parametrize("epsilon", [0, 0.1, 0.7])
+@pytest.mark.parametrize("eta", [0, 1, 1000])
 @pytest.mark.parametrize("gate", [X, Y, Z, H, CZ, CNOT, ISWAP, SWAP])
 def test_biased_noise_representation_with_choi(
     gate: Gate, epsilon: float, eta: float
