@@ -97,8 +97,7 @@ def test_three_qubit_biased_noise_representation_error():
     q0, q1, q2 = LineQubit.range(3)
     with pytest.raises(ValueError):
         represent_operation_with_biased_noise(
-            Circuit(CCNOT(q0, q1, q2)),
-            0.05,
+            Circuit(CCNOT(q0, q1, q2)), 0.05, 10
         )
 
 
