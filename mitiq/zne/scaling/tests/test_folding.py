@@ -957,14 +957,18 @@ def test_global_fold_stretch_factor_eight_terminal_measurements():
     meas = Circuit(ops.measure_each(*qreg))
     folded = fold_global(circ + meas, scale_factor=3.5)
     correct = Circuit(
-        circ, inverse(circ), circ, inverse(circ)[0], circ[-1], meas,
+        circ,
+        inverse(circ),
+        circ,
+        inverse(circ)[0],
+        circ[-1],
+        meas,
     )
     assert _equal(folded, correct)
 
 
 def test_global_fold_moment_structure_maintained_full_scale_factors():
-    """Tests global folding maintains the input circuit's moment structure.
-    """
+    """Tests global folding maintains the input circuit's moment structure."""
     # Test circuit 1
     # 0: ───H───────────────
 
@@ -982,7 +986,11 @@ def test_global_fold_moment_structure_maintained_full_scale_factors():
     for i in range(1, 4):
         circuit1 += Circuit(gate_list1[i](qreg[i]))
     folded = fold_global(circuit1, scale_factor=3)
-    correct = Circuit(circuit1, inverse(circuit1), circuit1,)
+    correct = Circuit(
+        circuit1,
+        inverse(circuit1),
+        circuit1,
+    )
     assert _equal(folded, correct)
 
     # Test Circuit 2
@@ -1001,13 +1009,16 @@ def test_global_fold_moment_structure_maintained_full_scale_factors():
     for i in range(len(gate_list)):
         circ += Circuit(gate_list[i])
     folded = fold_global(circ, scale_factor=3)
-    correct = Circuit(circ, inverse(circ), circ,)
+    correct = Circuit(
+        circ,
+        inverse(circ),
+        circ,
+    )
     assert _equal(folded, correct)
 
 
 def test_global_fold_moment_structure_maintained_partial_scale_factors():
-    """Tests global folding maintains the input circuit's moment structure.
-    """
+    """Tests global folding maintains the input circuit's moment structure."""
     # Test circuit 1
     # 0: ───H───────────────
 
@@ -1273,7 +1284,11 @@ def test_fold_left_squash_moments():
 
 @pytest.mark.parametrize(
     "fold_method",
-    [fold_gates_from_left, fold_gates_from_right, fold_gates_at_random,],
+    [
+        fold_gates_from_left,
+        fold_gates_from_right,
+        fold_gates_at_random,
+    ],
 )
 def test_fold_and_squash_max_stretch(fold_method):
     """Tests folding and squashing a two-qubit circuit."""
@@ -1305,7 +1320,10 @@ def test_fold_and_squash_max_stretch(fold_method):
 
 
 @pytest.mark.parametrize(
-    "fold_method", [fold_global,],
+    "fold_method",
+    [
+        fold_global,
+    ],
 )
 def test_fold_global_no_squash(fold_method):
     """Tests folding and squashing a two-qubit circuit."""
