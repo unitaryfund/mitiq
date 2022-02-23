@@ -1,3 +1,19 @@
+# Copyright (C) 2022 Unitary Fund
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""Function to generate representations with biased noise."""
+
 from typing import List
 
 from cirq import (
@@ -18,6 +34,68 @@ def represent_operation_with_biased_noise(
     epsilon: float,
     eta: float,
 ) -> OperationRepresentation:
+    r"""As described in [Strikis2021]_, this function maps an
+    ``ideal_operation`` :math:`\mathcal{U}` into its quasi-probability
+    representation, which is a linear combination of noisy implementable
+    operations :math:`\sum_\alpha \eta_{\alpha} \mathcal{O}_{\alpha}`.
+
+    This function assumes a combined depolarizing and dephasing noise model
+    with a bias factor :math:`\eta` and that the following noisy
+    operations are implementable
+    :math:`\mathcal{O}_{\alpha} = \mathcal{D} \circ \mathcal P_\alpha
+    \circ \mathcal{U}`, where :math:`\mathcal{U}` is the unitary associated
+    to the input ``ideal_operation`` acting on :math:`k` qubits,
+    :math:`\mathcal{P}_\alpha` is a Pauli operation and
+    :math:`\mathcal{D}(\rho) = (1 - \epsilon) \rho + \epsilon I/2^k` is a
+    combined (biased) depolarizing and dephasing channel.
+
+    For a single-qubit ``ideal_operation``, the representation is as
+    follows:
+
+    .. math::
+         \mathcal{U}_{\beta} = \eta_1 \mathcal{O}_1 + \eta_2 \mathcal{O}_2 +
+                               \eta_3 \mathcal{O}_3 + \eta_4 \mathcal{O}_4
+
+    .. math::
+        \eta_1 = 1 + \frac{3 \epsilon (\eta + 1)}{3 (1 - \epsilon)(\eta + 1) +
+                 \epsilon (3 \eta + 1)} ,
+        \qquad \mathcal{O}_1 = \mathcal{D} \circ \mathcal{I} \circ \mathcal{U}
+
+        \eta_2 = - \frac{\epsilon}{3 (1 - \epsilon)(\eta + 1) +
+                 \epsilon (3 \eta + 1)} ,
+        \qquad \mathcal{O}_2 = \mathcal{D} \circ \mathcal{X} \circ \mathcal{U}
+
+        \eta_3 = - \frac{\epsilon}{3 (1 - \epsilon)(\eta + 1) +
+                 \epsilon (3 \eta + 1)} ,
+        \qquad \mathcal{O}_3 = \mathcal{D} \circ \mathcal{Y} \circ \mathcal{U}
+
+        \eta_4 = - \frac{\epsilon (\eta + 1)}{3 (1 - \epsilon)(\eta + 1) +
+                 \epsilon (3 \eta + 1)} ,
+        \qquad \mathcal{O}_4 = \mathcal{D} \circ \mathcal{Z} \circ \mathcal{U}
+
+    Args:
+        ideal_operation: The ideal operation (as a QPROGRAM) to represent.
+        epsilon: The local noise severity (as a float) of the combined channel.
+        eta: The noise bias between combined dephasing and depolarizing
+        channelswith :math:`\eta = 0` describing a fully depolarizing channel
+        and :math:`\eta = inf` describing a fully dephasing channel.
+
+    Returns:
+        The quasi-probability representation of the ``ideal_operation``.
+
+    .. note::
+        This representation is based on the ideal assumption that one
+        can append Pauli gates to a noisy operation without introducing
+        additional noise. For a backend which violates this assumption,
+        it remains a good approximation for small values of ``noise_level``.
+
+    .. note::
+        The input ``ideal_operation`` is typically a QPROGRAM with a single
+        gate but could also correspond to a sequence of more gates.
+        This is possible as long as the unitary associated to the input
+        QPROGRAM, followed by a single final biased noise channel, is
+        physically implementable.
+    """
     circ, in_type = convert_to_mitiq(ideal_operation)
 
     post_ops: List[List[Operation]]

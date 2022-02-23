@@ -1,4 +1,4 @@
-# Copyright (C) 2020 Unitary Fund
+# Copyright (C) 2022 Unitary Fund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,10 +37,25 @@ from mitiq.pec.representations.biased_noise import (
 )
 
 from mitiq.pec.channels import _operation_to_choi, _circuit_to_choi
+from mitiq.utils import _equal
+from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 
 
 def single_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
-    """ """
+    """Overhead calculation similar to that presented in [Temme2017]_ and
+    modified according to combined (biased) noise channel in [Strikis2021]_.
+
+    .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
+        "Error mitigation for short-depth quantum circuits,"
+        *Phys. Rev. Lett.* **119**, 180509 (2017),
+        (https://arxiv.org/abs/1612.02058).
+
+    .. [Strikis2021] : Armands Strikis, Dayue Qin, Yanzhu Chen,
+        Simon C. Benjamin, and Ying Li,
+        "Learning-Based Quantum Error Mitigation,"
+        *PRX QUANTUM* **2**, 040330 (2021),
+        (https://arxiv.org/abs/2005.07601v2).
+    """
     eta1 = 1 + 3 * epsilon * (eta + 1) / (
         3 * (1 - epsilon) * (eta + 1) + epsilon * (3 * eta + 1)
     )
@@ -54,7 +69,20 @@ def single_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
 
 
 def two_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
-    """ """
+    """Overhead calculation similar to that presented in [Temme2017]_ and
+    modified according to combined (biased) noise channel in [Strikis2021]_.
+
+    .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
+        "Error mitigation for short-depth quantum circuits,"
+        *Phys. Rev. Lett.* **119**, 180509 (2017),
+        (https://arxiv.org/abs/1612.02058).
+
+    .. [Strikis2021] : Armands Strikis, Dayue Qin, Yanzhu Chen,
+        Simon C. Benjamin, and Ying Li,
+        "Learning-Based Quantum Error Mitigation,"
+        *PRX QUANTUM* **2**, 040330 (2021),
+        (https://arxiv.org/abs/2005.07601v2).
+    """
     eta1 = 1 + 15 * epsilon * (eta + 1) / (
         15 * (1 - epsilon) * (eta + 1) + epsilon * (5 * eta + 1)
     )
@@ -99,6 +127,29 @@ def test_three_qubit_biased_noise_representation_error():
         represent_operation_with_biased_noise(
             Circuit(CCNOT(q0, q1, q2)), 0.05, 10
         )
+
+
+@pytest.mark.parametrize("circuit_type", ["cirq", "qiskit", "pyquil"])
+def test_represent_operations_with_biased_noise(circuit_type: str):
+    """Tests all operation representations are created."""
+    qreg = LineQubit.range(2)
+    circ_mitiq = Circuit([CNOT(*qreg), H(qreg[0]), Y(qreg[1]), CNOT(*qreg)])
+    circ = convert_from_mitiq(circ_mitiq, circuit_type)
+
+    reps = represent_operation_with_biased_noise(
+        ideal_circuit=circ, epsilon=0.1, eta=1
+    )
+
+    # For each operation in circ we should find its representation
+    for op in convert_to_mitiq(circ)[0].all_operations():
+        found = False
+        for rep in reps:
+            if _equal(rep.ideal, Circuit(op), require_qubit_equality=True):
+                found = True
+        assert found
+
+    # The number of reps. should match the number of unique operations
+    assert len(reps) == 3
 
 
 @pytest.mark.parametrize("epsilon", [0, 0.1, 0.7])
