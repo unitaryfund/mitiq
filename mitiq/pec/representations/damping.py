@@ -22,7 +22,7 @@ import numpy as np
 from cirq import (
     Circuit,
     Z,
-    channel,
+    kraus,
     AmplitudeDampingChannel,
     reset,
 )
@@ -34,7 +34,8 @@ from mitiq.pec.channels import tensor_product
 
 # TODO: this may be extended to an arbitrary QPROGRAM (GitHub issue gh-702).
 def _represent_operation_with_amplitude_damping_noise(
-    ideal_operation: Circuit, noise_level: float,
+    ideal_operation: Circuit,
+    noise_level: float,
 ) -> OperationRepresentation:
     r"""Returns the quasi-probability representation of the input
     single-qubit ``ideal_operation`` with respect to a basis of noisy
@@ -96,13 +97,14 @@ def _represent_operation_with_amplitude_damping_noise(
 
 
 def amplitude_damping_kraus(
-    noise_level: float, num_qubits: int,
+    noise_level: float,
+    num_qubits: int,
 ) -> List[np.ndarray]:
     """Returns the Kraus operators of the tensor product of local
     depolarizing channels acting on each qubit.
     """
     local_noisy_op = AmplitudeDampingChannel(noise_level)
-    local_kraus = list(channel(local_noisy_op))
+    local_kraus = list(kraus(local_noisy_op))
     return [
         tensor_product(*kraus_string)
         for kraus_string in product(local_kraus, repeat=num_qubits)

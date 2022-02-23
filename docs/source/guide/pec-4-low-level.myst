@@ -19,7 +19,7 @@ When applying PEC with Mitiq, the workflow of quantum and classical data is repr
 
 - The user provides a `QPROGRAM`, (i.e. a quantum circuit defined via any of the supported frontends).
 - Mitiq probabilistically generates a list of auxiliary circuits. This step depends on the quasi-probability representations provided by the user.
-- The generated circuits are executed via a user-defined [Executor](guide-executors.myst).
+- The generated circuits are executed via a user-defined [Executor](executors.myst).
 - Mitiq infers an unbiased estimate of the ideal expectation value from a classical post-processing of the measured data.
 - The error mitigated expectation value is returned to the user.
 
