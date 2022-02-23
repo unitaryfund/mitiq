@@ -953,12 +953,7 @@ def test_global_fold_stretch_factor_eight_terminal_measurements():
     meas = Circuit(ops.measure_each(*qreg))
     folded = fold_global(circ + meas, scale_factor=3.5)
     correct = Circuit(
-        circ,
-        inverse(circ),
-        circ,
-        inverse(circ)[0],
-        circ[-1],
-        meas,
+        circ, inverse(circ), circ, inverse(circ)[0], circ[-1], meas,
     )
     assert _equal(folded, correct)
 
@@ -1005,6 +1000,7 @@ def test_global_fold_moment_structure_maintained_full_scale_factors():
     correct = Circuit(circ, inverse(circ), circ,)
     assert _equal(folded, correct)
 
+
 def test_global_fold_moment_structure_maintained_partial_scale_factors():
     """Tests global folding maintains the input circuit's moment structure.
     """
@@ -1036,7 +1032,6 @@ def test_global_fold_moment_structure_maintained_partial_scale_factors():
     correct3 = Circuit(circuit1, inverse(circuit1), circuit1)
     assert _equal(folded3, correct3)
 
-    
 
 def test_convert_to_from_mitiq_qiskit():
     """Basic test for converting a Qiskit circuit to a Cirq circuit."""
