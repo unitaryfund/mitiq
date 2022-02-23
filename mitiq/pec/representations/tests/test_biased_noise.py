@@ -137,7 +137,7 @@ def test_represent_operations_with_biased_noise(circuit_type: str):
     circ = convert_from_mitiq(circ_mitiq, circuit_type)
 
     reps = represent_operation_with_biased_noise(
-        ideal_circuit=circ, epsilon=0.1, eta=1
+        ideal_operation=circ, epsilon=0.1, eta=1
     )
 
     # For each operation in circ we should find its representation
