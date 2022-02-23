@@ -956,15 +956,14 @@ def test_global_fold_stretch_factor_eight_terminal_measurements():
         circ,
         inverse(circ),
         circ,
-        inverse(Circuit([ops.T.on(qreg[2])], [ops.TOFFOLI.on(*qreg)],)),
-        [ops.T.on(qreg[2])],
-        [ops.TOFFOLI.on(*qreg)],
+        inverse(circ)[0],
+        circ[-1],
         meas,
     )
     assert _equal(folded, correct)
 
 
-def test_global_fold_moment_structure_maintained():
+def test_global_fold_moment_structure_maintained_full_scale_factors():
     """Tests global folding maintains the input circuit's moment structure.
     """
     # Test circuit 1
@@ -1006,6 +1005,38 @@ def test_global_fold_moment_structure_maintained():
     correct = Circuit(circ, inverse(circ), circ,)
     assert _equal(folded, correct)
 
+def test_global_fold_moment_structure_maintained_partial_scale_factors():
+    """Tests global folding maintains the input circuit's moment structure.
+    """
+    # Test circuit 1
+    # 0: ───H───────────────
+
+    # 1: ───────Z───────────
+
+    # 2: ───────────S───────
+
+    # 3: ───────────────T───
+
+    qreg = LineQubit.range(4)
+
+    gate_list1 = [ops.H, ops.Z, ops.S, ops.T]
+    circuit1 = Circuit(gate_list1[0](qreg[0]))
+
+    for i in range(1, 4):
+        circuit1 += Circuit(gate_list1[i](qreg[i]))
+    folded1 = fold_global(circuit1, scale_factor=1.5)
+    correct1 = Circuit(circuit1, inverse(circuit1)[0], circuit1[-1])
+    assert _equal(folded1, correct1)
+
+    folded2 = fold_global(circuit1, scale_factor=2.5)
+    correct2 = Circuit(circuit1, inverse(circuit1)[0:3], circuit1[1:])
+    assert _equal(folded2, correct2)
+
+    folded3 = fold_global(circuit1, scale_factor=2.75)
+    correct3 = Circuit(circuit1, inverse(circuit1), circuit1)
+    assert _equal(folded3, correct3)
+
+    
 
 def test_convert_to_from_mitiq_qiskit():
     """Basic test for converting a Qiskit circuit to a Cirq circuit."""

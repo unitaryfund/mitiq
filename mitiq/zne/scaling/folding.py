@@ -293,7 +293,7 @@ def fold_global(
 
     if num_to_fold > 0:
         folded += Circuit(
-            [inverse(operations[-num_to_fold:])], [operations[-num_to_fold:]]
+            [inverse(base_circuit[-num_to_fold:])], [base_circuit[-num_to_fold:]]
         )
 
     _append_measurements(folded, measurements)
