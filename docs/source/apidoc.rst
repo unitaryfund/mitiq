@@ -28,10 +28,24 @@ GHZ Circuits
 
 Clifford Data Regression
 ------------------------
+
+Clifford Data Regression (High-Level Tools)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.cdr.cdr
+   :members:
+
+Clifford Training Data
+^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.cdr.clifford_training_data
    :members:
 
-See Ref. :cite:`Czarnik_2020_arXiv` for more details on these methods.
+Data Regression
+^^^^^^^^^^^^^^^
+.. automodule:: mitiq.cdr.data_regression
+   :members:
+
+See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
+
 
 Mitiq - Braket
 --------------

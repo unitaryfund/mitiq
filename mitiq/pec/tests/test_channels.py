@@ -21,7 +21,7 @@ from cirq import (
     LineQubit,
     depolarize,
     Circuit,
-    channel,
+    kraus,
     AmplitudeDampingChannel,
     Y,
 )
@@ -77,7 +77,7 @@ def test_operation_to_choi():
     choi_twice = sum(
         [
             ((1.0 - epsilon) ** 2 * identity_part),
-            (2 * epsilon - epsilon ** 2) * mixed_part,
+            (2 * epsilon - epsilon**2) * mixed_part,
         ]
     )
 
@@ -108,13 +108,13 @@ def test_circuit_to_choi():
 def test_matrix_to_vector():
     for d in [1, 2, 3, 4]:
         mat = np.random.rand(d, d)
-        assert matrix_to_vector(mat).shape == (d ** 2,)
+        assert matrix_to_vector(mat).shape == (d**2,)
         assert (vector_to_matrix(matrix_to_vector(mat)) == mat).all
 
 
 def test_vector_to_matrix():
     for d in [1, 2, 3, 4]:
-        vec = np.random.rand(d ** 2)
+        vec = np.random.rand(d**2)
         assert vector_to_matrix(vec).shape == (d, d)
         assert (matrix_to_vector(vector_to_matrix(vec)) == vec).all
 
@@ -131,7 +131,7 @@ def test_kraus_to_super():
     Channels and states are non-physical, but this is irrelevant for the test.
     """
     for num_qubits in (1, 2, 3, 4, 5):
-        d = 2 ** num_qubits
+        d = 2**num_qubits
         fake_kraus_ops = [
             np.random.rand(d, d) + 1.0j * np.random.rand(d, d)
             for _ in range(7)
@@ -151,7 +151,7 @@ def test_super_to_choi():
     for noise_level in [0, 0.3, 1]:
         super_damping = kraus_to_super(amplitude_damping_kraus(noise_level, 1))
         # Apply Pauli Y to get some complex numbers
-        super_op = np.kron(channel(Y)[0], channel(Y)[0].conj()) @ super_damping
+        super_op = np.kron(kraus(Y)[0], kraus(Y)[0].conj()) @ super_damping
         choi_state = super_to_choi(super_op)
         # expected result
         q = LineQubit(0)
@@ -165,7 +165,7 @@ def test_choi_to_super():
     # Note: up to normalization, choi_to_super is equal to super_to_choi
     # and therefore we just run the following consistency test.
     for dim in (2, 4, 8, 16):
-        rand_mat = np.random.rand(dim ** 2, dim ** 2)
+        rand_mat = np.random.rand(dim**2, dim**2)
         assert np.allclose(super_to_choi(choi_to_super(rand_mat)), rand_mat)
         assert np.allclose(choi_to_super(super_to_choi(rand_mat)), rand_mat)
 

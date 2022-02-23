@@ -20,7 +20,7 @@ from typing import cast, List, Optional
 import numpy as np
 from scipy.optimize import minimize, LinearConstraint
 
-from cirq import channel
+from cirq import kraus
 
 from mitiq import QPROGRAM
 from mitiq.interface import convert_to_mitiq
@@ -127,7 +127,7 @@ def find_optimal_representation(
     """
     ideal_cirq_circuit, _ = convert_to_mitiq(ideal_operation)
     ideal_matrix = kraus_to_super(
-        cast(List[np.ndarray], channel(ideal_cirq_circuit))
+        cast(List[np.ndarray], kraus(ideal_cirq_circuit))
     )
     basis_set = noisy_basis.elements
 
@@ -144,7 +144,10 @@ def find_optimal_representation(
 
     # Run numerical optimization problem
     quasi_prob_dist = minimize_one_norm(
-        ideal_matrix, basis_matrices, tol=tol, initial_guess=initial_guess,
+        ideal_matrix,
+        basis_matrices,
+        tol=tol,
+        initial_guess=initial_guess,
     )
 
     basis_expansion = {op: eta for op, eta in zip(basis_set, quasi_prob_dist)}

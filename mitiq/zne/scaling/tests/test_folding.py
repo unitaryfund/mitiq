@@ -671,14 +671,18 @@ def test_fold_gates_at_random_seed_one_qubit():
     # Medium scale, fold two gates
     folded = fold_gates_at_random(circuit, scale_factor=2.5, seed=2)
     correct = Circuit(
-        [ops.X.on(qubit)], [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)] * 3,
+        [ops.X.on(qubit)],
+        [ops.Y.on(qubit)] * 3,
+        [ops.Z.on(qubit)] * 3,
     )
     assert _equal(folded, correct)
 
     # Max scale, fold three gates
     folded = fold_gates_at_random(circuit, scale_factor=3, seed=3)
     correct = Circuit(
-        [ops.X.on(qubit)] * 3, [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)] * 3,
+        [ops.X.on(qubit)] * 3,
+        [ops.Y.on(qubit)] * 3,
+        [ops.Z.on(qubit)] * 3,
     )
     assert _equal(folded, correct)
 
@@ -1353,10 +1357,16 @@ def test_fold_and_squash_random_circuits_random_stretches(fold_method):
         )
         scale = 2 * rng.random() + 1
         folded_not_squashed = fold_method(
-            circuit, scale_factor=scale, squash_moments=False, seed=trial,
+            circuit,
+            scale_factor=scale,
+            squash_moments=False,
+            seed=trial,
         )
         folded_and_squashed = fold_method(
-            circuit, scale_factor=scale, squash_moments=True, seed=trial,
+            circuit,
+            scale_factor=scale,
+            squash_moments=True,
+            seed=trial,
         )
         assert len(folded_and_squashed) <= len(folded_not_squashed)
 
@@ -1406,7 +1416,8 @@ def test_fold_local_with_fidelities(fold_method, qiskit):
 )
 @pytest.mark.parametrize("qiskit", [True, False])
 def test_fold_local_with_single_qubit_gates_fidelity_one(fold_method, qiskit):
-    """Tests folding only two-qubit gates by using fidelities = {"single": 1.}.
+    """Tests folding only two-qubit gates by using
+    fidelities = {"single": 1.}.
     """
     qreg = LineQubit.range(3)
     circ = Circuit(
@@ -1631,7 +1642,9 @@ def test_create_weight_mask_with_fidelities():
 @pytest.mark.parametrize("scale_factor", (1, 3, 5, 7, 9, 11))
 @pytest.mark.parametrize("method", ("at_random", "from_left", "from_right"))
 def test_create_fold_mask_with_odd_scale_factors(
-    weight_mask, scale_factor, method,
+    weight_mask,
+    scale_factor,
+    method,
 ):
     fold_mask = _create_fold_mask(weight_mask, scale_factor, method)
     num_folds = int((scale_factor - 1) / 2)
@@ -1740,7 +1753,10 @@ def test_create_fold_mask_approximates_well(method):
         weight_mask = [rnd_state.rand() for _ in range(100)]
         seed = rnd_state.randint(100)
         fold_mask = _create_fold_mask(
-            weight_mask, scale_factor, folding_method=method, seed=seed,
+            weight_mask,
+            scale_factor,
+            folding_method=method,
+            seed=seed,
         )
         out_weights = [w + 2 * n * w for w, n in zip(weight_mask, fold_mask)]
         actual_scale = sum(out_weights) / sum(weight_mask)
@@ -1807,7 +1823,9 @@ def test_apply_fold_mask_with_squash_moments_option():
     #
     # 1: ───T────H───
     q = LineQubit.range(2)
-    circ = Circuit([ops.T.on_each(*q), ops.H(q[1])],)
+    circ = Circuit(
+        [ops.T.on_each(*q), ops.H(q[1])],
+    )
     folded = _apply_fold_mask(circ, [1, 0, 0], squash_moments=False)
     # 0: ───T───T^-1───T───────
     #

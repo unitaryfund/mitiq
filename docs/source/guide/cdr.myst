@@ -1,0 +1,12 @@
+# Clifford Data Regression
+
+```{toctree}
+---
+maxdepth: 1
+---
+cdr-1-intro.myst
+cdr-2-use-case.myst
+cdr-3-options.myst
+cdr-4-low-level.myst
+cdr-5-theory.myst
+```

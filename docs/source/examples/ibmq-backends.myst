@@ -19,6 +19,7 @@ This tutorial shows an example of how to mitigate noise on IBMQ
 backends, broken down in the following steps.
 
 - [Error mitigation on IBMQ backends](#error-mitigation-on-ibmq-backends)
+  - [Settings](#settings)
   - [Setup: Defining a circuit](#setup-defining-a-circuit)
   - [High-level usage](#high-level-usage)
     - [Options](#options)
@@ -43,6 +44,7 @@ from mitiq.interface.mitiq_qiskit.qiskit_utils import initialized_depolarizing_n
 USE_REAL_HARDWARE = False
 ```
 
+(examples/ibmq-backends/setup-defining-a-circuit)=
 ## Setup: Defining a circuit
 
 +++
@@ -166,6 +168,7 @@ print(f"Mitigated result {mitigated:.3f}")
 Any different combination of noise scaling and extrapolation technique can be passed as arguments to
 ``zne.execute_with_zne``.
 
+(examples/ibmq-backends/cirq-frontend)=
 ### Cirq frontend
 
 It isn't necessary to use Qiskit frontends (circuits) to run on IBM backends. We can use conversions in

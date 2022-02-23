@@ -27,7 +27,7 @@ from cirq import (
     Circuit,
     is_measurement,
     DepolarizingChannel,
-    channel,
+    kraus,
 )
 
 from mitiq import QPROGRAM
@@ -197,7 +197,8 @@ def represent_operation_with_local_depolarizing_noise(
 
     if len(qubits) == 1:
         return represent_operation_with_global_depolarizing_noise(
-            ideal_operation, noise_level,
+            ideal_operation,
+            noise_level,
         )
 
     # The two-qubit case: tensor product of two depolarizing channels.
@@ -281,7 +282,8 @@ def represent_operations_in_circuit_with_global_depolarizing_noise(
             continue
         representations.append(
             represent_operation_with_global_depolarizing_noise(
-                Circuit(op), noise_level,
+                Circuit(op),
+                noise_level,
             )
         )
     return representations
@@ -326,24 +328,27 @@ def represent_operations_in_circuit_with_local_depolarizing_noise(
             continue
         representations.append(
             represent_operation_with_local_depolarizing_noise(
-                Circuit(op), noise_level,
+                Circuit(op),
+                noise_level,
             )
         )
     return representations
 
 
 def global_depolarizing_kraus(
-    noise_level: float, num_qubits: int,
+    noise_level: float,
+    num_qubits: int,
 ) -> List[np.ndarray]:
     """Returns the kraus operators of a global depolarizing channel at a
     given noise level.
     """
     noisy_op = DepolarizingChannel(noise_level, num_qubits)
-    return list(channel(noisy_op))
+    return list(kraus(noisy_op))
 
 
 def local_depolarizing_kraus(
-    noise_level: float, num_qubits: int,
+    noise_level: float,
+    num_qubits: int,
 ) -> List[np.ndarray]:
     """Returns the kraus operators of the tensor product of local
     depolarizing channels acting on each qubit.

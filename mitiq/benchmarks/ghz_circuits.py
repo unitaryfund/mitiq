@@ -22,19 +22,20 @@ from mitiq.interface import convert_from_mitiq
 
 
 def generate_ghz_circuit(
-    n_qubits: int, return_type: Optional[str] = None,
+    n_qubits: int,
+    return_type: Optional[str] = None,
 ) -> QPROGRAM:
     """Returns a GHZ circuit ie a circuit that prepares an ``n_qubits`` GHZ state.
 
-        Args:
-            n_qubits: The number of qubits in the circuit.
-            return_type: String which specifies the type of the
-            returned circuits. See the keys of
-            ``mitiq.SUPPORTED_PROGRAM_TYPES`` for options. If ``None``, the
-            returned circuits have type ``cirq.Circuit``.
+    Args:
+        n_qubits: The number of qubits in the circuit.
+        return_type: String which specifies the type of the returned
+            circuits. See the keys of ``mitiq.SUPPORTED_PROGRAM_TYPES``
+            for options. If ``None``, the returned circuits have type
+            ``cirq.Circuit``.
 
-        Returns:
-            A GHZ circuit acting on ``n_qubits`` qubits.
+    Returns:
+        A GHZ circuit acting on ``n_qubits`` qubits.
     """
     if n_qubits <= 0:
         raise ValueError(
