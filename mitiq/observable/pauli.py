@@ -33,6 +33,11 @@ from mitiq.interface import atomic_converter
 
 
 class PauliString:
+    """A `PauliString` is a (tensor) product of single-qubit Pauli gates I, X,
+    Y, and Z, with a leading (real or complex) coefficient. `PauliString`s can
+    be measured in any `mitiq.QPROGRAM`.
+    """
+
     _string_to_gate_map = {"I": cirq.I, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
 
     def __init__(
@@ -160,17 +165,19 @@ class PauliString:
 
 
 class PauliStringCollection:
+    """A collection of PauliStrings that qubit-wise commute and so can be
+    measured with a single circuit.
+    """
+
     def __init__(
         self, *paulis: PauliString, check_precondition: bool = True
     ) -> None:
-        """Initializes a ``PauliStringCollection``, a collection of
-        ``PauliString``s which qubit-wise commute and so can be measured with
-        a single circuit.
+        """Initializes a `PauliStringCollection`.
 
         Args:
             paulis: PauliStrings to add to the collection.
             check_precondition: If True, raises an error if some of the
-                ``PauliString``s do not qubit-wise commute.
+                `PauliString`s do not qubit-wise commute.
 
         Example:
             >>> pcol = PauliStringCollection(

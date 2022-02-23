@@ -14,23 +14,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Cirq utility functions."""
 
-from typing import Tuple, Union
+from typing import Tuple
 
 import numpy as np
 import cirq
 from mitiq.rem import MeasurementResult
-
-
-# Note: This is the same as cirq.PauliSumLike but without a typing.ForwardRef
-# which causes Sphinx errors.
-PauliSumLike = Union[
-    int,
-    float,
-    complex,
-    cirq.PauliString,
-    cirq.PauliSum,
-    cirq.SingleQubitPauliStringGateOperation,
-]
 
 
 # Executors.
@@ -64,48 +52,13 @@ def compute_density_matrix(
     return cirq.DensityMatrixSimulator().simulate(circuit).final_density_matrix
 
 
-def execute(circuit: cirq.Circuit, obs: np.ndarray) -> float:
-    """Simulates noiseless wavefunction evolution and returns the
-    expectation value of some observable.
-
-    Args:
-        circuit: The input Cirq circuit.
-        obs: The observable to measure as a NumPy array.
-
-    Returns:
-        The expectation value of obs as a float.
-    """
-    final_wvf = circuit.final_state_vector()
-    return np.real(final_wvf.conj().T @ obs @ final_wvf)
-
-
-def execute_with_shots(
-    circuit: cirq.Circuit, obs: PauliSumLike, shots: int
-) -> Union[float, complex]:
-    """Simulates noiseless wavefunction evolution and returns the
-    expectation value of a PauliString observable.
-
-    Args:
-        circuit: The input Cirq circuit.
-        obs: The observable to measure as a cirq.PauliString.
-        shots: The number of measurements.
-
-    Returns:
-        The expectation value of obs as a float.
-    """
-
-    # Do the sampling
-    psum = cirq.PauliSumCollector(circuit, obs, samples_per_term=shots)
-    psum.collect(sampler=cirq.Simulator())
-
-    # Return the expectation value
-    return psum.estimated_energy()
-
-
 def execute_with_depolarizing_noise(
     circuit: cirq.Circuit, obs: np.ndarray, noise: float
 ) -> float:
-    """Simulates a circuit with depolarizing noise at level noise.
+    """Simulates a circuit with depolarizing noise
+    and returns the expectation value of the input observable.
+    The expectation value is deterministically computed from
+    the final density matrix and, therefore, shot noise is absent.
 
     Args:
         circuit: The input Cirq circuit.
@@ -120,28 +73,3 @@ def execute_with_depolarizing_noise(
     rho = simulator.simulate(circuit).final_density_matrix
     expectation = np.real(np.trace(rho @ obs))
     return expectation
-
-
-def execute_with_shots_and_depolarizing_noise(
-    circuit: cirq.Circuit, obs: PauliSumLike, noise: float, shots: int
-) -> Union[float, complex]:
-    """Simulates a circuit with depolarizing noise at level noise.
-
-    Args:
-        circuit: The input Cirq circuit.
-        obs: The observable to measure as a NumPy array.
-        noise: The depolarizing noise strength as a float (0.001 is 0.1%)
-        shots: The number of measurements.
-
-    Returns:
-        The expectation value of obs as a float.
-    """
-    # Add noise
-    noisy = circuit.with_noise(cirq.depolarize(p=noise))  # type: ignore
-
-    # Do the sampling
-    psum = cirq.PauliSumCollector(noisy, obs, samples_per_term=shots)
-    psum.collect(sampler=cirq.DensityMatrixSimulator())
-
-    # Return the expectation value
-    return psum.estimated_energy()

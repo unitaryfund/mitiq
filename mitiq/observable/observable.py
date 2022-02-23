@@ -24,7 +24,18 @@ from mitiq._typing import MeasurementResult, QuantumResult, QPROGRAM
 
 
 class Observable:
+    """A quantum observable typically used to compute its mitigated expectation
+    value.
+
+    """
+
     def __init__(self, *paulis: PauliString) -> None:
+        """Initializes an `Observable` with :class:`.PauliString` objects.
+
+        Args:
+            paulis: PauliStrings used to define the observable.
+
+        """
         # TODO: Add option to Combine duplicates. E.g. [Z(0, Z(0)] -> [2*Z(0)].
         self._paulis = list(paulis)
         self._groups: List[PauliStringCollection]
@@ -104,7 +115,7 @@ class Observable:
             qubit_indices = self.qubit_indices
         n = len(qubit_indices)
 
-        matrix = np.zeros(shape=(2 ** n, 2 ** n), dtype=dtype)
+        matrix = np.zeros(shape=(2**n, 2**n), dtype=dtype)
         for pauli in self._paulis:
             matrix += pauli.matrix(
                 qubit_indices_to_include=qubit_indices

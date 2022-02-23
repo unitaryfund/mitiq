@@ -20,13 +20,13 @@ To apply PEC, you must know how to represent *ideal operations* as linear combin
 This information is exploited by Mitiq to remove the bias error from noisy expectation values.
 
 - By *ideal operations*, we mean noiseless unitary gates applied to specific qubits.
-- By *noisy implementable operations*, we mean those noisy gates that can be applied to specific qubits by a real backend. 
+- By *noisy implementable operations*, we mean those noisy gates that can be applied to specific qubits by a real backend.
 
 Since real backends are not perfect, the noisy implementable operations do not have an ideal unitary effect and typically correspond
 to non-unitary quantum channels.
 
 **Note:** In this documentation we often interchange the terms *gate* and *operation* for simplicity. However, in the source code of Mitiq,
-we follow the notation in which an operation is a gate applied to specific qubits, while a gate represents an abstract (qubit-independent) 
+we follow the notation in which an operation is a gate applied to specific qubits, while a gate represents an abstract (qubit-independent)
 operation.
 
 +++
@@ -34,7 +34,7 @@ operation.
 As with all techniques, PEC is compatible with any frontend supported by Mitiq:
 
 ```{code-cell} ipython3
-import mitiq 
+import mitiq
 
 mitiq.SUPPORTED_PROGRAM_TYPES.keys()
 ```
@@ -63,16 +63,16 @@ circuit = benchmarks.generate_rb_circuits(
 print(circuit)
 ```
 
-In the code cell above, we used the function {func}`~mitiq.benchmarks.randomized_benchmarking.generate_rb_circuits()`, in which `num_cliffords` is the 
+In the code cell above, we used the function {func}`~mitiq.benchmarks.randomized_benchmarking.generate_rb_circuits()`, in which `num_cliffords` is the
 number of random Clifford group elements and is proportional to the depth of the circuit.
 
 +++
 
-We now define an [executor](guide-executors.myst) which simulates a backend with depolarizing noise and computes the survival probability of the $|00\rangle$ state.
+We now define an [executor](executors.myst) which simulates a backend with depolarizing noise and computes the survival probability of the $|00\rangle$ state.
 
 +++
 
-**Note:** The body of the following function is supposed to be written by the user and depends on the specific 
+**Note:** The body of the following function is supposed to be written by the user and depends on the specific
 frontend and backend. Here, for simplicity, we first convert the input circuit to the Mitiq internal
 representation (Cirq) and then simulate it.
 
@@ -97,7 +97,7 @@ The function `execute` can be used to evaluate noisy (unmitigated) expectation v
 ```{code-cell} ipython3
 # Compute the expectation value of the |0⟩⟨0| observable.
 noisy_value = execute(circuit)
-ideal_value = execute(circuit, noise_level=0.0)      
+ideal_value = execute(circuit, noise_level=0.0)
 print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.5f}")
 ```
 
@@ -113,29 +113,29 @@ We now show how to use PEC to reduce this error.
 
 +++
 
-To apply PEC, we need to represent some or all of the operations of the ideal `circuit` as linear combinations 
+To apply PEC, we need to represent some or all of the operations of the ideal `circuit` as linear combinations
 of noisy implementable operations. Such linear combinations are also known as quasi-probability representations (see [What is the theory behind PEC?](pec-5-theory.myst)) and, in Mitiq, they correspond to {class}`.OperationRepresentation` objects. More information on the {class}`.OperationRepresentation` class can be found in the section [What additional options are available in PEC?](pec-3-options.myst).
 
 But how can we obtain the quasi-probability representations that are appropriate for a given backend?
 There are two main alternative scenarios.
 
-- **Case 1:** The noise of the backend can be approximated by a simple noise model, such that quasi-probability representations can be analytically computed {cite}`Temme_2017_PRL, Sun_2020_arXiv, Takagi_2020_PRR`. For example, this is possible for depolarizing or amplitude damping noise.
+- **Case 1:** The noise of the backend can be approximated by a simple noise model, such that quasi-probability representations can be analytically computed {cite}`Temme_2017_PRL, Sun_2021_PRAppl, Takagi_2020_PRR`. For example, this is possible for depolarizing or amplitude damping noise.
 
 - **Case 2:** The noise of the backend is too complex and cannot be approximated by a simple noise model.
 
-Depending on the previous two cases, the method to obtain quasi-probability representations is different. 
+Depending on the previous two cases, the method to obtain quasi-probability representations is different.
 
 - **Method for case 1:** A simple noise model (e.g. depolarizing or amplitude damping) is typically characterized by a single `noise_level`
 parameter (or a few parameters) that can be experimentally estimated. Possible techniques for estimating the noise level are randomized-benchmarking
 experiments or calibration experiments. Often, gate error probabilities are reported by hardware vendors and can be used to obtain a good guess
-for the `noise_level` without running any experiments. Given the noise model and the `noise_level`, one can apply known analytical expressions to 
-compute the quasi-probability representations of arbitrary gates {cite}`Temme_2017_PRL, Takagi_2020_PRR`. 
+for the `noise_level` without running any experiments. Given the noise model and the `noise_level`, one can apply known analytical expressions to
+compute the quasi-probability representations of arbitrary gates {cite}`Temme_2017_PRL, Takagi_2020_PRR`.
 
 - **Method for case 2:** Assuming an over-simplified noise model may be a bad approximation. In this case, the suggested approach is to
 perform the complete process tomography of a basis set of implementable noisy operations (e.g. the native gate set of the backend).
 One could also use *gate set tomography* (GST), a noise characterization technique which is robust to state-preparation and measurement errors.
-Given the superoperators of the noisy implementable operations, one can obtain the quasi-probability representations as solutions of 
-numerical optimization problems {cite}`Temme_2017_PRL, Sun_2020_arXiv`. In Mitiq, this is possible through the 
+Given the superoperators of the noisy implementable operations, one can obtain the quasi-probability representations as solutions of
+numerical optimization problems {cite}`Temme_2017_PRL, Sun_2021_PRAppl`. In Mitiq, this is possible through the
 {func}`.find_optimal_representation()` function as shown the section [What additional options are available in PEC?](pec-3-options.myst).
 
 +++
@@ -157,7 +157,7 @@ print(reps[0])
 ```
 
 **IMPORTANT:** For PEC to work properly, the noise model and the `noise_level`
-associated to the `execute` function must correspond to those used to compute the 
+associated to the `execute` function must correspond to those used to compute the
 {class}`.OperationRepresentation` objects.
 
 +++
