@@ -155,6 +155,11 @@ execution_timeout = 600
 # re-run for a subsequent docs build.
 jupyter_execute_notebooks = "cache"
 
+# If SKIP_PYQUIL is True, do not re-run PyQuil notebooks.
+if os.environ.get("SKIP_PYQUIL"):
+    print("Skipping PyQuil notebooks execution since SKIP_PYQUIL is True")
+    execution_excludepatterns = ['*pyquil*.ipynb']
+
 # -- Options for autodoc -----------------------------------------------------
 napoleon_google_docstring = True
 napoleon_use_ivar = True
