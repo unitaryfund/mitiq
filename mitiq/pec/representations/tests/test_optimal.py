@@ -310,7 +310,7 @@ def test_find_optimal_representation_single_qubit_amp_damping(circ_type):
         # Find optimal representation
         noisy_basis = NoisyBasis(*noisy_operations)
         rep = find_optimal_representation(
-            ideal_op_native, noisy_basis, tol=1.0e-8
+            ideal_op_native, noisy_basis, tol=1.0e-7, initial_guess=[0, 0, 0]
         )
         # Expected analytical result
         expected_rep = _represent_operation_with_amplitude_damping_noise(
@@ -330,7 +330,6 @@ def test_find_optimal_representation_no_superoperator_error():
         find_optimal_representation(Circuit(X(q)), noisy_basis)
 
 
-@mark.skip(reason="SciPy minimize not deterministic")
 def test_initial_guess_in_minimize_one_norm():
     for noise_level in [0.7, 0.9]:
         depo_kraus = global_depolarizing_kraus(noise_level, num_qubits=1)
@@ -350,10 +349,10 @@ def test_initial_guess_in_minimize_one_norm():
         )
         assert np.allclose(ideal_matrix, represented_mat)
 
-        # With a very bad guess it should fail
-        with raises(RuntimeError, match="optimal representation failed"):
+        # Test bad argument
+        with raises(ValueError, match="shapes"):
             minimize_one_norm(
                 ideal_matrix,
                 basis_matrices,
-                initial_guess=[-1.0e11, 1.0e11, -1.0e11, +1.0e11, -1.0e11],
+                initial_guess=[1],
             )
