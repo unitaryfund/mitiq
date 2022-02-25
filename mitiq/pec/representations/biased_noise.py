@@ -33,7 +33,7 @@ def represent_operation_with_biased_noise(
     ideal_operation: QPROGRAM,
     epsilon: float,
     eta: float,
-) -> List[OperationRepresentation]:
+) -> OperationRepresentation:
     r"""As described in [Strikis2021]_, this function maps an
     ``ideal_operation`` :math:`\mathcal{U}` into its quasi-probability
     representation, which is a linear combination of noisy implementable
@@ -157,4 +157,4 @@ def represent_operation_with_biased_noise(
 
     # Build basis expansion.
     expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}
-    return List[OperationRepresentation(ideal_operation, expansion)]
+    return OperationRepresentation(ideal_operation, expansion)
