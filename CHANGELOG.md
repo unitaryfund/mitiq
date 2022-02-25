@@ -1,5 +1,42 @@
 # Changelog
 
+
+## Version 0.13.0  (February 25th, 2022)
+
+### Summary
+
+Mitiq is now compatible with the latest version (0.13.1) of Cirq! This update was blocked for a long time because of some technical difficulties. So, many thanks to @vtomole for finding a solution to this issue!
+This should solve several dependency conflicts or warnings that you may have got when running `pip install mitiq` or `pip install -U mitiq`.
+
+The HTML rendering of all PyQuil examples in our documentation is now fixed. Thanks @astrojuanlu for useful suggestions about readthedocs!
+
+
+
+We also thank @Rahul-Mistri for adding GHZ circuits to our benchmarking module and for making Clifford circuits compatible with the Mitiq CDR technique (instead of raising an error as it happened before this release).
+
+We discussed and approved the design documents (RFC) for two new error-mitigation techniques: _learning-based PEC_ and _digital dynamical decoupling_. You can find them at [this link](https://github.com/unitaryfund/mitiq/projects/7). Special thanks go to @Misty-W and @Aaron-Robertson!
+
+### All Changes
+
+- Add pre-executed pyquil notebooks (@andreamari, gh-1142)
+- Fix optimal representation tests and unskip one of them (@andreamari gh-1141)
+- Update amazon-braket-sdk requirement from ~=1.11.1 to ~=1.15.0 (@dependabot, gh-1137, gh-1116, gh-1108, gh-1105) 
+- Update black requirement from ~=19.10b0 to ~=22.1 (@dependabot, @crazy4pi314, gh-1110) 
+- Bump actions/github-script from 5 to 6 (@dependabot, gh-1129) 
+- Update mypy requirement from ~=0.930 to ~=0.931 (@dependabot, gh-1078) 
+- docs: add vtomole as a contributor for test, code (@allcontributors, @andreamari, gh-1132) 
+- docs: add Rahul-Mistri as a contributor for test, code (@allcontributors, @andreamari, gh-1130) 
+- docs: add L-P-B as a contributor for test, code (@allcontributors, gh-1131) 
+- Update PR template (@nathanshammah, gh-1117) 
+- Remove unused functions from `cirq_utils` and fix non-deterministic tests. (@andreamari gh-1123)
+- Update pennylane requirement from ~=0.20.0 to ~=0.21.0 (@dependabot, gh-1122) 
+- Bump cirq version from 0.10.0 to 0.13.0 (@vtomole, gh-988)
+- Can use Clifford Circuits with `execute_with_cdr` (@Rahul-Mistri, gh-1104) 
+- Docstring for GHZ-circuits reformatted (@Rahul-Mistri, gh-1101)
+
+
+
+
 ## Version 0.12.0  (January 21st, 2022)
 
 ### Summary
