@@ -4,21 +4,26 @@
 ARG VARIANT="3.8"
 FROM mcr.microsoft.com/vscode/devcontainers/python:0-${VARIANT}
 
-# [Optional] If your pip requirements rarely change, uncomment this section to add them to the image.
-COPY dev_requirements.txt /tmp/pip-tmp/
-RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/dev_requirements.txt \
-   && rm -rf /tmp/pip-tmp
+USER root
 
 # [Optional] Uncomment this section to install additional OS packages.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends pandoc 
 
-USER root
 RUN python -m pip install --upgrade pip
+
+# [Optional] If your pip requirements rarely change, uncomment this section to add them to the image.
+COPY dev_requirements.txt /tmp/pip-tmp/
+COPY requirements.txt /tmp/pip-tmp/
+RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/dev_requirements.txt
+RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
+   && rm -rf /tmp/pip-tmp
 
 # Make sure the contents of our repo are in ${HOME}.
 # These steps are required for use on mybinder.org.
 # COPY . ${HOME}
 # RUN chown -R ${USER} ${HOME}
+
 # Drop back down to user permissions for things that don't need it.
-USER ${USER}
+# USER ${USER}
+# RUN pip install -e ${HOME}
