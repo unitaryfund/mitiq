@@ -28,7 +28,8 @@ from cirq import (
     Gate,
     LineQubit,
     Circuit,
-    DepolarizingChannel,
+    # DepolarizingChannel,
+    ops,
 )
 
 
@@ -165,12 +166,66 @@ def test_biased_noise_representation_with_choi(
         Circuit(gate.on(*qreg)), epsilon, eta
     )
     choi_components = []
+    if len(qreg) == 1:
+        eta1 = 1 + 3 * epsilon * (eta + 1) / (
+            3 * (1 - epsilon) * (eta + 1) + epsilon * (3 * eta + 1)
+        )
+        eta2 = -epsilon / (
+            3 * (1 - epsilon) * (eta + 1) + epsilon * (3 * eta + 1)
+        )
+        eta3 = (
+            -epsilon
+            * (3 * eta + 1)
+            / (3 * (1 - epsilon) * (eta + 1) + epsilon * (3 * eta + 1))
+        )
+        I_ = np.array([[1, 0], [0, 1]], dtype=np.complex64)
+        X_ = np.array([[0, 1], [1, 0]], dtype=np.complex64)
+        Y_ = np.array([[0, -1j], [1j, 0]], dtype=np.complex64)
+        Z_ = np.array([[1, 0], [0, -1]], dtype=np.complex64)
+        mix = [
+            (eta1, I_),
+            (eta2, X_),
+            (eta2, Y_),
+            (eta3, Z_),
+        ]
+    elif len(qreg) == 2:
+        eta1 = 1 + 15 * epsilon * (eta + 1) / (
+            15 * (1 - epsilon) * (eta + 1) + epsilon * (5 * eta + 1)
+        )
+        eta2 = -epsilon / (
+            15 * (1 - epsilon) * (eta + 1) + epsilon * (5 * eta + 1)
+        )
+        eta3 = (
+            -epsilon
+            * (5 * eta + 1)
+            / (15 * (1 - epsilon) * (eta + 1) + epsilon * (5 * eta + 1))
+        )
+        mix = [
+            (eta1, np.tensordot(I_, I_, axes=0)),
+            (eta2, np.tensordot(I_, X_, axes=0)),
+            (eta2, np.tensordot(I_, Y_, axes=0)),
+            (eta3, np.tensordot(I_, Z_, axes=0)),
+            (eta2, np.tensordot(X_, I_, axes=0)),
+            (eta2, np.tensordot(X_, X_, axes=0)),
+            (eta2, np.tensordot(X_, Y_, axes=0)),
+            (eta2, np.tensordot(X_, Z_, axes=0)),
+            (eta2, np.tensordot(Y_, I_, axes=0)),
+            (eta2, np.tensordot(Y_, X_, axes=0)),
+            (eta2, np.tensordot(Y_, Y_, axes=0)),
+            (eta2, np.tensordot(Y_, Z_, axes=0)),
+            (eta3, np.tensordot(Z_, I_, axes=0)),
+            (eta2, np.tensordot(Z_, X_, axes=0)),
+            (eta2, np.tensordot(Z_, Y_, axes=0)),
+            (eta3, np.tensordot(Z_, Z_, axes=0)),
+        ]
+
     for noisy_op, coeff in op_rep.basis_expansion.items():
         implementable_circ = noisy_op.circuit()
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.
         # Replace w/ custom channel:
-        biased_op = DepolarizingChannel(epsilon, len(qreg))(*qreg)
+        # biased_op = DepolarizingChannel(epsilon, len(qreg))(*qreg)
+        biased_op = ops.MixedUnitaryChannel(mix)
         implementable_circ.append(biased_op)
         sequence_choi = _circuit_to_choi(implementable_circ)
         choi_components.append(coeff * sequence_choi)
