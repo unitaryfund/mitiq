@@ -43,9 +43,8 @@ def represent_operation_with_biased_noise(
     with a bias factor :math:`\eta` and that the following noisy
     operations are implementable
     :math:`\mathcal{O}_{\alpha} = \mathcal{D} \circ \mathcal P_\alpha
-                                  \circ \mathcal{U}`,
-    where :math:`\mathcal{U}` is the unitary associated with the input
-    ``ideal_operation`` acting on :math:`k` qubits,
+    \circ \mathcal{U}`, where :math:`\mathcal{U}` is the unitary associated
+    to the input ``ideal_operation`` acting on :math:`k` qubits,
     :math:`\mathcal{P}_\alpha` is a Pauli operation and
     :math:`\mathcal{D}(\rho) = (1 - \epsilon) \rho + \epsilon I/2^k` is a
     combined (biased) depolarizing and dephasing channel.

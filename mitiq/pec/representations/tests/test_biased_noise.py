@@ -32,6 +32,7 @@ from cirq import (
     ops,
 )
 
+
 from mitiq.pec.representations.biased_noise import (
     represent_operation_with_biased_noise,
 )
@@ -140,10 +141,6 @@ def test_biased_noise_representation_with_choi(
         Circuit(gate.on(*qreg)), epsilon, eta
     )
     choi_components = []
-    I_ = np.array([[1, 0], [0, 1]], dtype=np.complex64)
-    X_ = np.array([[0, 1], [1, 0]], dtype=np.complex64)
-    Y_ = np.array([[0, -1j], [1j, 0]], dtype=np.complex64)
-    Z_ = np.array([[1, 0], [0, -1]], dtype=np.complex64)
     if len(qreg) == 1:
         eta1 = 1 + 3 * epsilon * (eta + 1) / (
             3 * (1 - epsilon) * (eta + 1) + epsilon * (3 * eta + 1)
@@ -156,6 +153,10 @@ def test_biased_noise_representation_with_choi(
             * (3 * eta + 1)
             / (3 * (1 - epsilon) * (eta + 1) + epsilon * (3 * eta + 1))
         )
+        I_ = np.array([[1, 0], [0, 1]], dtype=np.complex64)
+        X_ = np.array([[0, 1], [1, 0]], dtype=np.complex64)
+        Y_ = np.array([[0, -1j], [1j, 0]], dtype=np.complex64)
+        Z_ = np.array([[1, 0], [0, -1]], dtype=np.complex64)
         mix = [
             (eta1, I_),
             (eta2, X_),
