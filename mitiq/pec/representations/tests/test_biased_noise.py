@@ -143,15 +143,9 @@ def test_biased_noise_representation_with_choi(
     )
     choi_components = []
 
-    eta1 = 1 + 3 * epsilon * (eta + 1) / (
-        3 * (1 - epsilon) * (eta + 1) + epsilon * (3 * eta + 1)
-    )
-    eta2 = -epsilon / (3 * (1 - epsilon) * (eta + 1) + epsilon * (3 * eta + 1))
-    eta3 = (
-        -epsilon
-        * (3 * eta + 1)
-        / (3 * (1 - epsilon) * (eta + 1) + epsilon * (3 * eta + 1))
-    )
+    eta1 = 1 - epsilon
+    eta2 = epsilon / (3 * (eta + 1))
+    eta3 = epsilon * (3 * eta + 1) / (3 * (eta + 1))
 
     mix = [
         (eta1, unitary(I)),
