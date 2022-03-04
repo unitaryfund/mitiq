@@ -15,7 +15,7 @@ jobs:
       - name: Check out mitiq
         uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: 3.8
       - name: Install Python dependencies
@@ -38,7 +38,7 @@ jobs:
       - name: Check out mitiq
         uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: 3.8
 
@@ -66,7 +66,7 @@ jobs:
       - name: Check out mitiq
         uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: 3.7
       - name: Install Mitiq
@@ -85,7 +85,7 @@ jobs:
       - name: Check out mitiq
         uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: 3.7
       - name: Install Mitiq
@@ -118,7 +118,7 @@ jobs:
         with:
           fetch-depth: 2
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Python dependencies
