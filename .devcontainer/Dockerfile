@@ -8,9 +8,15 @@ USER root
 
 # [Optional] Uncomment this section to install additional OS packages.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends pandoc 
+    && apt-get -y install --no-install-recommends pandoc
 
 RUN python -m pip install --upgrade pip
+
+# Install miniconda and add it to path
+RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh \
+    && bash ~/miniconda.sh -b -p ~/miniconda \
+    && rm ~/miniconda.sh \
+    && export PATH=~/miniconda/bin:$PATH
 
 # [Optional] If your pip requirements rarely change, uncomment this section to add them to the image.
 COPY dev_requirements.txt /tmp/pip-tmp/

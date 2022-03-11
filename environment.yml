@@ -1,0 +1,12 @@
+name: mitiq
+channels:
+  - conda-forge
+dependencies:
+  - numpy~=1.22.3
+  - scipy~=1.8.0
+  - pip
+  - pip:
+    - cirq~=0.13.1
+# variables:
+#   VAR1: valueA
+#   VAR2: valueB 
