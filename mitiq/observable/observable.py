@@ -25,7 +25,7 @@ from mitiq._typing import MeasurementResult, QuantumResult, QPROGRAM
 
 class Observable:
     """A quantum observable typically used to compute its mitigated expectation
-     value.
+    value.
 
     """
 
@@ -115,7 +115,7 @@ class Observable:
             qubit_indices = self.qubit_indices
         n = len(qubit_indices)
 
-        matrix = np.zeros(shape=(2 ** n, 2 ** n), dtype=dtype)
+        matrix = np.zeros(shape=(2**n, 2**n), dtype=dtype)
         for pauli in self._paulis:
             matrix += pauli.matrix(
                 qubit_indices_to_include=qubit_indices

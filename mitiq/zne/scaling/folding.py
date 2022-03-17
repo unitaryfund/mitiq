@@ -307,7 +307,8 @@ def fold_global(
 
 
 def _create_weight_mask(
-    circuit: Circuit, fidelities: Optional[Dict[str, float]],
+    circuit: Circuit,
+    fidelities: Optional[Dict[str, float]],
 ) -> List[float]:
     """Returns a list of weights associated to each gate if the input
     circuit. Measurement gates are ignored.
@@ -734,7 +735,10 @@ def fold_gates_at_random(
     weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities"))
 
     num_folds_mask = _create_fold_mask(
-        weight_mask, scale_factor, folding_method="at_random", seed=seed,
+        weight_mask,
+        scale_factor,
+        folding_method="at_random",
+        seed=seed,
     )
 
     return _apply_fold_mask(

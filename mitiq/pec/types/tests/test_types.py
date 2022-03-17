@@ -717,13 +717,21 @@ def test_print_cirq_operation_representation():
     )
     # Positive first coefficient
     decomp = OperationRepresentation(
-        ideal=ideal, basis_expansion={noisy_xop: 0.5, noisy_zop: 0.5,},
+        ideal=ideal,
+        basis_expansion={
+            noisy_xop: 0.5,
+            noisy_zop: 0.5,
+        },
     )
     expected = r"0: ───H─── = 0.500*(0: ───X───)+0.500*(0: ───Z───)"
     assert str(decomp) == expected
     # Negative first coefficient
     decomp = OperationRepresentation(
-        ideal=ideal, basis_expansion={noisy_xop: -0.5, noisy_zop: 1.5,},
+        ideal=ideal,
+        basis_expansion={
+            noisy_xop: -0.5,
+            noisy_zop: 1.5,
+        },
     )
     expected = r"0: ───H─── = -0.500*(0: ───X───)+1.500*(0: ───Z───)"
     assert str(decomp) == expected
@@ -733,18 +741,21 @@ def test_print_cirq_operation_representation():
     assert str(decomp) == expected
     # Small coefficient approximation
     decomp = OperationRepresentation(
-        ideal=ideal, basis_expansion={noisy_xop: 1.00001, noisy_zop: 0.00001},
+        ideal=ideal,
+        basis_expansion={noisy_xop: 1.00001, noisy_zop: 0.00001},
     )
     expected = r"0: ───H─── = 1.000*(0: ───X───)"
     assert str(decomp) == expected
     # Small coefficient approximation different position
     decomp = OperationRepresentation(
-        ideal=ideal, basis_expansion={noisy_xop: 0.00001, noisy_zop: 1.00001},
+        ideal=ideal,
+        basis_expansion={noisy_xop: 0.00001, noisy_zop: 1.00001},
     )
     expected = r"0: ───H─── = 1.000*(0: ───Z───)"
     # Small coefficient approximation different position
     decomp = OperationRepresentation(
-        ideal=ideal, basis_expansion={noisy_xop: 0.00001},
+        ideal=ideal,
+        basis_expansion={noisy_xop: 0.00001},
     )
     expected = r"0: ───H─── = 0.000"
     assert str(decomp) == expected
@@ -761,11 +772,17 @@ def test_print_operation_representation_two_qubits():
     )
     noisy_b = NoisyOperation.from_cirq(
         circuit=cirq.Circuit(
-            cirq.Z.on_each(qreg), cirq.CNOT(*qreg), cirq.Z.on_each(qreg),
+            cirq.Z.on_each(qreg),
+            cirq.CNOT(*qreg),
+            cirq.Z.on_each(qreg),
         )
     )
     decomp = OperationRepresentation(
-        ideal=ideal, basis_expansion={noisy_a: 0.5, noisy_b: 0.5,},
+        ideal=ideal,
+        basis_expansion={
+            noisy_a: 0.5,
+            noisy_b: 0.5,
+        },
     )
     print(str(decomp))
     expected = f"""
@@ -800,7 +817,11 @@ def test_print_operation_representation_two_qubits_neg():
         circuit=cirq.Circuit(cirq.Z.on_each(qreg[1]))
     )
     decomp = OperationRepresentation(
-        ideal=ideal, basis_expansion={noisy_a: -0.5, noisy_b: 1.5,},
+        ideal=ideal,
+        basis_expansion={
+            noisy_a: -0.5,
+            noisy_b: 1.5,
+        },
     )
     print(str(decomp))
     expected = f"""
@@ -824,29 +845,36 @@ def test_equal_method_of_representations():
     q = cirq.LineQubit(0)
     ideal = cirq.Circuit(cirq.H(q))
     noisy_xop_a = NoisyOperation(
-        circuit=cirq.Circuit(cirq.X(q)), channel_matrix=np.zeros(shape=(4, 4)),
+        circuit=cirq.Circuit(cirq.X(q)),
+        channel_matrix=np.zeros(shape=(4, 4)),
     )
     noisy_zop_a = NoisyOperation(
-        circuit=cirq.Circuit(cirq.Z(q)), channel_matrix=np.zeros(shape=(4, 4)),
+        circuit=cirq.Circuit(cirq.Z(q)),
+        channel_matrix=np.zeros(shape=(4, 4)),
     )
     rep_a = OperationRepresentation(
-        ideal=ideal, basis_expansion={noisy_xop_a: 0.5, noisy_zop_a: 0.5},
+        ideal=ideal,
+        basis_expansion={noisy_xop_a: 0.5, noisy_zop_a: 0.5},
     )
     noisy_xop_b = NoisyOperation(
-        circuit=cirq.Circuit(cirq.X(q)), channel_matrix=np.ones(shape=(4, 4)),
+        circuit=cirq.Circuit(cirq.X(q)),
+        channel_matrix=np.ones(shape=(4, 4)),
     )
     noisy_zop_b = NoisyOperation(
-        circuit=cirq.Circuit(cirq.Z(q)), channel_matrix=np.ones(shape=(4, 4)),
+        circuit=cirq.Circuit(cirq.Z(q)),
+        channel_matrix=np.ones(shape=(4, 4)),
     )
     rep_b = OperationRepresentation(
-        ideal=ideal, basis_expansion={noisy_xop_b: 0.5, noisy_zop_b: 0.5},
+        ideal=ideal,
+        basis_expansion={noisy_xop_b: 0.5, noisy_zop_b: 0.5},
     )
     # Equal representation up to real superoperators
     assert rep_a == rep_b
     # Different ideal
     ideal_b = cirq.Circuit(cirq.X(q))
     rep_b = OperationRepresentation(
-        ideal=ideal_b, basis_expansion={noisy_xop_b: 0.5, noisy_zop_b: 0.5},
+        ideal=ideal_b,
+        basis_expansion={noisy_xop_b: 0.5, noisy_zop_b: 0.5},
     )
     assert rep_a != rep_b
     # Different type
@@ -854,22 +882,26 @@ def test_equal_method_of_representations():
     ideal_b = qiskit.QuantumCircuit(q_b)
     ideal_b.x(q_b)
     rep_b = OperationRepresentation(
-        ideal=ideal_b, basis_expansion={noisy_xop_b: 0.5, noisy_zop_b: 0.5},
+        ideal=ideal_b,
+        basis_expansion={noisy_xop_b: 0.5, noisy_zop_b: 0.5},
     )
     assert rep_a != rep_b
     # Different length
     rep_b = OperationRepresentation(
-        ideal=ideal, basis_expansion={noisy_xop_b: 0.5},
+        ideal=ideal,
+        basis_expansion={noisy_xop_b: 0.5},
     )
     assert rep_a != rep_b
     # Different operations
     noisy_diff = NoisyOperation(circuit=cirq.Circuit(cirq.H(q)))
     rep_b = OperationRepresentation(
-        ideal=ideal, basis_expansion={noisy_xop_b: 0.5, noisy_diff: 0.5},
+        ideal=ideal,
+        basis_expansion={noisy_xop_b: 0.5, noisy_diff: 0.5},
     )
     assert rep_a != rep_b
     # Different coefficients
     rep_b = OperationRepresentation(
-        ideal=ideal, basis_expansion={noisy_xop_b: 0.7, noisy_zop_b: 0.5},
+        ideal=ideal,
+        basis_expansion={noisy_xop_b: 0.7, noisy_zop_b: 0.5},
     )
     assert rep_a != rep_b

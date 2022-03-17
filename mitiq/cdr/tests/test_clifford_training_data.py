@@ -156,7 +156,9 @@ def test_generate_training_circuits_bad_methods():
 def test_generate_training_circuits_with_clifford_circuit():
     circuit = Circuit(cirq.ops.rx(0.0).on(cirq.LineQubit(0)))
     assert generate_training_circuits(
-        circuit, num_training_circuits=2, fraction_non_clifford=0.0,
+        circuit,
+        num_training_circuits=2,
+        fraction_non_clifford=0.0,
     ) == [circuit, circuit]
 
 

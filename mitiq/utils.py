@@ -90,7 +90,9 @@ def _is_measurement(op: ops.Operation) -> bool:
     return isinstance(op.gate, ops.measurement_gate.MeasurementGate)
 
 
-def _pop_measurements(circuit: Circuit,) -> List[Tuple[int, ops.Operation]]:
+def _pop_measurements(
+    circuit: Circuit,
+) -> List[Tuple[int, ops.Operation]]:
     """Removes all measurements from a circuit.
 
     Args:
