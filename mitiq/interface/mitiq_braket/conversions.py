@@ -314,9 +314,9 @@ def _translate_one_qubit_cirq_operation_to_braket_instruction(
 
     # Check common single-qubit gates.
     if isinstance(op, cirq_ops.Operation):
-        if isinstance(op.gate, cirq_ops.XPowGate):
-            exponent = op.gate.exponent
 
+        if isinstance(op.gate, cirq_ops.XPowGate):
+            exponent = cast(float, op.gate.exponent)
             if np.isclose(exponent, 1.0) or np.isclose(exponent, -1.0):
                 return [Instruction(braket_gates.X(), target)]
             elif np.isclose(exponent, 0.5):
@@ -327,16 +327,14 @@ def _translate_one_qubit_cirq_operation_to_braket_instruction(
             return [Instruction(braket_gates.Rx(exponent * np.pi), target)]
 
         elif isinstance(op.gate, cirq_ops.YPowGate):
-            exponent = op.gate.exponent
-
+            exponent = cast(float, op.gate.exponent)
             if np.isclose(exponent, 1.0) or np.isclose(exponent, -1.0):
                 return [Instruction(braket_gates.Y(), target)]
 
             return [Instruction(braket_gates.Ry(exponent * np.pi), target)]
 
         elif isinstance(op.gate, cirq_ops.ZPowGate):
-            exponent = op.gate.exponent
-
+            exponent = cast(float, op.gate.exponent)
             if np.isclose(exponent, 1.0) or np.isclose(exponent, -1.0):
                 return [Instruction(braket_gates.Z(), target)]
             elif np.isclose(exponent, 0.5):
@@ -351,7 +349,7 @@ def _translate_one_qubit_cirq_operation_to_braket_instruction(
             return [Instruction(braket_gates.Rz(exponent * np.pi), target)]
 
         elif isinstance(op.gate, cirq_ops.HPowGate) and np.isclose(
-            abs(op.gate.exponent), 1.0
+            abs(cast(float, op.gate.exponent)), 1.0
         ):
             return [Instruction(braket_gates.H(), target)]
 
@@ -397,28 +395,37 @@ def _translate_two_qubit_cirq_operation_to_braket_instruction(
 
     # Check common two-qubit gates.
     if isinstance(op.gate, cirq_ops.CNotPowGate) and np.isclose(
-        abs(op.gate.exponent), 1.0
+        abs(cast(float, op.gate.exponent)), 1.0
     ):
         return [Instruction(braket_gates.CNot(), [q1, q2])]
     elif isinstance(op.gate, cirq_ops.CZPowGate) and np.isclose(
-        abs(op.gate.exponent), 1.0
+        abs(cast(float, op.gate.exponent)), 1.0
     ):
         return [Instruction(braket_gates.CZ(), [q1, q2])]
     elif isinstance(op.gate, cirq_ops.ISwapPowGate) and np.isclose(
-        op.gate.exponent, 1.0
+        cast(float, op.gate.exponent), 1.0
     ):
         return [Instruction(braket_gates.ISwap(), [q1, q2])]
     elif isinstance(op.gate, cirq_ops.XXPowGate):
         return [
-            Instruction(braket_gates.XX(op.gate.exponent * np.pi), [q1, q2])
+            Instruction(
+                braket_gates.XX(cast(float, op.gate.exponent) * np.pi),
+                [q1, q2],
+            )
         ]
     elif isinstance(op.gate, cirq_ops.YYPowGate):
         return [
-            Instruction(braket_gates.YY(op.gate.exponent * np.pi), [q1, q2])
+            Instruction(
+                braket_gates.YY(cast(float, op.gate.exponent) * np.pi),
+                [q1, q2],
+            )
         ]
     elif isinstance(op.gate, cirq_ops.ZZPowGate):
         return [
-            Instruction(braket_gates.ZZ(op.gate.exponent * np.pi), [q1, q2])
+            Instruction(
+                braket_gates.ZZ(cast(float, op.gate.exponent) * np.pi),
+                [q1, q2],
+            )
         ]
 
     # Arbitrary two-qubit unitary decomposition.

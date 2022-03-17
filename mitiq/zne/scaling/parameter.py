@@ -148,7 +148,7 @@ def scale_parameters(
             else:
                 assert isinstance(gate, EigenGate)
                 base_gate = _get_base_gate(gate)
-                param = gate.exponent * np.pi
+                param = cast(float, gate.exponent) * np.pi
                 error = rng.normal(loc=0.0, scale=np.sqrt(noise))
                 new_param = param + error
                 curr_moment.append(
