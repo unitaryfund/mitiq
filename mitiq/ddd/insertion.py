@@ -18,7 +18,7 @@
 import numpy as np
 
 
-def _validate_integer_matrix(mask: np.array):
+def _validate_integer_matrix(mask: np.ndarray) -> None:
     """Ensures the input is a NumPy 2d array with integer elements."""
     if not isinstance(mask, np.ndarray):
         raise TypeError("The input matrix must be a numpy.ndarray object.")
@@ -28,7 +28,7 @@ def _validate_integer_matrix(mask: np.array):
         raise ValueError("The input must be a 2-dimensional array.")
 
 
-def get_slack_matrix_from_circuit_mask(mask: np.array) -> np.array:
+def get_slack_matrix_from_circuit_mask(mask: np.ndarray) -> np.ndarray:
     """Given a circuit mask matrix A, e.g. the output of get_circuit_mask(),
     returns a slack matrix B, where B_{i,j} = t if the position A{i,j} is the
     initial element of a sequence of t zeros (from left to right).
