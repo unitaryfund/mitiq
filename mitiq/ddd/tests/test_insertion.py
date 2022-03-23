@@ -15,7 +15,6 @@
 
 """Unit tests for DDD slack windows and DDD insertion tools."""
 
-import pytest
 import numpy as np
 import cirq
 from mitiq.ddd.insertion import get_circuit_mask
