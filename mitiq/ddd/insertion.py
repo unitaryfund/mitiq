@@ -20,7 +20,7 @@ from mitiq.interface import convert_to_mitiq
 from mitiq import QPROGRAM
 
 
-def get_circuit_mask(circuit: QPROGRAM) -> np.array:
+def get_circuit_mask(circuit: QPROGRAM) -> np.ndarray:
     """Given a circuit with n qubits and d moments returns a matrix
     A with n rows and d columns. The matrix elements are A_{i,j} = 1 if
     there is a gate acting on qubit i at moment j, while A_{i,j} = 0 otherwise.
@@ -33,7 +33,7 @@ def get_circuit_mask(circuit: QPROGRAM) -> np.array:
         for op in moment:
             qubit_indices = [
                 qubit[0] for qubit in indexed_qubits if qubit[1] in op.qubits
-            ]
+                ]
             for qubit_index in qubit_indices:
                 mask_matrix[qubit_index, moment_index] = 1
     return mask_matrix
