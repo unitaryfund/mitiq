@@ -24,6 +24,12 @@ def get_circuit_mask(circuit: QPROGRAM) -> np.ndarray:
     """Given a circuit with n qubits and d moments returns a matrix
     A with n rows and d columns. The matrix elements are A_{i,j} = 1 if
     there is a gate acting on qubit i at moment j, while A_{i,j} = 0 otherwise.
+
+    Args:
+        circuit: Input circuit to mask with n qubits and d moments
+
+    Returns:
+        A mask matrix with n rows and d columns 
     """
     mitiq_circuit, _ = convert_to_mitiq(circuit)
     qubits = sorted(mitiq_circuit.all_qubits())
