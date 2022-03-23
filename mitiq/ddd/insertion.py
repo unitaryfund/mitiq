@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tools to determine slack windows in circuits and to insert DDD sequences."""
-
 import numpy as np
 from mitiq.interface import convert_to_mitiq
 from mitiq import QPROGRAM
@@ -29,7 +28,7 @@ def get_circuit_mask(circuit: QPROGRAM) -> np.ndarray:
         circuit: Input circuit to mask with n qubits and d moments
 
     Returns:
-        A mask matrix with n rows and d columns 
+        A mask matrix with n rows and d columns
     """
     mitiq_circuit, _ = convert_to_mitiq(circuit)
     qubits = sorted(mitiq_circuit.all_qubits())
@@ -39,7 +38,7 @@ def get_circuit_mask(circuit: QPROGRAM) -> np.ndarray:
         for op in moment:
             qubit_indices = [
                 qubit[0] for qubit in indexed_qubits if qubit[1] in op.qubits
-                ]
+            ]
             for qubit_index in qubit_indices:
                 mask_matrix[qubit_index, moment_index] = 1
     return mask_matrix

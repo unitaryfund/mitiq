@@ -20,7 +20,7 @@ import numpy as np
 import cirq
 from mitiq.ddd.insertion import get_circuit_mask
 
-test_mask = np.array(
+test_mask_one = np.array(
     [
         [1, 0, 0, 0, 0, 0, 0],
         [1, 1, 0, 0, 0, 0, 0],
@@ -33,11 +33,32 @@ test_mask = np.array(
     ]
 )
 
+test_mask_two = np.array(
+    [
+        [1, 0],
+        [1, 1],
+        [1, 0],
+        [1, 0],
+        [1, 0],
+        [1, 0],
+        [1, 0],
+        [1, 0],
+        [1, 0],
+        [1, 0],
+    ]
+)
+
 
 def test_get_circuit_mask_one():
-    circuit1 = cirq.Circuit(
+    circuit = cirq.Circuit(
         cirq.SWAP(q, q + 1) for q in cirq.LineQubit.range(7)
     )
-    circuit_mask = get_circuit_mask(circuit1)
-    assert np.allclose(circuit_mask, test_mask)
+    circuit_mask = get_circuit_mask(circuit)
+    assert np.allclose(circuit_mask, test_mask_one)
 
+
+def test_get_circuit_mask_two():
+    qreg = cirq.GridQubit.rect(10, 1)
+    circuit = cirq.Circuit(cirq.ops.H.on_each(*qreg), cirq.ops.H.on(qreg[1]))
+    circuit_mask = get_circuit_mask(circuit)
+    assert np.allclose(circuit_mask, test_mask_two)
