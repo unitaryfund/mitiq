@@ -14,3 +14,5 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Digital dynamical decoupling (DDD) module."""
+
+from mitiq.ddd.insertion import get_circuit_mask
