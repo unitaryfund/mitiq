@@ -24,6 +24,10 @@ def get_circuit_mask(circuit: QPROGRAM) -> np.ndarray:
     A with n rows and d columns. The matrix elements are A_{i,j} = 1 if
     there is a gate acting on qubit i at moment j, while A_{i,j} = 0 otherwise.
 
+    Note:
+        This mask generation may yield unexpected behavior with circuits that
+        are not Cirq circuits.
+
     Args:
         circuit: Input circuit to mask with n qubits and d moments
 
