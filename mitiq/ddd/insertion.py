@@ -42,9 +42,9 @@ def get_slack_matrix_from_circuit_mask(mask: np.ndarray) -> np.ndarray:
     if not (mask**2 == mask).all():
         raise ValueError("The input matrix elements must be 0 or 1.")
 
-    num_raws, num_cols = mask.shape
-    slack_matrix = np.zeros((num_raws, num_cols))
-    for r in range(num_raws):
+    num_rows, num_cols = mask.shape
+    slack_matrix = np.zeros((num_rows, num_cols))
+    for r in range(num_rows):
         for c in range(num_cols):
             previous_elem = mask[r, c - 1] if c != 0 else 1
             if previous_elem == 1:
