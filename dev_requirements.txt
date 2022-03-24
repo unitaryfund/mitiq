@@ -21,3 +21,6 @@ pydata-sphinx-theme~=0.8.0
 jupytext==1.11.1
 sphinx-gallery
 nbsphinx
+
+# The following seems to be necessary for sphinx to run.
+jinja2>=2.3
