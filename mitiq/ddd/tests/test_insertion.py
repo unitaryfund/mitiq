@@ -17,14 +17,9 @@
 
 import numpy as np
 import cirq
-from mitiq.ddd.insertion import get_circuit_mask
-import qiskit
+from mitiq.ddd.insertion import _get_circuit_mask
 import pytest
 
-qreg_qiskit = qiskit.QuantumRegister(8)
-circuit_qiskit = qiskit.QuantumCircuit(qreg_qiskit)
-for q in range(len(qreg_qiskit) - 1):
-    circuit_qiskit.swap(q, q + 1)
 
 circuit_cirq_one = cirq.Circuit(
     cirq.SWAP(q, q + 1) for q in cirq.LineQubit.range(7)
@@ -64,13 +59,10 @@ test_mask_two = np.array(
 )
 
 
-@pytest.mark.parametrize("circuit", [circuit_cirq_one, circuit_qiskit])
-def test_get_circuit_mask_one_qiskit(circuit):
-    circuit_mask = get_circuit_mask(circuit)
-    assert np.allclose(circuit_mask, test_mask_one)
-
-
-@pytest.mark.parametrize("circuit", [circuit_cirq_two])
-def test_get_circuit_mask_two(circuit):
-    circuit_mask = get_circuit_mask(circuit)
-    assert np.allclose(circuit_mask, test_mask_two)
+@pytest.mark.parametrize(
+    ("circuit", "test_mask"),
+    [(circuit_cirq_one, test_mask_one), (circuit_cirq_two, test_mask_two)],
+)
+def test_get_circuit_mask(circuit, test_mask):
+    circuit_mask = _get_circuit_mask(circuit)
+    assert np.allclose(circuit_mask, test_mask)
