@@ -117,7 +117,7 @@ Insertion Helpers
 
 Rules
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. automodule:: mitiq.ddd.rules
+.. automodule:: mitiq.ddd.rules.rules
    :members:
 
 Probabilistic Error Cancellation
