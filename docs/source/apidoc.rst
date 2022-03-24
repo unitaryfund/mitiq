@@ -102,24 +102,6 @@ Pauli
 .. automodule:: mitiq.observable.pauli
    :members:
 
-Digital Dynamical Decoupling
---------------------------------
-
-Digital Dynamical Decoupling (High-Level Tools)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. automodule:: mitiq.ddd.ddd
-   :members:
-
-Insertion Helpers
-^^^^^^^^^^^^^^^^^^^^^^
-.. automodule:: mitiq.ddd.insertion.get_circuit_mask
-   :members:
-
-Rules
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. automodule:: mitiq.ddd.rules.rules
-   :members:
-
 Probabilistic Error Cancellation
 --------------------------------
 
