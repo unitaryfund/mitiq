@@ -278,6 +278,7 @@ def noise_scaling_converter(
             from mitiq.interface.mitiq_qiskit.conversions import (
                 _transform_registers,
                 _measurement_order,
+                _remove_identity,
             )
 
             scaled_circuit.remove_final_measurements()
@@ -285,6 +286,7 @@ def noise_scaling_converter(
                 scaled_circuit,
                 new_qregs=circuit.qregs,  # type: ignore
             )
+            _remove_identity(scaled_circuit)
             if circuit.cregs and not scaled_circuit.cregs:  # type: ignore
                 scaled_circuit.add_register(*circuit.cregs)  # type: ignore
 

@@ -104,8 +104,8 @@ def _map_qubits(
         qubits: A list of qubits to map.
         new_register_sizes: The size(s) of the new registers to map to.
             Note: These can be determined from ``new_registers``, but this
-            helper function is only called from ``_map_qubits`` where the sizes
-            are already computed.
+            helper function is only called from ``_transform_registers`` where
+            the sizes are already computed.
         new_registers: The new registers to map the ``qubits`` to.
 
     Returns:
@@ -116,6 +116,36 @@ def _map_qubits(
     return [
         qiskit.circuit.Qubit(new_registers[i], j) for i, j in mapped_indices
     ]
+
+
+def _add_identity_to_idle(
+    circuit: qiskit.QuantumCircuit,
+) -> List[int]:
+    data = copy.deepcopy(circuit._data)
+    bit_indices = set()
+    idle_bit_indices = []
+    for op in data:
+        gate, qubits, cbits = op
+        bit_indices.update(set(bit.index for bit in qubits))
+    for index in range(len(circuit)):
+        if index not in bit_indices:
+            idle_bit_indices.append(index)
+            circuit.i(index)
+    return idle_bit_indices
+
+
+def _remove_identity(
+    circuit: qiskit.QuantumCircuit,
+) -> None:
+    data = copy.deepcopy(circuit._data)
+    i_list = []
+    for i, op in enumerate(data):
+        gate, qubits, cbits = op
+        if gate.name == "id":
+            i_list.insert(0, i)
+    for i in i_list:
+        del data[i]
+    circuit._data = data
 
 
 def _measurement_order(
@@ -166,8 +196,8 @@ def _transform_registers(
     Raises:
         ValueError:
             * If the input circuit has more than one quantum register.
-            * If the number of qubits in the new quantum registers does not
-            match the number of qubits in the circuit.
+            * If the number of qubits in the new quantum registers is
+            greater than the number of qubits in the circuit.
     """
     if new_qregs is None:
         return
@@ -179,7 +209,7 @@ def _transform_registers(
         )
 
     qreg_sizes = [qreg.size for qreg in new_qregs]
-    nqubits_in_circuit = sum(qreg.size for qreg in circuit.qregs)
+    nqubits_in_circuit = circuit.num_qubits
 
     if len(qreg_sizes) and sum(qreg_sizes) < nqubits_in_circuit:
         raise ValueError(
@@ -244,6 +274,7 @@ def from_qiskit(circuit: qiskit.QuantumCircuit) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input Qiskit circuit.
     """
+    _add_identity_to_idle(circuit)
     return from_qasm(circuit.qasm())
 
 
