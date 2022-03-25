@@ -40,3 +40,43 @@ def _get_circuit_mask(circuit: Circuit) -> np.ndarray:
             for qubit_index in qubit_indices:
                 mask_matrix[qubit_index, moment_index] = 1
     return mask_matrix
+
+
+def _validate_integer_matrix(mask: np.ndarray) -> None:
+    """Ensures the input is a NumPy 2d array with integer elements."""
+    if not isinstance(mask, np.ndarray):
+        raise TypeError("The input matrix must be a numpy.ndarray object.")
+    if not np.issubdtype(mask.dtype.type, int):
+        raise TypeError("The input matrix must have integer elements.")
+    if len(mask.shape) != 2:
+        raise ValueError("The input must be a 2-dimensional array.")
+
+
+def get_slack_matrix_from_circuit_mask(mask: np.ndarray) -> np.ndarray:
+    """Given a circuit mask matrix A, e.g. the output of get_circuit_mask(),
+    returns a slack matrix B, where B_{i,j} = t if the position A{i,j} is the
+    initial element of a sequence of t zeros (from left to right).
+
+    Args:
+        mask: The mask matrix of a quantum circuit.
+
+    Returns: The matrix of slack lengths.
+    """
+    _validate_integer_matrix(mask)
+    if not (mask**2 == mask).all():
+        raise ValueError("The input matrix elements must be 0 or 1.")
+
+    num_rows, num_cols = mask.shape
+    slack_matrix = np.zeros((num_rows, num_cols), dtype=int)
+    for r in range(num_rows):
+        for c in range(num_cols):
+            previous_elem = mask[r, c - 1] if c != 0 else 1
+            if previous_elem == 1:
+                # Compute slack length
+                for elem in mask[r, c::]:
+                    if elem == 0:
+                        slack_matrix[r, c] += 1
+                    else:
+                        break
+
+    return slack_matrix
