@@ -274,7 +274,6 @@ def from_qiskit(circuit: qiskit.QuantumCircuit) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input Qiskit circuit.
     """
-    _add_identity_to_idle(circuit)
     return from_qasm(circuit.qasm())
 
 

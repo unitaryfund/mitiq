@@ -232,6 +232,12 @@ def noise_scaling_converter(
     def new_scaling_function(
         circuit: QPROGRAM, *args: Any, **kwargs: Any
     ) -> QPROGRAM:
+        if "qiskit" in circuit.__module__:
+            from mitiq.interface.mitiq_qiskit.conversions import (
+                _add_identity_to_idle
+            )
+            _add_identity_to_idle(circuit)
+
         scaled_circuit = atomic_converter(noise_scaling_function)(
             circuit, *args, **kwargs
         )
