@@ -151,6 +151,15 @@ class Executor:
                 for circuit_with_measurements in observable.measure_in(circuit)
             ]
             result_step = observable.ngroups
+        elif (
+            observable is not None
+            and self._executor_return_type not in MeasurementResultLike
+        ):
+            raise ValueError(
+                """Executor and observable are not compatible. Executors
+                returning expectation values as float must be used with
+                observable=None"""
+            )
         else:
             all_circuits = circuits
             result_step = 1
