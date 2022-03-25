@@ -56,15 +56,14 @@ def single_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
         *PRX QUANTUM* **2**, 040330 (2021),
         (https://arxiv.org/abs/2005.07601v2).
     """
-    eta1 = 1 + 3 * epsilon * (eta + 1) / (
-        3 * (1 - epsilon) * (eta + 1) + epsilon * (3 * eta + 1)
-    )
-    eta2 = epsilon / (3 * (1 - epsilon) * (eta + 1) + epsilon * (3 * eta + 1))
-    eta3 = (
-        epsilon
-        * (3 * eta + 1)
-        / (3 * (1 - epsilon) * (eta + 1) + epsilon * (3 * eta + 1))
-    )
+    a = 1 - epsilon
+    b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
+    c = epsilon / (3 * (eta + 1))
+    d = 1 / (((a - b) ** 2) - 4 * c**2)
+    eta1 = (a * (a - b) - 2 * c**2) * d / (a + b)
+    eta2 = -c * d
+    eta3 = 2 * c * d
+
     return eta1 + 2 * eta2 + eta3
 
 
@@ -143,15 +142,15 @@ def test_biased_noise_representation_with_choi(
     )
     choi_components = []
 
-    eta1 = 1 - epsilon
-    eta2 = epsilon / (3 * (eta + 1))
-    eta3 = epsilon * (3 * eta + 1) / (3 * (eta + 1))
+    a = 1 - epsilon
+    b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
+    c = epsilon / (3 * (eta + 1))
 
     mix = [
-        (eta1, unitary(I)),
-        (eta2, unitary(X)),
-        (eta2, unitary(Y)),
-        (eta3, unitary(Z)),
+        (a, unitary(I)),
+        (b, unitary(Z)),
+        (c, unitary(X)),
+        (c, unitary(Y)),
     ]
 
     for noisy_op, coeff in op_rep.basis_expansion.items():

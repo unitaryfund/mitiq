@@ -104,17 +104,13 @@ def represent_operation_with_biased_noise(
     if len(qubits) == 1:
         q = tuple(qubits)[0]
 
-        alpha_1 = 1 + 3 * epsilon * (eta + 1) / (
-            3 * (1 - epsilon) * (eta + 1) + epsilon * (3 * eta + 1)
-        )
-        alpha_2 = -epsilon / (
-            3 * (1 - epsilon) * (eta + 1) + epsilon * (3 * eta + 1)
-        )
-        alpha_3 = (
-            -epsilon
-            * (3 * eta + 1)
-            / (3 * (1 - epsilon) * (eta + 1) + epsilon * (3 * eta + 1))
-        )
+        a = 1 - epsilon
+        b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
+        c = epsilon / (3 * (eta + 1))
+        d = 1 / (((a - b) ** 2) - 4 * c**2)
+        alpha_1 = (a * (a - b) - 2 * c**2) * d / (a + b)
+        alpha_2 = -c * d
+        alpha_3 = 2 * c * d
 
         alphas = [alpha_1] + 2 * [alpha_2] + [alpha_3]
         post_ops = [[]]  # for eta_1, we do nothing, rather than I
