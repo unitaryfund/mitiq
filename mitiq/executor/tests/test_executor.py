@@ -204,6 +204,10 @@ def test_executor_evaluate_float(execute):
     assert executor.executed_circuits == circuits
     assert executor.quantum_results == [1, 2]
 
+# @pytest.mark.parametrize("",[])
+# def test_executor_observable_compatibility_check():
+#     with pytest.raises(ValueError):
+#         executor.evaluate(circuits)
 
 @pytest.mark.parametrize(
     "execute", [executor_measurements, executor_measurements_batched]
