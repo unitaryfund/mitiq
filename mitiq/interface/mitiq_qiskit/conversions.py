@@ -120,7 +120,7 @@ def _map_qubits(
 
 def _add_identity_to_idle(
     circuit: qiskit.QuantumCircuit,
-) -> Set:
+) -> Set[int]:
     """Adds identities to idle qubits in the circuit and returns the altered
     indices. Used to preserve idle qubits and indices in conversion.
 
@@ -145,7 +145,7 @@ def _add_identity_to_idle(
 
 def _remove_identity_from_idle(
     circuit: qiskit.QuantumCircuit,
-    idle_indices: Set,
+    idle_indices: Set[int],
 ) -> None:
     """Removes identities from the circuit corresponding to the set of indices.
     Used in conjunction with _add_identity_to_idle to preserve idle qubits and
@@ -155,8 +155,8 @@ def _remove_identity_from_idle(
         circuit: Qiskit circuit to have identities removed
         idle_indices: Set of altered idle qubit indices
     """
-    data = copy.deepcopy(circuit._data)
     index_list = []
+    data = copy.deepcopy(circuit._data)
     for target_index, op in enumerate(data):
         bit_indices = set()
         gate, qubits, cbits = op
@@ -164,7 +164,7 @@ def _remove_identity_from_idle(
         if gate.name == "id" and bit_indices.intersection(idle_indices):
             # Reverse index list order for data index preservation
             index_list.insert(0, target_index)
-    # index
+    # Traverse data from list end to preserve index
     for target_index in index_list:
         del data[target_index]
     circuit._data = data
