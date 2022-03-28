@@ -155,7 +155,7 @@ def _remove_identity_from_idle(
         circuit: Qiskit circuit to have identities removed
         idle_indices: Set of altered idle qubit indices
     """
-    index_list = []
+    index_list: List[int] = []
     data = copy.deepcopy(circuit._data)
     for target_index, op in enumerate(data):
         bit_indices = set()
