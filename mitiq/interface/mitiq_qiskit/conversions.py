@@ -17,7 +17,7 @@
 Qiskit's circuit representation.
 """
 import copy
-from typing import List, Optional, Tuple, Any
+from typing import List, Optional, Tuple, Any, Set
 import re
 
 import numpy as np
@@ -120,7 +120,16 @@ def _map_qubits(
 
 def _add_identity_to_idle(
     circuit: qiskit.QuantumCircuit,
-) -> set:
+) -> Set:
+    """Adds identities to idle qubits in the circuit and returns the altered
+    indices. Used to preserve idle qubits and indices in conversion.
+
+    Args:
+        circuit: Qiskit circuit to have identities added to idle qubits
+
+    Returns:
+        An unordered set of the indices that were altered
+    """
     data = copy.deepcopy(circuit._data)
     bit_indices = set()
     idle_bit_indices = set()
@@ -136,18 +145,28 @@ def _add_identity_to_idle(
 
 def _remove_identity_from_idle(
     circuit: qiskit.QuantumCircuit,
-    idle_indices: set,
+    idle_indices: Set,
 ) -> None:
+    """Removes identities from the circuit corresponding to the set of indices.
+    Used in conjunction with _add_identity_to_idle to preserve idle qubits and
+    indices in conversion.
+
+    Args:
+        circuit: Qiskit circuit to have identities removed
+        idle_indices: Set of altered idle qubit indices
+    """
     data = copy.deepcopy(circuit._data)
-    i_list = []
-    for i, op in enumerate(data):
+    index_list = []
+    for target_index, op in enumerate(data):
         bit_indices = set()
         gate, qubits, cbits = op
         bit_indices.update(set(bit.index for bit in qubits))
         if gate.name == "id" and bit_indices.intersection(idle_indices):
-            i_list.insert(0, i)
-    for i in i_list:
-        del data[i]
+            # Reverse index list order for data index preservation
+            index_list.insert(0, target_index)
+    # index
+    for target_index in index_list:
+        del data[target_index]
     circuit._data = data
 
 
