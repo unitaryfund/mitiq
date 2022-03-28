@@ -377,7 +377,7 @@ def test_add_identity_to_idle():
     id_indices = []
     for gates, qubits, cargs in circuit.get_instructions("id"):
         for qubit in qubits:
-           id_indices.append(qubit.index)  
+            id_indices.append(qubit.index)
     assert idle_indices == set(range(1, 8))
     assert id_indices == sorted(idle_indices)
 
@@ -391,5 +391,5 @@ def test_remove_identity_from_idle():
     id_indices = []
     for gates, qubits, cargs in circuit.get_instructions("id"):
         for qubit in qubits:
-           id_indices.append(qubit.index)  
+            id_indices.append(qubit.index)
     assert id_indices == []
