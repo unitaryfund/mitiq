@@ -19,6 +19,8 @@ from typing import cast, Any, Dict, List, Tuple
 
 import numpy as np
 
+from numpy.typing import NDArray
+
 from cirq import (
     LineQubit,
     Circuit,
@@ -225,7 +227,7 @@ def _max_ent_state_circuit(num_qubits: int) -> Circuit:
     return circ
 
 
-def _circuit_to_choi(circuit: Circuit) -> np.ndarray:
+def _circuit_to_choi(circuit: Circuit) -> ndarray:
     """Returns the density matrix of the Choi state associated to the
     input circuit.
 
