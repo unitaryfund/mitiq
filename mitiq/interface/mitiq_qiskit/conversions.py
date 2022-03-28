@@ -120,28 +120,31 @@ def _map_qubits(
 
 def _add_identity_to_idle(
     circuit: qiskit.QuantumCircuit,
-) -> List[int]:
+) -> set:
     data = copy.deepcopy(circuit._data)
     bit_indices = set()
-    idle_bit_indices = []
+    idle_bit_indices = set()
     for op in data:
         gate, qubits, cbits = op
         bit_indices.update(set(bit.index for bit in qubits))
     for index in range(circuit.num_qubits):
         if index not in bit_indices:
-            idle_bit_indices.append(index)
+            idle_bit_indices.add(index)
             circuit.i(index)
     return idle_bit_indices
 
 
-def _remove_identity(
+def _remove_identity_from_idle(
     circuit: qiskit.QuantumCircuit,
+    idle_indices: set,
 ) -> None:
     data = copy.deepcopy(circuit._data)
     i_list = []
     for i, op in enumerate(data):
+        bit_indices = set()
         gate, qubits, cbits = op
-        if gate.name == "id":
+        bit_indices.update(set(bit.index for bit in qubits))
+        if gate.name == "id" and bit_indices.intersection(idle_indices):
             i_list.insert(0, i)
     for i in i_list:
         del data[i]

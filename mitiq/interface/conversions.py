@@ -232,17 +232,20 @@ def noise_scaling_converter(
     def new_scaling_function(
         circuit: QPROGRAM, *args: Any, **kwargs: Any
     ) -> QPROGRAM:
+        # Pre atomic conversion
+        idle_indices = set()
         if "qiskit" in circuit.__module__:
             from mitiq.interface.mitiq_qiskit.conversions import (
                 _add_identity_to_idle,
             )
 
-            _add_identity_to_idle(circuit)
+            idle_indices = _add_identity_to_idle(circuit)
 
         scaled_circuit = atomic_converter(noise_scaling_function)(
             circuit, *args, **kwargs
         )
 
+        # Post atomic conversion
         # PyQuil: Restore declarations, measurements, and metadata.
         if "pyquil" in scaled_circuit.__module__:
             from pyquil import Program
@@ -285,7 +288,7 @@ def noise_scaling_converter(
             from mitiq.interface.mitiq_qiskit.conversions import (
                 _transform_registers,
                 _measurement_order,
-                _remove_identity,
+                _remove_identity_from_idle,
             )
 
             scaled_circuit.remove_final_measurements()
@@ -293,7 +296,7 @@ def noise_scaling_converter(
                 scaled_circuit,
                 new_qregs=circuit.qregs,  # type: ignore
             )
-            _remove_identity(scaled_circuit)
+            _remove_identity_from_idle(scaled_circuit, idle_indices)
             if circuit.cregs and not scaled_circuit.cregs:  # type: ignore
                 scaled_circuit.add_register(*circuit.cregs)  # type: ignore
 
