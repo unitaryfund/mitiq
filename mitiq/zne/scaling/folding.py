@@ -18,7 +18,7 @@ from copy import deepcopy
 from typing import Any, Dict, FrozenSet, List, Optional, cast
 
 import numpy as np
-from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary
+from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary, Moment
 
 from mitiq.interface import noise_scaling_converter
 from mitiq.utils import (
@@ -292,10 +292,30 @@ def fold_global(
     num_to_fold = int(round(fraction_scale * len(operations) / 2))
 
     if num_to_fold > 0:
-        folded += Circuit(
-            [inverse(base_circuit[-num_to_fold:])],
-            [base_circuit[-num_to_fold:]],
-        )
+
+        # create a list of operations needed for partial layers
+        ops_for_partial_layers = operations[-num_to_fold:]
+
+        # moments needed for partial layers
+        moment_list = []
+        for (i, moment) in enumerate(base_circuit[::-1]):
+            for i in range(len(ops_for_partial_layers)):
+                for op in moment:
+                    if ops_for_partial_layers[i] == op:
+                        moment_list.append(len(base_circuit) - 1 - i)
+
+        # create the partial layers
+        circuit_partial = Circuit()
+
+        for i in range(len(ops_for_partial_layers)):
+            for moment in base_circuit[moment_list[0] :]:
+                new_moment = Moment()
+                for op in moment:
+                    if op == ops_for_partial_layers[i]:
+                        new_moment = new_moment.with_operation(op)
+                circuit_partial.append(new_moment)
+
+        folded += inverse(circuit_partial) + circuit_partial
 
     _append_measurements(folded, measurements)
     return folded
