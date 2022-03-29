@@ -1174,15 +1174,17 @@ def test_fold_global_with_qiskit_circuits():
 
 
 def test_fold_global_with_qiskit_circuits_and_idle_qubits():
-    """Tests _fold_local with input Qiskit circuits where idle qubits are interspered."""
+    """Tests _fold_local with input Qiskit circuits where idle qubits are
+    interspered.
+    """
     # Test Qiskit circuit:
-    #           ┌───┐          ┌─┐      
+    #           ┌───┐          ┌─┐
     #  q4_0: |0>┤ H ├──■────■──┤M├──────
-    #           └───┘  │    │  └╥┘      
+    #           └───┘  │    │  └╥┘
     #  q4_1: |0>───────┼────┼───╫───────
-    #           ┌───┐┌─┴─┐  │   ║ ┌─┐   
+    #           ┌───┐┌─┴─┐  │   ║ ┌─┐
     #  q4_2: |0>┤ H ├┤ X ├──■───╫─┤M├───
-    #           └───┘└───┘  │   ║ └╥┘   
+    #           └───┘└───┘  │   ║ └╥┘
     #  q4_3: |0>────────────┼───╫──╫────
     #           ┌───┐┌───┐┌─┴─┐ ║  ║ ┌─┐
     #  q4_4: |0>┤ H ├┤ T ├┤ X ├─╫──╫─┤M├
