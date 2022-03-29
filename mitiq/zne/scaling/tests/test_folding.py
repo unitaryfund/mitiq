@@ -1173,6 +1173,53 @@ def test_fold_global_with_qiskit_circuits():
     assert folded_qiskit_circuit.cregs == qiskit_circuit.cregs
 
 
+def test_fold_global_with_qiskit_circuits_and_idle_qubits():
+    """Tests _fold_local with input Qiskit circuits where idle qubits are interspered."""
+    # Test Qiskit circuit:
+    #           ┌───┐          ┌─┐      
+    #  q4_0: |0>┤ H ├──■────■──┤M├──────
+    #           └───┘  │    │  └╥┘      
+    #  q4_1: |0>───────┼────┼───╫───────
+    #           ┌───┐┌─┴─┐  │   ║ ┌─┐   
+    #  q4_2: |0>┤ H ├┤ X ├──■───╫─┤M├───
+    #           └───┘└───┘  │   ║ └╥┘   
+    #  q4_3: |0>────────────┼───╫──╫────
+    #           ┌───┐┌───┐┌─┴─┐ ║  ║ ┌─┐
+    #  q4_4: |0>┤ H ├┤ T ├┤ X ├─╫──╫─┤M├
+    #           └───┘└───┘└───┘ ║  ║ └╥┘
+    #  c4:    5/════════════════╩══╩══╩═
+    #                           0  2  4
+    qiskit_qreg = QuantumRegister(5)
+    qiskit_creg = ClassicalRegister(5)
+    qiskit_circuit = QuantumCircuit(qiskit_qreg, qiskit_creg)
+    qiskit_circuit.h(qiskit_qreg[0])
+    qiskit_circuit.h(qiskit_qreg[2])
+    qiskit_circuit.h(qiskit_qreg[4])
+    qiskit_circuit.cnot(qiskit_qreg[0], qiskit_qreg[2])
+    qiskit_circuit.t(qiskit_qreg[4])
+    qiskit_circuit.ccx(qiskit_qreg[0], qiskit_qreg[2], qiskit_qreg[4])
+    qiskit_circuit.measure(qiskit_qreg[0], qiskit_creg[0])
+    qiskit_circuit.measure(qiskit_qreg[2], qiskit_creg[2])
+    qiskit_circuit.measure(qiskit_qreg[4], qiskit_creg[4])
+
+    # Return mitiq circuit
+    folded_circuit = fold_global(
+        qiskit_circuit,
+        scale_factor=2.71828,
+        fold_method=fold_gates_from_left,
+        return_mitiq=True,
+    )
+    assert isinstance(folded_circuit, Circuit)
+
+    # Return input circuit type
+    folded_qiskit_circuit = fold_global(
+        qiskit_circuit, scale_factor=2.0, fold_method=fold_gates_from_left
+    )
+    assert isinstance(folded_qiskit_circuit, QuantumCircuit)
+    assert folded_qiskit_circuit.qregs == qiskit_circuit.qregs
+    assert folded_qiskit_circuit.cregs == qiskit_circuit.cregs
+
+
 def test_fold_left_squash_moments():
     """Tests folding from left with kwarg squash_moments."""
     # Test circuit
