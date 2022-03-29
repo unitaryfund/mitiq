@@ -292,30 +292,21 @@ def fold_global(
     num_to_fold = int(round(fraction_scale * len(operations) / 2))
 
     if num_to_fold > 0:
-
-        # create a list of operations needed for partial layers
-        ops_for_partial_layers = operations[-num_to_fold:]
-
-        # moments needed for partial layers
-        moment_list = []
-        for (i, moment) in enumerate(base_circuit[::-1]):
-            for i in range(len(ops_for_partial_layers)):
-                for op in moment:
-                    if ops_for_partial_layers[i] == op:
-                        moment_list.append(len(base_circuit) - 1 - i)
-
-        # create the partial layers
-        circuit_partial = Circuit()
-
-        for i in range(len(ops_for_partial_layers)):
-            for moment in base_circuit[moment_list[0] :]:
-                new_moment = Moment()
-                for op in moment:
-                    if op == ops_for_partial_layers[i]:
-                        new_moment = new_moment.with_operation(op)
-                circuit_partial.append(new_moment)
-
-        folded += inverse(circuit_partial) + circuit_partial
+        # Create the inverse of the final partial circuit
+        inverse_partial = Circuit()
+        num_partial = 0
+        for moment in base_circuit[::-1]:
+            new_moment = Moment()
+            for op in moment:
+                new_moment = new_moment.with_operation(inverse(op))
+                num_partial += 1
+                if num_partial == num_to_fold:
+                    break
+            inverse_partial.append(new_moment)
+            if num_partial == num_to_fold:
+                break
+        # Append partially folded circuit
+        folded += inverse_partial + inverse(inverse_partial)
 
     _append_measurements(folded, measurements)
     return folded
