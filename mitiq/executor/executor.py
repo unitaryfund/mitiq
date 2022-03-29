@@ -154,6 +154,7 @@ class Executor:
         elif (
             observable is not None
             and self._executor_return_type not in MeasurementResultLike
+            and self._executor_return_type not in DensityMatrixLike
         ):
             raise ValueError(
                 """Executor and observable are not compatible. Executors
