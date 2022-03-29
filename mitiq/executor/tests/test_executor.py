@@ -205,6 +205,23 @@ def test_executor_evaluate_float(execute):
     assert executor.quantum_results == [1, 2]
 
 
+@pytest.mark.parametrize("execute",[
+    executor_batched, executor_batched_unique, executor_serial_unique,
+    executor_serial_typed, executor_serial, executor_pyquil_batched
+])
+@pytest.mark.parametrize("obs",[
+    PauliString("X"), PauliString("XZ"),  PauliString("Z"), 
+])
+def test_executor_observable_compatibility_check(execute, obs):
+    q = cirq.LineQubit(0)
+    circuits = [cirq.Circuit(cirq.X(q)), cirq.Circuit(cirq.H(q), cirq.Z(q))]
+
+    executor = Executor(execute)
+    
+    with pytest.raises(ValueError):
+         executor.evaluate(circuits, obs)
+
+
 @pytest.mark.parametrize(
     "execute", [executor_measurements, executor_measurements_batched]
 )
