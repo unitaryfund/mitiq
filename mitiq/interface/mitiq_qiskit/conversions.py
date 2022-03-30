@@ -247,6 +247,7 @@ def _transform_registers(
     circuit._qubit_set = set()
     circuit.qregs = []
     circuit._data = []
+    circuit._qubit_indices = {}
     circuit.add_register(*new_qregs)
 
     # Map the qubits in operations to the new qubits.
