@@ -1325,7 +1325,6 @@ def test_fold_and_squash_max_stretch(fold_method):
     assert len(folded_with_squash_moments_not_specified) == 15
 
 
-
 @pytest.mark.parametrize(
     "fold_method",
     [
