@@ -15,12 +15,52 @@
 
 """Unit tests for DDD slack windows and DDD insertion tools."""
 
-import pytest
 import numpy as np
+import cirq
+from mitiq.ddd.insertion import (
+    _get_circuit_mask,
+    get_slack_matrix_from_circuit_mask,
+)
+import pytest
 
-from mitiq.ddd.insertion import get_slack_matrix_from_circuit_mask
+circuit_cirq_one = cirq.Circuit(
+    cirq.SWAP(q, q + 1) for q in cirq.LineQubit.range(7)
+)
+
+qreg_cirq = cirq.GridQubit.rect(10, 1)
+circuit_cirq_two = cirq.Circuit(
+    cirq.ops.H.on_each(*qreg_cirq), cirq.ops.H.on(qreg_cirq[1])
+)
 
 # Define test mask matrices
+test_mask_one = np.array(
+    [
+        [1, 0, 0, 0, 0, 0, 0],
+        [1, 1, 0, 0, 0, 0, 0],
+        [0, 1, 1, 0, 0, 0, 0],
+        [0, 0, 1, 1, 0, 0, 0],
+        [0, 0, 0, 1, 1, 0, 0],
+        [0, 0, 0, 0, 1, 1, 0],
+        [0, 0, 0, 0, 0, 1, 1],
+        [0, 0, 0, 0, 0, 0, 1],
+    ]
+)
+
+test_mask_two = np.array(
+    [
+        [1, 0],
+        [1, 1],
+        [1, 0],
+        [1, 0],
+        [1, 0],
+        [1, 0],
+        [1, 0],
+        [1, 0],
+        [1, 0],
+        [1, 0],
+    ]
+)
+
 one_mask = np.array(
     [
         [0, 1, 1, 1, 1],
@@ -88,6 +128,15 @@ mixed_slack = np.array(
 )
 masks = [one_mask, two_mask, mixed_mask]
 slack_matrices = [one_slack, two_slack, mixed_slack]
+
+
+@pytest.mark.parametrize(
+    ("circuit", "test_mask"),
+    [(circuit_cirq_one, test_mask_one), (circuit_cirq_two, test_mask_two)],
+)
+def test_get_circuit_mask(circuit, test_mask):
+    circuit_mask = _get_circuit_mask(circuit)
+    assert np.allclose(circuit_mask, test_mask)
 
 
 def test_get_slack_matrix_from_circuit_mask():
