@@ -22,6 +22,8 @@
 from typing import List
 from copy import deepcopy
 import numpy as np
+import numpy.typing as npt
+
 
 from cirq import (
     Circuit,
@@ -65,7 +67,7 @@ def _max_ent_state_circuit(num_qubits: int) -> Circuit:
     )
 
 
-def _circuit_to_choi(circuit: Circuit) -> np.ndarray:
+def _circuit_to_choi(circuit: Circuit) -> npt.NDArray[np.complex64]:
     """Returns the density matrix of the Choi state associated to the
     input circuit.
 
@@ -86,7 +88,7 @@ def _circuit_to_choi(circuit: Circuit) -> np.ndarray:
     return simulator.simulate(full_circ).final_density_matrix  # type: ignore
 
 
-def _operation_to_choi(operation_tree: OP_TREE) -> np.ndarray:
+def _operation_to_choi(operation_tree: OP_TREE) -> npt.NDArray[np.complex64]:
     """Returns the density matrix of the Choi state associated to the
     input operation tree (e.g. a single operation or a sequence of operations).
 
@@ -102,7 +104,8 @@ def _operation_to_choi(operation_tree: OP_TREE) -> np.ndarray:
     return _circuit_to_choi(circuit)
 
 
-def tensor_product(*args: np.ndarray) -> np.ndarray:
+def tensor_product(*args: npt.NDArray[np.complex64]
+    ) -> npt.NDArray[np.complex64]:
     """Returns the Kronecker product of the input array-like arguments.
     This is a generalization of the binary function
     ``numpy.kron(arg_a, arg_b)`` to the case of an arbitrary number of
@@ -117,7 +120,8 @@ def tensor_product(*args: np.ndarray) -> np.ndarray:
     return val
 
 
-def matrix_to_vector(density_matrix: np.ndarray) -> np.ndarray:
+def matrix_to_vector(density_matrix: npt.NDArray[np.complex64]
+    ) -> npt.NDArray[np.complex64]:
     r"""Reshapes a :math:`d \times d` density matrix into a
     :math:`d^2`-dimensional state vector, according to the rule:
     :math:`|i \rangle\langle j| \rightarrow |i,j \rangle`.
@@ -137,7 +141,8 @@ def _safe_sqrt(
     return square_root
 
 
-def vector_to_matrix(vector: np.ndarray) -> np.ndarray:
+def vector_to_matrix(vector: npt.NDArray[np.complex64]
+    ) -> npt.NDArray[np.complex64]:
     r"""Reshapes a :math:`d^2`-dimensional state vector into a
     :math:`d \times d` density matrix, according to the rule:
     :math:`|i,j \rangle \rightarrow |i \rangle\langle j|`.
@@ -150,7 +155,8 @@ def vector_to_matrix(vector: np.ndarray) -> np.ndarray:
     return vector.reshape(dim, dim)
 
 
-def kraus_to_super(kraus_ops: List[np.ndarray]) -> np.ndarray:
+def kraus_to_super(kraus_ops: List[npt.NDArray[np.complex64]]
+    )-> npt.NDArray[np.complex64]:
     r"""Maps a set of Kraus operators into a single superoperator
     matrix acting by matrix multiplication on vectorized
     density matrices.
@@ -169,7 +175,8 @@ def kraus_to_super(kraus_ops: List[np.ndarray]) -> np.ndarray:
     return np.array(sum(np.kron(k, k.conj()) for k in kraus_ops))
 
 
-def choi_to_super(choi_state: np.ndarray) -> np.ndarray:
+def choi_to_super(choi_state: npt.NDArray[np.complex64]
+    )-> npt.NDArray[np.complex64]:
     """Returns the superoperator matrix corresponding to
     the channel defined by the input (normalized) Choi state.
 
@@ -187,7 +194,8 @@ def choi_to_super(choi_state: np.ndarray) -> np.ndarray:
     return dim * super_not_normalized
 
 
-def super_to_choi(super_operator: np.ndarray) -> np.ndarray:
+def super_to_choi(super_operator: npt.NDArray[np.complex64]
+    )-> npt.NDArray[np.complex64]:
     """Returns the normalized choi state corresponding to
     the channel defined by the input superoperator.
 
@@ -198,7 +206,8 @@ def super_to_choi(super_operator: np.ndarray) -> np.ndarray:
     return choi_to_super(super_operator) / dim_squared
 
 
-def kraus_to_choi(kraus_ops: List[np.ndarray]) -> np.ndarray:
+def kraus_to_choi(kraus_ops: List[npt.NDArray[np.complex64]]
+    ) -> npt.NDArray[np.complex64]:
     """Returns the normalized choi state corresponding to
     the channel defined by the input kraus operators.
     """

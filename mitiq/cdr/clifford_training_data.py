@@ -17,6 +17,7 @@
 from typing import List, Optional, Sequence, Union, Any, cast
 
 import numpy as np
+import numpy.typing as npt
 
 import cirq
 from cirq.circuits import Circuit
@@ -309,7 +310,7 @@ def _replace(
 
 def _random_clifford(
     num_angles: int, random_state: np.random.RandomState
-) -> np.ndarray:
+) -> npt.NDArray[np.complex64]:
     """Returns an array of Clifford angles chosen uniformly at random.
 
     Args:
@@ -322,7 +323,7 @@ def _random_clifford(
 
 
 @np.vectorize
-def _closest_clifford(angles: np.ndarray) -> float:
+def _closest_clifford(angles: npt.NDArray[np.complex64]) -> float:
     """Returns the nearest Clifford angles to the input angles.
 
     Args:
@@ -346,7 +347,7 @@ def _closest_clifford(angles: np.ndarray) -> float:
 
 @np.vectorize
 def _is_clifford_angle(
-    angles: np.ndarray,
+    angles: npt.NDArray[np.complex64],
     tol: float = 10**-5,
 ) -> bool:
     """Function to check if a given angle is Clifford.
@@ -361,7 +362,8 @@ def _is_clifford_angle(
     return False
 
 
-def _angle_to_proximities(angle: np.ndarray, sigma: float) -> List[float]:
+def _angle_to_proximities(angle: npt.NDArray[np.complex64], sigma: float
+    ) -> List[float]:
     """Returns probability distribution based on distance from angles to
     Clifford gates.
 
@@ -386,7 +388,8 @@ def _angle_to_proximities(angle: np.ndarray, sigma: float) -> List[float]:
 
 
 @np.vectorize
-def _angle_to_proximity(angle: np.ndarray, sigma: float) -> float:
+def _angle_to_proximity(angle: npt.NDArray[np.complex64], sigma: float
+    ) -> float:
     """Returns probability distribution based on distance from angles to
     Clifford gates.
 
@@ -404,7 +407,7 @@ def _angle_to_proximity(angle: np.ndarray, sigma: float) -> float:
 
 @np.vectorize
 def _probabilistic_angle_to_clifford(
-    angles: np.ndarray,
+    angles: npt.NDArray[np.complex64],
     sigma: float,
     random_state: np.random.RandomState,
 ) -> float:

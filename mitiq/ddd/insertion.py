@@ -16,9 +16,10 @@
 """Tools to determine slack windows in circuits and to insert DDD sequences."""
 
 import numpy as np
+import numpy.typing as npt
 
 
-def _validate_integer_matrix(mask: np.ndarray) -> None:
+def _validate_integer_matrix(mask: npt.NDArray[np.float64]) -> None:
     """Ensures the input is a NumPy 2d array with integer elements."""
     if not isinstance(mask, np.ndarray):
         raise TypeError("The input matrix must be a numpy.ndarray object.")
@@ -28,7 +29,8 @@ def _validate_integer_matrix(mask: np.ndarray) -> None:
         raise ValueError("The input must be a 2-dimensional array.")
 
 
-def get_slack_matrix_from_circuit_mask(mask: np.ndarray) -> np.ndarray:
+def get_slack_matrix_from_circuit_mask(mask: npt.NDArray[np.float64]
+    ) -> npt.NDArray[np.float64]:
     """Given a circuit mask matrix A, e.g. the output of get_circuit_mask(),
     returns a slack matrix B, where B_{i,j} = t if the position A{i,j} is the
     initial element of a sequence of t zeros (from left to right).

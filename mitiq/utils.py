@@ -18,6 +18,8 @@ from copy import deepcopy
 from typing import cast, Any, Dict, List, Tuple
 
 import numpy as np
+import numpy.typying as npt
+
 
 from numpy.typing import NDArray
 
@@ -227,7 +229,7 @@ def _max_ent_state_circuit(num_qubits: int) -> Circuit:
     return circ
 
 
-def _circuit_to_choi(circuit: Circuit) -> ndarray:
+def _circuit_to_choi(circuit: Circuit) -> npt.NDArray[np.complex64]:
     """Returns the density matrix of the Choi state associated to the
     input circuit.
 
@@ -248,7 +250,7 @@ def _circuit_to_choi(circuit: Circuit) -> ndarray:
     return simulator.simulate(full_circ).final_density_matrix  # type: ignore
 
 
-def _operation_to_choi(operation_tree: OP_TREE) -> np.ndarray:
+def _operation_to_choi(operation_tree: OP_TREE) -> npt.NDArray[np.complex64]:
     """Returns the density matrix of the Choi state associated to the
     input operation tree (e.g. a single operation or a sequence of operations).
 

@@ -15,6 +15,7 @@
 from typing import cast, List, Optional, Union
 
 import numpy as np
+import numpy.typing as npt
 
 from cirq import Circuit, LineQubit, ops as cirq_ops, protocols
 from cirq.linalg.decompositions import (
@@ -285,7 +286,7 @@ def _translate_two_qubit_braket_instruction_to_cirq_operation(
 
 
 def _translate_one_qubit_cirq_operation_to_braket_instruction(
-    op: Union[np.ndarray, cirq_ops.Operation],
+    op: Union[npt.NDArray[np.complex64], cirq_ops.Operation],
     target: Optional[int] = None,
 ) -> List[Instruction]:
     """Translates a one-qubit Cirq operation to a (sequence of) Braket

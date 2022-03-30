@@ -15,6 +15,7 @@
 
 """Qiskit utility functions."""
 import numpy as np
+import numpy.typing as npt
 import qiskit
 from qiskit import QuantumCircuit
 from typing import Optional
@@ -49,7 +50,7 @@ def initialized_depolarizing_noise(noise_level: float) -> NoiseModel:
     return noise_model
 
 
-def execute(circuit: QuantumCircuit, obs: np.ndarray) -> float:
+def execute(circuit: QuantumCircuit, obs: npt.NDArray[np.complex64]) -> float:
     """Simulates a noiseless evolution and returns the
     expectation value of some observable.
 
@@ -64,7 +65,7 @@ def execute(circuit: QuantumCircuit, obs: np.ndarray) -> float:
 
 
 def execute_with_shots(
-    circuit: QuantumCircuit, obs: np.ndarray, shots: int
+    circuit: QuantumCircuit, obs: npt.NDArray[np.complex64], shots: int
 ) -> float:
     """Simulates the evolution of the circuit and returns
     the expectation value of the observable.
@@ -88,8 +89,8 @@ def execute_with_shots(
 
 
 def execute_with_noise(
-    circuit: QuantumCircuit, obs: np.ndarray, noise_model: NoiseModel
-) -> float:
+    circuit: QuantumCircuit, obs: npt.NDArray[np.complex64],
+    noise_model: NoiseModel) -> float:
     """Simulates the evolution of the noisy circuit and returns
     the exact expectation value of the observable.
 
@@ -129,7 +130,7 @@ def execute_with_noise(
 
 def execute_with_shots_and_noise(
     circuit: QuantumCircuit,
-    obs: np.ndarray,
+    obs: npt.NDArray[np.complex64],
     noise_model: NoiseModel,
     shots: int,
     seed: Optional[int] = None,
