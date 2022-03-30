@@ -15,7 +15,7 @@
 
 """Utility functions."""
 from copy import deepcopy
-from typing import cast, Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 
@@ -169,12 +169,6 @@ def _equal(
                 )
             ]
             circ.batch_remove(measurements)
-
-            for i in range(len(measurements)):
-                gate = cast(MeasurementGate, measurements[i][1].gate)
-                gate.key = ""
-
-            circ.batch_insert(measurements)
 
     return CircuitDag.from_circuit(circuit_one) == CircuitDag.from_circuit(
         circuit_two
