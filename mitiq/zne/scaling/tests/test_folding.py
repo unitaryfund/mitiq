@@ -960,8 +960,14 @@ def test_global_fold_stretch_factor_eight_terminal_measurements():
         circ,
         inverse(circ),
         circ,
-        inverse(circ)[0],
-        circ[-1],
+        inverse(
+            Circuit(
+                [ops.T.on(qreg[2])],
+                [ops.TOFFOLI.on(*qreg)],
+            )
+        ),
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
         meas,
     )
     assert _equal(folded, correct)
