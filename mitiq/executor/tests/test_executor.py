@@ -230,7 +230,7 @@ def test_executor_observable_compatibility_check(execute, obs):
 
     executor = Executor(execute)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="are not compatible"):
         executor.evaluate(circuits, obs)
 
 
