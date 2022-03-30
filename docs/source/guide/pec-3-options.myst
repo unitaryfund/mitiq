@@ -27,6 +27,7 @@ Both steps can be achieved with Mitiq in different ways and with different optio
 In the following code we use Qiskit as a frontend, but the workflow is the same for other frontends.
 
 ```{code-cell} ipython3
+import numpy as np
 import qiskit # Frontend library
 from mitiq import pec  # Probabilistic error cancellation module
 ```
@@ -293,7 +294,7 @@ def execute(circuit):
     """
     circuit_copy = circuit.copy()    
     noise_model = initialized_depolarizing_noise(BASE_NOISE)
-    projector_on_zero = [[1, 0], [0, 0]]
+    projector_on_zero = np.array([[1, 0], [0, 0]])
     return execute_with_noise(circuit_copy, projector_on_zero, noise_model)
 
 # Cast the execute function into an Executor class to record the execution histroy
