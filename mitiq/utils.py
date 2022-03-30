@@ -105,7 +105,7 @@ def _pop_measurements(
     if measurements:
         circuit.batch_remove(measurements)
         # Remove the last moment too if left empty.
-        if len(circuit[-1])==0:
+        if len(circuit[-1]) == 0:
             del circuit[-1]
     return measurements
 
