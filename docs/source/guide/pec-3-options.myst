@@ -297,7 +297,7 @@ def execute(circuit):
     projector_on_zero = np.array([[1, 0], [0, 0]])
     return execute_with_noise(circuit_copy, projector_on_zero, noise_model)
 
-# Cast the execute function into an Executor class to record the execution histroy
+# Cast the execute function into an Executor class to record the execution history
 executor = Executor(execute)
 ```
 
