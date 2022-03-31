@@ -22,6 +22,9 @@ import numpy as np
 from mitiq import Executor, QPROGRAM
 from mitiq.rem import MeasurementResult
 
+from cirq import DensityMatrixSimulator
+from cirq.experiments.readout_confusion_matrix import measure_confusion_matrix
+
 MatrixLike = Union[
     np.ndarray,
     Iterable[np.ndarray],
@@ -53,6 +56,18 @@ def execute_with_rci(
 
     if not isinstance(executor, Executor):
         executor = Executor(executor)
+
+    if inverse_confusion_matrix is None:
+        print("No inverse confusion matrix")
+        qubits = set()
+        for m in circuit.moments:
+            for qubit in m.qubits:
+                qubits.add(qubit)
+
+        print(list(qubits))
+        inverse_confusion_matrix = measure_confusion_matrix(
+            DensityMatrixSimulator(), list(qubits)
+        )
 
     result = executor.evaluate(circuit)
     assert isinstance(result, MeasurementResult)
