@@ -18,7 +18,7 @@ from copy import deepcopy
 from typing import Any, Dict, FrozenSet, List, Optional, cast
 
 import numpy as np
-from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary
+from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary, Moment
 
 from mitiq.interface import noise_scaling_converter
 from mitiq.utils import (
@@ -266,10 +266,6 @@ def fold_global(
         scale_factor: Factor to scale the circuit by.
 
     Keyword Args:
-        squash_moments (bool): If True, all gates (including folded gates) are
-            placed as early as possible in the circuit. If False, new moments
-            are created for folded gates. This option only applies to QPROGRAM
-            types which have a "moment" or "time" structure. Default is True.
         return_mitiq (bool): If True, returns a Mitiq circuit instead of
             the input circuit type (if different). Default is False.
 
@@ -296,13 +292,24 @@ def fold_global(
     num_to_fold = int(round(fraction_scale * len(operations) / 2))
 
     if num_to_fold > 0:
-        folded += Circuit(
-            [inverse(operations[-num_to_fold:])], [operations[-num_to_fold:]]
-        )
+
+        # Create the inverse of the final partial circuit
+        inverse_partial = Circuit()
+        num_partial = 0
+        for moment in base_circuit[::-1]:
+            new_moment = Moment()
+            for op in moment.operations[::-1]:
+                new_moment = new_moment.with_operation(inverse(op))
+                num_partial += 1
+                if num_partial == num_to_fold:
+                    break
+            inverse_partial.append(new_moment)
+            if num_partial == num_to_fold:
+                break
+        # Append partially folded circuit
+        folded += inverse_partial + inverse(inverse_partial)
 
     _append_measurements(folded, measurements)
-    if not (kwargs.get("squash_moments") is False):
-        folded = _squash_moments(folded)
     return folded
 
 

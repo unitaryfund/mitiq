@@ -15,7 +15,7 @@
 
 """Utility functions."""
 from copy import deepcopy
-from typing import cast, Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 
@@ -102,7 +102,11 @@ def _pop_measurements(
         measurements: List of measurements in the circuit.
     """
     measurements = list(circuit.findall_operations(_is_measurement))
-    circuit.batch_remove(measurements)
+    if measurements:
+        circuit.batch_remove(measurements)
+        # Remove the last moment too if left empty.
+        if len(circuit[-1]) == 0:
+            del circuit[-1]
     return measurements
 
 
@@ -169,12 +173,6 @@ def _equal(
                 )
             ]
             circ.batch_remove(measurements)
-
-            for i in range(len(measurements)):
-                gate = cast(MeasurementGate, measurements[i][1].gate)
-                gate.key = ""
-
-            circ.batch_insert(measurements)
 
     return CircuitDag.from_circuit(circuit_one) == CircuitDag.from_circuit(
         circuit_two
