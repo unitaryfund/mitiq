@@ -102,7 +102,11 @@ def _pop_measurements(
         measurements: List of measurements in the circuit.
     """
     measurements = list(circuit.findall_operations(_is_measurement))
-    circuit.batch_remove(measurements)
+    if measurements:
+        circuit.batch_remove(measurements)
+        # Remove the last moment too if left empty.
+        if len(circuit[-1]) == 0:
+            del circuit[-1]
     return measurements
 
 
