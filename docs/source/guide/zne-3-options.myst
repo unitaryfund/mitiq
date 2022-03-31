@@ -335,11 +335,11 @@ noise_scaling_function = partial(
 factory = zne.inference.ExpFactory(scale_factors=[1, 2, 3], asymptote=0.25)
 
 zne_value = zne.execute_with_zne(
-    circuit,
-    executor,
-    execute,
-    scale_noise=noise_scaling_function,
+    circuit=circuit,
+    executor=executor,
+    observable=None,
     factory=factory,
+    scale_noise=noise_scaling_function,
     num_to_average=3,
 )
 
