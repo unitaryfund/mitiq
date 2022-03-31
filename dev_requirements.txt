@@ -17,7 +17,10 @@ sphinxcontrib-bibtex~=2.4.1
 sphinx-copybutton~=0.5.0
 sphinx-autodoc-typehints~=1.17.0
 myst-nb~=0.13.2
-pydata-sphinx-theme~=0.8.0
+pydata-sphinx-theme~=0.8.1
 jupytext~=1.13.7
 sphinx-gallery~=0.10.1
 nbsphinx~=0.8.8
+
+# The following seems to be necessary for sphinx to run.
+jinja2~=3.0.3
