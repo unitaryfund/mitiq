@@ -20,8 +20,6 @@ from typing import cast, List, Optional
 import numpy as np
 from scipy.optimize import minimize, LinearConstraint
 
-from cirq import channel
-
 from mitiq import QPROGRAM
 from mitiq.interface import convert_to_mitiq
 from mitiq.pec.types import NoisyBasis, OperationRepresentation

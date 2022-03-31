@@ -22,7 +22,6 @@ import numpy as np
 from cirq import (
     Circuit,
     Z,
-    channel,
     AmplitudeDampingChannel,
     reset,
 )

@@ -27,7 +27,6 @@ from cirq import (
     Circuit,
     is_measurement,
     DepolarizingChannel,
-    channel,
 )
 
 from mitiq import QPROGRAM
