@@ -56,26 +56,41 @@ def single_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
         *PRX QUANTUM* **2**, 040330 (2021),
         (https://arxiv.org/abs/2005.07601v2).
     """
-    a = 1 - epsilon
-    b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
-    c = epsilon / (3 * (eta + 1))
-    eta1 = (-(a**2) + a * b + 2 * c**2) / (
-        -(a**3)
-        + a**2 * b
-        + a * b**2
-        + 4 * a * c**2
-        - b**3
-        + 4 * b * c**2
+
+    eta1 = (
+        6 * epsilon**2 * eta
+        + 4 * epsilon**2
+        - 9 * epsilon * eta**2
+        - 24 * epsilon * eta
+        - 15 * epsilon
+        + 9 * eta**2
+        + 18 * eta
+        + 9
+    ) / (
+        24 * epsilon**2 * eta
+        + 16 * epsilon**2
+        - 18 * epsilon * eta**2
+        - 42 * epsilon * eta
+        - 24 * epsilon
+        + 9 * eta**2
+        + 18 * eta
+        + 9
     )
-    eta2 = -(a * b - b**2 + 2 * c**2) / (
-        -(a**3)
-        + a**2 * b
-        + a * b**2
-        + 4 * a * c**2
-        - b**3
-        + 4 * b * c**2
+    eta2 = (
+        epsilon
+        * (6 * epsilon * eta + 4 * epsilon - 9 * eta**2 - 12 * eta - 3)
+        / (
+            24 * epsilon**2 * eta
+            + 16 * epsilon**2
+            - 18 * epsilon * eta**2
+            - 42 * epsilon * eta
+            - 24 * epsilon
+            + 9 * eta**2
+            + 18 * eta
+            + 9
+        )
     )
-    eta3 = c / (a**2 - 2 * a * b + b**2 - 4 * c**2)
+    eta3 = epsilon / (4 * epsilon - 3 * eta - 3)
 
     return eta1 + eta2 + 2 * eta3
 
