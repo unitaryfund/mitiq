@@ -17,9 +17,10 @@
 from typing import Sequence
 
 import numpy as np
+import numpy.typing as npt
 
 
-def linear_fit_function(x_data: np.ndarray, params: Sequence[float]) -> float:
+def linear_fit_function(x_data: npt.NDArray[np.float64], params: Sequence[float]) -> float:
     """Returns y(x) = a_1 x_1 + ... + a_n x_n + b.
 
     Args:
@@ -32,7 +33,7 @@ def linear_fit_function(x_data: np.ndarray, params: Sequence[float]) -> float:
 
 
 def linear_fit_function_no_intercept(
-    x_data: np.ndarray, params: Sequence[float]
+    x_data: npt.NDArray[np.float64], params: Sequence[float]
 ) -> float:
     """Returns y(x) = a_1 x_1 + ... + a_n x_n.
 
