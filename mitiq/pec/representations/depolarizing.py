@@ -18,6 +18,7 @@
 from typing import List
 from itertools import product
 import numpy as np
+import numpy.typing as npt
 
 from cirq import (
     Operation,
@@ -338,7 +339,7 @@ def represent_operations_in_circuit_with_local_depolarizing_noise(
 def global_depolarizing_kraus(
     noise_level: float,
     num_qubits: int,
-) -> List[np.ndarray]:
+) -> List[npt.NDArray[np.complex64]]:
     """Returns the kraus operators of a global depolarizing channel at a
     given noise level.
     """
@@ -349,7 +350,7 @@ def global_depolarizing_kraus(
 def local_depolarizing_kraus(
     noise_level: float,
     num_qubits: int,
-) -> List[np.ndarray]:
+) -> List[npt.NDArray[np.complex64]]:
     """Returns the kraus operators of the tensor product of local
     depolarizing channels acting on each qubit.
     """

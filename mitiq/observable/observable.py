@@ -139,7 +139,7 @@ class Observable:
         )
 
     def _expectation_from_density_matrix(
-        self, density_matrix: np.ndarray
+        self, density_matrix: npt.NDArray[np.complex64]
     ) -> float:
         observable_matrix = self.matrix()
 

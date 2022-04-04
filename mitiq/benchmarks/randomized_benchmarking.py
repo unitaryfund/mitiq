@@ -17,6 +17,7 @@
 from typing import List, Optional, cast
 
 import numpy as np
+import numpy.typing as npt
 
 from cirq.experiments.qubit_characterizations import (
     _single_qubit_cliffords,
@@ -63,7 +64,7 @@ def generate_rb_circuits(
     if n_qubits == 1:
         c1 = cliffords.c1_in_xy
         cfd_mat_1q = cast(
-            np.ndarray, [_gate_seq_to_mats(gates) for gates in c1]
+            npt.NDArray[np.complex64], [_gate_seq_to_mats(gates) for gates in c1]
         )
         circuits = [
             _random_single_q_clifford(qubits[0], num_cliffords, c1, cfd_mat_1q)

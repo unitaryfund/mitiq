@@ -18,6 +18,7 @@ from typing import List
 from itertools import product
 
 import numpy as np
+import numpy.typing as npt
 
 from cirq import (
     Circuit,
@@ -99,7 +100,7 @@ def _represent_operation_with_amplitude_damping_noise(
 def amplitude_damping_kraus(
     noise_level: float,
     num_qubits: int,
-) -> List[np.ndarray]:
+) -> List[npt.NDArray[np.complex64]]:
     """Returns the Kraus operators of the tensor product of local
     depolarizing channels acting on each qubit.
     """
