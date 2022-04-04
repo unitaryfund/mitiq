@@ -19,7 +19,7 @@ import numpy as np
 import numpy.typing as npt
 
 
-def _get_circuit_mask(circuit: Circuit) -> np.ndarray:
+def _get_circuit_mask(circuit: Circuit) -> npt.NDArray[np.int64]:
     """Given a circuit with n qubits and d moments returns a matrix
     A with n rows and d columns. The matrix elements are A_{i,j} = 1 if
     there is a gate acting on qubit i at moment j, while A_{i,j} = 0 otherwise.
@@ -43,7 +43,7 @@ def _get_circuit_mask(circuit: Circuit) -> np.ndarray:
     return mask_matrix
 
 
-def _validate_integer_matrix(mask: np.ndarray) -> None:
+def _validate_integer_matrix(mask: npt.NDArray[np.int64]) -> None:
     """Ensures the input is a NumPy 2d array with integer elements."""
     if not isinstance(mask, np.ndarray):
         raise TypeError("The input matrix must be a numpy.ndarray object.")

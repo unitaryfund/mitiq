@@ -32,6 +32,7 @@ import warnings
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy.typing as npt
 from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
 from cirq import Circuit
@@ -114,7 +115,7 @@ def mitiq_curve_fit(
     scale_factors: Sequence[float],
     exp_values: Sequence[float],
     init_params: Optional[List[float]] = None,
-) -> Tuple[List[float], np.ndarray]:
+) -> Tuple[List[float], npt.NDArray[np.complex64]]:
     """Fits the ansatz to the (scale factor, expectation value) data using
     ``scipy.optimize.curve_fit``, returning the optimal parameters and
     covariance matrix of the parameters.
@@ -161,7 +162,7 @@ def mitiq_polyfit(
     exp_values: Sequence[float],
     deg: int,
     weights: Optional[Sequence[float]] = None,
-) -> Tuple[List[float], Optional[np.ndarray]]:
+) -> Tuple[List[float], Optional[npt.NDArray[np.complex64]]]:
     """Fits the ansatz to the (scale factor, expectation value) data using
     ``numpy.polyfit``, returning the optimal parameters and covariance matrix
     of the parameters.
@@ -224,14 +225,14 @@ class Factory(ABC):
         self._instack: List[Dict[str, float]] = []
         self._outstack: List[float] = []
         self._opt_params: Optional[List[float]] = None
-        self._params_cov: Optional[np.ndarray] = None
+        self._params_cov: Optional[npt.NDArray[np.complex64]] = None
         self._zne_limit: Optional[float] = None
         self._zne_error: Optional[float] = None
         self._zne_curve: Optional[Callable[[float], float]] = None
         self._already_reduced = False
         self._options: Dict[str, Optional[float]] = {}
 
-    def get_scale_factors(self) -> np.ndarray:
+    def get_scale_factors(self) -> npt.NDArray[np.complex64]:
         """Returns the scale factors at which the factory has computed
         expectation values.
         """
@@ -239,11 +240,11 @@ class Factory(ABC):
             [params.get("scale_factor") for params in self._instack]
         )
 
-    def get_expectation_values(self) -> np.ndarray:
+    def get_expectation_values(self) -> npt.NDArray[np.complex64]:
         """Returns the expectation values computed by the factory."""
         return np.array(self._outstack)
 
-    def get_optimal_parameters(self) -> np.ndarray:
+    def get_optimal_parameters(self) -> npt.NDArray[np.complex64]:
         """Returns the optimal model parameters produced by the extrapolation
         fit.
         """
@@ -251,7 +252,7 @@ class Factory(ABC):
             raise ValueError(DATA_MISSING_ERR)
         return np.array(self._opt_params)
 
-    def get_parameters_covariance(self) -> np.ndarray:
+    def get_parameters_covariance(self) -> npt.NDArray[np.complex64]:
         """Returns the covariance matrix of the model parameters produced by
         the extrapolation fit.
         """

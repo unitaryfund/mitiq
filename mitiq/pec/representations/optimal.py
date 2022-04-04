@@ -18,6 +18,7 @@
 from typing import cast, List, Optional
 
 import numpy as np
+import numpy.typing as npt
 from scipy.optimize import minimize, LinearConstraint
 
 from cirq import kraus
@@ -29,11 +30,11 @@ from mitiq.pec.channels import matrix_to_vector, kraus_to_super
 
 
 def minimize_one_norm(
-    ideal_matrix: np.ndarray,
-    basis_matrices: List[np.ndarray],
+    ideal_matrix: npt.NDArray[np.complex64],
+    basis_matrices: List[npt.NDArray[np.complex64]],
     tol: float = 1.0e-8,
-    initial_guess: Optional[np.ndarray] = None,
-) -> np.ndarray:
+    initial_guess: Optional[npt.NDArray[np.complex64]] = None,
+) -> npt.NDArray[np.complex64]:
     r"""
     Returns the list of real coefficients :math:`[x_0, x_1, \dots]`,
     which minimizes :math:`\sum_j |x_j|` with the contraint that
@@ -80,7 +81,7 @@ def minimize_one_norm(
 
     constraint = LinearConstraint(matrix_a, lb=array_b - tol, ub=array_b + tol)
 
-    def one_norm(x: np.ndarray) -> float:
+    def one_norm(x: npt.NDArray[np.complex64]) -> float:
         return np.linalg.norm(x, 1)
 
     if initial_guess is None:
@@ -98,7 +99,7 @@ def find_optimal_representation(
     ideal_operation: QPROGRAM,
     noisy_basis: NoisyBasis,
     tol: float = 1.0e-8,
-    initial_guess: Optional[np.ndarray] = None,
+    initial_guess: Optional[npt.NDArray[np.complex64]] = None,
 ) -> OperationRepresentation:
     r"""Returns the ``OperationRepresentaiton`` of the input ideal operation
     which minimizes the one-norm of the associated quasi-probability
@@ -127,7 +128,7 @@ def find_optimal_representation(
     """
     ideal_cirq_circuit, _ = convert_to_mitiq(ideal_operation)
     ideal_matrix = kraus_to_super(
-        cast(List[np.ndarray], kraus(ideal_cirq_circuit))
+        cast(List[npt.NDArray[np.complex64]], kraus(ideal_cirq_circuit))
     )
     basis_set = noisy_basis.elements
 

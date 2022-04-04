@@ -19,6 +19,7 @@ from itertools import product
 from typing import Any, cast, Dict, List, Optional, Sequence, Set, Tuple, Union
 
 import numpy as np
+import numpy.typing as npt
 
 import cirq
 from cirq.value.linear_dict import _format_coefficient
@@ -39,7 +40,7 @@ class NoisyOperation:
     """
 
     def __init__(
-        self, circuit: QPROGRAM, channel_matrix: Optional[np.ndarray] = None
+        self, circuit: QPROGRAM, channel_matrix: Optional[npt.NDArray[np.complex64]] = None
     ) -> None:
         """Initializes a NoisyOperation.
 
@@ -68,7 +69,7 @@ class NoisyOperation:
 
     @staticmethod
     def from_cirq(
-        circuit: cirq.CIRCUIT_LIKE, channel_matrix: Optional[np.ndarray] = None
+        circuit: cirq.CIRCUIT_LIKE, channel_matrix: Optional[npt.NDArray[np.complex64]] = None
     ) -> "NoisyOperation":
         if isinstance(circuit, cirq.Gate):
             qubits = tuple(cirq.LineQubit.range(circuit.num_qubits()))
@@ -93,7 +94,7 @@ class NoisyOperation:
     def _init_from_cirq(
         self,
         circuit: cirq.Circuit,
-        channel_matrix: Optional[np.ndarray] = None,
+        channel_matrix: Optional[npt.NDArray[np.complex64]] = None,
     ) -> None:
         """Initializes a noisy operation expressed as a Cirq circuit.
 
@@ -134,7 +135,7 @@ class NoisyOperation:
     def on_each(
         circuit: cirq.CIRCUIT_LIKE,
         qubits: Sequence[List[cirq.Qid]],
-        channel_matrix: Optional[np.ndarray] = None,
+        channel_matrix: Optional[npt.NDArray[np.complex64]] = None,
     ) -> List["NoisyOperation"]:
         """Returns a NoisyOperation(circuit, channel_matrix) on each
         qubit in qubits.
@@ -229,15 +230,15 @@ class NoisyOperation:
         return len(self.qubits)
 
     @property
-    def ideal_unitary(self) -> np.ndarray:
+    def ideal_unitary(self) -> npt.NDArray[np.complex64]:
         return cirq.unitary(self._circuit)
 
     @property
-    def ideal_channel_matrix(self) -> np.ndarray:
+    def ideal_channel_matrix(self) -> npt.NDArray[np.complex64]:
         raise NotImplementedError
 
     @property
-    def channel_matrix(self) -> np.ndarray:
+    def channel_matrix(self) -> npt.NDArray[np.complex64]:
         if self._channel_matrix is None:
             raise ValueError("The channel matrix is unknown.")
         return deepcopy(self._channel_matrix)
@@ -461,7 +462,7 @@ class OperationRepresentation:
         """Returns the L1 norm of the basis expansion coefficients."""
         return self._norm
 
-    def distribution(self) -> np.ndarray:
+    def distribution(self) -> npt.NDArray[np.complex64]:
         """Returns the Quasi-Probability Representation (QPR) of the
         decomposition. The QPR is the normalized magnitude of each coefficient
         in the basis expansion.
