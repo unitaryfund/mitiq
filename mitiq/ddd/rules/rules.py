@@ -27,8 +27,8 @@ def xx(
 
     Args:
         slack_length: Length of idle window to fill.
-        num_repetitions: How many repetitions of the dd rule to apply. Default
-            to 1.
+        num_repetitions: How many repetitions of the ddd rule to apply within
+            the slack window. Default to 1.
         spacing: How many identity spacing gates to apply between dynamical
             decoupling gates, as a positive-value int. Defaults to evenly
             spaced.
@@ -40,6 +40,15 @@ def xx(
     slack_difference = slack_length - num_decoupling_gates
     if spacing < 0:
         spacing = slack_difference // (num_decoupling_gates + 1)
+    slack_remainder = slack_length - (
+        spacing * (num_decoupling_gates + 1) + num_decoupling_gates
+    )
+    if slack_remainder < 0:
+        raise ValueError(
+            "Rule too long for given slack window by {} moments.".format(
+                slack_remainder * -1
+            )
+        )
     q = LineQubit(0)
     slack_gates = [I(q) for _ in range(spacing)]
     ddd_circuit = Circuit(
@@ -51,9 +60,6 @@ def xx(
             )
             for _ in range(num_decoupling_gates)
         ],
-    )
-    slack_remainder = slack_length - (
-        spacing * (num_decoupling_gates + 1) + num_decoupling_gates
     )
     for i in range(slack_remainder):
         ddd_circuit.append(I(q)) if i % 2 else ddd_circuit.insert(0, I(q))
@@ -67,8 +73,8 @@ def xyxy(
 
     Args:
         slack_length: Length of idle window to fill.
-        num_repetitions: How many repetitions of the dd rule to apply. Default
-            to 1.
+        num_repetitions: How many repetitions of the ddd rule to apply within
+            the slack window. Default to 1.
         spacing: How many identity spacing gates to apply between dynamical
             decoupling gates, as a positive-value int. Defaults to evenly
             spaced.
@@ -80,6 +86,16 @@ def xyxy(
     slack_difference = slack_length - num_decoupling_gates
     if spacing < 0:
         spacing = slack_difference // (num_decoupling_gates + 1)
+    slack_remainder = slack_length - (
+        spacing * (num_decoupling_gates + 1) + num_decoupling_gates
+    )
+    if slack_remainder < 0:
+        raise ValueError(
+            "Rule too long for given slack window by {} moments.".format(
+                slack_remainder * -1
+            )
+        )
+    print(slack_remainder)
     q = LineQubit(0)
     slack_gates = [I(q) for _ in range(spacing)]
     ddd_circuit = Circuit(
@@ -91,9 +107,6 @@ def xyxy(
             )
             for i in range(num_decoupling_gates)
         ],
-    )
-    slack_remainder = slack_length - (
-        spacing * (num_decoupling_gates + 1) + num_decoupling_gates
     )
     for i in range(slack_remainder):
         ddd_circuit.append(I(q)) if i % 2 else ddd_circuit.insert(0, I(q))
@@ -107,8 +120,8 @@ def yy(
 
     Args:
         slack_length: Length of idle window to fill.
-        num_repetitions: How many repetitions of the dd rule to apply. Default
-            to 1.
+        num_repetitions: How many repetitions of the ddd rule to apply within
+            the slack window. Default to 1.
         spacing: How many identity spacing gates to apply between dynamical
             decoupling gates, as a positive-value int. Defaults to evenly
             spaced.
@@ -120,6 +133,15 @@ def yy(
     slack_difference = slack_length - num_decoupling_gates
     if spacing < 0:
         spacing = slack_difference // (num_decoupling_gates + 1)
+    slack_remainder = slack_length - (
+        spacing * (num_decoupling_gates + 1) + num_decoupling_gates
+    )
+    if slack_remainder < 0:
+        raise ValueError(
+            "Rule too long for given slack window by {} moments.".format(
+                slack_remainder * -1
+            )
+        )
     q = LineQubit(0)
     slack_gates = [I(q) for _ in range(spacing)]
     ddd_circuit = Circuit(
@@ -131,9 +153,6 @@ def yy(
             )
             for _ in range(num_decoupling_gates)
         ],
-    )
-    slack_remainder = slack_length - (
-        spacing * (num_decoupling_gates + 1) + num_decoupling_gates
     )
     for i in range(slack_remainder):
         ddd_circuit.append(I(q)) if i % 2 else ddd_circuit.insert(0, I(q))
