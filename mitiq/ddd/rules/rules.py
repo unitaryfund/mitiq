@@ -52,6 +52,9 @@ def xx(
             for _ in range(num_decoupling_gates)
         ],
     )
+    slack_remainder = slack_length - (spacing * (num_decoupling_gates + 1) + num_decoupling_gates)
+    for i in range(slack_remainder):
+        ddd_circuit.append(I(q)) if i % 2 else ddd_circuit.insert(0, I(q))
     return ddd_circuit
 
 
@@ -87,6 +90,9 @@ def xyxy(
             for i in range(num_decoupling_gates)
         ],
     )
+    slack_remainder = slack_length - (spacing * (num_decoupling_gates + 1) + num_decoupling_gates)
+    for i in range(slack_remainder):
+        ddd_circuit.append(I(q)) if i % 2 else ddd_circuit.insert(0, I(q))
     return ddd_circuit
 
 
@@ -122,4 +128,7 @@ def yy(
             for _ in range(num_decoupling_gates)
         ],
     )
+    slack_remainder = slack_length - (spacing * (num_decoupling_gates + 1) + num_decoupling_gates)
+    for i in range(slack_remainder):
+        ddd_circuit.append(I(q)) if i % 2 else ddd_circuit.insert(0, I(q))
     return ddd_circuit
