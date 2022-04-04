@@ -59,6 +59,7 @@ jobs:
           make linkcheck
     # Push the book's HTML to github-pages
       - name: GitHub Pages action
+        if: github.event.pull_request.head.repo.full_name == github.repository
         uses: peaceiris/actions-gh-pages@v3.8.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

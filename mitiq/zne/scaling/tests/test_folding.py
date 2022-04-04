@@ -912,6 +912,8 @@ def test_global_fold_stretch_factor_of_three_with_terminal_measurements():
     folded = fold_global(circ + meas, scale_factor=3.0)
     correct = Circuit(circ, inverse(circ), circ, meas)
     assert _equal(folded, correct)
+    # Test the number of moments too
+    assert len(folded) == len(correct)
 
 
 def test_global_fold_stretch_factor_nine_with_terminal_measurements():
