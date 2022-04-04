@@ -92,7 +92,7 @@ def single_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
     )
     eta3 = epsilon / (4 * epsilon - 3 * eta - 3)
 
-    return eta1 + eta2 - 2 * eta3
+    return abs(eta1) + abs(eta2) + 2 * abs(eta3)
 
 
 def two_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
