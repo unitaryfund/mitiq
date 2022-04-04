@@ -16,3 +16,143 @@
 """Built-in rules determining what DDD sequence should be applied in a given
 slack window.
 """
+
+from cirq import Circuit, X, Y, I, LineQubit  # , Z
+
+
+def xx(
+    slack_length: int, num_repetitions: int = 1, spacing: int = -1
+) -> Circuit:
+    """Returns an XX digital dynamical decoupling sequence, based on inputs.
+
+    Args:
+        slack_length: Length of idle window to fill.
+        num_repetitions: How many repetitions of the dd rule to apply. Default
+            to 1.
+        spacing: How many identity spacing gates to apply between dynamical
+            decoupling gates, as a positive-value int. Defaults to evenly
+            spaced.
+    Returns:
+        An XX digital dynamical decoupling sequence, as a cirq circuit
+    """
+    default_length = 2
+    num_decoupling_gates = default_length * num_repetitions
+    slack_difference = slack_length - num_decoupling_gates
+    if spacing < 0:
+        spacing = slack_difference // num_decoupling_gates
+    uniform_spacing = (
+        1
+        if spacing == 1
+        else spacing * num_decoupling_gates // (num_decoupling_gates + 1)
+    )
+    slack_remainder = slack_difference - num_decoupling_gates * spacing
+    q = LineQubit(0)
+    slack_gates = [I(q) for _ in range(uniform_spacing)]
+    slack_fill = [I(q) for _ in range(slack_remainder)]
+    ddd_circuit = Circuit(
+        slack_fill[: slack_remainder // 2],
+        slack_gates,
+        [
+            (
+                X(q),
+                slack_gates,
+            )
+            for _ in range(num_decoupling_gates)
+        ],
+        slack_fill[slack_remainder // 2 :],
+    )
+    return ddd_circuit
+
+
+def xyxy(
+    slack_length: int, num_repetitions: int = 1, spacing: int = -1
+) -> Circuit:
+    """Returns an XYXY digital dynamical decoupling sequence, based on inputs.
+
+    Args:
+        slack_length: Length of idle window to fill.
+        num_repetitions: How many repetitions of the dd rule to apply. Default
+            to 1.
+        spacing: How many identity spacing gates to apply between dynamical
+            decoupling gates, as a positive-value int. Defaults to evenly
+            spaced.
+    Returns:
+        An XYXY digital dynamical decoupling sequence, as a cirq circuit
+    """
+    default_length = 4
+    num_decoupling_gates = default_length * num_repetitions
+    slack_difference = slack_length - num_decoupling_gates
+    if spacing < 0:
+        spacing = slack_difference // num_decoupling_gates
+    uniform_spacing = (
+        1
+        if spacing == 1
+        else spacing * num_decoupling_gates // (num_decoupling_gates + 1)
+    )
+    slack_remainder = slack_difference - num_decoupling_gates * spacing
+    q = LineQubit(0)
+    slack_gates = [I(q) for _ in range(uniform_spacing)]
+    slack_fill = [I(q) for _ in range(slack_remainder)]
+    ddd_circuit = Circuit(
+        slack_fill[: slack_remainder // 2],
+        slack_gates,
+        [
+            (
+                X(q),
+                slack_gates,
+                Y(q),
+                slack_gates,
+                X(q),
+                slack_gates,
+                Y(q),
+                slack_gates,
+            )
+            for _ in range(num_repetitions)
+        ],
+        slack_fill[slack_remainder // 2 :],
+    )
+    return ddd_circuit
+
+
+def yy(
+    slack_length: int, num_repetitions: int = 1, spacing: int = -1
+) -> Circuit:
+    """Returns a YY digital dynamical decoupling sequence, based on inputs.
+
+    Args:
+        slack_length: Length of idle window to fill.
+        num_repetitions: How many repetitions of the dd rule to apply. Default
+            to 1.
+        spacing: How many identity spacing gates to apply between dynamical
+            decoupling gates, as a positive-value int. Defaults to evenly
+            spaced.
+    Returns:
+        An YY digital dynamical decoupling sequence, as a cirq circuit
+    """
+    default_length = 2
+    num_decoupling_gates = default_length * num_repetitions
+    slack_difference = slack_length - num_decoupling_gates
+    if spacing < 0:
+        spacing = slack_difference // num_decoupling_gates
+    uniform_spacing = (
+        1
+        if spacing == 1
+        else spacing * num_decoupling_gates // (num_decoupling_gates + 1)
+    )
+    slack_remainder = slack_difference - num_decoupling_gates * spacing
+    q = LineQubit(0)
+    slack_gates = [I(q) for _ in range(uniform_spacing)]
+    slack_fill = [I(q) for _ in range(slack_remainder)]
+    ddd_circuit = Circuit(
+        slack_fill[: slack_remainder // 2],
+        slack_gates,
+        [
+            (
+                Y(q),
+                slack_gates,
+            )
+            for _ in range(num_decoupling_gates)
+        ],
+        slack_fill[slack_remainder // 2 :],
+    )
+    return ddd_circuit
