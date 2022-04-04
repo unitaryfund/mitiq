@@ -76,7 +76,8 @@ def single_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
         + 18 * eta
         + 9
     )
-    eta2 = (
+    eta2 = epsilon / (4 * epsilon - 3 * eta - 3)
+    eta3 = (
         epsilon
         * (6 * epsilon * eta + 4 * epsilon - 9 * eta**2 - 12 * eta - 3)
         / (
@@ -90,9 +91,8 @@ def single_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
             + 9
         )
     )
-    eta3 = epsilon / (4 * epsilon - 3 * eta - 3)
 
-    return abs(eta1) + abs(eta2) + 2 * abs(eta3)
+    return abs(eta1) + 2 * abs(eta2) + abs(eta3)
 
 
 def two_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
@@ -119,7 +119,7 @@ def two_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
         * (5 * eta + 1)
         / (15 * (1 - epsilon) * (eta + 1) + epsilon * (5 * eta + 1))
     )
-    return eta1 + 12 * eta2 + 3 * eta3
+    return abs(eta1) + 12 * abs(eta2) + 3 * abs(eta3)
 
 
 @pytest.mark.parametrize("epsilon", [0, 0.1, 0.7])
@@ -170,6 +170,7 @@ def test_biased_noise_representation_with_choi(
     )
     choi_components = []
 
+    # Define biased noise channel
     a = 1 - epsilon
     b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
     c = epsilon / (3 * (eta + 1))

@@ -123,7 +123,8 @@ def represent_operation_with_biased_noise(
             + 18 * eta
             + 9
         )
-        alpha_2 = (
+        alpha_2 = epsilon / (4 * epsilon - 3 * eta - 3)
+        alpha_3 = (
             epsilon
             * (6 * epsilon * eta + 4 * epsilon - 9 * eta**2 - 12 * eta - 3)
             / (
@@ -137,9 +138,8 @@ def represent_operation_with_biased_noise(
                 + 9
             )
         )
-        alpha_3 = epsilon / (4 * epsilon - 3 * eta - 3)
 
-        alphas = [alpha_1] + [alpha_2] + 2 * [alpha_3]
+        alphas = [alpha_1] + 2 * [alpha_2] + [alpha_3]
         post_ops = [[]]  # for eta_1, we do nothing, rather than I
         post_ops += [[P(q)] for P in [X, Y, Z]]  # 1Q Paulis
 
