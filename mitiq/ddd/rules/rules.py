@@ -16,8 +16,7 @@
 """Built-in rules determining what DDD sequence should be applied in a given
 slack window.
 """
-
-from cirq import Circuit, X, Y, I, LineQubit, Gate, Z
+from cirq import Circuit, X, Y, I, Z, LineQubit, Gate
 from typing import List, Optional
 
 from itertools import cycle
@@ -32,9 +31,9 @@ def construct_rule(
     Args:
         slack_length: Length of idle window to fill.
         num_repetitions: How many repetitions of the ddd rule to apply within
-            the slack window. Default to 1.
+            the slack window, as a positive int. Default to 1.
         spacing: How many identity spacing gates to apply between dynamical
-            decoupling gates, as a positive-value int. Defaults to evenly
+            decoupling gates, as a non-negative int. Defaults to evenly
             spaced.
         gates: A list of Cirq gates to build the rule. E.g. [X, X] is the xx
             sequence, [X, Y, X, Y] is the xyxy sequence
@@ -42,6 +41,12 @@ def construct_rule(
         A digital dynamical decoupling sequence, as a cirq circuit
     """
     default_length = len(gates)
+    if not num_repetitions > 0:
+        raise ValueError(
+            "Invalid number of sequence repetitions: {}.".format(
+                num_repetitions
+            )
+        )
     num_decoupling_gates = default_length * num_repetitions
     slack_difference = slack_length - num_decoupling_gates
     if spacing < 0:
@@ -80,9 +85,9 @@ def xx(
     Args:
         slack_length: Length of idle window to fill.
         num_repetitions: How many repetitions of the ddd rule to apply within
-            the slack window. Default to 1.
+            the slack window, as a positive int. Default to 1.
         spacing: How many identity spacing gates to apply between dynamical
-            decoupling gates, as a positive-value int. Defaults to evenly
+            decoupling gates, as a non-negative int. Defaults to evenly
             spaced.
     Returns:
         An XX digital dynamical decoupling sequence, as a cirq circuit
@@ -104,9 +109,9 @@ def xyxy(
     Args:
         slack_length: Length of idle window to fill.
         num_repetitions: How many repetitions of the ddd rule to apply within
-            the slack window. Default to 1.
+            the slack window, as a positive int. Default to 1.
         spacing: How many identity spacing gates to apply between dynamical
-            decoupling gates, as a positive-value int. Defaults to evenly
+            decoupling gates, as a non-negative int. Defaults to evenly
             spaced.
     Returns:
         An XYXY digital dynamical decoupling sequence, as a cirq circuit
@@ -128,9 +133,9 @@ def yy(
     Args:
         slack_length: Length of idle window to fill.
         num_repetitions: How many repetitions of the ddd rule to apply within
-            the slack window. Default to 1.
+            the slack window, as a positive int. Default to 1.
         spacing: How many identity spacing gates to apply between dynamical
-            decoupling gates, as a positive-value int. Defaults to evenly
+            decoupling gates, as a non-negative int. Defaults to evenly
             spaced.
     Returns:
         An YY digital dynamical decoupling sequence, as a cirq circuit
@@ -156,9 +161,9 @@ def random(
         slack_length: Length of idle window to fill.
         sequence_length: Length of the random sequence.
         num_repetitions: How many repetitions of the ddd rule to apply within
-            the slack window. Default to 1.
+            the slack window, as a positive int. Default to 1.
         spacing: How many identity spacing gates to apply between dynamical
-            decoupling gates, as a positive-value int. Defaults to evenly
+            decoupling gates, as a non-negative int. Defaults to evenly
             spaced.
     Returns:
         A random digital dynamical decoupling sequence, as a cirq circuit
