@@ -14,12 +14,36 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tools to determine slack windows in circuits and to insert DDD sequences."""
-
+from cirq import Circuit
 import numpy as np
 import numpy.typing as npt
 
 
-def _validate_integer_matrix(mask: npt.NDArray[np.float64]) -> None:
+def _get_circuit_mask(circuit: Circuit) -> np.ndarray:
+    """Given a circuit with n qubits and d moments returns a matrix
+    A with n rows and d columns. The matrix elements are A_{i,j} = 1 if
+    there is a gate acting on qubit i at moment j, while A_{i,j} = 0 otherwise.
+
+    Args:
+        circuit: Input circuit to mask with n qubits and d moments
+
+    Returns:
+        A mask matrix with n rows and d columns
+    """
+    qubits = sorted(circuit.all_qubits())
+    indexed_qubits = [(i, n) for (i, n) in enumerate(qubits)]
+    mask_matrix = np.zeros((len(qubits), len(circuit)), dtype=int)
+    for moment_index, moment in enumerate(circuit):
+        for op in moment:
+            qubit_indices = [
+                qubit[0] for qubit in indexed_qubits if qubit[1] in op.qubits
+            ]
+            for qubit_index in qubit_indices:
+                mask_matrix[qubit_index, moment_index] = 1
+    return mask_matrix
+
+
+def _validate_integer_matrix(mask: np.ndarray) -> None:
     """Ensures the input is a NumPy 2d array with integer elements."""
     if not isinstance(mask, np.ndarray):
         raise TypeError("The input matrix must be a numpy.ndarray object.")
