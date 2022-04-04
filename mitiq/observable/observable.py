@@ -17,6 +17,7 @@ import copy
 from typing import Callable, cast, List, Optional, Set
 
 import numpy as np
+import numpy.typing as npt
 import cirq
 
 from mitiq.observable.pauli import PauliString, PauliStringCollection
@@ -109,7 +110,7 @@ class Observable:
         self,
         qubit_indices: Optional[List[int]] = None,
         dtype: type = np.complex128,
-    ) -> np.ndarray:
+    ) -> npt.NDArray[np.complex64]:
         """Returns the (potentially very large) matrix of the Observable."""
         if qubit_indices is None:
             qubit_indices = self.qubit_indices
