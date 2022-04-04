@@ -18,8 +18,8 @@ from mitiq.ddd.rules.rules import construct_rule, xx, xyxy, yy, random
 import pytest
 from cirq import X, Y, Z
 
-
-@pytest.mark.parametrize("slack_length", [i for i in range(2, 25)])
+phi = (1 + 5**0.5)/2.0
+@pytest.mark.parametrize("slack_length", [int(round((phi**n - (1-phi)**n) / 5**0.5)) for n in range(2,10)])
 @pytest.mark.parametrize("num_repetitions", [i for i in range(1, 5)])
 def test_rules(slack_length, num_repetitions):
     @pytest.mark.parametrize(
@@ -51,11 +51,9 @@ def test_rules(slack_length, num_repetitions):
         @pytest.mark.parametrize(
             "gates",
             [
-                [X, X],
                 [X, Y, X, Y],
                 [Y, Y],
-                [Y, X, Y, X],
-                [Z, X, Y, Z],
+                [X, Y, Z],
             ],
         )
         def test_user_spaced_rule_construct(gates):
@@ -113,9 +111,7 @@ def test_rules(slack_length, num_repetitions):
     [
         [X, X],
         [X, Y, X, Y],
-        [Y, Y],
-        [Y, X, Y, X],
-        [Z, X, Y, Z],
+        [X, Y, Z]
     ],
 )
 def test_negative_reps(num_repetitions, gates):
@@ -131,16 +127,12 @@ def test_negative_reps(num_repetitions, gates):
 @pytest.mark.parametrize(
     "gates",
     [
-        [X, X],
-        [X, Y, X, Y],
-        [Y, Y],
-        [Y, X, Y, X],
-        [Z, X, Y, Z],
+        [X, Y, Z]
     ],
 )
-@pytest.mark.parametrize("slack_length", [i for i in range(8, 20)])
+@pytest.mark.parametrize("slack_length", [int(round((phi**n - (1-phi)**n) / 5**0.5)) for n in range(2,10)])
 @pytest.mark.parametrize("num_repetitions", [i for i in range(2, 4)])
-@pytest.mark.parametrize("spacing", [i for i in range(3, 7)])
+@pytest.mark.parametrize("spacing", [i for i in range(5, 7)])
 def test_rule_failure(gates, slack_length, num_repetitions, spacing):
     rule_length = len(gates)
     num_decoupling_gates = rule_length * num_repetitions
