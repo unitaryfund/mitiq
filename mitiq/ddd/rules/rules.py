@@ -39,18 +39,10 @@ def xx(
     num_decoupling_gates = default_length * num_repetitions
     slack_difference = slack_length - num_decoupling_gates
     if spacing < 0:
-        spacing = slack_difference // num_decoupling_gates
-    uniform_spacing = (
-        1
-        if spacing == 1
-        else spacing * num_decoupling_gates // (num_decoupling_gates + 1)
-    )
-    slack_remainder = slack_difference - num_decoupling_gates * spacing
+        spacing = slack_difference // (num_decoupling_gates + 1)
     q = LineQubit(0)
-    slack_gates = [I(q) for _ in range(uniform_spacing)]
-    slack_fill = [I(q) for _ in range(slack_remainder)]
+    slack_gates = [I(q) for _ in range(spacing)]
     ddd_circuit = Circuit(
-        slack_fill[: slack_remainder // 2],
         slack_gates,
         [
             (
@@ -59,7 +51,6 @@ def xx(
             )
             for _ in range(num_decoupling_gates)
         ],
-        slack_fill[slack_remainder // 2 :],
     )
     return ddd_circuit
 
@@ -83,33 +74,18 @@ def xyxy(
     num_decoupling_gates = default_length * num_repetitions
     slack_difference = slack_length - num_decoupling_gates
     if spacing < 0:
-        spacing = slack_difference // num_decoupling_gates
-    uniform_spacing = (
-        1
-        if spacing == 1
-        else spacing * num_decoupling_gates // (num_decoupling_gates + 1)
-    )
-    slack_remainder = slack_difference - num_decoupling_gates * spacing
+        spacing = slack_difference // (num_decoupling_gates + 1)
     q = LineQubit(0)
-    slack_gates = [I(q) for _ in range(uniform_spacing)]
-    slack_fill = [I(q) for _ in range(slack_remainder)]
+    slack_gates = [I(q) for _ in range(spacing)]
     ddd_circuit = Circuit(
-        slack_fill[: slack_remainder // 2],
         slack_gates,
         [
             (
-                X(q),
-                slack_gates,
-                Y(q),
-                slack_gates,
-                X(q),
-                slack_gates,
-                Y(q),
+                Y(q) if i % 2 else X(q),
                 slack_gates,
             )
-            for _ in range(num_repetitions)
+            for i in range(num_decoupling_gates)
         ],
-        slack_fill[slack_remainder // 2 :],
     )
     return ddd_circuit
 
@@ -133,18 +109,10 @@ def yy(
     num_decoupling_gates = default_length * num_repetitions
     slack_difference = slack_length - num_decoupling_gates
     if spacing < 0:
-        spacing = slack_difference // num_decoupling_gates
-    uniform_spacing = (
-        1
-        if spacing == 1
-        else spacing * num_decoupling_gates // (num_decoupling_gates + 1)
-    )
-    slack_remainder = slack_difference - num_decoupling_gates * spacing
+        spacing = slack_difference // (num_decoupling_gates + 1)
     q = LineQubit(0)
-    slack_gates = [I(q) for _ in range(uniform_spacing)]
-    slack_fill = [I(q) for _ in range(slack_remainder)]
+    slack_gates = [I(q) for _ in range(spacing)]
     ddd_circuit = Circuit(
-        slack_fill[: slack_remainder // 2],
         slack_gates,
         [
             (
@@ -153,6 +121,5 @@ def yy(
             )
             for _ in range(num_decoupling_gates)
         ],
-        slack_fill[slack_remainder // 2 :],
     )
     return ddd_circuit
