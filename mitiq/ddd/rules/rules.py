@@ -193,10 +193,7 @@ def _random_pauli_gates(
     Returns:
         A random digital dynamical decoupling sequence, as a cirq circuit
     """
-    if seed is None:
-        random_state = np.random
-    else:
-        random_state = np.random.RandomState(seed)
+    random_state = np.random.RandomState(seed)
     random_paulis = random_state.choice(
         [X, Y, Z], size=slack_length, replace=True
     )
