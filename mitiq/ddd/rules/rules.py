@@ -16,11 +16,10 @@
 """Built-in rules determining what DDD sequence should be applied in a given
 slack window.
 """
-from cirq import Circuit, X, Y, I, Z, LineQubit, Gate
-from typing import List, Optional
+from cirq import Circuit, X, Y, I, LineQubit, Gate
+from typing import List
 
 from itertools import cycle
-import numpy as np
 
 
 def construct_rule(
