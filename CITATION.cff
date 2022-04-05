@@ -30,7 +30,7 @@ authors:
   - family-names: Zeng
     given-names: William
 cff-version: 1.2.0
-message: "If you use this software, please cite the article from preferred-citation."
+message: "If you use mitiq for academic or industry purposes, please cite this article about the software package."
 title: >-
   Mitiq: A software package for error mitigation on
   noisy quantum computers
