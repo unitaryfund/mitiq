@@ -59,4 +59,42 @@ preferred-citation:
   type: article
   date-released: 2020-09-09
   version: 3.0
-title: "Unity Fund Mitiq"
+title: >-
+  Mitiq: A software package for error mitigation on
+  noisy quantum computers
+identifiers:
+  - type: doi
+    value: 10.48550/ARXIV.2009.04417
+  - type: url
+    value: 'https://arxiv.org/abs/2009.04417'
+repository-code: 'https://github.com/unitaryfund/mitiq'
+url: 'https://github.com/unitaryfund/mitiq'
+repository: 'https://github.com/unitaryfund/mitiq'
+abstract: >-
+  We introduce Mitiq, a Python package for error
+  mitigation on noisy quantum computers. Error
+  mitigation techniques can reduce the impact of
+  noise on near-term quantum computers with minimal
+  overhead in quantum resources by relying on a
+  mixture of quantum sampling and classical
+  post-processing techniques. Mitiq is an extensible
+  toolkit of different error mitigation methods,
+  including zero-noise extrapolation, probabilistic
+  error cancellation, and Clifford data regression.
+  The library is designed to be compatible with
+  generic backends and interfaces with different
+  quantum software frameworks. We describe Mitiq
+  using code snippets to demonstrate usage and
+  discuss features and contribution guidelines. We
+  present several examples demonstrating error
+  mitigation on IBM and Rigetti superconducting
+  quantum processors as well as on noisy simulators.
+keywords:
+  - Quantum Physics
+  - Emerging Technologies
+  - Physical sciences
+  - Computer and information sciences
+license: GPL-3.0
+commit: 41e91ebc6a7c62ed97771b63be11a6886cb5d81d
+version: 0.9.3
+date-released: '2021-08-12'
