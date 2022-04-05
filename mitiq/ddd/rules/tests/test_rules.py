@@ -25,14 +25,13 @@ phi = (1 + 5**0.5) / 2.0
     "slack_length",
     [int(round((phi**n - (1 - phi) ** n) / 5**0.5)) for n in range(2, 10)],
 )
-@pytest.mark.parametrize("num_repetitions", [i for i in range(1, 5)])
-def test_rules(slack_length, num_repetitions):
+def test_rules(slack_length):
     @pytest.mark.parametrize(
         "rule",
         [
-            xx(slack_length, num_repetitions),
-            xyxy(slack_length, num_repetitions),
-            yy(slack_length, num_repetitions),
+            xx(slack_length),
+            xyxy(slack_length),
+            yy(slack_length),
         ],
     )
     def test_rule(rule):
@@ -44,7 +43,6 @@ def test_rules(slack_length, num_repetitions):
             random(
                 slack_length,
                 sequence_length=[i for i in range(slack_length)][0],
-                num_repetitions=num_repetitions,
             ),
         ],
     )
@@ -65,7 +63,6 @@ def test_rules(slack_length, num_repetitions):
             rule = (
                 construct_rule(
                     slack_length=slack_length,
-                    num_repetitions=num_repetitions,
                     spacing=spacing,
                     gates=gates,
                 ),
@@ -77,17 +74,14 @@ def test_rules(slack_length, num_repetitions):
             [
                 xx(
                     slack_length=slack_length,
-                    num_repetitions=num_repetitions,
                     spacing=spacing,
                 ),
                 xyxy(
                     slack_length=slack_length,
-                    num_repetitions=num_repetitions,
                     spacing=spacing,
                 ),
                 yy(
                     slack_length=slack_length,
-                    num_repetitions=num_repetitions,
                     spacing=spacing,
                 ),
             ],
@@ -101,28 +95,12 @@ def test_rules(slack_length, num_repetitions):
                 random(
                     slack_length=slack_length,
                     sequence_length=[i for i in range(1, slack_length + 1)][0],
-                    num_repetitions=num_repetitions,
                     spacing=spacing,
                 ),
             ],
         )
         def test_user_spaced_random_rule(rule):
             assert len(rule) == slack_length
-
-
-@pytest.mark.parametrize("num_repetitions", [i for i in range(-5, 0)])
-@pytest.mark.parametrize(
-    "gates",
-    [[X, X], [X, Y, X, Y], [X, Y, Z]],
-)
-def test_negative_reps(num_repetitions, gates):
-    with pytest.raises(ValueError, match="number of sequence repetitions"):
-        construct_rule(
-            slack_length=10,
-            num_repetitions=num_repetitions,
-            spacing=-1,
-            gates=gates,
-        )
 
 
 @pytest.mark.parametrize(
@@ -133,11 +111,9 @@ def test_negative_reps(num_repetitions, gates):
     "slack_length",
     [int(round((phi**n - (1 - phi) ** n) / 5**0.5)) for n in range(2, 10)],
 )
-@pytest.mark.parametrize("num_repetitions", [i for i in range(2, 4)])
 @pytest.mark.parametrize("spacing", [i for i in range(5, 7)])
-def test_rule_failure(gates, slack_length, num_repetitions, spacing):
-    rule_length = len(gates)
-    num_decoupling_gates = rule_length * num_repetitions
+def test_rule_failure(gates, slack_length, spacing):
+    num_decoupling_gates = len(gates)
     if slack_length < (
         (num_decoupling_gates + 1) * spacing + num_decoupling_gates
     ):
@@ -146,7 +122,6 @@ def test_rule_failure(gates, slack_length, num_repetitions, spacing):
         ):
             construct_rule(
                 slack_length=slack_length,
-                num_repetitions=num_repetitions,
                 spacing=spacing,
                 gates=gates,
             )

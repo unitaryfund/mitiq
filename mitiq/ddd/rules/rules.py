@@ -24,30 +24,22 @@ import numpy as np
 
 
 def construct_rule(
-    slack_length: int, num_repetitions: int, spacing: int, gates: List[Gate]
+    slack_length: int, spacing: int, gates: List[Gate]
 ) -> Circuit:
     """Returns a digital dynamical decoupling sequence, based on inputs.
 
     Args:
         slack_length: Length of idle window to fill.
-        num_repetitions: How many repetitions of the ddd rule to apply within
-            the slack window, as a positive int. Default to 1.
         spacing: How many identity spacing gates to apply between dynamical
             decoupling gates, as a non-negative int. Defaults to evenly
             spaced.
         gates: A list of Cirq gates to build the rule. E.g. [X, X] is the xx
             sequence, [X, Y, X, Y] is the xyxy sequence
+            - Note: To repeat the sequence, specify a repeated gateset
     Returns:
         A digital dynamical decoupling sequence, as a cirq circuit
     """
-    default_length = len(gates)
-    if not num_repetitions > 0:
-        raise ValueError(
-            "Invalid number of sequence repetitions: {}.".format(
-                num_repetitions
-            )
-        )
-    num_decoupling_gates = default_length * num_repetitions
+    num_decoupling_gates = len(gates)
     slack_difference = slack_length - num_decoupling_gates
     if spacing < 0:
         spacing = slack_difference // (num_decoupling_gates + 1)
@@ -77,15 +69,11 @@ def construct_rule(
     return ddd_circuit
 
 
-def xx(
-    slack_length: int, num_repetitions: int = 1, spacing: int = -1
-) -> Circuit:
+def xx(slack_length: int, spacing: int = -1) -> Circuit:
     """Returns an XX digital dynamical decoupling sequence, based on inputs.
 
     Args:
         slack_length: Length of idle window to fill.
-        num_repetitions: How many repetitions of the ddd rule to apply within
-            the slack window, as a positive int. Default to 1.
         spacing: How many identity spacing gates to apply between dynamical
             decoupling gates, as a non-negative int. Defaults to evenly
             spaced.
@@ -94,22 +82,17 @@ def xx(
     """
     xx_rule = construct_rule(
         slack_length=slack_length,
-        num_repetitions=num_repetitions,
         spacing=spacing,
         gates=[X, X],
     )
     return xx_rule
 
 
-def xyxy(
-    slack_length: int, num_repetitions: int = 1, spacing: int = -1
-) -> Circuit:
+def xyxy(slack_length: int, spacing: int = -1) -> Circuit:
     """Returns an XYXY digital dynamical decoupling sequence, based on inputs.
 
     Args:
         slack_length: Length of idle window to fill.
-        num_repetitions: How many repetitions of the ddd rule to apply within
-            the slack window, as a positive int. Default to 1.
         spacing: How many identity spacing gates to apply between dynamical
             decoupling gates, as a non-negative int. Defaults to evenly
             spaced.
@@ -118,22 +101,17 @@ def xyxy(
     """
     xyxy_rule = construct_rule(
         slack_length=slack_length,
-        num_repetitions=num_repetitions,
         spacing=spacing,
         gates=[X, Y, X, Y],
     )
     return xyxy_rule
 
 
-def yy(
-    slack_length: int, num_repetitions: int = 1, spacing: int = -1
-) -> Circuit:
+def yy(slack_length: int, spacing: int = -1) -> Circuit:
     """Returns a YY digital dynamical decoupling sequence, based on inputs.
 
     Args:
         slack_length: Length of idle window to fill.
-        num_repetitions: How many repetitions of the ddd rule to apply within
-            the slack window, as a positive int. Default to 1.
         spacing: How many identity spacing gates to apply between dynamical
             decoupling gates, as a non-negative int. Defaults to evenly
             spaced.
@@ -142,7 +120,6 @@ def yy(
     """
     yy_rule = construct_rule(
         slack_length=slack_length,
-        num_repetitions=num_repetitions,
         spacing=spacing,
         gates=[Y, Y],
     )
@@ -152,7 +129,6 @@ def yy(
 def random(
     slack_length: int,
     sequence_length: int,
-    num_repetitions: int = 1,
     spacing: int = -1,
 ) -> Circuit:
     """Returns a random digital dynamical decoupling sequence, based on inputs.
@@ -160,8 +136,6 @@ def random(
     Args:
         slack_length: Length of idle window to fill.
         sequence_length: Length of the random sequence.
-        num_repetitions: How many repetitions of the ddd rule to apply within
-            the slack window, as a positive int. Default to 1.
         spacing: How many identity spacing gates to apply between dynamical
             decoupling gates, as a non-negative int. Defaults to evenly
             spaced.
@@ -173,7 +147,6 @@ def random(
     )
     random_rule = construct_rule(
         slack_length=slack_length,
-        num_repetitions=num_repetitions,
         spacing=spacing,
         gates=random_gates,
     )
