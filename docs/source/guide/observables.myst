@@ -127,6 +127,10 @@ obs.expectation(circuit, execute=mitiq_cirq.sample_bitstrings)
 
 In error mitigation techniques, you can provide an observable to specify the expectation value to mitigate.
 
+```{admonition} Note:
+When specifying an `Observable`, you must ensure that the return type of the executor function is `MeasurementResultLike` or `DensityMatrixLike`.
+```
+
 ```{code-cell} ipython3
 from mitiq import zne
 ```
