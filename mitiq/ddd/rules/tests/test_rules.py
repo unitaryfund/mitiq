@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for DDD rules."""
-from mitiq.ddd.rules.rules import construct_rule, xx, xyxy, yy, random
+from mitiq.ddd.rules.rules import construct_rule, xx, xyxy, yy
 import pytest
 from cirq import X, Y, Z
 
@@ -35,18 +35,6 @@ def test_rules(slack_length):
         ],
     )
     def test_rule(rule):
-        assert len(rule) == slack_length
-
-    @pytest.mark.parametrize(
-        "rule",
-        [
-            random(
-                slack_length,
-                sequence_length=[i for i in range(slack_length)][0],
-            ),
-        ],
-    )
-    def test_random_rule(rule):
         assert len(rule) == slack_length
 
     @pytest.mark.parametrize("spacing", [i for i in range(slack_length)])
@@ -87,19 +75,6 @@ def test_rules(slack_length):
             ],
         )
         def test_user_spaced_rule(rule):
-            assert len(rule) == slack_length
-
-        @pytest.mark.parametrize(
-            "rule",
-            [
-                random(
-                    slack_length=slack_length,
-                    sequence_length=[i for i in range(1, slack_length + 1)][0],
-                    spacing=spacing,
-                ),
-            ],
-        )
-        def test_user_spaced_random_rule(rule):
             assert len(rule) == slack_length
 
 
