@@ -3,8 +3,12 @@ authors:
     given-names: Ryan
   - family-names: Mari
     given-names: Andrea
-  - family-names: Kaiser
-    given-names: Sarah
+  - given-names: Sarah
+    family-names: Kaiser
+    email: sckaiser@sckaiser.com
+    name-particle: Dr. Sarah Kaiser
+    affiliation: Unitary Fund
+    orcid: 'https://orcid.org/0000-0002-3149-6534'
   - family-names: Karalekas
     given-names: Peter
   - family-names: Alves
