@@ -124,4 +124,3 @@ def yy(slack_length: int, spacing: int = -1) -> Circuit:
         gates=[Y, Y],
     )
     return yy_rule
-
