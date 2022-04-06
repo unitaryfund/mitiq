@@ -312,12 +312,6 @@ def cdr_decorator(
             for ``method_replace='gaussian'``.
             - random_state (int): Seed for sampling.
     """
-    # Raise an error if the decorator is used without parenthesis
-    if callable(observable):
-        raise TypeError(
-            "Decorator must be used with parentheses (i.e., @cdr_decorator()) "
-            "even if no explicit arguments are passed."
-        )
 
     def decorator(
         executor: Callable[[QPROGRAM], QuantumResult]
