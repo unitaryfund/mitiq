@@ -171,7 +171,9 @@ def test_decorator_execute_with_cdr(
     ],
 )
 @pytest.mark.parametrize("random_state", [1, 2, 3, 4, 5])
-def test_execute_with_cdr(circuit_type, fit_function, kwargs, random_state):
+def test_mitigated_execute_with_cdr(
+    circuit_type, fit_function, kwargs, random_state
+):
     circuit = random_x_z_cnot_circuit(
         LineQubit.range(2),
         n_moments=5,
@@ -256,7 +258,7 @@ def test_no_num_fit_parameters_with_custom_fit_raises_error():
         )
 
 
-def test_no_num_fit_parameters_mitigate_executor_with_custom_fit_raises_error():
+def test_no_num_fit_parameters_mitigate_executor_raises_error():
     with pytest.raises(ValueError, match="Must provide `num_fit_parameters`"):
         mitigated_executor = mitigate_executor(
             executor=execute,
@@ -271,6 +273,7 @@ def test_no_num_fit_parameters_mitigate_executor_with_custom_fit_raises_error():
                 )
             ),
         )
+        mitigated
 
 
 def test_execute_with_cdr_using_clifford_circuit():
