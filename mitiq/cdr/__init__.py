@@ -32,4 +32,4 @@ from mitiq.cdr.clifford_training_data import (
     is_clifford,
     generate_training_circuits,
 )
-from mitiq.cdr.cdr import execute_with_cdr
+from mitiq.cdr.cdr import execute_with_cdr, mitigate_executor, cdr_decorator
