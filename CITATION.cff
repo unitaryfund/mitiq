@@ -1,34 +1,70 @@
 authors:
-  - family-names: LaRose
-    given-names: Ryan
-  - family-names: Mari
-    given-names: Andrea
+  - given-names: Ryan
+    family-names: LaRose
+    email: rlarose@umich.edu
+    name-particle: Ryan LaRose
+    affiliation: 'Unitary Fund, Michigan State University'
+    orcid: 'https://orcid.org/0000-0002-5398-3341'   
+  - given-names: Andrea
+    family-names: Mari
+    email: andreamari84@gmail.com
+    name-particle: Dr. Andrea Mari
+    affiliation: 'Unitary Fund'
+    orcid: 'https://orcid.org/0000-0002-5785-3093'  
   - given-names: Sarah
     family-names: Kaiser
     email: sckaiser@sckaiser.com
     name-particle: Dr. Sarah Kaiser
-    affiliation: Unitary Fund
+    affiliation: 'Unitary Fund'
     orcid: 'https://orcid.org/0000-0002-3149-6534'
-  - family-names: Karalekas
-    given-names: Peter
-  - family-names: Alves
-    given-names: Andre
-  - family-names: Czarnik
-    given-names: Piotr
-  - family-names: Mandouh
-    given-names: Mohamed
-  - family-names: Gordon
-    given-names: Max
-  - family-names: Hindy
-    given-names: Yousef
-  - family-names: Robertson
-    given-names: Aaron
-  - family-names: Thakre
-    given-names: Purva
-  - family-names: Shammah
-    given-names: Nathan
-  - family-names: Zeng
-    given-names: William
+  - given-names: Peter
+    family-names: Karalekas  
+    email: peter@karalekas.com
+    name-particle: Peter Karalekas
+    affiliation: 'Unitary Fund'
+    orcid: 'https://orcid.org/0000-0001-6031-4800'  
+  - given-names: Andre
+    family-names: Alves
+    email: andre@alves.me
+    name-particle: Andre Alves
+    affiliation: 'Hamburg University of Applied Sciences'
+  - given-names: Piotr
+    family-names: Czarnik
+    name-particle: Dr. Piotr Czarnik
+    affiliation: 'Theoretical Division, Los Alamos National Laboratory'
+    orcid: 'https://orcid.org/ 0000-0002-0477-1158' 
+  - given-names: Mohamed
+    family-names: Mandouh
+    name-particle: Mohamed El Mandouh
+    affiliation: 'Institute for Quantum Computing, University of Waterloo'
+    orcid: 'https://orcid.org/0000-0001-9466-4884' 
+  - given-names: Max
+    family-names: Gordon
+    name-particle: Max Gordon
+    affiliation: 'Instituto de F ́ısica Te ́orica, UAM/CSIC, Universidad Aut ́onoma de Madrid'
+  - given-names: Yousef
+    family-names: Hindy
+    name-particle: Yousef Hindy
+    affiliation: 'Stanford University'
+  - given-names: Aaron
+    family-names: Robertson
+    name-particle: Aaron Robertson
+    affiliation: Independent researcher
+  - given-names: Purva
+    family-names: Thakre
+    name-particle: Purva Thakre
+    affiliation: 'Southern Illinois University'
+  - given-names: Nathan
+    family-names: Shammah
+    email: nathan.shammah@gmail.com
+    name-particle: Dr. Nathan Shammah
+    affiliation: 'Unitary Fund'
+    orcid: 'https://orcid.org/0000-0002-8775-3667' 
+  - given-names: William
+    family-names: Zeng
+    name-particle: Dr. William Zeng
+    affiliation: 'Unitary Fund, Stanford University, Goldman, Sachs & Co'
+    orcid: 'https://orcid.org/' 
 cff-version: 1.2.0
 message: "If you use mitiq for academic or industry purposes, please cite this article about the software package."
 title: >-
