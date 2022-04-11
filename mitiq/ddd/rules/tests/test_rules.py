@@ -14,89 +14,127 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for DDD rules."""
-from mitiq.ddd.rules.rules import construct_rule, xx, xyxy, yy
+from mitiq.ddd.rules.rules import general_rule, xx, xyxy, yy
 import pytest
-from cirq import X, Y, Z
-
-phi = (1 + 5**0.5) / 2.0
+from cirq import X, Y, Z, I, Circuit, LineQubit
+from mitiq.utils import _equal
 
 
 @pytest.mark.parametrize(
     "slack_length",
-    [int(round((phi**n - (1 - phi) ** n) / 5**0.5)) for n in range(2, 10)],
+    [4, 5, 8, 13, 21, 34],
 )
-def test_rules(slack_length):
-    @pytest.mark.parametrize(
-        "rule",
-        [
-            xx(slack_length),
-            xyxy(slack_length),
-            yy(slack_length),
-        ],
-    )
-    def test_rule(rule):
-        assert len(rule) == slack_length
-
-    @pytest.mark.parametrize("spacing", [i for i in range(slack_length)])
-    def user_spacing(spacing):
-        @pytest.mark.parametrize(
-            "gates",
-            [
-                [X, Y, X, Y],
-                [Y, Y],
-                [X, Y, Z],
-            ],
-        )
-        def test_user_spaced_rule_construct(gates):
-            rule = (
-                construct_rule(
-                    slack_length=slack_length,
-                    spacing=spacing,
-                    gates=gates,
-                ),
-            )
-            assert len(rule) == slack_length
-
-        @pytest.mark.parametrize(
-            "rule",
-            [
-                xx(
-                    slack_length=slack_length,
-                    spacing=spacing,
-                ),
-                xyxy(
-                    slack_length=slack_length,
-                    spacing=spacing,
-                ),
-                yy(
-                    slack_length=slack_length,
-                    spacing=spacing,
-                ),
-            ],
-        )
-        def test_user_spaced_rule(rule):
-            assert len(rule) == slack_length
-
-
 @pytest.mark.parametrize(
     "gates",
-    [[X, Y, Z]],
+    [
+        [X, X],
+        [X, Y, X, Y],
+        [Y, Y],
+        [X, Y, Z],
+    ],
 )
+def test_general_sequences(slack_length, gates):
+    sequence = general_rule(
+        slack_length=slack_length,
+        gates=gates,
+    )
+    gate_set = {X, Y, Z}
+    seq_gates = [op.gate for op in sequence.all_operations()]
+    assert len(sequence) == slack_length
+    assert gates == [gate for gate in seq_gates if gate in gate_set]
+
+
 @pytest.mark.parametrize(
     "slack_length",
-    [int(round((phi**n - (1 - phi) ** n) / 5**0.5)) for n in range(2, 10)],
+    [5, 8, 13, 21, 34],
+)
+@pytest.mark.parametrize(
+    "rule",
+    [
+        xx,
+        xyxy,
+        yy,
+    ],
+)
+def test_built_in_sequences(rule, slack_length):
+    name = rule.__name__
+    sequence = rule(slack_length)
+    gates = [X if i == "x" else Y for i in name]
+    gate_set = {X, Y}
+    seq_gates = [op.gate for op in sequence.all_operations()]
+    assert len(sequence) == slack_length
+    assert gates == [gate for gate in seq_gates if gate in gate_set]
+
+
+@pytest.mark.parametrize(
+    ("slack_length", "rule", "sequence"),
+    [
+        (
+            5,
+            xx,
+            Circuit(
+                [
+                    X(LineQubit(0)) if i % 2 else I(LineQubit(0))
+                    for i in range(5)
+                ]
+            ),
+        ),
+        (
+            5,
+            yy,
+            Circuit(
+                [
+                    Y(LineQubit(0)) if i % 2 else I(LineQubit(0))
+                    for i in range(5)
+                ]
+            ),
+        ),
+        (
+            4,
+            xyxy,
+            Circuit(
+                [
+                    Y(LineQubit(0)) if i % 2 else X(LineQubit(0))
+                    for i in range(4)
+                ]
+            ),
+        ),
+    ]
+)
+def test_exact_sequences(slack_length, rule, sequence):
+    sequence_to_test = rule(slack_length)
+    assert _equal(sequence_to_test, sequence)
+
+
+@pytest.mark.parametrize(
+    "slack_length",
+    [1, 2, 3, 5, 8, 13, 21, 34],
 )
 @pytest.mark.parametrize("spacing", [i for i in range(5, 7)])
-def test_rule_failure(gates, slack_length, spacing):
-    num_decoupling_gates = len(gates)
-    if slack_length < (
+def test_rule_failures(slack_length, spacing):
+    num_decoupling_gates = 3
+    if slack_length < num_decoupling_gates:
+        with pytest.raises(ValueError, match="too short"):
+            general_rule(
+                slack_length=slack_length,
+                spacing=spacing,
+                gates=[X, Y, Z],
+            )
+    elif slack_length < (
         (num_decoupling_gates + 1) * spacing + num_decoupling_gates
     ):
         with pytest.raises(
             ValueError, match="too long for given slack window"
         ):
-            construct_rule(
+            general_rule(
                 slack_length=slack_length,
                 spacing=spacing,
-                gates=gates,
+                gates=[X, Y, Z],
             )
+    else:
+        sequence = general_rule(
+            slack_length=slack_length,
+            spacing=spacing,
+            gates=[X, Y, Z],
+        )
+        assert len(sequence) == slack_length

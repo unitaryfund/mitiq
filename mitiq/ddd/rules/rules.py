@@ -22,22 +22,31 @@ from typing import List
 from itertools import cycle
 
 
-def construct_rule(
-    slack_length: int, spacing: int, gates: List[Gate]
+def general_rule(
+    slack_length: int, gates: List[Gate], spacing: int = -1
 ) -> Circuit:
     """Returns a digital dynamical decoupling sequence, based on inputs.
 
     Args:
         slack_length: Length of idle window to fill.
         spacing: How many identity spacing gates to apply between dynamical
-            decoupling gates, as a non-negative int. Defaults to evenly
-            spaced.
+            decoupling gates, as a non-negative int. Negative int corresponds
+            to default. Defaults to maximal spacing that fits a single sequence
+            in the given slack window.
+            E.g. given slack_length = 20, gates = [X, X] the spacing defaults
+            to 6 and the rule returns the sequence:
+            ──I──I──I──I──I──I──X──I──I──I──I──I──I──X──I──I──I──I──I──I──
+            given slack_length = 20, gates [X, Y, X, Y] the spacing defaults
+            to 3 and the rule returns the sequence:
+            ──I──I──I──I──X──I──I──I──Y──I──I──I──X──I──I──I──Y──I──I──I──
         gates: A list of Cirq gates to build the rule. E.g. [X, X] is the xx
             sequence, [X, Y, X, Y] is the xyxy sequence
             - Note: To repeat the sequence, specify a repeated gateset
     Returns:
         A digital dynamical decoupling sequence, as a cirq circuit
     """
+    if slack_length < 2 or slack_length < len(gates):
+        raise ValueError("Slack window is too short for the given gates.")
     num_decoupling_gates = len(gates)
     slack_difference = slack_length - num_decoupling_gates
     if spacing < 0:
@@ -74,12 +83,16 @@ def xx(slack_length: int, spacing: int = -1) -> Circuit:
     Args:
         slack_length: Length of idle window to fill.
         spacing: How many identity spacing gates to apply between dynamical
-            decoupling gates, as a non-negative int. Defaults to evenly
-            spaced.
+            decoupling gates, as a non-negative int. Negative int corresponds
+            to default. Defaults to maximal spacing that fits a single sequence
+            in the given slack window.
+            E.g. given slack_length = 20 the spacing defaults to 6 and this
+            rule returns the sequence:
+            ──I──I──I──I──I──I──X──I──I──I──I──I──I──X──I──I──I──I──I──I──
     Returns:
         An XX digital dynamical decoupling sequence, as a cirq circuit
     """
-    xx_rule = construct_rule(
+    xx_rule = general_rule(
         slack_length=slack_length,
         spacing=spacing,
         gates=[X, X],
@@ -93,12 +106,16 @@ def xyxy(slack_length: int, spacing: int = -1) -> Circuit:
     Args:
         slack_length: Length of idle window to fill.
         spacing: How many identity spacing gates to apply between dynamical
-            decoupling gates, as a non-negative int. Defaults to evenly
-            spaced.
+            decoupling gates, as a non-negative int. Negative int corresponds
+            to default. Defaults to maximal spacing that fits a single sequence
+            in the given slack window.
+            E.g. given slack_length = 20 the spacing defaults to 3 and this
+            rule returns the sequence:
+            ──I──I──I──I──X──I──I──I──Y──I──I──I──X──I──I──I──Y──I──I──I──
     Returns:
         An XYXY digital dynamical decoupling sequence, as a cirq circuit
     """
-    xyxy_rule = construct_rule(
+    xyxy_rule = general_rule(
         slack_length=slack_length,
         spacing=spacing,
         gates=[X, Y, X, Y],
@@ -112,12 +129,16 @@ def yy(slack_length: int, spacing: int = -1) -> Circuit:
     Args:
         slack_length: Length of idle window to fill.
         spacing: How many identity spacing gates to apply between dynamical
-            decoupling gates, as a non-negative int. Defaults to evenly
-            spaced.
+            decoupling gates, as a non-negative int. Negative int corresponds
+            to default. Defaults to maximal spacing that fits a single sequence
+            in the given slack window.
+            E.g. given slack_length = 20 the spacing defaults to 6 and
+            this rule returns the sequence:
+            ──I──I──I──I──I──I──Y──I──I──I──I──I──I──Y──I──I──I──I──I──I──
     Returns:
         An YY digital dynamical decoupling sequence, as a cirq circuit
     """
-    yy_rule = construct_rule(
+    yy_rule = general_rule(
         slack_length=slack_length,
         spacing=spacing,
         gates=[Y, Y],
