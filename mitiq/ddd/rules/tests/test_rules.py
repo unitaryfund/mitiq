@@ -99,7 +99,7 @@ def test_built_in_sequences(rule, slack_length):
                 ]
             ),
         ),
-    ]
+    ],
 )
 def test_exact_sequences(slack_length, rule, sequence):
     sequence_to_test = rule(slack_length)
