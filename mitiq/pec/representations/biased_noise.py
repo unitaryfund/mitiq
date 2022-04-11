@@ -147,25 +147,45 @@ def represent_operation_with_biased_noise(
     elif len(qubits) == 2:
         q0, q1 = qubits
 
-        alpha_1 = 1 + 15 * epsilon * (eta + 1) / (
-            15 * (1 - epsilon) * (eta + 1) + epsilon * (5 * eta + 1)
+        alpha_1 = (
+            6 * epsilon**2 * eta
+            + 4 * epsilon**2
+            - 9 * epsilon * eta**2
+            - 24 * epsilon * eta
+            - 15 * epsilon
+            + 9 * eta**2
+            + 18 * eta
+            + 9
+        ) / (
+            24 * epsilon**2 * eta
+            + 16 * epsilon**2
+            - 18 * epsilon * eta**2
+            - 42 * epsilon * eta
+            - 24 * epsilon
+            + 9 * eta**2
+            + 18 * eta
+            + 9
         )
-        alpha_2 = -epsilon / (
-            15 * (1 - epsilon) * (eta + 1) + epsilon * (5 * eta + 1)
-        )
+        alpha_2 = epsilon / (4 * epsilon - 3 * eta - 3)
         alpha_3 = (
-            -epsilon
-            * (5 * eta + 1)
-            / (15 * (1 - epsilon) * (eta + 1) + epsilon * (5 * eta + 1))
+            epsilon
+            * (6 * epsilon * eta + 4 * epsilon - 9 * eta**2 - 12 * eta - 3)
+            / (
+                24 * epsilon**2 * eta
+                + 16 * epsilon**2
+                - 18 * epsilon * eta**2
+                - 42 * epsilon * eta
+                - 24 * epsilon
+                + 9 * eta**2
+                + 18 * eta
+                + 9
+            )
         )
 
-        alphas = [alpha_1] + 12 * [alpha_2] + 3 * [alpha_3]
+        alphas = [alpha_1] + 2 * [alpha_2] + [alpha_3]
         post_ops = [[]]  # for eta_1, we do nothing, rather than I x I
         post_ops += [[P(q0)] for P in [X, Y, Z]]  # 1Q Paulis for q0
         post_ops += [[P(q1)] for P in [X, Y, Z]]  # 1Q Paulis for q1
-        post_ops += [
-            [Pi(q0), Pj(q1)] for Pi in [X, Y, Z] for Pj in [X, Y, Z]
-        ]  # 2Q Paulis
 
     else:
         raise ValueError(

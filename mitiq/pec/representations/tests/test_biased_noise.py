@@ -110,16 +110,42 @@ def two_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
         *PRX QUANTUM* **2**, 040330 (2021),
         (https://arxiv.org/abs/2005.07601v2).
     """
-    eta1 = 1 + 15 * epsilon * (eta + 1) / (
-        15 * (1 - epsilon) * (eta + 1) + epsilon * (5 * eta + 1)
+    eta1 = (
+        6 * epsilon**2 * eta
+        + 4 * epsilon**2
+        - 9 * epsilon * eta**2
+        - 24 * epsilon * eta
+        - 15 * epsilon
+        + 9 * eta**2
+        + 18 * eta
+        + 9
+    ) / (
+        24 * epsilon**2 * eta
+        + 16 * epsilon**2
+        - 18 * epsilon * eta**2
+        - 42 * epsilon * eta
+        - 24 * epsilon
+        + 9 * eta**2
+        + 18 * eta
+        + 9
     )
-    eta2 = epsilon / (15 * (1 - epsilon) * (eta + 1) + epsilon * (5 * eta + 1))
+    eta2 = epsilon / (4 * epsilon - 3 * eta - 3)
     eta3 = (
         epsilon
-        * (5 * eta + 1)
-        / (15 * (1 - epsilon) * (eta + 1) + epsilon * (5 * eta + 1))
+        * (6 * epsilon * eta + 4 * epsilon - 9 * eta**2 - 12 * eta - 3)
+        / (
+            24 * epsilon**2 * eta
+            + 16 * epsilon**2
+            - 18 * epsilon * eta**2
+            - 42 * epsilon * eta
+            - 24 * epsilon
+            + 9 * eta**2
+            + 18 * eta
+            + 9
+        )
     )
-    return abs(eta1) + 12 * abs(eta2) + 3 * abs(eta3)
+
+    return 2 * abs(eta1) + 4 * abs(eta2) + 2 * abs(eta3)
 
 
 @pytest.mark.parametrize("epsilon", [0, 0.1, 0.7])
