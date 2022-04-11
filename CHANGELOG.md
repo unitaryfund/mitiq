@@ -1,6 +1,44 @@
 # Changelog
 
-## Version 0.14.0  (In development...)
+## Version 0.15.0  (In development)
+
+## Version 0.14.0  (April 6th, 2022)
+
+### Summary
+
+This milestone focused on updating dependencies and making progress on two new features, dynamical decoupling and learning based error mitigation techniques. A number of high priority bugs and issues alo were fixed.
+
+### All Changes
+
+- Update pennylane requirement from ~=0.22.1 to ~=0.22.2 (@dependabot, gh-1203)
+- Update mypy requirement from ~=0.931 to ~=0.942 (@dependabot, gh-1183)
+- Update pennylane-qiskit requirement from ~=0.20.0 to ~=0.22.0 (@dependabot, gh-1170)
+- Update pennylane requirement from ~=0.21.0 to ~=0.22.1 (@dependabot, gh-1172)
+- Update qiskit requirement from ~=0.34.2 to ~=0.35.0 (@dependabot, gh-1199)
+- Update black requirement from ~=22.1 to ~=22.3 (@dependabot @andreamari @crazy4pi314, gh-1191)
+- Avoid creation of empty moments when using fold_global (@andreamari, gh-1196)
+- Merge pull request #1198 from unitaryfund/1140-raise-error-if-executo (@Misty-W)
+- Port changes from old branch - workaround (@Misty-W)
+- Merge pull request #1195 from unitaryfund/update-qiskit (@Misty-W)
+- Update docs/source/guide/pec-3-options.myst @crazy4pi314 (@Misty-W)
+- Merge branch 'master' into update-qiskit (@crazy4pi314)
+- Update Cirq to 0.14  (@andreamari, gh-1193)
+- fix pec-3-options notebook problem (@andreamari)
+- Remove option to squash moments in global folding  (@purva-thakre @andreamari, gh-1113)
+- update qiskit and fix conversions (@andreamari)
+- Idle qubits in conversion  (@Aaron-Robertson, gh-1185)
+- Add get_circuit_mask() for dynamical decoupling  (@Aaron-Robertson, gh-1178)
+- Update pydata-sphinx-theme requirement from ~=0.8.0 to ~=0.8.1  (@dependabot, gh-1188)
+- Add get_slack_matrix_from_circuit_matrix() function for dynamical decoupling (@andreamari @Aaron-Robertson,gh-1178)
+- Fix sphinx dependency problem  (@andreamari , gh-1181)
+- Create file structure for digital dynamical decoupling  (@andreamari, gh-1175)
+- adding pages publish step (@crazy4pi314,gh-1135)
+- cast gate exponents to float (@andreamari,gh-1174)
+- Update release.rst (@andreamari,gh-1145)
+- Bump actions/setup-python from 2 to 3  (@dependabot, gh-1149)
+- Bump actions/checkout from 2 to 3  (@dependabot, gh-1151)
+- Update amazon-braket-sdk requirement from ~=1.15.0 to ~=1.17.0  (@dependabot, gh-1153)
+- fixing install permissions, container user is root (@crazy4pi314 , gh-1147)
 
 ## Version 0.13.0  (February 25th, 2022)
 
