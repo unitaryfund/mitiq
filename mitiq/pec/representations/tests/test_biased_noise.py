@@ -120,20 +120,8 @@ def two_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
         + 18 * eta
         + 9
     ) / (
-        24 * epsilon**2 * eta
-        + 16 * epsilon**2
-        - 18 * epsilon * eta**2
-        - 42 * epsilon * eta
-        - 24 * epsilon
-        + 9 * eta**2
-        + 18 * eta
-        + 9
-    )
-    eta2 = epsilon / (4 * epsilon - 3 * eta - 3)
-    eta3 = (
-        epsilon
-        * (6 * epsilon * eta + 4 * epsilon - 9 * eta**2 - 12 * eta - 3)
-        / (
+        2
+        * (
             24 * epsilon**2 * eta
             + 16 * epsilon**2
             - 18 * epsilon * eta**2
@@ -144,7 +132,24 @@ def two_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
             + 9
         )
     )
-
+    eta2 = epsilon / (2 * (4 * epsilon - 3 * eta - 3))
+    eta3 = (
+        epsilon
+        * (6 * epsilon * eta + 4 * epsilon - 9 * eta**2 - 12 * eta - 3)
+        / (
+            2
+            * (
+                24 * epsilon**2 * eta
+                + 16 * epsilon**2
+                - 18 * epsilon * eta**2
+                - 42 * epsilon * eta
+                - 24 * epsilon
+                + 9 * eta**2
+                + 18 * eta
+                + 9
+            )
+        )
+    )
     return 2 * abs(eta1) + 4 * abs(eta2) + 2 * abs(eta3)
 
 
