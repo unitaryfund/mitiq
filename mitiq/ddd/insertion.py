@@ -16,6 +16,8 @@
 """Tools to determine slack windows in circuits and to insert DDD sequences."""
 from cirq import Circuit
 import numpy as np
+from typing import Optional, Callable
+from mitiq.interface import noise_scaling_converter
 
 
 def _get_circuit_mask(circuit: Circuit) -> np.ndarray:
@@ -80,3 +82,29 @@ def get_slack_matrix_from_circuit_mask(mask: np.ndarray) -> np.ndarray:
                         break
 
     return slack_matrix
+
+
+@noise_scaling_converter
+def insert_ddd_sequences(
+    circuit: Circuit,
+    rule: Optional[Callable[[int], Circuit]],
+) -> Circuit:
+    """Returns the circuit with DDD sequences applied according to the input rule.
+
+    Args:
+        circuit: The input circuit to execute with error-mitigation.
+        rule: The ddd insertion rule to apply
+
+    Returns: circuit_with_spin_echoes
+    """
+    slack_matrix = get_slack_matrix_from_circuit_mask(
+        _get_circuit_mask(circuit)
+    )
+    # Copy to avoid mutating the input circuit
+    circuit_with_ddd = circuit.copy()
+    for moment_idx, moment in enumerate(circuit_with_ddd):
+        slack_column = slack_matrix[:, moment_idx]
+        for _, slack_length in enumerate(slack_column):
+            ddd_sequence = rule(slack_length)
+            moment.append(ddd_sequence)
+    return circuit_with_ddd
