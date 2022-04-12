@@ -15,12 +15,33 @@
 
 """Information about Mitiq and dependencies."""
 import platform
+from pkg_resources import parse_requirements
 
 from cirq import __version__ as cirq_version
 from numpy import __version__ as numpy_version
 from scipy import __version__ as scipy_version
 
 import mitiq
+
+OPTIONAL_REQUIREMENTS = [
+    "pyquil",
+    "qiskit",
+    "amazon-braket-sdk",
+    "pennylane",
+    "pennylane-qiskit",
+]
+
+
+def latest_supported():
+    """Returns the versions of Mitiq's optional packages that are supported by
+    the current version of Mitiq. Requires that the dependency has a pinned
+    version in the dev_requirements.txt file.
+    """
+    return {
+        req.project_name: req.specs[0][1]
+        for req in parse_requirements(open("dev_requirements.txt"))
+        if req.project_name in OPTIONAL_REQUIREMENTS
+    }
 
 
 def about() -> None:
@@ -41,6 +62,16 @@ def about() -> None:
         from braket._sdk import __version__ as braket_version
     except ImportError:
         braket_version = "Not installed"
+    try:
+        from pennylane import __version__ as pennylane_version
+    except ImportError:
+        pennylane_version = "Not installed"
+    try:
+        from pennylane_qiskit import __version__ as pennylane_qiskit_version
+    except ImportError:
+        pennylane_qiskit_version = "Not installed"
+
+    optional_reqs = latest_supported()
 
     about_str = f"""
 Mitiq: A Python toolkit for implementing error mitigation on quantum computers
@@ -57,9 +88,16 @@ SciPy Version:\t{scipy_version}
 
 Optional Dependencies
 ---------------------
-PyQuil Version:\t{pyquil_version}
-Qiskit Version:\t{qiskit_version}
-Braket Version:\t{braket_version}
+PyQuil Version:           {pyquil_version}
+    Latest Supported:     {optional_reqs["pyquil"]}
+Qiskit Version:           {qiskit_version}
+    Latest Supported:     {optional_reqs["qiskit"]}
+Braket Version:           {braket_version}
+    Latest Supported:     {optional_reqs["amazon-braket-sdk"]}
+PennyLane Version:        {pennylane_version} 
+    Latest Supported:     {optional_reqs["pennylane"]}
+PennyLane-Qiskit Version: {pennylane_qiskit_version}
+    Latest Supported:     {optional_reqs["pennylane-qiskit"]}
 
 Python Version:\t{platform.python_version()}
 Platform Info:\t{platform.system()} ({platform.machine()})"""
