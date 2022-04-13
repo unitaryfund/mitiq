@@ -100,6 +100,9 @@ def represent_operation_with_biased_noise(
 
     post_ops: List[List[Operation]]
     qubits = circ.all_qubits()
+    a = 1 - epsilon
+    b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
+    c = epsilon / (3 * (eta + 1))
 
     if len(qubits) == 1:
         q = tuple(qubits)[0]
@@ -147,51 +150,84 @@ def represent_operation_with_biased_noise(
     elif len(qubits) == 2:
         q0, q1 = qubits
 
-        alpha_1 = (
-            6 * epsilon**2 * eta
-            + 4 * epsilon**2
-            - 9 * epsilon * eta**2
-            - 24 * epsilon * eta
-            - 15 * epsilon
-            + 9 * eta**2
-            + 18 * eta
-            + 9
-        ) / (
-            2
-            * (
-                24 * epsilon**2 * eta
-                + 16 * epsilon**2
-                - 18 * epsilon * eta**2
-                - 42 * epsilon * eta
-                - 24 * epsilon
-                + 9 * eta**2
-                + 18 * eta
-                + 9
-            )
-        )
-        alpha_2 = epsilon / (2 * (4 * epsilon - 3 * eta - 3))
-        alpha_3 = (
-            epsilon
-            * (6 * epsilon * eta + 4 * epsilon - 9 * eta**2 - 12 * eta - 3)
+        alpha_sq = (a**2 + a * b - 2 * c**2) ** 2 / (
+            a**3
+            + a**2 * b
+            - a * b**2
+            - 4 * a * c**2
+            - b**3
+            + 4 * b * c**2
+        ) ** 2
+        alpha_beta = (
+            (a**2 + a * b - 2 * c**2)
+            * (-a * b - b**2 + 2 * c**2)
             / (
-                2
+                a**3
+                + a**2 * b
+                - a * b**2
+                - 4 * a * c**2
+                - b**3
+                + 4 * b * c**2
+            )
+            ** 2
+        )
+        alpha_gamma = (
+            -c
+            * (a**2 + a * b - 2 * c**2)
+            / (
+                (a**2 + 2 * a * b + b**2 - 4 * c**2)
                 * (
-                    24 * epsilon**2 * eta
-                    + 16 * epsilon**2
-                    - 18 * epsilon * eta**2
-                    - 42 * epsilon * eta
-                    - 24 * epsilon
-                    + 9 * eta**2
-                    + 18 * eta
-                    + 9
+                    a**3
+                    + a**2 * b
+                    - a * b**2
+                    - 4 * a * c**2
+                    - b**3
+                    + 4 * b * c**2
                 )
             )
         )
-
-        alphas = 2 * [alpha_1] + 4 * [alpha_2] + 2 * [alpha_3]
+        beta_sq = (-a * b - b**2 + 2 * c**2) ** 2 / (
+            a**3
+            + a**2 * b
+            - a * b**2
+            - 4 * a * c**2
+            - b**3
+            + 4 * b * c**2
+        ) ** 2
+        beta_gamma = (
+            -c
+            * (-a * b - b**2 + 2 * c**2)
+            / (
+                (a**2 + 2 * a * b + b**2 - 4 * c**2)
+                * (
+                    a**3
+                    + a**2 * b
+                    - a * b**2
+                    - 4 * a * c**2
+                    - b**3
+                    + 4 * b * c**2
+                )
+            )
+        )
+        gamma_sq = c**2 / (a**2 + 2 * a * b + b**2 - 4 * c**2) ** 2
+        alphas = (
+            [alpha_sq]
+            + 2 * [alpha_gamma]
+            + [alpha_beta]
+            + 2 * [alpha_gamma]
+            + [alpha_beta]
+            + 2 * [gamma_sq]
+            + [beta_gamma]
+            + 2 * [gamma_sq]
+            + 3 * [beta_gamma]
+            + [beta_sq]
+        )
         post_ops = [[]]  # for eta_1, we do nothing, rather than I x I
         post_ops += [[P(q0)] for P in [X, Y, Z]]  # 1Q Paulis for q0
         post_ops += [[P(q1)] for P in [X, Y, Z]]  # 1Q Paulis for q1
+        post_ops += [
+            [Pi(q0), Pj(q1)] for Pi in [X, Y, Z] for Pj in [X, Y, Z]
+        ]  # 2Q Paulis
 
     else:
         raise ValueError(
