@@ -60,7 +60,8 @@ def get_slack_matrix_from_circuit_mask(mask: np.ndarray) -> np.ndarray:
     Args:
         mask: The mask matrix of a quantum circuit.
 
-    Returns: The matrix of slack lengths.
+    Returns:
+        The matrix of slack lengths.
     """
     _validate_integer_matrix(mask)
     if not (mask**2 == mask).all():

@@ -13,4 +13,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""High-level digital dynamical decoupling tools."""
+"""High-level digital dynamical decoupling (DDD) tools."""
