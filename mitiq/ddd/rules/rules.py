@@ -40,10 +40,10 @@ def general_rule(
             to 3 and the rule returns the sequence:
             ──I──I──I──I──X──I──I──I──Y──I──I──I──X──I──I──I──Y──I──I──I──
         gates: A list of Cirq gates to build the rule. E.g. [X, X] is the xx
-            sequence, [X, Y, X, Y] is the xyxy sequence
-            - Note: To repeat the sequence, specify a repeated gateset
+            sequence, [X, Y, X, Y] is the xyxy sequence.
+            - Note: To repeat the sequence, specify a repeated gateset.
     Returns:
-        A digital dynamical decoupling sequence, as a cirq circuit
+        A digital dynamical decoupling sequence, as a Cirq circuit.
     """
     if slack_length < 2 or slack_length < len(gates):
         raise ValueError("Slack window is too short for the given gates.")
@@ -90,7 +90,7 @@ def xx(slack_length: int, spacing: int = -1) -> Circuit:
             rule returns the sequence:
             ──I──I──I──I──I──I──X──I──I──I──I──I──I──X──I──I──I──I──I──I──
     Returns:
-        An XX digital dynamical decoupling sequence, as a cirq circuit
+        An XX digital dynamical decoupling sequence, as a Cirq circuit.
     """
     xx_rule = general_rule(
         slack_length=slack_length,
@@ -113,7 +113,7 @@ def xyxy(slack_length: int, spacing: int = -1) -> Circuit:
             rule returns the sequence:
             ──I──I──I──I──X──I──I──I──Y──I──I──I──X──I──I──I──Y──I──I──I──
     Returns:
-        An XYXY digital dynamical decoupling sequence, as a cirq circuit
+        An XYXY digital dynamical decoupling sequence, as a Cirq circuit.
     """
     xyxy_rule = general_rule(
         slack_length=slack_length,
@@ -136,7 +136,7 @@ def yy(slack_length: int, spacing: int = -1) -> Circuit:
             this rule returns the sequence:
             ──I──I──I──I──I──I──Y──I──I──I──I──I──I──Y──I──I──I──I──I──I──
     Returns:
-        An YY digital dynamical decoupling sequence, as a cirq circuit
+        An YY digital dynamical decoupling sequence, as a Cirq circuit.
     """
     yy_rule = general_rule(
         slack_length=slack_length,
