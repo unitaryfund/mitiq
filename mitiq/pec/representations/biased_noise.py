@@ -34,14 +34,14 @@ def represent_operation_with_biased_noise(
     epsilon: float,
     eta: float,
 ) -> OperationRepresentation:
-    r"""As described in [Strikis2021]_, this function maps an
+    r"""This function maps an
     ``ideal_operation`` :math:`\mathcal{U}` into its quasi-probability
     representation, which is a linear combination of noisy implementable
     operations :math:`\sum_\alpha \eta_{\alpha} \mathcal{O}_{\alpha}`.
 
     This function assumes a combined depolarizing and dephasing noise model
-    with a bias factor :math:`\eta` and that the following noisy
-    operations are implementable
+    with a bias factor :math:`\eta`  (see :cite:`Strikis_2021_PRXQuantumand`)
+    and that that the following noisy operations are implementable
     :math:`\mathcal{O}_{\alpha} = \mathcal{D} \circ \mathcal P_\alpha
     \circ \mathcal{U}`, where :math:`\mathcal{U}` is the unitary associated
     to the input ``ideal_operation`` acting on :math:`k` qubits,
