@@ -29,7 +29,7 @@ from mitiq.pec import OperationRepresentation, NoisyOperation
 from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 
 
-def represent_operation_with_biased_noise(
+def represent_operation_with_local_biased_noise(
     ideal_operation: QPROGRAM,
     epsilon: float,
     eta: float,
