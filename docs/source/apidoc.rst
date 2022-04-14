@@ -86,10 +86,20 @@ Qiskit Utils
 
 Digital Dynamical Decoupling
 ----------------------------
+
+Digital Dynamical Decoupling (High-Level Tools)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.ddd.ddd
    :members:
 
+Insertion
+^^^^^^^^^
 .. automodule:: mitiq.ddd.insertion
+   :members:
+
+Rules
+^^^^^
+.. automodule:: mitiq.ddd.rules.rules
    :members:
 
 Executors
