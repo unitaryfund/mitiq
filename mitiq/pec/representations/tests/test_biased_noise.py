@@ -174,12 +174,12 @@ def two_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
     )
     gamma_sq = c**2 / (a**2 + 2 * a * b + b**2 - 4 * c**2) ** 2
     overhead = (
-        abs(alpha_sq)
+        alpha_sq
         + 4 * abs(alpha_gamma)
-        + 2 * (alpha_beta)
+        + 2 * abs(alpha_beta)
         + 4 * (gamma_sq)
         + 4 * abs(beta_gamma)
-        + abs(beta_sq)
+        + beta_sq
     )
 
     return overhead
