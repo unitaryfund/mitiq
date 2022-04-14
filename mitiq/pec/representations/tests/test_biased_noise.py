@@ -35,7 +35,7 @@ from cirq import (
 
 
 from mitiq.pec.representations.biased_noise import (
-    represent_operation_with_biased_noise,
+    represent_operation_with_local_biased_noise,
 )
 
 from mitiq.pec.channels import _operation_to_choi, _circuit_to_choi
@@ -178,7 +178,7 @@ def test_single_qubit_representation_norm(
 ):
     q = LineQubit(0)
     optimal_norm = single_qubit_biased_noise_overhead(epsilon, eta)
-    norm = represent_operation_with_biased_noise(
+    norm = represent_operation_with_local_biased_noise(
         Circuit(gate(q)), epsilon, eta
     ).norm
     assert np.isclose(optimal_norm, norm)
@@ -190,7 +190,7 @@ def test_single_qubit_representation_norm(
 def test_two_qubit_representation_norm(gate: Gate, epsilon: float, eta: float):
     qreg = LineQubit.range(2)
     optimal_norm = two_qubit_biased_noise_overhead(epsilon, eta)
-    norm = represent_operation_with_biased_noise(
+    norm = represent_operation_with_local_biased_noise(
         Circuit(gate(*qreg)), epsilon, eta
     ).norm
     assert np.isclose(optimal_norm, norm)
@@ -199,7 +199,7 @@ def test_two_qubit_representation_norm(gate: Gate, epsilon: float, eta: float):
 def test_three_qubit_biased_noise_representation_error():
     q0, q1, q2 = LineQubit.range(3)
     with pytest.raises(ValueError):
-        represent_operation_with_biased_noise(
+        represent_operation_with_local_biased_noise(
             Circuit(CCNOT(q0, q1, q2)), 0.05, 10
         )
 
@@ -213,7 +213,7 @@ def test_biased_noise_representation_with_choi(
     """Tests the representation by comparing exact Choi matrices."""
     qreg = LineQubit.range(gate.num_qubits())
     ideal_choi = _operation_to_choi(gate.on(*qreg))
-    op_rep = represent_operation_with_biased_noise(
+    op_rep = represent_operation_with_local_biased_noise(
         Circuit(gate.on(*qreg)), epsilon, eta
     )
     choi_components = []

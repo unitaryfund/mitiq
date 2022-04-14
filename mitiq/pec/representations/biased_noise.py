@@ -40,7 +40,7 @@ def represent_operation_with_local_biased_noise(
     operations :math:`\sum_\alpha \eta_{\alpha} \mathcal{O}_{\alpha}`.
 
     This function assumes a combined depolarizing and dephasing noise model
-    with a bias factor :math:`\eta`  (see :cite:`Strikis_2021_PRXQuantumand`)
+    with a bias factor :math:`\eta`  (see :cite:`Strikis_2021_PRXQuantum`)
     and that that the following noisy operations are implementable
     :math:`\mathcal{O}_{\alpha} = \mathcal{D} \circ \mathcal P_\alpha
     \circ \mathcal{U}`, where :math:`\mathcal{U}` is the unitary associated
