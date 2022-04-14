@@ -100,32 +100,31 @@ def represent_operation_with_local_biased_noise(
 
     post_ops: List[List[Operation]]
     qubits = circ.all_qubits()
+
+    # Calculate coefficients in basis expansion in terms of eta and epsilon
     a = 1 - epsilon
     b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
     c = epsilon / (3 * (eta + 1))
-
+    alpha = (a**2 + a * b - 2 * c**2) / (
+        a**3
+        + a**2 * b
+        - a * b**2
+        - 4 * a * c**2
+        - b**3
+        + 4 * b * c**2
+    )
+    beta = (-a * b - b**2 + 2 * c**2) / (
+        a**3
+        + a**2 * b
+        - a * b**2
+        - 4 * a * c**2
+        - b**3
+        + 4 * b * c**2
+    )
+    gamma = -c / (a**2 + 2 * a * b + b**2 - 4 * c**2)
     if len(qubits) == 1:
         q = tuple(qubits)[0]
-
-        alpha_1 = (a**2 + a * b - 2 * c**2) / (
-            a**3
-            + a**2 * b
-            - a * b**2
-            - 4 * a * c**2
-            - b**3
-            + 4 * b * c**2
-        )
-        alpha_2 = -c / (a**2 + 2 * a * b + b**2 - 4 * c**2)
-        alpha_3 = (-a * b - b**2 + 2 * c**2) / (
-            a**3
-            + a**2 * b
-            - a * b**2
-            - 4 * a * c**2
-            - b**3
-            + 4 * b * c**2
-        )
-
-        alphas = [alpha_1] + 2 * [alpha_2] + [alpha_3]
+        alphas = [alpha] + 2 * [gamma] + [beta]
         post_ops = [[]]  # for eta_1, we do nothing, rather than I
         post_ops += [[P(q)] for P in [X, Y, Z]]  # 1Q Paulis
 
@@ -133,77 +132,17 @@ def represent_operation_with_local_biased_noise(
     elif len(qubits) == 2:
         q0, q1 = qubits
 
-        alpha_sq = (a**2 + a * b - 2 * c**2) ** 2 / (
-            a**3
-            + a**2 * b
-            - a * b**2
-            - 4 * a * c**2
-            - b**3
-            + 4 * b * c**2
-        ) ** 2
-        alpha_beta = (
-            (a**2 + a * b - 2 * c**2)
-            * (-a * b - b**2 + 2 * c**2)
-            / (
-                a**3
-                + a**2 * b
-                - a * b**2
-                - 4 * a * c**2
-                - b**3
-                + 4 * b * c**2
-            )
-            ** 2
-        )
-        alpha_gamma = (
-            -c
-            * (a**2 + a * b - 2 * c**2)
-            / (
-                (a**2 + 2 * a * b + b**2 - 4 * c**2)
-                * (
-                    a**3
-                    + a**2 * b
-                    - a * b**2
-                    - 4 * a * c**2
-                    - b**3
-                    + 4 * b * c**2
-                )
-            )
-        )
-        beta_sq = (-a * b - b**2 + 2 * c**2) ** 2 / (
-            a**3
-            + a**2 * b
-            - a * b**2
-            - 4 * a * c**2
-            - b**3
-            + 4 * b * c**2
-        ) ** 2
-        beta_gamma = (
-            -c
-            * (-a * b - b**2 + 2 * c**2)
-            / (
-                (a**2 + 2 * a * b + b**2 - 4 * c**2)
-                * (
-                    a**3
-                    + a**2 * b
-                    - a * b**2
-                    - 4 * a * c**2
-                    - b**3
-                    + 4 * b * c**2
-                )
-            )
-        )
-        gamma_sq = c**2 / (a**2 + 2 * a * b + b**2 - 4 * c**2) ** 2
         alphas = (
-            [alpha_sq]
-            + 2 * [alpha_gamma]
-            + [alpha_beta]
-            + 2 * [alpha_gamma]
-            + [alpha_beta]
-            + 2 * [gamma_sq]
-            + [beta_gamma]
-            + 2 * [gamma_sq]
-            + 3 * [beta_gamma]
-            + [beta_sq]
+            [alpha**2]
+            + 2 * [alpha * gamma]
+            + [alpha * beta]
+            + 2 * [alpha * gamma]
+            + [alpha * beta]
+            + 2 * [gamma**2]
+            + [beta * gamma]
+            + 2 * [gamma**2]
+            + 3 * [beta * gamma]
+            + [beta**2]
         )
         post_ops = [[]]  # for eta_1, we do nothing, rather than I x I
         post_ops += [[P(q0)] for P in [X, Y, Z]]  # 1Q Paulis for q0
