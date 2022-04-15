@@ -41,37 +41,18 @@ def represent_operation_with_local_biased_noise(
 
     This function assumes a combined depolarizing and dephasing noise model
     with a bias factor :math:`\eta`  (see :cite:`Strikis_2021_PRXQuantum`)
-    and that that the following noisy operations are implementable
-    :math:`\mathcal{O}_{\alpha} = \mathcal{D} \circ \mathcal P_\alpha
-    \circ \mathcal{U}`, where :math:`\mathcal{U}` is the unitary associated
+    and that that the following noisy operations are implementable,
+    where :math:`\mathcal{U}` is the unitary associated
     to the input ``ideal_operation`` acting on :math:`k` qubits,
     :math:`\mathcal{P}_\alpha` is a Pauli operation and
-    :math:`\mathcal{D}(\rho) = (1 - \epsilon) \rho + \epsilon I/2^k` is a
-    combined (biased) depolarizing and dephasing channel.
-
-    For a single-qubit ``ideal_operation``, the representation is as
-    follows:
-
-    .. math::
-         \mathcal{U}_{\beta} = \eta_1 \mathcal{O}_1 + \eta_2 \mathcal{O}_2 +
-                               \eta_3 \mathcal{O}_3 + \eta_4 \mathcal{O}_4
-
-    .. math::
-        \eta_1 = 1 + \frac{3 \epsilon (\eta + 1)}{3 (1 - \epsilon)(\eta + 1) +
-                 \epsilon (3 \eta + 1)} ,
-        \qquad \mathcal{O}_1 = \mathcal{D} \circ \mathcal{I} \circ \mathcal{U}
-
-        \eta_2 = - \frac{\epsilon}{3 (1 - \epsilon)(\eta + 1) +
-                 \epsilon (3 \eta + 1)} ,
-        \qquad \mathcal{O}_2 = \mathcal{D} \circ \mathcal{X} \circ \mathcal{U}
-
-        \eta_3 = - \frac{\epsilon}{3 (1 - \epsilon)(\eta + 1) +
-                 \epsilon (3 \eta + 1)} ,
-        \qquad \mathcal{O}_3 = \mathcal{D} \circ \mathcal{Y} \circ \mathcal{U}
-
-        \eta_4 = - \frac{\epsilon (\eta + 1)}{3 (1 - \epsilon)(\eta + 1) +
-                 \epsilon (3 \eta + 1)} ,
-        \qquad \mathcal{O}_4 = \mathcal{D} \circ \mathcal{Z} \circ \mathcal{U}
+    ..math::`\mathcal{D}(\epsilon) = (1 - \epsilon)[[mathbb{1}] +
+    \epsilon(frac{\eta}{\eta + 1}mathcal{D^{*}_ph}
+    + frac{1}{eta + 1}mathcal{D^{*}_pol})`is a combined (biased) depolarizing
+    and dephasing channel, with :math:`\mathcal{D}^{*}_ph
+    = frac{1}{3}\sum\_{\mu\in\{I,Z\}^{\otimes2}\setminusI^{\otimes}2}}[\mu]`
+    and :math:`\mathcal{D}^{*}_pol
+    = frac{1}{15}\sum\_{
+    \mu\in\{I,X,Y,Z\}^{\otimes2}\setminusI^{\otimes2}}[\mu]`
 
     Args:
         ideal_operation: The ideal operation (as a QPROGRAM) to represent.
