@@ -25,7 +25,7 @@ from mitiq.observable import PauliString, Observable
 from mitiq import interface
 
 # About and version.
-from mitiq._about import about
+from mitiq._about import about, latest_supported_packages
 from mitiq._version import __version__
 
 # Error mitigation modules.

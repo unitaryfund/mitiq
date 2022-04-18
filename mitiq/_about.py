@@ -69,7 +69,7 @@ except ImportError:
     INSTALLED_PKGS["pennylane-qiskit"] = "Not installed"
 
 
-def latest_supported():
+def latest_optional_supported():
     """Returns the versions of Mitiq's optional packages that are supported by
     the current version of Mitiq. Requires that the dependency has a pinned
     version in the dev_requirements.txt file.
@@ -80,7 +80,14 @@ def latest_supported():
         if req.project_name in (OPTIONAL_PKGS)
     }
 
-LATEST_SUPPORTED_PKGS.update(latest_supported())
+LATEST_SUPPORTED_PKGS.update(latest_optional_supported())
+
+def latest_supported_packages():
+    """Returns the versions of Mitiq's optional packages that are supported by
+    the current version of Mitiq. Requires that the dependency has a pinned
+    version in the dev_requirements.txt file.
+    """
+    return LATEST_SUPPORTED_PKGS
 
 def check_versions() -> None:
     """Checks that the installed versions of Mitiq's dependencies are
