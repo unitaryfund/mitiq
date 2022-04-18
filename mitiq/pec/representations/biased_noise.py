@@ -52,7 +52,7 @@ def represent_operation_with_local_biased_noise(
     = frac{1}{3}\sum\_{\mu\in\{I,Z\}^{\otimes2}\setminusI^{\otimes}2}}[\mu]`
     and :math:`\mathcal{D}^{*}_pol
     = frac{1}{15}\sum\_{
-    \mu\in\{I,X,Y,Z\}^{\otimes2}\setminusI^{\otimes2}}[\mu]`
+        \mu\in\{I,X,Y,Z\}^{\otimes2}\setminusI^{\otimes2}}[\mu]`
 
     Args:
         ideal_operation: The ideal operation (as a QPROGRAM) to represent.
@@ -60,7 +60,7 @@ def represent_operation_with_local_biased_noise(
         eta: The noise bias between combined dephasing and depolarizing
         channelswith :math:`\eta = 0` describing a fully depolarizing channel
         and :math:`\eta = inf` describing a fully dephasing channel.
-
+    
     Returns:
         The quasi-probability representation of the ``ideal_operation``.
 
