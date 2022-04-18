@@ -57,8 +57,9 @@ def represent_operation_with_local_biased_noise(
         ideal_operation: The ideal operation (as a QPROGRAM) to represent.
         epsilon: The local noise severity (as a float) of the combined channel.
         eta: The noise bias between combined dephasing and depolarizing
-        channelswith :math:`\eta = 0` describing a fully depolarizing channel
-        and :math:`\eta = \inf` describing a fully dephasing channel.
+            channels with :math:`\eta = 0` describing a fully depolarizing
+            channel and :math:`\eta = \inf` describing a fully dephasing
+            channel.
 
     Returns:
         The quasi-probability representation of the ``ideal_operation``.
