@@ -48,8 +48,8 @@ def represent_operation_with_local_biased_noise(
     :math:`\mathcal{P}_\alpha` is a Pauli operation and
     ..math::`\mathcal{D}(\epsilon) = (1 - \epsilon)[mathbb{1}] +
     \epsilon(frac{\eta}{\eta + 1} mathcal{Z}
-    + frac{1}{3}frac{1}{\eta + 1}(mathcal{X} + mathcal{Y} + mathcal{Z}))` is the
-    combined (biased) dephasing and depolarizing channel acting on a single
+    + frac{1}{3}frac{1}{\eta + 1}(mathcal{X} + mathcal{Y} + mathcal{Z}))` is
+    the combined (biased) dephasing and depolarizing channel acting on a single
     qubit. For multi-qubit operations, we use a noise channel that is the
     tensor product of the local single-qubit channels.
 
