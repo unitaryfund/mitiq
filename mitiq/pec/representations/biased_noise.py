@@ -41,18 +41,17 @@ def represent_operation_with_local_biased_noise(
 
     This function assumes a combined depolarizing and dephasing noise model
     with a bias factor :math:`\eta` (see :cite:`Strikis_2021_PRXQuantum`)
-    and that the following noisy operations are implementable,
+    and that the following noisy operations are implementable
+    :math:`\mathcal{O}_{\alpha} = \mathcal{D} \circ \mathcal P_\alpha`
     where :math:`\mathcal{U}` is the unitary associated
-    to the input ``ideal_operation`` acting on :math:`k` qubits,
+    to the input ``ideal_operation``,
     :math:`\mathcal{P}_\alpha` is a Pauli operation and
-    ..math::`\mathcal{D}(\epsilon) = (1 - \epsilon)[[mathbb{1}] +
-    \epsilon(frac{\eta}{\eta + 1}mathcal{D^{*}_ph}
-    + frac{1}{eta + 1}mathcal{D^{*}_pol})`is a combined (biased) depolarizing
-    and dephasing channel, with :math:`\mathcal{D}^{*}_ph
-    = frac{1}{3}\sum\_{\mu\in\{I,Z\}^{\otimes2}\setminusI^{\otimes}2}}[\mu]`
-    and :math:`\mathcal{D}^{*}_pol
-    = frac{1}{15}\sum\_{
-        \mu\in\{I,X,Y,Z\}^{\otimes2}\setminusI^{\otimes2}}[\mu]`
+    ..math::`\mathcal{D}(\epsilon) = (1 - \epsilon)[mathbb{1}] +
+    \epsilon(frac{\eta}{\eta + 1} mathcal{Z}
+    + frac{1}{3}frac{1}{\eta + 1}(mathcal{X} + mathcal{Y} + mathcal{Z}))` is the
+    combined (biased) dephasing and depolarizing channel acting on a single
+    qubit. For multi-qubit operations, we use a noise channel that is the
+    tensor product of the local single-qubit channels.
 
     Args:
         ideal_operation: The ideal operation (as a QPROGRAM) to represent.
