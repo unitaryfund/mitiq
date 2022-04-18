@@ -15,21 +15,58 @@
 
 """Information about Mitiq and dependencies."""
 import platform
+import warnings
 from pkg_resources import parse_requirements
 
+LATEST_SUPPORTED_PKGS = {req.project_name: req.specs[0][1]
+    for req in parse_requirements(open("requirements.txt"))}
+INSTALLED_PKGS = {}
+
+# Checking versions of Mitiq's core dependencies (must be installed)
+
 from cirq import __version__ as cirq_version
+INSTALLED_PKGS["cirq"] = cirq_version
 from numpy import __version__ as numpy_version
+INSTALLED_PKGS["numpy"] = numpy_version 
 from scipy import __version__ as scipy_version
+INSTALLED_PKGS["scipy"] = scipy_version 
 
 import mitiq
 
-OPTIONAL_REQUIREMENTS = [
+# Checking versions of Mitiq's optional dependencies (may be installed)
+OPTIONAL_PKGS = [
     "pyquil",
     "qiskit",
     "amazon-braket-sdk",
     "pennylane",
     "pennylane-qiskit",
 ]
+
+try:
+    from pyquil import __version__ as pyquil_version
+    INSTALLED_PKGS["pyquil"] = pyquil_version 
+except ImportError:
+    INSTALLED_PKGS["pyquil"] = "Not installed"
+try:
+    from qiskit import __qiskit_version__  # pragma: no cover
+    INSTALLED_PKGS["qiskit"] = __qiskit_version__["qiskit"]  # pragma: no cover
+except ImportError:
+    INSTALLED_PKGS["qiskit"] = "Not installed"
+try:
+    from braket._sdk import __version__ as braket_version
+    INSTALLED_PKGS["amazon-braket-sdk"] = braket_version
+except ImportError:
+    INSTALLED_PKGS["amazon-braket-sdk"] = "Not installed"
+try:
+    from pennylane import __version__ as pennylane_version
+    INSTALLED_PKGS["pennylane"] = pennylane_version
+except ImportError:
+    INSTALLED_PKGS["pennylane"] = "Not installed"
+try:
+    from pennylane_qiskit import __version__ as pennylane_qiskit_version
+    INSTALLED_PKGS["pennylane-qiskit"] = pennylane_qiskit_version
+except ImportError:
+    INSTALLED_PKGS["pennylane-qiskit"] = "Not installed"
 
 
 def latest_supported():
@@ -40,68 +77,72 @@ def latest_supported():
     return {
         req.project_name: req.specs[0][1]
         for req in parse_requirements(open("dev_requirements.txt"))
-        if req.project_name in OPTIONAL_REQUIREMENTS
+        if req.project_name in (OPTIONAL_PKGS)
     }
 
+LATEST_SUPPORTED_PKGS.update(latest_supported())
+
+def check_versions() -> None:
+    """Checks that the installed versions of Mitiq's dependencies are
+    supported by the current version of Mitiq.
+    """
+
+    for name, version in INSTALLED_PKGS.items():
+        if LATEST_SUPPORTED_PKGS[name] != version:
+            warnings.warn(
+                f"The currently installed version of {name} ({version}) is not"
+                f"the currently supported version ({LATEST_SUPPORTED_PKGS[name]})."
+                " If you are having trouble with this version of Mitiq, please "
+                "consider updating to the latest supported dependency versions.",
+                UserWarning,
+            )
+check_versions()
 
 def about() -> None:
     """Displays information about Mitiq, core/optional packages, and Python
     version/platform information.
     """
-    try:
-        from pyquil import __version__ as pyquil_version
-    except ImportError:
-        pyquil_version = "Not installed"
-    try:
-        from qiskit import __qiskit_version__  # pragma: no cover
+    check_versions()
+    about = f"""
+    Mitiq: A Python toolkit for implementing error mitigation on quantum computers
+    ==============================================================================
+    Authored by: Mitiq team, 2020 & later (https://github.com/unitaryfund/mitiq)
 
-        qiskit_version = __qiskit_version__["qiskit"]  # pragma: no cover
-    except ImportError:
-        qiskit_version = "Not installed"
-    try:
-        from braket._sdk import __version__ as braket_version
-    except ImportError:
-        braket_version = "Not installed"
-    try:
-        from pennylane import __version__ as pennylane_version
-    except ImportError:
-        pennylane_version = "Not installed"
-    try:
-        from pennylane_qiskit import __version__ as pennylane_qiskit_version
-    except ImportError:
-        pennylane_qiskit_version = "Not installed"
+    Mitiq Version: {mitiq.__version__}
 
-    optional_reqs = latest_supported()
+    Core Dependencies (must be installed):
+    --------------------------------------
+    Cirq:
+        - installed:        {INSTALLED_PKGS["cirq"]}
+        - latest supported: {LATEST_SUPPORTED_PKGS["cirq"]}
+    NumPy:
+        - installed:        {INSTALLED_PKGS["numpy"]}
+        - latest supported: {LATEST_SUPPORTED_PKGS["numpy"]}
+    SciPy:
+        - installed:        {INSTALLED_PKGS["scipy"]}
+        - latest supported: {LATEST_SUPPORTED_PKGS["scipy"]}
 
-    about_str = f"""
-Mitiq: A Python toolkit for implementing error mitigation on quantum computers
-==============================================================================
-Authored by: Mitiq team, 2020 & later (https://github.com/unitaryfund/mitiq)
+    Optional Dependencies
+    ---------------------
+    Braket:
+        - installed:        {INSTALLED_PKGS["amazon-braket-sdk"]}
+        - latest supported: {LATEST_SUPPORTED_PKGS["amazon-braket-sdk"]}
+    PennyLane:
+        - installed:        {INSTALLED_PKGS["pennylane"]}
+        - latest supported: {LATEST_SUPPORTED_PKGS["pennylane"]}
+    PennyLane-Qiskit:
+        - installed:        {INSTALLED_PKGS["pennylane-qiskit"]}
+        - latest supported: {LATEST_SUPPORTED_PKGS["pennylane-qiskit"]}
+    PyQuil:
+        - installed:        {INSTALLED_PKGS["pyquil"]}
+        - latest supported: {LATEST_SUPPORTED_PKGS["pyquil"]}
+    Qiskit:
+        - installed:        {INSTALLED_PKGS["qiskit"]}
+        - latest supported: {LATEST_SUPPORTED_PKGS["qiskit"]}
 
-Mitiq Version:\t{mitiq.__version__}
-
-Core Dependencies
------------------
-Cirq Version:\t{cirq_version}
-NumPy Version:\t{numpy_version}
-SciPy Version:\t{scipy_version}
-
-Optional Dependencies
----------------------
-PyQuil Version:           {pyquil_version}
-    Latest Supported:     {optional_reqs["pyquil"]}
-Qiskit Version:           {qiskit_version}
-    Latest Supported:     {optional_reqs["qiskit"]}
-Braket Version:           {braket_version}
-    Latest Supported:     {optional_reqs["amazon-braket-sdk"]}
-PennyLane Version:        {pennylane_version} 
-    Latest Supported:     {optional_reqs["pennylane"]}
-PennyLane-Qiskit Version: {pennylane_qiskit_version}
-    Latest Supported:     {optional_reqs["pennylane-qiskit"]}
-
-Python Version:\t{platform.python_version()}
-Platform Info:\t{platform.system()} ({platform.machine()})"""
-    print(about_str)
+    Python Version:\t{platform.python_version()}
+    Platform Info:\t{platform.system()} ({platform.machine()})"""
+    print(about)
 
 
 if __name__ == "__main__":
