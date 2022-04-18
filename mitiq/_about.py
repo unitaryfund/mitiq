@@ -15,6 +15,7 @@
 
 """Information about Mitiq and dependencies."""
 import platform
+from typing import Dict
 import warnings
 from pkg_resources import parse_requirements
 
@@ -75,7 +76,7 @@ except ImportError:
     INSTALLED_PKGS["pennylane-qiskit"] = "Not installed"
 
 
-def latest_optional_supported():
+def latest_optional_supported() -> Dict:
     """Returns the versions of Mitiq's optional packages that are supported by
     the current version of Mitiq. Requires that the dependency has a pinned
     version in the dev_requirements.txt file.
@@ -90,7 +91,7 @@ def latest_optional_supported():
 LATEST_SUPPORTED_PKGS.update(latest_optional_supported())
 
 
-def latest_supported_packages():
+def latest_supported_packages() -> Dict:
     """Returns the versions of Mitiq's optional packages that are supported by
     the current version of Mitiq. Requires that the dependency has a pinned
     version in the dev_requirements.txt file.
