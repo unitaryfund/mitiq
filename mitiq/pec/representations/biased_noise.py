@@ -68,7 +68,7 @@ def represent_operation_with_local_biased_noise(
         This representation is based on the ideal assumption that one
         can append Pauli gates to a noisy operation without introducing
         additional noise. For a backend which violates this assumption,
-        it remains a good approximation for small values of ``epsilon``.
+        it remains a good approximation for small values of ``noise_level``.
 
     .. note::
         The input ``ideal_operation`` is typically a QPROGRAM with a single
