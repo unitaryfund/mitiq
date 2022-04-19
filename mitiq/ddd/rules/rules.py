@@ -16,9 +16,8 @@
 """Built-in rules determining what DDD sequence should be applied in a given
 slack window.
 """
-from cirq import Circuit, X, Y, I, LineQubit, Gate
+from cirq import Circuit, X, Y, I, LineQubit, Gate, unitary, is_unitary
 from typing import List
-
 from itertools import cycle
 
 
@@ -45,8 +44,10 @@ def general_rule(
     Returns:
         A digital dynamical decoupling sequence, as a Cirq circuit.
     """
+    if len(gates) < 2:
+        raise ValueError("Gateset too short to make a ddd sequence.")
     if slack_length < 2 or slack_length < len(gates):
-        raise ValueError("Slack window is too short for the given gates.")
+        return Circuit()
     num_decoupling_gates = len(gates)
     slack_difference = slack_length - num_decoupling_gates
     if spacing < 0:
@@ -62,7 +63,7 @@ def general_rule(
         )
     q = LineQubit(0)
     slack_gates = [I(q) for _ in range(spacing)]
-    ddd_circuit = Circuit(
+    sequence = Circuit(
         slack_gates,
         [
             (
@@ -72,9 +73,11 @@ def general_rule(
             for (_, gate) in zip(range(num_decoupling_gates), cycle(gates))
         ],
     )
+    if not is_unitary(unitary(sequence)):
+        raise ValueError("Provided sequence is not unitary!")
     for i in range(slack_remainder):
-        ddd_circuit.append(I(q)) if i % 2 else ddd_circuit.insert(0, I(q))
-    return ddd_circuit
+        sequence.append(I(q)) if i % 2 else sequence.insert(0, I(q))
+    return sequence
 
 
 def xx(slack_length: int, spacing: int = -1) -> Circuit:
@@ -92,12 +95,12 @@ def xx(slack_length: int, spacing: int = -1) -> Circuit:
     Returns:
         An XX digital dynamical decoupling sequence, as a Cirq circuit.
     """
-    xx_rule = general_rule(
+    xx_sequence = general_rule(
         slack_length=slack_length,
         spacing=spacing,
         gates=[X, X],
     )
-    return xx_rule
+    return xx_sequence
 
 
 def xyxy(slack_length: int, spacing: int = -1) -> Circuit:
@@ -115,12 +118,12 @@ def xyxy(slack_length: int, spacing: int = -1) -> Circuit:
     Returns:
         An XYXY digital dynamical decoupling sequence, as a Cirq circuit.
     """
-    xyxy_rule = general_rule(
+    xyxy_sequence = general_rule(
         slack_length=slack_length,
         spacing=spacing,
         gates=[X, Y, X, Y],
     )
-    return xyxy_rule
+    return xyxy_sequence
 
 
 def yy(slack_length: int, spacing: int = -1) -> Circuit:
@@ -138,9 +141,43 @@ def yy(slack_length: int, spacing: int = -1) -> Circuit:
     Returns:
         An YY digital dynamical decoupling sequence, as a Cirq circuit.
     """
-    yy_rule = general_rule(
+    yy_sequence = general_rule(
         slack_length=slack_length,
         spacing=spacing,
         gates=[Y, Y],
     )
-    return yy_rule
+    return yy_sequence
+
+
+def repeated_rule(slack_length: int, gates: List[Gate]) -> Circuit:
+    """Returns a general digital dynamical decoupling sequence that repeats
+    until the slack is filled without spacing, up to a complete repetition.
+
+    Note:
+    Args:
+        slack_length: Length of idle window to fill.
+        gates: A list of Cirq gates to build the rule. E.g. [X, X] is the xx
+            sequence, [X, Y, X, Y] is the xyxy sequence.
+    Returns:
+        A repeated digital dynamical decoupling sequence, as a Cirq circuit.
+    Note:
+        Where the general rule requires pre-knowledge of the amount of slack,
+        this rule attempts to fill every moment with sequence repetitions
+        (up to a complete repetition of the gate set).
+        E.g. given slack_length = 17 and gates = [X, Y]
+            this rule returns the sequence:
+            ──I──X──Y──X──Y──X──Y──X──Y──X──Y──X──Y──X──Y──X──Y──
+    """
+    num_decoupling_gates = len(gates)
+    sequence = general_rule(
+        slack_length=slack_length,
+        spacing=0,
+        gates=[
+            gate
+            for (_, gate) in zip(
+                range(slack_length - (slack_length % num_decoupling_gates)),
+                cycle(gates),
+            )
+        ],
+    )
+    return sequence

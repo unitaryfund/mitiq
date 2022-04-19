@@ -14,11 +14,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for DDD rules."""
-from mitiq.ddd.rules.rules import general_rule, xx, xyxy, yy
+from mitiq.ddd.rules.rules import general_rule, xx, xyxy, yy, repeated_rule
 import pytest
 from cirq import X, Y, Z, I, Circuit, LineQubit
 from mitiq.utils import _equal
-
+from itertools import repeat
 
 @pytest.mark.parametrize(
     "slack_length",
@@ -114,12 +114,12 @@ def test_exact_sequences(slack_length, rule, sequence):
 def test_rule_failures(slack_length, spacing):
     num_decoupling_gates = 3
     if slack_length < num_decoupling_gates:
-        with pytest.raises(ValueError, match="too short"):
-            general_rule(
-                slack_length=slack_length,
-                spacing=spacing,
-                gates=[X, Y, Z],
-            )
+        sequence = general_rule(
+            slack_length=slack_length,
+            spacing=spacing,
+            gates=[X, Y, Z],
+        )
+        assert len(sequence) == 0
     elif slack_length < (
         (num_decoupling_gates + 1) * spacing + num_decoupling_gates
     ):
@@ -138,3 +138,47 @@ def test_rule_failures(slack_length, spacing):
             gates=[X, Y, Z],
         )
         assert len(sequence) == slack_length
+
+
+@pytest.mark.parametrize(
+    "slack_length",
+    [1, 2, 3, 5],
+)
+@pytest.mark.parametrize(
+    "gates",
+    [
+        [X],
+        [Y],
+        [Z],
+    ],
+)
+def test_general_for_incomplete_rule(slack_length, gates):
+    with pytest.raises(ValueError, match="too short to make a ddd sequence"):
+        general_rule(
+            slack_length=slack_length,
+            gates=gates,
+        )
+
+@pytest.mark.parametrize(
+    "slack_length",
+    [4, 5, 8, 13, 21, 34],
+)
+@pytest.mark.parametrize(
+    "gates",
+    [
+        [X, X],
+        [X, Y, X, Y],
+        [Y, Y],
+        [X, Y, Z],
+    ],
+)
+def test_repeated_sequences(slack_length, gates):
+    sequence = repeated_rule(
+        slack_length=slack_length,
+        gates=gates,
+    )
+    num_reps = slack_length // len(gates)
+    gate_set = {X, Y, Z}
+    seq_gates = [op.gate for op in sequence.all_operations()]
+    assert len(sequence) == slack_length
+    assert gates * num_reps == [gate for gate in seq_gates if gate in gate_set]
