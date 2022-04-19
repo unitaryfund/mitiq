@@ -38,8 +38,8 @@ def general_rule(
             given slack_length = 20, gates [X, Y, X, Y] the spacing defaults
             to 3 and the rule returns the sequence:
             ──I──I──I──I──X──I──I──I──Y──I──I──I──X──I──I──I──Y──I──I──I──
-        gates: A list of Cirq gates to build the rule. E.g. [X, X] is the xx
-            sequence, [X, Y, X, Y] is the xyxy sequence.
+        gates: A list of single qubit Cirq gates to build the rule. E.g. [X, X] is
+            the xx sequence, [X, Y, X, Y] is the xyxy sequence.
             - Note: To repeat the sequence, specify a repeated gateset.
     Returns:
         A digital dynamical decoupling sequence, as a Cirq circuit.
@@ -156,8 +156,8 @@ def repeated_rule(slack_length: int, gates: List[Gate]) -> Circuit:
     Note:
     Args:
         slack_length: Length of idle window to fill.
-        gates: A list of Cirq gates to build the rule. E.g. [X, X] is the xx
-            sequence, [X, Y, X, Y] is the xyxy sequence.
+        gates: A list of single qubit Cirq gates to build the rule. E.g. [X, X] is
+            the xx sequence, [X, Y, X, Y] is the xyxy sequence.
     Returns:
         A repeated digital dynamical decoupling sequence, as a Cirq circuit.
     Note:

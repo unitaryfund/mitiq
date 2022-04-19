@@ -16,7 +16,7 @@
 """Unit tests for DDD rules."""
 from mitiq.ddd.rules.rules import general_rule, xx, xyxy, yy, repeated_rule
 import pytest
-from cirq import X, Y, Z, I, Circuit, LineQubit
+from cirq import X, Y, Z, I, Circuit, LineQubit, CNOT
 from mitiq.utils import _equal
 
 
@@ -154,6 +154,23 @@ def test_rule_failures(slack_length, spacing):
 )
 def test_general_for_incomplete_rule(slack_length, gates):
     with pytest.raises(ValueError, match="too short to make a ddd sequence"):
+        general_rule(
+            slack_length=slack_length,
+            gates=gates,
+        )
+
+@pytest.mark.parametrize(
+    "slack_length",
+    [3, 5],
+)
+@pytest.mark.parametrize(
+    "gates",
+    [
+        [CNOT, X, Y],
+    ],
+)
+def test_general_for_multi_qubit_gate(slack_length, gates):
+    with pytest.raises(ValueError, match="Wrong number of qubits"):
         general_rule(
             slack_length=slack_length,
             gates=gates,
