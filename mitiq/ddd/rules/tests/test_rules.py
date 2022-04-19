@@ -18,7 +18,7 @@ from mitiq.ddd.rules.rules import general_rule, xx, xyxy, yy, repeated_rule
 import pytest
 from cirq import X, Y, Z, I, Circuit, LineQubit
 from mitiq.utils import _equal
-from itertools import repeat
+
 
 @pytest.mark.parametrize(
     "slack_length",
@@ -158,6 +158,7 @@ def test_general_for_incomplete_rule(slack_length, gates):
             slack_length=slack_length,
             gates=gates,
         )
+
 
 @pytest.mark.parametrize(
     "slack_length",
