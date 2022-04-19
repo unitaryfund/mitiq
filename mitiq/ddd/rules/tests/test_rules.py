@@ -16,7 +16,7 @@
 """Unit tests for DDD rules."""
 from mitiq.ddd.rules.rules import general_rule, xx, xyxy, yy, repeated_rule
 import pytest
-from cirq import X, Y, Z, I, Circuit, LineQubit, CNOT
+from cirq import X, Y, Z, I, Circuit, LineQubit, CNOT, bit_flip
 from mitiq.utils import _equal
 
 
@@ -159,6 +159,7 @@ def test_general_for_incomplete_rule(slack_length, gates):
             gates=gates,
         )
 
+
 @pytest.mark.parametrize(
     "slack_length",
     [3, 5],
@@ -200,3 +201,9 @@ def test_repeated_sequences(slack_length, gates):
     seq_gates = [op.gate for op in sequence.all_operations()]
     assert len(sequence) == slack_length
     assert gates * num_reps == [gate for gate in seq_gates if gate in gate_set]
+
+
+def test_not_unitary():
+    flipped = bit_flip(p=0.1)
+    with pytest.raises(TypeError, match="cirq.unitary failed"):
+        general_rule(slack_length=17, gates=[flipped, flipped])

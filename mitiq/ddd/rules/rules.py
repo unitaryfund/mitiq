@@ -16,7 +16,7 @@
 """Built-in rules determining what DDD sequence should be applied in a given
 slack window.
 """
-from cirq import Circuit, X, Y, I, LineQubit, Gate, unitary, is_unitary
+from cirq import Circuit, X, Y, I, LineQubit, Gate, unitary
 from typing import List
 from itertools import cycle
 
@@ -38,8 +38,8 @@ def general_rule(
             given slack_length = 20, gates [X, Y, X, Y] the spacing defaults
             to 3 and the rule returns the sequence:
             ──I──I──I──I──X──I──I──I──Y──I──I──I──X──I──I──I──Y──I──I──I──
-        gates: A list of single qubit Cirq gates to build the rule. E.g. [X, X] is
-            the xx sequence, [X, Y, X, Y] is the xyxy sequence.
+        gates: A list of single qubit Cirq gates to build the rule. E.g. [X, X]
+            is the xx sequence, [X, Y, X, Y] is the xyxy sequence.
             - Note: To repeat the sequence, specify a repeated gateset.
     Returns:
         A digital dynamical decoupling sequence, as a Cirq circuit.
@@ -73,8 +73,10 @@ def general_rule(
             for (_, gate) in zip(range(num_decoupling_gates), cycle(gates))
         ],
     )
-    if not is_unitary(unitary(sequence)):
-        raise ValueError("Provided sequence is not unitary!")
+    try:
+        unitary(sequence)
+    except Exception as e:
+        raise e
     for i in range(slack_remainder):
         sequence.append(I(q)) if i % 2 else sequence.insert(0, I(q))
     return sequence
@@ -153,11 +155,10 @@ def repeated_rule(slack_length: int, gates: List[Gate]) -> Circuit:
     """Returns a general digital dynamical decoupling sequence that repeats
     until the slack is filled without spacing, up to a complete repetition.
 
-    Note:
     Args:
         slack_length: Length of idle window to fill.
-        gates: A list of single qubit Cirq gates to build the rule. E.g. [X, X] is
-            the xx sequence, [X, Y, X, Y] is the xyxy sequence.
+        gates: A list of single qubit Cirq gates to build the rule. E.g. [X, X]
+            is the xx sequence, [X, Y, X, Y] is the xyxy sequence.
     Returns:
         A repeated digital dynamical decoupling sequence, as a Cirq circuit.
     Note:
