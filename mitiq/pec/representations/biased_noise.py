@@ -46,9 +46,9 @@ def represent_operation_with_local_biased_noise(
     where :math:`\mathcal{U}` is the unitary associated
     to the input ``ideal_operation``,
     :math:`\mathcal{P}_\alpha` is a Pauli operation and
-    ..math::`\mathcal{D}(\epsilon) = (1 - \epsilon)[mathbb{1}] +
-    \epsilon(frac{\eta}{\eta + 1} mathcal{Z}
-    + frac{1}{3}frac{1}{\eta + 1}(mathcal{X} + mathcal{Y} + mathcal{Z}))` is
+    ..math::`\mathcal{D}(\epsilon) = (1 - \epsilon)[\mathbb{1}] +
+    \epsilon(\frac{\eta}{\eta + 1} \mathcal{Z}
+    + \frac{1}{3}\frac{1}{\eta + 1}(\mathcal{X} + \mathcal{Y} + \mathcal{Z}))` is
     the combined (biased) dephasing and depolarizing channel acting on a single
     qubit. For multi-qubit operations, we use a noise channel that is the
     tensor product of the local single-qubit channels.
@@ -68,7 +68,7 @@ def represent_operation_with_local_biased_noise(
         This representation is based on the ideal assumption that one
         can append Pauli gates to a noisy operation without introducing
         additional noise. For a backend which violates this assumption,
-        it remains a good approximation for small values of ``noise_level``.
+        it remains a good approximation for small values of ``epsilon``.
 
     .. note::
         The input ``ideal_operation`` is typically a QPROGRAM with a single
