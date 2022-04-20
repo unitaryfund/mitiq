@@ -16,9 +16,19 @@
 """Built-in rules determining what DDD sequence should be applied in a given
 slack window.
 """
-from cirq import Circuit, X, Y, I, LineQubit, Gate, unitary
+from cirq import (
+    Circuit,
+    X,
+    Y,
+    I,
+    LineQubit,
+    Gate,
+    unitary,
+    allclose_up_to_global_phase,
+)
 from typing import List
 from itertools import cycle
+import numpy as np
 
 
 def general_rule(
@@ -56,11 +66,7 @@ def general_rule(
         spacing * (num_decoupling_gates + 1) + num_decoupling_gates
     )
     if slack_remainder < 0:
-        raise ValueError(
-            "Rule too long for given slack window by {} moments.".format(
-                slack_remainder * -1
-            )
-        )
+        return Circuit()
     q = LineQubit(0)
     slack_gates = [I(q) for _ in range(spacing)]
     sequence = Circuit(
@@ -73,10 +79,8 @@ def general_rule(
             for (_, gate) in zip(range(num_decoupling_gates), cycle(gates))
         ],
     )
-    try:
-        unitary(sequence)
-    except Exception as e:
-        raise e
+    if not allclose_up_to_global_phase(np.eye(2), unitary(sequence)):
+        raise ValueError("Sequence is not equivalent to the identity!")
     for i in range(slack_remainder):
         sequence.append(I(q)) if i % 2 else sequence.insert(0, I(q))
     return sequence
@@ -162,9 +166,9 @@ def repeated_rule(slack_length: int, gates: List[Gate]) -> Circuit:
     Returns:
         A repeated digital dynamical decoupling sequence, as a Cirq circuit.
     Note:
-        Where the general rule requires pre-knowledge of the amount of slack,
-        this rule attempts to fill every moment with sequence repetitions
-        (up to a complete repetition of the gate set).
+        Where :fun:`.general_rule()` fills a slack window with a single
+        sequence, this rule attempts to fill every moment with sequence
+        repetitions (up to a complete repetition of the gate set).
         E.g. given slack_length = 17 and gates = [X, Y]
             this rule returns the sequence:
             ──I──X──Y──X──Y──X──Y──X──Y──X──Y──X──Y──X──Y──X──Y──

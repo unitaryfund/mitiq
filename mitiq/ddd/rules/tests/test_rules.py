@@ -123,14 +123,12 @@ def test_rule_failures(slack_length, spacing):
     elif slack_length < (
         (num_decoupling_gates + 1) * spacing + num_decoupling_gates
     ):
-        with pytest.raises(
-            ValueError, match="too long for given slack window"
-        ):
-            general_rule(
-                slack_length=slack_length,
-                spacing=spacing,
-                gates=[X, Y, Z],
-            )
+        sequence = general_rule(
+            slack_length=slack_length,
+            spacing=spacing,
+            gates=[X, Y, Z],
+        )
+        assert len(sequence) == 0
     else:
         sequence = general_rule(
             slack_length=slack_length,
@@ -203,7 +201,19 @@ def test_repeated_sequences(slack_length, gates):
     assert gates * num_reps == [gate for gate in seq_gates if gate in gate_set]
 
 
-def test_not_unitary():
-    flipped = bit_flip(p=0.1)
-    with pytest.raises(TypeError, match="cirq.unitary failed"):
-        general_rule(slack_length=17, gates=[flipped, flipped])
+@pytest.mark.parametrize(
+    "gates",
+    [
+        [bit_flip(p=0.1), bit_flip(p=0.1)],
+        [X, X, X],
+    ],
+)
+def test_not_unitary(gates):
+    if set(gates).intersection({bit_flip(p=0.1)}):
+        with pytest.raises(TypeError, match="cirq.unitary failed"):
+            general_rule(slack_length=17, gates=gates)
+    else:
+        with pytest.raises(
+            ValueError, match="is not equivalent to the identity"
+        ):
+            general_rule(slack_length=17, gates=gates)
