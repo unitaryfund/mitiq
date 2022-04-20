@@ -209,7 +209,7 @@ def test_repeated_sequences(slack_length, gates):
     ],
 )
 def test_not_unitary(gates):
-    if set(gates).intersection({bit_flip(p=0.1)}):
+    if bit_flip(p=0.1) in gates:
         with pytest.raises(TypeError, match="cirq.unitary failed"):
             general_rule(slack_length=17, gates=gates)
     else:
