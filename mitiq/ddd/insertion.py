@@ -55,9 +55,9 @@ def _validate_integer_matrix(mask: np.ndarray) -> None:
 
 def get_slack_matrix_from_circuit_mask(mask: np.ndarray) -> np.ndarray:
     """Given a circuit mask matrix :math:`A`, e.g., the output of
-    ``get_circuit_mask()``, returns a slack matrix B,
-    where :math:`B_{i,j} = t` if the position :math:`A{i,j}` is the
-    initial element of a sequence of t zeros (from left to right).
+    ``_get_circuit_mask()``, returns a slack matrix :math:`B`,
+    where :math:`B_{i,j} = t` if the position :math:`A_{i,j}` is the
+    initial element of a sequence of :math:`t` zeros (from left to right).
 
     Args:
         mask: The mask matrix of a quantum circuit.
