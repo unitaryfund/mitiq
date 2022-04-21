@@ -20,8 +20,9 @@ import numpy as np
 
 def _get_circuit_mask(circuit: Circuit) -> np.ndarray:
     """Given a circuit with n qubits and d moments returns a matrix
-    A with n rows and d columns. The matrix elements are A_{i,j} = 1 if
-    there is a gate acting on qubit i at moment j, while A_{i,j} = 0 otherwise.
+    :math:`A` with n rows and d columns. The matrix elements are
+    :math:`A_{i,j} = 1` if there is a gate acting on qubit :math:`i` at moment
+    :math:`j`, while :math:`A_{i,j} = 0` otherwise.
 
     Args:
         circuit: Input circuit to mask with n qubits and d moments
@@ -53,8 +54,9 @@ def _validate_integer_matrix(mask: np.ndarray) -> None:
 
 
 def get_slack_matrix_from_circuit_mask(mask: np.ndarray) -> np.ndarray:
-    """Given a circuit mask matrix A, e.g. the output of get_circuit_mask(),
-    returns a slack matrix B, where B_{i,j} = t if the position A{i,j} is the
+    """Given a circuit mask matrix :math:`A`, e.g., the output of
+    ``get_circuit_mask()``, returns a slack matrix B,
+    where :math:`B_{i,j} = t` if the position :math:`A{i,j}` is the
     initial element of a sequence of t zeros (from left to right).
 
     Args:
