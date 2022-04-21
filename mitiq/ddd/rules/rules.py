@@ -165,13 +165,13 @@ def repeated_rule(slack_length: int, gates: List[Gate]) -> Circuit:
             is the xx sequence, [X, Y, X, Y] is the xyxy sequence.
     Returns:
         A repeated digital dynamical decoupling sequence, as a Cirq circuit.
+
     Note:
-        Where :fun:`.general_rule()` fills a slack window with a single
+        Where :func:`.general_rule()` fills a slack window with a single
         sequence, this rule attempts to fill every moment with sequence
         repetitions (up to a complete repetition of the gate set).
-        E.g. given slack_length = 17 and gates = [X, Y]
-            this rule returns the sequence:
-            ──I──X──Y──X──Y──X──Y──X──Y──X──Y──X──Y──X──Y──X──Y──
+        E.g. given slack_length = 17 and gates = [X, Y], this rule returns
+        the sequence: ──I──X──Y──X──Y──X──Y──X──Y──X──Y──X──Y──X──Y──X──Y──
     """
     num_decoupling_gates = len(gates)
     sequence = general_rule(
