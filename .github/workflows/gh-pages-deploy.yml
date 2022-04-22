@@ -1,0 +1,39 @@
+name: GH pages deploy
+
+# Right now, only runs on command via workflow_dispatch.
+# Depending on desired versioning behaivour, this can be changed to another
+# trigger.
+on:
+  workflow_dispatch:
+    inputs: {}
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out mitiq
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.8
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          make install requirements
+
+      - name: Run the quilc & qvm Docker images
+        run: |
+          docker run --rm -idt -p 5000:5000 rigetti/qvm -S
+          docker run --rm -idt -p 5555:5555 rigetti/quilc -R
+
+      - name: Build and test Sphinx docs
+        run: |
+          make docs
+    # Push the book's HTML to github-pages
+      - name: GitHub Pages action
+        uses: peaceiris/actions-gh-pages@v3.8.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/build/html
