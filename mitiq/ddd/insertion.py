@@ -14,9 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tools to determine slack windows in circuits and to insert DDD sequences."""
-from cirq import Circuit
+from cirq import Circuit, I, Operation
 import numpy as np
-from typing import Optional, Callable
+from typing import Optional, Callable, Tuple, List
 from mitiq.interface import noise_scaling_converter
 
 
@@ -36,11 +36,14 @@ def _get_circuit_mask(circuit: Circuit) -> np.ndarray:
     mask_matrix = np.zeros((len(qubits), len(circuit)), dtype=int)
     for moment_index, moment in enumerate(circuit):
         for op in moment:
-            qubit_indices = [
-                qubit[0] for qubit in indexed_qubits if qubit[1] in op.qubits
-            ]
-            for qubit_index in qubit_indices:
-                mask_matrix[qubit_index, moment_index] = 1
+            if op.gate != I:
+                qubit_indices = [
+                    qubit[0]
+                    for qubit in indexed_qubits
+                    if qubit[1] in op.qubits
+                ]
+                for qubit_index in qubit_indices:
+                    mask_matrix[qubit_index, moment_index] = 1
     return mask_matrix
 
 
@@ -84,6 +87,18 @@ def get_slack_matrix_from_circuit_mask(mask: np.ndarray) -> np.ndarray:
     return slack_matrix
 
 
+def _construct_replacements(
+    circuit: Circuit, sequence: Circuit, index: int
+) -> List[Tuple[int, Operation, Operation]]:
+    """Returns the replacements for insert_ddd_sequences."""
+    return [
+        (index + idx, old_moment.operations[0], new_moment.operations[0])
+        for new_moment, (idx, old_moment) in zip(
+            sequence, enumerate(circuit[index : index + len(sequence)])
+        )
+    ]
+
+
 @noise_scaling_converter
 def insert_ddd_sequences(
     circuit: Circuit,
@@ -102,9 +117,12 @@ def insert_ddd_sequences(
     )
     # Copy to avoid mutating the input circuit
     circuit_with_ddd = circuit.copy()
-    for moment_idx, moment in enumerate(circuit_with_ddd):
+    for moment_idx, moment in enumerate(circuit):
         slack_column = slack_matrix[:, moment_idx]
         for _, slack_length in enumerate(slack_column):
-            ddd_sequence = rule(slack_length)
-            moment.append(ddd_sequence)
+            if slack_length != 0:
+                ddd_sequence = rule(slack_length)
+                circuit_with_ddd.batch_replace(
+                    _construct_replacements(circuit, ddd_sequence, moment_idx)
+                )
     return circuit_with_ddd

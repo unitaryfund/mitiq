@@ -14,4 +14,4 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Built-in rules determining what DDD sequence should be applied in a given slack window."""
-from mitiq.ddd.rules.rules import xx, xyxy, yy, general_rule
+from mitiq.ddd.rules.rules import xx, xyxy, yy, general_rule, repeated_rule
