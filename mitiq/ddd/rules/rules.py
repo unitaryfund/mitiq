@@ -55,7 +55,7 @@ def general_rule(
         A digital dynamical decoupling sequence, as a Cirq circuit.
     """
     if len(gates) < 2:
-        raise ValueError("Gateset too short to make a ddd sequence.")
+        return Circuit()
     if slack_length < 2 or slack_length < len(gates):
         return Circuit()
     num_decoupling_gates = len(gates)

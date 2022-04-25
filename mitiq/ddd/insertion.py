@@ -14,7 +14,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tools to determine slack windows in circuits and to insert DDD sequences."""
-from cirq import Circuit, I, Operation
+import copy
+from cirq import Circuit, I, Operation, LineQubit
 import numpy as np
 from typing import Optional, Callable, Tuple, List
 from mitiq.interface import noise_scaling_converter
@@ -91,18 +92,19 @@ def _construct_replacements(
     circuit: Circuit, sequence: Circuit, index: int
 ) -> List[Tuple[int, Operation, Operation]]:
     """Returns the replacements for insert_ddd_sequences."""
+    
     return [
-        (index + idx, old_moment.operations[0], new_moment.operations[0])
+        (index + idx, old_moment.operations, new_moment.operations[0])
         for new_moment, (idx, old_moment) in zip(
             sequence, enumerate(circuit[index : index + len(sequence)])
         )
     ]
 
 
-@noise_scaling_converter
+# @noise_scaling_converter
 def insert_ddd_sequences(
     circuit: Circuit,
-    rule: Optional[Callable[[int], Circuit]],
+    rule: Callable[[int], Circuit],
 ) -> Circuit:
     """Returns the circuit with DDD sequences applied according to the input rule.
 
@@ -119,10 +121,19 @@ def insert_ddd_sequences(
     circuit_with_ddd = circuit.copy()
     for moment_idx, moment in enumerate(circuit):
         slack_column = slack_matrix[:, moment_idx]
-        for _, slack_length in enumerate(slack_column):
-            if slack_length != 0:
-                ddd_sequence = rule(slack_length)
-                circuit_with_ddd.batch_replace(
-                    _construct_replacements(circuit, ddd_sequence, moment_idx)
-                )
+        print(slack_column)
+        for row_index, slack_length in enumerate(slack_column):
+            if slack_length > 1:
+                ddd_sequence = rule(slack_length).transform_qubits({LineQubit(0): LineQubit(row_index)})
+                circuit.insert(moment_idx, ddd_sequence.all_operations())
+                # for idx in range(slack_length):
+                #     moment = circuit[moment_idx]
+                #     print(row_index)
+                #     moment.operations = 
+                #     print(op_to_replace)
+                #     replacements.append((moment_idx+idx, op_to_replace, ddd_sequence[idx]))
+                #     print(replacements)
+    # circuit_with_ddd.batch_replace(
+    #     replacements
+    # )
     return circuit_with_ddd
