@@ -31,8 +31,11 @@ from cirq import (
 )
 
 from mitiq import QPROGRAM
+from mitiq.interface.conversions import (
+    convert_from_mitiq_preserve_qubit_naming,
+    convert_to_mitiq_preserve_qubit_naming,
+)
 from mitiq.pec.types import OperationRepresentation, NoisyOperation
-from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 
 from mitiq.pec.channels import tensor_product
 
@@ -98,7 +101,9 @@ def represent_operation_with_global_depolarizing_noise(
         QPROGRAM, followed by a single final depolarizing channel, is
         physically implementable.
     """
-    circ, in_type = convert_to_mitiq(ideal_operation)
+    circ, in_type, idle_indices = convert_to_mitiq_preserve_qubit_naming(
+        ideal_operation
+    )
 
     post_ops: List[List[Operation]]
     qubits = circ.all_qubits()
@@ -141,7 +146,20 @@ def represent_operation_with_global_depolarizing_noise(
     imp_op_circuits = [circ + Circuit(op) for op in post_ops]
 
     # Convert back to input type.
-    imp_op_circuits = [convert_from_mitiq(c, in_type) for c in imp_op_circuits]
+    if in_type == "qiskit":
+        q_regs = ideal_operation.qregs
+        c_regs = ideal_operation.cregs
+        imp_op_circuits = [
+            convert_from_mitiq_preserve_qubit_naming(
+                c, in_type, idle_indices, q_regs, c_regs
+            )
+            for c in imp_op_circuits
+        ]
+    else:
+        imp_op_circuits = [
+            convert_from_mitiq_preserve_qubit_naming(c, in_type, idle_indices)
+            for c in imp_op_circuits
+        ]
 
     # Build basis expansion.
     expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}
@@ -191,7 +209,9 @@ def represent_operation_with_local_depolarizing_noise(
         *Phys. Rev. Lett.* **119**, 180509 (2017),
         (https://arxiv.org/abs/1612.02058).
     """
-    circ, in_type = convert_to_mitiq(ideal_operation)
+    circ, in_type, idle_indices = convert_to_mitiq_preserve_qubit_naming(
+        ideal_operation
+    )
 
     qubits = circ.all_qubits()
 
@@ -235,7 +255,21 @@ def represent_operation_with_local_depolarizing_noise(
         )
 
     # Convert back to input type.
-    circuits = [convert_from_mitiq(c, in_type) for c in imp_op_circuits]
+    # Convert back to input type.
+    if in_type == "qiskit":
+        q_regs = ideal_operation.qregs
+        c_regs = ideal_operation.cregs
+        circuits = [
+            convert_from_mitiq_preserve_qubit_naming(
+                c, in_type, idle_indices, q_regs, c_regs
+            )
+            for c in imp_op_circuits
+        ]
+    else:
+        circuits = [
+            convert_from_mitiq_preserve_qubit_naming(c, in_type, idle_indices)
+            for c in imp_op_circuits
+        ]
 
     # Build basis expansion.
     expansion = {NoisyOperation(c): a for c, a in zip(circuits, alphas)}
@@ -274,7 +308,9 @@ def represent_operations_in_circuit_with_global_depolarizing_noise(
         Cirq circuits, even if the input is not a ``cirq.Circuit``.
     """
 
-    circ, _ = convert_to_mitiq(ideal_circuit)
+    circ, in_type, idle_indices = convert_to_mitiq_preserve_qubit_naming(
+        ideal_circuit
+    )
 
     representations = []
     for op in set(circ.all_operations()):
@@ -320,7 +356,9 @@ def represent_operations_in_circuit_with_local_depolarizing_noise(
         The returned representations are always defined in terms of
         Cirq circuits, even if the input is not a ``cirq.Circuit``.
     """
-    circ, _ = convert_to_mitiq(ideal_circuit)
+    circ, in_type, idle_indices = convert_to_mitiq_preserve_qubit_naming(
+        ideal_circuit
+    )
 
     representations = []
     for op in set(circ.all_operations()):

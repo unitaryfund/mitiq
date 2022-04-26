@@ -18,6 +18,7 @@ from functools import wraps
 from typing import Any, Callable, cast, Iterable, Tuple
 
 from cirq import Circuit
+from qiskit import ClassicalRegister, QuantumRegister
 
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES, QPROGRAM
 
@@ -306,3 +307,172 @@ def noise_scaling_converter(
         return scaled_circuit
 
     return new_scaling_function
+
+
+def convert_to_mitiq_preserve_qubit_naming(
+    circuit: QPROGRAM,
+) -> Tuple[Circuit, str, set]:
+    idle_indices = set()
+    if "qiskit" in circuit.__module__:
+        from mitiq.interface.mitiq_qiskit.conversions import (
+            _add_identity_to_idle,
+        )
+
+        idle_indices = _add_identity_to_idle(circuit)
+
+    conversion_function: Callable[[Any], Circuit]
+    try:
+        package = circuit.__module__
+    except AttributeError:
+        raise UnsupportedCircuitError(
+            "Could not determine the package of the input circuit."
+        )
+
+    if "qiskit" in package:
+        from mitiq.interface.mitiq_qiskit.conversions import from_qiskit
+
+        input_circuit_type = "qiskit"
+        conversion_function = from_qiskit
+    elif "pyquil" in package:
+        from mitiq.interface.mitiq_pyquil.conversions import from_pyquil
+
+        input_circuit_type = "pyquil"
+        conversion_function = from_pyquil
+    elif "braket" in package:
+        from mitiq.interface.mitiq_braket.conversions import from_braket
+
+        input_circuit_type = "braket"
+        conversion_function = from_braket
+    elif "pennylane" in package:
+        from mitiq.interface.mitiq_pennylane.conversions import from_pennylane
+
+        input_circuit_type = "pennylane"
+        conversion_function = from_pennylane
+    elif isinstance(circuit, Circuit):
+        input_circuit_type = "cirq"
+
+        def conversion_function(circ: Circuit) -> Circuit:
+            return circ
+
+    else:
+        raise UnsupportedCircuitError(
+            f"Circuit from module {package} is not supported.\n\n"
+            f"Circuit types supported by Mitiq are \n{SUPPORTED_PROGRAM_TYPES}"
+        )
+
+    try:
+        mitiq_circuit = conversion_function(circuit)
+    except Exception:
+        raise CircuitConversionError(
+            "Circuit could not be converted to an internal Mitiq circuit. "
+            "This may be because the circuit contains custom gates or Pragmas "
+            "(pyQuil). If you think this is a bug or that this circuit should "
+            "be supported, you can open an issue at "
+            "https://github.com/unitaryfund/mitiq. \n\nProvided circuit has "
+            f"type {type(circuit)} and is:\n\n{circuit}\n\nCircuit types "
+            f"supported by Mitiq are \n{SUPPORTED_PROGRAM_TYPES}."
+        )
+
+    return mitiq_circuit, input_circuit_type, idle_indices
+
+
+def convert_from_mitiq_preserve_qubit_naming(
+    circuit: Circuit,
+    conversion_type: str,
+    idle_indices: set,
+    q_regs: QuantumRegister = None,
+    c_regs: ClassicalRegister = None,
+) -> QPROGRAM:
+    conversion_function: Callable[[Circuit], QPROGRAM]
+    if conversion_type == "qiskit":
+        from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
+
+        conversion_function = to_qiskit
+    elif conversion_type == "pyquil":
+        from mitiq.interface.mitiq_pyquil.conversions import to_pyquil
+
+        conversion_function = to_pyquil
+    elif conversion_type == "braket":
+        from mitiq.interface.mitiq_braket.conversions import to_braket
+
+        conversion_function = to_braket
+    elif conversion_type == "pennylane":
+        from mitiq.interface.mitiq_pennylane.conversions import to_pennylane
+
+        conversion_function = to_pennylane
+    elif conversion_type == "cirq":
+
+        def conversion_function(circ: Circuit) -> Circuit:
+            return circ
+
+    else:
+        raise UnsupportedCircuitError(
+            f"Conversion to circuit of type {conversion_type} is unsupported."
+            f"\nCircuit types supported by Mitiq = {SUPPORTED_PROGRAM_TYPES}"
+        )
+
+    try:
+        converted_circuit = conversion_function(circuit)
+    except Exception:
+        raise CircuitConversionError(
+            f"Circuit could not be converted from an internal Mitiq type to a "
+            f"circuit of type {conversion_type}."
+        )
+
+    if "pyquil" in converted_circuit.__module__:
+        from pyquil import Program
+        from pyquil.quilbase import Declare, Measurement
+
+        circuit = cast(Program, circuit)
+
+        # Grab all measurements from the input circuit.
+        measurements = [
+            instr
+            for instr in circuit.instructions
+            if isinstance(instr, Measurement)
+        ]
+
+        # Remove memory declarations added from Cirq -> pyQuil conversion.
+        new_declarations = {
+            k: v
+            for k, v in converted_circuit.declarations.items()
+            if k == "ro" or v.memory_type != "BIT"
+        }
+        new_declarations.update(circuit.declarations)
+
+        # Delete all declarations and measurements from the scaled circuit.
+        instructions = [
+            instr
+            for instr in converted_circuit.instructions
+            if not (isinstance(instr, (Declare, Measurement)))
+        ]
+
+        # Add back original declarations and measurements.
+        converted_circuit = Program(
+            list(new_declarations.values()) + instructions + measurements
+        )
+
+        # Set the number of shots to the input circuit.
+        converted_circuit.num_shots = circuit.num_shots
+
+    if "qiskit" in converted_circuit.__module__:
+        from mitiq.interface.mitiq_qiskit.conversions import (
+            _transform_registers,
+            _measurement_order,
+            _remove_identity_from_idle,
+        )
+
+        converted_circuit.remove_final_measurements()
+        _transform_registers(
+            converted_circuit,
+            q_regs,  # type: ignore
+        )
+        _remove_identity_from_idle(converted_circuit, idle_indices)
+
+        if c_regs and not converted_circuit.cregs:  # type: ignore
+            converted_circuit.add_register(*c_regs)  # type: ignore
+
+            for q, c in _measurement_order(circuit):
+                converted_circuit.measure(q, c)
+
+    return converted_circuit
