@@ -18,7 +18,6 @@ from functools import wraps
 from typing import Any, Callable, cast, Iterable, Tuple
 
 from cirq import Circuit
-from qiskit import ClassicalRegister, QuantumRegister
 
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES, QPROGRAM
 
@@ -312,6 +311,21 @@ def noise_scaling_converter(
 def convert_to_mitiq_preserve_qubit_naming(
     circuit: QPROGRAM,
 ) -> Tuple[Circuit, str, set]:
+    """Converts any valid input circuit to a mitiq circuit, preserving the
+    naming of the qubits in the register of the input circuit.
+
+        Args:
+            circuit: Any quantum circuit object supported by mitiq.
+                 See mitiq.SUPPORTED_PROGRAM_TYPES.
+
+        Raises:
+            UnsupportedCircuitError: If the input circuit is not supported.
+
+        Returns:
+            circuit: Mitiq circuit equivalent to input circuit.
+            input_circuit_type: Type of input circuit represented by a string.
+            idle_indices: Indices of idle qubits as a set of ints.
+    """
     idle_indices = set()
     if "qiskit" in circuit.__module__:
         from mitiq.interface.mitiq_qiskit.conversions import (
@@ -378,11 +392,18 @@ def convert_to_mitiq_preserve_qubit_naming(
 
 def convert_from_mitiq_preserve_qubit_naming(
     circuit: Circuit,
+    original_circuit: Circuit,
     conversion_type: str,
     idle_indices: set,
-    q_regs: QuantumRegister = None,
-    c_regs: ClassicalRegister = None,
 ) -> QPROGRAM:
+    """Converts a Mitiq circuit to a type specified by the conversion type.
+
+    Args:
+        circuit: Mitiq circuit to convert.
+        orignal_circuit: circuit prior to conversion to Mitiq. 
+        conversion_type: String specifier for the converted circuit type.
+        idle_indices: Indices of idle qubits.
+    """
     conversion_function: Callable[[Circuit], QPROGRAM]
     if conversion_type == "qiskit":
         from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
@@ -465,12 +486,16 @@ def convert_from_mitiq_preserve_qubit_naming(
         converted_circuit.remove_final_measurements()
         _transform_registers(
             converted_circuit,
-            q_regs,  # type: ignore
+            original_circuit.qregs,  # type: ignore
         )
         _remove_identity_from_idle(converted_circuit, idle_indices)
 
-        if c_regs and not converted_circuit.cregs:  # type: ignore
-            converted_circuit.add_register(*c_regs)  # type: ignore
+        if (
+            original_circuit.cregs and not converted_circuit.cregs
+        ):  # type: ignore
+            converted_circuit.add_register(
+                *original_circuit.cregs
+            )  # type: ignore
 
             for q, c in _measurement_order(circuit):
                 converted_circuit.measure(q, c)

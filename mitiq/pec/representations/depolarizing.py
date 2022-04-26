@@ -146,20 +146,15 @@ def represent_operation_with_global_depolarizing_noise(
     imp_op_circuits = [circ + Circuit(op) for op in post_ops]
 
     # Convert back to input type.
-    if in_type == "qiskit":
-        q_regs = ideal_operation.qregs
-        c_regs = ideal_operation.cregs
-        imp_op_circuits = [
-            convert_from_mitiq_preserve_qubit_naming(
-                c, in_type, idle_indices, q_regs, c_regs
-            )
-            for c in imp_op_circuits
-        ]
-    else:
-        imp_op_circuits = [
-            convert_from_mitiq_preserve_qubit_naming(c, in_type, idle_indices)
-            for c in imp_op_circuits
-        ]
+    imp_op_circuits = [
+        convert_from_mitiq_preserve_qubit_naming(
+            c,
+            ideal_operation,
+            in_type,
+            idle_indices,
+        )
+        for c in imp_op_circuits
+    ]
 
     # Build basis expansion.
     expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}
@@ -255,21 +250,12 @@ def represent_operation_with_local_depolarizing_noise(
         )
 
     # Convert back to input type.
-    # Convert back to input type.
-    if in_type == "qiskit":
-        q_regs = ideal_operation.qregs
-        c_regs = ideal_operation.cregs
-        circuits = [
-            convert_from_mitiq_preserve_qubit_naming(
-                c, in_type, idle_indices, q_regs, c_regs
-            )
-            for c in imp_op_circuits
-        ]
-    else:
-        circuits = [
-            convert_from_mitiq_preserve_qubit_naming(c, in_type, idle_indices)
-            for c in imp_op_circuits
-        ]
+    circuits = [
+        convert_from_mitiq_preserve_qubit_naming(
+            c, ideal_operation, in_type, idle_indices
+        )
+        for c in imp_op_circuits
+    ]
 
     # Build basis expansion.
     expansion = {NoisyOperation(c): a for c, a in zip(circuits, alphas)}
