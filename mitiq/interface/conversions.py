@@ -15,7 +15,7 @@
 
 """Functions for converting to/from Mitiq's internal circuit representation."""
 from functools import wraps
-from typing import Any, Callable, cast, Iterable, Tuple
+from typing import Any, Callable, cast, Iterable, Tuple, set
 
 from cirq import Circuit
 
