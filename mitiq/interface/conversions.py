@@ -400,7 +400,7 @@ def convert_from_mitiq_preserve_qubit_naming(
 
     Args:
         circuit: Mitiq circuit to convert.
-        orignal_circuit: circuit prior to conversion to Mitiq. 
+        orignal_circuit: circuit prior to conversion to Mitiq.
         conversion_type: String specifier for the converted circuit type.
         idle_indices: Indices of idle qubits.
     """
