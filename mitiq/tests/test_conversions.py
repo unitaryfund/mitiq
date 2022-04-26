@@ -14,6 +14,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tests for circuit conversions."""
+from mitiq.interface.conversions import (
+    convert_from_mitiq_preserve_qubit_naming,
+    convert_to_mitiq_preserve_qubit_naming,
+)
 import pytest
 
 import numpy as np
@@ -175,3 +179,43 @@ def test_atomic_one_to_many_converter(to_type):
     circuits = returns_several_circuits(circuit, return_mitiq=True)
     for circuit in circuits:
         assert isinstance(circuit, cirq.Circuit)
+
+
+@pytest.mark.parametrize(
+    "circuit", (qiskit_circuit, pyquil_circuit, braket_circuit)
+)
+def test_to_mitiq_preserve_qubit_naming(circuit):
+    converted_circuit, input_type, _ = convert_to_mitiq_preserve_qubit_naming(
+        circuit
+    )
+    assert _equal(converted_circuit, cirq_circuit)
+    assert input_type in circuit.__module__
+
+
+@pytest.mark.parametrize("item", ("circuit", 1, None))
+def test_to_mitiq_preserve_qubit_naming_bad_types(item):
+    with pytest.raises(
+        UnsupportedCircuitError,
+        match="Could not determine the package of the input circuit.",
+    ):
+        convert_to_mitiq_preserve_qubit_naming(item)
+
+
+@pytest.mark.parametrize(
+    "circuit_and_type",
+    (
+        (qiskit_circuit, "qiskit"),
+        (pyquil_circuit, "pyquil"),
+        (braket_circuit, "braket"),
+    ),
+)
+def test_from_mitiq_preserve_qubit_naming(circuit_and_type):
+    circuit, to_type = circuit_and_type
+    converted_circuit = convert_from_mitiq_preserve_qubit_naming(
+        cirq_circuit, circuit, to_type, idle_indices=set()
+    )
+    circuit, input_type, _ = convert_to_mitiq_preserve_qubit_naming(
+        converted_circuit
+    )
+    assert _equal(circuit, cirq_circuit)
+    assert input_type == to_type
