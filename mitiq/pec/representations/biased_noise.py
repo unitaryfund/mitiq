@@ -26,7 +26,10 @@ from cirq import (
 
 from mitiq import QPROGRAM
 from mitiq.pec import OperationRepresentation, NoisyOperation
-from mitiq.interface import convert_to_mitiq, convert_from_mitiq
+from mitiq.interface.conversions import (
+    convert_from_mitiq_preserve_qubit_naming,
+    convert_to_mitiq_preserve_qubit_naming,
+)
 
 
 def represent_operation_with_local_biased_noise(
@@ -81,7 +84,9 @@ def represent_operation_with_local_biased_noise(
         QPROGRAM, followed by a single final biased noise channel, is
         physically implementable.
     """
-    circ, in_type = convert_to_mitiq(ideal_operation)
+    circ, in_type, idle_indices = convert_to_mitiq_preserve_qubit_naming(
+        ideal_operation
+    )
 
     post_ops: List[List[Operation]]
     qubits = circ.all_qubits()
@@ -145,7 +150,12 @@ def represent_operation_with_local_biased_noise(
     imp_op_circuits = [circ + Circuit(op) for op in post_ops]
 
     # Convert back to input type.
-    imp_op_circuits = [convert_from_mitiq(c, in_type) for c in imp_op_circuits]
+    imp_op_circuits = [
+        convert_from_mitiq_preserve_qubit_naming(
+            c, ideal_operation, in_type, idle_indices
+        )
+        for c in imp_op_circuits
+    ]
 
     # Build basis expansion.
     expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}

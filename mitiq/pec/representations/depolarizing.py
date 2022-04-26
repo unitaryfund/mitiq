@@ -32,6 +32,7 @@ from cirq import (
 
 from mitiq import QPROGRAM
 from mitiq.interface.conversions import (
+    convert_to_mitiq,
     convert_from_mitiq_preserve_qubit_naming,
     convert_to_mitiq_preserve_qubit_naming,
 )
@@ -294,9 +295,7 @@ def represent_operations_in_circuit_with_global_depolarizing_noise(
         Cirq circuits, even if the input is not a ``cirq.Circuit``.
     """
 
-    circ, in_type, idle_indices = convert_to_mitiq_preserve_qubit_naming(
-        ideal_circuit
-    )
+    circ = convert_to_mitiq(ideal_circuit)
 
     representations = []
     for op in set(circ.all_operations()):
@@ -342,9 +341,7 @@ def represent_operations_in_circuit_with_local_depolarizing_noise(
         The returned representations are always defined in terms of
         Cirq circuits, even if the input is not a ``cirq.Circuit``.
     """
-    circ, in_type, idle_indices = convert_to_mitiq_preserve_qubit_naming(
-        ideal_circuit
-    )
+    circ = convert_to_mitiq(ideal_circuit)
 
     representations = []
     for op in set(circ.all_operations()):
