@@ -77,15 +77,12 @@ def mitigate_executor(
     scale_noise: Callable[[QPROGRAM, float], QPROGRAM] = fold_gates_at_random,
     num_to_average: int = 1,
 ) -> Callable[[QPROGRAM], float]:
-    """Returns an error-mitigated version of the input `executor`.
-
-    The input `executor` executes a circuit with an arbitrary backend and
-    produces an expectation value (without any error mitigation). The returned
-    executor executes the circuit with the same backend but uses zero-noise
-    extrapolation to produce a mitigated expectation value.
+    """Returns a modified version of the input 'executor' which is
+    error-mitigated with zero-noise extrapolation (ZNE).
 
     Args:
-        executor: Executes a circuit and returns a `QuantumResult`.
+        executor: A function that executes a circuit and returns the
+            unmitigated `QuantumResult` (e.g. an expectation value).
         observable: Observable to compute the expectation value of. If None,
             the `executor` must return an expectation value. Otherwise,
             the `QuantumResult` returned by `executor` is used to compute the
@@ -95,6 +92,9 @@ def mitigate_executor(
         scale_noise: Function for scaling the noise of a quantum circuit.
         num_to_average: Number of times expectation values are computed by
             the executor after each call to scale_noise, then averaged.
+
+    Returns:
+        The error-mitigated version of the input executor.
     """
 
     @wraps(executor)
@@ -120,9 +120,10 @@ def zne_decorator(
 ) -> Callable[
     [Callable[[QPROGRAM], QuantumResult]], Callable[[QPROGRAM], float]
 ]:
-    """Decorator which adds error mitigation to an executor function, i.e., a
-    function which executes a quantum circuit with an arbitrary backend and
-    returns an expectation value.
+    """Decorator which adds an error-mitigation layer based on zero-noise
+    extrapolation (ZNE) to an executor function, i.e., a function which
+    executes a quantum circuit with an arbitrary backend and returns a
+    `QuantumResult` (e.g. an expectation value).
 
     Args:
         observable: Observable to compute the expectation value of. If None,

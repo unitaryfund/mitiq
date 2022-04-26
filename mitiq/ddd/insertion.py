@@ -17,6 +17,8 @@
 from cirq import Circuit
 import numpy as np
 
+from mitiq import QPROGRAM
+
 
 def _get_circuit_mask(circuit: Circuit) -> np.ndarray:
     """Given a circuit with n qubits and d moments returns a matrix
@@ -83,3 +85,9 @@ def get_slack_matrix_from_circuit_mask(mask: np.ndarray) -> np.ndarray:
                         break
 
     return slack_matrix
+
+
+def insert_ddd_sequences(circuit: QPROGRAM) -> QPROGRAM:
+    """Mock function"""
+
+    return circuit
