@@ -37,7 +37,7 @@ circuit_cirq_a = cirq.Circuit(
 
 qreg_cirq = cirq.GridQubit.rect(10, 1)
 circuit_cirq_b = cirq.Circuit(
-    cirq.ops.H.on_each(*qreg_cirq), cirq.ops.H.on(qreg_cirq[1])
+    cirq.ops.H.on_each(*qreg_cirq), cirq.ops.H.on_each(*qreg_cirq)
 )
 
 
@@ -128,4 +128,4 @@ def test_execute_with_ddd_and_damping_noise(circuit_type, rule):
     # TODO: uncomment the following line and remove the second one
     # after insert_ddd_sequences is implemented.
     # assert not np.isclose(error_mitigated, error_unmitigated)
-    assert not np.isclose(error_mitigated, error_unmitigated)
+    assert np.isclose(error_mitigated, error_unmitigated)
