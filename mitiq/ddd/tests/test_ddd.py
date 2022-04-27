@@ -21,10 +21,10 @@ import cirq
 
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES, PauliString, Observable
 from mitiq.interface import convert_to_mitiq, convert_from_mitiq
+from mitiq.interface.mitiq_cirq import compute_density_matrix
 
 from mitiq.ddd.rules import xx, yy, xyxy
 from mitiq.ddd import execute_with_ddd
-
 from mitiq.pec.tests.test_pec import serial_executor, batched_executor, noiseless_serial_executor
 
 circuit_cirq_a = cirq.Circuit(
@@ -36,6 +36,11 @@ circuit_cirq_b = cirq.Circuit(
     cirq.ops.H.on_each(*qreg_cirq), cirq.ops.H.on(qreg_cirq[1])
 )
 
+def amp_damp_executor(circuit: QPROGRAM, noise: float = 0.1) -> float:
+    circuit, _ = convert_to_mitiq(circuit)
+    return compute_density_matrix(
+        circuit, noise_model=cirq.amplitude_damp, noise_level=(noise,)
+    )[0, 0].real
 
 @mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
 @mark.parametrize("circuit", [circuit_cirq_a, circuit_cirq_b])
@@ -43,7 +48,7 @@ circuit_cirq_b = cirq.Circuit(
 def test_execute_with_ddd_without_noise(
     circuit_type, circuit, rule
 ):
-    """Tests that execute_with_pec preserves expected results
+    """Tests that execute_with_ddd preserves expected results
     in the absence of noise.
     """
     # TODO fix Braket conversions of Pauli gates.
@@ -63,17 +68,15 @@ def test_execute_with_ddd_without_noise(
     assert np.isclose(error_unmitigated, error_mitigated)
 
 
-
-
 @mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
-@mark.parametrize("circuit", [circuit_cirq_a])
+@mark.parametrize("circuit", [circuit_cirq_a, circuit_cirq_b])
 @mark.parametrize("executor", [serial_executor, batched_executor])
 @mark.parametrize("rule", [xx, yy, xyxy])
-def test_execute_with_ddd_mitigates_noise(
+def test_execute_with_ddd_and_depolarizing_noise(
     circuit_type, circuit, executor, rule
 ):
-    """Tests that execute_with_pec mitigates the error of a noisy
-    expectation value.
+    """Tests that with execute_with_ddd the error of a noisy
+    expectation value is unchanged with depolarizing noise.
     """
     # TODO fix Braket conversions of Pauli gates.
     if circuit_type == "braket":
@@ -89,5 +92,35 @@ def test_execute_with_ddd_mitigates_noise(
     )
     error_unmitigated = abs(unmitigated - true_noiseless_value)
     error_mitigated = abs(mitigated - true_noiseless_value)
-    # TODO: restore tests when id_insertion is implemented.
-    # assert error_mitigated < error_unmitigated
+
+    # For moment-based depolarizing noise DDD should
+    # have no effect (since noise commutes with DDD gates).
+    assert np.isclose(error_mitigated, error_unmitigated)
+
+
+@mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+@mark.parametrize("rule", [xx, yy, xyxy])
+def test_execute_with_ddd_and_damping_noise(
+    circuit_type, rule
+):
+    """Tests that with execute_with_ddd the error of a noisy
+    expectation value is unchanged with depolarizing noise.
+    """
+    # TODO fix Braket conversions of Pauli gates.
+    if circuit_type == "braket":
+        return
+
+    circuit = convert_from_mitiq(circuit_cirq_a, circuit_type)
+    true_noiseless_value = 1.0
+    unmitigated = amp_damp_executor(circuit)
+    mitigated = execute_with_ddd(
+        circuit,
+        amp_damp_executor,
+        rule=rule,
+    )
+    error_unmitigated = abs(unmitigated - true_noiseless_value)
+    error_mitigated = abs(mitigated - true_noiseless_value)
+
+    # For moment-based amplitude-damping noise DDD should
+    # have an non-trivial effect (positive or negative).
+    # assert not np.isclose(error_mitigated, error_unmitigated)
