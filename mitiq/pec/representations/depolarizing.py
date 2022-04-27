@@ -103,6 +103,7 @@ def represent_operation_with_global_depolarizing_noise(
         QPROGRAM, followed by a single final depolarizing channel, is
         physically implementable.
     """
+    
     circuit_copy = copy.deepcopy(ideal_operation)
     converted_circ, _ = convert_to_mitiq(circuit_copy)
     post_ops: List[List[Operation]]
@@ -199,6 +200,7 @@ def represent_operation_with_local_depolarizing_noise(
         ideal_operation
     )    (https://arxiv.org/abs/1612.02058).
     """
+
     circuit_copy = copy.deepcopy(ideal_operation)
     converted_circ, _ = convert_to_mitiq(circuit_copy)
 

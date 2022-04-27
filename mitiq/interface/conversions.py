@@ -17,7 +17,7 @@
 from functools import wraps
 from typing import Any, Callable, cast, Iterable, Tuple
 
-from cirq import Circuit
+from cirq import Circuit, Operation
 
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES, QPROGRAM
 
@@ -309,14 +309,14 @@ def noise_scaling_converter(
 
 
 @noise_scaling_converter
-def convert_single_qubit_op(circuit, operator):
+def convert_single_qubit_op(circuit: QPROGRAM, op: Operation):
     """Basis of implementable operations as circuits."""
-    op_circ = Circuit(operator)
+    op_circ = Circuit(op)
     return op_circ
 
 
 @noise_scaling_converter
-def convert_two_qubit_op(circuit, operator_0, operator_1):
+def convert_two_qubit_op(circuit: QPROGRAM, op_0: Operation, op_1: Operation):
     """Basis of implementable operations as circuits."""
-    op_circ = Circuit(operator_0, operator_1)
+    op_circ = Circuit(op_0, op_1)
     return op_circ
