@@ -20,6 +20,8 @@ from mitiq.interface.conversions import (
     convert_from_mitiq,
     convert_to_mitiq,
     noise_scaling_converter,
+    convert_single_qubit_op,
+    convert_two_qubit_op,
     CircuitConversionError,
     UnsupportedCircuitError,
 )

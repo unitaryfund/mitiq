@@ -33,13 +33,11 @@ from cirq import (
 from mitiq import QPROGRAM
 from mitiq.interface.conversions import (
     convert_to_mitiq,
-    convert_from_mitiq_preserve_qubit_naming,
-    convert_to_mitiq_preserve_qubit_naming,
+    convert_single_qubit_op,
+    convert_two_qubit_op,
 )
 from mitiq.pec.types import OperationRepresentation, NoisyOperation
-from mitiq.interface import (
-    noise_scaling_converter,
-)
+
 
 from mitiq.pec.channels import tensor_product
 
@@ -145,20 +143,16 @@ def represent_operation_with_global_depolarizing_noise(
         )
 
     # Basis of implementable operations as circuits
-    
-    imp_op_circuits = [ideal_operation + generate_imp_op_circuits(ideal_operation, op) for op in post_ops]
+
+    imp_op_circuits = [
+        ideal_operation + convert_single_qubit_op(ideal_operation, op)
+        for op in post_ops
+    ]
 
     # Build basis expansion.
     expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}
 
     return OperationRepresentation(ideal_operation, expansion)
-
-
-@noise_scaling_converter
-def generate_imp_op_circuits(circuit, operator):
-    """Basis of implementable operations as circuits."""
-    imp_op_circ = Circuit(operator)
-    return imp_op_circ
 
 
 def represent_operation_with_local_depolarizing_noise(
@@ -201,13 +195,14 @@ def represent_operation_with_local_depolarizing_noise(
     .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
         "Error mitigation for short-depth quantum circuits,"
         *Phys. Rev. Lett.* **119**, 180509 (2017),
-        (https://arxiv.org/abs/1612.02058).
-    """
     circ, in_type, idle_indices = convert_to_mitiq_preserve_qubit_naming(
         ideal_operation
-    )
+    )    (https://arxiv.org/abs/1612.02058).
+    """
+    circuit_copy = copy.deepcopy(ideal_operation)
+    converted_circ, _ = convert_to_mitiq(circuit_copy)
 
-    qubits = circ.all_qubits()
+    qubits = converted_circ.all_qubits()
 
     if len(qubits) == 1:
         return represent_operation_with_global_depolarizing_noise(
@@ -228,18 +223,26 @@ def represent_operation_with_local_depolarizing_noise(
         alphas = []
 
         # The zero-pauli term in the linear combination
-        imp_op_circuits.append(circ)
+        imp_op_circuits.append(converted_circ)
         alphas.append(c_pos * c_pos)
 
         # The single-pauli terms in the linear combination
         for qubit in qubits:
             for pauli in [X, Y, Z]:
-                imp_op_circuits.append(circ + Circuit(pauli(qubit)))
+                imp_op_circuits.append(
+                    ideal_operation
+                    + convert_single_qubit_op(ideal_operation, pauli(qubit))
+                )
                 alphas.append(c_neg * c_pos)
 
         # The two-pauli terms in the linear combination
         for pauli_0, pauli_1 in product([X, Y, Z], repeat=2):
-            imp_op_circuits.append(circ + Circuit(pauli_0(q0), pauli_1(q1)))
+            imp_op_circuits.append(
+                ideal_operation
+                + convert_two_qubit_op(
+                    ideal_operation, pauli_0(q0), pauli_1(q1)
+                )
+            )
             alphas.append(c_neg * c_neg)
 
     else:
@@ -248,16 +251,8 @@ def represent_operation_with_local_depolarizing_noise(
             "Consider pre-compiling your circuit."
         )
 
-    # Convert back to input type.
-    circuits = [
-        convert_from_mitiq_preserve_qubit_naming(
-            c, ideal_operation, in_type, idle_indices
-        )
-        for c in imp_op_circuits
-    ]
-
     # Build basis expansion.
-    expansion = {NoisyOperation(c): a for c, a in zip(circuits, alphas)}
+    expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}
 
     return OperationRepresentation(ideal_operation, expansion)
 

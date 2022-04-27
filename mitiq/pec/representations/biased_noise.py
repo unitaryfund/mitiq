@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Function to generate representations with biased noise."""
-
+import copy
 from typing import List
 
 from cirq import (
@@ -21,14 +21,13 @@ from cirq import (
     X,
     Y,
     Z,
-    Circuit,
 )
 
 from mitiq import QPROGRAM
 from mitiq.pec import OperationRepresentation, NoisyOperation
 from mitiq.interface.conversions import (
-    convert_from_mitiq_preserve_qubit_naming,
-    convert_to_mitiq_preserve_qubit_naming,
+    convert_to_mitiq,
+    convert_single_qubit_op,
 )
 
 
@@ -84,12 +83,10 @@ def represent_operation_with_local_biased_noise(
         QPROGRAM, followed by a single final biased noise channel, is
         physically implementable.
     """
-    circ, in_type, idle_indices = convert_to_mitiq_preserve_qubit_naming(
-        ideal_operation
-    )
-
+    circuit_copy = copy.deepcopy(ideal_operation)
+    converted_circ, _ = convert_to_mitiq(circuit_copy)
     post_ops: List[List[Operation]]
-    qubits = circ.all_qubits()
+    qubits = converted_circ.all_qubits()
 
     # Calculate coefficients in basis expansion in terms of eta and epsilon
     a = 1 - epsilon
@@ -147,14 +144,9 @@ def represent_operation_with_local_biased_noise(
             "Consider pre-compiling your circuit."
         )
     # Basis of implementable operations as circuits.
-    imp_op_circuits = [circ + Circuit(op) for op in post_ops]
-
-    # Convert back to input type.
     imp_op_circuits = [
-        convert_from_mitiq_preserve_qubit_naming(
-            c, ideal_operation, in_type, idle_indices
-        )
-        for c in imp_op_circuits
+        ideal_operation + convert_single_qubit_op(ideal_operation, op)
+        for op in post_ops
     ]
 
     # Build basis expansion.
