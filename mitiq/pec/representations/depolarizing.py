@@ -157,7 +157,7 @@ def represent_operation_with_global_depolarizing_noise(
 @noise_scaling_converter
 def generate_imp_op_circuits(circuit, operator):
     """Basis of implementable operations as circuits."""
-    imp_op_circ = circuit + Circuit(operator)
+    imp_op_circ = Circuit(operator)
     return imp_op_circ
 
 
