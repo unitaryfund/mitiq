@@ -145,10 +145,8 @@ def represent_operation_with_global_depolarizing_noise(
         )
 
     # Basis of implementable operations as circuits
-    for op in post_ops:
-        imp_op_circuits = [
-            ideal_operation + generate_imp_op_circuits(ideal_operation, op)
-        ]
+    
+    imp_op_circuits = [ideal_operation + generate_imp_op_circuits(ideal_operation, op) for op in post_ops]
 
     # Build basis expansion.
     expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}
