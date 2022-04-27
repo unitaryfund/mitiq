@@ -84,19 +84,6 @@ def get_slack_matrix_from_circuit_mask(mask: np.ndarray) -> np.ndarray:
     return slack_matrix
 
 
-def _construct_replacements(
-    circuit: Circuit, sequence: Circuit, index: int
-) -> List[Tuple[int, Operation, Operation]]:
-    """Returns the replacements for insert_ddd_sequences."""
-
-    return [
-        (index + idx, old_moment.operations, new_moment.operations[0])
-        for new_moment, (idx, old_moment) in zip(
-            sequence, enumerate(circuit[index : index + len(sequence)])
-        )
-    ]
-
-
 @noise_scaling_converter
 def insert_ddd_sequences(
     circuit: Circuit,
@@ -115,12 +102,13 @@ def insert_ddd_sequences(
     )
     # Copy to avoid mutating the input circuit
     circuit_with_ddd = circuit.copy()
+    qubits = sorted(circuit.all_qubits())
     for moment_idx, moment in enumerate(circuit):
         slack_column = slack_matrix[:, moment_idx]
         for row_index, slack_length in enumerate(slack_column):
             if slack_length > 1:
                 ddd_sequence = rule(slack_length).transform_qubits(
-                    {LineQubit(0): LineQubit(row_index)}
+                    {LineQubit(0): qubits[row_index]}
                 )
                 for idx, op in enumerate(ddd_sequence.all_operations()):
                     circuit_with_ddd._moments[
