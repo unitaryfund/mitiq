@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Functions related to representations with depolarizing noise."""
 
-
+import copy
 from typing import List
 from itertools import product
 import numpy as np
@@ -37,6 +37,9 @@ from mitiq.interface.conversions import (
     convert_to_mitiq_preserve_qubit_naming,
 )
 from mitiq.pec.types import OperationRepresentation, NoisyOperation
+from mitiq.interface import (
+    noise_scaling_converter,
+)
 
 from mitiq.pec.channels import tensor_product
 
@@ -102,12 +105,10 @@ def represent_operation_with_global_depolarizing_noise(
         QPROGRAM, followed by a single final depolarizing channel, is
         physically implementable.
     """
-    circ, in_type, idle_indices = convert_to_mitiq_preserve_qubit_naming(
-        ideal_operation
-    )
-
+    circuit_copy = copy.deepcopy(ideal_operation)
+    converted_circ, _ = convert_to_mitiq(circuit_copy)
     post_ops: List[List[Operation]]
-    qubits = circ.all_qubits()
+    qubits = converted_circ.all_qubits()
 
     # The single-qubit case: linear combination of 1Q Paulis
     if len(qubits) == 1:
@@ -143,24 +144,23 @@ def represent_operation_with_global_depolarizing_noise(
             "Consider pre-compiling your circuit."
         )
 
-    # Basis of implementable operations as circuits.
-    imp_op_circuits = [circ + Circuit(op) for op in post_ops]
-
-    # Convert back to input type.
-    imp_op_circuits = [
-        convert_from_mitiq_preserve_qubit_naming(
-            c,
-            ideal_operation,
-            in_type,
-            idle_indices,
-        )
-        for c in imp_op_circuits
-    ]
+    # Basis of implementable operations as circuits
+    for op in post_ops:
+        imp_op_circuits = [
+            ideal_operation + generate_imp_op_circuits(ideal_operation, op)
+        ]
 
     # Build basis expansion.
     expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}
 
     return OperationRepresentation(ideal_operation, expansion)
+
+
+@noise_scaling_converter
+def generate_imp_op_circuits(circuit, operator):
+    """Basis of implementable operations as circuits."""
+    imp_op_circ = circuit + Circuit(operator)
+    return imp_op_circ
 
 
 def represent_operation_with_local_depolarizing_noise(
