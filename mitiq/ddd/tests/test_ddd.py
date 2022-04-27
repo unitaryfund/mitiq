@@ -19,13 +19,17 @@ import numpy as np
 from pytest import mark
 import cirq
 
-from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES, PauliString, Observable
+from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
 from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 
 from mitiq.ddd.rules import xx, yy, xyxy
 from mitiq.ddd import execute_with_ddd
-from mitiq.pec.tests.test_pec import serial_executor, batched_executor, noiseless_serial_executor
+from mitiq.pec.tests.test_pec import (
+    serial_executor,
+    batched_executor,
+    noiseless_serial_executor,
+)
 
 circuit_cirq_a = cirq.Circuit(
     cirq.SWAP(q, q + 1) for q in cirq.LineQubit.range(7)
@@ -36,18 +40,18 @@ circuit_cirq_b = cirq.Circuit(
     cirq.ops.H.on_each(*qreg_cirq), cirq.ops.H.on(qreg_cirq[1])
 )
 
+
 def amp_damp_executor(circuit: QPROGRAM, noise: float = 0.1) -> float:
     circuit, _ = convert_to_mitiq(circuit)
     return compute_density_matrix(
         circuit, noise_model=cirq.amplitude_damp, noise_level=(noise,)
     )[0, 0].real
 
+
 @mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
 @mark.parametrize("circuit", [circuit_cirq_a, circuit_cirq_b])
 @mark.parametrize("rule", [xx, yy, xyxy])
-def test_execute_with_ddd_without_noise(
-    circuit_type, circuit, rule
-):
+def test_execute_with_ddd_without_noise(circuit_type, circuit, rule):
     """Tests that execute_with_ddd preserves expected results
     in the absence of noise.
     """
@@ -100,9 +104,7 @@ def test_execute_with_ddd_and_depolarizing_noise(
 
 @mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
 @mark.parametrize("rule", [xx, yy, xyxy])
-def test_execute_with_ddd_and_damping_noise(
-    circuit_type, rule
-):
+def test_execute_with_ddd_and_damping_noise(circuit_type, rule):
     """Tests that with execute_with_ddd the error of a noisy
     expectation value is unchanged with depolarizing noise.
     """
@@ -123,4 +125,7 @@ def test_execute_with_ddd_and_damping_noise(
 
     # For moment-based amplitude-damping noise DDD should
     # have an non-trivial effect (positive or negative).
+    # TODO: uncomment the following line and remove the second one
+    # after insert_ddd_sequences is implemented.
     # assert not np.isclose(error_mitigated, error_unmitigated)
+    assert not np.isclose(error_mitigated, error_unmitigated)
