@@ -35,10 +35,10 @@ circuit_cirq_a = cirq.Circuit(
     cirq.SWAP(q, q + 1) for q in cirq.LineQubit.range(7)
 )
 
-qreg_cirq = cirq.GridQubit.rect(10, 1)
 circuit_cirq_b = cirq.Circuit(
-    cirq.ops.H.on_each(*qreg_cirq), cirq.ops.H.on_each(*qreg_cirq)
+    cirq.CNOT(q, q + 1) for q in cirq.LineQubit.range(4)
 )
+circuit_cirq_b += cirq.inverse(circuit_cirq_b)
 
 
 def amp_damp_executor(circuit: QPROGRAM, noise: float = 0.1) -> float:
@@ -55,10 +55,6 @@ def test_execute_with_ddd_without_noise(circuit_type, circuit, rule):
     """Tests that execute_with_ddd preserves expected results
     in the absence of noise.
     """
-    # TODO fix Braket conversions of Pauli gates.
-    if circuit_type == "braket":
-        return
-
     circuit = convert_from_mitiq(circuit, circuit_type)
     true_noiseless_value = 1.0
     unmitigated = noiseless_serial_executor(circuit)
@@ -82,10 +78,6 @@ def test_execute_with_ddd_and_depolarizing_noise(
     """Tests that with execute_with_ddd the error of a noisy
     expectation value is unchanged with depolarizing noise.
     """
-    # TODO fix Braket conversions of Pauli gates.
-    if circuit_type == "braket":
-        return
-
     circuit = convert_from_mitiq(circuit, circuit_type)
     true_noiseless_value = 1.0
     unmitigated = serial_executor(circuit)
@@ -108,10 +100,6 @@ def test_execute_with_ddd_and_damping_noise(circuit_type, rule):
     """Tests that with execute_with_ddd the error of a noisy
     expectation value is unchanged with depolarizing noise.
     """
-    # TODO fix Braket conversions of Pauli gates.
-    if circuit_type == "braket":
-        return
-
     circuit = convert_from_mitiq(circuit_cirq_a, circuit_type)
     true_noiseless_value = 1.0
     unmitigated = amp_damp_executor(circuit)
@@ -125,6 +113,7 @@ def test_execute_with_ddd_and_damping_noise(circuit_type, rule):
 
     # For moment-based amplitude-damping noise DDD should
     # have an non-trivial effect (positive or negative).
+
     # TODO: uncomment the following line and remove the second one
     # after insert_ddd_sequences is implemented.
     # assert not np.isclose(error_mitigated, error_unmitigated)
