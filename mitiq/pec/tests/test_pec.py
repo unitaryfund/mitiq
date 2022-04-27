@@ -25,7 +25,7 @@ import pyquil
 import qiskit
 
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES, PauliString, Observable
-from mitiq.interface import convert_to_mitiq, convert_from_mitiq
+from mitiq.interface import convert_to_mitiq, convert_from_mitiq, mitiq_cirq
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 
 from mitiq.pec import execute_with_pec, NoisyOperation, OperationRepresentation
