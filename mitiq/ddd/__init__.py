@@ -14,4 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Digital dynamical decoupling (DDD) module."""
+
 from mitiq.ddd import rules
+
+from mitiq.ddd.ddd import execute_with_ddd, mitigate_executor, ddd_decorator
