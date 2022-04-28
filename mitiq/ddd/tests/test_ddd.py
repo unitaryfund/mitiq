@@ -19,7 +19,7 @@ import numpy as np
 from pytest import mark
 import cirq
 
-from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
+from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES, Executor
 from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 
@@ -118,3 +118,52 @@ def test_execute_with_ddd_and_damping_noise(circuit_type, rule):
     # after insert_ddd_sequences is implemented.
     # assert not np.isclose(error_mitigated, error_unmitigated)
     assert np.isclose(error_mitigated, error_unmitigated)
+
+
+@mark.parametrize("executor", [serial_executor, batched_executor])
+def test_execute_with_ddd_with_num_trials(executor):
+    """Tests the option num_trials of execute_with_ddd."""
+    executor = Executor(executor)
+    mitigated_1 = execute_with_ddd(
+        circuit_cirq_a,
+        executor,
+        rule=xx,
+        num_trials=1,
+    )
+    assert executor.calls_to_executor == 1
+    assert len(executor.executed_circuits) == 1
+
+    mitigated_2 = execute_with_ddd(
+        circuit_cirq_a,
+        executor,
+        rule=xx,
+        num_trials=2,
+    )
+    # Note executor contains the history of both experiments
+    if executor.can_batch:
+        assert executor.calls_to_executor == 2
+    else:
+        assert executor.calls_to_executor == 3
+    assert len(executor.executed_circuits) == 3
+
+    # For deterministic DDD sequences num_trials is irrelevant
+    assert np.isclose(mitigated_1, mitigated_2)
+
+
+def test_execute_with_ddd_with_full_output():
+    """Tests the option full_output of execute_with_ddd."""
+    executor = Executor(noiseless_serial_executor)
+
+    ddd_value, ddd_data = execute_with_ddd(
+        circuit_cirq_a,
+        executor,
+        rule=xx,
+        num_trials=2,
+        full_output=True,
+    )
+    assert len(executor.executed_circuits) == 2
+    assert len(ddd_data["circuits_with_ddd"]) == 2
+    assert len(ddd_data["ddd_trials"]) == 2
+    assert ddd_data["ddd_value"] == ddd_value
+    # For deterministic rule
+    assert ddd_data["ddd_trials"][0] == ddd_data["ddd_trials"][1]

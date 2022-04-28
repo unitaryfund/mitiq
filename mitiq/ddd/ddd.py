@@ -79,18 +79,23 @@ def execute_with_ddd(
         executor = Executor(executor)
 
     # Insert DDD sequences in (a copy of) the input circuit
-    circuit_with_ddd = insert_ddd_sequences(circuit)
+    circuits_with_ddd = [
+        insert_ddd_sequences(circuit) for _ in range(num_trials)
+    ]
+    results = executor.evaluate(
+        circuits_with_ddd, observable, force_run_all=True,
+    )
 
-    results = executor.evaluate(circuit, observable)
+    assert len(results) == num_trials
 
-    assert len(results) == 1
-    ddd_value = np.real_if_close(results[0])
-
+    ddd_value = np.real_if_close(np.sum(results)) / num_trials
     if not full_output:
         return ddd_value
 
-    ddd_data = {"circuit_with_ddd": circuit_with_ddd}
-
+    ddd_data = {
+        "ddd_value": ddd_value,
+        "ddd_trials": results,
+        "circuits_with_ddd": circuits_with_ddd}
     return ddd_value, ddd_data
 
 
