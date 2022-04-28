@@ -25,7 +25,8 @@ from mitiq.ddd.insertion import (
 import pytest
 import qiskit
 from mitiq.ddd.rules import xx, xyxy
-
+from mitiq._typing import SUPPORTED_PROGRAM_TYPES
+from mitiq.interface.conversions import convert_from_mitiq
 circuit_cirq_one = cirq.Circuit(
     cirq.SWAP(q, q + 1) for q in cirq.LineQubit.range(7)
 )
@@ -207,7 +208,6 @@ def test_get_slack_matrix_from_circuit__bad_input_errors():
         get_slack_matrix_from_circuit_mask(np.array([[1, 0], [1, 1.7]]))
     with pytest.raises(ValueError, match="elements must be 0 or 1"):
         get_slack_matrix_from_circuit_mask(np.array([[2, 0], [0, 0]]))
-
 
 @pytest.mark.parametrize(
     ("circuit", "result", "rule"),

@@ -92,10 +92,10 @@ def insert_ddd_sequences(
     """Returns the circuit with DDD sequences applied according to the input rule.
 
     Args:
-        circuit: The input circuit to execute with error-mitigation.
-        rule: The ddd insertion rule to apply
+        circuit: QPROGRAM circuit to execute with DDD.
+        rule: DDD rule function to apply.
 
-    Returns: circuit_with_spin_echoes
+    Returns: Reconverted Circuit with spin echoes added.
     """
     slack_matrix = get_slack_matrix_from_circuit_mask(
         _get_circuit_mask(circuit)
