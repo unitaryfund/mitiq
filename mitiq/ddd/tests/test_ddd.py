@@ -114,6 +114,7 @@ def test_execute_with_ddd_and_damping_noise(circuit_type, rule):
 
     assert not np.isclose(error_mitigated, error_unmitigated)
 
+
 @mark.parametrize("executor", [serial_executor, batched_executor])
 def test_execute_with_ddd_with_num_trials(executor):
     """Tests the option num_trials of execute_with_ddd."""
