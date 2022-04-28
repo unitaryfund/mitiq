@@ -15,6 +15,7 @@
 
 """Unit tests for high-level DDD tools."""
 
+from typing import List
 import numpy as np
 from pytest import mark
 import cirq
@@ -24,7 +25,7 @@ from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 
 from mitiq.ddd.rules import xx, yy, xyxy
-from mitiq.ddd import execute_with_ddd
+from mitiq.ddd import execute_with_ddd, mitigate_executor, ddd_decorator
 from mitiq.pec.tests.test_pec import (
     serial_executor,
     batched_executor,
@@ -167,3 +168,34 @@ def test_execute_with_ddd_with_full_output():
     assert ddd_data["ddd_value"] == ddd_value
     # For a deterministic rule
     assert ddd_data["ddd_trials"][0] == ddd_data["ddd_trials"][1]
+
+
+def test_mitigate_executor_ddd():
+    ddd_value = execute_with_ddd(
+        circuit_cirq_a,
+        serial_executor,
+        rule=xx,
+    )
+    mitigated_executor = mitigate_executor(serial_executor, rule=xx)
+    assert np.isclose(mitigated_executor(circuit_cirq_a), ddd_value)
+
+
+def test_ddd_decorator():
+    ddd_value = execute_with_ddd(
+        circuit_cirq_a,
+        serial_executor,
+        rule=xx,
+    )
+
+    @ddd_decorator(rule=xx)
+    def my_serial_executor(circuit):
+        return serial_executor(circuit)
+
+    assert np.isclose(my_serial_executor(circuit_cirq_a), ddd_value)
+
+    # Test batched executors too
+    @ddd_decorator(rule=xx)
+    def my_batched_executor(circuits) -> List[float]:
+        return batched_executor(circuits)
+
+    assert np.isclose(*my_batched_executor([circuit_cirq_a]), ddd_value)

@@ -22,6 +22,7 @@ from typing import (
     Tuple,
     Dict,
     Any,
+    List,
 )
 
 from functools import wraps
@@ -137,20 +138,41 @@ def mitigate_executor(
     Returns:
         The error-mitigated version of the input executor.
     """
+    executor_obj = Executor(executor)
+    if not executor_obj.can_batch:
 
-    @wraps(executor)
-    def new_executor(
-        circuit: QPROGRAM,
-    ) -> Union[float, Tuple[float, Dict[str, Any]]]:
-        return execute_with_ddd(
-            circuit,
-            executor,
-            observable,
-            rule=rule,
-            rule_args=rule_args,
-            num_trials=num_trials,
-            full_output=full_output,
-        )
+        @wraps(executor)
+        def new_executor(
+            circuit: QPROGRAM,
+        ) -> Union[float, Tuple[float, Dict[str, Any]]]:
+            return execute_with_ddd(
+                circuit,
+                executor,
+                observable,
+                rule=rule,
+                rule_args=rule_args,
+                num_trials=num_trials,
+                full_output=full_output,
+            )
+
+    else:
+
+        @wraps(executor)
+        def new_executor(
+            circuits: List[QPROGRAM],
+        ) -> List[Union[float, Tuple[float, Dict[str, Any]]]]:
+            return [
+                execute_with_ddd(
+                    circuit,
+                    executor,
+                    observable,
+                    rule=rule,
+                    rule_args=rule_args,
+                    num_trials=num_trials,
+                    full_output=full_output,
+                )
+                for circuit in circuits
+            ]
 
     return new_executor
 
