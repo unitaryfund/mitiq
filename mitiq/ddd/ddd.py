@@ -80,7 +80,7 @@ def execute_with_ddd(
         executor = Executor(executor)
 
     rule_partial: Callable[[int], QPROGRAM]
-    rule_partial = partial(rule, **rule_args) 
+    rule_partial = partial(rule, **rule_args)
 
     # Insert DDD sequences in (a copy of) the input circuit
     circuits_with_ddd = [
