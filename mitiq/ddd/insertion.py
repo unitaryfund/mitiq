@@ -14,9 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tools to determine slack windows in circuits and to insert DDD sequences."""
-from cirq import Circuit, Operation, LineQubit
+from cirq import Circuit, LineQubit
 import numpy as np
-from typing import Callable, Tuple, List
+from typing import Callable
 from mitiq.interface import noise_scaling_converter
 
 
