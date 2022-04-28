@@ -20,6 +20,7 @@ from mitiq.interface.conversions import (
     convert_from_mitiq,
     convert_to_mitiq,
     noise_scaling_converter,
+    append_cirq_circuit_to_qprogram,
     CircuitConversionError,
     UnsupportedCircuitError,
 )
