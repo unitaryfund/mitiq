@@ -42,12 +42,12 @@ def general_rule(
             decoupling gates, as a non-negative int. Negative int corresponds
             to default. Defaults to maximal spacing that fits a single sequence
             in the given slack window.
-            E.g. given slack_length = 20, gates = [X, X] the spacing defaults
-            to 6 and the rule returns the sequence:
-            ──I──I──I──I──I──I──X──I──I──I──I──I──I──X──I──I──I──I──I──I──
-            given slack_length = 20, gates [X, Y, X, Y] the spacing defaults
-            to 3 and the rule returns the sequence:
-            ──I──I──I──I──X──I──I──I──Y──I──I──I──X──I──I──I──Y──I──I──I──
+            E.g. given slack_length = 8, gates = [X, X] the spacing defaults
+            to 2 and the rule returns the sequence:
+            ──I──I──X──I──I──X──I──I──
+            given slack_length = 9, gates [X, Y, X, Y] the spacing defaults
+            to 1 and the rule returns the sequence:
+            ──I──X──I──Y──I──X──I──Y──I──.
         gates: A list of single qubit Cirq gates to build the rule. E.g. [X, X]
             is the xx sequence, [X, Y, X, Y] is the xyxy sequence.
             - Note: To repeat the sequence, specify a repeated gateset.
@@ -95,9 +95,9 @@ def xx(slack_length: int, spacing: int = -1) -> Circuit:
             decoupling gates, as a non-negative int. Negative int corresponds
             to default. Defaults to maximal spacing that fits a single sequence
             in the given slack window.
-            E.g. given slack_length = 20 the spacing defaults to 6 and this
+            E.g. given slack_length = 8 the spacing defaults to 2 and this
             rule returns the sequence:
-            ──I──I──I──I──I──I──X──I──I──I──I──I──I──X──I──I──I──I──I──I──
+            ──I──I──X──I──I──X──I──I──.
     Returns:
         An XX digital dynamical decoupling sequence, as a Cirq circuit.
     """
@@ -118,9 +118,9 @@ def xyxy(slack_length: int, spacing: int = -1) -> Circuit:
             decoupling gates, as a non-negative int. Negative int corresponds
             to default. Defaults to maximal spacing that fits a single sequence
             in the given slack window.
-            E.g. given slack_length = 20 the spacing defaults to 3 and this
+            E.g. given slack_length = 9 the spacing defaults to 1 and this
             rule returns the sequence:
-            ──I──I──I──I──X──I──I──I──Y──I──I──I──X──I──I──I──Y──I──I──I──
+            ──I──X──I──Y──I──X──I──Y──I──.
     Returns:
         An XYXY digital dynamical decoupling sequence, as a Cirq circuit.
     """
@@ -141,9 +141,9 @@ def yy(slack_length: int, spacing: int = -1) -> Circuit:
             decoupling gates, as a non-negative int. Negative int corresponds
             to default. Defaults to maximal spacing that fits a single sequence
             in the given slack window.
-            E.g. given slack_length = 20 the spacing defaults to 6 and
+            E.g. given slack_length = 8 the spacing defaults to 2 and
             this rule returns the sequence:
-            ──I──I──I──I──I──I──Y──I──I──I──I──I──I──Y──I──I──I──I──I──I──
+            ──I──I──Y──I──I──Y──I──I──.
     Returns:
         An YY digital dynamical decoupling sequence, as a Cirq circuit.
     """
@@ -165,13 +165,13 @@ def repeated_rule(slack_length: int, gates: List[Gate]) -> Circuit:
             is the xx sequence, [X, Y, X, Y] is the xyxy sequence.
     Returns:
         A repeated digital dynamical decoupling sequence, as a Cirq circuit.
+
     Note:
-        Where :fun:`.general_rule()` fills a slack window with a single
+        Where :func:`.general_rule()` fills a slack window with a single
         sequence, this rule attempts to fill every moment with sequence
         repetitions (up to a complete repetition of the gate set).
-        E.g. given slack_length = 17 and gates = [X, Y]
-            this rule returns the sequence:
-            ──I──X──Y──X──Y──X──Y──X──Y──X──Y──X──Y──X──Y──X──Y──
+        E.g. given slack_length = 8 and gates = [X, Y, X, Y], this rule returns
+        the sequence: ──X──Y──X──Y──X──Y──X──Y──.
     """
     num_decoupling_gates = len(gates)
     sequence = general_rule(
