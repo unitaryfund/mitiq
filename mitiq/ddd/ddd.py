@@ -40,7 +40,7 @@ def execute_with_ddd(
     *,
     rule: Callable[[int], QPROGRAM],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
-    rule_args: Optional[Dict[str, Any]] = {},
+    rule_args: Dict[str, Any] = {},
     num_trials: int = 1,
     full_output: bool = False,
 ) -> Union[float, Tuple[float, Dict[str, Any]]]:
@@ -111,7 +111,7 @@ def mitigate_executor(
     *,
     rule: Callable[[int], QPROGRAM],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
-    rule_args: Optional[Dict[str, Any]] = {},
+    rule_args: Dict[str, Any] = {},
     num_trials: int = 1,
     full_output: bool = False,
 ) -> Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]:
@@ -184,7 +184,7 @@ def ddd_decorator(
     *,
     rule: Callable[[int], QPROGRAM],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
-    rule_args: Optional[Dict[str, Any]] = {},
+    rule_args: Dict[str, Any] = {},
     num_trials: int = 1,
     full_output: bool = False,
 ) -> Callable[
