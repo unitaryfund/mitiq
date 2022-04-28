@@ -18,6 +18,7 @@ from cirq import Circuit, LineQubit
 import numpy as np
 from typing import Callable
 from mitiq.interface import noise_scaling_converter
+from mitiq import QPROGRAM
 
 
 def _get_circuit_mask(circuit: Circuit) -> np.ndarray:
@@ -86,16 +87,32 @@ def get_slack_matrix_from_circuit_mask(mask: np.ndarray) -> np.ndarray:
 
     return slack_matrix
 
+def insert_ddd_sequences(
+    circuit: QPROGRAM,
+    rule: Callable[[int], Circuit],
+) -> QPROGRAM:
+    """Returns the circuit with DDD sequences applied according to the input rule.
+
+    Args:
+        circuit: The QPROGRAM circuit to be modified with DDD sequences.
+        rule: The rule determining what DDD sequences should be applied.
+            A set of built-in DDD rules can be imported from
+            ``mitiq.ddd.rules``.
+
+    Returns:
+        The circuit with DDD sequences added.
+    """
+    return _insert_ddd_sequences(circuit, rule)
 
 @noise_scaling_converter
-def insert_ddd_sequences(
+def _insert_ddd_sequences(
     circuit: Circuit,
     rule: Callable[[int], Circuit],
 ) -> Circuit:
     """Returns the circuit with DDD sequences applied according to the input rule.
 
     Args:
-        circuit: The QPROGRAM circuit to be modified with DDD sequences.
+        circuit: The Cirq circuit to be modified with DDD sequences.
         rule: The rule determining what DDD sequences should be applied.
             A set of built-in DDD rules can be imported from
             ``mitiq.ddd.rules``.
