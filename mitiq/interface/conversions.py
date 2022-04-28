@@ -17,7 +17,7 @@
 from functools import wraps
 from typing import Any, Callable, cast, Iterable, Tuple
 
-from cirq import Circuit, Operation
+from cirq import Circuit
 
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES, QPROGRAM
 
@@ -310,7 +310,7 @@ def noise_scaling_converter(
 
 @noise_scaling_converter
 def append_cirq_circuit_to_qprogram(
-    circuit: QPROGRAM, cirq_circuit: Operation
+    circuit: QPROGRAM, cirq_circuit: QPROGRAM
 ) -> QPROGRAM:
     """Appends a Cirq circuit to a QPROGRAM."""
     return circuit + cirq_circuit
