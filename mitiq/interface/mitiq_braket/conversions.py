@@ -353,6 +353,9 @@ def _translate_one_qubit_cirq_operation_to_braket_instruction(
         ):
             return [Instruction(braket_gates.H(), target)]
 
+        elif isinstance(op.gate, cirq_ops.IdentityGate):
+            return [Instruction(braket_gates.I(), target)]
+
     # Arbitrary single-qubit unitary decomposition.
     # TODO: This does not account for global phase.
     if isinstance(op, cirq_ops.Operation):

@@ -112,14 +112,7 @@ def test_execute_with_ddd_and_damping_noise(circuit_type, rule):
     error_unmitigated = abs(unmitigated - true_noiseless_value)
     error_mitigated = abs(mitigated - true_noiseless_value)
 
-    # For moment-based amplitude-damping noise DDD should
-    # have an non-trivial effect (positive or negative).
-
-    # TODO: uncomment the following line and remove the second one
-    # after insert_ddd_sequences is implemented.
-    # assert not np.isclose(error_mitigated, error_unmitigated)
-    assert np.isclose(error_mitigated, error_unmitigated)
-
+    assert not np.isclose(error_mitigated, error_unmitigated)
 
 @mark.parametrize("executor", [serial_executor, batched_executor])
 def test_execute_with_ddd_with_num_trials(executor):

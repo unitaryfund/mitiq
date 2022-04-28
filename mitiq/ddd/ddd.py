@@ -25,7 +25,7 @@ from typing import (
     List,
 )
 
-from functools import wraps
+from functools import wraps, partial
 import numpy as np
 
 from mitiq import Executor, Observable, QPROGRAM, QuantumResult
@@ -79,9 +79,11 @@ def execute_with_ddd(
     if not isinstance(executor, Executor):
         executor = Executor(executor)
 
+    rule_partial = partial(rule, **rule_args)
+
     # Insert DDD sequences in (a copy of) the input circuit
     circuits_with_ddd = [
-        insert_ddd_sequences(circuit) for _ in range(num_trials)
+        insert_ddd_sequences(circuit, rule_partial) for _ in range(num_trials)
     ]
     results = executor.evaluate(
         circuits_with_ddd,
