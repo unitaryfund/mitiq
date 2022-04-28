@@ -95,10 +95,13 @@ def insert_ddd_sequences(
     """Returns the circuit with DDD sequences applied according to the input rule.
 
     Args:
-        circuit: QPROGRAM circuit to execute with DDD.
-        rule: DDD rule function to apply.
+        circuit: The QPROGRAM circuit to be modified with DDD sequences.
+        rule: The rule determining what DDD sequences should be applied.
+            A set of built-in DDD rules can be imported from
+            ``mitiq.ddd.rules``.
 
-    Returns: Reconverted Circuit with spin echoes added.
+    Returns:
+        The circuit with DDD sequences added.
     """
     slack_matrix = get_slack_matrix_from_circuit_mask(
         _get_circuit_mask(circuit)
