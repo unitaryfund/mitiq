@@ -83,7 +83,9 @@ def execute_with_ddd(
         insert_ddd_sequences(circuit) for _ in range(num_trials)
     ]
     results = executor.evaluate(
-        circuits_with_ddd, observable, force_run_all=True,
+        circuits_with_ddd,
+        observable,
+        force_run_all=True,
     )
 
     assert len(results) == num_trials
@@ -95,7 +97,8 @@ def execute_with_ddd(
     ddd_data = {
         "ddd_value": ddd_value,
         "ddd_trials": results,
-        "circuits_with_ddd": circuits_with_ddd}
+        "circuits_with_ddd": circuits_with_ddd,
+    }
     return ddd_value, ddd_data
 
 

@@ -165,5 +165,5 @@ def test_execute_with_ddd_with_full_output():
     assert len(ddd_data["circuits_with_ddd"]) == 2
     assert len(ddd_data["ddd_trials"]) == 2
     assert ddd_data["ddd_value"] == ddd_value
-    # For deterministic rule
+    # For a deterministic rule
     assert ddd_data["ddd_trials"][0] == ddd_data["ddd_trials"][1]
