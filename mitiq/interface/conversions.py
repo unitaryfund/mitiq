@@ -309,16 +309,8 @@ def noise_scaling_converter(
 
 
 @noise_scaling_converter
-def convert_single_qubit_op(circuit: QPROGRAM, op: Operation) -> QPROGRAM:
-    """Basis of implementable operations as circuits."""
-    op_circ = Circuit(op)
-    return op_circ
-
-
-@noise_scaling_converter
-def convert_two_qubit_op(
-    circuit: QPROGRAM, op_0: Operation, op_1: Operation
+def append_cirq_circuit_to_qprogram(
+    circuit: QPROGRAM, cirq_circuit: Operation
 ) -> QPROGRAM:
-    """Basis of implementable operations as circuits."""
-    op_circ = Circuit(op_0, op_1)
-    return op_circ
+    """Appends a Cirq circuit to a QPROGRAM."""
+    return circuit + cirq_circuit

@@ -17,6 +17,7 @@ import copy
 from typing import List
 
 from cirq import (
+    Circuit,
     Operation,
     X,
     Y,
@@ -27,7 +28,7 @@ from mitiq import QPROGRAM
 from mitiq.pec import OperationRepresentation, NoisyOperation
 from mitiq.interface.conversions import (
     convert_to_mitiq,
-    convert_single_qubit_op,
+    append_cirq_circuit_to_qprogram,
 )
 
 
@@ -145,7 +146,8 @@ def represent_operation_with_local_biased_noise(
         )
     # Basis of implementable operations as circuits.
     imp_op_circuits = [
-        ideal_operation + convert_single_qubit_op(ideal_operation, op)
+        ideal_operation
+        + append_cirq_circuit_to_qprogram(ideal_operation, Circuit(op))
         for op in post_ops
     ]
 

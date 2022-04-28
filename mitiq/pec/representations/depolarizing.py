@@ -33,8 +33,7 @@ from cirq import (
 from mitiq import QPROGRAM
 from mitiq.interface.conversions import (
     convert_to_mitiq,
-    convert_single_qubit_op,
-    convert_two_qubit_op,
+    append_cirq_circuit_to_qprogram,
 )
 from mitiq.pec.types import OperationRepresentation, NoisyOperation
 
@@ -145,7 +144,10 @@ def represent_operation_with_global_depolarizing_noise(
     # Basis of implementable operations as circuits
 
     imp_op_circuits = [
-        ideal_operation + convert_single_qubit_op(ideal_operation, op)
+        append_cirq_circuit_to_qprogram(
+            ideal_operation,
+            Circuit(op),
+        )
         for op in post_ops
     ]
 
@@ -228,17 +230,18 @@ def represent_operation_with_local_depolarizing_noise(
         for qubit in qubits:
             for pauli in [X, Y, Z]:
                 imp_op_circuits.append(
-                    ideal_operation
-                    + convert_single_qubit_op(ideal_operation, pauli(qubit))
+                    append_cirq_circuit_to_qprogram(
+                        ideal_operation, Circuit(pauli(qubit))
+                    )
                 )
                 alphas.append(c_neg * c_pos)
 
         # The two-pauli terms in the linear combination
         for pauli_0, pauli_1 in product([X, Y, Z], repeat=2):
             imp_op_circuits.append(
-                ideal_operation
-                + convert_two_qubit_op(
-                    ideal_operation, pauli_0(q0), pauli_1(q1)
+                append_cirq_circuit_to_qprogram(
+                    ideal_operation,
+                    Circuit(pauli_0(q0), pauli_1(q1)),
                 )
             )
             alphas.append(c_neg * c_neg)
