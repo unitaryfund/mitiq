@@ -17,6 +17,7 @@
 
 from typing import Callable, Iterable, List, Optional, Sequence, Tuple, Union
 
+from functools import partial
 import numpy as np
 
 from mitiq import Executor, QPROGRAM
@@ -24,6 +25,8 @@ from mitiq.rem import MeasurementResult
 
 from cirq import DensityMatrixSimulator
 from cirq.experiments.readout_confusion_matrix import measure_confusion_matrix
+from cirq.sim import sample_state_vector
+from cirq.qis.states import to_valid_state_vector
 
 MatrixLike = Union[
     np.ndarray,
@@ -38,7 +41,7 @@ def execute_with_rci(
     circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], MeasurementResult]],
     inverse_confusion_matrix: Optional[MatrixLike] = None,
-):
+) -> MeasurementResult:
     """Returns the readout error mitigated expectation value utilizing an
     inverse confusion matrix that is computed by running the quantum program
     `circuit` with the executor function.
@@ -58,19 +61,39 @@ def execute_with_rci(
         executor = Executor(executor)
 
     if inverse_confusion_matrix is None:
-        print("No inverse confusion matrix")
-        qubits = set()
-        for m in circuit.moments:
-            for qubit in m.qubits:
-                qubits.add(qubit)
+        print("No inverse confusion matrix provided. Generating...")
+        qubits = list(circuit.all_qubits())
 
-        print(list(qubits))
-        inverse_confusion_matrix = measure_confusion_matrix(
-            DensityMatrixSimulator(), list(qubits)
+        # Build a tensored confusion matrix using smaller single qubit confusion matrices.
+        # Implies that errors are uncorrelated among qubits
+        tensored_matrix = measure_confusion_matrix(
+            DensityMatrixSimulator(), [[q] for q in qubits]
         )
+        inverse_confusion_matrix = tensored_matrix.correction_matrix()
 
-    result = executor.evaluate(circuit)
-    assert isinstance(result, MeasurementResult)
+    result = executor._run([circuit])
+    noisy_result = result[0]
+    assert isinstance(noisy_result, MeasurementResult)
 
-    print(result)
+    measurement_to_state_vector = partial(
+        to_valid_state_vector, num_qubits=len(qubits)
+    )
+
+    noisy_state_vectors = np.apply_along_axis(
+        measurement_to_state_vector, 1, noisy_result.asarray
+    )
+
+    adjusted_state_vectors = (
+        inverse_confusion_matrix @ noisy_state_vectors.T
+    ).T
+
+    state_vector_to_measurement = partial(
+        sample_state_vector, indices=noisy_result.qubit_indices
+    )
+
+    adjusted_result = np.apply_along_axis(
+        state_vector_to_measurement, 1, adjusted_state_vectors
+    ).squeeze()
+
+    return MeasurementResult(adjusted_result, noisy_result.qubit_indices)
 

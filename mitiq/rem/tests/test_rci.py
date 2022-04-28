@@ -36,7 +36,8 @@ def generic_executor(circuit, noise_level: float = 0.1) -> float:
 
 
 def test_rci_identity():
-    execute_with_rci(circ, sample_bitstrings)
+    result = execute_with_rci(circ, sample_bitstrings)
+    # print(result)
 
 
 if __name__ == "__main__":
