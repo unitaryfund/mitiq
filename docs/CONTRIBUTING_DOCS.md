@@ -251,4 +251,4 @@ are some notes on how to build docs.
 [The MyST syntax guide](https://myst-parser.readthedocs.io/en/latest/using/syntax.html) is a
 cheat sheet for the extended Markdown formatting that applies to both Markdown files as well as Markdown in Jupyter notebooks.
 
-[The MyST-NB Notebook guide](https://myst-nb.readthedocs.io/en/latest/use/markdown.html) can help you get you write or convert your notebook content for the docs.
+[The MyST-NB text-notebook guide](https://myst-nb.readthedocs.io/en/latest/authoring/text-notebooks.html) can help you get you write or convert your notebook content for the docs.
