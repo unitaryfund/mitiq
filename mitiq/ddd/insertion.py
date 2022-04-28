@@ -87,6 +87,7 @@ def get_slack_matrix_from_circuit_mask(mask: np.ndarray) -> np.ndarray:
 
     return slack_matrix
 
+
 def insert_ddd_sequences(
     circuit: QPROGRAM,
     rule: Callable[[int], Circuit],
@@ -103,6 +104,7 @@ def insert_ddd_sequences(
         The circuit with DDD sequences added.
     """
     return _insert_ddd_sequences(circuit, rule)
+
 
 @noise_scaling_converter
 def _insert_ddd_sequences(
