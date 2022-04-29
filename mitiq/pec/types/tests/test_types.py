@@ -784,7 +784,6 @@ def test_print_operation_representation_two_qubits():
             noisy_b: 0.5,
         },
     )
-    print(str(decomp))
     expected = f"""
 0: ───@───
       │
@@ -823,7 +822,6 @@ def test_print_operation_representation_two_qubits_neg():
             noisy_b: 1.5,
         },
     )
-    print(str(decomp))
     expected = f"""
 0: ───@───
       │
