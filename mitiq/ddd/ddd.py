@@ -182,7 +182,6 @@ def ddd_decorator(
     observable: Optional[Observable] = None,
     *,
     rule: Callable[[int], QPROGRAM],
-    random_state: Optional[Union[int, np.random.RandomState]] = None,
     rule_args: Dict[str, Any] = {},
     num_trials: int = 1,
     full_output: bool = False,
