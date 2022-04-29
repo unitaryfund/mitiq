@@ -201,3 +201,34 @@ def test_ddd_decorator():
         return batched_executor(circuits)
 
     assert np.isclose(*my_batched_executor([circuit_cirq_a]), ddd_value)
+
+
+def test_ddd_decorator_with_rule_args():
+    """Tests that rule_args option is working."""
+    unmitigated = amp_damp_executor(circuit_cirq_a)
+
+    @ddd_decorator(rule=xx)
+    def exec_xx(circuit):
+        return amp_damp_executor(circuit)
+
+    mitigated = exec_xx(circuit_cirq_a)
+    assert unmitigated < mitigated
+
+    @ddd_decorator(rule=xx, rule_args={"spacing": 100})
+    def exec_xx_large_spacing(circuit):
+        return amp_damp_executor(circuit)
+
+    mitigated_large_spacing = exec_xx_large_spacing(circuit_cirq_a)
+    # With very large spacing DDD sequences should not fit in the circuit.
+    # So we should get the same result as without mitigation.
+    assert np.isclose(unmitigated, mitigated_large_spacing)
+
+    @ddd_decorator(rule=xx, rule_args={"spacing": 1})
+    def exec_xx_small_spacing(circuit):
+        return amp_damp_executor(circuit)
+
+    mitigated_small_spacing = exec_xx_small_spacing(circuit_cirq_a)
+    # With small spacing results can be better or worst than default spacing.
+    # What is important to test is getting different results.
+    assert not np.isclose(unmitigated, mitigated_small_spacing)
+    assert not np.isclose(mitigated_large_spacing, mitigated_small_spacing)
