@@ -405,6 +405,10 @@ def _translate_two_qubit_cirq_operation_to_braket_instruction(
         abs(cast(float, op.gate.exponent)), 1.0
     ):
         return [Instruction(braket_gates.CZ(), [q1, q2])]
+    elif isinstance(op.gate, cirq_ops.SwapPowGate) and np.isclose(
+        cast(float, op.gate.exponent), 1.0
+    ):
+        return [Instruction(braket_gates.Swap(), [q1, q2])]
     elif isinstance(op.gate, cirq_ops.ISwapPowGate) and np.isclose(
         cast(float, op.gate.exponent), 1.0
     ):
