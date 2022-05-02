@@ -35,7 +35,7 @@ def learn_noise_parameters(
     epsilon0: float = 0,
     eta0: float = 1,
     observable: Optional[Observable] = None,
-):
+) -> List[float]:
     r"""Loss function: optimize the quasiprobability representation using
     the method of least squares
 
@@ -79,12 +79,12 @@ def learn_noise_parameters(
     epsilon = x_result[0]
     eta = x_result[1]
 
-    return epsilon, eta
+    return [epsilon, eta]
 
 
 def loss_function(
-    epsilon,
-    eta,
+    epsilon: float,
+    eta: float,
     operation: QPROGRAM,
     circuit: QPROGRAM,
     ideal_values: List[np.ndarray],
@@ -104,11 +104,13 @@ def loss_function(
     Returns: Square of the difference between the error-mitigated value and
         the ideal value, over the training set
     """
-    representations = represent_operation_with_local_biased_noise(
-        operation,
-        epsilon,
-        eta,
-    )
+    representations = [
+        represent_operation_with_local_biased_noise(
+            operation,
+            epsilon,
+            eta,
+        )
+    ]
     mitigated_value = execute_with_pec(
         circuit=circuit,
         observable=observable,
