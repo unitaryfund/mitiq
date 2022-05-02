@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Functions related to representations with depolarizing noise."""
 
-
+import copy
 from typing import List
 from itertools import product
 import numpy as np
@@ -31,8 +31,12 @@ from cirq import (
 )
 
 from mitiq import QPROGRAM
+from mitiq.interface.conversions import (
+    convert_to_mitiq,
+    append_cirq_circuit_to_qprogram,
+)
 from mitiq.pec.types import OperationRepresentation, NoisyOperation
-from mitiq.interface import convert_to_mitiq, convert_from_mitiq
+
 
 from mitiq.pec.channels import tensor_product
 
@@ -98,10 +102,10 @@ def represent_operation_with_global_depolarizing_noise(
         QPROGRAM, followed by a single final depolarizing channel, is
         physically implementable.
     """
-    circ, in_type = convert_to_mitiq(ideal_operation)
-
+    circuit_copy = copy.deepcopy(ideal_operation)
+    converted_circ, _ = convert_to_mitiq(circuit_copy)
     post_ops: List[List[Operation]]
-    qubits = circ.all_qubits()
+    qubits = converted_circ.all_qubits()
 
     # The single-qubit case: linear combination of 1Q Paulis
     if len(qubits) == 1:
@@ -137,11 +141,15 @@ def represent_operation_with_global_depolarizing_noise(
             "Consider pre-compiling your circuit."
         )
 
-    # Basis of implementable operations as circuits.
-    imp_op_circuits = [circ + Circuit(op) for op in post_ops]
+    # Basis of implementable operations as circuits
 
-    # Convert back to input type.
-    imp_op_circuits = [convert_from_mitiq(c, in_type) for c in imp_op_circuits]
+    imp_op_circuits = [
+        append_cirq_circuit_to_qprogram(
+            ideal_operation,
+            Circuit(op),
+        )
+        for op in post_ops
+    ]
 
     # Build basis expansion.
     expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}
@@ -191,9 +199,10 @@ def represent_operation_with_local_depolarizing_noise(
         *Phys. Rev. Lett.* **119**, 180509 (2017),
         (https://arxiv.org/abs/1612.02058).
     """
-    circ, in_type = convert_to_mitiq(ideal_operation)
+    circuit_copy = copy.deepcopy(ideal_operation)
+    converted_circ, _ = convert_to_mitiq(circuit_copy)
 
-    qubits = circ.all_qubits()
+    qubits = converted_circ.all_qubits()
 
     if len(qubits) == 1:
         return represent_operation_with_global_depolarizing_noise(
@@ -214,18 +223,27 @@ def represent_operation_with_local_depolarizing_noise(
         alphas = []
 
         # The zero-pauli term in the linear combination
-        imp_op_circuits.append(circ)
+        imp_op_circuits.append(converted_circ)
         alphas.append(c_pos * c_pos)
 
         # The single-pauli terms in the linear combination
         for qubit in qubits:
             for pauli in [X, Y, Z]:
-                imp_op_circuits.append(circ + Circuit(pauli(qubit)))
+                imp_op_circuits.append(
+                    append_cirq_circuit_to_qprogram(
+                        ideal_operation, Circuit(pauli(qubit))
+                    )
+                )
                 alphas.append(c_neg * c_pos)
 
         # The two-pauli terms in the linear combination
         for pauli_0, pauli_1 in product([X, Y, Z], repeat=2):
-            imp_op_circuits.append(circ + Circuit(pauli_0(q0), pauli_1(q1)))
+            imp_op_circuits.append(
+                append_cirq_circuit_to_qprogram(
+                    ideal_operation,
+                    Circuit(pauli_0(q0), pauli_1(q1)),
+                )
+            )
             alphas.append(c_neg * c_neg)
 
     else:
@@ -234,11 +252,8 @@ def represent_operation_with_local_depolarizing_noise(
             "Consider pre-compiling your circuit."
         )
 
-    # Convert back to input type.
-    circuits = [convert_from_mitiq(c, in_type) for c in imp_op_circuits]
-
     # Build basis expansion.
-    expansion = {NoisyOperation(c): a for c, a in zip(circuits, alphas)}
+    expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}
 
     return OperationRepresentation(ideal_operation, expansion)
 
