@@ -15,10 +15,10 @@
 """Function to calculate parameters for biased noise model via a
 learning-based technique."""
 
-from typing import Callable, Optional, List
+from typing import Optional, List
 import numpy as np
 from scipy.optimize import minimize
-from mitiq import QPROGRAM, QuantumResult, Observable
+from mitiq import QPROGRAM, Executor, Observable
 from mitiq.cdr import generate_training_circuits
 from mitiq.pec import execute_with_pec
 from mitiq.pec.representations.biased_noise import (
@@ -29,8 +29,8 @@ from mitiq.pec.representations.biased_noise import (
 def learn_noise_parameters(
     operation: QPROGRAM,
     circuit: QPROGRAM,
-    ideal_executor: Callable[[QPROGRAM], QuantumResult],
-    noisy_executor: Callable[[QPROGRAM], QuantumResult],
+    ideal_executor: Executor,
+    noisy_executor: Executor,
     num_training_circuits: int = 10,
     epsilon0: float = 0,
     eta0: float = 1,
@@ -88,7 +88,7 @@ def loss_function(
     operation: QPROGRAM,
     circuit: QPROGRAM,
     ideal_values: List[np.ndarray],
-    noisy_executor: Callable[[QPROGRAM], QuantumResult],
+    noisy_executor: Executor,
     observable: Optional[Observable] = None,
 ) -> float:
     r"""Loss function for optimizing the quasiprobability representation using
