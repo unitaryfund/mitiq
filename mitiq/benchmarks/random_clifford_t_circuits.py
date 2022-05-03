@@ -18,6 +18,7 @@ from typing import List, Optional, cast
 
 import numpy as np
 
+print("hhh---test---hhh")
 from cirq.experiments.qubit_characterizations import (
     _single_qubit_cliffords,
     _random_single_q_clifford,
