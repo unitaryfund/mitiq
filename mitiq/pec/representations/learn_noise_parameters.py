@@ -65,7 +65,7 @@ def learn_noise_parameters(
     ideal_values = []
     for training_circuit in training_circuits:
         ideal_values.append(
-            observable.expectation(training_circuit, ideal_executor).real
+            ideal_executor.evaluate(training_circuit, observable)
         )
 
     x0 = [epsilon0, eta0]  # initial parameter values for optimization
