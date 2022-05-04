@@ -72,7 +72,14 @@ def learn_noise_parameters(
     result = minimize(
         loss_function,
         x0,
-        args=(operation, circuit, ideal_values, noisy_executor),
+        args=(
+            operation,
+            circuit,
+            ideal_values,
+            noisy_executor,
+            num_training_circuits,
+            observable,
+        ),
         method="BFGS",
     )
     x_result = result.x
@@ -89,6 +96,7 @@ def loss_function(
     circuit: QPROGRAM,
     ideal_values: List[np.ndarray],
     noisy_executor: Executor,
+    num_training_circuits: int,
     observable: Optional[Observable] = None,
 ) -> float:
     r"""Loss function for optimizing the quasiprobability representation using
@@ -118,8 +126,10 @@ def loss_function(
         representations=representations,
     )
 
-    num_train = len(ideal_values)
     return (
-        sum((mitigated_value * np.ones(num_train) - ideal_values) ** 2)
-        / num_train
+        sum(
+            (mitigated_value * np.ones(num_training_circuits) - ideal_values)
+            ** 2
+        )
+        / num_training_circuits
     )

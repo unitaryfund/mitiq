@@ -142,6 +142,9 @@ Quasi-Probability Representations
 .. automodule:: mitiq.pec.representations.biased_noise
    :members:
 
+.. automodule:: mitiq.pec.representations.learn_noise_parameters
+   :members:
+
 Sampling from a Noisy Decomposition of an Ideal Operation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.pec.sampling
