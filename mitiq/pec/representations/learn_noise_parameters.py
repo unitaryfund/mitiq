@@ -26,7 +26,7 @@ from mitiq.pec.representations.biased_noise import (
 )
 
 
-def learn_noise_parameters(
+def learn_biased_noise_parameters(
     operation: QPROGRAM,
     circuit: QPROGRAM,
     ideal_executor: Executor,
