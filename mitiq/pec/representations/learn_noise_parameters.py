@@ -82,7 +82,7 @@ def learn_noise_parameters(
     return [epsilon, eta]
 
 
-def loss_function(
+def biased_noise_loss_function(
     epsilon: float,
     eta: float,
     operation: QPROGRAM,
