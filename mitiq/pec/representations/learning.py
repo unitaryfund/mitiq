@@ -26,7 +26,7 @@ from mitiq.pec.representations.biased_noise import (
 )
 
 
-def learn_noise_parameters(
+def learn_biased_noise_parameters(
     operation: QPROGRAM,
     circuit: QPROGRAM,
     ideal_executor: Executor,
@@ -89,7 +89,7 @@ def learn_noise_parameters(
     return [epsilon, eta]
 
 
-def loss_function(
+def biased_noise_loss_function(
     epsilon: float,
     eta: float,
     operation: QPROGRAM,
