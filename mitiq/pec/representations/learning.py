@@ -70,7 +70,7 @@ def learn_biased_noise_parameters(
 
     x0 = [epsilon0, eta0]  # initial parameter values for optimization
     result = minimize(
-        loss_function,
+        biased_noise_loss_function,
         x0,
         args=(
             operation,
