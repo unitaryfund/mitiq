@@ -103,6 +103,7 @@ def biased_noise_loss_function(
 ) -> float:
     r"""Loss function for optimizing the quasiprobability representation using
     the method of least squares
+
     Args:
         epsilon: local noise strength epsilon, an optimization parameter
         eta: noise bias between reduced dephasing and depolarizing
@@ -110,7 +111,8 @@ def biased_noise_loss_function(
         operation: ideal operation to be represented by a (learning-optmized)
             combination of noisy operations
         ideal_values: expectation values obtained by simulations run on the
-                    Clifford training circuits
+            Clifford training circuits
+    
     Returns: Square of the difference between the error-mitigated value and
         the ideal value, over the training set
     """
@@ -121,16 +123,14 @@ def biased_noise_loss_function(
             eta,
         )
     ]
-    mitigated = execute_with_pec(
+    mitigated = [execute_with_pec(
         circuit=circuit,
         observable=observable,
         executor=noisy_executor,
         representations=representations,
-    )
-    if mitigated is float:
-        mitigated_value = mitigated
-    else:
-        mitigated_value = mitigated[0]
+    )]
+    
+    mitigated_value = mitigated[0]
 
     return (
         sum(
