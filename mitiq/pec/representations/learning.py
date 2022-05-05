@@ -123,14 +123,18 @@ def biased_noise_loss_function(
             eta,
         )
     ]
-    mitigated = [execute_with_pec(
+    mitigated = execute_with_pec(
         circuit=circuit,
         observable=observable,
         executor=noisy_executor,
         representations=representations,
-    )]
+    )
     
-    mitigated_value = mitigated[0]
+    if mitigated is float: 
+        mitigated_value = mitigated
+        
+    else:
+        mitigated_value = mitigated[0]
 
     return (
         sum(
