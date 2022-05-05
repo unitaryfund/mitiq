@@ -43,14 +43,18 @@ def learn_biased_noise_parameters(
         operation: ideal operation to be represented by a (learning-optmized)
             combination of noisy operations.
         circuit: the full quantum program as defined by the user.
-        ideal_executor:
-        noisy_executor:
+        ideal_executor: Executes the ideal circuit and returns a
+            `QuantumResult`.
+        noisy_executor: Executes the noisy circuit and returns a
+            `QuantumResult`.
         num_training_circuits: number of Clifford circuits to be generated for
             training data.
         epsilon0: initial guess for noise strength.
         eta0: initial guess for noise bias.
-        observable (optional): a quantum observable typically used to compute
-            its mitigated expectation value.
+        observable (optional): Observable to compute the expectation value of.
+            If None, the `executor` must return an expectation value. Otherwise
+            the `QuantumResult` returned by `executor` is used to compute the
+            expectation of the observable.
 
     Returns:
         Optimized noise strength epsilon and noise bias eta.
@@ -62,11 +66,9 @@ def learn_biased_noise_parameters(
         method_select="uniform",
         method_replace="closest",
     )
-    ideal_values = []
-    for training_circuit in training_circuits:
-        ideal_values.append(
-            ideal_executor.evaluate(training_circuit, observable)
-        )
+    ideal_values = np.array(
+        ideal_executor.evaluate(training_circuits, observable)
+    )
 
     x0 = [epsilon0, eta0]  # initial parameter values for optimization
     result = minimize(
@@ -94,7 +96,7 @@ def biased_noise_loss_function(
     eta: float,
     operation: QPROGRAM,
     circuit: QPROGRAM,
-    ideal_values: List[np.ndarray],
+    ideal_values: np.ndarray,
     noisy_executor: Executor,
     num_training_circuits: int,
     observable: Optional[Observable] = None,
@@ -119,12 +121,16 @@ def biased_noise_loss_function(
             eta,
         )
     ]
-    mitigated_value = execute_with_pec(
+    mitigated = execute_with_pec(
         circuit=circuit,
         observable=observable,
         executor=noisy_executor,
         representations=representations,
     )
+    if mitigated is float:
+        mitigated_value = mitigated
+    else:
+        mitigated_value = mitigated[0]
 
     return (
         sum(

@@ -16,7 +16,17 @@ kernelspec:
 This notebook is a demonstration of learning a noise model used for calculating
 quasiprobability representations to be used in the PEC technique. 
 
-## Markdown
+## 
+```{code-cell} ipython3
+import numpy as np
+import cirq
+from cirq import DensityMatrixSimulator, Circuit
+from mitiq import Observable, PauliString, pec
+from mitiq.interface import convert_to_mitiq, mitiq_cirq
+from mitiq.pec.representations import learn_biased_noise_parameters
+```
+
+
 
 
 

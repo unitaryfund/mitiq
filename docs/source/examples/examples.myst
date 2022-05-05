@@ -10,3 +10,4 @@ MaxCut benchmark with zero-noise extrapolation <maxcut-demo.myst>
 Defining a Mitiq executor with a hamiltonian <hamiltonians.md>
 Mitiq paper codeblocks <mitiq-paper/mitiq-paper-codeblocks>
 Estimating the potential energy surface of molecular Hydrogen with ZNE <molecular_hydrogen.myst>
+Learning-based PEC <learning_based_PEC.myst>
