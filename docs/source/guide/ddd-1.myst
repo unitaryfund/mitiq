@@ -1,0 +1,125 @@
+---
+jupytext:
+  text_representation:
+    extension: .myst
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.10.3
+kernelspec:
+  display_name: Python 3 (ipykernel)
+  language: python
+  name: python3
+---
+
+# How do I use DDD?
+
+Digital Dynamical Decoupling (DDD) is an error mitigation technique in which
+sequences of gates are applied to slack windows, i.e. single-qubit idle
+windows, in a quantum circuit. Mitiq provides standard built-in rules that can
+be directly imported from `mitiq.ddd.rules`. 
+For more discussion of the theoryof DDD, see the section [What is the theory
+behind DDD?](ddd-5-theory.myst)).
+
+
+As with all techniques, DDD is compatible with any frontend supported by Mitiq:
+
+```{code-cell} ipython3
+import mitiq 
+
+mitiq.SUPPORTED_PROGRAM_TYPES.keys()
+```
+
+In the next cell you can select the frontend used in this tutorial. For example:
+
+```{code-cell} ipython3
+frontend = "cirq" 
+```
+
+## Problem setup
+We first define the circuit of interest. For simplicity, in this example we use
+a randomized-benchmarking circuit whose ideal execution is equivalent to the
+identity operation.
+
+```{code-cell} ipython3
+from mitiq import benchmarks
+
+circuit = benchmarks.generate_rb_circuits(
+  n_qubits=1, num_cliffords=2, return_type = frontend,
+)[0]
+
+print(circuit)
+```
+
+As an example, below we define a simple executor function 
+which inputs a circuit, executes it on a noisy simulator, and returns the probability 
+of the ground state. 
+See the [Executors](executors.myst) section for more information on how to 
+define more advanced executors.
+
+```{code-cell} ipython3
+import numpy as np
+from cirq import DensityMatrixSimulator, depolarize
+from mitiq.interface import convert_to_mitiq
+
+def execute(circuit, noise_level=0.01):
+    """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit
+    executed with depolarizing noise.
+    """
+    # Replace with code based on your frontend and backend.
+    mitiq_circuit, _ = convert_to_mitiq(circuit)
+    noisy_circuit = mitiq_circuit.with_noise(depolarize(p=noise_level))
+    rho = DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix
+    return rho[0, 0].real
+```
+
+The [executor](executors.myst) can be used to evaluate noisy (unmitigated)
+expectation values.
+
+```{code-cell} ipython3
+# Compute the expectation value of the |0><0| observable.
+noisy_value = execute(circuit)
+ideal_value = execute(circuit, noise_level=0.0)      
+print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.5f}")
+```
+
+## Apply DDD
+Digital dynamical decoupling can be easily implemented with the function 
+{func}`mitiq.ddd.ddd.execute_with_ddd()`.
+
+```{code-cell} ipython3
+from mitiq import ddd
+
+mitigated_result = ddd.execute_with_ddd(circuit, execute, rules)
+```
+
+```{code-cell} ipython3
+print(f"Error with mitigation (DDD): {abs(ideal_value - mitigated_result):.{3}}")
+```
+
+Here we observe that the application of DDD reduces the estimation error when compared 
+to the unmitigated result.
+
+In the example above, the *insertion* step was taken behind the scenes thanks
+to the default options of {func}`.execute_with_DDD`. Below we provide more details
+about this aspect of DDD in Mitiq.
+
++++
+
+
+
+```{code-cell} ipython3
+from mitiq import ddd
+
+mitigated_result = ddd.execute_with_ddd(
+     circuit, execute, 
+)
+```
+
+```{code-cell} ipython3
+print(f"Error with mitigation (DDD): {abs(ideal_value - mitigated_result):.{3}}")
+```
+
+The section
+[What additional options are available when using DDD?](DDD-3-options.myst)
+contains more information on rules for defining and tools for inserting DDD
+sequences in Mitiq.
