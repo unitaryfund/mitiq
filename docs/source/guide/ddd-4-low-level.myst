@@ -1,0 +1,34 @@
+---
+jupytext:
+  text_representation:
+    extension: .myst
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.11.1
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
+---
+
+# What happens when I use DDD?
+
+The workflow of Digital Dynamical Decoupling (DDD) in Mitiq is represented in the figure below.
+
+```{figure} ../img/ddd_workflow.png
+---
+width: 700px
+name: ddd-workflow
+---
+Workflow of the DDD technique in Mitiq.
+```
+
+- The user provides a `QPROGRAM`, (i.e. a quantum circuit defined via any of the supported frontends).
+- Mitiq modifies the input circuit with the insertion of digital dynamical decoupling sequences in idle windows.
+- The modified circuit is executed via a user-defined [Executor](executors.myst).
+- The error mitigated expectation value is returned to the user.
+
+With respect to other error-mitigation techniques like ZNE or PEC, DDD requires the execution of a single modified circuit and,
+for this reason, it does not require any post-processing of the measurement results.
+
+TODO: to complete.
