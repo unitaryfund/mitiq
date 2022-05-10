@@ -70,7 +70,7 @@ def learn_biased_noise_parameters(
         ideal_executor.evaluate(training_circuits, observable)
     )
 
-    x0 = [epsilon0, eta0]  # initial parameter values for optimization
+    x0 = np.array([epsilon0, eta0])  # initial parameter values for optimization
     result = minimize(
         biased_noise_loss_function,
         x0,
