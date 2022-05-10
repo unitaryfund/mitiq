@@ -19,6 +19,8 @@ import cirq
 from numpy import generic
 import pytest
 
+from mitiq import Observable
+from mitiq.observable.pauli import PauliString
 from mitiq.rem.rci import execute_with_rci
 from mitiq.interface.mitiq_cirq import sample_bitstrings
 
@@ -36,8 +38,9 @@ def generic_executor(circuit, noise_level: float = 0.1) -> float:
 
 
 def test_rci_identity():
-    result = execute_with_rci(circ, sample_bitstrings)
-    # print(result)
+    observable = Observable(PauliString(spec="Z"))
+    result = execute_with_rci(circ, sample_bitstrings, observable)
+    print(result)
 
 
 if __name__ == "__main__":

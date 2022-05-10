@@ -20,7 +20,7 @@ from typing import Callable, Iterable, List, Optional, Sequence, Tuple, Union
 from functools import partial
 import numpy as np
 
-from mitiq import Executor, QPROGRAM
+from mitiq import Executor, Observable, QPROGRAM
 from mitiq.rem import MeasurementResult
 
 from cirq import DensityMatrixSimulator
@@ -40,8 +40,9 @@ MatrixLike = Union[
 def execute_with_rci(
     circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], MeasurementResult]],
+    observable: Optional[Observable] = None,
     inverse_confusion_matrix: Optional[MatrixLike] = None,
-) -> MeasurementResult:
+) -> float:
     """Returns the readout error mitigated expectation value utilizing an
     inverse confusion matrix that is computed by running the quantum program
     `circuit` with the executor function.
@@ -95,5 +96,6 @@ def execute_with_rci(
         state_vector_to_measurement, 1, adjusted_state_vectors
     ).squeeze()
 
-    return MeasurementResult(adjusted_result, noisy_result.qubit_indices)
+    result = MeasurementResult(adjusted_result, noisy_result.qubit_indices)
+    return observable._expectation_from_measurements([result])
 
