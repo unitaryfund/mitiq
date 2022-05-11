@@ -103,6 +103,7 @@ def insert_ddd_sequences(
     Returns:
         The circuit with DDD sequences added.
     """
+
     return _insert_ddd_sequences(circuit, rule)
 
 
