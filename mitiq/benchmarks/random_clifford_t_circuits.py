@@ -18,7 +18,6 @@ from typing import List, Optional, cast
 
 import numpy as np
 
-print("hhh---test---hhh")
 from cirq.experiments.qubit_characterizations import (
     _single_qubit_cliffords,
     _random_single_q_clifford,
@@ -32,12 +31,13 @@ from mitiq.interface import convert_from_mitiq
 
 
 def generate_random_clifford_t_circuits(
-    n_qubits: int,
-    num_cliffords: int,
+    num_T: int,
+    num_single_qubit_cliffords: int,
+    num_double_qubit_cliffords: int,
     trials: int = 1,
     return_type: Optional[str] = None,
 ) -> List[QPROGRAM]:
-    """Returns a list of random clifford t circuits
+    """Returns a list of random clifford + t circuits
 
     Args:
         n_qubits: The number of qubits. Can be either 1 or 2.
@@ -52,39 +52,35 @@ def generate_random_clifford_t_circuits(
     Returns:
         A list of randomized benchmarking circuits.
     """
-    if n_qubits not in (1, 2):
-        raise ValueError(
-            "Only generates RB circuits on one or two "
-            f"qubits not {n_qubits}."
-        )
-    qubits = LineQubit.range(n_qubits)
+    print("start testing:") #remove this line
+    qubits = LineQubit.range(2)
     cliffords = _single_qubit_cliffords()
+    print("cliffords", cliffords)
 
-    if n_qubits == 1:
-        c1 = cliffords.c1_in_xy
-        cfd_mat_1q = cast(
-            np.ndarray, [_gate_seq_to_mats(gates) for gates in c1]
-        )
-        circuits = [
-            _random_single_q_clifford(qubits[0], num_cliffords, c1, cfd_mat_1q)
-            for _ in range(trials)
-        ]
-    else:
-        cfd_matrices = _two_qubit_clifford_matrices(
+    c1 = cliffords.c1_in_xy
+    cfd_mat_1q = cast(
+        np.ndarray, [_gate_seq_to_mats(gates) for gates in c1]
+    )
+    print("matrixs", cfd_mat_1q)
+    circuits = [
+        _random_single_q_clifford(qubits[0], num_single_qubit_cliffords, c1, cfd_mat_1q)
+        for _ in range(trials)
+    ]
+    cfd_matrices = _two_qubit_clifford_matrices(
+        qubits[0],
+        qubits[1],
+        cliffords,
+    )
+    circuits = [
+        _random_two_q_clifford(
             qubits[0],
             qubits[1],
+            num_double_qubit_cliffords,
+            cfd_matrices,
             cliffords,
         )
-        circuits = [
-            _random_two_q_clifford(
-                qubits[0],
-                qubits[1],
-                num_cliffords,
-                cfd_matrices,
-                cliffords,
-            )
-            for _ in range(trials)
-        ]
+        for _ in range(trials)
+    ]
 
     return_type = "cirq" if not return_type else return_type
     return [convert_from_mitiq(circuit, return_type) for circuit in circuits]
