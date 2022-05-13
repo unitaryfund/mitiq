@@ -86,7 +86,10 @@ def generate_volume_circuit(
     # Don't measure all of the qubits at the end of the circuit because we will
     # need to classically simulate it to compute its heavy set.
     heavy_bitstrings = compute_heavy_set(circuit) 
+
     return_type = "cirq" if not return_type else return_type
+    circuit = convert_from_mitiq(circuit, return_type) 
+
     return circuit, heavy_bitstrings 
 
 
