@@ -15,4 +15,3 @@ dist/
 build/
 coverage.xml
 jupyter_execute/
-docs/source/examples/learning_test_notebook.ipynb
