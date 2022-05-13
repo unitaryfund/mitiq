@@ -43,8 +43,8 @@ As shown in [How do I use DDD?](ddd-1-intro.myst), the function {func}`.execute_
 and directly returns the error-mitigated expectation value.
 In the next sections instead, we show how one can apply DDD at a lower level, i.e., by:
 
-- Characterizing all the slack windows in a circuit,
-- Inserting DDD sequences in all slack windows.
+- Characterizing all the slack windows in a circuit;
+- Inserting DDD sequences in all slack windows;
 - Executing the modified circuit.
 
 ## Analysis of idle windows (optional step)
@@ -55,7 +55,7 @@ This is an optional step, since it is actually not necessary to apply DDD with M
 Nonetheless, it provides additional information on the gate structure of the circuit that can be useful, especially for research purposes. 
 
 ### The circuit mask
-A quantum circuit can be represented as a 2D grid where the horizontal axis determines abstract and discrete
+A quantum circuit can be visualized as a 2D grid where the horizontal axis represents discrete
 time steps (often called moments) and the vertical axis represents the qubits of the circuit. Each gate occupies one or more grid cells,
 depending on the number of qubits it acts on. 
 
@@ -144,7 +144,7 @@ def execute(circuit, noise_level=0.003):
     return rho[0, 0].real
 ```
 
-If executed on noiseless backend, `circuit_with_ddd` and `circuit` are equivalent.
+If executed on a noiseless backend, `circuit_with_ddd` and `circuit` are equivalent.
 On a real backend, they have a different sensitivity to noise. The core idea of the DDD technique is that,
 `circuit_with_ddd` is (hopefully) less sensitive to noise thanks to the particular structure of DDD sequences.
 
@@ -163,7 +163,8 @@ execute(circuit)
 execute(circuit_with_ddd)
 ```
 
-Note that this exactly what {func}`.execute_with_ddd()` does behind the scenes. Let's verify this fact: 
+As a final remark, we stress that the low-level procedure that we have shown is exactly what {func}`.execute_with_ddd()` does behind the scenes.
+Let's verify this fact: 
 
 ```{code-cell} ipython3
 np.isclose(
