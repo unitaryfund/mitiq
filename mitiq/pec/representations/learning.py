@@ -70,7 +70,9 @@ def learn_biased_noise_parameters(
         ideal_executor.evaluate(training_circuits, observable)
     )
 
-    x0 = np.array([epsilon0, eta0])  # initial parameter values for optimization
+    x0 = np.array(
+        [epsilon0, eta0]
+    )  # initial parameter values for optimization
     result = minimize(
         biased_noise_loss_function,
         x0,
@@ -112,7 +114,7 @@ def biased_noise_loss_function(
             combination of noisy operations
         ideal_values: expectation values obtained by simulations run on the
             Clifford training circuits
-    
+
     Returns: Square of the difference between the error-mitigated value and
         the ideal value, over the training set
     """
@@ -132,7 +134,7 @@ def biased_noise_loss_function(
         representations=representations,
     )
 
-    if mitigated is float: 
+    if mitigated is float:
         mitigated_value = mitigated
 
     else:
