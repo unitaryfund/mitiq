@@ -13,19 +13,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Functions for creating GHZ circuits for benchmarking purposes."""
-from typing import Optional
+"""Functions for creating circuits of the form used in quantum
+volume experiments as defined in https://arxiv.org/abs/1811.12926.
+
+Useful overview of quantum volume experiments here:
+https://pennylane.ai/qml/demos/quantum_volume.html
+
+Cirq implementation of quantum volume circuits here:
+cirq-core/cirq/contrib/quantum_volume/quantum_volume.py
+"""
+
+from typing import Optional, List, Tuple
 
 import cirq
 from mitiq import QPROGRAM
 from mitiq.interface import convert_from_mitiq
+from mitiq.rem.measurement_result import Bitstring # List[int]
 
 
-def generate_ghz_circuit(
-    n_qubits: int,
+def generate_volume_circuit(
+    num_qubits: int,
     return_type: Optional[str] = None,
-) -> QPROGRAM:
-    """Returns a GHZ circuit ie a circuit that prepares an ``n_qubits`` GHZ state.
+) -> Tuple[QPROGRAM, List[Bitstring]:
+    """Returns a quantum volume circuit ie a circuit that 
+    TODO: finish description
 
     Args:
         n_qubits: The number of qubits in the circuit.
@@ -35,5 +46,21 @@ def generate_ghz_circuit(
             ``cirq.Circuit``.
 
     Returns:
-        A GHZ circuit acting on ``n_qubits`` qubits.
+        A quantum volume circuit acting on ``num_qubits`` qubits.
+        A list of the heavy bitstrings for the returned circuit.
     """
+
+    if num_qubits <= 0:
+        raise ValueError(
+            "Cannot prepare a volume circuit with {} qubits", num_qubits
+        )
+
+    qubits = cirq.LineQubit.range(num_qubits)
+    circuit = cirq.Circuit()
+
+    #TODO
+
+    return circuit, heavy_bitstrings 
+
+
+
