@@ -104,7 +104,7 @@ $$e^{i\pi} + 1 = 0$$ (euler)
 Euler's identity, equation {math:numref}`euler`, was elected one of the
 most beautiful mathematical formulas.
 
-You can see the syntax used for this example [here in the MyST documentation](https://myst-parser.readthedocs.io/en/latest/syntax/syntax.html#roles-an-in-line-extension-point).
+You can see the syntax used for this example [here in the MyST documentation](https://myst-parser.readthedocs.io/en/latest/syntax/syntax.html).
 
 ## Code cells and outputs
 
