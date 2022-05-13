@@ -84,7 +84,7 @@ of interest :math:`\langle X\rangle_{\text{ideal}}` after the action of an ideal
 :math:`\{\mathcal{\mathcal G}_i\}_{i=1}^L`. To do this in PEC, we sample a noisy operation
 :math:`\mathcal{O}_{\alpha}` for each ideal gate :math:`\mathcal{G}_i`
 with probability :math:`P_i(\alpha)`. This sampling produces a sequence of noisy operations
-:math:`\{\mathcal{O}_{\alpha_i}\}_{i=1}^L`) whose execution produces the
+:math:`\{\mathcal{O}_{\alpha_i}\}_{i=1}^L` whose execution produces the
 final mixed state :math:`\rho_f`. Then, by measuring the observable :math:`X`, setting
 :math:`\gamma_{\text{tot}} := \prod_{i}^L \gamma_i` and
 :math:`\sigma_{\text{tot}} = \prod_{i=1}^L \sigma_i(\alpha)`, we can obtain an unbiased
