@@ -84,6 +84,24 @@ Qiskit Utils
 .. automodule:: mitiq.interface.mitiq_qiskit.qiskit_utils
    :members:
 
+Digital Dynamical Decoupling
+----------------------------
+
+Digital Dynamical Decoupling (High-Level Tools)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.ddd.ddd
+   :members:
+
+Insertion
+^^^^^^^^^
+.. automodule:: mitiq.ddd.insertion
+   :members:
+
+Rules
+^^^^^
+.. automodule:: mitiq.ddd.rules.rules
+   :members:
+
 Executors
 ---------
 .. automodule:: mitiq.executor.executor

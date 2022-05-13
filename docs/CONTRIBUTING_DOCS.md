@@ -59,7 +59,7 @@ the extended MyST syntax. Just add the file to `source` directory and a TOC some
 
 ```{warning}
 Currently, `.rst` is supported for any of the files in the docs, but the current migration plan is to move everything to MyST serialization, to make it easier to include Jupyter notebooks and more consistent with documentation in the project root.
-If you want a good intro to MyST and how it compares to `.rst` see [this guide](https://myst-parser.readthedocs.io/en/latest/sphinx/intro.html#intro-writing).
+If you want a good intro to MyST and how it compares to `.rst` see [this guide](https://myst-parser.readthedocs.io/en/latest/sphinx/intro.html).
 ```
 
 The main table of contents (TOC) file for the docs is `index.myst`. It includes `guide\guide.myst` and `apidoc.myst`, among other files. To add a new file to the base TOC, make sure it gets listed in the `toctree` directive like this:
@@ -251,4 +251,4 @@ are some notes on how to build docs.
 [The MyST syntax guide](https://myst-parser.readthedocs.io/en/latest/using/syntax.html) is a
 cheat sheet for the extended Markdown formatting that applies to both Markdown files as well as Markdown in Jupyter notebooks.
 
-[The MyST-NB Notebook guide](https://myst-nb.readthedocs.io/en/latest/use/markdown.html) can help you get you write or convert your notebook content for the docs.
+[The MyST-NB Notebook guide](https://myst-nb.readthedocs.io/en/latest/authoring/basics.html?highlight=markdown#myst-markdown) can help you get you write or convert your notebook content for the docs.

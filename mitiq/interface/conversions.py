@@ -306,3 +306,11 @@ def noise_scaling_converter(
         return scaled_circuit
 
     return new_scaling_function
+
+
+@noise_scaling_converter
+def append_cirq_circuit_to_qprogram(
+    circuit: QPROGRAM, cirq_circuit: Circuit
+) -> QPROGRAM:
+    """Appends a Cirq circuit to a QPROGRAM."""
+    return circuit + cirq_circuit
