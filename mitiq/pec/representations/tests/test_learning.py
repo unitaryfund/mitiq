@@ -17,40 +17,55 @@ import numpy as np
 import pytest
 from cirq import (
     CNOT,
-    CZ,
-    ISWAP,
     I,
     X,
     Y,
     Z,
-    H,
-    SWAP,
-    Gate,
     LineQubit,
     Circuit,
     ops,
     unitary,
 )
-
+from mitiq.interface.mitiq_cirq import compute_density_matrix
+from mitiq.cdr._testing import random_x_z_cnot_circuit
 from mitiq.pec.representations.learning import learn_biased_noise_parameters
+
+circuit = random_x_z_cnot_circuit(
+    LineQubit.range(3), n_moments=5, random_state=1
+)
 
 
 @pytest.mark.parametrize("epsilon", [0, 0.7, 1])
 @pytest.mark.parametrize("eta", [0, 1, 1000])
-@pytest.mark.parametrize("operation", [X, Y, Z, H, CZ, CNOT, ISWAP, SWAP])
+@pytest.mark.parametrize(
+    "gate", [CNOT]
+)  # TODO: extract rx and rz ops from circuit?
 @pytest.mark.parametrize("offset", [-0.1, 0.1])
-def test_learn_biased_noise_parameters(epsilon, eta, operation, offset):
+def test_learn_biased_noise_parameters(epsilon, eta, gate, circuit, offset):
+    """Test the learning function with initial noise strength and noise bias
+    slightly offset from the simulated noise model values"""
+    # Define biased noise channel
     a = 1 - epsilon
     b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
     c = epsilon / (3 * (eta + 1))
+
     mix = [
         (a, unitary(I)),
         (b, unitary(Z)),
         (c, unitary(X)),
         (c, unitary(Y)),
     ]
-    [epsilon_learn, eta_learn] = learn_biased_noise_parameters(
-        operation=operation,
+
+    def ideal_executor(circ: Circuit) -> np.ndarray:
+        return compute_density_matrix(circ, noise_level=(0.0,))
+
+    def noisy_executor(circ: Circuit) -> np.ndarray:
+        return compute_density_matrix(
+            circ, noise_model=ops.MixedUnitaryChannel(mix).on_each(a, b)
+        )
+
+    [epsilon_opt, eta_opt] = learn_biased_noise_parameters(
+        operation=gate,
         circuit=circuit,
         ideal_executor=ideal_executor,
         noisy_executor=noisy_executor,
@@ -58,5 +73,5 @@ def test_learn_biased_noise_parameters(epsilon, eta, operation, offset):
         epsilon0=(1 + offset) * epsilon,
         eta0=(1 + offset) * eta,
     )
-    assert np.isclose(epsilon, epsilon_learn)
-    assert np.isclose(eta, eta_learn)
+    assert np.isclose(epsilon, epsilon_opt)
+    assert np.isclose(eta, eta_opt)
