@@ -1,0 +1,68 @@
+{
+  "cirq_type": "CrossEntropyResultDict",
+  "results": [
+    [
+      [
+        {
+          "cirq_type": "LineQubit",
+          "x": 0
+        },
+        {
+          "cirq_type": "LineQubit",
+          "x": 1
+        }
+      ],
+      {
+        "cirq_type": "CrossEntropyResult",
+        "data": [
+          [
+            2,
+            0.9
+          ],
+          [
+            4,
+            0.5
+          ]
+        ],
+        "repetitions": 1000,
+        "purity_data": null
+      }
+    ],
+    [
+      [
+        {
+          "cirq_type": "LineQubit",
+          "x": 2
+        },
+        {
+          "cirq_type": "LineQubit",
+          "x": 3
+        }
+      ],
+      {
+        "cirq_type": "CrossEntropyResult",
+        "data": [
+          [
+            2,
+            0.8
+          ],
+          [
+            4,
+            0.4
+          ]
+        ],
+        "repetitions": 1000,
+        "purity_data": [
+          [
+            2,
+            0.7
+          ],
+          [
+            4,
+            0.3
+          ]
+        ]
+      }
+    ]
+  ]
+}

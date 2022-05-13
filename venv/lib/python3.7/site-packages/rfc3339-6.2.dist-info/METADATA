@@ -1,0 +1,26 @@
+Metadata-Version: 2.1
+Name: rfc3339
+Version: 6.2
+Summary: Format dates according to the RFC 3339.
+Home-page: http://pypi.python.org/pypi/rfc3339/
+Author: Henry Precheur <henry@precheur.org>
+Author-email: henry@precheur.org
+License: ISCL
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Topic :: Internet
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+
+Formats dates according to the :RFC:`3339`.
+
+Report bugs and feature requests on Sourcehut_
+
+Source availabe on this Mercurial repository: https://hg.sr.ht/~henryprecheur/rfc3339
+
+.. _Sourcehut: https://todo.sr.ht/~henryprecheur/rfc3339
+
+

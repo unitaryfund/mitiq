@@ -1,0 +1,41 @@
+{
+  "cirq_type": "CliffordState",
+  "qubit_map": [
+    [
+      {
+        "cirq_type": "LineQubit",
+        "x": 0
+      },
+      0
+    ]
+  ],
+  "ch_form": {
+    "cirq_type": "StabilizerStateChForm",
+    "n": 1,
+    "G": [
+      [
+        true
+      ]
+    ],
+    "F": [
+      [
+        true
+      ]
+    ],
+    "M": [
+      [
+        false
+      ]
+    ],
+    "gamma": [
+      0
+    ],
+    "v": [
+      false
+    ],
+    "s": [
+      false
+    ],
+    "omega": 1
+  }
+}

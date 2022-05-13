@@ -1,0 +1,60 @@
+Metadata-Version: 2.1
+Name: duet
+Version: 0.2.6
+Summary: A simple future-based async library for python.
+Home-page: http://github.com/google/duet
+Author: The Duet Authors
+Author-email: maffoo@google.com
+License: Apache 2
+Platform: UNKNOWN
+Requires-Python: >=3.6.0
+Description-Content-Type: text/markdown
+Requires-Dist: asyncio-contextmanager (==1.0.1) ; python_version <= "3.6"
+Requires-Dist: contextvars (==2.4) ; python_version <= "3.6"
+Requires-Dist: typing-extensions (==3.10.0) ; python_version <= "3.7"
+Provides-Extra: dev_env
+Requires-Dist: black (==22.3.0) ; extra == 'dev_env'
+Requires-Dist: isort (==5.7.*) ; extra == 'dev_env'
+Requires-Dist: mypy (==0.931.*) ; extra == 'dev_env'
+Requires-Dist: pylint (==2.10.*) ; extra == 'dev_env'
+Requires-Dist: pytest (==6.2.*) ; extra == 'dev_env'
+Requires-Dist: twine (==3.3.*) ; extra == 'dev_env'
+
+# duet
+
+A simple future-based async library for python
+
+Duet takes inspiration from the amazing [trio](https://trio.readthedocs.io/en/stable/)
+library and the [structured concurrency](https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/)
+approach to async programming that it uses.
+However, duet differs from trio in two major ways:
+
+- Instead of a full-blown implementation of asynchronous IO, duet relies  on the
+  `Future` interface for parallelism, and provides a way to run async/await
+  coroutines around those `Future`s. This is useful if you are using an API that
+  returns futures, such as RPC libraries like gRPC. The standard `Future`
+  interface does not implement `__await__` directly, so `Future` instances must
+  be wrapped in `duet.AwaitableFuture`.
+
+- duet is re-entrant. At the top level, you run async code by calling
+  `duet.run(foo)`. Inside `foo` suppose you call a function that has not yet
+  been fully refactored to be asynchronous, but itself calls `duet.run(bar)`.
+  Most async libraries, including `trio` and `asyncio`, will raise an exception
+  if you try to "re-enter" the event loop in this way, but duet allows it. We
+  have found that this can simplify the process of refactoring code to be
+  asynchronous because you don't have to completely separate the sync and async
+  parts of your codebase all at once.
+
+## Installation
+
+Install from pypi:
+
+```
+pip install duet
+```
+
+## Note
+
+duet is not an official Google project.
+
+

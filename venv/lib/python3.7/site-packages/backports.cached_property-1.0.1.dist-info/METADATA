@@ -1,0 +1,93 @@
+Metadata-Version: 2.1
+Name: backports.cached-property
+Version: 1.0.1
+Summary: cached_property() - computed once per instance, cached as attribute
+Home-page: https://github.com/penguinolog/backports.cached_property
+Author: Aleksei Stepanov
+Author-email: penguinolog@gmail.com
+Maintainer: Aleksei Stepanov penguinolog@gmail.com
+License: MIT License
+Project-URL: Bug Tracker, https://github.com/penguinolog/backports.cached_property/issues
+Keywords: caching,development
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Requires-Python: >=3.6.0
+Description-Content-Type: text/x-rst
+Requires-Dist: typing (>=3.6) ; python_version < "3.7"
+
+backports.cached_property
+=========================
+
+.. image:: https://travis-ci.com/penguinolog/backports.cached_property.svg?branch=master
+    :target: https://travis-ci.com/penguinolog/backports.cached_property
+.. image:: https://img.shields.io/pypi/v/backports.cached-property.svg
+    :target: https://pypi.python.org/pypi/backports.cached-property
+.. image:: https://img.shields.io/pypi/pyversions/backports.cached-property.svg
+    :target: https://pypi.python.org/pypi/backports.cached-property
+.. image:: https://img.shields.io/pypi/status/backports.cached-property.svg
+    :target: https://pypi.python.org/pypi/backports.cached-property
+.. image:: https://img.shields.io/github/license/penguinolog/backports.cached_property.svg
+    :target: https://raw.githubusercontent.com/penguinolog/backports.cached_property/master/LICENSE
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/ambv/black
+
+What
+----
+
+Python 3.8 adds great descriptor to functools: cached_property.
+Technically all required APIs was available since python 3.6,
+but it is what it is.
+
+This package is a backport of this functionality for python 3.6 and 3.7.
+
+How to use
+----------
+
+.. code-block:: python
+
+    from backports.cached_property import cached_property
+
+And then python 3.8 documentation will work (because code is minimally changed):
+
+.. class:: cached_property
+
+   Transform a method of a class into a property whose value is computed once
+   and then cached as a normal attribute for the life of the instance. Similar
+   to `property`, with the addition of caching. Useful for expensive
+   computed properties of instances that are otherwise effectively immutable.
+
+   Example::
+
+       class DataSet:
+           def __init__(self, sequence_of_numbers):
+               self._data = sequence_of_numbers
+
+           @cached_property
+           def stdev(self):
+               return statistics.stdev(self._data)
+
+           @cached_property
+           def variance(self):
+               return statistics.variance(self._data)
+
+
+   .. note::
+
+      This decorator requires that the ``__dict__`` attribute on each instance
+      be a mutable mapping. This means it will not work with some types, such as
+      metaclasses (since the ``__dict__`` attributes on type instances are
+      read-only proxies for the class namespace), and those that specify
+      ``__slots__`` without including ``__dict__`` as one of the defined slots
+      (as such classes don't provide a ``__dict__`` attribute at all).
+
+

@@ -1,0 +1,1000 @@
+# Copyright 2020 The Cirq Developers
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from unittest import mock
+import datetime
+
+import pytest
+import freezegun
+import numpy as np
+
+from google.protobuf.duration_pb2 import Duration
+from google.protobuf.text_format import Merge
+from google.protobuf.timestamp_pb2 import Timestamp
+import cirq
+import cirq_google as cg
+import cirq_google.devices.known_devices as known_devices
+from cirq_google.api import v2
+from cirq_google.engine import util
+from cirq_google.engine.engine import EngineContext
+from cirq_google.engine.client.quantum_v1alpha1 import enums as qenums
+from cirq_google.engine.client.quantum_v1alpha1 import types as qtypes
+
+
+def _to_timestamp(json_string):
+    timestamp_proto = qtypes.timestamp_pb2.Timestamp()
+    timestamp_proto.FromJsonString(json_string)
+    return timestamp_proto
+
+
+_CALIBRATION = qtypes.QuantumCalibration(
+    name='projects/a/processors/p/calibrations/1562715599',
+    timestamp=_to_timestamp('2019-07-09T23:39:59Z'),
+    data=util.pack_any(
+        v2.metrics_pb2.MetricsSnapshot(
+            timestamp_ms=1562544000021,
+            metrics=[
+                v2.metrics_pb2.Metric(
+                    name='xeb',
+                    targets=['0_0', '0_1'],
+                    values=[v2.metrics_pb2.Value(double_val=0.9999)],
+                ),
+                v2.metrics_pb2.Metric(
+                    name='xeb',
+                    targets=['0_0', '1_0'],
+                    values=[v2.metrics_pb2.Value(double_val=0.9998)],
+                ),
+                v2.metrics_pb2.Metric(
+                    name='t1',
+                    targets=['0_0'],
+                    values=[v2.metrics_pb2.Value(double_val=321)],
+                ),
+                v2.metrics_pb2.Metric(
+                    name='t1',
+                    targets=['0_1'],
+                    values=[v2.metrics_pb2.Value(double_val=911)],
+                ),
+                v2.metrics_pb2.Metric(
+                    name='t1',
+                    targets=['0_1'],
+                    values=[v2.metrics_pb2.Value(double_val=505)],
+                ),
+                v2.metrics_pb2.Metric(
+                    name='globalMetric',
+                    values=[v2.metrics_pb2.Value(int32_val=12300)],
+                ),
+            ],
+        ),
+    ),
+)
+
+_DEVICE_SPEC = util.pack_any(
+    Merge(
+        """
+valid_gate_sets: [{
+    name: 'test_set',
+    valid_gates: [{
+        id: 'x',
+        number_of_qubits: 1,
+        gate_duration_picos: 1000,
+        valid_targets: ['1q_targets']
+    }]
+}],
+valid_qubits: ['0_0', '1_1'],
+valid_targets: [{
+    name: '1q_targets',
+    target_ordering: SYMMETRIC,
+    targets: [{
+        ids: ['0_0']
+    }]
+}]
+""",
+        v2.device_pb2.DeviceSpecification(),
+    )
+)
+
+
+_GATE_SET = cg.SerializableGateSet(
+    gate_set_name='x_gate_set',
+    serializers=[cg.GateOpSerializer(gate_type=cirq.XPowGate, serialized_gate_id='x', args=[])],
+    deserializers=[
+        cg.GateOpDeserializer(serialized_gate_id='x', gate_constructor=cirq.XPowGate, args=[])
+    ],
+)
+
+
+_CIRCUIT = cirq.Circuit(
+    cirq.X(cirq.GridQubit(5, 2)) ** 0.5, cirq.measure(cirq.GridQubit(5, 2), key='result')
+)
+
+
+_RESULTS_V2 = v2.result_pb2.Result(
+    sweep_results=[
+        v2.result_pb2.SweepResult(
+            repetitions=1,
+            parameterized_results=[
+                v2.result_pb2.ParameterizedResult(
+                    params=v2.result_pb2.ParameterDict(assignments={'a': 1}),
+                    measurement_results=[
+                        v2.result_pb2.MeasurementResult(
+                            key='q',
+                            qubit_measurement_results=[
+                                v2.result_pb2.QubitMeasurementResult(
+                                    qubit=v2.program_pb2.Qubit(id='1_1'), results=b'\000\001'
+                                )
+                            ],
+                        )
+                    ],
+                ),
+                v2.result_pb2.ParameterizedResult(
+                    params=v2.result_pb2.ParameterDict(assignments={'a': 2}),
+                    measurement_results=[
+                        v2.result_pb2.MeasurementResult(
+                            key='q',
+                            qubit_measurement_results=[
+                                v2.result_pb2.QubitMeasurementResult(
+                                    qubit=v2.program_pb2.Qubit(id='1_1'), results=b'\000\001'
+                                )
+                            ],
+                        )
+                    ],
+                ),
+            ],
+        )
+    ]
+)
+
+
+_RESULTS2_V2 = v2.result_pb2.Result(
+    sweep_results=[
+        v2.result_pb2.SweepResult(
+            repetitions=1,
+            parameterized_results=[
+                v2.result_pb2.ParameterizedResult(
+                    params=v2.result_pb2.ParameterDict(assignments={'a': 3}),
+                    measurement_results=[
+                        v2.result_pb2.MeasurementResult(
+                            key='q',
+                            qubit_measurement_results=[
+                                v2.result_pb2.QubitMeasurementResult(
+                                    qubit=v2.program_pb2.Qubit(id='1_1'), results=b'\000\001'
+                                )
+                            ],
+                        )
+                    ],
+                ),
+                v2.result_pb2.ParameterizedResult(
+                    params=v2.result_pb2.ParameterDict(assignments={'a': 4}),
+                    measurement_results=[
+                        v2.result_pb2.MeasurementResult(
+                            key='q',
+                            qubit_measurement_results=[
+                                v2.result_pb2.QubitMeasurementResult(
+                                    qubit=v2.program_pb2.Qubit(id='1_1'), results=b'\000\001'
+                                )
+                            ],
+                        )
+                    ],
+                ),
+            ],
+        )
+    ]
+)
+
+
+_BATCH_RESULTS_V2 = util.pack_any(
+    v2.batch_pb2.BatchResult(results=[_RESULTS_V2, _RESULTS2_V2]),
+)
+
+
+_CALIBRATION_RESULTS_V2 = util.pack_any(
+    v2.calibration_pb2.FocusedCalibrationResult(
+        results=[
+            v2.calibration_pb2.CalibrationLayerResult(
+                code=v2.calibration_pb2.SUCCESS,
+                error_message='First success',
+                token='abc123',
+                metrics=v2.metrics_pb2.MetricsSnapshot(
+                    metrics=[
+                        v2.metrics_pb2.Metric(
+                            name='fidelity',
+                            targets=['q2_3', 'q2_4'],
+                            values=[v2.metrics_pb2.Value(double_val=0.75)],
+                        )
+                    ]
+                ),
+            ),
+            v2.calibration_pb2.CalibrationLayerResult(
+                code=v2.calibration_pb2.SUCCESS, error_message='Second success'
+            ),
+        ]
+    )
+)
+
+
+@pytest.fixture(scope='session', autouse=True)
+def mock_grpc_client():
+    with mock.patch(
+        'cirq_google.engine.engine_client.quantum.QuantumEngineServiceClient'
+    ) as _fixture:
+        yield _fixture
+
+
+def test_engine():
+    processor = cg.EngineProcessor('a', 'p', EngineContext())
+    assert processor.engine().project_id == 'a'
+
+
+def test_engine_repr():
+    processor = cg.EngineProcessor('the-project-id', 'the-processor-id', EngineContext())
+    assert 'the-project-id' in repr(processor)
+    assert 'the-processor-id' in repr(processor)
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.get_processor')
+def test_health(get_processor):
+    get_processor.return_value = qtypes.QuantumProcessor(health=qtypes.QuantumProcessor.Health.OK)
+    processor = cg.EngineProcessor(
+        'a',
+        'p',
+        EngineContext(),
+        _processor=qtypes.QuantumProcessor(health=qtypes.QuantumProcessor.Health.DOWN),
+    )
+    assert processor.health() == 'OK'
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.get_processor')
+def test_expected_down_time(get_processor):
+    processor = cg.EngineProcessor('a', 'p', EngineContext(), _processor=qtypes.QuantumProcessor())
+    assert not processor.expected_down_time()
+
+    get_processor.return_value = qtypes.QuantumProcessor(
+        expected_down_time=qtypes.timestamp_pb2.Timestamp(seconds=1581515101)
+    )
+
+    assert cg.EngineProcessor('a', 'p', EngineContext()).expected_down_time() == datetime.datetime(
+        2020, 2, 12, 13, 45, 1
+    )
+    get_processor.assert_called_once()
+
+
+def test_expected_recovery_time():
+    processor = cg.EngineProcessor('a', 'p', EngineContext(), _processor=qtypes.QuantumProcessor())
+    assert not processor.expected_recovery_time()
+    processor = cg.EngineProcessor(
+        'a',
+        'p',
+        EngineContext(),
+        _processor=qtypes.QuantumProcessor(
+            expected_recovery_time=qtypes.timestamp_pb2.Timestamp(seconds=1581515101)
+        ),
+    )
+    assert processor.expected_recovery_time() == datetime.datetime(2020, 2, 12, 13, 45, 1)
+
+
+def test_supported_languages():
+    processor = cg.EngineProcessor('a', 'p', EngineContext(), _processor=qtypes.QuantumProcessor())
+    assert processor.supported_languages() == []
+    processor = cg.EngineProcessor(
+        'a',
+        'p',
+        EngineContext(),
+        _processor=qtypes.QuantumProcessor(supported_languages=['lang1', 'lang2']),
+    )
+    assert processor.supported_languages() == ['lang1', 'lang2']
+
+
+def test_get_device_specification():
+    processor = cg.EngineProcessor('a', 'p', EngineContext(), _processor=qtypes.QuantumProcessor())
+    assert not processor.get_device_specification()
+
+    # Construct expected device proto based on example
+    expected = v2.device_pb2.DeviceSpecification()
+    gs = expected.valid_gate_sets.add()
+    gs.name = 'test_set'
+    gates = gs.valid_gates.add()
+    gates.id = 'x'
+    gates.number_of_qubits = 1
+    gates.gate_duration_picos = 1000
+    gates.valid_targets.extend(['1q_targets'])
+    expected.valid_qubits.extend(['0_0', '1_1'])
+    target = expected.valid_targets.add()
+    target.name = '1q_targets'
+    target.target_ordering = v2.device_pb2.TargetSet.SYMMETRIC
+    new_target = target.targets.add()
+    new_target.ids.extend(['0_0'])
+
+    processor = cg.EngineProcessor(
+        'a', 'p', EngineContext(), _processor=qtypes.QuantumProcessor(device_spec=_DEVICE_SPEC)
+    )
+    assert processor.get_device_specification() == expected
+
+
+def test_get_device():
+    processor = cg.EngineProcessor(
+        'a', 'p', EngineContext(), _processor=qtypes.QuantumProcessor(device_spec=_DEVICE_SPEC)
+    )
+    device = processor.get_device(gate_sets=[_GATE_SET])
+    assert device.qubits == [cirq.GridQubit(0, 0), cirq.GridQubit(1, 1)]
+    device.validate_operation(cirq.X(cirq.GridQubit(0, 0)))
+    with pytest.raises(ValueError):
+        device.validate_operation(cirq.X(cirq.GridQubit(1, 2)))
+    with pytest.raises(ValueError):
+        device.validate_operation(cirq.Y(cirq.GridQubit(0, 0)))
+    with pytest.raises(ValueError, match='must be SerializableGateSet'):
+        processor.get_device(gate_sets=[cg.serialization.circuit_serializer.CIRCUIT_SERIALIZER])
+
+
+def test_default_gate_sets():
+    # Sycamore should have valid gate sets with default
+    processor = cg.EngineProcessor(
+        'a',
+        'p',
+        EngineContext(),
+        _processor=qtypes.QuantumProcessor(device_spec=util.pack_any(known_devices.SYCAMORE_PROTO)),
+    )
+    device = processor.get_device()
+    device.validate_operation(cirq.X(cirq.GridQubit(5, 4)))
+    # Test that a device with no standard gatesets doesn't blow up
+    processor = cg.EngineProcessor(
+        'a', 'p', EngineContext(), _processor=qtypes.QuantumProcessor(device_spec=_DEVICE_SPEC)
+    )
+    device = processor.get_device()
+    assert device.qubits == [cirq.GridQubit(0, 0), cirq.GridQubit(1, 1)]
+
+
+def test_get_missing_device():
+    processor = cg.EngineProcessor('a', 'p', EngineContext(), _processor=qtypes.QuantumProcessor())
+    with pytest.raises(ValueError, match='device specification'):
+        _ = processor.get_device(gate_sets=[_GATE_SET])
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.list_calibrations')
+def test_list_calibrations(list_calibrations):
+    list_calibrations.return_value = [_CALIBRATION]
+    processor = cg.EngineProcessor('a', 'p', EngineContext())
+    assert [c.timestamp for c in processor.list_calibrations()] == [1562544000021]
+    list_calibrations.assert_called_with('a', 'p', '')
+    assert [c.timestamp for c in processor.list_calibrations(earliest_timestamp=1562500000)] == [
+        1562544000021
+    ]
+    list_calibrations.assert_called_with('a', 'p', 'timestamp >= 1562500000')
+    assert [c.timestamp for c in processor.list_calibrations(latest_timestamp=1562600000)] == [
+        1562544000021
+    ]
+    list_calibrations.assert_called_with('a', 'p', 'timestamp <= 1562600000')
+    assert [c.timestamp for c in processor.list_calibrations(1562500000, 1562600000)] == [
+        1562544000021
+    ]
+    list_calibrations.assert_called_with(
+        'a', 'p', 'timestamp >= 1562500000 AND timestamp <= 1562600000'
+    )
+    assert [
+        c.timestamp
+        for c in processor.list_calibrations(
+            earliest_timestamp=datetime.datetime.fromtimestamp(1562500000)
+        )
+    ] == [1562544000021]
+    list_calibrations.assert_called_with('a', 'p', 'timestamp >= 1562500000')
+
+    today = datetime.date.today()
+    # Use local time to get timestamp
+    today_midnight_timestamp = int(
+        datetime.datetime(today.year, today.month, today.day).timestamp()
+    )
+    assert [c.timestamp for c in processor.list_calibrations(earliest_timestamp=today)] == [
+        1562544000021
+    ]
+    list_calibrations.assert_called_with('a', 'p', f'timestamp >= {today_midnight_timestamp}')
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.list_calibrations')
+def test_list_calibrations_old_params(list_calibrations):
+    # Disable pylint warnings for use of deprecated parameters
+    # pylint: disable=unexpected-keyword-arg
+    list_calibrations.return_value = [_CALIBRATION]
+    processor = cg.EngineProcessor('a', 'p', EngineContext())
+    with cirq.testing.assert_deprecated('Change earliest_timestamp_seconds', deadline='v1.0'):
+        assert [
+            c.timestamp for c in processor.list_calibrations(earliest_timestamp_seconds=1562500000)
+        ] == [1562544000021]
+    list_calibrations.assert_called_with('a', 'p', 'timestamp >= 1562500000')
+    with cirq.testing.assert_deprecated('Change latest_timestamp_seconds', deadline='v1.0'):
+        assert [
+            c.timestamp for c in processor.list_calibrations(latest_timestamp_seconds=1562600000)
+        ] == [1562544000021]
+    list_calibrations.assert_called_with('a', 'p', 'timestamp <= 1562600000')
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.get_calibration')
+def test_get_calibration(get_calibration):
+    get_calibration.return_value = _CALIBRATION
+    processor = cg.EngineProcessor('a', 'p', EngineContext())
+    calibration = processor.get_calibration(1562544000021)
+    assert calibration.timestamp == 1562544000021
+    assert set(calibration.keys()) == {'xeb', 't1', 'globalMetric'}
+    get_calibration.assert_called_once_with('a', 'p', 1562544000021)
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.get_current_calibration')
+def test_current_calibration(get_current_calibration):
+    get_current_calibration.return_value = _CALIBRATION
+    processor = cg.EngineProcessor('a', 'p', EngineContext())
+    calibration = processor.get_current_calibration()
+    assert calibration.timestamp == 1562544000021
+    assert set(calibration.keys()) == {'xeb', 't1', 'globalMetric'}
+    get_current_calibration.assert_called_once_with('a', 'p')
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.get_current_calibration')
+def test_missing_latest_calibration(get_current_calibration):
+    get_current_calibration.return_value = None
+    processor = cg.EngineProcessor('a', 'p', EngineContext())
+    assert not processor.get_current_calibration()
+    get_current_calibration.assert_called_once_with('a', 'p')
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.create_reservation')
+def test_create_reservation(create_reservation):
+    name = 'projects/proj/processors/p0/reservations/psherman-wallaby-way'
+    result = qtypes.QuantumReservation(
+        name=name,
+        start_time=Timestamp(seconds=1000000000),
+        end_time=Timestamp(seconds=1000003600),
+        whitelisted_users=['dstrain@google.com'],
+    )
+    create_reservation.return_value = result
+    processor = cg.EngineProcessor('proj', 'p0', EngineContext())
+    assert processor.create_reservation(
+        datetime.datetime.fromtimestamp(1000000000),
+        datetime.datetime.fromtimestamp(1000003600),
+        ['dstrain@google.com'],
+    )
+    create_reservation.assert_called_once_with(
+        'proj',
+        'p0',
+        datetime.datetime.fromtimestamp(1000000000),
+        datetime.datetime.fromtimestamp(1000003600),
+        ['dstrain@google.com'],
+    )
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.delete_reservation')
+def test_delete_reservation(delete_reservation):
+    name = 'projects/proj/processors/p0/reservations/rid'
+    result = qtypes.QuantumReservation(
+        name=name,
+        start_time=Timestamp(seconds=1000000000),
+        end_time=Timestamp(seconds=1000003600),
+        whitelisted_users=['dstrain@google.com'],
+    )
+    delete_reservation.return_value = result
+    processor = cg.EngineProcessor('proj', 'p0', EngineContext())
+    assert processor._delete_reservation('rid') == result
+    delete_reservation.assert_called_once_with('proj', 'p0', 'rid')
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.cancel_reservation')
+def test_cancel_reservation(cancel_reservation):
+    name = 'projects/proj/processors/p0/reservations/rid'
+    result = qtypes.QuantumReservation(
+        name=name,
+        start_time=Timestamp(seconds=1000000000),
+        end_time=Timestamp(seconds=1000003600),
+        whitelisted_users=['dstrain@google.com'],
+    )
+    cancel_reservation.return_value = result
+    processor = cg.EngineProcessor('proj', 'p0', EngineContext())
+    assert processor._cancel_reservation('rid') == result
+    cancel_reservation.assert_called_once_with('proj', 'p0', 'rid')
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.get_reservation')
+@mock.patch('cirq_google.engine.engine_client.EngineClient.delete_reservation')
+def test_remove_reservation_delete(delete_reservation, get_reservation):
+    name = 'projects/proj/processors/p0/reservations/rid'
+    now = int(datetime.datetime.now().timestamp())
+    result = qtypes.QuantumReservation(
+        name=name,
+        start_time=Timestamp(seconds=now + 20000),
+        end_time=Timestamp(seconds=now + 23610),
+        whitelisted_users=['dstrain@google.com'],
+    )
+    get_reservation.return_value = result
+    delete_reservation.return_value = result
+    processor = cg.EngineProcessor(
+        'proj',
+        'p0',
+        EngineContext(),
+        qtypes.QuantumProcessor(schedule_frozen_period=Duration(seconds=10000)),
+    )
+    assert processor.remove_reservation('rid') == result
+    delete_reservation.assert_called_once_with('proj', 'p0', 'rid')
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.get_reservation')
+@mock.patch('cirq_google.engine.engine_client.EngineClient.cancel_reservation')
+def test_remove_reservation_cancel(cancel_reservation, get_reservation):
+    name = 'projects/proj/processors/p0/reservations/rid'
+    now = int(datetime.datetime.now().timestamp())
+    result = qtypes.QuantumReservation(
+        name=name,
+        start_time=Timestamp(seconds=now + 10),
+        end_time=Timestamp(seconds=now + 3610),
+        whitelisted_users=['dstrain@google.com'],
+    )
+    get_reservation.return_value = result
+    cancel_reservation.return_value = result
+    processor = cg.EngineProcessor(
+        'proj',
+        'p0',
+        EngineContext(),
+        qtypes.QuantumProcessor(schedule_frozen_period=Duration(seconds=10000)),
+    )
+    assert processor.remove_reservation('rid') == result
+    cancel_reservation.assert_called_once_with('proj', 'p0', 'rid')
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.get_reservation')
+def test_remove_reservation_not_found(get_reservation):
+    get_reservation.return_value = None
+    processor = cg.EngineProcessor(
+        'proj',
+        'p0',
+        EngineContext(),
+        qtypes.QuantumProcessor(schedule_frozen_period=Duration(seconds=10000)),
+    )
+    with pytest.raises(ValueError):
+        processor.remove_reservation('rid')
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.get_processor')
+@mock.patch('cirq_google.engine.engine_client.EngineClient.get_reservation')
+def test_remove_reservation_failures(get_reservation, get_processor):
+    name = 'projects/proj/processors/p0/reservations/rid'
+    now = int(datetime.datetime.now().timestamp())
+    result = qtypes.QuantumReservation(
+        name=name,
+        start_time=Timestamp(seconds=now + 10),
+        end_time=Timestamp(seconds=now + 3610),
+        whitelisted_users=['dstrain@google.com'],
+    )
+    get_reservation.return_value = result
+    get_processor.return_value = None
+
+    # no processor
+    processor = cg.EngineProcessor('proj', 'p0', EngineContext())
+    with pytest.raises(ValueError):
+        processor.remove_reservation('rid')
+
+    # No freeze period defined
+    processor = cg.EngineProcessor('proj', 'p0', EngineContext(), qtypes.QuantumProcessor())
+    with pytest.raises(ValueError):
+        processor.remove_reservation('rid')
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.get_reservation')
+def test_get_reservation(get_reservation):
+    name = 'projects/proj/processors/p0/reservations/rid'
+    result = qtypes.QuantumReservation(
+        name=name,
+        start_time=Timestamp(seconds=1000000000),
+        end_time=Timestamp(seconds=1000003600),
+        whitelisted_users=['dstrain@google.com'],
+    )
+    get_reservation.return_value = result
+    processor = cg.EngineProcessor('proj', 'p0', EngineContext())
+    assert processor.get_reservation('rid') == result
+    get_reservation.assert_called_once_with('proj', 'p0', 'rid')
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.update_reservation')
+def test_update_reservation(update_reservation):
+    name = 'projects/proj/processors/p0/reservations/rid'
+    result = qtypes.QuantumReservation(
+        name=name,
+        start_time=Timestamp(seconds=1000000000),
+        end_time=Timestamp(seconds=1000003600),
+        whitelisted_users=['dstrain@google.com'],
+    )
+    start = datetime.datetime.fromtimestamp(1000000000)
+    end = datetime.datetime.fromtimestamp(1000003600)
+    update_reservation.return_value = result
+    processor = cg.EngineProcessor('proj', 'p0', EngineContext())
+    assert processor.update_reservation('rid', start, end, ['dstrain@google.com']) == result
+    update_reservation.assert_called_once_with(
+        'proj', 'p0', 'rid', start=start, end=end, whitelisted_users=['dstrain@google.com']
+    )
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.list_reservations')
+def test_list_reservation(list_reservations):
+    name = 'projects/proj/processors/p0/reservations/rid'
+    results = [
+        qtypes.QuantumReservation(
+            name=name,
+            start_time=Timestamp(seconds=1000000000),
+            end_time=Timestamp(seconds=1000003600),
+            whitelisted_users=['dstrain@google.com'],
+        ),
+        qtypes.QuantumReservation(
+            name=name + '2',
+            start_time=Timestamp(seconds=1000003600),
+            end_time=Timestamp(seconds=1000007200),
+            whitelisted_users=['wcourtney@google.com'],
+        ),
+    ]
+    list_reservations.return_value = results
+    processor = cg.EngineProcessor('proj', 'p0', EngineContext())
+    assert (
+        processor.list_reservations(
+            datetime.datetime.fromtimestamp(1000000000), datetime.datetime.fromtimestamp(1000010000)
+        )
+        == results
+    )
+    list_reservations.assert_called_once_with(
+        'proj', 'p0', 'start_time < 1000010000 AND end_time > 1000000000'
+    )
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.list_time_slots')
+def test_get_schedule(list_time_slots):
+    results = [
+        qtypes.QuantumTimeSlot(
+            processor_name='potofgold',
+            start_time=Timestamp(seconds=1000020000),
+            end_time=Timestamp(seconds=1000040000),
+            slot_type=qenums.QuantumTimeSlot.TimeSlotType.MAINTENANCE,
+            maintenance_config=qtypes.QuantumTimeSlot.MaintenanceConfig(
+                title='Testing',
+                description='Testing some new configuration.',
+            ),
+        ),
+        qtypes.QuantumTimeSlot(
+            processor_name='potofgold',
+            start_time=Timestamp(seconds=1000010000),
+            end_time=Timestamp(seconds=1000020000),
+            slot_type=qenums.QuantumTimeSlot.TimeSlotType.RESERVATION,
+            reservation_config=qtypes.QuantumTimeSlot.ReservationConfig(
+                project_id='super_secret_quantum'
+            ),
+        ),
+    ]
+    list_time_slots.return_value = results
+    processor = cg.EngineProcessor('proj', 'p0', EngineContext())
+    assert (
+        processor.get_schedule(
+            datetime.datetime.fromtimestamp(1000000000), datetime.datetime.fromtimestamp(1000050000)
+        )
+        == results
+    )
+    list_time_slots.assert_called_once_with(
+        'proj', 'p0', 'start_time < 1000050000 AND end_time > 1000000000'
+    )
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient.list_time_slots')
+def test_get_schedule_filter_by_time_slot(list_time_slots):
+    results = [
+        qtypes.QuantumTimeSlot(
+            processor_name='potofgold',
+            start_time=Timestamp(seconds=1000020000),
+            end_time=Timestamp(seconds=1000040000),
+            slot_type=qenums.QuantumTimeSlot.TimeSlotType.MAINTENANCE,
+            maintenance_config=qtypes.QuantumTimeSlot.MaintenanceConfig(
+                title='Testing',
+                description='Testing some new configuration.',
+            ),
+        )
+    ]
+    list_time_slots.return_value = results
+    processor = cg.EngineProcessor('proj', 'p0', EngineContext())
+
+    assert (
+        processor.get_schedule(
+            datetime.datetime.fromtimestamp(1000000000),
+            datetime.datetime.fromtimestamp(1000050000),
+            qenums.QuantumTimeSlot.TimeSlotType.MAINTENANCE,
+        )
+        == results
+    )
+    list_time_slots.assert_called_once_with(
+        'proj',
+        'p0',
+        'start_time < 1000050000 AND end_time > 1000000000 AND ' + 'time_slot_type = MAINTENANCE',
+    )
+
+
+def _allow_deprecated_freezegun(func):
+    # a local hack, as freeze_time walks through all the sys.modules, and retrieves all the
+    # attributes for all modules when it reaches deprecated module attributes, we throw an error
+    # as the deprecation module thinks Cirq is using something deprecated. This hack SHOULD NOT be
+    # used elsewhere, it is specific to freezegun functionality.
+    def wrapper(*args, **kwargs):
+        import os
+        from cirq.testing.deprecation import ALLOW_DEPRECATION_IN_TEST
+
+        orig_exist, orig_value = (
+            ALLOW_DEPRECATION_IN_TEST in os.environ,
+            os.environ.get(ALLOW_DEPRECATION_IN_TEST, None),
+        )
+
+        os.environ[ALLOW_DEPRECATION_IN_TEST] = 'True'
+        try:
+            return func(*args, **kwargs)
+        finally:
+            if orig_exist:
+                # mypy can't resolve that orig_exist ensures that orig_value
+                # of type Optional[str] can't be None
+                # coverage: ignore
+                os.environ[ALLOW_DEPRECATION_IN_TEST] = orig_value  # type: ignore
+            else:
+                del os.environ[ALLOW_DEPRECATION_IN_TEST]
+
+    return wrapper
+
+
+@_allow_deprecated_freezegun
+@freezegun.freeze_time()
+@mock.patch('cirq_google.engine.engine_client.EngineClient.list_time_slots')
+def test_get_schedule_time_filter_behavior(list_time_slots):
+    list_time_slots.return_value = []
+    processor = cg.EngineProcessor('proj', 'p0', EngineContext())
+
+    now = int(datetime.datetime.now().timestamp())
+    in_two_weeks = int((datetime.datetime.now() + datetime.timedelta(weeks=2)).timestamp())
+    processor.get_schedule()
+    list_time_slots.assert_called_with(
+        'proj', 'p0', f'start_time < {in_two_weeks} AND end_time > {now}'
+    )
+
+    with pytest.raises(ValueError, match='from_time of type'):
+        processor.get_schedule(from_time=object())
+
+    with pytest.raises(ValueError, match='to_time of type'):
+        processor.get_schedule(to_time=object())
+
+    processor.get_schedule(from_time=None, to_time=None)
+    list_time_slots.assert_called_with('proj', 'p0', '')
+
+    processor.get_schedule(from_time=datetime.timedelta(0), to_time=None)
+    list_time_slots.assert_called_with('proj', 'p0', f'end_time > {now}')
+
+    processor.get_schedule(from_time=datetime.timedelta(seconds=200), to_time=None)
+    list_time_slots.assert_called_with('proj', 'p0', f'end_time > {now + 200}')
+
+    test_timestamp = datetime.datetime.utcfromtimestamp(52)
+    utc_ts = int(test_timestamp.timestamp())
+    processor.get_schedule(from_time=test_timestamp, to_time=None)
+    list_time_slots.assert_called_with('proj', 'p0', f'end_time > {utc_ts}')
+
+    processor.get_schedule(from_time=None, to_time=datetime.timedelta(0))
+    list_time_slots.assert_called_with('proj', 'p0', f'start_time < {now}')
+
+    processor.get_schedule(from_time=None, to_time=datetime.timedelta(seconds=200))
+    list_time_slots.assert_called_with('proj', 'p0', f'start_time < {now + 200}')
+
+    processor.get_schedule(from_time=None, to_time=test_timestamp)
+    list_time_slots.assert_called_with('proj', 'p0', f'start_time < {utc_ts}')
+
+
+@_allow_deprecated_freezegun
+@freezegun.freeze_time()
+@mock.patch('cirq_google.engine.engine_client.EngineClient.list_reservations')
+def test_list_reservations_time_filter_behavior(list_reservations):
+    list_reservations.return_value = []
+    processor = cg.EngineProcessor('proj', 'p0', EngineContext())
+
+    now = int(datetime.datetime.now().timestamp())
+    in_two_weeks = int((datetime.datetime.now() + datetime.timedelta(weeks=2)).timestamp())
+    processor.list_reservations()
+    list_reservations.assert_called_with(
+        'proj', 'p0', f'start_time < {in_two_weeks} AND end_time > {now}'
+    )
+
+    with pytest.raises(ValueError, match='from_time of type'):
+        processor.list_reservations(from_time=object())
+
+    with pytest.raises(ValueError, match='to_time of type'):
+        processor.list_reservations(to_time=object())
+
+    processor.list_reservations(from_time=None, to_time=None)
+    list_reservations.assert_called_with('proj', 'p0', '')
+
+    processor.list_reservations(from_time=datetime.timedelta(0), to_time=None)
+    list_reservations.assert_called_with('proj', 'p0', f'end_time > {now}')
+
+    processor.list_reservations(from_time=datetime.timedelta(seconds=200), to_time=None)
+    list_reservations.assert_called_with('proj', 'p0', f'end_time > {now + 200}')
+
+    test_timestamp = datetime.datetime.utcfromtimestamp(52)
+    utc_ts = int(test_timestamp.timestamp())
+    processor.list_reservations(from_time=test_timestamp, to_time=None)
+    list_reservations.assert_called_with('proj', 'p0', f'end_time > {utc_ts}')
+
+    processor.list_reservations(from_time=None, to_time=datetime.timedelta(0))
+    list_reservations.assert_called_with('proj', 'p0', f'start_time < {now}')
+
+    processor.list_reservations(from_time=None, to_time=datetime.timedelta(seconds=200))
+    list_reservations.assert_called_with('proj', 'p0', f'start_time < {now + 200}')
+
+    processor.list_reservations(from_time=None, to_time=test_timestamp)
+    list_reservations.assert_called_with('proj', 'p0', f'start_time < {utc_ts}')
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient')
+def test_run_sweep_params(client):
+    client().create_program.return_value = (
+        'prog',
+        qtypes.QuantumProgram(name='projects/proj/programs/prog'),
+    )
+    client().create_job.return_value = (
+        'job-id',
+        qtypes.QuantumJob(
+            name='projects/proj/programs/prog/jobs/job-id', execution_status={'state': 'READY'}
+        ),
+    )
+    client().get_job.return_value = qtypes.QuantumJob(execution_status={'state': 'SUCCESS'})
+    client().get_job_results.return_value = qtypes.QuantumResult(result=util.pack_any(_RESULTS_V2))
+
+    processor = cg.EngineProcessor('a', 'p', EngineContext())
+    job = processor.run_sweep(
+        program=_CIRCUIT,
+        params=[cirq.ParamResolver({'a': 1}), cirq.ParamResolver({'a': 2})],
+        gate_set=cg.XMON,
+    )
+    results = job.results()
+    assert len(results) == 2
+    for i, v in enumerate([1, 2]):
+        assert results[i].repetitions == 1
+        assert results[i].params.param_dict == {'a': v}
+        assert results[i].measurements == {'q': np.array([[0]], dtype='uint8')}
+
+    client().create_program.assert_called_once()
+    client().create_job.assert_called_once()
+
+    run_context = v2.run_context_pb2.RunContext()
+    client().create_job.call_args[1]['run_context'].Unpack(run_context)
+    sweeps = run_context.parameter_sweeps
+    assert len(sweeps) == 2
+    for i, v in enumerate([1.0, 2.0]):
+        assert sweeps[i].repetitions == 1
+        assert sweeps[i].sweep.sweep_function.sweeps[0].single_sweep.points.points == [v]
+    client().get_job.assert_called_once()
+    client().get_job_results.assert_called_once()
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient')
+def test_run_batch(client):
+    client().create_program.return_value = (
+        'prog',
+        qtypes.QuantumProgram(name='projects/proj/programs/prog'),
+    )
+    client().create_job.return_value = (
+        'job-id',
+        qtypes.QuantumJob(
+            name='projects/proj/programs/prog/jobs/job-id', execution_status={'state': 'READY'}
+        ),
+    )
+    client().get_job.return_value = qtypes.QuantumJob(execution_status={'state': 'SUCCESS'})
+    client().get_job_results.return_value = qtypes.QuantumResult(result=_BATCH_RESULTS_V2)
+
+    processor = cg.EngineProcessor('a', 'p', EngineContext())
+    job = processor.run_batch(
+        gate_set=cg.XMON,
+        programs=[_CIRCUIT, _CIRCUIT],
+        job_id='job-id',
+        params_list=[cirq.Points('a', [1, 2]), cirq.Points('a', [3, 4])],
+    )
+    results = job.results()
+    assert len(results) == 4
+    for i, v in enumerate([1, 2, 3, 4]):
+        assert results[i].repetitions == 1
+        assert results[i].params.param_dict == {'a': v}
+        assert results[i].measurements == {'q': np.array([[0]], dtype='uint8')}
+    client().create_program.assert_called_once()
+    client().create_job.assert_called_once()
+    run_context = v2.batch_pb2.BatchRunContext()
+    client().create_job.call_args[1]['run_context'].Unpack(run_context)
+    assert len(run_context.run_contexts) == 2
+    for idx, rc in enumerate(run_context.run_contexts):
+        sweeps = rc.parameter_sweeps
+        assert len(sweeps) == 1
+        assert sweeps[0].repetitions == 1
+        if idx == 0:
+            assert sweeps[0].sweep.single_sweep.points.points == [1.0, 2.0]
+        if idx == 1:
+            assert sweeps[0].sweep.single_sweep.points.points == [3.0, 4.0]
+    client().get_job.assert_called_once()
+    client().get_job_results.assert_called_once()
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient')
+def test_run_calibration(client):
+    client().create_program.return_value = (
+        'prog',
+        qtypes.QuantumProgram(name='projects/proj/programs/prog'),
+    )
+    client().create_job.return_value = (
+        'job-id',
+        qtypes.QuantumJob(
+            name='projects/proj/programs/prog/jobs/job-id', execution_status={'state': 'READY'}
+        ),
+    )
+    client().get_job.return_value = qtypes.QuantumJob(execution_status={'state': 'SUCCESS'})
+    client().get_job_results.return_value = qtypes.QuantumResult(result=_CALIBRATION_RESULTS_V2)
+
+    q1 = cirq.GridQubit(2, 3)
+    q2 = cirq.GridQubit(2, 4)
+    layer1 = cg.CalibrationLayer('xeb', cirq.Circuit(cirq.CZ(q1, q2)), {'num_layers': 42})
+    layer2 = cg.CalibrationLayer(
+        'readout', cirq.Circuit(cirq.measure(q1, q2)), {'num_samples': 4242}
+    )
+    processor = cg.EngineProcessor('proj', 'mysim', EngineContext())
+    job = processor.run_calibration(
+        gate_set=cg.FSIM_GATESET, layers=[layer1, layer2], job_id='job-id'
+    )
+    results = job.calibration_results()
+    assert len(results) == 2
+    assert results[0].code == v2.calibration_pb2.SUCCESS
+    assert results[0].error_message == 'First success'
+    assert results[0].token == 'abc123'
+    assert len(results[0].metrics) == 1
+    assert len(results[0].metrics['fidelity']) == 1
+    assert results[0].metrics['fidelity'][(q1, q2)] == [0.75]
+    assert results[1].code == v2.calibration_pb2.SUCCESS
+    assert results[1].error_message == 'Second success'
+
+    # assert label is correct
+    client().create_job.assert_called_once_with(
+        project_id='proj',
+        program_id='prog',
+        job_id='job-id',
+        processor_ids=['mysim'],
+        run_context=util.pack_any(v2.run_context_pb2.RunContext()),
+        description=None,
+        labels={'calibration': ''},
+    )
+
+
+@mock.patch('cirq_google.engine.engine_client.EngineClient')
+def test_sampler(client):
+    client().create_program.return_value = (
+        'prog',
+        qtypes.QuantumProgram(name='projects/proj/programs/prog'),
+    )
+    client().create_job.return_value = (
+        'job-id',
+        qtypes.QuantumJob(
+            name='projects/proj/programs/prog/jobs/job-id', execution_status={'state': 'READY'}
+        ),
+    )
+    client().get_job.return_value = qtypes.QuantumJob(execution_status={'state': 'SUCCESS'})
+    client().get_job_results.return_value = qtypes.QuantumResult(result=util.pack_any(_RESULTS_V2))
+    processor = cg.EngineProcessor('proj', 'mysim', EngineContext())
+    sampler = processor.get_sampler(gate_set=cg.XMON)
+    results = sampler.run_sweep(
+        program=_CIRCUIT, params=[cirq.ParamResolver({'a': 1}), cirq.ParamResolver({'a': 2})]
+    )
+    assert len(results) == 2
+    for i, v in enumerate([1, 2]):
+        assert results[i].repetitions == 1
+        assert results[i].params.param_dict == {'a': v}
+        assert results[i].measurements == {'q': np.array([[0]], dtype='uint8')}
+    assert client().create_program.call_args[0][0] == 'proj'
+
+
+def test_str():
+    processor = cg.EngineProcessor('a', 'p', EngineContext())
+    assert str(processor) == 'EngineProcessor(project_id=\'a\', processor_id=\'p\')'
