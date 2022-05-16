@@ -16,3 +16,4 @@
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 from mitiq.benchmarks.mirror_circuits import generate_mirror_circuit
 from mitiq.benchmarks.ghz_circuits import generate_ghz_circuit
+from mitiq.benchmarks.random_clifford_t_circuits import generate_random_clifford_t_circuits
