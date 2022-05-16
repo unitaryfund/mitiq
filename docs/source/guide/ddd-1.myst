@@ -51,14 +51,14 @@ print(circuit)
 ```
 
 As an example, below we define a simple executor function 
-which inputs a circuit, executes it on a noisy simulator, and returns the probability 
-of the ground state. 
+which inputs a circuit, executes it on a noisy simulator, and returns the
+probability of the ground state. 
 See the [Executors](executors.myst) section for more information on how to 
 define more advanced executors.
 
 ```{code-cell} ipython3
 import numpy as np
-from cirq import DensityMatrixSimulator, depolarize
+from cirq import DensityMatrixSimulator, amplitude_damp
 from mitiq.interface import convert_to_mitiq
 
 def execute(circuit, noise_level=0.01):
@@ -67,7 +67,7 @@ def execute(circuit, noise_level=0.01):
     """
     # Replace with code based on your frontend and backend.
     mitiq_circuit, _ = convert_to_mitiq(circuit)
-    noisy_circuit = mitiq_circuit.with_noise(depolarize(p=noise_level))
+    noisy_circuit = mitiq_circuit.with_noise(amplitude_damp(p=noise_level))
     rho = DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix
     return rho[0, 0].real
 ```
@@ -80,6 +80,13 @@ expectation values.
 noisy_value = execute(circuit)
 ideal_value = execute(circuit, noise_level=0.0)      
 print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.5f}")
+```
+
+## Select rule for determining the DDD sequence to be applied in each slack
+window
+```{code-cell} ipython3
+from mitiq import ddd
+rules = mitiq.ddd.rules.rules.xx(slack_length, spacing=- 1)
 ```
 
 ## Apply DDD
