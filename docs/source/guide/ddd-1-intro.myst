@@ -62,7 +62,7 @@ import numpy as np
 from cirq import DensityMatrixSimulator, amplitude_damp
 from mitiq.interface import convert_to_mitiq
 
-def execute(circuit, noise_level=0.01):
+def execute(circuit, noise_level=0.05):
     """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit
     executed with depolarizing noise.
     """
@@ -87,7 +87,8 @@ print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.5f}")
 window
 ```{code-cell} ipython3
 from mitiq import ddd
-rules = mitiq.ddd.rules.rules.xx(slack_length=4)
+rules = ddd.rules.xx
+print(rules)
 ```
 
 ## Apply DDD
