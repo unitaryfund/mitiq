@@ -11,6 +11,7 @@ pytest-cov~=3.0.0
 flake8~=4.0.1
 black~=22.3
 mypy~=0.942
+types-setuptools~=57.4
 
 # Documentation and examples.
 sphinxcontrib-bibtex~=2.4.1
