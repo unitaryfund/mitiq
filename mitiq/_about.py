@@ -23,143 +23,138 @@ from cirq import __version__ as cirq_version
 from numpy import __version__ as numpy_version
 from scipy import __version__ as scipy_version
 
-import mitiq
-
-# Logging versions of Mitiq's core dependencies (must be installed)
-LATEST_SUPPORTED_PKGS = {
-    req.project_name: req.specs[0][1]
-    for req in parse_requirements(open("requirements.txt"))
-}
-INSTALLED_PKGS = {}
-INSTALLED_PKGS["cirq"] = cirq_version
-INSTALLED_PKGS["numpy"] = numpy_version
-INSTALLED_PKGS["scipy"] = scipy_version
-
-# Checking versions of Mitiq's optional dependencies (may be installed)
-OPTIONAL_PKGS = [
-    "pyquil",
-    "qiskit",
-    "amazon-braket-sdk",
-    "pennylane",
-    "pennylane-qiskit",
-]
-
-try:
-    from pyquil import __version__ as pyquil_version
-
-    INSTALLED_PKGS["pyquil"] = pyquil_version
-except ImportError:
-    INSTALLED_PKGS["pyquil"] = "Not installed"
-try:
-    from qiskit import __qiskit_version__  # pragma: no cover
-
-    INSTALLED_PKGS["qiskit"] = __qiskit_version__["qiskit"]  # pragma: no cover
-except ImportError:
-    INSTALLED_PKGS["qiskit"] = "Not installed"
-try:
-    from braket._sdk import __version__ as braket_version
-
-    INSTALLED_PKGS["amazon-braket-sdk"] = braket_version
-except ImportError:
-    INSTALLED_PKGS["amazon-braket-sdk"] = "Not installed"
-try:
-    from pennylane import __version__ as pennylane_version
-
-    INSTALLED_PKGS["pennylane"] = pennylane_version
-except ImportError:
-    INSTALLED_PKGS["pennylane"] = "Not installed"
-try:
-    from pennylane_qiskit import __version__ as pennylane_qiskit_version
-
-    INSTALLED_PKGS["pennylane-qiskit"] = pennylane_qiskit_version
-except ImportError:
-    INSTALLED_PKGS["pennylane-qiskit"] = "Not installed"
+from mitiq import __version__ as mitiq_version
 
 
-def latest_optional_supported() -> Dict:
-    """Returns the versions of Mitiq's optional packages that are supported by
-    the current version of Mitiq. Requires that the dependency has a pinned
-    version in the dev_requirements.txt file.
+def installed_packages() -> Dict[str, str]:
+    """Returns the versions of (core and optional) packages
+    that are installed in the local environment.
     """
-    return {
+    # Logging versions of Mitiq's core dependencies (must be installed)
+    installed_pkgs = {}
+    installed_pkgs["cirq"] = cirq_version
+    installed_pkgs["numpy"] = numpy_version
+    installed_pkgs["scipy"] = scipy_version
+
+    # Logging versions of Mitiq's optional dependencies
+    try:
+        from pyquil import __version__ as pyquil_version
+
+        installed_pkgs["pyquil"] = pyquil_version
+    except ImportError:
+        installed_pkgs["pyquil"] = "Not found"
+    try:
+        from qiskit import __qiskit_version__
+
+        installed_pkgs["qiskit"] = __qiskit_version__["qiskit"]
+    except ImportError:
+        installed_pkgs["qiskit"] = "Not found"
+    try:
+        from braket._sdk import __version__ as braket_version
+
+        installed_pkgs["amazon-braket-sdk"] = braket_version
+    except ImportError:
+        installed_pkgs["amazon-braket-sdk"] = "Not found"
+    try:
+        from pennylane import __version__ as pennylane_version
+
+        installed_pkgs["pennylane"] = pennylane_version
+    except ImportError:
+        installed_pkgs["pennylane"] = "Not found"
+    try:
+        from pennylane_qiskit import __version__ as pennylane_qiskit_version
+
+        installed_pkgs["pennylane-qiskit"] = pennylane_qiskit_version
+    except ImportError:
+        installed_pkgs["pennylane-qiskit"] = "Not found"
+
+    return installed_pkgs
+
+
+def latest_supported_packages() -> Dict[str, str]:
+    """Returns the latest versions of (core and optional) packages
+    that are supported by the current version of Mitiq.
+    """
+    # Mitiq optional packages whose versions are checked
+    optional_pkg = [
+        "pyquil",
+        "qiskit",
+        "amazon-braket-sdk",
+        "pennylane",
+        "pennylane-qiskit",
+    ]
+    latest_core = {
+        req.project_name: req.specs[0][1]
+        for req in parse_requirements(open("requirements.txt"))
+    }
+    latest_dev = {
         req.project_name: req.specs[0][1]
         for req in parse_requirements(open("dev_requirements.txt"))
-        if req.project_name in (OPTIONAL_PKGS)
+        if req.project_name in optional_pkg
     }
-
-
-LATEST_SUPPORTED_PKGS.update(latest_optional_supported())
-
-
-def latest_supported_packages() -> Dict:
-    """Returns the versions of Mitiq's optional packages that are supported by
-    the current version of Mitiq. Requires that the dependency has a pinned
-    version in the dev_requirements.txt file.
-    """
-    return LATEST_SUPPORTED_PKGS
+    return dict(**latest_core, **latest_dev)
 
 
 def check_versions() -> None:
     """Checks that the installed versions of Mitiq's dependencies are
     supported by the current version of Mitiq.
     """
-
-    for name, version in INSTALLED_PKGS.items():
-        if LATEST_SUPPORTED_PKGS[name] != version:
+    latest_supported_pkgs = latest_supported_packages()
+    installed_pkgs = installed_packages()
+    for name, version in installed_pkgs.items():
+        if latest_supported_pkgs[name] != version:
             warnings.warn(
                 f"The currently installed version of {name} ({version}) is "
                 "not the currently supported version "
-                f"({LATEST_SUPPORTED_PKGS[name]}). If you are having trouble"
-                ", please consider updating to the latest supported"
-                " dependency versions.",
+                f"({latest_supported_pkgs[name]}). If you are having trouble"
+                f", please consider downgrading {name} to the latest supported"
+                " dependency version.",
                 UserWarning,
             )
-
-
-check_versions()
 
 
 def about() -> None:
     """Displays information about Mitiq, core/optional packages, and Python
     version/platform information.
     """
-    check_versions()
+    latest_supported_pkgs = latest_supported_packages()
+    installed_pkgs = installed_packages()
     about = f"""
 Mitiq: A Python toolkit for implementing error mitigation on quantum computers
 ==============================================================================
 Authored by: Mitiq team, 2020 & later (https://github.com/unitaryfund/mitiq)
 
-Mitiq Version: {mitiq.__version__}
+Mitiq Version: {mitiq_version}
 
 Core Dependencies (must be installed):
 --------------------------------------
 Cirq:
-    - installed:        {INSTALLED_PKGS["cirq"]}
-    - latest supported: {LATEST_SUPPORTED_PKGS["cirq"]}
+    - installed:        {installed_pkgs["cirq"]}
+    - latest supported: {latest_supported_pkgs["cirq"]}
 NumPy:
-    - installed:        {INSTALLED_PKGS["numpy"]}
-    - latest supported: {LATEST_SUPPORTED_PKGS["numpy"]}
+    - installed:        {installed_pkgs["numpy"]}
+    - latest supported: {latest_supported_pkgs["numpy"]}
 SciPy:
-    - installed:        {INSTALLED_PKGS["scipy"]}
-    - latest supported: {LATEST_SUPPORTED_PKGS["scipy"]}
+    - installed:        {installed_pkgs["scipy"]}
+    - latest supported: {latest_supported_pkgs["scipy"]}
 
 Optional Dependencies
 ---------------------
 Braket:
-    - installed:        {INSTALLED_PKGS["amazon-braket-sdk"]}
-    - latest supported: {LATEST_SUPPORTED_PKGS["amazon-braket-sdk"]}
+    - installed:        {installed_pkgs["amazon-braket-sdk"]}
+    - latest supported: {latest_supported_pkgs["amazon-braket-sdk"]}
 PennyLane:
-    - installed:        {INSTALLED_PKGS["pennylane"]}
-    - latest supported: {LATEST_SUPPORTED_PKGS["pennylane"]}
+    - installed:        {installed_pkgs["pennylane"]}
+    - latest supported: {latest_supported_pkgs["pennylane"]}
 PennyLane-Qiskit:
-    - installed:        {INSTALLED_PKGS["pennylane-qiskit"]}
-    - latest supported: {LATEST_SUPPORTED_PKGS["pennylane-qiskit"]}
+    - installed:        {installed_pkgs["pennylane-qiskit"]}
+    - latest supported: {latest_supported_pkgs["pennylane-qiskit"]}
 PyQuil:
-    - installed:        {INSTALLED_PKGS["pyquil"]}
-    - latest supported: {LATEST_SUPPORTED_PKGS["pyquil"]}
+    - installed:        {installed_pkgs["pyquil"]}
+    - latest supported: {latest_supported_pkgs["pyquil"]}
 Qiskit:
-    - installed:        {INSTALLED_PKGS["qiskit"]}
-    - latest supported: {LATEST_SUPPORTED_PKGS["qiskit"]}
+    - installed:        {installed_pkgs["qiskit"]}
+    - latest supported: {latest_supported_pkgs["qiskit"]}
 
 Python Version:\t{platform.python_version()}
 Platform Info:\t{platform.system()} ({platform.machine()})"""
