@@ -185,7 +185,7 @@ def test_from_braket_three_qubit_gates():
 
 
 def _rotation_of_pi_over_7(num_qubits):
-    matrix = np.identity(2 ** num_qubits)
+    matrix = np.identity(2**num_qubits)
     matrix[0:2, 0:2] = [
         [np.cos(np.pi / 7), np.sin(np.pi / 7)],
         [-np.sin(np.pi / 7), np.cos(np.pi / 7)],
@@ -307,7 +307,11 @@ def test_to_from_braket_uncommon_two_qubit_gates(uncommon_gate):
 
 
 @pytest.mark.parametrize(
-    "common_gate", [ops.TOFFOLI, ops.FREDKIN,],
+    "common_gate",
+    [
+        ops.TOFFOLI,
+        ops.FREDKIN,
+    ],
 )
 def test_to_from_braket_common_three_qubit_gates(common_gate):
     """These gates should stay the same (i.e., not get decomposed) when

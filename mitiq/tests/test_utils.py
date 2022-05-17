@@ -256,7 +256,7 @@ def test_pop_measurements_and_add_measurements():
     assert _equal(copy, circ)
 
 
-@pytest.mark.parametrize("gate", [X ** 3, Y ** -3, Z ** -1, H ** -1])
+@pytest.mark.parametrize("gate", [X**3, Y**-3, Z**-1, H**-1])
 def test_simplify_gate_exponent(gate):
     # Check exponent is simplified to 1
     assert _simplify_gate_exponent(gate).exponent == 1
@@ -264,7 +264,7 @@ def test_simplify_gate_exponent(gate):
     assert _simplify_gate_exponent(gate) == gate
 
 
-@pytest.mark.parametrize("gate", [T ** -1, S ** -1, MeasurementGate(1)])
+@pytest.mark.parametrize("gate", [T**-1, S**-1, MeasurementGate(1)])
 def test_simplify_gate_exponent_with_gates_that_cannot_be_simplified(gate):
     # Check the gate is not simplified (same representation)
     assert _simplify_gate_exponent(gate).__repr__() == gate.__repr__()
@@ -375,7 +375,7 @@ def test_circuit_to_choi_and_operation_to_choi():
     choi_twice = sum(
         [
             ((1.0 - epsilon) ** 2 * identity_part),
-            (2 * epsilon - epsilon ** 2) * mixed_part,
+            (2 * epsilon - epsilon**2) * mixed_part,
         ]
     )
 

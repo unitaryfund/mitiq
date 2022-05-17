@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""Tests for mirror circuits."""
+
 from mitiq.benchmarks import mirror_circuits
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES
 from mitiq.utils import _equal
@@ -137,7 +139,7 @@ def test_generate_mirror_circuit(depth_twoqprob_graph):
     result = (
         cirq.Simulator()
         .run(circ, repetitions=1_000)
-        .multi_measurement_histogram(keys=circ.all_measurement_keys())
+        .multi_measurement_histogram(keys=circ.all_measurement_key_names())
     )
     assert (
         len(result.keys()) == 1

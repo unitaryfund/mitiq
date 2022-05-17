@@ -1,5 +1,160 @@
 # Changelog
 
+## Version 0.16.0  (In development)
+
+## Version 0.15.0 (April 29th, 2022)
+
+### Summary
+This milestone focused on updating dependencies and making progress on two new features, dynamical decoupling and learning based PEC. For dynamical decoupling, high-level functions and rules were added. For learning-based PEC, a function calculating representations with a biased (combination of depolarizing and dephasing) noise model was added. Several high priority bugs and issues were also fixed.
+
+Special thanks to new contributors @RubidgeCarrie and @nickdgardner for their contributions to this release!
+
+### All Changes
+
+- Add digital dynamical decoupling high-level functions (@andreamari, gh-1251)
+- Fix qubit naming in OperationRepresentations for Qiskit circuits (@Misty-W, gh-1238)
+- Fix broken link in contributing guide (@Misty-W, gh-1257)
+- Insert sequences for dynamical decoupling (@Aaron-Robertson, gh-1221)
+- Short sequences in DDD API docs (@andreamari, gh-1237)
+- Update pennylane-qiskit requirement from ~=0.22.0 to ~=0.23.0 (@dependabot, gh-1249)
+- Update qiskit requirement from ~=0.36.0 to ~=0.36.1 (@dependabot, gh-1242)
+- Update pennylane requirement from ~=0.22.2 to ~=0.23.0 (@dependabot, gh-1248)
+- Move the gh pages deploy to a manually triggered action (@crazy4pi314, gh-1243)
+- Update AUTHORS (@nickdgardner, gh-1239)
+- fix typo (@nickdgardner, gh-1240)
+- Add DDD to Api-Doc, fixes #1209 (@nathanshammah, gh-1226)
+- Add rules for dynamical decoupling (@Aaron-Robertson, gh-1202)
+- Fix compilation to native gateset in Braket notebook (@andreamari, gh-1225)
+- Update amazon-braket-sdk requirement from ~=1.17.0 to ~=1.19.0 (@ dependabot, 1235)
+- Function to represent OperationRepresentations for biased noise (@Misty-W, gh-1233)
+- Bump codecov/codecov-action from 2.1.0 to 3.0.0 (@dependabot, gh-1216)
+- Bump actions/stale from 4 to 5 (@dependabot, gh-1217)
+- Update sphinxcontrib-bibtex requirement from ~=2.4.1 to ~=2.4.2 (@dependabot, gh-1218)
+- Update cirq requirement from ~=0.14.0 to ~=0.14.1 @dependabot, gh-1219)
+- Added citiation file for the repo (RubidgeCarrie, gh-1200)
+- Add mitigate_executor and cdr_decorator to mitiq.cdr (@Aaron-Robertson, gh-1204)
+- Update qiskit requirement from ~=0.35.0 to ~=0.36.0 (@dependabot, gh-1213)
+
+## Version 0.14.0  (April 6th, 2022)
+
+### Summary
+
+This milestone focused on updating dependencies and making progress on two new features, dynamical decoupling and learning based error mitigation techniques. A number of high priority bugs and issues also were fixed.
+
+### All Changes
+
+- Update pennylane requirement from ~=0.22.1 to ~=0.22.2 (@dependabot, gh-1203)
+- Update mypy requirement from ~=0.931 to ~=0.942 (@dependabot, gh-1183)
+- Update pennylane-qiskit requirement from ~=0.20.0 to ~=0.22.0 (@dependabot, gh-1170)
+- Update pennylane requirement from ~=0.21.0 to ~=0.22.1 (@dependabot, gh-1172)
+- Update qiskit requirement from ~=0.34.2 to ~=0.35.0 (@dependabot, gh-1199)
+- Update black requirement from ~=22.1 to ~=22.3 (@dependabot @andreamari @crazy4pi314, gh-1191)
+- Avoid creation of empty moments when using fold_global (@andreamari, gh-1196)
+- Merge pull request #1198 from unitaryfund/1140-raise-error-if-executo (@Misty-W)
+- Port changes from old branch - workaround (@Misty-W)
+- Merge pull request #1195 from unitaryfund/update-qiskit (@Misty-W)
+- Update docs/source/guide/pec-3-options.myst @crazy4pi314 (@Misty-W)
+- Merge branch 'master' into update-qiskit (@crazy4pi314)
+- Update Cirq to 0.14  (@andreamari, gh-1193)
+- fix pec-3-options notebook problem (@andreamari)
+- Remove option to squash moments in global folding  (@purva-thakre @andreamari, gh-1113)
+- update qiskit and fix conversions (@andreamari)
+- Idle qubits in conversion  (@Aaron-Robertson, gh-1185)
+- Add get_circuit_mask() for dynamical decoupling  (@Aaron-Robertson, gh-1178)
+- Update pydata-sphinx-theme requirement from ~=0.8.0 to ~=0.8.1  (@dependabot, gh-1188)
+- Add get_slack_matrix_from_circuit_matrix() function for dynamical decoupling (@andreamari @Aaron-Robertson,gh-1178)
+- Fix sphinx dependency problem  (@andreamari , gh-1181)
+- Create file structure for digital dynamical decoupling  (@andreamari, gh-1175)
+- adding pages publish step (@crazy4pi314,gh-1135)
+- cast gate exponents to float (@andreamari,gh-1174)
+- Update release.rst (@andreamari,gh-1145)
+- Bump actions/setup-python from 2 to 3  (@dependabot, gh-1149)
+- Bump actions/checkout from 2 to 3  (@dependabot, gh-1151)
+- Update amazon-braket-sdk requirement from ~=1.15.0 to ~=1.17.0  (@dependabot, gh-1153)
+- fixing install permissions, container user is root (@crazy4pi314 , gh-1147)
+
+## Version 0.13.0  (February 25th, 2022)
+
+### Summary
+
+Mitiq is now compatible with the latest version (0.13.1) of Cirq! This update was blocked for a long time because of some technical difficulties. So, many thanks to @vtomole for finding a solution to this issue!
+This should solve several dependency conflicts or warnings that you may have got when running `pip install mitiq` or `pip install -U mitiq`.
+
+The HTML rendering of all PyQuil examples in our documentation is now fixed. Thanks @astrojuanlu for useful suggestions about readthedocs!
+
+
+
+We also thank @Rahul-Mistri for adding GHZ circuits to our benchmarking module and for making Clifford circuits compatible with the Mitiq CDR technique (instead of raising an error as it happened before this release).
+
+We discussed and approved the design documents (RFC) for two new error-mitigation techniques: _learning-based PEC_ and _digital dynamical decoupling_. You can find them at [this link](https://github.com/unitaryfund/mitiq/projects/7). Special thanks go to @Misty-W and @Aaron-Robertson!
+
+### All Changes
+
+- Add pre-executed pyquil notebooks (@andreamari, gh-1142)
+- Fix optimal representation tests and unskip one of them (@andreamari gh-1141)
+- Update amazon-braket-sdk requirement from ~=1.11.1 to ~=1.15.0 (@dependabot, gh-1137, gh-1116, gh-1108, gh-1105) 
+- Update black requirement from ~=19.10b0 to ~=22.1 (@dependabot, @crazy4pi314, gh-1110) 
+- Bump actions/github-script from 5 to 6 (@dependabot, gh-1129) 
+- Update mypy requirement from ~=0.930 to ~=0.931 (@dependabot, gh-1078) 
+- docs: add vtomole as a contributor for test, code (@allcontributors, @andreamari, gh-1132) 
+- docs: add Rahul-Mistri as a contributor for test, code (@allcontributors, @andreamari, gh-1130) 
+- docs: add L-P-B as a contributor for test, code (@allcontributors, gh-1131) 
+- Update PR template (@nathanshammah, gh-1117) 
+- Remove unused functions from `cirq_utils` and fix non-deterministic tests. (@andreamari gh-1123)
+- Update pennylane requirement from ~=0.20.0 to ~=0.21.0 (@dependabot, gh-1122) 
+- Bump cirq version from 0.10.0 to 0.13.0 (@vtomole, gh-988)
+- Can use Clifford Circuits with `execute_with_cdr` (@Rahul-Mistri, gh-1104) 
+- Docstring for GHZ-circuits reformatted (@Rahul-Mistri, gh-1101)
+
+
+
+
+## Version 0.12.0  (January 21st, 2022)
+
+### Summary
+
+This release contains a considerable overhaul of the documentation organization and content:
+
+- The guide is now divided into Core concepts and a new presentation of the quantum errror mitigation techniques (ZNE, PEC and CDR). Each technique contains subsections that explain with code snippets how to use them in Mitiq (gh-1021, gh-1004 gh-1031, gh-1099). Also the API doc has been extended and improved. Many thanks to @purvathakre @Misty-W for their help on rewriting the documentation and reviewing the pull requests.
+- An example on how to use ZNE to improve the calculations of the energy potential landscape of molecular Hydrogen using VQE was added by @andreamari.
+
+**New features**
+- GHZ circuits were added to the benchmark subpackage by @Rahul-Mistri.
+- Airspeed-velocity (asv) has been added to the CI by @rmlarose.
+
+### All Changes
+
+- Add core concepts guide page (@crazy4pi314, @nathanshammah, @andreamari, gh-1053)
+- Add cdr-2-use-case.myst (gh-1099) (@andreamari, @nathanshammah)
+- CDR documentation reorg (@nathanshammah, @andreamari, @crazy4pi314, gh-1031)
+- Add molecular Hydrogen example (@andreamari, gh-1087)
+- Update pydata-sphinx-theme requirement from ~=0.7.2 to ~=0.8.0 (@dependabot, gh-1091)
+- Use raw.execute in asv benchmarks and remove GHZ circuits from asv (@rmlarose)
+- Added GHZ circuits to benchmark (@Rahul-Mistri, gh-1089)
+- Update scipy requirement from ~=1.7.2 to ~=1.7.3 (@dependabot
+, gh-1084)
+- PR to trigger CI and fix a broken link (@andreamari, gh-1082)
+- Fix readthedocs by changing a LaTex equation (@andreamari, @nathanshammah, gh-1077)
+- Add asv benchmarking framework (@rmlarose, gh-1047)
+- Update zne-3-options.myst (@andreamari, gh-1075)
+- Update API doc with REM, executors and observables (@nathanshammah, gh-1050)
+- ZNE Guide Reorg (@crazy4pi314, @Misty-W, @purva-thakre, @nathanshammah, @andreamari, gh-1021)
+- Fix broken link on master. (@andreamari, gh-1069)
+- Update mypy requirement from ~=0.910 to ~=0.930 (@dependabot, gh-1065)
+- Docs: add AkashNarayanan as a contributor for infra (@allcontributors, gh-1059)
+- Fixes #1034 release docs update (@crazy4pi314, @nathanshammah, gh-1054)
+- Docs: add DSamuel1 as a contributor for code (@allcontributors, @Misty-W, gh-1056)
+- Docs: add Misty-W as a contributor for code, example (@allcontributors, gh-1055)
+- Docs: update README.md (@allcontributors)
+- Update PEC docs (@andreamari, @nathanshammah, @rmlarose, gh-1004)
+- Revert "Update mypy requirement from ~=0.910 to ~=0.920 (@nathanshammah, gh-1052)
+- Update mypy requirement from ~=0.910 to ~=0.920 (@dependabot, gh-1051)
+- Update pytest-xdist[psutil] requirement from ~=2.4.0 to ~=2.5.0 (@dependabot, gh-1044)
+- Update amazon-braket-sdk requirement from ~=1.11.0 to ~=1.11.1 (@dependabot, gh-1042)
+- Update pennylane requirement from ~=0.19.0 to ~=0.19.1 (@dependabot, gh-1029)
+- Update amazon-braket-sdk requirement from ~=1.9.5 to ~=1.11.0 (@dependabot, gh-1038)
+
+
 ## Version 0.11.1  (November 29th, 2021)
 
 ### Summary
@@ -8,7 +163,7 @@ This patch release fixes two bugs:
 
 - Bug: PEC could only be used with `cirq.Circuit`s, not `mitiq.QPROGRAM`, due to a missing conversion.
     - Fix: PEC can now be used with any `mitiq.QPROGRAM` (gh-1018).
-- Bug: CDR classically simulated the wrong circuits when doing regression. 
+- Bug: CDR classically simulated the wrong circuits when doing regression.
     - Fix: The correct circuits are now classically simulated (gh-1026).
 
 Also fixes a smaller bug where some tools in `mitiq.interface.mitiq_qiskit` modified `qiskit.QuantumCircuit`s when they shouldn't.
@@ -22,7 +177,7 @@ Also fixes a smaller bug where some tools in `mitiq.interface.mitiq_qiskit` modi
 - Update qiskit requirement from ~=0.31.0 to ~=0.32.0 (@dependabot, gh-1025)
 - Update pydata-sphinx-theme requirement from ~=0.7.1 to ~=0.7.2 (@dependabot, gh-1024)
 - [Bug fix] Avoid circuit mutation in qiskit executors (@andreamari, gh-1019)
-- [Bug fix] Add back-conversions in execute_with_pec (@andreamari, gh-1018) 
+- [Bug fix] Add back-conversions in execute_with_pec (@andreamari, gh-1018)
 - Increase shots in zne tests with shot_list (@andreamari, gh-1020)
 - Update pennylane requirement from ~=0.18.0 to ~=0.19.0 (@nathanshammah, gh-1022)
 - Add workflow figures and technique descriptions (@nathanshammah, gh-953)
@@ -38,15 +193,15 @@ for Pennylane has been added by adding `pennylane.QuantumTape`s to `mitiq.QPROGR
 **New features**
 
 - Specify and use a `mitiq.Observable` in any error-mitigation technique.
-  - This means the `executor` function does not have to return the expectation value as a `float` anymore, but rather 
-    can return a `mitiq.QuantumResult` - i.e., an object from which the expectation value can be computed provided 
+  - This means the `executor` function does not have to return the expectation value as a `float` anymore, but rather
+    can return a `mitiq.QuantumResult` - i.e., an object from which the expectation value can be computed provided
     an observable.
   - The `executor` function can still return a `float`, in which case the `Observable` does not need to be specified
     (and should not be specified).
 
 - All error mitigation techniques can now use batching with the same interface.
 
-- PEC can be run with only a subset of representations of the gates in a circuit. In other words, if the circuit has 
+- PEC can be run with only a subset of representations of the gates in a circuit. In other words, if the circuit has
   two gates, `H` and `CNOT`, you can run `execute_with_pec` by only providing an `OperationRepresentation` for, e.g.,
   the `CNOT`.
   - Before, you had to provide all representations or an error would be raised.
@@ -77,7 +232,7 @@ execute_with_pec(circuit, executor, observable, representations)
 
 The latter will raise `# TypeError: execute_with_pec() missing 1 required keyword-only argument: 'representations'`.
 
-- The first argument of `execute_with_zne` is now `circuit` instead of `qp` to match signatures of other 
+- The first argument of `execute_with_zne` is now `circuit` instead of `qp` to match signatures of other
 `execute_with_xxx` functions.
 
 ### All Changes
@@ -101,12 +256,12 @@ The latter will raise `# TypeError: execute_with_pec() missing 1 required keywor
 - Fix pip package resolving problems (@andreamari, gh-976)
 - Add support for pennylane circuits (everybody and their grandmother, gh-836)
 - Keyword only arguments in execute_with_technique functions (@rmlarose, gh-971)
-- Foldability check includes a check for inverse (@purva-thakre, gh-939) 
-- Bump actions/github-script from 3 to 5 (@dependabot, gh-969) 
+- Foldability check includes a check for inverse (@purva-thakre, gh-939)
+- Bump actions/github-script from 3 to 5 (@dependabot, gh-969)
 - PEC with Observables & skip operations without known representations (@rmlarose, gh-954)
-- Update qiskit-terra requirement from ~=0.18.2 to ~=0.18.3 (@dependabot, gh-955) 
+- Update qiskit-terra requirement from ~=0.18.2 to ~=0.18.3 (@dependabot, gh-955)
 - Add observable to zne_decorator (@rmlarose, gh-967)
-- Update qiskit-ibmq-provider requirement from ~=0.16.0 to ~=0.17.0 (@dependabot, gh-965) 
+- Update qiskit-ibmq-provider requirement from ~=0.16.0 to ~=0.17.0 (@dependabot, gh-965)
 - Binder badge workflow (@AkashNarayanan, gh-964)
 - Fix links and typos in vqe-pyquil-demo.myst and pyquil_demo.myst (@Misty-W, gh-959)
 - ZNE with Observables (@rmlarose, gh-948)
@@ -136,7 +291,7 @@ Some highlights:
 - Dependabot is now helping us keep our dependencies up to date.
 - Lots of documentation fixes and features like a gallery view of the examples and mybinder.org support.
 - New `Observable` and `MeasurementResult` dataclass.
-  
+
 Thanks to @Misty-W and @DSamuel1 for their great contributions this release! 🎉
 
 ### All Changes
@@ -294,12 +449,12 @@ This release has the following major components:
 - Improves the (sampling) performance of PEC (by a lot!) via fewer circuit conversions.
 - Adds `PauliString` object, the first change of several in the generalization of executors. This object is not yet used in any error mitigation pipelines but can be used as a stand-alone.
 
-Additionally, this release 
+Additionally, this release
 
 - Fixes some CI components including uploading coverage from master and suppressing nightly Test PyPI uploads on forks.
 - Adds links to GitHub on README and RTD.
 
-Special thanks to all contributors - @purva-thakre, @Aaron-Robertson, @andre-a-alves, @mstechly, @ckissane, @HaoTy, @briancylui, and @L-P-B - for your work on this release! 
+Special thanks to all contributors - @purva-thakre, @Aaron-Robertson, @andre-a-alves, @mstechly, @ckissane, @HaoTy, @briancylui, and @L-P-B - for your work on this release!
 
 ### All Changes
 

@@ -37,8 +37,7 @@ from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 
 
 class LargeSampleWarning(Warning):
-    """Warning is raised when PEC sample size is greater than 10 ** 5
-    """
+    """Warning is raised when PEC sample size is greater than 10 ** 5"""
 
     pass
 
@@ -61,8 +60,9 @@ def execute_with_pec(
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
 ) -> Union[float, Tuple[float, Dict[str, Any]]]:
-    r"""Evaluates the expectation value associated to the input circuit
-    using probabilistic error cancellation (PEC) [Temme2017]_ [Endo2018]_.
+    r"""Estimates the error-mitigated expectation value associated to the
+    input circuit, via the application of probabilistic error cancellation
+    (PEC). [Temme2017]_ [Endo2018]_.
 
     This function implements PEC by:
 
@@ -75,7 +75,8 @@ def execute_with_pec(
 
     Args:
         circuit: The input circuit to execute with error-mitigation.
-        executor: Executes a circuit and returns a `QuantumResult`.
+        executor: A Mitiq executor that executes a circuit and returns the
+            unmitigated ``QuantumResult`` (e.g. an expectation value).
         observable: Observable to compute the expectation value of. If None,
             the `executor` must return an expectation value. Otherwise,
             the `QuantumResult` returned by `executor` is used to compute the
@@ -97,14 +98,15 @@ def execute_with_pec(
             If True a dictionary containing all PEC data is returned too.
 
     Returns:
-        pec_value: The PEC estimate of the ideal expectation value associated
-            to the input circuit.
-        pec_data: A dictionary which contains all the raw data involved in the
-            PEC process (including the PEC estimation error). The error is
-            estimated as pec_std / sqrt(num_samples), where 'pec_std' is the
-            standard deviation of the PEC samples, i.e., the square root of the
-            mean squared deviation of the sampled values from 'pec_value'.
-            This is returned only if ``full_output`` is ``True``.
+        The tuple ``(pec_value, pec_data)`` where ``pec_value`` is the
+        expectation value estimated with PEC and ``pec_data`` is a dictionary
+        which contains all the raw data involved in the PEC process (including
+        the PEC estimation error).
+        The error is estimated as ``pec_std / sqrt(num_samples)``, where
+        ``pec_std`` is the standard deviation of the PEC samples, i.e., the
+        square root of the mean squared deviation of the sampled values from
+        ``pec_value``. If ``full_output`` is ``True``, only ``pec_value`` is
+        returned.
 
     .. [Endo2018] : Suguru Endo, Simon C. Benjamin, Ying Li,
         "Practical Quantum Error Mitigation for Near-Future Applications"
@@ -128,7 +130,9 @@ def execute_with_pec(
 
     # Get the 1-norm of the circuit quasi-probability representation
     _, _, norm = sample_circuit(
-        converted_circuit, representations, num_samples=1,
+        converted_circuit,
+        representations,
+        num_samples=1,
     )
 
     # Deduce the number of samples (if not given by the user)
@@ -136,7 +140,7 @@ def execute_with_pec(
         num_samples = int((norm / precision) ** 2)
 
     # Issue warning for very large sample size
-    if num_samples > 10 ** 5:
+    if num_samples > 10**5:
         warnings.warn(_LARGE_SAMPLE_WARN, LargeSampleWarning)
 
     # Sample all the circuits
@@ -195,18 +199,12 @@ def mitigate_executor(
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
 ) -> Callable[[QPROGRAM], Union[float, Tuple[float, Dict[str, Any]]]]:
-    """Returns a probabilistic error cancellation (PEC) mitigated version of
-    the input 'executor'.
-
-    The input `executor` executes a circuit with an arbitrary backend and
-    produces an expectation value (without any error mitigation). The returned
-    executor executes the circuit with the same backend but uses probabilistic
-    error cancellation to produce the PEC estimate of the ideal expectation
-    value associated to the input circuit as well as A dictionary which
-    contains all the raw data involved in the PEC process.
+    """Returns a modified version of the input 'executor' which is
+    error-mitigated with probabilistic error cancellation (PEC).
 
     Args:
-        executor: Executes a circuit and returns a `QuantumResult`.
+        executor: A function that executes a circuit and returns the
+            unmitigated `QuantumResult` (e.g. an expectation value).
         observable: Observable to compute the expectation value of. If None,
             the `executor` must return an expectation value. Otherwise,
             the `QuantumResult` returned by `executor` is used to compute the
@@ -226,6 +224,9 @@ def mitigate_executor(
         random_state: Seed for sampling circuits.
         full_output: If False only the average PEC value is returned.
             If True a dictionary containing all PEC data is returned too.
+
+    Returns:
+        The error-mitigated version of the input executor.
     """
 
     @wraps(executor)
@@ -257,17 +258,17 @@ def pec_decorator(
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
 ) -> Callable[
-    [Callable[[Union[QPROGRAM, Any, Any, Any]], QuantumResult]],
+    [Callable[[Union[QPROGRAM]], QuantumResult]],
     Callable[
-        [Union[QPROGRAM, Any, Any, Any]],
+        [Union[QPROGRAM]],
         Union[float, Tuple[float, Dict[str, Any]]],
     ],
 ]:
-    """Decorator which adds probabilistic error cancellation (PEC) mitigation
-    to an executor function, i.e., a function which executes a quantum circuit
-    with an arbitrary backend and returns the PEC estimate of the ideal
-    expectation value associated to the input circuit as well as A dictionary
-    which contains all the raw data involved in the PEC process.
+    """Decorator which adds an error-mitigation layer based on probabilistic
+    error cancellation (PEC) to an executor function, i.e., a function which
+    executes a quantum circuit with an arbitrary backend and returns a
+    ``QuantumResult`` (e.g. an expectation value).
+
 
     Args:
         observable: Observable to compute the expectation value of. If None,
@@ -289,6 +290,9 @@ def pec_decorator(
         random_state: Seed for sampling circuits.
         full_output: If False only the average PEC value is returned.
             If True a dictionary containing all PEC data is returned too.
+
+    Returns:
+        The error-mitigating decorator to be applied to an executor function.
     """
 
     def decorator(

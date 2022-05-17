@@ -11,32 +11,41 @@ API-doc
 Benchmarks
 ----------
 
-MaxCut
-^^^^^^
-.. automodule:: mitiq.benchmarks.maxcut
-   :members:
-
-Random Circuits
+Mirror Circuits
 ^^^^^^^^^^^^^^^
-.. automodule:: mitiq.benchmarks.random_circuits
+.. automodule:: mitiq.benchmarks.mirror_circuits
    :members:
 
-Randomized Benchmarking
-^^^^^^^^^^^^^^^^^^^^^^^
+Randomized Benchmarking Circuits
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.benchmarks.randomized_benchmarking
    :members:
 
-Utils
-^^^^^
-.. automodule:: mitiq.benchmarks.utils
+GHZ Circuits
+^^^^^^^^^^^^
+.. automodule:: mitiq.benchmarks.ghz_circuits
    :members:
 
 Clifford Data Regression
 ------------------------
+
+Clifford Data Regression (High-Level Tools)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.cdr.cdr
+   :members:
+
+Clifford Training Data
+^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.cdr.clifford_training_data
    :members:
 
-See Ref. :cite:`Czarnik_2020_arXiv` for more details on these methods.
+Data Regression
+^^^^^^^^^^^^^^^
+.. automodule:: mitiq.cdr.data_regression
+   :members:
+
+See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
+
 
 Mitiq - Braket
 --------------
@@ -75,6 +84,42 @@ Qiskit Utils
 .. automodule:: mitiq.interface.mitiq_qiskit.qiskit_utils
    :members:
 
+Digital Dynamical Decoupling
+----------------------------
+
+Digital Dynamical Decoupling (High-Level Tools)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.ddd.ddd
+   :members:
+
+Insertion
+^^^^^^^^^
+.. automodule:: mitiq.ddd.insertion
+   :members:
+
+Rules
+^^^^^
+.. automodule:: mitiq.ddd.rules.rules
+   :members:
+
+Executors
+---------
+.. automodule:: mitiq.executor.executor
+   :members:
+
+Observables
+-----------
+
+Observable
+^^^^^^^^^^
+.. automodule:: mitiq.observable.observable
+   :members:
+
+Pauli
+^^^^^^^^^^^
+.. automodule:: mitiq.observable.pauli
+   :members:
+
 Probabilistic Error Cancellation
 --------------------------------
 
@@ -94,6 +139,9 @@ Quasi-Probability Representations
 .. automodule:: mitiq.pec.representations.depolarizing
    :members:
 
+.. automodule:: mitiq.pec.representations.biased_noise
+   :members:
+
 Sampling from a Noisy Decomposition of an Ideal Operation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.pec.sampling
@@ -109,6 +157,25 @@ Utilities for Quantum Channels
 .. automodule:: mitiq.pec.channels
    :members:
 
+Raw
+---
+
+Run experiments without error mitigation (raw results)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.raw.raw
+
+Readout Error Mitigation
+------------------------
+
+Measurement Result
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.rem.measurement_result
+   :members:
+
+Post-selection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automodule:: mitiq.rem.post_select
+   :members:
 
 Zero Noise Extrapolation
 ------------------------

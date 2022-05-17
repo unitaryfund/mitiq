@@ -17,7 +17,7 @@
 Qiskit's circuit representation.
 """
 import copy
-from typing import List, Optional, Tuple, Any
+from typing import List, Optional, Tuple, Any, Set
 import re
 
 import numpy as np
@@ -104,8 +104,8 @@ def _map_qubits(
         qubits: A list of qubits to map.
         new_register_sizes: The size(s) of the new registers to map to.
             Note: These can be determined from ``new_registers``, but this
-            helper function is only called from ``_map_qubits`` where the sizes
-            are already computed.
+            helper function is only called from ``_transform_registers`` where
+            the sizes are already computed.
         new_registers: The new registers to map the ``qubits`` to.
 
     Returns:
@@ -116,6 +116,58 @@ def _map_qubits(
     return [
         qiskit.circuit.Qubit(new_registers[i], j) for i, j in mapped_indices
     ]
+
+
+def _add_identity_to_idle(
+    circuit: qiskit.QuantumCircuit,
+) -> Set[int]:
+    """Adds identities to idle qubits in the circuit and returns the altered
+    indices. Used to preserve idle qubits and indices in conversion.
+
+    Args:
+        circuit: Qiskit circuit to have identities added to idle qubits
+
+    Returns:
+        An unordered set of the indices that were altered
+    """
+    data = copy.deepcopy(circuit._data)
+    bit_indices = set()
+    idle_bit_indices = set()
+    for op in data:
+        gate, qubits, cbits = op
+        bit_indices.update(set(bit.index for bit in qubits))
+    for index in range(circuit.num_qubits):
+        if index not in bit_indices:
+            idle_bit_indices.add(index)
+            circuit.i(index)
+    return idle_bit_indices
+
+
+def _remove_identity_from_idle(
+    circuit: qiskit.QuantumCircuit,
+    idle_indices: Set[int],
+) -> None:
+    """Removes identities from the circuit corresponding to the set of indices.
+    Used in conjunction with _add_identity_to_idle to preserve idle qubits and
+    indices in conversion.
+
+    Args:
+        circuit: Qiskit circuit to have identities removed
+        idle_indices: Set of altered idle qubit indices
+    """
+    index_list: List[int] = []
+    data = copy.deepcopy(circuit._data)
+    for target_index, op in enumerate(data):
+        bit_indices = set()
+        gate, qubits, cbits = op
+        bit_indices.update(set(bit.index for bit in qubits))
+        if gate.name == "id" and bit_indices.intersection(idle_indices):
+            # Reverse index list order for data index preservation
+            index_list.insert(0, target_index)
+    # Traverse data from list end to preserve index
+    for target_index in index_list:
+        del data[target_index]
+    circuit._data = data
 
 
 def _measurement_order(
@@ -166,8 +218,8 @@ def _transform_registers(
     Raises:
         ValueError:
             * If the input circuit has more than one quantum register.
-            * If the number of qubits in the new quantum registers does not
-            match the number of qubits in the circuit.
+            * If the number of qubits in the new quantum registers is
+            greater than the number of qubits in the circuit.
     """
     if new_qregs is None:
         return
@@ -179,7 +231,7 @@ def _transform_registers(
         )
 
     qreg_sizes = [qreg.size for qreg in new_qregs]
-    nqubits_in_circuit = sum(qreg.size for qreg in circuit.qregs)
+    nqubits_in_circuit = circuit.num_qubits
 
     if len(qreg_sizes) and sum(qreg_sizes) < nqubits_in_circuit:
         raise ValueError(
@@ -195,6 +247,7 @@ def _transform_registers(
     circuit._qubit_set = set()
     circuit.qregs = []
     circuit._data = []
+    circuit._qubit_indices = {}
     circuit.add_register(*new_qregs)
 
     # Map the qubits in operations to the new qubits.

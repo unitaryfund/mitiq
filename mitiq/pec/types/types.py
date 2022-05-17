@@ -112,15 +112,15 @@ class NoisyOperation:
 
         self._qubits = tuple(self._circuit.all_qubits())
         self._num_qubits = len(self._qubits)
-        self._dimension = 2 ** self._num_qubits
+        self._dimension = 2**self._num_qubits
 
         if channel_matrix is None:
             self._channel_matrix = None
             return
 
         if channel_matrix.shape != (
-            self._dimension ** 2,
-            self._dimension ** 2,
+            self._dimension**2,
+            self._dimension**2,
         ):
             raise ValueError(
                 f"Arg `channel_matrix` has shape {channel_matrix.shape}"
@@ -175,7 +175,8 @@ class NoisyOperation:
 
         noisy_ops = []  # type: List[NoisyOperation]
         base_circuit = NoisyOperation.from_cirq(
-            circuit, channel_matrix,
+            circuit,
+            channel_matrix,
         )._circuit
         base_qubits = list(base_circuit.all_qubits())
 
@@ -196,7 +197,9 @@ class NoisyOperation:
         self, qubits: Sequence[List[cirq.Qid]]
     ) -> Sequence["NoisyOperation"]:
         return [self] + NoisyOperation.on_each(
-            self._circuit, qubits, self._channel_matrix,
+            self._circuit,
+            qubits,
+            self._channel_matrix,
         )
 
     @staticmethod

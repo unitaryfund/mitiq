@@ -671,14 +671,18 @@ def test_fold_gates_at_random_seed_one_qubit():
     # Medium scale, fold two gates
     folded = fold_gates_at_random(circuit, scale_factor=2.5, seed=2)
     correct = Circuit(
-        [ops.X.on(qubit)], [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)] * 3,
+        [ops.X.on(qubit)],
+        [ops.Y.on(qubit)] * 3,
+        [ops.Z.on(qubit)] * 3,
     )
     assert _equal(folded, correct)
 
     # Max scale, fold three gates
     folded = fold_gates_at_random(circuit, scale_factor=3, seed=3)
     correct = Circuit(
-        [ops.X.on(qubit)] * 3, [ops.Y.on(qubit)] * 3, [ops.Z.on(qubit)] * 3,
+        [ops.X.on(qubit)] * 3,
+        [ops.Y.on(qubit)] * 3,
+        [ops.Z.on(qubit)] * 3,
     )
     assert _equal(folded, correct)
 
@@ -908,6 +912,8 @@ def test_global_fold_stretch_factor_of_three_with_terminal_measurements():
     folded = fold_global(circ + meas, scale_factor=3.0)
     correct = Circuit(circ, inverse(circ), circ, meas)
     assert _equal(folded, correct)
+    # Test the number of moments too
+    assert len(folded) == len(correct)
 
 
 def test_global_fold_stretch_factor_nine_with_terminal_measurements():
@@ -956,12 +962,98 @@ def test_global_fold_stretch_factor_eight_terminal_measurements():
         circ,
         inverse(circ),
         circ,
-        inverse(Circuit([ops.T.on(qreg[2])], [ops.TOFFOLI.on(*qreg)],)),
+        inverse(
+            Circuit(
+                [ops.T.on(qreg[2])],
+                [ops.TOFFOLI.on(*qreg)],
+            )
+        ),
         [ops.T.on(qreg[2])],
         [ops.TOFFOLI.on(*qreg)],
         meas,
     )
     assert _equal(folded, correct)
+
+
+def test_global_fold_moment_structure_maintained_full_scale_factors():
+    """Tests global folding maintains the input circuit's moment structure."""
+    # Test circuit 1
+    # 0: ───H───────────────
+
+    # 1: ───────Z───────────
+
+    # 2: ───────────S───────
+
+    # 3: ───────────────T───
+
+    qreg = LineQubit.range(4)
+
+    gate_list1 = [ops.H, ops.Z, ops.S, ops.T]
+    circuit1 = Circuit(gate_list1[0](qreg[0]))
+
+    for i in range(1, 4):
+        circuit1 += Circuit(gate_list1[i](qreg[i]))
+    folded = fold_global(circuit1, scale_factor=3)
+    correct = Circuit(
+        circuit1,
+        inverse(circuit1),
+        circuit1,
+    )
+    assert _equal(folded, correct)
+
+    # Test Circuit 2
+    # 0: ───H───@───────@───
+    #           │       |
+    # 1: ───H───X───────@───
+    #                   │
+    # 2: ───H───────T───X───
+    qreg = LineQubit.range(3)
+    gate_list = [
+        ops.CNOT.on(qreg[0], qreg[1]),
+        [ops.T.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+    ]
+    circ = Circuit([ops.H.on_each(*qreg)])
+    for i in range(len(gate_list)):
+        circ += Circuit(gate_list[i])
+    folded = fold_global(circ, scale_factor=3)
+    correct = Circuit(
+        circ,
+        inverse(circ),
+        circ,
+    )
+    assert _equal(folded, correct)
+
+
+def test_global_fold_moment_structure_maintained_partial_scale_factors():
+    """Tests global folding maintains the input circuit's moment structure."""
+    # Test circuit 1
+    # 0: ───H───────────────
+
+    # 1: ───────Z───────────
+
+    # 2: ───────────S───────
+
+    # 3: ───────────────T───
+
+    qreg = LineQubit.range(4)
+
+    gate_list1 = [ops.H, ops.Z, ops.S, ops.T]
+    circuit1 = Circuit(gate_list1[0](qreg[0]))
+
+    for i in range(1, 4):
+        circuit1 += Circuit(gate_list1[i](qreg[i]))
+    folded1 = fold_global(circuit1, scale_factor=1.5)
+    correct1 = Circuit(circuit1, inverse(circuit1)[0], circuit1[-1])
+    assert _equal(folded1, correct1)
+
+    folded2 = fold_global(circuit1, scale_factor=2.5)
+    correct2 = Circuit(circuit1, inverse(circuit1)[0:3], circuit1[1:])
+    assert _equal(folded2, correct2)
+
+    folded3 = fold_global(circuit1, scale_factor=2.75)
+    correct3 = Circuit(circuit1, inverse(circuit1), circuit1)
+    assert _equal(folded3, correct3)
 
 
 def test_convert_to_from_mitiq_qiskit():
@@ -1164,6 +1256,55 @@ def test_fold_global_with_qiskit_circuits():
     assert folded_qiskit_circuit.cregs == qiskit_circuit.cregs
 
 
+def test_fold_global_with_qiskit_circuits_and_idle_qubits():
+    """Tests _fold_local with input Qiskit circuits where idle qubits are
+    interspered.
+    """
+    # Test Qiskit circuit:
+    #           ┌───┐          ┌─┐
+    #  q4_0: |0>┤ H ├──■────■──┤M├──────
+    #           └───┘  │    │  └╥┘
+    #  q4_1: |0>───────┼────┼───╫───────
+    #           ┌───┐┌─┴─┐  │   ║ ┌─┐
+    #  q4_2: |0>┤ H ├┤ X ├──■───╫─┤M├───
+    #           └───┘└───┘  │   ║ └╥┘
+    #  q4_3: |0>────────────┼───╫──╫────
+    #           ┌───┐┌───┐┌─┴─┐ ║  ║ ┌─┐
+    #  q4_4: |0>┤ H ├┤ T ├┤ X ├─╫──╫─┤M├
+    #           └───┘└───┘└───┘ ║  ║ └╥┘
+    #  c4:    5/════════════════╩══╩══╩═
+    #                           0  2  4
+    qiskit_qreg = QuantumRegister(5)
+    qiskit_creg = ClassicalRegister(5)
+    qiskit_circuit = QuantumCircuit(qiskit_qreg, qiskit_creg)
+    qiskit_circuit.h(qiskit_qreg[0])
+    qiskit_circuit.h(qiskit_qreg[2])
+    qiskit_circuit.h(qiskit_qreg[4])
+    qiskit_circuit.cnot(qiskit_qreg[0], qiskit_qreg[2])
+    qiskit_circuit.t(qiskit_qreg[4])
+    qiskit_circuit.ccx(qiskit_qreg[0], qiskit_qreg[2], qiskit_qreg[4])
+    qiskit_circuit.measure(qiskit_qreg[0], qiskit_creg[0])
+    qiskit_circuit.measure(qiskit_qreg[2], qiskit_creg[2])
+    qiskit_circuit.measure(qiskit_qreg[4], qiskit_creg[4])
+
+    # Return mitiq circuit
+    folded_circuit = fold_global(
+        qiskit_circuit,
+        scale_factor=2.71828,
+        fold_method=fold_gates_from_left,
+        return_mitiq=True,
+    )
+    assert isinstance(folded_circuit, Circuit)
+
+    # Return input circuit type
+    folded_qiskit_circuit = fold_global(
+        qiskit_circuit, scale_factor=2.0, fold_method=fold_gates_from_left
+    )
+    assert isinstance(folded_qiskit_circuit, QuantumCircuit)
+    assert folded_qiskit_circuit.qregs == qiskit_circuit.qregs
+    assert folded_qiskit_circuit.cregs == qiskit_circuit.cregs
+
+
 def test_fold_left_squash_moments():
     """Tests folding from left with kwarg squash_moments."""
     # Test circuit
@@ -1204,7 +1345,6 @@ def test_fold_left_squash_moments():
         fold_gates_from_left,
         fold_gates_from_right,
         fold_gates_at_random,
-        fold_global,
     ],
 )
 def test_fold_and_squash_max_stretch(fold_method):
@@ -1242,7 +1382,6 @@ def test_fold_and_squash_max_stretch(fold_method):
         fold_gates_from_left,
         fold_gates_from_right,
         fold_gates_at_random,
-        fold_global,
     ],
 )
 def test_fold_and_squash_random_circuits_random_stretches(fold_method):
@@ -1257,10 +1396,16 @@ def test_fold_and_squash_random_circuits_random_stretches(fold_method):
         )
         scale = 2 * rng.random() + 1
         folded_not_squashed = fold_method(
-            circuit, scale_factor=scale, squash_moments=False, seed=trial,
+            circuit,
+            scale_factor=scale,
+            squash_moments=False,
+            seed=trial,
         )
         folded_and_squashed = fold_method(
-            circuit, scale_factor=scale, squash_moments=True, seed=trial,
+            circuit,
+            scale_factor=scale,
+            squash_moments=True,
+            seed=trial,
         )
         assert len(folded_and_squashed) <= len(folded_not_squashed)
 
@@ -1310,7 +1455,8 @@ def test_fold_local_with_fidelities(fold_method, qiskit):
 )
 @pytest.mark.parametrize("qiskit", [True, False])
 def test_fold_local_with_single_qubit_gates_fidelity_one(fold_method, qiskit):
-    """Tests folding only two-qubit gates by using fidelities = {"single": 1.}.
+    """Tests folding only two-qubit gates by using
+    fidelities = {"single": 1.}.
     """
     qreg = LineQubit.range(3)
     circ = Circuit(
@@ -1535,7 +1681,9 @@ def test_create_weight_mask_with_fidelities():
 @pytest.mark.parametrize("scale_factor", (1, 3, 5, 7, 9, 11))
 @pytest.mark.parametrize("method", ("at_random", "from_left", "from_right"))
 def test_create_fold_mask_with_odd_scale_factors(
-    weight_mask, scale_factor, method,
+    weight_mask,
+    scale_factor,
+    method,
 ):
     fold_mask = _create_fold_mask(weight_mask, scale_factor, method)
     num_folds = int((scale_factor - 1) / 2)
@@ -1644,7 +1792,10 @@ def test_create_fold_mask_approximates_well(method):
         weight_mask = [rnd_state.rand() for _ in range(100)]
         seed = rnd_state.randint(100)
         fold_mask = _create_fold_mask(
-            weight_mask, scale_factor, folding_method=method, seed=seed,
+            weight_mask,
+            scale_factor,
+            folding_method=method,
+            seed=seed,
         )
         out_weights = [w + 2 * n * w for w, n in zip(weight_mask, fold_mask)]
         actual_scale = sum(out_weights) / sum(weight_mask)
@@ -1711,7 +1862,9 @@ def test_apply_fold_mask_with_squash_moments_option():
     #
     # 1: ───T────H───
     q = LineQubit.range(2)
-    circ = Circuit([ops.T.on_each(*q), ops.H(q[1])],)
+    circ = Circuit(
+        [ops.T.on_each(*q), ops.H(q[1])],
+    )
     folded = _apply_fold_mask(circ, [1, 0, 0], squash_moments=False)
     # 0: ───T───T^-1───T───────
     #

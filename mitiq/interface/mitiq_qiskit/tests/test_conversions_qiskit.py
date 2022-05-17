@@ -32,6 +32,8 @@ from mitiq.interface.mitiq_qiskit.conversions import (
     _transform_registers,
     _measurement_order,
     _remove_qasm_barriers,
+    _add_identity_to_idle,
+    _remove_identity_from_idle,
 )
 
 
@@ -365,3 +367,29 @@ def test_measurement_order(size):
 
     order = _measurement_order(circuit)
     assert order == [(q[i], c[i]) for i in index_order]
+
+
+def test_add_identity_to_idle():
+    circuit = qiskit.QuantumCircuit(9)
+    circuit.x([0, 8])
+    circuit.cx(0, 8)
+    idle_indices = _add_identity_to_idle(circuit)
+    id_indices = []
+    for gates, qubits, cargs in circuit.get_instructions("id"):
+        for qubit in qubits:
+            id_indices.append(qubit.index)
+    assert idle_indices == set(range(1, 8))
+    assert id_indices == sorted(idle_indices)
+
+
+def test_remove_identity_from_idle():
+    idle_indices = set(range(1, 8))
+    circuit = qiskit.QuantumCircuit(9)
+    circuit.x([0, 8])
+    circuit.cx(0, 8)
+    _remove_identity_from_idle(circuit, idle_indices)
+    id_indices = []
+    for gates, qubits, cargs in circuit.get_instructions("id"):
+        for qubit in qubits:
+            id_indices.append(qubit.index)
+    assert id_indices == []

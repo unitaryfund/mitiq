@@ -71,7 +71,8 @@ def test_sample_sequence_qiskit():
     noisy_zop = NoisyOperation(zcircuit)
 
     rep = OperationRepresentation(
-        ideal=circuit, basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
+        ideal=circuit,
+        basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
     )
 
     for _ in range(5):
@@ -88,7 +89,8 @@ def test_sample_sequence_pyquil():
     noisy_zop = NoisyOperation(pyquil.Program(pyquil.gates.Z(0)))
 
     rep = OperationRepresentation(
-        ideal=circuit, basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
+        ideal=circuit,
+        basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
     )
 
     for _ in range(50):
@@ -279,7 +281,8 @@ def test_sample_sequence_choi(gate: cirq.Gate):
     noisy_choi = _operation_to_choi(noisy_op_tree)
 
     representation = represent_operation_with_local_depolarizing_noise(
-        ideal_circ, BASE_NOISE,
+        ideal_circ,
+        BASE_NOISE,
     )
 
     choi_unbiased_estimates = []
@@ -305,7 +308,9 @@ def test_sample_circuit_choi():
     # A simple 2-qubit circuit
     qreg = cirq.LineQubit.range(2)
     ideal_circ = cirq.Circuit(
-        cirq.X.on(qreg[0]), cirq.I.on(qreg[1]), cirq.CNOT.on(*qreg),
+        cirq.X.on(qreg[0]),
+        cirq.I.on(qreg[1]),
+        cirq.CNOT.on(*qreg),
     )
 
     noisy_circuit = ideal_circ.with_noise(cirq.depolarize(BASE_NOISE))
@@ -314,7 +319,8 @@ def test_sample_circuit_choi():
     noisy_choi = _operation_to_choi(noisy_circuit)
 
     rep_list = represent_operations_in_circuit_with_local_depolarizing_noise(
-        ideal_circuit=ideal_circ, noise_level=BASE_NOISE,
+        ideal_circuit=ideal_circ,
+        noise_level=BASE_NOISE,
     )
 
     choi_unbiased_estimates = []

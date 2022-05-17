@@ -348,7 +348,9 @@ def test_qiskit_run_factory_with_number_of_shots():
     shot_list = [10_000, 30_000]
 
     fac = inference.ExpFactory(
-        scale_factors=scale_factors, shot_list=shot_list, asymptote=0.5,
+        scale_factors=scale_factors,
+        shot_list=shot_list,
+        asymptote=0.5,
     )
 
     circuit = qiskit_measure(
@@ -362,7 +364,9 @@ def test_qiskit_run_factory_with_number_of_shots():
     )
     base = qiskit_executor(circuit)
     zne_value = fac.run(
-        circuit, qiskit_executor, scale_noise=scaling.fold_gates_at_random,
+        circuit,
+        qiskit_executor,
+        scale_noise=scaling.fold_gates_at_random,
     ).reduce()
 
     assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
@@ -381,7 +385,9 @@ def test_qiskit_mitigate_executor_with_shot_list():
     shot_list = [10_000, 30_000]
 
     fac = inference.ExpFactory(
-        scale_factors=scale_factors, shot_list=shot_list, asymptote=0.5,
+        scale_factors=scale_factors,
+        shot_list=shot_list,
+        asymptote=0.5,
     )
     mitigated_executor = mitigate_executor(qiskit_executor, factory=fac)
 

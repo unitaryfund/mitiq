@@ -64,10 +64,10 @@ def single_qubit_depolarizing_overhead(noise_level: float) -> float:
 def two_qubit_depolarizing_overhead(noise_level: float) -> float:
     """See [Temme2017]_ for more information.
 
-        .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
-            "Error mitigation for short-depth quantum circuits,"
-            *Phys. Rev. Lett.* **119**, 180509 (2017),
-            (https://arxiv.org/abs/1612.02058).
+    .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
+        "Error mitigation for short-depth quantum circuits,"
+        *Phys. Rev. Lett.* **119**, 180509 (2017),
+        (https://arxiv.org/abs/1612.02058).
     """
     epsilon = 16 / 15 * noise_level
     return (1 + 7 * epsilon / 8) / (1 - epsilon)
@@ -79,7 +79,8 @@ def test_single_qubit_representation_norm(gate: Gate, noise: float):
     q = LineQubit(0)
     optimal_norm = single_qubit_depolarizing_overhead(noise)
     norm = represent_operation_with_global_depolarizing_noise(
-        Circuit(gate(q)), noise,
+        Circuit(gate(q)),
+        noise,
     ).norm
     assert np.isclose(optimal_norm, norm)
 
@@ -90,7 +91,8 @@ def test_two_qubit_representation_norm(gate: Gate, noise: float):
     qreg = LineQubit.range(2)
     optimal_norm = two_qubit_depolarizing_overhead(noise)
     norm = represent_operation_with_global_depolarizing_noise(
-        Circuit(gate(*qreg)), noise,
+        Circuit(gate(*qreg)),
+        noise,
     ).norm
     assert np.isclose(optimal_norm, norm)
 
@@ -99,7 +101,8 @@ def test_three_qubit_depolarizing_representation_error():
     q0, q1, q2 = LineQubit.range(3)
     with pytest.raises(ValueError):
         represent_operation_with_global_depolarizing_noise(
-            Circuit(CCNOT(q0, q1, q2)), 0.05,
+            Circuit(CCNOT(q0, q1, q2)),
+            0.05,
         )
 
 
@@ -110,7 +113,8 @@ def test_depolarizing_representation_with_choi(gate: Gate, noise: float):
     qreg = LineQubit.range(gate.num_qubits())
     ideal_choi = _operation_to_choi(gate.on(*qreg))
     op_rep = represent_operation_with_global_depolarizing_noise(
-        Circuit(gate.on(*qreg)), noise,
+        Circuit(gate.on(*qreg)),
+        noise,
     )
     choi_components = []
     for noisy_op, coeff in op_rep.basis_expansion.items():
@@ -122,7 +126,7 @@ def test_depolarizing_representation_with_choi(gate: Gate, noise: float):
         sequence_choi = _circuit_to_choi(implementable_circ)
         choi_components.append(coeff * sequence_choi)
     combination_choi = np.sum(choi_components, axis=0)
-    assert np.allclose(ideal_choi, combination_choi, atol=10 ** -6)
+    assert np.allclose(ideal_choi, combination_choi, atol=10**-6)
 
 
 @pytest.mark.parametrize("noise", [0, 0.1, 0.7])
@@ -132,7 +136,8 @@ def test_local_depolarizing_representation_with_choi(gate: Gate, noise: float):
     qreg = LineQubit.range(gate.num_qubits())
     ideal_choi = _operation_to_choi(gate.on(*qreg))
     op_rep = represent_operation_with_local_depolarizing_noise(
-        Circuit(gate.on(*qreg)), noise,
+        Circuit(gate.on(*qreg)),
+        noise,
     )
     choi_components = []
     for noisy_op, coeff in op_rep.basis_expansion.items():
@@ -145,14 +150,15 @@ def test_local_depolarizing_representation_with_choi(gate: Gate, noise: float):
         sequence_choi = _circuit_to_choi(implementable_circ)
         choi_components.append(coeff * sequence_choi)
     combination_choi = np.sum(choi_components, axis=0)
-    assert np.allclose(ideal_choi, combination_choi, atol=10 ** -6)
+    assert np.allclose(ideal_choi, combination_choi, atol=10**-6)
 
 
 def test_three_qubit_local_depolarizing_representation_error():
     q0, q1, q2 = LineQubit.range(3)
     with pytest.raises(ValueError):
         represent_operation_with_local_depolarizing_noise(
-            Circuit(CCNOT(q0, q1, q2)), 0.05,
+            Circuit(CCNOT(q0, q1, q2)),
+            0.05,
         )
 
 
@@ -164,7 +170,8 @@ def test_represent_operations_in_circuit_global(circuit_type: str):
     circ = convert_from_mitiq(circ_mitiq, circuit_type)
 
     reps = represent_operations_in_circuit_with_global_depolarizing_noise(
-        ideal_circuit=circ, noise_level=0.1,
+        ideal_circuit=circ,
+        noise_level=0.1,
     )
 
     # For each operation in circ we should find its representation
@@ -187,7 +194,8 @@ def test_represent_operations_in_circuit_local(circuit_type: str):
     circ = convert_from_mitiq(circ_mitiq, circuit_type)
 
     reps = represent_operations_in_circuit_with_local_depolarizing_noise(
-        ideal_circuit=circ, noise_level=0.1,
+        ideal_circuit=circ,
+        noise_level=0.1,
     )
 
     for op in convert_to_mitiq(circ)[0].all_operations():
@@ -210,7 +218,8 @@ def test_represent_operations_in_circuit_local(circuit_type: str):
 )
 @pytest.mark.parametrize("circuit_type", ["cirq", "qiskit", "pyquil"])
 def test_represent_operations_in_circuit_with_measurements(
-    circuit_type: str, rep_function,
+    circuit_type: str,
+    rep_function,
 ):
     """Tests measurements in circuit are ignored (not represented)."""
     q0, q1 = LineQubit.range(2)
@@ -239,7 +248,8 @@ def test_represent_operations_in_circuit_with_measurements(
 
 
 @pytest.mark.parametrize(
-    "kraus_function", [global_depolarizing_kraus, local_depolarizing_kraus],
+    "kraus_function",
+    [global_depolarizing_kraus, local_depolarizing_kraus],
 )
 def test_depolarizing_kraus(kraus_function):
     expected = [
@@ -254,4 +264,4 @@ def test_depolarizing_kraus(kraus_function):
         for noise_level in (0.1, 1):
             kraus_ops = kraus_function(noise_level, num_qubits)
             dual_channel = sum([k.conj().T @ k for k in kraus_ops])
-            assert np.allclose(dual_channel, np.eye(2 ** num_qubits))
+            assert np.allclose(dual_channel, np.eye(2**num_qubits))

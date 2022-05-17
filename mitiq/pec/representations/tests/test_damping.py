@@ -41,7 +41,8 @@ def test_single_qubit_representation_norm(gate: Gate, noise: float):
     q = LineQubit(0)
     optimal_norm = (1 + noise) / (1 - noise)
     norm = _represent_operation_with_amplitude_damping_noise(
-        Circuit(gate(q)), noise,
+        Circuit(gate(q)),
+        noise,
     ).norm
     assert np.isclose(optimal_norm, norm)
 
@@ -52,14 +53,17 @@ def test_single_qubit_representation_norm(gate: Gate, noise: float):
 @pytest.mark.parametrize("noise", [0, 0.1, 0.7])
 @pytest.mark.parametrize("gate", [X, Y, Z, H])
 def test_amplitude_damping_representation_with_choi(
-    gate: Gate, noise: float, circuit_type: str,
+    gate: Gate,
+    noise: float,
+    circuit_type: str,
 ):
     """Tests the representation by comparing exact Choi matrices."""
     q = LineQubit(0)
     ideal_circuit = convert_from_mitiq(Circuit(gate.on(q)), circuit_type)
     ideal_choi = _circuit_to_choi(Circuit(gate.on(q)))
     op_rep = _represent_operation_with_amplitude_damping_noise(
-        ideal_circuit, noise,
+        ideal_circuit,
+        noise,
     )
     choi_components = []
     for noisy_op, coeff in op_rep.basis_expansion.items():
@@ -72,7 +76,7 @@ def test_amplitude_damping_representation_with_choi(
         choi_components.append(coeff * sequence_choi)
 
     combination_choi = np.sum(choi_components, axis=0)
-    assert np.allclose(ideal_choi, combination_choi, atol=10 ** -8)
+    assert np.allclose(ideal_choi, combination_choi, atol=10**-8)
 
 
 def test_damping_kraus():
@@ -88,4 +92,4 @@ def test_damping_kraus():
         for noise_level in (0.1, 1):
             kraus_ops = amplitude_damping_kraus(noise_level, num_qubits)
             dual_channel = sum([k.conj().T @ k for k in kraus_ops])
-            assert np.allclose(dual_channel, np.eye(2 ** num_qubits))
+            assert np.allclose(dual_channel, np.eye(2**num_qubits))

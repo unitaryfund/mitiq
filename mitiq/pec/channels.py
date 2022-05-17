@@ -126,12 +126,13 @@ def matrix_to_vector(density_matrix: np.ndarray) -> np.ndarray:
 
 
 def _safe_sqrt(
-    perfect_square: int, error_str: str = "The input must be a square number.",
+    perfect_square: int,
+    error_str: str = "The input must be a square number.",
 ) -> int:
     """Takes the square root of the input integer and
     raises an error if the input is not a perfect square."""
     square_root = int(np.round(np.sqrt(perfect_square)))
-    if square_root ** 2 != perfect_square:
+    if square_root**2 != perfect_square:
         raise ValueError(error_str)
     return square_root
 
@@ -182,7 +183,7 @@ def choi_to_super(choi_state: np.ndarray) -> np.ndarray:
 
     choi_kl_ij = choi_state.reshape(dim, dim, dim, dim)
     choi_ki_lj = choi_kl_ij.transpose(0, 2, 1, 3)
-    super_not_normalized = choi_ki_lj.reshape(dim ** 2, dim ** 2)
+    super_not_normalized = choi_ki_lj.reshape(dim**2, dim**2)
     return dim * super_not_normalized
 
 

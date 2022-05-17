@@ -39,7 +39,10 @@ def test_post_select_inverted():
     assert post_select(res, lambda bits: sum(bits) == 1).result == [[0, 0, 1]]
     assert post_select(
         res, lambda bits: sum(bits) == 1, inverted=True
-    ).result == [[1, 1, 0], [0, 0, 0],]
+    ).result == [
+        [1, 1, 0],
+        [0, 0, 0],
+    ]
 
     assert post_select(res, lambda bits: sum(bits) == 3).result == []
     assert (

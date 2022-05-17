@@ -1,7 +1,7 @@
 # <a href="https://github.com/unitaryfund/mitiq"><img src="https://github.com/unitaryfund/mitiq/blob/master/docs/source/img/mitiq-logo.png?raw=true" alt="Mitiq logo" width="350"/></a>
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-28-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-31-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![Documentation Status](https://readthedocs.org/projects/mitiq/badge/?version=stable)](https://mitiq.readthedocs.io/en/stable/)
@@ -23,7 +23,7 @@ Error mitigation seeks to reduce these effects at the software level by
 compiling quantum programs in clever ways.
 
 Want to know more? Check out our
-[documentation](https://mitiq.readthedocs.io/en/stable/guide/guide-overview.html) and chat with us on [Discord](http://discord.unitary.fund).
+[documentation](https://mitiq.readthedocs.io/en/stable/guide/guide.html) and chat with us on [Discord](http://discord.unitary.fund).
 
 > Do you use near-term quantum hardware? Have you tried Mitiq? Either way, take our survey and help make Mitiq better! [bit.ly/mitiq-survey](https://bit.ly/mitiq-survey)
 
@@ -65,7 +65,7 @@ Error (w/o  Mitiq): 0.0688
 Error (with Mitiq): 0.0002
 ```
 
-See our [guides](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html) and [examples](https://mitiq.readthedocs.io) for more explanation, techniques, and benchmarks.
+See our [guides](https://mitiq.readthedocs.io/en/stable/guide/guide.html) and [examples](https://mitiq.readthedocs.io) for more explanation, techniques, and benchmarks.
 The examples and other notebooks can be run interactively on the cloud with [mybinder.org](https://mybinder.org/v2/gh/unitaryfund/mitiq/master?filepath=%2Fdocs%2Fsource%2Fexamples).
 
 ## Quick Tour
@@ -74,9 +74,9 @@ The examples and other notebooks can be run interactively on the cloud with [myb
 
 | Technique                                 | Documentation                                                                                                   | Mitiq module                                                            | Paper Reference(s)                                                                                  |
 |-------------------------------------------|-----------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| Zero-noise extrapolation                  | [ZNE](https://mitiq.readthedocs.io/en/stable/guide/guide-zne.html)                                              | [mitiq.zne](https://github.com/unitaryfund/mitiq/tree/master/mitiq/zne) | [1611.09301](https://arxiv.org/abs/1611.09301)<br>[1612.02058](https://arxiv.org/abs/1612.02058)<br>[1805.04492](https://arxiv.org/abs/1805.04492)|
-| Probabilistic error cancellation          | [PEC](https://mitiq.readthedocs.io/en/stable/guide/guide-getting-started.html#probabilistic-error-cancellation) | [mitiq.pec](https://github.com/unitaryfund/mitiq/tree/master/mitiq/pec) | [1612.02058](https://arxiv.org/abs/1612.02058)<br>[1712.09271](https://arxiv.org/abs/1712.09271)<br>[1905.10135](https://arxiv.org/abs/1905.10135)|
-| (Variable-noise) Clifford data regression | [CDR](https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html)                                             | [mitiq.cdr](https://github.com/unitaryfund/mitiq/tree/master/mitiq/cdr) | [2005.10189](https://arxiv.org/abs/2005.10189)<br>[2011.01157](https://arxiv.org/abs/2011.01157)    |
+| Zero-noise extrapolation                  | [ZNE](https://mitiq.readthedocs.io/en/latest/guide/zne.html)                                              | [mitiq.zne](https://github.com/unitaryfund/mitiq/tree/master/mitiq/zne) | [1611.09301](https://arxiv.org/abs/1611.09301)<br>[1612.02058](https://arxiv.org/abs/1612.02058)<br>[1805.04492](https://arxiv.org/abs/1805.04492)|
+| Probabilistic error cancellation          | [PEC](https://mitiq.readthedocs.io/en/latest/guide/pec.html) | [mitiq.pec](https://github.com/unitaryfund/mitiq/tree/master/mitiq/pec) | [1612.02058](https://arxiv.org/abs/1612.02058)<br>[1712.09271](https://arxiv.org/abs/1712.09271)<br>[1905.10135](https://arxiv.org/abs/1905.10135)|
+| (Variable-noise) Clifford data regression | [CDR](https://mitiq.readthedocs.io/en/latest/guide/cdr.html)                                             | [mitiq.cdr](https://github.com/unitaryfund/mitiq/tree/master/mitiq/cdr) | [2005.10189](https://arxiv.org/abs/2005.10189)<br>[2011.01157](https://arxiv.org/abs/2011.01157)    |
 | Dynamical decoupling                      | (In progress)                                                                                                   | (In progress)                                                           | [9803057](https://arxiv.org/abs/quant-ph/9803057)<br>[1807.08768](https://arxiv.org/abs/1807.08768) |
 
 See our [roadmap](https://github.com/unitaryfund/mitiq/projects/5) for additional candidate techniques to implement. If there is a technique you are looking for, please file a [feature request](https://github.com/unitaryfund/mitiq/issues/new?assignees=&labels=feature-request&template=feature_request.md&title=).
@@ -154,6 +154,11 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/francespoblete"><img src="https://avatars.githubusercontent.com/u/65167390?v=4?s=100" width="100px;" alt=""/><br /><sub><b>francespoblete</b></sub></a><br /><a href="#design-francespoblete" title="Design">🎨</a></td>
     <td align="center"><a href="https://github.com/Misty-W"><img src="https://avatars.githubusercontent.com/u/82074193?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Misty-W</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=Misty-W" title="Code">💻</a> <a href="#example-Misty-W" title="Examples">💡</a></td>
     <td align="center"><a href="https://github.com/AkashNarayanan"><img src="https://avatars.githubusercontent.com/u/83135130?v=4?s=100" width="100px;" alt=""/><br /><sub><b>AkashNarayanan B</b></sub></a><br /><a href="#infra-AkashNarayanan" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/L-P-B"><img src="https://avatars.githubusercontent.com/u/32333736?v=4?s=100" width="100px;" alt=""/><br /><sub><b>L-P-B</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=L-P-B" title="Tests">⚠️</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=L-P-B" title="Code">💻</a></td>                                    
+    <td align="center"><a href="https://github.com/Rahul-Mistri"><img src="https://avatars.githubusercontent.com/u/52910775?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rahul Mistri</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=Rahul-Mistri" title="Tests">⚠️</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=Rahul-Mistri" title="Code">💻</a></td>
+    <td align="center"><a href="http://vtomole.com"><img src="https://avatars.githubusercontent.com/u/8405160?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Victory Omole</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=vtomole" title="Tests">⚠️</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=vtomole" title="Code">💻</a></td>
   </tr>
 </table>
 

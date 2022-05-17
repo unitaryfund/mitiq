@@ -14,10 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from mitiq.interface.mitiq_cirq.cirq_utils import (
-    execute,
-    execute_with_shots,
-    execute_with_depolarizing_noise,
-    execute_with_shots_and_depolarizing_noise,
     sample_bitstrings,
     compute_density_matrix,
+    execute_with_depolarizing_noise,
 )

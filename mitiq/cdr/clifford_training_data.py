@@ -86,8 +86,9 @@ def generate_training_circuits(
             if not cirq.has_stabilizer_effect(op)
         ]
     )
+
     if len(non_clifford_indices_and_ops) == 0:
-        raise ValueError("Circuit is already Clifford.")
+        return [circuit] * num_training_circuits
 
     non_clifford_indices = np.int32(non_clifford_indices_and_ops[:, 0])
     non_clifford_ops = non_clifford_indices_and_ops[:, 1]
@@ -300,7 +301,8 @@ def _replace(
     return [
         cirq.ops.rz(a).on(*q)
         for (a, q) in zip(
-            clifford_angles, [op.qubits for op in non_clifford_ops],
+            clifford_angles,
+            [op.qubits for op in non_clifford_ops],
         )
     ]
 
@@ -343,7 +345,10 @@ def _closest_clifford(angles: np.ndarray) -> float:
 
 
 @np.vectorize
-def _is_clifford_angle(angles: np.ndarray, tol: float = 10 ** -5,) -> bool:
+def _is_clifford_angle(
+    angles: np.ndarray,
+    tol: float = 10**-5,
+) -> bool:
     """Function to check if a given angle is Clifford.
 
     Args:
@@ -375,7 +380,7 @@ def _angle_to_proximities(angle: np.ndarray, sigma: float) -> List[float]:
     for exponent in range(4):
         if exponent == 0:
             exponent = 4
-        diff = np.linalg.norm(rz_matrix - s_matrix ** exponent)
+        diff = np.linalg.norm(rz_matrix - s_matrix**exponent)
         dists.append(np.exp(-((diff / sigma) ** 2)))
     return dists
 
@@ -399,7 +404,9 @@ def _angle_to_proximity(angle: np.ndarray, sigma: float) -> float:
 
 @np.vectorize
 def _probabilistic_angle_to_clifford(
-    angles: np.ndarray, sigma: float, random_state: np.random.RandomState,
+    angles: np.ndarray,
+    sigma: float,
+    random_state: np.random.RandomState,
 ) -> float:
     """Returns a Clifford angle sampled from the distribution
 

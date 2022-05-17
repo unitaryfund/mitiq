@@ -154,12 +154,12 @@ def test_generate_training_circuits_bad_methods():
 
 
 def test_generate_training_circuits_with_clifford_circuit():
-    with pytest.raises(ValueError, match="Circuit is already Clifford."):
-        generate_training_circuits(
-            Circuit(cirq.ops.rx(0.0).on(cirq.LineQubit(0))),
-            num_training_circuits=1,
-            fraction_non_clifford=0.0,
-        )
+    circuit = Circuit(cirq.ops.rx(0.0).on(cirq.LineQubit(0)))
+    assert generate_training_circuits(
+        circuit,
+        num_training_circuits=2,
+        fraction_non_clifford=0.0,
+    ) == [circuit, circuit]
 
 
 @pytest.mark.parametrize("method_select", ["uniform", "gaussian"])

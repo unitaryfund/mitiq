@@ -45,7 +45,7 @@ The start of any release is drafting the changelog and bumping the version
 number.
 
 ^^^^^^^^^^^^^^^^^^^^
-Verify the changelog
+Update the changelog
 ^^^^^^^^^^^^^^^^^^^^
 
 This task has two parts:
@@ -65,9 +65,7 @@ Bump version in VERSION.txt
 When releasing a new version, one must update the ``VERSION.txt``
 file which is the single source of truth for version information. We follow 
 SemVer, so typically a release will involve changing the version from
-``vX.Y.Zdev`` (development) to ``vX.Y.Z`` (released). This will be reflected as
-a change in stable release versions from ``vX.(Y-1).Z`` to ``vX.Y.Z``,
-in the case of a MINOR version increase.
+``vX.Y.Zdev`` (development) to ``vX.Y.Z`` (released).
 
 --------------
 Do the release
@@ -77,8 +75,8 @@ Do the release
 Create a new tag
 ^^^^^^^^^^^^^^^^
 
-Once the the changelog and `version.txt` are ready, checkout and pull the
-latest on the master branch. Then once you are up to date, tag the most recent
+Once the above changes (new changelog and new version) are merged into the master branch, checkout and pull the
+latest on the master branch from your local machine. Then once you are up to date, tag the most recent
 commit on master (using ``git tag``) with a tag that matches the number ``VERSION.txt``
 (with a preceding "v", so ``0.1.0`` is ``v0.1.0``) and push this tag to the
 Github repository.
@@ -103,19 +101,22 @@ action, triggered by the tag you made in the previous step
 review it and publish the release.
 
     - GitHub will create compressed files with the repository.
+    - GitHub adds the full changelog in the draft release. Please keep the content related to the new release and remove the content related to previous releases.
 
 .. note::
     If all the above steps have been successfully completed,
     ReadTheDocs (RTD) will automatically build new ``latest`` and ``stable`` versions
     of the documentation. So, no additional steps are needed for updating RTD. You can
     verify changes have been updating by viewing `<https://mitiq.readthedocs.io/>`__.
+    Note that this may require a significant amount of time. You can check the
+    build status `here <https://readthedocs.org/projects/mitiq/builds/>`__ 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Release the new version on PyPI
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Once the GitHub release is published, the release is also published on PyPI 
-by the `publish-pypi` action.
+by the `publish-pypi` action. This may require a few minutes. 
 If it seems like it didn't push a new version to PyPI, you can trigger it manually.
 Go to `<https://github.com/unitaryfund/mitiq/actions/workflows/publish-pypi.yml>`__ and use
 the "Run Workflow" button to publish the new version on PyPI.
@@ -134,14 +135,6 @@ In case the action for releasing on PyPI fails, the Python commands to release M
 .. note::
     You need to be a registered maintainer of Mitiq project on PyPI to upload
     a new release on PyPI from your local machine.
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Start the new version on Github
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. note::
-    You need to have write access to the Mitiq Github repository to make
-    a new release.
 
 ------------------------------------------------
 Update the new development version
