@@ -19,6 +19,7 @@ import platform
 import warnings
 from pkg_resources import parse_requirements
 import os
+import requests
 
 from cirq import __version__ as cirq_version
 from numpy import __version__ as numpy_version
@@ -26,7 +27,10 @@ from scipy import __version__ as scipy_version
 
 from mitiq import __version__ as mitiq_version
 
-_dir_of_this_file = os.path.dirname(os.path.abspath(__file__))
+
+class FailedToGetMitiqRequirements(Exception):
+    pass
+
 
 def installed_packages() -> Dict[str, str]:
     """Returns the versions of (core and optional) packages
@@ -86,10 +90,31 @@ def latest_supported_packages() -> Dict[str, str]:
         "pennylane-qiskit",
     ]
 
-    with open(f"{_dir_of_this_file}/../requirements.txt", "r") as f:
-        _requirements = f.read().strip()
-    with open(f"{_dir_of_this_file}/../dev_requirements.txt", "r") as f:
-        _dev_requirements = f.read().strip()
+    try:
+        # This should work if Mitiq is installed from source
+        _dir_of_this_file = os.path.dirname(os.path.abspath(__file__))
+        with open(f"{_dir_of_this_file}/../requirements.txt", "r") as f:
+            _requirements = f.read()
+        with open(f"{_dir_of_this_file}/../dev_requirements.txt", "r") as f:
+            _dev_requirements = f.read()
+    except FileNotFoundError:
+        # This should work if Mitiq is installed from PiPy
+        try:
+            url_rep = "https://raw.githubusercontent.com/unitaryfund/mitiq/"
+            url_req = url_rep + "v" + mitiq_version + "/requirements.txt"
+            url_dev_req = (
+                url_rep + "v" + mitiq_version + "/dev_requirements.txt"
+            )
+            _requirements = requests.get(url_req).text
+            _dev_requirements = requests.get(url_dev_req).text
+        except requests.exceptions.ConnectionError:
+            raise FailedToGetMitiqRequirements()
+
+    if not _requirements or not _dev_requirements:
+        raise FailedToGetMitiqRequirements()
+
+    if _requirements[:3] == "404" or _dev_requirements[3] == "404":
+        raise FailedToGetMitiqRequirements()
 
     latest_core = {
         req.project_name: req.specs[0][1]
