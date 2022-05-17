@@ -14,10 +14,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Information about Mitiq and dependencies."""
-import platform
 from typing import Dict
+import platform
 import warnings
 from pkg_resources import parse_requirements
+import os
 
 from cirq import __version__ as cirq_version
 from numpy import __version__ as numpy_version
@@ -83,13 +84,20 @@ def latest_supported_packages() -> Dict[str, str]:
         "pennylane",
         "pennylane-qiskit",
     ]
+
+    _dir_of_this_file = os.path.dirname(os.path.abspath(__file__))
+    with open(f"{_dir_of_this_file}/../requirements.txt", "r") as f:
+        _requirements = f.read().strip()
+    with open(f"{_dir_of_this_file}/../dev_requirements.txt", "r") as f:
+        _dev_requirements = f.read().strip()
+
     latest_core = {
         req.project_name: req.specs[0][1]
-        for req in parse_requirements(open("requirements.txt"))
+        for req in parse_requirements(_requirements)
     }
     latest_dev = {
         req.project_name: req.specs[0][1]
-        for req in parse_requirements(open("dev_requirements.txt"))
+        for req in parse_requirements(_dev_requirements)
         if req.project_name in optional_pkg
     }
     return dict(**latest_core, **latest_dev)

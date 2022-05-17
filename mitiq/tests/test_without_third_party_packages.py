@@ -21,14 +21,15 @@ mitiq.interface.mitiq_[package], where [package] is any supported package that
 interfaces with Mitiq (see mitiq.SUPPORTED_PROGRAM_TYPES).
 """
 from abc import ABCMeta
+import os
+
+import mitiq
 
 
 def test_import():
     """Simple test that Mitiq can be imported without any (or all) supported
     program types.
     """
-    import mitiq
-
     if isinstance(mitiq.QPROGRAM, ABCMeta):
         pass  # If only Cirq is installed, QPROGRAM is not a typing.Union.
     else:
@@ -39,4 +40,24 @@ def test_import():
         )
 
 
-# TODO: More tests wanted!
+def test_import_in_different_path():
+    """Check mitiq can be imported in a different path."""
+    initial_path = os.getcwd()
+    os.chdir("../")
+    import mitiq
+
+    os.chdir(initial_path)
+    assert mitiq.QPROGRAM
+
+
+def test_mitiq_about():
+    """Check mitiq.about() runs without errors."""
+    mitiq.about()
+
+
+def test_mitiq_about_in_different_path():
+    """Check mitiq.about() runs without errors in a different path."""
+    initial_path = os.getcwd()
+    os.chdir("../")
+    mitiq.about()
+    os.chdir(initial_path)
