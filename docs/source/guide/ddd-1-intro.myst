@@ -47,6 +47,15 @@ circuit = Circuit(
     rz(-0.23).on(a),
     CNOT.on(b, a),
     rx(-0.112).on(a),
+    rx(0.1).on(a),
+    rz(0.4).on(a),
+    rx(-0.72).on(a),
+    rz(0.2).on(a),
+    rx(-0.1).on(b),
+    CNOT.on(a, b),
+    rz(-0.23).on(a),
+    CNOT.on(b, a),
+    rx(-0.112).on(a),
     )
 
 print(circuit)
@@ -62,7 +71,7 @@ import numpy as np
 from cirq import DensityMatrixSimulator, amplitude_damp
 from mitiq.interface import convert_to_mitiq
 
-def execute(circuit, noise_level=0.05):
+def execute(circuit, noise_level=0.1):
     """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit
     executed with depolarizing noise.
     """
@@ -80,13 +89,13 @@ expectation values.
 # Compute the expectation value of the |0><0| observable.
 noisy_value = execute(circuit)
 ideal_value = execute(circuit, noise_level=0.0)      
-print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.5f}")
+print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.3}")
 ```
 
 ## Select rule for determining the DDD sequence to be applied in each slack window
 ```{code-cell} ipython3
 from mitiq import ddd
-rules = ddd.rules.xx
+rules = ddd.rules.yy
 ```
 
 ## Apply DDD
