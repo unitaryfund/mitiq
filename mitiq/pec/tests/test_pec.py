@@ -375,7 +375,6 @@ def test_precision_option_in_execute_with_pec(precision: float):
         random_state=1,
     )
     # The error should scale as precision
-    print(pec_data["pec_error"] / precision)
     assert np.isclose(pec_data["pec_error"] / precision, 1.0, atol=0.15)
 
     # Check precision is ignored when num_samples is given.

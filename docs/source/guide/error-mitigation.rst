@@ -84,7 +84,7 @@ of interest :math:`\langle X\rangle_{\text{ideal}}` after the action of an ideal
 :math:`\{\mathcal{\mathcal G}_i\}_{i=1}^L`. To do this in PEC, we sample a noisy operation
 :math:`\mathcal{O}_{\alpha}` for each ideal gate :math:`\mathcal{G}_i`
 with probability :math:`P_i(\alpha)`. This sampling produces a sequence of noisy operations
-:math:`\{\mathcal{O}_{\alpha_i}\}_{i=1}^L`) whose execution produces the
+:math:`\{\mathcal{O}_{\alpha_i}\}_{i=1}^L` whose execution produces the
 final mixed state :math:`\rho_f`. Then, by measuring the observable :math:`X`, setting
 :math:`\gamma_{\text{tot}} := \prod_{i}^L \gamma_i` and
 :math:`\sigma_{\text{tot}} = \prod_{i=1}^L \sigma_i(\alpha)`, we can obtain an unbiased
@@ -247,7 +247,7 @@ A list of research articles academic resources on error mitigation:
 
 - On **randomization methods**:
    - Randomized compiling with twirling gates, J. Wallman *et al.*, *Phys. Rev. A*, 2016 :cite:`Wallman_2016_PRA`
-   - Porbabilistic error correction, K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
+   - Probabilistic error correction, K. Temme *et al.*, *Phys. Rev. Lett.*, 2017 :cite:`Temme_2017_PRL`
    - Practical proposal, S. Endo *et al.*, *Phys. Rev. X*, 2018 :cite:`Endo_2018_PRX`
    - Experiment on trapped ions, S. Zhang  *et al.*, *Nature Comm.* 2020 :cite:`Zhang_2020_NatComm`
    - Experiment with gate set tomography on a supeconducting circuit device, J. Sun *et al.*, 2019 arXiv :cite:`Sun_2021_PRAppl`

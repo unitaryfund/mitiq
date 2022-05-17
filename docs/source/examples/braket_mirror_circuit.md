@@ -132,21 +132,20 @@ def compile_to_rigetti_gateset(circuit: Circuit) -> Circuit:
             compiled.add_instruction(gates.Instruction(gates.Rx(np.pi / 2), instr.target))
         elif isinstance(instr.operator, gates.Ry):
             compiled.add_instruction(gates.Instruction(gates.Rx(-np.pi / 2), instr.target))
-            compiled.add_instruction(gates.Instruction(gates.Rz(instr.operator.angle), instr.target))
+            compiled.add_instruction(gates.Instruction(gates.Rz(-instr.operator.angle), instr.target))
             compiled.add_instruction(gates.Instruction(gates.Rx(np.pi / 2), instr.target))
         elif isinstance(instr.operator, gates.Y):
             compiled.add_instruction(gates.Instruction(gates.Rx(-np.pi / 2), instr.target))
             compiled.add_instruction(gates.Instruction(gates.Rz(np.pi), instr.target))
             compiled.add_instruction(gates.Instruction(gates.Rx(np.pi / 2), instr.target))
         elif isinstance(instr.operator, gates.X):
-            compiled.add_instruction(gates.Instruction(gates.Rx(np.pi / 2), instr.target))
-            compiled.add_instruction(gates.Instruction(gates.Rx(np.pi / 2), instr.target))
+            compiled.add_instruction(gates.Instruction(gates.Rx(np.pi), instr.target))
         elif isinstance(instr.operator, gates.Z):
             compiled.add_instruction(gates.Instruction(gates.Rz(np.pi), instr.target))
         elif isinstance(instr.operator, gates.S):
-            compiled.add_instruction(gates.Instruction(gates.Rz(np.pi / 4), instr.target))
+            compiled.add_instruction(gates.Instruction(gates.Rz(np.pi / 2), instr.target))
         elif isinstance(instr.operator, gates.Si):
-            compiled.add_instruction(gates.Instruction(gates.Rz(-np.pi / 4), instr.target))
+            compiled.add_instruction(gates.Instruction(gates.Rz(-np.pi / 2), instr.target))
         else:
             compiled.add_instruction(instr)
     

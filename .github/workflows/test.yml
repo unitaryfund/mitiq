@@ -57,13 +57,7 @@ jobs:
           make docs
           make doctest
           make linkcheck
-    # Push the book's HTML to github-pages
-      - name: GitHub Pages action
-        if: github.event.pull_request.head.repo.full_name == github.repository
-        uses: peaceiris/actions-gh-pages@v3.8.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/build/html
+
 
   # This is to make sure Mitiq works without optional 3rd party packages like Qiskit, pyQuil, etc.
   # E.g., if we accidentally `import qiskit` in Mitiq where we shouldn't, this test will catch that.
@@ -141,6 +135,6 @@ jobs:
       - name: Submit coverage report to Codecov
         # Only submit to Codecov once.
         if: ${{ matrix.python-version == 3.8 }}
-        uses: codecov/codecov-action@v2.1.0
+        uses: codecov/codecov-action@v3.1.0
         with:
           fail_ci_if_error: true

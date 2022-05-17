@@ -1,12 +1,45 @@
 # Changelog
 
-## Version 0.15.0  (In development)
+## Version 0.16.0  (In development)
+
+## Version 0.15.0 (April 29th, 2022)
+
+### Summary
+This milestone focused on updating dependencies and making progress on two new features, dynamical decoupling and learning based PEC. For dynamical decoupling, high-level functions and rules were added. For learning-based PEC, a function calculating representations with a biased (combination of depolarizing and dephasing) noise model was added. Several high priority bugs and issues were also fixed.
+
+Special thanks to new contributors @RubidgeCarrie and @nickdgardner for their contributions to this release!
+
+### All Changes
+
+- Add digital dynamical decoupling high-level functions (@andreamari, gh-1251)
+- Fix qubit naming in OperationRepresentations for Qiskit circuits (@Misty-W, gh-1238)
+- Fix broken link in contributing guide (@Misty-W, gh-1257)
+- Insert sequences for dynamical decoupling (@Aaron-Robertson, gh-1221)
+- Short sequences in DDD API docs (@andreamari, gh-1237)
+- Update pennylane-qiskit requirement from ~=0.22.0 to ~=0.23.0 (@dependabot, gh-1249)
+- Update qiskit requirement from ~=0.36.0 to ~=0.36.1 (@dependabot, gh-1242)
+- Update pennylane requirement from ~=0.22.2 to ~=0.23.0 (@dependabot, gh-1248)
+- Move the gh pages deploy to a manually triggered action (@crazy4pi314, gh-1243)
+- Update AUTHORS (@nickdgardner, gh-1239)
+- fix typo (@nickdgardner, gh-1240)
+- Add DDD to Api-Doc, fixes #1209 (@nathanshammah, gh-1226)
+- Add rules for dynamical decoupling (@Aaron-Robertson, gh-1202)
+- Fix compilation to native gateset in Braket notebook (@andreamari, gh-1225)
+- Update amazon-braket-sdk requirement from ~=1.17.0 to ~=1.19.0 (@ dependabot, 1235)
+- Function to represent OperationRepresentations for biased noise (@Misty-W, gh-1233)
+- Bump codecov/codecov-action from 2.1.0 to 3.0.0 (@dependabot, gh-1216)
+- Bump actions/stale from 4 to 5 (@dependabot, gh-1217)
+- Update sphinxcontrib-bibtex requirement from ~=2.4.1 to ~=2.4.2 (@dependabot, gh-1218)
+- Update cirq requirement from ~=0.14.0 to ~=0.14.1 @dependabot, gh-1219)
+- Added citiation file for the repo (RubidgeCarrie, gh-1200)
+- Add mitigate_executor and cdr_decorator to mitiq.cdr (@Aaron-Robertson, gh-1204)
+- Update qiskit requirement from ~=0.35.0 to ~=0.36.0 (@dependabot, gh-1213)
 
 ## Version 0.14.0  (April 6th, 2022)
 
 ### Summary
 
-This milestone focused on updating dependencies and making progress on two new features, dynamical decoupling and learning based error mitigation techniques. A number of high priority bugs and issues alo were fixed.
+This milestone focused on updating dependencies and making progress on two new features, dynamical decoupling and learning based error mitigation techniques. A number of high priority bugs and issues also were fixed.
 
 ### All Changes
 
