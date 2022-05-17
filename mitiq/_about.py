@@ -26,6 +26,7 @@ from scipy import __version__ as scipy_version
 
 from mitiq import __version__ as mitiq_version
 
+_dir_of_this_file = os.path.dirname(os.path.abspath(__file__))
 
 def installed_packages() -> Dict[str, str]:
     """Returns the versions of (core and optional) packages
@@ -85,7 +86,6 @@ def latest_supported_packages() -> Dict[str, str]:
         "pennylane-qiskit",
     ]
 
-    _dir_of_this_file = os.path.dirname(os.path.abspath(__file__))
     with open(f"{_dir_of_this_file}/../requirements.txt", "r") as f:
         _requirements = f.read().strip()
     with open(f"{_dir_of_this_file}/../dev_requirements.txt", "r") as f:
