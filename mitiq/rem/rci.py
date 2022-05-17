@@ -17,16 +17,19 @@
 
 from typing import Callable, Iterable, List, Optional, Sequence, Tuple, Union
 
-from functools import partial
+from functools import partial, wraps
 import numpy as np
 
-from mitiq import Executor, Observable, QPROGRAM
-from mitiq.rem import MeasurementResult
+from mitiq import (
+    Executor,
+    Observable,
+    QPROGRAM,
+    MeasurementResult,
+)
 
 from cirq.experiments.single_qubit_readout_calibration_test import (
     NoisySingleQubitReadoutSampler,
 )
-from cirq import DensityMatrixSimulator
 from cirq.experiments.readout_confusion_matrix import measure_confusion_matrix
 from cirq.sim import sample_state_vector
 from cirq.qis.states import to_valid_state_vector
@@ -53,10 +56,9 @@ def execute_with_rci(
     `circuit` with the executor function.
 
     Args:
-        circuit: Quantum program to execute with error mitigation.
-        executor: A ``mitiq.Executor`` or a function which inputs a (list
-            of) quantum circuits and outputs a (list of)
-            ``mitiq.rem.MeasurementResult``s.
+        executor: A Mitiq executor that executes a circuit and returns the
+            unmitigated ``MeasurementResult``.
+        observable: Observable to compute the expectation value of.
         inverse_confusion_matrix: The inverse confusion matrix to apply to the
             probability vector that represents the noisy measurement results.
             If None, then an inverse confusion matrix will be generated
@@ -64,7 +66,6 @@ def execute_with_rci(
         p0: Probability of flipping a 0 to a 1.
         p1: Probability of flipping a 1 to a 0.
     """
-
     if not isinstance(executor, Executor):
         executor = Executor(executor)
 
@@ -107,3 +108,89 @@ def execute_with_rci(
     result = MeasurementResult(adjusted_result, noisy_result.qubit_indices)
     return observable._expectation_from_measurements([result])
 
+
+def mitigate_executor(
+    executor: Callable[[QPROGRAM], MeasurementResult],
+    observable: Optional[Observable] = None,
+    *,
+    inverse_confusion_matrix: Optional[MatrixLike] = None,
+    p0: float = 0.01,
+    p1: float = 0.01,
+) -> Callable[[QPROGRAM], float]:
+    """Returns a modified version of the input 'executor' which is
+    error-mitigated with readout confusion inversion (RCI).
+
+    Args:
+        executor: A Mitiq executor that executes a circuit and returns the
+            unmitigated ``MeasurementResult``.
+        observable: Observable to compute the expectation value of.
+        inverse_confusion_matrix: The inverse confusion matrix to apply to the
+            probability vector that represents the noisy measurement results.
+            If None, then an inverse confusion matrix will be generated
+            utilizing the same `executor`.
+        p0: Probability of flipping a 0 to a 1.
+        p1: Probability of flipping a 1 to a 0.
+
+    Returns:
+        The error-mitigated version of the input executor.
+    """
+
+    @wraps(executor)
+    def new_executor(qp: QPROGRAM) -> float:
+        return execute_with_rci(
+            qp,
+            executor,
+            observable,
+            inverse_confusion_matrix=inverse_confusion_matrix,
+            p0=p0,
+            p1=p1,
+        )
+
+    return new_executor
+
+
+def rci_decorator(
+    observable: Optional[Observable] = None,
+    *,
+    inverse_confusion_matrix: Optional[MatrixLike] = None,
+    p0: float = 0.01,
+    p1: float = 0.01,
+) -> Callable[
+    [Callable[[QPROGRAM], MeasurementResult]], Callable[[QPROGRAM], float]
+]:
+    """Decorator which adds an error-mitigation layer based on readout
+    confusion inversion (RCI) to an executor function, i.e., a function
+    which executes a quantum circuit with an arbitrary backend and returns
+    a ``MeasurementResult``.
+
+    Args:
+        observable: Observable to compute the expectation value of.
+        inverse_confusion_matrix: The inverse confusion matrix to apply to the
+            probability vector that represents the noisy measurement results.
+            If None, then an inverse confusion matrix will be generated
+            utilizing the same `executor`.
+        p0: Probability of flipping a 0 to a 1.
+        p1: Probability of flipping a 1 to a 0.
+
+    Returns:
+        The error-mitigating decorator to be applied to an executor function.
+    """
+    # Raise an error if the decorator is used without parenthesis
+    if callable(observable):
+        raise TypeError(
+            "Decorator must be used with parentheses (i.e., @rci_decorator()) "
+            "even if no explicit arguments are passed."
+        )
+
+    def decorator(
+        executor: Callable[[QPROGRAM], MeasurementResult]
+    ) -> Callable[[QPROGRAM], float]:
+        return mitigate_executor(
+            executor,
+            observable,
+            inverse_confusion_matrix=inverse_confusion_matrix,
+            p0=p0,
+            p1=p1,
+        )
+
+    return decorator
