@@ -18,7 +18,7 @@ sequences of gates are applied to slack windows, i.e. single-qubit idle
 windows, in a quantum circuit. Mitiq provides standard built-in rules that can
 be directly imported from `mitiq.ddd.rules`. 
 For more discussion of the theory of DDD, see the section [What is the theory
-behind DDD?](ddd-5-theory.myst)).
+behind DDD?](ddd-5-theory.myst).
 
 
 As with all techniques, DDD is compatible with any frontend supported by Mitiq:
@@ -32,12 +32,12 @@ mitiq.SUPPORTED_PROGRAM_TYPES.keys()
 
 ## Problem setup
 We first define the circuit of interest. In this example, the circuit has a
-slack window with slack length 4.
+slack window with a slack length of 4.
 
 ```{code-cell} ipython3
-import cirq
-a, b = cirq.LineQubit.range(2)
-circuit = cirq.Circuit(
+from cirq import LineQubit, Circuit, rx, rz, CNOT
+a, b = LineQubit.range(2)
+circuit = Circuit(
     rx(0.1).on(a),
     rz(0.4).on(a),
     rx(-0.72).on(a),
@@ -52,11 +52,10 @@ circuit = cirq.Circuit(
 print(circuit)
 ```
 
-As an example, below we define a simple executor function 
-which inputs a circuit, executes it on a noisy simulator, and returns the
-probability of the ground state. 
-See the [Executors](executors.myst) section for more information on how to 
-define more advanced executors.
+Next we define a simple executor function which inputs a circuit, executes
+the circuit on a noisy simulator, and returns the probability of the ground
+state. See the [Executors](executors.myst) section for more information on
+how to define more advanced executors.
 
 ```{code-cell} ipython3
 import numpy as np
@@ -96,8 +95,6 @@ Digital dynamical decoupling can be easily implemented with the function
 {func}`mitiq.ddd.ddd.execute_with_ddd()`.
 
 ```{code-cell} ipython3
-from mitiq import ddd
-
 mitigated_result = ddd.execute_with_ddd(
     circuit=circuit, 
     executor=execute, 

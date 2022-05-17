@@ -15,3 +15,4 @@ dist/
 build/
 coverage.xml
 jupyter_execute/
+docs/source/guide/troubleshooting_ddd-1.ipynb
