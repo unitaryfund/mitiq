@@ -139,7 +139,9 @@ The recent utilities added to Cirq (quantumlib/Cirq#4800) have made it much easi
 
 Currently, this has been implemented on the following branch:
 - [amirebrahimi/mitiq@rci](https://github.com/amirebrahimi/mitiq/tree/rci/)
-- latest commit: amirebrahimi/mitiq@9262622601216a7ec4e6f966ae134d19d948b4d5
+- Main files:
+   - [rci.py](https://github.com/amirebrahimi/mitiq/blob/rci/mitiq/rem/rci.py)
+   - [test_rci.py](https://github.com/amirebrahimi/mitiq/blob/rci/mitiq/rem/tests/test_rci.py)
 
 
 ## Alternatives
