@@ -68,7 +68,7 @@ def execute(circuit, noise_level=0.05):
     """
     # Replace with code based on your frontend and backend.
     mitiq_circuit, _ = convert_to_mitiq(circuit)
-    noisy_circuit = mitiq_circuit.with_noise(amplitude_damp(p=noise_level))
+    noisy_circuit = mitiq_circuit.with_noise(amplitude_damp(gamma=noise_level))
     rho = DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix
     return rho[0, 0].real
 ```
@@ -88,7 +88,6 @@ window
 ```{code-cell} ipython3
 from mitiq import ddd
 rules = ddd.rules.xx
-print(rules)
 ```
 
 ## Apply DDD
