@@ -68,6 +68,7 @@ Their values are calculated using OpenFermion.
 radii = [0.2 * i for i in range(1, 14)]
 
 def qubit_operator_to_pauli_sum(qubit_op) -> List:
+    """Converts the OpenFermion qubit operator to a list of mitiq Pauli Strings."""
     psum = []
     for ind_ops, coeff in qubit_op.terms.items():
         if ind_ops == tuple():
@@ -81,6 +82,7 @@ def qubit_operator_to_pauli_sum(qubit_op) -> List:
     return psum
 
 def get_hamiltonian(bond_length) -> Observable:
+    """Returns the hamiltonian associated to the input bond length."""
     geometry = [('H', (0., 0., 0.)), ('H', (0., 0., bond_length))]
     molecular_hamiltonian = generate_molecular_hamiltonian(geometry, basis='sto-6g', multiplicity=1, charge=0)
     fermionic_op = of.transforms.get_fermion_operator(molecular_hamiltonian)
