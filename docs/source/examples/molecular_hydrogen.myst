@@ -33,12 +33,15 @@ In this example, we variationally estimate the potential energy surface of the m
 
 ```{code-cell} ipython3
 from functools import partial
+from typing import List
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import brute
 import cirq
+import openfermion as of
+from openfermionpyscf import generate_molecular_hamiltonian
 
-from mitiq import zne  # Zero-noise extrapolation module
+from mitiq import PauliString, Observable, Executor, zne  # Zero-noise extrapolation module
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 ```
 
@@ -59,56 +62,35 @@ where $g_i$ are numerical values that depend on the bond length $R$. The above H
 1. Reduces resources (qubit number) by symmetry considerations (see {cite}`OMalley_2016_PRX` for more details).
 
 Each coefficient $g_i$ is a function of the bond length $g_i = g_i(R)$.
-Their values are specified in the table below, extracted from Table 1 of Appendix C of {cite}`OMalley_2016_PRX`, in which the first column corresponds to the bond length $R$.
+Their values are calculated using OpenFermion. 
 
 ```{code-cell} ipython3
-# Data is organized as follow
-#   |   R   |   g0   |   g1   |   g2   |    g3  |   g4   |   g5   |
-table = np.array([
-    [ 0.2   ,  2.8489,  0.5678, -1.4508,  0.6799,  0.0791,  0.0791],
-    [ 0.4   ,  1.1182,  0.4754, -0.9145,  0.6438,  0.0825,  0.0825],
-    [ 0.6   ,  0.4808,  0.3937, -0.595 ,  0.6025,  0.087 ,  0.087 ],
-    [ 0.8   ,  0.1626,  0.3288, -0.3915,  0.5616,  0.0925,  0.0925],
-    [ 1.0   , -0.0172,  0.2779, -0.255 ,  0.5235,  0.0986,  0.0986],
-    [ 1.2   , -0.1253,  0.2374, -0.1603,  0.4892,  0.105 ,  0.105 ],
-    [ 1.4   , -0.1927,  0.2048, -0.0929,  0.4588,  0.1116,  0.1116],
-    [ 1.6   , -0.2355,  0.1782, -0.0442,  0.4323,  0.1181,  0.1181],
-    [ 1.8   , -0.2632,  0.1565, -0.0088,  0.4094,  0.1241,  0.1241],
-    [ 2.0   , -0.2812,  0.139 ,  0.0171,  0.3898,  0.1297,  0.1297],
-    [ 2.2   , -0.2934,  0.1251,  0.0359,  0.373 ,  0.1347,  0.1347],
-    [ 2.4   , -0.3018,  0.1142,  0.0495,  0.3586,  0.1392,  0.1392],
-    [ 2.6   , -0.3079,  0.1059,  0.0594,  0.3461,  0.1432,  0.1432],
-])
+radii = [0.2 * i for i in range(1, 14)]
 
-# Grab the radius R and the g_j coefficients
-radii = table[:, 0]
-coeffs = table[:, 1:]
+def qubit_operator_to_pauli_sum(qubit_op) -> List:
+    psum = []
+    for ind_ops, coeff in qubit_op.terms.items():
+        if ind_ops == tuple():
+            psum.append(PauliString("I", coeff))
+            continue
+        term = ["I", "I"]
+        for ind, op in ind_ops:
+            term[ind] = op
+        term = ''.join(term)
+        psum.append(PauliString(term, coeff))
+    return psum
+
+def get_hamiltonian(bond_length) -> Observable:
+    geometry = [('H', (0., 0., 0.)), ('H', (0., 0., bond_length))]
+    molecular_hamiltonian = generate_molecular_hamiltonian(geometry, basis='sto-6g', multiplicity=1, charge=0)
+    fermionic_op = of.transforms.get_fermion_operator(molecular_hamiltonian)
+    bk_op = of.transforms.symmetry_conserving_bravyi_kitaev(fermionic_op, active_orbitals=4, active_fermions=2)
+    qubit_operator = qubit_operator_to_pauli_sum(bk_op)
+    return Observable(*qubit_operator)
+
+hamiltonians = [get_hamiltonian(i) for i in radii]
 ```
 
-We define a function that evaluates the expectation value of the Hamiltonian on a noisy backend and for a given input circuit (ansatz).
-Here we use a Cirq density matrix simulator with a simple depolarizing noise model.
-
-```{code-cell} ipython3
-def energy(
-    ansatz: cirq.Circuit, radius_index: int, depo_noise_strength: float = 0.05
-) -> float:
-    """Computes the energy at a given bond length (radius)."""
-    npI = np.identity(2)
-    npX = np.array([[0.0, 1.0], [1.0, 0.0]])
-    npY = np.array([[0.0, -1j], [1j, 0.0]])
-    npZ = np.array([[1.0, 0.0], [0.0, -1.0]])
-    terms = [
-        coeffs[radius_index][0] * np.kron(npI, npI),
-        coeffs[radius_index][1] * np.kron(npZ, npI),
-        coeffs[radius_index][2] * np.kron(npI, npZ),
-        coeffs[radius_index][3] * np.kron(npZ, npZ),
-        coeffs[radius_index][4] * np.kron(npX, npX),
-        coeffs[radius_index][5] * np.kron(npY, npY),
-    ]
-    hamiltonian = sum(terms)
-    rho = compute_density_matrix(ansatz, cirq.depolarize, (depo_noise_strength,))
-    return np.trace(rho @ hamiltonian).real
-```
 
 ## Evaluating the energy landscape for a fixed $R$
 
@@ -122,7 +104,6 @@ def ansatz(theta: float) -> cirq.Circuit:
     qreg = cirq.LineQubit.range(2)
     return cirq.Circuit(
         cirq.ops.ry(np.pi / 2).on(qreg[0]),
-        cirq.ops.X.on(qreg[1]),
         cirq.ops.rx(-np.pi / 2).on(qreg[1]),
         cirq.ops.CNOT.on(*qreg),
         cirq.ops.rz(theta).on(qreg[1]),
@@ -145,7 +126,8 @@ all_energies = []
 for pval in pvals:
     energies = []
     for theta in thetas:
-        energies.append(energy(ansatz(theta), radius_index=0, depo_noise_strength=pval))
+        results = hamiltonians[0].expectation(ansatz(theta), execute=partial(compute_density_matrix, noise_model=cirq.depolarize, noise_level=(pval,)))
+        energies.append(np.real(results))
     all_energies.append(energies)
 ```
 
@@ -179,16 +161,17 @@ for p in pvals[1:]:
     mitigated = []
     for theta in thetas:
         # Define an executor function
-        execute = partial(energy, radius_index=0, depo_noise_strength=p)
+        executor = Executor(partial(compute_density_matrix, noise_model=cirq.depolarize, noise_level=(p,)))
         # Run ZNE
         zne_value = zne.execute_with_zne(
             ansatz(theta),
-            execute,
+            executor,
+            hamiltonians[0],
             factory=fac,
             scale_noise=scaling_function,
             num_to_average=num_to_average,
         )
-        mitigated.append(zne_value)
+        mitigated.append(np.real(zne_value))
     all_mitigated.append(mitigated)
 ```
 
@@ -275,7 +258,8 @@ for pval in pvals:
     for i in range(len(radii)):
         # Objective function to minimize
         def obj(theta):
-            return energy(ansatz(theta), radius_index=i, depo_noise_strength=pval)
+            val = hamiltonians[i].expectation(ansatz(theta[0]), execute=partial(compute_density_matrix, noise_model=cirq.depolarize, noise_level=(pval,)))
+            return np.real(val)
 
         res = brute(obj, ranges=[(0, 2 * np.pi)], Ns=10, finish=None, full_output=True)
         these_thetas.append(res[0])
@@ -303,13 +287,14 @@ for pval in pvals[1:]:
     for i in range(len(radii)):
 
         def objective_function(theta):
-            return zne.execute_with_zne(
+            return np.real(zne.execute_with_zne(
                 ansatz(theta),
-                partial(energy, radius_index=i, depo_noise_strength=pval),
+                Executor(partial(compute_density_matrix, noise_model=cirq.depolarize, noise_level=(pval,))),
+                hamiltonians[i],
                 factory=fac,
                 scale_noise=scaling_function,
                 num_to_average=num_to_average,
-            )
+            ))
 
         # Minimize energy with respect to "theta"
         res = brute(
