@@ -23,6 +23,9 @@ import numpy as np
 from mitiq import Executor, Observable, QPROGRAM
 from mitiq.rem import MeasurementResult
 
+from cirq.experiments.single_qubit_readout_calibration_test import (
+    NoisySingleQubitReadoutSampler,
+)
 from cirq import DensityMatrixSimulator
 from cirq.experiments.readout_confusion_matrix import measure_confusion_matrix
 from cirq.sim import sample_state_vector
@@ -42,6 +45,8 @@ def execute_with_rci(
     executor: Union[Executor, Callable[[QPROGRAM], MeasurementResult]],
     observable: Optional[Observable] = None,
     inverse_confusion_matrix: Optional[MatrixLike] = None,
+    p0: float = 0.01,
+    p1: float = 0.01,
 ) -> float:
     """Returns the readout error mitigated expectation value utilizing an
     inverse confusion matrix that is computed by running the quantum program
@@ -56,19 +61,22 @@ def execute_with_rci(
             probability vector that represents the noisy measurement results.
             If None, then an inverse confusion matrix will be generated
             utilizing the same `executor`.
+        p0: Probability of flipping a 0 to a 1.
+        p1: Probability of flipping a 1 to a 0.
     """
 
     if not isinstance(executor, Executor):
         executor = Executor(executor)
 
+    qubits = list(circuit.all_qubits())
+
     if inverse_confusion_matrix is None:
         print("No inverse confusion matrix provided. Generating...")
-        qubits = list(circuit.all_qubits())
 
         # Build a tensored confusion matrix using smaller single qubit confusion matrices.
         # Implies that errors are uncorrelated among qubits
         tensored_matrix = measure_confusion_matrix(
-            DensityMatrixSimulator(), [[q] for q in qubits]
+            NoisySingleQubitReadoutSampler(p0, p1), [[q] for q in qubits]
         )
         inverse_confusion_matrix = tensored_matrix.correction_matrix()
 
