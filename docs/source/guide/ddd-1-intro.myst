@@ -124,5 +124,4 @@ to the unmitigated result.
 
 The section
 [What additional options are available when using DDD?](ddd-3-options.myst)
-contains more information on rules for defining and tools for inserting DDD
-sequences in Mitiq.
+contains information on more advanced ways of applying DDD with Mitiq.
