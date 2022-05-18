@@ -15,7 +15,7 @@ kernelspec:
 
 Digital Dynamical Decoupling (DDD) is an error mitigation technique in which
 sequences of gates are applied to slack windows, i.e. single-qubit idle
-windows, in a quantum circuit. Mitiq provides standard built-in rules that can
+windows, in a quantum circuit. Mitiq provides standard DDD sequences that can
 be directly imported from `mitiq.ddd.rules`. 
 For more discussion of the theory of DDD, see the section [What is the theory
 behind DDD?](ddd-5-theory.myst).
