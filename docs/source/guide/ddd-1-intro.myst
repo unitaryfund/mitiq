@@ -96,6 +96,7 @@ print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.3}")
 ## Select rule for determining the DDD sequence to be applied in each slack window
 ```{code-cell} ipython3
 from mitiq import ddd
+
 rules = ddd.rules.yy
 ```
 
