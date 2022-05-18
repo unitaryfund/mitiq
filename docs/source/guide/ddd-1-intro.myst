@@ -74,7 +74,7 @@ from mitiq.interface import convert_to_mitiq
 
 def execute(circuit, noise_level=0.1):
     """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit
-    executed with depolarizing noise.
+    executed with amplitude damping noise.
     """
     # Replace with code based on your frontend and backend.
     mitiq_circuit, _ = convert_to_mitiq(circuit)
