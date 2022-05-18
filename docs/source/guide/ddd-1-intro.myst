@@ -36,6 +36,7 @@ slack window with a length of 4 (in the sense that 4 single-qubit gates can fit 
 
 ```{code-cell} ipython3
 from cirq import LineQubit, Circuit, rx, rz, CNOT
+
 a, b = LineQubit.range(2)
 circuit = Circuit(
     rx(0.1).on(a),
