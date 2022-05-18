@@ -26,14 +26,14 @@ authors:
   - given-names: Piotr
     family-names: Czarnik
     affiliation: 'Theoretical Division, Los Alamos National Laboratory'
-    orcid: 'https://orcid.org/ 0000-0002-0477-1158' 
+    orcid: 'https://orcid.org/0000-0002-0477-1158' 
   - given-names: Mohamed
-    family-names: Mandouh
+    family-names: El Mandouh
     affiliation: 'Institute for Quantum Computing, University of Waterloo'
     orcid: 'https://orcid.org/0000-0001-9466-4884' 
   - given-names: Max
     family-names: Gordon
-    affiliation: 'Instituto de F ́ısica Te ́orica, UAM/CSIC, Universidad Aut ́onoma de Madrid'
+    affiliation: 'Instituto de Física Teórica, UAM/CSIC, Universidad Autónoma de Madrid'
   - given-names: Yousef
     family-names: Hindy
     affiliation: 'Stanford University'
@@ -51,7 +51,6 @@ authors:
   - given-names: William
     family-names: Zeng
     affiliation: 'Unitary Fund, Stanford University, Goldman, Sachs & Co'
-    orcid: 'https://orcid.org/' 
 cff-version: 1.2.0
 message: "If you use mitiq for academic or industry purposes, please cite this article about the software package."
 title: >-
@@ -64,7 +63,6 @@ identifiers:
     value: 'https://arxiv.org/abs/2009.04417'
 repository-code: 'https://github.com/unitaryfund/mitiq'
 url: 'https://github.com/unitaryfund/mitiq'
-repository: 'https://github.com/unitaryfund/mitiq'
 abstract: >-
   We introduce Mitiq, a Python package for error
   mitigation on noisy quantum computers. Error
