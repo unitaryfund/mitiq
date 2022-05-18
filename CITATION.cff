@@ -1,3 +1,11 @@
+cff-version: 1.2.0
+title: >-
+  Mitiq: A software package for error mitigation on
+  noisy quantum computers
+message: >-
+  If you use mitiq for academic or industry purposes,
+  please cite this article about the software
+  package.
 authors:
   - given-names: Ryan
     family-names: LaRose
@@ -51,11 +59,6 @@ authors:
   - given-names: William
     family-names: Zeng
     affiliation: 'Unitary Fund, Stanford University, Goldman, Sachs & Co'
-cff-version: 1.2.0
-message: "If you use mitiq for academic or industry purposes, please cite this article about the software package."
-title: >-
-  Mitiq: A software package for error mitigation on
-  noisy quantum computers
 identifiers:
   - type: doi
     value: 10.48550/ARXIV.2009.04417
