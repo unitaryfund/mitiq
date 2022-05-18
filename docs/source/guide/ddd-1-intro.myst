@@ -40,24 +40,13 @@ from cirq import LineQubit, Circuit, rx, rz, CNOT
 a, b = LineQubit.range(2)
 circuit = Circuit(
     rx(0.1).on(a),
-    rz(0.4).on(a),
-    rx(-0.72).on(a),
-    rz(0.2).on(a),
-    rx(-0.1).on(b),
-    CNOT.on(a, b),
-    rz(-0.23).on(a),
-    CNOT.on(b, a),
-    rx(-0.112).on(a),
     rx(0.1).on(a),
     rz(0.4).on(a),
     rx(-0.72).on(a),
     rz(0.2).on(a),
-    rx(-0.1).on(b),
+    rx(-0.8).on(b),
     CNOT.on(a, b),
-    rz(-0.23).on(a),
-    CNOT.on(b, a),
-    rx(-0.112).on(a),
-    )
+)
 
 print(circuit)
 ```
