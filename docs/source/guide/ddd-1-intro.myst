@@ -108,7 +108,14 @@ print(f"Error with mitigation (DDD): {abs(ideal_value - mitigated_result):.{3}}"
 Here we observe that the application of DDD reduces the estimation error when compared 
 to the unmitigated result.
 
-Note however that this fact is not always true! DDD is designed to mitigate noise that has a finite correlation time. For the simple Markovian noise simulated in this example, DDD can still have an non-trivial effect on the final error, but it is not always a positive effect. For example, one can check that by changing the parameters of the input circuit, the error with DDD is sometimes larger than the unmitigated error.
+```{admonition} Note:
+DDD is designed to mitigate noise that has a finite correlation time. For the
+simple Markovian noise simulated in this example, DDD can still have a 
+non-trivial effect on the final error, but it is not always a positive effect. 
+For example, one can check that by changing the parameters of the input circuit, 
+the error with DDD is sometimes larger than the unmitigated error.
+```
+
 +++
 
 The section
