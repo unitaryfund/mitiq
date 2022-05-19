@@ -102,7 +102,7 @@ mitigated_result = ddd.execute_with_ddd(
 ```
 
 ```{code-cell} ipython3
-print(f"Error with mitigation (DDD): {abs(ideal_value - mitigated_result):.{3}}")
+print(f"Error with mitigation (DDD): {abs(ideal_value - mitigated_result) :.3}")
 ```
 
 Here we observe that the application of DDD reduces the estimation error when compared 
