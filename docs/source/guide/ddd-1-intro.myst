@@ -15,8 +15,8 @@ kernelspec:
 
 Digital Dynamical Decoupling (DDD) is an error mitigation technique in which
 sequences of gates are applied to slack windows, i.e. single-qubit idle
-windows, in a quantum circuit. Mitiq provides standard DDD sequences that can
-be directly imported from `mitiq.ddd.rules`. 
+windows, in a quantum circuit. Such sequences of gates can reduce the coupling
+between the qubits and the environment, mitigating the effects of noise.
 For more discussion of the theory of DDD, see the section [What is the theory
 behind DDD?](ddd-5-theory.myst).
 
@@ -83,21 +83,23 @@ print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.3}")
 ```
 
 ## Select the DDD sequences to be applied
+We now import a DDD _rule_ from Mitiq, i. e., a function that generates DDD sequences of different length.
+In this example, we opt for YY sequences (pairs of Pauli Y operations).
 ```{code-cell} ipython3
 from mitiq import ddd
 
-rules = ddd.rules.yy
+rule = ddd.rules.yy
 ```
 
 ## Apply DDD
 Digital dynamical decoupling can be easily implemented with the function 
-{func}`mitiq.ddd.ddd.execute_with_ddd()`.
+{func}`.execute_with_ddd()`.
 
 ```{code-cell} ipython3
 mitigated_result = ddd.execute_with_ddd(
     circuit=circuit, 
     executor=execute, 
-    rule=rules
+    rule=rule,
 )
 ```
 
