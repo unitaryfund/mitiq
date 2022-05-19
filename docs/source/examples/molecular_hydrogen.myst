@@ -82,7 +82,8 @@ def qubit_operator_to_pauli_sum(qubit_op) -> List:
     return psum
 
 def get_hamiltonian(bond_length) -> Observable:
-    """Returns the hamiltonian associated to the input bond length."""
+    """Returns the hamiltonian for the H2 molecule at the given bond length. Uses the STO-6G basis set and the Bravyi-Kitaev
+    transform to map fermionic operators to qubits. Results in a 2 qubit hamiltonian returned via a metriq.Observable."""
     geometry = [('H', (0., 0., 0.)), ('H', (0., 0., bond_length))]
     molecular_hamiltonian = generate_molecular_hamiltonian(geometry, basis='sto-6g', multiplicity=1, charge=0)
     fermionic_op = of.transforms.get_fermion_operator(molecular_hamiltonian)
