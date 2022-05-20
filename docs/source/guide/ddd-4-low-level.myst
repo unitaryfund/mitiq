@@ -104,8 +104,8 @@ import numpy as np
 print(f"The circuit contains {np.count_nonzero(slack_matrix)} slack windows.")
 print(f"The maximum slack length is {np.max(slack_matrix)}.")
 lengths, counts = np.unique(slack_matrix, return_counts=True)
-lenght_distribution = dict(zip(lengths[1:], counts[1:]))
-print(f"The full distribution of slack lengths is {lenght_distribution}.")
+length_distribution = dict(zip(lengths[1:], counts[1:]))
+print(f"The full distribution of slack lengths is {length_distribution}.")
 print(f"On average, each qubit spends {np.mean(slack_matrix) :.0%} of time in idle mode.")
 ```
 
