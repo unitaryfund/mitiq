@@ -12,3 +12,18 @@ kernelspec:
 ---
 
 # When should I use DDD?
+
+## Advantages
+
+Dynamical decoupling is a technique that has been originally devised to shield from noise from environments with memory effects. It can thus be effective also against structured baths.
+
+Dynamical decoupling is also effective for one-shot quantum computing algorithms, i.e., it finds application beyond algorithms that just require expected values, like variational quantum algorithms.
+
+
+
+
+## Disadvantages
+
+Dynamical decoupling is generally applied at the pulse level. Mitiq provides it at the gate-level. In any case, native-gate control is required, to be able to know that the actual gates providing the decoupling sequence are run on the quantum processor or simulator.
+
+Another limitation of dynamical decoupling is that it cannot improve results against completely symmetric noise effects (symmetrical with respect to gates applied in a quanutum circuit). In particular, (digital) dynamical decoupling does not improve coherence times against depolarizing noise.
