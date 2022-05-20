@@ -23,7 +23,7 @@ name: ddd-workflow
 Workflow of the DDD technique in Mitiq.
 ```
 
-- The user provides a `QPROGRAM`, (i.e. a quantum circuit defined via any of the supported frontends).
+- The user provides a `QPROGRAM`, (i.e. a quantum circuit defined via any of the supported [frontends](frontends-backends.myst)).
 - Mitiq modifies the input circuit with the insertion of DDD gate sequences in idle windows.
 - The modified circuit is executed via a user-defined [Executor](executors.myst).
 - The error mitigated expectation value is returned to the user.
