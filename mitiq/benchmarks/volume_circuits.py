@@ -40,7 +40,7 @@ def generate_volume_circuit(
     depth: int,
     return_type: Optional[str] = None,
 ) -> Tuple[QPROGRAM, List[Bitstring]]:
-    """Generates a model circuit with the given number of qubits and depth.
+    """Generates a volume circuit with the given number of qubits and depth.
 
     The generated circuit consists of `depth` layers of random qubit
     permutations followed by random two-qubit gates that are sampled from the
