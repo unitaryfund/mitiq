@@ -25,6 +25,8 @@ cirq-core/cirq/contrib/quantum_volume/quantum_volume.py
 
 from typing import Optional, List, Tuple
 
+from numpy import random
+
 from cirq.contrib.quantum_volume import (
     generate_model_circuit,
     compute_heavy_set,
@@ -38,6 +40,7 @@ from mitiq.rem.measurement_result import Bitstring # List[int]
 def generate_volume_circuit(
     num_qubits: int,
     depth: int,
+    seed: Optional[int] = None,
     return_type: Optional[str] = None,
 ) -> Tuple[QPROGRAM, List[Bitstring]]:
     """Generates a volume circuit with the given number of qubits and depth.
@@ -49,6 +52,7 @@ def generate_volume_circuit(
     Args:
         num_qubits: The number of qubits in the generated circuit. 
         depth: The number of qubits in the generated circuit.
+        seed: Seed for generating random circuit.
         return_type: String which specifies the type of the returned
             circuits. See the keys of ``mitiq.SUPPORTED_PROGRAM_TYPES``
             for options. If ``None``, the returned circuits have type
@@ -64,7 +68,9 @@ def generate_volume_circuit(
             "Cannot prepare a volume circuit with {} qubits", num_qubits
         )
     
-    circuit = generate_model_circuit(num_qubits, depth)
+    random_state = random.RandomState(seed)
+
+    circuit = generate_model_circuit(num_qubits, depth, random_state)
     heavy_set = compute_heavy_set(circuit)
 
     return_type = "cirq" if not return_type else return_type
