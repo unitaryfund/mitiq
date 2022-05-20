@@ -26,6 +26,11 @@ GHZ Circuits
 .. automodule:: mitiq.benchmarks.ghz_circuits
    :members:
 
+Volume Circuits
+^^^^^^^^^^^^
+.. automodule:: mitiq.benchmarks.volume_circuits
+   :members:
+
 Clifford Data Regression
 ------------------------
 
