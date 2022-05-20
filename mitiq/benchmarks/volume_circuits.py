@@ -70,7 +70,7 @@ def generate_volume_circuit(
     
     random_state = random.RandomState(seed)
 
-    circuit = generate_model_circuit(num_qubits, depth, random_state)
+    circuit = generate_model_circuit(num_qubits, depth, random_state=random_state)
     heavy_set = compute_heavy_set(circuit)
 
     return_type = "cirq" if not return_type else return_type
