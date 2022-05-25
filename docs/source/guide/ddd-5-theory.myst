@@ -27,8 +27,8 @@ In theory, for ideal sequences of infinitely quick and strong pulses, complete n
 In real practical settings, due to the finite frequency and finite amplitude of DD sequences,
 both effects are possible but only as imperfect approximations.
 
-In the context of quantum computing DD can be considered as an error mitigation method but,
-when compared to other error mitigation techniques, it has very peculiar features:
+In the context of quantum computing, DD can be considered as an error mitigation method.
+With respect to other error mitigation techniques, DDD has very peculiar features:
 
 - It maps a noisy quantum computation to a _single_ error-mitigated computation (no need to take linear combinations
 of noisy results as in [ZNE](zne-5-theory.myst), [PEC](pec-5-theory.myst) and [CDR](cdr-5-theory.myst)).
@@ -54,7 +54,7 @@ to distinguish it from the standard pulse-level formulation.
 This type of gate-level approach is very similar to the gate-level abstraction used in Mitiq to implement
 _digital zero-noise extrapolation_ via _unitary folding_ (see [What is the theory behind ZNE?](zne-5-theory.myst)).
 ```
-Experimental evidence showing the practical utility gate-level decoupling sequences is given in several publications [Lidar].
+Experimental evidence showing the practical utility gate-level decoupling sequences is given in several publications [extract some references form RFC for DDD].
 
 
 ```{warning}
