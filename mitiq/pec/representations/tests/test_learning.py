@@ -17,6 +17,8 @@ import numpy as np
 import pytest
 from cirq import (
     CNOT,
+    Rx,
+    Rz,
     I,
     X,
     Y,
@@ -26,6 +28,7 @@ from cirq import (
     ops,
     unitary,
 )
+from mitiq import Executor, Observable, PauliString
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.cdr._testing import random_x_z_cnot_circuit
 from mitiq.pec.representations.learning import learn_biased_noise_parameters
@@ -33,17 +36,19 @@ from mitiq.pec.representations.learning import learn_biased_noise_parameters
 circuit = random_x_z_cnot_circuit(
     LineQubit.range(3), n_moments=5, random_state=1
 )
+Rx_ops = list(circuit.findall_operations_with_gate_type(Rx))
+Rz_ops = list(circuit.findall_operations_with_gate_type(Rz))
 
 
 @pytest.mark.parametrize("epsilon", [0, 0.7, 1])
 @pytest.mark.parametrize("eta", [0, 1, 1000])
-@pytest.mark.parametrize(
-    "gate", [CNOT]
-)  # TODO: extract rx and rz ops from circuit?
 @pytest.mark.parametrize("offset", [-0.1, 0.1])
-def test_learn_biased_noise_parameters(epsilon, eta, gate, circuit, offset):
+@pytest.mark.parametrize("gate", CNOT, Rx_ops[0][2], Rz_ops[0][2])
+def test_learn_biased_noise_parameters(epsilon, eta, offset, gate):
     """Test the learning function with initial noise strength and noise bias
     slightly offset from the simulated noise model values"""
+
+    observable = Observable(PauliString("XZ"), PauliString("YY"))
     # Define biased noise channel
     a = 1 - epsilon
     b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
@@ -60,18 +65,20 @@ def test_learn_biased_noise_parameters(epsilon, eta, gate, circuit, offset):
         return compute_density_matrix(circ, noise_level=(0.0,))
 
     def noisy_executor(circ: Circuit) -> np.ndarray:
+        qreg = LineQubit.range(gate.num_qubits())
         return compute_density_matrix(
-            circ, noise_model=ops.MixedUnitaryChannel(mix).on_each(a, b)
+            circ, noise_model=ops.MixedUnitaryChannel(mix).on_each(*qreg)
         )
 
     [epsilon_opt, eta_opt] = learn_biased_noise_parameters(
         operation=gate,
         circuit=circuit,
-        ideal_executor=ideal_executor,
-        noisy_executor=noisy_executor,
+        ideal_executor=Executor(ideal_executor),
+        noisy_executor=Executor(noisy_executor),
         num_training_circuits=10,
         epsilon0=(1 + offset) * epsilon,
         eta0=(1 + offset) * eta,
+        observable=observable,
     )
     assert np.isclose(epsilon, epsilon_opt)
     assert np.isclose(eta, eta_opt)

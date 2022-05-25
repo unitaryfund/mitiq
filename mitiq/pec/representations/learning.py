@@ -18,6 +18,7 @@ learning-based technique."""
 from typing import Optional, List
 import numpy as np
 from scipy.optimize import minimize
+from cirq import Circuit, LineQubit
 from mitiq import QPROGRAM, Executor, Observable
 from mitiq.cdr import generate_training_circuits
 from mitiq.pec import execute_with_pec
@@ -66,8 +67,9 @@ def learn_biased_noise_parameters(
         method_select="uniform",
         method_replace="closest",
     )
+
     ideal_values = np.array(
-        ideal_executor.evaluate(training_circuits, observable)
+        [ideal_executor.evaluate(t, observable) for t in training_circuits]
     )
 
     x0 = np.array(
@@ -120,9 +122,10 @@ def biased_noise_loss_function(
     """
     epsilon = x0[0]
     eta = x0[1]
+    qreg = LineQubit.range(operation.num_qubits())
     representations = [
         represent_operation_with_local_biased_noise(
-            operation,
+            Circuit(operation.on(*qreg)),
             epsilon,
             eta,
         )
