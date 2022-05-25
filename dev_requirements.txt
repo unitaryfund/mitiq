@@ -3,7 +3,7 @@ qiskit~=0.36.2
 pyquil~=3.0.0
 pennylane-qiskit~=0.23.0
 pennylane~=0.23.1
-amazon-braket-sdk~=1.23.1
+amazon-braket-sdk~=1.23.2
 
 # Unit tests, coverage, and formatting/style.
 pytest-xdist[psutil]~=2.5.0
