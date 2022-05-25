@@ -42,7 +42,7 @@ reduction via classical post-processing.
 
 
 
-### Digital dynamical decoupling
+## Digital dynamical decoupling
 
 In a quantum computing device based on the circuit model, sequences of DD pulses can be mapped to sequences
 of discrete quantum gates (typically Pauli gates). We refer to this gate-level formulation as _digital dynamical decoupling_ (DDD)
@@ -68,7 +68,7 @@ via simple transformations of abstract quantum circuits. For this reason, DDD is
 
 
 
-### Common examples of DDD sequences
+## Common examples of DDD sequences
 
 Common dynamical decoupling sequences are arrays of (evenly spaced) Pauli gates. In particular:
 - The _XX_ sequence is typically appropriate for mitigating (time-correlated) dephasing noise;
