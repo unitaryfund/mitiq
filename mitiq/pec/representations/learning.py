@@ -137,15 +137,9 @@ def biased_noise_loss_function(
         representations=representations,
     )
 
-    if mitigated is float:
-        mitigated_value = mitigated
-
-    else:
-        mitigated_value = mitigated[0]
-
     return (
-        sum(
-            (mitigated_value * np.ones(num_training_circuits) - ideal_values)
+        np.sum(
+            (mitigated * np.ones(num_training_circuits) - ideal_values)
             ** 2
         )
         / num_training_circuits

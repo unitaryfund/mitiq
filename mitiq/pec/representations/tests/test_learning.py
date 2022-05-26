@@ -65,10 +65,8 @@ def test_learn_biased_noise_parameters(epsilon, eta, offset, gate):
         return compute_density_matrix(circ, noise_level=(0.0,))
 
     def noisy_executor(circ: Circuit) -> np.ndarray:
-        qreg = LineQubit.range(gate.num_qubits())
-        return compute_density_matrix(
-            circ, noise_model=ops.MixedUnitaryChannel(mix).on_each(*qreg)
-        )
+        noisy_circ = circ.with_noise(ops.MixedUnitaryChannel(mix))
+        return ideal_executor(noisy_circ)
 
     [epsilon_opt, eta_opt] = learn_biased_noise_parameters(
         operation=gate,
