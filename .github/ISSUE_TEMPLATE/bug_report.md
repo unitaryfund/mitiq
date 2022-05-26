@@ -12,17 +12,19 @@ assignees: ''
 <!-- checked to make sure this bug has not already been reported -->
 
 
-Issue Description
------------------
+## Issue Description
+<!-- A short description of the bug here, along with what you expected the behavior to be. -->
 
-Insert a short description of the bug here, along with what you expected the behavior to be.
+<!-- Thanks for helping us improve mitiq! 🙂 -->
 
-Thanks for helping us improve mitiq! 🙂
+## How to Reproduce
 
-How to Reproduce
-----------------
+1. ...
+2. ...
+3. ...
 
-If useful, provide a numbered list of the steps that result in the error.
+## Expected behavior
+<!-- A clear and concise description of what you expected to happen. -->
 
 Otherwise, just fill out the "Code Snippet" and "Error Output" sections below.
 
