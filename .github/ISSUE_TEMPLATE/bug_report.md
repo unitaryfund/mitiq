@@ -26,13 +26,10 @@ assignees: ''
 ## Expected behavior
 <!-- A clear and concise description of what you expected to happen. -->
 
+---
 
-
-
-
-
-Environment Context
--------------------
+<details>
+<summary>Environment Context</summary>
 
 Use the `about()` function to summarize information on operating system, python version and dependencies.
 ```python
@@ -45,3 +42,5 @@ Additional Python Environment Details (`pip freeze` or `conda list`):
 ```
 Copy and paste the output of `pip freeze` or `conda list` here.
 ```
+
+</details>
