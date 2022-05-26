@@ -26,19 +26,10 @@ assignees: ''
 ## Expected behavior
 <!-- A clear and concise description of what you expected to happen. -->
 
-Otherwise, just fill out the "Code Snippet" and "Error Output" sections below.
 
-### Code Snippet
 
-```python
-Include a snippet of the mitiq code that produces the error here.
-```
 
-### Error Output
 
-```
-Additionally, please copy and paste the output of the above code here.
-```
 
 Environment Context
 -------------------
