@@ -7,11 +7,10 @@ assignees: ''
 
 ---
 
-Pre-Report Checklist
---------------------
+<!-- Before submitting an issue please make sure you are: -->
+<!-- running the latest version of mitiq -->
+<!-- checked to make sure this bug has not already been reported -->
 
-- [ ] I am running the latest version of mitiq
-- [ ] I checked to make sure that this bug has not already been reported
 
 Issue Description
 -----------------

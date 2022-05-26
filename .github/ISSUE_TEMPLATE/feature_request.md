@@ -7,10 +7,8 @@ assignees: ''
 
 ---
 
-Pre-Request Checklist
----------------------
+<!-- Before submitting an issue please make sure you checked to make sure that this feature has not already been requested. -->
 
-- [ ] I checked to make sure that this feature has not already been requested.
 
 Issue Description
 -----------------
