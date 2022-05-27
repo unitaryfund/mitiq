@@ -43,7 +43,7 @@ Rz_ops = list(circuit.findall_operations_with_gate_type(Rz))
 @pytest.mark.parametrize("epsilon", [0, 0.7, 1])
 @pytest.mark.parametrize("eta", [0, 1, 1000])
 @pytest.mark.parametrize("offset", [-0.1, 0.1])
-@pytest.mark.parametrize("gate", CNOT, Rx_ops[0][2], Rz_ops[0][2])
+@pytest.mark.parametrize("gate", [CNOT, Rx_ops[0][2], Rz_ops[0][2]])
 def test_learn_biased_noise_parameters(epsilon, eta, offset, gate):
     """Test the learning function with initial noise strength and noise bias
     slightly offset from the simulated noise model values"""
