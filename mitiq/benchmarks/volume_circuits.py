@@ -23,7 +23,7 @@ Cirq implementation of quantum volume circuits:
 cirq-core/cirq/contrib/quantum_volume/quantum_volume.py
 """
 
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, cast
 
 from numpy import random
 
@@ -31,6 +31,7 @@ from cirq.contrib.quantum_volume import (
     generate_model_circuit,
     compute_heavy_set,
 )
+from cirq.value import big_endian_int_to_bits
 
 from mitiq import QPROGRAM
 from mitiq.interface import convert_from_mitiq
@@ -71,11 +72,15 @@ def generate_volume_circuit(
     random_state = random.RandomState(seed)
 
     circuit = generate_model_circuit(num_qubits, depth, random_state=random_state)
-    heavy_set = compute_heavy_set(circuit)
+    heavy_vals = compute_heavy_set(circuit)
+
+    # Convert base-10 ints to Bitstrings.
+    heavy_bitstrings = [big_endian_int_to_bits(val, bit_count=num_qubits)
+            for val in heavy_vals]
 
     return_type = "cirq" if not return_type else return_type
     circuit = convert_from_mitiq(circuit, return_type) 
 
-    return circuit, heavy_set 
+    return circuit, heavy_bitstrings
 
 
