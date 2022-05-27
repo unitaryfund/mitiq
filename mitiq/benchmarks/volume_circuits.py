@@ -79,8 +79,4 @@ def generate_volume_circuit(
             for val in heavy_vals]
 
     return_type = "cirq" if not return_type else return_type
-    circuit = convert_from_mitiq(circuit, return_type) 
-
-    return circuit, heavy_bitstrings
-
-
+    return convert_from_mitiq(circuit, return_type), heavy_bitstrings
