@@ -27,11 +27,14 @@ from typing import Optional, List, Tuple
 
 from numpy import random
 
+from cirq import decompose as cirq_decompose
+from cirq.circuits import Circuit
 from cirq.contrib.quantum_volume import (
     generate_model_circuit,
     compute_heavy_set,
 )
 from cirq.value import big_endian_int_to_bits
+
 
 from mitiq import QPROGRAM
 from mitiq.interface import convert_from_mitiq
@@ -41,6 +44,7 @@ from mitiq.rem.measurement_result import Bitstring
 def generate_volume_circuit(
     num_qubits: int,
     depth: int,
+    decompose: bool = False,
     seed: Optional[int] = None,
     return_type: Optional[str] = None,
 ) -> Tuple[QPROGRAM, List[Bitstring]]:
@@ -53,6 +57,8 @@ def generate_volume_circuit(
     Args:
         num_qubits: The number of qubits in the generated circuit.
         depth: The number of qubits in the generated circuit.
+        decompose: Recursively decomposes the randomly sampled (numerical)
+            unitary matrix gates into simpler gates defined in cirq.ops 
         seed: Seed for generating random circuit.
         return_type: String which specifies the type of the returned
             circuits. See the keys of ``mitiq.SUPPORTED_PROGRAM_TYPES``
@@ -80,6 +86,10 @@ def generate_volume_circuit(
     heavy_bitstrings = [
         big_endian_int_to_bits(val, bit_count=num_qubits) for val in heavy_vals
     ]
+
+    if decompose:
+        # Decompose random unitary gates into simpler gates. 
+        circuit = Circuit(cirq_decompose(circuit))
 
     return_type = "cirq" if not return_type else return_type
     return convert_from_mitiq(circuit, return_type), heavy_bitstrings
