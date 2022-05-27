@@ -83,7 +83,6 @@ def learn_biased_noise_parameters(
             circuit,
             ideal_values,
             noisy_executor,
-            num_training_circuits,
             observable,
         ),
         method="BFGS",
@@ -101,7 +100,6 @@ def biased_noise_loss_function(
     circuit: QPROGRAM,
     ideal_values: np.ndarray,
     noisy_executor: Executor,
-    num_training_circuits: int,
     observable: Optional[Observable] = None,
 ) -> float:
     r"""Loss function for optimizing the quasiprobability representation using
@@ -115,7 +113,13 @@ def biased_noise_loss_function(
         operation: ideal operation to be represented by a (learning-optmized)
             combination of noisy operations
         ideal_values: expectation values obtained by simulations run on the
-            Clifford training circuits
+            Clifford training circuit
+        noisy_executor: Executes the noisy circuit and returns a
+            `QuantumResult`.
+        observable (optional): Observable to compute the expectation value of.
+            If None, the `executor` must return an expectation value. Otherwise
+            the `QuantumResult` returned by `executor` is used to compute the
+            expectation of the observable.
 
     Returns: Square of the difference between the error-mitigated value and
         the ideal value, over the training set
@@ -139,8 +143,8 @@ def biased_noise_loss_function(
 
     return (
         np.sum(
-            (mitigated * np.ones(num_training_circuits) - ideal_values)
+            (mitigated * np.ones(len(ideal_values)) - ideal_values)
             ** 2
         )
-        / num_training_circuits
+        / len(ideal_values)
     )
