@@ -58,7 +58,7 @@ def generate_volume_circuit(
         num_qubits: The number of qubits in the generated circuit.
         depth: The number of qubits in the generated circuit.
         decompose: Recursively decomposes the randomly sampled (numerical)
-            unitary matrix gates into simpler gates defined in cirq.ops 
+            unitary matrix gates into simpler gates defined in cirq.ops
         seed: Seed for generating random circuit.
         return_type: String which specifies the type of the returned
             circuits. See the keys of ``mitiq.SUPPORTED_PROGRAM_TYPES``
@@ -88,7 +88,7 @@ def generate_volume_circuit(
     ]
 
     if decompose:
-        # Decompose random unitary gates into simpler gates. 
+        # Decompose random unitary gates into simpler gates.
         circuit = Circuit(cirq_decompose(circuit))
 
     return_type = "cirq" if not return_type else return_type
