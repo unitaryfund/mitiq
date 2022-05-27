@@ -96,7 +96,7 @@ def learn_biased_noise_parameters(
 
 
 def biased_noise_loss_function(
-    x0: np.ndarray,
+    x: np.ndarray,
     operation: QPROGRAM,
     circuit: QPROGRAM,
     ideal_values: np.ndarray,
@@ -108,7 +108,7 @@ def biased_noise_loss_function(
     the method of least squares
 
     Args:
-        x0: array of initial guesses for optimization parameters epsilon
+        x: array of optimization parameters epsilon
             (local noise strength) and eta (noise bias between reduced
             dephasing and depolarizing
             channels)
@@ -120,8 +120,8 @@ def biased_noise_loss_function(
     Returns: Square of the difference between the error-mitigated value and
         the ideal value, over the training set
     """
-    epsilon = x0[0]
-    eta = x0[1]
+    epsilon = x[0]
+    eta = x[1]
     qreg = LineQubit.range(operation.num_qubits())
     representations = [
         represent_operation_with_local_biased_noise(
