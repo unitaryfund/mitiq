@@ -200,6 +200,7 @@ def test_repeated_sequences(slack_length, gates):
     assert len(sequence) == slack_length
     assert gates * num_reps == [gate for gate in seq_gates if gate in gate_set]
 
+
 @pytest.mark.parametrize(
     "slack_length",
     [2, 3],
@@ -217,6 +218,7 @@ def test_short_repeated_sequences(slack_length, gates):
         gates=gates,
     )
     assert len(sequence) == 0
+
 
 @pytest.mark.parametrize(
     "gates",
