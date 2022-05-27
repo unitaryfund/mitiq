@@ -71,13 +71,15 @@ def generate_volume_circuit(
 
     random_state = random.RandomState(seed)
 
-    circuit = generate_model_circuit(num_qubits, depth,
-                                     random_state=random_state)
+    circuit = generate_model_circuit(
+        num_qubits, depth, random_state=random_state
+    )
     heavy_vals = compute_heavy_set(circuit)
 
     # Convert base-10 ints to Bitstrings.
-    heavy_bitstrings = [big_endian_int_to_bits(val, bit_count=num_qubits)
-                        for val in heavy_vals]
+    heavy_bitstrings = [
+        big_endian_int_to_bits(val, bit_count=num_qubits) for val in heavy_vals
+    ]
 
     return_type = "cirq" if not return_type else return_type
     return convert_from_mitiq(circuit, return_type), heavy_bitstrings
