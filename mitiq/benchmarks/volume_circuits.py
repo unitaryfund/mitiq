@@ -48,7 +48,7 @@ def generate_volume_circuit(
     seed: Optional[int] = None,
     return_type: Optional[str] = None,
 ) -> Tuple[QPROGRAM, List[Bitstring]]:
-    """Generates a volume circuit with the given number of qubits and depth.
+    """Generate a volume circuit with the given number of qubits and depth.
 
     The generated circuit consists of `depth` layers of random qubit
     permutations followed by random two-qubit gates that are sampled from the
@@ -76,16 +76,10 @@ def generate_volume_circuit(
         )
 
     random_state = random.RandomState(seed)
-
     circuit = generate_model_circuit(
         num_qubits, depth, random_state=random_state
     )
-    heavy_vals = compute_heavy_set(circuit)
-
-    # Convert base-10 ints to Bitstrings.
-    heavy_bitstrings = [
-        big_endian_int_to_bits(val, bit_count=num_qubits) for val in heavy_vals
-    ]
+    heavy_bitstrings = compute_heavy_bitstrings(circuit, num_qubits)
 
     if decompose:
         # Decompose random unitary gates into simpler gates.
@@ -93,3 +87,26 @@ def generate_volume_circuit(
 
     return_type = "cirq" if not return_type else return_type
     return convert_from_mitiq(circuit, return_type), heavy_bitstrings
+
+
+def compute_heavy_bitstrings(
+    circuit: Circuit,
+    num_qubits: int,
+) -> List[Bitstring]:
+    """Classically compute the heavy bitstrings of the provided circuit.
+
+    The heavy bitstrings are defined as the output bit-strings that have a
+    greater than median probability of being generated.
+
+    Args:
+        circuit: The circuit to classically simulate.
+
+    Returns:
+        A list containing the heavy bitstrings.
+    """
+    heavy_vals = compute_heavy_set(circuit)
+    # Convert base-10 ints to Bitstrings.
+    heavy_bitstrings = [
+        big_endian_int_to_bits(val, bit_count=num_qubits) for val in heavy_vals
+    ]
+    return heavy_bitstrings

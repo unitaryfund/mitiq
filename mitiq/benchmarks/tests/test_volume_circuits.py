@@ -23,7 +23,13 @@ fits with mitiq's interface.
 
 import pytest
 
-from mitiq.benchmarks.volume_circuits import generate_volume_circuit
+import cirq
+
+from mitiq.benchmarks.volume_circuits import (
+    generate_volume_circuit,
+    compute_heavy_bitstrings,
+)
+
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES
 
 
@@ -41,6 +47,23 @@ def test_generate_model_circuit_with_seed():
 
     assert circuit_1 == circuit_2
     assert circuit_2 != circuit_3
+
+
+def test_compute_heavy_bitstrings():
+    """Test that the heavy bitstrings can be computed from a given circuit."""
+    a, b, c = cirq.LineQubit.range(3)
+    model_circuit = cirq.Circuit(
+        [
+            cirq.Moment([]),
+            cirq.Moment([cirq.X(a), cirq.Y(b)]),
+            cirq.Moment([]),
+            cirq.Moment([cirq.CNOT(a, c)]),
+            cirq.Moment([cirq.Z(a), cirq.H(b)]),
+        ]
+    )
+    true_heavy_set = [[1, 0, 1], [1, 1, 1]]
+    computed_heavy_set = compute_heavy_bitstrings(model_circuit, 3)
+    assert computed_heavy_set == true_heavy_set
 
 
 @pytest.mark.parametrize("return_type", SUPPORTED_PROGRAM_TYPES.keys())
