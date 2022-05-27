@@ -1,1 +1,0 @@
-cirq.RandomGateChannel(sub_gate=cirq.X, probability=0.25)

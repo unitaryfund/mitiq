@@ -1,5 +1,0 @@
-[cirq.Moment(
-    cirq.X(cirq.LineQubit(0)),
-    cirq.Y(cirq.LineQubit(1)),
-    cirq.Z(cirq.LineQubit(2)),
-)]

@@ -1,1 +1,0 @@
-cirq.AnyIntegerPowerGateFamily(cirq.ops.common_gates.XPowGate)

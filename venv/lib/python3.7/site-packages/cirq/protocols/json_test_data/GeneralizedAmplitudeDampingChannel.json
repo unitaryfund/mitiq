@@ -1,5 +1,0 @@
-{
-  "cirq_type": "GeneralizedAmplitudeDampingChannel",
-  "p": 0.1,
-  "gamma": 0.2
-}

@@ -1,1 +1,0 @@
-cirq.Rx(rads=np.pi*0.25)

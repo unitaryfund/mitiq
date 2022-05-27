@@ -1,1 +1,0 @@
-cirq.DensePauliString('XYZI', coefficient=1j)

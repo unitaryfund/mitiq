@@ -1,5 +1,0 @@
-{
-  "cirq_type": "PhaseGradientGate",
-  "num_qubits": 3,
-  "exponent": 0.235
-}

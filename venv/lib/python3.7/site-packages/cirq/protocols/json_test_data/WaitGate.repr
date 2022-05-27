@@ -1,1 +1,0 @@
-cirq.WaitGate(cirq.Duration(nanos=10))

@@ -1,1 +1,0 @@
-cirq.X.on(cirq.LineQubit(0))

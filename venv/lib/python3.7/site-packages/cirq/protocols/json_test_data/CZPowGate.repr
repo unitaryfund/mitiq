@@ -1,1 +1,0 @@
-cirq.CZPowGate(exponent=0.123, global_shift=0.456)

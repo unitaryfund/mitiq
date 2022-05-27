@@ -1,9 +1,0 @@
-{
-      "cirq_type": "RandomGateChannel",
-      "sub_gate": {
-            "cirq_type": "_PauliX",
-            "exponent": 1,
-            "global_shift": 0.0
-      },
-      "probability": 0.25
-}

@@ -1,1 +1,0 @@
-cirq.DeviceMetadata(cirq.LineQubit.range(4), nx.star_graph(3))

@@ -1,1 +1,0 @@
-sympy.Equality(sympy.Symbol('s'), sympy.Symbol('t'))

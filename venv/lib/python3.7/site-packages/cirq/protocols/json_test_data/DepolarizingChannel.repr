@@ -1,1 +1,0 @@
-cirq.depolarize(p=0.5)

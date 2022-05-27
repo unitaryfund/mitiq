@@ -1,4 +1,0 @@
-{
-  "cirq_type": "PhaseDampingChannel",
-  "gamma": 0.5
-}

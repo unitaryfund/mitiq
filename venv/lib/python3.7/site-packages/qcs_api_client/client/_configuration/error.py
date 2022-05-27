@@ -1,2 +1,0 @@
-class QCSClientConfigurationError(Exception):
-    pass

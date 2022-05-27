@@ -1,4 +1,0 @@
-{
-  "cirq_type": "cirq.google.BitstringsMeasurement",
-  "n_repetitions": 10000
-}

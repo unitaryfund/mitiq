@@ -1,1 +1,0 @@
-cirq.SingleQubitCliffordGate(_clifford_tableau=cirq.CliffordTableau(num_qubits=1))

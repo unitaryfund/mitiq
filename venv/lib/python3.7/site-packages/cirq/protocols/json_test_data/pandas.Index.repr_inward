@@ -1,3 +1,0 @@
-[
-pd.Index([1, 2, 3], name='test', dtype='int64'),
-]
