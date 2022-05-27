@@ -27,7 +27,7 @@ from cirq.experiments.qubit_characterizations import (
     _two_qubit_clifford_matrices,
 )
 from typing import Sequence
-from cirq import LineQubit, ops
+from cirq import LineQubit, ops,circuits
 from mitiq import QPROGRAM
 from mitiq.interface import convert_from_mitiq
 
@@ -95,6 +95,7 @@ def generate_random_clifford_t_circuits(
     return_type = "cirq" if not return_type else return_type
     return [convert_from_mitiq(circuit, return_type) for circuit in circuits]
 
+
 #function to generate single qubit cliffords
 def _random_single_q_clifford_T(
     qubit: 'cirq.Qid',
@@ -104,7 +105,8 @@ def _random_single_q_clifford_T(
 ) -> 'cirq.Circuit':
     clifford_group_size = 24 #number of elements in clifford group
     gate_ids = list(np.random.choice(clifford_group_size, num_single_qubit_cliffords))
-    gate_sequence = [[gate,ops.Z**0.25] for gate_id in gate_ids for gate in cfds[gate_id]]
+    random_T_list = [ops.Z**0.25, ops.Z**0.75, ops.Z**0, ops.Z**1]
+    gate_sequence = [[gate,random_T_list[np.random.choice(4)]] for gate_id in gate_ids for gate in cfds[gate_id]]
     gate_sequence = [gate for list in gate_sequence for gate in list]
     idx = _find_inv_matrix(_gate_seq_to_mats(gate_sequence), cfd_matrices)
     gate_sequence.extend(cfds[idx])
