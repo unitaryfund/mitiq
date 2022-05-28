@@ -16,6 +16,7 @@
 learning-based technique."""
 
 from typing import Optional, List
+from typing import cast
 import numpy as np
 from scipy.optimize import minimize
 from cirq import Circuit, LineQubit, Gate
@@ -134,12 +135,15 @@ def biased_noise_loss_function(
             eta,
         )
     ]
-    mitigated = execute_with_pec(
-        circuit=circuit,
-        observable=observable,
-        executor=noisy_executor,
-        representations=representations,
-        full_output=False,
+    mitigated = cast(
+        float,
+        execute_with_pec(
+            circuit=circuit,
+            observable=observable,
+            executor=noisy_executor,
+            representations=representations,
+            full_output=False,
+        ),
     )
 
     return np.sum(
