@@ -14,9 +14,11 @@ jobs:
       - name: Close Stale Issues
         uses: actions/stale@v5
         with:
-          days-before-stale: 60
-          days-before-close: 7
-          stale-issue-message: This issue had no activity for **2 months**, and will be closed in **one week** unless there is new activity. Cheers!
+          days-before-stale: 120
+          days-before-close: 14
+          stale-issue-message: This issue had no activity for **4 months**, and will be closed in **2 weeks** unless there is new activity. Cheers!
           stale-issue-label: stale
-          stale-pr-message: This pull request had no activity for **2 months**, and will be closed in **one week** unless there is new activity. Cheers!
+          stale-pr-message: This pull request had no activity for **4 months**, and will be closed in **2 weeks** unless there is new activity. Cheers!
           stale-pr-label: stale
+          exempt-issue-labels: 'bug,roadmap,priority/p0'
+          exempt-pr-labels: 'bug,roadmap,priority/p0'
