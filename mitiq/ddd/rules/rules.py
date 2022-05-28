@@ -174,6 +174,8 @@ def repeated_rule(slack_length: int, gates: List[Gate]) -> Circuit:
         the sequence: ──X──Y──X──Y──X──Y──X──Y──.
     """
     num_decoupling_gates = len(gates)
+    if num_decoupling_gates > slack_length:
+        return Circuit()
     sequence = general_rule(
         slack_length=slack_length,
         spacing=0,
