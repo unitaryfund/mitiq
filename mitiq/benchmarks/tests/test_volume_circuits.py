@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Tests for volume circuits. The cirq functions that do the main work
+"""Tests for quantum volume circuits. The Cirq functions that do the main work
 are tested here:
 cirq-core/cirq/contrib/quantum_volume/quantum_volume_test.py
 
