@@ -70,12 +70,6 @@ def generate_quantum_volume_circuit(
         A quantum volume circuit acting on ``num_qubits`` qubits.
         A list of the heavy bitstrings for the returned circuit.
     """
-
-    if num_qubits <= 0:
-        raise ValueError(
-            "Cannot prepare a volume circuit with {} qubits", num_qubits
-        )
-
     random_state = random.RandomState(seed)
     circuit = generate_model_circuit(
         num_qubits, depth, random_state=random_state
