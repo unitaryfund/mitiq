@@ -17,7 +17,7 @@
 are tested here:
 cirq-core/cirq/contrib/quantum_volume/quantum_volume_test.py
 
-Tests below check that generate_volume_circuit() works as a wrapper and
+Tests below check that generate_quantum_volume_circuit() works as a wrapper and
 fits with Mitiq's interface.
 """
 
@@ -25,8 +25,8 @@ import pytest
 
 import cirq
 
-from mitiq.benchmarks.volume_circuits import (
-    generate_volume_circuit,
+from mitiq.benchmarks.quantum_volume_circuits import (
+    generate_quantum_volume_circuit,
     compute_heavy_bitstrings,
 )
 
@@ -35,15 +35,15 @@ from mitiq._typing import SUPPORTED_PROGRAM_TYPES
 
 def test_generate_model_circuit_no_seed():
     """Test that random circuit of the right length is generated."""
-    circuit, _ = generate_volume_circuit(3, 3)
+    circuit, _ = generate_quantum_volume_circuit(3, 3)
     assert len(circuit) == 3
 
 
 def test_generate_model_circuit_with_seed():
     """Test that a model circuit is determined by its seed."""
-    circuit_1, _ = generate_volume_circuit(3, 3, seed=1)
-    circuit_2, _ = generate_volume_circuit(3, 3, seed=1)
-    circuit_3, _ = generate_volume_circuit(3, 3, seed=2)
+    circuit_1, _ = generate_quantum_volume_circuit(3, 3, seed=1)
+    circuit_2, _ = generate_quantum_volume_circuit(3, 3, seed=1)
+    circuit_3, _ = generate_quantum_volume_circuit(3, 3, seed=2)
 
     assert circuit_1 == circuit_2
     assert circuit_2 != circuit_3
@@ -68,5 +68,5 @@ def test_compute_heavy_bitstrings():
 
 @pytest.mark.parametrize("return_type", SUPPORTED_PROGRAM_TYPES.keys())
 def test_volume_conversion(return_type):
-    circuit, _ = generate_volume_circuit(3, 3, return_type=return_type)
+    circuit, _ = generate_quantum_volume_circuit(3, 3, return_type=return_type)
     assert return_type in circuit.__module__

@@ -16,4 +16,6 @@
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 from mitiq.benchmarks.mirror_circuits import generate_mirror_circuit
 from mitiq.benchmarks.ghz_circuits import generate_ghz_circuit
-from mitiq.benchmarks.volume_circuits import generate_volume_circuit
+from mitiq.benchmarks.quantum_volume_circuits import (
+    generate_quantum_volume_circuit,
+)

@@ -41,14 +41,15 @@ from mitiq.interface import convert_from_mitiq
 from mitiq.rem.measurement_result import Bitstring
 
 
-def generate_volume_circuit(
+def generate_quantum_volume_circuit(
     num_qubits: int,
     depth: int,
     decompose: bool = False,
     seed: Optional[int] = None,
     return_type: Optional[str] = None,
 ) -> Tuple[QPROGRAM, List[Bitstring]]:
-    """Generate a volume circuit with the given number of qubits and depth.
+    """Generate a quantum volume circuit with the given number of qubits and
+    depth.
 
     The generated circuit consists of `depth` layers of random qubit
     permutations followed by random two-qubit gates that are sampled from the
