@@ -18,7 +18,7 @@ are tested here:
 cirq-core/cirq/contrib/quantum_volume/quantum_volume_test.py
 
 Tests below check that generate_volume_circuit() works as a wrapper and
-fits with mitiq's interface.
+fits with Mitiq's interface.
 """
 
 import pytest
