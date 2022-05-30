@@ -24,8 +24,7 @@ fits with Mitiq's interface.
 import pytest
 
 import cirq
-from cirq import ops, protocols 
-from cirq import decompose as cirq_decompose
+from cirq import protocols
 
 from mitiq.benchmarks.quantum_volume_circuits import (
     generate_quantum_volume_circuit,
@@ -77,9 +76,9 @@ def test_circuit_decomposition():
         ops.CZPowGate,
         ops.MeasurementGate,
         ops.GlobalPhaseGate
-    """ 
+    """
     circuit, _ = generate_quantum_volume_circuit(3, 3, decompose=True)
-    for op in [operation for moment in circuit for operation in moment]: 
+    for op in [operation for moment in circuit for operation in moment]:
         assert op in protocols.decompose_protocol.DECOMPOSE_TARGET_GATESET
 
 
