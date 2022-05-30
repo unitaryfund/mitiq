@@ -24,6 +24,8 @@ fits with Mitiq's interface.
 import pytest
 
 import cirq
+from cirq import ops, protocols 
+from cirq import decompose as cirq_decompose
 
 from mitiq.benchmarks.quantum_volume_circuits import (
     generate_quantum_volume_circuit,
@@ -64,6 +66,21 @@ def test_compute_heavy_bitstrings():
     true_heavy_set = [[1, 0, 1], [1, 1, 1]]
     computed_heavy_set = compute_heavy_bitstrings(model_circuit, 3)
     assert computed_heavy_set == true_heavy_set
+
+
+def test_circuit_decomposition():
+    """Test that decomposed circuit consists of gates in default cirq gatest.
+    As defined in cirq.protocols.decompose_protocol, this default gateset is
+        ops.XPowGate,
+        ops.YPowGate,
+        ops.ZPowGate,
+        ops.CZPowGate,
+        ops.MeasurementGate,
+        ops.GlobalPhaseGate
+    """ 
+    circuit, _ = generate_quantum_volume_circuit(3, 3, decompose=True)
+    for op in [operation for moment in circuit for operation in moment]: 
+        assert op in protocols.decompose_protocol.DECOMPOSE_TARGET_GATESET
 
 
 @pytest.mark.parametrize("return_type", SUPPORTED_PROGRAM_TYPES.keys())
