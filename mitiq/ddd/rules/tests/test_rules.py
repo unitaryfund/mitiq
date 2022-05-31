@@ -202,6 +202,25 @@ def test_repeated_sequences(slack_length, gates):
 
 
 @pytest.mark.parametrize(
+    "slack_length",
+    [2, 3],
+)
+@pytest.mark.parametrize(
+    "gates",
+    [
+        [X, Y, X, Y],
+        [Y, Y, Y, Y],
+    ],
+)
+def test_short_repeated_sequences(slack_length, gates):
+    sequence = repeated_rule(
+        slack_length=slack_length,
+        gates=gates,
+    )
+    assert len(sequence) == 0
+
+
+@pytest.mark.parametrize(
     "gates",
     [
         [bit_flip(p=0.1), bit_flip(p=0.1)],
