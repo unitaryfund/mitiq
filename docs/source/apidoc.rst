@@ -27,7 +27,7 @@ GHZ Circuits
    :members:
 
 Quantum Volume Circuits
-^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.benchmarks.quantum_volume_circuits
    :members:
 
