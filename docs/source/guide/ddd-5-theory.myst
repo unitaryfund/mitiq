@@ -13,7 +13,7 @@ kernelspec:
 
 # What is the theory behind DDD?
 
-Dynamical decoupling (DD) [Viola and Lloyd PRA 1998, Viola, Knill, Lloyd, PRL 1999, Peng,Suter1, Lidar JPB 2011]
+Dynamical decoupling (DD) {cite}`Viola_1998_PRA, Viola_1999_PRL, Zhang_2014_PRL`
 is a quantum control technique to effectively reduce the interaction of a quantum system with its environment.
 The protocol works by driving a quantum system with rapid sequences of periodic control pulses.
 The application of DD sequences can have in two effects depending on the correlation time of the environment:
@@ -54,7 +54,7 @@ to distinguish it from the standard pulse-level formulation.
 This type of gate-level approach is very similar to the gate-level abstraction used in Mitiq to implement
 _digital zero-noise extrapolation_ via _unitary folding_ (see [What is the theory behind ZNE?](zne-5-theory.myst)).
 ```
-Experimental evidence showing the practical utility gate-level decoupling sequences is given in several publications [extract some references form RFC for DDD].
+Experimental evidence showing the practical utility gate-level decoupling sequences is given in several publications {cite}`Pokharel_2018_PRL, Jurcevic_2021_arxiv, GoogleQuantum_2021_nature, Smith_2021_arxiv, Das_2021_ACM`.
 
 
 ```{warning}
