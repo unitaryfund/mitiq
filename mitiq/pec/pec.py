@@ -62,7 +62,7 @@ def execute_with_pec(
 ) -> Union[float, Tuple[float, Dict[str, Any]]]:
     r"""Estimates the error-mitigated expectation value associated to the
     input circuit, via the application of probabilistic error cancellation
-    (PEC). [Temme2017]_ [Endo2018]_.
+    (PEC). :cite:`Temme_2017_PRL` :cite:`Endo_2018_PRX`.
 
     This function implements PEC by:
 
@@ -87,7 +87,7 @@ def execute_with_pec(
             is bounded by 1). The number of samples is deduced according
             to the formula (one_norm / precision) ** 2, where 'one_norm'
             is related to the negativity of the quasi-probability
-            representation [Temme2017]_. If 'num_samples' is explicitly set
+            representation :cite:`Temme_2017_PRL`. If 'num_samples' is explicitly set
             by the user, 'precision' is ignored and has no effect.
         num_samples: The number of noisy circuits to be sampled for PEC.
             If not given, this is deduced from the argument 'precision'.
@@ -107,15 +107,6 @@ def execute_with_pec(
         square root of the mean squared deviation of the sampled values from
         ``pec_value``. If ``full_output`` is ``True``, only ``pec_value`` is
         returned.
-
-    .. [Endo2018] : Suguru Endo, Simon C. Benjamin, Ying Li,
-        "Practical Quantum Error Mitigation for Near-Future Applications"
-        *Phys. Rev. **X 8**, 031027 (2018),
-        (https://arxiv.org/abs/1712.09271).
-
-    .. [Takagi2020] : Ryuji Takagi,
-        "Optimal resource cost for error mitigation,"
-        (https://arxiv.org/abs/2006.12509).
     """
     if isinstance(random_state, int):
         random_state = np.random.RandomState(random_state)
@@ -215,7 +206,7 @@ def mitigate_executor(
             is bounded by 1). The number of samples is deduced according
             to the formula (one_norm / precision) ** 2, where 'one_norm'
             is related to the negativity of the quasi-probability
-            representation [Temme2017]_. If 'num_samples' is explicitly set,
+            representation :cite:`Temme_2017_PRL`. If 'num_samples' is explicitly set,
             'precision' is ignored and has no effect.
         num_samples: The number of noisy circuits to be sampled for PEC.
             If not given, this is deduced from the argument 'precision'.
@@ -281,7 +272,7 @@ def pec_decorator(
             is bounded by 1). The number of samples is deduced according
             to the formula (one_norm / precision) ** 2, where 'one_norm'
             is related to the negativity of the quasi-probability
-            representation [Temme2017]_. If 'num_samples' is explicitly set
+            representation :cite:`Temme_2017_PRL`. If 'num_samples' is explicitly set
             by the user, 'precision' is ignored and has no effect.
         num_samples: The number of noisy circuits to be sampled for PEC.
             If not given, this is deduced from the argument 'precision'.

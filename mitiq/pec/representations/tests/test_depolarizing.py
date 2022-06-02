@@ -50,24 +50,14 @@ from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 
 
 def single_qubit_depolarizing_overhead(noise_level: float) -> float:
-    """See [Temme2017]_ for more information.
-
-    .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
-        "Error mitigation for short-depth quantum circuits,"
-        *Phys. Rev. Lett.* **119**, 180509 (2017),
-        (https://arxiv.org/abs/1612.02058).
+    """See :cite:`Temme_2017_PRL` for more information.
     """
     epsilon = 4 / 3 * noise_level
     return (1 + epsilon / 2) / (1 - epsilon)
 
 
 def two_qubit_depolarizing_overhead(noise_level: float) -> float:
-    """See [Temme2017]_ for more information.
-
-    .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
-        "Error mitigation for short-depth quantum circuits,"
-        *Phys. Rev. Lett.* **119**, 180509 (2017),
-        (https://arxiv.org/abs/1612.02058).
+    """See :cite:`Temme_2017_PRL` for more information.
     """
     epsilon = 16 / 15 * noise_level
     return (1 + 7 * epsilon / 8) / (1 - epsilon)

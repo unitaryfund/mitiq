@@ -47,7 +47,7 @@ def generate_training_circuits(
     The way in which non-Clifford gates are selected to be replaced is
     determined by ``method_select`` and ``method_replace``.
 
-    In the Clifford Data Regression (CDR) method [Czarnik2020]_, data
+    In the Clifford Data Regression (CDR) method :cite:`Czarnik_2021_Quantum`, data
     generated from these circuits is used as a training set to learn the
     effect of noise.
 
@@ -70,9 +70,6 @@ def generate_training_circuits(
             - sigma_replace (float): Width of the Gaussian distribution used
             for ``method_replace='gaussian'``.
 
-    .. [Czarnik2020] : Piotr Czarnik, Andrew Arramsmith, Patrick Coles,
-        Lukasz Cincio, "Error mitigation with Clifford quantum circuit
-        data," (https://arxiv.org/abs/2005.10189).
     """
     if random_state is None or isinstance(random_state, int):
         random_state = np.random.RandomState(random_state)
