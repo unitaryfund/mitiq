@@ -16,15 +16,15 @@ kernelspec:
 Dynamical decoupling (DD) {cite}`Viola_1998_PRA, Viola_1999_PRL, Zhang_2014_PRL`
 is a quantum control technique to effectively reduce the interaction of a quantum system with its environment.
 The protocol works by driving a quantum system with rapid sequences of periodic control pulses.
-The application of DD sequences can have in two effects depending on the correlation time of the environment:
+The application of DD sequences can have two effects depending on the correlation time of the environment:
 
-1. For Markovian noise, DD can make the overall quantum channel more symmetric (analogously to quantum twirling)
+1. For Markovian noise, DD can make the overall quantum channel more symmetric (analogous to quantum twirling)
 but cannot actually decouple the system from the environment;
 
-2. For non-Markovian noise, DD can effectively decouple the system form the environment.
-In theory, for ideal sequences of infinitely quick and strong pulses, complete noise suppresion is achievable.
+2. For non-Markovian noise, DD can effectively decouple the system from the environment.
+In theory, ideal sequences of infinitely quick and strong pulses, can result in complete noise suppression.
 
-In real practical settings, due to the finite frequency and finite amplitude of DD sequences,
+In practice, due to the finite frequency and finite amplitude of DD sequences,
 both effects are possible but only as imperfect approximations.
 
 In the context of quantum computing, DD can be considered as an error mitigation method.
@@ -34,7 +34,7 @@ With respect to other error mitigation techniques, DDD has very peculiar feature
 of noisy results as in [ZNE](zne-5-theory.myst), [PEC](pec-5-theory.myst) and [CDR](cdr-5-theory.myst)).
 
 - As a consequence of the previous point, there is not a fundamental error mitigation overhead or
-an increase of statistical uncertainty in the final results.
+increase in statistical uncertainty in the final result.
 
 - If noise is time-correlated, it can suppress real errors at the physical level instead of applying a virtual noise
 reduction via classical post-processing.
@@ -89,6 +89,3 @@ results are theoretically known, such that one can empirically determine what se
 It may happen that, for some sequences, the final error of the quantum computation is actually increased.
 As with all other error-mitigation techniques, one should always take into account that an improvement of performances is not guaranteed.
 
-```{code-cell} ipython3
-
-```
