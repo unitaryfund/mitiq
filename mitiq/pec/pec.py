@@ -73,29 +73,25 @@ def execute_with_pec(
     3. Estimating the ideal expectation value from a suitable linear
        combination of the noisy ones.
 
-    Args:
-        circuit: The input circuit to execute with error-mitigation.
-        executor: A Mitiq executor that executes a circuit and returns the
-            unmitigated ``QuantumResult`` (e.g. an expectation value).
-        observable: Observable to compute the expectation value of. If None,
-            the `executor` must return an expectation value. Otherwise,
-            the `QuantumResult` returned by `executor` is used to compute the
-            expectation of the observable.
-        representations: Representations (basis expansions) of each operation
-            in the input circuit.
-        precision: The desired estimation precision (assuming the observable
-            is bounded by 1). The number of samples is deduced according
-            to the formula (one_norm / precision) ** 2, where 'one_norm'
-            is related to the negativity of the quasi-probability
-            representation :cite:`Temme_2017_PRL`. If 'num_samples' is explicitly set
-            by the user, 'precision' is ignored and has no effect.
-        num_samples: The number of noisy circuits to be sampled for PEC.
-            If not given, this is deduced from the argument 'precision'.
-        force_run_all: If True, all sampled circuits are executed regardless of
-            uniqueness, else a minimal unique set is executed.
-        random_state: Seed for sampling circuits.
-        full_output: If False only the average PEC value is returned.
-            If True a dictionary containing all PEC data is returned too.
+    Args: circuit: The input circuit to execute with error-mitigation.
+    executor: A Mitiq executor that executes a circuit and returns the
+    unmitigated ``QuantumResult`` (e.g. an expectation value). observable:
+    Observable to compute the expectation value of. If None, the `executor`
+    must return an expectation value. Otherwise, the `QuantumResult` returned
+    by `executor` is used to compute the expectation of the observable.
+    representations: Representations (basis expansions) of each operation in
+    the input circuit. precision: The desired estimation precision (assuming
+    the observable is bounded by 1). The number of samples is deduced
+    according to the formula (one_norm / precision) ** 2, where 'one_norm' is
+    related to the negativity of the quasi-probability representation
+    :cite:`Temme_2017_PRL`. If 'num_samples' is explicitly set by the user,
+    'precision' is ignored and has no effect. num_samples: The number of
+    noisy circuits to be sampled for PEC. If not given, this is deduced from
+    the argument 'precision'. force_run_all: If True, all sampled circuits
+    are executed regardless of uniqueness, else a minimal unique set is
+    executed. random_state: Seed for sampling circuits. full_output: If False
+    only the average PEC value is returned. If True a dictionary containing
+    all PEC data is returned too.
 
     Returns:
         The tuple ``(pec_value, pec_data)`` where ``pec_value`` is the
@@ -193,28 +189,24 @@ def mitigate_executor(
     """Returns a modified version of the input 'executor' which is
     error-mitigated with probabilistic error cancellation (PEC).
 
-    Args:
-        executor: A function that executes a circuit and returns the
-            unmitigated `QuantumResult` (e.g. an expectation value).
-        observable: Observable to compute the expectation value of. If None,
-            the `executor` must return an expectation value. Otherwise,
-            the `QuantumResult` returned by `executor` is used to compute the
-            expectation of the observable.
-        representations: Representations (basis expansions) of each operation
-            in the input circuit.
-        precision: The desired estimation precision (assuming the observable
-            is bounded by 1). The number of samples is deduced according
-            to the formula (one_norm / precision) ** 2, where 'one_norm'
-            is related to the negativity of the quasi-probability
-            representation :cite:`Temme_2017_PRL`. If 'num_samples' is explicitly set,
-            'precision' is ignored and has no effect.
-        num_samples: The number of noisy circuits to be sampled for PEC.
-            If not given, this is deduced from the argument 'precision'.
-        force_run_all: If True, all sampled circuits are executed regardless of
-            uniqueness, else a minimal unique set is executed.
-        random_state: Seed for sampling circuits.
-        full_output: If False only the average PEC value is returned.
-            If True a dictionary containing all PEC data is returned too.
+    Args: executor: A function that executes a circuit and returns the
+    unmitigated `QuantumResult` (e.g. an expectation value). observable:
+    Observable to compute the expectation value of. If None, the `executor`
+    must return an expectation value. Otherwise, the `QuantumResult` returned
+    by `executor` is used to compute the expectation of the observable.
+    representations: Representations (basis expansions) of each operation in
+    the input circuit. precision: The desired estimation precision (assuming
+    the observable is bounded by 1). The number of samples is deduced
+    according to the formula (one_norm / precision) ** 2, where 'one_norm' is
+    related to the negativity of the quasi-probability representation
+    :cite:`Temme_2017_PRL`. If 'num_samples' is explicitly set, 'precision'
+    is ignored and has no effect. num_samples: The number of noisy circuits
+    to be sampled for PEC. If not given, this is deduced from the argument
+    'precision'. force_run_all: If True, all sampled circuits are executed
+    regardless of uniqueness, else a minimal unique set is executed.
+    random_state: Seed for sampling circuits. full_output: If False only the
+    average PEC value is returned. If True a dictionary containing all PEC
+    data is returned too.
 
     Returns:
         The error-mitigated version of the input executor.
@@ -261,26 +253,23 @@ def pec_decorator(
     ``QuantumResult`` (e.g. an expectation value).
 
 
-    Args:
-        observable: Observable to compute the expectation value of. If None,
-            the `executor` function being decorated must return an expectation
-            value. Otherwise, the `QuantumResult` returned by this `executor`
-            is used to compute the expectation of the observable.
-        representations: Representations (basis expansions) of each operation
-            in the input circuit.
-        precision: The desired estimation precision (assuming the observable
-            is bounded by 1). The number of samples is deduced according
-            to the formula (one_norm / precision) ** 2, where 'one_norm'
-            is related to the negativity of the quasi-probability
-            representation :cite:`Temme_2017_PRL`. If 'num_samples' is explicitly set
-            by the user, 'precision' is ignored and has no effect.
-        num_samples: The number of noisy circuits to be sampled for PEC.
-            If not given, this is deduced from the argument 'precision'.
-        force_run_all: If True, all sampled circuits are executed regardless of
-            uniqueness, else a minimal unique set is executed.
-        random_state: Seed for sampling circuits.
-        full_output: If False only the average PEC value is returned.
-            If True a dictionary containing all PEC data is returned too.
+    Args: observable: Observable to compute the expectation value of. If
+    None, the `executor` function being decorated must return an expectation
+    value. Otherwise, the `QuantumResult` returned by this `executor` is used
+    to compute the expectation of the observable. representations:
+    Representations (basis expansions) of each operation in the input
+    circuit. precision: The desired estimation precision (assuming the
+    observable is bounded by 1). The number of samples is deduced according
+    to the formula (one_norm / precision) ** 2, where 'one_norm' is related
+    to the negativity of the quasi-probability representation
+    :cite:`Temme_2017_PRL`. If 'num_samples' is explicitly set by the user,
+    'precision' is ignored and has no effect. num_samples: The number of
+    noisy circuits to be sampled for PEC. If not given, this is deduced from
+    the argument 'precision'. force_run_all: If True, all sampled circuits
+    are executed regardless of uniqueness, else a minimal unique set is
+    executed. random_state: Seed for sampling circuits. full_output: If False
+    only the average PEC value is returned. If True a dictionary containing
+    all PEC data is returned too.
 
     Returns:
         The error-mitigating decorator to be applied to an executor function.

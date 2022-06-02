@@ -47,9 +47,9 @@ def generate_training_circuits(
     The way in which non-Clifford gates are selected to be replaced is
     determined by ``method_select`` and ``method_replace``.
 
-    In the Clifford Data Regression (CDR) method :cite:`Czarnik_2021_Quantum`, data
-    generated from these circuits is used as a training set to learn the
-    effect of noise.
+    In the Clifford Data Regression (CDR) method
+    :cite:`Czarnik_2021_Quantum`, data generated from these circuits is used
+    as a training set to learn the effect of noise.
 
     Args:
         circuit: A circuit of interest assumed to be compiled into the gate
