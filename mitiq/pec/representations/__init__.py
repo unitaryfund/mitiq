@@ -36,3 +36,7 @@ from mitiq.pec.representations.optimal import (
 from mitiq.pec.representations.biased_noise import (
     represent_operation_with_local_biased_noise,
 )
+
+from mitiq.pec.representations.learning import (
+    learn_biased_noise_parameters,
+)
