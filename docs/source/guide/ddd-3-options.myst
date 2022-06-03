@@ -6,7 +6,7 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.11.1
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
@@ -23,8 +23,32 @@ Mitiq provides basic built in rules to approximate the behavior(s) described and
 rules, which generate the corresponding sequences spaced evenly over the input slack window. Within each of these rules, the user may specify a different spacing between
 the gates in the sequence and pass the desired spacing as an argument in the high level tools, as before:
 ```{code-cell} ipython3
-from mitiq import ddd
+from mitiq import ddd, QPROGRAM
+from cirq import LineQubit, Circuit, rx, rz, CNOT, X, Y, SWAP, DensityMatrixSimulator, amplitude_damp
+from mitiq.interface import convert_to_mitiq
+from mitiq.interface.mitiq_cirq import compute_density_matrix
+import numpy as np
 
+a, b = LineQubit.range(2)
+circuit = Circuit(
+    rx(0.1).on(a),
+    rz(0.4).on(a),
+    rx(-0.72).on(a),
+    rz(0.2).on(a),
+    rx(-0.8).on(b),
+)
+
+def execute(circuit, noise_level=0.1):
+    """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit
+    executed with amplitude damping noise.
+    """
+    # Replace with code based on your frontend and backend.
+    mitiq_circuit, _ = convert_to_mitiq(circuit)
+    noisy_circuit = mitiq_circuit.with_noise(amplitude_damp(gamma=noise_level))
+    rho = DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix
+    return rho[0, 0].real
+
+  
 rule = ddd.rules.xx
 mitigated_result = ddd.execute_with_ddd(
     circuit=circuit, 
@@ -54,9 +78,7 @@ slack window with repetitions of the provided sequence. Adapting the circuit use
 repeat the sequence as follows:
 
 ```{code-cell} ipython3
-from cirq import X, Y
-from cirq import LineQubit, Circuit, rx, rz, CNOT
-
+from cirq import CNOT, X, Y
 a, b = LineQubit.range(2)
 circuit_one = Circuit(
     rx(0.1).on(a),
@@ -75,13 +97,13 @@ circuit_one = Circuit(
 
 print(circuit_one)
 
-custom_rule = ddd.rules.repeated_rule(X, Y, X, Y)
-print(custom_rule)
+def custom_rule(slack_length: int)->Circuit:
+   return ddd.rules.repeated_rule(slack_length=slack_length, gates=[X, Y, X, Y])
 ```
 
 When {func}`.execute_with_ddd()` is called with the inputs above, it executes the following circuit:
 ```{code-cell} ipython3
-ddd.insert_ddd_sequences(circuit, custom_rule)
+ddd.insert_ddd_sequences(circuit_one, custom_rule)
 ```
 
 ## Nested rules
@@ -93,7 +115,6 @@ than the 4 moment minimum for _XYXY_.
 In this case, one needs only insert the longer sequence first, then apply DDD as in the default case:
 ```{code-cell} ipython3
 from cirq import SWAP
-
 qreg = LineQubit.range(8)
 x_layer = Circuit(X.on_each(qreg))
 cnots_layer = Circuit(SWAP.on(q, q + 1) for q in qreg[:-1])
