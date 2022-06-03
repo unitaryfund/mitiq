@@ -13,7 +13,7 @@ Congratulations to the new member of the Mitiq team @natestemen and special than
 ### All Changes
 
 - Add section 2 (use case) on DDD to user guide (@nathanshammah, gh-1304)
-- Update DDD options documentation (third section) (andreamari, gh-1327)
+- Update DDD options documentation (third section) (@andreamari, gh-1327)
 - Add additional options subsection for DDD (third section) (@Aaron-Robertson, gh-1326)
 - Add theory subsection for DDD (fifth section) (@andreamari, @natestemen, gh-1311)
 - Update amazon-braket-sdk requirement from ~=1.19.0 to ~=1.24.0 (@dependabot gh-1324, gh-1310, gh-1306, gh-1303, gh-1297, gh-1278, gh-1271)
