@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.176.0 (In development)
+## Version 0.17.0 (In development)
 
 ## Version 0.16.0 (June 3rd, 2022)
 ### Summary
