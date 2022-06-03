@@ -36,7 +36,6 @@ import numpy as np
 
 from mitiq import ddd
 from cirq import LineQubit, Circuit, rx, rz, CNOT, X, Y, H, Z, SWAP, DensityMatrixSimulator, amplitude_damp
-from mitiq.interface.mitiq_cirq import compute_density_matrix
 
 a, b = LineQubit.range(2)
 circuit_one = Circuit(
