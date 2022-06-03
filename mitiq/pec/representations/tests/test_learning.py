@@ -34,7 +34,7 @@ from mitiq.cdr._testing import random_x_z_cnot_circuit
 from mitiq.pec.representations.learning import learn_biased_noise_parameters
 
 circuit = random_x_z_cnot_circuit(
-    LineQubit.range(3), n_moments=5, random_state=1
+    LineQubit.range(2), n_moments=5, random_state=1
 )
 Rx_ops = list(circuit.findall_operations_with_gate_type(Rx))
 Rz_ops = list(circuit.findall_operations_with_gate_type(Rz))
