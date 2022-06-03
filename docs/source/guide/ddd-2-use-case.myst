@@ -19,7 +19,7 @@ Dynamical decoupling is a technique that has been originally devised to shield a
 
 It is thus particularly effective against structured baths, colored noise or any type of noise with some level of memory effects. More details on the theory of digital dynamical decoupling are given in the section [What is the theory behind DDD?](ddd-5-theory.myst).
 
-Dynamical decoupling is also effective for one-shot quantum computing algorithms, i.e., it finds application beyond algorithms that just require expected values, like variational quantum algorithms.
+Dynamical decoupling is also effective for single-shot quantum computing algorithms, i.e., it finds application beyond algorithms that just require expectation values, like variational quantum algorithms.
 
 
 
