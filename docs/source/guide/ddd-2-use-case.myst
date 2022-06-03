@@ -28,4 +28,4 @@ Dynamical decoupling is also effective for one-shot quantum computing algorithms
 
 Dynamical decoupling is generally applied at the pulse level. Mitiq provides it at the gate-level. In any case, native-gate control is required, to be able to know that the actual gates providing the decoupling sequence are run on the quantum processor or simulator.
 
-Another limitation of dynamical decoupling is that it cannot improve results against completely symmetric noise effects (symmetrical with respect to gates applied in a quanutum circuit). In particular, (digital) dynamical decoupling does not improve coherence times against depolarizing noise.
+Another limitation of dynamical decoupling is that it cannot improve results against completely symmetric noise effects (symmetrical with respect to gates applied in the decoupling sequence). In particular, digital dynamical decoupling is ineffective against depolarizing Markovian noise.
