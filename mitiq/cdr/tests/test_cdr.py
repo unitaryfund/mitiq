@@ -44,7 +44,7 @@ def execute(circuit: QPROGRAM) -> np.ndarray:
     return compute_density_matrix(convert_to_mitiq(circuit)[0])
 
 def batched_execute(circuits) -> List[np.ndarray]:
-    return [execute(circuit) for circuit for circuits]
+    return [execute(circuit) for circuit in circuits]
 
 def simulate(circuit: QPROGRAM) -> np.ndarray:
     return compute_density_matrix(
