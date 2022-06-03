@@ -17,7 +17,7 @@ kernelspec:
 
 Dynamical decoupling is a technique that has been originally devised to shield a quantum system from quantum noise coming from an environment, using open-loop control techniques :cite:`Viola_1999_PRL`. The crucial idea behind dynamical decoupling is to intervene with control pulses on timescales that are faster than those of the system-environment interaction.
 
-The theory of dynamical decoupling was originally devised at the pulse level and can include environments with memory effects. It can thus be effective also against structured baths or so called color-noise environments.
+It is thus particularly effective against structured baths, colored noise or any type of noise with some level of memory effects. More details on the theory of digital dynamical decoupling are given in the section [What is the theory behind DDD?](ddd-5-theory.myst).
 
 Dynamical decoupling is also effective for one-shot quantum computing algorithms, i.e., it finds application beyond algorithms that just require expected values, like variational quantum algorithms.
 
