@@ -43,8 +43,10 @@ from mitiq.interface.mitiq_cirq import compute_density_matrix
 def execute(circuit: QPROGRAM) -> np.ndarray:
     return compute_density_matrix(convert_to_mitiq(circuit)[0])
 
+
 def batched_execute(circuits) -> List[np.ndarray]:
     return [execute(circuit) for circuit in circuits]
+
 
 def simulate(circuit: QPROGRAM) -> np.ndarray:
     return compute_density_matrix(
@@ -213,7 +215,8 @@ def test_mitigated_execute_with_cdr(
         **kwargs,
     )
     cdr_batched_mitigated = cdr_batched_executor([circuit])
-    assert abs(cdr_batched_mitigated - true_value) <= abs(noisy_value - true_value)
+    assert abs(cdr_batched_mitigated - true_value) <= \
+           abs(noisy_value - true_value)
 
 
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
