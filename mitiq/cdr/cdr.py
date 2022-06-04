@@ -252,7 +252,7 @@ def mitigate_executor(
 
         @wraps(executor)
         def new_executor(
-                circuits: List[QPROGRAM],
+            circuits: List[QPROGRAM],
         ) -> List[float]:
             return [
                 execute_with_cdr(

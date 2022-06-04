@@ -252,7 +252,7 @@ def mitigate_executor(
 
         @wraps(executor)
         def new_executor(
-                circuits: List[QPROGRAM],
+            circuits: List[QPROGRAM],
         ) -> List[Union[float, Tuple[float, Dict[str, Any]]]]:
             return [
                 execute_with_pec(

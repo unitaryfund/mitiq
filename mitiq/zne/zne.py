@@ -103,9 +103,7 @@ def mitigate_executor(
     if not executor_obj.can_batch:
 
         @wraps(executor)
-        def new_executor(
-            circuit: QPROGRAM
-        ) -> float:
+        def new_executor(circuit: QPROGRAM) -> float:
             return execute_with_zne(
                 circuit,
                 executor,
@@ -118,9 +116,7 @@ def mitigate_executor(
     else:
 
         @wraps(executor)
-        def new_executor(
-            circuits: List[QPROGRAM]
-        ) -> List[float]:
+        def new_executor(circuits: List[QPROGRAM]) -> List[float]:
             return [
                 execute_with_zne(
                     circuit,
