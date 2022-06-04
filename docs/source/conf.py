@@ -346,7 +346,7 @@ nbsphinx_thumbnails = {
     'examples/molecular_hydrogen': '_static/molecular-hydrogen-vqe.png',
     'examples/vqe-pyquil-demo': '_static/vqe-pyquil-demo.png',
     'examples/pyquil_demo': '_static/pyquil-demo.png',
+    'examples/mitiq-paper/*': '_static/mitiq-codeblocks.png',
     # default images if no thumbnail is specified
     'examples/*': '_static/mitiq-logo.png',
-    'examples/mitiq-paper/*': '_static/mitiq-logo.png',
 }
