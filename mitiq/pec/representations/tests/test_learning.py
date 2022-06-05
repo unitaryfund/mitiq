@@ -79,14 +79,7 @@ def biased_noise_channel(epsilon, eta):
 @pytest.mark.parametrize("epsilon", [0, 0.7, 1])
 @pytest.mark.parametrize("eta", [0, 1, 1000])
 @pytest.mark.parametrize("gate", [CNOT, Rx_ops[0][2], Rz_ops[0][2]])
-def test_biased_noise_loss_function(
-    epsilon,
-    eta,
-    gate,
-    training_circuits,
-    ideal_values,
-    observable,
-):
+def test_biased_noise_loss_function(epsilon, eta, gate):
     """Test that the biased noise loss function value (calculated with error
     mitigation) is smaller than the loss calculated with the noisy
     (unmitigated) executor"""
@@ -114,9 +107,7 @@ def test_biased_noise_loss_function(
 
 
 @pytest.mark.parametrize("gate", [CNOT, Rx_ops[0][2], Rz_ops[0][2]])
-def test_biased_noise_compare_ideal(
-    gate, training_circuits, observable, ideal_values
-):
+def test_biased_noise_compare_ideal(gate):
     def noisy_execute(circ: Circuit) -> np.ndarray:
         noisy_circ = circ.with_noise(biased_noise_channel(0, 0))
         return ideal_execute(noisy_circ)
