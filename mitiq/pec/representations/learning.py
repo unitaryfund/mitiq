@@ -68,16 +68,18 @@ def biased_noise_loss_function(
             eta,
         )
     ]
-    mitigated_values = [
-        execute_with_pec(
-            circuit=training_circuit,
-            observable=observable,
-            executor=noisy_executor,
-            representations=representations,
-            full_output=False,
-        )
-        for training_circuit in training_circuits
-    ]
+    mitigated_values = np.array(
+        [
+            execute_with_pec(
+                circuit=training_circuit,
+                observable=observable,
+                executor=noisy_executor,
+                representations=representations,
+                full_output=False,
+            )
+            for training_circuit in training_circuits
+        ]
+    )
 
     return np.sum((mitigated_values - ideal_values) ** 2) / len(
         training_circuits
