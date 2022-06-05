@@ -38,5 +38,5 @@ from mitiq.pec.representations.biased_noise import (
 )
 
 from mitiq.pec.representations.learning import (
-    learn_biased_noise_parameters,
+    biased_noise_loss_function,
 )

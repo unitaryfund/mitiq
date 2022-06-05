@@ -30,25 +30,39 @@ from cirq import (
 )
 from mitiq import Executor, Observable, PauliString
 from mitiq.interface.mitiq_cirq import compute_density_matrix
+from mitiq.cdr import generate_training_circuits
 from mitiq.cdr._testing import random_x_z_cnot_circuit
-from mitiq.pec.representations.learning import learn_biased_noise_parameters
+from mitiq.pec.representations.learning import biased_noise_loss_function
 
 circuit = random_x_z_cnot_circuit(
     LineQubit.range(2), n_moments=5, random_state=1
 )
+
+observable = Observable(PauliString("XZ"), PauliString("YY"))
+
+training_circuits = generate_training_circuits(
+    circuit=circuit,
+    num_training_circuits=10,
+    fraction_non_clifford=0,
+    method_select="uniform",
+    method_replace="closest",
+)
+
 Rx_ops = list(circuit.findall_operations_with_gate_type(Rx))
 Rz_ops = list(circuit.findall_operations_with_gate_type(Rz))
 
 
-@pytest.mark.parametrize("epsilon", [0, 0.7, 1])
-@pytest.mark.parametrize("eta", [0, 1, 1000])
-@pytest.mark.parametrize("gate", [CNOT, Rx_ops[0][2], Rz_ops[0][2]])
-def test_learn_biased_noise_parameters(epsilon, eta, gate):
-    """Test the learning function with initial noise strength and noise bias
-    slightly offset from the simulated noise model values"""
+def ideal_execute(circ: Circuit) -> np.ndarray:
+    return compute_density_matrix(circ, noise_level=(0.0,))
 
-    observable = Observable(PauliString("XZ"), PauliString("YY"))
-    # Define biased noise channel
+
+ideal_executor = Executor(ideal_execute)
+ideal_values = np.array(
+    [ideal_executor.evaluate(t, observable) for t in training_circuits]
+)
+
+
+def biased_noise_channel(epsilon, eta):
     a = 1 - epsilon
     b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
     c = epsilon / (3 * (eta + 1))
@@ -59,25 +73,64 @@ def test_learn_biased_noise_parameters(epsilon, eta, gate):
         (c, unitary(X)),
         (c, unitary(Y)),
     ]
+    return ops.MixedUnitaryChannel(mix)
 
-    def ideal_executor(circ: Circuit) -> np.ndarray:
-        return compute_density_matrix(circ, noise_level=(0.0,))
 
-    def noisy_executor(circ: Circuit) -> np.ndarray:
-        noisy_circ = circ.with_noise(ops.MixedUnitaryChannel(mix))
-        return ideal_executor(noisy_circ)
-
-    offset = 0.01
-
-    [epsilon_opt, eta_opt] = learn_biased_noise_parameters(
-        operation=gate,
-        circuit=circuit,
-        ideal_executor=Executor(ideal_executor),
-        noisy_executor=Executor(noisy_executor),
-        num_training_circuits=10,
-        epsilon0=(1 + offset) * epsilon,
-        eta0=(1 + offset) * eta,
-        observable=observable,
+@pytest.mark.parametrize("epsilon", [0, 0.7, 1])
+@pytest.mark.parametrize("eta", [0, 1, 1000])
+@pytest.mark.parametrize("gate", [CNOT, Rx_ops[0][2], Rz_ops[0][2]])
+def test_biased_noise_loss_function(
+    epsilon,
+    eta,
+    gate,
+    training_circuits,
+    ideal_values,
+    observable,
+):
+    """Test that the biased noise loss function value (calculated with error
+    mitigation) is smaller than the loss calculated with the noisy
+    (unmitigated) executor"""
+    
+    def noisy_execute(circ: Circuit) -> np.ndarray:
+        noisy_circ = circ.with_noise(biased_noise_channel(epsilon, eta))
+        return ideal_execute(noisy_circ)
+    
+    noisy_executor = Executor(noisy_execute)
+    noisy_values = np.array(
+        [
+            noisy_executor.evaluate(t, observable)
+            for t in training_circuits
+        ]
     )
-    assert np.isclose(epsilon_opt, epsilon, rtol=1e-03, atol=1e-05)
-    assert np.isclose(eta_opt, eta, rtol=1e-02, atol=1e-04)
+    loss = biased_noise_loss_function(
+        [epsilon, eta],
+        gate,
+        training_circuits,
+        ideal_values,
+        noisy_executor,
+        observable,
+    )
+
+    assert loss <= np.sum((noisy_values - ideal_values) ** 2) / len(
+        training_circuits
+    )
+
+
+@pytest.mark.parametrize("gate", [CNOT, Rx_ops[0][2], Rz_ops[0][2]])
+def test_biased_noise_compare_ideal(
+    gate, training_circuits, observable, ideal_values
+):
+    def noisy_execute(circ: Circuit) -> np.ndarray:
+        noisy_circ = circ.with_noise(biased_noise_channel(0, 0))
+        return ideal_execute(noisy_circ)
+    
+    noisy_executor = Executor(noisy_execute)
+    loss = biased_noise_loss_function(
+        [0, 0],
+        gate,
+        training_circuits,
+        ideal_values,
+        noisy_executor,
+        observable,
+    )
+    assert np.isclose(loss, 0)
