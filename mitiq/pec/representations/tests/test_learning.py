@@ -42,7 +42,7 @@ observable = Observable(PauliString("XZ"), PauliString("YY"))
 
 training_circuits = generate_training_circuits(
     circuit=circuit,
-    num_training_circuits=10,
+    num_training_circuits=3,
     fraction_non_clifford=0,
     method_select="uniform",
     method_replace="closest",
@@ -77,8 +77,8 @@ def biased_noise_channel(epsilon, eta):
 
 
 @pytest.mark.parametrize("epsilon", [0, 0.7, 1])
-@pytest.mark.parametrize("eta", [0, 1, 1000])
-@pytest.mark.parametrize("gate", [CNOT, Rx_ops[0][2], Rz_ops[0][2]])
+@pytest.mark.parametrize("eta", [0, 1])
+@pytest.mark.parametrize("gate", [CNOT, Rx_ops[0][2]])
 def test_biased_noise_loss_function(epsilon, eta, gate):
     """Test that the biased noise loss function value (calculated with error
     mitigation) is smaller than the loss calculated with the noisy
