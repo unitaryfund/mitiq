@@ -90,17 +90,14 @@ def test_biased_noise_loss_function(
     """Test that the biased noise loss function value (calculated with error
     mitigation) is smaller than the loss calculated with the noisy
     (unmitigated) executor"""
-    
+
     def noisy_execute(circ: Circuit) -> np.ndarray:
         noisy_circ = circ.with_noise(biased_noise_channel(epsilon, eta))
         return ideal_execute(noisy_circ)
-    
+
     noisy_executor = Executor(noisy_execute)
     noisy_values = np.array(
-        [
-            noisy_executor.evaluate(t, observable)
-            for t in training_circuits
-        ]
+        [noisy_executor.evaluate(t, observable) for t in training_circuits]
     )
     loss = biased_noise_loss_function(
         [epsilon, eta],
@@ -123,7 +120,7 @@ def test_biased_noise_compare_ideal(
     def noisy_execute(circ: Circuit) -> np.ndarray:
         noisy_circ = circ.with_noise(biased_noise_channel(0, 0))
         return ideal_execute(noisy_circ)
-    
+
     noisy_executor = Executor(noisy_execute)
     loss = biased_noise_loss_function(
         [0, 0],
