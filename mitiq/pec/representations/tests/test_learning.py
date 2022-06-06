@@ -106,7 +106,7 @@ def test_biased_noise_loss_function(epsilon, eta, gate):
     )
 
 
-@pytest.mark.parametrize("gate", [CNOT, Rx_ops[0][2], Rz_ops[0][2]])
+@pytest.mark.parametrize("gate", [CNOT, Rz_ops[0][2]])
 def test_biased_noise_compare_ideal(gate):
     def noisy_execute(circ: Circuit) -> np.ndarray:
         noisy_circ = circ.with_noise(biased_noise_channel(0, 0))
