@@ -17,11 +17,81 @@ learning-based technique."""
 
 from typing import Optional, Dict, Any, List
 import numpy as np
+from scipy.optimize import minimize
+from cirq import Circuit, LineQubit, Gate
 from mitiq import QPROGRAM, Executor, Observable
+from mitiq.cdr import generate_training_circuits
 from mitiq.pec import execute_with_pec
 from mitiq.pec.representations.biased_noise import (
     represent_operation_with_local_biased_noise,
 )
+
+
+def learn_biased_noise_parameters(
+    operation: Gate,
+    circuit: QPROGRAM,
+    ideal_executor: Executor,
+    noisy_executor: Executor,
+    num_training_circuits: int = 10,
+    epsilon0: float = 0,
+    eta0: float = 1,
+    observable: Optional[Observable] = None,
+) -> List[float]:
+    r"""Loss function: optimize the quasiprobability representation using
+    the method of least squares
+
+    Args:
+        operation: ideal operation to be represented by a (learning-optmized)
+            combination of noisy operations.
+        circuit: the full quantum program as defined by the user.
+        ideal_executor: Executes the ideal circuit and returns a
+            `QuantumResult`.
+        noisy_executor: Executes the noisy circuit and returns a
+            `QuantumResult`.
+        num_training_circuits: number of Clifford circuits to be generated for
+            training data.
+        epsilon0: initial guess for noise strength.
+        eta0: initial guess for noise bias.
+        observable (optional): Observable to compute the expectation value of.
+            If None, the `executor` must return an expectation value. Otherwise
+            the `QuantumResult` returned by `executor` is used to compute the
+            expectation of the observable.
+
+    Returns:
+        Optimized noise strength epsilon and noise bias eta.
+    """
+    training_circuits = generate_training_circuits(
+        circuit=circuit,
+        num_training_circuits=num_training_circuits,
+        fraction_non_clifford=0,
+        method_select="uniform",
+        method_replace="closest",
+    )
+
+    ideal_values = np.array(
+        [ideal_executor.evaluate(t, observable) for t in training_circuits]
+    )
+
+    x0 = np.array(
+        [epsilon0, eta0]
+    )  # initial parameter values for optimization
+    result = minimize(
+        biased_noise_loss_function,
+        x0,
+        args=(
+            operation,
+            circuit,
+            ideal_values,
+            noisy_executor,
+            observable,
+        ),
+        method="BFGS",
+    )
+    x_result = result.x
+    epsilon = x_result[0]
+    eta = x_result[1]
+
+    return [epsilon, eta]
 
 
 def _biased_noise_loss_function(
