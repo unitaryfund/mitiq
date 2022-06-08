@@ -61,7 +61,7 @@ where $g_i$ are numerical values that depend on the bond length $R$. The above H
 1. Uses the Bravyi-Kitaev transform, and
 1. Reduces resources (qubit number) by symmetry considerations (see {cite}`OMalley_2016_PRX` for more details).
 
-Each coefficient $g_i$ is a function of the bond length $g_i = g_i(R)$. The exact parameters from the paper are outlined below:
+Each coefficient $g_i$ is a function of the bond length $g_i = g_i(R)$. The exact parameters can be extracted from Appendix C of {cite}`OMalley_2016_PRX`.
 
 ```{code-cell} ipython3
 # Data is organized as follow
