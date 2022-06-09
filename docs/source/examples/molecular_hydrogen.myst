@@ -63,7 +63,8 @@ where $g_i$ are numerical values that depend on the bond length $R$. The above H
 
 Each coefficient $g_i$ is a function of the bond length $g_i = g_i(R)$. The exact parameters can be extracted from Appendix C of {cite}`OMalley_2016_PRX`.
 
-We can also calculate their values automatically using OpenFermion (an open source quantum chemistry package).
+We can also calculate their values automatically using OpenFermion (an open source quantum chemistry package). 
+To run the code of this example, the Python package `openfermionpyscf` must be [installed](https://github.com/quantumlib/OpenFermion-PySCF) in your system.
 This results in slightly modified hamiltonians of the form:
 
 \begin{equation}
