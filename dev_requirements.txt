@@ -21,8 +21,8 @@ pydata-sphinx-theme~=0.8.1
 jupytext==1.11.1
 sphinx-gallery
 nbsphinx
-openfermion; sys_platform != 'win32'
-openfermionpyscf; sys_platform != 'win32'
+openfermion==1.3.0; sys_platform != 'win32'
+openfermionpyscf==0.5; sys_platform != 'win32'
 
 # The following seems to be necessary for sphinx to run.
 jinja2~=3.0.3
