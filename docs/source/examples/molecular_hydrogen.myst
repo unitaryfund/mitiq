@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# Estimating the potential energy surface of molecular Hydrogen with ZNE
+# Estimating the potential energy surface of molecular Hydrogen with ZNE and OpenFermion
 
 +++
 
