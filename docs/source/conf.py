@@ -325,7 +325,7 @@ html_theme = "pydata_sphinx_theme"  # 'alabaster', 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ['_static']
+html_static_path = ['_thumbnails']
 
 # display logo on top-left of html pages
 html_logo = "img/mitiq-logo.png"
@@ -338,12 +338,15 @@ nbsphinx_custom_formats = {
 nbsphinx_execute = 'always'
 
 nbsphinx_thumbnails = {
-    'examples/hamiltonians': '_images/vqe-cirq-pauli-sum-mitigation-plot.png',
-    'examples/simple_landscape': '_images/simple_landscape_13_0.png',
-    'examples/maxcut-demo': '_images/maxcut-demo_48_1.png',
-    'examples/pyquil-demo': '_images/pyquil_demo_11_0.png',
-    'examples/molecular_hydrogen': '_images/molecular_hydrogen_26_0.png',
+    'examples/hamiltonians': '_static/vqe-cirq-pauli-sum-mitigation-plot.png',
+    'examples/braket_mirror_circuit': '_static/mirror-circuits.png',
+    'examples/maxcut-demo': '_static/max-cut.png',
+    'examples/ibmq-backends': '_static/ibmq-gate-map.png',
+    'examples/simple_landscape': '_static/simple-landscape.png',
+    'examples/molecular_hydrogen': '_static/molecular-hydrogen-vqe.png',
+    'examples/vqe-pyquil-demo': '_static/vqe-pyquil-demo.png',
+    'examples/pyquil_demo': '_static/pyquil-demo.png',
+    'examples/mitiq-paper/*': '_static/mitiq-codeblocks.png',
     # default images if no thumbnail is specified
     'examples/*': '_static/mitiq-logo.png',
-    'examples/mitiq-paper/*': '_static/mitiq-logo.png',
 }
