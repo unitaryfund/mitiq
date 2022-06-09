@@ -27,7 +27,7 @@ from mitiq.pec.representations.biased_noise import (
 
 def biased_noise_loss_function(
     params: np.ndarray,
-    operations_to_mitigate: List[QPROGRAM],
+    operation: Gate,
     training_circuits: List[QPROGRAM],
     ideal_values: np.ndarray,
     noisy_executor: Executor,
