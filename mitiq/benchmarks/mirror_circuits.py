@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Functions for creating mirror circuits
-as defined in https://arxiv.org/abs/2008.11294 for
-benchmarking quantum computers (with error mitigation)."""
+"""Functions for creating mirror circuits as defined in
+:cite:`Proctor_2021_NatPhys` for benchmarking quantum computers
+(with error mitigation)."""
 from typing import List, Optional, Tuple
 
 from numpy import random
