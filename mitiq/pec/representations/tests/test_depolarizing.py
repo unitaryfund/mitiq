@@ -54,6 +54,9 @@ def single_qubit_depolarizing_overhead(noise_level: float) -> float:
 
     Args:
         noise_level: multiplier of noise level in :cite:`Temme_2017_PRL`
+
+    Returns:
+        Depolarizing overhead value with noise level considered.
     """
     epsilon = 4 / 3 * noise_level
     return (1 + epsilon / 2) / (1 - epsilon)
@@ -64,6 +67,9 @@ def two_qubit_depolarizing_overhead(noise_level: float) -> float:
 
     Args:
         noise_level: multiplier of noise level in :cite:`Temme_2017_PRL`
+
+    Returns:
+        Depolarizing overhead value with noise level considered.
     """
     epsilon = 16 / 15 * noise_level
     return (1 + 7 * epsilon / 8) / (1 - epsilon)
