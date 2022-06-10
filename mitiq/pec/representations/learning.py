@@ -27,7 +27,7 @@ from mitiq.pec.representations.biased_noise import (
 
 def biased_noise_loss_function(
     params: np.ndarray,
-    operation: Gate,
+    operations_to_mitigate: List[QPROGRAM],
     training_circuits: List[QPROGRAM],
     ideal_values: np.ndarray,
     noisy_executor: Executor,
@@ -42,8 +42,8 @@ def biased_noise_loss_function(
             (local noise strength) and eta (noise bias between reduced
             dephasing and depolarizing
             channels)
-        operation: ideal operation to be represented by a (learning-optmized)
-            combination of noisy operations
+        operation_to_mitigate: list of ideal operations to be represented by a
+            (learning-optmized) combination of noisy operations
         training_circuits: list of training circuits for generating the
             error-mitigated expectation values
         ideal_values: expectation values obtained by simulations run on the
@@ -61,13 +61,12 @@ def biased_noise_loss_function(
     """
     epsilon = params[0]
     eta = params[1]
-    qreg = LineQubit.range(operation.num_qubits())
     representations = [
         represent_operation_with_local_biased_noise(
-            Circuit(operation.on(*qreg)),
+            Circuit(operation),
             epsilon,
             eta,
-        )
+        ) for operation in operations_to_mitigate
     ]
     mitigated_values = np.array(
         [
