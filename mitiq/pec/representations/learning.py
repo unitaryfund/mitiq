@@ -66,7 +66,7 @@ def biased_noise_loss_function(
             Circuit(operation),
             epsilon,
             eta,
-        ) 
+        )
         for operation in operations_to_mitigate
     ]
     mitigated_values = np.array(
