@@ -16,7 +16,7 @@
 import numpy as np
 import pytest
 from cirq import (
-    CNOT,
+    CXPowGate,
     Rx,
     Rz,
     I,
@@ -50,6 +50,7 @@ training_circuits = generate_training_circuits(
     method_replace="closest",
 )
 
+CNOT_ops = list(circuit.findall_operations_with_gate_type(CXPowGate))
 Rx_ops = list(circuit.findall_operations_with_gate_type(Rx))
 Rz_ops = list(circuit.findall_operations_with_gate_type(Rz))
 
@@ -80,7 +81,7 @@ def biased_noise_channel(epsilon: float, eta: float):
 
 @pytest.mark.parametrize("epsilon", [0, 0.7, 1])
 @pytest.mark.parametrize("eta", [0, 1])
-@pytest.mark.parametrize("operations", [[CNOT], [Rx_ops[0][2]]])
+@pytest.mark.parametrize("operations", [[CNOT_ops[0][1]], [Rx_ops[0][1]]])
 def test_biased_noise_loss_function(epsilon, eta, operations):
     """Test that the biased noise loss function value (calculated with error
     mitigation) is smaller than the loss calculated with the noisy
@@ -109,7 +110,7 @@ def test_biased_noise_loss_function(epsilon, eta, operations):
     )
 
 
-@pytest.mark.parametrize("operations", [[CNOT], [Rz_ops[0][2]]])
+@pytest.mark.parametrize("operations", [[CNOT_ops[0][1]], [Rz_ops[0][1]]])
 def test_biased_noise_loss_compare_ideal(operations):
     def noisy_execute(circ: Circuit) -> np.ndarray:
         noisy_circ = circ.with_noise(biased_noise_channel(0, 0))
