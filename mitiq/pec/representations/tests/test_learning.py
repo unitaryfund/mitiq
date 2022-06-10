@@ -38,7 +38,7 @@ circuit = random_x_z_cnot_circuit(
     LineQubit.range(2), n_moments=5, random_state=1
 )
 
-pec_kwargs = ["precision", 0.1] # set precision of mitigated value in loss fn
+pec_kwargs = {"precision": 0.1}  # set precision of mitigated value in loss fn
 
 observable = Observable(PauliString("XZ"), PauliString("YY"))
 
