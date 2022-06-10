@@ -38,6 +38,8 @@ circuit = random_x_z_cnot_circuit(
     LineQubit.range(2), n_moments=5, random_state=1
 )
 
+pec_kwargs = ["precision", 0.1] # set precision of mitigated value in loss fn
+
 observable = Observable(PauliString("XZ"), PauliString("YY"))
 
 training_circuits = generate_training_circuits(
@@ -62,7 +64,7 @@ ideal_values = np.array(
 )
 
 
-def biased_noise_channel(epsilon, eta):
+def biased_noise_channel(epsilon: float, eta: float):
     a = 1 - epsilon
     b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
     c = epsilon / (3 * (eta + 1))
@@ -93,12 +95,13 @@ def test_biased_noise_loss_function(epsilon, eta, gate):
         [noisy_executor.evaluate(t, observable) for t in training_circuits]
     )
     loss = biased_noise_loss_function(
-        [epsilon, eta],
-        gate,
-        training_circuits,
-        ideal_values,
-        noisy_executor,
-        observable,
+        params=[epsilon, eta],
+        operation=gate,
+        training_circuits=training_circuits,
+        ideal_values=ideal_values,
+        noisy_executor=noisy_executor,
+        pec_kwargs=pec_kwargs,
+        observable=observable,
     )
 
     assert loss <= np.sum((noisy_values - ideal_values) ** 2) / len(
@@ -107,18 +110,19 @@ def test_biased_noise_loss_function(epsilon, eta, gate):
 
 
 @pytest.mark.parametrize("gate", [CNOT, Rz_ops[0][2]])
-def test_biased_noise_compare_ideal(gate):
+def test_biased_noise_loss_compare_ideal(gate):
     def noisy_execute(circ: Circuit) -> np.ndarray:
         noisy_circ = circ.with_noise(biased_noise_channel(0, 0))
         return ideal_execute(noisy_circ)
 
     noisy_executor = Executor(noisy_execute)
     loss = biased_noise_loss_function(
-        [0, 0],
-        gate,
-        training_circuits,
-        ideal_values,
-        noisy_executor,
-        observable,
+        params=[0, 0],
+        operation=gate,
+        training_circuits=training_circuits,
+        ideal_values=ideal_values,
+        noisy_executor=noisy_executor,
+        pec_kwargs=pec_kwargs,
+        observable=observable,
     )
     assert np.isclose(loss, 0)

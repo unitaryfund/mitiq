@@ -15,7 +15,7 @@
 """Function to calculate parameters for biased noise model via a
 learning-based technique."""
 
-from typing import Optional, List
+from typing import Optional, Dict, Any, List
 import numpy as np
 from cirq import Circuit, LineQubit, Gate
 from mitiq import QPROGRAM, Executor, Observable
@@ -31,6 +31,7 @@ def biased_noise_loss_function(
     training_circuits: List[QPROGRAM],
     ideal_values: np.ndarray,
     noisy_executor: Executor,
+    pec_kwargs: Dict["str", Any],
     observable: Optional[Observable] = None,
 ) -> float:
     r"""Loss function for optimizing the quasiprobability representation using
@@ -76,6 +77,7 @@ def biased_noise_loss_function(
                 executor=noisy_executor,
                 representations=representations,
                 full_output=False,
+                **pec_kwargs,
             )
             for training_circuit in training_circuits
         ]
