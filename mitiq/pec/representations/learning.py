@@ -17,7 +17,7 @@ learning-based technique."""
 
 from typing import Optional, Dict, Any, List
 import numpy as np
-from cirq import Circuit, LineQubit, Gate
+from cirq import Circuit
 from mitiq import QPROGRAM, Executor, Observable
 from mitiq.pec import execute_with_pec
 from mitiq.pec.representations.biased_noise import (
