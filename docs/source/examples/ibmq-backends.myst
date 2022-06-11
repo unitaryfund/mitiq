@@ -12,7 +12,7 @@ kernelspec:
 ---
 
 (label-zne-example)=
-# Error mitigation on IBMQ backends
+# Error mitigation on IBMQ backends with Qiskit
 
 
 This tutorial shows an example of how to mitigate noise on IBMQ
@@ -168,40 +168,6 @@ print(f"Mitigated result {mitigated:.3f}")
 Any different combination of noise scaling and extrapolation technique can be passed as arguments to
 ``zne.execute_with_zne``.
 
-(examples/ibmq-backends/cirq-frontend)=
-### Cirq frontend
-
-It isn't necessary to use Qiskit frontends (circuits) to run on IBM backends. We can use conversions in
-Mitiq to use any supported frontend with any supported backend. Below, we show how to run a Cirq circuit on an
-IBMQ backend.
-
-First, we define the Cirq circuit.
-
-```{code-cell} ipython3
-import cirq
-
-qbit = cirq.LineQubit(0)
-cirq_circuit = cirq.Circuit([cirq.X(qbit)] * 10, cirq.measure(qbit))
-```
-
-Now, we simply add a line to our executor function which converts from a Cirq circuit to a Qiskit circuit.
-
-```{code-cell} ipython3
-from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
-
-def cirq_ibm_executor(cirq_circuit: cirq.Circuit, shots: int = 1024) -> float:
-    qiskit_circuit = to_qiskit(cirq_circuit)
-    return ibmq_executor(qiskit_circuit, shots)
-```
-
-After this, we can use ``zne.execute_with_zne`` in the same way as above.
-
-```{code-cell} ipython3
-mitigated = zne.execute_with_zne(cirq_circuit, cirq_ibm_executor)
-print(f"Mitigated result: {mitigated:.3f}")
-```
-
-As above, different noise scaling or extrapolation methods can be used.
 
 ## Lower-level usage
 
