@@ -17,7 +17,7 @@ learning-based technique."""
 
 from typing import Optional, Dict, Any, List
 import numpy as np
-from cirq import Circuit, LineQubit, Gate
+from cirq import Circuit
 from mitiq import QPROGRAM, Executor, Observable
 from mitiq.pec import execute_with_pec
 from mitiq.pec.representations.biased_noise import (
@@ -27,7 +27,7 @@ from mitiq.pec.representations.biased_noise import (
 
 def biased_noise_loss_function(
     params: np.ndarray,
-    operation: Gate,
+    operations_to_mitigate: List[QPROGRAM],
     training_circuits: List[QPROGRAM],
     ideal_values: np.ndarray,
     noisy_executor: Executor,
@@ -38,19 +38,20 @@ def biased_noise_loss_function(
     the method of least squares
 
     Args:
-        params: array of optimization parameters epsilon
+        params: Array of optimization parameters epsilon
             (local noise strength) and eta (noise bias between reduced
             dephasing and depolarizing
             channels)
-        operation: ideal operation to be represented by a (learning-optmized)
-            combination of noisy operations
-        training_circuits: list of training circuits for generating the
+        operations_to_mitigate: List of ideal operations to be represented by
+        a (learning-optimized) combination of noisy operations
+        training_circuits: List of training circuits for generating the
             error-mitigated expectation values
-        ideal_values: expectation values obtained by simulations run on the
+        ideal_values: Expectation values obtained by simulations run on the
             Clifford training circuit
         noisy_executor: Executes the circuit with noise and returns a
             `QuantumResult`.
-
+        pec_kwargs: Options to pass to `execute_w_pec` for the error-mitigated
+            expection value obtained from executing the training circuits
         observable (optional): Observable to compute the expectation value of.
             If None, the `executor` must return an expectation value. Otherwise
             the `QuantumResult` returned by `executor` is used to compute the
@@ -61,13 +62,13 @@ def biased_noise_loss_function(
     """
     epsilon = params[0]
     eta = params[1]
-    qreg = LineQubit.range(operation.num_qubits())
     representations = [
         represent_operation_with_local_biased_noise(
-            Circuit(operation.on(*qreg)),
+            Circuit(operation),
             epsilon,
             eta,
         )
+        for operation in operations_to_mitigate
     ]
     mitigated_values = np.array(
         [
