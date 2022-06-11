@@ -30,7 +30,6 @@ backends with the Cirq frontend, broken down in the following steps.
 ## Settings
 
 ```{code-cell} ipython3
-import cirq
 from qiskit.test.ibmq_mock import mock_get_backend
 
 from mitiq import zne
@@ -99,6 +98,8 @@ We define this function in the following code block. Because we are using IBMQ b
 for instructions to create an account, save credentials, and see online quantum computers.
 
 ```{code-cell} ipython3
+import qiskit
+
 if qiskit.IBMQ.stored_account() and USE_REAL_HARDWARE:
     provider = qiskit.IBMQ.load_account()
     backend = provider.get_backend("ibmq_qasm_simulator")  # Set quantum computer here!
