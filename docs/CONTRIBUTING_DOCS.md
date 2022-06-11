@@ -44,18 +44,17 @@ extensions = ['sphinx.ext.autodoc','sphinx.ext.doctest']
 
 ## Updating the Documentation
 
-You need not to modify the `docs/build` folder, as it is automatically generated. You should only modify the `docs/source` files.
+Documentation is found in `docs/source`, and is divided into the following sections:
 
-The documentation is divided into:
 -  a **guide**, whose content needs to be
 written from scratch, 
 - **examples** which can be either jupyter notebooks or MyST formatted notebooks, and
 - an **API-doc** part, which is (mostly)
 automatically generated.
 
-Information in the docs can be added as markdown (`.md`/`.myst`) files, since
+Information in the docs can be added as markdown (`.md`/`.myst`) files, as
 the `myst-parser` extension supports both basic markdown syntax as well as
-the extended MyST syntax. Just add the file to `source` directory and a TOC somewhere (if you want that).
+the extended MyST syntax. If you are adding a new file (as opposed to editing an existing one), consider adding it to an associated TOC.
 
 ```{warning}
 Currently, `.rst` is supported for any of the files in the docs, but the current migration plan is to move everything to MyST serialization, to make it easier to include Jupyter notebooks and more consistent with documentation in the project root.
@@ -76,9 +75,10 @@ file.myst
 ```{tip}
 If you use VS Code as your text editor there is a nice extension that does syntax highlighting for MyST: [https://marketplace.visualstudio.com/items?itemName=ExecutableBookProject.myst-highlight](https://marketplace.visualstudio.com/items?itemName=ExecutableBookProject.myst-highlight)
 ```
+
 ### Including other files in the docs 
 
-To include `.md` files outside of the documentation `source` directory, you can add a stub `*.myst` file to the toctree inside the `docs\source` directory that contains:
+To include `.md` files outside of the documentation `source` directory, you can add a stub `*.myst` file to the toctree inside the `docs/source` directory that contains:
 
 ````
 ```{include} path/to/file.md
@@ -91,16 +91,15 @@ where `file.md` is the one to be added. For more information on including files 
 
 ### Adding files to the user guide
 
-To add information in the guide, it is recommended to add markdown (`.md`) or MyST markdown files (`.myst`) to the `docs/guide/` directory.
-Remember to add any files you add to the `docs/guide/` directory to the guide TOC file `docs/source/guide/guide.myst`.
+To add information in the guide, please add markdown (`.md`) or MyST markdown (`.myst`) files to the `docs/guide` directory.
+Remember to add new files to the guide's TOC file `docs/source/guide/guide.myst`.
 
 ### Adding code examples
 
-All code examples, besides explanations on the use of core software package features, live in the `examples` directory under `docs/source`. You can add regular
-Jupyter notebooks (`.ipynb`) or MyST formatted markdown notebooks (`.myst` or `.md`) which you can think of as notebooks if you could write them in markdown.
-In general MyST formatting will be preferred as it is much easier to diff in version control, but adds one additional step for folks contributing them directly.
+All code examples, besides explanations on the use of core software package features, live in the `examples` directory under `docs/source`. You can add
+Jupyter notebooks (`.ipynb`) or MyST markdown notebooks, but MyST formatting will be preferred as it is much easier to diff in version control.
 
-If you have a notebook you want to add, and want to automatically convert it from the `.ipynb` to the `.myst` file format, you can use a great Python command line tool called [jupytext](https://jupytext.readthedocs.io/en/latest/index.html).
+If you have a notebook you want to add, and want to automatically convert it from the `.ipynb` to `.myst`, you can use a great Python command line tool called [jupytext](https://jupytext.readthedocs.io/en/latest/index.html).
 Not only can `jupytext` convert between the formats on demand, but once you install it, you can configure it to manage _both_ a Jupyter and Markdown version of your file, so you don't have to remember to do conversions (for more details, see the `jupytext` docs on [paired notebooks](https://jupytext.readthedocs.io/en/latest/index.html#paired-notebooks).
 Using the paired notebooks you can continue your development in the notebooks as normal, and just commit to git the markdown serialized version when you want to add to the docs.
 You can even add this tool as a [git pre-commit hook](https://jupytext.readthedocs.io/en/latest/using-pre-commit.html) if you want!
@@ -112,13 +111,14 @@ There is a [sample markdown formatted notebook in the `examples` directory](./ex
 ### Automatically add information from the API docs
 
 New modules, classes and functions can be added by listing them
-in the appropriate `.md or `*.myst` file (such as `apidoc.myst` or a child), e.g.,
+in the appropriate file (such as `apidoc.myst` or a child), e.g.,
 
-```
+````
 ## New Module
 ```{automodule} mitiq.new_module
    :members:
 ```
+````
 will add all elements of the `mitiq.new_module` module with a subtitle "New Module." 
 You can hand-pick classes and functions to add, to comment them, as well as exclude them.
 
@@ -127,24 +127,23 @@ If you are adding new features to Mitiq, make sure to add API docs in the
 source code, and to the API page `apidoc.rst`.
 ```
 
-### Build the documentation locally
-The easiest way to build the docs is to just run `make docs` from the project 
-root directory in bash, which by default builds the html docs output.
-You can also use from root `make pdf` to generate the PDF version.
+## Build the documentation locally
+The easiest way to build the docs is to run `make docs` from the project 
+root directory, which by default builds the html docs output.
+You can also use run `make pdf` to generate a PDF version.
 
 ```{tip}
-If you want to remove previous builds and make the HTML docs fresh, try `make docs-clean`!
+If you want a fresh build with no caching, run `make docs-clean`!
 ```
 
-If you want to call sphinx directly, you can from bash move to the `docs` 
-folder and run
-
+To call sphinx directly, `cd` into the `docs` directory and run
 ```bash
 sphinx-build -b html source build
-
 ```
-this generates the `docs/build` folder. This folder is not kept track of in the
+
+These commands generate the `docs/build` folder. This folder is not kept track of in the
 github repository, as `docs/build` is present in the `.gitignore` file.
+Once the documentation is generated you can view it by opening it in your browser (HTML output) or your PDF viewer (PDF output).
 
 ```{note}
 The `html` and `latex` and `pdf` files will be automatically created in the
@@ -162,7 +161,6 @@ highlighting), use the `code-block` directive:
 
 ````
 ```{code-block} python
-
    1+1        # simple example
 ```
 ````
@@ -174,7 +172,6 @@ in an invisible block. An example is:
 
 ````
 ```{testcode} python
-
    1+1        # simple example
 ```
 ````
@@ -210,13 +207,14 @@ If you have code blocks you want to run, but not be displayed, use the
 There is also the `doctest` directive, which allows you to include interactive
 Python blocks. These need to be given this way:
 
-````md
+````
 ```{doctest} python
    >>> import numpy as np
    >>> print(np.array(2))
    array(2)
 ```
 ````
+
 ```{note}
 Notice that no space is left between the last input and the output when writing code blocks with interactive inputs and outputs.
 ```
@@ -234,7 +232,7 @@ In order to skip a test, if this is problematic, one can use the `SKIP` and
 
 Mitiq uses the `doctest` [extension](https://www.sphinx-doc.org/en/master/usage/extensions/doctest.html) to run and test code in the docs, which is configured in the `conf.py` file. To execute the tests in bash, run:
 
-```bash
+```sh
 make doctest
 ```
 from the root directory. 

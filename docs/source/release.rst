@@ -17,6 +17,7 @@ Development work is done on separate branches and forks that get merged into
 ``master`` when they are ready to be included in the next release.
 
 The main steps of our git flow are as follows:
+
 - Feature work and bug fixes are done on branches (external contributors should fork and then work on branches on their fork)
 - Once work is ready for review and inclusion in a release, make a PR from the branch/fork to master on the Mitiq repo. Squash merges are preferred.
 - PRs are then reviewed by the team and the community and then merged into master as appropriate. This means that this feature/fix will be included in the next release.
@@ -49,14 +50,9 @@ Update the changelog
 ^^^^^^^^^^^^^^^^^^^^
 
 This task has two parts:
-1. Make sure that ``CHANGELOG.md`` has an entry for each pull request (PR)
-since the last release (PRs). These entries should contain a short description
-of the PR, as well as the author username and PR number in the form
-(@username, gh-xxx).
-2. The release author should add a "Summary" section with a couple sentences
-describing the latest release, and then update the title of the release
-section to include the release date and remove the "In Development"
-designation.
+
+#. Make sure that ``CHANGELOG.md`` has an entry for each pull request (PR) since the last release (PRs). These entries should contain a short description of the PR, as well as the author username and PR number in the form (@username, gh-xxx).
+#. The release author should add a "Summary" section with a couple sentences describing the latest release, and then update the title of the release section to include the release date and remove the "In Development" designation.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Bump version in VERSION.txt
