@@ -30,8 +30,6 @@ backends with the Cirq frontend, broken down in the following steps.
 ## Settings
 
 ```{code-cell} ipython3
-from qiskit.test.ibmq_mock import mock_get_backend
-
 from mitiq import zne
 from mitiq.interface.mitiq_qiskit.qiskit_utils import initialized_depolarizing_noise
 ```
@@ -63,7 +61,7 @@ import cirq
 
 qbit = cirq.LineQubit(0)
 cirq_circuit = cirq.Circuit([cirq.X(qbit)] * 10, cirq.measure(qbit))
-print(circuit)
+print(cirq_circuit)
 ```
 
 Now, we simply add a line to our executor function which converts from a Cirq circuit to a Qiskit circuit.
@@ -148,8 +146,8 @@ At this point, the circuit can be executed to return a mitigated expectation val
 as follows.
 
 ```{code-cell} ipython3
-unmitigated = ibmq_executor(circuit)
-mitigated = zne.execute_with_zne(circuit, ibmq_executor)
+unmitigated = cirq_ibm_executor(cirq_circuit)
+mitigated = zne.execute_with_zne(cirq_circuit, cirq_ibm_executor)
 print(f"Unmitigated result {unmitigated:.3f}")
 print(f"Mitigated result {mitigated:.3f}")
 ```
@@ -169,7 +167,7 @@ following code block shows an example of using linear extrapolation with five di
 
 ```{code-cell} ipython3
 linear_factory = zne.inference.LinearFactory(scale_factors=[1.0, 1.5, 2.0, 2.5, 3.0])
-mitigated = zne.execute_with_zne(circuit, ibmq_executor, factory=linear_factory)
+mitigated = zne.execute_with_zne(cirq_circuit, cirq_ibm_executor, factory=linear_factory)
 print(f"Mitigated result {mitigated:.3f}")
 ```
 
@@ -179,7 +177,7 @@ scaling noise by folding gates starting from the left (instead of at random, the
 ``zne.execute_with_zne``).
 
 ```{code-cell} ipython3
-mitigated = zne.execute_with_zne(circuit, ibmq_executor, scale_noise=zne.scaling.fold_gates_from_left)
+mitigated = zne.execute_with_zne(cirq_circuit, cirq_ibm_executor, scale_noise=zne.scaling.fold_gates_from_left)
 print(f"Mitigated result {mitigated:.3f}")
 ```
 
@@ -199,13 +197,13 @@ local folding method.
 ```{code-cell} ipython3
 scale_factors = [1., 1.5, 2., 2.5, 3.]
 folded_circuits = [
-        zne.scaling.fold_gates_at_random(circuit, scale)
+        zne.scaling.fold_gates_at_random(to_qiskit(cirq_circuit), scale)
         for scale in scale_factors
 ]
 
 # Check that the circuit depth is (approximately) scaled as expected
 for j, c in enumerate(folded_circuits):
-    print(f"Number of gates of folded circuit {j} scaled by: {len(c) / len(circuit):.3f}")
+    print(f"Number of gates of folded circuit {j} scaled by: {len(c) / len(cirq_circuit):.3f}")
 ```
 
 For a noiseless simulation, the expectation of this observable should be 1.0 because our circuit compiles to the identity.
