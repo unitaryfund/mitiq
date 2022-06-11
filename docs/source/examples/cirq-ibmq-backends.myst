@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-(label-zne-example)=
+(label-cirq-zne-example)=
 # Error mitigation on IBMQ backends
 
 
@@ -51,7 +51,7 @@ USE_REAL_HARDWARE = False
 
 For simplicity, we'll use a random single-qubit circuit with ten gates that compiles to the identity, defined below.
 
-```{code-cell} ipython3
+
 ### Cirq frontend
 
 It isn't necessary to use Qiskit frontends (circuits) to run on IBM backends. We can use conversions in
