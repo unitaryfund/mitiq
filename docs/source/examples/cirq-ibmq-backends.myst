@@ -22,8 +22,7 @@ backends with the Cirq frontend, broken down in the following steps.
   - [Settings](#settings)
   - [Setup: Defining a circuit](#setup-defining-a-circuit)
   - [High-level usage](#high-level-usage)
-    - [Options](#options)
-    - [Cirq frontend](#cirq-frontend)
+  - [Options](#options)
   - [Lower-level usage](#lower-level-usage)
 
 +++
@@ -51,7 +50,7 @@ USE_REAL_HARDWARE = False
 
 For simplicity, we'll use a random single-qubit circuit with ten gates that compiles to the identity, defined below.
 
-
+(examples/cirq-ibmq-backends/cirq-frontend)=
 ### Cirq frontend
 
 It isn't necessary to use Qiskit frontends (circuits) to run on IBM backends. We can use conversions in
@@ -158,7 +157,7 @@ As long as a circuit and a function for executing the circuit are defined, the `
 be called as above to return zero-noise extrapolated expectation value(s).
 
 
-### Options
+## Options
 
 
 Different options for noise scaling and extrapolation can be passed into the ``zne.execute_with_zne`` function.
