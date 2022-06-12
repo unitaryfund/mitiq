@@ -12,7 +12,7 @@ kernelspec:
 ---
 
 (label-cirq-zne-example)=
-# Error mitigation on IBMQ backends
+# Error mitigation on IBMQ backends with Cirq
 
 
 This tutorial shows an example of how to mitigate noise on IBMQ
