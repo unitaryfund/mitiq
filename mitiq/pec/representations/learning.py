@@ -17,7 +17,6 @@ learning-based technique."""
 
 from typing import Optional, Dict, Any, List
 import numpy as np
-from cirq import Circuit
 from mitiq import QPROGRAM, Executor, Observable
 from mitiq.pec import execute_with_pec
 from mitiq.pec.representations.biased_noise import (
@@ -64,7 +63,7 @@ def biased_noise_loss_function(
     eta = params[1]
     representations = [
         represent_operation_with_local_biased_noise(
-            Circuit(operation),
+            operation,
             epsilon,
             eta,
         )
