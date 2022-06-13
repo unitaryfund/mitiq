@@ -42,19 +42,9 @@ from mitiq.pec.channels import _operation_to_choi, _circuit_to_choi
 
 
 def single_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
-    """Overhead calculation similar to that presented in [Temme2017]_ and
-    modified according to combined (biased) noise channel in [Strikis2021]_.
-
-    .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
-        "Error mitigation for short-depth quantum circuits,"
-        *Phys. Rev. Lett.* **119**, 180509 (2017),
-        (https://arxiv.org/abs/1612.02058).
-
-    .. [Strikis2021] : Armands Strikis, Dayue Qin, Yanzhu Chen,
-        Simon C. Benjamin, and Ying Li,
-        "Learning-Based Quantum Error Mitigation,"
-        *PRX QUANTUM* **2**, 040330 (2021),
-        (https://arxiv.org/abs/2005.07601v2).
+    """Overhead calculation similar to that presented in
+    :cite:`Temme_2017_PRL` and modified according to combined (biased) noise
+    channel in :cite:`Strikis_2021_PRXQuantum`.
     """
     a = 1 - epsilon
     b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
@@ -81,19 +71,9 @@ def single_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
 
 
 def two_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:
-    """Overhead calculation similar to that presented in [Temme2017]_ and
-    modified according to combined (biased) noise channel in [Strikis2021]_.
-
-    .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
-        "Error mitigation for short-depth quantum circuits,"
-        *Phys. Rev. Lett.* **119**, 180509 (2017),
-        (https://arxiv.org/abs/1612.02058).
-
-    .. [Strikis2021] : Armands Strikis, Dayue Qin, Yanzhu Chen,
-        Simon C. Benjamin, and Ying Li,
-        "Learning-Based Quantum Error Mitigation,"
-        *PRX QUANTUM* **2**, 040330 (2021),
-        (https://arxiv.org/abs/2005.07601v2).
+    """Overhead calculation similar to that presented in
+    :cite:`Temme_2017_PRL` and modified according to combined (biased) noise
+    channel in :cite:`Strikis_2021_PRXQuantum`.
     """
     a = 1 - epsilon
     b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
