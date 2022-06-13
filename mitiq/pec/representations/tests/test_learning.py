@@ -83,7 +83,9 @@ def biased_noise_channel(epsilon: float, eta: float) -> MixedUnitaryChannel:
 
 @pytest.mark.parametrize("epsilon", [0, 0.7, 1])
 @pytest.mark.parametrize("eta", [0, 1])
-@pytest.mark.parametrize("operations", [[CNOT_ops[0][1]], [Rx_ops[0][1]]])
+@pytest.mark.parametrize(
+    "operations", [[Circuit(CNOT_ops[0][1])], [Circuit(Rx_ops[0][1])]]
+)
 def test_biased_noise_loss_function(epsilon, eta, operations):
     """Test that the biased noise loss function value (calculated with error
     mitigation) is less than (or equal to) the loss calculated with the noisy
@@ -112,7 +114,9 @@ def test_biased_noise_loss_function(epsilon, eta, operations):
     )
 
 
-@pytest.mark.parametrize("operations", [[CNOT_ops[0][1]], [Rz_ops[0][1]]])
+@pytest.mark.parametrize(
+    "operations", [[Circuit(CNOT_ops[0][1])], [Circuit(Rz_ops[0][1])]]
+)
 def test_biased_noise_loss_compare_ideal(operations):
     """Test that the loss function is zero when the noise strength is zero"""
 
