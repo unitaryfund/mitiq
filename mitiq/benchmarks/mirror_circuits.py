@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Functions for creating mirror circuits
-as defined in https://arxiv.org/abs/2008.11294 for
-benchmarking quantum computers (with error mitigation)."""
+"""Functions for creating mirror circuits as defined in
+:cite:`Proctor_2021_NatPhys` for benchmarking quantum computers
+(with error mitigation)."""
 from typing import List, Optional, Tuple
 
 from numpy import random
@@ -54,16 +54,18 @@ def edge_grab(
     connectivity_graph: nx.Graph,
     random_state: random.RandomState,
 ) -> nx.Graph:
-    """Returns a set of edges for which two qubit gates
-    are to be applied given a two qubit gate density
-    and the connectivity graph that must be satisfied.
-
+    """
     Args:
         two_qubit_gate_prob: Probability of an edge being chosen
             from the set of candidate edges.
         connectivity_graph: The connectivity graph for the backend
             on which the circuit will be run.
         random_state: Random state to select edges (uniformly at random).
+
+    Returns:
+        Returns a set of edges for which two qubit gates are to be
+        applied given a two qubit gate density and the connectivity graph
+        that must be satisfied.
     """
     connectivity_graph = connectivity_graph.copy()
     candidate_edges = nx.Graph()
@@ -89,15 +91,17 @@ def random_cliffords(
     random_state: random.RandomState,
     two_qubit_gate: cirq.Gate = cirq.CNOT,
 ) -> cirq.Circuit:
-    """Returns a circuit with a two-qubit Clifford gate applied
-    to each edge in edges, and a random single-qubit
-    Clifford gate applied to every other qubit.
-
+    """
     Args:
         connectivity_graph: A graph with the edges for which the
             two-qubit Clifford gate is to be applied.
         random_state: Random state to choose Cliffords (uniformly at random).
         two_qubit_gate: Two-qubit gate to use.
+
+    Returns:
+        A circuit with a two-qubit Clifford gate applied to each edge in
+        edges, and a random single-qubit Clifford gate applied to every
+        other qubit.
     """
     gates = [
         two_qubit_gate.on(cirq.LineQubit(a), cirq.LineQubit(b))
@@ -114,13 +118,15 @@ def random_cliffords(
 def random_single_cliffords(
     connectivity_graph: nx.Graph, random_state: random.RandomState
 ) -> cirq.Circuit:
-    """Returns a circuit with a random single-qubit Clifford gate
-    applied on each given qubit.
-
+    """
     Args:
         connectivity_graph: A graph with each node representing a qubit for
             which a random single-qubit Clifford gate is to be applied.
         random_state: Random state to choose Cliffords (uniformly at random).
+
+    Returns:
+        A circuit with a random single-qubit Clifford gate applied on each
+        given qubit.
     """
     gates: List[cirq.Operation] = []
     for qubit in connectivity_graph.nodes:
@@ -138,8 +144,7 @@ def generate_mirror_circuit(
     seed: Optional[int] = None,
     return_type: Optional[str] = None,
 ) -> Tuple[QPROGRAM, Bitstring]:
-    """Returns a randomized mirror circuit.
-
+    """
     Args:
         nlayers: The number of random Clifford layers to be generated.
         two_qubit_gate_prob: Probability of a two-qubit gate being applied.
@@ -153,6 +158,9 @@ def generate_mirror_circuit(
             returned circuit. See the keys of ``mitiq.SUPPORTED_PROGRAM_TYPES``
             for options. If ``None``, the returned circuit is a
             ``cirq.Circuit``.
+
+    Returns:
+        A randomized mirror circuit.
     """
     if not 0 <= two_qubit_gate_prob <= 1:
         raise ValueError("two_qubit_gate_prob must be between 0 and 1")
