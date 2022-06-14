@@ -147,17 +147,18 @@ def test_learn_biased_noise_parameters(epsilon, eta, gate):
     """Test the learning function with initial noise strength and noise bias
     with a small offset from the simulated noise model values"""
 
-    def noisy_executor(circ: Circuit) -> np.ndarray:
-        noisy_circ = circ.with_noise(ops.MixedUnitaryChannel(mix))
-        return ideal_executor(noisy_circ)
-
+    def noisy_execute(circ: Circuit) -> np.ndarray:
+        noisy_circ = circ.with_noise(biased_noise_channel(epsilon, eta))
+        return ideal_execute(noisy_circ)
+        
+    noisy_executor = Executor(noisy_execute)
     offset = 0.01
 
     [epsilon_opt, eta_opt] = learn_biased_noise_parameters(
         operation=gate,
         circuit=circuit,
-        ideal_executor=Executor(ideal_executor),
-        noisy_executor=Executor(noisy_executor),
+        ideal_executor=ideal_executor,
+        noisy_executor=noisy_executor,
         num_training_circuits=10,
         epsilon0=(1 + offset) * epsilon,
         eta0=(1 + offset) * eta,
