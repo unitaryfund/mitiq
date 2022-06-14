@@ -33,7 +33,7 @@ from mitiq import Executor, Observable, PauliString
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.cdr import generate_training_circuits
 from mitiq.cdr._testing import random_x_z_cnot_circuit
-from mitiq.pec.representations.learning import biased_noise_loss_function
+from mitiq.pec.representations.learning import _biased_noise_loss_function
 
 circuit = random_x_z_cnot_circuit(
     LineQubit.range(2), n_moments=5, random_state=1
@@ -99,7 +99,7 @@ def test_biased_noise_loss_function(epsilon, eta, operations):
     noisy_values = np.array(
         [noisy_executor.evaluate(t, observable) for t in training_circuits]
     )
-    loss = biased_noise_loss_function(
+    loss = _biased_noise_loss_function(
         params=[epsilon, eta],
         operations_to_mitigate=operations,
         training_circuits=training_circuits,
@@ -125,7 +125,7 @@ def test_biased_noise_loss_compare_ideal(operations):
         return ideal_execute(noisy_circ)
 
     noisy_executor = Executor(noisy_execute)
-    loss = biased_noise_loss_function(
+    loss = _biased_noise_loss_function(
         params=[0, 0],
         operations_to_mitigate=operations,
         training_circuits=training_circuits,
