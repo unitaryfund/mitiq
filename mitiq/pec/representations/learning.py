@@ -33,31 +33,29 @@ def _biased_noise_loss_function(
     pec_kwargs: Dict["str", Any],
     observable: Optional[Observable] = None,
 ) -> float:
-    r"""Loss function for optimizing the quasiprobability representation using
-    the method of least squares
+    r"""Loss function for optimizing quasi-probability representations
+    assuming a biased noise model depending on two real parameters.
 
     Args:
         params: Array of optimization parameters epsilon
             (local noise strength) and eta (noise bias between reduced
-            dephasing and depolarizing
-            channels)
+            dephasing and depolarizing channels).
         operations_to_mitigate: List of ideal operations to be represented by
-        a (learning-optimized) combination of noisy operations
+            a combination of noisy operations.
         training_circuits: List of training circuits for generating the
-            error-mitigated expectation values
-        ideal_values: Expectation values obtained by simulations run on the
-            Clifford training circuit
+            error-mitigated expectation values.
+        ideal_values: Expectation values obtained by noiseless simulations.
         noisy_executor: Executes the circuit with noise and returns a
             `QuantumResult`.
         pec_kwargs: Options to pass to `execute_w_pec` for the error-mitigated
-            expection value obtained from executing the training circuits
+            expectation value obtained from executing the training circuits.
         observable (optional): Observable to compute the expectation value of.
             If None, the `executor` must return an expectation value. Otherwise
             the `QuantumResult` returned by `executor` is used to compute the
             expectation of the observable.
 
-    Returns: Square of the difference between the error-mitigated values and
-        the ideal values, over the training set
+    Returns: Mean squared error between the error-mitigated values and
+        the ideal values, over the training set.
     """
     epsilon = params[0]
     eta = params[1]
