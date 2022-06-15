@@ -259,8 +259,7 @@ zne_value = zne.execute_with_zne(
     scale_noise=scale_param_noise,
     num_to_average=10,
 )
-# We are applying parameter-noise mitigation with an executor which is instead subject to depolarizing noise.
-# Therefore, we don't expect good performances.
+# Parameter-noise mitigation is designed for random, coherent noise. For simplicity, we use depolarizing noise here, so we don't expect the best performance.
 print("ZNE value via parameter noise scaling:", zne_value)
 ```
 
