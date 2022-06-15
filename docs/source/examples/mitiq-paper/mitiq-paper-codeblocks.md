@@ -244,14 +244,14 @@ print("\nScaled circuit:", scaled, sep="\n")
 > Note: The paper shows pseudocode; here we show an example.
 
 ```{code-cell} ipython3
-from mitiq.zne.scaling import compute_parameter_variance
+from functools import partial
+from mitiq.zne.scaling import compute_parameter_variance, scale_parameters
 
 # Estimate base level of parameter noise
 base_variance = compute_parameter_variance(executor, cirq.X, cirq.LineQubit(0))
 print("Estimation of parameter noise variance:", base_variance)
 
-def scale_param_noise(circuit, scale_factor):
-    return zne.scaling.scale_parameters(circuit, scale_factor, base_variance=0.009)
+scale_param_noise = partial(scale_parameters, base_variance=base_variance)
 
 zne_value = zne.execute_with_zne(
     circuit,
