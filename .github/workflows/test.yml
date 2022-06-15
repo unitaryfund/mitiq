@@ -106,12 +106,11 @@ jobs:
           exit 0
 
   test-linux:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
         python-version: [3.7, 3.8]
-
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Check out mitiq
         uses: actions/checkout@v3
@@ -140,12 +139,11 @@ jobs:
           fail_ci_if_error: true
 
   test-nonlinux:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [macos-latest, windows-latest]
         python-version: [3.7, 3.8]
-
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Check out mitiq
         uses: actions/checkout@v3
