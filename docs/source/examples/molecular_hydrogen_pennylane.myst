@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# Estimating the potential energy surface of molecular Hydrogen with ZNE and PennyLane
+# Estimating the potential energy surface of molecular Hydrogen with ZNE and PennyLane + Cirq
 
 +++
 
@@ -33,13 +33,10 @@ In this example, we variationally estimate the potential energy surface of the m
 
 ```{code-cell} ipython3
 from functools import partial
-from typing import List
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import brute
 import cirq
-import openfermion as of
-from openfermionpyscf import generate_molecular_hamiltonian
 
 import pennylane as qml
 from pennylane.grouping import pauli_word_to_string
@@ -103,9 +100,8 @@ hamiltonians = [molecular_hamiltonian(rad) for rad in radii]
 print(f"Hamiltonian at R = {radii[0]} Angstroms is:\n {hamiltonians[0]}")
 ```
 
-\begin{equation}
-    H = g_0 I + g_1 Z_0 + g_2 Z_1 + g_3 Z_0 Z_1 + g_4 X_0 X_1
-\end{equation}
+We define a function that evaluates the expectation value of the Hamiltonian on a noisy backend and for a given input circuit (ansatz).
+Here we use a Cirq density matrix simulator with a simple depolarizing noise model.
 
 ```{code-cell} ipython3
 def energy(
@@ -119,7 +115,6 @@ def energy(
     return expec_val.real
 ```
 
-
 ## Evaluating the energy landscape for a fixed $R$
 
 +++
@@ -131,6 +126,7 @@ def ansatz(theta: float) -> cirq.Circuit:
     """Returns the circuit associated to the input variational parameter."""
     qreg = cirq.LineQubit.range(2)
     return cirq.Circuit(
+        cirq.ops.X.on(qreg[1]),
         cirq.ops.ry(np.pi / 2).on(qreg[0]),
         cirq.ops.rx(-np.pi / 2).on(qreg[1]),
         cirq.ops.CNOT.on(*qreg),
@@ -154,8 +150,7 @@ all_energies = []
 for pval in pvals:
     energies = []
     for theta in thetas:
-        results = hamiltonians[0].expectation(ansatz(theta), execute=partial(compute_density_matrix, noise_model=cirq.depolarize, noise_level=(pval,)))
-        energies.append(np.real(results))
+        energies.append(energy(ansatz(theta), radius_index=0, depo_noise_strength=pval))
     all_energies.append(energies)
 ```
 
@@ -190,17 +185,16 @@ for p in pvals[1:]:
     mitigated = []
     for theta in thetas:
         # Define an executor function
-        executor = Executor(partial(compute_density_matrix, noise_model=cirq.depolarize, noise_level=(p,)))
+        execute = partial(energy, radius_index=0, depo_noise_strength=p)
         # Run ZNE
         zne_value = zne.execute_with_zne(
             ansatz(theta),
-            executor,
-            hamiltonians[0],
+            execute,
             factory=fac,
             scale_noise=scaling_function,
             num_to_average=num_to_average,
         )
-        mitigated.append(np.real(zne_value))
+        mitigated.append(zne_value)
     all_mitigated.append(mitigated)
 ```
 
@@ -321,7 +315,7 @@ for pval in pvals[1:]:
                 factory=fac,
                 scale_noise=scaling_function,
                 num_to_average=num_to_average,
-            ))
+            )
 
         # Minimize energy with respect to "theta"
         res = brute(

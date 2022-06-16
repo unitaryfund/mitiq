@@ -344,6 +344,7 @@ nbsphinx_thumbnails = {
     'examples/ibmq-backends': '_static/ibmq-gate-map.png',
     'examples/simple_landscape': '_static/simple-landscape.png',
     'examples/molecular_hydrogen': '_static/molecular-hydrogen-vqe.png',
+    'examples/molecular_hydrogen_pennylane': '_static/molecular-hydrogen-vqe-pennylane.png',
     'examples/vqe-pyquil-demo': '_static/vqe-pyquil-demo.png',
     'examples/pyquil_demo': '_static/pyquil-demo.png',
     'examples/mitiq-paper/*': '_static/mitiq-codeblocks.png',
