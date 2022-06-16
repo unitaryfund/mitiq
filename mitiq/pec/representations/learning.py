@@ -18,7 +18,6 @@ learning-based technique."""
 from typing import Optional, Dict, Any, List
 import numpy as np
 from scipy.optimize import minimize
-from cirq import Circuit, LineQubit, Gate
 from mitiq import QPROGRAM, Executor, Observable
 from mitiq.cdr import generate_training_circuits
 from mitiq.pec import execute_with_pec
@@ -28,7 +27,7 @@ from mitiq.pec.representations.biased_noise import (
 
 
 def learn_biased_noise_parameters(
-    operation: Gate,
+    operations_to_learn: List[QPROGRAM],
     circuit: QPROGRAM,
     ideal_executor: Executor,
     noisy_executor: Executor,
@@ -71,18 +70,21 @@ def learn_biased_noise_parameters(
     ideal_values = np.array(
         [ideal_executor.evaluate(t, observable) for t in training_circuits]
     )
+    # Set number of samples used to calculate mitigated value in loss function
+    pec_kwargs = {"num_samples": 10}
 
     x0 = np.array(
         [epsilon0, eta0]
     )  # initial parameter values for optimization
     result = minimize(
-        biased_noise_loss_function,
+        _biased_noise_loss_function,
         x0,
         args=(
-            operation,
-            circuit,
+            operations_to_learn,
+            training_circuits,
             ideal_values,
             noisy_executor,
+            pec_kwargs,
             observable,
         ),
         method="BFGS",
