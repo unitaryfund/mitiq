@@ -71,7 +71,7 @@ def learn_biased_noise_parameters(
         [ideal_executor.evaluate(t, observable) for t in training_circuits]
     )
     # Set number of samples used to calculate mitigated value in loss function
-    pec_kwargs = {"num_samples": 10}
+    pec_kwargs = {"num_samples": 50}
 
     x0 = np.array(
         [epsilon0, eta0]
