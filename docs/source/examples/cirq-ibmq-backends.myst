@@ -12,18 +12,19 @@ kernelspec:
 ---
 
 (label-cirq-zne-example)=
-# Error mitigation with Cirq on IBMQ backends
+# [Error mitigation with Cirq on IBMQ backends](#error-mitigation-cirq-on-ibmq-backends)
 
 
-This tutorial shows an example of how to mitigate noise on IBMQ
-backends with the Cirq frontend, broken down in the following steps.
+This tutorial shows an example of how to mitigate noise on IBMQ backends with the Cirq frontend.
+It isn't necessary to use Qiskit frontends (circuits) to run on IBM backends. We can use conversions in
+Mitiq to use supported frontends with supported backends. Below, we show how to run a Cirq circuit on an
+IBMQ backend, broken down in the following steps.
 
-- [Error mitigation on IBMQ backends with Cirq](#error-mitigation-cirq-on-ibmq-backends)
-  - [Settings](#settings)
-  - [Setup: Defining a circuit](#setup-defining-a-circuit)
-  - [High-level usage](#high-level-usage)
-  - [Options](#options)
-  - [Lower-level usage](#lower-level-usage)
+- [Settings](#settings)
+- [Setup: Defining a circuit](#setup-defining-a-circuit)
+- [High-level usage](#high-level-usage)
+- [Options](#options)
+- [Lower-level usage](#lower-level-usage)
 
 +++
 
@@ -34,27 +35,19 @@ from mitiq import zne
 from mitiq.interface.mitiq_qiskit.qiskit_utils import initialized_depolarizing_noise
 ```
 
-**Note:** If `USE_REAL_HARDWARE` is set to `False`, a classically simulated noisy backend is used instead of a real quantum computer.
-
 ```{code-cell} ipython3
 USE_REAL_HARDWARE = False
 ```
 
+**Note:** When `USE_REAL_HARDWARE` is set to `False`, a classically simulated noisy backend is used instead of a real quantum computer.
+
 (examples/cirq-ibmq-backends/setup-defining-a-circuit)=
-## Setup: Defining a circuit
+## Setup: Defining a circuit in Cirq
 
 +++
 
 For simplicity, we'll use a random single-qubit circuit with ten gates that compiles to the identity, defined below.
 
-(examples/cirq-ibmq-backends/cirq-frontend)=
-### Cirq frontend
-
-It isn't necessary to use Qiskit frontends (circuits) to run on IBM backends. We can use conversions in
-Mitiq to use any supported frontend with any supported backend. Below, we show how to run a Cirq circuit on an
-IBMQ backend.
-
-First, we define the Cirq circuit.
 
 ```{code-cell} ipython3
 import cirq
@@ -64,15 +57,6 @@ cirq_circuit = cirq.Circuit([cirq.X(qbit)] * 10, cirq.measure(qbit))
 print(cirq_circuit)
 ```
 
-Now, we simply add a line to our executor function which converts from a Cirq circuit to a Qiskit circuit.
-
-```{code-cell} ipython3
-from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
-
-def cirq_ibm_executor(cirq_circuit: cirq.Circuit, shots: int = 1024) -> float:
-    qiskit_circuit = to_qiskit(cirq_circuit)
-    return ibmq_executor(qiskit_circuit, shots)
-```
 
 We will use the probability of the ground state as our observable to mitigate, the expectation value of which should
 evaluate to one in the noiseless setting.
@@ -81,22 +65,25 @@ evaluate to one in the noiseless setting.
 ## High-level usage
 
 
-To use Mitiq with just a few lines of code, we simply need to define a function which inputs a circuit and outputs
+To use Mitiq with just a few lines of code, we need to define an executor, a function which inputs a circuit and outputs
 the expectation value to mitigate. This function will:
 
 1. [Optionally] Add measurement(s) to the circuit.
 2. Run the circuit.
 3. Convert from raw measurement statistics (or a different output format) to an expectation value.
 
-We define this function in the following code block. Because we are using IBMQ backends, we first load our account.
+For information on how to define more advanced executors, see the [Executors](executors.myst) section of the Mitiq user guide.
+
+We define the executor function in the following code block. Because we are using IBMQ backends, we first load our account.
 
 +++
 
-**Note:** Using an IBM quantum computer requires a valid IBMQ account. See https://quantum-computing.ibm.com/
+**Note:** Using an IBM quantum computer requires a valid IBMQ account. See <https://quantum-computing.ibm.com/>
 for instructions to create an account, save credentials, and see online quantum computers.
 
 ```{code-cell} ipython3
 import qiskit
+from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
 
 if qiskit.IBMQ.stored_account() and USE_REAL_HARDWARE:
     provider = qiskit.IBMQ.load_account()
@@ -106,13 +93,16 @@ else:
     backend = qiskit.Aer.get_backend("qasm_simulator"),
 
 
-def ibmq_executor(circuit: qiskit.QuantumCircuit, shots: int = 8192) -> float:
+def cirq_ibm_executor(cirq_circuit: cirq.Circuit, shots: int = 1024) -> float:
     """Returns the expectation value to be mitigated.
 
     Args:
         circuit: Circuit to run.
         shots: Number of times to execute the circuit to compute the expectation value.
     """
+    # convert from Cirq circuit to Qiskit circuit.
+    circuit = to_qiskit(cirq_circuit) 
+    
     if USE_REAL_HARDWARE:
         # Run the circuit on hardware
         job = qiskit.execute(
@@ -141,6 +131,7 @@ def ibmq_executor(circuit: qiskit.QuantumCircuit, shots: int = 8192) -> float:
         expectation_value = counts.get("0") / shots
     return expectation_value
 ```
+
 
 At this point, the circuit can be executed to return a mitigated expectation value by running ``zne.execute_with_zne``,
 as follows.

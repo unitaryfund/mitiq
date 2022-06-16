@@ -12,19 +12,18 @@ kernelspec:
 ---
 
 (label-zne-example)=
-# Error mitigation on IBMQ backends with Qiskit
+# [Error mitigation on IBMQ backends with Qiskit](#error-mitigation-on-ibmq-backends)
 
 
 This tutorial shows an example of how to mitigate noise on IBMQ
 backends, broken down in the following steps.
 
-- [Error mitigation on IBMQ backends](#error-mitigation-on-ibmq-backends)
-  - [Settings](#settings)
-  - [Setup: Defining a circuit](#setup-defining-a-circuit)
-  - [High-level usage](#high-level-usage)
+- [Settings](#settings)
+- [Setup: Defining a circuit](#setup-defining-a-circuit)
+- [High-level usage](#high-level-usage)
     - [Options](#options)
     - [Cirq frontend](#cirq-frontend)
-  - [Lower-level usage](#lower-level-usage)
+- [Lower-level usage](#lower-level-usage)
 
 +++
 
@@ -78,7 +77,7 @@ We define this function in the following code block. Because we are using IBMQ b
 
 +++
 
-**Note:** Using an IBM quantum computer requires a valid IBMQ account. See https://quantum-computing.ibm.com/
+**Note:** Using an IBM quantum computer requires a valid IBMQ account. See <https://quantum-computing.ibm.com/>
 for instructions to create an account, save credentials, and see online quantum computers.
 
 ```{code-cell} ipython3
