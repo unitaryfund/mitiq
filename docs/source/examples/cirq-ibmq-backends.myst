@@ -15,7 +15,7 @@ kernelspec:
 # [Error mitigation with Cirq on IBMQ backends](#error-mitigation-cirq-on-ibmq-backends)
 
 
-This tutorial shows an example of how to mitigate noise on IBMQ backends with the Cirq frontend.
+This tutorial shows an example of how to mitigate noise on IBMQ backends with the [Cirq frontend](https://quantumai.google/cirq).
 It isn't necessary to use Qiskit frontends (circuits) to run on IBM backends. We can use conversions in
 Mitiq to use supported frontends with supported backends. Below, we show how to run a Cirq circuit on an
 IBMQ backend, broken down in the following steps.
@@ -72,7 +72,7 @@ the expectation value to mitigate. This function will:
 2. Run the circuit.
 3. Convert from raw measurement statistics (or a different output format) to an expectation value.
 
-For information on how to define more advanced executors, see the [Executors](source/guide/executors.myst) section of the Mitiq user guide.
+For information on how to define more advanced executors, see the {ref}`Executors <guide/executors/executors>` section of the Mitiq user guide.
 
 We define the executor function in the following code block. Because we are using IBMQ backends, we first load our account.
 

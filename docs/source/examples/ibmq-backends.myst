@@ -21,8 +21,7 @@ backends, broken down in the following steps.
 - [Settings](#settings)
 - [Setup: Defining a circuit](#setup-defining-a-circuit)
 - [High-level usage](#high-level-usage)
-    - [Options](#options)
-    - [Cirq frontend](#cirq-frontend)
+- [Options](#options)
 - [Lower-level usage](#lower-level-usage)
 
 +++
@@ -139,7 +138,7 @@ As long as a circuit and a function for executing the circuit are defined, the `
 be called as above to return zero-noise extrapolated expectation value(s).
 
 
-### Options
+## Options
 
 
 Different options for noise scaling and extrapolation can be passed into the ``zne.execute_with_zne`` function.
