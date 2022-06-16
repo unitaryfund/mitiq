@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# Estimating the potential energy surface of molecular Hydrogen with ZNE and OpenFermion
+# Estimating the potential energy surface of molecular Hydrogen with ZNE and PennyLane + Cirq
 
 +++
 
@@ -24,7 +24,7 @@ shown in Figure 4 of the Mitiq white paper.
 ```{figure} https://calango.org/images/courses/27/528/3350/lewis-structures-and-covalent-bonding_1.jpg
 ---
 height: 200px
-name: h2-figure
+name: h2-mol-figure
 ---
 Figure 1: Pictorial representation of the $\rm H_2$ molecule.
 Extracted from [calango.org](https://calango.org/lessons/3350/learn/lewis-structures-and-covalent-bonding/).
@@ -33,15 +33,16 @@ In this example, we variationally estimate the potential energy surface of the m
 
 ```{code-cell} ipython3
 from functools import partial
-from typing import List
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import brute
 import cirq
-import openfermion as of
-from openfermionpyscf import generate_molecular_hamiltonian
 
-from mitiq import PauliString, Observable, Executor, zne  # Zero-noise extrapolation module
+import pennylane as qml
+from pennylane.grouping import pauli_word_to_string
+
+import mitiq
+from mitiq import zne  # Zero-noise extrapolation module
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 ```
 
@@ -61,47 +62,58 @@ where $g_i$ are numerical values that depend on the bond length $R$. The above H
 1. Uses the Bravyi-Kitaev transform, and
 1. Reduces resources (qubit number) by symmetry considerations (see {cite}`OMalley_2016_PRX` for more details).
 
-Each coefficient $g_i$ is a function of the bond length $g_i = g_i(R)$. The exact parameters can be extracted from Appendix C of {cite}`OMalley_2016_PRX`.
-
-We can also calculate their values automatically using OpenFermion (an open source quantum chemistry package). 
-To run the code of this example, the Python package `openfermionpyscf` must be [installed](https://github.com/quantumlib/OpenFermion-PySCF) in your system.
-This results in slightly modified hamiltonians of the form:
-
-\begin{equation}
-    H = g_0 I + g_1 Z_0 + g_2 Z_1 + g_3 Z_0 Z_1 + g_4 X_0 X_1
-\end{equation}
+Each coefficient $g_i$ is a function of the bond length $g_i = g_i(R)$. We obtain the `H` for $\rm H_2$ at any given bond length $R$
+by first building the full molecular Hamiltonian using [`PennyLane`](https://pennylane.readthedocs.io/) and then
+tapering it using the symmetries mentioned in the Appendix A of {cite}`OMalley_2016_PRX` to reduce it to a two qubit Hamiltonian, 
+where the qubits `0` and `2` corresponds to the labels `0` and `1` in the Hamiltonian `H` given above.
 
 ```{code-cell} ipython3
-radii = [0.2 * i for i in range(1, 14)]
 
-def qubit_operator_to_pauli_sum(qubit_op) -> List:
-    """Converts the OpenFermion qubit operator to a list of mitiq Pauli Strings."""
-    psum = []
-    for ind_ops, coeff in qubit_op.terms.items():
-        if ind_ops == tuple():
-            psum.append(PauliString("I", coeff))
-            continue
-        term = ["I", "I"]
-        for ind, op in ind_ops:
-            term[ind] = op
-        term = ''.join(term)
-        psum.append(PauliString(term, coeff))
-    return psum
+ang_to_bohr = 1.8897259886 # pennylane specifies coordinates in terms of Bohr radius
+def molecular_hamiltonian(bond_length: float) -> mitiq.Observable:
+    """ Builds the Hamiltonian for H2 at a given bond length """
+    symbols = ['H', 'H']
+    geometry = ang_to_bohr * np.array([[0., 0., - 0.5 * bond_length], 
+                                       [0., 0., 0.5 * bond_length]])
+    mol = qml.qchem.Molecule(symbols, geometry)
+    Hamil, qubits = qml.qchem.molecular_hamiltonian(symbols, geometry, basis="sto-6g", 
+                                                    method="pyscf", mapping="bravyi_kitaev")
 
-def get_hamiltonian(bond_length) -> Observable:
-    """Returns the hamiltonian for the H2 molecule at the given bond length. Uses the STO-6G basis set and the Bravyi-Kitaev
-    transform to map fermionic operators to qubits. Results in a 2 qubit hamiltonian returned via a metriq.Observable."""
-    geometry = [('H', (0., 0., 0.)), ('H', (0., 0., bond_length))]
-    molecular_hamiltonian = generate_molecular_hamiltonian(geometry, basis='sto-6g', multiplicity=1, charge=0)
-    fermionic_op = of.transforms.get_fermion_operator(molecular_hamiltonian)
-    bk_op = of.transforms.symmetry_conserving_bravyi_kitaev(fermionic_op, active_orbitals=4, active_fermions=2)
-    qubit_operator = qubit_operator_to_pauli_sum(bk_op)
-    return Observable(*qubit_operator)
+    # tapering the Hamiltonian using symmetries
+    generators = [qml.PauliZ(1), qml.PauliZ(3)] # symmetries corresponding to qubit 1 and 3 
+    paulix_ops = [qml.PauliX(1), qml.PauliX(3)] # corresponding paulix ops for tapering 
+    eigval_sec = [1, 1] # optimal sector containing the ground state
+    Hamil_tapered = qml.taper(Hamil, generators, paulix_ops, eigval_sec)
 
-hamiltonians = [get_hamiltonian(i) for i in radii]
-print(hamiltonians[0])
+    # converting the tapered Hamiltonian to mitiq Observable
+    coeffs, ops = Hamil_tapered.terms()
+    wire_map = {0 : 0, 2 : 1} # for relabeling the qubits in the Pauli representation
+    pauli_str = [mitiq.PauliString(
+                pauli_word_to_string(op, wire_map=wire_map), coeff=coeff.numpy())
+                 for coeff, op in zip(coeffs, ops)]
+    hamil_obs = mitiq.Observable(*pauli_str)
+
+    return hamil_obs
+
+radii = np.linspace(0.2, 2.6, 13)
+hamiltonians = [molecular_hamiltonian(rad) for rad in radii]
+print(f"Hamiltonian at R = {radii[0]} Angstroms is:\n {hamiltonians[0]}")
 ```
 
+We define a function that evaluates the expectation value of the Hamiltonian on a noisy backend and for a given input circuit (ansatz).
+Here we use a Cirq density matrix simulator with a simple depolarizing noise model.
+
+```{code-cell} ipython3
+def energy(
+    ansatz: cirq.Circuit, radius_index: int, depo_noise_strength: float = 0.05
+) -> float:
+    """Computes the energy at a given bond length (radius)."""
+    hamiltonian = hamiltonians[radius_index]
+    executor = mitiq.Executor(compute_density_matrix)
+    kwargs = {"noise_model":cirq.depolarize, "noise_level":(depo_noise_strength,)}
+    expec_val = executor.evaluate(ansatz, hamiltonian, **kwargs)[0]
+    return expec_val.real
+```
 
 ## Evaluating the energy landscape for a fixed $R$
 
@@ -114,6 +126,7 @@ def ansatz(theta: float) -> cirq.Circuit:
     """Returns the circuit associated to the input variational parameter."""
     qreg = cirq.LineQubit.range(2)
     return cirq.Circuit(
+        cirq.ops.X.on(qreg[1]),
         cirq.ops.ry(np.pi / 2).on(qreg[0]),
         cirq.ops.rx(-np.pi / 2).on(qreg[1]),
         cirq.ops.CNOT.on(*qreg),
@@ -137,8 +150,7 @@ all_energies = []
 for pval in pvals:
     energies = []
     for theta in thetas:
-        results = hamiltonians[0].expectation(ansatz(theta), execute=partial(compute_density_matrix, noise_model=cirq.depolarize, noise_level=(pval,)))
-        energies.append(np.real(results))
+        energies.append(energy(ansatz(theta), radius_index=0, depo_noise_strength=pval))
     all_energies.append(energies)
 ```
 
@@ -173,17 +185,16 @@ for p in pvals[1:]:
     mitigated = []
     for theta in thetas:
         # Define an executor function
-        executor = Executor(partial(compute_density_matrix, noise_model=cirq.depolarize, noise_level=(p,)))
+        execute = partial(energy, radius_index=0, depo_noise_strength=p)
         # Run ZNE
         zne_value = zne.execute_with_zne(
             ansatz(theta),
-            executor,
-            hamiltonians[0],
+            execute,
             factory=fac,
             scale_noise=scaling_function,
             num_to_average=num_to_average,
         )
-        mitigated.append(np.real(zne_value))
+        mitigated.append(zne_value)
     all_mitigated.append(mitigated)
 ```
 
@@ -270,8 +281,7 @@ for pval in pvals:
     for i in range(len(radii)):
         # Objective function to minimize
         def obj(theta):
-            val = hamiltonians[i].expectation(ansatz(theta[0]), execute=partial(compute_density_matrix, noise_model=cirq.depolarize, noise_level=(pval,)))
-            return np.real(val)
+            return energy(ansatz(theta[0]), radius_index=i, depo_noise_strength=pval)
 
         res = brute(obj, ranges=[(0, 2 * np.pi)], Ns=10, finish=None, full_output=True)
         these_thetas.append(res[0])
@@ -299,14 +309,13 @@ for pval in pvals[1:]:
     for i in range(len(radii)):
 
         def objective_function(theta):
-            return np.real(zne.execute_with_zne(
-                ansatz(theta),
-                Executor(partial(compute_density_matrix, noise_model=cirq.depolarize, noise_level=(pval,))),
-                hamiltonians[i],
+            return zne.execute_with_zne(
+                ansatz(theta[0]),
+                partial(energy, radius_index=i, depo_noise_strength=pval),
                 factory=fac,
                 scale_noise=scaling_function,
                 num_to_average=num_to_average,
-            ))
+            )
 
         # Minimize energy with respect to "theta"
         res = brute(
