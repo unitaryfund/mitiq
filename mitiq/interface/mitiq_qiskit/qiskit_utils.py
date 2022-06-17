@@ -14,10 +14,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Qiskit utility functions."""
+import string
 import numpy as np
 import qiskit
 from qiskit import QuantumCircuit
 from typing import Optional
+from qiskit import Aer
+from qiskit import IBMQ
+from qiskit.providers.jobstatus import JOB_FINAL_STATES
+from qiskit import QuantumCircuit, assemble, transpile
+import time
 
 # Noise simulation packages
 from qiskit.providers.aer.noise import NoiseModel
@@ -64,7 +70,7 @@ def execute(circuit: QuantumCircuit, obs: np.ndarray) -> float:
 
 
 def execute_with_shots(
-    circuit: QuantumCircuit, obs: np.ndarray, shots: int
+    circuit: QuantumCircuit, obs: np.ndarray, shots: int, simulator:bool, machine_name:string,IBMQ_ACCOUNT_TOKEN:string
 ) -> float:
     """Simulates the evolution of the circuit and returns
     the expectation value of the observable.
@@ -79,12 +85,43 @@ def execute_with_shots(
 
     """
 
-    return execute_with_shots_and_noise(
-        circuit,
-        obs,
-        noise_model=None,
-        shots=shots,
-    )
+    """ Added code to use qiskit backends"""
+    if(simulator):
+        #runs on a qiskit simulator 
+
+        # use local simulator
+
+        backend = Aer.get_backend(machine_name)
+        qobj = assemble(circuit, backend, shots=shots)
+        job = backend.run(qobj)
+        result = job.result()
+        counts = result.get_counts()
+
+        return counts
+
+    else:
+        IBMQ.enable_account(IBMQ_ACCOUNT_TOKEN)
+        backend = IBMQ.backend(name=machine_name)[0]
+        qobj = assemble(circuit, backend, shots=shots)
+        job = backend.run(qobj)
+
+        while job_status not in JOB_FINAL_STATES:
+            time.sleep(10)
+            job_status = job.status()
+
+        result = job.result()
+        counts = result.get_counts()
+        return counts
+
+
+    """ Addition ends here"""
+
+    # return execute_with_shots_and_noise(
+    #     circuit,
+    #     obs,
+    #     noise_model=None,
+    #     shots=shots,
+    # )
 
 
 def execute_with_noise(
