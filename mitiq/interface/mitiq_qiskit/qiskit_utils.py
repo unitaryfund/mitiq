@@ -23,6 +23,7 @@ from qiskit import Aer
 from qiskit import IBMQ
 from qiskit.providers.jobstatus import JOB_FINAL_STATES
 from qiskit import QuantumCircuit, assemble, transpile
+from qiskit.tools.monitor import job_monitor
 import time
 
 # Noise simulation packages
@@ -86,6 +87,7 @@ def execute_with_shots(
     """
 
     """ Added code to use qiskit backends"""
+    
     if(simulator):
         #runs on a qiskit simulator 
 
@@ -101,17 +103,20 @@ def execute_with_shots(
 
     else:
         IBMQ.enable_account(IBMQ_ACCOUNT_TOKEN)
-        backend = IBMQ.backend(name=machine_name)[0]
-        qobj = assemble(circuit, backend, shots=shots)
-        job = backend.run(qobj)
+        provider = IBMQ.get_provider(hub='ibm-q')
+        #provider.backends()
+        
+        backend = provider.get_backend(name=machine_name)
+        print(backend)
 
-        while job_status not in JOB_FINAL_STATES:
-            time.sleep(10)
-            job_status = job.status()
+        transpiled_circuit = transpile(circuit, backend, optimization_level=3)
+        job = backend.run(transpiled_circuit,shots=shots)
+        job_monitor(job, interval=2)
 
-        result = job.result()
-        counts = result.get_counts()
-        return counts
+        results = job.result()
+        answer = results.get_counts()
+
+        return answer
 
 
     """ Addition ends here"""
