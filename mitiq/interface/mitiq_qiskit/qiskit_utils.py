@@ -71,7 +71,7 @@ def execute(circuit: QuantumCircuit, obs: np.ndarray) -> float:
 
 
 def execute_with_shots(
-    circuit: QuantumCircuit, obs: np.ndarray, shots: int, simulator:bool, machine_name:string,IBMQ_ACCOUNT_TOKEN:string
+    circuit: QuantumCircuit, obs: np.ndarray, shots: int, simulator:bool, machine_name:str,IBMQ_ACCOUNT_TOKEN:str
 ) -> float:
     """Simulates the evolution of the circuit and returns
     the expectation value of the observable.
