@@ -135,3 +135,58 @@ def test_biased_noise_loss_compare_ideal(operations):
         observable=observable,
     )
     assert np.isclose(loss, 0)
+
+  
+import qiskit
+from qiskit import QuantumCircuit
+from qiskit.providers.aer.noise import NoiseModel
+from mitiq.interface.mitiq_qiskit.qiskit_utils import (
+    initialized_depolarizing_noise,
+)
+def test_loss_function_qiskit():
+
+
+    def noisy_execute_qiskit(
+        circuit: QuantumCircuit,
+        obs: np.ndarray,
+        noise_model: NoiseModel,
+        shots: int,
+    ) -> float:
+        """Simulates the evolution of the noisy circuit and returns
+        the statistical estimate of the expectation value of the observable.
+        """
+        # Avoid mutating circuit
+        circ = circuit.copy()
+        # we need to modify the circuit to measure obs in its eigenbasis
+     # we do this by appending a unitary operation
+        # obtains a U s.t. obs = U diag(eigvals) U^dag
+        eigvals, U = np.linalg.eigh(obs)
+        circ.unitary(np.linalg.inv(U), qubits=range(circ.num_qubits))
+
+        circ.measure_all()
+
+        if noise_model is None:
+            basis_gates = None
+        else:
+            basis_gates = noise_model.basis_gates
+
+    # execution of the experiment
+    job = qiskit.execute(
+        circ,
+        backend=qiskit.Aer.get_backend("aer_simulator"),
+        backend_options={"method": "density_matrix"},
+        noise_model=noise_model,
+        basis_gates=basis_gates,
+        shots=shots,
+    )
+    counts = job.result().get_counts()
+    expectation = 0
+
+    for bitstring, count in counts.items():
+        expectation += (
+            eigvals[int(bitstring[0 : circ.num_qubits], 2)] * count / shots
+        )
+    return expectation
+
+
+noisy_executor = noisy_execute_qiskit(circuit=circuit, obs=obsevable, noise_model=initialized_depolarizing_noise(NOISE))
