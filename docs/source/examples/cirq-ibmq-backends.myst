@@ -33,9 +33,8 @@ IBMQ backend, broken down in the following steps.
 ```{code-cell} ipython3
 from mitiq import zne
 from mitiq.interface.mitiq_qiskit.qiskit_utils import initialized_depolarizing_noise
-```
 
-```{code-cell} ipython3
+
 USE_REAL_HARDWARE = False
 ```
 
