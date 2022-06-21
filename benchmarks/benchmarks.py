@@ -16,6 +16,7 @@
 """Mitiq accuracy and timing benchmarks."""
 
 import functools
+import os
 
 import networkx as nx
 import numpy as np
@@ -25,6 +26,15 @@ from mitiq import benchmarks, raw, pec, zne, Observable, PauliString
 from mitiq.interface import mitiq_cirq
 
 
+if os.environ.get("BENCHMARK_CI"):
+    params = {"nqubits": [1], "depth": [1, 2, 3], "num_samples": [10]}
+else:
+    params = {"nqubits": [2], "depth": [2, 4, 6], "num_samples": [20]}
+
+nqubits = params["nqubits"]
+depth = params["depth"]
+num_samples = params["num_samples"]
+
 compute_density_matrix_noiseless = functools.partial(
     mitiq_cirq.compute_density_matrix, noise_level=(0.0,)
 )
@@ -32,7 +42,9 @@ benchmark_circuit_types = ("rb", "mirror")
 
 
 def get_benchmark_circuit(
-    circuit_type: str, nqubits: int, depth: int,
+    circuit_type: str,
+    nqubits: int,
+    depth: int,
 ) -> cirq.Circuit:
     """Returns a benchmark circuit.
 
@@ -59,7 +71,10 @@ def get_benchmark_circuit(
 
 
 def track_zne(
-    circuit_type: str, nqubits: int, depth: int, observable: Observable,
+    circuit_type: str,
+    nqubits: int,
+    depth: int,
+    observable: Observable,
 ) -> float:
     """Returns the ZNE error mitigation factor, i.e., the ratio
 
@@ -80,7 +95,9 @@ def track_zne(
         circuit, mitiq_cirq.compute_density_matrix, observable
     )
     zne_value = zne.execute_with_zne(
-        circuit, mitiq_cirq.compute_density_matrix, observable,
+        circuit,
+        mitiq_cirq.compute_density_matrix,
+        observable,
     )
     return np.real(abs(true_value - raw_value) / abs(true_value - zne_value))
 
@@ -93,8 +110,8 @@ track_zne.param_names = [
 ]
 track_zne.params = (
     benchmark_circuit_types,
-    [1],
-    [1, 2, 3],
+    nqubits,
+    depth,
     [Observable(PauliString("Z"))],
 )
 track_zne.unit = "Error mitigation factor"
@@ -155,10 +172,10 @@ track_pec.param_names = [
 ]
 track_pec.params = (
     benchmark_circuit_types,
-    [1],
-    [1, 2, 3],
+    nqubits,
+    depth,
     [Observable(PauliString("Z"))],
-    [10],
+    num_samples,
 )
 track_pec.unit = "Error mitigation factor"
 track_pec.timeout = 300
