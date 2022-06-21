@@ -171,5 +171,5 @@ def test_learn_biased_noise_parameters(epsilon, eta, operations):
         eta0=(1 + offset) * eta,
         observable=observable,
     )
-    assert np.isclose(epsilon_opt, epsilon, rtol=1e-03, atol=1e-05)
-    assert np.isclose(eta_opt, eta, rtol=1e-02, atol=1e-04)
+    assert np.isclose(epsilon_opt, epsilon, rtol=1e-01, atol=1e-02)
+    assert np.isclose(eta_opt, eta, rtol=1e-01, atol=1e-02)
