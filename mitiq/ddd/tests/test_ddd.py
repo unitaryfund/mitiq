@@ -182,7 +182,7 @@ def test_mitigate_executor_ddd():
     assert np.isclose(mitigated_executor(circuit_cirq_a), ddd_value)
 
     batched_mitigated_executor = mitigate_executor(batched_executor, rule=xx)
-    assert np.isclose(*batched_mitigated_executor([circuit_cirq_a]))
+    assert np.isclose(*batched_mitigated_executor([circuit_cirq_a]), ddd_value)
 
 
 def test_ddd_decorator():
