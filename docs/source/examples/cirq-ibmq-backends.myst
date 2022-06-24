@@ -132,7 +132,7 @@ def cirq_ibm_executor(cirq_circuit: cirq.Circuit, shots: int = 1024) -> float:
 ```
 
 
-At this point, the circuit can be executed to return a mitigated expectation value by running Mitiq's [`zne.execute_with_zne`](https://mitiq.readthedocs.io/en/stable/apidoc.html?highlight=execute_with_zne#mitiq.zne.zne.execute_with_zne) function as follows.
+At this point, the circuit can be executed to return a mitigated expectation value by running Mitiq's {func}`.zne.execute_with_zne` function as follows.
 
 ```{code-cell} ipython3
 unmitigated = cirq_ibm_executor(cirq_circuit)
