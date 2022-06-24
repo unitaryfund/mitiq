@@ -38,7 +38,7 @@ training_circuits = generate_training_circuits(
 )
 
 
-def ideal_executor(circ: qiskit.QuantumCircuit):
+def ideal_executor(circ: qiskit.QuantumCircuit) -> float:
     noise_model = initialized_depolarizing_noise(noise_level=0)
     observable = Observable(PauliString("ZZ"))
     return execute_with_noise(circ, observable.matrix(), noise_model)
@@ -47,12 +47,12 @@ def ideal_executor(circ: qiskit.QuantumCircuit):
 ideal_values = np.array([ideal_executor(t) for t in training_circuits])
 
 
-def biased_noise_loss_compare_ideal_qiskit(operations):
+def biased_noise_loss_compare_ideal_qiskit(operations) -> float:
     """Test that the loss function is zero when the noise strength is zero"""
 
     pec_kwargs = {"num_samples": 10}
 
-    def noisy_execute(circ: qiskit.QuantumCircuit):
+    def noisy_execute(circ: qiskit.QuantumCircuit) -> float:
         noise_model = initialized_depolarizing_noise(0.0)
         observable = Observable(PauliString("ZZ"))
         return execute_with_noise(circ, observable.matrix(), noise_model)
