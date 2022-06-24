@@ -15,4 +15,3 @@ dist/
 build/
 coverage.xml
 jupyter_execute/
-mitiq/pec/representations/tests/learningtest.py

@@ -102,7 +102,7 @@ def test_biased_noise_loss_function(epsilon, eta, operations):
     noisy_values = np.array(
         [noisy_executor.evaluate(t, observable) for t in training_circuits]
     )
-    loss = _biased_noise_loss_function(
+    loss = biased_noise_loss_function(
         params=[epsilon, eta],
         operations_to_mitigate=operations,
         training_circuits=training_circuits,
@@ -128,7 +128,7 @@ def test_biased_noise_loss_compare_ideal(operations):
         return ideal_execute(noisy_circ)
 
     noisy_executor = Executor(noisy_execute)
-    loss = _biased_noise_loss_function(
+    loss = biased_noise_loss_function(
         params=[0, 0],
         operations_to_mitigate=operations,
         training_circuits=training_circuits,
