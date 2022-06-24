@@ -495,7 +495,7 @@ def test_mitigate_executor_qiskit():
 
     batched_unmitigated = batched_executor([circuit])
 
-    batched_mitigated_executor = mitigated_executor(
+    batched_mitigated_executor = mitigate_executor(
         batched_executor,
         representations=[rep],
         num_samples=10,
