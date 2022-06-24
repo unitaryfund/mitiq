@@ -14,10 +14,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for zero-noise extrapolation."""
+from typing import List
 import functools
+import pytest
 
 import numpy as np
-import pytest
 import cirq
 import qiskit
 
