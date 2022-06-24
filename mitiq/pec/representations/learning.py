@@ -96,7 +96,7 @@ def learn_biased_noise_parameters(
     return [epsilon, eta]
 
 
-def _biased_noise_loss_function(
+def biased_noise_loss_function(
     params: np.ndarray,
     operations_to_mitigate: List[QPROGRAM],
     training_circuits: List[QPROGRAM],

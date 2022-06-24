@@ -34,7 +34,7 @@ from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.cdr import generate_training_circuits
 from mitiq.cdr._testing import random_x_z_cnot_circuit
 from mitiq.pec.representations.learning import (
-    _biased_noise_loss_function,
+    biased_noise_loss_function,
     learn_biased_noise_parameters,
 )
 
