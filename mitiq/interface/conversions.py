@@ -16,6 +16,7 @@
 """Functions for converting to/from Mitiq's internal circuit representation."""
 from functools import wraps
 from typing import Any, Callable, cast, Iterable, Tuple
+from copy import deepcopy
 
 from cirq import Circuit
 
@@ -232,6 +233,7 @@ def noise_scaling_converter(
     def new_scaling_function(
         circuit: QPROGRAM, *args: Any, **kwargs: Any
     ) -> QPROGRAM:
+
         # Pre atomic conversion
         idle_indices = set()
         if "qiskit" in circuit.__module__:
@@ -239,6 +241,8 @@ def noise_scaling_converter(
                 _add_identity_to_idle,
             )
 
+            # Avoid mutating the input circuit
+            circuit = deepcopy(circuit)
             idle_indices = _add_identity_to_idle(circuit)
 
         scaled_circuit = atomic_converter(noise_scaling_function)(
