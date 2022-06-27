@@ -141,17 +141,17 @@ print(f"Unmitigated result {unmitigated:.3f}")
 print(f"Mitigated result {mitigated:.3f}")
 ```
 
-As long as a circuit and a function for executing the circuit are defined, the ``zne.execute_with_zne`` function can
+As long as a circuit and a function for executing the circuit are defined, the {func}`zne.execute_with_zne` function can
 be called as above to return zero-noise extrapolated expectation value(s).
 
 
 ## Options
 
 
-Different options for noise scaling and extrapolation can be passed into the ``zne.execute_with_zne`` function.
+Different options for noise scaling and extrapolation can be passed into the {func}`zne.execute_with_zne` function.
 By default, noise is scaled by locally folding gates at random, and the default extrapolation is Richardson.
 
-To specify a different extrapolation technique, we can pass a different ``Factory`` object to ``execute_with_zne``. The
+To specify a different extrapolation technique, we can pass a different {class}`.Factory` object to {func}`execute_with_zne`. The
 following code block shows an example of using linear extrapolation with five different (noise) scale factors.
 
 ```{code-cell} ipython3
@@ -163,7 +163,7 @@ print(f"Mitigated result {mitigated:.3f}")
 To specify a different noise scaling method, we can pass a different function for the argument ``scale_noise``. This
 function should input a circuit and scale factor and return a circuit. The following code block shows an example of
 scaling noise by global folding (instead of local folding, the default behavior for
-``zne.execute_with_zne``).
+{func}`zne.execute_with_zne`).
 
 ```{code-cell} ipython3
 mitigated = zne.execute_with_zne(cirq_circuit, cirq_ibm_executor, scale_noise=zne.scaling.fold_global)
@@ -171,13 +171,13 @@ print(f"Mitigated result {mitigated:.3f}")
 ```
 
 Any different combination of noise scaling and extrapolation technique can be passed as arguments to
-``zne.execute_with_zne``.
+{func}`zne.execute_with_zne`.
 
 
 ## Lower-level usage
 
 Here, we give more detailed usage of the Mitiq library which mimics what happens in the call to
-``zne.execute_with_zne`` in the previous example. In addition to showing more of the Mitiq library, this
+{func}`zne.execute_with_zne` in the previous example. In addition to showing more of the Mitiq library, this
 example explains the code in the previous section in more detail.
 
 First, we define factors to scale the circuit length by and fold the circuit using the ``fold_gates_at_random``
@@ -245,7 +245,7 @@ corresponds to a circuit with scale factor one, i.e., the original circuit.)
 print("Unmitigated expectation value:", round(expectation_values[0], 3))
 ```
 
-Now we can use the static ``extrapolate`` method of ``zne.inference.Factory`` objects to extrapolate to the zero-noise limit. Below we use an exponential fit and print out the extrapolated zero-noise value.
+Now we can use the static ``extrapolate`` method of {class}`zne.inference.Factory` objects to extrapolate to the zero-noise limit. Below we use an exponential fit and print out the extrapolated zero-noise value.
 
 ```{code-cell} ipython3
 zero_noise_value = zne.ExpFactory.extrapolate(scale_factors, expectation_values, asymptote=0.5)
