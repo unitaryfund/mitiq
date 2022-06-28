@@ -97,6 +97,11 @@ Note: Cirq is a core requirement of Mitiq and is installed when you `pip install
 
 You can use Mitiq with any backend you have access to that can interface with supported frontends.
 
+### Benchmarks
+
+Mitiq uses [`asv`](https://asv.readthedocs.io/en/stable/) to benchmark the core functionalities of the project.
+They are found in the [`benchmarks/`](benchmarks/) directory and their changes can be seen overtime at https://benchmarks.mitiq.dev/.
+
 ### Citing Mitiq
 
 If you use Mitiq in your research, please reference the [Mitiq preprint](https://arxiv.org/abs/2009.04417) ([bibtex](https://arxiv2bibtex.org/?q=2009.04417&format=bibtex)). A list of papers citing Mitiq can be found on [Google Scholar](https://scholar.google.com/scholar?cites=12810395086731011605) / [Semantic Scholar](https://www.semanticscholar.org/paper/Mitiq%3A-A-software-package-for-error-mitigation-on-LaRose-Mari/dc55b366d5b2212c6df8cd5c0bf05bab13104bd7#citing-papers).
