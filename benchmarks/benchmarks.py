@@ -29,7 +29,7 @@ from mitiq.interface import mitiq_cirq
 if os.environ.get("BENCHMARK_CI"):
     params = {"nqubits": [1], "depth": [1, 2, 3], "num_pec_samples": [10]}
 else:
-    params = {"nqubits": [2], "depth": [2, 4, 6], "num_samples": [20]}
+    params = {"nqubits": [2], "depth": [1, 5, 10], "num_pec_samples": [100]}
 
 nqubits = params["nqubits"]
 depth = params["depth"]
