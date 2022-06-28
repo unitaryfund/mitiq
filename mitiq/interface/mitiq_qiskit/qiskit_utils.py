@@ -71,7 +71,7 @@ def execute(circuit: QuantumCircuit, obs: np.ndarray) -> float:
 
 
 def execute_with_shots(
-    circuit: QuantumCircuit, obs: np.ndarray, shots: int, simulator:bool, machine_name:str,IBMQ_ACCOUNT_TOKEN:str
+    circuit: QuantumCircuit, obs: np.ndarray, shots: int, simulation:bool, machine_name:str,IBMQ_ACCOUNT_TOKEN:str
 ) -> float:
     #Add defaults
     # making them optional
@@ -90,7 +90,7 @@ def execute_with_shots(
 
     """ Added code to use qiskit backends"""
     
-    if(simulator):
+    if(simulation):
         #runs on a qiskit simulator 
 
         # use local simulator
