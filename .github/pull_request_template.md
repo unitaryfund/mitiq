@@ -1,14 +1,6 @@
 <!--
 ⚠️ Your pull request title should be short, detailed, and understandable for all.
 ⚠️ If your pull request fixes an open issue, please link to the issue.
-
-Ensure you have completed the following before continuing.
-✅ I have read the CONTRIBUTING document.
-✅ I have added tests to cover my changes.
-✅ I updated the documentation, where relevant.
-✅ I used type hints (https://www.python.org/dev/peps/pep-0484/) in function signatures.
-✅ I used Google-style (https://google.github.io/styleguide/pyguide.html#383-functions-and-methods) docstrings for functions.
-✅ I added myself / the copyright holder to the AUTHORS file.
 -->
 
 <!--
@@ -31,3 +23,10 @@ For more information, check the Mitiq style guidelines (https://mitiq.readthedoc
 ### License
 
 - [ ] I license this contribution under the terms of the GNU GPL, version 3 and grant Unitary Fund the right to provide additional permissions as described in section 7 of the GNU GPL, version 3.
+
+Before opening the PR, please ensure you have completed the following where appropriate.
+- I added unit tests for new code.
+- I used [type hints](https://www.python.org/dev/peps/pep-0484/) in function signatures.
+- I used [Google-style](https://google.github.io/styleguide/pyguide.html#383-functions-and-methods) docstrings for functions.
+- I [updated the documentation](../blob/master/docs/CONTRIBUTING_DOCS.md) where relevant.
+- Added myself / the copyright holder to the AUTHORS file
