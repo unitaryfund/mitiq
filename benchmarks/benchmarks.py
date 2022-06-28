@@ -27,13 +27,13 @@ from mitiq.interface import mitiq_cirq
 
 
 if os.environ.get("BENCHMARK_CI"):
-    params = {"nqubits": [1], "depth": [1, 2, 3], "num_samples": [10]}
+    params = {"nqubits": [1], "depth": [1, 2, 3], "num_pec_samples": [10]}
 else:
     params = {"nqubits": [2], "depth": [2, 4, 6], "num_samples": [20]}
 
 nqubits = params["nqubits"]
 depth = params["depth"]
-num_samples = params["num_samples"]
+num_pec_samples = params["num_pec_samples"]
 
 compute_density_matrix_noiseless = functools.partial(
     mitiq_cirq.compute_density_matrix, noise_level=(0.0,)
@@ -123,7 +123,7 @@ def track_pec(
     nqubits: int,
     depth: int,
     observable: Observable,
-    num_samples: int,
+    num_pec_samples: int,
 ) -> float:
     """Returns the PEC error mitigation factor, i.e., the ratio
 
@@ -134,7 +134,7 @@ def track_pec(
         nqubits: Number of qubits in the benchmark circuit.
         depth: Some proxy of depth in the benchmark circuit.
         observable: Observable to compute the expectation value of.
-        num_samples: Number of circuits to sample/run.
+        num_pec_samples: Number of circuits to sample/run.
     """
     circuit = get_benchmark_circuit(circuit_type, nqubits, depth)
 
@@ -158,7 +158,7 @@ def track_pec(
         compute_density_matrix,
         observable,
         representations=reps,
-        num_samples=num_samples,
+        num_samples=num_pec_samples,
     )
     return np.real(abs(true_value - raw_value) / abs(true_value - pec_value))
 
@@ -175,7 +175,7 @@ track_pec.params = (
     nqubits,
     depth,
     [Observable(PauliString("Z"))],
-    num_samples,
+    num_pec_samples,
 )
 track_pec.unit = "Error mitigation factor"
 track_pec.timeout = 300
