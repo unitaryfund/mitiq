@@ -26,10 +26,11 @@ from mitiq.rem.measurement_result import MeasurementResult
 
 
 def test_sample_bitstrings():
-    """Tests if the outcome is as expected with different noise models and error rate."""
+    """Tests if the outcome is as expected with different noise models and
+    error rate."""
 
-    # testing default options i.e. noise model is amplitude damping with the default error rate
-    # shots is also the default number
+    # testing default options i.e. noise model is amplitude damping with
+    # the default error rate, shots is also the default number
     qc = cirq.Circuit(cirq.X(cirq.LineQubit(0))) + cirq.Circuit(
         cirq.measure(cirq.LineQubit(0))
     )
