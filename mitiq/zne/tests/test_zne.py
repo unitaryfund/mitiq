@@ -327,7 +327,7 @@ def test_qiskit_mitigate_executor():
     zne_value = mitigated_executor(circuit)
     assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
     batched_mitigated_executor = mitigate_executor(batched_qiskit_executor)
-    batched_zne_values = batched_mitigated_executor([circuit])
+    batched_zne_values = batched_mitigated_executor([circuit] * 3)
     assert [
         abs(true_zne_value - batched_zne_value) < abs(true_zne_value - base)
         for batched_zne_value in batched_zne_values

@@ -493,7 +493,7 @@ def test_mitigate_executor_qiskit():
 
     assert np.isclose(unmitigated, mitigated)
 
-    batched_unmitigated = batched_executor([circuit])
+    batched_unmitigated = batched_executor([circuit] * 3)
 
     batched_mitigated_executor = mitigate_executor(
         batched_executor,
@@ -501,7 +501,7 @@ def test_mitigate_executor_qiskit():
         num_samples=10,
         random_state=1,
     )
-    batched_mitigated = batched_mitigated_executor([circuit])
+    batched_mitigated = batched_mitigated_executor([circuit] * 3)
 
     assert np.isclose(batched_unmitigated, batched_mitigated)
 
