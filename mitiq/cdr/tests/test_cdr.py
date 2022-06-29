@@ -216,9 +216,10 @@ def test_mitigated_execute_with_cdr(
     )
     cdr_batched_mitigated_values = cdr_batched_executor([circuit] * 3)
     assert [
-        abs(cdr_batched_mitigated - true_value) <= abs(noisy_value - true_value)
+        abs(cdr_batched_mitigated - true_value)
+        <= abs(noisy_value - true_value)
         for cdr_batched_mitigated in cdr_batched_mitigated_values
-    ]    
+    ]
 
 
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
