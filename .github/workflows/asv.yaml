@@ -1,0 +1,79 @@
+name: benchmarks
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  benchmarks:
+    name: Run benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out mitiq
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+
+      - name: Run benchmarks
+        run: |
+          pip install asv virtualenv
+          asv machine --machine ghrunner
+          asv run --attribute rounds=4
+          cp asv.conf.json results
+
+      - name: Upload benchmark results results
+        uses: actions/upload-artifact@v3
+        with:
+          name: asv_new_results
+          path: results
+
+  publish-results:
+    name: Publish benchmark results
+    needs: benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+
+      - name: Install ASV
+        run: pip install asv
+
+      - name: Checkout mitiq-bench repo
+        uses: actions/checkout@v3
+        with:
+          repository: unitaryfund/mitiq-bench
+          token: ${{ secrets.BENCH_PAT }}
+
+      - name: Download benchmark data
+        uses: actions/download-artifact@v3
+        with:
+          name: asv_new_results
+          path: new_results
+
+      - name: Move data to correct location
+        run: |
+          cp -vr new_results/* results
+          mv results/asv.conf.json .
+
+      - name: Push new data to benchmark repo
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: "['results', 'asv.conf.json']"
+          default_author: github_actions
+          message: new benchmark data
+
+      - name: Publish results
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          asv publish
+          git fetch origin gh-pages:gh-pages
+          asv gh-pages
