@@ -37,7 +37,9 @@ def sample_bitstrings(
         result=np.column_stack(list(result.measurements.values())),
         qubit_indices=tuple(
             # q[2:-1] is necessary to convert "q(number)" into "number"
-            int(q[2:-1]) for k in result.measurements.keys() for q in k.split(",")
+            int(q[2:-1])
+            for k in result.measurements.keys()
+            for q in k.split(",")
         ),
     )
 
