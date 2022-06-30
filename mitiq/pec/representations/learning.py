@@ -31,6 +31,7 @@ def learn_biased_noise_parameters(
     circuit: QPROGRAM,
     ideal_executor: Executor,
     noisy_executor: Executor,
+    pec_kwargs: Dict["str", Any],
     num_training_circuits: int = 10,
     epsilon0: float = 0,
     eta0: float = 1,
@@ -70,8 +71,6 @@ def learn_biased_noise_parameters(
     ideal_values = np.array(
         [ideal_executor.evaluate(t, observable) for t in training_circuits]
     )
-    # Set number of samples used to calculate mitigated value in loss function
-    pec_kwargs = {"num_samples": 50}
 
     x0 = np.array(
         [epsilon0, eta0]

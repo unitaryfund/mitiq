@@ -29,7 +29,10 @@ from cirq import (
     ops,
     unitary,
 )
+import qiskit
 from mitiq import Executor, Observable, PauliString
+from mitiq.interface.mitiq_qiskit import qiskit_utils 
+from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.cdr import generate_training_circuits
 from mitiq.cdr._testing import random_x_z_cnot_circuit
@@ -43,7 +46,7 @@ circuit = random_x_z_cnot_circuit(
 )
 
 # Set number of samples used to calculate mitigated value in loss function
-pec_kwargs = {"num_samples": 100}
+pec_kwargs = {"num_samples": 50}
 
 observable = Observable(PauliString("XZ"), PauliString("YY"))
 
@@ -166,10 +169,53 @@ def test_learn_biased_noise_parameters(epsilon, eta, operations):
         circuit=circuit,
         ideal_executor=ideal_executor,
         noisy_executor=noisy_executor,
+        pec_kwargs=pec_kwargs,
         num_training_circuits=10,
         epsilon0=(1 + offset) * epsilon,
         eta0=(1 + offset) * eta,
         observable=observable,
+    )
+    assert np.isclose(epsilon_opt, epsilon, rtol=1e-01, atol=1e-02)
+    assert np.isclose(eta_opt, eta, rtol=1e-01, atol=1e-02)
+
+
+@pytest.mark.parametrize(
+    "operations",
+    [
+        [to_qiskit(Circuit(CNOT_ops[0][1]))],
+        [to_qiskit(Circuit(Rx_ops[0][1]))],
+        [to_qiskit(Circuit(Rz_ops[0][1]))],
+    ],
+)
+def test_learn_biased_noise_parameters_qiskit(operations):
+    """Test the learning function with initial noise strength and noise bias
+    with a small offset from the simulated noise model values"""
+    epsilon = 0.7
+    eta = 0
+
+    def ideal_execute_qiskit(circ: qiskit.QuantumCircuit) -> float:
+        noise_model = qiskit_utils.initialized_depolarizing_noise(0.0)
+        return qiskit_utils.execute_with_noise(circ, observable.matrix(), noise_model)
+
+    ideal_executor_qiskit = Executor(ideal_execute_qiskit)
+
+    def noisy_execute_qiskit(circ: qiskit.QuantumCircuit) -> float:
+        noise_model = qiskit_utils.initialized_depolarizing_noise(0.7)
+        return qiskit_utils.execute_with_noise(circ, observable.matrix(), noise_model)
+    
+    noisy_executor_qiskit = Executor(noisy_execute_qiskit)
+    offset = 0.01
+
+    qiskit_circuit = to_qiskit(circuit)
+    [epsilon_opt, eta_opt] = learn_biased_noise_parameters(
+        operations_to_learn=operations,
+        circuit=qiskit_circuit,
+        ideal_executor=ideal_executor_qiskit,
+        noisy_executor=noisy_executor_qiskit,
+        pec_kwargs=pec_kwargs,
+        num_training_circuits=10,
+        epsilon0=(1 + offset) * epsilon,
+        eta0=(1 + offset) * eta,
     )
     assert np.isclose(epsilon_opt, epsilon, rtol=1e-01, atol=1e-02)
     assert np.isclose(eta_opt, eta, rtol=1e-01, atol=1e-02)
