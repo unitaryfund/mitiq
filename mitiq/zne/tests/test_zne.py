@@ -14,10 +14,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for zero-noise extrapolation."""
+from typing import List
 import functools
+import pytest
 
 import numpy as np
-import pytest
 import cirq
 import qiskit
 
@@ -304,6 +305,10 @@ def qiskit_decorated_executor(qp: QPROGRAM) -> float:
     return qiskit_executor(qp)
 
 
+def batched_qiskit_executor(circuits) -> List[float]:
+    return [qiskit_executor(circuit) for circuit in circuits]
+
+
 def test_qiskit_mitigate_executor():
     true_zne_value = 1.0
 
@@ -321,6 +326,12 @@ def test_qiskit_mitigate_executor():
     mitigated_executor = mitigate_executor(qiskit_executor)
     zne_value = mitigated_executor(circuit)
     assert abs(true_zne_value - zne_value) < abs(true_zne_value - base)
+    batched_mitigated_executor = mitigate_executor(batched_qiskit_executor)
+    batched_zne_values = batched_mitigated_executor([circuit] * 3)
+    assert [
+        abs(true_zne_value - batched_zne_value) < abs(true_zne_value - base)
+        for batched_zne_value in batched_zne_values
+    ]
 
 
 def test_qiskit_zne_decorator():
