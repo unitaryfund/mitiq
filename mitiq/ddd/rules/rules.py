@@ -69,16 +69,11 @@ def general_rule(
         return Circuit()
     q = LineQubit(0)
     slack_gates = [I(q) for _ in range(spacing)]
-    sequence = Circuit(
-        slack_gates,
-        [
-            (
-                gate.on(q),
-                slack_gates,
-            )
-            for (_, gate) in zip(range(num_decoupling_gates), cycle(gates))
-        ],
-    )
+    sequence = Circuit(slack_gates)
+    for gate in gates:
+        sequence.append(gate.on(q))
+        sequence.append(slack_gates)
+
     if not allclose_up_to_global_phase(np.eye(2), unitary(sequence)):
         raise ValueError("Sequence is not equivalent to the identity!")
     for i in range(slack_remainder):

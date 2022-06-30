@@ -41,7 +41,7 @@ def test_pauli_init():
     assert pauli._pauli == cirq.PauliString(
         1.0, cirq.Z(a), cirq.X(b), cirq.Y(c)
     )
-    assert str(pauli) == "Z(1)*X(2)*Y(3)"
+    assert str(pauli) == "Z(q(1))*X(q(2))*Y(q(3))"
 
 
 def test_pauli_init_empty():
@@ -58,7 +58,7 @@ def test_pauli_init_with_support():
     assert pauli._pauli == cirq.PauliString(
         cirq.X(cirq.LineQubit(support[0])), cirq.Z(cirq.LineQubit(support[1]))
     )
-    assert str(pauli) == f"X({support[0]})*Z({support[1]})"
+    assert str(pauli) == f"X(q({support[0]}))*Z(q({support[1]}))"
 
 
 def test_pauli_eq():
@@ -292,11 +292,11 @@ def test_pstring_collection_str():
     x = PauliString(spec="X")
     iz = PauliString(spec="IZ")
     pcol = PauliStringCollection(x, iz)
-    assert str(pcol) == "X(0) + Z(1)"
+    assert str(pcol) == "X(q(0)) + Z(q(1))"
 
     xz = PauliString(spec="XZ", coeff=-2.4)
     pcol.add(xz)
-    assert str(pcol) == "X(0) + Z(1) + (-2.4+0j)*X(0)*Z(1)"
+    assert str(pcol) == "X(q(0)) + Z(q(1)) + (-2.4+0j)*X(q(0))*Z(q(1))"
 
 
 def test_pstring_collection_add():
