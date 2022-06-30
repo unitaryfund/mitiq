@@ -503,7 +503,12 @@ def test_mitigate_executor_qiskit():
     )
     batched_mitigated = batched_mitigated_executor([circuit] * 3)
 
-    assert np.isclose(batched_unmitigated, batched_mitigated)
+    assert [
+        np.isclose(batched_unmitigated_value, batched_mitigated_value)
+        for batched_unmitigated_value, batched_mitigated_value in zip(
+            batched_unmitigated, batched_mitigated
+        )
+    ]
 
 
 def test_pec_decorator_qiskit():
