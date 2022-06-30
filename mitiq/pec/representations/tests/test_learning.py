@@ -31,7 +31,7 @@ from cirq import (
 )
 import qiskit
 from mitiq import Executor, Observable, PauliString
-from mitiq.interface.mitiq_qiskit import qiskit_utils 
+from mitiq.interface.mitiq_qiskit import qiskit_utils
 from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.cdr import generate_training_circuits
@@ -195,14 +195,18 @@ def test_learn_biased_noise_parameters_qiskit(operations):
 
     def ideal_execute_qiskit(circ: qiskit.QuantumCircuit) -> float:
         noise_model = qiskit_utils.initialized_depolarizing_noise(0.0)
-        return qiskit_utils.execute_with_noise(circ, observable.matrix(), noise_model)
+        return qiskit_utils.execute_with_noise(
+            circ, observable.matrix(), noise_model
+        )
 
     ideal_executor_qiskit = Executor(ideal_execute_qiskit)
 
     def noisy_execute_qiskit(circ: qiskit.QuantumCircuit) -> float:
         noise_model = qiskit_utils.initialized_depolarizing_noise(0.7)
-        return qiskit_utils.execute_with_noise(circ, observable.matrix(), noise_model)
-    
+        return qiskit_utils.execute_with_noise(
+            circ, observable.matrix(), noise_model
+        )
+
     noisy_executor_qiskit = Executor(noisy_execute_qiskit)
     offset = 0.01
 
