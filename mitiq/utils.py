@@ -171,7 +171,6 @@ def _equal(
                 )
             ]
             circ.batch_remove(measurements)
-
     return circuit_one == circuit_two
 
 
