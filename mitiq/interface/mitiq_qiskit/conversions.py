@@ -129,6 +129,9 @@ def _add_identity_to_idle(
 
     Returns:
         An unordered set of the indices that were altered
+
+    Note: An idle qubit is a qubit without any gates (including Qiskit
+        barriers) acting on it. 
     """
 
     data = copy.deepcopy(circuit._data)
@@ -136,8 +139,6 @@ def _add_identity_to_idle(
     idle_bit_indices = set()
     for op in data:
         gate, qubits, cbits = op
-        if gate.name == "barrier":  # Skip barriers
-            continue
         bit_indices.update(set(bit.index for bit in qubits))
     for index in range(circuit.num_qubits):
         if index not in bit_indices:
