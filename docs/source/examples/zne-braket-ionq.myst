@@ -160,13 +160,13 @@ More details on ZNE options are given [here](../guide/zne-3-options.myst).
 
 ```{code-cell} ipython3
 factory = zne.inference.LinearFactory(scale_factors=[1.0, 1.5, 2.0, 2.5, 3.0])
-noise_sclaing_method = zne.scaling.fold_global
+noise_scaling_method = zne.scaling.fold_global
 
 mitigated = zne.execute_with_zne(
     braket_circuit,
     braket_ionq_execute,
     factory=factory,
-    scale_noise=zne.scaling.fold_global, 
+    scale_noise=noise_scaling_method, 
 )
 print(f"Mitigated result {mitigated:.3f}")
 ```
