@@ -165,8 +165,6 @@ def circuit():
     for _ in range(10):
         qml.PauliX(wires=0)
     return qml.expval(qml.PauliZ(0))
-```
 
-```{code-cell} ipython3
 print(f"Zero-noise extrapolated value: {circuit():.3f}")
 ```
