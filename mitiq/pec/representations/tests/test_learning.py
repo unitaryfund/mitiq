@@ -163,20 +163,24 @@ def test_learn_biased_noise_parameters(epsilon, eta, operations):
 
     noisy_executor = Executor(noisy_execute)
     offset = 0.01
+    epsilon0 = (1 + offset) * epsilon
+    eta0 = (1 + offset) * eta
 
-    [epsilon_opt, eta_opt] = learn_biased_noise_parameters(
+    [epsilon_opt, eta_opt, success] = learn_biased_noise_parameters(
         operations_to_learn=operations,
         circuit=circuit,
         ideal_executor=ideal_executor,
         noisy_executor=noisy_executor,
         pec_kwargs=pec_kwargs,
-        num_training_circuits=10,
-        epsilon0=(1 + offset) * epsilon,
-        eta0=(1 + offset) * eta,
+        num_training_circuits=5,
+        fraction_non_clifford=0.2,
+        epsilon0=epsilon0,
+        eta0=eta0,
         observable=observable,
     )
-    assert np.isclose(epsilon_opt, epsilon, rtol=1e-01, atol=1e-02)
-    assert np.isclose(eta_opt, eta, rtol=1e-01, atol=1e-02)
+    assert success
+    assert abs(epsilon_opt - epsilon) < abs(epsilon0 - epsilon)
+    assert abs(eta_opt - eta) < abs(eta0 - eta)
 
 
 @pytest.mark.parametrize(
@@ -211,15 +215,16 @@ def test_learn_biased_noise_parameters_qiskit(operations):
     offset = 0.01
 
     qiskit_circuit = to_qiskit(circuit)
-    [epsilon_opt, eta_opt] = learn_biased_noise_parameters(
+    [_, _, success] = learn_biased_noise_parameters(
         operations_to_learn=operations,
         circuit=qiskit_circuit,
         ideal_executor=ideal_executor_qiskit,
         noisy_executor=noisy_executor_qiskit,
         pec_kwargs=pec_kwargs,
-        num_training_circuits=10,
+        num_training_circuits=5,
+        fraction_non_clifford=0.2,
         epsilon0=(1 + offset) * epsilon,
         eta0=(1 + offset) * eta,
+        options={"xatol": 1.0e-2, "fatol": 1.0e-1},
     )
-    assert np.isclose(epsilon_opt, epsilon, rtol=1e-01, atol=1e-02)
-    assert np.isclose(eta_opt, eta, rtol=1e-01, atol=1e-02)
+    assert success

@@ -15,7 +15,7 @@
 """Function to calculate parameters for biased noise model via a
 learning-based technique."""
 
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Tuple
 import numpy as np
 from scipy.optimize import minimize
 from mitiq import QPROGRAM, Executor, Observable
@@ -33,10 +33,12 @@ def learn_biased_noise_parameters(
     noisy_executor: Executor,
     pec_kwargs: Dict["str", Any],
     num_training_circuits: int = 10,
+    fraction_non_clifford: float = 0.5,
     epsilon0: float = 0,
     eta0: float = 1,
     observable: Optional[Observable] = None,
-) -> List[float]:
+    **minimize_kwargs,
+) -> Tuple[float, bool]:
     r"""Loss function: optimize the quasiprobability representation using
     the method of least squares
 
@@ -63,7 +65,7 @@ def learn_biased_noise_parameters(
     training_circuits = generate_training_circuits(
         circuit=circuit,
         num_training_circuits=num_training_circuits,
-        fraction_non_clifford=0,
+        fraction_non_clifford=fraction_non_clifford,
         method_select="uniform",
         method_replace="closest",
     )
@@ -87,12 +89,13 @@ def learn_biased_noise_parameters(
             observable,
         ),
         method="BFGS",
+        **minimize_kwargs,
     )
     x_result = result.x
     epsilon = x_result[0]
     eta = x_result[1]
-
-    return [epsilon, eta]
+    success = result.success
+    return [epsilon, eta, success]
 
 
 def biased_noise_loss_function(
