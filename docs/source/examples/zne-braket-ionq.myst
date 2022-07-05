@@ -40,10 +40,18 @@ from mitiq import zne
 
 ```{code-cell} ipython3
 USE_REAL_HARDWARE = False
-number_of_shots = 1024
 ```
 
 **Note:** When `USE_REAL_HARDWARE` is set to `False`, a classically simulated noisy backend is used instead of a real quantum computer.
+
++++
+
+We also set the number of times each quantum circuit is executed and measured (`number_of_shots`).
+Setting a large number of shots improves the accuracy of the results, but also increases the computational cost and the execution time.
+
+```{code-cell} ipython3
+number_of_shots = 1024
+```
 
 ## Setup: Defining a circuit in Braket
 
@@ -110,7 +118,7 @@ def braket_ionq_execute(
         circuit_to_run.apply_gate_noise(
             braket.circuits.Noise.Depolarizing(noise_level),
             # By default, noise is applied to all gates.
-            # Uncomment next line to add noise to specific gates, e.g., CNOT gates. 
+            # Uncomment next line to add noise only to specific gates, e.g., only to CNOT gates. 
             # target_gates=braket.circuits.gates.CNot,
         )
 
