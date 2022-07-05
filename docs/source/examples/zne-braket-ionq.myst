@@ -61,7 +61,7 @@ print(braket_circuit)
 ```
 
 We will use the probability of measuring the system in the _zero_ state ($p = \langle 0 | \rho |0\rangle$) as our expectation value to error-mitigate.
-The expectation value evaluates to one in the noiseless setting, but is usually smaller when estimated on noisy backend.
+The expectation value evaluates to one in the noiseless setting, but is usually smaller when estimated on a noisy backend.
 
 ## High-level usage
 
