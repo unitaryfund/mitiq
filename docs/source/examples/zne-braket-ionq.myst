@@ -42,8 +42,9 @@ from mitiq import zne
 USE_REAL_HARDWARE = False
 ```
 
-**Note:** When `USE_REAL_HARDWARE` is set to `False`, a classically simulated noisy backend is used instead of a real quantum computer.
-
+```{note} 
+When `USE_REAL_HARDWARE` is set to `False`, a classically simulated noisy backend is used instead of a real quantum computer.
+```
 +++
 
 We also set the number of times each quantum circuit is executed and measured (`number_of_shots`).
@@ -219,8 +220,9 @@ expectation_values = [braket_ionq_execute(c) for c in folded_circuits]
 print(f"Expectation values:\n{expectation_values}")
 ```
 
-**Note:** Using a _batched_ executor could speedup this step, as explained in the [Executors](../guide/executors.myst) section.
-
+```{note}
+Using a _batched_ executor could speedup this step, as explained in the [Executors](../guide/executors.myst) section.
+```
 +++
 
 We can now see the unmitigated expectation value by printing the first element of ``expectation_values``.
