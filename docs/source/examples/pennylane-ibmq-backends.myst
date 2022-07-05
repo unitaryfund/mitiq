@@ -128,10 +128,9 @@ mitigated = qml.transforms.mitigate_with_zne(
 print(f"Mitigated result {mitigated:.3f}")
 ```
 
-To specify a different noise scaling method, we can pass a different function for the argument ``scale_noise``. This
-function should input a circuit and scale factor and return a circuit. The following code block shows an example of
-scaling noise by global folding (instead of local folding, the default behavior for
-{func}`zne.execute_with_zne`).
+To specify a different noise scaling method, we can pass a different function for the argument ``scale_noise``.
+This function should input a circuit and scale factor and return a circuit.
+The following code block shows an example of scaling noise by local folding instead of global folding.
 
 ```{code-cell} ipython3
 from mitiq.zne.scaling import fold_gates_at_random
