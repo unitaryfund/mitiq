@@ -37,23 +37,25 @@ def learn_biased_noise_parameters(
     epsilon0: float = 0,
     eta0: float = 1,
     observable: Optional[Observable] = None,
-    **minimize_kwargs: Dict["str", Any],
-) -> Tuple[float, float, bool]:
-    r"""Loss function: optimize the quasiprobability representation using
-    the method of least squares
+    **minimize_kwargs,
+) -> Tuple[float, bool]:
+    r"""This function larns optimal noise parameters for a set of input operations.
+    The learning process is based on the execution of a set of training circuits on
+    a noisy backend and on a classical simulator. The training circuits
+    are near-Clifford approximations of the input circuit. A biased nose model
+    characterized by two parameters (epsilon and eta) is assumed.
 
     Args:
-        operation: ideal operation to be represented by a (learning-optmized)
-            combination of noisy operations.
-        circuit: the full quantum program as defined by the user.
-        ideal_executor: Executes the ideal circuit and returns a
-            `QuantumResult`.
-        noisy_executor: Executes the noisy circuit and returns a
-            `QuantumResult`.
-        num_training_circuits: number of Clifford circuits to be generated for
-            training data.
-        epsilon0: initial guess for noise strength.
-        eta0: initial guess for noise bias.
+        operations_to_learn: The ideal operations to learn the noise model of.
+        circuit: The full quantum program as defined by the user.
+        ideal_executor: Simulates a circuit and returns
+        a noiseless `QuantumResult`.
+        noisy_executor: Executes a circuit on a noisy backend
+        and returns a `QuantumResult`.
+        num_training_circuits: Number of near-Clifford circuits to be generated for
+            training.
+        epsilon0: Initial guess for noise strength.
+        eta0: Initial guess for noise bias.
         observable (optional): Observable to compute the expectation value of.
             If None, the `executor` must return an expectation value. Otherwise
             the `QuantumResult` returned by `executor` is used to compute the
