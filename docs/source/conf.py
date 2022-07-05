@@ -342,6 +342,7 @@ nbsphinx_thumbnails = {
     'examples/braket_mirror_circuit': '_static/mirror-circuits.png',
     'examples/maxcut-demo': '_static/max-cut.png',
     'examples/cirq-ibmq-backends': '_static/cirq-mitiq-ibmq.png',
+    'examples/pennylane-ibmq-backends': '_static/zne-pennylane.png',
     'examples/ibmq-backends': '_static/ibmq-gate-map.png',
     'examples/simple_landscape': '_static/simple-landscape.png',
     'examples/molecular_hydrogen': '_static/molecular-hydrogen-vqe.png',
