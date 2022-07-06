@@ -1835,7 +1835,7 @@ def test_apply_fold_mask():
     assert _equal(folded, correct)
 
     folded = _apply_fold_mask(circ, [0, 3, 0, 0, 0, 0])
-    correct = Circuit(*[ops.H.on(qreg[1])] * 6) + circ
+    correct = Circuit([ops.H.on(qreg[1])] * 6) + circ
     assert _equal(folded, _squash_moments(correct))
 
     folded = _apply_fold_mask(circ, [0, 0, 1, 0, 0, 0])
