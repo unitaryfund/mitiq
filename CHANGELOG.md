@@ -6,7 +6,7 @@
 
 ### Summary
 
-This release marks the completion of UnitaryHACK 2022!
+This release includes contributions from UnitaryHACK 2022! 🎉
 We had 3 merged pull requests, and a fourth is looking to be merged in the next milestone.
 Along with the great contributions from hackers, this release focused on expanding our ZNE examples to other frontends (Cirq, Braket, and Pennylane), building out learning-based PEC, and improving our benchmarking infrastructure.
 
