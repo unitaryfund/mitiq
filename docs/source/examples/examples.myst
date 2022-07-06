@@ -5,6 +5,7 @@ Mirror circuit benchmark improved with zero-noise extrapolation on AWS Braket <b
 Zero-noise extrapolation with Qiskit on IBMQ backends <ibmq-backends.myst>
 Zero-noise extrapolation with Cirq on IBMQ backends <cirq-ibmq-backends.myst>
 Zero-noise extrapolation with Braket on IonQ backend <zne-braket-ionq.myst>
+Zero-noise extrapolation with Pennylane on IBMQ backends <pennylane-ibmq-backends.myst>
 Zero-noise extrapolation on PyQuil parametric programs <pyquil_demo.ipynb>
 Variational quantum eigensolver improved with zero-noise extrapolation <vqe-pyquil-demo.ipynb>
 Variational circuit mitigation with zero-noise extrapolation <simple_landscape.myst>
