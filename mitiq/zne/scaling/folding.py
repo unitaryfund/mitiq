@@ -84,11 +84,12 @@ def _squash_moments(circuit: Circuit) -> Circuit:
     Args:
         circuit: Circuit to squash moments of.
     """
-    return Circuit(
-        circuit.all_operations(),
-        strategy=InsertStrategy.EARLIEST,
-        device=circuit.device,
+    output_circuit = circuit.copy()
+    output_circuit = output_circuit[0:0]  # Remove moments
+    output_circuit.append(
+        circuit.all_operations(), strategy=InsertStrategy.EARLIEST
     )
+    return output_circuit
 
 
 def _fold_all(

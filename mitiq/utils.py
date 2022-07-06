@@ -22,7 +22,6 @@ import numpy as np
 from cirq import (
     LineQubit,
     Circuit,
-    CircuitDag,
     EigenGate,
     Gate,
     GateOperation,
@@ -148,11 +147,10 @@ def _equal(
         else the two are not equal.
         If True, the qubits of both circuits must have a well-defined ordering.
     """
-    if circuit_one is circuit_two:
-        return True
-
-    circuit_one = deepcopy(circuit_one)
-    circuit_two = deepcopy(circuit_two)
+    # Make a deepcopy only if it's necessary
+    if not (require_qubit_equality and require_measurement_equality):
+        circuit_one = deepcopy(circuit_one)
+        circuit_two = deepcopy(circuit_two)
 
     if not require_qubit_equality:
         # Transform the qubits of circuit one to those of circuit two
@@ -173,10 +171,7 @@ def _equal(
                 )
             ]
             circ.batch_remove(measurements)
-
-    return CircuitDag.from_circuit(circuit_one) == CircuitDag.from_circuit(
-        circuit_two
-    )
+    return circuit_one == circuit_two
 
 
 def _are_close_dict(dict_a: Dict[Any, Any], dict_b: Dict[Any, Any]) -> bool:
