@@ -37,13 +37,14 @@ def learn_biased_noise_parameters(
     epsilon0: float = 0,
     eta0: float = 1,
     observable: Optional[Observable] = None,
-    **minimize_kwargs,
-) -> Tuple[float, bool]:
-    r"""This function larns optimal noise parameters for a set of input operations.
-    The learning process is based on the execution of a set of training circuits on
-    a noisy backend and on a classical simulator. The training circuits
-    are near-Clifford approximations of the input circuit. A biased nose model
-    characterized by two parameters (epsilon and eta) is assumed.
+    **minimize_kwargs: Dict["str", Any],
+) -> Tuple[float, float, bool]:
+    r"""This function learns optimal noise parameters for a set of input
+    operations.The learning process is based on the execution of a set of
+    training circuits on a noisy backend and on a classical simulator. The
+    training circuits are near-Clifford approximations of the input circuit.
+    A biased nose model characterized by two parameters (epsilon and eta)
+    is assumed.
 
     Args:
         operations_to_learn: The ideal operations to learn the noise model of.
@@ -52,8 +53,8 @@ def learn_biased_noise_parameters(
         a noiseless `QuantumResult`.
         noisy_executor: Executes a circuit on a noisy backend
         and returns a `QuantumResult`.
-        num_training_circuits: Number of near-Clifford circuits to be generated for
-            training.
+        num_training_circuits: Number of near-Clifford circuits to be
+            generated for training.
         epsilon0: Initial guess for noise strength.
         eta0: Initial guess for noise bias.
         observable (optional): Observable to compute the expectation value of.
