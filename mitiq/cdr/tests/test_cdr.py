@@ -16,6 +16,8 @@
 """Tests for the Clifford data regression top-level API."""
 import pytest
 
+from typing import List
+
 import numpy as np
 
 import cirq
@@ -40,6 +42,10 @@ from mitiq.interface.mitiq_cirq import compute_density_matrix
 # Allow execution with any QPROGRAM for testing.
 def execute(circuit: QPROGRAM) -> np.ndarray:
     return compute_density_matrix(convert_to_mitiq(circuit)[0])
+
+
+def batched_execute(circuits) -> List[np.ndarray]:
+    return [execute(circuit) for circuit in circuits]
 
 
 def simulate(circuit: QPROGRAM) -> np.ndarray:
@@ -197,6 +203,23 @@ def test_mitigated_execute_with_cdr(
     )
     cdr_mitigated = cdr_executor(circuit)
     assert abs(cdr_mitigated - true_value) <= abs(noisy_value - true_value)
+
+    cdr_batched_executor = mitigate_executor(
+        executor=batched_execute,
+        observable=obs,
+        simulator=simulate,
+        num_training_circuits=20,
+        fraction_non_clifford=0.5,
+        fit_function=fit_function,
+        random_state=random_state,
+        **kwargs,
+    )
+    cdr_batched_mitigated_values = cdr_batched_executor([circuit] * 3)
+    assert [
+        abs(cdr_batched_mitigated - true_value)
+        <= abs(noisy_value - true_value)
+        for cdr_batched_mitigated in cdr_batched_mitigated_values
+    ]
 
 
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
