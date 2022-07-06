@@ -1,3 +1,6 @@
 numpy~=1.20.1
 scipy~=1.7.3
 cirq~=0.15.0
+
+# Remove once https://github.com/python-rapidjson/python-rapidjson/issues/166 is resolved.
+python-rapidjson<=1.6
