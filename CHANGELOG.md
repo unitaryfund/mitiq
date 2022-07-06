@@ -1,5 +1,7 @@
 # Changelog
 
+## Version 0.18.0 (In development)
+
 ## Version 0.17.0
 
 ### Summary
