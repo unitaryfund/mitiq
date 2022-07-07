@@ -330,6 +330,8 @@ html_static_path = ['_thumbnails']
 # display logo on top-left of html pages
 html_logo = "img/mitiq-logo.png"
 
+html_favicon = 'img/mitiq.ico'
+
 myst_update_mathjax = False
 
 nbsphinx_custom_formats = {
