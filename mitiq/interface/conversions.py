@@ -16,7 +16,6 @@
 """Functions for converting to/from Mitiq's internal circuit representation."""
 from functools import wraps
 from typing import Any, Callable, cast, Iterable, Tuple
-from copy import deepcopy
 
 from cirq import Circuit
 
@@ -243,7 +242,7 @@ def noise_scaling_converter(
             from qiskit.transpiler.passes import RemoveBarriers
 
             # Avoid mutating the input circuit
-            circuit = deepcopy(circuit)
+            circuit = circuit.copy()
             # Removing barriers is necessary to correctly identify idle qubits
             circuit = RemoveBarriers()(circuit)
             # Apply identity gates to idle qubits otherwise they get lost
