@@ -95,10 +95,10 @@ def learn_biased_noise_parameters(
         **minimize_kwargs,
     )
     x_result = result.x
-    epsilon = cast(float, x_result[0])
-    eta = cast(float, x_result[1])
+    epsilon_opt = cast(float, x_result[0])
+    eta_opt = cast(float, x_result[1])
     success = cast(bool, result.success)
-    return epsilon, eta, success
+    return epsilon_opt, eta_opt, success
 
 
 def biased_noise_loss_function(

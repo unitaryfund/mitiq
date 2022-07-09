@@ -225,6 +225,5 @@ def test_learn_biased_noise_parameters_qiskit(operations):
         fraction_non_clifford=0.2,
         epsilon0=(1 + offset) * epsilon,
         eta0=(1 + offset) * eta,
-        options={"xatol": 1.0e-2, "fatol": 1.0e-1},
     )
     assert success
