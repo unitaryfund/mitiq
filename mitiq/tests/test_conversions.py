@@ -212,4 +212,4 @@ def test_noise_scaling_converter_with_qiskit_idle_qubits_and_barriers():
     expected.x(2)
     assert scaled == expected
     # Mitiq should not mutate the input circuit
-    test_circuit_qiskit == test_copy
+    assert test_circuit_qiskit == test_copy
