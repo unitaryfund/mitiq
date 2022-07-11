@@ -129,7 +129,11 @@ def _add_identity_to_idle(
 
     Returns:
         An unordered set of the indices that were altered
+
+    Note: An idle qubit is a qubit without any gates (including Qiskit
+        barriers) acting on it.
     """
+
     data = copy.deepcopy(circuit._data)
     bit_indices = set()
     idle_bit_indices = set()
