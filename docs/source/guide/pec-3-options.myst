@@ -415,3 +415,21 @@ uncertainty of the PEC result. For example, given the raw samples contained in  
 one can apply a [bootstrapping](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)) approach. Alternatively, 
 a simpler but computationally more expensive approach is to perform multiple PEC estimations of the same expectation
 value and compute the standard deviation of the results.
+
+
+### Applying learning-based PEC
+
++++
+Mitiq also contains functions for the learning quasiprobability representations of an ideal gate from Clifford circuit simulations,
+with biased noise or depolarizing noise models.
+The resulting quasiprobability representations can be used to obtain an error-mitigated expectation value in the `representations` argument of
+{func}`.pec.execute_with_pec`.
+The learning-based PEC workflow was inspired by the procedure described in *Strikis et al. PRX Quantum (2021)* {cite}`Strikis_2021_PRXQuantum`.
+
++++
+
+#### Learning quasiprobability representations with a depolarizing noise model
+
+
+
+#### Learning quasiprobability representations with a biased noise model
