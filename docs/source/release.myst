@@ -50,9 +50,12 @@ version number.
 This task has two parts:
 
 1.  Make sure that `CHANGELOG.md` has an entry for each pull request
-    (PR) since the last release (PRs). These entries should contain a
-    short description of the PR, as well as the author username and PR
-    number in the form (\@username, gh-xxx).
+    (PR) since the last release. This can be generated from the commit
+    history using `git log vX.Y.Z.. --pretty=format:"- %s [%an]"`
+    where `vX.Y.Z` is the last version of mitiq which was released.
+    The author names need to then be replaced with the author's GitHub
+    handle. An example might look like `- Update python-rapidjson requirement from <=1.6 to <1.8 (#1389) [@dependabot[bot]]`
+    once completed.
 2.  The release author should add a \"Summary\" section with a couple
     sentences describing the latest release, and then update the title
     of the release section to include the release date and remove the
