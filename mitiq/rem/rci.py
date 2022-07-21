@@ -27,8 +27,8 @@ from mitiq import (
     MeasurementResult,
 )
 
-from cirq.sim import sample_state_vector
-from cirq.qis.states import to_valid_state_vector
+from cirq.sim import sample_state_vector as sample_prob_dist
+from cirq.qis.states import to_valid_state_vector as to_prob_dist
 
 MatrixLike = Union[
     np.ndarray,
@@ -66,24 +66,24 @@ def execute_with_rci(
     noisy_result = result[0]
     assert isinstance(noisy_result, MeasurementResult)
 
-    measurement_to_state_vector = partial(
-        to_valid_state_vector, num_qubits=len(qubits)
+    measurement_to_prob_dist = partial(
+        to_prob_dist, num_qubits=len(qubits)
     )
 
-    noisy_state_vectors = np.apply_along_axis(
-        measurement_to_state_vector, 1, noisy_result.asarray
+    empirical_prob_dist = np.apply_along_axis(
+        measurement_to_prob_dist, 1, noisy_result.asarray
     )
 
-    adjusted_state_vectors = (
-        inverse_confusion_matrix @ noisy_state_vectors.T
+    adjusted_prob_dist = (
+        inverse_confusion_matrix @ empirical_prob_dist.T
     ).T
 
-    state_vector_to_measurement = partial(
-        sample_state_vector, indices=noisy_result.qubit_indices
+    prob_dist_to_measurement = partial(
+        to_prob_dist, indices=noisy_result.qubit_indices
     )
 
     adjusted_result = np.apply_along_axis(
-        state_vector_to_measurement, 1, adjusted_state_vectors
+        prob_dist_to_measurement, 1, adjusted_prob_dist
     ).squeeze()
 
     result = MeasurementResult(adjusted_result, noisy_result.qubit_indices)
