@@ -22,6 +22,9 @@ from cirq.experiments.single_qubit_readout_calibration_test import (
 import numpy as np
 
 from mitiq import Observable, QPROGRAM
+from mitiq.interface.mitiq_cirq.cirq_utils import (
+    generate_inverse_confusion_matrix,
+)
 from mitiq.observable.pauli import PauliString
 from mitiq.rem.measurement_result import MeasurementResult
 from mitiq.rem.rci import execute_with_rci, mitigate_executor, rci_decorator
@@ -51,24 +54,8 @@ def noisy_readout_executor(
 def test_rci_identity():
     executor = partial(sample_bitstrings, noise_level=(0,))
     identity = np.identity(4)
-    result = execute_with_rci(
-        circ, executor, observable, inverse_confusion_matrix=identity
-    )
+    result = execute_with_rci(circ, executor, identity, observable=observable)
     assert np.isclose(result, -2.0)
-
-
-def test_rci_without_matrix():
-    # test with an executor that completely flips results
-    p0 = 1
-    p1 = 1
-    noisy_executor = partial(noisy_readout_executor, p0=p0, p1=p1)
-    unmitigated = raw_execute(circ, noisy_executor, observable)
-    assert np.isclose(unmitigated, 2.0)
-
-    mitigated = execute_with_rci(
-        circ, noisy_executor, observable, p0=p0, p1=p1
-    )
-    assert np.isclose(mitigated, -2.0)
 
 
 def test_rci_with_matrix():
@@ -89,8 +76,8 @@ def test_rci_with_matrix():
     mitigated = execute_with_rci(
         circ,
         noisy_executor,
-        observable,
-        inverse_confusion_matrix=inverse_confusion_matrix,
+        inverse_confusion_matrix,
+        observable=observable,
     )
     assert np.isclose(mitigated, -2.0)
 
@@ -102,10 +89,12 @@ def test_doc_is_preserved():
         """Doc of the original executor."""
         return 0
 
-    mit_executor = mitigate_executor(first_executor)
+    identity = np.identity(4)
+
+    mit_executor = mitigate_executor(first_executor, identity)
     assert mit_executor.__doc__ == first_executor.__doc__
 
-    @rci_decorator()
+    @rci_decorator(identity)
     def second_executor(circuit):
         """Doc of the original executor."""
         return 0
@@ -139,18 +128,23 @@ def test_mitigate_executor():
     assert abs(true_rci_value - rci_value) < abs(true_rci_value - base)
 
 
-@rci_decorator(observable=observable, p0=1, p1=1)
-def noisy_readout_decorated_executor(qp: QPROGRAM) -> MeasurementResult:
-    # test with an executor that completely flips results
-    return noisy_readout_executor(qp, p0=1, p1=1)
-
-
 def test_rci_decorator():
     true_rci_value = -2.0
+
+    qubits = list(circ.all_qubits())
 
     # test with an executor that completely flips results
     p0 = 1
     p1 = 1
+    inverse_confusion_matrix = generate_inverse_confusion_matrix(
+        qubits, p0=p0, p1=p1
+    )
+
+    @rci_decorator(inverse_confusion_matrix, observable=observable)
+    def noisy_readout_decorated_executor(qp: QPROGRAM) -> MeasurementResult:
+        # test with an executor that completely flips results
+        return noisy_readout_executor(qp, p0=1, p1=1)
+
     noisy_executor = partial(noisy_readout_executor, p0=p0, p1=p1)
 
     base = raw_execute(circ, noisy_executor, observable)
@@ -166,4 +160,3 @@ if __name__ == "__main__":
     # test_doc_is_preserved()
     # test_mitigate_executor()
     test_rci_decorator()
-
