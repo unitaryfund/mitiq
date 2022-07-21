@@ -67,7 +67,7 @@ By printing the Hamiltonian we see:
 .. doctest::
 
     >>> print(ham)
-    1.500*X(0)*Z(1)-0.700*Y(1)
+    1.500*X(q(0))*Z(q(1))-0.700*Y(q(1))
 ```
 
 Note that we could have created the Hamiltonian by directly defining a {class}`~cirq.PauliSum` with the coefficients.

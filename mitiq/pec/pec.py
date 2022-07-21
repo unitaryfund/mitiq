@@ -24,6 +24,7 @@ from typing import (
     Dict,
     Any,
     cast,
+    List,
 )
 from functools import wraps
 import warnings
@@ -62,7 +63,7 @@ def execute_with_pec(
 ) -> Union[float, Tuple[float, Dict[str, Any]]]:
     r"""Estimates the error-mitigated expectation value associated to the
     input circuit, via the application of probabilistic error cancellation
-    (PEC). [Temme2017]_ [Endo2018]_.
+    (PEC). :cite:`Temme_2017_PRL` :cite:`Endo_2018_PRX`.
 
     This function implements PEC by:
 
@@ -87,8 +88,9 @@ def execute_with_pec(
             is bounded by 1). The number of samples is deduced according
             to the formula (one_norm / precision) ** 2, where 'one_norm'
             is related to the negativity of the quasi-probability
-            representation [Temme2017]_. If 'num_samples' is explicitly set
-            by the user, 'precision' is ignored and has no effect.
+            representation :cite:`Temme_2017_PRL`. If 'num_samples' is
+            explicitly set by the user, 'precision' is ignored and has no
+            effect.
         num_samples: The number of noisy circuits to be sampled for PEC.
             If not given, this is deduced from the argument 'precision'.
         force_run_all: If True, all sampled circuits are executed regardless of
@@ -107,15 +109,6 @@ def execute_with_pec(
         square root of the mean squared deviation of the sampled values from
         ``pec_value``. If ``full_output`` is ``True``, only ``pec_value`` is
         returned.
-
-    .. [Endo2018] : Suguru Endo, Simon C. Benjamin, Ying Li,
-        "Practical Quantum Error Mitigation for Near-Future Applications"
-        *Phys. Rev. **X 8**, 031027 (2018),
-        (https://arxiv.org/abs/1712.09271).
-
-    .. [Takagi2020] : Ryuji Takagi,
-        "Optimal resource cost for error mitigation,"
-        (https://arxiv.org/abs/2006.12509).
     """
     if isinstance(random_state, int):
         random_state = np.random.RandomState(random_state)
@@ -215,8 +208,8 @@ def mitigate_executor(
             is bounded by 1). The number of samples is deduced according
             to the formula (one_norm / precision) ** 2, where 'one_norm'
             is related to the negativity of the quasi-probability
-            representation [Temme2017]_. If 'num_samples' is explicitly set,
-            'precision' is ignored and has no effect.
+            representation :cite:`Temme_2017_PRL`. If 'num_samples' is
+            explicitly set, 'precision' is ignored and has no effect.
         num_samples: The number of noisy circuits to be sampled for PEC.
             If not given, this is deduced from the argument 'precision'.
         force_run_all: If True, all sampled circuits are executed regardless of
@@ -228,22 +221,45 @@ def mitigate_executor(
     Returns:
         The error-mitigated version of the input executor.
     """
+    executor_obj = Executor(executor)
+    if not executor_obj.can_batch:
 
-    @wraps(executor)
-    def new_executor(
-        circuit: QPROGRAM,
-    ) -> Union[float, Tuple[float, Dict[str, Any]]]:
-        return execute_with_pec(
-            circuit,
-            executor,
-            observable,
-            representations=representations,
-            precision=precision,
-            num_samples=num_samples,
-            force_run_all=force_run_all,
-            random_state=random_state,
-            full_output=full_output,
-        )
+        @wraps(executor)
+        def new_executor(
+            circuit: QPROGRAM,
+        ) -> Union[float, Tuple[float, Dict[str, Any]]]:
+            return execute_with_pec(
+                circuit,
+                executor,
+                observable,
+                representations=representations,
+                precision=precision,
+                num_samples=num_samples,
+                force_run_all=force_run_all,
+                random_state=random_state,
+                full_output=full_output,
+            )
+
+    else:
+
+        @wraps(executor)
+        def new_executor(
+            circuits: List[QPROGRAM],
+        ) -> List[Union[float, Tuple[float, Dict[str, Any]]]]:
+            return [
+                execute_with_pec(
+                    circuit,
+                    executor,
+                    observable,
+                    representations=representations,
+                    precision=precision,
+                    num_samples=num_samples,
+                    force_run_all=force_run_all,
+                    random_state=random_state,
+                    full_output=full_output,
+                )
+                for circuit in circuits
+            ]
 
     return new_executor
 
@@ -281,8 +297,9 @@ def pec_decorator(
             is bounded by 1). The number of samples is deduced according
             to the formula (one_norm / precision) ** 2, where 'one_norm'
             is related to the negativity of the quasi-probability
-            representation [Temme2017]_. If 'num_samples' is explicitly set
-            by the user, 'precision' is ignored and has no effect.
+            representation :cite:`Temme_2017_PRL`. If 'num_samples' is
+            explicitly set by the user, 'precision' is ignored and has no
+            effect.
         num_samples: The number of noisy circuits to be sampled for PEC.
             If not given, this is deduced from the argument 'precision'.
         force_run_all: If True, all sampled circuits are executed regardless of

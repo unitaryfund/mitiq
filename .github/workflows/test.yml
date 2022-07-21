@@ -15,7 +15,7 @@ jobs:
       - name: Check out mitiq
         uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
       - name: Install Python dependencies
@@ -38,7 +38,7 @@ jobs:
       - name: Check out mitiq
         uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
 
@@ -58,7 +58,6 @@ jobs:
           make doctest
           make linkcheck
 
-
   # This is to make sure Mitiq works without optional 3rd party packages like Qiskit, pyQuil, etc.
   # E.g., if we accidentally `import qiskit` in Mitiq where we shouldn't, this test will catch that.
   core:
@@ -67,7 +66,7 @@ jobs:
       - name: Check out mitiq
         uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: 3.7
       - name: Install Mitiq
@@ -86,9 +85,9 @@ jobs:
       - name: Check out mitiq
         uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.7
+          python-version: 3.8
       - name: Install Mitiq
         run: |
           python -m pip install --upgrade pip
@@ -96,22 +95,17 @@ jobs:
 
       - name: Run ASV benchmarks
         run: |
-          pip install asv
+          pip install asv virtualenv
+          export BENCHMARK_CI=1
           asv machine --yes
-          result=$(asv dev)
-          echo "${result}"
-          if [[ $result == *"failed"* ]]; then
-            exit 1
-          fi
-          exit 0
+          asv run --quick --strict
 
-  test:
-    runs-on: ${{ matrix.os }}
+  test-linux:
     strategy:
       matrix:
         os: [ubuntu-latest]
         python-version: [3.7, 3.8]
-
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Check out mitiq
         uses: actions/checkout@v3
@@ -119,7 +113,7 @@ jobs:
         with:
           fetch-depth: 2
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Python dependencies
@@ -138,3 +132,23 @@ jobs:
         uses: codecov/codecov-action@v3.1.0
         with:
           fail_ci_if_error: true
+
+  test-nonlinux:
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+        python-version: [3.7, 3.8]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out mitiq
+        uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          make install requirements
+      - name: Run the Mitiq unit tests via pytest
+        run: make test

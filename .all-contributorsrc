@@ -331,6 +331,18 @@
         "code"
       ]
     },
+    {
+      "login": "natestemen",
+      "name": "nate stemen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12703123?v=4",
+      "profile": "http://natestemen.xyz",
+      "contributions": [
+        "infra",
+        "doc",
+        "test",
+        "code"
+      ]
+    }
   ],
   "contributorsPerLine": 7,
   "projectName": "mitiq",

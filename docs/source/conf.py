@@ -59,8 +59,8 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinxcontrib.bibtex",
     "sphinx_copybutton",
-    'nbsphinx',
-    'sphinx_gallery.load_style'
+    "nbsphinx",
+    "sphinx_gallery.load_style",
 ]
 
 intersphinx_mapping = {
@@ -158,7 +158,7 @@ jupyter_execute_notebooks = "cache"
 # If SKIP_PYQUIL is True, do not re-run PyQuil notebooks.
 if os.environ.get("SKIP_PYQUIL"):
     print("Skipping PyQuil notebooks execution since SKIP_PYQUIL is True")
-    execution_excludepatterns = ['*pyquil*.ipynb']
+    execution_excludepatterns = ["*pyquil*.ipynb"]
 
 # -- Options for autodoc -----------------------------------------------------
 napoleon_google_docstring = True
@@ -182,8 +182,8 @@ bibtex_bibfiles = ["refs.bib"]
 
 # Links matching with the following regular expressions will be ignored
 linkcheck_ignore = [
-    r'https://doi.org/10.1088/0034-4885/74/10/104401',
-    r'https://doi.org/10.1088/1367-2630/12/7/075008',
+    r"https://doi.org/10.1088/0034-4885/74/10/104401",
+    r"https://doi.org/10.1088/1367-2630/12/7/075008",
 ]
 
 
@@ -325,25 +325,34 @@ html_theme = "pydata_sphinx_theme"  # 'alabaster', 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ['_static']
+html_static_path = ["_thumbnails"]
 
 # display logo on top-left of html pages
 html_logo = "img/mitiq-logo.png"
 
+html_favicon = "img/mitiq.ico"
+
 myst_update_mathjax = False
 
 nbsphinx_custom_formats = {
-    '.mystnb': ['jupytext.reads', {'fmt': 'mystnb'}],
+    ".mystnb": ["jupytext.reads", {"fmt": "mystnb"}],
 }
-nbsphinx_execute = 'always'
+nbsphinx_execute = "always"
 
 nbsphinx_thumbnails = {
-    'examples/hamiltonians': '_images/vqe-cirq-pauli-sum-mitigation-plot.png',
-    'examples/simple_landscape': '_images/simple_landscape_13_0.png',
-    'examples/maxcut-demo': '_images/maxcut-demo_48_1.png',
-    'examples/pyquil-demo': '_images/pyquil_demo_11_0.png',
-    'examples/molecular_hydrogen': '_images/molecular_hydrogen_26_0.png',
+    "examples/hamiltonians": "_static/vqe-cirq-pauli-sum-mitigation-plot.png",
+    "examples/braket_mirror_circuit": "_static/mirror-circuits.png",
+    "examples/maxcut-demo": "_static/max-cut.png",
+    "examples/cirq-ibmq-backends": "_static/cirq-mitiq-ibmq.png",
+    "examples/pennylane-ibmq-backends": "_static/zne-pennylane.png",
+    "examples/ibmq-backends": "_static/ibmq-gate-map.png",
+    "examples/simple_landscape": "_static/simple-landscape.png",
+    "examples/molecular_hydrogen": "_static/molecular-hydrogen-vqe.png",
+    "examples/molecular_hydrogen_pennylane": "_static/mol-h2-vqe-pl.png",
+    "examples/vqe-pyquil-demo": "_static/vqe-pyquil-demo.png",
+    "examples/pyquil_demo": "_static/pyquil-demo.png",
+    "examples/mitiq-paper/*": "_static/mitiq-codeblocks.png",
+    "examples/zne-braket-ionq": "_static/zne-braket-ionq.png",
     # default images if no thumbnail is specified
-    'examples/*': '_static/mitiq-logo.png',
-    'examples/mitiq-paper/*': '_static/mitiq-logo.png',
+    "examples/*": "_static/mitiq-logo.png",
 }

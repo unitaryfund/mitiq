@@ -49,7 +49,7 @@ For example, you can use {func}`mitiq.interface.mitiq_braket.conversions.from_br
 
 Examples for using each of the frameworks to represent the input to a mitigation method are linked below.
 
-- {ref}`Cirq <examples/ibmq-backends/cirq-frontend>`
+- {ref}`Cirq <examples/cirq-ibmq-backends/setup-defining-a-circuit>`
 - {ref}`Qiskit <examples/ibmq-backends/setup-defining-a-circuit>`
 - {ref}`PyQuil <examples/pyquil_demo>`
 - {ref}`Braket <examples/braket_mirror_circuit/define-the-circuit>`

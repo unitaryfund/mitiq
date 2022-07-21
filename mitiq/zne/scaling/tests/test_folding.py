@@ -214,7 +214,11 @@ def test_fold_all_skip_moments(skip):
         times_to_add = 3 * (i not in skip) + (i in skip)
         for _ in range(times_to_add):
             correct += moment
-    assert _equal(folded, correct, require_qubit_equality=True)
+    assert _equal(
+        _squash_moments(folded),
+        _squash_moments(correct),
+        require_qubit_equality=True,
+    )
 
 
 def test_folding_with_bad_scale_factor():
@@ -268,7 +272,7 @@ def test_fold_from_left_two_qubits():
         [ops.CNOT.on(*qreg)] * 3,
         [ops.T.on(qreg[1])],
     )
-    assert _equal(folded, correct)
+    assert _equal(folded, _squash_moments(correct))
 
     # Full scale factor
     folded = fold_gates_from_left(circ, scale_factor=3)
@@ -301,7 +305,7 @@ def test_fold_from_left_no_stretch():
     """Unit test for folding gates from left for a scale factor of one."""
     circuit = testing.random_circuit(qubits=2, n_moments=10, op_density=0.99)
     folded = fold_gates_from_left(circuit, scale_factor=1)
-    assert _equal(folded, circuit)
+    assert _equal(folded, _squash_moments(circuit))
     assert not (folded is circuit)
 
 
@@ -311,7 +315,7 @@ def test_fold_from_left_scale_factor_larger_than_three():
     circuit = Circuit([ops.SWAP.on(*qreg)], [ops.CNOT.on(*qreg)])
     folded = fold_gates_from_left(circuit, scale_factor=5.0)
     correct = Circuit([ops.SWAP.on(*qreg)] * 5, [ops.CNOT.on(*qreg)] * 5)
-    assert _equal(folded, correct)
+    assert _equal(folded, _squash_moments(correct))
 
 
 def test_fold_from_right_scale_factor_larger_than_three():
@@ -652,7 +656,7 @@ def test_fold_gates_at_random_no_stretch():
     """Tests folded circuit is identical for a scale factor of one."""
     circuit = testing.random_circuit(qubits=3, n_moments=10, op_density=0.99)
     folded = fold_gates_at_random(circuit, scale_factor=1, seed=None)
-    assert _equal(folded, circuit)
+    assert _equal(folded, _squash_moments(circuit))
 
 
 def test_fold_gates_at_random_seed_one_qubit():
@@ -1832,11 +1836,11 @@ def test_apply_fold_mask():
 
     folded = _apply_fold_mask(circ, [0, 3, 0, 0, 0, 0])
     correct = Circuit([ops.H.on(qreg[1])] * 6) + circ
-    assert _equal(folded, correct)
+    assert _equal(folded, _squash_moments(correct))
 
     folded = _apply_fold_mask(circ, [0, 0, 1, 0, 0, 0])
-    correct = Circuit([ops.H.on(qreg[2])] * 2) + circ
-    assert _equal(folded, correct)
+    correct = Circuit([ops.H.on(qreg[2])] * 2 + circ)
+    assert _equal(folded, _squash_moments(correct))
 
     folded = _apply_fold_mask(circ, [1, 1, 1, 1, 1, 1])
     correct = Circuit(

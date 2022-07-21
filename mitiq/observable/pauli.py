@@ -84,7 +84,7 @@ class PauliString:
 
     @property
     def coeff(self) -> complex:
-        return self._pauli.coefficient
+        return self._pauli.coefficient  # type: ignore
 
     def matrix(
         self,

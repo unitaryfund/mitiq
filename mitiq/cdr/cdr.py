@@ -15,7 +15,7 @@
 
 """API for using Clifford Data Regression (CDR) error mitigation."""
 
-from typing import Any, Callable, Optional, Sequence, Union
+from typing import Any, Callable, Optional, Sequence, Union, List
 from functools import wraps
 import numpy as np
 from scipy.optimize import curve_fit
@@ -227,24 +227,49 @@ def mitigate_executor(
             - sigma_replace (float): Width of the Gaussian distribution used
             for ``method_replace='gaussian'``.
             - random_state (int): Seed for sampling."""
+    executor_obj = Executor(executor)
+    if not executor_obj.can_batch:
 
-    @wraps(executor)
-    def new_executor(
-        circuit: QPROGRAM,
-    ) -> float:
-        return execute_with_cdr(
-            circuit,
-            executor,
-            observable,
-            simulator=simulator,
-            num_training_circuits=num_training_circuits,
-            fraction_non_clifford=fraction_non_clifford,
-            fit_function=fit_function,
-            num_fit_parameters=num_fit_parameters,
-            scale_factors=scale_factors,
-            scale_noise=scale_noise,
-            **kwargs,
-        )
+        @wraps(executor)
+        def new_executor(
+            circuit: QPROGRAM,
+        ) -> float:
+            return execute_with_cdr(
+                circuit,
+                executor,
+                observable,
+                simulator=simulator,
+                num_training_circuits=num_training_circuits,
+                fraction_non_clifford=fraction_non_clifford,
+                fit_function=fit_function,
+                num_fit_parameters=num_fit_parameters,
+                scale_factors=scale_factors,
+                scale_noise=scale_noise,
+                **kwargs,
+            )
+
+    else:
+
+        @wraps(executor)
+        def new_executor(
+            circuits: List[QPROGRAM],
+        ) -> List[float]:
+            return [
+                execute_with_cdr(
+                    circuit,
+                    executor,
+                    observable,
+                    simulator=simulator,
+                    num_training_circuits=num_training_circuits,
+                    fraction_non_clifford=fraction_non_clifford,
+                    fit_function=fit_function,
+                    num_fit_parameters=num_fit_parameters,
+                    scale_factors=scale_factors,
+                    scale_noise=scale_noise,
+                    **kwargs,
+                )
+                for circuit in circuits
+            ]
 
     return new_executor
 

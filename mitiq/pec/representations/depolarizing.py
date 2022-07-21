@@ -44,7 +44,7 @@ from mitiq.pec.channels import tensor_product
 def represent_operation_with_global_depolarizing_noise(
     ideal_operation: QPROGRAM, noise_level: float
 ) -> OperationRepresentation:
-    r"""As described in [Temme2017]_, this function maps an
+    r"""As described in :cite:`Temme_2017_PRL`, this function maps an
     ``ideal_operation`` :math:`\mathcal{U}` into its quasi-probability
     representation, which is a linear combination of noisy implementable
     operations :math:`\sum_\alpha \eta_{\alpha} \mathcal{O}_{\alpha}`.
@@ -79,7 +79,7 @@ def represent_operation_with_global_depolarizing_noise(
         \eta_4 =- \frac{1}{4}\frac{\epsilon}{1- \epsilon} , \qquad
         \mathcal{O}_4 = \mathcal{D} \circ \mathcal{Z} \circ \mathcal{U}
 
-    It was proven in [Takagi2020]_ that, under suitable assumptions,
+    It was proven in :cite:`Takagi_2020_PRR` that, under suitable assumptions,
     this representation is optimal (minimum 1-norm).
 
     Args:
@@ -160,7 +160,7 @@ def represent_operation_with_global_depolarizing_noise(
 def represent_operation_with_local_depolarizing_noise(
     ideal_operation: QPROGRAM, noise_level: float
 ) -> OperationRepresentation:
-    r"""As described in [Temme2017]_, this function maps an
+    r"""As described in :cite:`Temme_2017_PRL`, this function maps an
     ``ideal_operation`` :math:`\mathcal{U}` into its quasi-probability
     representation, which is a linear combination of noisy implementable
     operations :math:`\sum_\alpha \eta_{\alpha} \mathcal{O}_{\alpha}`.
@@ -193,11 +193,6 @@ def represent_operation_with_local_depolarizing_noise(
         This is possible as long as the unitary associated to the input
         QPROGRAM, followed by a single final depolarizing channel, is
         physically implementable.
-
-    .. [Temme2017] : Kristan Temme, Sergey Bravyi, Jay M. Gambetta,
-        "Error mitigation for short-depth quantum circuits,"
-        *Phys. Rev. Lett.* **119**, 180509 (2017),
-        (https://arxiv.org/abs/1612.02058).
     """
     circuit_copy = copy.deepcopy(ideal_operation)
     converted_circ, _ = convert_to_mitiq(circuit_copy)

@@ -228,6 +228,7 @@ colab:
 id: Ey4vYYR1k4ul
 outputId: d8cea421-0902-442e-e4c6-02cb24b9fd9a
 ---
+# Example of parameter-noise scaling.
 q = cirq.LineQubit(0)
 circuit2 = cirq.Circuit(cirq.X.on(q) ** (3 / 5), cirq.Z.on(q) ** (4 / 5))
 print("Circuit:", circuit2, sep="\n")
@@ -236,9 +237,35 @@ scaled = zne.scaling.scale_parameters(circuit2, scale_factor=2.0, base_variance=
 print("\nScaled circuit:", scaled, sep="\n")
 ```
 
+**Codeblock 13**
+
++++
+
+> Note: The paper shows pseudocode; here we show an example.
+
+```{code-cell} ipython3
+from functools import partial
+from mitiq.zne.scaling import compute_parameter_variance, scale_parameters
+
+# Estimate base level of parameter noise
+base_variance = compute_parameter_variance(executor, cirq.X, cirq.LineQubit(0))
+print("Estimation of parameter noise variance:", base_variance)
+
+scale_param_noise = partial(scale_parameters, base_variance=base_variance)
+
+zne_value = zne.execute_with_zne(
+    circuit,
+    executor,
+    scale_noise=scale_param_noise,
+    num_to_average=10,
+)
+# Parameter-noise mitigation is designed for random, coherent noise. For simplicity, we use depolarizing noise here, so we don't expect the best performance.
+print("ZNE value via parameter noise scaling:", zne_value)
+```
+
 +++ {"id": "ye9I9WLNrGxU"}
 
-**Codeblock 13**
+**Codeblock 14**
 
 ```{code-cell} ipython3
 ---
@@ -257,7 +284,7 @@ print("ZNE value:", zne_value)
 
 +++ {"id": "vm3EwufPfn_B"}
 
-**Codeblock 14**
+**Codeblock 15**
 
 ```{code-cell} ipython3
 :id: AhnilvXffoF2
@@ -267,7 +294,7 @@ linear_factory = zne.inference.LinearFactory(scale_factors=[1.0, 2.0, 3.0])
 
 +++ {"id": "3ubB9KrvfoLo"}
 
-**Codeblock 15**
+**Codeblock 16**
 
 ```{code-cell} ipython3
 ---
@@ -286,7 +313,7 @@ print("ZNE value:", zne_value)
 
 +++ {"id": "doyAREdJfoWC"}
 
-**Codeblock 16**
+**Codeblock 17**
 
 ```{code-cell} ipython3
 ---
@@ -307,7 +334,7 @@ print("ZNE value:", zne_value)
 
 +++ {"id": "zvIc-aLuGAut"}
 
-**Codeblock 17**
+**Codeblock 18**
 
 ```{code-cell} ipython3
 ---
@@ -328,7 +355,7 @@ print("ZNE value:", zne_value)
 
 +++ {"id": "bbaOzdc-GLeM"}
 
-**Codeblock 18**
+**Codeblock 19**
 
 ```{code-cell} ipython3
 ---
@@ -362,7 +389,7 @@ print("ZNE value:", zne_value)
 
 +++ {"id": "t3o-Xc5rGLsR"}
 
-**Codeblock 19**
+**Codeblock 20**
 
 ```{code-cell} ipython3
 :id: qqndfKFIGLy6
@@ -383,7 +410,7 @@ noisy_z = pec.NoisyOperation(
 
 +++ {"id": "J0rb6P6XGL42"}
 
-**Codeblock 20 & 21**
+**Codeblock 21 & 22**
 
 ```{code-cell} ipython3
 :id: UsxGtCrAGL-h
@@ -396,7 +423,7 @@ h_rep = pec.OperationRepresentation(
 
 +++ {"id": "D2NVsYKVGMJ-"}
 
-**Codeblock 22**
+**Codeblock 23**
 
 ```{code-cell} ipython3
 :id: Civ6U2OSGMQV
@@ -406,7 +433,7 @@ noisy_op, sign, coeff = h_rep.sample()
 
 +++ {"id": "F8Ryo8cGGMWu"}
 
-**Codeblock 23**
+**Codeblock 24**
 
 ```{code-cell} ipython3
 ---
@@ -421,9 +448,11 @@ sampled, sign, norm = pec.sample_circuit(circuit3, representations=[h_rep])
 print("Sampled circuit:", sampled, sep="\n")  # Run many times to see different sampled circuits!
 ```
 
+> Note: For a runnable code block in which PEC is applied to estimate an expectation value, see _Codeblock 7_.
+
 +++ {"id": "RYh92EfKGMix"}
 
-**Codeblock 24 & 25**
+**Codeblock 25 & 26**
 
 +++ {"id": "C6K0VzUCLkcw"}
 
@@ -431,7 +460,7 @@ See https://mitiq.readthedocs.io/en/stable/examples/cdr_api.html.
 
 +++ {"id": "T73iRSXLGMud"}
 
-**Codeblock 26**
+**Codeblock 27**
 
 ```{code-cell} ipython3
 ---
@@ -449,7 +478,7 @@ print("ZNE value:", zne_value)
 
 +++ {"id": "042uqn-fMiYj"}
 
-**Codeblock 27**
+**Codeblock 28**
 
 ```{code-cell} ipython3
 ---
@@ -471,7 +500,7 @@ print("ZNE value:", zne_value)
 
 +++ {"id": "P5HEyCXwMio8"}
 
-**Codeblock 28**
+**Codeblock 29**
 
 ```{code-cell} ipython3
 ---
@@ -497,7 +526,7 @@ print("ZNE then PEC value:", zne_then_pec_value)  # Note this is not accurate (b
 
 +++ {"id": "LQYPqUazMi3b"}
 
-**Codeblock 29**
+**Codeblock 30**
 
 ```{code-cell} ipython3
 :id: dyk7Hj1nPB48

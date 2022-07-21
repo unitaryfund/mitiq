@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """High-level zero-noise extrapolation tools."""
-from typing import Callable, Optional, Union
+from typing import Callable, Optional, Union, List
 from functools import wraps
 
 from mitiq import Executor, Observable, QPROGRAM, QuantumResult
@@ -99,17 +99,35 @@ def mitigate_executor(
     Returns:
         The error-mitigated version of the input executor.
     """
+    executor_obj = Executor(executor)
+    if not executor_obj.can_batch:
 
-    @wraps(executor)
-    def new_executor(qp: QPROGRAM) -> float:
-        return execute_with_zne(
-            qp,
-            executor,
-            observable,
-            factory=factory,
-            scale_noise=scale_noise,
-            num_to_average=num_to_average,
-        )
+        @wraps(executor)
+        def new_executor(circuit: QPROGRAM) -> float:
+            return execute_with_zne(
+                circuit,
+                executor,
+                observable,
+                factory=factory,
+                scale_noise=scale_noise,
+                num_to_average=num_to_average,
+            )
+
+    else:
+
+        @wraps(executor)
+        def new_executor(circuits: List[QPROGRAM]) -> List[float]:
+            return [
+                execute_with_zne(
+                    circuit,
+                    executor,
+                    observable,
+                    factory=factory,
+                    scale_noise=scale_noise,
+                    num_to_average=num_to_average,
+                )
+                for circuit in circuits
+            ]
 
     return new_executor
 

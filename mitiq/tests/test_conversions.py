@@ -176,3 +176,40 @@ def test_atomic_one_to_many_converter(to_type):
     circuits = returns_several_circuits(circuit, return_mitiq=True)
     for circuit in circuits:
         assert isinstance(circuit, cirq.Circuit)
+
+
+def test_noise_scaling_converter_with_qiskit_idle_qubits_and_barriers():
+    """Idle qubits must be preserved even if the input has barriers.
+    Test input:
+         ┌───┐ ░
+    q_0: ┤ X ├─░─
+         └───┘ ░
+    q_1: ──────░─
+         ┌───┐ ░
+    q_2: ┤ X ├─░─
+         └───┘ ░
+    q_3: ────────
+    Expected output:
+         ┌───┐
+    q_0: ┤ X ├
+         └───┘
+    q_1: ─────
+         ┌───┐
+    q_2: ┤ X ├
+         └───┘
+    q_3: ─────
+    """
+    test_circuit_qiskit = qiskit.QuantumCircuit(4)
+    test_circuit_qiskit.x(0)
+    test_circuit_qiskit.x(2)
+    test_circuit_qiskit.barrier(0, 1, 2)
+    test_copy = test_circuit_qiskit.copy()
+
+    scaled = scaling_function(test_circuit_qiskit)
+    # Mitiq is expected to remove qiskit barriers
+    expected = qiskit.QuantumCircuit(4)
+    expected.x(0)
+    expected.x(2)
+    assert scaled == expected
+    # Mitiq should not mutate the input circuit
+    assert test_circuit_qiskit == test_copy

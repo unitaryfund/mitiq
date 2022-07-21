@@ -49,7 +49,7 @@ def test_observable():
     assert obs.nterms == 2
     assert obs.ngroups == 1
 
-    assert str(obs) == "-X(0) + (2+0j)*Z(1)"
+    assert str(obs) == "-X(q(0)) + (2+0j)*Z(q(1))"
 
     correct_matrix = -1.0 * np.kron(xmat, imat) + 2.0 * np.kron(imat, zmat)
     assert np.allclose(obs.matrix(), correct_matrix)

@@ -1,6 +1,84 @@
 # Changelog
 
-## Version 0.16.0  (In development)
+## Version 0.18.0 (In development)
+
+## Version 0.17.0
+
+### Summary
+
+This release includes contributions from UnitaryHACK 2022! 🎉
+We had 3 merged pull requests, and a fourth is looking to be merged in the next milestone.
+Along with the great contributions from hackers, this release focused on expanding our ZNE examples to other frontends (Cirq, Braket, and Pennylane), building out learning-based PEC, and improving our benchmarking infrastructure.
+
+
+### All Changes
+
+- Support the latest Cirq version (0.15.0) (@andreamari, gh-1379)
+- add ZNE example using pennylane (@natestemen, gh-1384)
+- Add ZNE example with Braket and IonQ (@andreamari, gh-1363)
+- docs: add natestemen as a contributor for infra, doc, test, code (allcontributors, gh-1383)
+- remove comma (@natestemen, gh-1381)
+- add myself to authors (@natestemen, gh-1372)
+- Deploy asv benchmark data to web (@natestemen, gh-1354)
+- Batched mitigate (@nylewong, gh-1286)
+- Update black requirement from ~=22.3 to ~=22.6 (@dependabot, gh-1370)
+- Add Error Mitigation example with Cirq (@misty-w, gh-1351)
+- Update amazon-braket-sdk requirement from ~=1.25.1 to ~=1.25.2 (@dependabot, gh-1367)
+- Update pennylane-qiskit requirement from ~=0.23.0 to ~=0.24.0 (@dependabot, gh-1361)
+- Update Mitiq paper code blocks based on paper review (@andreamari, gh-1357)
+- Update pennylane requirement from ~=0.23.1 to ~=0.24.0 (@dependabot, gh-1362)
+- Update amazon-braket-sdk requirement from ~=1.25.0 to ~=1.25.1 (@dependabot, gh-1359)
+- Improving the H2 example (@obliviateandsurrender, gh-1337)
+- Test on windows and mac on each PR and add openfermion to dev requirements (@andreamari, gh-1348)
+- Loss function for learning biased noise (@misty-w, gh-1340)
+- Modify docstrings, documentation to use citations from refs.bib [unitaryhack] (@wingcode, gh-1325)
+- [unitaryhack] v2 Updated molecular hydrogen tutorial OpenFermion (@lockwo, gh-1349)
+- Update amazon-braket-sdk requirement from ~=1.24.0 to ~=1.25.0 (@dependabot, gh-1345)
+- Bump actions/setup-python from 3 to 4 (@dependabot, gh-1344)
+- [unitaryhack] Add thumbnails for examples (@obliviateandsurrender, gh-1338)
+- Revert "[unitaryhack] Updated molecular hydrogen tutorial" (@andreamari, gh-1347)
+- [unitaryhack] Updated molecular hydrogen tutorial (@lockwo, gh-1296)
+- Update mypy requirement from ~=0.960 to ~=0.961 (@dependabot, gh-1342)
+- Merge pull request #1320 from unitaryfund/nts-contrib-docs (@natestemen)
+
+
+## Version 0.16.0 (June 3rd, 2022)
+### Summary
+
+This release officially adds support for the digital dynamical decoupling (DDD) technique which is now [fully documented](https://mitiq.readthedocs.io/en/latest/guide/ddd.html) and so ready to be applied by Mitiq users. This is still very new technique and so, if you notice any bugs, please let us know by
+opening [issues](https://github.com/unitaryfund/mitiq/issues) on GihHub.
+A further notable addition is the function [generate_quantum_volume_circuit()](https://mitiq.readthedocs.io/en/latest/apidoc.html#mitiq.benchmarks.quantum_volume_circuits.generate_quantum_volume_circuit) by @nickdgardner, extending the Mitiq benchmarking module with quantum volume
+circuits.
+
+Congratulations to the new member of the Mitiq team @natestemen and special thanks to the external contributors @Aaron-Robertson, @nickdgardner, @ZhaoyiLi-HekJukZaaiZyuJan and @amirebrahimi!
+
+### All Changes
+
+- Add section 2 (use case) on DDD to user guide (@nathanshammah, gh-1304)
+- Update DDD options documentation (third section) (@andreamari, gh-1327)
+- Add additional options subsection for DDD (third section) (@Aaron-Robertson, gh-1326)
+- Add theory subsection for DDD (fifth section) (@andreamari, @natestemen, gh-1311)
+- Update amazon-braket-sdk requirement from ~=1.19.0 to ~=1.24.0 (@dependabot gh-1324, gh-1310, gh-1306, gh-1303, gh-1297, gh-1278, gh-1271)
+- Ensure lists in documentation are displayed properly (@natestemen, gh-1322)
+- Add quantum volume circuits to benchmarking module (@nickdgardner, gh-1281)
+- Update readme table with DDD (@andreamari, gh-1318)
+- Test PR for unitaryhack test bounty (@nathanshammah, gh-1317)
+- Fixes unexpected error from repeated rule (@Aaron-Robertson, gh-1316)
+- Update mypy requirement from ~=0.950 to ~=0.960 (@dependabot, gh-1314)
+- Use single URL when referring to google style (@natestemen, gh-1309)
+- Update close-stale.yml (@andreamari, gh-1295)
+- Update contributing docs (@amirebrahimi, gh-1305)  
+- Add fourth section of DDD docs (@andreamari, gh-1276) 
+- Fix citation file (@natestemen, gh-1299) 
+- Write the first sub-section of the DDD guide: How do I use DDD? (@Misty-W, gh-1277) 
+- Update qiskit requirement from ~=0.36.1 to ~=0.36.2 (@dependabot, gh-1302) 
+- Rename test_randomized_benchmaking.py to test_randomized_benchmarking.py (@nickdgardner, gh-1284)
+- Fix broken links in docs (@andreamari, gh-1282) 
+- Create file structure (@andreamari, gh-1275)
+- Update pennylane requirement from ~=0.23.0 to ~=0.23.1 (@dependabot, gh-1274) 
+- Fixed typo in documentation formula (@ZhaoyiLi-HekJukZaaiZyuJan, gh-1246) 
+- Update version to 0.16dev (@nathanshammah, gh-1268)
+
 
 ## Version 0.15.0 (April 29th, 2022)
 

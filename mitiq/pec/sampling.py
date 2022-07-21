@@ -24,7 +24,6 @@ import numpy as np
 import cirq
 
 from mitiq import QPROGRAM
-from mitiq.utils import _equal
 from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 from mitiq.pec.types import OperationRepresentation
 
@@ -71,7 +70,7 @@ def sample_sequence(
     ideal, _ = convert_to_mitiq(ideal_operation)
     operation_representation = None
     for representation in representations:
-        if _equal(representation._ideal, ideal, require_qubit_equality=True):
+        if representation._ideal == ideal:
             operation_representation = representation
             break
 
