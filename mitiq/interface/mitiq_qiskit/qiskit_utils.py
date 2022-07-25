@@ -200,21 +200,22 @@ def sample_bitstrings(
     """Returns measurement bitstrings obtained from executing the input circuit on
     a Qiskit backend (passed as an argument).
     Note that the input circuit must contain measurement gates
-    (unless `measure_all` is `True`).
+    (unless ``measure_all`` is ``True``).
 
     Args:
         circuit: The input Qiskit circuit.
         backend: A real or fake Qiskit backend. The input circuit
             should be transpiled into a compatible gate set.
-            It may be necessary to set optimization_level=0 when transpiling.
-        noise_model: A valid Qiskit `NoiseModel` object. This option is used
-            if and only if `backend` is `None`. In this case a default density
-            matrix simulator is used with `optimization_level=0`.
+            It may be necessary to set ``optimization_level=0`` when
+            transpiling.
+        noise_model: A valid Qiskit ``NoiseModel`` object. This option is used
+            if and only if ``backend`` is ``None``. In this case a default
+            density matrix simulator is used with ``optimization_level=0``.
         shots: The number of measurements.
         qubit_indices: Optional qubit indices associated to bitstrings.
 
     Returns:
-        The measured bitstrings casted as a Mitiq {class}`.MeasurementResult`
+        The measured bitstrings casted as a Mitiq :class:`.MeasurementResult`
         object.
     """
     circuit_to_execute = circuit.copy()
