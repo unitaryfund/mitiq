@@ -14,8 +14,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for qiskit executors (qiskit_utils.py)."""
+import pytest
 import numpy as np
 from qiskit import QuantumCircuit
+from qiskit.test.mock import FakeLima
 
 from mitiq.interface.mitiq_qiskit.qiskit_utils import (
     execute,
@@ -23,7 +25,9 @@ from mitiq.interface.mitiq_qiskit.qiskit_utils import (
     execute_with_noise,
     execute_with_shots_and_noise,
     initialized_depolarizing_noise,
+    sample_bitstrings,
 )
+from mitiq import MeasurementResult
 
 NOISE = 0.007
 ONE_QUBIT_GS_PROJECTOR = np.array([[1, 0], [0, 0]])
@@ -174,3 +178,63 @@ def test_circuit_is_not_mutated_by_executors():
     )
     assert single_qubit_circ.data == expected_circuit.data
     assert single_qubit_circ == expected_circuit
+
+
+def test_sample_bitstrings():
+    """Tests that the function sample_bitstrings returns a valid
+    mitiq.MeasurementResult.
+    """
+
+    two_qubit_circ = QuantumCircuit(2, 1)
+    two_qubit_circ.cx(0, 1)
+    two_qubit_circ.measure(0, 0)
+
+    measurement_result = sample_bitstrings(
+        circuit=two_qubit_circ,
+        backend=None,
+        noise_model=initialized_depolarizing_noise(0),
+        shots=5,
+    )
+    assert measurement_result.result == [[0], [0], [0], [0], [0]]
+    assert measurement_result.qubit_indices == (0,)
+
+    two_qubit_circ = QuantumCircuit(2)
+    two_qubit_circ.cx(0, 1)
+    measurement_result = sample_bitstrings(
+        circuit=two_qubit_circ,
+        backend=None,
+        noise_model=initialized_depolarizing_noise(0),
+        shots=2,
+        measure_all=True,
+    )
+    assert measurement_result.result == [[0, 0], [0, 0]]
+    assert measurement_result.qubit_indices == (0, 1)
+    assert isinstance(measurement_result, MeasurementResult)
+
+
+def test_sample_bitstrings_with_backend():
+    """Tests that the function sample_bitstrings returns a valid
+    mitiq.MeasurementResult if a qiskit backend is used.
+    """
+    two_qubit_circ = QuantumCircuit(2)
+    two_qubit_circ.cx(0, 1)
+    measurement_result = sample_bitstrings(
+        circuit=two_qubit_circ,
+        backend=FakeLima(),
+        shots=5,
+        measure_all=True,
+    )
+    assert len(measurement_result.result) == 5
+    assert len(measurement_result.result[0]) == 2
+    assert measurement_result.qubit_indices == (0, 1)
+
+
+def test_sample_bitstrings_error_message():
+    """Tests that an error is given backend and nose_model are both None."""
+    two_qubit_circ = QuantumCircuit(2)
+    two_qubit_circ.cx(0, 1)
+    with pytest.raises(ValueError, match="Either a backend or a noise model"):
+        sample_bitstrings(
+            circuit=two_qubit_circ,
+            shots=5,
+        )
