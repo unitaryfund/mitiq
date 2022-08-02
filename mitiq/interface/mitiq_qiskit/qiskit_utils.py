@@ -263,7 +263,7 @@ def compute_expectation_value_on_noisy_backend(
     shots: int = 10000,
     measure_all: bool = False,
     qubit_indices: Optional[Tuple[int]] = None,
-) -> MeasurementResult:
+) -> complex:
     """Returns the noisy expectation value of the input Mitiq observable
     obtained from executing the input circuit on a Qiskit backend.
 
@@ -292,4 +292,4 @@ def compute_expectation_value_on_noisy_backend(
     )
     executor = Executor(execute)
 
-    return executor.evaluate(circuit, obs)
+    return executor.evaluate(circuit, obs)[0]

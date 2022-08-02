@@ -253,7 +253,7 @@ def test_compute_expectation_value_on_noisy_backend_with_noise_model():
         qiskit_circuit,
         obs,
         noise_model=initialized_depolarizing_noise(0),
-    )[0]
+    )
 
     assert isinstance(noiseless_expval, complex)
     assert np.isclose(np.imag(noiseless_expval), 0.0)
@@ -264,7 +264,7 @@ def test_compute_expectation_value_on_noisy_backend_with_noise_model():
         qiskit_circuit,
         obs,
         noise_model=initialized_depolarizing_noise(0.01),
-    )[0]
+    )
 
     assert isinstance(expval, complex)
     assert np.isclose(np.imag(expval), 0.0)
@@ -282,7 +282,7 @@ def test_compute_expectation_value_on_noisy_backend_with_qiskit_backend():
         qiskit_circuit,
         obs,
         backend=FakeLima(),
-    )[0]
+    )
 
     assert isinstance(expval, complex)
     assert np.isclose(np.imag(expval), 0.0)
@@ -304,12 +304,12 @@ def test_compute_expectation_value_on_noisy_backend_with_measurements():
         qiskit_circuit,
         obs,
         noise_model=initialized_depolarizing_noise(0.01),
-    )[0]
+    )
     assert 0.9 < np.real(expval) < 1.0
 
     expval = compute_expectation_value_on_noisy_backend(
         qiskit_circuit,
         obs,
         backend=FakeLima(),
-    )[0]
+    )
     assert 0.9 < np.real(expval) < 1.0
