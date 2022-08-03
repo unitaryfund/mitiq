@@ -83,7 +83,9 @@ def generic_executor(circuit, noise_level: float = 0.1) -> float:
 
 # Default executor for unit tests
 def executor(circuit) -> float:
-    wavefunction = circuit.final_state_vector()
+    wavefunction = circuit.final_state_vector(
+        ignore_terminal_measurements=True
+    )
     return np.real(wavefunction.conj().T @ np.kron(npX, npZ) @ wavefunction)
 
 
