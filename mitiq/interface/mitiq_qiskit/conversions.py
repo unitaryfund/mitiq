@@ -255,13 +255,10 @@ def _transform_registers(
     circuit.add_register(*new_qregs)
 
     # Map the qubits in operations to the new qubits.
-    new_ops = []
     for op in data:
         gate, qubits, cbits = op
         new_qubits = _map_qubits(qubits, qreg_sizes, new_qregs)
-        new_ops.append((gate, new_qubits, cbits))
-
-    circuit._data = new_ops
+        circuit.append(gate, new_qubits, cbits)
 
 
 def to_qasm(circuit: cirq.Circuit) -> QASMType:
