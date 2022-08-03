@@ -788,8 +788,8 @@ class AdaptiveFactory(Factory, ABC):
 
 
 class PolyFactory(BatchedFactory):
-    """Factory object implementing a zero-noise extrapolation algorithm based on
-    a polynomial fit.
+    """Factory object implementing a zero-noise extrapolation algorithm based
+    on a polynomial fit.
 
     Args:
         scale_factors: Sequence of noise scale factors at which

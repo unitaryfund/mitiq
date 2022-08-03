@@ -92,7 +92,8 @@ def insert_ddd_sequences(
     circuit: QPROGRAM,
     rule: Callable[[int], Circuit],
 ) -> QPROGRAM:
-    """Returns the circuit with DDD sequences applied according to the input rule.
+    """Returns the circuit with DDD sequences applied according to the input
+    rule.
 
     Args:
         circuit: The QPROGRAM circuit to be modified with DDD sequences.
@@ -112,7 +113,8 @@ def _insert_ddd_sequences(
     circuit: Circuit,
     rule: Callable[[int], Circuit],
 ) -> Circuit:
-    """Returns the circuit with DDD sequences applied according to the input rule.
+    """Returns the circuit with DDD sequences applied according to the input
+    rule.
 
     Args:
         circuit: The Cirq circuit to be modified with DDD sequences.
