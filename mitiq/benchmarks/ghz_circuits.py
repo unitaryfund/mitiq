@@ -25,7 +25,8 @@ def generate_ghz_circuit(
     n_qubits: int,
     return_type: Optional[str] = None,
 ) -> QPROGRAM:
-    """Returns a GHZ circuit ie a circuit that prepares an ``n_qubits`` GHZ state.
+    """Returns a GHZ circuit ie a circuit that prepares an ``n_qubits``
+    GHZ state.
 
     Args:
         n_qubits: The number of qubits in the circuit.
