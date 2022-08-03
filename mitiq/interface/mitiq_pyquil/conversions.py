@@ -17,6 +17,7 @@
 pyQuil's circuit representation (Quil programs).
 """
 from cirq import Circuit, LineQubit
+from cirq_rigetti.quil_output import QuilOutput
 from pyquil import Program
 
 from cirq_rigetti import circuit_from_quil
@@ -37,9 +38,11 @@ def to_quil(circuit: Circuit) -> QuilType:
     # if we are using LineQubits, keep the qubit labeling the same
     if isinstance(max_qubit, LineQubit):
         qubit_range = max_qubit.x + 1
-        return circuit.to_quil(qubit_order=LineQubit.range(qubit_range))
+        return str(
+            QuilOutput(circuit.all_operations(), LineQubit.range(qubit_range))
+        )[23:]
     # otherwise, use the default ordering (starting from zero)
-    return circuit.to_quil()
+    return str(QuilOutput(circuit.all_operations(), circuit.all_qubits()))[23:]
 
 
 def to_pyquil(circuit: Circuit) -> Program:
