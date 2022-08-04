@@ -8,7 +8,7 @@ amazon-braket-sdk~=1.27.1
 # Unit tests, coverage, and formatting/style.
 pytest-xdist[psutil]~=2.5.0
 pytest-cov~=3.0.0
-flake8~=5.0.3
+flake8~=5.0.4
 black~=22.6
 mypy~=0.971
 
