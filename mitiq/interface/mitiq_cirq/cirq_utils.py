@@ -68,7 +68,7 @@ def compute_density_matrix(
         noise_level: Noise rate as a tuple of floats.
 
     Returns:
-        NumPy array for the final density matrix.
+        The final density matrix as a NumPy array.
     """
     if sum(noise_level) > 0:
         circuit = circuit.with_noise(noise_model(*noise_level))  # type: ignore
