@@ -41,7 +41,9 @@ def to_quil(circuit: Circuit) -> QuilType:
             QuilOutput(circuit.all_operations(), LineQubit.range(qubit_range))
         )[23:]
     # otherwise, use the default ordering (starting from zero)
-    return str(QuilOutput(circuit.all_operations(), circuit.all_qubits()))[23:]
+    return str(
+        QuilOutput(circuit.all_operations(), sorted(circuit.all_qubits()))
+    )[23:]
 
 
 def to_pyquil(circuit: Circuit) -> Program:
