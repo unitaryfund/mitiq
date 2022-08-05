@@ -52,7 +52,7 @@ format:
 
 .PHONY: install
 install:
-	pip install -e .[development]
+	poetry install
 
 .PHONY: pdf
 pdf:
@@ -60,7 +60,7 @@ pdf:
 
 .PHONY: requirements
 requirements: requirements.txt
-	pip install -r requirements.txt
+	poetry install --no-dev
 
 .PHONY: test
 test:
