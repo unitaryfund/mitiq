@@ -65,7 +65,7 @@ def compute_density_matrix(
     Args:
         circuit: The input Cirq circuit.
         noise_model: Input Cirq noise model. Default is amplitude damping.
-        noise_level: Noise rate as a tuple of floats
+        noise_level: Noise rate as a tuple of floats.
 
     Returns:
         NumPy array for the final density matrix.
