@@ -59,7 +59,8 @@ def compute_density_matrix(
     noise_model: cirq.NOISE_MODEL_LIKE = cirq.amplitude_damp,  # type: ignore
     noise_level: Tuple[float] = (0.01,),
 ) -> np.ndarray:
-    """Finds the density matrix of a noisy version of the input circuit.
+    """Returns the density matrix of the quantum state after the
+    (noisy) execution of the input circuit.
 
     Args:
         circuit: The input Cirq circuit.
