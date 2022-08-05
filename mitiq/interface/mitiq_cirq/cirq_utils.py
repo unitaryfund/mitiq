@@ -35,9 +35,9 @@ def sample_bitstrings(
     Args:
         circuit: The input Cirq circuit.
         noise_model: Input Cirq noise model. Default is amplitude damping.
-        noise_level: Noise rate as a tuple of floats
-        sampler: Cirq simulator from which the result will be sampled from
-        shots: Number of measurements
+        noise_level: Noise rate as a tuple of floats.
+        sampler: Cirq simulator from which the result will be sampled from.
+        shots: Number of measurements.
 
     Returns:
         Sampled outcome from a measurement.
