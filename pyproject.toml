@@ -1,3 +1,57 @@
+[tool.poetry]
+name = "mitiq"
+version = "0.18.0dev"
+description = '''
+Mitiq is an open source toolkit for implementing error mitigation techniques
+on most current intermediate-scale quantum computers.
+'''
+authors = ["Unitary Fund <info@unitary.fund>"]
+license = "GPL v3.0"
+readme = "README.md"
+
+homepage = "https://mitiq.readthedocs.io/en/stable/"
+repository = "https://github.com/unitaryfund/mitiq/"
+documentation = "https://mitiq.readthedocs.io/en/stable/"
+
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering",
+]
+
+[tool.poetry.dependencies]
+python = ">=3.7.2,<3.11"
+numpy = "1.20.1"
+scipy = "1.7.3"
+cirq = "0.15.0"
+
+[tool.poetry.dev-dependencies]
+qiskit = "^0.37.1"
+pyquil = "3.0.0"
+PennyLane-qiskit = "^0.24.0"
+PennyLane = "^0.24.0"
+amazon-braket-sdk = "^1.27.1"
+pytest-xdist = { version = "^2.5.0", extras = ["psutil"] }
+pytest-cov = "^3.0.0"
+flake8 = "^5.0.4"
+black = "^22.6.0"
+mypy = "^0.971"
+sphinxcontrib-bibtex = "2.4.2"
+sphinx-copybutton = "0.4.0"
+sphinx-autodoc-typehints = "1.12.0"
+myst-nb = "0.12.3"
+pydata-sphinx-theme = "0.8.1"
+jupytext = "1.11.1"
+sphinx-gallery = "^0.11.0"
+nbsphinx = "^0.8.9"
+openfermion = { version = "^1.5.0", markers = "sys_platform != 'win32'" }
+openfermionpyscf = { version = "^0.5", markers = "sys_platform != 'win32'" }
+Jinja2 = "3.0.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.black]
 line-length = 79
 target-version = ['py36', 'py37', 'py38']
