@@ -29,6 +29,19 @@ def sample_bitstrings(
     sampler: cirq.Sampler = cirq.DensityMatrixSimulator(),
     shots: int = 8192,
 ) -> MeasurementResult:
+    """Adds noise to the input circuit. The noise is added based on a
+    particular noise model and some value for the error rate.
+
+    Args:
+        circuit: The input Cirq circuit.
+        noise_model: Input Cirq noise model. Default is amplitude damping.
+        noise_level: Noise rate as a tuple of floats.
+        sampler: Cirq simulator from which the result will be sampled from.
+        shots: Number of measurements.
+
+    Returns:
+        Sampled outcome from a measurement.
+    """
     if sum(noise_level) > 0:
         circuit = circuit.with_noise(noise_model(*noise_level))  # type: ignore
 
@@ -49,6 +62,17 @@ def compute_density_matrix(
     noise_model: cirq.NOISE_MODEL_LIKE = cirq.amplitude_damp,  # type: ignore
     noise_level: Tuple[float] = (0.01,),
 ) -> np.ndarray:
+    """Returns the density matrix of the quantum state after the
+    (noisy) execution of the input circuit.
+
+    Args:
+        circuit: The input Cirq circuit.
+        noise_model: Input Cirq noise model. Default is amplitude damping.
+        noise_level: Noise rate as a tuple of floats.
+
+    Returns:
+        The final density matrix as a NumPy array.
+    """
     if sum(noise_level) > 0:
         circuit = circuit.with_noise(noise_model(*noise_level))  # type: ignore
 
