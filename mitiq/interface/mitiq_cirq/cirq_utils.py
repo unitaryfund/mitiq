@@ -29,8 +29,8 @@ def sample_bitstrings(
     sampler: cirq.Sampler = cirq.DensityMatrixSimulator(),
     shots: int = 8192,
 ) -> MeasurementResult:
-    """Adds noise to the input circuit. The noise is added based on a particular
-    noise model and some value for the error rate.
+    """Adds noise to the input circuit. The noise is added based on a
+    particular noise model and some value for the error rate.
 
     Args:
         circuit: The input Cirq circuit.
