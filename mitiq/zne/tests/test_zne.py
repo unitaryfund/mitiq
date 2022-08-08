@@ -141,7 +141,7 @@ def test_with_observable_two_qubits(executor):
     circuit = cirq.Circuit(
         cirq.H.on(cirq.LineQubit(0)), cirq.CNOT.on(*cirq.LineQubit.range(2))
     )
-    circuit += [circuit, cirq.inverse(circuit)] * 20
+    circuit += [circuit.copy(), cirq.inverse(circuit.copy())] * 20
 
     noisy_value = observable.expectation(circuit, sample_bitstrings)
     zne_value = execute_with_zne(
