@@ -39,7 +39,7 @@ else:
     params = {
         "nqubits": [2],
         "depth": [1, 5, 10],
-        "num_pec_samples": [100],
+        "num_pec_samples": [50, 100],
         "fold_method": [fold_gates_at_random, fold_global],
     }
 
