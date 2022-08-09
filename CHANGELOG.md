@@ -1,6 +1,32 @@
 # Changelog
 
-## Version 0.18.0 (In development)
+## Version 0.17.1
+
+### Summary
+
+This patch release includes support for the latest versions of Qiskit (0.37.1), Cirq (1.0.0), and Pyquil (3.2.1), along with other minor dependency upgrades and bug fixes.
+
+### All Changes
+
+- Update pyquil requirement from ~=3.0.0 to ~=3.2.1 (#1425) [@dependabot]
+- Update cirq requirement from ~=0.15.0 to ~=1.0.0 (#1402) [@dependabot]
+- Add fold methods as parameters to benchmarks (#1374) [@natestemen]
+- Updates tests and docstrings for cirq utils (#1371) [@purva-thakre]
+- Update amazon-braket-sdk requirement from ~=1.27.1 to ~=1.28.1 (#1430) [@dependabot]
+- Bump openfermion from 1.5.0 to 1.5.1 (#1429) [@dependabot]
+- Update flake8 requirement from ~=5.0.3 to ~=5.0.4 (#1423) [@dependabot]
+- Update flake8 requirement from ~=4.0.1 to ~=5.0.3 (#1419) [@dependabot]
+- Support for Qiskit 0.37 (#1421) [@1ucian0]
+- Update amazon-braket-sdk requirement from ~=1.26.1 to ~=1.27.1 (#1417) [@dependabot]
+- Bump openfermion from 1.3.0 to 1.5.0 (#1412) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.26.0 to ~=1.26.1 (#1405) [@dependabot]
+- Update mypy requirement from ~=0.961 to ~=0.971 (#1406) [@dependabot]
+- Update release docs (#1404) [@natestemen]
+- Update amazon-braket-sdk requirement from ~=1.25.2 to ~=1.26.0 (#1403) [@dependabot]
+- update version.txt to dev (#1398) [@natestemen]
+- Prevent idle qubits with qiskit barriers from being lost after conversions (#1369) [@andreamari]
+- Add custom RTD favicon (#1390) [@natestemen]
+- Update python-rapidjson requirement from <=1.6 to <1.8 (#1389) [@dependabot]
 
 ## Version 0.17.0
 
