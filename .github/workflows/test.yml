@@ -161,9 +161,18 @@ jobs:
   test-nonlinux:
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [macOS, Windows]
         python-version: [3.7, 3.8]
-    runs-on: ${{ matrix.os }}
+        include:
+          - os: Windows
+            image: windows-latest
+          - os: macOS
+            image: macos-latest
+      fail-fast: false
+    runs-on: ${{ matrix.image }}
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Check out mitiq
         uses: actions/checkout@v3
@@ -176,6 +185,14 @@ jobs:
       - name: Set up Poetry
         run: |
           curl -sL https://install.python-poetry.org | python - -y
+
+      - name: Update PATH
+        if: ${{ matrix.os != 'Windows' }}
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Update Path for Windows
+        if: ${{ matrix.os == 'Windows' }}
+        run: echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
 
       - name: Install Python dependencies
         run: |
