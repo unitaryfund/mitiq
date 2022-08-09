@@ -39,11 +39,11 @@ def to_quil(circuit: Circuit) -> QuilType:
         qubit_range = max_qubit.x + 1
         return str(
             QuilOutput(circuit.all_operations(), LineQubit.range(qubit_range))
-        )[23:]
+        )
     # otherwise, use the default ordering (starting from zero)
     return str(
         QuilOutput(circuit.all_operations(), sorted(circuit.all_qubits()))
-    )[23:]
+    )
 
 
 def to_pyquil(circuit: Circuit) -> Program:
