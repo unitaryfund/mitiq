@@ -9,15 +9,15 @@ check-all: check-format check-style check-types
 
 .PHONY: check-format
 check-format:
-	black --check --diff mitiq
+	poetry run black --check --diff mitiq
 
 .PHONY: check-style
 check-style:
-	flake8
+	poetry run flake8
 
 .PHONY: check-types
 check-types:
-	mypy mitiq --show-error-codes
+	poetry run mypy mitiq --show-error-codes
 
 .PHONY: clean
 clean:
@@ -48,7 +48,7 @@ linkcheck:
 
 .PHONY: format
 format:
-	black mitiq
+	poetry run black mitiq
 
 .PHONY: install
 install:
@@ -59,17 +59,17 @@ pdf:
 	echo "s" | make -C docs latexpdf
 
 .PHONY: requirements
-requirements: requirements.txt
+requirements:
 	poetry install --no-dev
 
 .PHONY: test
 test:
-	pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml --ignore=mitiq/interface/mitiq_pyquil
+	poetry run pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml --ignore=mitiq/interface/mitiq_pyquil
 
 .PHONY: test-pyquil
 test-pyquil:
-	pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/interface/mitiq_pyquil
+	poetry run pytest -v --cov=mitiq --cov-report=term --cov-report=xml mitiq/interface/mitiq_pyquil
 
 .PHONY: test-all
 test-all:
-	pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml
+	poetry run pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml
