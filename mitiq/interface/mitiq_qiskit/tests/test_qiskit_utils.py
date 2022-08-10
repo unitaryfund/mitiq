@@ -200,6 +200,11 @@ def test_sample_bitstrings():
     assert measurement_result.result == [[0], [0], [0], [0], [0]]
     assert measurement_result.qubit_indices == (0,)
 
+
+def test_sample_bitstrings_with_measure_all():
+    """Tests that the function sample_bitstrings returns a valid
+    mitiq.MeasurementResult when "measure_all" is True.
+    """
     two_qubit_circ = QuantumCircuit(2)
     two_qubit_circ.cx(0, 1)
     measurement_result = sample_bitstrings(
