@@ -198,8 +198,8 @@ def sample_bitstrings(
     measure_all: bool = False,
     qubit_indices: Optional[Tuple[int]] = None,
 ) -> MeasurementResult:
-    """Returns measurement bitstrings obtained from executing the input circuit on
-    a Qiskit backend (passed as an argument).
+    """Returns measurement bitstrings obtained from executing the input circuit
+    on a Qiskit backend (passed as an argument).
     Note that the input circuit must contain measurement gates
     (unless ``measure_all`` is ``True``).
 
