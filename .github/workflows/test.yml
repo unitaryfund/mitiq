@@ -195,8 +195,8 @@ jobs:
         run: echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
 
       - name: Install Python dependencies
-        run: |
-          make install requirements
+        run: | # test deps?
+          make install
 
       - name: Run the Mitiq unit tests via pytest
         run: make test
