@@ -194,6 +194,9 @@ jobs:
         if: matrix.os == 'Windows'
         run: echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
 
+      - name: Configure Poetry
+        run: poetry config virtualenvs.in-project true
+
       - name: Install Python dependencies
         run: | # test deps?
           make install
