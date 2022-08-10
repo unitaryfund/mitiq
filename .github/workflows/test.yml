@@ -54,8 +54,8 @@ jobs:
           curl -sL https://install.python-poetry.org | python - -y
 
       - name: Install Python dependencies
-        run: |
-          make install requirements
+        run: | # maybe create a "docs" group
+          make install
 
       - name: Run the quilc & qvm Docker images
         run: |
