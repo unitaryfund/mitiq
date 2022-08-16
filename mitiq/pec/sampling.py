@@ -33,6 +33,7 @@ def sample_sequence(
     representations: Sequence[OperationRepresentation],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     num_samples: int = 1,
+    representation_warning: Optional[bool] = True,
 ) -> Tuple[List[QPROGRAM], List[int], float]:
     """Samples a list of implementable sequences from the quasi-probability
     representation of the input ideal operation.
@@ -75,9 +76,12 @@ def sample_sequence(
             break
 
     if operation_representation is None:
-        warnings.warn(
-            UserWarning(f"No representation found for \n\n{ideal_operation}.")
-        )
+        if representation_warning:
+            warnings.warn(
+                UserWarning(
+                    f"No representation found for \n\n{ideal_operation}."
+                )
+            )
         return (
             [ideal_operation] * num_samples,
             [1] * num_samples,
@@ -101,6 +105,7 @@ def sample_circuit(
     representations: Sequence[OperationRepresentation],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     num_samples: int = 1,
+    representation_warning: Optional[bool] = True,
 ) -> Tuple[List[QPROGRAM], List[int], float]:
     """Samples a list of implementable circuits from the quasi-probability
     representation of the input ideal circuit.
@@ -148,6 +153,7 @@ def sample_circuit(
             representations,
             num_samples=num_samples,
             random_state=random_state,
+            representation_warning=representation_warning,
         )
 
         norm *= loc_norm

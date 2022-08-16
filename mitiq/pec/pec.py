@@ -60,6 +60,7 @@ def execute_with_pec(
     force_run_all: bool = True,
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
+    representation_warning: Optional[bool] = True,
 ) -> Union[float, Tuple[float, Dict[str, Any]]]:
     r"""Estimates the error-mitigated expectation value associated to the
     input circuit, via the application of probabilistic error cancellation
