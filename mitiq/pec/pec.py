@@ -99,6 +99,9 @@ def execute_with_pec(
         random_state: Seed for sampling circuits.
         full_output: If False only the average PEC value is returned.
             If True a dictionary containing all PEC data is returned too.
+        representation_warning: Optionally suppress ""No representation found
+            for ... ideal_operation" warnings"
+
 
     Returns:
         The tuple ``(pec_value, pec_data)`` where ``pec_value`` is the
@@ -143,6 +146,7 @@ def execute_with_pec(
         representations,
         random_state=random_state,
         num_samples=num_samples,
+        representation_warning=representation_warning,
     )
 
     # Convert back to the original type
