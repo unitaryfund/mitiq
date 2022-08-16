@@ -153,7 +153,7 @@ jobs:
 
       - name: Submit coverage report to Codecov
         # Only submit to Codecov once.
-        if: ${{ matrix.python-version == 3.8 }}
+        if: matrix.python-version == 3.8
         uses: codecov/codecov-action@v3.1.0
         with:
           fail_ci_if_error: true
@@ -187,11 +187,11 @@ jobs:
           curl -sL https://install.python-poetry.org | python - -y
 
       - name: Update PATH
-        if: ${{ matrix.os != 'Windows' }}
+        if: matrix.os != 'Windows'
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Update Path for Windows
-        if: ${{ matrix.os == 'Windows' }}
+        if: matrix.os == 'Windows'
         run: echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
 
       - name: Install Python dependencies
