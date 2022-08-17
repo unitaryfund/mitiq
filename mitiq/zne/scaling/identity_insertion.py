@@ -122,5 +122,3 @@ def insert_id_layers(input_circuit: Circuit, scale_factor: float)-> Circuit:
     # before returning scaled_circuit, terminal measurements need to be added 
     _append_measurements(scaled_circuit, measurements)
     return scaled_circuit
-
-

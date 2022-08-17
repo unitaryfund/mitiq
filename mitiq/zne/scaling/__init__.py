@@ -25,3 +25,4 @@ from mitiq.zne.scaling.parameter import (
     scale_parameters,
     compute_parameter_variance,
 )
+from mitiq.zne.scaling.identity_insertion import insert_id_layers
