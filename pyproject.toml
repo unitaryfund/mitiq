@@ -23,14 +23,14 @@ classifiers = [
 python = ">=3.7.2,<3.9"
 numpy = "1.20.1"
 scipy = "1.7.3"
-cirq = "0.15.0"
+cirq = "1.0.0"
 
 [tool.poetry.dev-dependencies]
 qiskit = "^0.37.1"
-pyquil = "3.0.0"
+pyquil = "3.3.0"
 PennyLane-qiskit = "^0.24.0"
 PennyLane = "^0.24.0"
-amazon-braket-sdk = "^1.27.1"
+amazon-braket-sdk = "^1.29.0"
 pytest-xdist = { version = "^2.5.0", extras = ["psutil"] }
 pytest-cov = "^3.0.0"
 flake8 = "^5.0.4"
@@ -44,7 +44,7 @@ pydata-sphinx-theme = "0.8.1"
 jupytext = "1.11.1"
 sphinx-gallery = "^0.11.0"
 nbsphinx = "^0.8.9"
-openfermion = { version = "^1.5.0", markers = "sys_platform != 'win32'" }
+openfermion = { version = "^1.5.1", markers = "sys_platform != 'win32'" }
 openfermionpyscf = { version = "^0.5", markers = "sys_platform != 'win32'" }
 Jinja2 = "3.0.3"
 pybtex = "^0.24.0"
