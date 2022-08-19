@@ -66,7 +66,7 @@ circuit_qiskit_two = qiskit.QuantumCircuit(qreg, creg)
 for q in qreg:
     circuit_qiskit_two.x(q)
     circuit_qiskit_two.x(3)
-circuit_qiskit_two.measure(0,3)
+circuit_qiskit_two.measure(0, 3)
 circuit_qiskit_two.cx(0, 3)
 
 circuit_qiskit_validated = qiskit.QuantumCircuit(qreg)
@@ -103,7 +103,7 @@ for i in range(4):
         circuit_qiskit_two_validated.x(i)
         circuit_qiskit_two_validated.x(i)
         circuit_qiskit_two_validated.i(i)
-circuit_qiskit_two_validated.measure(0,3)
+circuit_qiskit_two_validated.measure(0, 3)
 circuit_qiskit_two_validated.cx(0, 3)
 
 # Define test mask matrices
@@ -245,7 +245,7 @@ def test_get_slack_matrix_from_circuit__bad_input_errors():
         (circuit_cirq_two, circuit_cirq_two, xx),
         (circuit_cirq_three, circuit_cirq_three_validated, xyxy),
         (circuit_qiskit_one, circuit_qiskit_validated, xx),
-        (circuit_qiskit_two, circuit_qiskit_two_validated, xx)
+        (circuit_qiskit_two, circuit_qiskit_two_validated, xx),
     ],
 )
 def test_insert_sequences(circuit, result, rule):
