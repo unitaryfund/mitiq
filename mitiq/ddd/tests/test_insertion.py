@@ -250,6 +250,4 @@ def test_get_slack_matrix_from_circuit__bad_input_errors():
 )
 def test_insert_sequences(circuit, result, rule):
     circuit_with_sequences = insert_ddd_sequences(circuit, rule)
-    print(circuit_with_sequences)
-    print(result)
     assert circuit_with_sequences == result
