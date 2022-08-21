@@ -32,7 +32,7 @@ from typing import (
 
 import numpy as np
 
-from mitiq import QPROGRAM, QuantumResult
+from mitiq._typing import QPROGRAM, QuantumResult
 
 from mitiq.observable.observable import Observable
 from mitiq.rem.measurement_result import MeasurementResult
