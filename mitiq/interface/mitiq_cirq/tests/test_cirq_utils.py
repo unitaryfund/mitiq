@@ -17,7 +17,62 @@
 import numpy as np
 import cirq
 
-from mitiq.interface.mitiq_cirq import execute_with_depolarizing_noise
+from mitiq.interface.mitiq_cirq import (
+    sample_bitstrings,
+    compute_density_matrix,
+    execute_with_depolarizing_noise,
+)
+from mitiq.rem.measurement_result import MeasurementResult
+
+
+def test_sample_bitstrings():
+    """Tests if the outcome is as expected with different noise models and
+    error rate."""
+
+    # testing default options i.e. noise model is amplitude damping with
+    # the default error rate, shots is also the default number
+    qc = cirq.Circuit(cirq.X(cirq.LineQubit(0))) + cirq.Circuit(
+        cirq.measure(cirq.LineQubit(0))
+    )
+    result_default = sample_bitstrings(qc)
+    assert result_default.nqubits == 1
+    assert result_default.qubit_indices == (0,)
+    assert result_default.shots == 8192
+    assert isinstance(result_default, MeasurementResult)
+
+    # test for sum(noise_level) = 0
+    result_no_noise = sample_bitstrings(qc, noise_level=(0.00,), shots=10)
+    assert np.allclose(
+        result_no_noise.asarray,
+        np.array([[1], [1], [1], [1], [1], [1], [1], [1], [1], [1]]),
+    )
+
+    # test result with inputs different from default
+    result_not_default = sample_bitstrings(
+        qc,
+        cirq.GeneralizedAmplitudeDampingChannel,
+        (0.1, 0.1),
+        cirq.DensityMatrixSimulator(),
+        8000,
+    )
+    assert result_not_default.nqubits == 1
+    assert result_not_default.qubit_indices == (0,)
+    assert result_not_default.shots == 8000
+
+
+def test_compute_density_matrix():
+    """Tests if the density matrix of a noisy circuit is output as expected."""
+
+    qc = cirq.Circuit(cirq.X(cirq.LineQubit(0)))
+    assert np.isclose(np.trace(compute_density_matrix(qc)), 1)
+    assert np.isclose(
+        np.trace(
+            compute_density_matrix(
+                qc, cirq.GeneralizedAmplitudeDampingChannel, (0.1, 0.1)
+            )
+        ),
+        1,
+    )
 
 
 def test_execute_with_depolarizing_noise():

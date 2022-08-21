@@ -20,20 +20,33 @@ import os
 
 import networkx as nx
 import numpy as np
+from typing import Callable
 
 import cirq
 from mitiq import benchmarks, raw, pec, zne, Observable, PauliString
 from mitiq.interface import mitiq_cirq
+from mitiq.zne.scaling import fold_gates_at_random, fold_global
 
 
 if os.environ.get("BENCHMARK_CI"):
-    params = {"nqubits": [1], "depth": [1, 2, 3], "num_pec_samples": [10]}
+    params = {
+        "nqubits": [1],
+        "depth": [1, 2, 3],
+        "num_pec_samples": [10],
+        "fold_method": [fold_gates_at_random],
+    }
 else:
-    params = {"nqubits": [2], "depth": [1, 5, 10], "num_pec_samples": [100]}
+    params = {
+        "nqubits": [2],
+        "depth": [1, 5, 10],
+        "num_pec_samples": [50, 100],
+        "fold_method": [fold_gates_at_random, fold_global],
+    }
 
 nqubits = params["nqubits"]
 depth = params["depth"]
 num_pec_samples = params["num_pec_samples"]
+fold_method = params["fold_method"]
 
 compute_density_matrix_noiseless = functools.partial(
     mitiq_cirq.compute_density_matrix, noise_level=(0.0,)
@@ -75,6 +88,7 @@ def track_zne(
     nqubits: int,
     depth: int,
     observable: Observable,
+    fold_method: Callable,
 ) -> float:
     """Returns the ZNE error mitigation factor, i.e., the ratio
 
@@ -98,6 +112,7 @@ def track_zne(
         circuit,
         mitiq_cirq.compute_density_matrix,
         observable,
+        scale_noise=fold_method,
     )
     return np.real(abs(true_value - raw_value) / abs(true_value - zne_value))
 
@@ -107,12 +122,14 @@ track_zne.param_names = [
     "nqubits",
     "depth",
     "observable",
+    "fold_method",
 ]
 track_zne.params = (
     benchmark_circuit_types,
     nqubits,
     depth,
     [Observable(PauliString("Z"))],
+    fold_method,
 )
 track_zne.unit = "Error mitigation factor"
 track_zne.timeout = 300

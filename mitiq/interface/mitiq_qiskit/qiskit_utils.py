@@ -14,6 +14,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Qiskit utility functions."""
+from typing import Tuple
+from functools import partial
 import numpy as np
 import qiskit
 from qiskit import QuantumCircuit
@@ -24,6 +26,9 @@ from qiskit.providers.aer.noise import NoiseModel
 from qiskit.providers.aer.noise.errors.standard_errors import (
     depolarizing_error,
 )
+from qiskit.providers import Backend
+
+from mitiq import MeasurementResult, Observable, Executor
 
 
 def initialized_depolarizing_noise(noise_level: float) -> NoiseModel:
@@ -183,3 +188,108 @@ def execute_with_shots_and_noise(
             eigvals[int(bitstring[0 : circ.num_qubits], 2)] * count / shots
         )
     return expectation
+
+
+def sample_bitstrings(
+    circuit: QuantumCircuit,
+    backend: Optional[Backend] = None,
+    noise_model: Optional[NoiseModel] = None,  # type: ignore
+    shots: int = 10000,
+    measure_all: bool = False,
+    qubit_indices: Optional[Tuple[int]] = None,
+) -> MeasurementResult:
+    """Returns measurement bitstrings obtained from executing the input circuit
+    on a Qiskit backend (passed as an argument).
+    Note that the input circuit must contain measurement gates
+    (unless ``measure_all`` is ``True``).
+
+    Args:
+        circuit: The input Qiskit circuit.
+        backend: A real or fake Qiskit backend. The input circuit
+            should be transpiled into a compatible gate set.
+            It may be necessary to set ``optimization_level=0`` when
+            transpiling.
+        noise_model: A valid Qiskit ``NoiseModel`` object. This option is used
+            if and only if ``backend`` is ``None``. In this case a default
+            density matrix simulator is used with ``optimization_level=0``.
+        shots: The number of measurements.
+        measure_all: If True, measurement gates are applied to all qubits.
+        qubit_indices: Optional qubit indices associated to bitstrings.
+
+    Returns:
+        The measured bitstrings casted as a Mitiq :class:`.MeasurementResult`
+        object.
+    """
+
+    if measure_all:
+        circuit = circuit.measure_all(inplace=False)
+
+    if backend:
+        job = backend.run(circuit, shots=shots)
+    elif noise_model:
+        job = qiskit.execute(
+            circuit,
+            backend=qiskit.Aer.get_backend("aer_simulator"),
+            backend_options={"method": "density_matrix"},
+            noise_model=noise_model,
+            # we want all gates to be actually applied,
+            # so we skip any circuit optimization
+            basis_gates=noise_model.basis_gates,
+            optimization_level=0,
+            shots=shots,
+        )
+    else:
+        raise ValueError(
+            "Either a backend or a noise model must be given as input."
+        )
+
+    counts = job.result().get_counts(circuit)
+    bitstrings = []
+    for key, val in counts.items():
+        bitstring = [int(c) for c in key]
+        for _ in range(val):
+            bitstrings.append(bitstring)
+    return MeasurementResult(
+        result=bitstrings,
+        qubit_indices=qubit_indices,
+    )
+
+
+def compute_expectation_value_on_noisy_backend(
+    circuit: QuantumCircuit,
+    obs: Observable,
+    backend: Optional[Backend] = None,
+    noise_model: Optional[NoiseModel] = None,  # type: ignore
+    shots: int = 10000,
+    measure_all: bool = False,
+    qubit_indices: Optional[Tuple[int]] = None,
+) -> complex:
+    """Returns the noisy expectation value of the input Mitiq observable
+    obtained from executing the input circuit on a Qiskit backend.
+
+    Args:
+        circuit: The input Qiskit circuit.
+        obs: The Mitiq observable to compute the expectation value of.
+        backend: A real or fake Qiskit backend. The input circuit
+            should be transpiled into a compatible gate set.
+        noise_model: A valid Qiskit ``NoiseModel`` object. This option is used
+            if and only if ``backend`` is ``None``. In this case a default
+            density matrix simulator is used with ``optimization_level=0``.
+        shots: The number of measurements.
+        measure_all: If True, measurement gates are applied to all qubits.
+        qubit_indices: Optional qubit indices associated to bitstrings.
+
+    Returns:
+        The noisy expectation value.
+    """
+    execute = partial(
+        sample_bitstrings,
+        backend=backend,
+        noise_model=noise_model,
+        shots=shots,
+        measure_all=measure_all,
+        qubit_indices=qubit_indices,
+    )
+    executor = Executor(execute)
+
+    return executor.evaluate(circuit, obs)[0]
