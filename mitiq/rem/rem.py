@@ -34,37 +34,13 @@ MatrixLike = Union[
 ]
 
 
-def execute_with_rem(
-    circuit: 'QPROGRAM',
-    executor: Union['Executor', Callable[['QPROGRAM'], MeasurementResult]],
+def mitigate_measurements(
+    noisy_result: MeasurementResult, 
     inverse_confusion_matrix: MatrixLike,
-    *,
-    observable: Optional['Observable'] = None,
-) -> float:
-    """Returns the readout error mitigated expectation value utilizing an
-    inverse confusion matrix that is computed by running the quantum program
-    `circuit` with the executor function.
-
-    Args:
-        executor: A Mitiq executor that executes a circuit and returns the
-            unmitigated ``MeasurementResult``.
-        observable: Observable to compute the expectation value of.
-        inverse_confusion_matrix: The inverse confusion matrix to apply to the
-            probability vector that represents the noisy measurement results.
-    """
-    from mitiq.executor import Executor  # Avoid circular import.
-
-    if not isinstance(executor, Executor):
-        executor = Executor(executor)
-
-    qubits = list(circuit.all_qubits())
-
-    result = executor._run([circuit])
-    noisy_result = result[0]
-    assert isinstance(noisy_result, MeasurementResult)
-
+    num_qubits: int
+) -> MeasurementResult:
     measurement_to_prob_dist = partial(
-        to_prob_dist, num_qubits=len(qubits)
+        to_prob_dist, num_qubits=num_qubits
     )
 
     empirical_prob_dist = np.apply_along_axis(
@@ -84,6 +60,37 @@ def execute_with_rem(
     ).squeeze()
 
     result = MeasurementResult(adjusted_result, noisy_result.qubit_indices)
+    return result
+
+def execute_with_rem(
+    circuit: 'QPROGRAM',
+    executor: Union['Executor', Callable[['QPROGRAM'], MeasurementResult]],
+    inverse_confusion_matrix: MatrixLike,
+    *,
+    observable: Optional['Observable'] = None,
+) -> float:
+    """Returns the readout error mitigated expectation value utilizing an
+    inverse confusion matrix.
+
+    Args:
+        executor: A Mitiq executor that executes a circuit and returns the
+            unmitigated ``MeasurementResult``.
+        observable: Observable to compute the expectation value of.
+        inverse_confusion_matrix: The inverse confusion matrix to apply to the
+            probability vector estimated with noisy measurement results.
+    """
+    from mitiq.executor import Executor  # Avoid circular import.
+
+    if not isinstance(executor, Executor):
+        executor = Executor(executor)
+
+    qubits = list(circuit.all_qubits())
+
+    result = executor._run([circuit])
+    noisy_result = result[0]
+    assert isinstance(noisy_result, MeasurementResult)
+
+    result = mitigate_measurements(noisy_result, inverse_confusion_matrix, len(qubits))
     return observable._expectation_from_measurements([result])
 
 
@@ -101,7 +108,7 @@ def mitigate_executor(
             unmitigated ``MeasurementResult``.
         observable: Observable to compute the expectation value of.
         inverse_confusion_matrix: The inverse confusion matrix to apply to the
-            probability vector that represents the noisy measurement results.
+            probability vector estimated with noisy measurement results.
 
     Returns:
         The error-mitigated version of the input executor.
@@ -135,7 +142,7 @@ def rem_decorator(
     Args:
         observable: Observable to compute the expectation value of.
         inverse_confusion_matrix: The inverse confusion matrix to apply to the
-            probability vector that represents the noisy measurement results.
+            probability vector estimated with noisy measurement results.
 
     Returns:
         The error-mitigating decorator to be applied to an executor function.
