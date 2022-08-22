@@ -41,12 +41,15 @@ from mitiq.pec.representations.learning import (
     learn_biased_noise_parameters,
 )
 
+seed = 1
+rng = np.random.RandomState(seed)
 circuit = random_x_z_cnot_circuit(
-    LineQubit.range(2), n_moments=5, random_state=1
+    LineQubit.range(2), n_moments=5, random_state=rng
 )
 
+
 # Set number of samples used to calculate mitigated value in loss function
-pec_kwargs = {"num_samples": 50}
+pec_kwargs = {"num_samples": 50, "random_state": 1}
 
 observable = Observable(PauliString("XZ"), PauliString("YY"))
 
