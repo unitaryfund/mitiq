@@ -15,7 +15,7 @@ kernelspec:
 
 # Mitiq paper codeblocks
 
-Codeblocks from the main text of the [Mitiq paper](https://arxiv.org/abs/2009.04417) [1].
+Codeblocks from the main text of the [Mitiq whitepaper](https://quantum-journal.org/papers/q-2022-08-11-774/) [1] published in [Quantum](https://quantum-journal.org/).
 
 +++ {"id": "DRplhovffVfk"}
 
@@ -575,4 +575,4 @@ execute(circ)
 
 ## References
 [1] *Mitiq: A software package for error mitigation on noisy quantum computers*,
-Ryan  LaRose, Andrea  Mari, Sarah  Kaiser, Peter  J.  Karalekas, Andre  A. Alves, Piotr Czarnik, Mohamed El Mandouh, Max H. Gordon, Yousef Hindy, Aaron Robertson, Purva Thakre, Nathan Shammah, and William J. Zeng, [https://arxiv.org/abs/2009.04417](https://arxiv.org/abs/2009.04417)
+Ryan LaRose, Andrea Mari, Sarah Kaiser, Peter J. Karalekas, Andre A. Alves, Piotr Czarnik, Mohamed El Mandouh, Max H. Gordon, Yousef Hindy, Aaron Robertson, Purva Thakre, Misty Wahl, Danny Samuel, Rahul Mistri, Maxime Tremblay, Nick Gardner, Nathaniel T. Stemen, Nathan Shammah and William J. Zeng, https://quantum-journal.org/papers/q-2022-08-11-774/
