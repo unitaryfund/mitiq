@@ -37,10 +37,17 @@ MatrixLike = Union[
 def mitigate_measurements(
     noisy_result: MeasurementResult, 
     inverse_confusion_matrix: MatrixLike,
-    num_qubits: int
 ) -> MeasurementResult:
+    """Applies the inverse confusion matrix against the noisy measurement
+    result and returns the adjusted measurements.
+
+    Args:
+        noisy_results: The unmitigated ``MeasurementResult``.
+        inverse_confusion_matrix: The inverse confusion matrix to apply to the
+            probability vector estimated with noisy measurement results.
+    """
     measurement_to_prob_dist = partial(
-        to_prob_dist, num_qubits=num_qubits
+        to_prob_dist, num_qubits=len(noisy_result.qubit_indices)
     )
 
     empirical_prob_dist = np.apply_along_axis(
@@ -84,13 +91,11 @@ def execute_with_rem(
     if not isinstance(executor, Executor):
         executor = Executor(executor)
 
-    qubits = list(circuit.all_qubits())
-
     result = executor._run([circuit])
     noisy_result = result[0]
     assert isinstance(noisy_result, MeasurementResult)
 
-    result = mitigate_measurements(noisy_result, inverse_confusion_matrix, len(qubits))
+    result = mitigate_measurements(noisy_result, inverse_confusion_matrix)
     return observable._expectation_from_measurements([result])
 
 
