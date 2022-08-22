@@ -21,7 +21,7 @@ import cirq
 
 from mitiq.interface import mitiq_qiskit, mitiq_pyquil
 from mitiq.observable.pauli import PauliString, PauliStringCollection
-from mitiq.rem import MeasurementResult
+from mitiq.rem.measurement_result import MeasurementResult
 from mitiq.utils import _equal
 
 
