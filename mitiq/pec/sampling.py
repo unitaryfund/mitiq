@@ -57,7 +57,6 @@ def sample_sequence(
         random_state: Seed for sampling.
         num_samples: The number of samples.
 
-
     Returns:
         The tuple (``sequences``, ``signs``, ``norm``) where
         ``sequences`` are the sampled sequences,
