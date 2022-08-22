@@ -115,8 +115,6 @@ def sample_circuit(
             in the circuit, a ValueError is raised.
         random_state: Seed for sampling.
         num_samples: The number of samples.
-        representation_warning: Optionally suppress ""No representation found
-            for ... ideal_operation" warnings"
 
     Returns:
         The tuple (``sampled_circuits``, ``signs``, ``norm``) where
