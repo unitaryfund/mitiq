@@ -18,7 +18,7 @@ from typing import Tuple, Union, Iterable, List, Sequence
 
 import numpy as np
 import cirq
-from mitiq.rem.measurement_result import MeasurementResult
+from mitiq.measurement.measurement_result import MeasurementResult
 
 from cirq.experiments.single_qubit_readout_calibration_test import (
     NoisySingleQubitReadoutSampler,
@@ -31,6 +31,7 @@ MatrixLike = Union[
     Sequence[np.ndarray],
     Tuple[np.ndarray],
 ]
+
 
 # Executors.
 def sample_bitstrings(
@@ -114,7 +115,7 @@ def execute_with_depolarizing_noise(
 
 
 def generate_inverse_confusion_matrix(
-    qubits: Union[Sequence["cirq.Qid"], Sequence[Sequence["cirq.Qid"]]],
+    qubits: Sequence["cirq.Qid"],
     p0: float = 0.01,
     p1: float = 0.01,
 ) -> MatrixLike:
@@ -126,10 +127,12 @@ def generate_inverse_confusion_matrix(
         p0: Probability of flipping a 0 to a 1.
         p1: Probability of flipping a 1 to a 0.
     """
-    # Build a tensored confusion matrix using smaller single qubit confusion matrices.
-    # Implies that errors are uncorrelated among qubits
+    # Build a tensored confusion matrix using smaller single qubit confusion
+    # matrices. Implies that errors are uncorrelated among qubits.
+    qubit_measures = [[q] for q in qubits]
+
     tensored_matrix = cirq.measure_confusion_matrix(
-        NoisySingleQubitReadoutSampler(p0, p1), [[q] for q in qubits]
+        NoisySingleQubitReadoutSampler(p0, p1), qubit_measures
     )
     inverse_confusion_matrix = tensored_matrix.correction_matrix()
 

@@ -17,7 +17,7 @@
 import pytest
 
 import numpy as np
-from mitiq.rem.measurement_result import MeasurementResult
+from mitiq.measurement.measurement_result import MeasurementResult
 
 
 @pytest.mark.parametrize("asarray", (True, False))

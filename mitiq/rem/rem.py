@@ -23,7 +23,10 @@ import numpy as np
 from cirq.sim import sample_state_vector as sample_prob_dist
 from cirq.qis.states import to_valid_state_vector as to_prob_dist
 
-from .measurement_result import MeasurementResult
+from .._typing import QPROGRAM
+from ..executor.executor import Executor
+from ..measurement.measurement_result import MeasurementResult
+from ..observable.observable import Observable
 
 MatrixLike = Union[
     np.ndarray,
@@ -35,7 +38,7 @@ MatrixLike = Union[
 
 
 def mitigate_measurements(
-    noisy_result: MeasurementResult, 
+    noisy_result: MeasurementResult,
     inverse_confusion_matrix: MatrixLike,
 ) -> MeasurementResult:
     """Applies the inverse confusion matrix against the noisy measurement
@@ -46,6 +49,7 @@ def mitigate_measurements(
         inverse_confusion_matrix: The inverse confusion matrix to apply to the
             probability vector estimated with noisy measurement results.
     """
+    assert noisy_result.qubit_indices is not None
     measurement_to_prob_dist = partial(
         to_prob_dist, num_qubits=len(noisy_result.qubit_indices)
     )
@@ -54,9 +58,7 @@ def mitigate_measurements(
         measurement_to_prob_dist, 1, noisy_result.asarray
     )
 
-    adjusted_prob_dist = (
-        inverse_confusion_matrix @ empirical_prob_dist.T
-    ).T
+    adjusted_prob_dist = (inverse_confusion_matrix @ empirical_prob_dist.T).T
 
     prob_dist_to_measurement = partial(
         sample_prob_dist, indices=noisy_result.qubit_indices
@@ -69,12 +71,13 @@ def mitigate_measurements(
     result = MeasurementResult(adjusted_result, noisy_result.qubit_indices)
     return result
 
+
 def execute_with_rem(
-    circuit: 'QPROGRAM',
-    executor: Union['Executor', Callable[['QPROGRAM'], MeasurementResult]],
+    circuit: QPROGRAM,
+    executor: Union[Executor, Callable[[QPROGRAM], MeasurementResult]],
     inverse_confusion_matrix: MatrixLike,
     *,
-    observable: Optional['Observable'] = None,
+    observable: Optional[Observable] = None,
 ) -> float:
     """Returns the readout error mitigated expectation value utilizing an
     inverse confusion matrix.
@@ -86,8 +89,6 @@ def execute_with_rem(
         inverse_confusion_matrix: The inverse confusion matrix to apply to the
             probability vector estimated with noisy measurement results.
     """
-    from mitiq.executor import Executor  # Avoid circular import.
-
     if not isinstance(executor, Executor):
         executor = Executor(executor)
 
@@ -95,16 +96,19 @@ def execute_with_rem(
     noisy_result = result[0]
     assert isinstance(noisy_result, MeasurementResult)
 
-    result = mitigate_measurements(noisy_result, inverse_confusion_matrix)
-    return observable._expectation_from_measurements([result])
+    mitigated_result = mitigate_measurements(
+        noisy_result, inverse_confusion_matrix
+    )
+    assert observable is not None
+    return observable._expectation_from_measurements([mitigated_result])
 
 
 def mitigate_executor(
-    executor: Callable[['QPROGRAM'], MeasurementResult],
+    executor: Callable[[QPROGRAM], MeasurementResult],
     inverse_confusion_matrix: MatrixLike,
     *,
-    observable: Optional['Observable'] = None,
-) -> Callable[['QPROGRAM'], float]:
+    observable: Optional[Observable] = None,
+) -> Callable[[QPROGRAM], float]:
     """Returns a modified version of the input 'executor' which is
     error-mitigated with readout confusion inversion (RCI).
 
@@ -118,7 +122,6 @@ def mitigate_executor(
     Returns:
         The error-mitigated version of the input executor.
     """
-    from mitiq._typing import QPROGRAM  # Avoid circular import.
 
     @wraps(executor)
     def new_executor(qp: QPROGRAM) -> float:
@@ -135,9 +138,9 @@ def mitigate_executor(
 def rem_decorator(
     inverse_confusion_matrix: MatrixLike,
     *,
-    observable: Optional['Observable'] = None,
+    observable: Optional[Observable] = None,
 ) -> Callable[
-    [Callable[['QPROGRAM'], MeasurementResult]], Callable[['QPROGRAM'], float]
+    [Callable[[QPROGRAM], MeasurementResult]], Callable[[QPROGRAM], float]
 ]:
     """Decorator which adds an error-mitigation layer based on readout
     confusion inversion (RCI) to an executor function, i.e., a function
@@ -152,8 +155,6 @@ def rem_decorator(
     Returns:
         The error-mitigating decorator to be applied to an executor function.
     """
-    from mitiq._typing import QPROGRAM  # Avoid circular import.
-
     # Raise an error if the decorator is used without parenthesis
     if callable(observable):
         raise TypeError(

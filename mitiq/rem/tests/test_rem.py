@@ -26,7 +26,7 @@ from mitiq.interface.mitiq_cirq.cirq_utils import (
 )
 from mitiq.observable.observable import Observable
 from mitiq.observable.pauli import PauliString
-from mitiq.rem.measurement_result import MeasurementResult
+from mitiq.measurement.measurement_result import MeasurementResult
 from mitiq.rem.rem import execute_with_rem, mitigate_executor, rem_decorator
 from mitiq.raw import execute as raw_execute
 from mitiq.interface.mitiq_cirq import sample_bitstrings
@@ -46,8 +46,10 @@ def noisy_readout_executor(
     return MeasurementResult(
         result=np.column_stack(list(result.measurements.values())),
         qubit_indices=tuple(
-            # q[2:-1] is necessary to convert "q(number)" into "number"            
-            int(q[2:-1]) for k in result.measurements.keys() for q in k.split(",")
+            # q[2:-1] is necessary to convert "q(number)" into "number"
+            int(q[2:-1])
+            for k in result.measurements.keys()
+            for q in k.split(",")
         ),
     )
 
