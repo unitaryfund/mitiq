@@ -16,4 +16,9 @@
 """Readout error mitigation (REM) techniques."""
 
 from mitiq.rem.post_select import post_select
-from mitiq.rem.rem import mitigate_measurements, execute_with_rem, mitigate_executor, rem_decorator
+from mitiq.rem.rem import (
+    mitigate_measurements,
+    execute_with_rem,
+    mitigate_executor,
+    rem_decorator,
+)
