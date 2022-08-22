@@ -99,7 +99,6 @@ def execute_with_pec(
         full_output: If False only the average PEC value is returned.
             If True a dictionary containing all PEC data is returned too.
 
-
     Returns:
         The tuple ``(pec_value, pec_data)`` where ``pec_value`` is the
         expectation value estimated with PEC and ``pec_data`` is a dictionary
