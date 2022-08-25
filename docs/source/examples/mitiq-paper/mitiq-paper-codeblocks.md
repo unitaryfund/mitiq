@@ -15,7 +15,7 @@ kernelspec:
 
 # Mitiq paper codeblocks
 
-Codeblocks from the main text of the [Mitiq whitepaper](https://quantum-journal.org/papers/q-2022-08-11-774/) [1] published in [Quantum](https://quantum-journal.org/).
+Codeblocks from the main text of the [Mitiq whitepaper](https://quantum-journal.org/papers/q-2022-08-11-774/) {cite}`LaRose_2022_Quantum` published in [Quantum](https://quantum-journal.org/).
 
 +++ {"id": "DRplhovffVfk"}
 
