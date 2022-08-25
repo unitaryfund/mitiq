@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for scaling noise by inserting identity layers."""
-import numpy as np
 import pytest
 from mitiq.zne.scaling.identity_insertion import (
     UnscalableCircuitError,
@@ -48,3 +47,70 @@ def test_id_layers_whole_scale_factor(scale_factor):
         [ops.I.on_each(*qreg)] * num_layers,
     )
     assert _equal(scaled, correct)
+
+
+def test_scale_with_intermediate_measurements_raises_error():
+    """Tests scaling function raise an error on circuits with
+    intermediate measurements.
+    """
+    qbit = LineQubit(0)
+    circ = Circuit([ops.H.on(qbit)], [ops.measure(qbit)], [ops.T.on(qbit)])
+    with pytest.raises(
+        UnscalableCircuitError,
+        match="Circuit contains intermediate measurements",
+    ):
+        insert_id_layers(circ, scale_factor=3.0)
+
+
+def test_scaling_with_terminal_measurement():
+    """Checks if the circuit with a terminal measurement is scaled with identity
+    layers as expected.
+    """
+    qbit = LineQubit(0)
+    input_circ = Circuit(
+        [ops.H.on(qbit)], [ops.T.on(qbit)], [ops.measure(qbit)]
+    )
+    scaled_circ = insert_id_layers(input_circ, scale_factor=3.0)
+    expected_circ = Circuit(
+        [ops.H.on(qbit)],
+        [ops.I.on(qbit)] * 2,
+        [ops.T.on(qbit)],
+        [ops.I.on(qbit)] * 2,
+        [ops.measure(qbit)],
+    )
+    assert _equal(scaled_circ, expected_circ)
+
+
+def test_calculate_id_layers_diff_scale_factor():
+    """Checks if the partial layers to be inserted are 0 for a full scale factor
+    and may or may not be 0 otherwise.
+    """
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.X.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+    )
+    circ_depth = len(circ)
+    full_scale_factor = 3
+    id_layers_full_scale = _calculate_id_layers(circ_depth, full_scale_factor)
+    assert id_layers_full_scale[-1] == 0
+
+    float_scale_factor_list = [1.3, 2.6, 3.77, 4.8, 5.9]
+    for i in float_scale_factor_list:
+        float_scale_factor = i
+        id_layers_float_scale = _calculate_id_layers(
+            circ_depth, float_scale_factor
+        )
+        # below accounts for the case when the intended scale factor is
+        # approximated by having some partial layers or not.
+        if id_layers_float_scale[-1] != 0:
+            assert id_layers_float_scale[-1] > 0
+        else:
+            assert id_layers_float_scale[-1] == 0
+
+    bad_scale_factor_list = [-1.3, 0, -3, 0.76]
+    for i in bad_scale_factor_list:
+        with pytest.raises(ValueError, match="Requires scale_factor >= 1"):
+            _calculate_id_layers(circ_depth, i)
