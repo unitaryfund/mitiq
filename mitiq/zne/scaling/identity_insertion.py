@@ -118,7 +118,7 @@ def insert_id_layers(input_circuit: Circuit, scale_factor: float) -> Circuit:
         index_counter = Counter(random_moment_indices)
     else:
         random_moment_indices = []
-        index_counter = dict()
+        index_counter = Counter()
 
     # create a layer of identity acting on every qubit in the circuit
     circuit_qubits = list(input_circuit.all_qubits())
