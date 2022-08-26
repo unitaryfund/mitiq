@@ -150,7 +150,10 @@
       "contributions": [
         "example",
         "test",
-        "bug"
+        "bug",
+        "ideas",
+        "code",
+        "doc"
       ]
     },
     {
