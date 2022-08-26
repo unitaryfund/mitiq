@@ -1,7 +1,7 @@
 # <a href="https://github.com/unitaryfund/mitiq"><img src="https://github.com/unitaryfund/mitiq/blob/master/docs/source/img/mitiq-logo.png?raw=true" alt="Mitiq logo" width="350"/></a>
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-32-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-33-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![build](https://github.com/unitaryfund/mitiq/workflows/build/badge.svg)](https://github.com/unitaryfund/mitiq/actions)
 [![Documentation Status](https://readthedocs.org/projects/mitiq/badge/?version=stable)](https://mitiq.readthedocs.io/en/stable/)
@@ -165,6 +165,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/Rahul-Mistri"><img src="https://avatars.githubusercontent.com/u/52910775?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rahul Mistri</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=Rahul-Mistri" title="Tests">⚠️</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=Rahul-Mistri" title="Code">💻</a></td>
     <td align="center"><a href="http://vtomole.com"><img src="https://avatars.githubusercontent.com/u/8405160?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Victory Omole</b></sub></a><br /><a href="https://github.com/unitaryfund/mitiq/commits?author=vtomole" title="Tests">⚠️</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=vtomole" title="Code">💻</a></td>
     <td align="center"><a href="http://natestemen.xyz"><img src="https://avatars.githubusercontent.com/u/12703123?v=4?s=100" width="100px;" alt=""/><br /><sub><b>nate stemen</b></sub></a><br /><a href="#infra-natestemen" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=natestemen" title="Documentation">📖</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=natestemen" title="Tests">⚠️</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=natestemen" title="Code">💻</a></td>
+    <td align="center"><a href="http://www.lucianobello.com.ar"><img src="https://avatars.githubusercontent.com/u/766693?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Luciano Bello</b></sub></a><br /><a href="#infra-1ucian0" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/unitaryfund/mitiq/commits?author=1ucian0" title="Code">💻</a></td>
   </tr>
 </table>
 
