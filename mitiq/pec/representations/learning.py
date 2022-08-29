@@ -158,6 +158,6 @@ def biased_noise_loss_function(
         ]
     )
 
-    return np.sum(abs(mitigated_values - ideal_values) ** 2) / len(
+    return np.sum(abs(mitigated_values.reshape(-1, 1) - ideal_values.reshape(-1, 1)) ** 2) / len(
         training_circuits
     )

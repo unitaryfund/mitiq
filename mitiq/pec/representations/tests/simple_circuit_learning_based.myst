@@ -1,0 +1,200 @@
+---
+jupytext:
+  text_representation:
+    extension: .myst
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.14.1
+kernelspec:
+  display_name: Python 3 (ipykernel)
+  language: python
+  name: python3
+---
+
+```{code-cell} ipython3
+import warnings
+warnings.simplefilter("ignore", UserWarning)
+import numpy as np
+from cirq import (
+    CXPowGate,
+    MixedUnitaryChannel,
+    Rx,
+    Rz,
+    I,
+    X,
+    Y,
+    Z,
+    LineQubit,
+    Circuit,
+    ops,
+    unitary,
+)
+from mitiq import Executor, Observable, PauliString
+from mitiq.interface.mitiq_cirq import compute_density_matrix
+from mitiq.cdr import generate_training_circuits
+from mitiq.cdr._testing import random_x_z_cnot_circuit
+from mitiq.pec.representations.biased_noise import (
+    represent_operation_with_local_biased_noise)
+from mitiq.pec.representations.learning import (
+    biased_noise_loss_function,
+    learn_biased_noise_parameters,
+)
+```
+
+```{code-cell} ipython3
+seed = 1
+rng = np.random.RandomState(seed)
+circuit = random_x_z_cnot_circuit(
+    LineQubit.range(2), n_moments=5, random_state=rng
+)
+
+pec_kwargs = {"num_samples": 100, "random_state": 1}
+
+observable = Observable(PauliString("XZ"), PauliString("YY"))
+
+CNOT_ops = list(circuit.findall_operations_with_gate_type(CXPowGate))
+Rx_ops = list(circuit.findall_operations_with_gate_type(Rx))
+Rz_ops = list(circuit.findall_operations_with_gate_type(Rz))
+
+
+operation = Circuit(CNOT_ops[0][1])
+operations = [operation]
+
+def ideal_execute(circ: Circuit) -> np.ndarray:
+    return compute_density_matrix(circ, noise_level=(0.0,))
+
+
+ideal_executor = Executor(ideal_execute)
+```
+
+```{code-cell} ipython3
+epsilon = 0.7
+eta = 1000
+
+def biased_noise_channel(epsilon: float, eta: float) -> MixedUnitaryChannel:
+    a = 1 - epsilon
+    b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
+    c = epsilon / (3 * (eta + 1))
+
+    mix = [
+        (a, unitary(I)),
+        (b, unitary(Z)),
+        (c, unitary(X)),
+        (c, unitary(Y)),
+    ]
+    return ops.MixedUnitaryChannel(mix)
+
+
+def noisy_execute(circ: Circuit) -> np.ndarray:
+    noisy_circ = circ.copy()[0:0]
+
+    for op in circ.all_operations(): 
+        noisy_circ.append(op)
+        if isinstance(op.gate, CXPowGate):
+            qubits = op.qubits
+            noisy_circ.append(biased_noise_channel(epsilon, eta)(qubits[0]))
+            noisy_circ.append(biased_noise_channel(epsilon, eta)(qubits[1]))
+
+    return ideal_execute(noisy_circ)
+
+noisy_executor = Executor(noisy_execute)
+```
+
+```{code-cell} ipython3
+num_training_circuits = 10
+fraction_non_clifford = 0.2
+
+training_circuits = generate_training_circuits(
+    circuit=circuit,
+    num_training_circuits=num_training_circuits,
+    fraction_non_clifford=fraction_non_clifford,
+    method_select="uniform",
+    method_replace="closest",
+)
+```
+
+```{code-cell} ipython3
+ideal_values = np.array(
+    [ideal_executor.evaluate(t, observable) for t in training_circuits]
+)
+print(ideal_values)
+```
+
+```{code-cell} ipython3
+epsilons = np.linspace(0, 1, 51)
+etas = np.linspace(0, 1000, 51)
+
+
+from mitiq.pec.representations.learning import biased_noise_loss_function
+loss_epsilons = [biased_noise_loss_function([eps, eta], operations, training_circuits, ideal_values, noisy_executor, pec_kwargs, observable) for eps in epsilons]
+loss_etas = [biased_noise_loss_function([epsilon, et], operations, training_circuits, ideal_values, noisy_executor, pec_kwargs, observable) for et in etas]
+```
+
+```{code-cell} ipython3
+from matplotlib import pyplot as plt
+_ = plt.plot(epsilons, loss_epsilons)
+print(loss_epsilons)
+```
+
+```{code-cell} ipython3
+_ = plt.plot(etas, loss_etas)
+print(loss_etas)
+```
+
+```{code-cell} ipython3
+reps_eta1000 = [represent_operation_with_local_biased_noise(operation, epsilons[25], eta)]
+from mitiq.pec import execute_with_pec
+mitigated_values = np.array(
+        [
+            execute_with_pec(
+                circuit=training_circuit,
+                observable=observable,
+                executor=noisy_executor,
+                representations=reps,
+                full_output=False,
+                **pec_kwargs,
+            )
+            for training_circuit in training_circuits
+        ]
+    )
+```
+
+```{code-cell} ipython3
+rep_eta1000 = reps_eta1000[0]
+print(rep_eta1000)
+print(sum(rep_eta1000.coeffs))
+```
+
+```{code-cell} ipython3
+reps_zero_bias = [represent_operation_with_local_biased_noise(operation, epsilons[25], 0)]
+from mitiq.pec import execute_with_pec
+mitigated_values = np.array(
+        [
+            execute_with_pec(
+                circuit=training_circuit,
+                observable=observable,
+                executor=noisy_executor,
+                representations=reps,
+                full_output=False,
+                **pec_kwargs,
+            )
+            for training_circuit in training_circuits
+        ]
+    )
+```
+
+```{code-cell} ipython3
+rep_zero_bias = reps_zero_bias[0]
+print(rep_zero_bias)
+print(sum(rep_zero_bias.coeffs))
+```
+
+```{code-cell} ipython3
+print(np.sum(abs(mitigated_values.reshape(-1, 1) - ideal_values.reshape(-1, 1)) ** 2) / len(
+        training_circuits
+    ))
+```
+
+```{code-cell} ipython3
+
+```
