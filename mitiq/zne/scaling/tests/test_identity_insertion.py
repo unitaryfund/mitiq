@@ -63,8 +63,8 @@ def test_scale_with_intermediate_measurements_raises_error():
 
 
 def test_scaling_with_terminal_measurement():
-    """Checks if the circuit with a terminal measurement is scaled with identity
-    layers as expected.
+    """Checks if the circuit with a terminal measurement is
+    scaled with identity layers as expected.
     """
     qbit = LineQubit(0)
     input_circ = Circuit(
@@ -82,8 +82,11 @@ def test_scaling_with_terminal_measurement():
 
 
 def test_calculate_id_layers_diff_scale_factor():
-    """Checks if the partial layers to be inserted are 0 for a full scale factor
-    and may or may not be 0 otherwise.
+    """Checks if the partial layers to be inserted are 0 for a full
+    scale factor and may or may not be 0 otherwise.
+
+    Also checks if an error is raised for an invalid scale factor
+    value.
     """
     qreg = LineQubit.range(3)
     circ = Circuit(
@@ -114,3 +117,39 @@ def test_calculate_id_layers_diff_scale_factor():
     for i in bad_scale_factor_list:
         with pytest.raises(ValueError, match="Requires scale_factor >= 1"):
             _calculate_id_layers(circ_depth, i)
+
+
+@pytest.mark.parametrize(
+    "intended_scale_factor",
+    (1, 1.1, 1.3, 1.7, 1.9, 2, 3.1, 3.6, 3.9, 3, 4, 5, 6),
+)
+def test_compare_scale_factor(intended_scale_factor):
+    """tests if the intended scale factor is approximately close to the
+    actual scale factor.
+    """
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.X.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+    )
+    scaled = insert_id_layers(circ, intended_scale_factor)
+    achieved_scale_factor = len(scaled) / len(circ)
+    assert achieved_scale_factor <= intended_scale_factor
+
+
+def test_insert_id_layers_bad_scale_factor():
+    """Checks if an error is raised for a bad scale factor."""
+    qreg = LineQubit.range(3)
+    circ = Circuit(
+        [ops.H.on_each(*qreg)],
+        [ops.CNOT.on(qreg[0], qreg[1])],
+        [ops.X.on(qreg[2])],
+        [ops.TOFFOLI.on(*qreg)],
+    )
+
+    bad_scale_factor_list = [-1.3, 0, -3, 0.76]
+    for i in bad_scale_factor_list:
+        with pytest.raises(ValueError, match="Requires scale_factor >= 1"):
+            insert_id_layers(circ, i)
