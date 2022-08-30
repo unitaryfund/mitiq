@@ -117,6 +117,7 @@ def test_calculate_id_layers_diff_scale_factor():
     for i in bad_scale_factor_list:
         with pytest.raises(ValueError, match="Requires scale_factor >= 1"):
             _calculate_id_layers(circ_depth, i)
+            insert_id_layers(circ, i)
 
 
 @pytest.mark.parametrize(
@@ -137,19 +138,3 @@ def test_compare_scale_factor(intended_scale_factor):
     scaled = insert_id_layers(circ, intended_scale_factor)
     achieved_scale_factor = len(scaled) / len(circ)
     assert achieved_scale_factor <= intended_scale_factor
-
-
-def test_insert_id_layers_bad_scale_factor():
-    """Checks if an error is raised for a bad scale factor."""
-    qreg = LineQubit.range(3)
-    circ = Circuit(
-        [ops.H.on_each(*qreg)],
-        [ops.CNOT.on(qreg[0], qreg[1])],
-        [ops.X.on(qreg[2])],
-        [ops.TOFFOLI.on(*qreg)],
-    )
-
-    bad_scale_factor_list = [-1.3, 0, -3, 0.76]
-    for i in bad_scale_factor_list:
-        with pytest.raises(ValueError, match="Requires scale_factor >= 1"):
-            insert_id_layers(circ, i)
