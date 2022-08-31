@@ -146,8 +146,8 @@ def test_biased_noise_loss_compare_ideal(operations):
     assert np.isclose(loss, 0)
 
 
-@pytest.mark.parametrize("epsilon", [0, 0.7, 1])
-@pytest.mark.parametrize("eta", [0, 1, 1000])
+@pytest.mark.parametrize("epsilon", [0, 0.01, 0.05])
+@pytest.mark.parametrize("eta", [0, 1, 10])
 @pytest.mark.parametrize(
     "operations",
     [
@@ -161,7 +161,14 @@ def test_learn_biased_noise_parameters(epsilon, eta, operations):
     with a small offset from the simulated noise model values"""
 
     def noisy_execute(circ: Circuit) -> np.ndarray:
-        noisy_circ = circ.with_noise(biased_noise_channel(epsilon, eta))
+        noisy_circ = circ.copy()[0:0]
+
+        for op in circ.all_operations():
+            noisy_circ.append(op)
+            if isinstance(op.gate, CXPowGate):
+                qubits = op.qubits
+                noisy_circ.append(biased_noise_channel(epsilon, eta)(qubits[0]))
+                noisy_circ.append(biased_noise_channel(epsilon, eta)(qubits[1]))
         return ideal_execute(noisy_circ)
 
     noisy_executor = Executor(noisy_execute)
@@ -197,7 +204,7 @@ def test_learn_biased_noise_parameters(epsilon, eta, operations):
 def test_learn_biased_noise_parameters_qiskit(operations):
     """Test the learning function with initial noise strength and noise bias
     with a small offset from the simulated noise model values"""
-    epsilon = 0.7
+    epsilon = 0.05
     eta = 0
 
     def ideal_execute_qiskit(circ: qiskit.QuantumCircuit) -> float:
@@ -209,7 +216,7 @@ def test_learn_biased_noise_parameters_qiskit(operations):
     ideal_executor_qiskit = Executor(ideal_execute_qiskit)
 
     def noisy_execute_qiskit(circ: qiskit.QuantumCircuit) -> float:
-        noise_model = qiskit_utils.initialized_depolarizing_noise(0.7)
+        noise_model = qiskit_utils.initialized_depolarizing_noise(epsilon)
         return qiskit_utils.execute_with_noise(
             circ, observable.matrix(), noise_model
         )

@@ -65,12 +65,12 @@ def learn_biased_noise_parameters(
     Returns:
         Optimized noise strength epsilon and noise bias eta.
     """
+    random_state = np.random.RandomState(1)
     training_circuits = generate_training_circuits(
         circuit=circuit,
         num_training_circuits=num_training_circuits,
         fraction_non_clifford=fraction_non_clifford,
-        method_select="uniform",
-        method_replace="closest",
+        random_state=random_state,
     )
 
     ideal_values = np.array(
@@ -158,6 +158,6 @@ def biased_noise_loss_function(
         ]
     )
 
-    return np.sum(abs(mitigated_values.reshape(-1, 1) - ideal_values.reshape(-1, 1)) ** 2) / len(
-        training_circuits
-    )
+    return np.sum(
+        abs(mitigated_values.reshape(-1, 1) - ideal_values.reshape(-1, 1)) ** 2
+    ) / len(training_circuits)
