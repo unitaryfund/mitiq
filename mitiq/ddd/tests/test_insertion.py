@@ -66,7 +66,7 @@ circuit_qiskit_two = qiskit.QuantumCircuit(qreg, creg)
 for q in qreg:
     circuit_qiskit_two.x(q)
     circuit_qiskit_two.x(3)
-circuit_qiskit_two.measure(0, 3)
+circuit_qiskit_two.measure(2, 3)
 circuit_qiskit_two.cx(0, 3)
 
 circuit_qiskit_validated = qiskit.QuantumCircuit(qreg)
@@ -103,8 +103,8 @@ for i in range(4):
         circuit_qiskit_two_validated.x(i)
         circuit_qiskit_two_validated.x(i)
         circuit_qiskit_two_validated.i(i)
-circuit_qiskit_two_validated.measure(0, 3)
 circuit_qiskit_two_validated.cx(0, 3)
+circuit_qiskit_two_validated.measure(2, 3)
 
 # Define test mask matrices
 test_mask_one = np.array(
