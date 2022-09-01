@@ -52,29 +52,61 @@ circuit_cirq_three_validated = cirq.Circuit(
 )
 
 qreg = qiskit.QuantumRegister(4)
+creg = qiskit.ClassicalRegister(4)
+
+# Qiskit test without measurement
 circuit_qiskit_one = qiskit.QuantumCircuit(qreg)
 for q in qreg:
     circuit_qiskit_one.x(q)
     circuit_qiskit_one.x(3)
 circuit_qiskit_one.cx(0, 3)
 
-qiskit.QuantumRegister(4)
-circuit_qiskit_validate = qiskit.QuantumCircuit(qreg)
+# Qiskit test with measurement
+circuit_qiskit_two = qiskit.QuantumCircuit(qreg, creg)
+for q in qreg:
+    circuit_qiskit_two.x(q)
+    circuit_qiskit_two.x(3)
+circuit_qiskit_two.measure(2, 3)
+circuit_qiskit_two.cx(0, 3)
+
+circuit_qiskit_validated = qiskit.QuantumCircuit(qreg)
 for i in range(4):
-    circuit_qiskit_validate.x(i)
-    circuit_qiskit_validate.x(3)
+    circuit_qiskit_validated.x(i)
+    circuit_qiskit_validated.x(3)
     if i != 3 and i != 0:
-        circuit_qiskit_validate.i(i)
-        circuit_qiskit_validate.x(i)
-        circuit_qiskit_validate.i(i)
-        circuit_qiskit_validate.x(i)
-        circuit_qiskit_validate.i(i)
+        circuit_qiskit_validated.i(i)
+        circuit_qiskit_validated.x(i)
+        circuit_qiskit_validated.i(i)
+        circuit_qiskit_validated.x(i)
+        circuit_qiskit_validated.i(i)
     elif i == 0:
-        circuit_qiskit_validate.i(i)
-        circuit_qiskit_validate.x(i)
-        circuit_qiskit_validate.x(i)
-        circuit_qiskit_validate.i(i)
-circuit_qiskit_validate.cx(0, 3)
+        circuit_qiskit_validated.i(i)
+        circuit_qiskit_validated.x(i)
+        circuit_qiskit_validated.x(i)
+        circuit_qiskit_validated.i(i)
+circuit_qiskit_validated.cx(0, 3)
+
+# Qiskit validate with measurement
+circuit_qiskit_two_validated = qiskit.QuantumCircuit(qreg, creg)
+
+for i in range(4):
+    circuit_qiskit_two_validated.x(i)
+    circuit_qiskit_two_validated.x(3)
+    if i != 3 and i != 0:
+        if i == 1:
+            circuit_qiskit_two_validated.i(i)
+        circuit_qiskit_two_validated.i(i)
+        circuit_qiskit_two_validated.x(i)
+        circuit_qiskit_two_validated.i(i)
+        circuit_qiskit_two_validated.x(i)
+        circuit_qiskit_two_validated.i(i)
+    elif i == 0:
+        circuit_qiskit_two_validated.i(i)
+        circuit_qiskit_two_validated.x(i)
+        circuit_qiskit_two_validated.x(i)
+        circuit_qiskit_two_validated.i(i)
+circuit_qiskit_two_validated.cx(0, 3)
+circuit_qiskit_two_validated.measure(2, 3)
 
 # Define test mask matrices
 test_mask_one = np.array(
@@ -214,7 +246,8 @@ def test_get_slack_matrix_from_circuit__bad_input_errors():
     [
         (circuit_cirq_two, circuit_cirq_two, xx),
         (circuit_cirq_three, circuit_cirq_three_validated, xyxy),
-        (circuit_qiskit_one, circuit_qiskit_validate, xx),
+        (circuit_qiskit_one, circuit_qiskit_validated, xx),
+        (circuit_qiskit_two, circuit_qiskit_two_validated, xx),
     ],
 )
 def test_insert_sequences(circuit, result, rule):
