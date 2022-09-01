@@ -106,7 +106,7 @@ noisy_executor = Executor(noisy_execute)
 ```
 
 ```{code-cell} ipython3
-num_training_circuits = 10
+num_training_circuits = 5
 fraction_non_clifford = 0.2
 
 training_circuits = generate_training_circuits(
@@ -246,12 +246,7 @@ print(loss_small_epsilons)
 ```{code-cell} ipython3
 offset = 0.01
 epsilon0 = (1 + offset) * epsilon
-eta0 = eta
-training_kwargs = {
-    "num_training_circuits": 10,
-    "fraction_non_clifford": 0.2,
-    "random_state": 1,
-}
+eta0 = eta + 0.1 * offset
 from mitiq.pec.representations.learning import learn_biased_noise_parameters
 
 import timeit
@@ -263,7 +258,7 @@ start = timeit.default_timer()
     ideal_executor=ideal_executor,
     noisy_executor=noisy_executor,
     pec_kwargs=pec_kwargs,
-    num_training_circuits=10,
+    num_training_circuits=5,
     fraction_non_clifford=0.2,
     epsilon0=epsilon0,
     eta0=eta0,
@@ -303,5 +298,44 @@ _ = plt.plot(smaller_epsilons, loss_smaller_epsilons)
 ```
 
 ```{code-cell} ipython3
+noisy_circuit = circuit.copy()[0:0]
 
+for op in circuit.all_operations():
+    noisy_circuit.append(op)
+    if isinstance(op.gate, operation.all_operations.gate):
+        qubits = op.qubits
+        noisy_circuit.append(biased_noise_channel(epsilon, eta)(qubits[0]))
+        noisy_circuit.append(biased_noise_channel(epsilon, eta)(qubits[1]))
+print(noisy_circuit)
+```
+
+```{code-cell} ipython3
+def biased_noise_channel(epsilon: float, eta: float) -> MixedUnitaryChannel:
+    a = 1 - epsilon
+    b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
+    c = epsilon / (3 * (eta + 1))
+
+    mix = [
+        (a, unitary(I)),
+        (b, unitary(Z)),
+        (c, unitary(X)),
+        (c, unitary(Y)),
+    ]
+    return ops.MixedUnitaryChannel(mix)
+
+
+def noisy_execute(circ: Circuit) -> np.ndarray:
+    noisy_circ = circ.copy()[0:0]
+
+    for op in circ.all_operations():
+        noisy_circ.append(op)
+        if isinstance(op.gate, CXPowGate):
+            qubits = op.qubits
+            noisy_circ.append(biased_noise_channel(epsilon, eta)(qubits[0]))
+            noisy_circ.append(biased_noise_channel(epsilon, eta)(qubits[1]))
+
+    return ideal_execute(noisy_circ)
+
+
+noisy_executor = Executor(noisy_execute)
 ```

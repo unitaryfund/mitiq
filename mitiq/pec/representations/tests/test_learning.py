@@ -167,14 +167,21 @@ def test_learn_biased_noise_parameters(epsilon, eta, operations):
             noisy_circ.append(op)
             if isinstance(op.gate, CXPowGate):
                 qubits = op.qubits
-                noisy_circ.append(biased_noise_channel(epsilon, eta)(qubits[0]))
-                noisy_circ.append(biased_noise_channel(epsilon, eta)(qubits[1]))
+                noisy_circ.append(
+                    biased_noise_channel(epsilon, eta)(qubits[0])
+                )
+                noisy_circ.append(
+                    biased_noise_channel(epsilon, eta)(qubits[1])
+                )
         return ideal_execute(noisy_circ)
 
     noisy_executor = Executor(noisy_execute)
     offset = 0.01
     epsilon0 = (1 + offset) * epsilon
-    eta0 = (1 + offset) * eta
+    if eta == 0:
+        eta0 = 0.1 * offset
+    else:
+        eta0 = (1 + offset) * eta
 
     [epsilon_opt, eta_opt, success] = learn_biased_noise_parameters(
         operations_to_learn=operations,
