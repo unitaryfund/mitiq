@@ -302,11 +302,15 @@ noisy_circuit = circuit.copy()[0:0]
 
 for op in circuit.all_operations():
     noisy_circuit.append(op)
-    if isinstance(op.gate, operation.all_operations.gate):
+    if isinstance(op.gate, type(Rz_ops[0][2])):
         qubits = op.qubits
-        noisy_circuit.append(biased_noise_channel(epsilon, eta)(qubits[0]))
-        noisy_circuit.append(biased_noise_channel(epsilon, eta)(qubits[1]))
+        for q in qubits:
+            noisy_circuit.append(biased_noise_channel(epsilon, eta)(q))
 print(noisy_circuit)
+```
+
+```{code-cell} ipython3
+print((qubits))
 ```
 
 ```{code-cell} ipython3

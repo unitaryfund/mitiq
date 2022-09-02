@@ -148,14 +148,7 @@ def test_biased_noise_loss_compare_ideal(operations):
 
 @pytest.mark.parametrize("epsilon", [0, 0.01, 0.05])
 @pytest.mark.parametrize("eta", [0, 1, 10])
-@pytest.mark.parametrize(
-    "operations",
-    [
-        [Circuit(CNOT_ops[0][1])],
-        [Circuit(Rx_ops[0][1])],
-        [Circuit(Rz_ops[0][1])],
-    ],
-)
+@pytest.mark.parametrize("operations", [CNOT_ops[0], Rx_ops[0], Rz_ops[0]])
 def test_learn_biased_noise_parameters(epsilon, eta, operations):
     """Test the learning function with initial noise strength and noise bias
     with a small offset from the simulated noise model values"""
@@ -165,7 +158,7 @@ def test_learn_biased_noise_parameters(epsilon, eta, operations):
 
         for op in circ.all_operations():
             noisy_circ.append(op)
-            if isinstance(op.gate, CXPowGate):
+            if isinstance(op.gate, type(operations[2])):
                 qubits = op.qubits
                 noisy_circ.append(
                     biased_noise_channel(epsilon, eta)(qubits[0])
@@ -177,18 +170,24 @@ def test_learn_biased_noise_parameters(epsilon, eta, operations):
 
     noisy_executor = Executor(noisy_execute)
     offset = 0.01
-    epsilon0 = (1 + offset) * epsilon
+    if epsilon == 0:
+        epsilon0 = 0.1 * offset
+    else:
+        epsilon0 = (1 + offset) * epsilon
     if eta == 0:
         eta0 = 0.1 * offset
     else:
         eta0 = (1 + offset) * eta
 
+    operations_to_learn = [Circuit(operations[1])]
+
+    pec_kwargs_learning = {"num_samples": 5000, "random_state": 1}
     [epsilon_opt, eta_opt, success] = learn_biased_noise_parameters(
-        operations_to_learn=operations,
+        operations_to_learn=operations_to_learn,
         circuit=circuit,
         ideal_executor=ideal_executor,
         noisy_executor=noisy_executor,
-        pec_kwargs=pec_kwargs,
+        pec_kwargs=pec_kwargs_learning,
         num_training_circuits=5,
         fraction_non_clifford=0.2,
         epsilon0=epsilon0,
