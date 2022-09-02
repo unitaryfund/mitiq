@@ -4,7 +4,7 @@
 
 ### Summary
 
-This release cycle focused on review and approval of two RFCs, one for Readout Error Mitigation (REM) [#1387]((#1387)) and one for Identity insertion noise scaling [#335]((#335)) (not listed as PRs). It also includes bug fixes and minor dependency upgrades. 
+This release cycle focused on review and approval of two RFCs, one for Readout Error Mitigation (REM) [#1387](https://github.com/unitaryfund/mitiq/issues/1387) and one for Identity insertion noise scaling [#335](https://github.com/unitaryfund/mitiq/issues/335) (not listed as PRs). It also includes bug fixes and minor dependency upgrades. 
 
 ### All Changes
 
