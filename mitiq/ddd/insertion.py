@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tools to determine slack windows in circuits and to insert DDD sequences."""
-from cirq import Circuit, LineQubit
+from cirq import Circuit, LineQubit, synchronize_terminal_measurements
 import numpy as np
 from typing import Callable
 from mitiq.interface import noise_scaling_converter
@@ -125,6 +125,7 @@ def _insert_ddd_sequences(
     Returns:
         The circuit with DDD sequences added.
     """
+    circuit = synchronize_terminal_measurements(circuit)
     slack_matrix = get_slack_matrix_from_circuit_mask(
         _get_circuit_mask(circuit)
     )
