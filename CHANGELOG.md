@@ -8,6 +8,8 @@ This release cycle focused on review and approval of two RFCs, one for Readout E
 
 ### All Changes
 
+- Update amazon-braket-sdk requirement from ~=1.29.2 to ~=1.29.3 . #1481 by [@dependabot] 
+
 - Update black requirement from ~=22.6 to ~=22.8  infrastructureFor issues related to building, packaging, and continuous integration.
 #1477 by [@dependabot] 
 
