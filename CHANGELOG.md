@@ -8,33 +8,19 @@ This release cycle focused on review and approval of two RFCs, one for Readout E
 
 ### All Changes
 
-- Update amazon-braket-sdk requirement from ~=1.29.2 to ~=1.29.3 . #1481 by [@dependabot] 
-
-- Update black requirement from ~=22.6 to ~=22.8  infrastructureFor issues related to building, packaging, and continuous integration.
-#1477 by [@dependabot] 
-
-- docs: add Aaron-Robertson as a contributor for ideas, code, doc #1464 by [@allcontributors]
-
-- docs: add 1ucian0 as a contributor for infra, code #1461 by [@allcontributors]
-
-- Update amazon-braket-sdk requirement from ~=1.29.0 to ~=1.29.2  infrastructureFor issues related to building, packaging, and continuous integration. #1459 by [@dependabot] 
-
-- Update qiskit requirement from ~=0.37.1 to ~=0.37.2  infrastructureFor issues related to building, packaging, and continuous integration. #1458 by [@dependabot] 
-
-- Update sphinxcontrib-bibtex requirement from ~=2.4.2 to ~=2.5.0  infrastructureFor issues related to building, packaging, and continuous integration. #1457 by [@dependabot]
-
-- Mid circuit measurement fixed for ddd #1446 by [@Aaron-Robertson]
-
-- Update pennylane requirement from ~=0.24.0 to ~=0.25.1  infrastructureFor issues related to building, packaging, and continuous integration. #1444 by [@dependabot]
-
-- Update amazon-braket-sdk requirement from ~=1.28.1 to ~=1.29.0  infrastructureFor issues related to building, packaging, and continuous integration. #1437 by [@dependabot]
-
-- Update pyquil requirement from ~=3.2.1 to ~=3.3.0  infrastructureFor issues related to building, packaging, and continuous integration.
-#1436 by [@dependabot]
-
-- remove patch release docs #1435 by [@natestemen]
-
-- 0.18.0 in dev #1433 by [@natestemen]
+- Update amazon-braket-sdk requirement from ~=1.29.2 to ~=1.29.3 (#1481) [@dependabot] 
+- Update black requirement from ~=22.6 to ~=22.8 (#1477) [@dependabot] 
+- docs: add Aaron-Robertson as a contributor for ideas, code, doc (#1464) [@allcontributors]
+- docs: add 1ucian0 as a contributor for infra, code (#1461) [@allcontributors]
+- Update amazon-braket-sdk requirement from ~=1.29.0 to ~=1.29.2 (#1459) [@dependabot] 
+- Update qiskit requirement from ~=0.37.1 to ~=0.37.2 (#1458) [@dependabot] 
+- Update sphinxcontrib-bibtex requirement from ~=2.4.2 to ~=2.5.0 (#1457) [@dependabot]
+- Mid circuit measurement fixed for ddd (#1446) [@Aaron-Robertson]
+- Update pennylane requirement from ~=0.24.0 to ~=0.25.1  (#1444) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.28.1 to ~=1.29.0  (#1437) [@dependabot]
+- Update pyquil requirement from ~=3.2.1 to ~=3.3.0 (#1436) [@dependabot]
+- remove patch release docs (#1435) [@natestemen]
+- 0.18.0 in dev (#1433) [@natestemen]
 
 ## Version 0.17.1
 
