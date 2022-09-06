@@ -343,3 +343,7 @@ def noisy_execute(circ: Circuit) -> np.ndarray:
 
 noisy_executor = Executor(noisy_execute)
 ```
+
+```{code-cell} ipython3
+
+```

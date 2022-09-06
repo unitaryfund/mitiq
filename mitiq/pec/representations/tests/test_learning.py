@@ -160,12 +160,8 @@ def test_learn_biased_noise_parameters(epsilon, eta, operations):
             noisy_circ.append(op)
             if isinstance(op.gate, type(operations[2])):
                 qubits = op.qubits
-                noisy_circ.append(
-                    biased_noise_channel(epsilon, eta)(qubits[0])
-                )
-                noisy_circ.append(
-                    biased_noise_channel(epsilon, eta)(qubits[1])
-                )
+                for q in qubits:
+                    noisy_circ.append(biased_noise_channel(epsilon, eta)(q))
         return ideal_execute(noisy_circ)
 
     noisy_executor = Executor(noisy_execute)
