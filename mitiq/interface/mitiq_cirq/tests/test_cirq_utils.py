@@ -22,7 +22,7 @@ from mitiq.interface.mitiq_cirq import (
     compute_density_matrix,
     execute_with_depolarizing_noise,
 )
-from mitiq.rem.measurement_result import MeasurementResult
+from mitiq._typing import MeasurementResult
 
 
 def test_sample_bitstrings():

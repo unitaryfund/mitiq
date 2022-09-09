@@ -14,8 +14,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Quantum computer input/output.
-from mitiq._typing import SUPPORTED_PROGRAM_TYPES, QPROGRAM, QuantumResult
-from mitiq.rem.measurement_result import MeasurementResult
+from mitiq._typing import (
+    SUPPORTED_PROGRAM_TYPES,
+    QPROGRAM,
+    MeasurementResult,
+    QuantumResult,
+)
 
 # Executors and observables.
 from mitiq.executor import Executor

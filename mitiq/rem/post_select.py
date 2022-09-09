@@ -15,7 +15,7 @@
 
 from typing import Callable
 
-from mitiq.rem.measurement_result import Bitstring, MeasurementResult
+from mitiq._typing import Bitstring, MeasurementResult
 
 
 def post_select(
