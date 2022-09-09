@@ -47,6 +47,7 @@ def generate_training_circuits(
     In the Clifford Data Regression (CDR) method
     :cite:`Czarnik_2021_Quantum`, data generated from these circuits is used
     as a training set to learn the effect of noise.
+
     Args:
         circuit: A circuit of interest assumed to be compiled into the gate
             set {Rz, sqrt(X), CNOT}, or such that all the non-Clifford gates
@@ -112,6 +113,7 @@ def _map_to_near_clifford(
 ) -> Sequence[cirq.ops.Operation]:
     """Returns the list of non-Clifford operations with some of these replaced
     by Clifford operations.
+
     Args:
         non_clifford_ops: A sequence of non-Clifford operations.
         fraction_non_clifford: The (approximate) fraction of non-Clifford
@@ -166,6 +168,7 @@ def _select(
 ) -> List[int]:
     """Returns indices of non-Clifford operations selected (to be replaced)
     according to some method.
+
     Args:
         non_clifford_ops: Sequence of non-Clifford operations.
         fraction_non_clifford: fraction of non-Clifford gates to change.
@@ -219,6 +222,7 @@ def _replace(
     """Function that takes the non-Clifford angles and replacement and
     selection specifications, returning the projected angles according to a
     specific method.
+
     Args:
         non_clifford_ops: array of non-Clifford angles.
         method: {'uniform', 'gaussian', 'closest'} method to use
@@ -227,9 +231,11 @@ def _replace(
                        of selected non-Clifford gates, only has effect if
                        method_replace = 'gaussian'.
         random_state: Seed for sampling.
+
     Returns:
         rz_non_clifford_replaced: the selected non-Clifford gates replaced by a
                                Clifford according to some method.
+
     Raises:
         Exception: If argument 'method_replace' is not either 'closest',
         'uniform' or 'gaussian'.
