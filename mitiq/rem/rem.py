@@ -23,10 +23,9 @@ import numpy as np
 from cirq.sim import sample_state_vector as sample_prob_dist
 from cirq.qis.states import to_valid_state_vector as to_prob_dist
 
-from .._typing import QPROGRAM
-from ..executor.executor import Executor
-from ..measurement.measurement_result import MeasurementResult
-from ..observable.observable import Observable
+from mitiq._typing import QPROGRAM, MeasurementResult
+from mitiq.executor.executor import Executor
+from mitiq.observable.observable import Observable
 
 MatrixLike = Union[
     np.ndarray,

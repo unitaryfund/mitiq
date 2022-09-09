@@ -38,7 +38,7 @@ from cirq.value import big_endian_int_to_bits
 
 from mitiq import QPROGRAM
 from mitiq.interface import convert_from_mitiq
-from mitiq.measurement.measurement_result import Bitstring
+from mitiq.executor.measurement_result import Bitstring
 
 
 def generate_quantum_volume_circuit(

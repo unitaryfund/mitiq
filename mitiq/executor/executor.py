@@ -35,7 +35,7 @@ import numpy as np
 from mitiq import QPROGRAM, QuantumResult
 
 from mitiq.observable.observable import Observable
-from mitiq.measurement.measurement_result import MeasurementResult
+from mitiq._typing import MeasurementResult
 from mitiq.interface import convert_from_mitiq, convert_to_mitiq
 
 

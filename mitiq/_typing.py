@@ -23,12 +23,12 @@
        a quantum program from which expectation values to be mitigated can be
        computed. Note this includes expectation values themselves.
 """
-from typing import Union
+from dataclasses import dataclass
+from typing import cast, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 
 from cirq import Circuit as _Circuit
-from mitiq.measurement.measurement_result import MeasurementResult
 
 
 # Supported quantum programs.
@@ -64,6 +64,61 @@ except ImportError:  # pragma: no cover
 
 # Supported + installed quantum programs.
 QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit, _BKCircuit, _QuantumTape]
+
+
+# Define MeasurementResult, a result obtained by measuring qubits on a quantum
+# computer.
+Bitstring = List[int]
+
+
+@dataclass
+class MeasurementResult:
+    """Bitstrings sampled from a quantum computer."""
+
+    result: List[Bitstring]
+    qubit_indices: Optional[Tuple[int, ...]] = None
+
+    def __post_init__(self) -> None:
+        if not set(b for bits in self.result for b in bits).issubset({0, 1}):
+            raise ValueError(
+                "MeasurementResult contains elements which are not (0, 1)."
+            )
+
+        self._bitstrings = np.array(self.result)
+        if isinstance(self.result, np.ndarray):
+            self.result = cast(List[Bitstring], self.result.tolist())
+
+        if not self.qubit_indices:
+            self.qubit_indices = tuple(range(self.nqubits))
+        else:
+            if len(self.qubit_indices) != self.nqubits:
+                raise ValueError(
+                    f"MeasurementResult has {self.nqubits} qubit(s) but there "
+                    f"are {len(self.qubit_indices)} `qubit_indices`."
+                )
+        self._measurements = dict(zip(self.qubit_indices, self._bitstrings.T))
+
+    @property
+    def shots(self) -> int:
+        return self._bitstrings.shape[0]
+
+    @property
+    def nqubits(self) -> int:
+        return (
+            self._bitstrings.shape[1]
+            if len(self._bitstrings.shape) >= 2
+            else 0
+        )
+
+    @property
+    def asarray(self) -> np.ndarray:
+        return self._bitstrings
+
+    def __getitem__(self, indices: List[int]) -> np.ndarray:
+        return np.array([self._measurements[i] for i in indices]).T
+
+    def __iter__(self) -> Iterable[Bitstring]:
+        yield from self.result
 
 
 # An `executor` function inputs a quantum program and outputs an object from

@@ -18,7 +18,7 @@ from typing import Tuple, Union, Iterable, List, Sequence
 
 import numpy as np
 import cirq
-from mitiq.measurement.measurement_result import MeasurementResult
+from mitiq._typing import MeasurementResult
 
 from cirq.experiments.single_qubit_readout_calibration_test import (
     NoisySingleQubitReadoutSampler,

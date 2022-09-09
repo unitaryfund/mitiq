@@ -22,8 +22,8 @@ import numpy as np
 import cirq
 import pyquil
 
+from mitiq._typing import MeasurementResult
 from mitiq.executor.executor import Executor
-from mitiq.measurement.measurement_result import MeasurementResult
 from mitiq.observable import Observable, PauliString
 from mitiq.interface.mitiq_cirq import (
     compute_density_matrix,

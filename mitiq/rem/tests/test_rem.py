@@ -26,7 +26,7 @@ from mitiq.interface.mitiq_cirq.cirq_utils import (
 )
 from mitiq.observable.observable import Observable
 from mitiq.observable.pauli import PauliString
-from mitiq.measurement.measurement_result import MeasurementResult
+from mitiq._typing import MeasurementResult
 from mitiq.rem.rem import execute_with_rem, mitigate_executor, rem_decorator
 from mitiq.raw import execute as raw_execute
 from mitiq.interface.mitiq_cirq import sample_bitstrings
