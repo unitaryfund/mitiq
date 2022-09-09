@@ -174,7 +174,7 @@ Readout Error Mitigation
 
 Measurement Result
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. automodule:: mitiq._typing.measurement_result
+.. autoclass:: MeasurementResult
    :members:
 
 Post-selection
