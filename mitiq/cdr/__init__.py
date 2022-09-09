@@ -27,9 +27,8 @@ from mitiq.cdr.data_regression import (
     linear_fit_function,
     linear_fit_function_no_intercept,
 )
-from mitiq.cdr.clifford_training_data import (
-    count_non_cliffords,
+from mitiq.cdr.clifford_utils import (
     is_clifford,
-    generate_training_circuits,
+    count_non_cliffords,
 )
 from mitiq.cdr.cdr import execute_with_cdr, mitigate_executor, cdr_decorator

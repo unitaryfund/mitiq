@@ -218,6 +218,30 @@ def atomic_one_to_many_converter(
     return qprogram_modifier
 
 
+def class_atomic_one_to_many_converter(
+    cirq_circuit_modifier: Callable[..., Iterable[Circuit]]
+) -> Callable[..., Iterable[QPROGRAM]]:
+    @wraps(cirq_circuit_modifier)
+    def class_qprogram_modifier(
+        self, circuit: QPROGRAM, *args: Any, **kwargs: Any
+    ) -> Iterable[QPROGRAM]:
+        mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
+
+        modified_circuits: Iterable[Circuit] = cirq_circuit_modifier(
+            self, mitiq_circuit, *args, **kwargs
+        )
+
+        if kwargs.get("return_mitiq") is True:
+            return modified_circuits
+
+        return [
+            convert_from_mitiq(modified_circuit, input_circuit_type)
+            for modified_circuit in modified_circuits
+        ]
+
+    return class_qprogram_modifier
+
+
 def noise_scaling_converter(
     noise_scaling_function: Callable[..., Any]
 ) -> Callable[..., Any]:

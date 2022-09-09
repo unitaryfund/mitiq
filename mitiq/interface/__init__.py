@@ -17,6 +17,7 @@ from mitiq.interface.conversions import (
     accept_any_qprogram_as_input,
     atomic_converter,
     atomic_one_to_many_converter,
+    class_atomic_one_to_many_converter,
     convert_from_mitiq,
     convert_to_mitiq,
     noise_scaling_converter,

@@ -31,7 +31,7 @@ from cirq import (
 )
 from mitiq import Executor, Observable, PauliString
 from mitiq.interface.mitiq_cirq import compute_density_matrix
-from mitiq.cdr import generate_training_circuits
+from mitiq.cdr.random_circuit_generator import RandomCircuitGenerator
 from mitiq.cdr._testing import random_x_z_cnot_circuit
 from mitiq.pec.representations.learning import _biased_noise_loss_function
 
@@ -44,12 +44,15 @@ pec_kwargs = {"num_samples": 100}
 
 observable = Observable(PauliString("XZ"), PauliString("YY"))
 
-training_circuits = generate_training_circuits(
-    circuit=circuit,
-    num_training_circuits=3,
+
+random_circuit_generator = RandomCircuitGenerator(
     fraction_non_clifford=0,
     method_select="uniform",
     method_replace="closest",
+)
+training_circuits = random_circuit_generator.generate_circuits(
+    circuit=circuit,
+    num_training_circuits=3,
 )
 
 CNOT_ops = list(circuit.findall_operations_with_gate_type(CXPowGate))
