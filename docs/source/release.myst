@@ -143,24 +143,3 @@ following release, meaning that if `vX.Y.Z` was just released, then
 there should be a section for `vX.(Y+1).Z` that is marked \"In
 Development\". Also, change the version in the `VERSION.txt` file from
 `vX.Y.Z` to `vX.(Y+1).0dev`.
-
-# Releasing a version patch
-
-The steps for the patch should be basically identical to a release,
-however, the commits for the patch should be pushed/cherry-picked onto a
-branch that starts from the tag of the version it is patching. So if you
-had just made the 3.14.0 release (which would have a tag on `master`)
-then you would want to make a branch from that tag called v3.14.0 and
-then cherry-pick the commits you need for the patch to that branch. Once
-the state of that branch reflects the changes you need including
-updating the change log and version number, tag the branch with the
-appropriate version tag and then review the auto-generated GitHub
-release.
-
-Now, there is history that is on this patch branch that is not on
-`master`, so it is up to the maintainers to make sure that history is
-merged back into `master`. This could be done by simply merging the
-branch back into `master`, and then resolving any conflicts. Maybe the
-changes are only relevant for that version and are superseded by the
-next version, so only merging the changes in the change log are all that
-are needed to be merged back.
