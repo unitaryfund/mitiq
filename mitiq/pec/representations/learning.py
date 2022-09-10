@@ -32,10 +32,9 @@ def learn_biased_noise_parameters(
     ideal_executor: Executor,
     noisy_executor: Executor,
     pec_kwargs: Dict["str", Any],
-    num_training_circuits: int = 10,
-    fraction_non_clifford: float = 0.5,
-    epsilon0: float = 0,
-    eta0: float = 1,
+    num_training_circuits: int = 5,
+    fraction_non_clifford: float = 0.2,
+    epsilon0: float = 0.05,
     observable: Optional[Observable] = None,
     **minimize_kwargs: Dict["str", Any],
 ) -> Tuple[float, float, bool]:
@@ -43,8 +42,7 @@ def learn_biased_noise_parameters(
     operations.The learning process is based on the execution of a set of
     training circuits on a noisy backend and on a classical simulator. The
     training circuits are near-Clifford approximations of the input circuit.
-    A biased nose model characterized by two parameters (epsilon and eta)
-    is assumed.
+    A depolarizing noise model characterized is assumed.
 
     Args:
         operations_to_learn: The ideal operations to learn the noise model of.
@@ -56,14 +54,14 @@ def learn_biased_noise_parameters(
         num_training_circuits: Number of near-Clifford circuits to be
             generated for training.
         epsilon0: Initial guess for noise strength.
-        eta0: Initial guess for noise bias.
         observable (optional): Observable to compute the expectation value of.
             If None, the `executor` must return an expectation value. Otherwise
             the `QuantumResult` returned by `executor` is used to compute the
             expectation of the observable.
 
     Returns:
-        Optimized noise strength epsilon and noise bias eta.
+        A flag indicating whether or not the optimizer exited successfully and
+        the optimized noise strength epsilon.
     """
     random_state = np.random.RandomState(1)
     training_circuits = generate_training_circuits(
@@ -77,12 +75,28 @@ def learn_biased_noise_parameters(
         [ideal_executor.evaluate(t, observable) for t in training_circuits]
     )
 
-    x0 = np.array(
-        [epsilon0, eta0]
-    )  # initial parameter values for optimization
+    def depolarizing_noise_loss_function(
+        epsilon,
+        operations_to_mitigate,
+        training_circuits,
+        ideal_values,
+        noisy_executor,
+        pec_kwargs,
+        observable,
+    ):
+        return biased_noise_loss_function(
+            [epsilon[0], 0],
+            operations_to_mitigate,
+            training_circuits,
+            ideal_values,
+            noisy_executor,
+            pec_kwargs,
+            observable,
+        )
+
     result = minimize(
-        biased_noise_loss_function,
-        x0,
+        depolarizing_noise_loss_function,
+        epsilon0,
         args=(
             operations_to_learn,
             training_circuits,
@@ -95,10 +109,10 @@ def learn_biased_noise_parameters(
         **minimize_kwargs,
     )
     x_result = result.x
-    epsilon_opt = cast(float, x_result[0])
-    eta_opt = cast(float, x_result[1])
     success = cast(bool, result.success)
-    return epsilon_opt, eta_opt, success
+    epsilon_opt = cast(float, x_result[0])
+
+    return success, epsilon_opt
 
 
 def biased_noise_loss_function(

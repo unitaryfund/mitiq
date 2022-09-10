@@ -146,12 +146,13 @@ def test_biased_noise_loss_compare_ideal(operations):
     assert np.isclose(loss, 0)
 
 
-@pytest.mark.parametrize("epsilon", [0, 0.01, 0.05])
-@pytest.mark.parametrize("eta", [0, 1, 10])
-@pytest.mark.parametrize("operations", [CNOT_ops[0], Rx_ops[0], Rz_ops[0]])
-def test_learn_biased_noise_parameters(epsilon, eta, operations):
+@pytest.mark.parametrize("epsilon", [0, 0.05, 0.1])
+@pytest.mark.parametrize("operations", [CNOT_ops[0]])
+def test_learn_biased_noise_parameters(epsilon, operations):
     """Test the learning function with initial noise strength and noise bias
     with a small offset from the simulated noise model values"""
+
+    eta = 0
 
     def noisy_execute(circ: Circuit) -> np.ndarray:
         noisy_circ = circ.copy()[0:0]
@@ -170,15 +171,11 @@ def test_learn_biased_noise_parameters(epsilon, eta, operations):
         epsilon0 = 0.1 * offset
     else:
         epsilon0 = (1 + offset) * epsilon
-    if eta == 0:
-        eta0 = 0.1 * offset
-    else:
-        eta0 = (1 + offset) * eta
 
     operations_to_learn = [Circuit(operations[1])]
 
     pec_kwargs_learning = {"num_samples": 5000, "random_state": 1}
-    [epsilon_opt, eta_opt, success] = learn_biased_noise_parameters(
+    [success, epsilon_opt] = learn_biased_noise_parameters(
         operations_to_learn=operations_to_learn,
         circuit=circuit,
         ideal_executor=ideal_executor,
@@ -187,12 +184,10 @@ def test_learn_biased_noise_parameters(epsilon, eta, operations):
         num_training_circuits=5,
         fraction_non_clifford=0.2,
         epsilon0=epsilon0,
-        eta0=eta0,
         observable=observable,
     )
     assert success
     assert abs(epsilon_opt - epsilon) < abs(epsilon0 - epsilon)
-    assert abs(eta_opt - eta) < abs(eta0 - eta)
 
 
 @pytest.mark.parametrize(
@@ -207,7 +202,6 @@ def test_learn_biased_noise_parameters_qiskit(operations):
     """Test the learning function with initial noise strength and noise bias
     with a small offset from the simulated noise model values"""
     epsilon = 0.05
-    eta = 0
 
     def ideal_execute_qiskit(circ: qiskit.QuantumCircuit) -> float:
         noise_model = qiskit_utils.initialized_depolarizing_noise(0.0)
@@ -227,7 +221,7 @@ def test_learn_biased_noise_parameters_qiskit(operations):
     offset = 0.01
 
     qiskit_circuit = to_qiskit(circuit)
-    [_, _, success] = learn_biased_noise_parameters(
+    [success, _] = learn_biased_noise_parameters(
         operations_to_learn=operations,
         circuit=qiskit_circuit,
         ideal_executor=ideal_executor_qiskit,
@@ -236,6 +230,5 @@ def test_learn_biased_noise_parameters_qiskit(operations):
         num_training_circuits=5,
         fraction_non_clifford=0.2,
         epsilon0=(1 + offset) * epsilon,
-        eta0=(1 + offset) * eta,
     )
     assert success
