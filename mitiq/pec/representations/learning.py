@@ -37,7 +37,7 @@ def learn_biased_noise_parameters(
     epsilon0: float = 0.05,
     observable: Optional[Observable] = None,
     **minimize_kwargs: Dict["str", Any],
-) -> Tuple[float, float, bool]:
+) -> Tuple[bool, float]:
     r"""This function learns optimal noise parameters for a set of input
     operations.The learning process is based on the execution of a set of
     training circuits on a noisy backend and on a classical simulator. The
@@ -76,16 +76,16 @@ def learn_biased_noise_parameters(
     )
 
     def depolarizing_noise_loss_function(
-        epsilon,
-        operations_to_mitigate,
-        training_circuits,
-        ideal_values,
-        noisy_executor,
-        pec_kwargs,
-        observable,
-    ):
+        epsilon: List[int],
+        operations_to_mitigate: List[QPROGRAM],
+        training_circuits: List[QPROGRAM],
+        ideal_values: np.ndarray,
+        noisy_executor: Executor,
+        pec_kwargs: Dict["str", Any],
+        observable: Optional[Observable] = None,
+    ) -> float:
         return biased_noise_loss_function(
-            [epsilon[0], 0],
+            np.array([epsilon[0], 0]),
             operations_to_mitigate,
             training_circuits,
             ideal_values,
