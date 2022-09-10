@@ -223,7 +223,7 @@ def class_atomic_one_to_many_converter(
 ) -> Callable[..., Iterable[QPROGRAM]]:
     @wraps(cirq_circuit_modifier)
     def class_qprogram_modifier(
-        self, circuit: QPROGRAM, *args: Any, **kwargs: Any
+        self: object, circuit: QPROGRAM, *args: Any, **kwargs: Any
     ) -> Iterable[QPROGRAM]:
         mitiq_circuit, input_circuit_type = convert_to_mitiq(circuit)
 
