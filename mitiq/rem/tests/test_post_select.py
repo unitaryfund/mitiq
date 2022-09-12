@@ -16,7 +16,8 @@
 """Unit tests for post-selection of measurement results."""
 import pytest
 
-from mitiq.rem import post_select, MeasurementResult
+from mitiq.rem import post_select
+from mitiq._typing import MeasurementResult
 
 
 def test_post_select():

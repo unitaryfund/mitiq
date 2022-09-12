@@ -25,7 +25,7 @@ import cirq
 from cirq.experiments.qubit_characterizations import _single_qubit_cliffords
 from mitiq.interface import convert_from_mitiq
 from mitiq import QPROGRAM
-from mitiq.rem.measurement_result import Bitstring
+from mitiq._typing import Bitstring
 
 
 single_q_cliffords = _single_qubit_cliffords()
