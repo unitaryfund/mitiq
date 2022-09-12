@@ -355,17 +355,6 @@
         "infra",
         "code"
       ]
-    },
-    {
-      "login": "amirebrahimi",
-      "name": "Amir Ebrahimi",
-      "avatar_url": "https://avatars.githubusercontent.com/u/904110?v=4",
-      "profile": "https://github.com/amirebrahimi/",
-      "contributions": [
-        "doc",
-        "test",
-        "code"
-      ]
     }
   ],
   "contributorsPerLine": 7,
