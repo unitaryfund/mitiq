@@ -167,7 +167,7 @@ def test_learn_biased_noise_parameters(epsilon, operations):
         return ideal_execute(noisy_circ)
 
     noisy_executor = Executor(noisy_execute)
-    offset = 0.1
+    offset = 0.01
     if epsilon == 0:
         epsilon0 = 0.1 * offset
     else:
