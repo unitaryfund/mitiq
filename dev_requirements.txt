@@ -23,6 +23,7 @@ sphinx-gallery==0.10.1
 nbsphinx
 openfermion==1.5.1; sys_platform != 'win32'
 openfermionpyscf==0.5; sys_platform != 'win32'
+bqskit==0.3.0
 
 # The following seems to be necessary for sphinx to run.
 jinja2~=3.0.3
