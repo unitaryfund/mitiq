@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Cirq utility functions."""
 
-from typing import Tuple, Union, Iterable, List, Sequence
+from typing import Tuple, Sequence
 
 import numpy as np
 import cirq
@@ -23,14 +23,6 @@ from mitiq._typing import MeasurementResult
 from cirq.experiments.single_qubit_readout_calibration_test import (
     NoisySingleQubitReadoutSampler,
 )
-
-MatrixLike = Union[
-    np.ndarray,
-    Iterable[np.ndarray],
-    List[np.ndarray],
-    Sequence[np.ndarray],
-    Tuple[np.ndarray],
-]
 
 
 # Executors.
@@ -118,7 +110,7 @@ def generate_inverse_confusion_matrix(
     qubits: Sequence["cirq.Qid"],
     p0: float = 0.01,
     p1: float = 0.01,
-) -> MatrixLike:
+) -> np.ndarray:
     """
     Generates the inverse confusion matrix assuming a single-qubit
     model for measurement errors. This is useful for applying

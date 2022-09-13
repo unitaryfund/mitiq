@@ -20,6 +20,7 @@ from cirq.experiments.single_qubit_readout_calibration_test import (
     NoisySingleQubitReadoutSampler,
 )
 import numpy as np
+import pytest
 
 from mitiq.interface.mitiq_cirq.cirq_utils import (
     generate_inverse_confusion_matrix,
@@ -69,12 +70,14 @@ def test_rem_with_matrix():
     unmitigated = raw_execute(circ, noisy_executor, observable)
     assert np.isclose(unmitigated, 2.0)
 
-    inverse_confusion_matrix = [
-        [0, 0, 0, 1],
-        [0, 0, 1, 0],
-        [0, 1, 0, 0],
-        [1, 0, 0, 0],
-    ]
+    inverse_confusion_matrix = np.array(
+        [
+            [0, 0, 0, 1],
+            [0, 0, 1, 0],
+            [0, 1, 0, 0],
+            [1, 0, 0, 0],
+        ]
+    )
 
     mitigated = execute_with_rem(
         circ,
@@ -83,6 +86,13 @@ def test_rem_with_matrix():
         observable=observable,
     )
     assert np.isclose(mitigated, -2.0)
+
+
+def test_rem_with_invalid_matrix():
+    executor = partial(sample_bitstrings, noise_level=(0,))
+    identity = np.identity(2)
+    with pytest.raises(AssertionError):
+        execute_with_rem(circ, executor, identity, observable=observable)
 
 
 def test_doc_is_preserved():
@@ -113,12 +123,14 @@ def test_mitigate_executor():
     p1 = 1
     noisy_executor = partial(noisy_readout_executor, p0=p0, p1=p1)
 
-    inverse_confusion_matrix = [
-        [0, 0, 0, 1],
-        [0, 0, 1, 0],
-        [0, 1, 0, 0],
-        [1, 0, 0, 0],
-    ]
+    inverse_confusion_matrix = np.array(
+        [
+            [0, 0, 0, 1],
+            [0, 0, 1, 0],
+            [0, 1, 0, 0],
+            [1, 0, 0, 0],
+        ]
+    )
 
     base = raw_execute(circ, noisy_executor, observable)
 
@@ -154,12 +166,3 @@ def test_rem_decorator():
 
     rem_value = noisy_readout_decorated_executor(circ)
     assert abs(true_rem_value - rem_value) < abs(true_rem_value - base)
-
-
-if __name__ == "__main__":
-    # test_rem_identity()
-    # test_rem_without_matrix()
-    # test_rem_with_matrix()
-    # test_doc_is_preserved()
-    # test_mitigate_executor()
-    test_rem_decorator()

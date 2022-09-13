@@ -15,30 +15,44 @@
 
 """Readout Confusion Inversion."""
 
-from typing import Callable, Iterable, List, Optional, Sequence, Tuple, Union
+from typing import Callable, Optional, Union
 
-from functools import partial, wraps
+from functools import wraps
 import numpy as np
-
-from cirq.sim import sample_state_vector as sample_prob_dist
-from cirq.qis.states import to_valid_state_vector as to_prob_dist
 
 from mitiq._typing import QPROGRAM, MeasurementResult
 from mitiq.executor.executor import Executor
 from mitiq.observable.observable import Observable
 
-MatrixLike = Union[
-    np.ndarray,
-    Iterable[np.ndarray],
-    List[np.ndarray],
-    Sequence[np.ndarray],
-    Tuple[np.ndarray],
-]
+
+def to_probability_vector(measurement: np.ndarray) -> np.ndarray:
+    """Convert a raw measurement to a probability vector.
+
+    Args:
+        measurement: A single measurement.
+    """
+    index = int("".join([str(m) for m in measurement]))
+    pv = np.zeros((2 ** measurement.shape[0]), dtype=np.uint8)
+    pv[index] = 1
+    return pv
+
+
+def sample_probability_vector(probability_vector: np.ndarray) -> np.ndarray:
+    """Sample a probability vector and return a raw measurement.
+
+    Args:
+        probability_vector: A probability vector.
+    """
+    result = np.random.choice(
+        len(probability_vector), size=1, p=probability_vector
+    )[0]
+    value = [int(i) for i in bin(result)[2:]]
+    return np.array(value, dtype=np.uint8)
 
 
 def mitigate_measurements(
     noisy_result: MeasurementResult,
-    inverse_confusion_matrix: MatrixLike,
+    inverse_confusion_matrix: np.ndarray,
 ) -> MeasurementResult:
     """Applies the inverse confusion matrix against the noisy measurement
     result and returns the adjusted measurements.
@@ -49,23 +63,18 @@ def mitigate_measurements(
             probability vector estimated with noisy measurement results.
     """
     assert noisy_result.qubit_indices is not None
-    measurement_to_prob_dist = partial(
-        to_prob_dist, num_qubits=len(noisy_result.qubit_indices)
-    )
+    num_qubits = len(noisy_result.qubit_indices)
+    assert inverse_confusion_matrix.shape == (2**num_qubits, 2**num_qubits)
 
     empirical_prob_dist = np.apply_along_axis(
-        measurement_to_prob_dist, 1, noisy_result.asarray
+        to_probability_vector, 1, noisy_result.asarray
     )
 
     adjusted_prob_dist = (inverse_confusion_matrix @ empirical_prob_dist.T).T
 
-    prob_dist_to_measurement = partial(
-        sample_prob_dist, indices=noisy_result.qubit_indices
-    )
-
     adjusted_result = np.apply_along_axis(
-        prob_dist_to_measurement, 1, adjusted_prob_dist
-    ).squeeze()
+        sample_probability_vector, 1, adjusted_prob_dist
+    )
 
     result = MeasurementResult(adjusted_result, noisy_result.qubit_indices)
     return result
@@ -74,7 +83,7 @@ def mitigate_measurements(
 def execute_with_rem(
     circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], MeasurementResult]],
-    inverse_confusion_matrix: MatrixLike,
+    inverse_confusion_matrix: np.ndarray,
     *,
     observable: Optional[Observable] = None,
 ) -> float:
@@ -104,7 +113,7 @@ def execute_with_rem(
 
 def mitigate_executor(
     executor: Callable[[QPROGRAM], MeasurementResult],
-    inverse_confusion_matrix: MatrixLike,
+    inverse_confusion_matrix: np.ndarray,
     *,
     observable: Optional[Observable] = None,
 ) -> Callable[[QPROGRAM], float]:
@@ -135,7 +144,7 @@ def mitigate_executor(
 
 
 def rem_decorator(
-    inverse_confusion_matrix: MatrixLike,
+    inverse_confusion_matrix: np.ndarray,
     *,
     observable: Optional[Observable] = None,
 ) -> Callable[
