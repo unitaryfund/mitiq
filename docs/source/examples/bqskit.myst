@@ -30,12 +30,12 @@ The main steps taken in this tutorial are:
 To begin we import many of the required functions.
 
 ```{code-cell} ipython3
-import mitiq
 import bqskit
+import mitiq
 
 import cirq
-from cirq.contrib.qasm_import import circuit_from_qasm
 import numpy as np
+from cirq.contrib.qasm_import import circuit_from_qasm
 ```
 
 ## Random circuit generation
@@ -49,7 +49,9 @@ depth = 10
 density = 1
 RANDOM_SEED = 479
 
-random_circuit = cirq.testing.random_circuit(num_qubits, depth, density, random_state=RANDOM_SEED)
+random_circuit = cirq.testing.random_circuit(
+    num_qubits, depth, density, random_state=RANDOM_SEED
+)
 ```
 
 ```{code-cell} ipython3
@@ -61,8 +63,8 @@ Here we must remove the `// Generated from Cirq v1.0.0` comment at the beginning
 
 ```{code-cell} ipython3
 qasm_code = cirq.qasm(random_circuit)
-with open('tmp.qasm', 'w') as f:
-    f.write(qasm_code[31:]) # remove google prefix
+with open("tmp.qasm", "w") as f:
+    f.write(qasm_code[31:])  # remove google prefix
 ```
 
 ## Compilation
@@ -71,7 +73,7 @@ The temporary file can then be read in by `bqskit`, and compiled.
 By default `bqskit` attempts to reduce the circuit depth as its primary optimization, and compiles into the following gateset: $\{\mathsf{U3}, \mathsf{CNOT}, \sqrt{X}, R_Z\}$.
 
 ```{code-cell} ipython3
-bqs_circuit = bqskit.ir.Circuit.from_file('tmp.qasm')
+bqs_circuit = bqskit.ir.Circuit.from_file("tmp.qasm")
 task = bqskit.compiler.CompilationTask.optimize(bqs_circuit)
 
 with bqskit.compiler.Compiler() as compiler:
@@ -81,11 +83,11 @@ with bqskit.compiler.Compiler() as compiler:
 Since `bqskit` uses a custom intermediate representation, we need to now convert this circuit to a form we can use for futher processing, and error mitigation. This can be done easily by writing the circuit back to QASM, which `cirq` can then read in.
 
 ```{code-cell} ipython3
-compiled_bqs_circuit.save('out.qasm')
+compiled_bqs_circuit.save("out.qasm")
 
-with open('out.qasm') as f:
+with open("out.qasm") as f:
     qasm_out = f.read()
-    
+
 compiled_circuit = circuit_from_qasm(qasm_out)
 ```
 
@@ -102,9 +104,15 @@ def execute(circuit, noise_level=0.05):
     for op in circuit.all_operations():
         noisy_circuit.append(op)
         if len(op.qubits) == 2:
-            noisy_circuit.append(cirq.depolarize(p=noise_level, n_qubits=2)(*op.qubits))
-    
-    rho = cirq.DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix
+            noisy_circuit.append(
+                cirq.depolarize(p=noise_level, n_qubits=2)(*op.qubits)
+            )
+
+    rho = (
+        cirq.DensityMatrixSimulator()
+        .simulate(noisy_circuit)
+        .final_density_matrix
+    )
     return rho[0, 0].real
 ```
 
@@ -138,17 +146,25 @@ int_entry = "{:<11}  {:<15} {:<10}"
 print(header.format("", "uncompiled", "compiled"))
 print(entry.format("ideal", uncompiled_ideal_value, compiled_ideal_value))
 print(entry.format("noisy", uncompiled_noisy_value, compiled_noisy_value))
-print(entry.format("mitigated", uncompiled_mitigated_result, compiled_mitigated_result))
-print(entry.format(
-    "error",
-    abs(uncompiled_ideal_value - uncompiled_mitigated_result),
-    abs(compiled_ideal_value - compiled_mitigated_result),
-))
-print(int_entry.format(
-    "depth",
-    len(random_circuit),
-    len(compiled_circuit),
-))
+print(
+    entry.format(
+        "mitigated", uncompiled_mitigated_result, compiled_mitigated_result
+    )
+)
+print(
+    entry.format(
+        "error",
+        abs(uncompiled_ideal_value - uncompiled_mitigated_result),
+        abs(compiled_ideal_value - compiled_mitigated_result),
+    )
+)
+print(
+    int_entry.format(
+        "depth",
+        len(random_circuit),
+        len(compiled_circuit),
+    )
+)
 ```
 
 Hence for this particular random circuit we see that using both compilation _and_ error mitigation combine for the most accurate result.
@@ -179,24 +195,24 @@ depths = []
 for i in tqdm(range(num_circuits)):
     random_circuit = cirq.testing.random_circuit(num_qubits, depth, 1)
     qasm_code = cirq.qasm(random_circuit)
-    with open(f'tmp{i}.qasm', 'w') as f:
+    with open(f"tmp{i}.qasm", "w") as f:
         f.write(qasm_code[31:])
-        
-    bqs_circuit = bqskit.ir.Circuit.from_file(f'tmp{i}.qasm')
+
+    bqs_circuit = bqskit.ir.Circuit.from_file(f"tmp{i}.qasm")
     task = bqskit.compiler.CompilationTask.optimize(bqs_circuit)
     with bqskit.compiler.Compiler() as compiler:
         optimized_circuit = compiler.compile(task)
 
-    optimized_circuit.save(f'out{i}.qasm')
-    with open(f'out{i}.qasm') as f:
+    optimized_circuit.save(f"out{i}.qasm")
+    with open(f"out{i}.qasm") as f:
         qasm_out = f.read()
     compiled_circuit = circuit_from_qasm(qasm_out)
-    
+
     depths.append((len(random_circuit), len(compiled_circuit)))
-    
+
     ideal_uncompiled.append(execute(random_circuit, noise_level=0.0))
     ideal_compiled.append(execute(compiled_circuit, noise_level=0.0))
-    
+
     unmitigated_uncompiled.append(execute(random_circuit))
     unmitigated_compiled.append(execute(compiled_circuit))
 
@@ -216,7 +232,13 @@ To see how compilation, and mitigation effect the overall accuracy of the measur
 uncompiled_error, compiled_error = [], []
 uncompiled_unmitigated_error, compiled_unmitigated_error = [], []
 
-for ideal, uncompiled, compiled, noisy_uncompiled, noisy_compiled in zip(ideal_uncompiled, mitigated_uncompiled, mitigated_compiled, unmitigated_uncompiled, unmitigated_compiled):
+for ideal, uncompiled, compiled, noisy_uncompiled, noisy_compiled in zip(
+    ideal_uncompiled,
+    mitigated_uncompiled,
+    mitigated_compiled,
+    unmitigated_uncompiled,
+    unmitigated_compiled,
+):
     uncompiled_error.append(abs(ideal - uncompiled))
     compiled_error.append(abs(ideal - compiled))
     uncompiled_unmitigated_error.append(abs(ideal - noisy_uncompiled))
@@ -232,32 +254,44 @@ fig, axs = plt.subplots(1, 2, sharey=True, sharex=True, tight_layout=True)
 bins = np.linspace(0, 0.4, 25)
 
 axs[0].hist(uncompiled_error, bins=bins, label="mitigated", alpha=0.5)
-axs[0].hist(uncompiled_unmitigated_error, bins=bins, label="unmitigated", alpha=0.5)
+axs[0].hist(
+    uncompiled_unmitigated_error, bins=bins, label="unmitigated", alpha=0.5
+)
 
 axs[1].hist(compiled_error, bins=bins, label="mitigated", alpha=0.5)
-axs[1].hist(compiled_unmitigated_error, bins=bins, label="unmitigated", alpha=0.5)
+axs[1].hist(
+    compiled_unmitigated_error, bins=bins, label="unmitigated", alpha=0.5
+)
 
-axs[0].set_xlabel('error')
-axs[1].set_xlabel('error')
-axs[0].set_ylabel('count')
+axs[0].set_xlabel("error")
+axs[1].set_xlabel("error")
+axs[0].set_ylabel("count")
 
 
-axs[0].set_title('Uncompiled')
-axs[1].set_title('Compiled')
+axs[0].set_title("Uncompiled")
+axs[1].set_title("Compiled")
 
 axs[0].legend()
-axs[1].legend();
+axs[1].legend()
 ```
 
 The plot above shows that error mitigation helps in both cases: with uncompiled circuits and with compiled circuits.
 In fact, the mean of both histograms decreases when using error mitigation.
 
 ```{code-cell} ipython3
-round(np.array(compiled_unmitigated_error).mean() - np.array(compiled_error).mean(), 4)
+round(
+    np.array(compiled_unmitigated_error).mean()
+    - np.array(compiled_error).mean(),
+    4,
+)
 ```
 
 ```{code-cell} ipython3
-round(np.array(compiled_unmitigated_error).std() - np.array(compiled_error).std(), 4)
+round(
+    np.array(compiled_unmitigated_error).std()
+    - np.array(compiled_error).std(),
+    4,
+)
 ```
 
 In this tutorial we've seen how one can use error mitigation in conjunction with circuit compilation.
