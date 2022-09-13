@@ -31,7 +31,7 @@ def to_probability_vector(measurement: np.ndarray) -> np.ndarray:
     Args:
         measurement: A single measurement.
     """
-    index = int("".join([str(m) for m in measurement]))
+    index = int("".join([str(m) for m in measurement]), base=2)
     pv = np.zeros((2 ** measurement.shape[0]), dtype=np.uint8)
     pv[index] = 1
     return pv
