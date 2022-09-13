@@ -164,7 +164,7 @@ def rem_decorator(
         The error-mitigating decorator to be applied to an executor function.
     """
     # Raise an error if the decorator is used without parenthesis
-    if callable(observable):
+    if not callable(observable):
         raise TypeError(
             "Decorator must be used with parentheses (i.e., @rem_decorator()) "
             "even if no explicit arguments are passed."

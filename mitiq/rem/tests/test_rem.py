@@ -166,3 +166,14 @@ def test_rem_decorator():
 
     rem_value = noisy_readout_decorated_executor(circ)
     assert abs(true_rem_value - rem_value) < abs(true_rem_value - base)
+
+
+def test_error_rem_decorator():
+    """Tests that the proper error is raised if the decorator is
+    used without parenthesis.
+    """
+    with pytest.raises(TypeError, match="Decorator must be used with paren"):
+
+        @rem_decorator
+        def test_executor(circuit):
+            return 0
