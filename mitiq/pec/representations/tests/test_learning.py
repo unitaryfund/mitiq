@@ -148,7 +148,7 @@ def test_biased_noise_loss_compare_ideal(operations):
 
 
 @pytest.mark.parametrize("epsilon", [0.05, 0.1])
-@pytest.mark.parametrize("operations", [CNOT_ops[0]])
+@pytest.mark.parametrize("operations", [CNOT_ops[0], Rx_ops[0], Rz_ops[0]])
 def test_learn_biased_noise_parameters(epsilon, operations):
     """Test the learning function with initial noise strength and noise bias
     with a small offset from the simulated noise model values"""
@@ -156,22 +156,19 @@ def test_learn_biased_noise_parameters(epsilon, operations):
     eta = 0
 
     def noisy_execute(circ: Circuit) -> np.ndarray:
-        noisy_circ = circ.copy()[0:0]
-
-        for op in circ.all_operations():
-            noisy_circ.append(op)
-            if isinstance(op.gate, type(operations[2])):
-                qubits = op.qubits
-                for q in qubits:
-                    noisy_circ.append(biased_noise_channel(epsilon, eta)(q))
+        noisy_circ = circ.copy()
+        qubits = operations[1].qubits
+        for q in qubits:
+            noisy_circ.insert(
+                operations[0] + 1,
+                biased_noise_channel(epsilon, eta)(q),
+                strategy=InsertStrategy.EARLIEST,
+            )
         return ideal_execute(noisy_circ)
 
     noisy_executor = Executor(noisy_execute)
-    offset = 0.01
-    if epsilon == 0:
-        epsilon0 = 0.1 * offset
-    else:
-        epsilon0 = (1 + offset) * epsilon
+    offset = 0.1
+    epsilon0 = (1 + offset) * epsilon
 
     operations_to_learn = [Circuit(operations[1])]
 
@@ -211,11 +208,8 @@ def test_learn_biased_noise_parameters_rotation(epsilon, operations):
         return ideal_execute(noisy_circ)
 
     noisy_executor = Executor(noisy_execute)
-    offset = 0.1
-    if epsilon == 0:
-        epsilon0 = 0.1 * offset
-    else:
-        epsilon0 = (1 + offset) * epsilon
+    offset = 0.01
+    epsilon0 = (1 + offset) * epsilon
 
     operations_to_learn = [Circuit(operations[1])]
 
