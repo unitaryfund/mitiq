@@ -11,19 +11,22 @@ kernelspec:
   name: python3
 ---
 
-# BQSKit Compilation with Error Mitigation
+# Improving the accuracy of BQSKit compiled circuits with error mitigation
 
-In this tutorial we will describe how to use error mitigation capabilities from [Mitiq](https://mitiq.readthedocs.io/en/stable/), together with the compilation capabilities of [BQSKit](https://bqskit.lbl.gov/).
+In this tutorial we describe how to use error mitigation capabilities from [Mitiq](https://mitiq.readthedocs.io/en/stable/) together with the compilation capabilities of [BQSKit](https://bqskit.lbl.gov/).
 
-Before getting started, run the following install commands to ensure you have the required python packages.
+To get started, ensure you have the requisite python packages by running the following install commands.
 - `pip install mitiq`
-- `pip install bqskit==0.3.0` (here we use an older version of `bqskit` in order to satisfy version requirements between the two packages)
+- `pip install bqskit==0.3.0` (here we use an older version of `bqskit` to satisfy version requirements between the two packages)
 
-The main steps taken in this tutorial are:
-1. Generate a random circuit
-2. Compile it with `bqskit`
-3. Use error mitigation on the compiled circuit
-4. Compare the results obtained with and without error mitigation
+The main goal of this tutorial is to understand how to use `bqskit` together with `mitiq`.
+To do this, we will
+1. generate a random circuit,
+2. compile it with `bqskit`,
+3. use error mitigation on the compiled circuit, and
+4. compare the results obtained with and without error mitigation.
+
+After demonstrating the use of the two packages, we can then try and understand how circuit compilation with BQSKit in general interacts with error mitigation by running the process many times and comparing results.
 
 ---
 
@@ -40,7 +43,7 @@ from cirq.contrib.qasm_import import circuit_from_qasm
 
 ## Random circuit generation
 
-To begin, we use `cirq`'s [`random_circuit`](https://quantumai.google/reference/python/cirq/testing/random_circuit) function to generare a random circuit with specified qubit number, depth and density (which refers to the probability of an operation occuring at a given moment).
+To begin, we use `cirq`'s [`random_circuit`](https://quantumai.google/reference/python/cirq/testing/random_circuit) function to generate a random circuit with specified qubit number, depth and density (which refers to the probability of an operation occurring at a given moment).
 Here we also use a random seed for reproducibility.
 
 ```{code-cell} ipython3
@@ -58,19 +61,22 @@ random_circuit = cirq.testing.random_circuit(
 print(random_circuit)
 ```
 
-We now write the circuit out to QASM for consumption by `bqskit`.
-Here we must remove the `// Generated from Cirq v1.0.0` comment at the beginning of the file to ensure `bqskit` can properly consume the operations described therein.
+Since `bqskit` uses a custom intermediate representation for circuits, we must write the circuit out to QASM for consumption by `bqskit`.
+Here we must remove the comment `// Generated from Cirq v1.0.0` at the beginning of the file to ensure `bqskit` can properly consume the operations described therein.
 
 ```{code-cell} ipython3
 qasm_code = cirq.qasm(random_circuit)
 with open("tmp.qasm", "w") as f:
-    f.write(qasm_code[31:])  # remove google prefix
+    f.write(qasm_code[31:])  # remove cirq prefix
 ```
+
+We now have a file `tmp.qasm` that contains a random circuit, ready for compilation.
 
 ## Compilation
 
-The temporary file can then be read in by `bqskit`, and compiled.
-By default `bqskit` attempts to reduce the circuit depth as its primary optimization, and compiles into the following gateset: $\{\mathsf{U3}, \mathsf{CNOT}, \sqrt{X}, R_Z\}$.
+The random circuit can then be read in by `bqskit`'s [`from_file`](https://bqskit.readthedocs.io/en/latest/source/autogen/bqskit.ir.Circuit.from_file.html) function in preparation for compilation.
+The workflow is then to create a [`CompilationTask`](https://bqskit.readthedocs.io/en/latest/source/autogen/bqskit.compiler.CompilationTask.html) object which completely specifies the mathematical problem of the circuit compilation problem.
+By default `bqskit` attempts to reduce the circuit depth as its primary optimization, and compiles the circuit into the following gateset: $\{\mathsf{U3}, \mathsf{CNOT}, \sqrt{X}, R_Z\}$.
 
 ```{code-cell} ipython3
 bqs_circuit = bqskit.ir.Circuit.from_file("tmp.qasm")
@@ -80,7 +86,8 @@ with bqskit.compiler.Compiler() as compiler:
     compiled_bqs_circuit = compiler.compile(task)
 ```
 
-Since `bqskit` uses a custom intermediate representation, we need to now convert this circuit to a form we can use for futher processing, and error mitigation. This can be done easily by writing the circuit back to QASM, which `cirq` can then read in.
+For further processing, we convert the compiled circuit back into a `cirq.Circuit` object.
+This can be done easily by writing the circuit to QASM, which `cirq` can then read in.
 
 ```{code-cell} ipython3
 compiled_bqs_circuit.save("out.qasm")
@@ -91,12 +98,18 @@ with open("out.qasm") as f:
 compiled_circuit = circuit_from_qasm(qasm_out)
 ```
 
+At this point we have two `cirq` circuits: `random_circuit` and `compiled_circuit`.
+Both represent the same (or very close to the same) unitary operation, but with different gatesets.
+
 ## Error Mitigation
 
 Now that we have a compiled circuit, we are ready to use `mitiq`'s error mitigation capabilities.
-In this tutorial we will use one of the simplest, and easiest to use methods: [Zero Noise Extrapolation](https://mitiq.readthedocs.io/en/stable/guide/zne-1-intro.html) (ZNE), but there are multiple other techniques described in our [user guide](https://mitiq.readthedocs.io/en/stable/guide/guide.html).
+In this tutorial we will use one of the simplest, and easiest to use methods: [Zero Noise Extrapolation](https://mitiq.readthedocs.io/en/stable/guide/zne-1-intro.html) (ZNE), but there are multiple other techniques described in our [user guide](https://mitiq.readthedocs.io/en/stable/guide/guide.html) which could be used as well.
+In this tutorial we assume a simple error model of depolarizing noise on two-qubit gates.
 
-To use this method, we need to define a function which takes as input a circuit, and returns some sort of expectation value, or probability. Here we will define a function `execute` which adds a tunable noise parameter, which controls the strength of our assumed two-qubit depolarizing noise model. Then a density matrix simulation is run, and we measure the probability of observing the system in the ground state(s).
+To use this method, we need to define a function (in `mitiq` this is often referred to as an executor) which takes as input a circuit, and returns some sort of expectation value, or probability.
+Here we will define a function `execute` which adds a tunable noise parameter, which controls the strength of the simulated noise.
+Then, a density matrix simulation is run, and we measure the probability of observing the system in the ground state(s).
 
 ```{code-cell} ipython3
 def execute(circuit, noise_level=0.05):
@@ -116,7 +129,7 @@ def execute(circuit, noise_level=0.05):
     return rho[0, 0].real
 ```
 
-Since we'd like to see how compilation effects error mitigation, we run the `execute` function on both the compiled, and random circuits, both with and without noise.
+Since we'd like to see how compilation effects error mitigation, we first simulate the ideal and noisy values using the simulator defined above.
 
 ```{code-cell} ipython3
 uncompiled_ideal_value = execute(random_circuit, noise_level=0.0)
@@ -126,7 +139,7 @@ compiled_ideal_value = execute(compiled_circuit, noise_level=0.0)
 compiled_noisy_value = execute(compiled_circuit)
 ```
 
-We can now use ZNE --- on both the random, and compiled circuit --- to obtain the mitigated expectation values for these circuits.
+With these values taken, we are now ready to use ZNE --- on both the random, and compiled circuit --- to obtain mitigated expectation values.
 
 ```{code-cell} ipython3
 from mitiq import zne
@@ -135,9 +148,19 @@ uncompiled_mitigated_result = zne.execute_with_zne(random_circuit, execute)
 compiled_mitigated_result = zne.execute_with_zne(compiled_circuit, execute)
 ```
 
+Thus we have four variables which we can compare against ideal values to see how performance varies for this circuit across compilation and mitigation.
+
+|                                | compiled | mitigated |
+| ------------------------------ | -------- | --------- |
+| `uncompiled_noisy_value`       | ❌       | ❌         |
+| `uncompiled_mitigated_result`  | ❌       | ✅         |
+| `compiled_noisy_value`         | ✅       | ❌         |
+| `compiled_mitigated_result`    | ✅       | ✅         |
+
+
 ## Comparison
 
-These data are then summarized in the following output.
+These data are then summarized in the following table printed below.
 
 ```{code-cell} ipython3
 header = "{:<11} {:<15} {:<10}"
@@ -169,16 +192,12 @@ print(
 
 Hence for this particular random circuit we see that using both compilation _and_ error mitigation combine for the most accurate result.
 Note that despite using BQSKit to compile the circuit, the depth has actually increased. 
-This can occsionally happen when the random circuit contains gates that are harder to compile into BQSKit's default gateset.
+This can occasionally happen when the random circuit contains gates that are harder to compile into BQSKit's default gateset.
 
-We can now wrap this code into a loop to get a better understanding of how errors change for the following four combinations of compilation and mitigation:
+## More random circuits
 
-| compiled | mitigated |
-| -------- | --------- |
-| ❌       | ❌         |
-| ❌       | ✅         |
-| ✅       | ❌         |
-| ✅       | ✅         |
+We can now repeat the procedure above with many random circuits to get a better understanding of how these two technologies interact in a more general setting.
+To do this we wrap the previously written code in a for loop and collect the results.
 
 ```{code-cell} ipython3
 from tqdm import tqdm
@@ -223,10 +242,10 @@ for i in tqdm(range(num_circuits)):
 As a sanity check we ensure that the ideal values for the random circuit, and its compiled counterpart are equivalent up to $10^{-7}$.
 
 ```{code-cell} ipython3
-np.allclose(ideal_uncompiled, ideal_compiled, atol=1e-7)
+print(np.allclose(ideal_uncompiled, ideal_compiled, atol=1e-7))
 ```
 
-To see how compilation, and mitigation effect the overall accuracy of the measured observables, we calculate the errors.
+We can then go ahead and calculate the errors as before for all the data at once.
 
 ```{code-cell} ipython3
 uncompiled_error, compiled_error = [], []
@@ -245,7 +264,7 @@ for ideal, uncompiled, compiled, noisy_uncompiled, noisy_compiled in zip(
     compiled_unmitigated_error.append(abs(ideal - noisy_compiled))
 ```
 
-We can now histogram the errors to get a visual representation of the effect of these two operations.
+A histogram of the errors gives a visual representation of the effect and interplay of these two operations.
 
 ```{code-cell} ipython3
 import matplotlib.pyplot as plt
@@ -275,23 +294,22 @@ axs[0].legend()
 axs[1].legend()
 ```
 
-The plot above shows that error mitigation helps in both cases: with uncompiled circuits and with compiled circuits.
-In fact, the mean of both histograms decreases when using error mitigation.
+The histogram shows that error mitigation helps in both cases: with uncompiled and compiled circuits.
+Moreover, the mean of both histograms decreases when using error mitigation.
 
 ```{code-cell} ipython3
-round(
+change_in_mean = (
     np.array(compiled_unmitigated_error).mean()
-    - np.array(compiled_error).mean(),
-    4,
+    - np.array(compiled_error).mean()
 )
-```
-
-```{code-cell} ipython3
-round(
+print(
+    f"Average error decrease when error mitigating compiled circuits: {change_in_mean:.4f}"
+)
+change_in_std = (
     np.array(compiled_unmitigated_error).std()
     - np.array(compiled_error).std(),
-    4,
 )
+print(f"Change in standard deviation: {change_in_std:.4f}")
 ```
 
 In this tutorial we've seen how one can use error mitigation in conjunction with circuit compilation.
