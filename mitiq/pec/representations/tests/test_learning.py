@@ -188,47 +188,6 @@ def test_learn_biased_noise_parameters(epsilon, operations):
     assert abs(epsilon_opt - epsilon) < abs(epsilon0 - epsilon)
 
 
-@pytest.mark.parametrize("epsilon", [0.05, 0.1])
-@pytest.mark.parametrize("operations", [Rx_ops[0], Rz_ops[0]])
-def test_learn_biased_noise_parameters_rotation(epsilon, operations):
-    """Test the learning function with initial noise strength and noise bias
-    with a small offset from the simulated noise model values"""
-
-    eta = 0
-
-    def noisy_execute(circ: Circuit) -> np.ndarray:
-        noisy_circ = circ.copy()
-        qubits = operations[1].qubits
-        for q in qubits:
-            noisy_circ.insert(
-                operations[0],
-                biased_noise_channel(epsilon, eta)(q),
-                strategy=InsertStrategy.EARLIEST,
-            )
-        return ideal_execute(noisy_circ)
-
-    noisy_executor = Executor(noisy_execute)
-    offset = 0.01
-    epsilon0 = (1 + offset) * epsilon
-
-    operations_to_learn = [Circuit(operations[1])]
-
-    pec_kwargs_learning = {"num_samples": 5000, "random_state": 1}
-    [success, epsilon_opt] = learn_biased_noise_parameters(
-        operations_to_learn=operations_to_learn,
-        circuit=circuit,
-        ideal_executor=ideal_executor,
-        noisy_executor=noisy_executor,
-        pec_kwargs=pec_kwargs_learning,
-        num_training_circuits=5,
-        fraction_non_clifford=0.2,
-        epsilon0=epsilon0,
-        observable=observable,
-    )
-    assert success
-    assert abs(epsilon_opt - epsilon) < abs(epsilon0 - epsilon)
-
-
 @pytest.mark.parametrize(
     "operations",
     [
