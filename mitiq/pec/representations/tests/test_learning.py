@@ -30,10 +30,7 @@ from cirq import (
     unitary,
     InsertStrategy,
 )
-import qiskit
 from mitiq import Executor, Observable, PauliString
-from mitiq.interface.mitiq_qiskit import qiskit_utils
-from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.cdr import generate_training_circuits
 from mitiq.cdr._testing import random_x_z_cnot_circuit
@@ -154,25 +151,28 @@ def test_learn_biased_noise_parameters(epsilon, operations):
     with a small offset from the simulated noise model values"""
 
     eta = 0
+    index = operations[0]
+    op = operations[1]
 
     def noisy_execute(circ: Circuit) -> np.ndarray:
         noisy_circ = circ.copy()
-        qubits = operations[1].qubits
+        qubits = op.qubits
         for q in qubits:
             noisy_circ.insert(
-                operations[0] + 1,
+                index + 1,
                 biased_noise_channel(epsilon, eta)(q),
                 strategy=InsertStrategy.EARLIEST,
             )
         return ideal_execute(noisy_circ)
 
     noisy_executor = Executor(noisy_execute)
-    offset = 0.1
-    epsilon0 = (1 + offset) * epsilon
+
+    offset = 0.01
+    epsilon0 = (1 - offset) * epsilon
 
     operations_to_learn = [Circuit(operations[1])]
 
-    pec_kwargs_learning = {"num_samples": 5000, "random_state": 1}
+    pec_kwargs_learning = {"num_samples": 100, "random_state": 1}
     [success, epsilon_opt] = learn_biased_noise_parameters(
         operations_to_learn=operations_to_learn,
         circuit=circuit,
@@ -185,48 +185,4 @@ def test_learn_biased_noise_parameters(epsilon, operations):
         observable=observable,
     )
     assert success
-    assert abs(epsilon_opt - epsilon) < abs(epsilon0 - epsilon)
-
-
-@pytest.mark.parametrize(
-    "operations",
-    [
-        [to_qiskit(Circuit(CNOT_ops[0][1]))],
-        [to_qiskit(Circuit(Rx_ops[0][1]))],
-        [to_qiskit(Circuit(Rz_ops[0][1]))],
-    ],
-)
-def test_learn_biased_noise_parameters_qiskit(operations):
-    """Test the learning function with initial noise strength and noise bias
-    with a small offset from the simulated noise model values"""
-    epsilon = 0.05
-
-    def ideal_execute_qiskit(circ: qiskit.QuantumCircuit) -> float:
-        noise_model = qiskit_utils.initialized_depolarizing_noise(0.0)
-        return qiskit_utils.execute_with_noise(
-            circ, observable.matrix(), noise_model
-        )
-
-    ideal_executor_qiskit = Executor(ideal_execute_qiskit)
-
-    def noisy_execute_qiskit(circ: qiskit.QuantumCircuit) -> float:
-        noise_model = qiskit_utils.initialized_depolarizing_noise(epsilon)
-        return qiskit_utils.execute_with_noise(
-            circ, observable.matrix(), noise_model
-        )
-
-    noisy_executor_qiskit = Executor(noisy_execute_qiskit)
-    offset = 0.01
-
-    qiskit_circuit = to_qiskit(circuit)
-    [success, _] = learn_biased_noise_parameters(
-        operations_to_learn=operations,
-        circuit=qiskit_circuit,
-        ideal_executor=ideal_executor_qiskit,
-        noisy_executor=noisy_executor_qiskit,
-        pec_kwargs=pec_kwargs,
-        num_training_circuits=5,
-        fraction_non_clifford=0.2,
-        epsilon0=(1 + offset) * epsilon,
-    )
-    assert success
+    assert abs(epsilon_opt - epsilon) < offset

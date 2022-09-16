@@ -105,7 +105,7 @@ def learn_biased_noise_parameters(
             pec_kwargs,
             observable,
         ),
-        method="BFGS",
+        method="Nelder-Mead",
         **minimize_kwargs,
     )
     x_result = result.x
