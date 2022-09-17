@@ -101,14 +101,18 @@ def biased_noise_loss_function(
 
 
 def unmitigated_loss_function(
-    epsilon_guess, noisy_executor, training_circuits, observable=None
-):
+    epsilon_guess: float,
+    noisy_executor: Executor,
+    training_circuits: List[QPROGRAM],
+    observable: Optional[Observable] = None,
+) -> float:
     def noise_model_execute(circ: Circuit) -> np.ndarray:
         circuit = convert_to_mitiq(circ)[0]
         noisy_circ = circuit.with_noise(
             biased_noise_channel(epsilon=epsilon_guess[0], eta=0)
         )
-        return compute_density_matrix(noisy_circ, noise_level=(0.0,))
+        density_matrix = compute_density_matrix(noisy_circ, noise_level=(0.0,))
+        return density_matrix
 
     noise_model_executor = Executor(noise_model_execute)
     noise_model_values = np.array(
@@ -146,13 +150,13 @@ def biased_noise_channel(epsilon: float, eta: float) -> MixedUnitaryChannel:
 
 
 def learn_noise_parameters_from_unmitigated_data(
-    circuit,
-    epsilon0,
-    noisy_executor,
-    num_training_circuits,
-    fraction_non_clifford,
-    training_random_state=None,
-    observable=None,
+    circuit: QPROGRAM,
+    epsilon0: float,
+    noisy_executor: Executor,
+    num_training_circuits: int = 5,
+    fraction_non_clifford: float = 0.2,
+    training_random_state: np.random.RandomState = None,
+    observable: Optional[Observable] = None,
 ):
     training_circuits = generate_training_circuits(
         circuit,
