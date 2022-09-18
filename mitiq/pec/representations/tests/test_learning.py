@@ -38,6 +38,7 @@ from mitiq.cdr import generate_training_circuits
 from mitiq.cdr._testing import random_x_z_cnot_circuit
 from mitiq.pec.representations.learning import (
     biased_noise_loss_function,
+    _unmitigated_loss_function,
     learn_noise_parameters_from_unmitigated_data,
 )
 
@@ -144,6 +145,25 @@ def test_biased_noise_loss_compare_ideal(operations):
 
 
 offset = 0.01
+
+
+@pytest.mark.parametrize("epsilon", [0, 0.05, 0.1])
+def test_unmitigated_loss_function(epsilon):
+    def noisy_execute(circ: Circuit) -> np.ndarray:
+        noisy_circ = circ.with_noise(
+            biased_noise_channel(epsilon=epsilon, eta=0)
+        )
+        return ideal_execute(noisy_circ)
+
+    noisy_executor = Executor(noisy_execute)
+    loss = _unmitigated_loss_function(
+        epsilon_guess=[epsilon],
+        noisy_executor=noisy_executor,
+        training_circuits=training_circuits,
+        observable=observable,
+    )
+
+    assert np.isclose(loss, 0)
 
 
 @pytest.mark.parametrize("epsilon", [0, 0.05, 0.1])

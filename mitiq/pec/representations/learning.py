@@ -100,19 +100,21 @@ def biased_noise_loss_function(
     )
 
 
-def unmitigated_loss_function(
-    epsilon_guess: float,
+def _unmitigated_loss_function(
+    epsilon_guess: np.ndarray,
     noisy_executor: Executor,
     training_circuits: List[QPROGRAM],
     observable: Optional[Observable] = None,
 ) -> float:
+    def ideal_execute(circ: Circuit) -> np.ndarray:
+        return compute_density_matrix(circ, noise_level=(0.0,))
+
     def noise_model_execute(circ: Circuit) -> np.ndarray:
         circuit = convert_to_mitiq(circ)[0]
         noisy_circ = circuit.with_noise(
             biased_noise_channel(epsilon=epsilon_guess[0], eta=0)
         )
-        density_matrix = compute_density_matrix(noisy_circ, noise_level=(0.0,))
-        return density_matrix
+        return ideal_execute(noisy_circ)
 
     noise_model_executor = Executor(noise_model_execute)
     noise_model_values = np.array(
@@ -157,7 +159,7 @@ def learn_noise_parameters_from_unmitigated_data(
     fraction_non_clifford: float = 0.2,
     training_random_state: np.random.RandomState = None,
     observable: Optional[Observable] = None,
-):
+) -> float:
     training_circuits = generate_training_circuits(
         circuit,
         num_training_circuits=num_training_circuits,
@@ -165,7 +167,7 @@ def learn_noise_parameters_from_unmitigated_data(
         random_state=training_random_state,
     )
     result = minimize(
-        fun=unmitigated_loss_function,
+        fun=_unmitigated_loss_function,
         x0=epsilon0,
         args=(noisy_executor, training_circuits, observable),
         method="Nelder-Mead",
