@@ -172,13 +172,12 @@ def test_learn_biased_noise_parameters(epsilon, operations):
 
     operations_to_learn = [Circuit(operations[1])]
 
-    pec_kwargs_learning = {"num_samples": 100, "random_state": 1}
     [success, epsilon_opt] = learn_biased_noise_parameters(
         operations_to_learn=operations_to_learn,
         circuit=circuit,
         ideal_executor=ideal_executor,
         noisy_executor=noisy_executor,
-        pec_kwargs=pec_kwargs_learning,
+        pec_kwargs=pec_kwargs,
         num_training_circuits=5,
         fraction_non_clifford=0.2,
         epsilon0=epsilon0,
