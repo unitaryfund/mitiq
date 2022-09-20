@@ -19,7 +19,7 @@ sphinx-autodoc-typehints~=1.12.0
 myst-nb~=0.12.3
 pydata-sphinx-theme~=0.8.1
 jupytext==1.11.1
-sphinx-gallery
+sphinx-gallery==0.10.1
 nbsphinx
 openfermion==1.5.1; sys_platform != 'win32'
 openfermionpyscf==0.5; sys_platform != 'win32'
