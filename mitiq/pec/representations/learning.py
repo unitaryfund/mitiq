@@ -39,11 +39,12 @@ def learn_depolarizing_noise_parameter(
     observable: Optional[Observable] = None,
     **minimize_kwargs: Dict["str", Any],
 ) -> Tuple[bool, float]:
-    r"""This function learns optimal noise parameters for a set of input
-    operations. The learning process is based on the execution of a set of
-    training circuits on a noisy backend and on a classical simulator. The
-    training circuits are near-Clifford approximations of the input circuit.
-    A depolarizing noise model characterized is assumed.
+    r"""This function learns the depolarizing noise parameter (epsilon)
+    associated to a set of input operations. The learning process is based on
+    the execution of a set of training circuits on a noisy backend and on a
+    classical simulator. The training circuits are near-Clifford approximations
+    of the input circuit. A depolarizing noise model characterization is
+    assumed.
 
     Args:
         operations_to_learn: The ideal operations to learn the noise model of.

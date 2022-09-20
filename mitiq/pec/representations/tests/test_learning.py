@@ -152,10 +152,10 @@ def test_learn_depolarizing_noise_parameter(epsilon, operations):
 
     index = operations[0]
     op = operations[1]
-    offset = 0.25
+    offset = 0.1
     eta = 0
 
-    pec_kwargs_learning = {"num_samples": 150, "random_state": 1}
+    pec_kwargs_learning = {"num_samples": 300, "random_state": 1}
 
     def noisy_execute(circ: Circuit) -> np.ndarray:
         noisy_circ = circ.copy()
