@@ -351,6 +351,7 @@ nbsphinx_thumbnails = {
     "examples/pyquil_demo": "_static/pyquil-demo.png",
     "examples/mitiq-paper/*": "_static/mitiq-codeblocks.png",
     "examples/zne-braket-ionq": "_static/zne-braket-ionq.png",
+    "examples/bqskit": "_static/bqskit.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }
