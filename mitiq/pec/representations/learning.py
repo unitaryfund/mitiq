@@ -26,7 +26,7 @@ from mitiq.pec.representations.biased_noise import (
 )
 
 
-def learn_biased_noise_parameters(
+def learn_depolarizing_noise_parameter(
     operations_to_learn: List[QPROGRAM],
     circuit: QPROGRAM,
     ideal_executor: Executor,
@@ -34,12 +34,13 @@ def learn_biased_noise_parameters(
     pec_kwargs: Dict["str", Any],
     num_training_circuits: int = 5,
     fraction_non_clifford: float = 0.2,
+    training_random_state: np.random.RandomState = None,
     epsilon0: float = 0.05,
     observable: Optional[Observable] = None,
     **minimize_kwargs: Dict["str", Any],
 ) -> Tuple[bool, float]:
     r"""This function learns optimal noise parameters for a set of input
-    operations.The learning process is based on the execution of a set of
+    operations. The learning process is based on the execution of a set of
     training circuits on a noisy backend and on a classical simulator. The
     training circuits are near-Clifford approximations of the input circuit.
     A depolarizing noise model characterized is assumed.
@@ -54,6 +55,7 @@ def learn_biased_noise_parameters(
         num_training_circuits: Number of near-Clifford circuits to be
             generated for training.
         epsilon0: Initial guess for noise strength.
+        training_random_state: Random seed for generating training circuits.
         observable (optional): Observable to compute the expectation value of.
             If None, the `executor` must return an expectation value. Otherwise
             the `QuantumResult` returned by `executor` is used to compute the
@@ -63,12 +65,11 @@ def learn_biased_noise_parameters(
         A flag indicating whether or not the optimizer exited successfully and
         the optimized noise strength epsilon.
     """
-    random_state = np.random.RandomState(1)
     training_circuits = generate_training_circuits(
         circuit=circuit,
         num_training_circuits=num_training_circuits,
         fraction_non_clifford=fraction_non_clifford,
-        random_state=random_state,
+        random_state=training_random_state,
     )
 
     ideal_values = np.array(
@@ -172,6 +173,6 @@ def biased_noise_loss_function(
         ]
     )
 
-    return np.sum(
+    return np.mean(
         abs(mitigated_values.reshape(-1, 1) - ideal_values.reshape(-1, 1)) ** 2
-    ) / len(training_circuits)
+    )

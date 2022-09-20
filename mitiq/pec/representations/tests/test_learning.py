@@ -30,13 +30,14 @@ from cirq import (
     unitary,
     InsertStrategy,
 )
+
 from mitiq import Executor, Observable, PauliString
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.cdr import generate_training_circuits
 from mitiq.cdr._testing import random_x_z_cnot_circuit
 from mitiq.pec.representations.learning import (
     biased_noise_loss_function,
-    learn_biased_noise_parameters,
+    learn_depolarizing_noise_parameter,
 )
 
 seed = 1
@@ -44,7 +45,6 @@ rng = np.random.RandomState(seed)
 circuit = random_x_z_cnot_circuit(
     LineQubit.range(2), n_moments=5, random_state=rng
 )
-
 
 # Set number of samples used to calculate mitigated value in loss function
 pec_kwargs = {"num_samples": 50, "random_state": 1}
@@ -145,14 +145,17 @@ def test_biased_noise_loss_compare_ideal(operations):
 
 
 @pytest.mark.parametrize("epsilon", [0.05, 0.1])
-@pytest.mark.parametrize("operations", [CNOT_ops[0], Rx_ops[0], Rz_ops[0]])
-def test_learn_biased_noise_parameters(epsilon, operations):
-    """Test the learning function with initial noise strength and noise bias
-    with a small offset from the simulated noise model values"""
+@pytest.mark.parametrize("operations", [CNOT_ops[0]])
+def test_learn_depolarizing_noise_parameter(epsilon, operations):
+    """Test the learning function with initial noise strength with a small
+    offset from the simulated noise model values"""
 
-    eta = 0
     index = operations[0]
     op = operations[1]
+    offset = 0.25
+    eta = 0
+
+    pec_kwargs_learning = {"num_samples": 150, "random_state": 1}
 
     def noisy_execute(circ: Circuit) -> np.ndarray:
         noisy_circ = circ.copy()
@@ -167,21 +170,21 @@ def test_learn_biased_noise_parameters(epsilon, operations):
 
     noisy_executor = Executor(noisy_execute)
 
-    offset = 0.01
     epsilon0 = (1 - offset) * epsilon
 
     operations_to_learn = [Circuit(operations[1])]
 
-    [success, epsilon_opt] = learn_biased_noise_parameters(
+    [success, epsilon_opt] = learn_depolarizing_noise_parameter(
         operations_to_learn=operations_to_learn,
         circuit=circuit,
         ideal_executor=ideal_executor,
         noisy_executor=noisy_executor,
-        pec_kwargs=pec_kwargs,
+        pec_kwargs=pec_kwargs_learning,
         num_training_circuits=5,
         fraction_non_clifford=0.2,
+        training_random_state=np.random.RandomState(1),
         epsilon0=epsilon0,
         observable=observable,
     )
     assert success
-    assert abs(epsilon_opt - epsilon) < offset
+    assert abs(epsilon_opt - epsilon) < offset * epsilon
