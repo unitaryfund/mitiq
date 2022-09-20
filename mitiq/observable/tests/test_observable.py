@@ -21,7 +21,7 @@ import cirq
 
 from mitiq.observable.observable import Observable
 from mitiq.observable.pauli import PauliString, PauliStringCollection
-from mitiq.rem.measurement_result import MeasurementResult
+from mitiq._typing import MeasurementResult
 from mitiq.interface.mitiq_cirq.cirq_utils import (
     sample_bitstrings,
     compute_density_matrix,

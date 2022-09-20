@@ -18,7 +18,7 @@ from typing import Tuple
 
 import numpy as np
 import cirq
-from mitiq.rem import MeasurementResult
+from mitiq._typing import MeasurementResult
 
 
 # Executors.

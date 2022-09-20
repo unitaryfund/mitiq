@@ -7,7 +7,7 @@ hidden: true
 ---
 readme.myst
 guide/guide.myst
-examples/examples.rst
+examples/examples.myst
 apidoc.rst
 toc_contributing.myst
 changelog.myst
