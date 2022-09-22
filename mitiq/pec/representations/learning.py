@@ -17,6 +17,7 @@ learning-based technique."""
 
 from typing import cast, Optional, Dict, Any, List, Tuple
 import numpy as np
+import numpy.typing as npt
 from scipy.optimize import minimize
 from mitiq import QPROGRAM, Executor, Observable
 from mitiq.cdr import generate_training_circuits
@@ -136,10 +137,10 @@ def learn_depolarizing_noise_parameter(
 
 
 def biased_noise_loss_function(
-    params: np.ndarray,
+    params: npt.NDArray[np.float64],
     operations_to_mitigate: List[QPROGRAM],
     training_circuits: List[QPROGRAM],
-    ideal_values: np.ndarray,
+    ideal_values: npt.NDArray[np.float64],
     noisy_executor: Executor,
     pec_kwargs: Dict["str", Any],
     observable: Optional[Observable] = None,

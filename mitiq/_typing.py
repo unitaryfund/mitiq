@@ -27,6 +27,7 @@ from dataclasses import dataclass
 from typing import cast, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
+import numpy.typing as npt
 
 from cirq import Circuit as _Circuit
 
@@ -111,10 +112,10 @@ class MeasurementResult:
         )
 
     @property
-    def asarray(self) -> np.ndarray:
+    def asarray(self) -> npt.NDArray[np.int64]:
         return self._bitstrings
 
-    def __getitem__(self, indices: List[int]) -> np.ndarray:
+    def __getitem__(self, indices: List[int]) -> npt.NDArray[np.int64]:
         return np.array([self._measurements[i] for i in indices]).T
 
     def __iter__(self) -> Iterable[Bitstring]:

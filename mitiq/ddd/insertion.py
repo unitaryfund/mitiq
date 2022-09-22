@@ -16,12 +16,13 @@
 """Tools to determine slack windows in circuits and to insert DDD sequences."""
 from cirq import Circuit, LineQubit, synchronize_terminal_measurements
 import numpy as np
+import numpy.typing as npt
 from typing import Callable
 from mitiq.interface import noise_scaling_converter
 from mitiq import QPROGRAM
 
 
-def _get_circuit_mask(circuit: Circuit) -> np.ndarray:
+def _get_circuit_mask(circuit: Circuit) -> npt.NDArray[np.int64]:
     """Given a circuit with n qubits and d moments returns a matrix
     :math:`A` with n rows and d columns. The matrix elements are
     :math:`A_{i,j} = 1` if there is a gate acting on qubit :math:`i` at moment
@@ -46,7 +47,7 @@ def _get_circuit_mask(circuit: Circuit) -> np.ndarray:
     return mask_matrix
 
 
-def _validate_integer_matrix(mask: np.ndarray) -> None:
+def _validate_integer_matrix(mask: npt.NDArray[np.int64]) -> None:
     """Ensures the input is a NumPy 2d array with integer elements."""
     if not isinstance(mask, np.ndarray):
         raise TypeError("The input matrix must be a numpy.ndarray object.")
@@ -56,7 +57,9 @@ def _validate_integer_matrix(mask: np.ndarray) -> None:
         raise ValueError("The input must be a 2-dimensional array.")
 
 
-def get_slack_matrix_from_circuit_mask(mask: np.ndarray) -> np.ndarray:
+def get_slack_matrix_from_circuit_mask(
+    mask: npt.NDArray[np.int64],
+) -> npt.NDArray[np.int64]:
     """Given a circuit mask matrix :math:`A`, e.g., the output of
     ``_get_circuit_mask()``, returns a slack matrix :math:`B`,
     where :math:`B_{i,j} = t` if the position :math:`A_{i,j}` is the

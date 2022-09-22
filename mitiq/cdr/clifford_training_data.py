@@ -180,7 +180,7 @@ def _select(
         random_state: Random state for sampling.
     """
     if random_state is None:
-        random_state = np.random
+        random_state = np.random  # type: ignore
 
     num_non_cliff = len(non_clifford_ops)
     num_to_replace = int(round(fraction_non_clifford * num_non_cliff))
@@ -196,7 +196,7 @@ def _select(
             ]
         )
         probabilities = angle_to_proximity(non_clifford_angles, sigma)
-        distribution = [k / sum(probabilities) for k in probabilities]
+        distribution = probabilities / sum(probabilities)
     else:
         raise ValueError(
             f"Arg `method_select` must be 'uniform' or 'gaussian' but was "
@@ -241,7 +241,7 @@ def _replace(
         'uniform' or 'gaussian'.
     """
     if random_state is None:
-        random_state = np.random
+        random_state = np.random  # type: ignore
 
     # TODO: Update these functions to act on operations instead of angles.
     non_clifford_angles = np.array(
@@ -252,7 +252,7 @@ def _replace(
 
     elif method == "uniform":
         clifford_angles = random_clifford(
-            len(non_clifford_angles), random_state
+            len(non_clifford_angles), cast(np.random.RandomState, random_state)
         )
 
     elif method == "gaussian":

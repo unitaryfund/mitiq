@@ -17,6 +17,7 @@ import copy
 from typing import Callable, cast, List, Optional, Set
 
 import numpy as np
+import numpy.typing as npt
 import cirq
 
 from mitiq.observable.pauli import PauliString, PauliStringCollection
@@ -85,7 +86,7 @@ class Observable:
 
         psets: List[PauliStringCollection] = []
         paulis = copy.deepcopy(self._paulis)
-        rng.shuffle(paulis)
+        rng.shuffle(paulis)  # type: ignore
 
         while paulis:
             pauli = paulis.pop()
@@ -109,7 +110,7 @@ class Observable:
         self,
         qubit_indices: Optional[List[int]] = None,
         dtype: type = np.complex128,
-    ) -> np.ndarray:
+    ) -> npt.NDArray[np.complex64]:
         """Returns the (potentially very large) matrix of the Observable."""
         if qubit_indices is None:
             qubit_indices = self.qubit_indices
@@ -139,7 +140,7 @@ class Observable:
         )
 
     def _expectation_from_density_matrix(
-        self, density_matrix: np.ndarray
+        self, density_matrix: npt.NDArray[np.complex64]
     ) -> float:
         observable_matrix = self.matrix()
 
