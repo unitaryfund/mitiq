@@ -39,7 +39,13 @@ from mitiq.observable.observable import Observable
 from mitiq.interface import convert_from_mitiq, convert_to_mitiq
 
 
-DensityMatrixLike = [npt.ArrayLike]
+DensityMatrixLike = [
+    np.ndarray,
+    Iterable[np.ndarray],  # type: ignore
+    List[np.ndarray],  # type: ignore
+    Sequence[np.ndarray],  # type: ignore
+    Tuple[np.ndarray],
+]
 FloatLike = [
     None,  # Untyped executors are assumed to return floats.
     float,
