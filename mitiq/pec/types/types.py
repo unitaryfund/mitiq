@@ -517,7 +517,9 @@ class OperationRepresentation:
                 f"but was {type(random_state)}."
             )
 
-        noisy_op = rng.choice(self.noisy_operations, p=self.distribution())  # type: ignore
+        noisy_op = rng.choice(
+            self.noisy_operations, p=self.distribution()
+        )  # type: ignore
         return noisy_op, int(self.sign_of(noisy_op)), self.coeff_of(noisy_op)
 
     def __str__(self) -> str:
