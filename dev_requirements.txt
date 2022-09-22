@@ -13,6 +13,7 @@ black~=22.8
 mypy~=0.981
 
 # Documentation and examples.
+Sphinx==5.1.1
 sphinxcontrib-bibtex~=2.5.0
 sphinx-copybutton~=0.4.0
 sphinx-autodoc-typehints~=1.12.0
@@ -21,6 +22,7 @@ pydata-sphinx-theme~=0.8.1
 jupytext==1.11.1
 sphinx-gallery==0.10.1
 nbsphinx
+pyscf==2.1.0
 openfermion==1.5.1; sys_platform != 'win32'
 openfermionpyscf==0.5; sys_platform != 'win32'
 
