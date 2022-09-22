@@ -45,6 +45,7 @@ DensityMatrixLike = [
     List[np.ndarray],  # type: ignore
     Sequence[np.ndarray],  # type: ignore
     Tuple[np.ndarray],
+    npt.NDArray[np.complex64],
 ]
 FloatLike = [
     None,  # Untyped executors are assumed to return floats.
