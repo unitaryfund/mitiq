@@ -50,17 +50,11 @@ DensityMatrixLike = [
 FloatLike = [
     None,  # Untyped executors are assumed to return floats.
     float,
-    Iterable[float],
-    List[float],
-    Sequence[float],
-    Tuple[float],
+    Sequence[float],  # Returned by batched executors
 ]
 MeasurementResultLike = [
     MeasurementResult,
-    Iterable[MeasurementResult],
-    List[MeasurementResult],
-    Sequence[MeasurementResult],
-    Tuple[MeasurementResult],
+    Sequence[MeasurementResult],  # Returned by batched executors
 ]
 
 
