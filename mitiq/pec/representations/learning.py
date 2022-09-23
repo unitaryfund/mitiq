@@ -163,7 +163,7 @@ def biased_noise_loss_function(
             training circuits.
         observable (optional): Observable to compute the expectation value of.
             If None, the ``executor`` must return an expectation value.
-            Otherwise the ``QuantumResult`` returned by `'executor`` is used to
+            Otherwise the ``QuantumResult`` returned by ``executor`` is used to
             compute the expectation of the observable.
 
     Returns: Mean squared error between the error-mitigated values and
