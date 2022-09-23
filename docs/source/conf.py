@@ -64,7 +64,7 @@ extensions = [
 ]
 
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3.7", None),
+    "python": ("https://docs.python.org/3.8", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
     # Cirq is no longer using sphinx docs so interlinking is not possible.
