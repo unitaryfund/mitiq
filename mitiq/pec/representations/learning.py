@@ -37,7 +37,7 @@ def learn_depolarizing_noise_parameter(
     training_random_state: np.random.RandomState = None,
     epsilon0: float = 0.05,
     observable: Optional[Observable] = None,
-    solver: Optional[str] = "Nelder-Mead",
+    method: Optional[str] = "Nelder-Mead",
     **minimize_kwargs: Dict["str", Any],
 ) -> Tuple[bool, float]:
     r"""This function learns the depolarizing noise parameter (epsilon)
@@ -47,22 +47,16 @@ def learn_depolarizing_noise_parameter(
     of the input circuit. A depolarizing noise model characterization is
     assumed.
 
-    Note: using this function may require some tuning. One of the main
-    challenges is setting a good value of `num_samples` in the PEC options
-    `pec_kwargs`. Setting a small value of `num_samples` is typically
-    necessary to obtain a reasonable execution time. On the other hand,
-    using a number of PEC samples that is too small can result in a large
-    statistical error, ultimately causing the optimization process to fail.
-
     Args:
         operations_to_learn: The ideal operations to learn the noise model of.
         circuit: The full quantum program as defined by the user.
         ideal_executor: Simulates a circuit and returns
-            a noiseless `QuantumResult`.
+            a noiseless ``QuantumResult``.
         noisy_executor: Executes a circuit on a noisy backend
-            and returns a `QuantumResult`.
-        pec_kwargs: Options to pass to `execute_w_pec` for the error-mitigated
-            expectation value obtained from executing the training circuits.
+            and returns a ``QuantumResult``.
+        pec_kwargs: Options to pass to ``execute_w_pec`` for the
+            error-mitigated expectation value obtained from executing
+            the training circuits.
         num_training_circuits: Number of near-Clifford circuits to be
             generated for training.
         fraction_non_clifford: The (approximate) fraction of non-Clifford
@@ -70,17 +64,25 @@ def learn_depolarizing_noise_parameter(
         training_random_state: Seed for sampling the training circuits.
         epsilon0: Initial guess for noise strength.
         observable (optional): Observable to compute the expectation value of.
-            If None, the `executor` must return an expectation value.
+            If None, the ``executor`` must return an expectation value.
             Otherwise the `QuantumResult` returned by `executor` is used to
             compute the expectation of the observable.
-        solver: Type of solver. Must be a solver supported by
-            `scipy.optimize.minimize`.
+        method: Type of optimizer. Must be an optimizer supported by
+            ``scipy.optimize.minimize``.
         minimize_kwargs: Options to pass to the solver called by
-            `scipy.optimize.minizmize`.
+            ``scipy.optimize.minizmize``.
 
     Returns:
         A flag indicating whether or not the optimizer exited successfully and
         the optimized noise strength epsilon.
+
+    .. note:: Using this function may require some tuning. One of the main
+        challenges is setting a good value of ``num_samples`` in the PEC
+        options ``pec_kwargs``. Setting a small value of ``num_samples`` is
+        typicallynecessary to obtain a reasonable execution time. On the other
+        hand,using a number of PEC samples that is too small can result in a
+        large statistical error, ultimately causing the optimization process to
+        fail.
     """
     training_circuits = generate_training_circuits(
         circuit=circuit,
@@ -123,7 +125,7 @@ def learn_depolarizing_noise_parameter(
             pec_kwargs,
             observable,
         ),
-        method=solver,
+        method=method,
         **minimize_kwargs,
     )
     x_result = result.x
@@ -155,13 +157,14 @@ def biased_noise_loss_function(
             error-mitigated expectation values.
         ideal_values: Expectation values obtained by noiseless simulations.
         noisy_executor: Executes the circuit with noise and returns a
-            `QuantumResult`.
-        pec_kwargs: Options to pass to `execute_w_pec` for the error-mitigated
-            expectation value obtained from executing the training circuits.
+            ``QuantumResult``.
+        pec_kwargs: Options to pass to ``execute_w_pec`` for the
+            error-mitigated expectation value obtained from executing the
+            training circuits.
         observable (optional): Observable to compute the expectation value of.
-            If None, the `executor` must return an expectation value. Otherwise
-            the `QuantumResult` returned by `executor` is used to compute the
-            expectation of the observable.
+            If None, the ``executor`` must return an expectation value.
+            Otherwise the ``QuantumResult`` returned by `'executor`` is used to
+            compute the expectation of the observable.
 
     Returns: Mean squared error between the error-mitigated values and
         the ideal values, over the training set.
