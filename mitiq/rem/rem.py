@@ -38,7 +38,7 @@ def to_probability_vector(measurement: np.ndarray) -> np.ndarray:
 
 
 def sample_probability_vector(probability_vector: np.ndarray) -> np.ndarray:
-    """Sample a probability vector and return a raw measurement.
+    """Sample a probability vector and returns a bitstring.
 
     Args:
         probability_vector: A probability vector.
