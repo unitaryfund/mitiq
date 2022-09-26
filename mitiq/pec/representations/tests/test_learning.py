@@ -39,6 +39,7 @@ from mitiq.cdr import generate_training_circuits
 from mitiq.cdr._testing import random_x_z_cnot_circuit
 from mitiq.pec.representations.learning import (
     biased_noise_loss_function,
+    learn_biased_noise_parameters,
     learn_depolarizing_noise_parameter,
 )
 
@@ -205,15 +206,13 @@ def test_biased_noise_loss_function_qiskit(operations):
 
 
 @pytest.mark.parametrize("epsilon", [0.05, 0.1])
-@pytest.mark.parametrize("operations", [CNOT_ops[0]])
 # We assume the operation "op" appears just once in the circuit such
 # that it's enough to add a single noise channel after that operation.
-def test_learn_depolarizing_noise_parameter(epsilon, operations):
+def test_learn_depolarizing_noise_parameter(epsilon):
     """Test the learning function with initial noise strength with a small
     offset from the simulated noise model values"""
-
-    index = operations[0]
-    op = operations[1]
+    index = CNOT_ops[0][0]
+    op = CNOT_ops[0][1]
     offset = 0.1
     eta = 0
 
@@ -234,7 +233,7 @@ def test_learn_depolarizing_noise_parameter(epsilon, operations):
 
     epsilon0 = (1 - offset) * epsilon
 
-    operations_to_learn = [Circuit(operations[1])]
+    operations_to_learn = [Circuit(op)]
 
     [success, epsilon_opt] = learn_depolarizing_noise_parameter(
         operations_to_learn=operations_to_learn,
@@ -247,6 +246,60 @@ def test_learn_depolarizing_noise_parameter(epsilon, operations):
         training_random_state=np.random.RandomState(1),
         epsilon0=epsilon0,
         observable=observable,
+        method="Nelder-Mead",
     )
     assert success
     assert abs(epsilon_opt - epsilon) < offset * epsilon
+
+
+@pytest.mark.parametrize("epsilon", [0.05, 0.1])
+@pytest.mark.parametrize("eta", [1, 2])
+# We assume the operation "op" appears just once in the circuit such
+# that it's enough to add a single noise channel after that operation.
+def test_learn_biased_noise_parameters(epsilon, eta):
+    """Test the learning function with initial noise strength with a small
+    offset from the simulated noise model values"""
+
+    index = CNOT_ops[0][0]
+    op = CNOT_ops[0][1]
+    eta = 1
+
+    pec_kwargs_learning = {"num_samples": 600, "random_state": 1}
+
+    def noisy_execute(circ: Circuit) -> np.ndarray:
+        noisy_circ = circ.copy()
+        qubits = op.qubits
+        for q in qubits:
+            noisy_circ.insert(
+                index + 1,
+                biased_noise_channel(epsilon, eta)(q),
+                strategy=InsertStrategy.EARLIEST,
+            )
+        return ideal_execute(noisy_circ)
+
+    noisy_executor = Executor(noisy_execute)
+
+    eps_offset = 0.1
+    eta_offset = 0.2
+    epsilon0 = (1 - eps_offset) * epsilon
+    eta0 = (1 + eta_offset) * eta
+
+    operations_to_learn = [Circuit(op)]
+
+    [success, epsilon_opt, eta_opt] = learn_biased_noise_parameters(
+        operations_to_learn=operations_to_learn,
+        circuit=circuit,
+        ideal_executor=ideal_executor,
+        noisy_executor=noisy_executor,
+        pec_kwargs=pec_kwargs_learning,
+        num_training_circuits=5,
+        fraction_non_clifford=0.2,
+        training_random_state=np.random.RandomState(1),
+        epsilon0=epsilon0,
+        eta0=eta0,
+        observable=observable,
+        method="Nelder-Mead",
+    )
+    assert success
+    assert abs(epsilon_opt - epsilon) < eps_offset * epsilon
+    assert abs(eta_opt - eta) < eta_offset * eta
