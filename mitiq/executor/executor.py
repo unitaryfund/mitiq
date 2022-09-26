@@ -50,11 +50,17 @@ DensityMatrixLike = [
 FloatLike = [
     None,  # Untyped executors are assumed to return floats.
     float,
-    Sequence[float],  # Returned by batched executors
+    Iterable[float],
+    List[float],
+    Sequence[float],
+    Tuple[float],
 ]
 MeasurementResultLike = [
     MeasurementResult,
-    Sequence[MeasurementResult],  # Returned by batched executors
+    Iterable[MeasurementResult],
+    List[MeasurementResult],
+    Sequence[MeasurementResult],
+    Tuple[MeasurementResult],
 ]
 
 
@@ -81,6 +87,9 @@ class Executor:
 
         executor_annotation = inspect.getfullargspec(executor).annotations
         self._executor_return_type = executor_annotation.get("return")
+        print(executor)
+        print(executor_annotation)
+        print(self._executor_return_type)
         self._max_batch_size = max_batch_size
 
         self._executed_circuits: List[QPROGRAM] = []
@@ -169,7 +178,9 @@ class Executor:
 
         elif self._executor_return_type in DensityMatrixLike:
             observable = cast(Observable, observable)
+            print("before:", all_results)
             all_results = cast(List[npt.NDArray[np.complex64]], all_results)
+            print("after: ", all_results)
             results = [
                 observable._expectation_from_density_matrix(density_matrix)
                 for density_matrix in all_results
