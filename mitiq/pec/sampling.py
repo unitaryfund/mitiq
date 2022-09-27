@@ -89,7 +89,9 @@ def sample_sequence(
     sequences = []
     signs = []
     for _ in range(num_samples):
-        noisy_op, sign, _ = operation_representation.sample(random_state)
+        noisy_op, sign, _ = operation_representation.sample(
+            random_state  # type: ignore
+        )
         sequences.append(noisy_op.circuit())
         signs.append(sign)
 

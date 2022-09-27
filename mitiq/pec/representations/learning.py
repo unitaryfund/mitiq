@@ -17,6 +17,7 @@ learning-based technique."""
 
 from typing import cast, Optional, Dict, Any, List, Tuple
 import numpy as np
+import numpy.typing as npt
 from scipy.optimize import minimize
 from mitiq import QPROGRAM, Executor, Observable
 from mitiq.cdr import generate_training_circuits
@@ -34,7 +35,7 @@ def learn_depolarizing_noise_parameter(
     pec_kwargs: Dict["str", Any],
     num_training_circuits: int = 5,
     fraction_non_clifford: float = 0.2,
-    training_random_state: np.random.RandomState = None,
+    training_random_state: np.random.RandomState = None,  # type: ignore
     epsilon0: float = 0.05,
     observable: Optional[Observable] = None,
     method: Optional[str] = "Nelder-Mead",
@@ -99,7 +100,7 @@ def learn_depolarizing_noise_parameter(
         epsilon: List[int],
         operations_to_mitigate: List[QPROGRAM],
         training_circuits: List[QPROGRAM],
-        ideal_values: np.ndarray,
+        ideal_values: npt.NDArray[np.float64],
         noisy_executor: Executor,
         pec_kwargs: Dict["str", Any],
         observable: Optional[Observable] = None,
@@ -136,10 +137,10 @@ def learn_depolarizing_noise_parameter(
 
 
 def biased_noise_loss_function(
-    params: np.ndarray,
+    params: npt.NDArray[np.float64],
     operations_to_mitigate: List[QPROGRAM],
     training_circuits: List[QPROGRAM],
-    ideal_values: np.ndarray,
+    ideal_values: npt.NDArray[np.float64],
     noisy_executor: Executor,
     pec_kwargs: Dict["str", Any],
     observable: Optional[Observable] = None,

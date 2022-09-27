@@ -26,6 +26,7 @@ from typing import (
 )
 
 import numpy as np
+import numpy.typing as npt
 import cirq
 
 from mitiq._typing import QPROGRAM, MeasurementResult
@@ -90,7 +91,7 @@ class PauliString:
         self,
         qubit_indices_to_include: Optional[List[int]] = None,
         dtype: type = np.complex128,
-    ) -> np.ndarray:
+    ) -> npt.NDArray[np.complex64]:
         """Returns the (potentially very large) matrix of the PauliString."""
         qubits = (
             [cirq.LineQubit(x) for x in qubit_indices_to_include]

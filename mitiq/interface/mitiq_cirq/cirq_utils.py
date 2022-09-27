@@ -17,6 +17,7 @@
 from typing import Tuple
 
 import numpy as np
+import numpy.typing as npt
 import cirq
 from mitiq._typing import MeasurementResult
 
@@ -61,7 +62,7 @@ def compute_density_matrix(
     circuit: cirq.Circuit,
     noise_model: cirq.NOISE_MODEL_LIKE = cirq.amplitude_damp,  # type: ignore
     noise_level: Tuple[float] = (0.01,),
-) -> np.ndarray:
+) -> npt.NDArray[np.complex64]:
     """Returns the density matrix of the quantum state after the
     (noisy) execution of the input circuit.
 
@@ -80,7 +81,7 @@ def compute_density_matrix(
 
 
 def execute_with_depolarizing_noise(
-    circuit: cirq.Circuit, obs: np.ndarray, noise: float
+    circuit: cirq.Circuit, obs: npt.NDArray[np.complex64], noise: float
 ) -> float:
     """Simulates a circuit with depolarizing noise
     and returns the expectation value of the input observable.

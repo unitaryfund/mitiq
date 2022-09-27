@@ -31,6 +31,7 @@ from typing import (
 )
 
 import numpy as np
+import numpy.typing as npt
 
 from mitiq import QPROGRAM, MeasurementResult, QuantumResult
 
@@ -40,10 +41,11 @@ from mitiq.interface import convert_from_mitiq, convert_to_mitiq
 
 DensityMatrixLike = [
     np.ndarray,
-    Iterable[np.ndarray],
-    List[np.ndarray],
-    Sequence[np.ndarray],
+    Iterable[np.ndarray],  # type: ignore
+    List[np.ndarray],  # type: ignore
+    Sequence[np.ndarray],  # type: ignore
     Tuple[np.ndarray],
+    npt.NDArray[np.complex64],
 ]
 FloatLike = [
     None,  # Untyped executors are assumed to return floats.
@@ -173,7 +175,9 @@ class Executor:
 
         elif self._executor_return_type in DensityMatrixLike:
             observable = cast(Observable, observable)
-            all_results = cast(List[np.ndarray], all_results)
+            print("before:", all_results)
+            all_results = cast(List[npt.NDArray[np.complex64]], all_results)
+            print("after: ", all_results)
             results = [
                 observable._expectation_from_density_matrix(density_matrix)
                 for density_matrix in all_results
