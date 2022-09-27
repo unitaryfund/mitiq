@@ -22,11 +22,11 @@ More details on the Mitiq notions of frontends and backends are given [here](../
 
 Below, we show how to run a simple Braket circuit on an IonQ device, broken down in the following steps.
 
-- [Settings](#settings)
-- [Setup: Defining a circuit](#setup-defining-a-circuit)
-- [High-level usage](#high-level-usage)
-- [Options](#options)
-- [Lower-level usage](#lower-level-usage)
+- [](#settings)
+- [](#setup-defining-a-circuit-in-braket)
+- [](#high-level-usage)
+- [](#options)
+- [](#lower-level-usage)
 
 +++
 

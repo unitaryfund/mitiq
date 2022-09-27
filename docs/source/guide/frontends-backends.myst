@@ -52,6 +52,7 @@ Examples for using each of the frameworks to represent the input to a mitigation
 - {ref}`Cirq <examples/cirq-ibmq-backends/setup-defining-a-circuit>`
 - {ref}`Qiskit <examples/ibmq-backends/setup-defining-a-circuit>`
 - {ref}`PyQuil <examples/pyquil_demo>`
+- {ref}`PennyLane <examples/ibmq-backends-pennylane/setup-defining-a-circuit>`
 - {ref}`Braket <examples/braket_mirror_circuit/define-the-circuit>`
 
 ## Backends

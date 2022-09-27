@@ -113,6 +113,8 @@ myst_enable_extensions = [
     "smartquotes",
 ]
 
+myst_heading_anchors = 3
+
 # Tells MyST to treat URIs beginning with these prefixes as external links.
 # Links that don't begin with these will be treated as internal cross-links.
 myst_url_schemes = ("http", "https", "mailto")

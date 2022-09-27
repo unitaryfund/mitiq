@@ -16,13 +16,14 @@ kernelspec:
 
 In this tutorial we will cover how to use Mitiq in conjunction with [PennyLane](https://pennylane.ai/), and further how to run error-mitigated circuits on IBMQ backends.
 
-- [Setup: Defining a circuit](#setup-defining-a-circuit)
-- [High-level usage](#high-level-usage)
-- [Options](#options)
-- [Decorator usage](#decorator-usage)
+- [](#setup-defining-a-circuit)
+- [](#high-level-usage)
+- [](#options)
+- [](#decorator-usage)
 
 +++
 
+(examples/ibmq-backends-pennylane/setup-defining-a-circuit)=
 ## Setup: Defining a circuit
 
 +++
