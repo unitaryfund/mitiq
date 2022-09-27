@@ -87,9 +87,6 @@ class Executor:
 
         executor_annotation = inspect.getfullargspec(executor).annotations
         self._executor_return_type = executor_annotation.get("return")
-        print(executor)
-        print(executor_annotation)
-        print(self._executor_return_type)
         self._max_batch_size = max_batch_size
 
         self._executed_circuits: List[QPROGRAM] = []
