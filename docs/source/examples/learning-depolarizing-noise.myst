@@ -1,0 +1,150 @@
+---
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.14.1
+kernelspec:
+  display_name: Python 3.8.13 64-bit ('venv_mitiq_learnrepspec')
+  language: python
+  name: python3813jvsc74a57bd0992c44e14009e3623432b51dfa0ccb8179e6507fb1569359de12ac98f26b40e8
+---
+
+```{code-cell} ipython3
+import warnings
+
+warnings.simplefilter("ignore", UserWarning)
+import numpy as np
+from cirq import (
+    CXPowGate,
+    MixedUnitaryChannel,
+    Rx,
+    Rz,
+    I,
+    X,
+    Y,
+    Z,
+    LineQubit,
+    Circuit,
+    ops,
+    unitary,
+    InsertStrategy,
+)
+from mitiq import Executor, Observable, PauliString
+from mitiq.interface.mitiq_cirq import compute_density_matrix
+from mitiq.cdr import generate_training_circuits
+from mitiq.cdr._testing import random_x_z_cnot_circuit
+from mitiq.pec.representations.learning import (
+    biased_noise_loss_function,
+    learn_depolarizing_noise_parameter,
+)
+```
+
+Begin with a simple Rx-Rz-CNOT circuit
+
+```{code-cell} ipython3
+circuit = random_x_z_cnot_circuit(
+    LineQubit.range(2), n_moments=5, random_state=np.random.RandomState(1)
+)
+print(circuit)
+```
+
+In this example, we wish to learn the strength of depolarizing noise of the first CNOT gate in the circuit (there is only one).
+
+```{code-cell} ipython3
+CNOT_ops = list(circuit.findall_operations_with_gate_type(CXPowGate))
+index = CNOT_ops[0][0]
+op = CNOT_ops[0][1]
+operations_to_learn = [Circuit(op)]
+```
+
+Specify the observable of interest
+
+```{code-cell} ipython3
+observable = Observable(PauliString("XZ"), PauliString("YY"))
+```
+
+Define the "ideal executor" for simulating the Clifford training circuits without noise (for comparison to the error-mitigated expectation values)
+
+```{code-cell} ipython3
+def ideal_execute(circ: Circuit) -> np.ndarray:
+    return compute_density_matrix(circ, noise_level=(0.0,))
+
+
+ideal_executor = Executor(ideal_execute)
+```
+
+Define the noisy executor, in this case for simulating depolarizing noise on one operation (CNOT) of each of the training circuits. The optimized value of the noise strength `epsilon` should be close to the value defined for this executor. The bias `eta` is zero because we are simulating depolarizing noise.
+
+```{code-cell} ipython3
+epsilon = 0.05
+eta = 0
+
+
+def biased_noise_channel(epsilon: float, eta: float) -> MixedUnitaryChannel:
+    a = 1 - epsilon
+    b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
+    c = epsilon / (3 * (eta + 1))
+
+    mix = [
+        (a, unitary(I)),
+        (b, unitary(Z)),
+        (c, unitary(X)),
+        (c, unitary(Y)),
+    ]
+    return ops.MixedUnitaryChannel(mix)
+
+
+def noisy_execute(circ: Circuit) -> np.ndarray:
+    noisy_circ = circ.copy()
+    qubits = op.qubits
+    for q in qubits:
+        noisy_circ.insert(
+            index + 1,
+            biased_noise_channel(epsilon, eta)(q),
+            strategy=InsertStrategy.EARLIEST,
+        )
+    return ideal_execute(noisy_circ)
+
+
+noisy_executor = Executor(noisy_execute)
+```
+
+Set the initial conditions and number of PEC samples.  
+Setting a small value of `num_samples` is typically necessary to obtain a reasonable execution time.  
+On the other hand, using a number of PEC samples that is too small can result in a large statistical error, ultimately causing the optimization process to fail.
+
+```{code-cell} ipython3
+offset = 0.1
+epsilon0 = (1 - offset) * epsilon
+pec_kwargs_learning = {"num_samples": 300, "random_state": 1}
+```
+
+Use Nelder-Mead method from `scipy.optimize.minimize` to find the optimized value of epsilon.
+
+```{code-cell} ipython3
+import timeit
+
+start = timeit.default_timer()
+[success, epsilon_opt] = learn_depolarizing_noise_parameter(
+    operations_to_learn=operations_to_learn,
+    circuit=circuit,
+    ideal_executor=ideal_executor,
+    noisy_executor=noisy_executor,
+    pec_kwargs=pec_kwargs_learning,
+    num_training_circuits=5,
+    fraction_non_clifford=0.2,
+    training_random_state=np.random.RandomState(1),
+    epsilon0=epsilon0,
+    observable=observable,
+)
+end = timeit.default_timer()
+print(end - start)
+
+print(success)
+print(abs(epsilon_opt - epsilon))
+print(offset * epsilon)
+```
+
+Optimization completed successfully and the optimized value of epsilon is closer to the true value of epsilon than the intial value was.
