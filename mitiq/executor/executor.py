@@ -175,9 +175,7 @@ class Executor:
 
         elif self._executor_return_type in DensityMatrixLike:
             observable = cast(Observable, observable)
-            print("before:", all_results)
             all_results = cast(List[npt.NDArray[np.complex64]], all_results)
-            print("after: ", all_results)
             results = [
                 observable._expectation_from_density_matrix(density_matrix)
                 for density_matrix in all_results
