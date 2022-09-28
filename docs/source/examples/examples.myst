@@ -14,5 +14,6 @@ Defining a Mitiq executor with a hamiltonian <hamiltonians.md>
 Mitiq paper codeblocks <mitiq-paper/mitiq-paper-codeblocks>
 Estimating the potential energy surface of molecular Hydrogen with ZNE <molecular_hydrogen.myst>
 Estimating the potential energy surface of molecular Hydrogen with ZNE and PennyLane + Cirq <molecular_hydrogen_pennylane.myst>
+Improving the accuracy of BQSKit compiled circuits with error mitigation <bqskit.myst>
 Learning the noise strength of depolarizing noise from Clifford circuit data <learning-depolarizing-noise.myst>
 ```
