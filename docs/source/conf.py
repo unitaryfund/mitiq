@@ -153,10 +153,11 @@ execution_timeout = 600
 # re-run for a subsequent docs build.
 jupyter_execute_notebooks = "cache"
 
+execution_excludepatterns = ["bqskit.ipynb"]
 # If SKIP_PYQUIL is True, do not re-run PyQuil notebooks.
 if os.environ.get("SKIP_PYQUIL"):
     print("Skipping PyQuil notebooks execution since SKIP_PYQUIL is True")
-    execution_excludepatterns = ["*pyquil*.ipynb"]
+    execution_excludepatterns.append("*pyquil*.ipynb")
 
 # -- Options for autodoc -----------------------------------------------------
 napoleon_google_docstring = True
@@ -351,6 +352,7 @@ nbsphinx_thumbnails = {
     "examples/pyquil_demo": "_static/pyquil-demo.png",
     "examples/mitiq-paper/*": "_static/mitiq-codeblocks.png",
     "examples/zne-braket-ionq": "_static/zne-braket-ionq.png",
+    "examples/bqskit": "_static/bqskit.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }
