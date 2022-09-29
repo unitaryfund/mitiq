@@ -144,6 +144,8 @@ Quasi-Probability Representations
 .. automodule:: mitiq.pec.representations.depolarizing
    :members:
 
+Learning-based PEC
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: mitiq.pec.representations.biased_noise
    :members:
 
