@@ -11,18 +11,17 @@ kernelspec:
   name: python3
 ---
 
-(label-zne-example)=
-# [Error mitigation on IBMQ backends with Qiskit](#error-mitigation-on-ibmq-backends)
+# Error mitigation on IBMQ backends with Qiskit
 
 
 This tutorial shows an example of how to mitigate noise on IBMQ
 backends, broken down in the following steps.
 
-- [Settings](#settings)
-- [Setup: Defining a circuit](#setup-defining-a-circuit)
-- [High-level usage](#high-level-usage)
-- [Options](#options)
-- [Lower-level usage](#lower-level-usage)
+- [](#settings)
+- [](#setup-defining-a-circuit)
+- [](#high-level-usage)
+- [](#options)
+- [](#lower-level-usage)
 
 +++
 

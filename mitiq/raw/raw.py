@@ -23,7 +23,7 @@ def execute(
     circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     observable: Optional[Observable] = None,
-) -> complex:
+) -> float:
     """Evaluates the expectation value associated to the input circuit
     without using error mitigation.
 

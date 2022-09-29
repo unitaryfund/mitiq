@@ -113,51 +113,27 @@ myst_enable_extensions = [
     "smartquotes",
 ]
 
+myst_heading_anchors = 3
+
 # Tells MyST to treat URIs beginning with these prefixes as external links.
 # Links that don't begin with these will be treated as internal cross-links.
 myst_url_schemes = ("http", "https", "mailto")
 
 # -- Options for myst_nb -----------------------------------------------------
 
-# Needed to explicitly set render priority for the `doctest` mode.
-# https://myst-nb.readthedocs.io/en/latest/use/formatting_outputs.html#render-priority
-nb_render_priority = {
-    "html": (
-        "application/vnd.jupyter.widget-view+json",
-        "application/javascript",
-        "text/html",
-        "image/svg+xml",
-        "image/png",
-        "image/jpeg",
-        "text/markdown",
-        "text/latex",
-        "text/plain",
-    ),
-    "doctest": (
-        "application/vnd.jupyter.widget-view+json",
-        "application/javascript",
-        "text/html",
-        "image/svg+xml",
-        "image/png",
-        "image/jpeg",
-        "text/markdown",
-        "text/latex",
-        "text/plain",
-    ),
-}
 # How long should Sphinx wait while a notebook is being evaluated before
 # quitting.
-execution_timeout = 600
+nb_execution_timeout = 600
 
 # By default, if nothing has changed in the source, a notebook won't be
 # re-run for a subsequent docs build.
-jupyter_execute_notebooks = "cache"
+nb_execution_mode = "cache"
 
-execution_excludepatterns = ["bqskit.ipynb"]
+nb_execution_excludepatterns = ["bqskit.ipynb"]
 # If SKIP_PYQUIL is True, do not re-run PyQuil notebooks.
 if os.environ.get("SKIP_PYQUIL"):
     print("Skipping PyQuil notebooks execution since SKIP_PYQUIL is True")
-    execution_excludepatterns.append("*pyquil*.ipynb")
+    nb_execution_excludepatterns.append("*pyquil*.ipynb")
 
 # -- Options for autodoc -----------------------------------------------------
 napoleon_google_docstring = True
@@ -330,6 +306,10 @@ html_static_path = ["_thumbnails"]
 html_logo = "img/mitiq-logo.png"
 
 html_favicon = "img/mitiq.ico"
+
+# Add extra paths that contain custom files here, relative to this directory.
+# These files are copied directly to the root of the documentation.
+html_extra_path = ["robots.txt"]
 
 myst_update_mathjax = False
 

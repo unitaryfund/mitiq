@@ -22,6 +22,7 @@ from cirq.linalg.decompositions import (
     deconstruct_single_qubit_matrix_into_angles,
     kak_decomposition,
 )
+import cirq_ionq.ionq_native_gates as cirq_ionq_ops
 from braket.circuits import (
     gates as braket_gates,
     Circuit as BKCircuit,
@@ -192,6 +193,14 @@ def _translate_one_qubit_braket_instruction_to_cirq_operation(
         return [cirq_ops.rz(gate.angle).on(*qubits)]
     elif isinstance(gate, braket_gates.PhaseShift):
         return [cirq_ops.Z.on(*qubits) ** (gate.angle / np.pi)]
+    elif isinstance(gate, braket_gates.GPi):
+        return [
+            cirq_ionq_ops.GPIGate(phi=gate.angle / (2 * np.pi)).on(*qubits)
+        ]
+    elif isinstance(gate, braket_gates.GPi2):
+        return [
+            cirq_ionq_ops.GPI2Gate(phi=gate.angle / (2 * np.pi)).on(*qubits)
+        ]
 
     else:
         _raise_braket_to_cirq_error(instr)
@@ -279,6 +288,15 @@ def _translate_two_qubit_braket_instruction_to_cirq_operation(
     elif isinstance(gate, braket_gates.XY):
         return [cirq_ops.ISwapPowGate(exponent=gate.angle / np.pi).on(*qubits)]
 
+    # Two-qubit two-parameters parameterized gates.
+    elif isinstance(gate, braket_gates.MS):
+        return [
+            cirq_ionq_ops.MSGate(
+                phi0=gate.angle_1 / (2 * np.pi),
+                phi1=gate.angle_2 / (2 * np.pi),
+            ).on(*qubits)
+        ]
+
     else:
         _raise_braket_to_cirq_error(instr)
 
@@ -357,6 +375,14 @@ def _translate_one_qubit_cirq_operation_to_braket_instruction(
         elif isinstance(op.gate, cirq_ops.IdentityGate):
             return [Instruction(braket_gates.I(), target)]
 
+        # IonQ native gates
+        elif isinstance(op.gate, cirq_ionq_ops.GPIGate):
+            angle = op.gate.phi * 2 * np.pi
+            return [Instruction(braket_gates.GPi(angle), target)]
+        elif isinstance(op.gate, cirq_ionq_ops.GPI2Gate):
+            angle = op.gate.phi * 2 * np.pi
+            return [Instruction(braket_gates.GPi2(angle), target)]
+
     # Arbitrary single-qubit unitary decomposition.
     # TODO: This does not account for global phase.
     if isinstance(op, cirq_ops.Operation):
@@ -432,6 +458,16 @@ def _translate_two_qubit_cirq_operation_to_braket_instruction(
         return [
             Instruction(
                 braket_gates.ZZ(cast(float, op.gate.exponent) * np.pi),
+                [q1, q2],
+            )
+        ]
+
+    # IonQ native gates
+    elif isinstance(op.gate, cirq_ionq_ops.MSGate):
+        a0, a1 = op.gate.phi0, op.gate.phi1
+        return [
+            Instruction(
+                braket_gates.MS(a0 * 2 * np.pi, a1 * 2 * np.pi),
                 [q1, q2],
             )
         ]
