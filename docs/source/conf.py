@@ -129,11 +129,11 @@ nb_execution_timeout = 600
 # re-run for a subsequent docs build.
 nb_execution_mode = "cache"
 
-execution_excludepatterns = ["bqskit.ipynb"]
+nb_execution_excludepatterns = ["bqskit.ipynb"]
 # If SKIP_PYQUIL is True, do not re-run PyQuil notebooks.
 if os.environ.get("SKIP_PYQUIL"):
     print("Skipping PyQuil notebooks execution since SKIP_PYQUIL is True")
-    execution_excludepatterns.append("*pyquil*.ipynb")
+    nb_execution_excludepatterns.append("*pyquil*.ipynb")
 
 # -- Options for autodoc -----------------------------------------------------
 napoleon_google_docstring = True
