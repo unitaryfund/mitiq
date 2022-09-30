@@ -268,7 +268,14 @@ def test_to_from_braket_common_one_qubit_gates():
     assert _equal(test_circuit, cirq_circuit, require_qubit_equality=True)
 
 
-@pytest.mark.parametrize("uncommon_gate", [ops.HPowGate(exponent=-1 / 14)])
+@pytest.mark.parametrize(
+    "uncommon_gate",
+    [
+        ops.HPowGate(exponent=-1 / 14),
+        cirq_ionq_ops.GPIGate(phi=1 / 14),
+        cirq_ionq_ops.GPI2Gate(phi=1 / 14),
+    ],
+)
 def test_to_from_braket_uncommon_one_qubit_gates(uncommon_gate):
     """These gates get decomposed when converting Cirq -> Braket -> Cirq, but
     the unitaries should be equal up to global phase.
@@ -315,7 +322,11 @@ def test_to_from_braket_common_two_qubit_gates(common_gate):
 
 @pytest.mark.parametrize(
     "uncommon_gate",
-    [ops.CNotPowGate(exponent=-1 / 17), ops.CZPowGate(exponent=2 / 7)],
+    [
+        ops.CNotPowGate(exponent=-1 / 17),
+        ops.CZPowGate(exponent=2 / 7),
+        cirq_ionq_ops.MSGate(phi0=1 / 7, phi1=2 / 7),
+    ],
 )
 def test_to_from_braket_uncommon_two_qubit_gates(uncommon_gate):
     """These gates get decomposed when converting Cirq -> Braket -> Cirq, but
