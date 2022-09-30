@@ -16,7 +16,7 @@ kernelspec:
 +++
 
 In this notebook we solve a simple [_MaxCut_ problem](https://en.wikipedia.org/wiki/Maximum_cut) with the
-_Quantum Approximate Optimization Algorithm_ (QAOA) [[1-5]](#References) executed on a simulated noisy backend.
+_Quantum Approximate Optimization Algorithm_ (QAOA) [[1-5]](#references) executed on a simulated noisy backend.
 In particular we are interested in investigating how Mitiq can help reduce errors and improve the results.
 
 +++

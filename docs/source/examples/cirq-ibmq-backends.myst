@@ -11,8 +11,7 @@ kernelspec:
   name: python3
 ---
 
-(label-cirq-zne-example)=
-# [Error mitigation with Cirq on IBMQ backends](#error-mitigation-cirq-on-ibmq-backends)
+# Error mitigation with Cirq on IBMQ backends
 
 
 This tutorial shows an example of how to mitigate noise on IBMQ backends with the [Cirq frontend](https://quantumai.google/cirq).
@@ -20,11 +19,11 @@ It isn't necessary to use Qiskit frontends (circuits) to run on IBM backends. We
 Mitiq to use supported frontends with supported backends. Below, we show how to run a Cirq circuit on an
 IBMQ backend, broken down in the following steps.
 
-- [Settings](#settings)
-- [Setup: Defining a circuit](#setup-defining-a-circuit)
-- [High-level usage](#high-level-usage)
-- [Options](#options)
-- [Lower-level usage](#lower-level-usage)
+- [](#settings)
+- [](#setup-defining-a-circuit-in-cirq)
+- [](#high-level-usage)
+- [](#options)
+- [](#lower-level-usage)
 
 +++
 

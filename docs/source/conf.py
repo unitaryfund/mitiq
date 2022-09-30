@@ -113,45 +113,21 @@ myst_enable_extensions = [
     "smartquotes",
 ]
 
+myst_heading_anchors = 3
+
 # Tells MyST to treat URIs beginning with these prefixes as external links.
 # Links that don't begin with these will be treated as internal cross-links.
 myst_url_schemes = ("http", "https", "mailto")
 
 # -- Options for myst_nb -----------------------------------------------------
 
-# Needed to explicitly set render priority for the `doctest` mode.
-# https://myst-nb.readthedocs.io/en/latest/use/formatting_outputs.html#render-priority
-nb_render_priority = {
-    "html": (
-        "application/vnd.jupyter.widget-view+json",
-        "application/javascript",
-        "text/html",
-        "image/svg+xml",
-        "image/png",
-        "image/jpeg",
-        "text/markdown",
-        "text/latex",
-        "text/plain",
-    ),
-    "doctest": (
-        "application/vnd.jupyter.widget-view+json",
-        "application/javascript",
-        "text/html",
-        "image/svg+xml",
-        "image/png",
-        "image/jpeg",
-        "text/markdown",
-        "text/latex",
-        "text/plain",
-    ),
-}
 # How long should Sphinx wait while a notebook is being evaluated before
 # quitting.
-execution_timeout = 600
+nb_execution_timeout = 600
 
 # By default, if nothing has changed in the source, a notebook won't be
 # re-run for a subsequent docs build.
-jupyter_execute_notebooks = "cache"
+nb_execution_mode = "cache"
 
 execution_excludepatterns = ["bqskit.ipynb"]
 # If SKIP_PYQUIL is True, do not re-run PyQuil notebooks.
