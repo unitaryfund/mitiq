@@ -13,7 +13,7 @@ black~=22.8
 mypy~=0.981
 
 # Documentation and examples.
-Sphinx==5.1.1
+Sphinx==5.2.3
 sphinxcontrib-bibtex~=2.5.0
 sphinx-copybutton~=0.4.0
 sphinx-autodoc-typehints~=1.19.4
