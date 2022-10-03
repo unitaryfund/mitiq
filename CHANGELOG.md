@@ -9,7 +9,9 @@ We drop support for Python `3.7`.
 
 Mitiq is now compatible with Numpy `1.21.6`. Different versions of NumPy may not work properly.
 
-Another important update is the addition of new [tools](https://mitiq.readthedocs.io/en/latest/apidoc.html#module-mitiq.pec.representations.biased_noise) for applying learning-based PEC!
+Another important update is the addition of new tools for applying learning-based PEC!
+This release introduces a function for learning depolarizing noise representations from Clifford circuit data. 
+Read more in our updated [API-doc](https://mitiq.readthedocs.io/en/latest/apidoc.html#module-mitiq.pec.representations.biased_noise).
 
 Special thanks to the external contributors @yitchen-tim, @amirebrahimi and @isaac-gs!
 
