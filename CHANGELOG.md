@@ -35,7 +35,7 @@ Special thanks to the external contributors @yitchen-tim, @amirebrahimi and @isa
 - Update amazon-braket-sdk requirement from ~=1.30.2 to ~=1.31.0 (#1512) [@dependabot[bot]]
 - Add whitepaper publication info/links (#1456) [@natestemen]
 - Support python 3.9 (#1505) [@natestemen]
-- Learning function for biased noise (#1358) [@misty-w]
+- Learning function for biased noise (#1358) [@Misty-W]
 - Update amazon-braket-sdk requirement from ~=1.30.1 to ~=1.30.2 (#1506) [@dependabot[bot]]
 - Bump actions/stale from 5 to 6 (#1502) [@dependabot[bot]]
 - Update amazon-braket-sdk requirement from ~=1.30.0 to ~=1.30.1 (#1499) [@dependabot[bot]]
