@@ -63,13 +63,13 @@ def _calculate_id_layers(
         input_circuit and a number of partial layers to be inserted after
         some random moments to be able to achieve the intended scale factor.
     """
-    if not 1.0 <= scale_factor:
+    if scale_factor < 1:
         raise ValueError(
-            f"Requires scale_factor >= 1 but scale_factor ={scale_factor}."
+            f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
         )
 
     # find number of uniform layers
-    num_uniform_layers = int(scale_factor - 1.0)
+    num_uniform_layers = int(scale_factor - 1)
     int_scale_factor = num_uniform_layers + 1
     if np.isclose(int_scale_factor, scale_factor):
         return [num_uniform_layers, 0]
