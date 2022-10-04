@@ -75,14 +75,17 @@ def minimize_one_norm(
     # Express the representation constraint written in the docstring in the
     # form of a matrix multiplication applied to the x vector: A @ x == b.
     matrix_a = np.array(
-        [matrix_to_vector(mat) for mat in basis_matrices_real]
+        [
+            matrix_to_vector(mat)  # type: ignore[arg-type]
+            for mat in basis_matrices_real
+        ]
     ).T
-    array_b = matrix_to_vector(ideal_matrix_real)
+    array_b = matrix_to_vector(ideal_matrix_real)  # type: ignore[arg-type]
 
     constraint = LinearConstraint(matrix_a, lb=array_b - tol, ub=array_b + tol)
 
     def one_norm(x: npt.NDArray[np.complex64]) -> float:
-        return np.linalg.norm(x, 1)
+        return cast(float, np.linalg.norm(x, 1))
 
     if initial_guess is None:
         initial_guess = np.zeros(len(basis_matrices))

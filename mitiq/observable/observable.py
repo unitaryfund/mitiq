@@ -109,20 +109,17 @@ class Observable:
     def matrix(
         self,
         qubit_indices: Optional[List[int]] = None,
-        dtype: type = np.complex128,
     ) -> npt.NDArray[np.complex64]:
         """Returns the (potentially very large) matrix of the Observable."""
         if qubit_indices is None:
             qubit_indices = self.qubit_indices
         n = len(qubit_indices)
 
-        matrix = np.zeros(shape=(2**n, 2**n), dtype=dtype)
+        obs_matrix = np.zeros(shape=(2**n, 2**n), dtype=np.complex64)
         for pauli in self._paulis:
-            matrix += pauli.matrix(
-                qubit_indices_to_include=qubit_indices
-            ).astype(dtype=dtype)
+            obs_matrix += pauli.matrix(qubit_indices_to_include=qubit_indices)
 
-        return matrix
+        return obs_matrix
 
     def expectation(
         self, circuit: QPROGRAM, execute: Callable[[QPROGRAM], QuantumResult]

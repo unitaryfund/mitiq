@@ -162,7 +162,7 @@ def execute_with_pec(
         for s, val in zip(signs, results)
     ]
 
-    pec_value = np.average(unbiased_estimators)
+    pec_value = cast(float, np.average(unbiased_estimators))
 
     if not full_output:
         return pec_value

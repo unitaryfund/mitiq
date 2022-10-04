@@ -120,7 +120,7 @@ class Executor:
         observable: Optional[Observable] = None,
         force_run_all: bool = False,
         **kwargs: Any,
-    ) -> List[complex]:
+    ) -> List[float]:
         """Returns the expectation value Tr[ρ O] for each circuit in
         ``circuits`` where O is the observable provided or implicitly defined
         by the ``executor``. (The observable is implicitly defined when the

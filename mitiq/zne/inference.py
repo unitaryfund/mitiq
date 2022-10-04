@@ -781,7 +781,7 @@ class AdaptiveFactory(Factory, ABC):
             expectation_values = executor.evaluate(  # type: ignore[union-attr]
                 to_run, observable, force_run_all=True, **exec_params
             )
-            return np.average(expectation_values)
+            return cast(float, np.average(expectation_values))
 
         return self.run_classical(
             scale_factor_to_expectation_value, max_iterations
@@ -876,7 +876,7 @@ class PolyFactory(BatchedFactory):
                 zne_error = np.sqrt(params_cov[order, order])
 
         def zne_curve(scale_factor: float) -> float:
-            return np.polyval(opt_params, scale_factor)
+            return cast(float, np.polyval(opt_params, scale_factor))
 
         return zne_limit, zne_error, opt_params, params_cov, zne_curve
 
@@ -1350,12 +1350,6 @@ class PolyExpFactory(BatchedFactory):
                 "The order cannot exceed the number"
                 f" of data points minus {1 + shift}."
             )
-        if not np.allclose(np.real(exp_values), exp_values):
-            raise ValueError(
-                f"Cannot extrapolate: Some expectation values in {exp_values} "
-                f"have non-zero imaginary part."
-            )
-        exp_values = np.real(exp_values)
 
         # Initialize default errors
         zne_error = None
