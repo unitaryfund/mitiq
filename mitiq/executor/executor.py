@@ -17,6 +17,7 @@
 by error mitigation techniques to compute expectation values."""
 
 from collections import Counter
+import warnings
 import inspect
 from typing import (
     Any,
@@ -32,6 +33,7 @@ from typing import (
 
 import numpy as np
 import numpy.typing as npt
+from scipy.linalg import ishermitian
 
 from mitiq import QPROGRAM, MeasurementResult, QuantumResult
 
@@ -140,6 +142,11 @@ class Executor:
         """
         if not isinstance(circuits, List):
             circuits = [circuits]
+
+        if observable is not None and not ishermitian(observable.matrix()):
+            warnings.warn(
+                "Expected observable to be hermitian. Continue with caution."
+            )
 
         # Get all required circuits to run.
         if (
