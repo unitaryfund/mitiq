@@ -139,6 +139,9 @@ class Executor:
             force_run_all: If True, force every circuit in the input sequence
                 to be executed (if some are identical). Else, detects identical
                 circuits and runs a minimal set.
+
+        Returns:
+            List of real valued expectation values.
         """
         if not isinstance(circuits, List):
             circuits = [circuits]
