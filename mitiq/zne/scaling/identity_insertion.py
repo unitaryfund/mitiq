@@ -16,6 +16,7 @@
 gates."""
 
 import numpy as np
+from typing import Tuple
 from collections import Counter
 from cirq import Circuit, ops, Moment
 from mitiq.utils import (
@@ -48,7 +49,7 @@ def _check_scalable(input_circuit: Circuit) -> None:
 
 def _calculate_id_layers(
     input_circuit_depth: int, scale_factor: float
-) -> tuple():
+) -> Tuple[int, int]:
     """Returns a list of integers that describes the number of identity layers
     to be inserted after each layer of the input circuit.
 
