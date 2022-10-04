@@ -148,7 +148,9 @@ class Observable:
                 keep_indices=self.qubit_indices,
             ).reshape(observable_matrix.shape)
 
-        return cast(float, np.trace(density_matrix @ observable_matrix))
+        return np.real_if_close(
+            np.trace(density_matrix @ observable_matrix)
+        ).item()
 
     def __str__(self) -> str:
         return " + ".join(map(str, self._paulis))

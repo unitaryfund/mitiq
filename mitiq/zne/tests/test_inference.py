@@ -999,7 +999,7 @@ def test_short_circuit_warning(factory):
 
 
 def test_extrapolate_raises_error_on_complex_expectation_values():
-    with raises(ValueError, match="non-zero imaginary"):
+    with raises(TypeError, match="must be a string or a real number"):
         PolyExpFactory.extrapolate(
             scale_factors=[1, 2, 3], exp_values=[1, 0.5 + 1e-5j, 6], order=1
         )
