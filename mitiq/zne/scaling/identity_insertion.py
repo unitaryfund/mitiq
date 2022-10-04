@@ -16,7 +16,6 @@
 gates."""
 
 import numpy as np
-from typing import List
 from collections import Counter
 from cirq import Circuit, ops, Moment
 from mitiq.utils import (
@@ -49,7 +48,7 @@ def _check_scalable(input_circuit: Circuit) -> None:
 
 def _calculate_id_layers(
     input_circuit_depth: int, scale_factor: float
-) -> List[int]:
+) -> tuple():
     """Returns a list of integers that describes the number of identity layers
     to be inserted after each layer of the input circuit.
 
@@ -58,7 +57,7 @@ def _calculate_id_layers(
         scale_factor : Intended noise scaling factor
 
     Returns:
-        [num_uniform_layers, num_partial_layers] : A list of the number of
+        (num_uniform_layers, num_partial_layers) : A tuple of the number of
         uniform identity layers to be inserted after each moment in the
         input_circuit and a number of partial layers to be inserted after
         some random moments to be able to achieve the intended scale factor.
@@ -79,7 +78,7 @@ def _calculate_id_layers(
         num_partial_layers = int(
             input_circuit_depth * (scale_factor - 1 - num_uniform_layers)
         )
-        return [num_uniform_layers, num_partial_layers]
+        return tuple([num_uniform_layers, num_partial_layers])
 
 
 # identity insertion scaling function
@@ -101,41 +100,33 @@ def insert_id_layers(input_circuit: Circuit, scale_factor: float) -> Circuit:
     input_circuit_depth = len(input_circuit)
 
     # find number of uniform and partial layers
-    num_layers_list = _calculate_id_layers(input_circuit_depth, scale_factor)
-    num_uniform_layers = num_layers_list[0]
-    num_partial_layers = num_layers_list[-1]
-
-    input_circuit_moment_list = []
-    for i in range(input_circuit_depth):
-        input_circuit_moment_list.append(input_circuit[i])
+    num_uniform_layers, num_partial_layers = _calculate_id_layers(
+        input_circuit_depth, scale_factor
+    )
 
     # find list of random moments for partial layers
-    if num_partial_layers != 0:
-        random_moment_indices = np.random.randint(
-            input_circuit_depth, size=num_partial_layers
-        ).tolist()
-        # figure out if the random list has any repeated indices
-        index_counter = Counter(random_moment_indices)
-    else:
-        random_moment_indices = []
-        index_counter = Counter()
+    random_moment_indices = np.random.randint(
+        input_circuit_depth, size=num_partial_layers
+    )
+    # figure out if the random list has any repeated indices
+    index_counter = Counter(random_moment_indices)
 
     # create a layer of identity acting on every qubit in the circuit
-    circuit_qubits = list(input_circuit.all_qubits())
-    id_layer = Moment(ops.I.on_each(circuit_qubits))
+    circuit_qubits = input_circuit.all_qubits()
+    id_layer = Moment(ops.I.on_each(*circuit_qubits))
 
     # create the scaled circuit
     scaled_circuit = Circuit()
     for i in range(input_circuit_depth):
-        scaled_circuit = scaled_circuit + input_circuit[i]
+        scaled_circuit.append(input_circuit[i])
         # add partial layers if i is in random moment index list
         if i in random_moment_indices:
             num_partial_layers_random_moment = index_counter[i]
-            scaled_circuit = (
-                scaled_circuit + [id_layer] * num_partial_layers_random_moment
+            scaled_circuit.append(
+                [id_layer] * num_partial_layers_random_moment
             )
         # now insert uniform layers
-        scaled_circuit = scaled_circuit + [id_layer] * num_uniform_layers
+        scaled_circuit.append([id_layer] * num_uniform_layers)
 
     # before returning scaled_circuit, terminal measurements need to be added
     _append_measurements(scaled_circuit, measurements)
