@@ -138,6 +138,6 @@ def test_compare_scale_factor(intended_scale_factor):
     achieved_scale_factor = len(scaled) / len(circ)
     # below bounds the achieved scale factor within a range to
     # keeps track of cases where partial layers are inserted and the
-    # scale factor is a float in between the two. 
+    # scale factor is a float in between the two.
     assert achieved_scale_factor <= intended_scale_factor
-    assert achieved_scale_factor >= intended_scale_factor-1
+    assert achieved_scale_factor >= intended_scale_factor - 1
