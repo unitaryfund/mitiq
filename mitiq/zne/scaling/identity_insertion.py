@@ -72,14 +72,14 @@ def _calculate_id_layers(
     num_uniform_layers = int(scale_factor - 1)
     int_scale_factor = num_uniform_layers + 1
     if np.isclose(int_scale_factor, scale_factor):
-        return tuple(num_uniform_layers, 0)
+        return (num_uniform_layers, 0)
     else:
         # find partial layers by approximating closest to the desired
         # scale_factor
         num_partial_layers = int(
             input_circuit_depth * (scale_factor - 1 - num_uniform_layers)
         )
-        return tuple(num_uniform_layers, num_partial_layers)
+        return (num_uniform_layers, num_partial_layers)
 
 
 # identity insertion scaling function
