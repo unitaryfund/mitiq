@@ -35,9 +35,9 @@ def test_id_layers_whole_scale_factor(scale_factor):
         [ops.X.on(qreg[2])],
         [ops.TOFFOLI.on(*qreg)],
     )
-    scaled = insert_id_layers(circ, scale_factor=scale_factor)
+    scaled_circ = insert_id_layers(circ, scale_factor=scale_factor)
     num_layers = scale_factor - 1
-    correct = Circuit(
+    expected_circ = Circuit(
         [ops.H.on_each(*qreg)],
         [ops.I.on_each(*qreg)] * num_layers,
         [ops.CNOT.on(qreg[0], qreg[1])],
@@ -46,7 +46,7 @@ def test_id_layers_whole_scale_factor(scale_factor):
         [ops.TOFFOLI.on(*qreg)],
         [ops.I.on_each(*qreg)] * num_layers,
     )
-    assert _equal(scaled, correct)
+    assert _equal(scaled_circ, expected_circ)
 
 
 def test_scale_with_intermediate_measurements_raises_error():
@@ -98,7 +98,8 @@ def test_calculate_id_layers_diff_scale_factor():
     circ_depth = len(circ)
     full_scale_factor = 3
     id_layers_full_scale = _calculate_id_layers(circ_depth, full_scale_factor)
-    assert id_layers_full_scale[-1] == 0
+    num_partial_layers_full_scale_factor = id_layers_full_scale[-1]
+    assert num_partial_layers_full_scale_factor == 0
 
     float_scale_factor_list = [1.3, 2.6, 3.77, 4.8, 5.9]
     for i in float_scale_factor_list:
@@ -108,10 +109,8 @@ def test_calculate_id_layers_diff_scale_factor():
         )
         # below accounts for the case when the intended scale factor is
         # approximated by having some partial layers or not.
-        if id_layers_float_scale[-1] != 0:
-            assert id_layers_float_scale[-1] > 0
-        else:
-            assert id_layers_float_scale[-1] == 0
+        num_partial_layers_float_scale_factor = id_layers_float_scale[-1]
+        assert num_partial_layers_float_scale_factor >= 0
 
     bad_scale_factor_list = [-1.3, 0, -3, 0.76]
     for i in bad_scale_factor_list:
@@ -137,4 +136,8 @@ def test_compare_scale_factor(intended_scale_factor):
     )
     scaled = insert_id_layers(circ, intended_scale_factor)
     achieved_scale_factor = len(scaled) / len(circ)
+    # below bounds the achieved scale factor within a range to
+    # keeps track of cases where partial layers are inserted and the
+    # scale factor is a float in between the two. 
     assert achieved_scale_factor <= intended_scale_factor
+    assert achieved_scale_factor >= intended_scale_factor-1
