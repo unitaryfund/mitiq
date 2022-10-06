@@ -307,6 +307,10 @@ html_logo = "img/mitiq-logo.png"
 
 html_favicon = "img/mitiq.ico"
 
+# Add extra paths that contain custom files here, relative to this directory.
+# These files are copied directly to the root of the documentation.
+html_extra_path = ["robots.txt"]
+
 myst_update_mathjax = False
 
 nbsphinx_custom_formats = {
