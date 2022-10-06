@@ -50,7 +50,7 @@ def _check_scalable(input_circuit: Circuit) -> None:
 def _calculate_id_layers(
     input_circuit_depth: int, scale_factor: float
 ) -> Tuple[int, int]:
-    """Returns a list of integers that describes the number of identity layers
+    """Returns a tuple of integers that describes the number of identity layers
     to be inserted after each layer of the input circuit.
 
     Args:
