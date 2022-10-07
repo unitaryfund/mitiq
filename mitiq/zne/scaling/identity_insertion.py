@@ -101,7 +101,7 @@ def insert_id_layers(input_circuit: Circuit, scale_factor: float) -> Circuit:
     random_moment_indices = np.random.randint(
         input_circuit_depth, size=num_partial_layers
     )
-   
+
     index_counter = Counter(random_moment_indices)
 
     circuit_qubits = input_circuit.all_qubits()
