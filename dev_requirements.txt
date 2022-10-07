@@ -18,7 +18,7 @@ sphinxcontrib-bibtex~=2.5.0
 sphinx-copybutton~=0.4.0
 sphinx-autodoc-typehints~=1.19.4
 myst-nb~=0.17.1
-pydata-sphinx-theme~=0.10.1
+pydata-sphinx-theme~=0.11.0
 jupytext==1.14.1
 sphinx-gallery==0.10.1
 nbsphinx
