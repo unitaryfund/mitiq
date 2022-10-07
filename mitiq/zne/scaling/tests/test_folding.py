@@ -1677,6 +1677,10 @@ def test_create_weight_mask_with_fidelities():
     weight_mask = _create_weight_mask(circ, fidelities)
     assert np.allclose(weight_mask, [0.9, 0.9, 0.9, 0.8, 0.0, 0.7])
 
+    fidelities = {"rx": 1.0, "H": 0.1}
+    with pytest.warns(UserWarning, match="don't currently support"):
+        weight_mask = _create_weight_mask(circ, fidelities)
+
 
 @pytest.mark.parametrize(
     "weight_mask",
