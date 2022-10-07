@@ -118,16 +118,12 @@ def insert_id_layers(input_circuit: Circuit, scale_factor: float) -> Circuit:
 
     # create the scaled circuit
     scaled_circuit = Circuit()
-    for i in range(input_circuit_depth):
-        scaled_circuit.append(input_circuit[i])
-        # add partial layers if i is in random moment index list
-        if i in random_moment_indices:
-            num_partial_layers_random_moment = index_counter[i]
-            scaled_circuit.append(
-                [id_layer] * num_partial_layers_random_moment
-            )
-        # now insert uniform layers
-        scaled_circuit.append([id_layer] * num_uniform_layers)
+    for i, op in enumerate(input_circuit):
+        scaled_circuit.append(op)
+
+        scaled_circuit.append(
+            [id_layer] * (num_uniform_layers + index_counter.get(i, 0))
+        )
 
     # before returning scaled_circuit, terminal measurements need to be added
     _append_measurements(scaled_circuit, measurements)
