@@ -107,8 +107,7 @@ def test_calculate_id_layers_diff_scale_factor():
         id_layers_float_scale = _calculate_id_layers(
             circ_depth, float_scale_factor
         )
-        # below accounts for the case when the intended scale factor is
-        # approximated by having some partial layers or not.
+      
         num_partial_layers_float_scale_factor = id_layers_float_scale[-1]
         assert num_partial_layers_float_scale_factor >= 0
 
@@ -136,8 +135,6 @@ def test_compare_scale_factor(intended_scale_factor):
     )
     scaled = insert_id_layers(circ, intended_scale_factor)
     achieved_scale_factor = len(scaled) / len(circ)
-    # below bounds the achieved scale factor within a range to
-    # keeps track of cases where partial layers are inserted and the
-    # scale factor is a float in between the two.
+  
     assert achieved_scale_factor <= intended_scale_factor
     assert achieved_scale_factor >= intended_scale_factor - 1

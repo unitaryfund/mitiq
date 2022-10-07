@@ -68,21 +68,17 @@ def _calculate_id_layers(
             f"Requires scale_factor >= 1 but scale_factor = {scale_factor}."
         )
 
-    # find number of uniform layers
     num_uniform_layers = int(scale_factor - 1)
     int_scale_factor = num_uniform_layers + 1
     if np.isclose(int_scale_factor, scale_factor):
         return (num_uniform_layers, 0)
     else:
-        # find partial layers by approximating closest to the desired
-        # scale_factor
         num_partial_layers = int(
             input_circuit_depth * (scale_factor - 1 - num_uniform_layers)
         )
         return (num_uniform_layers, num_partial_layers)
 
 
-# identity insertion scaling function
 def insert_id_layers(input_circuit: Circuit, scale_factor: float) -> Circuit:
     """Returns a scaled version of the input circuit by inserting layers of
     identities.
@@ -94,29 +90,23 @@ def insert_id_layers(input_circuit: Circuit, scale_factor: float) -> Circuit:
     Returns:
         scaled_circuit : Scaled quantum circuit via identity layer insertions
     """
-    # Calculate input circuit depth after checking if it is scalable, remove
-    # terminal measurements
     _check_scalable(input_circuit)
     measurements = _pop_measurements(input_circuit)
     input_circuit_depth = len(input_circuit)
 
-    # find number of uniform and partial layers
     num_uniform_layers, num_partial_layers = _calculate_id_layers(
         input_circuit_depth, scale_factor
     )
 
-    # find list of random moments for partial layers
     random_moment_indices = np.random.randint(
         input_circuit_depth, size=num_partial_layers
     )
-    # figure out if the random list has any repeated indices
+   
     index_counter = Counter(random_moment_indices)
 
-    # create a layer of identity acting on every qubit in the circuit
     circuit_qubits = input_circuit.all_qubits()
     id_layer = Moment(ops.I.on_each(*circuit_qubits))
 
-    # create the scaled circuit
     scaled_circuit = Circuit()
     for i, op in enumerate(input_circuit):
         scaled_circuit.append(op)
@@ -125,6 +115,5 @@ def insert_id_layers(input_circuit: Circuit, scale_factor: float) -> Circuit:
             [id_layer] * (num_uniform_layers + index_counter.get(i, 0))
         )
 
-    # before returning scaled_circuit, terminal measurements need to be added
     _append_measurements(scaled_circuit, measurements)
     return scaled_circuit

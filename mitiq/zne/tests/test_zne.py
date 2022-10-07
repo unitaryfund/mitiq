@@ -39,8 +39,8 @@ from mitiq.zne.scaling import (
     fold_gates_from_left,
     fold_gates_from_right,
     fold_gates_at_random,
+    insert_id_layers,
 )
-from mitiq.zne.scaling.identity_insertion import insert_id_layers
 from mitiq._typing import QPROGRAM
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 
