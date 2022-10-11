@@ -16,8 +16,8 @@
 gates."""
 
 import numpy as np
+import random
 from typing import Tuple
-from collections import Counter
 from cirq import Circuit, ops, Moment
 from mitiq.utils import (
     _append_measurements,
@@ -98,11 +98,9 @@ def insert_id_layers(input_circuit: Circuit, scale_factor: float) -> Circuit:
         input_circuit_depth, scale_factor
     )
 
-    random_moment_indices = np.random.randint(
-        input_circuit_depth, size=num_partial_layers
+    random_moment_indices = random.sample(
+        range(input_circuit_depth), num_partial_layers
     )
-
-    index_counter = Counter(random_moment_indices)
 
     circuit_qubits = input_circuit.all_qubits()
     id_layer = Moment(ops.I.on_each(*circuit_qubits))
@@ -111,9 +109,10 @@ def insert_id_layers(input_circuit: Circuit, scale_factor: float) -> Circuit:
     for i, op in enumerate(input_circuit):
         scaled_circuit.append(op)
 
-        scaled_circuit.append(
-            [id_layer] * (num_uniform_layers + index_counter.get(i, 0))
-        )
+        scaled_circuit.append([id_layer] * (num_uniform_layers))
+
+        if i in random_moment_indices:
+            scaled_circuit.append(id_layer)
 
     _append_measurements(scaled_circuit, measurements)
     return scaled_circuit
