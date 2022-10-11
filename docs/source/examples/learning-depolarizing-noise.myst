@@ -11,14 +11,18 @@ kernelspec:
   name: python3813jvsc74a57bd0992c44e14009e3623432b51dfa0ccb8179e6507fb1569359de12ac98f26b40e8
 ---
 
-```{code-cell} ipython3
-import warnings
+# Learning quasiprobability representations with a depolarizing noise model
 
-warnings.simplefilter("ignore", UserWarning)
++++
+
+In this example, we demonstrate the workflow of learning quasiprobability representations of a `CNOT` gate with a depolarizing noise model, from Clifford circuit data. The depolarizing noise model is parameterized by the noise strength, `epsilon`. The resulting quasiprobability representations of the `CNOT` gate are then used to obtain an error-mitigated expectation value with Mitiq's probabilistic error cancellation module.
+
+```{code-cell} ipython3
 import numpy as np
+from matplotlib import pyplot as plt
 from cirq import (
     CXPowGate,
-    MixedUnitaryChannel,
+    DepolarizingChannel,
     Rx,
     Rz,
     I,
@@ -35,13 +39,17 @@ from mitiq import Executor, Observable, PauliString
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.cdr import generate_training_circuits
 from mitiq.cdr._testing import random_x_z_cnot_circuit
+from mitiq.pec import execute_with_pec
+from mitiq.pec.representations.depolarizing import (
+    represent_operation_with_local_depolarizing_noise,
+)
 from mitiq.pec.representations.learning import (
     biased_noise_loss_function,
     learn_depolarizing_noise_parameter,
 )
 ```
 
-Begin with a simple Rx-Rz-CNOT circuit
+Create a simple Rx-Rz-CNOT circuit using `mitiq.cdr._testing.random_x_z_cnot_circuit`. Here we use an (optional) seed for reproducibility.
 
 ```{code-cell} ipython3
 circuit = random_x_z_cnot_circuit(
@@ -50,7 +58,7 @@ circuit = random_x_z_cnot_circuit(
 print(circuit)
 ```
 
-In this example, we wish to learn the strength of depolarizing noise of the first CNOT gate in the circuit (there is only one).
+In this example, we will learn the strength of depolarizing noise of the `CNOT` gate in the circuit.
 
 ```{code-cell} ipython3
 CNOT_ops = list(circuit.findall_operations_with_gate_type(CXPowGate))
@@ -59,13 +67,13 @@ op = CNOT_ops[0][1]
 operations_to_learn = [Circuit(op)]
 ```
 
-Specify the observable of interest
+Specify the observable of interest.
 
 ```{code-cell} ipython3
 observable = Observable(PauliString("XZ"), PauliString("YY"))
 ```
 
-Define the "ideal executor" for simulating the Clifford training circuits without noise (for comparison to the error-mitigated expectation values)
+Define the ideal executor function for simulating the Clifford training circuits without noise. This will be used for comparison to the error-mitigated expectation values in the learning function, and for a final comparison with the mitigated and unmitigated values at the end of the workflow.
 
 ```{code-cell} ipython3
 def ideal_execute(circ: Circuit) -> np.ndarray:
@@ -75,25 +83,10 @@ def ideal_execute(circ: Circuit) -> np.ndarray:
 ideal_executor = Executor(ideal_execute)
 ```
 
-Define the noisy executor, in this case for simulating depolarizing noise on one operation (CNOT) of each of the training circuits. The optimized value of the noise strength `epsilon` should be close to the value defined for this executor. The bias `eta` is zero because we are simulating depolarizing noise.
+Define the noisy executor, in this case for simulating depolarizing noise on the `CNOT` gate in each of the training circuits. The optimized value of the noise strength `epsilon` should be close to the value defined for this executor.
 
 ```{code-cell} ipython3
 epsilon = 0.05
-eta = 0
-
-
-def biased_noise_channel(epsilon: float, eta: float) -> MixedUnitaryChannel:
-    a = 1 - epsilon
-    b = epsilon * (3 * eta + 1) / (3 * (eta + 1))
-    c = epsilon / (3 * (eta + 1))
-
-    mix = [
-        (a, unitary(I)),
-        (b, unitary(Z)),
-        (c, unitary(X)),
-        (c, unitary(Y)),
-    ]
-    return ops.MixedUnitaryChannel(mix)
 
 
 def noisy_execute(circ: Circuit) -> np.ndarray:
@@ -102,7 +95,7 @@ def noisy_execute(circ: Circuit) -> np.ndarray:
     for q in qubits:
         noisy_circ.insert(
             index + 1,
-            biased_noise_channel(epsilon, eta)(q),
+            DepolarizingChannel(epsilon)(q),
             strategy=InsertStrategy.EARLIEST,
         )
     return ideal_execute(noisy_circ)
@@ -111,40 +104,105 @@ def noisy_execute(circ: Circuit) -> np.ndarray:
 noisy_executor = Executor(noisy_execute)
 ```
 
-Set the initial conditions and number of PEC samples.  
-Setting a small value of `num_samples` is typically necessary to obtain a reasonable execution time.  
-On the other hand, using a number of PEC samples that is too small can result in a large statistical error, ultimately causing the optimization process to fail.
+Before calling the optimizer, let's plot the loss function that will be minimized in the learning routine, over a small range of noise strength values. The loss function calls `execute_with_pec`, and we can optionally pass keyword arguments to set the number of PEC samples, among other options. Here we set a relatively small value of `num_samples` to obtain a reasonable execution time. However, we avoid using a number of PEC samples that is too small, as it can result in a large statistical error and ultimately cause the optimization process to fail.
+
+```{code-cell} ipython3
+pec_kwargs = {"num_samples": 600, "random_state": 1}
+
+training_circuits = generate_training_circuits(
+    circuit=circuit,
+    num_training_circuits=5,
+    fraction_non_clifford=0.2,
+    random_state=np.random.RandomState(1),
+)
+ideal_values = np.array(
+    [ideal_executor.evaluate(tc, observable) for tc in training_circuits]
+)
+
+epsilons = np.linspace(0, 0.1, 21)
+
+import warnings
+
+# suppress warnings about missing representations
+# this example only simulates noise on CNOT
+warnings.simplefilter("ignore", UserWarning)
+loss = [
+    biased_noise_loss_function(
+        [eps, 0],
+        operations_to_learn,
+        training_circuits,
+        ideal_values,
+        noisy_executor,
+        pec_kwargs,
+        observable,
+    )
+    for eps in epsilons
+]
+
+_ = plt.plot(epsilons, loss)
+plt.title("Depolarizing noise loss function")
+plt.xlabel("Noise strength")
+plt.ylabel("Loss")
+plt.show()
+```
+
+Now we set the initial conditions for the optimization. For purposes of this demonstration, our initial guess for epsilon, `epsilon0`, is slightly offset from the true value of `epsilon`.
 
 ```{code-cell} ipython3
 offset = 0.1
 epsilon0 = (1 - offset) * epsilon
-pec_kwargs_learning = {"num_samples": 300, "random_state": 1}
 ```
 
 Use Nelder-Mead method from `scipy.optimize.minimize` to find the optimized value of epsilon.
 
 ```{code-cell} ipython3
-import timeit
-
-start = timeit.default_timer()
 [success, epsilon_opt] = learn_depolarizing_noise_parameter(
     operations_to_learn=operations_to_learn,
     circuit=circuit,
     ideal_executor=ideal_executor,
     noisy_executor=noisy_executor,
-    pec_kwargs=pec_kwargs_learning,
+    pec_kwargs=pec_kwargs,
     num_training_circuits=5,
     fraction_non_clifford=0.2,
     training_random_state=np.random.RandomState(1),
     epsilon0=epsilon0,
     observable=observable,
+    method="Nelder-Mead",
 )
-end = timeit.default_timer()
-print(end - start)
 
 print(success)
 print(abs(epsilon_opt - epsilon))
 print(offset * epsilon)
 ```
 
-Optimization completed successfully and the optimized value of epsilon is closer to the true value of epsilon than the intial value was.
+Optimization completed successfully and the optimized value of epsilon is closer to the true value of epsilon as compared to the initial value. 
+
+Now we will use the optimized value of the noise strength to map CNOT into its quasiprobability representation.
+
+```{code-cell} ipython3
+representations = [
+    represent_operation_with_local_depolarizing_noise(Circuit(op), epsilon_opt)
+]
+```
+
+Apply PEC on original noisy circuit to obtain the error-mitigated expectation value.
+
+```{code-cell} ipython3
+mitigated = execute_with_pec(
+    circuit=circuit,
+    executor=noisy_executor,
+    observable=observable,
+    representations=representations,
+    **pec_kwargs,
+)
+print(mitigated.real)
+```
+
+Comparing with unmitigated and ideal values, we see that the mitigated value, calculated with the depolarizing noise strength learned from Clifford circuit data is closer to the ideal value, as compared with the noisy value.
+
+```{code-cell} ipython3
+unmitigated = noisy_executor.evaluate(circuit, observable)[0].real
+ideal = ideal_executor.evaluate(circuit, observable)[0].real
+print(unmitigated)
+print(ideal)
+```
