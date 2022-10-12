@@ -106,8 +106,8 @@ def insert_id_layers(input_circuit: Circuit, scale_factor: float) -> Circuit:
     id_layer = Moment(ops.I.on_each(*circuit_qubits))
 
     scaled_circuit = Circuit()
-    for i, op in enumerate(input_circuit):
-        scaled_circuit.append(op)
+    for i, moment in enumerate(input_circuit):
+        scaled_circuit.append(moment)
 
         scaled_circuit.append([id_layer] * (num_uniform_layers))
 
