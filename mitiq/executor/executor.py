@@ -33,7 +33,6 @@ from typing import (
 
 import numpy as np
 import numpy.typing as npt
-from scipy.linalg import ishermitian
 
 from mitiq import QPROGRAM, MeasurementResult, QuantumResult
 
