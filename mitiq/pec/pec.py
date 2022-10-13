@@ -274,9 +274,9 @@ def pec_decorator(
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
 ) -> Callable[
-    [Callable[[Union[QPROGRAM]], QuantumResult]],
+    [Callable[[QPROGRAM], QuantumResult]],
     Callable[
-        [Union[QPROGRAM]],
+        [QPROGRAM],
         Union[float, Tuple[float, Dict[str, Any]]],
     ],
 ]:

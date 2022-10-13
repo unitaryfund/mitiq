@@ -1008,7 +1008,7 @@ class FakeNodesFactory(BatchedFactory):
 
     @staticmethod
     def _map_to_fake_nodes(
-        x: Union[Sequence[float]], a: float, b: float
+        x: Sequence[float], a: float, b: float
     ) -> Sequence[float]:
         """
         A function that maps inputs to Chebyshev-Lobatto points. Based on
