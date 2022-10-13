@@ -1350,6 +1350,12 @@ class PolyExpFactory(BatchedFactory):
                 "The order cannot exceed the number"
                 f" of data points minus {1 + shift}."
             )
+        if not np.allclose(np.real(exp_values), exp_values):
+            raise ValueError(
+                f"Cannot extrapolate: Some expectation values in {exp_values} "
+                f"have non-zero imaginary part."
+            )
+        exp_values = np.real(exp_values)
 
         # Initialize default errors
         zne_error = None
