@@ -39,6 +39,7 @@ from mitiq import QPROGRAM, MeasurementResult, QuantumResult
 
 from mitiq.observable.observable import Observable
 from mitiq.interface import convert_from_mitiq, convert_to_mitiq
+from mitiq.observable.pauli import PauliString
 
 
 DensityMatrixLike = [
@@ -146,7 +147,17 @@ class Executor:
         if not isinstance(circuits, List):
             circuits = [circuits]
 
-        if observable is not None and not ishermitian(observable.matrix()):
+        warn_non_hermitian = False
+        if observable:
+            if isinstance(observable, PauliString):
+                if observable.coeff.imag > 0.0001:
+                    warn_non_hermitian = True
+            elif isinstance(observable, Observable):
+                if any(
+                    pauli.coeff.imag > 0.0001 for pauli in observable._paulis
+                ):
+                    warn_non_hermitian = True
+        if warn_non_hermitian:
             warnings.warn(
                 "Expected observable to be hermitian. Continue with caution."
             )
