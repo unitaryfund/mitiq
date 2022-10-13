@@ -14,24 +14,24 @@ kernelspec:
 
 +++ {"tags": []}
 
-# Using ZNE to compute the energy landscape of a variational circuit with INSERT-FRONTEND
+# Using ZNE to compute the energy landscape of a variational circuit with Qiskit
 
 +++
 
-This tutorial shows an example in which the energy landscape for a two-qubit variational circuit is explored with and without error mitigation, using INSERT-FRONTEND as our frontend.
+This tutorial shows an example in which the energy landscape for a two-qubit variational circuit is explored with and without error mitigation, using Qiskit as our frontend.
 
 ```{code-cell} ipython3
 import matplotlib.pyplot as plt
 import numpy as np
 #TODO # from cirq import Circuit, rx, CNOT, DensityMatrixSimulator, LineQubit, depolarize
+from qiskit import QuantumCircuit, Aer, transpile
+from qiskit.providers.aer.noise import NoiseModel, depolarizing_error
 
 from mitiq.zne import mitigate_executor
 from mitiq.zne.inference import RichardsonFactory
-
-SIMULATOR = #TODO #DensityMatrixSimulator()
 ```
 
-## Defining the ideal variational circuit in INSERT-FRONTEND 
+## Defining the ideal variational circuit in Qiskit 
 
 +++
 
