@@ -1355,7 +1355,7 @@ class PolyExpFactory(BatchedFactory):
                 f"Cannot extrapolate: Some expectation values in {exp_values} "
                 f"have non-zero imaginary part."
             )
-        exp_values = np.real(exp_values)
+        exp_values = np.real(exp_values).tolist()
 
         # Initialize default errors
         zne_error = None
