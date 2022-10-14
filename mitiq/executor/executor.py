@@ -191,7 +191,9 @@ class Executor:
 
         # Parse the results.
         if self._executor_return_type in FloatLike:
-            results = all_results
+            results = np.real_if_close(
+                cast(Sequence[float], all_results)
+            ).tolist()
 
         elif self._executor_return_type in DensityMatrixLike:
             observable = cast(Observable, observable)
