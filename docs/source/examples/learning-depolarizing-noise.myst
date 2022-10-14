@@ -8,7 +8,7 @@ jupytext:
 kernelspec:
   display_name: Python 3.8.13 64-bit ('venv_mitiq_learnrepspec')
   language: python
-  name: python3813jvsc74a57bd0992c44e14009e3623432b51dfa0ccb8179e6507fb1569359de12ac98f26b40e8
+  name:  python3
 ---
 
 # Learning quasiprobability representations with a depolarizing noise model
