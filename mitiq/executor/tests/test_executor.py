@@ -99,6 +99,18 @@ def test_executor_is_batched_executor():
     assert Executor.is_batched_executor(executor_measurements_batched)
 
 
+def test_executor_non_hermitian_observable():
+    obs = Observable(PauliString("Z", coeff=1j))
+
+    q = cirq.LineQubit(0)
+    circuits = [cirq.Circuit(cirq.I.on(q)), cirq.Circuit(cirq.X.on(q))]
+
+    executor = Executor(executor_measurements)
+
+    with pytest.warns(UserWarning, match="hermitian"):
+        executor.evaluate(circuits, obs)
+
+
 @pytest.mark.parametrize("ncircuits", (5, 10, 25))
 @pytest.mark.parametrize("executor", (executor_batched, executor_serial))
 def test_run_executor_identical_circuits_batched(ncircuits, executor):
