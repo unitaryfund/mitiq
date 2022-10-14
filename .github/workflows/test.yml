@@ -102,6 +102,7 @@ jobs:
 
   test-linux:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest]
         python-version: ['3.8', '3.9', '3.10']
@@ -135,6 +136,7 @@ jobs:
 
   test-nonlinux:
     strategy:
+      fail-fast: false
       matrix:
         os: [macos-latest, windows-latest]
         python-version: ['3.8', '3.9', '3.10']
