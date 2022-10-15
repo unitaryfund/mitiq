@@ -15,7 +15,7 @@ kernelspec:
 
 +++
 
-In this example, we demonstrate the workflow of learning quasiprobability representations of a `CNOT` gate with a depolarizing noise model, from Clifford circuit data. The depolarizing noise model is parameterized by the noise strength, `epsilon`. The resulting quasiprobability representations of the `CNOT` gate are then used to obtain an error-mitigated expectation value with Mitiq's probabilistic error cancellation module.
+In this example, we demonstrate the workflow of learning quasiprobability representations of a `CNOT` gate with a depolarizing noise model, from Clifford circuit data. The depolarizing noise model is parameterized by the noise strength, `epsilon`. The resulting quasiprobability representations of the `CNOT` gate are then used to obtain an error-mitigated expectation value with Mitiq's {ref}`probabilistic error cancellation module <guide/pec>`.
 
 ```{code-cell} ipython3
 import numpy as np
@@ -104,7 +104,7 @@ def noisy_execute(circ: Circuit) -> np.ndarray:
 noisy_executor = Executor(noisy_execute)
 ```
 
-Before calling the optimizer, let's plot the loss function that will be minimized in the learning routine, over a small range of noise strength values. The loss function calls `execute_with_pec`, and we can optionally pass keyword arguments to set the number of PEC samples, among other options. Here we set a relatively small value of `num_samples` to obtain a reasonable execution time. However, we avoid using a number of PEC samples that is too small, as it can result in a large statistical error and ultimately cause the optimization process to fail.
+Before calling the optimizer, let's plot the loss function that will be minimized in the learning routine, over a small range of noise strength values. The loss function calls {func}`execute_with_pec`, and we can optionally pass keyword arguments to set the number of PEC samples, among other options. Here we set a relatively small value of `num_samples` to obtain a reasonable execution time. However, we avoid using a number of PEC samples that is too small, as it can result in a large statistical error and ultimately cause the optimization process to fail.
 
 ```{code-cell} ipython3
 pec_kwargs = {"num_samples": 600, "random_state": 1}
@@ -153,7 +153,7 @@ offset = 0.1
 epsilon0 = (1 - offset) * epsilon
 ```
 
-Use Nelder-Mead method from `scipy.optimize.minimize` to find the optimized value of epsilon.
+Use Nelder-Mead method from [`scipy.optimize.minimize`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html) to find the optimized value of epsilon.
 
 ```{code-cell} ipython3
 [success, epsilon_opt] = learn_depolarizing_noise_parameter(
