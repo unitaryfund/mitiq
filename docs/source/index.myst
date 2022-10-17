@@ -11,7 +11,7 @@ examples/examples.myst
 apidoc.rst
 toc_contributing.myst
 changelog.myst
-zz_bibliography.rst
+zz_bibliography.myst
 ```
 
 ```{include} ./readme.myst
