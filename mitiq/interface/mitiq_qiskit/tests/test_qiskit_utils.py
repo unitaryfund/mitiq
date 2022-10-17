@@ -17,7 +17,7 @@
 import pytest
 import numpy as np
 from qiskit import QuantumCircuit
-from qiskit.test.mock import FakeLima
+from qiskit.providers.fake_provider import FakeLima
 
 from mitiq.interface.mitiq_qiskit.qiskit_utils import (
     execute,
