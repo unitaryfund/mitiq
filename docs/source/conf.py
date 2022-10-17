@@ -95,7 +95,6 @@ master_doc = "index"
 # -- Options for myst_parser -------------------------------------------------
 # Specifies which of the parsers should handle each file extension.
 source_suffix = {
-    ".rst": "restructuredtext",
     ".ipynb": "myst-nb",
     ".myst": "myst-nb",
     ".mystnb": "myst-nb",
