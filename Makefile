@@ -13,7 +13,7 @@ check-format:
 
 .PHONY: check-style
 check-style:
-	flake8
+	flake8 mitiq
 
 .PHONY: check-types
 check-types:
