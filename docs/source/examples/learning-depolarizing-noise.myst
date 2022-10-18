@@ -15,7 +15,10 @@ kernelspec:
 
 +++
 
-In this example, we demonstrate the workflow of learning quasiprobability representations of a `CNOT` gate with a depolarizing noise model, from Clifford circuit data. The depolarizing noise model is parameterized by the noise strength, `epsilon`. The resulting quasiprobability representations of the `CNOT` gate are then used to obtain an error-mitigated expectation value with Mitiq's {ref}`probabilistic error cancellation module <guide/pec/pec>`.
+In this example, we demonstrate the workflow of learning quasiprobability representations of a `CNOT` gate with a depolarizing noise model,
+from Clifford circuit data. The depolarizing noise model is parameterized by the noise strength, `epsilon`. The resulting quasiprobability
+representations of the `CNOT` gate are then used to obtain an error-mitigated expectation value with Mitiq's {ref}`probabilistic error
+cancellation module <guide/pec/pec>`. The learning-based PEC workflow was inspired by the procedure described in :cite:`Strikis_2021_PRXQuantum`.
 
 ```{code-cell} ipython3
 import numpy as np
@@ -49,7 +52,9 @@ from mitiq.pec.representations.learning import (
 )
 ```
 
-Create a simple Rx-Rz-CNOT circuit using `mitiq.cdr._testing.random_x_z_cnot_circuit`. Here we use an (optional) seed for reproducibility.
+Since the learning-based workflow uses the function `.generate_training_circuits` from Mitiq's Clifford Data Regression module
+to generate the near-Clifford training circuits, the input circuit must be one that is compiled into the Rx-Rz-CNOT gateset. 
+Here we use a simple Rx-Rz-CNOT circuit, with an (optional) seed for reproducibility.
 
 ```{code-cell} ipython3
 circuit = random_x_z_cnot_circuit(
@@ -58,12 +63,6 @@ circuit = random_x_z_cnot_circuit(
 print(circuit)
 ```
 
-
-Specify the observable of interest.
-
-```{code-cell} ipython3
-observable = Observable(PauliString("XZ"), PauliString("YY"))
-```
 
 Define the ideal executor function for simulating the Clifford training circuits without noise. 
 This will be used for comparison to the error-mitigated expectation values in the learning function,
@@ -119,6 +118,9 @@ training_circuits = generate_training_circuits(
     fraction_non_clifford=0.2,
     random_state=np.random.RandomState(1),
 )
+
+observable = Observable(PauliString("XZ"), PauliString("YY"))
+
 ideal_values = np.array(
     [ideal_executor.evaluate(tc, observable) for tc in training_circuits]
 )
@@ -159,7 +161,7 @@ epsilon0 = (1 - offset) * epsilon
 ```
 
 Use Nelder-Mead method from [`scipy.optimize.minimize`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html)
-to find the optimized value of epsilon.
+to find the value of epsilon that minimizes the depolarizing noise loss function. 
 
 ```{code-cell} ipython3
 [success, epsilon_opt] = learn_depolarizing_noise_parameter(
@@ -201,15 +203,16 @@ mitigated = execute_with_pec(
     representations=representations,
     **pec_kwargs,
 )
-print(mitigated.real)
+mitigated_result = mitigated.real
+print(mitigated_result)
 ```
 
 Comparing with unmitigated and ideal values, we see that the mitigated value, calculated with the depolarizing noise strength
 learned from Clifford circuit data is closer to the ideal value, as compared with the noisy value.
 
 ```{code-cell} ipython3
-unmitigated = noisy_executor.evaluate(circuit, observable)[0].real
-ideal = ideal_executor.evaluate(circuit, observable)[0].real
-print(unmitigated-ideal)
-print(mitigated-ideal)
+noisy_value = noisy_executor.evaluate(circuit, observable)[0].real
+ideal_value = ideal_executor.evaluate(circuit, observable)[0].real
+print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.5f}")
+print(f"Error with mitigation (PEC): {abs(ideal_value - mitigated_result):.{3}}")
 ```
