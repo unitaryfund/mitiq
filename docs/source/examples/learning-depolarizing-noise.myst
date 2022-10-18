@@ -14,9 +14,13 @@ kernelspec:
 # Learning quasiprobability representations with a depolarizing noise model
 
 In this example, we demonstrate the workflow of learning quasiprobability representations of a `CNOT` gate with a depolarizing noise model,
-from Clifford circuit data. The depolarizing noise model is parameterized by the noise strength, `epsilon`. The resulting quasiprobability
-representations of the `CNOT` gate are then used to obtain an error-mitigated expectation value with Mitiq's {ref}`probabilistic error
-cancellation module <guide/pec/pec>`. The learning-based PEC workflow was inspired by the procedure described in :cite:`Strikis_2021_PRXQuantum`.
+from Clifford circuit data.
+The depolarizing noise model is parameterized by the noise strength, `epsilon`.
+The resulting quasiprobability representations of the `CNOT` gate are then used to obtain an error-mitigated expectation value with Mitiq's
+{ref}`probabilistic error cancellation module <guide/pec/pec>`. 
+For a more in-depth description of the learning function used in this example, see the section on {func}`.learn_depolarizing_noise_parameter,`
+in the API-doc.
+The learning-based PEC workflow was inspired by the procedure described in :cite:`Strikis_2021_PRXQuantum`.
 
 ```{code-cell} ipython3
 import numpy as np
@@ -50,8 +54,8 @@ from mitiq.pec.representations.learning import (
 )
 ```
 
-Since the learning-based workflow uses the function `.generate_training_circuits` from Mitiq's Clifford Data Regression module
-to generate the near-Clifford training circuits, the input circuit must be one that is compiled into the Rx-Rz-CNOT gateset. 
+Since the learning-based workflow uses the function {func}`cdr.generate_training_circuits` from Mitiq's {ref}`Clifford data regression module
+<guide/cdr/cdr>` to generate the near-Clifford training circuits, the input circuit must be one that is compiled into the Rx-Rz-CNOT gateset. 
 Here we use a simple Rx-Rz-CNOT circuit, with an (optional) seed for reproducibility.
 
 ```{code-cell} ipython3
@@ -63,8 +67,8 @@ print(circuit)
 
 
 Define the ideal executor function for simulating the Clifford training circuits without noise. 
-This will be used for comparison to the error-mitigated expectation values in the learning function,
-and for a final comparison with the mitigated and unmitigated values at the end of the workflow.
+This will be used for comparison to the error-mitigated expectation values in the learning function, and for a final comparison with the
+mitigated and unmitigated values at the end of the workflow.
 
 ```{code-cell} ipython3
 def ideal_execute(circ: Circuit) -> np.ndarray:
@@ -100,12 +104,13 @@ def noisy_execute(circ: Circuit) -> np.ndarray:
 noisy_executor = Executor(noisy_execute)
 ```
 
-Before calling the optimizer, let's plot the loss function that will be minimized in the learning routine,
-over a small range of noise strength values. The loss function calls {func}`.execute_with_pec`,
-and we can optionally pass keyword arguments to set the number of PEC samples, among other options. 
+Before calling the optimizer, let's plot the loss function that will be minimized in the learning routine, over a small range of noise strength 
+values.
+The loss function calls {func}`pec.execute_with_pec`, and we can optionally pass keyword arguments to set the number of PEC samples, among other 
+options. 
 Here we set a relatively small value of `num_samples` to obtain a reasonable execution time. 
-However, we avoid using a number of PEC samples that is too small, as it can result in a large statistical error
-and ultimately cause the optimization process to fail.
+However, we avoid using a number of PEC samples that is too small, as it can result in a large statistical error and ultimately cause the 
+optimization process to fail.
 
 ```{code-cell} ipython3
 pec_kwargs = {"num_samples": 600, "random_state": 1}
@@ -150,16 +155,16 @@ plt.ylabel("Loss")
 plt.show()
 ```
 
-Now we set the initial conditions for the optimization. For purposes of this demonstration, our initial guess for epsilon,
-`epsilon0`, is slightly offset from the true value of `epsilon`.
+Now we set the initial conditions for the optimization. For purposes of this demonstration, our initial guess for epsilon, `epsilon0`, is
+slightly offset from the true value of `epsilon`.
 
 ```{code-cell} ipython3
 offset = 0.1
 epsilon0 = (1 - offset) * epsilon
 ```
 
-Use Nelder-Mead method from [`scipy.optimize.minimize`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html)
-to find the value of epsilon that minimizes the depolarizing noise loss function. 
+Use Nelder-Mead method from [`scipy.optimize.minimize`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html) to
+find the value of epsilon that minimizes the depolarizing noise loss function. 
 
 ```{code-cell} ipython3
 [success, epsilon_opt] = learn_depolarizing_noise_parameter(
