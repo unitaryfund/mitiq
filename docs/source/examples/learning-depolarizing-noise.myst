@@ -13,8 +13,6 @@ kernelspec:
 
 # Learning quasiprobability representations with a depolarizing noise model
 
-+++
-
 In this example, we demonstrate the workflow of learning quasiprobability representations of a `CNOT` gate with a depolarizing noise model,
 from Clifford circuit data. The depolarizing noise model is parameterized by the noise strength, `epsilon`. The resulting quasiprobability
 representations of the `CNOT` gate are then used to obtain an error-mitigated expectation value with Mitiq's {ref}`probabilistic error
