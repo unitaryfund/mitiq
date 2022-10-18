@@ -36,6 +36,7 @@ def learn_biased_noise_parameters(
     ideal_executor: Executor,
     noisy_executor: Executor,
     pec_kwargs: Dict["str", Any],
+    pec_data: Optional[np.ndarray] = np.array([]),
     num_training_circuits: int = 5,
     fraction_non_clifford: float = 0.2,
     training_random_state: np.random.RandomState = None,
@@ -85,8 +86,8 @@ def learn_biased_noise_parameters(
     .. note:: Using this function may require some tuning. One of the main
         challenges is setting a good value of ``num_samples`` in the PEC
         options ``pec_kwargs``. Setting a small value of ``num_samples`` is
-        typicallynecessary to obtain a reasonable execution time. On the other
-        hand,using a number of PEC samples that is too small can result in a
+        typically necessary to obtain a reasonable execution time. On the other
+        hand, using a number of PEC samples that is too small can result in a
         large statistical error, ultimately causing the optimization process to
         fail.
     """
@@ -110,6 +111,7 @@ def learn_biased_noise_parameters(
             ideal_values,
             noisy_executor,
             pec_kwargs,
+            pec_data,
             observable,
         ),
         method=method,
@@ -129,6 +131,7 @@ def learn_depolarizing_noise_parameter(
     ideal_executor: Executor,
     noisy_executor: Executor,
     pec_kwargs: Dict["str", Any],
+    pec_data: Optional[np.ndarray] = np.array([]),
     num_training_circuits: int = 5,
     fraction_non_clifford: float = 0.2,
     training_random_state: np.random.RandomState = None,  # type: ignore
@@ -200,6 +203,7 @@ def learn_depolarizing_noise_parameter(
             ideal_values,
             noisy_executor,
             pec_kwargs,
+            pec_data,
             observable,
         ),
         method=method,
@@ -219,16 +223,22 @@ def depolarizing_noise_loss_function(
     ideal_values: np.ndarray,
     noisy_executor: Executor,
     pec_kwargs: Dict["str", Any],
+    pec_data: Optional[np.ndarray] = np.array([]),
     observable: Optional[Observable] = None,
 ) -> float:
-    representations = [
-        represent_operation_with_local_depolarizing_noise(
+    if pec_data.size > 0: 
+        ind = np.abs(pec_data[:, 0] - epsilon).argmin() 
+        mitigated_values = pec_data[ind, 1:] 
+
+    else:
+        representations = [
+            represent_operation_with_local_depolarizing_noise(
             operation,
             epsilon[0],
         )
         for operation in operations_to_mitigate
     ]
-    mitigated_values = np.array(
+        mitigated_values = np.array(
         [
             execute_with_pec(
                 circuit=training_circuit,
@@ -254,7 +264,9 @@ def biased_noise_loss_function(
     ideal_values: npt.NDArray[np.float64],
     noisy_executor: Executor,
     pec_kwargs: Dict["str", Any],
+    pec_data: Optional[np.ndarray] = np.array([]),
     observable: Optional[Observable] = None,
+    
 ) -> float:
     r"""Loss function for optimizing quasi-probability representations
     assuming a biased noise model depending on two real parameters.
@@ -269,10 +281,11 @@ def biased_noise_loss_function(
             error-mitigated expectation values.
         ideal_values: Expectation values obtained by noiseless simulations.
         noisy_executor: Executes the circuit with noise and returns a
-            ``QuantumResult``.
-        pec_kwargs: Options to pass to ``execute_w_pec`` for the
-            error-mitigated expectation value obtained from executing the
-            training circuits.
+            `QuantumResult`.
+        pec_kwargs: Options to pass to `execute_w_pec` for the error-mitigated
+            expectation value obtained from executing the training circuits.
+        pec_data (optional): 3-D. Array of error-mitigated expection values for
+            model training. 
         observable (optional): Observable to compute the expectation value of.
             If None, the ``executor`` must return an expectation value.
             Otherwise the ``QuantumResult`` returned by ``executor`` is used to
@@ -283,16 +296,23 @@ def biased_noise_loss_function(
     """
     epsilon = params[0]
     eta = params[1]
-    representations = [
-        represent_operation_with_local_biased_noise(
+
+    if pec_data.size > 0: 
+        ind_eps = np.abs(pec_data[:, 0, 0] - epsilon).argmin()
+        ind_eta = np.abs(pec_data[0, :, 0] - eta).argmin()
+        mitigated_values = pec_data[ind_eps, ind_eta, :] 
+
+    else:
+        representations = [
+            represent_operation_with_local_biased_noise(
             operation,
             epsilon,
             eta,
         )
         for operation in operations_to_mitigate
-    ]
-    mitigated_values = np.array(
-        [
+        ]
+        mitigated_values = np.array(
+            [
             execute_with_pec(
                 circuit=training_circuit,
                 observable=observable,
@@ -301,9 +321,9 @@ def biased_noise_loss_function(
                 full_output=False,
                 **pec_kwargs,
             )
-            for training_circuit in training_circuits
-        ]
-    )
+                for training_circuit in training_circuits
+            ]
+        )
 
     return np.mean(
         abs(mitigated_values.reshape(-1, 1) - ideal_values.reshape(-1, 1)) ** 2

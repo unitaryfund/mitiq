@@ -17,6 +17,7 @@ import numpy as np
 import pytest
 from cirq import (
     CXPowGate,
+    DepolarizingChannel,
     MixedUnitaryChannel,
     Rx,
     Rz,
@@ -214,18 +215,16 @@ def test_learn_depolarizing_noise_parameter(epsilon):
     index = CNOT_ops[0][0]
     op = CNOT_ops[0][1]
     offset = 0.1
-    eta = 0
 
-    pec_kwargs_learning = {"num_samples": 300, "random_state": 1}
-
+    # We assume the operation "op" appears just once in the circuit such
+    # that it's enough to add a single noise channel after that operation.
     def noisy_execute(circ: Circuit) -> np.ndarray:
         noisy_circ = circ.copy()
         qubits = op.qubits
         for q in qubits:
             noisy_circ.insert(
                 index + 1,
-                biased_noise_channel(epsilon, eta)(q),
-                strategy=InsertStrategy.EARLIEST,
+                DepolarizingChannel(epsilon)(q),
             )
         return ideal_execute(noisy_circ)
 
@@ -235,12 +234,19 @@ def test_learn_depolarizing_noise_parameter(epsilon):
 
     operations_to_learn = [Circuit(op)]
 
+    pec_data = np.loadtxt(
+        "./mitiq/pec/representations/tests/learning_pec_data/learning_pec_data_eps_"
+        + str(epsilon).replace(".", "_")
+        + ".txt"
+    )
+
     [success, epsilon_opt] = learn_depolarizing_noise_parameter(
         operations_to_learn=operations_to_learn,
         circuit=circuit,
         ideal_executor=ideal_executor,
         noisy_executor=noisy_executor,
-        pec_kwargs=pec_kwargs_learning,
+        pec_kwargs={},
+        pec_data=pec_data,
         num_training_circuits=5,
         fraction_non_clifford=0.2,
         training_random_state=np.random.RandomState(1),
@@ -252,8 +258,8 @@ def test_learn_depolarizing_noise_parameter(epsilon):
     assert abs(epsilon_opt - epsilon) < offset * epsilon
 
 
-@pytest.mark.parametrize("epsilon", [0.05, 0.1])
-@pytest.mark.parametrize("eta", [1, 2])
+@pytest.mark.parametrize("epsilon", [0.05])
+@pytest.mark.parametrize("eta", [1])
 # We assume the operation "op" appears just once in the circuit such
 # that it's enough to add a single noise channel after that operation.
 def test_learn_biased_noise_parameters(epsilon, eta):
@@ -264,7 +270,7 @@ def test_learn_biased_noise_parameters(epsilon, eta):
     op = CNOT_ops[0][1]
     eta = 1
 
-    pec_kwargs_learning = {"num_samples": 600, "random_state": 1}
+    pec_kwargs_learning = {}
 
     def noisy_execute(circ: Circuit) -> np.ndarray:
         noisy_circ = circ.copy()
@@ -273,7 +279,6 @@ def test_learn_biased_noise_parameters(epsilon, eta):
             noisy_circ.insert(
                 index + 1,
                 biased_noise_channel(epsilon, eta)(q),
-                strategy=InsertStrategy.EARLIEST,
             )
         return ideal_execute(noisy_circ)
 
@@ -285,6 +290,21 @@ def test_learn_biased_noise_parameters(epsilon, eta):
     eta0 = (1 + eta_offset) * eta
 
     operations_to_learn = [Circuit(op)]
+    
+    num_training_circuits = 5
+    pec_data = np.zeros([122, 122, num_training_circuits])
+
+    for tc in range(0, num_training_circuits):
+        pec_data[:, :, tc] = np.loadtxt(
+            "./mitiq/pec/representations/tests/learning_pec_data/learning_pec_data_eps_"
+            + str(epsilon).replace(".", "_")
+            + "eta_"
+            + str(eta)
+            + "tc_"
+            + str(tc)
+            + ".txt"
+        )
+
 
     [success, epsilon_opt, eta_opt] = learn_biased_noise_parameters(
         operations_to_learn=operations_to_learn,
@@ -292,7 +312,8 @@ def test_learn_biased_noise_parameters(epsilon, eta):
         ideal_executor=ideal_executor,
         noisy_executor=noisy_executor,
         pec_kwargs=pec_kwargs_learning,
-        num_training_circuits=5,
+        pec_data=np.array(pec_data),
+        num_training_circuits=num_training_circuits,
         fraction_non_clifford=0.2,
         training_random_state=np.random.RandomState(1),
         epsilon0=epsilon0,
