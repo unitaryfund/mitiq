@@ -39,6 +39,7 @@ from mitiq.zne.scaling import (
     fold_gates_from_left,
     fold_gates_from_right,
     fold_gates_at_random,
+    insert_id_layers,
 )
 from mitiq._typing import QPROGRAM
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
@@ -159,7 +160,12 @@ def test_with_observable_two_qubits(executor):
 
 @pytest.mark.parametrize(
     "fold_method",
-    [fold_gates_from_left, fold_gates_from_right, fold_gates_at_random],
+    [
+        fold_gates_from_left,
+        fold_gates_from_right,
+        fold_gates_at_random,
+        insert_id_layers,
+    ],
 )
 @pytest.mark.parametrize("factory", [LinearFactory, RichardsonFactory])
 @pytest.mark.parametrize("num_to_average", [1, 2, 5])
@@ -178,7 +184,12 @@ def test_execute_with_zne_no_noise(fold_method, factory, num_to_average):
 @pytest.mark.parametrize("factory", [LinearFactory, RichardsonFactory])
 @pytest.mark.parametrize(
     "fold_method",
-    [fold_gates_from_left, fold_gates_from_right, fold_gates_at_random],
+    [
+        fold_gates_from_left,
+        fold_gates_from_right,
+        fold_gates_at_random,
+        insert_id_layers,
+    ],
 )
 def test_averaging_improves_zne_value_with_fake_noise(factory, fold_method):
     """Tests that averaging with Gaussian noise produces a better ZNE value
