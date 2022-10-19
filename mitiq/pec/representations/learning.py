@@ -12,8 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""Function to calculate parameters for biased noise model via a
-learning-based technique."""
+"""Functions to calculate parameters for depolarizing noise and biased noise
+models via a learning-based technique."""
 
 from typing import cast, Optional, Dict, Any, List, Tuple
 import numpy as np
@@ -36,10 +36,10 @@ def learn_biased_noise_parameters(
     ideal_executor: Executor,
     noisy_executor: Executor,
     pec_kwargs: Dict["str", Any],
-    pec_data: Optional[np.ndarray] = np.array([]),
+    pec_data: npt.NDArray[np.float64] = np.array([]),
     num_training_circuits: int = 5,
     fraction_non_clifford: float = 0.2,
-    training_random_state: np.random.RandomState = None,
+    training_random_state: Optional[np.random.RandomState] = None,
     epsilon0: float = 0.05,
     eta0: float = 1,
     observable: Optional[Observable] = None,
@@ -131,7 +131,7 @@ def learn_depolarizing_noise_parameter(
     ideal_executor: Executor,
     noisy_executor: Executor,
     pec_kwargs: Dict["str", Any],
-    pec_data: Optional[np.ndarray] = np.array([]),
+    pec_data: npt.NDArray[np.float64] = np.array([]),
     num_training_circuits: int = 5,
     fraction_non_clifford: float = 0.2,
     training_random_state: np.random.RandomState = None,  # type: ignore
@@ -220,10 +220,10 @@ def depolarizing_noise_loss_function(
     epsilon: List[int],
     operations_to_mitigate: List[QPROGRAM],
     training_circuits: List[QPROGRAM],
-    ideal_values: np.ndarray,
+    ideal_values: npt.NDArray[np.float64],
     noisy_executor: Executor,
     pec_kwargs: Dict["str", Any],
-    pec_data: Optional[np.ndarray] = np.array([]),
+    pec_data: npt.NDArray[np.float64] = np.array([]),
     observable: Optional[Observable] = None,
 ) -> float:
     if pec_data.size > 0: 
@@ -264,7 +264,7 @@ def biased_noise_loss_function(
     ideal_values: npt.NDArray[np.float64],
     noisy_executor: Executor,
     pec_kwargs: Dict["str", Any],
-    pec_data: Optional[np.ndarray] = np.array([]),
+    pec_data: npt.NDArray[np.float64] = np.array([]),
     observable: Optional[Observable] = None,
     
 ) -> float:

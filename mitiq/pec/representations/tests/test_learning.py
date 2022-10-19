@@ -29,7 +29,6 @@ from cirq import (
     Circuit,
     ops,
     unitary,
-    InsertStrategy,
 )
 import qiskit
 from mitiq import Executor, Observable, PauliString
@@ -235,7 +234,8 @@ def test_learn_depolarizing_noise_parameter(epsilon):
     operations_to_learn = [Circuit(op)]
 
     pec_data = np.loadtxt(
-        "./mitiq/pec/representations/tests/learning_pec_data/learning_pec_data_eps_"
+        "./mitiq/pec/representations/tests/learning_pec_data/"
+        + "learning_pec_data_eps_"
         + str(epsilon).replace(".", "_")
         + ".txt"
     )
@@ -258,7 +258,7 @@ def test_learn_depolarizing_noise_parameter(epsilon):
     assert abs(epsilon_opt - epsilon) < offset * epsilon
 
 
-@pytest.mark.parametrize("epsilon", [0.05])
+@pytest.mark.parametrize("epsilon", [0.05, 0.1])
 @pytest.mark.parametrize("eta", [1])
 # We assume the operation "op" appears just once in the circuit such
 # that it's enough to add a single noise channel after that operation.
@@ -290,13 +290,14 @@ def test_learn_biased_noise_parameters(epsilon, eta):
     eta0 = (1 - eta_offset) * eta
 
     operations_to_learn = [Circuit(op)]
-    
+
     num_training_circuits = 5
     pec_data = np.zeros([122, 122, num_training_circuits])
 
     for tc in range(0, num_training_circuits):
         pec_data[:, :, tc] = np.loadtxt(
-            "./mitiq/pec/representations/tests/learning_pec_data/learning_pec_data_eps_"
+            "./mitiq/pec/representations/tests/learning_pec_data/"
+            + "learning_pec_data_eps_"
             + str(epsilon).replace(".", "_")
             + "eta_"
             + str(eta)
@@ -304,7 +305,6 @@ def test_learn_biased_noise_parameters(epsilon, eta):
             + str(tc)
             + ".txt"
         )
-
 
     [success, epsilon_opt, eta_opt] = learn_biased_noise_parameters(
         operations_to_learn=operations_to_learn,
