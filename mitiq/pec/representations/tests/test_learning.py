@@ -287,7 +287,7 @@ def test_learn_biased_noise_parameters(epsilon, eta):
     eps_offset = 0.1
     eta_offset = 0.2
     epsilon0 = (1 - eps_offset) * epsilon
-    eta0 = (1 + eta_offset) * eta
+    eta0 = (1 - eta_offset) * eta
 
     operations_to_learn = [Circuit(op)]
     
