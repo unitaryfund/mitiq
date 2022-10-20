@@ -62,6 +62,7 @@ mitigated and unmitigated values at the end of the workflow.
 
 ```{code-cell} ipython3
 def ideal_execute(circ: Circuit) -> np.ndarray:
+    # For large circuits, this should be replaced by a near-Clifford simulator.
     return compute_density_matrix(circ, noise_level=(0.0,))
 
 
