@@ -55,9 +55,18 @@ def mitigate_measurements(
         inverse_confusion_matrix: The inverse confusion matrix to apply to the
             probability vector estimated with noisy measurement results.
     """
-    assert noisy_result.qubit_indices is not None
+    if noisy_result.qubit_indices is None:
+        raise ValueError(
+            "Qubit indices are missing from the noisy measurement result."
+        )
+
     num_qubits = len(noisy_result.qubit_indices)
-    assert inverse_confusion_matrix.shape == (2**num_qubits, 2**num_qubits)
+    required_shape = (2**num_qubits, 2**num_qubits)
+    if inverse_confusion_matrix.shape != required_shape:
+        raise ValueError(
+            f"Inverse confusion matrix should have shape {required_shape}, but"
+            f" it has {inverse_confusion_matrix.shape} instead."
+        )
 
     empirical_prob_dist = np.apply_along_axis(
         to_probability_vector, 1, noisy_result.asarray
