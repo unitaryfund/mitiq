@@ -58,7 +58,9 @@ def noisy_readout_executor(
 def test_rem_identity():
     executor = partial(sample_bitstrings, noise_level=(0,))
     identity = np.identity(4)
-    result = execute_with_rem(circ, executor, identity, observable=observable)
+    result = execute_with_rem(
+        circ, executor, observable, inverse_confusion_matrix=identity
+    )
     assert np.isclose(result, -2.0)
 
 
@@ -82,8 +84,8 @@ def test_rem_with_matrix():
     mitigated = execute_with_rem(
         circ,
         noisy_executor,
-        inverse_confusion_matrix,
-        observable=observable,
+        observable,
+        inverse_confusion_matrix=inverse_confusion_matrix,
     )
     assert np.isclose(mitigated, -2.0)
 
@@ -92,7 +94,9 @@ def test_rem_with_invalid_matrix():
     executor = partial(sample_bitstrings, noise_level=(0,))
     identity = np.identity(2)
     with pytest.raises(AssertionError):
-        execute_with_rem(circ, executor, identity, observable=observable)
+        execute_with_rem(
+            circ, executor, observable, inverse_confusion_matrix=identity
+        )
 
 
 def test_doc_is_preserved():
@@ -104,10 +108,12 @@ def test_doc_is_preserved():
 
     identity = np.identity(4)
 
-    mit_executor = mitigate_executor(first_executor, identity)
+    mit_executor = mitigate_executor(
+        first_executor, inverse_confusion_matrix=identity
+    )
     assert mit_executor.__doc__ == first_executor.__doc__
 
-    @rem_decorator(identity)
+    @rem_decorator(inverse_confusion_matrix=identity)
     def second_executor(circuit):
         """Doc of the original executor."""
         return 0
@@ -136,7 +142,7 @@ def test_mitigate_executor():
 
     mitigated_executor = mitigate_executor(
         noisy_executor,
-        observable=observable,
+        observable,
         inverse_confusion_matrix=inverse_confusion_matrix,
     )
     rem_value = mitigated_executor(circ)
@@ -155,7 +161,9 @@ def test_rem_decorator():
         qubits, p0=p0, p1=p1
     )
 
-    @rem_decorator(inverse_confusion_matrix, observable=observable)
+    @rem_decorator(
+        observable, inverse_confusion_matrix=inverse_confusion_matrix
+    )
     def noisy_readout_decorated_executor(qp) -> MeasurementResult:
         # test with an executor that completely flips results
         return noisy_readout_executor(qp, p0=1, p1=1)
@@ -166,14 +174,3 @@ def test_rem_decorator():
 
     rem_value = noisy_readout_decorated_executor(circ)
     assert abs(true_rem_value - rem_value) < abs(true_rem_value - base)
-
-
-def test_error_rem_decorator():
-    """Tests that the proper error is raised if the decorator is
-    used without parenthesis.
-    """
-    with pytest.raises(TypeError, match="Decorator must be used with paren"):
-
-        @rem_decorator
-        def test_executor(circuit):
-            return 0

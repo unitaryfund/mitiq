@@ -83,9 +83,9 @@ def mitigate_measurements(
 def execute_with_rem(
     circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], MeasurementResult]],
-    inverse_confusion_matrix: np.ndarray,
-    *,
     observable: Optional[Observable] = None,
+    *,
+    inverse_confusion_matrix: np.ndarray,
 ) -> float:
     """Returns the readout error mitigated expectation value utilizing an
     inverse confusion matrix.
@@ -113,9 +113,9 @@ def execute_with_rem(
 
 def mitigate_executor(
     executor: Callable[[QPROGRAM], MeasurementResult],
-    inverse_confusion_matrix: np.ndarray,
-    *,
     observable: Optional[Observable] = None,
+    *,
+    inverse_confusion_matrix: np.ndarray,
 ) -> Callable[[QPROGRAM], float]:
     """Returns a modified version of the input 'executor' which is
     error-mitigated with readout confusion inversion (RCI).
@@ -136,17 +136,17 @@ def mitigate_executor(
         return execute_with_rem(
             qp,
             executor,
-            inverse_confusion_matrix,
-            observable=observable,
+            observable,
+            inverse_confusion_matrix=inverse_confusion_matrix,
         )
 
     return new_executor
 
 
 def rem_decorator(
-    inverse_confusion_matrix: np.ndarray,
-    *,
     observable: Optional[Observable] = None,
+    *,
+    inverse_confusion_matrix: np.ndarray,
 ) -> Callable[
     [Callable[[QPROGRAM], MeasurementResult]], Callable[[QPROGRAM], float]
 ]:
@@ -164,7 +164,7 @@ def rem_decorator(
         The error-mitigating decorator to be applied to an executor function.
     """
     # Raise an error if the decorator is used without parenthesis
-    if callable(inverse_confusion_matrix):
+    if callable(observable):
         raise TypeError(
             "Decorator must be used with parentheses (i.e., @rem_decorator()) "
             "even if no explicit arguments are passed."
@@ -175,8 +175,8 @@ def rem_decorator(
     ) -> Callable[[QPROGRAM], float]:
         return mitigate_executor(
             executor,
-            inverse_confusion_matrix,
-            observable=observable,
+            observable,
+            inverse_confusion_matrix=inverse_confusion_matrix,
         )
 
     return decorator
