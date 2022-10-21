@@ -36,4 +36,4 @@ For a simple example in which the application of ZNE reduces the estimation erro
 compared to the unmitigated result, see:
 
 [Zero Noise Extrapolation for mitigating errors in energy landscape of a two-qubit
-variational circuit](https://mitiq.readthedocs.io/en/latest/examples/simple_landscape.html)
+variational circuit](https://mitiq.readthedocs.io/en/latest/examples/simple-landscape-cirq.html)
