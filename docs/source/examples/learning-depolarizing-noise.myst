@@ -45,7 +45,7 @@ from mitiq.pec.representations.learning import (
 )
 ```
 
-Since the learning-based workflow uses the function {func}`.cdr.generate_training_circuits` from Mitiq's {ref}`Clifford data regression module
+Since the learning-based workflow uses the function {func}`.cdr.clifford_training_data.generate_training_circuits` from Mitiq's {ref}`Clifford data regression module
 <guide/cdr/cdr>` to generate the near-Clifford training circuits, the input circuit must be one that is compiled into the Rx-Rz-CNOT gateset. 
 Here we use a simple Rx-Rz-CNOT circuit, with an (optional) seed for reproducibility.
 
@@ -96,7 +96,7 @@ noisy_executor = Executor(noisy_execute)
 ```
 
 Before calling the optimizer, let's plot the loss function that will be minimized in the learning routine, over a small range of noise strength values.
-The loss function calls {func}`pec.execute_with_pec`, and we can optionally pass keyword arguments to set the number of PEC samples, among other options. 
+The loss function calls {func}`.pec.execute_with_pec`, and we can optionally pass keyword arguments to set the number of PEC samples, among other options. 
 Here we set a relatively small value of `num_samples` to obtain a reasonable execution time. 
 However, we avoid using a number of PEC samples that is too small, as it can result in a large statistical error and ultimately cause the optimization process to fail.
 
@@ -174,7 +174,7 @@ print(f"Difference of learned value from true value: {abs(epsilon_opt - epsilon)
 print(f"Difference of initial guess from true value: {abs(epsilon0 - epsilon) :.5f}")
 ```
 
-Optimization completed successfully and the optimized value of epsilon is closer to the true value of epsilon as compared to the initial value. 
+Optimization completed successfully and the optimized value of epsilon is closer to the true value of epsilon as compared to the initial value.
 
 Now we will use the optimized value of the noise strength to map CNOT into its quasiprobability representation.
 
