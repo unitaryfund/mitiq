@@ -15,4 +15,5 @@ Mitiq paper codeblocks <mitiq-paper/mitiq-paper-codeblocks>
 Estimating the potential energy surface of molecular Hydrogen with ZNE <molecular_hydrogen.myst>
 Estimating the potential energy surface of molecular Hydrogen with ZNE and PennyLane + Cirq <molecular_hydrogen_pennylane.myst>
 Improving the accuracy of BQSKit compiled circuits with error mitigation <bqskit.myst>
+Learning quasiprobability representations with a depolarizing noise model <learning-depolarizing-noise.myst>
 ```
