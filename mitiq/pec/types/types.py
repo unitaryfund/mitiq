@@ -406,7 +406,9 @@ class OperationRepresentation:
     """
 
     def __init__(
-        self, ideal: QPROGRAM, basis_expansion: Dict[NoisyOperation, float]
+        self, ideal: QPROGRAM, 
+        basis_expansion: Dict[NoisyOperation, float],
+        require_qubit_equality: bool = True,
     ) -> None:
         """Initializes an OperationRepresentation.
 

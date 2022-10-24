@@ -33,6 +33,7 @@ def sample_sequence(
     representations: Sequence[OperationRepresentation],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     num_samples: int = 1,
+    require_qubit_equality: bool = True,
 ) -> Tuple[List[QPROGRAM], List[int], float]:
     """Samples a list of implementable sequences from the quasi-probability
     representation of the input ideal operation.
@@ -70,14 +71,16 @@ def sample_sequence(
     ideal, _ = convert_to_mitiq(ideal_operation)
     operation_representation = None
     for representation in representations:
-        if representation._ideal == ideal:
+        if _equal(representation.ideal, ideal, require_qubit_equality=True):
             operation_representation = representation
             break
 
     if operation_representation is None:
-        warnings.warn(
-            UserWarning(f"No representation found for \n\n{ideal_operation}.")
-        )
+        for representation in representations:
+            if representation.is_qubit_independent and _equal(representation.ideal, ideal, require_qubit_equality=False):
+                operation_representation = representation
+                break
+
         return (
             [ideal_operation] * num_samples,
             [1] * num_samples,
@@ -103,6 +106,7 @@ def sample_circuit(
     representations: Sequence[OperationRepresentation],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     num_samples: int = 1,
+    require_qubit_equality: bool = True,
 ) -> Tuple[List[QPROGRAM], List[int], float]:
     """Samples a list of implementable circuits from the quasi-probability
     representation of the input ideal circuit.
@@ -150,6 +154,7 @@ def sample_circuit(
             representations,
             num_samples=num_samples,
             random_state=random_state,
+            require_qubit_equality=require_qubit_equality,
         )
 
         norm *= loc_norm
