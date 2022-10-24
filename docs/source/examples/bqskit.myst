@@ -7,7 +7,6 @@ jupytext:
     jupytext_version: 1.14.1
 kernelspec:
   display_name: Python 3
-  language: python
   name: python3
 ---
 
@@ -17,7 +16,7 @@ In this tutorial we describe how to use error mitigation capabilities from [Miti
 
 To get started, ensure you have the requisite python packages by running the following install commands.
 - `pip install mitiq`
-- `pip install bqskit==0.3.0` (here we use an older version of `bqskit` to satisfy version requirements between the two packages)
+- `pip install 'bqskit[ext]'`
 
 The main goal of this tutorial is to understand how to use `bqskit` together with `mitiq`.
 To do this, we will
@@ -71,6 +70,11 @@ The workflow is then to create a [`CompilationTask`](https://bqskit.readthedocs.
 By default `bqskit` attempts to reduce the circuit depth as its primary optimization, and compiles the circuit into the following gateset: $\{\mathsf{U3}, \mathsf{CNOT}, \sqrt{X}, R_Z\}$.
 
 ```{code-cell} ipython3
+import os
+from bqskit.utils.docs import building_docs
+assert 'BQSKIT_DOC_CHECK_OVERRIDE' in os.environ
+assert not building_docs()
+
 compiled = bqskit.compile(bqskit_circuit)
 compiled_circuit = bqskit_to_cirq(compiled)
 ```
