@@ -40,13 +40,21 @@ _cirq_gates_to_string_keys = {
     ops.Z: "Z",
     ops.T: "T",
     ops.I: "I",
+    ops.S: "S",
+    ops.T: "T",
+    ops.rx: "RX",
+    ops.ry: "RY",
+    ops.rz: "RZ",
     ops.CNOT: "CNOT",
     ops.CZ: "CZ",
+    ops.SWAP: "SWAP",
+    ops.ISWAP: "ISWAP",
+    ops.CSWAP: "CSWAP",
     ops.TOFFOLI: "TOFFOLI",
 }
-_string_keys_to_cirq_gates = dict(
-    zip(_cirq_gates_to_string_keys.values(), _cirq_gates_to_string_keys.keys())
-)
+_string_keys_to_cirq_gates = {
+    opstring: op for op, opstring in _cirq_gates_to_string_keys.items()
+}
 
 _valid_gate_names = list(
     map(
@@ -237,8 +245,16 @@ def fold_all(
                 "Y"         | Pauli Y
                 "Z"         | Pauli Z
                 "I"         | Identity
+                "S"         | Phase
+                "T"         | Pi/8 gate
+                "rx"        | X-rotation
+                "ry"        | Y-rotation
+                "rz"        | Z-rotation
                 "CNOT"      | CNOT
                 "CZ"        | CZ gate
+                "SWAP"      | Swap
+                "ISWAP"     | Imaginary swap
+                "CSWAP"     | CSWAP
                 "TOFFOLI"   | Toffoli gate
                 "single"    | All single qubit gates
                 "double"    | All two-qubit gates
@@ -326,7 +342,7 @@ def _create_weight_mask(
     circuit: Circuit,
     fidelities: Dict[str, float],
 ) -> List[float]:
-    """Returns a list of weights associated to each gate if the input
+    """Returns a list of weights associated to each gate in the input
     circuit. Measurement gates are ignored.
 
     The gate ordering is equal to the one used in the `all_operations()`
@@ -572,8 +588,16 @@ def fold_gates_from_left(
                 "Y"         | Pauli Y
                 "Z"         | Pauli Z
                 "I"         | Identity
+                "S"         | Phase
+                "T"         | Pi/8 gate
+                "rx"        | X-rotation
+                "ry"        | Y-rotation
+                "rz"        | Z-rotation
                 "CNOT"      | CNOT
                 "CZ"        | CZ gate
+                "SWAP"      | Swap
+                "ISWAP"     | Imaginary swap
+                "CSWAP"     | CSWAP
                 "TOFFOLI"   | Toffoli gate
                 "single"    | All single qubit gates
                 "double"    | All two-qubit gates
@@ -649,8 +673,16 @@ def fold_gates_from_right(
                 "Y"         | Pauli Y
                 "Z"         | Pauli Z
                 "I"         | Identity
+                "S"         | Phase
+                "T"         | Pi/8 gate
+                "rx"        | X-rotation
+                "ry"        | Y-rotation
+                "rz"        | Z-rotation
                 "CNOT"      | CNOT
                 "CZ"        | CZ gate
+                "SWAP"      | Swap
+                "ISWAP"     | Imaginary swap
+                "CSWAP"     | CSWAP
                 "TOFFOLI"   | Toffoli gate
                 "single"    | All single qubit gates
                 "double"    | All two-qubit gates
@@ -730,8 +762,16 @@ def fold_gates_at_random(
                 "Y"         | Pauli Y
                 "Z"         | Pauli Z
                 "I"         | Identity
+                "S"         | Phase
+                "T"         | Pi/8 gate
+                "rx"        | X-rotation
+                "ry"        | Y-rotation
+                "rz"        | Z-rotation
                 "CNOT"      | CNOT
                 "CZ"        | CZ gate
+                "SWAP"      | Swap
+                "ISWAP"     | Imaginary swap
+                "CSWAP"     | CSWAP
                 "TOFFOLI"   | Toffoli gate
                 "single"    | All single qubit gates
                 "double"    | All two-qubit gates
