@@ -1661,21 +1661,38 @@ def test_create_weight_mask_with_fidelities():
         ops.H.on_each(*qreg),
         ops.CNOT.on(qreg[0], qreg[1]),
         ops.T.on(qreg[2]),
+        ops.ISWAP.on(qreg[1], qreg[0]),
         ops.TOFFOLI.on(*qreg),
         ops.measure_each(*qreg),
     )
     # Measurement gates should be ignored
-    fidelities = {"H": 0.9, "CNOT": 0.8, "T": 0.7, "TOFFOLI": 0.6}
+    fidelities = {
+        "H": 0.9,
+        "CNOT": 0.8,
+        "T": 0.7,
+        "TOFFOLI": 0.6,
+        "ISWAP": 0.5,
+    }
     weight_mask = _create_weight_mask(circ, fidelities)
-    assert np.allclose(weight_mask, [0.1, 0.1, 0.1, 0.2, 0.3, 0.4])
+    assert np.allclose(weight_mask, [0.1, 0.1, 0.1, 0.2, 0.3, 0.5, 0.4])
 
     fidelities = {"single": 1.0, "double": 0.5, "triple": 0.1}
     weight_mask = _create_weight_mask(circ, fidelities)
-    assert np.allclose(weight_mask, [0.0, 0.0, 0.0, 0.5, 0.0, 0.9])
+    assert np.allclose(weight_mask, [0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.9])
 
-    fidelities = {"single": 1.0, "H": 0.1, "CNOT": 0.2, "TOFFOLI": 0.3}
+    fidelities = {
+        "single": 1.0,
+        "double": 1.0,
+        "H": 0.1,
+        "CNOT": 0.2,
+        "TOFFOLI": 0.3,
+    }
     weight_mask = _create_weight_mask(circ, fidelities)
-    assert np.allclose(weight_mask, [0.9, 0.9, 0.9, 0.8, 0.0, 0.7])
+    assert np.allclose(weight_mask, [0.9, 0.9, 0.9, 0.8, 0.0, 0.0, 0.7])
+
+    fidelities = {"waitgate": 1.0, "H": 0.1}
+    with pytest.warns(UserWarning, match="don't currently support"):
+        weight_mask = _create_weight_mask(circ, fidelities)
 
 
 @pytest.mark.parametrize(

@@ -16,6 +16,7 @@
 """Functions for local and global unitary folding on supported circuits."""
 from copy import deepcopy
 from typing import Any, Dict, FrozenSet, List, Optional, cast
+import warnings
 
 import numpy as np
 from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary, Moment
@@ -39,13 +40,28 @@ _cirq_gates_to_string_keys = {
     ops.Z: "Z",
     ops.T: "T",
     ops.I: "I",
+    ops.S: "S",
+    ops.T: "T",
+    ops.rx: "rx",
+    ops.ry: "ry",
+    ops.rz: "rz",
     ops.CNOT: "CNOT",
     ops.CZ: "CZ",
+    ops.SWAP: "SWAP",
+    ops.ISWAP: "ISWAP",
+    ops.CSWAP: "CSWAP",
     ops.TOFFOLI: "TOFFOLI",
 }
-_string_keys_to_cirq_gates = dict(
-    zip(_cirq_gates_to_string_keys.values(), _cirq_gates_to_string_keys.keys())
-)
+_string_keys_to_cirq_gates = {
+    opstring: op for op, opstring in _cirq_gates_to_string_keys.items()
+}
+
+_valid_gate_names = list(
+    map(
+        lambda gate_name: gate_name.lower(),
+        _cirq_gates_to_string_keys.values(),
+    )
+) + ["single", "double", "triple"]
 
 
 # Helper functions
@@ -170,7 +186,7 @@ def _default_weight(op: ops.Operation) -> float:
 
 
 def _get_weight_for_gate(
-    weights: Optional[Dict[str, float]], op: ops.Operation
+    weights: Dict[str, float], op: ops.Operation
 ) -> float:
     """Returns the weight for a given gate, using a default value of 1.0 if
     weights is None or if the weight is not specified.
@@ -229,8 +245,16 @@ def fold_all(
                 "Y"         | Pauli Y
                 "Z"         | Pauli Z
                 "I"         | Identity
+                "S"         | Phase gate
+                "T"         | T gate
+                "rx"        | X-rotation
+                "ry"        | Y-rotation
+                "rz"        | Z-rotation
                 "CNOT"      | CNOT
                 "CZ"        | CZ gate
+                "SWAP"      | Swap
+                "ISWAP"     | Imaginary swap
+                "CSWAP"     | CSWAP
                 "TOFFOLI"   | Toffoli gate
                 "single"    | All single qubit gates
                 "double"    | All two-qubit gates
@@ -316,9 +340,9 @@ def fold_global(
 
 def _create_weight_mask(
     circuit: Circuit,
-    fidelities: Optional[Dict[str, float]],
+    fidelities: Dict[str, float],
 ) -> List[float]:
-    """Returns a list of weights associated to each gate if the input
+    """Returns a list of weights associated to each gate in the input
     circuit. Measurement gates are ignored.
 
     The gate ordering is equal to the one used in the `all_operations()`
@@ -334,12 +358,20 @@ def _create_weight_mask(
 
     Returns: The list of weights associated to all the gates.
     """
-    if fidelities and not all(0.0 < f <= 1.0 for f in fidelities.values()):
+    if not all(0.0 < f <= 1.0 for f in fidelities.values()):
         raise ValueError("Fidelities should be in the interval (0, 1].")
-    weights = None
-    if fidelities:
-        # Round to avoid ugly numbers like 0.09999999999999998 instead of 0.1
-        weights = {k: round(1.0 - f, 12) for k, f in fidelities.items()}
+
+    invalid_fidelities = filter(
+        lambda opname: opname.lower() not in _valid_gate_names, fidelities
+    )
+    for gate_name in invalid_fidelities:
+        warnings.warn(
+            f"You passed a fidelity for the gate '{gate_name}', but we don't "
+            "currently support this gate."
+        )
+
+    # Round to avoid ugly numbers like 0.09999999999999998 instead of 0.1
+    weights = {k: round(1.0 - f, 12) for k, f in fidelities.items()}
 
     # Build mask with weights of each gate
     return [
@@ -556,8 +588,16 @@ def fold_gates_from_left(
                 "Y"         | Pauli Y
                 "Z"         | Pauli Z
                 "I"         | Identity
+                "S"         | Phase gate
+                "T"         | T gate
+                "rx"        | X-rotation
+                "ry"        | Y-rotation
+                "rz"        | Z-rotation
                 "CNOT"      | CNOT
                 "CZ"        | CZ gate
+                "SWAP"      | Swap
+                "ISWAP"     | Imaginary swap
+                "CSWAP"     | CSWAP
                 "TOFFOLI"   | Toffoli gate
                 "single"    | All single qubit gates
                 "double"    | All two-qubit gates
@@ -582,7 +622,7 @@ def fold_gates_from_left(
 
     """
 
-    weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities"))
+    weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities", {}))
 
     num_folds_mask = _create_fold_mask(
         weight_mask, scale_factor, folding_method="from_left"
@@ -633,8 +673,16 @@ def fold_gates_from_right(
                 "Y"         | Pauli Y
                 "Z"         | Pauli Z
                 "I"         | Identity
+                "S"         | Phase gate
+                "T"         | T gate
+                "rx"        | X-rotation
+                "ry"        | Y-rotation
+                "rz"        | Z-rotation
                 "CNOT"      | CNOT
                 "CZ"        | CZ gate
+                "SWAP"      | Swap
+                "ISWAP"     | Imaginary swap
+                "CSWAP"     | CSWAP
                 "TOFFOLI"   | Toffoli gate
                 "single"    | All single qubit gates
                 "double"    | All two-qubit gates
@@ -659,7 +707,7 @@ def fold_gates_from_right(
 
     """
 
-    weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities"))
+    weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities", {}))
 
     num_folds_mask = _create_fold_mask(
         weight_mask, scale_factor, folding_method="from_right"
@@ -714,8 +762,16 @@ def fold_gates_at_random(
                 "Y"         | Pauli Y
                 "Z"         | Pauli Z
                 "I"         | Identity
+                "S"         | Phase gate
+                "T"         | T gate
+                "rx"        | X-rotation
+                "ry"        | Y-rotation
+                "rz"        | Z-rotation
                 "CNOT"      | CNOT
                 "CZ"        | CZ gate
+                "SWAP"      | Swap
+                "ISWAP"     | Imaginary swap
+                "CSWAP"     | CSWAP
                 "TOFFOLI"   | Toffoli gate
                 "single"    | All single qubit gates
                 "double"    | All two-qubit gates
@@ -740,7 +796,7 @@ def fold_gates_at_random(
 
     """
 
-    weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities"))
+    weight_mask = _create_weight_mask(circuit, kwargs.get("fidelities", {}))
 
     num_folds_mask = _create_fold_mask(
         weight_mask,
