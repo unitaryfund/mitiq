@@ -42,9 +42,9 @@ _cirq_gates_to_string_keys = {
     ops.I: "I",
     ops.S: "S",
     ops.T: "T",
-    ops.rx: "RX",
-    ops.ry: "RY",
-    ops.rz: "RZ",
+    ops.rx: "rx",
+    ops.ry: "ry",
+    ops.rz: "rz",
     ops.CNOT: "CNOT",
     ops.CZ: "CZ",
     ops.SWAP: "SWAP",
@@ -245,8 +245,8 @@ def fold_all(
                 "Y"         | Pauli Y
                 "Z"         | Pauli Z
                 "I"         | Identity
-                "S"         | Phase
-                "T"         | Pi/8 gate
+                "S"         | Phase gate
+                "T"         | T gate
                 "rx"        | X-rotation
                 "ry"        | Y-rotation
                 "rz"        | Z-rotation
@@ -588,8 +588,8 @@ def fold_gates_from_left(
                 "Y"         | Pauli Y
                 "Z"         | Pauli Z
                 "I"         | Identity
-                "S"         | Phase
-                "T"         | Pi/8 gate
+                "S"         | Phase gate
+                "T"         | T gate
                 "rx"        | X-rotation
                 "ry"        | Y-rotation
                 "rz"        | Z-rotation
@@ -673,8 +673,8 @@ def fold_gates_from_right(
                 "Y"         | Pauli Y
                 "Z"         | Pauli Z
                 "I"         | Identity
-                "S"         | Phase
-                "T"         | Pi/8 gate
+                "S"         | Phase gate
+                "T"         | T gate
                 "rx"        | X-rotation
                 "ry"        | Y-rotation
                 "rz"        | Z-rotation
@@ -762,8 +762,8 @@ def fold_gates_at_random(
                 "Y"         | Pauli Y
                 "Z"         | Pauli Z
                 "I"         | Identity
-                "S"         | Phase
-                "T"         | Pi/8 gate
+                "S"         | Phase gate
+                "T"         | T gate
                 "rx"        | X-rotation
                 "ry"        | Y-rotation
                 "rz"        | Z-rotation
