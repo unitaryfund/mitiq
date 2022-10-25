@@ -217,7 +217,7 @@ def learn_depolarizing_noise_parameter(
 
 
 def depolarizing_noise_loss_function(
-    epsilon: List[int],
+    epsilon: npt.NDArray[np.float64],
     operations_to_mitigate: List[QPROGRAM],
     training_circuits: List[QPROGRAM],
     ideal_values: npt.NDArray[np.float64],
@@ -226,31 +226,31 @@ def depolarizing_noise_loss_function(
     pec_data: npt.NDArray[np.float64] = np.array([]),
     observable: Optional[Observable] = None,
 ) -> float:
-    if pec_data.size > 0: 
-        ind = np.abs(pec_data[:, 0] - epsilon).argmin() 
-        mitigated_values = pec_data[ind, 1:] 
+    if pec_data.size > 0:
+        ind = np.abs(pec_data[:, 0] - epsilon).argmin()
+        mitigated_values = pec_data[ind, 1:]
 
     else:
         representations = [
             represent_operation_with_local_depolarizing_noise(
-            operation,
-            epsilon[0],
-        )
-        for operation in operations_to_mitigate
-    ]
-        mitigated_values = np.array(
-        [
-            execute_with_pec(
-                circuit=training_circuit,
-                observable=observable,
-                executor=noisy_executor,
-                representations=representations,
-                full_output=False,
-                **pec_kwargs,
+                operation,
+                epsilon[0],
             )
-            for training_circuit in training_circuits
+            for operation in operations_to_mitigate
         ]
-    )
+        mitigated_values = np.array(
+            [
+                execute_with_pec(
+                    circuit=training_circuit,
+                    observable=observable,
+                    executor=noisy_executor,
+                    representations=representations,
+                    full_output=False,
+                    **pec_kwargs,
+                )
+                for training_circuit in training_circuits
+            ]
+        )
 
     return np.mean(
         abs(mitigated_values.reshape(-1, 1) - ideal_values.reshape(-1, 1)) ** 2
@@ -266,7 +266,6 @@ def biased_noise_loss_function(
     pec_kwargs: Dict["str", Any],
     pec_data: npt.NDArray[np.float64] = np.array([]),
     observable: Optional[Observable] = None,
-    
 ) -> float:
     r"""Loss function for optimizing quasi-probability representations
     assuming a biased noise model depending on two real parameters.
@@ -285,7 +284,7 @@ def biased_noise_loss_function(
         pec_kwargs: Options to pass to `execute_w_pec` for the error-mitigated
             expectation value obtained from executing the training circuits.
         pec_data (optional): 3-D. Array of error-mitigated expection values for
-            model training. 
+            model training.
         observable (optional): Observable to compute the expectation value of.
             If None, the ``executor`` must return an expectation value.
             Otherwise the ``QuantumResult`` returned by ``executor`` is used to
@@ -297,30 +296,30 @@ def biased_noise_loss_function(
     epsilon = params[0]
     eta = params[1]
 
-    if pec_data.size > 0: 
+    if pec_data.size > 0:
         ind_eps = np.abs(pec_data[:, 0, 0] - epsilon).argmin()
         ind_eta = np.abs(pec_data[0, :, 0] - eta).argmin()
-        mitigated_values = pec_data[ind_eps, ind_eta, :] 
+        mitigated_values = pec_data[ind_eps, ind_eta, :]
 
     else:
         representations = [
             represent_operation_with_local_biased_noise(
-            operation,
-            epsilon,
-            eta,
-        )
-        for operation in operations_to_mitigate
+                operation,
+                epsilon,
+                eta,
+            )
+            for operation in operations_to_mitigate
         ]
         mitigated_values = np.array(
             [
-            execute_with_pec(
-                circuit=training_circuit,
-                observable=observable,
-                executor=noisy_executor,
-                representations=representations,
-                full_output=False,
-                **pec_kwargs,
-            )
+                execute_with_pec(
+                    circuit=training_circuit,
+                    observable=observable,
+                    executor=noisy_executor,
+                    representations=representations,
+                    full_output=False,
+                    **pec_kwargs,
+                )
                 for training_circuit in training_circuits
             ]
         )
