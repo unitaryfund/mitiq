@@ -119,12 +119,11 @@ def executor_with_noise(circuit: QuantumCircuit) -> float:
     circ = circuit.copy()
     circ.save_density_matrix()
     
-    # Initialize qiskit noise model. In this case a
-    # depolarizing noise model with the same noise strength for each
-    # gate of the standard IBM basis
+    # Initialize qiskit noise model. In this case a depolarizing
+    # noise model with the same noise strength on all gates
     noise_model = NoiseModel()
     noise_model.add_all_qubit_quantum_error(
-        depolarizing_error(noise_level, 1), ["u1", "u2", "u3"]
+        depolarizing_error(noise_level, 1), ["rx"]
     )
     noise_model.add_all_qubit_quantum_error(
         depolarizing_error(noise_level, 2), ["cx"]
