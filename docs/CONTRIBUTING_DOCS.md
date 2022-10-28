@@ -2,10 +2,6 @@
 This is the contributors guide for the documentation of Mitiq,
 the Python toolkit for implementing error mitigation on quantum computers.
 
-![Python Build](https://github.com/unitaryfund/mitiq/workflows/Python%20Build/badge.svg?branch=master)
-[![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
-[![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](https://unitary.fund)
-
 ## Requirements
 Our documentation is generated with
 [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html).
