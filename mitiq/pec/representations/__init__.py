@@ -38,6 +38,8 @@ from mitiq.pec.representations.biased_noise import (
 )
 
 from mitiq.pec.representations.learning import (
+    depolarizing_noise_loss_function,
     biased_noise_loss_function,
     learn_depolarizing_noise_parameter,
+    learn_biased_noise_parameters,
 )

@@ -38,9 +38,10 @@ from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.cdr import generate_training_circuits
 from mitiq.cdr._testing import random_x_z_cnot_circuit
 from mitiq.pec.representations.learning import (
+    depolarizing_noise_loss_function,
     biased_noise_loss_function,
-    learn_biased_noise_parameters,
     learn_depolarizing_noise_parameter,
+    learn_biased_noise_parameters,
 )
 
 seed = 1
@@ -89,6 +90,38 @@ def biased_noise_channel(epsilon: float, eta: float) -> MixedUnitaryChannel:
         (c, unitary(Y)),
     ]
     return ops.MixedUnitaryChannel(mix)
+
+
+@pytest.mark.parametrize("epsilon", [0.05, 0.1])
+@pytest.mark.parametrize(
+    "operations", [[Circuit(CNOT_ops[0][1])], [Circuit(Rx_ops[0][1])]]
+)
+def test_depolarizing_noise_loss_function(epsilon, operations):
+    """Test that the biased noise loss function value (calculated with error
+    mitigation) is less than (or equal to) the loss calculated with the noisy
+    (unmitigated) executor"""
+
+    def noisy_execute(circ: Circuit) -> np.ndarray:
+        noisy_circ = circ.with_noise(DepolarizingChannel(epsilon))
+        return ideal_execute(noisy_circ)
+
+    noisy_executor = Executor(noisy_execute)
+    noisy_values = np.array(
+        [noisy_executor.evaluate(t, observable) for t in training_circuits]
+    )
+    loss = depolarizing_noise_loss_function(
+        epsilon=np.array([epsilon]),
+        operations_to_mitigate=operations,
+        training_circuits=training_circuits,
+        ideal_values=ideal_values,
+        noisy_executor=noisy_executor,
+        pec_kwargs=pec_kwargs,
+        observable=observable,
+    )
+
+    assert loss <= np.sum((noisy_values - ideal_values) ** 2) / len(
+        training_circuits
+    )
 
 
 @pytest.mark.parametrize("epsilon", [0, 0.7, 1])
@@ -260,26 +293,25 @@ def test_learn_depolarizing_noise_parameter(epsilon):
 
 @pytest.mark.parametrize("epsilon", [0.05, 0.1])
 @pytest.mark.parametrize("eta", [1])
-# We assume the operation "op" appears just once in the circuit such
-# that it's enough to add a single noise channel after that operation.
 def test_learn_biased_noise_parameters(epsilon, eta):
     """Test the learning function with initial noise strength with a small
     offset from the simulated noise model values"""
 
-    index = CNOT_ops[0][0]
-    op = CNOT_ops[0][1]
     eta = 1
 
     pec_kwargs_learning = {}
 
+    operations_to_learn = [Circuit(op[1]) for op in CNOT_ops]
+
     def noisy_execute(circ: Circuit) -> np.ndarray:
         noisy_circ = circ.copy()
-        qubits = op.qubits
-        for q in qubits:
-            noisy_circ.insert(
-                index + 1,
-                biased_noise_channel(epsilon, eta)(q),
-            )
+        insertions = []
+        for op in CNOT_ops:
+            index = op[0] + 1
+            qubits = op[1].qubits
+            for q in qubits:
+                insertions.append((index, DepolarizingChannel(epsilon)(q)))
+        noisy_circ.batch_insert(insertions)
         return ideal_execute(noisy_circ)
 
     noisy_executor = Executor(noisy_execute)
@@ -288,8 +320,6 @@ def test_learn_biased_noise_parameters(epsilon, eta):
     eta_offset = 0.2
     epsilon0 = (1 - eps_offset) * epsilon
     eta0 = (1 - eta_offset) * eta
-
-    operations_to_learn = [Circuit(op)]
 
     num_training_circuits = 5
     pec_data = np.zeros([122, 122, num_training_circuits])
