@@ -4,10 +4,10 @@
 
 ### Summary
 
-This milestone focused on updating our support for numpy (1.23), building out documentation for learning-based PEC, and scoping out what device/noise calibration might look like as part of mitiq.
+This milestone focused on updating our support for numpy (1.23), adding a tutorial demonstrating the learning-based PEC workflow, and scoping out what device/noise calibration might look like as part of Mitiq.
 Additionally identity insertion has been added as a noise-scaling technique available for mitigation protocols such as zero-noise extrapolation.
-Expect more documentation of this feature in future release.
-Big thanks to @purva-thakre for getting this in mitiq!
+Expect more documentation of this feature in future releases.
+Big thanks to @purva-thakre for getting this in Mitiq!
 
 There are also some minor bug fixes, documentation updates, and a new example contributed by @nickdgardner as well!
 
