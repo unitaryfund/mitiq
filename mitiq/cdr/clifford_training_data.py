@@ -84,7 +84,9 @@ def generate_training_circuits(
         return [circuit] * num_training_circuits
 
     non_clifford_indices = np.int32(non_clifford_indices_and_ops[:, 0])
-    non_clifford_ops = non_clifford_indices_and_ops[:, 1]
+    non_clifford_ops = cast(
+        List[cirq.ops.Operation], non_clifford_indices_and_ops[:, 1]
+    )
 
     # Replace (some of) the non-Clifford operations.
     near_clifford_circuits = []

@@ -48,7 +48,7 @@ def sample_bitstrings(
 
     result = sampler.run(circuit, repetitions=shots)
     return MeasurementResult(
-        result=np.column_stack(list(result.measurements.values())),
+        result=np.column_stack(list(result.measurements.values())).tolist(),
         qubit_indices=tuple(
             # q[2:-1] is necessary to convert "q(number)" into "number"
             int(q[2:-1])

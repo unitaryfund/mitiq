@@ -8,10 +8,10 @@ hidden: true
 readme.myst
 guide/guide.myst
 examples/examples.myst
-apidoc.rst
+apidoc.myst
 toc_contributing.myst
 changelog.myst
-zz_bibliography.rst
+bibliography.myst
 ```
 
 ```{include} ./readme.myst

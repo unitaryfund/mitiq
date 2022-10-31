@@ -95,7 +95,6 @@ master_doc = "index"
 # -- Options for myst_parser -------------------------------------------------
 # Specifies which of the parsers should handle each file extension.
 source_suffix = {
-    ".rst": "restructuredtext",
     ".ipynb": "myst-nb",
     ".myst": "myst-nb",
     ".mystnb": "myst-nb",
@@ -334,6 +333,7 @@ nbsphinx_thumbnails = {
     "examples/zne-braket-ionq": "_static/zne-braket-ionq.png",
     "examples/bqskit": "_static/bqskit.png",
     "examples/simple-landscape-qiskit": "_static/simple-landscape-qiskit.png",
+    "examples/learning-depolarizing-noise": "_static/learn-depolarizing.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }
