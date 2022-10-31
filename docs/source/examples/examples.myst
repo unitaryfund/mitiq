@@ -8,7 +8,8 @@ Zero-noise extrapolation with Braket on IonQ backend <zne-braket-ionq.myst>
 Zero-noise extrapolation with Pennylane on IBMQ backends <pennylane-ibmq-backends.myst>
 Zero-noise extrapolation on PyQuil parametric programs <pyquil_demo.ipynb>
 Variational quantum eigensolver improved with zero-noise extrapolation <vqe-pyquil-demo.ipynb>
-Variational circuit mitigation with zero-noise extrapolation <simple_landscape.myst>
+Using ZNE to compute the energy landscape of a variational circuit with Cirq <simple-landscape-cirq.myst>
+Using ZNE to compute the energy landscape of a variational circuit with Qiskit <simple-landscape-qiskit.myst>
 MaxCut benchmark with zero-noise extrapolation <maxcut-demo.myst>
 Defining a Mitiq executor with a hamiltonian <hamiltonians.md>
 Mitiq paper codeblocks <mitiq-paper/mitiq-paper-codeblocks>

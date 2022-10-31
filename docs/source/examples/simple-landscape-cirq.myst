@@ -186,5 +186,5 @@ We also observe that the minimum of mitigated energy approximates well the theor
 ```{code-cell} ipython3
 print(f"Minimum of the noisy landscape: {round(min(expectations), 3)}")
 print(f"Minimum of the mitigated landscape: {round(min(mitigated_expectations), 3)}")
-print(f"Theoretical groud state energy: {min(np.linalg.eigvals(hamiltonian))}")
+print(f"Theoretical ground state energy: {min(np.linalg.eigvals(hamiltonian))}")
 ```

@@ -324,7 +324,7 @@ nbsphinx_thumbnails = {
     "examples/cirq-ibmq-backends": "_static/cirq-mitiq-ibmq.png",
     "examples/pennylane-ibmq-backends": "_static/zne-pennylane.png",
     "examples/ibmq-backends": "_static/ibmq-gate-map.png",
-    "examples/simple_landscape": "_static/simple-landscape.png",
+    "examples/simple-landscape-cirq": "_static/simple-landscape-cirq.png",
     "examples/molecular_hydrogen": "_static/molecular-hydrogen-vqe.png",
     "examples/molecular_hydrogen_pennylane": "_static/mol-h2-vqe-pl.png",
     "examples/vqe-pyquil-demo": "_static/vqe-pyquil-demo.png",
@@ -332,6 +332,7 @@ nbsphinx_thumbnails = {
     "examples/mitiq-paper/*": "_static/mitiq-codeblocks.png",
     "examples/zne-braket-ionq": "_static/zne-braket-ionq.png",
     "examples/bqskit": "_static/bqskit.png",
+    "examples/simple-landscape-qiskit": "_static/simple-landscape-qiskit.png",
     "examples/learning-depolarizing-noise": "_static/learn-depolarizing.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
