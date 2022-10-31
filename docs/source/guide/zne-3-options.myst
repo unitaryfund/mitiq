@@ -61,10 +61,14 @@ In Mitiq a noise scaling method is represented by a *noise scaling function* tha
 returns a `scaled_circuit`. For a noiseless backend, `scaled_circuit` has the same effect as `circuit`. For a noisy backend, 
 `scaled_circuit` is more sensitive to errors depending on the magnitude of `scale_factor`. 
 
+As discussed previosuly in [How do I use ZNE?](zne-1-intro.myst), the two available methods to scale noise are by inserting
+unitaries or by inserting layers of identity gates. Note that the number of layers inserted are different for the two methods even
+if they have the same scale factor greater than 1. 
+
 ### Unitary Folding 
 
-Mitiq provides several noise scaling functions. Most of them are based on the repeated application of the *unitary folding* technique in
-which a unitary $G$ is mapped as follows:
+Mitiq provides several noise scaling functions for the repeated application of the *unitary folding* technique. In
+this technique regardless of the *unitary folding* function used, a unitary $G$ is mapped as follows:
 
 $$G \longrightarrow G G^\dagger G.$$
 
@@ -90,7 +94,7 @@ in [What happens when I use ZNE ?](zne-4-low-level.myst).
 
 +++
 
-**Note:** *All folding functions can be applied to circuits defined in any supported frontend. For example, in the next code cells we use Cirq to represent quantum circuits.*
+**Note:** *All scaling functions can be applied to circuits defined in any supported frontend. For example, in the next code cells we use Cirq to represent quantum circuits.*
 
 +++
 
@@ -211,6 +215,88 @@ A full list of string keys for gates can be found with `help(fold_method)` where
 folding method. Fidelity values must be between zero and one.
 
 +++
+
+### Identity Scaling
+
+Mitiq has only one noise scaling function for the *identity scaling* technique. The goal of this technique is to insert
+layers of identity gates such that they act evenly across all qubits in the circuit. A unitary $G$ is mapped as follows after
+a single identity layer is inserted :
+
+$$G \longrightarrow G I.$$
+
+Here, $G$ is one layer of gates in the input circuit where the gates in each layer are supposed to act at the same time instance.
+
+The Mitiq function for *identity insertion scaling* is {func}`.insert_id_layers()`. Depending on the `scale_factor`, the number of
+identity layers are inserted in such a way that the new scale factor is exactly the desired `scale_factor` or is very close to it. 
+
+
+#### The difference between integer scale factors and real scale factors
+
+When the scale factor is 1, no identity layers are inserted and circuit depth remains unchanged. For some scale factor greater than 1, 
+there will be some layers that are inserted uniformly after each moment and some inserted at random to get the desired scale factor. 
+
+Consider an input circuit of depth $d$.
+
+Let $\lambda$ be the desired scale factor, $n$ be the uniformly inserted identity layers and $s$ be the randomly inserted identity layers. 
+
+The circuit depth of the returned identity scaled circuit is $\lambda d = d(1+n) + s$. 
+
+Thus, an expression for the scale factor can be derived by comparing the new circuit depth to the initial circuit depth. 
+
+$$\lambda = 1 + n + \frac{s}{d} = 1 + \frac{dn+s}{d} = 1+ \frac{k}{d}.$$
+
+When $\lambda$ is an integer, $\lambda = 1+x$ where $x$ is some integer less than $\lambda$. If the scale factor is an integer, identity
+layers are inserted uniformly after each moment in the input circuit because $n = x$.
+
+```{figure} ../img/zne_id_scaling_example.png
+---
+
+name: input_circ_layers
+---
+The diagram shows the two layers in the input circuit.
+```
+
+Using the same circuit defined previously, the original circuit depth is $2$. If the desired scale 
+factor is $5$ then the new scaled circuit depth has to be $10$ as $5 = \frac{10}{2}$. Using above expression for $\lambda = 1+ 4$, the
+number of uniformly inserted identity layers in the scaled circuit will be $4$. 
+
+```{figure} ../img/zne_id_scaling_integer_factor.png
+---
+
+name: scaled_circuit_integer_factor
+---
+The diagram shows the uniform layers inserted in the input circuit after the initial circuit was scaled via
+identity insertion scaling for an integer scale factor. 
+```
+
+```{code-cell} ipython3
+import cirq
+from mitiq import zne
+
+# Get a circuit to fold
+qreg = cirq.LineQubit.range(2)
+circuit = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1]))
+print("Original circuit:", circuit, sep="\n")
+
+# Apply lidentity scaling
+scaled_circuit = zne.scaling.insert_id_layers(circuit, scale_factor=5)
+print("Identity Scaled circuit:", scaled_circuit, sep="\n")
+```
+
+If the scale factor is a real number greater than or equal to 1, the identity layer insertion can be described as a mix of uniform
+and randomly inserted layers. In this case, the identity layers are inserted uniformly for some integer value and to be able to achieve
+the intended scale factor, there are some non-uniform layers inserted after some random layers in the original input circuit. The achieved
+scale factor might not be exactly the same as the actual scale factor but will be approximately close to it. 
+
+```{figure} ../img/zne_id_scaling_real_factor.png
+---
+
+name: figzne
+---
+The diagram shows the uniform layers and random layer inserted in the input circuit
+after the initial circuit was scaled via identity insertion scaling for a real scale factor.
+```
+
 
 ## Extrapolation methods: Factory objects
 
