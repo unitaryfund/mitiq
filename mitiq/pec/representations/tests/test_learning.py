@@ -297,8 +297,6 @@ def test_learn_biased_noise_parameters(epsilon, eta):
     """Test the learning function with initial noise strength with a small
     offset from the simulated noise model values"""
 
-    eta = 1
-
     pec_kwargs_learning = {}
 
     operations_to_learn = [Circuit(op[1]) for op in CNOT_ops]
