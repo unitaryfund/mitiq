@@ -141,17 +141,17 @@ def executor_with_noise(circuit: QuantumCircuit) -> float:
     return expectation 
 ```
 
-:::{note}
+```{note}
 The above code block uses depolarizing noise, but any Qiskit `NoiseModel` can be substituted in.
-:::
+```
 
 ## Computing the landscape without noise
 
 We now compute the energy landscape $\langle H \rangle(\gamma) =\langle Z \otimes Z \rangle(\gamma)$ on the noiseless simulator.
 
-:::{note}
+```{note}
 The remaining code in this tutorial is generic and does not depend on a particular frontend.
-:::
+```
 
 ```{code-cell} ipython3
 gammas = np.linspace(0, 2 * np.pi, 50)
