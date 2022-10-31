@@ -100,7 +100,10 @@ print(f"Error with mitigation (ZNE): {abs(ideal_value - mitigated_result):.{3}}"
 
 Here we observe that the application of ZNE reduces the estimation error when compared 
 to the unmitigated result.
-In the example above, both the noise *scaling* and *inference* steps were taken behinds the scenes thanks to the default options of {func}`.execute_with_zne`. Below we provide more details about these two aspects of ZNE in Mitiq.
+In the example above, both the noise *scaling* and *inference* steps were taken behinds the scenes thanks to 
+the default options of {func}`.execute_with_zne` where the default noise scaling method is {func}`.fold_gates_at_random()`
+and the executor computes the average expectation value once. Below we provide more details about these two aspects of ZNE 
+in Mitiq.
 
 +++
 
