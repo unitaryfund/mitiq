@@ -61,7 +61,7 @@ In Mitiq a noise scaling method is represented by a *noise scaling function* tha
 returns a `scaled_circuit`. For a noiseless backend, `scaled_circuit` has the same effect as `circuit`. For a noisy backend, 
 `scaled_circuit` is more sensitive to errors depending on the magnitude of `scale_factor`. 
 
-As discussed previosuly in [How do I use ZNE?](zne-1-intro.myst), the two available methods to scale noise are by inserting
+As discussed previously in [How do I use ZNE?](zne-1-intro.myst), the two available methods to scale noise are by inserting
 unitaries or by inserting layers of identity gates. Note that the number of layers inserted are different for the two methods even
 if they have the same scale factor greater than 1. 
 
