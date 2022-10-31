@@ -12,11 +12,7 @@ kernelspec:
   name: python3
 ---
 
-+++ {"tags": []}
-
 # Using ZNE to compute the energy landscape of a variational circuit with Qiskit
-
-+++
 
 This tutorial shows an example in which the energy landscape for a two-qubit variational circuit is explored with and without error mitigation, using Qiskit as our frontend.
 
@@ -33,8 +29,6 @@ from mitiq.zne.inference import RichardsonFactory
 ```
 
 ## Defining the ideal variational circuit in Qiskit 
-
-+++
 
 We define a function which returns a simple two-qubit variational circuit depending on a single parameter  $\gamma$ ("gamma").
 
@@ -147,19 +141,17 @@ def executor_with_noise(circuit: QuantumCircuit) -> float:
     return expectation 
 ```
 
-**Note:** The above code block uses depolarizing noise, but any Qiskit `NoiseModel` can be substituted in.
-
-+++
+:::{note}
+The above code block uses depolarizing noise, but any Qiskit `NoiseModel` can be substituted in.
+:::
 
 ## Computing the landscape without noise
 
-+++
-
 We now compute the energy landscape $\langle H \rangle(\gamma) =\langle Z \otimes Z \rangle(\gamma)$ on the noiseless simulator.
 
-+++
-
-**Note:** The remaining code in this tutorial is generic and does not depend on a particular frontend.
+:::{note}
+The remaining code in this tutorial is generic and does not depend on a particular frontend.
+:::
 
 ```{code-cell} ipython3
 gammas = np.linspace(0, 2 * np.pi, 50)
@@ -242,8 +234,4 @@ We also observe that the minimum of mitigated energy approximates well the theor
 print(f"Minimum of the noisy landscape: {round(min(expectations), 3)}")
 print(f"Minimum of the mitigated landscape: {round(min(mitigated_expectations), 3)}")
 print(f"Theoretical ground state energy: {min(np.linalg.eigvals(hamiltonian))}")
-```
-
-```{code-cell} ipython3
-
 ```
