@@ -291,7 +291,7 @@ def test_learn_depolarizing_noise_parameter(epsilon):
 
 
 @pytest.mark.parametrize("epsilon", [0.05, 0.1])
-@pytest.mark.parametrize("eta", [1])
+@pytest.mark.parametrize("eta", [1, 2])
 def test_learn_biased_noise_parameters(epsilon, eta):
     """Test the learning function with initial noise strength with a small
     offset from the simulated noise model values"""

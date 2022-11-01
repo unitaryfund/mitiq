@@ -101,13 +101,22 @@ def learn_biased_noise_parameters(
         [ideal_executor.evaluate(t, observable) for t in training_circuits]
     )
 
-    if learning_kwargs is not None:
-        minimize_kwargs = learning_kwargs.get("learning_kwargs")
+    minimize_kwargs = learning_kwargs.get("learning_kwargs")
+
+    if minimize_kwargs is not None:
         pec_data = minimize_kwargs.pop("pec_data", None)  # type: ignore
         method = minimize_kwargs.pop("method", None)  # type: ignore
 
-    if method is None:
+        if pec_data is None:
+            pec_data = np.array([])
+
+        if method is None:
+            method = "Nelder-Mead"
+
+    else:
+        pec_data = np.array([])
         method = "Nelder-Mead"
+        minimize_kwargs = {}
 
     result = minimize(
         biased_noise_loss_function,
@@ -201,13 +210,22 @@ def learn_depolarizing_noise_parameter(
         [ideal_executor.evaluate(t, observable) for t in training_circuits]
     )
 
-    if learning_kwargs is not None:
-        minimize_kwargs = learning_kwargs.get("learning_kwargs")
+    minimize_kwargs = learning_kwargs.get("learning_kwargs")
+
+    if minimize_kwargs is not None:
         pec_data = minimize_kwargs.pop("pec_data", None)  # type: ignore
         method = minimize_kwargs.pop("method", None)  # type: ignore
 
-    if method is None:
+        if pec_data is None:
+            pec_data = np.array([])
+
+        if method is None:
+            method = "Nelder-Mead"
+
+    else:
+        pec_data = np.array([])
         method = "Nelder-Mead"
+        minimize_kwargs = {}
 
     result = minimize(
         depolarizing_noise_loss_function,
