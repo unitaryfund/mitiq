@@ -36,15 +36,13 @@ def learn_biased_noise_parameters(
     ideal_executor: Executor,
     noisy_executor: Executor,
     pec_kwargs: Dict["str", Any],
-    pec_data: npt.NDArray[np.float64] = np.array([]),
     num_training_circuits: int = 5,
     fraction_non_clifford: float = 0.2,
-    training_random_state: Optional[np.random.RandomState] = None,
+    training_random_state: np.random.RandomState = None,  # type: ignore
     epsilon0: float = 0.05,
     eta0: float = 1,
     observable: Optional[Observable] = None,
-    method: Optional[str] = "Nelder-Mead",
-    **minimize_kwargs: Dict["str", Any],
+    **learning_kwargs: Dict["str", Any],  # type: ignore
 ) -> Tuple[bool, float, float]:
     r"""This function learns the depolarizing noise parameter (epsilon)
     associated to a set of input operations. The learning process is based on
@@ -74,9 +72,10 @@ def learn_biased_noise_parameters(
             If None, the ``executor`` must return an expectation value.
             Otherwise the `QuantumResult` returned by `executor` is used to
             compute the expectation of the observable.
-        method: Type of optimizer. Must be an optimizer supported by
-            ``scipy.optimize.minimize``.
-        minimize_kwargs: Options to pass to the solver called by
+        learning_kwargs: Additional inputs and options including ``pec_data``
+            from pre-executed runs of PEC on training circuits, ``method`` i.e.
+            type of optimizer (supported by ``scipy.optimize.minimize``), and
+            options to pass to the solver called by
             ``scipy.optimize.minizmize``.
 
     Returns:
@@ -101,6 +100,14 @@ def learn_biased_noise_parameters(
     ideal_values = np.array(
         [ideal_executor.evaluate(t, observable) for t in training_circuits]
     )
+
+    if learning_kwargs is not None:
+        minimize_kwargs = learning_kwargs.get("learning_kwargs")
+        pec_data = minimize_kwargs.pop("pec_data", None)  # type: ignore
+        method = minimize_kwargs.pop("method", None)  # type: ignore
+
+    if method is None:
+        method = "Nelder-Mead"
 
     result = minimize(
         biased_noise_loss_function,
@@ -131,14 +138,12 @@ def learn_depolarizing_noise_parameter(
     ideal_executor: Executor,
     noisy_executor: Executor,
     pec_kwargs: Dict["str", Any],
-    pec_data: npt.NDArray[np.float64] = np.array([]),
     num_training_circuits: int = 5,
     fraction_non_clifford: float = 0.2,
     training_random_state: np.random.RandomState = None,  # type: ignore
     epsilon0: float = 0.05,
     observable: Optional[Observable] = None,
-    method: Optional[str] = "Nelder-Mead",
-    **minimize_kwargs: Dict["str", Any],
+    **learning_kwargs: Dict["str", Any],  # type: ignore
 ) -> Tuple[bool, float]:
     r"""This function learns the depolarizing noise parameter (epsilon)
     associated to a set of input operations. The learning process is based on
@@ -167,9 +172,10 @@ def learn_depolarizing_noise_parameter(
             If None, the ``executor`` must return an expectation value.
             Otherwise the `QuantumResult` returned by `executor` is used to
             compute the expectation of the observable.
-        method: Type of optimizer. Must be an optimizer supported by
-            ``scipy.optimize.minimize``.
-        minimize_kwargs: Options to pass to the solver called by
+        learning_kwargs: Additional inputs and options including ``pec_data``
+            from pre-executed runs of PEC on training circuits, ``method`` i.e.
+            type of optimizer (supported by ``scipy.optimize.minimize``), and
+            options to pass to the solver called by
             ``scipy.optimize.minizmize``.
 
     Returns:
@@ -194,6 +200,15 @@ def learn_depolarizing_noise_parameter(
     ideal_values = np.array(
         [ideal_executor.evaluate(t, observable) for t in training_circuits]
     )
+
+    if learning_kwargs is not None:
+        minimize_kwargs = learning_kwargs.get("learning_kwargs")
+        pec_data = minimize_kwargs.pop("pec_data", None)  # type: ignore
+        method = minimize_kwargs.pop("method", None)  # type: ignore
+
+    if method is None:
+        method = "Nelder-Mead"
+
     result = minimize(
         depolarizing_noise_loss_function,
         epsilon0,

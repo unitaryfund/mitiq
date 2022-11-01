@@ -44,8 +44,7 @@ from mitiq.pec.representations.learning import (
     learn_biased_noise_parameters,
 )
 
-seed = 1
-rng = np.random.RandomState(seed)
+rng = np.random.RandomState(1)
 circuit = random_x_z_cnot_circuit(
     LineQubit.range(2), n_moments=5, random_state=rng
 )
@@ -285,7 +284,7 @@ def test_learn_depolarizing_noise_parameter(epsilon):
         training_random_state=np.random.RandomState(1),
         epsilon0=epsilon0,
         observable=observable,
-        method="Nelder-Mead",
+        learning_kwargs={"pec_data": pec_data},
     )
     assert success
     assert abs(epsilon_opt - epsilon) < offset * epsilon
@@ -297,8 +296,6 @@ def test_learn_biased_noise_parameters(epsilon, eta):
     """Test the learning function with initial noise strength with a small
     offset from the simulated noise model values"""
 
-    pec_kwargs_learning = {}
-
     operations_to_learn = [Circuit(op[1]) for op in CNOT_ops]
 
     def noisy_execute(circ: Circuit) -> np.ndarray:
@@ -308,7 +305,9 @@ def test_learn_biased_noise_parameters(epsilon, eta):
             index = op[0] + 1
             qubits = op[1].qubits
             for q in qubits:
-                insertions.append((index, DepolarizingChannel(epsilon)(q)))
+                insertions.append(
+                    (index, biased_noise_channel(epsilon, eta)(q))
+                )
         noisy_circ.batch_insert(insertions)
         return ideal_execute(noisy_circ)
 
@@ -339,15 +338,14 @@ def test_learn_biased_noise_parameters(epsilon, eta):
         circuit=circuit,
         ideal_executor=ideal_executor,
         noisy_executor=noisy_executor,
-        pec_kwargs=pec_kwargs_learning,
-        pec_data=np.array(pec_data),
+        pec_kwargs={},
         num_training_circuits=num_training_circuits,
         fraction_non_clifford=0.2,
         training_random_state=np.random.RandomState(1),
         epsilon0=epsilon0,
         eta0=eta0,
         observable=observable,
-        method="Nelder-Mead",
+        learning_kwargs={"pec_data": pec_data},
     )
     assert success
     assert abs(epsilon_opt - epsilon) < eps_offset * epsilon

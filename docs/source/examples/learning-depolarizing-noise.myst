@@ -166,7 +166,6 @@ to find the value of epsilon that minimizes the depolarizing noise loss function
     training_random_state=np.random.RandomState(1),
     epsilon0=epsilon0,
     observable=observable,
-    method="Nelder-Mead",
 )
 
 print(success)
