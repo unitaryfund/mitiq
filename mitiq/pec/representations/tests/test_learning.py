@@ -50,7 +50,7 @@ circuit = random_x_z_cnot_circuit(
 )
 
 # Set number of samples used to calculate mitigated value in loss function
-pec_kwargs = {"num_samples": 50, "random_state": 1}
+pec_kwargs = {"num_samples": 20, "random_state": 1}
 
 observable = Observable(PauliString("XZ"), PauliString("YY"))
 
@@ -238,32 +238,28 @@ def test_biased_noise_loss_function_qiskit(operations):
 
 
 @pytest.mark.parametrize("epsilon", [0.05, 0.1])
-# We assume the operation "op" appears just once in the circuit such
-# that it's enough to add a single noise channel after that operation.
 def test_learn_depolarizing_noise_parameter(epsilon):
     """Test the learning function with initial noise strength with a small
     offset from the simulated noise model values"""
-    index = CNOT_ops[0][0]
-    op = CNOT_ops[0][1]
+
+    operations_to_learn = [Circuit(op[1]) for op in CNOT_ops]
+
     offset = 0.1
 
-    # We assume the operation "op" appears just once in the circuit such
-    # that it's enough to add a single noise channel after that operation.
     def noisy_execute(circ: Circuit) -> np.ndarray:
         noisy_circ = circ.copy()
-        qubits = op.qubits
-        for q in qubits:
-            noisy_circ.insert(
-                index + 1,
-                DepolarizingChannel(epsilon)(q),
-            )
+        insertions = []
+        for op in CNOT_ops:
+            index = op[0] + 1
+            qubits = op[1].qubits
+            for q in qubits:
+                insertions.append((index, DepolarizingChannel(epsilon)(q)))
+        noisy_circ.batch_insert(insertions)
         return ideal_execute(noisy_circ)
 
     noisy_executor = Executor(noisy_execute)
 
     epsilon0 = (1 - offset) * epsilon
-
-    operations_to_learn = [Circuit(op)]
 
     pec_data = np.loadtxt(
         "./mitiq/pec/representations/tests/learning_pec_data/"
@@ -278,7 +274,6 @@ def test_learn_depolarizing_noise_parameter(epsilon):
         ideal_executor=ideal_executor,
         noisy_executor=noisy_executor,
         pec_kwargs={},
-        pec_data=pec_data,
         num_training_circuits=5,
         fraction_non_clifford=0.2,
         training_random_state=np.random.RandomState(1),
@@ -290,11 +285,47 @@ def test_learn_depolarizing_noise_parameter(epsilon):
     assert abs(epsilon_opt - epsilon) < offset * epsilon
 
 
+def test_learn_depolarizing_noise_no_data():
+
+    operations_to_learn = [Circuit(op[1]) for op in CNOT_ops]
+
+    epsilon = 0.05
+
+    def noisy_execute(circ: Circuit) -> np.ndarray:
+        noisy_circ = circ.copy()
+        insertions = []
+        for op in CNOT_ops:
+            index = op[0] + 1
+            qubits = op[1].qubits
+            for q in qubits:
+                insertions.append((index, DepolarizingChannel(epsilon)(q)))
+        noisy_circ.batch_insert(insertions)
+        return ideal_execute(noisy_circ)
+
+    noisy_executor = Executor(noisy_execute)
+
+    offset = 0.01
+    epsilon0 = (1 - offset) * epsilon
+
+    [success, _] = learn_depolarizing_noise_parameter(
+        operations_to_learn=operations_to_learn,
+        circuit=circuit,
+        ideal_executor=ideal_executor,
+        noisy_executor=noisy_executor,
+        pec_kwargs=pec_kwargs,
+        num_training_circuits=5,
+        fraction_non_clifford=0.2,
+        training_random_state=np.random.RandomState(1),
+        epsilon0=epsilon0,
+        observable=observable,
+    )
+    assert success
+
+
 @pytest.mark.parametrize("epsilon", [0.05, 0.1])
 @pytest.mark.parametrize("eta", [1, 2])
 def test_learn_biased_noise_parameters(epsilon, eta):
-    """Test the learning function with initial noise strength with a small
-    offset from the simulated noise model values"""
+    """Test the learning function can run without pre-executed data"""
 
     operations_to_learn = [Circuit(op[1]) for op in CNOT_ops]
 
@@ -350,3 +381,51 @@ def test_learn_biased_noise_parameters(epsilon, eta):
     assert success
     assert abs(epsilon_opt - epsilon) < eps_offset * epsilon
     assert abs(eta_opt - eta) < eta_offset * eta
+
+
+def test_learn_biased_noise_no_data():
+    """Test the learning function can run without pre-executed data"""
+
+    epsilon = 0.05
+    eta = 1
+    eps_offset = 0.1
+    eta_offset = 0.2
+    epsilon0 = (1 - eps_offset) * epsilon
+    eta0 = (1 - eta_offset) * eta
+
+    operations_to_learn = [Circuit(op[1]) for op in CNOT_ops]
+
+    def noisy_execute(circ: Circuit) -> np.ndarray:
+        noisy_circ = circ.copy()
+        insertions = []
+        for op in CNOT_ops:
+            index = op[0] + 1
+            qubits = op[1].qubits
+            for q in qubits:
+                insertions.append(
+                    (index, biased_noise_channel(epsilon, eta)(q))
+                )
+        noisy_circ.batch_insert(insertions)
+        return ideal_execute(noisy_circ)
+
+    noisy_executor = Executor(noisy_execute)
+
+    eps_offset = 0.1
+    eta_offset = 0.2
+    epsilon0 = (1 - eps_offset) * epsilon
+    eta0 = (1 - eta_offset) * eta
+
+    [success, _, _] = learn_biased_noise_parameters(
+        operations_to_learn=operations_to_learn,
+        circuit=circuit,
+        ideal_executor=ideal_executor,
+        noisy_executor=noisy_executor,
+        pec_kwargs=pec_kwargs,
+        num_training_circuits=5,
+        fraction_non_clifford=0.2,
+        training_random_state=np.random.RandomState(1),
+        epsilon0=epsilon0,
+        eta0=eta0,
+        observable=observable,
+    )
+    assert success
