@@ -72,11 +72,11 @@ def learn_biased_noise_parameters(
             If None, the ``executor`` must return an expectation value.
             Otherwise the `QuantumResult` returned by `executor` is used to
             compute the expectation of the observable.
-        learning_kwargs: Additional inputs and options including ``pec_data``
-            from pre-executed runs of PEC on training circuits, ``method`` i.e.
-            type of optimizer (supported by ``scipy.optimize.minimize``), and
-            options to pass to the solver called by
-            ``scipy.optimize.minizmize``.
+        learning_kwargs (optional): Additional inputs and options including
+            ``pec_data`` from pre-executed runs of PEC on training circuits,
+            ``method`` an optimization method supported by
+            ``scipy.optimize.minimize``, and settings for the chosen
+            optimization method.
 
     Returns:
         A flag indicating whether or not the optimizer exited successfully, the
@@ -181,11 +181,11 @@ def learn_depolarizing_noise_parameter(
             If None, the ``executor`` must return an expectation value.
             Otherwise the `QuantumResult` returned by `executor` is used to
             compute the expectation of the observable.
-        learning_kwargs: Additional inputs and options including ``pec_data``
-            from pre-executed runs of PEC on training circuits, ``method`` i.e.
-            type of optimizer (supported by ``scipy.optimize.minimize``), and
-            options to pass to the solver called by
-            ``scipy.optimize.minizmize``.
+        learning_kwargs (optional): Additional inputs and options including
+            ``pec_data`` from pre-executed runs of PEC on training circuits,
+            ``method`` an optimization method supported by
+            ``scipy.optimize.minimize``, and settings for the chosen
+            optimization method.
 
     Returns:
         A flag indicating whether or not the optimizer exited successfully and
