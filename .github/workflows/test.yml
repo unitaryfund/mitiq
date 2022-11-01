@@ -54,6 +54,7 @@ jobs:
 
       - name: Build and test Sphinx docs
         run: |
+          export BQSKIT_DOC_CHECK_OVERRIDE=1
           make docs
           make doctest
           make linkcheck

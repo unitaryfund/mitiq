@@ -1,6 +1,43 @@
 # Changelog
 
-## Version 0.20.0 (In Development)
+## Version 0.21.0 (In Development)
+
+## Version 0.20.0
+
+### Summary
+
+This milestone focused on updating our support for numpy (1.23), adding a tutorial demonstrating the learning-based PEC workflow, and scoping out what device/noise calibration might look like as part of Mitiq.
+Additionally identity insertion has been added as a noise-scaling technique available for mitigation protocols such as zero-noise extrapolation.
+Expect more documentation of this feature in future releases.
+Big thanks to @purva-thakre for getting this in Mitiq!
+
+There are also some minor bug fixes, documentation updates, and a new example contributed by @nickdgardner as well!
+
+### All changes
+- Port BQSKit example to 1.0 release (#1557) [@natestemen]
+- Add Qiskit example on mitigating the energy landscape of a variational circuit (#1551) [@nickdgardner]
+- Bump pytest-xdist[psutil] from 2.5.0 to 3.0.2 (#1569) [@dependabot]
+- remove badges from contributing to docs doc (#1571) [@natestemen]
+- Warn when unsupported gate fidelity is passed (#1542) [@natestemen]
+- remove gh-pages deploy action (#1566) [@natestemen]
+- First demo of learning function (#1514) [@misty-w]
+- remove stale bot (#1558) [@natestemen]
+- Update scipy requirement from ~=1.9.2 to ~=1.9.3 (#1561) [@dependabot]
+- Docs infrastructure improvements (#1559) [@natestemen]
+- Identity Insertion Scaling (#1442) [@purva-thakre]
+- Update scipy requirement from ~=1.9.1 to ~=1.9.2 (#1548) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.31.0 to ~=1.31.1 (#1549) [@dependabot]
+- Update qiskit requirement from ~=0.38.0 to ~=0.39.0 (#1550) [@dependabot]
+- Update numpy requirement from ~=1.23.3 to ~=1.23.4 (#1553) [@dependabot]
+- Revert "[temporary] ignore errors from first-interaction (#1532)" (#1555) [@natestemen]
+- allow all tests to run if one fails (#1554) [@natestemen]
+- Update numpy requirement from ~=1.21.6 to ~=1.23.3 (#1486) [@dependabot]
+- Update black requirement from ~=22.8 to ~=22.10 (#1544) [@dependabot]
+- Update pydata-sphinx-theme requirement from ~=0.10.1 to ~=0.11.0 (#1545) [@dependabot]
+- add robots.txt 🤖 (#1543) [@natestemen]
+- Set master in dev mode (#1536) [@andreamari]
+- Update mypy requirement from ~=0.981 to ~=0.982 (#1537) [@dependabot]
+- Update pyquil requirement from ~=3.3.1 to ~=3.3.2 (#1539) [@dependabot]
 
 ## Version 0.19.0
 
