@@ -72,7 +72,7 @@ def learn_biased_noise_parameters(
             If None, the ``executor`` must return an expectation value.
             Otherwise the `QuantumResult` returned by `executor` is used to
             compute the expectation of the observable.
-        learning_kwargs (optional): Additional inputs and options including
+        learning_kwargs (optional): Additional data and options including
             ``pec_data`` from pre-executed runs of PEC on training circuits,
             ``method`` an optimization method supported by
             ``scipy.optimize.minimize``, and settings for the chosen
@@ -101,22 +101,9 @@ def learn_biased_noise_parameters(
         [ideal_executor.evaluate(t, observable) for t in training_circuits]
     )
 
-    minimize_kwargs = learning_kwargs.get("learning_kwargs")
-
-    if minimize_kwargs is not None:
-        pec_data = minimize_kwargs.pop("pec_data", None)  # type: ignore
-        method = minimize_kwargs.pop("method", None)  # type: ignore
-
-        if pec_data is None:
-            pec_data = np.array([])
-
-        if method is None:
-            method = "Nelder-Mead"
-
-    else:
-        pec_data = np.array([])
-        method = "Nelder-Mead"
-        minimize_kwargs = {}
+    pec_data, method, minimize_kwargs = _parse_learning_kwargs(
+        learning_kwargs=learning_kwargs
+    )
 
     result = minimize(
         biased_noise_loss_function,
@@ -181,7 +168,7 @@ def learn_depolarizing_noise_parameter(
             If None, the ``executor`` must return an expectation value.
             Otherwise the `QuantumResult` returned by `executor` is used to
             compute the expectation of the observable.
-        learning_kwargs (optional): Additional inputs and options including
+        learning_kwargs (optional): Additional data and options including
             ``pec_data`` from pre-executed runs of PEC on training circuits,
             ``method`` an optimization method supported by
             ``scipy.optimize.minimize``, and settings for the chosen
@@ -210,22 +197,9 @@ def learn_depolarizing_noise_parameter(
         [ideal_executor.evaluate(t, observable) for t in training_circuits]
     )
 
-    minimize_kwargs = learning_kwargs.get("learning_kwargs")
-
-    if minimize_kwargs is not None:
-        pec_data = minimize_kwargs.pop("pec_data", None)  # type: ignore
-        method = minimize_kwargs.pop("method", None)  # type: ignore
-
-        if pec_data is None:
-            pec_data = np.array([])
-
-        if method is None:
-            method = "Nelder-Mead"
-
-    else:
-        pec_data = np.array([])
-        method = "Nelder-Mead"
-        minimize_kwargs = {}
+    pec_data, method, minimize_kwargs = _parse_learning_kwargs(
+        learning_kwargs=learning_kwargs
+    )
 
     result = minimize(
         depolarizing_noise_loss_function,
@@ -360,3 +334,35 @@ def biased_noise_loss_function(
     return np.mean(
         abs(mitigated_values.reshape(-1, 1) - ideal_values.reshape(-1, 1)) ** 2
     )
+
+
+def _parse_learning_kwargs(
+    learning_kwargs: Dict["str", Any]
+) -> Tuple[npt.NDArray[np.float64], str, Dict["str", Any]]:
+    r"""Function for handling additional options and data for the learning
+    functions.
+
+    Args:
+        learning_kwargs: Additional data and options including
+            ``pec_data`` from pre-executed runs of PEC on training circuits,
+            ``method`` an optimization method supported by
+            ``scipy.optimize.minimize``, and settings for the chosen
+            optimization method.
+
+    Returns:
+       Values contained in learning_kwargs or defaults if not specified.
+    """
+    minimize_kwargs = learning_kwargs.get("learning_kwargs")
+
+    if minimize_kwargs is not None:
+        pec_data = minimize_kwargs.pop(
+            "pec_data", np.array([])
+        )  # type: ignore
+        method = minimize_kwargs.pop("method", "Nelder-Mead")  # type: ignore
+
+    else:
+        pec_data = np.array([])
+        method = "Nelder-Mead"
+        minimize_kwargs = {}
+
+    return pec_data, method, minimize_kwargs
