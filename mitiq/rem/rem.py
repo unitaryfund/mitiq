@@ -48,11 +48,16 @@ def execute_with_rem(
 
     result = executor._run([circuit])
     noisy_result = result[0]
-    assert isinstance(noisy_result, MeasurementResult)
+    if not isinstance(noisy_result, MeasurementResult):
+        raise TypeError("Results are not of type MeasurementResult.")
 
     mitigated_result = mitigate_measurements(
         noisy_result, inverse_confusion_matrix
     )
+
+    if observable is None:
+        raise ValueError("An observable is required.")
+
     assert observable is not None
     return observable._expectation_from_measurements([mitigated_result])
 

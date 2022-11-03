@@ -93,7 +93,7 @@ def test_rem_with_matrix():
 def test_rem_with_invalid_matrix():
     executor = partial(sample_bitstrings, noise_level=(0,))
     identity = np.identity(2)
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         execute_with_rem(
             circ, executor, observable, inverse_confusion_matrix=identity
         )
@@ -165,8 +165,7 @@ def test_rem_decorator():
         observable, inverse_confusion_matrix=inverse_confusion_matrix
     )
     def noisy_readout_decorated_executor(qp) -> MeasurementResult:
-        # test with an executor that completely flips results
-        return noisy_readout_executor(qp, p0=1, p1=1)
+        return noisy_readout_executor(qp, p0=p0, p1=p1)
 
     noisy_executor = partial(noisy_readout_executor, p0=p0, p1=p1)
 
