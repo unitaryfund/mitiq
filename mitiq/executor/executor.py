@@ -17,6 +17,7 @@
 by error mitigation techniques to compute expectation values."""
 
 from collections import Counter
+import warnings
 import inspect
 from typing import (
     Any,
@@ -31,19 +32,22 @@ from typing import (
 )
 
 import numpy as np
+import numpy.typing as npt
 
 from mitiq import QPROGRAM, MeasurementResult, QuantumResult
 
 from mitiq.observable.observable import Observable
 from mitiq.interface import convert_from_mitiq, convert_to_mitiq
+from mitiq.observable.pauli import PauliString
 
 
 DensityMatrixLike = [
     np.ndarray,
-    Iterable[np.ndarray],
-    List[np.ndarray],
-    Sequence[np.ndarray],
+    Iterable[np.ndarray],  # type: ignore
+    List[np.ndarray],  # type: ignore
+    Sequence[np.ndarray],  # type: ignore
     Tuple[np.ndarray],
+    npt.NDArray[np.complex64],
 ]
 FloatLike = [
     None,  # Untyped executors are assumed to return floats.
@@ -118,7 +122,7 @@ class Executor:
         observable: Optional[Observable] = None,
         force_run_all: bool = False,
         **kwargs: Any,
-    ) -> List[complex]:
+    ) -> List[float]:
         """Returns the expectation value Tr[ρ O] for each circuit in
         ``circuits`` where O is the observable provided or implicitly defined
         by the ``executor``. (The observable is implicitly defined when the
@@ -135,9 +139,27 @@ class Executor:
             force_run_all: If True, force every circuit in the input sequence
                 to be executed (if some are identical). Else, detects identical
                 circuits and runs a minimal set.
+
+        Returns:
+            List of real valued expectation values.
         """
         if not isinstance(circuits, List):
             circuits = [circuits]
+
+        warn_non_hermitian = False
+        if observable:
+            if isinstance(observable, PauliString):
+                if observable.coeff.imag > 0.0001:
+                    warn_non_hermitian = True
+            elif isinstance(observable, Observable):
+                if any(
+                    pauli.coeff.imag > 0.0001 for pauli in observable._paulis
+                ):
+                    warn_non_hermitian = True
+        if warn_non_hermitian:
+            warnings.warn(
+                "Expected observable to be hermitian. Continue with caution."
+            )
 
         # Get all required circuits to run.
         if (
@@ -169,11 +191,13 @@ class Executor:
 
         # Parse the results.
         if self._executor_return_type in FloatLike:
-            results = all_results
+            results = np.real_if_close(
+                cast(Sequence[float], all_results)
+            ).tolist()
 
         elif self._executor_return_type in DensityMatrixLike:
             observable = cast(Observable, observable)
-            all_results = cast(List[np.ndarray], all_results)
+            all_results = cast(List[npt.NDArray[np.complex64]], all_results)
             results = [
                 observable._expectation_from_density_matrix(density_matrix)
                 for density_matrix in all_results

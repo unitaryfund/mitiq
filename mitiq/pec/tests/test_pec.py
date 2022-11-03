@@ -316,7 +316,7 @@ def test_execute_with_pec_partial_representations():
         force_run_all=False,
         random_state=101,
     )
-    assert isinstance(pec_value, complex)
+    assert isinstance(pec_value, float)
 
 
 @pytest.mark.parametrize("circuit", [oneq_circ, twoq_circ])

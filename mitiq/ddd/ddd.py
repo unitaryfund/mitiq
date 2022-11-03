@@ -93,7 +93,7 @@ def execute_with_ddd(
 
     assert len(results) == num_trials
 
-    ddd_value = np.real_if_close(np.sum(results)) / num_trials
+    ddd_value = np.sum(results) / num_trials
     if not full_output:
         return ddd_value
 

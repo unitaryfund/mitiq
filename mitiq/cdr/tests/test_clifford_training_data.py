@@ -23,37 +23,17 @@ from cirq.circuits import Circuit
 from mitiq._typing import SUPPORTED_PROGRAM_TYPES
 from mitiq.interface import convert_from_mitiq
 from mitiq.cdr.clifford_training_data import (
-    _is_clifford_angle,
-    is_clifford,
-    _map_to_near_clifford,
     _select,
+    _map_to_near_clifford,
     _replace,
-    _closest_clifford,
-    _random_clifford,
-    _angle_to_proximity,
-    _angle_to_proximities,
-    _probabilistic_angle_to_clifford,
-    count_non_cliffords,
     generate_training_circuits,
-    _CLIFFORD_ANGLES,
+)
+
+from mitiq.cdr.clifford_utils import (
+    is_clifford,
+    count_non_cliffords,
 )
 from mitiq.cdr._testing import random_x_z_cnot_circuit
-
-
-@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
-def test_is_clifford_with_clifford(circuit_type):
-    circuit = convert_from_mitiq(
-        cirq.Circuit(cirq.Z.on(cirq.LineQubit(0))), circuit_type
-    )
-    assert is_clifford(circuit)
-
-
-@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
-def test_is_clifford_with_nonclifford(circuit_type):
-    circuit = convert_from_mitiq(
-        cirq.Circuit(cirq.T.on(cirq.LineQubit(0))), circuit_type
-    )
-    assert not is_clifford(circuit)
 
 
 def test_generate_training_circuits():
@@ -211,64 +191,3 @@ def test_select(method):
     assert len(indices) == int(
         round((1.0 - fraction_non_clifford) * len(non_clifford_ops))
     )
-
-
-@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
-def test_count_non_cliffords(circuit_type):
-    a, b = cirq.LineQubit.range(2)
-    circuit = Circuit(
-        cirq.rz(0.0).on(a),  # Clifford.
-        cirq.rx(0.1 * np.pi).on(b),  # Non-Clifford.
-        cirq.rx(0.5 * np.pi).on(b),  # Clifford
-        cirq.rz(0.4 * np.pi).on(b),  # Non-Clifford.
-        cirq.rz(0.5 * np.pi).on(b),  # Clifford.
-        cirq.CNOT.on(a, b),  # Clifford.
-    )
-    circuit = convert_from_mitiq(circuit, circuit_type)
-
-    assert count_non_cliffords(circuit) == 2
-
-
-def test_count_non_cliffords_empty_circuit():
-    assert count_non_cliffords(Circuit()) == 0
-
-
-def test_is_clifford_angle():
-    for p in range(4):
-        assert _is_clifford_angle(p * np.array(_CLIFFORD_ANGLES)).all()
-
-    assert not _is_clifford_angle(-0.17)
-
-
-def test_closest_clifford():
-    for ang in _CLIFFORD_ANGLES:
-        angs = np.linspace(ang - np.pi / 4 + 0.01, ang + np.pi / 4 - 0.01)
-        for a in angs:
-            assert _closest_clifford(a) == ang
-
-
-def test_random_clifford():
-    assert set(_random_clifford(20, np.random.RandomState(1))).issubset(
-        _CLIFFORD_ANGLES
-    )
-
-
-def test_angle_to_proximities():
-    for sigma in np.linspace(0.1, 2, 10):
-        for ang in _CLIFFORD_ANGLES:
-            probabilities = _angle_to_proximities(ang, sigma)
-            assert (isinstance(p, float) for p in probabilities)
-
-
-def test_angle_to_proximity():
-    for sigma in np.linspace(0.1, 2, 10):
-        probabilities = _angle_to_proximity(_CLIFFORD_ANGLES, sigma)
-        assert all(isinstance(p, float) for p in probabilities)
-
-
-def test_probabilistic_angles_to_clifford():
-    for sigma in np.linspace(0.1, 2, 10):
-        angles = _probabilistic_angle_to_clifford(
-            _CLIFFORD_ANGLES, sigma, np.random.RandomState(1)
-        )
-        assert all(a in _CLIFFORD_ANGLES for a in angles)

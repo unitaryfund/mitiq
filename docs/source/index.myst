@@ -7,11 +7,11 @@ hidden: true
 ---
 readme.myst
 guide/guide.myst
-examples/examples.rst
-apidoc.rst
+examples/examples.myst
+apidoc.myst
 toc_contributing.myst
 changelog.myst
-zz_bibliography.rst
+bibliography.myst
 ```
 
 ```{include} ./readme.myst

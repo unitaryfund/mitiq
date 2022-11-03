@@ -64,7 +64,7 @@ extensions = [
 ]
 
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3.7", None),
+    "python": ("https://docs.python.org/3.8", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
     # Cirq is no longer using sphinx docs so interlinking is not possible.
@@ -87,9 +87,7 @@ language = "en"
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = [
-    "guide/_guide-zne-lindblad.rst",
-]
+exclude_patterns = []
 
 # The master toctree document.
 master_doc = "index"
@@ -97,7 +95,6 @@ master_doc = "index"
 # -- Options for myst_parser -------------------------------------------------
 # Specifies which of the parsers should handle each file extension.
 source_suffix = {
-    ".rst": "restructuredtext",
     ".ipynb": "myst-nb",
     ".myst": "myst-nb",
     ".mystnb": "myst-nb",
@@ -115,50 +112,26 @@ myst_enable_extensions = [
     "smartquotes",
 ]
 
+myst_heading_anchors = 3
+
 # Tells MyST to treat URIs beginning with these prefixes as external links.
 # Links that don't begin with these will be treated as internal cross-links.
 myst_url_schemes = ("http", "https", "mailto")
 
 # -- Options for myst_nb -----------------------------------------------------
 
-# Needed to explicitly set render priority for the `doctest` mode.
-# https://myst-nb.readthedocs.io/en/latest/use/formatting_outputs.html#render-priority
-nb_render_priority = {
-    "html": (
-        "application/vnd.jupyter.widget-view+json",
-        "application/javascript",
-        "text/html",
-        "image/svg+xml",
-        "image/png",
-        "image/jpeg",
-        "text/markdown",
-        "text/latex",
-        "text/plain",
-    ),
-    "doctest": (
-        "application/vnd.jupyter.widget-view+json",
-        "application/javascript",
-        "text/html",
-        "image/svg+xml",
-        "image/png",
-        "image/jpeg",
-        "text/markdown",
-        "text/latex",
-        "text/plain",
-    ),
-}
 # How long should Sphinx wait while a notebook is being evaluated before
 # quitting.
-execution_timeout = 600
+nb_execution_timeout = 600
 
 # By default, if nothing has changed in the source, a notebook won't be
 # re-run for a subsequent docs build.
-jupyter_execute_notebooks = "cache"
+nb_execution_mode = "cache"
 
 # If SKIP_PYQUIL is True, do not re-run PyQuil notebooks.
 if os.environ.get("SKIP_PYQUIL"):
     print("Skipping PyQuil notebooks execution since SKIP_PYQUIL is True")
-    execution_excludepatterns = ["*pyquil*.ipynb"]
+    nb_execution_excludepatterns = ["*pyquil*.ipynb"]
 
 # -- Options for autodoc -----------------------------------------------------
 napoleon_google_docstring = True
@@ -332,6 +305,10 @@ html_logo = "img/mitiq-logo.png"
 
 html_favicon = "img/mitiq.ico"
 
+# Add extra paths that contain custom files here, relative to this directory.
+# These files are copied directly to the root of the documentation.
+html_extra_path = ["robots.txt"]
+
 myst_update_mathjax = False
 
 nbsphinx_custom_formats = {
@@ -346,13 +323,16 @@ nbsphinx_thumbnails = {
     "examples/cirq-ibmq-backends": "_static/cirq-mitiq-ibmq.png",
     "examples/pennylane-ibmq-backends": "_static/zne-pennylane.png",
     "examples/ibmq-backends": "_static/ibmq-gate-map.png",
-    "examples/simple_landscape": "_static/simple-landscape.png",
+    "examples/simple-landscape-cirq": "_static/simple-landscape-cirq.png",
     "examples/molecular_hydrogen": "_static/molecular-hydrogen-vqe.png",
     "examples/molecular_hydrogen_pennylane": "_static/mol-h2-vqe-pl.png",
     "examples/vqe-pyquil-demo": "_static/vqe-pyquil-demo.png",
     "examples/pyquil_demo": "_static/pyquil-demo.png",
     "examples/mitiq-paper/*": "_static/mitiq-codeblocks.png",
     "examples/zne-braket-ionq": "_static/zne-braket-ionq.png",
+    "examples/bqskit": "_static/bqskit.png",
+    "examples/simple-landscape-qiskit": "_static/simple-landscape-qiskit.png",
+    "examples/learning-depolarizing-noise": "_static/learn-depolarizing.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }

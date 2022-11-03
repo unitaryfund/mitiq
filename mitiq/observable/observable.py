@@ -17,6 +17,7 @@ import copy
 from typing import Callable, cast, List, Optional, Set
 
 import numpy as np
+import numpy.typing as npt
 import cirq
 
 from mitiq.observable.pauli import PauliString, PauliStringCollection
@@ -85,7 +86,7 @@ class Observable:
 
         psets: List[PauliStringCollection] = []
         paulis = copy.deepcopy(self._paulis)
-        rng.shuffle(paulis)
+        rng.shuffle(paulis)  # type: ignore
 
         while paulis:
             pauli = paulis.pop()
@@ -108,20 +109,17 @@ class Observable:
     def matrix(
         self,
         qubit_indices: Optional[List[int]] = None,
-        dtype: type = np.complex128,
-    ) -> np.ndarray:
+    ) -> npt.NDArray[np.complex64]:
         """Returns the (potentially very large) matrix of the Observable."""
         if qubit_indices is None:
             qubit_indices = self.qubit_indices
         n = len(qubit_indices)
 
-        matrix = np.zeros(shape=(2**n, 2**n), dtype=dtype)
+        obs_matrix = np.zeros(shape=(2**n, 2**n), dtype=np.complex64)
         for pauli in self._paulis:
-            matrix += pauli.matrix(
-                qubit_indices_to_include=qubit_indices
-            ).astype(dtype=dtype)
+            obs_matrix += pauli.matrix(qubit_indices_to_include=qubit_indices)
 
-        return matrix
+        return obs_matrix
 
     def expectation(
         self, circuit: QPROGRAM, execute: Callable[[QPROGRAM], QuantumResult]
@@ -139,7 +137,7 @@ class Observable:
         )
 
     def _expectation_from_density_matrix(
-        self, density_matrix: np.ndarray
+        self, density_matrix: npt.NDArray[np.complex64]
     ) -> float:
         observable_matrix = self.matrix()
 
@@ -150,7 +148,9 @@ class Observable:
                 keep_indices=self.qubit_indices,
             ).reshape(observable_matrix.shape)
 
-        return cast(float, np.trace(density_matrix @ observable_matrix))
+        return np.real_if_close(
+            np.trace(density_matrix @ observable_matrix)
+        ).item()
 
     def __str__(self) -> str:
         return " + ".join(map(str, self._paulis))

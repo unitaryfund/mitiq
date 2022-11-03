@@ -162,7 +162,7 @@ def execute_with_pec(
         for s, val in zip(signs, results)
     ]
 
-    pec_value = np.average(unbiased_estimators)
+    pec_value = cast(float, np.average(unbiased_estimators))
 
     if not full_output:
         return pec_value
@@ -274,9 +274,9 @@ def pec_decorator(
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     full_output: bool = False,
 ) -> Callable[
-    [Callable[[Union[QPROGRAM]], QuantumResult]],
+    [Callable[[QPROGRAM], QuantumResult]],
     Callable[
-        [Union[QPROGRAM]],
+        [QPROGRAM],
         Union[float, Tuple[float, Dict[str, Any]]],
     ],
 ]:

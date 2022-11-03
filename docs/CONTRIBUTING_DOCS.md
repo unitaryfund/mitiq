@@ -2,10 +2,6 @@
 This is the contributors guide for the documentation of Mitiq,
 the Python toolkit for implementing error mitigation on quantum computers.
 
-![Python Build](https://github.com/unitaryfund/mitiq/workflows/Python%20Build/badge.svg?branch=master)
-[![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
-[![Unitary Fund](https://img.shields.io/badge/Supported%20By-UNITARY%20FUND-brightgreen.svg?style=for-the-badge)](https://unitary.fund)
-
 ## Requirements
 Our documentation is generated with
 [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html).
@@ -110,21 +106,26 @@ There is a [sample markdown formatted notebook in the `examples` directory](./ex
 
 ### Automatically add information from the API docs
 
-New modules, classes and functions can be added by listing them
-in the appropriate file (such as `apidoc.myst` or a child), e.g.,
+New modules, classes and functions can be added by listing them in the appropriate file (such as `apidoc.myst` or a child), e.g.,
 
 ````
 ## New Module
-```{automodule} mitiq.new_module
+```{eval-rst}
+.. automodule:: mitiq.new_module
    :members:
 ```
 ````
 will add all elements of the `mitiq.new_module` module with a subtitle "New Module." 
 You can hand-pick classes and functions to add, to comment them, as well as exclude them.
 
+```{warning}
+The `eval-rst` directive must be used for now as [myst-parser](https://github.com/executablebooks/MyST-Parser) only supports parsing docstrings as RST.
+Once <https://github.com/executablebooks/MyST-Parser/issues/228> is closed, we can migrate to markdown docstrings.
+```
+
 ```{tip}
 If you are adding new features to Mitiq, make sure to add API docs in the
-source code, and to the API page `apidoc.rst`.
+source code, and to the API page `apidoc.myst`.
 ```
 
 ## Build the documentation locally

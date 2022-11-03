@@ -25,8 +25,8 @@ from mitiq.cdr import (
     generate_training_circuits,
     linear_fit_function,
     linear_fit_function_no_intercept,
-    is_clifford,
 )
+from mitiq.cdr.clifford_utils import is_clifford
 from mitiq.zne.scaling import fold_gates_at_random
 
 
