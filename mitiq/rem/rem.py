@@ -19,6 +19,7 @@ from typing import Callable, Optional, Union
 
 from functools import wraps
 import numpy as np
+import numpy.typing as npt
 
 from mitiq._typing import QPROGRAM, MeasurementResult
 from mitiq.executor.executor import Executor
@@ -31,7 +32,7 @@ def execute_with_rem(
     executor: Union[Executor, Callable[[QPROGRAM], MeasurementResult]],
     observable: Optional[Observable] = None,
     *,
-    inverse_confusion_matrix: np.ndarray,
+    inverse_confusion_matrix: npt.NDArray[np.float64],
 ) -> float:
     """Returns the readout error mitigated expectation value utilizing an
     inverse confusion matrix.
@@ -66,7 +67,7 @@ def mitigate_executor(
     executor: Callable[[QPROGRAM], MeasurementResult],
     observable: Optional[Observable] = None,
     *,
-    inverse_confusion_matrix: np.ndarray,
+    inverse_confusion_matrix: npt.NDArray[np.float64],
 ) -> Callable[[QPROGRAM], float]:
     """Returns a modified version of the input 'executor' which is
     error-mitigated with readout confusion inversion (RCI).
@@ -97,7 +98,7 @@ def mitigate_executor(
 def rem_decorator(
     observable: Optional[Observable] = None,
     *,
-    inverse_confusion_matrix: np.ndarray,
+    inverse_confusion_matrix: npt.NDArray[np.float64],
 ) -> Callable[
     [Callable[[QPROGRAM], MeasurementResult]], Callable[[QPROGRAM], float]
 ]:

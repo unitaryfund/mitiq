@@ -14,13 +14,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import numpy as np
+import numpy.typing as npt
 
 from mitiq._typing import MeasurementResult, Bitstring
 
 
 def sample_probability_vector(
-    probability_vector: np.ndarray, samples: int
-) -> np.ndarray:
+    probability_vector: npt.NDArray[np.float64], samples: int
+) -> npt.NDArray[np.uint8]:
     """Generate a number of samples from a probability distribution as
     bitstrings.
 
@@ -39,14 +40,14 @@ def sample_probability_vector(
     # split the binary strings into an array of ints
     bitstrings = np.apply_along_axis(
         np.fromstring, 1, binary_strings[:, None], dtype="U1"
-    ).astype(int)
+    ).astype(np.uint8)
 
     return bitstrings
 
 
 def bitstrings_to_probability_vector(
     bitstrings: list[Bitstring],
-) -> np.ndarray:
+) -> npt.NDArray[np.float64]:
     """Converts a list of measured bitstrings to a probability vector estimated
     as the empirical frequency of each bitstring (ordered with increasing
     binary value).
@@ -65,7 +66,7 @@ def bitstrings_to_probability_vector(
 
 def mitigate_measurements(
     noisy_result: MeasurementResult,
-    inverse_confusion_matrix: np.ndarray,
+    inverse_confusion_matrix: npt.NDArray[np.float64],
 ) -> MeasurementResult:
     """Applies the inverse confusion matrix against the noisy measurement
     result and returns the adjusted measurements.

@@ -111,7 +111,7 @@ def generate_inverse_confusion_matrix(
     qubits: Sequence["cirq.Qid"],
     p0: float = 0.01,
     p1: float = 0.01,
-) -> np.ndarray:
+) -> npt.NDArray[np.float64]:
     """
     Generates the inverse confusion matrix assuming a single-qubit
     model for measurement errors. This is useful for applying
