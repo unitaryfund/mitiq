@@ -15,32 +15,52 @@
 
 import numpy as np
 
-from mitiq._typing import MeasurementResult
+from mitiq._typing import MeasurementResult, Bitstring
 
 
-def to_probability_vector(measurement: np.ndarray) -> np.ndarray:
-    """Convert a raw measurement to a probability vector.
-
-    Args:
-        measurement: A single measurement.
-    """
-    index = int("".join([str(m) for m in measurement]), base=2)
-    pv = np.zeros((2 ** measurement.shape[0]), dtype=np.uint8)
-    pv[index] = 1
-    return pv
-
-
-def sample_probability_vector(probability_vector: np.ndarray) -> np.ndarray:
-    """Sample a probability vector and returns a bitstring.
+def sample_probability_vector(
+    probability_vector: np.ndarray, samples: int
+) -> np.ndarray:
+    """Generate a number of samples from a probability distribution as
+    bitstrings.
 
     Args:
         probability_vector: A probability vector.
     """
-    result = np.random.choice(
-        len(probability_vector), size=1, p=probability_vector
-    )[0]
-    value = [int(i) for i in bin(result)[2:]]
-    return np.array(value, dtype=np.uint8)
+    # sample using the probability distribution given
+    num_values = len(probability_vector)
+    choices = np.random.choice(num_values, size=samples, p=probability_vector)
+
+    # convert samples to binary strings
+    bit_width = int(np.log2(num_values))
+    binary_repr_vec = np.vectorize(np.binary_repr)
+    binary_strings = binary_repr_vec(choices, width=bit_width)
+
+    # split the binary strings into an array of ints
+    bitstrings = np.apply_along_axis(
+        np.fromstring, 1, binary_strings[:, None], dtype="U1"
+    ).astype(int)
+
+    return bitstrings
+
+
+def bitstrings_to_probability_vector(
+    bitstrings: list[Bitstring],
+) -> np.ndarray:
+    """Converts a list of measured bitstrings to a probability vector estimated
+    as the empirical frequency of each bitstring (ordered with increasing
+    binary value).
+
+    Args:
+        bitstrings: All measured bitstrings.
+    """
+    pv = np.zeros(2 ** len(bitstrings[0]))
+    for bs in bitstrings:
+        index = int("".join([str(bit) for bit in bs]), base=2)
+        pv[index] += 1
+    pv /= len(bitstrings)
+
+    return pv
 
 
 def mitigate_measurements(
@@ -68,15 +88,19 @@ def mitigate_measurements(
             f" it has {inverse_confusion_matrix.shape} instead."
         )
 
-    empirical_prob_dist = np.apply_along_axis(
-        to_probability_vector, 1, noisy_result.asarray
-    )
+    empirical_prob_dist = bitstrings_to_probability_vector(noisy_result.result)
 
     adjusted_prob_dist = (inverse_confusion_matrix @ empirical_prob_dist.T).T
+    # remove negative values
+    adjusted_prob_dist = adjusted_prob_dist.clip(min=0)
+    # re-normalize, so values sum to 1
+    adjusted_prob_dist /= np.sum(adjusted_prob_dist)
 
-    adjusted_result = np.apply_along_axis(
-        sample_probability_vector, 1, adjusted_prob_dist
+    adjusted_result = sample_probability_vector(
+        adjusted_prob_dist, noisy_result.shots
     )
 
-    result = MeasurementResult(adjusted_result, noisy_result.qubit_indices)
+    result = MeasurementResult(
+        adjusted_result.tolist(), noisy_result.qubit_indices
+    )
     return result
