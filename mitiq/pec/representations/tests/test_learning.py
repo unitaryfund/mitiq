@@ -75,7 +75,7 @@ def ideal_execute(circ: Circuit) -> np.ndarray:
 
 ideal_executor = Executor(ideal_execute)
 ideal_values = np.array(
-    [ideal_executor.evaluate(t, observable) for t in training_circuits]
+    [ideal_executor.evaluate(t, observable)[0] for t in training_circuits]
 )
 
 
@@ -120,9 +120,7 @@ def test_depolarizing_noise_loss_function(epsilon, operations):
         observable=observable,
     )
 
-    assert loss <= np.sum((noisy_values - ideal_values) ** 2) / len(
-        training_circuits
-    )
+    assert loss <= np.mean((noisy_values - ideal_values) ** 2)
 
 
 @pytest.mark.parametrize("epsilon", [0, 0.7, 1])
@@ -153,9 +151,7 @@ def test_biased_noise_loss_function(epsilon, eta, operations):
         observable=observable,
     )
 
-    assert loss <= np.sum((noisy_values - ideal_values) ** 2) / len(
-        training_circuits
-    )
+    assert loss <= np.mean((noisy_values - ideal_values) ** 2)
 
 
 @pytest.mark.parametrize(
@@ -210,7 +206,10 @@ def test_biased_noise_loss_function_qiskit(operations):
 
     ideal_executor_qiskit = Executor(ideal_execute_qiskit)
     ideal_values = np.array(
-        [ideal_executor_qiskit.evaluate(t) for t in qiskit_training_circuits]
+        [
+            ideal_executor_qiskit.evaluate(t)[0]
+            for t in qiskit_training_circuits
+        ]
     )
 
     epsilon = 0.1
@@ -222,7 +221,10 @@ def test_biased_noise_loss_function_qiskit(operations):
     noisy_executor_qiskit = Executor(noisy_execute_qiskit)
 
     noisy_values = np.array(
-        [noisy_executor_qiskit.evaluate(t) for t in qiskit_training_circuits]
+        [
+            noisy_executor_qiskit.evaluate(t)[0]
+            for t in qiskit_training_circuits
+        ]
     )
 
     loss = biased_noise_loss_function(
@@ -234,9 +236,7 @@ def test_biased_noise_loss_function_qiskit(operations):
         pec_kwargs=pec_kwargs,
     )
 
-    assert loss <= np.mean(
-        abs(noisy_values.reshape(-1, 1) - ideal_values.reshape(-1, 1)) ** 2
-    )
+    assert loss <= np.mean((noisy_values - ideal_values) ** 2)
 
 
 @pytest.mark.parametrize("epsilon", [0.05, 0.1])

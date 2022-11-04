@@ -113,7 +113,7 @@ training_circuits = generate_training_circuits(
 observable = Observable(PauliString("XZ"), PauliString("YY"))
 
 ideal_values = np.array(
-    [ideal_executor.evaluate(tc, observable) for tc in training_circuits]
+    [ideal_executor.evaluate(tc, observable)[0] for tc in training_circuits]
 )
 
 epsilons = np.linspace(0.03, 0.07, 9)

@@ -99,7 +99,7 @@ def learn_biased_noise_parameters(
     )
 
     ideal_values = np.array(
-        [ideal_executor.evaluate(t, observable) for t in training_circuits]
+        [ideal_executor.evaluate(t, observable)[0] for t in training_circuits]
     )
 
     pec_data, method, minimize_kwargs = _parse_learning_kwargs(
@@ -194,7 +194,7 @@ def learn_depolarizing_noise_parameter(
     )
 
     ideal_values = np.array(
-        [ideal_executor.evaluate(t, observable) for t in training_circuits]
+        [ideal_executor.evaluate(t, observable)[0] for t in training_circuits]
     )
 
     pec_data, method, minimize_kwargs = _parse_learning_kwargs(
@@ -285,9 +285,7 @@ def depolarizing_noise_loss_function(
             ]
         )
 
-    return np.mean(
-        abs(mitigated_values.reshape(-1, 1) - ideal_values.reshape(-1, 1)) ** 2
-    )
+    return np.mean((mitigated_values - ideal_values) ** 2)
 
 
 def biased_noise_loss_function(
@@ -357,9 +355,7 @@ def biased_noise_loss_function(
             ]
         )
 
-    return np.mean(
-        abs(mitigated_values.reshape(-1, 1) - ideal_values.reshape(-1, 1)) ** 2
-    )
+    return np.mean((mitigated_values - ideal_values) ** 2)
 
 
 def _parse_learning_kwargs(
