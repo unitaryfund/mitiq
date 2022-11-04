@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import os
 import numpy as np
 import pytest
 from cirq import (
@@ -261,12 +262,12 @@ def test_learn_depolarizing_noise_parameter(epsilon):
     noisy_executor = Executor(noisy_execute)
 
     epsilon0 = (1 - offset) * epsilon
-
+    eps_string = str(epsilon).replace(".", "_")
     pec_data = np.loadtxt(
-        "./mitiq/pec/representations/tests/learning_pec_data/"
-        + "learning_pec_data_eps_"
-        + str(epsilon).replace(".", "_")
-        + ".txt"
+        os.path.join(
+            "./mitiq/pec/representations/tests/learning_pec_data",
+            f"learning_pec_data_eps_{eps_string}.txt",
+        )
     )
 
     [success, epsilon_opt] = learn_depolarizing_noise_parameter(
@@ -274,7 +275,6 @@ def test_learn_depolarizing_noise_parameter(epsilon):
         circuit=circuit,
         ideal_executor=ideal_executor,
         noisy_executor=noisy_executor,
-        pec_kwargs={},
         num_training_circuits=5,
         fraction_non_clifford=0.2,
         training_random_state=np.random.RandomState(1),
@@ -316,16 +316,13 @@ def test_learn_biased_noise_parameters(epsilon, eta):
     num_training_circuits = 5
     pec_data = np.zeros([122, 122, num_training_circuits])
 
+    eps_string = str(epsilon).replace(".", "_")
     for tc in range(0, num_training_circuits):
         pec_data[:, :, tc] = np.loadtxt(
-            "./mitiq/pec/representations/tests/learning_pec_data/"
-            + "learning_pec_data_eps_"
-            + str(epsilon).replace(".", "_")
-            + "eta_"
-            + str(eta)
-            + "tc_"
-            + str(tc)
-            + ".txt"
+            os.path.join(
+                "./mitiq/pec/representations/tests/learning_pec_data",
+                f"learning_pec_data_eps_{eps_string}eta_{eta}tc_{tc}.txt",
+            )
         )
 
     [success, epsilon_opt, eta_opt] = learn_biased_noise_parameters(
@@ -333,7 +330,6 @@ def test_learn_biased_noise_parameters(epsilon, eta):
         circuit=circuit,
         ideal_executor=ideal_executor,
         noisy_executor=noisy_executor,
-        pec_kwargs={},
         num_training_circuits=num_training_circuits,
         fraction_non_clifford=0.2,
         training_random_state=np.random.RandomState(1),

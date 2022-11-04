@@ -15,7 +15,7 @@
 """Functions to calculate parameters for depolarizing noise and biased noise
 models via a learning-based technique."""
 
-from typing import cast, Optional, Dict, Any, List, Tuple
+from typing import Optional, Dict, Any, List, Tuple
 import numpy as np
 import numpy.typing as npt
 from scipy.optimize import minimize
@@ -35,14 +35,14 @@ def learn_biased_noise_parameters(
     circuit: QPROGRAM,
     ideal_executor: Executor,
     noisy_executor: Executor,
-    pec_kwargs: Dict["str", Any],
+    pec_kwargs: Optional[Dict["str", Any]] = {},
     num_training_circuits: int = 5,
     fraction_non_clifford: float = 0.2,
-    training_random_state: np.random.RandomState = None,  # type: ignore
+    training_random_state: Optional[np.random.RandomState] = None,
     epsilon0: float = 0.05,
     eta0: float = 1,
     observable: Optional[Observable] = None,
-    **learning_kwargs: Dict["str", Any],  # type: ignore
+    **learning_kwargs: Dict["str", Any],
 ) -> Tuple[bool, float, float]:
     r"""This function learns the depolarizing noise parameter (epsilon)
     associated to a set of input operations. The learning process is based on
@@ -58,7 +58,7 @@ def learn_biased_noise_parameters(
             a noiseless ``QuantumResult``.
         noisy_executor: Executes a circuit on a noisy backend
             and returns a ``QuantumResult``.
-        pec_kwargs: Options to pass to ``execute_w_pec`` for the
+        pec_kwargs (optional): Options to pass to ``execute_w_pec`` for the
             error-mitigated expectation value obtained from executing
             the training circuits.
         num_training_circuits: Number of near-Clifford circuits to be
@@ -79,8 +79,9 @@ def learn_biased_noise_parameters(
             optimization method.
 
     Returns:
-        A flag indicating whether or not the optimizer exited successfully, the
-        optimized noise strength epsilon, and the optimized noise bias, eta.
+        A 3-tuple containing a flag indicating whether or not the optimizer
+        exited successfully, the optimized noise strength epsilon, and the
+        optimized noise bias, eta.
 
     .. note:: Using this function may require some tuning. One of the main
         challenges is setting a good value of ``num_samples`` in the PEC
@@ -120,10 +121,9 @@ def learn_biased_noise_parameters(
         method=method,
         **minimize_kwargs,
     )
-    x_result = result.x
-    success = cast(bool, result.success)
-    epsilon_opt = cast(float, x_result[0])
-    eta_opt = cast(float, x_result[1])
+
+    success = result.success
+    epsilon_opt, eta_opt = result.x
 
     return success, epsilon_opt, eta_opt
 
@@ -133,13 +133,13 @@ def learn_depolarizing_noise_parameter(
     circuit: QPROGRAM,
     ideal_executor: Executor,
     noisy_executor: Executor,
-    pec_kwargs: Dict["str", Any],
+    pec_kwargs: Optional[Dict["str", Any]] = {},
     num_training_circuits: int = 5,
     fraction_non_clifford: float = 0.2,
-    training_random_state: np.random.RandomState = None,  # type: ignore
+    training_random_state: Optional[np.random.RandomState] = None,
     epsilon0: float = 0.05,
     observable: Optional[Observable] = None,
-    **learning_kwargs: Dict["str", Any],  # type: ignore
+    **learning_kwargs: Dict["str", Any],
 ) -> Tuple[bool, float]:
     r"""This function learns the depolarizing noise parameter (epsilon)
     associated to a set of input operations. The learning process is based on
@@ -155,7 +155,7 @@ def learn_depolarizing_noise_parameter(
             a noiseless ``QuantumResult``.
         noisy_executor: Executes a circuit on a noisy backend
             and returns a ``QuantumResult``.
-        pec_kwargs: Options to pass to ``execute_w_pec`` for the
+        pec_kwargs (optional): Options to pass to ``execute_w_pec`` for the
             error-mitigated expectation value obtained from executing
             the training circuits.
         num_training_circuits: Number of near-Clifford circuits to be
@@ -175,8 +175,8 @@ def learn_depolarizing_noise_parameter(
             optimization method.
 
     Returns:
-        A flag indicating whether or not the optimizer exited successfully and
-        the optimized noise strength epsilon.
+        A 2-tuple containing flag indicating whether or not the optimizer
+        exited successfully and the optimized noise strength epsilon.
 
     .. note:: Using this function may require some tuning. One of the main
         challenges is setting a good value of ``num_samples`` in the PEC
@@ -216,9 +216,9 @@ def learn_depolarizing_noise_parameter(
         method=method,
         **minimize_kwargs,
     )
-    x_result = result.x
-    success = cast(bool, result.success)
-    epsilon_opt = cast(float, x_result[0])
+
+    success = result.success
+    epsilon_opt = result.x[0]
 
     return success, epsilon_opt
 
@@ -233,6 +233,32 @@ def depolarizing_noise_loss_function(
     pec_data: npt.NDArray[np.float64] = np.array([]),
     observable: Optional[Observable] = None,
 ) -> float:
+    r"""Loss function for optimizing quasi-probability representations
+    assuming a depolarizing noise model depending on one real parameter.
+
+    Args:
+        epsilon: Array of optimization parameters epsilon
+            (local noise strength) and eta (noise bias between reduced
+            dephasing and depolarizing channels).
+        operations_to_mitigate: List of ideal operations to be represented by
+            a combination of noisy operations.
+        training_circuits: List of training circuits for generating the
+            error-mitigated expectation values.
+        ideal_values: Expectation values obtained by noiseless simulations.
+        noisy_executor: Executes the circuit with noise and returns a
+            `QuantumResult`.
+        pec_kwargs: Options to pass to `execute_w_pec` for the error-mitigated
+            expectation value obtained from executing the training circuits.
+        pec_data (optional): 3-D. Array of error-mitigated expection values for
+            model training.
+        observable (optional): Observable to compute the expectation value of.
+            If None, the ``executor`` must return an expectation value.
+            Otherwise the ``QuantumResult`` returned by ``executor`` is used to
+            compute the expectation of the observable.
+
+    Returns: Mean squared error between the error-mitigated values and
+        the ideal values, over the training set.
+    """
     if pec_data.size > 0:
         ind = np.abs(pec_data[:, 0] - epsilon).argmin()
         mitigated_values = pec_data[ind, 1:]
@@ -354,15 +380,10 @@ def _parse_learning_kwargs(
     """
     minimize_kwargs = learning_kwargs.get("learning_kwargs")
 
-    if minimize_kwargs is not None:
-        pec_data = minimize_kwargs.pop(
-            "pec_data", np.array([])
-        )  # type: ignore
-        method = minimize_kwargs.pop("method", "Nelder-Mead")  # type: ignore
-
-    else:
-        pec_data = np.array([])
-        method = "Nelder-Mead"
+    if minimize_kwargs is None:
         minimize_kwargs = {}
+
+    pec_data = minimize_kwargs.pop("pec_data", np.array([]))
+    method = minimize_kwargs.pop("method", "Nelder-Mead")
 
     return pec_data, method, minimize_kwargs
