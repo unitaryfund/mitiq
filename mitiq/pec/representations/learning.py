@@ -230,7 +230,7 @@ def depolarizing_noise_loss_function(
     ideal_values: npt.NDArray[np.float64],
     noisy_executor: Executor,
     pec_kwargs: Dict["str", Any],
-    pec_data: npt.NDArray[np.float64] = np.array([]),
+    pec_data: Optional[npt.NDArray[np.float64]] = None,
     observable: Optional[Observable] = None,
 ) -> float:
     r"""Loss function for optimizing quasi-probability representations
@@ -259,7 +259,7 @@ def depolarizing_noise_loss_function(
     Returns: Mean squared error between the error-mitigated values and
         the ideal values, over the training set.
     """
-    if pec_data.size > 0:
+    if pec_data is not None:
         ind = np.abs(pec_data[:, 0] - epsilon).argmin()
         mitigated_values = pec_data[ind, 1:]
 
@@ -297,7 +297,7 @@ def biased_noise_loss_function(
     ideal_values: npt.NDArray[np.float64],
     noisy_executor: Executor,
     pec_kwargs: Dict["str", Any],
-    pec_data: npt.NDArray[np.float64] = np.array([]),
+    pec_data: Optional[npt.NDArray[np.float64]] = None,
     observable: Optional[Observable] = None,
 ) -> float:
     r"""Loss function for optimizing quasi-probability representations
@@ -329,7 +329,7 @@ def biased_noise_loss_function(
     epsilon = params[0]
     eta = params[1]
 
-    if pec_data.size > 0:
+    if pec_data is not None:
         ind_eps = np.abs(pec_data[:, 0, 0] - epsilon).argmin()
         ind_eta = np.abs(pec_data[0, :, 0] - eta).argmin()
         mitigated_values = pec_data[ind_eps, ind_eta, :]
@@ -363,7 +363,7 @@ def biased_noise_loss_function(
 
 
 def _parse_learning_kwargs(
-    learning_kwargs: Dict["str", Any]
+    **learning_kwargs: Dict["str", Any]
 ) -> Tuple[npt.NDArray[np.float64], str, Dict["str", Any]]:
     r"""Function for handling additional options and data for the learning
     functions.
@@ -383,7 +383,7 @@ def _parse_learning_kwargs(
     if minimize_kwargs is None:
         minimize_kwargs = {}
 
-    pec_data = minimize_kwargs.pop("pec_data", np.array([]))
+    pec_data = minimize_kwargs.pop("pec_data", None)
     method = minimize_kwargs.pop("method", "Nelder-Mead")
 
     return pec_data, method, minimize_kwargs
