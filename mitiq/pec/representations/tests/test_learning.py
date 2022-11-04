@@ -343,8 +343,13 @@ def test_learn_biased_noise_parameters(epsilon, eta):
     assert abs(eta_opt - eta) < eta_offset * eta
 
 
+learning_kwargs = {}
+
+
 def test_parse_learning_kwargs():
-    pec_data, method, minimize_kwargs = _parse_learning_kwargs()
+    pec_data, method, minimize_kwargs = _parse_learning_kwargs(
+        learning_kwargs=learning_kwargs
+    )
     assert pec_data is None
     assert method == "Nelder-Mead"
     assert minimize_kwargs == {}

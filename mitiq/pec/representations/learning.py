@@ -363,7 +363,7 @@ def biased_noise_loss_function(
 
 
 def _parse_learning_kwargs(
-    **learning_kwargs: Dict["str", Any]
+    learning_kwargs: Dict["str", Any]
 ) -> Tuple[npt.NDArray[np.float64], str, Dict["str", Any]]:
     r"""Function for handling additional options and data for the learning
     functions.
