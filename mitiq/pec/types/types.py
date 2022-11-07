@@ -406,9 +406,10 @@ class OperationRepresentation:
     """
 
     def __init__(
-        self, ideal: QPROGRAM, 
+        self,
+        ideal: QPROGRAM,
         basis_expansion: Dict[NoisyOperation, float],
-        require_qubit_equality: bool = True,
+        is_qubit_independent: bool = False,
     ) -> None:
         """Initializes an OperationRepresentation.
 
@@ -423,6 +424,7 @@ class OperationRepresentation:
         """
         self._native_ideal = ideal
         self._ideal, self._native_type = convert_to_mitiq(ideal)
+        self.is_qubit_independent = is_qubit_independent
 
         if not all(
             isinstance(op, NoisyOperation) for op in basis_expansion.keys()

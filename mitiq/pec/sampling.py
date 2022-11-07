@@ -17,7 +17,6 @@
 
 from typing import List, Optional, Tuple, Sequence, Union
 from copy import deepcopy
-import warnings
 
 import numpy as np
 
@@ -26,6 +25,7 @@ import cirq
 from mitiq import QPROGRAM
 from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 from mitiq.pec.types import OperationRepresentation
+from mitiq.utils import _equal
 
 
 def sample_sequence(
@@ -74,10 +74,17 @@ def sample_sequence(
         if _equal(representation.ideal, ideal, require_qubit_equality=True):
             operation_representation = representation
             break
+        if representation.is_qubit_independent and _equal(
+            representation.ideal, ideal, require_qubit_equality=False
+        ):
+            operation_representation = representation
+            break
 
     if operation_representation is None:
         for representation in representations:
-            if representation.is_qubit_independent and _equal(representation.ideal, ideal, require_qubit_equality=False):
+            if representation.is_qubit_independent and _equal(
+                representation.ideal, ideal, require_qubit_equality=False
+            ):
                 operation_representation = representation
                 break
 
