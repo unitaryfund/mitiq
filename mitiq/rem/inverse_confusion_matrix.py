@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from typing import List
 import numpy as np
 import numpy.typing as npt
 
@@ -46,7 +47,7 @@ def sample_probability_vector(
 
 
 def bitstrings_to_probability_vector(
-    bitstrings: list[Bitstring],
+    bitstrings: List[Bitstring],
 ) -> npt.NDArray[np.float64]:
     """Converts a list of measured bitstrings to a probability vector estimated
     as the empirical frequency of each bitstring (ordered with increasing
