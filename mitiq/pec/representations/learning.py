@@ -44,12 +44,11 @@ def learn_biased_noise_parameters(
     observable: Optional[Observable] = None,
     **learning_kwargs: Dict["str", Any],
 ) -> Tuple[bool, float, float]:
-    r"""This function learns the depolarizing noise parameter (epsilon)
+    r"""This function learns the biased noise parameters epsilon and eta
     associated to a set of input operations. The learning process is based on
     the execution of a set of training circuits on a noisy backend and on a
     classical simulator. The training circuits are near-Clifford approximations
-    of the input circuit. A depolarizing noise model characterization is
-    assumed.
+    of the input circuit. A biased noise model characterization is assumed.
 
     Args:
         operations_to_learn: The ideal operations to learn the noise model of.
@@ -75,7 +74,7 @@ def learn_biased_noise_parameters(
         learning_kwargs (optional): Additional data and options including
             ``pec_data`` from pre-executed runs of PEC on training circuits,
             ``method`` an optimization method supported by
-            ``scipy.optimize.minimize``, and settings for the chosen
+            ``scipy.optimize.minimize`` and settings for the chosen
             optimization method.
 
     Returns:
@@ -171,7 +170,7 @@ def learn_depolarizing_noise_parameter(
         learning_kwargs (optional): Additional data and options including
             ``pec_data`` from pre-executed runs of PEC on training circuits,
             ``method`` an optimization method supported by
-            ``scipy.optimize.minimize``, and settings for the chosen
+            ``scipy.optimize.minimize`` and settings for the chosen
             optimization method.
 
     Returns:
@@ -181,8 +180,8 @@ def learn_depolarizing_noise_parameter(
     .. note:: Using this function may require some tuning. One of the main
         challenges is setting a good value of ``num_samples`` in the PEC
         options ``pec_kwargs``. Setting a small value of ``num_samples`` is
-        typicallynecessary to obtain a reasonable execution time. On the other
-        hand,using a number of PEC samples that is too small can result in a
+        typically necessary to obtain a reasonable execution time. On the other
+        hand, using a number of PEC samples that is too small can result in a
         large statistical error, ultimately causing the optimization process to
         fail.
     """
