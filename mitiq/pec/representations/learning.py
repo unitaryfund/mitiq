@@ -35,7 +35,7 @@ def learn_biased_noise_parameters(
     circuit: QPROGRAM,
     ideal_executor: Executor,
     noisy_executor: Executor,
-    pec_kwargs: Optional[Dict["str", Any]] = {},
+    pec_kwargs: Dict[str, Any] = {},
     num_training_circuits: int = 5,
     fraction_non_clifford: float = 0.2,
     training_random_state: Optional[np.random.RandomState] = None,
@@ -98,7 +98,7 @@ def learn_biased_noise_parameters(
     )
 
     ideal_values = np.array(
-        [ideal_executor.evaluate(t, observable)[0] for t in training_circuits]
+        ideal_executor.evaluate(training_circuits, observable)
     )
 
     pec_data, method, minimize_kwargs = _parse_learning_kwargs(
@@ -132,7 +132,7 @@ def learn_depolarizing_noise_parameter(
     circuit: QPROGRAM,
     ideal_executor: Executor,
     noisy_executor: Executor,
-    pec_kwargs: Optional[Dict["str", Any]] = {},
+    pec_kwargs: Dict[str, Any] = {},
     num_training_circuits: int = 5,
     fraction_non_clifford: float = 0.2,
     training_random_state: Optional[np.random.RandomState] = None,
@@ -193,7 +193,7 @@ def learn_depolarizing_noise_parameter(
     )
 
     ideal_values = np.array(
-        [ideal_executor.evaluate(t, observable)[0] for t in training_circuits]
+        ideal_executor.evaluate(training_circuits, observable)
     )
 
     pec_data, method, minimize_kwargs = _parse_learning_kwargs(
@@ -228,7 +228,7 @@ def depolarizing_noise_loss_function(
     training_circuits: List[QPROGRAM],
     ideal_values: npt.NDArray[np.float64],
     noisy_executor: Executor,
-    pec_kwargs: Dict["str", Any],
+    pec_kwargs: Dict[str, Any],
     pec_data: Optional[npt.NDArray[np.float64]] = None,
     observable: Optional[Observable] = None,
 ) -> float:
@@ -293,7 +293,7 @@ def biased_noise_loss_function(
     training_circuits: List[QPROGRAM],
     ideal_values: npt.NDArray[np.float64],
     noisy_executor: Executor,
-    pec_kwargs: Dict["str", Any],
+    pec_kwargs: Dict[str, Any],
     pec_data: Optional[npt.NDArray[np.float64]] = None,
     observable: Optional[Observable] = None,
 ) -> float:
@@ -358,8 +358,8 @@ def biased_noise_loss_function(
 
 
 def _parse_learning_kwargs(
-    learning_kwargs: Dict["str", Any]
-) -> Tuple[npt.NDArray[np.float64], str, Dict["str", Any]]:
+    learning_kwargs: Dict[str, Any]
+) -> Tuple[npt.NDArray[np.float64], str, Dict[str, Any]]:
     r"""Function for handling additional options and data for the learning
     functions.
 

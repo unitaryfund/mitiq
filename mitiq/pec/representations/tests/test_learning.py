@@ -74,9 +74,7 @@ def ideal_execute(circ: Circuit) -> np.ndarray:
 
 
 ideal_executor = Executor(ideal_execute)
-ideal_values = np.array(
-    [ideal_executor.evaluate(t, observable)[0] for t in training_circuits]
-)
+ideal_values = np.array(ideal_executor.evaluate(training_circuits, observable))
 
 
 def biased_noise_channel(epsilon: float, eta: float) -> MixedUnitaryChannel:
@@ -108,7 +106,7 @@ def test_depolarizing_noise_loss_function(epsilon, operations):
 
     noisy_executor = Executor(noisy_execute)
     noisy_values = np.array(
-        [noisy_executor.evaluate(t, observable) for t in training_circuits]
+        noisy_executor.evaluate(training_circuits, observable)
     )
     loss = depolarizing_noise_loss_function(
         epsilon=np.array([epsilon]),
@@ -139,8 +137,9 @@ def test_biased_noise_loss_function(epsilon, eta, operations):
 
     noisy_executor = Executor(noisy_execute)
     noisy_values = np.array(
-        [noisy_executor.evaluate(t, observable) for t in training_circuits]
+        noisy_executor.evaluate(training_circuits, observable)
     )
+
     loss = biased_noise_loss_function(
         params=[epsilon, eta],
         operations_to_mitigate=operations,
@@ -206,10 +205,7 @@ def test_biased_noise_loss_function_qiskit(operations):
 
     ideal_executor_qiskit = Executor(ideal_execute_qiskit)
     ideal_values = np.array(
-        [
-            ideal_executor_qiskit.evaluate(t)[0]
-            for t in qiskit_training_circuits
-        ]
+        ideal_executor_qiskit.evaluate(qiskit_training_circuits)
     )
 
     epsilon = 0.1
@@ -221,10 +217,7 @@ def test_biased_noise_loss_function_qiskit(operations):
     noisy_executor_qiskit = Executor(noisy_execute_qiskit)
 
     noisy_values = np.array(
-        [
-            noisy_executor_qiskit.evaluate(t)[0]
-            for t in qiskit_training_circuits
-        ]
+        noisy_executor_qiskit.evaluate(qiskit_training_circuits)
     )
 
     loss = biased_noise_loss_function(
@@ -343,10 +336,8 @@ def test_learn_biased_noise_parameters(epsilon, eta):
     assert abs(eta_opt - eta) < eta_offset * eta
 
 
-learning_kwargs = {}
-
-
-def test_parse_learning_kwargs():
+def test_empty_learning_kwargs():
+    learning_kwargs = {}
     pec_data, method, minimize_kwargs = _parse_learning_kwargs(
         learning_kwargs=learning_kwargs
     )
