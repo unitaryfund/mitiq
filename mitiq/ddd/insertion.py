@@ -141,7 +141,7 @@ def _insert_ddd_sequences(
     # Copy to avoid mutating the input circuit
     circuit_with_ddd = circuit.copy()
     qubits = sorted(circuit.all_qubits())
-    for moment_idx, moment in enumerate(circuit):
+    for moment_idx in range(len(circuit)):
         slack_column = slack_matrix[:, moment_idx]
         for row_index, slack_length in enumerate(slack_column):
             if slack_length > 1:
