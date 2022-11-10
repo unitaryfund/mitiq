@@ -253,3 +253,17 @@ def test_get_slack_matrix_from_circuit__bad_input_errors():
 def test_insert_sequences(circuit, result, rule):
     circuit_with_sequences = insert_ddd_sequences(circuit, rule)
     assert circuit_with_sequences == result
+
+
+def test_midcircuit_measurement_raises_error():
+    qreg = qiskit.QuantumRegister(2)
+    creg = qiskit.ClassicalRegister(1)
+    circuit = qiskit.QuantumCircuit(qreg, creg)
+    for q in qreg:
+        circuit.x(q)
+
+    circuit.measure(0, 0)
+    circuit.cx(0, 1)
+
+    with pytest.raises(ValueError, match="midcircuit measurements"):
+        insert_ddd_sequences(circuit, xx)
