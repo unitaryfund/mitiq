@@ -458,17 +458,8 @@ optimization method (supported by {py:func}`scipy.optimize.minimize`) and settin
 mystnb:
   skip-execution: true
 ---
-[success, epsilon_opt] = learn_depolarizing_noise_parameter(
-    operation,
-    circuit,
-    ideal_executor,
-    noisy_executor,
-    pec_kwargs,
-    num_training_circuits,
-    fraction_non_clifford,
-    epsilon0=epsilon0,
-    observable=observable,
-)
+representations = represent_operation_with_local_depolarizing_noise(operation, epsilon_opt)
+
 ```
 
 
