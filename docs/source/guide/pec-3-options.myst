@@ -432,136 +432,222 @@ The learning-based PEC workflow was inspired by the procedure described in *Stri
 #### Learning quasiprobability representations with a depolarizing noise model
 
 In cases where the noise of the backend can be approximated by a depolarizing noise model,
-`pec.representations.learning.learn_depolarizing_noise_parameter` can be used to learn the noise strength `\epsilon` associated to a set of
-input operations. 
+{func}`.pec.representations.learning.learn_depolarizing_noise_parameter` can be used to learn the noise strength `epsilon` associated to a set
+of input operations. 
 
 
-The learning process is based on the execution of a set of training circuits on a noisy backend (via a noisy executor) 
-and on a classical simulator (via an ideal executor). 
+The learning process is based on the execution of a set of training circuits on a noisy backend via a noisy
+{ref}`executor <guide/executors/executors>` 
+and on a classical simulator via an ideal {ref}`executor <guide/executors/executors>`. 
 The training circuits are near-Clifford approximations of the input circuit. 
 During training, the noise strength parameter is used to calculate quasiprobability representations of the ideal gate with
 a depolarizing noise model.
-The representations are then input into {func}`.pec.execute_w_pec()` to obtain an error-mitigated expecation value from execution of the training
+The representations are then input into {func}`.pec.execute_w_pec` to obtain an error-mitigated expecation value from execution of the training
 circuit, for comparison with the ideal expecation value obtained from classical simulation of the training circuit.
-The optimizer used in the learning function is from `scipy.optimze.minimize`.
+The optimizer used in the learning function is from {py:func}`scipy.optimize.minimize`.
 The default optimization method in the learning function is `Nelder-Mead`, as that appears to work best for this particular problem setup.
 
 
 In addition to specifying the input operation, the circuit of interest, and the ideal and noisy executors, the user should specify the number
 of training circuits, the fraction of non-Clifford gates in the training circuits, and an initial guess for noise strength. 
 The user can also set options for the intermediate executions of {func}`.pec.execute_w_pec()` during the training process as a dictionary in
-`pec_kwargs`, specify the observable of which the expecation value is to be computed, and enter a dictionary of additional data and options including
-optimization method (supported by {py:func}`scipy.optimize.minimize`) and settings for the chosen optimization method.
+`pec_kwargs`, specify the observable{ref}`observable <guide/observables/observables>` of which the expecation value is to be computed, and
+enter a dictionary of additional data and options including optimization method (supported by {py:func}`scipy.optimize.minimize`) and settings
+for the chosen optimization method.
 
 ```{code-cell} ipython3
 ---
 mystnb:
   skip-execution: true
 ---
-representations = represent_operation_with_local_depolarizing_noise(operation, epsilon_opt)
+from qiskit.providers.aer.noise import NoiseModel
+from qiskit.providers.aer.noise.errors.standard_errors import (
+    depolarizing_error,
+)
+from mitiq import Observable, PauliString
+from mitiq.pec.representations.learning import (
+    learn_depolarizing_noise_parameter,
+)
 
+circuit = qiskit.QuantumCircuit(2)
+circuit.rx(1.14 * np.pi, 0)
+circuit.rz(0, 0)
+circuit.cx(1, 0)
+circuit.rx(1.71 * np.pi, 0)
+circuit.rx(1.14 * np.pi, 1)
+
+observable = Observable(PauliString("XZ"), PauliString("YY")).matrix()
+
+# set up ideal simulator
+def ideal_execute(circuit):
+    """Simulate (training) circuits without noise"""
+    circuit_copy = circuit.copy()
+    noise_model = initialized_depolarizing_noise(0.0)
+    return execute_with_noise(circuit_copy, observable, noise_model)
+
+
+epsilon = 0.05  # noise level for simulation in noisy executor
+
+
+def noisy_execute(circuit):
+    """Simulate circuit with a depolarizing noise model"""
+    circuit_copy = circuit.copy()
+    noise_model = NoiseModel()
+    noise_model.add_all_qubit_quantum_error(depolarizing_error(epsilon, 2), ["cx"])
+    return execute_with_noise(circuit_copy, observable, noise_model)
+
+
+operations_to_learn = qiskit.QuantumCircuit(2)
+operations_to_learn.cx(1, 0)
+
+import timeit
+
+[success, epsilon_opt] = learn_depolarizing_noise_parameter(
+    operations_to_learn=[operations_to_learn],  # learn rep of Hadamard
+    circuit=circuit,
+    ideal_executor=Executor(ideal_execute),
+    noisy_executor=Executor(noisy_execute),
+    pec_kwargs={"num_samples": 500},
+    num_training_circuits=5,
+    fraction_non_clifford=0.2,
+    
+    epsilon0=0.9 * epsilon,  # initial guess for epsilon
+)
+end = timeit.default_timer()
+print(end - start)
+print(success)
+print(epsilon_opt)
 ```
-
 
 ```{note}
 Using this function may require some tuning.
-One of the main challenges is setting a good value of ``num_samples`` in the PEC options ``pec_kwargs``.
-Setting a small value of ``num_samples`` is typically necessary to obtain a reasonable execution time.
+One of the main challenges is setting a good value of `num_samples` in the PEC options `pec_kwargs`.
+Setting a small value of `num_samples` is typically necessary to obtain a reasonable execution time.
 On the other hand, using a number of PEC samples that is too small can result in a large statistical error, ultimately causing the optimization
 process to fail.
 ```
 
 
-Upon completing the optimization loop, `learn_depolarizing_noise_parameter` returns a flag indicating whether or not the optimizer exited
-successfully, in addition to the optimized noise strength, which can then be input into 
-`represent_operation_with_local_depolarizing_noise` to calculate quasiprobability representations of the ideal gate in terms of noisy gates.
+Upon completing the optimization loop, {func}`.representations.learning.learn_depolarizing_noise_parameter` returns a flag indicating
+whether the optimizer exited successfully, in addition to the optimized noise strength, which can then be input into 
+{func}`.representations.depolarizing.represent_operation_with_local_depolarizing_noise` to calculate quasiprobability representations of the
+ideal gate in terms of noisy gates.
 
 ```{code-cell} ipython3
 ---
 mystnb:
   skip-execution: true
 ---
-representations = represent_operation_with_local_depolarizing_noise(operation, epsilon_opt)
+representations = represent_operation_with_local_depolarizing_noise(
+    operations_to_learn, epsilon_opt
+)
 ```
-
 
 #### Learning quasiprobability representations with a biased noise model
 
 In cases where the noise of the backend can be approximated by a combined depolarizing and dephasing noise model with a bias factor, also
 referred to as a biased noise model, `pec.representations.learning.learn_biased_noise_parameters` can be used to learn the noise strength
-`\epsilon` and noise bias `\eta`  associated to a set of input operations. 
+`epsilon` and noise bias `eta`  associated to a set of input operations. 
 
 
 The single-qubit biased noise channel is given by:
 
-```math
+$$
 \mathcal{D}(\epsilon) = (1 - \epsilon)[\mathbb{1}] 
 + \epsilon(\frac{\eta}{\eta + 1} \mathcal{Z}
 + \frac{1}{3}\frac{1}{\eta + 1}(\mathcal{X} + \mathcal{Y}
 + \mathcal{Z}))
- ``` 
+$$ 
 
 
 For multi-qubit operations, the noise channel used is the tensor product of the local single-qubit channels.
 
 
-The learning process is based on the execution of a set of training circuits on a noisy backend (via a noisy executor) 
-and on a classical simulator (via an ideal executor). 
+The learning process is based on the execution of a set of training circuits on a noisy backend via a noisy
+{ref}`executor <guide/executors/executors>` and on a classical simulator via an ideal {ref}`executor <guide/executors/executors>`. 
 The training circuits are near-Clifford approximations of the input circuit. 
 During training, the noise strength and noise bias parameters are used to calculate quasiprobability representations of the ideal gate with
 a biased noise model.
-The representations are then input into {func}`.pec.execute_w_pec()` to obtain an error-mitigated expecation value from execution of the training
+The representations are then input into {func}`.pec.execute_w_pec` to obtain an error-mitigated expecation value from execution of the training
 circuit, for comparison with the ideal expecation value obtained from classical simulation of the training circuit.
-The optimizer used in the learning function is from `scipy.optimze.minimize`.
+The optimizer used in the learning function is from {py:func}`scipy.optimize.minimize`.
 The default optimization method in the learning function is `Nelder-Mead`, as that appears to work best for this particular problem setup.
 
 
-In addition to specifying the input operation, the circuit of interest, and the ideal and noisy executors, the user should specify the number
-of training circuits, the fraction of non-Clifford gates in the training circuits, and initial guesses for noise strength and noise bias. 
-The user can also set options for the intermediate executions of ``execute_w_pec`` during the training process as a dictionary in
-`pec_kwargs`, specify the observable of which the expecation value is to be computed, and enter a dictionary of additional data and options including
-optimization method (supported by``scipy.optimize.minimize``) and settings for the chosen optimization method.
-
+In addition to specifying the input operation, the circuit of interest, and the ideal and noisy executors,
+the user should specify the number of training circuits, the fraction of non-Clifford gates in the training circuits, and initial guesses for
+noise strength and noise bias. 
+The user can also set options for the intermediate executions of {func}`.pec.execute_w_pec during the training process as a dictionary in
+`pec_kwargs`, specify the observable{ref}`observable <guide/observables/observables>` of which the expecation value is to be computed, and
+enter a dictionary of additional data and options including optimization method (supported by {py:func}`scipy.optimize.minimize`) and settings
+for the chosen optimization method.
 
 ```{code-cell} ipython3
 ---
 mystnb:
   skip-execution: true
 ---
-[success, epsilon_opt, eta_opt] = learn_biased_noise_parameters(
-    operation,
-    circuit,
-    ideal_executor,
-    noisy_executor,
-    pec_kwargs,
-    num_training_circuits,
-    fraction_non_clifford,
-    epsilon0=epsilon0,
-    observable=observable,
+from mitiq.pec.representations.learning import (
+    learn_biased_noise_parameters,
 )
-```
 
+epsilon = 0.05
+eta = 0
+
+# simulate biased noise occurs on the CNOT gates
+def noisy_execute(circuit):
+    circuit_copy = circuit.copy()
+    noise_model = NoiseModel()
+    noise_model.add_all_qubit_quantum_error(depolarizing_error(epsilon, 2), ["cx"])
+    return execute_with_noise(circuit_copy, observable, noise_model)
+
+
+operations_to_learn = qiskit.QuantumCircuit(2)
+operations_to_learn.cx(1, 0)
+
+start = timeit.default_timer()
+[success, epsilon_opt, eta_opt] = learn_biased_noise_parameters(
+    operations_to_learn=[operations_to_learn],  # learn rep of CNOT
+    circuit=circuit,
+    ideal_executor=Executor(ideal_execute),
+    noisy_executor=Executor(noisy_execute),
+    pec_kwargs={"num_samples": 500, "random_state": 1},
+    num_training_circuits=5,
+    fraction_non_clifford=0.2,
+    training_random_state=np.random.RandomState(1),
+    epsilon0=1.01 * 0.05,  # initial guess for noise strength
+    eta0= eta + 0.01,  # initial guess for noise bias
+)
+end = timeit.default_timer()
+print(end - start)
+print(success)
+print(epsilon_opt)
+print(eta_opt)
+```
 
 ```{note}
 Using this function may require some tuning.
-One of the main challenges is setting a good value of ``num_samples`` in the PEC options ``pec_kwargs``.
-Setting a small value of ``num_samples`` is typically necessary to obtain a reasonable execution time.
+One of the main challenges is setting a good value of `num_samples` in the PEC options `pec_kwargs`.
+Setting a small value of `num_samples` is typically necessary to obtain a reasonable execution time.
 On the other hand, using a number of PEC samples that is too small can result in a large statistical error, ultimately causing the optimization
 process to fail.
 ```
 
 
-Upon completing the optimization loop, `learn_biased_noise_parameters` returns a flag indicating whether or not the optimizer exited
-successfully, in addition to the optimized noise strength and noise bias, which can then be input into 
-`represent_operation_with_local_biased_noise` to calculate quasiprobability representations of the ideal gate in terms of noisy gates.
-
+Upon completing the optimization loop, {func}`.representations.learning.learn_biased_noise_parameters` returns a flag indicating whether the
+optimizer exited successfully, in addition to the optimized noise strength and noise bias, which can then be input into 
+{func}`.represent_operation_with_local_biased_noise` to calculate quasiprobability representations of the ideal gate in terms of noisy gates.
 
 ```{code-cell} ipython3
 ---
 mystnb:
   skip-execution: true
 ---
+from pec.representations import (
+    represent_operation_with_local_biased_noise,
+)
+
 representations = represent_operation_with_local_biased_noise(
-    operation, epsilon_opt, eta_opt
-    )
+    operations_to_learn, epsilon_opt, eta_opt
+)
 ```
