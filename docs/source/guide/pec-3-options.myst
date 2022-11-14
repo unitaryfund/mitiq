@@ -442,24 +442,21 @@ and on a classical simulator via an ideal {ref}`executor <guide/executors/execut
 The training circuits are near-Clifford approximations of the input circuit. 
 During training, the noise strength parameter is used to calculate quasiprobability representations of the ideal gate with
 a depolarizing noise model.
-The representations are then input into {func}`.pec.execute_w_pec` to obtain an error-mitigated expecation value from execution of the training
-circuit, for comparison with the ideal expecation value obtained from classical simulation of the training circuit.
+The representations are then input into {func}`.pec.execute_with_pec` to obtain an error-mitigated expecation value from execution of the
+training circuit, for comparison with the ideal expecation value obtained from classical simulation of the training circuit.
 The optimizer used in the learning function is from {py:func}`scipy.optimize.minimize`.
 The default optimization method in the learning function is `Nelder-Mead`, as that appears to work best for this particular problem setup.
 
 
 In addition to specifying the input operation, the circuit of interest, and the ideal and noisy executors, the user should specify the number
 of training circuits, the fraction of non-Clifford gates in the training circuits, and an initial guess for noise strength. 
-The user can also set options for the intermediate executions of {func}`.pec.execute_w_pec()` during the training process as a dictionary in
-`pec_kwargs`, specify the observable{ref}`observable <guide/observables/observables>` of which the expecation value is to be computed, and
+The user can also set options for the intermediate executions of {func}`.pec.execute_with_pec()` during the training process as a dictionary in
+`pec_kwargs`, specify the {ref}`observable <guide/observables/observables>` of which the expecation value is to be computed, and
 enter a dictionary of additional data and options including optimization method (supported by {py:func}`scipy.optimize.minimize`) and settings
 for the chosen optimization method.
 
 ```{code-cell} ipython3
----
-mystnb:
-  skip-execution: true
----
+:tags: ["skip-execution": true]
 from qiskit.providers.aer.noise import NoiseModel
 from qiskit.providers.aer.noise.errors.standard_errors import (
     depolarizing_error,
@@ -500,7 +497,6 @@ def noisy_execute(circuit):
 operations_to_learn = qiskit.QuantumCircuit(2)
 operations_to_learn.cx(1, 0)
 
-import timeit
 
 [success, epsilon_opt] = learn_depolarizing_noise_parameter(
     operations_to_learn=[operations_to_learn],  # learn rep of Hadamard
@@ -513,10 +509,6 @@ import timeit
     
     epsilon0=0.9 * epsilon,  # initial guess for epsilon
 )
-end = timeit.default_timer()
-print(end - start)
-print(success)
-print(epsilon_opt)
 ```
 
 ```{note}
@@ -534,10 +526,7 @@ whether the optimizer exited successfully, in addition to the optimized noise st
 ideal gate in terms of noisy gates.
 
 ```{code-cell} ipython3
----
-mystnb:
-  skip-execution: true
----
+:tags: ["skip-execution": true]
 representations = represent_operation_with_local_depolarizing_noise(
     operations_to_learn, epsilon_opt
 )
@@ -568,8 +557,8 @@ The learning process is based on the execution of a set of training circuits on 
 The training circuits are near-Clifford approximations of the input circuit. 
 During training, the noise strength and noise bias parameters are used to calculate quasiprobability representations of the ideal gate with
 a biased noise model.
-The representations are then input into {func}`.pec.execute_w_pec` to obtain an error-mitigated expecation value from execution of the training
-circuit, for comparison with the ideal expecation value obtained from classical simulation of the training circuit.
+The representations are then input into {func}`.pec.execute_with_pec` to obtain an error-mitigated expecation value from execution of the
+training circuit, for comparison with the ideal expecation value obtained from classical simulation of the training circuit.
 The optimizer used in the learning function is from {py:func}`scipy.optimize.minimize`.
 The default optimization method in the learning function is `Nelder-Mead`, as that appears to work best for this particular problem setup.
 
@@ -577,16 +566,13 @@ The default optimization method in the learning function is `Nelder-Mead`, as th
 In addition to specifying the input operation, the circuit of interest, and the ideal and noisy executors,
 the user should specify the number of training circuits, the fraction of non-Clifford gates in the training circuits, and initial guesses for
 noise strength and noise bias. 
-The user can also set options for the intermediate executions of {func}`.pec.execute_w_pec during the training process as a dictionary in
-`pec_kwargs`, specify the observable{ref}`observable <guide/observables/observables>` of which the expecation value is to be computed, and
+The user can also set options for the intermediate executions of {func}`.pec.execute_with_pec` during the training process as a dictionary in
+`pec_kwargs`, specify {ref}`observable <guide/observables/observables>` of which the expecation value is to be computed, and
 enter a dictionary of additional data and options including optimization method (supported by {py:func}`scipy.optimize.minimize`) and settings
 for the chosen optimization method.
 
 ```{code-cell} ipython3
----
-mystnb:
-  skip-execution: true
----
+:tags: ["skip-execution": true]
 from mitiq.pec.representations.learning import (
     learn_biased_noise_parameters,
 )
@@ -605,7 +591,6 @@ def noisy_execute(circuit):
 operations_to_learn = qiskit.QuantumCircuit(2)
 operations_to_learn.cx(1, 0)
 
-start = timeit.default_timer()
 [success, epsilon_opt, eta_opt] = learn_biased_noise_parameters(
     operations_to_learn=[operations_to_learn],  # learn rep of CNOT
     circuit=circuit,
@@ -618,11 +603,6 @@ start = timeit.default_timer()
     epsilon0=1.01 * 0.05,  # initial guess for noise strength
     eta0= eta + 0.01,  # initial guess for noise bias
 )
-end = timeit.default_timer()
-print(end - start)
-print(success)
-print(epsilon_opt)
-print(eta_opt)
 ```
 
 ```{note}
@@ -639,10 +619,7 @@ optimizer exited successfully, in addition to the optimized noise strength and n
 {func}`.represent_operation_with_local_biased_noise` to calculate quasiprobability representations of the ideal gate in terms of noisy gates.
 
 ```{code-cell} ipython3
----
-mystnb:
-  skip-execution: true
----
+:tags: ["skip-execution": true]
 from pec.representations import (
     represent_operation_with_local_biased_noise,
 )
