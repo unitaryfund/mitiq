@@ -456,7 +456,7 @@ enter a dictionary of additional data and options including optimization method 
 for the chosen optimization method.
 
 ```{code-cell} ipython3
-:tags: ["skip-execution": true]
+:tags: ["skip-execution"]
 from qiskit.providers.aer.noise import NoiseModel
 from qiskit.providers.aer.noise.errors.standard_errors import (
     depolarizing_error,
@@ -526,7 +526,7 @@ whether the optimizer exited successfully, in addition to the optimized noise st
 ideal gate in terms of noisy gates.
 
 ```{code-cell} ipython3
-:tags: ["skip-execution": true]
+:tags: ["skip-execution"]
 representations = represent_operation_with_local_depolarizing_noise(
     operations_to_learn, epsilon_opt
 )
@@ -572,7 +572,7 @@ enter a dictionary of additional data and options including optimization method 
 for the chosen optimization method.
 
 ```{code-cell} ipython3
-:tags: ["skip-execution": true]
+:tags: ["skip-execution"]
 from mitiq.pec.representations.learning import (
     learn_biased_noise_parameters,
 )
@@ -619,7 +619,7 @@ optimizer exited successfully, in addition to the optimized noise strength and n
 {func}`.represent_operation_with_local_biased_noise` to calculate quasiprobability representations of the ideal gate in terms of noisy gates.
 
 ```{code-cell} ipython3
-:tags: ["skip-execution": true]
+:tags: ["skip-execution"]
 from pec.representations import (
     represent_operation_with_local_biased_noise,
 )
