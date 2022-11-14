@@ -3,6 +3,7 @@ line-length = 79
 target-version = ['py310']
 
 [tool.pytest.ini_options]
+addopts = "--color=yes"
 filterwarnings = [
     # TODO: these are probably too restrictive
     'ignore::UserWarning',
