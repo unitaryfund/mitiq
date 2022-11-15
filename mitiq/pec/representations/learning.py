@@ -72,7 +72,6 @@ def learn_biased_noise_parameters(
             Otherwise the `QuantumResult` returned by `executor` is used to
             compute the expectation of the observable.
         learning_kwargs (optional): Additional data and options including
-            ``pec_data`` from pre-executed runs of PEC on training circuits,
             ``method`` an optimization method supported by
             ``scipy.optimize.minimize`` and settings for the chosen
             optimization method.
@@ -168,7 +167,6 @@ def learn_depolarizing_noise_parameter(
             Otherwise the `QuantumResult` returned by `executor` is used to
             compute the expectation of the observable.
         learning_kwargs (optional): Additional data and options including
-            ``pec_data`` from pre-executed runs of PEC on training circuits,
             ``method`` an optimization method supported by
             ``scipy.optimize.minimize`` and settings for the chosen
             optimization method.
@@ -248,7 +246,7 @@ def depolarizing_noise_loss_function(
             `QuantumResult`.
         pec_kwargs: Options to pass to `execute_w_pec` for the error-mitigated
             expectation value obtained from executing the training circuits.
-        pec_data (optional): 3-D. Array of error-mitigated expection values for
+        pec_data (optional): 2-D array of error-mitigated expection values for
             model training.
         observable (optional): Observable to compute the expectation value of.
             If None, the ``executor`` must return an expectation value.
@@ -313,7 +311,7 @@ def biased_noise_loss_function(
             `QuantumResult`.
         pec_kwargs: Options to pass to `execute_w_pec` for the error-mitigated
             expectation value obtained from executing the training circuits.
-        pec_data (optional): 3-D. Array of error-mitigated expection values for
+        pec_data (optional): 3-D array of error-mitigated expection values for
             model training.
         observable (optional): Observable to compute the expectation value of.
             If None, the ``executor`` must return an expectation value.
