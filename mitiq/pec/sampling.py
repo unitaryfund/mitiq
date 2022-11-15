@@ -72,26 +72,20 @@ def sample_sequence(
     ideal, _ = convert_to_mitiq(ideal_operation)
     operation_representation = None
     for representation in representations:
-        if _equal(representation.ideal, ideal, require_qubit_equality=True):
-            operation_representation = representation
-            break
-        if representation.is_qubit_independent and _equal(
-            representation.ideal, ideal, require_qubit_equality=False
+        if _equal(
+            cirq.Circuit(representation.ideal), ideal, require_qubit_equality
         ):
             operation_representation = representation
             break
-
+        if representation.is_qubit_independent and _equal(
+            cirq.Circuit(representation.ideal), ideal, require_qubit_equality
+        ):
+            operation_representation = representation
+            break
     if operation_representation is None:
-        for representation in representations:
-            if representation.is_qubit_independent and _equal(
-                representation.ideal, ideal, require_qubit_equality=False
-            ):
-                operation_representation = representation
-                break
-            else:
-                warnings.warn(
-                    UserWarning(f"No representation found for \n\n{ideal_operation}.")
-        ) 
+        warnings.warn(
+            UserWarning(f"No representation found for \n\n{ideal_operation}.")
+        )
         return (
             [ideal_operation] * num_samples,
             [1] * num_samples,
