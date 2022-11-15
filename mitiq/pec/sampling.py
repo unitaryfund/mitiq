@@ -17,6 +17,7 @@
 
 from typing import List, Optional, Tuple, Sequence, Union
 from copy import deepcopy
+import warnings
 
 import numpy as np
 
@@ -87,7 +88,10 @@ def sample_sequence(
             ):
                 operation_representation = representation
                 break
-
+            else:
+                warnings.warn(
+                    UserWarning(f"No representation found for \n\n{ideal_operation}.")
+        ) 
         return (
             [ideal_operation] * num_samples,
             [1] * num_samples,
