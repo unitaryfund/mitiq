@@ -40,7 +40,7 @@ from mitiq.pec.representations.depolarizing import (
     represent_operation_with_local_depolarizing_noise,
 )
 from mitiq.pec.representations.learning import (
-    biased_noise_loss_function,
+    depolarizing_noise_loss_function,
     learn_depolarizing_noise_parameter,
 )
 ```
@@ -112,9 +112,7 @@ training_circuits = generate_training_circuits(
 
 observable = Observable(PauliString("XZ"), PauliString("YY"))
 
-ideal_values = np.array(
-    [ideal_executor.evaluate(tc, observable) for tc in training_circuits]
-)
+ideal_values = np.array(ideal_executor.evaluate(training_circuits, observable))
 
 epsilons = np.linspace(0.03, 0.07, 9)
 
@@ -124,14 +122,14 @@ import warnings
 # this example only simulates noise on CNOT
 warnings.simplefilter("ignore", UserWarning)
 loss = [
-    biased_noise_loss_function(
-        [eps, 0],
+    depolarizing_noise_loss_function(
+        [eps],
         operations_to_learn,
         training_circuits,
         ideal_values,
         noisy_executor,
         pec_kwargs,
-        observable,
+        observable=observable,
     )
     for eps in epsilons
 ]
@@ -152,21 +150,20 @@ epsilon0 = (1 - offset) * epsilon
 ```
 
 Here we use the Nelder-Mead method in [`scipy.optimize.minimize`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html)
-to find the value of epsilon that minimizes the depolarizing noise loss function. 
+to find the value of epsilon that minimizes the depolarizing noise loss function.
 
 ```{code-cell} ipython3
 [success, epsilon_opt] = learn_depolarizing_noise_parameter(
-    operations_to_learn=operations_to_learn,
-    circuit=circuit,
-    ideal_executor=ideal_executor,
-    noisy_executor=noisy_executor,
-    pec_kwargs=pec_kwargs,
+    operations_to_learn,
+    circuit,
+    ideal_executor,
+    noisy_executor,
+    pec_kwargs,
     num_training_circuits=5,
     fraction_non_clifford=0.2,
     training_random_state=np.random.RandomState(1),
     epsilon0=epsilon0,
     observable=observable,
-    method="Nelder-Mead",
 )
 
 print(success)
