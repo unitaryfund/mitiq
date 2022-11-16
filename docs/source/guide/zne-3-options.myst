@@ -15,7 +15,7 @@ kernelspec:
 
 In the introductory section [How do I use ZNE?](zne-1-intro.myst), we used the function
 {func}`execute_with_zne()` to evaluate error-mitigated expectation values with zero-noise extrapolation.
-Beyond the positional arguments (`circuit`, `executor` and `observable`) that are common to all
+Beyond the positional arguments (`circuit` and `executor`) that are common to all
 error mitigation techniques, one can use additional keyword arguments for optional settings as shown in next code snippet:
 
 +++
@@ -26,7 +26,7 @@ from mitiq import zne
 zne_value = zne.execute_with_zne(
     circuit,
     executor,
-    observable,
+    observable = <"observable to compute the expectation value of">
     scale_noise = <"noise scaling method imported from zne.scaling">,
     factory = <"extrapolation Factory imported from zne.inference">,
     num_to_average = <"number of repeated evaluations for each noise-scaled circuit">,
@@ -35,7 +35,8 @@ zne_value = zne.execute_with_zne(
 
 +++
 
-The three main options are `scale_noise`, `factory` and `num_to_average`.
+The four main options are `observable`, `scale_noise`, `factory` and `num_to_average`.
+- The option `observable` can be used to specify the observable whose mitigated expectation value should be computed.
 - The option `scale_noise` can be used to select a noise scaling method.
     More details are explained below.
 - The option `factory` can be used to select an extrapolation method.
