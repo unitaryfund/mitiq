@@ -71,7 +71,7 @@ $$
 where we introduced the multi-index $\vec{\alpha}=(\alpha_1, \alpha_2, \dots ,\alpha_t)$ and
 
 $$
-\eta_{\vec{\alpha}} := \Pi_{i=1}^t \eta_{i, \alpha_i},
+\eta_{\vec{\alpha}} := \prod_{i=1}^t \eta_{i, \alpha_i},
 \quad  \langle A_{\vec{\alpha}}\rangle_{\rm noisy} :=  {\rm tr}[A \Phi_{\vec{\alpha}}(\rho_0)],
 \quad \Phi_{\vec{\alpha}} := \mathcal O_{t, \alpha_t} \circ \dots \circ \mathcal O_{2, \alpha_2} \circ \mathcal O_{1, \alpha_1}.
 $$
@@ -86,7 +86,7 @@ $$ \mathcal U =  \sum_{\vec{\alpha}} \eta_{\vec{\alpha}} \Phi_{\vec{\alpha}}. $$
 The one-norm $\gamma$ of the global quasi-probability distribution is the product of those of the gates:
 
 $$
-\sum_{\vec \alpha} \eta_{\vec{\alpha}}=1,  \qquad  \gamma = \sum_{\vec{\alpha}} |\eta_{\vec \alpha}| = \Pi_{i=1}^{t} \gamma_i.
+\sum_{\vec \alpha} \eta_{\vec{\alpha}}=1,  \qquad  \gamma = \sum_{\vec{\alpha}} |\eta_{\vec \alpha}| = \prod_{i=1}^{t} \gamma_i.
 $$
 
 All the noisy expectation values $\langle A_{\vec{\alpha}}\rangle_{\rm noisy}$ can be directly measured with
@@ -119,7 +119,7 @@ Therefore, at the level of quantum channels, we have:
 $$ \mathcal U = \gamma \mathbb E \left\{  {\rm sgn}(\eta_{i, \vec{\alpha}}) \Phi_{\vec{\alpha}} \right\},$$
 
 where $\mathbb E$ is the sample average over many repetitions of the previous probabilistic procedure and
-${\rm sgn}(\eta_{\vec{ \alpha}}) = \Pi_i {\rm sgn}(\eta_{i, \alpha})$.
+${\rm sgn}(\eta_{\vec{ \alpha}}) = \prod_i {\rm sgn}(\eta_{i, \alpha})$.
 As a direct consequence, we can express the ideal expectation value as follows:
 
 $$\langle A \rangle_{\text{ideal}} = \gamma\,
