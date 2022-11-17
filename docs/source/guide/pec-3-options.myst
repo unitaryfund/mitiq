@@ -429,13 +429,6 @@ The learning-based PEC workflow was inspired by the procedure described in *Stri
 
 +++
 
-### Learning quasiprobability representations with a depolarizing noise model
-
-In cases where the noise of the backend can be approximated by a depolarizing noise model,
-{func}`.pec.representations.learning.learn_depolarizing_noise_parameter` can be used to learn the noise strength `epsilon` associated to a set
-of input operations. 
-
-
 The learning process is based on the execution of a set of training circuits on a noisy backend via a noisy
 {ref}`executor <guide/executors/executors>` 
 and on a classical simulator via an ideal {ref}`executor <guide/executors/executors>`. 
@@ -449,14 +442,31 @@ The default optimization method in the learning function is `Nelder-Mead`, as th
 
 
 In addition to specifying the input operation, the circuit of interest, and the ideal and noisy executors, the user should specify the number
-of training circuits, the fraction of non-Clifford gates in the training circuits, and an initial guess for noise strength. 
+of training circuits, the fraction of non-Clifford gates in the training circuits, an initial guess for noise strength, and in the case of
+biased noise, an initial guess for a noise bias. 
 The user can also set options for the intermediate executions of {func}`.pec.execute_with_pec()` during the training process as a dictionary in
 `pec_kwargs`, specify the {ref}`observable <guide/observables/observables>` of which the expecation value is to be computed, and
 enter a dictionary of additional data and options including optimization method (supported by {py:func}`scipy.optimize.minimize`) and settings
 for the chosen optimization method.
 
+
+```{note}
+Using `learn_depolarizing_noise_parameter` and `learn_biased_noise_parameters` may require some tuning.
+One of the main challenges is setting a good value of `num_samples` in the PEC options `pec_kwargs`.
+Setting a small value of `num_samples` is typically necessary to obtain a reasonable execution time.
+On the other hand, using a number of PEC samples that is too small can result in a large statistical error, ultimately causing the optimization
+process to fail.
+```
+
+### Learning quasiprobability representations with a depolarizing noise model
+
+In cases where the noise of the backend can be approximated by a depolarizing noise model,
+{func}`.pec.representations.learning.learn_depolarizing_noise_parameter` can be used to learn the noise strength `epsilon` associated to a set
+of input operations.
+
 ```{code-cell} ipython3
 :tags: ["skip-execution"]
+
 from qiskit.providers.aer.noise import NoiseModel
 from qiskit.providers.aer.noise.errors.standard_errors import (
     depolarizing_error,
@@ -511,15 +521,6 @@ operations_to_learn.cx(1, 0)
 )
 ```
 
-```{note}
-Using this function may require some tuning.
-One of the main challenges is setting a good value of `num_samples` in the PEC options `pec_kwargs`.
-Setting a small value of `num_samples` is typically necessary to obtain a reasonable execution time.
-On the other hand, using a number of PEC samples that is too small can result in a large statistical error, ultimately causing the optimization
-process to fail.
-```
-
-
 Upon completing the optimization loop, {func}`.representations.learning.learn_depolarizing_noise_parameter` returns a flag indicating
 whether the optimizer exited successfully, in addition to the optimized noise strength, which can then be input into 
 {func}`.representations.depolarizing.represent_operation_with_local_depolarizing_noise` to calculate quasiprobability representations of the
@@ -527,6 +528,7 @@ ideal gate in terms of noisy gates.
 
 ```{code-cell} ipython3
 :tags: ["skip-execution"]
+
 representations = represent_operation_with_local_depolarizing_noise(
     operations_to_learn, epsilon_opt
 )
@@ -551,28 +553,9 @@ $$
 
 For multi-qubit operations, the noise channel used is the tensor product of the local single-qubit channels.
 
-
-The learning process is based on the execution of a set of training circuits on a noisy backend via a noisy
-{ref}`executor <guide/executors/executors>` and on a classical simulator via an ideal {ref}`executor <guide/executors/executors>`. 
-The training circuits are near-Clifford approximations of the input circuit. 
-During training, the noise strength and noise bias parameters are used to calculate quasiprobability representations of the ideal gate with
-a biased noise model.
-The representations are then input into {func}`.pec.execute_with_pec` to obtain an error-mitigated expecation value from execution of the
-training circuit, for comparison with the ideal expecation value obtained from classical simulation of the training circuit.
-The optimizer used in the learning function is from {py:func}`scipy.optimize.minimize`.
-The default optimization method in the learning function is `Nelder-Mead`, as that appears to work best for this particular problem setup.
-
-
-In addition to specifying the input operation, the circuit of interest, and the ideal and noisy executors,
-the user should specify the number of training circuits, the fraction of non-Clifford gates in the training circuits, and initial guesses for
-noise strength and noise bias. 
-The user can also set options for the intermediate executions of {func}`.pec.execute_with_pec` during the training process as a dictionary in
-`pec_kwargs`, specify {ref}`observable <guide/observables/observables>` of which the expecation value is to be computed, and
-enter a dictionary of additional data and options including optimization method (supported by {py:func}`scipy.optimize.minimize`) and settings
-for the chosen optimization method.
-
 ```{code-cell} ipython3
 :tags: ["skip-execution"]
+
 from mitiq.pec.representations.learning import (
     learn_biased_noise_parameters,
 )
@@ -605,21 +588,13 @@ operations_to_learn.cx(1, 0)
 )
 ```
 
-```{note}
-Using this function may require some tuning.
-One of the main challenges is setting a good value of `num_samples` in the PEC options `pec_kwargs`.
-Setting a small value of `num_samples` is typically necessary to obtain a reasonable execution time.
-On the other hand, using a number of PEC samples that is too small can result in a large statistical error, ultimately causing the optimization
-process to fail.
-```
-
-
 Upon completing the optimization loop, {func}`.representations.learning.learn_biased_noise_parameters` returns a flag indicating whether the
 optimizer exited successfully, in addition to the optimized noise strength and noise bias, which can then be input into 
 {func}`.represent_operation_with_local_biased_noise` to calculate quasiprobability representations of the ideal gate in terms of noisy gates.
 
 ```{code-cell} ipython3
 :tags: ["skip-execution"]
+
 from pec.representations import (
     represent_operation_with_local_biased_noise,
 )
