@@ -417,7 +417,7 @@ a simpler but computationally more expensive approach is to perform multiple PEC
 value and compute the standard deviation of the results.
 
 
-### Applying learning-based PEC
+## Applying learning-based PEC
 
 +++
 
@@ -429,7 +429,7 @@ The learning-based PEC workflow was inspired by the procedure described in *Stri
 
 +++
 
-#### Learning quasiprobability representations with a depolarizing noise model
+### Learning quasiprobability representations with a depolarizing noise model
 
 In cases where the noise of the backend can be approximated by a depolarizing noise model,
 {func}`.pec.representations.learning.learn_depolarizing_noise_parameter` can be used to learn the noise strength `epsilon` associated to a set
@@ -532,7 +532,7 @@ representations = represent_operation_with_local_depolarizing_noise(
 )
 ```
 
-#### Learning quasiprobability representations with a biased noise model
+### Learning quasiprobability representations with a biased noise model
 
 In cases where the noise of the backend can be approximated by a combined depolarizing and dephasing noise model with a bias factor, also
 referred to as a biased noise model, `pec.representations.learning.learn_biased_noise_parameters` can be used to learn the noise strength
