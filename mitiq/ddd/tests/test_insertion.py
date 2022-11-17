@@ -24,6 +24,7 @@ from mitiq.ddd.insertion import (
 )
 import pytest
 import qiskit
+import pyquil
 from mitiq.ddd.rules import xx, xyxy
 
 circuit_cirq_one = cirq.Circuit(
@@ -267,3 +268,15 @@ def test_midcircuit_measurement_raises_error():
 
     with pytest.raises(ValueError, match="midcircuit measurements"):
         insert_ddd_sequences(circuit, xx)
+
+
+def test_pyquil_midcircuit_measurement_raises_error():
+    p = pyquil.Program()
+    cbit = p.declare("cbit")
+    p += pyquil.gates.X(0)
+    p += pyquil.gates.X(1)
+    p += pyquil.gates.MEASURE(0, cbit[0])
+    p += pyquil.gates.X(0)
+
+    with pytest.raises(ValueError, match="midcircuit measurements"):
+        insert_ddd_sequences(p, xx)
