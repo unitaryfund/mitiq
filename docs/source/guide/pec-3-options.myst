@@ -542,10 +542,10 @@ referred to as a biased noise model, `pec.representations.learning.learn_biased_
 The single-qubit biased noise channel is given by:
 
 $$
-\mathcal{D}(\epsilon) = (1 - \epsilon)[\mathbb{1}] 
-+ \epsilon(\frac{\eta}{\eta + 1} \mathcal{Z}
+\mathcal{D}(\epsilon) = (1 - \epsilon)\mathbb{1}
++ \epsilon\Big(\frac{\eta}{\eta + 1} \mathcal{Z}
 + \frac{1}{3}\frac{1}{\eta + 1}(\mathcal{X} + \mathcal{Y}
-+ \mathcal{Z}))
++ \mathcal{Z})\Big)
 $$ 
 
 
