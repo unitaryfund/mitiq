@@ -22,7 +22,7 @@ from mitiq._typing import MeasurementResult, Bitstring
 
 def sample_probability_vector(
     probability_vector: npt.NDArray[np.float64], samples: int
-) -> npt.NDArray[np.uint8]:
+) -> List[Bitstring]:
     """Generate a number of samples from a probability distribution as
     bitstrings.
 
@@ -41,7 +41,7 @@ def sample_probability_vector(
     # split the binary strings into an array of ints
     bitstrings = np.apply_along_axis(
         np.fromstring, 1, binary_strings[:, None], dtype="U1"
-    ).astype(np.uint8)
+    ).astype(np.uint8).tolist()
 
     return bitstrings
 
@@ -103,6 +103,6 @@ def mitigate_measurements(
     )
 
     result = MeasurementResult(
-        adjusted_result.tolist(), noisy_result.qubit_indices
+        adjusted_result, noisy_result.qubit_indices
     )
     return result
