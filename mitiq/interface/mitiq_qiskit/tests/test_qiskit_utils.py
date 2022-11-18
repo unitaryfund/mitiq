@@ -293,28 +293,3 @@ def test_compute_expectation_value_on_noisy_backend_with_qiskit_backend():
     assert np.isclose(np.imag(expval), 0.0)
     # With noise the result is non-deterministic
     assert 0.9 < np.real(expval) < 1.0
-
-
-@pytest.mark.skip(reason="Cannot work until the issue gh-1420 is fixed.")
-def test_compute_expectation_value_on_noisy_backend_with_measurements():
-    """Tests the evaluation of an expectation value when the input
-    circuit has measurements.
-    """
-    obs = Observable(PauliString("X"))
-    qiskit_circuit = QuantumCircuit(1)
-    qiskit_circuit.h(0)
-    qiskit_circuit.measure_all()
-
-    expval = compute_expectation_value_on_noisy_backend(
-        qiskit_circuit,
-        obs,
-        noise_model=initialized_depolarizing_noise(0.01),
-    )
-    assert 0.9 < np.real(expval) < 1.0
-
-    expval = compute_expectation_value_on_noisy_backend(
-        qiskit_circuit,
-        obs,
-        backend=FakeLima(),
-    )
-    assert 0.9 < np.real(expval) < 1.0
