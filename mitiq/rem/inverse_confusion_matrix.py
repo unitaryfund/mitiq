@@ -90,12 +90,7 @@ def mitigate_measurements(
     Returns:
         A mitigated MeasurementResult.
     """
-    if noisy_result.qubit_indices is None:
-        raise ValueError(
-            "Qubit indices are missing from the noisy measurement result."
-        )
-
-    num_qubits = len(noisy_result.qubit_indices)
+    num_qubits = noisy_result.nqubits
     required_shape = (2**num_qubits, 2**num_qubits)
     if inverse_confusion_matrix.shape != required_shape:
         raise ValueError(

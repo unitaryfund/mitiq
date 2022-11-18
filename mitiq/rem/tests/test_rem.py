@@ -55,6 +55,32 @@ def noisy_readout_executor(
     )
 
 
+npX = np.array([[0, 1], [1, 0]])
+"""Defines the sigma_x Pauli matrix in SU(2) algebra as a (2,2) `np.array`."""
+
+npZ = np.array([[1, 0], [0, -1]])
+"""Defines the sigma_z Pauli matrix in SU(2) algebra as a (2,2) `np.array`."""
+
+
+# An invalid executor for unit tests since it returns an expectation
+def invalid_executor(circuit) -> float:
+    wavefunction = circuit.final_state_vector(
+        ignore_terminal_measurements=True
+    )
+    return np.real(wavefunction.conj().T @ np.kron(npX, npZ) @ wavefunction)
+
+
+def test_rem_invalid_executor():
+    identity = np.identity(4)
+    with pytest.raises(TypeError, match="not of type MeasurementResult"):
+        execute_with_rem(
+            circ,
+            invalid_executor,
+            observable,
+            inverse_confusion_matrix=identity,
+        )
+
+
 def test_rem_identity():
     executor = partial(sample_bitstrings, noise_level=(0,))
     identity = np.identity(4)
@@ -109,11 +135,11 @@ def test_doc_is_preserved():
     identity = np.identity(4)
 
     mit_executor = mitigate_executor(
-        first_executor, inverse_confusion_matrix=identity
+        first_executor, observable, inverse_confusion_matrix=identity
     )
     assert mit_executor.__doc__ == first_executor.__doc__
 
-    @rem_decorator(inverse_confusion_matrix=identity)
+    @rem_decorator(observable, inverse_confusion_matrix=identity)
     def second_executor(circuit):
         """Doc of the original executor."""
         return 0

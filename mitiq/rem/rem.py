@@ -15,7 +15,7 @@
 
 """Readout Confusion Inversion."""
 
-from typing import Callable, Optional, Union
+from typing import Callable, Union
 
 from functools import wraps
 import numpy as np
@@ -30,7 +30,7 @@ from mitiq.rem.inverse_confusion_matrix import mitigate_measurements
 def execute_with_rem(
     circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], MeasurementResult]],
-    observable: Optional[Observable] = None,
+    observable: Observable,
     *,
     inverse_confusion_matrix: npt.NDArray[np.float64],
 ) -> float:
@@ -40,7 +40,7 @@ def execute_with_rem(
     Args:
         executor: A Mitiq executor that executes a circuit and returns the
             unmitigated ``MeasurementResult``.
-        observable: Observable to compute the expectation value of.
+        observable: Observable to compute the expectation value of (required).
         inverse_confusion_matrix: The inverse confusion matrix to apply to the
             probability vector estimated with noisy measurement results.
 
@@ -59,16 +59,12 @@ def execute_with_rem(
         noisy_result, inverse_confusion_matrix
     )
 
-    if observable is None:
-        raise ValueError("An observable is required.")
-
-    assert observable is not None
     return observable._expectation_from_measurements([mitigated_result])
 
 
 def mitigate_executor(
     executor: Callable[[QPROGRAM], MeasurementResult],
-    observable: Optional[Observable] = None,
+    observable: Observable,
     *,
     inverse_confusion_matrix: npt.NDArray[np.float64],
 ) -> Callable[[QPROGRAM], float]:
@@ -78,7 +74,7 @@ def mitigate_executor(
     Args:
         executor: A Mitiq executor that executes a circuit and returns the
             unmitigated ``MeasurementResult``.
-        observable: Observable to compute the expectation value of.
+        observable: Observable to compute the expectation value of (required).
         inverse_confusion_matrix: The inverse confusion matrix to apply to the
             probability vector estimated with noisy measurement results.
 
@@ -99,7 +95,7 @@ def mitigate_executor(
 
 
 def rem_decorator(
-    observable: Optional[Observable] = None,
+    observable: Observable,
     *,
     inverse_confusion_matrix: npt.NDArray[np.float64],
 ) -> Callable[
@@ -111,19 +107,17 @@ def rem_decorator(
     a ``MeasurementResult``.
 
     Args:
-        observable: Observable to compute the expectation value of.
+        observable: Observable to compute the expectation value of (required).
         inverse_confusion_matrix: The inverse confusion matrix to apply to the
-            probability vector estimated with noisy measurement results.
+            probability vector estimated with noisy measurement results
+            (required).
 
     Returns:
         The error-mitigating decorator to be applied to an executor function.
     """
-    # Raise an error if the decorator is used without parenthesis
-    if callable(observable):
-        raise TypeError(
-            "Decorator must be used with parentheses (i.e., @rem_decorator()) "
-            "even if no explicit arguments are passed."
-        )
+    # NOTE: most decorators check for whether the decorator has been used
+    #   without parenthesis, but that is not possible with this decorator
+    #   since arguments are required.
 
     def decorator(
         executor: Callable[[QPROGRAM], MeasurementResult]
