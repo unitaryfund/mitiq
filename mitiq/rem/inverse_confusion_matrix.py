@@ -29,7 +29,7 @@ def sample_probability_vector(
     Args:
         probability_vector: A probability vector.
 
-    Returns: 
+    Returns:
         A list of sampled bitstrings.
     """
     # sample using the probability distribution given
@@ -83,7 +83,7 @@ def mitigate_measurements(
         inverse_confusion_matrix: The inverse confusion matrix to apply to the
             probability vector estimated with noisy measurement results.
 
-    Returns: 
+    Returns:
         A mitigated MeasurementResult.
     """
     if noisy_result.qubit_indices is None:
