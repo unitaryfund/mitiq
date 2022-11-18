@@ -116,10 +116,14 @@ def generate_inverse_confusion_matrix(
     Generates the inverse confusion matrix assuming a single-qubit
     model for measurement errors. This is useful for applying
     the measurement error mitigation technique in ``mitiq.rem``.
+
     Args:
         qubits: The qubits to measure.
         p0: Probability of flipping a 0 to a 1.
         p1: Probability of flipping a 1 to a 0.
+
+    Returns:
+        The inverse confusion matrix.
     """
     # Build a tensored confusion matrix using smaller single qubit confusion
     # matrices. Implies that errors are uncorrelated among qubits.

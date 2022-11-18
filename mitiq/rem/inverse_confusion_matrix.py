@@ -28,6 +28,9 @@ def sample_probability_vector(
 
     Args:
         probability_vector: A probability vector.
+
+    Returns: 
+        A list of sampled bitstrings.
     """
     # sample using the probability distribution given
     num_values = len(probability_vector)
@@ -55,6 +58,9 @@ def bitstrings_to_probability_vector(
 
     Args:
         bitstrings: All measured bitstrings.
+
+    Returns:
+        A probabiity vector corresponding to the measured bitstrings.
     """
     pv = np.zeros(2 ** len(bitstrings[0]))
     for bs in bitstrings:
@@ -76,6 +82,9 @@ def mitigate_measurements(
         noisy_results: The unmitigated ``MeasurementResult``.
         inverse_confusion_matrix: The inverse confusion matrix to apply to the
             probability vector estimated with noisy measurement results.
+
+    Returns: 
+        A mitigated MeasurementResult.
     """
     if noisy_result.qubit_indices is None:
         raise ValueError(

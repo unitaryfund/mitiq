@@ -43,6 +43,9 @@ def execute_with_rem(
         observable: Observable to compute the expectation value of.
         inverse_confusion_matrix: The inverse confusion matrix to apply to the
             probability vector estimated with noisy measurement results.
+
+    Returns:
+        The expectation value estimated with REM.
     """
     if not isinstance(executor, Executor):
         executor = Executor(executor)
