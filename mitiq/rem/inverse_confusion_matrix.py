@@ -58,7 +58,7 @@ def bitstrings_to_probability_vector(
     """
     pv = np.zeros(2 ** len(bitstrings[0]))
     for bs in bitstrings:
-        index = int("".join([str(bit) for bit in bs]), base=2)
+        index = int("".join(map(str, bs)), base=2)
         pv[index] += 1
     pv /= len(bitstrings)
 
