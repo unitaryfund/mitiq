@@ -42,9 +42,13 @@ def sample_probability_vector(
     binary_strings = binary_repr_vec(choices, width=bit_width)
 
     # split the binary strings into an array of ints
-    bitstrings = np.apply_along_axis(
-        np.fromstring, 1, binary_strings[:, None], dtype="U1"
-    ).astype(np.uint8).tolist()
+    bitstrings = (
+        np.apply_along_axis(
+            np.fromstring, 1, binary_strings[:, None], dtype="U1"
+        )
+        .astype(np.uint8)
+        .tolist()
+    )
 
     return bitstrings
 
@@ -111,7 +115,5 @@ def mitigate_measurements(
         adjusted_prob_dist, noisy_result.shots
     )
 
-    result = MeasurementResult(
-        adjusted_result, noisy_result.qubit_indices
-    )
+    result = MeasurementResult(adjusted_result, noisy_result.qubit_indices)
     return result
