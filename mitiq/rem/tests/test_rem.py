@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for readout confusion inversion."""
+from cmath import isclose
 from functools import partial
 import cirq
 from cirq.experiments.single_qubit_readout_calibration_test import (
@@ -147,21 +148,28 @@ def test_doc_is_preserved():
     assert second_executor.__doc__ == first_executor.__doc__
 
 
-def test_mitigate_executor():
+@pytest.mark.parametrize(
+    "p0, p1, atol",
+    [
+        (0, 0, 0),
+        (1, 1, 0),
+        (1, 0, 0),
+        (0, 1, 0),
+        (0.3, 0.1, 0),
+        (0.1, 0.3, 0),
+        (0.001, 0.001, 1e-2),
+        (0.02, 0.04, 0),
+        (0.3, 0.7, 0),
+    ],
+)
+def test_mitigate_executor(p0, p1, atol):
     true_rem_value = -2.0
 
-    # test with an executor that completely flips results
-    p0 = 1
-    p1 = 1
     noisy_executor = partial(noisy_readout_executor, p0=p0, p1=p1)
 
-    inverse_confusion_matrix = np.array(
-        [
-            [0, 0, 0, 1],
-            [0, 0, 1, 0],
-            [0, 1, 0, 0],
-            [1, 0, 0, 0],
-        ]
+    qubits = list(circ.all_qubits())
+    inverse_confusion_matrix = generate_inverse_confusion_matrix(
+        qubits, p0=p0, p1=p1
     )
 
     base = raw_execute(circ, noisy_executor, observable)
@@ -172,7 +180,11 @@ def test_mitigate_executor():
         inverse_confusion_matrix=inverse_confusion_matrix,
     )
     rem_value = mitigated_executor(circ)
-    assert abs(true_rem_value - rem_value) < abs(true_rem_value - base)
+    assert abs(true_rem_value - rem_value) < abs(
+        true_rem_value - base
+    ) or isclose(
+        true_rem_value - rem_value, true_rem_value - base, abs_tol=atol
+    )
 
 
 def test_rem_decorator():
