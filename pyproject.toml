@@ -6,6 +6,7 @@ target-version = ['py310']
 filterwarnings = [
     # TODO: these are probably too restrictive
     'ignore::UserWarning',
+    'ignore::DeprecationWarning',
 ]
 
 [tool.mypy]
