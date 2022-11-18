@@ -421,9 +421,9 @@ value and compute the standard deviation of the results.
 
 +++
 
-Mitiq also contains functions for the learning quasiprobability representations of an ideal gate from Clifford circuit simulations,
+Mitiq also contains functions for learning the quasiprobability representations of an ideal gate from Clifford circuit simulations,
 with biased noise or depolarizing noise models.
-The resulting quasiprobability representations can be used to obtain an error-mitigated expectation value in the `representations` argument of
+The resulting quasiprobability representations can be used to obtain an error-mitigated expectation value via the `representations` argument of
 {func}`.pec.execute_with_pec`.
 The learning-based PEC workflow was inspired by the procedure described in *Strikis et al. PRX Quantum (2021)* {cite}`Strikis_2021_PRXQuantum`.
 
