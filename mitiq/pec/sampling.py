@@ -22,6 +22,7 @@ import warnings
 import numpy as np
 
 import cirq
+from cirq import Circuit
 
 from mitiq import QPROGRAM
 from mitiq.interface import convert_to_mitiq, convert_from_mitiq
@@ -73,12 +74,9 @@ def sample_sequence(
     operation_representation = None
     for representation in representations:
         if _equal(
-            cirq.Circuit(representation.ideal), ideal, require_qubit_equality
-        ):
-            operation_representation = representation
-            break
-        if representation.is_qubit_independent and _equal(
-            cirq.Circuit(representation.ideal), ideal, require_qubit_equality
+            Circuit(representation.ideal),
+            Circuit(ideal),
+            require_qubit_equality=representation.is_qubit_dependent,
         ):
             operation_representation = representation
             break
