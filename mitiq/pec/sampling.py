@@ -15,7 +15,7 @@
 
 """Tools for sampling from the noisy representations of ideal operations."""
 
-from typing import List, Optional, Tuple, Sequence, Union
+from typing import List, Optional, Tuple, Sequence, Union, cast
 from copy import deepcopy
 import warnings
 
@@ -35,7 +35,6 @@ def sample_sequence(
     representations: Sequence[OperationRepresentation],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     num_samples: int = 1,
-    require_qubit_equality: bool = True,
 ) -> Tuple[List[QPROGRAM], List[int], float]:
     """Samples a list of implementable sequences from the quasi-probability
     representation of the input ideal operation.
@@ -74,8 +73,8 @@ def sample_sequence(
     operation_representation = None
     for representation in representations:
         if _equal(
-            Circuit(representation.ideal),
-            Circuit(ideal),
+            cast(Circuit, representation.ideal),
+            ideal,
             require_qubit_equality=representation.is_qubit_dependent,
         ):
             operation_representation = representation
@@ -109,7 +108,6 @@ def sample_circuit(
     representations: Sequence[OperationRepresentation],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     num_samples: int = 1,
-    require_qubit_equality: bool = True,
 ) -> Tuple[List[QPROGRAM], List[int], float]:
     """Samples a list of implementable circuits from the quasi-probability
     representation of the input ideal circuit.
@@ -157,7 +155,6 @@ def sample_circuit(
             representations,
             num_samples=num_samples,
             random_state=random_state,
-            require_qubit_equality=require_qubit_equality,
         )
 
         norm *= loc_norm
