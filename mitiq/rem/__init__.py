@@ -21,4 +21,5 @@ from mitiq.rem.rem import (
     execute_with_rem,
     mitigate_executor,
     rem_decorator,
+    mitigate_measurements,
 )
