@@ -1,6 +1,18 @@
 (guide/pec/pec)=
 # Probabilistic error cancellation
 
+Probabilistic error cancellation (PEC) is an error mitigation technique for improving the estimation of expectation values (see [What is the theory behind PEC?](pec-5-theory.myst)).
+
+```{figure} ../img/pec_workflow2_steps.png
+---
+width: 700px
+name: ddd-workflow
+---
+Workflow of the implementation of PEC in Mitiq, further detailed in the [What happens when I use PEC?](pec-4-low-level.myst) section.
+```
+
+You can read more about PEC in Mitiq in the following sections:
+
 ```{toctree}
 ---
 maxdepth: 1

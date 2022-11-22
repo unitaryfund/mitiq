@@ -1,5 +1,25 @@
 # Digital Dynamical Decoupling
 
+Digital Dynamical Decoupling (DDD) is an error mitigation technique in which
+sequences of gates are applied to slack windows, i.e. single-qubit idle
+windows, in a quantum circuit. Such sequences of gates can reduce the coupling
+between the qubits and the environment, mitigating the effects of noise.
+For more discussion of the theory of DDD, see the section [What is the theory
+behind DDD?](ddd-5-theory.myst). Below you can find sections of the
+documentation that address also the following questions:
+
+
+```{figure} ../img/ddd_workflow.png
+---
+width: 700px
+name: ddd-workflow
+---
+Workflow of the DDD technique in Mitiq, detailed in the [What happens when I use DDD?](ddd-4-low-level.myst) section.
+```
+
+Below you can find sections of the documentation that address also the following questions:
+
+
 ```{toctree}
 ---
 maxdepth: 1

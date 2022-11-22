@@ -13,21 +13,16 @@ kernelspec:
 
 # How do I use ZNE?
 
-Zero-noise extrapolation (ZNE) is an error mitigation technique in which an expectation 
-value is computed at different noise levels and, as a second step, the ideal 
-expectation value is inferred by extrapolating the measured results to the zero-noise 
-limit (see the section [What is the theory behind ZNE?](zne-5-theory.myst)).
-
-Both steps — noise scaling and extrapolation — can be applied with Mitiq. The 
-corresponding sub-modules are 
-[`mitiq.zne.scaling`](https://mitiq.readthedocs.io/en/latest/apidoc.html#module-mitiq.zne.scaling.folding) 
-and 
+Both steps characterizing ZNE — noise scaling and extrapolation — can be easily applied with Mitiq. The
+corresponding sub-modules are
+[`mitiq.zne.scaling`](https://mitiq.readthedocs.io/en/latest/apidoc.html#module-mitiq.zne.scaling.folding)
+and
 [`mitiq.zne.inference`](https://mitiq.readthedocs.io/en/latest/apidoc.html#module-mitiq.zne.inference).
 
 As with all techniques, ZNE is compatible with any frontend supported by Mitiq:
 
 ```{code-cell} ipython3
-import mitiq 
+import mitiq
 
 mitiq.SUPPORTED_PROGRAM_TYPES.keys()
 ```
@@ -35,7 +30,7 @@ mitiq.SUPPORTED_PROGRAM_TYPES.keys()
 In the next cell you can select the frontend used in this tutorial. For example:
 
 ```{code-cell} ipython3
-frontend = "cirq" 
+frontend = "cirq"
 ```
 
 ## Problem setup
@@ -53,10 +48,10 @@ circuit = benchmarks.generate_rb_circuits(
 print(circuit)
 ```
 
-As an example, below we define a simple executor function 
-which inputs a circuit, executes it on a noisy simulator, and returns the probability 
-of the ground state. 
-See the [Executors](executors.myst) section for more information on how to 
+As an example, below we define a simple executor function
+which inputs a circuit, executes it on a noisy simulator, and returns the probability
+of the ground state.
+See the [Executors](executors.myst) section for more information on how to
 define more advanced executors.
 
 ```{code-cell} ipython3
@@ -80,12 +75,12 @@ The [executor](executors.myst) can be used to evaluate noisy (unmitigated) expec
 ```{code-cell} ipython3
 # Compute the expectation value of the |0><0| observable.
 noisy_value = execute(circuit)
-ideal_value = execute(circuit, noise_level=0.0)      
+ideal_value = execute(circuit, noise_level=0.0)
 print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.5f}")
 ```
 
 ## Apply ZNE
-Zero-noise extrapolation can be easily implemented with the function 
+Zero-noise extrapolation can be easily implemented with the function
 [`mitiq.zne.zne.execute_with_zne()`](https://mitiq.readthedocs.io/en/latest/apidoc.html#mitiq.zne.zne.execute_with_zne).
 
 ```{code-cell} ipython3
@@ -98,7 +93,7 @@ mitigated_result = zne.execute_with_zne(circuit, execute)
 print(f"Error with mitigation (ZNE): {abs(ideal_value - mitigated_result):.{3}}")
 ```
 
-Here we observe that the application of ZNE reduces the estimation error when compared 
+Here we observe that the application of ZNE reduces the estimation error when compared
 to the unmitigated result.
 In the example above, both the noise *scaling* and *inference* steps were taken behinds the scenes thanks to the default options of {func}`.execute_with_zne`. Below we provide more details about these two aspects of ZNE in Mitiq.
 
@@ -109,7 +104,7 @@ In Mitiq, one can select a noise scaling method via *noise scaling functions*.
 A noise scaling function takes as input a circuit and a real scale factor and
 returns a new circuit. The returned circuit is equivalent to the input one (if executed on a noiseless backend),
 but is more sensitive to noise when executed on a real noisy backend. In practice, by applying a noise
-scaling function before the execution of a circuit, one can indirectly scale up the effect of noise. 
+scaling function before the execution of a circuit, one can indirectly scale up the effect of noise.
 See the section [What additional options are available in ZNE?](zne-3-options.myst) for more details.
 
 For example, the function {func}`.fold_gates_at_random()` applies the *unitary folding* map $G -> G G^\dagger G$
@@ -124,13 +119,13 @@ folded = fold_gates_at_random(circuit, scale_factor=2.)
 print("Folded circuit:", folded, sep="\n")
 ```
 
-## Select a noise extrapolation method 
-Define a {class}`.Factory` object to select the noise extrapolation method and the noise scale 
-factors. The section 
-[What additional options are available when using ZNE?](zne-3-options.myst) also 
-contains more details on the available noise extrapolation methods in Mitiq. 
+## Select a noise extrapolation method
+Define a {class}`.Factory` object to select the noise extrapolation method and the noise scale
+factors. The section
+[What additional options are available when using ZNE?](zne-3-options.myst) also
+contains more details on the available noise extrapolation methods in Mitiq.
 
-For example, a linear extrapolation method with scale factors 1 and 2, can be 
+For example, a linear extrapolation method with scale factors 1 and 2, can be
 initialized as follows:
 
 ```{code-cell} ipython3
@@ -153,5 +148,5 @@ mitigated_result = zne.execute_with_zne(
 print(f"Error with mitigation (ZNE): {abs(ideal_value - mitigated_result):.{3}}")
 ```
 
-The section [What additional options are available when using ZNE?](zne-3-options.myst) 
+The section [What additional options are available when using ZNE?](zne-3-options.myst)
 contains more information on both noise scaling and noise extrapolation methods in Mitiq.
