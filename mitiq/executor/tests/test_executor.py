@@ -16,6 +16,7 @@
 """Unit tests for Collector."""
 import pytest
 from typing import List
+from random import choices
 
 import numpy as np
 
@@ -182,8 +183,6 @@ def test_run_executor_force_run_all_serial_executor_identical_circuits(
 @pytest.mark.parametrize("s", (50, 100, 150))
 @pytest.mark.parametrize("b", (1, 2, 100))
 def test_run_executor_preserves_order(s, b):
-    rng = np.random.RandomState(1)
-
     collector = Executor(executor=executor_batched_unique, max_batch_size=b)
     assert collector.can_batch
 
@@ -191,7 +190,7 @@ def test_run_executor_preserves_order(s, b):
         cirq.Circuit(cirq.H(cirq.LineQubit(0))),
         cirq.Circuit([cirq.H(cirq.LineQubit(0))] * 2),
     ]
-    batch = [circuits[i] for i in rng.random_integers(low=0, high=1, size=s)]
+    batch = choices(circuits, k=s)
 
     assert np.allclose(collector._run(batch), executor_batched_unique(batch))
 
