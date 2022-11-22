@@ -7,8 +7,8 @@ limit (see the section [What is the theory behind ZNE?](zne-5-theory.myst)).
 
 ```{figure} ../img/zne_workflow2_steps.png
 ---
-width: 400
-name: figzne
+width: 700px
+name: figzne-overview
 ---
 The diagram shows the workflow of the zero noise extrapolation (ZNE) in Mitiq.
 ```

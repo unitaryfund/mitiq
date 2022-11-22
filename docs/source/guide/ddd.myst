@@ -12,7 +12,7 @@ documentation that address also the following questions:
 ```{figure} ../img/ddd_workflow.png
 ---
 width: 700px
-name: ddd-workflow
+name: ddd-workflow-overview
 ---
 Workflow of the DDD technique in Mitiq, detailed in the [What happens when I use DDD?](ddd-4-low-level.myst) section.
 ```
