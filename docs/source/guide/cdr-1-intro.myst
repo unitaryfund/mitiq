@@ -13,8 +13,6 @@ kernelspec:
 
 # How do I use CDR?
 
-Clifford data regression (CDR) is a learning-based quantum error mitigation technique in which an error mitigation model is trained with quantum circuits that _resemble_ the circuit of interest, but which are easier to classically simulate {cite}`Czarnik_2021_Quantum, Lowe_2021_PRR`. More information about this technique can be found in the section [What is the theory behind CDR?](cdr-5-theory.myst).
-
 Here we show how to use CDR by means of a simple example.
 
 ```{code-cell} ipython3
