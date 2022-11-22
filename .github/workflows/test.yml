@@ -96,7 +96,7 @@ jobs:
 
       - name: Run ASV benchmarks
         run: |
-          pip install asv virtualenv
+          pip install asv virtualenv pytest
           export BENCHMARK_CI=1
           asv machine --yes
           asv run --quick --strict
