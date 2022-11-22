@@ -14,12 +14,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Cirq utility functions."""
 
-from typing import Tuple
+from typing import Tuple, Sequence
 
 import numpy as np
 import numpy.typing as npt
 import cirq
 from mitiq._typing import MeasurementResult
+
+from cirq.experiments.single_qubit_readout_calibration_test import (
+    NoisySingleQubitReadoutSampler,
+)
 
 
 # Executors.
@@ -101,3 +105,33 @@ def execute_with_depolarizing_noise(
     rho = simulator.simulate(circuit).final_density_matrix
     expectation = np.real(np.trace(rho @ obs))
     return expectation
+
+
+def generate_inverse_confusion_matrix(
+    qubits: Sequence["cirq.Qid"],
+    p0: float = 0.01,
+    p1: float = 0.01,
+) -> npt.NDArray[np.float64]:
+    """
+    Generates the inverse confusion matrix assuming a single-qubit
+    model for measurement errors. This is useful for applying
+    the measurement error mitigation technique in ``mitiq.rem``.
+
+    Args:
+        qubits: The qubits to measure.
+        p0: Probability of flipping a 0 to a 1.
+        p1: Probability of flipping a 1 to a 0.
+
+    Returns:
+        The inverse confusion matrix.
+    """
+    # Build a tensored confusion matrix using smaller single qubit confusion
+    # matrices. Implies that errors are uncorrelated among qubits.
+    qubit_measures = [[q] for q in qubits]
+
+    tensored_matrix = cirq.measure_confusion_matrix(
+        NoisySingleQubitReadoutSampler(p0, p1), qubit_measures
+    )
+    inverse_confusion_matrix = tensored_matrix.correction_matrix()
+
+    return inverse_confusion_matrix
