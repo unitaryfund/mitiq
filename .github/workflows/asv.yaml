@@ -21,7 +21,7 @@ jobs:
 
       - name: Run benchmarks
         run: |
-          pip install asv virtualenv
+          pip install asv virtualenv pytest
           asv machine --machine ghrunner
           asv run --attribute rounds=4
           cp asv.conf.json results
