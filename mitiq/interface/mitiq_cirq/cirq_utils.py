@@ -21,10 +21,6 @@ import numpy.typing as npt
 import cirq
 from mitiq._typing import MeasurementResult
 
-from cirq.experiments.single_qubit_readout_calibration_test import (
-    NoisySingleQubitReadoutSampler,
-)
-
 
 # Executors.
 def sample_bitstrings(
