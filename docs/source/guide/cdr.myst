@@ -25,3 +25,5 @@ cdr-3-options.myst
 cdr-4-low-level.myst
 cdr-5-theory.myst
 ```
+
+A simple tutorial on CDR can be found in the code blocks in the [Problem setup](cdr-1-intro.myst) section of the first section of the user guide.
