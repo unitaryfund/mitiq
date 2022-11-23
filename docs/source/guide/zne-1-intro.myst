@@ -12,8 +12,8 @@ kernelspec:
 ---
 
 # How do I use ZNE?
-
-Both steps characterizing ZNE — noise scaling and extrapolation — can be easily applied with Mitiq. The
+ZNE is an easy to use technique which can be used in a single step
+(for those who are in a hurry), or two steps (for those who want more control over the process). Both steps characterizing ZNE — noise scaling and extrapolation — can be easily applied with Mitiq. The
 corresponding sub-modules are
 [`mitiq.zne.scaling`](https://mitiq.readthedocs.io/en/latest/apidoc.html#module-mitiq.zne.scaling.folding)
 and
