@@ -15,17 +15,19 @@
 
 """Tools for sampling from the noisy representations of ideal operations."""
 
-from typing import List, Optional, Tuple, Sequence, Union
+from typing import List, Optional, Tuple, Sequence, Union, cast
 from copy import deepcopy
 import warnings
 
 import numpy as np
 
 import cirq
+from cirq import Circuit
 
 from mitiq import QPROGRAM
 from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 from mitiq.pec.types import OperationRepresentation
+from mitiq.utils import _equal
 
 
 def sample_sequence(
@@ -70,10 +72,13 @@ def sample_sequence(
     ideal, _ = convert_to_mitiq(ideal_operation)
     operation_representation = None
     for representation in representations:
-        if representation._ideal == ideal:
+        if _equal(
+            cast(Circuit, representation.ideal),
+            ideal,
+            require_qubit_equality=representation.is_qubit_dependent,
+        ):
             operation_representation = representation
             break
-
     if operation_representation is None:
         warnings.warn(
             UserWarning(f"No representation found for \n\n{ideal_operation}.")

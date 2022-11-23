@@ -406,7 +406,10 @@ class OperationRepresentation:
     """
 
     def __init__(
-        self, ideal: QPROGRAM, basis_expansion: Dict[NoisyOperation, float]
+        self,
+        ideal: QPROGRAM,
+        basis_expansion: Dict[NoisyOperation, float],
+        is_qubit_dependent: bool = True,
     ) -> None:
         """Initializes an OperationRepresentation.
 
@@ -414,6 +417,11 @@ class OperationRepresentation:
             ideal: The ideal operation desired to be implemented.
             basis_expansion: Representation of the ideal operation in a basis
                 of `NoisyOperation`s.
+            is_qubit_dependent: If True, the representation
+                corresponds to the operation on the specific qubits defined in
+                `ideal`. If False, the representation is valid for the same
+                gate even if acting on different qubits from those specified in
+                `ideal`.
 
         Raises:
             TypeError: If all keys of `basis_expansion` are not instances of
@@ -421,6 +429,7 @@ class OperationRepresentation:
         """
         self._native_ideal = ideal
         self._ideal, self._native_type = convert_to_mitiq(ideal)
+        self.is_qubit_dependent = is_qubit_dependent
 
         if not all(
             isinstance(op, NoisyOperation) for op in basis_expansion.keys()

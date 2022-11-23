@@ -200,6 +200,38 @@ depolarizing_h_rep = represent_operation_with_local_depolarizing_noise(
 assert depolarizing_h_rep == h_rep
 ```
 
+### Qubit-independent representations
+
+It is possible to apply one representation of the same operation on different qubits, by setting the option `is_qubit_dependent` in 
+{class}`.OperationRepresentation` to `False`.
+
+```{code-cell} ipython3
+qreg = qiskit.QuantumRegister(2)
+
+circuit = qiskit.QuantumCircuit(qreg)
+_ = circuit.h(qreg)
+
+xcircuit = qiskit.QuantumCircuit(qreg)
+_ = xcircuit.x(qreg)
+
+zcircuit = qiskit.QuantumCircuit(qreg)
+_ = zcircuit.z(qreg)
+
+noisy_xop = pec.NoisyOperation(xcircuit)
+noisy_zop = pec.NoisyOperation(zcircuit)
+
+ideal_op = qiskit.QuantumCircuit(qiskit.QuantumRegister(2))
+_ = ideal_op.h(0)
+
+rep = pec.OperationRepresentation(
+    ideal=ideal_op,
+    basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
+    is_qubit_dependent=False,
+)
+
+print(rep)
+```
+
 ### Methods of the `OperationRepresentation` class
 
 +++
