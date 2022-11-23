@@ -1,7 +1,8 @@
 (guide/pec/pec)=
 # Probabilistic error cancellation
 
-Probabilistic error cancellation (PEC) is an error mitigation technique for improving the estimation of expectation values (see [What is the theory behind PEC?](pec-5-theory.myst)).
+Probabilistic error cancellation (PEC) is an error mitigation technique for improving the estimation of expectation values. 
+In PEC, ideal operations are represented as linear combinations of noisy operations and unbiased estimates of expectation values are obtained by Monte Carlo averaging over different noisy circuits (see [What is the theory behind PEC?](pec-5-theory.myst)).
 
 ```{figure} ../img/pec_workflow2_steps.png
 ---
