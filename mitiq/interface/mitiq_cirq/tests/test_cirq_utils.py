@@ -23,9 +23,6 @@ from mitiq.interface.mitiq_cirq import (
     execute_with_depolarizing_noise,
 )
 from mitiq._typing import MeasurementResult
-from mitiq.interface.mitiq_cirq.cirq_utils import (
-    generate_inverse_confusion_matrix,
-)
 
 
 def test_sample_bitstrings():
