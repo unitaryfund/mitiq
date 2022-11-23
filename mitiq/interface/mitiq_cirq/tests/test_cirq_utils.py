@@ -107,15 +107,3 @@ def test_execute_with_depolarizing_noise():
         qc, observable, noise3
     )
     assert np.isclose(observable_exp_value, 0.062452)
-
-
-def test_generate_inverse_confusion_matrix():
-    qubits = [cirq.LineQubit(i) for i in range(2)]
-    identity = np.identity(4)
-    assert (
-        generate_inverse_confusion_matrix(qubits, p0=0, p1=0) == identity
-    ).all()
-    assert (
-        generate_inverse_confusion_matrix(qubits, p0=1, p1=1)
-        == np.flipud(identity)
-    ).all()
