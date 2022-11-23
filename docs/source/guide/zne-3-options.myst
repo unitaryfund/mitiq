@@ -218,9 +218,8 @@ folding method. Fidelity values must be between zero and one.
 
 ### Identity Scaling
 
-Mitiq has only one noise scaling function for the *identity scaling* technique. The goal of this technique is to insert
-layers of identity gates such that they act evenly across all qubits in the circuit. A unitary $G$ is mapped as follows after
-a single identity layer is inserted :
+The goal of this technique is to insert layers of identity gates to extend the duration of the circuit, which, when used in the context of ZNE, provides a useful noise-scaling method.
+Mathematically, this is represented as composing identity operations after the target unitary $G$.
 
 $$G \longrightarrow I G$$
 
