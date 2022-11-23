@@ -153,11 +153,19 @@ def test_doc_is_preserved():
     [
         (0, 0, 0),
         (1, 1, 0),
-        (1, 0, 0),
-        (0, 1, 0),
+        (
+            1,
+            0,
+            2.1,
+        ),  # catastrophic failure from all 0s state, which is why atol=2.1
+        (
+            0,
+            1,
+            0,
+        ),  # undetectable: results in all 1s state, which is the desired state
         (0.3, 0.1, 0),
         (0.1, 0.3, 0),
-        (0.001, 0.001, 1e-2),
+        (0.001, 0.001, 1e-3),
         (0.02, 0.04, 0),
         (0.3, 0.7, 0),
     ],
@@ -167,9 +175,9 @@ def test_mitigate_executor(p0, p1, atol):
 
     noisy_executor = partial(noisy_readout_executor, p0=p0, p1=p1)
 
-    qubits = list(circ.all_qubits())
+    num_qubits = len(qreg)
     inverse_confusion_matrix = generate_inverse_confusion_matrix(
-        qubits, p0=p0, p1=p1
+        num_qubits, p0=p0, p1=p1
     )
 
     base = raw_execute(circ, noisy_executor, observable)
@@ -180,23 +188,25 @@ def test_mitigate_executor(p0, p1, atol):
         inverse_confusion_matrix=inverse_confusion_matrix,
     )
     rem_value = mitigated_executor(circ)
-    assert abs(true_rem_value - rem_value) < abs(
+    assert abs(true_rem_value - rem_value) <= abs(
         true_rem_value - base
     ) or isclose(
-        true_rem_value - rem_value, true_rem_value - base, abs_tol=atol
+        abs(true_rem_value - rem_value),
+        abs(true_rem_value - base),
+        abs_tol=atol,
     )
 
 
 def test_rem_decorator():
     true_rem_value = -2.0
 
-    qubits = list(circ.all_qubits())
+    num_qubits = len(qreg)
 
     # test with an executor that completely flips results
     p0 = 1
     p1 = 1
     inverse_confusion_matrix = generate_inverse_confusion_matrix(
-        qubits, p0=p0, p1=p1
+        num_qubits, p0=p0, p1=p1
     )
 
     @rem_decorator(

@@ -110,12 +110,12 @@ def test_execute_with_depolarizing_noise():
 
 
 def test_generate_inverse_confusion_matrix():
-    qubits = [cirq.LineQubit(i) for i in range(2)]
+    num_qubits = 2
     identity = np.identity(4)
     assert (
-        generate_inverse_confusion_matrix(qubits, p0=0, p1=0) == identity
+        generate_inverse_confusion_matrix(num_qubits, p0=0, p1=0) == identity
     ).all()
     assert (
-        generate_inverse_confusion_matrix(qubits, p0=1, p1=1)
+        generate_inverse_confusion_matrix(num_qubits, p0=1, p1=1)
         == np.flipud(identity)
     ).all()
