@@ -16,7 +16,7 @@ name: ddd-workflow-overview
 Workflow of the DDD technique in Mitiq, detailed in the [What happens when I use DDD?](ddd-4-low-level.myst) section.
 ```
 
-Below you can find sections of the documentation that address also the following questions:
+Below you can find sections of the documentation that address the following questions:
 
 
 ```{toctree}
