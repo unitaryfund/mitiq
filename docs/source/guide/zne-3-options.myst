@@ -222,31 +222,24 @@ Mitiq has only one noise scaling function for the *identity scaling* technique. 
 layers of identity gates such that they act evenly across all qubits in the circuit. A unitary $G$ is mapped as follows after
 a single identity layer is inserted :
 
-$$G \longrightarrow G I.$$
+$$G \longrightarrow I G$$
 
-Here, $G$ is one layer of gates in the input circuit where the gates in each layer are supposed to act at the same time instance.
+Here, $G$ is a single circuit layer containing individual that can be performed simultaneously.
 
-The Mitiq function for *identity insertion scaling* is {func}`.insert_id_layers()`. Depending on the `scale_factor`, the number of
-identity layers are inserted in such a way that the new scale factor is exactly the desired `scale_factor` or is very close to it. 
+To use this method, call {func}`.zne.scaling.insert_id_layers()` with both a circuit to scale, and a scale factor.
+Alternatively, pass it as the `scale_noise` argument to {func}`.zne.execute_with_zne` to use it instead of the default method of {func}`.fold_gates_at_random`.
 
 
-#### The difference between integer scale factors and real scale factors
+#### Integer and real scale factors
 
-When the scale factor is 1, no identity layers are inserted and circuit depth remains unchanged. For some scale factor greater than 1, 
-there will be some layers that are inserted uniformly after each moment and some inserted at random to get the desired scale factor. 
+When the scale factor is 1, no identity layers are inserted and circuit depth remains unchanged.
+For some scale factor greater than 1, there will need be some layers inserted non-uniformly to approach the desired scale factor. 
+
+##### Example
 
 Consider an input circuit of depth $d$.
-
-Let $\lambda$ be the desired scale factor, $n$ be the uniformly inserted identity layers and $s$ be the randomly inserted identity layers. 
-
-The circuit depth of the returned identity scaled circuit is $\lambda d = d(1+n) + s$. 
-
-Thus, an expression for the scale factor can be derived by comparing the new circuit depth to the initial circuit depth. 
-
-$$\lambda = 1 + n + \frac{s}{d} = 1 + \frac{dn+s}{d} = 1+ \frac{k}{d}.$$
-
-When $\lambda$ is an integer, $\lambda = 1+x$ where $x$ is some integer less than $\lambda$. If the scale factor is an integer, identity
-layers are inserted uniformly after each moment in the input circuit because $n = x$.
+Let $\lambda$ be the desired scale factor, $n$ be the number of uniformly inserted identity layers and $s$ be the number of randomly inserted identity layers. 
+The scaled circuit depth is then approximated as $\lambda d \approx d(1+n) + s$. 
 
 ```{figure} ../img/zne_id_scaling_example.png
 ---
@@ -283,10 +276,8 @@ scaled_circuit = zne.scaling.insert_id_layers(circuit, scale_factor=5)
 print("Identity Scaled circuit:", scaled_circuit, sep="\n")
 ```
 
-If the scale factor is a real number greater than or equal to 1, the identity layer insertion can be described as a mix of uniform
-and randomly inserted layers. In this case, the identity layers are inserted uniformly for some integer value and to be able to achieve
-the intended scale factor, there are some non-uniform layers inserted after some random layers in the original input circuit. The achieved
-scale factor might not be exactly the same as the actual scale factor but will be approximately close to it. 
+If the scale factor is a non-integer greater than or equal to 1, the identity layer insertion can be described as a mix of uniform and randomly inserted layers.
+In some cases, achieving the exact scale factor is not possible, but this method will insert identities appropriately to closely approximate it.
 
 ```{figure} ../img/zne_id_scaling_real_factor.png
 ---
