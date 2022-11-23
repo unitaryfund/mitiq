@@ -418,9 +418,10 @@ class OperationRepresentation:
             basis_expansion: Representation of the ideal operation in a basis
                 of `NoisyOperation`s.
             is_qubit_dependent: If True, the representation
-                corresponds to the operation on the specific qubits defined in `ideal`.
-                If False, the representation is valid for the same gate even if
-                acting on different qubits from those specified in `ideal`.
+                corresponds to the operation on the specific qubits defined in
+                `ideal`. If False, the representation is valid for the same
+                gate even if acting on different qubits from those specified in
+                `ideal`.
 
         Raises:
             TypeError: If all keys of `basis_expansion` are not instances of
