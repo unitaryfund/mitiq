@@ -106,7 +106,7 @@ def generate_inverse_confusion_matrix(
 
 
 def generate_tensored_inverse_confusion_matrix(
-    num_qubits: int, confusion_matrices: list[npt.NDArray[np.float64]]
+    num_qubits: int, confusion_matrices: List[npt.NDArray[np.float64]]
 ) -> npt.NDArray[np.float64]:
     """
     Generates the inverse confusion matrix utilizing the supplied
