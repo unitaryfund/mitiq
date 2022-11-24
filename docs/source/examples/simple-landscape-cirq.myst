@@ -15,7 +15,7 @@ kernelspec:
 
 +++
 
-This tutorial shows an example in which the energy landscape for a two-qubit variational 
+This tutorial shows an example in which the energy landscape for a two-qubit variational
 circuit is explored with and without error mitigation.
 
 ```{code-cell} ipython3
@@ -42,11 +42,11 @@ def variational_circuit(gamma: float) -> Circuit:
     Returns:
         The two-qubit circuit with a fixed gamma.
     """
-        
+
     q0, q1 = LineQubit.range(2)
-        
+
     return Circuit([rx(gamma)(q0), CNOT(q0, q1), rx(gamma)(q1), CNOT(q0, q1), rx(gamma)(q0)])
-   
+
 ```
 
 We can visualize the circuit for a particular $\gamma$ as follows.
@@ -177,8 +177,8 @@ plt.ylim(-1.5, 1.5);
 plt.show()
 ```
 
-Noise usually tends to flatten expectation values towards a constant. Therefore error mitigation 
-can be used to increase the visibility the landscape and this fact can simplify the energy minimization 
+Noise usually tends to flatten expectation values towards a constant. Therefore error mitigation
+can be used to increase the visibility the landscape and this fact can simplify the energy minimization
 which is required in most variational algorithms such as VQE or QAOA.
 
 We also observe that the minimum of mitigated energy approximates well the theoretical ground state which is equal to $-1$. Indeed:
