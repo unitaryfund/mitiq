@@ -281,7 +281,7 @@ In some cases, achieving the exact scale factor is not possible, but this method
 ```{figure} ../img/zne_id_scaling_real_factor.png
 ---
 
-name: figzne
+name: figznescaling
 ---
 The diagram shows the uniform layers and random layer inserted in the input circuit
 after the initial circuit was scaled via identity insertion scaling for a real scale factor.
