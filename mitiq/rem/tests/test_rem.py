@@ -23,12 +23,12 @@ from cirq.experiments.single_qubit_readout_calibration_test import (
 import numpy as np
 import pytest
 
-from mitiq.interface.mitiq_cirq.cirq_utils import (
-    generate_inverse_confusion_matrix,
-)
 from mitiq.observable.observable import Observable
 from mitiq.observable.pauli import PauliString
 from mitiq._typing import MeasurementResult
+from mitiq.rem.inverse_confusion_matrix import (
+    generate_inverse_confusion_matrix,
+)
 from mitiq.rem.rem import execute_with_rem, mitigate_executor, rem_decorator
 from mitiq.raw import execute as raw_execute
 from mitiq.interface.mitiq_cirq import sample_bitstrings
