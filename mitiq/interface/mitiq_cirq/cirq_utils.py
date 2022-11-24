@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Cirq utility functions."""
 
+from functools import reduce
 from typing import Tuple
 
 import numpy as np
@@ -101,3 +102,30 @@ def execute_with_depolarizing_noise(
     rho = simulator.simulate(circuit).final_density_matrix
     expectation = np.real(np.trace(rho @ obs))
     return expectation
+
+
+def generate_inverse_confusion_matrix(
+    num_qubits: int,
+    p0: float = 0.01,
+    p1: float = 0.01,
+) -> npt.NDArray[np.float64]:
+    """
+    Generates the inverse confusion matrix assuming a single-qubit
+    model for measurement errors. This is useful for applying
+    the measurement error mitigation technique in ``mitiq.rem``.
+
+    Args:
+        num_qubits: The number of qubits in the system.
+        p0: Probability of flipping a 0 to a 1.
+        p1: Probability of flipping a 1 to a 0.
+
+    Returns:
+        The inverse confusion matrix.
+    """
+    # Build a tensored confusion matrix using a smaller single qubit confusion
+    # matrix. Implies that errors are uncorrelated among qubits.
+    cm = np.array([[1 - p0, p1], [p0, 1 - p1]])
+    inv_cm = np.linalg.pinv(cm)
+
+    tensored_inv_cm = reduce(np.kron, [inv_cm] * num_qubits)
+    return tensored_inv_cm

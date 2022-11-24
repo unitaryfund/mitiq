@@ -95,19 +95,24 @@ print(f"Error with mitigation (ZNE): {abs(ideal_value - mitigated_result):.{3}}"
 
 Here we observe that the application of ZNE reduces the estimation error when compared
 to the unmitigated result.
-In the example above, both the noise *scaling* and *inference* steps were taken behinds the scenes thanks to the default options of {func}`.execute_with_zne`. Below we provide more details about these two aspects of ZNE in Mitiq.
+In the example above, both the noise *scaling* and *inference* steps were taken behinds the scenes thanks to 
+the default options of {func}`.execute_with_zne` where the default noise scaling method is {func}`.fold_gates_at_random()`
+and the executor computes the average expectation value once. Below we provide more details about these two aspects of ZNE 
+in Mitiq.
 
 +++
 
 ## Select a noise scaling method
 In Mitiq, one can select a noise scaling method via *noise scaling functions*.
-A noise scaling function takes as input a circuit and a real scale factor and
+A noise scaling function takes a circuit and a real scale factor as two inputs and
 returns a new circuit. The returned circuit is equivalent to the input one (if executed on a noiseless backend),
 but is more sensitive to noise when executed on a real noisy backend. In practice, by applying a noise
-scaling function before the execution of a circuit, one can indirectly scale up the effect of noise.
+scaling function before the execution of a circuit, one can indirectly scale up the effect of noise. The noise scaling
+function can either increase the total circuit execution time by inserting unitaries or increase the wait times in the
+middle of a circuit execution. These two methods are *unitary folding* and *identity scaling* respectively.
 See the section [What additional options are available in ZNE?](zne-3-options.myst) for more details.
 
-For example, the function {func}`.fold_gates_at_random()` applies the *unitary folding* map $G -> G G^\dagger G$
+For example, the function {func}`.fold_gates_at_random()` applies the *unitary folding* map $G \rightarrow G G^\dagger G$
 to a random subset of gates of the input circuit.
 The folded circuit is more sensitive to gate errors since it has a number of gates approximately
 equal to `scale_factor * n`, where `n` is the number of gates in the input circuit.

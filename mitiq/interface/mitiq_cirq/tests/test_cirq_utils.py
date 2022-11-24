@@ -23,6 +23,9 @@ from mitiq.interface.mitiq_cirq import (
     execute_with_depolarizing_noise,
 )
 from mitiq._typing import MeasurementResult
+from mitiq.interface.mitiq_cirq.cirq_utils import (
+    generate_inverse_confusion_matrix,
+)
 
 
 def test_sample_bitstrings():
@@ -104,3 +107,15 @@ def test_execute_with_depolarizing_noise():
         qc, observable, noise3
     )
     assert np.isclose(observable_exp_value, 0.062452)
+
+
+def test_generate_inverse_confusion_matrix():
+    num_qubits = 2
+    identity = np.identity(4)
+    assert (
+        generate_inverse_confusion_matrix(num_qubits, p0=0, p1=0) == identity
+    ).all()
+    assert (
+        generate_inverse_confusion_matrix(num_qubits, p0=1, p1=1)
+        == np.flipud(identity)
+    ).all()
