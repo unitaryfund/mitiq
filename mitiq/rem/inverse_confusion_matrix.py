@@ -95,8 +95,9 @@ def generate_inverse_confusion_matrix(
     Returns:
         The inverse confusion matrix.
     """
-    # Build a tensored confusion matrix using a smaller single qubit confusion
-    # matrix. Implies that errors are uncorrelated among qubits.
+    # Use a smaller single qubit confusion matrix for generating
+    # the larger inverse confusion matrix (by tensoring).
+    # Implies that errors are uncorrelated among qubits.
     cm = np.array([[1 - p0, p1], [p0, 1 - p1]])
     inv_cm = np.linalg.pinv(cm)
 
@@ -121,8 +122,6 @@ def generate_tensored_inverse_confusion_matrix(
     Returns:
         The inverse confusion matrix.
     """
-    # Build a tensored confusion matrix using a smaller single qubit confusion
-    # matrix. Implies that errors are uncorrelated among qubits.
     inv_confusion_matrices = [np.linalg.pinv(cm) for cm in confusion_matrices]
     tensored_inv_cm = reduce(np.kron, inv_confusion_matrices)
 
