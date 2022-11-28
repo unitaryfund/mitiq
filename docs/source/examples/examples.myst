@@ -2,6 +2,7 @@
 
 ```{nbgallery}
 Mirror circuit benchmark improved with zero-noise extrapolation on AWS Braket <braket_mirror_circuit.md>
+Probabilistic error cancellation (PEC) with Mirror Circuits <pec_tutorial.md>
 Zero-noise extrapolation with Qiskit on IBMQ backends <ibmq-backends.myst>
 Zero-noise extrapolation with Cirq on IBMQ backends <cirq-ibmq-backends.myst>
 Zero-noise extrapolation with Braket on IonQ backend <zne-braket-ionq.myst>
