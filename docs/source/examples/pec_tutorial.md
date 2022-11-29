@@ -295,7 +295,7 @@ std_pec_values = np.std(pec_values, axis=1, ddof=1)
 plt.figure(figsize=(9, 5))
 
 plt.plot(depths, avg_true_values, label="True", lw=2)
-plt.errorbar(depths, avg_noisy_values, yerr=std_noisy_values, label="Raw", **kwargs)
+plt.errorbar(depths, avg_noisy_values, yerr=std_noisy_values, label="Raw")
 plt.errorbar(depths, avg_pec_values, yerr=std_pec_values, label="PEC", **kwargs)
     
 plt.title(f"""Simulator with mirror circuits using PEC \nqubits {qubits}, {trials} trials.""")
