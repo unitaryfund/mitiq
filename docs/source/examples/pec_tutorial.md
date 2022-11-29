@@ -13,9 +13,7 @@ kernelspec:
 
 # Probabilistic error cancellation (PEC) with Mirror Circuits
 
-This notebook shows improved performance on a mirror circuit benchmark with
-probabilistic error cancellation (PEC) extrapolation on the `braket_dm` noisy
-simulator.
+This notebook shows probabilistic error cancellation (PEC) improving performance of a mirror circuit benchmark  on the `braket_dm` noisy simulator.
 
 In PEC, the first step is to characterize the set of noisy, implementable operations $\{\mathcal{O_{\alpha}}\}$ of a computer so that we can represent the ideal (noiseless) operations $\{\mathcal{G}_i\}$ of a circuit in this basis, namely
 $$
