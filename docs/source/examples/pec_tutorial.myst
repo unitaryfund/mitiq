@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .md
+    extension: .myst
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.12.0
@@ -16,9 +16,11 @@ kernelspec:
 This notebook shows probabilistic error cancellation (PEC) improving performance of a mirror circuit benchmark  on the `braket_dm` noisy simulator.
 
 In PEC, the first step is to characterize the set of noisy, implementable operations $\{\mathcal{O_{\alpha}}\}$ of a quantum device so that we can represent the ideal (noiseless) operations $\{\mathcal{G}_i\}$ of a circuit in this basis, namely
+
 $$
 \mathcal{G}_i = \sum_{\alpha} \eta_{i, \alpha} \mathcal{O}_{\alpha}.
 $$
+
 Note that the calligraphic symbols $\mathcal{G}_i$ and $\mathcal{O}_{\alpha}$ stand for super-operators acting on the quantum state of the qubits as linear quantum channels, and $\eta_{i, \alpha} \in \mathbb{R}$.
 
 ## Setup
@@ -199,7 +201,6 @@ def execute(
     for circ_to_run in to_run:
         job_result = backend.run(circ_to_run, shots=shots).result()
         results.append(job_result.measurement_probabilities.get("".join(map(str, correct_bitstring)), 0.0))
-    print("Results:", results)
 
     return results
 ```
