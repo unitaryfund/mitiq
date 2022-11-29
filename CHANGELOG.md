@@ -1,6 +1,49 @@
 # Changelog
 
-## Version 0.21.0 (In Development)
+## Version 0.22.0 (In Development)
+
+## Version 0.21.0
+
+### Summary
+This release officially adds support for the learning-based PEC sub-technique which is now
+[fully documented](https://mitiq.readthedocs.io/en/latest/guide/pec-3-options.html) and ready to be applied by Mitiq users.
+We are still assessing the stability of this new sub-technique, so if you notice any bugs, please let us know by opening
+[issues](https://github.com/unitaryfund/mitiq/issues) on GitHub.
+
+Functions to apply Readout Error Mitigation (REM) are also introduced in this release, special thanks to Amir Ebrahimi for this contribution!
+
+During the release cycle we accepted the
+[RFC for implementation of calibration tools (Solution 1)](https://github.com/unitaryfund/mitiq/issues/#1578).
+
+In addition, this release adds support for qubit-independent representations for PEC, along with bug fixes and minor dependency upgrades.
+
+### All changes
+- Cleanup (some) Deprecation Warnings (#1556) [@purva-thakre]
+- Update qiskit requirement from ~=0.39.2 to ~=0.39.3 (#1611) [@dependabot]
+- Documentation for Identity Scaling (#1573) [@purva-thakre]
+- Bump flake8 from 5.0.4 to 6.0.0 (#1609) [@dependabot]
+- Techniques intro  documentation (#1603) [@nathanshammah]
+- Update pennylane requirement from ~=0.26.0 to ~=0.27.0 (#1590) [@dependabot]
+- Enable user to define qubit-independent representations (#1565) [@Misty-W]
+- Refactor generate_inverse_confusion_matrix (#1607) [@amirebrahimi]
+- REM implementation (#1449) [@amirebrahimi]
+- Update numpy requirement from ~=1.23.4 to ~=1.23.5 (#1600) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.34.1 to ~=1.34.3 (#1599) [@dependabot]
+- remove skipped test (#1598) [@natestemen]
+- Write user guide section for learning-based PEC (#1395) [@Misty-W]
+- Raise error when inserting DDD sequence with midcircuit measurement (#1586) [@natestemen]
+- use \prod instead of \Pi  documentationImprovements or additions to documentation (#1592) [@natestemen]
+- Update amazon-braket-sdk requirement from ~=1.34.0 to ~=1.34.1 (#1595) [@dependabot]
+- Learn biased noise parameters (#1510) [@Misty-W]
+- Update qiskit requirement from ~=0.39.0 to ~=0.39.1 (#1579) [@dependabot]
+- Update qiskit requirement from ~=0.39.1 to ~=0.39.2 (#1581) [dependabot]
+- Update amazon-braket-sdk requirement from ~=1.31.1 to ~=1.33.1 (#1585) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.33.1 to ~=1.33.2 (#1588) [@dependabot]
+- Update pennylane-qiskit requirement from ~=0.24.0 to ~=0.27.0 (#1591) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.33.2 to ~=1.34.0 (#1589) [@dependabot]
+- color output from pytest on CI (#1587) [@natestemen]
+- Implement conversions of IonQ native gates for Braket (#1525) [@yitchen-tim]
+- use python 3.10 for asv (#1580) [@natestemen]
 
 ## Version 0.20.0
 
