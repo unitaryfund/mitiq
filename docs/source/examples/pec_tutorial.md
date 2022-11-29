@@ -41,7 +41,6 @@ import qiskit
 
 import networkx as nx
 import numpy as np
-import pandas as pd
 
 from braket.devices import LocalSimulator
 from braket.circuits import Circuit, gates, Noise
