@@ -13,7 +13,7 @@ We are still assessing the stability of this new sub-technique, so if you notice
 Functions to apply Readout Error Mitigation (REM) are also introduced in this release, special thanks to Amir Ebrahimi for this contribution!
 
 During the release cycle we accepted the
-[RFC for implementation of calibration tools (Solution 1)](https://github.com/unitaryfund/mitiq/issues/#1578).
+[RFC for implementation of calibration tools (Solution 1)](https://github.com/unitaryfund/mitiq/issues/1578).
 
 In addition, this release adds support for qubit-independent representations for PEC, along with bug fixes and minor dependency upgrades.
 
