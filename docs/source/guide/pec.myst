@@ -23,7 +23,8 @@ pec-3-options.myst
 pec-4-low-level.myst
 pec-5-theory.myst
 ```
-Here is a tutorial on how to use PEC in Mitiq:
+Here are some tutorials on how to use PEC in Mitiq:
 - [Learning quasiprobability representations with a depolarizing noise model](../examples/learning-depolarizing-noise.myst)
+- [Probabilistic error cancellation (PEC) with Mirror Circuits](../examples/pec_tutorial.myst)
 
 You can find many more examples on a variety of error mitigation techniques in the **[Examples](../examples/examples.myst)** section of the documentation.
