@@ -16,11 +16,9 @@ During the release cycle we accepted the
 [RFC for implementation of calibration tools (Solution 1)](https://github.com/unitaryfund/mitiq/issues/1578).
 We also completed a prototype of this approach, which will be released in a future version of Mitiq.
 
-In addition, this release includes a basic PEC tutorial and adds support for qubit-independent representations for PEC, along with bug fixes
-and minor dependency upgrades.
+In addition, this release adds support for qubit-independent representations for PEC, along with bug fixes and minor dependency upgrades.
 
 ### All changes
-- Adding PEC simulator mitiq tutorial (#1612) [@vprusso]
 - Cleanup (some) Deprecation Warnings (#1556) [@purva-thakre]
 - Update qiskit requirement from ~=0.39.2 to ~=0.39.3 (#1611) [@dependabot]
 - Documentation for Identity Scaling (#1573) [@purva-thakre]
