@@ -13,7 +13,7 @@ kernelspec:
 
 # Probabilistic error cancellation (PEC) with Mirror Circuits
 
-This notebook shows probabilistic error cancellation (PEC) improving performance of a mirror circuit benchmark  on the `braket_dm` noisy simulator.
+This notebook shows probabilistic error cancellation (PEC) *Temme et al. PRL (2017)* {cite}`Temme_2017_PRL`, *Sun et al. PRLAppl (2021)* {cite}`Sun_2021_PRAppl`,  *Zhang et al. NatComm (2020)* {cite}`Zhang_2020_NatComm`, improving performance of a mirror circuit benchmark  on the `braket_dm` noisy simulator.
 
 In PEC, the first step is to characterize the set of noisy, implementable operations $\{\mathcal{O_{\alpha}}\}$ of a quantum device so that we can represent the ideal (noiseless) operations $\{\mathcal{G}_i\}$ of a circuit in this basis, namely
 
@@ -305,6 +305,4 @@ plt.ylabel("Expectation value")
 plt.legend();
 ```
 
-![PEC results](https://i.ibb.co/m4v1201/download.png)
-
-We can see that PEC on average improves the expectation value at each depth.
+We can see that PEC on average improves the expectation value at each depth. For an example of how one applies PEC on quantum hardware consult *Russo et al. PRL (2022)* {cite}`Russo_2022_Testing` and the companion [software repository](https://github.com/unitaryfund/research/tree/main/qem-on-hardware).
