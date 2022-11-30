@@ -6,11 +6,16 @@
 
 ### Summary
 This release officially adds support for the learning-based PEC sub-technique which is now
-[fully documented](https://mitiq.readthedocs.io/en/latest/guide/pec-3-options.html) and ready to be applied by Mitiq users.
+[fully documented](https://mitiq.readthedocs.io/en/latest/guide/pec-3-options.html#applying-learning-based-pec) and ready to be applied by
+Mitiq users.
 We are still assessing the stability of this new sub-technique, so if you notice any bugs, please let us know by opening
 [issues](https://github.com/unitaryfund/mitiq/issues) on GitHub.
 
 Functions to apply Readout Error Mitigation (REM) are also introduced in this release, special thanks to Amir Ebrahimi for this contribution!
+
+Also, the [noise scaling by identity insertion](https://mitiq.readthedocs.io/en/latest/guide/zne-3-options.html#identity-scaling)
+method is included in the ZNE section of the user guide. 
+Special thanks to Purva Thakre for this contribution!
 
 During the release cycle we accepted the
 [RFC for implementation of calibration tools (Solution 1)](https://github.com/unitaryfund/mitiq/issues/1578).
