@@ -281,13 +281,6 @@ for depth in depths:
     pec_values.append(pec_depth_values)
 ```
 
-For each call of `execute`, we have a collection of expectation values and signs. We combine them as per
-
-$$
-\frac{\eta}{M} \sum_{i=1}^M \sigma_i E_i
-$$
-
-which is an unbiased estimator of the true (noiseless) expectation value.
 
 Now we can visualize the results.
 
