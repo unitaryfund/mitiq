@@ -71,7 +71,7 @@ class Calibration:
 
     def compute_improvements(self):
         """compute improvement factors for each calibration result"""
-        best_val = 1.0
+        best_val = 0.0
         best_key = ""
         circuit_index = 0
         for i, result in enumerate(self.results):
@@ -81,7 +81,7 @@ class Calibration:
             for em_key, expval in result["mitigated"].items():
                 diff = abs((ideal - expval) / ideal)
                 error_diff = abs(unmitigated_error - diff)
-                if error_diff < best_val:
+                if error_diff > best_val:
                     best_val = error_diff
                     best_key = em_key
                     circuit_index = i
