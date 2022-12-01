@@ -96,10 +96,8 @@ There should be a new draft release on GitHub created by the
 previous step [here](https://github.com/unitaryfund/mitiq/releases). You
 will need to review it and publish the release.
 
-> -   GitHub will create compressed files with the repository.
-> -   GitHub adds the full changelog in the draft release. Please keep
->     the content related to the new release and remove the content
->     related to previous releases.
+-   GitHub will create compressed files with the repository.
+-   GitHub adds the full changelog in the draft release. Please keep the content related to the new release and remove the content related to previous releases.
 
 ```{note}
 If all the above steps have been successfully completed, ReadTheDocs
@@ -135,6 +133,13 @@ twine upload dist/*
 You need to be a registered maintainer of Mitiq project on PyPI to
 upload a new release on PyPI from your local machine.
 ```
+
+## Tell people 📢
+
+The release is done now!
+Congrats to you, and the team on your hard work.
+Make sure people know about the release by posting about it in the [`#mitiq`](https://discord.com/channels/764231928676089909/773957956659052605) and [`#uf-news`](https://discord.com/channels/764231928676089909/764231928676089912) channels on Discord.
+Finally, send a message to Frances to coordinate posts on our social accounts (or do this yourself if you have access).
 
 ## Update the new development version
 
