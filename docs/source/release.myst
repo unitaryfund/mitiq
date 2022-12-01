@@ -92,7 +92,7 @@ new release.
 ```
 
 There should be a new draft release on GitHub created by the
-[gh-release]{.title-ref} action, triggered by the tag you made in the
+[gh-release](https://github.com/unitaryfund/mitiq/blob/master/.github/workflows/gh-release.yml) action, triggered by the tag you made in the
 previous step [here](https://github.com/unitaryfund/mitiq/releases). You
 will need to review it and publish the release.
 
@@ -114,7 +114,7 @@ significant amount of time. You can check the build status
 ### Release the new version on PyPI
 
 Once the GitHub release is published, the release is also published on
-PyPI by the [publish-pypi]{.title-ref} action. This may require a few
+PyPI by the [publish-pypi](https://github.com/unitaryfund/mitiq/blob/master/.github/workflows/publish-pypi.yml) action. This may require a few
 minutes. If it seems like it didn\'t push a new version to PyPI, you can
 trigger it manually. Go to
 <https://github.com/unitaryfund/mitiq/actions/workflows/publish-pypi.yml>
