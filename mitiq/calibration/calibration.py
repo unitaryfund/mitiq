@@ -23,8 +23,8 @@ class Calibration:
     def __init__(
         self,
         executor: Executor,
-        ideal_executor: Executor,
         settings: Settings,
+        ideal_executor: Executor | None = None,
     ):
         self.executor = executor
         self.ideal_executor = ideal_executor
@@ -62,7 +62,9 @@ class Calibration:
                 mitigated[
                     f"{method_key}-{factory}-{scale_factors}-{scale_method}"
                 ] = mitiq_func(circuit, self.executor)
-            ideal = self.ideal_executor(circuit)
+            ideal = (
+                self.ideal_executor(circuit) if self.ideal_executor else 1.0
+            )
             expvals.append(
                 {"unmitigated": expval, "mitigated": mitigated, "ideal": ideal}
             )
