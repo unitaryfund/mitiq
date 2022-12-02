@@ -46,13 +46,9 @@ class Settings:
     def __init__(
         self,
         mitigation_methods: list[str],
-        circuit_types: list[str] = ["rb", "mirror"],
-        circuit_dimensions: tuple[int, int] = (5, 20),
-        method_params: dict[str, Any] = {
-            "scale_factors": [[1.0, 2.0, 3.0], [1.0, 3.0, 5.0]],
-            "scale_methods": [fold_global, fold_gates_at_random],
-            "factories": [RichardsonFactory, LinearFactory],
-        },
+        circuit_types: list[str],
+        circuit_dimensions: tuple[int, int],
+        method_params: dict[str, Any],
     ):
         self.mitigation_methods = mitigation_methods
         self.method_params = method_params
@@ -117,4 +113,9 @@ ZNESettings = Settings(
     ["zne"],
     circuit_types=["ghz", "rb", "mirror"],
     circuit_dimensions=(2, 5),
+    method_params={
+        "scale_factors": [[1.0, 2.0, 3.0], [1.0, 3.0, 5.0]],
+        "scale_methods": [fold_global, fold_gates_at_random],
+        "factories": [RichardsonFactory, LinearFactory],
+    },
 )
