@@ -60,7 +60,8 @@ class Calibration:
                 self.ideal_executor(circuit) if self.ideal_executor else 1.0
             )
             mitigated = {
-                method: [] for method in self.settings.mitigation_methods
+                method: {"results": [], "method_improvement_factor": 0.0}
+                for method in self.settings.mitigation_methods
             }
             for (
                 method,
@@ -69,7 +70,7 @@ class Calibration:
                 scale_method,
                 em_func,
             ) in self.settings.mitigate_functions():
-                em_method = mitigated[method]
+                em_method = mitigated[method]["results"]
                 em_method.append(
                     {
                         "extrapolation_method": factory.__name__,
@@ -96,13 +97,15 @@ class Calibration:
             ideal = result["ideal"]
             unmitigated = result["unmitigated"]
             unmitigated_error = abs((ideal - unmitigated) / ideal)
-            for em_key, expval in result["mitigated"].items():
-                diff = abs((ideal - expval) / ideal)
-                error_diff = abs(unmitigated_error - diff)
-                if error_diff > best_val:
-                    best_val = error_diff
-                    best_key = em_key
-                    circuit_index = i
+            for em_key, di in result["mitigated"].items():
+                for res in di["results"]:
+                    mitigated_expval = res["mitigated_value"]
+                    diff = abs((ideal - mitigated_expval) / ideal)
+                    error_diff = abs(unmitigated_error - diff)
+                    if error_diff > best_val:
+                        best_val = error_diff
+                        best_key = em_key
+                        circuit_index = i
         print("circuit index:", circuit_index)
         print("|ideal - best| / ideal =", best_val)
         return best_key
