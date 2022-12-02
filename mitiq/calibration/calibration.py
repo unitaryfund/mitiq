@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from typing import Any
 from mitiq import Executor
 from mitiq.calibration import Settings
 from math import prod
@@ -31,11 +32,12 @@ class Calibration:
         self.ideal_executor = ideal_executor
         self.settings = settings
         self.circuits = self.settings.make_circuits()
-        self.results = []
+        self.results: list[dict[str, Any]] = []
 
     def get_cost(self) -> dict[str, int]:
-        """Return expected number of noisy expectation values required for calibration.
-        If method requires simulation, returns number of ideal expectation values needed."""
+        """Return expected number of noisy expectation values required for
+        calibration. If ideal_executor is defined the calibration process will
+        simulate an equal number of expectation values."""
         num_circuits = len(self.circuits)
         num_methods = len(self.settings.mitigation_methods)
         num_options = prod(map(len, self.settings.method_params.values()))
@@ -47,31 +49,42 @@ class Calibration:
             "ideal_executions": ideal,
         }
 
-    def run_circuits(self) -> list[dict[str, float]]:
+    def run_circuits(self) -> None:
         """run the calibration circuits and store the ideal and noisy expectation values for each circuit."""
         expvals = []
         for circuit_data in self.circuits:
             circuit = circuit_data.circuit
-            expval = self.executor(circuit)
-            mitigated = {}
+            noisy_expval = self.executor(circuit)
+            ideal_expval = (
+                self.ideal_executor(circuit) if self.ideal_executor else 1.0
+            )
+            mitigated = {
+                method: [] for method in self.settings.mitigation_methods
+            }
             for (
-                method_key,
+                method,
                 factory,
                 scale_factors,
                 scale_method,
-                mitiq_func,
+                em_func,
             ) in self.settings.mitigate_functions():
-                mitigated[
-                    f"{method_key}-{factory}-{scale_factors}-{scale_method}"
-                ] = mitiq_func(circuit, self.executor)
-            ideal = (
-                self.ideal_executor(circuit) if self.ideal_executor else 1.0
-            )
+                em_method = mitigated[method]
+                em_method.append(
+                    {
+                        "extrapolation_method": factory.__name__,
+                        "scale_factors": scale_factors,
+                        "scale_noise_method": scale_method.__name__,
+                        "mitigated_value": em_func(circuit, self.executor),
+                    }
+                )
             expvals.append(
-                {"unmitigated": expval, "mitigated": mitigated, "ideal": ideal}
+                {
+                    "unmitigated": noisy_expval,
+                    "mitigated": mitigated,
+                    "ideal": ideal_expval,
+                }
             )
         self.results = expvals
-        # return expvals
 
     def compute_improvements(self):
         """compute improvement factors for each calibration result"""
