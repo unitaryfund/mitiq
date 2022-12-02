@@ -13,10 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from math import prod
 from typing import Any
+
 from mitiq import Executor
 from mitiq.calibration import Settings
-from math import prod
 
 
 class Calibration:

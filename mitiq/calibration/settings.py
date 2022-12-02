@@ -13,28 +13,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from collections import namedtuple
+from functools import partial
+from itertools import product
+from typing import Any, Callable
+
+import networkx as nx
+
+from mitiq._typing import QPROGRAM
+from mitiq.benchmarks import (
+    generate_ghz_circuit,
+    generate_mirror_circuit,
+    generate_quantum_volume_circuit,
+    generate_rb_circuits,
+)
+from mitiq.pec import execute_with_pec
+from mitiq.zne import execute_with_zne
+from mitiq.zne.inference import ExpFactory, LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import (
-    fold_global,
     fold_gates_at_random,
+    fold_global,
     insert_id_layers,
 )
-from mitiq.zne.inference import RichardsonFactory, LinearFactory, ExpFactory
-from mitiq.zne import execute_with_zne
-from mitiq.pec import execute_with_pec
-from mitiq.benchmarks import (
-    generate_rb_circuits,
-    generate_mirror_circuit,
-    generate_ghz_circuit,
-    generate_quantum_volume_circuit,
-)
-from mitiq._typing import QPROGRAM
-
-from typing import Callable, Any
-import networkx as nx
-from collections import namedtuple
-from itertools import product
-from functools import partial
-
 
 CircuitData = namedtuple(
     "CircuitData",
