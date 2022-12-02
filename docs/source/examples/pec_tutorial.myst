@@ -217,7 +217,7 @@ is replaced by $G_i$ with probability $|a_i| /\gamma$, where $\gamma=\sum_i |a_i
 This procedure is repeated multiple times, generating $M$ (`num_samples`) circuits. The associated noisy expectation values are re-combined by Mitiq according to the following formula
 
 $$
-\frac{\gamma}{M} \sum_{i=1}^M \sigma_i E_i ,
+\frac{\gamma}{M} \sum_{i=1}^M {\rm sign}(a_i) E_i ,
 $$
 
 which is an unbiased estimator of the true (noiseless) expectation value.
