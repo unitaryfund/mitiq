@@ -46,7 +46,6 @@ class Settings:
     def __init__(
         self,
         mitigation_methods: list[str],
-        max_executions: int = 1000,
         circuit_types: list[str] = ["rb", "mirror"],
         circuit_dimensions: tuple[int, int] = (5, 20),
         method_params: dict[str, Any] = {
@@ -57,7 +56,6 @@ class Settings:
     ):
         self.mitigation_methods = mitigation_methods
         self.method_params = method_params
-        self.max_executions = max_executions
         self.circuit_types = circuit_types
         self.circuit_dimensions = circuit_dimensions
 

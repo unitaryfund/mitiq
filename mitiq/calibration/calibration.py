@@ -15,6 +15,7 @@
 
 from mitiq import Executor
 from mitiq.calibration import Settings
+from math import prod
 
 
 class Calibration:
@@ -37,8 +38,9 @@ class Calibration:
         If method requires simulation, returns number of ideal expectation values needed."""
         num_circuits = len(self.circuits)
         num_methods = len(self.settings.mitigation_methods)
+        num_options = prod(map(len, self.settings.method_params.values()))
 
-        noisy = num_circuits * self.settings.max_executions * num_methods
+        noisy = num_circuits * num_methods * num_options
         ideal = noisy if self.ideal_executor else 0
         return {
             "noisy_executions": noisy,
