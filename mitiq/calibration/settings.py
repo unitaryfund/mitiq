@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from collections import namedtuple
+from dataclasses import dataclass
 from functools import partial
 from itertools import product
 from typing import Any, Callable
@@ -36,13 +36,17 @@ from mitiq.zne.scaling import (
     insert_id_layers,
 )
 
-CircuitData = namedtuple(
-    "CircuitData",
-    ["circuit", "metadata"],
-)
+
+@dataclass
+class CircuitData:
+    circuit: QPROGRAM
+    dimensions: tuple[int, int]
+    metadata: dict[str, Any]
 
 
 class Settings:
+    """A class to store settings relating to error mitigation calibration."""
+
     def __init__(
         self,
         mitigation_methods: list[str],
@@ -55,7 +59,7 @@ class Settings:
         self.circuit_types = circuit_types
         self.circuit_dimensions = circuit_dimensions
 
-    def make_circuits(self) -> list[QPROGRAM]:
+    def make_circuits(self) -> list[CircuitData]:
         """Generate circuits specified by `circuit_types` and `circuit_dimensions`"""
         circuits = []
         nqubits, depth = self.circuit_dimensions
@@ -77,7 +81,13 @@ class Settings:
                     f"invalid value passed for `circuit_types`. Must be one of `ghz`, `rb`, `mirror`, or `qv`, but got {circuit_type}"
                 )
 
-            circuits.append(CircuitData(circuit, circuit_type))
+            circuits.append(
+                CircuitData(
+                    circuit,
+                    self.circuit_dimensions,
+                    {"circuit_type": circuit_type},
+                )
+            )
         return circuits
 
     def mitigate_functions(self) -> list[tuple[str, Callable]]:
