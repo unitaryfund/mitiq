@@ -41,7 +41,8 @@ from mitiq.zne.scaling import (
 class CircuitData:
     circuit: QPROGRAM
     dimensions: tuple[int, int]
-    metadata: dict[str, Any]
+    type: str
+    two_qubit_gate_count: int
 
 
 class Settings:
@@ -89,10 +90,8 @@ class Settings:
                 CircuitData(
                     circuit,
                     circuit_dimensions,
-                    {
-                        "circuit_type": circuit_type,
-                        "two_qubit_gate_count": two_qubit_gate_count,
-                    },
+                    circuit_type,
+                    two_qubit_gate_count,
                 )
             )
         return circuits
