@@ -297,7 +297,7 @@ std_pec_values = np.std(pec_values, axis=1, ddof=1)
 plt.figure(figsize=(9, 5))
 
 plt.plot(depths, avg_true_values,  '--', label="True", lw=2)
-eb = plt.errorbar(depths, avg_noisy_values, yerr=std_noisy_values, label="Raw")
+eb = plt.errorbar(depths, avg_noisy_values, yerr=std_noisy_values, label="Raw", ls='-.')
 eb[-1][0].set_linestyle('-.')
 plt.errorbar(depths, avg_pec_values, yerr=std_pec_values, label="PEC")
     
