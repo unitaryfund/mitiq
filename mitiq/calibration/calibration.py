@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from math import prod
+from math import prod, sqrt
 from typing import Any
 
 from mitiq import Executor
@@ -60,7 +60,7 @@ class Calibration:
                 self.ideal_executor(circuit) if self.ideal_executor else 1.0
             )
             mitigated = {
-                method: {"results": [], "method_improvement_factor": 0.0}
+                method: {"results": [], "method_improvement_factor": None}
                 for method in self.settings.mitigation_methods
             }
             for (
@@ -97,14 +97,27 @@ class Calibration:
             ideal = result["ideal"]
             unmitigated = result["unmitigated"]
             unmitigated_error = abs((ideal - unmitigated) / ideal)
-            for em_key, di in result["mitigated"].items():
+            for method, di in result["mitigated"].items():
+                results = di["results"]
+                mitigated_vals = list(
+                    map(lambda di: di["mitigated_value"], results)
+                )
+                method_improvement_factor = abs(unmitigated - ideal) / sqrt(
+                    len(mitigated_vals)
+                    * sum(
+                        (mitigated_val - ideal) ** 2
+                        for mitigated_val in mitigated_vals
+                    )
+                )
+                di["method_improvement_factor"] = method_improvement_factor
+
                 for res in di["results"]:
                     mitigated_expval = res["mitigated_value"]
                     diff = abs((ideal - mitigated_expval) / ideal)
                     error_diff = abs(unmitigated_error - diff)
                     if error_diff > best_val:
                         best_val = error_diff
-                        best_key = em_key
+                        best_key = method
                         circuit_index = i
         print("circuit index:", circuit_index)
         print("|ideal - best| / ideal =", best_val)
