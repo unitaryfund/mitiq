@@ -81,11 +81,18 @@ class Settings:
                     f"invalid value passed for `circuit_types`. Must be one of `ghz`, `rb`, `mirror`, or `qv`, but got {circuit_type}"
                 )
 
+            circuit_dimensions = (len(circuit.all_qubits()), len(circuit))
+            two_qubit_gate_count = sum(
+                [len(op.qubits) > 1 for op in circuit.all_operations()]
+            )
             circuits.append(
                 CircuitData(
                     circuit,
-                    self.circuit_dimensions,
-                    {"circuit_type": circuit_type},
+                    circuit_dimensions,
+                    {
+                        "circuit_type": circuit_type,
+                        "two_qubit_gate_count": two_qubit_gate_count,
+                    },
                 )
             )
         return circuits
