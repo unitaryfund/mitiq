@@ -1,21 +1,22 @@
 # Examples
 
 ```{nbgallery}
-ZNE with Braket on a Rigetti backend: Improving mirror circuits <braket_mirror_circuit.md>
-PEC with Braket on a Braket simulator: Improving mirror circuits <pec_tutorial.myst>
-ZNE with Qiskit on IBM Quantum backends <ibmq-backends.myst>
-ZNE with Cirq on IBM Quantum backends <cirq-ibmq-backends.myst>
-ZNE with Braket on IonQ backends <zne-braket-ionq.myst>
-ZNE with Pennylane on IBMQ backends <pennylane-ibmq-backends.myst>
+PEC on a Braket simulator: Mirror circuits <pec_tutorial.myst>
+PEC with Cirq: Learning representations <learning-depolarizing-noise.myst>
+ZNE on a Rigetti backend with Braket: Mirror circuits <braket_mirror_circuit.md>
+ZNE on IonQ backends with Braket <zne-braket-ionq.myst>
+ZNE on IBM Quantum backends with Qiskit <ibmq-backends.myst>
+ZNE on IBMQ backends with Pennylane <pennylane-ibmq-backends.myst>
+ZNE on IBM Quantum backends with Cirq <cirq-ibmq-backends.myst>
 ZNE with PyQuil: Parametric programs <pyquil_demo.ipynb>
 ZNE with PyQuil: Improving VQE <vqe-pyquil-demo.ipynb>
 ZNE with Cirq: Energy landscape of a variational circuit <simple-landscape-cirq.myst>
 ZNE with Qiskit: Energy landscape of a variational circuit <simple-landscape-qiskit.myst>
-ZNE: MaxCut benchmark <maxcut-demo.myst>
-Defining a Mitiq executor with a hamiltonian <hamiltonians.md>
-Mitiq paper codeblocks <mitiq-paper/mitiq-paper-codeblocks>
+ZNE with Cirq: Solving MaxCut with QAOA <maxcut-demo.myst>
+ZNE with Cirq: Hamiltonian simulation with Pauli gates<hamiltonians.md>
 ZNE with Cirq: Energy of molecular Hydrogen <molecular_hydrogen.myst>
 ZNE with PennyLane + Cirq: Energy of molecular Hydrogen <molecular_hydrogen_pennylane.myst>
+The Mitiq paper code <mitiq-paper/mitiq-paper-codeblocks>
 ZNE with OpenQASM: BQSKit compiler <bqskit.myst>
-PEC with Cirq: Representation learning with depolarizing noise <learning-depolarizing-noise.myst>
+
 ```
