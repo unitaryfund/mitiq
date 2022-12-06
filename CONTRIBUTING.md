@@ -180,7 +180,7 @@ This is a list of accepted request-for-comments (RFC) documents by date of creat
 
 - [Learning-based PEC RFC](https://docs.google.com/document/d/1VItesy6R5SlUa_YXW1km7IjFZ8kzyFeHUepHak1fEh4/edit) by Misty Wahl (@Misty-W) Oct 25, 2021
 
-- [Digital dynamical decoupling RFC](https://docs.google.com/document/d/1cRwFCTn6kUjI1P0kNydtevxIYtE4r8Omd_iWK0Pe8qo/edit#heading=h.mckr847qq60k) by Aaron Robertson (@Aaron-Robertson) Jan 28, 2021
+- [Digital dynamical decoupling RFC](https://docs.google.com/document/d/1cRwFCTn6kUjI1P0kNydtevxIYtE4r8Omd_iWK0Pe8qo/edit) by Aaron Robertson (@Aaron-Robertson) Jan 28, 2021
 
 
 ## Code of conduct
