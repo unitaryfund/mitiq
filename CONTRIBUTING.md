@@ -170,7 +170,7 @@ This is a list of accepted request-for-comments (RFC) documents by date of creat
 
 - [Implementation of Mitiq calibration RFC](https://docs.google.com/document/d/1EZUJyEEUQUH33UOgSIzCCvXyxP0WLOQn11W0x4Ox4nY/edit) by Andrea Mari (@andreamari) Nov 2, 2022
 
-- [Calibration RFC](https://docs.google.com/document/d/1otUHnTlyNS-0rxGAxltHLF1iD5C9qT9oEZ3jn8VHWgw/edit) by Andrea Mari (@andreamari) Oct 6, 2022
+- [Calibration tools for error mitigation RFC (abstract general solutions)](https://docs.google.com/document/d/1otUHnTlyNS-0rxGAxltHLF1iD5C9qT9oEZ3jn8VHWgw/edit) by Andrea Mari (@andreamari) Oct 6, 2022
 
 - [Identity insersion scaling RFC](https://docs.google.com/document/d/1hbd9frjYiSy0WujA0iCccc-oMO4Q-kZc2G4b3lkJHdk/edit) by Purva Thakre (@purva-thakre) Jun 29, 2022
 
