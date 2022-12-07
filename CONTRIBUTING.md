@@ -156,9 +156,7 @@ default of 88 (this is configured in the [`pyproject.toml`](https://github.com/u
 
 If you are interested in adding a larger new feature or other functionality to Mitiq, please make a copy of our
 Request For Comments (RFC) [template](https://docs.google.com/document/d/1adomheXpbqp4YIBFQ49IsAJzuJKWyr75GRO1NeWg0Fo/)
-and fill out the details of your enhancement proposal. Take a look at
-[previous RFCs](https://github.com/unitaryfund/mitiq/issues?q=is%3Aissue+is%3Aclosed+RFC) for examples on how to fill
-out your proposal. Once you have completed your proposal, then please
+and fill out the details of your enhancement proposal. Take a look at [previous RFCs](#list-of-accepted-rfcs) for examples on how to fill out your proposal. Once you have completed your proposal, then please
 [create a feature request issue](https://github.com/unitaryfund/mitiq/issues/new?assignees=&labels=feature-request&template=feature_request.md&title=)
 and add a link to your proposal document (make sure to enable commenting!). For any part of the template that you
 weren't able to complete please mention that in the PR description and/or discuss with us on
