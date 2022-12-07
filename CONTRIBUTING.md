@@ -168,7 +168,7 @@ weren't able to complete please mention that in the PR description and/or discus
 
 This is a list of accepted request-for-comments (RFC) documents by date of creation (reverse chronological order):
 
-- [Implementation of Mitiq calibration RFC](https://docs.google.com/document/d/1EZUJyEEUQUH33UOgSIzCCvXyxP0WLOQn11W0x4Ox4nY/edit) by Andrea Mari (@andreamari) Nov 2, 2022
+- [Implementation RFC for Mitiq calibration](https://docs.google.com/document/d/1EZUJyEEUQUH33UOgSIzCCvXyxP0WLOQn11W0x4Ox4nY/edit) by Andrea Mari (@andreamari) Nov 2, 2022
 
 - [Calibration tools for error mitigation RFC (abstract general solutions)](https://docs.google.com/document/d/1otUHnTlyNS-0rxGAxltHLF1iD5C9qT9oEZ3jn8VHWgw/edit) by Andrea Mari (@andreamari) Oct 6, 2022
 
