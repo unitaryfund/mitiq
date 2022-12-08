@@ -73,6 +73,7 @@ class Calibration:
                 em_method = mitigated[method]["results"]
                 em_method.append(
                     {
+                        "circuit_type": circuit_data.type,
                         "extrapolation_method": factory.__name__,
                         "scale_factors": scale_factors,
                         "scale_noise_method": scale_method.__name__,
@@ -88,16 +89,12 @@ class Calibration:
             )
         self.results = expvals
 
-    def compute_improvements(self):
+    def compute_improvements(self) -> None:
         """compute improvement factors for each calibration result"""
-        best_val = 0.0
-        best_key = ""
-        circuit_index = 0
-        for i, result in enumerate(self.results):
+        for result in self.results:
             ideal = result["ideal"]
             unmitigated = result["unmitigated"]
-            unmitigated_error = abs((ideal - unmitigated) / ideal)
-            for method, di in result["mitigated"].items():
+            for di in result["mitigated"].values():
                 results = di["results"]
                 mitigated_vals = list(
                     map(lambda di: di["mitigated_value"], results)
@@ -111,6 +108,15 @@ class Calibration:
                 )
                 di["method_improvement_factor"] = method_improvement_factor
 
+    def get_optimal_strategy(self) -> str:
+        """uses the improvement factors to propose optimal error mitigation strategy"""
+        best_val = 0.0
+        best_key = ""
+        for result in self.results:
+            ideal = result["ideal"]
+            unmitigated = result["unmitigated"]
+            unmitigated_error = abs((ideal - unmitigated) / ideal)
+            for method, di in result["mitigated"].items():
                 for res in di["results"]:
                     mitigated_expval = res["mitigated_value"]
                     diff = abs((ideal - mitigated_expval) / ideal)
@@ -118,15 +124,4 @@ class Calibration:
                     if error_diff > best_val:
                         best_val = error_diff
                         best_key = method
-                        circuit_index = i
-        print("circuit index:", circuit_index)
-        print("|ideal - best| / ideal =", best_val)
         return best_key
-
-    def get_optimal_strategy(self):
-        """uses the improvement factors to propose optimal error mitigation strategy"""
-        pass
-
-    def run(self):
-        """make_circuits -> run_circuits -> compute_improvements"""
-        pass
