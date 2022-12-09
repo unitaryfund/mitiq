@@ -101,17 +101,18 @@ Here we set a relatively small value of `num_samples` to obtain a reasonable exe
 However, we avoid using a number of PEC samples that is too small, as it can result in a large statistical error and ultimately cause the optimization process to fail.
 
 ```{code-cell} ipython3
-:tags: ["skip-execution"]
 pec_kwargs = {"num_samples": 500, "random_state": 1}
+observable = Observable(PauliString("XZ"), PauliString("YY"))
+```
 
+```{code-cell} ipython3
+:tags: ["skip-execution"]
 training_circuits = generate_training_circuits(
     circuit=circuit,
     num_training_circuits=5,
     fraction_non_clifford=0.2,
     random_state=np.random.RandomState(1),
 )
-
-observable = Observable(PauliString("XZ"), PauliString("YY"))
 
 ideal_values = np.array(ideal_executor.evaluate(training_circuits, observable))
 
