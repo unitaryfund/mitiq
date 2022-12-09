@@ -53,7 +53,7 @@ The new default event loop will not support Unix-style APIs used by some depende
 1. Locate your environment directory (likely `C:\Users\{username}\anaconda3\envs\{your_env}`), and open `{env_dir}/Lib/asyncio/__init__.py`.
 2. Add `import asyncio` to the file's import statements.
 3. Find the block of code below and replace it with the provided replacement.
-    * Original Code  
+    * Original Code
 
           if sys.platform == 'win32':  # pragma: no cover
               from .windows_events import *
@@ -61,8 +61,8 @@ The new default event loop will not support Unix-style APIs used by some depende
           else:
               from .unix_events import *  # pragma: no cover
               __all__ += unix_events.__all__
-  
-    * Replacement Code  
+
+    * Replacement Code
 
           if sys.platform == 'win32':  # pragma: no cover
               from .windows_events import *
@@ -71,7 +71,7 @@ The new default event loop will not support Unix-style APIs used by some depende
           else:
               from .unix_events import *  # pragma: no cover
               __all__ += unix_events.__all__
-  
+
 
 ### Adding tests
 If you add new features to a function or class, it is required to add tests for such object. Mitiq uses a nested structure for packaging tests in directories named `tests` at the same level of each module.
@@ -118,7 +118,7 @@ docstrings with
 ```bash
 (myenv) make doctest
 ```
-You may need to run `make docs` before you are able to run `make doctest`. 
+You may need to run `make docs` before you are able to run `make doctest`.
 
 ### Style Guidelines
 
@@ -156,13 +156,30 @@ default of 88 (this is configured in the [`pyproject.toml`](https://github.com/u
 
 If you are interested in adding a larger new feature or other functionality to Mitiq, please make a copy of our
 Request For Comments (RFC) [template](https://docs.google.com/document/d/1adomheXpbqp4YIBFQ49IsAJzuJKWyr75GRO1NeWg0Fo/)
-and fill out the details of your enhancement proposal. Take a look at
-[previous RFCs](https://github.com/unitaryfund/mitiq/issues?q=is%3Aissue+is%3Aclosed+RFC) for examples on how to fill
-out your proposal. Once you have completed your proposal, then please
+and fill out the details of your enhancement proposal. Take a look at [previous RFCs](#list-of-accepted-rfcs) for examples on how to fill out your proposal. Once you have completed your proposal, then please
 [create a feature request issue](https://github.com/unitaryfund/mitiq/issues/new?assignees=&labels=feature-request&template=feature_request.md&title=)
 and add a link to your proposal document (make sure to enable commenting!). For any part of the template that you
 weren't able to complete please mention that in the PR description and/or discuss with us on
 [discord](http://discord.unitary.fund).
+
+### List of accepted RFCs
+
+This is a list of accepted request-for-comments (RFC) documents by date of creation (reverse chronological order):
+
+- [Implementation RFC for Mitiq calibration](https://docs.google.com/document/d/1EZUJyEEUQUH33UOgSIzCCvXyxP0WLOQn11W0x4Ox4nY/edit) by Andrea Mari (@andreamari) Nov 2, 2022
+
+- [Calibration tools for error mitigation RFC (abstract general solutions)](https://docs.google.com/document/d/1otUHnTlyNS-0rxGAxltHLF1iD5C9qT9oEZ3jn8VHWgw/edit) by Andrea Mari (@andreamari) Oct 6, 2022
+
+- [Identity insersion scaling RFC](https://docs.google.com/document/d/1hbd9frjYiSy0WujA0iCccc-oMO4Q-kZc2G4b3lkJHdk/edit) by Purva Thakre (@purva-thakre) Jun 29, 2022
+
+- [Readout Confusion Inversion RFC](https://docs.google.com/document/d/1buO5PrO5sS02VXjcaYf37RuR0rF6xpyr4J9H1tI4vN4/edit) by Amir Ebrahimi (@amirebrahimi) Jun 16, 2022
+
+- [Documentation reorganization RFC](https://docs.google.com/document/d/13un5TZPknSOhmOBkrL2rsofjGfdp2jDnd-DywLpGFPc/edit) by Ryan LaRose (@rmlarose) Dec 1, 2021
+
+- [Learning-based PEC RFC](https://docs.google.com/document/d/1VItesy6R5SlUa_YXW1km7IjFZ8kzyFeHUepHak1fEh4/edit) by Misty Wahl (@Misty-W) Oct 25, 2021
+
+- [Digital dynamical decoupling RFC](https://docs.google.com/document/d/1cRwFCTn6kUjI1P0kNydtevxIYtE4r8Omd_iWK0Pe8qo/edit) by Aaron Robertson (@Aaron-Robertson) Jan 28, 2021
+
 
 ## Code of conduct
 Mitiq development abides to the [Contributors' Covenant](https://mitiq.readthedocs.io/en/latest/code_of_conduct.html).
