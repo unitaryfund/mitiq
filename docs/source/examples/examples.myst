@@ -1,8 +1,6 @@
 # Examples
 
 ```{nbgallery}
-PEC on a Braket simulator: Mirror circuits <pec_tutorial.myst>
-PEC with Cirq: Learning representations <learning-depolarizing-noise.myst>
 ZNE on a Rigetti backend with Braket: Mirror circuits <braket_mirror_circuit.md>
 ZNE on IonQ backends with Braket <zne-braket-ionq.myst>
 ZNE on IBM Quantum backends with Qiskit <ibmq-backends.myst>
@@ -16,7 +14,9 @@ ZNE with Cirq: Solving MaxCut with QAOA <maxcut-demo.myst>
 ZNE with Cirq: Hamiltonian simulation with Pauli gates<hamiltonians.md>
 ZNE with Cirq: Energy of molecular Hydrogen <molecular_hydrogen.myst>
 ZNE with PennyLane + Cirq: Energy of molecular Hydrogen <molecular_hydrogen_pennylane.myst>
-The Mitiq paper code <mitiq-paper/mitiq-paper-codeblocks>
 ZNE with OpenQASM: BQSKit compiler <bqskit.myst>
+PEC on a Braket simulator: Mirror circuits <pec_tutorial.myst>
+PEC with Cirq: Learning representations <learning-depolarizing-noise.myst>
+The Mitiq paper code <mitiq-paper/mitiq-paper-codeblocks>
 
 ```
