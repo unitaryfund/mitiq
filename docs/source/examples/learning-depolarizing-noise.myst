@@ -101,6 +101,7 @@ Here we set a relatively small value of `num_samples` to obtain a reasonable exe
 However, we avoid using a number of PEC samples that is too small, as it can result in a large statistical error and ultimately cause the optimization process to fail.
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 pec_kwargs = {"num_samples": 500, "random_state": 1}
 
 training_circuits = generate_training_circuits(
@@ -140,6 +141,16 @@ plt.xlabel("Noise strength")
 plt.ylabel("Loss")
 plt.show()
 ```
+
+```{figure} ../_thumbnails/learn-depolarizing.png
+---
+
+name: depolarizing_noise_loss_function
+---
+The figure is a plot of the loss function for optimizing quasi-probability representations assuming a depolarizing noise model depending on
+one real parameter.
+```
+
 
 Now we set the initial conditions for the optimization. For purposes of this demonstration, our initial guess for epsilon, `epsilon0`, is
 slightly offset from the true value of `epsilon`.
