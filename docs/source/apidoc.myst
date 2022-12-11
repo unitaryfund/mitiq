@@ -190,7 +190,7 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
 .. automodule:: mitiq.raw.raw
 ```
 
-## Readout Error Mitigation
+## Readout-Error Mitigation
 
 ### Measurement Result
 ```{eval-rst}
@@ -201,6 +201,12 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
 ### Post-selection
 ```{eval-rst}
 .. automodule:: mitiq.rem.post_select
+   :members:
+```
+
+### REM Technique
+```{eval-rst}
+.. automodule:: mitiq.rem.rem
    :members:
 ```
 
