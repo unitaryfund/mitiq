@@ -474,23 +474,29 @@ def test_exp_factory_no_asympt(test_f: Callable[[float], float]):
 
 @mark.parametrize("avoid_log", [False, True])
 @mark.parametrize("test_f", [f_poly_exp_down, f_poly_exp_up])
+@mark.parametrize("asymptote", [A, A + 1])
 def test_poly_exp_factory_with_asympt(
-    test_f: Callable[[float], float], avoid_log: bool
+    test_f: Callable[[float], float],
+    avoid_log: bool,
+    asymptote: float,
 ):
     """Test of (almost) exponential extrapolator."""
     # test that, for a non-linear exponent,
     # order=1 is bad while order=2 is better.
     seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = PolyExpFactory(X_VALS, order=1, asymptote=A, avoid_log=avoid_log)
+    fac = PolyExpFactory(
+        X_VALS, order=1, asymptote=asymptote, avoid_log=avoid_log
+    )
     fac.run_classical(seeded_f)
     assert not np.isclose(fac.reduce(), seeded_f(0, err=0), atol=NOT_CLOSE_TOL)
     seeded_f = apply_seed_to_func(test_f, SEED)
-    fac = PolyExpFactory(X_VALS, order=2, asymptote=A, avoid_log=avoid_log)
+    fac = PolyExpFactory(
+        X_VALS, order=2, asymptote=asymptote, avoid_log=avoid_log
+    )
     fac.run_classical(seeded_f)
     assert not fac._opt_params
 
     zne_value = fac.reduce()
-    assert np.isclose(zne_value, seeded_f(0, err=0), atol=POLYEXP_TOL)
 
     # There are four parameters to fit for the PolyExpFactory of order 1
     assert len(fac._opt_params) == 4
@@ -498,7 +504,11 @@ def test_poly_exp_factory_with_asympt(
     exp_values = [test_f(x) for x in X_VALS]
     assert np.isclose(
         PolyExpFactory.extrapolate(
-            X_VALS, exp_values, order=2, asymptote=A, avoid_log=avoid_log
+            X_VALS,
+            exp_values,
+            order=2,
+            asymptote=asymptote,
+            avoid_log=avoid_log,
         ),
         zne_value,
         atol=POLYEXP_TOL,
