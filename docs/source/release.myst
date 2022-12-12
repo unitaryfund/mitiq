@@ -1,31 +1,3 @@
-# Mitiq Git flow
-
-The basic development workflow for Mitiq is done in units of milestones.
-These are tracked in the GitHub milestone feature and all issues that
-are planned to be addressed in the current milestone should be tagged
-with the proper milestone.
-
-All releases for Mitiq are tagged on the `master` branch with tags for
-the version number of the release. Development work is done on separate
-branches and forks that get merged into `master` when they are ready to
-be included in the next release.
-
-The main steps of our git flow are as follows:
--   Feature work and bug fixes are done on branches (external
-    contributors should fork and then work on branches on their fork)
--   Once work is ready for review and inclusion in a release, make a PR
-    from the branch/fork to master on the Mitiq repo. Squash merges are
-    preferred.
--   PRs are then reviewed by the team and the community and then merged
-    into master as appropriate. This means that this feature/fix will be
-    included in the next release.
--   When it is time to make a release, a PR is made from the master
-    branch to the release branch and final automatic testing and manual
-    review is done to make sure it is good to be released.
--   Once the code is ready to be released, the PR from Master to release
-    is approved and a tag is created on release for the appropriate
-    semantic version number.
-
 # Releasing a new version of Mitiq
 
 ```{note}
