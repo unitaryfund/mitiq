@@ -103,6 +103,11 @@ However, we avoid using a number of PEC samples that is too small, as it can res
 ```{code-cell} ipython3
 pec_kwargs = {"num_samples": 500, "random_state": 1}
 observable = Observable(PauliString("XZ"), PauliString("YY"))
+
+import warnings
+# suppress warnings about missing representations
+# this example only simulates noise on CNOT
+warnings.simplefilter("ignore", UserWarning)
 ```
 
 ```{code-cell} ipython3
@@ -118,11 +123,6 @@ ideal_values = np.array(ideal_executor.evaluate(training_circuits, observable))
 
 epsilons = np.linspace(0.03, 0.07, 9)
 
-import warnings
-
-# suppress warnings about missing representations
-# this example only simulates noise on CNOT
-warnings.simplefilter("ignore", UserWarning)
 loss = [
     depolarizing_noise_loss_function(
         [eps],
