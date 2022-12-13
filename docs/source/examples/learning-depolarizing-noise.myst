@@ -102,7 +102,16 @@ However, we avoid using a number of PEC samples that is too small, as it can res
 
 ```{code-cell} ipython3
 pec_kwargs = {"num_samples": 500, "random_state": 1}
+observable = Observable(PauliString("XZ"), PauliString("YY"))
 
+import warnings
+# suppress warnings about missing representations
+# this example only simulates noise on CNOT
+warnings.simplefilter("ignore", UserWarning)
+```
+
+```{code-cell} ipython3
+:tags: ["skip-execution"]
 training_circuits = generate_training_circuits(
     circuit=circuit,
     num_training_circuits=5,
@@ -110,17 +119,10 @@ training_circuits = generate_training_circuits(
     random_state=np.random.RandomState(1),
 )
 
-observable = Observable(PauliString("XZ"), PauliString("YY"))
-
 ideal_values = np.array(ideal_executor.evaluate(training_circuits, observable))
 
 epsilons = np.linspace(0.03, 0.07, 9)
 
-import warnings
-
-# suppress warnings about missing representations
-# this example only simulates noise on CNOT
-warnings.simplefilter("ignore", UserWarning)
 loss = [
     depolarizing_noise_loss_function(
         [eps],
@@ -140,6 +142,16 @@ plt.xlabel("Noise strength")
 plt.ylabel("Loss")
 plt.show()
 ```
+
+```{figure} ../_thumbnails/learn-depolarizing.png
+---
+
+name: depolarizing_noise_loss_function
+---
+The figure is a plot of the loss function for optimizing quasi-probability representations assuming a depolarizing noise model depending on
+one real parameter.
+```
+
 
 Now we set the initial conditions for the optimization. For purposes of this demonstration, our initial guess for epsilon, `epsilon0`, is
 slightly offset from the true value of `epsilon`.
