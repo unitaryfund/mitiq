@@ -1364,12 +1364,8 @@ class PolyExpFactory(BatchedFactory):
         # Deduce "sign" parameter of the exponential ansatz
         linear_params, _ = mitiq_polyfit(scale_factors, exp_values, deg=1)
 
-        if (
-            asymptote is not None
-            and np.sign(-linear_params[0] * (asymptote - linear_params[1]))
-            == 1
-        ):
-            sign = np.sign(linear_params[0])
+        if asymptote is not None:
+            sign = np.sign(-(asymptote - linear_params[1]))
         else:
             sign = np.sign(-linear_params[0])
 
