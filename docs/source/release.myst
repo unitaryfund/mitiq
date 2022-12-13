@@ -2,7 +2,7 @@
 
 ```{note}
 These instructions are for Mitiq maintainers.
-Releasing a new version of Mitiq is typically performed by the milestone manager whose responsibilities are detailed [here](https://mitiq.readthedocs.io/en/stable/milestone_managing.html).
+Releasing a new version of Mitiq is typically performed by the milestone manager whose responsibilities are detailed [here](./milestone_managing).
 ```
 
 When the time is ready for a new release, follow the checklist and
