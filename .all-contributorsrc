@@ -292,7 +292,11 @@
       "profile": "https://github.com/Misty-W",
       "contributions": [
         "code",
-        "example"
+        "example",
+        "ideas",
+        "test",
+        "maintenance",
+        "doc"
       ]
     },
     {
@@ -373,5 +377,6 @@
   "projectOwner": "unitaryfund",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "angular"
 }
