@@ -16,10 +16,10 @@ ZNE with Qiskit: Energy landscape of a variational circuit <simple-landscape-qis
 ZNE with Cirq: Solving MaxCut with QAOA <maxcut-demo.myst>
 ZNE with Cirq: Hamiltonian simulation with Pauli gates<hamiltonians.md>
 ZNE with Cirq: Energy of molecular Hydrogen <molecular_hydrogen.myst>
+ZNE with Cirq: Noise scaling methods <scaling.md>
 ZNE with PennyLane + Cirq: Energy of molecular Hydrogen <molecular_hydrogen_pennylane.myst>
 ZNE with BQSKit compiled circuits <bqskit.myst>
 PEC on a Braket simulator: Mirror circuits <pec_tutorial.myst>
 PEC with Cirq: Learning representations <learning-depolarizing-noise.myst>
 The Mitiq paper code <mitiq-paper/mitiq-paper-codeblocks>
-
 ```
