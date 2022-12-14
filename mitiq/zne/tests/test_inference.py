@@ -533,6 +533,27 @@ def test_poly_exp_factory_no_asympt(test_f: Callable[[float], float]):
     )
 
 
+@mark.parametrize("infinite_noise_limit", [0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2])
+@mark.parametrize(
+    "exp_vals", [[0.700000001, 0.7, 0.7, 0.7], [0.7, 0.7, 0.7, 0.700001]]
+)
+def test_poly_exp_factory_converges_toward_asympt(
+    exp_vals: List[float],
+    infinite_noise_limit: float,
+):
+    """Test of (almost) exponential extrapolator in special cases"""
+    # show that the extrapolation achieves the best fit even when the measured
+    # data decay or grow away from the expected direction as indicated by the
+    # asymptote
+    scale_factors = [1.0, 2, 3, 4]
+    assert np.isclose(
+        ExpFactory.extrapolate(
+            scale_factors, exp_vals, asymptote=infinite_noise_limit
+        ),
+        0.7,
+    )
+
+
 @mark.parametrize("avoid_log", [False, True])
 @mark.parametrize("test_f", [f_exp_down, f_exp_up])
 def test_ada_exp_factory_with_asympt(
