@@ -32,8 +32,17 @@ class Calibration:
         | Callable[[QPROGRAM], QuantumResult]
         | None = None,
     ):
-        self.executor = executor
-        self.ideal_executor = ideal_executor
+
+        self.executor = (
+            Executor(executor)
+            if not isinstance(executor, Executor)
+            else executor
+        )
+        self.ideal_executor = (
+            Executor(ideal_executor)
+            if ideal_executor and not isinstance(ideal_executor, Executor)
+            else ideal_executor
+        )
         self.settings = settings
         self.circuits = self.settings.make_circuits()
         self.results: list[dict[str, Any]] = []
@@ -60,29 +69,24 @@ class Calibration:
         expvals = []
         for circuit_data in self.circuits:
             circuit = circuit_data.circuit
-            noisy_expval = self.executor(circuit)
+            noisy_expval = self.executor.evaluate(circuit)[0]
             ideal_expval = (
-                self.ideal_executor(circuit) if self.ideal_executor else 1.0
+                self.ideal_executor.evaluate(circuit)[0]
+                if self.ideal_executor
+                else 1.0
             )
-            mitigated = {
-                method: {"results": [], "method_improvement_factor": None}
-                for method in self.settings.techniques
+            mitigated: dict[str, dict[str, Any]] = {
+                technique: {"results": [], "method_improvement_factor": None}
+                for technique in self.settings.techniques
             }
-            for (
-                method,
-                factory,
-                scale_factors,
-                scale_method,
-                em_func,
-            ) in self.settings.mitigate_functions():
-                em_method = mitigated[method]["results"]
-                em_method.append(
+            for strategy in self.settings.make_strategies():
+                mitigated[strategy.technique]["results"].append(
                     {
                         "circuit_type": circuit_data.type,
-                        "extrapolation_method": factory.__name__,
-                        "scale_factors": scale_factors,
-                        "scale_noise_method": scale_method.__name__,
-                        "mitigated_value": em_func(circuit, self.executor),
+                        "mitigated_value": strategy.mitigation_function(
+                            circuit, self.executor
+                        ),
+                        **strategy.technique_params,
                     }
                 )
             expvals.append(

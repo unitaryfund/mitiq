@@ -16,34 +16,42 @@
 from dataclasses import dataclass
 from functools import partial
 from itertools import product
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 import networkx as nx
+import cirq
 
-from mitiq._typing import QPROGRAM
+from mitiq._typing import QuantumResult
 from mitiq.benchmarks import (
     generate_ghz_circuit,
     generate_mirror_circuit,
     generate_quantum_volume_circuit,
     generate_rb_circuits,
 )
-from mitiq.pec import execute_with_pec
+
+# from mitiq.pec import execute_with_pec
 from mitiq.zne import execute_with_zne
-from mitiq.zne.inference import ExpFactory, LinearFactory, RichardsonFactory
+from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import (
     fold_gates_at_random,
     fold_global,
-    insert_id_layers,
 )
 
 
 @dataclass
 class CircuitData:
-    circuit: QPROGRAM
+    circuit: cirq.Circuit
     num_qubits: int
     circuit_depth: int
     type: str
     two_qubit_gate_count: int
+
+
+@dataclass
+class Strategy:
+    technique: str
+    technique_params: dict[str, Any]
+    mitigation_function: Callable[..., QuantumResult]
 
 
 class Settings:
@@ -83,9 +91,12 @@ class Settings:
                 circuit = generate_quantum_volume_circuit(nqubits, depth)[0]
             else:
                 raise ValueError(
-                    f"invalid value passed for `circuit_types`. Must be one of `ghz`, `rb`, `mirror`, or `qv`, but got {circuit_type}"
+                    "invalid value passed for `circuit_types`. Must be "
+                    "one of `ghz`, `rb`, `mirror`, or `qv`, "
+                    f"but got {circuit_type}."
                 )
 
+            circuit = cast(cirq.Circuit, circuit)
             two_qubit_gate_count = sum(
                 [len(op.qubits) > 1 for op in circuit.all_operations()]
             )
@@ -100,7 +111,7 @@ class Settings:
             )
         return circuits
 
-    def mitigate_functions(self) -> list[tuple[str, Callable]]:
+    def make_strategies(self) -> list[Strategy]:
         """Generates a list of ready to apply error mitigation functions
         preloaded with hyperparameters."""
         funcs = []
@@ -118,13 +129,22 @@ class Settings:
                         scale_noise=scale_method,
                     )
                     funcs.append(
-                        ("zne", factory, scale_factors, scale_method, em_func)
+                        Strategy(
+                            method,
+                            {
+                                "factory": factory.__name__,
+                                "scale_factors": scale_factors,
+                                "scale_method": scale_method.__name__,
+                            },
+                            em_func,
+                        )
                     )
-            elif method == "pec":
-                funcs.append(("pec", execute_with_pec))
+            # elif method == "pec":
+            #     funcs.append(("pec", execute_with_pec))
             else:
                 raise ValueError(
-                    "invalid value passed for mitigation_methods. Must be one of `zne`, `pec`"
+                    "Invalid value passed for mitigation_methods. "
+                    "Must be one of `zne`, `pec`"
                 )
         return funcs
 
