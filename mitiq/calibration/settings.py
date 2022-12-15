@@ -50,13 +50,13 @@ class Settings:
 
     def __init__(
         self,
-        mitigation_methods: list[str],
+        techniques: list[str],
         circuit_types: list[str],
         circuit_dimensions: tuple[int, int],
-        method_params: dict[str, Any],
+        technique_params: dict[str, Any],
     ):
-        self.mitigation_methods = mitigation_methods
-        self.method_params = method_params
+        self.techniques = techniques
+        self.technique_params = technique_params
         self.circuit_types = circuit_types
         self.circuit_dimensions = circuit_dimensions
 
@@ -101,12 +101,12 @@ class Settings:
         """Generates a list of ready to apply error mitigation functions
         preloaded with hyperparameters."""
         funcs = []
-        for method in self.mitigation_methods:
+        for method in self.techniques:
             if method == "zne":
                 for factory, scale_factors, scale_method in product(
-                    self.method_params["factories"],
-                    self.method_params["scale_factors"],
-                    self.method_params["scale_methods"],
+                    self.technique_params["factories"],
+                    self.technique_params["scale_factors"],
+                    self.technique_params["scale_methods"],
                 ):
                     inference_func = factory(scale_factors)
                     em_func = partial(
@@ -130,7 +130,7 @@ ZNESettings = Settings(
     ["zne"],
     circuit_types=["ghz", "rb", "mirror"],
     circuit_dimensions=(2, 5),
-    method_params={
+    technique_params={
         "scale_factors": [[1.0, 2.0, 3.0], [1.0, 3.0, 5.0]],
         "scale_methods": [fold_global, fold_gates_at_random],
         "factories": [RichardsonFactory, LinearFactory],

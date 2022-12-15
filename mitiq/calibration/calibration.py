@@ -44,8 +44,8 @@ class Calibration:
         Calibration object, the number of classical simulations is also
         returned."""
         num_circuits = len(self.circuits)
-        num_methods = len(self.settings.mitigation_methods)
-        num_options = prod(map(len, self.settings.method_params.values()))
+        num_methods = len(self.settings.techniques)
+        num_options = prod(map(len, self.settings.technique_params.values()))
 
         noisy = num_circuits * num_methods * num_options
         ideal = noisy if self.ideal_executor else 0
@@ -66,7 +66,7 @@ class Calibration:
             )
             mitigated = {
                 method: {"results": [], "method_improvement_factor": None}
-                for method in self.settings.mitigation_methods
+                for method in self.settings.techniques
             }
             for (
                 method,
