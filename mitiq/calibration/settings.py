@@ -40,7 +40,8 @@ from mitiq.zne.scaling import (
 @dataclass
 class CircuitData:
     circuit: QPROGRAM
-    dimensions: tuple[int, int]
+    num_qubits: int
+    circuit_depth: int
     type: str
     two_qubit_gate_count: int
 
@@ -52,19 +53,21 @@ class Settings:
         self,
         techniques: list[str],
         circuit_types: list[str],
-        circuit_dimensions: tuple[int, int],
+        num_qubits: int,
+        circuit_depth: int,
         technique_params: dict[str, Any],
     ):
         self.techniques = techniques
         self.technique_params = technique_params
         self.circuit_types = circuit_types
-        self.circuit_dimensions = circuit_dimensions
+        self.num_qubits = num_qubits
+        self.circuit_depth = circuit_depth
 
     def make_circuits(self) -> list[CircuitData]:
         """Generate the circuits to run in a calibration experiment via the
         parameters passed in initialization."""
         circuits = []
-        nqubits, depth = self.circuit_dimensions
+        nqubits, depth = self.num_qubits, self.circuit_depth
         for circuit_type in self.circuit_types:
             if circuit_type == "ghz":
                 circuit = generate_ghz_circuit(nqubits)
@@ -83,16 +86,16 @@ class Settings:
                     f"invalid value passed for `circuit_types`. Must be one of `ghz`, `rb`, `mirror`, or `qv`, but got {circuit_type}"
                 )
 
-            circuit_dimensions = (len(circuit.all_qubits()), len(circuit))
             two_qubit_gate_count = sum(
                 [len(op.qubits) > 1 for op in circuit.all_operations()]
             )
             circuits.append(
                 CircuitData(
                     circuit,
-                    circuit_dimensions,
-                    circuit_type,
-                    two_qubit_gate_count,
+                    num_qubits=len(circuit.all_qubits()),
+                    circuit_depth=len(circuit),
+                    type=circuit_type,
+                    two_qubit_gate_count=two_qubit_gate_count,
                 )
             )
         return circuits
@@ -129,7 +132,8 @@ class Settings:
 ZNESettings = Settings(
     ["zne"],
     circuit_types=["ghz", "rb", "mirror"],
-    circuit_dimensions=(2, 5),
+    num_qubits=2,
+    circuit_depth=5,
     technique_params={
         "scale_factors": [[1.0, 2.0, 3.0], [1.0, 3.0, 5.0]],
         "scale_methods": [fold_global, fold_gates_at_random],
