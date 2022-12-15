@@ -14,9 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from math import prod, sqrt
-from typing import Any
+from typing import Any, Callable
 
-from mitiq import Executor
+from mitiq import QPROGRAM, Executor, QuantumResult
 from mitiq.calibration import Settings
 
 
@@ -25,9 +25,11 @@ class Calibration:
 
     def __init__(
         self,
-        executor: Executor,
+        executor: Executor | Callable[[QPROGRAM], QuantumResult],
         settings: Settings,
-        ideal_executor: Executor | None = None,
+        ideal_executor: Executor
+        | Callable[[QPROGRAM], QuantumResult]
+        | None = None,
     ):
         self.executor = executor
         self.ideal_executor = ideal_executor
