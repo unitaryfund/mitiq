@@ -61,7 +61,8 @@ class Settings:
         self.circuit_dimensions = circuit_dimensions
 
     def make_circuits(self) -> list[CircuitData]:
-        """Generate circuits specified by `circuit_types` and `circuit_dimensions`"""
+        """Generate the circuits to run in a calibration experiment via the
+        parameters passed in initialization."""
         circuits = []
         nqubits, depth = self.circuit_dimensions
         for circuit_type in self.circuit_types:
@@ -97,8 +98,8 @@ class Settings:
         return circuits
 
     def mitigate_functions(self) -> list[tuple[str, Callable]]:
-        """return a list of tuples containing a string identifier and an
-        error mitigation function"""
+        """Generates a list of ready to apply error mitigation functions
+        preloaded with hyperparameters."""
         funcs = []
         for method in self.mitigation_methods:
             if method == "zne":

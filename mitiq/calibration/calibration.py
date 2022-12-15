@@ -21,7 +21,8 @@ from mitiq.calibration import Settings
 
 
 class Calibration:
-    """A calibration object which keeps track of, and aids in EM parameter tuning."""
+    """A calibration object which keeps track of, and aids in Error
+    Mitigation parameter tuning."""
 
     def __init__(
         self,
@@ -38,9 +39,10 @@ class Calibration:
         self.results: list[dict[str, Any]] = []
 
     def get_cost(self) -> dict[str, int]:
-        """Return expected number of noisy expectation values required for
-        calibration. If ideal_executor is defined the calibration process will
-        simulate an equal number of expectation values."""
+        """Returns the expected number of noisy expectation values required
+        for calibration. If an ideal_executor was used in specifying the
+        Calibration object, the number of classical simulations is also
+        returned."""
         num_circuits = len(self.circuits)
         num_methods = len(self.settings.mitigation_methods)
         num_options = prod(map(len, self.settings.method_params.values()))
@@ -53,7 +55,8 @@ class Calibration:
         }
 
     def run_circuits(self) -> None:
-        """run the calibration circuits and store the ideal and noisy expectation values for each circuit."""
+        """Run the calibration circuits and store the ideal and noisy
+        expectation values for each circuit in `self.results`."""
         expvals = []
         for circuit_data in self.circuits:
             circuit = circuit_data.circuit
@@ -92,7 +95,8 @@ class Calibration:
         self.results = expvals
 
     def compute_improvements(self) -> None:
-        """compute improvement factors for each calibration result"""
+        """Compute the improvement factors for each calibration circuit that
+        was run."""
         for result in self.results:
             ideal = result["ideal"]
             unmitigated = result["unmitigated"]
@@ -111,7 +115,8 @@ class Calibration:
                 di["method_improvement_factor"] = method_improvement_factor
 
     def get_optimal_strategy(self) -> str:
-        """uses the improvement factors to propose optimal error mitigation strategy"""
+        """Finds the optimal error mitigation strategy using the improvement
+        factors calculated, and stored in `self.results`."""
         best_val = 0.0
         best_key = ""
         for result in self.results:
