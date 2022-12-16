@@ -1,0 +1,87 @@
+# Glossary
+
+## Circuit Depth
+The depth of a circuit can be thought of as the overall number of time
+steps in the circuit's execution. 
+Within each time slice are operations that can be performed in parallel (meaning that no operation's input
+depends on any other operation's output)
+and can therefore be treated logically as simultaneous. Circuit depth is an important TODO  
+
+## Circuit Size
+The size of a circuit is the number of operations it contains. If a circuit has 
+$n$ qubits and depth $d$, then its size is $n \cdot d$. (We count the logically trivial/identity operation,
+in which a qubit is supposed to maintain its state, as an operation like any other since implementing
+it physically is not trivial---it is just another step where noise builds up.)
+
+
+
+## Clifford Data Regression (CDR)
+TODO: single sentence summary
+
+For the theory behind CDR and how to use it in Mitiq, see the User Guide
+section on [CDR](./cdr.myst).
+
+## Digital Dynamical Decoupling (DDD)
+TODO: single sentence summary
+
+For the theory behind digital dynamical decoupling and how to use it in Mitiq, see the User Guide
+section on [DDD](./ddd.myst).
+
+## Expectation Value
+## Gate Fidelity
+## Global Folding
+## Local Folding
+## Observable
+
+## Operation
+Terminologically it is sometimes helpful to make the following technical distinction between ``operation'' and ``operator'': an operation is a particular occurrence/instantiation of an abstract operator (unitary gate or measurement), the event of applying the operator to a particular qubit or qubits. For example, the Hadamard gate is an operator (a type), while applying a Hadamard gate at two locations in a circuit is two operations (tokens/particular instances). But often it is natural to use the terms operation and operator interchangeably for both concepts (the meaning should always be clear from the context).
+
+## Probabilistic Error Cancellation (PEC)
+TODO: single sentence summary
+
+For the theory behind PEC and how to use it in Mitiq, see the User Guide
+section on [PEC](./pec.myst).
+
+## Quantum Error Mitigation (QEM)
+TODO: entry
+
+For more on error mitigation, see the User Guide [section](./error-mitigation.myst)
+
+
+
+## Quantum Error Correction (QEC)
+TODO: entry
+
+For more on quantum error correction and how it differs from error mitigation,
+see the User Guide section on [error mitigation](./error-mitigation.myst)
+
+
+## Readout Error Mitigation (REM)
+TODO: single sentence summary
+
+For the theory behind REM and how to use it in Mitiq, see the User Guide
+section on [REM] TODO: add link when available
+
+## Sampling Overhead
+
+## Zero Noise Extrapolation (ZNE) 
+TODO: single sentence summary
+
+For the theory behind PEC and how to use it in Mitiq, see the User Guide
+section on [ZNE](./zne.myst).
+
+
+<!-- MAYBE INCLUDE
+## Ansatz
+## Circuit Size
+## Hamiltonian
+## Monte Carlo Estimation
+## Near-term Algorithm
+## Noise Model
+## Pulse Stretching
+## Quantum Approximate Optimization Algorithm (QAOA)
+## Quantum Channel
+## Quasi-Probability Decomposition
+## Variational Quantum Algorithm (VQA)
+## Variational Quantum Eigensolver (VQE)
+-->
