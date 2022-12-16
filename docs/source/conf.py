@@ -44,6 +44,7 @@ sys.path.append(os.path.abspath("sphinxext"))
 extensions = [
     "myst_nb",
     "sphinx.ext.mathjax",
+    "sphinx_book_theme",
     "IPython.sphinxext.ipython_console_highlighting",
     "IPython.sphinxext.ipython_directive",
     "matplotlib.sphinxext.plot_directive",
@@ -285,6 +286,7 @@ pybtex_register_plugin("pybtex.style.formatting", "apsstyle", ApsStyle)
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
 
+
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
@@ -293,7 +295,7 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "pydata_sphinx_theme"  # 'alabaster', 'sphinx_rtd_theme'
+html_theme = "sphinx_book_theme"  # 'alabaster', 'sphinx_rtd_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
