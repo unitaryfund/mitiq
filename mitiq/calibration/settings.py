@@ -21,7 +21,7 @@ from typing import Any, Callable, cast
 import networkx as nx
 import cirq
 
-from mitiq._typing import QuantumResult
+from mitiq._typing import QuantumResult, Bitstring
 from mitiq.benchmarks import (
     generate_ghz_circuit,
     generate_mirror_circuit,
@@ -45,6 +45,7 @@ class CircuitData:
     circuit_depth: int
     type: str
     two_qubit_gate_count: int
+    ideal_distribution: dict[str, float]
 
 
 @dataclass
@@ -79,16 +80,24 @@ class Settings:
         for circuit_type in self.circuit_types:
             if circuit_type == "ghz":
                 circuit = generate_ghz_circuit(nqubits)
+                ideal = {"0" * nqubits: 0.5, "1" * nqubits: 0.5}
             elif circuit_type == "rb":
                 circuit = generate_rb_circuits(nqubits, depth)[0]
+                ideal = {"0" * nqubits: 1.0}
             elif circuit_type == "mirror":
-                circuit = generate_mirror_circuit(
+                circuit, bitstring_list = generate_mirror_circuit(
                     nlayers=depth,
                     two_qubit_gate_prob=1.0,
                     connectivity_graph=nx.complete_graph(nqubits),
-                )[0]
+                )
+                ideal_bitstring = "".join(map(str, bitstring_list))
+                ideal = {ideal_bitstring: 1.0}
             elif circuit_type == "qv":
-                circuit = generate_quantum_volume_circuit(nqubits, depth)[0]
+                circuit, _ = generate_quantum_volume_circuit(nqubits, depth)
+                raise NotImplementedError(
+                    "quantum volume circuits are not yet supported in calibration"
+                )
+
             else:
                 raise ValueError(
                     "invalid value passed for `circuit_types`. Must be "
@@ -107,6 +116,7 @@ class Settings:
                     circuit_depth=len(circuit),
                     type=circuit_type,
                     two_qubit_gate_count=two_qubit_gate_count,
+                    ideal_distribution=ideal,
                 )
             )
         return circuits

@@ -13,11 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from collections import Counter
 from math import prod, sqrt
-from typing import Any, Callable
+from typing import Any, Callable, Union, cast
 
-from mitiq import QPROGRAM, Executor, QuantumResult
-from mitiq.calibration import Settings
+import cirq
+
+from mitiq import QPROGRAM, Executor, MeasurementResult, QuantumResult
+from mitiq.calibration.settings import Settings
 
 
 class Calibration:
@@ -26,11 +29,11 @@ class Calibration:
 
     def __init__(
         self,
-        executor: Executor | Callable[[QPROGRAM], QuantumResult],
+        executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
         settings: Settings,
-        ideal_executor: Executor
-        | Callable[[QPROGRAM], QuantumResult]
-        | None = None,
+        ideal_executor: Union[
+            Executor, Callable[[QPROGRAM], QuantumResult], None
+        ] = None,
     ):
 
         self.executor = (
@@ -69,31 +72,51 @@ class Calibration:
         expvals = []
         for circuit_data in self.circuits:
             circuit = circuit_data.circuit
-            noisy_expval = self.executor.evaluate(circuit)[0]
-            ideal_expval = (
-                self.ideal_executor.evaluate(circuit)[0]
+            circuit.append(cirq.measure(circuit.all_qubits()))
+
+            noisy_results = cast(
+                MeasurementResult, self.executor._run([circuit])[0]
+            ).result
+            noisy_distribution = bitstrings_to_distribution(noisy_results)
+            ideal_results = (
+                cast(
+                    MeasurementResult, self.ideal_executor._run([circuit])[0]
+                ).result
                 if self.ideal_executor
-                else 1.0
+                else None
             )
+            ideal_distribution = (
+                bitstrings_to_distribution(ideal_results)
+                if ideal_results
+                else {"1" * len(circuit.all_qubits()): 1.0}
+            )
+
             mitigated: dict[str, dict[str, Any]] = {
                 technique: {"results": [], "method_improvement_factor": None}
                 for technique in self.settings.techniques
             }
             for strategy in self.settings.make_strategies():
+                most_probable_bitstring = max(
+                    ideal_distribution, key=ideal_distribution.get
+                )
+                expval_executor = bitstring_executor_to_expval_executor(
+                    self.executor, most_probable_bitstring
+                )
+                mitigated_expval = strategy.mitigation_function(
+                    circuit, expval_executor
+                )
                 mitigated[strategy.technique]["results"].append(
                     {
                         "circuit_type": circuit_data.type,
-                        "mitigated_value": strategy.mitigation_function(
-                            circuit, self.executor
-                        ),
+                        "mitigated_value": mitigated_expval,
                         **strategy.technique_params,
                     }
                 )
             expvals.append(
                 {
-                    "unmitigated": noisy_expval,
+                    "noisy_dist": noisy_distribution,
+                    "ideal_dist": ideal_distribution,
                     "mitigated": mitigated,
-                    "ideal": ideal_expval,
                 }
             )
         self.results = expvals
@@ -102,17 +125,21 @@ class Calibration:
         """Compute the improvement factors for each calibration circuit that
         was run."""
         for result in self.results:
-            ideal = result["ideal"]
-            unmitigated = result["unmitigated"]
+            ideal_dist = result["ideal_dist"]
+            ideal_expval = max(ideal_dist.values())
+            noisy_dist = result["noisy_dist"]
+            noisy_expval = max(noisy_dist.values())
             for di in result["mitigated"].values():
                 results = di["results"]
                 mitigated_vals = list(
                     map(lambda di: di["mitigated_value"], results)
                 )
-                method_improvement_factor = abs(unmitigated - ideal) / sqrt(
+                method_improvement_factor = abs(
+                    noisy_expval - ideal_expval
+                ) / sqrt(
                     len(mitigated_vals)
                     * sum(
-                        (mitigated_val - ideal) ** 2
+                        (mitigated_val - ideal_expval) ** 2
                         for mitigated_val in mitigated_vals
                     )
                 )
@@ -124,9 +151,11 @@ class Calibration:
         best_val = 0.0
         best_key = ""
         for result in self.results:
-            ideal = result["ideal"]
-            unmitigated = result["unmitigated"]
-            unmitigated_error = abs((ideal - unmitigated) / ideal)
+            ideal_dist = result["ideal_dist"]
+            ideal = max(ideal_dist.values())
+            noisy_dist = result["noisy_dist"]
+            noisy = max(noisy_dist.values())
+            unmitigated_error = abs((ideal - noisy) / ideal)
             for method, di in result["mitigated"].items():
                 for res in di["results"]:
                     mitigated_expval = res["mitigated_value"]
@@ -136,3 +165,31 @@ class Calibration:
                         best_val = error_diff
                         best_key = method
         return best_key
+
+
+def bitstrings_to_distribution(
+    bitstrings: list[list[int]],
+) -> dict[str, float]:
+    """Helper function to convert raw measurement results to probability
+    distributions."""
+    distribution = Counter(
+        ["".join(map(str, bitstring)) for bitstring in bitstrings]
+    )
+    bitstring_count = len(bitstrings)
+    for bitstring in distribution:
+        distribution[bitstring] /= bitstring_count
+    return dict(distribution)
+
+
+def bitstring_executor_to_expval_executor(
+    ex: Executor, bitstring: str
+) -> Executor:
+    """Constructs a new executor returning expectation value given by the
+    probability that the state is in state `bitstring`."""
+
+    def expval_executor(circuit: cirq.Circuit) -> float:
+        raw = ex._run([circuit])[0].result
+        bitstring_distribution = bitstrings_to_distribution(raw)
+        return bitstring_distribution.get(bitstring, 0) / len(raw)
+
+    return Executor(expval_executor)
