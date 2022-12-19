@@ -66,7 +66,7 @@ class Calibrator:
             "ideal_executions": ideal,
         }
 
-    def run_circuits(self) -> None:
+    def run_circuits(self) -> list[dict[str, Any]]:
         """Run the calibration circuits and store the ideal and noisy
         expectation values for each circuit in `self.results`."""
         expvals = []
@@ -119,12 +119,14 @@ class Calibrator:
                     "mitigated": mitigated,
                 }
             )
-        self.results = expvals
+        return expvals
 
-    def compute_improvements(self) -> None:
+    def compute_improvements(
+        self, experiment_results: list[dict[str, Any]]
+    ) -> None:
         """Compute the improvement factors for each calibration circuit that
         was run."""
-        for result in self.results:
+        for result in experiment_results:
             ideal_dist = result["ideal_dist"]
             ideal_expval = max(ideal_dist.values())
             noisy_dist = result["noisy_dist"]
@@ -145,12 +147,12 @@ class Calibrator:
                 )
                 di["method_improvement_factor"] = method_improvement_factor
 
-    def get_optimal_strategy(self) -> str:
+    def get_optimal_strategy(self, results: list[dict[str, Any]]) -> str:
         """Finds the optimal error mitigation strategy using the improvement
         factors calculated, and stored in `self.results`."""
         best_val = 0.0
         best_key = ""
-        for result in self.results:
+        for result in results:
             ideal_dist = result["ideal_dist"]
             ideal = max(ideal_dist.values())
             noisy_dist = result["noisy_dist"]
@@ -165,6 +167,13 @@ class Calibrator:
                         best_val = error_diff
                         best_key = method
         return best_key
+
+    def run(self):
+        results = self.run_circuits()
+        self.compute_improvements(results)
+        self.results = results
+        strategy = self.get_optimal_strategy(results)
+        return strategy
 
 
 def bitstrings_to_distribution(
