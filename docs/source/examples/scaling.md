@@ -124,7 +124,7 @@ def variational_circuit(gamma):
 We can run this circuit many times, varying $\gamma$ each time, and compute ideal and noisy expectation values to compare to the mitigated versions.
 We do this comparison by using an improvement factor (IF) which is defined as
 ```{math}
-\left|\frac{\text{ideal} - \text{mitigated}}{\text{ideal} - \text{noisy}}\right|.
+\left|\frac{\text{ideal} - \text{noisy}}{\text{ideal} - \text{mitigated}}\right|.
 ```
 
 ```{code-cell} ipython3
@@ -142,8 +142,8 @@ for _ in range(100):
     id_expval = execute_with_zne(circuit, execute, scale_noise=insert_id_layers)
 
     noisy_error = abs(ideal_expval - noisy_expval)
-    folded_IF = abs(ideal_expval - folded_expval) / noisy_error
-    scaled_IF = abs(ideal_expval - id_expval) / noisy_error
+    folded_IF = noisy_error / abs(ideal_expval - folded_expval)
+    scaled_IF = noisy_error / abs(ideal_expval - id_expval)
 
     results["fold"].append(folded_IF)
     results["id"].append(scaled_IF)
