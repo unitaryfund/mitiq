@@ -92,15 +92,15 @@ class Calibrator:
             )
 
             mitigated: dict[str, dict[str, Any]] = {
-                technique: {"results": [], "method_improvement_factor": None}
+                technique: {"results": [], "improvement_factor": None}
                 for technique in self.settings.techniques
             }
+            bitstring_to_observe = max(
+                ideal_distribution, key=ideal_distribution.get
+            )
             for strategy in self.settings.make_strategies():
-                most_probable_bitstring = max(
-                    ideal_distribution, key=ideal_distribution.get
-                )
                 expval_executor = bitstring_executor_to_expval_executor(
-                    self.executor, most_probable_bitstring
+                    self.executor, bitstring_to_observe
                 )
                 mitigated_expval = strategy.mitigation_function(
                     circuit, expval_executor
@@ -114,8 +114,12 @@ class Calibrator:
                 )
             expvals.append(
                 {
-                    "noisy_dist": noisy_distribution,
-                    "ideal_dist": ideal_distribution,
+                    "noisy_value": noisy_distribution.get(
+                        bitstring_to_observe, 0
+                    ),
+                    "ideal_value": ideal_distribution.get(
+                        bitstring_to_observe, 0
+                    ),
                     "mitigated": mitigated,
                 }
             )
@@ -124,56 +128,44 @@ class Calibrator:
     def compute_improvements(
         self, experiment_results: list[dict[str, Any]]
     ) -> None:
-        """Compute the improvement factors for each calibration circuit that
-        was run."""
+        """Computes the improvement factors for each calibration circuit that
+        was run. Saves the improvement factors in the input dictionary."""
         for result in experiment_results:
-            ideal_dist = result["ideal_dist"]
-            ideal_expval = max(ideal_dist.values())
-            noisy_dist = result["noisy_dist"]
-            noisy_expval = max(noisy_dist.values())
+            ideal_value = result["ideal_value"]
+            noisy_value = result["noisy_value"]
             for di in result["mitigated"].values():
                 results = di["results"]
-                mitigated_vals = list(
+                mitigated_values = list(
                     map(lambda di: di["mitigated_value"], results)
                 )
-                method_improvement_factor = abs(
-                    noisy_expval - ideal_expval
-                ) / sqrt(
-                    len(mitigated_vals)
+                improvement_factor = abs(noisy_value - ideal_value) / sqrt(
+                    len(mitigated_values)
                     * sum(
-                        (mitigated_val - ideal_expval) ** 2
-                        for mitigated_val in mitigated_vals
+                        (mitigated_value - ideal_value) ** 2
+                        for mitigated_value in mitigated_values
                     )
                 )
-                di["method_improvement_factor"] = method_improvement_factor
+                di["improvement_factor"] = improvement_factor
 
     def get_optimal_strategy(self, results: list[dict[str, Any]]) -> str:
         """Finds the optimal error mitigation strategy using the improvement
-        factors calculated, and stored in `self.results`."""
+        factors calculated, and stored in `self.results`.
+        
+        Currently, this function """
         best_val = 0.0
         best_key = ""
         for result in results:
-            ideal_dist = result["ideal_dist"]
-            ideal = max(ideal_dist.values())
-            noisy_dist = result["noisy_dist"]
-            noisy = max(noisy_dist.values())
-            unmitigated_error = abs((ideal - noisy) / ideal)
             for method, di in result["mitigated"].items():
-                for res in di["results"]:
-                    mitigated_expval = res["mitigated_value"]
-                    diff = abs((ideal - mitigated_expval) / ideal)
-                    error_diff = abs(unmitigated_error - diff)
-                    if error_diff > best_val:
-                        best_val = error_diff
-                        best_key = method
+                improvement_factor = di["improvement_factor"]
+                if improvement_factor > best_val:
+                    best_val = improvement_factor
+                    best_key = method
         return best_key
 
-    def run(self) -> str:
+    def run(self) -> None:
         results = self.run_circuits()
         self.compute_improvements(results)
         self.results = results
-        strategy = self.get_optimal_strategy(results)
-        return strategy
 
 
 def bitstrings_to_distribution(
