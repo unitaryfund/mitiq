@@ -14,18 +14,25 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tests for the Clifford data regression top-level API."""
-import pytest
 import cirq
+import numpy as np
+
+from mitiq import MeasurementResult
 from mitiq.calibration import Calibrator, ZNESettings
 
 
 def execute(circuit, noise_level=0.001):
-    noisy_circuit = circuit.with_noise(cirq.depolarize(p=noise_level))
-    return (
-        cirq.DensityMatrixSimulator()
-        .simulate(noisy_circuit)
-        .final_density_matrix[0, 0]
-        .real
+    circuit = circuit.with_noise(cirq.amplitude_damp(noise_level))
+
+    result = cirq.DensityMatrixSimulator().run(circuit, repetitions=100)
+    return MeasurementResult(
+        result=np.column_stack(list(result.measurements.values())).tolist(),
+        qubit_indices=tuple(
+            # q[2:-1] is necessary to convert "q(number)" into "number"
+            int(q[2:-1])
+            for k in result.measurements.keys()
+            for q in k.split(",")
+        ),
     )
 
 
@@ -33,6 +40,6 @@ def test_workflow():
     cal = Calibrator(execute, ZNESettings)
     assert cal.get_cost() == {"noisy_executions": 24, "ideal_executions": 0}
 
-    cal.run_circuits()
-    cal.compute_improvements()
-    assert cal.get_optimal_strategy() == "zne"
+    results = cal.run_circuits()
+    cal.compute_improvements(results)
+    assert cal.get_optimal_strategy(results) == "zne"
