@@ -168,7 +168,7 @@ class Calibrator:
                         best_key = method
         return best_key
 
-    def run(self):
+    def run(self) -> str:
         results = self.run_circuits()
         self.compute_improvements(results)
         self.results = results
@@ -197,7 +197,7 @@ def bitstring_executor_to_expval_executor(
     probability that the state is in state `bitstring`."""
 
     def expval_executor(circuit: cirq.Circuit) -> float:
-        raw = ex._run([circuit])[0].result
+        raw = cast(MeasurementResult, ex._run([circuit])[0]).result
         bitstring_distribution = bitstrings_to_distribution(raw)
         return bitstring_distribution.get(bitstring, 0) / len(raw)
 

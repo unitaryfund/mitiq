@@ -21,7 +21,7 @@ from typing import Any, Callable, cast
 import networkx as nx
 import cirq
 
-from mitiq._typing import QuantumResult, Bitstring
+from mitiq._typing import QuantumResult
 from mitiq.benchmarks import (
     generate_ghz_circuit,
     generate_mirror_circuit,
@@ -95,7 +95,7 @@ class Settings:
             elif circuit_type == "qv":
                 circuit, _ = generate_quantum_volume_circuit(nqubits, depth)
                 raise NotImplementedError(
-                    "quantum volume circuits are not yet supported in calibration"
+                    "quantum volume circuits not yet supported in calibration"
                 )
 
             else:
