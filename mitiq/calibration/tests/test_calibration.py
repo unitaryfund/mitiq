@@ -16,7 +16,7 @@
 """Tests for the Clifford data regression top-level API."""
 import pytest
 import cirq
-from mitiq.calibration import Calibration, ZNESettings
+from mitiq.calibration import Calibrator, ZNESettings
 
 
 def execute(circuit, noise_level=0.001):
@@ -30,7 +30,7 @@ def execute(circuit, noise_level=0.001):
 
 
 def test_workflow():
-    cal = Calibration(execute, ZNESettings)
+    cal = Calibrator(execute, ZNESettings)
     assert cal.get_cost() == {"noisy_executions": 24, "ideal_executions": 0}
 
     cal.run_circuits()

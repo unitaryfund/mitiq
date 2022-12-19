@@ -23,7 +23,7 @@ from mitiq import QPROGRAM, Executor, MeasurementResult, QuantumResult
 from mitiq.calibration.settings import Settings
 
 
-class Calibration:
+class Calibrator:
     """A calibration object which keeps track of, and aids in Error
     Mitigation parameter tuning."""
 
@@ -53,7 +53,7 @@ class Calibration:
     def get_cost(self) -> dict[str, int]:
         """Returns the expected number of noisy expectation values required
         for calibration. If an ideal_executor was used in specifying the
-        Calibration object, the number of classical simulations is also
+        Calibrator object, the number of classical simulations is also
         returned."""
         num_circuits = len(self.circuits)
         num_methods = len(self.settings.techniques)
