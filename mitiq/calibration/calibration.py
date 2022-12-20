@@ -38,14 +38,12 @@ class Calibrator:
     ):
 
         self.executor = (
-            Executor(executor)
-            if not isinstance(executor, Executor)
-            else executor
+            executor if isinstance(executor, Executor) else Executor(executor)
         )
         self.ideal_executor = (
             Executor(ideal_executor)
             if ideal_executor and not isinstance(ideal_executor, Executor)
-            else ideal_executor
+            else None
         )
         self.settings = settings
         self.circuits = self.settings.make_circuits()
@@ -61,7 +59,7 @@ class Calibrator:
         num_options = prod(map(len, self.settings.technique_params.values()))
 
         noisy = num_circuits * num_methods * num_options
-        ideal = noisy if self.ideal_executor else 0
+        ideal = 0  # TODO: ideal executor is currently unused
         return {
             "noisy_executions": noisy,
             "ideal_executions": ideal,
@@ -79,30 +77,19 @@ class Calibrator:
                 MeasurementResult, self.executor._run([circuit])[0]
             ).result
             noisy_distribution = bitstrings_to_distribution(noisy_results)
-            ideal_results = (
-                cast(
-                    MeasurementResult, self.ideal_executor._run([circuit])[0]
-                ).result
-                if self.ideal_executor
-                else None
-            )
-            ideal_distribution = (
-                bitstrings_to_distribution(ideal_results)
-                if ideal_results
-                else {"1" * len(circuit.all_qubits()): 1.0}
-            )
 
             mitigated: dict[str, dict[str, Any]] = {
                 technique: {"results": [], "improvement_factor": None}
                 for technique in self.settings.techniques
             }
             bitstring_to_observe = max(
-                ideal_distribution, key=ideal_distribution.get
+                circuit_data.ideal_distribution,
+                key=circuit_data.ideal_distribution.get,
+            )
+            expval_executor = bitstring_executor_to_expval_executor(
+                self.executor, bitstring_to_observe
             )
             for strategy in self.settings.make_strategies():
-                expval_executor = bitstring_executor_to_expval_executor(
-                    self.executor, bitstring_to_observe
-                )
                 mitigated_expval = strategy.mitigation_function(
                     circuit, expval_executor
                 )
@@ -120,9 +107,9 @@ class Calibrator:
                     "noisy_value": noisy_distribution.get(
                         bitstring_to_observe, 0
                     ),
-                    "ideal_value": ideal_distribution.get(
-                        bitstring_to_observe, 0
-                    ),
+                    "ideal_value": circuit_data.ideal_distribution[
+                        bitstring_to_observe
+                    ],
                     "mitigated": mitigated,
                 }
             )
