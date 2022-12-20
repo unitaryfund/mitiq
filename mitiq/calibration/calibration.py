@@ -69,48 +69,35 @@ class Calibrator:
         """Run the calibration circuits and store the ideal and noisy
         expectation values for each circuit in `self.results`."""
         expvals = []
-        for circuit_data in self.circuits:
-            circuit = circuit_data.circuit
+        for problem in self.circuits:
+            circuit, distribution = problem["circuit", "ideal_distribution"]
             circuit.append(cirq.measure(circuit.all_qubits()))
 
-            noisy_results = cast(
-                MeasurementResult, self.executor._run([circuit])[0]
-            ).result
-            noisy_distribution = bitstrings_to_distribution(noisy_results)
+            expval_executor, bitstring_to_measure = convert_to_expval_executor(
+                self.executor, distribution
+            )
+            noisy_value = expval_executor.evaluate(circuit)[0]
 
-            mitigated: dict[str, dict[str, Any]] = {
+            mitigated_values: dict[str, dict[str, Any]] = {
                 technique: {"results": [], "improvement_factor": None}
                 for technique in self.settings.techniques
             }
-            bitstring_to_observe = max(
-                circuit_data.ideal_distribution,
-                key=circuit_data.ideal_distribution.get,
-            )
-            expval_executor = bitstring_executor_to_expval_executor(
-                self.executor, bitstring_to_observe
-            )
             for strategy in self.settings.make_strategies():
-                mitigated_expval = strategy.mitigation_function(
-                    circuit, expval_executor
-                )
-                mitigated[strategy.technique]["results"].append(
-                    {
-                        "mitigated_value": mitigated_expval,
-                        **strategy.technique_params,
-                    }
-                )
-            circuit_info = asdict(circuit_data)
+                technique, params, mitiq_func = strategy
+                mitigated_value = mitiq_func(circuit, expval_executor)
+
+                result = {"mitigated_value": mitigated_value, **params}
+                mitigated_values[technique]["results"].append(result)
+
+            circuit_info = asdict(problem)
+            # remove circuit; it can be regenerated if needed
             del circuit_info["circuit"]
             expvals.append(
                 {
                     "circuit_info": circuit_info,
-                    "noisy_value": noisy_distribution.get(
-                        bitstring_to_observe, 0
-                    ),
-                    "ideal_value": circuit_data.ideal_distribution[
-                        bitstring_to_observe
-                    ],
-                    "mitigated": mitigated,
+                    "noisy_value": noisy_value,
+                    "ideal_value": distribution[bitstring_to_measure],
+                    "mitigated_values": mitigated_values,
                 }
             )
         return expvals
@@ -123,7 +110,7 @@ class Calibrator:
         for result in experiment_results:
             ideal_value = result["ideal_value"]
             noisy_value = result["noisy_value"]
-            for di in result["mitigated"].values():
+            for di in result["mitigated_values"].values():
                 results = di["results"]
                 mitigated_values = list(
                     map(lambda di: di["mitigated_value"], results)
@@ -140,12 +127,12 @@ class Calibrator:
     def get_optimal_strategy(self, results: list[dict[str, Any]]) -> str:
         """Finds the optimal error mitigation strategy using the improvement
         factors calculated, and stored in `self.results`.
-        
-        Currently, this function """
+
+        Currently, this function"""
         best_val = 0.0
         best_key = ""
         for result in results:
-            for method, di in result["mitigated"].items():
+            for method, di in result["mitigated_values"].items():
                 improvement_factor = di["improvement_factor"]
                 if improvement_factor > best_val:
                     best_val = improvement_factor
@@ -168,19 +155,30 @@ def bitstrings_to_distribution(
     )
     bitstring_count = len(bitstrings)
     for bitstring in distribution:
-        distribution[bitstring] /= bitstring_count
+        distribution[bitstring] /= bitstring_count  # type: ignore [assignment]
     return dict(distribution)
 
 
-def bitstring_executor_to_expval_executor(
-    ex: Executor, bitstring: str
-) -> Executor:
-    """Constructs a new executor returning expectation value given by the
-    probability that the state is in state `bitstring`."""
+def convert_to_expval_executor(
+    ex: Executor, distribution: dict[str, float]
+) -> tuple[Executor, str]:
+    """Constructs a new executor returning an expectation value given by the
+    probability that the circuit outputs the most likely state according to the
+    ideal distribution.
+
+    Returns:
+        A two-tuple containing:
+            - An executor returning expectation values: QPROGRAM -> float
+            - The most likely bitstring, according to the passed `distribution`
+    """
+    bitstring_to_measure = max(distribution, key=distribution.get)
 
     def expval_executor(circuit: cirq.Circuit) -> float:
         raw = cast(MeasurementResult, ex._run([circuit])[0]).result
         bitstring_distribution = bitstrings_to_distribution(raw)
-        return bitstring_distribution.get(bitstring, 0)
+        return bitstring_distribution.get(bitstring_to_measure, 0)
 
-    return Executor(expval_executor)
+    return (
+        Executor(expval_executor),  # type: ignore [arg-type]
+        bitstring_to_measure,
+    )

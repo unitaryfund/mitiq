@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from dataclasses import dataclass
+from dataclasses import dataclass, astuple
 from functools import partial
 from itertools import product
-from typing import Any, Callable, cast
+from typing import Any, Callable, cast, Iterator
 
 import networkx as nx
 import cirq
@@ -39,7 +39,7 @@ from mitiq.zne.scaling import (
 
 
 @dataclass
-class CircuitData:
+class BenchmarkProblem:
     circuit: cirq.Circuit
     num_qubits: int
     circuit_depth: int
@@ -47,12 +47,18 @@ class CircuitData:
     two_qubit_gate_count: int
     ideal_distribution: dict[str, float]
 
+    def __getitem__(self, keys: tuple[str, ...]) -> Iterator[Any]:
+        return iter(getattr(self, k) for k in keys)
+
 
 @dataclass
 class Strategy:
     technique: str
     technique_params: dict[str, Any]
     mitigation_function: Callable[..., QuantumResult]
+
+    def __iter__(self) -> Iterator[Any]:
+        return iter(astuple(self))
 
 
 class Settings:
@@ -72,7 +78,7 @@ class Settings:
         self.num_qubits = num_qubits
         self.circuit_depth = circuit_depth
 
-    def make_circuits(self) -> list[CircuitData]:
+    def make_circuits(self) -> list[BenchmarkProblem]:
         """Generate the circuits to run in a calibration experiment via the
         parameters passed in initialization."""
         circuits = []
@@ -110,7 +116,7 @@ class Settings:
                 [len(op.qubits) > 1 for op in circuit.all_operations()]
             )
             circuits.append(
-                CircuitData(
+                BenchmarkProblem(
                     circuit,
                     num_qubits=len(circuit.all_qubits()),
                     circuit_depth=len(circuit),
