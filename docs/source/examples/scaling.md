@@ -13,13 +13,13 @@ kernelspec:
 
 # Noise Scaling Methods
 
-In this tutorial we will review the differences between noise scaling methods used in [Zero-Noise Extrapolation](https://mitiq.readthedocs.io/en/stable/guide/zne.html) (ZNE).
-As a reminder, ZNE works by running multiple versions of the desired circuit, each intended to scale the noise up from the base-level achieved by the hardware.
+In this tutorial we will compare two noise scaling methods available for use in [Zero-Noise Extrapolation](https://mitiq.readthedocs.io/en/stable/guide/zne.html) (ZNE): identity insertion and unitary folding.
+ZNE works by running multiple versions of the desired circuit, each intended to scale the noise up from the base-level achieved by the hardware.
 Experimentally these experiments are often performed by pulse stretching, but as a quantum programmer, we typically do not have access to such low-level control.
-For this reason we use "digital" methods that allow us to scale the noise using gate-based methods.
+For this reason, we use "digital" methods that allow us to scale the noise using gate-based methods.
 To this end, we will study circuit folding and identity insertion as methods to increase the amount of noise present in our computation.
 
-As a reminder, these techniques are summarized by the following equations, and can be performed in Mitiq with the associated functions.
+These techniques are summarized by the following equations, and can be performed in Mitiq with the associated functions.
 
 |                | Folding              | Identity Insertion |
 | -------------- | -------------------- | ------------------ |
@@ -29,7 +29,8 @@ As a reminder, these techniques are summarized by the following equations, and c
 ## Comparison
 
 To get started, we can demo what these two functions do to a small GHZ circuit.
-Each function (`fold_global` and `insert_id_layers`) take a circuit, and a specified scale factor which controls how much to increase the depth of the specified circuit.
+Each function (`fold_global` and `insert_id_layers`) will take a circuit, and a specified scale factor as inputs.
+The argument `scale_factor` controls how much to increase the depth of the input circuit so that the achieved scale factor is exactly equal, or very close, to the specified scale factor.
 
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_ghz_circuit
@@ -47,7 +48,7 @@ print(insert_id_layers(demo, scale_factor))
 ```
 
 Theoretically, these circuits should give the same result when measured, but due to noise, this is almost never the case.
-These two methods work both by extending the duration of the circuit, but do so in different ways that might be beneficial for different scenarios.
+Both methods work by extending the duration of the circuit, but do so in different ways that might be beneficial for different scenarios.
 When using folding, noise is amplified by applying additional gates, and in particular inverse gates.
 Scaling amplifies noise by letting the qubits idle for longer _between_ computation.
 
@@ -76,13 +77,14 @@ for scale_factor in range(1, 10):
     )
 ```
 
-As expected we have $\mathtt{depth} * \mathtt{scale\_factor} = \mathtt{scaled\_depth}$.
+As expected, we have $\mathtt{depth} * \mathtt{scale\_factor} = \mathtt{scaled\_depth}$ when the scale factor is an integer.
+The scale factor can also take on non-integer values, where this equation will hold approximately.
 
 ## Using noise scaling methods
 
-Here we demo how you can use these noise-scaling technique in ZNE.
-First we define an [executor](https://mitiq.readthedocs.io/en/stable/guide/executors.html) which is needed to tell Mitiq how to run the circuit.
-Here we choose a simple density matrix simulation with depolarizing noise which acts between every circuit layer.
+Here, we demo how you can use these noise-scaling technique in ZNE.
+First, we define an [executor](https://mitiq.readthedocs.io/en/stable/guide/executors.html) which is needed to tell Mitiq how to run the circuit.
+We choose depolarizing noise via a simple density matrix simulation to act between every circuit layer.
 
 ```{code-cell} ipython3
 from mitiq.zne import execute_with_zne
@@ -157,5 +159,5 @@ As we can see, both techniques offer an improvement.
 
 ## Conclusion
 
-In this tutorial we've shown how to use both folding and identity insertion as noise scaling methods for Zero-Noise Extrapolation.
+In this tutorial, we've shown how to use both folding and identity insertion as noise scaling methods for Zero-Noise Extrapolation.
 If you're interested in finding out more about these techniques, check out our [Noise Scaling Functions](https://mitiq.readthedocs.io/en/stable/guide/zne-3-options.html#noise-scaling-functions) section of our users guide!
