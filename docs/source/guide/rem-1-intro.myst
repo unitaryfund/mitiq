@@ -120,7 +120,7 @@ print(f"Error with mitigation (REM): {abs((ideal_value - mitigated_result)/ideal
 Here we observe that the application of REM eliminates the readout error when compared
 to the unmitigated result.
 
-```{admonition} Note:
+```{note} 
 It is necessary to supply the inverse confusion matrix to the REM technique.
 There are various approaches that can be used to generate the inverse 
 confusion matrix with some being more costly than others.
