@@ -16,7 +16,7 @@
 from collections import Counter
 from dataclasses import asdict
 from math import prod, sqrt
-from typing import Any, Callable, Union, cast
+from typing import Any, Callable, Union, cast, List, Dict
 
 import cirq
 
@@ -47,9 +47,9 @@ class Calibrator:
         )
         self.settings = settings
         self.circuits = self.settings.make_circuits()
-        self.results: list[dict[str, Any]] = []
+        self.results: List[Dict[str, Any]] = []
 
-    def get_cost(self) -> dict[str, int]:
+    def get_cost(self) -> Dict[str, int]:
         """Returns the expected number of noisy expectation values required
         for calibration. If an ideal_executor was used in specifying the
         Calibrator object, the number of classical simulations is also
@@ -65,7 +65,7 @@ class Calibrator:
             "ideal_executions": ideal,
         }
 
-    def run_circuits(self) -> list[dict[str, Any]]:
+    def run_circuits(self) -> List[Dict[str, Any]]:
         """Run the calibration circuits and store the ideal and noisy
         expectation values for each circuit in `self.results`."""
         expvals = []
@@ -78,7 +78,7 @@ class Calibrator:
             )
             noisy_value = expval_executor.evaluate(circuit)[0]
 
-            mitigated_values: dict[str, dict[str, Any]] = {
+            mitigated_values: Dict[str, Dict[str, Any]] = {
                 technique: {"results": [], "improvement_factor": None}
                 for technique in self.settings.techniques
             }
@@ -103,7 +103,7 @@ class Calibrator:
         return expvals
 
     def compute_improvements(
-        self, experiment_results: list[dict[str, Any]]
+        self, experiment_results: List[Dict[str, Any]]
     ) -> None:
         """Computes the improvement factors for each calibration circuit that
         was run. Saves the improvement factors in the input dictionary."""
@@ -124,7 +124,7 @@ class Calibrator:
                 )
                 di["improvement_factor"] = improvement_factor
 
-    def get_optimal_strategy(self, results: list[dict[str, Any]]) -> str:
+    def get_optimal_strategy(self, results: List[Dict[str, Any]]) -> str:
         """Finds the optimal error mitigation strategy using the improvement
         factors calculated, and stored in `self.results`.
 
@@ -146,8 +146,8 @@ class Calibrator:
 
 
 def bitstrings_to_distribution(
-    bitstrings: list[list[int]],
-) -> dict[str, float]:
+    bitstrings: List[List[int]],
+) -> Dict[str, float]:
     """Helper function to convert raw measurement results to probability
     distributions."""
     distribution = Counter(
@@ -160,7 +160,7 @@ def bitstrings_to_distribution(
 
 
 def convert_to_expval_executor(
-    ex: Executor, distribution: dict[str, float]
+    ex: Executor, distribution: Dict[str, float]
 ) -> tuple[Executor, str]:
     """Constructs a new executor returning an expectation value given by the
     probability that the circuit outputs the most likely state according to the
@@ -171,7 +171,10 @@ def convert_to_expval_executor(
             - An executor returning expectation values: QPROGRAM -> float
             - The most likely bitstring, according to the passed `distribution`
     """
-    bitstring_to_measure = max(distribution, key=distribution.get)
+    bitstring_to_measure = max(
+        distribution,
+        key=distribution.get,  # type: ignore [arg-type]
+    )
 
     def expval_executor(circuit: cirq.Circuit) -> float:
         raw = cast(MeasurementResult, ex._run([circuit])[0]).result

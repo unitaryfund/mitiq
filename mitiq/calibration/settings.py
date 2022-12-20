@@ -16,7 +16,7 @@
 from dataclasses import dataclass, astuple
 from functools import partial
 from itertools import product
-from typing import Any, Callable, cast, Iterator
+from typing import Any, Callable, cast, Iterator, List, Dict
 
 import networkx as nx
 import cirq
@@ -45,7 +45,7 @@ class BenchmarkProblem:
     circuit_depth: int
     type: str
     two_qubit_gate_count: int
-    ideal_distribution: dict[str, float]
+    ideal_distribution: Dict[str, float]
 
     def __getitem__(self, keys: tuple[str, ...]) -> Iterator[Any]:
         return iter(getattr(self, k) for k in keys)
@@ -54,7 +54,7 @@ class BenchmarkProblem:
 @dataclass
 class Strategy:
     technique: str
-    technique_params: dict[str, Any]
+    technique_params: Dict[str, Any]
     mitigation_function: Callable[..., QuantumResult]
 
     def __iter__(self) -> Iterator[Any]:
@@ -66,11 +66,11 @@ class Settings:
 
     def __init__(
         self,
-        techniques: list[str],
+        techniques: List[str],
         circuit_types: list[str],
         num_qubits: int,
         circuit_depth: int,
-        technique_params: dict[str, Any],
+        technique_params: Dict[str, Any],
     ):
         self.techniques = techniques
         self.technique_params = technique_params
