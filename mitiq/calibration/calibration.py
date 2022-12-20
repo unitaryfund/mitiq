@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from collections import Counter
+from dataclasses import asdict
 from math import prod, sqrt
 from typing import Any, Callable, Union, cast
 
@@ -107,13 +108,15 @@ class Calibrator:
                 )
                 mitigated[strategy.technique]["results"].append(
                     {
-                        "circuit_type": circuit_data.type,
                         "mitigated_value": mitigated_expval,
                         **strategy.technique_params,
                     }
                 )
+            circuit_info = asdict(circuit_data)
+            del circuit_info["circuit"]
             expvals.append(
                 {
+                    "circuit_info": circuit_info,
                     "noisy_value": noisy_distribution.get(
                         bitstring_to_observe, 0
                     ),
