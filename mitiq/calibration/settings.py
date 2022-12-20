@@ -16,7 +16,7 @@
 from dataclasses import dataclass, astuple
 from functools import partial
 from itertools import product
-from typing import Any, Callable, cast, Iterator, List, Dict
+from typing import Any, Callable, cast, Iterator, List, Dict, Tuple
 
 import networkx as nx
 import cirq
@@ -47,7 +47,7 @@ class BenchmarkProblem:
     two_qubit_gate_count: int
     ideal_distribution: Dict[str, float]
 
-    def __getitem__(self, keys: tuple[str, ...]) -> Iterator[Any]:
+    def __getitem__(self, keys: Tuple[str, ...]) -> Iterator[Any]:
         return iter(getattr(self, k) for k in keys)
 
 

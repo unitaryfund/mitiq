@@ -16,7 +16,7 @@
 from collections import Counter
 from dataclasses import asdict
 from math import prod, sqrt
-from typing import Any, Callable, Union, cast, List, Dict
+from typing import Any, Callable, Union, cast, List, Dict, Tuple
 
 import cirq
 
@@ -161,7 +161,7 @@ def bitstrings_to_distribution(
 
 def convert_to_expval_executor(
     ex: Executor, distribution: Dict[str, float]
-) -> tuple[Executor, str]:
+) -> Tuple[Executor, str]:
     """Constructs a new executor returning an expectation value given by the
     probability that the circuit outputs the most likely state according to the
     ideal distribution.
