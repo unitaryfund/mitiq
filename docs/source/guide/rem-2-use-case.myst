@@ -15,20 +15,19 @@ kernelspec:
 
 ## Advantages
 
-Readout-error mitigation is a technique that can correct the final step of a quantum algorithm: readout. 
-These errors are likely device-specific and, as such, can be mitigated specifically that way. If a
-device is fully characterized, then almost any bias can be corrected. Even with a partially 
-characterized device or a partial characterization of the readout of the device one can obtain 
-error mitigation benefits. This technique can also be coupled with other error mitigation techniques.
-
-
-
+Readout error mitigation is a technique that deals with errors that many other
+techniques do not handle. For that reason it can often be combined with
+existing workflows to produce better results without much modification. The
+technique can also accept as much information as the user has about the
+measurement statistics in order to generate more accurate predictions.
 
 ## Disadvantages
 
-The specificity of this technique, which can be an advantage, is also a disadvantage because it means 
-that the mitigation cannot be generally applied to a class of devices. Readout-error mitigation
-requires generating confusion matrices, which require numerous additional measurements in the 
-computational basis (scaling exponentially), are specific to a device. These matrices must then be
-inverted and provided to the technique. For better scaling when generating these matrices, 
-readout-error characterization can be kept locally to a qubit or groups of qubits.
+The specificity of this technique, which can be an advantage, is also a
+disadvantage because it means that the measurement statistics that enable
+readout mitigation for one device cannot be generally applied to other
+devices. Readout-error mitigation requires generating confusion matrices,
+which require numerous additional measurements in the computational basis
+(scaling exponentially). These matrices must then be inverted and provided to
+the technique. For better scaling when generating these matrices, readout-error
+characterization can be kept locally to a qubit or groups of qubits.
