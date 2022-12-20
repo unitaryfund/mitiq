@@ -36,10 +36,9 @@ def execute(circuit, noise_level=0.001):
     )
 
 
-def test_workflow():
+def test_basic_workflow():
     cal = Calibrator(execute, ZNESettings)
     assert cal.get_cost() == {"noisy_executions": 24, "ideal_executions": 0}
 
-    results = cal.run_circuits()
-    cal.compute_improvements(results)
-    assert cal.get_optimal_strategy(results) == "zne"
+    cal.run()
+    assert cal.get_optimal_strategy(cal.results) == "zne"
