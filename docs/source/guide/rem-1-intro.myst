@@ -23,9 +23,11 @@ mitiq.SUPPORTED_PROGRAM_TYPES.keys()
 
 
 ## Problem setup
-This example uses a Z0 + Z1 observable with a circuit that flips each qubit to 
-the |1> state. However, this is an incredibly noisy device where each qubit's
-readout is flipped. So, we mitigate these error results with REM.
+In this example we will simulate a noisy device that flips qubits just before
+measurement to demonstrate the capabilities of REM. This method requires an 
+{ref}`observable <guide/observables/observables>` to be defined, and we use
+$Z_0 + Z_1$ as an example. Since the circuit includes an $X$ gate on each qubit, 
+the expectation value should be $-2$.
 
 ```{code-cell} ipython3
 from cirq import LineQubit, Circuit, X, measure_each
@@ -44,6 +46,11 @@ Next we define a simple noisy readout executor function which takes a
 circuit as input, executes the circuit on a noisy simulator, and 
 returns the raw measurement results. See the [Executors](executors.myst) 
 section for more information on how to define more advanced executors.
+
+```{warning}
+REM executors require bitstrings as output since the technique applies
+to raw measurements results.
+```
 
 ```{code-cell} ipython3
 from functools import partial
@@ -80,13 +87,15 @@ expectation values.
 from mitiq.raw import execute as raw_execute
 
 # Compute the expectation value of the observable.
-# Use a noisy executor that completely flips results
-noisy_executor = partial(noisy_readout_executor, p0=1, p1=1)
+# Use a noisy executor that has a 25% chance of flipping
+p_flip = 0.25
+noisy_executor = partial(noisy_readout_executor, p0=p_flip, p1=p_flip)
 noisy_value = raw_execute(circuit, noisy_executor, observable)
 
 ideal_executor = partial(noisy_readout_executor, p0=0, p1=0)
 ideal_value = raw_execute(circuit, ideal_executor, observable)
-print(f"Error without mitigation: {abs((ideal_value - noisy_value)/ideal_value) :.3}")
+error = abs((ideal_value - noisy_value)/ideal_value)
+print(f"Error without mitigation: {error:.3}")
 ```
 
 ## Apply REM to raw readout results
@@ -94,16 +103,13 @@ Readout-error mitigation can be easily applied with the function
 {func}`.execute_with_rem()`.
 
 ```{code-cell} ipython3
+from mitiq.rem import generate_inverse_confusion_matrix
 from mitiq import rem
 
-inverse_confusion_matrix = np.array(
-    [
-        [0, 0, 0, 1],
-        [0, 0, 1, 0],
-        [0, 1, 0, 0],
-        [1, 0, 0, 0],
-    ]
-)
+# We use a utility method to generate a simple inverse confusion matrix, but
+# you can supply your own confusion matrices and invert them using the helper
+# function generate_tensored_inverse_confusion_matrix().
+inverse_confusion_matrix = generate_inverse_confusion_matrix(2, p_flip, p_flip)
 
 mitigated_result = rem.execute_with_rem(
     circuit,
@@ -114,10 +120,11 @@ mitigated_result = rem.execute_with_rem(
 ```
 
 ```{code-cell} ipython3
-print(f"Error with mitigation (REM): {abs((ideal_value - mitigated_result)/ideal_value) :.3}")
+error = abs((ideal_value - mitigated_result)/ideal_value)
+print(f"Error with mitigation (REM): {error:.3}")
 ```
 
-Here we observe that the application of REM eliminates the readout error when compared
+Here we observe that the application of REM reduces the readout error when compared
 to the unmitigated result.
 
 ```{note} 
