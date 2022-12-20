@@ -67,7 +67,7 @@ class Settings:
     def __init__(
         self,
         techniques: List[str],
-        circuit_types: list[str],
+        circuit_types: List[str],
         num_qubits: int,
         circuit_depth: int,
         technique_params: Dict[str, Any],
@@ -78,7 +78,7 @@ class Settings:
         self.num_qubits = num_qubits
         self.circuit_depth = circuit_depth
 
-    def make_circuits(self) -> list[BenchmarkProblem]:
+    def make_circuits(self) -> List[BenchmarkProblem]:
         """Generate the circuits to run in a calibration experiment via the
         parameters passed in initialization."""
         circuits = []
@@ -127,7 +127,7 @@ class Settings:
             )
         return circuits
 
-    def make_strategies(self) -> list[Strategy]:
+    def make_strategies(self) -> List[Strategy]:
         """Generates a list of ready to apply error mitigation functions
         preloaded with hyperparameters."""
         funcs = []
