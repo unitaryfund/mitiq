@@ -90,7 +90,7 @@ print(f"Error without mitigation: {abs((ideal_value - noisy_value)/ideal_value) 
 ```
 
 ## Apply REM to raw readout results
-Readout-error mitigation can be easily implemented with the function
+Readout-error mitigation can be easily applied with the function
 {func}`.execute_with_rem()`.
 
 ```{code-cell} ipython3
