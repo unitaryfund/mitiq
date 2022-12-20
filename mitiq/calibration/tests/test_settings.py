@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import pytest
 
 from mitiq.calibration import ZNESettings, Settings
 from mitiq.zne.scaling import fold_global, fold_gates_at_random
@@ -40,6 +41,56 @@ def test_basic_settings():
     strategies = settings.make_strategies()
     num_strategies = 1 * 2 * 3
     assert len(strategies) == num_strategies
+
+
+def test_make_circuits_qv_circuits():
+    settings = Settings(
+        ["zne"],
+        circuit_types=["qv"],
+        num_qubits=2,
+        circuit_depth=999,
+        technique_params={
+            "scale_factors": [[1, 3, 4]],
+            "scale_methods": [fold_global, fold_gates_at_random],
+            "factories": [RichardsonFactory, ExpFactory, LinearFactory],
+        },
+    )
+    with pytest.raises(NotImplementedError, match="quantum volume circuits"):
+        settings.make_circuits()
+
+
+def test_make_circuits_invalid_circuit_type():
+    settings = Settings(
+        ["zne"],
+        circuit_types=["foobar"],
+        num_qubits=2,
+        circuit_depth=999,
+        technique_params={
+            "scale_factors": [[1, 3, 4]],
+            "scale_methods": [fold_global, fold_gates_at_random],
+            "factories": [RichardsonFactory, ExpFactory, LinearFactory],
+        },
+    )
+    with pytest.raises(
+        ValueError, match="invalid value passed for `circuit_types`"
+    ):
+        settings.make_circuits()
+
+
+def test_make_strategies_invalid_method():
+    settings = Settings(
+        ["destroy_my_errors"],
+        circuit_types=["shor"],
+        num_qubits=2,
+        circuit_depth=999,
+        technique_params={
+            "scale_factors": [[1, 3, 4]],
+            "scale_methods": [fold_global, fold_gates_at_random],
+            "factories": [RichardsonFactory, ExpFactory, LinearFactory],
+        },
+    )
+    with pytest.raises(ValueError, match="Invalid value passed"):
+        settings.make_strategies()
 
 
 def test_ZNESettings():
