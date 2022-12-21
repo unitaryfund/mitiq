@@ -79,13 +79,16 @@ computer = nx.to_directed(computer)
 ## Define the circuit
 
 We use mirror circuits to benchmark the performance of the device.
-Mirror circuits, introduced in *Proctor et al. arXiv (2021)* {cite}`Proctor_2021_NatPhys` ([arXiv:2008.11294](https://arxiv.org/abs/2008.11294)),
-are designed such that only one bitstring should be sampled. When run on a device, any other measured bitstrings are due to noise.
+Mirror circuits, introduced in
+*Proctor et al. arXiv (2021)* {cite}`Proctor_2021_NatPhys` ([arXiv:2008.11294](https://arxiv.org/abs/2008.11294)),
+are designed such that only one bitstring should be sampled. 
+When run on a device, any other measured bitstrings are due to noise.
 The frequency of the correct bitstring is our target metric.
 
 > Note: Mirror circuits build on Loschmidt echo circuits - i.e., circuits of the form $U U^\dagger$ for some unitary $U$.
 Loschmidt echo circuits are good benchmarks but have shortcomings - e.g., they are unable to detect coherent errors.
-Mirror circuits add new features to account for these shortcomings. For more background, see [arXiv:2008.11294](https://arxiv.org/abs/2008.11294).
+Mirror circuits add new features to account for these shortcomings. 
+For more background, see [arXiv:2008.11294](https://arxiv.org/abs/2008.11294).
 
 To define a mirror circuit, we need the device graph. 
 We will use a subgraph of the device, and our first step is picking a subgraph with good qubits.
@@ -108,20 +111,10 @@ def get_circuit(depth: int, seed: int) -> Tuple[cirq.Circuit, str]:
     return circuit, correct_bitstring 
 ```
 
-## Select the DDD sequences to be applied
-We now import a DDD _rule_ from Mitiq, i. e., a function that generates DDD sequences of different length.
-In this example, with simulated amplitude damping noise, we opt for YY sequences (pairs of Pauli Y operations).
-
-```{code-cell} ipython3
-from mitiq import ddd
-
-rule = ddd.rules.yy
-```
 
 ### Helper methods
 
-It will be useful later to us to have a number of utility functions for counting
-CNOT gates and operations.
+It will be useful later to us to have a number of utility functions for counting CNOT gates and operations.
 
 ```{code-cell} ipython
 def get_num_cnot_count(circuit: cirq.Circuit) -> int:
@@ -140,8 +133,8 @@ def get_oneq_count(circuit: cirq.Circuit) -> int:
 
 ## Define the executor
 
-Now that we have a circuit, we define the `execute` function which inputs a circuit and returns an expectation value - here, the frequency of
-sampling the correct bitstring.
+Now that we have a circuit, we define the `execute` function which inputs a circuit and returns an expectation value - here, the
+frequency of sampling the correct bitstring.
 
 ```{code-cell} ipython3
 def execute(
@@ -178,6 +171,17 @@ def execute(
 
     return results
 ```
+
+## Select the DDD sequences to be applied
+We now import a DDD _rule_ from Mitiq, i. e., a function that generates DDD sequences of different length.
+In this example, with simulated amplitude damping noise, we opt for YY sequences (pairs of Pauli Y operations).
+
+```{code-cell} ipython3
+from mitiq import ddd
+
+rule = ddd.rules.yy
+```
+
 
 ## Running the experiment
 
@@ -266,5 +270,5 @@ plt.legend();
 ```
 
 We can see that DDD on average improves the expectation value at each depth.
-Note that the size of the error bars represents the standard deviation of the noisy values (for the "Raw" line) and the standard deviation of
-the DDD values (for the "DDD" line).
+Note that the size of the error bars represents the standard deviation of the noisy values (for the "Raw" line) and the standard
+deviation of the DDD values (for the "DDD" line).
