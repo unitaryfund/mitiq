@@ -335,6 +335,7 @@ nbsphinx_thumbnails = {
     "examples/learning-depolarizing-noise": "_static/learn-depolarizing.png",
     "examples/pec_tutorial": "_static/pec-tutorial.png",
     "examples/scaling": "_static/scaling.png",
+    "examples/ddd_tutorial": "_static/ddd-tutorial.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }

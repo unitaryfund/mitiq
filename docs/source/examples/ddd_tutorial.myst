@@ -4,7 +4,7 @@ jupytext:
     extension: .myst
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.12.0
+    jupytext_version: 1.14.1
 kernelspec:
   display_name: Python 3
   language: python
@@ -40,7 +40,6 @@ import numpy as np
 
 # Mitiq imports.
 from mitiq import benchmarks, ddd
-
 ```
 
 ## Define parameters
@@ -62,18 +61,17 @@ trials: int = 4
 depths: List[int] = [1, 5, 9]
 ```
 
-
 We also define a graph representation of our qubits and assume a line topology.
 
 ```{code-cell} ipython3
 # Assume chain-like connectivity
 computer = nx.Graph()
 computer.add_edges_from([(0, 1), (1, 2)])
+nx.draw(computer, with_labels=True)
 
 # Add reversed edges to computer graph.
 # This is important to represent CNOT gates with target and control reversed.
 computer = nx.to_directed(computer)
-
 ```
 
 ## Define the circuit
@@ -111,12 +109,11 @@ def get_circuit(depth: int, seed: int) -> Tuple[cirq.Circuit, str]:
     return circuit, correct_bitstring 
 ```
 
-
 ### Helper methods
 
 It will be useful later to us to have a number of utility functions for counting CNOT gates and operations.
 
-```{code-cell} ipython
+```{code-cell} ipython3
 def get_num_cnot_count(circuit: cirq.Circuit) -> int:
     """Determine number of cnot gates in a given `Circuit` object."""    
     # Count CNOT gates for `cirq`-type circuit objects:
@@ -129,7 +126,6 @@ def get_num_cnot_count(circuit: cirq.Circuit) -> int:
 def get_oneq_count(circuit: cirq.Circuit) -> int:
     return len(circuit.instructions) - get_num_cnot_count(circuit)
 ```
-
 
 ## Define the executor
 
@@ -182,9 +178,7 @@ from mitiq import ddd
 rule = ddd.rules.yy
 ```
 
-
 ## Running the experiment
-
 
 ```{code-cell} ipython3
 cnot_counts, oneq_counts = [], []
@@ -242,7 +236,6 @@ for depth in depths:
     
     ddd_values.append(ddd_depth_values)
 ```
-
 
 Now we can visualize the results.
 
