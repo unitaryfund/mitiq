@@ -104,7 +104,7 @@ def get_circuit(depth: int, seed: int) -> Tuple[cirq.Circuit, str]:
         connectivity_graph=computer,
         two_qubit_gate_name="CNOT",
         seed=seed,
-        return_type="braket",
+        return_type="cirq",
     )        
     return circuit, correct_bitstring 
 ```
@@ -152,9 +152,10 @@ def execute(
     for circuit in circuits:
         circuit_to_run = circuit.copy()            
         if is_noisy:            
-            circuit_to_run.apply_gate_noise(
-                Noise.Depolarizing(probability=cnot_error_prob/2), target_gates=gates.CNot
+            circuit_to_run.with_noise(
+                cirq.amplitude_damp(p=0.05)
             )
+        circuit_to_run.append(cirq.measure(circuit_to_run.all_qubits()))
         to_run.append(circuit_to_run)
     
     backend = cirq.Simulator()
@@ -162,7 +163,7 @@ def execute(
     # Process each job.
     results: List[float] = []
     for circ_to_run in to_run:
-        result = backend.run(circ_to_run, shots=shots).result()
+        result = backend.run(circ_to_run).result()
         results.append(job_result.measurement_probabilities.get("".join(map(str, correct_bitstring)), 0.0))
 
     return results
@@ -194,7 +195,7 @@ for depth in depths:
     true_depth_values, noisy_depth_values = [], []
     pec_depth_values = []
 
-    noise_scaled_exdddtation_depth_values = []
+    noise_scaled_expectation_depth_values = []
 
     for trial in range(trials):
         # Local seed is calculated in this way to ensure that we don't get repeat values in loop.        
