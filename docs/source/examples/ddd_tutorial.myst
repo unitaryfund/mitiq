@@ -118,13 +118,13 @@ def get_num_cnot_count(circuit: cirq.Circuit) -> int:
     """Determine number of cnot gates in a given `Circuit` object."""    
     # Count CNOT gates for `cirq`-type circuit objects:
     num_cnots: int = 0
-    for instruction in circuit.instructions:
-        if isinstance(instruction.operator, gates.CNot):
+    for instruction in circuit.all_operations():
+        if isinstance(instruction, cirq.CXPowGate):
             num_cnots += 1
     return num_cnots
 
 def get_oneq_count(circuit: cirq.Circuit) -> int:
-    return len(circuit.instructions) - get_num_cnot_count(circuit)
+    return len(list(circuit.all_operations())) - get_num_cnot_count(circuit)
 ```
 
 ## Define the executor
@@ -153,9 +153,9 @@ def execute(
         circuit_to_run = circuit.copy()            
         if is_noisy:            
             circuit_to_run.with_noise(
-                cirq.amplitude_damp(p=0.05)
+                cirq.amplitude_damp(0.05)
             )
-        circuit_to_run.append(cirq.measure(circuit_to_run.all_qubits()))
+        circuit_to_run.append(cirq.measure(qubit) for qubit in circuit_to_run.all_qubits())
         to_run.append(circuit_to_run)
     
     backend = cirq.Simulator()
@@ -163,8 +163,8 @@ def execute(
     # Process each job.
     results: List[float] = []
     for circ_to_run in to_run:
-        result = backend.run(circ_to_run).result()
-        results.append(job_result.measurement_probabilities.get("".join(map(str, correct_bitstring)), 0.0))
+        result = backend.simulate(circ_to_run)
+        results.append(result.final_state_vector)
 
     return results
 ```
@@ -193,7 +193,7 @@ for depth in depths:
     
     cnot_depth_counts, oneq_depth_counts = [], []
     true_depth_values, noisy_depth_values = [], []
-    pec_depth_values = []
+    ddd_depth_values = []
 
     noise_scaled_expectation_depth_values = []
 
@@ -215,8 +215,7 @@ for depth in depths:
         ddd_value = ddd.execute_with_ddd(
             circuit, 
             ddd_executor, 
-            rule, 
-            num_trials,
+            rule=rule, 
         )
 
         ddd_depth_values.append(ddd_value)
