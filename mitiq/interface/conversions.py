@@ -234,7 +234,6 @@ def noise_scaling_converter(
     ) -> QPROGRAM:
 
         # Pre atomic conversion
-        idle_indices = set()
         if "qiskit" in circuit.__module__:
             from mitiq.interface.mitiq_qiskit.conversions import (
                 _add_identity_to_idle,
@@ -247,7 +246,7 @@ def noise_scaling_converter(
             circuit = RemoveBarriers()(circuit)
             # Apply identity gates to idle qubits otherwise they get lost
             # when converting to Cirq. Eventually, identities will be removed.
-            idle_indices = _add_identity_to_idle(circuit)
+            idle_qubits = _add_identity_to_idle(circuit)
 
         scaled_circuit = atomic_converter(noise_scaling_function)(
             circuit, *args, **kwargs
@@ -304,7 +303,7 @@ def noise_scaling_converter(
                 scaled_circuit,
                 new_qregs=circuit.qregs,  # type: ignore
             )
-            _remove_identity_from_idle(scaled_circuit, idle_indices)
+            _remove_identity_from_idle(scaled_circuit, idle_qubits)
             if circuit.cregs and not scaled_circuit.cregs:  # type: ignore
                 scaled_circuit.add_register(*circuit.cregs)  # type: ignore
 

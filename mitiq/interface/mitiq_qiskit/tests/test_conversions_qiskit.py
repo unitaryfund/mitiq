@@ -36,7 +36,6 @@ from mitiq.interface.mitiq_qiskit.conversions import (
     _remove_identity_from_idle,
 )
 from mitiq.interface import convert_to_mitiq
-from mitiq.utils import _equal
 
 
 def _multi_reg_circuits():
@@ -417,7 +416,7 @@ def test_remove_identity_from_idle():
 
 
 def test_add_identity_to_idle_with_multiple_registers():
-    """Tests idle qubits are correctly detected even with multiple registers."""
+    """Tests idle qubits are correctly detected even with many registers."""
     circuit_multi_reg, circuit_single_reg = _multi_reg_circuits()
     _add_identity_to_idle(circuit_multi_reg)
     _add_identity_to_idle(circuit_single_reg)
@@ -431,7 +430,7 @@ def test_add_identity_to_idle_with_multiple_registers():
 
 
 def test_remove_identity_from_idle_with_multiple_registers():
-    """Tests identities are correctly removed even with multiple registers."""
+    """Tests identities are correctly removed even with many registers."""
     circuit_multi_reg, circuit_single_reg = _multi_reg_circuits()
 
     idle_qubits_multi = _add_identity_to_idle(circuit_multi_reg.copy())

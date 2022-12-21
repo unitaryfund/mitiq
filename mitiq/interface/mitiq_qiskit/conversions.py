@@ -167,9 +167,8 @@ def _remove_identity_from_idle(
         if gate.name == "id" and set(qubits).intersection(idle_qubits):
             to_delete_indices.append(index)
     # Traverse data from list end to preserve index
-    for index in to_delete_indices[-1:]:
+    for index in to_delete_indices[::-1]:
         del circuit._data[index]
-
 
 def _measurement_order(
     circuit: qiskit.QuantumCircuit,
