@@ -170,6 +170,7 @@ def _remove_identity_from_idle(
     for index in to_delete_indices[::-1]:
         del circuit._data[index]
 
+
 def _measurement_order(
     circuit: qiskit.QuantumCircuit,
 ) -> List[Tuple[Any, ...]]:
