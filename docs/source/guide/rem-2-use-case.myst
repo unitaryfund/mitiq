@@ -23,5 +23,14 @@ measurement statistics in order to generate more accurate predictions.
 
 ## Disadvantages
 
-Readout-error mitigation requires the preliminary characterization of the measurement errors associated to a specific backend. Measurement errors can be expressed in the form of a confusion matrix and its estimation involves numerous state preparations and measurements in the computational basis.
-The confusion matrix must then be inverted and provided as an input to the technique. The complete characterization of a full confusion matrix scales exponentially in the number of qubits. For a better scaling when generating these matrices, readout-error characterization can be simplified under the assumption that measurement errors are local with respect to individual qubits or group of qubits.
+Readout-error mitigation requires the preliminary characterization of the 
+measurement errors associated to a specific backend. Measurement errors can
+be expressed in the form of a confusion matrix and its estimation involves
+numerous state preparations and measurements in the computational basis.
+
+The confusion matrix must then be inverted and provided as an input to the
+technique. The complete characterization of a full confusion matrix scales
+exponentially in the number of qubits. For a better scaling when generating
+these matrices, readout-error characterization can be simplified under the
+assumption that measurement errors are local with respect to individual qubits
+or group of qubits.
