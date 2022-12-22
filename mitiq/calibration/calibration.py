@@ -16,12 +16,18 @@
 from collections import Counter
 from dataclasses import asdict
 from math import prod, sqrt
-from typing import Any, Callable, Union, cast, List, Dict, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
 import cirq
 
-from mitiq import QPROGRAM, Executor, MeasurementResult, QuantumResult
-from mitiq.calibration.settings import Settings
+from mitiq import (
+    QPROGRAM,
+    Executor,
+    MeasurementResult,
+    Observable,
+    QuantumResult,
+)
+from mitiq.calibration.settings import Settings, Strategy
 
 
 class Calibrator:
@@ -77,6 +83,8 @@ class Calibrator:
                 self.executor, distribution
             )
             noisy_value = expval_executor.evaluate(circuit)[0]
+            ideal_value = distribution[bitstring_to_measure]
+            noisy_error = ideal_value - noisy_value
 
             mitigated_values: Dict[str, Dict[str, Any]] = {
                 technique: {"results": [], "improvement_factor": None}
@@ -86,7 +94,15 @@ class Calibrator:
                 technique, params, mitiq_func = strategy
                 mitigated_value = mitiq_func(circuit, expval_executor)
 
-                result = {"mitigated_value": mitigated_value, **params}
+                improvement_factor = abs(
+                    noisy_error / (ideal_value - mitigated_value)
+                )
+                result = {
+                    "mitigated_value": mitigated_value,
+                    "improvement_factor": improvement_factor,
+                    "strategy": strategy,
+                    **params,
+                }
                 mitigated_values[technique]["results"].append(result)
 
             circuit_info = asdict(problem)
@@ -124,20 +140,19 @@ class Calibrator:
                 )
                 di["improvement_factor"] = improvement_factor
 
-    def get_optimal_strategy(self, results: List[Dict[str, Any]]) -> str:
-        """Finds the optimal error mitigation strategy using the improvement
-        factors calculated, and stored in `self.results`.
-
-        Currently, this function"""
-        best_val = 0.0
-        best_key = ""
-        for result in results:
-            for method, di in result["mitigated_values"].items():
-                improvement_factor = di["improvement_factor"]
-                if improvement_factor > best_val:
-                    best_val = improvement_factor
-                    best_key = method
-        return best_key
+    def best_strategy(self, results: List[Dict[str, Any]]) -> Strategy:
+        """Finds the best strategy by using the parameters that had the
+        largest improvement factor."""
+        best_improvement_factor = 0.0
+        strategy = None
+        for circuit in results:
+            for result in circuit["mitigated_values"]["zne"]["results"]:
+                if result["improvement_factor"] > best_improvement_factor:
+                    best_improvement_factor = result["improvement_factor"]
+                    strategy = result["strategy"]
+        if strategy is None:
+            raise ValueError("None of the improvement factors were > 0")
+        return strategy
 
     def run(self) -> None:
         results = self.run_circuits()
@@ -160,7 +175,9 @@ def bitstrings_to_distribution(
 
 
 def convert_to_expval_executor(
-    ex: Executor, distribution: Dict[str, float]
+    ex: Executor,
+    distribution: Optional[Dict[str, float]] = None,
+    bitstring: Optional[str] = None,
 ) -> Tuple[Executor, str]:
     """Constructs a new executor returning an expectation value given by the
     probability that the circuit outputs the most likely state according to the
@@ -171,10 +188,14 @@ def convert_to_expval_executor(
             - An executor returning expectation values: QPROGRAM -> float
             - The most likely bitstring, according to the passed `distribution`
     """
-    bitstring_to_measure = max(
-        distribution,
-        key=distribution.get,  # type: ignore [arg-type]
-    )
+    bitstring_to_measure = ""
+    if distribution:
+        bitstring_to_measure = max(
+            distribution,
+            key=distribution.get,  # type: ignore [arg-type]
+        )
+    elif bitstring:
+        bitstring = bitstring
 
     def expval_executor(circuit: cirq.Circuit) -> float:
         raw = cast(MeasurementResult, ex._run([circuit])[0]).result
@@ -185,3 +206,19 @@ def convert_to_expval_executor(
         Executor(expval_executor),  # type: ignore [arg-type]
         bitstring_to_measure,
     )
+
+
+def execute_with_mitigation(
+    circuit: QPROGRAM,
+    calibrator: Calibrator,
+    bitstring: str,
+    observable: Optional[Observable] = None,
+) -> QuantumResult:
+    if not calibrator.results:
+        calibrator.run()
+    strategy = calibrator.best_strategy(calibrator.results)
+    em_func = strategy.mitigation_function
+    expval_executor, _ = convert_to_expval_executor(
+        calibrator.executor, bitstring=bitstring
+    )
+    return em_func(circuit, executor=expval_executor, observable=observable)

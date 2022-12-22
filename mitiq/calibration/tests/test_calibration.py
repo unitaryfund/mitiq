@@ -27,6 +27,7 @@ from mitiq.calibration.calibration import (
     bitstrings_to_distribution,
     convert_to_expval_executor,
 )
+from mitiq.calibration.settings import Strategy
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import (
     fold_gates_at_random,
@@ -72,7 +73,7 @@ def test_ZNE_workflow():
     cal.run()
     assert len(cal.results) == 3
     assert cal.results[0]["mitigated_values"]["zne"]["improvement_factor"] >= 0
-    assert cal.get_optimal_strategy(cal.results) == "zne"
+    assert isinstance(cal.best_strategy(cal.results), Strategy)
 
 
 def test_get_cost():
@@ -107,6 +108,8 @@ def test_validate_run_circuits_schema():
                                 "scale_factors": [float],
                                 "scale_method": str,
                                 "mitigated_value": float,
+                                "improvement_factor": float,
+                                "strategy": Strategy,
                             }
                         ],
                     }
@@ -159,3 +162,6 @@ def test_convert_to_expval_executor():
 
     rb_circuit_expval = noiseless_expval_executor.evaluate(rb_circuit)
     assert np.isclose(rb_circuit_expval, 1.0)
+
+
+# def test_execute_with_mitigation():
