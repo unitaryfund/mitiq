@@ -156,7 +156,7 @@ print("Avg improvement factor (`insert_id_layers`): ", round(np.average(results[
 
 As we can see, both techniques offer an improvement, but for this problem identity insertion outperforms folding dramatically.
 This is due to the fact that ZNE assumes one can scale the noise throughout a circuit by doubling, tripling, etc, the noise's strength.
-Identity insertion does exactly this, and hence has great performance on this simple noise model.
+On the simple noise model used in our example, identity insertion does exactly this, and hence has great performance.
 Noise models with increased complexity would likely see more equal, or perhaps better performance by folding-based techniques.
 
 
