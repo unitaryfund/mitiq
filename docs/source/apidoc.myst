@@ -241,3 +241,10 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
 .. automodule:: mitiq.zne.scaling.parameter
    :members:
 ```
+
+## Calibration
+
+```{eval-rst}
+.. automodule:: mitiq.calibration
+   :members:
+```
