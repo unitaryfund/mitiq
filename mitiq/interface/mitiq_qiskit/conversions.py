@@ -154,8 +154,8 @@ def _remove_identity_from_idle(
 ) -> None:
     """Removes identities from the circuit corresponding to the input
     idle qubits.
-    Used in conjunction with _add_identity_to_idle to preserve idle qubits and
-    indices in conversion.
+    Used in conjunction with _add_identity_to_idle to preserve idle qubits in
+    conversion.
 
     Args:
         circuit: Qiskit circuit to have identities removed
