@@ -1,6 +1,41 @@
 # Changelog
 
-## Version 0.22.0 (In Development)
+## Version 0.23.0 (In Development)
+
+## Version 0.22.0
+
+### Summary
+In this release we focused on improving our documentation (2 new examples, and new REM docs, and some cleanup that should make navigating the docs easier), along with some bug fixes.
+This release also adds a new module `calibration` which allows one to run a series of experiments to see what error mitigation parameters will work best for their particular setup.
+This feature is still under active development.
+
+Many thanks to @amirebrahimi for his continued work on making readout error mitigation available, and usable in Mitiq.
+
+Thanks to everyone who contributed to Mitiq this year!
+It's been a great time for error mitigation, and we look forward to continuing to grow Mitiq in the new year!
+Happy holidays! 🎄🎉🎊
+
+### All changes
+- Calibration prototype (#1614) [@natestemen]
+- Noise scaling tutorial (identity insertion/folding) (#1633) [@natestemen]
+- Fill in second sub-section of REM docs (#1630) [@amirebrahimi]
+- Add REM docs sections and fill out the first section (#1629) [@amirebrahimi]
+- Update pennylane-qiskit requirement from ~=0.27.0 to ~=0.28.0 (#1641) [@dependabot]
+- Revert "Update pennylane requirement from ~=0.27.0 to ~=0.28.0 (#1640)" (#1642) [@natestemen]
+- Update pennylane requirement from ~=0.27.0 to ~=0.28.0 (#1640) [@dependabot]
+- Update numpy requirement from ~=1.23.5 to ~=1.24.0 (#1638) [@dependabot]
+- Update mitiq build badge display name (#1636) [@Misty-W]
+- Fix build badge (#1635) [@andreamari]
+- Contributing/dev tasks docs improvements (#1615) [@natestemen]
+- Fix extrapolations for ExpFactory in special cases  (#1631) [@Misty-W]
+- docs: add Misty-W as a contributor for ideas, test, and 2 more (#1632) [@allcontributors]
+- Update learning depolarizing noise tutorial to avoid long execution time (#1628) [@Misty-W]
+- Format examples' titles and list (#1622) [@nathanshammah]
+- Update qiskit requirement from ~=0.39.3 to ~=0.39.4 (#1625) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.34.3 to ~=1.35.1 (#1626) [@dependabot]
+- Add list of accepted RFCs to docs (#1623) [@nathanshammah]
+- REM: Utility method maintenance (#1610) [@amirebrahimi]
+- Adding PEC simulator mitiq tutorial (#1612) [@vprusso]
 
 ## Version 0.21.0
 
