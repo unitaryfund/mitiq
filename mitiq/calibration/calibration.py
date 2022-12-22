@@ -143,7 +143,7 @@ class Calibrator:
     def best_strategy(self, results: List[Dict[str, Any]]) -> Strategy:
         """Finds the best strategy by using the parameters that had the
         largest improvement factor."""
-        best_improvement_factor = 0.0
+        best_improvement_factor = 1.0
         strategy = None
         for circuit in results:
             for result in circuit["mitigated_values"]["zne"]["results"]:
