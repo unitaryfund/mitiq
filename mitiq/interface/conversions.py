@@ -254,7 +254,7 @@ def noise_scaling_converter(
 
         # Post atomic conversion
         # PyQuil: Restore declarations, measurements, and metadata.
-        if "pyquil" in scaled_circuit.__module__:
+        if "pyquil" in circuit.__module__:
             from pyquil import Program
             from pyquil.quilbase import Declare, Measurement
 
@@ -291,7 +291,7 @@ def noise_scaling_converter(
             scaled_circuit.num_shots = circuit.num_shots
 
         # Qiskit: Keep the same register structure and measurement order.
-        if "qiskit" in scaled_circuit.__module__:
+        if "qiskit" in circuit.__module__:
             from mitiq.interface.mitiq_qiskit.conversions import (
                 _transform_registers,
                 _measurement_order,
