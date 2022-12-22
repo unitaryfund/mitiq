@@ -56,7 +56,7 @@ settings = Settings(
     num_qubits=2,
     circuit_depth=10,
     technique_params={
-        "scale_factors": [[1.0, 2.0, 3.0], [1.0, 3.0, 5.0], [2.0, 4.0, 8.0]],
+        "scale_factors": [[1.0, 1.2, 1.4], [1.0, 1.5, 2.0], [1.0, 2.0, 3.0]],
         "scale_methods": [
             fold_global,
             fold_gates_at_random,
