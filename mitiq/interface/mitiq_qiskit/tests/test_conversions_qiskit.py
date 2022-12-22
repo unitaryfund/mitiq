@@ -35,6 +35,24 @@ from mitiq.interface.mitiq_qiskit.conversions import (
     _add_identity_to_idle,
     _remove_identity_from_idle,
 )
+from mitiq.interface import convert_to_mitiq
+
+
+def _multi_reg_circuits():
+    """Returns a circuit with multiple registers
+    and an equivalent circuit with a single register."""
+    qregs = [qiskit.QuantumRegister(1, f"q{j}") for j in range(4)]
+    circuit_multi_reg = qiskit.QuantumCircuit(*qregs)
+    for q in qregs[1:]:
+        circuit_multi_reg.x(q)
+        circuit_multi_reg.x(3)
+    qreg = qiskit.QuantumRegister(4, "q")
+    circuit_single_reg = qiskit.QuantumCircuit(qreg)
+    for q in qreg[1:]:
+        circuit_single_reg.x(q)
+        circuit_single_reg.x(3)
+
+    return circuit_multi_reg, circuit_single_reg
 
 
 def test_remove_qasm_barriers():
@@ -373,13 +391,15 @@ def test_add_identity_to_idle():
     circuit = qiskit.QuantumCircuit(9)
     circuit.x([0, 8])
     circuit.cx(0, 8)
-    idle_indices = _add_identity_to_idle(circuit)
-    id_indices = []
+    expected_idle_qubits = circuit.qubits[1:-1]
+
+    idle_qubits = _add_identity_to_idle(circuit)
+    id_qubits = []
     for gates, qubits, cargs in circuit.get_instructions("id"):
         for qubit in qubits:
-            id_indices.append(qubit.index)
-    assert idle_indices == set(range(1, 8))
-    assert id_indices == sorted(idle_indices)
+            id_qubits.append(qubit)
+    assert idle_qubits == set(expected_idle_qubits)
+    assert set(id_qubits) == idle_qubits
 
 
 def test_remove_identity_from_idle():
@@ -393,3 +413,33 @@ def test_remove_identity_from_idle():
         for qubit in qubits:
             id_indices.append(qubit.index)
     assert id_indices == []
+
+
+def test_add_identity_to_idle_with_multiple_registers():
+    """Tests idle qubits are correctly detected even with many registers."""
+    circuit_multi_reg, circuit_single_reg = _multi_reg_circuits()
+    _add_identity_to_idle(circuit_multi_reg)
+    _add_identity_to_idle(circuit_single_reg)
+
+    # The result should be the same for both types of registers
+    assert _equal(
+        convert_to_mitiq(circuit_multi_reg)[0],
+        convert_to_mitiq(circuit_single_reg)[0],
+        require_qubit_equality=False,  # Qubit names can be different
+    )
+
+
+def test_remove_identity_from_idle_with_multiple_registers():
+    """Tests identities are correctly removed even with many registers."""
+    circuit_multi_reg, circuit_single_reg = _multi_reg_circuits()
+
+    idle_qubits_multi = _add_identity_to_idle(circuit_multi_reg.copy())
+    idle_qubits_single = _add_identity_to_idle(circuit_single_reg.copy())
+
+    _remove_identity_from_idle(circuit_multi_reg, idle_qubits_multi)
+    _remove_identity_from_idle(circuit_single_reg, idle_qubits_single)
+
+    # Adding and removing identities should preserve the input
+    input_multi, input_single = _multi_reg_circuits()
+    assert circuit_multi_reg == input_multi
+    assert circuit_single_reg == input_single
