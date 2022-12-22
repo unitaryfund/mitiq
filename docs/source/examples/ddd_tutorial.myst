@@ -78,7 +78,7 @@ topology = nx.to_directed(topology)
 ## Define the circuit
 
 We use mirror circuits to benchmark the performance of the device.
-Mirror circuits, introduced in *Proctor et al. arXiv (2021)* {cite}`Proctor_2021_NatPhys`, are designed such that only one bitstring
+Mirror circuits, introduced in *Proctor et al. (2021)* {cite}`Proctor_2021_NatPhys`, are designed such that only one bitstring
 should be sampled. 
 When run on a device, any other measured bitstrings are due to noise.
 The frequency of the correct bitstring is our target metric.
@@ -118,7 +118,7 @@ frequency of sampling the correct bitstring.
 
 ```{code-cell} ipython3
 def execute(
-    circuits: cirq.Circuit,
+    circuit: cirq.Circuit,
     shots: int,
     correct_bitstring: str,
     is_noisy: bool = True,
@@ -126,36 +126,25 @@ def execute(
     """Executes the input circuit(s) and returns ⟨A⟩, where
     A = |correct_bitstring⟩⟨correct_bitstring| for each circuit.
     """
-    if not isinstance(circuits, list):
-        circuits = [circuits]
-
-    # Store all circuits to run in list to be returned.
-    to_run = []
 
     # Compile circuits to appropriate gateset.
-    for circuit in circuits:
-        circuit_to_run = circuit.copy()
-        if is_noisy:
-            to_run.append(circuit_to_run.with_noise(cirq.amplitude_damp(0.05)))
-        else:
-            to_run.append(circuit_to_run)
+    if is_noisy:
+        circuit_to_run = circuit.with_noise(cirq.amplitude_damp(0.05))
+    else:
+        circuit_to_run = circuit.with_noise(cirq.amplitude_damp(0.05))
 
     backend = cirq.Simulator()
 
-    # Process each job.
-    results: List[float] = []
-    for circ_to_run in to_run:
-        counts = 0
-        for _ in range(shots):
-            result = backend.run(
-                circ_to_run + cirq.measure(*sorted(circuit.all_qubits()))
-            )
-            bitstring = list(result.measurements.values())[0][0].tolist()
-            if bitstring == correct_bitstring:
-                counts += 1
-        results.append(counts / shots)
+    counts = 0
+    for _ in range(shots):
+        result = backend.run(
+            circuit_to_run + cirq.measure(*sorted(circuit.all_qubits()))
+        )
+        bitstring = list(result.measurements.values())[0][0].tolist()
+        if bitstring == correct_bitstring:
+            counts += 1
 
-    return results
+    return (counts / shots)
 ```
 
 ## Select the DDD sequences to be applied
@@ -192,8 +181,8 @@ for depth in depths:
 
         circuit, correct_bitstring = get_circuit(depth, local_seed)
 
-        (true_value,) = execute(circuit, shots, correct_bitstring, is_noisy=False)
-        (noisy_value,) = execute(circuit, shots, correct_bitstring, is_noisy=True)
+        true_value = execute(circuit, shots, correct_bitstring, is_noisy=False)
+        noisy_value = execute(circuit, shots, correct_bitstring, is_noisy=True)
 
         ddd_executor = functools.partial(
             execute,
