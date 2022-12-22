@@ -34,5 +34,5 @@ Here is a tutorial on how to use DDD in Mitiq:
 
 [DDD with Cirq: Mirror circuits](../examples/ddd_tutorial.myst)
 
-You can find many more examples on a variety of error mitigation techniques in the **[Examples](../examples/examples.myst)** section of the
-documentation.
+You can find many more examples on a variety of error mitigation techniques in the **[Examples](../examples/examples.myst)** section of
+the documentation.
