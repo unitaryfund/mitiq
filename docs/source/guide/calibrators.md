@@ -20,7 +20,7 @@ This gives the user freedom to work on more important parts of their algorithm/q
 ## Workflow
 
 To begin, we will need to define an executor which tells Mitiq how to run circuits.
-In order to use the calibration capabilities of Mitiq, we will need to define an executor which returns bitstrings, rather than an expectation value as might be common.
+In order to use the calibration capabilities of Mitiq, we will need to define an executor which returns all the measured bitstrings, rather than an expectation value.
 This allows the calibration experiment to extract more fine-grained data from each circuit experiment it will run
 
 ```{code-cell} ipython3
@@ -52,7 +52,7 @@ from mitiq.calibration import Calibrator, ZNESettings, execute_with_mitigation
 ```
 
 To instantiate a `Calibrator` we need to pass it an executor (as defined above), and a `Settings` object.
-You are free to define your own, but we provide `ZNESettings` as a starting point to test basic performance.
+You are free to define your own `Settings`, but we provide `ZNESettings` as a simple starting point based on different zero-noise extrapolation strategies.
 Finally, the `execute_with_mitigation` function allows us to pass the calibration results directly to Mitiq and have it pick the strategy that performed best.
 
 ## Calibration Experiments
@@ -66,24 +66,20 @@ print(cal.get_cost())
 cal.run()
 ```
 
-```{code-cell} ipython3
-from pprint import pprint
-pprint(cal.results)
-print(len(cal.results))
-```
+## Applying the optimal error mitigation strategy
 
-## Using Calibrator Object with Mitigation
-
-To demonstrate `execute_with_mitigation` we define a randomized benchmarking circuit to test it on.
-All circuits that are run through an executor returning bitstrings must contains measurements.
+We first define randomized benchmarking circuit to test the effect of error mitigation.
 
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_rb_circuits
+
 circuit = generate_rb_circuits(2, 10)[0]
+# circuits passed to an executor returning bitstrings must contain measurements
 circuit.append(cirq.measure(circuit.all_qubits()))
 ```
 
-We can now pass the randomized benchmarking circuit, along with the calibrator object, and a final argument used for specifying a bitstring that we would like to measure.
+Instead of deciding what error mitigation technique and what options to use, we can ask Mitiq to determine the optimal error mitigation strategy based on the previous calibration. 
+We can obtain this by calling the `execute_with_mitigation` function and passing the `circuit`, along with the `Calibrator` object.
 
 ```{code-cell} ipython3
 execute_with_mitigation(circuit, cal, bitstring='00')
