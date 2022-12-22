@@ -19,7 +19,7 @@ This gives the user freedom to work on more important parts of their algorithm/q
 
 ## Workflow
 
-To begin, we will need to define an executor which tells mitiq how to run circuits.
+To begin, we will need to define an executor which tells Mitiq how to run circuits.
 In order to use the calibration capabilities of Mitiq, we will need to define an executor which returns bitstrings, rather than an expectation value as might be common.
 This allows the calibration experiment to extract more fine-grained data from each circuit experiment it will run
 
