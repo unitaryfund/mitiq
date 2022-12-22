@@ -47,47 +47,48 @@ from mitiq import benchmarks, ddd
 
 ```{code-cell} ipython3
 # Random seed for circuit generation.
-seed: int = 1
+seed = 1
 
 # Total number of shots to use.
 shots: int = 1000
 
 # Qubits to use on the experiment.
-qubits: List[int] = [0, 1, 2]
+qubits = [0, 1, 2]
 
 # Average results over this many trials (circuit instances) at each depth.
-trials: int = 3
+trials = 3
 
 # Clifford depths.
-depths: List[int] = [1, 5, 9]
+depths = [1, 5, 9]
 ```
 
 We also define a graph representation of our qubits and assume a line topology.
 
 ```{code-cell} ipython3
 # Assume chain-like connectivity
-computer = nx.Graph()
-computer.add_edges_from([(0, 1), (1, 2)])
-nx.draw(computer, with_labels=True)
+topology = nx.Graph()
+topology.add_edges_from([(0, 1), (1, 2)])
+nx.draw(topology, with_labels=True)
 
-# Add reversed edges to computer graph.
+# Add reversed edges to topology graph.
 # This is important to represent CNOT gates with target and control reversed.
-computer = nx.to_directed(computer)
+topology = nx.to_directed(topology)
 ```
 
 ## Define the circuit
 
 We use mirror circuits to benchmark the performance of the device.
-Mirror circuits, introduced in
-*Proctor et al. arXiv (2021)* {cite}`Proctor_2021_NatPhys` ([arXiv:2008.11294](https://arxiv.org/abs/2008.11294)),
-are designed such that only one bitstring should be sampled. 
+Mirror circuits, introduced in *Proctor et al. arXiv (2021)* {cite}`Proctor_2021_NatPhys`, are designed such that only one bitstring should
+be sampled. 
 When run on a device, any other measured bitstrings are due to noise.
 The frequency of the correct bitstring is our target metric.
 
-> Note: Mirror circuits build on Loschmidt echo circuits - i.e., circuits of the form $U U^\dagger$ for some unitary $U$.
+```{admonition} Note
+Mirror circuits build on Loschmidt echo circuits - i.e., circuits of the form $U U^\dagger$ for some unitary $U$.
 Loschmidt echo circuits are good benchmarks but have shortcomings - e.g., they are unable to detect coherent errors.
 Mirror circuits add new features to account for these shortcomings. 
 For more background, see [arXiv:2008.11294](https://arxiv.org/abs/2008.11294).
+```
 
 To define a mirror circuit, we need the device graph. 
 We will use a subgraph of the device, and our first step is picking a subgraph with good qubits.
@@ -95,38 +96,19 @@ We will use a subgraph of the device, and our first step is picking a subgraph w
 
 ### Generate mirror circuit
 
-Now that we have the device (sub)graph, we can generate a mirror circuit and the bitstring it should sample as follows.
+Now that we have the device graph, we can generate a mirror circuit and the bitstring it should sample as follows.
 
 ```{code-cell} ipython3
 def get_circuit(depth: int, seed: int) -> Tuple[cirq.Circuit, str]:
     circuit, correct_bitstring = benchmarks.generate_mirror_circuit(
         nlayers=depth,
         two_qubit_gate_prob=1.0,
-        connectivity_graph=computer,
+        connectivity_graph=topology,
         two_qubit_gate_name="CNOT",
         seed=seed,
         return_type="cirq",
     )
     return circuit, correct_bitstring
-```
-
-### Helper methods
-
-It will be useful later to us to have a number of utility functions for counting CNOT gates and operations.
-
-```{code-cell} ipython3
-def get_num_cnot_count(circuit: cirq.Circuit) -> int:
-    """Determine number of cnot gates in a given `Circuit` object."""
-    # Count CNOT gates for `cirq`-type circuit objects:
-    num_cnots: int = 0
-    for instruction in circuit.all_operations():
-        if isinstance(instruction, cirq.CXPowGate):
-            num_cnots += 1
-    return num_cnots
-
-
-def get_oneq_count(circuit: cirq.Circuit) -> int:
-    return len(list(circuit.all_operations())) - get_num_cnot_count(circuit)
 ```
 
 ## Define the executor
@@ -136,7 +118,7 @@ frequency of sampling the correct bitstring.
 
 ```{code-cell} ipython3
 def execute(
-    circuits: Union[cirq.Circuit, List[cirq.Circuit]],
+    circuits: cirq.Circuit,
     shots: int,
     correct_bitstring: str,
     is_noisy: bool = True,
@@ -148,7 +130,7 @@ def execute(
         circuits = [circuits]
 
     # Store all circuits to run in list to be returned.
-    to_run: List[cirq.Circuit] = []
+    to_run = []
 
     # Compile circuits to appropriate gateset.
     for circuit in circuits:
@@ -186,11 +168,11 @@ from mitiq import ddd
 rule = ddd.rules.yy
 ```
 
-## Running the experiment
+## Sample bitstrings from mirror circuits
 
 ```{code-cell} ipython3
-:tags: ["skip-execution"]
-cnot_counts, oneq_counts = [], []
+:tags: [skip-execution]
+
 true_values, noisy_values = [], []
 ddd_values = []
 
@@ -199,7 +181,6 @@ noise_scaled_expectation_values = []
 for depth in depths:
     print("Status: On depth", depth, end="\n\n")
 
-    cnot_depth_counts, oneq_depth_counts = [], []
     true_depth_values, noisy_depth_values = [], []
     ddd_depth_values = []
 
@@ -226,14 +207,8 @@ for depth in depths:
 
         ddd_depth_values.append(ddd_value)
 
-        cnot_depth_counts.append(get_num_cnot_count(circuit))
-        oneq_depth_counts.append(get_oneq_count(circuit))
-
         true_depth_values.append(true_value)
         noisy_depth_values.append(noisy_value)
-
-    cnot_counts.append(cnot_depth_counts)
-    oneq_counts.append(oneq_depth_counts)
 
     true_values.append(true_depth_values)
     noisy_values.append(noisy_depth_values)
@@ -246,7 +221,8 @@ for depth in depths:
 Now we can visualize the results.
 
 ```{code-cell} ipython3
-:tags: ["skip-execution"]
+:tags: [skip-execution]
+
 avg_true_values = np.average(true_values, axis=1)
 avg_noisy_values = np.average(noisy_values, axis=1)
 
