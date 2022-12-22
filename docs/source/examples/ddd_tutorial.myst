@@ -271,7 +271,7 @@ plt.ylabel("Expectation value")
 _ = plt.legend()
 ```
 
-```{figure} ../_thumbnails/ddd_tutorial.png
+```{figure} ../_thumbnails/ddd-tutorial.png
 ---
 
 name: ddd_mirror_circuit_comparison
