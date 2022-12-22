@@ -56,7 +56,7 @@ shots: int = 1000
 qubits: List[int] = [0, 1, 2]
 
 # Average results over this many trials (circuit instances) at each depth.
-trials: int = 4
+trials: int = 3
 
 # Clifford depths.
 depths: List[int] = [1, 5, 9]
@@ -189,6 +189,7 @@ rule = ddd.rules.yy
 ## Running the experiment
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 cnot_counts, oneq_counts = [], []
 true_values, noisy_values = [], []
 ddd_values = []
@@ -220,7 +221,7 @@ for depth in depths:
         )
 
         ddd_value = ddd.execute_with_ddd(
-            circuit, ddd_executor, rule=rule
+            circuit, ddd_executor, rule=rule, num_trials = 100,
         )
 
         ddd_depth_values.append(ddd_value)
@@ -245,6 +246,7 @@ for depth in depths:
 Now we can visualize the results.
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 avg_true_values = np.average(true_values, axis=1)
 avg_noisy_values = np.average(noisy_values, axis=1)
 
@@ -269,6 +271,15 @@ plt.ylabel("Expectation value")
 _ = plt.legend()
 ```
 
-We can see that DDD on average improves the expectation value at each depth.
+```{figure} ../_thumbnails/ddd_tutorial.png
+---
+
+name: ddd_mirror_circuit_comparison
+---
+The figure is a plot of the expectation values obtained from simulating mirror circuits with amplitude damping noise and applying DDD.
+```
+
+
+We can see that DDD on average improves the expectation value at depths above 3.
 Note that the size of the error bars represents the standard deviation of the noisy values (for the "Raw" line) and the standard
 deviation of the DDD values (for the "DDD" line).
