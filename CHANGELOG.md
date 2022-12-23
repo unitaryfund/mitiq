@@ -17,6 +17,8 @@ Happy holidays! 🎄🎉🎊
 
 ### All changes
 - Digital Dynamical Decoupling Tutorial on Mirror Circuits (#1645) [@Misty-W]
+- Fix bug for Qiskit circuits with idle qubits (#1646) [@andreamari]
+- Calibration core concepts docs (#1648) [@natestemen]
 - Calibration prototype (#1614) [@natestemen]
 - Noise scaling tutorial (identity insertion/folding) (#1633) [@natestemen]
 - Fill in second sub-section of REM docs (#1630) [@amirebrahimi]
