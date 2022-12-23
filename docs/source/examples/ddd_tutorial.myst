@@ -120,7 +120,7 @@ frequency of sampling the correct bitstring.
 def execute(
     circuit: cirq.Circuit,
     shots: int,
-    correct_bitstring: str,
+    correct_bitstring: List[int],
     is_noisy: bool = True,
 ) -> float:
     """Executes the input circuit(s) and returns ⟨A⟩, where
