@@ -5,7 +5,7 @@
 ## Version 0.22.0
 
 ### Summary
-In this release we focused on improving our documentation (2 new examples, and new REM docs, and some cleanup that should make navigating the docs easier), along with some bug fixes.
+In this release we focused on improving our documentation with three new examples, new REM docs, and navigation improvements, along with some bug fixes.
 This release also adds a new module `calibration` which allows one to run a series of experiments to see what error mitigation parameters will work best for their particular setup.
 This feature is still under active development.
 
@@ -16,6 +16,7 @@ It's been a great time for error mitigation, and we look forward to continuing t
 Happy holidays! 🎄🎉🎊
 
 ### All changes
+- Digital Dynamical Decoupling Tutorial on Mirror Circuits (#1645) [@Misty-W]
 - Calibration prototype (#1614) [@natestemen]
 - Noise scaling tutorial (identity insertion/folding) (#1633) [@natestemen]
 - Fill in second sub-section of REM docs (#1630) [@amirebrahimi]
