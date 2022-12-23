@@ -15,7 +15,7 @@ kernelspec:
 
 The workflow of Digital Dynamical Decoupling (DDD) in Mitiq is represented in the figure below.
 
-```{figure} ../img/ddd_workflow.png
+```{figure} ../img/ddd_workflow.svg
 ---
 width: 700px
 name: ddd-workflow
