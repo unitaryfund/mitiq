@@ -99,7 +99,7 @@ We will use a subgraph of the device, and our first step is picking a subgraph w
 Now that we have the device graph, we can generate a mirror circuit and the bitstring it should sample as follows.
 
 ```{code-cell} ipython3
-def get_circuit(depth: int, seed: int) -> Tuple[cirq.Circuit, str]:
+def get_circuit(depth: int, seed: int) -> Tuple[cirq.Circuit, List[int]:
     circuit, correct_bitstring = benchmarks.generate_mirror_circuit(
         nlayers=depth,
         two_qubit_gate_prob=1.0,
@@ -122,12 +122,11 @@ def execute(
     shots: int,
     correct_bitstring: str,
     is_noisy: bool = True,
-) -> List[float]:
+) -> float:
     """Executes the input circuit(s) and returns ⟨A⟩, where
     A = |correct_bitstring⟩⟨correct_bitstring| for each circuit.
     """
 
-    # Compile circuits to appropriate gateset.
     if is_noisy:
         circuit_to_run = circuit.with_noise(cirq.amplitude_damp(0.05))
     else:
