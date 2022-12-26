@@ -130,7 +130,7 @@ def execute(
     if is_noisy:
         circuit_to_run = circuit.with_noise(cirq.amplitude_damp(0.05))
     else:
-        circuit_to_run = circuit.with_noise(cirq.amplitude_damp(0.05))
+        circuit_to_run = circuit.with_noise(cirq.amplitude_damp(0.0))
 
     backend = cirq.Simulator()
 
@@ -190,7 +190,7 @@ for depth in depths:
         )
 
         ddd_value = ddd.execute_with_ddd(
-            circuit, ddd_executor, rule=rule, num_trials = 100,
+            circuit, ddd_executor, rule=rule, num_trials = 10,
         )
 
         ddd_depth_values.append(ddd_value)
@@ -243,7 +243,6 @@ name: ddd_mirror_circuit_comparison
 The figure is a plot of the expectation values obtained from simulating mirror circuits with amplitude damping noise and applying DDD.
 ```
 
-
-We can see that DDD on average improves the expectation value at depths above 3.
+We can see that on average DDD very slightly improves the expectation value **at depths above 3**.
 Note that the size of the error bars represents the standard deviation of the noisy values (for the "Raw" line) and the standard
 deviation of the DDD values (for the "DDD" line).
