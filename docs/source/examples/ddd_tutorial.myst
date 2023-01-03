@@ -25,7 +25,7 @@ for the rest of this tutorial.
 
 ```{code-cell} ipython3
 import functools
-from typing import List, Tuple, Union
+from typing import List, Tuple
 
 # Plotting imports.
 import matplotlib.pyplot as plt
@@ -243,6 +243,6 @@ name: ddd_mirror_circuit_comparison
 The figure is a plot of the expectation values obtained from simulating mirror circuits with amplitude damping noise and applying DDD.
 ```
 
-We can see that on average DDD very slightly improves the expectation value **at depths above 3**.
+We can see that on average DDD *very slightly* improves the expectation value **at depths above 3**.
 Note that the size of the error bars represents the standard deviation of the noisy values (for the "Raw" line) and the standard
 deviation of the DDD values (for the "DDD" line).
