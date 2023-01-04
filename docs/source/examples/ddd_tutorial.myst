@@ -116,7 +116,9 @@ def get_circuit(depth: int, seed: int) -> Tuple[cirq.Circuit, List[int]]:
 Now that we have a circuit, we define the `execute` function which inputs a circuit and returns an expectation value - here, the
 frequency of sampling the correct bitstring.
 
-**Importantly**, since DDD is designed to mitigate time-correlated (non-Markovian) noise, we simulate a particular noise model consisting of systematic $R_Z$ rotations applied to each qubit after each moment. This corresponds to a dephasing noise which is strongly time-correlated and, therefore, likely to be mitigated by DDD.
+**Importantly**, since DDD is designed to mitigate time-correlated (non-Markovian) noise, we simulate a particular noise model consisting of
+systematic $R_Z$ rotations applied to each qubit after each moment. 
+This corresponds to a dephasing noise which is strongly time-correlated and, therefore, likely to be mitigated by DDD.
 
 ```{code-cell} ipython3
 def execute(
@@ -185,7 +187,9 @@ for depth in depths:
         )
 
         ddd_value = ddd.execute_with_ddd(
-            circuit, noisy_executor, rule=rule,
+            circuit,
+            noisy_executor,
+            rule=rule,
         )
 
         ddd_depth_values.append(ddd_value)
