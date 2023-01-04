@@ -238,7 +238,3 @@ The figure is a plot of the expectation values obtained from simulating mirror c
 We can see that on average DDD *slightly* improves the expectation value.
 Note that the size of the error bars represents the standard deviation of the noisy values (for the "Raw" line) and the standard
 deviation of the DDD values (for the "DDD" line).
-
-```{code-cell} ipython3
-
-```
