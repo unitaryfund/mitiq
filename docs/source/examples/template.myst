@@ -47,7 +47,7 @@ For example, here's the MyST-NB logo:
 
 ![myst-nb logo](../img/unitary_fund_logo.png)
 
-By adding `"html_image"` to the `myst_enable_extensions` list in the sphinx configuration ([see here](https://myst-parser.readthedocs.io/en/latest/syntax/optional.html#images)), you can even add HTML `img` tags with attributes:
+By adding `"html_image"` to the `myst_enable_extensions` list in the sphinx configuration ([see here](https://myst-parser.readthedocs.io/en/latest/syntax/optional.html#html-images)), you can even add HTML `img` tags with attributes:
 
 ```html
 <img src="../img/unitary_fund_logo.png" alt="logo" width="200px" class="shadow mb-2">
