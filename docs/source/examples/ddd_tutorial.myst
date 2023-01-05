@@ -159,7 +159,6 @@ rule = ddd.rules.yy
 ## Sample bitstrings from mirror circuits
 
 ```{code-cell} ipython3
-:tags: [skip-execution]
 
 true_values, noisy_values = [], []
 ddd_values = []
@@ -205,7 +204,6 @@ for depth in depths:
 Now we can visualize the results.
 
 ```{code-cell} ipython3
-:tags: [skip-execution]
 
 avg_true_values = np.average(true_values, axis=1)
 avg_noisy_values = np.average(noisy_values, axis=1)
@@ -231,13 +229,6 @@ plt.ylabel("Expectation value")
 _ = plt.legend()
 ```
 
-```{figure} ../_thumbnails/ddd-tutorial.png
----
-
-name: ddd_mirror_circuit_comparison
----
-The figure is a plot of the expectation values obtained from simulating mirror circuits with time-correlated dephasing noise and applying DDD.
-```
 
 We can see that on average DDD *slightly* improves the expectation value.
 Note that the size of the error bars represents the standard deviation of the noisy values (for the "Raw" line) and the standard
