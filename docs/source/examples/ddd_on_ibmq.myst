@@ -4,9 +4,9 @@ jupytext:
     extension: .myst
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.1
+    jupytext_version: 1.11.1
 kernelspec:
-  display_name: Python 3 (ipykernel)
+  display_name: Python 3
   language: python
   name: python3
 ---
@@ -196,7 +196,6 @@ rule = ddd.rules.yy
 ## Sample bitstrings from mirror circuits
 
 ```{code-cell} ipython3
-:tags: [skip-execution]
 
 true_values, noisy_values = [], []
 ddd_values = []
@@ -242,7 +241,6 @@ for depth in depths:
 Now we can visualize the results.
 
 ```{code-cell} ipython3
-:tags: [skip-execution]
 
 avg_true_values = np.average(true_values, axis=1)
 avg_noisy_values = np.average(noisy_values, axis=1)
