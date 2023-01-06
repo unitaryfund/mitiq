@@ -4,7 +4,7 @@ jupytext:
     extension: .myst
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.14.1
+    jupytext_version: 1.11.1
 kernelspec:
   display_name: Python 3
   language: python
@@ -25,7 +25,7 @@ for the rest of this tutorial.
 
 ```{code-cell} ipython3
 import functools
-from typing import List, Tuple, Union
+from typing import List, Tuple
 
 # Plotting imports.
 import matplotlib.pyplot as plt
@@ -50,7 +50,7 @@ from mitiq import benchmarks, ddd
 seed = 1
 
 # Total number of shots to use.
-shots: int = 1000
+shots: int = 10000
 
 # Qubits to use on the experiment.
 qubits = [0, 1, 2]
@@ -59,7 +59,7 @@ qubits = [0, 1, 2]
 trials = 3
 
 # Clifford depths.
-depths = [1, 5, 9]
+depths = [10, 20, 30]
 ```
 
 We also define a graph representation of our qubits and assume a line topology.
@@ -116,6 +116,10 @@ def get_circuit(depth: int, seed: int) -> Tuple[cirq.Circuit, List[int]]:
 Now that we have a circuit, we define the `execute` function which inputs a circuit and returns an expectation value - here, the
 frequency of sampling the correct bitstring.
 
+**Importantly**, since DDD is designed to mitigate time-correlated (non-Markovian) noise, we simulate a particular noise model consisting of
+systematic $R_Z$ rotations applied to each qubit after each moment. 
+This corresponds to a dephasing noise which is strongly time-correlated and, therefore, likely to be mitigated by DDD.
+
 ```{code-cell} ipython3
 def execute(
     circuit: cirq.Circuit,
@@ -126,29 +130,25 @@ def execute(
     """Executes the input circuit(s) and returns ⟨A⟩, where
     A = |correct_bitstring⟩⟨correct_bitstring| for each circuit.
     """
-
+    # This is useful to understand if DDD gates are inserted into the circuit.
+    print(f"Executing circuit with {len(list(circuit.all_operations()))} gates.")
     if is_noisy:
-        circuit_to_run = circuit.with_noise(cirq.amplitude_damp(0.05))
+        # Simulate systematic dephasing (coherent RZ) on each qubit for each moment.
+        circuit_to_run = circuit.with_noise(cirq.rz(0.05))
     else:
-        circuit_to_run = circuit.with_noise(cirq.amplitude_damp(0.05))
+        circuit_to_run = circuit.copy()
 
-    backend = cirq.Simulator()
+    circuit_to_run += cirq.measure(*sorted(circuit.all_qubits()), key="m")
+    backend = cirq.DensityMatrixSimulator()
 
-    counts = 0
-    for _ in range(shots):
-        result = backend.run(
-            circuit_to_run + cirq.measure(*sorted(circuit.all_qubits()))
-        )
-        bitstring = list(result.measurements.values())[0][0].tolist()
-        if bitstring == correct_bitstring:
-            counts += 1
-
-    return (counts / shots)
+    result = backend.run(circuit_to_run, repetitions=shots)
+    expval = result.measurements["m"].tolist().count(correct_bitstring) / shots
+    return expval
 ```
 
 ## Select the DDD sequences to be applied
 We now import a DDD _rule_ from Mitiq, i. e., a function that generates DDD sequences of different length.
-In this example, with simulated amplitude damping noise, we opt for YY sequences (pairs of Pauli Y operations).
+In this example, we opt for YY sequences (pairs of Pauli Y operations).
 
 ```{code-cell} ipython3
 from mitiq import ddd
@@ -159,7 +159,6 @@ rule = ddd.rules.yy
 ## Sample bitstrings from mirror circuits
 
 ```{code-cell} ipython3
-:tags: [skip-execution]
 
 true_values, noisy_values = [], []
 ddd_values = []
@@ -169,13 +168,10 @@ noise_scaled_expectation_values = []
 for depth in depths:
     print("Status: On depth", depth, end="\n\n")
 
-    true_depth_values, noisy_depth_values = [], []
-    ddd_depth_values = []
-
-    noise_scaled_expectation_depth_values = []
+    true_depth_values, noisy_depth_values, ddd_depth_values = [], [], []
 
     for trial in range(trials):
-        # Local seed is calculated in this way to ensure that we don't get repeat values in loop.
+        # Local seed is calculated in this way to ensure that we don't get repeated values in loop.
         local_seed = 10**6 * depth + 10**3 * seed + trial
 
         circuit, correct_bitstring = get_circuit(depth, local_seed)
@@ -183,14 +179,16 @@ for depth in depths:
         true_value = execute(circuit, shots, correct_bitstring, is_noisy=False)
         noisy_value = execute(circuit, shots, correct_bitstring, is_noisy=True)
 
-        ddd_executor = functools.partial(
+        noisy_executor = functools.partial(
             execute,
             shots=shots,
             correct_bitstring=correct_bitstring,
         )
 
         ddd_value = ddd.execute_with_ddd(
-            circuit, ddd_executor, rule=rule, num_trials = 100,
+            circuit,
+            noisy_executor,
+            rule=rule,
         )
 
         ddd_depth_values.append(ddd_value)
@@ -200,16 +198,12 @@ for depth in depths:
 
     true_values.append(true_depth_values)
     noisy_values.append(noisy_depth_values)
-
-    noise_scaled_expectation_values.append(noise_scaled_expectation_depth_values)
-
     ddd_values.append(ddd_depth_values)
 ```
 
 Now we can visualize the results.
 
 ```{code-cell} ipython3
-:tags: [skip-execution]
 
 avg_true_values = np.average(true_values, axis=1)
 avg_noisy_values = np.average(noisy_values, axis=1)
@@ -235,15 +229,7 @@ plt.ylabel("Expectation value")
 _ = plt.legend()
 ```
 
-```{figure} ../_thumbnails/ddd-tutorial.png
----
 
-name: ddd_mirror_circuit_comparison
----
-The figure is a plot of the expectation values obtained from simulating mirror circuits with amplitude damping noise and applying DDD.
-```
-
-
-We can see that DDD on average improves the expectation value at depths above 3.
+We can see that on average DDD *slightly* improves the expectation value.
 Note that the size of the error bars represents the standard deviation of the noisy values (for the "Raw" line) and the standard
 deviation of the DDD values (for the "DDD" line).
