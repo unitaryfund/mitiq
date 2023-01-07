@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# Digital dynamical decoupling (DDD) with Mirror Circuits
+# Digital dynamical decoupling (DDD) with Qiskit on Mirror Circuits
 
 In this notebook DDD is applied to improve the success rate of the computation. 
 In DDD, sequences of gates are applied to slack windows, i.e. single-qubit idle windows, in a quantum circuit. 

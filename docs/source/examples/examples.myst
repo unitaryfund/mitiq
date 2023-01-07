@@ -22,5 +22,6 @@ ZNE with BQSKit compiled circuits <bqskit.myst>
 PEC on a Braket simulator: Mirror circuits <pec_tutorial.myst>
 PEC with Cirq: Learning representations <learning-depolarizing-noise.myst>
 DDD with Cirq: Mirror circuits <ddd_tutorial.myst>
+DDD with Qiskit: Mirror circuits <ddd_on_ibmq.myst>
 The Mitiq paper code <mitiq-paper/mitiq-paper-codeblocks>
 ```
