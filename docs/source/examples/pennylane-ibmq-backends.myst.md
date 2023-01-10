@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .myst.md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.1
@@ -148,7 +148,7 @@ mitigated = qml.transforms.mitigate_with_zne(
 print(f"Mitigated result {mitigated:.3f}")
 ```
 
-Further options are described and elaborated in our article on [additional options](../guide/zne-3-options.myst) in ZNE.
+Further options are described and elaborated in our article on [additional options](../guide/zne-3-options.myst.md) in ZNE.
 
 
 ## Decorator usage

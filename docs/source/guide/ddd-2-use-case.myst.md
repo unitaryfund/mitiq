@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .myst.md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.10.3
@@ -17,7 +17,7 @@ kernelspec:
 
 Dynamical decoupling is a technique that has been originally devised to shield a quantum system from quantum noise coming from an environment, using open-loop control techniques {cite}`Viola_1999_PRL`. The crucial idea behind dynamical decoupling is to intervene with control pulses on timescales that are faster than those of the system-environment interaction.
 
-It is thus particularly effective against structured baths, colored noise or any type of noise with some level of memory effects. More details on the theory of digital dynamical decoupling are given in the section [What is the theory behind DDD?](ddd-5-theory.myst).
+It is thus particularly effective against structured baths, colored noise or any type of noise with some level of memory effects. More details on the theory of digital dynamical decoupling are given in the section [What is the theory behind DDD?](ddd-5-theory.myst.md).
 
 Dynamical decoupling is also effective for single-shot quantum computing algorithms, i.e., it finds application beyond algorithms that just require expectation values, like variational quantum algorithms.
 

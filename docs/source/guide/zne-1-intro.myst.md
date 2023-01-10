@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .myst.md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.1
@@ -51,7 +51,7 @@ print(circuit)
 As an example, below we define a simple executor function
 which inputs a circuit, executes it on a noisy simulator, and returns the probability
 of the ground state.
-See the [Executors](executors.myst) section for more information on how to
+See the [Executors](executors.myst.md) section for more information on how to
 define more advanced executors.
 
 ```{code-cell} ipython3
@@ -70,7 +70,7 @@ def execute(circuit, noise_level=0.01):
     return rho[0, 0].real
 ```
 
-The [executor](executors.myst) can be used to evaluate noisy (unmitigated) expectation values.
+The [executor](executors.myst.md) can be used to evaluate noisy (unmitigated) expectation values.
 
 ```{code-cell} ipython3
 # Compute the expectation value of the |0><0| observable.
@@ -110,7 +110,7 @@ but is more sensitive to noise when executed on a real noisy backend. In practic
 scaling function before the execution of a circuit, one can indirectly scale up the effect of noise. The noise scaling
 function can either increase the total circuit execution time by inserting unitaries or increase the wait times in the
 middle of a circuit execution. These two methods are *unitary folding* and *identity scaling* respectively.
-See the section [What additional options are available in ZNE?](zne-3-options.myst) for more details.
+See the section [What additional options are available in ZNE?](zne-3-options.myst.md) for more details.
 
 For example, the function {func}`.fold_gates_at_random()` applies the *unitary folding* map $G \rightarrow G G^\dagger G$
 to a random subset of gates of the input circuit.
@@ -127,7 +127,7 @@ print("Folded circuit:", folded, sep="\n")
 ## Select a noise extrapolation method
 Define a {class}`.Factory` object to select the noise extrapolation method and the noise scale
 factors. The section
-[What additional options are available when using ZNE?](zne-3-options.myst) also
+[What additional options are available when using ZNE?](zne-3-options.myst.md) also
 contains more details on the available noise extrapolation methods in Mitiq.
 
 For example, a linear extrapolation method with scale factors 1 and 2, can be
@@ -153,5 +153,5 @@ mitigated_result = zne.execute_with_zne(
 print(f"Error with mitigation (ZNE): {abs(ideal_value - mitigated_result):.{3}}")
 ```
 
-The section [What additional options are available when using ZNE?](zne-3-options.myst)
+The section [What additional options are available when using ZNE?](zne-3-options.myst.md)
 contains more information on both noise scaling and noise extrapolation methods in Mitiq.

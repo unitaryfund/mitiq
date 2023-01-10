@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .myst.md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.1
@@ -23,12 +23,12 @@ name: ddd-workflow
 Workflow of the DDD technique in Mitiq.
 ```
 
-- The user provides a `QPROGRAM`, (i.e. a quantum circuit defined via any of the supported [frontends](frontends-backends.myst)).
+- The user provides a `QPROGRAM`, (i.e. a quantum circuit defined via any of the supported [frontends](frontends-backends.myst.md)).
 - Mitiq modifies the input circuit with the insertion of DDD gate sequences in idle windows.
-- The modified circuit is executed via a user-defined [Executor](executors.myst).
+- The modified circuit is executed via a user-defined [Executor](executors.myst.md).
 - The error mitigated expectation value is returned to the user.
 
-With respect to the workflows of other error-mitigation techniques (e.g. [ZNE](zne-4-low-level.myst) or [PEC](pec-4-low-level.myst)),
+With respect to the workflows of other error-mitigation techniques (e.g. [ZNE](zne-4-low-level.myst.md) or [PEC](pec-4-low-level.myst.md)),
 DDD involves the generation and the execution of a _single_ modified circuit.
 For this reason, there is no need to combine the results of multiple circuits and the final inference step which is necessary for other 
 techniques is instead trivial for DDD.
@@ -39,7 +39,7 @@ the associated results are averaged to obtain the final expectation value. This 
 it can be considered as an average of independent single-circuit workflows.
 ```
 
-As shown in [How do I use DDD?](ddd-1-intro.myst), the function {func}`.execute_with_ddd()` applies DDD behind the scenes 
+As shown in [How do I use DDD?](ddd-1-intro.myst.md), the function {func}`.execute_with_ddd()` applies DDD behind the scenes 
 and directly returns the error-mitigated expectation value.
 In the next sections instead, we show how one can apply DDD at a lower level, i.e., by:
 

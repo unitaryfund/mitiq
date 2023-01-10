@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .myst.md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.4
@@ -53,7 +53,7 @@ The diagram demonstrates how gates are inserted in a circuit when *local folding
 
 More details on the theory of unitary folding can be found in {cite}`Giurgica_Tiron_2020_arXiv`.
 More details on its practical implementation in Mitiq can be found in 
-[What additional options are available for ZNE?](zne-3-options.myst).
+[What additional options are available for ZNE?](zne-3-options.myst.md).
 
 A noise scaling technique similar to unitary folding is *pulse-stretching*: a method that only applies to 
 devices with pulse-level access {cite}`Temme_2017_PRL, Kandala_2019_Nature`.
@@ -106,4 +106,4 @@ $$
 where $m$ is equal to the number of data points in the fit (i.e. the number of noise scaled expectation values).
  
 More details on how to apply different extrapolation methods with Mitiq can be found in [What additional options
-are available in ZNE?](zne-3-options.myst).
+are available in ZNE?](zne-3-options.myst.md).

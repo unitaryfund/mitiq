@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .myst.md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.1
@@ -16,7 +16,7 @@ kernelspec:
 In this notebook DDD is applied to improve the success rate of the computation. 
 In DDD, sequences of gates are applied to slack windows, i.e. single-qubit idle windows, in a quantum circuit. 
 Applying such sequences can reduce the coupling between the qubits and the environment, mitigating the effects of noise. 
-For more information on DDD, see the section [DDD section of the user guide](../guide/ddd.myst).
+For more information on DDD, see the section [DDD section of the user guide](../guide/ddd.myst.md).
 
 ## Setup
 

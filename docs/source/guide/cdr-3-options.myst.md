@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .myst.md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.1
@@ -13,7 +13,7 @@ kernelspec:
 
 # What additional options are available in CDR?
 
-In addition to the four necessary ingredients shown in [How do I use CDR?](cdr-1-intro.myst), there are additional parameters in CDR.
+In addition to the four necessary ingredients shown in [How do I use CDR?](cdr-1-intro.myst.md), there are additional parameters in CDR.
 
 One option is how many circuits are in the training set (default is 10). This can be changed as follows.
 

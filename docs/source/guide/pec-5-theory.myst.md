@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .myst.md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.1
@@ -51,7 +51,7 @@ to the error mitigation cost associated to the gate $\mathcal G_i$.
 ***Note:** In principle, the gate index "$i$" in the noisy operations $\mathcal O_{i, \alpha}$ could be dropped.
 However, we keep it to explicitly define gate-dependent basis of implementable operations, consistently with
 the  structure of the `OperationRepresentation` class discussed in [What additional options are
-available in PEC?](pec-3-options.myst).*
+available in PEC?](pec-3-options.myst.md).*
 
 
 ## Error cancellation

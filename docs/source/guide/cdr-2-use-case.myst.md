@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .myst.md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.1
@@ -22,7 +22,7 @@ to the used backend.
 
 This self-tuning property is even stronger in the case of _variable-noise-CDR_, i.e., when using the _scale_factors_ option
 in {func}`.execute_with_cdr`. In this case, the final error mitigated expectation value is obtained
-as a linear combination of noise-scaled expectation values. This is similar to the [ZNE approach](zne-5-theory.myst) but, in CDR, 
+as a linear combination of noise-scaled expectation values. This is similar to the [ZNE approach](zne-5-theory.myst.md) but, in CDR, 
 the coefficients of the linear combination are learned instead of being fixed by the extrapolation model.
 
 

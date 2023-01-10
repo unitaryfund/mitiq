@@ -5,14 +5,14 @@ maxdepth: 2
 caption: Contents
 hidden: true
 ---
-readme.myst
-guide/guide.myst
-examples/examples.myst
-apidoc.myst
-toc_contributing.myst
-changelog.myst
-bibliography.myst
+readme.myst.md
+guide/guide.myst.md
+examples/examples.myst.md
+apidoc.myst.md
+toc_contributing.myst.md
+changelog.myst.md
+bibliography.myst.md
 ```
 
-```{include} ./readme.myst
+```{include} ./readme.myst.md
 ```

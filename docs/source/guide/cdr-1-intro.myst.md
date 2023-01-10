@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .myst.md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.1
@@ -68,7 +68,7 @@ circuit = 5 * circuit
 ```
 
 ### 2. Define an executor
-We define an [executor](executors.myst) function which inputs a circuit and returns a {class}`.QuantumResult`. Here for sake of example we use a simulator that adds single-qubit depolarizing noise after each moment and returns the final density matrix.
+We define an [executor](executors.myst.md) function which inputs a circuit and returns a {class}`.QuantumResult`. Here for sake of example we use a simulator that adds single-qubit depolarizing noise after each moment and returns the final density matrix.
 
 ```{code-cell} ipython3
 from mitiq.interface.mitiq_cirq import compute_density_matrix
@@ -89,7 +89,7 @@ print(obs)
 
 +++
 
-You can read more about the {class}`Observable` class in the [documentation](observables.myst).
+You can read more about the {class}`Observable` class in the [documentation](observables.myst.md).
 
 +++
 

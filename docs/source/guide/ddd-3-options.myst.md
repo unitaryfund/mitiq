@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .myst.md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.1
@@ -26,7 +26,7 @@ We'll discuss several ways of defining DDD rules:
 
 ## Built-in DDD rules
 Mitiq provides basic built in rules to approximate dynamical decoupling sequences that are most used and discussed
-in the literature (for more details see [What is the theory behind DDD?](ddd-5-theory.myst)).
+in the literature (for more details see [What is the theory behind DDD?](ddd-5-theory.myst.md)).
 For example, the _XX_, _YY_, and _XYXY_ rules generate the corresponding gate sequences spaced evenly over the input slack window.
 For each of these rules, the user may specify a different spacing between the gates in the sequence and pass the desired option as shown
 in the next code cell.
@@ -138,7 +138,7 @@ print(custom_rule(4))
 Suppose a user wants to mix sequences where, for example, _XYXY_ is applied first to long slack windows and then _XX_ is applied
 to all the shorter windows that are left over.
 
-As demonstrated in detail in the [next user guide section](ddd-4-low-level.myst), the function {func}`.insert_ddd_sequences()`
+As demonstrated in detail in the [next user guide section](ddd-4-low-level.myst.md), the function {func}`.insert_ddd_sequences()`
 is all one needs to apply DDD.
 So, to apply two nested rules, one only needs to call {func}`.insert_ddd_sequences()` twice as shown in the following example.
 
