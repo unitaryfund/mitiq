@@ -48,7 +48,7 @@ written from scratch,
 - an **API-doc** part, which is (mostly)
 automatically generated.
 
-Information in the docs can be added as markdown (`.md`/`.myst`) files, as
+Information in the docs can be added as markdown files, as
 the `myst-parser` extension supports both basic markdown syntax as well as
 the extended MyST syntax. If you are adding a new file (as opposed to editing an existing one), consider adding it to an associated TOC.
 
@@ -57,14 +57,14 @@ Currently, `.rst` is supported for any of the files in the docs, but the current
 If you want a good intro to MyST and how it compares to `.rst` see [this guide](https://myst-parser.readthedocs.io/en/latest/sphinx/intro.html).
 ```
 
-The main table of contents (TOC) file for the docs is `index.myst`. It includes `guide\guide.myst` and `apidoc.myst`, among other files. To add a new file to the base TOC, make sure it gets listed in the `toctree` directive like this:
+The main table of contents (TOC) file for the docs is `index.md`. It includes `guide\guide.md` and `apidoc.md`, among other files. To add a new file to the base TOC, make sure it gets listed in the `toctree` directive like this:
 ````
 ```{toctree}
 ---
 maxdepth: 2 
 caption: Contents
 ---
-file.myst
+file.md
 ```
 ````
 
@@ -74,7 +74,7 @@ If you use VS Code as your text editor there is a nice extension that does synta
 
 ### Including other files in the docs 
 
-To include `.md` files outside of the documentation `source` directory, you can add a stub `*.myst` file to the toctree inside the `docs/source` directory that contains:
+To include `.md` files outside of the documentation `source` directory, you can add a stub `*.md` file to the toctree inside the `docs/source` directory that contains:
 
 ````
 ```{include} path/to/file.md
@@ -87,26 +87,26 @@ where `file.md` is the one to be added. For more information on including files 
 
 ### Adding files to the user guide
 
-To add information in the guide, please add markdown (`.md`) or MyST markdown (`.myst`) files to the `docs/guide` directory.
-Remember to add new files to the guide's TOC file `docs/source/guide/guide.myst`.
+To add information in the guide, please add markdown (`.md`) files to the `docs/guide` directory.
+Remember to add new files to the guide's TOC file `docs/source/guide/guide.md`.
 
 ### Adding code examples
 
 All code examples, besides explanations on the use of core software package features, live in the `examples` directory under `docs/source`. You can add
 Jupyter notebooks (`.ipynb`) or MyST markdown notebooks, but MyST formatting will be preferred as it is much easier to diff in version control.
 
-If you have a notebook you want to add, and want to automatically convert it from the `.ipynb` to `.myst`, you can use a great Python command line tool called [jupytext](https://jupytext.readthedocs.io/en/latest/index.html).
+If you have a notebook you want to add, and want to automatically convert it from the `.ipynb` to `.md`, you can use a great Python command line tool called [jupytext](https://jupytext.readthedocs.io/en/latest/index.html).
 Not only can `jupytext` convert between the formats on demand, but once you install it, you can configure it to manage _both_ a Jupyter and Markdown version of your file, so you don't have to remember to do conversions (for more details, see the `jupytext` docs on [paired notebooks](https://jupytext.readthedocs.io/en/latest/index.html#paired-notebooks).
 Using the paired notebooks you can continue your development in the notebooks as normal, and just commit to git the markdown serialized version when you want to add to the docs.
 You can even add this tool as a [git pre-commit hook](https://jupytext.readthedocs.io/en/latest/using-pre-commit.html) if you want!
 
 ```{tip}
-There is a [sample markdown formatted notebook in the `examples` directory](./examples/template.myst) for you to take a look at as you write your own!
+There is a [sample markdown formatted notebook in the `examples` directory](./examples/template.md) for you to take a look at as you write your own!
 ```
 
 ### Automatically add information from the API docs
 
-New modules, classes and functions can be added by listing them in the appropriate file (such as `apidoc.myst` or a child), e.g.,
+New modules, classes and functions can be added by listing them in the appropriate file (such as `apidoc.md` or a child), e.g.,
 
 ````
 ## New Module
@@ -125,7 +125,7 @@ Once <https://github.com/executablebooks/MyST-Parser/issues/228> is closed, we c
 
 ```{tip}
 If you are adding new features to Mitiq, make sure to add API docs in the
-source code, and to the API page `apidoc.myst`.
+source code, and to the API page `apidoc.md`.
 ```
 
 ## Build the documentation locally

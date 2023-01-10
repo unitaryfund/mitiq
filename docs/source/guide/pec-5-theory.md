@@ -51,7 +51,7 @@ to the error mitigation cost associated to the gate $\mathcal G_i$.
 ***Note:** In principle, the gate index "$i$" in the noisy operations $\mathcal O_{i, \alpha}$ could be dropped.
 However, we keep it to explicitly define gate-dependent basis of implementable operations, consistently with
 the  structure of the `OperationRepresentation` class discussed in [What additional options are
-available in PEC?](pec-3-options.myst).*
+available in PEC?](pec-3-options.md).*
 
 
 ## Error cancellation

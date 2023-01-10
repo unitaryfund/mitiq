@@ -4,10 +4,10 @@
 ---
 maxdepth: 2 
 ---
-contributing.myst
-contributing_docs.myst
-examples/template.myst
-release.myst
-milestone_managing.myst
-code_of_conduct.myst
+contributing.md
+contributing_docs.md
+examples/template.md
+release.md
+milestone_managing.md
+code_of_conduct.md
 ```
