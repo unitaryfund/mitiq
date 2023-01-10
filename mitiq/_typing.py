@@ -24,7 +24,7 @@
        computed. Note this includes expectation values themselves.
 """
 from dataclasses import dataclass
-from typing import cast, Iterable, List, Optional, Tuple, Union
+from typing import cast, Iterable, List, Optional, Tuple, Union, Sequence
 
 import numpy as np
 import numpy.typing as npt
@@ -69,25 +69,30 @@ QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit, _BKCircuit, _QuantumTape]
 
 # Define MeasurementResult, a result obtained by measuring qubits on a quantum
 # computer.
-Bitstring = List[int]
+Bitstring = Union[str, List[int]]
 
 
 @dataclass
 class MeasurementResult:
     """Bitstrings sampled from a quantum computer."""
 
-    result: List[Bitstring]
+    result: Sequence[Bitstring]
     qubit_indices: Optional[Tuple[int, ...]] = None
 
     def __post_init__(self) -> None:
-        if not set(b for bits in self.result for b in bits).issubset({0, 1}):
-            raise ValueError(
-                "MeasurementResult contains elements which are not (0, 1)."
-            )
+        symbols = set(b for bits in self.result for b in bits)
+        if not (symbols.issubset({0, 1}) or symbols.issubset({"0", "1"})):
+            raise ValueError("Bitstrings should look like '011' or [0, 1, 1].")
 
-        self._bitstrings = np.array(self.result)
+        if symbols.issubset({"0", "1"}):
+            # Convert to list of integers
+            int_result = [[int(b) for b in bits] for bits in self.result]
+            self.result: List[List[int]] = list(int_result)
+
         if isinstance(self.result, np.ndarray):
             self.result = cast(List[Bitstring], self.result.tolist())
+
+        self._bitstrings = np.array(self.result)
 
         if not self.qubit_indices:
             self.qubit_indices = tuple(range(self.nqubits))

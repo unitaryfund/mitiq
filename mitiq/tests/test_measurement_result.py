@@ -44,10 +44,10 @@ def test_measurement_result_bad_qubit_indices():
 
 
 def test_measurement_result_not_bits():
-    with pytest.raises(ValueError, match="contains elements"):
+    with pytest.raises(ValueError, match="should look like"):
         MeasurementResult(result=[[2]])
 
-    with pytest.raises(ValueError, match="contains elements"):
+    with pytest.raises(ValueError, match="should look like"):
         MeasurementResult(result=[[0, 0], [0, 1], [-1, 0]])
 
 
@@ -82,3 +82,16 @@ def test_convert_to_array():
     assert np.allclose(result.asarray, np.array(bitstrings))
 
     assert np.allclose(MeasurementResult([]).asarray, np.array([]))
+
+
+@pytest.mark.parametrize("qubit_indices", ((0, 1), (1, 20)))
+def test_measurement_result_with_strings(qubit_indices):
+    bitstrings = ["00", "01", "10"]
+    int_bitstrings = [[0, 0], [0, 1], [1, 0]]
+
+    result = MeasurementResult(bitstrings, qubit_indices=qubit_indices)
+
+    assert result.nqubits == 2
+    assert result.qubit_indices == qubit_indices
+    assert result.shots == 3
+    assert np.allclose(result.result, int_bitstrings)
