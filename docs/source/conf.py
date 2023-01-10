@@ -95,9 +95,8 @@ master_doc = "index"
 # -- Options for myst_parser -------------------------------------------------
 # Specifies which of the parsers should handle each file extension.
 source_suffix = {
+    ".md": "myst-nb",
     ".ipynb": "myst-nb",
-    ".myst": "myst-nb",
-    ".mystnb": "myst-nb",
 }
 
 # Enables extensions to MyST parser that allows for richer markup options.
