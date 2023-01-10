@@ -4,11 +4,11 @@
 ---
 maxdepth: 2
 ---
-core-concepts.myst
-zne.myst
-pec.myst
-cdr.myst
-ddd.myst
-rem.myst
-error-mitigation.myst
+core-concepts.md
+zne.md
+pec.md
+cdr.md
+ddd.md
+rem.md
+error-mitigation.md
 ```

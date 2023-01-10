@@ -4,8 +4,8 @@
 ---
 maxdepth: 1
 ---
-frontends-backends.myst
-executors.myst
-observables.myst
-calibrators
+frontends-backends.md
+executors.md
+observables.md
+calibrators.md
 ```

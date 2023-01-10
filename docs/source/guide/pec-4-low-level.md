@@ -19,18 +19,18 @@ When applying PEC with Mitiq, the workflow of quantum and classical data is repr
 
 - The user provides a `QPROGRAM`, (i.e. a quantum circuit defined via any of the supported frontends).
 - Mitiq probabilistically generates a list of auxiliary circuits. This step depends on the quasi-probability representations provided by the user.
-- The generated circuits are executed via a user-defined [Executor](executors.myst).
+- The generated circuits are executed via a user-defined [Executor](executors.md).
 - Mitiq infers an unbiased estimate of the ideal expectation value from a classical post-processing of the measured data.
 - The error mitigated expectation value is returned to the user.
 
 The general workflow of PEC is similar to the workflow of ZNE. The main difference is that in ZNE the auxiliary
 circuits are obtained by noise scaling, while
 in PEC they are probabilistically generated. As a consequence, the final inference step is different too.
-The inference step of PEC is based on the Monte Carlo estimation protocol discussed in [What is the theory behind PEC?](pec-5-theory.myst)
+The inference step of PEC is based on the Monte Carlo estimation protocol discussed in [What is the theory behind PEC?](pec-5-theory.md)
 
 +++
 
-As shown in the Section [How do I use PEC?](pec-1-intro.myst), the standard way of applying PEC in Mitiq is based
+As shown in the Section [How do I use PEC?](pec-1-intro.md), the standard way of applying PEC in Mitiq is based
 on the function {func}`.execute_with_pec()`. However, one may be interested in applying PEC with a lower-level of
 abstraction for reasons of efficiency or for customization proposes. 
 In particular, it could be useful to explicitly split the PEC process into the two main steps shown in the figure above:
@@ -48,7 +48,7 @@ In particular, it could be useful to explicitly split the PEC process into the t
 
 +++
 
-We define the circuit of interest as we did in [How do I use PEC?](pec-1-intro.myst)
+We define the circuit of interest as we did in [How do I use PEC?](pec-1-intro.md)
 
 ```{code-cell} ipython3
 import mitiq
@@ -63,7 +63,7 @@ print(circuit)
 ```
 
 We assume local depolarizing noise and we define the list of {class}`.OperationRepresentation`s (one for each gate)
-as we did in [How do I use PEC?](pec-1-intro.myst).
+as we did in [How do I use PEC?](pec-1-intro.md).
 
 ```{code-cell} ipython3
 from mitiq.pec.representations.depolarizing import represent_operations_in_circuit_with_local_depolarizing_noise
@@ -91,13 +91,13 @@ print(reps[0])
 
 +++
 
-According to the [theory of PEC](pec-5-theory.myst), to probabilistically generate an auxiliary circuit one should:
+According to the [theory of PEC](pec-5-theory.md), to probabilistically generate an auxiliary circuit one should:
 - Define an empty `sampled_circuit` to be populated with probabilistic operations $\mathcal O_{j,\alpha}$;
 - Define an empty `gate_sign_list` to be populated with the sign values ${\rm sgn}(\eta_{j,\alpha})$;
 - Start a loop over the ideal operations of `circuit`;
 - For each gate of `circuit`, search for the corresponding {class}`.OperationRepresentation` in `reps`;
 - Sample a noisy gate from the quasi-probability distribution of the ideal gate using `rep[j].sample()` as
-   shown in [What additional options are available in PEC?](pec-3-options.myst);
+   shown in [What additional options are available in PEC?](pec-3-options.md);
 - Append the sampled gate to `sampled_circuit` and the corresponding sign to `gate_sign_list`;
 - When the loop is completed, return `sampled_circuit` and the associated `sampled_sign` (which is the product of all
    the elements of `gate_sign_list`).
@@ -142,9 +142,9 @@ of the ideal expectation value from the noisy execution of the `sampled_circuits
 
 +++
 
-To execute the auxiliary circuits we define the same `execute` function that we used in the Section ["How do I use PEC?"](pec-1-intro.myst).
+To execute the auxiliary circuits we define the same `execute` function that we used in the Section ["How do I use PEC?"](pec-1-intro.md).
 Actually, since we have a list of circuits to execute, we define a *batched* version of the function, i.e., a function that takes a list of
-circuits as input and returns a list of expectation values. More details on batched executors can be found in the ["Executors"](pec-1-intro.myst) section.
+circuits as input and returns a list of expectation values. More details on batched executors can be found in the ["Executors"](pec-1-intro.md) section.
 
 ```{code-cell} ipython3
 from typing import List
@@ -205,7 +205,7 @@ assert noisy_expecation_values_direct == noisy_expecation_values
 
 +++
 
-According to the [theory of PEC](pec-5-theory.myst), the ideal expectation value can be estimated as an average of
+According to the [theory of PEC](pec-5-theory.md), the ideal expectation value can be estimated as an average of
 the noisy auxiliary expectation values, after scaling them by the corresponding `sampled_signs` and by the `one_norm` coefficient
 (obtained in the previous section).
 
