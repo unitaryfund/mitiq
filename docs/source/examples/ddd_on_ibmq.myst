@@ -137,40 +137,39 @@ else:
     backend = qiskit.Aer.get_backend("qasm_simulator"),
 
 
-def ibmq_executor(circuit: QuantumCircuit, shots: int, correct_bitstring: List[int], noisy_sim: bool = True) -> float:
+def ibmq_executor(circuit: QuantumCircuit, shots: int, correct_bitstring: List[int], is_noisy_sim: bool = True) -> float:
     """Returns the expectation value to be mitigated.
 
     Args:
         circuit: Circuit to run.
         shots: Number of times to execute the circuit to compute the expectation value.
     """
-
+    circuit_to_run = circuit.copy()
     if USE_REAL_HARDWARE:
         # Run the circuit on hardware
         job = qiskit.execute(
-            experiments=circuit,
+            experiments=circuit_to_run,
             backend=backend,
             optimization_level=0,  # Important to preserve folded gates.
             shots=shots
         )
     else:
         # Simulate the circuit with noise
-        if noisy_sim:
-            data = circuit.data
-            circuit_to_run = qiskit.QuantumCircuit(
-                circuit.qubits, circuit.clbits
-            )  
-            for op in data[:len(data)-6]:
-                circuit_to_run.append(op)
-                for q in op.qubits:
-                    circuit_to_run.rz(0.05, q)
-            for op in data[len(data)-6 : ]:
-                circuit_to_run.append(op)
-
+        if is_noisy_sim:
+            noise_model = NoiseModel()
+            error1 = coherent_unitary_error(RZGate(0.05).to_matrix())
+            noise_model.add_all_qubit_quantum_error(error1, ['u1', 'u2', 'u3'])
+            error2 = error1.tensor(error1)
+            noise_model.add_all_qubit_quantum_error(error2, ['cx'])
+            job = qiskit.execute(
+            experiments=circuit_to_run,
+            backend=qiskit.Aer.get_backend("qasm_simulator"),
+            noise_model=noise_model,
+            optimization_level=0,
+            shots=shots,
+        )
         else:
-            circuit_to_run = circuit.copy()
-
-        job = qiskit.execute(
+            job = qiskit.execute(
             experiments=circuit_to_run,
             backend=qiskit.Aer.get_backend("qasm_simulator"),
             optimization_level=0,
@@ -197,6 +196,7 @@ rule = ddd.rules.yy
 ## Sample bitstrings from mirror circuits
 
 ```{code-cell} ipython3
+
 true_values, noisy_values = [], []
 ddd_values = []
 
@@ -213,8 +213,8 @@ for depth in depths:
 
         circuit, correct_bitstring = get_circuit(depth, local_seed)
 
-        true_value = ibmq_executor(circuit, shots, correct_bitstring, noisy_sim=False)
-        noisy_value = ibmq_executor(circuit, shots, correct_bitstring, noisy_sim=True)
+        true_value = ibmq_executor(circuit, shots, correct_bitstring, is_noisy_sim=False)
+        noisy_value = ibmq_executor(circuit, shots, correct_bitstring, is_noisy_sim=True)
 
         noisy_executor = functools.partial(
             ibmq_executor,
@@ -241,6 +241,7 @@ for depth in depths:
 Now we can visualize the results.
 
 ```{code-cell} ipython3
+
 avg_true_values = np.average(true_values, axis=1)
 avg_noisy_values = np.average(noisy_values, axis=1)
 
@@ -263,6 +264,14 @@ plt.title(
 plt.xlabel("Depth")
 plt.ylabel("Expectation value")
 _ = plt.legend()
+```
+
+```{figure} ../_thumbnails/ddd-tutorial.png
+---
+
+name: ddd_mirror_circuit_comparison
+---
+The figure is a plot of the expectation values obtained from simulating mirror circuits with time-correlated dephasing noise and applying DDD.
 ```
 
 We can see that on average DDD *slightly* improves the expectation value.
