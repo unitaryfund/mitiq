@@ -36,14 +36,15 @@ plt.rcParams.update({"font.family": "serif", "font.size": 15})
 # Third-party imports.
 import qiskit
 from qiskit import QuantumCircuit
-from qiskit.circuit.library.standard_gates import RZGate
-from qiskit.providers.aer.noise import NoiseModel, coherent_unitary_error
+
+import cirq
 
 import networkx as nx
 import numpy as np
 
 # Mitiq imports.
 from mitiq import benchmarks, ddd
+from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 ```
 
 ```{code-cell} ipython3
@@ -137,39 +138,33 @@ else:
     backend = qiskit.Aer.get_backend("qasm_simulator"),
 
 
-def ibmq_executor(circuit: QuantumCircuit, shots: int, correct_bitstring: List[int], is_noisy_sim: bool = True) -> float:
+def ibmq_executor(circuit: QuantumCircuit, shots: int, correct_bitstring: List[int], noisy_sim: bool = True) -> float:
     """Returns the expectation value to be mitigated.
 
     Args:
         circuit: Circuit to run.
         shots: Number of times to execute the circuit to compute the expectation value.
     """
-    circuit_to_run = circuit.copy()
+    
     if USE_REAL_HARDWARE:
         # Run the circuit on hardware
         job = qiskit.execute(
-            experiments=circuit_to_run,
+            experiments=circuit,
             backend=backend,
             optimization_level=0,  # Important to preserve folded gates.
             shots=shots
         )
     else:
         # Simulate the circuit with noise
-        if is_noisy_sim:
-            noise_model = NoiseModel()
-            error1 = coherent_unitary_error(RZGate(0.05).to_matrix())
-            noise_model.add_all_qubit_quantum_error(error1, ['u1', 'u2', 'u3'])
-            error2 = error1.tensor(error1)
-            noise_model.add_all_qubit_quantum_error(error2, ['cx'])
-            job = qiskit.execute(
-            experiments=circuit_to_run,
-            backend=qiskit.Aer.get_backend("qasm_simulator"),
-            noise_model=noise_model,
-            optimization_level=0,
-            shots=shots,
-        )
+        if noisy_sim:
+            converted, _ = convert_to_mitiq(circuit)
+            noisy = converted.with_noise(cirq.rz(0.05))
+            circuit_to_run = convert_from_mitiq(noisy, "qiskit")
+            
         else:
-            job = qiskit.execute(
+            circuit_to_run = circuit.copy()
+        
+        job = qiskit.execute(
             experiments=circuit_to_run,
             backend=qiskit.Aer.get_backend("qasm_simulator"),
             optimization_level=0,
@@ -196,7 +191,6 @@ rule = ddd.rules.yy
 ## Sample bitstrings from mirror circuits
 
 ```{code-cell} ipython3
-
 true_values, noisy_values = [], []
 ddd_values = []
 
@@ -213,8 +207,8 @@ for depth in depths:
 
         circuit, correct_bitstring = get_circuit(depth, local_seed)
 
-        true_value = ibmq_executor(circuit, shots, correct_bitstring, is_noisy_sim=False)
-        noisy_value = ibmq_executor(circuit, shots, correct_bitstring, is_noisy_sim=True)
+        true_value = ibmq_executor(circuit, shots, correct_bitstring, noisy_sim=False)
+        noisy_value = ibmq_executor(circuit, shots, correct_bitstring, noisy_sim=True)
 
         noisy_executor = functools.partial(
             ibmq_executor,
@@ -241,7 +235,6 @@ for depth in depths:
 Now we can visualize the results.
 
 ```{code-cell} ipython3
-
 avg_true_values = np.average(true_values, axis=1)
 avg_noisy_values = np.average(noisy_values, axis=1)
 
