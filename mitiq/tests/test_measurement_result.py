@@ -97,10 +97,11 @@ def test_measurement_result_with_strings(qubit_indices):
     assert result.shots == 3
     assert np.allclose(result.result, int_bitstrings)
 
+
 @pytest.mark.parametrize("qubit_indices", ((0, 1), (1, 20)))
 def test_measurement_result_from_dict(qubit_indices):
     """Test initialization from a dictionary of counts."""
-    counts = {"00":1, "01": 2}
+    counts = {"00": 1, "01": 2}
     int_bitstrings = [[0, 0], [0, 1], [0, 1]]
 
     result = MeasurementResult.from_dict(
@@ -112,9 +113,10 @@ def test_measurement_result_from_dict(qubit_indices):
     assert result.shots == 3
     assert np.allclose(result.result, int_bitstrings)
 
+
 def test_measurement_result_to_dict():
     """Test initialization from a dictionary of counts."""
-    counts = {"00":1, "01": 2}
+    counts = {"00": 1, "01": 2}
 
     int_bitstrings = [[0, 0], [0, 1], [0, 1]]
     result = MeasurementResult(

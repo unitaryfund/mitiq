@@ -24,7 +24,7 @@
        computed. Note this includes expectation values themselves.
 """
 from dataclasses import dataclass
-from typing import cast, Iterable, List, Optional, Tuple, Union, Sequence
+from typing import cast, Iterable, List, Optional, Tuple, Union, Sequence, Dict
 
 import numpy as np
 import numpy.typing as npt
@@ -95,8 +95,6 @@ class MeasurementResult:
         if isinstance(self.result, np.ndarray):
             self.result = cast(List[Bitstring], self.result.tolist())
 
-
-
         self._bitstrings = np.array(self.result)
 
         if not self.qubit_indices:
@@ -107,6 +105,8 @@ class MeasurementResult:
                     f"MeasurementResult has {self.nqubits} qubit(s) but there "
                     f"are {len(self.qubit_indices)} `qubit_indices`."
                 )
+
+        self._measurements = dict(zip(self.qubit_indices, self._bitstrings.T))
 
     @property
     def shots(self) -> int:
@@ -137,28 +137,27 @@ class MeasurementResult:
         """
         counter = Counter(counts)
         return cls(list(counter.elements()), qubit_indices)
-    
-    def to_counter(self):
+
+    def to_counter(self) -> Counter[str]:
         """Returns a colleciton.Counter whose keys are the measured
         bitstrings the and whose values are the counts.
-        
+
         Note: Qubit indices (self.qubit_indeces) are lost in the conversion.
         """
         strings = ["".join(map(str, bits)) for bits in self.result]
         print(strings)
         return Counter(strings)
-    
-    def to_dict(self):
+
+    def to_dict(self) -> Dict[str, int]:
         """Returns a Python dictionary whose keys are the measured
         bitstrings the and whose values are the counts.
-        
+
         Note: Qubit indices (self.qubit_indeces) are lost in the conversion.
         """
         return {**self.to_counter()}
 
     def __getitem__(self, indices: List[int]) -> npt.NDArray[np.int64]:
-        measurements = dict(zip(self.qubit_indices, self._bitstrings.T))
-        return np.array([measurements[i] for i in indices]).T
+        return np.array([self._measurements[i] for i in indices]).T
 
     def __iter__(self) -> Iterable[Bitstring]:
         yield from self.result
