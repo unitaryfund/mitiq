@@ -25,6 +25,7 @@
 """
 from dataclasses import dataclass
 from typing import cast, Iterable, List, Optional, Tuple, Union, Sequence, Dict
+from typing import Counter as CounterType
 
 import numpy as np
 import numpy.typing as npt
@@ -138,7 +139,7 @@ class MeasurementResult:
         counter = Counter(counts)
         return cls(list(counter.elements()), qubit_indices)
 
-    def to_counter(self) -> Counter[str]:
+    def to_counter(self) -> CounterType[str]:
         """Returns a colleciton.Counter whose keys are the measured
         bitstrings the and whose values are the counts.
 
