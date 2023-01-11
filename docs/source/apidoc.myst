@@ -190,13 +190,32 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
 .. automodule:: mitiq.raw.raw
 ```
 
-## Readout-Error Mitigation
+## Mitiq circuits and results
 
-### Measurement Result
+### Circuit types
 ```{eval-rst}
-.. autoclass:: mitiq._typing.MeasurementResult
-   :members:
+.. autoclass:: mitiq.typing.QPROGRAM
 ```
+
+```{eval-rst}
+.. autoclass:: mitiq.typing.SUPPORTED_PROGRAM_TYPES
+```
+
+### Result types
+```{eval-rst}
+.. autoclass:: mitiq.typing.QuantumResult
+```
+
+```{eval-rst}
+.. autoclass:: mitiq.typing.Bitstring
+```
+
+```{eval-rst}
+.. autoclass:: mitiq.typing.MeasurementResult
+```
+
+
+## Readout-Error Mitigation
 
 ### Post-selection
 ```{eval-rst}

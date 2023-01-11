@@ -29,7 +29,7 @@ import numpy as np
 import numpy.typing as npt
 import cirq
 
-from mitiq._typing import QPROGRAM, MeasurementResult
+from mitiq import QPROGRAM, MeasurementResult
 from mitiq.interface import atomic_converter
 
 

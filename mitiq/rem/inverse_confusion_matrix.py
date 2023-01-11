@@ -14,12 +14,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from functools import reduce
-from typing import List
+from typing import List, Sequence
 import numpy as np
 import numpy.typing as npt
 
 
-from mitiq._typing import MeasurementResult, Bitstring, Sequence
+from mitiq import MeasurementResult, Bitstring
 
 
 def sample_probability_vector(

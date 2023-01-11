@@ -19,7 +19,7 @@ import pytest
 import numpy as np
 
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
-from mitiq._typing import SUPPORTED_PROGRAM_TYPES
+from mitiq import SUPPORTED_PROGRAM_TYPES
 
 
 @pytest.mark.parametrize("n_qubits", (1, 2))

@@ -21,7 +21,7 @@ from functools import wraps
 import numpy as np
 import numpy.typing as npt
 
-from mitiq._typing import QPROGRAM, MeasurementResult
+from mitiq import QPROGRAM, MeasurementResult
 from mitiq.executor.executor import Executor
 from mitiq.observable.observable import Observable
 from mitiq.rem.inverse_confusion_matrix import mitigate_measurements

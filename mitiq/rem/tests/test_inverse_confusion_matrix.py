@@ -20,7 +20,7 @@ from math import isclose
 import numpy as np
 import pytest
 
-from mitiq._typing import MeasurementResult
+from mitiq import MeasurementResult
 from mitiq.rem.inverse_confusion_matrix import (
     bitstrings_to_probability_vector,
     generate_inverse_confusion_matrix,

@@ -25,7 +25,7 @@ import pytest
 
 from mitiq.observable.observable import Observable
 from mitiq.observable.pauli import PauliString
-from mitiq._typing import MeasurementResult
+from mitiq import MeasurementResult
 from mitiq.rem.inverse_confusion_matrix import (
     generate_inverse_confusion_matrix,
 )

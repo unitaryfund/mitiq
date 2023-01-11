@@ -21,7 +21,7 @@ from typing import Any, Callable, cast, Iterator, List, Dict, Tuple
 import networkx as nx
 import cirq
 
-from mitiq._typing import QuantumResult
+from mitiq import QuantumResult
 from mitiq.benchmarks import (
     generate_ghz_circuit,
     generate_mirror_circuit,

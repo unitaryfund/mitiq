@@ -37,7 +37,7 @@ from numpy.lib.polynomial import RankWarning
 from scipy.optimize import curve_fit, OptimizeWarning
 from cirq import Circuit
 
-from mitiq._typing import QPROGRAM, QuantumResult
+from mitiq import QPROGRAM, QuantumResult
 from mitiq.observable import Observable
 from mitiq.executor import Executor
 from mitiq.zne.scaling import fold_gates_at_random
