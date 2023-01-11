@@ -32,10 +32,6 @@ def test_measurement_result(asarray, qubit_indices):
     assert result.qubit_indices == qubit_indices
     assert result.shots == 3
     assert np.allclose(result.result, bitstrings)
-    assert (
-        repr(result) == f"MeasurementResult(result=[[0, 0], [0, 1], [1, 0]], "
-        f"qubit_indices={qubit_indices})"
-    )
 
 
 def test_measurement_result_bad_qubit_indices():
@@ -51,15 +47,21 @@ def test_measurement_result_not_bits():
         MeasurementResult(result=[[0, 0], [0, 1], [-1, 0]])
 
 
-def test_getitem():
+def test_filter_qubits():
     result = MeasurementResult([[0, 0, 1], [0, 1, 0], [1, 0, 0]])
-    assert np.allclose(result[[0]], np.array([[0], [0], [1]]))
-    assert np.allclose(result[[1]], np.array([[0], [1], [0]]))
-    assert np.allclose(result[[2]], np.array([[1], [0], [0]]))
+    assert np.allclose(result.filter_qubits([0]), np.array([[0], [0], [1]]))
+    assert np.allclose(result.filter_qubits([1]), np.array([[0], [1], [0]]))
+    assert np.allclose(result.filter_qubits([2]), np.array([[1], [0], [0]]))
 
-    assert np.allclose(result[[0, 1]], np.array([[0, 0], [0, 1], [1, 0]]))
-    assert np.allclose(result[[0, 2]], np.array([[0, 1], [0, 0], [1, 0]]))
-    assert np.allclose(result[[1, 2]], np.array([[0, 1], [1, 0], [0, 0]]))
+    assert np.allclose(
+        result.filter_qubits([0, 1]), np.array([[0, 0], [0, 1], [1, 0]])
+    )
+    assert np.allclose(
+        result.filter_qubits([0, 2]), np.array([[0, 1], [0, 0], [1, 0]])
+    )
+    assert np.allclose(
+        result.filter_qubits([1, 2]), np.array([[0, 1], [1, 0], [0, 0]])
+    )
 
 
 def test_empty():
@@ -67,13 +69,6 @@ def test_empty():
     assert result.nqubits == 0
     assert result.shots == 0
     assert result.result == []
-
-
-def test_iter():
-    bitstrings = [[0, 1, 1], [0, 1, 0], [1, 0, 0]]
-
-    for m, bits in zip(MeasurementResult(bitstrings), bitstrings):
-        assert m == bits
 
 
 def test_convert_to_array():
@@ -99,12 +94,12 @@ def test_measurement_result_with_strings(qubit_indices):
 
 
 @pytest.mark.parametrize("qubit_indices", ((0, 1), (1, 20)))
-def test_measurement_result_from_dict(qubit_indices):
+def test_measurement_result_from_counts(qubit_indices):
     """Test initialization from a dictionary of counts."""
     counts = {"00": 1, "01": 2}
     int_bitstrings = [[0, 0], [0, 1], [0, 1]]
 
-    result = MeasurementResult.from_dict(
+    result = MeasurementResult.from_counts(
         counts=counts,
         qubit_indices=qubit_indices,
     )
@@ -114,7 +109,7 @@ def test_measurement_result_from_dict(qubit_indices):
     assert np.allclose(result.result, int_bitstrings)
 
 
-def test_measurement_result_to_dict():
+def test_measurement_result_get_counts():
     """Test initialization from a dictionary of counts."""
     counts = {"00": 1, "01": 2}
 
@@ -123,7 +118,22 @@ def test_measurement_result_to_dict():
         result=int_bitstrings,
         qubit_indices=(1, 20),
     )
-    assert result.to_dict() == counts
+    assert result.get_counts() == counts
     # Info about qubit indices is expected to be lost
-    new_res = MeasurementResult.from_dict(result.to_dict())
+    new_res = MeasurementResult.from_counts(result.get_counts())
     assert new_res.qubit_indices != result.qubit_indices
+
+
+def test_measurement_repr_():
+    """Test string representation and printing."""
+    counts = {"00": 1000, "01": 200}
+    result = MeasurementResult.from_counts(
+        counts=counts,
+        qubit_indices=(1, 20),
+    )
+    expected = (
+        "MeasurementResult: {'qubit_indices': (1, 20),"
+        " 'shots': 1200, 'counts': {'00': 1000, '01': 200}}"
+    )
+    assert result.__repr__() == expected
+    assert result.__str__() == expected

@@ -282,7 +282,7 @@ class PauliStringCollection:
     ) -> float:
         total = 0.0
         for pauli in self.elements:
-            bitstrings = measurements[sorted(pauli.support())]
+            bitstrings = measurements.filter_qubits(sorted(pauli.support()))
             value = (
                 np.average([(-1) ** np.sum(bits) for bits in bitstrings])
                 if len(bitstrings) > 0
