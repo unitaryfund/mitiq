@@ -31,6 +31,8 @@ import numpy.typing as npt
 
 from cirq import Circuit as _Circuit
 
+from collections import Counter
+
 
 # Supported quantum programs.
 SUPPORTED_PROGRAM_TYPES = {
@@ -80,6 +82,7 @@ class MeasurementResult:
     qubit_indices: Optional[Tuple[int, ...]] = None
 
     def __post_init__(self) -> None:
+        # Validate arguments
         symbols = set(b for bits in self.result for b in bits)
         if not (symbols.issubset({0, 1}) or symbols.issubset({"0", "1"})):
             raise ValueError("Bitstrings should look like '011' or [0, 1, 1].")
@@ -92,6 +95,8 @@ class MeasurementResult:
         if isinstance(self.result, np.ndarray):
             self.result = cast(List[Bitstring], self.result.tolist())
 
+
+
         self._bitstrings = np.array(self.result)
 
         if not self.qubit_indices:
@@ -102,7 +107,6 @@ class MeasurementResult:
                     f"MeasurementResult has {self.nqubits} qubit(s) but there "
                     f"are {len(self.qubit_indices)} `qubit_indices`."
                 )
-        self._measurements = dict(zip(self.qubit_indices, self._bitstrings.T))
 
     @property
     def shots(self) -> int:
@@ -120,8 +124,41 @@ class MeasurementResult:
     def asarray(self) -> npt.NDArray[np.int64]:
         return self._bitstrings
 
+    @classmethod
+    def from_dict(
+        cls,
+        counts: Sequence[Bitstring],
+        qubit_indices: Optional[Tuple[int, ...]] = None,
+    ) -> "MeasurementResult":
+        """Initializes a MeasurementResult from a dictionary of counts.
+
+        Example:
+        >>> MeasurementResult.from_dict({"00": 175, "11": 177})
+        """
+        counter = Counter(counts)
+        return cls(list(counter.elements()), qubit_indices)
+    
+    def to_counter(self):
+        """Returns a colleciton.Counter whose keys are the measured
+        bitstrings the and whose values are the counts.
+        
+        Note: Qubit indices (self.qubit_indeces) are lost in the conversion.
+        """
+        strings = ["".join(map(str, bits)) for bits in self.result]
+        print(strings)
+        return Counter(strings)
+    
+    def to_dict(self):
+        """Returns a Python dictionary whose keys are the measured
+        bitstrings the and whose values are the counts.
+        
+        Note: Qubit indices (self.qubit_indeces) are lost in the conversion.
+        """
+        return {**self.to_counter()}
+
     def __getitem__(self, indices: List[int]) -> npt.NDArray[np.int64]:
-        return np.array([self._measurements[i] for i in indices]).T
+        measurements = dict(zip(self.qubit_indices, self._bitstrings.T))
+        return np.array([measurements[i] for i in indices]).T
 
     def __iter__(self) -> Iterable[Bitstring]:
         yield from self.result

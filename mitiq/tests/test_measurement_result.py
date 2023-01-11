@@ -86,6 +86,7 @@ def test_convert_to_array():
 
 @pytest.mark.parametrize("qubit_indices", ((0, 1), (1, 20)))
 def test_measurement_result_with_strings(qubit_indices):
+    """Try using strings instead of lists of integers."""
     bitstrings = ["00", "01", "10"]
     int_bitstrings = [[0, 0], [0, 1], [1, 0]]
 
@@ -95,3 +96,32 @@ def test_measurement_result_with_strings(qubit_indices):
     assert result.qubit_indices == qubit_indices
     assert result.shots == 3
     assert np.allclose(result.result, int_bitstrings)
+
+@pytest.mark.parametrize("qubit_indices", ((0, 1), (1, 20)))
+def test_measurement_result_from_dict(qubit_indices):
+    """Test initialization from a dictionary of counts."""
+    counts = {"00":1, "01": 2}
+    int_bitstrings = [[0, 0], [0, 1], [0, 1]]
+
+    result = MeasurementResult.from_dict(
+        counts=counts,
+        qubit_indices=qubit_indices,
+    )
+    assert result.nqubits == 2
+    assert result.qubit_indices == qubit_indices
+    assert result.shots == 3
+    assert np.allclose(result.result, int_bitstrings)
+
+def test_measurement_result_to_dict():
+    """Test initialization from a dictionary of counts."""
+    counts = {"00":1, "01": 2}
+
+    int_bitstrings = [[0, 0], [0, 1], [0, 1]]
+    result = MeasurementResult(
+        result=int_bitstrings,
+        qubit_indices=(1, 20),
+    )
+    assert result.to_dict() == counts
+    # Info about qubit indices is expected to be lost
+    new_res = MeasurementResult.from_dict(result.to_dict())
+    assert new_res.qubit_indices != result.qubit_indices
