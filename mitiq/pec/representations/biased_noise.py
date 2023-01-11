@@ -65,7 +65,7 @@ def represent_operation_with_local_biased_noise(
         epsilon: The local noise severity (as a float) of the combined channel.
         eta: The noise bias between combined dephasing and depolarizing
             channels with :math:`\eta = 0` describing a fully depolarizing
-            channel and :math:`\eta = \inf` describing a fully dephasing
+            channel and :math:`\eta = \infty` describing a fully dephasing
             channel.
 
     Returns:
