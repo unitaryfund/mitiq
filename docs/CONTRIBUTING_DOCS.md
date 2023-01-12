@@ -48,9 +48,8 @@ written from scratch,
 - an **API-doc** part, which is (mostly)
 automatically generated.
 
-Information in the docs can be added as markdown files, as
-the `myst-parser` extension supports both basic markdown syntax as well as
-the extended MyST syntax. If you are adding a new file (as opposed to editing an existing one), consider adding it to an associated TOC.
+Information in the docs should be added as markdown files using the MyST markdown syntax.
+If you are adding a new file (as opposed to editing an existing one), ensure to add it to an associated TOC so that it is discoverable.
 
 The main table of contents (TOC) file for the docs is `index.md`. It includes `guide\guide.md` and `apidoc.md`, among other files. To add a new file to the base TOC, make sure it gets listed in the `toctree` directive like this:
 ````
