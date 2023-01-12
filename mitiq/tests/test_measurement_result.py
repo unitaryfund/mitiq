@@ -121,7 +121,7 @@ def test_measurement_result_get_counts():
     assert result.get_counts() == counts
     # Info about qubit indices is expected to be lost
     new_res = MeasurementResult.from_counts(result.get_counts())
-    assert new_res.qubit_indices != result.qubit_indices
+    assert new_res.qubit_indices == (0, 1)  # Default values
 
 
 def test_measurement_result_to_from_dictionary():
@@ -146,5 +146,5 @@ def test_measurement_repr_():
         "MeasurementResult: {'nqubits': 2, 'qubit_indices': (1, 20),"
         " 'shots': 1200, 'counts': {'00': 1000, '01': 200}}"
     )
-    assert result.__repr__() == expected
-    assert result.__str__() == expected
+    assert repr(result) == expected
+    assert str(result) == expected
