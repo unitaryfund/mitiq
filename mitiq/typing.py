@@ -132,8 +132,9 @@ class MeasurementResult:
     ) -> "MeasurementResult":
         """Initializes a MeasurementResult from a dictionary of counts.
 
-        Example:
-        >>> MeasurementResult.from_counts({"00": 175, "11": 177})
+        **Example**::
+
+            MeasurementResult.from_counts({"00": 175, "11": 177})
         """
         counter = Counter(counts)
         return cls(list(counter.elements()), qubit_indices)
