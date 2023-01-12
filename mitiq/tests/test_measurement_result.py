@@ -90,7 +90,7 @@ def test_measurement_result_with_strings(qubit_indices):
     assert result.nqubits == 2
     assert result.qubit_indices == qubit_indices
     assert result.shots == 3
-    assert np.allclose(result.result, int_bitstrings)
+    assert result.result == int_bitstrings
 
 
 @pytest.mark.parametrize("qubit_indices", ((0, 1), (1, 20)))
@@ -106,7 +106,7 @@ def test_measurement_result_from_counts(qubit_indices):
     assert result.nqubits == 2
     assert result.qubit_indices == qubit_indices
     assert result.shots == 3
-    assert np.allclose(result.result, int_bitstrings)
+    assert result.result == int_bitstrings
 
 
 def test_measurement_result_get_counts():
@@ -124,6 +124,17 @@ def test_measurement_result_get_counts():
     assert new_res.qubit_indices != result.qubit_indices
 
 
+def test_measurement_result_to_from_dictionary():
+    """Test initialization from a dictionary of counts."""
+    data = {
+        "counts": {"00": 1, "01": 2},
+        "shots": 3,
+        "nqubits": 2,
+        "qubit_indices": (1, 7),
+    }
+    assert MeasurementResult.from_dict(data).to_dict() == data
+
+
 def test_measurement_repr_():
     """Test string representation and printing."""
     counts = {"00": 1000, "01": 200}
@@ -132,7 +143,7 @@ def test_measurement_repr_():
         qubit_indices=(1, 20),
     )
     expected = (
-        "MeasurementResult: {'qubit_indices': (1, 20),"
+        "MeasurementResult: {'nqubits': 2, 'qubit_indices': (1, 20),"
         " 'shots': 1200, 'counts': {'00': 1000, '01': 200}}"
     )
     assert result.__repr__() == expected

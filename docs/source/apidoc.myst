@@ -37,16 +37,10 @@
 
 ## Circuit types and result types
 
-### Circuit types
 ```{eval-rst}
 .. autoclass:: mitiq.typing.QPROGRAM
 ```
 
-```{eval-rst}
-.. autoclass:: mitiq.typing.SUPPORTED_PROGRAM_TYPES
-```
-
-### Result types
 ```{eval-rst}
 .. autoclass:: mitiq.typing.QuantumResult
 ```

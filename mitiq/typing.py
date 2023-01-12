@@ -130,7 +130,7 @@ class MeasurementResult:
         counts: Dict[str, int],
         qubit_indices: Optional[Tuple[int, ...]] = None,
     ) -> "MeasurementResult":
-        """Initializes a MeasurementResult from a dictionary of counts.
+        """Initializes a ``MeasurementResult`` from a dictionary of counts.
 
         **Example**::
 
@@ -140,24 +140,33 @@ class MeasurementResult:
         return cls(list(counter.elements()), qubit_indices)
 
     def get_counts(self) -> Dict[str, int]:
-        """Returns a colleciton.Counter whose keys are the measured
-        bitstrings the and whose values are the counts.
+        """Returns a Python dictionary whose keys are the measured
+        bitstrings and whose values are the counts.
         """
         strings = ["".join(map(str, bits)) for bits in self.result]
         return dict(Counter(strings))
 
     def to_dict(self) -> Dict[str, Any]:
-        """Returns a Python dictionary whose keys are the measured
-        bitstrings the and whose values are the counts.
+        """Exports data to a Python dictionary.
 
-        Note: Qubit indices (self.qubit_indeces) are lost in the conversion.
+        Note: Information about the order measurements is not preserved.
         """
-        data = {
+
+        return {
+            "nqubits": self.nqubits,
             "qubit_indices": self.qubit_indices,
             "shots": self.shots,
             "counts": self.get_counts(),
         }
-        return data
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "MeasurementResult":
+        """Loads a ``MeasurementResult`` from a Python dictionary.
+
+        Note: Only ``data["counts"]`` and ``data["qubit_indices"]`` are used
+        by this method. Total shots and number of qubits are deduced.
+        """
+        return cls.from_counts(data["counts"], data["qubit_indices"])
 
     def filter_qubits(self, qubit_indices: List[int]) -> npt.NDArray[np.int64]:
         """Returns the bitstrings associated to a subset of qubits."""
