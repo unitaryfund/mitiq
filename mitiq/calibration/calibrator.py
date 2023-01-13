@@ -135,9 +135,7 @@ class Calibrator:
             noisy_value = result["noisy_value"]
             for di in result["mitigated_values"].values():
                 results = di["results"]
-                mitigated_values = list(
-                    map(lambda di: di["mitigated_value"], results)
-                )
+                mitigated_values = [di["mitigated_value"] for di in results]
                 improvement_factor = abs(noisy_value - ideal_value) / sqrt(
                     len(mitigated_values)
                     * sum(
