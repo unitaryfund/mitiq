@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from collections import Counter
-from dataclasses import asdict
 from math import prod, sqrt
 from typing import (
     Any,
@@ -115,9 +114,7 @@ class Calibrator:
                 }
                 mitigated_values[technique]["results"].append(result)
 
-            circuit_info = asdict(problem)
-            # remove circuit; it can be regenerated if needed
-            del circuit_info["circuit"]
+            circuit_info = problem.problem_summary_dict()
             expvals.append(
                 {
                     "circuit_info": circuit_info,

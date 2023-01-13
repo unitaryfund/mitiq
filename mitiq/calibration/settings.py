@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from dataclasses import dataclass, astuple
+from dataclasses import dataclass, astuple, asdict
 from functools import partial
 from itertools import product
 from typing import Any, Callable, cast, Iterator, List, Dict, Tuple
@@ -41,14 +41,34 @@ from mitiq.zne.scaling import (
 @dataclass
 class BenchmarkProblem:
     circuit: cirq.Circuit
-    num_qubits: int
-    circuit_depth: int
     type: str
-    two_qubit_gate_count: int
     ideal_distribution: Dict[str, float]
 
     def __getitem__(self, keys: Tuple[str, ...]) -> Iterator[Any]:
         return iter(getattr(self, k) for k in keys)
+
+    @property
+    def num_qubits(self) -> int:
+        return len(self.circuit.all_qubits())
+
+    @property
+    def circuit_depth(self) -> int:
+        return len(self.circuit)
+
+    @property
+    def two_qubit_gate_count(self) -> int:
+        return sum(
+            [len(op.qubits) > 1 for op in self.circuit.all_operations()]
+        )
+    
+    def problem_summary_dict(self) -> Dict[str, Any]:
+        base = asdict(self)
+        # remove circuit; it can be regenerated if needed
+        del base["circuit"]
+        base["num_qubits"] = self.num_qubits
+        base["circuit_depth"] = self.circuit_depth
+        base["two_qubit_gate_count"] = self.two_qubit_gate_count
+        return base
 
 
 @dataclass
@@ -112,16 +132,10 @@ class Settings:
                 )
 
             circuit = cast(cirq.Circuit, circuit)
-            two_qubit_gate_count = sum(
-                [len(op.qubits) > 1 for op in circuit.all_operations()]
-            )
             circuits.append(
                 BenchmarkProblem(
                     circuit,
-                    num_qubits=len(circuit.all_qubits()),
-                    circuit_depth=len(circuit),
                     type=circuit_type,
-                    two_qubit_gate_count=two_qubit_gate_count,
                     ideal_distribution=ideal,
                 )
             )
