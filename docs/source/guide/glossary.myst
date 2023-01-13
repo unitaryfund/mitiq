@@ -25,34 +25,6 @@ quantum operations).
 In the Mitiq documentation it will always be clear which sense of calibration is meant.
 
 
-
-## Circuit Depth
-Circuit depth corresponds to computation time. It is the overall number of time
-steps in the circuit's execution. 
-Within each time step are operations that can be performed in parallel (meaning that no operation's input
-depends on any other operation's output)
-and can therefore be regarded collectively as a single computation step. Circuit depth is the main limiting
-factor for computation on NISQ devices. Because they lack error correction, NISQ devices
-accumulate noise continuously while executing a circuit, until eventually all useful information in 
-their qubits gets scrambled beyond recovery. The qubits need to be measured before that happens
-to extract the information. This limits algorithms designed for NISQ devices to running 
-short-depth or "shallow" circuits.
-
-
-<!--
-TODO  
-- link podcast?
--->
-
-## Circuit Size
-The size of a circuit is the number of operations (gate applications) it contains. If a circuit has 
-$n$ qubits and depth $d$, then its size is $n \cdot d$. We count the identity operation,
-in which a qubit is supposed to maintain its state, as an operation like any other since implementing
-it physically is not trivial---it is just another step where noise builds up. (In fact, by some measures
-the identity/idling operation is the [noisiest](https://youtu.be/dqlMrG7zRPs?t=616) operation of all.)
-
-
-
 ## Clifford Data Regression (CDR) 
 Clifford data regression (CDR) is a learning-based quantum error mitigation technique in which an error mitigation model is
 trained with quantum circuits that resemble the circuit of interest, but which are easier to classically simulate.
@@ -79,9 +51,6 @@ which the only role of the quantum processor is to repeatedly compute expectatio
 for the classical processor to use in performing some overall useful computational task (see [Variational Quantum Algorithm](vqa)).
 
 
-
-
-
 ## Gate Fidelity
 The fidelity of a gate in a quantum device (e.g. the CNOT gate as implemented in a particular quantum computer) is a measure of how 
 closely the device's implementation of the gate approximates the ideal gate.
@@ -92,61 +61,12 @@ Mitiq incorporates user-provided gate fidelities as an optional way to control h
 weights for sampling which gates to fold). For more details, see this [section](https://mitiq.readthedocs.io/en/stable/guide/zne-3-options.html#folding-gates-by-fidelity) of the User Guide and
 this [section](https://mitiq.readthedocs.io/en/stable/apidoc.html#mitiq.zne.scaling.folding.fold_gates_at_random) of the API-doc.
 
-## Global Folding
-See the entry on [Unitary Folding](#unitary-folding).
 
 ## Hamiltonian
 The Hamiltonian of a quantum system is a Hermitian operator (and therefore an [observable](#observable) that represents 
 he total energy of the system. The Hamiltonian's eigenvalues and eigenvectors represent, respectively, the system's possible energy levels and
 its corresponding energy states.
 
-## Local Folding
-See the entry on [Unitary Folding](#unitary-folding).
-
-## Observable
-An observable is a real-number-valued physical property of a quantum system (e.g.
-a computer's qubits) which can be measured. In the context of the expectation-value-based algorithms that QEM is
-mainly used for (see [Variational Quantum Algorithm](vqa)), the relevant observable is the energy level of some
-problem-specific physical system, represented by a Hamiltonian operator (see [](#hamiltonian)). 
-In general, observables are represented by Hermitian operators, which
-have a full basis of orthonormal eigenstates (the measurement basis) and real eigenvalues (the
-possible measurement readouts). 
-
-Unlike physics (which focuses on understanding physical systems in their own right) quantum computing uses such systems as a means for encoding and processing information, and
-in this context the most salient aspect of an observable 
-is what particular measurement basis it defines. So it can be helpful to forget the physical meaning/connotations of the term observable, and think of it simply as this measurement basis. 
-For example, the Pauli operators $Z$ and $X$ (the two most
-common observables/measurement operators in quantum computing) have the same
-possible readouts/eigenvalues $\{1, -1\}$, but $Z$ defines the measurement basis
-$\{ |0\rangle, |1\rangle \}$, known as the $Z$-basis and $X$ defines the measurement basis $\{|+\rangle, |-\rangle\}$, known as the $X$-basis. Any observable (e.g. the problem Hamiltonian of a VQA) can be
-expressed as a real-linear combination of the Pauli operators $X$, $Y$, and $Z$. For a tutorial on how to do this in Mitiq, see this [example](https://mitiq.readthedocs.io/en/stable/examples/hamiltonians.html).
-
-
-
-## Operation
-In quantum computing research and software one sometimes encounters the
-following terminological distinction between
-"operation" and "operator": an operation is a particular occurrence of an
-abstract operator (unitary gate or measurement), the event of applying that operator to a particular qubit or qubits.
-For example, the Hadamard gate is an operator, whereas applying a Hadamard gate at two locations in a circuit
-is two operations. This distinction is helpful in certain contexts (e.g. the definition of [](#circuit-size)).
-In other contexts, it is natural to use the terms operation and operator more loosely, to refer
-variously to either concept. In all cases the meaning should be clear from the context.
-
-## Unitary Folding
-Unitary folding is an approach to noise-scaling for ZNE that is *digital* (does not break the gate abstraction),
-unlike other noise-scaling approaches that require pulse-level (i.e. below-gate-level) control over qubits. It extends
-the input circuit's [depth](#circuit-depth) while preserving its ideal unitary transformation.
-
-There are two basic types of unitary folding: local and global. Unitary folding in general transforms a circuit with the following map:
-
-$$G \longrightarrow G G^\dagger G.$$
-
-When $G$ represents each *individual gate* of a circuit, the map is being applied locally so we call this **local folding**.
-When $G$ represents the *group of gates* making up the circuit as a whole, the map is being applied globally so we call this **global folding**.
-
-For details and diagrams of unitary, local, and global folding, see sections [here](https://mitiq.readthedocs.io/en/stable/guide/zne-3-options.html#unitary-folding) and
-[here](https://mitiq.readthedocs.io/en/stable/guide/zne-5-theory.html#step-1-intentionally-scale-noise) of the User Guide.
 
 ## Probabilistic Error Cancellation (PEC)
 Probabilistic error cancellation (PEC) is an error mitigation technique in which ideal operations are
@@ -156,62 +76,13 @@ In PEC, unbiased estimates of expectation values are obtained by Monte Carlo ave
 For the theory behind PEC and how to use it in Mitiq, see the User Guide
 section on [PEC](./pec.myst).
 
-## Quantum Error Mitigation (QEM)
-The goal of most
-quantum error mitigation methods (and all methods currently supported by Mitiq)
-is accurate and sample-efficient estimation of expectation values.
-Specifically, QEM methods are designed to reduce bias (i.e. systematic shift away from the ideal value)
-due to noise in estimators of ideal expectation values on NISQ devices, and to do so
-without requiring too many extra circuit runs (see [](#sampling-overhead)).
-At a high-level, QEM methods work by (somehow) post-processing data from multiple circuit runs, where the set of circuits
-to be run is (somehow) derived from the ideal input circuit provided to the method. Designing a good QEM algorithm
-amounts to finding good ways of filling in the details of the two *somehow*'s (how to *generate* the set of circuits to run, how to *infer* an estimate
-from the results). In statistical terms, a QEM method gives an estimator for ideal expectation values, and its reduction in 
-bias comes at a cost of an increase in variance (compared to the "naive estimator" of taking the sample mean of
-noisy runs of the input circuit). This increase in variance is why QEM methods have a sampling overhead compared 
-to the baseline naive estimator (taking the empirical mean of multiple runs of the input circuit without modifying it). 
-The following figure (from {cite}`Bharti_2022_RMP`, fig. 5) represents this bias-variance tradeoff in quantum error mitigation.
-
-```{figure} ../img/bias-variance-tradeoff.png
----
-width: 350px
-name: bias-variance-tradeoff
----
-```
-The distribution of the estimated
-expectation value using error mitigation is centered on the true value (the QEM estimator is [unbiased](https://en.wikipedia.org/wiki/Bias_of_an_estimator)),
-while the estimates without error mitigation are systematically shifted away the true value (the naive estimator is biased).
-On the other hand, the mitigated estimates are more spread out (have less [precision](https://en.wikipedia.org/wiki/Accuracy_and_precision)) than the 
-unmitigated estimates, assuming both estimates are produced from the same number of samples). 
-
-
-
-
-<!--
-The input to a QEM algorithm is an ideal circuit $\mathcal U$ applied to a fixed input state $\rho$ , and an observable $A$ whose expectation value  
-applying $\mathcal U$ to $\rho_0$, a QEM 
-Because QEM methods
-QEM methods 
--->
-
-For more on error mitigation, see the corresponding User Guide [section](./error-mitigation.myst).
-
-
-## Quantum Error Correction (QEC)
-
-Quantum error correction (QEC) and quantum error mitigation (QEM) are conceptually very different,
-despite having similar names and goals (i.e. overcoming the barriers to quantum computation presented by noise).
-TODO: fill out with a couple sentences on the main conceptual differences.
-
-For more on quantum error correction and how it differs from error mitigation,
-see the User Guide section on [error mitigation](./error-mitigation.myst).
-
 
 ## Readout Error Mitigation (REM)
 TODO: single sentence summary
 
 For the theory behind REM and how to use it in Mitiq, see the User Guide
 section on [REM] TODO: add link when available
+
 
 ## Sampling Overhead
 The sampling overhead (or sampling cost) of a QEM method is how many more circuit runs (or "shots") it 
@@ -222,34 +93,6 @@ Mathematically the sampling overhead/cost is often represented as a multiplicati
 one needs $C_{QEM} \cdot N$ circuit shots to obtain the same precision as the naive method would with only $N$ shots.
 
 
-
-
-
-(vqa)=
-## Variational Quantum Algorithm (VQA)
-A variational quantum algorithm is a hybrid classical-quantum algorithm that iteratively minimizes some objective function,
-represented as the expectation value of a problem-specific Hamiltonian.
-
-It is helpful to describe the form of a VQA using a diagram. (This diagram and description following it are reproduced from {cite}`Bharti_2022_RMP`, fig. 2.)
-```{figure} ../img/vqa.png
----
-width: 550px
-name: vqa-schematic 
----
-```
-
-The VQA workflow can be divided into four main components:
-**(a)** the *objective function* $O$ that encodes the problem to be solved; **(b)** the *parametrized quantum circuit* (PQC) $U$, in which variables
-$\boldsymbol{\theta}$ are tuned to minimize the objective; **(c)** the *measurement scheme*, which performs the basis changes and measurements
-needed to estimate expectation values that are used to evaluate the objective; and **(d)** the *classical optimizer* that minimizes the objective.
-The PQC can be defined heuristically, following hardware-inspired Ansätze, or designed from the knowledge about the problem Hamiltonian $H$.
-*Inputs* of a VQA are the circuit Ansatz $U(\boldsymbol{\theta})$ and the initial parameter values $\boldsymbol{\theta}_0$. *Outputs* include
-optimized parameter values $\boldsymbol{\theta}^*$ and the minimum of the objective.
-
-
- 
-
-
 ## Zero Noise Extrapolation (ZNE) 
 Zero-noise extrapolation (ZNE) is an error mitigation technique in which an
 expectation value is computed at different noise levels and, as a second step,
@@ -257,21 +100,3 @@ the ideal expectation value is inferred by extrapolating the measured results to
 
 For the theory behind ZNE and how to use it in Mitiq, see the User Guide
 section on [ZNE](./zne.myst).
-
-
-<!-- MAYBE INCLUDE
-## Ansatz
-## Benchmark circuits
-## Circuit Size
-## Coherence/Decoherence
-## Hamiltonian
-## Monte Carlo Estimation
-## Near-term Algorithm
-## Noise Model
-## Parametrized Circuit
-## Pulse Stretching
-## Quantum Approximate Optimization Algorithm (QAOA)
-## Quantum Channel
-## Quasi-Probability Decomposition 
-## Variational Quantum Eigensolver (VQE)
--->
