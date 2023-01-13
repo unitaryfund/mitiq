@@ -1,9 +1,9 @@
 # Third-party integration.
-qiskit~=0.39.4
+qiskit~=0.39.5
 pyquil~=3.3.2
 pennylane-qiskit~=0.28.0
 pennylane~=0.28.0
-amazon-braket-sdk~=1.35.2
+amazon-braket-sdk~=1.35.3
 
 # Unit tests, coverage, and formatting/style.
 pytest==7.1.3
