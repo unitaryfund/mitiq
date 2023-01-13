@@ -19,7 +19,7 @@ from typing import Any, Callable, cast, Iterable, Tuple
 
 from cirq import Circuit
 
-from mitiq._typing import SUPPORTED_PROGRAM_TYPES, QPROGRAM
+from mitiq import SUPPORTED_PROGRAM_TYPES, QPROGRAM
 
 
 class UnsupportedCircuitError(Exception):

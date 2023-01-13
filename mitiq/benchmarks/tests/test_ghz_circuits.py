@@ -19,7 +19,7 @@ import pytest
 import numpy as np
 
 from mitiq.benchmarks import ghz_circuits
-from mitiq._typing import SUPPORTED_PROGRAM_TYPES
+from mitiq import SUPPORTED_PROGRAM_TYPES
 
 
 @pytest.mark.parametrize("nqubits", [1, 5])

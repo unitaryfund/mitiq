@@ -24,8 +24,7 @@ import networkx as nx
 import cirq
 from cirq.experiments.qubit_characterizations import _single_qubit_cliffords
 from mitiq.interface import convert_from_mitiq
-from mitiq import QPROGRAM
-from mitiq._typing import Bitstring
+from mitiq import QPROGRAM, Bitstring
 
 
 single_q_cliffords = _single_qubit_cliffords()

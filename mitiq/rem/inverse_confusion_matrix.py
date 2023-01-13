@@ -14,12 +14,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from functools import reduce
-from typing import List
+from typing import List, Sequence
 import numpy as np
 import numpy.typing as npt
 
 
-from mitiq._typing import MeasurementResult, Bitstring
+from mitiq import MeasurementResult, Bitstring
 
 
 def sample_probability_vector(
@@ -56,7 +56,7 @@ def sample_probability_vector(
 
 
 def bitstrings_to_probability_vector(
-    bitstrings: List[Bitstring],
+    bitstrings: Sequence[Bitstring],
 ) -> npt.NDArray[np.float64]:
     """Converts a list of measured bitstrings to a probability vector estimated
     as the empirical frequency of each bitstring (ordered with increasing

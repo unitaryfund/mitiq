@@ -21,7 +21,7 @@ import numpy.typing as npt
 import cirq
 
 from mitiq.observable.pauli import PauliString, PauliStringCollection
-from mitiq._typing import MeasurementResult, QuantumResult, QPROGRAM
+from mitiq import MeasurementResult, QuantumResult, QPROGRAM
 
 
 class Observable:

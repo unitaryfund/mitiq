@@ -41,7 +41,7 @@ from mitiq.zne.scaling import (
     fold_gates_at_random,
     insert_id_layers,
 )
-from mitiq._typing import QPROGRAM
+from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 
 from mitiq.interface.mitiq_qiskit import (
@@ -49,7 +49,6 @@ from mitiq.interface.mitiq_qiskit import (
     initialized_depolarizing_noise,
 )
 
-from mitiq._typing import SUPPORTED_PROGRAM_TYPES
 from mitiq.interface import convert_from_mitiq, accept_any_qprogram_as_input
 from mitiq.interface.mitiq_cirq import (
     sample_bitstrings,

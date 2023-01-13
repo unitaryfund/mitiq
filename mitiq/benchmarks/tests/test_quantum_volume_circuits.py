@@ -31,7 +31,7 @@ from mitiq.benchmarks.quantum_volume_circuits import (
     compute_heavy_bitstrings,
 )
 
-from mitiq._typing import SUPPORTED_PROGRAM_TYPES
+from mitiq import SUPPORTED_PROGRAM_TYPES
 
 
 def test_generate_model_circuit_no_seed():

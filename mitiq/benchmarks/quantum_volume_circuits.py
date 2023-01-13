@@ -23,7 +23,7 @@ Cirq implementation of quantum volume circuits:
 cirq-core/cirq/contrib/quantum_volume/quantum_volume.py
 """
 
-from typing import Optional, List, Tuple
+from typing import Optional, Tuple, Sequence
 
 from numpy import random
 
@@ -37,7 +37,7 @@ from cirq.value import big_endian_int_to_bits
 
 
 from mitiq import QPROGRAM
-from mitiq._typing import Bitstring
+from mitiq import Bitstring
 from mitiq.interface import convert_from_mitiq
 
 
@@ -47,7 +47,7 @@ def generate_quantum_volume_circuit(
     decompose: bool = False,
     seed: Optional[int] = None,
     return_type: Optional[str] = None,
-) -> Tuple[QPROGRAM, List[Bitstring]]:
+) -> Tuple[QPROGRAM, Sequence[Bitstring]]:
     """Generate a quantum volume circuit with the given number of qubits and
     depth.
 
@@ -87,7 +87,7 @@ def generate_quantum_volume_circuit(
 def compute_heavy_bitstrings(
     circuit: Circuit,
     num_qubits: int,
-) -> List[Bitstring]:
+) -> Sequence[Bitstring]:
     """Classically compute the heavy bitstrings of the provided circuit.
 
     The heavy bitstrings are defined as the output bit-strings that have a

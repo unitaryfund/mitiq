@@ -35,6 +35,26 @@
    :members:
 ```
 
+## Circuit types and result types
+
+```{eval-rst}
+.. autoclass:: mitiq.typing.QPROGRAM
+```
+
+```{eval-rst}
+.. autoclass:: mitiq.typing.QuantumResult
+```
+
+```{eval-rst}
+.. autoclass:: mitiq.typing.Bitstring
+```
+
+```{eval-rst}
+.. autoclass:: mitiq.typing.MeasurementResult
+   :members:
+```
+
+
 ## Clifford Data Regression
 
 ### Clifford Data Regression (High-Level Tools)
@@ -191,12 +211,6 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
 ```
 
 ## Readout-Error Mitigation
-
-### Measurement Result
-```{eval-rst}
-.. autoclass:: mitiq._typing.MeasurementResult
-   :members:
-```
 
 ### Post-selection
 ```{eval-rst}

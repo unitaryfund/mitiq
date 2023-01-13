@@ -16,7 +16,7 @@
 """Tests for mirror circuits."""
 
 from mitiq.benchmarks import mirror_circuits
-from mitiq._typing import SUPPORTED_PROGRAM_TYPES
+from mitiq import SUPPORTED_PROGRAM_TYPES
 from mitiq.utils import _equal
 from numpy import random
 import networkx as nx

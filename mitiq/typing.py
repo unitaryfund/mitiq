@@ -24,12 +24,14 @@
        computed. Note this includes expectation values themselves.
 """
 from dataclasses import dataclass
-from typing import cast, Iterable, List, Optional, Tuple, Union
+from typing import cast, List, Optional, Tuple, Union, Sequence, Dict, Any
 
 import numpy as np
 import numpy.typing as npt
 
 from cirq import Circuit as _Circuit
+
+from collections import Counter
 
 
 # Supported quantum programs.
@@ -69,25 +71,31 @@ QPROGRAM = Union[_Circuit, _Program, _QuantumCircuit, _BKCircuit, _QuantumTape]
 
 # Define MeasurementResult, a result obtained by measuring qubits on a quantum
 # computer.
-Bitstring = List[int]
+Bitstring = Union[str, List[int]]
 
 
 @dataclass
 class MeasurementResult:
     """Bitstrings sampled from a quantum computer."""
 
-    result: List[Bitstring]
+    result: Sequence[Bitstring]
     qubit_indices: Optional[Tuple[int, ...]] = None
 
     def __post_init__(self) -> None:
-        if not set(b for bits in self.result for b in bits).issubset({0, 1}):
-            raise ValueError(
-                "MeasurementResult contains elements which are not (0, 1)."
-            )
+        # Validate arguments
+        symbols = set(b for bits in self.result for b in bits)
+        if not (symbols.issubset({0, 1}) or symbols.issubset({"0", "1"})):
+            raise ValueError("Bitstrings should look like '011' or [0, 1, 1].")
 
-        self._bitstrings = np.array(self.result)
+        if symbols.issubset({"0", "1"}):
+            # Convert to list of integers
+            int_result = [[int(b) for b in bits] for bits in self.result]
+            self.result: List[List[int]] = list(int_result)
+
         if isinstance(self.result, np.ndarray):
             self.result = cast(List[Bitstring], self.result.tolist())
+
+        self._bitstrings = np.array(self.result)
 
         if not self.qubit_indices:
             self.qubit_indices = tuple(range(self.nqubits))
@@ -97,6 +105,7 @@ class MeasurementResult:
                     f"MeasurementResult has {self.nqubits} qubit(s) but there "
                     f"are {len(self.qubit_indices)} `qubit_indices`."
                 )
+
         self._measurements = dict(zip(self.qubit_indices, self._bitstrings.T))
 
     @property
@@ -115,11 +124,57 @@ class MeasurementResult:
     def asarray(self) -> npt.NDArray[np.int64]:
         return self._bitstrings
 
-    def __getitem__(self, indices: List[int]) -> npt.NDArray[np.int64]:
-        return np.array([self._measurements[i] for i in indices]).T
+    @classmethod
+    def from_counts(
+        cls,
+        counts: Dict[str, int],
+        qubit_indices: Optional[Tuple[int, ...]] = None,
+    ) -> "MeasurementResult":
+        """Initializes a ``MeasurementResult`` from a dictionary of counts.
 
-    def __iter__(self) -> Iterable[Bitstring]:
-        yield from self.result
+        **Example**::
+
+            MeasurementResult.from_counts({"00": 175, "11": 177})
+        """
+        counter = Counter(counts)
+        return cls(list(counter.elements()), qubit_indices)
+
+    def get_counts(self) -> Dict[str, int]:
+        """Returns a Python dictionary whose keys are the measured
+        bitstrings and whose values are the counts.
+        """
+        strings = ["".join(map(str, bits)) for bits in self.result]
+        return dict(Counter(strings))
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Exports data to a Python dictionary.
+
+        Note: Information about the order measurements is not preserved.
+        """
+
+        return {
+            "nqubits": self.nqubits,
+            "qubit_indices": self.qubit_indices,
+            "shots": self.shots,
+            "counts": self.get_counts(),
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "MeasurementResult":
+        """Loads a ``MeasurementResult`` from a Python dictionary.
+
+        Note: Only ``data["counts"]`` and ``data["qubit_indices"]`` are used
+        by this method. Total shots and number of qubits are deduced.
+        """
+        return cls.from_counts(data["counts"], data["qubit_indices"])
+
+    def filter_qubits(self, qubit_indices: List[int]) -> npt.NDArray[np.int64]:
+        """Returns the bitstrings associated to a subset of qubits."""
+        return np.array([self._measurements[i] for i in qubit_indices]).T
+
+    def __repr__(self) -> str:
+        # We redefine __repr__ in this way to avoid very long output strings.
+        return "MeasurementResult: " + str(self.to_dict())
 
 
 # An `executor` function inputs a quantum program and outputs an object from

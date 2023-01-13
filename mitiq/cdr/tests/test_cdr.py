@@ -24,7 +24,7 @@ import cirq
 from cirq import LineQubit
 
 from mitiq import PauliString, Observable, QPROGRAM
-from mitiq._typing import SUPPORTED_PROGRAM_TYPES
+from mitiq import SUPPORTED_PROGRAM_TYPES
 from mitiq.cdr import (
     execute_with_cdr,
     linear_fit_function_no_intercept,

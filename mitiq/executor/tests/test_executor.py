@@ -23,7 +23,7 @@ import numpy as np
 import cirq
 import pyquil
 
-from mitiq._typing import MeasurementResult
+from mitiq import MeasurementResult
 from mitiq.executor.executor import Executor
 from mitiq.observable import Observable, PauliString
 from mitiq.interface.mitiq_cirq import (

@@ -16,7 +16,17 @@
 from collections import Counter
 from dataclasses import asdict
 from math import prod, sqrt
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Union,
+    cast,
+    Sequence,
+)
 
 import cirq
 
@@ -161,7 +171,7 @@ class Calibrator:
 
 
 def bitstrings_to_distribution(
-    bitstrings: List[List[int]],
+    bitstrings: Sequence[List[int]],
 ) -> Dict[str, float]:
     """Helper function to convert raw measurement results to probability
     distributions."""
@@ -199,6 +209,7 @@ def convert_to_expval_executor(
 
     def expval_executor(circuit: cirq.Circuit) -> float:
         raw = cast(MeasurementResult, ex._run([circuit])[0]).result
+        raw = cast(List[List[int]], raw)
         bitstring_distribution = bitstrings_to_distribution(raw)
         return bitstring_distribution.get(bitstring_to_measure, 0)
 

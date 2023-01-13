@@ -14,10 +14,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Quantum computer input/output.
-from mitiq._typing import (
+from mitiq.typing import (
     SUPPORTED_PROGRAM_TYPES,
     QPROGRAM,
     MeasurementResult,
+    QuantumResult,
+    Bitstring,
     QuantumResult,
 )
 

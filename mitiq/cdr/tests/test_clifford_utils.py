@@ -20,7 +20,7 @@ import numpy as np
 import cirq
 from cirq.circuits import Circuit
 
-from mitiq._typing import SUPPORTED_PROGRAM_TYPES
+from mitiq import SUPPORTED_PROGRAM_TYPES
 from mitiq.interface import convert_from_mitiq
 from mitiq.cdr.clifford_utils import (
     is_clifford_angle,
