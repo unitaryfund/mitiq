@@ -23,7 +23,7 @@ from schema import Schema, Or
 from mitiq import Executor, MeasurementResult
 from mitiq.benchmarks import generate_rb_circuits
 from mitiq.calibration import Calibrator, Settings, ZNESettings
-from mitiq.calibration.calibration import (
+from mitiq.calibration.calibrator import (
     bitstrings_to_distribution,
     convert_to_expval_executor,
 )
