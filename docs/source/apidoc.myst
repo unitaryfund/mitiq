@@ -259,6 +259,9 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
 ## Calibration
 
 ```{eval-rst}
-.. automodule:: mitiq.calibration
+.. automodule:: mitiq.calibration.calibrator
+   :members:
+
+.. automodule:: mitiq.calibration.settings
    :members:
 ```
