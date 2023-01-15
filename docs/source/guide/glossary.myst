@@ -13,90 +13,60 @@ kernelspec:
 
 # Glossary
 
-## Calibration
-In the design terminology of Mitiq, calibration refers to the process of choosing
+
+
+
+Calibration
+: The process of choosing
 the optimal QEM method and/or the optimal parameter settings of a method for a user's specific situation
 (problem type, circuit structure, resource constraints, etc.). It is analogous to choosing a machine learning method
-and optimal hyperparameters.
-In quantum computing and engineering, calibration has a different meaning. It refers to
-tuning a physical device so that it better approximates some ideal property or operation (for example, tuning the microwave pulses that act on
-the qubits in a superconducting computer so that they better approximate/physically realize their corresponding ideal 
-quantum operations).
-In the Mitiq documentation it will always be clear which sense of calibration is meant.
+and its optimal hyperparameters. (Not to be confused with "calibration" in the sense of
+tuning a physical device so that it better approximates some ideal property or operation.)
 
 
-## Clifford Data Regression (CDR) 
-Clifford data regression (CDR) is a learning-based quantum error mitigation technique in which an error mitigation model is
-trained with quantum circuits that resemble the circuit of interest, but which are easier to classically simulate.
-
-For the theory behind CDR and how to use it in Mitiq, see the User Guide
-section on [CDR](./cdr.myst).
-
-## Digital Dynamical Decoupling (DDD)
-Digital Dynamical Decoupling (DDD) is an error mitigation technique in which sequences of gates are applied to slack windows,
-i.e. single-qubit idle windows, in a quantum circuit. Such sequences of gates can reduce the coupling
-between the qubits and the environment, mitigating the effects of noise.
-
-For the theory behind DDD and how to use it in Mitiq, see the User Guide
-section on [DDD](./ddd.myst).
-
-## Expectation Value
-The expectation value of an observable $A$ on state $\rho$ is the average
-readout value (observed numerical measurement outcome) when $A$ is measured on $\rho$. Mathematically it is usually 
-expressed as $\text{Tr}[A\rho]$ (the trace of the state that results from applying $A$ to $\rho$). 
-The expectation value of $A$ is denoted $\langle A \rangle$. (Note that this notation suppresses the state $\rho$,
-but it should be clear from context what state $A$ is being measured on). Expectation values are important 
-in quantum computing because many near-term quantum algorithms are variational quantum algorithms, in 
-which the only role of the quantum processor is to repeatedly compute expectation values
-for the classical processor to use in performing some overall useful computational task (see [Variational Quantum Algorithm](vqa)).
+Expectation Value
+: The expectation value of an observable $A$ on state $\rho$ is the average
+readout value when $A$ is measured on $\rho$. Mathematically, this is $\text{Tr}[A\rho]$ and usually denoted $\langle A \rangle$ (when this notation is used, the state $\rho$ that $A$ is being measured on should be clear from context). Expectation values are important 
+for near-term quantum computing because in variational quantum algorithms,
+the only role of the quantum processor is to repeatedly compute expectation values, which a classical processor then uses to perform some overall useful computational task.
 
 
-## Gate Fidelity
-The fidelity of a gate in a quantum device (e.g. the CNOT gate as implemented in a particular quantum computer) is a measure of how 
-closely the device's implementation of the gate approximates the ideal gate.
+Gate Fidelity
+: A number between 0 and 1 measuring how 
+closely a particular device's (noisy) physical implementation of a gate approximates the ideal gate's action on quantum states. Mitiq implements a noise-scaling method for ZNE in which each gate of the input circuit is sampled for [unitary folding](./zne-3-options.myst#unitary-folding) with probability proportional to its infidelity (1 - fidelity), described [here](./zne-3-options.myst#folding-gates-by-fidelity) and [here](https://mitiq.readthedocs.io/en/stable/apidoc.html#mitiq.zne.scaling.folding.fold_gates_at_random) in the documentation.
 
-TODO: give precise definition after confirming which one to use 
+   
 
-Mitiq incorporates user-provided gate fidelities as an optional way to control how ZNE performs noise-scaling in the local folding paradigm (the fidelities serve as
-weights for sampling which gates to fold). For more details, see this [section](https://mitiq.readthedocs.io/en/stable/guide/zne-3-options.html#folding-gates-by-fidelity) of the User Guide and
-this [section](https://mitiq.readthedocs.io/en/stable/apidoc.html#mitiq.zne.scaling.folding.fold_gates_at_random) of the API-doc.
-
-
-## Hamiltonian
-The Hamiltonian of a quantum system is a Hermitian operator (and therefore an [observable](#observable) that represents 
-he total energy of the system. The Hamiltonian's eigenvalues and eigenvectors represent, respectively, the system's possible energy levels and
-its corresponding energy states.
+Hamiltonian
+: A Hermitian operator whose eigenvalues and eigenvectors represent, respectively, a quantum system's possible energy levels and corresponding energy states. Most variational quantum algorithms work by encoding the objective of an optimization problem (e.g. finding the maximum cut in a graph) as the task of minimizing the expectation value of a problem-specific Hamiltonian, which physically corresponds to finding the ground-state energy of that Hamiltonian. For an example of how error mitigation helps such algorithms, see [Solving MaxCut with Mitiq-improved QAOA](../examples/maxcut-demo.myst).
 
 
-## Probabilistic Error Cancellation (PEC)
-Probabilistic error cancellation (PEC) is an error mitigation technique in which ideal operations are
-represented as linear combinations of noisy operations.
-In PEC, unbiased estimates of expectation values are obtained by Monte Carlo averaging over different noisy circuits.
-
-For the theory behind PEC and how to use it in Mitiq, see the User Guide
-section on [PEC](./pec.myst).
+Sampling Overhead
+: The basic resource-cost measure used to evaluate QEM methods---how many more circuit executions ("runs," "shots") does a method need to achieve the same level of statistical precision in estimating an expectation value, compared to 
+the naive (i.e. unmitigated) method of running the same noisy input circuit $N$ times and returning the
+sample mean of the measurement outcomes. Also called sampling cost, it is usually reported as a multiplicative factor $C$, defined as the ratio of the QEM estimator's variance to the sample-mean estimator's variance, and meaning that
+the method needs $C \cdot N$ circuit shots to obtain the same precision as the sample-mean estimator would with only $N$ shots. 
 
 
-## Readout Error Mitigation (REM)
-TODO: single sentence summary
-
-For the theory behind REM and how to use it in Mitiq, see the User Guide
-section on [REM] TODO: add link when available
-
-
-## Sampling Overhead
-The sampling overhead (or sampling cost) of a QEM method is how many more circuit runs (or "shots") it 
-requires to achieve the same level of statistical precision/variability in its estimate of an expectation value, compared to 
-the naive (i.e. unmitigated and probably biased) estimation method of running the same noisy input circuit $N$ times and returning the
-empirical mean. 
-Mathematically the sampling overhead/cost is often represented as a multiplicative factor $C_{QEM}$, meaning that (for a particular QEM method)
-one needs $C_{QEM} \cdot N$ circuit shots to obtain the same precision as the naive method would with only $N$ shots.
+## QEM Methods
+[Clifford Data Regression (CDR)](./cdr.myst)
+: An error mitigation model is
+trained with quantum circuits that resemble the circuit of interest, but which are easier to classically simulate. 
 
 
-## Zero Noise Extrapolation (ZNE) 
-Zero-noise extrapolation (ZNE) is an error mitigation technique in which an
-expectation value is computed at different noise levels and, as a second step,
+[Digital Dynamical Decoupling (DDD)](./ddd.myst)
+: Sequences of gates are applied to slack windows (single-qubit idle windows) in a quantum circuit to reduce the coupling
+between the qubits and the environment, mitigating the effects of noise. 
+
+
+[Probabilistic Error Cancellation (PEC)](./pec.myst)
+: Ideal operations are represented as quasi-probability distributions over noisy implementable operations, and unbiased estimates of expectation values are obtained by averaging over circuits sampled according to this representation.
+
+
+[Readout Error Mitigation (REM)](./rem.myst)
+: Inverted transition/confusion matrices are applied to noisy measurement results to mitigate errors in the estimation of expectation values.  
+
+
+[Zero Noise Extrapolation (ZNE)](./zne.myst)
+: An expectation value is computed at different noise levels and then
 the ideal expectation value is inferred by extrapolating the measured results to the zero-noise limit.
-
-For the theory behind ZNE and how to use it in Mitiq, see the User Guide
-section on [ZNE](./zne.myst).
