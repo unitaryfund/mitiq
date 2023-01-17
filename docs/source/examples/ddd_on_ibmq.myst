@@ -45,6 +45,7 @@ import numpy as np
 # Mitiq imports.
 from mitiq import benchmarks, ddd
 from mitiq.interface import convert_to_mitiq, convert_from_mitiq
+from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
 ```
 
 ```{code-cell} ipython3
@@ -158,8 +159,9 @@ def ibmq_executor(circuit: QuantumCircuit, shots: int, correct_bitstring: List[i
         # Simulate the circuit with noise
         if noisy_sim:
             converted, _ = convert_to_mitiq(circuit)
-            noisy = converted.with_noise(cirq.rz(0.05))
-            circuit_to_run = convert_from_mitiq(noisy, "qiskit")
+#             noisy = converted.with_noise(cirq.rz(0.05))
+#             print(noisy)
+            circuit_to_run = to_qiskit(converted)
             
         else:
             circuit_to_run = circuit.copy()
