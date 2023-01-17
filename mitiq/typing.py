@@ -146,7 +146,7 @@ class MeasurementResult:
         strings = ["".join(map(str, bits)) for bits in self.result]
         return dict(Counter(strings))
 
-    def prob_distribution(self) -> Dict[str, int]:
+    def prob_distribution(self) -> Dict[str, float]:
         """Returns a Python dictionary whose keys are the measured
         bitstrings and whose values are their empirical frequencies.
         """
