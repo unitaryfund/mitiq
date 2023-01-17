@@ -92,24 +92,7 @@ def get_circuit(num_qubits) -> Tuple[qiskit.QuantumCircuit, List[int]]:
 ```
 
 ```{code-cell} ipython3
-circ, bitstr = get_circuit(5)
-# print(circ)
-# print(circ.data)
 
-qc = qiskit.QuantumCircuit(5)
-
-for idx in range(5):
-    qc.h(idx)
-
-qc.x(0)
-qc.measure_all()
-print(qc)
-
-from qiskit.converters.circuit_to_dag import circuit_to_dag
-from qiskit.converters.dag_to_circuit import dag_to_circuit
-
-dag = circuit_to_dag(qc)
-print(list(dag.idle()))
 ```
 
 ## Define the executor
