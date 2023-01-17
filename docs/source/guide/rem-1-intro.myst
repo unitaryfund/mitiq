@@ -4,7 +4,7 @@ jupytext:
     extension: .myst
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.11.1
+    jupytext_version: 1.14.1
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -20,7 +20,6 @@ import mitiq
 
 mitiq.SUPPORTED_PROGRAM_TYPES.keys()
 ```
-
 
 ## Problem setup
 In this example we will simulate a noisy device that flips qubits just before
@@ -70,13 +69,7 @@ def noisy_readout_executor(
     result = simulator.run(circuit, repetitions=shots)
 
     return MeasurementResult(
-        result=np.column_stack(list(result.measurements.values())),
-        qubit_indices=tuple(
-            # q[2:-1] is necessary to convert "q(number)" into "number"
-            int(q[2:-1])
-            for k in result.measurements.keys()
-            for q in k.split(",")
-        ),
+        result=np.column_stack(list(result.measurements.values()))
     )
 ```
 
