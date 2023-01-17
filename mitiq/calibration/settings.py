@@ -31,6 +31,7 @@ from mitiq.benchmarks import (
 )
 
 from mitiq.pec import execute_with_pec
+from mitiq.raw import execute
 from mitiq.zne import execute_with_zne
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import (
@@ -42,6 +43,7 @@ from mitiq.zne.scaling import (
 class MitigationTechnique(Enum):
     ZNE = auto()
     PEC = auto()
+    RAW = auto()
 
     @property
     def mitigation_function(self) -> Callable[..., QuantumResult]:
@@ -49,6 +51,8 @@ class MitigationTechnique(Enum):
             return execute_with_zne
         elif self is MitigationTechnique.PEC:
             return execute_with_pec
+        elif self is MitigationTechnique.RAW:
+            return execute
 
 
 @dataclass
@@ -230,3 +234,5 @@ ZNESettings = Settings(
         },
     ],
 )
+
+DefaultStrategy = Strategy(MitigationTechnique.RAW, {})

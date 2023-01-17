@@ -36,7 +36,7 @@ from mitiq import (
     Observable,
     QuantumResult,
 )
-from mitiq.calibration.settings import Settings, Strategy
+from mitiq.calibration.settings import Settings, Strategy, DefaultStrategy
 
 
 class Calibrator:
@@ -150,14 +150,12 @@ class Calibrator:
         """Finds the best strategy by using the parameters that had the
         largest improvement factor."""
         best_improvement_factor = 1.0
-        strategy = None
+        strategy = DefaultStrategy
         for circuit in results:
             for result in circuit["mitigated_values"]["ZNE"]["results"]:
                 if result["improvement_factor"] > best_improvement_factor:
                     best_improvement_factor = result["improvement_factor"]
                     strategy = result["strategy"]
-        if strategy is None:
-            raise ValueError("None of the improvement factors were > 0")
         return strategy
 
     def run(self) -> None:
