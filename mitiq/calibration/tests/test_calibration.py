@@ -51,18 +51,31 @@ def execute(circuit, noise_level=0.001):
 
 
 settings = Settings(
-    techniques=["zne"],
     circuit_types=["ghz", "rb"],
     num_qubits=2,
     circuit_depth=10,
-    technique_params={
-        "scale_factors": [[1.0, 1.2, 1.4], [1.0, 1.5, 2.0], [1.0, 2.0, 3.0]],
-        "scale_methods": [
-            fold_global,
-            fold_gates_at_random,
-        ],
-        "factories": [RichardsonFactory, LinearFactory],
-    },
+    strategies=[
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": RichardsonFactory([1.0, 3.0, 5.0]),
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": LinearFactory([1.0, 2.0, 3.0]),
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": LinearFactory([1.0, 3.0, 5.0]),
+        },
+    ],
 )
 
 
@@ -72,14 +85,14 @@ def test_ZNE_workflow():
 
     cal.run()
     assert len(cal.results) == 3
-    assert cal.results[0]["mitigated_values"]["zne"]["improvement_factor"] >= 0
+    assert cal.results[0]["mitigated_values"]["ZNE"]["improvement_factor"] >= 0
     assert isinstance(cal.best_strategy(cal.results), Strategy)
 
 
 def test_get_cost():
     cal = Calibrator(execute, settings)
     cost = cal.get_cost()
-    expected_cost = 2 * 3 * 2 * 2  # circuits * scale * methods * factories
+    expected_cost = 2 * 4  # circuits * num_experiments
     assert cost["noisy_executions"] == expected_cost
     assert cost["ideal_executions"] == 0
 
@@ -124,13 +137,13 @@ def test_compute_improvements_modifies_IF():
     cal = Calibrator(execute, settings)
     cal.run_circuits()
     IFs = [
-        res["mitigated_values"]["zne"]["improvement_factor"]
+        res["mitigated_values"]["ZNE"]["improvement_factor"]
         for res in cal.results
     ]
     assert all(IF is None for IF in IFs)
     cal.compute_improvements(cal.results)
     IFs = [
-        res["mitigated_values"]["zne"]["improvement_factor"]
+        res["mitigated_values"]["ZNE"]["improvement_factor"]
         for res in cal.results
     ]
     assert all(IF is not None for IF in IFs)

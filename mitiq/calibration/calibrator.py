@@ -70,10 +70,9 @@ class Calibrator:
         Calibrator object, the number of classical simulations is also
         returned."""
         num_circuits = len(self.circuits)
-        num_methods = len(self.settings.techniques)
-        num_options = prod(map(len, self.settings.technique_params.values()))
+        num_options = len(self.settings.technique_params)
 
-        noisy = num_circuits * num_methods * num_options
+        noisy = num_circuits * num_options
         ideal = 0  # TODO: ideal executor is currently unused
         return {
             "noisy_executions": noisy,
@@ -96,22 +95,24 @@ class Calibrator:
             noisy_error = ideal_value - noisy_value
 
             mitigated_values: Dict[str, Dict[str, Any]] = {
-                technique: {"results": [], "improvement_factor": None}
+                technique.name: {"results": [], "improvement_factor": None}
                 for technique in self.settings.techniques
             }
             for strategy in self.settings.make_strategies():
-                technique, params, mitiq_func = strategy
-                mitigated_value = mitiq_func(circuit, expval_executor)
-
+                mitigated_value = strategy.mitigation_function(
+                    circuit, expval_executor
+                )
                 improvement_factor = abs(
                     noisy_error / (ideal_value - mitigated_value)
                 )
+
                 result = {
                     "mitigated_value": mitigated_value,
                     "improvement_factor": improvement_factor,
                     "strategy": strategy,
-                    **params,
+                    **strategy.as_dict(),
                 }
+                technique = strategy.technique.name
                 mitigated_values[technique]["results"].append(result)
 
             circuit_info = problem.problem_summary_dict()
@@ -151,7 +152,7 @@ class Calibrator:
         best_improvement_factor = 1.0
         strategy = None
         for circuit in results:
-            for result in circuit["mitigated_values"]["zne"]["results"]:
+            for result in circuit["mitigated_values"]["ZNE"]["results"]:
                 if result["improvement_factor"] > best_improvement_factor:
                     best_improvement_factor = result["improvement_factor"]
                     strategy = result["strategy"]

@@ -17,11 +17,12 @@ from dataclasses import dataclass, astuple, asdict
 from functools import partial
 from itertools import product
 from typing import Any, Callable, cast, Iterator, List, Dict, Tuple
+from enum import Enum, auto
 
 import networkx as nx
 import cirq
 
-from mitiq import QuantumResult
+from mitiq import QuantumResult, QPROGRAM
 from mitiq.benchmarks import (
     generate_ghz_circuit,
     generate_mirror_circuit,
@@ -29,13 +30,25 @@ from mitiq.benchmarks import (
     generate_rb_circuits,
 )
 
-# from mitiq.pec import execute_with_pec
+from mitiq.pec import execute_with_pec
 from mitiq.zne import execute_with_zne
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import (
     fold_gates_at_random,
     fold_global,
 )
+
+
+class MitigationTechnique(Enum):
+    ZNE = auto()
+    PEC = auto()
+
+    @property
+    def mitigation_function(self) -> Callable[..., QuantumResult]:
+        if self is MitigationTechnique.ZNE:
+            return execute_with_zne
+        elif self is MitigationTechnique.PEC:
+            return execute_with_pec
 
 
 @dataclass
@@ -60,7 +73,7 @@ class BenchmarkProblem:
         return sum(
             [len(op.qubits) > 1 for op in self.circuit.all_operations()]
         )
-    
+
     def problem_summary_dict(self) -> Dict[str, Any]:
         base = asdict(self)
         # remove circuit; it can be regenerated if needed
@@ -73,9 +86,23 @@ class BenchmarkProblem:
 
 @dataclass
 class Strategy:
-    technique: str
+    technique: MitigationTechnique
     technique_params: Dict[str, Any]
-    mitigation_function: Callable[..., QuantumResult]
+
+    @property
+    def mitigation_function(self) -> Callable[..., QuantumResult]:
+        return partial(
+            self.technique.mitigation_function, **self.technique_params
+        )
+
+    def as_dict(self) -> Dict[str, Any]:
+        di = {}
+        if self.technique is MitigationTechnique.ZNE:
+            inference_func = self.technique_params["factory"]
+            di["factory"] = inference_func.__class__.__name__
+            di["scale_factors"] = inference_func.get_scale_factors().tolist()
+            di["scale_method"] = self.technique_params["scale_noise"].__name__
+        return di
 
     def __iter__(self) -> Iterator[Any]:
         return iter(astuple(self))
@@ -86,14 +113,16 @@ class Settings:
 
     def __init__(
         self,
-        techniques: List[str],
         circuit_types: List[str],
         num_qubits: int,
         circuit_depth: int,
-        technique_params: Dict[str, Any],
+        strategies: List[Dict[str, Any]],
     ):
-        self.techniques = techniques
-        self.technique_params = technique_params
+        self.techniques = [
+            MitigationTechnique[technique["technique"].upper()]
+            for technique in strategies
+        ]
+        self.technique_params = strategies
         self.circuit_types = circuit_types
         self.num_qubits = num_qubits
         self.circuit_depth = circuit_depth
@@ -145,48 +174,59 @@ class Settings:
         """Generates a list of ready to apply error mitigation functions
         preloaded with hyperparameters."""
         funcs = []
-        for method in self.techniques:
-            if method == "zne":
-                for factory, scale_factors, scale_method in product(
-                    self.technique_params["factories"],
-                    self.technique_params["scale_factors"],
-                    self.technique_params["scale_methods"],
-                ):
-                    inference_func = factory(scale_factors)
-                    em_func = partial(
-                        execute_with_zne,
-                        factory=inference_func,
-                        scale_noise=scale_method,
-                    )
-                    funcs.append(
-                        Strategy(
-                            method,
-                            {
-                                "factory": factory.__name__,
-                                "scale_factors": scale_factors,
-                                "scale_method": scale_method.__name__,
-                            },
-                            em_func,
-                        )
-                    )
-            # elif method == "pec":
-            #     funcs.append(("pec", execute_with_pec))
-            else:
-                raise ValueError(
-                    "Invalid value passed for mitigation_methods. "
-                    "Must be one of `zne`, `pec`"
-                )
+        for technique, params in zip(self.techniques, self.technique_params):
+            params_copy = params.copy()
+            del params_copy["technique"]
+            funcs.append(
+                Strategy(technique=technique, technique_params=params_copy)
+            )
         return funcs
 
 
 ZNESettings = Settings(
-    ["zne"],
     circuit_types=["ghz", "rb", "mirror"],
     num_qubits=2,
     circuit_depth=5,
-    technique_params={
-        "scale_factors": [[1.0, 2.0, 3.0], [1.0, 3.0, 5.0]],
-        "scale_methods": [fold_global, fold_gates_at_random],
-        "factories": [RichardsonFactory, LinearFactory],
-    },
+    strategies=[
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": RichardsonFactory([1.0, 3.0, 5.0]),
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": LinearFactory([1.0, 2.0, 3.0]),
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": LinearFactory([1.0, 3.0, 5.0]),
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_gates_at_random,
+            "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_gates_at_random,
+            "factory": RichardsonFactory([1.0, 3.0, 5.0]),
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_gates_at_random,
+            "factory": LinearFactory([1.0, 2.0, 3.0]),
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_gates_at_random,
+            "factory": LinearFactory([1.0, 3.0, 5.0]),
+        },
+    ],
 )
