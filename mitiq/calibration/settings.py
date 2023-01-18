@@ -15,14 +15,13 @@
 
 from dataclasses import dataclass, astuple, asdict
 from functools import partial
-from itertools import product
 from typing import Any, Callable, cast, Iterator, List, Dict, Tuple
 from enum import Enum, auto
 
 import networkx as nx
 import cirq
 
-from mitiq import QuantumResult, QPROGRAM
+from mitiq import QuantumResult
 from mitiq.benchmarks import (
     generate_ghz_circuit,
     generate_mirror_circuit,
@@ -50,7 +49,7 @@ class MitigationTechnique(Enum):
         if self is MitigationTechnique.ZNE:
             return execute_with_zne
         elif self is MitigationTechnique.PEC:
-            return execute_with_pec
+            return cast(Callable[..., float], execute_with_pec)
         elif self is MitigationTechnique.RAW:
             return execute
 
@@ -110,6 +109,11 @@ class Strategy:
 
     def __iter__(self) -> Iterator[Any]:
         return iter(astuple(self))
+
+    def __str__(self) -> str:
+        di = self.as_dict()
+        di["technique"] = self.technique.name
+        return str(di)
 
 
 class Settings:

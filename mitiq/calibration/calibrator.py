@@ -40,7 +40,7 @@ from mitiq.calibration.settings import Settings, Strategy, DefaultStrategy
 
 
 class Calibrator:
-    """A calibration object which keeps track of, and aids in Error
+    """An object used to orchestrate experiments, and determine in Error
     Mitigation parameter tuning."""
 
     def __init__(
@@ -215,15 +215,33 @@ def convert_to_expval_executor(
 
 def execute_with_mitigation(
     circuit: QPROGRAM,
-    calibrator: Calibrator,
-    bitstring: str,
+    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     observable: Optional[Observable] = None,
+    *,
+    calibrator: Calibrator,
 ) -> QuantumResult:
+    """Estimates the error-mitigated expectation value associated to the
+    input circuit, via the application of the best mitigation strategy, as
+    determined by calibration.
+
+
+    Args:
+        circuit: The input circuit to execute.
+        executor: A Mitiq executor that executes a circuit and returns the
+            unmitigated ``QuantumResult`` (e.g. an expectation value).
+        observable: Observable to compute the expectation value of. If
+            ``None``, the ``executor`` must return an expectation value.
+            Otherwise, the ``QuantumResult`` returned by ``executor`` is used
+            to compute the expectation of the observable.
+        calibrator: ``Calibrator`` object with which to determine the error
+            mitigation strategy to execute the circuit.
+
+    Returns:
+        The error mitigated expectation expectation value.
+    """
+
     if not calibrator.results:
         calibrator.run()
     strategy = calibrator.best_strategy(calibrator.results)
     em_func = strategy.mitigation_function
-    expval_executor, _ = convert_to_expval_executor(
-        calibrator.executor, bitstring=bitstring
-    )
-    return em_func(circuit, executor=expval_executor, observable=observable)
+    return em_func(circuit, executor=executor, observable=observable)

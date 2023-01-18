@@ -15,8 +15,8 @@
 import pytest
 
 from mitiq.calibration import ZNESettings, Settings
-from mitiq.zne.scaling import fold_global, fold_gates_at_random
-from mitiq.zne.inference import RichardsonFactory, ExpFactory, LinearFactory
+from mitiq.zne.scaling import fold_global
+from mitiq.zne.inference import RichardsonFactory, LinearFactory
 
 
 def test_basic_settings():

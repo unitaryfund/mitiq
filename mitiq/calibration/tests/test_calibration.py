@@ -29,10 +29,7 @@ from mitiq.calibration.calibrator import (
 )
 from mitiq.calibration.settings import Strategy
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
-from mitiq.zne.scaling import (
-    fold_gates_at_random,
-    fold_global,
-)
+from mitiq.zne.scaling import fold_global
 
 
 def execute(circuit, noise_level=0.001):
