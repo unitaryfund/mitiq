@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="438.94376mm"
+   height="222.25mm"
+   viewBox="0 0 438.94376 222.25"
+   version="1.1"
+   id="svg993"
+   inkscape:version="1.2.2 (b0a8486, 2022-12-01)"
+   sodipodi:docname="rem_workflow.svg"
+   inkscape:export-filename="../dev/qc/mitiq/docs/source/img/rem_workflow.png"
+   inkscape:export-xdpi="600"
+   inkscape:export-ydpi="600"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs987">
+    <marker
+       style="overflow:visible"
+       id="marker1314"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="5.3244081"
+       markerHeight="6.155385"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path1312" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker7404"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="5.3244081"
+       markerHeight="6.155385"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path7402" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="TriangleStart"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="5.3244081"
+       markerHeight="6.155385"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+    <clipPath
+       id="clip0">
+      <rect
+         x="20"
+         y="125"
+         width="1659"
+         height="852"
+         id="rect1556" />
+    </clipPath>
+    <clipPath
+       id="clip0-2">
+      <rect
+         x="20"
+         y="125"
+         width="1659"
+         height="852"
+         id="rect1716" />
+    </clipPath>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.5"
+     inkscape:cx="573"
+     inkscape:cy="565"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1440"
+     inkscape:window-height="813"
+     inkscape:window-x="0"
+     inkscape:window-y="23"
+     inkscape:window-maximized="1"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1" />
+  <metadata
+     id="metadata990">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(215.69211,-315.9881)">
+    <rect
+       x="-215.69211"
+       y="315.9881"
+       width="119.85625"
+       height="222.25"
+       fill="#ffff93"
+       id="rect1721"
+       style="stroke-width:0.264583" />
+    <text
+       font-family="'Lucida Console', 'Lucida Console_MSFontService', sans-serif"
+       font-weight="400"
+       font-stretch="semi-condensed"
+       font-size="16.9333px"
+       id="text1723"
+       x="-176.0914"
+       y="334.24435"
+       style="stroke-width:0.264583">User</text>
+    <rect
+       x="-92.660866"
+       y="315.9881"
+       width="192.61667"
+       height="222.25"
+       fill="#afffff"
+       id="rect1725"
+       style="stroke-width:0.264583;fill:#a2d0aa;fill-opacity:1" />
+    <text
+       font-weight="400"
+       font-stretch="semi-condensed"
+       font-size="16.9333px"
+       id="text1727"
+       x="-40.748028"
+       y="334.24435"
+       style="font-weight:400;font-stretch:semi-condensed;font-size:16.9333px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.264583">mitiq.rem</text>
+    <rect
+       x="-206.29941"
+       y="355.01413"
+       width="101.33542"
+       height="67.46875"
+       stroke="#000000"
+       stroke-width="1.19062"
+       stroke-miterlimit="8"
+       fill="#ffffe1"
+       id="rect1737" />
+    <rect
+       x="-206.29941"
+       y="462.17038"
+       width="101.33542"
+       height="67.73333"
+       stroke-miterlimit="8"
+       id="rect1743"
+       style="fill:#ffffe1;stroke:#000000;stroke-width:1.19061995;stroke-miterlimit:8" />
+    <rect
+       x="103.39539"
+       y="315.9881"
+       width="119.85625"
+       height="222.25"
+       fill="#d9d9d9"
+       id="rect1757"
+       style="stroke-width:0.264583" />
+    <text
+       font-family="'Lucida Console', 'Lucida Console_MSFontService', sans-serif"
+       font-weight="400"
+       font-stretch="semi-condensed"
+       font-size="16.9333px"
+       id="text1759"
+       x="122.51682"
+       y="334.24435"
+       style="stroke-width:0.264583">Hardware</text>
+    <rect
+       x="112.78809"
+       y="415.86832"
+       width="101.33542"
+       height="45.772915"
+       stroke="#000000"
+       stroke-width="1.19062"
+       stroke-miterlimit="8"
+       fill="#a6a6a6"
+       id="rect1761"
+       style="fill:#ffffff;fill-opacity:1" />
+    <g
+       id="g980"
+       transform="matrix(0.82993196,0,0,0.82993196,-18.013783,271.5724)">
+      <rect
+         x="-97.253273"
+         y="296.23883"
+         width="84.243759"
+         height="16.668762"
+         id="rect1522"
+         style="fill:#f2f2f2;stroke-width:0.203147"
+         inkscape:label="rect1522" />
+      <text
+         font-weight="400"
+         font-stretch="semi-condensed"
+         font-size="10.5833px"
+         id="text1524"
+         x="-93.412315"
+         y="308.14508"
+         style="font-weight:400;font-stretch:semi-condensed;font-size:10.5833px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.264583">2. Inference</text>
+    </g>
+    <g
+       id="g996"
+       transform="matrix(1.229906,0,0,1,2.6021438,218.86319)">
+      <rect
+         x="-82.494347"
+         y="172.71333"
+         width="98.971611"
+         height="26.987499"
+         fill="#f2f2f2"
+         id="rect1512"
+         style="stroke-width:0.270078" />
+    </g>
+    <rect
+       x="-22.943151"
+       y="450.13181"
+       width="101.33542"
+       height="67.204163"
+       stroke="#000000"
+       stroke-width="1.19062"
+       stroke-miterlimit="8"
+       fill="#ddffff"
+       id="rect1769-0"
+       style="stroke-dasharray:none;stroke-dashoffset:0" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:0;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="27.075659"
+       y="466.7724"
+       id="text916-8"><tspan
+         sodipodi:role="line"
+         x="27.075659"
+         y="466.7724"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.6417px;line-height:1.25;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan5295">REM</tspan><tspan
+         sodipodi:role="line"
+         x="27.075661"
+         y="480.35345"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.5833px;line-height:1.25;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan5297"
+         dx="0 0 0 0">via inverse</tspan><tspan
+         sodipodi:role="line"
+         x="27.075659"
+         y="493.58258"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.5833px;line-height:1.25;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan5299">confusion</tspan><tspan
+         sodipodi:role="line"
+         x="27.075659"
+         y="506.81171"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.5833px;line-height:1.25;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan5387">matrices</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="-157.39725"
+       y="479.20273"
+       id="text916-7-2"><tspan
+         sodipodi:role="line"
+         x="-157.39725"
+         y="479.20273"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.64166641px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.26458332"
+         id="tspan918-3-2">Error-</tspan><tspan
+         sodipodi:role="line"
+         x="-157.39725"
+         y="493.75482"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.64166641px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.26458332"
+         id="tspan990">mitigated</tspan><tspan
+         sodipodi:role="line"
+         x="-157.39725"
+         y="508.30688"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.64166641px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.26458332"
+         id="tspan964-5">expectation</tspan><tspan
+         sodipodi:role="line"
+         x="-157.39725"
+         y="522.85895"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.64166641px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.26458332"
+         id="tspan994">value</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="162.76848"
+       y="433.80991"
+       id="text916-7-0"><tspan
+         sodipodi:role="line"
+         x="162.76848"
+         y="433.80991"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.64166641px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.26458332"
+         id="tspan964-4">Execute on</tspan><tspan
+         sodipodi:role="line"
+         x="162.76848"
+         y="448.362"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.64166641px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.26458332"
+         id="tspan1013">backend</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="-156.06029"
+       y="384.89777"
+       id="text1017"><tspan
+         sodipodi:role="line"
+         id="tspan1015"
+         x="-156.06029"
+         y="384.89777"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.6417px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583">Quantum</tspan><tspan
+         sodipodi:role="line"
+         x="-156.06029"
+         y="399.44989"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.6417px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583"
+         id="tspan1021">program</tspan></text>
+    <path
+       style="display:none;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.565;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#TriangleStart)"
+       d="m 163.72039,462.56726 v 22.225 H 84.345386"
+       id="linearrow2"
+       inkscape:connector-type="orthogonal"
+       inkscape:connector-curvature="0" />
+    <g
+       id="path1014"
+       inkscape:label="linearrow2-compat"
+       transform="translate(-1.0625e-6)">
+      <path
+         style="color:#000000;fill:#000000;fill-rule:evenodd;-inkscape-stroke:none"
+         d="m 162.9375,462.56641 v 21.44336 H 84.345703 v 1.56445 h 80.156247 v -23.00781 z"
+         id="path1029" />
+      <g
+         id="g1019">
+        <g
+           id="path1021">
+          <path
+             style="color:#000000;fill:#000000;fill-rule:evenodd;stroke-width:0.7825pt;-inkscape-stroke:none"
+             d="m 79.830361,484.79226 6.768625,-3.9125 v 7.825 z"
+             id="path1025" />
+          <path
+             style="color:#000000;fill:#000000;fill-rule:evenodd;-inkscape-stroke:none"
+             d="m 87.121094,479.97656 -8.333985,4.81641 0.78125,0.45117 7.552735,4.36523 z m -1.042969,1.80664 v 6.01953 l -5.205078,-3.00976 z"
+             id="path1027" />
+        </g>
+      </g>
+    </g>
+    <path
+       style="display:none;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.53996;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker7404)"
+       d="M -23.604611,485.32143 H -98.922689"
+       id="linearrow3"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0" />
+    <g
+       id="path1031"
+       inkscape:label="linearrow3-compat"
+       transform="translate(-1.0625e-6)">
+      <path
+         style="color:#000000;fill:#000000;fill-rule:evenodd;-inkscape-stroke:none"
+         d="m -98.921875,484.55078 v 1.54102 h 75.316406 v -1.54102 z"
+         id="path1046" />
+      <g
+         id="g1036">
+        <g
+           id="path1038">
+          <path
+             style="color:#000000;fill:#000000;fill-rule:evenodd;stroke-width:0.76998pt;-inkscape-stroke:none"
+             d="m -103.36547,485.32143 6.660323,-3.8499 v 7.6998 z"
+             id="path1042" />
+          <path
+             style="color:#000000;fill:#000000;fill-rule:evenodd;-inkscape-stroke:none"
+             d="m -96.191406,480.58203 -8.199224,4.74024 0.76758,0.44335 7.431644,4.29493 z m -1.027344,1.7793 v 5.91992 l -5.12109,-2.96094 z"
+             id="path1044" />
+        </g>
+      </g>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:8.78064px;line-height:1.25;fill:#000000;stroke-width:1.565;stroke-dasharray:none"
+       x="-97.158775"
+       y="401.18393"
+       id="text4598"><tspan
+         sodipodi:role="line"
+         id="tspan4596"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.78064px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';stroke-width:1.565"
+         x="-97.158775"
+         y="401.18393"
+         dx="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.5875">1. Generate circuit(s) </tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.78064px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';stroke-width:1.565"
+         x="-97.158775"
+         y="412.20505"
+         id="tspan4600">    (trivial for REM)</tspan></text>
+    <path
+       style="display:none;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.56925;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1314)"
+       d="m -104.57595,379.49654 h 268.2767 v 30.67706"
+       id="linearrow1"
+       inkscape:connector-type="orthogonal"
+       inkscape:connector-curvature="0"
+       transform="translate(-1.0625e-6)" />
+    <g
+       id="linearrow1-compat">
+      <path
+         style="color:#000000;display:inline;fill:#000000;fill-rule:evenodd;-inkscape-stroke:none"
+         d="m -104.57617,378.71289 v 1.56836 h 267.49219 v 29.89258 h 1.57031 v -31.46094 z"
+         id="path954" />
+      <g
+         id="g944">
+        <g
+           id="path946">
+          <path
+             style="color:#000000;fill:#000000;fill-rule:evenodd;stroke-width:0.784625pt;-inkscape-stroke:none"
+             d="m 163.70075,414.70089 -3.92312,-6.78701 h 7.84624 z"
+             id="path950" />
+          <path
+             style="color:#000000;fill:#000000;fill-rule:evenodd;-inkscape-stroke:none"
+             d="m 158.87109,407.39062 4.83008,8.35547 0.45313,-0.7832 4.37695,-7.57227 z m 1.8125,1.04688 h 6.03516 l -3.01758,5.21875 z"
+             id="path952" />
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
