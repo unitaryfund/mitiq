@@ -21,13 +21,11 @@ The variational algorithm used in this example is based on *O’Malley et al. PR
 With the appropriate settings (see code comments in the ZNE subsection), this notebook reproduces the results
 shown in Figure 4 of the Mitiq white paper.
 
-```{figure} https://calango.org/images/courses/27/528/3350/lewis-structures-and-covalent-bonding_1.jpg
+```{figure} ../img/h2_molecule.svg
 ---
-height: 200px
-name: h2-mol-figure
+height: 300px
 ---
 Figure 1: Pictorial representation of the $\rm H_2$ molecule.
-Extracted from [calango.org](https://calango.org/lessons/3350/learn/lewis-structures-and-covalent-bonding/).
 In this example, we variationally estimate the potential energy surface of the molecule as a function of the bond length $R$.
 ```
 
