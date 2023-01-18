@@ -15,14 +15,14 @@
 
 """Readout Confusion Inversion."""
 
-from typing import Callable, Union
-
+from typing import Callable, Union, List, Sequence
+from copy import deepcopy
 from functools import wraps
 import numpy as np
 import numpy.typing as npt
 
 from mitiq import QPROGRAM, MeasurementResult
-from mitiq.executor.executor import Executor
+from mitiq.executor.executor import Executor, MeasurementResultLike
 from mitiq.observable.observable import Observable
 from mitiq.rem.inverse_confusion_matrix import mitigate_measurements
 
@@ -50,56 +50,64 @@ def execute_with_rem(
     if not isinstance(executor, Executor):
         executor = Executor(executor)
 
-    result = executor._run([circuit])
-    noisy_result = result[0]
-    if not isinstance(noisy_result, MeasurementResult):
-        raise TypeError("Results are not of type MeasurementResult.")
+    executor_with_rem = mitigate_executor(executor, inverse_confusion_matrix=inverse_confusion_matrix)
 
-    mitigated_result = mitigate_measurements(
-        noisy_result, inverse_confusion_matrix
-    )
-
-    return observable._expectation_from_measurements([mitigated_result])
+    return executor_with_rem.evaluate(circuit, observable)[0]
 
 
 def mitigate_executor(
-    executor: Callable[[QPROGRAM], MeasurementResult],
-    observable: Observable,
+    executor: Union[Executor, Callable[[QPROGRAM], MeasurementResult]],
     *,
     inverse_confusion_matrix: npt.NDArray[np.float64],
-) -> Callable[[QPROGRAM], float]:
+) -> Union[Executor, Callable[[QPROGRAM], MeasurementResult]]:
     """Returns a modified version of the input 'executor' which is
     error-mitigated with readout confusion inversion (RCI).
 
     Args:
         executor: A Mitiq executor that executes a circuit and returns the
             unmitigated ``MeasurementResult``.
-        observable: Observable to compute the expectation value of (required).
         inverse_confusion_matrix: The inverse confusion matrix to apply to the
             probability vector estimated with noisy measurement results.
 
     Returns:
         The error-mitigated version of the input executor.
     """
+    if not isinstance(executor, Executor):
+        executor_obj = Executor(executor)
+    else:
+        executor_obj = deepcopy(executor)
+    
+    def post_run(results: Sequence[MeasurementResult]) -> Sequence[MeasurementResult]:
+        return [
+            mitigate_measurements(res, inverse_confusion_matrix)
+            for res in results
+        ]
 
-    @wraps(executor)
-    def new_executor(qp: QPROGRAM) -> float:
-        return execute_with_rem(
-            qp,
-            executor,
-            observable,
-            inverse_confusion_matrix=inverse_confusion_matrix,
-        )
+    executor_obj._post_run = post_run
+
+    if isinstance(executor, Executor):
+        new_executor = executor_obj
+
+    elif not executor_obj.can_batch:
+        @wraps(executor)
+        def new_executor(circuit: QPROGRAM) -> MeasurementResult:
+            return executor_obj._run([circuit])[0]
+    elif executor_obj.can_batch:
+        @wraps(executor)
+        def new_executor(
+            circuits: List[QPROGRAM],
+        ) -> Sequence[MeasurementResult]:
+            return executor_obj._run(circuits)
 
     return new_executor
 
 
 def rem_decorator(
-    observable: Observable,
     *,
     inverse_confusion_matrix: npt.NDArray[np.float64],
 ) -> Callable[
-    [Callable[[QPROGRAM], MeasurementResult]], Callable[[QPROGRAM], float]
+        [Callable[[QPROGRAM], MeasurementResult]],
+        Callable[[QPROGRAM], MeasurementResult],
 ]:
     """Decorator which adds an error-mitigation layer based on readout
     confusion inversion (RCI) to an executor function, i.e., a function
@@ -107,7 +115,6 @@ def rem_decorator(
     a ``MeasurementResult``.
 
     Args:
-        observable: Observable to compute the expectation value of (required).
         inverse_confusion_matrix: The inverse confusion matrix to apply to the
             probability vector estimated with noisy measurement results
             (required).
@@ -121,10 +128,9 @@ def rem_decorator(
 
     def decorator(
         executor: Callable[[QPROGRAM], MeasurementResult]
-    ) -> Callable[[QPROGRAM], float]:
+    ) -> Callable[[QPROGRAM], MeasurementResult]:
         return mitigate_executor(
             executor,
-            observable,
             inverse_confusion_matrix=inverse_confusion_matrix,
         )
 

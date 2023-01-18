@@ -35,7 +35,8 @@ from mitiq.interface.mitiq_cirq import sample_bitstrings
 
 # Default qubit register and circuit for unit tests
 qreg = [cirq.LineQubit(i) for i in range(2)]
-circ = cirq.Circuit(cirq.ops.X.on_each(*qreg), cirq.measure_each(*qreg))
+circ_with_measurements = cirq.Circuit(cirq.ops.X.on_each(*qreg), cirq.measure_each(*qreg))
+circ = cirq.Circuit(cirq.ops.X.on_each(*qreg))
 observable = Observable(PauliString("ZI"), PauliString("IZ"))
 
 
@@ -77,7 +78,7 @@ def test_rem_invalid_executor():
         execute_with_rem(
             circ,
             invalid_executor,
-            observable,
+            observable=None,
             inverse_confusion_matrix=identity,
         )
 
@@ -131,16 +132,16 @@ def test_doc_is_preserved():
 
     def first_executor(circuit):
         """Doc of the original executor."""
-        return 0
+        return MeasurementResult()
 
     identity = np.identity(4)
 
     mit_executor = mitigate_executor(
-        first_executor, observable, inverse_confusion_matrix=identity
+        first_executor, inverse_confusion_matrix=identity
     )
     assert mit_executor.__doc__ == first_executor.__doc__
 
-    @rem_decorator(observable, inverse_confusion_matrix=identity)
+    @rem_decorator(inverse_confusion_matrix=identity)
     def second_executor(circuit):
         """Doc of the original executor."""
         return 0
@@ -184,10 +185,9 @@ def test_mitigate_executor(p0, p1, atol):
 
     mitigated_executor = mitigate_executor(
         noisy_executor,
-        observable,
         inverse_confusion_matrix=inverse_confusion_matrix,
     )
-    rem_value = mitigated_executor(circ)
+    rem_value = raw_execute(circ, mitigated_executor, observable)
     assert abs(true_rem_value - rem_value) <= abs(
         true_rem_value - base
     ) or isclose(
@@ -210,7 +210,7 @@ def test_rem_decorator():
     )
 
     @rem_decorator(
-        observable, inverse_confusion_matrix=inverse_confusion_matrix
+        inverse_confusion_matrix=inverse_confusion_matrix
     )
     def noisy_readout_decorated_executor(qp) -> MeasurementResult:
         return noisy_readout_executor(qp, p0=p0, p1=p1)
@@ -219,5 +219,5 @@ def test_rem_decorator():
 
     base = raw_execute(circ, noisy_executor, observable)
 
-    rem_value = noisy_readout_decorated_executor(circ)
+    rem_value = raw_execute(circ, noisy_readout_decorated_executor, observable)
     assert abs(true_rem_value - rem_value) < abs(true_rem_value - base)
