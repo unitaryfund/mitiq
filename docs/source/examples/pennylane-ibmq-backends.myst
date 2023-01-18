@@ -16,11 +16,10 @@ kernelspec:
 
 In this tutorial we will cover how to use Mitiq in conjunction with [PennyLane](https://pennylane.ai/), and further how to run error-mitigated circuits on IBMQ backends.
 
-- [Error mitigation with Pennylane on IBMQ backends](#error-mitigation-with-pennylane-on-ibmq-backends)
-  - [Setup: Defining a circuit](#setup-defining-a-circuit)
-  - [High-level usage](#high-level-usage)
-  - [Options](#options)
-  - [Decorator usage](#decorator-usage)
+- [](#setup-defining-a-circuit)
+- [](#high-level-usage)
+- [](#options)
+- [](#decorator-usage)
 
 +++
 
@@ -149,7 +148,7 @@ mitigated = qml.transforms.mitigate_with_zne(
 print(f"Mitigated result {mitigated:.3f}")
 ```
 
-Further options are described and elaborated in our article on [additional options](../guide/zne-3-options.md) in ZNE.
+Further options are described and elaborated in our article on [additional options](../guide/zne-3-options.myst) in ZNE.
 
 
 ## Decorator usage

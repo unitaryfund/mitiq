@@ -16,7 +16,7 @@ kernelspec:
 In this notebook DDD is applied to improve the success rate of the computation. 
 In DDD, sequences of gates are applied to slack windows, i.e. single-qubit idle windows, in a quantum circuit. 
 Applying such sequences can reduce the coupling between the qubits and the environment, mitigating the effects of noise. 
-For more information on DDD, see the section [DDD section of the user guide](../guide/ddd.md).
+For more information on DDD, see the section [DDD section of the user guide](../guide/ddd.myst).
 
 ## Setup
 
