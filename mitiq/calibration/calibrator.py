@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from collections import Counter
-from math import prod, sqrt
+from math import sqrt
 from typing import (
     Any,
     Callable,
