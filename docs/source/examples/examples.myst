@@ -17,7 +17,6 @@ ZNE with Cirq: Solving MaxCut with QAOA <maxcut-demo.myst>
 ZNE with Cirq: Hamiltonian simulation with Pauli gates<hamiltonians.md>
 ZNE with Cirq: Energy of molecular Hydrogen <molecular_hydrogen.myst>
 ZNE with Cirq: Noise scaling methods <scaling.md>
-<<<<<<< HEAD:docs/source/examples/examples.md
 ZNE with PennyLane + Cirq: Energy of molecular Hydrogen <molecular_hydrogen_pennylane.md>
 ZNE with BQSKit compiled circuits <bqskit.md>
 PEC on a Braket simulator: Mirror circuits <pec_tutorial.md>
@@ -25,12 +24,4 @@ PEC with Cirq: Learning representations <learning-depolarizing-noise.md>
 DDD with Cirq: Mirror circuits <ddd_tutorial.md>
 DDD with Qiskit: GHZ circuits <ddd_on_ibmq_ghz.md>
 The Mitiq paper code <mitiq-paper/mitiq-paper-codeblocks.md>
-=======
-ZNE with PennyLane + Cirq: Energy of molecular Hydrogen <molecular_hydrogen_pennylane.myst>
-ZNE with BQSKit compiled circuits <bqskit.myst>
-PEC on a Braket simulator: Mirror circuits <pec_tutorial.myst>
-PEC with Cirq: Learning representations <learning-depolarizing-noise.myst>
-DDD with Cirq: Mirror circuits <ddd_tutorial.myst>
-The Mitiq paper code <mitiq-paper/mitiq-paper-codeblocks>
->>>>>>> parent of d12c966 (Use `md` extension for myst markdown files (#1671)):docs/source/examples/examples.myst
 ```
