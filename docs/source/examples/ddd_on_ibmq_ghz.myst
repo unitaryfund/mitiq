@@ -105,7 +105,7 @@ else:
 
 
 def ibmq_executor(
-    circuit: QuantumCircuit,
+    circuit: qiskit.QuantumCircuit,
     shots: int,
     correct_bitstring: List[int],
     noisy_sim: bool = True,
@@ -240,4 +240,4 @@ plt.ylabel("Expectation value")
 _ = plt.legend()
 ```
 
-We can see that on average DDD improves the expectation value at each circuit depth.
+We can see that on average DDD improves the expectation value at each circuit width. The improvement slightly increases with circuit size, which is expected given the strongly time-correlated dephasing noise applied in this example. In general, real hardware would exhibit a different noise model from what is shown here, but real devices usually have some time-correlated noise that can be mitigated by dynamical decoupling.
