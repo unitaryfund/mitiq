@@ -15,10 +15,10 @@ kernelspec:
 # Zero-noise extrapolation with Braket on the IonQ backend
 
 
-This tutorial shows an example of how to apply zero-noise extrapolation ([ZNE](../guide/zne.myst))
+This tutorial shows an example of how to apply zero-noise extrapolation ([ZNE](../guide/zne.md))
 with the [Braket](https://github.com/aws/amazon-braket-sdk-python)
 frontend to mitigate errors on an [IonQ](https://ionq.com/) backend.
-More details on the Mitiq notions of frontends and backends are given [here](../guide/frontends-backends.myst).
+More details on the Mitiq notions of frontends and backends are given [here](../guide/frontends-backends.md).
 
 Below, we show how to run a simple Braket circuit on an IonQ device, broken down in the following steps.
 
@@ -82,7 +82,7 @@ This function will:
 2. Run the circuit on a backend.
 3. Convert from raw measurement statistics (or a different output format) to an expectation value.
 
-For information on how to define more advanced executors, see the [Executors](../guide/executors.myst) section of the Mitiq User Guide.
+For information on how to define more advanced executors, see the [Executors](../guide/executors.md) section of the Mitiq User Guide.
 
 +++
 
@@ -157,7 +157,7 @@ By default, noise is scaled by locally folding gates at random, and the default 
 To specify a different extrapolation technique, we can pass a different {class}`.Factory` object to {func}`.execute_with_zne`. 
 The following code block shows an example of using linear extrapolation with five different (noise) scale factors.
 Moreover, instead of _local unitary folding_, _global unitary folding_ is used to scale noise.
-More details on ZNE options are given [here](../guide/zne-3-options.myst).
+More details on ZNE options are given [here](../guide/zne-3-options.md).
 
 ```{code-cell} ipython3
 factory = zne.inference.LinearFactory(scale_factors=[1.0, 1.5, 2.0, 2.5, 3.0])
@@ -221,7 +221,7 @@ print(f"Expectation values:\n{expectation_values}")
 ```
 
 ```{note}
-Using a _batched_ executor could speedup this step, as explained in the [Executors](../guide/executors.myst) section.
+Using a _batched_ executor could speedup this step, as explained in the [Executors](../guide/executors.md) section.
 ```
 +++
 
