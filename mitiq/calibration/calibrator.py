@@ -41,7 +41,14 @@ from mitiq.calibration.settings import Settings, Strategy, DefaultStrategy
 
 class Calibrator:
     """An object used to orchestrate experiments, and determine in Error
-    Mitigation parameter tuning."""
+    Mitigation parameter tuning.
+
+    Args:
+        executor: Noisy simulation/hardware on which to run circuits.
+        settings: A ``Settings`` object which specifies the type and amount of
+            circuits/error mitigation methods to run.
+        ideal_executor: TODO
+    """
 
     def __init__(
         self,
@@ -65,10 +72,12 @@ class Calibrator:
         self.results: List[Dict[str, Any]] = []
 
     def get_cost(self) -> Dict[str, int]:
-        """Returns the expected number of noisy expectation values required
-        for calibration. If an ideal_executor was used in specifying the
-        Calibrator object, the number of classical simulations is also
-        returned."""
+        """Returns the expected number of noisy and ideal expectation values
+        required for calibration.
+
+        Returns:
+            A summary of the number of circuits to be run.
+        """
         num_circuits = len(self.circuits)
         num_options = len(self.settings.technique_params)
 
@@ -80,8 +89,12 @@ class Calibrator:
         }
 
     def run_circuits(self) -> List[Dict[str, Any]]:
-        """Run the calibration circuits and store the ideal and noisy
-        expectation values for each circuit in `self.results`."""
+        """Run the calibration circuits using the specified executor(s).
+
+        Returns:
+            A collection of experimental results along with a summary of each
+            :class:`BenchmarkProblem` that was run.
+        """
         expvals = []
         for problem in self.circuits:
             circuit, distribution = problem["circuit", "ideal_distribution"]
@@ -130,7 +143,11 @@ class Calibrator:
         self, experiment_results: List[Dict[str, Any]]
     ) -> None:
         """Computes the improvement factors for each calibration circuit that
-        was run. Saves the improvement factors in the input dictionary."""
+        was run. Saves the improvement factors in the input dictionary.
+
+        Args:
+            experiment_results: Results obtained from :func:`run_circuits`.
+        """
         for result in experiment_results:
             ideal_value = result["ideal_value"]
             noisy_value = result["noisy_value"]
@@ -148,7 +165,16 @@ class Calibrator:
 
     def best_strategy(self, results: List[Dict[str, Any]]) -> Strategy:
         """Finds the best strategy by using the parameters that had the
-        largest improvement factor."""
+        largest improvement factor.
+
+        Args:
+            results: Calibration experiment results. Obtained by first running
+                :func:`run_circuits` and :func:`compute_improvements`.
+
+        Returns:
+            A single :class:`Strategy` object specifying the technique and
+            parameters that performed best.
+        """
         best_improvement_factor = 1.0
         strategy = DefaultStrategy
         for circuit in results:
@@ -187,10 +213,14 @@ def convert_to_expval_executor(
     probability that the circuit outputs the most likely state according to the
     ideal distribution.
 
+    Args:
+        ex: Executor which returns bitstrings, or :class:`.MeasurementResult`s.
+        distribution: The ideal distribution at the end of the circuit run.
+        bitstring: The bitstring to measure the probability of.
+
     Returns:
-        A two-tuple containing:
-            - An executor returning expectation values: QPROGRAM -> float
-            - The most likely bitstring, according to the passed `distribution`
+        A tuple containing an executor returning expectation values and,
+        the most likely bitstring, according to the passed ``distribution``
     """
     bitstring_to_measure = ""
     if distribution:
@@ -199,7 +229,7 @@ def convert_to_expval_executor(
             key=distribution.get,  # type: ignore [arg-type]
         )
     elif bitstring:
-        bitstring = bitstring
+        bitstring_to_measure = bitstring
 
     def expval_executor(circuit: cirq.Circuit) -> float:
         raw = cast(MeasurementResult, ex._run([circuit])[0]).result

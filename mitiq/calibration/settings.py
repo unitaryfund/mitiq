@@ -40,6 +40,9 @@ from mitiq.zne.scaling import (
 
 
 class MitigationTechnique(Enum):
+    """Simple enum type for handling validation, and providing helper functions
+    when accessing mitigation techniques."""
+
     ZNE = auto()
     PEC = auto()
     RAW = auto()
@@ -56,6 +59,16 @@ class MitigationTechnique(Enum):
 
 @dataclass
 class BenchmarkProblem:
+    """A dataclass containing information for instances of problems that will
+    be run during the calibrations process.
+
+    Args:
+        circuit: The circuit to be run.
+        type: The type of the circuit (often the name of the algorithm)
+        ideal_distribution: The ideal probability distribution after applying
+            ``circuit``.
+    """
+
     circuit: cirq.Circuit
     type: str
     ideal_distribution: Dict[str, float]
@@ -78,6 +91,13 @@ class BenchmarkProblem:
         )
 
     def problem_summary_dict(self) -> Dict[str, Any]:
+        """Produces a summary of the ``BenchmarkProblem``, to be used in
+        recording the results when running calibration experiments.
+
+        Returns:
+            Dictionary summarizing important attributes of the problem's
+            circuit.
+        """
         base = asdict(self)
         # remove circuit; it can be regenerated if needed
         del base["circuit"]
@@ -89,6 +109,16 @@ class BenchmarkProblem:
 
 @dataclass
 class Strategy:
+    """A dataclass which describes precisely an error mitigation approach by
+    specifies a technique and the associated options.
+
+    Args:
+        technique: One of Mitiq's support error mitigation strategies,
+            specified as a :class:`MitigationTechnique`.
+        technique_params: A dictionary of options to pass to the mitigation
+            method specified in `technique`.
+    """
+
     technique: MitigationTechnique
     technique_params: Dict[str, Any]
 
@@ -99,6 +129,10 @@ class Strategy:
         )
 
     def as_dict(self) -> Dict[str, Any]:
+        """A summary of the strategies parameters, without the technique added.
+
+        Returns:
+            A dictionary describing the strategies parameters."""
         di = {}
         if self.technique is MitigationTechnique.ZNE:
             inference_func = self.technique_params["factory"]
@@ -117,7 +151,14 @@ class Strategy:
 
 
 class Settings:
-    """A class to store settings relating to error mitigation calibration."""
+    """A class to store configuration relating to Error Mitigation calibration.
+
+    Args:
+        circuit_types: TODO
+        num_qubits:
+        circuit_depth:
+        strategies:
+    """
 
     def __init__(
         self,
@@ -136,8 +177,10 @@ class Settings:
         self.circuit_depth = circuit_depth
 
     def make_circuits(self) -> List[BenchmarkProblem]:
-        """Generate the circuits to run in a calibration experiment via the
-        parameters passed in initialization."""
+        """Generate the circuits to run for the calibration experiment.
+
+        Returns:
+            A list of :class:`BenchmarkProblem` objects"""
         circuits = []
         nqubits, depth = self.num_qubits, self.circuit_depth
         for circuit_type in self.circuit_types:
@@ -179,8 +222,11 @@ class Settings:
         return circuits
 
     def make_strategies(self) -> List[Strategy]:
-        """Generates a list of ready to apply error mitigation functions
-        preloaded with hyperparameters."""
+        """Generates a list of :class:`Strategy` objects using the specified
+        configurations.
+
+        Returns:
+            A list of :class:`Strategy` objects."""
         funcs = []
         for technique, params in zip(self.techniques, self.technique_params):
             params_copy = params.copy()
