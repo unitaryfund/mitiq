@@ -214,7 +214,8 @@ def convert_to_expval_executor(
     ideal distribution.
 
     Args:
-        ex: Executor which returns bitstrings, or :class:`.MeasurementResult`s.
+        ex: Executor which returns bitstrings, or :class:`.MeasurementResult`
+            instance.
         distribution: The ideal distribution at the end of the circuit run.
         bitstring: The bitstring to measure the probability of.
 
