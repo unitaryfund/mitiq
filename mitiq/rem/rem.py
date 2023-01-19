@@ -22,7 +22,7 @@ import numpy as np
 import numpy.typing as npt
 
 from mitiq import QPROGRAM, MeasurementResult
-from mitiq.executor.executor import Executor, MeasurementResultLike
+from mitiq.executor.executor import Executor
 from mitiq.observable.observable import Observable
 from mitiq.rem.inverse_confusion_matrix import mitigate_measurements
 
@@ -50,7 +50,9 @@ def execute_with_rem(
     if not isinstance(executor, Executor):
         executor = Executor(executor)
 
-    executor_with_rem = mitigate_executor(executor, inverse_confusion_matrix=inverse_confusion_matrix)
+    executor_with_rem = mitigate_executor(
+        executor, inverse_confusion_matrix=inverse_confusion_matrix
+    )
 
     return executor_with_rem.evaluate(circuit, observable)[0]
 
@@ -76,8 +78,10 @@ def mitigate_executor(
         executor_obj = Executor(executor)
     else:
         executor_obj = deepcopy(executor)
-    
-    def post_run(results: Sequence[MeasurementResult]) -> Sequence[MeasurementResult]:
+
+    def post_run(
+        results: Sequence[MeasurementResult],
+    ) -> Sequence[MeasurementResult]:
         return [
             mitigate_measurements(res, inverse_confusion_matrix)
             for res in results
@@ -89,10 +93,13 @@ def mitigate_executor(
         new_executor = executor_obj
 
     elif not executor_obj.can_batch:
+
         @wraps(executor)
         def new_executor(circuit: QPROGRAM) -> MeasurementResult:
             return executor_obj._run([circuit])[0]
+
     elif executor_obj.can_batch:
+
         @wraps(executor)
         def new_executor(
             circuits: List[QPROGRAM],
@@ -106,8 +113,8 @@ def rem_decorator(
     *,
     inverse_confusion_matrix: npt.NDArray[np.float64],
 ) -> Callable[
-        [Callable[[QPROGRAM], MeasurementResult]],
-        Callable[[QPROGRAM], MeasurementResult],
+    [Callable[[QPROGRAM], MeasurementResult]],
+    Callable[[QPROGRAM], MeasurementResult],
 ]:
     """Decorator which adds an error-mitigation layer based on readout
     confusion inversion (RCI) to an executor function, i.e., a function

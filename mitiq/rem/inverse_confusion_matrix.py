@@ -153,7 +153,7 @@ def mitigate_measurements(
     """
     if not isinstance(noisy_result, MeasurementResult):
         raise TypeError("Result is not of type MeasurementResult.")
-    
+
     num_qubits = noisy_result.nqubits
     required_shape = (2**num_qubits, 2**num_qubits)
     if inverse_confusion_matrix.shape != required_shape:

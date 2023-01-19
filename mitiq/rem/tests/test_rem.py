@@ -35,7 +35,9 @@ from mitiq.interface.mitiq_cirq import sample_bitstrings
 
 # Default qubit register and circuit for unit tests
 qreg = [cirq.LineQubit(i) for i in range(2)]
-circ_with_measurements = cirq.Circuit(cirq.ops.X.on_each(*qreg), cirq.measure_each(*qreg))
+circ_with_measurements = cirq.Circuit(
+    cirq.ops.X.on_each(*qreg), cirq.measure_each(*qreg)
+)
 circ = cirq.Circuit(cirq.ops.X.on_each(*qreg))
 observable = Observable(PauliString("ZI"), PauliString("IZ"))
 
@@ -209,9 +211,7 @@ def test_rem_decorator():
         num_qubits, p0=p0, p1=p1
     )
 
-    @rem_decorator(
-        inverse_confusion_matrix=inverse_confusion_matrix
-    )
+    @rem_decorator(inverse_confusion_matrix=inverse_confusion_matrix)
     def noisy_readout_decorated_executor(qp) -> MeasurementResult:
         return noisy_readout_executor(qp, p0=p0, p1=p1)
 

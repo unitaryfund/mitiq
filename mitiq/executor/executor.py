@@ -282,10 +282,12 @@ class Executor:
 
         return self._post_run(results)
 
-    def _post_run(self, results: Sequence[QuantumResult]) -> Sequence[QuantumResult]:
+    def _post_run(
+        self, results: Sequence[QuantumResult]
+    ) -> Sequence[QuantumResult]:
         """Post-processes the measurement results.
-        For example, this method can be overridden by a readout error mitigation
-        function.
+        For example, this method can be overridden by a
+        readout error mitigation function.
         """
         return results
 
