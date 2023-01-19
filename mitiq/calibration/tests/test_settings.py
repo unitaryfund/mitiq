@@ -15,8 +15,21 @@
 import pytest
 
 from mitiq.calibration import ZNESettings, Settings
+from mitiq.calibration.settings import MitigationTechnique
+from mitiq.raw import execute
+from mitiq.pec import execute_with_pec
 from mitiq.zne.scaling import fold_global
 from mitiq.zne.inference import RichardsonFactory, LinearFactory
+
+
+def test_MitigationTechnique():
+    pec_enum = MitigationTechnique.PEC
+    assert pec_enum.mitigation_function == execute_with_pec
+    assert pec_enum.name == "PEC"
+
+    raw_enum = MitigationTechnique.RAW
+    assert raw_enum.mitigation_function == execute
+    assert raw_enum.name == "RAW"
 
 
 def test_basic_settings():
