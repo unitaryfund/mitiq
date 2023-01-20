@@ -52,8 +52,6 @@ USE_REAL_HARDWARE = False
 ## Define parameters
 
 ```{code-cell} ipython3
-# Random seed for circuit generation.
-seed = 1
 
 # Total number of shots to use.
 shots: int = 10000
@@ -68,11 +66,11 @@ trials = 3
 ## Define the circuit
 
 We use Greenberger-Horne-Zeilinger (GHZ) circuits to benchmark the performance of the device.
-GHZ circuits are designed such that only two bitstrings |00...0> and |11...1>
+GHZ circuits are designed such that only two bitstrings $|00...0 \rangle$ and $|11...1 \rangle$
 should be sampled, with $P_0 = P_1 = 0.5$.
 As noted in *Mooney et al. (2021)* {cite}`Mooney_2021`, when GHZ circuits are run on a device, any other measured bitstrings are due to noise.
 In this example, the GHZ circuit is applied, followed by its inverse. 
-Therefore the frequency of the |00...0> bitstring is our target metric.
+Therefore $P_0 = 1$ and the frequency of the $|00...0 \rangle$ bitstring is our target metric.
 
 ```{code-cell} ipython3
 def get_circuit(num_qubits) -> Tuple[qiskit.QuantumCircuit, List[int]]:
@@ -91,8 +89,9 @@ def get_circuit(num_qubits) -> Tuple[qiskit.QuantumCircuit, List[int]]:
 Now that we have a circuit, we define the `execute` function which inputs a circuit and returns an expectation value - here, the
 frequency of sampling the correct bitstring.
 
-**Importantly**, since DDD is designed to mitigate time-correlated (non-Markovian) noise, we simulate a particular noise model consisting of
-systematic $R_Z$ rotations applied to each qubit after each moment. 
+**Importantly**, since DDD is designed to mitigate time-correlated (non-Markovian) noise,
+if ``USE_REAL_HARDWARE``  is ``False`` we simulate a particular noise model consisting of
+systematic $R_Z$ rotations applied to each qubit after each layer. 
 This corresponds to a dephasing noise which is strongly time-correlated and, therefore, likely to be mitigated by DDD.
 
 ```{code-cell} ipython3
@@ -141,13 +140,13 @@ def ibmq_executor(
                 shots=shots,
             )
             all_counts = job.result().get_counts()
-            P0 = (
+            p_zero = (
                 all_counts.get(
                     ("".join(map(str, correct_bitstring))).replace("", " ")[1:-1], 0.0
                 )
                 / shots
             )
-            return P0
+            return p_zero
 
         else:
             job = qiskit.execute(
