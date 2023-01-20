@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import pytest
+import json
 
 from mitiq.calibration import ZNESettings, Settings
 from mitiq.calibration.settings import MitigationTechnique
@@ -70,6 +71,9 @@ def test_basic_settings():
     strategies = settings.make_strategies()
     num_strategies = 4
     assert len(strategies) == num_strategies
+
+    strategy_summary = str(strategies[0]).replace("'", '"')
+    assert isinstance(json.loads(strategy_summary), dict)
 
 
 def test_make_circuits_qv_circuits():
