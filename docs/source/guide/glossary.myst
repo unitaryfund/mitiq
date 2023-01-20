@@ -16,11 +16,11 @@ kernelspec:
 
 
 
-Calibration
+[Calibration](calibrators.md)
 : The process of choosing
 the optimal QEM method and/or the optimal parameter settings of a method for a user's specific situation
 (problem type, circuit structure, resource constraints, etc.). It is analogous to choosing a machine learning method
-and its optimal hyperparameters. (Not to be confused with "calibration" in the sense of
+and its optimal hyperparameters. (Not to be confused with "noise calibration" in the sense of
 tuning a physical device so that it better approximates some ideal property or operation.)
 
 
@@ -28,7 +28,7 @@ Expectation Value
 : The expectation value of an observable $A$ on state $\rho$ is the average
 readout value when $A$ is measured on $\rho$. Mathematically, this is $\text{Tr}[A\rho]$ and usually denoted $\langle A \rangle$ (when this notation is used, the state $\rho$ that $A$ is being measured on should be clear from context). Expectation values are important 
 for near-term quantum computing because in variational quantum algorithms,
-the only role of the quantum processor is to repeatedly compute expectation values, which a classical processor then uses to perform some overall useful computational task.
+the only role of the quantum processor is to repeatedly compute expectation values, which a classical processor then uses to perform some overall useful computational task. In Mitiq, [Executors](executors.md) are used to calculate error-mitigated expectation values.
 
 
 Gate Fidelity
