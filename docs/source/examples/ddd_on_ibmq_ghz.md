@@ -54,10 +54,10 @@ USE_REAL_HARDWARE = False
 ```{code-cell} ipython3
 
 # Total number of shots to use.
-shots: int = 10000
+shots: int = 1000
 
 # Qubits to use on the experiment.
-num_qubits = [4, 6, 8]
+num_qubits = [3, 5, 7]
 
 # Average results over this many trials (circuit instances) at each depth.
 trials = 3
@@ -107,7 +107,7 @@ def ibmq_executor(
     circuit: qiskit.QuantumCircuit,
     shots: int,
     correct_bitstring: List[int],
-    noisy_sim: bool = True,
+    noisy: bool = True,
 ) -> float:
     """Returns the expectation value to be mitigated.
 
@@ -116,23 +116,21 @@ def ibmq_executor(
         shots: Number of times to execute the circuit to compute the expectation value.
     """
 
-    if USE_REAL_HARDWARE:
-        # Run the circuit on hardware
-        job = qiskit.execute(
+    if noisy:
+        if USE_REAL_HARDWARE:
+            # Run the circuit on hardware
+            job = qiskit.execute(
             experiments=circuit,
             backend=backend,
             optimization_level=0,  # Important to preserve folded gates.
             shots=shots,
         )
 
-    else:
-        circuit_to_run = circuit.copy()
-
-        # Simulate the circuit with noise
-        if noisy_sim:
+        else: 
+            # Simulate the circuit with noise  
             converted, circuit_type = convert_to_mitiq(circuit)
-            noisy = converted.with_noise(cirq.rz(0.05))
-            circuit_to_run = convert_from_mitiq(noisy, circuit_type)
+            noisy_circ = converted.with_noise(cirq.rz(0.05))
+            circuit_to_run = convert_from_mitiq(noisy_circ, circuit_type)
             job = qiskit.execute(
                 experiments=circuit_to_run,
                 backend=qiskit.Aer.get_backend("qasm_simulator"),
@@ -148,18 +146,19 @@ def ibmq_executor(
             )
             return p_zero
 
-        else:
-            job = qiskit.execute(
-                experiments=circuit_to_run,
-                backend=qiskit.Aer.get_backend("qasm_simulator"),
-                optimization_level=0,
-                shots=shots,
-            )
+    else:
+        circuit_to_run = circuit.copy()
+        job = qiskit.execute(
+            experiments=circuit_to_run,
+            backend=qiskit.Aer.get_backend("qasm_simulator"),
+            optimization_level=0,
+            shots=shots,
+        )
 
     # Convert from raw measurement counts to the expectation value
     all_counts = job.result().get_counts()
-    P0 = all_counts.get("".join(map(str, correct_bitstring)), 0.0) / shots
-    return P0
+    p_zero = all_counts.get("".join(map(str, correct_bitstring)), 0.0) / shots
+    return p_zero
 ```
 
 ## Select the DDD sequences to be applied
@@ -184,11 +183,11 @@ for nq in num_qubits:
     for trial in range(trials):
 
         true_nqubits_values.append(
-            ibmq_executor(circuit, shots, correct_bitstring, noisy_sim=False)
+            ibmq_executor(circuit, shots, correct_bitstring, noisy=False)
         )
 
         noisy_nqubits_values.append(
-            ibmq_executor(circuit, shots, correct_bitstring, noisy_sim=True)
+            ibmq_executor(circuit, shots, correct_bitstring, noisy=True)
         )
 
         noisy_executor = functools.partial(
@@ -239,4 +238,9 @@ plt.ylabel("Expectation value")
 _ = plt.legend()
 ```
 
-We can see that on average DDD improves the expectation value at each circuit width. The improvement slightly increases with circuit size, which is expected given the strongly time-correlated dephasing noise applied in this example. In general, real hardware would exhibit a different noise model from what is shown here, but real devices usually have some time-correlated noise that can be mitigated by dynamical decoupling.
+We can see that on average DDD improves the expectation value at each circuit width. 
+Note that the size of the error bars represents the standard deviation of the noisy values (for the “Raw” line) and the standard deviation
+of the DDD values (for the “DDD” line).
+The improvement slightly increases with circuit size, which is expected given the strongly time-correlated dephasing noise applied in this example.
+In general, real hardware would exhibit a different noise model from what is shown here, but real devices usually have some time-correlated noise
+that can be mitigated by dynamical decoupling.
