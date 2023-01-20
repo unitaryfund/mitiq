@@ -241,6 +241,6 @@ _ = plt.legend()
 We can see that on average DDD improves the expectation value at each circuit width. 
 Note that the size of the error bars represents the standard deviation of the noisy values (for the “Raw” line) and the standard deviation
 of the DDD values (for the “DDD” line).
-The improvement slightly increases with circuit size, which is expected given the strongly time-correlated dephasing noise applied in this example.
+The improvement increases with circuit size, which is expected given the strongly time-correlated dephasing noise applied in this example.
 In general, real hardware would exhibit a different noise model from what is shown here, but real devices usually have some time-correlated noise
 that can be mitigated by dynamical decoupling.
