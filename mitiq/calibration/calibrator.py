@@ -13,6 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from operator import itemgetter
+from itertools import groupby
+import warnings
 from collections import Counter
 from math import sqrt
 from typing import (
@@ -175,14 +178,24 @@ class Calibrator:
             A single :class:`Strategy` object specifying the technique and
             parameters that performed best.
         """
-        best_improvement_factor = 1.0
-        strategy = DefaultStrategy
-        for circuit in results:
-            for result in circuit["mitigated_values"]["ZNE"]["results"]:
-                if result["improvement_factor"] > best_improvement_factor:
-                    best_improvement_factor = result["improvement_factor"]
-                    strategy = result["strategy"]
-        return strategy
+        largest improvement factor."""
+        base_improvement_factor = 1.0
+        strategy_groups = sorted(results, key=itemgetter("strategy"))
+        for _, strategy_group in groupby(
+            strategy_groups, key=itemgetter("strategy")
+        ):
+            self.compute_improvements(list(strategy_group))
+        improvement_factor_groups = sorted(
+            strategy_groups, key=itemgetter("improvement_factor"), reverse=True
+        )
+        best_improvement_factor = improvement_factor_groups[0][
+            "improvement_factor"
+        ]
+        if best_improvement_factor > base_improvement_factor:
+            return improvement_factor_groups[0]["strategy"]
+        else:
+            warnings.warn("None of the improvement factors were > 1")
+            return DefaultStrategy
 
     def run(self) -> None:
         results = self.run_circuits()
