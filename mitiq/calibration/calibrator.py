@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from copy import deepcopy
+import warnings
 from collections import Counter
 from math import sqrt
 from typing import (
@@ -70,7 +72,7 @@ class Calibrator:
             else None
         )
         self.settings = settings
-        self.circuits = self.settings.make_circuits()
+        self.circuits = self.settings.make_circuits(self.settings.circuit_seed)
         self.results: List[Dict[str, Any]] = []
 
     def get_cost(self) -> Dict[str, int]:
@@ -178,12 +180,42 @@ class Calibrator:
             parameters that performed best.
         """
         best_improvement_factor = 1.0
+        num_circuits = len(self.settings.circuit_types)
+
         strategy = DefaultStrategy
-        for circuit in results:
-            for result in circuit["mitigated_values"]["ZNE"]["results"]:
-                if result["improvement_factor"] > best_improvement_factor:
-                    best_improvement_factor = result["improvement_factor"]
-                    strategy = result["strategy"]
+
+        def filter_on_strategy(
+            result: Dict[str, Dict[str, Dict[str, Any]]], strategy_id: int
+        ) -> Dict[str, Dict[str, Dict[str, Any]]]:
+            res = result
+            res["mitigated_values"]["ZNE"]["results"] = [
+                res["mitigated_values"]["ZNE"]["results"][strategy_id]
+            ]
+            return result
+
+        for strategy_id in range(
+            len(results[0]["mitigated_values"]["ZNE"]["results"])
+        ):
+            strategy_group = []
+            for c in range(num_circuits):
+                result_copy = deepcopy(results)
+                strategy_group.append(
+                    filter_on_strategy(result_copy[c], strategy_id=strategy_id)
+                )
+                self.compute_improvements(strategy_group)
+
+            if (
+                strategy_group[0]["mitigated_values"]["ZNE"]["results"][0][
+                    "improvement_factor"
+                ]
+                > best_improvement_factor
+            ):
+                strategy = strategy_group[0]["mitigated_values"]["ZNE"][
+                    "results"
+                ][0]["strategy"]
+        if strategy is None:
+            warnings.warn("None of the improvement factors were > 1")
+            return DefaultStrategy
         return strategy
 
     def run(self) -> None:

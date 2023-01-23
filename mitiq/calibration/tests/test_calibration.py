@@ -151,6 +151,52 @@ def test_compute_improvements_modifies_IF():
     assert all(IF is not None for IF in IFs)
 
 
+def test_best_strategy():
+
+    test_strategy_settings = Settings(
+        circuit_types=["ghz", "mirror"],
+        num_qubits=2,
+        circuit_depth=10,
+        strategies=[
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+            },
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": RichardsonFactory([1.0, 3.0, 5.0]),
+            },
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": LinearFactory([1.0, 2.0, 3.0]),
+            },
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": LinearFactory([1.0, 3.0, 5.0]),
+            },
+        ],
+        circuit_seed=1,
+    )
+    cal = Calibrator(execute, test_strategy_settings)
+    cal.run()
+    strategy = cal.best_strategy(cal.results)
+    strategy_params = strategy.as_dict()
+
+    # if cal.results[0]["mitigated_values"]["ZNE"]["improvement_factor"] >= 1:
+    #     assert strategy_params != {}
+    # else:
+    #     assert strategy_params == {}
+    assert strategy_params == {
+        "factory": "RichardsonFactory",
+        "scale_factors": [1.0, 3.0, 5.0],
+        "scale_method": "fold_global",
+    }
+
+
 def test_bitstrings_to_distribution():
     bitstrings = [[1, 1], [1, 1], [1, 1], [1, 0]]
     distribution = bitstrings_to_distribution(bitstrings)
