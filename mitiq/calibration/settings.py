@@ -17,6 +17,7 @@ from dataclasses import dataclass, astuple
 from functools import partial
 from itertools import product
 from typing import Any, Callable, cast, Iterator, List, Dict, Tuple
+from enum import Enum, auto
 
 import networkx as nx
 import cirq
@@ -29,13 +30,32 @@ from mitiq.benchmarks import (
     generate_rb_circuits,
 )
 
-# from mitiq.pec import execute_with_pec
+from mitiq.pec import execute_with_pec
+from mitiq.raw import execute
 from mitiq.zne import execute_with_zne
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import (
     fold_gates_at_random,
     fold_global,
 )
+
+
+class MitigationTechnique(Enum):
+    """Simple enum type for handling validation, and providing helper functions
+    when accessing mitigation techniques."""
+
+    ZNE = auto()
+    PEC = auto()
+    RAW = auto()
+
+    @property
+    def mitigation_function(self) -> Callable[..., QuantumResult]:
+        if self is MitigationTechnique.ZNE:
+            return execute_with_zne
+        elif self is MitigationTechnique.PEC:
+            return cast(Callable[..., float], execute_with_pec)
+        elif self is MitigationTechnique.RAW:
+            return execute
 
 
 @dataclass
@@ -176,3 +196,5 @@ ZNESettings = Settings(
         "factories": [RichardsonFactory, LinearFactory],
     },
 )
+
+DefaultStrategy = Strategy(MitigationTechnique.RAW, {})

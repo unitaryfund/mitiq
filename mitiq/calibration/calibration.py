@@ -157,19 +157,19 @@ class Calibrator:
         """Finds the best strategy by using the parameters that had the
         largest improvement factor."""
         base_improvement_factor = 1.0
-        strategy_groups = sorted(results, key="strategy")
-        for strategy_group in groupby(
+        strategy_groups = sorted(results, key=itemgetter("strategy"))
+        for _, strategy_group in groupby(
             strategy_groups, key=itemgetter("strategy")
         ):
-            self.compute_improvements(strategy_group)
+            self.compute_improvements(list(strategy_group))
         improvement_factor_groups = sorted(
             strategy_groups, key=itemgetter("improvement_factor"), reverse=True
         )
-        best_improvement_factor = improvement_factor_groups[0][0][
+        best_improvement_factor = improvement_factor_groups[0][
             "improvement_factor"
         ]
         if best_improvement_factor > base_improvement_factor:
-            return improvement_factor_groups[0][0]["strategy"]
+            return improvement_factor_groups[0]["strategy"]
         else:
             warnings.warn("None of the improvement factors were > 1")
             return DefaultStrategy
