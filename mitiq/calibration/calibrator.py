@@ -178,7 +178,7 @@ class Calibrator:
             A single :class:`Strategy` object specifying the technique and
             parameters that performed best.
         """
-        largest improvement factor."""
+
         base_improvement_factor = 1.0
         strategy_groups = sorted(results, key=itemgetter("strategy"))
         for _, strategy_group in groupby(
