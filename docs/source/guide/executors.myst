@@ -80,7 +80,7 @@ To run a circuit of sequence of circuits, use the `Executor.evaluate` method.
 ```{code-cell} ipython3
 import cirq
 
-q = cirq.GridQubit(0, 0)
+q = cirq.LineQubit(0)
 circuit = cirq.Circuit(cirq.H.on(q))
 
 obs = Observable(PauliString("Z"))
@@ -203,7 +203,12 @@ def noisy_sampler(circuit, noise_level=0.1, shots=1000) -> MeasurementResult:
     simulator = cirq.DensityMatrixSimulator()
     result = simulator.run(circuit_to_run, repetitions=shots)
     bitstrings = np.column_stack(list(result.measurements.values()))
-    return MeasurementResult(bitstrings)
+    qubit_indices = tuple(
+            int(q[2:-1])  # Extract index from "q(index)" string
+            for k in result.measurements.keys()
+            for q in k.split(",")
+    )
+    return MeasurementResult(bitstrings, qubit_indices)
 ```
 
 ```{code-cell} ipython3
@@ -219,7 +224,7 @@ The rest of the Mitiq workflow is the same as in the case of a density matrix ex
 
 ```{code-cell} ipython3
 executor = Executor(noisy_sampler)
-obs = Observable(PauliString("Z"))
+obs = Observable(PauliString("X"))
 results = executor.evaluate(circuit, obs)
 
 print("Results:", results)

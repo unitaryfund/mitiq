@@ -35,7 +35,7 @@ from mitiq.observable.observable import Observable
 from mitiq.observable.pauli import PauliString
 
 qreg = [LineQubit(i) for i in range(2)]
-circuit = Circuit(X.on_each(*qreg), measure_each(*qreg))
+circuit = Circuit(X.on_each(*qreg))
 observable = Observable(PauliString("ZI"), PauliString("IZ"))
 
 print(circuit)
@@ -67,10 +67,8 @@ def noisy_readout_executor(
     # Replace with code based on your frontend and backend.
     simulator = NoisySingleQubitReadoutSampler(p0, p1)
     result = simulator.run(circuit, repetitions=shots)
-
-    return MeasurementResult(
-        result=np.column_stack(list(result.measurements.values()))
-    )
+    bitstrings = np.column_stack(list(result.measurements.values()))
+    return MeasurementResult(bitstrings, qubit_indices = (0, 1))
 ```
 
 The [executor](executors.myst) can be used to evaluate noisy (unmitigated)
@@ -103,9 +101,11 @@ from mitiq import rem
 # you can supply your own confusion matrices and invert them using the helper
 # function generate_tensored_inverse_confusion_matrix().
 inverse_confusion_matrix = generate_inverse_confusion_matrix(2, p_flip, p_flip)
+circuit_with_measurements = circuit.copy()
+circuit_with_measurements.append(measure_each(*qreg))
 
 mitigated_result = rem.execute_with_rem(
-    circuit,
+    circuit_with_measurements,
     noisy_executor,
     observable,
     inverse_confusion_matrix=inverse_confusion_matrix,
