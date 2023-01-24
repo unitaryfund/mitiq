@@ -76,7 +76,16 @@ Bitstring = Union[str, List[int]]
 
 @dataclass
 class MeasurementResult:
-    """Bitstrings sampled from a quantum computer."""
+    """Bitstrings sampled from a quantum computer.
+
+    Args:
+        result: The sequence of measured bitstrings.
+        qubit_indeces: The qubit indices associated to each
+            bit in a bitstring (from left to right).
+            If not given, Mitiq assumes the default ordering
+            ``tuple(range(self.nqubits))``, where ``self.nqubits``
+            is the bitstring length deduced from ``result``.
+    """
 
     result: Sequence[Bitstring]
     qubit_indices: Optional[Tuple[int, ...]] = None
