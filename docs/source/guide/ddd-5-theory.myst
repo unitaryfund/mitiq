@@ -32,7 +32,7 @@ In the context of quantum computing, DD can be considered as an error mitigation
 With respect to other error mitigation techniques, DD has very peculiar features:
 
 - It maps a noisy quantum computation to a _single_ error-mitigated computation (no need to take linear combinations
-of noisy results as in [ZNE](zne-5-theory.md [PEC](pec-5-theory.md) and [CDR](cdr-5-theory.md)).
+of noisy results as in [ZNE](zne-5-theory.myst), [PEC](pec-5-theory.myst) and [CDR](cdr-5-theory.myst)).
 
 - As a consequence of the previous point, there is not a fundamental error mitigation overhead or
 increase in statistical uncertainty in the final result.
@@ -53,7 +53,7 @@ to distinguish it from the standard pulse-level formulation.
 
 ```{note}
 This type of gate-level approach is very similar to the gate-level abstraction used in Mitiq to implement
-_digital zero-noise extrapolation_ via _unitary folding_ (see [What is the theory behind ZNE?](zne-5-theory.md)).
+_digital zero-noise extrapolation_ via _unitary folding_ (see [What is the theory behind ZNE?](zne-5-theory.myst)).
 ```
 Experimental evidence showing the practical utility gate-level decoupling sequences is given in several publications {cite}`Pokharel_2018_PRL, Jurcevic_2021_arxiv, GoogleQuantum_2021_nature, Smith_2021_arxiv, Das_2021_ACM`.
 
@@ -81,7 +81,7 @@ A general property of DDD sequences is that, if executed on a noiseless backend,
 ```
 
 All the above examples of DDD sequences are supported in Mitiq and more general ones can be defined and customized by users.
-For more details on how to define DDD sequences in Mitiq see [What additional options are available for DDD?](ddd-3-options.md).
+For more details on how to define DDD sequences in Mitiq see [What additional options are available for DDD?](ddd-3-options.myst).
 
 In a practical scenario it is hard to characterize the noise model and the noise spectrum of a quantum device and the
 choice of the optimal sequence is not obvious _a priori_. A possible strategy is to run a few circuits whose noiseless

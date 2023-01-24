@@ -95,8 +95,9 @@ master_doc = "index"
 # -- Options for myst_parser -------------------------------------------------
 # Specifies which of the parsers should handle each file extension.
 source_suffix = {
-    ".md": "myst-nb",
     ".ipynb": "myst-nb",
+    ".myst": "myst-nb",
+    ".mystnb": "myst-nb",
 }
 
 # Enables extensions to MyST parser that allows for richer markup options.
@@ -335,6 +336,7 @@ nbsphinx_thumbnails = {
     "examples/pec_tutorial": "_static/pec-tutorial.png",
     "examples/scaling": "_static/scaling.png",
     "examples/ddd_tutorial": "_static/ddd-tutorial.png",
+    "examples/ddd_on_ibmq_ghz": "_static/ddd-ibmq-ghz.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }

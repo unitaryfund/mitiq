@@ -65,7 +65,7 @@ number of random Clifford group elements and is proportional to the depth of the
 
 +++
 
-We now define an [executor](executors.md) which simulates a backend with depolarizing noise and computes the survival probability of the $|00\rangle$ state.
+We now define an [executor](executors.myst) which simulates a backend with depolarizing noise and computes the survival probability of the $|00\rangle$ state.
 
 +++
 
@@ -111,7 +111,7 @@ We now show how to use PEC to reduce this error.
 +++
 
 To apply PEC, we need to represent some or all of the operations of the ideal `circuit` as linear combinations
-of noisy implementable operations. Such linear combinations are also known as quasi-probability representations (see [What is the theory behind PEC?](pec-5-theory.md)) and, in Mitiq, they correspond to {class}`.OperationRepresentation` objects. More information on the {class}`.OperationRepresentation` class can be found in the section [What additional options are available in PEC?](pec-3-options.md).
+of noisy implementable operations. Such linear combinations are also known as quasi-probability representations (see [What is the theory behind PEC?](pec-5-theory.myst)) and, in Mitiq, they correspond to {class}`.OperationRepresentation` objects. More information on the {class}`.OperationRepresentation` class can be found in the section [What additional options are available in PEC?](pec-3-options.myst).
 
 But how can we obtain the quasi-probability representations that are appropriate for a given backend?
 There are two main alternative scenarios.
@@ -133,7 +133,7 @@ perform the complete process tomography of a basis set of implementable noisy op
 One could also use *gate set tomography* (GST), a noise characterization technique which is robust to state-preparation and measurement errors.
 Given the superoperators of the noisy implementable operations, one can obtain the quasi-probability representations as solutions of
 numerical optimization problems {cite}`Temme_2017_PRL, Sun_2021_PRAppl`. In Mitiq, this is possible through the
-{func}`.find_optimal_representation()` function as shown the section [What additional options are available in PEC?](pec-3-options.md).
+{func}`.find_optimal_representation()` function as shown the section [What additional options are available in PEC?](pec-3-options.myst).
 
 +++
 
