@@ -15,7 +15,8 @@
 
 """Readout Confusion Inversion."""
 
-from typing import Callable, Union, List, Sequence
+from typing import Callable, Union, List, Sequence, cast
+from types import MethodType
 from copy import deepcopy
 from functools import wraps
 import numpy as np
@@ -48,11 +49,14 @@ def execute_with_rem(
         The expectation value estimated with REM.
     """
     if not isinstance(executor, Executor):
-        executor = Executor(executor)
+        executor_obj = Executor(executor)
 
     executor_with_rem = mitigate_executor(
-        executor, inverse_confusion_matrix=inverse_confusion_matrix
+        executor_obj, inverse_confusion_matrix=inverse_confusion_matrix
     )
+
+    # Since the input is an Executor the output is an Executor
+    executor_with_rem = cast(Executor, executor_with_rem)
 
     return executor_with_rem.evaluate(circuit, observable)[0]
 
@@ -80,6 +84,7 @@ def mitigate_executor(
         executor_obj = deepcopy(executor)
 
     def post_run(
+        self: MeasurementResult,
         results: Sequence[MeasurementResult],
     ) -> Sequence[MeasurementResult]:
         return [
@@ -87,7 +92,7 @@ def mitigate_executor(
             for res in results
         ]
 
-    executor_obj._post_run = post_run
+    setattr(executor_obj, "_post_run", MethodType(post_run, executor_obj))
 
     if isinstance(executor, Executor):
         new_executor = executor_obj
@@ -96,7 +101,8 @@ def mitigate_executor(
 
         @wraps(executor)
         def new_executor(circuit: QPROGRAM) -> MeasurementResult:
-            return executor_obj._run([circuit])[0]
+            result = cast(MeasurementResult, executor_obj._run([circuit])[0])
+            return result
 
     elif executor_obj.can_batch:
 
@@ -104,7 +110,8 @@ def mitigate_executor(
         def new_executor(
             circuits: List[QPROGRAM],
         ) -> Sequence[MeasurementResult]:
-            return executor_obj._run(circuits)
+            results = executor_obj._run(circuits)
+            return cast(Sequence[MeasurementResult], results)
 
     return new_executor
 
@@ -136,9 +143,13 @@ def rem_decorator(
     def decorator(
         executor: Callable[[QPROGRAM], MeasurementResult]
     ) -> Callable[[QPROGRAM], MeasurementResult]:
-        return mitigate_executor(
+        mitigated_executor = mitigate_executor(
             executor,
             inverse_confusion_matrix=inverse_confusion_matrix,
+        )
+        return cast(
+            Callable[[QPROGRAM], MeasurementResult],
+            mitigated_executor,
         )
 
     return decorator
