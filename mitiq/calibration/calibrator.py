@@ -70,7 +70,7 @@ class Calibrator:
             else None
         )
         self.settings = settings
-        self.circuits = self.settings.make_circuits()
+        self.circuits = self.settings.make_circuits(self.settings.circuit_seed)
         self.results: List[Dict[str, Any]] = []
 
     def get_cost(self) -> Dict[str, int]:
@@ -180,6 +180,8 @@ class Calibrator:
 
         best_improvement_factor = 1.0
         num_circuits = len(self.settings.circuit_types)
+
+        strategy = None
 
         def filter_on_strategy(
             result: Dict[str, Dict[str, Dict[str, Any]]], strategy_id: int
