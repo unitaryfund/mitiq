@@ -14,22 +14,21 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for readout confusion inversion."""
-from cmath import isclose
+from typing import List
 from functools import partial
+import numpy as np
+import pytest
+
 import cirq
 from cirq.experiments.single_qubit_readout_calibration_test import (
     NoisySingleQubitReadoutSampler,
 )
-import numpy as np
-import pytest
 
-from mitiq.observable.observable import Observable
-from mitiq.observable.pauli import PauliString
-from mitiq import MeasurementResult
+from mitiq import MeasurementResult, Executor, Observable, PauliString
 from mitiq.rem.inverse_confusion_matrix import (
     generate_inverse_confusion_matrix,
 )
-from mitiq.rem.rem import execute_with_rem, mitigate_executor, rem_decorator
+from mitiq.rem import execute_with_rem, mitigate_executor, rem_decorator
 from mitiq.raw import execute as raw_execute
 from mitiq.interface.mitiq_cirq import sample_bitstrings
 
@@ -192,10 +191,10 @@ def test_mitigate_executor(p0, p1, atol):
     rem_value = raw_execute(circ, mitigated_executor, observable)
     assert abs(true_rem_value - rem_value) <= abs(
         true_rem_value - base
-    ) or isclose(
+    ) or np.isclose(
         abs(true_rem_value - rem_value),
         abs(true_rem_value - base),
-        abs_tol=atol,
+        atol=atol,
     )
 
 
@@ -221,3 +220,30 @@ def test_rem_decorator():
 
     rem_value = raw_execute(circ, noisy_readout_decorated_executor, observable)
     assert abs(true_rem_value - rem_value) < abs(true_rem_value - base)
+
+
+def test_rem_decorator_batched():
+    circuits = [circ, 3 * circ]
+    true_values = [-2.0, -2.0]
+    num_qubits = len(qreg)
+    p0 = 0.2
+    p1 = 0.1
+    inverse_confusion_matrix = generate_inverse_confusion_matrix(
+        num_qubits, p0=p0, p1=p1
+    )
+
+    @rem_decorator(inverse_confusion_matrix=inverse_confusion_matrix)
+    def noisy_readout_batched(circuits) -> List[MeasurementResult]:
+        return [noisy_readout_executor(c, p0=p0, p1=p1) for c in circuits]
+
+    noisy_executor = partial(noisy_readout_executor, p0=p0, p1=p1)
+    base_values = [
+        raw_execute(c, noisy_executor, observable) for c in circuits
+    ]
+    rem_values = Executor(noisy_readout_batched).evaluate(circuits, observable)
+    print(true_values)
+    print(base_values)
+    print(rem_values)
+    for true_val, base, rem_val in zip(true_values, base_values, rem_values):
+        assert abs(true_val - rem_val) < abs(true_val - base)
+        assert np.isclose(true_val, rem_val, atol=0.05)
