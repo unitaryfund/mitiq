@@ -68,7 +68,7 @@ from cirq.experiments.single_qubit_readout_calibration_test import (
     NoisySingleQubitReadoutSampler,
 )
 
-from mitiq._typing import MeasurementResult
+from mitiq import MeasurementResult
 from mitiq.raw import execute as raw_execute
 
 def noisy_readout_executor(
