@@ -13,7 +13,7 @@ kernelspec:
 
 # What additional options are available when using ZNE?
 
-In the introductory section [How do I use ZNE?](zne-1-intro.md), we used the function
+In the introductory section [How do I use ZNE?](zne-1-intro.myst), we used the function
 {func}`execute_with_zne()` to evaluate error-mitigated expectation values with zero-noise extrapolation.
 Beyond the positional arguments (`circuit`, `executor` and `observable`) that are common to all
 error mitigation techniques, one can use additional keyword arguments for optional settings as shown in next code snippet:
@@ -55,13 +55,13 @@ and how they can be applied in practice.
 
 To apply ZNE, we need to effectively increase the noise acting in a quantum computation. Instead of directly controlling the physical backend,
 Mitiq achieves this task by *digital* noise scaling, i.e., with circuit manipulations that indirectly increase the effect of noise but keep the circuit logic unchanged.
-More details on digital ZNE can be found in [What is the theory behind ZNE?](zne-5-theory.md)
+More details on digital ZNE can be found in [What is the theory behind ZNE?](zne-5-theory.myst)
 
 In Mitiq a noise scaling method is represented by a *noise scaling function* that takes as input a `circuit` and a real `scale_factor` and
 returns a `scaled_circuit`. For a noiseless backend, `scaled_circuit` has the same effect as `circuit`. For a noisy backend, 
 `scaled_circuit` is more sensitive to errors depending on the magnitude of `scale_factor`. 
 
-As discussed previously in [How do I use ZNE?](zne-1-intro.md), the two available methods to scale noise are by inserting
+As discussed previously in [How do I use ZNE?](zne-1-intro.myst), the two available methods to scale noise are by inserting
 unitaries or by inserting layers of identity gates. Note that the number of layers inserted are different for the two methods even
 if they have the same scale factor greater than 1. 
 
@@ -90,7 +90,7 @@ For more details on folding functions, we suggest to click on the functions list
 
 If not specified by the user, the default noise scaling method in Mitiq is {func}`.fold_gates_at_random()`.
 Custom noise-scaling functions can also be defined by the user, as shown
-in [What happens when I use ZNE ?](zne-4-low-level.md).
+in [What happens when I use ZNE ?](zne-4-low-level.myst).
 
 +++
 
@@ -355,7 +355,7 @@ This means that a {class}`.RichardsonFactory` object is equivalent to a {class}`
 
 +++
 
-To show an example, we define a circuit and an executor as shown in [How do I use ZNE?](zne-1-intro.md) but apply ZNE with advanced options.
+To show an example, we define a circuit and an executor as shown in [How do I use ZNE?](zne-1-intro.myst) but apply ZNE with advanced options.
 
 ```{code-cell} ipython3
 from mitiq import benchmarks
@@ -451,4 +451,4 @@ _ = factory.plot_fit()
 ```
 
 In this section we have shown how to run ZNE with non-default options.
-A lower-level usage of noise scaling methods and {class}`.Factory` objects is presented the next section ([What happens when I use ZNE?](zne-4-low-level.md)).
+A lower-level usage of noise scaling methods and {class}`.Factory` objects is presented the next section ([What happens when I use ZNE?](zne-4-low-level.myst)).
