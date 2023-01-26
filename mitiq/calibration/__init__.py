@@ -13,5 +13,5 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from mitiq.calibration.calibration import Calibrator, execute_with_mitigation
+from mitiq.calibration.calibrator import Calibrator, execute_with_mitigation
 from mitiq.calibration.settings import Settings, ZNESettings
