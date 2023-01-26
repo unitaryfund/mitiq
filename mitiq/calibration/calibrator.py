@@ -235,7 +235,7 @@ def convert_to_expval_executor(
         bitstring_to_measure = bitstring
 
     def expval_executor(circuit: cirq.Circuit) -> float:
-        raw = cast(MeasurementResult, executor._run([circuit])[0]).result
+        raw = cast(MeasurementResult, executor.run([circuit])[0]).result
         raw = cast(List[List[int]], raw)
         bitstring_distribution = bitstrings_to_distribution(raw)
         return bitstring_distribution.get(bitstring_to_measure, 0)
