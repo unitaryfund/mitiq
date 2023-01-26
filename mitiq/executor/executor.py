@@ -327,8 +327,9 @@ class Executor:
 
                 #. A function which inputs a single ``QPROGRAM`` and outputs a
                    single ``QuantumResult``.
-                #. A function which inputs a list of ``QPROGRAM``\s and outputs
-                   a list of ``QuantumResult``\s (one for each ``QPROGRAM``).
+                #. A function which inputs a list of ``QPROGRAM`` objects and
+                   returns a list of ``QuantumResult`` instances (one for each
+                   ``QPROGRAM``).
 
         Returns:
             True if the executor is detected as batched, else False.
