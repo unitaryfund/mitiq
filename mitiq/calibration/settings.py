@@ -189,7 +189,6 @@ class Settings:
         self.circuit_depth = circuit_depth
         self.circuit_seed = circuit_seed
 
-
     def make_circuits(
         self, seed: Optional[int] = None
     ) -> List[BenchmarkProblem]:
