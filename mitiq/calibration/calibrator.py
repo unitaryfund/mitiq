@@ -210,9 +210,16 @@ class Calibrator:
                 ]
                 > best_improvement_factor
             ):
+                best_improvement_factor = strategy_group[0][
+                    "mitigated_values"
+                ]["ZNE"]["results"][0]["improvement_factor"]
                 strategy = strategy_group[0]["mitigated_values"]["ZNE"][
                     "results"
                 ][0]["strategy"]
+        self.results.append(
+            {"best_improvement_factor": best_improvement_factor}
+        )
+
         if strategy is None:
             warnings.warn("None of the improvement factors were > 1")
             return DefaultStrategy

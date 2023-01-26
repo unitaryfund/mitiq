@@ -186,15 +186,10 @@ def test_best_strategy():
     strategy = cal.best_strategy(cal.results)
     strategy_params = strategy.as_dict()
 
-    # if cal.results[0]["mitigated_values"]["ZNE"]["improvement_factor"] >= 1:
-    #     assert strategy_params != {}
-    # else:
-    #     assert strategy_params == {}
-    assert strategy_params == {
-        "factory": "RichardsonFactory",
-        "scale_factors": [1.0, 3.0, 5.0],
-        "scale_method": "fold_global",
-    }
+    if cal.results[-1]["best_improvement_factor"] > 1:
+        assert strategy_params != {}
+    else:
+        assert strategy_params == {}
 
 
 def test_bitstrings_to_distribution():
