@@ -92,11 +92,11 @@ class MeasurementResult:
             is the bitstring length deduced from ``result``.
 
     Note:
-        Using the default option for ``qubit_indeces`` can be
-        dangerous, especially when estimating an :class:`.Observable`
+        Use caution when selecting the default option for ``qubit_indices``,
+        especially when estimating an :class:`.Observable`
         acting on a subset of qubits. In this case Mitiq
         only applies measurement gates to the specific qubits and, therefore,
-        it is essential to specify the corresponding ``qubit_indeces``.
+        it is essential to specify the corresponding ``qubit_indices``.
     """
 
     result: Sequence[Bitstring]
