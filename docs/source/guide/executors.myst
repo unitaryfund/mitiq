@@ -4,7 +4,7 @@ jupytext:
     extension: .myst
     format_name: myst
     format_version: 0.13
-    jupytext_version: 1.12.0
+    jupytext_version: 1.14.1
 kernelspec:
   display_name: Python 3 (ipykernel)
   language: python
@@ -80,7 +80,7 @@ To run a circuit of sequence of circuits, use the `Executor.evaluate` method.
 ```{code-cell} ipython3
 import cirq
 
-q = cirq.GridQubit(0, 0)
+q = cirq.LineQubit(0)
 circuit = cirq.Circuit(cirq.H.on(q))
 
 obs = Observable(PauliString("Z"))
@@ -183,4 +183,52 @@ print(f"ZNE value: {zne_value :g}")
 print("Calls to executor:", batched_executor.calls_to_executor)
 print("\nExecuted circuits:\n", *batched_executor.executed_circuits, sep="\n")
 print("\nQuantum results:\n", *batched_executor.quantum_results, sep="\n")
+```
+
+## Defining an `Executor` that returns measurement outcomes (bitstrings)
+
++++
+
+In the previous examples we have shown executors that return the density matrix of the final state. This is possible only for classical simulations.
+The typical result of a real quantum computation is instead a list of bitstrings corresponding to the ("0" or "1") outcomes obtained when measuring each qubit in the computational basis.
+In Mitiq this type of quantum backend is captured by an {class}`.Executor` that returns a {class}`.MeasurementResult` object.
+
+For example, here is an example of a Cirq executor function that returns raw measurement outcomes:
+
+```{code-cell} ipython3
+from mitiq import MeasurementResult
+
+def noisy_sampler(circuit, noise_level=0.1, shots=1000) -> MeasurementResult:
+    circuit_to_run = circuit.with_noise(cirq.depolarize(noise_level))
+    simulator = cirq.DensityMatrixSimulator()
+    result = simulator.run(circuit_to_run, repetitions=shots)
+    bitstrings = np.column_stack(list(result.measurements.values()))
+    qubit_indices = tuple(
+            int(q[2:-1])  # Extract index from "q(index)" string
+            for k in result.measurements.keys()
+            for q in k.split(",")
+    )
+    return MeasurementResult(bitstrings, qubit_indices)
+```
+
+```{code-cell} ipython3
+# Circuit with measurements to test the noisy_sampler function
+circuit_with_measurements = circuit.copy()
+circuit_with_measurements.append(cirq.measure(*circuit.all_qubits()))
+
+print("Circuit to execute:", circuit_with_measurements)
+noisy_sampler(circuit_with_measurements)
+```
+
+The rest of the Mitiq workflow is the same as in the case of a density matrix executor. For example:
+
+```{code-cell} ipython3
+executor = Executor(noisy_sampler)
+obs = Observable(PauliString("X"))
+results = executor.evaluate(circuit, obs)
+
+print("Results:", results)
+print("Calls to executor:", executor.calls_to_executor)
+print("\nExecuted circuits:\n", *executor.executed_circuits, sep="\n")
+print("\nQuantum results:\n", *executor.quantum_results, sep="\n")
 ```

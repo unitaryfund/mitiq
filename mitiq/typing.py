@@ -76,7 +76,28 @@ Bitstring = Union[str, List[int]]
 
 @dataclass
 class MeasurementResult:
-    """Bitstrings sampled from a quantum computer."""
+    """Mitiq object for collecting the bitstrings sampled from a quantum
+    computer when executing a circuit. This is one of the possible types
+    (see :class:`~mitiq.typing.QuantumResult`) that an
+    :class:`.Executor` can return.
+
+    Args:
+        result:
+            The sequence of measured bitstrings.
+        qubit_indices:
+            The qubit indices associated to each
+            bit in a bitstring (from left to right).
+            If not given, Mitiq assumes the default ordering
+            ``tuple(range(self.nqubits))``, where ``self.nqubits``
+            is the bitstring length deduced from ``result``.
+
+    Note:
+        Use caution when selecting the default option for ``qubit_indices``,
+        especially when estimating an :class:`.Observable`
+        acting on a subset of qubits. In this case Mitiq
+        only applies measurement gates to the specific qubits and, therefore,
+        it is essential to specify the corresponding ``qubit_indices``.
+    """
 
     result: Sequence[Bitstring]
     qubit_indices: Optional[Tuple[int, ...]] = None
@@ -145,6 +166,12 @@ class MeasurementResult:
         """
         strings = ["".join(map(str, bits)) for bits in self.result]
         return dict(Counter(strings))
+
+    def prob_distribution(self) -> Dict[str, float]:
+        """Returns a Python dictionary whose keys are the measured
+        bitstrings and whose values are their empirical frequencies.
+        """
+        return {k: v / self.shots for k, v in self.get_counts().items()}
 
     def to_dict(self) -> Dict[str, Any]:
         """Exports data to a Python dictionary.

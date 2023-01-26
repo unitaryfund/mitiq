@@ -148,3 +148,16 @@ def test_measurement_repr_():
     )
     assert repr(result) == expected
     assert str(result) == expected
+
+
+def test_measurement_result_prob_distribution():
+    """Test initialization from a dictionary of counts."""
+    int_bitstrings = [[0, 0], [0, 1], [0, 1], [0, 1]]
+    result = MeasurementResult(
+        result=int_bitstrings,
+        qubit_indices=(1, 20),
+    )
+    dist = result.prob_distribution()
+    assert len(dist) == 2
+    assert np.isclose(dist["00"], 0.25)
+    assert np.isclose(dist["01"], 0.75)
