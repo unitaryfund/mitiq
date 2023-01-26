@@ -40,14 +40,16 @@ from mitiq.calibration.settings import Settings, Strategy, DefaultStrategy
 
 
 class Calibrator:
-    """An object used to orchestrate experiments, and determine in Error
-    Mitigation parameter tuning.
+    """An object used to orchestrate experiments for calibrating optimal error
+    mitigation strategies.
 
     Args:
-        executor: Noisy simulation/hardware on which to run circuits.
+        executor: An unmitigated executor returning a
+            :class:`.MeasurementResult`.
         settings: A ``Settings`` object which specifies the type and amount of
             circuits/error mitigation methods to run.
-        ideal_executor: TODO
+        ideal_executor: An optional simulated executor returning the ideal
+            :class:`.MeasurementResult` without noise.
     """
 
     def __init__(
@@ -89,7 +91,7 @@ class Calibrator:
         }
 
     def run_circuits(self) -> List[Dict[str, Any]]:
-        """Run the calibration circuits using the specified executor(s).
+        """Runs all the circuits required for calibration.
 
         Returns:
             A collection of experimental results along with a summary of each
@@ -205,7 +207,7 @@ def bitstrings_to_distribution(
 
 
 def convert_to_expval_executor(
-    ex: Executor,
+    executor: Executor,
     distribution: Optional[Dict[str, float]] = None,
     bitstring: Optional[str] = None,
 ) -> Tuple[Executor, str]:
@@ -214,8 +216,8 @@ def convert_to_expval_executor(
     ideal distribution.
 
     Args:
-        ex: Executor which returns bitstrings, or :class:`.MeasurementResult`
-            instance.
+        executor: Executor which returns a :class:`.MeasurementResult`
+            (bitstrings).
         distribution: The ideal distribution at the end of the circuit run.
         bitstring: The bitstring to measure the probability of.
 
@@ -233,7 +235,7 @@ def convert_to_expval_executor(
         bitstring_to_measure = bitstring
 
     def expval_executor(circuit: cirq.Circuit) -> float:
-        raw = cast(MeasurementResult, ex._run([circuit])[0]).result
+        raw = cast(MeasurementResult, executor._run([circuit])[0]).result
         raw = cast(List[List[int]], raw)
         bitstring_distribution = bitstrings_to_distribution(raw)
         return bitstring_distribution.get(bitstring_to_measure, 0)

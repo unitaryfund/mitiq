@@ -110,7 +110,7 @@ class BenchmarkProblem:
 @dataclass
 class Strategy:
     """A dataclass which describes precisely an error mitigation approach by
-    specifies a technique and the associated options.
+    specifying a technique and the associated options.
 
     Args:
         technique: One of Mitiq's support error mitigation strategies,
@@ -151,13 +151,24 @@ class Strategy:
 
 
 class Settings:
-    """A class to store configuration relating to Error Mitigation calibration.
+    """A class to store the configuration settings of a :class:`.Calibrator`.
 
     Args:
-        circuit_types: TODO
-        num_qubits:
-        circuit_depth:
-        strategies:
+        circuit_types: List of strings specifying circuit types to use.
+            Must be drawn from the Identifier column::
+
+                Identifier  | Circuit Type
+                ----------------------------
+                "ghz"       | GHZ circuit
+                "rb"        | Randomized Benchmarking
+                "mirror"    | Mirror circuit
+
+        num_qubits: Number of qubits to use for circuit generation.
+        circuit_depth: Circuit depth to use when generating circuits. Only
+            used when ``num_qubits`` in combination with the circuit type does
+            not specify the depth.
+        strategies: A specification of the methods/parameters to be used in
+            calibration experiments.
     """
 
     def __init__(
