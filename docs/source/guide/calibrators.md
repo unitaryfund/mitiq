@@ -77,7 +77,6 @@ We can obtain this by calling the `execute_with_mitigation` function and passing
 def execute(circuit, noise_level=0.001):
     circuit = circuit.with_noise(cirq.amplitude_damp(noise_level))
 
-    result = cirq.DensityMatrixSimulator().run(circuit, repetitions=100)
     rho = (
         cirq.DensityMatrixSimulator()
         .simulate(circuit)
