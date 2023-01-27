@@ -1,5 +1,5 @@
 # Third-party integration.
-qiskit~=0.39.5
+qiskit~=0.40.0
 pyquil~=3.3.2
 pennylane-qiskit~=0.28.0
 pennylane~=0.28.0
