@@ -68,6 +68,8 @@ def mitigate_executor(
 ) -> Union[Executor, Callable[[QPROGRAM], MeasurementResult]]:
     """Returns a modified version of the input 'executor' which is
     error-mitigated with readout confusion inversion (RCI).
+    The type of the output executor will be equal to the type of
+    the input executor: an :class:`.Executor` object or a Python callable.
 
     Args:
         executor: A Mitiq executor that executes a circuit and returns the
@@ -78,6 +80,8 @@ def mitigate_executor(
     Returns:
         The error-mitigated version of the input executor.
     """
+    # We always mitigate an Executor object but, to preserve the input type,
+    # we eventually return a callable if the input executor is a callable.
     if not isinstance(executor, Executor):
         executor_obj = Executor(executor)
     else:
