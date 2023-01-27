@@ -82,13 +82,13 @@ p_flip = 0.25
 noisy_executor = partial(noisy_readout_executor, p0=p_flip, p1=p_flip)
 ```
 
-With our noisy executor we can obtain the raw measurement results with {func}`Executor._run()`:
+With our noisy executor we can obtain the raw measurement results with {func}`Executor.run()`:
 
 ```{code-cell} ipython3
 from mitiq.executor.executor import Executor
 
 executor = Executor(noisy_executor)
-result = executor._run([circuit])
+result = executor.run([circuit])
 noisy_result = result[0]
 print(noisy_result.get_counts())
 ```
