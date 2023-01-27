@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.14.1
@@ -86,7 +86,7 @@ error = abs((ideal_value - noisy_value)/ideal_value)
 print(f"Error without mitigation: {error:.3}")
 ```
 
-## Apply REM to raw readout results
+## Apply REM
 Readout-error mitigation can be easily applied with the function
 {func}`.execute_with_rem()`.
 
@@ -98,11 +98,9 @@ from mitiq import rem
 # you can supply your own confusion matrices and invert them using the helper
 # function generate_tensored_inverse_confusion_matrix().
 inverse_confusion_matrix = generate_inverse_confusion_matrix(2, p_flip, p_flip)
-circuit_with_measurements = circuit.copy()
-circuit_with_measurements.append(measure_each(*qreg))
 
 mitigated_result = rem.execute_with_rem(
-    circuit_with_measurements,
+    circuit,
     noisy_executor,
     observable,
     inverse_confusion_matrix=inverse_confusion_matrix,
