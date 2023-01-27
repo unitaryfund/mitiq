@@ -27,6 +27,7 @@ from mitiq.rem.inverse_confusion_matrix import (
     generate_tensored_inverse_confusion_matrix,
     mitigate_measurements,
     sample_probability_vector,
+    closest_positive_distribution,
 )
 
 
@@ -167,3 +168,32 @@ def test_mitigate_measurements():
     assert mitigate_measurements(measurements, np.flipud(identity)).result == [
         [1, 0]
     ]
+
+
+def test_closest_positive_distribution():
+    inputs = [
+        [0.3, 0.7],  # Test optimal input
+        [-0.1, 1.1],  # Test negative elements
+        [10, 10],  # Test normalization
+        [-1, 1, -1, 1],  # Test more elements
+        [-1, 0.1, -1, 0.2],  # Non-trivial problem
+    ]
+    expected = [
+        [0.3, 0.7],
+        [0, 1],
+        [0.5, 0.5],
+        [0, 0.5, 0, 0.5],
+        [0, 0.450317, 0, 0.549683],
+    ]
+    for quasi_prob, prob in zip(inputs, expected):
+        assert np.allclose(
+            closest_positive_distribution(quasi_prob),
+            prob,
+            atol=1e-5,
+        )
+
+
+def test_closest_positive_distribution_error():
+    """Test unfeasible problem to trigger error."""
+    with pytest.raises(ValueError, match="REM failed to determine"):
+        closest_positive_distribution([0, 0])
