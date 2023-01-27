@@ -98,9 +98,11 @@ from mitiq import rem
 # you can supply your own confusion matrices and invert them using the helper
 # function generate_tensored_inverse_confusion_matrix().
 inverse_confusion_matrix = generate_inverse_confusion_matrix(2, p_flip, p_flip)
+circuit_with_measurements = circuit.copy()
+circuit_with_measurements.append(measure_each(*qreg))
 
 mitigated_result = rem.execute_with_rem(
-    circuit,
+    circuit_with_measurements,
     noisy_executor,
     observable,
     inverse_confusion_matrix=inverse_confusion_matrix,

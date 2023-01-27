@@ -54,7 +54,6 @@ def execute_with_rem(
     executor_with_rem = mitigate_executor(
         executor_obj, inverse_confusion_matrix=inverse_confusion_matrix
     )
-
     # Since the input is an Executor the output is an Executor
     executor_with_rem = cast(Executor, executor_with_rem)
 
@@ -105,7 +104,7 @@ def mitigate_executor(
 
         @wraps(executor)
         def new_executor(circuit: QPROGRAM) -> MeasurementResult:
-            result = cast(MeasurementResult, executor_obj._run([circuit])[0])
+            result = cast(MeasurementResult, executor_obj.run([circuit])[0])
             return result
 
     elif executor_obj.can_batch:
@@ -114,7 +113,7 @@ def mitigate_executor(
         def new_executor(
             circuits: List[QPROGRAM],
         ) -> Sequence[MeasurementResult]:
-            results = executor_obj._run(circuits)
+            results = executor_obj.run(circuits)
             return cast(Sequence[MeasurementResult], results)
 
     return new_executor

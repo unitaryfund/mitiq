@@ -13,23 +13,53 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import pytest
+import json
 
 from mitiq.calibration import ZNESettings, Settings
-from mitiq.zne.scaling import fold_global, fold_gates_at_random
-from mitiq.zne.inference import RichardsonFactory, ExpFactory, LinearFactory
+from mitiq.calibration.settings import MitigationTechnique
+from mitiq.raw import execute
+from mitiq.pec import execute_with_pec
+from mitiq.zne.scaling import fold_global
+from mitiq.zne.inference import RichardsonFactory, LinearFactory
+
+
+def test_MitigationTechnique():
+    pec_enum = MitigationTechnique.PEC
+    assert pec_enum.mitigation_function == execute_with_pec
+    assert pec_enum.name == "PEC"
+
+    raw_enum = MitigationTechnique.RAW
+    assert raw_enum.mitigation_function == execute
+    assert raw_enum.name == "RAW"
 
 
 def test_basic_settings():
     settings = Settings(
-        ["zne"],
         circuit_types=["ghz"],
         num_qubits=2,
         circuit_depth=999,
-        technique_params={
-            "scale_factors": [[1, 3, 4]],
-            "scale_methods": [fold_global, fold_gates_at_random],
-            "factories": [RichardsonFactory, ExpFactory, LinearFactory],
-        },
+        strategies=[
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+            },
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": RichardsonFactory([1.0, 3.0, 5.0]),
+            },
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": LinearFactory([1.0, 2.0, 3.0]),
+            },
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": LinearFactory([1.0, 3.0, 5.0]),
+            },
+        ],
     )
     circuits = settings.make_circuits()
     assert len(circuits) == 1
@@ -39,21 +69,25 @@ def test_basic_settings():
     assert ghz_problem.ideal_distribution == {"00": 0.5, "11": 0.5}
 
     strategies = settings.make_strategies()
-    num_strategies = 1 * 2 * 3
+    num_strategies = 4
     assert len(strategies) == num_strategies
+
+    strategy_summary = str(strategies[0]).replace("'", '"')
+    assert isinstance(json.loads(strategy_summary), dict)
 
 
 def test_make_circuits_qv_circuits():
     settings = Settings(
-        ["zne"],
         circuit_types=["qv"],
         num_qubits=2,
         circuit_depth=999,
-        technique_params={
-            "scale_factors": [[1, 3, 4]],
-            "scale_methods": [fold_global, fold_gates_at_random],
-            "factories": [RichardsonFactory, ExpFactory, LinearFactory],
-        },
+        strategies=[
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+            }
+        ],
     )
     with pytest.raises(NotImplementedError, match="quantum volume circuits"):
         settings.make_circuits()
@@ -61,15 +95,16 @@ def test_make_circuits_qv_circuits():
 
 def test_make_circuits_invalid_circuit_type():
     settings = Settings(
-        ["zne"],
         circuit_types=["foobar"],
         num_qubits=2,
         circuit_depth=999,
-        technique_params={
-            "scale_factors": [[1, 3, 4]],
-            "scale_methods": [fold_global, fold_gates_at_random],
-            "factories": [RichardsonFactory, ExpFactory, LinearFactory],
-        },
+        strategies=[
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+            }
+        ],
     )
     with pytest.raises(
         ValueError, match="invalid value passed for `circuit_types`"
@@ -77,20 +112,20 @@ def test_make_circuits_invalid_circuit_type():
         settings.make_circuits()
 
 
-def test_make_strategies_invalid_method():
-    settings = Settings(
-        ["destroy_my_errors"],
-        circuit_types=["shor"],
-        num_qubits=2,
-        circuit_depth=999,
-        technique_params={
-            "scale_factors": [[1, 3, 4]],
-            "scale_methods": [fold_global, fold_gates_at_random],
-            "factories": [RichardsonFactory, ExpFactory, LinearFactory],
-        },
-    )
-    with pytest.raises(ValueError, match="Invalid value passed"):
-        settings.make_strategies()
+def test_make_strategies_invalid_technique():
+    with pytest.raises(KeyError, match="DESTROY"):
+        Settings(
+            circuit_types=["shor"],
+            num_qubits=2,
+            circuit_depth=999,
+            strategies=[
+                {
+                    "technique": "destroy_my_errors",
+                    "scale_noise": fold_global,
+                    "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+                }
+            ],
+        )
 
 
 def test_ZNESettings():
