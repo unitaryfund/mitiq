@@ -42,7 +42,7 @@ print(circuit)
 
 Next we define a simple noisy readout executor function which takes a 
 circuit as input, executes the circuit on a noisy simulator, and 
-returns the raw measurement results. See the [Executors](executors.myst) 
+returns the raw measurement results. See the [Executors](executors.md) 
 section for more information on how to define more advanced executors.
 
 ```{warning}
@@ -68,7 +68,7 @@ def noisy_readout_executor(circuit, p0, p1, shots=8192) -> MeasurementResult:
     return MeasurementResult(bitstrings, qubit_indices = (0, 1))
 ```
 
-The [executor](executors.myst) can be used to evaluate noisy (unmitigated)
+The [executor](executors.md) can be used to evaluate noisy (unmitigated)
 expectation values.
 
 ```{code-cell} ipython3
@@ -126,6 +126,6 @@ confusion matrix with some being more costly than others.
 +++
 
 The section
-[What additional options are available when using REM?](rem-3-options.myst)
+[What additional options are available when using REM?](rem-3-options.md)
 contains more information on generating inverse confusion matrices in order to 
 apply REM with Mitiq.
