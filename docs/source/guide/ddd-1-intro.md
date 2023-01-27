@@ -45,7 +45,7 @@ print(circuit)
 
 Next we define a simple executor function which inputs a circuit, executes
 the circuit on a noisy simulator, and returns the probability of the ground
-state. See the [Executors](executors.myst) section for more information on
+state. See the [Executors](executors.md) section for more information on
 how to define more advanced executors.
 
 ```{code-cell} ipython3
@@ -64,7 +64,7 @@ def execute(circuit, noise_level=0.1):
     return rho[0, 0].real
 ```
 
-The [executor](executors.myst) can be used to evaluate noisy (unmitigated)
+The [executor](executors.md) can be used to evaluate noisy (unmitigated)
 expectation values.
 
 ```{code-cell} ipython3
@@ -113,5 +113,5 @@ the error with DDD is sometimes larger than the unmitigated error.
 +++
 
 The section
-[What additional options are available when using DDD?](ddd-3-options.myst)
+[What additional options are available when using DDD?](ddd-3-options.md)
 contains information on more advanced ways of applying DDD with Mitiq.
