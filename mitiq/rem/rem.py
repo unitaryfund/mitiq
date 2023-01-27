@@ -50,7 +50,7 @@ def execute_with_rem(
     if not isinstance(executor, Executor):
         executor = Executor(executor)
 
-    result = executor._run([circuit])
+    result = executor.run([circuit])
     noisy_result = result[0]
     if not isinstance(noisy_result, MeasurementResult):
         raise TypeError("Results are not of type MeasurementResult.")
