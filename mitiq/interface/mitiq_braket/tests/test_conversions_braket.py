@@ -232,7 +232,6 @@ def test_from_braket_raises_on_unsupported_gates():
 
 def test_to_braket_raises_on_unsupported_gates():
     for num_qubits in range(3, 5):
-        print(num_qubits)
         qubits = [LineQubit(int(qubit)) for qubit in range(num_qubits)]
         op = ops.MatrixGate(_rotation_of_pi_over_7(num_qubits)).on(*qubits)
         circuit = Circuit(op)
