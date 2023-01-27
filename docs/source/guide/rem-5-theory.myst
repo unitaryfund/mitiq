@@ -23,7 +23,7 @@ symmetry, bitstrings that do not preserve it, can be discarded. This
 possibility is indeed available in {mod}`mitiq.rem.post_select`.
 
 With regards to the more elaborate technique of confusion matrix inversion,
-also supported in Mitiq, the most relevant references are Refs. {cite}`Maciejewski_2020,Bravyi_2021`.
+also [supported](rem-1-intro) in Mitiq, the most relevant references are Refs. {cite}`Maciejewski_2020,Bravyi_2021`.
 In Ref. {cite}`Maciejewski_2020`, a REM technique for NISQ devices has been
 introduced in conjuction with the reconstruction of a Positive-Operator Valued
 Measure (POVM) describing the measurement. The technique was there tested on a
