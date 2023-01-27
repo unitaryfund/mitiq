@@ -48,7 +48,7 @@ For trace-preserving operations, the coefficients $\{\eta_\alpha\}$ form a quasi
 $$\sum_\alpha \eta_\alpha = 1, \quad  \gamma = \| \eta \|_1= \sum_\alpha   |\eta_\alpha| \ge 1.$$
 
 The value of $\gamma$ is related to the negative "volume" of the distribution and quantifies to the sampling
-cost of PEC (see [What is the theory behind PEC?](pec-5-theory.myst)).
+cost of PEC (see [What is the theory behind PEC?](pec-5-theory.md)).
 
 +++
 
@@ -313,7 +313,7 @@ that gate will not be mitigated. In practice, all the gates without {class}`.Ope
 are treated by Mitiq as if they were noiseless.*
 
 The executor must be defined by the user since it depends on the specific frontend and backend
-(see the [Executors](executors.myst) section).
+(see the [Executors](executors.md) section).
 Here, for simplicity, we import the basic {func}`.execute_with_noise` function from the Qiskit utilities of Mitiq.
 
 ```{code-cell} ipython3
@@ -337,7 +337,7 @@ executor = Executor(execute)
 
 +++
 
-In the ["How do I use PEC?"](pec-1-intro.myst) section, we have shown how to apply PEC
+In the ["How do I use PEC?"](pec-1-intro.md) section, we have shown how to apply PEC
 with the minimum amount of options by simply calling the function {func}`.execute_with_pec()`
 with the basic arguments `circuit`, `executor`, and `representations`.
 
@@ -358,7 +358,7 @@ pec_value, pec_data = pec.execute_with_pec(
 Similar to other error mitigation modules, `observable` is an optional argument of 
 {func}`.execute_with_pec`. If `observable` is `None` the executor must return an expectation value,
 otherwise the executor must return a `mitiq.QuantumResult` from which the expectation value of the input
-`observable` can be computed. See the [Executors](executors.myst) section for more details. 
+`observable` can be computed. See the [Executors](executors.md) section for more details. 
 
 
 Another option that can be used, instead of `num_samples`, is `precision`.
@@ -369,7 +369,7 @@ $|\langle  A \rangle_{ \rm ideal} - \langle  A \rangle_{ \rm PEC}|$ (up to const
 statistical fluctuations).  In practice, `precision` is used by Mitiq to automatically determine `num_samples`,
 according to the formula: `num_samples` = $(\gamma /$ `precision`$)^2$, where $\gamma$ is the one-norm the circuit
 quasi-probability distribution.
-See ["What is the theory behind PEC?"](pec-5-theory.myst) for more details on the sampling cost.
+See ["What is the theory behind PEC?"](pec-5-theory.md) for more details on the sampling cost.
 
 ```{code-cell} ipython3
 # Optional Executor re-initialization to clean the history
@@ -393,7 +393,7 @@ time. Try re-executing the previous cell with smaller values of `precision` to i
 
 +++
 
-As discussed in the [Executors](executors.myst) section, we can extract the execution history
+As discussed in the [Executors](executors.md) section, we can extract the execution history
 from `executor`. This is a way to see what Mitiq does behind the scenes which is independent from the error
 mitigation technique.
 

@@ -33,7 +33,7 @@ The diagram shows the workflow of the zero noise extrapolation (ZNE) technique i
   - A parametrized curve is fit to the noise-scaled expectation values.
   - The curve is extrapolated to the zero-noise limit, obtaining an error mitigated expectation value.
 
-As demonstrated in [How do I use ZNE ?](zne-1-intro.myst), the function {func}`.execute_with_zne()` applies both steps behind the scenes.
+As demonstrated in [How do I use ZNE ?](zne-1-intro.md), the function {func}`.execute_with_zne()` applies both steps behind the scenes.
 In the next sections instead, we show how one can apply ZNE at a lower level, i.e., by applying each step independently.
 
 Moreover, we will also show how the user can customize noise scaling methods and factory objects.
@@ -45,7 +45,7 @@ Moreover, we will also show how the user can customize noise scaling methods and
 +++
 
 ### Problem setup
-We define a circuit and an executor, as shown in [How do I use ZNE?](zne-1-intro.myst).
+We define a circuit and an executor, as shown in [How do I use ZNE?](zne-1-intro.md).
 
 ```{code-cell} ipython3
 from mitiq import benchmarks
@@ -145,7 +145,7 @@ zne.execute_with_zne(circuit, execute, scale_noise=my_custom_folding_function)
 +++
 
 If necessary, the user can modify existing extrapolation methods by subclassing
-one of the [built-in factories](zne-3-options.myst#extrapolation-methods-factory-objects).
+one of the [built-in factories](zne-3-options.md#extrapolation-methods-factory-objects).
 
 Alternatively, a custom adaptive extrapolation method can be derived from the abstract class {class}`.AdaptiveFactory`.
 In this case its core methods must be implemented:
