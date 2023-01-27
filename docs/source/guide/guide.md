@@ -11,4 +11,5 @@ cdr.md
 ddd.md
 rem.md
 error-mitigation.md
+glossary.md
 ```
