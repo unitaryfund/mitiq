@@ -23,22 +23,22 @@ name: rem-workflow
 Workflow of the REM technique in Mitiq.
 ```
 
-- The user provides a `QPROGRAM`, (i.e. a quantum circuit defined via any of the supported [frontends](frontends-backends.myst)).
+- The user provides a `QPROGRAM`, (i.e. a quantum circuit defined via any of the supported [frontends](frontends-backends.md))).
 - Mitiq leaves the input circuit unmodified.
-- The unmodified circuit is executed via a user-defined [Executor](executors.myst).
+- The unmodified circuit is executed via a user-defined [Executor](executors.md).
 - REM modifies the measurement results by transforming by an inverse confusion matrix.
 - The error mitigated expectation value is returned to the user.
 
-With respect to the workflows of other error-mitigation techniques (e.g. [ZNE](zne-4-low-level.myst) or [PEC](pec-4-low-level.myst)), REM does not require the modification of the circuit. The results of the execution of the _single_ unmodified circuit are what get modified. For this reason, the circuit generation step is trivial and the work of the technique happens in the final inference step.
+With respect to the workflows of other error-mitigation techniques (e.g. [ZNE](zne-4-low-level.md) or [PEC](pec-4-low-level.md)), REM does not require the modification of the circuit. The results of the execution of the _single_ unmodified circuit are what get modified. For this reason, the circuit generation step is trivial and the work of the technique happens in the final inference step.
 
-As shown in [How do I use REM?](rem-1-intro.myst), the function {func}`.execute_with_rem()` applies REM behind the scenes and directly returns the error-mitigated expectation value. In the next sections instead, we show how one can apply REM at a lower level, i.e., by by applying each step independently:
+As shown in [How do I use REM?](rem-1-intro.md), the function {func}`.execute_with_rem()` applies REM behind the scenes and directly returns the error-mitigated expectation value. In the next sections instead, we show how one can apply REM at a lower level, i.e., by by applying each step independently:
 
 - Obtaining measurement results directly from the executor;
 - Mitigating the measurements with an inverse confusion matrix
 
 ## Obtaining measurements results directly from the executor
 
-Let's use the same example from [How do I use REM?](rem-1-intro.myst):
+Let's use the same example from [How do I use REM?](rem-1-intro.md):
 
 ```{code-cell} ipython3
 from cirq import LineQubit, Circuit, X, measure_each
@@ -97,7 +97,7 @@ Here we can see that instead of only getting `'11'` results we get other bitstri
 
 ## Mitigating the measurements with an inverse confusion matrix
 
-For this example we used a simple, uncorrelated readout error model where each qubit has a separate probability of flipping from $|0\rangle \rightarrow |1\rangle$ and $|1\rangle \rightarrow |0\rangle$ during readout. More details of constructing this inverse confusion matrix are presented in [What additional options are available when using REM?](rem-3-options.myst).
+For this example we used a simple, uncorrelated readout error model where each qubit has a separate probability of flipping from $|0\rangle \rightarrow |1\rangle$ and $|1\rangle \rightarrow |0\rangle$ during readout. More details of constructing this inverse confusion matrix are presented in [What additional options are available when using REM?](rem-3-options.md).
 
 ```{code-cell} ipython3
 from mitiq.rem import generate_inverse_confusion_matrix
@@ -117,4 +117,4 @@ print(mitigated_result.get_counts())
 
 Now, we can see more of the `'11'` results that we would expect. These mitigated results would subsequently be used by any later stages that compute expectation values of observables.
 
-The details of how the measurements are mitigated are presented in [What is the theory behind REM?](rem-5-theory.myst).
+The details of how the measurements are mitigated are presented in [What is the theory behind REM?](rem-5-theory.md).
