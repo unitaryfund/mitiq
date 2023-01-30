@@ -13,9 +13,7 @@ kernelspec:
 
 # What is the theory behind REM?
 
-Readout error mitigation (REM), in general, is probably one of the most general
- and earliest error mitigation techniques, which itself can refer to a number
- of specific approaches.
+Readout error mitigation (REM), is one of the most general and earliest studied error mitigation techniques, which can refer to a variety of specific approaches.
 
 A simple version of readout error mitigation is postselection of bitstrings. For
 example, if one knows that the measured bitstrings should preserve some
