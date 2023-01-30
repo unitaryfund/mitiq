@@ -305,7 +305,6 @@ def execute_with_mitigation(
     input circuit, via the application of the best mitigation strategy, as
     determined by calibration.
 
-
     Args:
         circuit: The input circuit to execute.
         executor: A Mitiq executor that executes a circuit and returns the

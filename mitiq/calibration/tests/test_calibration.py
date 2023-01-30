@@ -152,7 +152,6 @@ def test_compute_improvements_modifies_IF():
 
 
 def test_best_strategy():
-
     test_strategy_settings = Settings(
         circuit_types=["ghz", "mirror"],
         num_qubits=2,
@@ -184,12 +183,11 @@ def test_best_strategy():
     cal = Calibrator(execute, test_strategy_settings)
     cal.run()
     strategy = cal.best_strategy(cal.results)
-    strategy_params = strategy.as_dict()
 
     if cal.results[-1]["best_improvement_factor"] > 1:
-        assert strategy_params != {}
+        assert strategy.technique.name == "ZNE"
     else:
-        assert strategy_params == {}
+        assert strategy.technique.name == "RAW"
 
 
 def test_bitstrings_to_distribution():

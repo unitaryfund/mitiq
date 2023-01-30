@@ -169,8 +169,7 @@ class Settings:
             not specify the depth.
         strategies: A specification of the methods/parameters to be used in
             calibration experiments.
-
-        seed: a random seed for (mirror) circuit generation.
+        seed: A random seed for (mirror) circuit generation.
     """
 
     def __init__(
