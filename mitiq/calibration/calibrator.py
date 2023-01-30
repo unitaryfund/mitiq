@@ -72,7 +72,7 @@ class Calibrator:
             else None
         )
         self.settings = settings
-        self.circuits = self.settings.make_circuits(self.settings.circuit_seed)
+        self.circuits = settings.make_circuits()
         self.results: List[Dict[str, Any]] = []
 
     def get_cost(self) -> Dict[str, int]:
@@ -187,11 +187,20 @@ class Calibrator:
         def filter_on_strategy(
             result: Dict[str, Dict[str, Dict[str, Any]]], strategy_id: int
         ) -> Dict[str, Dict[str, Dict[str, Any]]]:
+            """Obtain results corresponding to the strategy of interest.
+            Args:
+                result: Calibration experiment results.
+                strategy_id: Index of the strategy of interest.
+
+            Returns:
+                A dictionary of results corresponding to the strategy of
+                interest.
+            """
             res = result
             res["mitigated_values"]["ZNE"]["results"] = [
                 res["mitigated_values"]["ZNE"]["results"][strategy_id]
             ]
-            return result
+            return res
 
         for strategy_id in range(
             len(results[0]["mitigated_values"]["ZNE"]["results"])
@@ -220,9 +229,9 @@ class Calibrator:
             {"best_improvement_factor": best_improvement_factor}
         )
 
-        if strategy is None:
+        if strategy is DefaultStrategy:
             warnings.warn("None of the improvement factors were > 1")
-            return DefaultStrategy
+
         return strategy
 
     def run(self) -> None:

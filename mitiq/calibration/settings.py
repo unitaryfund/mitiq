@@ -169,6 +169,8 @@ class Settings:
             not specify the depth.
         strategies: A specification of the methods/parameters to be used in
             calibration experiments.
+
+        seed: a random seed for (mirror) circuit generation.
     """
 
     def __init__(
@@ -189,16 +191,16 @@ class Settings:
         self.circuit_depth = circuit_depth
         self.circuit_seed = circuit_seed
 
-    def make_circuits(
-        self, seed: Optional[int] = None
-    ) -> List[BenchmarkProblem]:
+    def make_circuits(self) -> List[BenchmarkProblem]:
         """Generate the circuits to run for the calibration experiment.
-        Args:
-            seed(optional): a random seed for (mirror) circuit generation.
         Returns:
             A list of :class:`BenchmarkProblem` objects"""
         circuits = []
-        nqubits, depth = self.num_qubits, self.circuit_depth
+        nqubits, depth, seed = (
+            self.num_qubits,
+            self.circuit_depth,
+            self.circuit_seed,
+        )
         for circuit_type in self.circuit_types:
             if circuit_type == "ghz":
                 circuit = generate_ghz_circuit(nqubits)
