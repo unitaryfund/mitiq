@@ -17,10 +17,10 @@ Readout error mitigation (REM), in general, is probably one of the most general
  and earliest error mitigation techniques, which itself can refer to a number
  of specific approaches.
 
-Readout error mitigation can include simple postselection of bitstrings. For
+A simple version of readout error mitigation is postselection of bitstrings. For
 example, if one knows that the measured bitstrings should preserve some
-symmetry, bitstrings that do not preserve it, can be discarded. This
-possibility is indeed available in {mod}`mitiq.rem.post_select`.
+symmetry, bitstrings that do not preserve it can be discarded. Such capability 
+is indeed available in {mod}`mitiq.rem.post_select`.
 
 With regards to the more elaborate technique of confusion matrix inversion,
 also [supported](rem-1-intro) in Mitiq, the most relevant references are Refs. {cite}`Maciejewski_2020,Bravyi_2021`.
