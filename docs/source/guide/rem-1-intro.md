@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.14.1
@@ -22,11 +22,10 @@ mitiq.SUPPORTED_PROGRAM_TYPES.keys()
 ```
 
 ## Problem setup
-In this example we will simulate a noisy device that flips qubits just before
-measurement to demonstrate the capabilities of REM. This method requires an 
+In this example we will simulate a noisy device to demonstrate the capabilities of REM. This method requires an 
 {ref}`observable <guide/observables/observables>` to be defined, and we use
 $Z_0 + Z_1$ as an example. Since the circuit includes an $X$ gate on each qubit, 
-the expectation value should be $-2$.
+the noiseless expectation value should be $-2$.
 
 ```{code-cell} ipython3
 from cirq import LineQubit, Circuit, X, measure_each
@@ -61,9 +60,7 @@ from cirq.experiments.single_qubit_readout_calibration_test import (
 
 from mitiq import MeasurementResult
 
-def noisy_readout_executor(
-    circuit, p0: float = 0.01, p1: float = 0.01, shots: int = 8192
-) -> MeasurementResult:
+def noisy_readout_executor(circuit, p0, p1, shots=8192) -> MeasurementResult:
     # Replace with code based on your frontend and backend.
     simulator = NoisySingleQubitReadoutSampler(p0, p1)
     result = simulator.run(circuit, repetitions=shots)
@@ -78,7 +75,7 @@ expectation values.
 from mitiq.raw import execute as raw_execute
 
 # Compute the expectation value of the observable.
-# Use a noisy executor that has a 25% chance of flipping
+# Use a noisy executor that has a 25% chance of bit flipping
 p_flip = 0.25
 noisy_executor = partial(noisy_readout_executor, p0=p_flip, p1=p_flip)
 noisy_value = raw_execute(circuit, noisy_executor, observable)
@@ -89,7 +86,7 @@ error = abs((ideal_value - noisy_value)/ideal_value)
 print(f"Error without mitigation: {error:.3}")
 ```
 
-## Apply REM to raw readout results
+## Apply REM
 Readout-error mitigation can be easily applied with the function
 {func}`.execute_with_rem()`.
 
@@ -101,11 +98,9 @@ from mitiq import rem
 # you can supply your own confusion matrices and invert them using the helper
 # function generate_tensored_inverse_confusion_matrix().
 inverse_confusion_matrix = generate_inverse_confusion_matrix(2, p_flip, p_flip)
-circuit_with_measurements = circuit.copy()
-circuit_with_measurements.append(measure_each(*qreg))
 
 mitigated_result = rem.execute_with_rem(
-    circuit_with_measurements,
+    circuit,
     noisy_executor,
     observable,
     inverse_confusion_matrix=inverse_confusion_matrix,

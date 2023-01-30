@@ -280,6 +280,15 @@ class Executor:
         results_dict = dict(zip(collection.keys(), these_results))
         results = [results_dict[key] for key in hashable_circuits]
 
+        return self._post_run(results)
+
+    def _post_run(
+        self, results: Sequence[QuantumResult]
+    ) -> Sequence[QuantumResult]:
+        """Post-processes the measurement results.
+        For example, this method can be overridden by a
+        readout error mitigation function.
+        """
         return results
 
     def _call_executor(
