@@ -90,7 +90,7 @@ In each code example we show an explicit computation of the full $2^n \times 2^n
 ```
 
 ### Inverse confusion matrix from $k$ local confusion matrices 
-The function `generate_tensored_inverse_confusion_matrix(num_qubits, confusion_matrices)` can be applied to any $n$-qubit confusion matrix $A$ which is factorized into the tensor product of $k$ smaller, local confusion matrices (supplied by the user in `confusion_matrices`), one for each subgroup in a partition of the $n$ qubits into $k$ smaller subgroups. The factorization encodes the assumption that there are $k$ independent/uncorrelated noise processes affecting the $k$ disjoint subgroups of qubits (possibly of different sizes), but within each subgroup noise may be correlated between qubits in that subgroup. This model includes the simplest noise model above as the special case where $k=n$ and each of the $n$ single-qubit subgroups has the same confusion matrix $A_1$:
+The function `generate_tensored_inverse_confusion_matrix(num_qubits, confusion_matrices)` can be applied to any $n$-qubit confusion matrix $A$ which is factorized into the tensor product of $k$ smaller, local confusion matrices (supplied by the user in `confusion_matrices`), one for each subset in a partition of the $n$ qubits into $k$ smaller subsets. The factorization encodes the assumption that there are $k$ independent/uncorrelated noise processes affecting the $k$ disjoint subsets of qubits (possibly of different sizes), but within each subset noise may be correlated between qubits in that subset. This model includes the simplest noise model above as the special case where $k=n$ and each of the $n$ single-qubit subsets has the same confusion matrix $A_1$:
 
 $$
 A = A^{(1)}_1 \otimes \dots \otimes A^{(n)}_1.
