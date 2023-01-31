@@ -15,7 +15,7 @@
 
 from dataclasses import dataclass, astuple, asdict
 from functools import partial
-from typing import Any, Callable, cast, Iterator, List, Dict, Tuple
+from typing import Any, Callable, cast, Iterator, List, Dict, Tuple, Optional
 from enum import Enum, auto
 
 import networkx as nx
@@ -169,6 +169,7 @@ class Settings:
             not specify the depth.
         strategies: A specification of the methods/parameters to be used in
             calibration experiments.
+        seed: A random seed for (mirror) circuit generation.
     """
 
     def __init__(
@@ -177,6 +178,7 @@ class Settings:
         num_qubits: int,
         circuit_depth: int,
         strategies: List[Dict[str, Any]],
+        circuit_seed: Optional[int] = None,
     ):
         self.techniques = [
             MitigationTechnique[technique["technique"].upper()]
@@ -186,14 +188,18 @@ class Settings:
         self.circuit_types = circuit_types
         self.num_qubits = num_qubits
         self.circuit_depth = circuit_depth
+        self.circuit_seed = circuit_seed
 
     def make_circuits(self) -> List[BenchmarkProblem]:
         """Generate the circuits to run for the calibration experiment.
-
         Returns:
             A list of :class:`BenchmarkProblem` objects"""
         circuits = []
-        nqubits, depth = self.num_qubits, self.circuit_depth
+        nqubits, depth, seed = (
+            self.num_qubits,
+            self.circuit_depth,
+            self.circuit_seed,
+        )
         for circuit_type in self.circuit_types:
             if circuit_type == "ghz":
                 circuit = generate_ghz_circuit(nqubits)
@@ -206,6 +212,7 @@ class Settings:
                     nlayers=depth,
                     two_qubit_gate_prob=1.0,
                     connectivity_graph=nx.complete_graph(nqubits),
+                    seed=seed,
                 )
                 ideal_bitstring = "".join(map(str, bitstring_list))
                 ideal = {ideal_bitstring: 1.0}
