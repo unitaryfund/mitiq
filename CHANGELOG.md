@@ -1,5 +1,7 @@
 # Changelog
 
+## Version 0.24.0 (In development)
+
 ## Version 0.23.0
 
 The main improvements introduced in this release are:
