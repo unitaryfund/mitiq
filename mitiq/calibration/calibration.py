@@ -133,6 +133,7 @@ class Calibrator:
     ) -> None:
         """Computes the improvement factors for each calibration circuit that
         was run. Saves the improvement factors in the input dictionary."""
+        regularizing_epsilon = 1e-30
         for result in experiment_results:
             ideal_value = result["ideal_value"]
             noisy_value = result["noisy_value"]
@@ -142,7 +143,7 @@ class Calibrator:
                     map(lambda di: di["mitigated_value"], results)
                 )
                 improvement_factor = abs(noisy_value - ideal_value) / sqrt(
-                    len(mitigated_values)
+                    regularizing_epsilon + len(mitigated_values)
                     * sum(
                         (mitigated_value - ideal_value) ** 2
                         for mitigated_value in mitigated_values
