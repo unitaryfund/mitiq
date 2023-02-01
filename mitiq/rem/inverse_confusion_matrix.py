@@ -17,7 +17,7 @@ from functools import reduce
 from typing import List, Sequence
 import numpy as np
 import numpy.typing as npt
-
+import scipy
 
 from mitiq import MeasurementResult, Bitstring
 
@@ -136,6 +136,42 @@ def generate_tensored_inverse_confusion_matrix(
     return tensored_inv_cm
 
 
+def closest_positive_distribution(
+    quasi_probabilities: npt.NDArray[np.float64],
+) -> npt.NDArray[np.float64]:
+    """Given the input quasi-probability distribution returns the closest
+    positive probability distribution (with respect to the total variation
+    distance).
+
+    Args:
+        quasi_probabilities: The input array of real coefficients.
+
+    Returns:
+        The closest probability distribution.
+    """
+    quasi_probabilities = np.array(quasi_probabilities, dtype=np.float64)
+    init_guess = quasi_probabilities.clip(min=0)
+    init_guess /= np.sum(init_guess)
+
+    def distance(probabilities: npt.NDArray[np.float64]) -> np.float64:
+        return np.linalg.norm(probabilities - quasi_probabilities)
+
+    num_vars = len(init_guess)
+    bounds = scipy.optimize.Bounds(np.zeros(num_vars), np.ones(num_vars))
+    normalization = scipy.optimize.LinearConstraint(np.ones(num_vars).T, 1, 1)
+    result = scipy.optimize.minimize(
+        distance,
+        init_guess,
+        bounds=bounds,
+        constraints=normalization,
+    )
+    if not result.success:
+        raise ValueError(
+            "REM failed to determine the closest positive distribution."
+        )
+    return result.x
+
+
 def mitigate_measurements(
     noisy_result: MeasurementResult,
     inverse_confusion_matrix: npt.NDArray[np.float64],
@@ -163,16 +199,11 @@ def mitigate_measurements(
         )
 
     empirical_prob_dist = bitstrings_to_probability_vector(noisy_result.result)
-
-    adjusted_prob_dist = (inverse_confusion_matrix @ empirical_prob_dist.T).T
-    # remove negative values
-    adjusted_prob_dist = adjusted_prob_dist.clip(min=0)
-    # re-normalize, so values sum to 1
-    adjusted_prob_dist /= np.sum(adjusted_prob_dist)
-
-    adjusted_result = sample_probability_vector(
+    adjusted_quasi_dist = (inverse_confusion_matrix @ empirical_prob_dist.T).T
+    adjusted_prob_dist = closest_positive_distribution(adjusted_quasi_dist)
+    adjusted_bitstrings = sample_probability_vector(
         adjusted_prob_dist, noisy_result.shots
     )
+    result = MeasurementResult(adjusted_bitstrings, noisy_result.qubit_indices)
 
-    result = MeasurementResult(adjusted_result, noisy_result.qubit_indices)
     return result

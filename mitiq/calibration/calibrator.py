@@ -152,6 +152,7 @@ class Calibrator:
         Args:
             experiment_results: Results obtained from :func:`run_circuits`.
         """
+        regularizing_epsilon = 1e-30
         for result in experiment_results:
             ideal_value = result["ideal_value"]
             noisy_value = result["noisy_value"]
@@ -159,7 +160,8 @@ class Calibrator:
                 results = di["results"]
                 mitigated_values = [di["mitigated_value"] for di in results]
                 improvement_factor = abs(noisy_value - ideal_value) / sqrt(
-                    len(mitigated_values)
+                    regularizing_epsilon
+                    + len(mitigated_values)
                     * sum(
                         (mitigated_value - ideal_value) ** 2
                         for mitigated_value in mitigated_values
