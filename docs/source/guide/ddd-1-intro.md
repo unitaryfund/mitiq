@@ -1,0 +1,117 @@
+---
+jupytext:
+  text_representation:
+    extension: .myst
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.11.1
+kernelspec:
+  display_name: Python 3 (ipykernel)
+  language: python
+  name: python3
+---
+
+# How do I use DDD?
+
+As with all techniques, DDD is compatible with any frontend supported by Mitiq:
+
+```{code-cell} ipython3
+import mitiq
+
+mitiq.SUPPORTED_PROGRAM_TYPES.keys()
+```
+
+
+## Problem setup
+We first define the circuit of interest. In this example, the circuit has a
+slack window with a length of 4 (in the sense that 4 single-qubit gates can fit in that window).
+
+```{code-cell} ipython3
+from cirq import LineQubit, Circuit, rx, rz, CNOT
+
+a, b = LineQubit.range(2)
+circuit = Circuit(
+    rx(0.1).on(a),
+    rx(0.1).on(a),
+    rz(0.4).on(a),
+    rx(-0.72).on(a),
+    rz(0.2).on(a),
+    rx(-0.8).on(b),
+    CNOT.on(a, b),
+)
+
+print(circuit)
+```
+
+Next we define a simple executor function which inputs a circuit, executes
+the circuit on a noisy simulator, and returns the probability of the ground
+state. See the [Executors](executors.md) section for more information on
+how to define more advanced executors.
+
+```{code-cell} ipython3
+import numpy as np
+from cirq import DensityMatrixSimulator, amplitude_damp
+from mitiq.interface import convert_to_mitiq
+
+def execute(circuit, noise_level=0.1):
+    """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit
+    executed with amplitude damping noise.
+    """
+    # Replace with code based on your frontend and backend.
+    mitiq_circuit, _ = convert_to_mitiq(circuit)
+    noisy_circuit = mitiq_circuit.with_noise(amplitude_damp(gamma=noise_level))
+    rho = DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix
+    return rho[0, 0].real
+```
+
+The [executor](executors.md) can be used to evaluate noisy (unmitigated)
+expectation values.
+
+```{code-cell} ipython3
+# Compute the expectation value of the |0><0| observable.
+noisy_value = execute(circuit)
+ideal_value = execute(circuit, noise_level=0.0)
+print(f"Error without mitigation: {abs(ideal_value - noisy_value) :.3}")
+```
+
+## Select the DDD sequences to be applied
+We now import a DDD _rule_ from Mitiq, i. e., a function that generates DDD sequences of different length.
+In this example, we opt for YY sequences (pairs of Pauli Y operations).
+```{code-cell} ipython3
+from mitiq import ddd
+
+rule = ddd.rules.yy
+```
+
+## Apply DDD
+Digital dynamical decoupling can be easily implemented with the function
+{func}`.execute_with_ddd()`.
+
+```{code-cell} ipython3
+mitigated_result = ddd.execute_with_ddd(
+    circuit=circuit,
+    executor=execute,
+    rule=rule,
+)
+```
+
+```{code-cell} ipython3
+print(f"Error with mitigation (DDD): {abs(ideal_value - mitigated_result) :.3}")
+```
+
+Here we observe that the application of DDD reduces the estimation error when compared
+to the unmitigated result.
+
+```{admonition} Note:
+DDD is designed to mitigate noise that has a finite correlation time. For the
+simple Markovian noise simulated in this example, DDD can still have a
+non-trivial effect on the final error, but it is not always a positive effect.
+For example, one can check that by changing the parameters of the input circuit,
+the error with DDD is sometimes larger than the unmitigated error.
+```
+
++++
+
+The section
+[What additional options are available when using DDD?](ddd-3-options.md)
+contains information on more advanced ways of applying DDD with Mitiq.

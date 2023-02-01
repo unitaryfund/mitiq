@@ -95,9 +95,8 @@ master_doc = "index"
 # -- Options for myst_parser -------------------------------------------------
 # Specifies which of the parsers should handle each file extension.
 source_suffix = {
+    ".md": "myst-nb",
     ".ipynb": "myst-nb",
-    ".myst": "myst-nb",
-    ".mystnb": "myst-nb",
 }
 
 # Enables extensions to MyST parser that allows for richer markup options.
@@ -112,7 +111,7 @@ myst_enable_extensions = [
     "smartquotes",
 ]
 
-myst_heading_anchors = 3
+myst_heading_anchors = 4
 
 # Tells MyST to treat URIs beginning with these prefixes as external links.
 # Links that don't begin with these will be treated as internal cross-links.

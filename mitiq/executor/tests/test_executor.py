@@ -117,7 +117,7 @@ def test_executor_non_hermitian_observable():
 def test_run_executor_identical_circuits_batched(ncircuits, executor):
     collector = Executor(executor=executor, max_batch_size=10)
     circuits = [cirq.Circuit(cirq.H(cirq.LineQubit(0)))] * ncircuits
-    results = collector._run(circuits)
+    results = collector.run(circuits)
 
     assert np.allclose(results, np.zeros(ncircuits))
     assert collector.calls_to_executor == 1
@@ -134,7 +134,7 @@ def test_run_executor_nonidentical_pyquil_programs(batch_size):
         pyquil.Program(pyquil.gates.X(0)),
         pyquil.Program(pyquil.gates.H(0)),
     ] * 10
-    results = collector._run(circuits)
+    results = collector.run(circuits)
 
     assert np.allclose(results, np.zeros(len(circuits)))
     if batch_size == 1:
@@ -156,7 +156,7 @@ def test_run_executor_all_unique(ncircuits, batch_size):
         )
         for _ in range(ncircuits)
     ]
-    results = collector._run(circuits)
+    results = collector.run(circuits)
 
     assert np.allclose(results, np.zeros(ncircuits))
     assert collector.calls_to_executor == np.ceil(ncircuits / batch_size)
@@ -171,7 +171,7 @@ def test_run_executor_force_run_all_serial_executor_identical_circuits(
     assert not collector.can_batch
 
     circuits = [cirq.Circuit(cirq.H(cirq.LineQubit(0)))] * ncircuits
-    results = collector._run(circuits, force_run_all=force_run_all)
+    results = collector.run(circuits, force_run_all=force_run_all)
 
     assert np.allclose(results, np.zeros(ncircuits))
     if force_run_all:
@@ -192,7 +192,7 @@ def test_run_executor_preserves_order(s, b):
     ]
     batch = choices(circuits, k=s)
 
-    assert np.allclose(collector._run(batch), executor_batched_unique(batch))
+    assert np.allclose(collector.run(batch), executor_batched_unique(batch))
 
 
 @pytest.mark.parametrize(

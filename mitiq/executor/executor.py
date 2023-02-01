@@ -187,7 +187,7 @@ class Executor:
             result_step = 1
 
         # Run all required circuits.
-        all_results = self._run(all_circuits, force_run_all, **kwargs)
+        all_results = self.run(all_circuits, force_run_all, **kwargs)
 
         # Parse the results.
         if self._executor_return_type in FloatLike:
@@ -221,7 +221,7 @@ class Executor:
 
         return results  # type: ignore[return-value]
 
-    def _run(
+    def run(
         self,
         circuits: Sequence[QPROGRAM],
         force_run_all: bool = False,
@@ -233,8 +233,8 @@ class Executor:
         Args:
             circuits: Sequence of circuits to execute using the executor.
             force_run_all: If True, force every circuit in the input sequence
-            to be executed (if some are identical). Else, detects identical
-            circuits and runs a minimal set.
+                to be executed (if some are identical). Else, detects identical
+                circuits and runs a minimal set.
         """
         start_result_index = len(self._quantum_results)
 
@@ -280,6 +280,15 @@ class Executor:
         results_dict = dict(zip(collection.keys(), these_results))
         results = [results_dict[key] for key in hashable_circuits]
 
+        return self._post_run(results)
+
+    def _post_run(
+        self, results: Sequence[QuantumResult]
+    ) -> Sequence[QuantumResult]:
+        """Post-processes the measurement results.
+        For example, this method can be overridden by a
+        readout error mitigation function.
+        """
         return results
 
     def _call_executor(
@@ -312,10 +321,10 @@ class Executor:
         The executor is detected as "batched" if and only if it is annotated
         with a return type that is one of the following:
 
-            * ``Iterable[QuantumResult]``
-            * ``List[QuantumResult]``
-            * ``Sequence[QuantumResult]``
-            * ``Tuple[QuantumResult]``
+        * ``Iterable[QuantumResult]``
+        * ``List[QuantumResult]``
+        * ``Sequence[QuantumResult]``
+        * ``Tuple[QuantumResult]``
 
         Otherwise, it is considered "serial".
 
@@ -325,10 +334,11 @@ class Executor:
         Args:
             executor: A "serial executor" (1) or a "batched executor" (2).
 
-                (1) A function which inputs a single ``QPROGRAM`` and outputs a
-                single ``QuantumResult``.
-                (2) A function which inputs a list of ``QPROGRAM``s and outputs
-                a list of ``QuantumResult``s (one for each ``QPROGRAM``).
+                #. A function which inputs a single ``QPROGRAM`` and outputs a
+                   single ``QuantumResult``.
+                #. A function which inputs a list of ``QPROGRAM`` objects and
+                   returns a list of ``QuantumResult`` instances (one for each
+                   ``QPROGRAM``).
 
         Returns:
             True if the executor is detected as batched, else False.

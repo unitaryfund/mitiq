@@ -22,17 +22,19 @@ from schema import Schema, Or
 
 from mitiq import Executor, MeasurementResult
 from mitiq.benchmarks import generate_rb_circuits
-from mitiq.calibration import Calibrator, Settings, ZNESettings
-from mitiq.calibration.calibration import (
+from mitiq.calibration import (
+    Calibrator,
+    Settings,
+    ZNESettings,
+    execute_with_mitigation,
+)
+from mitiq.calibration.calibrator import (
     bitstrings_to_distribution,
     convert_to_expval_executor,
 )
 from mitiq.calibration.settings import Strategy
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
-from mitiq.zne.scaling import (
-    fold_gates_at_random,
-    fold_global,
-)
+from mitiq.zne.scaling import fold_global
 
 
 def execute(circuit, noise_level=0.001):
@@ -51,18 +53,31 @@ def execute(circuit, noise_level=0.001):
 
 
 settings = Settings(
-    techniques=["zne"],
     circuit_types=["ghz", "rb"],
     num_qubits=2,
     circuit_depth=10,
-    technique_params={
-        "scale_factors": [[1.0, 1.2, 1.4], [1.0, 1.5, 2.0], [1.0, 2.0, 3.0]],
-        "scale_methods": [
-            fold_global,
-            fold_gates_at_random,
-        ],
-        "factories": [RichardsonFactory, LinearFactory],
-    },
+    strategies=[
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": RichardsonFactory([1.0, 3.0, 5.0]),
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": LinearFactory([1.0, 2.0, 3.0]),
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": LinearFactory([1.0, 3.0, 5.0]),
+        },
+    ],
 )
 
 
@@ -72,14 +87,14 @@ def test_ZNE_workflow():
 
     cal.run()
     assert len(cal.results) == 3
-    assert cal.results[0]["mitigated_values"]["zne"]["improvement_factor"] >= 0
+    assert cal.results[0]["mitigated_values"]["ZNE"]["improvement_factor"] >= 0
     assert isinstance(cal.best_strategy(cal.results), Strategy)
 
 
 def test_get_cost():
     cal = Calibrator(execute, settings)
     cost = cal.get_cost()
-    expected_cost = 2 * 3 * 2 * 2  # circuits * scale * methods * factories
+    expected_cost = 2 * 4  # circuits * num_experiments
     assert cost["noisy_executions"] == expected_cost
     assert cost["ideal_executions"] == 0
 
@@ -124,16 +139,56 @@ def test_compute_improvements_modifies_IF():
     cal = Calibrator(execute, settings)
     cal.run_circuits()
     IFs = [
-        res["mitigated_values"]["zne"]["improvement_factor"]
+        res["mitigated_values"]["ZNE"]["improvement_factor"]
         for res in cal.results
     ]
     assert all(IF is None for IF in IFs)
     cal.compute_improvements(cal.results)
     IFs = [
-        res["mitigated_values"]["zne"]["improvement_factor"]
+        res["mitigated_values"]["ZNE"]["improvement_factor"]
         for res in cal.results
     ]
     assert all(IF is not None for IF in IFs)
+
+
+def test_best_strategy():
+    test_strategy_settings = Settings(
+        circuit_types=["ghz", "mirror"],
+        num_qubits=2,
+        circuit_depth=10,
+        strategies=[
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+            },
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": RichardsonFactory([1.0, 3.0, 5.0]),
+            },
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": LinearFactory([1.0, 2.0, 3.0]),
+            },
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": LinearFactory([1.0, 3.0, 5.0]),
+            },
+        ],
+        circuit_seed=1,
+    )
+    for _ in range(5):
+        cal = Calibrator(execute, test_strategy_settings)
+        cal.run()
+        strategy = cal.best_strategy(cal.results)
+
+        if cal.results[-1]["best_improvement_factor"] > 1:
+            assert strategy.technique.name == "ZNE"
+        else:
+            assert strategy.technique.name == "RAW"
 
 
 def test_bitstrings_to_distribution():
@@ -164,4 +219,17 @@ def test_convert_to_expval_executor():
     assert np.isclose(rb_circuit_expval, 1.0)
 
 
-# def test_execute_with_mitigation():
+def test_execute_with_mitigation():
+    cal = Calibrator(execute, ZNESettings)
+
+    expval_executor, _ = convert_to_expval_executor(
+        Executor(execute), {"00": 1.0}
+    )
+    rb_circuit = generate_rb_circuits(2, 10)[0]
+    rb_circuit.append(cirq.measure(rb_circuit.all_qubits()))
+
+    expval = execute_with_mitigation(
+        rb_circuit, expval_executor, calibrator=cal
+    )
+    assert isinstance(expval, float)
+    assert 0 <= expval <= 1.5
