@@ -1,7 +1,6 @@
 # Examples
 
-Below you can find a gallery of tutorials applying Zero Noise Extrapolation (ZNE)
-and Probabilistic Error Cancellation (PEC) with Mitiq:
+Below you can find a gallery of tutorials applying Zero Noise Extrapolation (ZNE), Probabilistic Error Cancellation (PEC), and Digital Dynamical Decoupling (DDD) with Mitiq:
 
 ```{nbgallery}
 ZNE on a Rigetti backend with Braket: Mirror circuits <braket_mirror_circuit.md>
