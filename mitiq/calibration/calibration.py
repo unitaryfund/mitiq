@@ -143,7 +143,8 @@ class Calibrator:
                     map(lambda di: di["mitigated_value"], results)
                 )
                 improvement_factor = abs(noisy_value - ideal_value) / sqrt(
-                    regularizing_epsilon + len(mitigated_values)
+                    regularizing_epsilon
+                    + len(mitigated_values)
                     * sum(
                         (mitigated_value - ideal_value) ** 2
                         for mitigated_value in mitigated_values
