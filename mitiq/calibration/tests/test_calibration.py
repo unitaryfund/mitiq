@@ -29,7 +29,6 @@ from mitiq.calibration import (
     execute_with_mitigation,
 )
 from mitiq.calibration.calibrator import (
-    bitstrings_to_distribution,
     convert_to_expval_executor,
 )
 from mitiq.calibration.settings import Strategy
@@ -189,22 +188,6 @@ def test_best_strategy():
             assert strategy.technique.name == "ZNE"
         else:
             assert strategy.technique.name == "RAW"
-
-
-def test_bitstrings_to_distribution():
-    bitstrings = [[1, 1], [1, 1], [1, 1], [1, 0]]
-    distribution = bitstrings_to_distribution(bitstrings)
-    assert distribution == {"11": 0.75, "10": 0.25}
-
-    bitstrings = [[0, 0, 0], [0, 0, 1], [0, 0, 1], [1, 0, 0], [0, 0, 1]]
-    distribution = bitstrings_to_distribution(bitstrings)
-    assert distribution == {"000": 0.2, "001": 0.6, "100": 0.2}
-
-
-def test_bitstrings_to_distribution_normalized():
-    bitstrings = np.random.randint(2, size=(50, 3))
-    distribution = bitstrings_to_distribution(bitstrings)
-    assert np.isclose(sum(distribution.values()), 1)
 
 
 def test_convert_to_expval_executor():

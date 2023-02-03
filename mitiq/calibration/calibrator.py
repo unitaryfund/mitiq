@@ -15,7 +15,6 @@
 
 from copy import deepcopy
 import warnings
-from collections import Counter
 from math import sqrt
 from typing import (
     Any,
@@ -25,7 +24,6 @@ from typing import (
     Optional,
     Union,
     cast,
-    Sequence,
 )
 
 import cirq
@@ -243,20 +241,6 @@ class Calibrator:
         self.results = results
 
 
-def bitstrings_to_distribution(
-    bitstrings: Sequence[List[int]],
-) -> Dict[str, float]:
-    """Helper function to convert raw measurement results to probability
-    distributions."""
-    distribution = Counter(
-        ["".join(map(str, bitstring)) for bitstring in bitstrings]
-    )
-    bitstring_count = len(bitstrings)
-    for bitstring in distribution:
-        distribution[bitstring] /= bitstring_count  # type: ignore [assignment]
-    return dict(distribution)
-
-
 def convert_to_expval_executor(
     executor: Executor,
     bitstring: str,
@@ -276,10 +260,9 @@ def convert_to_expval_executor(
     """
 
     def expval_executor(circuit: cirq.Circuit) -> float:
-        raw = cast(MeasurementResult, executor.run([circuit])[0]).result
-        raw = cast(List[List[int]], raw)
-        bitstring_distribution = bitstrings_to_distribution(raw)
-        return bitstring_distribution.get(bitstring, 0)
+        raw = cast(MeasurementResult, executor.run([circuit])[0])
+        distribution = raw.prob_distribution()
+        return distribution.get(bitstring, 0)
 
     return Executor(expval_executor)
 
