@@ -76,6 +76,9 @@ class BenchmarkProblem:
     def __getitem__(self, keys: Tuple[str, ...]) -> Iterator[Any]:
         return iter(getattr(self, k) for k in keys)
 
+    def most_likely_bitstring(self) -> str:
+        return max(self.ideal_distribution, key=self.ideal_distribution.get)
+
     @property
     def num_qubits(self) -> int:
         return len(self.circuit.all_qubits())

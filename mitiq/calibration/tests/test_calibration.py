@@ -209,8 +209,8 @@ def test_bitstrings_to_distribution_normalized():
 
 def test_convert_to_expval_executor():
     noiseless_bitstring_executor = Executor(partial(execute, noise_level=0))
-    noiseless_expval_executor, _ = convert_to_expval_executor(
-        noiseless_bitstring_executor, {"00": 1.0}
+    noiseless_expval_executor = convert_to_expval_executor(
+        noiseless_bitstring_executor, bitstring="00"
     )
     rb_circuit = generate_rb_circuits(2, 10)[0]
     rb_circuit.append(cirq.measure(rb_circuit.all_qubits()))
@@ -222,8 +222,8 @@ def test_convert_to_expval_executor():
 def test_execute_with_mitigation():
     cal = Calibrator(execute, ZNESettings)
 
-    expval_executor, _ = convert_to_expval_executor(
-        Executor(execute), {"00": 1.0}
+    expval_executor = convert_to_expval_executor(
+        Executor(execute), bitstring="00"
     )
     rb_circuit = generate_rb_circuits(2, 10)[0]
     rb_circuit.append(cirq.measure(rb_circuit.all_qubits()))

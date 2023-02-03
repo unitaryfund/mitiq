@@ -23,7 +23,6 @@ from typing import (
     Dict,
     List,
     Optional,
-    Tuple,
     Union,
     cast,
     Sequence,
@@ -104,9 +103,11 @@ class Calibrator:
             circuit, distribution = problem["circuit", "ideal_distribution"]
             circuit.append(cirq.measure(circuit.all_qubits()))
 
-            expval_executor, bitstring_to_measure = convert_to_expval_executor(
-                self.executor, distribution
+            bitstring_to_measure = problem.most_likely_bitstring()
+            expval_executor = convert_to_expval_executor(
+                self.executor, bitstring_to_measure
             )
+
             noisy_value = expval_executor.evaluate(circuit)[0]
             ideal_value = distribution[bitstring_to_measure]
             noisy_error = ideal_value - noisy_value
@@ -258,9 +259,8 @@ def bitstrings_to_distribution(
 
 def convert_to_expval_executor(
     executor: Executor,
-    distribution: Optional[Dict[str, float]] = None,
-    bitstring: Optional[str] = None,
-) -> Tuple[Executor, str]:
+    bitstring: str,
+) -> Executor:
     """Constructs a new executor returning an expectation value given by the
     probability that the circuit outputs the most likely state according to the
     ideal distribution.
@@ -268,32 +268,20 @@ def convert_to_expval_executor(
     Args:
         executor: Executor which returns a :class:`.MeasurementResult`
             (bitstrings).
-        distribution: The ideal distribution at the end of the circuit run.
         bitstring: The bitstring to measure the probability of.
 
     Returns:
         A tuple containing an executor returning expectation values and,
         the most likely bitstring, according to the passed ``distribution``
     """
-    bitstring_to_measure = ""
-    if distribution:
-        bitstring_to_measure = max(
-            distribution,
-            key=distribution.get,  # type: ignore [arg-type]
-        )
-    elif bitstring:
-        bitstring_to_measure = bitstring
 
     def expval_executor(circuit: cirq.Circuit) -> float:
         raw = cast(MeasurementResult, executor.run([circuit])[0]).result
         raw = cast(List[List[int]], raw)
         bitstring_distribution = bitstrings_to_distribution(raw)
-        return bitstring_distribution.get(bitstring_to_measure, 0)
+        return bitstring_distribution.get(bitstring, 0)
 
-    return (
-        Executor(expval_executor),  # type: ignore [arg-type]
-        bitstring_to_measure,
-    )
+    return Executor(expval_executor)
 
 
 def execute_with_mitigation(
