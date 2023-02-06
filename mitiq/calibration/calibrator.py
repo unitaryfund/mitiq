@@ -13,18 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from copy import deepcopy
-import warnings
 from math import sqrt
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Union,
-    cast,
-)
+from typing import Any, Callable, Dict, List, Optional, Union, cast
+from collections import defaultdict
+from dataclasses import dataclass
 
 import cirq
 
@@ -35,7 +27,19 @@ from mitiq import (
     Observable,
     QuantumResult,
 )
-from mitiq.calibration.settings import Settings, Strategy, DefaultStrategy
+from mitiq.calibration.settings import (
+    Settings,
+    Strategy,
+    BenchmarkProblem,
+)
+
+
+@dataclass
+class Result:
+    strategy: Strategy
+    problem: BenchmarkProblem
+    results: Dict[str, float]
+    id: int = -1
 
 
 class Calibrator:
@@ -70,7 +74,7 @@ class Calibrator:
         )
         self.settings = settings
         self.circuits = settings.make_circuits()
-        self.results: List[Dict[str, Any]] = []
+        self.results: List[Result] = []
 
     def get_cost(self) -> Dict[str, int]:
         """Returns the expected number of noisy and ideal expectation values
@@ -89,16 +93,18 @@ class Calibrator:
             "ideal_executions": ideal,
         }
 
-    def run_circuits(self) -> List[Dict[str, Any]]:
+    def run_circuits(self) -> List[Result]:
         """Runs all the circuits required for calibration.
 
         Returns:
             A collection of experimental results along with a summary of each
             :class:`BenchmarkProblem` that was run.
         """
-        expvals = []
+        results = []
+
+        strategies = self.settings.make_strategies()
         for problem in self.circuits:
-            circuit, distribution = problem["circuit", "ideal_distribution"]
+            circuit = problem.circuit
             circuit.append(cirq.measure(circuit.all_qubits()))
 
             bitstring_to_measure = problem.most_likely_bitstring()
@@ -107,40 +113,38 @@ class Calibrator:
             )
 
             noisy_value = expval_executor.evaluate(circuit)[0]
-            ideal_value = distribution[bitstring_to_measure]
-            noisy_error = ideal_value - noisy_value
 
-            mitigated_values: Dict[str, Dict[str, Any]] = {
-                technique.name: {"results": [], "improvement_factor": None}
-                for technique in self.settings.techniques
-            }
-            for strategy in self.settings.make_strategies():
+            for strategy in strategies:
                 mitigated_value = strategy.mitigation_function(
                     circuit, expval_executor
                 )
-                improvement_factor = abs(
-                    noisy_error / (ideal_value - mitigated_value)
-                )
 
                 result = {
-                    "mitigated_value": mitigated_value,
-                    "improvement_factor": improvement_factor,
-                    "strategy": strategy,
-                    **strategy.as_dict(),
+                    "mitigated": mitigated_value,
+                    "noisy": noisy_value,
+                    "ideal": problem.largest_probability(),
                 }
-                technique = strategy.technique.name
-                mitigated_values[technique]["results"].append(result)
+                summary = Result(
+                    strategy=strategy, problem=problem, results=result
+                )
+                results.append(summary)
 
-            circuit_info = problem.problem_summary_dict()
-            expvals.append(
-                {
-                    "circuit_info": circuit_info,
-                    "noisy_value": noisy_value,
-                    "ideal_value": distribution[bitstring_to_measure],
-                    "mitigated_values": mitigated_values,
-                }
-            )
-        return expvals
+        return results
+
+    def filter_problems(
+        self, results: List[Result]
+    ) -> Dict[int, List[Dict[str, float]]]:
+
+        di = defaultdict(list)
+        for res in results:
+            di[res.strategy.id].append(res.results)
+
+        return di
+
+    def get_strategy(self, strategy_id: int) -> Strategy:
+        for res in self.results:
+            if res.strategy.id == strategy_id:
+                return res.strategy
 
     def compute_improvements(
         self, experiment_results: List[Dict[str, Any]]
@@ -168,76 +172,37 @@ class Calibrator:
                 )
                 di["improvement_factor"] = improvement_factor
 
-    def best_strategy(self, results: List[Dict[str, Any]]) -> Strategy:
+    def compute_errors(self, results: List[Result]) -> Dict[int, float]:
+        errors = {}
+        strategy_results = self.filter_problems(results)
+        for strategy_id, results in strategy_results.items():
+            average_error = 0
+            for result in results:
+                average_error += abs(result["ideal"] - result["mitigated"])
+
+            errors[strategy_id] = average_error / len(results)
+
+        return errors
+
+    def best_strategy(self, results: List[Result]) -> Strategy:
         """Finds the best strategy by using the parameters that had the
-        largest improvement factor.
+        smallest error.
 
         Args:
             results: Calibration experiment results. Obtained by first running
-                :func:`run_circuits` and :func:`compute_improvements`.
+                :func:`run_circuits`.
 
         Returns:
             A single :class:`Strategy` object specifying the technique and
             parameters that performed best.
         """
-        best_improvement_factor = 1.0
-        num_circuits = len(self.settings.circuit_types)
+        errors = self.compute_errors(results)
 
-        strategy = DefaultStrategy
-
-        def filter_on_strategy(
-            result: Dict[str, Dict[str, Dict[str, Any]]], strategy_id: int
-        ) -> Dict[str, Dict[str, Dict[str, Any]]]:
-            """Obtain results corresponding to the strategy of interest.
-            Args:
-                result: Calibration experiment results.
-                strategy_id: Index of the strategy of interest.
-
-            Returns:
-                A dictionary of results corresponding to the strategy of
-                interest.
-            """
-            res = result
-            res["mitigated_values"]["ZNE"]["results"] = [
-                res["mitigated_values"]["ZNE"]["results"][strategy_id]
-            ]
-            return res
-
-        for strategy_id in range(
-            len(results[0]["mitigated_values"]["ZNE"]["results"])
-        ):
-            strategy_group = []
-            for c in range(num_circuits):
-                result_copy = deepcopy(results)
-                strategy_group.append(
-                    filter_on_strategy(result_copy[c], strategy_id=strategy_id)
-                )
-                self.compute_improvements(strategy_group)
-
-            if (
-                strategy_group[0]["mitigated_values"]["ZNE"]["results"][0][
-                    "improvement_factor"
-                ]
-                > best_improvement_factor
-            ):
-                best_improvement_factor = strategy_group[0][
-                    "mitigated_values"
-                ]["ZNE"]["results"][0]["improvement_factor"]
-                strategy = strategy_group[0]["mitigated_values"]["ZNE"][
-                    "results"
-                ][0]["strategy"]
-        self.results.append(
-            {"best_improvement_factor": best_improvement_factor}
-        )
-
-        if strategy is DefaultStrategy:
-            warnings.warn("None of the improvement factors were > 1")
-
-        return strategy
+        best_strategy_id = min(errors, key=errors.get)
+        return self.get_strategy(best_strategy_id)
 
     def run(self) -> None:
         results = self.run_circuits()
-        self.compute_improvements(results)
         self.results = results
 
 

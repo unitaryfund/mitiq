@@ -17,6 +17,7 @@ from dataclasses import dataclass, astuple, asdict
 from functools import partial
 from typing import Any, Callable, cast, Iterator, List, Dict, Tuple, Optional
 from enum import Enum, auto
+import itertools
 
 import networkx as nx
 import cirq
@@ -79,6 +80,9 @@ class BenchmarkProblem:
     def most_likely_bitstring(self) -> str:
         return max(self.ideal_distribution, key=self.ideal_distribution.get)
 
+    def largest_probability(self) -> float:
+        return max(self.ideal_distribution.values())
+
     @property
     def num_qubits(self) -> int:
         return len(self.circuit.all_qubits())
@@ -109,6 +113,9 @@ class BenchmarkProblem:
         base["two_qubit_gate_count"] = self.two_qubit_gate_count
         return base
 
+    def __repr__(self) -> str:
+        return str(self.problem_summary_dict())
+
 
 @dataclass
 class Strategy:
@@ -122,8 +129,14 @@ class Strategy:
             method specified in `technique`.
     """
 
+    id_iter = itertools.count()
+
     technique: MitigationTechnique
     technique_params: Dict[str, Any]
+    id: int = -1
+
+    def __post_init__(self):
+        self.id = next(Strategy.id_iter)
 
     @property
     def mitigation_function(self) -> Callable[..., QuantumResult]:
@@ -136,21 +149,24 @@ class Strategy:
 
         Returns:
             A dictionary describing the strategies parameters."""
-        di = {}
+        summary = {"id": self.id, "technique": self.technique.name}
         if self.technique is MitigationTechnique.ZNE:
             inference_func = self.technique_params["factory"]
-            di["factory"] = inference_func.__class__.__name__
-            di["scale_factors"] = inference_func.get_scale_factors().tolist()
-            di["scale_method"] = self.technique_params["scale_noise"].__name__
-        return di
+            summary["factory"] = inference_func.__class__.__name__
+            summary[
+                "scale_factors"
+            ] = inference_func.get_scale_factors().tolist()
+            summary["scale_method"] = self.technique_params[
+                "scale_noise"
+            ].__name__
+
+        return summary
 
     def __iter__(self) -> Iterator[Any]:
         return iter(astuple(self))
 
-    def __str__(self) -> str:
-        di = self.as_dict()
-        di["technique"] = self.technique.name
-        return str(di)
+    def __repr__(self) -> str:
+        return str(self.as_dict())
 
 
 class Settings:

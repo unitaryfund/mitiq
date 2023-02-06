@@ -28,9 +28,7 @@ from mitiq.calibration import (
     ZNESettings,
     execute_with_mitigation,
 )
-from mitiq.calibration.calibrator import (
-    convert_to_expval_executor,
-)
+from mitiq.calibration.calibrator import convert_to_expval_executor, Result
 from mitiq.calibration.settings import Strategy
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import fold_global
@@ -82,11 +80,12 @@ settings = Settings(
 
 def test_ZNE_workflow():
     cal = Calibrator(execute, ZNESettings)
-    assert cal.get_cost() == {"noisy_executions": 24, "ideal_executions": 0}
+    cost = cal.get_cost()
+    assert cost == {"noisy_executions": 24, "ideal_executions": 0}
 
     cal.run()
-    assert len(cal.results) == 3
-    assert cal.results[0]["mitigated_values"]["ZNE"]["improvement_factor"] >= 0
+    assert len(cal.results) == cost["noisy_executions"]
+    assert isinstance(cal.results[0], Result)
     assert isinstance(cal.best_strategy(cal.results), Strategy)
 
 
@@ -101,36 +100,7 @@ def test_get_cost():
 def test_validate_run_circuits_schema():
     cal = Calibrator(execute, settings)
     results = cal.run_circuits()
-    results_schema = Schema(
-        [
-            {
-                "circuit_info": {
-                    "circuit_depth": int,
-                    "ideal_distribution": {str: float},
-                    "num_qubits": int,
-                    "two_qubit_gate_count": int,
-                    "type": str,
-                },
-                "ideal_value": float,
-                "noisy_value": float,
-                "mitigated_values": {
-                    str: {
-                        "improvement_factor": Or(float, None),
-                        "results": [
-                            {
-                                "factory": str,
-                                "scale_factors": [float],
-                                "scale_method": str,
-                                "mitigated_value": float,
-                                "improvement_factor": float,
-                                "strategy": Strategy,
-                            }
-                        ],
-                    }
-                },
-            }
-        ]
-    )
+    results_schema = Schema([Result])
     assert results_schema.validate(results)
 
 
@@ -184,10 +154,7 @@ def test_best_strategy():
         cal.run()
         strategy = cal.best_strategy(cal.results)
 
-        if cal.results[-1]["best_improvement_factor"] > 1:
-            assert strategy.technique.name == "ZNE"
-        else:
-            assert strategy.technique.name == "RAW"
+        assert strategy.technique.name == "ZNE"
 
 
 def test_convert_to_expval_executor():
