@@ -49,7 +49,7 @@ class MitigationTechnique(Enum):
     RAW = auto()
 
     @property
-    def mitigation_function(self) -> Callable[..., QuantumResult]:
+    def mitigation_function(self) -> Callable[..., float]:
         if self is MitigationTechnique.ZNE:
             return execute_with_zne
         elif self is MitigationTechnique.PEC:
@@ -78,7 +78,8 @@ class BenchmarkProblem:
         return iter(getattr(self, k) for k in keys)
 
     def most_likely_bitstring(self) -> str:
-        return max(self.ideal_distribution, key=self.ideal_distribution.get)
+        distribution = self.ideal_distribution
+        return max(distribution, key=distribution.__getitem__)
 
     def largest_probability(self) -> float:
         return max(self.ideal_distribution.values())
@@ -93,9 +94,7 @@ class BenchmarkProblem:
 
     @property
     def two_qubit_gate_count(self) -> int:
-        return sum(
-            [len(op.qubits) > 1 for op in self.circuit.all_operations()]
-        )
+        return sum(len(op.qubits) > 1 for op in self.circuit.all_operations())
 
     def problem_summary_dict(self) -> Dict[str, Any]:
         """Produces a summary of the ``BenchmarkProblem``, to be used in
@@ -135,11 +134,11 @@ class Strategy:
     technique_params: Dict[str, Any]
     id: int = -1
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.id = next(Strategy.id_iter)
 
     @property
-    def mitigation_function(self) -> Callable[..., QuantumResult]:
+    def mitigation_function(self) -> Callable[..., float]:
         return partial(
             self.technique.mitigation_function, **self.technique_params
         )

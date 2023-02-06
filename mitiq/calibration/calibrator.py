@@ -31,6 +31,7 @@ from mitiq.calibration.settings import (
     Settings,
     Strategy,
     BenchmarkProblem,
+    DefaultStrategy,
 )
 
 
@@ -145,6 +146,7 @@ class Calibrator:
         for res in self.results:
             if res.strategy.id == strategy_id:
                 return res.strategy
+        return DefaultStrategy
 
     def compute_improvements(
         self, experiment_results: List[Dict[str, Any]]
@@ -175,12 +177,12 @@ class Calibrator:
     def compute_errors(self, results: List[Result]) -> Dict[int, float]:
         errors = {}
         strategy_results = self.filter_problems(results)
-        for strategy_id, results in strategy_results.items():
-            average_error = 0
-            for result in results:
+        for strategy_id, expectation_values in strategy_results.items():
+            average_error = 0.0
+            for result in expectation_values:
                 average_error += abs(result["ideal"] - result["mitigated"])
 
-            errors[strategy_id] = average_error / len(results)
+            errors[strategy_id] = average_error / len(expectation_values)
 
         return errors
 
@@ -198,7 +200,7 @@ class Calibrator:
         """
         errors = self.compute_errors(results)
 
-        best_strategy_id = min(errors, key=errors.get)
+        best_strategy_id = min(errors, key=errors.__getitem__)
         return self.get_strategy(best_strategy_id)
 
     def run(self) -> None:
