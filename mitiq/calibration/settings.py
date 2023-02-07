@@ -95,7 +95,7 @@ class BenchmarkProblem:
     def two_qubit_gate_count(self) -> int:
         return sum(len(op.qubits) > 1 for op in self.circuit.all_operations())
 
-    def problem_summary_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         """Produces a summary of the ``BenchmarkProblem``, to be used in
         recording the results when running calibration experiments.
 
@@ -112,7 +112,7 @@ class BenchmarkProblem:
         return base
 
     def __repr__(self) -> str:
-        return str(self.problem_summary_dict())
+        return str(self.to_dict())
 
 
 @dataclass
@@ -142,7 +142,7 @@ class Strategy:
             self.technique.mitigation_function, **self.technique_params
         )
 
-    def as_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         """A summary of the strategies parameters, without the technique added.
 
         Returns:
@@ -164,7 +164,7 @@ class Strategy:
         return iter(astuple(self))
 
     def __repr__(self) -> str:
-        return str(self.as_dict())
+        return str(self.to_dict())
 
 
 class Settings:
