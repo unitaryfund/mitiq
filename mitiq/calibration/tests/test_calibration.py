@@ -97,22 +97,6 @@ def test_validate_run_circuits_schema():
     assert results_schema.validate(results)
 
 
-def test_compute_improvements_modifies_IF():
-    cal = Calibrator(execute, settings)
-    cal.run_circuits()
-    IFs = [
-        res["mitigated_values"]["ZNE"]["improvement_factor"]
-        for res in cal.results
-    ]
-    assert all(IF is None for IF in IFs)
-    cal.compute_improvements(cal.results)
-    IFs = [
-        res["mitigated_values"]["ZNE"]["improvement_factor"]
-        for res in cal.results
-    ]
-    assert all(IF is not None for IF in IFs)
-
-
 def test_best_strategy():
     test_strategy_settings = Settings(
         circuit_types=["ghz", "mirror"],

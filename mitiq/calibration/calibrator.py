@@ -148,32 +148,6 @@ class Calibrator:
                 return res.strategy
         return DefaultStrategy
 
-    def compute_improvements(
-        self, experiment_results: List[Dict[str, Any]]
-    ) -> None:
-        """Computes the improvement factors for each calibration circuit that
-        was run. Saves the improvement factors in the input dictionary.
-
-        Args:
-            experiment_results: Results obtained from :func:`run_circuits`.
-        """
-        regularizing_epsilon = 1e-30
-        for result in experiment_results:
-            ideal_value = result["ideal_value"]
-            noisy_value = result["noisy_value"]
-            for di in result["mitigated_values"].values():
-                results = di["results"]
-                mitigated_values = [di["mitigated_value"] for di in results]
-                improvement_factor = abs(noisy_value - ideal_value) / sqrt(
-                    regularizing_epsilon
-                    + len(mitigated_values)
-                    * sum(
-                        (mitigated_value - ideal_value) ** 2
-                        for mitigated_value in mitigated_values
-                    )
-                )
-                di["improvement_factor"] = improvement_factor
-
     def compute_errors(self, results: List[Result]) -> Dict[int, float]:
         errors = {}
         strategy_results = self.filter_problems(results)

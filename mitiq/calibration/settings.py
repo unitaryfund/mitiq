@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from dataclasses import dataclass, astuple, asdict
+from dataclasses import dataclass, asdict
 from functools import partial
 from typing import Any, Callable, cast, Iterator, List, Dict, Tuple, Optional
 from enum import Enum, auto
@@ -72,9 +72,6 @@ class BenchmarkProblem:
     circuit: cirq.Circuit
     type: str
     ideal_distribution: Dict[str, float]
-
-    def __getitem__(self, keys: Tuple[str, ...]) -> Iterator[Any]:
-        return iter(getattr(self, k) for k in keys)
 
     def most_likely_bitstring(self) -> str:
         distribution = self.ideal_distribution
@@ -159,9 +156,6 @@ class Strategy:
             ].__name__
 
         return summary
-
-    def __iter__(self) -> Iterator[Any]:
-        return iter(astuple(self))
 
     def __repr__(self) -> str:
         return str(self.to_dict())

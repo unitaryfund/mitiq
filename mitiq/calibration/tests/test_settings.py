@@ -16,7 +16,7 @@ import pytest
 import json
 
 from mitiq.calibration import ZNESettings, Settings
-from mitiq.calibration.settings import MitigationTechnique
+from mitiq.calibration.settings import MitigationTechnique, BenchmarkProblem
 from mitiq.raw import execute
 from mitiq.pec import execute_with_pec
 from mitiq.zne.scaling import fold_global
@@ -131,6 +131,12 @@ def test_make_strategies_invalid_technique():
 def test_ZNESettings():
     circuits = ZNESettings.make_circuits()
     strategies = ZNESettings.make_strategies()
+
+    repr_string = repr(circuits[0])
+    assert all(
+        s in repr_string
+        for s in ("type", "ideal_distribution", "num_qubits", "circuit_depth")
+    )
 
     assert len(circuits) == 3
     assert len(strategies) == 2 * 2 * 2
