@@ -18,7 +18,7 @@ from functools import partial
 
 import cirq
 import numpy as np
-from schema import Schema, Or
+from schema import Schema
 
 from mitiq import Executor, MeasurementResult
 from mitiq.benchmarks import generate_rb_circuits

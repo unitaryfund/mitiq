@@ -22,7 +22,6 @@ import itertools
 import networkx as nx
 import cirq
 
-from mitiq import QuantumResult
 from mitiq.benchmarks import (
     generate_ghz_circuit,
     generate_mirror_circuit,
