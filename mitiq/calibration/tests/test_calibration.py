@@ -38,15 +38,8 @@ def execute(circuit, noise_level=0.001):
     circuit = circuit.with_noise(cirq.amplitude_damp(noise_level))
 
     result = cirq.DensityMatrixSimulator().run(circuit, repetitions=100)
-    return MeasurementResult(
-        result=np.column_stack(list(result.measurements.values())).tolist(),
-        qubit_indices=tuple(
-            # q[2:-1] is necessary to convert "q(number)" into "number"
-            int(q[2:-1])
-            for k in result.measurements.keys()
-            for q in k.split(",")
-        ),
-    )
+    bitstrings = np.column_stack(list(result.measurements.values()))
+    return MeasurementResult(bitstrings)
 
 
 settings = Settings(
