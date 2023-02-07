@@ -11,7 +11,7 @@ pytest-xdist[psutil]==3.0.2
 pytest-cov==4.0.0
 flake8==6.0.0
 black==22.10
-mypy==0.982
+mypy==1.0.0
 schema==0.7.5
 
 # Documentation and examples.
