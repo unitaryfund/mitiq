@@ -30,11 +30,8 @@ from functools import wraps
 import warnings
 import numpy as np
 
-from cirq import Circuit as CirqCircuit
-
 from mitiq import Executor, Observable, QPROGRAM, QuantumResult
 from mitiq.pec import sample_circuit, OperationRepresentation
-from mitiq.interface import convert_to_mitiq, convert_from_mitiq
 
 
 class LargeSampleWarning(Warning):
@@ -118,7 +115,6 @@ def execute_with_pec(
             "The value of 'precision' should be within the interval (0, 1],"
             f" but precision is {precision}."
         )
-
 
     # Get the 1-norm of the circuit quasi-probability representation
     _, _, norm = sample_circuit(
