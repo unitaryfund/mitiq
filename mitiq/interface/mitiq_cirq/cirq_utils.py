@@ -19,7 +19,7 @@ from typing import Tuple
 import numpy as np
 import numpy.typing as npt
 import cirq
-from mitiq._typing import MeasurementResult
+from mitiq import MeasurementResult
 
 
 # Executors.

@@ -120,7 +120,7 @@ def _map_qubits(
 
 def _add_identity_to_idle(
     circuit: qiskit.QuantumCircuit,
-) -> Set[int]:
+) -> Set[qiskit.circuit.Qubit]:
     """Adds identities to idle qubits in the circuit and returns the altered
     indices. Used to preserve idle qubits and indices in conversion.
 
@@ -133,45 +133,42 @@ def _add_identity_to_idle(
     Note: An idle qubit is a qubit without any gates (including Qiskit
         barriers) acting on it.
     """
+    all_qubits = set(circuit.qubits)
+    used_qubits = set()
+    idle_qubits = set()
+    # Get used qubits
+    for op in circuit.data:
+        _, qubits, _ = op
+        used_qubits.update(set(qubits))
+    idle_qubits = all_qubits - used_qubits
+    # Modify input circuit applying I to idle qubits
+    for q in idle_qubits:
+        circuit.i(q)
 
-    data = copy.deepcopy(circuit._data)
-    bit_indices = set()
-    idle_bit_indices = set()
-    for op in data:
-        gate, qubits, cbits = op
-        bit_indices.update(set(bit.index for bit in qubits))
-    for index in range(circuit.num_qubits):
-        if index not in bit_indices:
-            idle_bit_indices.add(index)
-            circuit.i(index)
-    return idle_bit_indices
+    return idle_qubits
 
 
 def _remove_identity_from_idle(
     circuit: qiskit.QuantumCircuit,
-    idle_indices: Set[int],
+    idle_qubits: Set[qiskit.circuit.Qubit],
 ) -> None:
-    """Removes identities from the circuit corresponding to the set of indices.
-    Used in conjunction with _add_identity_to_idle to preserve idle qubits and
-    indices in conversion.
+    """Removes identities from the circuit corresponding to the input
+    idle qubits.
+    Used in conjunction with _add_identity_to_idle to preserve idle qubits in
+    conversion.
 
     Args:
         circuit: Qiskit circuit to have identities removed
-        idle_indices: Set of altered idle qubit indices
+        idle_indices: Set of altered idle qubits.
     """
-    index_list: List[int] = []
-    data = copy.deepcopy(circuit._data)
-    for target_index, op in enumerate(data):
-        bit_indices = set()
+    to_delete_indices: List[int] = []
+    for index, op in enumerate(circuit._data):
         gate, qubits, cbits = op
-        bit_indices.update(set(bit.index for bit in qubits))
-        if gate.name == "id" and bit_indices.intersection(idle_indices):
-            # Reverse index list order for data index preservation
-            index_list.insert(0, target_index)
+        if gate.name == "id" and set(qubits).intersection(idle_qubits):
+            to_delete_indices.append(index)
     # Traverse data from list end to preserve index
-    for target_index in index_list:
-        del data[target_index]
-    circuit._data = data
+    for index in to_delete_indices[::-1]:
+        del circuit._data[index]
 
 
 def _measurement_order(

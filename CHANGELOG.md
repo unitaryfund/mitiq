@@ -1,6 +1,92 @@
 # Changelog
 
-## Version 0.22.0 (In Development)
+## Version 0.24.0 (In development)
+
+## Version 0.23.0
+
+The main improvements introduced in this release are:
+
+- A significant refactoring of the Mitiq [calibration module](https://mitiq.readthedocs.io/en/latest/guide/calibrators.html). We generalized the `Settings`
+object, which is now able to generate a more general list of `BenchmarkProblem` objects (wrapping circuits and ideal results) and a list of `Strategy` objects
+representing the error mitigation strategies to compare. We also improved how the optimal `Strategy` is determined. Specifically, we now average over `BenchmarkProblems` to reduce fluctuations and spurious results. 
+We remark that the `mitiq.calibration` module is very new and quickly evolving. Therefore further significant breaking changes are likely to happen in future releases.
+
+- A non-trivial refactoring of the REM module. We changed the underlying workflow of the technique which is now applied directly to executors, instead of applying REM during the evaluation of expectation values. Expectation values can still be mitigated as usual with `execute_with_rem` but mitigated executors can now return raw `MeasurementResult` objects (bitstrings). 
+
+- We also significantly extended the REM documentation with new and informative sections. Special thanks to @amirebrahimi and @nickdgardner for their high-quality and useful contributions!
+
+- We now have 2 tutorials focused on digital dynamical decoupling (DDD)---one for Cirq and one for Qiskit---both showing an improvement for a theoretical highly-correlated noise model. Moreover, the Qiskit tutorial on DDD is a useful starting point for testing the technique on real hardware.
+
+### All changes
+
+- Use closest probability distribution in REM (#1688) [@andreamari]
+- REM: Write-up third section of docs (#1693) [@nickdgardner]
+- Improve calibration method parameter selection (#1682) [@Misty-W]
+- Add References about REM (#1691) [@nathanshammah]
+- REM: mitigate executors as a first step and expectation values at a second step. (#1678) [@andreamari]
+- Draft for glossary of QEM concepts in docs (#1647) [@nickdgardner]
+- myst -> md (#1689) [@natestemen]
+- use executor.run in rem docs (#1690) [@andreamari]
+- REM: Write-up fourth section of docs (#1680) [@amirebrahimi]
+- upgrade `_run` to a public function (#1684) [@natestemen]
+- Update pyquil requirement from ~=3.3.2 to ~=3.3.3 (#1686) [@dependabot[bot]]
+- Update qiskit requirement from ~=0.39.5 to ~=0.40.0 (#1687) [@dependabot[bot]]
+- Calibration improvements (#1676) [@natestemen]
+- Further updates related to the measurement result class (#1673) [@andreamari]
+- DDD on IBMQ backends (#1665) [@Misty-W]
+- Update amazon-braket-sdk requirement from ~=1.35.2 to ~=1.35.3 (#1674) [@dependabot[bot]]
+- Update qiskit requirement from ~=0.39.4 to ~=0.39.5 (#1675) [@dependabot[bot]]
+- Use `md` extension for myst markdown files (#1671) [@natestemen]
+- add H2 image (#1677) [@andreamari]
+- Use source svg files instead of exported pngs (#1651) [@amirebrahimi]
+- Improve and modify MeasurementResult class (#1670) [@andreamari]
+- Update pennylane requirement from ~=0.27.0 to ~=0.28.0 (#1643) [@dependabot[bot]]
+- Update cirq requirement from ~=1.0.0 to ~=1.1.0 (#1644) [@dependabot[bot]]
+- loosen numpy requirements (#1672) [@natestemen]
+- clean up latex (#1669) [@natestemen]
+- Fix executor and update wording of DDD tutorial (#1655) [@Misty-W]
+- Update scipy requirement from ~=1.9.3 to ~=1.10.0 (#1657) [@dependabot[bot]]
+- update link (#1661) [@natestemen]
+- Update amazon-braket-sdk requirement from ~=1.35.1 to ~=1.35.2 (#1656) [@dependabot[bot]]
+- Update numpy requirement from ~=1.24.0 to ~=1.24.1 (#1652) [@dependabot[bot]]
+
+## Version 0.22.0
+
+### Summary
+In this release we focused on improving our documentation with three new examples, new REM docs, and navigation improvements, along with some bug fixes.
+This release also adds a new module `calibration` which allows one to run a series of experiments to see what error mitigation parameters will work best for their particular setup.
+This feature is still under active development.
+
+Many thanks to @amirebrahimi for his continued work on making readout error mitigation available, and usable in Mitiq.
+
+Thanks to everyone who contributed to Mitiq this year!
+It's been a great time for error mitigation, and we look forward to continuing to grow Mitiq in the new year!
+Happy holidays! 🎄🎉🎊
+
+### All changes
+- Digital Dynamical Decoupling Tutorial on Mirror Circuits (#1645) [@Misty-W]
+- Fix bug for Qiskit circuits with idle qubits (#1646) [@andreamari]
+- Calibration core concepts docs (#1648) [@natestemen]
+- Calibration prototype (#1614) [@natestemen]
+- Noise scaling tutorial (identity insertion/folding) (#1633) [@natestemen]
+- Fill in second sub-section of REM docs (#1630) [@amirebrahimi]
+- Add REM docs sections and fill out the first section (#1629) [@amirebrahimi]
+- Update pennylane-qiskit requirement from ~=0.27.0 to ~=0.28.0 (#1641) [@dependabot]
+- Revert "Update pennylane requirement from ~=0.27.0 to ~=0.28.0 (#1640)" (#1642) [@natestemen]
+- Update pennylane requirement from ~=0.27.0 to ~=0.28.0 (#1640) [@dependabot]
+- Update numpy requirement from ~=1.23.5 to ~=1.24.0 (#1638) [@dependabot]
+- Update mitiq build badge display name (#1636) [@Misty-W]
+- Fix build badge (#1635) [@andreamari]
+- Contributing/dev tasks docs improvements (#1615) [@natestemen]
+- Fix extrapolations for ExpFactory in special cases  (#1631) [@Misty-W]
+- docs: add Misty-W as a contributor for ideas, test, and 2 more (#1632) [@allcontributors]
+- Update learning depolarizing noise tutorial to avoid long execution time (#1628) [@Misty-W]
+- Format examples' titles and list (#1622) [@nathanshammah]
+- Update qiskit requirement from ~=0.39.3 to ~=0.39.4 (#1625) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.34.3 to ~=1.35.1 (#1626) [@dependabot]
+- Add list of accepted RFCs to docs (#1623) [@nathanshammah]
+- REM: Utility method maintenance (#1610) [@amirebrahimi]
+- Adding PEC simulator mitiq tutorial (#1612) [@vprusso]
 
 ## Version 0.21.0
 

@@ -3,7 +3,7 @@
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-34-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
-[![build](https://github.com/unitaryfund/mitiq/workflows/test/badge.svg?branch=master)](https://github.com/unitaryfund/mitiq/actions)
+[![build](https://github.com/unitaryfund/mitiq/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/unitaryfund/mitiq/actions)
 [![Documentation Status](https://readthedocs.org/projects/mitiq/badge/?version=stable)](https://mitiq.readthedocs.io/en/stable/)
 [![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
 [![PyPI version](https://badge.fury.io/py/mitiq.svg)](https://badge.fury.io/py/mitiq)
@@ -77,7 +77,8 @@ The examples and other notebooks can be run interactively on the cloud with [myb
 | Zero-noise extrapolation                  | [ZNE](https://mitiq.readthedocs.io/en/latest/guide/zne.html) | [mitiq.zne](https://github.com/unitaryfund/mitiq/tree/master/mitiq/zne) | [1611.09301](https://arxiv.org/abs/1611.09301)<br>[1612.02058](https://arxiv.org/abs/1612.02058)<br>[1805.04492](https://arxiv.org/abs/1805.04492) |
 | Probabilistic error cancellation          | [PEC](https://mitiq.readthedocs.io/en/latest/guide/pec.html) | [mitiq.pec](https://github.com/unitaryfund/mitiq/tree/master/mitiq/pec) | [1612.02058](https://arxiv.org/abs/1612.02058)<br>[1712.09271](https://arxiv.org/abs/1712.09271)<br>[1905.10135](https://arxiv.org/abs/1905.10135) |
 | (Variable-noise) Clifford data regression | [CDR](https://mitiq.readthedocs.io/en/latest/guide/cdr.html) | [mitiq.cdr](https://github.com/unitaryfund/mitiq/tree/master/mitiq/cdr) | [2005.10189](https://arxiv.org/abs/2005.10189)<br>[2011.01157](https://arxiv.org/abs/2011.01157)                                                   |
-| Dynamical decoupling                      | [DDD](https://mitiq.readthedocs.io/en/latest/guide/ddd.html) | [mitiq.cdd](https://github.com/unitaryfund/mitiq/tree/master/mitiq/ddd) | [9803057](https://arxiv.org/abs/quant-ph/9803057)<br>[1807.08768](https://arxiv.org/abs/1807.08768)                                                |
+| Digital dynamical decoupling                      | [DDD](https://mitiq.readthedocs.io/en/latest/guide/ddd.html) | [mitiq.cdd](https://github.com/unitaryfund/mitiq/tree/master/mitiq/ddd) | [9803057](https://arxiv.org/abs/quant-ph/9803057)<br>[1807.08768](https://arxiv.org/abs/1807.08768)                                                |
+| Readout-error mitigation                  | [REM](https://mitiq.readthedocs.io/en/latest/guide/rem.html) | [mitiq.rem](https://github.com/unitaryfund/mitiq/tree/master/mitiq/rem) | [1907.08518](https://arxiv.org/abs/1907.08518) <br>[2006.14044](https://arxiv.org/abs/2006.14044)                        |
 
 See our [roadmap](https://github.com/unitaryfund/mitiq/wiki) for additional candidate techniques to implement. If there is a technique you are looking for, please file a [feature request](https://github.com/unitaryfund/mitiq/issues/new?assignees=&labels=feature-request&template=feature_request.md&title=).
 

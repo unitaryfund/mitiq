@@ -29,7 +29,7 @@ from braket.circuits import (
 )
 import pennylane as qml
 
-from mitiq._typing import SUPPORTED_PROGRAM_TYPES
+from mitiq import SUPPORTED_PROGRAM_TYPES
 from mitiq.interface import (
     convert_to_mitiq,
     convert_from_mitiq,

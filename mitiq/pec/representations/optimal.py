@@ -41,9 +41,7 @@ def minimize_one_norm(
     the following representation of the input ``ideal_matrix`` holds:
 
     .. math::
-        :nowrap:
-
-        \text{ideal_matrix} = x_0 A_0 + x_1 A_1 + ...,
+        \text{ideal_matrix} = x_0 A_0 + x_1 A_1 + \cdots
 
     where :math:`\{A_j\}` are the basis matrices, i.e., the elements of
     the input ``basis_matrices``.
@@ -104,18 +102,18 @@ def find_optimal_representation(
     tol: float = 1.0e-8,
     initial_guess: Optional[npt.NDArray[np.float64]] = None,
 ) -> OperationRepresentation:
-    r"""Returns the ``OperationRepresentaiton`` of the input ideal operation
+    r"""Returns the ``OperationRepresentation`` of the input ideal operation
     which minimizes the one-norm of the associated quasi-probability
     distribution.
 
-    More precicely, it solve the following optimization problem:
+    More precisely, it solve the following optimization problem:
 
     .. math::
-        \min_{{\eta_\alpha}} = \sum_\alpha |\eta_\alpha|,
-        \text{ such that }
-        \mathcal G = \sum_\alpha \eta_\alpha \mathcal O_\alpha,
+        \min_{\eta_\alpha} \left\{\sum_\alpha |\eta_\alpha| \, : \,
+        \mathcal G = \sum_\alpha \eta_\alpha \mathcal O_\alpha \right\}
 
-    where :math:`\{\mathcal O_j\}` is the input basis of noisy operations.
+    where :math:`\{\mathcal O_j\}` is the input basis of noisy operations,
+    and :math:`\mathcal{G}` is the ideal operation to be represented.
 
     Args:
         ideal_operation: The ideal operation to represent.
@@ -125,7 +123,7 @@ def find_optimal_representation(
         tol: The error tolerance for each matrix element
             of the represented operation.
         initial_guess: Optional initial guess for the coefficients
-            :math:`\{ \eta_\alpha \}``.
+            :math:`\{ \eta_\alpha \}`.
 
     Returns: The optimal OperationRepresentation.
     """

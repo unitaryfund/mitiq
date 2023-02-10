@@ -17,7 +17,7 @@
 import pytest
 
 from mitiq.rem import post_select
-from mitiq._typing import MeasurementResult
+from mitiq import MeasurementResult
 
 
 def test_post_select():

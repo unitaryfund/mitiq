@@ -96,9 +96,8 @@ master_doc = "index"
 # -- Options for myst_parser -------------------------------------------------
 # Specifies which of the parsers should handle each file extension.
 source_suffix = {
+    ".md": "myst-nb",
     ".ipynb": "myst-nb",
-    ".myst": "myst-nb",
-    ".mystnb": "myst-nb",
 }
 
 # Enables extensions to MyST parser that allows for richer markup options.
@@ -113,7 +112,7 @@ myst_enable_extensions = [
     "smartquotes",
 ]
 
-myst_heading_anchors = 3
+myst_heading_anchors = 4
 
 # Tells MyST to treat URIs beginning with these prefixes as external links.
 # Links that don't begin with these will be treated as internal cross-links.
@@ -158,6 +157,8 @@ bibtex_bibfiles = ["refs.bib"]
 linkcheck_ignore = [
     r"https://doi.org/10.1088/0034-4885/74/10/104401",
     r"https://doi.org/10.1088/1367-2630/12/7/075008",
+    r"https://doi.org/10.7566/JPSJ.90.032001",
+    r"https://doi.org/10.7566/jpsj.90.032001",
 ]
 
 
@@ -336,6 +337,9 @@ nbsphinx_thumbnails = {
     "examples/simple-landscape-qiskit": "_static/simple-landscape-qiskit.png",
     "examples/learning-depolarizing-noise": "_static/learn-depolarizing.png",
     "examples/pec_tutorial": "_static/pec-tutorial.png",
+    "examples/scaling": "_static/scaling.png",
+    "examples/ddd_tutorial": "_static/ddd-tutorial.png",
+    "examples/ddd_on_ibmq_ghz": "_static/ddd-ibmq-ghz.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }
