@@ -68,21 +68,20 @@ class NoisyOperation:
 
         self._circuit = cirq_circuit
         self._native_type = native_type
-        self._qubits = tuple(self._circuit.all_qubits())
-        self._num_qubits = len(self._qubits)
-        self._dimension = 2**self._num_qubits
+
+        dimension = 2**self.num_qubits
 
         if channel_matrix is None:
             self._channel_matrix = None
 
         elif channel_matrix.shape != (
-            self._dimension**2,
-            self._dimension**2,
+            dimension**2,
+            dimension**2,
         ):
             raise ValueError(
                 f"Arg `channel_matrix` has shape {channel_matrix.shape}"
                 " but the expected shape is"
-                f" {self._dimension ** 2, self._dimension ** 2}."
+                f" {dimension ** 2, dimension ** 2}."
             )
         self._channel_matrix = deepcopy(channel_matrix)
 
@@ -98,19 +97,11 @@ class NoisyOperation:
 
     @property
     def qubits(self) -> Tuple[cirq.Qid, ...]:
-        return self._qubits
+        return tuple(self._circuit.all_qubits())
 
     @property
     def num_qubits(self) -> int:
         return len(self.qubits)
-
-    @property
-    def ideal_unitary(self) -> npt.NDArray[np.complex64]:
-        return cirq.unitary(self._circuit)
-
-    @property
-    def ideal_channel_matrix(self) -> npt.NDArray[np.complex64]:
-        raise NotImplementedError
 
     @property
     def channel_matrix(self) -> npt.NDArray[np.complex64]:
@@ -120,7 +111,7 @@ class NoisyOperation:
 
     def copy(self) -> "NoisyOperation":
         """Returns a copy of the NoisyOperation."""
-        return NoisyOperation(self._circuit, self._channel_matrix)
+        return NoisyOperation(self._native_circuit, self._channel_matrix)
 
     def __add__(self, other: Any) -> "NoisyOperation":
         if not isinstance(other, NoisyOperation):
@@ -139,7 +130,7 @@ class NoisyOperation:
         return NoisyOperation(self._circuit + other._circuit, matrix)
 
     def __str__(self) -> str:
-        return self._circuit.__str__()
+        return self._native_circuit.__str__()
 
 
 class NoisyBasis:

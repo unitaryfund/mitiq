@@ -42,11 +42,11 @@ def test_init_with_cirq_circuit():
     assert isinstance(noisy_op._circuit, cirq.Circuit)
 
     assert noisy_op.qubits == (cirq.LineQubit(0),)
-    assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq.Z))
     assert np.allclose(noisy_op.channel_matrix, real)
     assert noisy_op.channel_matrix is not real
 
     assert noisy_op._native_type == "cirq"
+    assert _equal(zcirq, noisy_op.circuit)
     assert _equal(noisy_op._native_circuit, noisy_op.circuit)
 
 
@@ -66,11 +66,11 @@ def test_init_with_different_qubits(qubit):
         require_qubit_equality=True,
     )
     assert noisy_op.qubits == (qubit,)
-    assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(ideal_op))
     assert np.allclose(noisy_op.channel_matrix, real)
     assert noisy_op.channel_matrix is not real
 
     assert noisy_op._native_type == "cirq"
+    assert _equal(cirq.Circuit(ideal_op), noisy_op.circuit)
     assert _equal(noisy_op._native_circuit, noisy_op.circuit)
 
 
@@ -83,7 +83,6 @@ def test_init_with_cirq_input():
     assert isinstance(noisy_op._circuit, cirq.Circuit)
     assert _equal(noisy_op.circuit, circ, require_qubit_equality=True)
     assert set(noisy_op.qubits) == set(qreg)
-    assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(circ))
     assert np.allclose(noisy_op.channel_matrix, real)
     assert noisy_op.channel_matrix is not real
 
@@ -107,7 +106,6 @@ def test_init_with_qiskit_circuit():
     assert noisy_op._native_circuit == circ
     assert noisy_op._native_type == "qiskit"
 
-    assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq_circ))
     assert np.allclose(noisy_op.channel_matrix, real)
     assert noisy_op.channel_matrix is not real
 
@@ -144,7 +142,6 @@ def test_init_with_pyquil_program():
     assert noisy_op._native_circuit == circ
     assert noisy_op._native_type == "pyquil"
 
-    assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq_circ))
     assert np.allclose(noisy_op.channel_matrix, real)
     assert noisy_op.channel_matrix is not real
 
@@ -173,8 +170,6 @@ def test_unknown_channel_matrix():
     assert noisy_op.native_circuit == circ
     assert noisy_op._native_circuit == circ
     assert noisy_op._native_type == "qiskit"
-
-    assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq_circ))
 
     with pytest.raises(ValueError, match="The channel matrix is unknown."):
         _ = noisy_op.channel_matrix
@@ -212,7 +207,6 @@ def test_add_pyquil_noisy_operations():
     correct = cirq.Circuit([cirq.X.on(cirq.NamedQubit("Q"))] * 2)
 
     assert _equal(noisy_op._circuit, correct, require_qubit_equality=False)
-    assert np.allclose(noisy_op.ideal_unitary, np.identity(2))
     assert np.allclose(noisy_op.channel_matrix, real @ real)
 
 
@@ -230,7 +224,6 @@ def test_add_qiskit_noisy_operations():
     correct = cirq.Circuit([cirq.X.on(cirq.NamedQubit("Q"))] * 2)
 
     assert _equal(noisy_op._circuit, correct, require_qubit_equality=False)
-    assert np.allclose(noisy_op.ideal_unitary, np.identity(2))
     assert np.allclose(noisy_op.channel_matrix, real @ real)
 
 
@@ -498,7 +491,10 @@ def test_representation_sample_zero_coefficient():
         noisy_op, sign, coeff = decomp.sample(random_state=random_state)
         assert sign == 1
         assert coeff == 0.5
-        assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq.X))
+        assert np.allclose(
+            cirq.unitary(noisy_op.circuit),
+            cirq.unitary(cirq.X),
+        )
 
 
 def test_print_cirq_operation_representation():
