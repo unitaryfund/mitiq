@@ -101,8 +101,9 @@ def test_init_with_qiskit_circuit():
     noisy_op = NoisyOperation(circ, real)
     assert isinstance(noisy_op._circuit, cirq.Circuit)
     assert _equal(noisy_op._circuit, cirq_circ)
+    assert _equal(noisy_op.circuit, cirq_circ)
 
-    assert noisy_op.circuit == circ
+    assert noisy_op.native_circuit == circ
     assert noisy_op._native_circuit == circ
     assert noisy_op._native_type == "qiskit"
 
@@ -137,8 +138,9 @@ def test_init_with_pyquil_program():
     noisy_op = NoisyOperation(circ, real)
     assert isinstance(noisy_op._circuit, cirq.Circuit)
     assert _equal(noisy_op._circuit, cirq_circ)
+    assert _equal(noisy_op.circuit, cirq_circ)
 
-    assert noisy_op.circuit == circ
+    assert noisy_op.native_circuit == circ
     assert noisy_op._native_circuit == circ
     assert noisy_op._native_type == "pyquil"
 
@@ -166,8 +168,9 @@ def test_unknown_channel_matrix():
     noisy_op = NoisyOperation(circ)
     assert isinstance(noisy_op._circuit, cirq.Circuit)
     assert _equal(noisy_op._circuit, cirq_circ)
+    assert _equal(noisy_op.circuit, cirq_circ)
 
-    assert noisy_op.circuit == circ
+    assert noisy_op.native_circuit == circ
     assert noisy_op._native_circuit == circ
     assert noisy_op._native_type == "qiskit"
 
@@ -285,7 +288,7 @@ def test_pyquil_noisy_basis():
     assert len(noisy_basis) == 2
 
     for op in noisy_basis.elements:
-        assert isinstance(op.circuit(), pyquil.Program)
+        assert isinstance(op.native_circuit, pyquil.Program)
         assert isinstance(op._circuit, cirq.Circuit)
 
 
@@ -305,7 +308,7 @@ def test_qiskit_noisy_basis():
     assert len(noisy_basis) == 2
 
     for op in noisy_basis.elements:
-        assert isinstance(op.circuit(), qiskit.QuantumCircuit)
+        assert isinstance(op.native_circuit, qiskit.QuantumCircuit)
         assert isinstance(op._circuit, cirq.Circuit)
 
 
@@ -364,7 +367,7 @@ def test_get_sequences_simple(length):
     assert len(sequences) == len(noisy_basis) ** length
 
     for sequence in sequences:
-        assert len(sequence.circuit()) == length
+        assert len(sequence.circuit) == length
 
 
 def get_test_representation():
