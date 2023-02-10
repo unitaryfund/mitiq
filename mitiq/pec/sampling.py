@@ -35,7 +35,7 @@ def sample_sequence(
     representations: Sequence[OperationRepresentation],
     random_state: Optional[Union[int, np.random.RandomState]] = None,
     num_samples: int = 1,
-) -> Tuple[List[QPROGRAM], List[int], float]:
+) -> Tuple[List[Circuit], List[int], float]:
     """Samples a list of implementable sequences from the quasi-probability
     representation of the input ideal operation.
     Returns the list of sequences, the corresponding list of signs and the
@@ -84,7 +84,7 @@ def sample_sequence(
             UserWarning(f"No representation found for \n\n{ideal_operation}.")
         )
         return (
-            [ideal_operation] * num_samples,
+            [ideal] * num_samples,
             [1] * num_samples,
             1.0,
         )
@@ -97,7 +97,7 @@ def sample_sequence(
         noisy_op, sign, _ = operation_representation.sample(
             random_state  # type: ignore
         )
-        sequences.append(noisy_op.circuit())
+        sequences.append(noisy_op.circuit)
         signs.append(sign)
 
     return sequences, signs, norm
