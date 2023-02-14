@@ -18,7 +18,6 @@ from functools import partial
 
 import cirq
 import numpy as np
-from schema import Schema
 
 from mitiq import Executor, MeasurementResult
 from mitiq.benchmarks import generate_rb_circuits
@@ -28,7 +27,10 @@ from mitiq.calibration import (
     ZNESettings,
     execute_with_mitigation,
 )
-from mitiq.calibration.calibrator import convert_to_expval_executor, Result
+from mitiq.calibration.calibrator import (
+    convert_to_expval_executor,
+    ExperimentResults,
+)
 from mitiq.calibration.settings import Strategy
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import fold_global
@@ -77,9 +79,11 @@ def test_ZNE_workflow():
     assert cost == {"noisy_executions": 24, "ideal_executions": 0}
 
     cal.run()
-    assert len(cal.results) == cost["noisy_executions"]
-    assert isinstance(cal.results[0], Result)
-    assert isinstance(cal.best_strategy(cal.results), Strategy)
+    num_strategies, num_problems = cal.results.mitigated.shape
+    num_results = num_strategies * num_problems
+    assert num_results == cost["noisy_executions"]
+    assert isinstance(cal.results, ExperimentResults)
+    assert isinstance(cal.best_strategy(), Strategy)
 
 
 def test_get_cost():
@@ -88,13 +92,6 @@ def test_get_cost():
     expected_cost = 2 * 4  # circuits * num_experiments
     assert cost["noisy_executions"] == expected_cost
     assert cost["ideal_executions"] == 0
-
-
-def test_validate_run_circuits_schema():
-    cal = Calibrator(execute, settings)
-    results = cal.run_circuits()
-    results_schema = Schema([Result])
-    assert results_schema.validate(results)
 
 
 def test_best_strategy():
@@ -129,7 +126,7 @@ def test_best_strategy():
     for _ in range(5):
         cal = Calibrator(execute, test_strategy_settings)
         cal.run()
-        strategy = cal.best_strategy(cal.results)
+        strategy = cal.best_strategy()
 
         assert strategy.technique.name == "ZNE"
 

@@ -16,7 +16,7 @@ import pytest
 import json
 
 from mitiq.calibration import ZNESettings, Settings
-from mitiq.calibration.settings import MitigationTechnique, BenchmarkProblem
+from mitiq.calibration.settings import MitigationTechnique
 from mitiq.raw import execute
 from mitiq.pec import execute_with_pec
 from mitiq.zne.scaling import fold_global

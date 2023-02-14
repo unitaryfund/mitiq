@@ -12,7 +12,6 @@ pytest-cov==4.0.0
 flake8==6.0.0
 black==22.10
 mypy==0.982
-schema==0.7.5
 
 # Documentation and examples.
 Sphinx==5.2.3

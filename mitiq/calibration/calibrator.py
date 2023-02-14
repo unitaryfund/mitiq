@@ -13,12 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from math import sqrt
-from typing import Any, Callable, Dict, List, Optional, Union, cast
-from collections import defaultdict
-from dataclasses import dataclass
+from typing import Callable, Dict, Optional, Union, cast
 
 import cirq
+import numpy as np
+import numpy.typing as npt
 
 from mitiq import (
     QPROGRAM,
@@ -31,16 +30,39 @@ from mitiq.calibration.settings import (
     Settings,
     Strategy,
     BenchmarkProblem,
-    DefaultStrategy,
 )
 
 
-@dataclass
-class Result:
-    strategy: Strategy
-    problem: BenchmarkProblem
-    results: Dict[str, float]
-    id: int = -1
+class ExperimentResults:
+    def __init__(self, num_strategies: int, num_problems: int) -> None:
+        self.num_strategies = num_strategies
+        self.num_problems = num_problems
+        self.mitigated = np.zeros((num_strategies, num_problems))
+        self.noisy = np.zeros((num_strategies, num_problems))
+        self.ideal = np.zeros((num_strategies, num_problems))
+
+    def add_result(
+        self,
+        strategy: Strategy,
+        problem: BenchmarkProblem,
+        *,
+        ideal_val: float,
+        noisy_val: float,
+        mitigated_val: float,
+    ) -> None:
+        self.mitigated[strategy.id, problem.id] = mitigated_val
+        self.noisy[strategy.id, problem.id] = noisy_val
+        self.ideal[strategy.id, problem.id] = ideal_val
+
+    def errors(self) -> npt.NDArray[np.float32]:
+        return abs(self.ideal - self.mitigated)
+
+    def smallest_error(self) -> int:
+        errors = self.errors()
+        strategy_errors = np.sum(errors, axis=1)
+        strategy_errors /= len(errors[0])
+        strategy_id = np.argmin(strategy_errors)
+        return strategy_id
 
 
 class Calibrator:
@@ -75,7 +97,11 @@ class Calibrator:
         )
         self.settings = settings
         self.circuits = settings.make_circuits()
-        self.results: List[Result] = []
+        self.strategies = settings.make_strategies()
+        self.results = ExperimentResults(
+            num_strategies=len(self.strategies),
+            num_problems=len(self.circuits),
+        )
 
     def get_cost(self) -> Dict[str, int]:
         """Returns the expected number of noisy and ideal expectation values
@@ -94,16 +120,8 @@ class Calibrator:
             "ideal_executions": ideal,
         }
 
-    def run_circuits(self) -> List[Result]:
-        """Runs all the circuits required for calibration.
-
-        Returns:
-            A collection of experimental results along with a summary of each
-            :class:`BenchmarkProblem` that was run.
-        """
-        results = []
-
-        strategies = self.settings.make_strategies()
+    def run(self) -> None:
+        """Runs all the circuits required for calibration."""
         for problem in self.circuits:
             circuit = problem.circuit
             circuit.append(cirq.measure(circuit.all_qubits()))
@@ -115,52 +133,19 @@ class Calibrator:
 
             noisy_value = expval_executor.evaluate(circuit)[0]
 
-            for strategy in strategies:
+            for strategy in self.strategies:
                 mitigated_value = strategy.mitigation_function(
                     circuit, expval_executor
                 )
-
-                result = {
-                    "mitigated": mitigated_value,
-                    "noisy": noisy_value,
-                    "ideal": problem.largest_probability(),
-                }
-                summary = Result(
-                    strategy=strategy, problem=problem, results=result
+                self.results.add_result(
+                    strategy,
+                    problem,
+                    ideal_val=problem.largest_probability(),
+                    noisy_val=noisy_value,
+                    mitigated_val=mitigated_value,
                 )
-                results.append(summary)
 
-        return results
-
-    def filter_problems(
-        self, results: List[Result]
-    ) -> Dict[int, List[Dict[str, float]]]:
-
-        di = defaultdict(list)
-        for res in results:
-            di[res.strategy.id].append(res.results)
-
-        return di
-
-    def get_strategy(self, strategy_id: int) -> Strategy:
-        for res in self.results:
-            if res.strategy.id == strategy_id:
-                return res.strategy
-        return DefaultStrategy
-
-    def compute_errors(self, results: List[Result]) -> Dict[int, float]:
-        errors = {}
-        strategy_results = self.filter_problems(results)
-        for strategy_id, expectation_values in strategy_results.items():
-            average_error = 0.0
-            for result in expectation_values:
-                average_error += abs(result["ideal"] - result["mitigated"])
-
-            errors[strategy_id] = average_error / len(expectation_values)
-
-        return errors
-
-    def best_strategy(self, results: List[Result]) -> Strategy:
+    def best_strategy(self) -> Strategy:
         """Finds the best strategy by using the parameters that had the
         smallest error.
 
@@ -172,20 +157,11 @@ class Calibrator:
             A single :class:`Strategy` object specifying the technique and
             parameters that performed best.
         """
-        errors = self.compute_errors(results)
-
-        best_strategy_id = min(errors, key=errors.__getitem__)
-        return self.get_strategy(best_strategy_id)
-
-    def run(self) -> None:
-        results = self.run_circuits()
-        self.results = results
+        strategy_id = self.results.smallest_error()
+        return self.settings.get_strategy(strategy_id)
 
 
-def convert_to_expval_executor(
-    executor: Executor,
-    bitstring: str,
-) -> Executor:
+def convert_to_expval_executor(executor: Executor, bitstring: str) -> Executor:
     """Constructs a new executor returning an expectation value given by the
     probability that the circuit outputs the most likely state according to the
     ideal distribution.
@@ -203,7 +179,7 @@ def convert_to_expval_executor(
     def expval_executor(circuit: cirq.Circuit) -> float:
         raw = cast(MeasurementResult, executor.run([circuit])[0])
         distribution = raw.prob_distribution()
-        return distribution.get(bitstring, 0)
+        return distribution.get(bitstring, 0.0)
 
     return Executor(expval_executor)
 
@@ -236,6 +212,6 @@ def execute_with_mitigation(
 
     if not calibrator.results:
         calibrator.run()
-    strategy = calibrator.best_strategy(calibrator.results)
+    strategy = calibrator.best_strategy()
     em_func = strategy.mitigation_function
     return em_func(circuit, executor=executor, observable=observable)
