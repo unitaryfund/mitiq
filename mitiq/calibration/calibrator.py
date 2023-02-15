@@ -57,10 +57,9 @@ class ExperimentResults:
     def squared_errors(self) -> npt.NDArray[np.float32]:
         return (self.ideal - self.mitigated) ** 2
 
-    def smallest_error(self) -> int:
+    def best_strategy_id(self) -> int:
         errors = self.squared_errors()
         strategy_errors = np.sum(errors, axis=1)
-        strategy_errors /= len(errors[0])
         strategy_id = np.argmin(strategy_errors)
         return strategy_id
 
@@ -157,7 +156,7 @@ class Calibrator:
             A single :class:`Strategy` object specifying the technique and
             parameters that performed best.
         """
-        strategy_id = self.results.smallest_error()
+        strategy_id = self.results.best_strategy_id()
         return self.settings.get_strategy(strategy_id)
 
 
