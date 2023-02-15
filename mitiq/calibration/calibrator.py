@@ -95,7 +95,7 @@ class Calibrator:
             else None
         )
         self.settings = settings
-        self.circuits = settings.make_circuits()
+        self.circuits = settings.make_problems()
         self.strategies = settings.make_strategies()
         self.results = ExperimentResults(
             num_strategies=len(self.strategies),

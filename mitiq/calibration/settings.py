@@ -206,7 +206,7 @@ class Settings:
     def get_problem(self, problem_id: int) -> BenchmarkProblem:
         return self.problem_dict[problem_id]
 
-    def make_circuits(self) -> List[BenchmarkProblem]:
+    def make_problems(self) -> List[BenchmarkProblem]:
         """Generate the circuits to run for the calibration experiment.
         Returns:
             A list of :class:`BenchmarkProblem` objects"""
