@@ -54,11 +54,11 @@ class ExperimentResults:
         self.noisy[strategy.id, problem.id] = noisy_val
         self.ideal[strategy.id, problem.id] = ideal_val
 
-    def errors(self) -> npt.NDArray[np.float32]:
-        return abs(self.ideal - self.mitigated)
+    def squared_errors(self) -> npt.NDArray[np.float32]:
+        return (self.ideal - self.mitigated) ** 2
 
     def smallest_error(self) -> int:
-        errors = self.errors()
+        errors = self.squared_errors()
         strategy_errors = np.sum(errors, axis=1)
         strategy_errors /= len(errors[0])
         strategy_id = np.argmin(strategy_errors)
