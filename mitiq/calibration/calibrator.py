@@ -37,9 +37,9 @@ class ExperimentResults:
     def __init__(self, num_strategies: int, num_problems: int) -> None:
         self.num_strategies = num_strategies
         self.num_problems = num_problems
-        self.mitigated = np.zeros((num_strategies, num_problems))
-        self.noisy = np.zeros((num_strategies, num_problems))
-        self.ideal = np.zeros((num_strategies, num_problems))
+        self.mitigated = np.full((num_strategies, num_problems), np.nan)
+        self.noisy = np.full((num_strategies, num_problems), np.nan)
+        self.ideal = np.full((num_strategies, num_problems), np.nan)
 
     def add_result(
         self,
@@ -143,6 +143,11 @@ class Calibrator:
                     noisy_val=noisy_value,
                     mitigated_val=mitigated_value,
                 )
+        if np.isnan(self.results.mitigated).any():
+            raise ValueError(
+                "A result from a calibration experiment is missing. "
+                "Please try to run the experiment again."
+            )
 
     def best_strategy(self) -> Strategy:
         """Finds the best strategy by using the parameters that had the
