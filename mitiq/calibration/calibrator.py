@@ -34,6 +34,9 @@ from mitiq.calibration.settings import (
 
 
 class ExperimentResults:
+    """Class to store calibration experiment data, and provide helper methods
+    for computing results based on it."""
+
     def __init__(self, num_strategies: int, num_problems: int) -> None:
         self.num_strategies = num_strategies
         self.num_problems = num_problems
@@ -50,14 +53,21 @@ class ExperimentResults:
         noisy_val: float,
         mitigated_val: float,
     ) -> None:
+        """Add a single result from a (Strategy, BenchmarkProblem) pair and
+        store the results."""
         self.mitigated[strategy.id, problem.id] = mitigated_val
         self.noisy[strategy.id, problem.id] = noisy_val
         self.ideal[strategy.id, problem.id] = ideal_val
 
     def squared_errors(self) -> npt.NDArray[np.float32]:
+        """Returns an array of squared errors, one for each (strategy, problem)
+        pair."""
         return (self.ideal - self.mitigated) ** 2
 
     def best_strategy_id(self) -> int:
+        """Returns the stategy id that corresponds to the strategy that
+        maintained the smallest error across all ``BenchmarkProblem``
+        instances."""
         errors = self.squared_errors()
         strategy_errors = np.sum(errors, axis=1)
         strategy_id = np.argmin(strategy_errors)
