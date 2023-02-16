@@ -70,7 +70,7 @@ class ExperimentResults:
         instances."""
         errors = self.squared_errors()
         strategy_errors = np.sum(errors, axis=1)
-        strategy_id = np.argmin(strategy_errors)
+        strategy_id = int(np.argmin(strategy_errors))
         return strategy_id
 
 
@@ -195,7 +195,7 @@ def convert_to_expval_executor(executor: Executor, bitstring: str) -> Executor:
         distribution = raw.prob_distribution()
         return distribution.get(bitstring, 0.0)
 
-    return Executor(expval_executor)
+    return Executor(expval_executor)  # type: ignore [arg-type]
 
 
 def execute_with_mitigation(
