@@ -31,7 +31,11 @@ from mitiq.calibration.calibrator import (
     convert_to_expval_executor,
     ExperimentResults,
 )
-from mitiq.calibration.settings import Strategy
+from mitiq.calibration.settings import (
+    Strategy,
+    MitigationTechnique,
+    BenchmarkProblem,
+)
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import fold_global
 
@@ -123,12 +127,13 @@ def test_best_strategy():
         ],
         circuit_seed=1,
     )
-    for _ in range(5):
-        cal = Calibrator(execute, test_strategy_settings)
-        cal.run()
-        strategy = cal.best_strategy()
 
-        assert strategy.technique.name == "ZNE"
+    cal = Calibrator(execute, test_strategy_settings)
+    cal.run()
+    assert not np.isnan(cal.results.mitigated).all()
+
+    strategy = cal.best_strategy()
+    assert strategy.technique.name == "ZNE"
 
 
 def test_convert_to_expval_executor():
@@ -157,3 +162,32 @@ def test_execute_with_mitigation():
     )
     assert isinstance(expval, float)
     assert 0 <= expval <= 1.5
+
+
+def test_ExtrapolationResults_add_result():
+    er = ExperimentResults(5, 3)
+    assert np.isnan(er.mitigated).all()
+    strat = Strategy(0, MitigationTechnique.ZNE, {})
+    problem = BenchmarkProblem(0, "circuit", "ghz", {})
+    er.add_result(
+        strat, problem, ideal_val=1.0, noisy_val=0.8, mitigated_val=0.9
+    )
+    assert not np.isnan(er.mitigated).all()
+
+
+def test_ExtrapolationResults_errors():
+    num_strategies, num_problems = 5, 3
+    er = ExperimentResults(num_strategies, num_problems)
+    er.mitigated = np.random.random((num_strategies, num_problems))
+    er.ideal = np.random.random((num_strategies, num_problems))
+
+    assert (er.squared_errors() > 0).all()
+
+
+def test_ExtrapolationResults_best_strategy():
+    num_strategies, num_problems = 5, 3
+    er = ExperimentResults(num_strategies, num_problems)
+    er.mitigated = np.zeros((num_strategies, num_problems))
+    er.mitigated[4, 2] = 0.8
+    er.ideal = np.ones((num_strategies, num_problems))
+    assert er.best_strategy_id() == 4
