@@ -203,9 +203,6 @@ class Settings:
     def get_strategy(self, strategy_id: int) -> Strategy:
         return self.strategy_dict[strategy_id]
 
-    def get_problem(self, problem_id: int) -> BenchmarkProblem:
-        return self.problem_dict[problem_id]
-
     def make_problems(self) -> List[BenchmarkProblem]:
         """Generate the benchmark problems for the calibration experiment.
         Returns:
