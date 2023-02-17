@@ -152,5 +152,4 @@ def find_optimal_representation(
         initial_guess=initial_guess,
     )
 
-    basis_expansion = {op: eta for op, eta in zip(basis_set, quasi_prob_dist)}
-    return OperationRepresentation(ideal_operation, basis_expansion)
+    return OperationRepresentation(ideal_operation, basis_set, quasi_prob_dist)

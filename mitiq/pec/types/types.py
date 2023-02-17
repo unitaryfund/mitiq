@@ -16,7 +16,7 @@
 """Types used in probabilistic error cancellation."""
 from copy import deepcopy
 from itertools import product
-from typing import Any, cast, Dict, List, Optional, Sequence, Set, Tuple
+from typing import Any, List, Optional, Sequence, Set, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -213,7 +213,8 @@ class OperationRepresentation:
     def __init__(
         self,
         ideal: QPROGRAM,
-        basis_expansion: Dict[NoisyOperation, float],
+        noisy_operations: List[NoisyOperation],
+        coeffs: List[float],
         is_qubit_dependent: bool = True,
     ) -> None:
         """Initializes an OperationRepresentation.
@@ -232,86 +233,56 @@ class OperationRepresentation:
             TypeError: If all keys of `basis_expansion` are not instances of
                 `NoisyOperation`s.
         """
-        self._native_ideal = ideal
-        self._ideal, self._native_type = convert_to_mitiq(ideal)
-        self.is_qubit_dependent = is_qubit_dependent
-
-        if not all(
-            isinstance(op, NoisyOperation) for op in basis_expansion.keys()
-        ):
+        if not all(isinstance(o, NoisyOperation) for o in noisy_operations):
             raise TypeError(
-                "All keys of `basis_expansion` must be "
+                "All elements of `noisy_operations` must be "
                 "of type `NoisyOperation`."
             )
 
-        self._basis_expansion = cirq.LinearDict(basis_expansion)
-        self._norm = sum(abs(coeff) for coeff in self.coeffs)
-        self._distribution = (
-            np.array(
-                list(
-                    map(
-                        abs,  # type: ignore
-                        self.coeffs,
-                    )
-                )
+        if not all(isinstance(c, float) for c in coeffs):
+            raise TypeError("All elements of `coeffs` must be floats.")
+
+        if len(noisy_operations) != len(coeffs):
+            raise ValueError(
+                "`noisy_operations` and `coeffs` must have equal lengths"
+                f" but {len(noisy_operations)}!={len(coeffs)}."
             )
-            / self.norm
-        )
+        self._native_ideal = deepcopy(ideal)
+        self._ideal, self._native_type = convert_to_mitiq(ideal)
+        self._noisy_operations = noisy_operations
+        self._coeffs = coeffs
+        self._norm = sum(abs(c) for c in coeffs)
+        self._distribution = [abs(c) / self._norm for c in coeffs]
+        self.is_qubit_dependent = is_qubit_dependent
 
     @property
     def ideal(self) -> QPROGRAM:
         return self._ideal
 
     @property
-    def basis_expansion(self) -> cirq.LinearDict[NoisyOperation]:
-        return self._basis_expansion
+    def basis_expansion(self) -> List[Tuple[float, NoisyOperation]]:
+        return [(c, o) for c, o in zip(self._coeffs, self._noisy_operations)]
 
     @property
-    def noisy_operations(self) -> Tuple[NoisyOperation, ...]:
-        return tuple(self._basis_expansion.keys())
+    def noisy_operations(self) -> List[NoisyOperation]:
+        return self._noisy_operations
 
     @property
-    def coeffs(self) -> Tuple[float, ...]:
-        return tuple(cast(List[float], self._basis_expansion.values()))
+    def coeffs(self) -> List[float]:
+        """Returns the coefficients of the quasi-probability distribution."""
+        return self._coeffs
 
     @property
     def norm(self) -> float:
-        """Returns the L1 norm of the basis expansion coefficients."""
+        """Returns the 1-norm of the quasi-probability distribution."""
         return self._norm
 
-    def distribution(self) -> npt.NDArray[np.float64]:
-        """Returns the Quasi-Probability Representation (QPR) of the
-        decomposition. The QPR is the normalized magnitude of each coefficient
-        in the basis expansion.
+    @property
+    def distribution(self) -> List[float]:
+        """Returns the probability distribution obtained from taking
+        the absolute value and normalizing the quasi-probability distribution.
         """
         return self._distribution
-
-    def coeff_of(self, noisy_op: NoisyOperation) -> float:
-        """Returns the coefficient of the noisy operation in the basis
-        expansion.
-
-        Args:
-            noisy_op: NoisyOperation to get the coefficient of.
-
-        Raises:
-            ValueError: If noisy_op doesn't appear in the basis expansion.
-        """
-        if noisy_op not in self.noisy_operations:
-            raise ValueError(
-                "Arg `noisy_op` does not appear in the basis expansion."
-            )
-        return cast(float, self._basis_expansion.get(noisy_op))
-
-    def sign_of(self, noisy_op: NoisyOperation) -> float:
-        """Returns the sign of the noisy operation in the basis expansion.
-
-        Args:
-            noisy_op: NoisyOperation to get the sign of.
-
-        Raises:
-            ValueError: If noisy_op doesn't appear in the basis expansion.
-        """
-        return np.sign(self.coeff_of(noisy_op))
 
     def sample(
         self, random_state: Optional[np.random.RandomState] = None
@@ -331,10 +302,9 @@ class OperationRepresentation:
                 f"but was {type(random_state)}."
             )
 
-        noisy_op = rng.choice(
-            self.noisy_operations, p=self.distribution()  # type: ignore
-        )
-        return noisy_op, int(self.sign_of(noisy_op)), self.coeff_of(noisy_op)
+        idx = rng.choice(len(self.coeffs), p=self.distribution)
+        coeff, noisy_op = self.basis_expansion[idx]
+        return noisy_op, int(np.sign(coeff)), coeff
 
     def __str__(self) -> str:
         lhs = str(self._ideal) + " = "
@@ -362,11 +332,10 @@ class OperationRepresentation:
         return lhs + rhs
 
     def __eq__(self, other: Any) -> bool:
-        """Checks if two representations are equivalent. This function return
+        """Checks if two representations are equivalent. This function returns
         True if the representations have the same ideal operation, the same
         coefficients and equivalent NoisyOperation(s) (same gates but not
-        necessarily same channel_matrix matrix representations since
-        channel_matrix matrices are optional).
+        necessarily same channel_matrix since channel_matrix is optional).
         """
         if self._native_type != other._native_type:
             return False
@@ -374,19 +343,17 @@ class OperationRepresentation:
         if not _equal(self._ideal, other._ideal):
             return False
 
-        noisy_ops_a = self.noisy_operations
-        noisy_ops_b = other.noisy_operations
-        if len(noisy_ops_a) != len(noisy_ops_b):
+        if len(self.basis_expansion) != len(other.basis_expansion):
             return False
 
-        for op_a in noisy_ops_a:
+        for c_a, op_a in self.basis_expansion:
             found = False
-            for op_b in noisy_ops_b:
+            for c_b, op_b in other.basis_expansion:
                 if _equal(op_a._circuit, op_b._circuit):
                     found = True
                     break
             if not found:
                 return False
-            if not np.isclose(self.coeff_of(op_a), other.coeff_of(op_b)):
+            if not np.isclose(c_a, c_b):
                 return False
         return True
