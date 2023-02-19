@@ -212,7 +212,7 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
 
 ## Readout-Error Mitigation
 
-### Post-selection
+### Postselection
 ```{eval-rst}
 .. automodule:: mitiq.rem.post_select
    :members:

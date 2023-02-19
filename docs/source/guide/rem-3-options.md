@@ -15,30 +15,7 @@ kernelspec:
 
 ## Overview
 The main options the user has when using REM concern how to specify the inverse
-confusion matrix that is used to mitigate errors in the raw measurement (or "readout") results. Currently Mitiq does not implement methods for estimating readout-error confusion matrices (which is a form of measurement noise calibration and therefore a device specific task), so the user must provide enough information to allow Mitiq to construct one. As described below, Mitiq's options support the differing levels of information a user may have about the readout-error characteristics of their device. After the confusion matrix has been constructed, the remaining steps of standard REM are straightforward (compute the pseudoinverse of the confusion matrix and then apply this to the raw measurement results). 
-
-
-
-## What is a Confusion Matrix?
-
-A device's readout-error confusion matrix $A$ is a square matrix that encodes, for each pair of measurement basis states $|u\rangle$ and $|v\rangle$, the probability that the device will report $|u\rangle$ as the measurement outcome when the true state being measured was $|v\rangle$. On an ideal, noise-free device, $|u\rangle$ would always equal $|v\rangle$, so the corresponding confusion matrix would have ones on the diagonal and zeros elsewhere. For simplicity of exposition, we will assume throughout that the measurement basis (i.e. the eigenbasis of the observable being measured) is the computational or $Z$ basis. For a two qubit device, the general picture of a confusion matrix to have in mind is:
-
-$$
-\begin{bmatrix}
-Pr(00|00) & Pr(01|00) & Pr(10|00) & Pr(11|00) \\
-Pr(00|01) & Pr(01|01) & Pr(10|01) & Pr(11|01) \\
-Pr(00|10) & Pr(01|10) & Pr(10|10) & Pr(11|10) \\
-Pr(00|11) & Pr(01|11) & Pr(10|11) & Pr(11|11)
-\end{bmatrix}
-$$
-
-
-where $Pr(ij|kl)$ is the probability of observing state $|ij\rangle$ when measuring true state $|kl\rangle$. 
-
-The most straightforward way to empirically estimate a device's full confusion matrix is to go through all the measurement basis states, and for each one $|u\rangle$, repeatedly prepare-then-measure $|u\rangle$ and record the histogram of observed outcomes. This histogram, normalized to give a probability distribution, is an estimate for the $u$th column of the confusion matrix A (i.e. the distribution of measurement outcomes when the true state is $|u\rangle$). Since the number of basis states scales exponentially with the number of qubits $n$, estimating the full confusion matrix in this way requires $O(2^n)$ samples and is therefore only practical for small devices. 
-
-Note that the estimated confusion matrix $A$ is circuit-independent---it characterizes the readout noise of the device regardless of what circuit is being executed. So in principle (assuming the noise characteristics of the device do not shift over time) $A$ only needs to be estimated once, and its [Moore-Penrose](https://en.wikipedia.org/wiki/Moore%E2%80%93Penrose_inverse) [pseudoinverse](https://numpy.org/doc/stable/reference/generated/numpy.linalg.pinv.html) $A^{+}$ only needs to be computed once. One can then perform REM for any particular circuit on the device by applying $A^{+}$ to the measurement outcomes from repeated runs of that circuit. For more details, see [What is the theory behind REM?](rem-5-theory.md).
-
+confusion matrix that is used to mitigate errors in the raw measurement (or "readout") results. Currently Mitiq does not implement methods for estimating readout-error confusion matrices (which is a form of measurement noise calibration and therefore a device specific task), so the user must provide enough information to allow Mitiq to construct one. As described below, Mitiq's options support the differing levels of information a user may have about the readout-error characteristics of their device. After the confusion matrix has been constructed, the remaining steps of standard REM are straightforward (compute the pseudoinverse of the confusion matrix and then apply this to the raw measurement results). For more information on what a confusion matrix is, see [What is the theory behind REM?](rem-5-theory.md#what-is-a-confusion-matrix).
 
 ## Options for specifying the inverse confusion matrix  
 

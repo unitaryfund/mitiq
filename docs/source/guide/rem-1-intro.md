@@ -86,8 +86,31 @@ error = abs((ideal_value - noisy_value)/ideal_value)
 print(f"Error without mitigation: {error:.3}")
 ```
 
+## Apply Postselection
+The simplest version of readout error mitigation that we could do is to postselect specific bitstrings using 
+{mod}`mitiq.rem.post_select`. In our case we know that we should only have bitstrings of `[1,1]`, so we could discard
+any results that don't match.
+
+```{code-cell} ipython3
+from mitiq.rem import post_select
+
+circuit_with_measurements = circuit.copy()
+circuit_with_measurements.append(measure_each(*qreg))
+noisy_measurements = noisy_executor(circuit_with_measurements)
+print(f"Before postselection: {noisy_measurements.get_counts()}")
+postselected_measurements = post_select(noisy_measurements, lambda bits: bits == [1,1])
+print(f"After postselection: {postselected_measurements.get_counts()}")
+total_measurements = len(noisy_measurements.result)
+discarded_measurements = total_measurements - len(postselected_measurements.result)
+print(f"Discarded measurements: {discarded_measurements} ({discarded_measurements/total_measurements:.0%} of total)")
+```
+
+So, if we used these postselected results, then we'd get our expected noiseless expectation value. However, that comes
+at the cost of throwing away many of our measurements, which doesn't scale well in practice with the number of qubits
+we are measuring. 
+
 ## Apply REM
-Readout-error mitigation can be easily applied with the function
+A more elaborate readout-error mitigation technique can be easily applied with the function
 {func}`.execute_with_rem()`.
 
 ```{code-cell} ipython3
@@ -123,7 +146,5 @@ confusion matrix with some being more costly than others.
 
 +++
 
-The section
-[What additional options are available when using REM?](rem-3-options.md)
-contains more information on generating inverse confusion matrices in order to 
-apply REM with Mitiq.
+The section [What additional options are available when using REM?](rem-3-options.md) contains more information on
+generating inverse confusion matrices in order to apply REM with Mitiq.
