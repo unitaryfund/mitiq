@@ -11,13 +11,13 @@ kernelspec:
   name: python3
 ---
 
-# Hands-on lab on error mitigation with Mitiq.
+# Solution to hands-on lab on error mitigation with Mitiq.
 +++
 
 This is a hands-on notebook created for the [`SQMS/GGI 2022 Summer School on Quantum Simulation of Field Theories`](https://www.ggi.infn.it/showevent.pl?id=436). 
 
 It is a guided tutorial on error mitigation with Mitiq and is focused on the zero-noise extrapolation (ZNE) technique. As this is
-intended to be a hands-on exercise, the solutions to the examples are linked at the end of the notebook. 
+intended to be a hands-on exercise, the solutions to the examples are provided in this notebook.  
 
 Useful links :
 
@@ -41,8 +41,7 @@ The lab is split into the following sections :
 - [](#computing-a-quantum-expectation-value-without-error-mitigation)
 - [](#apply-zero-noise-extrapolation-with-mitiq)
 - [](#explicitly-selecting-the-noise-scaling-method-and-the-extrapolation-method)
-- [](#what-happens-behind-the-scenes-a-low-level-application-of-ZNE)
-
+- [](#what-happens-behind-the-scenes-a-low-level-application-of-zne)
 +++
 
 ## Checking Python packages are installed correctly
@@ -119,7 +118,7 @@ from qiskit import QuantumCircuit
 from qiskit.providers.aer import AerSimulator
 from qiskit.tools.visualization import plot_histogram
 from qiskit import transpile
-from qiskit.test import mock  # Fake (simulated) QPUs
+from qiskit.providers.fake_provider import FakeJakarta  # Fake (simulated) QPUs
 
 # Number of measurements
 shots = 10 ** 5
@@ -142,7 +141,7 @@ plot_histogram(ideal_counts, title='Counts for an ideal GHZ state')
 We now execute the same circuit on a noisy backend (a classical emulator of a real QPU)
 
 ```{code-cell} ipython3
-noisy_backend = mock.FakeJakarta() # QPU emulator
+noisy_backend = FakeJakarta() # QPU emulator
 
 # Compile the circuit into the native gates of the backend
 compiled_circuit = transpile(circuit_to_run, noisy_backend)
@@ -171,7 +170,7 @@ Before using Mitiq we need wrap the previous code into a function that takes as 
 def execute(compiled_circuit):
     """Executes the input circuits and returns the expectation value of A=|00..0><00..0| + |11..1><11..1|."""
     print("Executing a circuit of depth:", compiled_circuit.depth())
-    noisy_backend = mock.FakeJakarta()
+    noisy_backend = FakeJakarta()
     noisy_result = noisy_backend.run(compiled_circuit, shots=shots).result()
     noisy_counts = noisy_result.get_counts(compiled_circuit)
     noisy_expectation_value = (noisy_counts[n_qubits * "0"] + noisy_counts[n_qubits * "1"]) / shots
@@ -298,5 +297,15 @@ _ = linear_factory.plot_fit()
 
 +++
 ## References
+
+1. _Mitiq: A software package for error mitigation on noisy quantum computers_, R. LaRose at al., [arXiv:2009.04417](https://arxiv.org/abs/2009.04417) (2020).
+
+2. _Efficient variational quantum simulator incorporating active error minimisation_, Y. Li, S. C. Benjamin, [arXiv:1611.09301](https://arxiv.org/abs/1611.09301) (2016).
+
+3. _Error mitigation for short-depth quantum circuits_, K. Temme, S. Bravyi, J. M. Gambetta, [arXiv:1612.02058](https://arxiv.org/abs/1612.02058) (2016).
+
+4. _Digital zero noise extrapolation for quantum error mitigation_, 
+T. Giurgica-Tiron, Y. Hindy, R. LaRose, A. Mari, W. J. Zeng,
+[arXiv:2005.10921](https://arxiv.org/abs/2005.10921) (2020).
 
 +++
