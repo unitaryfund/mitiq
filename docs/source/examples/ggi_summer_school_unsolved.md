@@ -301,7 +301,7 @@ _ = linear_factory.plot_fit()
 
 **Note:** We evaluated two different extrapolations without measuring the system twice. This is possible since the final extrapolation step is simply a classical post-processing of the same measured data.
 
-The solutions to this notebook are available [here .](ggi_summer_School_solved.md)
+The solutions to this notebook are available [here .](ggi_summer_school_solved.md)
 
 +++
 ## References
