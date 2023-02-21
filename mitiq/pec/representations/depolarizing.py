@@ -152,10 +152,9 @@ def represent_operation_with_global_depolarizing_noise(
         for op in post_ops
     ]
 
-    # Build basis expansion.
-    expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}
+    noisy_operations = [NoisyOperation(c) for c in imp_op_circuits]
 
-    return OperationRepresentation(ideal_operation, expansion)
+    return OperationRepresentation(ideal_operation, noisy_operations, alphas)
 
 
 def represent_operation_with_local_depolarizing_noise(
@@ -248,10 +247,9 @@ def represent_operation_with_local_depolarizing_noise(
             "Consider pre-compiling your circuit."
         )
 
-    # Build basis expansion.
-    expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}
+    noisy_operations = [NoisyOperation(c) for c in imp_op_circuits]
 
-    return OperationRepresentation(ideal_operation, expansion)
+    return OperationRepresentation(ideal_operation, noisy_operations, alphas)
 
 
 def represent_operations_in_circuit_with_global_depolarizing_noise(

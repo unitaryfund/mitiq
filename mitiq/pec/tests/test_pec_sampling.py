@@ -64,10 +64,8 @@ def test_sample_sequence_cirq():
 
     rep = OperationRepresentation(
         ideal=circuit,
-        basis_expansion={
-            NoisyOperation(xcirq): 0.5,
-            NoisyOperation(zcirq): -0.5,
-        },
+        noisy_operations=[NoisyOperation(xcirq), NoisyOperation(zcirq)],
+        coeffs=[0.5, -0.5],
     )
 
     for _ in range(5):
@@ -93,7 +91,8 @@ def test_sample_sequence_qiskit():
 
     rep = OperationRepresentation(
         ideal=circuit,
-        basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
+        noisy_operations=[noisy_xop, noisy_zop],
+        coeffs=[0.5, -0.5],
     )
 
     for _ in range(5):
@@ -111,7 +110,8 @@ def test_sample_sequence_pyquil():
 
     rep = OperationRepresentation(
         ideal=circuit,
-        basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
+        noisy_operations=[noisy_xop, noisy_zop],
+        coeffs=[0.5, -0.5],
     )
 
     for _ in range(50):
@@ -126,10 +126,8 @@ def test_sample_sequence_cirq_random_state(seed):
     circuit = Circuit(cirq.H.on(LineQubit(0)))
     rep = OperationRepresentation(
         ideal=circuit,
-        basis_expansion={
-            NoisyOperation(xcirq): 0.5,
-            NoisyOperation(zcirq): -0.5,
-        },
+        noisy_operations=[NoisyOperation(xcirq), NoisyOperation(zcirq)],
+        coeffs=[0.5, -0.5],
     )
 
     sequences, signs, norm = sample_sequence(
@@ -152,10 +150,8 @@ def test_qubit_independent_representation_cirq(qubit):
 
     rep = OperationRepresentation(
         ideal=Circuit(cirq.H.on(LineQubit(qubit))),
-        basis_expansion={
-            NoisyOperation(xcirq): 0.5,
-            NoisyOperation(zcirq): -0.5,
-        },
+        noisy_operations=[NoisyOperation(xcirq), NoisyOperation(zcirq)],
+        coeffs=[0.5, -0.5],
         is_qubit_dependent=False,
     )
 
@@ -187,7 +183,8 @@ def test_qubit_independent_representation_qiskit(qubit):
     _ = ideal_op.h(qubit)
     rep = OperationRepresentation(
         ideal=ideal_op,
-        basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
+        noisy_operations=[noisy_xop, noisy_zop],
+        coeffs=[0.5, -0.5],
         is_qubit_dependent=False,
     )
 
@@ -207,7 +204,8 @@ def test_qubit_independent_representation_pyquil(qubit):
 
     rep = OperationRepresentation(
         ideal=circuit,
-        basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
+        noisy_operations=[noisy_xop, noisy_zop],
+        coeffs=[0.5, -0.5],
         is_qubit_dependent=False,
     )
 
@@ -225,10 +223,8 @@ def test_qubit_independent_representation_pyquil(qubit):
         [
             OperationRepresentation(
                 Circuit(cirq.H.on(LineQubit(0))),
-                {
-                    NoisyOperation(xcirq): 0.5,
-                    NoisyOperation(zcirq): -0.5,
-                },
+                [NoisyOperation(xcirq), NoisyOperation(zcirq)],
+                [0.5, -0.5],
             )
         ],
     ],
@@ -253,19 +249,15 @@ def test_sample_circuit_cirq(measure):
         circuit.append(measure_each(*LineQubit.range(2)))
 
     h_rep = OperationRepresentation(
-        ideal=circuit[:1],
-        basis_expansion={
-            NoisyOperation(xcirq): 0.6,
-            NoisyOperation(zcirq): -0.6,
-        },
+        circuit[:1],
+        [NoisyOperation(xcirq), NoisyOperation(zcirq)],
+        [0.6, -0.6],
     )
 
     cnot_rep = OperationRepresentation(
-        ideal=circuit[1:2],
-        basis_expansion={
-            NoisyOperation(cnotcirq): 0.7,
-            NoisyOperation(czcirq): -0.7,
-        },
+        circuit[1:2],
+        [NoisyOperation(cnotcirq), NoisyOperation(czcirq)],
+        [0.7, -0.7],
     )
 
     for _ in range(50):
@@ -286,11 +278,9 @@ def test_sample_circuit_partial_representations():
     )
 
     cnot_rep = OperationRepresentation(
-        ideal=circuit[1:2],
-        basis_expansion={
-            NoisyOperation(cnotcirq): 0.7,
-            NoisyOperation(czcirq): -0.7,
-        },
+        circuit[1:2],
+        [NoisyOperation(cnotcirq), NoisyOperation(czcirq)],
+        [0.7, -0.7],
     )
 
     for _ in range(10):
@@ -308,19 +298,21 @@ def test_sample_circuit_pyquil():
     circuit = Program(gates.H(0), gates.CNOT(0, 1))
 
     h_rep = OperationRepresentation(
-        ideal=circuit[:1],
-        basis_expansion={
-            NoisyOperation(Program(gates.X(0))): 0.6,
-            NoisyOperation(Program(gates.Z(0))): -0.6,
-        },
+        circuit[:1],
+        [
+            NoisyOperation(Program(gates.X(0))),
+            NoisyOperation(Program(gates.Z(0))),
+        ],
+        [0.6, -0.6],
     )
 
     cnot_rep = OperationRepresentation(
-        ideal=circuit[1:],
-        basis_expansion={
-            NoisyOperation(Program(gates.CNOT(0, 1))): 0.7,
-            NoisyOperation(Program(gates.CZ(0, 1))): -0.7,
-        },
+        circuit[1:],
+        [
+            NoisyOperation(Program(gates.CNOT(0, 1))),
+            NoisyOperation(Program(gates.CZ(0, 1))),
+        ],
+        [0.7, -0.7],
     )
 
     for _ in range(50):
@@ -338,10 +330,8 @@ def test_sample_circuit_with_seed():
     circ = Circuit([cirq.X.on(LineQubit(0)) for _ in range(10)])
     rep = OperationRepresentation(
         ideal=Circuit(cirq.X.on(LineQubit(0))),
-        basis_expansion={
-            NoisyOperation(zcirq): 1.0,
-            NoisyOperation(xcirq): -1.0,
-        },
+        noisy_operations=[NoisyOperation(zcirq), NoisyOperation(xcirq)],
+        coeffs=[1.0, -1.0],
     )
 
     expected_circuits, expected_signs, expected_norm = sample_circuit(
@@ -363,7 +353,9 @@ def test_sample_circuit_with_seed():
 def test_sample_circuit_trivial_decomposition():
     circuit = Circuit(ops.H.on(NamedQubit("Q")))
     rep = OperationRepresentation(
-        ideal=circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+        ideal=circuit,
+        noisy_operations=[NoisyOperation(circuit)],
+        coeffs=[1.0],
     )
 
     sampled_circuits, signs, norm = sample_circuit(
