@@ -195,3 +195,11 @@ def test_ExtrapolationResults_best_strategy():
     er.mitigated[4, 2] = 0.8
     er.ideal = np.ones((num_strategies, num_problems))
     assert er.best_strategy_id() == 4
+
+
+def test_logging(capfd):
+    cal = Calibrator(execute, ZNESettings)
+    cal.run(log=True)
+
+    captured = capfd.readouterr()
+    assert "circuit" in captured.out

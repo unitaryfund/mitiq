@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from typing import Callable, Dict, Optional, Union, cast
+import warnings
 
 import cirq
 import numpy as np
@@ -56,12 +57,26 @@ class ExperimentResults:
         ideal_val: float,
         noisy_val: float,
         mitigated_val: float,
+        log: bool = False,
     ) -> None:
         """Add a single result from a (Strategy, BenchmarkProblem) pair and
         store the results."""
         self.mitigated[strategy.id, problem.id] = mitigated_val
         self.noisy[strategy.id, problem.id] = noisy_val
         self.ideal[strategy.id, problem.id] = ideal_val
+        if not log:
+            return
+        mitigated_better = abs(ideal_val - mitigated_val) < abs(
+            ideal_val - noisy_val
+        )
+        performance = "✅" if mitigated_better else "❌"
+        print(
+            f"Running {problem.type} circuit using:",
+            list(strategy.to_dict().values()),
+        )
+        print(
+            f"{performance} ideal: {ideal_val:.2f}\tnoisy: {noisy_val:.2f}\tmitigated: {mitigated_val:.2f}"
+        )
 
     def is_missing_data(self) -> bool:
         """Method to check if there is any missing data that was expected from
@@ -148,7 +163,7 @@ class Calibrator:
             "ideal_executions": ideal,
         }
 
-    def run(self) -> None:
+    def run(self, log: bool = False) -> None:
         """Runs all the circuits required for calibration."""
         for problem in self.circuits:
             circuit = problem.circuit
@@ -162,15 +177,18 @@ class Calibrator:
             noisy_value = expval_executor.evaluate(circuit)[0]
 
             for strategy in self.strategies:
-                mitigated_value = strategy.mitigation_function(
-                    circuit, expval_executor
-                )
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore", UserWarning)
+                    mitigated_value = strategy.mitigation_function(
+                        circuit, expval_executor
+                    )
                 self.results.add_result(
                     strategy,
                     problem,
                     ideal_val=problem.largest_probability(),
                     noisy_val=noisy_value,
                     mitigated_val=mitigated_value,
+                    log=log,
                 )
         self.results.ensure_full()
 
