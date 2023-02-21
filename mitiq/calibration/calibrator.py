@@ -33,6 +33,10 @@ from mitiq.calibration.settings import (
 )
 
 
+class MissingResultsError(Exception):
+    pass
+
+
 class ExperimentResults:
     """Class to store calibration experiment data, and provide helper methods
     for computing results based on it."""
@@ -58,6 +62,21 @@ class ExperimentResults:
         self.mitigated[strategy.id, problem.id] = mitigated_val
         self.noisy[strategy.id, problem.id] = noisy_val
         self.ideal[strategy.id, problem.id] = ideal_val
+
+    def is_missing_data(self) -> bool:
+        """Method to check if there is any missing data that was expected from
+        the calibration experiments."""
+        return np.isnan(self.mitigated + self.noisy + self.ideal).any()
+
+    def ensure_full(self) -> None:
+        """Check to ensure all expected data is collected. All mitigated, noisy
+        and ideal values must be nonempty for this to pass and return True."""
+        if self.is_missing_data():
+            raise MissingResultsError(
+                "There are missing results from the expected calibration "
+                "experiments. Please try running the experiments again with "
+                "the `run` function."
+            )
 
     def squared_errors(self) -> npt.NDArray[np.float32]:
         """Returns an array of squared errors, one for each (strategy, problem)
@@ -153,11 +172,7 @@ class Calibrator:
                     noisy_val=noisy_value,
                     mitigated_val=mitigated_value,
                 )
-        if np.isnan(self.results.mitigated).any():
-            raise ValueError(
-                "A result from a calibration experiment is missing. "
-                "Please try to run the experiment again."
-            )
+        self.results.ensure_full()
 
     def best_strategy(self) -> Strategy:
         """Finds the best strategy by using the parameters that had the
@@ -165,12 +180,14 @@ class Calibrator:
 
         Args:
             results: Calibration experiment results. Obtained by first running
-                :func:`run_circuits`.
+                :func:`run`.
 
         Returns:
             A single :class:`Strategy` object specifying the technique and
             parameters that performed best.
         """
+        self.results.ensure_full()
+
         strategy_id = self.results.best_strategy_id()
         return self.settings.get_strategy(strategy_id)
 
@@ -224,7 +241,7 @@ def execute_with_mitigation(
         The error mitigated expectation expectation value.
     """
 
-    if not calibrator.results:
+    if calibrator.results.is_missing_data():
         calibrator.run()
     strategy = calibrator.best_strategy()
     em_func = strategy.mitigation_function

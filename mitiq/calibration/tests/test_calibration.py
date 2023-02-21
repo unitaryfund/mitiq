@@ -166,13 +166,17 @@ def test_execute_with_mitigation():
 
 def test_ExtrapolationResults_add_result():
     er = ExperimentResults(5, 3)
-    assert np.isnan(er.mitigated).all()
+    assert er.is_missing_data()
     strat = Strategy(0, MitigationTechnique.ZNE, {})
     problem = BenchmarkProblem(0, "circuit", "ghz", {})
     er.add_result(
         strat, problem, ideal_val=1.0, noisy_val=0.8, mitigated_val=0.9
     )
-    assert not np.isnan(er.mitigated).all()
+    assert er.is_missing_data()
+    er.mitigated = np.ones((5, 3))
+    er.ideal = np.ones((5, 3))
+    er.noisy = np.ones((5, 3))
+    assert not er.is_missing_data()
 
 
 def test_ExtrapolationResults_errors():
