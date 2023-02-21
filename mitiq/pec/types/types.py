@@ -15,8 +15,7 @@
 
 """Types used in probabilistic error cancellation."""
 from copy import deepcopy
-from itertools import product
-from typing import Any, List, Optional, Sequence, Set, Tuple
+from typing import Any, List, Optional, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -136,73 +135,16 @@ class NoisyOperation:
 class NoisyBasis:
     """A set of noisy operations which a quantum computer can actually
     implement, assumed to form a basis of n-qubit unitary matrices.
+
+    This class has been removed since Mitiq v0.24.0.
     """
 
-    def __init__(self, *basis_elements: NoisyOperation) -> None:
-        """Initializes a NoisyBasis.
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
 
-        Args:
-            basis_elements: Sequence of basis elements as `NoisyOperation`s.
-        """
-        if not all(
-            isinstance(element, NoisyOperation) for element in basis_elements
-        ):
-            raise ValueError(
-                "All basis elements must be of type `NoisyOperation`."
-            )
-
-        self._basis_elements = set(basis_elements)
-
-    @property
-    def elements(self) -> Set[NoisyOperation]:
-        return self._basis_elements
-
-    def all_qubits(self) -> Set[cirq.Qid]:
-        """Returns the set of qubits that basis elements act on."""
-        qubits = set()
-        for noisy_op in self._basis_elements:
-            qubits.update(set(noisy_op.qubits))
-        return qubits
-
-    def add(self, *basis_elements: Sequence["NoisyOperation"]) -> None:
-        """Add elements to the NoisyBasis.
-
-        Args:
-            basis_elements: Sequence of basis elements as ``NoisyOperation``'s
-                to add to the current basis elements.
-        """
-        for noisy_op in basis_elements:
-            if not isinstance(noisy_op, NoisyOperation):
-                raise TypeError(
-                    "All basis elements must be of type `NoisyOperation`."
-                )
-            self._basis_elements.add(noisy_op)
-
-    def get_sequences(self, length: int) -> List[NoisyOperation]:
-        """Returns a list of all implementable NoisyOperation's of the given
-        length.
-
-        Example: If the ideal operations of the noisy basis elements are {I, X}
-            and length = 2, then this method returns the four NoisyOperations
-            whose ideal operations are {II, IX, XI, XX}.
-
-        Args:
-            length: Number of NoisyOperation's in each element of the returned
-                list.
-        """
-        sequences = []
-        for prod in product(self._basis_elements, repeat=length):
-            this_sequence = prod[0]
-            for noisy_op in prod[1:]:
-                this_sequence += noisy_op
-            sequences.append(this_sequence)
-        return sequences
-
-    def represent(self, circuit: QPROGRAM) -> None:
-        raise NotImplementedError
-
-    def __len__(self) -> int:
-        return len(self._basis_elements)
+        raise NotImplementedError(
+            "The NoisyBasis class has been removed since Mitiq v0.24.0."
+            " Please replace it with a list of NoisyOperation objects."
+        )
 
 
 class OperationRepresentation:

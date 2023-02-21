@@ -253,114 +253,11 @@ def test_noisy_operation_str():
     assert isinstance(noisy_op.__str__(), str)
 
 
-def test_noisy_basis_simple():
-    rng = np.random.RandomState(seed=1)
-    noisy_basis = NoisyBasis(
-        NoisyOperation(circuit=icirq, channel_matrix=rng.rand(4, 4)),
-        NoisyOperation(circuit=xcirq, channel_matrix=rng.rand(4, 4)),
-        NoisyOperation(circuit=ycirq, channel_matrix=rng.rand(4, 4)),
-        NoisyOperation(circuit=zcirq, channel_matrix=rng.rand(4, 4)),
-    )
-    assert len(noisy_basis) == 4
-    assert noisy_basis.all_qubits() == {cirq.LineQubit(0)}
-
-
-def test_pyquil_noisy_basis():
-    rng = np.random.RandomState(seed=1)
-
-    noisy_basis = NoisyBasis(
-        NoisyOperation(
-            circuit=pyquil.Program(pyquil.gates.I(0)),
-            channel_matrix=rng.rand(4, 4),
-        ),
-        NoisyOperation(
-            circuit=pyquil.Program(pyquil.gates.Y(0)),
-            channel_matrix=rng.rand(4, 4),
-        ),
-    )
-    assert len(noisy_basis) == 2
-
-    for op in noisy_basis.elements:
-        assert isinstance(op.native_circuit, pyquil.Program)
-        assert isinstance(op._circuit, cirq.Circuit)
-
-
-def test_qiskit_noisy_basis():
-    rng = np.random.RandomState(seed=1)
-
-    qreg = qiskit.QuantumRegister(1)
-    xcirc = qiskit.QuantumCircuit(qreg)
-    _ = xcirc.x(qreg)
-    zcirc = qiskit.QuantumCircuit(qreg)
-    _ = zcirc.z(qreg)
-
-    noisy_basis = NoisyBasis(
-        NoisyOperation(circuit=xcirc, channel_matrix=rng.rand(4, 4)),
-        NoisyOperation(circuit=zcirc, channel_matrix=rng.rand(4, 4)),
-    )
-    assert len(noisy_basis) == 2
-
-    for op in noisy_basis.elements:
-        assert isinstance(op.native_circuit, qiskit.QuantumCircuit)
-        assert isinstance(op._circuit, cirq.Circuit)
-
-
-@pytest.mark.parametrize(
-    "element",
-    (
-        cirq.X,
-        cirq.CNOT(*cirq.LineQubit.range(2)),
-        pyquil.gates.H,
-        pyquil.gates.CNOT(0, 1),
-        qiskit.extensions.HGate,
-        qiskit.extensions.CXGate,
-    ),
-)
-def test_noisy_basis_bad_types(element):
-    with pytest.raises(ValueError, match="must be of type `NoisyOperation`"):
-        NoisyBasis(element)
-
-
-def test_noisy_basis_add():
-    rng = np.random.RandomState(seed=1)
-    noisy_basis = NoisyBasis(
-        NoisyOperation(circuit=icirq, channel_matrix=rng.rand(4, 4)),
-        NoisyOperation(circuit=xcirq, channel_matrix=rng.rand(4, 4)),
-    )
-    assert len(noisy_basis) == 2
-
-    noisy_basis.add(
-        NoisyOperation(circuit=ycirq, channel_matrix=rng.rand(4, 4)),
-        NoisyOperation(circuit=zcirq, channel_matrix=rng.rand(4, 4)),
-    )
-    assert len(noisy_basis) == 4
-
-
-def test_noisy_basis_add_bad_types():
-    rng = np.random.RandomState(seed=1)
-    noisy_basis = NoisyBasis(
-        NoisyOperation(icirq, channel_matrix=rng.rand(4, 4)),
-        NoisyOperation(xcirq, channel_matrix=rng.rand(4, 4)),
-    )
-
-    with pytest.raises(TypeError, match="All basis elements must be of type"):
-        noisy_basis.add(cirq.Y)
-
-
-@pytest.mark.parametrize("length", (2, 3, 5))
-def test_get_sequences_simple(length):
-    rng = np.random.RandomState(seed=1)
-    noisy_basis = NoisyBasis(
-        NoisyOperation(circuit=icirq, channel_matrix=rng.rand(4, 4)),
-        NoisyOperation(circuit=xcirq, channel_matrix=rng.rand(4, 4)),
-    )
-
-    sequences = noisy_basis.get_sequences(length=length)
-    assert all(isinstance(s, NoisyOperation) for s in sequences)
-    assert len(sequences) == len(noisy_basis) ** length
-
-    for sequence in sequences:
-        assert len(sequence.circuit) == length
+def test_noisy_basis_deprecation_error():
+    with pytest.raises(NotImplementedError, match="NoisyBasis"):
+        NoisyBasis()
+    with pytest.raises(NotImplementedError, match="NoisyBasis"):
+        NoisyBasis(zcirq, xcirq)
 
 
 def get_test_representation():
