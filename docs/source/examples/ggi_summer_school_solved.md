@@ -30,7 +30,7 @@ Useful links :
 ```{figure} ../img/zne_workflow2_steps.png
 ---
 width: 400
-name: figzne
+name: figzne1
 ---
 The diagram shows the workflow of the zero noise extrapolation (ZNE) technique in Mitiq.
 ```
