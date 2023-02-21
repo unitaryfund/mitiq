@@ -54,7 +54,7 @@ from mitiq.pec.channels import (
     choi_to_super,
 )
 
-from mitiq.pec.types import NoisyBasis, NoisyOperation
+from mitiq.pec.types import NoisyOperation
 from mitiq.interface import convert_from_mitiq
 
 
@@ -262,7 +262,9 @@ def test_find_optimal_representation_single_qubit_depolarizing(circ_type):
         ]
         # Find optimal representation
         rep = find_optimal_representation(
-            ideal_op_native, noisy_operations, tol=1.0e-8,
+            ideal_op_native,
+            noisy_operations,
+            tol=1.0e-8,
         )
         # Expected analytical result
         expected_rep = represent_operation_with_local_depolarizing_noise(
@@ -307,7 +309,10 @@ def test_find_optimal_representation_single_qubit_amp_damping(circ_type):
         ]
         # Find optimal representation
         rep = find_optimal_representation(
-            ideal_op_native, noisy_operations, tol=1.0e-7, initial_guess=[0, 0, 0]
+            ideal_op_native,
+            noisy_operations,
+            tol=1.0e-7,
+            initial_guess=[0, 0, 0],
         )
         # Expected analytical result
         expected_rep = _represent_operation_with_amplitude_damping_noise(
