@@ -109,6 +109,11 @@ class ExperimentResults:
         strategy_id = int(np.argmin(strategy_errors))
         return strategy_id
 
+    def reset_data(self) -> None:
+        self = ExperimentResults(
+            num_strategies=self.num_strategies, num_problems=self.num_problems
+        )
+
 
 class Calibrator:
     """An object used to orchestrate experiments for calibrating optimal error
@@ -167,8 +172,11 @@ class Calibrator:
 
     def run(self, log: bool = False) -> None:
         """Runs all the circuits required for calibration."""
+        if not self.results.is_missing_data():
+            self.results.reset_data()
+
         for problem in self.circuits:
-            circuit = problem.circuit
+            circuit = problem.circuit.copy()
             circuit.append(cirq.measure(circuit.all_qubits()))
 
             bitstring_to_measure = problem.most_likely_bitstring()
