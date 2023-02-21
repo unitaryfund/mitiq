@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.14.1
@@ -125,12 +125,6 @@ and cannot be derived by Mitiq with the procedure shown in the next section.*
 
 +++
 
-Combining the noisy operations defined above, we obtain a {class}`.NoisyBasis`.
-
-```{code-cell} ipython3
-noisy_basis = pec.NoisyBasis(*noisy_operations)
-```
-
 Similar to what we did for `basis_circuits`, we also define the `ideal_operation` that we aim to represent in the
 form of a `QPROGRAM`. Assuming that we aim to represent the Hadamard gate, we have:
 
@@ -142,12 +136,12 @@ print(f"The ideal operation to expand in the noisy basis is:\n{ideal_operation}"
 
 The Mitiq function {func}`.find_optimal_representation`
 can be used to numerically obtain an  {class}`.OperationRepresentation` of the `ideal_operation`
-in the basis of the noisy implementable gates (`noisy_basis`).
+in the basis of the noisy implementable gates (`noisy_operations`).
 
 ```{code-cell} ipython3
 from mitiq.pec.representations import find_optimal_representation
 
-h_rep = find_optimal_representation(ideal_operation, noisy_basis)
+h_rep = find_optimal_representation(ideal_operation, noisy_operations)
 print(f"Optimal representation:\n{h_rep}")
 ```
 
@@ -173,13 +167,11 @@ distribution ${\eta_\alpha}$.
 # We assume to know the quasi-distribution
 quasi_dist = h_rep.coeffs
 
-# This is just a reordering of noisy_operations to match quasi_dist
-reordered_noisy_operations = h_rep.noisy_operations
-
 # Manual definition of the OperationRepresentation
-basis_expansion = dict(zip(reordered_noisy_operations, quasi_dist))
 manual_h_rep = pec.OperationRepresentation(
-    ideal=ideal_operation, basis_expansion=basis_expansion
+    ideal=ideal_operation,
+    noisy_operations=noisy_operations,
+    coeffs=quasi_dist,
 )
 
 # Test that the manual definition is equivalent to h_rep
@@ -225,7 +217,8 @@ _ = ideal_op.h(0)
 
 rep = pec.OperationRepresentation(
     ideal=ideal_op,
-    basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
+    noisy_operations=[noisy_xop, noisy_zop],
+    coeffs=[0.5, -0.5],
     is_qubit_dependent=False,
 )
 
@@ -275,7 +268,7 @@ assert sum([abs(eta) for eta in h_rep.coeffs]) == h_rep.norm
 
 ```{code-cell} ipython3
 # Positive and normalized distribution p(alpha)=|eta_alpha|/gamma
-h_rep.distribution()
+h_rep.distribution
 ```
 
 ## Estimating expectation values with PEC

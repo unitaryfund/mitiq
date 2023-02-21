@@ -117,8 +117,8 @@ def find_optimal_representation(
 
     Args:
         ideal_operation: The ideal operation to represent.
-        noisy_basis: The ``NoisyBasis`` in which the ``ideal_operation``
-            should be represented. It must contain ``NoisyOperation`` objects
+        noisy_operations: The basis in which the ``ideal_operation``
+            should be represented. Must be a list of ``NoisyOperation`` objects
             which are initialized with a numerical superoperator matrix.
         tol: The error tolerance for each matrix element
             of the represented operation.
