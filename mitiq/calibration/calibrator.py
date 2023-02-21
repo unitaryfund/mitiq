@@ -75,7 +75,9 @@ class ExperimentResults:
             list(strategy.to_dict().values()),
         )
         print(
-            f"{performance} ideal: {ideal_val:.2f}\tnoisy: {noisy_val:.2f}\tmitigated: {mitigated_val:.2f}"
+            f"{performance} ideal: {ideal_val:.2f}\t"
+            f"noisy: {noisy_val:.2f}\t"
+            f"mitigated: {mitigated_val:.2f}"
         )
 
     def is_missing_data(self) -> bool:
@@ -239,7 +241,7 @@ def execute_with_mitigation(
     observable: Optional[Observable] = None,
     *,
     calibrator: Calibrator,
-) -> QuantumResult:
+) -> Union[QuantumResult, None]:
     """Estimates the error-mitigated expectation value associated to the
     input circuit, via the application of the best mitigation strategy, as
     determined by calibration.
@@ -260,7 +262,18 @@ def execute_with_mitigation(
     """
 
     if calibrator.results.is_missing_data():
-        calibrator.run()
+        cost = calibrator.get_cost()
+        answer = input(
+            "Calibration experiments have not yet been run. You can run the "
+            "experiments manually by calling `calibrator.run()`, or they can "
+            f"be run now. The potential cost is:\n{cost}\n"
+            "Would you like the experiments to be run automatically? (yes/no)"
+        )
+        if answer.lower() == "yes":
+            calibrator.run()
+        else:
+            return None
+
     strategy = calibrator.best_strategy()
     em_func = strategy.mitigation_function
     return em_func(circuit, executor=executor, observable=observable)
