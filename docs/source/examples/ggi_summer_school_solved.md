@@ -1,4 +1,6 @@
 ---
+hidden: true
+
 jupytext:
   text_representation:
     extension: .myst
