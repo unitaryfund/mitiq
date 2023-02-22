@@ -110,9 +110,7 @@ class ExperimentResults:
         return strategy_id
 
     def reset_data(self) -> None:
-        self = ExperimentResults(
-            num_strategies=self.num_strategies, num_problems=self.num_problems
-        )
+        self.__init__(self.num_strategies, self.num_problems)
 
 
 class Calibrator:

@@ -15,6 +15,7 @@
 
 """Tests for the Clifford data regression top-level API."""
 from functools import partial
+import pytest
 
 import cirq
 import numpy as np
@@ -30,6 +31,7 @@ from mitiq.calibration import (
 from mitiq.calibration.calibrator import (
     convert_to_expval_executor,
     ExperimentResults,
+    MissingResultsError,
 )
 from mitiq.calibration.settings import (
     Strategy,
@@ -166,6 +168,12 @@ def test_execute_with_mitigation(monkeypatch):
     assert 0 <= expval <= 1.5
 
 
+def test_double_run():
+    cal = Calibrator(execute, ZNESettings)
+    cal.run()
+    cal.run()
+
+
 def test_ExtrapolationResults_add_result():
     er = ExperimentResults(5, 3)
     assert er.is_missing_data()
@@ -205,3 +213,22 @@ def test_logging(capfd):
 
     captured = capfd.readouterr()
     assert "circuit" in captured.out
+
+
+def test_ExperimentResults_reset_data():
+    num_strategies, num_problems = 5, 3
+    er = ExperimentResults(num_strategies, num_problems)
+    strat = Strategy(0, MitigationTechnique.ZNE, {})
+    problem = BenchmarkProblem(0, "circuit", "ghz", {})
+    er.add_result(
+        strat, problem, ideal_val=1.0, noisy_val=0.8, mitigated_val=0.9
+    )
+    assert not np.isnan(er.mitigated).all()
+    er.reset_data()
+    assert np.isnan(er.mitigated).all()
+
+
+def test_ExperimentResults_ensure_full():
+    er = ExperimentResults(5, 3)
+    with pytest.raises(MissingResultsError):
+        er.ensure_full()
