@@ -109,10 +109,6 @@ class NoisyOperation:
             raise ValueError("The channel matrix is unknown.")
         return deepcopy(self._channel_matrix)
 
-    def copy(self) -> "NoisyOperation":
-        """Returns a copy of the NoisyOperation."""
-        return NoisyOperation(self._native_circuit, self._channel_matrix)
-
     def __add__(self, other: Any) -> "NoisyOperation":
         if not isinstance(other, NoisyOperation):
             raise ValueError(
