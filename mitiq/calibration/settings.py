@@ -162,22 +162,12 @@ class Settings:
     """A class to store the configuration settings of a :class:`.Calibrator`.
 
     Args:
-        circuit_types: List of strings specifying circuit types to use.
-            Must be drawn from the Identifier column::
-
-                Identifier  | Circuit Type
-                ----------------------------
-                "ghz"       | GHZ circuit
-                "rb"        | Randomized Benchmarking
-                "mirror"    | Mirror circuit
-
-        num_qubits: Number of qubits to use for circuit generation.
-        circuit_depth: Circuit depth to use when generating circuits. Only
-            used when ``num_qubits`` in combination with the circuit type does
-            not specify the depth.
+        benchmarks: A specification of the parameters for generating circuits
+            to be used in calibration experiments, which are `"circuit_type"`,
+            `"num_qubits"`, `"circuit_depth"`, and in the case of mirror
+            circuits, a random seed `"circuit_seed"`.
         strategies: A specification of the methods/parameters to be used in
             calibration experiments.
-        seed: A random seed for (mirror) circuit generation.
     """
 
     def __init__(
