@@ -148,7 +148,7 @@ def test_convert_to_expval_executor():
     assert np.isclose(rb_circuit_expval, 1.0)
 
 
-def test_execute_with_mitigation():
+def test_execute_with_mitigation(monkeypatch):
     cal = Calibrator(execute, ZNESettings)
 
     expval_executor = convert_to_expval_executor(
@@ -157,6 +157,8 @@ def test_execute_with_mitigation():
     rb_circuit = generate_rb_circuits(2, 10)[0]
     rb_circuit.append(cirq.measure(rb_circuit.all_qubits()))
 
+    # override the def of `input` so that it returns "yes"
+    monkeypatch.setattr("builtins.input", lambda _: "yes")
     expval = execute_with_mitigation(
         rb_circuit, expval_executor, calibrator=cal
     )
