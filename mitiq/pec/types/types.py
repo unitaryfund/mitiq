@@ -16,6 +16,7 @@
 """Types used in probabilistic error cancellation."""
 from copy import deepcopy
 from typing import Any, List, Optional, Tuple
+import warnings
 
 import numpy as np
 import numpy.typing as npt
@@ -29,12 +30,11 @@ from mitiq.interface import (
     CircuitConversionError,
     UnsupportedCircuitError,
 )
-from mitiq.utils import _equal
 
 
 class NoisyOperation:
     """An operation (or sequence of operations) which a noisy quantum computer
-    can actually implement.
+    can actually implement.p
     """
 
     def __init__(
@@ -184,11 +184,6 @@ class OperationRepresentation:
         if not all(isinstance(c, float) for c in coeffs):
             raise TypeError("All elements of `coeffs` must be floats.")
 
-        if len(noisy_operations) != len(coeffs):
-            raise ValueError(
-                "`noisy_operations` and `coeffs` must have equal lengths"
-                f" but {len(noisy_operations)}!={len(coeffs)}."
-            )
         self._native_ideal = deepcopy(ideal)
         self._ideal, self._native_type = convert_to_mitiq(ideal)
         self._noisy_operations = noisy_operations
@@ -196,9 +191,28 @@ class OperationRepresentation:
         self._norm = sum(abs(c) for c in coeffs)
         self._distribution = [abs(c) / self._norm for c in coeffs]
         self.is_qubit_dependent = is_qubit_dependent
+        self._validate()
+
+    def _validate(self) -> None:
+        """Validates initialization arguments."""
+        if len(self._noisy_operations) != len(self._coeffs):
+            raise ValueError(
+                "`noisy_operations` and `coeffs` must have equal lengths"
+                f" but {len(self._noisy_operations)}!={len(self._coeffs)}."
+            )
+        if not np.isclose(sum(self._coeffs), 1.0, atol=10**-4):
+            warnings.warn("The sum of the coefficients is different from 1.")
+        for op in self._noisy_operations:
+            if self._ideal.all_qubits() != op.circuit.all_qubits():
+                raise ValueError(
+                    "The operation to represent acts on"
+                    f" {self._ideal.all_qubits()}. Noisy operations"
+                    f" must act on the same qubits but {op} acts on:"
+                    f" {op.circuit.all_qubits()}"
+                )
 
     @property
-    def ideal(self) -> QPROGRAM:
+    def ideal(self) -> cirq.Circuit:
         return self._ideal
 
     @property
@@ -279,10 +293,13 @@ class OperationRepresentation:
         coefficients and equivalent NoisyOperation(s) (same gates but not
         necessarily same channel_matrix since channel_matrix is optional).
         """
+        if self.is_qubit_dependent != other.is_qubit_dependent:
+            return False
+
         if self._native_type != other._native_type:
             return False
 
-        if not _equal(self._ideal, other._ideal):
+        if not self._ideal == other._ideal:
             return False
 
         if len(self.basis_expansion) != len(other.basis_expansion):
@@ -291,7 +308,7 @@ class OperationRepresentation:
         for c_a, op_a in self.basis_expansion:
             found = False
             for c_b, op_b in other.basis_expansion:
-                if _equal(op_a._circuit, op_b._circuit):
+                if op_a._circuit == op_b._circuit:
                     found = True
                     break
             if not found:

@@ -143,33 +143,38 @@ def test_sample_sequence_cirq_random_state(seed):
         assert np.isclose(new_norm, norm)
 
 
-@pytest.mark.parametrize("qubit", [0, 1])
-def test_qubit_independent_representation_cirq(qubit):
-    circuit = Circuit(cirq.H.on(LineQubit(0)), cirq.H.on(LineQubit(1)))
+def test_qubit_independent_representation_cirq():
+    """Test that an OperationRepresentation defined for some qubits can
+    (optionally) be used to mitigate gates acting on different qubits."""
+    circuit = Circuit([cirq.I.on(LineQubit(0)), cirq.H.on(LineQubit(1))])
     circuit.append(measure_each(*LineQubit.range(2)))
 
     rep = OperationRepresentation(
-        ideal=Circuit(cirq.H.on(LineQubit(qubit))),
+        ideal=Circuit(cirq.H.on(LineQubit(0))),
         noisy_operations=[NoisyOperation(xcirq), NoisyOperation(zcirq)],
         coeffs=[0.5, -0.5],
         is_qubit_dependent=False,
     )
 
+    expected_a = Circuit([cirq.I.on(LineQubit(0)), cirq.X.on(LineQubit(1))])
+    expected_b = Circuit([cirq.I.on(LineQubit(0)), cirq.Z.on(LineQubit(1))])
+
     for _ in range(5):
-        seqs, signs, norm = sample_sequence(circuit, representations=[rep])
-        assert isinstance(seqs[0], Circuit)
+        seqs, signs, norm = sample_circuit(circuit, representations=[rep])
+        assert seqs[0] in [expected_a, expected_b]
         assert signs[0] in {1, -1}
         assert norm == 1.0
 
 
-@pytest.mark.parametrize("qubit", [0, 1])
-def test_qubit_independent_representation_qiskit(qubit):
+def test_qubit_independent_representation_qiskit():
+    """Test that an OperationRepresentation defined for some qubits can
+    (optionally) be used to mitigate gates acting on different qubits."""
 
-    qreg = QuantumRegister(2)
+    different_qreg = QuantumRegister(2, name="q")
+    circuit_to_mitigate = QuantumCircuit(different_qreg)
+    _ = circuit_to_mitigate.cnot(*different_qreg)
 
-    circuit = QuantumCircuit(qreg)
-    _ = circuit.h(qreg)
-
+    qreg = QuantumRegister(2, name="rep_register")
     xcircuit = QuantumCircuit(qreg)
     _ = xcircuit.x(qreg)
 
@@ -179,8 +184,8 @@ def test_qubit_independent_representation_qiskit(qubit):
     noisy_xop = NoisyOperation(xcircuit)
     noisy_zop = NoisyOperation(zcircuit)
 
-    ideal_op = QuantumCircuit(QuantumRegister(2))
-    _ = ideal_op.h(qubit)
+    ideal_op = QuantumCircuit(qreg)
+    _ = ideal_op.cnot(*qreg)
     rep = OperationRepresentation(
         ideal=ideal_op,
         noisy_operations=[noisy_xop, noisy_zop],
@@ -188,30 +193,41 @@ def test_qubit_independent_representation_qiskit(qubit):
         is_qubit_dependent=False,
     )
 
+    # Expected outcomes
+    xcircuit_different = QuantumCircuit(different_qreg)
+    xcircuit_different.x(different_qreg)
+    zcircuit_different = QuantumCircuit(different_qreg)
+    zcircuit_different.z(different_qreg)
+
     for _ in range(5):
-        seqs, signs, norm = sample_sequence(circuit, representations=[rep])
-        assert isinstance(seqs[0], QuantumCircuit)
+        seqs, signs, norm = sample_sequence(
+            circuit_to_mitigate, representations=[rep]
+        )
+        assert seqs[0] in [xcircuit_different, zcircuit_different]
         assert signs[0] in {1, -1}
         assert norm == 1.0
 
 
-@pytest.mark.parametrize("qubit", [0, 1])
-def test_qubit_independent_representation_pyquil(qubit):
-    circuit = Program(gates.H(0), gates.H(1))
+def test_qubit_independent_representation_pyquil():
+    """Test that an OperationRepresentation defined for some qubits can
+    (optionally) be used to mitigate gates acting on different qubits."""
+    circuit_to_mitigate = Program(gates.H(1))
 
     noisy_xop = NoisyOperation(Program(gates.X(0)))
     noisy_zop = NoisyOperation(Program(gates.Z(0)))
 
     rep = OperationRepresentation(
-        ideal=circuit,
+        ideal=Program(gates.H(0)),
         noisy_operations=[noisy_xop, noisy_zop],
         coeffs=[0.5, -0.5],
         is_qubit_dependent=False,
     )
 
     for _ in range(50):
-        seqs, signs, norm = sample_sequence(circuit, representations=[rep])
-        assert isinstance(seqs[0], Program)
+        seqs, signs, norm = sample_sequence(
+            circuit_to_mitigate, representations=[rep]
+        )
+        assert seqs[0] in [Program(gates.X(1)), Program(gates.Z(1))]
         assert signs[0] in {1, -1}
         assert norm == 1.0
 

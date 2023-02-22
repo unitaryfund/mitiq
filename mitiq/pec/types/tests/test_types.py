@@ -479,7 +479,7 @@ def test_print_operation_representation_two_qubits_neg():
             cirq.H.on_each(qreg[0]), cirq.CNOT(*qreg), cirq.H.on_each(qreg[1])
         )
     )
-    noisy_b = NoisyOperation(circuit=cirq.Circuit(cirq.Z.on_each(qreg[1])))
+    noisy_b = NoisyOperation(circuit=cirq.Circuit(cirq.Z.on_each(*qreg)))
     decomp = OperationRepresentation(
         ideal=ideal,
         noisy_operations=[noisy_a, noisy_b],
@@ -496,7 +496,10 @@ def test_print_operation_representation_two_qubits_neg():
 1: ───────X───H───
 
 +1.500
+0: ───Z───
+
 1: ───Z───"""
+
     # Remove initial newline
     expected = expected[1:]
     assert str(decomp) == expected
@@ -545,9 +548,10 @@ def test_equal_method_of_representations():
     q_b = qiskit.QuantumRegister(1)
     ideal_b = qiskit.QuantumCircuit(q_b)
     ideal_b.x(q_b)
+    noisy_opx = NoisyOperation(ideal_b)
     rep_b = OperationRepresentation(
         ideal=ideal_b,
-        noisy_operations=[noisy_xop_b, noisy_zop_b],
+        noisy_operations=[noisy_opx, noisy_opx],
         coeffs=[0.5, 0.5],
     )
     assert rep_a != rep_b
@@ -587,3 +591,23 @@ def test_noisy_operation_copy():
     assert op_a.circuit == op_b.circuit
     assert op_a.native_circuit == op_b.native_circuit
     assert str(op_a) == str(op_b)
+
+
+def test_operation_representation_warnings():
+    with pytest.warns(UserWarning, match="different from 1"):
+        OperationRepresentation(
+            ideal=xcirq,
+            noisy_operations=[NoisyOperation(xcirq), NoisyOperation(zcirq)],
+            coeffs=[0.5, 0.1],
+        )
+
+
+def test_different_qubits_error():
+    """Ideal operation and noisy operations must have equal qubits."""
+
+    with pytest.raises(ValueError, match="must act on the same qubits"):
+        OperationRepresentation(
+            ideal=cirq.Circuit(cirq.X(cirq.NamedQubit("a"))),
+            noisy_operations=[NoisyOperation(xcirq), NoisyOperation(zcirq)],
+            coeffs=[0.5, 0.5],
+        )

@@ -194,35 +194,41 @@ assert depolarizing_h_rep == h_rep
 
 ### Qubit-independent representations
 
-It is possible to apply one representation of the same operation on different qubits, by setting the option `is_qubit_dependent` in 
-{class}`.OperationRepresentation` to `False`.
+It is possible to define a qubit-independent {class}`.OperationRepresentation` by setting the option `is_qubit_dependent` to `False`.
+
+In this case, a signle {class}`.OperationRepresentation` representing a gate acting on some arbitrary qubits can be used to mitigate
+the same gate even if acting on different qubits.
 
 ```{code-cell} ipython3
-qreg = qiskit.QuantumRegister(2)
 
+qreg = qiskit.QuantumRegister(2) 
 circuit = qiskit.QuantumCircuit(qreg)
-_ = circuit.h(qreg)
+circuit.h(0)
+circuit.h(1)
 
-xcircuit = qiskit.QuantumCircuit(qreg)
-_ = xcircuit.x(qreg)
-
-zcircuit = qiskit.QuantumCircuit(qreg)
-_ = zcircuit.z(qreg)
-
-noisy_xop = pec.NoisyOperation(xcircuit)
-noisy_zop = pec.NoisyOperation(zcircuit)
-
-ideal_op = qiskit.QuantumCircuit(qiskit.QuantumRegister(2))
-_ = ideal_op.h(0)
+# OperationRepresentation defined on different qubits
+rep_qreg = qiskit.QuantumRegister(1, "rep_reg") 
+ideal_op = qiskit.QuantumCircuit(rep_qreg)
+ideal_op.h(rep_qreg)
+hxcircuit = qiskit.QuantumCircuit(rep_qreg)
+hxcircuit.h(0)
+hxcircuit.x(0)
+hzcircuit = qiskit.QuantumCircuit(rep_qreg)
+hzcircuit.h(0)
+hzcircuit.z(0)
+noisy_hxop = pec.NoisyOperation(hxcircuit)
+noisy_hzop = pec.NoisyOperation(hzcircuit)
 
 rep = pec.OperationRepresentation(
     ideal=ideal_op,
-    noisy_operations=[noisy_xop, noisy_zop],
-    coeffs=[0.5, -0.5],
+    noisy_operations=[noisy_hxop, noisy_hzop],
+    coeffs=[0.5, 0.5],
     is_qubit_dependent=False,
 )
-
 print(rep)
+print("Using the same rep on a circuit with H gates acting on different qubits:")
+sampled_circuits, _, _ = pec.sample_circuit(circuit, representations=[rep])
+print(*sampled_circuits)
 ```
 
 ### Methods of the `OperationRepresentation` class
