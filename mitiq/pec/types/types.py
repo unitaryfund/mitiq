@@ -129,7 +129,7 @@ class NoisyOperation:
         return NoisyOperation(self._circuit + other._circuit, matrix)
 
     def __str__(self) -> str:
-        return self._native_circuit.__str__()
+        return self._circuit.__str__()
 
 
 class NoisyBasis:
