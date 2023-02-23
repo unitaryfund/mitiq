@@ -193,7 +193,7 @@ class OperationRepresentation:
         """Validates initialization arguments."""
         if len(self._noisy_operations) != len(self._coeffs):
             raise ValueError(
-                "`noisy_operations` and `coeffs` must have equal lengths"
+                "`noisy_operations` and `coeffs` must have equal length"
                 f" but {len(self._noisy_operations)}!={len(self._coeffs)}."
             )
         if not np.isclose(sum(self._coeffs), 1.0, atol=10**-4):

@@ -570,6 +570,14 @@ def test_equal_method_of_representations():
         coeffs=[0.7, 0.5],
     )
     assert rep_a != rep_b
+    # Different value of is_qubit_dependent
+    rep_b = OperationRepresentation(
+        ideal=ideal,
+        noisy_operations=[noisy_xop_a, noisy_zop_a],
+        coeffs=[0.5, 0.5],
+        is_qubit_dependent=False,
+    )
+    assert rep_a != rep_b
 
 
 def test_operation_representation_warnings():
@@ -589,4 +597,14 @@ def test_different_qubits_error():
             ideal=cirq.Circuit(cirq.X(cirq.NamedQubit("a"))),
             noisy_operations=[NoisyOperation(xcirq), NoisyOperation(zcirq)],
             coeffs=[0.5, 0.5],
+        )
+
+def test_different_length_error():
+    """The number of coefficients must be = to the number of noisy operations.
+    """
+    with pytest.raises(ValueError, match="must have equal length"):
+        OperationRepresentation(
+            ideal=cirq.Circuit(cirq.X(cirq.LineQubit(0))),
+            noisy_operations=[NoisyOperation(xcirq), NoisyOperation(zcirq)],
+            coeffs=[0.5, 0.5, 0.4],
         )
