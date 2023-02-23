@@ -69,7 +69,7 @@ class ExperimentResults:
         )
         performance = "✅" if mitigated_better else "❌"
         print(
-            f"Running {problem.type} circuit using:",
+            f"Ran {problem.type} circuit using:",
             list(strategy.to_dict().values()),
         )
         print(
