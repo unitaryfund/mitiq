@@ -601,8 +601,7 @@ def test_different_qubits_error():
 
 
 def test_different_length_error():
-    """The number of coefficients must be = to the number of noisy operations.
-    """
+    """The number of coefficients must be = to the number of noisy operations."""
     with pytest.raises(ValueError, match="must have equal length"):
         OperationRepresentation(
             ideal=cirq.Circuit(cirq.X(cirq.LineQubit(0))),
