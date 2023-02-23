@@ -13,15 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from dataclasses import dataclass, astuple, asdict
+from dataclasses import dataclass, asdict
 from functools import partial
-from typing import Any, Callable, cast, Iterator, List, Dict, Tuple, Optional
+from typing import Any, Callable, cast, List, Dict, Optional
 from enum import Enum, auto
 
 import networkx as nx
 import cirq
 
-from mitiq import QuantumResult
 from mitiq.benchmarks import (
     generate_ghz_circuit,
     generate_mirror_circuit,
@@ -48,7 +47,7 @@ class MitigationTechnique(Enum):
     RAW = auto()
 
     @property
-    def mitigation_function(self) -> Callable[..., QuantumResult]:
+    def mitigation_function(self) -> Callable[..., float]:
         if self is MitigationTechnique.ZNE:
             return execute_with_zne
         elif self is MitigationTechnique.PEC:
@@ -63,18 +62,24 @@ class BenchmarkProblem:
     be run during the calibrations process.
 
     Args:
+        id: A unique numerical id.
         circuit: The circuit to be run.
         type: The type of the circuit (often the name of the algorithm)
         ideal_distribution: The ideal probability distribution after applying
             ``circuit``.
     """
 
+    id: int
     circuit: cirq.Circuit
     type: str
     ideal_distribution: Dict[str, float]
 
-    def __getitem__(self, keys: Tuple[str, ...]) -> Iterator[Any]:
-        return iter(getattr(self, k) for k in keys)
+    def most_likely_bitstring(self) -> str:
+        distribution = self.ideal_distribution
+        return max(distribution, key=distribution.__getitem__)
+
+    def largest_probability(self) -> float:
+        return max(self.ideal_distribution.values())
 
     @property
     def num_qubits(self) -> int:
@@ -86,11 +91,9 @@ class BenchmarkProblem:
 
     @property
     def two_qubit_gate_count(self) -> int:
-        return sum(
-            [len(op.qubits) > 1 for op in self.circuit.all_operations()]
-        )
+        return sum(len(op.qubits) > 1 for op in self.circuit.all_operations())
 
-    def problem_summary_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         """Produces a summary of the ``BenchmarkProblem``, to be used in
         recording the results when running calibration experiments.
 
@@ -106,6 +109,9 @@ class BenchmarkProblem:
         base["two_qubit_gate_count"] = self.two_qubit_gate_count
         return base
 
+    def __repr__(self) -> str:
+        return str(self.to_dict())
+
 
 @dataclass
 class Strategy:
@@ -113,41 +119,43 @@ class Strategy:
     specifying a technique and the associated options.
 
     Args:
+        id: A unique numerical id.
         technique: One of Mitiq's support error mitigation strategies,
             specified as a :class:`MitigationTechnique`.
         technique_params: A dictionary of options to pass to the mitigation
             method specified in `technique`.
     """
 
+    id: int
     technique: MitigationTechnique
     technique_params: Dict[str, Any]
 
     @property
-    def mitigation_function(self) -> Callable[..., QuantumResult]:
+    def mitigation_function(self) -> Callable[..., float]:
         return partial(
             self.technique.mitigation_function, **self.technique_params
         )
 
-    def as_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         """A summary of the strategies parameters, without the technique added.
 
         Returns:
             A dictionary describing the strategies parameters."""
-        di = {}
+        summary = {"id": self.id, "technique": self.technique.name}
         if self.technique is MitigationTechnique.ZNE:
             inference_func = self.technique_params["factory"]
-            di["factory"] = inference_func.__class__.__name__
-            di["scale_factors"] = inference_func.get_scale_factors().tolist()
-            di["scale_method"] = self.technique_params["scale_noise"].__name__
-        return di
+            summary["factory"] = inference_func.__class__.__name__
+            summary[
+                "scale_factors"
+            ] = inference_func.get_scale_factors().tolist()
+            summary["scale_method"] = self.technique_params[
+                "scale_noise"
+            ].__name__
 
-    def __iter__(self) -> Iterator[Any]:
-        return iter(astuple(self))
+        return summary
 
-    def __str__(self) -> str:
-        di = self.as_dict()
-        di["technique"] = self.technique.name
-        return str(di)
+    def __repr__(self) -> str:
+        return str(self.to_dict())
 
 
 class Settings:
@@ -189,9 +197,14 @@ class Settings:
         self.num_qubits = num_qubits
         self.circuit_depth = circuit_depth
         self.circuit_seed = circuit_seed
+        self.strategy_dict: Dict[int, Strategy] = {}
+        self.problem_dict: Dict[int, BenchmarkProblem] = {}
 
-    def make_circuits(self) -> List[BenchmarkProblem]:
-        """Generate the circuits to run for the calibration experiment.
+    def get_strategy(self, strategy_id: int) -> Strategy:
+        return self.strategy_dict[strategy_id]
+
+    def make_problems(self) -> List[BenchmarkProblem]:
+        """Generate the benchmark problems for the calibration experiment.
         Returns:
             A list of :class:`BenchmarkProblem` objects"""
         circuits = []
@@ -200,7 +213,7 @@ class Settings:
             self.circuit_depth,
             self.circuit_seed,
         )
-        for circuit_type in self.circuit_types:
+        for i, circuit_type in enumerate(self.circuit_types):
             if circuit_type == "ghz":
                 circuit = generate_ghz_circuit(nqubits)
                 ideal = {"0" * nqubits: 0.5, "1" * nqubits: 0.5}
@@ -230,13 +243,15 @@ class Settings:
                 )
 
             circuit = cast(cirq.Circuit, circuit)
-            circuits.append(
-                BenchmarkProblem(
-                    circuit,
-                    type=circuit_type,
-                    ideal_distribution=ideal,
-                )
+            problem = BenchmarkProblem(
+                id=i,
+                circuit=circuit,
+                type=circuit_type,
+                ideal_distribution=ideal,
             )
+            circuits.append(problem)
+            self.problem_dict[problem.id] = problem
+
         return circuits
 
     def make_strategies(self) -> List[Strategy]:
@@ -246,12 +261,17 @@ class Settings:
         Returns:
             A list of :class:`Strategy` objects."""
         funcs = []
-        for technique, params in zip(self.techniques, self.technique_params):
+        for i, (technique, params) in enumerate(
+            zip(self.techniques, self.technique_params)
+        ):
             params_copy = params.copy()
             del params_copy["technique"]
-            funcs.append(
-                Strategy(technique=technique, technique_params=params_copy)
+
+            strategy = Strategy(
+                id=i, technique=technique, technique_params=params_copy
             )
+            funcs.append(strategy)
+            self.strategy_dict[strategy.id] = strategy
         return funcs
 
 
@@ -303,4 +323,4 @@ ZNESettings = Settings(
     ],
 )
 
-DefaultStrategy = Strategy(MitigationTechnique.RAW, {})
+DefaultStrategy = Strategy(0, MitigationTechnique.RAW, {})

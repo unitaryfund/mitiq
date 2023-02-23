@@ -289,13 +289,6 @@ def test_representation_simple():
     assert set(decomp.noisy_operations) == {noisy_xop, noisy_zop}
 
 
-def test_representation_coeff_of():
-    ideal, noisy_xop, noisy_zop, decomp = get_test_representation()
-
-    assert np.isclose(decomp.coeffs[0], 0.5)
-    assert np.isclose(decomp.coeffs[1], -0.5)
-
-
 def test_representation_bad_type():
     ideal = cirq.Circuit(cirq.H(cirq.LineQubit(0)))
 
@@ -577,20 +570,6 @@ def test_equal_method_of_representations():
         coeffs=[0.7, 0.5],
     )
     assert rep_a != rep_b
-
-
-def test_noisy_operation_copy():
-    cnot_qiskit = qiskit.QuantumCircuit(2)
-    cnot_qiskit.cnot(0, 1)
-    matrix = np.random.rand(16, 16)
-    op_a = NoisyOperation(cnot_qiskit, matrix)
-    op_b = op_a.copy()
-    assert np.allclose(op_a.channel_matrix, op_b.channel_matrix)
-    assert op_a.num_qubits == op_b.num_qubits
-    assert op_a.qubits == op_b.qubits
-    assert op_a.circuit == op_b.circuit
-    assert op_a.native_circuit == op_b.native_circuit
-    assert str(op_a) == str(op_b)
 
 
 def test_operation_representation_warnings():

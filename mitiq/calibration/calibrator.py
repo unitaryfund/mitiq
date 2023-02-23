@@ -13,23 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from copy import deepcopy
-import warnings
-from collections import Counter
-from math import sqrt
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Union,
-    cast,
-    Sequence,
-)
+from typing import Callable, Dict, Optional, Union, cast
 
 import cirq
+import numpy as np
+import numpy.typing as npt
 
 from mitiq import (
     QPROGRAM,
@@ -38,7 +26,71 @@ from mitiq import (
     Observable,
     QuantumResult,
 )
-from mitiq.calibration.settings import Settings, Strategy, DefaultStrategy
+from mitiq.calibration.settings import (
+    Settings,
+    Strategy,
+    BenchmarkProblem,
+)
+
+
+class MissingResultsError(Exception):
+    pass
+
+
+class ExperimentResults:
+    """Class to store calibration experiment data, and provide helper methods
+    for computing results based on it."""
+
+    def __init__(self, num_strategies: int, num_problems: int) -> None:
+        self.num_strategies = num_strategies
+        self.num_problems = num_problems
+        self.mitigated = np.full((num_strategies, num_problems), np.nan)
+        self.noisy = np.full((num_strategies, num_problems), np.nan)
+        self.ideal = np.full((num_strategies, num_problems), np.nan)
+
+    def add_result(
+        self,
+        strategy: Strategy,
+        problem: BenchmarkProblem,
+        *,
+        ideal_val: float,
+        noisy_val: float,
+        mitigated_val: float,
+    ) -> None:
+        """Add a single result from a (Strategy, BenchmarkProblem) pair and
+        store the results."""
+        self.mitigated[strategy.id, problem.id] = mitigated_val
+        self.noisy[strategy.id, problem.id] = noisy_val
+        self.ideal[strategy.id, problem.id] = ideal_val
+
+    def is_missing_data(self) -> bool:
+        """Method to check if there is any missing data that was expected from
+        the calibration experiments."""
+        return np.isnan(self.mitigated + self.noisy + self.ideal).any()
+
+    def ensure_full(self) -> None:
+        """Check to ensure all expected data is collected. All mitigated, noisy
+        and ideal values must be nonempty for this to pass and return True."""
+        if self.is_missing_data():
+            raise MissingResultsError(
+                "There are missing results from the expected calibration "
+                "experiments. Please try running the experiments again with "
+                "the `run` function."
+            )
+
+    def squared_errors(self) -> npt.NDArray[np.float32]:
+        """Returns an array of squared errors, one for each (strategy, problem)
+        pair."""
+        return (self.ideal - self.mitigated) ** 2
+
+    def best_strategy_id(self) -> int:
+        """Returns the stategy id that corresponds to the strategy that
+        maintained the smallest error across all ``BenchmarkProblem``
+        instances."""
+        errors = self.squared_errors()
+        strategy_errors = np.sum(errors, axis=1)
+        strategy_id = int(np.argmin(strategy_errors))
+        return strategy_id
 
 
 class Calibrator:
@@ -72,8 +124,12 @@ class Calibrator:
             else None
         )
         self.settings = settings
-        self.circuits = settings.make_circuits()
-        self.results: List[Dict[str, Any]] = []
+        self.circuits = settings.make_problems()
+        self.strategies = settings.make_strategies()
+        self.results = ExperimentResults(
+            num_strategies=len(self.strategies),
+            num_problems=len(self.circuits),
+        )
 
     def get_cost(self) -> Dict[str, int]:
         """Returns the expected number of noisy and ideal expectation values
@@ -92,175 +148,51 @@ class Calibrator:
             "ideal_executions": ideal,
         }
 
-    def run_circuits(self) -> List[Dict[str, Any]]:
-        """Runs all the circuits required for calibration.
-
-        Returns:
-            A collection of experimental results along with a summary of each
-            :class:`BenchmarkProblem` that was run.
-        """
-        expvals = []
+    def run(self) -> None:
+        """Runs all the circuits required for calibration."""
         for problem in self.circuits:
-            circuit, distribution = problem["circuit", "ideal_distribution"]
+            circuit = problem.circuit
             circuit.append(cirq.measure(circuit.all_qubits()))
 
-            expval_executor, bitstring_to_measure = convert_to_expval_executor(
-                self.executor, distribution
+            bitstring_to_measure = problem.most_likely_bitstring()
+            expval_executor = convert_to_expval_executor(
+                self.executor, bitstring_to_measure
             )
-            noisy_value = expval_executor.evaluate(circuit)[0]
-            ideal_value = distribution[bitstring_to_measure]
-            noisy_error = ideal_value - noisy_value
 
-            mitigated_values: Dict[str, Dict[str, Any]] = {
-                technique.name: {"results": [], "improvement_factor": None}
-                for technique in self.settings.techniques
-            }
-            for strategy in self.settings.make_strategies():
+            noisy_value = expval_executor.evaluate(circuit)[0]
+
+            for strategy in self.strategies:
                 mitigated_value = strategy.mitigation_function(
                     circuit, expval_executor
                 )
-                improvement_factor = abs(
-                    noisy_error / (ideal_value - mitigated_value)
+                self.results.add_result(
+                    strategy,
+                    problem,
+                    ideal_val=problem.largest_probability(),
+                    noisy_val=noisy_value,
+                    mitigated_val=mitigated_value,
                 )
+        self.results.ensure_full()
 
-                result = {
-                    "mitigated_value": mitigated_value,
-                    "improvement_factor": improvement_factor,
-                    "strategy": strategy,
-                    **strategy.as_dict(),
-                }
-                technique = strategy.technique.name
-                mitigated_values[technique]["results"].append(result)
-
-            circuit_info = problem.problem_summary_dict()
-            expvals.append(
-                {
-                    "circuit_info": circuit_info,
-                    "noisy_value": noisy_value,
-                    "ideal_value": distribution[bitstring_to_measure],
-                    "mitigated_values": mitigated_values,
-                }
-            )
-        return expvals
-
-    def compute_improvements(
-        self, experiment_results: List[Dict[str, Any]]
-    ) -> None:
-        """Computes the improvement factors for each calibration circuit that
-        was run. Saves the improvement factors in the input dictionary.
-
-        Args:
-            experiment_results: Results obtained from :func:`run_circuits`.
-        """
-        regularizing_epsilon = 1e-30
-        for result in experiment_results:
-            ideal_value = result["ideal_value"]
-            noisy_value = result["noisy_value"]
-            for di in result["mitigated_values"].values():
-                results = di["results"]
-                mitigated_values = [di["mitigated_value"] for di in results]
-                improvement_factor = abs(noisy_value - ideal_value) / sqrt(
-                    regularizing_epsilon
-                    + len(mitigated_values)
-                    * sum(
-                        (mitigated_value - ideal_value) ** 2
-                        for mitigated_value in mitigated_values
-                    )
-                )
-                di["improvement_factor"] = improvement_factor
-
-    def best_strategy(self, results: List[Dict[str, Any]]) -> Strategy:
+    def best_strategy(self) -> Strategy:
         """Finds the best strategy by using the parameters that had the
-        largest improvement factor.
+        smallest error.
 
         Args:
             results: Calibration experiment results. Obtained by first running
-                :func:`run_circuits` and :func:`compute_improvements`.
+                :func:`run`.
 
         Returns:
             A single :class:`Strategy` object specifying the technique and
             parameters that performed best.
         """
-        best_improvement_factor = 1.0
-        num_circuits = len(self.settings.circuit_types)
+        self.results.ensure_full()
 
-        strategy = DefaultStrategy
-
-        def filter_on_strategy(
-            result: Dict[str, Dict[str, Dict[str, Any]]], strategy_id: int
-        ) -> Dict[str, Dict[str, Dict[str, Any]]]:
-            """Obtain results corresponding to the strategy of interest.
-            Args:
-                result: Calibration experiment results.
-                strategy_id: Index of the strategy of interest.
-
-            Returns:
-                A dictionary of results corresponding to the strategy of
-                interest.
-            """
-            res = result
-            res["mitigated_values"]["ZNE"]["results"] = [
-                res["mitigated_values"]["ZNE"]["results"][strategy_id]
-            ]
-            return res
-
-        for strategy_id in range(
-            len(results[0]["mitigated_values"]["ZNE"]["results"])
-        ):
-            strategy_group = []
-            for c in range(num_circuits):
-                result_copy = deepcopy(results)
-                strategy_group.append(
-                    filter_on_strategy(result_copy[c], strategy_id=strategy_id)
-                )
-                self.compute_improvements(strategy_group)
-
-            if (
-                strategy_group[0]["mitigated_values"]["ZNE"]["results"][0][
-                    "improvement_factor"
-                ]
-                > best_improvement_factor
-            ):
-                best_improvement_factor = strategy_group[0][
-                    "mitigated_values"
-                ]["ZNE"]["results"][0]["improvement_factor"]
-                strategy = strategy_group[0]["mitigated_values"]["ZNE"][
-                    "results"
-                ][0]["strategy"]
-        self.results.append(
-            {"best_improvement_factor": best_improvement_factor}
-        )
-
-        if strategy is DefaultStrategy:
-            warnings.warn("None of the improvement factors were > 1")
-
-        return strategy
-
-    def run(self) -> None:
-        results = self.run_circuits()
-        self.compute_improvements(results)
-        self.results = results
+        strategy_id = self.results.best_strategy_id()
+        return self.settings.get_strategy(strategy_id)
 
 
-def bitstrings_to_distribution(
-    bitstrings: Sequence[List[int]],
-) -> Dict[str, float]:
-    """Helper function to convert raw measurement results to probability
-    distributions."""
-    distribution = Counter(
-        ["".join(map(str, bitstring)) for bitstring in bitstrings]
-    )
-    bitstring_count = len(bitstrings)
-    for bitstring in distribution:
-        distribution[bitstring] /= bitstring_count  # type: ignore [assignment]
-    return dict(distribution)
-
-
-def convert_to_expval_executor(
-    executor: Executor,
-    distribution: Optional[Dict[str, float]] = None,
-    bitstring: Optional[str] = None,
-) -> Tuple[Executor, str]:
+def convert_to_expval_executor(executor: Executor, bitstring: str) -> Executor:
     """Constructs a new executor returning an expectation value given by the
     probability that the circuit outputs the most likely state according to the
     ideal distribution.
@@ -268,32 +200,19 @@ def convert_to_expval_executor(
     Args:
         executor: Executor which returns a :class:`.MeasurementResult`
             (bitstrings).
-        distribution: The ideal distribution at the end of the circuit run.
         bitstring: The bitstring to measure the probability of.
 
     Returns:
         A tuple containing an executor returning expectation values and,
         the most likely bitstring, according to the passed ``distribution``
     """
-    bitstring_to_measure = ""
-    if distribution:
-        bitstring_to_measure = max(
-            distribution,
-            key=distribution.get,  # type: ignore [arg-type]
-        )
-    elif bitstring:
-        bitstring_to_measure = bitstring
 
     def expval_executor(circuit: cirq.Circuit) -> float:
-        raw = cast(MeasurementResult, executor.run([circuit])[0]).result
-        raw = cast(List[List[int]], raw)
-        bitstring_distribution = bitstrings_to_distribution(raw)
-        return bitstring_distribution.get(bitstring_to_measure, 0)
+        raw = cast(MeasurementResult, executor.run([circuit])[0])
+        distribution = raw.prob_distribution()
+        return distribution.get(bitstring, 0.0)
 
-    return (
-        Executor(expval_executor),  # type: ignore [arg-type]
-        bitstring_to_measure,
-    )
+    return Executor(expval_executor)  # type: ignore [arg-type]
 
 
 def execute_with_mitigation(
@@ -322,8 +241,8 @@ def execute_with_mitigation(
         The error mitigated expectation expectation value.
     """
 
-    if not calibrator.results:
+    if calibrator.results.is_missing_data():
         calibrator.run()
-    strategy = calibrator.best_strategy(calibrator.results)
+    strategy = calibrator.best_strategy()
     em_func = strategy.mitigation_function
     return em_func(circuit, executor=executor, observable=observable)
