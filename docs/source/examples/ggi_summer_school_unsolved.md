@@ -142,6 +142,7 @@ plot_histogram(ideal_counts, title='Counts for an ideal GHZ state')
 We now execute the same circuit on a noisy backend (a classical emulator of a real QPU)
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 noisy_backend = FakeJakarta() # QPU emulator
 
 # Compile the circuit into the native gates of the backend
@@ -183,6 +184,7 @@ def execute(compiled_circuit):
 Let us check if the function works as expeted.
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 print(f"The noisy expectation value is <A> = {execute(compiled_circuit)}")
 ```
 
@@ -205,6 +207,7 @@ print(f"The error mitigated expectation value is <A> = {zne_value}")
 Let us compare the absolute estimation error obtained with and without Mitiq.
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 print(f"Error without Mitiq: {abs(ideal_expectation_value - noisy_expectation_value)}")
 print(f"Error with Mitiq: {abs(ideal_expectation_value - zne_value)}")
 ```
@@ -243,6 +246,7 @@ For example, the function `zne.scaling.fold_gates_at_random()` applies transform
 ### STEP 1: Noise-scaled expectation values are evaluated via gate-level "unitary folding" transformations
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 locally_folded_circuit = # apply fold_gates_at_random() to "circuit" with scale factor of 3.
 # Link to docs: https://mitiq.readthedocs.io/en/stable/apidoc.html#mitiq.zne.scaling.folding.fold_gates_at_random
 
@@ -255,6 +259,7 @@ print(locally_folded_circuit)
 Alternatively, the function `zne.scaling.fold_global()` applies the transformation $U \rightarrow U U^\dagger U$ to the full circuit.
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 globally_folded_circuit = # apply fold_global() to "circuit" with scale factor of 3.
 # Link to docs: https://mitiq.readthedocs.io/en/stable/apidoc.html#mitiq.zne.scaling.folding.fold_global
 
@@ -267,6 +272,7 @@ In both cases, the results are longer circuits which are more sensitive to noise
 For example, let's use global folding to evaluate a list of noise scaled expectation values.
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 scale_factors = [1.0, 2.0, 3.0]
 # It is usually better apply unitary folding to the compiled circuit
 noise_scaled_circuits = [zne.scaling.fold_global(compiled_circuit, s) for s in scale_factors]
@@ -282,6 +288,7 @@ Given the list of noise scaled expectation values, one can extrapolate the zero-
 
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 # Initialize a Richardson extrapolation object
 richardson_factory = zne.RichardsonFactory(scale_factors)
 
