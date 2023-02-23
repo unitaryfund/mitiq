@@ -45,9 +45,7 @@ class ExperimentResults:
     def __init__(self, num_strategies: int, num_problems: int) -> None:
         self.num_strategies = num_strategies
         self.num_problems = num_problems
-        self.mitigated = np.full((num_strategies, num_problems), np.nan)
-        self.noisy = np.full((num_strategies, num_problems), np.nan)
-        self.ideal = np.full((num_strategies, num_problems), np.nan)
+        self.reset_data()
 
     def add_result(
         self,
@@ -110,7 +108,12 @@ class ExperimentResults:
         return strategy_id
 
     def reset_data(self) -> None:
-        self.__init__(self.num_strategies, self.num_problems)
+        """Reset all experiment result data using NaN values."""
+        self.mitigated = np.full(
+            (self.num_strategies, self.num_problems), np.nan
+        )
+        self.noisy = np.full((self.num_strategies, self.num_problems), np.nan)
+        self.ideal = np.full((self.num_strategies, self.num_problems), np.nan)
 
 
 class Calibrator:
