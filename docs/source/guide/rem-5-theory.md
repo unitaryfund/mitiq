@@ -33,10 +33,10 @@ A device's readout-error confusion matrix $A$ is a square matrix that encodes, f
 
 $$
 \begin{bmatrix}
-Pr(00|00) & Pr(01|00) & Pr(10|00) & Pr(11|00) \\
-Pr(00|01) & Pr(01|01) & Pr(10|01) & Pr(11|01) \\
-Pr(00|10) & Pr(01|10) & Pr(10|10) & Pr(11|10) \\
-Pr(00|11) & Pr(01|11) & Pr(10|11) & Pr(11|11)
+Pr(00|00) & Pr(00|01) & Pr(00|10) & Pr(00|11) \\
+Pr(01|00) & Pr(01|01) & Pr(01|10) & Pr(01|11) \\
+Pr(10|00) & Pr(10|01) & Pr(10|10) & Pr(10|11) \\
+Pr(11|00) & Pr(11|01) & Pr(11|10) & Pr(11|11)
 \end{bmatrix}
 $$
 

@@ -88,8 +88,10 @@ print(f"Error without mitigation: {error:.3}")
 
 ## Apply Postselection
 The simplest version of readout error mitigation that we could do is to postselect specific bitstrings using 
-{mod}`mitiq.rem.post_select`. In our case we know that we should only have bitstrings of `[1,1]`, so we could discard
-any results that don't match.
+{mod}`mitiq.rem.post_select`. We observe that the circuit in our example is symmetric with respect to interchanging the
+two qubits. Assuming we are given the promise that the ideal result must be a unique bitstring, such a bitstring must
+be symmetric with respect to a bit swap. Therefore, a possible error mitigation strategy is to keep only the results
+where the bits match.
 
 ```{code-cell} ipython3
 from mitiq.rem import post_select
@@ -98,16 +100,20 @@ circuit_with_measurements = circuit.copy()
 circuit_with_measurements.append(measure_each(*qreg))
 noisy_measurements = noisy_executor(circuit_with_measurements)
 print(f"Before postselection: {noisy_measurements.get_counts()}")
-postselected_measurements = post_select(noisy_measurements, lambda bits: bits == [1,1])
+postselected_measurements = post_select(noisy_measurements, lambda bits: bits[0] == bits[1])
 print(f"After postselection: {postselected_measurements.get_counts()}")
 total_measurements = len(noisy_measurements.result)
 discarded_measurements = total_measurements - len(postselected_measurements.result)
 print(f"Discarded measurements: {discarded_measurements} ({discarded_measurements/total_measurements:.0%} of total)")
+
+mitigated_result = observable._expectation_from_measurements([postselected_measurements])
+error = abs((ideal_value - mitigated_result)/ideal_value)
+print(f"Error with mitigation (PS): {error:.3}")
 ```
 
-So, if we used these postselected results, then we'd get our expected noiseless expectation value. However, that comes
-at the cost of throwing away many of our measurements, which doesn't scale well in practice with the number of qubits
-we are measuring. 
+So, if we used these postselected results, then we'd get closer to the expected noiseless expectation value. However, 
+that comes at the cost of throwing away many of our measurements, which doesn't scale well in practice with the 
+number of qubits we are measuring. 
 
 ## Apply REM
 A more elaborate readout-error mitigation technique can be easily applied with the function
