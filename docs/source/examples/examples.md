@@ -23,6 +23,5 @@ PEC with Cirq: Learning representations <learning-depolarizing-noise.md>
 DDD with Cirq: Mirror circuits <ddd_tutorial.md>
 DDD with Qiskit: GHZ circuits <ddd_on_ibmq_ghz.md>
 GGI Summer School ZNE Hands-On Tutorial <ggi_summer_school_unsolved.md>
-GGI Summer School ZNE Hands-On Tutorial (Solved) <ggi_summer_school_solved.md>
 The Mitiq paper code <mitiq-paper/mitiq-paper-codeblocks.md>
 ```

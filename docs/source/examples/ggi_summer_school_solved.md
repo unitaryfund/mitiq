@@ -1,5 +1,5 @@
 ---
-hidden: true
+orphan: true
 
 jupytext:
   text_representation:
