@@ -97,7 +97,7 @@ def sample_sequence(
         noisy_op, sign, _ = operation_representation.sample(
             random_state  # type: ignore
         )
-        sequences.append(noisy_op.circuit())
+        sequences.append(noisy_op.native_circuit)
         signs.append(sign)
 
     return sequences, signs, norm

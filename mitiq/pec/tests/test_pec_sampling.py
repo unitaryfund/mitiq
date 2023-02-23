@@ -51,6 +51,12 @@ from mitiq.pec.representations import (
 from mitiq.pec.channels import _operation_to_choi, _circuit_to_choi
 
 
+xcirq = Circuit(cirq.X(cirq.LineQubit(0)))
+zcirq = Circuit(cirq.Z(cirq.LineQubit(0)))
+cnotcirq = Circuit(cirq.CNOT(cirq.LineQubit(0), cirq.LineQubit(1)))
+czcirq = Circuit(cirq.CZ(cirq.LineQubit(0), cirq.LineQubit(1)))
+
+
 def test_sample_sequence_cirq():
     circuit = Circuit(cirq.H(LineQubit(0)))
 
@@ -59,8 +65,8 @@ def test_sample_sequence_cirq():
     rep = OperationRepresentation(
         ideal=circuit,
         basis_expansion={
-            NoisyOperation.from_cirq(circuit=cirq.X): 0.5,
-            NoisyOperation.from_cirq(circuit=cirq.Z): -0.5,
+            NoisyOperation(xcirq): 0.5,
+            NoisyOperation(zcirq): -0.5,
         },
     )
 
@@ -121,8 +127,8 @@ def test_sample_sequence_cirq_random_state(seed):
     rep = OperationRepresentation(
         ideal=circuit,
         basis_expansion={
-            NoisyOperation.from_cirq(circuit=cirq.X): 0.5,
-            NoisyOperation.from_cirq(circuit=cirq.Z): -0.5,
+            NoisyOperation(xcirq): 0.5,
+            NoisyOperation(zcirq): -0.5,
         },
     )
 
@@ -147,8 +153,8 @@ def test_qubit_independent_representation_cirq(qubit):
     rep = OperationRepresentation(
         ideal=Circuit(cirq.H.on(LineQubit(qubit))),
         basis_expansion={
-            NoisyOperation.from_cirq(circuit=cirq.X): 0.5,
-            NoisyOperation.from_cirq(circuit=cirq.Z): -0.5,
+            NoisyOperation(xcirq): 0.5,
+            NoisyOperation(zcirq): -0.5,
         },
         is_qubit_dependent=False,
     )
@@ -220,8 +226,8 @@ def test_qubit_independent_representation_pyquil(qubit):
             OperationRepresentation(
                 Circuit(cirq.H.on(LineQubit(0))),
                 {
-                    NoisyOperation.from_cirq(circuit=cirq.X): 0.5,
-                    NoisyOperation.from_cirq(circuit=cirq.Z): -0.5,
+                    NoisyOperation(xcirq): 0.5,
+                    NoisyOperation(zcirq): -0.5,
                 },
             )
         ],
@@ -249,16 +255,16 @@ def test_sample_circuit_cirq(measure):
     h_rep = OperationRepresentation(
         ideal=circuit[:1],
         basis_expansion={
-            NoisyOperation.from_cirq(circuit=cirq.X): 0.6,
-            NoisyOperation.from_cirq(circuit=cirq.Z): -0.6,
+            NoisyOperation(xcirq): 0.6,
+            NoisyOperation(zcirq): -0.6,
         },
     )
 
     cnot_rep = OperationRepresentation(
         ideal=circuit[1:2],
         basis_expansion={
-            NoisyOperation.from_cirq(circuit=cirq.CNOT): 0.7,
-            NoisyOperation.from_cirq(circuit=cirq.CZ): -0.7,
+            NoisyOperation(cnotcirq): 0.7,
+            NoisyOperation(czcirq): -0.7,
         },
     )
 
@@ -282,8 +288,8 @@ def test_sample_circuit_partial_representations():
     cnot_rep = OperationRepresentation(
         ideal=circuit[1:2],
         basis_expansion={
-            NoisyOperation.from_cirq(circuit=cirq.CNOT): 0.7,
-            NoisyOperation.from_cirq(circuit=cirq.CZ): -0.7,
+            NoisyOperation(cnotcirq): 0.7,
+            NoisyOperation(czcirq): -0.7,
         },
     )
 
@@ -333,8 +339,8 @@ def test_sample_circuit_with_seed():
     rep = OperationRepresentation(
         ideal=Circuit(cirq.X.on(LineQubit(0))),
         basis_expansion={
-            NoisyOperation.from_cirq(cirq.Z): 1.0,
-            NoisyOperation.from_cirq(cirq.X): -1.0,
+            NoisyOperation(zcirq): 1.0,
+            NoisyOperation(xcirq): -1.0,
         },
     )
 

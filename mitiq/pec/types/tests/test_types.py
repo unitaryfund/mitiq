@@ -17,6 +17,7 @@ import numpy as np
 import pytest
 
 import cirq
+from cirq import Circuit
 import pyquil
 import qiskit
 
@@ -27,81 +28,61 @@ from mitiq.pec.types import (
     OperationRepresentation,
 )
 
+icirq = Circuit(cirq.I(cirq.LineQubit(0)))
+xcirq = Circuit(cirq.X(cirq.LineQubit(0)))
+ycirq = Circuit(cirq.Y(cirq.LineQubit(0)))
+zcirq = Circuit(cirq.Z(cirq.LineQubit(0)))
+hcirq = Circuit(cirq.H(cirq.LineQubit(0)))
+cnotcirq = Circuit(cirq.CNOT(cirq.LineQubit(0), cirq.LineQubit(1)))
 
-def test_init_with_gate():
-    ideal_gate = cirq.Z
+
+def test_init_with_cirq_circuit():
     real = np.zeros(shape=(4, 4))
-    noisy_op = NoisyOperation.from_cirq(ideal_gate, real)
+    noisy_op = NoisyOperation(zcirq, real)
     assert isinstance(noisy_op._circuit, cirq.Circuit)
 
-    assert _equal(
-        noisy_op.circuit(),
-        cirq.Circuit(ideal_gate.on(cirq.LineQubit(0))),
-        require_qubit_equality=False,
-    )
     assert noisy_op.qubits == (cirq.LineQubit(0),)
-    assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq.Z))
     assert np.allclose(noisy_op.channel_matrix, real)
     assert noisy_op.channel_matrix is not real
 
     assert noisy_op._native_type == "cirq"
-    assert _equal(noisy_op._native_circuit, noisy_op.circuit())
+    assert _equal(zcirq, noisy_op.circuit)
+    assert _equal(noisy_op._native_circuit, noisy_op.circuit)
 
 
 @pytest.mark.parametrize(
     "qubit",
     (cirq.LineQubit(0), cirq.GridQubit(1, 2), cirq.NamedQubit("Qubit")),
 )
-def test_init_with_operation(qubit):
-    ideal_op = cirq.H.on(qubit)
+def test_init_with_different_qubits(qubit):
+    ideal_op = Circuit(cirq.H.on(qubit))
     real = np.zeros(shape=(4, 4))
-    noisy_op = NoisyOperation.from_cirq(ideal_op, real)
+    noisy_op = NoisyOperation(ideal_op, real)
 
     assert isinstance(noisy_op._circuit, cirq.Circuit)
     assert _equal(
-        noisy_op.circuit(),
+        noisy_op.circuit,
         cirq.Circuit(ideal_op),
         require_qubit_equality=True,
     )
     assert noisy_op.qubits == (qubit,)
-    assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(ideal_op))
     assert np.allclose(noisy_op.channel_matrix, real)
     assert noisy_op.channel_matrix is not real
 
     assert noisy_op._native_type == "cirq"
-    assert _equal(noisy_op._native_circuit, noisy_op.circuit())
+    assert _equal(cirq.Circuit(ideal_op), noisy_op.circuit)
+    assert _equal(noisy_op._native_circuit, noisy_op.circuit)
 
 
-def test_init_with_op_tree():
-    qreg = cirq.LineQubit.range(2)
-    ideal_ops = [cirq.H.on(qreg[0]), cirq.CNOT.on(*qreg)]
-    real = np.zeros(shape=(16, 16))
-    noisy_op = NoisyOperation.from_cirq(ideal_ops, real)
-
-    assert isinstance(noisy_op._circuit, cirq.Circuit)
-    assert _equal(
-        noisy_op.circuit(),
-        cirq.Circuit(ideal_ops),
-        require_qubit_equality=True,
-    )
-    assert set(noisy_op.qubits) == set(qreg)
-    assert np.allclose(
-        noisy_op.ideal_unitary, cirq.unitary(cirq.Circuit(ideal_ops))
-    )
-    assert np.allclose(noisy_op.channel_matrix, real)
-    assert noisy_op.channel_matrix is not real
-
-
-def test_init_with_cirq_circuit():
+def test_init_with_cirq_input():
     qreg = cirq.LineQubit.range(2)
     circ = cirq.Circuit(cirq.H.on(qreg[0]), cirq.CNOT.on(*qreg))
     real = np.zeros(shape=(16, 16))
     noisy_op = NoisyOperation(circ, real)
 
     assert isinstance(noisy_op._circuit, cirq.Circuit)
-    assert _equal(noisy_op.circuit(), circ, require_qubit_equality=True)
+    assert _equal(noisy_op.circuit, circ, require_qubit_equality=True)
     assert set(noisy_op.qubits) == set(qreg)
-    assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(circ))
     assert np.allclose(noisy_op.channel_matrix, real)
     assert noisy_op.channel_matrix is not real
 
@@ -119,12 +100,12 @@ def test_init_with_qiskit_circuit():
     noisy_op = NoisyOperation(circ, real)
     assert isinstance(noisy_op._circuit, cirq.Circuit)
     assert _equal(noisy_op._circuit, cirq_circ)
+    assert _equal(noisy_op.circuit, cirq_circ)
 
-    assert noisy_op.circuit() == circ
+    assert noisy_op.native_circuit == circ
     assert noisy_op._native_circuit == circ
     assert noisy_op._native_type == "qiskit"
 
-    assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq_circ))
     assert np.allclose(noisy_op.channel_matrix, real)
     assert noisy_op.channel_matrix is not real
 
@@ -141,7 +122,7 @@ def test_init_with_qiskit_circuit():
 )
 def test_init_with_gates_raises_error(gate):
     rng = np.random.RandomState(seed=1)
-    with pytest.raises(TypeError, match="Arg `circuit` must be one of"):
+    with pytest.raises(TypeError, match="Failed to convert to an internal"):
         NoisyOperation(circuit=gate, channel_matrix=rng.rand(4, 4))
 
 
@@ -155,21 +136,14 @@ def test_init_with_pyquil_program():
     noisy_op = NoisyOperation(circ, real)
     assert isinstance(noisy_op._circuit, cirq.Circuit)
     assert _equal(noisy_op._circuit, cirq_circ)
+    assert _equal(noisy_op.circuit, cirq_circ)
 
-    assert noisy_op.circuit() == circ
+    assert noisy_op.native_circuit == circ
     assert noisy_op._native_circuit == circ
     assert noisy_op._native_type == "pyquil"
 
-    assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq_circ))
     assert np.allclose(noisy_op.channel_matrix, real)
     assert noisy_op.channel_matrix is not real
-
-
-def test_init_with_bad_types():
-    ideal_ops = [cirq.H, cirq.CNOT]
-    real = np.zeros(shape=(16, 16))
-    with pytest.raises(ValueError, match="must be cirq.CIRCUIT_LIKE"):
-        NoisyOperation.from_cirq(ideal_ops, real)
 
 
 def test_init_dimension_mismatch_error():
@@ -191,12 +165,11 @@ def test_unknown_channel_matrix():
     noisy_op = NoisyOperation(circ)
     assert isinstance(noisy_op._circuit, cirq.Circuit)
     assert _equal(noisy_op._circuit, cirq_circ)
+    assert _equal(noisy_op.circuit, cirq_circ)
 
-    assert noisy_op.circuit() == circ
+    assert noisy_op.native_circuit == circ
     assert noisy_op._native_circuit == circ
     assert noisy_op._native_type == "qiskit"
-
-    assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq_circ))
 
     with pytest.raises(ValueError, match="The channel matrix is unknown."):
         _ = noisy_op.channel_matrix
@@ -234,7 +207,6 @@ def test_add_pyquil_noisy_operations():
     correct = cirq.Circuit([cirq.X.on(cirq.NamedQubit("Q"))] * 2)
 
     assert _equal(noisy_op._circuit, correct, require_qubit_equality=False)
-    assert np.allclose(noisy_op.ideal_unitary, np.identity(2))
     assert np.allclose(noisy_op.channel_matrix, real @ real)
 
 
@@ -252,7 +224,6 @@ def test_add_qiskit_noisy_operations():
     correct = cirq.Circuit([cirq.X.on(cirq.NamedQubit("Q"))] * 2)
 
     assert _equal(noisy_op._circuit, correct, require_qubit_equality=False)
-    assert np.allclose(noisy_op.ideal_unitary, np.identity(2))
     assert np.allclose(noisy_op.channel_matrix, real @ real)
 
 
@@ -277,169 +248,18 @@ def test_add_noisy_operation_no_channel_matrix():
         (noisy_op1 + noisy_op2).channel_matrix
 
 
-@pytest.mark.parametrize(
-    "qreg",
-    (
-        cirq.LineQubit.range(5),
-        cirq.GridQubit.square(5),
-        [cirq.NamedQubit(str(i)) for i in range(5)],
-    ),
-)
-@pytest.mark.parametrize("real", [np.zeros(shape=(4, 4)), None])
-def test_on_each_single_qubit(qreg, real):
-    noisy_ops = NoisyOperation.on_each(
-        cirq.X, qubits=qreg, channel_matrix=real
-    )
-
-    assert len(noisy_ops) == len(qreg)
-
-    for i, op in enumerate(noisy_ops):
-        if real is not None:
-            assert np.allclose(op.channel_matrix, real)
-        assert op.num_qubits == 1
-        assert list(op.circuit().all_qubits())[0] == qreg[i]
-
-
-@pytest.mark.parametrize(
-    "qubits",
-    (
-        [cirq.LineQubit.range(2), cirq.LineQubit.range(2, 4)],
-        [cirq.LineQubit.range(5, 7), cirq.LineQubit.range(10, 12)],
-        [cirq.GridQubit.rect(1, 2), cirq.GridQubit.rect(2, 1)],
-    ),
-)
-@pytest.mark.parametrize("real", [np.zeros(shape=(16, 16)), None])
-def test_on_each_multiple_qubits(qubits, real):
-    noisy_ops = NoisyOperation.on_each(
-        cirq.CNOT, qubits=qubits, channel_matrix=real
-    )
-    assert len(noisy_ops) == 2
-
-    for i, op in enumerate(noisy_ops):
-        if real is not None:
-            assert np.allclose(op.channel_matrix, real)
-        assert op.num_qubits == 2
-        assert set(op.qubits) == set(qubits[i])
-
-
-def test_on_each_multiple_qubits_bad_qubits_shape():
-    real_cnot = np.zeros(shape=(16, 16))
-    qubits = [cirq.LineQubit.range(3)]
-    with pytest.raises(
-        ValueError, match="Number of qubits in each register should be"
-    ):
-        NoisyOperation.on_each(
-            cirq.CNOT, qubits=qubits, channel_matrix=real_cnot
-        )
-
-
-def test_on_each_bad_types():
-    ideal = cirq.Circuit(cirq.I(cirq.LineQubit(0)))
-    real = np.identity(4)
-    with pytest.raises(TypeError, match="must be iterable"):
-        NoisyOperation.on_each(
-            ideal, qubits=cirq.NamedQubit("new"), channel_matrix=real
-        )
-
-
-@pytest.mark.parametrize(
-    "qubit", (cirq.NamedQubit("New qubit"), cirq.GridQubit(2, 3))
-)
-@pytest.mark.parametrize("real", [np.zeros(shape=(4, 4)), None])
-def test_transform_qubits_single_qubit(qubit, real):
-    gate = cirq.H
-    noisy_op = NoisyOperation.from_cirq(gate, real)
-
-    assert set(noisy_op.qubits) != {qubit}
-    noisy_op.transform_qubits(qubit)
-    assert set(noisy_op.qubits) == {qubit}
-
-
-@pytest.mark.parametrize(
-    "qubits", (cirq.LineQubit.range(4, 6), cirq.GridQubit.rect(1, 2))
-)
-@pytest.mark.parametrize("real", [np.zeros(shape=(16, 16)), None])
-def test_transform_qubits_multiple_qubits(qubits, real):
-    qreg = [cirq.NamedQubit("Dummy 1"), cirq.NamedQubit("Dummy 2")]
-    ideal = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(*qreg))
-    noisy_op = NoisyOperation(ideal, real)
-
-    assert set(noisy_op.qubits) != set(qubits)
-    if real is not None:
-        assert np.allclose(noisy_op.channel_matrix, real)
-
-    noisy_op.transform_qubits(qubits)
-    assert set(noisy_op.qubits) == set(qubits)
-    if real is not None:
-        assert np.allclose(noisy_op.channel_matrix, real)
-
-
-def test_transform_qubits_wrong_number():
-    real = np.zeros(shape=(16, 16))
-    qreg = [cirq.NamedQubit("Dummy 1"), cirq.NamedQubit("Dummy 2")]
-    ideal = cirq.Circuit(cirq.ops.CNOT.on(*qreg))
-    noisy_op = NoisyOperation(ideal, real)
-
-    with pytest.raises(ValueError, match="Expected 2 qubits but received"):
-        noisy_op.transform_qubits(qubits=[cirq.NamedQubit("new")])
-
-
-def test_with_qubits():
-    real = np.zeros(shape=(16, 16))
-    qreg = [cirq.NamedQubit("Dummy 1"), cirq.NamedQubit("Dummy 2")]
-    ideal = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(*qreg))
-    noisy_op = NoisyOperation(ideal, real)
-
-    assert set(noisy_op.qubits) == set(qreg)
-    assert np.allclose(noisy_op.channel_matrix, real)
-
-    qubits = cirq.LineQubit.range(2)
-    new_noisy_op = noisy_op.with_qubits(qubits)
-    assert set(new_noisy_op.qubits) == set(qubits)
-    assert np.allclose(new_noisy_op.channel_matrix, real)
-
-
-@pytest.mark.parametrize("real", [np.zeros(shape=(4, 4)), None])
-def test_extend_to_single_qubit(real):
-    qbit, qreg = cirq.LineQubit(0), cirq.LineQubit.range(1, 10)
-    ideal = cirq.Z.on(qbit)
-    noisy_op_on_one_qubit = NoisyOperation.from_cirq(ideal, real)
-
-    noisy_ops_on_all_qubits = noisy_op_on_one_qubit.extend_to(qreg)
-
-    assert isinstance(noisy_ops_on_all_qubits, list)
-    assert len(noisy_ops_on_all_qubits) == 10
-
-    for op in noisy_ops_on_all_qubits:
-        assert _equal(op.circuit(), cirq.Circuit(ideal))
-        assert np.allclose(op.ideal_unitary, cirq.unitary(ideal))
-
-        if real is not None:
-            assert np.allclose(op.channel_matrix, real)
-
-
 def test_noisy_operation_str():
-    noisy_op = NoisyOperation.from_cirq(
-        circuit=cirq.I, channel_matrix=np.identity(4)
-    )
+    noisy_op = NoisyOperation(circuit=icirq, channel_matrix=np.identity(4))
     assert isinstance(noisy_op.__str__(), str)
 
 
 def test_noisy_basis_simple():
     rng = np.random.RandomState(seed=1)
     noisy_basis = NoisyBasis(
-        NoisyOperation.from_cirq(
-            circuit=cirq.I, channel_matrix=rng.rand(4, 4)
-        ),
-        NoisyOperation.from_cirq(
-            circuit=cirq.X, channel_matrix=rng.rand(4, 4)
-        ),
-        NoisyOperation.from_cirq(
-            circuit=cirq.Y, channel_matrix=rng.rand(4, 4)
-        ),
-        NoisyOperation.from_cirq(
-            circuit=cirq.Z, channel_matrix=rng.rand(4, 4)
-        ),
+        NoisyOperation(circuit=icirq, channel_matrix=rng.rand(4, 4)),
+        NoisyOperation(circuit=xcirq, channel_matrix=rng.rand(4, 4)),
+        NoisyOperation(circuit=ycirq, channel_matrix=rng.rand(4, 4)),
+        NoisyOperation(circuit=zcirq, channel_matrix=rng.rand(4, 4)),
     )
     assert len(noisy_basis) == 4
     assert noisy_basis.all_qubits() == {cirq.LineQubit(0)}
@@ -461,7 +281,7 @@ def test_pyquil_noisy_basis():
     assert len(noisy_basis) == 2
 
     for op in noisy_basis.elements:
-        assert isinstance(op.circuit(), pyquil.Program)
+        assert isinstance(op.native_circuit, pyquil.Program)
         assert isinstance(op._circuit, cirq.Circuit)
 
 
@@ -481,7 +301,7 @@ def test_qiskit_noisy_basis():
     assert len(noisy_basis) == 2
 
     for op in noisy_basis.elements:
-        assert isinstance(op.circuit(), qiskit.QuantumCircuit)
+        assert isinstance(op.native_circuit, qiskit.QuantumCircuit)
         assert isinstance(op._circuit, cirq.Circuit)
 
 
@@ -504,22 +324,14 @@ def test_noisy_basis_bad_types(element):
 def test_noisy_basis_add():
     rng = np.random.RandomState(seed=1)
     noisy_basis = NoisyBasis(
-        NoisyOperation.from_cirq(
-            circuit=cirq.I, channel_matrix=rng.rand(4, 4)
-        ),
-        NoisyOperation.from_cirq(
-            circuit=cirq.X, channel_matrix=rng.rand(4, 4)
-        ),
+        NoisyOperation(circuit=icirq, channel_matrix=rng.rand(4, 4)),
+        NoisyOperation(circuit=xcirq, channel_matrix=rng.rand(4, 4)),
     )
     assert len(noisy_basis) == 2
 
     noisy_basis.add(
-        NoisyOperation.from_cirq(
-            circuit=cirq.Y, channel_matrix=rng.rand(4, 4)
-        ),
-        NoisyOperation.from_cirq(
-            circuit=cirq.Z, channel_matrix=rng.rand(4, 4)
-        ),
+        NoisyOperation(circuit=ycirq, channel_matrix=rng.rand(4, 4)),
+        NoisyOperation(circuit=zcirq, channel_matrix=rng.rand(4, 4)),
     )
     assert len(noisy_basis) == 4
 
@@ -527,44 +339,20 @@ def test_noisy_basis_add():
 def test_noisy_basis_add_bad_types():
     rng = np.random.RandomState(seed=1)
     noisy_basis = NoisyBasis(
-        NoisyOperation.from_cirq(
-            circuit=cirq.I, channel_matrix=rng.rand(4, 4)
-        ),
-        NoisyOperation.from_cirq(
-            circuit=cirq.X, channel_matrix=rng.rand(4, 4)
-        ),
+        NoisyOperation(icirq, channel_matrix=rng.rand(4, 4)),
+        NoisyOperation(xcirq, channel_matrix=rng.rand(4, 4)),
     )
 
     with pytest.raises(TypeError, match="All basis elements must be of type"):
         noisy_basis.add(cirq.Y)
 
 
-def test_extend_to_simple():
-    rng = np.random.RandomState(seed=1)
-    noisy_basis = NoisyBasis(
-        NoisyOperation.from_cirq(
-            circuit=cirq.I, channel_matrix=rng.rand(4, 4)
-        ),
-        NoisyOperation.from_cirq(
-            circuit=cirq.X, channel_matrix=rng.rand(4, 4)
-        ),
-    )
-    assert len(noisy_basis.elements) == 2
-
-    noisy_basis.extend_to(cirq.LineQubit.range(1, 3))
-    assert len(noisy_basis.elements) == 6
-
-
 @pytest.mark.parametrize("length", (2, 3, 5))
 def test_get_sequences_simple(length):
     rng = np.random.RandomState(seed=1)
     noisy_basis = NoisyBasis(
-        NoisyOperation.from_cirq(
-            circuit=cirq.I, channel_matrix=rng.rand(4, 4)
-        ),
-        NoisyOperation.from_cirq(
-            circuit=cirq.X, channel_matrix=rng.rand(4, 4)
-        ),
+        NoisyOperation(circuit=icirq, channel_matrix=rng.rand(4, 4)),
+        NoisyOperation(circuit=xcirq, channel_matrix=rng.rand(4, 4)),
     )
 
     sequences = noisy_basis.get_sequences(length=length)
@@ -572,17 +360,17 @@ def test_get_sequences_simple(length):
     assert len(sequences) == len(noisy_basis) ** length
 
     for sequence in sequences:
-        assert len(sequence.circuit()) == length
+        assert len(sequence.circuit) == length
 
 
 def get_test_representation():
     ideal = cirq.Circuit(cirq.H(cirq.LineQubit(0)))
 
-    noisy_xop = NoisyOperation.from_cirq(
-        circuit=cirq.X, channel_matrix=np.zeros(shape=(4, 4))
+    noisy_xop = NoisyOperation(
+        circuit=xcirq, channel_matrix=np.zeros(shape=(4, 4))
     )
-    noisy_zop = NoisyOperation.from_cirq(
-        circuit=cirq.Z, channel_matrix=np.zeros(shape=(4, 4))
+    noisy_zop = NoisyOperation(
+        circuit=zcirq, channel_matrix=np.zeros(shape=(4, 4))
     )
 
     decomp = OperationRepresentation(
@@ -612,8 +400,8 @@ def test_representation_coeff_of():
 def test_representation_bad_type_for_basis_expansion():
     ideal = cirq.Circuit(cirq.H(cirq.LineQubit(0)))
 
-    noisy_xop = NoisyOperation.from_cirq(
-        circuit=cirq.X, channel_matrix=np.zeros(shape=(4, 4))
+    noisy_xop = NoisyOperation(
+        circuit=xcirq, channel_matrix=np.zeros(shape=(4, 4))
     )
 
     with pytest.raises(TypeError, match="All keys of `basis_expansion` must"):
@@ -626,16 +414,16 @@ def test_representation_coeff_of_nonexistant_operation():
     qbit = cirq.LineQubit(0)
     ideal = cirq.Circuit(cirq.X(qbit))
 
-    noisy_xop = NoisyOperation.from_cirq(
-        circuit=cirq.X, channel_matrix=np.zeros(shape=(4, 4))
+    noisy_xop = NoisyOperation(
+        circuit=xcirq, channel_matrix=np.zeros(shape=(4, 4))
     )
 
     decomp = OperationRepresentation(
         ideal=ideal, basis_expansion=dict([(noisy_xop, 0.5)])
     )
 
-    noisy_zop = NoisyOperation.from_cirq(
-        circuit=cirq.Z, channel_matrix=np.zeros(shape=(4, 4))
+    noisy_zop = NoisyOperation(
+        circuit=zcirq, channel_matrix=np.zeros(shape=(4, 4))
     )
     with pytest.raises(ValueError, match="does not appear in the basis"):
         decomp.coeff_of(noisy_zop)
@@ -683,11 +471,11 @@ def test_representation_sample_bad_seed_type():
 def test_representation_sample_zero_coefficient():
     ideal = cirq.Circuit(cirq.H(cirq.LineQubit(0)))
 
-    noisy_xop = NoisyOperation.from_cirq(
-        circuit=cirq.X, channel_matrix=np.zeros(shape=(4, 4))
+    noisy_xop = NoisyOperation(
+        circuit=xcirq, channel_matrix=np.zeros(shape=(4, 4))
     )
-    noisy_zop = NoisyOperation.from_cirq(
-        circuit=cirq.Z, channel_matrix=np.zeros(shape=(4, 4))
+    noisy_zop = NoisyOperation(
+        circuit=zcirq, channel_matrix=np.zeros(shape=(4, 4))
     )
 
     decomp = OperationRepresentation(
@@ -703,17 +491,20 @@ def test_representation_sample_zero_coefficient():
         noisy_op, sign, coeff = decomp.sample(random_state=random_state)
         assert sign == 1
         assert coeff == 0.5
-        assert np.allclose(noisy_op.ideal_unitary, cirq.unitary(cirq.X))
+        assert np.allclose(
+            cirq.unitary(noisy_op.circuit),
+            cirq.unitary(cirq.X),
+        )
 
 
 def test_print_cirq_operation_representation():
     ideal = cirq.Circuit(cirq.H(cirq.LineQubit(0)))
 
-    noisy_xop = NoisyOperation.from_cirq(
-        circuit=cirq.X, channel_matrix=np.zeros(shape=(4, 4))
+    noisy_xop = NoisyOperation(
+        circuit=xcirq, channel_matrix=np.zeros(shape=(4, 4))
     )
-    noisy_zop = NoisyOperation.from_cirq(
-        circuit=cirq.Z, channel_matrix=np.zeros(shape=(4, 4))
+    noisy_zop = NoisyOperation(
+        circuit=zcirq, channel_matrix=np.zeros(shape=(4, 4))
     )
     # Positive first coefficient
     decomp = OperationRepresentation(
@@ -765,12 +556,12 @@ def test_print_operation_representation_two_qubits():
     qreg = cirq.LineQubit.range(2)
     ideal = cirq.Circuit(cirq.CNOT(*qreg))
 
-    noisy_a = NoisyOperation.from_cirq(
+    noisy_a = NoisyOperation(
         circuit=cirq.Circuit(
             cirq.H.on_each(qreg), cirq.CNOT(*qreg), cirq.H.on_each(qreg)
         )
     )
-    noisy_b = NoisyOperation.from_cirq(
+    noisy_b = NoisyOperation(
         circuit=cirq.Circuit(
             cirq.Z.on_each(qreg),
             cirq.CNOT(*qreg),
@@ -807,14 +598,12 @@ def test_print_operation_representation_two_qubits_neg():
     qreg = cirq.LineQubit.range(2)
     ideal = cirq.Circuit(cirq.CNOT(*qreg))
 
-    noisy_a = NoisyOperation.from_cirq(
+    noisy_a = NoisyOperation(
         circuit=cirq.Circuit(
             cirq.H.on_each(qreg[0]), cirq.CNOT(*qreg), cirq.H.on_each(qreg[1])
         )
     )
-    noisy_b = NoisyOperation.from_cirq(
-        circuit=cirq.Circuit(cirq.Z.on_each(qreg[1]))
-    )
+    noisy_b = NoisyOperation(circuit=cirq.Circuit(cirq.Z.on_each(qreg[1])))
     decomp = OperationRepresentation(
         ideal=ideal,
         basis_expansion={

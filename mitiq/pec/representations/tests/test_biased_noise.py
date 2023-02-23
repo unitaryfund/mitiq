@@ -211,7 +211,7 @@ def test_biased_noise_representation_with_choi(
     ]
 
     for noisy_op, coeff in op_rep.basis_expansion.items():
-        implementable_circ = noisy_op.circuit()
+        implementable_circ = noisy_op.circuit
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.
         biased_op = ops.MixedUnitaryChannel(mix).on_each(*qreg)
