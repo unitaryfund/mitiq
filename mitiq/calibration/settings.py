@@ -162,10 +162,26 @@ class Settings:
     """A class to store the configuration settings of a :class:`.Calibrator`.
 
     Args:
-        benchmarks: A specification of the parameters for generating circuits
-            to be used in calibration experiments, which are `"circuit_type"`,
-            `"num_qubits"`, `"circuit_depth"`, and in the case of mirror
-            circuits, a random seed `"circuit_seed"`.
+        benchmarks: A list where each element is a dictionary of parameters for
+            generating circuits to be used in calibration experiments. The
+            dictionary keys include ``"circuit_type"``, ``"num_qubits"``,
+            ``"circuit_depth"``, and in the case of mirror circuits, a random
+            seed ``"circuit_seed"``.
+            An example of input to ``benchmarks`` is
+            .. code-block:: python
+                [
+                    {
+                        "circuit_type": "mirror",
+                        "num_qubits": 3,
+                        "circuit_depth": 5,
+                        "circuit_seed": 1,
+                    },
+                    {
+                        "circuit_type": "rb",
+                        "num_qubits": 2,
+                        "circuit_depth": 7,
+                    }
+                ]
         strategies: A specification of the methods/parameters to be used in
             calibration experiments.
     """
@@ -194,9 +210,14 @@ class Settings:
         circuits = []
         for i, benchmark in enumerate(self.benchmarks):
             circuit_type = benchmark["circuit_type"]
-            depth = benchmark["circuit_depth"]
             num_qubits = benchmark["num_qubits"]
-
+            if (
+                "circuit_depth" in benchmark.keys()
+                and benchmark["circuit_depth"] is not None
+            ):
+                depth = benchmark["circuit_depth"]
+            else:
+                depth = num_qubits
             if circuit_type == "ghz":
                 circuit = generate_ghz_circuit(num_qubits)
                 ideal = {"0" * num_qubits: 0.5, "1" * num_qubits: 0.5}
@@ -264,7 +285,6 @@ ZNESettings = Settings(
         {
             "circuit_type": "ghz",
             "num_qubits": 2,
-            "circuit_depth": None,
         },
         {
             "circuit_type": "rb",
