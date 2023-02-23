@@ -57,6 +57,6 @@ distribution to obtain an adjusted *quasi*-probability distribution, $p' = A^{+}
 non-positive. As such, we want to find the closest *positive* probability distribution {cite}`Bravyi_2021` to our
 empirical probability distribution:
 
- $$ p'' = \min_{p_{\rm positive}} \||p' - p_{\rm positive}\||_1$$
+ $$ p'' = \min_{p_{\rm positive}} \|p' - p_{\rm positive}\|_1$$
 
 Finally, we can draw samples from this new probability distribution, $x \sim p''$ , and return those as our mitigated results.
