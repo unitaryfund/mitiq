@@ -104,6 +104,7 @@ class BenchmarkProblem:
         base = asdict(self)
         # remove circuit; it can be regenerated if needed
         del base["circuit"]
+        del base["id"]
         base["num_qubits"] = self.num_qubits
         base["circuit_depth"] = self.circuit_depth
         base["two_qubit_gate_count"] = self.two_qubit_gate_count
@@ -141,7 +142,7 @@ class Strategy:
 
         Returns:
             A dictionary describing the strategies parameters."""
-        summary = {"id": self.id, "technique": self.technique.name}
+        summary = {"technique": self.technique.name}
         if self.technique is MitigationTechnique.ZNE:
             inference_func = self.technique_params["factory"]
             summary["factory"] = inference_func.__class__.__name__

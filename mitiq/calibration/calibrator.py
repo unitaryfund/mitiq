@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from typing import Callable, Dict, Optional, Union, cast
+import warnings
 
 import cirq
 import numpy as np
@@ -44,9 +45,7 @@ class ExperimentResults:
     def __init__(self, num_strategies: int, num_problems: int) -> None:
         self.num_strategies = num_strategies
         self.num_problems = num_problems
-        self.mitigated = np.full((num_strategies, num_problems), np.nan)
-        self.noisy = np.full((num_strategies, num_problems), np.nan)
-        self.ideal = np.full((num_strategies, num_problems), np.nan)
+        self.reset_data()
 
     def add_result(
         self,
@@ -56,12 +55,28 @@ class ExperimentResults:
         ideal_val: float,
         noisy_val: float,
         mitigated_val: float,
+        log: bool = False,
     ) -> None:
         """Add a single result from a (Strategy, BenchmarkProblem) pair and
         store the results."""
         self.mitigated[strategy.id, problem.id] = mitigated_val
         self.noisy[strategy.id, problem.id] = noisy_val
         self.ideal[strategy.id, problem.id] = ideal_val
+        if not log:
+            return
+        mitigated_better = abs(ideal_val - mitigated_val) < abs(
+            ideal_val - noisy_val
+        )
+        performance = "✅" if mitigated_better else "❌"
+        print(
+            f"Ran {problem.type} circuit using:",
+            list(strategy.to_dict().values()),
+        )
+        print(
+            f"{performance} ideal: {ideal_val:.2f}\t"
+            f"noisy: {noisy_val:.2f}\t"
+            f"mitigated: {mitigated_val:.2f}"
+        )
 
     def is_missing_data(self) -> bool:
         """Method to check if there is any missing data that was expected from
@@ -91,6 +106,14 @@ class ExperimentResults:
         strategy_errors = np.sum(errors, axis=1)
         strategy_id = int(np.argmin(strategy_errors))
         return strategy_id
+
+    def reset_data(self) -> None:
+        """Reset all experiment result data using NaN values."""
+        self.mitigated = np.full(
+            (self.num_strategies, self.num_problems), np.nan
+        )
+        self.noisy = np.full((self.num_strategies, self.num_problems), np.nan)
+        self.ideal = np.full((self.num_strategies, self.num_problems), np.nan)
 
 
 class Calibrator:
@@ -148,10 +171,13 @@ class Calibrator:
             "ideal_executions": ideal,
         }
 
-    def run(self) -> None:
+    def run(self, log: bool = False) -> None:
         """Runs all the circuits required for calibration."""
+        if not self.results.is_missing_data():
+            self.results.reset_data()
+
         for problem in self.circuits:
-            circuit = problem.circuit
+            circuit = problem.circuit.copy()
             circuit.append(cirq.measure(circuit.all_qubits()))
 
             bitstring_to_measure = problem.most_likely_bitstring()
@@ -162,15 +188,18 @@ class Calibrator:
             noisy_value = expval_executor.evaluate(circuit)[0]
 
             for strategy in self.strategies:
-                mitigated_value = strategy.mitigation_function(
-                    circuit, expval_executor
-                )
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore", UserWarning)
+                    mitigated_value = strategy.mitigation_function(
+                        circuit, expval_executor
+                    )
                 self.results.add_result(
                     strategy,
                     problem,
                     ideal_val=problem.largest_probability(),
                     noisy_val=noisy_value,
                     mitigated_val=mitigated_value,
+                    log=log,
                 )
         self.results.ensure_full()
 
@@ -221,7 +250,7 @@ def execute_with_mitigation(
     observable: Optional[Observable] = None,
     *,
     calibrator: Calibrator,
-) -> QuantumResult:
+) -> Union[QuantumResult, None]:
     """Estimates the error-mitigated expectation value associated to the
     input circuit, via the application of the best mitigation strategy, as
     determined by calibration.
@@ -242,7 +271,18 @@ def execute_with_mitigation(
     """
 
     if calibrator.results.is_missing_data():
-        calibrator.run()
+        cost = calibrator.get_cost()
+        answer = input(
+            "Calibration experiments have not yet been run. You can run the "
+            "experiments manually by calling `calibrator.run()`, or they can "
+            f"be run now. The potential cost is:\n{cost}\n"
+            "Would you like the experiments to be run automatically? (yes/no)"
+        )
+        if answer.lower() == "yes":
+            calibrator.run()
+        else:
+            return None
+
     strategy = calibrator.best_strategy()
     em_func = strategy.mitigation_function
     return em_func(circuit, executor=executor, observable=observable)
