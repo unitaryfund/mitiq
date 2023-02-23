@@ -599,6 +599,7 @@ def test_different_qubits_error():
             coeffs=[0.5, 0.5],
         )
 
+
 def test_different_length_error():
     """The number of coefficients must be = to the number of noisy operations.
     """
