@@ -127,7 +127,7 @@ shots = 10 ** 5
 We first execute the circuit on an ideal noiseless simulator.
 
 ```{code-cell} ipython3
-:tags: ["raises-exception"]
+:tags: ["skip-execution"]
 ideal_backend = AerSimulator()
 
 # Append measurement gates
@@ -149,7 +149,7 @@ compiled_circuit = transpile(circuit_to_run, noisy_backend)
 ```
 
 ```{code-cell} ipython3
-:tags: ["raises-exception"]
+:tags: ["skip-execution"]
 # Run the simulation on the noisy backend
 
 # TODO: Run circuit_to_run on the noisy backend and get the noisy counts
@@ -158,7 +158,7 @@ plot_histogram(noisy_counts, title='Counts for a noisy GHZ state', figsize=(15, 
 ```
 
 ```{code-cell} ipython3
-:tags: ["raises-exception"]
+:tags: ["skip-execution"]
 ideal_expectation_value = # TODO: get <A> from ideal_counts
 print(f"The ideal expectation value is <A> = {ideal_expectation_value}")
 
@@ -171,7 +171,7 @@ print(f"The noisy expectation value is <A> = {noisy_expectation_value}")
 Before using Mitiq we need wrap the previous code into a function that takes as input a circuit and returns the noisy expectation value of the observable $A$. This function will be used by Mitiq as a black box during the error mitigation process.
 
 ```{code-cell} ipython3
-:tags: ["raises-exception"]
+:tags: ["skip-execution"]
 def execute(compiled_circuit):
     """Executes the input circuits and returns the expectation value of A=|00..0><00..0| + |11..1><11..1|."""
     print("Executing a circuit of depth:", compiled_circuit.depth())
@@ -189,7 +189,7 @@ print(f"The noisy expectation value is <A> = {execute(compiled_circuit)}")
 We can now apply zero-noise extrapolation with Mitiq. Without advanced options, this requires a single line of code.
 
 ```{code-cell} ipython3
-:tags: ["raises-exception"]
+:tags: ["skip-execution"]
 from mitiq import zne
 
 zne_value = zne.execute_with_zne(
@@ -214,7 +214,7 @@ print(f"Error with Mitiq: {abs(ideal_expectation_value - zne_value)}")
 ## Explicitly selecting the noise-scaling method and the extrapolation method
 
 ```{code-cell} ipython3
-:tags: ["raises-exception"]
+:tags: ["skip-execution"]
 from mitiq import zne
 
 # Select a noise scaling method
@@ -294,7 +294,7 @@ _ = richardson_factory.plot_fit()
 ```
 
 ```{code-cell} ipython3
-:tags: ["raises-exception"]
+:tags: ["skip-execution"]
 # Initialize a linear extrapolation object
 linear_factory = # TODO... see docs: https://mitiq.readthedocs.io/en/stable/apidoc.html#mitiq.zne.inference.LinearFactory
 
