@@ -111,9 +111,7 @@ error = abs((ideal_value - mitigated_result)/ideal_value)
 print(f"Error with mitigation (PS): {error:.3}")
 ```
 
-So, if we used these postselected results, then we'd get closer to the expected noiseless expectation value. However, 
-that comes at the cost of throwing away many of our measurements, which doesn't scale well in practice with the 
-number of qubits we are measuring. 
+So, if we used these postselected results, then we'd get closer to the expected noiseless expectation value. However, that comes at the cost of throwing away a fraction of our measurements. 
 
 ## Apply REM
 A more elaborate readout-error mitigation technique can be easily applied with the function
