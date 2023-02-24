@@ -159,16 +159,15 @@ class Strategy:
 
 
 class Settings:
-    """A class to store the configuration settings of a :class:`.Calibrator`.
+    r"""A class to store the configuration settings of a :class:`.Calibrator`.
 
     Args:
         benchmarks: A list where each element is a dictionary of parameters for
             generating circuits to be used in calibration experiments. The
             dictionary keys include ``"circuit_type"``, ``"num_qubits"``,
             ``"circuit_depth"``, and in the case of mirror circuits, a random
-            seed ``"circuit_seed"``.
-            An example of input to ``benchmarks`` is
-            .. code-block:: python
+            seed ``"circuit_seed"``. An example of input to ``benchmarks`` is::
+
                 [
                     {
                         "circuit_type": "mirror",
@@ -182,6 +181,7 @@ class Settings:
                         "circuit_depth": 7,
                     }
                 ]
+
         strategies: A specification of the methods/parameters to be used in
             calibration experiments.
     """
