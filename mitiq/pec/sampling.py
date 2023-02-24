@@ -89,13 +89,12 @@ def sample_sequence(
         )
 
     # Qubit mapping is necessary for qubit-independent operation reps
-    qubit_map = {
-        q_in: q_out
-        for q_in, q_out in zip(
+    qubit_map = dict(
+        zip(
             sorted(operation_representation.ideal.all_qubits()),
             sorted(ideal.all_qubits()),
         )
-    }
+    )
 
     # Sample from this representation.
     norm = operation_representation.norm
