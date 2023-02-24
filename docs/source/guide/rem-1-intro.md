@@ -88,7 +88,7 @@ print(f"Error without mitigation: {error:.3}")
 
 ## Apply Postselection
 The simplest version of readout error mitigation that we could do is to postselect specific bitstrings using 
-{mod}`mitiq.rem.post_select`. We observe that the circuit in our example is symmetric with respect to interchanging the
+{mod}`mitiq.rem.post_select`. This strategy is only applicable if, from the structure of the problem, there is some kind symmetry that we can assume and therefore enforce by post-selection. For example, we observe that the circuit in our example is symmetric with respect to interchanging the
 two qubits. Assuming we are given the promise that the ideal result must be a unique bitstring, such a bitstring must
 be symmetric with respect to a bit swap. Therefore, a possible error mitigation strategy is to keep only the results
 where the bits match.
