@@ -86,8 +86,35 @@ error = abs((ideal_value - noisy_value)/ideal_value)
 print(f"Error without mitigation: {error:.3}")
 ```
 
+## Apply Postselection
+The simplest version of readout error mitigation that we could do is to postselect specific bitstrings using 
+{mod}`mitiq.rem.post_select`. This strategy is only applicable if, from the structure of the problem, there is some kind symmetry that we can assume and therefore enforce by post-selection. For example, we observe that the circuit in our example is symmetric with respect to interchanging the
+two qubits. Assuming we are given the promise that the ideal result must be a unique bitstring, such a bitstring must
+be symmetric with respect to a bit swap. Therefore, a possible error mitigation strategy is to keep only the results
+where the bits match.
+
+```{code-cell} ipython3
+from mitiq.rem import post_select
+
+circuit_with_measurements = circuit.copy()
+circuit_with_measurements.append(measure_each(*qreg))
+noisy_measurements = noisy_executor(circuit_with_measurements)
+print(f"Before postselection: {noisy_measurements.get_counts()}")
+postselected_measurements = post_select(noisy_measurements, lambda bits: bits[0] == bits[1])
+print(f"After postselection: {postselected_measurements.get_counts()}")
+total_measurements = len(noisy_measurements.result)
+discarded_measurements = total_measurements - len(postselected_measurements.result)
+print(f"Discarded measurements: {discarded_measurements} ({discarded_measurements/total_measurements:.0%} of total)")
+
+mitigated_result = observable._expectation_from_measurements([postselected_measurements])
+error = abs((ideal_value - mitigated_result)/ideal_value)
+print(f"Error with mitigation (PS): {error:.3}")
+```
+
+So, if we used these postselected results, then we'd get closer to the expected noiseless expectation value. However, that comes at the cost of throwing away a fraction of our measurements. 
+
 ## Apply REM
-Readout-error mitigation can be easily applied with the function
+A more elaborate readout-error mitigation technique can be easily applied with the function
 {func}`.execute_with_rem()`.
 
 ```{code-cell} ipython3
@@ -123,7 +150,5 @@ confusion matrix with some being more costly than others.
 
 +++
 
-The section
-[What additional options are available when using REM?](rem-3-options.md)
-contains more information on generating inverse confusion matrices in order to 
-apply REM with Mitiq.
+The section [What additional options are available when using REM?](rem-3-options.md) contains more information on
+generating inverse confusion matrices in order to apply REM with Mitiq.
