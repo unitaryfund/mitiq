@@ -48,16 +48,16 @@ The lab is split into the following sections :
 
 ## Checking Python packages are installed correctly
 
-This notebook was tested with **Mitiq v0.20.0** and **qiskit v0.39.0**. It probably works with other versions too. Moreover, with minor changes, it can be adapted to quantum libraries that are different from Qiskit: Cirq, Braket, PyQuil, etc..
+This notebook was tested with **Mitiq v0.23.0** and **qiskit v0.41.0**. It probably works with other versions too. Moreover, with minor changes, it can be adapted to quantum libraries that are different from Qiskit: Cirq, Braket, PyQuil, etc..
 
 If you need to install Mitiq and/or Qiskit, you can uncomment and run the following cells.
 
 ```{code-cell} ipython3
-# !pip install mitiq==0.20.0
+# !pip install mitiq==0.23.0
 ```
 
 ```{code-cell} ipython3
-# !pip install qiskit==0.39.0
+# !pip install qiskit==0.41.0
 ```
 
 If you encounter problems when installing Mitiq on your local machine,
