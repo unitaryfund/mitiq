@@ -170,15 +170,15 @@ class Settings:
 
                 [
                     {
-                        "circuit_type": "mirror",
-                        "num_qubits": 3,
-                        "circuit_depth": 5,
-                        "circuit_seed": 1,
-                    },
-                    {
                         "circuit_type": "rb",
                         "num_qubits": 2,
                         "circuit_depth": 7,
+                    },
+                    {
+                        "circuit_type": "mirror",
+                        "num_qubits": 2,
+                        "circuit_depth": 7,
+                        "circuit_seed": 1,
                     }
                 ]
 
@@ -293,8 +293,8 @@ ZNESettings = Settings(
         },
         {
             "circuit_type": "mirror",
-            "num_qubits": 3,
-            "circuit_depth": 5,
+            "num_qubits": 2,
+            "circuit_depth": 7,
             "circuit_seed": 1,
         },
     ],
