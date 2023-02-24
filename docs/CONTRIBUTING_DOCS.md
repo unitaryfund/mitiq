@@ -126,8 +126,7 @@ source code, and to the API page `apidoc.md`.
 
 ## Build the documentation locally
 The easiest way to build the docs is to run `make docs` from the project 
-root directory, which by default builds the html docs output.
-You can also use run `make pdf` to generate a PDF version.
+root directory, which builds the html docs output.
 
 ```{tip}
 If you want a fresh build with no caching, run `make docs-clean`!
@@ -138,14 +137,8 @@ To call sphinx directly, `cd` into the `docs` directory and run
 sphinx-build -b html source build
 ```
 
-These commands generate the `docs/build` folder. This folder is not kept track of in the
-github repository, as `docs/build` is present in the `.gitignore` file.
-Once the documentation is generated you can view it by opening it in your browser (HTML output) or your PDF viewer (PDF output).
-
-```{note}
-The `html` and `latex` and `pdf` files will be automatically created in the
-`docs/build` folder.
-```
+These commands generate the `docs/build` folder, which is ignore by the `.gitignore` file.
+Once the documentation is generated you can view it by opening it in your browser.
 
 ## Testing the Documentation 
 
@@ -189,7 +182,7 @@ If you have code blocks you want to run, but not be displayed, use the
 
 ````
 ```{testsetup} python
-   import numpy as np  # this block is not rendered in the html or pdf
+   import numpy as np  # this block is not rendered in the html
 ```
 
 ```{testcode} python
