@@ -212,9 +212,8 @@ class Settings:
         for i, benchmark in enumerate(self.benchmarks):
             circuit_type = benchmark["circuit_type"]
             num_qubits = benchmark["num_qubits"]
-            depth = benchmark.get("circuit_depth")
-            if not depth:
-                depth = num_qubits
+            # Circuits only generated when depth is specified
+            depth = benchmark.get("circuit_depth", -1)
             if circuit_type == "ghz":
                 circuit = generate_ghz_circuit(num_qubits)
                 ideal = {"0" * num_qubits: 0.5, "1" * num_qubits: 0.5}
