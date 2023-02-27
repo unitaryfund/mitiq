@@ -15,7 +15,7 @@
 
 from dataclasses import dataclass, asdict
 from functools import partial
-from typing import Any, Callable, cast, List, Dict, Optional
+from typing import Any, Callable, cast, List, Dict
 from enum import Enum, auto
 
 import networkx as nx
@@ -160,44 +160,44 @@ class Strategy:
 
 
 class Settings:
-    """A class to store the configuration settings of a :class:`.Calibrator`.
+    r"""A class to store the configuration settings of a :class:`.Calibrator`.
 
     Args:
-        circuit_types: List of strings specifying circuit types to use.
-            Must be drawn from the Identifier column::
+        benchmarks: A list where each element is a dictionary of parameters for
+            generating circuits to be used in calibration experiments. The
+            dictionary keys include ``"circuit_type"``, ``"num_qubits"``,
+            ``"circuit_depth"``, and in the case of mirror circuits, a random
+            seed ``"circuit_seed"``. An example of input to ``benchmarks`` is::
 
-                Identifier  | Circuit Type
-                ----------------------------
-                "ghz"       | GHZ circuit
-                "rb"        | Randomized Benchmarking
-                "mirror"    | Mirror circuit
+                [
+                    {
+                        "circuit_type": "rb",
+                        "num_qubits": 2,
+                        "circuit_depth": 7,
+                    },
+                    {
+                        "circuit_type": "mirror",
+                        "num_qubits": 2,
+                        "circuit_depth": 7,
+                        "circuit_seed": 1,
+                    }
+                ]
 
-        num_qubits: Number of qubits to use for circuit generation.
-        circuit_depth: Circuit depth to use when generating circuits. Only
-            used when ``num_qubits`` in combination with the circuit type does
-            not specify the depth.
         strategies: A specification of the methods/parameters to be used in
             calibration experiments.
-        seed: A random seed for (mirror) circuit generation.
     """
 
     def __init__(
         self,
-        circuit_types: List[str],
-        num_qubits: int,
-        circuit_depth: int,
+        benchmarks: List[Dict[str, Any]],
         strategies: List[Dict[str, Any]],
-        circuit_seed: Optional[int] = None,
     ):
         self.techniques = [
             MitigationTechnique[technique["technique"].upper()]
             for technique in strategies
         ]
         self.technique_params = strategies
-        self.circuit_types = circuit_types
-        self.num_qubits = num_qubits
-        self.circuit_depth = circuit_depth
-        self.circuit_seed = circuit_seed
+        self.benchmarks = benchmarks
         self.strategy_dict: Dict[int, Strategy] = {}
         self.problem_dict: Dict[int, BenchmarkProblem] = {}
 
@@ -209,29 +209,34 @@ class Settings:
         Returns:
             A list of :class:`BenchmarkProblem` objects"""
         circuits = []
-        nqubits, depth, seed = (
-            self.num_qubits,
-            self.circuit_depth,
-            self.circuit_seed,
-        )
-        for i, circuit_type in enumerate(self.circuit_types):
+        for i, benchmark in enumerate(self.benchmarks):
+            circuit_type = benchmark["circuit_type"]
+            num_qubits = benchmark["num_qubits"]
+            if (
+                "circuit_depth" in benchmark.keys()
+                and benchmark["circuit_depth"] is not None
+            ):
+                depth = benchmark["circuit_depth"]
+            else:
+                depth = num_qubits
             if circuit_type == "ghz":
-                circuit = generate_ghz_circuit(nqubits)
-                ideal = {"0" * nqubits: 0.5, "1" * nqubits: 0.5}
+                circuit = generate_ghz_circuit(num_qubits)
+                ideal = {"0" * num_qubits: 0.5, "1" * num_qubits: 0.5}
             elif circuit_type == "rb":
-                circuit = generate_rb_circuits(nqubits, depth)[0]
-                ideal = {"0" * nqubits: 1.0}
+                circuit = generate_rb_circuits(num_qubits, depth)[0]
+                ideal = {"0" * num_qubits: 1.0}
             elif circuit_type == "mirror":
+                seed = benchmark["circuit_seed"]
                 circuit, bitstring_list = generate_mirror_circuit(
                     nlayers=depth,
                     two_qubit_gate_prob=1.0,
-                    connectivity_graph=nx.complete_graph(nqubits),
+                    connectivity_graph=nx.complete_graph(num_qubits),
                     seed=seed,
                 )
                 ideal_bitstring = "".join(map(str, bitstring_list))
                 ideal = {ideal_bitstring: 1.0}
             elif circuit_type == "qv":
-                circuit, _ = generate_quantum_volume_circuit(nqubits, depth)
+                circuit, _ = generate_quantum_volume_circuit(num_qubits, depth)
                 raise NotImplementedError(
                     "quantum volume circuits not yet supported in calibration"
                 )
@@ -277,9 +282,23 @@ class Settings:
 
 
 ZNESettings = Settings(
-    circuit_types=["ghz", "rb", "mirror"],
-    num_qubits=2,
-    circuit_depth=5,
+    benchmarks=[
+        {
+            "circuit_type": "ghz",
+            "num_qubits": 2,
+        },
+        {
+            "circuit_type": "rb",
+            "num_qubits": 2,
+            "circuit_depth": 7,
+        },
+        {
+            "circuit_type": "mirror",
+            "num_qubits": 2,
+            "circuit_depth": 7,
+            "circuit_seed": 1,
+        },
+    ],
     strategies=[
         {
             "technique": "zne",

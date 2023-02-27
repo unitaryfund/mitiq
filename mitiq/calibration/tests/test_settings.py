@@ -35,9 +35,13 @@ def test_MitigationTechnique():
 
 def test_basic_settings():
     settings = Settings(
-        circuit_types=["ghz"],
-        num_qubits=2,
-        circuit_depth=999,
+        benchmarks=[
+            {
+                "circuit_type": "ghz",
+                "num_qubits": 2,
+                "circuit_depth": 999,
+            }
+        ],
         strategies=[
             {
                 "technique": "zne",
@@ -78,9 +82,13 @@ def test_basic_settings():
 
 def test_make_circuits_qv_circuits():
     settings = Settings(
-        circuit_types=["qv"],
-        num_qubits=2,
-        circuit_depth=999,
+        [
+            {
+                "circuit_type": "qv",
+                "num_qubits": 2,
+                "circuit_depth": 999,
+            }
+        ],
         strategies=[
             {
                 "technique": "zne",
@@ -95,9 +103,7 @@ def test_make_circuits_qv_circuits():
 
 def test_make_circuits_invalid_circuit_type():
     settings = Settings(
-        circuit_types=["foobar"],
-        num_qubits=2,
-        circuit_depth=999,
+        [{"circuit_type": "foobar", "num_qubits": 2, "circuit_depth": 999}],
         strategies=[
             {
                 "technique": "zne",
@@ -115,9 +121,7 @@ def test_make_circuits_invalid_circuit_type():
 def test_make_strategies_invalid_technique():
     with pytest.raises(KeyError, match="DESTROY"):
         Settings(
-            circuit_types=["shor"],
-            num_qubits=2,
-            circuit_depth=999,
+            [{"circuit_types": "shor", "num_qubits": 2, "circuit_depth": 999}],
             strategies=[
                 {
                     "technique": "destroy_my_errors",

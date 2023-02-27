@@ -51,9 +51,14 @@ def execute(circuit, noise_level=0.001):
 
 
 settings = Settings(
-    circuit_types=["ghz", "rb"],
-    num_qubits=2,
-    circuit_depth=10,
+    [
+        {
+            "circuit_type": "ghz",
+            "num_qubits": 2,
+            "circuit_depth": 10,
+        },
+        {"circuit_type": "rb", "num_qubits": 2, "circuit_depth": 10},
+    ],
     strategies=[
         {
             "technique": "zne",
@@ -102,9 +107,15 @@ def test_get_cost():
 
 def test_best_strategy():
     test_strategy_settings = Settings(
-        circuit_types=["ghz", "mirror"],
-        num_qubits=2,
-        circuit_depth=10,
+        benchmarks=[
+            {"circuit_type": "ghz", "num_qubits": 2, "circuit_depth": 10},
+            {
+                "circuit_type": "mirror",
+                "num_qubits": 2,
+                "circuit_depth": 10,
+                "circuit_seed": 1,
+            },
+        ],
         strategies=[
             {
                 "technique": "zne",
@@ -127,7 +138,6 @@ def test_best_strategy():
                 "factory": LinearFactory([1.0, 3.0, 5.0]),
             },
         ],
-        circuit_seed=1,
     )
 
     cal = Calibrator(execute, test_strategy_settings)
