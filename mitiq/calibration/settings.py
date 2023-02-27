@@ -160,14 +160,14 @@ class Strategy:
 
 
 class Settings:
-    r"""A class to store the configuration settings of a :class:`.Calibrator`.
+    """A class to store the configuration settings of a :class:`.Calibrator`.
 
     Args:
         benchmarks: A list where each element is a dictionary of parameters for
             generating circuits to be used in calibration experiments. The
-            dictionary keys include ``"circuit_type"``, ``"num_qubits"``,
-            ``"circuit_depth"``, and in the case of mirror circuits, a random
-            seed ``"circuit_seed"``. An example of input to ``benchmarks`` is::
+            dictionary keys include ``circuit_type``, ``num_qubits``,
+            ``circuit_depth``, and in the case of mirror circuits, a random
+            seed ``circuit_seed``. An example of input to ``benchmarks`` is::
 
                 [
                     {
@@ -212,13 +212,7 @@ class Settings:
         for i, benchmark in enumerate(self.benchmarks):
             circuit_type = benchmark["circuit_type"]
             num_qubits = benchmark["num_qubits"]
-            if (
-                "circuit_depth" in benchmark.keys()
-                and benchmark["circuit_depth"] is not None
-            ):
-                depth = benchmark["circuit_depth"]
-            else:
-                depth = num_qubits
+            depth = benchmark.get("circuit_depth")
             if circuit_type == "ghz":
                 circuit = generate_ghz_circuit(num_qubits)
                 ideal = {"0" * num_qubits: 0.5, "1" * num_qubits: 0.5}
