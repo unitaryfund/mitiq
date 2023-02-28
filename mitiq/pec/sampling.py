@@ -105,7 +105,7 @@ def sample_sequence(
             random_state  # type: ignore
         )
         if operation_representation.is_qubit_dependent:
-            native_circuit = noisy_op.native_circuit
+            native_circ = noisy_op.native_circuit
         else:
             cirq_circ = noisy_op.circuit
             cirq_circ = cirq_circ.transform_qubits(qubit_map)
