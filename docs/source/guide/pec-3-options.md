@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.14.1
@@ -125,12 +125,6 @@ and cannot be derived by Mitiq with the procedure shown in the next section.*
 
 +++
 
-Combining the noisy operations defined above, we obtain a {class}`.NoisyBasis`.
-
-```{code-cell} ipython3
-noisy_basis = pec.NoisyBasis(*noisy_operations)
-```
-
 Similar to what we did for `basis_circuits`, we also define the `ideal_operation` that we aim to represent in the
 form of a `QPROGRAM`. Assuming that we aim to represent the Hadamard gate, we have:
 
@@ -142,12 +136,12 @@ print(f"The ideal operation to expand in the noisy basis is:\n{ideal_operation}"
 
 The Mitiq function {func}`.find_optimal_representation`
 can be used to numerically obtain an  {class}`.OperationRepresentation` of the `ideal_operation`
-in the basis of the noisy implementable gates (`noisy_basis`).
+in the basis of the noisy implementable gates (`noisy_operations`).
 
 ```{code-cell} ipython3
 from mitiq.pec.representations import find_optimal_representation
 
-h_rep = find_optimal_representation(ideal_operation, noisy_basis)
+h_rep = find_optimal_representation(ideal_operation, noisy_operations)
 print(f"Optimal representation:\n{h_rep}")
 ```
 
@@ -173,13 +167,11 @@ distribution ${\eta_\alpha}$.
 # We assume to know the quasi-distribution
 quasi_dist = h_rep.coeffs
 
-# This is just a reordering of noisy_operations to match quasi_dist
-reordered_noisy_operations = h_rep.noisy_operations
-
 # Manual definition of the OperationRepresentation
-basis_expansion = dict(zip(reordered_noisy_operations, quasi_dist))
 manual_h_rep = pec.OperationRepresentation(
-    ideal=ideal_operation, basis_expansion=basis_expansion
+    ideal=ideal_operation,
+    noisy_operations=noisy_operations,
+    coeffs=quasi_dist,
 )
 
 # Test that the manual definition is equivalent to h_rep
@@ -202,34 +194,41 @@ assert depolarizing_h_rep == h_rep
 
 ### Qubit-independent representations
 
-It is possible to apply one representation of the same operation on different qubits, by setting the option `is_qubit_dependent` in 
-{class}`.OperationRepresentation` to `False`.
+It is possible to define a qubit-independent {class}`.OperationRepresentation` by setting the option `is_qubit_dependent` to `False`.
+
+In this case, a signle {class}`.OperationRepresentation` representing a gate acting on some arbitrary qubits can be used to mitigate
+the same gate even if acting on different qubits.
 
 ```{code-cell} ipython3
-qreg = qiskit.QuantumRegister(2)
 
+qreg = qiskit.QuantumRegister(2) 
 circuit = qiskit.QuantumCircuit(qreg)
-_ = circuit.h(qreg)
+circuit.h(0)
+circuit.h(1)
 
-xcircuit = qiskit.QuantumCircuit(qreg)
-_ = xcircuit.x(qreg)
-
-zcircuit = qiskit.QuantumCircuit(qreg)
-_ = zcircuit.z(qreg)
-
-noisy_xop = pec.NoisyOperation(xcircuit)
-noisy_zop = pec.NoisyOperation(zcircuit)
-
-ideal_op = qiskit.QuantumCircuit(qiskit.QuantumRegister(2))
-_ = ideal_op.h(0)
+# OperationRepresentation defined on different qubits
+rep_qreg = qiskit.QuantumRegister(1, "rep_reg") 
+ideal_op = qiskit.QuantumCircuit(rep_qreg)
+ideal_op.h(rep_qreg)
+hxcircuit = qiskit.QuantumCircuit(rep_qreg)
+hxcircuit.h(0)
+hxcircuit.x(0)
+hzcircuit = qiskit.QuantumCircuit(rep_qreg)
+hzcircuit.h(0)
+hzcircuit.z(0)
+noisy_hxop = pec.NoisyOperation(hxcircuit)
+noisy_hzop = pec.NoisyOperation(hzcircuit)
 
 rep = pec.OperationRepresentation(
     ideal=ideal_op,
-    basis_expansion={noisy_xop: 0.5, noisy_zop: -0.5},
+    noisy_operations=[noisy_hxop, noisy_hzop],
+    coeffs=[0.5, 0.5],
     is_qubit_dependent=False,
 )
-
 print(rep)
+print("Using the same rep on a circuit with H gates acting on different qubits:")
+sampled_circuits, _, _ = pec.sample_circuit(circuit, representations=[rep])
+print(*sampled_circuits)
 ```
 
 ### Methods of the `OperationRepresentation` class
@@ -275,7 +274,7 @@ assert sum([abs(eta) for eta in h_rep.coeffs]) == h_rep.norm
 
 ```{code-cell} ipython3
 # Positive and normalized distribution p(alpha)=|eta_alpha|/gamma
-h_rep.distribution()
+h_rep.distribution
 ```
 
 ## Estimating expectation values with PEC

@@ -210,7 +210,7 @@ def test_biased_noise_representation_with_choi(
         (c, unitary(Y)),
     ]
 
-    for noisy_op, coeff in op_rep.basis_expansion.items():
+    for coeff, noisy_op in op_rep.basis_expansion:
         implementable_circ = noisy_op.circuit
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.

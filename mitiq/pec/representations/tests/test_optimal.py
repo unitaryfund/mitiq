@@ -54,7 +54,7 @@ from mitiq.pec.channels import (
     choi_to_super,
 )
 
-from mitiq.pec.types import NoisyBasis, NoisyOperation
+from mitiq.pec.types import NoisyOperation
 from mitiq.interface import convert_from_mitiq
 
 
@@ -218,9 +218,8 @@ def test_find_optimal_representation_depolarizing_two_qubit_gates(circ_type):
         ]
 
         # Find optimal representation
-        noisy_basis = NoisyBasis(*noisy_operations)
         rep = find_optimal_representation(
-            ideal_op_native, noisy_basis, tol=1.0e-8
+            ideal_op_native, noisy_operations, tol=1.0e-8
         )
         # Expected analytical result
         expected_rep = represent_operation_with_local_depolarizing_noise(
@@ -262,9 +261,10 @@ def test_find_optimal_representation_single_qubit_depolarizing(circ_type):
             for ideal, real in zip(implementable_native, super_operators)
         ]
         # Find optimal representation
-        noisy_basis = NoisyBasis(*noisy_operations)
         rep = find_optimal_representation(
-            ideal_op_native, noisy_basis, tol=1.0e-8
+            ideal_op_native,
+            noisy_operations,
+            tol=1.0e-8,
         )
         # Expected analytical result
         expected_rep = represent_operation_with_local_depolarizing_noise(
@@ -308,9 +308,11 @@ def test_find_optimal_representation_single_qubit_amp_damping(circ_type):
             for ideal, real in zip(implementable_native, super_operators)
         ]
         # Find optimal representation
-        noisy_basis = NoisyBasis(*noisy_operations)
         rep = find_optimal_representation(
-            ideal_op_native, noisy_basis, tol=1.0e-7, initial_guess=[0, 0, 0]
+            ideal_op_native,
+            noisy_operations,
+            tol=1.0e-7,
+            initial_guess=[0, 0, 0],
         )
         # Expected analytical result
         expected_rep = _represent_operation_with_amplitude_damping_noise(
@@ -325,9 +327,8 @@ def test_find_optimal_representation_no_superoperator_error():
     q = LineQubit(0)
     # Define noisy operation without superoperator matrix
     noisy_op = NoisyOperation(Circuit(X(q)))
-    noisy_basis = NoisyBasis(noisy_op)
     with raises(ValueError, match="numerical superoperator matrix"):
-        find_optimal_representation(Circuit(X(q)), noisy_basis)
+        find_optimal_representation(Circuit(X(q)), [noisy_op])
 
 
 def test_initial_guess_in_minimize_one_norm():

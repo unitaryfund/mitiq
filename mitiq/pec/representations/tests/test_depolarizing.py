@@ -119,7 +119,7 @@ def test_depolarizing_representation_with_choi(gate: Gate, noise: float):
         noise,
     )
     choi_components = []
-    for noisy_op, coeff in op_rep.basis_expansion.items():
+    for coeff, noisy_op in op_rep.basis_expansion:
         implementable_circ = noisy_op.circuit
         # Apply noise after each sequence.
         # NOTE: noise is not applied after each operation.
@@ -142,7 +142,7 @@ def test_local_depolarizing_representation_with_choi(gate: Gate, noise: float):
         noise,
     )
     choi_components = []
-    for noisy_op, coeff in op_rep.basis_expansion.items():
+    for coeff, noisy_op in op_rep.basis_expansion:
         implementable_circ = noisy_op.circuit
         # The representation assume local noise on each qubit.
         depolarizing_op = DepolarizingChannel(noise).on_each(*qreg)

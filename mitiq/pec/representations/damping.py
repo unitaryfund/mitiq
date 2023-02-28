@@ -90,11 +90,9 @@ def _represent_operation_with_amplitude_damping_noise(
 
     # Basis of implementable operations as circuits
     imp_op_circuits = [ideal_operation + Circuit(op) for op in post_ops]
+    noisy_operations = [NoisyOperation(c) for c in imp_op_circuits]
 
-    # Build basis_expantion
-    expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, etas)}
-
-    return OperationRepresentation(ideal_operation, expansion)
+    return OperationRepresentation(ideal_operation, noisy_operations, etas)
 
 
 def amplitude_damping_kraus(

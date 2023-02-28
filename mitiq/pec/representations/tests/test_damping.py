@@ -66,7 +66,7 @@ def test_amplitude_damping_representation_with_choi(
         noise,
     )
     choi_components = []
-    for noisy_op, coeff in op_rep.basis_expansion.items():
+    for coeff, noisy_op in op_rep.basis_expansion:
         implementable_circ = noisy_op.circuit
         depolarizing_op = AmplitudeDampingChannel(noise).on(q)
         # Apply noise after each sequence.
