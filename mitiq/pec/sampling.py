@@ -104,9 +104,12 @@ def sample_sequence(
         noisy_op, sign, _ = operation_representation.sample(
             random_state  # type: ignore
         )
-        cirq_circ = noisy_op.circuit
-        cirq_circ = cirq_circ.transform_qubits(qubit_map)
-        native_circ = convert_from_mitiq(cirq_circ, native_type)
+        if operation_representation.is_qubit_dependent:
+            native_circuit = noisy_op.native_circuit
+        else:
+            cirq_circ = noisy_op.circuit
+            cirq_circ = cirq_circ.transform_qubits(qubit_map)
+            native_circ = convert_from_mitiq(cirq_circ, native_type)
         sequences.append(native_circ)
         signs.append(sign)
 
