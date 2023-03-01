@@ -6,6 +6,7 @@ Highlights of this release include refactoring of parts of the PEC module, impro
 completion of the REM section of the user guide, and the publishing of a Mitiq tutorial first presented as a lab exercise at the SQMS/GGI 2022 Summer School on Quantum Simulation of Field Theories.
 Special thanks to UF Ambassadors Amir Ebrahimi and Purva Thakre for their contributions to this release!
 
+**Breaking changes:** The class `NoisyOperation` is deprecated and removed from Mitiq. Moreover the initialization arguments of the `OperationRepresentation` class changed. Please check the associated API-docs and the [PEC section](https://mitiq.readthedocs.io/en/stable/guide/pec.html) of the docs for more details.
 - Refactoring of NoisyOperation, NoisyBasis, OperationRepresentation (#1712) [@andreamari]
 - Add Summer School Notebook to Docs (#1720) [@purva-thakre]
 - Fix mypy errors on #1728 (#1729) [@Misty-W]
