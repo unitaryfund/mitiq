@@ -7,6 +7,8 @@ completion of the REM section of the user guide, and the publishing of a Mitiq t
 Special thanks to UF Ambassadors Amir Ebrahimi and Purva Thakre for their contributions to this release!
 
 **Breaking changes:** The class `NoisyOperation` is deprecated and removed from Mitiq. Moreover the initialization arguments of the `OperationRepresentation` class changed. Please check the associated API-docs and the [PEC section](https://mitiq.readthedocs.io/en/stable/guide/pec.html) of the docs for more details.
+- Update pennylane-qiskit requirement from ~=0.28.0 to ~=0.29.0 (#1733) [@dependabot[bot]]
+- Update pennylane requirement from ~=0.28.0 to ~=0.29.0 (#1732) [@dependabot[bot]]
 - Refactoring of NoisyOperation, NoisyBasis, OperationRepresentation (#1712) [@andreamari]
 - Add Summer School Notebook to Docs (#1720) [@purva-thakre]
 - Fix mypy errors on #1728 (#1729) [@Misty-W]
