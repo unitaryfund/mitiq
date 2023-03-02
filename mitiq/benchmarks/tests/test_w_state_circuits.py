@@ -15,19 +15,27 @@
 
 """Tests for W-state benchmarking circuits."""
 
-import pytest
-import numpy as np
+# import pytest
+# import numpy as np
 import cirq
-from mitiq.utils import _equal
 
-from mitiq.benchmarks.w_state_circuits import GRotationGate, W_circuit_linear_complexity
+# from mitiq.utils import _equal
+
+from mitiq.benchmarks.w_state_circuits import (
+    GRotationGate,
+    W_circuit_linear_complexity,
+)
+
 
 def test_w4_circuit():
     output_circuit = W_circuit_linear_complexity(4)
     qubits = cirq.LineQubit.range(4)
     correct_circuit = cirq.Circuit(
-        cirq.ControlledGate(GRotationGate(1/4)).on(qubits[0], qubits[1]), cirq.CNOT(qubits[1], qubits[0]), 
-        cirq.ControlledGate(GRotationGate(1/3)).on(qubits[1], qubits[2]), cirq.CNOT(qubits[2], qubits[1]),
-        cirq.ControlledGate(GRotationGate(1/2)).on(qubits[2], qubits[3]), cirq.CNOT(qubits[3], qubits[2]),
-        )
-    assert _equal(output_circuit, correct_circuit, require_qubit_equality=True)
+        cirq.ControlledGate(GRotationGate(1 / 4)).on(qubits[0], qubits[1]),
+        cirq.CNOT(qubits[1], qubits[0]),
+        cirq.ControlledGate(GRotationGate(1 / 3)).on(qubits[1], qubits[2]),
+        cirq.CNOT(qubits[2], qubits[1]),
+        cirq.ControlledGate(GRotationGate(1 / 2)).on(qubits[2], qubits[3]),
+        cirq.CNOT(qubits[3], qubits[2]),
+    )
+    assert repr(output_circuit) == repr(correct_circuit)

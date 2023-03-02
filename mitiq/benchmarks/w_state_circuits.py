@@ -25,10 +25,10 @@ from mitiq import QPROGRAM
 from mitiq.interface import convert_from_mitiq
 
 
-
 class GRotationGate(cirq.Gate):
     """Defines rotation gate G(p) with parameter p bounded between 0 amd 1.
     https://quantumai.google/cirq/build/custom_gates#with_parameters"""
+
     def __init__(self, p):
         super(GRotationGate, self)
         self.p = p
@@ -37,10 +37,15 @@ class GRotationGate(cirq.Gate):
         return 1
 
     def _unitary_(self):
-        return np.array([
-            [np.sqrt(self.p), -np.sqrt(1-self.p)],
-            [np.sqrt(1-self.p), np.sqrt(self.p)]
-        ])
+        return np.array(
+            [
+                [np.sqrt(self.p), -np.sqrt(1 - self.p)],
+                [np.sqrt(1 - self.p), np.sqrt(self.p)],
+            ]
+        )
+
+    def __repr__(self) -> str:
+        return f"G({self.p})"
 
     def _circuit_diagram_info_(self, args):
         return f"G({self.p})"
@@ -51,7 +56,8 @@ def W_circuit_linear_complexity(
     n_qubits: int,
     return_type: Optional[str] = None,
 ) -> QPROGRAM:
-    """Returns a circuit to create a ``n_qubit`` qubit W-state with linear complexity. 
+    """Returns a circuit to create a ``n_qubit`` qubit W-state with linear
+    complexity.
     Args:
         n_qubits: The number of qubits in the circuit.
         return_type: Return type of the output circuit.
@@ -59,20 +65,21 @@ def W_circuit_linear_complexity(
         A W-state circuit of linear complexity acting on ``n_qubits`` qubits.
     """
     if n_qubits <= 0:
-        raise ValueError(
-            "{} is invalid for the number of qubits. ", n_qubits
-        )
+        raise ValueError("{} is invalid for the number of qubits. ", n_qubits)
 
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = cirq.Circuit()
 
     for i, j in zip(range(0, n_qubits), range(1, n_qubits)):
         N = n_qubits - i
-        circuit.append(cirq.ControlledGate(GRotationGate(1/N)).on(qubits[i], qubits[j]))
+        circuit.append(
+            cirq.ControlledGate(GRotationGate(1 / N)).on(qubits[i], qubits[j])
+        )
         circuit.append(cirq.CNOT(qubits[j], qubits[i]))
-    
+
     return_type = "cirq" if not return_type else return_type
 
     return convert_from_mitiq(circuit, return_type)
 
-# Logarithmic time ocmplexity circuit
+
+# Logarithmic time complexity circuit
