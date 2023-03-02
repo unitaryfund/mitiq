@@ -2,7 +2,6 @@
 
 ## Version 0.25.0 (In development)
 
-
 ## Version 0.24.0
 
 Highlights of this release include refactoring of parts of the PEC module, improvements to the Calibration data and settings structures,
