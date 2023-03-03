@@ -16,39 +16,12 @@
 """ Functions for creating 2 W-state benchmarking circuits as defined in
 :cite:`Cruz_2019_Efficient`"""
 
-from typing import Optional, Union
-import numpy.typing as npt
+from typing import Optional
 import numpy as np
 import cirq
 
 from mitiq import QPROGRAM
 from mitiq.interface import convert_from_mitiq
-
-
-class GRotationGate(cirq.Gate):
-    """Defines rotation gate G(p) with parameter p bounded between 0 amd 1.
-    https://quantumai.google/cirq/build/custom_gates#with_parameters"""
-    
-    def __init__(self, p : float) -> None:
-        super(GRotationGate, self)
-        self.p = p
-
-    def _num_qubits_(self) -> int:
-        return 1
-
-    def _unitary_(self) -> npt.NDArray[np.int64]:
-        return np.array(
-            [
-                [np.sqrt(self.p), -np.sqrt(1 - self.p)],
-                [np.sqrt(1 - self.p), np.sqrt(self.p)],
-            ]
-        )
-
-    def __repr__(self) -> str:
-        return f"G({self.p})"
-
-    def _circuit_diagram_info_(self, args: float)  -> str: 
-        return f"G({self.p})"
 
 
 # Build a linear complexity circuit
@@ -73,7 +46,7 @@ def W_circuit_linear_complexity(
     for i, j in zip(range(0, n_qubits), range(1, n_qubits)):
         N = n_qubits - i
         circuit.append(
-            cirq.ControlledGate(GRotationGate(1 / N)).on(qubits[i], qubits[j])
+            cirq.Ry(rads=1 / N * np.pi).controlled().on(qubits[i], qubits[j])
         )
         circuit.append(cirq.CNOT(qubits[j], qubits[i]))
 
