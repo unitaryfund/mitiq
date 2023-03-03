@@ -16,8 +16,8 @@
 """ Functions for creating 2 W-state benchmarking circuits as defined in
 :cite:`Cruz_2019_Efficient`"""
 
-from typing import Optional
-
+from typing import Optional, Union
+import numpy.typing as npt
 import numpy as np
 import cirq
 
@@ -28,15 +28,15 @@ from mitiq.interface import convert_from_mitiq
 class GRotationGate(cirq.Gate):
     """Defines rotation gate G(p) with parameter p bounded between 0 amd 1.
     https://quantumai.google/cirq/build/custom_gates#with_parameters"""
-
-    def __init__(self, p):
+    
+    def __init__(self, p : float) -> None:
         super(GRotationGate, self)
         self.p = p
 
-    def _num_qubits_(self):
+    def _num_qubits_(self) -> int:
         return 1
 
-    def _unitary_(self):
+    def _unitary_(self) -> npt.NDArray[np.int64]:
         return np.array(
             [
                 [np.sqrt(self.p), -np.sqrt(1 - self.p)],
@@ -47,7 +47,7 @@ class GRotationGate(cirq.Gate):
     def __repr__(self) -> str:
         return f"G({self.p})"
 
-    def _circuit_diagram_info_(self, args):
+    def _circuit_diagram_info_(self, args: float)  -> str: 
         return f"G({self.p})"
 
 
