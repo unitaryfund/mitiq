@@ -2,7 +2,7 @@
 qiskit~=0.41.1
 pyquil~=3.3.3
 pennylane-qiskit~=0.29.0
-pennylane~=0.29.0
+pennylane~=0.29.1
 amazon-braket-sdk~=1.35.5
 
 # Unit tests, coverage, and formatting/style.
