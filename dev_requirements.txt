@@ -1,8 +1,8 @@
 # Third-party integration.
-qiskit~=0.41.0
+qiskit~=0.41.1
 pyquil~=3.3.3
-pennylane-qiskit~=0.28.0
-pennylane~=0.28.0
+pennylane-qiskit~=0.29.0
+pennylane~=0.29.1
 amazon-braket-sdk~=1.35.5
 
 # Unit tests, coverage, and formatting/style.
@@ -12,7 +12,6 @@ pytest-cov==4.0.0
 flake8==6.0.0
 black==22.10
 mypy==1.0.0
-schema==0.7.5
 
 # Documentation and examples.
 Sphinx==5.2.3

@@ -151,5 +151,5 @@ def represent_operation_with_local_biased_noise(
     ]
 
     # Build basis expansion.
-    expansion = {NoisyOperation(c): a for c, a in zip(imp_op_circuits, alphas)}
-    return OperationRepresentation(ideal_operation, expansion)
+    noisy_operations = [NoisyOperation(c) for c in imp_op_circuits]
+    return OperationRepresentation(ideal_operation, noisy_operations, alphas)

@@ -54,10 +54,6 @@ format:
 install:
 	pip install -e .[development]
 
-.PHONY: pdf
-pdf:
-	echo "s" | make -C docs latexpdf
-
 .PHONY: requirements
 requirements: requirements.txt
 	pip install -r requirements.txt

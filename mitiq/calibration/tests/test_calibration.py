@@ -15,10 +15,10 @@
 
 """Tests for the Clifford data regression top-level API."""
 from functools import partial
+import pytest
 
 import cirq
 import numpy as np
-from schema import Schema, Or
 
 from mitiq import Executor, MeasurementResult
 from mitiq.benchmarks import generate_rb_circuits
@@ -29,10 +29,15 @@ from mitiq.calibration import (
     execute_with_mitigation,
 )
 from mitiq.calibration.calibrator import (
-    bitstrings_to_distribution,
     convert_to_expval_executor,
+    ExperimentResults,
+    MissingResultsError,
 )
-from mitiq.calibration.settings import Strategy
+from mitiq.calibration.settings import (
+    Strategy,
+    MitigationTechnique,
+    BenchmarkProblem,
+)
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import fold_global
 
@@ -41,21 +46,19 @@ def execute(circuit, noise_level=0.001):
     circuit = circuit.with_noise(cirq.amplitude_damp(noise_level))
 
     result = cirq.DensityMatrixSimulator().run(circuit, repetitions=100)
-    return MeasurementResult(
-        result=np.column_stack(list(result.measurements.values())).tolist(),
-        qubit_indices=tuple(
-            # q[2:-1] is necessary to convert "q(number)" into "number"
-            int(q[2:-1])
-            for k in result.measurements.keys()
-            for q in k.split(",")
-        ),
-    )
+    bitstrings = np.column_stack(list(result.measurements.values()))
+    return MeasurementResult(bitstrings)
 
 
 settings = Settings(
-    circuit_types=["ghz", "rb"],
-    num_qubits=2,
-    circuit_depth=10,
+    [
+        {
+            "circuit_type": "ghz",
+            "num_qubits": 2,
+            "circuit_depth": 10,
+        },
+        {"circuit_type": "rb", "num_qubits": 2, "circuit_depth": 10},
+    ],
     strategies=[
         {
             "technique": "zne",
@@ -83,12 +86,15 @@ settings = Settings(
 
 def test_ZNE_workflow():
     cal = Calibrator(execute, ZNESettings)
-    assert cal.get_cost() == {"noisy_executions": 24, "ideal_executions": 0}
+    cost = cal.get_cost()
+    assert cost == {"noisy_executions": 24, "ideal_executions": 0}
 
     cal.run()
-    assert len(cal.results) == 3
-    assert cal.results[0]["mitigated_values"]["ZNE"]["improvement_factor"] >= 0
-    assert isinstance(cal.best_strategy(cal.results), Strategy)
+    num_strategies, num_problems = cal.results.mitigated.shape
+    num_results = num_strategies * num_problems
+    assert num_results == cost["noisy_executions"]
+    assert isinstance(cal.results, ExperimentResults)
+    assert isinstance(cal.best_strategy(), Strategy)
 
 
 def test_get_cost():
@@ -99,63 +105,17 @@ def test_get_cost():
     assert cost["ideal_executions"] == 0
 
 
-def test_validate_run_circuits_schema():
-    cal = Calibrator(execute, settings)
-    results = cal.run_circuits()
-    results_schema = Schema(
-        [
-            {
-                "circuit_info": {
-                    "circuit_depth": int,
-                    "ideal_distribution": {str: float},
-                    "num_qubits": int,
-                    "two_qubit_gate_count": int,
-                    "type": str,
-                },
-                "ideal_value": float,
-                "noisy_value": float,
-                "mitigated_values": {
-                    str: {
-                        "improvement_factor": Or(float, None),
-                        "results": [
-                            {
-                                "factory": str,
-                                "scale_factors": [float],
-                                "scale_method": str,
-                                "mitigated_value": float,
-                                "improvement_factor": float,
-                                "strategy": Strategy,
-                            }
-                        ],
-                    }
-                },
-            }
-        ]
-    )
-    assert results_schema.validate(results)
-
-
-def test_compute_improvements_modifies_IF():
-    cal = Calibrator(execute, settings)
-    cal.run_circuits()
-    IFs = [
-        res["mitigated_values"]["ZNE"]["improvement_factor"]
-        for res in cal.results
-    ]
-    assert all(IF is None for IF in IFs)
-    cal.compute_improvements(cal.results)
-    IFs = [
-        res["mitigated_values"]["ZNE"]["improvement_factor"]
-        for res in cal.results
-    ]
-    assert all(IF is not None for IF in IFs)
-
-
 def test_best_strategy():
     test_strategy_settings = Settings(
-        circuit_types=["ghz", "mirror"],
-        num_qubits=2,
-        circuit_depth=10,
+        benchmarks=[
+            {"circuit_type": "ghz", "num_qubits": 2, "circuit_depth": 10},
+            {
+                "circuit_type": "mirror",
+                "num_qubits": 2,
+                "circuit_depth": 10,
+                "circuit_seed": 1,
+            },
+        ],
         strategies=[
             {
                 "technique": "zne",
@@ -178,39 +138,20 @@ def test_best_strategy():
                 "factory": LinearFactory([1.0, 3.0, 5.0]),
             },
         ],
-        circuit_seed=1,
     )
-    for _ in range(5):
-        cal = Calibrator(execute, test_strategy_settings)
-        cal.run()
-        strategy = cal.best_strategy(cal.results)
 
-        if cal.results[-1]["best_improvement_factor"] > 1:
-            assert strategy.technique.name == "ZNE"
-        else:
-            assert strategy.technique.name == "RAW"
+    cal = Calibrator(execute, test_strategy_settings)
+    cal.run()
+    assert not np.isnan(cal.results.mitigated).all()
 
-
-def test_bitstrings_to_distribution():
-    bitstrings = [[1, 1], [1, 1], [1, 1], [1, 0]]
-    distribution = bitstrings_to_distribution(bitstrings)
-    assert distribution == {"11": 0.75, "10": 0.25}
-
-    bitstrings = [[0, 0, 0], [0, 0, 1], [0, 0, 1], [1, 0, 0], [0, 0, 1]]
-    distribution = bitstrings_to_distribution(bitstrings)
-    assert distribution == {"000": 0.2, "001": 0.6, "100": 0.2}
-
-
-def test_bitstrings_to_distribution_normalized():
-    bitstrings = np.random.randint(2, size=(50, 3))
-    distribution = bitstrings_to_distribution(bitstrings)
-    assert np.isclose(sum(distribution.values()), 1)
+    strategy = cal.best_strategy()
+    assert strategy.technique.name == "ZNE"
 
 
 def test_convert_to_expval_executor():
     noiseless_bitstring_executor = Executor(partial(execute, noise_level=0))
-    noiseless_expval_executor, _ = convert_to_expval_executor(
-        noiseless_bitstring_executor, {"00": 1.0}
+    noiseless_expval_executor = convert_to_expval_executor(
+        noiseless_bitstring_executor, bitstring="00"
     )
     rb_circuit = generate_rb_circuits(2, 10)[0]
     rb_circuit.append(cirq.measure(rb_circuit.all_qubits()))
@@ -219,17 +160,85 @@ def test_convert_to_expval_executor():
     assert np.isclose(rb_circuit_expval, 1.0)
 
 
-def test_execute_with_mitigation():
+def test_execute_with_mitigation(monkeypatch):
     cal = Calibrator(execute, ZNESettings)
 
-    expval_executor, _ = convert_to_expval_executor(
-        Executor(execute), {"00": 1.0}
+    expval_executor = convert_to_expval_executor(
+        Executor(execute), bitstring="00"
     )
     rb_circuit = generate_rb_circuits(2, 10)[0]
     rb_circuit.append(cirq.measure(rb_circuit.all_qubits()))
 
+    # override the def of `input` so that it returns "yes"
+    monkeypatch.setattr("builtins.input", lambda _: "yes")
     expval = execute_with_mitigation(
         rb_circuit, expval_executor, calibrator=cal
     )
     assert isinstance(expval, float)
     assert 0 <= expval <= 1.5
+
+
+def test_double_run():
+    cal = Calibrator(execute, ZNESettings)
+    cal.run()
+    cal.run()
+
+
+def test_ExtrapolationResults_add_result():
+    er = ExperimentResults(5, 3)
+    assert er.is_missing_data()
+    strat = Strategy(0, MitigationTechnique.ZNE, {})
+    problem = BenchmarkProblem(0, "circuit", "ghz", {})
+    er.add_result(
+        strat, problem, ideal_val=1.0, noisy_val=0.8, mitigated_val=0.9
+    )
+    assert er.is_missing_data()
+    er.mitigated = np.ones((5, 3))
+    er.ideal = np.ones((5, 3))
+    er.noisy = np.ones((5, 3))
+    assert not er.is_missing_data()
+
+
+def test_ExtrapolationResults_errors():
+    num_strategies, num_problems = 5, 3
+    er = ExperimentResults(num_strategies, num_problems)
+    er.mitigated = np.random.random((num_strategies, num_problems))
+    er.ideal = np.random.random((num_strategies, num_problems))
+
+    assert (er.squared_errors() > 0).all()
+
+
+def test_ExtrapolationResults_best_strategy():
+    num_strategies, num_problems = 5, 3
+    er = ExperimentResults(num_strategies, num_problems)
+    er.mitigated = np.zeros((num_strategies, num_problems))
+    er.mitigated[4, 2] = 0.8
+    er.ideal = np.ones((num_strategies, num_problems))
+    assert er.best_strategy_id() == 4
+
+
+def test_logging(capfd):
+    cal = Calibrator(execute, ZNESettings)
+    cal.run(log=True)
+
+    captured = capfd.readouterr()
+    assert "circuit" in captured.out
+
+
+def test_ExperimentResults_reset_data():
+    num_strategies, num_problems = 5, 3
+    er = ExperimentResults(num_strategies, num_problems)
+    strat = Strategy(0, MitigationTechnique.ZNE, {})
+    problem = BenchmarkProblem(0, "circuit", "ghz", {})
+    er.add_result(
+        strat, problem, ideal_val=1.0, noisy_val=0.8, mitigated_val=0.9
+    )
+    assert not np.isnan(er.mitigated).all()
+    er.reset_data()
+    assert np.isnan(er.mitigated).all()
+
+
+def test_ExperimentResults_ensure_full():
+    er = ExperimentResults(5, 3)
+    with pytest.raises(MissingResultsError):
+        er.ensure_full()

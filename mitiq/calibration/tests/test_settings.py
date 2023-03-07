@@ -35,9 +35,13 @@ def test_MitigationTechnique():
 
 def test_basic_settings():
     settings = Settings(
-        circuit_types=["ghz"],
-        num_qubits=2,
-        circuit_depth=999,
+        benchmarks=[
+            {
+                "circuit_type": "ghz",
+                "num_qubits": 2,
+                "circuit_depth": 999,
+            }
+        ],
         strategies=[
             {
                 "technique": "zne",
@@ -61,7 +65,7 @@ def test_basic_settings():
             },
         ],
     )
-    circuits = settings.make_circuits()
+    circuits = settings.make_problems()
     assert len(circuits) == 1
     ghz_problem = circuits[0]
     assert len(ghz_problem.circuit) == 2
@@ -78,9 +82,13 @@ def test_basic_settings():
 
 def test_make_circuits_qv_circuits():
     settings = Settings(
-        circuit_types=["qv"],
-        num_qubits=2,
-        circuit_depth=999,
+        [
+            {
+                "circuit_type": "qv",
+                "num_qubits": 2,
+                "circuit_depth": 999,
+            }
+        ],
         strategies=[
             {
                 "technique": "zne",
@@ -90,14 +98,12 @@ def test_make_circuits_qv_circuits():
         ],
     )
     with pytest.raises(NotImplementedError, match="quantum volume circuits"):
-        settings.make_circuits()
+        settings.make_problems()
 
 
 def test_make_circuits_invalid_circuit_type():
     settings = Settings(
-        circuit_types=["foobar"],
-        num_qubits=2,
-        circuit_depth=999,
+        [{"circuit_type": "foobar", "num_qubits": 2, "circuit_depth": 999}],
         strategies=[
             {
                 "technique": "zne",
@@ -109,15 +115,13 @@ def test_make_circuits_invalid_circuit_type():
     with pytest.raises(
         ValueError, match="invalid value passed for `circuit_types`"
     ):
-        settings.make_circuits()
+        settings.make_problems()
 
 
 def test_make_strategies_invalid_technique():
     with pytest.raises(KeyError, match="DESTROY"):
         Settings(
-            circuit_types=["shor"],
-            num_qubits=2,
-            circuit_depth=999,
+            [{"circuit_types": "shor", "num_qubits": 2, "circuit_depth": 999}],
             strategies=[
                 {
                     "technique": "destroy_my_errors",
@@ -129,8 +133,14 @@ def test_make_strategies_invalid_technique():
 
 
 def test_ZNESettings():
-    circuits = ZNESettings.make_circuits()
+    circuits = ZNESettings.make_problems()
     strategies = ZNESettings.make_strategies()
+
+    repr_string = repr(circuits[0])
+    assert all(
+        s in repr_string
+        for s in ("type", "ideal_distribution", "num_qubits", "circuit_depth")
+    )
 
     assert len(circuits) == 3
     assert len(strategies) == 2 * 2 * 2

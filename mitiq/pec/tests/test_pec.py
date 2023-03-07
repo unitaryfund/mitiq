@@ -102,7 +102,9 @@ twoq_circ = cirq.Circuit(cirq.Y.on(q1), cirq.CNOT.on(q0, q1), cirq.Y.on(q1))
 def test_execute_with_pec_cirq_trivial_decomposition():
     circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
     rep = OperationRepresentation(
-        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+        circuit,
+        [NoisyOperation(circuit)],
+        [1.0],
     )
 
     unmitigated = serial_executor(circuit)
@@ -120,7 +122,9 @@ def test_execute_with_pec_cirq_trivial_decomposition():
 def test_execute_with_pec_pyquil_trivial_decomposition():
     circuit = pyquil.Program(pyquil.gates.H(0))
     rep = OperationRepresentation(
-        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+        circuit,
+        [NoisyOperation(circuit)],
+        [1.0],
     )
     unmitigated = serial_executor(circuit)
 
@@ -140,7 +144,9 @@ def test_execute_with_pec_qiskit_trivial_decomposition():
     circuit = qiskit.QuantumCircuit(qreg)
     _ = circuit.x(qreg)
     rep = OperationRepresentation(
-        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+        circuit,
+        [NoisyOperation(circuit)],
+        [1.0],
     )
     unmitigated = serial_executor(circuit)
 
@@ -178,11 +184,12 @@ def test_pyquil_noiseless_decomposition_multiqubit(nqubits):
     representations = []
     for q in range(nqubits):
         representation = OperationRepresentation(
-            ideal=pyquil.Program(pyquil.gates.H(q)),
-            basis_expansion={
-                NoisyOperation(circuit=pyquil.Program(pyquil.gates.X(q))): 0.5,
-                NoisyOperation(circuit=pyquil.Program(pyquil.gates.Z(q))): 0.5,
-            },
+            pyquil.Program(pyquil.gates.H(q)),
+            [
+                NoisyOperation(pyquil.Program(pyquil.gates.X(q))),
+                NoisyOperation(pyquil.Program(pyquil.gates.Z(q))),
+            ],
+            coeffs=[0.5, 0.5],
         )
         representations.append(representation)
 
@@ -217,11 +224,12 @@ def test_qiskit_noiseless_decomposition_multiqubit(nqubits):
         zcircuit.z(q)
 
         representation = OperationRepresentation(
-            ideal=opcircuit,
-            basis_expansion={
-                NoisyOperation(circuit=xcircuit): 0.5,
-                NoisyOperation(circuit=zcircuit): 0.5,
-            },
+            opcircuit,
+            [
+                NoisyOperation(circuit=xcircuit),
+                NoisyOperation(circuit=zcircuit),
+            ],
+            [0.5, 0.5],
         )
         representations.append(representation)
 
@@ -460,7 +468,9 @@ def decorated_serial_executor(circuit: QPROGRAM) -> float:
     in the tests for trivial decomposition.
     """
     rep = OperationRepresentation(
-        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+        circuit,
+        [NoisyOperation(circuit)],
+        [1.0],
     )
 
     @pec_decorator(representations=[rep])
@@ -479,7 +489,9 @@ def test_mitigate_executor_qiskit():
     circuit = qiskit.QuantumCircuit(qreg)
     _ = circuit.x(qreg)
     rep = OperationRepresentation(
-        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+        circuit,
+        [NoisyOperation(circuit)],
+        [1.0],
     )
     unmitigated = serial_executor(circuit)
 
@@ -533,7 +545,9 @@ def test_mitigate_executor_cirq():
     """
     circuit = cirq.Circuit(cirq.H.on(cirq.LineQubit(0)))
     rep = OperationRepresentation(
-        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+        circuit,
+        [NoisyOperation(circuit)],
+        [1.0],
     )
     unmitigated = serial_executor(circuit)
 
@@ -568,7 +582,9 @@ def test_mitigate_executor_pyquil():
     """
     circuit = pyquil.Program(pyquil.gates.H(0))
     rep = OperationRepresentation(
-        circuit, basis_expansion={NoisyOperation(circuit): 1.0}
+        circuit,
+        [NoisyOperation(circuit)],
+        [1.0],
     )
     unmitigated = serial_executor(circuit)
 

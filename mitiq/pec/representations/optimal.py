@@ -25,7 +25,7 @@ from cirq import kraus
 
 from mitiq import QPROGRAM
 from mitiq.interface import convert_to_mitiq
-from mitiq.pec.types import NoisyBasis, OperationRepresentation
+from mitiq.pec.types import NoisyOperation, OperationRepresentation
 from mitiq.pec.channels import matrix_to_vector, kraus_to_super
 
 
@@ -98,7 +98,7 @@ def minimize_one_norm(
 
 def find_optimal_representation(
     ideal_operation: QPROGRAM,
-    noisy_basis: NoisyBasis,
+    noisy_operations: List[NoisyOperation],
     tol: float = 1.0e-8,
     initial_guess: Optional[npt.NDArray[np.float64]] = None,
 ) -> OperationRepresentation:
@@ -117,8 +117,8 @@ def find_optimal_representation(
 
     Args:
         ideal_operation: The ideal operation to represent.
-        noisy_basis: The ``NoisyBasis`` in which the ``ideal_operation``
-            should be represented. It must contain ``NoisyOperation`` objects
+        noisy_operations: The basis in which the ``ideal_operation``
+            should be represented. Must be a list of ``NoisyOperation`` objects
             which are initialized with a numerical superoperator matrix.
         tol: The error tolerance for each matrix element
             of the represented operation.
@@ -131,10 +131,11 @@ def find_optimal_representation(
     ideal_matrix = kraus_to_super(
         cast(List[npt.NDArray[np.complex64]], kraus(ideal_cirq_circuit))
     )
-    basis_set = noisy_basis.elements
 
     try:
-        basis_matrices = [noisy_op.channel_matrix for noisy_op in basis_set]
+        basis_matrices = [
+            noisy_op.channel_matrix for noisy_op in noisy_operations
+        ]
     except ValueError as err:
         if str(err) == "The channel matrix is unknown.":
             raise ValueError(
@@ -152,5 +153,6 @@ def find_optimal_representation(
         initial_guess=initial_guess,
     )
 
-    basis_expansion = {op: eta for op, eta in zip(basis_set, quasi_prob_dist)}
-    return OperationRepresentation(ideal_operation, basis_expansion)
+    return OperationRepresentation(
+        ideal_operation, noisy_operations, quasi_prob_dist.tolist()
+    )

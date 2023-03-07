@@ -160,7 +160,7 @@ ax.scatter(*data, c=data[2])
 The following cells setup a test (which won't be rendered in the notebook), the test code and the test output cell:
 
 ```{testsetup}
-# this block is not rendered in the html or pdf
+# this block is not rendered in the html
 import numpy as np
 from cirq import Circuit, depolarize
 from cirq import LineQubit, X, DensityMatrixSimulator

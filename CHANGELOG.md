@@ -1,6 +1,40 @@
 # Changelog
 
-## Version 0.24.0 (In development)
+## Version 0.25.0 (In development)
+
+## Version 0.24.0
+
+Highlights of this release include refactoring of parts of the PEC module, improvements to the Calibration data and settings structures,
+completion of the REM section of the user guide, and the publishing of a Mitiq tutorial first presented as a lab exercise at the [SQMS/GGI 2022 Summer School on Quantum Simulation of Field Theories](https://www.ggi.infn.it/showevent.pl?id=436).
+Special thanks to UF Ambassadors **Amir Ebrahimi** and **Purva Thakre** for their contributions to this release!
+
+**Breaking changes:** The class `NoisyOperation` is deprecated and removed from Mitiq. Moreover the initialization arguments of the `OperationRepresentation` class changed. Please check the associated API-docs and the [PEC section](https://mitiq.readthedocs.io/en/stable/guide/pec.html) of the docs for more details.
+- Update pennylane-qiskit requirement from ~=0.28.0 to ~=0.29.0 (#1733) [@dependabot[bot]]
+- Update pennylane requirement from ~=0.28.0 to ~=0.29.0 (#1732) [@dependabot[bot]]
+- Refactoring of NoisyOperation, NoisyBasis, OperationRepresentation (#1712) [@andreamari]
+- Add Summer School Notebook to Docs (#1720) [@purva-thakre]
+- Fix mypy errors on #1728 (#1729) [@Misty-W]
+- Update settings.py (#1728) [@Misty-W]
+- Improve default `ZNESettings` for calibration (#1721) [@Misty-W]
+- Update qiskit requirement from ~=0.41.0 to ~=0.41.1 (#1727) [@dependabot[bot]]
+- Bump actions/setup-python from 3 to 4 (#1726) [@dependabot[bot]]
+- remove pdf doc build (#1725) [@natestemen]
+- REM: Update the fifth section of the docs (#1718) [Amir Ebrahimi]
+- [calibration] usability improvements (#1714) [@natestemen]
+- Simplify noisy operation (#1713) [@andreamari]
+- Calibration results data structure refactor (#1706) [@natestemen]
+- Update scipy requirement from ~=1.10.0 to ~=1.10.1 (#1719) [@dependabot[bot]]
+- Update amazon-braket-sdk requirement from ~=1.35.4 to ~=1.35.5 (#1717) [@dependabot[bot]]
+- Bump mypy from 0.982 to 1.0.0 (#1707) [@dependabot[bot]]
+- Remove unnecessary circuit conversion in PEC (#1710) [@Misty-W]
+- Update amazon-braket-sdk requirement from ~=1.35.3 to ~=1.35.4 (#1711) [@dependabot[bot]]
+- Ignore a temporarely broken but correct DOI link (#1705) [@andreamari]
+- Upgrade to qiskit 0.41.0 manually after failed dependabot PR (#1703) [@Misty-W]
+- Update README.md (#1702) [@andreamari]
+- Revert "Update qiskit requirement from ~=0.40.0 to ~=0.41.0 (#1697)" (#1701) [@Misty-W]
+- Update qiskit requirement from ~=0.40.0 to ~=0.41.0 (#1697) [@dependabot[bot]]
+- Set version in dev mode (#1700) [@andreamari]
+- advertise the fact that we have DDD examples now (#1698) [@natestemen]
 
 ## Version 0.23.0
 

@@ -417,7 +417,8 @@ noisy_z = pec.NoisyOperation(
 
 h_rep = pec.OperationRepresentation(
     ideal=cirq.Circuit(cirq.H.on(q)),
-    basis_expansion = {noisy_x: 0.52, noisy_z: -0.48}
+    noisy_operations=[noisy_x, noisy_z],
+    coeffs=[0.52, -0.48],
 )
 ```
 

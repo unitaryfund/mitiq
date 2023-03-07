@@ -15,14 +15,13 @@
 
 """Tools for sampling from the noisy representations of ideal operations."""
 
-from typing import List, Optional, Tuple, Sequence, Union, cast
+from typing import List, Optional, Tuple, Sequence, Union
 from copy import deepcopy
 import warnings
 
 import numpy as np
 
 import cirq
-from cirq import Circuit
 
 from mitiq import QPROGRAM
 from mitiq.interface import convert_to_mitiq, convert_from_mitiq
@@ -69,11 +68,11 @@ def sample_sequence(
         ValueError: If no representation is found for `ideal_operation`.
     """
     # Grab the representation for the given ideal operation.
-    ideal, _ = convert_to_mitiq(ideal_operation)
+    ideal, native_type = convert_to_mitiq(ideal_operation)
     operation_representation = None
     for representation in representations:
         if _equal(
-            cast(Circuit, representation.ideal),
+            representation.ideal,
             ideal,
             require_qubit_equality=representation.is_qubit_dependent,
         ):
@@ -89,6 +88,14 @@ def sample_sequence(
             1.0,
         )
 
+    # Qubit mapping is necessary for qubit-independent operation reps
+    qubit_map = dict(
+        zip(
+            sorted(operation_representation.ideal.all_qubits()),
+            sorted(ideal.all_qubits()),
+        )
+    )
+
     # Sample from this representation.
     norm = operation_representation.norm
     sequences = []
@@ -97,7 +104,13 @@ def sample_sequence(
         noisy_op, sign, _ = operation_representation.sample(
             random_state  # type: ignore
         )
-        sequences.append(noisy_op.circuit())
+        if operation_representation.is_qubit_dependent:
+            native_circ = noisy_op.native_circuit
+        else:
+            cirq_circ = noisy_op.circuit
+            cirq_circ = cirq_circ.transform_qubits(qubit_map)
+            native_circ = convert_from_mitiq(cirq_circ, native_type)
+        sequences.append(native_circ)
         signs.append(sign)
 
     return sequences, signs, norm

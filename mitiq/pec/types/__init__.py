@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from mitiq.pec.types.types import (
-    NoisyBasis,
     NoisyOperation,
     OperationRepresentation,
+    NoisyBasis,
 )

@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from mitiq.pec.types import NoisyOperation, NoisyBasis, OperationRepresentation
+from mitiq.pec.types import NoisyOperation, OperationRepresentation, NoisyBasis
 from mitiq.pec.sampling import sample_sequence, sample_circuit
 from mitiq.pec.pec import execute_with_pec, mitigate_executor, pec_decorator
 
