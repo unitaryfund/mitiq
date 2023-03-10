@@ -24,7 +24,7 @@ jupyter:
 
 Composing techniques
 
-```python
+```{code-cell} ipython3
 import cirq
 import numpy as np
 from mitiq.benchmarks import generate_rb_circuits
@@ -33,13 +33,13 @@ from mitiq import MeasurementResult, Observable, PauliString, raw
 
 Randomized benchmarking circuits in Mitiq
 
-```python
+```{code-cell} ipython3
 circuit = generate_rb_circuits(2, 5)[0]
 ```
 
 Define the executor (standard verbiage and link)
 
-```python
+```{code-cell} ipython3
 def execute(circuit: cirq.Circuit, noise_level: float = 0.005, p0: float = 0.05) -> MeasurementResult:
     measurements = circuit[-1]
     circuit =  circuit[:-1]
@@ -56,21 +56,21 @@ def execute(circuit: cirq.Circuit, noise_level: float = 0.005, p0: float = 0.05)
 
 Obtain unmitigated expectation value of the ZI + ZZ observable. In the ideal case the result should be 2, but the unmitigated result is impacted by depolarizing and readout errors.
 
-```python
+```{code-cell} ipython3
 # step 2
 obs = Observable(PauliString("ZI"), PauliString("IZ"))
 result = raw.execute(circuit, execute, obs)
 print(result)
 ```
 
-```python
+```{code-cell} ipython3
 from functools import partial
 ideal = raw.execute(circuit, partial(execute, noise_level=0, p0=0), obs)
 ```
 
 Next we apply readout error mitigation (REM). (Brief explanation + link to guide)
 
-```python
+```{code-cell} ipython3
 # step 3 (REM)
 from mitiq import rem
 p0 = p1 =0.05
@@ -82,7 +82,7 @@ obs.expectation(circuit, rem_executor)
 
 Now apply zero noise extrapolation (ZNE). (Brief explanation + link to guide)
 
-```python
+```{code-cell} ipython3
 # step 4 (ZNE)
 from mitiq import zne
 
@@ -93,7 +93,7 @@ zne_executor(circuit)
 
 Finally, we apply a combination of REM and ZNE. REM is applied first to minimize the impact of measurement errors on the extrapolated result in ZNE.
 
-```python
+```{code-cell} ipython3
 # step 5 (REM + ZNE)
 
 both_executor = zne.mitigate_executor(rem_executor, observable=obs)
