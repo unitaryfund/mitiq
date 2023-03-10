@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Tools to determine slack windows in circuits and to insert DDD sequences."""
-from cirq import Circuit, LineQubit, synchronize_terminal_measurements
+from cirq import Circuit, LineQubit, synchronize_terminal_measurements, I
 import numpy as np
 import numpy.typing as npt
 from typing import Callable
@@ -25,8 +25,8 @@ from mitiq import QPROGRAM
 def _get_circuit_mask(circuit: Circuit) -> npt.NDArray[np.int64]:
     """Given a circuit with n qubits and d moments returns a matrix
     :math:`A` with n rows and d columns. The matrix elements are
-    :math:`A_{i,j} = 1` if there is a gate acting on qubit :math:`i` at moment
-    :math:`j`, while :math:`A_{i,j} = 0` otherwise.
+    :math:`A_{i,j} = 1` if there is a non-identity gate acting on qubit
+    :math:`i` at moment :math:`j`, while :math:`A_{i,j} = 0` otherwise.
 
     Args:
         circuit: Input circuit to mask with n qubits and d moments
@@ -40,7 +40,9 @@ def _get_circuit_mask(circuit: Circuit) -> npt.NDArray[np.int64]:
     for moment_index, moment in enumerate(circuit):
         for op in moment:
             qubit_indices = [
-                qubit[0] for qubit in indexed_qubits if qubit[1] in op.qubits
+                qubit[0]
+                for qubit in indexed_qubits
+                if qubit[1] in op.qubits and op.gate != I
             ]
             for qubit_index in qubit_indices:
                 mask_matrix[qubit_index, moment_index] = 1
