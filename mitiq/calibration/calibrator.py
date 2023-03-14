@@ -133,6 +133,7 @@ class Calibrator:
         self,
         executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
         settings: Settings,
+        frontend_type: str = "cirq",
         ideal_executor: Union[
             Executor, Callable[[QPROGRAM], QuantumResult], None
         ] = None,
@@ -141,17 +142,18 @@ class Calibrator:
         self.executor = (
             executor if isinstance(executor, Executor) else Executor(executor)
         )
+        self.frontend_type = frontend_type
         self.ideal_executor = (
             Executor(ideal_executor)
             if ideal_executor and not isinstance(ideal_executor, Executor)
             else None
         )
         self.settings = settings
-        self.circuits = settings.make_problems()
+        self.problems = settings.make_problems()
         self.strategies = settings.make_strategies()
         self.results = ExperimentResults(
             num_strategies=len(self.strategies),
-            num_problems=len(self.circuits),
+            num_problems=len(self.problems),
         )
 
     def get_cost(self) -> Dict[str, int]:
@@ -161,7 +163,7 @@ class Calibrator:
         Returns:
             A summary of the number of circuits to be run.
         """
-        num_circuits = len(self.circuits)
+        num_circuits = len(self.problems)
         num_options = len(self.settings.technique_params)
 
         noisy = num_circuits * num_options
@@ -176,17 +178,13 @@ class Calibrator:
         if not self.results.is_missing_data():
             self.results.reset_data()
 
-        for problem in self.circuits:
-            circuit = problem.circuit.copy()
-            circuit.append(cirq.measure(circuit.all_qubits()))
-
+        for problem in self.problems:
+            circuit = problem.converted_circuit(self.frontend_type)
             bitstring_to_measure = problem.most_likely_bitstring()
             expval_executor = convert_to_expval_executor(
                 self.executor, bitstring_to_measure
             )
-
             noisy_value = expval_executor.evaluate(circuit)[0]
-
             for strategy in self.strategies:
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", UserWarning)
