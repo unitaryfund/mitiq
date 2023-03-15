@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-<!-- #region -->
+
 # Digital dynamical decoupling (DDD) with Qiskit on GHZ Circuits
 
 In this notebook DDD is applied to improve the success rate of the computation, first on a simulated device and then
@@ -65,6 +65,20 @@ for rule in rules:
 ```
 
 
+## Set parameters for the experiment
+
+```{code-cell} ipython3
+# Total number of shots to use.
+shots = 10000
+
+# Qubits to use on the experiment.
+num_qubits = 2
+
+# Test at multiple depths.
+depths = [10, 30, 50, 100]
+```
+
+
 ## Define the circuit
 
 We use Greenberger-Horne-Zeilinger (GHZ) circuits to benchmark the performance of the device.
@@ -104,19 +118,6 @@ Test the circuit output for depth 4, with IX sequences inserted
 ```{code-cell} ipython3
 ibm_circ= get_circuit_with_sequence(4, rep_ixix_rule)
 print(ibm_circ)
-```
-
-## Set parameters for the experiment
-
-```{code-cell} ipython3
-# Total number of shots to use.
-shots = 10000
-
-# Qubits to use on the experiment.
-num_qubits = 2
-
-# Test at multiple depths.
-depths = [10, 30, 50, 100]
 ```
 
 
@@ -239,4 +240,4 @@ name: ddd-qiskit-ghz-plot-ibmq
 ---
 The figure is a plot of the unmitigated and DDD-mitigated expectation values obtained from executing the corresponding circuits.
 ```
-<!-- #endregion -->
+
