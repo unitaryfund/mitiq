@@ -53,7 +53,7 @@ def rep_i_rule(window_length: int) -> Callable[[int], QPROGRAM]:
 def rep_ixix_rule(window_length: int) -> Callable[[int], QPROGRAM]:
     return ddd.rules.repeated_rule(window_length, [cirq.I, cirq.X, cirq.I, cirq.X])
 
-def rep_xx_rule(window_length: int) ->: Callable[[int], QPROGRAM]
+def rep_xx_rule(window_length: int) -> Callable[[int], QPROGRAM]:
     return ddd.rules.repeated_rule(window_length, [cirq.X, cirq.X])
 
 # Set DDD sequences to test.
