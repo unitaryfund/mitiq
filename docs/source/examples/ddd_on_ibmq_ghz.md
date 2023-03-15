@@ -27,7 +27,7 @@ We begin by importing the relevant modules and libraries that we will require
 for the rest of this tutorial.
 
 ```{code-cell} ipython3
-from typing import List
+from typing import List, Callable
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -36,7 +36,7 @@ import qiskit
 from qiskit.providers.fake_provider import FakeLima as FakeLima
 
 from mitiq.interface.mitiq_qiskit import to_qiskit
-from mitiq import ddd
+from mitiq import ddd, QPROGRAM
 ```
 
 
@@ -76,7 +76,7 @@ and finally the inverse of the GHZ sequence.
 Therefore $P_0 = 1$ and the frequency of the $|00...0 \rangle$ bitstring is our target metric.
 
 ```{code-cell} ipython3
-def get_circuit_with_sequence(depth: int, rule: mitiq.ddd.):
+def get_circuit_with_sequence(depth: int, rule: Callable[[int], QPROGRAM]):
     circuit = qiskit.QuantumCircuit(num_qubits, num_qubits)
     circuit.h(0)
     circuit.cx(0, 1)
