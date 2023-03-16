@@ -237,7 +237,7 @@ class Settings:
                 circuit = generate_rb_circuits(num_qubits, depth)[0]
                 ideal = {"0" * num_qubits: 1.0}
             elif circuit_type == "mirror":
-                seed = benchmark["circuit_seed"]
+                seed = benchmark.get("circuit_seed", None)
                 circuit, bitstring_list = generate_mirror_circuit(
                     nlayers=depth,
                     two_qubit_gate_prob=1.0,

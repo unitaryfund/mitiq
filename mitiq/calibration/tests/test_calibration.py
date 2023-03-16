@@ -20,7 +20,7 @@ import pytest
 import cirq
 import numpy as np
 
-from mitiq import Executor, MeasurementResult
+from mitiq import Executor, MeasurementResult, SUPPORTED_PROGRAM_TYPES
 from mitiq.benchmarks import generate_rb_circuits
 from mitiq.calibration import (
     Calibrator,
@@ -40,15 +40,30 @@ from mitiq.calibration.settings import (
 )
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import fold_global
+from mitiq.interface import convert_to_mitiq
 
 
-def execute(circuit, noise_level=0.001):
-    circuit = circuit.with_noise(cirq.amplitude_damp(noise_level))
-
-    result = cirq.DensityMatrixSimulator().run(circuit, repetitions=100)
-    bitstrings = np.column_stack(list(result.measurements.values()))
-    return MeasurementResult(bitstrings)
-
+light_settings = Settings(
+    [
+        {
+            "circuit_type": "mirror",
+            "num_qubits": 1,
+            "circuit_depth": 1,
+        },
+        {
+            "circuit_type": "mirror",
+            "num_qubits": 2,
+            "circuit_depth": 1,
+        },
+    ],
+    strategies=[
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": LinearFactory([1.0, 2.0]),
+        },
+    ],
+)
 
 settings = Settings(
     [
@@ -84,11 +99,51 @@ settings = Settings(
 )
 
 
+def execute(circuit, noise_level=0.001):
+    circuit = circuit.with_noise(cirq.amplitude_damp(noise_level))
+
+    result = cirq.DensityMatrixSimulator().run(circuit, repetitions=100)
+    bitstrings = np.column_stack(list(result.measurements.values()))
+    return MeasurementResult(bitstrings)
+
+
+def non_cirq_execute(circuit):
+    # Ensure test circuits are converted to user's frontend by the Calibrator
+    assert not isinstance(circuit, cirq.Circuit)
+    circuit, circuit_type = convert_to_mitiq(circuit)
+    # Pennylane and Braket conversions discard measurements so we re-append
+    if circuit_type in ["braket", "pennylane"]:
+        circuit.append(cirq.measure(q) for q in circuit.all_qubits())
+    return execute(circuit)
+
+
 def test_ZNE_workflow():
     cal = Calibrator(execute, ZNESettings)
     cost = cal.get_cost()
     assert cost == {"noisy_executions": 24, "ideal_executions": 0}
 
+    cal.run()
+    num_strategies, num_problems = cal.results.mitigated.shape
+    num_results = num_strategies * num_problems
+    assert num_results == cost["noisy_executions"]
+    assert isinstance(cal.results, ExperimentResults)
+    assert isinstance(cal.best_strategy(), Strategy)
+
+
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_ZNE_workflow_multi_platform(circuit_type):
+    """Test the ZNE workflow runs with all possible frontends."""
+    # Only test frontends different from cirq
+    if circuit_type == "cirq":
+        return
+
+    cal = Calibrator(
+        non_cirq_execute,
+        light_settings,
+        frontend_type=circuit_type,
+    )
+    cost = cal.get_cost()
+    assert cost == {"noisy_executions": 2, "ideal_executions": 0}
     cal.run()
     num_strategies, num_problems = cal.results.mitigated.shape
     num_results = num_strategies * num_problems

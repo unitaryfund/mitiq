@@ -16,7 +16,6 @@
 from typing import Callable, Dict, Optional, Union, cast
 import warnings
 
-import cirq
 import numpy as np
 import numpy.typing as npt
 
@@ -234,7 +233,7 @@ def convert_to_expval_executor(executor: Executor, bitstring: str) -> Executor:
         the most likely bitstring, according to the passed ``distribution``
     """
 
-    def expval_executor(circuit: cirq.Circuit) -> float:
+    def expval_executor(circuit: QPROGRAM) -> float:
         raw = cast(MeasurementResult, executor.run([circuit])[0])
         distribution = raw.prob_distribution()
         return distribution.get(bitstring, 0.0)
