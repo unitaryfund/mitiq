@@ -14,10 +14,14 @@ kernelspec:
 
 # Digital dynamical decoupling (DDD) with Qiskit on GHZ Circuits
 
-In this notebook DDD is applied to improve the success rate of the computation, first on a simulated device and then
-on a real hardware backend. 
+In this notebook DDD is applied to improve the success rate of the computation on a real hardware backend. 
+A similar approach can be taken on a simulated backend, by setting the ``USE_REAL_HARDWARE`` option to ``False``
+and specifying a simulated backend from `qiskit.providers.fake_provider`, which includes a noise model that approximates the noise of the
+real device.
+
 In DDD, sequences of gates are applied to slack windows, i.e. single-qubit idle windows, in a quantum circuit. 
-Applying such sequences can reduce the coupling between the qubits and the environment, mitigating the effects of noise. 
+Applying such sequences can reduce the coupling between the qubits and the environment, mitigating the effects of noise.
+While the DDD module includes some built-in sequences, the user may choose to define others best suited to their application.
 For more information on DDD, see the section [DDD section of the user guide](../guide/ddd.md).
 
 
@@ -33,7 +37,6 @@ from matplotlib import pyplot as plt
 
 import cirq
 import qiskit
-from qiskit.providers.fake_provider import FakeLima as FakeLima
 
 from mitiq.interface.mitiq_qiskit import to_qiskit
 from mitiq import ddd, QPROGRAM
@@ -85,8 +88,8 @@ We use Greenberger-Horne-Zeilinger (GHZ) circuits to benchmark the performance o
 GHZ circuits are designed such that only two bitstrings $|00...0 \rangle$ and $|11...1 \rangle$
 should be sampled, with $P_0 = P_1 = 0.5$.
 As noted in *Mooney et al. (2021)* {cite}`Mooney_2021`, when GHZ circuits are run on a device, any other measured bitstrings are due to noise.
-In this example the GHZ sequence is applied first, followed by a long idle window of identity gates
-and finally the inverse of the GHZ sequence. 
+In this example the GHZ sequence is applied first, followed by a long idle window of identity gates and finally the inverse of the GHZ
+sequence.
 Therefore $P_0 = 1$ and the frequency of the $|00...0 \rangle$ bitstring is our target metric.
 
 ```{code-cell} ipython3
@@ -126,12 +129,8 @@ print(ibm_circ)
 Now that we have a circuit, we define the `execute` function which inputs a circuit and returns an expectation value -
 here, the frequency of sampling the correct bitstring.
 
-
-If ``USE_REAL_HARDWARE`` is set to ``False``, we use a simulated backend with a noise model that approximates the
-noise of the real device. 
-
 ```{code-cell} ipython3
-USE_REAL_HARDWARE = False
+USE_REAL_HARDWARE = True
 ```
 
 ```{code-cell} ipython3
@@ -139,6 +138,7 @@ if USE_REAL_HARDWARE:
     provider = qiskit.IBMQ.load_account()
     backend = provider.get_backend("ibmq_lima")
 else:
+    from qiskit.providers.fake_provider import FakeLima as FakeLima
     backend = FakeLima()
 
 
@@ -156,8 +156,6 @@ def ibm_executor(
     """
     if noisy:
         transpiled = qiskit.transpile(circuit, backend=backend, optimization_level=0)
-        print("Transpiled circuit:")
-        print(transpiled)
         job = backend.run(transpiled, optimization_level=0, shots=shots)
     else:
         ideal_backand = qiskit.Aer.get_backend("qasm_simulator")
@@ -174,6 +172,7 @@ def ibm_executor(
 ## Run circuits with and without DDD
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 data = []
 for depth in depths:
     for rule in rules:
@@ -187,6 +186,7 @@ for depth in depths:
 Now we can visualize the results.
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 # Plot unmitigated
 x, y = [], []
 for res in data:
@@ -223,21 +223,16 @@ plt.plot(x, y, "--*", label="xx")
 plt.legend()
 ```
 
-We can see that on average DDD improves the expectation value at each circuit width. 
-Note that the size of the error bars represents the standard deviation of the noisy values (for the “Raw” line) and the standard deviation
-of the DDD values (for the “DDD” line).
-The improvement increases with circuit size, which is expected given the strongly time-correlated dephasing noise applied in this example.
-In general, real hardware would exhibit a different noise model from what is shown here, but real devices usually have some time-correlated noise
-that can be mitigated by dynamical decoupling.
-
-
-
-
 ```{figure} ../img/ddd_qiskit_ghz_plot.png
 ---
 
 name: ddd-qiskit-ghz-plot-ibmq
 ---
-The figure is a plot of the unmitigated and DDD-mitigated expectation values obtained from executing the corresponding circuits.
+Plot of the unmitigated and DDD-mitigated expectation values obtained from executing the corresponding circuits.
 ```
 
+
+We can see that DDD improves the expectation value at each circuit depth, and the repeated XX sequence is the best at mitigating the errors
+occurring during idle windows. 
+This is expected because the idle windows are long compared to the length of the other operations in the circuit, so repeated pulses close
+together in time would most effectively decouple the qubits from the environment.
