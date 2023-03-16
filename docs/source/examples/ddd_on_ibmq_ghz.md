@@ -195,7 +195,9 @@ for depth in depths:
     for rule in rules:
         print(f"DDD sequence: {rule}.")
         circuit = get_circuit_with_sequence(depth, rule)
-        noisy_value = ibm_executor(circuit, shots=shots, correct_bitstring=[0])
+        noisy_value = ibm_executor(
+            circuit, shots=shots, correct_bitstring=[0]
+        )
         print("Result:", noisy_value)
         data.append((depth, rule, noisy_value))
 ```
