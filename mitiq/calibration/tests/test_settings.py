@@ -163,7 +163,8 @@ def test_benchmark_problem_class(circuit_type):
     )
     assert problem.circuit == circuit
     conv_circ = problem.converted_circuit(circuit_type)
-    assert isinstance(conv_circ, QPROGRAM)
+    assert any([isinstance(conv_circ, q) for q in QPROGRAM.__args__])
+    # For at least one case, test the circuit is correct and has measurements
     if circuit_type == "qiskit":
         qreg = qiskit.QuantumRegister(1, name="q")
         creg = qiskit.ClassicalRegister(1, name="m0")
