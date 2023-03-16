@@ -54,7 +54,9 @@ def rep_i_rule(window_length: int) -> Callable[[int], QPROGRAM]:
     return cirq.Circuit(seq)
 
 def rep_ixix_rule(window_length: int) -> Callable[[int], QPROGRAM]:
-    return ddd.rules.repeated_rule(window_length, [cirq.I, cirq.X, cirq.I, cirq.X])
+    return ddd.rules.repeated_rule(
+        window_length, [cirq.I, cirq.X, cirq.I, cirq.X]
+    )
 
 def rep_xx_rule(window_length: int) -> Callable[[int], QPROGRAM]:
     return ddd.rules.repeated_rule(window_length, [cirq.X, cirq.X])
@@ -94,6 +96,16 @@ Therefore $P_0 = 1$ and the frequency of the $|00...0 \rangle$ bitstring is our 
 
 ```{code-cell} ipython3
 def get_circuit_with_sequence(depth: int, rule: Callable[[int], QPROGRAM]):
+    """Returns a circuit composed of a GHZ sequence, idle windows with or
+        without DDD sequences, and finally an inverse GHZ sequence.
+
+    Args:
+        depth: The depth of the idle window in the circuit.
+        rule: A function determining the sequence to insert in the idle window.
+            In the unmitigated case this generates a sequence of identity
+            gates. In the DDD mitigated case it generates a sequence of non-
+            identity gates or a combination of identity and non-identity gates.
+    """
     circuit = qiskit.QuantumCircuit(num_qubits, num_qubits)
     circuit.h(0)
     circuit.cx(0, 1)
@@ -149,11 +161,15 @@ def ibm_executor(
     correct_bitstring: List[int],
     noisy: bool = True,
 ) -> float:
-    """Returns the expectation value to be mitigated.
+    """Executes the input circuit(s) and returns ⟨A⟩, where 
+    A = |correct_bitstring⟩⟨correct_bitstring| for each circuit.
 
     Args:
         circuit: Circuit to run.
-        shots: Number of times to execute the circuit to compute the expectation value.
+        shots: Number of times to execute the circuit to compute the
+            expectation value.
+        correct_bitstring: Bitstring the circuit is expected to return, in the
+            absence of noise.
     """
     if noisy:
         transpiled = qiskit.transpile(circuit, backend=backend, optimization_level=0)
@@ -224,7 +240,7 @@ plt.plot(x, y, "--*", label="xx")
 plt.legend()
 ```
 
-```{figure} ../img/ddd_qiskit_ghz_plot.png
+```{figure} ../_thumbnails/ddd_qiskit_ghz_plot.png
 ---
 
 name: ddd-qiskit-ghz-plot-ibmq
