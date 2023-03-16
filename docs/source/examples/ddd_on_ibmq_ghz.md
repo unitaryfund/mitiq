@@ -134,6 +134,7 @@ USE_REAL_HARDWARE = True
 ```
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 if USE_REAL_HARDWARE:
     provider = qiskit.IBMQ.load_account()
     backend = provider.get_backend("ibmq_lima")
@@ -235,4 +236,4 @@ Plot of the unmitigated and DDD-mitigated expectation values obtained from execu
 We can see that DDD improves the expectation value at each circuit depth, and the repeated XX sequence is the best at mitigating the errors
 occurring during idle windows. 
 This is expected because the idle windows are long compared to the length of the other operations in the circuit, so repeated pulses close
-together in time would most effectively decouple the qubits from the environment.
+together in time would more effectively decouple the qubits from the environment.
