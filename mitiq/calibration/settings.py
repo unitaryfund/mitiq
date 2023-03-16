@@ -92,7 +92,6 @@ class BenchmarkProblem:
         Returns:
             The converted circuit with final measurements.
         """
-        # TODO: check circuit_type with SUPPORTED_PROGRAM_TYPES
         circuit = self.circuit.copy()
         circuit.append(cirq.measure(circuit.all_qubits()))
         return convert_from_mitiq(circuit, circuit_type)
