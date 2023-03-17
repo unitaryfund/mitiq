@@ -13,12 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Callable, Dict, Optional, Union, cast
+from typing import Callable, Dict, Optional, Union, cast, Sequence
 import warnings
 
 import numpy as np
 import numpy.typing as npt
 
+import cirq
 from mitiq import (
     QPROGRAM,
     Executor,
@@ -31,6 +32,7 @@ from mitiq.calibration.settings import (
     Strategy,
     BenchmarkProblem,
 )
+from mitiq.interface import convert_from_mitiq
 
 
 class MissingResultsError(Exception):
@@ -124,6 +126,8 @@ class Calibrator:
             :class:`.MeasurementResult`.
         settings: A ``Settings`` object which specifies the type and amount of
             circuits/error mitigation methods to run.
+        frontend: The executor frontend as a string. For a list of supported
+            frontends see ``mitiq.SUPPORTED_PROGRAM_TYPES.keys()``,
         ideal_executor: An optional simulated executor returning the ideal
             :class:`.MeasurementResult` without noise.
     """
@@ -132,7 +136,7 @@ class Calibrator:
         self,
         executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
         settings: Settings,
-        frontend_type: str = "cirq",
+        frontend: str,
         ideal_executor: Union[
             Executor, Callable[[QPROGRAM], QuantumResult], None
         ] = None,
@@ -141,7 +145,6 @@ class Calibrator:
         self.executor = (
             executor if isinstance(executor, Executor) else Executor(executor)
         )
-        self.frontend_type = frontend_type
         self.ideal_executor = (
             Executor(ideal_executor)
             if ideal_executor and not isinstance(ideal_executor, Executor)
@@ -154,6 +157,31 @@ class Calibrator:
             num_strategies=len(self.strategies),
             num_problems=len(self.problems),
         )
+
+        # Build an executor of Cirq circuits
+        def cirq_execute(
+            circuits: Sequence[cirq.Circuit],
+        ) -> Sequence[MeasurementResult]:
+            q_programs = [convert_from_mitiq(c, frontend) for c in circuits]
+            results = cast(
+                Sequence[MeasurementResult], self.executor.run(q_programs)
+            )
+            return results
+
+        self._cirq_executor = Executor(cirq_execute)  # type: ignore [arg-type]
+
+    @property
+    def cirq_executor(self) -> Executor:
+        """Returns an executor which is able to run Cirq circuits
+        by converting them and calling self.executor.
+
+        Args:
+            executor: Executor which takes as input QPROGRAM circuits.
+
+        Returns:
+            Executor which takes as input a Cirq circuits.
+        """
+        return self._cirq_executor
 
     def get_cost(self) -> Dict[str, int]:
         """Returns the expected number of noisy and ideal expectation values
@@ -178,10 +206,13 @@ class Calibrator:
             self.results.reset_data()
 
         for problem in self.problems:
-            circuit = problem.converted_circuit(self.frontend_type)
+            # Benchmark circuits have no measurements, so we append them.
+            circuit = problem.circuit.copy()
+            circuit.append(cirq.measure(circuit.all_qubits()))
+
             bitstring_to_measure = problem.most_likely_bitstring()
             expval_executor = convert_to_expval_executor(
-                self.executor, bitstring_to_measure
+                self.cirq_executor, bitstring_to_measure
             )
             noisy_value = expval_executor.evaluate(circuit)[0]
             for strategy in self.strategies:

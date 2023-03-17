@@ -118,7 +118,7 @@ def non_cirq_execute(circuit):
 
 
 def test_ZNE_workflow():
-    cal = Calibrator(execute, ZNESettings)
+    cal = Calibrator(execute, ZNESettings, frontend="cirq")
     cost = cal.get_cost()
     assert cost == {"noisy_executions": 24, "ideal_executions": 0}
 
@@ -140,7 +140,7 @@ def test_ZNE_workflow_multi_platform(circuit_type):
     cal = Calibrator(
         non_cirq_execute,
         light_settings,
-        frontend_type=circuit_type,
+        frontend=circuit_type,
     )
     cost = cal.get_cost()
     assert cost == {"noisy_executions": 2, "ideal_executions": 0}
@@ -153,7 +153,7 @@ def test_ZNE_workflow_multi_platform(circuit_type):
 
 
 def test_get_cost():
-    cal = Calibrator(execute, settings)
+    cal = Calibrator(execute, settings, frontend="cirq")
     cost = cal.get_cost()
     expected_cost = 2 * 4  # circuits * num_experiments
     assert cost["noisy_executions"] == expected_cost
@@ -195,7 +195,7 @@ def test_best_strategy():
         ],
     )
 
-    cal = Calibrator(execute, test_strategy_settings)
+    cal = Calibrator(execute, test_strategy_settings, frontend="cirq")
     cal.run()
     assert not np.isnan(cal.results.mitigated).all()
 
@@ -216,7 +216,7 @@ def test_convert_to_expval_executor():
 
 
 def test_execute_with_mitigation(monkeypatch):
-    cal = Calibrator(execute, ZNESettings)
+    cal = Calibrator(execute, ZNESettings, frontend="cirq")
 
     expval_executor = convert_to_expval_executor(
         Executor(execute), bitstring="00"
@@ -234,7 +234,7 @@ def test_execute_with_mitigation(monkeypatch):
 
 
 def test_double_run():
-    cal = Calibrator(execute, ZNESettings)
+    cal = Calibrator(execute, ZNESettings, frontend="cirq")
     cal.run()
     cal.run()
 
@@ -273,7 +273,7 @@ def test_ExtrapolationResults_best_strategy():
 
 
 def test_logging(capfd):
-    cal = Calibrator(execute, ZNESettings)
+    cal = Calibrator(execute, ZNESettings, frontend="cirq")
     cal.run(log=True)
 
     captured = capfd.readouterr()
