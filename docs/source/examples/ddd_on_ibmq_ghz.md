@@ -149,7 +149,7 @@ USE_REAL_HARDWARE = True
 :tags: ["remove-cell"]
 # hidden settings to allow efficient docs build
 USE_REAL_HARDWARE = False
-depths = [2, 6, 10, 20]
+depths = [4, 6, 8, 10]
 ```
 
 ```{code-cell} ipython3
