@@ -86,3 +86,7 @@ def execute(circuit, noise_level=0.001):
 
 execute_with_mitigation(circuit, execute, calibrator=cal)
 ```
+
+```{code-cell} ipython3
+
+```
