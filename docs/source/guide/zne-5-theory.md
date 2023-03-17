@@ -66,7 +66,7 @@ The diagram demonstrates how identity gates are inserted after a circuit layer w
 ```
 
 Additional details on the theory of identity insertion scaling are similar to those in unitary folding. The only difference 
-is that instead of scaling gate noise, the insertion of an identity gate increases the wait time after each circuit layer is executed. This allows the qubits to interact with the environment through some noisy process. The decoherence time for the qubits in a quantum system is determined by the amount of time our system of interest remains coherent and uncouples from the external environment. More details on decoherence can be found in {cite}`Schlosshauer_2019, Zurek_2003_arxiv`.
+is that instead of scaling gate noise, the insertion of an identity gate increases the wait time after each circuit layer is executed. This allows the qubits to interact with the environment through some noisy process and decohere if the system-environment interaction is strong. The decoherence time for the qubits in a quantum system is determined by the amount of time our system of interest remains coherent and uncouples from the external environment. More details on decoherence can be found in {cite}`Schlosshauer_2019, Zurek_2003_arxiv`.
 
 More details on practical implementation of both methods in Mitiq can be found in 
 [What additional options are available for ZNE?](zne-3-options.md).
