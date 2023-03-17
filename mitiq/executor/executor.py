@@ -224,7 +224,7 @@ class Executor:
     def run(
         self,
         circuits: Sequence[QPROGRAM],
-        force_run_all: bool = True,
+        force_run_all: bool = False,
         **kwargs: Any,
     ) -> Sequence[QuantumResult]:
         """Runs all input circuits using the least number of possible calls to
