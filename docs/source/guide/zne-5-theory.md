@@ -57,7 +57,7 @@ More details on the theory of unitary folding can be found in {cite}`Giurgica_Ti
 In *identity insertion scaling*, we perform a mapping $G \mapsto I G$. 
 This mapping can be applied as shown in the diagram below.
 
-```{figure} ../img/id_scaling_layers.png
+```{figure} ../img/zne_id_scaling_layers.png
 ---
 width: 500
 name: figid
