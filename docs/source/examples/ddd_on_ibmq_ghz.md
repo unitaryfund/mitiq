@@ -146,7 +146,13 @@ USE_REAL_HARDWARE = True
 ```
 
 ```{code-cell} ipython3
-:tags: ["skip-execution"]
+:tags: ["remove-cell"]
+# hidden settings to allow efficient docs build
+USE_REAL_HARDWARE = False
+depths = [2, 6, 10, 20]
+```
+
+```{code-cell} ipython3
 if USE_REAL_HARDWARE:
     provider = qiskit.IBMQ.load_account()
     backend = provider.get_backend("ibmq_lima")
@@ -189,7 +195,7 @@ def ibm_executor(
 ## Run circuits with and without DDD
 
 ```{code-cell} ipython3
-:tags: ["skip-execution"]
+:tags: ["remove-output"]
 data = []
 for depth in depths:
     for rule in rules:
@@ -205,7 +211,7 @@ for depth in depths:
 Now we can visualize the results.
 
 ```{code-cell} ipython3
-:tags: ["skip-execution"]
+:tags: ["remove-output"]
 # Plot unmitigated
 x, y = [], []
 for res in data:
