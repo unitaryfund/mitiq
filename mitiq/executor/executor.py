@@ -120,7 +120,7 @@ class Executor:
         self,
         circuits: Union[QPROGRAM, List[QPROGRAM]],
         observable: Optional[Observable] = None,
-        force_run_all: bool = False,
+        force_run_all: bool = True,
         **kwargs: Any,
     ) -> List[float]:
         """Returns the expectation value Tr[ρ O] for each circuit in
@@ -224,7 +224,7 @@ class Executor:
     def run(
         self,
         circuits: Sequence[QPROGRAM],
-        force_run_all: bool = False,
+        force_run_all: bool = True,
         **kwargs: Any,
     ) -> Sequence[QuantumResult]:
         """Runs all input circuits using the least number of possible calls to
