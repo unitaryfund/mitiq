@@ -151,11 +151,13 @@ def _insert_ddd_sequences(
                     {LineQubit(0): qubits[row_index]}
                 )
                 for idx, op in enumerate(ddd_sequence.all_operations()):
-                    circuit_with_ddd._moments[
-                        moment_idx + idx
-                    ] = circuit_with_ddd._moments[
-                        moment_idx + idx
-                    ].with_operations(
+                    moment = circuit_with_ddd[moment_idx + idx]
+                    op_to_replace = moment.operation_at(*op.qubits)
+
+                    if op_to_replace and op_to_replace.gate == I:
+                        moment = moment.without_operations_touching(op.qubits)
+
+                    circuit_with_ddd[moment_idx + idx] = moment.with_operation(
                         op
                     )
     return circuit_with_ddd
