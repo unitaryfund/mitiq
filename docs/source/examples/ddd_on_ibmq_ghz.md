@@ -40,6 +40,7 @@ import qiskit
 
 from mitiq.interface.mitiq_qiskit import to_qiskit
 from mitiq import ddd, QPROGRAM
+from mitiq.ddd import insert_ddd_sequences
 ```
 
 
@@ -62,7 +63,7 @@ def rep_xx_rule(window_length: int) -> Callable[[int], QPROGRAM]:
     return ddd.rules.repeated_rule(window_length, [cirq.X, cirq.X])
 
 # Set DDD sequences to test.
-rules = [rep_i_rule, rep_ixix_rule, rep_xx_rule, ddd.rules.xx]
+rules = [rep_ixix_rule, rep_xx_rule, ddd.rules.xx]
 
 # Test the sequence insertion
 for rule in rules:
@@ -95,22 +96,18 @@ sequence.
 Therefore $P_0 = 1$ and the frequency of the $|00...0 \rangle$ bitstring is our target metric.
 
 ```{code-cell} ipython3
-def get_circuit_with_sequence(depth: int, rule: Callable[[int], QPROGRAM]):
-    """Returns a circuit composed of a GHZ sequence, idle windows with or
-        without DDD sequences, and finally an inverse GHZ sequence.
+def get_circuit(depth: int):
+    """Returns a circuit composed of a GHZ sequence, idle windows,
+    and finally an inverse GHZ sequence.
 
     Args:
         depth: The depth of the idle window in the circuit.
-        rule: A function determining the sequence to insert in the idle window.
-            In the unmitigated case this generates a sequence of identity
-            gates. In the DDD mitigated case it generates a sequence of non-
-            identity gates or a combination of identity and non-identity gates.
     """
     circuit = qiskit.QuantumCircuit(num_qubits, num_qubits)
     circuit.h(0)
     circuit.cx(0, 1)
     
-    sequence = rule(depth)
+    sequence = rep_i_rule(depth)
     sequence_qiskit = to_qiskit(sequence)    
     circuit = circuit.compose(sequence_qiskit)
     
@@ -118,9 +115,6 @@ def get_circuit_with_sequence(depth: int, rule: Callable[[int], QPROGRAM]):
     circuit.h(0)
     circuit.measure(0, 0)
     return circuit
-
-def get_circuit(depth):
-    return get_circuit_with_sequence(depth, rep_i_rule)
 ```
 
 Test the circuit output for depth 4, unmitigated
@@ -131,8 +125,8 @@ print(ibm_circ)
 
 Test the circuit output for depth 4, with IX sequences inserted 
 ```{code-cell} ipython3
-ibm_circ= get_circuit_with_sequence(4, rep_ixix_rule)
-print(ibm_circ)
+ixix_circ= insert_ddd_sequences(ibm_circ, rep_ixix_rule)
+print(ixix_circ)
 ```
 
 
@@ -198,14 +192,20 @@ def ibm_executor(
 :tags: ["remove-output"]
 data = []
 for depth in depths:
-    for rule in rules:
-        print(f"DDD sequence: {rule}.")
-        circuit = get_circuit_with_sequence(depth, rule)
-        noisy_value = ibm_executor(
+    circuit = get_circuit(depth)
+    noisy_value = ibm_executor(
             circuit, shots=shots, correct_bitstring=[0]
+    )
+    print("Result:", noisy_value)
+    data.append((depth, rule, noisy_value))
+    for rule in rules:
+        print(f"DDD sequence: {rule}.")   
+        ddd_circuit = insert_ddd_sequences(circuit, rule)
+        ddd_value = ibm_executor(
+            ddd_circuit, shots=shots, correct_bitstring=[0]
         )
-        print("Result:", noisy_value)
-        data.append((depth, rule, noisy_value))
+        print("Result:", ddd_value)
+        data.append((depth, rule, ddd_value))
 ```
 
 Now we can visualize the results.
