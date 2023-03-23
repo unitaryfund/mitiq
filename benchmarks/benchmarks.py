@@ -17,13 +17,14 @@
 
 import functools
 import os
+from mitiq import Observable, PauliString
 
 import networkx as nx
 import numpy as np
 from typing import Callable
 
 import cirq
-from mitiq import benchmarks, raw, pec, zne, Observable, PauliString
+from mitiq import benchmarks, raw, pec, zne
 from mitiq.interface import mitiq_cirq
 from mitiq.zne.scaling import fold_gates_at_random, fold_global
 

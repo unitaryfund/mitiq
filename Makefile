@@ -69,3 +69,11 @@ test-pyquil:
 .PHONY: test-all
 test-all:
 	pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml
+
+.PHONY: get-test-result
+get-test-result:
+	pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml --ignore=mitiq/interface/mitiq_pyquil --junitxml=test-results.xml
+
+.PHONY: add-test-order
+add-test-order:
+	python3 parse_test_result.py
