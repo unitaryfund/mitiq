@@ -13,9 +13,8 @@ kernelspec:
 
 # Calibration
 
-The `mitiq.calibration.Calibrator` class provides a workflow for users to run a set of experiments to automatically determine an error mitigation strategy.
+The `mitiq.Calibrator` class provides a workflow for users to run a set of experiments to automatically determine an error mitigation strategy.
 This gives the user freedom to work on more important parts of their algorithm/quantum program, and allows them to spend less time tuning error mitigation parameters.
-
 
 ## Workflow
 
@@ -40,7 +39,7 @@ def execute(circuit, noise_level=0.001):
 We can now import the required objects and functions required for calibration.
 
 ```{code-cell} ipython3
-from mitiq.calibration import Calibrator, execute_with_mitigation
+from mitiq import Calibrator
 ```
 
 To instantiate a `Calibrator` we need to pass it an executor (as defined above), and a `Settings` object.
