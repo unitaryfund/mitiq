@@ -178,6 +178,21 @@ def test_execute_with_mitigation(monkeypatch):
     assert 0 <= expval <= 1.5
 
 
+def test_cal_execute_w_mitigation():
+    cal = Calibrator(execute)
+    cal.run()
+
+    expval_executor = convert_to_expval_executor(
+        Executor(execute), bitstring="00"
+    )
+    rb_circuit = generate_rb_circuits(2, 10)[0]
+    rb_circuit.append(cirq.measure(rb_circuit.all_qubits()))
+
+    expval = cal.execute_with_mitigation(rb_circuit, expval_executor)
+    assert isinstance(expval, float)
+    assert 0 <= expval <= 1.5
+
+
 def test_double_run():
     cal = Calibrator(execute, ZNESettings)
     cal.run()
