@@ -70,7 +70,7 @@ circuit = generate_rb_circuits(2, 10)[0]
 circuit.append(cirq.measure(circuit.all_qubits()))
 ```
 
-Instead of deciding what error mitigation technique and what options to use, we can ask Mitiq to determine the optimal error mitigation strategy based on the previously performed calibration. 
+Instead of deciding what error mitigation technique and what options to use, we can ask Mitiq to determine the optimal error mitigation strategy based on the previously performed calibration.
 We can obtain this by calling the `execute_with_mitigation` function and passing the `circuit`, `Calibrator` object, and a new expectation value executor.
 
 ```{code-cell} ipython3
@@ -90,3 +90,8 @@ execute_with_mitigation(circuit, execute, calibrator=cal)
 ```{code-cell} ipython3
 
 ```
+
+## Tutorial
+You can find an example on quantum error mitigation calibration in the **[Examples](../examples/calibration-tutorial.md)** section of the documentation.
+This example illustrates functionalities from the calibration module using ZNE
+on a simulated IBM Quantum backend using Qiskit, defining a new settings object.
