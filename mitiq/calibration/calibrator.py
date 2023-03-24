@@ -221,6 +221,17 @@ class Calibrator:
         strategy_id = self.results.best_strategy_id()
         return self.settings.get_strategy(strategy_id)
 
+    def execute_with_mitigation(
+        self,
+        circuit: QPROGRAM,
+        expval_executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
+        observable: Optional[Observable] = None,
+    ) -> float:
+        """See :func:`execute_with_mitigation` for signature and details."""
+        return execute_with_mitigation(
+            circuit, expval_executor, observable, calibrator=self
+        )
+
 
 def convert_to_expval_executor(executor: Executor, bitstring: str) -> Executor:
     """Constructs a new executor returning an expectation value given by the
