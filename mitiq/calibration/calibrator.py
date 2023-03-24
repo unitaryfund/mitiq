@@ -29,6 +29,7 @@ from mitiq import (
 )
 from mitiq.calibration.settings import (
     Settings,
+    ZNESettings,
     Strategy,
     BenchmarkProblem,
 )
@@ -132,7 +133,7 @@ class Calibrator:
     def __init__(
         self,
         executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
-        settings: Settings,
+        settings: Settings = ZNESettings,
         ideal_executor: Union[
             Executor, Callable[[QPROGRAM], QuantumResult], None
         ] = None,

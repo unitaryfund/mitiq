@@ -40,7 +40,7 @@ def execute(circuit, noise_level=0.001):
 We can now import the required objects and functions required for calibration.
 
 ```{code-cell} ipython3
-from mitiq.calibration import Calibrator, ZNESettings, execute_with_mitigation
+from mitiq.calibration import Calibrator, execute_with_mitigation
 ```
 
 To instantiate a `Calibrator` we need to pass it an executor (as defined above), and a `Settings` object.
@@ -53,7 +53,7 @@ Before running any experiments, we can call the `get_cost` function to ensure th
 Once instantiated, we call the `run` method to run the set of experiments, and the results of such experiments are stored internal to the class in `cal.results`.
 
 ```{code-cell} ipython3
-cal = Calibrator(execute, ZNESettings)
+cal = Calibrator(execute)
 print(cal.get_cost())
 cal.run()
 ```
