@@ -226,7 +226,7 @@ class Calibrator:
         circuit: QPROGRAM,
         expval_executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
         observable: Optional[Observable] = None,
-    ) -> float:
+    ) -> Union[QuantumResult, None]:
         """See :func:`execute_with_mitigation` for signature and details."""
         return execute_with_mitigation(
             circuit, expval_executor, observable, calibrator=self
