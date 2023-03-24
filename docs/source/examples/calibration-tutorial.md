@@ -14,18 +14,27 @@ kernelspec:
 
 # Breaking into error mitigation with Mitiq's calibration module
 
-Things that this tutorial covers:
-- Getting started with Mitiq's calibration module  
-- Use Qiskit noisy simulatro with FakeJakarta
-- Run calibration with RBSettings  
-- Conclusion
++++
+
+<img src="../_thumbnails/calibration.png" width="400">
+
++++
+
+This tutorial helps answer the question: "What quantum error
+mitigation technique should I use for my problem?". The newly introduced
+`mitiq.calibration` module helps answer that in an optimized way, thrhough `Benchmarks` and `Strategies`.
+
+More specifically, this tutorial covers:
+- Getting started with Mitiq's calibration module with ZNE
+- Use Qiskit noisy simulator with `FakeJakarta` as backend
+- Run calibration with some special settings, `RBSettings`, using the `cal.run(log=True)` option
 
 +++
 
 ## Getting started with Mitiq
 
 ```{code-cell} ipython3
-import numpy as np 
+import numpy as np
 from mitiq import MeasurementResult
 from mitiq.interface.mitiq_qiskit.conversions import to_qiskit, from_qiskit
 import mitiq
@@ -69,7 +78,7 @@ print(len(circuit))
 print(circuit)
 ```
 
-We define a function that executes the quantum circuits and returns the expectation value. This is consumed by Mitiq's `execute_with_zne`. 
+We define a function that executes the quantum circuits and returns the expectation value. This is consumed by Mitiq's `execute_with_zne`.
 
 ```{code-cell} ipython3
 def execute_circuit(circuit):
@@ -84,7 +93,7 @@ def execute_circuit(circuit):
 ```{code-cell} ipython3
 mitigated = execute_with_zne(circuit, execute_circuit)
 unmitigated = execute_circuit(circuit)
-ideal = 1 #property of RB circuits 
+ideal = 1 #property of RB circuits
 
 print("ideal = \t \t",ideal)
 print("unmitigated = \t \t",unmitigated)
@@ -95,7 +104,7 @@ print("mitigated = \t \t",mitigated)
 
 +++
 
- Let's consider as executor a noisy quantum circuit using Qiskit noisy backend simulators, `FakeJakarta`. Right now the calibration module does not natively support Qiskit circuits, so in the executor, we use Mitiq's conversion functions to convert the Qiskit circuit with `mitiq.interface.mitiq_qiskit.conversions.to_qiskit`. 
+ Let's consider as executor a noisy quantum circuit using Qiskit noisy backend simulators, `FakeJakarta`. Right now the calibration module does not natively support Qiskit circuits, so in the executor, we use Mitiq's conversion functions to convert the Qiskit circuit with `mitiq.interface.mitiq_qiskit.conversions.to_qiskit`.
 
 ```{code-cell} ipython3
 def execute_calibration(cirq_circuit):
@@ -108,13 +117,13 @@ def execute_calibration(cirq_circuit):
     return measurements
 ```
 
-We import from the calibration module the key ingredients to use `mitiq.calibration`: the `Calibrator` class, the `mitiq.calibration.settings.Settings` class and the `execute_with_mitigation` function. 
+We import from the calibration module the key ingredients to use `mitiq.calibration`: the `Calibrator` class, the `mitiq.calibration.settings.Settings` class and the `execute_with_mitigation` function.
 
-Currently `mitiq.calibration` supports ZNE as a technique to calibrate from, tuning different scale factors, extrapolation methods and circuit scaling methods. 
+Currently `mitiq.calibration` supports ZNE as a technique to calibrate from, tuning different scale factors, extrapolation methods and circuit scaling methods.
 
 +++
 
-Let's run the calibration using an ad-hoc RBSettings and using the `log=True` option in order to print the list of experiments run. 
+Let's run the calibration using an ad-hoc RBSettings and using the `log=True` option in order to print the list of experiments run.
 
 +++
 
@@ -181,7 +190,7 @@ print(cal.get_cost())
 cal.run(log=True)
 ```
 
-As you can see above, several experiments were run, and each one has either a red cross (❌) or a green check (✅) to signal whether the error mitigation experiment obtained an expectation value that is better than the non-mitigated one. 
+As you can see above, several experiments were run, and each one has either a red cross (❌) or a green check (✅) to signal whether the error mitigation experiment obtained an expectation value that is better than the non-mitigated one.
 
 ```{code-cell} ipython3
 calibrated_mitigated=execute_with_mitigation(circuit, execute_circuit, calibrator=cal)
@@ -192,8 +201,4 @@ print("ideal = \t \t",ideal)
 print("unmitigated = \t \t",unmitigated)
 print("mitigated = \t \t",mitigated)
 print("calibrated_mitigated = \t",calibrated_mitigated)
-```
-
-```{code-cell} ipython3
-
 ```
