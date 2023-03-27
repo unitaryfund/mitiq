@@ -15,11 +15,10 @@
 
 from typing import Callable, Dict, Optional, Union, cast, Sequence
 import warnings
-
 import numpy as np
 import numpy.typing as npt
-
 import cirq
+
 from mitiq import (
     QPROGRAM,
     Executor,
