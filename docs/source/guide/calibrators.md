@@ -53,7 +53,7 @@ Before running any experiments, we can call the `get_cost` function to ensure th
 Once instantiated, we call the `run` method to run the set of experiments, and the results of such experiments are stored internal to the class in `cal.results`.
 
 ```{code-cell} ipython3
-cal = Calibrator(execute, ZNESettings)
+cal = Calibrator(execute, ZNESettings, frontend="cirq")
 print(cal.get_cost())
 cal.run()
 ```

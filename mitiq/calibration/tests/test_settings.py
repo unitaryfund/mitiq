@@ -14,9 +14,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import pytest
 import json
+import cirq
+import qiskit
 
+from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
 from mitiq.calibration import ZNESettings, Settings
-from mitiq.calibration.settings import MitigationTechnique
+from mitiq.calibration.settings import MitigationTechnique, BenchmarkProblem
 from mitiq.raw import execute
 from mitiq.pec import execute_with_pec
 from mitiq.zne.scaling import fold_global
@@ -144,3 +147,28 @@ def test_ZNESettings():
 
     assert len(circuits) == 3
     assert len(strategies) == 2 * 2 * 2
+
+
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_benchmark_problem_class(circuit_type):
+    qubit = cirq.LineQubit(0)
+    circuit = cirq.Circuit(cirq.X(qubit))
+    circuit_with_measurements = circuit.copy()
+    circuit_with_measurements.append(cirq.measure(qubit))
+    problem = BenchmarkProblem(
+        id=7,
+        circuit=circuit,
+        type="",
+        ideal_distribution={},
+    )
+    assert problem.circuit == circuit
+    conv_circ = problem.converted_circuit(circuit_type)
+    assert any([isinstance(conv_circ, q) for q in QPROGRAM.__args__])
+    # For at least one case, test the circuit is correct and has measurements
+    if circuit_type == "qiskit":
+        qreg = qiskit.QuantumRegister(1, name="q")
+        creg = qiskit.ClassicalRegister(1, name="m0")
+        expected = qiskit.QuantumCircuit(qreg, creg)
+        expected.x(0)
+        expected.measure(0, 0)
+        assert conv_circ == expected
