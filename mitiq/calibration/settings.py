@@ -21,13 +21,14 @@ from enum import Enum, auto
 import networkx as nx
 import cirq
 
+from mitiq import QPROGRAM
+from mitiq.interface import convert_from_mitiq
 from mitiq.benchmarks import (
     generate_ghz_circuit,
     generate_mirror_circuit,
     generate_quantum_volume_circuit,
     generate_rb_circuits,
 )
-
 from mitiq.pec import execute_with_pec
 from mitiq.raw import execute
 from mitiq.zne import execute_with_zne
@@ -80,6 +81,20 @@ class BenchmarkProblem:
 
     def largest_probability(self) -> float:
         return max(self.ideal_distribution.values())
+
+    def converted_circuit(self, circuit_type: str) -> QPROGRAM:
+        """Adds measurements to all qubits and convert
+        to the input frontend type.
+
+        Args:
+            circuit_type: The circuit type as a string.
+                For supported circuit types see mitiq.SUPPORTED_PROGRAM_TYPES.
+        Returns:
+            The converted circuit with final measurements.
+        """
+        circuit = self.circuit.copy()
+        circuit.append(cirq.measure(circuit.all_qubits()))
+        return convert_from_mitiq(circuit, circuit_type)
 
     @property
     def num_qubits(self) -> int:
@@ -221,7 +236,7 @@ class Settings:
                 circuit = generate_rb_circuits(num_qubits, depth)[0]
                 ideal = {"0" * num_qubits: 1.0}
             elif circuit_type == "mirror":
-                seed = benchmark["circuit_seed"]
+                seed = benchmark.get("circuit_seed", None)
                 circuit, bitstring_list = generate_mirror_circuit(
                     nlayers=depth,
                     two_qubit_gate_prob=1.0,

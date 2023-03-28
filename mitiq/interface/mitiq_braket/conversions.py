@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from typing import cast, List, Optional, Union
+from warnings import warn
 
 import numpy as np
 import numpy.typing as npt
@@ -122,6 +123,11 @@ def _translate_cirq_operation_to_braket_instruction(
     Raises:
         ValueError: If the operation cannot be converted to Braket.
     """
+    # Measurement gates do not exist in Braket.
+    if isinstance(op.gate, cirq_ops.MeasurementGate):
+        warn("Measurement gate removed when converting from Cirq to Braket.")
+        return []
+
     nqubits = protocols.num_qubits(op)
 
     if nqubits == 1:
