@@ -135,8 +135,8 @@ class Calibrator:
     def __init__(
         self,
         executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
-        settings: Settings = ZNESettings,
         frontend: str,
+        settings: Settings = ZNESettings,
         ideal_executor: Union[
             Executor, Callable[[QPROGRAM], QuantumResult], None
         ] = None,
