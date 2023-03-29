@@ -39,16 +39,26 @@ def test_w4_circuit():
     output_circuit = W_circuit_linear_complexity(4)
     qubits = cirq.LineQubit.range(4)
     correct_circuit = cirq.Circuit(
-        cirq.Ry(rads=2*math.acos(np.sqrt(1/4))).controlled().on(qubits[0], qubits[1]),
+        cirq.Ry(rads=2 * math.acos(np.sqrt(1 / 4)))
+        .controlled()
+        .on(qubits[0], qubits[1]),
         cirq.CNOT(qubits[1], qubits[0]),
-        cirq.Ry(rads=2*math.acos(np.sqrt(1/3))).controlled().on(qubits[1], qubits[2]),
+        cirq.Ry(rads=2 * math.acos(np.sqrt(1 / 3)))
+        .controlled()
+        .on(qubits[1], qubits[2]),
         cirq.CNOT(qubits[2], qubits[1]),
-        cirq.Ry(rads=2*math.acos(np.sqrt(1/2))).controlled().on(qubits[2], qubits[3]),
+        cirq.Ry(rads=2 * math.acos(np.sqrt(1 / 2)))
+        .controlled()
+        .on(qubits[2], qubits[3]),
         cirq.CNOT(qubits[3], qubits[2]),
     )
     assert _equal(output_circuit, correct_circuit)
 
-    w4_state_vector = cirq.Simulator().simulate(output_circuit, initial_state = 1000).final_state_vector
+    w4_state_vector = (
+        cirq.Simulator()
+        .simulate(output_circuit, initial_state=1000)
+        .final_state_vector
+    )
     assert np.isclose(w4_state_vector[1], 0.5)
     assert np.isclose(w4_state_vector[2], 0.5)
     assert np.isclose(w4_state_vector[4], 0.5)
