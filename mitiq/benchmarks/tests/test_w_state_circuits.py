@@ -18,7 +18,6 @@
 import pytest
 import numpy as np
 import cirq
-import math
 
 from mitiq.utils import _equal
 
@@ -40,15 +39,15 @@ def test_w4_circuit():
     output_circuit = generate_w_circuit(4)
     qubits = cirq.LineQubit.range(4)
     correct_circuit = cirq.Circuit(
-        cirq.Ry(rads=2 * math.acos(np.sqrt(1 / 4)))
+        cirq.Ry(rads=2 * np.arccos(np.sqrt(1 / 4)))
         .controlled()
         .on(qubits[0], qubits[1]),
         cirq.CNOT(qubits[1], qubits[0]),
-        cirq.Ry(rads=2 * math.acos(np.sqrt(1 / 3)))
+        cirq.Ry(rads=2 * np.arccos(np.sqrt(1 / 3)))
         .controlled()
         .on(qubits[1], qubits[2]),
         cirq.CNOT(qubits[2], qubits[1]),
-        cirq.Ry(rads=2 * math.acos(np.sqrt(1 / 2)))
+        cirq.Ry(rads=2 * np.arccos(np.sqrt(1 / 2)))
         .controlled()
         .on(qubits[2], qubits[3]),
         cirq.CNOT(qubits[3], qubits[2]),
@@ -69,7 +68,7 @@ def test_w2_circuit():
     output_circuit = generate_w_circuit(2)
     qubits = cirq.LineQubit.range(2)
     correct_circuit = cirq.Circuit(
-        cirq.Ry(rads=2 * math.acos(np.sqrt(1 / 2)))
+        cirq.Ry(rads=2 * np.arccos(np.sqrt(1 / 2)))
         .controlled()
         .on(qubits[0], qubits[1]),
         cirq.CNOT(qubits[1], qubits[0]),
@@ -81,11 +80,11 @@ def test_w3_circuit():
     output_circuit = generate_w_circuit(3)
     qubits = cirq.LineQubit.range(3)
     correct_circuit = cirq.Circuit(
-        cirq.Ry(rads=2 * math.acos(np.sqrt(1 / 3)))
+        cirq.Ry(rads=2 * np.arccos(np.sqrt(1 / 3)))
         .controlled()
         .on(qubits[0], qubits[1]),
         cirq.CNOT(qubits[1], qubits[0]),
-        cirq.Ry(rads=2 * math.acos(np.sqrt(1 / 2)))
+        cirq.Ry(rads=2 * np.arccos(np.sqrt(1 / 2)))
         .controlled()
         .on(qubits[1], qubits[2]),
         cirq.CNOT(qubits[2], qubits[1]),
