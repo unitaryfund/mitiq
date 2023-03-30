@@ -33,12 +33,6 @@ More specifically, this tutorial covers:
 
 ## Getting started with Mitiq
 
-```{code-cell} ipython3
-import numpy as np
-from mitiq import MeasurementResult
-from mitiq.interface.mitiq_qiskit.conversions import to_qiskit, from_qiskit
-import mitiq
-```
 
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_rb_circuits
@@ -78,7 +72,7 @@ print(len(circuit))
 print(circuit)
 ```
 
-We define a function that executes the quantum circuits and returns the expectation value. This is consumed by Mitiq's `execute_with_zne`.
+We define a function that executes the quantum circuits and returns the expectation value. This is consumed by Mitiq's `execute_with_zne`. In this example, the expectation value is the probability of measuring the ground state, which is what one would expect from an ideal randomized benchmarking circuit.
 
 ```{code-cell} ipython3
 def execute_circuit(circuit):
@@ -104,7 +98,7 @@ print("mitigated = \t \t",mitigated)
 
 +++
 
- Let's consider as executor a noisy quantum circuit using Qiskit noisy backend simulators, `FakeJakarta`. Right now the calibration module does not natively support Qiskit circuits, so in the executor, we use Mitiq's conversion functions to convert the Qiskit circuit with `mitiq.interface.mitiq_qiskit.conversions.to_qiskit`.
+ Let's consider as executor a noisy quantum circuit using Qiskit noisy backend simulators, `FakeJakarta`. Note that the executor passed to the `Calibrator` object must return counts, as opposed to expectation values.
 
 ```{code-cell} ipython3
 def execute_calibration(qiskit_circuit):
@@ -127,7 +121,8 @@ Let's run the calibration using an ad-hoc RBSettings and using the `log=True` op
 +++
 
 - benchmarks: Circuit type: "rb"
-- strategies: use various "zne" strategies, testing various "scale_noise" methods, and ZNE factories for extrapolation
+- strategies: use various "zne" strategies, testing various "scale_noise" methods (such as `mitiq.zne.scaling.folding.fold_global` and `mitiq.zne.scaling.folding.fold_gates_at_random`), and ZNE factories for extrapolation (such as `mitiq.zne.inference.RichardsonFactory` and `mitiq.zne.inference.LinearFactory`)
+
 
 ```{code-cell} ipython3
 RBSettings = Settings(
