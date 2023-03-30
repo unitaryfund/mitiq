@@ -24,6 +24,7 @@ from mitiq.utils import _equal
 from mitiq.benchmarks.w_state_circuits import (
     generate_w_circuit,
 )
+from mitiq import SUPPORTED_PROGRAM_TYPES
 
 
 def test_bad_qubit_number():
@@ -62,7 +63,9 @@ def test_w4_circuit():
         .simulate(output_circuit, initial_state=1000)
         .final_state_vector
     )
-    correct_final_state_vector = np.array([0, 0.5, 0.5, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0, 0, 0, 0])
+    correct_final_state_vector = np.array(
+        [0, 0.5, 0.5, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0, 0, 0, 0]
+    )
     assert np.allclose(w4_state_vector, correct_final_state_vector)
 
 
@@ -86,7 +89,9 @@ def test_w2_circuit():
         .simulate(output_circuit, initial_state=10)
         .final_state_vector
     )
-    correct_final_state_vector = np.array([0, 1/np.sqrt(2), 1/np.sqrt(2), 0])
+    correct_final_state_vector = np.array(
+        [0, 1 / np.sqrt(2), 1 / np.sqrt(2), 0]
+    )
     assert np.allclose(w2_state_vector, correct_final_state_vector)
 
 
@@ -107,11 +112,19 @@ def test_w3_circuit():
     )
     assert _equal(output_circuit, correct_circuit)
 
-     # compare the state vector
+    # compare the state vector
     w3_state_vector = (
         cirq.Simulator()
         .simulate(output_circuit, initial_state=100)
         .final_state_vector
     )
-    correct_final_state_vector = np.array([0, 1/np.sqrt(3), 1/np.sqrt(3), 0, 1/np.sqrt(3),0,0,0])
+    correct_final_state_vector = np.array(
+        [0, 1 / np.sqrt(3), 1 / np.sqrt(3), 0, 1 / np.sqrt(3), 0, 0, 0]
+    )
     assert np.allclose(w3_state_vector, correct_final_state_vector)
+
+
+@pytest.mark.parametrize("return_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_conversion(return_type):
+    circuit = generate_w_circuit(3, return_type)
+    assert return_type in circuit.__module__
