@@ -25,13 +25,12 @@ from mitiq import QPROGRAM
 from mitiq.interface import convert_from_mitiq
 
 
-# Build a linear complexity circuit
 def W_circuit_linear_complexity(
     n_qubits: int,
     return_type: Optional[str] = None,
 ) -> QPROGRAM:
-    """Returns a circuit to create a ``n_qubit`` qubit W-state with linear
-    complexity.
+    """Returns a circuit to create a ``n_qubit`` qubit Werner-state with linear
+    complexity as defined in :cite:`Cruz_2019_Efficient`.
     Args:
         n_qubits: The number of qubits in the circuit.
         return_type: Return type of the output circuit.
@@ -56,5 +55,3 @@ def W_circuit_linear_complexity(
 
     return convert_from_mitiq(circuit, return_type)
 
-
-# Logarithmic time complexity circuit
