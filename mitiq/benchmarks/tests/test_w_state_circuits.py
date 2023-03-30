@@ -36,6 +36,8 @@ def test_bad_qubit_number():
 
 def test_w4_circuit():
     """Tests for a W-state of 3 qubits."""
+
+    # compare the circuits
     output_circuit = generate_w_circuit(4)
     qubits = cirq.LineQubit.range(4)
     correct_circuit = cirq.Circuit(
@@ -54,18 +56,20 @@ def test_w4_circuit():
     )
     assert _equal(output_circuit, correct_circuit)
 
+    # compare the state vector
     w4_state_vector = (
         cirq.Simulator()
         .simulate(output_circuit, initial_state=1000)
         .final_state_vector
     )
-    non_zero_final_vector = np.nonzero(w4_state_vector)
-    for i in range(len(non_zero_final_vector[0])):
-        assert np.isclose(w4_state_vector[non_zero_final_vector[0][i]], 0.5)
+    correct_final_state_vector = np.array([0, 0.5, 0.5, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0, 0, 0, 0])
+    assert np.allclose(w4_state_vector, correct_final_state_vector)
 
 
 def test_w2_circuit():
     """Tests for W-state of 2 qubits."""
+
+    # compare the output circuit with expected circuit
     output_circuit = generate_w_circuit(2)
     qubits = cirq.LineQubit.range(2)
     correct_circuit = cirq.Circuit(
@@ -76,9 +80,19 @@ def test_w2_circuit():
     )
     assert _equal(output_circuit, correct_circuit)
 
+    # compare the state vector
+    w2_state_vector = (
+        cirq.Simulator()
+        .simulate(output_circuit, initial_state=10)
+        .final_state_vector
+    )
+    correct_final_state_vector = np.array([0, 1/np.sqrt(2), 1/np.sqrt(2), 0])
+    assert np.allclose(w2_state_vector, correct_final_state_vector)
+
 
 def test_w3_circuit():
     """Tests for W-state of 3 qubits."""
+    # compare the output circuit with expected circuit
     output_circuit = generate_w_circuit(3)
     qubits = cirq.LineQubit.range(3)
     correct_circuit = cirq.Circuit(
@@ -92,3 +106,12 @@ def test_w3_circuit():
         cirq.CNOT(qubits[2], qubits[1]),
     )
     assert _equal(output_circuit, correct_circuit)
+
+     # compare the state vector
+    w3_state_vector = (
+        cirq.Simulator()
+        .simulate(output_circuit, initial_state=100)
+        .final_state_vector
+    )
+    correct_final_state_vector = np.array([0, 1/np.sqrt(3), 1/np.sqrt(3), 0, 1/np.sqrt(3),0,0,0])
+    assert np.allclose(w3_state_vector, correct_final_state_vector)
