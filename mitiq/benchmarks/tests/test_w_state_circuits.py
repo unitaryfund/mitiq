@@ -35,7 +35,7 @@ def test_bad_qubit_number():
 
 
 def test_w4_circuit():
-    """Tests for a W-state of 3 qubits. """
+    """Tests for a W-state of 3 qubits."""
     output_circuit = generate_w_circuit(4)
     qubits = cirq.LineQubit.range(4)
     correct_circuit = cirq.Circuit(
@@ -63,6 +63,7 @@ def test_w4_circuit():
     for i in range(len(non_zero_final_vector[0])):
         assert np.isclose(w4_state_vector[non_zero_final_vector[0][i]], 0.5)
 
+
 def test_w2_circuit():
     """Tests for W-state of 2 qubits."""
     output_circuit = generate_w_circuit(2)
@@ -74,6 +75,7 @@ def test_w2_circuit():
         cirq.CNOT(qubits[1], qubits[0]),
     )
     assert _equal(output_circuit, correct_circuit)
+
 
 def test_w3_circuit():
     """Tests for W-state of 3 qubits."""
