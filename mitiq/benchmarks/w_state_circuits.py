@@ -19,13 +19,13 @@
 from typing import Optional
 import numpy as np
 import cirq
-import math
+
 
 from mitiq import QPROGRAM
 from mitiq.interface import convert_from_mitiq
 
 
-def W_circuit_linear_complexity(
+def generate_w_circuit(
     n_qubits: int,
     return_type: Optional[str] = None,
 ) -> QPROGRAM:
@@ -45,7 +45,7 @@ def W_circuit_linear_complexity(
 
     for i, j in zip(range(0, n_qubits), range(1, n_qubits)):
         N = n_qubits - i
-        angle = 2 * math.acos(np.sqrt(1 / N))
+        angle = 2 * np.arccos(np.sqrt(1 / N))
         circuit.append(
             cirq.Ry(rads=angle).controlled().on(qubits[i], qubits[j])
         )
@@ -54,4 +54,3 @@ def W_circuit_linear_complexity(
     return_type = "cirq" if not return_type else return_type
 
     return convert_from_mitiq(circuit, return_type)
-

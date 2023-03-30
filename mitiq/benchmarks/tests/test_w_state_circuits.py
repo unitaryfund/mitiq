@@ -23,7 +23,7 @@ import math
 from mitiq.utils import _equal
 
 from mitiq.benchmarks.w_state_circuits import (
-    W_circuit_linear_complexity,
+    generate_w_circuit,
 )
 
 
@@ -32,11 +32,11 @@ def test_bad_qubit_number():
         with pytest.raises(
             ValueError, match="{} is invalid for the number of qubits. "
         ):
-            W_circuit_linear_complexity(n)
+            generate_w_circuit(n)
 
 
 def test_w4_circuit():
-    output_circuit = W_circuit_linear_complexity(4)
+    output_circuit = generate_w_circuit(4)
     qubits = cirq.LineQubit.range(4)
     correct_circuit = cirq.Circuit(
         cirq.Ry(rads=2 * math.acos(np.sqrt(1 / 4)))
