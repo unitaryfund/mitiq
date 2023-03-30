@@ -107,9 +107,8 @@ print("mitigated = \t \t",mitigated)
  Let's consider as executor a noisy quantum circuit using Qiskit noisy backend simulators, `FakeJakarta`. Right now the calibration module does not natively support Qiskit circuits, so in the executor, we use Mitiq's conversion functions to convert the Qiskit circuit with `mitiq.interface.mitiq_qiskit.conversions.to_qiskit`.
 
 ```{code-cell} ipython3
-def execute_calibration(cirq_circuit):
+def execute_calibration(qiskit_circuit):
     """Execute the input circuits and return the measurement results."""
-    qiskit_circuit = to_qiskit(cirq_circuit)
     noisy_backend = FakeJakarta()
     noisy_result = noisy_backend.run(qiskit_circuit, shots=shots).result()
     noisy_counts = noisy_result.get_counts(qiskit_circuit)
