@@ -225,13 +225,15 @@ $$G \longrightarrow I G$$
 
 Here, $G$ is a single circuit layer containing individual that can be performed simultaneously.
 
-To use this method, call {func}`.zne.scaling.insert_id_layers()` with both a circuit to scale, and a scale factor.
+To use this method, call {func}`.zne.scaling.identity_insertion.insert_id_layers()` with both a circuit to scale, and a scale factor.
 Alternatively, pass it as the `scale_noise` argument to {func}`.zne.execute_with_zne` to use it instead of the default method of {func}`.fold_gates_at_random`.
 
 
 #### Integer and Real Scale Factors
 
-When the scale factor is 1, no identity layers are inserted and circuit depth remains unchanged. For some scale factor greater than 1, there will need to be some layers inserted non-uniformly to approach the desired scale factor. This is determined by the scale factor being an integer or a float. 
+When the scale factor is 1, no identity layers are inserted and circuit depth remains unchanged. 
+
+For some scale factor greater than 1, there will need to be some layers inserted non-uniformly to approach the desired scale factor. This is determined by the scale factor being an integer or a float. 
 
 - When the scale factor is an integer, identity layers are inserted uniformly after each moment in the input circuit. 
 - When the scale factor is a non-integer, identity layers are inserted uniformly until the closest integer less than the scale factor is achieved. Then the layers are inserted at random to achieve a value approximately close to the intended scale factor. 
