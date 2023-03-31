@@ -3,6 +3,7 @@
 Below you can find a gallery of tutorials applying Zero Noise Extrapolation (ZNE), Probabilistic Error Cancellation (PEC), and Digital Dynamical Decoupling (DDD) with Mitiq:
 
 ```{nbgallery}
+ZNE Calibration with Qiskit <calibration-tutorial.md>
 ZNE on a Rigetti backend with Braket: Mirror circuits <braket_mirror_circuit.md>
 ZNE on IonQ backends with Braket <zne-braket-ionq.md>
 ZNE on IBM Quantum backends with Qiskit <ibmq-backends.md>
