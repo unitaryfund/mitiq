@@ -13,12 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Callable, Dict, Optional, Union, cast
+from typing import Callable, Dict, Optional, Union, cast, Sequence
 import warnings
-
-import cirq
 import numpy as np
 import numpy.typing as npt
+import cirq
 
 from mitiq import (
     QPROGRAM,
@@ -32,6 +31,7 @@ from mitiq.calibration.settings import (
     Strategy,
     BenchmarkProblem,
 )
+from mitiq.interface import convert_from_mitiq
 
 
 class MissingResultsError(Exception):
@@ -125,6 +125,8 @@ class Calibrator:
             :class:`.MeasurementResult`.
         settings: A ``Settings`` object which specifies the type and amount of
             circuits/error mitigation methods to run.
+        frontend: The executor frontend as a string. For a list of supported
+            frontends see ``mitiq.SUPPORTED_PROGRAM_TYPES.keys()``,
         ideal_executor: An optional simulated executor returning the ideal
             :class:`.MeasurementResult` without noise.
     """
@@ -133,6 +135,7 @@ class Calibrator:
         self,
         executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
         settings: Settings,
+        frontend: str,
         ideal_executor: Union[
             Executor, Callable[[QPROGRAM], QuantumResult], None
         ] = None,
@@ -147,12 +150,37 @@ class Calibrator:
             else None
         )
         self.settings = settings
-        self.circuits = settings.make_problems()
+        self.problems = settings.make_problems()
         self.strategies = settings.make_strategies()
         self.results = ExperimentResults(
             num_strategies=len(self.strategies),
-            num_problems=len(self.circuits),
+            num_problems=len(self.problems),
         )
+
+        # Build an executor of Cirq circuits
+        def cirq_execute(
+            circuits: Sequence[cirq.Circuit],
+        ) -> Sequence[MeasurementResult]:
+            q_programs = [convert_from_mitiq(c, frontend) for c in circuits]
+            results = cast(
+                Sequence[MeasurementResult], self.executor.run(q_programs)
+            )
+            return results
+
+        self._cirq_executor = Executor(cirq_execute)  # type: ignore [arg-type]
+
+    @property
+    def cirq_executor(self) -> Executor:
+        """Returns an executor which is able to run Cirq circuits
+        by converting them and calling self.executor.
+
+        Args:
+            executor: Executor which takes as input QPROGRAM circuits.
+
+        Returns:
+            Executor which takes as input a Cirq circuits.
+        """
+        return self._cirq_executor
 
     def get_cost(self) -> Dict[str, int]:
         """Returns the expected number of noisy and ideal expectation values
@@ -161,7 +189,7 @@ class Calibrator:
         Returns:
             A summary of the number of circuits to be run.
         """
-        num_circuits = len(self.circuits)
+        num_circuits = len(self.problems)
         num_options = len(self.settings.technique_params)
 
         noisy = num_circuits * num_options
@@ -176,17 +204,16 @@ class Calibrator:
         if not self.results.is_missing_data():
             self.results.reset_data()
 
-        for problem in self.circuits:
+        for problem in self.problems:
+            # Benchmark circuits have no measurements, so we append them.
             circuit = problem.circuit.copy()
             circuit.append(cirq.measure(circuit.all_qubits()))
 
             bitstring_to_measure = problem.most_likely_bitstring()
             expval_executor = convert_to_expval_executor(
-                self.executor, bitstring_to_measure
+                self.cirq_executor, bitstring_to_measure
             )
-
             noisy_value = expval_executor.evaluate(circuit)[0]
-
             for strategy in self.strategies:
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", UserWarning)
@@ -236,7 +263,7 @@ def convert_to_expval_executor(executor: Executor, bitstring: str) -> Executor:
         the most likely bitstring, according to the passed ``distribution``
     """
 
-    def expval_executor(circuit: cirq.Circuit) -> float:
+    def expval_executor(circuit: QPROGRAM) -> float:
         raw = cast(MeasurementResult, executor.run([circuit])[0])
         distribution = raw.prob_distribution()
         return distribution.get(bitstring, 0.0)
