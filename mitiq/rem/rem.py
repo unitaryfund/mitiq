@@ -87,7 +87,7 @@ def mitigate_executor(
         executor_obj = deepcopy(executor)
 
     def post_run(
-        self: MeasurementResult,
+        self: Executor,
         results: Sequence[MeasurementResult],
     ) -> Sequence[MeasurementResult]:
         return [

@@ -120,7 +120,7 @@ class Executor:
         self,
         circuits: Union[QPROGRAM, List[QPROGRAM]],
         observable: Optional[Observable] = None,
-        force_run_all: bool = False,
+        force_run_all: bool = True,
         **kwargs: Any,
     ) -> List[float]:
         """Returns the expectation value Tr[ρ O] for each circuit in
@@ -224,7 +224,7 @@ class Executor:
     def run(
         self,
         circuits: Sequence[QPROGRAM],
-        force_run_all: bool = False,
+        force_run_all: bool = True,
         **kwargs: Any,
     ) -> Sequence[QuantumResult]:
         """Runs all input circuits using the least number of possible calls to
@@ -271,14 +271,12 @@ class Executor:
                 batch = to_run[i * step : (i + 1) * step]
                 self._call_executor(batch, **kwargs)
 
-        these_results = self._quantum_results[start_result_index:]
+        results = self._quantum_results[start_result_index:]
 
-        if force_run_all:
-            return these_results
-
-        # Expand computed results to all results using counts.
-        results_dict = dict(zip(collection.keys(), these_results))
-        results = [results_dict[key] for key in hashable_circuits]
+        if not force_run_all:
+            # Expand computed results to all results using counts.
+            results_dict = dict(zip(collection.keys(), results))
+            results = [results_dict[key] for key in hashable_circuits]
 
         return self._post_run(results)
 

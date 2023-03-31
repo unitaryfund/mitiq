@@ -117,7 +117,7 @@ def test_executor_non_hermitian_observable():
 def test_run_executor_identical_circuits_batched(ncircuits, executor):
     collector = Executor(executor=executor, max_batch_size=10)
     circuits = [cirq.Circuit(cirq.H(cirq.LineQubit(0)))] * ncircuits
-    results = collector.run(circuits)
+    results = collector.run(circuits, force_run_all=False)
 
     assert np.allclose(results, np.zeros(ncircuits))
     assert collector.calls_to_executor == 1
@@ -134,7 +134,7 @@ def test_run_executor_nonidentical_pyquil_programs(batch_size):
         pyquil.Program(pyquil.gates.X(0)),
         pyquil.Program(pyquil.gates.H(0)),
     ] * 10
-    results = collector.run(circuits)
+    results = collector.run(circuits, force_run_all=False)
 
     assert np.allclose(results, np.zeros(len(circuits)))
     if batch_size == 1:
