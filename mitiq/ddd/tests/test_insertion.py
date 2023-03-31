@@ -280,3 +280,23 @@ def test_pyquil_midcircuit_measurement_raises_error():
 
     with pytest.raises(ValueError, match="midcircuit measurements"):
         insert_ddd_sequences(p, xx)
+
+
+def test_insert_sequence_over_identity_gates():
+    qubits = cirq.LineQubit.range(2)
+    circuit = cirq.Circuit(
+        cirq.ops.H.on_each(*qubits),
+        cirq.ops.I.on_each(*qubits),
+        cirq.ops.I.on_each(*qubits),
+        cirq.ops.H.on_each(*qubits),
+    )
+    circuit_expected = cirq.Circuit(
+        cirq.ops.H.on_each(*qubits),
+        cirq.ops.X.on_each(*qubits),
+        cirq.ops.X.on_each(*qubits),
+        cirq.ops.H.on_each(*qubits),
+    )
+
+    ddd_circuit = insert_ddd_sequences(circuit, rule=xx)
+
+    assert ddd_circuit == circuit_expected
