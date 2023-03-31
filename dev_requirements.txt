@@ -23,7 +23,7 @@ pydata-sphinx-theme==0.11.0
 jupytext==1.14.1
 sphinx-gallery==0.10.1
 nbsphinx==0.8.9
-# pyscf==2.2.0; sys_platform != 'win32'
+pyscf==2.2.0; sys_platform != 'win32'
 openfermion==1.5.1; sys_platform != 'win32'
 openfermionpyscf==0.5; sys_platform != 'win32'
 bqskit[ext]==1.0.3
