@@ -112,7 +112,7 @@ function can either increase the total circuit execution time by inserting unita
 middle of a circuit execution. These two methods are *unitary folding* and *identity scaling* respectively.
 See the section [What additional options are available in ZNE?](zne-3-options.md) for more details.
 
-For example, the function {func}`.fold_gates_at_random()` applies the *unitary folding* map $G \rightarrow G G^\dagger G$
+For example, the default function {func}`.fold_gates_at_random()` applies the *unitary folding* map $G \rightarrow G G^\dagger G$
 to a random subset of gates of the input circuit.
 The folded circuit is more sensitive to gate errors since it has a number of gates approximately
 equal to `scale_factor * n`, where `n` is the number of gates in the input circuit.
