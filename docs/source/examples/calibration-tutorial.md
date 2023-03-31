@@ -44,6 +44,7 @@ from mitiq.zne.scaling import (
 
 from mitiq.calibration import Calibrator, ZNESettings, execute_with_mitigation
 from mitiq.calibration.settings import Settings
+from mitiq import MeasurementResult
 ```
 
 ```{code-cell} ipython3
@@ -105,6 +106,7 @@ def execute_calibration(qiskit_circuit):
     noisy_backend = FakeJakarta()
     noisy_result = noisy_backend.run(qiskit_circuit, shots=shots).result()
     noisy_counts = noisy_result.get_counts(qiskit_circuit)
+    noisy_counts = { k.replace(" ",""):v for k, v in noisy_counts.items()}
     measurements = MeasurementResult.from_counts(noisy_counts)
     return measurements
 ```
@@ -177,8 +179,7 @@ RBSettings = Settings(
 ```
 
 ```{code-cell} ipython3
-cal = Calibrator(execute_calibration, RBSettings)
-print(cal.get_cost())
+cal = Calibrator(execute_calibration, RBSettings, frontend="qiskit")
 cal.run(log=True)
 ```
 
