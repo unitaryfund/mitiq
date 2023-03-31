@@ -23,7 +23,7 @@ This process works in two steps:
 - **Step 1: Intentionally scale noise**. This can be done with different methods.
 *Pulse-stretching* {cite}`Temme_2017_PRL` can be used to increase the noise level
 of a quantum computation. Similar results can be obtained, at a gate-level, with *unitary folding*
-{cite}`Li_2017_PRX, Giurgica_Tiron_2020_arXiv`.
+{cite}`Li_2017_PRX, Giurgica_Tiron_2020_arXiv` or *identity insertion scaling*.
 
 - **Step 2: Extrapolate to the noiseless limit**. This can be done by
 fitting a curve (often called *extrapolation model*) to the expectation values measured at different noise levels
@@ -31,8 +31,10 @@ to extrapolate the noiseless expectation value.
 
 ## Step 1: Intentionally scale noise.
 
-A technique to increase the noise level of a circuit is to intentionally increase its depth.
-This can be obtained using the *unitary folding* mapping $G \mapsto G G^\dagger G$. 
+A technique to increase the noise level of a circuit at the gate level is to intentionally increase its depth.
+This can be obtained using either *unitary folding* or *identity scaling*. 
+
+In *unitary folding*, we perform a mapping $G \mapsto G G^\dagger G$. 
 This mapping can be applied *globally* or *locally* as shown in the diagrams below.
 
 ```{figure} ../img/zne_global_folding.png
@@ -50,10 +52,25 @@ name: figzne_local
 ---
 The diagram demonstrates how gates are inserted in a circuit when *local folding* is applied.
 ```
-
 More details on the theory of unitary folding can be found in {cite}`Giurgica_Tiron_2020_arXiv`.
-More details on its practical implementation in Mitiq can be found in 
+
+In *identity insertion scaling*, we perform a mapping $G \mapsto I G$. 
+This mapping can be applied as shown in the diagram below.
+
+```{figure} ../img/zne_id_scaling_layers.png
+---
+width: 500
+name: figid
+---
+The diagram demonstrates how identity gates are inserted after a circuit layer when identity insertion scaling function is applied.
+```
+
+Additional details on the theory of identity insertion scaling are similar to those in unitary folding. The only difference 
+is that instead of scaling gate noise, the insertion of an identity gate increases the wait time after each circuit layer is executed. This allows the qubits to interact with the environment through some noisy process and decohere if the system-environment interaction is strong. The decoherence time for the qubits in a quantum system is determined by the amount of time our system of interest remains coherent and uncouples from the external environment. More details on decoherence can be found in {cite}`Schlosshauer_2019, Zurek_2003_arxiv`.
+
+More details on practical implementation of both methods in Mitiq can be found in 
 [What additional options are available for ZNE?](zne-3-options.md).
+
 
 A noise scaling technique similar to unitary folding is *pulse-stretching*: a method that only applies to 
 devices with pulse-level access {cite}`Temme_2017_PRL, Kandala_2019_Nature`.
