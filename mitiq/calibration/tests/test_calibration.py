@@ -25,7 +25,6 @@ from mitiq.benchmarks import generate_rb_circuits
 from mitiq.calibration import (
     Calibrator,
     Settings,
-    ZNESettings,
     execute_with_mitigation,
 )
 from mitiq.calibration.calibrator import (
