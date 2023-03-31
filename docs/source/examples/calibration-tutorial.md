@@ -33,7 +33,6 @@ More specifically, this tutorial covers:
 
 ## Getting started with Mitiq
 
-
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_rb_circuits
 from mitiq.zne import execute_with_zne
@@ -66,7 +65,7 @@ shots = 10 ** 3
 We now use Mitiq's built-in `generate_rb_circuits` from the `mitiq.benchmarks` module to define the quantum circuit.
 
 ```{code-cell} ipython3
-circuit = generate_rb_circuits(n_qubits, depth_circuit,return_type="qiskit")[0]#,trials=3)#[0]
+circuit = generate_rb_circuits(n_qubits, depth_circuit,return_type="qiskit")[0]
 circuit.measure_all()
 print(len(circuit))
 print(circuit)
@@ -98,7 +97,7 @@ print("mitigated = \t \t",mitigated)
 
 +++
 
- Let's consider as executor a noisy quantum circuit using Qiskit noisy backend simulators, `FakeJakarta`. Note that the executor passed to the `Calibrator` object must return counts, as opposed to expectation values.
+Let's consider a noisy backend using the Qiskit noisy simulator, `FakeJakarta`. Note that the executor passed to the `Calibrator` object must return counts, as opposed to expectation values.
 
 ```{code-cell} ipython3
 def execute_calibration(qiskit_circuit):
@@ -122,7 +121,6 @@ Let's run the calibration using an ad-hoc RBSettings and using the `log=True` op
 
 - benchmarks: Circuit type: "rb"
 - strategies: use various "zne" strategies, testing various "scale_noise" methods (such as `mitiq.zne.scaling.folding.fold_global` and `mitiq.zne.scaling.folding.fold_gates_at_random`), and ZNE factories for extrapolation (such as `mitiq.zne.inference.RichardsonFactory` and `mitiq.zne.inference.LinearFactory`)
-
 
 ```{code-cell} ipython3
 RBSettings = Settings(
@@ -195,4 +193,8 @@ print("ideal = \t \t",ideal)
 print("unmitigated = \t \t",unmitigated)
 print("mitigated = \t \t",mitigated)
 print("calibrated_mitigated = \t",calibrated_mitigated)
+```
+
+```{code-cell} ipython3
+
 ```
