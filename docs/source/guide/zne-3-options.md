@@ -229,10 +229,12 @@ To use this method, call {func}`.zne.scaling.insert_id_layers()` with both a cir
 Alternatively, pass it as the `scale_noise` argument to {func}`.zne.execute_with_zne` to use it instead of the default method of {func}`.fold_gates_at_random`.
 
 
-#### Integer and real scale factors
+#### Integer and Real Scale Factors
 
-When the scale factor is 1, no identity layers are inserted and circuit depth remains unchanged.
-For some scale factor greater than 1, there will need be some layers inserted non-uniformly to approach the desired scale factor. 
+When the scale factor is 1, no identity layers are inserted and circuit depth remains unchanged. For some scale factor greater than 1, there will need to be some layers inserted non-uniformly to approach the desired scale factor. This is determined by the scale factor being an integer or a float. 
+
+- When the scale factor is an integer, identity layers are inserted uniformly after each moment in the input circuit. 
+- When the scale factor is a non-integer, identity layers are inserted uniformly until the closest integer less than the scale factor is achieved. Then the layers are inserted at random to achieve a value approximately close to the intended scale factor. 
 
 ##### Example
 
@@ -261,20 +263,6 @@ The diagram shows the uniform layers inserted in the input circuit after the ini
 identity insertion scaling for an integer scale factor. 
 ```
 
-```{code-cell} ipython3
-import cirq
-from mitiq import zne
-
-# Get a circuit to fold
-qreg = cirq.LineQubit.range(2)
-circuit = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1]))
-print("Original circuit:", circuit, sep="\n")
-
-# Apply lidentity scaling
-scaled_circuit = zne.scaling.insert_id_layers(circuit, scale_factor=5)
-print("Identity Scaled circuit:", scaled_circuit, sep="\n")
-```
-
 If the scale factor is a non-integer greater than or equal to 1, the identity layer insertion can be described as a mix of uniform and randomly inserted layers.
 In some cases, achieving the exact scale factor is not possible, but this method will insert identities appropriately to closely approximate it.
 
@@ -287,6 +275,23 @@ The diagram shows the uniform layers and random layer inserted in the input circ
 after the initial circuit was scaled via identity insertion scaling for a real scale factor.
 ```
 
+```{code-cell} ipython3
+import cirq
+from mitiq import zne
+
+# Get a circuit to fold
+qreg = cirq.LineQubit.range(2)
+circuit = cirq.Circuit(cirq.ops.H.on(qreg[0]), cirq.ops.CNOT.on(qreg[0], qreg[1]))
+print("Original circuit:", circuit, sep="\n")
+
+# Apply identity scaling for uniform layers
+scaled_circuit = zne.scaling.insert_id_layers(circuit, scale_factor=5)
+print("Identity Scaled circuit for an integer scale factor :", scaled_circuit, sep="\n")
+
+# Apply identity scaling for non-integer scale factor
+scaled_circuit = zne.scaling.insert_id_layers(circuit, scale_factor=5.5)
+print("Identity Scaled circuit for a non-integer scale factor :", scaled_circuit, sep="\n")
+```
 
 ## Extrapolation methods: Factory objects
 

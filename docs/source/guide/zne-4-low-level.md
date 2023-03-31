@@ -14,7 +14,7 @@ kernelspec:
 # What happens when I use ZNE?
 
 In Mitiq, ZNE is clearly divided into two steps, noise scaling and extrapolation. They are shown in the Figure below.
-The corresponding sub-modules in the codebase are {mod}`mitiq.zne.scaling.folding` and {mod}`mitiq.zne.inference`.
+The corresponding sub-modules in the codebase are {mod}`mitiq.zne.scaling.folding`,  {mod}`mitiq.zne.scaling.identity_insertion` and {mod}`mitiq.zne.inference`.
 
 ```{figure} ../img/zne_workflow2_steps.png
 ---
@@ -26,7 +26,7 @@ The diagram shows the workflow of the zero noise extrapolation (ZNE) technique i
 
 **The first step** involves generating and executing noise-scaled quantum circuits.
   - The user provides a `QPROGRAM`, i.e., a quantum circuit defined via any of the supported frontends.
-  - Mitiq generates a set of noise-scaled circuits by applying unitary folding with different scale factors.
+  - Mitiq generates a set of noise-scaled circuits by applying a scaling method (*unitary folding* or *identity insertion scaling*) with different scale factors.
   - The noise-scaled circuits are executed on the noisy backend obtaining a set of noise-scaled expectation values.
 
 **The second step** involves inferring the zero-noise value from the measured results.
@@ -110,6 +110,16 @@ fac.reduce()
 ```{code-cell} ipython3
 # Plot the extrapolation fit
 _ = fac.plot_fit()
+```
+Both steps demonstrated above can be used for *identity insertion scaling* as well. The unitary folding function used above is now replaced with the identity insertion scaling function. 
+
+```{code-cell} ipython3
+from mitiq import zne
+
+# Choose a list of scale factors
+scale_factors = [1.0, 3.0, 5.0]
+# Generate a list of folded circuits
+noise_scaled_circuits = [zne.scaling.insert_id_layers(circuit, s) for s in scale_factors]
 ```
 
 ## Custom noise-scaling methods
