@@ -301,7 +301,7 @@ class Factory(ABC):
         observable: Optional[Observable] = None,
         scale_noise: Callable[
             [QPROGRAM, float], QPROGRAM
-        ] = fold_gates_at_random,
+        ] = fold_gates_at_random,  # type: ignore [has-type]
         num_to_average: int = 1,
     ) -> "Factory":
         """Calls the executor function on noise-scaled quantum circuit and
@@ -514,7 +514,7 @@ class BatchedFactory(Factory, ABC):
         observable: Optional[Observable] = None,
         scale_noise: Callable[
             [QPROGRAM, float], QPROGRAM
-        ] = fold_gates_at_random,
+        ] = fold_gates_at_random,  # type: ignore [has-type]
         num_to_average: int = 1,
     ) -> "BatchedFactory":
         """Computes the expectation values at each scale factor and stores them
@@ -741,7 +741,7 @@ class AdaptiveFactory(Factory, ABC):
         observable: Optional[Observable] = None,
         scale_noise: Callable[
             [QPROGRAM, float], QPROGRAM
-        ] = fold_gates_at_random,
+        ] = fold_gates_at_random,  # type: ignore [has-type]
         num_to_average: int = 1,
         max_iterations: int = 100,
     ) -> "AdaptiveFactory":
