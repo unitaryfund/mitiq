@@ -91,7 +91,7 @@ def test_layer_folding_all(layers_to_fold):
     # Second element of list should consist of circuit with only second layer
     # folded.
     expected_circuit_folded_2 = Circuit(
-        [ops.H(q0)] * (2 * layers_to_fold + 1),
-        [ops.CNOT(q0, q1)],
+        [ops.H(q0)],
+        [ops.CNOT(q0, q1)] * (2 * layers_to_fold + 1),
     )
     assert circuit_folded[1] == expected_circuit_folded_2
