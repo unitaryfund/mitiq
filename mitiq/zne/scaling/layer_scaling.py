@@ -14,12 +14,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Functions for layer-wise unitary folding on supported circuits."""
-from typing import List, Union
+from typing import List
 from cirq import Circuit, inverse, Moment
 
 
 def layer_folding(
-    circuit: Circuit, layers_to_fold: Union[List[int], int]
+    circuit: Circuit, layers_to_fold: List[int]
 ) -> Circuit:
     """Applies a variable amount of folding to select layers of a circuit.
 
@@ -33,11 +33,6 @@ def layer_folding(
         A cirq ``Circuit`` with layers and number of times to fold specified
         by ``layers_to_invert``.
     """
-    # If `layers_to_fold` is provided as an `int`, we apply `layers_to_fold` to
-    # each layer.
-    if isinstance(layers_to_fold, int):
-        layers_to_fold = [layers_to_fold] * len(circuit)
-
     layers = []
     for i, layer in enumerate(circuit):
         layers.append(layer)
