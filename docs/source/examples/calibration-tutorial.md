@@ -14,55 +14,47 @@ kernelspec:
 
 # Breaking into error mitigation with Mitiq's calibration module
 
-+++
-
 <img src="../_thumbnails/calibration.png" width="400">
-
-+++
 
 This tutorial helps answer the question: "What quantum error
 mitigation technique should I use for my problem?". The newly introduced
 `mitiq.calibration` module helps answer that in an optimized way, thrhough `Benchmarks` and `Strategies`.
 
 More specifically, this tutorial covers:
+
 - Getting started with Mitiq's calibration module with ZNE
 - Use Qiskit noisy simulator with `FakeJakarta` as backend
 - Run calibration with some special settings, `RBSettings`, using the `cal.run(log=True)` option
-
-+++
 
 ## Getting started with Mitiq
 
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_rb_circuits
 from mitiq.zne import execute_with_zne
-from mitiq.zne.inference import LinearFactory, RichardsonFactory
-from mitiq.zne.scaling import (
-    fold_gates_at_random,
-    fold_global,
+from mitiq import (
+    Calibrator,
+    Settings,
+    execute_with_mitigation,
+    MeasurementResult,
 )
 
-from mitiq.calibration import Calibrator, ZNESettings, execute_with_mitigation
-from mitiq.calibration.settings import Settings
-from mitiq import MeasurementResult
-```
-
-```{code-cell} ipython3
 from qiskit.providers.fake_provider import FakeJakarta  # Fake (simulated) QPU
 ```
 
 ### Define the circuit to study
 
 #### Global variables
+
 Define global variables for the quantum circuit of interest: number of qubits, depth of the quantum circuit and number of shots.
 
 ```{code-cell} ipython3
 n_qubits = 2
-depth_circuit= 20
+depth_circuit = 20
 shots = 10 ** 3
 ```
 
 #### Quantum circuit: Randomized benchmarking (RB)
+
 We now use Mitiq's built-in `generate_rb_circuits` from the `mitiq.benchmarks` module to define the quantum circuit.
 
 ```{code-cell} ipython3
@@ -96,8 +88,6 @@ print("mitigated = \t \t",mitigated)
 
 ## Using calibration to improve the results
 
-+++
-
 Let's consider a noisy backend using the Qiskit noisy simulator, `FakeJakarta`. Note that the executor passed to the `Calibrator` object must return counts, as opposed to expectation values.
 
 ```{code-cell} ipython3
@@ -115,16 +105,18 @@ We import from the calibration module the key ingredients to use `mitiq.calibrat
 
 Currently `mitiq.calibration` supports ZNE as a technique to calibrate from, tuning different scale factors, extrapolation methods and circuit scaling methods.
 
-+++
-
 Let's run the calibration using an ad-hoc RBSettings and using the `log=True` option in order to print the list of experiments run.
-
-+++
 
 - benchmarks: Circuit type: "rb"
 - strategies: use various "zne" strategies, testing various "scale_noise" methods (such as `mitiq.zne.scaling.folding.fold_global` and `mitiq.zne.scaling.folding.fold_gates_at_random`), and ZNE factories for extrapolation (such as `mitiq.zne.inference.RichardsonFactory` and `mitiq.zne.inference.LinearFactory`)
 
 ```{code-cell} ipython3
+from mitiq.zne.inference import LinearFactory, RichardsonFactory
+from mitiq.zne.scaling import (
+    fold_gates_at_random,
+    fold_global,
+)
+
 RBSettings = Settings(
     benchmarks=[
         {
@@ -179,7 +171,7 @@ RBSettings = Settings(
 ```
 
 ```{code-cell} ipython3
-cal = Calibrator(execute_calibration, RBSettings, frontend="qiskit")
+cal = Calibrator(execute_calibration, frontend="qiskit", settings=RBSettings)
 cal.run(log=True)
 ```
 
@@ -194,8 +186,4 @@ print("ideal = \t \t",ideal)
 print("unmitigated = \t \t",unmitigated)
 print("mitigated = \t \t",mitigated)
 print("calibrated_mitigated = \t",calibrated_mitigated)
-```
-
-```{code-cell} ipython3
-
 ```

@@ -28,6 +28,7 @@ from mitiq import (
 )
 from mitiq.calibration.settings import (
     Settings,
+    ZNESettings,
     Strategy,
     BenchmarkProblem,
 )
@@ -134,8 +135,9 @@ class Calibrator:
     def __init__(
         self,
         executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
-        settings: Settings,
+        *,
         frontend: str,
+        settings: Settings = ZNESettings,
         ideal_executor: Union[
             Executor, Callable[[QPROGRAM], QuantumResult], None
         ] = None,
@@ -246,6 +248,17 @@ class Calibrator:
 
         strategy_id = self.results.best_strategy_id()
         return self.settings.get_strategy(strategy_id)
+
+    def execute_with_mitigation(
+        self,
+        circuit: QPROGRAM,
+        expval_executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
+        observable: Optional[Observable] = None,
+    ) -> Union[QuantumResult, None]:
+        """See :func:`execute_with_mitigation` for signature and details."""
+        return execute_with_mitigation(
+            circuit, expval_executor, observable, calibrator=self
+        )
 
 
 def convert_to_expval_executor(executor: Executor, bitstring: str) -> Executor:

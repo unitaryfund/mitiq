@@ -37,5 +37,13 @@ from mitiq._version import __version__
 # Error mitigation modules.
 from mitiq import cdr, pec, rem, zne, ddd
 
+# Calibration
+from mitiq.calibration import (
+    Calibrator,
+    execute_with_mitigation,
+    ZNESettings,
+    Settings,
+)
+
 # Parallel interface for no error mitigation (for examples/benchmarking).
 from mitiq import raw
