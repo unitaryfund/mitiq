@@ -45,20 +45,21 @@ def test_layer_folding():
         for i2 in range(total_folds):
             for i3 in range(total_folds):
                 layers_to_fold = [i1, i2, i3]
-                    
+
                 folded_circuit = layer_folding(circ, layers_to_fold)
 
-                # For a given layer, the number of copies on a layer will be 
+                # For a given layer, the number of copies on a layer will be
                 # 2n + 1 where "n" is the number of folds to perform.
                 qreg = LineQubit.range(3)
                 correct = Circuit(
                     # Layer-1
-                    [ops.H.on_each(*qreg)] * (2*(layers_to_fold[0]) + 1),
+                    [ops.H.on_each(*qreg)] * (2 * (layers_to_fold[0]) + 1),
                     # Layer-2
-                    [ops.CNOT.on(qreg[0], qreg[1])] * (2*(layers_to_fold[1]) + 1),
-                    [ops.X.on(qreg[2])] * (2*(layers_to_fold[1]) + 1),
+                    [ops.CNOT.on(qreg[0], qreg[1])]
+                    * (2 * (layers_to_fold[1]) + 1),
+                    [ops.X.on(qreg[2])] * (2 * (layers_to_fold[1]) + 1),
                     # Layer-3
-                    [ops.TOFFOLI.on(*qreg)] * (2*(layers_to_fold[2]) + 1),
+                    [ops.TOFFOLI.on(*qreg)] * (2 * (layers_to_fold[2]) + 1),
                 )
                 assert folded_circuit == correct
 
@@ -75,16 +76,20 @@ def test_layer_folding_all(layers_to_fold):
         [ops.CNOT(q0, q1)],
     )
 
-    circuit_folded = layer_folding_all(circuit=circuit, layers_to_fold=layers_to_fold)
-    
-    # First element of list should consist of circuit with only first layer folded.
+    circuit_folded = layer_folding_all(
+        circuit=circuit, layers_to_fold=layers_to_fold
+    )
+
+    # First element of list should consist of circuit with only first layer
+    # folded.
     expected_circuit_folded_1 = Circuit(
         [ops.H(q0)] * (2 * layers_to_fold + 1),
         [ops.CNOT(q0, q1)],
     )
     assert circuit_folded[0] == expected_circuit_folded_1
 
-    # Second element of list should consist of circuit with only second layer folded.
+    # Second element of list should consist of circuit with only second layer
+    # folded.
     expected_circuit_folded_2 = Circuit(
         [ops.H(q0)] * (2 * layers_to_fold + 1),
         [ops.CNOT(q0, q1)],
