@@ -18,9 +18,7 @@ from typing import List
 from cirq import Circuit, inverse, Moment
 
 
-def layer_folding(
-    circuit: Circuit, layers_to_fold: List[int]
-) -> Circuit:
+def layer_folding(circuit: Circuit, layers_to_fold: List[int]) -> Circuit:
     """Applies a variable amount of folding to select layers of a circuit.
 
     Args:
