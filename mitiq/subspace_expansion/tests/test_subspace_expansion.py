@@ -21,23 +21,23 @@ from typing import List
 import numpy as np
 
 import cirq
-from cirq import X, Y, Z, I
+from cirq import X, Z, I
 
 from mitiq import PauliString, Observable, QPROGRAM
-from mitiq._typing import SUPPORTED_PROGRAM_TYPES
+
+from mitiq import SUPPORTED_PROGRAM_TYPES
 
 from mitiq.subspace_expansion import (
     execute_with_subspace_expansion,
 )
 from mitiq.subspace_expansion.utils import (
-    convert_from_cirq_PauliString_to_Mitiq_PauliString,
-    convert_from_Mitiq_Observable_to_cirq_PauliSum,
     convert_from_cirq_PauliSum_to_Mitiq_Observable,
 )
 
 from mitiq.interface import convert_from_mitiq, convert_to_mitiq
 
 from mitiq.interface.mitiq_cirq import compute_density_matrix
+
 
 # Allow execution with any QPROGRAM for testing.
 def execute(circuit: QPROGRAM) -> np.ndarray:
@@ -54,20 +54,29 @@ def simulate(circuit: QPROGRAM) -> np.ndarray:
     )
 
 
-def test_execute_with_cdr():
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_execute_with_subspace_expansion(circuit_type):
     qc, actual_qubits = prepare_logical_0_state_for_5_1_3_code()
-    Ms, Hc = get_Ms_and_Hc()
+    qc = convert_from_mitiq(qc, circuit_type)
+    (
+        check_operators,
+        code_hamiltonian,
+    ) = get_check_operators_and_code_hamiltonian()
     observable = convert_from_cirq_PauliSum_to_Mitiq_Observable(
         get_observable_cirq_in_code_space(actual_qubits, [Z, Z, Z, Z, Z])
     )
-    a = execute_with_subspace_expansion(qc, execute, Ms, Hc, observable)
-    assert abs(a.real - 1) < 0.001
+    mitigated_value = execute_with_subspace_expansion(
+        qc, execute, check_operators, code_hamiltonian, observable
+    )
+    assert abs(mitigated_value.real - 1) < 0.001
 
     observable = convert_from_cirq_PauliSum_to_Mitiq_Observable(
         get_observable_cirq_in_code_space(actual_qubits, [X, X, X, X, X])
     )
-    a = execute_with_subspace_expansion(qc, execute, Ms, Hc, observable)
-    assert abs(a.real - 0.5) < 0.001
+    mitigated_value = execute_with_subspace_expansion(
+        qc, execute, check_operators, code_hamiltonian, observable
+    )
+    assert abs(mitigated_value.real - 0.5) < 0.001
 
 
 def get_observable_cirq_in_code_space(
@@ -91,7 +100,7 @@ def get_observable_cirq_in_code_space(
     return observable_in_code_space
 
 
-def get_Ms_and_Hc() -> tuple:
+def get_check_operators_and_code_hamiltonian() -> tuple:
     Ms = [
         "YIYXX",
         "ZIZYY",
@@ -122,13 +131,14 @@ def get_Ms_and_Hc() -> tuple:
 
 def prepare_logical_0_state_for_5_1_3_code():
     def gram_schmidt(
-        vecs,
-    ):  # input a list of orthogonal vectors, use Gram-Schmidt to generate the rest
+        orthogonal_vecs: List[np.ndarray],
+    ):
+        # normalize input
         orthonormalVecs = [
-            vec / np.sqrt(np.vdot(vec, vec)) for vec in vecs
-        ]  # normalize input
-        dim = np.shape(vecs[0])[0]  # get dim of vector space
-        for i in range(dim - len(vecs)):
+            vec / np.sqrt(np.vdot(vec, vec)) for vec in orthogonal_vecs
+        ]
+        dim = np.shape(orthogonal_vecs[0])[0]  # get dim of vector space
+        for i in range(dim - len(orthogonal_vecs)):
             new_vec = np.zeros(dim)
             new_vec[i] = 1  # construct ith basis vector
             projs = sum(
@@ -143,9 +153,9 @@ def prepare_logical_0_state_for_5_1_3_code():
             )
         return orthonormalVecs
 
-    v0 = np.zeros(32)
+    logical_0_state = np.zeros(32)
     for z in ["00000", "10010", "01001", "10100", "01010", "00101"]:
-        v0[int(z, 2)] = 1 / 4
+        logical_0_state[int(z, 2)] = 1 / 4
     for z in [
         "11011",
         "00110",
@@ -158,11 +168,11 @@ def prepare_logical_0_state_for_5_1_3_code():
         "01100",
         "10111",
     ]:
-        v0[int(z, 2)] = -1 / 4
+        logical_0_state[int(z, 2)] = -1 / 4
 
-    v1 = np.zeros(32)
+    logical_1_state = np.zeros(32)
     for z in ["11111", "01101", "10110", "01011", "10101", "11010"]:
-        v1[int(z, 2)] = 1 / 4
+        logical_1_state[int(z, 2)] = 1 / 4
     for z in [
         "00100",
         "11001",
@@ -175,9 +185,10 @@ def prepare_logical_0_state_for_5_1_3_code():
         "10011",
         "01000",
     ]:
-        v1[int(z, 2)] = -1 / 4
+        logical_1_state[int(z, 2)] = -1 / 4
 
-    res = gram_schmidt([v0, v1])
+    # Fill up the rest of the matrix with orthonormal vectors
+    res = gram_schmidt([logical_0_state, logical_1_state])
     mat = np.reshape(res, (32, 32)).T
     circuit = cirq.Circuit()
     g = cirq.MatrixGate(mat)

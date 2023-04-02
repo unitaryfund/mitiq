@@ -13,9 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Clifford data regression method for error mitigation as introduced in:...
-.......
-....
+"""Subspace Expansion method for error mitigation as introduced in:
+
+[1] McClean, J.R., Jiang, Z., Rubin, N.C., Babbush, R. and Neven, H., 2020.
+    "Decoding quantum errors with subspace expansions". 
+    (https://arxiv.org/abs/1903.05786)
+[2] Yoshioka, N., Hakoshima, H., Matsuzaki, Y., Tokunaga, Y., Suzuki, Y. and Endo, S., 2022.
+    "Generalized quantum subspace expansion".
+    (https://arxiv.org/abs/2107.02611)
 
 """
 
