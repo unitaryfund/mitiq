@@ -1,6 +1,34 @@
 # Changelog
 
-## Version 0.25.0 (In development)
+## Version 0.26.0 (In development)
+
+## Version 0.25.0
+
+### Summary
+
+Highlights from this release include a bug fixed in DDD, extended documentation for identity insertion as a noise scaling technique, new results from testing DDD on IBMQ hardware, a new function `mitiq.benchmarks.w_state_circuits.generate_w_circuit` to generate W-state circuits, and a finalized calibration API.
+
+**Breaking Changes**: The `force_run_all` option for the [`evaluate`](https://mitiq.readthedocs.io/en/stable/apidoc.html#mitiq.executor.executor.Executor.evaluate) method defined on `Executor` objects now defaults to True.
+
+### All changes
+
+- Calibration API simplifications (#1763) [@natestemen]
+- W state Benchmarking Circuit (#1723) [@purva-thakre]
+- Consider id as slack in ddd circuit mask (#1744) [@Aaron-Robertson]
+- Remaining Stuff related to Identity Insertion Scaling in Docs (#1759) [@purva-thakre]
+- Add calibration tutorial (#1756) [@nathanshammah]
+- Set default force_run_all as True in PEC (#1755) [@andreamari]
+- Update amazon-braket-sdk requirement from ~=1.36.3 to ~=1.36.4 (#1765) [@dependabot]
+- Make the Calibrator multi-platform (#1748) [@andreamari]
+- Update amazon-braket-sdk requirement from ~=1.36.2 to ~=1.36.3 (#1761) [@dependabot]
+- Update DDD Qiskit tutorial with hardware experiments (#1751) [@Misty-W]
+- Bump pyscf from 2.1.1 to 2.2.0 (#1753) [@dependabot]
+- Update pyquil requirement from ~=3.3.3 to ~=3.3.4 (#1750) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.36.1 to ~=1.36.2 (#1749) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.35.5 to ~=1.36.1 (#1742) [@dependabot]
+- Fix DDD typo in README (#1743) [@natestemen]
+- Update pennylane requirement from ~=0.29.0 to ~=0.29.1 (#1741) [@dependabot]
+- Set `master` in dev mode (#1736) [@Misty-W]
 
 ## Version 0.24.0
 
