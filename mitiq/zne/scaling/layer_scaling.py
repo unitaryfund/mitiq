@@ -15,7 +15,8 @@
 
 """Functions for layer-wise unitary folding on supported circuits."""
 from typing import List
-from cirq import Circuit, inverse, Moment
+import cirq
+from cirq import inverse, Moment
 
 
 def layer_folding(circuit: Circuit, layers_to_fold: List[int]) -> Circuit:
