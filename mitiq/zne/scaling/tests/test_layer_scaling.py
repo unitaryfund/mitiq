@@ -64,8 +64,8 @@ def test_layer_folding():
                 assert folded_circuit == correct
 
 
-@pytest.mark.parametrize("layers_to_fold", range(5))
-def test_layer_folding_all(layers_to_fold):
+@pytest.mark.parametrize("num_folds", range(5))
+def test_layer_folding_all(num_folds):
     # Test circuit
     # 0: ───H───@───
     #           │
@@ -76,14 +76,12 @@ def test_layer_folding_all(layers_to_fold):
         [ops.CNOT(q0, q1)],
     )
 
-    circuit_folded = layer_folding_all(
-        circuit=circuit, layers_to_fold=layers_to_fold
-    )
+    circuit_folded = layer_folding_all(circuit=circuit, num_folds=num_folds)
 
     # First element of list should consist of circuit with only first layer
     # folded.
     expected_circuit_folded_1 = Circuit(
-        [ops.H(q0)] * (2 * layers_to_fold + 1),
+        [ops.H(q0)] * (2 * num_folds + 1),
         [ops.CNOT(q0, q1)],
     )
     assert circuit_folded[0] == expected_circuit_folded_1
@@ -92,6 +90,6 @@ def test_layer_folding_all(layers_to_fold):
     # folded.
     expected_circuit_folded_2 = Circuit(
         [ops.H(q0)],
-        [ops.CNOT(q0, q1)] * (2 * layers_to_fold + 1),
+        [ops.CNOT(q0, q1)] * (2 * num_folds + 1),
     )
     assert circuit_folded[1] == expected_circuit_folded_2

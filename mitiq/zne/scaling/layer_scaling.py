@@ -17,9 +17,13 @@
 from typing import List
 import cirq
 from cirq import inverse, Moment
+from mitiq.interface import noise_scaling_converter
 
 
-def layer_folding(circuit: Circuit, layers_to_fold: List[int]) -> Circuit:
+@noise_scaling_converter
+def layer_folding(
+    circuit: cirq.Circuit, layers_to_fold: List[int]
+) -> cirq.Circuit:
     """Applies a variable amount of folding to select layers of a circuit.
 
     Args:
@@ -42,15 +46,15 @@ def layer_folding(circuit: Circuit, layers_to_fold: List[int]) -> Circuit:
             layers.append(Moment(layer))
 
     # We combine each layer into a single circuit.
-    combined_circuit = Circuit()
+    combined_circuit = cirq.Circuit()
     for layer in layers:
-        combined_circuit.append(Circuit(layer))
+        combined_circuit.append(layer)
     return combined_circuit
 
 
 def layer_folding_all(
-    circuit: Circuit, num_folds: int = 1
-) -> List[Circuit]:
+    circuit: cirq.Circuit, num_folds: int = 1
+) -> List[cirq.Circuit]:
     """Return a list of cirq ``Circuit`` objects where the ith element in the
     list has the i^th layer inverted.
 
@@ -67,9 +71,7 @@ def layer_folding_all(
     return [
         layer_folding(
             circuit,
-            layers_to_fold=[0] * i
-            + [layers_to_fold]
-            + [0] * (len(circuit) - i),
+            layers_to_fold=[0] * i + [num_folds] + [0] * (len(circuit) - i),
         )
         for i in range(len(circuit))
     ]

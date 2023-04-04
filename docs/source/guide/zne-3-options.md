@@ -226,20 +226,20 @@ A quantum circuit $C$ may be represented as a series of $d$ layers. Each layer
 $L$ contains one or more quantum gates acting concurrently on an $n$-qubit
 system:
 
-$$C = L_d L_{d-1} \ldots L_2 L_1$$.
+$$C = L_d L_{d-1} \cdots L_2 L_1$$.
 
 The $i$-inverse operation of a circuit $C$ is defined as
 
-$$C^{(i)} = L_d \ldots L_{i+1} \left[L_i L_i^{-1} L_i\right] L_{i-1} \ldots L_1$$
+$$C^{(i)} = L_d \cdots L_{i+1} \left[L_i L_i^{-1} L_i\right] L_{i-1} \cdots L_1$$
 
 where we refer to $L_i$ as the *target layer* and $L_i^{-1}$ as the *inverse
-target layer*. The inverse target is composed of gates that would invert the
-gates in the target layer.
+target layer*. The inverse target layer is composed of gates that would invert
+the gates in the target layer.
 
 One can perform $m$ such inversions on a quantum circuit as well. A multiple
 $i$-inversion is defined as
 
-$$C^{(i)} = L_d \ldots L_{i+1} L_i \left[L_i^{-1} L_i\right]^m L_{i-1} \ldots L_1$$
+$$C^{(i)} = L_d \cdots L_{i+1} L_i \left[L_i^{-1} L_i\right]^m L_{i-1} \cdots L_1$$
 
 where we apply a given $i$-inversion $m$ times.
 
