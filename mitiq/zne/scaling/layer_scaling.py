@@ -49,7 +49,7 @@ def layer_folding(circuit: Circuit, layers_to_fold: List[int]) -> Circuit:
 
 
 def layer_folding_all(
-    circuit: Circuit, layers_to_fold: int = 1
+    circuit: Circuit, num_folds: int = 1
 ) -> List[Circuit]:
     """Return a list of cirq ``Circuit`` objects where the ith element in the
     list has the i^th layer inverted.
