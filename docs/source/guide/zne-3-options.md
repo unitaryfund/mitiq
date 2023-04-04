@@ -246,7 +246,7 @@ where we apply a given $i$-inversion $m$ times.
 For example, consider the following circuit
 
 ```{code-cell} ipython3
-from mitiq.zne.scaling import layer_folding
+from mitiq.zne.scaling.layer_scaling import layer_folding
 
 q0, q1 = cirq.LineQubit.range(2)
 circuit = cirq.Circuit(
