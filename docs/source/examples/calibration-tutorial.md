@@ -29,7 +29,7 @@ More specifically, this tutorial covers:
 ## Getting started with Mitiq
 
 ```{code-cell} ipython3
-from mitiq.benchmarks import generate_rb_circuits
+from mitiq.benchmarks import generate_rb_circuits, generate_ghz_circuit
 from mitiq.zne import execute_with_zne
 from mitiq import (
     Calibrator,
@@ -48,9 +48,9 @@ from qiskit.providers.fake_provider import FakeJakarta  # Fake (simulated) QPU
 Define global variables for the quantum circuit of interest: number of qubits, depth of the quantum circuit and number of shots.
 
 ```{code-cell} ipython3
-n_qubits = 2
-depth_circuit = 20
-shots = 10 ** 3
+n_qubits = 20
+depth_circuit = 100
+shots = 10 ** 4
 ```
 
 #### Quantum circuit: Randomized benchmarking (RB)
@@ -58,7 +58,7 @@ shots = 10 ** 3
 We now use Mitiq's built-in `generate_rb_circuits` from the `mitiq.benchmarks` module to define the quantum circuit.
 
 ```{code-cell} ipython3
-circuit = generate_rb_circuits(n_qubits, depth_circuit,return_type="qiskit")[0]
+circuit = generate_ghz_circuit(n_qubits, return_type="qiskit")
 circuit.measure_all()
 print(len(circuit))
 print(circuit)
@@ -79,7 +79,7 @@ def execute_circuit(circuit):
 ```{code-cell} ipython3
 mitigated = execute_with_zne(circuit, execute_circuit)
 unmitigated = execute_circuit(circuit)
-ideal = 1 #property of RB circuits
+ideal = 0.5 #property of GHZ circuits
 
 print("ideal = \t \t",ideal)
 print("unmitigated = \t \t",unmitigated)
@@ -117,12 +117,13 @@ from mitiq.zne.scaling import (
     fold_global,
 )
 
-RBSettings = Settings(
+test_qubits = n_qubits // 2
+
+GHZSettings = Settings(
     benchmarks=[
         {
-            "circuit_type": "rb",
-            "num_qubits": n_qubits,
-            "circuit_depth": depth_circuit,
+            "circuit_type": "ghz",
+            "num_qubits": test_qubits,
         },
     ],
     strategies=[
@@ -171,7 +172,7 @@ RBSettings = Settings(
 ```
 
 ```{code-cell} ipython3
-cal = Calibrator(execute_calibration, frontend="qiskit", settings=RBSettings)
+cal = Calibrator(execute_calibration, frontend="qiskit", settings=GHZSettings)
 cal.run(log=True)
 ```
 
@@ -187,3 +188,11 @@ print("unmitigated = \t \t",unmitigated)
 print("mitigated = \t \t",mitigated)
 print("calibrated_mitigated = \t",calibrated_mitigated)
 ```
+
+1. Make sure `Settings` object has the default `ZNE Settings`. Still some randomness -> yes
+2. Try different folding technique 
+3. Try identity insertion - need to implement identity insertion settings
+4. Modify noise model that the default is bad
+5. Modify  number of shots - make results more deterministic
+6. Add seeds
+7. Exponential extrapolation
