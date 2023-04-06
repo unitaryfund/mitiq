@@ -39,7 +39,8 @@ def generate_qpe_circuit(
     """
     if evalue_reg <= 0:
         raise ValueError(
-            f"Arg `evalue_reg` must be positive but was {evalue_reg}."
+            "{} is invalid for the number of eigenvalue register qubits. ",
+            evalue_reg,
         )
     num_qubits_for_gate = input_gate.num_qubits()
     if num_qubits_for_gate > 1:
@@ -47,9 +48,9 @@ def generate_qpe_circuit(
             "This QPE circuit generation method only works for 1-qubit gates."
         )
 
-    if evalue_reg < num_qubits_for_gate:
+    if evalue_reg == num_qubits_for_gate:
         raise ValueError(
-            "The eigenvalue register must be larger than the eigenstate reg."
+            "The eigenvalue register must be larger than the eigenstate register."
         )
 
     total_num_qubits = evalue_reg + num_qubits_for_gate
