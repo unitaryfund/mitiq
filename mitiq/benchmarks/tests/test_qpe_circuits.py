@@ -56,7 +56,7 @@ def test_conversion(return_type):
     assert return_type in circuit.__module__
 
 
-def test_QPE_PauliX():
+def test_circuit_PauliX():
     generated_circuit = generate_qpe_circuit(3, cirq.X)
     qubits = cirq.LineQubit.range(3 + 1)
     expected_circuit = cirq.Circuit(
@@ -108,12 +108,8 @@ def test_QPE_PauliX():
     )
     assert _equal(generated_circuit, expected_circuit)
 
-    # initialize the state to +
 
-    # initialize the state to -
-
-
-def test_QPE_TGate():
+def test_circuit_QPE_TGate():
     generated_circuit = generate_qpe_circuit(3, cirq.T)
     qubits = cirq.LineQubit.range(3 + 1)
     expected_circuit = cirq.Circuit(
@@ -165,4 +161,44 @@ def test_QPE_TGate():
     )
     assert _equal(generated_circuit, expected_circuit)
 
-    # initialize the state to 1
+
+def test_phase_angle_estimation():
+    def _binary_to_int(input_array):
+        result_string = ""
+        for i in range(len(input_array)):
+            result_string += str(input_array[i])
+            result = int(result_string, 2)
+        return result
+
+    n_eigstate_reg = 3
+    # initialize the eigenstate reg to |+> by using H after Pauli X Gate
+    # + add measurements on ereg register
+    # expect eigenvalue to be +1
+    qubits = cirq.LineQubit.range(n_eigstate_reg + 1)
+    PauliX_on_0_qft_circuit = (
+        cirq.Circuit(cirq.H(qubits[3]))
+        + generate_qpe_circuit(3, cirq.X)
+        + cirq.measure(qubits[0:3])
+    )
+    simulator = cirq.Simulator()
+    result1 = simulator.run(PauliX_on_0_qft_circuit)
+    result_array1 = result1.records["q(0),q(1),q(2)"]
+    result1 = _binary_to_int(result_array1[0][0])
+    calculated_angle = result1 / 2**n_eigstate_reg
+    assert calculated_angle == 0
+
+    # initialize the eigenstate reg to |-> by using X and H after Pauli X Gate
+    # + add measurements on ereg register
+    # expect eigenvalue to be -1 (ignoring complex i)
+    qubits = cirq.LineQubit.range(n_eigstate_reg + 1)
+    PauliX_on_1_qft_circuit = (
+        cirq.Circuit(cirq.X(qubits[3]), cirq.H(qubits[3]))
+        + generate_qpe_circuit(3, cirq.X)
+        + cirq.measure(qubits[0:3])
+    )
+    simulator = cirq.Simulator()
+    result2 = simulator.run(PauliX_on_1_qft_circuit)
+    result_array2 = result2.records["q(0),q(1),q(2)"]
+    result2 = _binary_to_int(result_array2[0][0])
+    calculated_angle = result2 / 2**n_eigstate_reg
+    assert calculated_angle == 0.75

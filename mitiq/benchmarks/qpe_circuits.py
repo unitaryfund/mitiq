@@ -61,6 +61,7 @@ def generate_qpe_circuit(
     for i in range(evalue_reg):
         hadamard_circuit.append(cirq.H(qreg[i]))
     circuit = circuit + hadamard_circuit
+
     for i in range(total_num_qubits - 1)[::-1]:
         circuit.append(
             [input_gate(qreg[-1]).controlled_by(qreg[i])]
