@@ -39,18 +39,16 @@ def generate_qpe_circuit(
     """
     if evalue_reg <= 0:
         raise ValueError(
-            "{} is invalid for the number of eigenvalue register qubits. ",
+            "{} is invalid for the number of eigenvalue reg qubits. ",
             evalue_reg,
         )
     num_qubits_for_gate = input_gate.num_qubits()
     if num_qubits_for_gate > 1:
-        raise ValueError(
-            "This QPE circuit generation method only works for 1-qubit gates."
-        )
+        raise ValueError("This QPE method only works for 1-qubit gates.")
 
     if evalue_reg == num_qubits_for_gate:
         raise ValueError(
-            "The eigenvalue register must be larger than the eigenstate register."
+            "The eigenvalue reg must be larger than the eigenstate reg."
         )
 
     total_num_qubits = evalue_reg + num_qubits_for_gate
@@ -59,8 +57,10 @@ def generate_qpe_circuit(
 
     # QFT circuit
     # apply hadamard and controlled unitary to the qubits in the eigenvalue reg
+    hadamard_circuit = cirq.Circuit()
     for i in range(evalue_reg):
-        circuit.append(cirq.H(qreg[i]))
+        hadamard_circuit.append(cirq.H(qreg[i]))
+    circuit = circuit + hadamard_circuit
     for i in range(total_num_qubits - 1)[::-1]:
         circuit.append(
             [input_gate(qreg[-1]).controlled_by(qreg[i])]
@@ -74,11 +74,8 @@ def generate_qpe_circuit(
             cirq.SWAP(qreg[i], qreg[evalue_reg - 1 - i]),
             strategy=cirq.InsertStrategy.NEW,
         )
-    # apply inverse of hadamard and controlled unitary
-    for i in range(evalue_reg):
-        circuit.append(
-            cirq.H(qreg[i]), strategy=cirq.InsertStrategy.NEW_THEN_INLINE
-        )
+    # apply inverse of hadamard followed by controlled unitary
+    circuit = circuit + hadamard_circuit
     for i in range(1, evalue_reg):
         for j in range(evalue_reg):
             if j < i:
