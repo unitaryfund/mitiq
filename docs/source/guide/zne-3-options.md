@@ -218,19 +218,19 @@ folding method. Fidelity values must be between zero and one.
 
 #### Folding gates by layer
 
-Circuit debugging techniques (as proposed in
-[arXiv:2204.06056](https://arxiv.org/abs/2204.06056)) utilize the ability to
-apply layerwise folding of a circuit.
+Circuit debugging techniques, as proposed in
+*Calderon et al. Quantum (2023)* {cite}`Calderon_2023_Quantum`, utilize the
+ability to apply layerwise folding of a circuit.
 
-A quantum circuit $C$ may be represented as a series of $d$ layers. Each layer
-$L$ contains one or more quantum gates acting concurrently on an $n$-qubit
+A quantum circuit $C$ may be represented as a series of $d$ layers. Each layer $L$
+contains one or more quantum gates acting concurrently on an $n$-qubit
 system:
 
 $$C = L_d L_{d-1} \cdots L_2 L_1$$.
 
 The $i$-inverse operation of a circuit $C$ is defined as
 
-$$C^{(i)} = L_d \cdots L_{i+1} \left[L_i L_i^{-1} L_i\right] L_{i-1} \cdots L_1$$
+$$C^{(i)} = L_d \cdots L_{i+1} [L_i L_i^{-1} L_i] L_{i-1} \cdots L_1$$
 
 where we refer to $L_i$ as the *target layer* and $L_i^{-1}$ as the *inverse
 target layer*. The inverse target layer is composed of gates that would invert
