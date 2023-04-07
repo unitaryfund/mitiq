@@ -250,6 +250,12 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 
+### Noise Scaling: Layerwise Folding
+```{eval-rst}
+.. automodule:: mitiq.zne.scaling.layer_scaling
+   :members:
+```
+
 ### Noise Scaling: Parameter Calibration
 ```{eval-rst}
 .. automodule:: mitiq.zne.scaling.parameter
