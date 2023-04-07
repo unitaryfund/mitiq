@@ -133,4 +133,4 @@ def test_bad_layers_to_fold():
         ValueError,
         match="Length of `layers_to_fold` must be equal to length of circuit.",
     ):
-        layer_folding(circuit, [1] * len(circuit) + 1)
+        layer_folding(circuit, [1] * (len(circuit) + 1))

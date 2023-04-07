@@ -77,10 +77,9 @@ def layer_folding_all(
         A cirq ``Circuit`` with layers and number of times to fold specified by
         ``layers_to_invert``.
     """
-    return [
-        layer_folding(
-            circuit,
-            layers_to_fold=[0] * i + [num_folds] + [0] * (len(circuit) - i),
-        )
-        for i in range(len(circuit))
-    ]
+    circuits = []
+    for i in range(len(circuit)):
+        layers_to_fold = [0] * len(circuit)
+        layers_to_fold[i] = num_folds
+        circuits.append(layer_folding(circuit, layers_to_fold))
+    return circuits
