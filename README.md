@@ -130,8 +130,8 @@ guidelines](https://mitiq.readthedocs.io/en/stable/toc_contributing.html) and/or
 
 ## Contributors ✨
 
-A list of the wonderful people that have made this project possible is available [here](https://github.com/unitaryfund/mitiq/graphs/contributors).
-Non-code contributors are also much appreciated.
+Thank you to all of the [wonderful people](https://github.com/unitaryfund/mitiq/graphs/contributors) that have made this project possible.
+Non-code contributors are also much appreciated, and are listed here.
 Thank you to
 
 - [@francespoblete](https://github.com/francespoblete) for much of Mitiq's design work/vision
