@@ -259,7 +259,7 @@ print(circuit)
 This circuit consists of two layers (the first layer has a Hadamard gate and the
 second layer has a CNOT gate).
 
-We can make use of the `layer_folding` function where the argument
+We can make use of the {func}`.layer_folding()` function where the argument
 `layers_to_fold` is a list of size $d$ where each element in the list is an
 integer that refers to the number of times to fold the layer at index `i`.
 
