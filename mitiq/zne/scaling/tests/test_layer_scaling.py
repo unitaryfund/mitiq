@@ -19,8 +19,36 @@ from cirq import (
     Circuit,
     LineQubit,
     ops,
+    synchronize_terminal_measurements,
 )
 from mitiq.zne.scaling.layer_scaling import layer_folding, layer_folding_all
+
+
+def test_layer_folding_with_measurements():
+    # Test circuit
+    # 0: ───H───M───────
+    #
+    # 1: ───H───@───M───
+    #           │
+    # 2: ───────X───M───
+    q = LineQubit.range(3)
+    circuit = Circuit(
+        ops.H(q[0]),
+        ops.H(q[1]),
+        ops.CNOT(*q[1:]),
+        ops.measure_each(*q),
+    )
+    folded_circuit = layer_folding(circuit, [1] * len(circuit))
+
+    expected_folded_circuit = Circuit(
+        [ops.H(q[1])] * 3,
+        [ops.CNOT(*q[1:])] * 3,
+        ops.measure_each(*q),
+    )
+    expected_folded_circuit = synchronize_terminal_measurements(
+        expected_folded_circuit
+    )
+    assert folded_circuit == expected_folded_circuit
 
 
 def test_layer_folding():
@@ -93,3 +121,16 @@ def test_layer_folding_all(num_folds):
         [ops.CNOT(q0, q1)] * (2 * num_folds + 1),
     )
     assert circuit_folded[1] == expected_circuit_folded_2
+
+
+def test_bad_layers_to_fold():
+    q0, q1 = LineQubit.range(2)
+    circuit = Circuit(
+        [ops.H(q0)],
+        [ops.CNOT(q0, q1)],
+    )
+    with pytest.raises(
+        ValueError,
+        match="Length of `layers_to_fold` must be equal to length of circuit.",
+    ):
+        layer_folding(circuit, [1] * len(circuit) + 1)

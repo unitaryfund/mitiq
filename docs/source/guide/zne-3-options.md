@@ -227,8 +227,8 @@ contains one or more quantum gates acting concurrently on an $n$-qubit
 system:
 
 $$
-C = L_d L_{d-1} \cdots L_2 L_1
-$$.
+C = L_d L_{d-1} \cdots L_2 L_1.
+$$
 
 The $i$-inverse operation of a circuit $C$ is defined as
 

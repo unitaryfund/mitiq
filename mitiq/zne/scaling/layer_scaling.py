@@ -36,14 +36,23 @@ def layer_folding(
         A cirq ``Circuit`` with layers and number of times to fold specified
         by ``layers_to_invert``.
     """
+    circuit = cirq.synchronize_terminal_measurements(circuit)
     layers = []
+
+    if len(layers_to_fold) != len(circuit):
+        raise ValueError(
+            "Length of `layers_to_fold` must be equal to length of circuit."
+        )
+
     for i, layer in enumerate(circuit):
         layers.append(layer)
         # Apply the requisite number of folds to each layer.
         num_fold = layers_to_fold[i]
         for _ in range(num_fold):
-            layers.append(Moment(inverse(layer)))
-            layers.append(Moment(layer))
+            # We only fold the layer if it does not contain a measurement.
+            if not cirq.is_measurement(layer):
+                layers.append(Moment(inverse(layer)))
+                layers.append(Moment(layer))
 
     # We combine each layer into a single circuit.
     combined_circuit = cirq.Circuit()
