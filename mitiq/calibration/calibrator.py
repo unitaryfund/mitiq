@@ -252,16 +252,23 @@ class Calibrator:
     def execute_with_mitigation(
         self,
         circuit: QPROGRAM,
-        expval_executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
+        expval_executor: Optional[
+            Union[Executor, Callable[[QPROGRAM], QuantumResult]]
+        ] = None,
         observable: Optional[Observable] = None,
     ) -> Union[QuantumResult, None]:
         """See :func:`execute_with_mitigation` for signature and details."""
+        expval_executor = expval_executor or convert_to_expval_executor(
+            self.cirq_executor
+        )
         return execute_with_mitigation(
             circuit, expval_executor, observable, calibrator=self
         )
 
 
-def convert_to_expval_executor(executor: Executor, bitstring: str) -> Executor:
+def convert_to_expval_executor(
+    executor: Executor, bitstring: Optional[str] = None
+) -> Executor:
     """Constructs a new executor returning an expectation value given by the
     probability that the circuit outputs the most likely state according to the
     ideal distribution.
@@ -269,17 +276,26 @@ def convert_to_expval_executor(executor: Executor, bitstring: str) -> Executor:
     Args:
         executor: Executor which returns a :class:`.MeasurementResult`
             (bitstrings).
-        bitstring: The bitstring to measure the probability of.
+        bitstring: The bitstring to measure the probability of. Defaults to
+            ground state bitstring "00...0".
 
     Returns:
         A tuple containing an executor returning expectation values and,
         the most likely bitstring, according to the passed ``distribution``
     """
 
-    def expval_executor(circuit: QPROGRAM) -> float:
-        raw = cast(MeasurementResult, executor.run([circuit])[0])
+    def expval_executor(circuit: cirq.Circuit) -> float:
+        circuit_with_meas = circuit.copy()
+        if not cirq.is_measurement(circuit_with_meas):
+            circuit_with_meas.append(
+                cirq.measure(circuit_with_meas.all_qubits())
+            )
+        raw = cast(MeasurementResult, executor.run([circuit_with_meas])[0])
         distribution = raw.prob_distribution()
-        return distribution.get(bitstring, 0.0)
+        bitstring_to_get = bitstring or "0" * len(
+            circuit_with_meas.all_qubits()
+        )
+        return distribution.get(bitstring_to_get, 0.0)
 
     return Executor(expval_executor)  # type: ignore [arg-type]
 
