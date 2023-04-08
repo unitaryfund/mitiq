@@ -41,6 +41,7 @@ def test_layer_folding_with_measurements():
     folded_circuit = layer_folding(circuit, [1] * len(circuit))
 
     expected_folded_circuit = Circuit(
+        [ops.H(q[0])] * 3,
         [ops.H(q[1])] * 3,
         [ops.CNOT(*q[1:])] * 3,
         ops.measure_each(*q),
