@@ -167,11 +167,10 @@ def test_phase_angle_estimation():
         result_string = ""
         for i in range(len(input_array)):
             result_string += str(input_array[i])
-            result = int(result_string, 2)
-        return result
+        return int(result_string, 2)
 
     n_eigstate_reg = 3
-    # initialize the eigenstate reg to |+> by using H after Pauli X Gate
+    # initialize the eigenstate reg to |+> by using H
     # + add measurements on ereg register
     # expect eigenvalue to be +1
     qubits = cirq.LineQubit.range(n_eigstate_reg + 1)

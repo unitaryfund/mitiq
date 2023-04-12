@@ -25,14 +25,16 @@ def generate_qpe_circuit(
     input_gate: cirq.Gate,
     return_type: Optional[str] = None,
 ) -> QPROGRAM:
-    """Returns a circuit to create a Quantum Phase Estimation circuit as
+    """Returns a circuit to create a quantum phase estimation (QPE) circuit as
     defined in https://en.wikipedia.org/wiki/Quantum_phase_estimation_algorithm
-
+    
+    The unitary to estimate the phase of corresponds to a
+    single-qubit gate (``input_gate``).
     The IQFT circuit defined in this method is taken from taken from Sec 7.7.4
     of :cite:`Wong_2022`.
     Args:
         evalue_reg : Number of qubits in the eigenvalue register
-        input_gate: A quantum gate
+        input_gate: The unitary to estimate the phase of as a single-qubit Cirq gate.
         return_type: Return type of the output circuit.
     Returns:
         A Quantum Phase Estimation circuit.
