@@ -22,19 +22,24 @@ from mitiq.interface import convert_from_mitiq
 
 def generate_qpe_circuit(
     evalue_reg: int,
-    input_gate: cirq.Gate,
+    input_gate: cirq.Gate = cirq.T,
     return_type: Optional[str] = None,
 ) -> QPROGRAM:
     """Returns a circuit to create a quantum phase estimation (QPE) circuit as
     defined in https://en.wikipedia.org/wiki/Quantum_phase_estimation_algorithm
-    
+
     The unitary to estimate the phase of corresponds to a
     single-qubit gate (``input_gate``).
+
     The IQFT circuit defined in this method is taken from taken from Sec 7.7.4
-    of :cite:`Wong_2022`.
+    of :cite:`Wong_2022`. The notation for eigenvalue register and eigenstate
+    register used to define this function also follows from :cite:`Wong_2022`.
+
     Args:
-        evalue_reg : Number of qubits in the eigenvalue register
-        input_gate: The unitary to estimate the phase of as a single-qubit Cirq gate.
+        evalue_reg : Number of qubits in the eigenvalue register. The qubits
+            in this variable are used to estimate the phase.
+        input_gate: The unitary to estimate the phase of as a single-qubit
+            Cirq gate. Default gate used here is `cirq.T`.
         return_type: Return type of the output circuit.
     Returns:
         A Quantum Phase Estimation circuit.
@@ -78,7 +83,7 @@ def generate_qpe_circuit(
             strategy=cirq.InsertStrategy.NEW,
         )
     # apply inverse of hadamard followed by controlled unitary
-    circuit = circuit + hadamard_circuit
+    circuit.append(cirq.H(qreg[0]), strategy=cirq.InsertStrategy.NEW)
     for i in range(1, evalue_reg):
         for j in range(evalue_reg):
             if j < i:
@@ -86,6 +91,10 @@ def generate_qpe_circuit(
                     cirq.inverse(input_gate(qreg[i]).controlled_by(qreg[j])),
                     strategy=cirq.InsertStrategy.NEW,
                 )
+        circuit.append(
+            cirq.H(qreg[i]),
+            strategy=cirq.InsertStrategy.NEW,
+        )
     return_type = "cirq" if not return_type else return_type
 
     return convert_from_mitiq(circuit, return_type)

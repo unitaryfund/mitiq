@@ -92,17 +92,21 @@ def test_circuit_PauliX():
             ),
             cirq.Moment(
                 cirq.H(qubits[0]),
-                cirq.H(qubits[1]),
-                cirq.H(qubits[2]),
             ),
             cirq.Moment(
                 (cirq.CNOT**-1.0).on(qubits[0], qubits[1]),
+            ),
+            cirq.Moment(
+                cirq.H(qubits[1]),
             ),
             cirq.Moment(
                 (cirq.CNOT**-1.0).on(qubits[0], qubits[2]),
             ),
             cirq.Moment(
                 (cirq.CNOT**-1.0).on(qubits[1], qubits[2]),
+            ),
+            cirq.Moment(
+                cirq.H(qubits[2]),
             ),
         ]
     )
@@ -145,11 +149,12 @@ def test_circuit_QPE_TGate():
             ),
             cirq.Moment(
                 cirq.H(qubits[0]),
-                cirq.H(qubits[1]),
-                cirq.H(qubits[2]),
             ),
             cirq.Moment(
                 (cirq.CZ**-0.25).on(qubits[0], qubits[1]),
+            ),
+            cirq.Moment(
+                cirq.H(qubits[1]),
             ),
             cirq.Moment(
                 (cirq.CZ**-0.25).on(qubits[0], qubits[2]),
@@ -157,9 +162,15 @@ def test_circuit_QPE_TGate():
             cirq.Moment(
                 (cirq.CZ**-0.25).on(qubits[1], qubits[2]),
             ),
+            cirq.Moment(
+                cirq.H(qubits[2]),
+            ),
         ]
     )
     assert _equal(generated_circuit, expected_circuit)
+
+    generated_circuit_check_default_option = generate_qpe_circuit(3)
+    assert _equal(generated_circuit_check_default_option, expected_circuit)
 
 
 def test_phase_angle_estimation():
@@ -183,12 +194,12 @@ def test_phase_angle_estimation():
     result1 = simulator.run(PauliX_on_0_qft_circuit)
     result_array1 = result1.records["q(0),q(1),q(2)"]
     result1 = _binary_to_int(result_array1[0][0])
-    calculated_angle = result1 / 2**n_eigstate_reg
-    assert calculated_angle == 0
+    calculated_constant = result1 / 2**n_eigstate_reg
+    assert calculated_constant == 0
 
     # initialize the eigenstate reg to |-> by using X and H after Pauli X Gate
     # + add measurements on ereg register
-    # expect eigenvalue to be -1 (ignoring complex i)
+    # expect eigenvalue to be -1
     qubits = cirq.LineQubit.range(n_eigstate_reg + 1)
     PauliX_on_1_qft_circuit = (
         cirq.Circuit(cirq.X(qubits[3]), cirq.H(qubits[3]))
@@ -199,5 +210,5 @@ def test_phase_angle_estimation():
     result2 = simulator.run(PauliX_on_1_qft_circuit)
     result_array2 = result2.records["q(0),q(1),q(2)"]
     result2 = _binary_to_int(result_array2[0][0])
-    calculated_angle = result2 / 2**n_eigstate_reg
-    assert calculated_angle == 0.75
+    calculated_constant = result2 / 2**n_eigstate_reg
+    assert calculated_constant == 0.5
