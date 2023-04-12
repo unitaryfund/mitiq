@@ -184,6 +184,7 @@ def test_phase_angle_estimation():
     # initialize the eigenstate reg to |+> by using H
     # + add measurements on ereg register
     # expect eigenvalue to be +1
+    # the constant calculated is n in exp(2 pi i n)
     qubits = cirq.LineQubit.range(n_eigstate_reg + 1)
     PauliX_on_0_qft_circuit = (
         cirq.Circuit(cirq.H(qubits[3]))
