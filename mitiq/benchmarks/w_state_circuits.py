@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-""" Functions for creating 2 W-state benchmarking circuits as defined in
-:cite:`Cruz_2019_Efficient`"""
+""" Functions for creating a linear complexity W-state benchmarking circuit
+as defined in :cite:`Cruz_2019_Efficient`"""
 
 from typing import Optional
 import numpy as np

@@ -9,3 +9,5 @@ from mitiq.benchmarks.ghz_circuits import generate_ghz_circuit
 from mitiq.benchmarks.quantum_volume_circuits import (
     generate_quantum_volume_circuit,
 )
+from mitiq.benchmarks.w_state_circuits import generate_w_circuit
+from mitiq.benchmarks.qpe_circuits import generate_qpe_circuit
