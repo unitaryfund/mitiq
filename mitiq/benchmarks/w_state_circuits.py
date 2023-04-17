@@ -29,8 +29,8 @@ def generate_w_circuit(
     n_qubits: int,
     return_type: Optional[str] = None,
 ) -> QPROGRAM:
-    """Returns a circuit to create a ``n_qubits`` qubit Werner-state with linear
-    complexity as defined in :cite:`Cruz_2019_Efficient`.
+    """Returns a circuit to create a ``n_qubits`` qubit Werner-state with
+    linear complexity as defined in :cite:`Cruz_2019_Efficient`.
 
 
     Args:
