@@ -1,7 +1,9 @@
 # <a href="https://github.com/unitaryfund/mitiq"><img src="https://github.com/unitaryfund/mitiq/blob/master/docs/source/img/mitiq-logo.png?raw=true" alt="Mitiq logo" width="350"/></a>
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-34-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![build](https://github.com/unitaryfund/mitiq/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/unitaryfund/mitiq/actions)
@@ -42,39 +44,46 @@ Define a function which inputs a circuit and returns an expectation value you wa
 
 ```python
 import cirq
-import numpy as np
-
-from mitiq import Calibrator, MeasurementResult, benchmarks
+from mitiq import zne, benchmarks
 
 
-def execute(circuit, noise_level=0.001):
-    """Returns measurement statistics from circuit with amplitude damping noise."""
-    circuit = circuit.with_noise(cirq.amplitude_damp(noise_level))
-    result = cirq.DensityMatrixSimulator().run(circuit, repetitions=1000)
-    bitstrings = np.column_stack(list(result.measurements.values()))
-    return MeasurementResult(bitstrings)
+def execute(circuit, noise_level=0.005):
+    """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit
+    with depolarizing noise."""
+    noisy_circuit = circuit.with_noise(cirq.depolarize(p=noise_level))
+    return (
+        cirq.DensityMatrixSimulator()
+        .simulate(noisy_circuit)
+        .final_density_matrix[0, 0]
+        .real
+    )
 
-
-cal = Calibrator(execute, frontend="cirq")
-cal.run()
 
 circuit = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=50)[0]
-circuit.append(cirq.measure(circuit.all_qubits()))
 
-mitigated_value = cal.execute_with_mitigation(circuit)
-true_value = execute(circuit, noise_level=0.0).prob_distribution()["0"]
-noisy_value = execute(circuit).prob_distribution()["0"]
+true_value = execute(circuit, noise_level=0.0)      # Ideal quantum computer
+noisy_value = execute(circuit)                      # Noisy quantum computer
+zne_value = zne.execute_with_zne(circuit, execute)  # Noisy quantum computer + Mitiq
 
 print(f"Error w/o  Mitiq: {abs((true_value - noisy_value) / true_value):.3f}")
-print(f"Error w Mitiq: {abs((true_value - mitigated_value) / true_value):.3f}")
+print(f"Error w Mitiq:    {abs((true_value - zne_value) / true_value):.3f}")
 ```
 
 Sample output:
 
 ```
-Error w/o  Mitiq: 0.033
-Error w Mitiq: 0.012
+Error w/o  Mitiq: 0.264
+Error w Mitiq:    0.073
 ```
+
+### Calibration
+
+Unsure what error mitigation technique or parameters to use?
+Try out the calibration module demonstrated below to help find the best parameters for you particular backend!
+
+<video width="520" height="400" controls>
+  <source src="docs/source/img/calibration.mp4" type="video/mp4">
+</video>
 
 See our [guides](https://mitiq.readthedocs.io/en/stable/guide/guide.html) and [examples](https://mitiq.readthedocs.io) for more explanation, techniques, and benchmarks.
 The examples and other notebooks can be run interactively on the cloud with [mybinder.org](https://mybinder.org/v2/gh/unitaryfund/mitiq/master?filepath=%2Fdocs%2Fsource%2Fexamples).
