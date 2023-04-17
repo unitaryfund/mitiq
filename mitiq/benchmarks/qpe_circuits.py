@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-""" Functions to create a QPE circuit"""
+"""Functions to create a QPE circuit."""
+
 from typing import Optional
 import cirq
 from mitiq import QPROGRAM
