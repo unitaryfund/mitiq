@@ -170,6 +170,23 @@ class Strategy:
 
         return summary
 
+    def print_line(self, performance: str, circuit_type: str) -> None:
+        summary = self.to_dict()
+        str_scale_factors = str(summary["scale_factors"])[1:-1]
+        row = (
+            performance,
+            circuit_type,
+            self.technique.name,
+            summary["factory"][:-7],
+            str_scale_factors,
+            summary["scale_method"],
+        )
+        print(
+            "| {:^10} | {:^7} | {:^6} | {:<13} | {:<13} | {:<20} |".format(
+                *row
+            )
+        )
+
     def __repr__(self) -> str:
         return str(self.to_dict())
 

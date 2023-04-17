@@ -34,6 +34,13 @@ from mitiq.calibration.settings import (
 )
 from mitiq.interface import convert_from_mitiq
 
+TABLE_HEADER_STR = (
+    "| performance | circuit | method | extrapolation | scale factors "
+    "| scale_method         |\n"
+    "| ----------- | ------- | ------ | ------------- | ------------- "
+    "| -------------------- |"
+)
+
 
 class MissingResultsError(Exception):
     pass
@@ -69,15 +76,7 @@ class ExperimentResults:
             ideal_val - noisy_val
         )
         performance = "✅" if mitigated_better else "❌"
-        print(
-            f"Ran {problem.type} circuit using:",
-            list(strategy.to_dict().values()),
-        )
-        print(
-            f"{performance} ideal: {ideal_val:.2f}\t"
-            f"noisy: {noisy_val:.2f}\t"
-            f"mitigated: {mitigated_val:.2f}"
-        )
+        strategy.print_line(performance, problem.type)
 
     def is_missing_data(self) -> bool:
         """Method to check if there is any missing data that was expected from
@@ -205,6 +204,9 @@ class Calibrator:
         """Runs all the circuits required for calibration."""
         if not self.results.is_missing_data():
             self.results.reset_data()
+
+        if log:
+            print(TABLE_HEADER_STR)
 
         for problem in self.problems:
             # Benchmark circuits have no measurements, so we append them.
