@@ -14,9 +14,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Functions for layer-wise unitary folding on supported circuits."""
-from typing import List
+from typing import Callable, List
 import cirq
-from cirq import inverse, Moment
+from cirq import Moment, inverse
+
+from mitiq import QPROGRAM
 from mitiq.interface import noise_scaling_converter
 
 
@@ -47,7 +49,7 @@ def layer_folding(
     for i, layer in enumerate(circuit):
         layers.append(layer)
         # Apply the requisite number of folds to each layer.
-        num_fold = layers_to_fold[i]
+        num_fold = int(layers_to_fold[i])
         for _ in range(num_fold):
             # We only fold the layer if it does not contain a measurement.
             if not cirq.is_measurement(layer):
@@ -61,25 +63,14 @@ def layer_folding(
     return combined_circuit
 
 
-def layer_folding_all(
-    circuit: cirq.Circuit, num_folds: int = 1
-) -> List[cirq.Circuit]:
-    """Return a list of cirq ``Circuit`` objects where the ith element in the
-    list has the i^th layer inverted.
+def get_layer_folding(layer_index: int) -> Callable[[QPROGRAM, float], QPROGRAM]:
+    @noise_scaling_converter
+    def fold_ith_layer(
+        circuit: cirq.Circuit, scale_factor: float
+    ) -> cirq.Circuit:
+        layers = [0] * len(circuit)
+        layers[layer_index] = scale_factor
 
-    Args:
-        circuit: The input cirq circuit.
-        layers_to_fold: A list with the index referring to the layer number,
-                        and the element filled by an integer represents the
-                        number of times the layer is folded.
+        return layer_folding(circuit, layers_to_fold=layers)
 
-    Returns:
-        A cirq ``Circuit`` with layers and number of times to fold specified by
-        ``layers_to_invert``.
-    """
-    circuits = []
-    for i in range(len(circuit)):
-        layers_to_fold = [0] * len(circuit)
-        layers_to_fold[i] = num_folds
-        circuits.append(layer_folding(circuit, layers_to_fold))
-    return circuits
+    return fold_ith_layer

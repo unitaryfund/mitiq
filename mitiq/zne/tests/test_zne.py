@@ -31,6 +31,7 @@ from mitiq.zne.scaling import (
     fold_gates_at_random,
     insert_id_layers,
 )
+from mitiq.zne.scaling.layer_scaling import get_layer_folding
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 
@@ -490,6 +491,31 @@ def test_execute_with_zne_with_supported_circuits(circuit_type):
     zne_value = execute_with_zne(circuit, generic_executor, factory=fac)
     # Test zero noise limit is better than unmitigated expectation value
     assert abs(unmitigated - expected) > abs(zne_value - expected)
+
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_layerwise_execute_with_zne_with_supported_circuits(circuit_type):
+    # Define a circuit equivalent to the identity
+    qreg = cirq.LineQubit.range(2)
+    cirq_circuit = cirq.Circuit(
+        cirq.H.on_each(qreg),
+        cirq.CNOT(*qreg),
+        cirq.CNOT(*qreg),
+        cirq.H.on_each(qreg),
+    )
+    # Convert to one of the supported program types
+    circuit = convert_from_mitiq(cirq_circuit, circuit_type)
+    expected = generic_executor(circuit, noise_level=0.0)
+    unmitigated = generic_executor(circuit)
+    # Use odd scale factors for deterministic results
+    fac = RichardsonFactory([1.0, 3.0, 5.0])
+    # Layerwise-fold
+    layer_to_fold = 0
+    fold_layer_func = get_layer_folding(layer_to_fold)
+
+    zne_value = execute_with_zne(circuit, generic_executor, factory=fac, scale_noise=fold_layer_func)
+
+    # Test zero noise limit increases noise overall.
+    assert abs(unmitigated - expected) < abs(zne_value - expected)
 
 
 def test_execute_with_zne_transpiled_qiskit_circuit():

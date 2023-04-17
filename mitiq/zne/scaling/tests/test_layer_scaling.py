@@ -21,7 +21,7 @@ from cirq import (
     ops,
     synchronize_terminal_measurements,
 )
-from mitiq.zne.scaling.layer_scaling import layer_folding, layer_folding_all
+from mitiq.zne.scaling.layer_scaling import layer_folding
 
 
 def test_layer_folding_with_measurements():
@@ -91,37 +91,6 @@ def test_layer_folding():
                     [ops.TOFFOLI.on(*qreg)] * (2 * (layers_to_fold[2]) + 1),
                 )
                 assert folded_circuit == correct
-
-
-@pytest.mark.parametrize("num_folds", range(5))
-def test_layer_folding_all(num_folds):
-    # Test circuit
-    # 0: ───H───@───
-    #           │
-    # 1: ───────X───
-    q0, q1 = LineQubit.range(2)
-    circuit = Circuit(
-        [ops.H(q0)],
-        [ops.CNOT(q0, q1)],
-    )
-
-    circuit_folded = layer_folding_all(circuit=circuit, num_folds=num_folds)
-
-    # First element of list should consist of circuit with only first layer
-    # folded.
-    expected_circuit_folded_1 = Circuit(
-        [ops.H(q0)] * (2 * num_folds + 1),
-        [ops.CNOT(q0, q1)],
-    )
-    assert circuit_folded[0] == expected_circuit_folded_1
-
-    # Second element of list should consist of circuit with only second layer
-    # folded.
-    expected_circuit_folded_2 = Circuit(
-        [ops.H(q0)],
-        [ops.CNOT(q0, q1)] * (2 * num_folds + 1),
-    )
-    assert circuit_folded[1] == expected_circuit_folded_2
 
 
 def test_bad_layers_to_fold():

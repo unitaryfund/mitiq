@@ -13,7 +13,6 @@ from mitiq.zne.scaling.folding import (
 )
 from mitiq.zne.scaling.layer_scaling import (
     layer_folding,
-    layer_folding_all,
 )
 from mitiq.zne.scaling.parameter import (
     scale_parameters,
