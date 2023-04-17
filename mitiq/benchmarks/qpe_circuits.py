@@ -39,7 +39,7 @@ def generate_qpe_circuit(
     Args:
         evalue_reg : Number of qubits in the eigenvalue register. The qubits
             in this variable are used to estimate the phase.
-        input_gate: The unitary to estimate the phase of as a single-qubit
+        input_gate : The unitary to estimate the phase of as a single-qubit
             Cirq gate. Default gate used here is `cirq.T`.
         return_type: Return type of the output circuit.
     Returns:
