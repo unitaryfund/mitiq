@@ -49,7 +49,7 @@ def layer_folding(
     for i, layer in enumerate(circuit):
         layers.append(layer)
         # Apply the requisite number of folds to each layer.
-        num_fold = int(layers_to_fold[i])
+        num_fold = layers_to_fold[i]
         for _ in range(num_fold):
             # We only fold the layer if it does not contain a measurement.
             if not cirq.is_measurement(layer):
@@ -63,10 +63,12 @@ def layer_folding(
     return combined_circuit
 
 
-def get_layer_folding(layer_index: int) -> Callable[[QPROGRAM, float], QPROGRAM]:
+def get_layer_folding(
+    layer_index: int,
+) -> Callable[[QPROGRAM, float], QPROGRAM]:
     @noise_scaling_converter
     def fold_ith_layer(
-        circuit: cirq.Circuit, scale_factor: float
+        circuit: cirq.Circuit, scale_factor: int
     ) -> cirq.Circuit:
         layers = [0] * len(circuit)
         layers[layer_index] = scale_factor
