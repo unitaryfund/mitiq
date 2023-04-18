@@ -18,6 +18,7 @@ from mitiq.benchmarks import (
     generate_mirror_circuit,
     generate_quantum_volume_circuit,
     generate_rb_circuits,
+    generate_w_circuit,
 )
 from mitiq.pec import execute_with_pec
 from mitiq.raw import execute
@@ -222,6 +223,12 @@ class Settings:
             if circuit_type == "ghz":
                 circuit = generate_ghz_circuit(num_qubits)
                 ideal = {"0" * num_qubits: 0.5, "1" * num_qubits: 0.5}
+            elif circuit_type == "w":
+                circuit = generate_w_circuit(num_qubits)
+                ideal = {}
+                for i in range(num_qubits):
+                    bitstring = "0" * i + "1" + "0" * (num_qubits - i)
+                    ideal[bitstring] = 1 / num_qubits
             elif circuit_type == "rb":
                 circuit = generate_rb_circuits(num_qubits, depth)[0]
                 ideal = {"0" * num_qubits: 1.0}
@@ -285,6 +292,10 @@ ZNESettings = Settings(
     benchmarks=[
         {
             "circuit_type": "ghz",
+            "num_qubits": 2,
+        },
+        {
+            "circuit_type": "w",
             "num_qubits": 2,
         },
         {
