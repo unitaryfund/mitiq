@@ -135,7 +135,7 @@ def test_ZNESettings():
         for s in ("type", "ideal_distribution", "num_qubits", "circuit_depth")
     )
 
-    assert len(circuits) == 3
+    assert len(circuits) == 4
     assert len(strategies) == 2 * 2 * 2
 
 
@@ -162,3 +162,34 @@ def test_benchmark_problem_class(circuit_type):
         expected.x(0)
         expected.measure(0, 0)
         assert conv_circ == expected
+
+
+def test_settings_make_problems():
+    """Test the `make_problems` method of `Settings`"""
+    settings = Settings(
+        [
+            {
+                "circuit_type": "w",
+                "num_qubits": 2,
+            }
+        ],
+        strategies=[
+            {
+                "technique": "zne",
+                "scale_noise": fold_global,
+                "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+            }
+        ],
+    )
+
+    problems = settings.make_problems()
+    assert len(problems) == 1
+
+    ideal_distribution = {"01": 0.5, "10": 0.5}
+
+    problem = problems[0]
+
+    assert problem.ideal_distribution == ideal_distribution
+    assert problem.two_qubit_gate_count == 2
+    assert problem.num_qubits == 2
+    assert problem.circuit_depth == 2

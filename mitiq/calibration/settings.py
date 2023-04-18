@@ -227,7 +227,7 @@ class Settings:
                 circuit = generate_w_circuit(num_qubits)
                 ideal = {}
                 for i in range(num_qubits):
-                    bitstring = "0" * i + "1" + "0" * (num_qubits - i)
+                    bitstring = "0" * i + "1" + "0" * (num_qubits - i - 1)
                     ideal[bitstring] = 1 / num_qubits
             elif circuit_type == "rb":
                 circuit = generate_rb_circuits(num_qubits, depth)[0]
@@ -251,7 +251,7 @@ class Settings:
             else:
                 raise ValueError(
                     "invalid value passed for `circuit_types`. Must be "
-                    "one of `ghz`, `rb`, `mirror`, or `qv`, "
+                    "one of `ghz`, `rb`, `mirror`, `w`, or `qv`, "
                     f"but got {circuit_type}."
                 )
 
