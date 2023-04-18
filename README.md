@@ -81,7 +81,7 @@ Error w Mitiq:    0.073
 Unsure which error mitigation technique or parameters to use?
 Try out the calibration module demonstrated below to help find the best parameters for you particular backend!
 
-https://user-images.githubusercontent.com/12703123/232909963-19ee1921-5fcf-4362-901b-40ec27c9f5ac.mp4
+![](docs/source/img/calibration.gif)
 
 See our [guides](https://mitiq.readthedocs.io/en/stable/guide/guide.html) and [examples](https://mitiq.readthedocs.io) for more explanation, techniques, and benchmarks.
 The examples and other notebooks can be run interactively on the cloud with [mybinder.org](https://mybinder.org/v2/gh/unitaryfund/mitiq/master?filepath=%2Fdocs%2Fsource%2Fexamples).
