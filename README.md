@@ -78,7 +78,7 @@ Error w Mitiq:    0.073
 
 ### Calibration
 
-Unsure what error mitigation technique or parameters to use?
+Unsure which error mitigation technique or parameters to use?
 Try out the calibration module demonstrated below to help find the best parameters for you particular backend!
 
 <video width="520" height="400" controls>
