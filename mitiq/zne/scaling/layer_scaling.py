@@ -71,7 +71,10 @@ def get_layer_folding(
         circuit: cirq.Circuit, scale_factor: int
     ) -> cirq.Circuit:
         layers = [0] * len(circuit)
-        layers[layer_index] = scale_factor
+        num_folds = (scale_factor - 1)  /  2
+        if np.isclose(num_folds, int(num_folds)):
+            num_folds = int(num_folds)
+        layers[layer_index] = num_folds
 
         return layer_folding(circuit, layers_to_fold=layers)
 
