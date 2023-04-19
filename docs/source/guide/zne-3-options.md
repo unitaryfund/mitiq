@@ -282,6 +282,13 @@ of folding the first layer twice and the second layer three times.
 print(layer_folding(circuit, [2, 3]))
 ```
 
+The `layer_folding` function could be used for noise diagnostics `cite
+Calderon_2023_Quantum` or for a low-level implementation of ZNE in a similar way
+as shown in the `[next section](zne-4-low-level.md)`.
+
+To get a noise scaling function which is instead directly compatible with
+execute_with_zne one can use  `{func}.get_layer_folding`.
+
 ### Identity Scaling
 
 The goal of this technique is to insert layers of identity gates to extend the duration of the circuit, which, when used in the context of ZNE, provides a useful noise-scaling method.

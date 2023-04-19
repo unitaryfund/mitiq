@@ -14,12 +14,19 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Functions for layer-wise unitary folding on supported circuits."""
+from copy import deepcopy
+import numpy as np
 from typing import Callable, List
 import cirq
 from cirq import Moment, inverse
 
 from mitiq import QPROGRAM
+from mitiq.zne.scaling.folding import _check_foldable
 from mitiq.interface import noise_scaling_converter
+from mitiq.utils import (
+    _append_measurements,
+    _pop_measurements,
+)
 
 
 @noise_scaling_converter
@@ -66,16 +73,43 @@ def layer_folding(
 def get_layer_folding(
     layer_index: int,
 ) -> Callable[[QPROGRAM, float], QPROGRAM]:
+    """Applies a variable amount of folding to select layers of a circuit.
+
+    Args:
+        layer_index: The layer of the circuit to apply folding to.
+
+    Returns:
+        fold_ith_layer: The function for folding the ith layer.
+    """
+
     @noise_scaling_converter
     def fold_ith_layer(
         circuit: cirq.Circuit, scale_factor: int
     ) -> cirq.Circuit:
+        """Returns a circuit folded according to integer scale factors.
+
+        Args:
+            circuit: Circuit to fold.
+            scale_factor: Factor to scale the circuit by.
+
+        Returns:
+            layer_folding: the folded quantum circuit.
+        """
         layers = [0] * len(circuit)
-        num_folds = (scale_factor - 1)  /  2
+        num_folds = (scale_factor - 1) / 2
         if np.isclose(num_folds, int(num_folds)):
             num_folds = int(num_folds)
-        layers[layer_index] = num_folds
+        layers[layer_index] = int(num_folds)
 
-        return layer_folding(circuit, layers_to_fold=layers)
+        _check_foldable(circuit)
+
+        folded = deepcopy(circuit)
+        measurements = _pop_measurements(folded)
+
+        folded = layer_folding(folded, layers_to_fold=layers)
+
+        _append_measurements(folded, measurements)
+
+        return folded
 
     return fold_ith_layer
