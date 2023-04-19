@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-""" Functions to create a QPE circuit"""
+"""Functions to create a QPE circuit."""
+
 from typing import Optional
 import cirq
 from mitiq import QPROGRAM
@@ -38,7 +39,7 @@ def generate_qpe_circuit(
     Args:
         evalue_reg : Number of qubits in the eigenvalue register. The qubits
             in this variable are used to estimate the phase.
-        input_gate: The unitary to estimate the phase of as a single-qubit
+        input_gate : The unitary to estimate the phase of as a single-qubit
             Cirq gate. Default gate used here is `cirq.T`.
         return_type: Return type of the output circuit.
     Returns:

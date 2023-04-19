@@ -35,6 +35,18 @@
    :members:
 ```
 
+### Quantum Phase Estimation Circuits
+```{eval-rst}
+.. automodule:: mitiq.benchmarks.qpe_circuits
+   :members:
+```
+
+### W State Circuits
+```{eval-rst}
+.. automodule:: mitiq.benchmarks.w_state_circuits
+   :members:
+```
+
 ## Circuit types and result types
 
 ```{eval-rst}

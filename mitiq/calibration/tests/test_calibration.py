@@ -109,7 +109,7 @@ def non_cirq_execute(circuit):
 def test_ZNE_workflow():
     cal = Calibrator(execute, frontend="cirq")
     cost = cal.get_cost()
-    assert cost == {"noisy_executions": 24, "ideal_executions": 0}
+    assert cost == {"noisy_executions": 32, "ideal_executions": 0}
 
     cal.run()
     num_strategies, num_problems = cal.results.mitigated.shape

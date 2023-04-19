@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-""" Functions for creating a linear complexity W-state benchmarking circuit
-as defined in :cite:`Cruz_2019_Efficient`"""
+"""Functions for creating a linear complexity W-state benchmarking circuit
+as defined in :cite:`Cruz_2019_Efficient`."""
 
 from typing import Optional
 import numpy as np
@@ -29,11 +29,13 @@ def generate_w_circuit(
     n_qubits: int,
     return_type: Optional[str] = None,
 ) -> QPROGRAM:
-    """Returns a circuit to create a ``n_qubit`` qubit Werner-state with linear
-    complexity as defined in :cite:`Cruz_2019_Efficient`.
+    """Returns a circuit to create a ``n_qubits`` qubit Werner-state with
+    linear complexity as defined in :cite:`Cruz_2019_Efficient`.
+
+
     Args:
-        n_qubits: The number of qubits in the circuit.
-        return_type: Return type of the output circuit.
+        n_qubits : The number of qubits in the circuit.
+        return_type : Return type of the output circuit.
     Returns:
         A W-state circuit of linear complexity acting on ``n_qubits`` qubits.
     """
