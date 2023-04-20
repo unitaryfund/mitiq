@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Functions for layer-wise unitary folding on supported circuits."""
-from copy import deepcopy
 import numpy as np
 from typing import Callable, List
 import cirq
@@ -23,10 +22,6 @@ from cirq import Moment, inverse
 from mitiq import QPROGRAM
 from mitiq.zne.scaling.folding import _check_foldable
 from mitiq.interface import noise_scaling_converter
-from mitiq.utils import (
-    _append_measurements,
-    _pop_measurements,
-)
 
 
 @noise_scaling_converter
@@ -44,12 +39,12 @@ def layer_folding(
     Returns:
         The folded circuit.
     """
-    circuit = cirq.synchronize_terminal_measurements(circuit)
     layers = []
 
     if len(layers_to_fold) != len(circuit):
         raise ValueError(
-            f"Length of layers_to_fold must be equal to the circuit depth excluding measurements, i.e., {len(circuit_without_meas)})"
+            f"Length of layers_to_fold must be equal to the circuit depth "
+            f"excluding measurements, i.e., {len(circuit)})"
         )
 
     for i, layer in enumerate(circuit):
@@ -102,7 +97,7 @@ def get_layer_folding(
 
         _check_foldable(circuit)
 
-        folded = layer_folding(folded, layers_to_fold=layers)
+        folded = layer_folding(circuit, layers_to_fold=layers)
 
         return folded
 
