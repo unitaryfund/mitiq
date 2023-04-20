@@ -517,8 +517,8 @@ def test_layerwise_execute_with_zne_with_supported_circuits(circuit_type):
         circuit, generic_executor, factory=fac, scale_noise=fold_layer_func
     )
 
-    # Test zero noise limit increases noise overall.
-    assert abs(unmitigated - expected) < abs(zne_value - expected)
+    # Test zero noise limit is better than unmitigated expectation value
+    assert abs(unmitigated - expected) > abs(zne_value - expected)
 
 
 def test_execute_with_zne_transpiled_qiskit_circuit():
