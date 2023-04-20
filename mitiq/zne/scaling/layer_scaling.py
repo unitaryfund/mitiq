@@ -49,7 +49,7 @@ def layer_folding(
 
     if len(layers_to_fold) != len(circuit):
         raise ValueError(
-            "Length of `layers_to_fold` must be equal to length of circuit."
+            f"Length of layers_to_fold must be equal to the circuit depth excluding measurements, i.e., {len(circuit_without_meas)})"
         )
 
     for i, layer in enumerate(circuit):
