@@ -42,8 +42,7 @@ def layer_folding(
                         number of times the layer is folded.
 
     Returns:
-        A cirq ``Circuit`` with layers and number of times to fold specified
-        by ``layers_to_invert``.
+        The folded circuit.
     """
     circuit = cirq.synchronize_terminal_measurements(circuit)
     layers = []
