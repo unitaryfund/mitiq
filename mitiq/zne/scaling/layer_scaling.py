@@ -38,7 +38,7 @@ def layer_folding(
     Args:
         circuit: The input circuit.
         layers_to_fold: A list with the index referring to the layer number,
-                        and the element filled by an integer represents the
+                        and the element filled by an integer representing the
                         number of times the layer is folded.
 
     Returns:
