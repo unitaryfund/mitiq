@@ -1,8 +1,11 @@
 # <a href="https://github.com/unitaryfund/mitiq"><img src="https://github.com/unitaryfund/mitiq/blob/master/docs/source/img/mitiq-logo.png?raw=true" alt="Mitiq logo" width="350"/></a>
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-34-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
+
 [![build](https://github.com/unitaryfund/mitiq/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/unitaryfund/mitiq/actions)
 [![Documentation Status](https://readthedocs.org/projects/mitiq/badge/?version=stable)](https://mitiq.readthedocs.io/en/stable/)
 [![codecov](https://codecov.io/gh/unitaryfund/mitiq/branch/master/graph/badge.svg)](https://codecov.io/gh/unitaryfund/mitiq)
@@ -43,26 +46,41 @@ import cirq
 from mitiq import zne, benchmarks
 
 
-def execute(circuit: cirq.Circuit, noise_level: float = 0.001) -> float:
-    """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit with depolarizing noise."""
+def execute(circuit, noise_level=0.005):
+    """Returns Tr[ρ |0⟩⟨0|] where ρ is the state prepared by the circuit
+    with depolarizing noise."""
     noisy_circuit = circuit.with_noise(cirq.depolarize(p=noise_level))
-    return cirq.DensityMatrixSimulator().simulate(noisy_circuit).final_density_matrix[0, 0].real
+    return (
+        cirq.DensityMatrixSimulator()
+        .simulate(noisy_circuit)
+        .final_density_matrix[0, 0]
+        .real
+    )
 
 
-circuit: cirq.Circuit = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=50)[0]
+circuit = benchmarks.generate_rb_circuits(n_qubits=1, num_cliffords=50)[0]
 
-true_value = execute(circuit, noise_level=0.0)       # Ideal quantum computer.
-noisy_value = execute(circuit)                       # Noisy quantum computer.
-zne_value = zne.execute_with_zne(circuit, execute)   # Noisy quantum computer + Mitiq.
+true_value = execute(circuit, noise_level=0.0)      # Ideal quantum computer
+noisy_value = execute(circuit)                      # Noisy quantum computer
+zne_value = zne.execute_with_zne(circuit, execute)  # Noisy quantum computer + Mitiq
 
-print(f"Error (w/o  Mitiq): %0.4f" %abs((true_value - noisy_value) / true_value))
-print(f"Error (with Mitiq): %0.4f" %abs((true_value - zne_value) / true_value))
+print(f"Error w/o  Mitiq: {abs((true_value - noisy_value) / true_value):.3f}")
+print(f"Error w Mitiq:    {abs((true_value - zne_value) / true_value):.3f}")
 ```
+
 Sample output:
+
 ```
-Error (w/o  Mitiq): 0.0688
-Error (with Mitiq): 0.0002
+Error w/o  Mitiq: 0.264
+Error w Mitiq:    0.073
 ```
+
+### Calibration
+
+Unsure which error mitigation technique or parameters to use?
+Try out the calibration module demonstrated below to help find the best parameters for you particular backend!
+
+![](docs/source/img/calibration.gif)
 
 See our [guides](https://mitiq.readthedocs.io/en/stable/guide/guide.html) and [examples](https://mitiq.readthedocs.io) for more explanation, techniques, and benchmarks.
 The examples and other notebooks can be run interactively on the cloud with [mybinder.org](https://mybinder.org/v2/gh/unitaryfund/mitiq/master?filepath=%2Fdocs%2Fsource%2Fexamples).
@@ -71,25 +89,25 @@ The examples and other notebooks can be run interactively on the cloud with [myb
 
 ### Error mitigation techniques
 
-| Technique                                 | Documentation                                                | Mitiq module                                                            | Paper Reference(s)                                                                                                                                 |
-| ----------------------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Technique                                 | Documentation                                                | Mitiq module                                                              | Paper Reference(s)                                                                                                                                 |
+| ----------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Zero-noise extrapolation                  | [ZNE](https://mitiq.readthedocs.io/en/latest/guide/zne.html) | [`mitiq.zne`](https://github.com/unitaryfund/mitiq/tree/master/mitiq/zne) | [1611.09301](https://arxiv.org/abs/1611.09301)<br>[1612.02058](https://arxiv.org/abs/1612.02058)<br>[1805.04492](https://arxiv.org/abs/1805.04492) |
 | Probabilistic error cancellation          | [PEC](https://mitiq.readthedocs.io/en/latest/guide/pec.html) | [`mitiq.pec`](https://github.com/unitaryfund/mitiq/tree/master/mitiq/pec) | [1612.02058](https://arxiv.org/abs/1612.02058)<br>[1712.09271](https://arxiv.org/abs/1712.09271)<br>[1905.10135](https://arxiv.org/abs/1905.10135) |
 | (Variable-noise) Clifford data regression | [CDR](https://mitiq.readthedocs.io/en/latest/guide/cdr.html) | [`mitiq.cdr`](https://github.com/unitaryfund/mitiq/tree/master/mitiq/cdr) | [2005.10189](https://arxiv.org/abs/2005.10189)<br>[2011.01157](https://arxiv.org/abs/2011.01157)                                                   |
-| Digital dynamical decoupling                      | [DDD](https://mitiq.readthedocs.io/en/latest/guide/ddd.html) | [`mitiq.ddd`](https://github.com/unitaryfund/mitiq/tree/master/mitiq/ddd) | [9803057](https://arxiv.org/abs/quant-ph/9803057)<br>[1807.08768](https://arxiv.org/abs/1807.08768)                                                |
-| Readout-error mitigation                  | [REM](https://mitiq.readthedocs.io/en/latest/guide/rem.html) | [`mitiq.rem`](https://github.com/unitaryfund/mitiq/tree/master/mitiq/rem) | [1907.08518](https://arxiv.org/abs/1907.08518) <br>[2006.14044](https://arxiv.org/abs/2006.14044)                        |
+| Digital dynamical decoupling              | [DDD](https://mitiq.readthedocs.io/en/latest/guide/ddd.html) | [`mitiq.ddd`](https://github.com/unitaryfund/mitiq/tree/master/mitiq/ddd) | [9803057](https://arxiv.org/abs/quant-ph/9803057)<br>[1807.08768](https://arxiv.org/abs/1807.08768)                                                |
+| Readout-error mitigation                  | [REM](https://mitiq.readthedocs.io/en/latest/guide/rem.html) | [`mitiq.rem`](https://github.com/unitaryfund/mitiq/tree/master/mitiq/rem) | [1907.08518](https://arxiv.org/abs/1907.08518) <br>[2006.14044](https://arxiv.org/abs/2006.14044)                                                  |
 
 See our [roadmap](https://github.com/unitaryfund/mitiq/wiki) for additional candidate techniques to implement. If there is a technique you are looking for, please file a [feature request](https://github.com/unitaryfund/mitiq/issues/new?assignees=&labels=feature-request&template=feature_request.md&title=).
 
 ### Interface
 
-We refer to any programming language you can write quantum circuits in as a *frontend*, and any quantum computer / simulator you can simulate circuits in as a *backend*.
+We refer to any programming language you can write quantum circuits in as a _frontend_, and any quantum computer / simulator you can simulate circuits in as a _backend_.
 
 #### Supported frontends
 
-| [Cirq](https://quantumai.google/cirq)                                                                                                                                         | [Qiskit](https://qiskit.org/)                                                                                         | [pyQuil](https://github.com/rigetti/pyquil)                                                                                                             | [Braket](https://github.com/aws/amazon-braket-sdk-python)                                                                                                                         | [PennyLane](https://pennylane.ai/)                                                                                                   |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| <a href="https://quantumai.google/cirq"><img src="https://raw.githubusercontent.com/quantumlib/Cirq/master/docs/images/Cirq_logo_color.png" alt="Cirq logo" width="130"/></a> | <a href="https://qiskit.org/"><img src="https://qiskit.org/images/qiskit-logo.png" alt="Qiskit logo" width="80"/></a> | <a href="https://github.com/rigetti/pyquil"><img src="https://www.rigetti.com/uploads/Logos/logo-rigetti-gray.jpg" alt="Rigetti logo" width="150"/></a> | <a href="https://github.com/aws/amazon-braket-sdk-python"><img src="https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png" alt="AWS logo" width="150"/></a> | &nbsp;&nbsp;  <a href="https://pennylane.ai/"><img src="https://pennylane.ai/img/xanadu_x.png" alt="PennyLane logo" width="60"/></a> |
+| [Cirq](https://quantumai.google/cirq)                                                                                                                                         | [Qiskit](https://qiskit.org/)                                                                                         | [pyQuil](https://github.com/rigetti/pyquil)                                                                                                             | [Braket](https://github.com/aws/amazon-braket-sdk-python)                                                                                                                         | [PennyLane](https://pennylane.ai/)                                                                                                  |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| <a href="https://quantumai.google/cirq"><img src="https://raw.githubusercontent.com/quantumlib/Cirq/master/docs/images/Cirq_logo_color.png" alt="Cirq logo" width="130"/></a> | <a href="https://qiskit.org/"><img src="https://qiskit.org/images/qiskit-logo.png" alt="Qiskit logo" width="80"/></a> | <a href="https://github.com/rigetti/pyquil"><img src="https://www.rigetti.com/uploads/Logos/logo-rigetti-gray.jpg" alt="Rigetti logo" width="150"/></a> | <a href="https://github.com/aws/amazon-braket-sdk-python"><img src="https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png" alt="AWS logo" width="150"/></a> | &nbsp;&nbsp; <a href="https://pennylane.ai/"><img src="https://pennylane.ai/img/xanadu_x.png" alt="PennyLane logo" width="60"/></a> |
 
 Note: Cirq is a core requirement of Mitiq and is installed when you `pip install mitiq`.
 
