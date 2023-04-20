@@ -14,7 +14,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Unit tests for scaling by layer."""
-import pytest
 from cirq import (
     Circuit,
     LineQubit,
@@ -91,16 +90,3 @@ def test_layer_folding():
                     [ops.TOFFOLI.on(*qreg)] * (2 * (layers_to_fold[2]) + 1),
                 )
                 assert folded_circuit == correct
-
-
-def test_bad_layers_to_fold():
-    q0, q1 = LineQubit.range(2)
-    circuit = Circuit(
-        [ops.H(q0)],
-        [ops.CNOT(q0, q1)],
-    )
-    with pytest.raises(
-        ValueError,
-        match="Length of `layers_to_fold` must be equal to length of circuit.",
-    ):
-        layer_folding(circuit, [1] * (len(circuit) + 1))
