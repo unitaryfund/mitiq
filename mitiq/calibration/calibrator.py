@@ -254,23 +254,16 @@ class Calibrator:
     def execute_with_mitigation(
         self,
         circuit: QPROGRAM,
-        expval_executor: Optional[
-            Union[Executor, Callable[[QPROGRAM], QuantumResult]]
-        ] = None,
+        expval_executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
         observable: Optional[Observable] = None,
     ) -> Union[QuantumResult, None]:
         """See :func:`execute_with_mitigation` for signature and details."""
-        expval_executor = expval_executor or convert_to_expval_executor(
-            self.cirq_executor
-        )
         return execute_with_mitigation(
             circuit, expval_executor, observable, calibrator=self
         )
 
 
-def convert_to_expval_executor(
-    executor: Executor, bitstring: Optional[str] = None
-) -> Executor:
+def convert_to_expval_executor(executor: Executor, bitstring: str) -> Executor:
     """Constructs a new executor returning an expectation value given by the
     probability that the circuit outputs the most likely state according to the
     ideal distribution.
@@ -294,10 +287,7 @@ def convert_to_expval_executor(
             )
         raw = cast(MeasurementResult, executor.run([circuit_with_meas])[0])
         distribution = raw.prob_distribution()
-        bitstring_to_get = bitstring or "0" * len(
-            circuit_with_meas.all_qubits()
-        )
-        return distribution.get(bitstring_to_get, 0.0)
+        return distribution.get(bitstring, 0.0)
 
     return Executor(expval_executor)  # type: ignore [arg-type]
 
