@@ -24,6 +24,13 @@ from mitiq.calibration.settings import (
 )
 from mitiq.interface import convert_from_mitiq
 
+TABLE_HEADER_STR = (
+    "| performance | circuit | method | extrapolation | scale factors "
+    "| scale_method         |\n"
+    "| ----------- | ------- | ------ | ------------- | ------------- "
+    "| -------------------- |"
+)
+
 
 class MissingResultsError(Exception):
     pass
@@ -59,15 +66,7 @@ class ExperimentResults:
             ideal_val - noisy_val
         )
         performance = "✅" if mitigated_better else "❌"
-        print(
-            f"Ran {problem.type} circuit using:",
-            list(strategy.to_dict().values()),
-        )
-        print(
-            f"{performance} ideal: {ideal_val:.2f}\t"
-            f"noisy: {noisy_val:.2f}\t"
-            f"mitigated: {mitigated_val:.2f}"
-        )
+        strategy.print_line(performance, problem.type)
 
     def is_missing_data(self) -> bool:
         """Method to check if there is any missing data that was expected from
@@ -196,6 +195,9 @@ class Calibrator:
         if not self.results.is_missing_data():
             self.results.reset_data()
 
+        if log:
+            print(TABLE_HEADER_STR)
+
         for problem in self.problems:
             # Benchmark circuits have no measurements, so we append them.
             circuit = problem.circuit.copy()
@@ -259,15 +261,21 @@ def convert_to_expval_executor(executor: Executor, bitstring: str) -> Executor:
     Args:
         executor: Executor which returns a :class:`.MeasurementResult`
             (bitstrings).
-        bitstring: The bitstring to measure the probability of.
+        bitstring: The bitstring to measure the probability of. Defaults to
+            ground state bitstring "00...0".
 
     Returns:
         A tuple containing an executor returning expectation values and,
         the most likely bitstring, according to the passed ``distribution``
     """
 
-    def expval_executor(circuit: QPROGRAM) -> float:
-        raw = cast(MeasurementResult, executor.run([circuit])[0])
+    def expval_executor(circuit: cirq.Circuit) -> float:
+        circuit_with_meas = circuit.copy()
+        if not cirq.is_measurement(circuit_with_meas):
+            circuit_with_meas.append(
+                cirq.measure(circuit_with_meas.all_qubits())
+            )
+        raw = cast(MeasurementResult, executor.run([circuit_with_meas])[0])
         distribution = raw.prob_distribution()
         return distribution.get(bitstring, 0.0)
 
