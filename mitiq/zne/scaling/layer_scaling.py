@@ -102,12 +102,7 @@ def get_layer_folding(
 
         _check_foldable(circuit)
 
-        folded = deepcopy(circuit)
-        measurements = _pop_measurements(folded)
-
         folded = layer_folding(folded, layers_to_fold=layers)
-
-        _append_measurements(folded, measurements)
 
         return folded
 
