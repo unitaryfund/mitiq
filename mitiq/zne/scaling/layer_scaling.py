@@ -39,6 +39,7 @@ def layer_folding(
     Returns:
         The folded circuit.
     """
+    circuit = cirq.synchronize_terminal_measurements(circuit)
     layers = []
 
     for i, layer in enumerate(circuit):
