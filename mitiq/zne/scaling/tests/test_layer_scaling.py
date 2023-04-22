@@ -18,7 +18,6 @@ from cirq import (
     Circuit,
     LineQubit,
     ops,
-    synchronize_terminal_measurements,
 )
 from mitiq.zne.scaling.layer_scaling import layer_folding
 
@@ -44,9 +43,6 @@ def test_layer_folding_with_measurements():
         [ops.H(q[1])] * 3,
         [ops.CNOT(*q[1:])] * 3,
         ops.measure_each(*q),
-    )
-    expected_folded_circuit = synchronize_terminal_measurements(
-        expected_folded_circuit
     )
     assert folded_circuit == expected_folded_circuit
 
