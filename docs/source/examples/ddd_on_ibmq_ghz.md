@@ -1,16 +1,16 @@
 ---
 jupytext:
+  formats: md:myst
   text_representation:
-    extension: .myst
+    extension: .md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.14.1
 kernelspec:
-  display_name: Python 3
+  display_name: Python 3 (ipykernel)
   language: python
   name: python3
 ---
-
 
 # Digital dynamical decoupling (DDD) with Qiskit on GHZ Circuits
 
@@ -24,6 +24,7 @@ Applying such sequences can reduce the coupling between the qubits and the envir
 While the DDD module includes some built-in sequences, the user may choose to define others best suited to their application.
 For more information on DDD, see the section [DDD section of the user guide](../guide/ddd.md).
 
++++
 
 ## Setup
 
@@ -35,23 +36,19 @@ from typing import List, Callable
 import numpy as np
 from matplotlib import pyplot as plt
 
-import cirq
 import qiskit
 
 from mitiq.interface.mitiq_qiskit import to_qiskit
 from mitiq import ddd, QPROGRAM
+from mitiq.ddd import insert_ddd_sequences
 ```
 
-
 ## Define DDD rules
-We now use DDD _rule_ from Mitiq, i. e., a function that generates DDD sequences of different length.
-In this example, we test the performance of repeated I, repeated IXIX, repeated XX, and XX sequences.
+We now use Mitiq's DDD _rule_, i. e., a function that generates DDD sequences of different length.
+In this example, we test the performance of repeated I (default built into `get_circuit` below) and repeated IXIX, repeated XX, and XX sequences from Mitiq.
 
 ```{code-cell} ipython3
-def rep_i_rule(window_length: int) -> Callable[[int], QPROGRAM]:
-    """This is the trivial sequence and corresponds the unmitigated case."""
-    seq = ddd.rules.repeated_rule(window_length, [cirq.I])
-    return cirq.Circuit(seq)
+import cirq
 
 def rep_ixix_rule(window_length: int) -> Callable[[int], QPROGRAM]:
     return ddd.rules.repeated_rule(
@@ -62,13 +59,12 @@ def rep_xx_rule(window_length: int) -> Callable[[int], QPROGRAM]:
     return ddd.rules.repeated_rule(window_length, [cirq.X, cirq.X])
 
 # Set DDD sequences to test.
-rules = [rep_i_rule, rep_ixix_rule, rep_xx_rule, ddd.rules.xx]
+rules = [rep_ixix_rule, rep_xx_rule, ddd.rules.xx]
 
 # Test the sequence insertion
 for rule in rules:
     print(rule(10))
 ```
-
 
 ## Set parameters for the experiment
 
@@ -83,7 +79,6 @@ num_qubits = 2
 depths = [10, 30, 50, 100]
 ```
 
-
 ## Define the circuit
 
 We use Greenberger-Horne-Zeilinger (GHZ) circuits to benchmark the performance of the device.
@@ -92,49 +87,41 @@ should be sampled, with $P_0 = P_1 = 0.5$.
 As noted in *Mooney et al. (2021)* {cite}`Mooney_2021`, when GHZ circuits are run on a device, any other measured bitstrings are due to noise.
 In this example the GHZ sequence is applied first, followed by a long idle window of identity gates and finally the inverse of the GHZ
 sequence.
-Therefore $P_0 = 1$ and the frequency of the $|00...0 \rangle$ bitstring is our target metric.
+Therefore $P_0 = 1$, and the frequency of the $|0 \rangle$ bitstring is our target metric (in this example we only measure the first qubit).
 
 ```{code-cell} ipython3
-def get_circuit_with_sequence(depth: int, rule: Callable[[int], QPROGRAM]):
-    """Returns a circuit composed of a GHZ sequence, idle windows with or
-        without DDD sequences, and finally an inverse GHZ sequence.
+def get_circuit(depth: int):
+    """Returns a circuit composed of a GHZ sequence, idle windows,
+    and finally an inverse GHZ sequence.
 
     Args:
         depth: The depth of the idle window in the circuit.
-        rule: A function determining the sequence to insert in the idle window.
-            In the unmitigated case this generates a sequence of identity
-            gates. In the DDD mitigated case it generates a sequence of non-
-            identity gates or a combination of identity and non-identity gates.
     """
     circuit = qiskit.QuantumCircuit(num_qubits, num_qubits)
     circuit.h(0)
     circuit.cx(0, 1)
-    
-    sequence = rule(depth)
-    sequence_qiskit = to_qiskit(sequence)    
-    circuit = circuit.compose(sequence_qiskit)
-    
+    for _ in range(depth):
+        circuit.i(0)
+        circuit.i(1)
     circuit.cx(0, 1)
     circuit.h(0)
     circuit.measure(0, 0)
     return circuit
-
-def get_circuit(depth):
-    return get_circuit_with_sequence(depth, rep_i_rule)
 ```
 
 Test the circuit output for depth 4, unmitigated
+
 ```{code-cell} ipython3
-ibm_circ= get_circuit(4)
+ibm_circ = get_circuit(4)
 print(ibm_circ)
 ```
 
-Test the circuit output for depth 4, with IX sequences inserted 
-```{code-cell} ipython3
-ibm_circ= get_circuit_with_sequence(4, rep_ixix_rule)
-print(ibm_circ)
-```
+Test the circuit output for depth 4, with IX sequences inserted
 
+```{code-cell} ipython3
+ixix_circ = insert_ddd_sequences(ibm_circ, rep_ixix_rule)
+print(ixix_circ)
+```
 
 ## Define the executor
 
@@ -143,13 +130,16 @@ here, the frequency of sampling the correct bitstring.
 
 ```{code-cell} ipython3
 USE_REAL_HARDWARE = True
+correct_bitstring=[0]
 ```
 
 ```{code-cell} ipython3
-:tags: ["remove-cell"]
+:tags: [remove-cell]
+
 # hidden settings to allow efficient docs build
 USE_REAL_HARDWARE = False
 depths = [2, 4, 6, 8]
+correct_bitstring=[0, 0]
 ```
 
 ```{code-cell} ipython3
@@ -186,36 +176,39 @@ def ibm_executor(
 
     # Convert from raw measurement counts to the expectation value
     all_counts = job.result().get_counts()
-    print("Counts:", all_counts)
     prob_zero = all_counts.get("".join(map(str, correct_bitstring)), 0.0) / shots
     return prob_zero
 ```
 
-
 ## Run circuits with and without DDD
 
 ```{code-cell} ipython3
-:tags: ["remove-output"]
+:tags: [remove-output]
+
 data = []
 for depth in depths:
+    circuit = get_circuit(depth)
+    noisy_value = ibm_executor(
+            circuit, shots=shots, correct_bitstring=correct_bitstring
+    )
+    data.append((depth, "unmitigated", noisy_value))
     for rule in rules:
-        print(f"DDD sequence: {rule}.")
-        circuit = get_circuit_with_sequence(depth, rule)
-        noisy_value = ibm_executor(
-            circuit, shots=shots, correct_bitstring=[0]
+        ddd_circuit = insert_ddd_sequences(circuit, rule)
+        ddd_value = ibm_executor(
+            ddd_circuit, shots=shots, correct_bitstring=correct_bitstring
         )
-        print("Result:", noisy_value)
-        data.append((depth, rule, noisy_value))
+        data.append((depth, rule.__name__, ddd_value))
 ```
 
 Now we can visualize the results.
 
 ```{code-cell} ipython3
-:tags: ["remove-output"]
+:tags: [remove-output]
+
 # Plot unmitigated
 x, y = [], []
 for res in data:
-    if res[1].__name__ == "rep_i_rule":
+    if res[1] == "unmitigated":
         x.append(res[0])
         y.append(res[2])
 plt.plot(x, y, "--*", label="Unmitigated")
@@ -223,7 +216,7 @@ plt.plot(x, y, "--*", label="Unmitigated")
 # Plot xx
 x, y = [], []
 for res in data:
-    if res[1].__name__ == "rep_xx_rule":
+    if res[1] == "rep_xx_rule":
         x.append(res[0])
         y.append(res[2])
 plt.plot(x, y, "--*", label="rep_xx_rule")
@@ -231,7 +224,7 @@ plt.plot(x, y, "--*", label="rep_xx_rule")
 # Plot ixix
 x, y = [], []
 for res in data:
-    if res[1].__name__ == "rep_ixix_rule":
+    if res[1] == "rep_ixix_rule":
         x.append(res[0])
         y.append(res[2])
 plt.plot(x, y, "--*", label="rep_ixix_rule")
@@ -239,7 +232,7 @@ plt.plot(x, y, "--*", label="rep_ixix_rule")
 # Plot xx
 x, y = [], []
 for res in data:
-    if res[1].__name__ == "xx":
+    if res[1] == "xx":
         x.append(res[0])
         y.append(res[2])
 plt.plot(x, y, "--*", label="xx")
@@ -256,6 +249,7 @@ name: ddd-qiskit-ghz-plot-ibmq
 Plot of the unmitigated and DDD-mitigated expectation values obtained from executing the corresponding circuits.
 ```
 
++++
 
 We can see that DDD improves the expectation value at each circuit depth, and the repeated XX sequence is the best at mitigating the errors
-occurring during idle windows. 
+occurring during idle windows.
