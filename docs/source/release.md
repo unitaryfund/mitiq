@@ -15,8 +15,9 @@ instructions of this document to go through all the steps below:
 
 ## Prepare the master branch
 
-The start of any release is drafting the changelog and bumping the
-version number.
+The start of any release is drafting the changelog and bumping the version number.
+Ensure the commit where these changes are made include authorship for all contributors for the given milestone (code, or not).
+(Co-authored commits can be created by following the documentation [here](https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors).)
 
 ### Update the changelog
 
@@ -69,8 +70,8 @@ There should be a new draft release on GitHub created by the
 previous step [here](https://github.com/unitaryfund/mitiq/releases). You
 will need to review it and publish the release.
 
--   GitHub will create compressed files with the repository.
--   GitHub adds the full changelog in the draft release. Please keep the content related to the new release and remove the content related to previous releases.
+- GitHub will create compressed files with the repository.
+- GitHub adds the full changelog in the draft release. Please keep the content related to the new release and remove the content related to previous releases.
 
 ```{note}
 If all the above steps have been successfully completed, ReadTheDocs
@@ -94,7 +95,7 @@ and use the "Run Workflow" button to publish the new version on PyPI.
 In case the action for releasing on PyPI fails, the Python commands to
 release Mitiq are:
 
-``` bash
+```bash
 python -m pip install --upgrade pip
 make install requirements
 pip install setuptools wheel twine
