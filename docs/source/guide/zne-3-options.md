@@ -287,7 +287,7 @@ or for a low-level implementation of ZNE in a similar way
 as shown in the [next section](zne-4-low-level.md).
 
 To get a noise scaling function which is instead directly compatible with
-`{func}.execute_with_zne` one can use  `{func}.get_layer_folding`.
+{func}`.execute_with_zne` one can use  {func}`.get_layer_folding`.
 
 ### Identity Scaling
 
