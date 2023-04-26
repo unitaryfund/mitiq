@@ -19,7 +19,7 @@ from cirq import (
     LineQubit,
     ops,
 )
-from mitiq.zne.scaling.layer_scaling import layer_folding
+from mitiq.zne.scaling import layer_folding
 
 
 def test_layer_folding_with_measurements():
