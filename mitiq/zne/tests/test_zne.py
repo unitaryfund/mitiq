@@ -31,7 +31,7 @@ from mitiq.zne.scaling import (
     fold_gates_at_random,
     insert_id_layers,
 )
-from mitiq.zne.scaling.layer_scaling import get_layer_folding
+from mitiq.zne.scaling import get_layer_folding
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
 from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 

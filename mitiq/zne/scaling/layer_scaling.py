@@ -70,7 +70,9 @@ def layer_folding(
 def get_layer_folding(
     layer_index: int,
 ) -> Callable[[QPROGRAM, float], QPROGRAM]:
-    """Applies a variable amount of folding to select layers of a circuit.
+    """Return function to perform folding. The function return can be used as
+    an argument to define the noise scaling within the `execute_with_zne`
+    function.
 
     Args:
         layer_index: The layer of the circuit to apply folding to.
@@ -92,13 +94,13 @@ def get_layer_folding(
         Returns:
             layer_folding: the folded quantum circuit.
         """
+        _check_foldable(circuit)
+
         layers = [0] * len(circuit)
-        num_folds = (scale_factor - 1) / 2
+        num_folds = (scale_factor - 1) // 2
         if np.isclose(num_folds, int(num_folds)):
             num_folds = int(num_folds)
-        layers[layer_index] = int(num_folds)
-
-        _check_foldable(circuit)
+        layers[layer_index] = num_folds
 
         folded = layer_folding(circuit, layers_to_fold=layers)
 
