@@ -203,13 +203,13 @@ jobs:
           echo "dirs=$changed_directories" >> $GITHUB_STATE
 
       - name: Get changed directories (Windows)
-          id: changed_dirs_windows
-          if: runner.os == 'Windows'
-          run: |
-            $changed_directories = git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | Select-String -Pattern '^mitiq/' | Select-String -NotMatch -Pattern '/\.' | ForEach-Object {($_ -split '/')[1]} | Select-Object -Unique
-            $changed_directories = $changed_directories -join ' '
-            echo "Changed directories: $changed_directories"
-            echo "dirs=$changed_directories" >> $env:GITHUB_STATE
+        id: changed_dirs_windows
+        if: runner.os == 'Windows'
+        run: |
+          $changed_directories = git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | Select-String -Pattern '^mitiq/' | Select-String -NotMatch -Pattern '/\.' | ForEach-Object {($_ -split '/')[1]} | Select-Object -Unique
+          $changed_directories = $changed_directories -join ' '
+          echo "Changed directories: $changed_directories"
+          echo "dirs=$changed_directories" >> $env:GITHUB_STATE
 
       - name: Run tests for changed directories (Linux and macOS)
         if: runner.os != 'Windows'
