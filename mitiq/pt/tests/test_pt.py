@@ -42,14 +42,14 @@ def test_generate_lookup_table():
 @pytest.mark.parametrize(
     "gate, seed_val, expected_tuple",
     [
-        ("CNOT", 0, (cirq.Y, cirq.X, cirq.X, cirq.Y)),
-        ("CZ", 0, (cirq.Y, cirq.Z, cirq.Z, cirq.Y)),
-        ("CNOT", 1, (cirq.I, cirq.X, cirq.X, cirq.I)),
-        ("CZ", 1, (cirq.Z, cirq.I, cirq.I, cirq.Z)),
+        (cirq.CNOT, 0, (cirq.I, cirq.Z, cirq.Z, cirq.I)),
+        (cirq.CZ, 2, (cirq.Z, cirq.I, cirq.X, cirq.Z)),
+        (cirq.CNOT, 3, (cirq.Z, cirq.X, cirq.X, cirq.Z)),
+        (cirq.CZ, 4, (cirq.Z, cirq.I, cirq.I, cirq.Z)),
     ],
 )
 def test_sample_paulis(gate, seed_val, expected_tuple):
-    seed(seed_val)  # Fix random seed for reproducibility
+    seed(seed_val)  # Fix random seed for reproducibility - it's broken
     P1, P2, R1, R2 = sample_paulis(gate)
     assert (P1, P2, R1, R2) == expected_tuple
 

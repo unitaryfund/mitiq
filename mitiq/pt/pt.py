@@ -72,7 +72,7 @@ def pauli_twirled_circuits(
 def sample_paulis(
     two_qubit_gate: cirq.Gate,
 ) -> Tuple[cirq.Gate, cirq.Gate, cirq.Gate, cirq.Gate]:
-    if two_qubit_gate not in ["CNOT", "CZ"]:
+    if two_qubit_gate not in [cirq.CNOT, cirq.CZ]:
         raise ValueError("Invalid two-qubit gate. Supported gates: CNOT, CZ")
 
     lookup_table = (
