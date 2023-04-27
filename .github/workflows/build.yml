@@ -126,13 +126,14 @@ jobs:
       - name: Get changed directories
         id: changed_dirs
         run: |
-          changed_directories=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '/' | awk 'BEGIN{FS="/"}{print $1}' | uniq)
+          changed_directories=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^mitiq/' | grep -v '/\.' | awk 'BEGIN{FS="/"}{print $2}' | uniq)
           echo "Changed directories: $changed_directories"
-          echo "::set-output name=dirs::$changed_directories"
+          echo "dirs=$changed_directories" >> $GITHUB_STATE
 
       - name: Run tests for changed directories
         run: |
-          for dir in ${{ steps.changed_dirs.outputs.dirs }}; do
+          source $GITHUB_STATE
+          for dir in $dirs; do
             make test-$dir
           done
 
@@ -196,13 +197,14 @@ jobs:
       - name: Get changed directories
         id: changed_dirs
         run: |
-          changed_directories=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '/' | awk 'BEGIN{FS="/"}{print $1}' | uniq)
+          changed_directories=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^mitiq/' | grep -v '/\.' | awk 'BEGIN{FS="/"}{print $2}' | uniq)
           echo "Changed directories: $changed_directories"
-          echo "::set-output name=dirs::$changed_directories"
+          echo "dirs=$changed_directories" >> $GITHUB_STATE
 
       - name: Run tests for changed directories
         run: |
-          for dir in ${{ steps.changed_dirs.outputs.dirs }}; do
+          source $GITHUB_STATE
+          for dir in $dirs; do
             make test-$dir
           done
 
