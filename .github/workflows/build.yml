@@ -221,10 +221,11 @@ jobs:
       - name: Run tests for changed directories (Windows)
         if: runner.os == 'Windows'
         run: |
-          source $GITHUB_OUTPUT
-          for (dir in $dirs);
+          $dirs = $env:GITHUB_OUTPUT -split " "
+          foreach ($dir in $dirs) {
+            echo "Running tests for directory: $dir"
             make test-$dir
-          done
+          }
 
   test-nonlinux:
     if: github.event.pull_request.draft == false
