@@ -2,7 +2,6 @@ name: build
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, draft, review_requested, ready_for_review]
     branches:
       - master
   push:
@@ -102,7 +101,7 @@ jobs:
           asv machine --yes
           asv run --quick --strict
 
-  test-linux:
+  test-linux-draft:
     strategy:
       fail-fast: false
       matrix:
@@ -136,7 +135,15 @@ jobs:
           for dir in ${{ steps.changed_dirs.outputs.dirs }}; do
             make test-$dir
           done
+
+  test-linux:
     if: github.event.pull_request.draft == false
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Check out mitiq
         uses: actions/checkout@v3
@@ -164,7 +171,7 @@ jobs:
         with:
           fail_ci_if_error: true
 
-  test-nonlinux:
+  test-nonlinux-draft:
     strategy:
       fail-fast: false
       matrix:
@@ -198,7 +205,15 @@ jobs:
           for dir in ${{ steps.changed_dirs.outputs.dirs }}; do
             make test-$dir
           done
+
+  test-nonlinux:
     if: github.event.pull_request.draft == false
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Check out mitiq
         uses: actions/checkout@v3
