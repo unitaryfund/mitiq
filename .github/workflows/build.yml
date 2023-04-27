@@ -126,7 +126,7 @@ jobs:
       - name: Get changed directories
         id: changed_dirs
         run: |
-          changed_directories=$(python -c "import os; import sys; changes = os.popen('git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }}').read(); subdirs = [path.split('/')[1] for path in changes.splitlines() if path.startswith('mitiq/') and not '/.' in path]; sys.stdout.write(' '.join(subdirs))")
+          changed_directories=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^mitiq/' | grep -v '/\.' | awk 'BEGIN{FS="/"}{print $2}' | uniq)
           echo "Changed directories: $changed_directories"
           echo "dirs=$changed_directories" >> $GITHUB_STATE
 
@@ -194,12 +194,21 @@ jobs:
           python -m pip install --upgrade pip
           make install requirements
 
-      - name: Get changed directories
+      - name: Get changed directories (Linux and macOS)
         id: changed_dirs
+        if: runner.os != 'Windows'
         run: |
-          changed_directories=$(python -c "import os; import sys; changes = os.popen('git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }}').read(); subdirs = [path.split('/')[1] for path in changes.splitlines() if path.startswith('mitiq/') and not '/.' in path]; sys.stdout.write(' '.join(subdirs))")
+          changed_directories=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^mitiq/' | grep -v '/\.' | awk 'BEGIN{FS="/"}{print $2}' | uniq)
           echo "Changed directories: $changed_directories"
           echo "dirs=$changed_directories" >> $GITHUB_STATE
+
+      - name: Get changed directories (Windows)
+        id: changed_dirs_windows
+        if: runner.os == 'Windows'
+        run: |
+          $changed_directories = git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | Select-String -Pattern '^mitiq/' | Select-String -NotMatch -Pattern '/\.' | ForEach-Object {($_ -split '/')[1]} | Select-Object -Unique
+          echo "Changed directories: $($changed_directories -join ' ')"
+          echo "dirs=$($changed_directories -join ' ')" >> $env:GITHUB_STATE
 
       - name: Run tests for changed directories
         run: |
