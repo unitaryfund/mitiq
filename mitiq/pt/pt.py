@@ -5,11 +5,42 @@
 
 from typing import Callable, List, Optional, Tuple, Union
 
+import random
 import cirq
 import numpy as np
 
 from mitiq import QPROGRAM, Executor, Observable, QuantumResult
 from mitiq.interface import atomic_converter
+
+
+def _generate_lookup_table(gate):
+    if gate not in ['CNOT', 'CZ']:
+        raise ValueError('Invalid two-qubit gate. Supported gates: CNOT, CZ')
+
+    c = cirq.X if gate == 'CNOT' else cirq.Z
+    lookup_table = [
+        (cirq.I, cirq.I, cirq.I, cirq.I),
+        (cirq.X, cirq.I, cirq.I, cirq.X),
+        (cirq.Y, cirq.I, cirq.I, cirq.Y),
+        (cirq.Z, cirq.I, cirq.I, cirq.Z),
+        (cirq.I, c, c, cirq.I),
+        (cirq.X, c, c, cirq.X),
+        (cirq.Y, c, c, cirq.Y),
+        (cirq.Z, c, c, cirq.Z),
+        (cirq.I, cirq.Y, cirq.Y, cirq.I),
+        (cirq.X, cirq.Y, cirq.Y, cirq.X),
+        (cirq.Y, cirq.Y, cirq.Y, cirq.Y),
+        (cirq.Z, cirq.Y, cirq.Y, cirq.Z),
+        (cirq.I, cirq.Z, cirq.Z, cirq.I),
+        (cirq.X, cirq.Z, cirq.Z, cirq.X),
+        (cirq.Y, cirq.Z, cirq.Z, cirq.Y),
+        (cirq.Z, cirq.Z, cirq.Z, cirq.Z),
+    ]
+
+    return lookup_table
+
+lookup_table_CNOT = _generate_lookup_table('CNOT')
+lookup_table_CZ = _generate_lookup_table('CZ')
 
 
 def execute_with_pauli_twirling(
@@ -36,9 +67,13 @@ def pauli_twirled_circuits(
 Paulis = Union[cirq.IdentityGate, cirq.XPowGate, cirq.YPowGate, cirq.ZPowGate]
 
 
-def sample_paulis() -> Tuple[Paulis, Paulis, Paulis, Paulis]:
-    # P, Q, R, S
-    return cirq.ops.X, cirq.ops.I, cirq.ops.X, cirq.ops.X
+def sample_paulis(two_qubit_gate) -> Tuple[Paulis, Paulis, Paulis, Paulis]:
+    if two_qubit_gate not in ['CNOT', 'CZ']:
+        raise ValueError('Invalid two-qubit gate. Supported gates: CNOT, CZ')
+
+    lookup_table = lookup_table_CNOT if two_qubit_gate == 'CNOT' else lookup_table_CZ
+    P1, P2, R1, R2 = random.choice(lookup_table)
+    return P1, P2, R1, R2
 
 
 @atomic_converter
@@ -47,10 +82,10 @@ def add_paulis(circuit: cirq.Circuit) -> cirq.Circuit:
 
 
 def twirl_CNOT(op: cirq.Operation) -> cirq.OP_TREE:
-    if op.gate != cirq.CNOT:
+    if op.gate not in [cirq.CNOT, cirq.CZ]:
         return op
 
-    P, Q, R, S = sample_paulis()
+    P, Q, R, S = sample_paulis(str(op.gate))
     control_qubit, target_qubit = op.qubits
     return [
         P.on(control_qubit),
@@ -59,3 +94,4 @@ def twirl_CNOT(op: cirq.Operation) -> cirq.OP_TREE:
         R.on(control_qubit),
         S.on(target_qubit),
     ]
+
