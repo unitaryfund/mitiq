@@ -43,9 +43,9 @@ def test_generate_lookup_table():
     "gate, seed_val, expected_tuple",
     [
         (cirq.CNOT, 0, (cirq.I, cirq.Z, cirq.Z, cirq.I)),
-        (cirq.CZ, 2, (cirq.Z, cirq.I, cirq.X, cirq.Z)),
+        (cirq.CZ, 2, (cirq.X, cirq.I, cirq.I, cirq.X)),
         (cirq.CNOT, 3, (cirq.Z, cirq.X, cirq.X, cirq.Z)),
-        (cirq.CZ, 4, (cirq.Z, cirq.I, cirq.I, cirq.Z)),
+        (cirq.CZ, 4, (cirq.Z, cirq.Z, cirq.Z, cirq.Z)),
     ],
 )
 def test_sample_paulis(gate, seed_val, expected_tuple):
