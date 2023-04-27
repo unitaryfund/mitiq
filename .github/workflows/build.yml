@@ -210,12 +210,22 @@ jobs:
           echo "Changed directories: $($changed_directories -join ' ')"
           echo "dirs=$($changed_directories -join ' ')" >> $env:GITHUB_STATE
 
-      - name: Run tests for changed directories
+      - name: Run tests for changed directories (Linux and macOS)
+        if: runner.os != 'Windows'
         run: |
           source $GITHUB_STATE
           for dir in $dirs; do
             make test-$dir
           done
+
+      - name: Run tests for changed directories (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          Get-Content -Path $env:GITHUB_STATE | ForEach-Object { $script:dirs = ($_ -split "=")[1] }
+          $dirs = $dirs -split " "
+          foreach ($dir in $dirs) {
+            & "make" "test-$dir"
+          }
 
   test-nonlinux:
     if: github.event.pull_request.draft == false
