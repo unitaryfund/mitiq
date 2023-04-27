@@ -126,7 +126,7 @@ jobs:
       - name: Get changed directories
         id: changed_dirs
         run: |
-          changed_directories=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^mitiq/' | grep -v '/\.' | awk 'BEGIN{FS="/"}{print $2}' | uniq)
+          changed_directories=$(python -c "import os; import sys; changes = os.popen('git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }}').read(); subdirs = [path.split('/')[1] for path in changes.splitlines() if path.startswith('mitiq/') and not '/.' in path]; sys.stdout.write(' '.join(subdirs))")
           echo "Changed directories: $changed_directories"
           echo "dirs=$changed_directories" >> $GITHUB_STATE
 
@@ -197,7 +197,7 @@ jobs:
       - name: Get changed directories
         id: changed_dirs
         run: |
-          changed_directories=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^mitiq/' | grep -v '/\.' | awk 'BEGIN{FS="/"}{print $2}' | uniq)
+          changed_directories=$(python -c "import os; import sys; changes = os.popen('git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }}').read(); subdirs = [path.split('/')[1] for path in changes.splitlines() if path.startswith('mitiq/') and not '/.' in path]; sys.stdout.write(' '.join(subdirs))")
           echo "Changed directories: $changed_directories"
           echo "dirs=$changed_directories" >> $GITHUB_STATE
 
