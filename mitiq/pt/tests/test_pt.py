@@ -34,21 +34,26 @@ def test_generate_lookup_table():
         with pytest.raises(ValueError):
             _generate_lookup_table(gate)
 
-    _test_generate_lookup_table('CNOT', 16)
-    _test_generate_lookup_table('CZ', 16)
-    _test_generate_lookup_table_exception('INVALID_GATE')
+    _test_generate_lookup_table("CNOT", 16)
+    _test_generate_lookup_table("CZ", 16)
+    _test_generate_lookup_table_exception("INVALID_GATE")
 
-@pytest.mark.parametrize("gate, seed_val, expected_tuple", [
-    ('CNOT', 0, (cirq.Y, cirq.X, cirq.X, cirq.Y)),
-    ('CZ', 0, (cirq.Y, cirq.Z, cirq.Z, cirq.Y)),
-    ('CNOT', 1, (cirq.I, cirq.X, cirq.X, cirq.I)),
-    ('CZ', 1, (cirq.Z, cirq.I, cirq.I, cirq.Z))
-])
+
+@pytest.mark.parametrize(
+    "gate, seed_val, expected_tuple",
+    [
+        ("CNOT", 0, (cirq.Y, cirq.X, cirq.X, cirq.Y)),
+        ("CZ", 0, (cirq.Y, cirq.Z, cirq.Z, cirq.Y)),
+        ("CNOT", 1, (cirq.I, cirq.X, cirq.X, cirq.I)),
+        ("CZ", 1, (cirq.Z, cirq.I, cirq.I, cirq.Z)),
+    ],
+)
 def test_sample_paulis(gate, seed_val, expected_tuple):
     seed(seed_val)  # Fix random seed for reproducibility
     P1, P2, R1, R2 = sample_paulis(gate)
     assert (P1, P2, R1, R2) == expected_tuple
 
-def test_sample_paulis():
+
+def test_sample_paulis_exception():
     with pytest.raises(ValueError):
-        sample_paulis('INVALID_GATE')
+        sample_paulis("INVALID_GATE")
