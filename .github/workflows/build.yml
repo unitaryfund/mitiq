@@ -128,11 +128,11 @@ jobs:
         run: |
           changed_directories=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^mitiq/' | grep -v '/\.' | awk 'BEGIN{FS="/"}{print $2}' | uniq)
           echo "Changed directories: $changed_directories"
-          echo "dirs=$changed_directories" >> $GITHUB_STATE
+          echo "dirs=$changed_directories" >> $GITHUB_OUTPUT
 
       - name: Run tests for changed directories
         run: |
-          source $GITHUB_STATE
+          source $GITHUB_OUTPUT
           for dir in $dirs; do
             make test-$dir
           done
@@ -200,21 +200,20 @@ jobs:
         run: |
           changed_directories=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^mitiq/' | grep -v '/\.' | awk 'BEGIN{FS="/"}{print $2}' | uniq)
           echo "Changed directories: $changed_directories"
-          echo "dirs=$changed_directories" >> $GITHUB_STATE
+          echo "dirs=$changed_directories" >> $GITHUB_OUTPUT
 
       - name: Get changed directories (Windows)
         id: changed_dirs_windows
         if: runner.os == 'Windows'
         run: |
           $changed_directories = git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | Select-String -Pattern '^mitiq/' | Select-String -NotMatch -Pattern '/\.' | ForEach-Object {($_ -split '/')[1]} | Select-Object -Unique
-          $changed_directories = $changed_directories -join ' '
-          echo "Changed directories: $changed_directories"
-          echo "Changed-dirs=$changed_directories" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "Changed directories: $($changed_directories -join ' ')"
+          echo "dirs=$($changed_directories -join ' ')" >> $env:GITHUB_OUTPUT
 
       - name: Run tests for changed directories (Linux and macOS)
         if: runner.os != 'Windows'
         run: |
-          source $GITHUB_STATE
+          source $GITHUB_OUTPUT
           for dir in $dirs; do
             make test-$dir
           done
@@ -222,12 +221,10 @@ jobs:
       - name: Run tests for changed directories (Windows)
         if: runner.os == 'Windows'
         run: |
-          echo "Changed directories from environment variable: $env:Changed_dirs"
-          $dirs = $env:Changed_dirs -split " "
-          $dirs | ForEach-Object {
-            echo "Running tests for directory: $_"
-            & "make" "test-$_"
-          }
+          source $GITHUB_OUTPUT
+          for (dir in $dirs);
+            make test-$dir
+          done
 
   test-nonlinux:
     if: github.event.pull_request.draft == false
