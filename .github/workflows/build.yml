@@ -221,7 +221,7 @@ jobs:
       - name: Run tests for changed directories (Windows)
         if: runner.os == 'Windows'
         run: |
-          $dirs = $env:Changed-dirs -split " "
+          $dirs = $env:$Changed-dirs -split " "
           foreach ($dir in $dirs) {
             echo "Running tests for directory: $dir"
             make test-$dir
