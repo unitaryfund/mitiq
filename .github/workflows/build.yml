@@ -2,6 +2,7 @@ name: build
 
 on:
   pull_request:
+    types: [draft, review_requested, ready_for_review]
     branches:
       - master
   push:
