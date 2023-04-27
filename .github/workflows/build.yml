@@ -224,10 +224,12 @@ jobs:
         run: |
           Get-Content -Path $env:GITHUB_STATE | ForEach-Object { $script:dirs = ($_ -split "=")[1] }
           $dirs = $dirs -split " "
+          Write-Host "Changed directories from environment variable: $dirs"
+          
           foreach ($dir in $dirs) {
+            Write-Host "Running tests for directory: $dir"
             & "make" "test-$dir"
           }
-        shell: pwsh
 
   test-nonlinux:
     if: github.event.pull_request.draft == false
