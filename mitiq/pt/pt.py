@@ -84,10 +84,10 @@ def sample_paulis(
 
 @atomic_converter
 def add_paulis(circuit: cirq.Circuit) -> cirq.Circuit:
-    return circuit.map_operations(twirl_CNOT)
+    return circuit.map_operations(twirl_two_qubit_gate)
 
 
-def twirl_CNOT(op: cirq.Operation) -> cirq.OP_TREE:
+def twirl_two_qubit_gate(op: cirq.Operation) -> cirq.OP_TREE:
     if op.gate not in [cirq.CNOT, cirq.CZ]:
         return op
 
