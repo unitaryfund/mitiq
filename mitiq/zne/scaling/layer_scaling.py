@@ -78,7 +78,7 @@ def get_layer_folding(
         layer_index: The layer of the circuit to apply folding to.
 
     Returns:
-        fold_ith_layer: The function for folding the ith layer.
+        The function for folding the ith layer.
     """
 
     @noise_scaling_converter
