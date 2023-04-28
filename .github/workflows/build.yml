@@ -128,12 +128,12 @@ jobs:
         run: |
           changed_directories=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^mitiq/' | grep -v '/\.' | awk 'BEGIN{FS="/"}{print $2}' | uniq)
           echo "Changed directories: $changed_directories"
-          echo "dirs=$changed_directories" >> $GITHUB_OUTPUT
+          echo "CHANGED_DIRECTORIES=$changed_directories" >> $GITHUB_OUTPUT
 
       - name: Run tests for changed directories
         run: |
-          source $GITHUB_OUTPUT
-          for dir in $dirs; do
+          echo $CHANGED_DIRECTORIES
+          for dir in $CHANGED_DIRECTORIES; do
             make test-$dir
           done
 
@@ -200,7 +200,7 @@ jobs:
         run: |
           changed_directories=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^mitiq/' | grep -v '/\.' | awk 'BEGIN{FS="/"}{print $2}' | uniq)
           echo "Changed directories: $changed_directories"
-          echo "dirs=$changed_directories" >> $GITHUB_OUTPUT
+          echo "CHANGED_DIRECTORIES=$changed_directories" >> $GITHUB_OUTPUT
 
       - name: Get changed directories (Windows)
         id: changed_dirs_windows
@@ -213,8 +213,8 @@ jobs:
       - name: Run tests for changed directories (Linux and macOS)
         if: runner.os != 'Windows'
         run: |
-          source $GITHUB_OUTPUT
-          for dir in $dirs; do
+          echo $CHANGED_DIRECTORIES
+          for dir in $CHANGED_DIRECTORIES; do
             make test-$dir
           done
 
