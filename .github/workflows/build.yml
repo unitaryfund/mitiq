@@ -8,7 +8,6 @@ on:
       - synchronize
       - ready_for_review
       - draft
-      - review_requested
     branches:
       - master
   push:
