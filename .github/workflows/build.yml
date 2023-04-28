@@ -232,10 +232,14 @@ jobs:
         id: run_test_for_changed_dirs_windows
         if: runner.os == 'Windows'
         run: |
-          $dirs = $env:cdirs -split " "
-          foreach ($dir in $dirs) {
-            echo "Running tests for directory: $dir"
-            make test-$dir
+          if (![string]::IsNullOrEmpty($env:cdirs)) {
+            $dirs = $env:cdirs -split " "
+            foreach ($dir in $dirs) {
+              echo "Running tests for directory: $dir"
+              make test-$dir
+            }
+          } else {
+            echo "No directories to test."
           }
 
   test-nonlinux:
