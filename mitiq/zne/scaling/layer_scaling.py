@@ -92,7 +92,7 @@ def get_layer_folding(
             scale_factor: Factor to scale the circuit by.
 
         Returns:
-            layer_folding: the folded quantum circuit.
+            The folded quantum circuit.
         """
         _check_foldable(circuit)
 
