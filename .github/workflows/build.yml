@@ -128,7 +128,7 @@ jobs:
         run: |
           changed_directories=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^mitiq/' | grep -v '/\.' | awk 'BEGIN{FS="/"}{print $2}' | uniq)
           echo "Changed directories: $changed_directories"
-          echo "CHANGED_DIRECTORIES=$changed_directories" >> $GITHUB_OUTPUT
+          echo "CHANGED_DIRECTORIES=$changed_directories" >> $GITHUB_ENV
 
       - name: Run tests for changed directories
         run: |
