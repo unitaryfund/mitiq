@@ -102,6 +102,7 @@ jobs:
           asv run --quick --strict
 
   test-linux-draft:
+    if: github.event.pull_request.draft == true
     strategy:
       fail-fast: false
       matrix:
@@ -173,6 +174,7 @@ jobs:
           fail_ci_if_error: true
 
   test-nonlinux-draft:
+    if: github.event.pull_request.draft == true
     strategy:
       fail-fast: false
       matrix:
