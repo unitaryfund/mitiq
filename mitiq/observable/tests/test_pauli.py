@@ -372,3 +372,13 @@ def test_pstringcollection_expectation_from_measurements_qubit_indices():
         PauliString(spec="Z", coeff=-2.0, support=(5,))
     )
     assert np.isclose(pset._expectation_from_measurements(measurements), 0.0)
+
+
+def test_spec():
+    x = PauliString(spec="XIZYII")
+    assert x.spec == "XZY"
+
+
+def test_with_coeff():
+    x = PauliString(spec="X")
+    assert x.with_coeff(2) == 2

@@ -274,3 +274,56 @@ def test_observable_expectation_supported_qubits(executor):
     # <Z2> = 0.
     obs = Observable(PauliString(spec="Z", support=(2,)))
     assert np.isclose(obs.expectation(circuit, executor), 0.0, atol=5e-2)
+
+
+def test_observable_mul():
+    XI = PauliString("XI", 0.3)
+    YY = PauliString("YY", 0.7)
+    XZ = PauliString("XZ", 0.1)
+    ZX = PauliString("ZX", 0.2)
+    IZ = PauliString("IZ", -0.4)
+    o1 = Observable(XI, YY, XZ)
+    o2 = Observable(ZX, IZ)
+    o3 = Observable(XI * ZX, XI * IZ, YY * ZX, YY * IZ, XZ * ZX, XZ * IZ)
+    assert np.allclose((o1 * o2).matrix(), o3.matrix())
+
+
+def test_observable_multiplication():
+    YXXYZ = PauliString("YXXYZ", 0.3)
+    ZYIZX = PauliString("ZYIZX", 0.7)
+    IZZXY = PauliString("IZZXY", 0.1)
+    YZIXZ = PauliString("YZIXZ", 0.2)
+    XZYII = PauliString("XZYII", -0.4)
+    YYZXI = PauliString("YYZXI", 0.7)
+    IIXYZ = PauliString("IIXYZ", 0.7)
+    ZYXIZ = PauliString("ZYXIZ", 0.1)
+    YIZXI = PauliString("YIZXI", 0.2)
+    l1 = [YXXYZ, ZYIZX, IZZXY, YZIXZ, XZYII]
+    l2 = [YYZXI, IIXYZ, ZYXIZ, YIZXI]
+    o1 = Observable(*l1)
+    o2 = Observable(*l2)
+    l3 = [p1 * p2 for p1 in l1 for p2 in l2]
+    o3 = Observable(*l3)
+    assert np.allclose((o1 * o2).matrix(), o3.matrix())
+
+
+def test_pauli_string_left_multiplication():
+    XI = PauliString("XI", 0.3)
+    YY = PauliString("YY", 0.7)
+    XZ = PauliString("XZ", 0.1)
+    IZ = PauliString("IZ", -0.4)
+    l = [XI, YY, XZ]
+    o1 = Observable(*l)
+    o2 = Observable(*[p * IZ for p in l])
+    assert np.allclose((o1 * IZ).matrix(), o2.matrix())
+
+
+def test_pauli_string_right_multiplication():
+    XI = PauliString("XI", 0.3)
+    YY = PauliString("YY", 0.7)
+    XZ = PauliString("XZ", 0.1)
+    IZ = PauliString("IZ", -0.4)
+    l = [XI, YY, XZ]
+    o1 = Observable(*l)
+    o2 = Observable(*[IZ * p for p in l])
+    assert np.allclose((IZ * o1).matrix(), o2.matrix())

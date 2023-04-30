@@ -23,6 +23,7 @@ from typing import (
     Optional,
     Sequence,
     Set,
+    Union,
 )
 
 import numpy as np
@@ -40,6 +41,7 @@ class PauliString:
     """
 
     _string_to_gate_map = {"I": cirq.I, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
+    _gate_to_string_map = {cirq.I: "I", cirq.X: "X", cirq.Y: "Y", cirq.Z: "Z"}
 
     def __init__(
         self,
@@ -130,6 +132,17 @@ class PauliString:
                 return False
         return True
 
+    def with_coeff(self, coeff) -> "PauliString":
+        return PauliString(spec=self.spec, coeff=coeff, support=self.support())
+
+    @property
+    def spec(self) -> str:
+        """Returns a string representation of the Pauli gates in the PauliString."""
+        return "".join(
+            self._gate_to_string_map[self._pauli[q]]
+            for q in sorted(self._pauli.qubits)
+        )
+
     def support(self) -> Set[int]:
         return {q.x for q in self._pauli.qubits}
 
@@ -146,10 +159,18 @@ class PauliString:
             measurements
         )
 
-    def __mul__(self, other: "PauliString") -> "PauliString":
-        result = PauliString()
-        result._pauli = self._pauli * other._pauli
-        return result
+    def __mul__(
+        self, other: Union["PauliString", complex, float, int]
+    ) -> "PauliString":
+        if isinstance(other, PauliString):
+            result = PauliString()
+            result._pauli = self._pauli * other._pauli
+            return result
+        elif isinstance(other, (complex, float, int)):
+            result = PauliString()
+            result._pauli = self._pauli * other
+            return result
+        return NotImplemented
 
     def __eq__(self, other: Any) -> bool:
         return self._pauli == other._pauli

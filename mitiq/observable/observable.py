@@ -66,12 +66,33 @@ class Observable:
         return {q for pauli in self._paulis for q in pauli._pauli.qubits}
 
     @property
+    def paulis(self) -> List[PauliString]:
+        return self._paulis
+
+    @property
     def qubit_indices(self) -> List[int]:
         return [cast(cirq.LineQubit, q).x for q in sorted(self._qubits())]
 
     @property
     def nqubits(self) -> int:
         return len(self.qubit_indices)
+
+    def __mul__(self, other):
+        if isinstance(other, (PauliString, complex, float, int)):
+            return Observable(*[pauli * other for pauli in self._paulis])
+        elif isinstance(other, Observable):
+            all_paulis = []
+            for other_pauli in other._paulis:
+                all_paulis += [pauli * other_pauli for pauli in self._paulis]
+            new_observable = Observable(*all_paulis)
+            new_observable._combine_duplicates()
+            return new_observable
+        return NotImplemented
+
+    def __rmul__(self, other):
+        if isinstance(other, (PauliString, complex, float, int)):
+            return Observable(*[other * pauli for pauli in self._paulis])
+        return NotImplemented
 
     @property
     def groups(self) -> List[PauliStringCollection]:
@@ -127,6 +148,23 @@ class Observable:
         from mitiq.executor import Executor  # Avoid circular import.
 
         return Executor(execute).evaluate(circuit, observable=self)[0]
+
+    def _combine_duplicates(self):
+        d = {}
+        for pauli_string in self._paulis:
+            cache_key = pauli_string.with_coeff(1)
+            if cache_key in d:
+                new_coeff = pauli_string.coeff + d[cache_key].coeff
+                d[cache_key] = d[cache_key].with_coeff(new_coeff)
+            else:
+                d[cache_key] = pauli_string
+        self._paulis = list(
+            [
+                pauli_string
+                for pauli_string in d.values()
+                if pauli_string.coeff != 0
+            ]
+        )
 
     def _expectation_from_measurements(
         self, measurements: List[MeasurementResult]
