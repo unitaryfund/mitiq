@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
-from typing import Callable, cast, List, Optional, Set
+from typing import Callable, cast, List, Optional, Set, Union, Dict
 
 import numpy as np
 import numpy.typing as npt
@@ -77,7 +77,9 @@ class Observable:
     def nqubits(self) -> int:
         return len(self.qubit_indices)
 
-    def __mul__(self, other):
+    def __mul__(
+        self, other: Union["Observable", "PauliString", complex, float, int]
+    ) -> "Observable":
         if isinstance(other, (PauliString, complex, float, int)):
             return Observable(*[pauli * other for pauli in self._paulis])
         elif isinstance(other, Observable):
@@ -89,7 +91,9 @@ class Observable:
             return new_observable
         return NotImplemented
 
-    def __rmul__(self, other):
+    def __rmul__(
+        self, other: Union["PauliString", complex, float, int]
+    ) -> "Observable":
         if isinstance(other, (PauliString, complex, float, int)):
             return Observable(*[other * pauli for pauli in self._paulis])
         return NotImplemented
@@ -149,8 +153,8 @@ class Observable:
 
         return Executor(execute).evaluate(circuit, observable=self)[0]
 
-    def _combine_duplicates(self):
-        d = {}
+    def _combine_duplicates(self) -> None:
+        d: Dict[PauliString, PauliString] = {}
         for pauli_string in self._paulis:
             cache_key = pauli_string.with_coeff(1)
             if cache_key in d:

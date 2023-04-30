@@ -375,10 +375,8 @@ def test_pstringcollection_expectation_from_measurements_qubit_indices():
 
 
 def test_spec():
-    x = PauliString(spec="XIZYII")
-    assert x.spec == "XZY"
+    assert PauliString(spec="XIZYII").spec == "XZY"
 
 
 def test_with_coeff():
-    x = PauliString(spec="X")
-    assert x.with_coeff(2) == 2
+    assert PauliString(spec="X").with_coeff(2).coeff == 2

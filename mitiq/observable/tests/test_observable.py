@@ -282,10 +282,12 @@ def test_observable_mul():
     XZ = PauliString("XZ", 0.1)
     ZX = PauliString("ZX", 0.2)
     IZ = PauliString("IZ", -0.4)
-    o1 = Observable(XI, YY, XZ)
-    o2 = Observable(ZX, IZ)
-    o3 = Observable(XI * ZX, XI * IZ, YY * ZX, YY * IZ, XZ * ZX, XZ * IZ)
-    assert np.allclose((o1 * o2).matrix(), o3.matrix())
+    obs1 = Observable(XI, YY, XZ)
+    obs2 = Observable(ZX, IZ)
+    correct_obs = Observable(
+        XI * ZX, XI * IZ, YY * ZX, YY * IZ, XZ * ZX, XZ * IZ
+    )
+    assert np.allclose((obs1 * obs2).matrix(), correct_obs.matrix())
 
 
 def test_observable_multiplication():
@@ -298,13 +300,13 @@ def test_observable_multiplication():
     IIXYZ = PauliString("IIXYZ", 0.7)
     ZYXIZ = PauliString("ZYXIZ", 0.1)
     YIZXI = PauliString("YIZXI", 0.2)
-    l1 = [YXXYZ, ZYIZX, IZZXY, YZIXZ, XZYII]
-    l2 = [YYZXI, IIXYZ, ZYXIZ, YIZXI]
-    o1 = Observable(*l1)
-    o2 = Observable(*l2)
-    l3 = [p1 * p2 for p1 in l1 for p2 in l2]
-    o3 = Observable(*l3)
-    assert np.allclose((o1 * o2).matrix(), o3.matrix())
+    pauli_strings_1 = [YXXYZ, ZYIZX, IZZXY, YZIXZ, XZYII]
+    pauli_strings_2 = [YYZXI, IIXYZ, ZYXIZ, YIZXI]
+    obs1 = Observable(*pauli_strings_1)
+    obs2 = Observable(*pauli_strings_2)
+    l3 = [p1 * p2 for p1 in pauli_strings_1 for p2 in pauli_strings_2]
+    correct_obs = Observable(*l3)
+    assert np.allclose((obs1 * obs2).matrix(), correct_obs.matrix())
 
 
 def test_pauli_string_left_multiplication():
@@ -312,10 +314,10 @@ def test_pauli_string_left_multiplication():
     YY = PauliString("YY", 0.7)
     XZ = PauliString("XZ", 0.1)
     IZ = PauliString("IZ", -0.4)
-    l = [XI, YY, XZ]
-    o1 = Observable(*l)
-    o2 = Observable(*[p * IZ for p in l])
-    assert np.allclose((o1 * IZ).matrix(), o2.matrix())
+    pauli_strings = [XI, YY, XZ]
+    obs1 = Observable(*pauli_strings)
+    correct_obs = Observable(*[p * IZ for p in pauli_strings])
+    assert np.allclose((obs1 * IZ).matrix(), correct_obs.matrix())
 
 
 def test_pauli_string_right_multiplication():
@@ -323,7 +325,7 @@ def test_pauli_string_right_multiplication():
     YY = PauliString("YY", 0.7)
     XZ = PauliString("XZ", 0.1)
     IZ = PauliString("IZ", -0.4)
-    l = [XI, YY, XZ]
-    o1 = Observable(*l)
-    o2 = Observable(*[IZ * p for p in l])
-    assert np.allclose((IZ * o1).matrix(), o2.matrix())
+    pauli_strings = [XI, YY, XZ]
+    obs1 = Observable(*pauli_strings)
+    correct_obs = Observable(*[IZ * p for p in pauli_strings])
+    assert np.allclose((IZ * obs1).matrix(), correct_obs.matrix())

@@ -132,12 +132,15 @@ class PauliString:
                 return False
         return True
 
-    def with_coeff(self, coeff) -> "PauliString":
-        return PauliString(spec=self.spec, coeff=coeff, support=self.support())
+    def with_coeff(self, coeff: complex) -> "PauliString":
+        return PauliString(
+            spec=self.spec, coeff=coeff, support=sorted(self.support())
+        )
 
     @property
     def spec(self) -> str:
-        """Returns a string representation of the Pauli gates in the PauliString."""
+        """Returns a string representation of the Pauli gates in
+        the PauliString."""
         return "".join(
             self._gate_to_string_map[self._pauli[q]]
             for q in sorted(self._pauli.qubits)
@@ -171,6 +174,9 @@ class PauliString:
             result._pauli = self._pauli * other
             return result
         return NotImplemented
+
+    def __rmul__(self, other: Union[complex, float, int]) -> "PauliString":
+        return self.__mul__(other)
 
     def __eq__(self, other: Any) -> bool:
         return self._pauli == other._pauli
