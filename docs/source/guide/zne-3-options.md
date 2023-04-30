@@ -216,6 +216,79 @@ folding method. Fidelity values must be between zero and one.
 
 +++
 
+#### Folding gates by layer
+
+Circuit debugging techniques, as proposed in
+*Calderon et al. Quantum (2023)* {cite}`Calderon_2023_Quantum`, utilize the
+ability to apply layerwise folding of a circuit.
+
+A quantum circuit $C$ may be represented as a series of $d$ layers. Each layer $L$
+contains one or more quantum gates acting concurrently on an $n$-qubit
+system:
+
+$$
+C = L_d L_{d-1} \cdots L_2 L_1.
+$$
+
+The $i$-inverse operation of a circuit $C$ is defined as
+
+$$
+C^{(i)} = L_d \cdots L_{i+1} [L_i L_i^{-1} L_i] L_{i-1} \cdots L_1
+$$
+
+where we refer to $L_i$ as the *target layer* and $L_i^{-1}$ as the *inverse
+target layer*. The inverse target layer is composed of gates that would invert
+the gates in the target layer.
+
+One can perform $m$ such inversions on a quantum circuit as well. A multiple
+$i$-inversion is defined as
+
+$$
+C^{(i)} = L_d \cdots L_{i+1} L_i \left[L_i^{-1} L_i\right]^m L_{i-1} \cdots L_1
+$$
+
+where we apply a given $i$-inversion $m$ times.
+
+For example, consider the following circuit
+
+```{code-cell} ipython3
+from mitiq.zne.scaling.layer_scaling import layer_folding
+
+q0, q1 = cirq.LineQubit.range(2)
+circuit = cirq.Circuit(
+    cirq.H(q0),
+    cirq.CNOT(q0, q1),
+)
+print(circuit)
+```
+
+This circuit consists of two layers (the first layer has a Hadamard gate and the
+second layer has a CNOT gate).
+
+We can make use of the {func}`.layer_folding()` function where the argument
+`layers_to_fold` is a list of size $d$ where each element in the list is an
+integer that refers to the number of times to fold the layer at index `i`.
+
+As an example, we can apply a single fold only to the first layer of the circuit
+
+```{code-cell} ipython3
+print(layer_folding(circuit, [1, 0]))
+```
+
+We can also fold specific layers a variable number of times. Here is an example
+of folding the first layer twice and the second layer three times.
+
+```{code-cell} ipython3
+print(layer_folding(circuit, [2, 3]))
+```
+
+The `layer_folding` function could be used for noise diagnostics {cite}`Calderon_2023_Quantum`
+or for a low-level implementation of ZNE in a similar way
+as shown in the [next section](zne-4-low-level.md).
+
+To get a noise scaling function which is instead directly compatible with
+{func}`.execute_with_zne` one can use  {func}`.get_layer_folding`.
+
 ### Identity Scaling
 
 The goal of this technique is to insert layers of identity gates to extend the duration of the circuit, which, when used in the context of ZNE, provides a useful noise-scaling method.
