@@ -12,7 +12,7 @@ import numpy as np
 from mitiq import QPROGRAM, Executor, Observable, QuantumResult
 from mitiq.interface import atomic_converter
 
-Paulis = Union[cirq.IdentityGate, cirq.XPowGate, cirq.YPowGate, cirq.ZPowGate]
+# Paulis = Union[cirq.IdentityGate, cirq.XPowGate, cirq.YPowGate, cirq.ZPowGate]
 
 
 def _generate_lookup_table(

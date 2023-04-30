@@ -5,6 +5,5 @@
 
 from mitiq.pt.pt import (
     execute_with_pauli_twirling,
-    _generate_lookup_table,
     sample_paulis,
 )
