@@ -276,7 +276,7 @@ def test_observable_expectation_supported_qubits(executor):
     assert np.isclose(obs.expectation(circuit, executor), 0.0, atol=5e-2)
 
 
-def test_observable_mul():
+def test_observable_multuplication_1():
     XI = PauliString("XI", 0.3)
     YY = PauliString("YY", 0.7)
     XZ = PauliString("XZ", 0.1)
@@ -290,7 +290,7 @@ def test_observable_mul():
     assert np.allclose((obs1 * obs2).matrix(), correct_obs.matrix())
 
 
-def test_observable_multiplication():
+def test_observable_multiplication_2():
     YXXYZ = PauliString("YXXYZ", 0.3)
     ZYIZX = PauliString("ZYIZX", 0.7)
     IZZXY = PauliString("IZZXY", 0.1)
@@ -307,6 +307,13 @@ def test_observable_multiplication():
     l3 = [p1 * p2 for p1 in pauli_strings_1 for p2 in pauli_strings_2]
     correct_obs = Observable(*l3)
     assert np.allclose((obs1 * obs2).matrix(), correct_obs.matrix())
+
+
+def test_scalar_multiplication():
+    YXXYZ = PauliString("YXXYZ", 0.3)
+    obs = Observable(YXXYZ)
+    assert np.allclose((obs * 2.0).matrix(), Observable(YXXYZ * 2.0).matrix())
+    assert np.allclose((2.0 * obs).matrix(), Observable(YXXYZ * 2.0).matrix())
 
 
 def test_pauli_string_left_multiplication():

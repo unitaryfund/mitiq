@@ -190,6 +190,8 @@ def test_weight():
 
 def test_multiplication():
     Pauli = PauliString
+    assert 2 * Pauli("X") == Pauli("X", coeff=2)
+    assert Pauli("X") * 2 == Pauli("X", coeff=2)
     assert Pauli("X") * Pauli("I") == Pauli("X")
     assert Pauli("X") * Pauli("Y") == Pauli("Z", coeff=1j)
     assert Pauli("X") * Pauli("Y", support=(1,)) == Pauli("XY")
