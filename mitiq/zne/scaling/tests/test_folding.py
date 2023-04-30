@@ -48,7 +48,7 @@ from sympy import Symbol
 
 def test_squash_moments_two_qubits():
     """Tests squashing moments in a two-qubit circuit with 'staggered' single
-    qubit gats.
+    qubit gates.
     """
     # Test circuit:
     # 0: ───────H───────H───────H───────H───────H───
