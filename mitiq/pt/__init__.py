@@ -5,5 +5,6 @@
 
 from mitiq.pt.pt import (
     execute_with_pauli_twirling,
-    sample_paulis,
+    twirl_CNOT_gates,
+    twirl_CZ_gates,
 )

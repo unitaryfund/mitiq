@@ -3,10 +3,19 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-from mitiq.pt.pt import add_paulis, sample_paulis, _generate_lookup_table
+import random
+
 import cirq
-import pytest
-from random import seed
+import qiskit
+import numpy as np
+import networkx as nx
+
+from mitiq.pt.pt import (
+    twirl_CNOT_gates,
+    execute_with_pauli_twirling,
+)
+from mitiq.interface.mitiq_cirq import compute_density_matrix
+from mitiq.benchmarks import generate_mirror_circuit
 
 num_qubits = 2
 qubits = cirq.LineQubit.range(num_qubits)
@@ -14,46 +23,63 @@ circuit = cirq.Circuit()
 circuit.append(cirq.CNOT.on_each(zip(qubits, qubits[1:])))
 
 
-def test_add_paulis():
-    twirled = add_paulis(circuit)
-    twirled_circuit = cirq.Circuit(
-        cirq.X.on(qubits[0]),
-        cirq.I.on(qubits[1]),
-        cirq.CNOT.on(*qubits),
-        cirq.X.on_each(*qubits),
+def amp_damp_executor(circuit: cirq.Circuit, noise: float = 0.005) -> float:
+    return compute_density_matrix(
+        circuit, noise_model=cirq.amplitude_damp, noise_level=(noise,)
+    )[0, 0].real
+
+
+def test_twirl_CNOT_implements_same_unitary():
+    num_circuits = 1
+    twirled = twirl_CNOT_gates(circuit, num_circuits=num_circuits)
+    assert len(twirled) == num_circuits
+    original_unitary = cirq.unitary(circuit)
+    twirled_unitary = cirq.unitary(twirled[0])
+    assert np.array_equal(twirled_unitary, original_unitary) or np.array_equal(
+        -1 * twirled_unitary, original_unitary
     )
 
-    assert twirled == twirled_circuit
+
+def test_twirl_CNOT_qiskit():
+    qc = qiskit.QuantumCircuit(2, 2)
+    qc.h(0)
+    qc.cx(0, 1)
+    qc.measure([0, 1], [0, 1])
+    num_circuits = 10
+    twirled = twirl_CNOT_gates(qc, num_circuits=num_circuits)
+    assert len(twirled) == num_circuits
+    random_index = random.randint(0, 9)
+    assert isinstance(twirled[random_index], qiskit.QuantumCircuit)
 
 
-def test_generate_lookup_table():
-    def _test_generate_lookup_table(gate, expected_length):
-        assert len(_generate_lookup_table(gate)) == expected_length
-
-    def _test_generate_lookup_table_exception(gate):
-        with pytest.raises(ValueError):
-            _generate_lookup_table(gate)
-
-    _test_generate_lookup_table("CNOT", 16)
-    _test_generate_lookup_table("CZ", 16)
-    _test_generate_lookup_table_exception("INVALID_GATE")
+def test_twirl_CZ():
+    ...
 
 
-@pytest.mark.parametrize(
-    "gate, seed_val, expected_tuple",
-    [
-        (cirq.CNOT, 0, (cirq.I, cirq.Z, cirq.Z, cirq.I)),
-        (cirq.CZ, 2, (cirq.X, cirq.I, cirq.I, cirq.X)),
-        (cirq.CNOT, 3, (cirq.Z, cirq.X, cirq.X, cirq.Z)),
-        (cirq.CZ, 4, (cirq.Z, cirq.Z, cirq.Z, cirq.Z)),
-    ],
-)
-def test_sample_paulis(gate, seed_val, expected_tuple):
-    seed(seed_val)  # Fix random seed for reproducibility - it's broken
-    P1, P2, R1, R2 = sample_paulis(gate)
-    assert (P1, P2, R1, R2) == expected_tuple
+def test_twirl_CNOT_increases_layer_count():
+    num_qubits = 3
+    num_layers = 10
+    gateset = {cirq.X: 1, cirq.Y: 1, cirq.Z: 1, cirq.H: 1, cirq.CNOT: 2}
+    circuit = cirq.testing.random_circuit(
+        num_qubits, num_layers, op_density=0.8, gate_domain=gateset
+    )
+    num_CNOTS = sum([op.gate == cirq.CNOT for op in circuit.all_operations()])
+    twirled = twirl_CNOT_gates(circuit, num_circuits=1)[0]
+    if num_CNOTS:
+        assert len(twirled) > len(circuit)
+    else:
+        assert len(twirled) == len(circuit)
 
 
-def test_sample_paulis_exception():
-    with pytest.raises(ValueError):
-        sample_paulis("INVALID_GATE")
+def test_execute_with_pauli_twirling():
+    num_qubits = 3
+    num_layers = 20
+    circuit, _ = generate_mirror_circuit(
+        nlayers=num_layers,
+        two_qubit_gate_prob=1.0,
+        connectivity_graph=nx.complete_graph(num_qubits),
+    )
+    expval = execute_with_pauli_twirling(
+        circuit, amp_damp_executor, num_circuits=10
+    )
+    assert 0 <= expval < 0.4

@@ -3,7 +3,7 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-from typing import Callable, List, Optional, Tuple, Union, cast
+from typing import Callable, List, Optional, Union, cast
 
 import random
 import cirq
@@ -12,40 +12,44 @@ import numpy as np
 from mitiq import QPROGRAM, Executor, Observable, QuantumResult
 from mitiq.interface import atomic_converter
 
-# Paulis = Union[cirq.IdentityGate, cirq.XPowGate, cirq.YPowGate, cirq.ZPowGate]
-
-
-def _generate_lookup_table(
-    gate: str,
-) -> List[Tuple[cirq.Gate, cirq.Gate, cirq.Gate, cirq.Gate]]:
-    if gate not in ["CNOT", "CZ"]:
-        raise ValueError("Invalid two-qubit gate. Supported gates: CNOT, CZ")
-
-    c = cirq.X if gate == "CNOT" else cirq.Z
-    lookup_table = [
-        (cirq.I, cirq.I, cirq.I, cirq.I),
-        (cirq.X, cirq.I, cirq.I, cirq.X),
-        (cirq.Y, cirq.I, cirq.I, cirq.Y),
-        (cirq.Z, cirq.I, cirq.I, cirq.Z),
-        (cirq.I, c, c, cirq.I),
-        (cirq.X, c, c, cirq.X),
-        (cirq.Y, c, c, cirq.Y),
-        (cirq.Z, c, c, cirq.Z),
-        (cirq.I, cirq.Y, cirq.Y, cirq.I),
-        (cirq.X, cirq.Y, cirq.Y, cirq.X),
-        (cirq.Y, cirq.Y, cirq.Y, cirq.Y),
-        (cirq.Z, cirq.Y, cirq.Y, cirq.Z),
-        (cirq.I, cirq.Z, cirq.Z, cirq.I),
-        (cirq.X, cirq.Z, cirq.Z, cirq.X),
-        (cirq.Y, cirq.Z, cirq.Z, cirq.Y),
-        (cirq.Z, cirq.Z, cirq.Z, cirq.Z),
-    ]
-
-    return lookup_table
-
-
-lookup_table_CNOT = _generate_lookup_table("CNOT")
-lookup_table_CZ = _generate_lookup_table("CZ")
+# P, Q, R, S from https://arxiv.org/pdf/2301.02690.pdf
+CNOT_twirling_gates = [
+    (cirq.I, cirq.I, cirq.I, cirq.I),
+    (cirq.I, cirq.X, cirq.I, cirq.X),
+    (cirq.I, cirq.Y, cirq.Z, cirq.Y),
+    (cirq.I, cirq.Z, cirq.Z, cirq.Z),
+    (cirq.Y, cirq.I, cirq.Y, cirq.X),
+    (cirq.Y, cirq.X, cirq.Y, cirq.I),
+    (cirq.Y, cirq.Y, cirq.X, cirq.Z),
+    (cirq.Y, cirq.Z, cirq.X, cirq.Y),
+    (cirq.X, cirq.I, cirq.X, cirq.X),
+    (cirq.X, cirq.X, cirq.X, cirq.I),
+    (cirq.X, cirq.Y, cirq.Y, cirq.Z),
+    (cirq.X, cirq.Z, cirq.Y, cirq.Y),
+    (cirq.Z, cirq.I, cirq.Z, cirq.I),
+    (cirq.Z, cirq.X, cirq.Z, cirq.X),
+    (cirq.Z, cirq.Y, cirq.I, cirq.Y),
+    (cirq.Z, cirq.Z, cirq.I, cirq.Z),
+]
+# TODO: check the CZ gates. should be in PQRS order
+CZ_twirling_gates = [
+    (cirq.I, cirq.I, cirq.I, cirq.I),
+    (cirq.X, cirq.I, cirq.I, cirq.X),
+    (cirq.Y, cirq.I, cirq.I, cirq.Y),
+    (cirq.Z, cirq.I, cirq.I, cirq.Z),
+    (cirq.I, cirq.Z, cirq.Z, cirq.I),
+    (cirq.X, cirq.Z, cirq.Z, cirq.X),
+    (cirq.Y, cirq.Z, cirq.Z, cirq.Y),
+    (cirq.Z, cirq.Z, cirq.Z, cirq.Z),
+    (cirq.I, cirq.Y, cirq.Y, cirq.I),
+    (cirq.X, cirq.Y, cirq.Y, cirq.X),
+    (cirq.Y, cirq.Y, cirq.Y, cirq.Y),
+    (cirq.Z, cirq.Y, cirq.Y, cirq.Z),
+    (cirq.I, cirq.Z, cirq.Z, cirq.I),
+    (cirq.X, cirq.Z, cirq.Z, cirq.X),
+    (cirq.Y, cirq.Z, cirq.Z, cirq.Y),
+    (cirq.Z, cirq.Z, cirq.Z, cirq.Z),
+]
 
 
 def execute_with_pauli_twirling(
@@ -58,40 +62,45 @@ def execute_with_pauli_twirling(
     executor = (
         executor if isinstance(executor, Executor) else Executor(executor)
     )
-    twirled_circuits = pauli_twirled_circuits(circuit, num_circuits)
+    twirled_circuits = twirl_CNOT_gates(circuit, num_circuits)
     expvals = executor.evaluate(twirled_circuits, observable)
     return cast(float, np.average(expvals))
 
 
-def pauli_twirled_circuits(
-    circuit: QPROGRAM, num_circuits: int
-) -> List[QPROGRAM]:
-    return [add_paulis(circuit) for _ in range(num_circuits)]
-
-
-def sample_paulis(
-    two_qubit_gate: cirq.Gate,
-) -> Tuple[cirq.Gate, cirq.Gate, cirq.Gate, cirq.Gate]:
-    if two_qubit_gate not in [cirq.CNOT, cirq.CZ]:
-        raise ValueError("Invalid two-qubit gate. Supported gates: CNOT, CZ")
-
-    lookup_table = (
-        lookup_table_CNOT if two_qubit_gate == cirq.CNOT else lookup_table_CZ
+def twirl_CNOT_gates(circuit: QPROGRAM, num_circuits: int) -> List[QPROGRAM]:
+    twirl_qprogram = atomic_converter(
+        lambda circuit: circuit.map_operations(_twirl_single_CNOT_gate)
     )
-    P1, P2, R1, R2 = random.choice(lookup_table)
-    return P1, P2, R1, R2
+    return [twirl_qprogram(circuit) for _ in range(num_circuits)]
 
 
-@atomic_converter
-def add_paulis(circuit: cirq.Circuit) -> cirq.Circuit:
-    return circuit.map_operations(twirl_two_qubit_gate)
+def twirl_CZ_gates(circuit: QPROGRAM, num_circuits: int) -> List[QPROGRAM]:
+    twirl_qprogram = atomic_converter(
+        lambda circuit: circuit.map_operations(_twirl_single_CZ_gate)
+    )
+    return [twirl_qprogram(circuit) for _ in range(num_circuits)]
 
 
-def twirl_two_qubit_gate(op: cirq.Operation) -> cirq.OP_TREE:
-    if op.gate not in [cirq.CNOT, cirq.CZ]:
+def _twirl_single_CNOT_gate(op: cirq.Operation) -> cirq.OP_TREE:
+    if op.gate != cirq.CNOT:
         return op
 
-    P, Q, R, S = sample_paulis(op.gate)
+    P, Q, R, S = random.choice(CNOT_twirling_gates)
+    control_qubit, target_qubit = op.qubits
+    return [
+        P.on(control_qubit),
+        Q.on(target_qubit),
+        op,
+        R.on(control_qubit),
+        S.on(target_qubit),
+    ]
+
+
+def _twirl_single_CZ_gate(op: cirq.Operation) -> cirq.OP_TREE:
+    if op.gate != cirq.CZ:
+        return op
+
+    P, Q, R, S = random.choice(CZ_twirling_gates)
     control_qubit, target_qubit = op.qubits
     return [
         P.on(control_qubit),
