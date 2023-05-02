@@ -297,5 +297,5 @@ def from_qasm(qasm: QASMType) -> cirq.Circuit:
     Returns:
         Mitiq circuit representation equivalent to the input QASM string.
     """
-    qasm = _remove_qasm_barriers(qasm)
+    # qasm = _remove_qasm_barriers(qasm)
     return circuit_from_qasm(qasm)

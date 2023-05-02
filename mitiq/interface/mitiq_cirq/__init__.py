@@ -8,3 +8,5 @@ from mitiq.interface.mitiq_cirq.cirq_utils import (
     compute_density_matrix,
     execute_with_depolarizing_noise,
 )
+
+from mitiq.interface.mitiq_cirq.cirq_barrier import Barrier
