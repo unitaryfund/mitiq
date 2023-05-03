@@ -20,6 +20,7 @@ from typing import Any, Dict, List, Tuple
 import numpy as np
 import numpy.typing as npt
 
+import cirq
 from cirq import (
     LineQubit,
     Circuit,
@@ -254,3 +255,15 @@ def _operation_to_choi(operation_tree: OP_TREE) -> npt.NDArray[np.complex64]:
     """
     circuit = Circuit(operation_tree)
     return _circuit_to_choi(circuit)
+
+
+def _cirq_pauli_to_string(pauli: cirq.PauliString[Any]) -> str:
+    """Returns the string representation of a Cirq PauliString.
+
+    Args:
+        pauli: The input PauliString.
+    Returns:
+        The string representation of the input PauliString.
+    """
+    gate_to_string_map = {cirq.I: "I", cirq.X: "X", cirq.Y: "Y", cirq.Z: "Z"}
+    return "".join(gate_to_string_map[pauli[q]] for q in sorted(pauli.qubits))

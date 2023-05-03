@@ -37,7 +37,6 @@ class Observable:
             paulis: PauliStrings used to define the observable.
 
         """
-        # TODO: Add option to Combine duplicates. E.g. [Z(0, Z(0)] -> [2*Z(0)].
         self._paulis = list(paulis)
         self._groups: List[PauliStringCollection]
         self._ngroups: int
@@ -87,8 +86,7 @@ class Observable:
             for other_pauli in other._paulis:
                 all_paulis += [pauli * other_pauli for pauli in self._paulis]
             new_observable = Observable(*all_paulis)
-            new_observable._combine_duplicates()
-            return new_observable
+            return new_observable.combine_duplicates()
         return NotImplemented
 
     def __rmul__(
@@ -153,7 +151,7 @@ class Observable:
 
         return Executor(execute).evaluate(circuit, observable=self)[0]
 
-    def _combine_duplicates(self) -> None:
+    def combine_duplicates(self) -> "Observable":
         d: Dict[PauliString, PauliString] = {}
         for pauli_string in self._paulis:
             cache_key = pauli_string.with_coeff(1)
@@ -162,13 +160,14 @@ class Observable:
                 d[cache_key] = d[cache_key].with_coeff(new_coeff)
             else:
                 d[cache_key] = pauli_string
-        self._paulis = list(
+        deduped_paulis = list(
             [
                 pauli_string
                 for pauli_string in d.values()
-                if pauli_string.coeff != 0
+                if not np.isclose(pauli_string.coeff, 0.0)
             ]
         )
+        return Observable(*deduped_paulis)
 
     def _expectation_from_measurements(
         self, measurements: List[MeasurementResult]

@@ -32,6 +32,7 @@ import cirq
 
 from mitiq import QPROGRAM, MeasurementResult
 from mitiq.interface import atomic_converter
+from mitiq.utils import _cirq_pauli_to_string
 
 
 class PauliString:
@@ -41,7 +42,6 @@ class PauliString:
     """
 
     _string_to_gate_map = {"I": cirq.I, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
-    _gate_to_string_map = {cirq.I: "I", cirq.X: "X", cirq.Y: "Y", cirq.Z: "Z"}
 
     def __init__(
         self,
@@ -83,6 +83,16 @@ class PauliString:
                 self._string_to_gate_map[s].on(cirq.LineQubit(i))
                 for (i, s) in zip(support, spec)
             ),
+        )
+
+    @staticmethod
+    def from_cirq_pauli_string(
+        cirq_pauli_string: cirq.PauliString[Any],
+    ) -> "PauliString":
+        return PauliString(
+            spec=_cirq_pauli_to_string(cirq_pauli_string),
+            coeff=cirq_pauli_string.coefficient,  # type: ignore
+            support=sorted(q.x for q in cirq_pauli_string.qubits),
         )
 
     @property
@@ -141,10 +151,7 @@ class PauliString:
     def spec(self) -> str:
         """Returns a string representation of the Pauli gates in
         the PauliString."""
-        return "".join(
-            self._gate_to_string_map[self._pauli[q]]
-            for q in sorted(self._pauli.qubits)
-        )
+        return _cirq_pauli_to_string(self._pauli)
 
     def support(self) -> Set[int]:
         return {q.x for q in self._pauli.qubits}
@@ -166,13 +173,11 @@ class PauliString:
         self, other: Union["PauliString", complex, float, int]
     ) -> "PauliString":
         if isinstance(other, PauliString):
-            result = PauliString()
-            result._pauli = self._pauli * other._pauli
-            return result
+            return PauliString.from_cirq_pauli_string(
+                self._pauli * other._pauli
+            )
         elif isinstance(other, (complex, float, int)):
-            result = PauliString()
-            result._pauli = self._pauli * other
-            return result
+            return PauliString.from_cirq_pauli_string(self._pauli * other)
         return NotImplemented
 
     def __rmul__(self, other: Union[complex, float, int]) -> "PauliString":
