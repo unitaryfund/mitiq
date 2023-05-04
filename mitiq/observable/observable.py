@@ -155,7 +155,13 @@ class Observable:
         return Executor(execute).evaluate(circuit, observable=self)[0]
 
     def _combine_duplicates(self) -> None:
-        pauli_string_coefficients = defaultdict(int)
+        """Modifies self._paulis in place.
+        Combines duplicate PauliStrings by adding their coefficients.
+        Discards paulis with zero coefficients.
+        """
+        pauli_string_coefficients: defaultdict[
+            PauliString, complex
+        ] = defaultdict(complex)
         for pauli_string in self._paulis:
             cache_key = pauli_string.with_coeff(1)
             new_coeff = (

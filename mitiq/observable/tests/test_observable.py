@@ -336,3 +336,30 @@ def test_pauli_string_right_multiplication():
     obs1 = Observable(*pauli_strings)
     correct_obs = Observable(*[IZ * p for p in pauli_strings])
     assert IZ * obs1 == correct_obs
+
+
+def test_pauli_string_deduplication():
+    XI = PauliString("XI", 0.3)
+    YY = PauliString("YY", 0.7)
+    XZ = PauliString("XZ", 0.1)
+    n_repeat_paulis = 4
+    pauli_strings = [XI, YY, XZ] * n_repeat_paulis
+
+    obs = Observable(*pauli_strings)
+    assert obs.nterms == 3
+    assert obs == Observable(
+        XI.with_coeff(XI.coeff * n_repeat_paulis),
+        YY.with_coeff(YY.coeff * n_repeat_paulis),
+        XZ.with_coeff(XZ.coeff * n_repeat_paulis),
+    )
+
+
+def test_pauli_string_deduplication_removal_of_0_coefficients():
+    XI = PauliString("XI", 0.3)
+    YY = PauliString("YY", 0.7)
+
+    pauli_strings = [XI, YY, XI, YY.with_coeff(-YY.coeff)]
+
+    obs = Observable(*pauli_strings)
+    assert obs.nterms == 1
+    assert obs == Observable(XI.with_coeff(XI.coeff * 2))
