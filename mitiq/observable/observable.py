@@ -82,10 +82,11 @@ class Observable:
         if isinstance(other, (PauliString, complex, float, int)):
             return Observable(*[pauli * other for pauli in self._paulis])
         elif isinstance(other, Observable):
-            all_paulis = []
-            for other_pauli in other._paulis:
-                all_paulis += [pauli * other_pauli for pauli in self._paulis]
-            new_observable = Observable(*all_paulis)
+            new_observable = Observable(
+                pauli * other_pauli
+                for pauli in self._paulis
+                for other_pauli in other._paulis
+            )
             return new_observable.combine_duplicates()
         return NotImplemented
 
