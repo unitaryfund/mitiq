@@ -116,8 +116,8 @@ def test_observable_partition_can_be_measured_with():
     )
 
     assert obs.nqubits == n
-    assert obs.nterms == nterms
-    assert obs.ngroups <= nterms
+    assert obs.nterms <= nterms  # because of deduplication
+    assert obs.ngroups <= obs.nterms
 
     for pset in obs.groups:
         pauli_list = list(pset.elements)
@@ -287,7 +287,7 @@ def test_observable_multuplication_1():
     correct_obs = Observable(
         XI * ZX, XI * IZ, YY * ZX, YY * IZ, XZ * ZX, XZ * IZ
     )
-    assert np.allclose((obs1 * obs2).matrix(), correct_obs.matrix())
+    assert obs1 * obs2 == correct_obs
 
 
 def test_observable_multiplication_2():
@@ -306,14 +306,14 @@ def test_observable_multiplication_2():
     obs2 = Observable(*pauli_strings_2)
     l3 = [p1 * p2 for p1 in pauli_strings_1 for p2 in pauli_strings_2]
     correct_obs = Observable(*l3)
-    assert np.allclose((obs1 * obs2).matrix(), correct_obs.matrix())
+    assert obs1 * obs2 == correct_obs
 
 
 def test_scalar_multiplication():
     YXXYZ = PauliString("YXXYZ", 0.3)
     obs = Observable(YXXYZ)
-    assert np.allclose((obs * 2.0).matrix(), Observable(YXXYZ * 2.0).matrix())
-    assert np.allclose((2.0 * obs).matrix(), Observable(YXXYZ * 2.0).matrix())
+    assert obs * 2.0 == Observable(YXXYZ * 2.0)
+    assert 2.0 * obs == Observable(YXXYZ * 2.0)
 
 
 def test_pauli_string_left_multiplication():
@@ -324,7 +324,7 @@ def test_pauli_string_left_multiplication():
     pauli_strings = [XI, YY, XZ]
     obs1 = Observable(*pauli_strings)
     correct_obs = Observable(*[p * IZ for p in pauli_strings])
-    assert np.allclose((obs1 * IZ).matrix(), correct_obs.matrix())
+    assert obs1 * IZ == correct_obs
 
 
 def test_pauli_string_right_multiplication():
@@ -335,4 +335,4 @@ def test_pauli_string_right_multiplication():
     pauli_strings = [XI, YY, XZ]
     obs1 = Observable(*pauli_strings)
     correct_obs = Observable(*[IZ * p for p in pauli_strings])
-    assert np.allclose((IZ * obs1).matrix(), correct_obs.matrix())
+    assert IZ * obs1 == correct_obs

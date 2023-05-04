@@ -14,12 +14,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
-from typing import Callable, cast, List, Optional, Set, Union, Dict
+from typing import Callable, cast, List, Optional, Set, Union, Any
 
 import numpy as np
 import numpy.typing as npt
 import cirq
 
+from collections import defaultdict
+from numbers import Number
 from mitiq.observable.pauli import PauliString, PauliStringCollection
 from mitiq import MeasurementResult, QuantumResult, QPROGRAM
 
@@ -38,6 +40,7 @@ class Observable:
 
         """
         self._paulis = list(paulis)
+        self._combine_duplicates()
         self._groups: List[PauliStringCollection]
         self._ngroups: int
         self.partition()
@@ -77,23 +80,22 @@ class Observable:
         return len(self.qubit_indices)
 
     def __mul__(
-        self, other: Union["Observable", "PauliString", complex, float, int]
+        self, other: Union["Observable", "PauliString", Number]
     ) -> "Observable":
-        if isinstance(other, (PauliString, complex, float, int)):
+        if isinstance(other, (PauliString, Number)):
             return Observable(*[pauli * other for pauli in self._paulis])
         elif isinstance(other, Observable):
-            new_observable = Observable(
-                pauli * other_pauli
-                for pauli in self._paulis
-                for other_pauli in other._paulis
+            return Observable(
+                *[
+                    pauli * other_pauli
+                    for pauli in self._paulis
+                    for other_pauli in other._paulis
+                ]
             )
-            return new_observable.combine_duplicates()
         return NotImplemented
 
-    def __rmul__(
-        self, other: Union["PauliString", complex, float, int]
-    ) -> "Observable":
-        if isinstance(other, (PauliString, complex, float, int)):
+    def __rmul__(self, other: Union["PauliString", Number]) -> "Observable":
+        if isinstance(other, (PauliString, Number)):
             return Observable(*[other * pauli for pauli in self._paulis])
         return NotImplemented
 
@@ -152,23 +154,21 @@ class Observable:
 
         return Executor(execute).evaluate(circuit, observable=self)[0]
 
-    def combine_duplicates(self) -> "Observable":
-        d: Dict[PauliString, PauliString] = {}
+    def _combine_duplicates(self) -> None:
+        pauli_string_coefficients = defaultdict(int)
         for pauli_string in self._paulis:
             cache_key = pauli_string.with_coeff(1)
-            if cache_key in d:
-                new_coeff = pauli_string.coeff + d[cache_key].coeff
-                d[cache_key] = d[cache_key].with_coeff(new_coeff)
-            else:
-                d[cache_key] = pauli_string
-        deduped_paulis = list(
+            new_coeff = (
+                pauli_string.coeff + pauli_string_coefficients[cache_key]
+            )
+            pauli_string_coefficients[cache_key] = new_coeff
+        self._paulis = list(
             [
-                pauli_string
-                for pauli_string in d.values()
-                if not np.isclose(pauli_string.coeff, 0.0)
+                pauli_string.with_coeff(coeff)
+                for (pauli_string, coeff) in pauli_string_coefficients.items()
+                if not np.isclose(coeff, 0.0)
             ]
         )
-        return Observable(*deduped_paulis)
 
     def _expectation_from_measurements(
         self, measurements: List[MeasurementResult]
@@ -196,3 +196,6 @@ class Observable:
 
     def __str__(self) -> str:
         return " + ".join(map(str, self._paulis))
+
+    def __eq__(self, other: Any) -> bool:
+        return np.allclose(self.matrix(), other.matrix())

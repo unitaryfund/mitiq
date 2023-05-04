@@ -30,6 +30,7 @@ import numpy as np
 import numpy.typing as npt
 import cirq
 
+from numbers import Number
 from mitiq import QPROGRAM, MeasurementResult
 from mitiq.interface import atomic_converter
 from mitiq.utils import _cirq_pauli_to_string
@@ -169,18 +170,16 @@ class PauliString:
             measurements
         )
 
-    def __mul__(
-        self, other: Union["PauliString", complex, float, int]
-    ) -> "PauliString":
+    def __mul__(self, other: Union["PauliString", Number]) -> "PauliString":
         if isinstance(other, PauliString):
             return PauliString.from_cirq_pauli_string(
                 self._pauli * other._pauli
             )
-        elif isinstance(other, (complex, float, int)):
+        elif isinstance(other, Number):
             return PauliString.from_cirq_pauli_string(self._pauli * other)
         return NotImplemented
 
-    def __rmul__(self, other: Union[complex, float, int]) -> "PauliString":
+    def __rmul__(self, other: Number) -> "PauliString":
         return self.__mul__(other)
 
     def __eq__(self, other: Any) -> bool:
