@@ -10,7 +10,7 @@ import cirq
 import numpy as np
 
 from mitiq import QPROGRAM, Executor, Observable, QuantumResult
-from mitiq.interface import atomic_converter
+from mitiq.interface import noise_scaling_converter
 
 # P, Q, R, S from https://arxiv.org/pdf/2301.02690.pdf
 CNOT_twirling_gates = [
@@ -68,17 +68,23 @@ def execute_with_pauli_twirling(
 
 
 def twirl_CNOT_gates(circuit: QPROGRAM, num_circuits: int) -> List[QPROGRAM]:
-    twirl_qprogram = atomic_converter(
-        lambda circuit: circuit.map_operations(_twirl_single_CNOT_gate)
-    )
-    return [twirl_qprogram(circuit) for _ in range(num_circuits)]
+    return [_twirl_CNOT_qprogram(circuit) for _ in range(num_circuits)]
+
+
+@noise_scaling_converter
+def _twirl_CNOT_qprogram(circuit: cirq.Circuit) -> List[cirq.Circuit]:
+    return circuit.map_operations(_twirl_single_CNOT_gate)
 
 
 def twirl_CZ_gates(circuit: QPROGRAM, num_circuits: int) -> List[QPROGRAM]:
-    twirl_qprogram = atomic_converter(
-        lambda circuit: circuit.map_operations(_twirl_single_CZ_gate)
-    )
-    return [twirl_qprogram(circuit) for _ in range(num_circuits)]
+    return [
+        _twirl_CZ_qprogram(circuit, num_circuits) for _ in range(num_circuits)
+    ]
+
+
+@noise_scaling_converter
+def _twirl_CZ_qprogram(circuit: cirq.Circuit) -> List[cirq.Circuit]:
+    return circuit.map_operations(_twirl_single_CZ_gate)
 
 
 def _twirl_single_CNOT_gate(op: cirq.Operation) -> cirq.OP_TREE:
