@@ -6,9 +6,9 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.14.5
 kernelspec:
-  display_name: conda_braket
+  display_name: Python 3
   language: python
-  name: conda_braket
+  name: python3
 ---
 
 # Using ZNE to compute the energy landscape of a variational circuit with Braket
