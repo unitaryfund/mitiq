@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from braket.devices import LocalSimulator
-from braket.circuits import Circuit, gates, Noise,Observable
+from braket.circuits import Circuit, Noise, Observable
 
 from mitiq.zne import mitigate_executor
 from mitiq.zne.inference import RichardsonFactory
