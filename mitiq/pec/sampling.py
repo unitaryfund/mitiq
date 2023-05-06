@@ -91,9 +91,7 @@ def sample_sequence(
     sequences = []
     signs = []
     for _ in range(num_samples):
-        noisy_op, sign, _ = operation_representation.sample(
-            random_state  # type: ignore
-        )
+        noisy_op, sign, _ = operation_representation.sample(random_state)
         if operation_representation.is_qubit_dependent:
             native_circ = noisy_op.native_circuit
         else:
