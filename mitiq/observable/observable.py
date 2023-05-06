@@ -5,6 +5,7 @@
 
 import copy
 from typing import Callable, cast, List, Optional, Set, Union, Any, Iterable
+import random
 
 import numpy as np
 import numpy.typing as npt
@@ -97,16 +98,16 @@ class Observable:
         return self._ngroups
 
     def partition(self, seed: Optional[int] = None) -> None:
-        rng = np.random.RandomState(seed)
+        rng = random.Random(seed)
 
         psets: List[PauliStringCollection] = []
         paulis = copy.deepcopy(self._paulis)
-        rng.shuffle(paulis)  # type: ignore
+        rng.shuffle(paulis)
 
         while paulis:
             pauli = paulis.pop()
             added = False
-            for (i, pset) in enumerate(psets):
+            for i, pset in enumerate(psets):
                 if pset.can_add(pauli):
                     pset.add(pauli)
                     added = True
