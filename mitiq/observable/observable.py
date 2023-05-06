@@ -39,8 +39,7 @@ class Observable:
             paulis: PauliStrings used to define the observable.
 
         """
-        self._paulis = list(paulis)
-        self._combine_duplicates()
+        self._paulis = _combine_duplicate_pauli_strings(list(paulis))
         self._groups: List[PauliStringCollection]
         self._ngroups: int
         self.partition()
@@ -154,28 +153,6 @@ class Observable:
 
         return Executor(execute).evaluate(circuit, observable=self)[0]
 
-    def _combine_duplicates(self) -> None:
-        """Modifies self._paulis in place.
-        Combines duplicate PauliStrings by adding their coefficients.
-        Discards paulis with zero coefficients.
-        """
-        pauli_string_coefficients: defaultdict[
-            PauliString, complex
-        ] = defaultdict(complex)
-        for pauli_string in self._paulis:
-            cache_key = pauli_string.with_coeff(1)
-            new_coeff = (
-                pauli_string.coeff + pauli_string_coefficients[cache_key]
-            )
-            pauli_string_coefficients[cache_key] = new_coeff
-        self._paulis = list(
-            [
-                pauli_string.with_coeff(coeff)
-                for (pauli_string, coeff) in pauli_string_coefficients.items()
-                if not np.isclose(coeff, 0.0)
-            ]
-        )
-
     def _expectation_from_measurements(
         self, measurements: List[MeasurementResult]
     ) -> float:
@@ -205,3 +182,27 @@ class Observable:
 
     def __eq__(self, other: Any) -> bool:
         return np.allclose(self.matrix(), other.matrix())
+
+
+def _combine_duplicate_pauli_strings(
+    paulis: list[PauliString],
+) -> list[PauliString]:
+    """Combines duplicate PauliStrings by adding their coefficients.
+    Discards paulis with zero coefficients.
+
+    Returns: deduped list of PauliStrings.
+    """
+    pauli_string_coefficients: defaultdict[PauliString, complex] = defaultdict(
+        complex
+    )
+    for pauli_string in paulis:
+        cache_key = pauli_string.with_coeff(1)
+        new_coeff = pauli_string.coeff + pauli_string_coefficients[cache_key]
+        pauli_string_coefficients[cache_key] = new_coeff
+    return list(
+        [
+            pauli_string.with_coeff(coeff)
+            for (pauli_string, coeff) in pauli_string_coefficients.items()
+            if not np.isclose(coeff, 0.0)
+        ]
+    )
