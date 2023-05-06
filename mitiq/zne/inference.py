@@ -222,25 +222,23 @@ class Factory(ABC):
         self._already_reduced = False
         self._options: Dict[str, Optional[float]] = {}
 
-    def get_scale_factors(self) -> npt.NDArray[np.float64]:
+    def get_scale_factors(self) -> List[float]:
         """Returns the scale factors at which the factory has computed
         expectation values.
         """
-        return np.array(
-            [params.get("scale_factor") for params in self._instack]
-        )
+        return [params.get("scale_factor", 0.0) for params in self._instack]
 
-    def get_expectation_values(self) -> npt.NDArray[np.float64]:
+    def get_expectation_values(self) -> List[float]:
         """Returns the expectation values computed by the factory."""
-        return np.array(self._outstack)
+        return self._outstack
 
-    def get_optimal_parameters(self) -> npt.NDArray[np.float64]:
+    def get_optimal_parameters(self) -> List[float]:
         """Returns the optimal model parameters produced by the extrapolation
         fit.
         """
         if self._opt_params is None:
             raise ValueError(DATA_MISSING_ERR)
-        return np.array(self._opt_params)
+        return self._opt_params
 
     def get_parameters_covariance(self) -> npt.NDArray[np.float64]:
         """Returns the covariance matrix of the model parameters produced by
@@ -248,7 +246,7 @@ class Factory(ABC):
         """
         if self._params_cov is None:
             raise ValueError(DATA_MISSING_ERR)
-        return np.array(self._params_cov)
+        return self._params_cov
 
     def get_zero_noise_limit(self) -> float:
         """Returns the last evaluation of the zero-noise limit
@@ -575,7 +573,7 @@ class BatchedFactory(Factory, ABC):
         reshaped = np.array(res).reshape((-1, num_to_average))
 
         # Average the "num_to_average" columns
-        self._outstack = np.average(reshaped, axis=1)
+        self._outstack = np.average(reshaped, axis=1).tolist()
 
         return self
 
@@ -962,7 +960,6 @@ class FakeNodesFactory(BatchedFactory):
         exp_values: Sequence[float],
         full_output: bool = False,
     ) -> ExtrapolationResult:
-
         if not FakeNodesFactory._is_equally_spaced(scale_factors):
             raise ValueError("The scale factors must be equally spaced.")
 
@@ -1595,7 +1592,7 @@ class AdaExpFactory(AdaptiveFactory):
         return len(self._outstack) == self._steps
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         asymptote: Optional[float] = None,
@@ -1666,9 +1663,9 @@ class AdaExpFactory(AdaptiveFactory):
             self._opt_params,
             self._params_cov,
             self._zne_curve,
-        ) = self.extrapolate(  # type: ignore
-            cast(Sequence[float], self.get_scale_factors()),
-            cast(Sequence[float], self.get_expectation_values()),
+        ) = self.extrapolate(  # type: ignore [misc]
+            self.get_scale_factors(),
+            self.get_expectation_values(),
             asymptote=self.asymptote,
             avoid_log=self.avoid_log,
             full_output=True,
