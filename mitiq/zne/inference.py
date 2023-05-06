@@ -137,7 +137,7 @@ def mitiq_curve_fit(
             # replace OptimizeWarning with ExtrapolationWarning
             if warn.category is OptimizeWarning:
                 warn.category = ExtrapolationWarning
-                warn.message = _EXTR_WARN  # type: ignore
+                warn.message = _EXTR_WARN
             # re-raise all warnings
             warnings.warn_explicit(
                 warn.message, warn.category, warn.filename, warn.lineno
@@ -186,7 +186,7 @@ def mitiq_polyfit(
         # replace RankWarning with ExtrapolationWarning
         if warn.category is RankWarning:
             warn.category = ExtrapolationWarning
-            warn.message = _EXTR_WARN  # type: ignore
+            warn.message = _EXTR_WARN
         # re-raise all warnings
         warnings.warn_explicit(
             warn.message, warn.category, warn.filename, warn.lineno
@@ -816,7 +816,7 @@ class PolyFactory(BatchedFactory):
         self._options = {"order": order}
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         order: int,
@@ -889,7 +889,7 @@ class RichardsonFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
@@ -957,7 +957,7 @@ class FakeNodesFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
@@ -1057,7 +1057,7 @@ class LinearFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
@@ -1142,7 +1142,7 @@ class ExpFactory(BatchedFactory):
         }
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         asymptote: Optional[float] = None,
@@ -1263,7 +1263,7 @@ class PolyExpFactory(BatchedFactory):
         }
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         order: int,
@@ -1448,7 +1448,7 @@ class PolyExpFactory(BatchedFactory):
             scale_factors,
             zstack,
             deg=order,
-            weights=np.sqrt(np.abs(shifted_y)),  # type: ignore
+            weights=np.sqrt(np.abs(shifted_y)),
         )
         # The zero noise limit is ansatz(0)
         zne_limit = asymptote + sign * np.exp(z_coefficients[-1])

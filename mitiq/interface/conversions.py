@@ -195,9 +195,7 @@ def accept_any_qprogram_as_input(
         circuit: QPROGRAM, *args: Any, **kwargs: Any
     ) -> Any:
         cirq_circuit, _ = convert_to_mitiq(circuit)
-        return accept_cirq_circuit_function(  # type: ignore
-            cirq_circuit, *args, **kwargs
-        )
+        return accept_cirq_circuit_function(cirq_circuit, *args, **kwargs)
 
     return accept_any_qprogram_function
 
@@ -272,7 +270,6 @@ def noise_scaling_converter(
     def new_scaling_function(
         circuit: QPROGRAM, *args: Any, **kwargs: Any
     ) -> QPROGRAM:
-
         # Pre atomic conversion
         if "qiskit" in circuit.__module__:
             from mitiq.interface.mitiq_qiskit.conversions import (
@@ -339,13 +336,10 @@ def noise_scaling_converter(
             )
 
             scaled_circuit.remove_final_measurements()
-            _transform_registers(
-                scaled_circuit,
-                new_qregs=circuit.qregs,  # type: ignore
-            )
+            _transform_registers(scaled_circuit, new_qregs=circuit.qregs)
             _remove_identity_from_idle(scaled_circuit, idle_qubits)
-            if circuit.cregs and not scaled_circuit.cregs:  # type: ignore
-                scaled_circuit.add_register(*circuit.cregs)  # type: ignore
+            if circuit.cregs and not scaled_circuit.cregs:
+                scaled_circuit.add_register(*circuit.cregs)
 
             for q, c in _measurement_order(circuit):
                 scaled_circuit.measure(q, c)

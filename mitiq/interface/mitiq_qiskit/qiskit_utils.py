@@ -184,7 +184,7 @@ def execute_with_shots_and_noise(
 def sample_bitstrings(
     circuit: QuantumCircuit,
     backend: Optional[Backend] = None,
-    noise_model: Optional[NoiseModel] = None,  # type: ignore
+    noise_model: Optional[NoiseModel] = None,
     shots: int = 10000,
     measure_all: bool = False,
     qubit_indices: Optional[Tuple[int]] = None,
@@ -250,7 +250,7 @@ def compute_expectation_value_on_noisy_backend(
     circuit: QuantumCircuit,
     obs: Observable,
     backend: Optional[Backend] = None,
-    noise_model: Optional[NoiseModel] = None,  # type: ignore
+    noise_model: Optional[NoiseModel] = None,
     shots: int = 10000,
     measure_all: bool = False,
     qubit_indices: Optional[Tuple[int]] = None,

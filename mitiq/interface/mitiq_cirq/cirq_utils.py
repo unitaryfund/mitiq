@@ -86,7 +86,7 @@ def execute_with_depolarizing_noise(
     Returns:
         The expectation value of obs as a float.
     """
-    circuit = circuit.with_noise(cirq.depolarize(p=noise))  # type: ignore
+    circuit = circuit.with_noise(cirq.depolarize(p=noise))
     simulator = cirq.DensityMatrixSimulator()
     rho = simulator.simulate(circuit).final_density_matrix
     expectation = np.real(np.trace(rho @ obs))
