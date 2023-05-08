@@ -22,7 +22,7 @@ myst-nb==0.17.1
 pydata-sphinx-theme==0.11.0
 jupytext==1.14.1
 sphinx-gallery==0.10.1
-nbsphinx==0.8.9
+nbsphinx==0.9.1
 pyscf==2.2.1; sys_platform != 'win32'
 openfermion==1.5.1; sys_platform != 'win32'
 openfermionpyscf==0.5; sys_platform != 'win32'
