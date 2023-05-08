@@ -104,7 +104,7 @@ class MeasurementResult:
             self.result: List[List[int]] = list(int_result)
 
         if isinstance(self.result, np.ndarray):
-            self.result = cast(List[Bitstring], self.result.tolist())
+            self.result = self.result.tolist()
 
         self._bitstrings = np.array(self.result)
 
