@@ -13,14 +13,11 @@ kernelspec:
 
 # Estimating the potential energy surface of molecular Hydrogen with ZNE and OpenFermion
 
-+++
-
 In this example we apply zero-noise extrapolation (ZNE) to the estimation of the potential energy surface of molecular Hydrogen ($\rm H_2$).
-The variational algorithm used in this example is based on *O’Malley et al. PRX (2016)* {cite}`OMalley_2016_PRX`.
+The variational algorithm used in this example is based on _O’Malley et al. PRX (2016)_ {cite}`OMalley_2016_PRX`.
 
 With the appropriate settings (see code comments in the ZNE subsection), this notebook reproduces the results
 shown in Figure 4 of the Mitiq white paper.
-
 
 ```{figure} ../img/h2_molecule.svg
 ---
@@ -62,12 +59,12 @@ where $g_i$ are numerical values that depend on the bond length $R$. The above H
 
 Each coefficient $g_i$ is a function of the bond length $g_i = g_i(R)$. The exact parameters can be extracted from Appendix C of {cite}`OMalley_2016_PRX`.
 
-We can also calculate their values automatically using OpenFermion (an open source quantum chemistry package). 
+We can also calculate their values automatically using OpenFermion (an open source quantum chemistry package).
 To run the code of this example, the Python package `openfermionpyscf` must be [installed](https://github.com/quantumlib/OpenFermion-PySCF) in your system.
 This results in slightly modified hamiltonians of the form:
 
 \begin{equation}
-    H = g_0 I + g_1 Z_0 + g_2 Z_1 + g_3 Z_0 Z_1 + g_4 X_0 X_1
+   H = g_0 I + g_1 Z_0 + g_2 Z_1 + g_3 Z_0 Z_1 + g_4 X_0 X_1
 \end{equation}
 
 ```{code-cell} ipython3
@@ -100,7 +97,6 @@ def get_hamiltonian(bond_length) -> Observable:
 hamiltonians = [get_hamiltonian(i) for i in radii]
 print(hamiltonians[0])
 ```
-
 
 ## Evaluating the energy landscape for a fixed $R$
 
@@ -136,7 +132,7 @@ all_energies = []
 for pval in pvals:
     energies = []
     for theta in thetas:
-        results = hamiltonians[0].expectation(ansatz(theta), execute=partial(compute_density_matrix, noise_model=cirq.depolarize, noise_level=(pval,)))
+        results = hamiltonians[0].expectation(ansatz(theta), execute=partial(compute_density_matrix, noise_model_function=cirq.depolarize, noise_level=(pval,)))
         energies.append(np.real(results))
     all_energies.append(energies)
 ```
@@ -161,7 +157,7 @@ num_to_average = 1
 
 # To reproduce the results of the Mitiq paper use the following settings
 # scaling_function = zne.scaling.fold_gates_at_random
-# pfac = zne.inference.PolyFactory(order=3, 
+# pfac = zne.inference.PolyFactory(order=3,
 #                           scale_factors=[1., 1.5, 2., 2.5, 3., 3.5, 4., 4.5, 5., 5.5, 6.])
 # num_to_average = 5
 # pvals = (0.00, 0.02, 0.04, 0.06)
@@ -172,7 +168,7 @@ for p in pvals[1:]:
     mitigated = []
     for theta in thetas:
         # Define an executor function
-        executor = Executor(partial(compute_density_matrix, noise_model=cirq.depolarize, noise_level=(p,)))
+        executor = Executor(partial(compute_density_matrix, noise_model_function=cirq.depolarize, noise_level=(p,)))
         # Run ZNE
         zne_value = zne.execute_with_zne(
             ansatz(theta),
@@ -187,6 +183,7 @@ for p in pvals[1:]:
 ```
 
 In the next figure we visualize the following results:
+
 1. The ideal noiseless energy landscape $E(\theta, R)$ corresponding to `all_energies[0]`;
 2. The noisy (unmitigated) energies `all_energies`;
 3. The corresponding error-mitigated energies `all_mitigated`.
@@ -282,8 +279,6 @@ for pval in pvals:
 
 The unmitigated potential energy surfaces are now stored in the `best_energies` variable and will be visualized later.
 
-
-
 ### Applying zero-noise extrapolation to estimate $V(R)$
 
 We use zero-noise extrapolation to error-mitigate the potential energy surface $V(R)$.
@@ -300,7 +295,7 @@ for pval in pvals[1:]:
         def objective_function(theta):
             return np.real(zne.execute_with_zne(
                 ansatz(theta),
-                Executor(partial(compute_density_matrix, noise_model=cirq.depolarize, noise_level=(pval,))),
+                Executor(partial(compute_density_matrix, noise_model_function=cirq.depolarize, noise_level=(pval,))),
                 hamiltonians[i],
                 factory=fac,
                 scale_noise=scaling_function,
@@ -323,6 +318,7 @@ for pval in pvals[1:]:
 ```
 
 In the next figure we visualize the following results:
+
 1. The ideal noiseless potential energy surface $V(R)$ corresponding to `best_energies[0]`;
 2. The noisy (unmitigated) potential energy surfaces `best_energies`;
 3. The corresponding error-mitigated potential energy surfaces `best_mitigated_energies`.
