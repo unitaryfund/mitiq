@@ -64,7 +64,7 @@ test:
 
 .PHONY: test-%
 test-%:
-	pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml */$(*)/*
+	pytest -n auto -v --cov=mitiq --cov-report=term --cov-report=xml */$(*)/
 
 .PHONY: test-pyquil
 test-pyquil:
