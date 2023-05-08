@@ -39,12 +39,11 @@ circuit = generate_rb_circuits(2, 5)[0]
 
 ## Noise model and executor
 
-The noise in this example is a combination of depolarizing and readout errors, the latter of which are modeled as bit flips immediately prior to measurement. We use an [`Executor`](../guide/executors.md) function to execute the quantum circuit with the noise model applied.
+The noise in this example is a combination of depolarizing and readout errors, the latter of which are modeled as bit flips immediately prior to measurement. We use an [executor function](../guide/executors.md) to run the quantum circuit with the noise model applied.
 
 ```{code-cell} ipython3
 def execute(circuit: cirq.Circuit, noise_level: float = 0.005, p0: float = 0.05) -> MeasurementResult:
-    """Execute a circuit and return a ``MeasurementResult``, with depolarizing noise of strength
-    ``noise_level`` and readout errors with probability ``p0``."""
+    """Execute a circuit with depolarizing noise of strength ... and readout errors ...
     measurements = circuit[-1]
     circuit =  circuit[:-1]
     circuit = circuit.with_noise(cirq.depolarize(noise_level))
@@ -69,6 +68,7 @@ noisy = raw.execute(circuit, execute, obs)
 
 ```{code-cell} ipython3
 from functools import partial
+
 ideal = raw.execute(circuit, partial(execute, noise_level=0, p0=0), obs)
 f"Error without mitigation: {abs(ideal - noisy) :.5f}"
 ```
@@ -77,6 +77,7 @@ Next we generate the inverse confusion matrix and apply readout error mitigation
 
 ```{code-cell} ipython3
 from mitiq import rem
+
 p0 = p1 = 0.05
 icm = rem.generate_inverse_confusion_matrix(2, p0, p1)
 rem_executor = rem.mitigate_executor(execute, inverse_confusion_matrix=icm)
