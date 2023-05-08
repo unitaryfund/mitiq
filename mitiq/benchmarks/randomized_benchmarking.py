@@ -4,10 +4,9 @@
 # LICENSE file in the root directory of this source tree.
 
 """Functions for generating randomized benchmarking circuits."""
-from typing import List, Optional, cast
+from typing import List, Optional
 
 import numpy as np
-import numpy.typing as npt
 
 from cirq.experiments.qubit_characterizations import (
     _single_qubit_cliffords,

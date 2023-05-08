@@ -5,7 +5,7 @@
 
 """Functions for converting to/from Mitiq's internal circuit representation."""
 from functools import wraps
-from typing import Any, Callable, cast, Iterable, Tuple, Dict
+from typing import Any, Callable, Dict, Iterable, Tuple, cast
 
 from cirq import Circuit
 
@@ -272,10 +272,11 @@ def noise_scaling_converter(
     ) -> QPROGRAM:
         # Pre atomic conversion
         if "qiskit" in circuit.__module__:
+            from qiskit.transpiler.passes import RemoveBarriers
+
             from mitiq.interface.mitiq_qiskit.conversions import (
                 _add_identity_to_idle,
             )
-            from qiskit.transpiler.passes import RemoveBarriers
 
             # Avoid mutating the input circuit
             circuit = circuit.copy()
@@ -328,9 +329,9 @@ def noise_scaling_converter(
         # Qiskit: Keep the same register structure and measurement order.
         if "qiskit" in scaled_circuit.__module__:
             from mitiq.interface.mitiq_qiskit.conversions import (
-                _transform_registers,
                 _measurement_order,
                 _remove_identity_from_idle,
+                _transform_registers,
             )
 
             scaled_circuit.remove_final_measurements()

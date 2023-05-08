@@ -14,7 +14,7 @@
        computed. Note this includes expectation values themselves.
 """
 from dataclasses import dataclass
-from typing import cast, List, Optional, Tuple, Union, Sequence, Dict, Any
+from typing import List, Optional, Tuple, Union, Sequence, Dict, Any
 
 import numpy as np
 import numpy.typing as npt
