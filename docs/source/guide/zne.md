@@ -1,4 +1,4 @@
-# Zero Noise Extrapolation
+# Zero-Noise Extrapolation
 
 Zero-noise extrapolation (ZNE) is an error mitigation technique in which an expectation
 value is computed at different noise levels and, as a second step, the ideal
@@ -25,7 +25,9 @@ zne-3-options.md
 zne-4-low-level.md
 zne-5-theory.md
 ```
+
 Here are some examples on how to use ZNE in Mitiq:
+
 - [Zero-noise extrapolation with Qiskit on IBMQ backends](../examples/ibmq-backends.md)
 - [Zero-noise extrapolation with Pennylane on IBMQ backends](../examples/pennylane-ibmq-backends.md)
 - [Zero-noise extrapolation with Braket on the IonQ backend](../examples/zne-braket-ionq.md)

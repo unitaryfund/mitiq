@@ -7,7 +7,6 @@ mitigation" or "readout confusion inversion".
 For more discussion of the theory of REM, see the section [What is the theory
 behind REM?](rem-5-theory.md).
 
-
 ```{figure} ../img/rem_workflow.svg
 ---
 width: 700px
@@ -17,7 +16,6 @@ Workflow of the REM technique in Mitiq, detailed in the [What happens when I use
 ```
 
 Below you can find sections of the documentation that address the following questions:
-
 
 ```{toctree}
 ---
