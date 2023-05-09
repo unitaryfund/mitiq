@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import copy
-from typing import Callable, cast, List, Optional, Set, Union, Any
+from typing import Callable, cast, List, Optional, Set, Union, Any, Iterable
 
 import numpy as np
 import numpy.typing as npt
@@ -39,7 +39,7 @@ class Observable:
             paulis: PauliStrings used to define the observable.
 
         """
-        self._paulis = _combine_duplicate_pauli_strings(list(paulis))
+        self._paulis = _combine_duplicate_pauli_strings(paulis)
         self._groups: List[PauliStringCollection]
         self._ngroups: int
         self.partition()
@@ -198,10 +198,8 @@ def _combine_duplicate_pauli_strings(
     for pauli_string in paulis:
         cache_key = pauli_string.with_coeff(1)
         pauli_string_coefficients[cache_key] += pauli_string.coeff
-    return list(
-        [
-            pauli_string.with_coeff(coeff)
-            for (pauli_string, coeff) in pauli_string_coefficients.items()
-            if not np.isclose(coeff, 0.0)
-        ]
-    )
+    return [
+        pauli_string.with_coeff(coeff)
+        for (pauli_string, coeff) in pauli_string_coefficients.items()
+        if not np.isclose(coeff, 0.0)
+    ]
