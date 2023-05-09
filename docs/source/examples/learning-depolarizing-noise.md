@@ -17,7 +17,7 @@ In this example, we demonstrate the workflow of learning quasiprobability repres
 from Clifford circuit data.
 The depolarizing noise model is parameterized by the noise strength, `epsilon`.
 The resulting quasiprobability representations of the `CNOT` gate are then used to obtain an error-mitigated expectation value with Mitiq's
-{ref}`probabilistic error cancellation module <guide/pec>`.
+[probabilistic error cancellation module](../guide/pec.md).
 For a more in-depth description of the learning function used in this example, see the section on {func}`.learn_depolarizing_noise_parameter`
 in the API-doc.
 The learning-based PEC workflow was inspired by the procedure described in *Strikis et al. PRX Quantum (2021)* {cite}`Strikis_2021_PRXQuantum`.
@@ -45,8 +45,7 @@ from mitiq.pec.representations.learning import (
 )
 ```
 
-Since the learning-based workflow uses the function {func}`.cdr.clifford_training_data.generate_training_circuits` from Mitiq's {ref}`Clifford data regression module
-<guide/cdr>` to generate the near-Clifford training circuits, the input circuit must be one that is compiled into the Rx-Rz-CNOT gateset.
+Since the learning-based workflow uses the function {func}`.cdr.clifford_training_data.generate_training_circuits` from Mitiq's [Clifford data regression module](../guide/cdr.md) to generate the near-Clifford training circuits, the input circuit must be one that is compiled into the Rx-Rz-CNOT gateset.
 Here we use a simple Rx-Rz-CNOT circuit, with an (optional) seed for reproducibility.
 
 ```{code-cell} ipython3
