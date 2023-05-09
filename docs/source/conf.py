@@ -154,6 +154,7 @@ bibtex_bibfiles = ["refs.bib"]
 
 # Links matching with the following regular expressions will be ignored
 linkcheck_ignore = [
+    r"https://mybinder.org/",
     r"https://doi.org/10.1088/0034-4885/74/10/104401",
     r"https://doi.org/10.1088/1367-2630/12/7/075008",
     r"https://doi.org/10.7566/JPSJ.90.032001",
