@@ -31,23 +31,22 @@ CNOT_twirling_gates = [
     (cirq.Z, cirq.Y, cirq.I, cirq.Y),
     (cirq.Z, cirq.Z, cirq.I, cirq.Z),
 ]
-# TODO: check the CZ gates. should be in PQRS order
 CZ_twirling_gates = [
     (cirq.I, cirq.I, cirq.I, cirq.I),
-    (cirq.X, cirq.I, cirq.I, cirq.X),
-    (cirq.Y, cirq.I, cirq.I, cirq.Y),
-    (cirq.Z, cirq.I, cirq.I, cirq.Z),
-    (cirq.I, cirq.Z, cirq.Z, cirq.I),
-    (cirq.X, cirq.Z, cirq.Z, cirq.X),
-    (cirq.Y, cirq.Z, cirq.Z, cirq.Y),
-    (cirq.Z, cirq.Z, cirq.Z, cirq.Z),
-    (cirq.I, cirq.Y, cirq.Y, cirq.I),
+    (cirq.I, cirq.X, cirq.Z, cirq.X),
+    (cirq.I, cirq.Y, cirq.Z, cirq.Y),
+    (cirq.I, cirq.Z, cirq.I, cirq.Z),
+    (cirq.X, cirq.I, cirq.X, cirq.Z),
+    (cirq.X, cirq.X, cirq.Y, cirq.Y),
     (cirq.X, cirq.Y, cirq.Y, cirq.X),
-    (cirq.Y, cirq.Y, cirq.Y, cirq.Y),
-    (cirq.Z, cirq.Y, cirq.Y, cirq.Z),
-    (cirq.I, cirq.Z, cirq.Z, cirq.I),
-    (cirq.X, cirq.Z, cirq.Z, cirq.X),
-    (cirq.Y, cirq.Z, cirq.Z, cirq.Y),
+    (cirq.X, cirq.Z, cirq.X, cirq.I),
+    (cirq.Y, cirq.I, cirq.Y, cirq.Z),
+    (cirq.Y, cirq.X, cirq.X, cirq.Y),
+    (cirq.Y, cirq.Y, cirq.X, cirq.X),
+    (cirq.Y, cirq.Z, cirq.Y, cirq.I),
+    (cirq.Z, cirq.I, cirq.Z, cirq.I),
+    (cirq.Z, cirq.X, cirq.I, cirq.X),
+    (cirq.Z, cirq.Y, cirq.I, cirq.Y),
     (cirq.Z, cirq.Z, cirq.Z, cirq.Z),
 ]
 
@@ -104,9 +103,7 @@ def twirl_CZ_gates(circuit: QPROGRAM, num_circuits: int) -> List[QPROGRAM]:
         circuit: The circuit to generate twirled versions of
         num_circuits: The number of sampled circuits to return
     """
-    return [
-        _twirl_CZ_qprogram(circuit, num_circuits) for _ in range(num_circuits)
-    ]
+    return [_twirl_CZ_qprogram(circuit) for _ in range(num_circuits)]
 
 
 @noise_scaling_converter

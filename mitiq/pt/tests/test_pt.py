@@ -12,7 +12,10 @@ import networkx as nx
 
 from mitiq.pt.pt import (
     twirl_CNOT_gates,
+    twirl_CZ_gates,
     execute_with_pauli_twirling,
+    CNOT_twirling_gates,
+    CZ_twirling_gates,
 )
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.benchmarks import generate_mirror_circuit
@@ -40,6 +43,49 @@ def test_twirl_CNOT_implements_same_unitary():
     )
 
 
+def test_twirl_CZ_implements_same_unitary():
+    num_circuits = 1
+    twirled = twirl_CZ_gates(circuit, num_circuits=num_circuits)
+    assert len(twirled) == num_circuits
+    original_unitary = cirq.unitary(circuit)
+    twirled_unitary = cirq.unitary(twirled[0])
+    assert np.array_equal(twirled_unitary, original_unitary) or np.array_equal(
+        -1 * twirled_unitary, original_unitary
+    )
+
+
+def test_CNOT_twirl_table():
+    a, b = cirq.LineQubit.range(2)
+    for P, Q, R, S in CNOT_twirling_gates:
+        circuit = cirq.Circuit(
+            P.on(a),
+            Q.on(b),
+            cirq.CNOT.on(a, b),
+            R.on(a),
+            S.on(b),
+            cirq.CNOT.on(a, b),
+        )
+        assert np.allclose(cirq.unitary(circuit), np.eye(4)) or np.allclose(
+            -1 * cirq.unitary(circuit), np.eye(4)
+        )
+
+
+def test_CZ_twirl_table():
+    a, b = cirq.LineQubit.range(2)
+    for P, Q, R, S in CZ_twirling_gates:
+        circuit = cirq.Circuit(
+            P.on(a),
+            Q.on(b),
+            cirq.CZ.on(a, b),
+            R.on(a),
+            S.on(b),
+            cirq.CZ.on(a, b),
+        )
+        assert np.allclose(cirq.unitary(circuit), np.eye(4)) or np.allclose(
+            -1 * cirq.unitary(circuit), np.eye(4)
+        )
+
+
 def test_twirl_CNOT_qiskit():
     qc = qiskit.QuantumCircuit(2, 2)
     qc.h(0)
@@ -50,10 +96,6 @@ def test_twirl_CNOT_qiskit():
     assert len(twirled) == num_circuits
     random_index = random.randint(0, 9)
     assert isinstance(twirled[random_index], qiskit.QuantumCircuit)
-
-
-def test_twirl_CZ():
-    ...
 
 
 def test_twirl_CNOT_increases_layer_count():
