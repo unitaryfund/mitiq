@@ -154,6 +154,7 @@ bibtex_bibfiles = ["refs.bib"]
 
 # Links matching with the following regular expressions will be ignored
 linkcheck_ignore = [
+    r"https://mybinder.org/",
     r"https://doi.org/10.1088/0034-4885/74/10/104401",
     r"https://doi.org/10.1088/1367-2630/12/7/075008",
     r"https://doi.org/10.7566/JPSJ.90.032001",
@@ -339,6 +340,7 @@ nbsphinx_thumbnails = {
     "examples/ddd_tutorial": "_static/ddd-tutorial.png",
     "examples/ddd_on_ibmq_ghz": "_static/ddd_qiskit_ghz_plot.png",
     "examples/calibration-tutorial": "_static/calibration.png",
+    "examples/combine_rem_zne": "_static/combine_rem_zne.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }

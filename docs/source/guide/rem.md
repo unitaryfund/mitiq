@@ -29,3 +29,5 @@ rem-3-options.md
 rem-4-low-level.md
 rem-5-theory.md
 ```
+
+Here is an example on how to use REM (and REM in combination with [ZNE](./zne.md)) in Mitiq: [Composing techniques: REM + ZNE](../examples/combine_rem_zne.md).
