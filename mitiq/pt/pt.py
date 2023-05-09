@@ -92,7 +92,7 @@ def twirl_CNOT_gates(circuit: QPROGRAM, num_circuits: int) -> List[QPROGRAM]:
 
 
 @noise_scaling_converter
-def _twirl_CNOT_qprogram(circuit: cirq.Circuit) -> List[cirq.Circuit]:
+def _twirl_CNOT_qprogram(circuit: cirq.Circuit) -> cirq.Circuit:
     return circuit.map_operations(_twirl_single_CNOT_gate)
 
 
@@ -107,7 +107,7 @@ def twirl_CZ_gates(circuit: QPROGRAM, num_circuits: int) -> List[QPROGRAM]:
 
 
 @noise_scaling_converter
-def _twirl_CZ_qprogram(circuit: cirq.Circuit) -> List[cirq.Circuit]:
+def _twirl_CZ_qprogram(circuit: cirq.Circuit) -> cirq.Circuit:
     return circuit.map_operations(_twirl_single_CZ_gate)
 
 
