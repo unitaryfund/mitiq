@@ -58,7 +58,8 @@ def execute_with_pauli_twirling(
     *,
     num_circuits: int = 10,
 ) -> float:
-    """Estimates the expecation value by averaging pauli twirled circuits.
+    """Estimates the expectation value of the input circuit by averaging
+    expectation values obtained from Pauli twirled circuits.
 
     Args:
         circuit: The input circuit to execute with twirling.
@@ -112,8 +113,8 @@ def _twirl_CZ_qprogram(circuit: cirq.Circuit) -> cirq.Circuit:
 
 
 def _twirl_single_CNOT_gate(op: cirq.Operation) -> cirq.OP_TREE:
-    """Function which converts a CNOT to a logical equivalent. That is, it
-    converts CNOT operations into the following, leaving all other cirq
+    """Function which converts a CNOT gate to a logical equivalent. That is,
+    it converts CNOT operations into the following, leaving all other cirq
     operations alone.
 
         --P---⏺---R--
@@ -138,8 +139,8 @@ def _twirl_single_CNOT_gate(op: cirq.Operation) -> cirq.OP_TREE:
 
 
 def _twirl_single_CZ_gate(op: cirq.Operation) -> cirq.OP_TREE:
-    """Function which converts a CNOT to a logical equivalent. That is, it
-    converts CNOT operations into the following, leaving all other cirq
+    """Function which converts a CZ gate to a logical equivalent. That is, it
+    converts CZ operations into the following, leaving all other cirq
     operations alone.
 
         --P---⏺---R--
