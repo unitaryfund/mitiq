@@ -180,7 +180,9 @@ class PauliString:
         return NotImplemented
 
     def __rmul__(self, other: Number) -> "PauliString":
-        return self.__mul__(other)
+        if isinstance(other, Number):
+            return self.__mul__(other)
+        return NotImplemented
 
     def __eq__(self, other: Any) -> bool:
         return self._pauli == other._pauli
