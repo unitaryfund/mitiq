@@ -197,8 +197,7 @@ def _combine_duplicate_pauli_strings(
     )
     for pauli_string in paulis:
         cache_key = pauli_string.with_coeff(1)
-        new_coeff = pauli_string.coeff + pauli_string_coefficients[cache_key]
-        pauli_string_coefficients[cache_key] = new_coeff
+        pauli_string_coefficients[cache_key] += pauli_string.coeff
     return list(
         [
             pauli_string.with_coeff(coeff)
