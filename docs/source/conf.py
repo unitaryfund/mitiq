@@ -339,6 +339,7 @@ nbsphinx_thumbnails = {
     "examples/ddd_tutorial": "_static/ddd-tutorial.png",
     "examples/ddd_on_ibmq_ghz": "_static/ddd_qiskit_ghz_plot.png",
     "examples/calibration-tutorial": "_static/calibration.png",
+    "examples/combine_rem_zne": "_static/combine_rem_zne.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }
