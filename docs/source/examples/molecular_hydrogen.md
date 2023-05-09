@@ -266,10 +266,19 @@ for pval in pvals:
     for i in range(len(radii)):
         # Objective function to minimize
         def obj(theta):
-            val = hamiltonians[i].expectation(ansatz(theta[0]), execute=partial(compute_density_matrix, noise_model=cirq.depolarize, noise_level=(pval,)))
+            val = hamiltonians[i].expectation(
+                ansatz(theta[0]),
+                execute=partial(
+                    compute_density_matrix,
+                    noise_model_function=cirq.depolarize,
+                    noise_level=(pval,),
+                ),
+            )
             return np.real(val)
 
-        res = brute(obj, ranges=[(0, 2 * np.pi)], Ns=10, finish=None, full_output=True)
+        res = brute(
+            obj, ranges=[(0, 2 * np.pi)], Ns=10, finish=None, full_output=True
+        )
         these_thetas.append(res[0])
         these_energies.append(res[1])
 
