@@ -17,7 +17,7 @@ In this example, we demonstrate the workflow of learning quasiprobability repres
 from Clifford circuit data.
 The depolarizing noise model is parameterized by the noise strength, `epsilon`.
 The resulting quasiprobability representations of the `CNOT` gate are then used to obtain an error-mitigated expectation value with Mitiq's
-{ref}`probabilistic error cancellation module <guide/pec/pec>`. 
+{ref}`probabilistic error cancellation module <guide/pec>`.
 For a more in-depth description of the learning function used in this example, see the section on {func}`.learn_depolarizing_noise_parameter`
 in the API-doc.
 The learning-based PEC workflow was inspired by the procedure described in *Strikis et al. PRX Quantum (2021)* {cite}`Strikis_2021_PRXQuantum`.
@@ -46,7 +46,7 @@ from mitiq.pec.representations.learning import (
 ```
 
 Since the learning-based workflow uses the function {func}`.cdr.clifford_training_data.generate_training_circuits` from Mitiq's {ref}`Clifford data regression module
-<guide/cdr/cdr>` to generate the near-Clifford training circuits, the input circuit must be one that is compiled into the Rx-Rz-CNOT gateset. 
+<guide/cdr>` to generate the near-Clifford training circuits, the input circuit must be one that is compiled into the Rx-Rz-CNOT gateset.
 Here we use a simple Rx-Rz-CNOT circuit, with an (optional) seed for reproducibility.
 
 ```{code-cell} ipython3
@@ -56,7 +56,7 @@ circuit = random_x_z_cnot_circuit(
 print(circuit)
 ```
 
-Define the ideal executor function for simulating the Clifford training circuits without noise. 
+Define the ideal executor function for simulating the Clifford training circuits without noise.
 This will be used for comparison to the error-mitigated expectation values in the learning function, and for a final comparison with the
 mitigated and unmitigated values at the end of the workflow.
 
@@ -69,7 +69,7 @@ def ideal_execute(circ: Circuit) -> np.ndarray:
 ideal_executor = Executor(ideal_execute)
 ```
 
-Define the noisy executor, in this case for simulating depolarizing noise on the `CNOT` gate in each of the training circuits. 
+Define the noisy executor, in this case for simulating depolarizing noise on the `CNOT` gate in each of the training circuits.
 The optimized value of the noise strength `epsilon` should be close to the value defined for this executor.
 
 ```{code-cell} ipython3
@@ -86,7 +86,7 @@ def noisy_execute(circ: Circuit) -> np.ndarray:
         index = op[0] + 1
         qubits = op[1].qubits
         for q in qubits:
-            insertions.append((index, DepolarizingChannel(epsilon)(q))) 
+            insertions.append((index, DepolarizingChannel(epsilon)(q)))
     noisy_circ.batch_insert(insertions)
 
     return ideal_execute(noisy_circ)
@@ -96,8 +96,8 @@ noisy_executor = Executor(noisy_execute)
 ```
 
 Before calling the optimizer, let's plot the loss function that will be minimized in the learning routine, over a small range of noise strength values.
-The loss function calls {func}`.pec.execute_with_pec`, and we can optionally pass keyword arguments to set the number of PEC samples, among other options. 
-Here we set a relatively small value of `num_samples` to obtain a reasonable execution time. 
+The loss function calls {func}`.pec.execute_with_pec`, and we can optionally pass keyword arguments to set the number of PEC samples, among other options.
+Here we set a relatively small value of `num_samples` to obtain a reasonable execution time.
 However, we avoid using a number of PEC samples that is too small, as it can result in a large statistical error and ultimately cause the optimization process to fail.
 
 ```{code-cell} ipython3
@@ -151,7 +151,6 @@ name: depolarizing_noise_loss_function
 The figure is a plot of the loss function for optimizing quasi-probability representations assuming a depolarizing noise model depending on
 one real parameter.
 ```
-
 
 Now we set the initial conditions for the optimization. For purposes of this demonstration, our initial guess for epsilon, `epsilon0`, is
 slightly offset from the true value of `epsilon`.
