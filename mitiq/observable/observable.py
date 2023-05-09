@@ -185,8 +185,8 @@ class Observable:
 
 
 def _combine_duplicate_pauli_strings(
-    paulis: list[PauliString],
-) -> list[PauliString]:
+    paulis: Iterable[PauliString],
+) -> List[PauliString]:
     """Combines duplicate PauliStrings by adding their coefficients.
     Discards paulis with zero coefficients.
 
