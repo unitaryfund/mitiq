@@ -1,6 +1,33 @@
 # Changelog
 
-## Version 0.26.0 (In development)
+## Version 0.27.0 (In development)
+
+## Version 0.26.0
+Highlights from this release include functions for applying Pauli Twirling of CNOT and CZ gates, support for noise scaling by circuit layer in ZNE, functions to generate Quantum Phase Estimation benchmarking circuits, and a new example composing two Mitiq techniques: REM and ZNE. 
+
+Special thanks to UF Ambassadors **Purva Thakre** and **Aaron Robertson** for their contributions to this release!
+
+### All changes
+
+- Compose REM + ZNE in Mitiq (#1745) [@Misty-W]
+- bump nbsphinx (#1821) [@natestemen]
+- Update pennylane requirement from ~=0.29.1 to ~=0.30.0 (#1819) [@dependabot[bot]]
+- Update amazon-braket-sdk requirement from ~=1.37.1 to ~=1.38.0 (#1817) [@dependabot[bot]]
+- Update amazon-braket-sdk requirement from ~=1.37.0 to ~=1.37.1 (#1804) [@dependabot[bot]]
+- Support noise scaling by layer (#1767) [@vprusso]
+- Remove version specificity from codecov/codecov-action (#1801) [@dependabot[bot]]
+- Update pyquil requirement from ~=3.4.1 to ~=3.5.0 (#1793) [@dependabot[bot]]
+- use 1.7.0 link for grove (#1803) [@natestemen]
+- Remove allcontributors (#1791) [@natestemen]
+- Update qiskit tutorial with ddd functions (#1762) [@Misty-W]
+- Add calibration workflow to README (#1778) [@natestemen]
+- Make W-state circuits available to use in `Calibration` (#1792) [@Misty-W]
+- W State and QPE Benchmarking circuits in API Doc (#1785) [@purva-thakre]
+- Update pyquil requirement from ~=3.4.0 to ~=3.4.1 (#1786) [@dependabot[bot]]
+- Uprade python support to 3.11 (#1663) [@natestemen]
+- Update pyquil requirement from ~=3.3.5 to ~=3.4.0 (#1784) [@dependabot[bot]]
+- Bump codecov/codecov-action from 3.1.1 to 3.1.2 (#1781) [@dependabot[bot]]
+- Quantum Phase Estimation Benchmarking Circuit (#1775) [@purva-thakre]
 
 ## Version 0.25.0
 
@@ -15,7 +42,7 @@ Highlights from this release include a bug fixed in DDD, extended documentation 
 - Calibration API simplifications (#1763) [@natestemen]
 - W state Benchmarking Circuit (#1723) [@purva-thakre]
 - Consider id as slack in ddd circuit mask (#1744) [@Aaron-Robertson]
-- Remaining Stuff related to Identity Insertion Scaling in Docs (#1759) [@purva-thakre]
+- Remaining Stuff related to Identity Insertion Scaling in Docs (#1759) [@natestemen]
 - Add calibration tutorial (#1756) [@nathanshammah]
 - Set default force_run_all as True in PEC (#1755) [@andreamari]
 - Update amazon-braket-sdk requirement from ~=1.36.3 to ~=1.36.4 (#1765) [@dependabot]
@@ -47,7 +74,7 @@ Special thanks to UF Ambassadors **Amir Ebrahimi** and **Purva Thakre** for thei
 - Update qiskit requirement from ~=0.41.0 to ~=0.41.1 (#1727) [@dependabot[bot]]
 - Bump actions/setup-python from 3 to 4 (#1726) [@dependabot[bot]]
 - remove pdf doc build (#1725) [@natestemen]
-- REM: Update the fifth section of the docs (#1718) [Amir Ebrahimi]
+- REM: Update the fifth section of the docs (#1718) [@amirebrahimi]
 - [calibration] usability improvements (#1714) [@natestemen]
 - Simplify noisy operation (#1713) [@andreamari]
 - Calibration results data structure refactor (#1706) [@natestemen]
