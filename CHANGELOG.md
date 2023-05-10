@@ -9,6 +9,13 @@
 Highlights from this release include functions for applying Pauli Twirling of CNOT and CZ gates, support for noise scaling by circuit layer in ZNE, functions to generate Quantum Phase Estimation benchmarking circuits, and a new example composing two Mitiq techniques: REM and ZNE. 
 Special thanks to UF Ambassadors **Purva Thakre** and **Aaron Robertson** for their contributions to this release!
 
+The use of the Pauli Twirling module is demonstrated in the following code cell.
+
+```py
+from mitiq import pt
+twirled_value = pt.execute_with_pauli_twirling(circuit, expval_executor)
+```
+
 ### All changes
 
 - CNOT twirling (#1802) [@natestemen]
