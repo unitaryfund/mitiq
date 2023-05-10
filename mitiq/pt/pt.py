@@ -69,7 +69,7 @@ def execute_with_pauli_twirling(
             ``None``, the ``executor`` must return an expectation value
             (float). Otherwise, the ``QuantumResult`` returned by ``executor``
             is used to compute the expectation of the observable.
-        num_circuits: Number of circuits to be randomly twirled, and averaged.
+        num_circuits: Number of circuits to be twirled, and averaged.
 
     Returns:
         The expectation value estimated with Pauli twirling.
