@@ -9,6 +9,7 @@ Special thanks to UF Ambassadors **Purva Thakre** and **Aaron Robertson** for th
 
 ### All changes
 
+- CNOT twirling (#1802) [@natestemen]
 - Compose REM + ZNE in Mitiq (#1745) [@Misty-W]
 - bump nbsphinx (#1821) [@natestemen]
 - Update pennylane requirement from ~=0.29.1 to ~=0.30.0 (#1819) [@dependabot[bot]]
