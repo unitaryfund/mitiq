@@ -45,7 +45,7 @@ Highlights from this release include a bug fixed in DDD, extended documentation 
 - Calibration API simplifications (#1763) [@natestemen]
 - W state Benchmarking Circuit (#1723) [@purva-thakre]
 - Consider id as slack in ddd circuit mask (#1744) [@Aaron-Robertson]
-- Remaining Stuff related to Identity Insertion Scaling in Docs (#1759) [@natestemen]
+- Remaining Stuff related to Identity Insertion Scaling in Docs (#1759) [@purva-thakre]
 - Add calibration tutorial (#1756) [@nathanshammah]
 - Set default force_run_all as True in PEC (#1755) [@andreamari]
 - Update amazon-braket-sdk requirement from ~=1.36.3 to ~=1.36.4 (#1765) [@dependabot]
