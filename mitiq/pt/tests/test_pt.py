@@ -23,7 +23,8 @@ from mitiq.benchmarks import generate_mirror_circuit
 num_qubits = 2
 qubits = cirq.LineQubit.range(num_qubits)
 circuit = cirq.Circuit()
-circuit.append(cirq.CNOT.on_each(zip(qubits, qubits[1:])))
+circuit.append(cirq.CNOT(*qubits))
+circuit.append(cirq.CZ(*qubits))
 
 
 def amp_damp_executor(circuit: cirq.Circuit, noise: float = 0.005) -> float:
