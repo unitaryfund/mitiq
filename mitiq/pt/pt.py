@@ -77,7 +77,10 @@ def execute_with_pauli_twirling(
     executor = (
         executor if isinstance(executor, Executor) else Executor(executor)
     )
-    twirled_circuits = twirl_CNOT_gates(circuit, num_circuits)
+    CNOT_twirled_circuits = twirl_CNOT_gates(circuit, num_circuits)
+    twirled_circuits = [
+        twirl_CZ_gates(c, num_circuits=1)[0] for c in CNOT_twirled_circuits
+    ]
     expvals = executor.evaluate(twirled_circuits, observable)
     return cast(float, np.average(expvals))
 
