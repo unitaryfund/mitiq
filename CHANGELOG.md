@@ -3,8 +3,10 @@
 ## Version 0.27.0 (In development)
 
 ## Version 0.26.0
-Highlights from this release include functions for applying Pauli Twirling of CNOT and CZ gates, support for noise scaling by circuit layer in ZNE, functions to generate Quantum Phase Estimation benchmarking circuits, and a new example composing two Mitiq techniques: REM and ZNE. 
 
+### Summary
+
+Highlights from this release include functions for applying Pauli Twirling of CNOT and CZ gates, support for noise scaling by circuit layer in ZNE, functions to generate Quantum Phase Estimation benchmarking circuits, and a new example composing two Mitiq techniques: REM and ZNE. 
 Special thanks to UF Ambassadors **Purva Thakre** and **Aaron Robertson** for their contributions to this release!
 
 ### All changes
