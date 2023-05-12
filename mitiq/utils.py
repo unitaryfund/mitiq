@@ -20,7 +20,6 @@ from cirq import (
     OP_TREE,
     Gate,
     Qid,
-    LineQid,
     CircuitDiagramInfoArgs,
     EigenGate,
     GateOperation,
