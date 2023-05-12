@@ -31,7 +31,7 @@ from mitiq.utils import (
     _equal,
     _is_measurement,
     _simplify_gate_exponent,
-    _simplify_circuit_exponents,
+    _simplify_circuit_exponents_and_remove_barriers,
     _max_ent_state_circuit,
     _circuit_to_choi,
     _operation_to_choi,
@@ -266,7 +266,7 @@ def test_simplify_circuit_exponents_controlled_gate():
     )
     copy = circuit.copy()
 
-    _simplify_circuit_exponents(circuit)
+    _simplify_circuit_exponents_and_remove_barriers(circuit)
     assert _equal(circuit, copy)
 
 
@@ -291,7 +291,7 @@ def test_simplify_circuit_exponents():
     assert inverse_qasm != expected_qasm
 
     # Simplify the circuit
-    _simplify_circuit_exponents(inverse_circuit)
+    _simplify_circuit_exponents_and_remove_barriers(inverse_circuit)
 
     # Check inverse_circuit has the expected simplified representation
     simplified_repr = inverse_circuit.__repr__()
@@ -311,7 +311,7 @@ def test_simplify_circuit_exponents_with_non_self_inverse_gates():
     inverse_qasm = inverse_circuit._to_qasm_output().__str__()
 
     # Simplify the circuit (it should not change this circuit)
-    _simplify_circuit_exponents(inverse_circuit)
+    _simplify_circuit_exponents_and_remove_barriers(inverse_circuit)
 
     # Check inverse_circuit did not change
     simplified_repr = inverse_circuit.__repr__()
