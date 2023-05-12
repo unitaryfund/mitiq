@@ -50,6 +50,64 @@ class Barrier(Gate):
         return self._qubits
 
 
+def _simplify_gate_exponent(gate: EigenGate) -> EigenGate:
+    """Returns the input gate with a simplified exponent if possible,
+    otherwise the input gate is returned without any change.
+
+    The input gate is not mutated.
+
+    Args:
+        gate: The input gate to simplify.
+
+    Returns: The simplified gate.
+    """
+    # Try to simplify the gate exponent to 1
+    if hasattr(gate, "_with_exponent") and gate == gate._with_exponent(1):
+        return gate._with_exponent(1)
+    return gate
+
+
+def _simplify_circuit_exponents_and_remove_barriers(
+    circuit: Circuit, return_barriers: bool = False
+) -> Optional[List[Tuple[int, Barrier]]]:
+    """Simplifies the gate exponents of the input circuit if possible,
+    mutating the input circuit and optionally returning barrier indices.
+
+    Args:
+        circuit: The circuit to simplify.
+        return_barriers: Whether to return barrier indices.
+    """
+    barrier_indices = []
+
+    # Iterate over moments
+    for moment_idx, moment in enumerate(circuit):
+        simplified_operations = []
+
+        # Iterate over operations in moment
+        for op in moment:
+            if isinstance(op.gate, Barrier):
+                if return_barriers:
+                    barrier_indices.append((moment_idx, op.gate))
+                continue
+
+            if not isinstance(op, GateOperation):
+                simplified_operations.append(op)
+                continue
+
+            if isinstance(op.gate, EigenGate):
+                simplified_gate: Gate = _simplify_gate_exponent(op.gate)
+            else:
+                simplified_gate = op.gate
+
+            simplified_operation = op.with_gate(simplified_gate)
+            simplified_operations.append(simplified_operation)
+
+        # Mutate the input circuit
+        circuit[moment_idx] = Moment(simplified_operations)
+
+    return barrier_indices if return_barriers else None
+
+
 def _is_measurement(op: ops.Operation) -> bool:
     """Returns true if the operation's gate is a measurement, else False.
 
@@ -223,61 +281,3 @@ def _operation_to_choi(operation_tree: OP_TREE) -> npt.NDArray[np.complex64]:
     """
     circuit = Circuit(operation_tree)
     return _circuit_to_choi(circuit)
-
-
-def _simplify_gate_exponent(gate: EigenGate) -> EigenGate:
-    """Returns the input gate with a simplified exponent if possible,
-    otherwise the input gate is returned without any change.
-
-    The input gate is not mutated.
-
-    Args:
-        gate: The input gate to simplify.
-
-    Returns: The simplified gate.
-    """
-    # Try to simplify the gate exponent to 1
-    if hasattr(gate, "_with_exponent") and gate == gate._with_exponent(1):
-        return gate._with_exponent(1)
-    return gate
-
-
-def _simplify_circuit_exponents_and_remove_barriers(
-    circuit: Circuit, return_barriers: bool = False
-) -> Optional[List[Tuple[int, Barrier]]]:
-    """Simplifies the gate exponents of the input circuit if possible,
-    mutating the input circuit and optionally returning barrier indices.
-
-    Args:
-        circuit: The circuit to simplify.
-        return_barriers: Whether to return barrier indices.
-    """
-    barrier_indices = []
-
-    # Iterate over moments
-    for moment_idx, moment in enumerate(circuit):
-        simplified_operations = []
-
-        # Iterate over operations in moment
-        for op in moment:
-            if isinstance(op.gate, Barrier):
-                if return_barriers:
-                    barrier_indices.append((moment_idx, op.gate))
-                continue
-
-            if not isinstance(op, GateOperation):
-                simplified_operations.append(op)
-                continue
-
-            if isinstance(op.gate, EigenGate):
-                simplified_gate: Gate = _simplify_gate_exponent(op.gate)
-            else:
-                simplified_gate = op.gate
-
-            simplified_operation = op.with_gate(simplified_gate)
-            simplified_operations.append(simplified_operation)
-
-        # Mutate the input circuit
-        circuit[moment_idx] = Moment(simplified_operations)
-
-    return barrier_indices if return_barriers else None
