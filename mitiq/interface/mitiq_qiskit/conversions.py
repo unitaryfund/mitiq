@@ -16,7 +16,10 @@ import cirq
 from cirq.contrib.qasm_import import circuit_from_qasm
 import qiskit
 
-from mitiq.utils import _simplify_circuit_exponents_and_remove_barriers, Barrier
+from mitiq.utils import (
+    _simplify_circuit_exponents_and_remove_barriers,
+    Barrier,
+)
 
 
 QASMType = str
@@ -45,9 +48,12 @@ def _remove_qasm_barriers(qasm: QASMType) -> QASMType:
     return "".join(lines)
 
 
-def _extract_qasm_barriers(qasm: QASMType) -> Tuple[QASMType, List[Tuple[int, List[int]]]]:
+def _extract_qasm_barriers(
+    qasm: QASMType,
+) -> Tuple[QASMType, List[Tuple[int, List[int]]]]:
     """Returns a copy of the input QASM with all barriers removed and a list
-    of tuples where each tuple contains the line number and qubit indices of a barrier.
+    of tuples where each tuple contains the line number and qubit indices of a
+    barrier.
 
     Args:
         qasm: QASM to extract barriers from.
@@ -61,7 +67,10 @@ def _extract_qasm_barriers(qasm: QASMType) -> Tuple[QASMType, List[Tuple[int, Li
         match = re.match(r"^\s*barrier ((?:q\[\d+\],? ?)+);", line)
         if match is not None:
             qubits_str = match.group(1)
-            qubits = [int(qubit_index) for qubit_index in re.findall(r"q\[(\d+)\]", qubits_str)]
+            qubits = [
+                int(qubit_index)
+                for qubit_index in re.findall(r"q\[(\d+)\]", qubits_str)
+            ]
             barrier_info.append((i, qubits))
 
     # Remove the barrier lines
@@ -71,16 +80,21 @@ def _extract_qasm_barriers(qasm: QASMType) -> Tuple[QASMType, List[Tuple[int, Li
     return qasm_without_barriers, barrier_info
 
 
-
-def _add_qasm_barriers(qasm: str, barriers: List[Tuple[int, Barrier]]) -> str:
-    """Returns a copy of the input QASM with barriers added at the specified indices."""
+def _add_qasm_barriers(
+    qasm: QASMType, barriers: List[Tuple[int, Barrier]]
+) -> QASMType:
+    """Returns a copy of the input QASM with barriers added at the specified
+    indices.
+    """
     # Split the QASM into lines
     lines = qasm.split("\n")
 
-    # For each barrier, create a QASM barrier string and insert it into the lines
+    # For each barrier, create a QASM barrier string and insert it
     for index, barrier in barriers:
-        qubit_indices = [qubit.index for qubit in barrier.get_qubits()]
-        qubit_strs = [f"q[{index}]" for index in qubit_indices]
+        qubits = barrier.get_qubits()
+        if qubits is None:
+            continue
+        qubit_strs = [f"q[{qubit._comparison_key}]" for qubit in qubits]
         barrier_str = f"barrier {', '.join(qubit_strs)};"
         lines.insert(index, barrier_str)
 
@@ -302,7 +316,9 @@ def to_qasm(circuit: cirq.Circuit) -> QASMType:
     Returns:
         The QASM string with custom barriers.
     """
-    barrier_indices = _simplify_circuit_exponents_and_remove_barriers(circuit, return_barriers=True)
+    barrier_indices = _simplify_circuit_exponents_and_remove_barriers(
+        circuit, return_barriers=True
+    )
     qasm_without_barriers = circuit.to_qasm()
 
     # Only add barriers if there are any
@@ -364,8 +380,10 @@ def from_qasm(qasm: QASMType) -> cirq.Circuit:
 
         # Create a barrier gate for each qubit
         for qubit in qubits:
-            barrier = Barrier().set_qubits([circuit.all_qubits()[qubit]])
-            moment = moment.with_operation(barrier.on(circuit.all_qubits()[qubit]))
+            barrier = Barrier().set_qubits([list(circuit.all_qubits())[qubit]])
+            moment = moment.with_operation(
+                barrier.on(list(circuit.all_qubits())[qubit])
+            )
 
         # Replace the moment in the circuit
         circuit[line_number] = moment

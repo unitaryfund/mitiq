@@ -20,7 +20,7 @@ from cirq import (
     OP_TREE,
     Gate,
     Qid,
-    Operation,
+    LineQid,
     CircuitDiagramInfoArgs,
     EigenGate,
     GateOperation,
@@ -30,20 +30,25 @@ from cirq.ops.measurement_gate import MeasurementGate
 
 
 class Barrier(Gate):
-    def __init__(self, qubits):
-        self.qubits = qubits
+    def __init__(self) -> None:
+        super().__init__()
+        self._qubits: Optional[List[Qid]] = None
 
-    def num_qubits(self):
-        return len(self.qubits)
+    def num_qubits(self) -> int:
+        return 1
 
-    def _decompose_(self, qubits: List[Qid]) -> Optional[List[Operation]]:
+    def _decompose_(self, qubits: List[Qid]) -> List[None]:
         return []
 
     def _circuit_diagram_info_(self, args: CircuitDiagramInfoArgs) -> str:
         return "B"
 
-    def get_qubits(self):
-        return self.qubits
+    def set_qubits(self, qubits: List[Qid]) -> "Barrier":
+        self._qubits = qubits
+        return self
+
+    def get_qubits(self) -> Optional[List[Qid]]:
+        return self._qubits
 
 
 def _is_measurement(op: ops.Operation) -> bool:
@@ -240,7 +245,7 @@ def _simplify_gate_exponent(gate: EigenGate) -> EigenGate:
 
 def _simplify_circuit_exponents_and_remove_barriers(
     circuit: Circuit, return_barriers: bool = False
-) -> Optional[List[Tuple[int, int]]]:
+) -> Optional[List[Tuple[int, Barrier]]]:
     """Simplifies the gate exponents of the input circuit if possible,
     mutating the input circuit and optionally returning barrier indices.
 
@@ -276,7 +281,4 @@ def _simplify_circuit_exponents_and_remove_barriers(
         # Mutate the input circuit
         circuit[moment_idx] = Moment(simplified_operations)
 
-    if return_barriers:
-        return barrier_indices
-    else:
-        return None
+    return barrier_indices if return_barriers else None
