@@ -80,20 +80,24 @@ def _extract_qasm_barriers(
     return qasm_without_barriers, barrier_info
 
 
-def _add_qasm_barriers(
-    qasm: QASMType, barriers: List[Tuple[int, Barrier]]
-) -> QASMType:
-    """Returns a copy of the input QASM with barriers added at the specified
-    indices.
-    """
+def _add_qasm_barriers(qasm: str, barriers: List[Tuple[int, Barrier]]) -> str:
+    """Returns a copy of the input QASM with barriers added at the specified indices."""
     # Split the QASM into lines
     lines = qasm.split("\n")
 
-    # For each barrier, create a QASM barrier string and insert it
+    # Reverse the barriers list to insert from the end
+    barriers = list(reversed(barriers))
+
+    # For each barrier, create a QASM barrier string and insert it into the lines
     for index, barrier in barriers:
         qubits = barrier.get_qubits()
         if qubits is None:
             continue
+        if not all(isinstance(qubit, cirq.LineQubit) for qubit in qubits):
+            raise TypeError(
+                "All qubits must be LineQubits for QASM conversion."
+            )
+
         qubit_strs = [f"q[{qubit._comparison_key}]" for qubit in qubits]
         barrier_str = f"barrier {', '.join(qubit_strs)};"
         lines.insert(index, barrier_str)
