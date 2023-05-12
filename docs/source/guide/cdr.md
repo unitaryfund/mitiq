@@ -1,8 +1,6 @@
-(guide/cdr/cdr)=
 # Clifford Data Regression
 
 Clifford data regression (CDR) is a learning-based quantum error mitigation technique in which an error mitigation model is trained with quantum circuits that _resemble_ the circuit of interest, but which are easier to classically simulate {cite}`Czarnik_2021_Quantum, Lowe_2021_PRR`.
-
 
 ```{figure} ../img/cdr_workflow2_steps.png
 ---
@@ -13,7 +11,6 @@ The CDR workflow in Mitiq is fully explained in the [What happens when I use CDR
 ```
 
 Below you can find sections of the documentation that address the following questions:
-
 
 ```{toctree}
 ---
