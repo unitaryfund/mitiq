@@ -147,7 +147,10 @@ def test_qubit_independent_representation_cirq():
     )
 
     expected_a = Circuit([cirq.I.on(LineQubit(0)), cirq.X.on(LineQubit(1))])
+    expected_a.append(measure_each(*LineQubit.range(2)))
+
     expected_b = Circuit([cirq.I.on(LineQubit(0)), cirq.Z.on(LineQubit(1))])
+    expected_b.append(measure_each(*LineQubit.range(2)))
 
     for _ in range(5):
         seqs, signs, norm = sample_circuit(circuit, representations=[rep])
@@ -272,9 +275,15 @@ def test_sample_circuit_cirq(measure):
         )
 
         assert isinstance(sampled_circuits[0], Circuit)
-        assert len(sampled_circuits[0]) == 2
         assert signs[0] in (-1, 1)
         assert norm >= 1
+        if measure:
+            assert len(sampled_circuits[0]) == 3
+            assert cirq.is_measurement(
+                sampled_circuits[0][-1][0]  # first op of last moment
+            )
+        else:
+            assert len(sampled_circuits[0]) == 2
 
 
 def test_sample_circuit_partial_representations():
