@@ -274,6 +274,12 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 
+## Pauli Twirling
+```{eval-rst}
+.. automodule:: mitiq.pt.pt
+   :members:
+```
+
 ## Calibration
 
 ```{eval-rst}
