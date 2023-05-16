@@ -108,10 +108,12 @@ def test_twirl_CNOT_increases_layer_count():
     )
     num_CNOTS = sum([op.gate == cirq.CNOT for op in circuit.all_operations()])
     twirled = twirl_CNOT_gates(circuit, num_circuits=1)[0]
+    num_gates_before = len(list(circuit.all_operations()))
+    num_gates_after = len(list(twirled.all_operations()))
     if num_CNOTS:
-        assert len(twirled) > len(circuit)
+        assert num_gates_after > num_gates_before
     else:
-        assert len(twirled) == len(circuit)
+        assert num_gates_after == num_gates_before
 
 
 def test_execute_with_pauli_twirling():
