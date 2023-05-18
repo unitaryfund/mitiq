@@ -24,12 +24,12 @@ More specifically, this tutorial covers:
 
 - Getting started with Mitiq's calibration module with ZNE
 - Use Qiskit noisy simulator with `FakeJakarta` as backend
-- Run calibration with some special settings, `RBSettings`, using the `cal.run(log=True)` option
+- Run calibration with some special settings, `GHZSettings`, using the `cal.run(log=True)` option
 
 ## Getting started with Mitiq
 
 ```{code-cell} ipython3
-from mitiq.benchmarks import generate_rb_circuits, generate_ghz_circuit
+from mitiq.benchmarks import generate_ghz_circuit
 from mitiq.zne import execute_with_zne
 from mitiq import (
     Calibrator,
@@ -48,14 +48,14 @@ from qiskit.providers.fake_provider import FakeJakarta  # Fake (simulated) QPU
 Define global variables for the quantum circuit of interest: number of qubits, depth of the quantum circuit and number of shots.
 
 ```{code-cell} ipython3
-n_qubits = 20
-depth_circuit = 100
+n_qubits = 7
+depth_circuit = 10
 shots = 10 ** 4
 ```
 
-#### Quantum circuit: Randomized benchmarking (RB)
+#### Quantum circuit: GHZ
 
-We now use Mitiq's built-in `generate_rb_circuits` from the `mitiq.benchmarks` module to define the quantum circuit.
+We now use Mitiq's built-in {func}`.generate_rb_circuits()` from the `mitiq.benchmarks` module to define the quantum circuit.
 
 ```{code-cell} ipython3
 circuit = generate_ghz_circuit(n_qubits, return_type="qiskit")
@@ -77,13 +77,14 @@ def execute_circuit(circuit):
 ```
 
 ```{code-cell} ipython3
-mitigated = execute_with_zne(circuit, execute_circuit)
+from mitiq.zne.scaling.folding import fold_global
+mitigated = execute_with_zne(circuit, execute_circuit, scale_noise=fold_global)
 unmitigated = execute_circuit(circuit)
 ideal = 0.5 #property of GHZ circuits
 
 print("ideal = \t \t",ideal)
 print("unmitigated = \t \t",unmitigated)
-print("mitigated = \t \t",mitigated)
+print("mitigated = \t \t", mitigated)
 ```
 
 ## Using calibration to improve the results
@@ -189,10 +190,6 @@ print("mitigated = \t \t",mitigated)
 print("calibrated_mitigated = \t",calibrated_mitigated)
 ```
 
-1. Make sure `Settings` object has the default `ZNE Settings`. Still some randomness -> yes
-2. Try different folding technique 
-3. Try identity insertion - need to implement identity insertion settings
-4. Modify noise model that the default is bad
-5. Modify  number of shots - make results more deterministic
-6. Add seeds
-7. Exponential extrapolation
+```{code-cell} ipython3
+
+```
