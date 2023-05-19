@@ -10,6 +10,7 @@ from typing import Optional, Tuple, Sequence
 import numpy as np
 
 from mitiq import QPROGRAM
+from mitiq import Bitstring
 from mitiq.interface import convert_from_mitiq
 
 from mitiq.benchmarks.quantum_volume_circuits import generate_quantum_volume_circuit
@@ -50,28 +51,18 @@ def generate_mirror_qv_circuit(
         A list of the bitstrings for the returned circuit.
     """
     
-    if depth%2 !=0:
-        depth = depth + 1
-    else:
-        depth = depth
-    first_half_depth = int(depth/2)
-
-    circ = cirq.Circuit()
-    qv_half = generate_quantum_volume_circuit(num_qubits, first_half_depth, seed=seed, decompose=decompose)
-    mirror_qv_half = cirq.inverse(qv_half[0])
-    circ.append(qv_half[0], mirror_qv_half)
+    first_half_depth = depth
     
-    #un-squash circuit moments
-    output_circ = cirq.Circuit()
-    output_ops = list(circ.all_operations())
-    for i in output_ops:
-        output_circ.append(i, strategy=cirq.InsertStrategy.NEW)
-        
+    qv_half_circ, _ = generate_quantum_volume_circuit(num_qubits, first_half_depth, seed=seed, decompose=decompose)
+    mirror_half_circ = cirq.inverse(half_circ)
+    circ = qv_half_circ + mirror_half_circ
+    circ_with_mes = circ + cirq.measure(circ.all_qubits())
+
     
     # get the bitstring
-    circ_with_measurements = output_circ + cirq.measure(output_circ.all_qubits())
+    circ_with_measurements = circ + cirq.measure(circ.all_qubits())
     simulate_result = cirq.Simulator().run(circ_with_measurements)
     bitstring = list(simulate_result.measurements.values())[0][0].tolist()
     
 
-    return(output_circ, bitstring)
+    return(circ, bitstring)
