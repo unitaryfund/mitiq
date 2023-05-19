@@ -7,13 +7,19 @@
 
 
 import cirq
+import pytest
 
 from mitiq.benchmarks.mirror_qv_circuits import generate_mirror_qv_circuit
 
 
-def test_generate_mirror_qv_circuit_bitstring():
-    # odd depth layers
-    test_circ, _ = generate_mirror_qv_circuit(4, 3)
+@pytest.mark.parametrize(
+    "depth_num",
+    [1, 2, 3, 4, 5, 6, 7, 8],
+)
+def test_generate_mirror_qv_circuit(depth_num):
+    test_circ, _ = generate_mirror_qv_circuit(4, depth_num)
+
+    # check bitstring is all 0's
     bit_test = cirq.Simulator().run(
         test_circ + cirq.measure(test_circ.all_qubits()), repetitions=1000
     )
@@ -21,11 +27,10 @@ def test_generate_mirror_qv_circuit_bitstring():
     expected_bitstring = [0] * 4
     assert test_bitstring == expected_bitstring
 
-    # even depth layers
-    test_circ, _ = generate_mirror_qv_circuit(4, 4)
-    bit_test = cirq.Simulator().run(
-        test_circ + cirq.measure(test_circ.all_qubits()), repetitions=1000
-    )
-    test_bitstring = list(bit_test.measurements.values())[0][0].tolist()
-    expected_bitstring = [0] * 4
-    assert test_bitstring == expected_bitstring
+
+def test_bad_depth_number():
+    for n in (-1, 0):
+        with pytest.raises(
+            ValueError, match="{} is invalid for the generated circuit depth."
+        ):
+            generate_mirror_qv_circuit(3, n)

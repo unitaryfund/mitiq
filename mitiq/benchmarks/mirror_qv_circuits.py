@@ -54,6 +54,10 @@ def generate_mirror_qv_circuit(
         A quantum volume circuit acting on ``num_qubits`` qubits.
         A list of the bitstrings for the returned circuit.
     """
+    if depth <= 0:
+        raise ValueError(
+            "{} is invalid for the generated circuit depth.", depth
+        )
 
     if depth % 2 == 0:
         first_half_depth = int(depth / 2)
