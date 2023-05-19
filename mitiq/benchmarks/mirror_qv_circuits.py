@@ -55,11 +55,11 @@ def generate_mirror_qv_circuit(
         A list of the bitstrings for the returned circuit.
     """
 
-    if depth%2 ==0:
-        first_half_depth = int(depth/2)
+    if depth % 2 == 0:
+        first_half_depth = int(depth / 2)
     else:
-        first_half_depth = int((depth+1)/2)
-    
+        first_half_depth = int((depth + 1) / 2)
+
     qv_generated, _ = generate_quantum_volume_circuit(
         num_qubits, first_half_depth, seed=seed, decompose=decompose
     )
