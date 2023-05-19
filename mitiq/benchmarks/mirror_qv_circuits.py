@@ -1,20 +1,16 @@
-# Copyright (C) 2023 Unitary Fund
+# Copyright (C) Unitary Fund
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# This source code is licensed under the GPL license (v3) found in the
+# LICENSE file in the root directory of this source tree.
 
 """Functions to create a Mirror Quantum Volume Benchmarking circuit
 as defined in https://arxiv.org/abs/2303.02108."""
+
+from typing import Optional, Tuple, Sequence
+import numpy as np
+
+from mitiq import QPROGRAM
+from mitiq.interface import convert_from_mitiq
 
 from mitiq.benchmarks.quantum_volume_circuits import generate_quantum_volume_circuit
 import cirq
@@ -30,7 +26,11 @@ def generate_mirror_qv_circuit(
     depth.
 
     The generated circuit consists of a quantum volume circuit upto `depth/2` layers
-    followed by an inverse of the quantum volume portion upto `depth/2`.
+    followed by an inverse of the quantum volume portion upto `depth/2` when `depth`
+    is an even number. 
+    
+    When `depth` is odd, the layers will be chnaged to `depth+1`.
+    
 
     The output bit-string is always supposed to be a string of zeroes. 
 
@@ -49,16 +49,29 @@ def generate_mirror_qv_circuit(
         A quantum volume circuit acting on ``num_qubits`` qubits.
         A list of the bitstrings for the returned circuit.
     """
+    
+    if depth%2 !=0:
+        depth = depth + 1
+    else:
+        depth = depth
     first_half_depth = int(depth/2)
-    random_option = random.RandomState(seed)
 
     circ = cirq.Circuit()
-    qv_half = generate_quantum_volume_circuit(num_qubits, first_half_depth, decompose, random_option)
-    mirror_qv_half = cirq.inverse(qv_half)
-    circ.append(qv_half, mirror_qv_half)
+    qv_half = generate_quantum_volume_circuit(num_qubits, first_half_depth, seed=seed, decompose=decompose)
+    mirror_qv_half = cirq.inverse(qv_half[0])
+    circ.append(qv_half[0], mirror_qv_half)
+    
+    #un-squash circuit moments
+    output_circ = cirq.Circuit()
+    output_ops = list(circ.all_operations())
+    for i in output_ops:
+        output_circ.append(i, strategy=cirq.InsertStrategy.NEW)
+        
+    
+    # get the bitstring
+    circ_with_measurements = output_circ + cirq.measure(output_circ.all_qubits())
+    simulate_result = cirq.Simulator().run(circ_with_measurements)
+    bitstring = list(simulate_result.measurements.values())[0][0].tolist()
+    
 
-    return(circ)
-
-
-
-
+    return(output_circ, bitstring)
