@@ -11,6 +11,7 @@ from typing import Optional, Tuple, Sequence
 
 from mitiq import QPROGRAM
 from mitiq import Bitstring
+from mitiq.interface.conversions import convert_to_mitiq
 
 
 from mitiq.benchmarks.quantum_volume_circuits import (
@@ -59,11 +60,17 @@ def generate_mirror_qv_circuit(
     else:
         first_half_depth = int((depth+1)/2)
     
-
-    qv_half_circ, _ = generate_quantum_volume_circuit(
+    qv_generated, _ = generate_quantum_volume_circuit(
         num_qubits, first_half_depth, seed=seed, decompose=decompose
     )
-    mirror_half_circ = cirq.inverse(qv_half_circ)
+    qv_half_circ, _ = convert_to_mitiq(qv_generated)
+
+    mirror_half_circ = cirq.Circuit()
+    qv_half_ops = list(qv_half_circ.all_operations())
+    for i in range(len(qv_half_ops))[::-1]:
+        op_inverse = cirq.inverse(qv_half_ops[i])
+        mirror_half_circ.append(op_inverse, strategy=cirq.InsertStrategy.NEW)
+
     circ = qv_half_circ + mirror_half_circ
 
     # get the bitstring
