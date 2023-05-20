@@ -13,6 +13,7 @@ ZNE with PyQuil: Parametric programs <pyquil_demo.ipynb>
 ZNE with PyQuil: Improving VQE <vqe-pyquil-demo.ipynb>
 ZNE with Cirq: Energy landscape of a variational circuit <simple-landscape-cirq.md>
 ZNE with Qiskit: Energy landscape of a variational circuit <simple-landscape-qiskit.md>
+ZNE with Qiskit: Quantum simulation of quantum many body scars <quantum_simulation_scars_ibmq.ipynb>
 ZNE with Cirq: Solving MaxCut with QAOA <maxcut-demo.md>
 ZNE with Cirq: Hamiltonian simulation with Pauli gates<hamiltonians.md>
 ZNE with Cirq: Energy of molecular Hydrogen <molecular_hydrogen.md>
