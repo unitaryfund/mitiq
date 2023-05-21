@@ -11,7 +11,7 @@ from typing import Optional, Tuple, Sequence
 
 from mitiq import QPROGRAM
 from mitiq import Bitstring
-from mitiq.interface.conversions import convert_to_mitiq
+from mitiq.interface.conversions import convert_to_mitiq, convert_from_mitiq
 
 
 from mitiq.benchmarks.quantum_volume_circuits import (
@@ -82,4 +82,9 @@ def generate_mirror_qv_circuit(
     simulate_result = cirq.Simulator().run(circ_with_measurements)
     bitstring = list(simulate_result.measurements.values())[0][0].tolist()
 
-    return (circ, bitstring)
+    if decompose:
+        # Decompose random unitary gates into simpler gates.
+        circ = cirq.Circuit(cirq.decompose(circ))
+
+    return_type = "cirq" if not return_type else return_type
+    return convert_from_mitiq(circ, return_type), bitstring

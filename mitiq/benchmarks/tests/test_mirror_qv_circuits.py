@@ -10,6 +10,7 @@ import cirq
 import pytest
 
 from mitiq.benchmarks.mirror_qv_circuits import generate_mirror_qv_circuit
+from mitiq import SUPPORTED_PROGRAM_TYPES
 
 
 @pytest.mark.parametrize(
@@ -34,3 +35,34 @@ def test_bad_depth_number():
             ValueError, match="{} is invalid for the generated circuit depth."
         ):
             generate_mirror_qv_circuit(3, n)
+
+
+@pytest.mark.parametrize("return_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_volume_conversion(return_type):
+    circuit, _ = generate_mirror_qv_circuit(4, 3, return_type=return_type)
+    assert return_type in circuit.__module__
+
+
+def test_generate_model_circuit_with_seed():
+    """Test that a model circuit is determined by its seed."""
+    circuit_1, _ = generate_mirror_qv_circuit(4, 3, seed=1)
+    circuit_2, _ = generate_mirror_qv_circuit(4, 3, seed=1)
+    circuit_3, _ = generate_mirror_qv_circuit(4, 3, seed=2)
+
+    assert circuit_1 == circuit_2
+    assert circuit_2 != circuit_3
+
+
+def test_circuit_decomposition():
+    """Test that decomposed circuit consists of gates in default cirq gatest.
+    As defined in cirq.protocols.decompose_protocol, this default gateset is
+        ops.XPowGate,
+        ops.YPowGate,
+        ops.ZPowGate,
+        ops.CZPowGate,
+        ops.MeasurementGate,
+        ops.GlobalPhaseGate
+    """
+    circuit, _ = generate_mirror_qv_circuit(4, 3, decompose=True)
+    for op in [operation for moment in circuit for operation in moment]:
+        assert op in cirq.protocols.decompose_protocol.DECOMPOSE_TARGET_GATESET
