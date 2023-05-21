@@ -47,6 +47,12 @@
    :members:
 ```
 
+### W State Circuits
+```{eval-rst}
+.. automodule:: mitiq.benchmarks.mirror_qv_circuits.py
+   :members:
+```
+
 ## Circuit types and result types
 
 ```{eval-rst}

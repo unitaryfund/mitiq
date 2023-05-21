@@ -28,7 +28,7 @@ def generate_mirror_qv_circuit(
     return_type: Optional[str] = None,
 ) -> Tuple[QPROGRAM, Sequence[Bitstring]]:
     """Generate a mirror quantum volume circuit with the given number of qubits
-    and depth.
+    and depth as defined in :cite:`Amico_2023_arxiv`.
 
     The generated circuit consists of a quantum volume circuit upto `depth/2`
     layers followed by an inverse of the quantum volume portion upto `depth/2`
