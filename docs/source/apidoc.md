@@ -47,9 +47,9 @@
    :members:
 ```
 
-### W State Circuits
+### Mirror Quantum Volume Circuits
 ```{eval-rst}
-.. automodule:: mitiq.benchmarks.mirror_qv_circuits.py
+.. automodule:: mitiq.benchmarks.mirror_qv_circuits
    :members:
 ```
 
