@@ -4,12 +4,14 @@
 # LICENSE file in the root directory of this source tree.
 
 import copy
-from typing import Callable, cast, List, Optional, Set
+from typing import Callable, cast, List, Optional, Set, Union, Any, Iterable
 
 import numpy as np
 import numpy.typing as npt
 import cirq
 
+from collections import defaultdict
+from numbers import Number
 from mitiq.observable.pauli import PauliString, PauliStringCollection
 from mitiq import MeasurementResult, QuantumResult, QPROGRAM
 
@@ -27,8 +29,7 @@ class Observable:
             paulis: PauliStrings used to define the observable.
 
         """
-        # TODO: Add option to Combine duplicates. E.g. [Z(0, Z(0)] -> [2*Z(0)].
-        self._paulis = list(paulis)
+        self._paulis = _combine_duplicate_pauli_strings(paulis)
         self._groups: List[PauliStringCollection]
         self._ngroups: int
         self.partition()
@@ -56,12 +57,36 @@ class Observable:
         return {q for pauli in self._paulis for q in pauli._pauli.qubits}
 
     @property
+    def paulis(self) -> List[PauliString]:
+        return self._paulis
+
+    @property
     def qubit_indices(self) -> List[int]:
         return [cast(cirq.LineQubit, q).x for q in sorted(self._qubits())]
 
     @property
     def nqubits(self) -> int:
         return len(self.qubit_indices)
+
+    def __mul__(
+        self, other: Union["Observable", "PauliString", Number]
+    ) -> "Observable":
+        if isinstance(other, (PauliString, Number)):
+            return Observable(*[pauli * other for pauli in self._paulis])
+        elif isinstance(other, Observable):
+            return Observable(
+                *[
+                    pauli * other_pauli
+                    for pauli in self._paulis
+                    for other_pauli in other._paulis
+                ]
+            )
+        return NotImplemented
+
+    def __rmul__(self, other: Union["PauliString", Number]) -> "Observable":
+        if isinstance(other, (PauliString, Number)):
+            return Observable(*[other * pauli for pauli in self._paulis])
+        return NotImplemented
 
     @property
     def groups(self) -> List[PauliStringCollection]:
@@ -144,3 +169,27 @@ class Observable:
 
     def __str__(self) -> str:
         return " + ".join(map(str, self._paulis))
+
+    def __eq__(self, other: Any) -> bool:
+        return np.allclose(self.matrix(), other.matrix())
+
+
+def _combine_duplicate_pauli_strings(
+    paulis: Iterable[PauliString],
+) -> List[PauliString]:
+    """Combines duplicate PauliStrings by adding their coefficients.
+    Discards paulis with zero coefficients.
+
+    Returns: deduped list of PauliStrings.
+    """
+    pauli_string_coefficients: defaultdict[PauliString, complex] = defaultdict(
+        complex
+    )
+    for pauli_string in paulis:
+        cache_key = pauli_string.with_coeff(1)
+        pauli_string_coefficients[cache_key] += pauli_string.coeff
+    return [
+        pauli_string.with_coeff(coeff)
+        for (pauli_string, coeff) in pauli_string_coefficients.items()
+        if not np.isclose(coeff, 0.0)
+    ]
