@@ -60,11 +60,11 @@ print(circuit)
 ```
 
 ## Defining the executor functions with and without noise
-To use error mitigation methods in Mitiq, we define an executor function which computes the expectation value of a simple Hamiltonian $H=Z \otimes Z$, i.e., Pauli-$Z$ on each qubit. To compare to the noiseless result, we define both a noiseless and a noisy executor below.
+To use error mitigation methods in Mitiq, we define an executor function which computes the expectation value of a simple Hamiltonian $H=Z \otimes Z$, i.e., Pauli-$Z$ on each qubit. To compare to the noiseless result, we define both a noiseless and a noisy executor below.More information about executors can be found [here](../guide/executors.md).
 
 ```{code-cell} ipython3
 # Observable to measure
-z = np.diag([1, -1])
+Z = np.diag([1, -1])
 hamiltonian = np.kron(z, z)
 
 def noiseless_executor(circ: Circuit) -> float:
@@ -80,7 +80,7 @@ def noiseless_executor(circ: Circuit) -> float:
     # Evaluate the ZZ expectation value
     circ.expectation(observable=Observable.Z() @ Observable.Z(), target=range(2))
     
-    task = device.run(circ, shots = 0)
+    task = device.run(circ)
     result = task.result()
     return result.values
 
@@ -102,10 +102,11 @@ def executor_with_noise(circ: Circuit) -> float:
     # Use the noiseless_executor function to return the expectation value of the ZZ observable for the noisy circuit
     return noiseless_executor(circ)
 ```
-
 ```{note}
-The above code block uses depolarizing noise, but any Braket `Noise` channel can be substituted in.
+The above code block uses depolarizing noise, but any Braket [`Noise`](https://amazon-braket-sdk-python.readthedocs.io/en/latest/_apidoc/braket.circuits.noise.html) channel can be substituted in.
 ```
+
++++
 
 ## Computing the landscape without noise
 
@@ -138,7 +139,6 @@ We now compute the unmitigated energy landscape $\langle H \rangle(\gamma) =\lan
 in the following code block.
 
 ```{code-cell} ipython3
-gammas = np.linspace(0, 2 * np.pi, 50)
 expectations = [executor_with_noise(variational_circuit(g)) for g in gammas]
 ```
 
@@ -158,11 +158,11 @@ plt.show()
 
 ## Computing the mitigated landscape
 We now repeat the same task but use Mitiq to mitigate errors.
-We initialize a RichardsonFactory with scale factors `[1, 3, 5]` and we get a mitigated executor as follows.
+We initialize a [RichardsonFactory](https://mitiq.readthedocs.io/en/stable/apidoc.html#mitiq.zne.inference.RichardsonFactory) with scale factors `[1, 3, 5]` and we get a mitigated executor as follows.
 
 ```{code-cell} ipython3
 fac = RichardsonFactory(scale_factors=[1, 3, 5])
-mitigated_executor = mitigate_executor(executor_with_noise, factory=fac)
+mitigated_executor = zne.mitigate_executor(executor_with_noise, factory=fac)
 ```
 
 We then run the same code above to compute the energy landscape, but this time use the ``mitigated_executor`` instead of just the executor.
@@ -196,8 +196,4 @@ We also observe that the minimum of mitigated energy approximates well the theor
 print(f"Minimum of the noisy landscape: {round(min([exp[0] for exp in expectations]), 3)}")
 print(f"Minimum of the mitigated landscape: {round(min(mitigated_expectations), 3)}")
 print(f"Theoretical ground state energy: {min(np.linalg.eigvals(hamiltonian))}")
-```
-
-```{code-cell} ipython3
-
 ```
