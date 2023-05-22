@@ -22,7 +22,7 @@ import numpy as np
 from braket.devices import LocalSimulator
 from braket.circuits import Circuit, Noise, Observable
 
-from mitiq.zne import mitigate_executor
+from mitiq import zne
 from mitiq.zne.inference import RichardsonFactory
 ```
 
