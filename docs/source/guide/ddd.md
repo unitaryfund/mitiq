@@ -7,7 +7,6 @@ between the qubits and the environment, mitigating the effects of noise.
 For more discussion of the theory of DDD, see the section [What is the theory
 behind DDD?](ddd-5-theory.md).
 
-
 ```{figure} ../img/ddd_workflow.svg
 ---
 width: 700px
@@ -17,7 +16,6 @@ Workflow of the DDD technique in Mitiq, detailed in the [What happens when I use
 ```
 
 Below you can find sections of the documentation that address the following questions:
-
 
 ```{toctree}
 ---

@@ -106,8 +106,8 @@ def test_observable_partition_can_be_measured_with():
     )
 
     assert obs.nqubits == n
-    assert obs.nterms == nterms
-    assert obs.ngroups <= nterms
+    assert obs.nterms <= nterms  # because of deduplication
+    assert obs.ngroups <= obs.nterms
 
     for pset in obs.groups:
         pauli_list = list(pset.elements)
@@ -264,3 +264,92 @@ def test_observable_expectation_supported_qubits(executor):
     # <Z2> = 0.
     obs = Observable(PauliString(spec="Z", support=(2,)))
     assert np.isclose(obs.expectation(circuit, executor), 0.0, atol=5e-2)
+
+
+def test_observable_multuplication_1():
+    XI = PauliString("XI", 0.3)
+    YY = PauliString("YY", 0.7)
+    XZ = PauliString("XZ", 0.1)
+    ZX = PauliString("ZX", 0.2)
+    IZ = PauliString("IZ", -0.4)
+    obs1 = Observable(XI, YY, XZ)
+    obs2 = Observable(ZX, IZ)
+    correct_obs = Observable(
+        XI * ZX, XI * IZ, YY * ZX, YY * IZ, XZ * ZX, XZ * IZ
+    )
+    assert obs1 * obs2 == correct_obs
+
+
+def test_observable_multiplication_2():
+    YXXYZ = PauliString("YXXYZ", 0.3)
+    ZYIZX = PauliString("ZYIZX", 0.7)
+    IZZXY = PauliString("IZZXY", 0.1)
+    YZIXZ = PauliString("YZIXZ", 0.2)
+    XZYII = PauliString("XZYII", -0.4)
+    YYZXI = PauliString("YYZXI", 0.7)
+    IIXYZ = PauliString("IIXYZ", 0.7)
+    ZYXIZ = PauliString("ZYXIZ", 0.1)
+    YIZXI = PauliString("YIZXI", 0.2)
+    pauli_strings_1 = [YXXYZ, ZYIZX, IZZXY, YZIXZ, XZYII]
+    pauli_strings_2 = [YYZXI, IIXYZ, ZYXIZ, YIZXI]
+    obs1 = Observable(*pauli_strings_1)
+    obs2 = Observable(*pauli_strings_2)
+    l3 = [p1 * p2 for p1 in pauli_strings_1 for p2 in pauli_strings_2]
+    correct_obs = Observable(*l3)
+    assert obs1 * obs2 == correct_obs
+
+
+def test_scalar_multiplication():
+    YXXYZ = PauliString("YXXYZ", 0.3)
+    obs = Observable(YXXYZ)
+    assert obs * 2.0 == Observable(YXXYZ * 2.0)
+    assert 2.0 * obs == Observable(YXXYZ * 2.0)
+
+
+def test_pauli_string_left_multiplication():
+    XI = PauliString("XI", 0.3)
+    YY = PauliString("YY", 0.7)
+    XZ = PauliString("XZ", 0.1)
+    IZ = PauliString("IZ", -0.4)
+    pauli_strings = [XI, YY, XZ]
+    obs1 = Observable(*pauli_strings)
+    correct_obs = Observable(*[p * IZ for p in pauli_strings])
+    assert obs1 * IZ == correct_obs
+
+
+def test_pauli_string_right_multiplication():
+    XI = PauliString("XI", 0.3)
+    YY = PauliString("YY", 0.7)
+    XZ = PauliString("XZ", 0.1)
+    IZ = PauliString("IZ", -0.4)
+    pauli_strings = [XI, YY, XZ]
+    obs1 = Observable(*pauli_strings)
+    correct_obs = Observable(*[IZ * p for p in pauli_strings])
+    assert IZ * obs1 == correct_obs
+
+
+def test_pauli_string_deduplication():
+    XI = PauliString("XI", 0.3)
+    YY = PauliString("YY", 0.7)
+    XZ = PauliString("XZ", 0.1)
+    n_repeat_paulis = 4
+    pauli_strings = [XI, YY, XZ] * n_repeat_paulis
+
+    obs = Observable(*pauli_strings)
+    assert obs.nterms == 3
+    assert obs == Observable(
+        XI.with_coeff(XI.coeff * n_repeat_paulis),
+        YY.with_coeff(YY.coeff * n_repeat_paulis),
+        XZ.with_coeff(XZ.coeff * n_repeat_paulis),
+    )
+
+
+def test_pauli_string_deduplication_removal_of_0_coefficients():
+    XI = PauliString("XI", 0.3)
+    YY = PauliString("YY", 0.7)
+
+    pauli_strings = [XI, YY, XI, YY.with_coeff(-YY.coeff)]
+
+    obs = Observable(*pauli_strings)
+    assert obs.nterms == 1
+    assert obs == Observable(XI.with_coeff(XI.coeff * 2))

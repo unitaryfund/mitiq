@@ -93,6 +93,13 @@ If above format check fails then you will be presented with a [diff](https://bla
 ```bash
 make format
 ```
+We also use [Mypy](https://mypy.readthedocs.io/en/stable/) as a type checker to find incompatible types compared to the type
+hints in your code. To test this locally, run the type check test in the top-level directory of the repository. 
+
+To find incorrectly used types by type checking in `mypy`, use
+```bash
+make check-types
+```
 
 If you aren't presented with any errors, then that means your code is ready to commit!
 
