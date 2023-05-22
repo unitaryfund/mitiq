@@ -65,7 +65,7 @@ To use error mitigation methods in Mitiq, we define an executor function which c
 ```{code-cell} ipython3
 # Observable to measure
 Z = np.diag([1, -1])
-hamiltonian = np.kron(z, z)
+hamiltonian = np.kron(Z, Z)
 
 def noiseless_executor(circ: Circuit) -> float:
     """Simulates the execution of a circuit without noise.
