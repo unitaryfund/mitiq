@@ -82,7 +82,7 @@ def execute_circuit(circuit):
 ```
 
 ```{code-cell} ipython3
-mitigated = execute_with_zne(circuit, execute_circuit, scale_noise=fold_all, factory=LinearFactory([1, 3, 5]))
+mitigated = execute_with_zne(circuit, execute_circuit, factory=LinearFactory([1, 3, 5]))
 unmitigated = execute_circuit(circuit)
 ideal = 1 #property of RB circuits
 
@@ -203,7 +203,7 @@ As you can see above, several experiments were run, and each one has either a re
 
 ```{code-cell} ipython3
 calibrated_mitigated=execute_with_mitigation(circuit, execute_circuit, calibrator=cal)
-mitigated=execute_with_zne(circuit, execute_circuit, scale_noise=fold_all, factory=LinearFactory([1, 3, 5]))
+mitigated=execute_with_zne(circuit, execute_circuit, factory=LinearFactory([1, 3, 5]))
 unmitigated=execute_circuit(circuit)
 
 print("ideal = \t \t",ideal)
