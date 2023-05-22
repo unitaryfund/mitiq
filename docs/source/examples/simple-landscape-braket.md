@@ -30,7 +30,7 @@ from mitiq.zne.inference import RichardsonFactory
 
 +++
 
-We define a function which returns a simple two-qubit variational circuit depending on a single parameter  $\gamma$ ("gamma").
+We define a function which returns a simple two-qubit variational circuit depending on a single parameter $\gamma$ ("gamma").
 
 ```{code-cell} ipython3
 def variational_circuit(gamma: float) -> Circuit:
