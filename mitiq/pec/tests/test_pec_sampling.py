@@ -280,7 +280,7 @@ def test_sample_circuit_cirq(measure):
         if measure:
             assert len(sampled_circuits[0]) == 3
             assert cirq.is_measurement(
-                sampled_circuits[0][-1][0]  # first op of last moment
+                list(sampled_circuits[0].all_operations())[-1]  # last gate
             )
         else:
             assert len(sampled_circuits[0]) == 2
