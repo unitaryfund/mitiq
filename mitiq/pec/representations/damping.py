@@ -27,6 +27,7 @@ from mitiq.pec.channels import tensor_product
 def _represent_operation_with_amplitude_damping_noise(
     ideal_operation: Circuit,
     noise_level: float,
+    is_qubit_dependent: bool = True,
 ) -> OperationRepresentation:
     r"""Returns the quasi-probability representation of the input
     single-qubit ``ideal_operation`` with respect to a basis of noisy
@@ -42,6 +43,10 @@ def _represent_operation_with_amplitude_damping_noise(
     Args:
         ideal_operation: The ideal operation (as a QPROGRAM) to represent.
         noise_level: The noise level of each amplitude damping channel.
+        is_qubit_dependent: If True, the representation corresponds to the
+            operation on the specific qubits defined in `ideal`. If False, the
+            representation is valid for the same gate even if acting on
+            different qubits from those specified in `ideal`.
 
     Returns:
         The quasi-probability representation of the ``ideal_operation``.
@@ -82,7 +87,9 @@ def _represent_operation_with_amplitude_damping_noise(
     imp_op_circuits = [ideal_operation + Circuit(op) for op in post_ops]
     noisy_operations = [NoisyOperation(c) for c in imp_op_circuits]
 
-    return OperationRepresentation(ideal_operation, noisy_operations, etas)
+    return OperationRepresentation(
+        ideal_operation, noisy_operations, etas, is_qubit_dependent
+    )
 
 
 def amplitude_damping_kraus(

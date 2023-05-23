@@ -21,6 +21,9 @@ from mitiq.benchmarks import (
     generate_w_circuit,
 )
 from mitiq.pec import execute_with_pec
+from mitiq.pec.representations import (
+    represent_operation_with_local_depolarizing_noise,
+)
 from mitiq.raw import execute
 from mitiq.zne import execute_with_zne
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
@@ -139,9 +142,25 @@ class Strategy:
 
     @property
     def mitigation_function(self) -> Callable[..., float]:
-        return partial(
-            self.technique.mitigation_function, **self.technique_params
-        )
+        if self.technique is MitigationTechnique.PEC:
+            rep_function = self.technique_params.pop("representation_function")
+            operations = self.technique_params.pop("operations")
+            is_qubit_dependent = self.technique_params.pop(
+                "is_qubit_dependent", True
+            )
+            noise_level = self.technique_params.pop("noise_level")
+            return partial(
+                self.technique.mitigation_function,
+                [
+                    rep_function(op, noise_level, is_qubit_dependent)
+                    for op in operations
+                ],
+                **self.technique_params,
+            )
+        else:
+            return partial(
+                self.technique.mitigation_function, **self.technique_params
+            )
 
     def to_dict(self) -> Dict[str, Any]:
         """A summary of the strategies parameters, without the technique added.
@@ -367,6 +386,77 @@ ZNESettings = Settings(
             "technique": "zne",
             "scale_noise": fold_gates_at_random,
             "factory": LinearFactory([1.0, 3.0, 5.0]),
+        },
+    ],
+)
+
+PECSettings = Settings(
+    benchmarks=[
+        {
+            "circuit_type": "ghz",
+            "num_qubits": 2,
+        },
+        {
+            "circuit_type": "w",
+            "num_qubits": 2,
+        },
+        {
+            "circuit_type": "rb",
+            "num_qubits": 2,
+            "circuit_depth": 7,
+        },
+        {
+            "circuit_type": "mirror",
+            "num_qubits": 2,
+            "circuit_depth": 7,
+            "circuit_seed": 1,
+        },
+    ],
+    strategies=[
+        {
+            "technique": "pec",
+            "representation_function": (
+                represent_operation_with_local_depolarizing_noise
+            ),
+            "operations": [cirq.CNOT, cirq.CZ],
+            "is_qubit_dependent": False,
+            "noise_level": 0.001,
+        },
+        {
+            "technique": "pec",
+            "representation_function": (
+                represent_operation_with_local_depolarizing_noise
+            ),
+            "operations": [cirq.CNOT, cirq.CZ],
+            "is_qubit_dependent": False,
+            "noise_level": 0.005,
+        },
+        {
+            "technique": "pec",
+            "representation_function": (
+                represent_operation_with_local_depolarizing_noise
+            ),
+            "operations": [cirq.CNOT, cirq.CZ],
+            "is_qubit_dependent": False,
+            "noise_level": 0.01,
+        },
+        {
+            "technique": "pec",
+            "representation_function": (
+                represent_operation_with_local_depolarizing_noise
+            ),
+            "operations": [cirq.CNOT, cirq.CZ],
+            "is_qubit_dependent": False,
+            "noise_level": 0.015,
+        },
+        {
+            "technique": "pec",
+            "representation_function": (
+                represent_operation_with_local_depolarizing_noise
+            ),
+            "operations": [cirq.CNOT, cirq.CZ],
+            "is_qubit_dependent": False,
+            "noise_level": 0.02,
         },
     ],
 )
