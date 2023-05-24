@@ -8,7 +8,7 @@ import cirq
 import qiskit
 
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
-from mitiq.calibration import ZNESettings, Settings
+from mitiq.calibration import ZNESettings, PECSettings, Settings
 from mitiq.calibration.settings import MitigationTechnique, BenchmarkProblem
 from mitiq.raw import execute
 from mitiq.pec import execute_with_pec
@@ -128,15 +128,25 @@ def test_make_strategies_invalid_technique():
 def test_ZNESettings():
     circuits = ZNESettings.make_problems()
     strategies = ZNESettings.make_strategies()
-
     repr_string = repr(circuits[0])
     assert all(
         s in repr_string
         for s in ("type", "ideal_distribution", "num_qubits", "circuit_depth")
     )
-
     assert len(circuits) == 4
     assert len(strategies) == 2 * 2 * 2
+
+
+def test_PECSettings():
+    circuits = PECSettings.make_problems()
+    strategies = PECSettings.make_strategies()
+    repr_string = repr(circuits[0])
+    assert all(
+        s in repr_string
+        for s in ("type", "ideal_distribution", "num_qubits", "circuit_depth")
+    )
+    assert len(circuits) == 4
+    assert len(strategies) == 5
 
 
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())

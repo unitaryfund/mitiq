@@ -23,6 +23,7 @@ from mitiq.calibration.calibrator import (
     MissingResultsError,
 )
 from mitiq.calibration.settings import (
+    PECSettings,
     Strategy,
     MitigationTechnique,
     BenchmarkProblem,
@@ -110,6 +111,27 @@ def test_ZNE_workflow():
     cal = Calibrator(execute, frontend="cirq")
     cost = cal.get_cost()
     assert cost == {"noisy_executions": 32, "ideal_executions": 0}
+
+    cal.run()
+    num_strategies, num_problems = cal.results.mitigated.shape
+    num_results = num_strategies * num_problems
+    assert num_results == cost["noisy_executions"]
+    assert isinstance(cal.results, ExperimentResults)
+    assert isinstance(cal.best_strategy(), Strategy)
+
+
+def pec_execute(circuit, noise_level=0.01):
+    circuit = circuit.with_noise(cirq.depolarize(noise_level))
+
+    result = cirq.DensityMatrixSimulator().run(circuit, repetitions=100)
+    bitstrings = np.column_stack(list(result.measurements.values()))
+    return MeasurementResult(bitstrings)
+
+
+def test_PEC_workflow():
+    cal = Calibrator(pec_execute, frontend="cirq", settings=PECSettings)
+    cost = cal.get_cost()
+    assert cost == {"noisy_executions": 20, "ideal_executions": 0}
 
     cal.run()
     num_strategies, num_problems = cal.results.mitigated.shape

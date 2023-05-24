@@ -3,13 +3,14 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
+from copy import deepcopy
 from dataclasses import dataclass, asdict
 from functools import partial
 from typing import Any, Callable, cast, List, Dict
 from enum import Enum, auto
 
 import networkx as nx
-import cirq
+from cirq import Circuit, LineQubit, measure, CNOT, CZ
 
 from mitiq import QPROGRAM
 from mitiq.interface import convert_from_mitiq
@@ -65,7 +66,7 @@ class BenchmarkProblem:
     """
 
     id: int
-    circuit: cirq.Circuit
+    circuit: Circuit
     type: str
     ideal_distribution: Dict[str, float]
 
@@ -87,7 +88,7 @@ class BenchmarkProblem:
             The converted circuit with final measurements.
         """
         circuit = self.circuit.copy()
-        circuit.append(cirq.measure(circuit.all_qubits()))
+        circuit.append(measure(circuit.all_qubits()))
         return convert_from_mitiq(circuit, circuit_type)
 
     @property
@@ -143,19 +144,24 @@ class Strategy:
     @property
     def mitigation_function(self) -> Callable[..., float]:
         if self.technique is MitigationTechnique.PEC:
-            rep_function = self.technique_params.pop("representation_function")
-            operations = self.technique_params.pop("operations")
-            is_qubit_dependent = self.technique_params.pop(
-                "is_qubit_dependent", True
-            )
-            noise_level = self.technique_params.pop("noise_level")
+            params_copy = deepcopy(self.technique_params)
+            rep_function = params_copy.pop("representation_function")
+            operations = params_copy.pop("operations")
+            noise_level = params_copy.pop("noise_level")
+            is_qubit_dependent = params_copy.pop("is_qubit_dependent", True)
+            representations = [
+                rep_function(
+                    Circuit(op(*LineQubit.range(2))),
+                    noise_level,
+                    is_qubit_dependent,
+                )
+                for op in operations
+            ]
+
             return partial(
                 self.technique.mitigation_function,
-                [
-                    rep_function(op, noise_level, is_qubit_dependent)
-                    for op in operations
-                ],
-                **self.technique_params,
+                representations=representations,
+                **params_copy,
             )
         else:
             return partial(
@@ -291,7 +297,7 @@ class Settings:
                     f"but got {circuit_type}."
                 )
 
-            circuit = cast(cirq.Circuit, circuit)
+            circuit = cast(Circuit, circuit)
             problem = BenchmarkProblem(
                 id=i,
                 circuit=circuit,
@@ -418,45 +424,50 @@ PECSettings = Settings(
             "representation_function": (
                 represent_operation_with_local_depolarizing_noise
             ),
-            "operations": [cirq.CNOT, cirq.CZ],
+            "operations": [CNOT, CZ],
             "is_qubit_dependent": False,
             "noise_level": 0.001,
+            "num_samples": 50,
         },
         {
             "technique": "pec",
             "representation_function": (
                 represent_operation_with_local_depolarizing_noise
             ),
-            "operations": [cirq.CNOT, cirq.CZ],
+            "operations": [CNOT, CZ],
             "is_qubit_dependent": False,
             "noise_level": 0.005,
+            "num_samples": 50,
         },
         {
             "technique": "pec",
             "representation_function": (
                 represent_operation_with_local_depolarizing_noise
             ),
-            "operations": [cirq.CNOT, cirq.CZ],
+            "operations": [CNOT, CZ],
             "is_qubit_dependent": False,
             "noise_level": 0.01,
+            "num_samples": 50,
         },
         {
             "technique": "pec",
             "representation_function": (
                 represent_operation_with_local_depolarizing_noise
             ),
-            "operations": [cirq.CNOT, cirq.CZ],
+            "operations": [CNOT, CZ],
             "is_qubit_dependent": False,
             "noise_level": 0.015,
+            "num_samples": 50,
         },
         {
             "technique": "pec",
             "representation_function": (
                 represent_operation_with_local_depolarizing_noise
             ),
-            "operations": [cirq.CNOT, cirq.CZ],
+            "operations": [CNOT, CZ],
             "is_qubit_dependent": False,
             "noise_level": 0.02,
+            "num_samples": 50,
         },
     ],
 )
