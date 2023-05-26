@@ -10,7 +10,7 @@ import numpy as np
 import numpy.typing as npt
 import qiskit
 from qiskit import QuantumCircuit
-from qiskit_aer import AerProvider
+from qiskit_aer import AerSimulator
 from typing import Optional
 
 # Noise simulation packages
@@ -112,8 +112,7 @@ def execute_with_noise(
     # execution of the experiment
     job = qiskit.execute(
         circ,
-        backend=AerProvider().get_backend("aer_simulator_density_matrix"),
-        noise_model=noise_model,
+        backend=AerSimulator(method="density_matrix", noise_model=noise_model),
         basis_gates=basis_gates,
         # we want all gates to be actually applied,
         # so we skip any circuit optimization
@@ -164,9 +163,7 @@ def execute_with_shots_and_noise(
     # execution of the experiment
     job = qiskit.execute(
         circ,
-        backend=AerProvider().get_backend("aer_simulator"),
-        backend_options={"method": "density_matrix"},
-        noise_model=noise_model,
+        backend=AerSimulator(method="density_matrix", noise_model=noise_model),
         # we want all gates to be actually applied,
         # so we skip any circuit optimization
         basis_gates=basis_gates,
@@ -223,9 +220,9 @@ def sample_bitstrings(
     elif noise_model:
         job = qiskit.execute(
             circuit,
-            backend=AerProvider().get_backend("aer_simulator"),
-            backend_options={"method": "density_matrix"},
-            noise_model=noise_model,
+            backend=AerSimulator(
+                method="density_matrix", noise_model=noise_model
+            ),
             # we want all gates to be actually applied,
             # so we skip any circuit optimization
             basis_gates=noise_model.basis_gates,
