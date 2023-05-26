@@ -13,7 +13,7 @@ import networkx as nx
 from mitiq.pt.pt import (
     twirl_CNOT_gates,
     twirl_CZ_gates,
-    execute_with_pauli_twirling,
+    execute_with_pt,
     CNOT_twirling_gates,
     CZ_twirling_gates,
 )
@@ -116,7 +116,7 @@ def test_twirl_CNOT_increases_layer_count():
         assert num_gates_after == num_gates_before
 
 
-def test_execute_with_pauli_twirling():
+def test_execute_with_pt():
     num_qubits = 3
     num_layers = 20
     circuit, _ = generate_mirror_circuit(
@@ -124,7 +124,7 @@ def test_execute_with_pauli_twirling():
         two_qubit_gate_prob=1.0,
         connectivity_graph=nx.complete_graph(num_qubits),
     )
-    expval = execute_with_pauli_twirling(
+    expval = execute_with_pt(
         circuit, amp_damp_executor, num_circuits=10
     )
     assert 0 <= expval < 0.4

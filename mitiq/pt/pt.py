@@ -51,7 +51,7 @@ CZ_twirling_gates = [
 ]
 
 
-def execute_with_pauli_twirling(
+def execute_with_pt(
     circuit: QPROGRAM,
     executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     observable: Optional[Observable] = None,
