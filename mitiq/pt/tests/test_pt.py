@@ -124,7 +124,5 @@ def test_execute_with_pt():
         two_qubit_gate_prob=1.0,
         connectivity_graph=nx.complete_graph(num_qubits),
     )
-    expval = execute_with_pt(
-        circuit, amp_damp_executor, num_circuits=10
-    )
+    expval = execute_with_pt(circuit, amp_damp_executor, num_circuits=10)
     assert 0 <= expval < 0.4
