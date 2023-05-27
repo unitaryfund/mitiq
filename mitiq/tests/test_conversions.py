@@ -26,9 +26,13 @@ from mitiq.interface import (
     accept_any_qprogram_as_input,
     atomic_one_to_many_converter,
     noise_scaling_converter,
+    register_mitiq_converter,
     UnsupportedCircuitError,
 )
+from mitiq.interface.mitiq_qiskit import to_qasm, from_qasm
 from mitiq.utils import _equal
+
+QASMType = str
 
 # Cirq Bell circuit.
 cirq_qreg = cirq.LineQubit.range(2)
@@ -41,7 +45,14 @@ qiskit_qreg = qiskit.QuantumRegister(2)
 qiskit_circuit = qiskit.QuantumCircuit(qiskit_qreg)
 qiskit_circuit.h(qiskit_qreg[0])
 qiskit_circuit.cnot(*qiskit_qreg)
+qasm_str = qiskit_circuit.qasm()
 
+
+class CircuitStr(str):
+    __module__ = "qasm"
+
+
+qasm_circuit = CircuitStr(qasm_str)
 # pyQuil Bell circuit.
 pyquil_circuit = Program(gates.H(0), gates.CNOT(0, 1))
 
@@ -86,6 +97,14 @@ def test_to_mitiq(circuit):
     assert input_type in circuit.__module__
 
 
+def test_register_to_mitiq():
+    circuit = qasm_circuit
+    register_mitiq_converter(circuit.__module__, "from", from_qasm)
+    converted_circuit, input_type = convert_to_mitiq(circuit)
+    assert _equal(converted_circuit, cirq_circuit)
+    assert input_type in circuit.__module__
+
+
 @pytest.mark.parametrize("item", ("circuit", 1, None))
 def test_to_mitiq_bad_types(item):
     with pytest.raises(
@@ -101,6 +120,14 @@ def test_from_mitiq(to_type):
     circuit, input_type = convert_to_mitiq(converted_circuit)
     assert _equal(circuit, cirq_circuit)
     assert input_type == to_type
+
+
+def test_register_from_mitiq():
+    circuit = qasm_circuit
+    register_mitiq_converter(circuit.__module__, "to", to_qasm)
+    converted_circuit, input_type = convert_to_mitiq(circuit)
+    assert _equal(converted_circuit, cirq_circuit)
+    assert input_type in circuit.__module__
 
 
 @pytest.mark.parametrize(

@@ -20,7 +20,11 @@ class CircuitConversionError(Exception):
     pass
 
 
-register_dict: Dict[Tuple[str, str], Callable[[Any], Circuit]] = {}
+register_dict: Dict[Tuple[str, str], Callable[[Any], Circuit]]
+try:
+    register_dict
+except NameError:
+    register_dict = {}
 
 
 def register_mitiq_converter(
@@ -86,6 +90,7 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
     else:
         for package_name, _ in register_dict:
             if package_name in package:
+                input_circuit_type = package_name
                 conversion_function = register_dict[package_name, "from"]
                 break
         else:
