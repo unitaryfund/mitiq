@@ -10,6 +10,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import datetime
 import os
 import sys
 
@@ -26,7 +27,7 @@ sys.path.insert(0, os.path.abspath("../../"))
 # -- Project information -----------------------------------------------------
 
 project = "Mitiq"
-copyright = "2020, Tech Team @ Unitary Fund"
+copyright = f"2020 - {datetime.date.today().year}, Tech Team @ Unitary Fund"
 author = "Tech Team @ Unitary Fund"
 
 # The full version, including alpha/beta/rc tags
