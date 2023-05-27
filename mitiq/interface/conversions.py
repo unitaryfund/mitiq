@@ -5,7 +5,7 @@
 
 """Functions for converting to/from Mitiq's internal circuit representation."""
 from functools import wraps
-from typing import Any, Callable, cast, Iterable, Tuple, Dict
+from typing import Any, Callable, cast, Iterable, Tuple, Dict, Union
 
 from cirq import Circuit
 
@@ -20,17 +20,23 @@ class CircuitConversionError(Exception):
     pass
 
 
-register_dict: Dict[Tuple[str, str], Callable[[Any], Circuit]]
+register_to_dict: Dict[Tuple[str, str], Callable[[Any], Circuit]]
 try:
-    register_dict
+    register_to_dict
 except NameError:
-    register_dict = {}
+    register_to_dict = {}
+
+register_from_dict: Dict[Tuple[str, str], Callable[[Circuit], Any]]
+try:
+    register_from_dict
+except NameError:
+    register_from_dict = {}
 
 
 def register_mitiq_converter(
     package_name: str,
     direction: str,
-    convert_function: Callable[[Any], Circuit],
+    convert_function: Union[Callable[[Any], Circuit], Callable[[Circuit], Any]],
 ) -> None:
     """Registers converters for unsupported circuit types.
 
@@ -47,10 +53,14 @@ def register_mitiq_converter(
             direction hint above: "from" returns a Mitiq/Cirq circuit,
             "to" returns a Non-Mitiq circuit.
     """
-    global register_dict
     if direction not in ["to", "from"]:
         raise ValueError("Invalid direction. Expected 'to' or 'from'.")
-    register_dict[(package_name, direction)] = convert_function
+    elif direction == "to":
+        global register_to_dict
+        register_to_dict[(package_name, direction)] = convert_function
+    else:
+        global register_from_dict
+        register_from_dict[(package_name, direction)] = convert_function
 
 
 def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
@@ -103,10 +113,10 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
             return circ
 
     else:
-        for package_name, _ in register_dict:
+        for package_name, _ in register_from_dict:
             if package_name in package:
                 input_circuit_type = package_name
-                conversion_function = register_dict[package_name, "from"]
+                conversion_function = register_from_dict[package_name, "from"]
                 break
         else:
             raise UnsupportedCircuitError(
@@ -162,9 +172,9 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
             return circ
 
     else:
-        for package_name, _ in register_dict:
+        for package_name, _ in register_to_dict:
             if package_name == conversion_type:
-                conversion_function = register_dict[package_name, "from"]
+                conversion_function = register_to_dict[package_name, "from"]
                 break
         else:
             raise UnsupportedCircuitError(
