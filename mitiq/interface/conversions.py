@@ -19,18 +19,20 @@ class UnsupportedCircuitError(Exception):
 class CircuitConversionError(Exception):
     pass
 
+
 register_dict: Dict[Tuple[str, str], Callable[[Any], Circuit]] = {}
 
+
 def register_mitiq_converter(
-    package_name: str, 
-    direction: str, 
-    convert_function: Callable[[Any], Circuit]
-):
+    package_name: str,
+    direction: str,
+    convert_function: Callable[[Any], Circuit],
+) -> None:
+    global register_dict
     if direction not in ["to", "from"]:
         raise ValueError("Invalid direction. Expected 'to' or 'from'.")
     register_dict[(package_name, direction)] = convert_function
-    global register_dict
-    register_dict[package_name] = convert_function
+
 
 def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
     """Converts any valid input circuit to a mitiq circuit.
@@ -80,17 +82,19 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
 
         def conversion_function(circ: Circuit) -> Circuit:
             return circ
+
     else:
-        for package_name in register_dict:
-             if package_name in package:
-                conversion_function = register_dict[(package_name, "from")]
+        for package_name, _ in register_dict:
+            if package_name in package:
+                conversion_function = register_dict[package_name, "from"]
                 break
         else:
-             raise UnsupportedCircuitError(
-            f"Circuit from module {package} is not supported.\n\n"
-            f"Please define a converter with register_mitiq_converter(),"
-            f"\nor specify a supported Circuit type: \n{SUPPORTED_PROGRAM_TYPES}"
-        )
+            raise UnsupportedCircuitError(
+                f"Circuit from module {package} is not supported.\n\n"
+                f"Please define a converter with register_mitiq_converter(),"
+                f"\nor specify a supported Circuit type:"
+                f"\n{SUPPORTED_PROGRAM_TYPES}"
+            )
 
     try:
         mitiq_circuit = conversion_function(circuit)
@@ -136,17 +140,20 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
 
         def conversion_function(circ: Circuit) -> Circuit:
             return circ
+
     else:
-        for package_name in register_dict:
-             if package_name == conversion_type:
-                conversion_function = register_dict[(package_name, "from")]
+        for package_name, _ in register_dict:
+            if package_name == conversion_type:
+                conversion_function = register_dict[package_name, "from"]
                 break
         else:
             raise UnsupportedCircuitError(
-            f"Conversion to circuit of type {conversion_type} is unsupported."
-            f"\n\nPlease define a converter with register_mitiq_converter(),"
-            f"\nor specify a supported Circuit type: \n{SUPPORTED_PROGRAM_TYPES}"
-        )
+                f"Conversion to circuit type {conversion_type} is unsupported."
+                f"\n\nPlease register a converter with"
+                f"register_mitiq_converter(),"
+                f"\nor specify a supported Circuit type:"
+                f"\n{SUPPORTED_PROGRAM_TYPES}"
+            )
 
     try:
         converted_circuit = conversion_function(circuit)
