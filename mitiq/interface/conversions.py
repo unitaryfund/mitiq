@@ -36,7 +36,9 @@ except NameError:
 def register_mitiq_converter(
     package_name: str,
     direction: str,
-    convert_function: Union[Callable[[Any], Circuit], Callable[[Circuit], Any]],
+    convert_function: Union[
+        Callable[[Any], Circuit], Callable[[Circuit], Any]
+    ],
 ) -> None:
     """Registers converters for unsupported circuit types.
 
