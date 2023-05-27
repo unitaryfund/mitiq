@@ -32,6 +32,21 @@ def register_mitiq_converter(
     direction: str,
     convert_function: Callable[[Any], Circuit],
 ) -> None:
+    """Registers converters for unsupported circuit types.
+
+    Args:
+        package_name: A quantum circuit module name that is not currently
+            supported by Mitiq. Note: this name should be the same as the
+            return from "circuit".__module__.
+                 See mitiq.SUPPORTED_PROGRAM_TYPES.
+        direction: Specifies the conversion direction relative to the non-Mitiq
+            circuit. i.e. "from" returns a Mitiq/Cirq circuit, "to" returns a
+            Non-Mitiq circuit.
+        convert_function: User specified function to convert to and from an
+            unsupported circuit type. These functions should follow the
+            direction hint above: "from" returns a Mitiq/Cirq circuit,
+            "to" returns a Non-Mitiq circuit.
+    """
     global register_dict
     if direction not in ["to", "from"]:
         raise ValueError("Invalid direction. Expected 'to' or 'from'.")
