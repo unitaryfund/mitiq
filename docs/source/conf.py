@@ -314,7 +314,15 @@ html_extra_path = ["robots.txt"]
 html_theme_options = {
     "announcement": '<a href="https://unitaryhack.dev/">unitaryHACK</a> is \
     coming <b>May 26-Jun 13</b>! Get rewarded for contributing to open source \
-    quantum software!'
+    quantum software!',
+    "icon_links": [
+        {
+            "name": "Source Repository",
+            "url": "https://github.com/unitaryfund/mitiq",
+            "icon": "fa-brands fa-github",
+            "type": "fontawesome",
+        }
+    ],
 }
 
 myst_update_mathjax = False
