@@ -295,7 +295,7 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "pydata_sphinx_theme"  # 'alabaster', 'sphinx_rtd_theme'
+html_theme = "sphinx_book_theme"  # 'alabaster', 'sphinx_rtd_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -314,7 +314,15 @@ html_extra_path = ["robots.txt"]
 html_theme_options = {
     "announcement": '<a href="https://unitaryhack.dev/">unitaryHACK</a> is \
     coming <b>May 26-Jun 13</b>! Get rewarded for contributing to open source \
-    quantum software!'
+    quantum software!',
+    "repository_url": "https://github.com/unitaryfund/mitiq",
+    "repository_branch": "master",
+    "use_source_button": False,
+    "use_repository_button": True,
+    "use_issues_button": True,
+    "use_download_button": True,
+    "use_fullscreen_button": False,
+    "path_to_docs": "docs/source",
 }
 
 myst_update_mathjax = False
