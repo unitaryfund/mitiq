@@ -34,7 +34,7 @@ from mitiq import zne
 from mitiq.interface.mitiq_qiskit.qiskit_utils import initialized_depolarizing_noise
 
 
-USE_REAL_HARDWARE = False
+USE_REAL_HARDWARE = True
 ```
 
 **Note:** When `USE_REAL_HARDWARE` is set to `False`, a classically simulated noisy backend is used instead of a real quantum computer.
@@ -81,14 +81,16 @@ for instructions to create an account, save credentials, and see online quantum 
 
 ```{code-cell} ipython3
 import qiskit
+from qiskit_aer import Aer
+from qiskit_ibm_provider import IBMProvider
 from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
 
-if qiskit.IBMQ.stored_account() and USE_REAL_HARDWARE:
-    provider = qiskit.IBMQ.load_account()
+if IBMProvider.saved_accounts() and USE_REAL_HARDWARE:
+    provider = IBMProvider()
     backend = provider.get_backend("ibmq_qasm_simulator")  # Set quantum computer here!
 else:
     # Default to a simulator.
-    backend = qiskit.Aer.get_backend("qasm_simulator"),
+    backend = Aer.get_backend("qasm_simulator"),
 
 
 def cirq_ibm_executor(cirq_circuit: cirq.Circuit, shots: int = 1024) -> float:

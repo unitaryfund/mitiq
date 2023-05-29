@@ -59,11 +59,12 @@ First, we get our devices set up depending on whether we would like to use real 
 
 ```{code-cell} ipython3
 import qiskit
+from qiskit_ibm_provider import IBMProvider
 
 USE_REAL_HARDWARE = False
 
-if qiskit.IBMQ.stored_account() and USE_REAL_HARDWARE:
-    provider = qiskit.IBMQ.load_account()
+if IBMProvider.saved_accounts() and USE_REAL_HARDWARE:
+    provider = IBMProvider()
     dev = qml.device(
         "qiskit.ibmq",
         wires=1,
