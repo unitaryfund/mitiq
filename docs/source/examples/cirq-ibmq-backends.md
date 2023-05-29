@@ -34,7 +34,7 @@ from mitiq import zne
 from mitiq.interface.mitiq_qiskit.qiskit_utils import initialized_depolarizing_noise
 
 
-USE_REAL_HARDWARE = True
+USE_REAL_HARDWARE = False
 ```
 
 **Note:** When `USE_REAL_HARDWARE` is set to `False`, a classically simulated noisy backend is used instead of a real quantum computer.
