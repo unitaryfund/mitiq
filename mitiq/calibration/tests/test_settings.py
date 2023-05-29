@@ -146,7 +146,7 @@ def test_PECSettings():
         for s in ("type", "ideal_distribution", "num_qubits", "circuit_depth")
     )
     assert len(circuits) == 4
-    assert len(strategies) == 5
+    assert len(strategies) == 2
 
 
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())

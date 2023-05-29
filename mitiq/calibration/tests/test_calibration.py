@@ -131,7 +131,7 @@ def pec_execute(circuit, noise_level=0.01):
 def test_PEC_workflow():
     cal = Calibrator(pec_execute, frontend="cirq", settings=PECSettings)
     cost = cal.get_cost()
-    assert cost == {"noisy_executions": 20, "ideal_executions": 0}
+    assert cost == {"noisy_executions": 8, "ideal_executions": 0}
 
     cal.run()
     num_strategies, num_problems = cal.results.mitigated.shape
