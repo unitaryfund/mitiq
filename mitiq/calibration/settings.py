@@ -154,7 +154,7 @@ class Strategy:
             summary["factory"] = inference_func.__class__.__name__
             summary[
                 "scale_factors"
-            ] = inference_func.get_scale_factors().tolist()
+            ] = inference_func._scale_factors
             summary["scale_method"] = self.technique_params[
                 "scale_noise"
             ].__name__
@@ -180,6 +180,12 @@ class Strategy:
 
     def __repr__(self) -> str:
         return str(self.to_dict())
+    
+    def num_circuit_required(self) -> int:
+        summary = self.to_dict()
+        if self.technique is MitigationTechnique.ZNE:
+            return len(summary["scale_factors"])
+        # TODO: elif self.technique is MitigationTechnique.PEC:
 
 
 class Settings:
