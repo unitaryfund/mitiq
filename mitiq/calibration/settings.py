@@ -151,7 +151,7 @@ class Strategy:
             is_qubit_dependent = params_copy.pop("is_qubit_dependent", True)
             representations = [
                 rep_function(
-                    Circuit(op(*LineQubit.range(2))),
+                    op,
                     noise_level,
                     is_qubit_dependent,
                 )
@@ -424,7 +424,10 @@ PECSettings = Settings(
             "representation_function": (
                 represent_operation_with_local_depolarizing_noise
             ),
-            "operations": [CNOT, CZ],
+            "operations": [
+                Circuit(CNOT(*LineQubit.range(2))),
+                Circuit(CZ(*LineQubit.range(2))),
+            ],
             "is_qubit_dependent": False,
             "noise_level": 0.001,
             "num_samples": 200,
@@ -434,7 +437,10 @@ PECSettings = Settings(
             "representation_function": (
                 represent_operation_with_local_depolarizing_noise
             ),
-            "operations": [CNOT, CZ],
+            "operations": [
+                Circuit(CNOT(*LineQubit.range(2))),
+                Circuit(CZ(*LineQubit.range(2))),
+            ],
             "is_qubit_dependent": False,
             "noise_level": 0.01,
             "num_samples": 200,

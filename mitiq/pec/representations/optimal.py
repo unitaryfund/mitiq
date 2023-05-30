@@ -116,9 +116,10 @@ def find_optimal_representation(
         initial_guess: Optional initial guess for the coefficients
             :math:`\{ \eta_\alpha \}`.
         is_qubit_dependent: If True, the representation corresponds to the
-            operation on the specific qubits defined in `ideal_operation`. If False, the
-            representation is valid for the same gate even if acting on
-            different qubits from those specified in `ideal_operation`.
+            operation on the specific qubits defined in `ideal_operation`.
+            If False, the representation is valid for the same gate even if
+            acting on different qubits from those specified in
+            `ideal_operation`.
 
     Returns: The optimal OperationRepresentation.
     """

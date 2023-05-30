@@ -8,7 +8,7 @@ from functools import partial
 import pytest
 
 import cirq
-from cirq import CNOT, CZ
+from cirq import Circuit, LineQubit, CNOT, CZ
 import numpy as np
 
 from mitiq import Executor, MeasurementResult, SUPPORTED_PROGRAM_TYPES
@@ -36,7 +36,7 @@ from mitiq.pec.representations import (
     represent_operation_with_local_depolarizing_noise,
 )
 
-light_ZNE_settings = Settings(
+light_zne_settings = Settings(
     [
         {
             "circuit_type": "mirror",
@@ -58,7 +58,7 @@ light_ZNE_settings = Settings(
     ],
 )
 
-light_PEC_settings = Settings(
+light_pec_settings = Settings(
     [
         {
             "circuit_type": "mirror",
@@ -77,7 +77,10 @@ light_PEC_settings = Settings(
             "representation_function": (
                 represent_operation_with_local_depolarizing_noise
             ),
-            "operations": [CNOT, CZ],
+            "operations": [
+                Circuit(CNOT(*LineQubit.range(2))),
+                Circuit(CZ(*LineQubit.range(2))),
+            ],
             "is_qubit_dependent": False,
             "noise_level": 0.001,
             "num_samples": 200,
@@ -120,7 +123,7 @@ settings = Settings(
 )
 
 
-def execute(circuit, noise_level=0.001):
+def damping_execute(circuit, noise_level=0.001):
     circuit = circuit.with_noise(cirq.amplitude_damp(noise_level))
 
     result = cirq.DensityMatrixSimulator().run(circuit, repetitions=100)
@@ -128,18 +131,36 @@ def execute(circuit, noise_level=0.001):
     return MeasurementResult(bitstrings)
 
 
-def non_cirq_execute(circuit):
+def depolarizing_execute(circuit, noise_level=0.01):
+    circuit = circuit.with_noise(cirq.depolarize(noise_level))
+
+    result = cirq.DensityMatrixSimulator().run(circuit, repetitions=100)
+    bitstrings = np.column_stack(list(result.measurements.values()))
+    return MeasurementResult(bitstrings)
+
+
+def non_cirq_damping_execute(circuit):
     # Ensure test circuits are converted to user's frontend by the Calibrator
     assert not isinstance(circuit, cirq.Circuit)
     circuit, circuit_type = convert_to_mitiq(circuit)
     # Pennylane and Braket conversions discard measurements so we re-append
     if circuit_type in ["braket", "pennylane"]:
         circuit.append(cirq.measure(q) for q in circuit.all_qubits())
-    return execute(circuit)
+    return damping_execute(circuit)
+
+
+def non_cirq_depolarizing_execute(circuit):
+    # Ensure test circuits are converted to user's frontend by the Calibrator
+    assert not isinstance(circuit, cirq.Circuit)
+    circuit, circuit_type = convert_to_mitiq(circuit)
+    # Pennylane and Braket conversions discard measurements so we re-append
+    if circuit_type in ["braket", "pennylane"]:
+        circuit.append(cirq.measure(q) for q in circuit.all_qubits())
+    return depolarizing_execute(circuit)
 
 
 def test_ZNE_workflow():
-    cal = Calibrator(execute, frontend="cirq")
+    cal = Calibrator(damping_execute, frontend="cirq")
     cost = cal.get_cost()
     assert cost == {"noisy_executions": 32, "ideal_executions": 0}
 
@@ -151,16 +172,10 @@ def test_ZNE_workflow():
     assert isinstance(cal.best_strategy(), Strategy)
 
 
-def pec_execute(circuit, noise_level=0.01):
-    circuit = circuit.with_noise(cirq.depolarize(noise_level))
-
-    result = cirq.DensityMatrixSimulator().run(circuit, repetitions=100)
-    bitstrings = np.column_stack(list(result.measurements.values()))
-    return MeasurementResult(bitstrings)
-
-
 def test_PEC_workflow():
-    cal = Calibrator(pec_execute, frontend="cirq", settings=PECSettings)
+    cal = Calibrator(
+        depolarizing_execute, frontend="cirq", settings=PECSettings
+    )
     cost = cal.get_cost()
     assert cost == {"noisy_executions": 8, "ideal_executions": 0}
 
@@ -180,9 +195,9 @@ def test_ZNE_workflow_multi_platform(circuit_type):
         return
 
     cal = Calibrator(
-        non_cirq_execute,
+        non_cirq_damping_execute,
         frontend=circuit_type,
-        settings=light_ZNE_settings,
+        settings=light_zne_settings,
     )
     cost = cal.get_cost()
     assert cost == {"noisy_executions": 2, "ideal_executions": 0}
@@ -202,9 +217,9 @@ def test_PEC_workflow_multi_platform(circuit_type):
         return
 
     cal = Calibrator(
-        non_cirq_execute,
+        non_cirq_damping_execute,
         frontend=circuit_type,
-        settings=light_PEC_settings,
+        settings=light_pec_settings,
     )
     cost = cal.get_cost()
     assert cost == {"noisy_executions": 2, "ideal_executions": 0}
@@ -217,7 +232,7 @@ def test_PEC_workflow_multi_platform(circuit_type):
 
 
 def test_get_cost():
-    cal = Calibrator(execute, frontend="cirq", settings=settings)
+    cal = Calibrator(damping_execute, frontend="cirq", settings=settings)
     cost = cal.get_cost()
     expected_cost = 2 * 4  # circuits * num_experiments
     assert cost["noisy_executions"] == expected_cost
@@ -259,7 +274,9 @@ def test_best_strategy():
         ],
     )
 
-    cal = Calibrator(execute, frontend="cirq", settings=test_strategy_settings)
+    cal = Calibrator(
+        damping_execute, frontend="cirq", settings=test_strategy_settings
+    )
     cal.run()
     assert not np.isnan(cal.results.mitigated).all()
 
@@ -268,7 +285,9 @@ def test_best_strategy():
 
 
 def test_convert_to_expval_executor():
-    noiseless_bitstring_executor = Executor(partial(execute, noise_level=0))
+    noiseless_bitstring_executor = Executor(
+        partial(damping_execute, noise_level=0)
+    )
     noiseless_expval_executor = convert_to_expval_executor(
         noiseless_bitstring_executor, bitstring="00"
     )
@@ -280,10 +299,10 @@ def test_convert_to_expval_executor():
 
 
 def test_execute_with_mitigation(monkeypatch):
-    cal = Calibrator(execute, frontend="cirq")
+    cal = Calibrator(damping_execute, frontend="cirq")
 
     expval_executor = convert_to_expval_executor(
-        Executor(execute), bitstring="00"
+        Executor(damping_execute), bitstring="00"
     )
     rb_circuit = generate_rb_circuits(2, 10)[0]
     rb_circuit.append(cirq.measure(rb_circuit.all_qubits()))
@@ -298,11 +317,11 @@ def test_execute_with_mitigation(monkeypatch):
 
 
 def test_cal_execute_w_mitigation():
-    cal = Calibrator(execute, frontend="cirq")
+    cal = Calibrator(damping_execute, frontend="cirq")
     cal.run()
 
     expval_executor = convert_to_expval_executor(
-        Executor(execute), bitstring="00"
+        Executor(damping_execute), bitstring="00"
     )
     rb_circuit = generate_rb_circuits(2, 10)[0]
     rb_circuit.append(cirq.measure(rb_circuit.all_qubits()))
@@ -313,7 +332,7 @@ def test_cal_execute_w_mitigation():
 
 
 def test_double_run():
-    cal = Calibrator(execute, frontend="cirq")
+    cal = Calibrator(damping_execute, frontend="cirq")
     cal.run()
     cal.run()
 
@@ -352,7 +371,7 @@ def test_ExtrapolationResults_best_strategy():
 
 
 def test_logging(capfd):
-    cal = Calibrator(execute, frontend="cirq")
+    cal = Calibrator(damping_execute, frontend="cirq")
     cal.run(log=True)
 
     captured = capfd.readouterr()
