@@ -72,8 +72,8 @@ CNOT_twirled_circuits = pt.twirl_CNOT_gates(circuit_to_twirl, num_circuits=10)
 twirled_circuits = [
     pt.twirl_CZ_gates(c, num_circuits=1)[0] for c in CNOT_twirled_circuits
 ]
-print(CNOT_twirled_circuits)
-print(twirled_circuits)
+print(CNOT_twirled_circuits[0:1])
+print(twirled_circuits[0:1])
 ```
 We see that we return lists of the randomly twirled circuits, and so we must take a simple average over their expectation values.
 
@@ -102,6 +102,7 @@ Pauli Twirling doesn't require running the circuit at different noise levels or 
 
 ```{code-cell} ipython3
 import numpy as np
+from typing import cast
 
 average = cast(float, np.average(expvals))
 print(average)
