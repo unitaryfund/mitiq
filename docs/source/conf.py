@@ -313,9 +313,9 @@ html_favicon = "img/mitiq.ico"
 html_extra_path = ["robots.txt"]
 
 html_theme_options = {
-    "announcement": '<a href="https://unitaryhack.dev/">unitaryHACK</a> is \
-    coming <b>May 26-Jun 13</b>! Get rewarded for contributing to open source \
-    quantum software!',
+    "announcement": '<a href="https://unitaryhack.dev/">unitaryHACK</a> has \
+    begun, and will run until <b>Jun 13</b>! Get rewarded for contributing to \
+    open source quantum software!',
     "icon_links": [
         {
             "name": "Source Repository",
