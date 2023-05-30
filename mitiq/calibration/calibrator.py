@@ -181,7 +181,9 @@ class Calibrator:
             A summary of the number of circuits to be run.
         """
         num_circuits = len(self.problems)
-        num_options = len(self.settings.technique_params)
+        num_options = 0
+        for strategy in self.settings.make_strategies():
+            num_options += strategy.num_circuit_required()
 
         noisy = num_circuits * num_options
         ideal = 0  # TODO: ideal executor is currently unused
