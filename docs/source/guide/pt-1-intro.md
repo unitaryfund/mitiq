@@ -79,7 +79,6 @@ from mitiq import pt
 mitigated_result = pt.execute_with_pt(
     circuit=circuit,
     executor=execute,
-    rule=rule,
 )
 ```
 
