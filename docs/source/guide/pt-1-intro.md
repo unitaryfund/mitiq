@@ -27,7 +27,7 @@ We first define the circuit of interest. In this example, the circuit has a
 slack window with a length of 4 (in the sense that 4 single-qubit gates can fit in that window).
 
 ```{code-cell} ipython3
-from cirq import LineQubit, Circuit, rx, rz, CNOT
+from cirq import LineQubit, Circuit, CZ, CNOT
 
 a, b, c, d  = LineQubit.range(4)
 circuit = Circuit(
