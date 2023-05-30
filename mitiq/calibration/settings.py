@@ -3,14 +3,13 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-from copy import deepcopy
 from dataclasses import dataclass, asdict
 from functools import partial
-from typing import Any, Callable, cast, List, Dict
+from typing import Any, Callable, cast, List, Dict, Union
 from enum import Enum, auto
 
 import networkx as nx
-from cirq import Circuit, LineQubit, measure, CNOT, CZ
+import cirq
 
 from mitiq import QPROGRAM
 from mitiq.interface import convert_from_mitiq
@@ -25,6 +24,7 @@ from mitiq.pec import execute_with_pec
 from mitiq.pec.representations import (
     represent_operation_with_local_depolarizing_noise,
 )
+from mitiq.pec.types.types import OperationRepresentation
 from mitiq.raw import execute
 from mitiq.zne import execute_with_zne
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
@@ -52,6 +52,12 @@ class MitigationTechnique(Enum):
             return execute
 
 
+calibration_supported_techniques = {
+    "ZNE": MitigationTechnique.ZNE,
+    "PEC": MitigationTechnique.PEC,
+}
+
+
 @dataclass
 class BenchmarkProblem:
     """A dataclass containing information for instances of problems that will
@@ -66,7 +72,7 @@ class BenchmarkProblem:
     """
 
     id: int
-    circuit: Circuit
+    circuit: cirq.Circuit
     type: str
     ideal_distribution: Dict[str, float]
 
@@ -88,7 +94,7 @@ class BenchmarkProblem:
             The converted circuit with final measurements.
         """
         circuit = self.circuit.copy()
-        circuit.append(measure(circuit.all_qubits()))
+        circuit.append(cirq.measure(circuit.all_qubits()))
         return convert_from_mitiq(circuit, circuit_type)
 
     @property
@@ -142,14 +148,13 @@ class Strategy:
     technique_params: Dict[str, Any]
 
     @property
-    def mitigation_function(self) -> Callable[..., float]:
+    def representations(self) -> Union[List[OperationRepresentation], None]:
         if self.technique is MitigationTechnique.PEC:
-            params_copy = deepcopy(self.technique_params)
-            rep_function = params_copy.pop("representation_function")
-            operations = params_copy.pop("operations")
-            noise_level = params_copy.pop("noise_level")
-            is_qubit_dependent = params_copy.pop("is_qubit_dependent", True)
-            representations = [
+            rep_function = self.technique_params["representation_function"]
+            operations = self.technique_params["operations"]
+            noise_level = self.technique_params["noise_level"]
+            is_qubit_dependent = self.technique_params["is_qubit_dependent"]
+            return [
                 rep_function(
                     op,
                     noise_level,
@@ -157,15 +162,37 @@ class Strategy:
                 )
                 for op in operations
             ]
+        else:
+            return None
 
+    @property
+    def mitigation_function(self) -> Callable[..., float]:
+        if self.technique is MitigationTechnique.PEC:
+            exclude_params = [
+                "representation_function",
+                "operations",
+                "noise_level",
+                "is_qubit_dependent",
+            ]
+            pec_params = {
+                k: self.technique_params[k]
+                for k in set(list(self.technique_params.keys()))
+                - set(exclude_params)
+            }
             return partial(
                 self.technique.mitigation_function,
-                representations=representations,
-                **params_copy,
+                representations=self.representations,
+                **pec_params,
             )
-        else:
+        elif self.technique is MitigationTechnique.ZNE:
             return partial(
                 self.technique.mitigation_function, **self.technique_params
+            )
+        else:
+            raise ValueError(
+                """Specified technique is not supported by calibration.
+                    See {} for supported techniques.""",
+                calibration_supported_techniques,
             )
 
     def to_dict(self) -> Dict[str, Any]:
@@ -297,7 +324,7 @@ class Settings:
                     f"but got {circuit_type}."
                 )
 
-            circuit = cast(Circuit, circuit)
+            circuit = cast(cirq.Circuit, circuit)
             problem = BenchmarkProblem(
                 id=i,
                 circuit=circuit,
@@ -425,8 +452,8 @@ PECSettings = Settings(
                 represent_operation_with_local_depolarizing_noise
             ),
             "operations": [
-                Circuit(CNOT(*LineQubit.range(2))),
-                Circuit(CZ(*LineQubit.range(2))),
+                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
+                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
             ],
             "is_qubit_dependent": False,
             "noise_level": 0.001,
@@ -438,8 +465,8 @@ PECSettings = Settings(
                 represent_operation_with_local_depolarizing_noise
             ),
             "operations": [
-                Circuit(CNOT(*LineQubit.range(2))),
-                Circuit(CZ(*LineQubit.range(2))),
+                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
+                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
             ],
             "is_qubit_dependent": False,
             "noise_level": 0.01,
