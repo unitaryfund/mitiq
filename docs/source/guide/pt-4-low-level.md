@@ -68,7 +68,7 @@ Now, we can see what happens when we apply the PT functions, through {func}`.twi
 from mitiq import pt
 
 circuit_to_twirl = circuit.copy()
-CNOT_twirled_circuits = pt.twirl_CNOT_gates(circuit_to_twirl)
+CNOT_twirled_circuits = pt.twirl_CNOT_gates(circuit_to_twirl, num_circuits=10)
 twirled_circuits = [
     pt.twirl_CZ_gates(c, num_circuits=1)[0] for c in CNOT_twirled_circuits
 ]
