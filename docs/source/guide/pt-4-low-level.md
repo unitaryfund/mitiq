@@ -50,7 +50,6 @@ In the next sections instead, we show how one can apply PT at a lower level, i.e
 First let's define our circuit:
 ```{code-cell} ipython3
 from cirq import LineQubit, Circuit, CZ, CNOT
-fr
 
 a, b, c, d  = LineQubit.range(4)
 circuit = Circuit(
