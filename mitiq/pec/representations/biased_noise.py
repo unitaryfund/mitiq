@@ -59,9 +59,9 @@ def represent_operation_with_local_biased_noise(
             channel and :math:`\eta = \infty` describing a fully dephasing
             channel.
         is_qubit_dependent: If True, the representation corresponds to the
-            operation on the specific qubits defined in `ideal`. If False, the
+            operation on the specific qubits defined in `ideal_operation`. If False, the
             representation is valid for the same gate even if acting on
-            different qubits from those specified in `ideal`.
+            different qubits from those specified in `ideal_operation`.
 
     Returns:
         The quasi-probability representation of the ``ideal_operation``.
