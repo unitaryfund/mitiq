@@ -114,6 +114,15 @@ def test_to_mitiq_bad_types(item):
         convert_to_mitiq(item)
 
 
+def test_register_bad_args():
+    circuit = qasm_circuit
+    with pytest.raises(
+        ValueError,
+        match="Invalid direction. Expected 'to' or 'from'.",
+    ):
+        register_mitiq_converter(circuit.__module__, "mitiq", from_qasm)
+
+
 @pytest.mark.parametrize("to_type", SUPPORTED_PROGRAM_TYPES.keys())
 def test_from_mitiq(to_type):
     converted_circuit = convert_from_mitiq(cirq_circuit, to_type)

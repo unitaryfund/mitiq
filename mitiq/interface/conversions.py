@@ -124,8 +124,8 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
             raise UnsupportedCircuitError(
                 f"Circuit from module {package} is not supported.\n\n"
                 f"Please define a converter with register_mitiq_converter(),"
-                f"\nor specify a supported Circuit type:"
-                f"\n{SUPPORTED_PROGRAM_TYPES}"
+                f"\n or specify a supported Circuit type:"
+                f"\n {SUPPORTED_PROGRAM_TYPES}"
             )
 
     try:
@@ -136,8 +136,8 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
             "This may be because the circuit contains custom gates or Pragmas "
             "(pyQuil). If you think this is a bug or that this circuit should "
             "be supported, you can open an issue at "
-            "https://github.com/unitaryfund/mitiq. \n\nProvided circuit has "
-            f"type {type(circuit)} and is:\n\n{circuit}\n\nCircuit types "
+            "https://github.com/unitaryfund/mitiq. \n\n Provided circuit has "
+            f"type {type(circuit)} and is:\n\n{circuit}\n\n Circuit types "
             f"supported by Mitiq are \n{SUPPORTED_PROGRAM_TYPES}."
         )
 
@@ -176,15 +176,15 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
     else:
         for package_name, _ in register_to_dict:
             if package_name == conversion_type:
-                conversion_function = register_to_dict[package_name, "from"]
+                conversion_function = register_to_dict[package_name, "to"]
                 break
         else:
             raise UnsupportedCircuitError(
                 f"Conversion to circuit type {conversion_type} is unsupported."
-                f"\n\nPlease register a converter with"
+                f"\n\n Please register a converter with"
                 f"register_mitiq_converter(),"
-                f"\nor specify a supported Circuit type:"
-                f"\n{SUPPORTED_PROGRAM_TYPES}"
+                f"\n or specify a supported Circuit type:"
+                f"\n {SUPPORTED_PROGRAM_TYPES}"
             )
 
     try:
