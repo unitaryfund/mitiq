@@ -13,7 +13,7 @@ kernelspec:
 
 # What is the theory behind Pauli Twirling?
 
-Pauli Twirling (PT) {cite}`Wallman_2016_PRA Hashim_2021_PRX Urbanek_2021_PRL`
+Pauli Twirling (PT) {cite}`Wallman_2016_PRA, Hashim_2021_PRX, Urbanek_2021_PRL`
 is a quantum error mitigation technique designed to tailor noise from a Markovian
 channel to a more manageable stochastic Pauli channel. This tailoring is achieved
 by randomly applying a series of Pauli operations to the quantum system, and in doing
