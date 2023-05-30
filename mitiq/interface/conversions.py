@@ -20,13 +20,13 @@ class CircuitConversionError(Exception):
     pass
 
 
-register_to_dict: Dict[Tuple[str, str], Callable[[Any], Circuit]]
+register_to_dict: Dict[str, Callable[[Any], Circuit]]
 try:
     register_to_dict
 except NameError:
     register_to_dict = {}
 
-register_from_dict: Dict[Tuple[str, str], Callable[[Circuit], Any]]
+register_from_dict: Dict[str, Callable[[Circuit], Any]]
 try:
     register_from_dict
 except NameError:
@@ -58,11 +58,9 @@ def register_mitiq_converter(
     if direction not in ["to", "from"]:
         raise ValueError("Invalid direction. Expected 'to' or 'from'.")
     elif direction == "to":
-        global register_to_dict
-        register_to_dict[(package_name, direction)] = convert_function
+        register_to_dict[package_name] = convert_function
     else:
-        global register_from_dict
-        register_from_dict[(package_name, direction)] = convert_function
+        register_from_dict[package_name] = convert_function
 
 
 def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
@@ -115,10 +113,10 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
             return circ
 
     else:
-        for package_name, _ in register_from_dict:
+        for package_name in register_from_dict:
             if package_name in package:
                 input_circuit_type = package_name
-                conversion_function = register_from_dict[package_name, "from"]
+                conversion_function = register_from_dict[package_name]
                 break
         else:
             raise UnsupportedCircuitError(
@@ -174,9 +172,9 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
             return circ
 
     else:
-        for package_name, _ in register_to_dict:
+        for package_name in register_to_dict:
             if package_name == conversion_type:
-                conversion_function = register_to_dict[package_name, "to"]
+                conversion_function = register_to_dict[package_name]
                 break
         else:
             raise UnsupportedCircuitError(
