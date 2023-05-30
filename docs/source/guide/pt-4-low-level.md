@@ -43,10 +43,37 @@ As shown in [How do I use PT?](pt-1-intro.md), the function {func}`.execute_with
 and directly returns the error-mitigated expectation value.
 In the next sections instead, we show how one can apply PT at a lower level, i.e., by:
 
-- Detecting CZ and CNOT gates in the circuit;
-- Mapping those operations to their twirled equivalences;
+- Twirling CZ and CNOT gates in the circuit;
 - Executing the modified circuit.
 
+## Twirling CZ and CNOT gates in the circuit
+First let's define our circuit:
+```{code-cell} ipython3
+from cirq import LineQubit, Circuit, CZ, CNOT
+fr
+
+a, b, c, d  = LineQubit.range(4)
+circuit = Circuit(
+    CNOT.on(a, b),
+    CZ.on(b, c),
+    CNOT.on(c, d),
+)
+
+print(circuit)
+```
+Now, we can see what happens when we apply the PT functions, through {func}`.twirl_CNOT_gates()` and the subsequent {func}`.twirl_CZ_gates()`
+```{code-cell} ipython3
+from mitiq import pt
+
+circuit_to_twirl = circuit.copy()
+CNOT_twirled_circuits = pt.twirl_CNOT_gates(circuit_to_twirl, num_circuits)
+twirled_circuits = [
+    pt.twirl_CZ_gates(c, num_circuits=1)[0] for c in CNOT_twirled_circuits
+]
+print(CNOT_twirled_circuits)
+print(twirled_circuits)
+```
+As shown in the next section, this approach is exactly equivalent to the application of the standard Mitiq function {func}`.execute_with_pt()`. 
 
 ## Executing the modified circuit
 
