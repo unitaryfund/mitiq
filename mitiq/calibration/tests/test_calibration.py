@@ -8,6 +8,7 @@ from functools import partial
 import pytest
 
 import cirq
+from cirq import CNOT, CZ
 import numpy as np
 
 from mitiq import Executor, MeasurementResult, SUPPORTED_PROGRAM_TYPES
@@ -31,9 +32,11 @@ from mitiq.calibration.settings import (
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import fold_global
 from mitiq.interface import convert_to_mitiq
+from mitiq.pec.representations import (
+    represent_operation_with_local_depolarizing_noise,
+)
 
-
-light_settings = Settings(
+light_ZNE_settings = Settings(
     [
         {
             "circuit_type": "mirror",
@@ -54,6 +57,34 @@ light_settings = Settings(
         },
     ],
 )
+
+light_PEC_settings = Settings(
+    [
+        {
+            "circuit_type": "mirror",
+            "num_qubits": 1,
+            "circuit_depth": 1,
+        },
+        {
+            "circuit_type": "mirror",
+            "num_qubits": 2,
+            "circuit_depth": 1,
+        },
+    ],
+    strategies=[
+        {
+            "technique": "pec",
+            "representation_function": (
+                represent_operation_with_local_depolarizing_noise
+            ),
+            "operations": [CNOT, CZ],
+            "is_qubit_dependent": False,
+            "noise_level": 0.001,
+            "num_samples": 200,
+        },
+    ],
+)
+
 
 settings = Settings(
     [
@@ -151,7 +182,29 @@ def test_ZNE_workflow_multi_platform(circuit_type):
     cal = Calibrator(
         non_cirq_execute,
         frontend=circuit_type,
-        settings=light_settings,
+        settings=light_ZNE_settings,
+    )
+    cost = cal.get_cost()
+    assert cost == {"noisy_executions": 2, "ideal_executions": 0}
+    cal.run()
+    num_strategies, num_problems = cal.results.mitigated.shape
+    num_results = num_strategies * num_problems
+    assert num_results == cost["noisy_executions"]
+    assert isinstance(cal.results, ExperimentResults)
+    assert isinstance(cal.best_strategy(), Strategy)
+
+
+@pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
+def test_PEC_workflow_multi_platform(circuit_type):
+    """Test the PEC workflow runs with all possible frontends."""
+    # Only test frontends different from cirq
+    if circuit_type == "cirq":
+        return
+
+    cal = Calibrator(
+        non_cirq_execute,
+        frontend=circuit_type,
+        settings=light_PEC_settings,
     )
     cost = cal.get_cost()
     assert cost == {"noisy_executions": 2, "ideal_executions": 0}
