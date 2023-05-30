@@ -25,7 +25,7 @@ Pauli Twirling is agnostic to our knowledge on the type of noise, easy to implem
 
 ## Disadvantages
 
-Pauli Twirling is generally combined with a recompilation to maintain circuit depth. Mitiq thus far does not provide this compilation, and so circuit depth is increased by the additional single-qubit gates.
+Pauli Twirling is generally combined with a compilation pass to maintain circuit depth. Mitiq thus far does not provide this compilation, and so circuit depth is increased by the additional single-qubit gates.
 
 Though the noise is tailored towards a more mitigable channel, it's possible for this channel to be entirely noisy (i.e. a completely depolarizing channel).
 

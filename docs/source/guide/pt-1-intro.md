@@ -29,15 +29,11 @@ slack window with a length of 4 (in the sense that 4 single-qubit gates can fit 
 ```{code-cell} ipython3
 from cirq import LineQubit, Circuit, rx, rz, CNOT
 
-a, b = LineQubit.range(2)
+a, b, c, d  = LineQubit.range(4)
 circuit = Circuit(
-    rx(0.1).on(a),
-    rx(0.1).on(a),
-    rz(0.4).on(a),
-    rx(-0.72).on(a),
-    rz(0.2).on(a),
-    rx(-0.8).on(b),
     CNOT.on(a, b),
+    CZ.on(b, c),
+    CNOT.on(c, d),
 )
 
 print(circuit)
@@ -94,11 +90,11 @@ Here we observe that the application of PT reduces the estimation error when com
 to the unmitigated result.
 
 ```{admonition} Note:
-PT is designed to mitigate noise that has a finite correlation time. For the
-simple Markovian noise simulated in this example, PT can still have a
-non-trivial effect on the final error, but it is not always a positive effect.
-For example, one can check that by changing the parameters of the input circuit,
-the error with PT is sometimes larger than the unmitigated error.
+PT is designed to mitigate the simple Markovian noise simulated in this example,
+but PT can still have a non-trivial effect on the final error, but it is not
+always a positive effect. For example, one can check that by changing the
+parameters of the input circuit, the error with PT is sometimes larger than
+the unmitigated error.
 ```
 
 +++

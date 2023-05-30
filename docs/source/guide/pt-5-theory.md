@@ -11,25 +11,27 @@ kernelspec:
   name: python3
 ---
 
-# What is the theory behind DDD?
+# What is the theory behind Pauli Twirling?
 
-Dynamical decoupling (DD) {cite}`Viola_1998_PRA, Viola_1999_PRL, Zhang_2014_PRL`
-is a quantum control technique to effectively reduce the interaction of a quantum system with its environment.
-The protocol works by driving a quantum system with rapid sequences of periodic control pulses.
+Pauli Twirling (PT) {cite}`Wallman_2016_PRA Hashim_2021_PRX Urbanek_2021_PRL`
+is a quantum error mitigation technique designed to tailor noise from a Markovian
+channel to a more manageable stochastic Pauli channel. This tailoring is achieved
+by randomly applying a series of Pauli operations to the quantum system, and in doing
+so reduces the complexity of the noise channel.
 
 The application of DD sequences can have two effects depending on the correlation time {cite}`Breuer_2007_Oxford` of the environment:
 
-1. For Markovian noise, DD can make the overall quantum channel more symmetric (analogous to quantum twirling {cite}`Wallman_2016_PRA`)
-but cannot actually decouple the system from the environment;
+1. For Markovian noise, PT can make the overall quantum channel more symmetric (analogous to dynamical decoupling {cite}`Viola_1998_PRA, Viola_1999_PRL, Zhang_2014_PRL`)
 
-2. For non-Markovian noise, DD can effectively decouple the system from the environment.
-In theory, ideal sequences of infinitely quick and strong pulses, can result in complete noise suppression.
+2. For non-Markovian noise, PT's performance might be degraded due to the inability to completely decouple the system from the environment in the presence of memory effects
 
-In practice, due to the finite frequency and finite amplitude of DD sequences,
-both effects are possible but only as imperfect approximations.
+Pauli Twirling (PT) can be a powerful tool for noise management in quantum systems. By twirling over the Pauli gates, PT transforms complex noise channels into simpler stochastic Pauli noise channels. Yet, as with all powerful tools, careful handling is required.
 
-In the context of quantum computing, DD can be considered as an error mitigation method.
-With respect to other error mitigation techniques, DD has very peculiar features:
+The success of PT is contingent on various factors, such as the nature of the noise and the specific characteristics of the quantum system. It's worth noting that, while PT generally simplifies the noise channel, there are circumstances where it could transform the noise negatively, for example into a completely depolarizing channel with a corresponding total loss of quantum information.
+
+For optimal results, Pauli Twirling should be implemented with an understanding of the underlying noise dynamics, and ideally, should be complemented with other error mitigation techniques to ensure robust quantum computation.
+
+In the context of quantum error mitigation, PT and DDD stand apart in that they have very peculiar features with respect to other error mitigation techniques. PT's peculiarities include:
 
 - It maps a noisy quantum computation to a _single_ error-mitigated computation (no need to take linear combinations
 of noisy results as in [ZNE](zne-5-theory.md [PEC](pec-5-theory.md) and [CDR](cdr-5-theory.md)).
@@ -37,56 +39,5 @@ of noisy results as in [ZNE](zne-5-theory.md [PEC](pec-5-theory.md) and [CDR](cd
 - As a consequence of the previous point, there is not a fundamental error mitigation overhead or
 increase in statistical uncertainty in the final result.
 
-- If noise is time-correlated, it can suppress real errors at the physical level instead of applying a virtual noise
-reduction via classical post-processing.
-
-
-
-
-## Digital dynamical decoupling
-
-In a quantum computing device based on the circuit model, sequences of DD pulses can be mapped to sequences
-of discrete quantum gates (typically Pauli gates). We refer to this gate-level formulation as _digital dynamical decoupling_ (DDD)
-to distinguish it from the standard pulse-level formulation.
-
-
-
-```{note}
-This type of gate-level approach is very similar to the gate-level abstraction used in Mitiq to implement
-_digital zero-noise extrapolation_ via _unitary folding_ (see [What is the theory behind ZNE?](zne-5-theory.md)).
-```
-Experimental evidence showing the practical utility gate-level decoupling sequences is given in several publications {cite}`Pokharel_2018_PRL, Jurcevic_2021_arxiv, GoogleQuantum_2021_nature, Smith_2021_arxiv, Das_2021_ACM`.
-
-
-```{warning}
-Gate-level DDD can only be considered as an approximation of the ideal (pulse-level) DD technique. Moreover, quantum backends 
-may internally optimize and schedule gates in unpredictable ways such that, in practice, DDD sequences may not be physically applied
-as expected.
-```
-
-A significant advantage of DDD with respect to pulse-level DD is the possibility of defining it in a backend-independent way, 
-via simple transformations of abstract quantum circuits. For this reason, DDD is particularly suitable for a multi-platform library like Mitiq.
-
-
-
-## Common examples of DDD sequences
-
-Common dynamical decoupling sequences are arrays of (evenly spaced) Pauli gates. In particular:
-- The _XX_ sequence is typically appropriate for mitigating (time-correlated) dephasing noise;
-- The _YY_ sequence is typically appropriate for mitigating (time-correlated) amplitude damping noise;
-- The _XYXY_ sequence is typically appropriate for mitigating generic single-qubit noise.
-
-```{note}
-A general property of DDD sequences is that, if executed on a noiseless backend, they are equivalent to the identity operation.
-```
-
-All the above examples of DDD sequences are supported in Mitiq and more general ones can be defined and customized by users.
-For more details on how to define DDD sequences in Mitiq see [What additional options are available for DDD?](ddd-3-options.md).
-
-In a practical scenario it is hard to characterize the noise model and the noise spectrum of a quantum device and the
-choice of the optimal sequence is not obvious _a priori_. A possible strategy is to run a few circuits whose noiseless
-results are theoretically known, such that one can empirically determine what sequence is optimal for a specific backend.
-
-It may happen that, for some sequences, the final error of the quantum computation is actually increased.
-As with all other error-mitigation techniques, one should always take into account that an improvement of performances is not guaranteed.
+- If noise is time-correlated, PT should not be expected to yield positive (noise-reducing) results on its own
 

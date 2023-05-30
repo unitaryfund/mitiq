@@ -64,7 +64,7 @@ def execute(circuit, noise_level=0.003):
 
 If executed on a noiseless backend, `circuit_with_pt` and `circuit` are equivalent.
 On a real backend, they have a different sensitivity to noise. The core idea of the PT technique is that,
-`circuit_with_pt` is (hopefully) less sensitive Markovian to noise thanks to the randomized Pauli insertions.
+`circuit_with_pt` is (hopefully) less sensitive to Markovian noise thanks to the randomized Pauli insertions.
 
 ```{code-cell} ipython3
 # Ideal result
@@ -81,12 +81,12 @@ execute(circuit)
 execute(circuit_with_pt)
 ```
 
-As a final remark, we stress that the low-level procedure that we have shown is exactly what {func}`.execute_with_ddd()` does behind the scenes.
+As a final remark, we stress that the low-level procedure that we have shown is exactly what {func}`.execute_with_pt()` does behind the scenes.
 Let's verify this fact: 
 
 ```{code-cell} ipython3
 np.isclose(
-  pt.execute_with_pt(circuit, execute, rule=xyxy_rule),
+  pt.execute_with_pt(circuit, execute),
   execute(circuit_with_pt),
 )
 ```
