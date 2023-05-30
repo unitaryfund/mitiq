@@ -75,6 +75,7 @@ Pauli Twirling can be easily implemented with the function
 {func}`.execute_with_pt()`.
 
 ```{code-cell} ipython3
+from mitiq import pt
 mitigated_result = pt.execute_with_pt(
     circuit=circuit,
     executor=execute,
