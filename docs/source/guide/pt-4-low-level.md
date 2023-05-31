@@ -18,7 +18,7 @@ The workflow of Pauli Twirling (PT) in Mitiq is represented in the figure below.
 ```{figure} ../img/pt_workflow.svg
 ---
 width: 700px
-name: pt-workflow-overview
+name: pt-workflow-overview-2
 ---
 Workflow of the PT technique in Mitiq, detailed in the [What happens when I use PT?](pt-4-low-level.md) section.
 ```

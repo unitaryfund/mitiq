@@ -6,7 +6,7 @@
    version="1.1"
    id="svg993"
    inkscape:version="1.2.2 (b0a8486, 2022-12-01)"
-   sodipodi:docname="ddd_workflow.svg"
+   sodipodi:docname="pt_workflow.svg"
    inkscape:export-filename="G:\My Drive\collaborations\zne_workflow2_steps.png"
    inkscape:export-xdpi="600"
    inkscape:export-ydpi="600"
@@ -113,7 +113,7 @@
        id="text1727"
        x="-40.748028"
        y="334.24435"
-       style="font-weight:400;font-stretch:semi-condensed;font-size:16.9333px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.264583">mitiq.ddd</text>
+       style="font-weight:400;font-stretch:semi-condensed;font-size:16.9333px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;stroke-width:0.264583">mitiq.pt</text>
     <path
        d="m -105.09628,389.43458 h 41.643564 l 0.709691,-0.76109 -0.79375,0.79375 h 33.706064 v -1.5875 h -34.499814 l -0.709691,0.76109 0.79375,-0.79375 h -40.849814 z m 74.471819,3.20766 7.9375,-3.96875 -7.9375,-3.96875 z"
        id="path1733"
@@ -250,7 +250,7 @@
          x="27.34024"
          y="405.53891"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.2306px;font-family:'Lucida Console', 'Lucida Console_MSFontService', sans-serif;-inkscape-font-specification:'Lucida Console, Lucida Console_MSFontService, sans-serif';text-align:center;text-anchor:middle;stroke-width:0.264583"
-         id="tspan924">around noisy gates</tspan></text>
+         id="tspan924">on CNOT/CZ</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
