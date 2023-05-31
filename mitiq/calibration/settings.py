@@ -247,6 +247,7 @@ class Strategy:
             return len(summary["scale_factors"])
         elif self.technique is MitigationTechnique.PEC:
             return summary["num_samples"]
+        return 0
             
 
 
