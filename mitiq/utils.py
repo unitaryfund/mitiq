@@ -144,7 +144,9 @@ def _equal(
         circuit_one = deepcopy(circuit_one)
         circuit_two = deepcopy(circuit_two)
 
-    if not require_qubit_equality:
+    if (not require_qubit_equality) and (
+        len(circuit_one.all_qubits()) == len(circuit_two.all_qubits())
+    ):
         # Transform the qubits of circuit one to those of circuit two
         qubit_map = dict(
             zip(
