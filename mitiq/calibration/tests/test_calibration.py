@@ -8,7 +8,6 @@ from functools import partial
 import pytest
 
 import cirq
-from cirq import Circuit, LineQubit, CNOT, CZ
 import numpy as np
 
 from mitiq import Executor, MeasurementResult, SUPPORTED_PROGRAM_TYPES
@@ -78,8 +77,8 @@ light_pec_settings = Settings(
                 represent_operation_with_local_depolarizing_noise
             ),
             "operations": [
-                Circuit(CNOT(*LineQubit.range(2))),
-                Circuit(CZ(*LineQubit.range(2))),
+                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
+                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
             ],
             "is_qubit_dependent": False,
             "noise_level": 0.001,

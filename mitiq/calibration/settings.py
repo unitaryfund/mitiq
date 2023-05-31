@@ -52,12 +52,6 @@ class MitigationTechnique(Enum):
             return execute
 
 
-calibration_supported_techniques = {
-    "ZNE": MitigationTechnique.ZNE,
-    "PEC": MitigationTechnique.PEC,
-}
-
-
 @dataclass
 class BenchmarkProblem:
     """A dataclass containing information for instances of problems that will
@@ -162,11 +156,10 @@ class Strategy:
                 )
                 for op in operations
             ]
-        else:
-            return None
+        return None
 
     @property
-    def mitigation_function(self) -> Callable[..., float]:
+    def mitigation_function(self) -> Union[Callable[..., float], None]:
         if self.technique is MitigationTechnique.PEC:
             exclude_params = [
                 "representation_function",
@@ -188,12 +181,7 @@ class Strategy:
             return partial(
                 self.technique.mitigation_function, **self.technique_params
             )
-        else:
-            raise ValueError(
-                """Specified technique is not supported by calibration.
-                    See {} for supported techniques.""",
-                calibration_supported_techniques,
-            )
+        return None
 
     def to_dict(self) -> Dict[str, Any]:
         """A summary of the strategies parameters, without the technique added.
@@ -204,13 +192,19 @@ class Strategy:
         if self.technique is MitigationTechnique.ZNE:
             inference_func = self.technique_params["factory"]
             summary["factory"] = inference_func.__class__.__name__
-            summary[
-                "scale_factors"
-            ] = inference_func.get_scale_factors().tolist()
+            summary["scale_factors"] = inference_func._scale_factors
             summary["scale_method"] = self.technique_params[
                 "scale_noise"
             ].__name__
-
+        elif self.technique is MitigationTechnique.PEC:
+            summary["representation_function"] = self.technique_params[
+                "representation_function"
+            ]
+            summary["operations"] = self.technique_params["operations"]
+            summary["noise_level"] = self.technique_params["noise_level"]
+            summary["is_qubit_dependent"] = self.technique_params[
+                "is_qubit_dependent"
+            ]
         return summary
 
     def print_line(self, performance: str, circuit_type: str) -> None:
