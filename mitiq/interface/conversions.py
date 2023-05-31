@@ -20,23 +20,24 @@ class CircuitConversionError(Exception):
     pass
 
 
-register_to_dict: Dict[str, Callable[[Circuit], Any]]
+from_mitiq_dict: Dict[str, Callable[[Circuit], Any]]
 try:
-    register_to_dict
+    from_mitiq_dict
 except NameError:
-    register_to_dict = {}
+    from_mitiq_dict = {}
 
-register_from_dict: Dict[str, Callable[[Any], Circuit]]
+to_mitiq_dict: Dict[str, Callable[[Any], Circuit]]
 try:
-    register_from_dict
+    to_mitiq_dict
 except NameError:
-    register_from_dict = {}
+    to_mitiq_dict = {}
 
 
 def register_mitiq_converters(
     package_name: str,
-    convert_to_function: Callable[[Circuit], Any],
-    convert_from_function: Callable[[Any], Circuit],
+    *,
+    convert_to_function: Callable[[Circuit], Any] = None,
+    convert_from_function: Callable[[Any], Circuit] = None,
 ) -> None:
     """Registers converters for unsupported circuit types.
 
@@ -52,8 +53,10 @@ def register_mitiq_converters(
             unsupported circuit type. This function returns a Mitiq/Cirq
             circuit.
     """
-    register_to_dict[package_name] = convert_to_function
-    register_from_dict[package_name] = convert_from_function
+    if convert_to_function is None or convert_from_function is None:
+        raise ValueError("Both convert_to_function and convert_from_function are required.")
+    from_mitiq_dict[package_name] = convert_to_function
+    to_mitiq_dict[package_name] = convert_from_function
 
 
 def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
@@ -100,9 +103,9 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
         input_circuit_type = "pennylane"
         conversion_function = from_pennylane
 
-    elif register_from_dict.get(package):
+    elif package in to_mitiq_dict:
         input_circuit_type = package
-        conversion_function = register_from_dict.get(package)
+        conversion_function = to_mitiq_dict.get(package)
 
     elif isinstance(circuit, Circuit):
         input_circuit_type = "cirq"
@@ -158,8 +161,8 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
         from mitiq.interface.mitiq_pennylane.conversions import to_pennylane
 
         conversion_function = to_pennylane
-    elif register_to_dict.get(conversion_type):
-        conversion_function = register_to_dict.get(conversion_type)
+    elif conversion_type in from_mitiq_dict:
+        conversion_function = from_mitiq_dict.get(conversion_type)
 
     elif conversion_type == "cirq":
 
