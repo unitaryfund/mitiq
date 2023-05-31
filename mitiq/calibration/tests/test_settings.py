@@ -8,12 +8,72 @@ import cirq
 import qiskit
 
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
-from mitiq.calibration import ZNESettings, Settings
-from mitiq.calibration.settings import MitigationTechnique, BenchmarkProblem
+from mitiq.calibration import ZNESettings, PECSettings, Settings
+from mitiq.calibration.settings import (
+    MitigationTechnique,
+    BenchmarkProblem,
+    Strategy,
+)
 from mitiq.raw import execute
-from mitiq.pec import execute_with_pec
+from mitiq.pec import (
+    execute_with_pec,
+    represent_operation_with_local_depolarizing_noise,
+)
 from mitiq.zne.scaling import fold_global
 from mitiq.zne.inference import RichardsonFactory, LinearFactory
+
+light_pec_settings = Settings(
+    [
+        {
+            "circuit_type": "mirror",
+            "num_qubits": 1,
+            "circuit_depth": 1,
+        },
+        {
+            "circuit_type": "mirror",
+            "num_qubits": 2,
+            "circuit_depth": 1,
+        },
+    ],
+    strategies=[
+        {
+            "technique": "pec",
+            "representation_function": (
+                represent_operation_with_local_depolarizing_noise
+            ),
+            "operations": [
+                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
+                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
+            ],
+            "is_qubit_dependent": False,
+            "noise_level": 0.001,
+            "num_samples": 200,
+        },
+    ],
+)
+
+
+light_zne_settings = Settings(
+    [
+        {
+            "circuit_type": "mirror",
+            "num_qubits": 1,
+            "circuit_depth": 1,
+        },
+        {
+            "circuit_type": "mirror",
+            "num_qubits": 2,
+            "circuit_depth": 1,
+        },
+    ],
+    strategies=[
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": LinearFactory([1.0, 2.0]),
+        },
+    ],
+)
 
 
 def test_MitigationTechnique():
@@ -125,18 +185,45 @@ def test_make_strategies_invalid_technique():
         )
 
 
+def test_unsupported_technique_error():
+    strategy = Strategy(1, MitigationTechnique.RAW, {})
+    with pytest.raises(
+        ValueError,
+        match="Specified technique is not supported by calibration.",
+    ):
+        strategy.mitigation_function()
+
+
+def test_PEC_representations():
+    pec_strategy = light_pec_settings.make_strategies()[0]
+    assert len(pec_strategy.representations) > 0
+
+    zne_strategy = light_zne_settings.make_strategies()[0]
+    assert not zne_strategy.representations
+
+
 def test_ZNESettings():
     circuits = ZNESettings.make_problems()
     strategies = ZNESettings.make_strategies()
-
     repr_string = repr(circuits[0])
     assert all(
         s in repr_string
         for s in ("type", "ideal_distribution", "num_qubits", "circuit_depth")
     )
-
     assert len(circuits) == 4
     assert len(strategies) == 2 * 2 * 2
+
+
+def test_PECSettings():
+    circuits = PECSettings.make_problems()
+    strategies = PECSettings.make_strategies()
+    repr_string = repr(circuits[0])
+    assert all(
+        s in repr_string
+        for s in ("type", "ideal_distribution", "num_qubits", "circuit_depth")
+    )
+    assert len(circuits) == 4
+    assert len(strategies) == 2
 
 
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())
@@ -193,3 +280,27 @@ def test_settings_make_problems():
     assert problem.two_qubit_gate_count == 2
     assert problem.num_qubits == 2
     assert problem.circuit_depth == 2
+
+
+def test_to_dict():
+    pec_strategy = light_pec_settings.make_strategies()[0]
+    assert pec_strategy.to_dict() == {
+        "technique": "PEC",
+        "representation_function": (
+            represent_operation_with_local_depolarizing_noise
+        ),
+        "operations": [
+            cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
+            cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
+        ],
+        "is_qubit_dependent": False,
+        "noise_level": 0.001,
+    }
+
+    zne_strategy = light_zne_settings.make_strategies()[0]
+    assert zne_strategy.to_dict() == {
+        "technique": "ZNE",
+        "scale_method": "fold_global",
+        "factory": "LinearFactory",
+        "scale_factors": [1.0, 2.0],
+    }
