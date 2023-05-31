@@ -9,7 +9,11 @@ import qiskit
 
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
 from mitiq.calibration import ZNESettings, PECSettings, Settings
-from mitiq.calibration.settings import MitigationTechnique, BenchmarkProblem
+from mitiq.calibration.settings import (
+    MitigationTechnique,
+    BenchmarkProblem,
+    Strategy,
+)
 from mitiq.raw import execute
 from mitiq.pec import (
     execute_with_pec,
@@ -179,6 +183,15 @@ def test_make_strategies_invalid_technique():
                 }
             ],
         )
+
+
+def test_unsupported_technique_error():
+    strategy = Strategy(1, MitigationTechnique.RAW, {})
+    with pytest.raises(
+        ValueError,
+        match="Specified technique is not supported by calibration.",
+    ):
+        strategy.mitigation_function()
 
 
 def test_PEC_representations():

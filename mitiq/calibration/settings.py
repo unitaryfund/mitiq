@@ -52,6 +52,12 @@ class MitigationTechnique(Enum):
             return execute
 
 
+calibration_supported_techniques = {
+    "ZNE": MitigationTechnique.ZNE,
+    "PEC": MitigationTechnique.PEC,
+}
+
+
 @dataclass
 class BenchmarkProblem:
     """A dataclass containing information for instances of problems that will
@@ -159,7 +165,7 @@ class Strategy:
         return None
 
     @property
-    def mitigation_function(self) -> Union[Callable[..., float], None]:
+    def mitigation_function(self) -> Callable[..., float]:
         if self.technique is MitigationTechnique.PEC:
             exclude_params = [
                 "representation_function",
@@ -181,7 +187,12 @@ class Strategy:
             return partial(
                 self.technique.mitigation_function, **self.technique_params
             )
-        return None
+        else:
+            raise ValueError(
+                """Specified technique is not supported by calibration.
+                    See {} for supported techniques.""",
+                calibration_supported_techniques,
+            )
 
     def to_dict(self) -> Dict[str, Any]:
         """A summary of the strategies parameters, without the technique added.
