@@ -218,6 +218,7 @@ class Strategy:
             summary["is_qubit_dependent"] = self.technique_params[
                 "is_qubit_dependent"
             ]
+            summary["num_samples"] = self.technique_params["num_samples"]
         return summary
 
     def print_line(self, performance: str, circuit_type: str) -> None:
@@ -244,7 +245,9 @@ class Strategy:
         summary = self.to_dict()
         if self.technique is MitigationTechnique.ZNE:
             return len(summary["scale_factors"])
-        # TODO: elif self.technique is MitigationTechnique.PEC:
+        elif self.technique is MitigationTechnique.PEC:
+            return summary["num_samples"]
+            
 
 
 class Settings:
