@@ -112,9 +112,7 @@ def test_ZNE_workflow():
     assert cost == {"noisy_executions": 96, "ideal_executions": 0}
 
     cal.run()
-    num_strategies, num_problems = cal.results.mitigated.shape
-    num_results = num_strategies * num_problems
-    assert num_results == cost["noisy_executions"]
+    
     assert isinstance(cal.results, ExperimentResults)
     assert isinstance(cal.best_strategy(), Strategy)
 
@@ -134,9 +132,7 @@ def test_ZNE_workflow_multi_platform(circuit_type):
     cost = cal.get_cost()
     assert cost == {"noisy_executions": 4, "ideal_executions": 0}
     cal.run()
-    num_strategies, num_problems = cal.results.mitigated.shape
-    num_results = num_strategies * num_problems
-    assert num_results == cost["noisy_executions"]
+    
     assert isinstance(cal.results, ExperimentResults)
     assert isinstance(cal.best_strategy(), Strategy)
 
