@@ -26,7 +26,7 @@ from mitiq.interface import (
     accept_any_qprogram_as_input,
     atomic_one_to_many_converter,
     noise_scaling_converter,
-    register_mitiq_converter,
+    register_mitiq_converters,
     UnsupportedCircuitError,
 )
 from mitiq.interface.mitiq_qiskit import to_qasm, from_qasm
@@ -98,8 +98,7 @@ def test_register_from_to_mitiq(qasm_str=qasm_str, cirq_circuit=cirq_circuit):
 
     qasm_circuit = CircuitStr(qasm_str)
 
-    register_mitiq_converter(qasm_circuit.__module__, "from", from_qasm)
-    register_mitiq_converter(qasm_circuit.__module__, "to", to_qasm)
+    register_mitiq_converters(qasm_circuit.__module__, to_qasm, from_qasm)
     converted_circuit = convert_from_mitiq(cirq_circuit, "qasm")
     converted_qasm = CircuitStr(converted_circuit)
     circuit, input_type = convert_to_mitiq(converted_qasm)
@@ -114,14 +113,6 @@ def test_to_mitiq_bad_types(item):
         match="Could not determine the package of the input circuit.",
     ):
         convert_to_mitiq(item)
-
-
-def test_register_bad_args(qasm_str=qasm_str):
-    with pytest.raises(
-        ValueError,
-        match="Invalid direction. Expected 'to' or 'from'.",
-    ):
-        register_mitiq_converter("qasm", "mitiq", from_qasm)
 
 
 @pytest.mark.parametrize("to_type", SUPPORTED_PROGRAM_TYPES.keys())
