@@ -92,7 +92,7 @@ def test_to_mitiq(circuit):
     assert input_type in circuit.__module__
 
 
-def test_register_from_to_mitiq(qasm_str=qasm_str, cirq_circuit=cirq_circuit):
+def test_register_from_to_mitiq():
     class CircuitStr(str):
         __module__ = "qasm"
 
