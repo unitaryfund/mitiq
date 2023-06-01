@@ -10,6 +10,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import datetime
 import os
 import sys
 
@@ -26,7 +27,7 @@ sys.path.insert(0, os.path.abspath("../../"))
 # -- Project information -----------------------------------------------------
 
 project = "Mitiq"
-copyright = "2020, Tech Team @ Unitary Fund"
+copyright = f"2020 - {datetime.date.today().year}, Tech Team @ Unitary Fund"
 author = "Tech Team @ Unitary Fund"
 
 # The full version, including alpha/beta/rc tags
@@ -312,9 +313,17 @@ html_favicon = "img/mitiq.ico"
 html_extra_path = ["robots.txt"]
 
 html_theme_options = {
-    "announcement": '<a href="https://unitaryhack.dev/">unitaryHACK</a> is \
-    coming <b>May 26-Jun 13</b>! Get rewarded for contributing to open source \
-    quantum software!'
+    "announcement": '<a href="https://unitaryhack.dev/">unitaryHACK</a> has \
+    begun, and will run until <b>Jun 13</b>! Get rewarded for contributing to \
+    open source quantum software!',
+    "icon_links": [
+        {
+            "name": "Source Repository",
+            "url": "https://github.com/unitaryfund/mitiq",
+            "icon": "fa-brands fa-github",
+            "type": "fontawesome",
+        }
+    ],
 }
 
 myst_update_mathjax = False
