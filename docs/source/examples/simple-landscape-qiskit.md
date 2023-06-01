@@ -22,7 +22,11 @@ import numpy as np
 
 import qiskit
 from qiskit import QuantumCircuit
-from qiskit.providers.aer.noise import NoiseModel, depolarizing_error
+from qiskit_aer import Aer, AerSimulator
+from qiskit_aer.noise import NoiseModel
+from qiskit_aer.noise.errors.standard_errors import (
+    depolarizing_error,
+)
 
 from mitiq.zne import mitigate_executor
 from mitiq.zne.inference import RichardsonFactory
@@ -83,7 +87,7 @@ def noiseless_executor(circuit: QuantumCircuit) -> float:
     # execute experiment without noise
     job = qiskit.execute(
         experiments=circ,
-        backend=qiskit.Aer.get_backend("aer_simulator_density_matrix"),
+        backend=AerSimulator(method="density_matrix"),
         noise_model=None,
         # we want all gates to be actually applied,
         # so we skip any circuit optimization 
@@ -127,7 +131,7 @@ def executor_with_noise(circuit: QuantumCircuit) -> float:
     # execute experiment with depolarizing noise
     job = qiskit.execute(
         experiments=circ,
-        backend=qiskit.Aer.get_backend("aer_simulator_density_matrix"),
+        backend=AerSimulator(method="density_matrix"),
         noise_model=noise_model,
         basis_gates=noise_model.basis_gates + ["save_density_matrix"],
         # we want all gates to be actually applied,

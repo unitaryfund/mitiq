@@ -115,7 +115,7 @@ Let's verify this fact, before applying any error mitigation.
 
 ```{code-cell} ipython3
 from qiskit import QuantumCircuit
-from qiskit.providers.aer import AerSimulator
+from qiskit_aer import AerSimulator
 from qiskit.tools.visualization import plot_histogram
 from qiskit import transpile
 from qiskit.providers.fake_provider import FakeJakarta  # Fake (simulated) QPUs
