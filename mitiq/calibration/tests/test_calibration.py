@@ -164,7 +164,6 @@ def test_ZNE_workflow():
     assert cost == {"noisy_executions": 96, "ideal_executions": 0}
 
     cal.run()
-    
     assert isinstance(cal.results, ExperimentResults)
     assert isinstance(cal.best_strategy(), Strategy)
 
@@ -177,7 +176,6 @@ def test_PEC_workflow():
     assert cost == {"noisy_executions": 1600, "ideal_executions": 0}
 
     cal.run()
-    
     assert isinstance(cal.results, ExperimentResults)
     assert isinstance(cal.best_strategy(), Strategy)
 
@@ -197,7 +195,6 @@ def test_ZNE_workflow_multi_platform(circuit_type):
     cost = cal.get_cost()
     assert cost == {"noisy_executions": 4, "ideal_executions": 0}
     cal.run()
-    
     assert isinstance(cal.results, ExperimentResults)
     assert isinstance(cal.best_strategy(), Strategy)
 
@@ -217,7 +214,6 @@ def test_PEC_workflow_multi_platform(circuit_type):
     cost = cal.get_cost()
     assert cost == {"noisy_executions": 400, "ideal_executions": 0}
     cal.run()
-    
     assert isinstance(cal.results, ExperimentResults)
     assert isinstance(cal.best_strategy(), Strategy)
 
