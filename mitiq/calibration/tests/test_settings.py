@@ -295,7 +295,7 @@ def test_to_dict():
         ],
         "is_qubit_dependent": False,
         "noise_level": 0.001,
-        "num_samples": 200
+        "num_samples": 200,
     }
 
     zne_strategy = light_zne_settings.make_strategies()[0]
