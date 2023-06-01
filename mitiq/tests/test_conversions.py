@@ -98,12 +98,17 @@ def test_register_from_to_mitiq(qasm_str=qasm_str, cirq_circuit=cirq_circuit):
 
     qasm_circuit = CircuitStr(qasm_str)
 
-    register_mitiq_converters(qasm_circuit.__module__, convert_to_function=to_qasm, convert_from_function=from_qasm)
+    register_mitiq_converters(
+        qasm_circuit.__module__,
+        convert_to_function=to_qasm,
+        convert_from_function=from_qasm,
+    )
     converted_circuit = convert_from_mitiq(cirq_circuit, "qasm")
     converted_qasm = CircuitStr(converted_circuit)
     circuit, input_type = convert_to_mitiq(converted_qasm)
     assert _equal(circuit, cirq_circuit)
     assert input_type == qasm_circuit.__module__
+
 
 @pytest.mark.parametrize("item", ("circuit", 1, None))
 def test_to_mitiq_bad_types(item):
