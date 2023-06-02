@@ -1,11 +1,10 @@
 # Pauli Twirling
 
-Pauli Twirling (PT) is an error mitigation technique in which,
+Pauli Twirling (PT) is an noise tailoring technique in which,
 in the Mitiq implementation, particularly noisy operations (e.g. CZ and CNOT)
-are mitigated by independent, random, single-qubit gates inserted into
+are transformed by independent, random, single-qubit gates inserted into
 the circuit such that the effective logical circuit remains unchanged
-but the noise is tailored into stochastic Pauli errors, as opposed to
-the Markovian processes that are otherwise dominant.
+but the noise is tailored towards stochastic Pauli errors.
 For more discussion of the theory of PT, see the section [What is the theory
 behind PT?](pt-5-theory.md).
 

@@ -29,7 +29,7 @@ Workflow of the PT technique in Mitiq, detailed in the [What happens when I use 
 - The error mitigated expectation value is returned to the user.
 
 With respect to the workflows of other error-mitigation techniques (e.g. [ZNE](zne-4-low-level.md) or [PEC](pec-4-low-level.md)),
-PT involves the generation of a _single_ randomly-modified circuit, and then averages over its executions.
+PT involves the generation of a _single_ circuit with random modifications, and subsequently averages over many executions.
 For this reason, there is no need for a complex final inference step, which is necessary for other 
 techniques, and so this average is instead trivial for PT.
 

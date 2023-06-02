@@ -23,8 +23,9 @@ mitiq.SUPPORTED_PROGRAM_TYPES.keys()
 
 
 ## Problem setup
-We first define the circuit of interest. In this example, the circuit has a
-slack window with a length of 4 (in the sense that 4 single-qubit gates can fit in that window).
+We first define the circuit of interest. In this example, the circuit has 
+two CNOT gates and a CZ gate. We can see that when we apply Pauli Twirling,
+we will generate 
 
 ```{code-cell} ipython3
 from cirq import LineQubit, Circuit, CZ, CNOT
@@ -90,11 +91,11 @@ Here we observe that the application of PT reduces the estimation error when com
 to the unmitigated result.
 
 ```{admonition} Note:
-PT is designed to mitigate the simple Markovian noise simulated in this example,
-but PT can still have a non-trivial effect on the final error, but it is not
-always a positive effect. For example, one can check that by changing the
-parameters of the input circuit, the error with PT is sometimes larger than
-the unmitigated error.
+PT is designed to transform the noise simulated in this example,
+but it should nnot be expected to always be a positive effect.
+In this sense, it is more of a noise tailoring technique, designed
+to be composed with other techniques rather than an error mitigation
+technique in and of itself.
 ```
 
 +++
