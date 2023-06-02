@@ -161,7 +161,7 @@ def non_cirq_depolarizing_execute(circuit):
 def test_ZNE_workflow():
     cal = Calibrator(damping_execute, frontend="cirq")
     cost = cal.get_cost()
-    assert cost == {"noisy_executions": 96, "ideal_executions": 0}
+    assert cost == {"noisy_executions": 8 * 3 * 4, "ideal_executions": 0}
 
     cal.run()
     assert isinstance(cal.results, ExperimentResults)
