@@ -18,7 +18,8 @@ from mitiq import SUPPORTED_PROGRAM_TYPES
     [1, 2, 3, 4, 5, 6, 7, 8],
 )
 def test_generate_mirror_qv_circuit(depth_num):
-    test_circ, _ = generate_mirror_qv_circuit(4, depth_num)
+    """Check the circuit output."""
+    test_circ = generate_mirror_qv_circuit(4, depth_num)
 
     # check bitstring is all 0's
     bit_test = cirq.Simulator().run(
@@ -30,6 +31,7 @@ def test_generate_mirror_qv_circuit(depth_num):
 
 
 def test_bad_depth_number():
+    """Check if an unacceptable depth number rasies an error."""
     for n in (-1, 0):
         with pytest.raises(
             ValueError, match="{} is invalid for the generated circuit depth."
@@ -39,15 +41,16 @@ def test_bad_depth_number():
 
 @pytest.mark.parametrize("return_type", SUPPORTED_PROGRAM_TYPES.keys())
 def test_volume_conversion(return_type):
-    circuit, _ = generate_mirror_qv_circuit(4, 3, return_type=return_type)
+    """Check generated circuit's return type."""
+    circuit = generate_mirror_qv_circuit(4, 3, return_type=return_type)
     assert return_type in circuit.__module__
 
 
 def test_generate_model_circuit_with_seed():
     """Test that a model circuit is determined by its seed."""
-    circuit_1, _ = generate_mirror_qv_circuit(4, 3, seed=1)
-    circuit_2, _ = generate_mirror_qv_circuit(4, 3, seed=1)
-    circuit_3, _ = generate_mirror_qv_circuit(4, 3, seed=2)
+    circuit_1 = generate_mirror_qv_circuit(4, 3, seed=1)
+    circuit_2 = generate_mirror_qv_circuit(4, 3, seed=1)
+    circuit_3 = generate_mirror_qv_circuit(4, 3, seed=2)
 
     assert circuit_1 == circuit_2
     assert circuit_2 != circuit_3
@@ -63,6 +66,6 @@ def test_circuit_decomposition():
         ops.MeasurementGate,
         ops.GlobalPhaseGate
     """
-    circuit, _ = generate_mirror_qv_circuit(4, 3, decompose=True)
+    circuit = generate_mirror_qv_circuit(4, 3, decompose=True)
     for op in [operation for moment in circuit for operation in moment]:
         assert op in cirq.protocols.decompose_protocol.DECOMPOSE_TARGET_GATESET

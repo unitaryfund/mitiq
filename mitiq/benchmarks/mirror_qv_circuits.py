@@ -6,11 +6,10 @@
 """Functions to create a Mirror Quantum Volume Benchmarking circuit
 as defined in https://arxiv.org/abs/2303.02108."""
 
-from typing import Optional, Tuple, Sequence
+from typing import Optional
 
 
 from mitiq import QPROGRAM
-from mitiq import Bitstring
 from mitiq.interface.conversions import convert_to_mitiq, convert_from_mitiq
 
 
@@ -26,7 +25,7 @@ def generate_mirror_qv_circuit(
     decompose: bool = False,
     seed: Optional[int] = None,
     return_type: Optional[str] = None,
-) -> Tuple[QPROGRAM, Sequence[Bitstring]]:
+) -> QPROGRAM:
     """Generate a mirror quantum volume circuit with the given number of qubits
     and depth as defined in :cite:`Amico_2023_arxiv`.
 
@@ -77,14 +76,9 @@ def generate_mirror_qv_circuit(
 
     circ = qv_half_circ + mirror_half_circ
 
-    # get the bitstring
-    circ_with_measurements = circ + cirq.measure(circ.all_qubits())
-    simulate_result = cirq.Simulator().run(circ_with_measurements)
-    bitstring = list(simulate_result.measurements.values())[0][0].tolist()
-
     if decompose:
         # Decompose random unitary gates into simpler gates.
         circ = cirq.Circuit(cirq.decompose(circ))
 
     return_type = "cirq" if not return_type else return_type
-    return convert_from_mitiq(circ, return_type), bitstring
+    return convert_from_mitiq(circ, return_type)
