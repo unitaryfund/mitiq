@@ -30,14 +30,14 @@ def generate_mirror_qv_circuit(
     """Generate a mirror quantum volume circuit with the given number of qubits
     and depth as defined in :cite:`Amico_2023_arxiv`.
 
-    The generated circuit consists of a quantum volume circuit upto `depth/2`
-    layers followed by an inverse of the quantum volume portion upto `depth/2`
+    The generated circuit consists of a quantum volume circuit up to `depth/2`
+    layers followed by an inverse of the quantum volume portion up to `depth/2`
     when `depth` is an even number.
 
-    When `depth` is odd, the layers will be chnaged to `depth+1`.
+    When `depth` is odd, the layers will be changed to `depth+1`.
 
 
-    The output bit-string is always supposed to be a string of zeroes.
+    The ideal output bit-string is a string of zeroes.
 
     Args:
         num_qubits: The number of qubits in the generated circuit.
