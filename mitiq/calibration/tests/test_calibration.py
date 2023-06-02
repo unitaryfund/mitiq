@@ -173,7 +173,7 @@ def test_PEC_workflow():
         depolarizing_execute, frontend="cirq", settings=PECSettings
     )
     cost = cal.get_cost()
-    assert cost == {"noisy_executions": 1600, "ideal_executions": 0}
+    assert cost == {"noisy_executions": 4 * 2 * 200, "ideal_executions": 0}
 
     cal.run()
     assert isinstance(cal.results, ExperimentResults)
@@ -193,7 +193,7 @@ def test_ZNE_workflow_multi_platform(circuit_type):
         settings=light_zne_settings,
     )
     cost = cal.get_cost()
-    assert cost == {"noisy_executions": 4, "ideal_executions": 0}
+    assert cost == {"noisy_executions": 2 * 2, "ideal_executions": 0}
     cal.run()
     assert isinstance(cal.results, ExperimentResults)
     assert isinstance(cal.best_strategy(), Strategy)
@@ -212,7 +212,7 @@ def test_PEC_workflow_multi_platform(circuit_type):
         settings=light_pec_settings,
     )
     cost = cal.get_cost()
-    assert cost == {"noisy_executions": 400, "ideal_executions": 0}
+    assert cost == {"noisy_executions": 2 * 200, "ideal_executions": 0}
     cal.run()
     assert isinstance(cal.results, ExperimentResults)
     assert isinstance(cal.best_strategy(), Strategy)
