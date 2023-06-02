@@ -203,9 +203,7 @@ class Strategy:
         if self.technique is MitigationTechnique.ZNE:
             inference_func = self.technique_params["factory"]
             summary["factory"] = inference_func.__class__.__name__
-
             summary["scale_factors"] = inference_func._scale_factors
-
             summary["scale_method"] = self.technique_params[
                 "scale_noise"
             ].__name__
