@@ -241,7 +241,7 @@ class Strategy:
     def __repr__(self) -> str:
         return str(self.to_dict())
 
-    def num_circuit_required(self) -> int:
+    def num_circuits_required(self) -> int:
         summary = self.to_dict()
         if self.technique is MitigationTechnique.ZNE:
             return len(summary["scale_factors"])
