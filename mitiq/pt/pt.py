@@ -10,7 +10,7 @@ import cirq
 import numpy as np
 
 from mitiq import QPROGRAM, Executor, Observable, QuantumResult
-from mitiq.interface import noise_scaling_converter
+from mitiq.interface import circuit_scaler
 
 # P, Q, R, S from https://arxiv.org/pdf/2301.02690.pdf
 CNOT_twirling_gates = [
@@ -95,7 +95,7 @@ def twirl_CNOT_gates(circuit: QPROGRAM, num_circuits: int) -> List[QPROGRAM]:
     return [_twirl_CNOT_qprogram(circuit) for _ in range(num_circuits)]
 
 
-@noise_scaling_converter
+@circuit_scaler
 def _twirl_CNOT_qprogram(circuit: cirq.Circuit) -> cirq.Circuit:
     return circuit.map_operations(_twirl_single_CNOT_gate)
 
@@ -110,7 +110,7 @@ def twirl_CZ_gates(circuit: QPROGRAM, num_circuits: int) -> List[QPROGRAM]:
     return [_twirl_CZ_qprogram(circuit) for _ in range(num_circuits)]
 
 
-@noise_scaling_converter
+@circuit_scaler
 def _twirl_CZ_qprogram(circuit: cirq.Circuit) -> cirq.Circuit:
     return circuit.map_operations(_twirl_single_CZ_gate)
 

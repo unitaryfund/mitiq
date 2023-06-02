@@ -269,17 +269,18 @@ def atomic_one_to_many_converter(
     return qprogram_modifier
 
 
-def noise_scaling_converter(
-    noise_scaling_function: Callable[..., Any]
-) -> Callable[..., Any]:
-    """Decorator for handling conversions with noise scaling functions.
+def circuit_scaler(scaling_function: Callable[..., Any]) -> Callable[..., Any]:
+    """Decorator that scales the gates in a circuit by a factor of
+    'scaling_factor'.
 
     Args:
-        noise_scaling_function: Function which inputs a cirq.Circuit, modifies
-            it to scale noise, then returns a cirq.Circuit.
+        scaling_function (Callable[..., Any]): The function to scale.
+
+    Returns:
+        Callable[..., Any]: The scaled function.
     """
 
-    @wraps(noise_scaling_function)
+    @wraps(scaling_function)
     def new_scaling_function(
         circuit: QPROGRAM, *args: Any, **kwargs: Any
     ) -> QPROGRAM:
@@ -299,7 +300,7 @@ def noise_scaling_converter(
             # when converting to Cirq. Eventually, identities will be removed.
             idle_qubits = _add_identity_to_idle(circuit)
 
-        scaled_circuit = atomic_converter(noise_scaling_function)(
+        scaled_circuit = atomic_converter(scaling_function)(
             circuit, *args, **kwargs
         )
 
@@ -366,7 +367,7 @@ def noise_scaling_converter(
     return new_scaling_function
 
 
-@noise_scaling_converter
+@circuit_scaler
 def append_cirq_circuit_to_qprogram(
     circuit: QPROGRAM, cirq_circuit: Circuit
 ) -> QPROGRAM:

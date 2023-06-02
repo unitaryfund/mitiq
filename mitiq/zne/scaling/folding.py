@@ -11,7 +11,7 @@ import warnings
 import numpy as np
 from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary, Moment
 
-from mitiq.interface import noise_scaling_converter
+from mitiq.interface import circuit_scaler
 from mitiq.utils import (
     _append_measurements,
     _is_measurement,
@@ -205,7 +205,7 @@ def _get_weight_for_gate(
 
 
 # Local folding functions
-@noise_scaling_converter
+@circuit_scaler
 def fold_all(
     circuit: Circuit,
     scale_factor: float,
@@ -266,7 +266,7 @@ def fold_all(
 
 
 # Global folding function
-@noise_scaling_converter
+@circuit_scaler
 def fold_global(
     circuit: Circuit, scale_factor: float, **kwargs: Any
 ) -> Circuit:
@@ -540,7 +540,7 @@ def _apply_fold_mask(
     return folded_circuit
 
 
-@noise_scaling_converter
+@circuit_scaler
 def fold_gates_from_left(
     circuit: Circuit, scale_factor: float, **kwargs: Any
 ) -> Circuit:
@@ -625,7 +625,7 @@ def fold_gates_from_left(
     )
 
 
-@noise_scaling_converter
+@circuit_scaler
 def fold_gates_from_right(
     circuit: Circuit, scale_factor: float, **kwargs: Any
 ) -> Circuit:
@@ -710,7 +710,7 @@ def fold_gates_from_right(
     )
 
 
-@noise_scaling_converter
+@circuit_scaler
 def fold_gates_at_random(
     circuit: Circuit,
     scale_factor: float,

@@ -19,7 +19,7 @@ from cirq import (
     MeasurementGate,
     Qid,
 )
-from mitiq.interface import noise_scaling_converter
+from mitiq.interface import circuit_scaler
 from mitiq import QPROGRAM
 
 
@@ -104,7 +104,7 @@ def compute_parameter_variance(
     return variance
 
 
-@noise_scaling_converter
+@circuit_scaler
 def scale_parameters(
     circuit: QPROGRAM,
     scale_factor: float,
