@@ -37,6 +37,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 import qiskit
+from qiskit_ibm_provider import IBMProvider
 
 from mitiq.interface.mitiq_qiskit import to_qiskit
 from mitiq import ddd, QPROGRAM
@@ -144,7 +145,7 @@ correct_bitstring=[0, 0]
 
 ```{code-cell} ipython3
 if USE_REAL_HARDWARE:
-    provider = qiskit.IBMQ.load_account()
+    provider = IBMProvider()
     backend = provider.get_backend("ibmq_lima")
 else:
     from qiskit.providers.fake_provider import FakeLima as FakeLima

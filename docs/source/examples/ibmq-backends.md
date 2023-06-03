@@ -30,6 +30,8 @@ backends, broken down in the following steps.
 ```{code-cell} ipython3
 import qiskit
 from qiskit.test.ibmq_mock import mock_get_backend
+from qiskit_aer import Aer
+from qiskit_ibm_provider import IBMProvider
 
 from mitiq import zne
 from mitiq.interface.mitiq_qiskit.qiskit_utils import initialized_depolarizing_noise
@@ -79,12 +81,12 @@ We define this function in the following code block. Because we are using IBMQ b
 for instructions to create an account, save credentials, and see online quantum computers.
 
 ```{code-cell} ipython3
-if qiskit.IBMQ.stored_account() and USE_REAL_HARDWARE:
-    provider = qiskit.IBMQ.load_account()
+if IBMProvider.saved_accounts() and USE_REAL_HARDWARE:
+    provider = IBMProvider()
     backend = provider.get_backend("ibmq_qasm_simulator")  # Set quantum computer here!
 else:
     # Default to a simulator.
-    backend = qiskit.Aer.get_backend("qasm_simulator"),
+    backend = Aer.get_backend("qasm_simulator"),
 
 
 def ibmq_executor(circuit: qiskit.QuantumCircuit, shots: int = 8192) -> float:
@@ -107,7 +109,7 @@ def ibmq_executor(circuit: qiskit.QuantumCircuit, shots: int = 8192) -> float:
         noise_model = initialized_depolarizing_noise(noise_level=0.02)
         job = qiskit.execute(
             experiments=circuit,
-            backend=qiskit.Aer.get_backend("qasm_simulator"),
+            backend=Aer.get_backend("qasm_simulator"),
             noise_model=noise_model,
             basis_gates=noise_model.basis_gates,
             optimization_level=0,  # Important to preserve folded gates.
@@ -210,7 +212,7 @@ else:
     noise_model = initialized_depolarizing_noise(noise_level=0.05)
     job = qiskit.execute(
         experiments=folded_circuits,
-        backend=qiskit.Aer.get_backend("qasm_simulator"),
+        backend=Aer.get_backend("qasm_simulator"),
         noise_model=noise_model,
         basis_gates=noise_model.basis_gates,
         optimization_level=0,  # Important to preserve folded gates.
