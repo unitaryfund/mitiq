@@ -127,6 +127,19 @@ def test_from_mitiq(to_type):
     assert input_type == to_type
 
 
+def test_unsupported_circuit_error():
+    class CircuitStr(str):
+        __module__ = "qasm"
+
+    mock_circuit = CircuitStr("mock")
+
+    with pytest.raises(
+        UnsupportedCircuitError,
+        match="Conversion to circuit type unsupported_circuit_type is unsupported.",
+    ):
+        convert_from_mitiq(mock_circuit, "unsupported_circuit_type")
+
+
 @pytest.mark.parametrize(
     "circuit_and_expected",
     [
