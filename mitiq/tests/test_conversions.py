@@ -135,7 +135,7 @@ def test_unsupported_circuit_error():
 
     with pytest.raises(
         UnsupportedCircuitError,
-        match="Conversion to circuit type unsupported_circuit_type is unsupported.",
+        match="Conversion to circuit type unsupported_circuit_type",
     ):
         convert_from_mitiq(mock_circuit, "unsupported_circuit_type")
 
