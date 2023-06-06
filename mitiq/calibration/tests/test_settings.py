@@ -305,3 +305,12 @@ def test_to_dict():
         "factory": "LinearFactory",
         "scale_factors": [1.0, 2.0],
     }
+
+
+def test_num_circuits_required():
+    undefine_strategy = Strategy(
+            id = 1,
+            technique = MitigationTechnique.RAW,
+            technique_params = {},
+    )
+    assert undefine_strategy.num_circuits_required() == 0
