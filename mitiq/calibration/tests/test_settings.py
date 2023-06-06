@@ -309,8 +309,8 @@ def test_to_dict():
 
 def test_num_circuits_required():
     undefine_strategy = Strategy(
-            id = 1,
-            technique = MitigationTechnique.RAW,
-            technique_params = {},
+        id=1,
+        technique=MitigationTechnique.RAW,
+        technique_params={},
     )
     assert undefine_strategy.num_circuits_required() == 0
