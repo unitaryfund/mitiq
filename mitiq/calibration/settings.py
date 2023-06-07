@@ -247,7 +247,7 @@ class Strategy:
             return summary["num_samples"]
         elif self.technique is MitigationTechnique.RAW:
             return 1
-        return 0
+        return None
 
 
 class Settings:
