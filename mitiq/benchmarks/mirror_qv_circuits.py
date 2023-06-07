@@ -51,7 +51,6 @@ def generate_mirror_qv_circuit(
 
     Returns:
         A quantum volume circuit acting on ``num_qubits`` qubits.
-        A list of the bitstrings for the returned circuit.
     """
     if depth <= 0:
         raise ValueError(
