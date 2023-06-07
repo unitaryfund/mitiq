@@ -11,6 +11,7 @@ import pytest
 import numpy as np
 import cirq
 import qiskit
+from qiskit_aer import AerSimulator
 
 from mitiq.zne import (
     inference,
@@ -278,9 +279,7 @@ def qiskit_executor(qp: QPROGRAM, shots: int = 10000) -> float:
 
 def get_counts(circuit: qiskit.QuantumCircuit):
     return (
-        qiskit.execute(
-            circuit, qiskit.Aer.get_backend("aer_simulator"), shots=100
-        )
+        qiskit.execute(circuit, AerSimulator(), shots=100)
         .result()
         .get_counts()
     )

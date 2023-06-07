@@ -5,7 +5,7 @@
 
 """Functions for converting to/from Mitiq's internal circuit representation."""
 from functools import wraps
-from typing import Any, Callable, cast, Iterable, Tuple, Dict, Union
+from typing import Any, Callable, cast, Iterable, Tuple, Dict
 
 from cirq import Circuit
 
@@ -20,25 +20,24 @@ class CircuitConversionError(Exception):
     pass
 
 
-register_to_dict: Dict[Tuple[str, str], Callable[[Any], Circuit]]
+FROM_MITIQ_DICT: Dict[str, Callable[[Circuit], Any]]
 try:
-    register_to_dict
+    FROM_MITIQ_DICT
 except NameError:
-    register_to_dict = {}
+    FROM_MITIQ_DICT = {}
 
-register_from_dict: Dict[Tuple[str, str], Callable[[Circuit], Any]]
+TO_MITIQ_DICT: Dict[str, Callable[[Any], Circuit]]
 try:
-    register_from_dict
+    TO_MITIQ_DICT
 except NameError:
-    register_from_dict = {}
+    TO_MITIQ_DICT = {}
 
 
-def register_mitiq_converter(
+def register_mitiq_converters(
     package_name: str,
-    direction: str,
-    convert_function: Union[
-        Callable[[Any], Circuit], Callable[[Circuit], Any]
-    ],
+    *,
+    convert_to_function: Callable[[Circuit], Any],
+    convert_from_function: Callable[[Any], Circuit],
 ) -> None:
     """Registers converters for unsupported circuit types.
 
@@ -47,22 +46,15 @@ def register_mitiq_converter(
             supported by Mitiq. Note: this name should be the same as the
             return from "circuit".__module__.
                  See mitiq.SUPPORTED_PROGRAM_TYPES.
-        direction: Specifies the conversion direction relative to the non-Mitiq
-            circuit. i.e. "from" returns a Mitiq/Cirq circuit, "to" returns a
-            Non-Mitiq circuit.
-        convert_function: User specified function to convert to and from an
-            unsupported circuit type. These functions should follow the
-            direction hint above: "from" returns a Mitiq/Cirq circuit,
-            "to" returns a Non-Mitiq circuit.
+        convert_to_function: User specified function to convert to an
+            unsupported circuit type. This function returns a Non-Mitiq
+            circuit.
+        convert_function: User specified function to convert from an
+            unsupported circuit type. This function returns a Mitiq/Cirq
+            circuit.
     """
-    if direction not in ["to", "from"]:
-        raise ValueError("Invalid direction. Expected 'to' or 'from'.")
-    elif direction == "to":
-        global register_to_dict
-        register_to_dict[(package_name, direction)] = convert_function
-    else:
-        global register_from_dict
-        register_from_dict[(package_name, direction)] = convert_function
+    FROM_MITIQ_DICT[package_name] = convert_to_function
+    TO_MITIQ_DICT[package_name] = convert_from_function
 
 
 def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
@@ -108,6 +100,11 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
 
         input_circuit_type = "pennylane"
         conversion_function = from_pennylane
+
+    elif package in TO_MITIQ_DICT:
+        input_circuit_type = package
+        conversion_function = TO_MITIQ_DICT[package]
+
     elif isinstance(circuit, Circuit):
         input_circuit_type = "cirq"
 
@@ -115,18 +112,12 @@ def convert_to_mitiq(circuit: QPROGRAM) -> Tuple[Circuit, str]:
             return circ
 
     else:
-        for package_name, _ in register_from_dict:
-            if package_name in package:
-                input_circuit_type = package_name
-                conversion_function = register_from_dict[package_name, "from"]
-                break
-        else:
-            raise UnsupportedCircuitError(
-                f"Circuit from module {package} is not supported.\n\n"
-                f"Please define a converter with register_mitiq_converter(),"
-                f"\n or specify a supported Circuit type:"
-                f"\n {SUPPORTED_PROGRAM_TYPES}"
-            )
+        raise UnsupportedCircuitError(
+            f"Circuit from module {package} is not supported.\n\n"
+            f"Please register converters with register_mitiq_converters(),"
+            f"\n or specify a supported Circuit type:"
+            f"\n {SUPPORTED_PROGRAM_TYPES}"
+        )
 
     try:
         mitiq_circuit = conversion_function(circuit)
@@ -168,24 +159,22 @@ def convert_from_mitiq(circuit: Circuit, conversion_type: str) -> QPROGRAM:
         from mitiq.interface.mitiq_pennylane.conversions import to_pennylane
 
         conversion_function = to_pennylane
+    elif conversion_type in FROM_MITIQ_DICT:
+        conversion_function = FROM_MITIQ_DICT[conversion_type]
+
     elif conversion_type == "cirq":
 
         def conversion_function(circ: Circuit) -> Circuit:
             return circ
 
     else:
-        for package_name, _ in register_to_dict:
-            if package_name == conversion_type:
-                conversion_function = register_to_dict[package_name, "to"]
-                break
-        else:
-            raise UnsupportedCircuitError(
-                f"Conversion to circuit type {conversion_type} is unsupported."
-                f"\n\n Please register a converter with"
-                f"register_mitiq_converter(),"
-                f"\n or specify a supported Circuit type:"
-                f"\n {SUPPORTED_PROGRAM_TYPES}"
-            )
+        raise UnsupportedCircuitError(
+            f"Conversion to circuit type {conversion_type} is unsupported."
+            f"\n\n Please register converters with"
+            f"register_mitiq_converters(),"
+            f"\n or specify a supported Circuit type:"
+            f"\n {SUPPORTED_PROGRAM_TYPES}"
+        )
 
     try:
         converted_circuit = conversion_function(circuit)
