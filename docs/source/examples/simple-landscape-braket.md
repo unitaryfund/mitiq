@@ -60,7 +60,9 @@ print(circuit)
 ```
 
 ## Defining the executor functions with and without noise
-To use error mitigation methods in Mitiq, we define an executor function which computes the expectation value of a simple Hamiltonian $H=Z \otimes Z$, i.e., Pauli-$Z$ on each qubit. To compare to the noiseless result, we define both a noiseless and a noisy executor below.More information about executors can be found [here](../guide/executors.md).
+To use error mitigation methods in Mitiq, we define an executor function which computes the expectation value of a simple Hamiltonian $H=Z \otimes Z$, i.e., Pauli-$Z$ on each qubit.
+To compare to the noiseless result, we define both a noiseless and a noisy executor below.
+More information about executors can be found [here](../guide/executors.md).
 
 ```{code-cell} ipython3
 # Observable to measure
