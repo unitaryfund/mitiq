@@ -216,6 +216,7 @@ class Strategy:
             summary["is_qubit_dependent"] = self.technique_params[
                 "is_qubit_dependent"
             ]
+            summary["num_samples"] = self.technique_params["num_samples"]
         return summary
 
     def print_line(self, performance: str, circuit_type: str) -> None:
@@ -237,6 +238,16 @@ class Strategy:
 
     def __repr__(self) -> str:
         return str(self.to_dict())
+
+    def num_circuits_required(self) -> int:
+        summary = self.to_dict()
+        if self.technique is MitigationTechnique.ZNE:
+            return len(summary["scale_factors"])
+        elif self.technique is MitigationTechnique.PEC:
+            return summary["num_samples"]
+        elif self.technique is MitigationTechnique.RAW:
+            return 1
+        return None
 
 
 class Settings:

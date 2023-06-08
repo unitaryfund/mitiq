@@ -295,6 +295,7 @@ def test_to_dict():
         ],
         "is_qubit_dependent": False,
         "noise_level": 0.001,
+        "num_samples": 200,
     }
 
     zne_strategy = light_zne_settings.make_strategies()[0]
@@ -304,3 +305,12 @@ def test_to_dict():
         "factory": "LinearFactory",
         "scale_factors": [1.0, 2.0],
     }
+
+
+def test_num_circuits_required_raw_execution():
+    undefine_strategy = Strategy(
+        id=1,
+        technique=MitigationTechnique.RAW,
+        technique_params={},
+    )
+    assert undefine_strategy.num_circuits_required() == 1
