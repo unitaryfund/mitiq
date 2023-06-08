@@ -47,6 +47,12 @@
    :members:
 ```
 
+### Mirror Quantum Volume Circuits
+```{eval-rst}
+.. automodule:: mitiq.benchmarks.mirror_qv_circuits
+   :members:
+```
+
 ## Circuit types and result types
 
 ```{eval-rst}

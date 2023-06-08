@@ -47,7 +47,7 @@ def generate_quantum_volume_circuit(
 
     Args:
         num_qubits: The number of qubits in the generated circuit.
-        depth: The number of qubits in the generated circuit.
+        depth: The number of layers in the generated circuit.
         decompose: Recursively decomposes the randomly sampled (numerical)
             unitary matrix gates into simpler gates.
         seed: Seed for generating random circuit.
