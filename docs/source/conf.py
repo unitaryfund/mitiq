@@ -341,6 +341,7 @@ nbsphinx_thumbnails = {
     "examples/pennylane-ibmq-backends": "_static/zne-pennylane.png",
     "examples/ibmq-backends": "_static/ibmq-gate-map.png",
     "examples/simple-landscape-cirq": "_static/simple-landscape-cirq.png",
+    "examples/simple-landscape-braket": "_static/simple-landscape-braket.png",
     "examples/molecular_hydrogen": "_static/molecular-hydrogen-vqe.png",
     "examples/molecular_hydrogen_pennylane": "_static/mol-h2-vqe-pl.png",
     "examples/vqe-pyquil-demo": "_static/vqe-pyquil-demo.png",

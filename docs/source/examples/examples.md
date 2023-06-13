@@ -12,6 +12,7 @@ ZNE on IBM Quantum backends with Cirq <cirq-ibmq-backends.md>
 ZNE with PyQuil: Parametric programs <pyquil_demo.ipynb>
 ZNE with PyQuil: Improving VQE <vqe-pyquil-demo.ipynb>
 ZNE with Cirq: Energy landscape of a variational circuit <simple-landscape-cirq.md>
+ZNE with Braket: Energy landscape of a variational circuit <simple-landscape-braket.md>
 ZNE with Qiskit: Energy landscape of a variational circuit <simple-landscape-qiskit.md>
 ZNE with Cirq: Solving MaxCut with QAOA <maxcut-demo.md>
 ZNE with Cirq: Hamiltonian simulation with Pauli gates<hamiltonians.md>
