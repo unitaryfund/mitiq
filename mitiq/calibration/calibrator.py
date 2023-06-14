@@ -21,14 +21,23 @@ from mitiq.calibration.settings import (
     ZNESettings,
     Strategy,
     BenchmarkProblem,
+    MitigationTechnique,
 )
 from mitiq.interface import convert_from_mitiq
 
-TABLE_HEADER_STR = (
+TABLE_HEADER_STR_ZNE = (
     "| performance | circuit | method | extrapolation | scale factors "
     "| scale_method         |\n"
     "| ----------- | ------- | ------ | ------------- | ------------- "
     "| -------------------- |"
+)
+
+TABLE_HEADER_STR_PEC = (
+    "| performance | circuit | method | "
+    "representation function | noise level | noise bias factor "
+    "| qubit dependent |\n"
+    "| ----------- | ------- | ------ | ----------------------- | ----------- "
+    "| ----------------- | --------------- | "
 )
 
 
@@ -198,7 +207,10 @@ class Calibrator:
             self.results.reset_data()
 
         if log:
-            print(TABLE_HEADER_STR)
+            if self.strategies[0].technique is MitigationTechnique.ZNE:
+                print(TABLE_HEADER_STR_ZNE)
+            elif self.strategies[0].technique is MitigationTechnique.PEC:
+                print(TABLE_HEADER_STR_PEC)
 
         for problem in self.problems:
             # Benchmark circuits have no measurements, so we append them.
@@ -210,12 +222,22 @@ class Calibrator:
                 self.cirq_executor, bitstring_to_measure
             )
             noisy_value = expval_executor.evaluate(circuit)[0]
-            for strategy in self.strategies:
+            for count, strategy in enumerate(self.strategies):
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", UserWarning)
                     mitigated_value = strategy.mitigation_function(
                         circuit, expval_executor
                     )
+                if (
+                    log
+                    and count
+                    and strategy.technique
+                    is not self.strategies[count - 1].technique
+                ):
+                    if strategy.technique is MitigationTechnique.ZNE:
+                        print(TABLE_HEADER_STR_ZNE)
+                    elif strategy.technique is MitigationTechnique.PEC:
+                        print(TABLE_HEADER_STR_PEC)
                 self.results.add_result(
                     strategy,
                     problem,
