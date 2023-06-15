@@ -203,6 +203,10 @@ class Strategy:
                 "representation_function"
             ]
             summary["noise_level"] = self.technique_params["noise_level"]
+            summary["is_qubit_dependent"] = self.technique_params[
+                "is_qubit_dependent"
+            ]
+            summary["num_samples"] = self.technique_params["num_samples"]
         return summary
 
     def print_line(self, performance: str, circuit_type: str) -> None:
