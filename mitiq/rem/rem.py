@@ -40,6 +40,8 @@ def execute_with_rem(
     """
     if not isinstance(executor, Executor):
         executor_obj = Executor(executor)
+    else:
+        executor_obj = executor
 
     executor_with_rem = mitigate_executor(
         executor_obj, inverse_confusion_matrix=inverse_confusion_matrix

@@ -102,7 +102,7 @@ def test_rem_with_matrix():
 
     mitigated = execute_with_rem(
         circ,
-        noisy_executor,
+        Executor(noisy_executor),
         observable,
         inverse_confusion_matrix=inverse_confusion_matrix,
     )
