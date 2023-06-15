@@ -7,7 +7,6 @@
 
 from typing import Callable, Union, List, Sequence, cast
 from types import MethodType
-from copy import deepcopy
 from functools import wraps
 import numpy as np
 import numpy.typing as npt
@@ -76,7 +75,7 @@ def mitigate_executor(
     if not isinstance(executor, Executor):
         executor_obj = Executor(executor)
     else:
-        executor_obj = deepcopy(executor)
+        executor_obj = executor
 
     def post_run(
         self: Executor,
