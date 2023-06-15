@@ -18,6 +18,8 @@ from mitiq.calibration import (
     execute_with_mitigation,
 )
 from mitiq.calibration.calibrator import (
+    TABLE_HEADER_STR_PEC,
+    TABLE_HEADER_STR_ZNE,
     convert_to_expval_executor,
     ExperimentResults,
     MissingResultsError,
@@ -358,9 +360,14 @@ def test_ExtrapolationResults_best_strategy():
 def test_logging(capfd, settings):
     cal = Calibrator(damping_execute, frontend="cirq", settings=settings)
     cal.run(log=True)
-
     captured = capfd.readouterr()
+    if settings is ZNESettings:
+        table_header_str = TABLE_HEADER_STR_ZNE
+    elif settings is PECSettings:
+        table_header_str = TABLE_HEADER_STR_PEC
     assert "circuit" in captured.out
+    assert (table_header_str) in captured.out
+    assert settings.get_strategy(1).technique.name in captured.out
 
 
 def test_ExperimentResults_reset_data():
