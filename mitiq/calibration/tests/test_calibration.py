@@ -27,6 +27,7 @@ from mitiq.calibration.settings import (
     Strategy,
     MitigationTechnique,
     BenchmarkProblem,
+    ZNESettings,
 )
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import fold_global
@@ -353,8 +354,9 @@ def test_ExtrapolationResults_best_strategy():
     assert er.best_strategy_id() == 4
 
 
-def test_logging(capfd):
-    cal = Calibrator(damping_execute, frontend="cirq")
+@pytest.mark.parametrize("settings", [ZNESettings, PECSettings])
+def test_logging(capfd, settings):
+    cal = Calibrator(damping_execute, frontend="cirq", settings=settings)
     cal.run(log=True)
 
     captured = capfd.readouterr()

@@ -197,20 +197,17 @@ class Strategy:
             summary["scale_method"] = self.technique_params[
                 "scale_noise"
             ].__name__
+
         elif self.technique is MitigationTechnique.PEC:
             summary["representation_function"] = self.technique_params[
                 "representation_function"
             ]
             summary["noise_level"] = self.technique_params["noise_level"]
-            summary["is_qubit_dependent"] = self.technique_params[
-                "is_qubit_dependent"
-            ]
-            summary["num_samples"] = self.technique_params["num_samples"]
         return summary
 
     def print_line(self, performance: str, circuit_type: str) -> None:
-        summary = self.to_dict()
         if self.technique is MitigationTechnique.ZNE:
+            summary = self.to_dict()
             str_scale_factors = str(summary["scale_factors"])[1:-1]
             row = (
                 performance,
@@ -220,20 +217,22 @@ class Strategy:
                 str_scale_factors,
                 summary["scale_method"],
             )
+            print(
+                "| {:^10} | {:^7} | {:^6} | {:<13} | {:<13} | {:<20} |".format(
+                    *row
+                )
+            )
         elif self.technique is MitigationTechnique.PEC:
+            summary = self.to_dict()
             row = (
                 performance,
                 circuit_type,
                 self.technique.name,
-                str(summary["representation_function"])[35:54],
-                summary["noise_level"],
-                str(summary["num_samples"]),
+                summary["representation_function"],
+                str(summary["operations"]),
+                str(summary["noise_level"]),
             )
-        print(
-            "| {:^10} | {:^7} | {:^6} | {:<13} | {:<13} | {:<20} |".format(
-                *row
-            )
-        )
+            print(row)
 
     def __repr__(self) -> str:
         return str(self.to_dict())

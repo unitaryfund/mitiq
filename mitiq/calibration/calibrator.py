@@ -34,10 +34,10 @@ TABLE_HEADER_STR_ZNE = (
 
 TABLE_HEADER_STR_PEC = (
     "| performance | circuit | method | "
-    "representation function | noise level | noise bias factor "
-    "| qubit dependent |\n"
-    "| ----------- | ------- | ------ | ----------------------- | ----------- "
-    "| ----------------- | --------------- | "
+    "representation function | operations to mitigate | noise level | "
+    " qubit dependent |\n"
+    "| ----------- | ------- | ------ | ----------------------- "
+    "| ---------------------- | ----------- | --------------- | "
 )
 
 
