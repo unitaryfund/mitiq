@@ -356,18 +356,57 @@ def test_ExtrapolationResults_best_strategy():
     assert er.best_strategy_id() == 4
 
 
-@pytest.mark.parametrize("settings", [ZNESettings, PECSettings])
+light_combined_settings = Settings(
+    [
+        {
+            "circuit_type": "mirror",
+            "num_qubits": 1,
+            "circuit_depth": 1,
+        },
+        {
+            "circuit_type": "mirror",
+            "num_qubits": 2,
+            "circuit_depth": 1,
+        },
+    ],
+    strategies=[
+        {
+            "technique": "pec",
+            "representation_function": (
+                represent_operation_with_local_depolarizing_noise
+            ),
+            "operations": [
+                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
+                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
+            ],
+            "is_qubit_dependent": False,
+            "noise_level": 0.001,
+            "num_samples": 200,
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": LinearFactory([1.0, 2.0]),
+        },
+    ],
+)
+
+
+@pytest.mark.parametrize(
+    "settings", [ZNESettings, light_pec_settings, light_combined_settings]
+)
 def test_logging(capfd, settings):
     cal = Calibrator(damping_execute, frontend="cirq", settings=settings)
     cal.run(log=True)
     captured = capfd.readouterr()
-    if settings is ZNESettings:
-        table_header_str = TABLE_HEADER_STR_ZNE
-    elif settings is PECSettings:
-        table_header_str = TABLE_HEADER_STR_PEC
     assert "circuit" in captured.out
-    assert (table_header_str) in captured.out
-    assert settings.get_strategy(1).technique.name in captured.out
+    assert settings.get_strategy(0).technique.name in captured.out
+    if settings is ZNESettings:
+        assert TABLE_HEADER_STR_ZNE in captured.out
+    elif settings is light_pec_settings:
+        assert TABLE_HEADER_STR_PEC in captured.out
+    elif settings is light_combined_settings:
+        assert TABLE_HEADER_STR_ZNE, TABLE_HEADER_STR_PEC in captured.out
 
 
 def test_ExperimentResults_reset_data():
