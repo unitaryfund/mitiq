@@ -356,19 +356,8 @@ def test_ExtrapolationResults_best_strategy():
     assert er.best_strategy_id() == 4
 
 
-light_combined_settings = Settings(
-    [
-        {
-            "circuit_type": "mirror",
-            "num_qubits": 1,
-            "circuit_depth": 1,
-        },
-        {
-            "circuit_type": "mirror",
-            "num_qubits": 2,
-            "circuit_depth": 1,
-        },
-    ],
+light_combined_settings1 = Settings(
+    benchmarks=light_zne_settings.benchmarks,
     strategies=[
         {
             "technique": "pec",
@@ -390,10 +379,39 @@ light_combined_settings = Settings(
         },
     ],
 )
+light_combined_settings2 = Settings(
+    benchmarks=light_zne_settings.benchmarks,
+    strategies=[
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": LinearFactory([1.0, 2.0]),
+        },
+        {
+            "technique": "pec",
+            "representation_function": (
+                represent_operation_with_local_depolarizing_noise
+            ),
+            "operations": [
+                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
+                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
+            ],
+            "is_qubit_dependent": False,
+            "noise_level": 0.001,
+            "num_samples": 200,
+        },
+    ],
+)
 
 
 @pytest.mark.parametrize(
-    "settings", [ZNESettings, light_pec_settings, light_combined_settings]
+    "settings",
+    [
+        ZNESettings,
+        light_pec_settings,
+        light_combined_settings1,
+        light_combined_settings2,
+    ],
 )
 def test_logging(capfd, settings):
     cal = Calibrator(damping_execute, frontend="cirq", settings=settings)
@@ -405,7 +423,7 @@ def test_logging(capfd, settings):
         assert TABLE_HEADER_STR_ZNE in captured.out
     elif settings is light_pec_settings:
         assert TABLE_HEADER_STR_PEC in captured.out
-    elif settings is light_combined_settings:
+    elif settings is [light_combined_settings1, light_combined_settings2]:
         assert TABLE_HEADER_STR_ZNE, TABLE_HEADER_STR_PEC in captured.out
 
 
