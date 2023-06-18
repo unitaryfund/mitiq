@@ -5,9 +5,8 @@
 
 """Functions for computing the projector for subspace expansion."""
 
-from typing import Callable, Sequence, Union
+from typing import Callable, Sequence, Union, Dict
 from mitiq import Observable, QPROGRAM, QuantumResult, PauliString
-from typing import Dict
 import numpy as np
 import numpy.typing as npt
 from scipy.linalg import eigh
@@ -19,13 +18,13 @@ def get_projector(
     executor: Callable[[QPROGRAM], QuantumResult],
     check_operators: Sequence[PauliString],
     code_hamiltonian: Observable,
+    pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
 ) -> Observable:
     """Computes the projector onto the code space defined by the
     check_operators provided that minimizes the code_hamiltonian.
 
     Returns: Projector as an Observable.
     """
-    pauli_string_to_expectation_cache: Dict[PauliString, complex] = {}
     S = _compute_overlap_matrix(
         circuit, executor, check_operators, pauli_string_to_expectation_cache
     )
@@ -48,12 +47,18 @@ def get_projector(
     return projector
 
 
-def _get_expectation_value_for_observable(
+def get_expectation_value_for_observable(
     circuit: QPROGRAM,
     executor: Callable[[QPROGRAM], QuantumResult],
     observable: Union[PauliString, Observable],
     pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
 ) -> float:
+    """Provide pauli_string_to_expectation_cache if you want to take advantage
+    of caching.
+
+    This function modifies pauli_string_to_expectation_cache in place.
+    """
+
     def get_expectation_value_for_one_pauli(
         pauli_string: PauliString,
     ) -> float:
@@ -91,7 +96,7 @@ def _compute_overlap_matrix(
     for i in range(len(check_operators)):
         S.append([])
         for j in range(len(check_operators)):
-            sij = _get_expectation_value_for_observable(
+            sij = get_expectation_value_for_observable(
                 circuit,
                 executor,
                 check_operators[i] * check_operators[j],
@@ -114,7 +119,7 @@ def _compute_hamiltonian_overlap_matrix(
         H.append([])
         for j in range(len(check_operators)):
             H[-1].append(
-                _get_expectation_value_for_observable(
+                get_expectation_value_for_observable(
                     circuit,
                     executor,
                     check_operators[i] * code_hamiltonian * check_operators[j],
