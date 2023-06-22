@@ -148,41 +148,31 @@ class Strategy:
     technique_params: Dict[str, Any]
 
     @property
-    def representations(self) -> Union[List[OperationRepresentation], None]:
-        if self.technique is MitigationTechnique.PEC:
-            rep_function = self.technique_params["representation_function"]
-            operations = self.technique_params["operations"]
-            noise_level = self.technique_params["noise_level"]
-            is_qubit_dependent = self.technique_params["is_qubit_dependent"]
-            return [
-                rep_function(
-                    op,
-                    noise_level,
-                    is_qubit_dependent,
-                )
-                for op in operations
-            ]
-        return None
-
-    @property
     def mitigation_function(self) -> Callable[..., float]:
         if self.technique is MitigationTechnique.PEC:
-            exclude_params = [
-                "representation_function",
-                "operations",
-                "noise_level",
-                "is_qubit_dependent",
-            ]
-            pec_params = {
-                k: self.technique_params[k]
-                for k in set(list(self.technique_params.keys()))
-                - set(exclude_params)
-            }
-            return partial(
-                self.technique.mitigation_function,
-                representations=self.representations,
-                **pec_params,
-            )
+            def partial_pec(circuit, execute):
+                rep_function = self.technique_params["representation_function"]           
+                operations = []
+                for op in circuit.all_operations():
+                    if len(op.qubits)>=2 and op not in operations:
+                        operations.append(cirq.Circuit(op))                    
+                noise_level = self.technique_params["noise_level"]
+                #is_qubit_dependent = self.technique_params["is_qubit_dependent"]
+                num_samples = self.technique_params["num_samples"]
+                reps = [
+                    rep_function(
+                        op,
+                        noise_level,
+                    )
+                    for op in operations
+                ]                
+                return self.technique.mitigation_function(
+                    circuit, 
+                    execute, 
+                    representations=reps,
+                    num_samples=num_samples,
+                )
+            return partial_pec
         elif self.technique is MitigationTechnique.ZNE:
             return partial(
                 self.technique.mitigation_function, **self.technique_params
@@ -219,23 +209,34 @@ class Strategy:
             summary["num_samples"] = self.technique_params["num_samples"]
         return summary
 
+    
     def print_line(self, performance: str, circuit_type: str) -> None:
         summary = self.to_dict()
-        str_scale_factors = str(summary["scale_factors"])[1:-1]
-        row = (
-            performance,
-            circuit_type,
-            self.technique.name,
-            summary["factory"][:-7],
-            str_scale_factors,
-            summary["scale_method"],
-        )
+        if self.technique is MitigationTechnique.ZNE:
+            str_scale_factors = str(summary["scale_factors"])[1:-1]
+            row = (
+                performance,
+                circuit_type,
+                self.technique.name,
+                summary["factory"][:-7],
+                str_scale_factors,
+                summary["scale_method"],
+            )
+        elif self.technique is MitigationTechnique.PEC:
+            row = (
+                performance,
+                circuit_type,
+                self.technique.name,
+                str(summary["representation_function"])[35:54],
+                summary["noise_level"],
+                str(summary["num_samples"]),
+                
+            )
         print(
             "| {:^10} | {:^7} | {:^6} | {:<13} | {:<13} | {:<20} |".format(
                 *row
             )
         )
-
     def __repr__(self) -> str:
         return str(self.to_dict())
 
@@ -467,10 +468,6 @@ PECSettings = Settings(
             "representation_function": (
                 represent_operation_with_local_depolarizing_noise
             ),
-            "operations": [
-                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
-                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
-            ],
             "is_qubit_dependent": False,
             "noise_level": 0.001,
             "num_samples": 200,
@@ -480,10 +477,6 @@ PECSettings = Settings(
             "representation_function": (
                 represent_operation_with_local_depolarizing_noise
             ),
-            "operations": [
-                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
-                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
-            ],
             "is_qubit_dependent": False,
             "noise_level": 0.01,
             "num_samples": 200,
