@@ -498,8 +498,8 @@ of input operations.
 ```{code-cell} ipython3
 :tags: ["skip-execution"]
 
-from qiskit.providers.aer.noise import NoiseModel
-from qiskit.providers.aer.noise.errors.standard_errors import (
+from qiskit_aer.noise import NoiseModel
+from qiskit_aer.noise.errors.standard_errors import (
     depolarizing_error,
 )
 from mitiq import Observable, PauliString
