@@ -282,8 +282,8 @@ mitigation:
 
 - **IBM Q**\'s [Qiskit](https://qiskit.org) provides a stack for
   quantum computing simulation and execution on real devices from the
-  cloud. In particular, `qiskit.Aer` contains the
-  {class}`~qiskit.providers.aer.noise.NoiseModel`
+  cloud. In particular, `qiskit_aer` contains the
+  {class}`~qiskit_aer.noise.NoiseModel`
   object, integrated with Mitiq tools. Qiskit\'s
   OpenPulse provides pulse-level control of qubit operations in some
   of the superconducting circuit devices. Mitiq can integrate with

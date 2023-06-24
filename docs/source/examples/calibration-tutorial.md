@@ -16,9 +16,8 @@ kernelspec:
 
 <img src="../_thumbnails/calibration.png" width="400">
 
-This tutorial helps answer the question: "What quantum error
-mitigation technique should I use for my problem?". The newly introduced
-`mitiq.calibration` module helps answer that in an optimized way, thrhough `Benchmarks` and `Strategies`.
+This tutorial helps answer the question: "What quantum error mitigation technique should I use for my problem?". 
+The newly introduced `mitiq.calibration` module helps answer that in an optimized way, through `Benchmarks` and `Strategies`.
 
 More specifically, this tutorial covers:
 
@@ -31,6 +30,12 @@ More specifically, this tutorial covers:
 ```{code-cell} ipython3
 from mitiq.benchmarks import generate_rb_circuits
 from mitiq.zne import execute_with_zne
+from mitiq.zne.scaling import (
+    fold_gates_at_random,
+    fold_global,
+    fold_all
+)
+from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq import (
     Calibrator,
     Settings,
@@ -49,8 +54,8 @@ Define global variables for the quantum circuit of interest: number of qubits, d
 
 ```{code-cell} ipython3
 n_qubits = 2
-depth_circuit = 20
-shots = 10 ** 3
+depth_circuit = 100
+shots = 10 ** 4
 ```
 
 #### Quantum circuit: Randomized benchmarking (RB)
@@ -61,10 +66,10 @@ We now use Mitiq's built-in `generate_rb_circuits` from the `mitiq.benchmarks` m
 circuit = generate_rb_circuits(n_qubits, depth_circuit,return_type="qiskit")[0]
 circuit.measure_all()
 print(len(circuit))
-print(circuit)
 ```
 
-We define a function that executes the quantum circuits and returns the expectation value. This is consumed by Mitiq's `execute_with_zne`. In this example, the expectation value is the probability of measuring the ground state, which is what one would expect from an ideal randomized benchmarking circuit.
+We define a function that executes the quantum circuits and returns the expectation value.
+This is consumed by Mitiq's `execute_with_zne`. In this example, the expectation value is the probability of measuring the ground state, which is what one would expect from an ideal randomized benchmarking circuit.
 
 ```{code-cell} ipython3
 def execute_circuit(circuit):
@@ -77,13 +82,13 @@ def execute_circuit(circuit):
 ```
 
 ```{code-cell} ipython3
-mitigated = execute_with_zne(circuit, execute_circuit)
+mitigated = execute_with_zne(circuit, execute_circuit, factory=LinearFactory([1, 3, 5]))
 unmitigated = execute_circuit(circuit)
 ideal = 1 #property of RB circuits
 
 print("ideal = \t \t",ideal)
-print("unmitigated = \t \t",unmitigated)
-print("mitigated = \t \t",mitigated)
+print("unmitigated = \t \t", "{:.5f}".format(unmitigated))
+print("mitigated = \t \t", "{:.5f}".format(mitigated))
 ```
 
 ## Using calibration to improve the results
@@ -108,21 +113,17 @@ Currently `mitiq.calibration` supports ZNE as a technique to calibrate from, tun
 Let's run the calibration using an ad-hoc RBSettings and using the `log=True` option in order to print the list of experiments run.
 
 - benchmarks: Circuit type: "rb"
-- strategies: use various "zne" strategies, testing various "scale_noise" methods (such as `mitiq.zne.scaling.folding.fold_global` and `mitiq.zne.scaling.folding.fold_gates_at_random`), and ZNE factories for extrapolation (such as `mitiq.zne.inference.RichardsonFactory` and `mitiq.zne.inference.LinearFactory`)
+- strategies: use various "zne" strategies, testing various "scale_noise" methods
+(such as `mitiq.zne.scaling.folding.fold_global`, `mitiq.zne.scaling.folding.fold_gates_at_random`, and `mitiq.zne.scaling.folding.fold_all`), 
+and ZNE factories for extrapolation (such as `mitiq.zne.inference.RichardsonFactory` and `mitiq.zne.inference.LinearFactory`)
 
 ```{code-cell} ipython3
-from mitiq.zne.inference import LinearFactory, RichardsonFactory
-from mitiq.zne.scaling import (
-    fold_gates_at_random,
-    fold_global,
-)
-
 RBSettings = Settings(
     benchmarks=[
         {
             "circuit_type": "rb",
-            "num_qubits": n_qubits,
-            "circuit_depth": depth_circuit,
+            "num_qubits": 2,
+            "circuit_depth": int(depth_circuit / 2),
         },
     ],
     strategies=[
@@ -146,6 +147,7 @@ RBSettings = Settings(
             "scale_noise": fold_global,
             "factory": LinearFactory([1.0, 3.0, 5.0]),
         },
+
         {
             "technique": "zne",
             "scale_noise": fold_gates_at_random,
@@ -166,6 +168,28 @@ RBSettings = Settings(
             "scale_noise": fold_gates_at_random,
             "factory": LinearFactory([1.0, 3.0, 5.0]),
         },
+
+        {
+            "technique": "zne",
+            "scale_noise": fold_all,
+            "factory": RichardsonFactory([1.0, 2.0, 3.0]),
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_all,
+            "factory": RichardsonFactory([1.0, 3.0, 5.0]),
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_all,
+            "factory": LinearFactory([1.0, 2.0, 3.0]),
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_all,
+            "factory": LinearFactory([1.0, 3.0, 5.0]),
+        },
+        
     ],
 )
 ```
@@ -179,11 +203,13 @@ As you can see above, several experiments were run, and each one has either a re
 
 ```{code-cell} ipython3
 calibrated_mitigated=execute_with_mitigation(circuit, execute_circuit, calibrator=cal)
-mitigated=execute_with_zne(circuit, execute_circuit)
+mitigated=execute_with_zne(circuit, execute_circuit, factory=LinearFactory([1, 3, 5]))
 unmitigated=execute_circuit(circuit)
 
 print("ideal = \t \t",ideal)
-print("unmitigated = \t \t",unmitigated)
-print("mitigated = \t \t",mitigated)
-print("calibrated_mitigated = \t",calibrated_mitigated)
+print("unmitigated = \t \t", "{:.5f}".format(unmitigated))
+print("mitigated = \t \t", "{:.5f}".format(mitigated))
+print("calibrated_mitigated = \t", "{:.5f}".format(calibrated_mitigated))
 ```
+
+We can see that the mitigated and calibrated-mitigated values show improvement over the unmitigated value, and that the calibrated value shows a larger improvement, achieving the objective of the calibration process.

@@ -5,7 +5,7 @@
 
 from dataclasses import dataclass, asdict
 from functools import partial
-from typing import Any, Callable, cast, List, Dict
+from typing import Any, Callable, cast, List, Dict, Union
 from enum import Enum, auto
 
 import networkx as nx
@@ -21,6 +21,10 @@ from mitiq.benchmarks import (
     generate_w_circuit,
 )
 from mitiq.pec import execute_with_pec
+from mitiq.pec.representations import (
+    represent_operation_with_local_depolarizing_noise,
+)
+from mitiq.pec.types.types import OperationRepresentation
 from mitiq.raw import execute
 from mitiq.zne import execute_with_zne
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
@@ -46,6 +50,12 @@ class MitigationTechnique(Enum):
             return cast(Callable[..., float], execute_with_pec)
         elif self is MitigationTechnique.RAW:
             return execute
+
+
+calibration_supported_techniques = {
+    "ZNE": MitigationTechnique.ZNE,
+    "PEC": MitigationTechnique.PEC,
+}
 
 
 @dataclass
@@ -138,10 +148,51 @@ class Strategy:
     technique_params: Dict[str, Any]
 
     @property
+    def representations(self) -> Union[List[OperationRepresentation], None]:
+        if self.technique is MitigationTechnique.PEC:
+            rep_function = self.technique_params["representation_function"]
+            operations = self.technique_params["operations"]
+            noise_level = self.technique_params["noise_level"]
+            is_qubit_dependent = self.technique_params["is_qubit_dependent"]
+            return [
+                rep_function(
+                    op,
+                    noise_level,
+                    is_qubit_dependent,
+                )
+                for op in operations
+            ]
+        return None
+
+    @property
     def mitigation_function(self) -> Callable[..., float]:
-        return partial(
-            self.technique.mitigation_function, **self.technique_params
-        )
+        if self.technique is MitigationTechnique.PEC:
+            exclude_params = [
+                "representation_function",
+                "operations",
+                "noise_level",
+                "is_qubit_dependent",
+            ]
+            pec_params = {
+                k: self.technique_params[k]
+                for k in set(list(self.technique_params.keys()))
+                - set(exclude_params)
+            }
+            return partial(
+                self.technique.mitigation_function,
+                representations=self.representations,
+                **pec_params,
+            )
+        elif self.technique is MitigationTechnique.ZNE:
+            return partial(
+                self.technique.mitigation_function, **self.technique_params
+            )
+        else:
+            raise ValueError(
+                """Specified technique is not supported by calibration.
+                    See {} for supported techniques.""",
+                calibration_supported_techniques,
+            )
 
     def to_dict(self) -> Dict[str, Any]:
         """A summary of the strategies parameters, without the technique added.
@@ -152,13 +203,20 @@ class Strategy:
         if self.technique is MitigationTechnique.ZNE:
             inference_func = self.technique_params["factory"]
             summary["factory"] = inference_func.__class__.__name__
-            summary[
-                "scale_factors"
-            ] = inference_func.get_scale_factors().tolist()
+            summary["scale_factors"] = inference_func._scale_factors
             summary["scale_method"] = self.technique_params[
                 "scale_noise"
             ].__name__
-
+        elif self.technique is MitigationTechnique.PEC:
+            summary["representation_function"] = self.technique_params[
+                "representation_function"
+            ]
+            summary["operations"] = self.technique_params["operations"]
+            summary["noise_level"] = self.technique_params["noise_level"]
+            summary["is_qubit_dependent"] = self.technique_params[
+                "is_qubit_dependent"
+            ]
+            summary["num_samples"] = self.technique_params["num_samples"]
         return summary
 
     def print_line(self, performance: str, circuit_type: str) -> None:
@@ -180,6 +238,16 @@ class Strategy:
 
     def __repr__(self) -> str:
         return str(self.to_dict())
+
+    def num_circuits_required(self) -> int:
+        summary = self.to_dict()
+        if self.technique is MitigationTechnique.ZNE:
+            return len(summary["scale_factors"])
+        elif self.technique is MitigationTechnique.PEC:
+            return summary["num_samples"]
+        elif self.technique is MitigationTechnique.RAW:
+            return 1
+        return None
 
 
 class Settings:
@@ -367,6 +435,58 @@ ZNESettings = Settings(
             "technique": "zne",
             "scale_noise": fold_gates_at_random,
             "factory": LinearFactory([1.0, 3.0, 5.0]),
+        },
+    ],
+)
+
+PECSettings = Settings(
+    benchmarks=[
+        {
+            "circuit_type": "ghz",
+            "num_qubits": 2,
+        },
+        {
+            "circuit_type": "w",
+            "num_qubits": 2,
+        },
+        {
+            "circuit_type": "rb",
+            "num_qubits": 2,
+            "circuit_depth": 7,
+        },
+        {
+            "circuit_type": "mirror",
+            "num_qubits": 2,
+            "circuit_depth": 7,
+            "circuit_seed": 1,
+        },
+    ],
+    strategies=[
+        {
+            "technique": "pec",
+            "representation_function": (
+                represent_operation_with_local_depolarizing_noise
+            ),
+            "operations": [
+                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
+                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
+            ],
+            "is_qubit_dependent": False,
+            "noise_level": 0.001,
+            "num_samples": 200,
+        },
+        {
+            "technique": "pec",
+            "representation_function": (
+                represent_operation_with_local_depolarizing_noise
+            ),
+            "operations": [
+                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
+                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
+            ],
+            "is_qubit_dependent": False,
+            "noise_level": 0.01,
+            "num_samples": 200,
         },
     ],
 )

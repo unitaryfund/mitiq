@@ -149,19 +149,13 @@ def sample_circuit(
     norm = 1.0
 
     for op in ideal.all_operations():
-        # Ignore all measurements.
-        if cirq.is_measurement(op):
-            continue
-
         sequences, loc_signs, loc_norm = sample_sequence(
             cirq.Circuit(op),
             representations,
             num_samples=num_samples,
             random_state=random_state,
         )
-
         norm *= loc_norm
-
         for j in range(num_samples):
             sampled_signs[j] *= loc_signs[j]
             cirq_seq, _ = convert_to_mitiq(sequences[j])

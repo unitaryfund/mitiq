@@ -93,6 +93,13 @@ If above format check fails then you will be presented with a [diff](https://bla
 ```bash
 make format
 ```
+We also use [Mypy](https://mypy.readthedocs.io/en/stable/) as a type checker to find incompatible types compared to the type
+hints in your code. To test this locally, run the type check test in the top-level directory of the repository. 
+
+To find incorrectly used types by type checking in `mypy`, use
+```bash
+make check-types
+```
 
 If you aren't presented with any errors, then that means your code is ready to commit!
 
@@ -123,33 +130,6 @@ Milestones are tracked using the [GitHub milestone feature](https://github.com/u
 
 All releases for Mitiq are tagged on the `master` branch with tags for the version number of the release.
 Find all the previous releases [here](https://github.com/unitaryfund/mitiq/releases).
-
----
-### Special Note for Windows Users Using Python 3.8:
-To prevent errors when running `make docs` and `make doctest`, Windows developers using Python 3.8 will also need to edit `__init__.py` in their environment's asyncio directory.
-This is due to Python changing `asyncio`'s [default event loop in Windows beginning in Python 3.8](https://docs.python.org/3/library/asyncio-policy.html#asyncio.DefaultEventLoopPolicy).
-The new default event loop will not support Unix-style APIs used by some dependencies.
-1. Locate your environment directory (likely `C:\Users\{username}\anaconda3\envs\{your_env}`), and open `{env_dir}/Lib/asyncio/__init__.py`.
-2. Add `import asyncio` to the file's import statements.
-3. Find the block of code below and replace it with the provided replacement.
-    * Original Code
-
-          if sys.platform == 'win32':  # pragma: no cover
-              from .windows_events import *
-              __all__ += windows_events.__all__
-          else:
-              from .unix_events import *  # pragma: no cover
-              __all__ += unix_events.__all__
-
-    * Replacement Code
-
-          if sys.platform == 'win32':  # pragma: no cover
-              from .windows_events import *
-              asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-              __all__ += windows_events.__all__
-          else:
-              from .unix_events import *  # pragma: no cover
-              __all__ += unix_events.__all__
 
 ## Code of conduct
 Mitiq development abides to the [Contributors' Covenant](https://mitiq.readthedocs.io/en/latest/code_of_conduct.html).

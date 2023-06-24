@@ -2,6 +2,12 @@ name: build
 
 on:
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - draft
     branches:
       - master
   push:
@@ -101,7 +107,45 @@ jobs:
           asv machine --yes
           asv run --quick --strict
 
+  test-linux-draft:
+    if: github.event.pull_request.draft == true
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out mitiq
+        uses: actions/checkout@v3
+        # Increase fetch depth to work around Codecov issue (https://github.com/codecov/codecov-action/issues/190).
+        with:
+          fetch-depth: 2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          make install requirements
+
+      - name: Get changed directories
+        id: changed_dirs
+        run: |
+          changed_directories=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^mitiq/' | grep -v '/\.' | awk 'BEGIN{FS="/"}{print $2}' | uniq)
+          echo "Changed directories: $changed_directories"
+          echo "CHANGED_DIRECTORIES=$changed_directories" >> $GITHUB_ENV
+
+      - name: Run tests for changed directories
+        run: |
+          echo $CHANGED_DIRECTORIES
+          for dir in $CHANGED_DIRECTORIES; do
+            make test-$dir
+          done
+
   test-linux:
+    if: github.event.pull_request.draft == false
     strategy:
       fail-fast: false
       matrix:
@@ -135,7 +179,70 @@ jobs:
         with:
           fail_ci_if_error: true
 
+  test-nonlinux-draft:
+    if: github.event.pull_request.draft == true
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out mitiq
+        uses: actions/checkout@v3
+        # Increase fetch depth to work around Codecov issue (https://github.com/codecov/codecov-action/issues/190).
+        with:
+          fetch-depth: 2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          make install requirements
+
+      - name: Get changed directories (Linux and macOS)
+        id: changed_dirs
+        if: runner.os != 'Windows'
+        run: |
+          changed_directories=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^mitiq/' | grep -v '/\.' | awk 'BEGIN{FS="/"}{print $2}' | uniq)
+          echo "Changed directories: $changed_directories"
+          echo "CHANGED_DIRECTORIES=$changed_directories" >> $GITHUB_ENV
+
+      - name: Get changed directories (Windows)
+        id: changed_dirs_windows
+        if: runner.os == 'Windows'
+        run: |
+          $changed_directories = git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | Select-String -Pattern '^mitiq/' | Select-String -NotMatch -Pattern '/\.' | ForEach-Object {($_ -split '/')[1]} | Select-Object -Unique
+          echo "Changed directories: $($changed_directories -join ' ')"
+          echo "cdirs=$changed_directories" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Run tests for changed directories
+        id: run_test_for_changed_dirs
+        if: runner.os != 'Windows'
+        run: |
+          echo $CHANGED_DIRECTORIES
+          for dir in $CHANGED_DIRECTORIES; do
+            make test-$dir
+          done
+
+      - name: Run tests for changed directories (Windows)
+        id: run_test_for_changed_dirs_windows
+        if: runner.os == 'Windows'
+        run: |
+          if (![string]::IsNullOrEmpty($env:cdirs)) {
+            $dirs = $env:cdirs -split " "
+            foreach ($dir in $dirs) {
+              echo "Running tests for directory: $dir"
+              make test-$dir
+            }
+          } else {
+            echo "No directories to test."
+          }
+
   test-nonlinux:
+    if: github.event.pull_request.draft == false
     strategy:
       fail-fast: false
       matrix:
