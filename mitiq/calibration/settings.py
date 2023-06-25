@@ -5,7 +5,7 @@
 
 from dataclasses import dataclass, asdict
 from functools import partial
-from typing import Any, Callable, cast, List, Dict, Union
+from typing import Any, Callable, cast, List, Dict, Union, Tuple
 from enum import Enum, auto
 
 import networkx as nx
