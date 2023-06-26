@@ -150,7 +150,7 @@ class Strategy:
     @property
     def mitigation_function(self) -> Callable[..., float]:
         if self.technique is MitigationTechnique.PEC:
-            def partial_pec(circuit, execute) -> Union[float, Tuple[float, Dict[str, Any]]]:
+            def partial_pec(circuit, execute) -> Callable[..., float]:
                 rep_function = self.technique_params["representation_function"]           
                 operations = []
                 for op in circuit.all_operations():
@@ -201,7 +201,6 @@ class Strategy:
             summary["representation_function"] = self.technique_params[
                 "representation_function"
             ]
-            summary["operations"] = self.technique_params["operations"]
             summary["noise_level"] = self.technique_params["noise_level"]
             summary["is_qubit_dependent"] = self.technique_params[
                 "is_qubit_dependent"
