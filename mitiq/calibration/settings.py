@@ -148,7 +148,7 @@ class Strategy:
     technique_params: Dict[str, Any]
 
     @property
-    def mitigation_function(self) -> Callable[[Any, Any], Callable[..., float]]:
+    def mitigation_function(self) -> Callable[..., float]:
         if self.technique is MitigationTechnique.PEC:
             def partial_pec(circuit, execute) -> float:
                 rep_function = self.technique_params["representation_function"]           
