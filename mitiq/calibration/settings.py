@@ -11,7 +11,7 @@ from enum import Enum, auto
 import networkx as nx
 import cirq
 
-from mitiq import QPROGRAM
+from mitiq import QPROGRAM, Executor
 from mitiq.interface import convert_from_mitiq
 from mitiq.benchmarks import (
     generate_ghz_circuit,
