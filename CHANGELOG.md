@@ -1,9 +1,6 @@
 # Changelog
 
 ## Version 0.27.0
-# Changelog
-
-## Version 0.27.0
 
 ### Summary
 
