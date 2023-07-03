@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# Layerwise folding in Mitiq
+# ZNE with Qiskit: Layerwise folding
 
 
 This tutorial shows an example of how to mitigate noise on IBMQ backends with
