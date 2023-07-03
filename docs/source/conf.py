@@ -334,6 +334,7 @@ nbsphinx_thumbnails = {
     "examples/hamiltonians": "_static/vqe-cirq-pauli-sum-mitigation-plot.png",
     "examples/braket_mirror_circuit": "_static/mirror-circuits.png",
     "examples/maxcut-demo": "_static/max-cut.png",
+    "examples/layerwise-folding": "_static/layerwise.png",
     "examples/cirq-ibmq-backends": "_static/cirq-mitiq-ibmq.png",
     "examples/pennylane-ibmq-backends": "_static/zne-pennylane.png",
     "examples/ibmq-backends": "_static/ibmq-gate-map.png",

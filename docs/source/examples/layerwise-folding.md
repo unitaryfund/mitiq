@@ -18,15 +18,15 @@ This tutorial shows an example of how to mitigate noise on IBMQ backends with
 the Cirq frontend using layerwise folding in contrast with global folding.
 
 
-
-- [](#setup)
-- [](#helper-functions)
-- [](#define-circuit-to-analyze)
-- [](total-variational-distance-metric)
-- [](impact-of-single-vs.-double-folding)
-- [](#executor)
-- [](#experiment:-global-folding-with-linear-extrapolation)
-- [](#experiment:-layerwise-folding-with-linear-extrapolation)
+- [ZNE with Qiskit: Layerwise folding](#zne-with-qiskit-layerwise-folding)
+  - [Setup](#setup)
+  - [Helper functions](#helper-functions)
+  - [Define circuit to analyze](#define-circuit-to-analyze)
+  - [Total variational distance metric](#total-variational-distance-metric)
+  - [Impact of single vs. multiple folding](#impact-of-single-vs-multiple-folding)
+  - [Executor](#executor)
+  - [Global folding with linear extrapolation](#global-folding-with-linear-extrapolation)
+  - [Layerwise folding with linear extrapolation](#layerwise-folding-with-linear-extrapolation)
 
 +++
 
@@ -254,7 +254,7 @@ def executor(circuit: cirq.Circuit, shots: int = 10_000) -> float:
     return expectation_value
 ```
 
-## Experiment: Global folding with linear extrapolation
+## Global folding with linear extrapolation
 
 First, for comparison, we apply ZNE with global folding on the entire circuit.
 We then compare the mitigated result of applying ZNE with linear extrapolation
@@ -271,7 +271,7 @@ print(f"Unmitigated result {unmitigated:.3f}")
 print(f"Mitigated result {mitigated:.3f}")
 ```
 
-## Experiment: Layerwise folding with linear extrapolation
+## Layerwise folding with linear extrapolation
 
 For contrast, we apply layerwise folding on only the layer with the most noise
 and use linear extrapolation. As above, we compare the mitigated and
