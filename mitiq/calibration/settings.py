@@ -5,7 +5,7 @@
 
 from dataclasses import dataclass, asdict
 from functools import partial
-from typing import Any, Callable, cast, List, Dict, Union, Tuple
+from typing import Any, Callable, cast, List, Dict
 from enum import Enum, auto
 
 import networkx as nx
@@ -24,7 +24,6 @@ from mitiq.pec import execute_with_pec
 from mitiq.pec.representations import (
     represent_operation_with_local_depolarizing_noise,
 )
-from mitiq.pec.types.types import OperationRepresentation
 from mitiq.raw import execute
 from mitiq.zne import execute_with_zne
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
@@ -151,13 +150,12 @@ class Strategy:
     def mitigation_function(self) -> Callable[..., float]:
         if self.technique is MitigationTechnique.PEC:
             def partial_pec(circuit: cirq.Circuit, execute: Executor) -> float:
-                rep_function = self.technique_params["representation_function"]           
+                rep_function = self.technique_params["representation_function"]
                 operations = []
                 for op in circuit.all_operations():
-                    if len(op.qubits)>=2 and op not in operations:
-                        operations.append(cirq.Circuit(op))                    
+                    if len(op.qubits) >= 2 and op not in operations:
+                        operations.append(cirq.Circuit(op))
                 noise_level = self.technique_params["noise_level"]
-                #is_qubit_dependent = self.technique_params["is_qubit_dependent"]
                 num_samples = self.technique_params["num_samples"]
                 reps = [
                     rep_function(
@@ -165,10 +163,10 @@ class Strategy:
                         noise_level,
                     )
                     for op in operations
-                ]                
+                ]
                 return self.technique.mitigation_function(
-                    circuit, 
-                    execute, 
+                    circuit,
+                    execute,
                     representations=reps,
                     num_samples=num_samples,
                 )
@@ -208,7 +206,6 @@ class Strategy:
             summary["num_samples"] = self.technique_params["num_samples"]
         return summary
 
-    
     def print_line(self, performance: str, circuit_type: str) -> None:
         summary = self.to_dict()
         if self.technique is MitigationTechnique.ZNE:
@@ -229,13 +226,13 @@ class Strategy:
                 str(summary["representation_function"])[35:54],
                 summary["noise_level"],
                 str(summary["num_samples"]),
-                
             )
         print(
             "| {:^10} | {:^7} | {:^6} | {:<13} | {:<13} | {:<20} |".format(
                 *row
             )
         )
+
     def __repr__(self) -> str:
         return str(self.to_dict())
 
