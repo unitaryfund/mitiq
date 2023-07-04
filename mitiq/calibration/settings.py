@@ -149,6 +149,7 @@ class Strategy:
     @property
     def mitigation_function(self) -> Callable[..., float]:
         if self.technique is MitigationTechnique.PEC:
+
             def partial_pec(circuit: cirq.Circuit, execute: Executor) -> float:
                 rep_function = self.technique_params["representation_function"]
                 operations = []
@@ -170,6 +171,7 @@ class Strategy:
                     representations=reps,
                     num_samples=num_samples,
                 )
+
             return partial_pec
         elif self.technique is MitigationTechnique.ZNE:
             return partial(
