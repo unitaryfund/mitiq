@@ -18,8 +18,8 @@ from mitiq.calibration import (
     execute_with_mitigation,
 )
 from mitiq.calibration.calibrator import (
-    TABLE_HEADER_STR_PEC,
-    TABLE_HEADER_STR_ZNE,
+    PEC_TABLE_HEADER_STR,
+    ZNE_TABLE_HEADER_STR,
     convert_to_expval_executor,
     ExperimentResults,
     MissingResultsError,
@@ -420,11 +420,11 @@ def test_logging(capfd, settings):
     assert "circuit" in captured.out
     assert settings.get_strategy(0).technique.name in captured.out
     if settings is ZNESettings:
-        assert TABLE_HEADER_STR_ZNE in captured.out
+        assert ZNE_TABLE_HEADER_STR in captured.out
     elif settings is light_pec_settings:
-        assert TABLE_HEADER_STR_PEC in captured.out
+        assert PEC_TABLE_HEADER_STR in captured.out
     elif settings is [light_combined_settings1, light_combined_settings2]:
-        assert TABLE_HEADER_STR_ZNE, TABLE_HEADER_STR_PEC in captured.out
+        assert ZNE_TABLE_HEADER_STR, PEC_TABLE_HEADER_STR in captured.out
 
 
 def test_ExperimentResults_reset_data():

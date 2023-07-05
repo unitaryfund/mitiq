@@ -232,8 +232,8 @@ class Strategy:
                 performance,
                 circuit_type,
                 self.technique.name,
-                summary["representation_function"],
-                str(summary["operations"]),
+                str(summary["representation_function"].__name__),
+                str(list(s.all_operations() for s in summary["operations"])),
                 str(summary["noise_level"]),
             )
             print(row)

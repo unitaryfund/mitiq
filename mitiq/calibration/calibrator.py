@@ -25,14 +25,14 @@ from mitiq.calibration.settings import (
 )
 from mitiq.interface import convert_from_mitiq
 
-TABLE_HEADER_STR_ZNE = (
+ZNE_TABLE_HEADER_STR = (
     "| performance | circuit | method | extrapolation | scale factors "
     "| scale_method         |\n"
     "| ----------- | ------- | ------ | ------------- | ------------- "
     "| -------------------- |"
 )
 
-TABLE_HEADER_STR_PEC = (
+PEC_TABLE_HEADER_STR = (
     "| performance | circuit | method | "
     "representation function | operations to mitigate | noise level | "
     " qubit dependent |\n"
@@ -208,9 +208,9 @@ class Calibrator:
 
         if log:
             if self.strategies[0].technique is MitigationTechnique.ZNE:
-                print(TABLE_HEADER_STR_ZNE)
+                print(ZNE_TABLE_HEADER_STR)
             elif self.strategies[0].technique is MitigationTechnique.PEC:
-                print(TABLE_HEADER_STR_PEC)
+                print(PEC_TABLE_HEADER_STR)
 
         for problem in self.problems:
             # Benchmark circuits have no measurements, so we append them.
@@ -231,13 +231,13 @@ class Calibrator:
                 if (
                     log
                     and count
-                    and strategy.technique
-                    is not self.strategies[count - 1].technique
+                    and (strategy.technique
+                    is not self.strategies[count - 1].technique)
                 ):
                     if strategy.technique is MitigationTechnique.ZNE:
-                        print(TABLE_HEADER_STR_ZNE)
+                        print(ZNE_TABLE_HEADER_STR)
                     elif strategy.technique is MitigationTechnique.PEC:
-                        print(TABLE_HEADER_STR_PEC)
+                        print(PEC_TABLE_HEADER_STR)
                 self.results.add_result(
                     strategy,
                     problem,
