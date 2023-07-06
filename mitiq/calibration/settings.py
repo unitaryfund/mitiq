@@ -239,11 +239,10 @@ class Strategy:
                 str(summary["representation_function"].__name__),
                 str(ops),
                 summary["noise_level"],
-                str(summary["is_qubit_dependent"]),
             )
             print(
                 "| {:^10} | {:^7} | {:^6} | {:<13} | "
-                "{:<60} | {:<11} |  {:<13} |".format(*row)
+                "{:<60} | {:<11} |".format(*row)
             )
 
     def __repr__(self) -> str:

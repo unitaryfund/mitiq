@@ -34,10 +34,9 @@ ZNE_TABLE_HEADER_STR = (
 
 PEC_TABLE_HEADER_STR = (
     "| performance | circuit | method "
-    "| representation function | operations to mitigate | noise level "
-    "| qubit dependent |\n"
+    "| representation function | operations to mitigate | noise level |\n"
     "| ----------- | ------- | ------ | ----------------------- "
-    "| ---------------------- | ----------- | --------------- | "
+    "| ---------------------- | ----------- | "
 )
 
 
@@ -206,12 +205,6 @@ class Calibrator:
         if not self.results.is_missing_data():
             self.results.reset_data()
 
-        if log:
-            if self.strategies[0].technique is MitigationTechnique.ZNE:
-                print(ZNE_TABLE_HEADER_STR)
-            elif self.strategies[0].technique is MitigationTechnique.PEC:
-                print(PEC_TABLE_HEADER_STR)
-
         for problem in self.problems:
             # Benchmark circuits have no measurements, so we append them.
             circuit = problem.circuit.copy()
@@ -228,13 +221,13 @@ class Calibrator:
                     mitigated_value = strategy.mitigation_function(
                         circuit, expval_executor
                     )
-                if (
-                    log
-                    and count
+                if log and (
+                    count
                     and (
                         strategy.technique
                         is not self.strategies[count - 1].technique
                     )
+                    or not count
                 ):
                     if strategy.technique is MitigationTechnique.ZNE:
                         print(ZNE_TABLE_HEADER_STR)
