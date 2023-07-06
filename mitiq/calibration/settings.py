@@ -12,7 +12,7 @@ import networkx as nx
 import cirq
 
 from mitiq import QPROGRAM, Executor
-from mitiq.interface import convert_from_mitiq
+from mitiq.interface import convert_from_mitiq, convert_to_mitiq
 from mitiq.benchmarks import (
     generate_ghz_circuit,
     generate_mirror_circuit,
@@ -228,15 +228,23 @@ class Strategy:
             )
         elif self.technique is MitigationTechnique.PEC:
             summary = self.to_dict()
+            ops = list(
+                list(convert_to_mitiq(op)[0].all_operations())
+                for op in summary["operations"]
+            )
             row = (
                 performance,
                 circuit_type,
                 self.technique.name,
                 str(summary["representation_function"].__name__),
-                str(list(s.all_operations() for s in summary["operations"])),
-                str(summary["noise_level"]),
+                str(ops),
+                summary["noise_level"],
+                str(summary["is_qubit_dependent"]),
             )
-            print(row)
+            print(
+                "| {:^10} | {:^7} | {:^6} | {:<13} | "
+                "{:<60} | {:<11} |  {:<13} |".format(*row)
+            )
 
     def __repr__(self) -> str:
         return str(self.to_dict())

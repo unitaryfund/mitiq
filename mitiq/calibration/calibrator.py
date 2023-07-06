@@ -33,9 +33,9 @@ ZNE_TABLE_HEADER_STR = (
 )
 
 PEC_TABLE_HEADER_STR = (
-    "| performance | circuit | method | "
-    "representation function | operations to mitigate | noise level | "
-    " qubit dependent |\n"
+    "| performance | circuit | method "
+    "| representation function | operations to mitigate | noise level "
+    "| qubit dependent |\n"
     "| ----------- | ------- | ------ | ----------------------- "
     "| ---------------------- | ----------- | --------------- | "
 )
@@ -231,8 +231,10 @@ class Calibrator:
                 if (
                     log
                     and count
-                    and (strategy.technique
-                    is not self.strategies[count - 1].technique)
+                    and (
+                        strategy.technique
+                        is not self.strategies[count - 1].technique
+                    )
                 ):
                     if strategy.technique is MitigationTechnique.ZNE:
                         print(ZNE_TABLE_HEADER_STR)

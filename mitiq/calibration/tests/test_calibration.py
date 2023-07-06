@@ -379,6 +379,7 @@ light_combined_settings1 = Settings(
         },
     ],
 )
+
 light_combined_settings2 = Settings(
     benchmarks=light_zne_settings.benchmarks,
     strategies=[
