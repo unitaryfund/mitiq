@@ -146,7 +146,7 @@ $$
 p(k|C) = \langle \langle k | C | \rho_0 \rangle \rangle
 $$
 
-as the probability distribution oveer measurement outcomes at the output of a
+as the probability distribution over measurement outcomes at the output of a
 circuit $C$ where $k \in B^n$ with $B^n$ being the set of all $n$-length bit
 strings where $\langle \langle k |$ is the vectorized (non-ideal) POVM element
 that corresponds to measuring bit string $k$. 
