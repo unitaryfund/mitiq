@@ -1,7 +1,10 @@
-import numpy as np
+from typing import Tuple
+
 import cirq
-from typing import Tuple,List, Union
-#given error of the fidelity between the true state and the reconstructed state, return the number of measurements needed
+import numpy as np
+
+
+# given error of the fidelity between the true state and the reconstructed state, return the number of measurements needed
 def min_n_total_measurements(epsilon: float, num_qubits: int) -> int:
     """
     Calculate the number of measurements required to satisfy the shadow bound for the Pauli measurement scheme.
@@ -13,11 +16,11 @@ def min_n_total_measurements(epsilon: float, num_qubits: int) -> int:
     Returns:
         An integer that gives the number of samples required to satisfy the shadow bound.
     """
-    return int(34* (4**num_qubits) * epsilon**(-2))
+    return int(34 * (4 ** num_qubits) * epsilon ** (-2))
 
 
 # based on the theorem, we calculate N,K for the shadow bound
-def shadow_bound_theorem(error: float, observables: list, failure_rate: float)->Tuple[int,int]:
+def calculate_shadow_bound(error: float, observables: list, failure_rate: float) -> Tuple[int, int]:
     """
     Calculate the shadow bound for the Pauli measurement scheme.
 
@@ -31,7 +34,7 @@ def shadow_bound_theorem(error: float, observables: list, failure_rate: float)->
         An integer that gives the number of samples required to satisfy the shadow bound and
         the chunk size required attaining the specified failure rate.
     """
-    #number of observables to measure
+    # number of observables to measure
     M = len(observables)
     # K is the number of chunks in the median of means estimator
     K = 2 * np.log(2 * M / failure_rate)
@@ -40,10 +43,11 @@ def shadow_bound_theorem(error: float, observables: list, failure_rate: float)->
         lambda opt: np.linalg.norm(
             cirq.unitary(opt) - np.trace(cirq.unitary(opt)) / 2 ** int(np.log2(cirq.unitary(opt).shape[0])), ord=np.inf
         )
-        ** 2
+                    ** 2
     )
     N = 34 * max(shadow_norm(o) for o in observables) / error ** 2
     return int(np.ceil(N * K)), int(K)
+
 
 def operator_2_norm(R: np.ndarray) -> float:
     """
@@ -56,6 +60,7 @@ def operator_2_norm(R: np.ndarray) -> float:
         Scalar corresponding to the norm.
     """
     return float(np.sqrt(np.trace(R.conjugate().transpose() @ R)).reshape(-1).real)
+
 
 def fidelity(state_vector: np.ndarray, rho: np.ndarray) -> float:
     """
