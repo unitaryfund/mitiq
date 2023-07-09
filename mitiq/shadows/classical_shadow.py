@@ -88,7 +88,7 @@ def expectation_estimation_shadow(measurement_outcomes: Tuple[np.ndarray, np.nda
     # convert cirq observables to indices
     # map_pauli_to_int = {cirq.X: "X", cirq.Y: 1, cirq.Z: 2}
     target_obs, target_locs = [], []
-    for qubit, pauli in 90õobservable.items():
+    for qubit, pauli in observable.items():
         target_obs.append(str(pauli))
         target_locs.append(int(qubit))
 
