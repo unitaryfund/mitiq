@@ -12,18 +12,19 @@ def shadow_measure_with_executor(
         circuit: cirq.Circuit,
         executor: Executor,
         n_total_measurements: int, ) -> Tuple[np.ndarray, np.ndarray]:
-    """
+    r"""
     
-    Given a circuit, calculate the classical shadow of the circuit of aa bit
-      string, and the index of Pauli matrices that were measured.
+    Given a circuit, perform z-basis measurements on the circuit and return the outcomes in terms of a string,
+     which represents for z-basis measurement outcomes $$1:=\{1,0\}$$, $$-1:=\{0,1\}$$.
 
     Args: circuit (cirq.Circuit): Cirq circuit.
-          n_total_measurements (int): number of snapshots.
+              executor (Executor): measure with executor defined for measurements.
+              n_total_measurements (int): number of snapshots.
 
     Returns: outcomes (array): Tuple of two numpy arrays. The first array contains measurement outcomes (-1, 1)
-        while the second array contains the index for the sampled Pauli's (0,1,2=X,Y,Z).
-        Each row of the arrays corresponds to a distinct snapshot or sample while each
-        column corresponds to a different qubit.
+                    while the second array contains the index for the sampled Pauli's (0,1,2=X,Y,Z).
+                    Each row of the arrays corresponds to a distinct snapshot or sample while each
+                    column corresponds to a different qubit.
     """
 
     # Generate random Pauli unitaries
