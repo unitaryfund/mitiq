@@ -14,8 +14,11 @@ kernelspec:
 # ZNE with Qiskit: Layerwise folding
 
 
-This tutorial shows an example of how to mitigate noise on IBMQ backends with
-the Cirq frontend using layerwise folding in contrast with global folding.
+This tutorial shows an example of how to mitigate noise on IBMQ backends using
+layerwise folding in contrast with global folding.
+
+More information on the layerwise folding technique can be found in 
+*Calderon et al. Quantum (2023)* {cite}`Calderon_2023_Quantum`.
 
 
 - [ZNE with Qiskit: Layerwise folding](#zne-with-qiskit-layerwise-folding)
@@ -49,32 +52,14 @@ from mitiq.interface.mitiq_cirq.cirq_utils import sample_bitstrings
 from cirq.contrib.svg import SVGCircuit
 from qiskit_ibm_provider import IBMProvider
 
-USE_REAL_HARDWARE = False
-
-if USE_REAL_HARDWARE:
-    # Save account credentials.
-    #IBMProvider.save_account(token="<IBM_TOKEN_HERE>")
-
-    # Load a previously saved account.
-    provider = IBMProvider()
-    backend = provider.get_backend("ibmq_qasm_simulator")
-    noise_model = None
-else:
-    # Default to a simulator.
-    backend = qiskit.Aer.get_backend("qasm_simulator")
-    noise_model = initialized_depolarizing_noise(noise_level=0.02)
+# Default to a simulator.
+backend = qiskit.Aer.get_backend("qasm_simulator")
+noise_model = initialized_depolarizing_noise(noise_level=0.02)
 
 shots = 10_000
 ```
 
-**Note:** When `USE_REAL_HARDWARE` is set to `False`, a classically simulated noisy backend is used instead of a real quantum computer.
-
 ## Helper functions
-
-```{code-cell} ipython3
-# Display circuit in a more visually appealing way.
-draw = lambda circuit: SVGCircuit(circuit)
-```
 
 The following function will return a list of circuits where the ith element in
 the list is a circuit with layer "i" folded `num_folds` number of times. This
@@ -100,7 +85,7 @@ circuit = cirq.Circuit(
     [cirq.ops.CNOT(q0, q1)],
     [cirq.measure(cirq.LineQubit(0))],
 )
-draw(circuit)
+print(circuit)
 ```
 
 Let us invoke the `apply_num_folds_to_all_layers` function as follows.
@@ -113,14 +98,14 @@ Note that the first element of the list is the circuit with the first layer of
 the circuit folded twice.
 
 ```{code-cell} ipython3
-draw(folded_circuits[0])
+print(folded_circuits[0])
 ```
 
 Similarly, the second element of the list is the circuit with the second layer
 folded.
 
 ```{code-cell} ipython3
-draw(folded_circuits[1])
+print(folded_circuits[1])
 ```
 
 
@@ -131,7 +116,7 @@ other circuits here as well.
 
 ```{code-cell} ipython3
 circuit = cirq.Circuit([cirq.X(cirq.LineQubit(0))] * 10, cirq.measure(cirq.LineQubit(0)))
-draw(circuit)
+print(circuit)
 ```
 
 ## Total variational distance metric
@@ -148,8 +133,8 @@ $$
 
 as the probability distribution over measurement outcomes at the output of a
 circuit $C$ where $k \in B^n$ with $B^n$ being the set of all $n$-length bit
-strings where $\langle \langle k |$ is the vectorized (non-ideal) POVM element
-that corresponds to measuring bit string $k$. 
+strings where $\langle \langle k |$ is the vectorized POVM element that
+corresponds to measuring bit string $k$. 
 
 The *impact* of applying an inversion is given by
 
@@ -157,9 +142,9 @@ $$
 d \left[p(\cdot|C), p(\cdot|C^{(i)})\right]
 $$
 
-where $d$ is some distance measure. In
-[arXiv:2204.06056](https://arxiv.org/abs/2204.06056), the authors used the
-total variatonal distance (TVD) measure where
+where $d$ is some distance measure. In 
+*Calderon et al. Quantum (2023)* {cite}`Calderon_2023_Quantum` the authors used the total variational distance
+(TVD) measure where
 
 $$
 \eta^{(i)} := \frac{1}{2} \sum_{k} |p(k|C) - p(k|C^{(i)})|.
@@ -295,11 +280,10 @@ improve the mitigated value, it still will not eclipse the benefit of doing
 global folding.
 
 So why consider this technique in this context? One reason is that applying
-global folding will increase the length of the entire circuit while layerewise
+global folding will increase the length of the entire circuit while layerwise
 folding on a subset of only the noisiest layers will increase the circuit by a
 smaller factor. 
 
-If running a circuit on hardware is bottlenecked by the cost of running a long
+If running a circuit on hardware is bottle-necked by the cost of running a long
 circuit, this technique could potentially be used to arrive at a better result
 (although not as good as global folding) but with less monetary cost.
-
