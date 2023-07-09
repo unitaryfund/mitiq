@@ -67,7 +67,7 @@ def fidelity(state_vector: np.ndarray, rho: np.ndarray) -> float:
     Calculate the fidelity $$F(\rho,\sigma)=\mathrm{Tr}\sqrt{\rho^{1/2}\sigma\rho^{1/2}}$$, when $$\rho=|v\rangle\langle v|$$ is a pure state $$F(\rho,\sigma)=\langle v|\sigma|v\rangle$$.
 
     Args:
-        v (array): The vector whose norm we want to calculate.
+        state_vector (array): The vector whose norm we want to calculate.
         rho (array): The operator whose norm we want to calculate.
 
     Returns:
