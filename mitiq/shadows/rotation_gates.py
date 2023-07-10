@@ -5,6 +5,7 @@ import numpy as np
 
 # generate N random Pauli strings for given number of qubits
 
+
 def generate_random_pauli_strings(
     num_qubits: int, num_strings: int
 ) -> List[str]:
@@ -24,17 +25,18 @@ def generate_random_pauli_strings(
     paulis = np.random.choice(unitary_ensemble, (num_strings, num_qubits))
     return ["".join(pauli) for pauli in paulis]
 
+
 # attach random rotate gates to N copies of the circuit
 def get_rotated_circuits(
     circuit: cirq.Circuit, pauli_strings: List[str]
 ) -> List[cirq.Circuit]:
-    """Returns a list of circuits that are identical to the given circuit, 
-        except that each one has a different Pauli gate applied to each qubit, 
+    """Returns a list of circuits that are identical to the given circuit,
+        except that each one has a different Pauli gate applied to each qubit,
         followed by a measurement.
 
     Args:
         circuit: The circuit to measure.
-        pauli_strings: The Pauli strings to apply to each qubit, in order, 
+        pauli_strings: The Pauli strings to apply to each qubit, in order,
             before measuring.
 
     Returns:
@@ -46,7 +48,8 @@ def get_rotated_circuits(
     for pauli_string in pauli_strings:
         assert (
             len(pauli_string) == num_qubits
-        ), f"Pauli string must be same length as number of qubits, got {len(pauli_string)} and {num_qubits}"
+        ), f"Pauli string must be same length as number of qubits," \
+           f" got {len(pauli_string)} and {num_qubits}"
         rotated_circuit = circuit.copy()
         for i, pauli in enumerate(pauli_string):
             qubit = qubits[i]
