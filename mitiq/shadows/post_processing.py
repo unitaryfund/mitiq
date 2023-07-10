@@ -19,11 +19,13 @@ def snapshot_state(
     """
     num_qubits = len(b_list)
 
-    # computational basis states, e.g. $$|0\rangle=(1,0)$$, and zero_state$$=|0\rangle\langle0|$$.
+    # computational basis states, e.g. $$|0\rangle=(1,0)$$, and zero_state
+    # $$=|0\rangle\langle0|$$.
     zero_state = np.array([[1, 0], [0, 0]])
     one_state = np.array([[0, 0], [0, 1]])
 
-    # local unitaries that applied to the computational basis states, e.g. $$Z-$$basis measurement,
+    # local unitaries that applied to the computational basis states, e.g.
+    # $$Z-$$basis measurement,
     # which equivalent to a random Pauli measurement, i.e. for each qubit,
     # we randomly decide to measure the Pauli operators.
     phase_z = np.array([[1, 0], [0, -1j]], dtype=complex)
