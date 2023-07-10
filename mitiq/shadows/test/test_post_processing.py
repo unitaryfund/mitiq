@@ -1,19 +1,19 @@
+import cirq
+import numpy as np
+
 from mitiq.shadows.post_processing import (
     snapshot_state,
     shadow_state_reconstruction,
     expectation_estimation_shadow,
 )
-from mitiq.shadows.shadows_utils import *
-
-
-# executor = Executor(cirq_simulator_shadow_executor_fn, max_batch_size=int(1e10))
 
 
 def test_snapshot_state():
     b_list = [1, -1]
     u_list = ["X", "Y"]
     expected_result = np.array(
-        # here put the expected result based on the specific b_list and u_list inputs
+        # here put the expected result based on the
+        # specific b_list and u_list inputs
         [
             [0.25 + 0.0j, 0.0 + 0.75j, 0.75 + 0.0j, 0.0 + 2.25j],
             [0.0 - 0.75j, 0.25 + 0.0j, 0.0 - 2.25j, 0.75 + 0.0j],
@@ -28,7 +28,10 @@ def test_snapshot_state():
     assert result.shape == (
         2 ** len(b_list),
         2 ** len(b_list),
-    ), f"Expected shape {(2 ** len(b_list), 2 ** len(b_list))}, got {result.shape}"
+    ), (
+        f"Expected shape {(2 ** len(b_list), 2 ** len(b_list))}, "
+        f"got {result.shape}"
+    )
     assert np.allclose(
         result, expected_result
     ), f"Expected {expected_result}, got {result}"
@@ -41,7 +44,8 @@ def test_shadow_state_reconstruction():
 
     expected_result = np.array(
         [
-            # Fill in the expected result based on the specific b_lists and u_lists inputs.
+            # Fill in the expected result based on the specific
+            # b_lists and u_lists inputs.
             [
                 [
                     0.5 + 0.0j,
@@ -135,7 +139,10 @@ def test_shadow_state_reconstruction():
     assert result.shape == (
         2**num_qubits,
         2**num_qubits,
-    ), f"Expected shape {(2 ** num_qubits, 2 ** num_qubits)}, got {result.shape}"
+    ), (
+        f"Expected shape {(2 ** num_qubits, 2 ** num_qubits)}, "
+        f"got {result.shape}"
+    )
     assert np.allclose(
         result, expected_result
     ), f"Expected {expected_result}, but got {result}"
