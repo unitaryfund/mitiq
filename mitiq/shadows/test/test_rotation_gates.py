@@ -7,6 +7,7 @@ from mitiq.shadows.rotation_gates import (
     get_rotated_circuits,
 )
 
+
 def test_generate_random_pauli_strings():
     num_qubits = 5
     num_strings = 10
@@ -37,6 +38,8 @@ def test_get_rotated_circuits_time():
     pauli_strings = generate_random_pauli_strings(len(qubit), 1000)
     # Measure the execution time for attaching random rotate gates
     execution_time = timeit.timeit(
-        lambda: get_rotated_circuits(circuit, pauli_strings), number=1)
+        lambda: get_rotated_circuits(circuit, pauli_strings), number=1
+    )
     # Check if the execution time grows linearly with the number of strings
-    assert execution_time < 10  # Adjust this threshold based on your system performance
+    # Adjust this threshold based on your system performance
+    assert execution_time < 10
