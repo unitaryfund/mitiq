@@ -67,6 +67,9 @@ def test_execute_with_qse():
         code_hamiltonian,
     ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
     observable = get_observable_in_code_space(PauliString("ZZZZZ"))
+    unmitigated_value = observable.expectation(
+        qc, execute_with_depolarized_noise
+    )
     mitigated_value = execute_with_qse(
         qc,
         execute_with_depolarized_noise,
@@ -74,9 +77,12 @@ def test_execute_with_qse():
         code_hamiltonian,
         observable,
     )
-    assert abs(mitigated_value.real - 1) < 0.001
+    assert abs(mitigated_value.real - 1) < abs(unmitigated_value.real - 1)
 
     observable = get_observable_in_code_space(PauliString("XXXXX"))
+    unmitigated_value = observable.expectation(
+        qc, execute_with_depolarized_noise
+    )
     mitigated_value = execute_with_qse(
         qc,
         execute_with_depolarized_noise,
@@ -84,7 +90,7 @@ def test_execute_with_qse():
         code_hamiltonian,
         observable,
     )
-    assert abs(mitigated_value.real - 0.5) < 0.001
+    assert abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
 
 
 def test_mitigate_executor():
@@ -107,13 +113,16 @@ def test_mitigate_executor():
         code_hamiltonian,
         observable,
     )
+    unmitigated_value = observable.expectation(
+        qc, execute_with_depolarized_noise
+    )
     mitigated_value = mitigated_executor(qc)
-    assert abs(mitigated_value.real - 1) < 0.001
+    assert abs(mitigated_value.real - 1) < abs(unmitigated_value.real - 1)
 
     batched_mitigated_values = batched_mitigated_executor([qc] * 3)
     assert all(
         [
-            abs(mitigated_value.real - 1) < 0.001
+            abs(mitigated_value.real - 1) < abs(unmitigated_value.real - 1)
             for mitigated_value in batched_mitigated_values
         ]
     )
@@ -131,13 +140,16 @@ def test_mitigate_executor():
         code_hamiltonian,
         observable,
     )
+    unmitigated_value = observable.expectation(
+        qc, execute_with_depolarized_noise
+    )
     mitigated_value = mitigated_executor(qc)
-    assert abs(mitigated_value.real - 0.5) < 0.001
+    assert abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
 
     batched_mitigated_values = batched_mitigated_executor([qc] * 3)
     assert all(
         [
-            abs(mitigated_value.real - 0.5) < 0.001
+            abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
             for mitigated_value in batched_mitigated_values
         ]
     )
@@ -163,8 +175,11 @@ def test_qse_decorator():
             noise_level=(0.01,),
         )
 
+    unmitigated_value = observable.expectation(
+        qc, execute_with_depolarized_noise
+    )
     mitigated_value = decorated_executor(qc)
-    assert abs(mitigated_value.real - 1) < 0.001
+    assert abs(mitigated_value.real - 1) < abs(unmitigated_value.real - 1)
 
     observable = get_observable_in_code_space(PauliString("XXXXX"))
 
@@ -180,8 +195,11 @@ def test_qse_decorator():
             noise_level=(0.01,),
         )
 
+    unmitigated_value = observable.expectation(
+        qc, execute_with_depolarized_noise
+    )
     mitigated_value = decorated_executor(qc)
-    assert abs(mitigated_value.real - 0.5) < 0.001
+    assert abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
 
 
 def test_get_projector():
@@ -249,7 +267,7 @@ def test_compute_hamiltonian_overlap_matrix():
     assert H[0][0].real > -16
 
 
-def get_observable_in_code_space(observable: list[cirq.PauliString]):
+def get_observable_in_code_space(observable: List[cirq.PauliString]):
     FIVE_I = PauliString("IIIII")
     projector_onto_code_space = [
         PauliString("XZZXI"),

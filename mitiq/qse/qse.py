@@ -43,7 +43,7 @@ def execute_with_qse(
     Returns:
         The expectation value estimated with QSE.
     """
-    P = get_projector(
+    projector = get_projector(
         circuit,
         executor,
         check_operators,
@@ -54,12 +54,15 @@ def execute_with_qse(
     pop = get_expectation_value_for_observable(
         circuit,
         executor,
-        P * observable * P,
+        projector * observable * projector,
         pauli_string_to_expectation_cache,
     )
     # Compute the normalization factor: <P P>
     pp = get_expectation_value_for_observable(
-        circuit, executor, P * P, pauli_string_to_expectation_cache
+        circuit,
+        executor,
+        projector * projector,
+        pauli_string_to_expectation_cache,
     )
     return pop / pp
 
@@ -80,7 +83,7 @@ def mitigate_executor(
         check_operators: List of check operators that define the
         stabilizer code space.
         code_hamiltonian: Hamiltonian of the code space.
-        observable: Observable to compute the mitigated expectation value of.
+        observable: Observable to compute the mitigated expectation value for.
         pauli_string_to_expectation_cache: Cache for expectation values of
         Pauli strings used to compute the projector and the observable.
         share_cache: Only applicable for batched executors. If True, the

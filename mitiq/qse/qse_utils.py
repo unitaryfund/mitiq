@@ -5,7 +5,7 @@
 
 """Functions for computing the projector for subspace expansion."""
 
-from typing import Callable, Sequence, Union, Dict
+from typing import Callable, Sequence, Union, Dict, List
 from mitiq import Observable, QPROGRAM, QuantumResult, PauliString
 import numpy as np
 import numpy.typing as npt
@@ -91,7 +91,7 @@ def _compute_overlap_matrix(
     check_operators: Sequence[PauliString],
     pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
 ) -> npt.NDArray[np.float64]:
-    S: list[list[float]] = []
+    S: List[List[float]] = []
     # S_ij = <Ψ|Mi† Mj|Ψ>
     for i in range(len(check_operators)):
         S.append([])
@@ -113,7 +113,7 @@ def _compute_hamiltonian_overlap_matrix(
     code_hamiltonian: Observable,
     pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
 ) -> npt.NDArray[np.float64]:
-    H: list[list[float]] = []
+    H: List[List[float]] = []
     # H_ij = <Ψ|Mi† H Mj|Ψ>
     for i in range(len(check_operators)):
         H.append([])
