@@ -2,8 +2,6 @@ import cirq
 import pytest
 from typing import Callable, List
 from cirq import Circuit
-from mitiq import MeasurementResult
-
 
 from mitiq.shadows.executor_functions import (
     cirq_simulator_shadow_executor_fn,
