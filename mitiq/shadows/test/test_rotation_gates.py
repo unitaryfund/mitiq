@@ -37,6 +37,9 @@ def test_get_rotated_circuits_time():
     circuit = cirq.Circuit(cirq.H(q) for q in qubit)
     pauli_strings = generate_random_pauli_strings(len(qubit), 1000)
     # Measure the execution time for attaching random rotate gates
-    execution_time = timeit.timeit(lambda: get_rotated_circuits(circuit, pauli_strings), number=1)
+    execution_time = timeit.timeit(
+        lambda: get_rotated_circuits(circuit, pauli_strings), number=1
+    )
     # Check if the execution time grows linearly with the number of strings
-    assert execution_time < 10  # Adjust this threshold based on your system performance
+    # Adjust this threshold based on your system performance
+    assert execution_time < 10
