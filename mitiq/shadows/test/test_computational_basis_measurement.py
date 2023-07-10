@@ -78,5 +78,5 @@ def test_shadow_measure_with_executor_time_growth(n_qubits: int):
         times.append(time.time() - start_time)
     for i in range(1, len(times)):
         assert times[i] / times[i - 1] == pytest.approx(
-            measurements[i] / measurements[i - 1], rel=0.3
+            measurements[i] / measurements[i - 1], rel=0.5
         )

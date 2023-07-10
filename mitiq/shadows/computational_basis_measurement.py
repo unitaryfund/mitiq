@@ -55,6 +55,6 @@ def shadow_measure_with_executor(
 
     # output computational basis outcomes |b>
     # and the random unitaries in {X,Y,Z}.
-    shadow_outcomes = np.asarray(shadow_outcomes, dtype=int)
-    pauli_strings = np.asarray(pauli_strings, dtype=str)
-    return shadow_outcomes, pauli_strings
+    shadow_outcomes_np = np.asarray(shadow_outcomes, dtype=int)
+    pauli_strings_np = np.asarray(pauli_strings, dtype=str)
+    return shadow_outcomes_np, pauli_strings_np
