@@ -7,7 +7,7 @@ PAULI_MAP = {"X": 0, "Y": 1, "Z": 2}
 
 def snapshot_state(
     b_list: List[Union[int, float]], u_list: List[str]
-) -> np.ndarray[Any, np.complex128]:
+) -> np.ndarray[Any, Any]:
     """
     Impliment a single snapshot state reconstruction,
 
@@ -52,7 +52,7 @@ def snapshot_state(
 
 def shadow_state_reconstruction(
     measurement_outcomes: Tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]
-) -> np.ndarray:
+) -> np.ndarray[Any, Any]:
     """
     Reconstruct a state approximation as an average over all snapshots.
 
