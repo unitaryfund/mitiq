@@ -2,7 +2,6 @@ from typing import List
 import cirq
 import numpy as np
 
-
 # generate N random Pauli strings for given number of qubits
 
 
@@ -40,16 +39,16 @@ def get_rotated_circuits(
             before measuring.
 
     Returns:
-        A list of circuits, one for each Pauli string.
+        A list of circuits with rotation gates attached, one for each Pauli string.
     """
     qubits = list(circuit.all_qubits())
     num_qubits = len(qubits)
     rotated_circuits = []
     for pauli_string in pauli_strings:
-        assert (
-            len(pauli_string) == num_qubits
-        ), f"Pauli string must be same length as number of qubits," \
-           f" got {len(pauli_string)} and {num_qubits}"
+        assert len(pauli_string) == num_qubits, (
+            f"Pauli string must be same length as number of qubits,"
+            f" got {len(pauli_string)} and {num_qubits}"
+        )
         rotated_circuit = circuit.copy()
         for i, pauli in enumerate(pauli_string):
             qubit = qubits[i]
