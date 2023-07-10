@@ -13,10 +13,20 @@ from mitiq.typing import MeasurementResult
 def cirq_simulator_shadow_executor_fn(
     circuits: List[cirq.Circuit],
 ) -> List[MeasurementResult]:
+    """Convert a list of Cirq circuits to measurement results.
+
+    Args:
+        circuits: A list of Cirq circuits.
+    returns:
+        A list of MeasurementResult objects.
+    """
+    # Convert Cirq circuits to a list of MeasurementResult objects.
     outcomes = []
     simulator = cirq.Simulator()
     for circuit in tqdm(circuits, desc="Cirq Measurement"):
+        # Run the Cirq simulator on the circuit.
         result = simulator.run(circuit, repetitions=1)
+        # Convert the results to the format we expect.
         measurements = {}
         for key, value in result.measurements.items():
             # "q(0)" --> 0, "q(19)" --> 19, etc.
@@ -32,6 +42,13 @@ def cirq_simulator_shadow_executor_fn(
 def qiskit_simulator_shadow_executor_fn(
     cirq_circuits: List[cirq.Circuit], backend: Any = "aer_simulator"
 ) -> List[MeasurementResult]:
+    """Convert a list of Cirq circuits to measurement results.
+    Args:
+        cirq_circuits: A list of Cirq circuits.
+        backend: A qiskit backend.
+    returns:
+        A list of MeasurementResult objects.
+    """
     outcomes = []
     if isinstance(backend, str):
         backend = Aer.get_backend(backend)

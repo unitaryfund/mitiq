@@ -1,5 +1,9 @@
 import cirq
 import pytest
+from typing import Callable, List
+from cirq import Circuit
+from mitiq import MeasurementResult
+
 
 from mitiq.shadows.executor_functions import (
     cirq_simulator_shadow_executor_fn,
@@ -19,18 +23,15 @@ def executor_fn(request):
     indirect=True,
 )
 # @pytest.mark.parametrize("seed", [0,1,2,3,4,5,6,7,8,9])
-def test_executor_fn(executor_fn):
+def test_executor_fn(
+    executor_fn: Callable[[List[Circuit]], List[MeasurementResult]]
+) -> None:
+    """Test the executor function on a simple circuit.
+    Args:
+        executor_fn: An executor function.
+    Returns:
+        assert: The measurement outcomes are correct."""
     num_qubits = 3  # Number of qubits in the state
-
-    # # Create the pure state in the Z basis
-    # state_0 = np.zeros(2**num_qubits)
-    # state_0[0] = 1  # |0> state
-
-    # state_1 = np.zeros(2**num_qubits)
-    # state_1[1] = 1  # |1> state
-
-    # Create a Cirq circuit with measurement
-    # degree = 2*np.pi*np.random.rand(0, 1)
 
     qubits = cirq.LineQubit.range(num_qubits)
     circuit_0 = cirq.Circuit(
