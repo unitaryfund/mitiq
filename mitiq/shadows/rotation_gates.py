@@ -39,7 +39,8 @@ def get_rotated_circuits(
             before measuring.
 
     Returns:
-        A list of circuits with rotation gates attached, one for each Pauli string.
+        A list of circuits with rotation gates attached, one for each Pauli
+            string.
     """
     qubits = list(circuit.all_qubits())
     num_qubits = len(qubits)
