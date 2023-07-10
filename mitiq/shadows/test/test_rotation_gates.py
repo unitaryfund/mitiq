@@ -31,12 +31,10 @@ def test_generate_random_pauli_strings():
 
     # Check that each Pauli string is the correct length and contains only
     # the characters X, Y, and Z
-    #print(pauli_strings)
+    # print(pauli_strings)
     for s in pauli_strings:
         assert len(s) == num_qubits
         assert set(s).issubset({"X", "Y", "Z"})
-
-
 
 
 def test_get_rotated_circuits():
@@ -56,16 +54,17 @@ def test_get_rotated_circuits():
     for rc in rotated_circuits:
         assert isinstance(rc, cirq.Circuit)
 
+
 def test_generate_random_pauli_strings_time() -> None:
     """
-    Test if the execution time of generate_random_pauli_strings linearly with the number 
-    of Pauli strings.
+    Test if the execution time of generate_random_pauli_strings linearly
+    with the number of Pauli strings.
     """
     # Define the number of qubits
     num_qubits: int = 3
     times: list = []
     num_strings = [100, 200, 300, 400, 500]
-    for n in num_strings:    
+    for n in num_strings:
         # Measure the execution time for generating random Pauli strings
         start_time = time.time()
         generate_random_pauli_strings(num_qubits, n)
@@ -74,10 +73,11 @@ def test_generate_random_pauli_strings_time() -> None:
         assert times[i] / times[i - 1] == pytest.approx(
             num_strings[i] / num_strings[i - 1], rel=0.5
         )
-    
+
+
 def test_generate_random_pauli_strings_time_power_law() -> None:
     """
-    Test if the execution time of generate_random_pauli_strings grows 
+    Test if the execution time of generate_random_pauli_strings grows
     as a power law with respect to the number of qubits.
     """
     num_strings: int = 1000
