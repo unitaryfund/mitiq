@@ -3,8 +3,6 @@ import time
 import cirq
 import numpy as np
 import cirq.testing
-from cirq.testing.random_circuit import random_circuit
-
 
 from mitiq.shadows.rotation_gates import (
     generate_random_pauli_strings,
