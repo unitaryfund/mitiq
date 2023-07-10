@@ -4,26 +4,38 @@ import numpy as np
 
 
 # generate N random Pauli strings for given number of qubits
+
 def generate_random_pauli_strings(
     num_qubits: int, num_strings: int
 ) -> List[str]:
-    # return "XXXYZYZX" where len string == num_qubits
+    """Generate a list of random Pauli strings.
+
+    Args:
+        num_qubits: The number of qubits in the Pauli strings.
+        num_strings: The number of Pauli strings to generate.
+
+    Returns:
+        A list of number of `num_strings` random Pauli strings
+          of length `num_qubits`.
+    """
 
     # Sample random Pauli operators uniformly from X, Y, Z
     unitary_ensemble = ["X", "Y", "Z"]
     paulis = np.random.choice(unitary_ensemble, (num_strings, num_qubits))
     return ["".join(pauli) for pauli in paulis]
 
-
 # attach random rotate gates to N copies of the circuit
 def get_rotated_circuits(
     circuit: cirq.Circuit, pauli_strings: List[str]
 ) -> List[cirq.Circuit]:
-    """Returns a list of circuits that are identical to the given circuit, except that each one has a different Pauli gate applied to each qubit, followed by a measurement.
+    """Returns a list of circuits that are identical to the given circuit, 
+        except that each one has a different Pauli gate applied to each qubit, 
+        followed by a measurement.
 
     Args:
         circuit: The circuit to measure.
-        pauli_strings: The Pauli strings to apply to each qubit, in order, before measuring.
+        pauli_strings: The Pauli strings to apply to each qubit, in order, 
+            before measuring.
 
     Returns:
         A list of circuits, one for each Pauli string.
