@@ -78,7 +78,7 @@ def shadow_state_reconstruction(
 
 
 def expectation_estimation_shadow(
-    measurement_outcomes: Tuple[np.ndarray, np.ndarray],
+    measurement_outcomes: Tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]],
     observable: Any,
     k: int,
 ) -> float:
@@ -123,8 +123,8 @@ def expectation_estimation_shadow(
     for i in range(0, n_total_measurements, n_total_measurements // k):
         # assign the splits temporarily
         b_lists_k, u_lists_k = (
-            b_lists[i: i + n_total_measurements // k],
-            u_lists[i: i + n_total_measurements // k],
+            b_lists[i : i + n_total_measurements // k],
+            u_lists[i : i + n_total_measurements // k],
         )
         n_group_measurements = len(b_lists_k)
         # find the exact matches for the observable of
