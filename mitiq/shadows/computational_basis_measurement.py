@@ -1,9 +1,9 @@
-from typing import Tuple, List
+from typing import Tuple, List, cast
 
 import cirq
 import numpy as np
 
-from mitiq import Executor
+from mitiq import Executor, MeasurementResult
 from mitiq.shadows.rotation_gates import (
     generate_random_pauli_strings,
     get_rotated_circuits,
@@ -15,7 +15,7 @@ def shadow_measure_with_executor(
     circuit: cirq.Circuit,
     executor: Executor,
     n_total_measurements: int,
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> Tuple[np.ndarray[int], np.ndarray[str]]:
     r"""
 
     Given a circuit, perform z-basis measurements on the circuit and return the outcomes
@@ -48,16 +48,13 @@ def shadow_measure_with_executor(
     # Transform the outcomes into a numpy array 0 -> 1, 1 -> -1.
     shadow_outcomes = []
     for result in results:
+        result = cast(MeasurementResult, result)
         bitstring = list(result.get_counts().keys())[0]
         outcome = [1 - int(i) * 2 for i in bitstring]
         shadow_outcomes.append(outcome)
 
     # output computational basis outcomes |b>
     # and the random unitaries in {X,Y,Z}.
-    shadow_outcomes = np.array(shadow_outcomes, dtype=int)
-    assert shadow_outcomes.shape == (
-        n_total_measurements,
-        num_qubits,
-    ), f"shape is {shadow_outcomes.shape}"
-    pauli_strings = np.array(pauli_strings, dtype=str)
+    shadow_outcomes = np.asarray(shadow_outcomes, dtype=int)
+    pauli_strings = np.asarray(pauli_strings, dtype=str)
     return shadow_outcomes, pauli_strings
