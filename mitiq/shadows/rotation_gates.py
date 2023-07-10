@@ -1,10 +1,12 @@
 from typing import List
+
 import cirq
 import numpy as np
 
 
 # generate N random Pauli strings for given number of qubits
-def generate_random_pauli_strings(num_qubits: int, num_strings: int) -> List[str]:
+def generate_random_pauli_strings(num_qubits: int, num_strings: int) -> List[
+    str]:
     # return "XXXYZYZX" where len string == num_qubits
 
     # Sample random Pauli operators uniformly from X, Y, Z
