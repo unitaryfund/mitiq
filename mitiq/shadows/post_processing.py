@@ -83,15 +83,17 @@ def expectation_estimation_shadow(
     # list is a list of length len(qubits)
 
     r"""
-    Calculate the estimator $$E[O] = median(Tr{rho_{(k)} O})$$ where $$rho_(k))$$is set of $$k$$
-    snapshots in the shadow. Use median of means to ameliorate the effects of outliers.
+    Calculate the estimator $$E[O] = median(Tr{rho_{(k)} O})$$ where $$rho_(k))$$
+        is set of $$k$$ snapshots in the shadow.
+        Use median of means to ameliorate the effects of outliers.
 
     Args:
-        measurement_outcomes (tuple): A shadow tuple obtained from `shadow_measure_with_executor`.
-        observable (cirq.PauliString): Single cirq observable consisting of single Pauli
-            operators e.g. cirq.X(0) * cirq.Y(1).
+        measurement_outcomes (tuple): A shadow tuple obtained from
+            `shadow_measure_with_executor`. observable (cirq.PauliString):
+             Single cirq observable consisting of single Pauli
+             operators e.g. cirq.X(0) * cirq.Y(1).
         k (int): number of splits in the median of means estimator. k * N = R,
-            where R is the total number of measurements, N is the number of snapshots.
+             where R is the total number of measurements, N is the number of snapshots.
 
     Returns:
         Scalar corresponding to the estimate of the observable.

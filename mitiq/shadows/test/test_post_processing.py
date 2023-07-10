@@ -159,7 +159,7 @@ def test_expectation_estimation_shadow():
     k = 1
     expected_result = (
         -9
-    )  # This might not be correct. Please replace it with the correct expected result if you have it.
+    )
     print("expected_result", expected_result)
 
     result = expectation_estimation_shadow(measurement_outcomes, observable, k)
