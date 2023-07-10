@@ -194,17 +194,15 @@ class Executor:
             ]
 
         elif self._executor_return_type in MeasurementResultLike:
+            observable = cast(Observable, observable)
             all_results = cast(List[MeasurementResult], all_results)
-            if observable is not None:
-                observable = cast(Observable, observable)
-                results = [
-                    observable._expectation_from_measurements(
-                        all_results[i: i + result_step]
-                    )
-                    for i in range(len(all_results) // result_step)
-                ]
-            else:
-                results = all_results
+            results = [
+                observable._expectation_from_measurements(
+                    all_results[i : i + result_step]
+                )
+                for i in range(len(all_results) // result_step)
+            ]
+
         else:
             raise ValueError(
                 f"Could not parse executed results from executor with type"
