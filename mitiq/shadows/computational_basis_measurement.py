@@ -1,4 +1,4 @@
-from typing import Tuple, List, cast
+from typing import Tuple, List, cast, Any
 
 import cirq
 import numpy as np
@@ -15,7 +15,7 @@ def shadow_measure_with_executor(
     circuit: cirq.Circuit,
     executor: Executor,
     n_total_measurements: int,
-) -> Tuple[np.ndarray[int], np.ndarray[str]]:
+) -> Tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
     r"""
 
     Given a circuit, perform z-basis measurements on the circuit and return the outcomes
