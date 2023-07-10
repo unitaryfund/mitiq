@@ -43,7 +43,7 @@ def shadow_measure_with_executor(
     rotated_circuits = get_rotated_circuits(circuit, pauli_strings)
 
     # Run the circuits to collect the outcomes
-    results = executor.evaluate(rotated_circuits)
+    results = executor.run(rotated_circuits)
 
     # Transform the outcomes into a numpy array.
     shadow_outcomes = []
