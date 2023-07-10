@@ -134,6 +134,12 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 
+## Classical Shadows
+```{eval-rst}
+.. automodule:: mitiq.shadows.rotation_gates
+   :members:
+```
+
 ## Digital Dynamical Decoupling
 
 ### Digital Dynamical Decoupling (High-Level Tools)
