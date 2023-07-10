@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, List, Any
 
 import cirq
 import numpy as np
@@ -55,7 +55,7 @@ def calculate_shadow_bound(
     return int(np.ceil(N * K)), int(K)
 
 
-def operator_2_norm(R: np.ndarray[..., np.complex128]) -> float:
+def operator_2_norm(R: np.ndarray[Any, Any]) -> float:
     """
     Calculate the operator 2-norm.
 
@@ -73,8 +73,8 @@ def operator_2_norm(R: np.ndarray[..., np.complex128]) -> float:
 # given error of the fidelity between the true state and the reconstructed state,
 # return the number of measurements needed
 def fidelity(
-    state_vector: np.ndarray[..., np.complex128],
-    rho: np.ndarray[np.complex128],
+    state_vector: np.ndarray[Any, Any],
+    rho: np.ndarray[Any, Any],
 ) -> float:
     r"""
     Calculate the fidelity $$F(\rho,\sigma)=\mathrm{Tr}\sqrt{\rho^{1/2}\sigma\rho^{1/2}}$$,
