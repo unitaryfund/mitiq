@@ -33,7 +33,7 @@ def shadow_measure_with_executor(
                     column corresponds to a different qubit.
     """
 
-    # Generate random Pauli unitaries
+    # Generate n = n_total_measurements random Pauli unitaries of length num_qubits
     qubits = list(circuit.all_qubits())
     num_qubits = len(qubits)
     pauli_strings = generate_random_pauli_strings(
@@ -45,14 +45,15 @@ def shadow_measure_with_executor(
     # Run the circuits to collect the outcomes
     results = executor.run(rotated_circuits)
 
-    # Transform the outcomes into a numpy array.
+    # Transform the outcomes into a numpy array 0 -> 1, 1 -> -1.
     shadow_outcomes = []
     for result in results:
         bitstring = list(result.get_counts().keys())[0]
         outcome = [1 - int(i) * 2 for i in bitstring]
         shadow_outcomes.append(outcome)
-    # Combine the computational basis outcomes $$|\mathbf{b}\rangle$$
-    # and the unitaries sampled from $$CL_2^{\otimes n}$$.
+
+    # output computational basis outcomes |b>
+    # and the random unitaries in {X,Y,Z}.
     shadow_outcomes = np.array(shadow_outcomes, dtype=int)
     assert shadow_outcomes.shape == (
         n_total_measurements,
