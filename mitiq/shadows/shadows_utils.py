@@ -1,4 +1,5 @@
 from typing import Tuple, List
+
 import cirq
 import numpy as np
 from cirq.ops.pauli_string import PauliString
@@ -21,7 +22,9 @@ def min_n_total_measurements(epsilon: float, num_qubits: int) -> int:
 
 # based on the theorem, we calculate N,K for the shadow bound
 def calculate_shadow_bound(
-    error: float, observables: List[PauliString], failure_rate: float
+    error: float,
+    observables: List[PauliString],  # type: ignore
+    failure_rate: float,
 ) -> Tuple[int, int]:
     """
     Calculate the shadow bound for the Pauli measurement scheme.
@@ -52,7 +55,7 @@ def calculate_shadow_bound(
     return int(np.ceil(N * K)), int(K)
 
 
-def operator_2_norm(R: np.ndarray[np.complex128]) -> float:
+def operator_2_norm(R: np.ndarray[..., np.complex128]) -> float:
     """
     Calculate the operator 2-norm.
 
@@ -70,7 +73,8 @@ def operator_2_norm(R: np.ndarray[np.complex128]) -> float:
 # given error of the fidelity between the true state and the reconstructed state,
 # return the number of measurements needed
 def fidelity(
-    state_vector: np.ndarray[np.complex128], rho: np.ndarray[np.complex128]
+    state_vector: np.ndarray[..., np.complex128],
+    rho: np.ndarray[np.complex128],
 ) -> float:
     r"""
     Calculate the fidelity $$F(\rho,\sigma)=\mathrm{Tr}\sqrt{\rho^{1/2}\sigma\rho^{1/2}}$$,
