@@ -39,10 +39,7 @@ def test_shadow_measure_with_executor_output_dimensions(n_qubits: int):
     shadow_outcomes, pauli_strings = shadow_measure_with_executor(
         circuit, executor, n_total_measurements
     )
-    assert shadow_outcomes.shape == (
-        n_total_measurements,
-        n_qubits,
-    ), (
+    assert shadow_outcomes.shape == (n_total_measurements, n_qubits,), (
         f"Shadow outcomes have incorrect shape, "
         f"expected {(n_total_measurements, n_qubits)}, "
         f"got {shadow_outcomes.shape}"
