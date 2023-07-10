@@ -1,13 +1,15 @@
 from typing import Tuple, List, Union, Any
 import numpy as np
 
-PAULI_MAP = {'X': 0, 'Y': 1, 'Z': 2}
+PAULI_MAP = {"X": 0, "Y": 1, "Z": 2}
 
 
-def snapshot_state(b_list: List[bool], u_list: List[Union[int, float]]) -> np.ndarray:
+def snapshot_state(
+    b_list: List[bool], u_list: List[Union[int, float]]
+) -> np.ndarray:
     """
     Impliment a single snapshot state reconstruction,
-    
+
     Args:
         b_list (array): The list of classical outcomes for the snapshot.
         u_list (array): Indices for the applied Pauli measurement.
@@ -21,13 +23,15 @@ def snapshot_state(b_list: List[bool], u_list: List[Union[int, float]]) -> np.nd
     zero_state = np.array([[1, 0], [0, 0]])
     one_state = np.array([[0, 0], [0, 1]])
 
-    # local unitaries that applied to the computational basis states, e.g. $$Z-$$basis measurement, 
-    # which equivalent to a random Pauli measurement, i.e. for each qubit, we randomly decide to measure the Pauli operators.
+    # local unitaries that applied to the computational basis states, e.g. $$Z-$$basis measurement,
+    # which equivalent to a random Pauli measurement, i.e. for each qubit,
+    # we randomly decide to measure the Pauli operators.
     phase_z = np.array([[1, 0], [0, -1j]], dtype=complex)
     hadamard = np.array([[1, 1], [1, -1]]) / np.sqrt(2)
     identity = np.eye(2)
 
-    # act $$Ad_{U^\dagger}$$ on the computational basis states, where $$U$$ is the local unitary that used to do the Pauli measurement.
+    # act $$Ad_{U^\dagger}$$ on the computational basis states, where $$U$$ is
+    # the local unitary that used to do the Pauli measurement.
     unitaries = [hadamard, hadamard @ phase_z, identity]
 
     # reconstructing a single snapshot state by applying Eq. (S44)
@@ -43,7 +47,9 @@ def snapshot_state(b_list: List[bool], u_list: List[Union[int, float]]) -> np.nd
     return rho_snapshot
 
 
-def shadow_state_reconstruction(measurement_outcomes: Tuple[np.ndarray, np.ndarray]) -> np.ndarray:
+def shadow_state_reconstruction(
+    measurement_outcomes: Tuple[np.ndarray, np.ndarray]
+) -> np.ndarray:
     """
     Reconstruct a state approximation as an average over all snapshots.
 
@@ -59,17 +65,22 @@ def shadow_state_reconstruction(measurement_outcomes: Tuple[np.ndarray, np.ndarr
     b_lists, u_lists = measurement_outcomes
 
     # Averaging over snapshot states.
-    shadow_rho = np.zeros((2 ** num_qubits, 2 ** num_qubits), dtype=complex)
+    shadow_rho = np.zeros((2**num_qubits, 2**num_qubits), dtype=complex)
     for i in range(num_snapshots):
         shadow_rho += snapshot_state(b_lists[i], u_lists[i])
 
     return shadow_rho / num_snapshots
 
 
-def expectation_estimation_shadow(measurement_outcomes: Tuple[np.ndarray, np.ndarray], observable: Any,
-                                  k: int) -> float:
-    # Need R = NK in total, and split into K subsets of size and N is the number of snapshots.
-    # each subset is a tuple of (b_lists, u_lists) and each element of the list is a list of length len(qubits)
+def expectation_estimation_shadow(
+    measurement_outcomes: Tuple[np.ndarray, np.ndarray],
+    observable: Any,
+    k: int,
+) -> float:
+    # Need R = NK in total, and split into K subsets of size and N is the
+    # number of snapshots.
+    # each subset is a tuple of (b_lists, u_lists) and each element of the
+    # list is a list of length len(qubits)
 
     r"""
     Calculate the estimator $$E[O] = median(Tr{rho_{(k)} O})$$ where $$rho_(k))$$is set of $$k$$
@@ -79,7 +90,8 @@ def expectation_estimation_shadow(measurement_outcomes: Tuple[np.ndarray, np.nda
         measurement_outcomes (tuple): A shadow tuple obtained from `shadow_measure_with_executor`.
         observable (cirq.PauliString): Single cirq observable consisting of single Pauli
             operators e.g. cirq.X(0) * cirq.Y(1).
-        k (int): number of splits in the median of means estimator. k * N = R, where R is the total number of measurements, N is the number of snapshots.
+        k (int): number of splits in the median of means estimator. k * N = R,
+            where R is the total number of measurements, N is the number of snapshots.
 
     Returns:
         Scalar corresponding to the estimate of the observable.
@@ -101,11 +113,10 @@ def expectation_estimation_shadow(measurement_outcomes: Tuple[np.ndarray, np.nda
 
     # loop over the splits of the shadow:
     for i in range(0, n_total_measurements, n_total_measurements // k):
-
         # assign the splits temporarily
         b_lists_k, u_lists_k = (
-            b_lists[i: i + n_total_measurements // k],
-            u_lists[i: i + n_total_measurements // k],
+            b_lists[i : i + n_total_measurements // k],
+            u_lists[i : i + n_total_measurements // k],
         )
         n_group_measurements = len(b_lists_k)
         # find the exact matches for the observable of interest at the specified locations
