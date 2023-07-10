@@ -1,12 +1,13 @@
 from typing import Tuple, List, Union, Any
+
 import numpy as np
 
 PAULI_MAP = {"X": 0, "Y": 1, "Z": 2}
 
 
 def snapshot_state(
-    b_list: List[bool], u_list: List[Union[int, float]]
-) -> np.ndarray:
+    b_list: List[Union[int, float]], u_list: List[str]
+) -> np.ndarray[Any, np.complex128]:
     """
     Impliment a single snapshot state reconstruction,
 
@@ -28,7 +29,7 @@ def snapshot_state(
     # $$Z-$$basis measurement,
     # which equivalent to a random Pauli measurement, i.e. for each qubit,
     # we randomly decide to measure the Pauli operators.
-    phase_z = np.array([[1, 0], [0, -1j]], dtype=complex)
+    phase_z = np.array([[1, 0], [0, -1j]], dtype=np.complex128)
     hadamard = np.array([[1, 1], [1, -1]]) / np.sqrt(2)
     identity = np.eye(2)
 
@@ -37,7 +38,7 @@ def snapshot_state(
     unitaries = [hadamard, hadamard @ phase_z, identity]
 
     # reconstructing a single snapshot state by applying Eq. (S44)
-    rho_snapshot = [1]
+    rho_snapshot = np.array([1], dtype=np.complex128)
     for i in range(num_qubits):
         state = zero_state if b_list[i] == 1 else one_state
         U = unitaries[PAULI_MAP[u_list[i]]]
@@ -50,7 +51,7 @@ def snapshot_state(
 
 
 def shadow_state_reconstruction(
-    measurement_outcomes: Tuple[np.ndarray, np.ndarray]
+    measurement_outcomes: Tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]
 ) -> np.ndarray:
     """
     Reconstruct a state approximation as an average over all snapshots.
@@ -67,7 +68,9 @@ def shadow_state_reconstruction(
     b_lists, u_lists = measurement_outcomes
 
     # Averaging over snapshot states.
-    shadow_rho = np.zeros((2**num_qubits, 2**num_qubits), dtype=complex)
+    shadow_rho = np.zeros(
+        (2**num_qubits, 2**num_qubits), dtype=np.complex128
+    )
     for i in range(num_snapshots):
         shadow_rho += snapshot_state(b_lists[i], u_lists[i])
 
@@ -75,7 +78,7 @@ def shadow_state_reconstruction(
 
 
 def expectation_estimation_shadow(
-    measurement_outcomes: Tuple[np.ndarray, np.ndarray],
+    measurement_outcomes: Tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]],
     observable: Any,
     k: int,
 ) -> float:
