@@ -42,13 +42,18 @@ def test_shadow_measure_with_executor_output_dimensions(n_qubits: int):
     assert shadow_outcomes.shape == (
         n_total_measurements,
         n_qubits,
-    ), f"Shadow outcomes have incorrect shape, expected {(n_total_measurements, n_qubits)}, got {shadow_outcomes.shape}"
+    ), f"Shadow outcomes have incorrect shape, " \
+       f"expected {(n_total_measurements, n_qubits)}, " \
+       f"got {shadow_outcomes.shape}"
     assert pauli_strings.shape == (
         n_total_measurements,
-    ), f"Pauli strings have incorrect shape, expected {(n_total_measurements, n_qubits)}, got {pauli_strings.shape}"
+    ), f"Pauli strings have incorrect shape, " \
+       f"expected {(n_total_measurements, n_qubits)}, " \
+       f"got {pauli_strings.shape}"
     assert (
         len(pauli_strings[0]) == n_qubits
-    ), f"Pauli strings have incorrect number of characters, expected {n_qubits}, got {len(pauli_strings[0])}"
+    ), f"Pauli strings have incorrect number of characters, " \
+       f"expected {n_qubits}, got {len(pauli_strings[0])}"
 
 
 @pytest.mark.parametrize("n_qubits", [1, 2, 5])
@@ -60,10 +65,12 @@ def test_shadow_measure_with_executor_output_types(n_qubits: int):
     )
     assert (
         shadow_outcomes[0].dtype == int
-    ), f"Shadow outcomes have incorrect dtype, expected int, got {shadow_outcomes.dtype}"
+    ), f"Shadow outcomes have incorrect dtype, expected int, " \
+       f"got {shadow_outcomes.dtype}"
     assert isinstance(
         pauli_strings[0], str
-    ), f"Pauli strings have incorrect dtype, expected str, got {pauli_strings.dtype}"
+    ), f"Pauli strings have incorrect dtype, expected str, " \
+       f"got {pauli_strings.dtype}"
 
 
 @pytest.mark.parametrize("n_qubits", [1, 2, 5])

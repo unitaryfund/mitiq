@@ -1,4 +1,4 @@
-from typing import Tuple, List, cast, Any
+from typing import Tuple, cast, Any
 
 import cirq
 import numpy as np
@@ -18,22 +18,26 @@ def shadow_measure_with_executor(
 ) -> Tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
     r"""
 
-    Given a circuit, perform z-basis measurements on the circuit and return the outcomes
-    in terms of a string, which represents for z-basis measurement outcomes
-    $$1:=\{1,0\}$$, $$-1:=\{0,1\}$$.
+    Given a circuit, perform z-basis measurements on the circuit and return the
+     outcomes in terms of a string, which represents for z-basis measurement
+      outcomes 1:=(1,0), -1:=(0,1).
 
     Args: circuit (cirq.Circuit): Cirq circuit.
-              executor (Executor): measure with executor defined for measurements.
+              executor (Executor): measure with executor defined for
+               measurements.
               n_total_measurements (int): number of snapshots.
 
     Returns: outcomes (array): Tuple of two numpy arrays. The first array
                         contains measurement outcomes (-1, 1)
-                    while the second array contains the index for the sampled Pauli's (0,1,2=X,Y,Z).
-                    Each row of the arrays corresponds to a distinct snapshot or sample while each
+                    while the second array contains the index for the sampled
+                    Pauli's (0,1,2=X,Y,Z).
+                    Each row of the arrays corresponds to a distinct snapshot
+                     or sample while each
                     column corresponds to a different qubit.
     """
 
-    # Generate n = n_total_measurements random Pauli unitaries of length num_qubits
+    # Generate n = n_total_measurements
+    # random Pauli unitaries of length num_qubits
     qubits = list(circuit.all_qubits())
     num_qubits = len(qubits)
     pauli_strings = generate_random_pauli_strings(
