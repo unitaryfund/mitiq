@@ -24,7 +24,6 @@ def generate_random_pauli_strings(
     return ["".join(pauli) for pauli in paulis]
 
 
-# attach random rotate gates to N copies of the circuit
 def get_rotated_circuits(
     circuit: cirq.Circuit, pauli_strings: List[str]
 ) -> List[cirq.Circuit]:
