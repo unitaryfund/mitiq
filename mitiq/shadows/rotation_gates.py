@@ -2,7 +2,7 @@ from typing import List
 import cirq
 import numpy as np
 
-# generate N random Pauli strings for given number of qubits
+# Functions to implement random Pauli measurements.
 
 
 def generate_random_pauli_strings(
