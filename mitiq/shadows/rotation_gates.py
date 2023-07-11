@@ -33,8 +33,7 @@ def get_rotated_circuits(
 
     Args:
         circuit: The circuit to measure.
-        pauli_strings: The Pauli strings to apply to each qubit, in order,
-            before measuring.
+        pauli_strings: The Pauli strings to measure in each output circuit.
 
     Returns:
         A list of circuits with rotation gates attached, one for each Pauli
