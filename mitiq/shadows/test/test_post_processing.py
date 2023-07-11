@@ -30,7 +30,8 @@ def test_snapshot_state():
         f"got {result.shape}"
     )
     assert np.allclose(
-        result, expected_result), f"Expected {expected_result}, got {result}"
+        result, expected_result
+    ), f"Expected {expected_result}, got {result}"
 
 
 def test_shadow_state_reconstruction():
@@ -132,12 +133,13 @@ def test_shadow_state_reconstruction():
     assert isinstance(
         result, np.ndarray
     ), f"Expected a numpy array, got {type(result)}"
-    assert result.shape == (2 ** num_qubits, 2 ** num_qubits,), (
+    assert result.shape == (2**num_qubits, 2**num_qubits,), (
         f"Expected shape {(2 ** num_qubits, 2 ** num_qubits)}, "
         f"got {result.shape}"
     )
-    assert np.allclose(result, expected_result), \
-        f"Expected {expected_result}, but got {result}"
+    assert np.allclose(
+        result, expected_result
+    ), f"Expected {expected_result}, but got {result}"
 
 
 def test_expectation_estimation_shadow():
