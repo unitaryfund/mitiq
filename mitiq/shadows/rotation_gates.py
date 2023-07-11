@@ -15,8 +15,7 @@ def generate_random_pauli_strings(
         num_strings: The number of Pauli strings to generate.
 
     Returns:
-        A list of number of `num_strings` random Pauli strings
-          of length `num_qubits`.
+        A list of random Pauli strings.
     """
 
     # Sample random Pauli operators uniformly from X, Y, Z
