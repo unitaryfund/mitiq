@@ -1,4 +1,4 @@
-from mitiq.shadows.post_processing import (
+from mitiq.shadows.classical_postprocessing import (
     snapshot_state,
     shadow_state_reconstruction,
     expectation_estimation_shadow,

@@ -7,8 +7,7 @@ PAULI_MAP = {"X": 0, "Y": 1, "Z": 2}
 def snapshot_state(
     b_list: List[bool], u_list: List[Union[int, float]]
 ) -> np.ndarray:
-    """
-    Impliment a single snapshot state reconstruction,
+    """Impliment a single snapshot state reconstruction,
 
     Args:
         b_list (array): The list of classical outcomes for the snapshot.
@@ -48,8 +47,7 @@ def snapshot_state(
 def shadow_state_reconstruction(
     measurement_outcomes: Tuple[np.ndarray, np.ndarray]
 ) -> np.ndarray:
-    """
-    Reconstruct a state approximation as an average over all snapshots.
+    """Reconstruct a state approximation as an average over all snapshots.
 
     Args:
         shadow (tuple): A shadow tuple obtained from `z_basis_measurement`.
@@ -78,12 +76,12 @@ def expectation_estimation_shadow(
     # Need R = NK in total, and split into K subsets of size and N is the number of snapshots.
     # each subset is a tuple of (b_lists, u_lists) and each element of the list is a list of length len(qubits)
 
-    r"""
-    Calculate the estimator $$E[O] = median(Tr{rho_{(k)} O})$$ where $$rho_(k))$$is set of $$k$$
-    snapshots in the shadow. Use median of means to ameliorate the effects of outliers.
+    r"""Calculate the estimator $$E[O] = median(Tr{rho_{(k)} O})$$ where
+    $$rho_(k))$$is set of $$k$$ snapshots in the shadow. Use median of means to
+    ameliorate the effects of outliers.
 
     Args:
-        measurement_outcomes (tuple): A shadow tuple obtained from `shadow_measure_with_executor`.
+        measurement_outcomes (tuple): A shadow tuple obtained from `get_z_basis_measurement`.
         observable (cirq.PauliString): Single cirq observable consisting of single Pauli
             operators e.g. cirq.X(0) * cirq.Y(1).
         k (int): number of splits in the median of means estimator. k * N = R, where R is the total number of measurements, N is the number of snapshots.

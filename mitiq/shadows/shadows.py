@@ -2,7 +2,6 @@
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
-
 """High-level probabilistic error cancellation tools."""
 
 from typing import (
@@ -41,9 +40,12 @@ shadow_config = {
 
 def execute_with_shadows(
     circuit: cirq.Circuit,
-    executor: Union[Executor, Callable],
+    sampling_function: Optional[
+        Union[str, Callable]
+    ] = "cirq",  # choose from cirq, qiskit, or define your own sampling function
     observables: Optional[List[Observable]] = None,
     state_reconstruction: bool = False,
+    RShadow: Optional[bool] = False,
     *,
     # number of shots for shadow estimation
     # w/o calibration (RShadow = False) then dim of the shadow is R_2
@@ -59,15 +61,14 @@ def execute_with_shadows(
     ] = None,  # Number of Total Measurements for calibration
     error_rate: Optional[float] = None,  # epsilon
     precision: Optional[float] = None,  # 1 - delta
-    RShadow: Optional[bool] = False,
     random_seed: Optional[int] = None,
-    max_batch_size: int = 100000000,
+    sampling_function_config: Optional[dict] = {},
 ) -> dict:
     """
     Executes a circuit with shadow measurements.
     Args:
         circuit: The circuit to execute.
-        executor: The executor to use for running the circuit.
+        sampling_function: The sampling function to use for z basis measurements.
         observables: The observables to measure. If None, the state will be reconstructed.
         state_reconstruction: Whether to reconstruct the state or estimate the expectation value of the observables.
         K1: Number of groups of "median of means" used for calibration in rshadow
@@ -83,7 +84,6 @@ def execute_with_shadows(
         max_batch_size: The maximum batch size to use for the executor.
     Returns:
         A dictionary containing the shadow outcomes, the Pauli strings, and either the estimated density matrix or the estimated expectation values of the observables.
-
     """
 
     qubits: List[cirq.GridQubit] = list(circuit.all_qubits())
@@ -119,15 +119,18 @@ def execute_with_shadows(
     if random_seed is not None:
         np.random.seed(random_seed)
 
-    if not isinstance(executor, Executor):
-        assert isinstance(executor, Callable)
-        executor = Executor(executor, max_batch_size=max_batch_size)
+    # if not isinstance(sampling_function, Executor):
+    #     assert isinstance(sampling_function, Callable)
+    #     sampling_function = Executor(sampling_function, max_batch_size=max_batch_size)
 
     """
     Stage 1: Shadow Measurement
     """
-    shadow_outcomes, pauli_strings = shadow_measure_with_executor(
-        circuit, executor, n_total_measurements=measurement_total_rounds
+    shadow_outcomes, pauli_strings = get_z_basis_measurement(
+        circuit,
+        n_total_measurements=measurement_total_rounds,
+        sampling_function=sampling_function,
+        sampling_function_config=sampling_function_config,
     )
     output = {
         "shadow_outcomes": shadow_outcomes,
