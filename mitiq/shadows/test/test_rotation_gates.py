@@ -46,8 +46,6 @@ def test_get_rotated_circuits():
     # Rotate the circuit.
     rotated_circuits = get_rotated_circuits(circuit, pauli_strings)
 
-    # Verify that the circuit was rotated.
-    # print(rotated_circuits)
     assert len(rotated_circuits) == len(pauli_strings)
     for rc in rotated_circuits:
         assert isinstance(rc, cirq.Circuit)
