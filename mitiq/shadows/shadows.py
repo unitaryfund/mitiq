@@ -14,25 +14,26 @@ from typing import (
 import cirq
 import numpy as np
 
-from mitiq import Executor, Observable
+from mitiq import Observable
 from mitiq.shadows import *
 
 shadow_config = {
     "RShadow": False,  # Use Robust Shadow Estimation or not
-    # Algorithm parameters (median of means) that users can tune (if RShadow = False, K1 and N1 are not used)
-    # One can choose to fill in K1, K2, N1, N2, or leave them as None if one wants to define error_rate and precision instead.
+    # Algorithm parameters (median of means) that users can tune
+    # (if RShadow = False, K1 and N1 are not used)
+    # One can choose to fill in K1, K2, N1, N2, or leave them
+    # as None if one wants to define error_rate and precision instead.
     "K2": Optional[
         int
     ],  # Number of groups of "median of means" used for shadow estimation
-    "N2": Optional[
-        int
-    ],  # Number of shots per group of "median of means" used for shadow estimation
+    "N2": Optional[int],
+    # Number of shots per group of "median of means" used for shadow estimation
     "K1": Optional[
         int
     ],  # Number of groups of "median of means" used for calibration in rshadow
-    "N1": Optional[
-        int
-    ],  # Number of shots per group of "median of means" used for calibration in rshadow
+    "N1": Optional[int],
+    # Number of shots per group of "median of means" used for calibration
+    # in rshadow
     "error_rate": Optional[float],  # epsilon
     "precision": Optional[float],  # 1 - delta
 }
@@ -40,16 +41,16 @@ shadow_config = {
 
 def execute_with_shadows(
     circuit: cirq.Circuit,
-    sampling_function: Optional[
-        Union[str, Callable]
-    ] = "cirq",  # choose from cirq, qiskit, or define your own sampling function
+    sampling_function: Optional[Union[str, Callable]] = "cirq",
+    # choose from cirq, qiskit, or define your own sampling function
     observables: Optional[List[Observable]] = None,
     state_reconstruction: bool = False,
     RShadow: Optional[bool] = False,
     *,
     # number of shots for shadow estimation
     # w/o calibration (RShadow = False) then dim of the shadow is R_2
-    # w/ calibration (RShadow = True) then dim of the shadow is R_2, and dim of calibration is R_1.
+    # w/ calibration (RShadow = True) then dim of the shadow is R_2,
+    # and dim of calibration is R_1.
     # N1: Optional[int],
     K1: Optional[int] = None,
     estimation_total_rounds: Optional[int] = None,
@@ -118,10 +119,6 @@ def execute_with_shadows(
 
     if random_seed is not None:
         np.random.seed(random_seed)
-
-    # if not isinstance(sampling_function, Executor):
-    #     assert isinstance(sampling_function, Callable)
-    #     sampling_function = Executor(sampling_function, max_batch_size=max_batch_size)
 
     """
     Stage 1: Shadow Measurement

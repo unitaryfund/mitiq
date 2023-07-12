@@ -1,4 +1,5 @@
 from typing import Tuple, List, Union, Any
+
 import numpy as np
 
 PAULI_MAP = {"X": 0, "Y": 1, "Z": 2}

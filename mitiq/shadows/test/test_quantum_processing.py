@@ -1,20 +1,21 @@
 import time
-import numpy as np
+
 import cirq
 import cirq.testing
+import numpy as np
 import pytest
+from qiskit_aer import Aer
 
 from mitiq import MeasurementResult
+from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
+from mitiq.interface.mitiq_qiskit.qiskit_utils import (
+    sample_bitstrings as qiskit_sample_bitstrings,
+)
 from mitiq.shadows.quantum_processing import (
     generate_random_pauli_strings,
     get_rotated_circuits,
     get_z_basis_measurement,
 )
-from mitiq.interface.mitiq_qiskit.qiskit_utils import (
-    sample_bitstrings as qiskit_sample_bitstrings,
-)
-from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
-from qiskit_aer import Aer
 
 
 def test_generate_random_pauli_strings():
@@ -35,8 +36,7 @@ def test_generate_random_pauli_strings():
     assert len(pauli_strings) == num_strings
 
     # Check that each Pauli string is the correct length and contains only
-    # the characters X, Y, and Z
-    # print(pauli_strings)
+
     for s in pauli_strings:
         assert len(s) == num_qubits
         assert set(s).issubset({"X", "Y", "Z"})
@@ -44,26 +44,40 @@ def test_generate_random_pauli_strings():
 
 def test_get_rotated_circuits():
     """Tests that the circuit is rotated."""
-    # Set up the circuit and pauli strings.
-    num_qubits = 3
-    circuit = cirq.testing.random_circuit(num_qubits, 10, 0.5)
-    num_qubits = len(list(circuit.all_qubits()))
-    pauli_strings = generate_random_pauli_strings(num_qubits, 5)
 
+    # define circuit a two qubit bell state
+    circuit = cirq.Circuit()
+    qubits = cirq.LineQubit.range(2)
+    circuit.append(cirq.H(qubits[0]))
+    circuit.append(cirq.CNOT(qubits[0], qubits[1]))
+
+    num_qubits = len(list(circuit.all_qubits()))
+    # define the pauli measurements to be performed on the circuit
+    pauli_strings = ["XY", "YZ"]
     # Rotate the circuit.
     rotated_circuits = get_rotated_circuits(circuit, pauli_strings)
-
     # Verify that the circuit was rotated.
-    # print(rotated_circuits)
-    assert len(rotated_circuits) == len(pauli_strings)
+    circuit_1 = circuit.copy()
+    circuit_1.append(cirq.H(qubits[0]))
+    circuit_1.append(cirq.S(qubits[1]) ** -1)
+    circuit_1.append(cirq.H(qubits[1]))
+    circuit_1.append(cirq.measure(*qubits))
+    circuit_2 = circuit.copy()
+    circuit_2.append(cirq.S(qubits[0]) ** -1)
+    circuit_2.append(cirq.H(qubits[0]))
+    circuit_2.append(cirq.measure(*qubits))
+    assert rotated_circuits == [
+        circuit_1,
+        circuit_2,
+    ], f"Expected {rotated_circuits}, got {[circuit_1, circuit_2]}"
     for rc in rotated_circuits:
         assert isinstance(rc, cirq.Circuit)
 
 
 def test_generate_random_pauli_strings_time() -> None:
     """
-    Test if the execution time of generate_random_pauli_strings linearly with the number
-    of Pauli strings.
+    Test if the execution time of generate_random_pauli_strings linearly with
+    the number of Pauli strings.
     """
     # Define the number of qubits
     num_qubits: int = 3
@@ -176,12 +190,14 @@ def test_get_z_basis_measurement_output_types(
     shadow_outcomes, pauli_strings = get_z_basis_measurement(
         circuit, n_total_measurements, sampling_function=sampling_function
     )
-    assert (
-        shadow_outcomes[0].dtype == int
-    ), f"Shadow outcomes have incorrect dtype, expected int, got {shadow_outcomes.dtype}"
-    assert isinstance(
-        pauli_strings[0], str
-    ), f"Pauli strings have incorrect dtype, expected str, got {pauli_strings.dtype}"
+    assert shadow_outcomes[0].dtype == int, (
+        f"Shadow outcomes have incorrect dtype, expected int, "
+        f"got {shadow_outcomes.dtype}"
+    )
+    assert isinstance(pauli_strings[0], str), (
+        f"Pauli strings have incorrect dtype, expected str, "
+        f"got {pauli_strings.dtype}"
+    )
 
 
 @pytest.mark.parametrize(

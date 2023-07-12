@@ -6,14 +6,16 @@ from mitiq.shadows.classical_postprocessing import (
 from mitiq.shadows.shadows_utils import *
 
 
-# executor = Executor(cirq_simulator_shadow_executor_fn, max_batch_size=int(1e10))
+# executor = Executor(cirq_simulator_shadow_executor_fn,
+# max_batch_size=int(1e10))
 
 
 def test_snapshot_state():
     b_list = [1, -1]
     u_list = ["X", "Y"]
     expected_result = np.array(
-        # here put the expected result based on the specific b_list and u_list inputs
+        # here put the expected result based on the specific b_list
+        # and u_list inputs
         [
             [0.25 + 0.0j, 0.0 + 0.75j, 0.75 + 0.0j, 0.0 + 2.25j],
             [0.0 - 0.75j, 0.25 + 0.0j, 0.0 - 2.25j, 0.75 + 0.0j],
@@ -25,10 +27,10 @@ def test_snapshot_state():
     assert isinstance(
         result, np.ndarray
     ), f"Expected a numpy array, got {type(result)}"
-    assert result.shape == (
-        2 ** len(b_list),
-        2 ** len(b_list),
-    ), f"Expected shape {(2 ** len(b_list), 2 ** len(b_list))}, got {result.shape}"
+    assert result.shape == (2 ** len(b_list), 2 ** len(b_list),), (
+        f"Expected shape {(2 ** len(b_list), 2 ** len(b_list))}, "
+        f"got {result.shape}"
+    )
     assert np.allclose(
         result, expected_result
     ), f"Expected {expected_result}, got {result}"
@@ -132,10 +134,10 @@ def test_shadow_state_reconstruction():
     assert isinstance(
         result, np.ndarray
     ), f"Expected a numpy array, got {type(result)}"
-    assert result.shape == (
-        2**num_qubits,
-        2**num_qubits,
-    ), f"Expected shape {(2 ** num_qubits, 2 ** num_qubits)}, got {result.shape}"
+    assert result.shape == (2**num_qubits, 2**num_qubits,), (
+        f"Expected shape {(2 ** num_qubits, 2 ** num_qubits)}, "
+        f"got {result.shape}"
+    )
     assert np.allclose(
         result, expected_result
     ), f"Expected {expected_result}, but got {result}"
@@ -159,8 +161,7 @@ def test_expectation_estimation_shadow():
     k = 1
     expected_result = (
         -9
-    )  # This might not be correct. Please replace it with the correct expected result if you have it.
-    print("expected_result", expected_result)
+    )
 
     result = expectation_estimation_shadow(measurement_outcomes, observable, k)
     assert isinstance(result, float), f"Expected a float, got {type(result)}"
