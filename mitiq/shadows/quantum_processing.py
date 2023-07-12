@@ -59,7 +59,7 @@ def get_rotated_circuits(
     Returns:
          The list of circuits with rotation and measurement gates appended.
     """
-    qubits = list(circuit.all_qubits())
+    qubits = sorted(list(circuit.all_qubits()))
     num_qubits = len(qubits)
     rotated_circuits = []
     for pauli_string in pauli_strings:

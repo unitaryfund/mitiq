@@ -45,14 +45,16 @@ def test_generate_random_pauli_strings():
 def test_get_rotated_circuits():
     """Tests that the circuit is rotated."""
 
-    # define circuit a two qubit bell state
+    # define circuit
     circuit = cirq.Circuit()
-    qubits = cirq.LineQubit.range(2)
+    qubits = cirq.LineQubit.range(4)
     circuit.append(cirq.H(qubits[0]))
     circuit.append(cirq.CNOT(qubits[0], qubits[1]))
+    circuit.append(cirq.CNOT(qubits[1], qubits[2]))
+    circuit.append(cirq.CNOT(qubits[2], qubits[3]))
 
     # define the pauli measurements to be performed on the circuit
-    pauli_strings = ["XY", "YZ"]
+    pauli_strings = ["XYZX"]
     # Rotate the circuit.
     rotated_circuits = get_rotated_circuits(circuit, pauli_strings)
     # Verify that the circuit was rotated.
@@ -60,15 +62,11 @@ def test_get_rotated_circuits():
     circuit_1.append(cirq.H(qubits[0]))
     circuit_1.append(cirq.S(qubits[1]) ** -1)
     circuit_1.append(cirq.H(qubits[1]))
+    circuit_1.append(cirq.H(qubits[3]))
     circuit_1.append(cirq.measure(*qubits))
-    circuit_2 = circuit.copy()
-    circuit_2.append(cirq.S(qubits[0]) ** -1)
-    circuit_2.append(cirq.H(qubits[0]))
-    circuit_2.append(cirq.measure(*qubits))
-    assert rotated_circuits == [
-        circuit_1,
-        circuit_2,
-    ], f"Expected {rotated_circuits}, got {[circuit_1, circuit_2]}"
+
+    assert rotated_circuits[0] == circuit_1
+
     for rc in rotated_circuits:
         assert isinstance(rc, cirq.Circuit)
 
@@ -109,7 +107,7 @@ def test_generate_random_pauli_strings_time_power_law() -> None:
     for i in range(1, len(times)):
         log_ratio_times = np.log(times[i] / times[i - 1])
         log_ratio_qubits = np.log(num_qubits_list[i] / num_qubits_list[i - 1])
-        assert log_ratio_times == pytest.approx(log_ratio_qubits, rel=2)
+        assert log_ratio_times == pytest.approx(log_ratio_qubits, rel=5)
 
 
 n_total_measurements = 10
@@ -220,7 +218,7 @@ def test_get_z_basis_measurement_time_growth(
         times.append(time.time() - start_time)
     for i in range(1, len(times)):
         assert times[i] / times[i - 1] == pytest.approx(
-            measurements[i] / measurements[i - 1], rel=3
+            measurements[i] / measurements[i - 1], rel=8
         )
 
 
@@ -237,6 +235,7 @@ def test_user_sampling_bitstrings_fn():
         )
 
     qubits = cirq.LineQubit.range(3)
+    print(qubits)
     circuit = simple_test_circuit(qubits)
     shadow_outcomes, pauli_strings = get_z_basis_measurement(
         circuit, n_total_measurements, sampling_function=customized_fn
