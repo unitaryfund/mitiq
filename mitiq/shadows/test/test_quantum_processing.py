@@ -68,7 +68,8 @@ def test_get_rotated_circuits():
     assert rotated_circuits == [
         circuit_0,
         circuit_1,
-    ], f"Expected {rotated_circuits[0],rotated_circuits[1]}, got {circuit_0, circuit_1}"
+    ], f"Expected {rotated_circuits[0],rotated_circuits[1]}, " \
+       f"got {circuit_0, circuit_1}"
     for rc in rotated_circuits:
         assert isinstance(rc, cirq.Circuit)
 
