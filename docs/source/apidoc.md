@@ -133,7 +133,10 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
 .. automodule:: mitiq.interface.mitiq_qiskit.qiskit_utils
    :members:
 ```
+
 ## Classical Shadows
+
+### Utility Functions
 ```{eval-rst}
 .. automodule:: mitiq.shadows.shadows_utils
    :members:

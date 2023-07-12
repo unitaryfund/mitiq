@@ -79,12 +79,8 @@ def fidelity(
     state_vector: NDArray[Any],
     rho: NDArray[Any],
 ) -> float:
-    r"""
-    Calculate the fidelity
-    $$F(\rho,\sigma)=\mathrm{Tr}\sqrt{\rho^{1/2}\sigma\rho^{1/2}}$$,
-        when $$\rho=|v\rangle\langle v|$$ is a pure state
-        $$F(\rho,\sigma)=\langle v|\sigma|v\rangle$$.
-
+    """
+    Calculate the fidelity between a state vector and a density matrix.
     Args:
         state_vector (array): The vector whose norm we want to calculate.
         rho (array): The operator whose norm we want to calculate.
