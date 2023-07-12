@@ -16,7 +16,7 @@ kernelspec:
 # Solution to hands-on lab on error mitigation with Mitiq.
 +++
 
-This is a hands-on notebook created for the [`SQMS/GGI 2022 Summer School on Quantum Simulation of Field Theories`](https://www.ggi.infn.it/showevent.pl?id=436). 
+This is a hands-on notebook created for the [`SQMS/GGI 2022 Summer School on Quantum Simulation of Field Theories`](https://sqmscenter.fnal.gov/opportunities/summer-schools/#2022). 
 
 It is a guided tutorial on error mitigation with Mitiq and is focused on the zero-noise extrapolation (ZNE) technique. As this is
 intended to be a hands-on exercise, the solutions to the examples are provided in this notebook.  
