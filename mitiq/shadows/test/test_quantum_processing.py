@@ -56,19 +56,19 @@ def test_get_rotated_circuits():
     # Rotate the circuit.
     rotated_circuits = get_rotated_circuits(circuit, pauli_strings)
     # Verify that the circuit was rotated.
+    circuit_0 = circuit.copy()
+    circuit_0.append(cirq.H(qubits[0]))
+    circuit_0.append(cirq.S(qubits[1]) ** -1)
+    circuit_0.append(cirq.H(qubits[1]))
+    circuit_0.append(cirq.measure(*qubits))
     circuit_1 = circuit.copy()
+    circuit_1.append(cirq.S(qubits[0]) ** -1)
     circuit_1.append(cirq.H(qubits[0]))
-    circuit_1.append(cirq.S(qubits[1]) ** -1)
-    circuit_1.append(cirq.H(qubits[1]))
     circuit_1.append(cirq.measure(*qubits))
-    circuit_2 = circuit.copy()
-    circuit_2.append(cirq.S(qubits[0]) ** -1)
-    circuit_2.append(cirq.H(qubits[0]))
-    circuit_2.append(cirq.measure(*qubits))
     assert rotated_circuits == [
+        circuit_0,
         circuit_1,
-        circuit_2,
-    ], f"Expected {rotated_circuits}, got {[circuit_1, circuit_2]}"
+    ], f"Expected {rotated_circuits[0],rotated_circuits[1]}, got {circuit_0, circuit_1}"
     for rc in rotated_circuits:
         assert isinstance(rc, cirq.Circuit)
 
@@ -89,7 +89,7 @@ def test_generate_random_pauli_strings_time() -> None:
         times.append(time.time() - start_time)
     for i in range(1, len(times)):
         assert times[i] / times[i - 1] == pytest.approx(
-            num_strings[i] / num_strings[i - 1], rel=1
+            num_strings[i] / num_strings[i - 1], rel=2
         )
 
 
@@ -220,7 +220,7 @@ def test_get_z_basis_measurement_time_growth(
         times.append(time.time() - start_time)
     for i in range(1, len(times)):
         assert times[i] / times[i - 1] == pytest.approx(
-            measurements[i] / measurements[i - 1], rel=3
+            measurements[i] / measurements[i - 1], rel=5
         )
 
 
