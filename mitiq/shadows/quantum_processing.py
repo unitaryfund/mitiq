@@ -4,7 +4,10 @@ import cirq
 import numpy as np
 from numpy.typing import NDArray
 
-from qiskit_aer import Aer
+try:
+    from qiskit_aer import Aer
+except ImportError:
+    pass
 from tqdm.auto import tqdm
 
 from mitiq import MeasurementResult
