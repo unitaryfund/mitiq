@@ -1,21 +1,19 @@
+import cirq
+import numpy as np
+
 from mitiq.shadows.classical_postprocessing import (
     snapshot_state,
     shadow_state_reconstruction,
     expectation_estimation_shadow,
 )
-from mitiq.shadows.shadows_utils import *
-
-
-# executor = Executor(cirq_simulator_shadow_executor_fn,
-# max_batch_size=int(1e10))
 
 
 def test_snapshot_state():
     b_list = [1, -1]
     u_list = ["X", "Y"]
     expected_result = np.array(
-        # here put the expected result based on the specific b_list
-        # and u_list inputs
+        # here put the expected result based on the
+        # specific b_list and u_list inputs
         [
             [0.25 + 0.0j, 0.0 + 0.75j, 0.75 + 0.0j, 0.0 + 2.25j],
             [0.0 - 0.75j, 0.25 + 0.0j, 0.0 - 2.25j, 0.75 + 0.0j],
@@ -43,7 +41,8 @@ def test_shadow_state_reconstruction():
 
     expected_result = np.array(
         [
-            # Fill in the expected result based on the specific b_lists and u_lists inputs.
+            # Fill in the expected result based on the specific
+            # b_lists and u_lists inputs.
             [
                 [
                     0.5 + 0.0j,
@@ -159,9 +158,8 @@ def test_expectation_estimation_shadow():
     measurement_outcomes = (b_lists, u_lists)
     observable = cirq.Z(cirq.LineQubit(0)) * cirq.Z(cirq.LineQubit(1))
     k = 1
-    expected_result = (
-        -9
-    )
+    expected_result = -9
+    print("expected_result", expected_result)
 
     result = expectation_estimation_shadow(measurement_outcomes, observable, k)
     assert isinstance(result, float), f"Expected a float, got {type(result)}"
