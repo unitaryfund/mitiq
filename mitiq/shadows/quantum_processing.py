@@ -1,10 +1,11 @@
-from typing import Tuple, Callable, Optional, Dict, Any, List, Union
+from typing import Tuple, Callable, Dict, Any, List, Union
 
 import cirq
 import numpy as np
 from qiskit_aer import Aer
 from tqdm.auto import tqdm
 
+from mitiq import MeasurementResult
 from mitiq.interface.mitiq_cirq.cirq_utils import (
     sample_bitstrings as cirq_sample_bitstrings,
 )
@@ -89,9 +90,9 @@ def get_rotated_circuits(
 def get_z_basis_measurement(
     circuit: cirq.Circuit,
     n_total_measurements: int,
-    sampling_function: Optional[Union[str, Callable]] = "cirq",
-    sampling_function_config: Optional[Dict[str, Any]] = {},
-) -> Tuple[np.ndarray, np.ndarray]:
+    sampling_function: Union[str, Callable[..., MeasurementResult]] = "cirq",
+    sampling_function_config: Dict[str, Any] = {},
+) -> Tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
     r"""Given a circuit, perform z-basis measurements on the circuit and return
     the outcomes in terms of a string, which represents for z-basis measurement
     outcomes $$1:=\{1,0\}$$, $$-1:=\{0,1\}$$.
@@ -113,8 +114,8 @@ def get_z_basis_measurement(
          outcomes (array): Tuple of two numpy arrays. The first array
       contains measurement outcomes (-1, 1) while the second array contains the
       index for the sampled Pauli's (0,1,2=X,Y,Z). Each row of the arrays
-      corresponds to a distinct snapshot or sample while each column corresponds
-      to a different qubit.
+      corresponds to a distinct snapshot or sample while each column
+      corresponds to a different qubit.
     """
 
     # Generate random Pauli unitaries
@@ -162,26 +163,20 @@ def get_z_basis_measurement(
                 f"Sampling function {sampling_function} not supported"
             )
     else:
-        assert isinstance(
-            sampling_function, Callable
-        ), "Please define your own sample_bitstrings function"
         results = [
             sampling_function(rotated_circuit, **sampling_function_config)
             for rotated_circuit in rotated_circuits
         ]
 
-    # Transform the outcomes into a numpy array.
+    # Transform the outcomes into a numpy array 0 -> 1, 1 -> -1.
     shadow_outcomes = []
     for result in results:
         bitstring = list(result.get_counts().keys())[0]
         outcome = [1 - int(i) * 2 for i in bitstring]
         shadow_outcomes.append(outcome)
-    # Combine the computational basis outcomes |b>
-    # and the unitaries sampled from local Clifford group.
-    shadow_outcomes = np.array(shadow_outcomes, dtype=int)
-    assert shadow_outcomes.shape == (
-        n_total_measurements,
-        num_qubits,
-    ), f"shape is {shadow_outcomes.shape}"
-    pauli_strings = np.array(pauli_strings, dtype=str)
-    return shadow_outcomes, pauli_strings
+
+    # output computational basis outcomes |b>
+    # and the random unitaries in {X,Y,Z}.
+    shadow_outcomes_np = np.asarray(shadow_outcomes, dtype=int)
+    pauli_strings_np = np.asarray(pauli_strings, dtype=str)
+    return shadow_outcomes_np, pauli_strings_np

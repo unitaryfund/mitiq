@@ -51,7 +51,6 @@ def test_get_rotated_circuits():
     circuit.append(cirq.H(qubits[0]))
     circuit.append(cirq.CNOT(qubits[0], qubits[1]))
 
-    num_qubits = len(list(circuit.all_qubits()))
     # define the pauli measurements to be performed on the circuit
     pauli_strings = ["XY", "YZ"]
     # Rotate the circuit.
