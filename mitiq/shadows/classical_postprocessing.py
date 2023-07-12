@@ -11,9 +11,7 @@ identity = np.eye(2, dtype=complex)
 PAULI_MAP = {"X": hadamard, "Y": hadamard @ phase_z, "Z": identity}
 
 
-def snapshot_state(
-    b_list: List[float], u_list: List[str]
-) -> NDArray[Any]:
+def snapshot_state(b_list: List[float], u_list: List[str]) -> NDArray[Any]:
     """
     Implement a single snapshot state reconstruction,
 
