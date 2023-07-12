@@ -1,56 +1,48 @@
-from typing import Tuple, List, Union, Any
+from typing import Tuple, List, Any
 from numpy.typing import NDArray
 import numpy as np
+import cirq
 
-PAULI_MAP = {"X": 0, "Y": 1, "Z": 2}
+
+# local unitary that applied to the qubits
+phase_z = cirq.S._unitary_().conj()
+hadamard = cirq.H._unitary_()
+identity = cirq.I._unitary_()
+PAULI_MAP = {"X": hadamard, "Y": hadamard @ phase_z, "Z": identity}
 
 
-def snapshot_state(
-    b_list: List[Union[int, float]], u_list: List[str]
-) -> NDArray[Any]:
+def snapshot_state(b_list: List[float], u_list: List[str]) -> NDArray[Any]:
     """
     Implement a single snapshot state reconstruction,
-
     Args:
-        b_list (array): The list of classical outcomes for the snapshot.
-        u_list (array): Indices for the applied Pauli measurement.
-
+        b_list: The list of classical outcomes for the snapshot.
+        u_list: Array of ("X", "Y", "Z") for the applied Pauli measurement.
     Returns:
-        Numpy array with the reconstructed snapshot.
+        reconstructed snapshot in terms of nparray.
     """
-    num_qubits = len(b_list)
 
-    # computational basis states, e.g.|0>=(1,0)
-    zero_state = np.array([[1, 0], [0, 0]])
-    one_state = np.array([[0, 0], [0, 1]])
+    # computational basis states, e.g. b = 1 -> (1,0), b = -1 -> (0,1)
+    b_zero = np.array([[1.0 + 0.0j, 0.0 + 0.0j]])
+    zero_state = b_zero.T @ b_zero
 
-    # local unitary that applied to the computational basis states, e.g.
-    # $$Z-$$basis measurement,
-    # which equivalent to a random Pauli measurement, i.e. for each qubit,
-    # we randomly decide to measure the Pauli operators.
-    phase_z = np.array([[1, 0], [0, -1j]], dtype=np.complex128)
-    hadamard = np.array([[1, 1], [1, -1]]) / np.sqrt(2)
-    identity = np.eye(2)
-
-    # act $$Ad_{U^\dagger}$$ on the computational basis states, where $$U$$ is
-    # Define ensemble which the random unitary sample from.
-    unitaries = [hadamard, hadamard @ phase_z, identity]
+    b_one = np.array([[0.0 + 0.0j, 1.0 + 0.0j]])
+    one_state = b_one.T @ b_one
 
     # reconstructing a single snapshot state by applying Eq. (S44)
-    rho_snapshot = np.array([1], dtype=np.complex128)
-    for i in range(num_qubits):
-        state = zero_state if b_list[i] == 1 else one_state
-        U = unitaries[PAULI_MAP[u_list[i]]]
+    rho_snapshot = np.array([1.0 + 0.0j])
 
-        # applying Eq. (S44)
-        local_rho = 3 * (U.conj().T @ state @ U) - identity
+    for b, u in zip(b_list, u_list):
+        state = zero_state if b == 1 else one_state
+        U = PAULI_MAP[u]
+        # act $$Ad_{U^\dagger}$$ on the computational basis states
+        local_rho = 3.0 * (U.conj().T @ state @ U) - identity
         rho_snapshot = np.kron(rho_snapshot, local_rho)
 
     return rho_snapshot
 
 
 def shadow_state_reconstruction(
-    measurement_outcomes: Tuple[NDArray[Any], NDArray[Any]]
+    measurement_outcomes: Tuple[NDArray[Any], NDArray[np.str0]]
 ) -> NDArray[Any]:
     """
     Reconstruct a state approximation as an average over all snapshots.
@@ -68,9 +60,7 @@ def shadow_state_reconstruction(
     b_lists, u_lists = measurement_outcomes
 
     # Averaging over snapshot states.
-    shadow_rho = np.zeros(
-        (2**num_qubits, 2**num_qubits), dtype=np.complex128
-    )
+    shadow_rho = np.zeros((2**num_qubits, 2**num_qubits), dtype=complex)
     for i in range(num_snapshots):
         shadow_rho += snapshot_state(b_lists[i], u_lists[i])
 
@@ -78,31 +68,25 @@ def shadow_state_reconstruction(
 
 
 def expectation_estimation_shadow(
-    measurement_outcomes: Tuple[NDArray[Any], NDArray[Any]],
-    observable: Any,
+    measurement_outcomes: Tuple[NDArray[Any], NDArray[np.str0]],
+    observable: cirq.PauliString,  # type: ignore
     k: int,
 ) -> float:
-    # Need R = NK in total, and split into K subsets of size and
-    # N is the number of snapshots.
-    # each subset is a tuple of (b_lists, u_lists) and each
-    # element of the list is a list of length len(qubits)
-
-    r"""
-    Calculate the estimator $$E[O] = median(Tr{rho_{(k)} O})$$ where
-    $$rho_(k))$$is set of $$k$$ snapshots in the shadow.
+    """
+    Calculate the expectation value of an observable from classical shadows.
     Use median of means to ameliorate the effects of outliers.
 
     Args:
         measurement_outcomes (tuple): A shadow tuple obtained from
         `shadow_measure_with_executor`.
         observable (cirq.PauliString): Single cirq observable consisting of
-        single Pauli operators e.g. cirq.X(0) * cirq.Y(1).
+        single Pauli operators.
         k (int): number of splits in the median of means estimator. k * N = R,
-        where R is the total number of measurements,
-         N is the number of snapshots.
+        where R is the total number of measurements.
 
     Returns:
-        Scalar corresponding to the estimate of the observable.
+        Float corresponding to the estimate of the observable
+        expectation value.
     """
 
     # convert cirq observables to indices

@@ -17,9 +17,7 @@ from mitiq.interface.mitiq_qiskit.qiskit_utils import (
 )
 
 
-# Functions to implement random Pauli measurements.
-
-
+# generate a list of random Pauli strings
 def generate_random_pauli_strings(
     num_qubits: int, num_strings: int
 ) -> List[str]:
@@ -39,6 +37,7 @@ def generate_random_pauli_strings(
     return ["".join(pauli) for pauli in paulis]
 
 
+# attach measurement gates to list of circuits
 def get_rotated_circuits(
     circuit: cirq.Circuit,
     pauli_strings: List[str],
