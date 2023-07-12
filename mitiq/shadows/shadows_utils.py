@@ -1,5 +1,5 @@
 from typing import Tuple, List, Any
-
+from numpy.typing import NDArray
 import cirq
 import numpy as np
 from cirq.ops.pauli_string import PauliString
@@ -57,7 +57,7 @@ def calculate_shadow_bound(
     return int(np.ceil(N * K)), int(K)
 
 
-def operator_2_norm(R: np.ndarray[Any, Any]) -> float:
+def operator_2_norm(R: NDArray[Any]) -> float:
     """
     Calculate the operator 2-norm.
 
@@ -76,8 +76,8 @@ def operator_2_norm(R: np.ndarray[Any, Any]) -> float:
 # and the reconstructed state,
 # return the number of measurements needed
 def fidelity(
-    state_vector: np.ndarray[Any, Any],
-    rho: np.ndarray[Any, Any],
+    state_vector: NDArray[Any],
+    rho: NDArray[Any],
 ) -> float:
     r"""
     Calculate the fidelity
