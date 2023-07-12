@@ -88,35 +88,33 @@ def get_rotated_circuits(
 
 
 # Stage 1 of Classical Shadows: Measurements
-def get_z_basis_measurement(
+def random_pauli_basis_measurement(
     circuit: cirq.Circuit,
     n_total_measurements: int,
     sampling_function: Union[str, Callable[..., MeasurementResult]] = "cirq",
     sampling_function_config: Dict[str, Any] = {},
 ) -> Tuple[NDArray[Any], NDArray[Any]]:
-    r"""Given a circuit, perform z-basis measurements on the circuit and return
-    the outcomes in terms of a string, which represents for z-basis measurement
-    outcomes $$1:=\{1,0\}$$, $$-1:=\{0,1\}$$.
+    r"""Given a circuit, perform random Pauli-basis measurements on
+    the circuit and return the measurement outcomes & the sampled
+    Pauli strings.
 
     Args:
-         circuit (cirq.Circuit): Cirq circuit.
-         n_total_measurements (int): number of snapshots.
-         sampling_function (Optional[Union[str, Callable]]): Sampling function
-           to use. If None, then the default sampling function for the backend
-           is used. If a string, then the string is used to look up a
-           sampling function in the backend's sampling function registry.
-           If a callable, then the callable is used as the sampling function.
-           Defaults to None.
-         sampling_function_config (Optional[Dict[str, Any]]): Configuration
+         circuit: Cirq circuit.
+         n_total_measurements: number of snapshots.
+         sampling_function: Sampling function to use. If a string, then the
+            string is used to look up a default sampling function. If a
+            Callable, then the Callable is used as the sampling function.
+            Defaults to `"cirq"`.
+         sampling_function_config: Configuration
             for the sampling function. Defaults to {}. If sampling_function is
-            None, then this argument is ignored.
+            a string, then this argument is ignored.
 
     Returns:
-         outcomes (array): Tuple of two numpy arrays. The first array
-      contains measurement outcomes (-1, 1) while the second array contains the
-      index for the sampled Pauli's (0,1,2=X,Y,Z). Each row of the arrays
-      corresponds to a distinct snapshot or sample while each column
-      corresponds to a different qubit.
+         outcomes: Tuple of two numpy arrays. The first array contains
+            measurement outcomes (-1, 1) while the second array contains the
+            index for the sampled Pauli's (0,1,2=X,Y,Z). Each row of the arrays
+            corresponds to a distinct snapshot or sample while each column
+            corresponds to a different qubit.
     """
 
     # Generate random Pauli unitaries

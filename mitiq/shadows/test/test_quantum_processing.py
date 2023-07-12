@@ -14,7 +14,7 @@ from mitiq.interface.mitiq_qiskit.qiskit_utils import (
 from mitiq.shadows.quantum_processing import (
     generate_random_pauli_strings,
     get_rotated_circuits,
-    get_z_basis_measurement,
+    random_pauli_basis_measurement,
 )
 
 
@@ -142,7 +142,7 @@ def test_get_z_basis_measurement_no_errors(
 ):
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = simple_test_circuit(qubits)
-    get_z_basis_measurement(
+    random_pauli_basis_measurement(
         circuit, n_total_measurements=10, sampling_function=sampling_function
     )
 
@@ -158,7 +158,7 @@ def test_get_z_basis_measurement_output_dimensions(
 ):
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = simple_test_circuit(qubits)
-    shadow_outcomes, pauli_strings = get_z_basis_measurement(
+    shadow_outcomes, pauli_strings = random_pauli_basis_measurement(
         circuit, n_total_measurements, sampling_function=sampling_function
     )
     assert shadow_outcomes.shape == (n_total_measurements, n_qubits,), (
@@ -186,7 +186,7 @@ def test_get_z_basis_measurement_output_types(
 ):
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = simple_test_circuit(qubits)
-    shadow_outcomes, pauli_strings = get_z_basis_measurement(
+    shadow_outcomes, pauli_strings = random_pauli_basis_measurement(
         circuit, n_total_measurements, sampling_function=sampling_function
     )
     assert shadow_outcomes[0].dtype == int, (
@@ -214,7 +214,7 @@ def test_get_z_basis_measurement_time_growth(
     measurements = [10, 20, 30, 40, 50]
     for n in measurements:
         start_time = time.time()
-        get_z_basis_measurement(
+        random_pauli_basis_measurement(
             circuit, n, sampling_function=sampling_function
         )
         times.append(time.time() - start_time)
@@ -238,7 +238,7 @@ def test_user_sampling_bitstrings_fn():
 
     qubits = cirq.LineQubit.range(3)
     circuit = simple_test_circuit(qubits)
-    shadow_outcomes, pauli_strings = get_z_basis_measurement(
+    shadow_outcomes, pauli_strings = random_pauli_basis_measurement(
         circuit, n_total_measurements, sampling_function=customized_fn
     )
     assert shadow_outcomes.shape == (n_total_measurements, 3,), (
