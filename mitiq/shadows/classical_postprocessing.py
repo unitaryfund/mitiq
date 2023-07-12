@@ -1,19 +1,19 @@
-from typing import Tuple, List
+from typing import Tuple, List, Any
 
 import cirq
 import numpy as np
 from numpy.typing import NDArray
 
 # local unitary that applied to the qubits
-phase_z = np.array([[1, 0], [0, -1j]], dtype=np.complex_)
-hadamard = np.array([[1, 1], [1, -1]], dtype=np.complex_) / np.sqrt(2)
-identity = np.eye(2, dtype=np.complex_)
+phase_z = np.array([[1, 0], [0, -1j]], dtype=complex)
+hadamard = np.array([[1, 1], [1, -1]], dtype=complex) / np.sqrt(2)
+identity = np.eye(2, dtype=complex)
 PAULI_MAP = {"X": hadamard, "Y": hadamard @ phase_z, "Z": identity}
 
 
 def snapshot_state(
     b_list: List[float], u_list: List[str]
-) -> NDArray[np.complex_]:
+) -> NDArray[Any]:
     """
     Implement a single snapshot state reconstruction,
 
@@ -26,11 +26,11 @@ def snapshot_state(
     """
 
     # computational basis states, e.g.|0>=(1,0)
-    zero_state = np.array([[1, 0], [0, 0]], dtype=np.complex_)
-    one_state = np.array([[0, 0], [0, 1]], dtype=np.complex_)
+    zero_state = np.array([[1, 0], [0, 0]], dtype=complex)
+    one_state = np.array([[0, 0], [0, 1]], dtype=complex)
 
     # reconstructing a single snapshot state by applying Eq. (S44)
-    rho_snapshot = np.array([1], dtype=np.complex_)
+    rho_snapshot = np.array([1], dtype=complex)
 
     for b, u in zip(b_list, u_list):
         state = zero_state if b == 1 else one_state
@@ -43,8 +43,8 @@ def snapshot_state(
 
 
 def shadow_state_reconstruction(
-    measurement_outcomes: Tuple[NDArray[np.float_], NDArray[np.str0]]
-) -> NDArray[np.complex_]:
+    measurement_outcomes: Tuple[NDArray[Any], NDArray[np.str0]]
+) -> NDArray[Any]:
     """
     Reconstruct a state approximation as an average over all snapshots.
 
@@ -64,7 +64,7 @@ def shadow_state_reconstruction(
     b_lists, u_lists = measurement_outcomes
 
     # Averaging over snapshot states.
-    shadow_rho = np.zeros((2**num_qubits, 2**num_qubits), dtype=np.complex_)
+    shadow_rho = np.zeros((2**num_qubits, 2**num_qubits), dtype=complex)
     for i in range(num_snapshots):
         shadow_rho += snapshot_state(b_lists[i], u_lists[i])
 
@@ -72,7 +72,7 @@ def shadow_state_reconstruction(
 
 
 def expectation_estimation_shadow(
-    measurement_outcomes: Tuple[NDArray[np.float_], NDArray[np.str0]],
+    measurement_outcomes: Tuple[NDArray[Any], NDArray[np.str0]],
     observable: cirq.PauliString,  # type: ignore
     k: int,
 ) -> float:
