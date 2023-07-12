@@ -137,18 +137,10 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
 ## Classical Shadows
 
 ### Rotation Gates
+
+### Quantum Processing
 ```{eval-rst}
-.. automodule:: mitiq.shadows.rotation_gates
-   :members:
-```
-### Executor Functions
-```{eval-rst}
-.. automodule:: mitiq.shadows.executor_functions
-   :members:
-```
-### Z-basis Measurements
-```{eval-rst}
-.. automodule:: mitiq.shadows.computational_basis_measurement
+.. automodule:: mitiq.shadows.quantum_processing
    :members:
 ```
 
