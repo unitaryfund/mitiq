@@ -3,8 +3,15 @@ from typing import Tuple, Callable, Dict, Any, List, Union
 import cirq
 import numpy as np
 from numpy.typing import NDArray
-from qiskit_aer import Aer
-from tqdm.auto import tqdm
+
+try:
+    from qiskit_aer import Aer
+except ImportError:
+    Aer = None
+try:
+    from tqdm.auto import tqdm
+except ImportError:
+    tqdm = None
 
 from mitiq import MeasurementResult
 from mitiq.interface.mitiq_cirq.cirq_utils import (
@@ -16,9 +23,7 @@ from mitiq.interface.mitiq_qiskit.qiskit_utils import (
 )
 
 
-# Functions to implement random Pauli measurements.
-
-
+# generate a list of random Pauli strings
 def generate_random_pauli_strings(
     num_qubits: int, num_strings: int
 ) -> List[str]:
@@ -38,6 +43,7 @@ def generate_random_pauli_strings(
     return ["".join(pauli) for pauli in paulis]
 
 
+# attach measurement gates to list of circuits
 def get_rotated_circuits(
     circuit: cirq.Circuit,
     pauli_strings: List[str],
@@ -88,33 +94,35 @@ def get_rotated_circuits(
 
 
 # Stage 1 of Classical Shadows: Measurements
-def random_pauli_basis_measurement(
+def get_z_basis_measurement(
     circuit: cirq.Circuit,
     n_total_measurements: int,
     sampling_function: Union[str, Callable[..., MeasurementResult]] = "cirq",
     sampling_function_config: Dict[str, Any] = {},
 ) -> Tuple[NDArray[Any], NDArray[Any]]:
-    r"""Given a circuit, perform random Pauli-basis measurements on
-    the circuit and return the measurement outcomes & the sampled
-    Pauli strings.
+    r"""Given a circuit, perform z-basis measurements on the circuit and return
+    the outcomes in terms of a string, which represents for z-basis measurement
+    outcomes $$1:=\{1,0\}$$, $$-1:=\{0,1\}$$.
 
     Args:
-         circuit: Cirq circuit.
-         n_total_measurements: number of snapshots.
-         sampling_function: Sampling function to use. If a string, then the
-            string is used to look up a default sampling function. If a
-            Callable, then the Callable is used as the sampling function.
-            Defaults to `"cirq"`.
-         sampling_function_config: Configuration
+         circuit (cirq.Circuit): Cirq circuit.
+         n_total_measurements (int): number of snapshots.
+         sampling_function (Optional[Union[str, Callable]]): Sampling function
+           to use. If None, then the default sampling function for the backend
+           is used. If a string, then the string is used to look up a
+           sampling function in the backend's sampling function registry.
+           If a callable, then the callable is used as the sampling function.
+           Defaults to None.
+         sampling_function_config (Optional[Dict[str, Any]]): Configuration
             for the sampling function. Defaults to {}. If sampling_function is
-            a string, then this argument is ignored.
+            None, then this argument is ignored.
 
     Returns:
-         outcomes: Tuple of two numpy arrays. The first array contains
-            measurement outcomes (-1, 1) while the second array contains the
-            index for the sampled Pauli's (0,1,2=X,Y,Z). Each row of the arrays
-            corresponds to a distinct snapshot or sample while each column
-            corresponds to a different qubit.
+         outcomes (array): Tuple of two numpy arrays. The first array
+      contains measurement outcomes (-1, 1) while the second array contains the
+      index for the sampled Pauli's (0,1,2=X,Y,Z). Each row of the arrays
+      corresponds to a distinct snapshot or sample while each column
+      corresponds to a different qubit.
     """
 
     # Generate random Pauli unitaries
@@ -124,14 +132,16 @@ def random_pauli_basis_measurement(
         num_qubits, n_total_measurements
     )
     # Attach measurement gates to the circuit
-    rotated_circuits = tqdm(
-        get_rotated_circuits(
-            circuit,
-            pauli_strings,
-        ),
-        desc="Measurement",
-        leave=False,
+    rotated_circuits = get_rotated_circuits(
+        circuit,
+        pauli_strings,
     )
+    if tqdm is not None:
+        rotated_circuits = tqdm(
+            rotated_circuits,
+            desc="Measurement",
+            leave=False,
+        )
 
     if isinstance(sampling_function, str):
         if sampling_function == "cirq":
@@ -146,6 +156,10 @@ def random_pauli_basis_measurement(
                 for rotated_circuit in rotated_circuits
             ]
         elif sampling_function == "qiskit":
+            assert (
+                Aer is not None
+            ), "Qiskit must be installed to use the qiskit sampling "
+
             # Run the circuits to collect the outcomes for cirq
             results = [
                 qiskit_sample_bitstrings(
