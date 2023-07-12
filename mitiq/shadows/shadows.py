@@ -8,6 +8,7 @@ from typing import Optional, Callable, Union, List, Dict, Any
 
 import cirq
 import numpy as np
+from numpy.typing import NDArray
 from cirq.ops.pauli_string import PauliString
 
 from mitiq import MeasurementResult
@@ -44,7 +45,7 @@ def execute_with_shadows(
     precision: Optional[float] = None,  # 1 - delta
     random_seed: int = 0,
     sampling_function_config: Dict[str, Any] = {},
-) -> Dict[str, np.ndarray[Any, Any]]:
+) -> Dict[str, NDArray[Any]]:
     """
     Executes a circuit with shadow measurements.
     Args:

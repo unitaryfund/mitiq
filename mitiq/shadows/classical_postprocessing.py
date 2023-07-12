@@ -1,5 +1,5 @@
 from typing import Tuple, List, Union, Any
-
+from numpy.typing import NDArray
 import numpy as np
 
 PAULI_MAP = {"X": 0, "Y": 1, "Z": 2}
@@ -7,7 +7,7 @@ PAULI_MAP = {"X": 0, "Y": 1, "Z": 2}
 
 def snapshot_state(
     b_list: List[Union[int, float]], u_list: List[str]
-) -> np.ndarray[Any, Any]:
+) -> NDArray[Any]:
     """
     Implement a single snapshot state reconstruction,
 
@@ -50,8 +50,8 @@ def snapshot_state(
 
 
 def shadow_state_reconstruction(
-    measurement_outcomes: Tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]
-) -> np.ndarray[Any, Any]:
+    measurement_outcomes: Tuple[NDArray[Any], NDArray[Any]]
+) -> NDArray[Any]:
     """
     Reconstruct a state approximation as an average over all snapshots.
 
@@ -78,7 +78,7 @@ def shadow_state_reconstruction(
 
 
 def expectation_estimation_shadow(
-    measurement_outcomes: Tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]],
+    measurement_outcomes: Tuple[NDArray[Any], NDArray[Any]],
     observable: Any,
     k: int,
 ) -> float:

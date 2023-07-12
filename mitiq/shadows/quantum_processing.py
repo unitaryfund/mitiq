@@ -2,6 +2,8 @@ from typing import Tuple, Callable, Dict, Any, List, Union
 
 import cirq
 import numpy as np
+from numpy.typing import NDArray
+
 from qiskit_aer import Aer
 from tqdm.auto import tqdm
 
@@ -92,7 +94,7 @@ def get_z_basis_measurement(
     n_total_measurements: int,
     sampling_function: Union[str, Callable[..., MeasurementResult]] = "cirq",
     sampling_function_config: Dict[str, Any] = {},
-) -> Tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
+) -> Tuple[NDArray[Any], NDArray[Any]]:
     r"""Given a circuit, perform z-basis measurements on the circuit and return
     the outcomes in terms of a string, which represents for z-basis measurement
     outcomes $$1:=\{1,0\}$$, $$-1:=\{0,1\}$$.
