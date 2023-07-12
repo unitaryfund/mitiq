@@ -1,40 +1,41 @@
 from typing import Tuple, List, Any
-
-import cirq
-import numpy as np
 from numpy.typing import NDArray
+import numpy as np
+import cirq
+
 
 # local unitary that applied to the qubits
-phase_z = np.array([[1, 0], [0, -1j]], dtype=complex)
-hadamard = np.array([[1, 1], [1, -1]], dtype=complex) / np.sqrt(2)
-identity = np.eye(2, dtype=complex)
+phase_z = cirq.S._unitary_().conj()
+hadamard = cirq.H._unitary_()
+identity = cirq.I._unitary_()
 PAULI_MAP = {"X": hadamard, "Y": hadamard @ phase_z, "Z": identity}
 
 
 def snapshot_state(b_list: List[float], u_list: List[str]) -> NDArray[Any]:
     """
     Implement a single snapshot state reconstruction,
-
     Args:
         b_list: The list of classical outcomes for the snapshot.
         u_list: Array of ("X", "Y", "Z") for the applied Pauli measurement.
-
     Returns:
         reconstructed snapshot in terms of nparray.
     """
 
-    # computational basis states, e.g.|0>=(1,0)
-    zero_state = np.array([[1, 0], [0, 0]], dtype=complex)
-    one_state = np.array([[0, 0], [0, 1]], dtype=complex)
+    # computational basis states, e.g. b = 1 -> (1,0), b = -1 -> (0,1)
+    b_zero = np.array([[1.0 + 0.0j, 0.0 + 0.0j]])
+    zero_state = b_zero.T @ b_zero
+
+    b_one = np.array([[0.0 + 0.0j, 1.0 + 0.0j]])
+    one_state = b_one.T @ b_one
 
     # reconstructing a single snapshot state by applying Eq. (S44)
-    rho_snapshot = np.array([1], dtype=complex)
+    rho_snapshot = np.array([1.0 + 0.0j])
 
     for b, u in zip(b_list, u_list):
         state = zero_state if b == 1 else one_state
         U = PAULI_MAP[u]
         # act $$Ad_{U^\dagger}$$ on the computational basis states
-        local_rho = 3 * (U.conj().T @ state @ U) - identity
+        local_rho = 3.0 * (U.conj().T @ state @ U) - identity
         rho_snapshot = np.kron(rho_snapshot, local_rho)
 
     return rho_snapshot
@@ -47,11 +48,8 @@ def shadow_state_reconstruction(
     Reconstruct a state approximation as an average over all snapshots.
 
     Args:
-        measurement_outcomes: Tuple of two numpy arrays.
-        The first array contains measurement outcomes (-1, 1) while the second
-        array contains the index for the sampled Pauli's ("X","Y","Z"). Each
-        row of the arrays corresponds to a distinct snapshot or sample while
-        each column corresponds to a different qubit.
+        measurement_outcomes (tuple): A shadow tuple obtained
+        from `z_basis_measurement`.
 
     Returns:
         Numpy array with the reconstructed quantum state.
@@ -74,31 +72,23 @@ def expectation_estimation_shadow(
     observable: cirq.PauliString,  # type: ignore
     k: int,
 ) -> float:
-    # Need R = NK in total, and split into K subsets of size and
-    # N is the number of snapshots.
-    # each subset is a tuple of (b_lists, u_lists) and each
-    # element of the list is a list of length len(qubits)
-
-    r"""
-    Calculate the estimator $$E[O] = median(Tr{rho_{(k)} O})$$ where
-    $$rho_(k))$$is set of $$k$$ snapshots in the shadow.
+    """
+    Calculate the expectation value of an observable from classical shadows.
     Use median of means to ameliorate the effects of outliers.
 
     Args:
         measurement_outcomes: A shadow tuple obtained from
         `shadow_measure_with_executor`.
         observable: Single cirq observable consisting of
-        single Pauli operators e.g. cirq.X(0) * cirq.Y(1).
+        single Pauli operators.
         k: number of splits in the median of means estimator. k * N = R,
-        where R is the total number of measurements,
-         N is the number of snapshots.
+        where R is the total number of measurements.
 
     Returns:
-        Scalar corresponding to the estimate of the observable.
+        Float corresponding to the estimate of the observable
+        expectation value.
     """
-
-    # convert cirq observables to indices
-    # map_pauli_to_int = {cirq.X: "X", cirq.Y: 1, cirq.Z: 2}
+    # target observable
     target_obs, target_locs = [], []
     for qubit, pauli in observable.items():
         target_obs.append(str(pauli))

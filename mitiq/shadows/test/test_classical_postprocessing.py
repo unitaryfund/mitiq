@@ -12,6 +12,8 @@ def test_snapshot_state():
     b_list = [1, -1]
     u_list = ["X", "Y"]
     expected_result = np.array(
+        # here put the expected result based on the
+        # specific b_list and u_list inputs
         [
             [0.25 + 0.0j, 0.0 + 0.75j, 0.75 + 0.0j, 0.0 + 2.25j],
             [0.0 - 0.75j, 0.25 + 0.0j, 0.0 - 2.25j, 0.75 + 0.0j],
@@ -131,9 +133,9 @@ def test_shadow_state_reconstruction():
     assert isinstance(
         result, np.ndarray
     ), f"Expected a numpy array, got {type(result)}"
-    assert result.shape == (
-        2**num_qubits,
-        2**num_qubits,
+    assert result.shape == (2**num_qubits, 2**num_qubits,), (
+        f"Expected shape {(2 ** num_qubits, 2 ** num_qubits)}, "
+        f"got {result.shape}"
     )
     assert np.allclose(
         result, expected_result
