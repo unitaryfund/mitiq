@@ -1,3 +1,10 @@
+# Copyright (C) Unitary Fund
+#
+# This source code is licensed under the GPL license (v3) found in the
+# LICENSE file in the root directory of this source tree.
+
+"""Classical postprocessing process of classical shadows."""
+
 from typing import Tuple, List, Any
 from numpy.typing import NDArray
 import numpy as np
@@ -48,7 +55,7 @@ def shadow_state_reconstruction(
     Reconstruct a state approximation as an average over all snapshots.
 
     Args:
-        measurement_outcomes (tuple): A shadow tuple obtained
+        measurement_outcomes: A shadow tuple obtained
         from `z_basis_measurement`.
 
     Returns:
@@ -77,20 +84,18 @@ def expectation_estimation_shadow(
     Use median of means to ameliorate the effects of outliers.
 
     Args:
-        measurement_outcomes (tuple): A shadow tuple obtained from
+        measurement_outcomes: A shadow tuple obtained from
         `shadow_measure_with_executor`.
-        observable (cirq.PauliString): Single cirq observable consisting of
+        observable: Single cirq observable consisting of
         single Pauli operators.
-        k (int): number of splits in the median of means estimator. k * N = R,
+        k: number of splits in the median of means estimator. k * N = R,
         where R is the total number of measurements.
 
     Returns:
         Float corresponding to the estimate of the observable
         expectation value.
     """
-
-    # convert cirq observables to indices
-    # map_pauli_to_int = {cirq.X: "X", cirq.Y: 1, cirq.Z: 2}
+    # target observable
     target_obs, target_locs = [], []
     for qubit, pauli in observable.items():
         target_obs.append(str(pauli))
