@@ -56,8 +56,8 @@ def execute_with_shadows(
         error_rate: epsilon
         precision: 1 - delta
         random_seed: The random seed to use for the shadow measurements.
-        sampling_function_config: A dictionary of configuration options for the
-            sampling function.
+        sampling_function_config: A dictionary of configuration options for
+            the sampling function.
     Returns:
         A dictionary containing the shadow outcomes, the Pauli strings, and
         either the estimated density matrix or the estimated expectation

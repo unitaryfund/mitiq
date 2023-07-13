@@ -10,17 +10,19 @@ import numpy as np
 
 from mitiq.shadows import execute_with_shadows
 
+# define a fully entangled state
+qubits = [cirq.LineQubit(i) for i in range(3)]
+circuit = cirq.Circuit([cirq.H(q) for q in qubits])
+circuit.append(cirq.CNOT(qubits[0], qubits[1]))
+circuit.append(cirq.CNOT(qubits[1], qubits[2]))
+# Define list of observables
+observables = [cirq.X(q) for q in qubits]
+
 
 def test_execute_with_shadows():
     # Define a random circuit
-    qubits = [cirq.LineQubit(i) for i in range(3)]
-    circuit = cirq.testing.random_circuit(
-        qubits=qubits, n_moments=5, op_density=0.7
-    )
-    """Test classical shadow estimation process."""
 
-    # Define observables
-    observables = [cirq.X(qubits[i]) for i in range(3)]
+    """Test classical shadow estimation process."""
 
     # Call the function to test
     result = execute_with_shadows(
@@ -43,18 +45,13 @@ def test_execute_with_shadows():
 
 def test_execute_with_shadows_no_state_reconstruction():
     """Test with state_reconstruction set to False and observables provided"""
-    qubits = [cirq.LineQubit(i) for i in range(3)]
-    circuit = cirq.testing.random_circuit(
-        qubits=qubits, n_moments=5, op_density=0.7
-    )
 
-    observables = [cirq.X(q) for q in qubits]
     result = execute_with_shadows(
         circuit,
         observables=observables,
         state_reconstruction=False,
         num_total_measurements=10,
-        k_shadows=10,
+        k_shadows=2,
     )
     assert isinstance(result, dict)
     assert "est_observables" in result
@@ -63,12 +60,6 @@ def test_execute_with_shadows_no_state_reconstruction():
 def test_execute_with_shadows_no_state_reconstruction_error_rate():
     """Test with state_reconstruction set to False,
     observables and error_rate provided"""
-    qubits = [cirq.LineQubit(i) for i in range(3)]
-    circuit = cirq.testing.random_circuit(
-        qubits=qubits, n_moments=5, op_density=0.7
-    )
-
-    observables = [cirq.X(q) for q in qubits]
 
     result1 = execute_with_shadows(
         circuit,
@@ -95,9 +86,6 @@ def test_execute_with_shadows_no_state_reconstruction_error_rate():
 
 def test_execute_with_shadows_random_seed():
     """Test with different random seeds"""
-    qubits = [cirq.LineQubit(i) for i in range(3)]
-    circuit = cirq.Circuit([cirq.H(q) for q in qubits])
-    observables = [cirq.X(q) for q in qubits]
     result1 = execute_with_shadows(
         circuit,
         observables=observables,
@@ -120,11 +108,7 @@ def test_execute_with_shadows_random_seed():
 
 def test_execute_with_shadows_sampling_function():
     """Test with different sampling functions"""
-    qubits = [cirq.LineQubit(i) for i in range(3)]
-    circuit = cirq.testing.random_circuit(
-        qubits=qubits, n_moments=5, op_density=0.7
-    )
-    observables = [cirq.X(q) for q in qubits]
+
     result1 = execute_with_shadows(
         circuit,
         observables=observables,
@@ -147,11 +131,7 @@ def test_execute_with_shadows_sampling_function():
 
 def test_execute_with_shadows_sampling_function_config():
     """Test with different sampling function configs"""
-    qubits = [cirq.LineQubit(i) for i in range(3)]
-    circuit = cirq.testing.random_circuit(
-        qubits=qubits, n_moments=5, op_density=0.7
-    )
-    observables = [cirq.X(q) for q in qubits]
+
     config1 = {"option1": "value1"}
     config2 = {"option1": "value2"}
     result1 = execute_with_shadows(

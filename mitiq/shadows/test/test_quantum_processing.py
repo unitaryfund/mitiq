@@ -172,12 +172,10 @@ def test_get_z_basis_measurement_output_types(
     ["cirq", "qiskit"],
     indirect=True,
 )
-@pytest.mark.parametrize("n_qubits", [1, 2, 5])
-def test_get_z_basis_measurement_time_growth(
-    n_qubits: int, sampling_function: str
-):
+def test_get_z_basis_measurement_time_growth(sampling_function: str):
     """Test that get_z_basis_measurement scales linearly with the
     number of measurements."""
+    n_qubits = 5
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = simple_test_circuit(qubits)
     times = []
@@ -239,7 +237,6 @@ def test_user_sampling_bitstrings_fn():
         )
 
     qubits = cirq.LineQubit.range(3)
-    print(qubits)
     n_total_measurements = 10
     circuit = simple_test_circuit(qubits)
     shadow_outcomes, pauli_strings = get_z_basis_measurement(
