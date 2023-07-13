@@ -55,7 +55,7 @@ def shadow_state_reconstruction(
     Reconstruct a state approximation as an average over all snapshots.
 
     Args:
-        measurement_outcomes (tuple): A shadow tuple obtained
+        measurement_outcomes: A shadow tuple obtained
         from `z_basis_measurement`.
 
     Returns:
