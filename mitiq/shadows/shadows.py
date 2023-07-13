@@ -86,7 +86,6 @@ def execute_with_shadows(
                 observables=observables,
                 failure_rate=precision,
             )
-        print("Number of total measurements: ", num_total_measurements)
     else:
         assert num_total_measurements is not None
         if not state_reconstruction:
@@ -121,7 +120,7 @@ def execute_with_shadows(
         assert k_shadows is not None
         expectation_values = [
             expectation_estimation_shadow(
-                measurement_outcomes, obs, k=int(k_shadows)
+                measurement_outcomes, obs, k_shadows=int(k_shadows)
             )
             for obs in observables
         ]

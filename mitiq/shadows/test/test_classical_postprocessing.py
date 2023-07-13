@@ -167,11 +167,13 @@ def test_expectation_estimation_shadow():
     )
     measurement_outcomes = (b_lists, u_lists)
     observable = cirq.Z(cirq.LineQubit(0)) * cirq.Z(cirq.LineQubit(1))
-    k = 1
+    k_shadows = 1
     expected_result = -9
     print("expected_result", expected_result)
 
-    result = expectation_estimation_shadow(measurement_outcomes, observable, k)
+    result = expectation_estimation_shadow(
+        measurement_outcomes, observable, k_shadows
+    )
     assert isinstance(result, float), f"Expected a float, got {type(result)}"
     assert np.isclose(
         result, expected_result

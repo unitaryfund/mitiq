@@ -22,13 +22,14 @@ def snapshot_state(b_list: List[float], u_list: List[str]) -> NDArray[Any]:
     """
     Implement a single snapshot state reconstruction,
     Args:
-        b_list: The list of classical outcomes for the snapshot.
-        u_list: Array of ("X", "Y", "Z") for the applied Pauli measurement.
+        b_list: The list of classical outcomes for the snapshot b = 1 -> |0>,
+          b = -1 -> |1>.
+        u_list: Array of ("X", "Y", "Z") for the applied Pauli measurement
+        on each qubit.
     Returns:
         reconstructed snapshot in terms of nparray.
     """
 
-    # computational basis states, e.g. b = 1 -> (1,0), b = -1 -> (0,1)
     b_zero = np.array([[1.0 + 0.0j, 0.0 + 0.0j]])
     zero_state = b_zero.T @ b_zero
 
@@ -77,7 +78,7 @@ def shadow_state_reconstruction(
 def expectation_estimation_shadow(
     measurement_outcomes: Tuple[NDArray[Any], NDArray[np.str0]],
     observable: cirq.PauliString,  # type: ignore
-    k: int,
+    k_shadows: int,
 ) -> float:
     """
     Calculate the expectation value of an observable from classical shadows.
@@ -88,8 +89,7 @@ def expectation_estimation_shadow(
         `shadow_measure_with_executor`.
         observable: Single cirq observable consisting of
         single Pauli operators.
-        k: number of splits in the median of means estimator. k * N = R,
-        where R is the total number of measurements.
+        k_shadows: number of splits in the median of means estimator.
 
     Returns:
         Float corresponding to the estimate of the observable
@@ -109,11 +109,11 @@ def expectation_estimation_shadow(
     means = []
 
     # loop over the splits of the shadow:
-    for i in range(0, n_total_measurements, n_total_measurements // k):
+    for i in range(0, n_total_measurements, n_total_measurements // k_shadows):
         # assign the splits temporarily
         b_lists_k, u_lists_k = (
-            b_lists[i : i + n_total_measurements // k],
-            u_lists[i : i + n_total_measurements // k],
+            b_lists[i : i + n_total_measurements // k_shadows],
+            u_lists[i : i + n_total_measurements // k_shadows],
         )
         n_group_measurements = len(b_lists_k)
         # find the exact matches for the observable of
