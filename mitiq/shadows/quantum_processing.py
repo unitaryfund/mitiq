@@ -126,8 +126,7 @@ def get_z_basis_measurement(
     """
 
     # Generate random Pauli unitaries
-    qubits = list(circuit.all_qubits())
-    num_qubits = len(qubits)
+    num_qubits = len(circuit.all_qubits())
     pauli_strings = generate_random_pauli_strings(
         num_qubits, n_total_measurements
     )
