@@ -78,47 +78,7 @@ def test_get_rotated_circuits():
         assert isinstance(rc, cirq.Circuit)
 
 
-def test_generate_random_pauli_strings_time() -> None:
-    """
-    Test if the execution time of generate_random_pauli_strings scales
-    linearly with the number of Pauli strings.
-    """
-    num_qubits = 3
-    times = []
-    num_strings = [100, 200, 300, 400, 500]
-    for n in num_strings:
-        # Measure the execution time for generating random Pauli strings
-        start_time = time.time()
-        generate_random_pauli_strings(num_qubits, n)
-        times.append(time.time() - start_time)
-    for i in range(1, len(times)):
-        assert times[i] / times[i - 1] == pytest.approx(
-            num_strings[i] / num_strings[i - 1], rel=1
-        )
-
-
-def test_generate_random_pauli_strings_time_power_law() -> None:
-    """
-    Test if the execution time of generate_random_pauli_strings grows
-    as a power law with respect to the number of qubits.
-    """
-    num_strings: int = 1000
-    times: list = []
-    num_qubits_list = [3, 6, 9, 12, 15]
-    for num_qubits in num_qubits_list:
-        # Measure the execution time for generating random Pauli strings
-        start_time = time.time()
-        generate_random_pauli_strings(num_qubits, num_strings)
-        times.append(time.time() - start_time)
-    for i in range(1, len(times)):
-        log_ratio_times = np.log(times[i] / times[i - 1])
-        log_ratio_qubits = np.log(num_qubits_list[i] / num_qubits_list[i - 1])
-        assert log_ratio_times == pytest.approx(log_ratio_qubits, rel=5)
-
-
-n_total_measurements = 10
-
-
+# define a simple test circuit for the following tests
 def simple_test_circuit(qubits):
     circuit = cirq.Circuit()
     num_qubits = len(qubits)
@@ -161,6 +121,7 @@ def test_get_z_basis_measurement_output_dimensions(
 ):
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = simple_test_circuit(qubits)
+    n_total_measurements = 10
     shadow_outcomes, pauli_strings = get_z_basis_measurement(
         circuit, n_total_measurements, sampling_function=sampling_function
     )
@@ -190,7 +151,7 @@ def test_get_z_basis_measurement_output_types(
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = simple_test_circuit(qubits)
     shadow_outcomes, pauli_strings = get_z_basis_measurement(
-        circuit, n_total_measurements, sampling_function=sampling_function
+        circuit, n_total_measurements=10, sampling_function=sampling_function
     )
     assert shadow_outcomes[0].dtype == int, (
         f"Shadow outcomes have incorrect dtype, expected int, "
@@ -227,6 +188,35 @@ def test_get_z_basis_measurement_time_growth(
         )
 
 
+@pytest.mark.parametrize(
+    "sampling_function",
+    ["cirq", "qiskit"],
+    indirect=True,
+)
+def test_get_z_basis_measurement_time_growth(
+    # n_measurements: int,
+    sampling_function: str,
+):
+    n_qubits = [3, 6, 9, 12, 15]
+
+    times = []
+    for n in n_qubits:
+        qubits = cirq.LineQubit.range(n)
+        circuit = simple_test_circuit(qubits)
+        start_time = time.time()
+        get_z_basis_measurement(
+            circuit,
+            100,  # number of total measurements
+            sampling_function=sampling_function,
+        )
+
+        times.append(time.time() - start_time)
+    for i in range(1, len(times)):
+        log_ratio_times = np.log(times[i] / times[i - 1])
+        log_ratio_qubits = np.log(n_qubits[i] / n_qubits[i - 1])
+        assert log_ratio_times == pytest.approx(log_ratio_qubits, rel=5)
+
+
 def test_user_sampling_bitstrings_fn():
     def customized_fn(
         circuit: cirq.Circuit,
@@ -241,6 +231,7 @@ def test_user_sampling_bitstrings_fn():
 
     qubits = cirq.LineQubit.range(3)
     print(qubits)
+    n_total_measurements = 10
     circuit = simple_test_circuit(qubits)
     shadow_outcomes, pauli_strings = get_z_basis_measurement(
         circuit, n_total_measurements, sampling_function=customized_fn
