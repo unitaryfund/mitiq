@@ -1,3 +1,10 @@
+# Copyright (C) Unitary Fund
+#
+# This source code is licensed under the GPL license (v3) found in the
+# LICENSE file in the root directory of this source tree.
+
+"""Classical postprocessing process of classical shadows."""
+
 from typing import Tuple, List, Any
 from numpy.typing import NDArray
 import numpy as np
