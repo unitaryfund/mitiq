@@ -76,9 +76,8 @@ def test_generate_random_pauli_strings_time() -> None:
     Test if the execution time of generate_random_pauli_strings scales linearly with
     the number of Pauli strings.
     """
-    # Define the number of qubits
-    num_qubits: int = 3
-    times: list = []
+    num_qubits = 3
+    times = []
     num_strings = [100, 200, 300, 400, 500]
     for n in num_strings:
         # Measure the execution time for generating random Pauli strings
