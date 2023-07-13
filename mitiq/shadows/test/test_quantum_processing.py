@@ -1,5 +1,12 @@
-import time
+# Copyright (C) Unitary Fund
+#
+# This source code is licensed under the GPL license (v3) found in the
+# LICENSE file in the root directory of this source tree.
 
+"""Unit tests for quantum processing functions for classical shadows."""
+
+
+import time
 import cirq
 import cirq.testing
 import numpy as np
@@ -73,12 +80,11 @@ def test_get_rotated_circuits():
 
 def test_generate_random_pauli_strings_time() -> None:
     """
-    Test if the execution time of generate_random_pauli_strings linearly with
-    the number of Pauli strings.
+    Test if the execution time of generate_random_pauli_strings scales
+    linearly with the number of Pauli strings.
     """
-    # Define the number of qubits
-    num_qubits: int = 3
-    times: list = []
+    num_qubits = 3
+    times = []
     num_strings = [100, 200, 300, 400, 500]
     for n in num_strings:
         # Measure the execution time for generating random Pauli strings
@@ -116,8 +122,7 @@ n_total_measurements = 10
 def simple_test_circuit(qubits):
     circuit = cirq.Circuit()
     num_qubits = len(qubits)
-    for i, qubit in enumerate(qubits):
-        circuit.append(cirq.H(qubit))
+    circuit.append(cirq.H.on_each(*qubits))
     for i in range(num_qubits - 1):
         circuit.append(cirq.CNOT(qubits[i], qubits[i + 1]))
     return circuit

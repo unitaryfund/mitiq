@@ -1,3 +1,9 @@
+# Copyright (C) Unitary Fund
+#
+# This source code is licensed under the GPL license (v3) found in the
+# LICENSE file in the root directory of this source tree.
+
+"""Quantum processing functions for classical shadows."""
 from typing import Tuple, Callable, Dict, Any, List, Union
 
 import cirq
@@ -7,8 +13,11 @@ from numpy.typing import NDArray
 try:
     from qiskit_aer import Aer
 except ImportError:
-    pass
-from tqdm.auto import tqdm
+    Aer = None
+try:
+    from tqdm.auto import tqdm
+except ImportError:
+    tqdm = None
 
 from mitiq import MeasurementResult
 from mitiq.interface.mitiq_cirq.cirq_utils import (
@@ -20,7 +29,6 @@ from mitiq.interface.mitiq_qiskit.qiskit_utils import (
 )
 
 
-# generate a list of random Pauli strings
 def generate_random_pauli_strings(
     num_qubits: int, num_strings: int
 ) -> List[str]:
@@ -123,20 +131,21 @@ def get_z_basis_measurement(
     """
 
     # Generate random Pauli unitaries
-    qubits = list(circuit.all_qubits())
-    num_qubits = len(qubits)
+    num_qubits = len(circuit.all_qubits())
     pauli_strings = generate_random_pauli_strings(
         num_qubits, n_total_measurements
     )
     # Attach measurement gates to the circuit
-    rotated_circuits = tqdm(
-        get_rotated_circuits(
-            circuit,
-            pauli_strings,
-        ),
-        desc="Measurement",
-        leave=False,
+    rotated_circuits = get_rotated_circuits(
+        circuit,
+        pauli_strings,
     )
+    if tqdm is not None:
+        rotated_circuits = tqdm(
+            rotated_circuits,
+            desc="Measurement",
+            leave=False,
+        )
 
     if isinstance(sampling_function, str):
         if sampling_function == "cirq":
@@ -151,6 +160,10 @@ def get_z_basis_measurement(
                 for rotated_circuit in rotated_circuits
             ]
         elif sampling_function == "qiskit":
+            assert (
+                Aer is not None
+            ), "Qiskit must be installed to use the qiskit sampling "
+
             # Run the circuits to collect the outcomes for cirq
             results = [
                 qiskit_sample_bitstrings(
