@@ -1,12 +1,5 @@
-# Copyright (C) Unitary Fund
-#
-# This source code is licensed under the GPL license (v3) found in the
-# LICENSE file in the root directory of this source tree.
-
-"""Unit tests for quantum processing functions for classical shadows."""
-
-
 import time
+
 import cirq
 import cirq.testing
 import numpy as np
@@ -52,16 +45,14 @@ def test_generate_random_pauli_strings():
 def test_get_rotated_circuits():
     """Tests that the circuit is rotated."""
 
-    # define circuit
+    # define circuit a two qubit bell state
     circuit = cirq.Circuit()
-    qubits = cirq.LineQubit.range(4)
+    qubits = cirq.LineQubit.range(2)
     circuit.append(cirq.H(qubits[0]))
     circuit.append(cirq.CNOT(qubits[0], qubits[1]))
-    circuit.append(cirq.CNOT(qubits[1], qubits[2]))
-    circuit.append(cirq.CNOT(qubits[2], qubits[3]))
 
     # define the pauli measurements to be performed on the circuit
-    pauli_strings = ["XYZX"]
+    pauli_strings = ["XY", "YZ"]
     # Rotate the circuit.
     rotated_circuits = get_rotated_circuits(circuit, pauli_strings)
     # Verify that the circuit was rotated.
@@ -69,20 +60,66 @@ def test_get_rotated_circuits():
     circuit_1.append(cirq.H(qubits[0]))
     circuit_1.append(cirq.S(qubits[1]) ** -1)
     circuit_1.append(cirq.H(qubits[1]))
-    circuit_1.append(cirq.H(qubits[3]))
     circuit_1.append(cirq.measure(*qubits))
-
-    assert rotated_circuits[0] == circuit_1
-
+    circuit_2 = circuit.copy()
+    circuit_2.append(cirq.S(qubits[0]) ** -1)
+    circuit_2.append(cirq.H(qubits[0]))
+    circuit_2.append(cirq.measure(*qubits))
+    assert rotated_circuits == [
+        circuit_1,
+        circuit_2,
+    ], f"Expected {rotated_circuits}, got {[circuit_1, circuit_2]}"
     for rc in rotated_circuits:
         assert isinstance(rc, cirq.Circuit)
 
 
-# define a simple test circuit for the following tests
+def test_generate_random_pauli_strings_time() -> None:
+    """
+    Test if the execution time of generate_random_pauli_strings linearly with
+    the number of Pauli strings.
+    """
+    # Define the number of qubits
+    num_qubits: int = 3
+    times: list = []
+    num_strings = [100, 200, 300, 400, 500]
+    for n in num_strings:
+        # Measure the execution time for generating random Pauli strings
+        start_time = time.time()
+        generate_random_pauli_strings(num_qubits, n)
+        times.append(time.time() - start_time)
+    for i in range(1, len(times)):
+        assert times[i] / times[i - 1] == pytest.approx(
+            num_strings[i] / num_strings[i - 1], rel=1
+        )
+
+
+def test_generate_random_pauli_strings_time_power_law() -> None:
+    """
+    Test if the execution time of generate_random_pauli_strings grows
+    as a power law with respect to the number of qubits.
+    """
+    num_strings: int = 1000
+    times: list = []
+    num_qubits_list = [3, 6, 9, 12, 15]
+    for num_qubits in num_qubits_list:
+        # Measure the execution time for generating random Pauli strings
+        start_time = time.time()
+        generate_random_pauli_strings(num_qubits, num_strings)
+        times.append(time.time() - start_time)
+    for i in range(1, len(times)):
+        log_ratio_times = np.log(times[i] / times[i - 1])
+        log_ratio_qubits = np.log(num_qubits_list[i] / num_qubits_list[i - 1])
+        assert log_ratio_times == pytest.approx(log_ratio_qubits, rel=2)
+
+
+n_total_measurements = 10
+
+
 def simple_test_circuit(qubits):
     circuit = cirq.Circuit()
     num_qubits = len(qubits)
-    circuit.append(cirq.H.on_each(*qubits))
+    for i, qubit in enumerate(qubits):
+        circuit.append(cirq.H(qubit))
     for i in range(num_qubits - 1):
         circuit.append(cirq.CNOT(qubits[i], qubits[i + 1]))
     return circuit
@@ -121,7 +158,6 @@ def test_get_z_basis_measurement_output_dimensions(
 ):
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = simple_test_circuit(qubits)
-    n_total_measurements = 10
     shadow_outcomes, pauli_strings = get_z_basis_measurement(
         circuit, n_total_measurements, sampling_function=sampling_function
     )
@@ -151,7 +187,7 @@ def test_get_z_basis_measurement_output_types(
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = simple_test_circuit(qubits)
     shadow_outcomes, pauli_strings = get_z_basis_measurement(
-        circuit, n_total_measurements=10, sampling_function=sampling_function
+        circuit, n_total_measurements, sampling_function=sampling_function
     )
     assert shadow_outcomes[0].dtype == int, (
         f"Shadow outcomes have incorrect dtype, expected int, "
@@ -184,37 +220,8 @@ def test_get_z_basis_measurement_time_growth(
         times.append(time.time() - start_time)
     for i in range(1, len(times)):
         assert times[i] / times[i - 1] == pytest.approx(
-            measurements[i] / measurements[i - 1], rel=8
+            measurements[i] / measurements[i - 1], rel=3
         )
-
-
-@pytest.mark.parametrize(
-    "sampling_function",
-    ["cirq", "qiskit"],
-    indirect=True,
-)
-def test_get_z_basis_measurement_time_growth(
-    # n_measurements: int,
-    sampling_function: str,
-):
-    n_qubits = [3, 6, 9, 12, 15]
-
-    times = []
-    for n in n_qubits:
-        qubits = cirq.LineQubit.range(n)
-        circuit = simple_test_circuit(qubits)
-        start_time = time.time()
-        get_z_basis_measurement(
-            circuit,
-            100,  # number of total measurements
-            sampling_function=sampling_function,
-        )
-
-        times.append(time.time() - start_time)
-    for i in range(1, len(times)):
-        log_ratio_times = np.log(times[i] / times[i - 1])
-        log_ratio_qubits = np.log(n_qubits[i] / n_qubits[i - 1])
-        assert log_ratio_times == pytest.approx(log_ratio_qubits, rel=5)
 
 
 def test_user_sampling_bitstrings_fn():
@@ -230,8 +237,6 @@ def test_user_sampling_bitstrings_fn():
         )
 
     qubits = cirq.LineQubit.range(3)
-    print(qubits)
-    n_total_measurements = 10
     circuit = simple_test_circuit(qubits)
     shadow_outcomes, pauli_strings = get_z_basis_measurement(
         circuit, n_total_measurements, sampling_function=customized_fn
