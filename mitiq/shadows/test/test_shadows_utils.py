@@ -16,6 +16,7 @@ from mitiq.shadows.shadows_utils import (
 
 
 def test_min_n_total_measurements():
+    """Test min_n_total_measurements function."""
     assert (
         min_n_total_measurements(0.5, 2) == 2176
     ), f"Expected 2176, got {min_n_total_measurements(0.5, 2)}"
@@ -28,6 +29,7 @@ def test_min_n_total_measurements():
 
 
 def test_calculate_shadow_bound():
+    """Test calculate_shadow_bound function."""
     observables = [cirq.X, cirq.Y, cirq.Z]
     N, K = calculate_shadow_bound(0.5, observables, 0.1)
     assert isinstance(N, int), f"Expected int, got {type(N)}"
@@ -35,6 +37,7 @@ def test_calculate_shadow_bound():
 
 
 def test_operator_2_norm():
+    """Test operator_2_norm function."""
     R = np.array([[1, 2], [3, 4]])
     assert np.isclose(
         operator_2_norm(R), np.sqrt(30)
@@ -42,6 +45,7 @@ def test_operator_2_norm():
 
 
 def test_fidelity():
+    """Test fidelity function."""
     state_vector = np.array([0.5, 0.5, 0.5, 0.5])
     rho = np.eye(4) / 4
     assert np.isclose(

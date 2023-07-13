@@ -103,6 +103,7 @@ def sampling_function(request):
 def test_get_z_basis_measurement_no_errors(
     n_qubits: int, sampling_function: str
 ):
+    """Test that get_z_basis_measurement runs without errors."""
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = simple_test_circuit(qubits)
     get_z_basis_measurement(
@@ -119,6 +120,8 @@ def test_get_z_basis_measurement_no_errors(
 def test_get_z_basis_measurement_output_dimensions(
     n_qubits: int, sampling_function: str
 ):
+    """Test that get_z_basis_measurement returns the correct output
+    dimensions."""
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = simple_test_circuit(qubits)
     n_total_measurements = 10
@@ -148,6 +151,7 @@ def test_get_z_basis_measurement_output_dimensions(
 def test_get_z_basis_measurement_output_types(
     n_qubits: int, sampling_function: str
 ):
+    """Test that get_z_basis_measurement returns the correct output types."""
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = simple_test_circuit(qubits)
     shadow_outcomes, pauli_strings = get_z_basis_measurement(
@@ -172,6 +176,8 @@ def test_get_z_basis_measurement_output_types(
 def test_get_z_basis_measurement_time_growth(
     n_qubits: int, sampling_function: str
 ):
+    """Test that get_z_basis_measurement scales linearly with the
+    number of measurements."""
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = simple_test_circuit(qubits)
     times = []
@@ -193,10 +199,11 @@ def test_get_z_basis_measurement_time_growth(
     ["cirq", "qiskit"],
     indirect=True,
 )
-def test_get_z_basis_measurement_time_growth(
-    # n_measurements: int,
+def test_get_z_basis_measurement_time_power_growth(
     sampling_function: str,
 ):
+    """Test that get_z_basis_measurement scales follow power law with the
+    number of measurements."""
     n_qubits = [3, 6, 9, 12, 15]
 
     times = []
@@ -218,6 +225,8 @@ def test_get_z_basis_measurement_time_growth(
 
 
 def test_user_sampling_bitstrings_fn():
+    """Test that user-defined sampling function can be used successfully."""
+
     def customized_fn(
         circuit: cirq.Circuit,
     ) -> MeasurementResult:

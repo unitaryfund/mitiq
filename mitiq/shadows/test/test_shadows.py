@@ -17,6 +17,7 @@ def test_execute_with_shadows():
     circuit = cirq.testing.random_circuit(
         qubits=qubits, n_moments=5, op_density=0.7
     )
+    """Test classical shadow estimation process."""
 
     # Define observables
     observables = [cirq.X(qubits[i]) for i in range(3)]
@@ -41,7 +42,7 @@ def test_execute_with_shadows():
 
 
 def test_execute_with_shadows_no_state_reconstruction():
-    # Test with state_reconstruction set to False and observables provided
+    """Test with state_reconstruction set to False and observables provided"""
     qubits = [cirq.LineQubit(i) for i in range(3)]
     circuit = cirq.testing.random_circuit(
         qubits=qubits, n_moments=5, op_density=0.7
@@ -60,8 +61,8 @@ def test_execute_with_shadows_no_state_reconstruction():
 
 
 def test_execute_with_shadows_no_state_reconstruction_error_rate():
-    # Test with state_reconstruction set to False,
-    # observables and error_rate provided
+    """Test with state_reconstruction set to False,
+    observables and error_rate provided"""
     qubits = [cirq.LineQubit(i) for i in range(3)]
     circuit = cirq.testing.random_circuit(
         qubits=qubits, n_moments=5, op_density=0.7
@@ -93,7 +94,7 @@ def test_execute_with_shadows_no_state_reconstruction_error_rate():
 
 
 def test_execute_with_shadows_random_seed():
-    # Test with different random seeds
+    """Test with different random seeds"""
     qubits = [cirq.LineQubit(i) for i in range(3)]
     circuit = cirq.Circuit([cirq.H(q) for q in qubits])
     observables = [cirq.X(q) for q in qubits]
@@ -118,7 +119,7 @@ def test_execute_with_shadows_random_seed():
 
 
 def test_execute_with_shadows_sampling_function():
-    # Test with different sampling functions
+    """Test with different sampling functions"""
     qubits = [cirq.LineQubit(i) for i in range(3)]
     circuit = cirq.testing.random_circuit(
         qubits=qubits, n_moments=5, op_density=0.7
@@ -145,7 +146,7 @@ def test_execute_with_shadows_sampling_function():
 
 
 def test_execute_with_shadows_sampling_function_config():
-    # Test with different sampling function configs
+    """Test with different sampling function configs"""
     qubits = [cirq.LineQubit(i) for i in range(3)]
     circuit = cirq.testing.random_circuit(
         qubits=qubits, n_moments=5, op_density=0.7

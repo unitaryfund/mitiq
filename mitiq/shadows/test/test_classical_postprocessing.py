@@ -16,6 +16,7 @@ from mitiq.shadows.classical_postprocessing import (
 
 
 def test_snapshot_state():
+    """Test snapshot_state function."""
     b_list = [1, -1]
     u_list = ["X", "Y"]
     expected_result = np.array(
@@ -42,6 +43,7 @@ def test_snapshot_state():
 
 
 def test_shadow_state_reconstruction():
+    """Test shadow_state_reconstruction function."""
     b_lists = np.array([[1, -1, 1], [1, 1, -1], [1, 1, 1]])
     u_lists = np.array([["X", "Y", "Z"], ["Z", "Y", "X"], ["Y", "X", "Z"]])
     measurement_outcomes = (b_lists, u_lists)
@@ -150,6 +152,7 @@ def test_shadow_state_reconstruction():
 
 
 def test_expectation_estimation_shadow():
+    """Test expectation_estimation_shadow function."""
     b_lists = np.array(
         [
             [1, -1, 1, -1],
