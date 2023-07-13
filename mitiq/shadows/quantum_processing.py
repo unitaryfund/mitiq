@@ -1,3 +1,9 @@
+# Copyright (C) Unitary Fund
+#
+# This source code is licensed under the GPL license (v3) found in the
+# LICENSE file in the root directory of this source tree.
+
+"""Quantum processing functions for classical shadows."""
 from typing import Tuple, Callable, Dict, Any, List, Union
 
 import cirq
@@ -23,7 +29,6 @@ from mitiq.interface.mitiq_qiskit.qiskit_utils import (
 )
 
 
-# generate a list of random Pauli strings
 def generate_random_pauli_strings(
     num_qubits: int, num_strings: int
 ) -> List[str]:
