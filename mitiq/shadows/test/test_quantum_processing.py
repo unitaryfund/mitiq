@@ -73,7 +73,7 @@ def test_get_rotated_circuits():
 
 def test_generate_random_pauli_strings_time() -> None:
     """
-    Test if the execution time of generate_random_pauli_strings linearly with
+    Test if the execution time of generate_random_pauli_strings scales linearly with
     the number of Pauli strings.
     """
     # Define the number of qubits
