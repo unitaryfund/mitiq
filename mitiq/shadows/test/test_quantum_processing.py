@@ -115,8 +115,7 @@ n_total_measurements = 10
 def simple_test_circuit(qubits):
     circuit = cirq.Circuit()
     num_qubits = len(qubits)
-    for i, qubit in enumerate(qubits):
-        circuit.append(cirq.H(qubit))
+    circuit.append(cirq.H.on_each(*qubits))
     for i in range(num_qubits - 1):
         circuit.append(cirq.CNOT(qubits[i], qubits[i + 1]))
     return circuit
