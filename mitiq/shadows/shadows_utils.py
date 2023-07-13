@@ -1,3 +1,9 @@
+# Copyright (C) Unitary Fund
+#
+# This source code is licensed under the GPL license (v3) found in the
+# LICENSE file in the root directory of this source tree.
+
+"""Defines utility functions for classical shadows protocol."""
 from typing import Tuple, List, Any
 from numpy.typing import NDArray
 import cirq
@@ -11,8 +17,8 @@ def min_n_total_measurements(epsilon: float, num_qubits: int) -> int:
         for the Pauli measurement scheme.
 
     Args:
-        epsilon (float): The error on the estimator.
-        num_qubits (int): The number of qubits in the system.
+        epsilon: The error on the estimator.
+        num_qubits: The number of qubits in the system.
 
     Returns:
         An integer that gives the number of samples required to satisfy the
@@ -31,10 +37,10 @@ def calculate_shadow_bound(
     Calculate the shadow bound for the Pauli measurement scheme.
 
     Args:
-        error (float): The error on the estimator.
-        observables (list) : List of cirq.PauliString corresponding to the
+        error: The error on the estimator.
+        observables: List of cirq.PauliString corresponding to the
         observables we intend to measure.
-        failure_rate (float): Rate of failure for the bound to hold.
+        failure_rate: Rate of failure for the bound to hold.
 
     Returns:
         An integer that gives the number of samples required to satisfy
@@ -62,7 +68,7 @@ def operator_2_norm(R: NDArray[Any]) -> float:
     Calculate the operator 2-norm.
 
     Args:
-        R (array): The operator whose norm we want to calculate.
+        R: The operator whose norm we want to calculate.
 
     Returns:
         Scalar corresponding to the norm.
@@ -79,15 +85,11 @@ def fidelity(
     state_vector: NDArray[Any],
     rho: NDArray[Any],
 ) -> float:
-    r"""
-    Calculate the fidelity
-    $$F(\rho,\sigma)=\mathrm{Tr}\sqrt{\rho^{1/2}\sigma\rho^{1/2}}$$,
-        when $$\rho=|v\rangle\langle v|$$ is a pure state
-        $$F(\rho,\sigma)=\langle v|\sigma|v\rangle$$.
-
+    """
+    Calculate the fidelity between a state vector and a density matrix.
     Args:
-        state_vector (array): The vector whose norm we want to calculate.
-        rho (array): The operator whose norm we want to calculate.
+        state_vector: The vector whose norm we want to calculate.
+        rho: The operator whose norm we want to calculate.
 
     Returns:
         Scalar corresponding to the fidelity.
