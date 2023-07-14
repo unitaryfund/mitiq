@@ -2,14 +2,13 @@
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
-
 """Classical postprocessing process of classical shadows."""
 
 from typing import Tuple, List, Any
-from numpy.typing import NDArray
-import numpy as np
-import cirq
 
+import cirq
+import numpy as np
+from numpy.typing import NDArray
 
 # local unitary that applied to the qubits
 phase_z = cirq.S._unitary_().conj()
@@ -19,16 +18,22 @@ PAULI_MAP = {"X": hadamard, "Y": hadamard @ phase_z, "Z": identity}
 
 
 def snapshot_state(b_list: List[float], u_list: List[str]) -> NDArray[Any]:
-    """
-    Implement a single snapshot state reconstruction,
+    r"""
+    Implement a single snapshot state reconstruction.
+
     Args:
-        b_list: The list of classical outcomes for the snapshot.
-        u_list: Array of ("X", "Y", "Z") for the applied Pauli measurement.
+        b_list: The list of classical outcomes for the snapshot. Here,
+            b = 1 corresponds to :math:`|0\rangle`, and
+            b = -1 corresponds to :math:`|1\rangle`.
+
+        u_list: Array of ("X", "Y", "Z") for the applied
+            Pauli measurement on each qubit.
+
     Returns:
-        reconstructed snapshot in terms of nparray.
+        Reconstructed snapshot in terms of nparray.
     """
 
-    # computational basis states, e.g. b = 1 -> (1,0), b = -1 -> (0,1)
+    # z-basis measurement outcomes
     b_zero = np.array([[1.0 + 0.0j, 0.0 + 0.0j]])
     zero_state = b_zero.T @ b_zero
 
@@ -51,8 +56,7 @@ def snapshot_state(b_list: List[float], u_list: List[str]) -> NDArray[Any]:
 def shadow_state_reconstruction(
     measurement_outcomes: Tuple[NDArray[Any], NDArray[np.str0]]
 ) -> NDArray[Any]:
-    """
-    Reconstruct a state approximation as an average over all snapshots.
+    """Reconstruct a state approximation as an average over all snapshots.
 
     Args:
         measurement_outcomes: A shadow tuple obtained
@@ -77,19 +81,17 @@ def shadow_state_reconstruction(
 def expectation_estimation_shadow(
     measurement_outcomes: Tuple[NDArray[Any], NDArray[np.str0]],
     observable: cirq.PauliString,  # type: ignore
-    k: int,
+    k_shadows: int,
 ) -> float:
-    """
-    Calculate the expectation value of an observable from classical shadows.
+    """Calculate the expectation value of an observable from classical shadows.
     Use median of means to ameliorate the effects of outliers.
 
     Args:
         measurement_outcomes: A shadow tuple obtained from
-        `shadow_measure_with_executor`.
+            `z_basis_measurement`.
         observable: Single cirq observable consisting of
-        single Pauli operators.
-        k: number of splits in the median of means estimator. k * N = R,
-        where R is the total number of measurements.
+            Pauli operators.
+        k_shadows: number of splits in the median of means estimator.
 
     Returns:
         Float corresponding to the estimate of the observable
@@ -109,12 +111,13 @@ def expectation_estimation_shadow(
     means = []
 
     # loop over the splits of the shadow:
-    for i in range(0, n_total_measurements, n_total_measurements // k):
+    for i in range(0, n_total_measurements, n_total_measurements // k_shadows):
         # assign the splits temporarily
         b_lists_k, u_lists_k = (
-            b_lists[i : i + n_total_measurements // k],
-            u_lists[i : i + n_total_measurements // k],
+            b_lists[i : i + n_total_measurements // k_shadows],
+            u_lists[i : i + n_total_measurements // k_shadows],
         )
+        # number of measurements/shadows in each split
         n_group_measurements = len(b_lists_k)
         # find the exact matches for the observable of
         # interest at the specified locations
@@ -123,8 +126,11 @@ def expectation_estimation_shadow(
         # catch the edge case where there is no match in the chunk
         if sum(indices) > 0:
             # take the product and sum
-            product = np.prod(3 * (b_lists_k[indices][:, target_locs]), axis=1)
+            product = np.prod(
+                3.0 * (b_lists_k[indices][:, target_locs]), axis=1
+            )
             means.append(np.sum(product) / n_group_measurements)
         else:
-            means.append(0)
+            means.append(0.0)
+    # return the median of means
     return float(np.median(means))
