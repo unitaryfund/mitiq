@@ -128,7 +128,6 @@ def get_z_basis_measurement(
       corresponds to a different qubit.
     """
 
-    # Generate random Pauli unitaries
     num_qubits = len(circuit.all_qubits())
     pauli_strings = generate_random_pauli_strings(
         num_qubits, n_total_measurements
