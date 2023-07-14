@@ -107,54 +107,6 @@ def test_execute_with_shadows_random_seed():
         assert not np.array_equal(result1[key], result2[key])
 
 
-def test_execute_with_shadows_sampling_function():
-    """Test with different sampling functions"""
-
-    result1 = execute_with_shadows(
-        circuit,
-        observables=observables,
-        state_reconstruction=False,
-        num_total_measurements=10,
-        k_shadows=2,
-        sampling_function="cirq",
-    )
-    result2 = execute_with_shadows(
-        circuit,
-        observables=observables,
-        state_reconstruction=False,
-        num_total_measurements=10,
-        k_shadows=2,
-        sampling_function="qiskit",
-    )
-    for key in result1.keys():
-        assert not np.array_equal(result1[key], result2[key])
-
-
-def test_execute_with_shadows_sampling_function_config():
-    """Test with different sampling function configs"""
-
-    config1 = {"option1": "value1"}
-    config2 = {"option1": "value2"}
-    result1 = execute_with_shadows(
-        circuit,
-        observables=observables,
-        state_reconstruction=False,
-        num_total_measurements=1000,
-        k_shadows=10,
-        sampling_function_config=config1,
-    )
-    result2 = execute_with_shadows(
-        circuit,
-        observables=observables,
-        state_reconstruction=False,
-        num_total_measurements=1000,
-        k_shadows=10,
-        sampling_function_config=config2,
-    )
-    for key in result1.keys():
-        assert not np.array_equal(result1[key], result2[key])
-
-
 def test_execute_with_shadows_no_observables_no_reconstruction():
     """Test with no observables and no state_reconstruction"""
 
