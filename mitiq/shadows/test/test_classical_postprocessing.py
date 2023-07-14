@@ -168,7 +168,7 @@ def test_expectation_estimation_shadow():
     measurement_outcomes = (b_lists, u_lists)
     observable = cirq.Z(cirq.LineQubit(0)) * cirq.Z(cirq.LineQubit(1))
     k_shadows = 1
-    expected_result = -9
+    expected_result = -9.0
 
     result = expectation_estimation_shadow(
         measurement_outcomes, observable, k_shadows

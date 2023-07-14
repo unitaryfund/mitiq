@@ -105,33 +105,36 @@ def get_z_basis_measurement(
     sampling_function: Union[str, Callable[..., MeasurementResult]] = "cirq",
     sampling_function_config: Dict[str, Any] = {},
 ) -> Tuple[NDArray[Any], NDArray[Any]]:
-    """Given a circuit, perform z-basis measurements on the circuit and return
-    the outcomes in terms of a string, which represents for
-    z-basis measurement outcomes |0> -> 1, |1> = -1.
+    r"""
+    Given a circuit, perform z-basis measurements on the circuit and
+    return the outcomes. The outcomes are represented as a string where a
+    z-basis measurement outcome of \(|0\rangle\) corresponds to 1, and
+    \(|1\rangle\) corresponds to -1.
 
     Args:
-         circuit: Cirq circuit.
-         n_total_measurements: number of snapshots.
-         sampling_function: Sampling function to use. If None,
-         then the default sampling function for the backend
-         is used. If a string, then the string is used to look up a
-         sampling function in the backend's sampling function registry.
-         If a callable, then the callable is used as the sampling function.
-         Defaults to None.
-         sampling_function_config: Configuration for the sampling function.
-         Defaults to {}. If sampling_function is None, then this argument is
-         ignored.
+        circuit: Cirq circuit.
+        n_total_measurements: number of snapshots.
+        sampling_function: Sampling function to use. If None, then the
+            default sampling function for the backend is used. If a string,
+            then the string is used to look up a sampling function in the
+            backend's sampling function registry. If a callable,
+            then the callable is used as the sampling function. Defaults
+            to None.
+        sampling_function_config: Configuration for the sampling function.
+            Defaults to {}. If sampling_function is None, then this argument is
+            ignored.
 
-    Returns: Tuple of two numpy arrays. The first array contains
-    measurement
-    outcomes (-1, 1) while the second array contains the
-    index for the sampled Pauli's ("X","Y","Z"), which means local Clifford
-    rotations
-    plus z-basis measurements is effectively equivalent to random Pauli
-    measurements.
-    Each row of the arrays corresponds to a distinct snapshot or sample
-    while each column corresponds to measurement outcomes
-    and random Pauli measurement on a different qubit.
+    Returns:
+        Tuple of two numpy arrays. The first array contains
+        measurement outcomes (-1, 1) while the second array contains the
+        indices for the sampled Pauli's (``"X"``, ``"Y"``, ``"Z"``).
+        This implies that local
+        Clifford rotations plus z-basis measurements are effectively
+        equivalent
+        to random Pauli measurements. Each row of the arrays corresponds to a
+        distinct snapshot or sample, while each column corresponds to
+        measurement
+        outcomes and random Pauli measurement on a different qubit.
     """
 
     # Generate random Pauli unitaries
@@ -139,6 +142,7 @@ def get_z_basis_measurement(
     pauli_strings = generate_random_pauli_strings(
         num_qubits, n_total_measurements
     )
+
     # Attach measurement gates to the circuit
     rotated_circuits = get_rotated_circuits(
         circuit,

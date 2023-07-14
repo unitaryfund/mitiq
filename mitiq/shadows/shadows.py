@@ -2,7 +2,6 @@
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
-
 """Classical shadow estimation for quantum circuits."""
 
 from typing import Optional, Callable, Union, List, Dict, Any
@@ -32,31 +31,66 @@ def execute_with_shadows(
     *,
     k_shadows: Optional[int] = None,
     num_total_measurements: Optional[int] = None,
-    error_rate: Optional[float] = None,  # epsilon
-    precision: Optional[float] = None,  # 1 - delta
+    error_rate: Optional[float] = None,
+    failure_rate: Optional[float] = None,
     random_seed: Optional[int] = None,
     sampling_function_config: Dict[str, Any] = {},
 ) -> Dict[str, NDArray[Any]]:
-    """
+    r"""
     Executes a circuit with shadow measurements.
+
     Args:
         circuit: The circuit to execute.
         sampling_function: The sampling function to use for z basis
             measurements. Choose from `cirq`, `qiskit`, or define your
+            own sampling function.
+        observables: The set of observables to measure. If None, the state
+            will be reconstructed.
+        state_reconstruction: Whether to reconstruct the state or estimate
+            the expectation value of the observables.
+        k_shadows: Number of groups of "median of means" used for shadow
+            estimation.
+        num_total_measurements: Number of shots per group of
+            "median of means" used for shadow estimation.
+        error_rate: Predicting all features with error rate \( \epsilon\)
+            via median of means prediction.
+        failure_rate: \( \delta\). Accurately predicting all features via
+            median of means prediction with error rate less than or equals to
+            \(\epsilon\) with probability at least \(1 - \delta\).
+        random_seed: The random seed to use for the shadow measurements.
+        sampling_function_config: A dictionary of configuration options for
+            the sampling function.
+
+    Returns:
+        A dictionary containing the shadow outcomes, the Pauli strings, and
+        either the estimated density matrix or the estimated expectation
+        values of the observables.
+    """
+    # function code here
+
+    r"""
+    Executes a circuit with shadow measurements.
+    Args:
+        circuit: The circuit to execute.
+            sampling_function: The sampling function to use for z basis
+            measurements. Choose from `cirq`, `qiskit`, or define your
             own sampling function
         observables: The set of observables to measure. If None, the state
             will be reconstructed.
-        state_reconstruction: Whether to reconstruct the state or estimate the
-            expectation value of the observables.
+            state_reconstruction: Whether to reconstruct the state or estimate
+            the expectation value of the observables.
         k_shadows: Number of groups of "median of means" used for shadow
             estimation
         num_total_measurements: Number of shots per group of
-             "median of means" used for shadow estimation
+            "median of means" used for shadow estimation
         num_total_measurements: Total number of shots for shadow estimation
-        error_rate: epsilon
-        precision: 1 - delta
+        error_rate: Predicting all features with error rate
+            \( \epsilon\) via median of means prediction
+        failure_rate: \( \delta\) Accurately predicting all features via
+            median of means prediction with error rate less than or equals to
+            \(\epsilon\) with probability at least \(1 - \delta\).
         random_seed: The random seed to use for the shadow measurements.
-        sampling_function_config: A dictionary of configuration options for
+            sampling_function_config: A dictionary of configuration options for
             the sampling function.
     Returns:
         A dictionary containing the shadow outcomes, the Pauli strings, and
@@ -79,12 +113,12 @@ def execute_with_shadows(
             )
             k_shadows = 1
         else:  # Estimation expectation value of observables
-            assert precision is not None
+            assert failure_rate is not None
             assert observables is not None and len(observables) > 0
             num_total_measurements, k_shadows = calculate_shadow_bound(
                 error=error_rate,
                 observables=observables,
-                failure_rate=precision,
+                failure_rate=failure_rate,
             )
     else:
         assert num_total_measurements is not None

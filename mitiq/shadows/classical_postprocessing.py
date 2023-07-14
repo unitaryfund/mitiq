@@ -2,7 +2,6 @@
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
-
 """Classical postprocessing process of classical shadows."""
 
 from typing import Tuple, List, Any
@@ -19,17 +18,22 @@ PAULI_MAP = {"X": hadamard, "Y": hadamard @ phase_z, "Z": identity}
 
 
 def snapshot_state(b_list: List[float], u_list: List[str]) -> NDArray[Any]:
-    """
-    Implement a single snapshot state reconstruction,
+    r"""
+    Implement a single snapshot state reconstruction.
+
     Args:
-        b_list: The list of classical outcomes for the snapshot b = 1 -> |0>,
-          b = -1 -> |1>.
+        b_list: The list of classical outcomes for the snapshot. Here,
+            \(b = 1\) corresponds to \(\left|0\right>\), and
+            \(b = -1\) corresponds to \(\left|1\right>\).
+
         u_list: Array of ("X", "Y", "Z") for the applied Pauli measurement
-        on each qubit.
+            on each qubit.
+
     Returns:
-        reconstructed snapshot in terms of nparray.
+        Reconstructed snapshot in terms of nparray.
     """
 
+    # z-basis measurement outcomes
     b_zero = np.array([[1.0 + 0.0j, 0.0 + 0.0j]])
     zero_state = b_zero.T @ b_zero
 
@@ -52,8 +56,7 @@ def snapshot_state(b_list: List[float], u_list: List[str]) -> NDArray[Any]:
 def shadow_state_reconstruction(
     measurement_outcomes: Tuple[NDArray[Any], NDArray[np.str0]]
 ) -> NDArray[Any]:
-    """
-    Reconstruct a state approximation as an average over all snapshots.
+    """Reconstruct a state approximation as an average over all snapshots.
 
     Args:
         measurement_outcomes: A shadow tuple obtained
@@ -80,15 +83,14 @@ def expectation_estimation_shadow(
     observable: cirq.PauliString,  # type: ignore
     k_shadows: int,
 ) -> float:
-    """
-    Calculate the expectation value of an observable from classical shadows.
+    """Calculate the expectation value of an observable from classical shadows.
     Use median of means to ameliorate the effects of outliers.
 
     Args:
         measurement_outcomes: A shadow tuple obtained from
-        `shadow_measure_with_executor`.
+            `shadow_measure_with_executor`.
         observable: Single cirq observable consisting of
-        single Pauli operators.
+            Pauli operators.
         k_shadows: number of splits in the median of means estimator.
 
     Returns:
@@ -123,8 +125,12 @@ def expectation_estimation_shadow(
         # catch the edge case where there is no match in the chunk
         if sum(indices) > 0:
             # take the product and sum
-            product = np.prod(3 * (b_lists_k[indices][:, target_locs]), axis=1)
+            product = np.prod(
+                3.0 * (b_lists_k[indices][:, target_locs]), axis=1
+            )
             means.append(np.sum(product) / n_group_measurements)
+            # product = np.prod( (b_lists_k[indices][:, target_locs]), axis=1)
+            # means.append(np.sum(product) / sum(indices))
         else:
-            means.append(0)
+            means.append(0.0)
     return float(np.median(means))

@@ -7,11 +7,12 @@
 
 import cirq
 import numpy as np
-
+import pytest
 from mitiq.shadows import execute_with_shadows
 
 # define a fully entangled state
 qubits = [cirq.LineQubit(i) for i in range(3)]
+num_qubits = len(qubits)
 circuit = cirq.Circuit([cirq.H(q) for q in qubits])
 circuit.append(cirq.CNOT(qubits[0], qubits[1]))
 circuit.append(cirq.CNOT(qubits[1], qubits[2]))
@@ -67,7 +68,7 @@ def test_execute_with_shadows_no_state_reconstruction_error_rate():
         state_reconstruction=False,
         num_total_measurements=10,
         error_rate=0.9,
-        precision=0.99,
+        failure_rate=0.01,
     )
 
     result2 = execute_with_shadows(
@@ -75,7 +76,7 @@ def test_execute_with_shadows_no_state_reconstruction_error_rate():
         observables=observables,
         state_reconstruction=False,
         error_rate=0.9,
-        precision=0.99,
+        failure_rate=0.01,
     )
 
     assert isinstance(result1, dict)
@@ -152,3 +153,43 @@ def test_execute_with_shadows_sampling_function_config():
     )
     for key in result1.keys():
         assert not np.array_equal(result1[key], result2[key])
+
+
+def test_execute_with_shadows_no_observables_no_reconstruction():
+    """Test with no observables and no state_reconstruction"""
+
+    # observables is None and state_reconstruction is False
+    with pytest.raises(AssertionError) as excinfo:
+        execute_with_shadows(circuit, state_reconstruction=False)
+
+    assert (
+        str(excinfo.value) == "observables must be provided"
+        " if state_reconstruction is False"
+    )
+
+
+def test_execute_with_shadows_error_rate_and_state_reconstruction():
+    """Test with error_rate and state_reconstruction set to True"""
+
+    # error_rate is provided and state_reconstruction is True
+    result = execute_with_shadows(
+        circuit,
+        error_rate=0.99,
+        state_reconstruction=True,
+    )
+
+    # Assert that est_density_matrix is present in the output
+    assert "est_density_matrix" in result
+
+
+def test_execute_with_shadows_error_rate_without_failure_rate():
+    """Assert that AssertionError is raised when error_rate
+    is given without failure_rate"""
+
+    with pytest.raises(AssertionError):
+        execute_with_shadows(
+            circuit,
+            observables=observables,
+            error_rate=0.99,
+            state_reconstruction=False,
+        )

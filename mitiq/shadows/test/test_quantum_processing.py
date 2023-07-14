@@ -24,6 +24,31 @@ from mitiq.shadows.quantum_processing import (
     get_z_basis_measurement,
 )
 
+import importlib
+
+
+def test_optional_imports():
+    try:
+        from qiskit_aer import Aer
+    except ImportError:
+        Aer = None
+    try:
+        from tqdm.auto import tqdm
+    except ImportError:
+        tqdm = None
+
+    if importlib.util.find_spec("qiskit_aer") is not None:
+        assert (
+            Aer is not None
+        ), "Aer should be imported if qiskit_aer is available"
+    else:
+        assert Aer is None, "Aer should be None if qiskit_aer is not available"
+
+    if importlib.util.find_spec("tqdm") is not None:
+        assert tqdm is not None, "tqdm should be imported if tqdm is available"
+    else:
+        assert tqdm is None, "tqdm should be None if tqdm is not available"
+
 
 def test_generate_random_pauli_strings():
     """
@@ -76,6 +101,30 @@ def test_get_rotated_circuits():
 
     for rc in rotated_circuits:
         assert isinstance(rc, cirq.Circuit)
+
+
+def test_get_z_basis_measurement_invalid_sampling_function():
+    """Test that get_z_basis_measurement raises an error when an invalid"""
+    num_qubits = 3
+    n_total_measurements = 5
+    # A basic circuit with 3 qubits
+    circuit = cirq.Circuit(
+        cirq.H.on_each(*[cirq.LineQubit(i) for i in range(num_qubits)])
+    )
+
+    invalid_sampling_function = "invalid_function"
+
+    with pytest.raises(ValueError) as excinfo:
+        get_z_basis_measurement(
+            circuit,
+            n_total_measurements,
+            sampling_function=invalid_sampling_function,
+        )
+
+    assert (
+        str(excinfo.value) == f"Sampling function "
+        f"{invalid_sampling_function} not supported"
+    )
 
 
 # define a simple test circuit for the following tests

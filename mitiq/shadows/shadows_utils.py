@@ -2,7 +2,6 @@
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
-
 """Defines utility functions for classical shadows protocol."""
 from typing import Tuple, List, Any
 from numpy.typing import NDArray
@@ -12,9 +11,8 @@ from cirq.ops.pauli_string import PauliString
 
 
 def min_n_total_measurements(epsilon: float, num_qubits: int) -> int:
-    """
-    Calculate the number of measurements required to satisfy the shadow bound
-        for the Pauli measurement scheme.
+    """Calculate the number of measurements required to satisfy the shadow
+    bound for the Pauli measurement scheme.
 
     Args:
         epsilon: The error on the estimator.
@@ -33,8 +31,7 @@ def calculate_shadow_bound(
     observables: List[PauliString],  # type: ignore
     failure_rate: float,
 ) -> Tuple[int, int]:
-    """
-    Calculate the shadow bound for the Pauli measurement scheme.
+    """Calculate the shadow bound for the Pauli measurement scheme.
 
     Args:
         error: The error on the estimator.
@@ -64,8 +61,7 @@ def calculate_shadow_bound(
 
 
 def operator_2_norm(R: NDArray[Any]) -> float:
-    """
-    Calculate the operator 2-norm.
+    """Calculate the operator 2-norm.
 
     Args:
         R: The operator whose norm we want to calculate.
