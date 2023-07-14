@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Quantum processing functions for classical shadows."""
-from typing import Tuple, Callable, Dict, Any, List, Union
+from typing import Tuple, Callable, Any, List
 
 import cirq
 import numpy as np
@@ -20,13 +20,15 @@ except ImportError:
     tqdm = None
 
 from mitiq import MeasurementResult
-from mitiq.interface.mitiq_cirq.cirq_utils import (
-    sample_bitstrings as cirq_sample_bitstrings,
-)
-from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
-from mitiq.interface.mitiq_qiskit.qiskit_utils import (
-    sample_bitstrings as qiskit_sample_bitstrings,
-)
+
+
+# from mitiq.interface.mitiq_cirq.cirq_utils import (
+#     sample_bitstrings as cirq_sample_bitstrings,
+# )
+# from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
+# from mitiq.interface.mitiq_qiskit.qiskit_utils import (
+#     sample_bitstrings as qiskit_sample_bitstrings,
+# )
 
 
 def generate_random_pauli_strings(
@@ -42,7 +44,7 @@ def generate_random_pauli_strings(
         A list of random Pauli strings.
     """
 
-    # Sample random Pauli operators uniformly from X, Y, Z
+    # Sample random Pauli operators uniformly from ("X", "Y", "Z")
     unitary_ensemble = ["X", "Y", "Z"]
     paulis = np.random.choice(unitary_ensemble, (num_strings, num_qubits))
     return ["".join(pauli) for pauli in paulis]
@@ -97,41 +99,40 @@ def get_rotated_circuits(
     return rotated_circuits
 
 
-def get_z_basis_measurement(
+def random_pauli_measurement(
     circuit: cirq.Circuit,
     n_total_measurements: int,
-    sampling_function: Union[str, Callable[..., MeasurementResult]] = "cirq",
-    sampling_function_config: Dict[str, Any] = {},
+    executor: Callable[[cirq.Circuit], MeasurementResult],
 ) -> Tuple[NDArray[Any], NDArray[Any]]:
-    r"""Given a circuit, perform z-basis measurements on the circuit and return
-    the outcomes in terms of a string, which represents for z-basis measurement
-    outcomes $$1:=\{1,0\}$$, $$-1:=\{0,1\}$$.
+    r"""
+    Given a circuit, perform random Pauli measurements on the circuit and
+    return outcomes. The outcomes are represented as a string where a
+    z-basis measurement outcome of :math:`|0\rangle` corresponds to 1, and
+    :math:`|1\rangle` corresponds to -1.
 
     Args:
-         circuit (cirq.Circuit): Cirq circuit.
-         n_total_measurements (int): number of snapshots.
-         sampling_function (Optional[Union[str, Callable]]): Sampling function
-           to use. If None, then the default sampling function for the backend
-           is used. If a string, then the string is used to look up a
-           sampling function in the backend's sampling function registry.
-           If a callable, then the callable is used as the sampling function.
-           Defaults to None.
-         sampling_function_config (Optional[Dict[str, Any]]): Configuration
-            for the sampling function. Defaults to {}. If sampling_function is
-            None, then this argument is ignored.
+        circuit: Cirq circuit.
+        n_total_measurements: number of snapshots.
+        executor: Executor to use. If None, then the
+            default sampling function for the backend is used. The
+            callable is used as the executor.
 
     Returns:
-         outcomes (array): Tuple of two numpy arrays. The first array
-      contains measurement outcomes (-1, 1) while the second array contains the
-      index for the sampled Pauli's (0,1,2=X,Y,Z). Each row of the arrays
-      corresponds to a distinct snapshot or sample while each column
-      corresponds to a different qubit.
+        Tuple of two numpy arrays. The first array contains
+        measurement outcomes (-1, 1) while the second array contains the
+        indices for the sampled Pauli's ("X", "Y", "Z").
+        This implies that local Clifford rotations plus z-basis measurements
+        are effectively equivalent to random Pauli measurements.
+        Each row of the arrays corresponds to a distinct snapshot or sample,
+        while each column corresponds to measurement outcomes
+        and random Pauli measurement on a different qubit.
     """
 
     num_qubits = len(circuit.all_qubits())
     pauli_strings = generate_random_pauli_strings(
         num_qubits, n_total_measurements
     )
+
     # Rotate and attach measurement gates to the circuit
     rotated_circuits = get_rotated_circuits(
         circuit,
@@ -143,44 +144,9 @@ def get_z_basis_measurement(
             desc="Measurement",
             leave=False,
         )
-
-    if isinstance(sampling_function, str):
-        if sampling_function == "cirq":
-            # Run the circuits to collect the outcomes for cirq)
-            results = [
-                cirq_sample_bitstrings(
-                    rotated_circuit,
-                    noise_level=(0,),
-                    shots=1,
-                    sampler=cirq.Simulator(),
-                )
-                for rotated_circuit in rotated_circuits
-            ]
-        elif sampling_function == "qiskit":
-            assert (
-                Aer is not None
-            ), "Qiskit must be installed to use the qiskit sampling "
-
-            # Run the circuits to collect the outcomes for cirq
-            results = [
-                qiskit_sample_bitstrings(
-                    to_qiskit(rotated_circuit),
-                    noise_model=None,
-                    backend=Aer.get_backend("aer_simulator"),
-                    shots=1,
-                    measure_all=False,
-                )
-                for rotated_circuit in rotated_circuits
-            ]
-        else:
-            raise ValueError(
-                f"Sampling function {sampling_function} not supported"
-            )
-    else:
-        results = [
-            sampling_function(rotated_circuit, **sampling_function_config)
-            for rotated_circuit in rotated_circuits
-        ]
+    results = [
+        executor(rotated_circuit) for rotated_circuit in rotated_circuits
+    ]
 
     # Transform the outcomes into a numpy array 0 -> 1, 1 -> -1.
     shadow_outcomes = []
@@ -191,4 +157,5 @@ def get_z_basis_measurement(
 
     shadow_outcomes_np = np.asarray(shadow_outcomes, dtype=int)
     pauli_strings_np = np.asarray(pauli_strings, dtype=str)
+
     return shadow_outcomes_np, pauli_strings_np
