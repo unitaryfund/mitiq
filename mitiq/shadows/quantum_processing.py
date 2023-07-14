@@ -132,7 +132,7 @@ def get_z_basis_measurement(
     pauli_strings = generate_random_pauli_strings(
         num_qubits, n_total_measurements
     )
-    # Attach measurement gates to the circuit
+    # Rotate and attach measurement gates to the circuit
     rotated_circuits = get_rotated_circuits(
         circuit,
         pauli_strings,
