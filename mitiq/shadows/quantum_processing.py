@@ -48,7 +48,6 @@ def generate_random_pauli_strings(
     return ["".join(pauli) for pauli in paulis]
 
 
-# attach measurement gates to list of circuits
 def get_rotated_circuits(
     circuit: cirq.Circuit,
     pauli_strings: List[str],
