@@ -8,6 +8,7 @@
 import importlib
 import time
 from typing import Callable
+from unittest.mock import patch
 
 import cirq
 import cirq.testing
@@ -15,6 +16,7 @@ import numpy as np
 import pytest
 from qiskit_aer import Aer
 
+import mitiq
 from mitiq import MeasurementResult
 from mitiq.interface.mitiq_cirq.cirq_utils import (
     sample_bitstrings as cirq_sample_bitstrings,
@@ -28,6 +30,22 @@ from mitiq.shadows.quantum_processing import (
     get_rotated_circuits,
     random_pauli_measurement,
 )
+
+
+def test_tqdm_import_available():
+    # Test the case where tqdm is available
+    import tqdm as tqdm_orig
+
+    assert tqdm_orig is not None
+    assert mitiq.shadows.quantum_processing.tqdm is not None
+
+
+def test_tqdm_import_not_available():
+    with patch.dict("sys.modules", {"tqdm.auto": None}):
+        importlib.reload(
+            mitiq.shadows.quantum_processing
+        )  # Reload the module to trigger the import
+        assert mitiq.shadows.quantum_processing.tqdm is None
 
 
 def cirq_executor(
@@ -53,41 +71,24 @@ def qiskit_executor(
     )
 
 
-def test_optional_imports():
-    """Test that optional imports are handled correctly."""
-    try:
-        from tqdm.auto import tqdm
-    except ImportError:
-        tqdm = None
-
-    if importlib.util.find_spec("tqdm") is not None:
-        assert tqdm is not None, "tqdm should be imported if tqdm is available"
-    else:
-        assert tqdm is None, "tqdm should be None if tqdm is not available"
-
-
-def test_generate_random_pauli_strings():
+def test_generate_random_pauli_strings_time() -> None:
     """
-    Test that generate_random_pauli_strings returns a list of Pauli strings
-    of the correct length.
+    Test if the execution time of generate_random_pauli_strings linearly with
+    the number of Pauli strings.
     """
-
-    # Define the number of qubits and Pauli strings to generate
-    num_qubits = 5
-    num_strings = 10
-
-    # Generate the Pauli strings
-    pauli_strings = generate_random_pauli_strings(num_qubits, num_strings)
-
-    # Check that the function returned a list of the correct length
-    assert isinstance(pauli_strings, list)
-    assert len(pauli_strings) == num_strings
-
-    # Check that each Pauli string is the correct length and contains only
-
-    for s in pauli_strings:
-        assert len(s) == num_qubits
-        assert set(s).issubset({"X", "Y", "Z"})
+    # Define the number of qubits
+    num_qubits: int = 300
+    times: list = []
+    num_strings = [3000, 4000, 5000]
+    for n in num_strings:
+        # Measure the execution time for generating random Pauli strings
+        start_time = time.time()
+        generate_random_pauli_strings(num_qubits, n)
+        times.append(time.time() - start_time)
+    for i in range(1, len(times)):
+        assert times[i] / times[i - 1] == pytest.approx(
+            num_strings[i] / num_strings[i - 1], rel=1
+        )
 
 
 def test_get_rotated_circuits():

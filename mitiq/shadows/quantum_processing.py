@@ -11,24 +11,11 @@ import numpy as np
 from numpy.typing import NDArray
 
 try:
-    from qiskit_aer import Aer
-except ImportError:
-    Aer = None
-try:
     from tqdm.auto import tqdm
 except ImportError:
     tqdm = None
 
 from mitiq import MeasurementResult
-
-
-# from mitiq.interface.mitiq_cirq.cirq_utils import (
-#     sample_bitstrings as cirq_sample_bitstrings,
-# )
-# from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
-# from mitiq.interface.mitiq_qiskit.qiskit_utils import (
-#     sample_bitstrings as qiskit_sample_bitstrings,
-# )
 
 
 def generate_random_pauli_strings(
