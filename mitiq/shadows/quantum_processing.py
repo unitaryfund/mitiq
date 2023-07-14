@@ -189,8 +189,6 @@ def get_z_basis_measurement(
         outcome = [1 - int(i) * 2 for i in bitstring]
         shadow_outcomes.append(outcome)
 
-    # output computational basis outcomes |b>
-    # and the random unitaries in {X,Y,Z}.
     shadow_outcomes_np = np.asarray(shadow_outcomes, dtype=int)
     pauli_strings_np = np.asarray(pauli_strings, dtype=str)
     return shadow_outcomes_np, pauli_strings_np
