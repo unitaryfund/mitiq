@@ -97,7 +97,6 @@ def get_rotated_circuits(
     return rotated_circuits
 
 
-# Stage 1 of Classical Shadows: Measurements
 def get_z_basis_measurement(
     circuit: cirq.Circuit,
     n_total_measurements: int,
