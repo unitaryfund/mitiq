@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Quantum processing functions for classical shadows."""
-from typing import Tuple, Callable, Dict, Any, List, Union
+from typing import Tuple, Callable, Any, List
 
 import cirq
 import numpy as np
@@ -20,13 +20,15 @@ except ImportError:
     tqdm = None
 
 from mitiq import MeasurementResult
-from mitiq.interface.mitiq_cirq.cirq_utils import (
-    sample_bitstrings as cirq_sample_bitstrings,
-)
-from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
-from mitiq.interface.mitiq_qiskit.qiskit_utils import (
-    sample_bitstrings as qiskit_sample_bitstrings,
-)
+
+
+# from mitiq.interface.mitiq_cirq.cirq_utils import (
+#     sample_bitstrings as cirq_sample_bitstrings,
+# )
+# from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
+# from mitiq.interface.mitiq_qiskit.qiskit_utils import (
+#     sample_bitstrings as qiskit_sample_bitstrings,
+# )
 
 
 def generate_random_pauli_strings(
@@ -48,7 +50,6 @@ def generate_random_pauli_strings(
     return ["".join(pauli) for pauli in paulis]
 
 
-# attach measurement gates to list of circuits
 def get_rotated_circuits(
     circuit: cirq.Circuit,
     pauli_strings: List[str],
@@ -98,31 +99,23 @@ def get_rotated_circuits(
     return rotated_circuits
 
 
-# Stage 1 of Classical Shadows: Measurements
-def get_z_basis_measurement(
+def random_pauli_measurement(
     circuit: cirq.Circuit,
     n_total_measurements: int,
-    sampling_function: Union[str, Callable[..., MeasurementResult]] = "cirq",
-    sampling_function_config: Dict[str, Any] = {},
+    executor: Callable[[cirq.Circuit], MeasurementResult],
 ) -> Tuple[NDArray[Any], NDArray[Any]]:
     r"""
-    Given a circuit, perform z-basis measurements on the circuit and
-    return the outcomes. The outcomes are represented as a string where a
+    Given a circuit, perform random Pauli measurements on the circuit and
+    return outcomes. The outcomes are represented as a string where a
     z-basis measurement outcome of :math:`|0\rangle` corresponds to 1, and
     :math:`|1\rangle` corresponds to -1.
 
     Args:
         circuit: Cirq circuit.
         n_total_measurements: number of snapshots.
-        sampling_function: Sampling function to use. If None, then the
-            default sampling function for the backend is used. If a string,
-            then the string is used to look up a sampling function in the
-            backend's sampling function registry. If a callable,
-            then the callable is used as the sampling function. Defaults
-            to None.
-        sampling_function_config: Configuration for the sampling function.
-            Defaults to {}. If sampling_function is None, then this argument is
-            ignored.
+        executor: Executor to use. If None, then the
+            default sampling function for the backend is used. The
+            callable is used as the executor.
 
     Returns:
         Tuple of two numpy arrays. The first array contains
@@ -135,13 +128,12 @@ def get_z_basis_measurement(
         and random Pauli measurement on a different qubit.
     """
 
-    # Generate random Pauli unitaries
     num_qubits = len(circuit.all_qubits())
     pauli_strings = generate_random_pauli_strings(
         num_qubits, n_total_measurements
     )
 
-    # Attach measurement gates to the circuit
+    # Rotate and attach measurement gates to the circuit
     rotated_circuits = get_rotated_circuits(
         circuit,
         pauli_strings,
@@ -152,44 +144,9 @@ def get_z_basis_measurement(
             desc="Measurement",
             leave=False,
         )
-
-    if isinstance(sampling_function, str):
-        if sampling_function == "cirq":
-            # Run the circuits to collect the outcomes for cirq)
-            results = [
-                cirq_sample_bitstrings(
-                    rotated_circuit,
-                    noise_level=(0,),
-                    shots=1,
-                    sampler=cirq.Simulator(),
-                )
-                for rotated_circuit in rotated_circuits
-            ]
-        elif sampling_function == "qiskit":
-            assert (
-                Aer is not None
-            ), "Qiskit must be installed to use the qiskit sampling "
-
-            # Run the circuits to collect the outcomes for cirq
-            results = [
-                qiskit_sample_bitstrings(
-                    to_qiskit(rotated_circuit),
-                    noise_model=None,
-                    backend=Aer.get_backend("aer_simulator"),
-                    shots=1,
-                    measure_all=False,
-                )
-                for rotated_circuit in rotated_circuits
-            ]
-        else:
-            raise ValueError(
-                f"Sampling function {sampling_function} not supported"
-            )
-    else:
-        results = [
-            sampling_function(rotated_circuit, **sampling_function_config)
-            for rotated_circuit in rotated_circuits
-        ]
+    results = [
+        executor(rotated_circuit) for rotated_circuit in rotated_circuits
+    ]
 
     # Transform the outcomes into a numpy array 0 -> 1, 1 -> -1.
     shadow_outcomes = []
@@ -198,8 +155,6 @@ def get_z_basis_measurement(
         outcome = [1 - int(i) * 2 for i in bitstring]
         shadow_outcomes.append(outcome)
 
-    # output computational basis outcomes |b> ->  1 or -1
-    # and the random unitaries in ("X","Y","Z").
     shadow_outcomes_np = np.asarray(shadow_outcomes, dtype=int)
     pauli_strings_np = np.asarray(pauli_strings, dtype=str)
 

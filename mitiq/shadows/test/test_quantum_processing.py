@@ -5,8 +5,10 @@
 
 """Unit tests for quantum processing functions for classical shadows."""
 
-
+import importlib
 import time
+from typing import Callable
+
 import cirq
 import cirq.testing
 import numpy as np
@@ -14,6 +16,9 @@ import pytest
 from qiskit_aer import Aer
 
 from mitiq import MeasurementResult
+from mitiq.interface.mitiq_cirq.cirq_utils import (
+    sample_bitstrings as cirq_sample_bitstrings,
+)
 from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
 from mitiq.interface.mitiq_qiskit.qiskit_utils import (
     sample_bitstrings as qiskit_sample_bitstrings,
@@ -21,28 +26,39 @@ from mitiq.interface.mitiq_qiskit.qiskit_utils import (
 from mitiq.shadows.quantum_processing import (
     generate_random_pauli_strings,
     get_rotated_circuits,
-    get_z_basis_measurement,
+    random_pauli_measurement,
 )
 
-import importlib
+
+def cirq_executor(
+    circuit: cirq.Circuit,
+) -> MeasurementResult:
+    return cirq_sample_bitstrings(
+        circuit,
+        noise_level=(0,),
+        shots=1,
+        sampler=cirq.Simulator(),
+    )
+
+
+def qiskit_executor(
+    circuit: cirq.Circuit,
+) -> MeasurementResult:
+    return qiskit_sample_bitstrings(
+        to_qiskit(circuit),
+        noise_model=None,
+        backend=Aer.get_backend("aer_simulator"),
+        shots=1,
+        measure_all=False,
+    )
 
 
 def test_optional_imports():
-    try:
-        from qiskit_aer import Aer
-    except ImportError:
-        Aer = None
+    """Test that optional imports are handled correctly."""
     try:
         from tqdm.auto import tqdm
     except ImportError:
         tqdm = None
-
-    if importlib.util.find_spec("qiskit_aer") is not None:
-        assert (
-            Aer is not None
-        ), "Aer should be imported if qiskit_aer is available"
-    else:
-        assert Aer is None, "Aer should be None if qiskit_aer is not available"
 
     if importlib.util.find_spec("tqdm") is not None:
         assert tqdm is not None, "tqdm should be imported if tqdm is available"
@@ -103,30 +119,6 @@ def test_get_rotated_circuits():
         assert isinstance(rc, cirq.Circuit)
 
 
-def test_get_z_basis_measurement_invalid_sampling_function():
-    """Test that get_z_basis_measurement raises an error when an invalid"""
-    num_qubits = 3
-    n_total_measurements = 5
-    # A basic circuit with 3 qubits
-    circuit = cirq.Circuit(
-        cirq.H.on_each(*[cirq.LineQubit(i) for i in range(num_qubits)])
-    )
-
-    invalid_sampling_function = "invalid_function"
-
-    with pytest.raises(ValueError) as excinfo:
-        get_z_basis_measurement(
-            circuit,
-            n_total_measurements,
-            sampling_function=invalid_sampling_function,
-        )
-
-    assert (
-        str(excinfo.value) == f"Sampling function "
-        f"{invalid_sampling_function} not supported"
-    )
-
-
 # define a simple test circuit for the following tests
 def simple_test_circuit(qubits):
     circuit = cirq.Circuit()
@@ -139,43 +131,41 @@ def simple_test_circuit(qubits):
 
 # test different generators
 @pytest.fixture
-def sampling_function(request):
+def executor(request):
     return request.param
 
 
 @pytest.mark.parametrize(
-    "sampling_function",
-    ["cirq", "qiskit"],
+    "executor",
+    [cirq_executor, qiskit_executor],
     indirect=True,
 )
 @pytest.mark.parametrize("n_qubits", [1, 2, 5])
-def test_get_z_basis_measurement_no_errors(
-    n_qubits: int, sampling_function: str
-):
-    """Test that get_z_basis_measurement runs without errors."""
+def test_random_pauli_measurement_no_errors(n_qubits, executor):
+    """Test that random_pauli_measurement runs without errors."""
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = simple_test_circuit(qubits)
-    get_z_basis_measurement(
-        circuit, n_total_measurements=10, sampling_function=sampling_function
+    random_pauli_measurement(
+        circuit, n_total_measurements=10, executor=executor
     )
 
 
 @pytest.mark.parametrize(
-    "sampling_function",
-    ["cirq", "qiskit"],
+    "executor",
+    [cirq_executor, qiskit_executor],
     indirect=True,
 )
 @pytest.mark.parametrize("n_qubits", [1, 2, 5])
-def test_get_z_basis_measurement_output_dimensions(
-    n_qubits: int, sampling_function: str
+def test_random_pauli_measurement_output_dimensions(
+    n_qubits: int, executor: Callable
 ):
-    """Test that get_z_basis_measurement returns the correct output
+    """Test that random_pauli_measurement returns the correct output
     dimensions."""
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = simple_test_circuit(qubits)
     n_total_measurements = 10
-    shadow_outcomes, pauli_strings = get_z_basis_measurement(
-        circuit, n_total_measurements, sampling_function=sampling_function
+    shadow_outcomes, pauli_strings = random_pauli_measurement(
+        circuit, n_total_measurements, executor=executor
     )
     assert shadow_outcomes.shape == (n_total_measurements, n_qubits,), (
         f"Shadow outcomes have incorrect shape, expected "
@@ -192,19 +182,19 @@ def test_get_z_basis_measurement_output_dimensions(
 
 
 @pytest.mark.parametrize(
-    "sampling_function",
-    ["cirq", "qiskit"],
+    "executor",
+    [cirq_executor, qiskit_executor],
     indirect=True,
 )
 @pytest.mark.parametrize("n_qubits", [1, 2, 5])
-def test_get_z_basis_measurement_output_types(
-    n_qubits: int, sampling_function: str
+def test_random_pauli_measurement_output_types(
+    n_qubits: int, executor: Callable
 ):
-    """Test that get_z_basis_measurement returns the correct output types."""
+    """Test that random_pauli_measurement returns the correct output types."""
     qubits = cirq.LineQubit.range(n_qubits)
     circuit = simple_test_circuit(qubits)
-    shadow_outcomes, pauli_strings = get_z_basis_measurement(
-        circuit, n_total_measurements=10, sampling_function=sampling_function
+    shadow_outcomes, pauli_strings = random_pauli_measurement(
+        circuit, n_total_measurements=10, executor=executor
     )
     assert shadow_outcomes[0].dtype == int, (
         f"Shadow outcomes have incorrect dtype, expected int, "
@@ -217,12 +207,12 @@ def test_get_z_basis_measurement_output_types(
 
 
 @pytest.mark.parametrize(
-    "sampling_function",
-    ["cirq", "qiskit"],
+    "executor",
+    [cirq_executor, qiskit_executor],
     indirect=True,
 )
-def test_get_z_basis_measurement_time_growth(sampling_function: str):
-    """Test that get_z_basis_measurement scales linearly with the
+def test_random_pauli_measurement_time_growth(executor: Callable):
+    """Test that random_pauli_measurement scales linearly with the
     number of measurements."""
     n_qubits = 5
     qubits = cirq.LineQubit.range(n_qubits)
@@ -231,9 +221,7 @@ def test_get_z_basis_measurement_time_growth(sampling_function: str):
     measurements = [10, 20, 30, 40, 50]
     for n in measurements:
         start_time = time.time()
-        get_z_basis_measurement(
-            circuit, n, sampling_function=sampling_function
-        )
+        random_pauli_measurement(circuit, n, executor=executor)
         times.append(time.time() - start_time)
     for i in range(1, len(times)):
         assert times[i] / times[i - 1] == pytest.approx(
@@ -242,14 +230,14 @@ def test_get_z_basis_measurement_time_growth(sampling_function: str):
 
 
 @pytest.mark.parametrize(
-    "sampling_function",
-    ["cirq", "qiskit"],
+    "executor",
+    [cirq_executor, qiskit_executor],
     indirect=True,
 )
-def test_get_z_basis_measurement_time_power_growth(
-    sampling_function: str,
+def test_random_pauli_measurement_time_power_growth(
+    executor: Callable,
 ):
-    """Test that get_z_basis_measurement scales follow power law with the
+    """Test that random_pauli_measurement scales follow power law with the
     number of measurements."""
     n_qubits = [3, 6, 9, 12, 15]
 
@@ -258,10 +246,10 @@ def test_get_z_basis_measurement_time_power_growth(
         qubits = cirq.LineQubit.range(n)
         circuit = simple_test_circuit(qubits)
         start_time = time.time()
-        get_z_basis_measurement(
+        random_pauli_measurement(
             circuit,
             100,  # number of total measurements
-            sampling_function=sampling_function,
+            executor=executor,
         )
 
         times.append(time.time() - start_time)
@@ -288,8 +276,8 @@ def test_user_sampling_bitstrings_fn():
     qubits = cirq.LineQubit.range(3)
     n_total_measurements = 10
     circuit = simple_test_circuit(qubits)
-    shadow_outcomes, pauli_strings = get_z_basis_measurement(
-        circuit, n_total_measurements, sampling_function=customized_fn
+    shadow_outcomes, pauli_strings = random_pauli_measurement(
+        circuit, n_total_measurements, executor=customized_fn
     )
     assert shadow_outcomes.shape == (n_total_measurements, 3,), (
         f"Shadow outcomes have incorrect shape, expected "

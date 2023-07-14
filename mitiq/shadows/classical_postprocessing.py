@@ -5,10 +5,10 @@
 """Classical postprocessing process of classical shadows."""
 
 from typing import Tuple, List, Any
-from numpy.typing import NDArray
-import numpy as np
-import cirq
 
+import cirq
+import numpy as np
+from numpy.typing import NDArray
 
 # local unitary that applied to the qubits
 phase_z = cirq.S._unitary_().conj()

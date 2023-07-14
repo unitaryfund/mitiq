@@ -4,10 +4,11 @@
 # LICENSE file in the root directory of this source tree.
 """Defines utility functions for classical shadows protocol."""
 from typing import Tuple, List, Any
-from numpy.typing import NDArray
+
 import cirq
 import numpy as np
 from cirq.ops.pauli_string import PauliString
+from numpy.typing import NDArray
 
 
 def min_n_total_measurements(epsilon: float, num_qubits: int) -> int:

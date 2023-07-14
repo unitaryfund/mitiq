@@ -4,16 +4,16 @@
 # LICENSE file in the root directory of this source tree.
 """Classical shadow estimation for quantum circuits. Based on the paper"""
 
-from typing import Optional, Callable, Union, List, Dict, Any
+from typing import Optional, Callable, List, Dict, Any
 
 import cirq
 import numpy as np
-from numpy.typing import NDArray
 from cirq.ops.pauli_string import PauliString
+from numpy.typing import NDArray
 
 from mitiq import MeasurementResult
 from mitiq.shadows import (
-    get_z_basis_measurement,
+    random_pauli_measurement,
     shadow_state_reconstruction,
     expectation_estimation_shadow,
 )
@@ -25,7 +25,7 @@ from mitiq.shadows.shadows_utils import (
 
 def execute_with_shadows(
     circuit: cirq.Circuit,
-    sampling_function: Union[str, Callable[..., MeasurementResult]] = "cirq",
+    executor: Callable[[cirq.Circuit], MeasurementResult],
     observables: Optional[List[PauliString[Any]]] = None,  # type: ignore
     state_reconstruction: bool = False,
     *,
@@ -34,16 +34,13 @@ def execute_with_shadows(
     error_rate: Optional[float] = None,
     failure_rate: Optional[float] = None,
     random_seed: Optional[int] = None,
-    sampling_function_config: Dict[str, Any] = {},
 ) -> Dict[str, NDArray[Any]]:
     r"""
     Executes a circuit with shadow measurements.
 
     Args:
         circuit: The circuit to execute.
-        sampling_function: The sampling function to use for z basis
-            measurements. Choose from `cirq`, `qiskit`, or define your
-            own sampling function.
+        executor: The function to use to do quantum measurement.
         observables: The set of observables to measure. If None, the state
             will be reconstructed.
         state_reconstruction: Whether to reconstruct the state or estimate
@@ -59,8 +56,6 @@ def execute_with_shadows(
             median of means prediction with error rate less than or equals to
             :math:`\epsilon` with probability at least :math:`1 - \delta`.
         random_seed: The random seed to use for the shadow measurements.
-        sampling_function_config: A dictionary of configuration options for
-            the sampling function.
 
     Returns:
         A dictionary containing the shadow outcomes, the Pauli strings, and
@@ -101,11 +96,10 @@ def execute_with_shadows(
     """
     Stage 1: Shadow Measurement
     """
-    shadow_outcomes, pauli_strings = get_z_basis_measurement(
+    shadow_outcomes, pauli_strings = random_pauli_measurement(
         circuit,
         n_total_measurements=num_total_measurements,
-        sampling_function=sampling_function,
-        sampling_function_config=sampling_function_config,
+        executor=executor,
     )
     output = {
         "shadow_outcomes": shadow_outcomes,

@@ -8,6 +8,13 @@
 import cirq
 import numpy as np
 import pytest
+
+
+from mitiq import MeasurementResult
+from mitiq.interface.mitiq_cirq.cirq_utils import (
+    sample_bitstrings as cirq_sample_bitstrings,
+)
+
 from mitiq.shadows import execute_with_shadows
 
 # define a fully entangled state
@@ -18,6 +25,17 @@ circuit.append(cirq.CNOT(qubits[0], qubits[1]))
 circuit.append(cirq.CNOT(qubits[1], qubits[2]))
 # Define list of observables
 observables = [cirq.X(q) for q in qubits]
+
+
+def executor(
+    circuit: cirq.Circuit,
+) -> MeasurementResult:
+    return cirq_sample_bitstrings(
+        circuit,
+        noise_level=(0,),
+        shots=1,
+        sampler=cirq.Simulator(),
+    )
 
 
 def test_execute_with_shadows():
@@ -31,6 +49,7 @@ def test_execute_with_shadows():
         observables=observables,
         state_reconstruction=True,
         num_total_measurements=10,
+        executor=executor,
     )
 
     # Check that the result is a dictionary
@@ -53,6 +72,7 @@ def test_execute_with_shadows_no_state_reconstruction():
         state_reconstruction=False,
         num_total_measurements=10,
         k_shadows=2,
+        executor=executor,
     )
     assert isinstance(result, dict)
     assert "est_observables" in result
@@ -69,6 +89,7 @@ def test_execute_with_shadows_no_state_reconstruction_error_rate():
         num_total_measurements=10,
         error_rate=0.9,
         failure_rate=0.01,
+        executor=executor,
     )
 
     result2 = execute_with_shadows(
@@ -77,6 +98,7 @@ def test_execute_with_shadows_no_state_reconstruction_error_rate():
         state_reconstruction=False,
         error_rate=0.9,
         failure_rate=0.01,
+        executor=executor,
     )
 
     assert isinstance(result1, dict)
@@ -94,6 +116,7 @@ def test_execute_with_shadows_random_seed():
         num_total_measurements=10,
         k_shadows=2,
         random_seed=1,
+        executor=executor,
     )
     result2 = execute_with_shadows(
         circuit,
@@ -102,6 +125,7 @@ def test_execute_with_shadows_random_seed():
         num_total_measurements=10,
         k_shadows=2,
         random_seed=2,
+        executor=executor,
     )
     for key in result1.keys():
         assert not np.array_equal(result1[key], result2[key])
@@ -112,7 +136,9 @@ def test_execute_with_shadows_no_observables_no_reconstruction():
 
     # observables is None and state_reconstruction is False
     with pytest.raises(AssertionError) as excinfo:
-        execute_with_shadows(circuit, state_reconstruction=False)
+        execute_with_shadows(
+            circuit, state_reconstruction=False, executor=executor
+        )
 
     assert (
         str(excinfo.value) == "observables must be provided"
@@ -128,6 +154,7 @@ def test_execute_with_shadows_error_rate_and_state_reconstruction():
         circuit,
         error_rate=0.99,
         state_reconstruction=True,
+        executor=executor,
     )
 
     # Assert that est_density_matrix is present in the output
@@ -144,4 +171,5 @@ def test_execute_with_shadows_error_rate_without_failure_rate():
             observables=observables,
             error_rate=0.99,
             state_reconstruction=False,
+            executor=executor,
         )
