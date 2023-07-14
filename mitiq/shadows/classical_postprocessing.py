@@ -23,11 +23,11 @@ def snapshot_state(b_list: List[float], u_list: List[str]) -> NDArray[Any]:
 
     Args:
         b_list: The list of classical outcomes for the snapshot. Here,
-            \(b = 1\) corresponds to \(\left|0\right>\), and
-            \(b = -1\) corresponds to \(\left|1\right>\).
+            b = 1 corresponds to :math:`|0\rangle`, and
+            b = -1 corresponds to :math:`|1\rangle`.
 
-        u_list: Array of ("X", "Y", "Z") for the applied Pauli measurement
-            on each qubit.
+        u_list: Array of ("X", "Y", "Z") for the applied
+            Pauli measurement on each qubit.
 
     Returns:
         Reconstructed snapshot in terms of nparray.
@@ -88,7 +88,7 @@ def expectation_estimation_shadow(
 
     Args:
         measurement_outcomes: A shadow tuple obtained from
-            `shadow_measure_with_executor`.
+            `z_basis_measurement`.
         observable: Single cirq observable consisting of
             Pauli operators.
         k_shadows: number of splits in the median of means estimator.
@@ -117,6 +117,7 @@ def expectation_estimation_shadow(
             b_lists[i : i + n_total_measurements // k_shadows],
             u_lists[i : i + n_total_measurements // k_shadows],
         )
+        # number of measurements/shadows in each split
         n_group_measurements = len(b_lists_k)
         # find the exact matches for the observable of
         # interest at the specified locations
@@ -129,8 +130,7 @@ def expectation_estimation_shadow(
                 3.0 * (b_lists_k[indices][:, target_locs]), axis=1
             )
             means.append(np.sum(product) / n_group_measurements)
-            # product = np.prod( (b_lists_k[indices][:, target_locs]), axis=1)
-            # means.append(np.sum(product) / sum(indices))
         else:
             means.append(0.0)
+    # return the median of means
     return float(np.median(means))

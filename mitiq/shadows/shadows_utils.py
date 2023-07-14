@@ -83,6 +83,7 @@ def fidelity(
 ) -> float:
     """
     Calculate the fidelity between a state vector and a density matrix.
+
     Args:
         state_vector: The vector whose norm we want to calculate.
         rho: The operator whose norm we want to calculate.

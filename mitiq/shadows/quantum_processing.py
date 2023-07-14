@@ -42,7 +42,7 @@ def generate_random_pauli_strings(
         A list of random Pauli strings.
     """
 
-    # Sample random Pauli operators uniformly from X, Y, Z
+    # Sample random Pauli operators uniformly from ("X", "Y", "Z")
     unitary_ensemble = ["X", "Y", "Z"]
     paulis = np.random.choice(unitary_ensemble, (num_strings, num_qubits))
     return ["".join(pauli) for pauli in paulis]
@@ -108,8 +108,8 @@ def get_z_basis_measurement(
     r"""
     Given a circuit, perform z-basis measurements on the circuit and
     return the outcomes. The outcomes are represented as a string where a
-    z-basis measurement outcome of \(|0\rangle\) corresponds to 1, and
-    \(|1\rangle\) corresponds to -1.
+    z-basis measurement outcome of :math:`|0\rangle` corresponds to 1, and
+    :math:`|1\rangle` corresponds to -1.
 
     Args:
         circuit: Cirq circuit.
@@ -127,14 +127,12 @@ def get_z_basis_measurement(
     Returns:
         Tuple of two numpy arrays. The first array contains
         measurement outcomes (-1, 1) while the second array contains the
-        indices for the sampled Pauli's (``"X"``, ``"Y"``, ``"Z"``).
-        This implies that local
-        Clifford rotations plus z-basis measurements are effectively
-        equivalent
-        to random Pauli measurements. Each row of the arrays corresponds to a
-        distinct snapshot or sample, while each column corresponds to
-        measurement
-        outcomes and random Pauli measurement on a different qubit.
+        indices for the sampled Pauli's ("X", "Y", "Z").
+        This implies that local Clifford rotations plus z-basis measurements
+        are effectively equivalent to random Pauli measurements.
+        Each row of the arrays corresponds to a distinct snapshot or sample,
+        while each column corresponds to measurement outcomes
+        and random Pauli measurement on a different qubit.
     """
 
     # Generate random Pauli unitaries
@@ -201,7 +199,7 @@ def get_z_basis_measurement(
         shadow_outcomes.append(outcome)
 
     # output computational basis outcomes |b> ->  1 or -1
-    # and the random unitaries in {"X","Y","Z"}.
+    # and the random unitaries in ("X","Y","Z").
     shadow_outcomes_np = np.asarray(shadow_outcomes, dtype=int)
     pauli_strings_np = np.asarray(pauli_strings, dtype=str)
 
