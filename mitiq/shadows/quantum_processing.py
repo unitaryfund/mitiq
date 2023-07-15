@@ -59,13 +59,8 @@ def get_rotated_circuits(
     num_qubits = len(qubits)
     rotated_circuits = []
     for pauli_string in pauli_strings:
-        assert len(pauli_string) == num_qubits, (
-            f"Pauli string must be same length as number of qubits, "
-            f"got {len(pauli_string)} and {num_qubits}"
-        )
         rotated_circuit = circuit.copy()
-        for i, pauli in enumerate(pauli_string):
-            qubit = qubits[i]
+        for qubit, pauli in zip(qubits, pauli_string):
             # Pauli X measurement is equivalent to H plus a Z measurement
             if pauli == "X":
                 rotated_circuit.append(cirq.H(qubit))
