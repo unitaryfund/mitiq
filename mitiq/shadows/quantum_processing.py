@@ -100,8 +100,7 @@ def random_pauli_measurement(
     Args:
         circuit: Cirq circuit.
         n_total_measurements: number of snapshots.
-        executor: Executor to use. If None, then the
-            default sampling function for the backend is used. The
+        executor: Executor to use. The
             callable is used as the executor.
 
     Returns:
