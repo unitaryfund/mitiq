@@ -14,7 +14,7 @@ from cirq.ops.pauli_string import PauliString
 def min_n_total_measurements(epsilon: float, num_qubits: int) -> int:
     """
     Calculate the number of measurements required to satisfy the shadow bound
-        for the Pauli measurement scheme.
+    for the Pauli measurement scheme.
 
     Args:
         epsilon: The error on the estimator.
