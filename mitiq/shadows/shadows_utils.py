@@ -5,10 +5,11 @@
 
 """Defines utility functions for classical shadows protocol."""
 from typing import Tuple, List, Any
-from numpy.typing import NDArray
+
 import cirq
 import numpy as np
 from cirq.ops.pauli_string import PauliString
+from numpy.typing import NDArray
 
 
 def min_n_total_measurements(epsilon: float, num_qubits: int) -> int:
@@ -62,24 +63,6 @@ def calculate_shadow_bound(
     return int(np.ceil(N * K)), int(K)
 
 
-def operator_2_norm(R: NDArray[Any]) -> float:
-    """
-    Calculate the operator 2-norm.
-
-    Args:
-        R: The operator whose norm we want to calculate.
-
-    Returns:
-        Scalar corresponding to the norm.
-    """
-    return float(
-        np.sqrt(np.trace(R.conjugate().transpose() @ R)).reshape(-1).real
-    )
-
-
-# given error of the fidelity between the true state
-# and the reconstructed state,
-# return the number of measurements needed
 def fidelity(
     state_vector: NDArray[Any],
     rho: NDArray[Any],

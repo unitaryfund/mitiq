@@ -4,7 +4,6 @@ import numpy as np
 from mitiq.shadows.shadows_utils import (
     min_n_total_measurements,
     calculate_shadow_bound,
-    operator_2_norm,
     fidelity,
 )
 
@@ -26,13 +25,6 @@ def test_calculate_shadow_bound():
     N, K = calculate_shadow_bound(0.5, observables, 0.1)
     assert isinstance(N, int), f"Expected int, got {type(N)}"
     assert isinstance(K, int), f"Expected int, got {type(K)}"
-
-
-def test_operator_2_norm():
-    R = np.array([[1, 2], [3, 4]])
-    assert np.isclose(
-        operator_2_norm(R), np.sqrt(30)
-    ), f"Expected {np.sqrt(30)}, got {operator_2_norm(R)}"
 
 
 def test_fidelity():
