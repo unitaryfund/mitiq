@@ -27,7 +27,6 @@ def min_n_total_measurements(epsilon: float, num_qubits: int) -> int:
     return int(34 * (4**num_qubits) * epsilon ** (-2))
 
 
-# based on the theorem, we calculate N,K for the shadow bound
 def calculate_shadow_bound(
     error: float,
     observables: List[PauliString],  # type: ignore
