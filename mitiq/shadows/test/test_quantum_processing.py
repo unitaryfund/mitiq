@@ -73,7 +73,7 @@ def qiskit_executor(
 
 def test_generate_random_pauli_strings_time():
     """
-    Test if the execution time of generate_random_pauli_strings linearly with
+    Test if the execution time of generate_random_pauli_strings scales linearly with
     the number of Pauli strings.
     """
     # Define the number of qubits
