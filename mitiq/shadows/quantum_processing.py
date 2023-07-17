@@ -92,8 +92,9 @@ def random_pauli_measurement(
     Args:
         circuit: Cirq circuit.
         n_total_measurements: number of snapshots.
-        executor: A callable which runs a circuit and returns a single bitstring.
-            If more bitstrings are returned, only one of them is actually used.
+        executor: A callable which runs a circuit and returns a single
+            bitstring. If more bitstrings are returned, only one of them
+            is actually used.
 
     Returns:
         Tuple of two numpy arrays. The first array contains
