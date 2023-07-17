@@ -77,8 +77,8 @@ def test_generate_random_pauli_strings_time():
     with the number of Pauli strings.
     """
     # Define the number of qubits
-    num_qubits: int = 300
-    times: list = []
+    num_qubits = 300
+    times = []
     num_strings = [3000, 4000, 5000]
     for n in num_strings:
         # Measure the execution time for generating random Pauli strings
