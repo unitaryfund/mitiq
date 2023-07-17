@@ -11,6 +11,9 @@ from cirq.ops.pauli_string import PauliString
 from numpy.typing import NDArray
 
 
+
+
+
 def min_n_total_measurements(epsilon: float, num_qubits: int) -> int:
     """Calculate the number of measurements required to satisfy the shadow
     bound for the Pauli measurement scheme.
@@ -59,20 +62,6 @@ def calculate_shadow_bound(
     )
     N = 34 * max(shadow_norm(o) for o in observables) / error**2
     return int(np.ceil(N * K)), int(K)
-
-
-def operator_2_norm(R: NDArray[Any]) -> float:
-    """Calculate the operator 2-norm.
-
-    Args:
-        R: The operator whose norm we want to calculate.
-
-    Returns:
-        Scalar corresponding to the norm.
-    """
-    return float(
-        np.sqrt(np.trace(R.conjugate().transpose() @ R)).reshape(-1).real
-    )
 
 
 # given error of the fidelity between the true state
