@@ -173,3 +173,22 @@ def test_expectation_estimation_shadow():
     assert np.isclose(
         result, expected_result
     ), f"Expected {expected_result}, but got {result}"
+
+    def test_expectation_estimation_shadow_no_indices():
+        """Test expectation estimation for a shadow with no matching indices."""
+        q0, q1, q2 = cirq.LineQubit.range(3)
+        observable = cirq.PauliString({q0: cirq.X, q1: cirq.Y, q2: cirq.Z})
+        measurement_outcomes = (
+            np.array([[-1, 1, -1], [1, -1, 1], [-1, 1, -1]]),
+            np.array([["Z", "X", "Y"], ["Y", "Z", "X"], ["Z", "Z", "Y"]]),
+        )
+        k_shadows = 1
+
+        # Act
+        result = expectation_estimation_shadow(
+            measurement_outcomes, observable, k_shadows
+        )
+
+        # Assert
+        # All means should be 0 as there are no matching indices.
+        assert result == 0.0
