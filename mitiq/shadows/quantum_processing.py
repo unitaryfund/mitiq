@@ -73,9 +73,7 @@ def get_rotated_circuits(
                     pauli == "Z"
                 ), f"Pauli must be X, Y, Z. Got {pauli} instead."
         if add_measurements:
-            # append measurement gates
             rotated_circuit.append(cirq.measure(*qubits))
-        # append to list of circuits
         rotated_circuits.append(rotated_circuit)
     return rotated_circuits
 
