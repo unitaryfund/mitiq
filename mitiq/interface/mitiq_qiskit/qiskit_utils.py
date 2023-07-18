@@ -27,7 +27,7 @@ def initialized_depolarizing_noise(noise_level: float) -> NoiseModel:
     """Initializes a depolarizing noise Qiskit NoiseModel.
 
     Args:
-        noise_level: The noise strength as a float, e.g., 0.01 is 0.1%.
+        noise_level: The noise strength as a float, e.g., 0.01 is 1%.
 
     Returns:
         A Qiskit depolarizing NoiseModel.
