@@ -150,10 +150,7 @@ def test_random_pauli_measurement_output_dimensions(
     shadow_outcomes, pauli_strings = random_pauli_measurement(
         circuit, n_total_measurements, executor=executor
     )
-    assert shadow_outcomes.shape == (
-        n_total_measurements,
-        n_qubits,
-    ), (
+    assert shadow_outcomes.shape == (n_total_measurements, n_qubits,), (
         f"Shadow outcomes have incorrect shape, expected "
         f"{(n_total_measurements, n_qubits)}, got {shadow_outcomes.shape}"
     )
