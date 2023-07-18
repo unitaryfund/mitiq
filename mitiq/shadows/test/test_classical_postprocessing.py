@@ -174,6 +174,7 @@ def test_expectation_estimation_shadow():
         result, expected_result
     ), f"Expected {expected_result}, but got {result}"
 
+
 def test_expectation_estimation_shadow_no_indices():
     """
     Test expectation estimation for a shadow with no matching indices.
