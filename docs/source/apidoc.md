@@ -134,9 +134,27 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 ## Classical Shadows
+
+### Classical Shadows (High-Level Tools)
+```{eval-rst}
+.. automodule:: mitiq.shadows.shadows
+   :members:
+```
+
+### Quantum Processing
+```{eval-rst}
+.. automodule:: mitiq.shadows.quantum_processing
+   :members:
+```
 ### Classical Post-Processing
 ```{eval-rst}
 .. automodule:: mitiq.shadows.classical_postprocessing
+   :members:
+```
+
+### Classical Shadow Utility Functions
+```{eval-rst}
+.. automodule:: mitiq.shadows.shadows_utils
    :members:
 ```
 
