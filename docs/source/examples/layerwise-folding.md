@@ -289,12 +289,3 @@ While doing layerwise folding on the noisiest layer will, on average,
 improve the mitigated value, it still will not eclipse the benefit of doing
 global folding.
 ```
-
-So why consider this technique in this context? One reason is that applying
-global folding will increase the length of the entire circuit while layerwise
-folding on a subset of only the noisiest layers will increase the circuit by a
-smaller factor. 
-
-If running a circuit on hardware is bottle-necked by the cost of running a long
-circuit, this technique could potentially be used to arrive at a better result
-(although not as good as global folding) but with less monetary cost.
