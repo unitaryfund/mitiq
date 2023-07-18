@@ -48,9 +48,7 @@ def test_tqdm_import_not_available():
         assert mitiq.shadows.quantum_processing.tqdm is None
 
 
-def cirq_executor(
-    circuit: cirq.Circuit,
-) -> MeasurementResult:
+def cirq_executor(circuit: cirq.Circuit) -> MeasurementResult:
     return cirq_sample_bitstrings(
         circuit,
         noise_level=(0,),
@@ -59,9 +57,7 @@ def cirq_executor(
     )
 
 
-def qiskit_executor(
-    circuit: cirq.Circuit,
-) -> MeasurementResult:
+def qiskit_executor(circuit: cirq.Circuit) -> MeasurementResult:
     return qiskit_sample_bitstrings(
         to_qiskit(circuit),
         noise_model=None,
@@ -130,18 +126,8 @@ def simple_test_circuit(qubits):
     return circuit
 
 
-# test different generators
-@pytest.fixture
-def executor(request):
-    return request.param
-
-
-@pytest.mark.parametrize(
-    "executor",
-    [cirq_executor, qiskit_executor],
-    indirect=True,
-)
 @pytest.mark.parametrize("n_qubits", [1, 2, 5])
+@pytest.mark.parametrize("executor", [cirq_executor, qiskit_executor])
 def test_random_pauli_measurement_no_errors(n_qubits, executor):
     """Test that random_pauli_measurement runs without errors."""
     qubits = cirq.LineQubit.range(n_qubits)
@@ -151,12 +137,8 @@ def test_random_pauli_measurement_no_errors(n_qubits, executor):
     )
 
 
-@pytest.mark.parametrize(
-    "executor",
-    [cirq_executor, qiskit_executor],
-    indirect=True,
-)
 @pytest.mark.parametrize("n_qubits", [1, 2, 5])
+@pytest.mark.parametrize("executor", [cirq_executor, qiskit_executor])
 def test_random_pauli_measurement_output_dimensions(
     n_qubits: int, executor: Callable
 ):
@@ -168,7 +150,10 @@ def test_random_pauli_measurement_output_dimensions(
     shadow_outcomes, pauli_strings = random_pauli_measurement(
         circuit, n_total_measurements, executor=executor
     )
-    assert shadow_outcomes.shape == (n_total_measurements, n_qubits,), (
+    assert shadow_outcomes.shape == (
+        n_total_measurements,
+        n_qubits,
+    ), (
         f"Shadow outcomes have incorrect shape, expected "
         f"{(n_total_measurements, n_qubits)}, got {shadow_outcomes.shape}"
     )
@@ -182,12 +167,8 @@ def test_random_pauli_measurement_output_dimensions(
     )
 
 
-@pytest.mark.parametrize(
-    "executor",
-    [cirq_executor, qiskit_executor],
-    indirect=True,
-)
 @pytest.mark.parametrize("n_qubits", [1, 2, 5])
+@pytest.mark.parametrize("executor", [cirq_executor, qiskit_executor])
 def test_random_pauli_measurement_output_types(
     n_qubits: int, executor: Callable
 ):
@@ -207,11 +188,7 @@ def test_random_pauli_measurement_output_types(
     )
 
 
-@pytest.mark.parametrize(
-    "executor",
-    [cirq_executor, qiskit_executor],
-    indirect=True,
-)
+@pytest.mark.parametrize("executor", [cirq_executor, qiskit_executor])
 def test_random_pauli_measurement_time_growth(executor: Callable):
     """Test that random_pauli_measurement scales linearly with the
     number of measurements."""
@@ -230,11 +207,7 @@ def test_random_pauli_measurement_time_growth(executor: Callable):
         )
 
 
-@pytest.mark.parametrize(
-    "executor",
-    [cirq_executor, qiskit_executor],
-    indirect=True,
-)
+@pytest.mark.parametrize("executor", [cirq_executor, qiskit_executor])
 def test_random_pauli_measurement_time_power_growth(
     executor: Callable,
 ):
