@@ -6,7 +6,7 @@
 """Functions for computing the projector for subspace expansion."""
 
 from typing import Callable, Sequence, Union, Dict, List
-from mitiq import Observable, QPROGRAM, QuantumResult, PauliString
+from mitiq import Observable, QPROGRAM, QuantumResult, PauliString, Executor
 import numpy as np
 import numpy.typing as npt
 from scipy.linalg import eigh
@@ -15,7 +15,7 @@ from numpy.linalg import pinv
 
 def get_projector(
     circuit: QPROGRAM,
-    executor: Callable[[QPROGRAM], QuantumResult],
+    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     check_operators: Sequence[PauliString],
     code_hamiltonian: Observable,
     pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
@@ -49,7 +49,7 @@ def get_projector(
 
 def get_expectation_value_for_observable(
     circuit: QPROGRAM,
-    executor: Callable[[QPROGRAM], QuantumResult],
+    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     observable: Union[PauliString, Observable],
     pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
 ) -> float:
@@ -63,14 +63,17 @@ def get_expectation_value_for_observable(
         pauli_string: PauliString,
     ) -> float:
         cache_key = pauli_string.with_coeff(1)
-        pauli_string_to_expectation_cache[cache_key] = Observable(
-            cache_key
-        ).expectation(circuit, executor)
+        pauli_string_to_expectation_cache[cache_key] = final_executor.evaluate(
+            circuit, Observable(cache_key)
+        )[0]
         return (
             pauli_string_to_expectation_cache[cache_key] * pauli_string.coeff
         ).real
 
     total_expectation_value_for_observable = 0.0
+    final_executor: Executor = (
+        executor if isinstance(executor, Executor) else Executor(executor)
+    )
 
     if isinstance(observable, PauliString):
         pauli_string = observable
@@ -87,7 +90,7 @@ def get_expectation_value_for_observable(
 
 def _compute_overlap_matrix(
     circuit: QPROGRAM,
-    executor: Callable[[QPROGRAM], QuantumResult],
+    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     check_operators: Sequence[PauliString],
     pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
 ) -> npt.NDArray[np.float64]:
@@ -108,7 +111,7 @@ def _compute_overlap_matrix(
 
 def _compute_hamiltonian_overlap_matrix(
     circuit: QPROGRAM,
-    executor: Callable[[QPROGRAM], QuantumResult],
+    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     check_operators: Sequence[PauliString],
     code_hamiltonian: Observable,
     pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
