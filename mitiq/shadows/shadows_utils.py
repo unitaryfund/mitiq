@@ -14,15 +14,15 @@ from numpy.typing import NDArray
 
 def min_n_total_measurements(epsilon: float, num_qubits: int) -> int:
     """
-    Calculate the number of measurements required to satisfy the shadow bound
-    for the Pauli measurement scheme.
+    This function returns the minimum number of classical shadows required
+    for state reconstruction for achieving the desired accuracy.
 
     Args:
         epsilon: The error on the estimator.
         num_qubits: The number of qubits in the system.
 
     Returns:
-        An integer that gives the number of samples required to satisfy the
+        An integer that gives the number of snapshots required to satisfy the
         shadow bound.
     """
     return int(34 * (4**num_qubits) * epsilon ** (-2))
@@ -34,7 +34,10 @@ def calculate_shadow_bound(
     failure_rate: float,
 ) -> Tuple[int, int]:
     """
-    Calculate the shadow bound for the Pauli measurement scheme.
+    This function returns the minimum number of classical shadows required and
+    the number of groups "k" into which we need to split the shadows for
+    achieving the desired accuracy and failure rate in operator expectation
+    value estimation.
 
     Args:
         error: The error on the estimator.
@@ -43,7 +46,7 @@ def calculate_shadow_bound(
         failure_rate: Rate of failure for the bound to hold.
 
     Returns:
-        An integer that gives the number of samples required to satisfy
+        An integer that gives the number of snapshots required to satisfy
         the shadow bound and the chunk size required attaining the specified
         failure rate.
     """
