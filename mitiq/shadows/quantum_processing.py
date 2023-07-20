@@ -131,6 +131,11 @@ def random_pauli_measurement(
     shadow_outcomes = []
     for result in results:
         bitstring = list(result.get_counts().keys())[0]
+        if len(result.get_counts().keys()) > 1:
+            assert len(result.get_counts().keys()) == 1, (
+                "The `executor` must return a `MeasurementResult`"
+                " for a single shot"
+            )
         outcome = [1 - int(i) * 2 for i in bitstring]
         shadow_outcomes.append(outcome)
 

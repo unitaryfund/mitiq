@@ -7,7 +7,7 @@
 
 import importlib
 import time
-from typing import Callable
+from typing import Callable, List
 from unittest.mock import patch
 
 import cirq
@@ -48,6 +48,37 @@ def test_tqdm_import_not_available():
         assert mitiq.shadows.quantum_processing.tqdm is None
 
 
+def test_generate_random_pauli_strings():
+    """Tests that the function generates random Pauli strings."""
+    num_qubits = 5
+    num_strings = 10
+
+    # Generate random pauli strings
+    result = generate_random_pauli_strings(num_qubits, num_strings)
+
+    # Check that the result is a list
+    assert isinstance(result, List)
+
+    # Check that the number of strings matches the input
+    assert len(result) == num_strings
+
+    # Check that each string has the right number of qubits
+    for pauli_string in result:
+        assert len(pauli_string) == num_qubits
+
+    # Check that each string contains only the letters X, Y, and Z
+    for pauli_string in result:
+        assert set(pauli_string).issubset(set(["X", "Y", "Z"]))
+
+    # Check that the function raises an exception for negative num_qubits
+    # or num_strings
+    with pytest.raises(ValueError):
+        generate_random_pauli_strings(-1, num_strings)
+
+    with pytest.raises(ValueError):
+        generate_random_pauli_strings(num_qubits, -1)
+
+
 def cirq_executor(circuit: cirq.Circuit) -> MeasurementResult:
     return cirq_sample_bitstrings(
         circuit,
@@ -65,26 +96,6 @@ def qiskit_executor(circuit: cirq.Circuit) -> MeasurementResult:
         shots=1,
         measure_all=False,
     )
-
-
-def test_generate_random_pauli_strings_time():
-    """
-    Test if the execution time of generate_random_pauli_strings scales linearly
-    with the number of Pauli strings.
-    """
-    # Define the number of qubits
-    num_qubits = 300
-    times = []
-    num_strings = [3000, 4000, 5000]
-    for n in num_strings:
-        # Measure the execution time for generating random Pauli strings
-        start_time = time.time()
-        generate_random_pauli_strings(num_qubits, n)
-        times.append(time.time() - start_time)
-    for i in range(1, len(times)):
-        assert times[i] / times[i - 1] == pytest.approx(
-            num_strings[i] / num_strings[i - 1], rel=1
-        )
 
 
 def test_get_rotated_circuits():
