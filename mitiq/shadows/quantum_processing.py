@@ -96,9 +96,8 @@ def random_pauli_measurement(
             bitstring.
 
     Warning:
-        If your ``executor`` returns statistics for more than a single shot
-        (i.e. returns counts for multiple bitstrings), a **single bitstring**
-        will be chosen at random (from your distribution).
+        The ``executor`` must return a ``MeasurementResult``
+        for a single shot (i.e. a single bitstring).
 
     Returns:
         Tuple of two numpy arrays. The first array contains
