@@ -30,7 +30,7 @@ def min_n_total_measurements(epsilon: float, num_qubits: int) -> int:
 
 def calculate_shadow_bound(
     error: float,
-    observables: List[PauliString],  # type: ignore
+    observables: List[PauliString[Any]],
     failure_rate: float,
 ) -> Tuple[int, int]:
     """
