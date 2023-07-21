@@ -46,8 +46,8 @@ def calculate_shadow_bound(
         failure_rate: Rate of failure for the bound to hold.
 
     Returns:
-        An integer that gives the number of snapshots required to satisfy
-        the shadow bound and the chunk size required attaining the specified
+        Integers quantifying the number of snapshots required to satisfy
+        the shadow bound and the chunk size required to attain the specified
         failure rate.
     """
     M = len(observables)
