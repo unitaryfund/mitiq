@@ -67,8 +67,8 @@ def calculate_shadow_bound(
 
 
 def fidelity(
-    state_vector: NDArray[Any],
-    rho: NDArray[Any],
+    state_vector: NDArray[np.complex64],
+    rho: NDArray[np.complex64],
 ) -> float:
     """
     Calculate the fidelity between a state vector and a density matrix.
