@@ -79,6 +79,4 @@ def fidelity(
     Returns:
         Scalar corresponding to the fidelity.
     """
-    return float(
-        np.reshape(state_vector.conj().T @ rho @ state_vector, -1).real
-    )
+    return np.reshape(state_vector.conj().T @ rho @ state_vector, -1).real[0]
