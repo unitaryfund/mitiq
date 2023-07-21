@@ -41,10 +41,6 @@ light_pec_settings = Settings(
             "representation_function": (
                 represent_operation_with_local_depolarizing_noise
             ),
-            "operations": [
-                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
-                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
-            ],
             "is_qubit_dependent": False,
             "noise_level": 0.001,
             "num_samples": 200,
@@ -194,14 +190,6 @@ def test_unsupported_technique_error():
         strategy.mitigation_function()
 
 
-def test_PEC_representations():
-    pec_strategy = light_pec_settings.make_strategies()[0]
-    assert len(pec_strategy.representations) > 0
-
-    zne_strategy = light_zne_settings.make_strategies()[0]
-    assert not zne_strategy.representations
-
-
 def test_ZNESettings():
     circuits = ZNESettings.make_problems()
     strategies = ZNESettings.make_strategies()
@@ -289,10 +277,6 @@ def test_to_dict():
         "representation_function": (
             represent_operation_with_local_depolarizing_noise
         ),
-        "operations": [
-            cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
-            cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
-        ],
         "is_qubit_dependent": False,
         "noise_level": 0.001,
         "num_samples": 200,
