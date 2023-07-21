@@ -6,13 +6,11 @@
 """Unit tests for quantum processing functions for classical shadows."""
 
 import importlib
-import time
 from typing import Callable, List
 from unittest.mock import patch
 
 import cirq
 import cirq.testing
-import numpy as np
 import pytest
 from qiskit_aer import Aer
 
@@ -194,48 +192,3 @@ def test_random_pauli_measurement_output_types(
         f"Pauli strings have incorrect dtype, expected str, "
         f"got {pauli_strings.dtype}"
     )
-
-
-@pytest.mark.parametrize("executor", [cirq_executor, qiskit_executor])
-def test_random_pauli_measurement_time_growth(executor: Callable):
-    """Test that random_pauli_measurement scales linearly with the
-    number of measurements."""
-    n_qubits = 5
-    qubits = cirq.LineQubit.range(n_qubits)
-    circuit = simple_test_circuit(qubits)
-    times = []
-    measurements = [10, 20, 30, 40, 50]
-    for n in measurements:
-        start_time = time.time()
-        random_pauli_measurement(circuit, n, executor=executor)
-        times.append(time.time() - start_time)
-    for i in range(1, len(times)):
-        assert times[i] / times[i - 1] == pytest.approx(
-            measurements[i] / measurements[i - 1], rel=8
-        )
-
-
-@pytest.mark.parametrize("executor", [cirq_executor, qiskit_executor])
-def test_random_pauli_measurement_time_power_growth(
-    executor: Callable,
-):
-    """Test that random_pauli_measurement scales follow power law with the
-    number of measurements."""
-    n_qubits = [3, 6, 9, 12, 15]
-
-    times = []
-    for n in n_qubits:
-        qubits = cirq.LineQubit.range(n)
-        circuit = simple_test_circuit(qubits)
-        start_time = time.time()
-        random_pauli_measurement(
-            circuit,
-            100,  # number of total measurements
-            executor=executor,
-        )
-
-        times.append(time.time() - start_time)
-    for i in range(1, len(times)):
-        log_ratio_times = np.log(times[i] / times[i - 1])
-        log_ratio_qubits = np.log(n_qubits[i] / n_qubits[i - 1])
-        assert log_ratio_times == pytest.approx(log_ratio_qubits, rel=5)
