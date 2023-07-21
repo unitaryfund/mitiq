@@ -42,7 +42,7 @@ def calculate_shadow_bound(
     Args:
         error: The error on the estimator.
         observables: List of cirq.PauliString corresponding to the
-        observables we intend to measure.
+            observables we intend to measure.
         failure_rate: Rate of failure for the bound to hold.
 
     Returns:
