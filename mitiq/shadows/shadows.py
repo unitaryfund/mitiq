@@ -36,7 +36,8 @@ def execute_with_shadows(
     random_seed: Optional[int] = None,
 ) -> Dict[str, NDArray[Any]]:
     r"""
-    Executes a circuit with shadow measurements.
+    Executes a circuit with classical shadows. This function can be used for
+    state reconstruction or expectation value estimation of observables.
 
     Args:
         circuit: The circuit to execute.

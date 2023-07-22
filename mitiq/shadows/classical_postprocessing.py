@@ -60,7 +60,7 @@ def shadow_state_reconstruction(
 
     Args:
         measurement_outcomes: A shadow tuple obtained
-        from `z_basis_measurement`.
+        from `random_pauli_measurement`.
 
     Returns:
         Numpy array with the reconstructed quantum state.

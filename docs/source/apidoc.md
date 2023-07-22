@@ -158,22 +158,6 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 
-## Classical Shadows
-
-### Quantum Processing
-```{eval-rst}
-.. automodule:: mitiq.shadows.quantum_processing
-   :members:
-```
-
-## Classical Shadows
-
-### Utility Functions
-```{eval-rst}
-.. automodule:: mitiq.shadows.shadows_utils
-   :members:
-```
-
 
 
 ## Digital Dynamical Decoupling
