@@ -134,7 +134,6 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 
-## Classical Shadows
 
 ### Utility Functions
 ```{eval-rst}

@@ -2,27 +2,27 @@ import cirq
 import numpy as np
 
 from mitiq.shadows.shadows_utils import (
-    min_n_total_measurements,
-    calculate_shadow_bound,
+    n_measurements_tomography_bound,
+    n_measurements_opts_expectation_bound,
     fidelity,
 )
 
 
-def test_min_n_total_measurements():
+def test_n_measurements_tomography_bound():
     assert (
-        min_n_total_measurements(0.5, 2) == 2176
-    ), f"Expected 2176, got {min_n_total_measurements(0.5, 2)}"
+        n_measurements_tomography_bound(0.5, 2) == 2176
+    ), f"Expected 2176, got {n_measurements_tomography_bound(0.5, 2)}"
     assert (
-        min_n_total_measurements(1.0, 1) == 136
-    ), f"Expected 136, got {min_n_total_measurements(1.0, 1)}"
+        n_measurements_tomography_bound(1.0, 1) == 136
+    ), f"Expected 136, got {n_measurements_tomography_bound(1.0, 1)}"
     assert (
-        min_n_total_measurements(0.1, 3) == 217599
-    ), f"Expected 217599, got {min_n_total_measurements(0.1, 3)}"
+        n_measurements_tomography_bound(0.1, 3) == 217599
+    ), f"Expected 217599, got {n_measurements_tomography_bound(0.1, 3)}"
 
 
-def test_calculate_shadow_bound():
+def test_n_measurements_opts_expectation_bound():
     observables = [cirq.X, cirq.Y, cirq.Z]
-    N, K = calculate_shadow_bound(0.5, observables, 0.1)
+    N, K = n_measurements_opts_expectation_bound(0.5, observables, 0.1)
     assert isinstance(N, int), f"Expected int, got {type(N)}"
     assert isinstance(K, int), f"Expected int, got {type(K)}"
 

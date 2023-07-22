@@ -12,7 +12,7 @@ from cirq.ops.pauli_string import PauliString
 from numpy.typing import NDArray
 
 
-def min_n_total_measurements(epsilon: float, num_qubits: int) -> int:
+def n_measurements_tomography_bound(epsilon: float, num_qubits: int) -> int:
     """
     This function returns the minimum number of classical shadows required
     for state reconstruction for achieving the desired accuracy.
@@ -28,7 +28,29 @@ def min_n_total_measurements(epsilon: float, num_qubits: int) -> int:
     return int(34 * (4**num_qubits) * epsilon ** (-2))
 
 
-def calculate_shadow_bound(
+def local_clifford_shadow_norm(opt: PauliString[Any]) -> float:
+    """
+    Calculate shadow norm of an operator with random unitary sampled from local
+    Clifford group.
+    Args:
+        opt: a self-adjoint operator
+    Returns:
+        Shadow norm when unitary ensemble is local Clifford group.
+    """
+
+    norm = (
+        np.linalg.norm(
+            cirq.unitary(opt)
+            - np.trace(cirq.unitary(opt))
+            / 2 ** int(np.log2(cirq.unitary(opt).shape[0])),
+            ord=np.inf,
+        )
+        ** 2
+    )
+    return float(norm)
+
+
+def n_measurements_opts_expectation_bound(
     error: float,
     observables: List[PauliString[Any]],
     failure_rate: float,
@@ -53,16 +75,11 @@ def calculate_shadow_bound(
     M = len(observables)
     K = 2 * np.log(2 * M / failure_rate)
 
-    shadow_norm = (
-        lambda opt: np.linalg.norm(
-            cirq.unitary(opt)
-            - np.trace(cirq.unitary(opt))
-            / 2 ** int(np.log2(cirq.unitary(opt).shape[0])),
-            ord=np.inf,
-        )
-        ** 2
+    N = (
+        34
+        * max(local_clifford_shadow_norm(o) for o in observables)
+        / error**2
     )
-    N = 34 * max(shadow_norm(o) for o in observables) / error**2
     return int(np.ceil(N * K)), int(K)
 
 
