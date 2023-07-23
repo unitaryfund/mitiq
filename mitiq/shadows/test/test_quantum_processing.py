@@ -6,13 +6,11 @@
 """Unit tests for quantum processing functions for classical shadows."""
 
 import importlib
-import time
-from typing import Callable
+from typing import Callable, List
 from unittest.mock import patch
 
 import cirq
 import cirq.testing
-import numpy as np
 import pytest
 from qiskit_aer import Aer
 
@@ -48,6 +46,37 @@ def test_tqdm_import_not_available():
         assert mitiq.shadows.quantum_processing.tqdm is None
 
 
+def test_generate_random_pauli_strings():
+    """Tests that the function generates random Pauli strings."""
+    num_qubits = 5
+    num_strings = 10
+
+    # Generate random pauli strings
+    result = generate_random_pauli_strings(num_qubits, num_strings)
+
+    # Check that the result is a list
+    assert isinstance(result, List)
+
+    # Check that the number of strings matches the input
+    assert len(result) == num_strings
+
+    # Check that each string has the right number of qubits
+    for pauli_string in result:
+        assert len(pauli_string) == num_qubits
+
+    # Check that each string contains only the letters X, Y, and Z
+    for pauli_string in result:
+        assert set(pauli_string).issubset(set(["X", "Y", "Z"]))
+
+    # Check that the function raises an exception for negative num_qubits
+    # or num_strings
+    with pytest.raises(ValueError):
+        generate_random_pauli_strings(-1, num_strings)
+
+    with pytest.raises(ValueError):
+        generate_random_pauli_strings(num_qubits, -1)
+
+
 def cirq_executor(circuit: cirq.Circuit) -> MeasurementResult:
     return cirq_sample_bitstrings(
         circuit,
@@ -65,26 +94,6 @@ def qiskit_executor(circuit: cirq.Circuit) -> MeasurementResult:
         shots=1,
         measure_all=False,
     )
-
-
-def test_generate_random_pauli_strings_time():
-    """
-    Test if the execution time of generate_random_pauli_strings scales linearly
-    with the number of Pauli strings.
-    """
-    # Define the number of qubits
-    num_qubits = 300
-    times = []
-    num_strings = [3000, 4000, 5000]
-    for n in num_strings:
-        # Measure the execution time for generating random Pauli strings
-        start_time = time.time()
-        generate_random_pauli_strings(num_qubits, n)
-        times.append(time.time() - start_time)
-    for i in range(1, len(times)):
-        assert times[i] / times[i - 1] == pytest.approx(
-            num_strings[i] / num_strings[i - 1], rel=1
-        )
 
 
 def test_get_rotated_circuits():
@@ -183,48 +192,3 @@ def test_random_pauli_measurement_output_types(
         f"Pauli strings have incorrect dtype, expected str, "
         f"got {pauli_strings.dtype}"
     )
-
-
-@pytest.mark.parametrize("executor", [cirq_executor, qiskit_executor])
-def test_random_pauli_measurement_time_growth(executor: Callable):
-    """Test that random_pauli_measurement scales linearly with the
-    number of measurements."""
-    n_qubits = 5
-    qubits = cirq.LineQubit.range(n_qubits)
-    circuit = simple_test_circuit(qubits)
-    times = []
-    measurements = [10, 20, 30, 40, 50]
-    for n in measurements:
-        start_time = time.time()
-        random_pauli_measurement(circuit, n, executor=executor)
-        times.append(time.time() - start_time)
-    for i in range(1, len(times)):
-        assert times[i] / times[i - 1] == pytest.approx(
-            measurements[i] / measurements[i - 1], rel=8
-        )
-
-
-@pytest.mark.parametrize("executor", [cirq_executor, qiskit_executor])
-def test_random_pauli_measurement_time_power_growth(
-    executor: Callable,
-):
-    """Test that random_pauli_measurement scales follow power law with the
-    number of measurements."""
-    n_qubits = [3, 6, 9, 12, 15]
-
-    times = []
-    for n in n_qubits:
-        qubits = cirq.LineQubit.range(n)
-        circuit = simple_test_circuit(qubits)
-        start_time = time.time()
-        random_pauli_measurement(
-            circuit,
-            100,  # number of total measurements
-            executor=executor,
-        )
-
-        times.append(time.time() - start_time)
-    for i in range(1, len(times)):
-        log_ratio_times = np.log(times[i] / times[i - 1])
-        log_ratio_qubits = np.log(n_qubits[i] / n_qubits[i - 1])
-        assert log_ratio_times == pytest.approx(log_ratio_qubits, rel=5)

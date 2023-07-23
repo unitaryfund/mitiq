@@ -93,8 +93,11 @@ def random_pauli_measurement(
         circuit: Cirq circuit.
         n_total_measurements: number of snapshots.
         executor: A callable which runs a circuit and returns a single
-            bitstring. If more bitstrings are returned, only one of them
-            is actually used.
+            bitstring.
+
+    Warning:
+        The ``executor`` must return a ``MeasurementResult``
+        for a single shot (i.e. a single bitstring).
 
     Returns:
         Tuple of two numpy arrays. The first array contains
@@ -131,6 +134,12 @@ def random_pauli_measurement(
     shadow_outcomes = []
     for result in results:
         bitstring = list(result.get_counts().keys())[0]
+        if len(result.get_counts().keys()) > 1:
+            raise ValueError(
+                "The `executor` must return a `MeasurementResult` "
+                "for a single shot"
+            )
+
         outcome = [1 - int(i) * 2 for i in bitstring]
         shadow_outcomes.append(outcome)
 
