@@ -9,18 +9,16 @@ import cirq
 import numpy as np
 
 from mitiq.shadows.classical_postprocessing import (
-    snapshot_state,
+    classical_snapshot,
     shadow_state_reconstruction,
     expectation_estimation_shadow,
 )
 
 
-def test_snapshot_state():
+def test_classical_snapshot():
     b_list = [1, -1]
     u_list = ["X", "Y"]
     expected_result = np.array(
-        # here put the expected result based on the
-        # specific b_list and u_list inputs
         [
             [0.25 + 0.0j, 0.0 + 0.75j, 0.75 + 0.0j, 0.0 + 2.25j],
             [0.0 - 0.75j, 0.25 + 0.0j, 0.0 - 2.25j, 0.75 + 0.0j],
@@ -28,17 +26,13 @@ def test_snapshot_state():
             [0.0 - 2.25j, 0.75 + 0.0j, 0.0 - 0.75j, 0.25 + 0.0j],
         ]
     )
-    result = snapshot_state(b_list, u_list)
-    assert isinstance(
-        result, np.ndarray
-    ), f"Expected a numpy array, got {type(result)}"
-    assert result.shape == (2 ** len(b_list), 2 ** len(b_list),), (
-        f"Expected shape {(2 ** len(b_list), 2 ** len(b_list))}, "
-        f"got {result.shape}"
+    result = classical_snapshot(b_list, u_list)
+    assert isinstance(result, np.ndarray)
+    assert result.shape == (
+        2 ** len(b_list),
+        2 ** len(b_list),
     )
-    assert np.allclose(
-        result, expected_result
-    ), f"Expected {expected_result}, got {result}"
+    assert np.allclose(result, expected_result)
 
 
 def test_shadow_state_reconstruction():
@@ -48,8 +42,6 @@ def test_shadow_state_reconstruction():
 
     expected_result = np.array(
         [
-            # Fill in the expected result based on the specific
-            # b_lists and u_lists inputs.
             [
                 [
                     0.5 + 0.0j,
@@ -137,16 +129,12 @@ def test_shadow_state_reconstruction():
 
     result = shadow_state_reconstruction(measurement_outcomes)
     num_qubits = measurement_outcomes[0].shape[1]
-    assert isinstance(
-        result, np.ndarray
-    ), f"Expected a numpy array, got {type(result)}"
-    assert result.shape == (2**num_qubits, 2**num_qubits,), (
-        f"Expected shape {(2 ** num_qubits, 2 ** num_qubits)}, "
-        f"got {result.shape}"
+    assert isinstance(result, np.ndarray)
+    assert result.shape == (
+        2**num_qubits,
+        2**num_qubits,
     )
-    assert np.allclose(
-        result, expected_result
-    ), f"Expected {expected_result}, but got {result}"
+    assert np.allclose(result, expected_result)
 
 
 def test_expectation_estimation_shadow():
@@ -170,9 +158,7 @@ def test_expectation_estimation_shadow():
 
     result = expectation_estimation_shadow(measurement_outcomes, observable, k)
     assert isinstance(result, float), f"Expected a float, got {type(result)}"
-    assert np.isclose(
-        result, expected_result
-    ), f"Expected {expected_result}, but got {result}"
+    assert np.isclose(result, expected_result)
 
 
 def test_expectation_estimation_shadow_no_indices():
@@ -188,11 +174,8 @@ def test_expectation_estimation_shadow_no_indices():
     )
     k_shadows = 1
 
-    # Act
     result = expectation_estimation_shadow(
         measurement_outcomes, observable, k_shadows
     )
 
-    # Assert
-    # All means should be 0 as there are no matching indices.
     assert result == 0.0
