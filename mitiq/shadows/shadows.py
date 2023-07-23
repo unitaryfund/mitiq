@@ -4,13 +4,13 @@
 # LICENSE file in the root directory of this source tree.
 """Classical shadow estimation for quantum circuits. Based on the paper"""
 
-from typing import Optional, Callable, List, Dict, Any
+from typing import Optional, Callable, List, Dict, Any, Union
 
 import cirq
 import numpy as np
-from cirq.ops.pauli_string import PauliString
 from numpy.typing import NDArray
 
+import mitiq
 from mitiq import MeasurementResult
 from mitiq.shadows import (
     random_pauli_measurement,
@@ -26,7 +26,9 @@ from mitiq.shadows.shadows_utils import (
 def execute_with_shadows(
     circuit: cirq.Circuit,
     executor: Callable[[cirq.Circuit], MeasurementResult],
-    observables: Optional[List[PauliString[Any]]] = None,  # type: ignore
+    observables: Optional[
+        List[Union[str, mitiq.PauliString, cirq.PauliString[Any]]]
+    ] = None,
     state_reconstruction: bool = False,
     *,
     k_shadows: Optional[int] = None,
