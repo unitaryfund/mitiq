@@ -4,11 +4,14 @@
 # LICENSE file in the root directory of this source tree.
 """Classical post-processing process of classical shadows."""
 
-from typing import Tuple, List, Any
+from typing import Tuple, List, Any, Union
 
 import cirq
 import numpy as np
 from numpy.typing import NDArray
+from mitiq.shadows.shadows_utils import transform_to_cirq_paulistring
+
+import mitiq
 
 # local unitary that applied to the qubits
 phase_z = cirq.S._unitary_().conj()
@@ -17,7 +20,7 @@ identity = cirq.I._unitary_()
 PAULI_MAP = {"X": hadamard, "Y": hadamard @ phase_z, "Z": identity}
 
 
-def snapshot_state(b_list: List[float], u_list: List[str]) -> NDArray[Any]:
+def classical_snapshot(b_list: List[int], u_list: List[str]) -> NDArray[Any]:
     r"""
     Implement a single snapshot state reconstruction.
 
@@ -30,7 +33,8 @@ def snapshot_state(b_list: List[float], u_list: List[str]) -> NDArray[Any]:
             Pauli measurement on each qubit.
 
     Returns:
-        Reconstructed snapshot in terms of nparray.
+        Reconstructed snapshot in terms of nparray, which is not a physical
+        state.
     """
 
     # z-basis measurement outcomes
@@ -40,7 +44,6 @@ def snapshot_state(b_list: List[float], u_list: List[str]) -> NDArray[Any]:
     b_one = np.array([[0.0 + 0.0j, 1.0 + 0.0j]])
     one_state = b_one.T @ b_one
 
-    # reconstructing a single snapshot state by applying Eq. (S44)
     rho_snapshot = np.array([1.0 + 0.0j])
 
     for b, u in zip(b_list, u_list):
@@ -54,7 +57,7 @@ def snapshot_state(b_list: List[float], u_list: List[str]) -> NDArray[Any]:
 
 
 def shadow_state_reconstruction(
-    measurement_outcomes: Tuple[NDArray[Any], NDArray[np.str0]]
+    measurement_outcomes: Tuple[NDArray[Any], NDArray[np.string_]]
 ) -> NDArray[Any]:
     """Reconstruct a state approximation as an average over all snapshots.
 
@@ -71,16 +74,20 @@ def shadow_state_reconstruction(
     b_lists, u_lists = measurement_outcomes
 
     # Averaging over snapshot states.
-    shadow_rho = np.zeros((2**num_qubits, 2**num_qubits), dtype=complex)
-    for i in range(num_snapshots):
-        shadow_rho += snapshot_state(b_lists[i], u_lists[i])
+    shadow_rho = np.sum(
+        [
+            classical_snapshot(b_list, u_list)
+            for b_list, u_list in zip(b_lists, u_lists)
+        ],
+        axis=0,
+    )
 
     return shadow_rho / num_snapshots
 
 
 def expectation_estimation_shadow(
-    measurement_outcomes: Tuple[NDArray[Any], NDArray[np.str0]],
-    observable: cirq.PauliString,  # type: ignore
+    measurement_outcomes: Tuple[NDArray[Any], NDArray[np.string_]],
+    pauli_str: Union[str, mitiq.PauliString, cirq.PauliString[Any]],
     k_shadows: int,
 ) -> float:
     """Calculate the expectation value of an observable from classical shadows.
@@ -88,25 +95,25 @@ def expectation_estimation_shadow(
 
     Args:
         measurement_outcomes: A shadow tuple obtained from
-            `z_basis_measurement`.
-        observable: Single cirq observable consisting of
+            `random_pauli_measurement`.
+        pauli_str: Single cirq observable consisting of
             Pauli operators.
         k_shadows: number of splits in the median of means estimator.
 
     Returns:
-        Float corresponding to the estimate of the observable
-        expectation value.
+        Estimation of the observable expectation value.
     """
+    pauli_str = transform_to_cirq_paulistring(pauli_str)
+
     # target observable
     target_obs, target_locs = [], []
-    for qubit, pauli in observable.items():
+    for qubit, pauli in pauli_str.items():
         target_obs.append(str(pauli))
         target_locs.append(int(qubit))
 
-    # classical values stored in classical computer
     b_lists, u_lists = measurement_outcomes
     u_lists = np.array([list(u) for u in u_lists])
-    # number of measurements in each split
+
     n_total_measurements = len(b_lists)
     means = []
 
