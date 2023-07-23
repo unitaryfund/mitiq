@@ -87,7 +87,7 @@ def shadow_state_reconstruction(
 
 def expectation_estimation_shadow(
     measurement_outcomes: Tuple[NDArray[Any], NDArray[np.string_]],
-    pauli_str: Union[str, cirq.PauliString, mitiq.PauliString],  # type: ignore
+    pauli_str: Union[str, mitiq.PauliString, cirq.PauliString[Any]],
     k_shadows: int,
 ) -> float:
     """Calculate the expectation value of an observable from classical shadows.
