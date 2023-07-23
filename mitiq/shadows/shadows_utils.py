@@ -100,7 +100,7 @@ def fidelity(
 
 
 def transform_to_cirq_paulistring(
-    pauli_str: Union[str, mitiq.PauliString, cirq.PauliString]  # type: ignore
+    pauli_str: Union[str, mitiq.PauliString, cirq.PauliString[Any]]
 ) -> cirq.PauliString:  # type: ignore
     """Transforms mitiq.PauliString or string to a cirq.PauliString class.
 
