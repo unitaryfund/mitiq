@@ -4,8 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 
 """Defines utility functions for classical shadows protocol."""
-from typing import Tuple, List, Any
-
+from typing import Tuple, List, Any, Union
+import mitiq
 import cirq
 import numpy as np
 from cirq.ops.pauli_string import PauliString
@@ -97,3 +97,40 @@ def fidelity(
         Scalar corresponding to the fidelity.
     """
     return np.reshape(state_vector.conj().T @ rho @ state_vector, -1).real[0]
+
+
+def transform_to_cirq_paulistring(
+    pauli_str: Union[str, mitiq.PauliString, cirq.PauliString]  # type: ignore
+) -> cirq.PauliString:  # type: ignore
+    """Transforms mitiq.PauliString or string to a cirq.PauliString class.
+
+    Args:
+      pauli_str: A mitiq.PauliString or string or cirq.PauliString.
+
+    Returns:
+      A cirq.PauliString.
+    """
+    if isinstance(pauli_str, cirq.PauliString):
+        return pauli_str
+    elif isinstance(pauli_str, mitiq.PauliString):
+        return cirq.PauliString(
+            qubit_pauli_map={
+                cirq.LineQubit(i): gate
+                for i, gate in enumerate(pauli_str._pauli.values())
+            },
+            coefficient=pauli_str.coeff,
+        )
+    elif isinstance(pauli_str, str):
+        # Create a mapping for Pauli gates
+        pauli_map = {"I": cirq.I, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
+        # Create a dictionary where the keys are qubits and the values are
+        # corresponding Pauli operations
+        qubit_pauli_map = {
+            cirq.LineQubit(i): pauli_map[pauli_str[i]]
+            for i in range(len(pauli_str))
+        }
+        return cirq.PauliString(qubit_pauli_map)
+    else:
+        raise ValueError(
+            "pauli_str must be cirq.PauliString, mitiq.PauliString or string."
+        )
