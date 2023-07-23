@@ -9,7 +9,7 @@ from typing import Tuple, List, Any, Union
 import cirq
 import numpy as np
 from numpy.typing import NDArray
-from mitiq.shadows.utils import test_transform_to_cirq_paulistring
+from mitiq.shadows.shadows_utils import transform_to_cirq_paulistring
 
 import mitiq
 
@@ -87,7 +87,7 @@ def shadow_state_reconstruction(
 
 def expectation_estimation_shadow(
     measurement_outcomes: Tuple[NDArray[Any], NDArray[np.string_]],
-    pauli_string: Union[str, cirq.PauliString, mitiq.PauliString],  # type: ignore
+    pauli_str: Union[str, cirq.PauliString, mitiq.PauliString],  # type: ignore
     k_shadows: int,
 ) -> float:
     """Calculate the expectation value of an observable from classical shadows.
@@ -96,18 +96,18 @@ def expectation_estimation_shadow(
     Args:
         measurement_outcomes: A shadow tuple obtained from
             `random_pauli_measurement`.
-        pauli_string: Single cirq observable consisting of
+        pauli_str: Single cirq observable consisting of
             Pauli operators.
         k_shadows: number of splits in the median of means estimator.
 
     Returns:
         Estimation of the observable expectation value.
     """
-    pauli_string = transform_to_cirq_paulistring(pauli_string)
+    pauli_str = transform_to_cirq_paulistring(pauli_str)
 
     # target observable
     target_obs, target_locs = [], []
-    for qubit, pauli in pauli_string.items():
+    for qubit, pauli in pauli_str.items():
         target_obs.append(str(pauli))
         target_locs.append(int(qubit))
 

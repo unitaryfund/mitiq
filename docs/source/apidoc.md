@@ -134,6 +134,18 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 
+### Classical Post-Processing
+```{eval-rst}
+.. automodule:: mitiq.shadows.classical_postprocessing
+   :members:
+```
+
+### Utility Functions
+```{eval-rst}
+.. automodule:: mitiq.shadows.shadows_utils
+   :members:
+```
+
 ## Digital Dynamical Decoupling
 
 ### Digital Dynamical Decoupling (High-Level Tools)
