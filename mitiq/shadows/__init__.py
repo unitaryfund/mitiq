@@ -1,6 +1,6 @@
 from mitiq.shadows.classical_postprocessing import (
     expectation_estimation_shadow,
-    snapshot_state,
+    classical_snapshot,
     shadow_state_reconstruction,
 )
 from mitiq.shadows.quantum_processing import (

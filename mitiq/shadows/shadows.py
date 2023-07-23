@@ -18,8 +18,9 @@ from mitiq.shadows import (
     expectation_estimation_shadow,
 )
 from mitiq.shadows.shadows_utils import (
-    min_n_total_measurements,
-    calculate_shadow_bound,
+    n_measurements_tomography_bound,
+    n_measurements_opts_expectation_bound,
+    transform_to_cirq_paulistring,
 )
 
 
@@ -76,16 +77,22 @@ def execute_with_shadows(
 
     if error_rate is not None:
         if state_reconstruction:
-            num_total_measurements = min_n_total_measurements(
+            num_total_measurements = n_measurements_tomography_bound(
                 error_rate, num_qubits=num_qubits
             )
             k_shadows = 1
         else:  # Estimation expectation value of observables
             assert failure_rate is not None
             assert observables is not None and len(observables) > 0
-            num_total_measurements, k_shadows = calculate_shadow_bound(
+            cirq_observables = [
+                transform_to_cirq_paulistring(obs) for obs in observables
+            ]
+            (
+                num_total_measurements,
+                k_shadows,
+            ) = n_measurements_opts_expectation_bound(
                 error=error_rate,
-                observables=observables,
+                observables=cirq_observables,
                 failure_rate=failure_rate,
             )
     else:
