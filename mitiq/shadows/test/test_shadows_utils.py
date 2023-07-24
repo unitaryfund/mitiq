@@ -2,7 +2,6 @@ import cirq
 import numpy as np
 import mitiq
 import pytest
-from typing import Tuple
 from mitiq.shadows.shadows_utils import (
     n_measurements_tomography_bound,
     n_measurements_opts_expectation_bound,

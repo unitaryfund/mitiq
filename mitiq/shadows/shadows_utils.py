@@ -101,52 +101,57 @@ def fidelity(
 
 def transform_to_cirq_paulistring(
     pauli_str: Union[str, mitiq.PauliString, cirq.PauliString[Any]]
-) -> Tuple[float, cirq.PauliString]:  # type: ignore
-    """Transforms mitiq.PauliString, cirq.PauliString, cirq.PauliSum or string to a cirq.PauliString class.
+) -> Tuple[float, cirq.PauliString[Any]]:
+    """Transforms mitiq.PauliString, cirq.PauliString, cirq.PauliSum or string
+    to a cirq.PauliString class.
 
     Args:
-      pauli_str: A mitiq.PauliString, cirq.PauliString, cirq.PauliSum or string.
+      pauli_str: A mitiq.PauliString, cirq.PauliString, cirq.PauliSum
+        or string.
 
     Returns:
       A tuple containing the coefficient and a cirq.PauliString.
     """
     if isinstance(pauli_str, cirq.PauliString):
         # Extract coefficient and return cirq.PauliString without coefficient
-        coeff = pauli_str.coefficient.real
-        new_pauli_str = cirq.PauliString(
+        coeff = np.real(pauli_str.coefficient)  # type: ignore
+        new_pauli_str: cirq.PauliString[Any] = cirq.PauliString(
             {qubit: op for qubit, op in pauli_str.items()}
         )
         return coeff, new_pauli_str
 
     elif isinstance(pauli_str, mitiq.PauliString):
-        return (
-            pauli_str.coeff,
-            cirq.PauliString(
-                qubit_pauli_map={
-                    cirq.LineQubit(i): gate
-                    for i, gate in enumerate(pauli_str._pauli.values())
-                }
-            ),
+        qubit_pauli_map = {
+            cirq.LineQubit(i): gate
+            for i, gate in enumerate(pauli_str._pauli.values())
+        }
+        return np.real(pauli_str.coeff), cirq.PauliString(
+            qubit_pauli_map=qubit_pauli_map
         )
-
     elif isinstance(pauli_str, str):
         # Extract the coefficient from the start of the string
-        coeff_str, _, _, pauli_str = re.match(
+        matched_results = re.match(
             r"([+-]?(\d+(\.\d*)?|\.\d+))?(.*)", pauli_str
-        ).groups()
+        )
+        if matched_results is None:
+            raise ValueError("pauli_str should be of format '0.5IXXY'")
+        coeff_str, _, _, pauli_str = matched_results.groups()
         coefficient = float(coeff_str) if coeff_str else 1.0
 
         # Create a mapping for Pauli gates
-        pauli_map = {"I": cirq.I, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
+        pauli_map = {"X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
         # Create a dictionary where the keys are qubits and the values are
         # corresponding Pauli operations
-        qubit_pauli_map = {
-            cirq.LineQubit(i): pauli_map[pauli_str[i]]
-            for i in range(len(pauli_str))
-        }
-        return coefficient, cirq.PauliString(qubit_pauli_map)
+        qubit_pauli_map = {}
+        for i, pauli_name in enumerate(pauli_str):  # X, Y, Z, I
+            if pauli_name == "I":
+                continue
+            qubit_pauli_map[cirq.LineQubit(i)] = pauli_map[pauli_name]
+
+        return coefficient, cirq.PauliString(qubit_pauli_map=qubit_pauli_map)
 
     else:
         raise ValueError(
-            "pauli_str must be cirq.PauliString, mitiq.PauliString, cirq.PauliSum or string."
+            "pauli_str must be cirq.PauliString, mitiq.PauliString, "
+            "cirq.PauliSum or string."
         )
