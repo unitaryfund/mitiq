@@ -41,6 +41,7 @@ def get_rotated_circuits(
     circuit: cirq.Circuit,
     pauli_strings: List[str],
     add_measurements: bool = True,
+    bitflip_ratio: float = 0.00,
 ) -> List[cirq.Circuit]:
     """Returns a list of circuits that are identical to the input circuit,
     except that each one has single-qubit Clifford gates followed by
@@ -72,6 +73,10 @@ def get_rotated_circuits(
                 assert (
                     pauli == "Z"
                 ), f"Pauli must be X, Y, Z. Got {pauli} instead."
+        if bitflip_ratio > 0.0:
+            rotated_circuit.append(
+                cirq.bit_flip(bitflip_ratio).on_each(*qubits)
+            )
         if add_measurements:
             rotated_circuit.append(cirq.measure(*qubits))
         rotated_circuits.append(rotated_circuit)

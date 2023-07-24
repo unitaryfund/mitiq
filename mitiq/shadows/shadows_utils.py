@@ -10,6 +10,7 @@ import cirq
 import numpy as np
 from cirq.ops.pauli_string import PauliString
 from numpy.typing import NDArray
+import re
 
 
 def n_measurements_tomography_bound(epsilon: float, num_qubits: int) -> int:
@@ -37,7 +38,6 @@ def local_clifford_shadow_norm(opt: PauliString[Any]) -> float:
     Returns:
         Shadow norm when unitary ensemble is local Clifford group.
     """
-
     norm = (
         np.linalg.norm(
             cirq.unitary(opt)
@@ -101,26 +101,41 @@ def fidelity(
 
 def transform_to_cirq_paulistring(
     pauli_str: Union[str, mitiq.PauliString, cirq.PauliString[Any]]
-) -> cirq.PauliString:  # type: ignore
-    """Transforms mitiq.PauliString or string to a cirq.PauliString class.
+) -> Tuple[float, cirq.PauliString]:  # type: ignore
+    """Transforms mitiq.PauliString, cirq.PauliString, cirq.PauliSum or string to a cirq.PauliString class.
 
     Args:
-      pauli_str: A mitiq.PauliString or string or cirq.PauliString.
+      pauli_str: A mitiq.PauliString, cirq.PauliString, cirq.PauliSum or string.
 
     Returns:
-      A cirq.PauliString.
+      A tuple containing the coefficient and a cirq.PauliString.
     """
     if isinstance(pauli_str, cirq.PauliString):
-        return pauli_str
-    elif isinstance(pauli_str, mitiq.PauliString):
-        return cirq.PauliString(
-            qubit_pauli_map={
-                cirq.LineQubit(i): gate
-                for i, gate in enumerate(pauli_str._pauli.values())
-            },
-            coefficient=pauli_str.coeff,
+        # Extract coefficient and return cirq.PauliString without coefficient
+        coeff = pauli_str.coefficient.real
+        new_pauli_str = cirq.PauliString(
+            {qubit: op for qubit, op in pauli_str.items()}
         )
+        return coeff, new_pauli_str
+
+    elif isinstance(pauli_str, mitiq.PauliString):
+        return (
+            pauli_str.coeff,
+            cirq.PauliString(
+                qubit_pauli_map={
+                    cirq.LineQubit(i): gate
+                    for i, gate in enumerate(pauli_str._pauli.values())
+                }
+            ),
+        )
+
     elif isinstance(pauli_str, str):
+        # Extract the coefficient from the start of the string
+        coeff_str, _, _, pauli_str = re.match(
+            r"([+-]?(\d+(\.\d*)?|\.\d+))?(.*)", pauli_str
+        ).groups()
+        coefficient = float(coeff_str) if coeff_str else 1.0
+
         # Create a mapping for Pauli gates
         pauli_map = {"I": cirq.I, "X": cirq.X, "Y": cirq.Y, "Z": cirq.Z}
         # Create a dictionary where the keys are qubits and the values are
@@ -129,8 +144,9 @@ def transform_to_cirq_paulistring(
             cirq.LineQubit(i): pauli_map[pauli_str[i]]
             for i in range(len(pauli_str))
         }
-        return cirq.PauliString(qubit_pauli_map)
+        return coefficient, cirq.PauliString(qubit_pauli_map)
+
     else:
         raise ValueError(
-            "pauli_str must be cirq.PauliString, mitiq.PauliString or string."
+            "pauli_str must be cirq.PauliString, mitiq.PauliString, cirq.PauliSum or string."
         )

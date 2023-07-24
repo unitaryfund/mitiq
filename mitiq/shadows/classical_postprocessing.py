@@ -99,15 +99,19 @@ def expectation_estimation_shadow(
         pauli_str: Single cirq observable consisting of
             Pauli operators.
         k_shadows: number of splits in the median of means estimator.
+        coefficient: coefficient of the observable.
 
     Returns:
         Estimation of the observable expectation value.
     """
-    pauli_str = transform_to_cirq_paulistring(pauli_str)
+    cirq_paulistring = transform_to_cirq_paulistring(pauli_str)
+
+    coefficient = cirq_paulistring[0]
+    obs = cirq_paulistring[1]
 
     # target observable
     target_obs, target_locs = [], []
-    for qubit, pauli in pauli_str.items():
+    for qubit, pauli in obs.items():
         target_obs.append(str(pauli))
         target_locs.append(int(qubit))
 
@@ -140,4 +144,4 @@ def expectation_estimation_shadow(
         else:
             means.append(0.0)
     # return the median of means
-    return float(np.median(means))
+    return float(np.median(means)) * coefficient

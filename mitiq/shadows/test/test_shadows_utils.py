@@ -2,6 +2,7 @@ import cirq
 import numpy as np
 import mitiq
 import pytest
+from typing import Tuple
 from mitiq.shadows.shadows_utils import (
     n_measurements_tomography_bound,
     n_measurements_opts_expectation_bound,
@@ -39,23 +40,33 @@ def test_fidelity():
 
 def test_transform_to_cirq_paulistring():
     # Create a mitiq PauliString
-    string_pauli = "XYZZ"
-    mitiq_pauli = mitiq.PauliString(spec=string_pauli)
+    string_pauli = "0.5XYZZ"
+    mitiq_pauli = mitiq.PauliString("XYZZ", coeff=0.5)
 
     # Convert to cirq PauliString
-    cirq_pauli = transform_to_cirq_paulistring(mitiq_pauli)
+    cirq_pauli = transform_to_cirq_paulistring(mitiq_pauli)[1]
+    coeff = transform_to_cirq_paulistring(mitiq_pauli)[0]
     assert isinstance(cirq_pauli, cirq.PauliString)
-    assert str(cirq_pauli) == "X(q(0))*Y(q(1))*Z(q(2))*Z(q(3))"
+    assert cirq_pauli == cirq.X(cirq.LineQubit(0)) * cirq.Y(
+        cirq.LineQubit(1)
+    ) * cirq.Z(cirq.LineQubit(2)) * cirq.Z(cirq.LineQubit(3))
+    assert coeff == 0.5
 
     # Convert string to cirq PauliString
-    cirq_pauli = transform_to_cirq_paulistring(string_pauli)
+    cirq_pauli = transform_to_cirq_paulistring(string_pauli)[1]
+    coeff = transform_to_cirq_paulistring(string_pauli)[0]
     assert isinstance(cirq_pauli, cirq.PauliString)
-    assert str(cirq_pauli) == "X(q(0))*Y(q(1))*Z(q(2))*Z(q(3))"
+    assert cirq_pauli == cirq.X(cirq.LineQubit(0)) * cirq.Y(
+        cirq.LineQubit(1)
+    ) * cirq.Z(cirq.LineQubit(2)) * cirq.Z(cirq.LineQubit(3))
+    assert coeff == 0.5
 
     # Test with a cirq.PauliString
-    cirq_pauli = cirq.PauliString({cirq.LineQubit(0): cirq.X})
-    cirq_pauli_transformed = transform_to_cirq_paulistring(cirq_pauli)
-    assert cirq_pauli == cirq_pauli_transformed
+    cirq_pauli = 0.5 * cirq.X(cirq.LineQubit(0))
+    cirq_pauli_transformed = transform_to_cirq_paulistring(cirq_pauli)[1]
+    coeff = transform_to_cirq_paulistring(cirq_pauli)[0]
+    assert cirq_pauli_transformed == cirq.X(cirq.LineQubit(0))
+    assert coeff == 0.5
 
     # Test with an invalid input
     with pytest.raises(ValueError):

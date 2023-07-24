@@ -84,7 +84,7 @@ def execute_with_shadows(
         else:  # Estimation expectation value of observables
             assert failure_rate is not None
             assert observables is not None and len(observables) > 0
-            cirq_observables = [
+            coeff_observables = [
                 transform_to_cirq_paulistring(obs) for obs in observables
             ]
             (
@@ -92,7 +92,7 @@ def execute_with_shadows(
                 k_shadows,
             ) = n_measurements_opts_expectation_bound(
                 error=error_rate,
-                observables=cirq_observables,
+                observables=[coeff_obs[1] for coeff_obs in coeff_observables],
                 failure_rate=failure_rate,
             )
     else:
