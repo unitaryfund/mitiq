@@ -6,21 +6,20 @@
 """Tests for the Quantum Subspace Expansion top level API."""
 
 from typing import List
-
 import numpy as np
-
 import cirq
-
 from mitiq import PauliString, Observable, QPROGRAM
-
-from mitiq.qse import get_projector
+from mitiq.qse import (
+    get_projector,
+    execute_with_qse,
+    mitigate_executor,
+    qse_decorator,
+)
 from mitiq.qse.qse_utils import (
     _compute_overlap_matrix,
     _compute_hamiltonian_overlap_matrix,
 )
-
 from mitiq.interface import convert_to_mitiq
-
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 
 
@@ -32,14 +31,179 @@ def execute_with_depolarized_noise(circuit: QPROGRAM) -> np.ndarray:
     )
 
 
+def batched_execute_with_depolarized_noise(circuits) -> List[np.ndarray]:
+    return [execute_with_depolarized_noise(circuit) for circuit in circuits]
+
+
 def execute_no_noise(circuit: QPROGRAM) -> np.ndarray:
     return compute_density_matrix(
         convert_to_mitiq(circuit)[0], noise_level=(0,)
     )
 
 
+def test_execute_with_qse_no_noise():
+    qc = prepare_logical_0_state_for_5_1_3_code()
+    (
+        check_operators,
+        code_hamiltonian,
+    ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+    observable = get_observable_in_code_space(PauliString("ZZZZZ"))
+    mitigated_value = execute_with_qse(
+        qc, execute_no_noise, check_operators, code_hamiltonian, observable
+    )
+    assert np.isclose(mitigated_value.real, 1)
+
+    observable = get_observable_in_code_space(PauliString("XXXXX"))
+    mitigated_value = execute_with_qse(
+        qc, execute_no_noise, check_operators, code_hamiltonian, observable
+    )
+    assert np.isclose(mitigated_value.real, 0.5)
+
+
+def test_execute_with_qse():
+    qc = prepare_logical_0_state_for_5_1_3_code()
+    (
+        check_operators,
+        code_hamiltonian,
+    ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+    observable = get_observable_in_code_space(PauliString("ZZZZZ"))
+    unmitigated_value = observable.expectation(
+        qc, execute_with_depolarized_noise
+    )
+    mitigated_value = execute_with_qse(
+        qc,
+        execute_with_depolarized_noise,
+        check_operators,
+        code_hamiltonian,
+        observable,
+    )
+    assert abs(mitigated_value.real - 1) < abs(unmitigated_value.real - 1)
+
+    observable = get_observable_in_code_space(PauliString("XXXXX"))
+    unmitigated_value = observable.expectation(
+        qc, execute_with_depolarized_noise
+    )
+    mitigated_value = execute_with_qse(
+        qc,
+        execute_with_depolarized_noise,
+        check_operators,
+        code_hamiltonian,
+        observable,
+    )
+    assert abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
+
+
+def test_mitigate_executor():
+    qc = prepare_logical_0_state_for_5_1_3_code()
+    (
+        check_operators,
+        code_hamiltonian,
+    ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+
+    observable = get_observable_in_code_space(PauliString("ZZZZZ"))
+    mitigated_executor = mitigate_executor(
+        execute_with_depolarized_noise,
+        check_operators,
+        code_hamiltonian,
+        observable,
+    )
+    batched_mitigated_executor = mitigate_executor(
+        batched_execute_with_depolarized_noise,
+        check_operators,
+        code_hamiltonian,
+        observable,
+    )
+    unmitigated_value = observable.expectation(
+        qc, execute_with_depolarized_noise
+    )
+    mitigated_value = mitigated_executor(qc)
+    assert abs(mitigated_value.real - 1) < abs(unmitigated_value.real - 1)
+
+    batched_mitigated_values = batched_mitigated_executor([qc] * 3)
+    assert all(
+        [
+            abs(mitigated_value.real - 1) < abs(unmitigated_value.real - 1)
+            for mitigated_value in batched_mitigated_values
+        ]
+    )
+
+    observable = get_observable_in_code_space(PauliString("XXXXX"))
+    mitigated_executor = mitigate_executor(
+        execute_with_depolarized_noise,
+        check_operators,
+        code_hamiltonian,
+        observable,
+    )
+    batched_mitigated_executor = mitigate_executor(
+        batched_execute_with_depolarized_noise,
+        check_operators,
+        code_hamiltonian,
+        observable,
+    )
+    unmitigated_value = observable.expectation(
+        qc, execute_with_depolarized_noise
+    )
+    mitigated_value = mitigated_executor(qc)
+    assert abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
+
+    batched_mitigated_values = batched_mitigated_executor([qc] * 3)
+    assert all(
+        [
+            abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
+            for mitigated_value in batched_mitigated_values
+        ]
+    )
+
+
+def test_qse_decorator():
+    qc = prepare_logical_0_state_for_5_1_3_code()
+    (
+        check_operators,
+        code_hamiltonian,
+    ) = get_5_1_3_code_check_operators_and_code_hamiltonian()
+    observable = get_observable_in_code_space(PauliString("ZZZZZ"))
+
+    @qse_decorator(
+        check_operators=check_operators,
+        code_hamiltonian=code_hamiltonian,
+        observable=observable,
+    )
+    def decorated_executor(circuit: QPROGRAM) -> np.ndarray:
+        return compute_density_matrix(
+            convert_to_mitiq(circuit)[0],
+            noise_model=cirq.depolarize,
+            noise_level=(0.01,),
+        )
+
+    unmitigated_value = observable.expectation(
+        qc, execute_with_depolarized_noise
+    )
+    mitigated_value = decorated_executor(qc)
+    assert abs(mitigated_value.real - 1) < abs(unmitigated_value.real - 1)
+
+    observable = get_observable_in_code_space(PauliString("XXXXX"))
+
+    @qse_decorator(
+        check_operators=check_operators,
+        code_hamiltonian=code_hamiltonian,
+        observable=observable,
+    )
+    def decorated_executor(circuit: QPROGRAM) -> np.ndarray:
+        return compute_density_matrix(
+            convert_to_mitiq(circuit)[0],
+            noise_model=cirq.depolarize,
+            noise_level=(0.01,),
+        )
+
+    unmitigated_value = observable.expectation(
+        qc, execute_with_depolarized_noise
+    )
+    mitigated_value = decorated_executor(qc)
+    assert abs(mitigated_value.real - 0.5) < abs(unmitigated_value.real - 0.5)
+
+
 def test_get_projector():
-    qc, _ = prepare_logical_0_state_for_5_1_3_code()
+    qc = prepare_logical_0_state_for_5_1_3_code()
     (
         check_operators,
         code_hamiltonian,
@@ -50,7 +214,7 @@ def test_get_projector():
 
 
 def test_compute_overlap_matrix():
-    qc, _ = prepare_logical_0_state_for_5_1_3_code()
+    qc = prepare_logical_0_state_for_5_1_3_code()
     (
         check_operators,
         _,
@@ -77,7 +241,7 @@ def test_compute_overlap_matrix():
 
 
 def test_compute_hamiltonian_overlap_matrix():
-    qc, _ = prepare_logical_0_state_for_5_1_3_code()
+    qc = prepare_logical_0_state_for_5_1_3_code()
     (
         check_operators,
         code_hamiltonian,
@@ -101,6 +265,22 @@ def test_compute_hamiltonian_overlap_matrix():
     )
     assert np.allclose(H, H[0][0])
     assert H[0][0].real > -16
+
+
+def get_observable_in_code_space(observable: List[cirq.PauliString]):
+    FIVE_I = PauliString("IIIII")
+    projector_onto_code_space = [
+        PauliString("XZZXI"),
+        PauliString("IXZZX"),
+        PauliString("XIXZZ"),
+        PauliString("ZXIXZ"),
+    ]
+
+    observable_in_code_space = Observable(FIVE_I)
+    all_paulis = projector_onto_code_space + [observable]
+    for g in all_paulis:
+        observable_in_code_space *= 0.5 * Observable(FIVE_I, g)
+    return observable_in_code_space
 
 
 def get_5_1_3_code_check_operators_and_code_hamiltonian() -> tuple:
@@ -211,4 +391,5 @@ def prepare_logical_0_state_for_5_1_3_code():
     g = cirq.MatrixGate(matrix)
     qubits = cirq.LineQubit.range(5)
     circuit.append(g(*qubits))
-    return circuit, qubits
+
+    return circuit
