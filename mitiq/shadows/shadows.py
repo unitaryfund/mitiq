@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """Classical shadow estimation for quantum circuits. Based on the paper"""
 
-from typing import Optional, Callable, List, Dict, Any, Union
+from typing import Optional, Callable, List, Dict, Any
 
 import cirq
 import numpy as np
@@ -20,16 +20,13 @@ from mitiq.shadows import (
 from mitiq.shadows.shadows_utils import (
     n_measurements_tomography_bound,
     n_measurements_opts_expectation_bound,
-    transform_to_cirq_paulistring,
 )
 
 
 def execute_with_shadows(
     circuit: cirq.Circuit,
     executor: Callable[[cirq.Circuit], MeasurementResult],
-    observables: Optional[
-        List[Union[str, mitiq.PauliString, cirq.PauliString[Any]]]
-    ] = None,
+    observables: Optional[List[mitiq.PauliString]] = None,
     state_reconstruction: bool = False,
     *,
     k_shadows: Optional[int] = None,
@@ -84,15 +81,12 @@ def execute_with_shadows(
         else:  # Estimation expectation value of observables
             assert failure_rate is not None
             assert observables is not None and len(observables) > 0
-            coeff_observables = [
-                transform_to_cirq_paulistring(obs) for obs in observables
-            ]
             (
                 num_total_measurements,
                 k_shadows,
             ) = n_measurements_opts_expectation_bound(
                 error=error_rate,
-                observables=[coeff_obs[1] for coeff_obs in coeff_observables],
+                observables=observables,
                 failure_rate=failure_rate,
             )
     else:

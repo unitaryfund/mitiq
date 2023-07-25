@@ -8,7 +8,7 @@
 import cirq
 import numpy as np
 import pytest
-
+import mitiq
 
 from mitiq import MeasurementResult
 from mitiq.interface.mitiq_cirq.cirq_utils import (
@@ -24,7 +24,7 @@ circuit = cirq.Circuit([cirq.H(q) for q in qubits])
 circuit.append(cirq.CNOT(qubits[0], qubits[1]))
 circuit.append(cirq.CNOT(qubits[1], qubits[2]))
 # Define list of observables
-observables = [cirq.X(q) for q in qubits]
+observables = [mitiq.PauliString("X", support=(i,)) for i in range(num_qubits)]
 
 
 def executor(
