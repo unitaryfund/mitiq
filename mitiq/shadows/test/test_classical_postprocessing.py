@@ -8,7 +8,7 @@
 import cirq
 import numpy as np
 
-
+import mitiq
 from mitiq.shadows.classical_postprocessing import (
     classical_snapshot,
     shadow_state_reconstruction,
@@ -152,13 +152,13 @@ def test_expectation_estimation_shadow():
         ]
     )
     measurement_outcomes = (b_lists, u_lists)
-    observable = cirq.Z(cirq.LineQubit(0)) * cirq.Z(cirq.LineQubit(1))
+    observable = mitiq.PauliString("ZZ", support=(0, 1))
     k = 1
     expected_result = -9
     print("expected_result", expected_result)
 
     result = expectation_estimation_shadow(measurement_outcomes, observable, k)
-    assert isinstance(result, float), f"Expected a float, got {type(result)}"
+    assert isinstance(result, complex), f"Expected a float, got {type(result)}"
     assert np.isclose(result, expected_result)
 
 
@@ -168,7 +168,7 @@ def test_expectation_estimation_shadow_no_indices():
     The result should be 0 as there are no matching
     """
     q0, q1, q2 = cirq.LineQubit.range(3)
-    observable = cirq.PauliString({q0: cirq.X, q1: cirq.Y, q2: cirq.Z})
+    observable = mitiq.PauliString("XYZ", support=(0, 1, 2))
     measurement_outcomes = (
         np.array([[-1, 1, -1], [1, -1, 1], [-1, 1, -1]]),
         np.array([["Z", "X", "Y"], ["Y", "Z", "X"], ["Z", "Z", "Y"]]),

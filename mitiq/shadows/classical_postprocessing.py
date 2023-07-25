@@ -8,12 +8,11 @@
 # LICENSE file in the root directory of this source tree.
 """Classical post-processing process of classical shadows."""
 
-from typing import Tuple, List, Any, Union
+from typing import Tuple, List, Any
 
 import cirq
 import numpy as np
 from numpy.typing import NDArray
-from mitiq.shadows.shadows_utils import transform_to_cirq_paulistring
 
 import mitiq
 
@@ -72,13 +71,12 @@ def shadow_state_reconstruction(
     Returns:
         Numpy array with the reconstructed quantum state.
     """
-    num_snapshots, num_qubits = measurement_outcomes[0].shape
 
     # classical values
     b_lists, u_lists = measurement_outcomes
 
     # Averaging over snapshot states.
-    shadow_rho = np.sum(
+    shadow_rho = np.mean(
         [
             classical_snapshot(b_list, u_list)
             for b_list, u_list in zip(b_lists, u_lists)
@@ -86,34 +84,30 @@ def shadow_state_reconstruction(
         axis=0,
     )
 
-    return shadow_rho / num_snapshots
+    return shadow_rho
 
 
 def expectation_estimation_shadow(
     measurement_outcomes: Tuple[NDArray[Any], NDArray[np.string_]],
-    pauli_str: Union[str, mitiq.PauliString, cirq.PauliString[Any]],
+    pauli_str: mitiq.PauliString,
     k_shadows: int,
-) -> float:
+) -> complex:
     """Calculate the expectation value of an observable from classical shadows.
     Use median of means to ameliorate the effects of outliers.
 
     Args:
         measurement_outcomes: A shadow tuple obtained from
             `random_pauli_measurement`.
-        pauli_str: Single cirq observable consisting of
-            Pauli operators.
+        pauli_str: Single observable consisting of Pauli operators.
         k_shadows: number of splits in the median of means estimator.
-        coefficient: coefficient of the observable.
 
     Returns:
         Estimation of the observable expectation value.
     """
-    cirq_paulistring = transform_to_cirq_paulistring(pauli_str)
+    # mitiq version
+    obs = pauli_str._pauli
+    coeff = pauli_str.coeff
 
-    coefficient = cirq_paulistring[0]
-    obs = cirq_paulistring[1]
-
-    # target observable
     target_obs, target_locs = [], []
     for qubit, pauli in obs.items():
         target_obs.append(str(pauli))
@@ -148,4 +142,4 @@ def expectation_estimation_shadow(
         else:
             means.append(0.0)
     # return the median of means
-    return float(np.median(means)) * coefficient
+    return float(np.median(means)) * coeff
