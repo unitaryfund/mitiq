@@ -1,8 +1,4 @@
 # Copyright (C) Unitary Fund
-# Portions of this code have been adapted from PennyLane's tutorial
-# on Classical Shadows.
-# Original authors: PennyLane developers: Brian Doolittle, Roeland Wiersema
-# Tutorial link: https://pennylane.ai/qml/demos/tutorial_classical_shadows
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
