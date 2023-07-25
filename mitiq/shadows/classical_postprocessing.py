@@ -119,13 +119,11 @@ def expectation_estimation_shadow(
     n_total_measurements = len(b_lists)
     means = []
 
+    group_idxes = np.array_split(np.arange(n_total_measurements), k_shadows)
     # loop over the splits of the shadow:
-    for i in range(0, n_total_measurements, n_total_measurements // k_shadows):
-        # assign the splits temporarily
-        b_lists_k, u_lists_k = (
-            b_lists[i : i + n_total_measurements // k_shadows],
-            u_lists[i : i + n_total_measurements // k_shadows],
-        )
+    for idxes in group_idxes:
+        b_lists_k = b_lists[idxes]
+        u_lists_k = u_lists[idxes]
         # number of measurements/shadows in each split
         n_group_measurements = len(b_lists_k)
         # find the exact matches for the observable of
