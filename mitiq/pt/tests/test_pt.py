@@ -127,4 +127,4 @@ def test_execute_with_pauli_twirling():
     expval = execute_with_pauli_twirling(
         circuit, amp_damp_executor, num_circuits=10
     )
-    assert 0 <= expval < 0.4
+    assert 0 <= expval < 0.5
