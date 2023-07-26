@@ -7,7 +7,6 @@
 
 import cirq
 import numpy as np
-
 import mitiq
 from mitiq.shadows.classical_postprocessing import (
     classical_snapshot,

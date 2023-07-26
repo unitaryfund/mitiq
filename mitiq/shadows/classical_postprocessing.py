@@ -13,7 +13,6 @@ from typing import Tuple, List, Any
 import cirq
 import numpy as np
 from numpy.typing import NDArray
-
 import mitiq
 
 # local unitary that applied to the qubits

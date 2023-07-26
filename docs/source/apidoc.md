@@ -148,18 +148,6 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 
-### Utility Functions
-```{eval-rst}
-.. automodule:: mitiq.shadows.shadows_utils
-
-
-## Digital Dynamical Decoupling
-
-### Digital Dynamical Decoupling (High-Level Tools)
-```{eval-rst}
-.. automodule:: mitiq.ddd.ddd
-   :members:
-```
 
 ### Insertion
 ```{eval-rst}
