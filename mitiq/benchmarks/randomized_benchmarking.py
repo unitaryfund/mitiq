@@ -52,7 +52,9 @@ def generate_rb_circuits(
 
     if n_qubits == 1:
         c1 = cliffords.c1_in_xy
-        cfd_mat_1q = np.array([_gate_seq_to_mats(gates) for gates in c1])
+        cfd_mat_1q = np.array(
+            [_gate_seq_to_mats(gates) for gates in c1], dtype=np.complex64
+        )
 
         circuits = [
             _random_single_q_clifford(qubits[0], num_cliffords, c1, cfd_mat_1q)
