@@ -34,9 +34,9 @@ ZNE_TABLE_HEADER_STR = (
 
 PEC_TABLE_HEADER_STR = (
     "| performance | circuit | method "
-    "| representation function | operations to mitigate | noise level |\n"
-    "| ----------- | ------- | ------ | ----------------------- "
-    "| ---------------------- | ----------- | "
+    "| noise level | noise bias | representation function   | \n"
+    "| ----------- | ------- | ------ | ----------- | ---------- "
+    "| ------------------------- |"
 )
 
 
@@ -205,6 +205,7 @@ class Calibrator:
         if not self.results.is_missing_data():
             self.results.reset_data()
 
+        prev_technique = None
         for problem in self.problems:
             # Benchmark circuits have no measurements, so we append them.
             circuit = problem.circuit.copy()
@@ -215,24 +216,22 @@ class Calibrator:
                 self.cirq_executor, bitstring_to_measure
             )
             noisy_value = expval_executor.evaluate(circuit)[0]
-            for count, strategy in enumerate(self.strategies):
+            for strategy in self.strategies:
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", UserWarning)
                     mitigated_value = strategy.mitigation_function(
                         circuit, expval_executor
                     )
-                if log and (
-                    count
-                    and (
-                        strategy.technique
-                        is not self.strategies[count - 1].technique
-                    )
-                    or not count
+                if (
+                    strategy.technique != prev_technique
+                    and strategy.technique is MitigationTechnique.ZNE
                 ):
-                    if strategy.technique is MitigationTechnique.ZNE:
-                        print(ZNE_TABLE_HEADER_STR)
-                    elif strategy.technique is MitigationTechnique.PEC:
-                        print(PEC_TABLE_HEADER_STR)
+                    print(ZNE_TABLE_HEADER_STR)
+                elif (
+                    strategy.technique != prev_technique
+                    and strategy.technique is MitigationTechnique.PEC
+                ):
+                    print(PEC_TABLE_HEADER_STR)
                 self.results.add_result(
                     strategy,
                     problem,
@@ -241,6 +240,7 @@ class Calibrator:
                     mitigated_val=mitigated_value,
                     log=log,
                 )
+                prev_technique = strategy.technique
         self.results.ensure_full()
 
     def best_strategy(self) -> Strategy:

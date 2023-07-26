@@ -36,6 +36,7 @@ from mitiq.zne.scaling import fold_global
 from mitiq.interface import convert_to_mitiq
 from mitiq.pec.representations import (
     represent_operation_with_local_depolarizing_noise,
+    represent_operation_with_local_biased_noise,
 )
 
 light_zne_settings = Settings(
@@ -77,10 +78,11 @@ light_pec_settings = Settings(
         {
             "technique": "pec",
             "representation_function": (
-                represent_operation_with_local_depolarizing_noise
+                represent_operation_with_local_biased_noise
             ),
             "is_qubit_dependent": False,
-            "noise_level": 0.001,
+            "noise_level": 0.01,
+            "noise_bias": 0.1,
             "num_samples": 200,
         },
     ],
