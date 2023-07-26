@@ -169,7 +169,8 @@ def _select(
                       method_select = 'gaussian'.
         random_state: Random state for sampling.
     """
-    random_state = random_state or np.random.RandomState()
+    if random_state is None:
+        random_state = np.random  # type: ignore
 
     num_non_cliff = len(non_clifford_ops)
     num_to_replace = int(round(fraction_non_clifford * num_non_cliff))
@@ -193,7 +194,7 @@ def _select(
         )
 
     # Select (indices of) non-Clifford operations to replace.
-    selected_indices = random_state.choice(
+    selected_indices = cast(np.random.RandomState, random_state).choice(
         range(num_non_cliff),
         num_non_cliff - num_to_replace,
         replace=False,
@@ -229,7 +230,8 @@ def _replace(
         Exception: If argument 'method_replace' is not either 'closest',
         'uniform' or 'gaussian'.
     """
-    random_state = random_state or np.random.RandomState()
+    if random_state is None:
+        random_state = np.random  # type: ignore
 
     # TODO: Update these functions to act on operations instead of angles.
     non_clifford_angles = np.array(
@@ -240,7 +242,7 @@ def _replace(
 
     elif method == "uniform":
         clifford_angles = random_clifford(
-            len(non_clifford_angles), random_state
+            len(non_clifford_angles), cast(np.random.RandomState, random_state)
         )
 
     elif method == "gaussian":

@@ -326,6 +326,12 @@ def test_representation_sample_seed():
         assert np.isclose(coeff1, coeff2)
 
 
+def test_representation_sample_bad_seed_type():
+    _, _, _, decomp = get_test_representation()
+    with pytest.raises(TypeError, match="should be of type"):
+        decomp.sample(random_state=7)
+
+
 def test_representation_sample_zero_coefficient():
     ideal = cirq.Circuit(cirq.H(cirq.LineQubit(0)))
 

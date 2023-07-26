@@ -233,11 +233,19 @@ class OperationRepresentation:
         Args:
             random_state: Defines the seed for sampling if provided.
         """
+        if not random_state:
+            rng = np.random
+        elif isinstance(random_state, int):
+            rng = np.random.RandomState(random_state)  # type: ignore
+        elif isinstance(random_state, np.random.RandomState):
+            rng = random_state  # type: ignore
+        else:
+            raise TypeError(
+                "Arg `random_state` should be of type `np.random.RandomState` "
+                f"or `int`, but was {type(random_state)}."
+            )
 
-        if random_state is None or isinstance(random_state, int):
-            random_state = np.random.RandomState(random_state)
-
-        idx = random_state.choice(len(self.coeffs), p=self.distribution)
+        idx = rng.choice(len(self.coeffs), p=self.distribution)
         coeff, noisy_op = self.basis_expansion[idx]
         return noisy_op, int(np.sign(coeff)), coeff
 
