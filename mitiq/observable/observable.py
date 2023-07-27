@@ -106,7 +106,7 @@ class Observable:
         while paulis:
             pauli = paulis.pop()
             added = False
-            for (i, pset) in enumerate(psets):
+            for i, pset in enumerate(psets):
                 if pset.can_add(pauli):
                     pset.add(pauli)
                     added = True

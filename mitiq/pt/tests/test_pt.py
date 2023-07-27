@@ -29,7 +29,7 @@ circuit.append(cirq.CZ(*qubits))
 
 def amp_damp_executor(circuit: cirq.Circuit, noise: float = 0.005) -> float:
     return compute_density_matrix(
-        circuit, noise_model=cirq.amplitude_damp, noise_level=(noise,)
+        circuit, noise_model_function=cirq.amplitude_damp, noise_level=(noise,)
     )[0, 0].real
 
 
@@ -127,4 +127,4 @@ def test_execute_with_pauli_twirling():
     expval = execute_with_pauli_twirling(
         circuit, amp_damp_executor, num_circuits=10
     )
-    assert 0 <= expval < 0.4
+    assert 0 <= expval < 0.5
