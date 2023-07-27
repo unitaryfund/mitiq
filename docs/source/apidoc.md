@@ -156,6 +156,12 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 
+### Insertion
+```{eval-rst}
+.. automodule:: mitiq.ddd.insertion
+   :members:
+```
+
 ### Rules
 ```{eval-rst}
 .. automodule:: mitiq.ddd.rules.rules
