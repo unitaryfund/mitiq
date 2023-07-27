@@ -149,6 +149,7 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
 ```
 
 ## Digital Dynamical Decoupling
+
 ### Digital Dynamical Decoupling (High-Level Tools)
 ```{eval-rst}
 .. automodule:: mitiq.ddd.ddd
