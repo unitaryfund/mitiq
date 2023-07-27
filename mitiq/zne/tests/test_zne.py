@@ -91,7 +91,9 @@ def test_with_observable_batched_factory(executor):
     noisy_value = observable.expectation(circuit, sample_bitstrings)
     zne_value = execute_with_zne(
         circuit,
-        executor=functools.partial(executor, noise_model=cirq.depolarize),
+        executor=functools.partial(
+            executor, noise_model_function=cirq.depolarize
+        ),
         observable=observable,
         factory=PolyFactory(scale_factors=[1, 3, 5], order=2),
     )
@@ -112,7 +114,9 @@ def test_with_observable_adaptive_factory(executor):
     noisy_value = observable.expectation(circuit, sample_bitstrings)
     zne_value = execute_with_zne(
         circuit,
-        executor=functools.partial(executor, noise_model=cirq.amplitude_damp),
+        executor=functools.partial(
+            executor, noise_model_function=cirq.amplitude_damp
+        ),
         observable=observable,
         factory=AdaExpFactory(steps=4, asymptote=0.5),
     )
@@ -138,7 +142,9 @@ def test_with_observable_two_qubits(executor):
     noisy_value = observable.expectation(circuit, sample_bitstrings)
     zne_value = execute_with_zne(
         circuit,
-        executor=functools.partial(executor, noise_model=cirq.depolarize),
+        executor=functools.partial(
+            executor, noise_model_function=cirq.depolarize
+        ),
         observable=observable,
         factory=PolyFactory(scale_factors=[1, 3, 5], order=2),
     )

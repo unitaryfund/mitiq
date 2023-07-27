@@ -207,14 +207,14 @@ def _Z(q: QubitLike) -> Program:
     return p
 
 
-def is_magic_angle(angle: AngleLike) -> bool:
+def is_magic_angle(angle: complex) -> bool:
     """
     Checks to see if an angle is 0, +/-pi/2, or +/-pi.
     """
     return bool(
-        np.isclose(np.abs(cast(float, angle)), pi / 2)
-        or np.isclose(np.abs(cast(float, angle)), pi)
-        or np.isclose(cast(float, angle), 0.0)
+        np.isclose(np.abs(angle), pi / 2)
+        or np.isclose(np.abs(angle), pi)
+        or np.isclose(angle, 0.0)
     )
 
 
@@ -257,8 +257,8 @@ def basic_compile(program: Program) -> Program:
                 angle_param = inst.params[0]
                 new_prog += _PHASE(angle_param, inst.qubits[0])
             elif inst.name == "RX":
-                angle_param = inst.params[0]
-                if is_magic_angle(inst.params[0]):
+                angle_param = cast(complex, inst.params[0])
+                if is_magic_angle(angle_param):
                     # in case dagger
                     new_prog += RX(angle_param, inst.qubits[0])
                 else:

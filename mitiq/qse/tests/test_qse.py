@@ -26,7 +26,7 @@ from mitiq.interface.mitiq_cirq import compute_density_matrix
 def execute_with_depolarized_noise(circuit: QPROGRAM) -> np.ndarray:
     return compute_density_matrix(
         convert_to_mitiq(circuit)[0],
-        noise_model=cirq.depolarize,
+        noise_model_function=cirq.depolarize,
         noise_level=(0.01,),
     )
 
@@ -171,7 +171,7 @@ def test_qse_decorator():
     def decorated_executor(circuit: QPROGRAM) -> np.ndarray:
         return compute_density_matrix(
             convert_to_mitiq(circuit)[0],
-            noise_model=cirq.depolarize,
+            noise_model_function=cirq.depolarize,
             noise_level=(0.01,),
         )
 
@@ -191,7 +191,7 @@ def test_qse_decorator():
     def decorated_executor(circuit: QPROGRAM) -> np.ndarray:
         return compute_density_matrix(
             convert_to_mitiq(circuit)[0],
-            noise_model=cirq.depolarize,
+            noise_model_function=cirq.depolarize,
             noise_level=(0.01,),
         )
 
