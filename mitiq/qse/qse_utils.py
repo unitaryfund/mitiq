@@ -5,9 +5,8 @@
 
 """Functions for computing the projector for subspace expansion."""
 
-from typing import Callable, Sequence, Union
-from mitiq import Observable, QPROGRAM, QuantumResult, PauliString
-from typing import Dict
+from typing import Callable, Sequence, Union, Dict, List
+from mitiq import Observable, QPROGRAM, QuantumResult, PauliString, Executor
 import numpy as np
 import numpy.typing as npt
 from scipy.linalg import eigh
@@ -16,16 +15,16 @@ from numpy.linalg import pinv
 
 def get_projector(
     circuit: QPROGRAM,
-    executor: Callable[[QPROGRAM], QuantumResult],
+    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     check_operators: Sequence[PauliString],
     code_hamiltonian: Observable,
+    pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
 ) -> Observable:
     """Computes the projector onto the code space defined by the
     check_operators provided that minimizes the code_hamiltonian.
 
     Returns: Projector as an Observable.
     """
-    pauli_string_to_expectation_cache: Dict[PauliString, complex] = {}
     S = _compute_overlap_matrix(
         circuit, executor, check_operators, pauli_string_to_expectation_cache
     )
@@ -48,24 +47,33 @@ def get_projector(
     return projector
 
 
-def _get_expectation_value_for_observable(
+def get_expectation_value_for_observable(
     circuit: QPROGRAM,
-    executor: Callable[[QPROGRAM], QuantumResult],
+    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     observable: Union[PauliString, Observable],
     pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
 ) -> float:
+    """Provide pauli_string_to_expectation_cache if you want to take advantage
+    of caching.
+
+    This function modifies pauli_string_to_expectation_cache in place.
+    """
+
     def get_expectation_value_for_one_pauli(
         pauli_string: PauliString,
     ) -> float:
         cache_key = pauli_string.with_coeff(1)
-        pauli_string_to_expectation_cache[cache_key] = Observable(
-            cache_key
-        ).expectation(circuit, executor)
+        pauli_string_to_expectation_cache[cache_key] = final_executor.evaluate(
+            circuit, Observable(cache_key)
+        )[0]
         return (
             pauli_string_to_expectation_cache[cache_key] * pauli_string.coeff
         ).real
 
     total_expectation_value_for_observable = 0.0
+    final_executor: Executor = (
+        executor if isinstance(executor, Executor) else Executor(executor)
+    )
 
     if isinstance(observable, PauliString):
         pauli_string = observable
@@ -82,16 +90,16 @@ def _get_expectation_value_for_observable(
 
 def _compute_overlap_matrix(
     circuit: QPROGRAM,
-    executor: Callable[[QPROGRAM], QuantumResult],
+    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     check_operators: Sequence[PauliString],
     pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
 ) -> npt.NDArray[np.float64]:
-    S: list[list[float]] = []
+    S: List[List[float]] = []
     # S_ij = <Ψ|Mi† Mj|Ψ>
     for i in range(len(check_operators)):
         S.append([])
         for j in range(len(check_operators)):
-            sij = _get_expectation_value_for_observable(
+            sij = get_expectation_value_for_observable(
                 circuit,
                 executor,
                 check_operators[i] * check_operators[j],
@@ -103,18 +111,18 @@ def _compute_overlap_matrix(
 
 def _compute_hamiltonian_overlap_matrix(
     circuit: QPROGRAM,
-    executor: Callable[[QPROGRAM], QuantumResult],
+    executor: Union[Executor, Callable[[QPROGRAM], QuantumResult]],
     check_operators: Sequence[PauliString],
     code_hamiltonian: Observable,
     pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
 ) -> npt.NDArray[np.float64]:
-    H: list[list[float]] = []
+    H: List[List[float]] = []
     # H_ij = <Ψ|Mi† H Mj|Ψ>
     for i in range(len(check_operators)):
         H.append([])
         for j in range(len(check_operators)):
             H[-1].append(
-                _get_expectation_value_for_observable(
+                get_expectation_value_for_observable(
                     circuit,
                     executor,
                     check_operators[i] * code_hamiltonian * check_operators[j],

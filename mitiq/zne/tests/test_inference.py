@@ -151,7 +151,7 @@ def test_get_scale_factors_static_factories(factory):
 
     # Compute expectation values at all the scale factors
     fac.run_classical(apply_seed_to_func(f_lin, seed=1))
-    assert isinstance(fac.get_scale_factors(), np.ndarray)
+    assert isinstance(fac.get_scale_factors(), list)
     assert np.allclose(fac.get_scale_factors(), scale_factors)
 
 
@@ -161,26 +161,24 @@ def test_get_scale_factors_adaptive_factories(factory):
     fac = AdaExpFactory(steps=num_steps, scale_factor=2.0, asymptote=None)
 
     # Expectation values haven't been computed at any scale factors yet
-    assert isinstance(fac.get_scale_factors(), np.ndarray)
+    assert isinstance(fac.get_scale_factors(), list)
     assert len(fac.get_scale_factors()) == 0
 
     # Compute expectation values at all the scale factors
     fac.run_classical(apply_seed_to_func(f_exp_up, seed=1))
-    assert isinstance(fac.get_scale_factors(), np.ndarray)
+    assert isinstance(fac.get_scale_factors(), list)
 
     # Given this seeded executor, the scale factors should be as follows
-    correct_scale_factors = np.array(
-        [
-            1.0,
-            2.0,
-            4.0,
-            4.20469548,
-            4.20310693,
-            4.2054822,
-            4.2031916,
-            4.2052843,
-        ]
-    )
+    correct_scale_factors = [
+        1.0,
+        2.0,
+        4.0,
+        4.20469548,
+        4.20310693,
+        4.2054822,
+        4.2031916,
+        4.2052843,
+    ]
     assert len(fac.get_scale_factors()) == num_steps
     assert np.allclose(fac.get_scale_factors(), correct_scale_factors)
 
@@ -199,7 +197,7 @@ def test_get_scale_factors_adaptive_factories(factory):
 def test_get_expectation_values_static_factories(factory):
     scale_factors = np.linspace(1.0, 10.0, num=20)
     executor = apply_seed_to_func(f_lin, seed=1)
-    expectation_values = np.array([executor(scale) for scale in scale_factors])
+    expectation_values = [executor(scale) for scale in scale_factors]
 
     if factory is PolyFactory or factory is PolyExpFactory:
         fac = factory(scale_factors=scale_factors, order=2)
@@ -207,12 +205,12 @@ def test_get_expectation_values_static_factories(factory):
         fac = factory(scale_factors=scale_factors)
 
     # Expectation values haven't been computed at any scale factors yet
-    assert isinstance(fac.get_expectation_values(), np.ndarray)
+    assert isinstance(fac.get_expectation_values(), list)
     assert len(fac.get_expectation_values()) == 0
 
     # Compute expectation values at all the scale factors
     fac.run_classical(executor)
-    assert isinstance(fac.get_expectation_values(), np.ndarray)
+    assert isinstance(fac.get_expectation_values(), list)
     assert np.allclose(
         fac.get_expectation_values(), expectation_values, atol=1e-3
     )
@@ -225,29 +223,27 @@ def test_get_expectation_values_adaptive_factories(factory):
     executor = apply_seed_to_func(f_exp_up, seed=1)
 
     # Expectation values haven't been computed at any scale factors yet
-    assert isinstance(fac.get_expectation_values(), np.ndarray)
+    assert isinstance(fac.get_expectation_values(), list)
     assert len(fac.get_expectation_values()) == 0
 
     # Compute expectation values at all the scale factors
     fac.run_classical(executor)
-    assert isinstance(fac.get_scale_factors(), np.ndarray)
+    assert isinstance(fac.get_scale_factors(), list)
 
     # Given this seeded executor, the scale factors should be as follows
-    correct_scale_factors = np.array(
-        [
-            1.0,
-            2.0,
-            4.0,
-            4.20469548,
-            4.20310693,
-            4.2054822,
-            4.2031916,
-            4.2052843,
-        ]
-    )
-    correct_expectation_values = np.array(
-        [executor(scale) for scale in correct_scale_factors]
-    )
+    correct_scale_factors = [
+        1.0,
+        2.0,
+        4.0,
+        4.20469548,
+        4.20310693,
+        4.2054822,
+        4.2031916,
+        4.2052843,
+    ]
+    correct_expectation_values = [
+        executor(scale) for scale in correct_scale_factors
+    ]
     assert len(fac.get_expectation_values()) == num_steps
     assert np.allclose(
         fac.get_expectation_values(), correct_expectation_values, atol=1e-3
@@ -275,7 +271,7 @@ def test_run_sequential_and_batched(factory, batched):
         fac = factory(scale_factors=scale_factors)
 
     # Expectation values haven't been computed at any scale factors yet
-    assert isinstance(fac.get_expectation_values(), np.ndarray)
+    assert isinstance(fac.get_expectation_values(), list)
     assert len(fac.get_expectation_values()) == 0
 
     # Compute expectation values at all the scale factors
@@ -291,7 +287,7 @@ def test_run_sequential_and_batched(factory, batched):
 
     fac.run(cirq.Circuit(), executor, scale_noise=lambda circ, _: circ)
 
-    assert isinstance(fac.get_expectation_values(), np.ndarray)
+    assert isinstance(fac.get_expectation_values(), list)
     assert np.allclose(
         fac.get_expectation_values(), np.ones_like(scale_factors)
     )

@@ -113,7 +113,7 @@ Let's verify this fact, before applying any error mitigation.
 +++
 ### Run the circuit with a noiseless backend and with a noisy backend
 
-**Hint:** You can follow [this Qiskit example](https://qiskit.org/documentation/tutorials/simulators/2_device_noise_simulation.html) in which a (simulated) noiseless backend and a (simulated) noisy backend are compared.
+**Hint:** As a noiseless backend you can use the `AerSimulator` class. As a noisy backend you can use a _fake_ (simulated) device as shown [here](https://qiskit.org/documentation/apidoc/providers_fake_provider.html).
 
 ```{code-cell} ipython3
 from qiskit import QuantumCircuit

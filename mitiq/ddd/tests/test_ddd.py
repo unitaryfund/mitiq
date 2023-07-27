@@ -43,7 +43,7 @@ circuit_cirq_b += cirq.inverse(circuit_cirq_b)
 def amp_damp_executor(circuit: QPROGRAM, noise: float = 0.005) -> float:
     circuit, _ = convert_to_mitiq(circuit)
     return compute_density_matrix(
-        circuit, noise_model=cirq.amplitude_damp, noise_level=(noise,)
+        circuit, noise_model_function=cirq.amplitude_damp, noise_level=(noise,)
     )[0, 0].real
 
 

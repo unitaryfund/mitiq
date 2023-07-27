@@ -32,6 +32,7 @@ After demonstrating the use of the two packages, we can then try and understand 
 To begin we import many of the required modules and functions.
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 import bqskit
 from bqskit.ext import cirq_to_bqskit, bqskit_to_cirq
 import mitiq
@@ -48,6 +49,7 @@ Here we also use a random seed for reproducibility.
 The random circuit is then converted to BQSKit's custom internal representation with the `cirq_to_bqskit` function.
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 num_qubits = 3
 depth = 10
 density = 1
@@ -73,6 +75,7 @@ This allows for one to skip the second pass of compilation that is usually requi
 ```
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 compiled = bqskit.compile(bqskit_circuit)
 compiled_circuit = bqskit_to_cirq(compiled)
 
@@ -100,6 +103,7 @@ Two-qubit gates *are* generally much noisier than single qubit gates, but real q
 ```
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 def execute(circuit, noise_level=0.05):
     noisy_circuit = cirq.Circuit()
     for op in circuit.all_operations():
@@ -120,6 +124,7 @@ def execute(circuit, noise_level=0.05):
 Since we'd like to see how compilation effects error mitigation, we first simulate the ideal and noisy values using the simulator defined above.
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 uncompiled_ideal_value = execute(random_circuit, noise_level=0.0)
 uncompiled_noisy_value = execute(random_circuit)
 
@@ -130,6 +135,7 @@ compiled_noisy_value = execute(compiled_circuit)
 With these values taken, we are now ready to use ZNE --- on both the random, and compiled circuit --- to obtain mitigated expectation values.
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 from mitiq import zne
 
 uncompiled_mitigated_result = zne.execute_with_zne(random_circuit, execute)
@@ -152,6 +158,7 @@ Thus we have four variables which we can compare against ideal values to see how
 These data are then summarized in the following table printed below.
 
 ```{code-cell} ipython3
+:tags: ["skip-execution"]
 header = "{:<11} {:<15} {:<10}"
 entry = "{:<11}  {:<15.2f} {:<10.2f}"
 int_entry = "{:<11}  {:<15} {:<10}"

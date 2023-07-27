@@ -160,6 +160,14 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
 
 
 
+## Classical Shadows
+
+### Quantum Processing
+```{eval-rst}
+.. automodule:: mitiq.shadows.quantum_processing
+   :members:
+```
+
 ## Digital Dynamical Decoupling
 
 ### Digital Dynamical Decoupling (High-Level Tools)
