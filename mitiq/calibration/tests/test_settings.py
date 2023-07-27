@@ -279,6 +279,7 @@ def test_to_dict():
         ),
         "is_qubit_dependent": False,
         "noise_level": 0.001,
+        "noise_bias": 0,
         "num_samples": 200,
     }
 
