@@ -95,8 +95,8 @@ def expectation_estimation_shadow(
     Use median of means to ameliorate the effects of outliers.
 
     Args:
-        measurement_outcomes: A shadow tuple obtained from
-            `random_pauli_measurement`.
+        measurement_outcomes: measurement eigenstates and random unitary used
+            obtained from `random_pauli_measurement`.
         pauli_str: Single observable consisting of Pauli operators.
         k_shadows: number of splits in the median of means estimator.
 
