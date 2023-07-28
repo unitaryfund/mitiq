@@ -37,7 +37,7 @@ def local_clifford_shadow_norm(obs: mitiq.PauliString) -> float:
     Calculate shadow norm of an operator with random unitary sampled from local
     Clifford group.
     Args:
-        opt: a self-adjoint operator.
+        opt: a self-adjoint operator in terms of mitiq.
     Returns:
         Shadow norm when unitary ensemble is local Clifford group.
     """
