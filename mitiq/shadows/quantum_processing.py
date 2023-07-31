@@ -4,7 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 
 """Quantum processing functions for classical shadows."""
-from typing import Tuple, Callable, Any, List, Optional
+from typing import Tuple, Callable, List, Optional
+
 import cirq
 import numpy as np
 
