@@ -18,6 +18,8 @@ from mitiq.calibration import (
     execute_with_mitigation,
 )
 from mitiq.calibration.calibrator import (
+    PEC_TABLE_HEADER_STR,
+    ZNE_TABLE_HEADER_STR,
     convert_to_expval_executor,
     ExperimentResults,
     MissingResultsError,
@@ -27,12 +29,14 @@ from mitiq.calibration.settings import (
     Strategy,
     MitigationTechnique,
     BenchmarkProblem,
+    ZNESettings,
 )
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import fold_global
 from mitiq.interface import convert_to_mitiq
 from mitiq.pec.representations import (
     represent_operation_with_local_depolarizing_noise,
+    represent_operation_with_local_biased_noise,
 )
 
 light_zne_settings = Settings(
@@ -74,10 +78,11 @@ light_pec_settings = Settings(
         {
             "technique": "pec",
             "representation_function": (
-                represent_operation_with_local_depolarizing_noise
+                represent_operation_with_local_biased_noise
             ),
             "is_qubit_dependent": False,
-            "noise_level": 0.001,
+            "noise_level": 0.01,
+            "noise_bias": 0.1,
             "num_samples": 200,
         },
     ],
@@ -353,12 +358,76 @@ def test_ExtrapolationResults_best_strategy():
     assert er.best_strategy_id() == 4
 
 
-def test_logging(capfd):
-    cal = Calibrator(damping_execute, frontend="cirq")
-    cal.run(log=True)
+light_combined_settings1 = Settings(
+    benchmarks=light_zne_settings.benchmarks,
+    strategies=[
+        {
+            "technique": "pec",
+            "representation_function": (
+                represent_operation_with_local_depolarizing_noise
+            ),
+            "operations": [
+                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
+                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
+            ],
+            "is_qubit_dependent": False,
+            "noise_level": 0.001,
+            "num_samples": 200,
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": LinearFactory([1.0, 2.0]),
+        },
+    ],
+)
 
+light_combined_settings2 = Settings(
+    benchmarks=light_zne_settings.benchmarks,
+    strategies=[
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": LinearFactory([1.0, 2.0]),
+        },
+        {
+            "technique": "pec",
+            "representation_function": (
+                represent_operation_with_local_depolarizing_noise
+            ),
+            "operations": [
+                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
+                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
+            ],
+            "is_qubit_dependent": False,
+            "noise_level": 0.001,
+            "num_samples": 200,
+        },
+    ],
+)
+
+
+@pytest.mark.parametrize(
+    "settings",
+    [
+        ZNESettings,
+        light_pec_settings,
+        light_combined_settings1,
+        light_combined_settings2,
+    ],
+)
+def test_logging(capfd, settings):
+    cal = Calibrator(damping_execute, frontend="cirq", settings=settings)
+    cal.run(log=True)
     captured = capfd.readouterr()
     assert "circuit" in captured.out
+    assert settings.get_strategy(0).technique.name in captured.out
+    if settings is ZNESettings:
+        assert ZNE_TABLE_HEADER_STR in captured.out
+    elif settings is light_pec_settings:
+        assert PEC_TABLE_HEADER_STR in captured.out
+    elif settings is [light_combined_settings1, light_combined_settings2]:
+        assert ZNE_TABLE_HEADER_STR, PEC_TABLE_HEADER_STR in captured.out
 
 
 def test_ExperimentResults_reset_data():
