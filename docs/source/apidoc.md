@@ -137,6 +137,12 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
 
 ## Classical Shadows
 
+### Classical Post-Processing
+```{eval-rst}
+.. automodule:: mitiq.shadows.classical_postprocessing
+   :members:
+```
+
 ### Quantum Processing
 ```{eval-rst}
 .. automodule:: mitiq.shadows.quantum_processing
