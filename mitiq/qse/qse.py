@@ -135,7 +135,7 @@ def qse_decorator(
 
     Args:
         check_operators: List of check operators that define the
-        stabilizer code space.
+            stabilizer code space.
         code_hamiltonian: Hamiltonian of the code space.
         observable: Observable to compute the mitigated expectation value of.
         pauli_string_to_expectation_cache: Cache for expectation values of
