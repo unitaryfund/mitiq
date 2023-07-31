@@ -25,7 +25,7 @@ def execute_with_qse(
     pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
 ) -> float:
     """Function for the calculation of an observable from some circuit of
-        interest to be mitigated with Quantum Subspace Expansion
+    interest to be mitigated with Quantum Subspace Expansion
 
     Args:
         circuit: Quantum program to execute with error mitigation.
