@@ -83,8 +83,6 @@ def mitigate_executor(
         observable: Observable to compute the mitigated expectation value for.
         pauli_string_to_expectation_cache: Cache for expectation values of
             Pauli strings used to compute the projector and the observable.
-        share_cache: Only applicable for batched executors. If True, the
-            cache is shared between the all circuits in the batch.
 
     Returns:
         The error-mitigated version of the input executor.
@@ -142,8 +140,6 @@ def qse_decorator(
         observable: Observable to compute the mitigated expectation value of.
         pauli_string_to_expectation_cache: Cache for expectation values of
             Pauli strings used to compute the projector and the observable.
-        share_cache: Only applicable for batched executors. If True, the
-            cache is shared between the all circuits in the batch.
 
     Returns:
         The error-mitigating decorator to be applied to an executor function.
