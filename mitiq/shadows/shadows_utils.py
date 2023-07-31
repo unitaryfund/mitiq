@@ -8,12 +8,70 @@
 # LICENSE file in the root directory of this source tree.
 
 """Defines utility functions for classical shadows protocol."""
-from typing import List, Tuple
+from typing import Tuple, List, Any
 
 import numpy as np
 from numpy.typing import NDArray
+import cirq
 
 import mitiq
+
+from itertools import product
+
+Paulis = [
+    cirq.I._unitary_(),
+    cirq.X._unitary_(),
+    cirq.Y._unitary_(),
+    cirq.Z._unitary_(),
+]
+
+
+def kronecker_product(matrices: List[NDArray[Any]]) -> NDArray[Any]:
+    """
+    Returns the Kronecker product of a list of matrices.
+    """
+    result = matrices[0]
+    for matrix in matrices[1:]:
+        result = np.kron(result, matrix)
+    return result
+
+
+# Input must be a 2x2 matrix, output is a vector of 4 elements
+def operator_ptm_vector_rep(O: NDArray[Any]) -> NDArray[Any]:
+    r"""
+    Returns the PTM vector representation :math:`|o\rangle\!\rangle\in \mathcal{H}_{4^n}`
+    of an operator :math:`o\in \mathcal{L}(\mathcal{H}_{2^n})`.
+    """
+    # vector i-th entry is math:`d^{-1/2}Tr(oP_i)`
+    # where P_i is the i-th Pauli matrix
+    assert (
+        len(O.shape) == 2 and O.shape[0] == O.shape[1]
+    ), "Input must be a square matrix"
+    num_qubits = int(np.log2(O.shape[0]))
+    O_vec = []
+    for pauli_combination in product(Paulis, repeat=num_qubits):
+        kron_product = kronecker_product(pauli_combination)
+        O_vec.append(np.trace(O @ kron_product) * np.sqrt(1 / 2**num_qubits))
+    return np.array(O_vec)
+
+
+def eigenvalues_to_bitstring(values: List[int]) -> str:
+    """Converts eigenvalues to bitstring. e.g., [-1,1,1] -> '100'"""
+    return "".join(["1" if v == -1 else "0" for v in values])
+
+
+def bitstring_to_eigenvalues(bitstring: str) -> List[int]:
+    """Converts bitstring to eigenvalues. e.g., '100' -> [-1,1,1]"""
+    return [1 if b == "0" else -1 for b in bitstring]
+
+
+def create_string(n: int, loc_list: List[int]) -> str:
+    """
+    This function returns a string of length n with 1s at the locations
+    specified by loc_list and 0s elsewhere.
+    """
+    loc_set = set(loc_list)  # Convert list to set for efficient lookups
+    return "".join(map(lambda i: "1" if i in loc_set else "0", range(n)))
 
 
 def n_measurements_tomography_bound(epsilon: float, num_qubits: int) -> int:
@@ -36,10 +94,8 @@ def local_clifford_shadow_norm(obs: mitiq.PauliString) -> float:
     """
     Calculate shadow norm of an operator with random unitary sampled from local
     Clifford group.
-
     Args:
-        obs: An observable in terms of a ``mitiq.PauliString`` object.
-
+        opt: a self-adjoint operator.
     Returns:
         Shadow norm when unitary ensemble is local Clifford group.
     """
