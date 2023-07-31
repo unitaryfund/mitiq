@@ -49,10 +49,9 @@ def get_single_shot_pauli_fidelity(
     Args:
         b_list: Circuit qubits computational basis
             e.g. :math:`"01..":=|0\rangle|1\rangle..`.
-
         u_list: The local Pauli measurement performed on each qubit. e.g."XY.."
             means perform local X-basis measurement on the 1st qubit,
-             local Y-basis measurement the 2ed qubit in the circuit.
+            local Y-basis measurement the 2ed qubit in the circuit.
 
     Returns:
         Calculate Pauli fidelity for a single shot, and return the result as a
