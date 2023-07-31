@@ -342,7 +342,6 @@ def expectation_estimation_shadow(
                         "estimation of Pauli fidelity must be provided for"
                         "Pauli twirling calibration."
                     )
-                normalize_factor = get_normalize_factor(f_est)
                 # (2)the cali b_list_cal={"001110"} should exactly match the
                 # target_support = "001110"
                 # indices_Pi_obs is a boolean array of length 2^num_qubits
