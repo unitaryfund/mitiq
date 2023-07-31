@@ -26,6 +26,7 @@ def execute_with_qse(
 ) -> float:
     """Function for the calculation of an observable from some circuit of
         interest to be mitigated with Quantum Subspace Expansion
+
     Args:
         circuit: Quantum program to execute with error mitigation.
         executor: Executes a circuit and returns a `QuantumResult`.
@@ -35,6 +36,7 @@ def execute_with_qse(
         observable: Observable to compute the mitigated expectation value of.
         pauli_string_to_expectation_cache: Cache for expectation values of
         Pauli strings used to compute the projector and the observable.
+
     Returns:
         The expectation value estimated with QSE.
     """
@@ -83,6 +85,7 @@ def mitigate_executor(
         Pauli strings used to compute the projector and the observable.
         share_cache: Only applicable for batched executors. If True, the
         cache is shared between the all circuits in the batch.
+
     Returns:
         The error-mitigated version of the input executor.
     """
