@@ -23,6 +23,7 @@ from mitiq.benchmarks import (
 from mitiq.pec import execute_with_pec
 from mitiq.pec.representations import (
     represent_operation_with_local_depolarizing_noise,
+    represent_operation_with_local_biased_noise,
 )
 from mitiq.raw import execute
 from mitiq.zne import execute_with_zne
@@ -149,6 +150,7 @@ class Strategy:
     @property
     def mitigation_function(self) -> Callable[..., float]:
         if self.technique is MitigationTechnique.PEC:
+            self.technique_params.setdefault("noise_bias", 0)
 
             def partial_pec(circuit: cirq.Circuit, execute: Executor) -> float:
                 rep_function = self.technique_params["representation_function"]
@@ -156,15 +158,28 @@ class Strategy:
                 for op in circuit.all_operations():
                     if len(op.qubits) >= 2 and op not in operations:
                         operations.append(cirq.Circuit(op))
-                noise_level = self.technique_params["noise_level"]
+
                 num_samples = self.technique_params["num_samples"]
-                reps = [
-                    rep_function(
-                        op,
-                        noise_level,
-                    )
-                    for op in operations
-                ]
+                if (
+                    self.technique_params["representation_function"]
+                    == represent_operation_with_local_biased_noise
+                ):
+                    reps = [
+                        rep_function(
+                            op,
+                            self.technique_params["noise_level"],
+                            self.technique_params["noise_bias"],
+                        )
+                        for op in operations
+                    ]
+                else:
+                    reps = [
+                        rep_function(
+                            op,
+                            self.technique_params["noise_level"],
+                        )
+                        for op in operations
+                    ]
                 return self.technique.mitigation_function(
                     circuit,
                     execute,
@@ -197,11 +212,16 @@ class Strategy:
             summary["scale_method"] = self.technique_params[
                 "scale_noise"
             ].__name__
+
         elif self.technique is MitigationTechnique.PEC:
+
             summary["representation_function"] = self.technique_params[
                 "representation_function"
             ]
             summary["noise_level"] = self.technique_params["noise_level"]
+            summary["noise_bias"] = self.technique_params.setdefault(
+                "noise_bias", 0
+            )
             summary["is_qubit_dependent"] = self.technique_params[
                 "is_qubit_dependent"
             ]
@@ -209,8 +229,8 @@ class Strategy:
         return summary
 
     def print_line(self, performance: str, circuit_type: str) -> None:
-        summary = self.to_dict()
         if self.technique is MitigationTechnique.ZNE:
+            summary = self.to_dict()
             str_scale_factors = str(summary["scale_factors"])[1:-1]
             row = (
                 performance,
@@ -220,20 +240,33 @@ class Strategy:
                 str_scale_factors,
                 summary["scale_method"],
             )
+            print(
+                "| {:^10} | {:^7} | {:^6} | {:<13} | {:<13} | {:<20} |".format(
+                    *row
+                )
+            )
         elif self.technique is MitigationTechnique.PEC:
+            summary = self.to_dict()
+            if (
+                summary["representation_function"]
+                == represent_operation_with_local_biased_noise
+            ):
+                bias = summary["noise_bias"]
+            else:
+                bias = "N/A"
             row = (
                 performance,
                 circuit_type,
                 self.technique.name,
-                str(summary["representation_function"])[35:54],
                 summary["noise_level"],
-                str(summary["num_samples"]),
+                bias,
+                str(summary["representation_function"].__name__)[25:],
             )
-        print(
-            "| {:^10} | {:^7} | {:^6} | {:<13} | {:<13} | {:<20} |".format(
-                *row
+            print(
+                "| {:^10} | {:^7} | {:^6} | {:<11} | {:<10} | {:<25} |".format(
+                    *row
+                )
             )
-        )
 
     def __repr__(self) -> str:
         return str(self.to_dict())

@@ -21,14 +21,22 @@ from mitiq.calibration.settings import (
     ZNESettings,
     Strategy,
     BenchmarkProblem,
+    MitigationTechnique,
 )
 from mitiq.interface import convert_from_mitiq
 
-TABLE_HEADER_STR = (
+ZNE_TABLE_HEADER_STR = (
     "| performance | circuit | method | extrapolation | scale factors "
     "| scale_method         |\n"
     "| ----------- | ------- | ------ | ------------- | ------------- "
     "| -------------------- |"
+)
+
+PEC_TABLE_HEADER_STR = (
+    "| performance | circuit | method "
+    "| noise level | noise bias | representation function   | \n"
+    "| ----------- | ------- | ------ | ----------- | ---------- "
+    "| ------------------------- |"
 )
 
 
@@ -197,9 +205,7 @@ class Calibrator:
         if not self.results.is_missing_data():
             self.results.reset_data()
 
-        if log:
-            print(TABLE_HEADER_STR)
-
+        prev_technique = None
         for problem in self.problems:
             # Benchmark circuits have no measurements, so we append them.
             circuit = problem.circuit.copy()
@@ -216,6 +222,16 @@ class Calibrator:
                     mitigated_value = strategy.mitigation_function(
                         circuit, expval_executor
                     )
+                if (
+                    strategy.technique != prev_technique
+                    and strategy.technique is MitigationTechnique.ZNE
+                ):
+                    print(ZNE_TABLE_HEADER_STR)
+                elif (
+                    strategy.technique != prev_technique
+                    and strategy.technique is MitigationTechnique.PEC
+                ):
+                    print(PEC_TABLE_HEADER_STR)
                 self.results.add_result(
                     strategy,
                     problem,
@@ -224,6 +240,7 @@ class Calibrator:
                     mitigated_val=mitigated_value,
                     log=log,
                 )
+                prev_technique = strategy.technique
         self.results.ensure_full()
 
     def best_strategy(self) -> Strategy:
