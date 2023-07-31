@@ -74,17 +74,15 @@ def shadow_quantum_processing(
             must be same as executor in `pauli_twirling_calibrate`.
         num_total_measurements_shadow: Total number of shots for shadow
             estimation.
-        k_shadows: Number of groups of "median of means" used for shadow
-            estimation.
         random_seed: The random seed to use for the shadow measurements.
 
     Returns:
         A dictionary containing the bit strings, the Pauli strings
         `bit_strings`: Circuit qubits computational basis
-            e.g. :math:`"01..":=|0\rangle|1\rangle..`.
+        e.g. :math:`"01..":=|0\rangle|1\rangle..`.
         `pauli_strings`: The local Pauli measurement performed on each
-            qubit. e.g."XY.." means perform local X-basis measurement on the
-            1st qubit, local Y-basis measurement the 2ed qubit in the circuit.
+        qubit. e.g."XY.." means perform local X-basis measurement on the
+        1st qubit, local Y-basis measurement the 2ed qubit in the circuit.
     """
     if random_seed is not None:
         np.random.seed(random_seed)
@@ -119,6 +117,8 @@ def classical_post_processing(
         rshadows: Whether to use the calibration results.
         calibration_results: The output of function `pauli_twirling_calibrate`.
         observables: The set of observables to measure.
+        k_shadows: Number of groups of "median of means" used for shadow
+            estimation of expectation values.
         state_reconstruction: Whether to reconstruct the state or estimate
             the expectation value of the observables.
 
