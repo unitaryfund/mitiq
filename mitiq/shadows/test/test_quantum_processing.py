@@ -159,17 +159,15 @@ def test_random_pauli_measurement_output_dimensions(
     shadow_outcomes, pauli_strings = random_pauli_measurement(
         circuit, n_total_measurements, executor=executor
     )
-    assert shadow_outcomes.shape == (n_total_measurements, n_qubits), (
+    shadow_outcomes_shape = len(shadow_outcomes), len(shadow_outcomes[0])
+    pauli_strings_shape = len(pauli_strings), len(pauli_strings[0])
+    assert shadow_outcomes_shape == (n_total_measurements, n_qubits), (
         f"Shadow outcomes have incorrect shape, expected "
-        f"{(n_total_measurements, n_qubits)}, got {shadow_outcomes.shape}"
+        f"{(n_total_measurements, n_qubits)}, got {shadow_outcomes_shape}"
     )
-    assert pauli_strings.shape == (n_total_measurements,), (
+    assert pauli_strings_shape == (n_total_measurements, n_qubits), (
         f"Pauli strings have incorrect shape, expected "
-        f"{(n_total_measurements, n_qubits)}, got {pauli_strings.shape}"
-    )
-    assert len(pauli_strings[0]) == n_qubits, (
-        f"Pauli strings have incorrect number of characters, "
-        f"expected {n_qubits}, got {len(pauli_strings[0])}"
+        f"{(n_total_measurements, n_qubits)}, got {pauli_strings_shape}"
     )
 
 
@@ -184,11 +182,5 @@ def test_random_pauli_measurement_output_types(
     shadow_outcomes, pauli_strings = random_pauli_measurement(
         circuit, n_total_measurements=10, executor=executor
     )
-    assert shadow_outcomes[0].dtype == int, (
-        f"Shadow outcomes have incorrect dtype, expected int, "
-        f"got {shadow_outcomes.dtype}"
-    )
-    assert isinstance(pauli_strings[0], str), (
-        f"Pauli strings have incorrect dtype, expected str, "
-        f"got {pauli_strings.dtype}"
-    )
+    assert isinstance(shadow_outcomes[0], str)
+    assert isinstance(pauli_strings[0], str)
