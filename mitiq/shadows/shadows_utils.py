@@ -37,22 +37,25 @@ def kronecker_product(matrices: List[NDArray[Any]]) -> NDArray[Any]:
 
 
 # Input must be a 2x2 matrix, output is a vector of 4 elements
-def operator_ptm_vector_rep(O: NDArray[Any]) -> NDArray[Any]:
+def operator_ptm_vector_rep(opt: NDArray[Any]) -> NDArray[Any]:
     r"""
-    Returns the PTM vector representation :math:`|o\rangle\!\rangle\in \mathcal{H}_{4^n}`
-    of an operator :math:`o\in \mathcal{L}(\mathcal{H}_{2^n})`.
+    Returns the PTM vector representation
+    :math:`|o\rangle\!\rangle\in \mathcal{H}_{4^n}`
+    of an operator :math:`opt\in \mathcal{L}(\mathcal{H}_{2^n})`.
     """
     # vector i-th entry is math:`d^{-1/2}Tr(oP_i)`
     # where P_i is the i-th Pauli matrix
     assert (
-        len(O.shape) == 2 and O.shape[0] == O.shape[1]
+        len(opt.shape) == 2 and opt.shape[0] == opt.shape[1]
     ), "Input must be a square matrix"
-    num_qubits = int(np.log2(O.shape[0]))
-    O_vec = []
+    num_qubits = int(np.log2(opt.shape[0]))
+    opt_vec = []
     for pauli_combination in product(Paulis, repeat=num_qubits):
         kron_product = kronecker_product(pauli_combination)
-        O_vec.append(np.trace(O @ kron_product) * np.sqrt(1 / 2**num_qubits))
-    return np.array(O_vec)
+        opt_vec.append(
+            np.trace(opt @ kron_product) * np.sqrt(1 / 2**num_qubits)
+        )
+    return np.array(opt_vec)
 
 
 def eigenvalues_to_bitstring(values: List[int]) -> str:
