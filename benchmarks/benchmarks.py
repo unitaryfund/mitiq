@@ -152,7 +152,7 @@ def track_pec(
 
     compute_density_matrix = functools.partial(
         mitiq_cirq.compute_density_matrix,
-        noise_model=cirq.depolarize,
+        noise_model_function=cirq.depolarize,
         noise_level=(noise_level,),
     )
 
