@@ -12,12 +12,12 @@ from numpy.typing import NDArray
 
 import mitiq
 from mitiq import MeasurementResult
-from mitiq.shadows.quantum_processing import random_pauli_measurement
 from mitiq.shadows.classical_postprocessing import (
     shadow_state_reconstruction,
     expectation_estimation_shadow,
     get_pauli_fidelity,
 )
+from mitiq.shadows.quantum_processing import random_pauli_measurement
 
 
 def pauli_twirling_calibrate(
@@ -32,9 +32,10 @@ def pauli_twirling_calibrate(
 
     Args:
         qubits: The qubits to measure.
-        executor: The function to use to do quantum measurement, must be same as
-            executor in `shadow_quantum_processing`.
-        k_calibration: Number of groups of "median of means" used for calibration.
+        executor: The function to use to do quantum measurement, must be same
+            as executor in `shadow_quantum_processing`.
+        k_calibration: Number of groups of "median of means" used for
+            calibration.
         num_total_measurements_calibration: Number of shots per group of
             "median of means" used for calibration.
     Returns:

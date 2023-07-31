@@ -8,13 +8,15 @@
 import cirq
 
 import mitiq
-
 from mitiq import MeasurementResult
 from mitiq.interface.mitiq_cirq.cirq_utils import (
     sample_bitstrings as cirq_sample_bitstrings,
 )
-
-from mitiq.shadows import *
+from mitiq.shadows.shadows import (
+    pauli_twirling_calibrate,
+    shadow_quantum_processing,
+    classical_post_processing,
+)
 
 # define a fully entangled state
 # number of qubits in the circuit
@@ -48,7 +50,7 @@ def test_pauli_twirling_calibrate():
     # Check that the result is a dictionary
     assert isinstance(result, dict)
 
-    # Check that the dictionary contains the correct number of entries (2^num_qubits)
+    # Check that the dictionary contains the correct number of entries
     assert len(result) <= 2**num_qubits
 
     # Check that all values in the dictionary are floats
@@ -92,9 +94,7 @@ def test_classical_post_processing():
     ), f"Expected a dictionary, got {type(result)}"
 
     # Check that the dictionary contains the expected keys
-    assert (
-        "reconstructed_state" in result
-    ), f"Expected key 'reconstructed_state' in result"
+    assert "reconstructed_state" in result
 
     # Call the function with valid inputs and observables provided
     result = classical_post_processing(
