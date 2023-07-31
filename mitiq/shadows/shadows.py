@@ -42,6 +42,10 @@ def pauli_twirling_calibrate(
     """
     # calibration circuit is of same qubit number with original circuit
     zero_circuit = cirq.Circuit()
+    """
+    Calibration stage: calibrate errors in quantum measurement, can't
+    mitigate errors in state preparation stage.
+    """
     # perform random Pauli measurement one the calibration circuit
     calibration_measurement_outcomes = random_pauli_measurement(
         zero_circuit,
@@ -84,8 +88,9 @@ def shadow_quantum_processing(
     if random_seed is not None:
         np.random.seed(random_seed)
     r"""
-    Stage 1: Sample random unitary form :math:`\mathcal{g}\subset U(2^n)` and
-    perform computational basis measurement
+    Shadow stage 1: Sample random unitary form
+    :math:`\mathcal{g}\subset U(2^n)` and perform computational
+    basis measurement
     """
     # random Pauli measurement on the circuit
     output = random_pauli_measurement(
@@ -125,10 +130,14 @@ def classical_post_processing(
     """
 
     if rshadows:
-        assert calibration_results is not None
+        if calibration_results is None:
+            raise ValueError(
+                "Calibration results cannot be None when rshadows"
+            )
+
     """
-    Stage 2: Estimate the expectation value of the observables OR reconstruct
-    the state
+    Shadow stage 2: Estimate the expectation value of the observables OR
+    reconstruct the state
     """
     output: Dict[str, Union[float, NDArray[Any]]] = {}
     if state_reconstruction:
