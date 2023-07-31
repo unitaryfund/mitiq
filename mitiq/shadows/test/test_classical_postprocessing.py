@@ -7,11 +7,12 @@
 
 import cirq
 import numpy as np
+
 import mitiq
 from mitiq.shadows.classical_postprocessing import (
     classical_snapshot,
-    shadow_state_reconstruction,
     expectation_estimation_shadow,
+    shadow_state_reconstruction,
 )
 
 

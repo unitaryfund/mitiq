@@ -8,14 +8,14 @@
 # LICENSE file in the root directory of this source tree.
 """Classical post-processing process of classical shadows."""
 
-from typing import Tuple, List, Any
+from typing import Any, List, Tuple
 
 import cirq
 import numpy as np
 from numpy.typing import NDArray
+
 import mitiq
 
-# local unitary that applied to the qubits
 phase_z = cirq.S._unitary_().conj()
 hadamard = cirq.H._unitary_()
 identity = cirq.I._unitary_()
@@ -39,12 +39,8 @@ def classical_snapshot(b_list: List[int], u_list: List[str]) -> NDArray[Any]:
         state.
     """
 
-    # z-basis measurement outcomes
-    b_zero = np.array([[1.0 + 0.0j, 0.0 + 0.0j]])
-    zero_state = b_zero.T @ b_zero
-
-    b_one = np.array([[0.0 + 0.0j, 1.0 + 0.0j]])
-    one_state = b_one.T @ b_one
+    zero_state = np.array([[1, 0], [0, 0]])
+    one_state = np.array([[0, 0], [0, 1]])
 
     rho_snapshot = np.array([1.0 + 0.0j])
 
@@ -64,11 +60,10 @@ def shadow_state_reconstruction(
     """Reconstruct a state approximation as an average over all snapshots.
 
     Args:
-        measurement_outcomes: A shadow tuple obtained
-        from `random_pauli_measurement`.
+        measurement_outcomes: Tuple obtained from ``random_pauli_measurement``.
 
     Returns:
-        Numpy array with the reconstructed quantum state.
+        The reconstructed quantum state.
     """
 
     # classical values
@@ -96,9 +91,9 @@ def expectation_estimation_shadow(
 
     Args:
         measurement_outcomes: measurement eigenstates and random unitary used
-            obtained from `random_pauli_measurement`.
+            obtained from ``random_pauli_measurement``.
         pauli_str: Single observable consisting of Pauli operators.
-        k_shadows: number of splits in the median of means estimator.
+        k_shadows: Number of splits in the median of means estimator.
 
     Returns:
         Estimation of the observable expectation value.
@@ -138,5 +133,5 @@ def expectation_estimation_shadow(
             means.append(np.sum(product) / n_group_measurements)
         else:
             means.append(0.0)
-    # return the median of means
+
     return float(np.median(means)) * coeff
