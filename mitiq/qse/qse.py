@@ -25,16 +25,18 @@ def execute_with_qse(
     pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
 ) -> float:
     """Function for the calculation of an observable from some circuit of
-        interest to be mitigated with Quantum Subspace Expansion
+    interest to be mitigated with Quantum Subspace Expansion
+
     Args:
         circuit: Quantum program to execute with error mitigation.
         executor: Executes a circuit and returns a `QuantumResult`.
         check_operators: List of check operators that define the
-        stabilizer code space.
+            stabilizer code space.
         code_hamiltonian: Hamiltonian of the code space.
         observable: Observable to compute the mitigated expectation value of.
         pauli_string_to_expectation_cache: Cache for expectation values of
-        Pauli strings used to compute the projector and the observable.
+            Pauli strings used to compute the projector and the observable.
+
     Returns:
         The expectation value estimated with QSE.
     """
@@ -76,13 +78,12 @@ def mitigate_executor(
         circuit: Quantum program to execute with error mitigation.
         executor: Executes a circuit and returns a `QuantumResult`.
         check_operators: List of check operators that define the
-        stabilizer code space.
+            stabilizer code space.
         code_hamiltonian: Hamiltonian of the code space.
         observable: Observable to compute the mitigated expectation value for.
         pauli_string_to_expectation_cache: Cache for expectation values of
-        Pauli strings used to compute the projector and the observable.
-        share_cache: Only applicable for batched executors. If True, the
-        cache is shared between the all circuits in the batch.
+            Pauli strings used to compute the projector and the observable.
+
     Returns:
         The error-mitigated version of the input executor.
     """
@@ -134,13 +135,11 @@ def qse_decorator(
 
     Args:
         check_operators: List of check operators that define the
-        stabilizer code space.
+            stabilizer code space.
         code_hamiltonian: Hamiltonian of the code space.
         observable: Observable to compute the mitigated expectation value of.
         pauli_string_to_expectation_cache: Cache for expectation values of
-        Pauli strings used to compute the projector and the observable.
-        share_cache: Only applicable for batched executors. If True, the
-        cache is shared between the all circuits in the batch.
+            Pauli strings used to compute the projector and the observable.
 
     Returns:
         The error-mitigating decorator to be applied to an executor function.
