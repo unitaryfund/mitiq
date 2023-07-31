@@ -104,11 +104,12 @@ def random_pauli_measurement(
         Tuple of two list of string of length equals to`n_total_meausrements`,
         where each element in the list is a string, with the following format:
         strs in the 1st list: Circuit qubits computational basis
-            e.g. :math:`"01..":=|0\rangle|1\rangle..`.
-        strs in the 1st list: The local Pauli measurement performed on each
-            qubit. e.g."XY.." means perform local X-basis measurement on the
-            1st qubit, local Y-basis measurement the 2ed qubit in the circuit.
+        e.g. :math:`"01..":=|0\rangle|1\rangle..`.
+        strs in the 2ed list: The local Pauli measurement performed on each
+        qubit. e.g."XY.." means perform local X-basis measurement on the
+        1st qubit, local Y-basis measurement the 2ed qubit in the circuit.
     """
+
     qubits = sorted(list(circuit.all_qubits())) if qubits is None else qubits
     num_qubits = len(qubits)
     pauli_strings = generate_random_pauli_strings(
