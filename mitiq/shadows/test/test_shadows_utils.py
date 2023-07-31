@@ -1,11 +1,58 @@
-import numpy as np
+# Copyright (C) Unitary Fund
+#
+# This source code is licensed under the GPL license (v3) found in the
+# LICENSE file in the root directory of this source tree.
 
+"""Defines utility functions for classical shadows protocol."""
+
+import numpy as np
+import cirq
 import mitiq
 from mitiq.shadows.shadows_utils import (
+    kronecker_product,
+    operator_ptm_vector_rep,
+    eigenvalues_to_bitstring,
+    bitstring_to_eigenvalues,
+    create_string,
     n_measurements_tomography_bound,
     n_measurements_opts_expectation_bound,
     fidelity,
 )
+
+
+# Tests start here
+def test_kronecker_product():
+    matrices = [np.array([[1, 2], [3, 4]]), np.array([[0, 1], [1, 0]])]
+    expected_result = np.array(
+        [[0, 1, 0, 2], [1, 0, 2, 0], [0, 3, 0, 4], [3, 0, 4, 0]]
+    )
+    np.testing.assert_array_equal(kronecker_product(matrices), expected_result)
+
+
+def test_operator_ptm_vector_rep():
+    O = cirq.I._unitary_() / np.sqrt(2)
+    expected_result = np.array([1.0, 0.0, 0.0, 0.0])
+    np.testing.assert_array_almost_equal(
+        operator_ptm_vector_rep(O), expected_result
+    )
+
+
+def test_eigenvalues_to_bitstring():
+    values = [-1, 1, 1]
+    assert eigenvalues_to_bitstring(values) == "100"
+
+
+def test_bitstring_to_eigenvalues():
+    bitstring = "100"
+    np.testing.assert_array_equal(
+        bitstring_to_eigenvalues(bitstring), np.array([-1, 1, 1])
+    )
+
+
+def test_create_string():
+    n = 5
+    loc_list = [1, 3]
+    assert create_string(n, loc_list) == "01010"
 
 
 def test_n_measurements_tomography_bound():
