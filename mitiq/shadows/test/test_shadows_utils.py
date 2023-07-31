@@ -8,9 +8,9 @@ import numpy as np
 
 import mitiq
 from mitiq.shadows.shadows_utils import (
-    n_measurements_tomography_bound,
-    n_measurements_opts_expectation_bound,
     fidelity,
+    n_measurements_opts_expectation_bound,
+    n_measurements_tomography_bound,
 )
 
 

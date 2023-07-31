@@ -8,7 +8,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Defines utility functions for classical shadows protocol."""
-from typing import Tuple, List
+from typing import List, Tuple
 
 import numpy as np
 from numpy.typing import NDArray
@@ -36,8 +36,10 @@ def local_clifford_shadow_norm(obs: mitiq.PauliString) -> float:
     """
     Calculate shadow norm of an operator with random unitary sampled from local
     Clifford group.
+
     Args:
-        opt: a self-adjoint operator in terms of mitiq.
+        obs: An observable in terms of a ``mitiq.PauliString`` object.
+
     Returns:
         Shadow norm when unitary ensemble is local Clifford group.
     """
