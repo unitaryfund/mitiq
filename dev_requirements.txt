@@ -5,7 +5,7 @@ qiskit-ibm-provider~=0.6.2
 pyquil~=3.5.4
 pennylane-qiskit~=0.31.0
 pennylane~=0.31.0
-amazon-braket-sdk~=1.52.0
+amazon-braket-sdk~=1.53.0
 
 # Unit tests, coverage, and formatting/style.
 pytest==7.1.3
