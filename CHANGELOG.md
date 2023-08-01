@@ -15,7 +15,7 @@ execute_with_qse(circuit, executor, check_operators, code_hamiltonian, observabl
 ```
 
 This feature is still in flux, and would greatly benefit from further testing.
-Do give a shot!
+Do give a try, and [let us know if you have feedback](https://github.com/unitaryfund/mitiq/issues/new/)!
 More details can be found in our [API-doc](https://mitiq.readthedocs.io/en/latest/apidoc.html#module-mitiq.qse.qse).
 Congratulations to @bubakazouba for the great work here.
 
