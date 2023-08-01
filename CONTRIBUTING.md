@@ -12,7 +12,7 @@ The rest of this document describes the technical details of getting set up to d
 
 ## Development environment
 
-1. Ensure you have python 3.8 or greater installed. If not, you can find the downloads [here](https://www.python.org/downloads/). 
+1. Ensure you have python 3.8 or greater installed. If not, you can find the downloads [here](https://www.python.org/downloads/).
 2. Set up a virtual environment to isolate dependencies. This can be done with many different tools including [Virtualenv](https://virtualenv.pypa.io/en/latest/), [Pipenv](https://pypi.org/project/pipenv/), [Poetry](https://python-poetry.org/), and [Anaconda](https://www.anaconda.com/products/distribution). In what follows we will use Anaconda, but if you're familiar with other tools feel free to use those.
 3. Set up a local version of the [Mitiq repository](https://github.com/unitaryfund/mitiq). To do this you will need to use `git` which is a version control system. If you're unfamiliar, check out the [docs](https://git-scm.com/), and learn about what the typical [`git` workflow](https://www.asmeurer.com/git-workflow/) looks like.
 4. Inside the Mitiq repository (`cd mitiq`), activate a virtual environment. With conda this is done using the following command.
@@ -31,21 +31,23 @@ What follows are recommendations/requirements to keep in mind while contributing
 ## Making changes
 
 ### Adding tests
+
 When modifying and/or adding new code it is important to ensure the changes are covered by tests.
 Test thoroughly, but not excessively.
 Mitiq uses a nested structure for packaging tests in directories named `tests` at the same level of each module.
-The only except to this is that any tests requiring a QVM should be placed in the `mitiq_pyquil/tests` folder.
+The only exception to this is that any tests requiring a QVM should be placed in the `mitiq_pyquil/tests` folder.
 
 ### Running tests
 
-After making changes, please ensure your changes pass all the existing tests (and any new tests you've added).
-You can run the tests using the `pytest` CLI, but the [Makefile][makefile] contains many of the common commands you'll need to ensure your code is aligned with our standards.
+After making changes, ensure your changes pass all the existing tests (and any new tests you've added).
+Use `pytest mitiq/$MODULE` to run the tests for the module you are working on.
+Once they pass, you can run the entire test suite (excluding those that require the pyQuil QVM) by running the following command.
 
-For example, to run all the tests that do not require a pyQuil QVM, run
 ```bash
 make test
 ```
-This is typically suitable for most development tasks and is the easiest, and most common way to test.
+
+This can often be slow, however, so testing your changes iteravely using `pytest` is often faster when doing development.
 
 To run the tests for the pyQuil plugins, run
 ```bash
@@ -66,7 +68,7 @@ docker run --rm -idt -p 5555:5555 rigetti/quilc -R
 ```
 
 If you've modified any docstrings/added new functions, run `make doctest` to ensure they are formatted correctly.
-You may need to run `make docs` before you are able to run `make doctest`. 
+You may need to run `make docs` before you are able to run `make doctest`.
 
 ### Updating the documentation
 Follow these [instructions for contributing to the documentation](https://mitiq.readthedocs.io/en/latest/contributing_docs.html) which include guidelines about updating the API-doc list of modules and writing examples in the users guide.
@@ -74,9 +76,9 @@ Follow these [instructions for contributing to the documentation](https://mitiq.
 ### Style guidelines
 
 Mitiq code is developed according the best practices of Python development.
-* Please get familiar with [PEP 8](https://www.python.org/dev/peps/pep-0008/) (code) and [PEP 257](https://www.python.org/dev/peps/pep-0257/) (docstrings) guidelines.
-* Use annotations for type hints in the objects' signature.
-* Write [google-style docstrings](https://google.github.io/styleguide/pyguide.html#383-functions-and-methods).
+- Please get familiar with [PEP 8](https://www.python.org/dev/peps/pep-0008/) (code) and [PEP 257](https://www.python.org/dev/peps/pep-0257/) (docstrings) guidelines.
+- Use annotations for type hints in the objects' signature.
+- Write [google-style docstrings](https://google.github.io/styleguide/pyguide.html#383-functions-and-methods).
 
 We use [Black](https://black.readthedocs.io/en/stable/index.html) and `flake8` to automatically lint the code and enforce style requirements as part of the CI pipeline.
 You can run these style tests yourself locally in the top-level directory of the repository.
@@ -94,7 +96,7 @@ If above format check fails then you will be presented with a [diff](https://bla
 make format
 ```
 We also use [Mypy](https://mypy.readthedocs.io/en/stable/) as a type checker to find incompatible types compared to the type
-hints in your code. To test this locally, run the type check test in the top-level directory of the repository. 
+hints in your code. To test this locally, run the type check test in the top-level directory of the repository.
 
 To find incorrectly used types by type checking in `mypy`, use
 ```bash
@@ -112,8 +114,7 @@ For any part of the template that you weren't able to complete please mention th
 ### List of accepted RFCs
 This is a list of accepted request-for-comments (RFC) documents by date of creation (reverse chronological order):
 
-- [Robust Shadow Estimation](https://docs.google.com/document/d/1B5FnqQDvoRYap5fGPqzcbp-RXIrUFjbBcLiWIUrLmuA) by Min Li
-(@Min-Li) Jun 16, 2023
+- [Robust Shadow Estimation](https://docs.google.com/document/d/1B5FnqQDvoRYap5fGPqzcbp-RXIrUFjbBcLiWIUrLmuA) by Min Li (@Min-Li) Jun 16, 2023
 - [Error Mitigation by Subspace Expansion](https://docs.google.com/document/d/1JyQAwiw8BRT_oucZ6tQv0id6UhSdd3df1mNSPpOvu1I) by Ammar Jahin, Dariel Mok , Preksha Naik, Abdulrahman Sahmoud (@bubakazouba) Apr 28, 2023
 - [Implementation RFC for Mitiq calibration](https://docs.google.com/document/d/1EZUJyEEUQUH33UOgSIzCCvXyxP0WLOQn11W0x4Ox4nY/edit) by Andrea Mari (@andreamari) Nov 2, 2022
 - [Calibration tools for error mitigation RFC (abstract general solutions)](https://docs.google.com/document/d/1otUHnTlyNS-0rxGAxltHLF1iD5C9qT9oEZ3jn8VHWgw/edit) by Andrea Mari (@andreamari) Oct 6, 2022
@@ -122,9 +123,6 @@ This is a list of accepted request-for-comments (RFC) documents by date of creat
 - [Documentation reorganization RFC](https://docs.google.com/document/d/13un5TZPknSOhmOBkrL2rsofjGfdp2jDnd-DywLpGFPc/edit) by Ryan LaRose (@rmlarose) Dec 1, 2021
 - [Learning-based PEC RFC](https://docs.google.com/document/d/1VItesy6R5SlUa_YXW1km7IjFZ8kzyFeHUepHak1fEh4/edit) by Misty Wahl (@Misty-W) Oct 25, 2021
 - [Digital dynamical decoupling RFC](https://docs.google.com/document/d/1cRwFCTn6kUjI1P0kNydtevxIYtE4r8Omd_iWK0Pe8qo/edit) by Aaron Robertson (@Aaron-Robertson) Jan 28, 2021
-
-
-
 
 ## Code of conduct
 Mitiq development abides to the [Contributors' Covenant](https://mitiq.readthedocs.io/en/latest/code_of_conduct.html).
@@ -138,5 +136,3 @@ Find all the previous releases [here](https://github.com/unitaryfund/mitiq/relea
 
 ## Code of conduct
 Mitiq development abides to the [Contributors' Covenant](https://mitiq.readthedocs.io/en/latest/code_of_conduct.html).
-
-[makefile]: https://github.com/unitaryfund/mitiq/blob/master/Makefile
