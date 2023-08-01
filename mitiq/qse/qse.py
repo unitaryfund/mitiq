@@ -25,7 +25,7 @@ def execute_with_qse(
     pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
 ) -> float:
     """Function for the calculation of an observable from some circuit of
-    interest to be mitigated with Quantum Subspace Expansion
+    interest to be mitigated with quantum subspace expansion (QSE).
 
     Args:
         circuit: Quantum program to execute with error mitigation.
@@ -72,10 +72,9 @@ def mitigate_executor(
     pauli_string_to_expectation_cache: Dict[PauliString, complex] = {},
 ) -> Callable[[QPROGRAM], float]:
     """Returns a modified version of the input 'executor' which is
-    error-mitigated with zero-noise extrapolation (ZNE).
+    error-mitigated with quantum subspace expansion (QSE).
 
     Args:
-        circuit: Quantum program to execute with error mitigation.
         executor: Executes a circuit and returns a `QuantumResult`.
         check_operators: List of check operators that define the
             stabilizer code space.
