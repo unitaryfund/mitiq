@@ -1,7 +1,7 @@
 ---
 jupytext:
   text_representation:
-    extension: .myst
+    extension: .md
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.11.1
@@ -37,7 +37,7 @@ from scipy.optimize import brute
 import cirq
 
 import pennylane as qml
-from pennylane.grouping import pauli_word_to_string
+from pennylane.pauli import pauli_word_to_string
 
 import mitiq
 from mitiq import zne  # Zero-noise extrapolation module
