@@ -11,6 +11,7 @@
 from typing import Tuple, List, Any
 
 import numpy as np
+from scipy.linalg import sqrtm
 from numpy.typing import NDArray
 import cirq
 
@@ -146,17 +147,29 @@ def n_measurements_opts_expectation_bound(
     return int(np.ceil(N * K)), int(K)
 
 
-def fidelity(
-    state_vector: NDArray[np.complex64],
-    rho: NDArray[np.complex64],
-) -> float:
-    """
-    Calculate the fidelity between a state vector and a density matrix.
-    Args:
-        state_vector: The vector whose norm we want to calculate.
-        rho: The operator whose norm we want to calculate.
+# def fidelity(
+#     sigma: NDArray[np.complex64],
+#     rho: NDArray[np.complex64],
+# ) -> float:
+#     """
+#     fidelity is a measure of the "closeness" of two quantum states.
+#     It expresses the probability that one state will pass a test to
+#     identify as the other. 
+#     Args:
+#         sigma: Quantum state.
+#         rho: Quantum state
 
-    Returns:
-        Scalar corresponding to the fidelity.
-    """
-    return np.reshape(state_vector.conj().T @ rho @ state_vector, -1).real[0]
+#     Returns:
+#         Scalar corresponding to the fidelity.
+#     """
+#     if sigma.ndim ==1 and rho.ndim == 1:
+#         val = np.abs(np.dot(sigma.conj(), rho))**2.0
+#     elif sigma.ndim == 1 and rho.ndim == 2:
+#         val = np.abs(sigma.conj().T @ rho @ sigma)
+#     elif sigma.ndim == 2 and rho.ndim == 1:
+#         val = np.abs(rho.conj().T @ sigma @ rho)
+#     elif sigma.ndim == 2 and rho.ndim == 2:
+#         val = np.abs(np.trace(sqrtm(sigma) @ rho @ sqrtm(sigma)))
+#     else:
+#         raise ValueError("Invalid input dimensions")
+#     return float(val)

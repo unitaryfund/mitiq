@@ -36,7 +36,7 @@ one_state = b_one.T @ b_one
 
 """
 The following functions are used in the classical post-processing
-of calibration
+of calibration stage.
 """
 
 

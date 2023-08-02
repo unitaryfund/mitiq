@@ -23,8 +23,8 @@ from mitiq.shadows.quantum_processing import random_pauli_measurement
 def pauli_twirling_calibrate(
     qubits: List[cirq.Qid],
     executor: Callable[[cirq.Circuit], MeasurementResult],
-    num_total_measurements_calibration: int = 20000,
-    k_calibration: int = 1,
+    num_total_measurements_calibration: int = 50000,
+    k_calibration: int = 5,
 ) -> Dict[str, complex]:
     r"""
     This function returns the dictionary of the median of means estimation
