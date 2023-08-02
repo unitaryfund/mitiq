@@ -47,7 +47,7 @@ Once they pass, you can run the entire test suite (excluding those that require 
 make test
 ```
 
-This can often be slow, however, so testing your changes iteravely using `pytest` is often faster when doing development.
+This can often be slow, however, so testing your changes iteratively using `pytest` is often faster when doing development.
 
 To run the tests for the pyQuil plugins, run
 ```bash
