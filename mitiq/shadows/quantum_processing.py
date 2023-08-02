@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Quantum processing functions for classical shadows."""
-from typing import Tuple, Callable, List, Optional
+from typing import Tuple, Callable, List, Optional, Sequence
 
 import cirq
 import numpy as np
@@ -84,30 +84,33 @@ def random_pauli_measurement(
     executor: Callable[[cirq.Circuit], MeasurementResult],
     qubits: Optional[List[cirq.Qid]] = None,
 ) -> Tuple[List[str], List[str]]:
-    r"""
-    Given a circuit, perform random Pauli measurements on the circuit and
-    return outcomes. The outcomes are represented as a tuple of two lists of
-    strings.
+    r"""This function performs random Pauli measurements on a given circuit and
+    returns the outcomes. These outcomes are represented as a tuple of two
+    lists of strings.
 
     Args:
-        circuit: Cirq circuit.
-        n_total_measurements: number of snapshots.
-        executor: A callable which runs a circuit and returns a single
+        circuit: A Cirq circuit.
+        n_total_measurements: The number of snapshots.
+        executor: A callable that runs a circuit and returns a single
             bitstring.
-        qubits: The qubits to measure. If None, all qubits in the circuit
+        qubits: The qubits to be measured. If None, all qubits in the circuit
+            will be measured.
 
     Warning:
-        The ``executor`` must return a ``MeasurementResult``
-        for a single shot (i.e. a single bitstring).
+        The `executor` must return a `MeasurementResult` for a single shot,
+        i.e., a single bitstring.
 
     Returns:
-        Tuple of two list of string of length equals to`n_total_meausrements`,
-        where each element in the list is a string, with the following format:
-        strs in the 1st list: Circuit qubits computational basis
-        e.g. :math:`"01..":=|0\rangle|1\rangle..`.
-        strs in the 2ed list: The local Pauli measurement performed on each
-        qubit. e.g."XY.." means perform local X-basis measurement on the
-        1st qubit, local Y-basis measurement the 2ed qubit in the circuit.
+        A tuple of two lists of strings, each of length equal to
+        `n_total_measurements`. Each element in the list is a string, formatted
+        as follows:
+        - First list: The computational basis of
+        circuit qubits, e.g.
+        "01...1"=:math:`|0\rangle |1\rangle...|1\rangle`.
+        - Second list: The local Pauli measurement performed on each qubit.
+        e.g. "XY...Z" signifies a local X-basis measurement on the
+        first qubit, a local Y-basis measurement on the second qubit,
+        and a local Z-basis measurement on the last qubit in the circuit.
     """
 
     qubits = sorted(list(circuit.all_qubits())) if qubits is None else qubits
