@@ -40,7 +40,7 @@ def get_rotated_circuits(
     circuit: cirq.Circuit,
     pauli_strings: List[str],
     add_measurements: bool = True,
-    qubits: Optional[List[cirq.Qid]] = None,
+    qubits: Optional[Sequence[cirq.Qid]] = None,
 ) -> List[cirq.Circuit]:
     """Returns a list of circuits that are identical to the input circuit,
     except that each one has single-qubit Clifford gates followed by
