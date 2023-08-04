@@ -51,7 +51,7 @@ def get_rotated_circuits(
         circuit: The circuit to measure.
         pauli_strings: The Pauli strings to measure in each output circuit.
         add_measurements: Whether to add measurement gates to the circuit.
-        qubits: The qubits to measure. If None, all qubits in the circuit
+        qubits: The qubits to measure. If None, all qubits in the circuit.
     Returns:
          The list of circuits with rotation and measurement gates appended.
     """
