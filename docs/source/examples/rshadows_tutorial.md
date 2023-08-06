@@ -496,7 +496,7 @@ plt.ylabel("Energy Value")
 
 ```
     
-![png](../img/rshadows_2pt_func.png)
+![png](../img/rshadows_energy.png)
 
 ### 3.2 Two Point Correlation Function Estimation with RShadows
 Let's estimate two point correlation fuction: $\langle Z_0 Z_i\rangle$ of a 16-spin 1D Ising model with transverse field on critical point ground state.
@@ -625,7 +625,7 @@ plt.ylabel("Correlation")
 
 ```
     
-![png](../img/rshadows_energy.png)
+![png](../img/rshadows_2pt_func.png)
     
 
 ** Acknowledgements**
