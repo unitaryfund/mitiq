@@ -25,6 +25,7 @@ ZNE with BQSKit compiled circuits <bqskit.md>
 PEC on a Braket simulator: Mirror circuits <pec_tutorial.md>
 PEC with Cirq: Learning representations <learning-depolarizing-noise.md>
 Classical Shadows with Cirq: State Reconstruction and Observable Estimation <shadows_tutorial.md>
+Robust Shadow Estimation with Cirq: Pauli Twirling Calibration of Classical Shadows <rshadows_tutorial.md>
 DDD with Cirq: Mirror circuits <ddd_tutorial.md>
 DDD with Qiskit: GHZ circuits <ddd_on_ibmq_ghz.md>
 GGI Summer School ZNE Hands-On Tutorial <ggi_summer_school_unsolved.md>

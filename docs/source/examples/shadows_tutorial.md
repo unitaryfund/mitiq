@@ -1,10 +1,18 @@
+---
+jupytext:
+  text_representation:
+    extension: .myst
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.11.1
+kernelspec:
+  display_name: Python 3 (ipykernel)
+  language: python
+  name: python3
+---
 # Classical Shadows - code prototype
 
-**Copyright**
-
-Copyright (C) Unitary Fund. This source code is licensed under the GPL license (v3) found in the LICENSE file in the root directory of this source tree.
-
-The assocaited RFC can be found at [this link](https://docs.google.com/document/d/1B5FnqQDvoRYap5fGPqzcbp-RXIrUFjbBcLiWIUrLmuA/edit?usp=sharing).
+This notebook is a prototype of how to preform classical shadow protocol with mitiq.
 
 ```python
 import cirq
