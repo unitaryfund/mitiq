@@ -10,23 +10,16 @@ kernelspec:
   language: python
   name: python3
 ---
-# Classical Shadows - code prototype
 
-This notebook is a prototype of how to preform classical shadow protocol with mitiq.
+# Classical Shadows Protocol with Cirq
+
+This notebook shows how to use classical shadows estimation with the Mitiq library, focused initially on local (Pauli) measurements. We show some common scenarios such as state tomography, and operator expectation value estimation. The method creates an approximate classical description of a quantum state with few measurements while effectively characterizing and mitigating noise in the following notebook `rshadow_tutorial`.
 
 ```python
 import cirq
 import numpy as np
-from copy import deepcopy
-from tqdm.notebook import tqdm, trange
-from typing import List, Tuple, Union, Dict, Any
-from numpy import linalg
-
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
-import warnings
+from tqdm.notebook import tqdm
+from typing import List
 
 from mitiq.shadows.shadows import *
 from mitiq.shadows.shadows_utils import *
@@ -35,11 +28,7 @@ from mitiq.interface.mitiq_cirq.cirq_utils import (
     sample_bitstrings as cirq_sample_bitstrings,
 )
 
-warnings.filterwarnings("ignore")
-sns.set_style("whitegrid")
-%matplotlib inline
 # auto reload modules when they have changed
-# np.random.seed(666)
 %load_ext autoreload
 %autoreload 2
 ```
@@ -54,22 +43,10 @@ In the context of an $n$-qubit system, where $\rho$ is an unknown quantum state 
 num_qubits: int = 4
 # qubits in the circuit prepared in the $|0\rangle$ state
 qubits: List[cirq.Qid] = cirq.LineQubit.range(num_qubits)
+
 # defining random parameters for the circuit
 # np.random.seed(666)
-# params = np.array([0.82418808, 0.479966  , 1.17346801, 0.90904807])
 params: np.ndarray = np.random.randn(2 * num_qubits)
-
-
-def cirq_executor(
-    circuit: cirq.Circuit,
-) -> MeasurementResult:
-    return cirq_sample_bitstrings(
-        circuit,
-        noise_level=(0,),
-        shots=1,
-        sampler=cirq.Simulator(),
-    )
-
 
 # define circuit
 def simple_test_circuit(
@@ -84,8 +61,6 @@ def simple_test_circuit(
     for i, qubit in enumerate(qubits):
         circuit.append(cirq.rz(params[i + num_qubits])(qubit))
     return circuit
-
-
 # print the circuit
 test_circuits = simple_test_circuit(params, qubits)
 print(simple_test_circuit(params, qubits))
@@ -113,10 +88,22 @@ This process involves applying a random unitary selected from a randomly fixed e
 \begin{equation}
 U^\dagger|\hat{b}\rangle\langle\hat{b}| U\qquad \mathrm{where} \qquad \mathrm{Pr}[\hat{b}=b]=\langle b|U\rho U^\dagger|b\rangle.
 \end{equation}
+If the unitary group $\mathcal{U}$ is chosen to be the local Clifford group $\mathrm{CL}(2)^n$, this equavelent to performing a random Pauli measurement on each qubit. This means that for each qubit, we randomly decide to measure one of the Pauli operators. Define the `cirq_executor` take one shot of measurement and return the measurement result.
 
-If the unitary group $\mathcal{U}$ is chosen to be the local Clifford group $\mathrm{CL}(2)^n$, this corresponds to performing a random Pauli measurement. This means that for each qubit, we randomly decide to measure one of the Pauli operators. Considering that the only possible measurement to be performed is the $Z$-basis measurement, the random Pauli measurement is equivalent to randomly sampling a unitary from the unitary ensemble: $\mathcal{G}=\{\mathrm{id},\;\mathrm{H},\;\mathrm{H}\cdot \mathrm{S}^\dagger\}$ and then performing the $Z$-basis measurement. This is what we do after we perform stage 1 of the main function execute_with_shadows, and the outcomes are stored as two arrays: one for the measurement results $|0\rangle:=1,;|1\rangle:= -1$ and the other for the applied unitaries. In the case of local Pauli measurement, what gets recorded is the measured Pauli gate: $X,Y,Z$. If we conduct this process in two steps, first by sampling the unitary (say $U=\mathrm{H}$ or $\mathrm{H}\cdot \mathrm{S}^\dagger$), and then by performing the $Z$-basis measurement, it becomes equivalent to performing an $X$ or $Y$-basis measurement. So, in terms of implementation, we simply record a sequence of Pauli gates $u_i:= U_i^\dagger ZU_i$ that have been measured for each qubit in the circuit as one of the output lists of the measurement function `random_pauli_measurement`. In the main function, we package the quantum measurement process into function `shadow_quantum_processing`, which takes the quantum circuit and the number of shots as input and returns the measurement results in terms of bit strings, e.g. `01..`$:=|0\rangle|1\rangle..$ and the measured Pauli gates in terms of strings, e.g."XY.." means perform local X-basis measurement on the first qubit, local Y-basis measurement the second qubit in the circuit, etc.
+```python
+def cirq_executor(
+    circuit: cirq.Circuit,
+) -> MeasurementResult:
+    return cirq_sample_bitstrings(
+        circuit,
+        noise_level=(0,),
+        shots=1,
+        sampler=cirq.Simulator(),
+    )
+```
+In terms of implementation, considering that the only possible measurement to be performed is the $Z$-basis measurement, the random Pauli measurement is equivalent to randomly sampling a unitary from the unitary ensemble: $\mathcal{G}=\{\mathrm{id},\mathrm{H},\mathrm{H}\cdot \mathrm{S}^\dagger\}$. Afterward, the $Z$-basis measurement is conducted. We then record a sequence of Pauli gates $u_i:= U_i^\dagger ZU_i$ that have been measured for each qubit in the circuit. This sequence becomes one of the output lists of the measurement function random_pauli_measurement.
 
-
+In the main function, the quantum measurement process is encapsulated within the shadow_quantum_processing function. This function takes the quantum circuit and the number of shots as input. It returns the measurement results as bit strings, for example, '01...0' is equivelent to the measurement basis eigenstate: $|0\rangle|1\rangle...|0\rangle$. Additionally, it provides the measured Pauli gates in string format. For instance, 'XY...Z' signifies a local X-basis measurement on the first qubit, a local Y-basis measurement on the second qubit, and a local Z-basis measurement on the last qubit in the circuit.
 ```python
 shadow_quantum_processing(test_circuits, cirq_executor, 2)
 ```
@@ -214,6 +201,9 @@ We can plot the elementwise difference between the reconstructed state and the o
 
 
 ```python
+import matplotlib.pyplot as plt
+import seaborn as sns
+%matplotlib inline
 # Setting the style
 sns.set_style("white")
 
@@ -268,6 +258,11 @@ Compute the fidelity and $L_2$ distance between the state reconstructed through 
 
 
 ```python
+import pandas as pd
+import warnings
+warnings.filterwarnings("ignore")
+sns.set_style("whitegrid")
+
 # compute fidelity and operator 2-norm
 b_strings, u_strings = shadow_outcomes
 b_lists = np.array(b_strings)
@@ -319,7 +314,6 @@ for n_measurement in tqdm(n_measurement_list):
 ```
 
 ```python
-sns.set_style("whitegrid")
 plt.figure()
 sns.lineplot(
     data=df,

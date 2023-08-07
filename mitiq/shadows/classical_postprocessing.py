@@ -283,7 +283,10 @@ def expectation_estimation_shadow(
         observable: Single cirq observable consisting of
             Pauli operators.
         k_shadows: number of splits in the median of means estimator.
-
+        pauli_twirling_calibration: Whether to use Pauli twirling
+            calibration.
+        f_est: Output of `get_pauli_fidelity`.
+        
     Returns:
         Float corresponding to the estimate of the observable
         expectation value.

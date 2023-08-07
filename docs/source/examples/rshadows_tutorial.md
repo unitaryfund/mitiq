@@ -24,11 +24,6 @@ from typing import List, Tuple, Union, Dict, Any, Optional
 from numpy import linalg
 
 
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
-import warnings
-
 from mitiq.shadows.shadows import *
 from mitiq.shadows.quantum_processing import *
 from mitiq.shadows.classical_postprocessing import *
@@ -39,11 +34,7 @@ from mitiq.interface.mitiq_cirq.cirq_utils import (
 )
 from functools import partial
 
-warnings.filterwarnings("ignore")
-sns.set_style("whitegrid")
-%matplotlib inline
 # auto reload modules when they have changed
-# np.random.seed(666)
 %load_ext autoreload
 %autoreload 2
 ```
@@ -54,7 +45,7 @@ sns.set_style("whitegrid")
 
 The robust shadow estimation approach put forth in *Predicting Many Properties of a Quantum System from Very Few Measurements* {cite}`huang2020predicting` exhibits noise resilience. The inherent randomization in the protocol simplifies the noise, transforming it into a Pauli noise channel that can be characterized relatively straightforwardly. Once the noisy channel $\widehat{\mathcal{M}}$ is characterized $\widehat{\mathcal{M}}$, it is incorporated into the channel inversion $\widehat{\mathcal{M}}^{-1}$, resulting in an unbiased state estimator. The sampling error in the determination of the Pauli channel contributes to the variance of this estimator. 
 
-## 1. Define a zero state from which we'll extract calibration information
+## 1. Define a Circuit for Robust Shadow Estimation
 
 
 ```python
@@ -221,6 +212,7 @@ for bitstring in bitstrings:
 
 
 ```python
+import matplotlib.pyplot as plt
 # plot estimated vs theoretical Pauli fidelitys when no errors in quantum circuit
 plt.plot(
     [np.abs(f_est_results[b]) for b in reordered_bitstrings],
@@ -351,9 +343,7 @@ Import groud state of 1-D Ising model with periodic boundary condition, with $J=
 
 
 ```python
-from mitiq.shadows.spin_system import tfi_chain
-
-# from tensorflow_quantum.datasets import tfi_chain
+from tensorflow_quantum.datasets import tfi_chain
 num_qubits = 8
 qbs = cirq.GridQubit.rect(num_qubits, 1)
 circuits, labels, pauli_sums, addinfo = tfi_chain(qbs, "closed")
@@ -384,7 +374,6 @@ Calculate the exact expectation values of the Pauli operators for the above stat
 
 
 ```python
-from functools import partial
 from mitiq.interface import mitiq_cirq
 from mitiq import Observable
 
@@ -424,6 +413,8 @@ for noise_level in noise_levels:
 ```
 
 ```python
+import pandas as pd
+
 df_energy = pd.DataFrame(
     columns=["noise_model", "noise_level", "method", "observable", "value"]
 )
@@ -475,6 +466,10 @@ noise_model = "bit_flip"
 
 
 ```python
+import seaborn as sns
+sns.set_style("whitegrid")
+%matplotlib inline
+
 # Define a color palette
 palette = {"exact": "black", "robust": "red", "standard": "green"}
 
