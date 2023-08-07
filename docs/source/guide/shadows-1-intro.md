@@ -12,7 +12,7 @@ kernelspec:
 ---
 
 # How do I use shadows?
-Shadows is a technique that can be used to {ref}`mitigate readout errors <guide/rem-1-intro>` in noisy quantum devices. It is compatible with any frontend supported by Mitiq:
+
 
 ```{code-cell} ipython3
 import mitiq
