@@ -10,7 +10,7 @@ kernelspec:
   language: python
   name: python3
 ---
-# Robust Shadow Estimation Notebook
+# Robust Shadow Estimation with Mitiq
 
 This notebook is a prototype of how to perform robust shadow estimation protocol with mitiq.
 
@@ -18,11 +18,7 @@ This notebook is a prototype of how to perform robust shadow estimation protocol
 ```python
 import cirq
 import numpy as np
-from copy import deepcopy
-from tqdm.notebook import tqdm, trange
-from typing import List, Tuple, Union, Dict, Any, Optional
-from numpy import linalg
-
+from typing import List
 
 from mitiq.shadows.shadows import *
 from mitiq.shadows.quantum_processing import *
@@ -43,13 +39,40 @@ from functools import partial
       %reload_ext autoreload
 
 
-The robust shadow estimation approach put forth in *Predicting Many Properties of a Quantum System from Very Few Measurements* {cite}`huang2020predicting` exhibits noise resilience. The inherent randomization in the protocol simplifies the noise, transforming it into a Pauli noise channel that can be characterized relatively straightforwardly. Once the noisy channel $\widehat{\mathcal{M}}$ is characterized $\widehat{\mathcal{M}}$, it is incorporated into the channel inversion $\widehat{\mathcal{M}}^{-1}$, resulting in an unbiased state estimator. The sampling error in the determination of the Pauli channel contributes to the variance of this estimator. 
+The *robust shadow estimation*{cite}`chen2021robust` approach put forth in *Predicting Many Properties of a Quantum System from Very Few Measurements* {cite}`huang2020predicting` exhibits noise resilience. The inherent randomization in the protocol simplifies the noise, transforming it into a Pauli noise channel that can be characterized relatively straightforwardly. Once the noisy channel $\widehat{\mathcal{M}}$ is characterized $\widehat{\mathcal{M}}$, it is incorporated into the channel inversion $\widehat{\mathcal{M}}^{-1}$, resulting in an unbiased state estimator. The sampling error in the determination of the Pauli channel contributes to the variance of this estimator. 
 
-## 1. Define a Circuit for Robust Shadow Estimation
+## 1. Define Quantum Circuit and Executor
+In this notebook, we'll use the ground state of the Ising model with periodic boundary conditions as an example to study energy and two-point correlation function estimations. We'll compare the performance of robust shadow estimation with the standard shadow protocol, taking into account the bit-flip or depolarization noise on the quantum channels.
+
+The Hamiltonian of the Ising model is given by
+\begin{equation}
+H = -J\sum_{i=0}^{n-1} Z_i Z_{i+1} -  g\sum_{i=1}^N X_i,
+\end{equation}
+We focus on the case where $J = g =1$. We use the ground state of such a system eight spins provided by 
 
 
 ```python
-# define executor
+# import groud state of 1-D Ising model w/ periodic boundary condition
+from tensorflow_quantum.datasets import tfi_chain
+num_qubits = 8
+qubits: List[cirq.Qid] = cirq.LineQubit.range(num_qubits)
+qbs = cirq.GridQubit.rect(num_qubits, 1)
+circuits, labels, pauli_sums, addinfo = tfi_chain(qbs, "closed")
+lattice_idx = 40  # Critical point where g == 1
+g = addinfo[lattice_idx].g
+
+circuit = circuits[lattice_idx]
+qubit_map = {
+    cirq.GridQubit(i, 0): cirq.LineQubit(i) for i in range(num_qubits)
+}
+
+circuit = circuit.transform_qubits(qubit_map=qubit_map)
+```
+
+similar with the classical shadow protocal, we define the executor to perform the computational measurement for the circuit. Here we use the simulator that adds single-qubit depolarizing noise after rotation gates and before the $Z$-basis measurement, as the noise is assumped to be gate independent, time invariant and Markovian, the noisy gate satisfies $U_{\Lambda_U}(M_z)_{\Lambda_{\mathcal{M}_Z}}\equiv U\Lambda\mathcal{M}_Z$:
+
+
+```python
 def cirq_executor(
     circuit: cirq.Circuit,
     noise_model_function=cirq.depolarize,
@@ -88,53 +111,22 @@ def cirq_executor(
     )
     return executor
 
-
-# number of qubits in the circuit
-num_qubits: int = 4
-# qubits in the circuit prepared in the $|0\rangle$ state
-qubits: List[cirq.Qid] = cirq.LineQubit.range(num_qubits)
-# defining random parameters for the circuit
-# np.random.seed(666)
-params: np.ndarray = np.random.randn(2 * num_qubits)
-
-
-# define circuit
-def simple_test_circuit(
-    params: np.ndarray, qubits: List[cirq.Qid]
-) -> cirq.Circuit:
-    circuit: cirq.Circuit = cirq.Circuit()
-    for i, qubit in enumerate(qubits):
-        circuit.append(cirq.H(qubit))
-        circuit.append(cirq.ry(params[i])(qubit))
-    for i in range(num_qubits - 1):
-        circuit.append(cirq.CNOT(qubits[i], qubits[i + 1]))
-    for i, qubit in enumerate(qubits):
-        circuit.append(cirq.rz(params[i + num_qubits])(qubit))
-    return circuit
-
-
-test_circuit = simple_test_circuit(params, qubits)
-
-# print the circuit
-print(test_circuit)
 ```
-
-    0: ───H───Ry(-0.454π)───@───Rz(0.215π)───────────────────────────────
-                            │
-    1: ───H───Ry(-0.097π)───X───@────────────Rz(-0.149π)─────────────────
-                                │
-    2: ───H───Ry(0.462π)────────X────────────@─────────────Rz(-0.077π)───
-                                             │
-    3: ───H───Ry(-0.033π)────────────────────X─────────────Rz(-0.172π)───
-
 
 ## 2. Pauli Twirling Calibration
 ### 2.1 Pauli-transfer-matrix (PTM) representation (or Liouville representation)
 The Pauli Transfer Matrix (PTM) representation, or Liouville representation, is initially introduced to streamline the notation. We must recognize that all linear operators $\mathcal{L}(\mathcal{H}_d)$ upon the underlying Hilbert space $\mathcal{H}_d$ of $n$-qubits, where $d = 2^n$, can possess a vector representation utilizing the $n$-qubit normalized Pauli operator basis $\sigma_a=P_a/\sqrt{d}$. Here, $P_a$ represents the conventional Pauli matrices.
 
-For a linear operator $O\in\mathcal{L}(\mathcal{H}_d)$, a vector $|O\rangle\!\rangle \in\mathcal{H}_{d^2}$ is defined, where the $a$-th entry is $|O\rangle\!\rangle_a = d^{-1/2}\mathrm{Tr}(OP_a)$. The vector space $\mathcal{H}_{d^2}$'s inner product is established by the Hilbert-Schmidt inner product, represented as $\langle\!\langle A|B\rangle\!\rangle := \mathrm{Tr}(A^\dagger B)$. Therefore, the normalized Pauli basis $\{\sigma_a\}_a$ creates an orthonormal basis in $\mathcal{H}_{d^2}$, this is implemented in function `mitiq.shadows.shadows_utils.operator_ptm_vector_rep`.
+For a linear operator $O\in\mathcal{L}(\mathcal{H}_d)$, a vector $|O\rangle\!\rangle \in\mathcal{H}_{d^2}$ is defined, where the $a$-th entry is $|O\rangle\!\rangle_a = d^{-1/2}\mathrm{Tr}(OP_a)$. The vector space $\mathcal{H}_{d^2}$'s inner product is established by the Hilbert-Schmidt inner product, represented as $\langle\!\langle A|B\rangle\!\rangle := \mathrm{Tr}(A^\dagger B)$. Therefore, the normalized Pauli basis $\{\sigma_a\}_a$ creates an orthonormal basis in $\mathcal{H}_{d^2}$, this is implemented in function `operator_ptm_vector_rep`. For example $|\sigma_I\rangle\!\rangle$ have a vector rep:
 
-Superoperators on $\mathcal{H}_{d}$ are identified as linear maps that transform operators into operators, specifically $\mathcal{E}:\mathcal{L}(\mathcal{H}_d)\rightarrow \mathcal{L}(\mathcal{H}_d)$. Within the vector space $\mathcal{H}_{d^2}$, a superoperator $\mathcal{E}$ can be represented by a matrix within the Pauli basis, where the entries are determined as $\mathcal{E}_{ab} = \langle\!\langle \sigma_a|\mathcal{E}(\sigma_b)\rangle\!\rangle=\langle\!\langle \sigma_a|\mathcal{P}(\mathcal{E})|\sigma_b\rangle\!\rangle$, where $\mathcal{P}:\mathcal{L}(\mathcal{H}_d)\rightarrow \mathcal{L}(\mathcal{H}_{d^2})$ is an isomorphism. The process of choosing the Pauli basis for the superoperator is occasionally referred to as the Pauli transfer matrix. There is an occasional tendency to denote a superoperator and its PTM interchangeably, leading to a minor misuse of notation.
+
+```python
+operator_ptm_vector_rep(cirq.I._unitary_()/np.sqrt(2))
+```
+
+    array([1.+0.j, 0.+0.j, 0.+0.j, 0.+0.j])
+
+
 
 ### 2.2 Pauli Twilling of quantum channel and Pauli Fideltiy
 The classical shadow estimation employs a quantum channel, which is subsequently inverted. This operation essentially embodies a Pauli twirling. Within this framework, $\mathcal{G}$ represents a subset, to be further identified within the unitaries in $U(d)$. Moreover, $\mathcal{U}$ personifies the PTM representation of $U$. As $\mathcal{G}$ takes the form of a group, the PTMs ${\mathcal{U}}$ evolve into a representation of $\mathcal{G}$. The implementation of Schur’s Lemma facilitates the direct computation of the precise form of $\widehat{\mathcal{M}}$ when the noisy channel $\Lambda$, representing both the gate noise $\mathcal{U}$ and the measurement noise $\mathcal{M}_Z$, is integrated:
@@ -210,7 +202,6 @@ for bitstring in bitstrings:
     f_theoretical[bitstring] = f_val
 ```
 
-
 ```python
 import matplotlib.pyplot as plt
 # plot estimated vs theoretical Pauli fidelitys when no errors in quantum circuit
@@ -219,9 +210,12 @@ plt.plot(
     "-*",
     label="Noisy Channel",
 )
-plt.plot([f_theoretical[b] for b in reordered_bitstrings], label="Noisless Channel")
+plt.plot(
+    [f_theoretical[b] for b in reordered_bitstrings], label="Noisless Channel"
+)
 plt.xlabel(r"measurement basis states $b$")
-plt.xticks(range(len(reordered_bitstrings)), reordered_bitstrings)
+plt.xticks(range(len(reordered_bitstrings)), reordered_bitstrings, rotation='vertical', fontsize=6)
+
 plt.ylabel("Pauli fidelity")
 plt.legend()
 ```
@@ -253,39 +247,25 @@ Next steps are same with classical protocol,with the statistical method of takin
 \end{align}
 where we have $K_2$ estimators each of which is the average of $N_2$ single-round estimators $\hat{o}_i^{(j)}$, and take the median of these $K_2$ estimators as our final estimator $\hat{o}_\iota(N_2,K_2)$. We can calculate the median of means of each irreps with projection $\Pi_b=\bigotimes_{i=1}^n\Pi_{b_i}$, 
 
+
 ### 3.1 Ground State Energy Estimation of Ising model with the RSHADOWS algorithm
 
-In this section, we will use the RSHADOWS algorithm to estimate the ground state energy of the Ising model. The Hamiltonian of the Ising model is given by
-\begin{equation}
-H = -J\sum_{i=0}^{n-1} Z_i Z_{i+1} -  g\sum_{i=1}^N X_i,
-\end{equation}
-Define a function to compare the estimated ground state energy with the exact ground state energy:
+In this section, we will use the robust shadows estimation algorithm to estimate the ground state energy of the Ising model. We will use the `compare_shadow_methods` function to compare the performance of the robust shadows estimation algorithm and the classical shadows estimation algorithm. The `compare_shadow_methods` function takes the following parameters:
 
 
 ```python
 from joblib import Parallel, delayed
 
-
-def concat_multiprocess_outputs(all_outputs):
-    """Concatenate the output of the multiprocessed random_pauli_measurement
-    function.
-    """
-    bit_strings = np.concatenate([output[0] for output in all_outputs])
-    pauli_strings = np.concatenate([output[1] for output in all_outputs])
-    return (bit_strings, pauli_strings)
-
-
 def compare_shadow_methods(
     circuit,
     observables,
-    n_processes,
-    n_measurements_calibration,
+    n_measurement_calibration,
+    k_calibration,
     n_measurement_shadow,
     k_shadows,
     locality,
     noise_model_fn,
     noise_level,
-    k_calibration=1,
 ):
 
     noisy_executor = partial(
@@ -294,33 +274,19 @@ def compare_shadow_methods(
         noise_model_function=noise_model_fn,
     )
 
-    cal_outputs = Parallel(n_jobs=n_processes)(
-        delayed(pauli_twirling_calibrate)(
-            qubits=sorted(list(circuit.all_qubits())),
-            executor=noisy_executor,
-            num_total_measurements_calibration=n_measurements_calibration
-            // n_processes,
-            k_calibration=1,
-            locality=locality,
-        )
-        for _ in range(n_processes)
+    
+    f_est = pauli_twirling_calibrate(
+        qubits=sorted(list(circuit.all_qubits())),
+        executor=noisy_executor,
+        num_total_measurements_calibration=n_measurements_calibration,
+        k_calibration=k_calibration,
+        locality=locality,
     )
-    f_est = {
-        k: np.median([output[k] for output in cal_outputs])
-        for k in cal_outputs[0].keys()
-    }
-
-    measurement_outputs = Parallel(n_jobs=n_processes)(
-        delayed(shadow_quantum_processing)(
-            circuit,
-            num_total_measurements_shadow=n_measurement_shadow // n_processes,
-            executor=noisy_executor,
-        )
-        for _ in range(n_processes)
-    )
-    shadow_measurement_result = concat_multiprocess_outputs(
-        measurement_outputs
-    )
+         
+    shadow_measurement_result = shadow_quantum_processing(
+        circuit,
+        num_total_measurements_shadow=n_measurement_shadow,
+        executor=noisy_executor)
 
     output_shadow = classical_post_processing(
         shadow_outcomes=shadow_measurement_result,
@@ -339,23 +305,7 @@ def compare_shadow_methods(
     return {"standard": output_shadow, "robust": output_shadow_cal}
 ```
 
-Import groud state of 1-D Ising model with periodic boundary condition, with $J= h=1$ for a Ising model with 8 spins,
-
-
-```python
-from tensorflow_quantum.datasets import tfi_chain
-num_qubits = 8
-qbs = cirq.GridQubit.rect(num_qubits, 1)
-circuits, labels, pauli_sums, addinfo = tfi_chain(qbs, "closed")
-lattice_idx = 40  # Critical point where g == 1
-g = addinfo[lattice_idx].g
-circuit = circuits[lattice_idx]
-qubits = cirq.LineQubit.range(num_qubits)
-qubit_map = {
-    cirq.GridQubit(i, 0): cirq.LineQubit(i) for i in range(num_qubits)
-}
-circuit = circuit.transform_qubits(qubit_map=qubit_map)
-```
+We use the groud state of 1-D Ising model with periodic boundary condition, with $J= h=1$ for a Ising model with 8 spins as an example. The Hamiltonian is given by
 
 
 ```python
@@ -374,9 +324,6 @@ Calculate the exact expectation values of the Pauli operators for the above stat
 
 
 ```python
-from mitiq.interface import mitiq_cirq
-from mitiq import Observable
-
 state_vector = circuit.final_state_vector()
 expval_exact = []
 for i, pauli_string in enumerate(ising_hamiltonian):
@@ -385,6 +332,8 @@ for i, pauli_string in enumerate(ising_hamiltonian):
     )
     expval_exact.append(exp.real)
 ```
+
+We use bit_flip channel as an example to show how to use the robust shadow estimation (RSE) in Mitiq. The bit_flip channel is a common noise model in quantum computing. It is a Pauli channel that flips the state of a qubit with probability $p$. 
 
 
 ```python
@@ -399,18 +348,20 @@ for noise_level in noise_levels:
     est_values = compare_shadow_methods(
         circuit=circuit,
         observables=ising_hamiltonian,
-        n_processes=10,
-        n_measurements_calibration=100000,
-        n_measurement_shadow=100000,
-        k_shadows=10,
+        n_measurement_calibration=40000,
+        k_calibration=1,
+        n_measurement_shadow=40000,
+        k_shadows=4,
         locality=2,
         noise_model_fn=cirq.bit_flip,
         noise_level=noise_level,
-        k_calibration=1,
     )
     standard_results.append(est_values["standard"])
     robust_results.append(est_values["robust"])
 ```
+
+                                                                      
+
 
 ```python
 import pandas as pd
@@ -464,6 +415,10 @@ df_hamiltonian = df_hamiltonian.reset_index()
 noise_model = "bit_flip"
 ```
 
+    /var/folders/fj/9qx1s04j6n713s58ml36xbbm0000gn/T/ipykernel_43506/2256291526.py:1: FutureWarning: The default value of numeric_only in DataFrameGroupBy.sum is deprecated. In a future version, numeric_only will default to False. Either specify numeric_only or select only columns which should be valid for the function.
+      df_hamiltonian = df_energy.groupby(["noise_model", "noise_level", "method"]).sum()
+
+
 
 ```python
 import seaborn as sns
@@ -490,7 +445,7 @@ plt.xlabel("Noise Level")
 plt.ylabel("Energy Value")
 
 ```
-    
+
 ![png](../img/rshadows_energy.png)
 
 ### 3.2 Two Point Correlation Function Estimation with RShadows
@@ -501,9 +456,6 @@ Import groud state of 1-D Ising model with periodic boundary condition
 
 
 ```python
-from mitiq.shadows.spin_system import tfi_chain
-
-# from tensorflow_quantum.datasets import tfi_chain
 num_qubits = 16
 qbs = cirq.GridQubit.rect(num_qubits, 1)
 circuits, labels, pauli_sums, addinfo = tfi_chain(qbs, "closed")
@@ -517,7 +469,7 @@ qubit_map = {
 circuit = circuit.transform_qubits(qubit_map=qubit_map)
 ```
 
-Define obersevables lists as two point correlation functions between the first qubit and the rest of the qubits
+Define obersevables lists as two point correlation functions between the first qubit and the rest of the qubits $\{\langle Z_0 Z_i\rangle\}_{0\geq i\leq n-1}$
 
 
 ```python
@@ -541,23 +493,23 @@ for i, pauli_string in enumerate(two_pt_correlation):
     expval_exact.append(exp.real)
 ```
 
+with depolarizing noise set to $0.1$, we compare the unmitigated and mitigated results:
+
 
 ```python
 est_values = compare_shadow_methods(
     circuit=circuit,
     observables=two_pt_correlation,
     n_processes=10,
-    n_measurements_calibration=160000,
-    n_measurement_shadow=160000,
-    k_shadows=10,
+    n_measurement_calibration=50000,
+    n_measurement_shadow=50000,
+    k_shadows=5,
     locality=2,
     noise_model_fn=cirq.depolarize,
-    noise_level=0.3,
-    k_calibration=1,
+    noise_level=0.1,
+    k_calibration=3,
 )
 ```
-
-                                                                       
 
 
 ```python
@@ -619,7 +571,7 @@ plt.xlabel(r"Correlation Function $\langle Z_0Z_i \rangle$")
 plt.ylabel("Correlation")
 
 ```
-    
+
 ![png](../img/rshadows_2pt_func.png)
     
 
