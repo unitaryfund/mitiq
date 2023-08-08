@@ -59,7 +59,7 @@ def get_single_shot_pauli_fidelity(
 ) -> Dict[str, float]:
     r"""
     Calculate Pauli fidelity :math:`f_b` for a single shot measurement of the
-    calibration circuit for :math:`b = bit_string`.
+    calibration circuit for b= bit_string.
 
     In the notation of arXiv:2011.09636, this function estimates the
     coefficient :math:`f_b`, which characterize the (noisy) classical
@@ -83,7 +83,7 @@ def get_single_shot_pauli_fidelity(
             locality = 2.
 
     Returns:
-        A dictionary of Pauli fidelity :math:`\{bit_string: \hat{f}_b\}`.
+        A dictionary of Pauli fidelity bit_string: :math:`\{{f}_b\}`.
         If the locality is :math:`w < n`, then derive the output's keys from
         the bit_string. Ensure that the number of 1s in the keys is less
         than or equal to w. The corresponding Pauli fidelity is the product of
@@ -111,7 +111,7 @@ def get_single_shot_pauli_fidelity(
     return f_est
 
 
-def get_pauli_fidelity(
+def get_pauli_fidelities(
     calibration_measurement_outcomes: Tuple[List[str], List[str]],
     k_calibration: int,
     locality: Optional[int] = None,
@@ -133,7 +133,7 @@ def get_pauli_fidelity(
 
     Returns:
         an :math:`2^n`-dimensional array of Pauli fidelities
-        :math:'\hat{f}_b' for :math:`b = \{0,1\}^{n}`
+        :math:`f_b` for :math:`b = \{0,1\}^{n}`
     """
 
     # classical values of random Pauli measurement stored in classical computer
