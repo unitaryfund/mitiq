@@ -58,8 +58,14 @@ def get_single_shot_pauli_fidelity(
     locality: Optional[int] = None,
 ) -> Dict[str, float]:
     r"""
-    Calculate Pauli fidelity for a single shot measurement of the calibration
-    circuit. The locality is realized on the assumption that the noisy
+    Calculate Pauli fidelity :math:`f_b` for a single shot measurement of the
+    calibration circuit for b= bit_string.
+
+    In the notation of arXiv:2011.09636, this function estimates the
+    coefficient :math:`f_b`, which characterize the (noisy) classical
+    shadow channel.
+
+    The locality is realized on the assumption that the noisy
     channel :math:`\Lambda` is local
     :math:`\Lambda \equiv \bigotimes_i^n\Lambda_i`.
 
@@ -70,14 +76,14 @@ def get_single_shot_pauli_fidelity(
         pauli_string: The local Pauli measurement performed on each qubit.
             e.g.'XY...Z' means perform local X-basis measurement on the
             1st qubit, local Y-basis measurement the 2ed qubit, local Z-basis
-            measurement the last qubit in the circuit,
+            measurement the last qubit in the circuit.
         locality: The locality of the operator, whose expectation value is
             going to be estimated by the classical shadow. e.g. if operator is
             Ising model Hamiltonian with nearist neighbour interacting, then
             locality = 2.
 
     Returns:
-        A dictionary of Pauli fidelity :math:`\{bit_string: \hat{f}_b\}`.
+        A dictionary of Pauli fidelity bit_string: :math:`\{{f}_b\}`.
         If the locality is :math:`w < n`, then derive the output's keys from
         the bit_string. Ensure that the number of 1s in the keys is less
         than or equal to w. The corresponding Pauli fidelity is the product of
@@ -111,17 +117,23 @@ def get_pauli_fidelities(
     locality: Optional[int] = None,
 ) -> Dict[str, complex]:
     r"""
-    Calculate Pauli fidelity for a perticular
+    Calculate Pauli fidelities for the calibration circuit. In the notation of
+    arXiv:2011.09636, this function estimates the coefficients
+    :math:`f_b`, which characterize the (noisy) classical shadow channel
+    :math:`\mathcal{M}=\sum_b f_b \Pi_b`.
 
     Args:
         calibration_measurement_outcomes: The `random_Pauli_measurement`
             outcomes with circuit :math:`|0\rangle^{\otimes n}`}`
         k_calibration: number of splits in the median of means estimator.
-        locality: The locality of the Pauli twirling calibration.
+        locality: The locality of the operator, whose expectation value is
+            going to be estimated by the classical shadow. e.g. if operator is
+            Ising model Hamiltonian with nearist neighbour interacting, then
+            locality = 2.
 
     Returns:
-        an :math:`2^n`-dimensional array of Pauli fidelity
-        :math:'\hat{f}_m' for :math:`m = \{0,1\}^{n}`
+        an :math:`2^n`-dimensional array of Pauli fidelities
+        :math:`f_b` for :math:`b = \{0,1\}^{n}`
     """
 
     # classical values of random Pauli measurement stored in classical computer
@@ -291,9 +303,12 @@ def expectation_estimation_shadow(
     Args:
         measurement_outcomes: A shadow tuple obtained from
             `z_basis_measurement`.
-        observable: Single cirq observable consisting of
+        pauli_str: Single mitiq observable consisting of
             Pauli operators.
         k_shadows: number of splits in the median of means estimator.
+        pauli_twirling_calibration: Whether to use Pauli twirling
+            calibration.
+        f_est: The estimated Pauli fidelities for each calibration
 
     Returns:
         Float corresponding to the estimate of the observable
