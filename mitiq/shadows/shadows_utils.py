@@ -39,14 +39,13 @@ def kronecker_product(matrices: List[NDArray[Any]]) -> NDArray[Any]:
 def operator_ptm_vector_rep(obs: NDArray[Any]) -> NDArray[Any]:
     r"""
     Returns the PTM vector representation
-    :math:`|o\rangle\!\rangle\in \mathcal{H}_{4^n}`
-    of an operator :math:`o\in \mathcal{L}(\mathcal{H}_{2^n})`.
+    :math:`|obs\rangle\!\rangle\in \mathcal{H}_{4^n}`
+    of an operator :math:`obs\in \mathcal{L}(\mathcal{H}_{2^n})`.
     """
     # vector i-th entry is math:`d^{-1/2}Tr(oP_i)`
     # where P_i is the i-th Pauli matrix
-    assert (
-        len(obs.shape) == 2 and obs.shape[0] == obs.shape[1]
-    ), "Input must be a square matrix"
+    if not (len(obs.shape) == 2 and obs.shape[0] == obs.shape[1]):
+        raise TypeError("Input must be a square matrix")
     num_qubits = int(np.log2(obs.shape[0]))
     obs_vec = []
     for pauli_combination in product(PAULIS, repeat=num_qubits):
@@ -67,13 +66,13 @@ def bitstring_to_eigenvalues(bitstring: str) -> List[int]:
     return [1 if b == "0" else -1 for b in bitstring]
 
 
-def create_string(n: int, loc_list: List[int]) -> str:
+def create_string(str_len: int, loc_list: List[int]) -> str:
     """
-    This function returns a string of length n with 1s at the locations
+    This function returns a string of length str_len with 1s at the locations
     specified by loc_list and 0s elsewhere.
     """
     loc_set = set(loc_list)  # Convert list to set for efficient lookups
-    return "".join(map(lambda i: "1" if i in loc_set else "0", range(n)))
+    return "".join(map(lambda i: "1" if i in loc_set else "0", range(str_len)))
 
 
 def n_measurements_tomography_bound(epsilon: float, num_qubits: int) -> int:
@@ -97,7 +96,7 @@ def local_clifford_shadow_norm(obs: mitiq.PauliString) -> float:
     Calculate shadow norm of an operator with random unitary sampled from local
     Clifford group.
     Args:
-        opt: a self-adjoint operator.
+        obs: a self-adjoint operator, i.e. mitiq.PauliString with real coffe.
     Returns:
         Shadow norm when unitary ensemble is local Clifford group.
     """
@@ -150,12 +149,11 @@ def fidelity(
     rho: NDArray[np.complex64],
 ) -> float:
     """
-    fidelity is a measure of the "closeness" of two quantum states.
-    It expresses the probability that one state will pass a test to
-    identify as the other.
+    Calculate the fidelity between two states.
+
     Args:
-        sigma: Quantum state.
-        rho: Quantum state
+        sigma: A state in terms of square matrix or vector.
+        rho: A state in terms square matrix or vector.
 
     Returns:
         Scalar corresponding to the fidelity.
