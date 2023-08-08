@@ -75,6 +75,15 @@ def create_string(str_len: int, loc_list: List[int]) -> str:
     """
     This function returns a string of length str_len with 1s at the locations
     specified by loc_list and 0s elsewhere.
+
+    Args:
+        str_len: The length of the string.
+        loc_list: A list of integers specifying the locations of 1s in the
+            string.
+    Returns:
+        A string of length str_len with 1s at the locations specified by
+        loc_list and 0s elsewhere.
+        e.g. if str_len = 5, loc_list = [1,3], return '01010'
     """
     return "".join(
         map(lambda i: "1" if i in set(loc_list) else "0", range(str_len))
