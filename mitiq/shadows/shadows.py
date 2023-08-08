@@ -12,19 +12,20 @@ from numpy.typing import NDArray
 
 import mitiq
 from mitiq import MeasurementResult
+from mitiq.shadows.quantum_processing import random_pauli_measurement
 from mitiq.shadows.classical_postprocessing import (
     shadow_state_reconstruction,
     expectation_estimation_shadow,
     get_pauli_fidelity,
 )
-from mitiq.shadows.quantum_processing import random_pauli_measurement
 
 
 def pauli_twirling_calibrate(
     qubits: List[cirq.Qid],
     executor: Callable[[cirq.Circuit], MeasurementResult],
-    num_total_measurements_calibration: int = 50000,
-    k_calibration: int = 5,
+    num_total_measurements_calibration: int = 20000,
+    k_calibration: int = 1,
+    locality: Optional[int] = None,
 ) -> Dict[str, complex]:
     r"""
     This function returns the dictionary of the median of means estimation
@@ -38,15 +39,15 @@ def pauli_twirling_calibrate(
             calibration.
         num_total_measurements_calibration: Number of shots per group of
             "median of means" used for calibration.
+        locality: The locality of the operator, whose expectation value is
+            going to be estimated by the classical shadow. e.g. if operator is
+            Ising model Hamiltonian with nearist neighbour interacting, then
+            locality = 2.
     Returns:
         A dictionary containing the calibration outcomes.
     """
     # calibration circuit is of same qubit number with original circuit
     zero_circuit = cirq.Circuit()
-    """
-    Calibration stage: calibrate errors in quantum measurement, can't
-    mitigate errors in state preparation stage.
-    """
     # perform random Pauli measurement one the calibration circuit
     calibration_measurement_outcomes = random_pauli_measurement(
         zero_circuit,
@@ -55,7 +56,9 @@ def pauli_twirling_calibrate(
         qubits=qubits,
     )
     # get the median of means estimation of Pauli fidelities
-    return get_pauli_fidelity(calibration_measurement_outcomes, k_calibration)
+    return get_pauli_fidelity(
+        calibration_measurement_outcomes, k_calibration, locality=locality
+    )
 
 
 def shadow_quantum_processing(
@@ -63,6 +66,7 @@ def shadow_quantum_processing(
     executor: Callable[[cirq.Circuit], MeasurementResult],
     num_total_measurements_shadow: int,
     random_seed: Optional[int] = None,
+    qubits: Optional[List[cirq.Qid]] = None,
 ) -> Tuple[List[str], List[str]]:
     r"""
     Executes a circuit with classical shadows. This function can be used for
@@ -75,6 +79,7 @@ def shadow_quantum_processing(
         num_total_measurements_shadow: Total number of shots for shadow
             estimation.
         random_seed: The random seed to use for the shadow measurements.
+        qubits: The qubits to measure. If None, all qubits in the circuit.
 
     Returns:
         A dictionary containing the bit strings, the Pauli strings
@@ -96,6 +101,7 @@ def shadow_quantum_processing(
         circuit,
         n_total_measurements=num_total_measurements_shadow,
         executor=executor,
+        qubits=qubits,
     )
     return output
 
