@@ -13,12 +13,12 @@ from typing import Tuple, List, Any
 import numpy as np
 from numpy.typing import NDArray
 import cirq
-
+from scipy.linalg import sqrtm
 import mitiq
 
 from itertools import product
 
-Paulis = [
+PAULIS = [
     cirq.I._unitary_(),
     cirq.X._unitary_(),
     cirq.Y._unitary_(),
@@ -36,26 +36,25 @@ def kronecker_product(matrices: List[NDArray[Any]]) -> NDArray[Any]:
     return result
 
 
-# Input must be a 2x2 matrix, output is a vector of 4 elements
-def operator_ptm_vector_rep(opt: NDArray[Any]) -> NDArray[Any]:
+def operator_ptm_vector_rep(obs: NDArray[Any]) -> NDArray[Any]:
     r"""
     Returns the PTM vector representation
     :math:`|o\rangle\!\rangle\in \mathcal{H}_{4^n}`
-    of an operator :math:`opt\in \mathcal{L}(\mathcal{H}_{2^n})`.
+    of an operator :math:`o\in \mathcal{L}(\mathcal{H}_{2^n})`.
     """
     # vector i-th entry is math:`d^{-1/2}Tr(oP_i)`
     # where P_i is the i-th Pauli matrix
     assert (
-        len(opt.shape) == 2 and opt.shape[0] == opt.shape[1]
+        len(obs.shape) == 2 and obs.shape[0] == obs.shape[1]
     ), "Input must be a square matrix"
-    num_qubits = int(np.log2(opt.shape[0]))
-    opt_vec = []
-    for pauli_combination in product(Paulis, repeat=num_qubits):
+    num_qubits = int(np.log2(obs.shape[0]))
+    obs_vec = []
+    for pauli_combination in product(PAULIS, repeat=num_qubits):
         kron_product = kronecker_product(pauli_combination)
-        opt_vec.append(
-            np.trace(opt @ kron_product) * np.sqrt(1 / 2**num_qubits)
+        obs_vec.append(
+            np.trace(obs @ kron_product) * np.sqrt(1 / 2**num_qubits)
         )
-    return np.array(opt_vec)
+    return np.array(obs_vec)
 
 
 def eigenvalues_to_bitstring(values: List[int]) -> str:
@@ -147,16 +146,28 @@ def n_measurements_opts_expectation_bound(
 
 
 def fidelity(
-    state_vector: NDArray[np.complex64],
+    sigma: NDArray[np.complex64],
     rho: NDArray[np.complex64],
 ) -> float:
     """
-    Calculate the fidelity between a state vector and a density matrix.
+    fidelity is a measure of the "closeness" of two quantum states.
+    It expresses the probability that one state will pass a test to
+    identify as the other.
     Args:
-        state_vector: The vector whose norm we want to calculate.
-        rho: The operator whose norm we want to calculate.
+        sigma: Quantum state.
+        rho: Quantum state
 
     Returns:
         Scalar corresponding to the fidelity.
     """
-    return np.reshape(state_vector.conj().T @ rho @ state_vector, -1).real[0]
+    if sigma.ndim == 1 and rho.ndim == 1:
+        val = np.abs(np.dot(sigma.conj(), rho)) ** 2.0
+    elif sigma.ndim == 1 and rho.ndim == 2:
+        val = np.abs(sigma.conj().T @ rho @ sigma)
+    elif sigma.ndim == 2 and rho.ndim == 1:
+        val = np.abs(rho.conj().T @ sigma @ rho)
+    elif sigma.ndim == 2 and rho.ndim == 2:
+        val = np.abs(np.trace(sqrtm(sigma) @ rho @ sqrtm(sigma)))
+    else:
+        raise ValueError("Invalid input dimensions")
+    return float(val)

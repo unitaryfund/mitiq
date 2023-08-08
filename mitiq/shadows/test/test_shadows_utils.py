@@ -40,6 +40,7 @@ def test_operator_ptm_vector_rep():
 def test_eigenvalues_to_bitstring():
     values = [-1, 1, 1]
     assert eigenvalues_to_bitstring(values) == "100"
+    assert bitstring_to_eigenvalues(eigenvalues_to_bitstring(values)) == values
 
 
 def test_bitstring_to_eigenvalues():
@@ -47,12 +48,16 @@ def test_bitstring_to_eigenvalues():
     np.testing.assert_array_equal(
         bitstring_to_eigenvalues(bitstring), np.array([-1, 1, 1])
     )
+    assert (
+        eigenvalues_to_bitstring(bitstring_to_eigenvalues(bitstring))
+        == bitstring
+    )
 
 
 def test_create_string():
-    n = 5
+    str_len = 5
     loc_list = [1, 3]
-    assert create_string(n, loc_list) == "01010"
+    assert create_string(str_len, loc_list) == "01010"
 
 
 def test_n_measurements_tomography_bound():
