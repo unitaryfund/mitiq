@@ -84,7 +84,7 @@ def shadow_quantum_processing(
     Returns:
         A dictionary containing the bit strings, the Pauli strings
         `bit_strings`: Circuit qubits computational basis
-        e.g. :math:`"01..":=|0\rangle|1\rangle..`.
+        e.g. "01..":math:`:=|0\rangle|1\rangle..`.
         `pauli_strings`: The local Pauli measurement performed on each
         qubit. e.g."XY.." means perform local X-basis measurement on the
         1st qubit, local Y-basis measurement the 2ed qubit in the circuit.
