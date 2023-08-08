@@ -80,7 +80,7 @@ def cirq_executor(
     sampler=cirq.Simulator(),
 ) -> MeasurementResult:
     """
-    This function returns the measurement outcomes of a circuit with bitflipped measurements.
+    This function returns the measurement outcomes of a circuit with noisy channel added right before measurement.
     Args:
         circuit: The circuit to execute.
     Returns:
@@ -114,11 +114,8 @@ def cirq_executor(
 ```
 
 ## 2. Pauli Twirling Calibration
-### 2.1 Pauli-transfer-matrix (PTM) representation (or Liouville representation)
-The Pauli Transfer Matrix (PTM) representation, or Liouville representation, is initially introduced to streamline the notation. We must recognize that all linear operators $\mathcal{L}(\mathcal{H}_d)$ upon the underlying Hilbert space $\mathcal{H}_d$ of $n$-qubits, where $d = 2^n$, can possess a vector representation utilizing the $n$-qubit normalized Pauli operator basis $\sigma_a=P_a/\sqrt{d}$. Here, $P_a$ represents the conventional Pauli matrices.
-
-For a linear operator $O\in\mathcal{L}(\mathcal{H}_d)$, a vector $|O\rangle\!\rangle \in\mathcal{H}_{d^2}$ is defined, where the $a$-th entry is $|O\rangle\!\rangle_a = d^{-1/2}\mathrm{Tr}(OP_a)$. The vector space $\mathcal{H}_{d^2}$'s inner product is established by the Hilbert-Schmidt inner product, represented as $\langle\!\langle A|B\rangle\!\rangle := \mathrm{Tr}(A^\dagger B)$. Therefore, the normalized Pauli basis $\{\sigma_a\}_a$ creates an orthonormal basis in $\mathcal{H}_{d^2}$, this is implemented in function `operator_ptm_vector_rep`. For example $|\sigma_I\rangle\!\rangle$ have a vector rep:
-
+### 2.1 PTM Representation
+The PTM (Pauli Transfer Matrix) or Liouville representation provides a vector representation for all linear operators $\mathcal{L}(\mathcal{H}_d)$ on an $n$-qubit Hilbert space $\mathcal{H}_d$ (where $d = 2^n$). This representation uses the normalized Pauli operator basis $\sigma_a=P_a/\sqrt{d}$, with $P_a$ being the standard Pauli matrices.
 
 ```python
 operator_ptm_vector_rep(cirq.I._unitary_()/np.sqrt(2))
@@ -127,49 +124,31 @@ operator_ptm_vector_rep(cirq.I._unitary_()/np.sqrt(2))
     array([1.+0.j, 0.+0.j, 0.+0.j, 0.+0.j])
 
 
-
-### 2.2 Pauli Twilling of quantum channel and Pauli Fideltiy
-The classical shadow estimation employs a quantum channel, which is subsequently inverted. This operation essentially embodies a Pauli twirling. Within this framework, $\mathcal{G}$ represents a subset, to be further identified within the unitaries in $U(d)$. Moreover, $\mathcal{U}$ personifies the PTM representation of $U$. As $\mathcal{G}$ takes the form of a group, the PTMs ${\mathcal{U}}$ evolve into a representation of $\mathcal{G}$. The implementation of Schur’s Lemma facilitates the direct computation of the precise form of $\widehat{\mathcal{M}}$ when the noisy channel $\Lambda$, representing both the gate noise $\mathcal{U}$ and the measurement noise $\mathcal{M}_Z$, is integrated:
-\begin{align}
-\widehat{\mathcal{M}} = \mathbb{E}_{\mathcal{G}}[\mathcal{U}^\dagger\mathcal{M}_z\Lambda\mathcal{U}] = \sum_{\lambda}\hat{f}_\lambda\Pi_\lambda,\qquad \hat{f}_\lambda:=\frac{\mathrm{Tr}(\mathcal{M}_z\Lambda\Pi_\lambda)}{\mathrm{Tr}(\Pi_\lambda)}
-\end{align}
-where $\mathbb{R}_{\mathcal{G}}$ symbolizes the set of irreducible sub-representations of the group $\mathcal{G}$. The total number of these coefficients is related to the number of irreducible representations in the PTM representation of the twirling group $\mathcal{G}$. $\Pi_\lambda$, on the other hand, denotes the corresponding projector onto the invariant subspace, which exhibits pairwise orthogonality.
-
-When the subgroup of $U(d)$ is the local Clifford group $Cl_2^{\otimes n}$, the  projection onto irreducible representation can be decomposed into projections acting on each qubit: $\Pi_b=\bigotimes_{i=1}^n\Pi_{b_i}$, where $b_i\in\{0,1\}$ specifies the measurement basis state. Here is the equation for this relationship:
-\begin{align}
-        \Pi_{b_i}=\left\{
-        \begin{array}{ll}
-        |\sigma_0\rangle\!\rangle\langle\!\langle\sigma_0|& b_i=0 \\
-        \mathbb{I}- |\sigma_0\rangle\!\rangle\langle\!\langle\sigma_0|& b_i = 1 
-        \end{array}\right.
-\end{align}
-Therefore, the $n$-qubit local Clifford group has $2^n$ irreps.
-
-The expansion coefficients of the twirled channel, $\{\hat{f}_{b}\}_b$, are referred to as the Pauli fidelity. Being twirled by the local Clifford group, the channel $\widehat{M}$ becomes a Pauli channel that is symmetric among the $x, \;y,\; z$ indices. This sequence results in a computational basis measurement outcome $|b\rangle$ interpreted in terms of bitstrings b: $\{0,1\}^{n}$. Subsequently, compute the single-round Pauli fidelity estimator $\hat{f}^{(r)}_b = \langle\!\langle b|\mathcal{U}|P_b\rangle\!\rangle$ for every possible measurement outcome bitstring b: $\{0,1\}^n$, with $|P_b\rangle\!\rangle=\prod_i|P_{Z}^{b_i}\rangle\!\rangle$.
-
-The Pauli fidelity estimator for the local Clifford group can be computed utilizing the subsequent equation:
-\begin{align}
+### 2.2 Pauli Twirling of Quantum Channel and Pauli Fidelity:
+The classical shadow estimation involves Pauli twirling of a quantum channel represented by $\mathcal{G} \subset U(d)$, with PTM representation $\mathcal{U}$. This twirling allows direct computation of $\widehat{\mathcal{M}}$ for the noisy channel $\Lambda$:
+\begin{equation}
+\widehat{\mathcal{M}} = \mathbb{E}_{\mathcal{G}}[\mathcal{U}^\dagger\mathcal{M}_z\Lambda\mathcal{U}]
+\end{equation}
+Local Clifford group projections are given by:
+\begin{equation}
+\Pi_{b_i}=\left\{
+\begin{array}{ll}
+|\sigma_0\rangle\!\rangle\langle\!\langle\sigma_0|& b_i=0 \\
+\mathbb{I}- |\sigma_0\rangle\!\rangle\langle\!\langle\sigma_0|& b_i = 1 
+\end{array}\right.
+\end{equation}
+The Pauli fidelity for local Clifford group is:
+\begin{equation}
 \hat{f}^{(r)}_b = \prod_{i=1}^n \langle\!\langle b_i|\mathcal{U}_i|P_z^{b_i}\rangle\!\rangle
-\end{align}
-which was realized by function `get_single_shot_pauli_fidelity`.
+\end{equation}
+Final estimation is achieved using the median of means estimator. See `get_single_shot_pauli_fidelity` and `mitiq.shadows.classical_postprocessing.get_pauli_fidelity` for implementation.
 
-
-Repeat the above step for $R = NK$ rounds. Then the final estimation of fz is given by a median of means estimator $\hat{f}_m$ constructed from the single round estimators $\{\hat{f}_m^{(r)}\}_{1\leq r\leq R}$ with parameter $N, \;K$:
-calculate $K$ estimators each of which is the average of $N$ single-round estimators $\hat{f}$, and take the median of these $K$ estimators as our final estimator $\hat{f}$. In formula,
-\begin{align}
-&\bar{f}^{(k)}=\frac{1}{N}\sum_{r=(K-1)N+1}^{KN} \hat{f}^{(r)}\\
-& \hat{f} = \mathrm{median}\{\bar{f}^{(1)},\cdots\bar{f}^{(K)}\}_{1\leq k\leq K}
-\end{align}
-the number of $\{f_m\}$ is related to the number of irreducible representations in the PTM representation of the twirling group, when the twirling group is the local Clifford group, the number of irreducible representations is $2^n$. This was realized in fucntion `mitiq.shadows.classical_postprocessing.get_pauli_fidelity`.
-
-### 2.3 Noiseless Pauli Fidelity --- Ideal Inverse channal vs Estimate Noisy Inverse channel
-One could check that in the absence of noise in the quantum gates ($\Lambda\equiv\mathbb{I}$), the value of the Pauli fidelity $\hat{f}_{b}^{\mathrm{ideal}}\equiv \mathrm{Tr}(\mathcal{M}_z \Pi_b)/\mathrm{Tr}\Pi_b = 3^{-|{b}|}$, where $|b|$ is the count of $|1\rangle$ found in z-eigenstates $|b\rangle:=|b_i\rangle^{\otimes n}$.
-
-When the noisy channel is considered, the inverse channel $\widehat{\mathcal{M}}^{-1}$ can be abtained by inverse the noisy quantum channel $\widehat{\mathcal{M}}$, one has
-\begin{align}
-\widehat{\mathcal{M}}^{-1}=\sum_{b\in\{0,1\}^{\otimes n}}\hat{f}_b^{-1}\Pi_b
-\end{align}
-After the above steps, we can preform robust shadow calibration as we did in the standart classical shadow protocal, the only difference is we perform the inverse channel replaced by the calibrated version $\widehat{\mathcal{M}}^{-1}$. One can see that the noisy inverse channel $\mathrm{Tr}(\mathcal{M}_z \Pi_b)$ is differed from the one added on the classical shadow protocal by there difference on the Pauli fidelity $\hat{f}_b^{-1}$.
+### 2.3 Noiseless Pauli Fidelity:
+In the ideal noise-free scenario, Pauli fidelity is:
+\begin{equation}
+\hat{f}_{b}^{\mathrm{ideal}} = 3^{-|{b}|}
+\end{equation}
+For noisy channels, the inverse channel $\widehat{\mathcal{M}}^{-1}$ can be derived and used for robust shadow calibration, with differences attributed to variations in Pauli fidelity.
 
 
 ```python
@@ -204,6 +183,8 @@ for bitstring in bitstrings:
 
 ```python
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set_style("whitegrid")
 # plot estimated vs theoretical Pauli fidelitys when no errors in quantum circuit
 plt.plot(
     [np.abs(f_est_results[b]) for b in reordered_bitstrings],
@@ -254,27 +235,17 @@ In this section, we will use the robust shadows estimation algorithm to estimate
 
 
 ```python
-from joblib import Parallel, delayed
-
 def compare_shadow_methods(
     circuit,
     observables,
-    n_measurement_calibration,
+    n_measurements_calibration,
     k_calibration,
     n_measurement_shadow,
     k_shadows,
     locality,
-    noise_model_fn,
-    noise_level,
+    noisy_executor,
 ):
-
-    noisy_executor = partial(
-        cirq_executor,
-        noise_level=(noise_level,),
-        noise_model_function=noise_model_fn,
-    )
-
-    
+  
     f_est = pauli_twirling_calibrate(
         qubits=sorted(list(circuit.all_qubits())),
         executor=noisy_executor,
@@ -345,16 +316,20 @@ standard_results = []
 robust_results = []
 noise_model_fn = getattr(cirq, noise_model)
 for noise_level in noise_levels:
+    noisy_executor = partial(
+        cirq_executor,
+        noise_level=(noise_level,),
+        noise_model_function=cirq.bit_flip,
+    )
     est_values = compare_shadow_methods(
         circuit=circuit,
         observables=ising_hamiltonian,
-        n_measurement_calibration=40000,
-        k_calibration=1,
-        n_measurement_shadow=40000,
-        k_shadows=4,
+        n_measurements_calibration=10000,
+        n_measurement_shadow=10000,
+        k_shadows=1,
         locality=2,
-        noise_model_fn=cirq.bit_flip,
-        noise_level=noise_level,
+        noisy_executor = noisy_executor,
+        k_calibration=1,
     )
     standard_results.append(est_values["standard"])
     robust_results.append(est_values["robust"])
@@ -367,7 +342,7 @@ for noise_level in noise_levels:
 import pandas as pd
 
 df_energy = pd.DataFrame(
-    columns=["noise_model", "noise_level", "method", "observable", "value"]
+    columns=["noise_level", "method", "observable", "value"]
 )
 for i, noise_level in enumerate(noise_levels):
     est_values = {}
@@ -379,7 +354,6 @@ for i, noise_level in enumerate(noise_levels):
             df_energy,
             pd.DataFrame(
                 {
-                    "noise_model": noise_model,
                     "noise_level": noise_level,
                     "method": "exact",
                     "observable": [str(ham) for ham in ising_hamiltonian],
@@ -395,7 +369,6 @@ for i, noise_level in enumerate(noise_levels):
                 df_energy,
                 pd.DataFrame(
                     {
-                        "noise_model": noise_model,
                         "noise_level": noise_level,
                         "method": method,
                         "observable": [str(ham) for ham in ising_hamiltonian],
@@ -405,7 +378,6 @@ for i, noise_level in enumerate(noise_levels):
             ],
             ignore_index=True,
         )
-    
 ```
 
 
@@ -421,10 +393,6 @@ noise_model = "bit_flip"
 
 
 ```python
-import seaborn as sns
-sns.set_style("whitegrid")
-%matplotlib inline
-
 # Define a color palette
 palette = {"exact": "black", "robust": "red", "standard": "green"}
 
@@ -497,17 +465,17 @@ with depolarizing noise set to $0.1$, we compare the unmitigated and mitigated r
 
 
 ```python
+noisy_executor = partial(cirq_executor, noise_level=(0.1,))
 est_values = compare_shadow_methods(
-    circuit=circuit,
-    observables=two_pt_correlation,
-    n_processes=10,
-    n_measurement_calibration=50000,
-    n_measurement_shadow=50000,
-    k_shadows=5,
-    locality=2,
-    noise_model_fn=cirq.depolarize,
-    noise_level=0.1,
-    k_calibration=3,
+    circuit = circuit,
+    observables = two_pt_correlation,
+    n_processes = 10,
+    n_measurement_calibration = 50000,
+    n_measurement_shadow = 50000,
+    k_shadows = 5,
+    locality = 2,
+    noisy_executor = noisy_executor,
+    k_calibration = 3,
 )
 ```
 

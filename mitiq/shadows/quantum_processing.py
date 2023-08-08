@@ -10,7 +10,7 @@ import cirq
 import numpy as np
 
 try:
-    from tqdm.auto import tqdm
+    from tqdm import tqdm
 except ImportError:
     tqdm = None
 

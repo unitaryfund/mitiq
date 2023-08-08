@@ -55,7 +55,9 @@ def pauli_twirling_calibrate(
         qubits=qubits,
     )
     # get the median of means estimation of Pauli fidelities
-    return get_pauli_fidelity(calibration_measurement_outcomes, k_calibration, locality=locality)
+    return get_pauli_fidelity(
+        calibration_measurement_outcomes, k_calibration, locality=locality
+    )
 
 
 def shadow_quantum_processing(
