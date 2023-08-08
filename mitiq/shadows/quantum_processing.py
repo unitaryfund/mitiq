@@ -93,24 +93,19 @@ def random_pauli_measurement(
         n_total_measurements: The number of snapshots.
         executor: A callable that runs a circuit and returns a single
             bitstring.
-        qubits: The qubits to be measured. If None, all qubits in the circuit
-            will be measured.
+        qubits: The qubits in the circuit to be measured. If None,
+            all qubits in the circuit will be measured.
 
     Warning:
-        The `executor` must return a `MeasurementResult` for a single shot,
+        The ``executor`` must return a ``MeasurementResult`` for a single shot,
         i.e., a single bitstring.
 
     Returns:
-        A tuple of two lists of strings, each of length equal to
-        `n_total_measurements`. Each element in the list is a string, formatted
-        as follows:
-        - First list: The computational basis of
-        circuit qubits, e.g.
-        '01...1'=:math:`|0\rangle |1\rangle...|1\rangle`.
-        - Second list: The local Pauli measurement performed on each qubit.
-        e.g. 'XY...Z' signifies a local X-basis measurement on the
-        first qubit, a local Y-basis measurement on the second qubit,
-        and a local Z-basis measurement on the last qubit in the circuit.
+        Tuple containing two lists of strings, each of length equal to
+        ``n_total_measurements``. Strings in the first list are sequences of
+        0's and 1's, which represent qubit measurements outcomes in the
+        computational basis (e.g. "01001"). Strings in the second list are
+        sequences of Pauli-measurement performed on each qubit (e.g. "XZZYY").
     """
 
     qubits = sorted(list(circuit.all_qubits())) if qubits is None else qubits
