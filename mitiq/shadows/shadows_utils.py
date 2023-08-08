@@ -36,24 +36,29 @@ def kronecker_product(matrices: List[NDArray[Any]]) -> NDArray[Any]:
     return result
 
 
-def operator_ptm_vector_rep(obs: NDArray[Any]) -> NDArray[Any]:
+def operator_ptm_vector_rep(opt: NDArray[Any]) -> NDArray[Any]:
     r"""
-    Returns the PTM vector representation
-    :math:`|obs\rangle\!\rangle\in \mathcal{H}_{4^n}`
-    of an operator :math:`obs\in \mathcal{L}(\mathcal{H}_{2^n})`.
+    Returns the PTM vector representation of an operator.
+    :math:`\mathcal{L}(\mathcal{H}_{2^n})\ni opt\rightarrow|opt\rangle\!
+    \rangle\in \mathcal{H}_{4^n}`.
+
+    Args:
+        opt: A square matrix representing an operator.
+    Returns:
+        A Pauli transfer matrix (PTM) representation of the operator.
     """
     # vector i-th entry is math:`d^{-1/2}Tr(oP_i)`
     # where P_i is the i-th Pauli matrix
-    if not (len(obs.shape) == 2 and obs.shape[0] == obs.shape[1]):
+    if not (len(opt.shape) == 2 and opt.shape[0] == opt.shape[1]):
         raise TypeError("Input must be a square matrix")
-    num_qubits = int(np.log2(obs.shape[0]))
-    obs_vec = []
+    num_qubits = int(np.log2(opt.shape[0]))
+    opt_vec = []
     for pauli_combination in product(PAULIS, repeat=num_qubits):
         kron_product = kronecker_product(pauli_combination)
-        obs_vec.append(
-            np.trace(obs @ kron_product) * np.sqrt(1 / 2**num_qubits)
+        opt_vec.append(
+            np.trace(opt @ kron_product) * np.sqrt(1 / 2**num_qubits)
         )
-    return np.array(obs_vec)
+    return np.array(opt_vec)
 
 
 def eigenvalues_to_bitstring(values: List[int]) -> str:
@@ -96,7 +101,7 @@ def local_clifford_shadow_norm(obs: mitiq.PauliString) -> float:
     Calculate shadow norm of an operator with random unitary sampled from local
     Clifford group.
     Args:
-        obs: a self-adjoint operator, i.e. mitiq.PauliString with real coffe.
+        obs: A self-adjoint operator, i.e. mitiq.PauliString with real coffe.
     Returns:
         Shadow norm when unitary ensemble is local Clifford group.
     """
