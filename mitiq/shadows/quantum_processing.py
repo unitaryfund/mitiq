@@ -103,9 +103,9 @@ def random_pauli_measurement(
     Returns:
         Tuple containing two lists of strings, each of length equal to
         ``n_total_measurements``. Strings in the first list are sequences of
-        0's and 1's, which represent qubit measurements in the computational
-        basis (e.g. "01001"). Strings in the second list are sequences of
-        Pauli-measurement performed on each qubit (e.g. "XZZYY").
+        0's and 1's, which represent qubit measurements outcomes in the
+        computational basis (e.g. "01001"). Strings in the second list are
+        sequences of Pauli-measurement performed on each qubit (e.g. "XZZYY").
     """
 
     qubits = sorted(list(circuit.all_qubits())) if qubits is None else qubits
