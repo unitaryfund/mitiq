@@ -12,7 +12,7 @@ import mitiq
 from mitiq.shadows.shadows_utils import operator_ptm_vector_rep
 from mitiq.shadows.classical_postprocessing import (
     get_single_shot_pauli_fidelity,
-    get_pauli_fidelity,
+    get_pauli_fidelities,
     classical_snapshot,
     shadow_state_reconstruction,
     expectation_estimation_shadow,
@@ -38,7 +38,7 @@ def test_get_pauli_fidelity():
         "01": (0.25 + 0j),
         "11": (-0.25 + 0j),
     }
-    result = get_pauli_fidelity(
+    result = get_pauli_fidelities(
         calibration_measurement_outcomes, k_calibration
     )
 
