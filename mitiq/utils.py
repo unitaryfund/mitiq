@@ -5,7 +5,7 @@
 
 """Utility functions."""
 from copy import deepcopy
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Optional
 
 import numpy as np
 import numpy.typing as npt
@@ -14,17 +14,41 @@ import cirq
 from cirq import (
     LineQubit,
     Circuit,
-    EigenGate,
-    Gate,
-    GateOperation,
-    Moment,
     CNOT,
     H,
     DensityMatrixSimulator,
     ops,
     OP_TREE,
+    Gate,
+    Qid,
+    CircuitDiagramInfoArgs,
+    EigenGate,
+    GateOperation,
+    Moment,
 )
 from cirq.ops.measurement_gate import MeasurementGate
+
+
+class Barrier(Gate):
+    def __init__(self) -> None:
+        super().__init__()
+        self._qubits: Optional[List[Qid]] = None
+
+    def num_qubits(self) -> int:
+        return 1
+
+    def _decompose_(self, qubits: List[Qid]) -> List[None]:
+        return []
+
+    def _circuit_diagram_info_(self, args: CircuitDiagramInfoArgs) -> str:
+        return "B"
+
+    def set_qubits(self, qubits: List[Qid]) -> "Barrier":
+        self._qubits = qubits
+        return self
+
+    def get_qubits(self) -> Optional[List[Qid]]:
+        return self._qubits
 
 
 def _simplify_gate_exponent(gate: EigenGate) -> EigenGate:
@@ -44,18 +68,28 @@ def _simplify_gate_exponent(gate: EigenGate) -> EigenGate:
     return gate
 
 
-def _simplify_circuit_exponents(circuit: Circuit) -> None:
+def _simplify_circuit_exponents_and_remove_barriers(
+    circuit: Circuit, return_barriers: bool = False
+) -> Optional[List[Tuple[int, Barrier]]]:
     """Simplifies the gate exponents of the input circuit if possible,
-    mutating the input circuit.
+    mutating the input circuit and optionally returning barrier indices.
 
     Args:
         circuit: The circuit to simplify.
+        return_barriers: Whether to return barrier indices.
     """
+    barrier_indices = []
+
     # Iterate over moments
     for moment_idx, moment in enumerate(circuit):
         simplified_operations = []
+
         # Iterate over operations in moment
         for op in moment:
+            if isinstance(op.gate, Barrier):
+                if return_barriers:
+                    barrier_indices.append((moment_idx, op.gate))
+                continue
 
             if not isinstance(op, GateOperation):
                 simplified_operations.append(op)
@@ -68,8 +102,11 @@ def _simplify_circuit_exponents(circuit: Circuit) -> None:
 
             simplified_operation = op.with_gate(simplified_gate)
             simplified_operations.append(simplified_operation)
+
         # Mutate the input circuit
         circuit[moment_idx] = Moment(simplified_operations)
+
+    return barrier_indices if return_barriers else None
 
 
 def _is_measurement(op: ops.Operation) -> bool:
