@@ -39,7 +39,7 @@ def test_tqdm_import_available():
 
 
 def test_tqdm_import_not_available():
-    with patch.dict("sys.modules", {"tqdm.auto": None}):
+    with patch.dict("sys.modules", {"tqdm": None}):
         importlib.reload(
             mitiq.shadows.quantum_processing
         )  # Reload the module to trigger the import
