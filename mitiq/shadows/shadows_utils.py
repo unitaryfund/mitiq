@@ -29,6 +29,10 @@ PAULIS = [
 def kronecker_product(matrices: List[NDArray[Any]]) -> NDArray[Any]:
     """
     Returns the Kronecker product of a list of matrices.
+    Args:
+        matrices: A list of matrices.
+    Returns:
+        The Kronecker product of the matrices in the list.
     """
     result = matrices[0]
     for matrix in matrices[1:]:
@@ -62,12 +66,25 @@ def operator_ptm_vector_rep(opt: NDArray[Any]) -> NDArray[Any]:
 
 
 def eigenvalues_to_bitstring(values: List[int]) -> str:
-    """Converts eigenvalues to bitstring. e.g., [-1,1,1] -> '100'"""
+    """Converts eigenvalues to bitstring. e.g., [-1,1,1] -> '100'
+
+    Args:
+        values: A list of eigenvalues.
+    Returns:
+        A string of 1s and 0s corresponding to the states associated to
+            eigenvalues.
+    """
     return "".join(["1" if v == -1 else "0" for v in values])
 
 
 def bitstring_to_eigenvalues(bitstring: str) -> List[int]:
-    """Converts bitstring to eigenvalues. e.g., '100' -> [-1,1,1]"""
+    """Converts bitstring to eigenvalues. e.g., '100' -> [-1,1,1]
+
+    Args:
+        bitstring: A string of 1s and 0s.
+    Returns:
+        A list of eigenvalues corresponding to the bitstring.
+    """
     return [1 if b == "0" else -1 for b in bitstring]
 
 
@@ -110,6 +127,7 @@ def local_clifford_shadow_norm(obs: mitiq.PauliString) -> float:
     """
     Calculate shadow norm of an operator with random unitary sampled from local
     Clifford group.
+
     Args:
         obs: A self-adjoint operator, i.e. mitiq.PauliString with real coffe.
     Returns:
