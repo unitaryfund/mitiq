@@ -16,7 +16,7 @@ from mitiq.shadows.quantum_processing import random_pauli_measurement
 from mitiq.shadows.classical_postprocessing import (
     shadow_state_reconstruction,
     expectation_estimation_shadow,
-    get_pauli_fidelity,
+    get_pauli_fidelities,
 )
 
 
@@ -56,7 +56,7 @@ def pauli_twirling_calibrate(
         qubits=qubits,
     )
     # get the median of means estimation of Pauli fidelities
-    return get_pauli_fidelity(
+    return get_pauli_fidelities(
         calibration_measurement_outcomes, k_calibration, locality=locality
     )
 

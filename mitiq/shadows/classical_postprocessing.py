@@ -105,7 +105,7 @@ def get_single_shot_pauli_fidelity(
     return f_est
 
 
-def get_pauli_fidelity(
+def get_pauli_fidelities(
     calibration_measurement_outcomes: Tuple[List[str], List[str]],
     k_calibration: int,
     locality: Optional[int] = None,
