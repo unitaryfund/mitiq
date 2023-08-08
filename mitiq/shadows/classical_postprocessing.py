@@ -376,7 +376,8 @@ def expectation_estimation_shadow(
                 if f_val is None:
                     means.append(0.0)
                 else:
-                    # product becomes an array of snapshots expectation values witch satisfy condition (1) and (2)
+                    # product becomes an array of snapshots expectation values
+                    # witch satisfy condition (1) and (2)
                     product = (1.0 / f_val) * product
             else:
                 product = 3 ** (target_support.count("1")) * product

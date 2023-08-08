@@ -33,9 +33,10 @@ def pauli_twirling_calibrate(
 
     Args:
         qubits: The qubits to measure.
-        executor: The function to use to do quantum measurement, must be same as
-            executor in `shadow_quantum_processing`.
-        k_calibration: Number of groups of "median of means" used for calibration.
+        executor: The function to use to do quantum measurement, must be same
+            as executor in `shadow_quantum_processing`.
+        k_calibration: Number of groups of "median of means" used for
+            calibration.
         num_total_measurements_calibration: Number of shots per group of
             "median of means" used for calibration.
         locality: The locality of the operator, whose expectation value is
