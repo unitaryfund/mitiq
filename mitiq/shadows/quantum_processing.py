@@ -106,9 +106,9 @@ def random_pauli_measurement(
         as follows:
         - First list: The computational basis of
         circuit qubits, e.g.
-        "01...1"=:math:`|0\rangle |1\rangle...|1\rangle`.
+        '01...1'=:math:`|0\rangle |1\rangle...|1\rangle`.
         - Second list: The local Pauli measurement performed on each qubit.
-        e.g. "XY...Z" signifies a local X-basis measurement on the
+        e.g. 'XY...Z' signifies a local X-basis measurement on the
         first qubit, a local Y-basis measurement on the second qubit,
         and a local Z-basis measurement on the last qubit in the circuit.
     """
