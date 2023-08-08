@@ -12,8 +12,7 @@ import mitiq
 from mitiq.shadows.shadows_utils import operator_ptm_vector_rep
 from mitiq.shadows.classical_postprocessing import (
     get_single_shot_pauli_fidelity,
-    get_pauli_fidelity,
-    get_normalize_factor,
+    get_pauli_fidelities,
     classical_snapshot,
     shadow_state_reconstruction,
     expectation_estimation_shadow,
@@ -23,10 +22,8 @@ from mitiq.shadows.classical_postprocessing import (
 def test_get_single_shot_pauli_fidelity():
     b_list = "01"
     u_list = "XY"
-    expected_result = 1.0
-    assert np.isclose(
-        get_single_shot_pauli_fidelity(b_list, u_list), expected_result
-    )
+    expected_result = {"00": 1.0, "01": 0.0, "10": 0.0, "11": 0.0}
+    assert get_single_shot_pauli_fidelity(b_list, u_list) == expected_result
 
 
 def test_get_pauli_fidelity():
@@ -35,18 +32,18 @@ def test_get_pauli_fidelity():
         ["XX", "YY", "ZZ", "XY"],
     )
     k_calibration = 2
-    expected_result = {"00": 0.25, "01": 0.25, "10": 0.0, "11": 0.25}
-    result = get_pauli_fidelity(
+    expected_result = {
+        "00": (1 + 0j),
+        "10": (-0.25 + 0j),
+        "01": (0.25 + 0j),
+        "11": (-0.25 + 0j),
+    }
+    result = get_pauli_fidelities(
         calibration_measurement_outcomes, k_calibration
     )
+
     for key in expected_result.keys():
         assert np.isclose(result[key], expected_result[key])
-
-
-def test_get_normalize_factor():
-    f_est = {"00": 1, "01": 1 / 3, "10": 1 / 3, "11": 1 / 9}
-    expected_result = 1
-    assert np.isclose(get_normalize_factor(f_est), expected_result)
 
 
 def test_classical_snapshot_cal():
@@ -235,7 +232,7 @@ def test_expectation_estimation_shadow():
 
 def test_expectation_estimation_shadow_cal():
     b_lists = ["0101", "0110"]
-    u_lists = ["ZZXX", "ZZXX"]
+    u_lists = ["YXZZ", "XXXX"]
     f_est = {
         "0000": 1,
         "0001": 1 / 3,
@@ -256,9 +253,9 @@ def test_expectation_estimation_shadow_cal():
     }
 
     measurement_outcomes = b_lists, u_lists
-    observable = mitiq.PauliString("ZZ", support=(0, 1))
+    observable = mitiq.PauliString("YXZZ", support=(0, 1, 2, 3))
     k = 1
-    expected_result = -9
+    expected_result = 81 / 2
     print("expected_result", expected_result)
 
     result = expectation_estimation_shadow(

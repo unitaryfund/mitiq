@@ -16,7 +16,7 @@ from mitiq.shadows.quantum_processing import random_pauli_measurement
 from mitiq.shadows.classical_postprocessing import (
     shadow_state_reconstruction,
     expectation_estimation_shadow,
-    get_pauli_fidelity,
+    get_pauli_fidelities,
 )
 
 
@@ -56,7 +56,7 @@ def pauli_twirling_calibrate(
         qubits=qubits,
     )
     # get the median of means estimation of Pauli fidelities
-    return get_pauli_fidelity(
+    return get_pauli_fidelities(
         calibration_measurement_outcomes, k_calibration, locality=locality
     )
 
@@ -79,13 +79,12 @@ def shadow_quantum_processing(
         num_total_measurements_shadow: Total number of shots for shadow
             estimation.
         random_seed: The random seed to use for the shadow measurements.
-        qubits: The qubits to measure. If None, all qubits in the circuit
-            are measured.
+        qubits: The qubits to measure. If None, all qubits in the circuit.
 
     Returns:
         A dictionary containing the bit strings, the Pauli strings
         `bit_strings`: Circuit qubits computational basis
-        e.g. :math:`"01..":=|0\rangle|1\rangle..`.
+        e.g. "01..":math:`:=|0\rangle|1\rangle..`.
         `pauli_strings`: The local Pauli measurement performed on each
         qubit. e.g."XY.." means perform local X-basis measurement on the
         1st qubit, local Y-basis measurement the 2ed qubit in the circuit.

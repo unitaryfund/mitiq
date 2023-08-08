@@ -23,23 +23,20 @@ from mitiq.shadows.shadows_utils import (
     kronecker_product,
 )
 
-# local unitary that applied to the qubits
-sd = cirq.S._unitary_().conj()
-had = cirq.H._unitary_()
-ide = cirq.I._unitary_()
-PAULI_MAP = {"X": had, "Y": had @ sd, "Z": ide}
+# Local unitaries to measure Pauli operators in the Z basis
+PAULI_MAP = {
+    "X": cirq.H._unitary_(),
+    "Y": cirq.H._unitary_() @ cirq.S._unitary_().conj(),
+    "Z": cirq.I._unitary_(),
+}
 
-# z-basis measurement outcomes
-b_zero = np.array([[1.0 + 0.0j, 0.0 + 0.0j]])
-zero_state = b_zero.T @ b_zero
-
-b_one = np.array([[0.0 + 0.0j, 1.0 + 0.0j]])
-one_state = b_one.T @ b_one
+# Density matrices of single-qubit basis states
+ZERO_STATE = np.diag([1.0 + 0.0j, 0.0 + 0.0j])
+ONE_STATE = np.diag([0.0 + 0.0j, 1.0 + 0.0j])
 
 # F_LOCAL_MAP is based on local Pauli fidelity of qubit i
 # f_b_i = <<b_i|U_i|P_z^b_i>>
 # s.t. f_0 = U_11U_11^* + U_12U_12^*, f_1 = U_21U_21^* + U_22U_22^*
-p_z = cirq.Z._unitary_()
 F_LOCAL_MAP = {
     "0X": 0.0,
     "0Y": 0.0,
@@ -51,7 +48,7 @@ F_LOCAL_MAP = {
 
 """
 The following functions are used in the classical post-processing
-of calibration
+of calibration stage.
 """
 
 
@@ -61,8 +58,14 @@ def get_single_shot_pauli_fidelity(
     locality: Optional[int] = None,
 ) -> Dict[str, float]:
     r"""
-    Calculate Pauli fidelity for a single shot measurement of the calibration
-    circuit. The locality is realized on the assumption that the noisy
+    Calculate Pauli fidelity :math:`f_b` for a single shot measurement of the
+    calibration circuit for b= bit_string.
+
+    In the notation of arXiv:2011.09636, this function estimates the
+    coefficient :math:`f_b`, which characterize the (noisy) classical
+    shadow channel.
+
+    The locality is realized on the assumption that the noisy
     channel :math:`\Lambda` is local
     :math:`\Lambda \equiv \bigotimes_i^n\Lambda_i`.
 
@@ -73,14 +76,14 @@ def get_single_shot_pauli_fidelity(
         pauli_string: The local Pauli measurement performed on each qubit.
             e.g.'XY...Z' means perform local X-basis measurement on the
             1st qubit, local Y-basis measurement the 2ed qubit, local Z-basis
-            measurement the last qubit in the circuit,
+            measurement the last qubit in the circuit.
         locality: The locality of the operator, whose expectation value is
             going to be estimated by the classical shadow. e.g. if operator is
             Ising model Hamiltonian with nearist neighbour interacting, then
             locality = 2.
 
     Returns:
-        A dictionary of Pauli fidelity :math:`\{bit_string: \hat{f}_b\}`.
+        A dictionary of Pauli fidelity bit_string: :math:`\{{f}_b\}`.
         If the locality is :math:`w < n`, then derive the output's keys from
         the bit_string. Ensure that the number of 1s in the keys is less
         than or equal to w. The corresponding Pauli fidelity is the product of
@@ -108,23 +111,29 @@ def get_single_shot_pauli_fidelity(
     return f_est
 
 
-def get_pauli_fidelity(
+def get_pauli_fidelities(
     calibration_measurement_outcomes: Tuple[List[str], List[str]],
     k_calibration: int,
     locality: Optional[int] = None,
 ) -> Dict[str, complex]:
     r"""
-    Calculate Pauli fidelity for a perticular
+    Calculate Pauli fidelities for the calibration circuit. In the notation of
+    arXiv:2011.09636, this function estimates the coefficients
+    :math:`f_b`, which characterize the (noisy) classical shadow channel
+    :math:`\mathcal{M}=\sum_b f_b \Pi_b`.
 
     Args:
         calibration_measurement_outcomes: The `random_Pauli_measurement`
             outcomes with circuit :math:`|0\rangle^{\otimes n}`}`
         k_calibration: number of splits in the median of means estimator.
-        locality: The locality of the Pauli twirling calibration.
+        locality: The locality of the operator, whose expectation value is
+            going to be estimated by the classical shadow. e.g. if operator is
+            Ising model Hamiltonian with nearist neighbour interacting, then
+            locality = 2.
 
     Returns:
-        an :math:`2^n`-dimensional array of Pauli fidelity
-        :math:'\hat{f}_m' for :math:`m = \{0,1\}^{n}`
+        an :math:`2^n`-dimensional array of Pauli fidelities
+        :math:`f_b` for :math:`b = \{0,1\}^{n}`
     """
 
     # classical values of random Pauli measurement stored in classical computer
@@ -167,19 +176,6 @@ def get_pauli_fidelity(
         for bitstring, values in means.items()
     }
     return medians
-
-
-# # calculate trace(pi_b-1^{}*pi_b)
-# def get_normalize_factor(
-#         f_est: Dict[str, float],
-# ) -> float:
-#     num_qubits = len(list(f_est.keys())[0])
-#     trace_pi_b = 0.0
-#     for b_list_cal, f in f_est.items():
-#         trace_pi_b += 1 / f * 3 ** b_list_cal.count("1")
-
-#         # get normalize factor of inverse quantum channel
-#     return 10 ** num_qubits / trace_pi_b
 
 
 """
@@ -227,7 +223,6 @@ def classical_snapshot(
                 "twirling calibration."
             )
         elements = []
-        # normalize_factor = get_normalize_factor(f_est)
         # get b_list and f for each calibration measurement
         for b_list_cal, f in f_est.items():
             pi_snapshot_vecter = []
@@ -235,7 +230,7 @@ def classical_snapshot(
                 # get pi for each qubit based on calibration measurement
                 pi = pi_zero if b_1 == "0" else pi_one
                 # get state for each qubit based on shadow measurement
-                state = zero_state if b2 == "0" else one_state
+                state = ZERO_STATE if b2 == "0" else ONE_STATE
                 # get U2 for each qubit based on shadow measurement
                 U2 = PAULI_MAP[u2]
                 pi_snapshot_vecter.append(
@@ -251,10 +246,10 @@ def classical_snapshot(
     else:
         local_rhos = []
         for b, u in zip(b_list_shadow, u_list_shadow):
-            state = zero_state if b == "0" else one_state
+            state = ZERO_STATE if b == "0" else ONE_STATE
             U = PAULI_MAP[u]
             # apply inverse of the quantum channel,get PTM vector rep
-            local_rho = 3.0 * (U.conj().T @ state @ U) - ide
+            local_rho = 3.0 * (U.conj().T @ state @ U) - cirq.I._unitary_()
             local_rhos.append(local_rho)
 
         rho_snapshot = kronecker_product(local_rhos)
@@ -308,9 +303,12 @@ def expectation_estimation_shadow(
     Args:
         measurement_outcomes: A shadow tuple obtained from
             `z_basis_measurement`.
-        observable: Single cirq observable consisting of
+        pauli_str: Single mitiq observable consisting of
             Pauli operators.
         k_shadows: number of splits in the median of means estimator.
+        pauli_twirling_calibration: Whether to use Pauli twirling
+            calibration.
+        f_est: The estimated Pauli fidelities for each calibration
 
     Returns:
         Float corresponding to the estimate of the observable

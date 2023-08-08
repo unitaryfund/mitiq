@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Quantum processing functions for classical shadows."""
-from typing import Tuple, Callable, List, Optional
+from typing import Tuple, Callable, List, Optional, Sequence
 
 import cirq
 import numpy as np
@@ -40,7 +40,7 @@ def get_rotated_circuits(
     circuit: cirq.Circuit,
     pauli_strings: List[str],
     add_measurements: bool = True,
-    qubits: Optional[List[cirq.Qid]] = None,
+    qubits: Optional[Sequence[cirq.Qid]] = None,
 ) -> List[cirq.Circuit]:
     """Returns a list of circuits that are identical to the input circuit,
     except that each one has single-qubit Clifford gates followed by
@@ -51,7 +51,7 @@ def get_rotated_circuits(
         circuit: The circuit to measure.
         pauli_strings: The Pauli strings to measure in each output circuit.
         add_measurements: Whether to add measurement gates to the circuit.
-        qubits: The qubits to measure. If None, all qubits in the circuit
+        qubits: The qubits to measure. If None, all qubits in the circuit.
     Returns:
          The list of circuits with rotation and measurement gates appended.
     """
@@ -84,30 +84,28 @@ def random_pauli_measurement(
     executor: Callable[[cirq.Circuit], MeasurementResult],
     qubits: Optional[List[cirq.Qid]] = None,
 ) -> Tuple[List[str], List[str]]:
-    r"""
-    Given a circuit, perform random Pauli measurements on the circuit and
-    return outcomes. The outcomes are represented as a tuple of two lists of
-    strings.
+    r"""This function performs random Pauli measurements on a given circuit and
+    returns the outcomes. These outcomes are represented as a tuple of two
+    lists of strings.
 
     Args:
-        circuit: Cirq circuit.
-        n_total_measurements: number of snapshots.
-        executor: A callable which runs a circuit and returns a single
+        circuit: A Cirq circuit.
+        n_total_measurements: The number of snapshots.
+        executor: A callable that runs a circuit and returns a single
             bitstring.
-        qubits: The qubits to measure. If None, all qubits in the circuit
+        qubits: The qubits in the circuit to be measured. If None,
+            all qubits in the circuit will be measured.
 
     Warning:
-        The `executor` must return a `MeasurementResult`
-        for a single shot (i.e. a single bitstring).
+        The ``executor`` must return a ``MeasurementResult`` for a single shot,
+        i.e., a single bitstring.
 
     Returns:
-        Tuple of two list of string of length equals to`n_total_meausrements`,
-        where each element in the list is a string, with the following format:
-        strs in the 1st list: Circuit qubits computational basis
-        e.g. "01..":math:`:=|0\rangle|1\rangle..`.
-        strs in the 2ed list: The local Pauli measurement performed on each
-        qubit. e.g."XY.." means perform local X-basis measurement on the
-        1st qubit, local Y-basis measurement the 2ed qubit in the circuit.
+        Tuple containing two lists of strings, each of length equal to
+        ``n_total_measurements``. Strings in the first list are sequences of
+        0's and 1's, which represent qubit measurements outcomes in the
+        computational basis (e.g. "01001"). Strings in the second list are
+        sequences of Pauli-measurement performed on each qubit (e.g. "XZZYY").
     """
 
     qubits = sorted(list(circuit.all_qubits())) if qubits is None else qubits
