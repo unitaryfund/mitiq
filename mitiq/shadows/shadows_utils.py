@@ -18,7 +18,7 @@ import mitiq
 
 from itertools import product
 
-Paulis = [
+PAULIS = [
     cirq.I._unitary_(),
     cirq.X._unitary_(),
     cirq.Y._unitary_(),
@@ -36,7 +36,6 @@ def kronecker_product(matrices: List[NDArray[Any]]) -> NDArray[Any]:
     return result
 
 
-# Input must be a 2x2 matrix, output is a vector of 4 elements
 def operator_ptm_vector_rep(opt: NDArray[Any]) -> NDArray[Any]:
     r"""
     Returns the PTM vector representation
@@ -45,12 +44,12 @@ def operator_ptm_vector_rep(opt: NDArray[Any]) -> NDArray[Any]:
     """
     # vector i-th entry is math:`d^{-1/2}Tr(oP_i)`
     # where P_i is the i-th Pauli matrix
-    assert (
-        len(opt.shape) == 2 and opt.shape[0] == opt.shape[1]
-    ), "Input must be a square matrix"
+    if not (len(opt.shape) == 2 and opt.shape[0] == opt.shape[1]):
+        raise TypeError("Input must be a square matrix")
+
     num_qubits = int(np.log2(opt.shape[0]))
     opt_vec = []
-    for pauli_combination in product(Paulis, repeat=num_qubits):
+    for pauli_combination in product(PAULIS, repeat=num_qubits):
         kron_product = kronecker_product(pauli_combination)
         opt_vec.append(
             np.trace(opt @ kron_product) * np.sqrt(1 / 2**num_qubits)
@@ -68,13 +67,21 @@ def bitstring_to_eigenvalues(bitstring: str) -> List[int]:
     return [1 if b == "0" else -1 for b in bitstring]
 
 
-def create_string(n: int, loc_list: List[int]) -> str:
+def create_string(str_len: int, loc_list: List[int]) -> str:
     """
     This function returns a string of length n with 1s at the locations
     specified by loc_list and 0s elsewhere.
+    e.g. create_string(5, [1,3]) -> '01010'
+    Args:
+        str_len: The length of the string to be created.
+        loc_list: A list of integers specifying the locations of 1s in the
+            string.
+    Returns:
+        A string of length str_len with 1s at the locations specified by
+        loc_list and 0s elsewhere.
     """
     loc_set = set(loc_list)  # Convert list to set for efficient lookups
-    return "".join(map(lambda i: "1" if i in loc_set else "0", range(n)))
+    return "".join(map(lambda i: "1" if i in loc_set else "0", range(str_len)))
 
 
 def n_measurements_tomography_bound(epsilon: float, num_qubits: int) -> int:
