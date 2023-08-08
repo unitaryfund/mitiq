@@ -30,10 +30,10 @@ def test_kronecker_product():
 
 
 def test_operator_ptm_vector_rep():
-    obs = cirq.I._unitary_() / np.sqrt(2)
+    opt = cirq.I._unitary_() / np.sqrt(2)
     expected_result = np.array([1.0, 0.0, 0.0, 0.0])
     np.testing.assert_array_almost_equal(
-        operator_ptm_vector_rep(obs), expected_result
+        operator_ptm_vector_rep(opt), expected_result
     )
 
 
