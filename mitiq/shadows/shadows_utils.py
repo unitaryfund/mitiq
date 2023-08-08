@@ -76,8 +76,9 @@ def create_string(str_len: int, loc_list: List[int]) -> str:
     This function returns a string of length str_len with 1s at the locations
     specified by loc_list and 0s elsewhere.
     """
-    loc_set = set(loc_list)  # Convert list to set for efficient lookups
-    return "".join(map(lambda i: "1" if i in loc_set else "0", range(str_len)))
+    return "".join(
+        map(lambda i: "1" if i in set(loc_list) else "0", range(str_len))
+    )
 
 
 def n_measurements_tomography_bound(epsilon: float, num_qubits: int) -> int:
