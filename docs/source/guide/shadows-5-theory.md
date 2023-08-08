@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# Classical Shadow Protocol and its Robust Estimation
+# How to use Classical Shadow Estimation
 
 Investigating an unknown quantum system's properties is essential in quantum computing. Quantum Tomography enables a thorough classical description of a quantum state but demands exponentially large data and an equal number of experiments. Its alternative, Shadow Tomography, requires fewer computations but presupposes the capacity to perform entangling measurements across various state copies, involving exponentially large quantum operations. This section introduces an efficient alternative that constructs an approximate classical depiction of a quantum state with minimal state measurements.
 

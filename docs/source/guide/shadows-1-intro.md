@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# Utilization of classical shadows in Mitiq
+# How do I use Classical Shadows Estimation?
 
 
 The `mitiq.shadows` module facilitates the application of the classical shadows protocol on quantum circuits, designed for tasks like quantum state tomography or expectation value estimation. In addition this module integrates a robust shadow estimation protocol that's tailored to counteract noise. The primary objective of the classical shadow protocol is to extract information from a quantum state using repeated measurements.

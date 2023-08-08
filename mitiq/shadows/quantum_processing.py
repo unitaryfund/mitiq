@@ -97,14 +97,14 @@ def random_pauli_measurement(
         qubits: The qubits to measure. If None, all qubits in the circuit
 
     Warning:
-        The ``executor`` must return a ``MeasurementResult``
+        The `executor` must return a `MeasurementResult`
         for a single shot (i.e. a single bitstring).
 
     Returns:
         Tuple of two list of string of length equals to`n_total_meausrements`,
         where each element in the list is a string, with the following format:
         strs in the 1st list: Circuit qubits computational basis
-        e.g. :math:`"01..":=|0\rangle|1\rangle..`.
+        e.g. "01..":math:`:=|0\rangle|1\rangle..`.
         strs in the 2ed list: The local Pauli measurement performed on each
         qubit. e.g."XY.." means perform local X-basis measurement on the
         1st qubit, local Y-basis measurement the 2ed qubit in the circuit.
