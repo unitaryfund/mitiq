@@ -5,21 +5,25 @@
 
 """Unit tests for PEC."""
 import warnings
-from typing import List, Optional
 from functools import partial
-import pytest
+from typing import List, Optional
 
-import numpy as np
 import cirq
+import numpy as np
 import pyquil
+import pytest
 import qiskit
 
-from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES, PauliString, Observable
-from mitiq.interface import convert_to_mitiq, convert_from_mitiq, mitiq_cirq
+from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES, Observable, PauliString
+from mitiq.interface import convert_from_mitiq, convert_to_mitiq, mitiq_cirq
 from mitiq.interface.mitiq_cirq import compute_density_matrix
-
-from mitiq.pec import execute_with_pec, NoisyOperation, OperationRepresentation
-from mitiq.pec import mitigate_executor, pec_decorator
+from mitiq.pec import (
+    NoisyOperation,
+    OperationRepresentation,
+    execute_with_pec,
+    mitigate_executor,
+    pec_decorator,
+)
 from mitiq.pec.representations import (
     represent_operations_in_circuit_with_local_depolarizing_noise,
 )

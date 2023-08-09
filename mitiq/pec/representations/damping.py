@@ -4,23 +4,15 @@
 # LICENSE file in the root directory of this source tree.
 """Functions related to representations with amplitude damping noise."""
 
-from typing import List
 from itertools import product
+from typing import List
 
 import numpy as np
 import numpy.typing as npt
-
-from cirq import (
-    Circuit,
-    Z,
-    kraus,
-    AmplitudeDampingChannel,
-    reset,
-)
-
-from mitiq.pec.types import OperationRepresentation, NoisyOperation
+from cirq import AmplitudeDampingChannel, Circuit, Z, kraus, reset
 
 from mitiq.pec.channels import tensor_product
+from mitiq.pec.types import NoisyOperation, OperationRepresentation
 
 
 # TODO: this may be extended to an arbitrary QPROGRAM (GitHub issue gh-702).

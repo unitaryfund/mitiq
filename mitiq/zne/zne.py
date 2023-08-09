@@ -4,10 +4,10 @@
 # LICENSE file in the root directory of this source tree.
 
 """High-level zero-noise extrapolation tools."""
-from typing import Callable, Optional, Union, List
 from functools import wraps
+from typing import Callable, List, Optional, Union
 
-from mitiq import Executor, Observable, QPROGRAM, QuantumResult
+from mitiq import QPROGRAM, Executor, Observable, QuantumResult
 from mitiq.zne.inference import Factory, RichardsonFactory
 from mitiq.zne.scaling import fold_gates_at_random
 

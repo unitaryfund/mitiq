@@ -4,23 +4,23 @@
 # LICENSE file in the root directory of this source tree.
 
 """Unit tests for readout confusion inversion."""
-from typing import List
 from functools import partial
-import numpy as np
-import pytest
+from typing import List
 
 import cirq
+import numpy as np
+import pytest
 from cirq.experiments.single_qubit_readout_calibration_test import (
     NoisySingleQubitReadoutSampler,
 )
 
-from mitiq import MeasurementResult, Executor, Observable, PauliString
+from mitiq import Executor, MeasurementResult, Observable, PauliString
+from mitiq.interface.mitiq_cirq import sample_bitstrings
+from mitiq.raw import execute as raw_execute
+from mitiq.rem import execute_with_rem, mitigate_executor, rem_decorator
 from mitiq.rem.inverse_confusion_matrix import (
     generate_inverse_confusion_matrix,
 )
-from mitiq.rem import execute_with_rem, mitigate_executor, rem_decorator
-from mitiq.raw import execute as raw_execute
-from mitiq.interface.mitiq_cirq import sample_bitstrings
 
 # Default qubit register and circuit for unit tests
 qreg = [cirq.LineQubit(i) for i in range(2)]

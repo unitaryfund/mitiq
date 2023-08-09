@@ -4,21 +4,20 @@
 # LICENSE file in the root directory of this source tree.
 
 """Types used in probabilistic error cancellation."""
+import warnings
 from copy import deepcopy
 from typing import Any, List, Optional, Tuple, Union
-import warnings
-
-import numpy as np
-import numpy.typing as npt
 
 import cirq
+import numpy as np
+import numpy.typing as npt
 from cirq.value.linear_dict import _format_coefficient
 
 from mitiq import QPROGRAM
 from mitiq.interface import (
-    convert_to_mitiq,
     CircuitConversionError,
     UnsupportedCircuitError,
+    convert_to_mitiq,
 )
 
 

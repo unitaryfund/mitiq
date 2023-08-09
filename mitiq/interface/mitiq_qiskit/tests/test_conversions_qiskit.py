@@ -6,26 +6,25 @@
 """Unit tests for conversions between Mitiq circuits and Qiskit circuits."""
 import copy
 
+import cirq
 import numpy as np
 import pytest
-
-import cirq
 import qiskit
 
-from mitiq.utils import _equal
+from mitiq.interface import convert_to_mitiq
 from mitiq.interface.mitiq_qiskit.conversions import (
-    to_qasm,
-    to_qiskit,
+    _add_identity_to_idle,
+    _map_bit_index,
+    _measurement_order,
+    _remove_identity_from_idle,
+    _remove_qasm_barriers,
+    _transform_registers,
     from_qasm,
     from_qiskit,
-    _map_bit_index,
-    _transform_registers,
-    _measurement_order,
-    _remove_qasm_barriers,
-    _add_identity_to_idle,
-    _remove_identity_from_idle,
+    to_qasm,
+    to_qiskit,
 )
-from mitiq.interface import convert_to_mitiq
+from mitiq.utils import _equal
 
 
 def _multi_reg_circuits():

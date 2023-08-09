@@ -7,17 +7,15 @@
 Qiskit's circuit representation.
 """
 import copy
-from typing import List, Optional, Tuple, Any, Set
 import re
-
-import numpy as np
+from typing import Any, List, Optional, Set, Tuple
 
 import cirq
-from cirq.contrib.qasm_import import circuit_from_qasm
+import numpy as np
 import qiskit
+from cirq.contrib.qasm_import import circuit_from_qasm
 
 from mitiq.utils import _simplify_circuit_exponents
-
 
 QASMType = str
 

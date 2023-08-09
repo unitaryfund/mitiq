@@ -4,20 +4,19 @@
 # LICENSE file in the root directory of this source tree.
 
 """Functions for mapping circuits to (near) Clifford circuits."""
-from typing import List, Optional, Sequence, Union, Any, cast
-
-import numpy as np
+from typing import Any, List, Optional, Sequence, Union, cast
 
 import cirq
+import numpy as np
 from cirq.circuits import Circuit
 
-from mitiq.interface import atomic_one_to_many_converter
 from mitiq.cdr.clifford_utils import (
     angle_to_proximity,
     closest_clifford,
-    random_clifford,
     probabilistic_angle_to_clifford,
+    random_clifford,
 )
+from mitiq.interface import atomic_one_to_many_converter
 
 
 @atomic_one_to_many_converter

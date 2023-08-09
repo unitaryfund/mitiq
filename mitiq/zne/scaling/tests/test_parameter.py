@@ -6,19 +6,18 @@
 """Unit tests for parameter scaling."""
 from copy import deepcopy
 
-import pytest
 import numpy as np
-from cirq import Circuit, LineQubit, ops, CSWAP, ZPowGate
-
+import pytest
+from cirq import CSWAP, Circuit, LineQubit, ZPowGate, ops
 
 from mitiq.utils import _equal
 from mitiq.zne.scaling.parameter import (
-    scale_parameters,
-    _get_base_gate,
     CircuitMismatchException,
     GateTypeException,
     _generate_parameter_calibration_circuit,
+    _get_base_gate,
     compute_parameter_variance,
+    scale_parameters,
 )
 
 

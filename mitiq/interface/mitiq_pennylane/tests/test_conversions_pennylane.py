@@ -5,16 +5,15 @@
 
 """Unit tests for Pennylane <-> Cirq conversions."""
 
-import pytest
-import numpy as np
-
 import cirq
+import numpy as np
 import pennylane as qml
+import pytest
 
 from mitiq.interface.mitiq_pennylane import (
+    UnsupportedQuantumTapeError,
     from_pennylane,
     to_pennylane,
-    UnsupportedQuantumTapeError,
 )
 from mitiq.utils import _equal
 

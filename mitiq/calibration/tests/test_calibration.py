@@ -5,39 +5,35 @@
 
 """Tests for the Clifford data regression top-level API."""
 from functools import partial
-import pytest
 
 import cirq
 import numpy as np
+import pytest
 
-from mitiq import Executor, MeasurementResult, SUPPORTED_PROGRAM_TYPES
+from mitiq import SUPPORTED_PROGRAM_TYPES, Executor, MeasurementResult
 from mitiq.benchmarks import generate_rb_circuits
-from mitiq.calibration import (
-    Calibrator,
-    Settings,
-    execute_with_mitigation,
-)
+from mitiq.calibration import Calibrator, Settings, execute_with_mitigation
 from mitiq.calibration.calibrator import (
     PEC_TABLE_HEADER_STR,
     ZNE_TABLE_HEADER_STR,
-    convert_to_expval_executor,
     ExperimentResults,
     MissingResultsError,
+    convert_to_expval_executor,
 )
 from mitiq.calibration.settings import (
+    BenchmarkProblem,
+    MitigationTechnique,
     PECSettings,
     Strategy,
-    MitigationTechnique,
-    BenchmarkProblem,
     ZNESettings,
+)
+from mitiq.interface import convert_to_mitiq
+from mitiq.pec.representations import (
+    represent_operation_with_local_biased_noise,
+    represent_operation_with_local_depolarizing_noise,
 )
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import fold_global
-from mitiq.interface import convert_to_mitiq
-from mitiq.pec.representations import (
-    represent_operation_with_local_depolarizing_noise,
-    represent_operation_with_local_biased_noise,
-)
 
 light_zne_settings = Settings(
     [

@@ -4,20 +4,32 @@
 # LICENSE file in the root directory of this source tree.
 
 """Unit tests for zero-noise extrapolation."""
-from typing import List
 import functools
-import pytest
+from typing import List
 
-import numpy as np
 import cirq
+import numpy as np
+import pytest
 import qiskit
 from qiskit_aer import AerSimulator
 
+from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
+from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
+from mitiq.interface import accept_any_qprogram_as_input, convert_from_mitiq
+from mitiq.interface.mitiq_cirq import (
+    compute_density_matrix,
+    sample_bitstrings,
+)
+from mitiq.interface.mitiq_qiskit import (
+    execute_with_shots_and_noise,
+    initialized_depolarizing_noise,
+)
+from mitiq.observable import Observable, PauliString
 from mitiq.zne import (
-    inference,
-    scaling,
     execute_with_zne,
+    inference,
     mitigate_executor,
+    scaling,
     zne_decorator,
 )
 from mitiq.zne.inference import (
@@ -27,27 +39,12 @@ from mitiq.zne.inference import (
     RichardsonFactory,
 )
 from mitiq.zne.scaling import (
+    fold_gates_at_random,
     fold_gates_from_left,
     fold_gates_from_right,
-    fold_gates_at_random,
+    get_layer_folding,
     insert_id_layers,
 )
-from mitiq.zne.scaling import get_layer_folding
-from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
-from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
-
-from mitiq.interface.mitiq_qiskit import (
-    execute_with_shots_and_noise,
-    initialized_depolarizing_noise,
-)
-
-from mitiq.interface import convert_from_mitiq, accept_any_qprogram_as_input
-from mitiq.interface.mitiq_cirq import (
-    sample_bitstrings,
-    compute_density_matrix,
-)
-from mitiq.observable import Observable, PauliString
-
 
 BASE_NOISE = 0.007
 TEST_DEPTH = 30

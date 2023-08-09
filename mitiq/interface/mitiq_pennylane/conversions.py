@@ -8,14 +8,13 @@ Pennylane's circuit representation.
 """
 
 from cirq import Circuit
-
-from pennylane.wires import Wires
-from pennylane.tape import QuantumTape
 from pennylane import from_qasm as pennylane_from_qasm
+from pennylane.tape import QuantumTape
+from pennylane.wires import Wires
 from pennylane_qiskit.qiskit_device import QISKIT_OPERATION_MAP
 
-from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm, to_qasm
-
+from mitiq.interface.mitiq_qiskit import from_qasm as cirq_from_qasm
+from mitiq.interface.mitiq_qiskit import to_qasm
 
 SUPPORTED_PL = set(QISKIT_OPERATION_MAP.keys())
 UNSUPPORTED = {"CRX", "CRY", "CRZ", "S", "T"}

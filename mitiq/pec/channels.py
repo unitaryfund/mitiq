@@ -9,19 +9,12 @@
 
 """Utilities for manipulating matrix representations of quantum channels."""
 
-from typing import List
 from copy import deepcopy
+from typing import List
+
 import numpy as np
 import numpy.typing as npt
-
-from cirq import (
-    Circuit,
-    OP_TREE,
-    H,
-    CNOT,
-    LineQubit,
-    DensityMatrixSimulator,
-)
+from cirq import CNOT, OP_TREE, Circuit, DensityMatrixSimulator, H, LineQubit
 
 
 def _max_ent_state_circuit(num_qubits: int) -> Circuit:

@@ -5,37 +5,37 @@
 
 """Tests for utility functions."""
 from copy import deepcopy
-import pytest
 
-import numpy as np
 import cirq
+import numpy as np
+import pytest
 from cirq import (
-    LineQubit,
+    CNOT,
     Circuit,
     ControlledGate,
+    H,
+    LineQubit,
+    MeasurementGate,
+    S,
+    T,
     X,
     Y,
     Z,
-    H,
-    CNOT,
-    S,
-    T,
-    MeasurementGate,
-    ops,
     depolarize,
+    ops,
 )
 
 from mitiq.utils import (
     _append_measurements,
     _are_close_dict,
+    _circuit_to_choi,
     _equal,
     _is_measurement,
-    _simplify_gate_exponent,
-    _simplify_circuit_exponents,
     _max_ent_state_circuit,
-    _circuit_to_choi,
     _operation_to_choi,
     _pop_measurements,
+    _simplify_circuit_exponents,
+    _simplify_gate_exponent,
 )
 
 
