@@ -77,9 +77,9 @@ def get_single_shot_pauli_fidelity(
             1st qubit, local Y-basis measurement the 2ed qubit, local Z-basis
             measurement the last qubit in the circuit.
         locality: The locality of the operator, whose expectation value is
-            going to be estimated by the classical shadow. e.g. if operator is
-            Ising model Hamiltonian with nearist neighbour interacting, then
-            locality = 2.
+            going to be estimated by the classical shadow. E.g., if the
+            operator is the Ising model Hamiltonian with nearest neighbor
+            interactions, then locality = 2.
 
     Returns:
         A dictionary of Pauli fidelity bit_string: :math:`\{{f}_b\}`.
