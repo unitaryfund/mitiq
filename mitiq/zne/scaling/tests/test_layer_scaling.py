@@ -4,11 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 
 """Unit tests for scaling by layer."""
-from cirq import (
-    Circuit,
-    LineQubit,
-    ops,
-)
+from cirq import Circuit, LineQubit, ops
+
 from mitiq.zne.scaling import layer_folding
 
 

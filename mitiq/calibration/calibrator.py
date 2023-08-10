@@ -3,11 +3,12 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-from typing import Callable, Dict, Optional, Union, cast, Sequence
 import warnings
+from typing import Callable, Dict, Optional, Sequence, Union, cast
+
+import cirq
 import numpy as np
 import numpy.typing as npt
-import cirq
 
 from mitiq import (
     QPROGRAM,
@@ -17,11 +18,11 @@ from mitiq import (
     QuantumResult,
 )
 from mitiq.calibration.settings import (
-    Settings,
-    ZNESettings,
-    Strategy,
     BenchmarkProblem,
     MitigationTechnique,
+    Settings,
+    Strategy,
+    ZNESettings,
 )
 from mitiq.interface import convert_from_mitiq
 

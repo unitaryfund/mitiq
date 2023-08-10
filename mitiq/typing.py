@@ -13,16 +13,13 @@
        a quantum program from which expectation values to be mitigated can be
        computed. Note this includes expectation values themselves.
 """
+from collections import Counter
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, Union, Sequence, Dict, Any
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import numpy.typing as npt
-
 from cirq import Circuit as _Circuit
-
-from collections import Counter
-
 
 # Supported quantum programs.
 SUPPORTED_PROGRAM_TYPES = {

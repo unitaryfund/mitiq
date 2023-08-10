@@ -5,30 +5,29 @@
 
 """Tests related to the functions contained in `mitiq.pec.channels`."""
 
-from pytest import raises
 import numpy as np
 from cirq import (
-    LineQubit,
-    depolarize,
-    Circuit,
-    kraus,
     AmplitudeDampingChannel,
+    Circuit,
+    LineQubit,
     Y,
+    depolarize,
+    kraus,
 )
+from pytest import raises
 
 from mitiq.pec.channels import (
+    _circuit_to_choi,
     _max_ent_state_circuit,
     _operation_to_choi,
-    _circuit_to_choi,
-    vector_to_matrix,
-    matrix_to_vector,
-    kraus_to_super,
     choi_to_super,
-    super_to_choi,
     kraus_to_choi,
+    kraus_to_super,
+    matrix_to_vector,
+    super_to_choi,
     tensor_product,
+    vector_to_matrix,
 )
-
 from mitiq.pec.representations.damping import amplitude_damping_kraus
 
 

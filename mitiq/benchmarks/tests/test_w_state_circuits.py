@@ -5,16 +5,13 @@
 
 """Tests for W-state benchmarking circuits."""
 
-import pytest
-import numpy as np
 import cirq
+import numpy as np
+import pytest
 
-from mitiq.utils import _equal
-
-from mitiq.benchmarks.w_state_circuits import (
-    generate_w_circuit,
-)
 from mitiq import SUPPORTED_PROGRAM_TYPES
+from mitiq.benchmarks.w_state_circuits import generate_w_circuit
+from mitiq.utils import _equal
 
 
 def test_bad_qubit_number():

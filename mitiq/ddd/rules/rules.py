@@ -6,19 +6,20 @@
 """Built-in rules determining what DDD sequence should be applied in a given
 slack window.
 """
+from itertools import cycle
+from typing import List
+
+import numpy as np
 from cirq import (
     Circuit,
-    X,
-    Y,
+    Gate,
     I,
     LineQubit,
-    Gate,
-    unitary,
+    X,
+    Y,
     allclose_up_to_global_phase,
+    unitary,
 )
-from typing import List
-from itertools import cycle
-import numpy as np
 
 
 def general_rule(

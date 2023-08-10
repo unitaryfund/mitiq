@@ -11,17 +11,15 @@ Tests below check that generate_quantum_volume_circuit() works as a wrapper and
 fits with Mitiq's interface.
 """
 
-import pytest
-
 import cirq
+import pytest
 from cirq import protocols
 
-from mitiq.benchmarks.quantum_volume_circuits import (
-    generate_quantum_volume_circuit,
-    compute_heavy_bitstrings,
-)
-
 from mitiq import SUPPORTED_PROGRAM_TYPES
+from mitiq.benchmarks.quantum_volume_circuits import (
+    compute_heavy_bitstrings,
+    generate_quantum_volume_circuit,
+)
 
 
 def test_generate_model_circuit_no_seed():

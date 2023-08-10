@@ -5,18 +5,16 @@
 
 """Functions for layer-wise unitary folding on supported circuits."""
 from copy import deepcopy
-import numpy as np
 from typing import Callable, List
+
 import cirq
+import numpy as np
 from cirq import Moment, inverse
 
 from mitiq import QPROGRAM
-from mitiq.zne.scaling.folding import _check_foldable
 from mitiq.interface import noise_scaling_converter
-from mitiq.utils import (
-    _append_measurements,
-    _pop_measurements,
-)
+from mitiq.utils import _append_measurements, _pop_measurements
+from mitiq.zne.scaling.folding import _check_foldable
 
 
 @noise_scaling_converter

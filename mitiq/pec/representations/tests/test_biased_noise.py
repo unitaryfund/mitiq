@@ -10,25 +10,23 @@ from cirq import (
     CNOT,
     CZ,
     ISWAP,
+    SWAP,
+    Circuit,
+    Gate,
+    H,
     I,
+    LineQubit,
     X,
     Y,
     Z,
-    H,
-    SWAP,
-    Gate,
-    LineQubit,
-    Circuit,
     ops,
     unitary,
 )
 
-
+from mitiq.pec.channels import _circuit_to_choi, _operation_to_choi
 from mitiq.pec.representations.biased_noise import (
     represent_operation_with_local_biased_noise,
 )
-
-from mitiq.pec.channels import _operation_to_choi, _circuit_to_choi
 
 
 def single_qubit_biased_noise_overhead(epsilon: float, eta: float) -> float:

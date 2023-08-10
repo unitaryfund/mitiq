@@ -6,21 +6,23 @@
 """Tests for the Quantum Subspace Expansion top level API."""
 
 from typing import List
-import numpy as np
+
 import cirq
-from mitiq import PauliString, Observable, QPROGRAM
+import numpy as np
+
+from mitiq import QPROGRAM, Observable, PauliString
+from mitiq.interface import convert_to_mitiq
+from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.qse import (
-    get_projector,
     execute_with_qse,
+    get_projector,
     mitigate_executor,
     qse_decorator,
 )
 from mitiq.qse.qse_utils import (
-    _compute_overlap_matrix,
     _compute_hamiltonian_overlap_matrix,
+    _compute_overlap_matrix,
 )
-from mitiq.interface import convert_to_mitiq
-from mitiq.interface.mitiq_cirq import compute_density_matrix
 
 
 def execute_with_depolarized_noise(circuit: QPROGRAM) -> np.ndarray:

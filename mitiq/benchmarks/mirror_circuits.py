@@ -8,14 +8,13 @@
 (with error mitigation)."""
 from typing import List, Optional, Tuple
 
-from numpy import random
-import networkx as nx
-
 import cirq
+import networkx as nx
 from cirq.experiments.qubit_characterizations import _single_qubit_cliffords
-from mitiq.interface import convert_from_mitiq
-from mitiq import QPROGRAM, Bitstring
+from numpy import random
 
+from mitiq import QPROGRAM, Bitstring
+from mitiq.interface import convert_from_mitiq
 
 single_q_cliffords = _single_qubit_cliffords()
 cliffords = single_q_cliffords.c1_in_xy

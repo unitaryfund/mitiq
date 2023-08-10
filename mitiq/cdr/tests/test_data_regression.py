@@ -4,8 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 
 """Tests for the data regression portion of Clifford data regression."""
-import pytest
 import numpy as np
+import pytest
 
 from mitiq.cdr.data_regression import linear_fit_function
 

@@ -4,12 +4,12 @@
 # LICENSE file in the root directory of this source tree.
 
 """Functions for local and global unitary folding on supported circuits."""
+import warnings
 from copy import deepcopy
 from typing import Any, Dict, FrozenSet, List, Optional, cast
-import warnings
 
 import numpy as np
-from cirq import Circuit, InsertStrategy, inverse, ops, has_unitary, Moment
+from cirq import Circuit, InsertStrategy, Moment, has_unitary, inverse, ops
 
 from mitiq.interface import noise_scaling_converter
 from mitiq.utils import (
