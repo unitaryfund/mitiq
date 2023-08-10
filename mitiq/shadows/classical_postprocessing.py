@@ -70,8 +70,8 @@ def get_single_shot_pauli_fidelity(
     :math:`\Lambda \equiv \bigotimes_i^n\Lambda_i`.
 
     Args:
-        bit_string: Circuit qubits computational basis of length n equals to
-            the number of qubits in the circuit. e.g. bit_string =
+        bit_string: Bitstring associated to a computational state of length n
+            equals to the number of qubits in the circuit. e.g. bit_string =
             '01...0':math:`:=|0\rangle|1\rangle...|0\rangle`.
         pauli_string: The local Pauli measurement performed on each qubit.
             e.g.'XY...Z' means perform local X-basis measurement on the
@@ -124,7 +124,7 @@ def get_pauli_fidelities(
 
     Args:
         calibration_measurement_outcomes: The `random_Pauli_measurement`
-            outcomes with circuit :math:`|0\rangle^{\otimes n}`}`
+            outcomes for the state :math:`|0\rangle^{\otimes n}`}`
         k_calibration: number of splits in the median of means estimator.
         locality: The locality of the operator, whose expectation value is
             going to be estimated by the classical shadow. e.g. if operator is
@@ -182,13 +182,6 @@ def get_pauli_fidelities(
 The following functions are used in the classical post-processing of
 classical shadows.
 """
-# ptm rep of identity
-I_ptm = operator_ptm_vector_rep(np.eye(2) / np.sqrt(2))
-# define projections Pi_0 and Pi_1
-pi_zero = np.outer(I_ptm, I_ptm)
-pi_one = np.eye(4) - pi_zero
-pi_zero = np.diag(pi_zero)
-pi_one = np.diag(pi_one)
 
 
 def classical_snapshot(
@@ -216,6 +209,14 @@ def classical_snapshot(
         Reconstructed classical snapshot in terms of nparray.
     """
     # calibrate the noisy quantum channel, output in PTM rep.
+    # ptm rep of identity
+    I_ptm = operator_ptm_vector_rep(np.eye(2) / np.sqrt(2))
+    # define projections Pi_0 and Pi_1
+    pi_zero = np.outer(I_ptm, I_ptm)
+    pi_one = np.eye(4) - pi_zero
+    pi_zero = np.diag(pi_zero)
+    pi_one = np.diag(pi_one)
+
     if pauli_twirling_calibration:
         if f_est is None:
             raise ValueError(
@@ -265,14 +266,17 @@ def shadow_state_reconstruction(
 
     Args:
         shadow_measurement_outcomes: Measurement result and the basis
-            performing the measurement obtained from
+            performing the measurement obtained from `random_pauli_measurement`
+            for classical shadow protocol.
+        shadow_measurement_outcomes: Measurement results obtained from
             `random_pauli_measurement` for classical shadow protocol.
         pauli_twirling_calibration: Whether to use Pauli twirling
             calibration.
         f_est: The estimated Pauli fidelity for each calibration
     Returns:
-        Numpy array with the reconstructed state.
+        The state reconstructed from classical shadow protocol
     """
+
     # classical values of random Pauli measurement stored in classical computer
     b_lists_shadow, u_lists_shadow = shadow_measurement_outcomes
 
