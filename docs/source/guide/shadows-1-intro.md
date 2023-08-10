@@ -92,7 +92,7 @@ from mitiq import MeasurementResult
 def cirq_executor(
     circuit: cirq.Circuit,
     noise_model_function=cirq.depolarize,
-    noise_level=(0.2,),
+    noise_level=(0.1,),
     sampler=cirq.Simulator(),
 ) -> MeasurementResult:
     """

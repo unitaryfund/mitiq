@@ -141,7 +141,7 @@ The Pauli fidelity for local Clifford group is:
 \begin{equation}
 \hat{f}^{(r)}_b = \prod_{i=1}^n \langle\!\langle b_i|\mathcal{U}_i|P_z^{b_i}\rangle\!\rangle
 \end{equation}
-Final estimation is achieved using the median of means estimator. See `get_single_shot_pauli_fidelity` and `mitiq.shadows.classical_postprocessing.get_pauli_fidelity` for implementation.
+Final estimation is achieved using the median of means estimator. See `get_single_shot_pauli_fidelity` and `mitiq.shadows.classical_postprocessing.get_pauli_fidelities` for implementation.
 
 ### 2.3 Noiseless Pauli Fidelity:
 In the ideal noise-free scenario, Pauli fidelity is:
