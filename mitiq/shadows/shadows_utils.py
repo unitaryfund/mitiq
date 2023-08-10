@@ -8,12 +8,103 @@
 # LICENSE file in the root directory of this source tree.
 
 """Defines utility functions for classical shadows protocol."""
-from typing import List, Tuple
+from typing import Tuple, List, Any
 
 import numpy as np
 from numpy.typing import NDArray
-
+import cirq
+from scipy.linalg import sqrtm
 import mitiq
+
+from itertools import product
+
+PAULIS = [
+    cirq.I._unitary_(),
+    cirq.X._unitary_(),
+    cirq.Y._unitary_(),
+    cirq.Z._unitary_(),
+]
+
+
+def kronecker_product(matrices: List[NDArray[Any]]) -> NDArray[Any]:
+    """
+    Returns the Kronecker product of a list of matrices.
+    Args:
+        matrices: A list of matrices.
+    Returns:
+        The Kronecker product of the matrices in the list.
+    """
+    result = matrices[0]
+    for matrix in matrices[1:]:
+        result = np.kron(result, matrix)
+    return result
+
+
+def operator_ptm_vector_rep(opt: NDArray[Any]) -> NDArray[Any]:
+    r"""
+    Returns the PTM vector representation of an operator.
+    :math:`\mathcal{L}(\mathcal{H}_{2^n})\ni \mathtt{opt}\rightarrow
+    |\mathtt{opt}\rangle\!\rangle\in \mathcal{H}_{4^n}`.
+
+    Args:
+        opt: A square matrix representing an operator.
+    Returns:
+        A Pauli transfer matrix (PTM) representation of the operator.
+    """
+    # vector i-th entry is math:`d^{-1/2}Tr(oP_i)`
+    # where P_i is the i-th Pauli matrix
+    if not (len(opt.shape) == 2 and opt.shape[0] == opt.shape[1]):
+        raise TypeError("Input must be a square matrix")
+    num_qubits = int(np.log2(opt.shape[0]))
+    opt_vec = []
+    for pauli_combination in product(PAULIS, repeat=num_qubits):
+        kron_product = kronecker_product(pauli_combination)
+        opt_vec.append(
+            np.trace(opt @ kron_product) * np.sqrt(1 / 2**num_qubits)
+        )
+    return np.array(opt_vec)
+
+
+def eigenvalues_to_bitstring(values: List[int]) -> str:
+    """Converts eigenvalues to bitstring. e.g., [-1,1,1] -> '100'
+
+    Args:
+        values: A list of eigenvalues.
+    Returns:
+        A string of 1s and 0s corresponding to the states associated to
+            eigenvalues.
+    """
+    return "".join(["1" if v == -1 else "0" for v in values])
+
+
+def bitstring_to_eigenvalues(bitstring: str) -> List[int]:
+    """Converts bitstring to eigenvalues. e.g., '100' -> [-1,1,1]
+
+    Args:
+        bitstring: A string of 1s and 0s.
+    Returns:
+        A list of eigenvalues corresponding to the bitstring.
+    """
+    return [1 if b == "0" else -1 for b in bitstring]
+
+
+def create_string(str_len: int, loc_list: List[int]) -> str:
+    """
+    This function returns a string of length str_len with 1s at the locations
+    specified by loc_list and 0s elsewhere.
+
+    Args:
+        str_len: The length of the string.
+        loc_list: A list of integers specifying the locations of 1s in the
+            string.
+    Returns:
+        A string of length str_len with 1s at the locations specified by
+        loc_list and 0s elsewhere.
+        e.g. if str_len = 5, loc_list = [1,3], return '01010'
+    """
+    return "".join(
+        map(lambda i: "1" if i in set(loc_list) else "0", range(str_len))
+    )
 
 
 def n_measurements_tomography_bound(epsilon: float, num_qubits: int) -> int:
@@ -38,8 +129,7 @@ def local_clifford_shadow_norm(obs: mitiq.PauliString) -> float:
     Clifford group.
 
     Args:
-        obs: An observable in terms of a ``mitiq.PauliString`` object.
-
+        obs: A self-adjoint operator, i.e. mitiq.PauliString with real coffe.
     Returns:
         Shadow norm when unitary ensemble is local Clifford group.
     """
@@ -88,16 +178,27 @@ def n_measurements_opts_expectation_bound(
 
 
 def fidelity(
-    state_vector: NDArray[np.complex64],
+    sigma: NDArray[np.complex64],
     rho: NDArray[np.complex64],
 ) -> float:
     """
-    Calculate the fidelity between a state vector and a density matrix.
+    Calculate the fidelity between two states.
+
     Args:
-        state_vector: The vector whose norm we want to calculate.
-        rho: The operator whose norm we want to calculate.
+        sigma: A state in terms of square matrix or vector.
+        rho: A state in terms square matrix or vector.
 
     Returns:
         Scalar corresponding to the fidelity.
     """
-    return np.reshape(state_vector.conj().T @ rho @ state_vector, -1).real[0]
+    if sigma.ndim == 1 and rho.ndim == 1:
+        val = np.abs(np.dot(sigma.conj(), rho)) ** 2.0
+    elif sigma.ndim == 1 and rho.ndim == 2:
+        val = np.abs(sigma.conj().T @ rho @ sigma)
+    elif sigma.ndim == 2 and rho.ndim == 1:
+        val = np.abs(rho.conj().T @ sigma @ rho)
+    elif sigma.ndim == 2 and rho.ndim == 2:
+        val = np.abs(np.trace(sqrtm(sigma) @ rho @ sqrtm(sigma)))
+    else:
+        raise ValueError("Invalid input dimensions")
+    return float(val)
