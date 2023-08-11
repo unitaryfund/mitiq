@@ -48,7 +48,7 @@ F_LOCAL_MAP = {
 
 """
 The following functions are used in the classical post-processing
-of calibration stage.
+of calibration
 """
 
 
