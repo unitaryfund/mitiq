@@ -4,7 +4,16 @@
 # LICENSE file in the root directory of this source tree.
 """Classical shadow estimation for quantum circuits. Based on the paper"""
 
-from typing import Optional, Callable, List, Dict, Any, Tuple, Union, Mapping
+from typing import (
+    Optional,
+    Callable,
+    List,
+    Dict,
+    Any,
+    Tuple,
+    Union,
+    Mapping,
+)
 
 import cirq
 import numpy as np
@@ -21,18 +30,24 @@ from mitiq.shadows.classical_postprocessing import (
 
 
 def pauli_twirling_calibrate(
+    k_calibration: int = 1,
+    locality: Optional[int] = None,
     zero_state_shadow_outcomes: Optional[Tuple[List[str], List[str]]] = None,
     qubits: Optional[List[cirq.Qid]] = None,
     executor: Optional[Callable[[cirq.Circuit], MeasurementResult]] = None,
     num_total_measurements_calibration: Optional[int] = 20000,
-    k_calibration: int = 1,
-    locality: Optional[int] = None,
 ) -> Dict[str, complex]:
     r"""
     This function returns the dictionary of the median of means estimation
     of Pauli fidelities: {:math:`\{'b':f_{b}\}_{b\in\{0,1\}^n}`}.
 
     Args:
+        k_calibration: Number of groups of "median of means" used for
+            calibration.
+        locality: The locality of the operator, whose expectation value is
+            going to be estimated by the classical shadow. e.g. if operator is
+            Ising model Hamiltonian with nearist neighbour interacting, then
+            locality = 2.
         zero_state_shadow_outcomes: The output of function
             `shadow_quantum_processing` of zero calibrate state.
         qubits: The qubits to measure, needs to spercify when the
@@ -43,12 +58,7 @@ def pauli_twirling_calibrate(
         num_total_measurements_calibration: Number of shots per group of
             "median of means" used for calibration. Needs to spercify when
             the `zero_state_shadow_outcomes` is None.
-        k_calibration: Number of groups of "median of means" used for
-            calibration.
-        locality: The locality of the operator, whose expectation value is
-            going to be estimated by the classical shadow. e.g. if operator is
-            Ising model Hamiltonian with nearist neighbour interacting, then
-            locality = 2.
+
     Returns:
         A dictionary containing the calibration outcomes.
     """
@@ -97,6 +107,7 @@ def shadow_quantum_processing(
         num_total_measurements_shadow: Total number of shots for shadow
             estimation.
         random_seed: The random seed to use for the shadow measurements.
+        qubits: The qubits to measure.
 
     Returns:
         A dictionary containing the bit strings, the Pauli strings
