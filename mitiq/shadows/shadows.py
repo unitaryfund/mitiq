@@ -21,24 +21,30 @@ from mitiq.shadows.classical_postprocessing import (
 
 
 def pauli_twirling_calibrate(
-    qubits: List[cirq.Qid],
-    executor: Callable[[cirq.Circuit], MeasurementResult],
-    num_total_measurements_calibration: int = 20000,
+    zero_state_shadow_outcomes: Optional[Tuple[List[str], List[str]]] = None,
+    qubits: Optional[List[cirq.Qid]] = None,
+    executor: Optional[Callable[[cirq.Circuit], MeasurementResult]] = None,
+    num_total_measurements_calibration: Optional[int] = 20000,
     k_calibration: int = 1,
     locality: Optional[int] = None,
 ) -> Dict[str, complex]:
     r"""
     This function returns the dictionary of the median of means estimation
-    of Pauli fidelity: {:math:`\{'b':f_{b}\}_{b\in\{0,1\}^n}`}.
+    of Pauli fidelities: {:math:`\{'b':f_{b}\}_{b\in\{0,1\}^n}`}.
 
     Args:
-        qubits: The qubits to measure.
+        zero_state_shadow_outcomes: The output of function
+            `shadow_quantum_processing` of zero calibrate state.
+        qubits: The qubits to measure, needs to spercify when the
+            `zero_state_shadow_outcomes` is None.
         executor: The function to use to do quantum measurement, must be same
-            as executor in `shadow_quantum_processing`.
+            as executor in `shadow_quantum_processing`. Needs to spercify when
+            the `zero_state_shadow_outcomes` is None.
+        num_total_measurements_calibration: Number of shots per group of
+            "median of means" used for calibration. Needs to spercify when
+            the `zero_state_shadow_outcomes` is None.
         k_calibration: Number of groups of "median of means" used for
             calibration.
-        num_total_measurements_calibration: Number of shots per group of
-            "median of means" used for calibration.
         locality: The locality of the operator, whose expectation value is
             going to be estimated by the classical shadow. e.g. if operator is
             Ising model Hamiltonian with nearist neighbour interacting, then
@@ -46,15 +52,27 @@ def pauli_twirling_calibrate(
     Returns:
         A dictionary containing the calibration outcomes.
     """
-    # calibration circuit is of same qubit number with original circuit
-    zero_circuit = cirq.Circuit()
-    # perform random Pauli measurement one the calibration circuit
-    calibration_measurement_outcomes = random_pauli_measurement(
-        zero_circuit,
-        n_total_measurements=num_total_measurements_calibration,
-        executor=executor,
-        qubits=qubits,
-    )
+    if zero_state_shadow_outcomes is None:
+        if qubits is None:
+            raise ValueError("qubits should not be None.")
+        if executor is None:
+            raise ValueError("executor should not be None.")
+        if num_total_measurements_calibration is None:
+            raise ValueError(
+                "num_total_measurements_calibration should not be None."
+            )
+
+        # calibration circuit is of same qubit number with original circuit
+        zero_circuit = cirq.Circuit()
+        # perform random Pauli measurement one the calibration circuit
+        calibration_measurement_outcomes = random_pauli_measurement(
+            zero_circuit,
+            n_total_measurements=num_total_measurements_calibration,
+            executor=executor,
+            qubits=qubits,
+        )
+    else:
+        calibration_measurement_outcomes = zero_state_shadow_outcomes
     # get the median of means estimation of Pauli fidelities
     return get_pauli_fidelities(
         calibration_measurement_outcomes, k_calibration, locality=locality
@@ -79,12 +97,11 @@ def shadow_quantum_processing(
         num_total_measurements_shadow: Total number of shots for shadow
             estimation.
         random_seed: The random seed to use for the shadow measurements.
-        qubits: The qubits to measure. If None, all qubits in the circuit.
 
     Returns:
         A dictionary containing the bit strings, the Pauli strings
         `bit_strings`: Circuit qubits computational basis
-        e.g. "01..":math:`:=|0\rangle|1\rangle..`.
+        e.g. :math:`"01..":=|0\rangle|1\rangle..`.
         `pauli_strings`: The local Pauli measurement performed on each
         qubit. e.g."XY.." means perform local X-basis measurement on the
         1st qubit, local Y-basis measurement the 2ed qubit in the circuit.

@@ -5,6 +5,8 @@
 
 """Test classical shadow estimation process."""
 
+import pytest
+from unittest.mock import Mock, patch
 import cirq
 
 import mitiq
@@ -44,7 +46,7 @@ def test_pauli_twirling_calibrate():
 
     # Call the function with valid inputs
     result = pauli_twirling_calibrate(
-        qubits, executor, num_total_measurements_calibration=2
+        qubits=qubits, executor=executor, num_total_measurements_calibration=2
     )
 
     # Check that the result is a dictionary
