@@ -6,20 +6,14 @@
 import copy
 from typing import List
 
-from cirq import (
-    Circuit,
-    Operation,
-    X,
-    Y,
-    Z,
-)
+from cirq import Circuit, Operation, X, Y, Z
 
 from mitiq import QPROGRAM
-from mitiq.pec import OperationRepresentation, NoisyOperation
 from mitiq.interface.conversions import (
-    convert_to_mitiq,
     append_cirq_circuit_to_qprogram,
+    convert_to_mitiq,
 )
+from mitiq.pec import NoisyOperation, OperationRepresentation
 
 
 def represent_operation_with_local_biased_noise(

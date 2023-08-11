@@ -9,8 +9,8 @@
 import cirq
 import pytest
 
-from mitiq.benchmarks.mirror_qv_circuits import generate_mirror_qv_circuit
 from mitiq import SUPPORTED_PROGRAM_TYPES
+from mitiq.benchmarks.mirror_qv_circuits import generate_mirror_qv_circuit
 
 
 @pytest.mark.parametrize(

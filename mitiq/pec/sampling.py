@@ -5,16 +5,15 @@
 
 """Tools for sampling from the noisy representations of ideal operations."""
 
-from typing import List, Optional, Tuple, Sequence, Union
-from copy import deepcopy
 import warnings
-
-import numpy as np
+from copy import deepcopy
+from typing import List, Optional, Sequence, Tuple, Union
 
 import cirq
+import numpy as np
 
 from mitiq import QPROGRAM
-from mitiq.interface import convert_to_mitiq, convert_from_mitiq
+from mitiq.interface import convert_from_mitiq, convert_to_mitiq
 from mitiq.pec.types import OperationRepresentation
 from mitiq.utils import _equal
 

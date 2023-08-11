@@ -5,7 +5,6 @@
 
 """Tests for zne.py with PyQuil backend."""
 import numpy as np
-
 import pyquil
 
 from mitiq import benchmarks, zne

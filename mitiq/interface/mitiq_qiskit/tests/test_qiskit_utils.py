@@ -4,22 +4,21 @@
 # LICENSE file in the root directory of this source tree.
 
 """Unit tests for qiskit executors (qiskit_utils.py)."""
-import pytest
 import numpy as np
+import pytest
 from qiskit import QuantumCircuit
 from qiskit.providers.fake_provider import FakeLima
 
+from mitiq import MeasurementResult, Observable, PauliString
 from mitiq.interface.mitiq_qiskit.qiskit_utils import (
+    compute_expectation_value_on_noisy_backend,
     execute,
-    execute_with_shots,
     execute_with_noise,
+    execute_with_shots,
     execute_with_shots_and_noise,
     initialized_depolarizing_noise,
     sample_bitstrings,
-    compute_expectation_value_on_noisy_backend,
 )
-
-from mitiq import Observable, PauliString, MeasurementResult
 
 NOISE = 0.007
 ONE_QUBIT_GS_PROJECTOR = np.array([[1, 0], [0, 0]])

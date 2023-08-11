@@ -4,16 +4,16 @@
 # LICENSE file in the root directory of this source tree.
 
 import copy
-from typing import Callable, cast, List, Optional, Set, Union, Any, Iterable
-
-import numpy as np
-import numpy.typing as npt
-import cirq
-
 from collections import defaultdict
 from numbers import Number
+from typing import Any, Callable, Iterable, List, Optional, Set, Union, cast
+
+import cirq
+import numpy as np
+import numpy.typing as npt
+
+from mitiq import QPROGRAM, MeasurementResult, QuantumResult
 from mitiq.observable.pauli import PauliString, PauliStringCollection
-from mitiq import MeasurementResult, QuantumResult, QPROGRAM
 
 
 class Observable:

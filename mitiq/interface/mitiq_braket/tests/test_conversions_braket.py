@@ -3,16 +3,13 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-import pytest
-import numpy as np
-
-from braket.circuits import (
-    Circuit as BKCircuit,
-    Instruction,
-    gates as braket_gates,
-)
-from cirq import Circuit, LineQubit, ops, protocols, testing
 import cirq_ionq.ionq_native_gates as cirq_ionq_ops
+import numpy as np
+import pytest
+from braket.circuits import Circuit as BKCircuit
+from braket.circuits import Instruction
+from braket.circuits import gates as braket_gates
+from cirq import Circuit, LineQubit, ops, protocols, testing
 
 from mitiq.interface.mitiq_braket.conversions import from_braket, to_braket
 from mitiq.utils import _equal

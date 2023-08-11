@@ -108,11 +108,6 @@ Note: Cirq is a core requirement of Mitiq and is installed when you `pip install
 
 You can use Mitiq with any backend you have access to that can interface with supported frontends.
 
-### Benchmarks
-
-Mitiq uses [`asv`](https://asv.readthedocs.io/en/stable/) to benchmark the core functionalities of the project.
-They are found in the [`benchmarks/`](https://github.com/unitaryfund/mitiq/tree/master/benchmarks) directory and their changes can be seen overtime at https://benchmarks.mitiq.dev/.
-
 ### Citing Mitiq
 
 If you use Mitiq in your research, please reference the [Mitiq whitepaper](https://quantum-journal.org/papers/q-2022-08-11-774/) using the bibtex entry found in [`CITATION.bib`](https://github.com/unitaryfund/mitiq/blob/master/CITATION.bib).

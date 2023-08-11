@@ -7,25 +7,25 @@
 classically generated data.
 """
 from typing import Callable, List
-from pytest import mark, raises, warns
-
-import numpy as np
-from numpy.random import RandomState
 
 import cirq
+import numpy as np
+from cirq import H, LineQubit, X
+from numpy.random import RandomState
+from pytest import mark, raises, warns
+
 from mitiq.zne.inference import (
+    AdaExpFactory,
+    ConvergenceWarning,
+    ExpFactory,
     ExtrapolationError,
     ExtrapolationWarning,
-    ConvergenceWarning,
-    RichardsonFactory,
     FakeNodesFactory,
     LinearFactory,
-    PolyFactory,
-    ExpFactory,
     PolyExpFactory,
-    AdaExpFactory,
+    PolyFactory,
+    RichardsonFactory,
 )
-from cirq import LineQubit, X, H
 
 # Constant parameters for test functions:
 A = 0.5

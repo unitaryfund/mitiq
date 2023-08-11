@@ -5,18 +5,20 @@
 """Functions to calculate parameters for depolarizing noise and biased noise
 models via a learning-based technique."""
 
-from typing import Optional, Dict, Any, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
+
 import numpy as np
 import numpy.typing as npt
 from scipy.optimize import minimize
+
 from mitiq import QPROGRAM, Executor, Observable
 from mitiq.cdr import generate_training_circuits
 from mitiq.pec import execute_with_pec
-from mitiq.pec.representations.depolarizing import (
-    represent_operation_with_local_depolarizing_noise,
-)
 from mitiq.pec.representations.biased_noise import (
     represent_operation_with_local_biased_noise,
+)
+from mitiq.pec.representations.depolarizing import (
+    represent_operation_with_local_depolarizing_noise,
 )
 
 

@@ -4,35 +4,34 @@
 # LICENSE file in the root directory of this source tree.
 
 """Classes corresponding to different zero-noise extrapolation methods."""
+import warnings
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import (
     Any,
     Callable,
-    cast,
     Dict,
     List,
     Optional,
     Sequence,
     Tuple,
     Union,
+    cast,
 )
-import warnings
 
-from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
-from numpy.lib.polynomial import RankWarning
-from scipy.optimize import curve_fit, OptimizeWarning
 from cirq import Circuit
+from matplotlib.figure import Figure
+from numpy.lib.polynomial import RankWarning
+from scipy.optimize import OptimizeWarning, curve_fit
 
 from mitiq import QPROGRAM, QuantumResult
-from mitiq.observable import Observable
 from mitiq.executor import Executor
-from mitiq.zne.scaling import fold_gates_at_random
 from mitiq.interface import accept_any_qprogram_as_input
-
+from mitiq.observable import Observable
+from mitiq.zne.scaling import fold_gates_at_random
 
 ExtrapolationResult = Union[
     float,  # The zero-noise value.

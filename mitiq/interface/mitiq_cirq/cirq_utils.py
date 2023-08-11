@@ -4,11 +4,12 @@
 # LICENSE file in the root directory of this source tree.
 """Cirq utility functions."""
 
-from typing import Tuple, Callable
+from typing import Callable, Tuple
 
+import cirq
 import numpy as np
 import numpy.typing as npt
-import cirq
+
 from mitiq import MeasurementResult
 
 

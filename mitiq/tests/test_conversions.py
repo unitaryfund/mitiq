@@ -5,31 +5,27 @@
 
 """Tests for circuit conversions."""
 
-import pytest
-
-import numpy as np
-
 import cirq
-from pyquil import Program, gates
-import qiskit
-from braket.circuits import (
-    Circuit as BKCircuit,
-    gates as braket_gates,
-    Instruction,
-)
+import numpy as np
 import pennylane as qml
+import pytest
+import qiskit
+from braket.circuits import Circuit as BKCircuit
+from braket.circuits import Instruction
+from braket.circuits import gates as braket_gates
+from pyquil import Program, gates
 
 from mitiq import SUPPORTED_PROGRAM_TYPES
 from mitiq.interface import (
-    convert_to_mitiq,
-    convert_from_mitiq,
+    UnsupportedCircuitError,
     accept_any_qprogram_as_input,
     atomic_one_to_many_converter,
+    convert_from_mitiq,
+    convert_to_mitiq,
     noise_scaling_converter,
     register_mitiq_converters,
-    UnsupportedCircuitError,
 )
-from mitiq.interface.mitiq_qiskit import to_qasm, from_qasm
+from mitiq.interface.mitiq_qiskit import from_qasm, to_qasm
 from mitiq.utils import _equal
 
 QASMType = str

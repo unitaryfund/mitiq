@@ -4,28 +4,23 @@
 # LICENSE file in the root directory of this source tree.
 
 """Tests for the Clifford data regression top-level API."""
-import pytest
-
 from typing import List
 
-import numpy as np
-
 import cirq
+import numpy as np
+import pytest
 from cirq import LineQubit
 
-from mitiq import PauliString, Observable, QPROGRAM
-from mitiq import SUPPORTED_PROGRAM_TYPES
+from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES, Observable, PauliString
 from mitiq.cdr import (
-    execute_with_cdr,
-    linear_fit_function_no_intercept,
-    linear_fit_function,
-    mitigate_executor,
     cdr_decorator,
+    execute_with_cdr,
+    linear_fit_function,
+    linear_fit_function_no_intercept,
+    mitigate_executor,
 )
-
-from mitiq.interface import convert_from_mitiq, convert_to_mitiq
-
 from mitiq.cdr._testing import random_x_z_cnot_circuit
+from mitiq.interface import convert_from_mitiq, convert_to_mitiq
 from mitiq.interface.mitiq_cirq import compute_density_matrix
 
 

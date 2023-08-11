@@ -6,7 +6,7 @@
 """Run experiments without error mitigation."""
 from typing import Callable, Optional, Union
 
-from mitiq import Executor, Observable, QPROGRAM, QuantumResult
+from mitiq import QPROGRAM, Executor, Observable, QuantumResult
 
 
 def execute(

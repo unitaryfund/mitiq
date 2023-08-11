@@ -7,15 +7,15 @@
 from typing import List, Optional
 
 import numpy as np
-
+from cirq import LineQubit
 from cirq.experiments.qubit_characterizations import (
-    _single_qubit_cliffords,
+    _gate_seq_to_mats,
     _random_single_q_clifford,
     _random_two_q_clifford,
-    _gate_seq_to_mats,
+    _single_qubit_cliffords,
     _two_qubit_clifford_matrices,
 )
-from cirq import LineQubit
+
 from mitiq import QPROGRAM
 from mitiq.interface import convert_from_mitiq
 

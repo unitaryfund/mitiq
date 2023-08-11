@@ -4,9 +4,9 @@
 # LICENSE file in the root directory of this source tree.
 
 """Unit tests for measurement results."""
+import numpy as np
 import pytest
 
-import numpy as np
 from mitiq import MeasurementResult
 
 

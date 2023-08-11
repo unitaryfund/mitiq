@@ -6,7 +6,7 @@
 """Tests conversions to/from pyQuil circuits."""
 import numpy as np
 from pyquil import Program
-from pyquil.gates import CNOT, CZ, H, RZ, X, Y, Z
+from pyquil.gates import CNOT, CZ, RZ, H, X, Y, Z
 
 from mitiq.interface.mitiq_pyquil.conversions import from_pyquil, to_pyquil
 

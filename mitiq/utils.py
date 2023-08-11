@@ -7,22 +7,21 @@
 from copy import deepcopy
 from typing import Any, Dict, List, Tuple
 
+import cirq
 import numpy as np
 import numpy.typing as npt
-
-import cirq
 from cirq import (
-    LineQubit,
+    CNOT,
+    OP_TREE,
     Circuit,
+    DensityMatrixSimulator,
     EigenGate,
     Gate,
     GateOperation,
-    Moment,
-    CNOT,
     H,
-    DensityMatrixSimulator,
+    LineQubit,
+    Moment,
     ops,
-    OP_TREE,
 )
 from cirq.ops.measurement_gate import MeasurementGate
 

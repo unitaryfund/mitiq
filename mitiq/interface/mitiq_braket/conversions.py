@@ -2,22 +2,21 @@
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
-from typing import cast, List, Optional, Union
+from typing import List, Optional, Union, cast
 from warnings import warn
 
+import cirq_ionq.ionq_native_gates as cirq_ionq_ops
 import numpy as np
 import numpy.typing as npt
-
-from cirq import Circuit, LineQubit, ops as cirq_ops, protocols
+from braket.circuits import Circuit as BKCircuit
+from braket.circuits import Instruction
+from braket.circuits import gates as braket_gates
+from cirq import Circuit, LineQubit
+from cirq import ops as cirq_ops
+from cirq import protocols
 from cirq.linalg.decompositions import (
     deconstruct_single_qubit_matrix_into_angles,
     kak_decomposition,
-)
-import cirq_ionq.ionq_native_gates as cirq_ionq_ops
-from braket.circuits import (
-    gates as braket_gates,
-    Circuit as BKCircuit,
-    Instruction,
 )
 
 

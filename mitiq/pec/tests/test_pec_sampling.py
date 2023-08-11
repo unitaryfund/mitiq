@@ -5,41 +5,34 @@
 
 """Tests for mitiq.pec.sampling functions."""
 
+import cirq
 import numpy as np
 import pytest
-
-import cirq
 from cirq import (
     Circuit,
     Gate,
     LineQubit,
     NamedQubit,
-    ops,
     depolarize,
     measure,
     measure_each,
+    ops,
 )
-
-from pyquil import (
-    Program,
-    gates,
-)
-
-from qiskit import QuantumRegister, QuantumCircuit
+from pyquil import Program, gates
+from qiskit import QuantumCircuit, QuantumRegister
 
 from mitiq.pec import (
-    sample_sequence,
-    sample_circuit,
     NoisyOperation,
     OperationRepresentation,
+    sample_circuit,
+    sample_sequence,
 )
-from mitiq.utils import _equal
+from mitiq.pec.channels import _circuit_to_choi, _operation_to_choi
 from mitiq.pec.representations import (
     represent_operation_with_local_depolarizing_noise,
     represent_operations_in_circuit_with_local_depolarizing_noise,
 )
-from mitiq.pec.channels import _operation_to_choi, _circuit_to_choi
-
+from mitiq.utils import _equal
 
 xcirq = Circuit(cirq.X(cirq.LineQubit(0)))
 zcirq = Circuit(cirq.Z(cirq.LineQubit(0)))
