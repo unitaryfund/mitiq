@@ -9,7 +9,7 @@ from mitiq.interface.conversions import (
     atomic_one_to_many_converter,
     convert_from_mitiq,
     convert_to_mitiq,
-    circuit_scaler,
+    accept_qprogram_and_validate,
     append_cirq_circuit_to_qprogram,
     register_mitiq_converter,
     CircuitConversionError,

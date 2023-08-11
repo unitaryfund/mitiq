@@ -269,18 +269,25 @@ def atomic_one_to_many_converter(
     return qprogram_modifier
 
 
-def circuit_scaler(scaling_function: Callable[..., Any]) -> Callable[..., Any]:
-    """Decorator that scales the gates in a circuit by a factor of
-    'scaling_factor'.
+def accept_qprogram_and_validate(
+    cirq_circuit_modifier: Callable[..., Any]
+) -> Callable[..., Any]:
+    """This decorator performs two functions:
+
+        1. Transforms a function of signature (cirq.Circuit -> Any) to
+        (QPROGRAM -> Any)
+        2. Validates the incoming QPROGRAM instance to ensure Mitiq's error
+        mitigation techniques can be applied to it.
 
     Args:
-        scaling_function (Callable[..., Any]): The function to scale.
+        cirq_circuit_modifier: The function to scale.
 
     Returns:
-        Callable[..., Any]: The scaled function.
+        The transformed function which can take any QPROGRAM, and performs
+        circuit-level validation.
     """
 
-    @wraps(scaling_function)
+    @wraps(cirq_circuit_modifier)
     def new_scaling_function(
         circuit: QPROGRAM, *args: Any, **kwargs: Any
     ) -> QPROGRAM:
@@ -299,7 +306,7 @@ def circuit_scaler(scaling_function: Callable[..., Any]) -> Callable[..., Any]:
             # when converting to Cirq. Eventually, identities will be removed.
             idle_qubits = _add_identity_to_idle(circuit)
 
-        scaled_circuit = atomic_converter(scaling_function)(
+        scaled_circuit = atomic_converter(cirq_circuit_modifier)(
             circuit, *args, **kwargs
         )
 
@@ -366,7 +373,7 @@ def circuit_scaler(scaling_function: Callable[..., Any]) -> Callable[..., Any]:
     return new_scaling_function
 
 
-@circuit_scaler
+@accept_qprogram_and_validate
 def append_cirq_circuit_to_qprogram(
     circuit: QPROGRAM, cirq_circuit: cirq.Circuit
 ) -> QPROGRAM:

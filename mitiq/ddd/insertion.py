@@ -8,7 +8,7 @@ from cirq import Circuit, LineQubit, synchronize_terminal_measurements, I
 import numpy as np
 import numpy.typing as npt
 from typing import Callable
-from mitiq.interface import circuit_scaler
+from mitiq.interface import accept_qprogram_and_validate
 from mitiq import QPROGRAM
 
 
@@ -103,7 +103,7 @@ def insert_ddd_sequences(
     return _insert_ddd_sequences(circuit, rule)
 
 
-@circuit_scaler
+@accept_qprogram_and_validate
 def _insert_ddd_sequences(
     circuit: Circuit,
     rule: Callable[[int], Circuit],

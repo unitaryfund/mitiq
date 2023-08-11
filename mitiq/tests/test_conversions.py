@@ -25,7 +25,7 @@ from mitiq.interface import (
     convert_from_mitiq,
     accept_any_qprogram_as_input,
     atomic_one_to_many_converter,
-    circuit_scaler,
+    accept_qprogram_and_validate,
     register_mitiq_converter,
     UnsupportedCircuitError,
 )
@@ -73,7 +73,7 @@ circuit_types = {
 }
 
 
-@circuit_scaler
+@accept_qprogram_and_validate
 def scaling_function(circ: cirq.Circuit, *args, **kwargs) -> cirq.Circuit:
     return circ
 
