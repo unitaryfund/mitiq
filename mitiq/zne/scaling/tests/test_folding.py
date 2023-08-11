@@ -9,41 +9,41 @@ import pytest
 from cirq import (
     Circuit,
     GridQubit,
-    LineQubit,
-    ops,
-    inverse,
-    equal_up_to_global_phase,
     InsertStrategy,
-    testing,
+    LineQubit,
+    equal_up_to_global_phase,
+    inverse,
+    ops,
     ry,
     rz,
+    testing,
 )
-from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
-from qiskit.quantum_info.operators import Operator
 from pyquil import Program, gates
 from pyquil.quilbase import Pragma
+from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
+from qiskit.quantum_info.operators import Operator
+from sympy import Symbol
 
-from mitiq.utils import _equal
 from mitiq.interface import (
     CircuitConversionError,
-    convert_to_mitiq,
     convert_from_mitiq,
+    convert_to_mitiq,
 )
+from mitiq.utils import _equal
 from mitiq.zne.scaling.folding import (
     UnfoldableCircuitError,
-    _squash_moments,
+    _apply_fold_mask,
+    _create_fold_mask,
+    _create_weight_mask,
     _default_weight,
     _fold_all,
+    _squash_moments,
     fold_all,
+    fold_gates_at_random,
     fold_gates_from_left,
     fold_gates_from_right,
-    fold_gates_at_random,
     fold_global,
-    _create_weight_mask,
-    _create_fold_mask,
-    _apply_fold_mask,
 )
-from sympy import Symbol
 
 
 def test_squash_moments_two_qubits():

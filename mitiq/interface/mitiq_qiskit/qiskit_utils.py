@@ -4,23 +4,21 @@
 # LICENSE file in the root directory of this source tree.
 
 """Qiskit utility functions."""
-from typing import Tuple
 from functools import partial
+from typing import Optional, Tuple
+
 import numpy as np
 import numpy.typing as npt
 import qiskit
 from qiskit import QuantumCircuit
+from qiskit.providers import Backend
 from qiskit_aer import AerSimulator
-from typing import Optional
 
 # Noise simulation packages
 from qiskit_aer.noise import NoiseModel
-from qiskit_aer.noise.errors.standard_errors import (
-    depolarizing_error,
-)
-from qiskit.providers import Backend
+from qiskit_aer.noise.errors.standard_errors import depolarizing_error
 
-from mitiq import MeasurementResult, Observable, Executor
+from mitiq import Executor, MeasurementResult, Observable
 
 
 def initialized_depolarizing_noise(noise_level: float) -> NoiseModel:

@@ -5,11 +5,11 @@
 
 """Tests for GHZ circuits."""
 
-import pytest
 import numpy as np
+import pytest
 
-from mitiq.benchmarks import ghz_circuits
 from mitiq import SUPPORTED_PROGRAM_TYPES
+from mitiq.benchmarks import ghz_circuits
 
 
 @pytest.mark.parametrize("nqubits", [1, 5])

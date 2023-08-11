@@ -9,14 +9,14 @@ import cirq
 import numpy as np
 
 import mitiq
-from mitiq.shadows.shadows_utils import operator_ptm_vector_rep
 from mitiq.shadows.classical_postprocessing import (
-    get_single_shot_pauli_fidelity,
-    get_pauli_fidelities,
     classical_snapshot,
-    shadow_state_reconstruction,
     expectation_estimation_shadow,
+    get_pauli_fidelities,
+    get_single_shot_pauli_fidelity,
+    shadow_state_reconstruction,
 )
+from mitiq.shadows.shadows_utils import operator_ptm_vector_rep
 
 
 def test_get_single_shot_pauli_fidelity():

@@ -5,31 +5,29 @@
 """Functions related to representations with depolarizing noise."""
 
 import copy
-from typing import List
 from itertools import product
+from typing import List
+
 import numpy as np
 import numpy.typing as npt
-
 from cirq import (
+    Circuit,
+    DepolarizingChannel,
     Operation,
     X,
     Y,
     Z,
-    Circuit,
     is_measurement,
-    DepolarizingChannel,
     kraus,
 )
 
 from mitiq import QPROGRAM
 from mitiq.interface.conversions import (
-    convert_to_mitiq,
     append_cirq_circuit_to_qprogram,
+    convert_to_mitiq,
 )
-from mitiq.pec.types import OperationRepresentation, NoisyOperation
-
-
 from mitiq.pec.channels import tensor_product
+from mitiq.pec.types import NoisyOperation, OperationRepresentation
 
 
 def represent_operation_with_global_depolarizing_noise(

@@ -4,36 +4,38 @@
 # LICENSE file in the root directory of this source tree.
 
 import os
+
 import numpy as np
 import pytest
+import qiskit
 from cirq import (
+    Circuit,
     CXPowGate,
     DepolarizingChannel,
+    I,
+    LineQubit,
     MixedUnitaryChannel,
     Rx,
     Rz,
-    I,
     X,
     Y,
     Z,
-    LineQubit,
-    Circuit,
     ops,
     unitary,
 )
-import qiskit
+
 from mitiq import Executor, Observable, PauliString
-from mitiq.interface.mitiq_qiskit import qiskit_utils
-from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
-from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.cdr import generate_training_circuits
 from mitiq.cdr._testing import random_x_z_cnot_circuit
+from mitiq.interface.mitiq_cirq import compute_density_matrix
+from mitiq.interface.mitiq_qiskit import qiskit_utils
+from mitiq.interface.mitiq_qiskit.conversions import to_qiskit
 from mitiq.pec.representations.learning import (
-    depolarizing_noise_loss_function,
-    biased_noise_loss_function,
-    learn_depolarizing_noise_parameter,
-    learn_biased_noise_parameters,
     _parse_learning_kwargs,
+    biased_noise_loss_function,
+    depolarizing_noise_loss_function,
+    learn_biased_noise_parameters,
+    learn_depolarizing_noise_parameter,
 )
 
 rng = np.random.RandomState(1)

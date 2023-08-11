@@ -3,8 +3,8 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-import numpy as np
 import cirq
+import numpy as np
 
 
 def random_x_z_circuit(qubits, n_moments, random_state) -> cirq.Circuit:

@@ -6,10 +6,9 @@
 """Functions for mapping circuits to (near) Clifford circuits."""
 from typing import List
 
+import cirq
 import numpy as np
 import numpy.typing as npt
-
-import cirq
 from cirq.circuits import Circuit
 
 from mitiq.interface import accept_any_qprogram_as_input

@@ -311,6 +311,12 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
    :members:
 ```
 
+## Quantum Subspace Expansion
+```{eval-rst}
+.. automodule:: mitiq.qse.qse
+   :members:
+```
+
 ## Calibration
 
 ```{eval-rst}

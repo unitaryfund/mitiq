@@ -4,22 +4,21 @@
 # LICENSE file in the root directory of this source tree.
 
 """Unit tests for Collector."""
-import pytest
-from typing import List
 from random import choices
-
-import numpy as np
+from typing import List
 
 import cirq
+import numpy as np
 import pyquil
+import pytest
 
 from mitiq import MeasurementResult
 from mitiq.executor.executor import Executor
-from mitiq.observable import Observable, PauliString
 from mitiq.interface.mitiq_cirq import (
     compute_density_matrix,
     sample_bitstrings,
 )
+from mitiq.observable import Observable, PauliString
 
 
 # Serial / batched executors which return floats.

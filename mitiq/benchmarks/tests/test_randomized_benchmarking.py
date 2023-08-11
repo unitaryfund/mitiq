@@ -5,11 +5,11 @@
 
 """Tests for randomized benchmarking circuits."""
 
-import pytest
 import numpy as np
+import pytest
 
-from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 from mitiq import SUPPORTED_PROGRAM_TYPES
+from mitiq.benchmarks.randomized_benchmarking import generate_rb_circuits
 
 
 @pytest.mark.parametrize("n_qubits", (1, 2))

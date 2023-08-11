@@ -2,6 +2,12 @@
 line-length = 79
 target-version = ['py311']
 
+[tool.isort]
+profile = "black"
+skip_glob = ["**/__init__.py"]
+line_length = 79
+skip_gitignore = "True"
+
 [tool.pytest.ini_options]
 addopts = "--color=yes"
 filterwarnings = [

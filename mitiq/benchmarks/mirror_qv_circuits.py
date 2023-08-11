@@ -8,15 +8,13 @@ as defined in https://arxiv.org/abs/2303.02108."""
 
 from typing import Optional
 
+import cirq
 
 from mitiq import QPROGRAM
-from mitiq.interface.conversions import convert_to_mitiq, convert_from_mitiq
-
-
 from mitiq.benchmarks.quantum_volume_circuits import (
     generate_quantum_volume_circuit,
 )
-import cirq
+from mitiq.interface.conversions import convert_from_mitiq, convert_to_mitiq
 
 
 def generate_mirror_qv_circuit(

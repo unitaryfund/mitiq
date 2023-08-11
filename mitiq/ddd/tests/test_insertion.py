@@ -5,16 +5,17 @@
 
 """Unit tests for DDD slack windows and DDD insertion tools."""
 
-import numpy as np
 import cirq
+import numpy as np
+import pyquil
+import pytest
+import qiskit
+
 from mitiq.ddd.insertion import (
     _get_circuit_mask,
     get_slack_matrix_from_circuit_mask,
     insert_ddd_sequences,
 )
-import pytest
-import qiskit
-import pyquil
 from mitiq.ddd.rules import xx, xyxy
 
 circuit_cirq_one = cirq.Circuit(

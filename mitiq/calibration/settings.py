@@ -3,16 +3,15 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-from dataclasses import dataclass, asdict
-from functools import partial
-from typing import Any, Callable, cast, List, Dict
+from dataclasses import asdict, dataclass
 from enum import Enum, auto
+from functools import partial
+from typing import Any, Callable, Dict, List, cast
 
-import networkx as nx
 import cirq
+import networkx as nx
 
 from mitiq import QPROGRAM, Executor
-from mitiq.interface import convert_from_mitiq
 from mitiq.benchmarks import (
     generate_ghz_circuit,
     generate_mirror_circuit,
@@ -20,18 +19,16 @@ from mitiq.benchmarks import (
     generate_rb_circuits,
     generate_w_circuit,
 )
+from mitiq.interface import convert_from_mitiq
 from mitiq.pec import execute_with_pec
 from mitiq.pec.representations import (
-    represent_operation_with_local_depolarizing_noise,
     represent_operation_with_local_biased_noise,
+    represent_operation_with_local_depolarizing_noise,
 )
 from mitiq.raw import execute
 from mitiq.zne import execute_with_zne
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
-from mitiq.zne.scaling import (
-    fold_gates_at_random,
-    fold_global,
-)
+from mitiq.zne.scaling import fold_gates_at_random, fold_global
 
 
 class MitigationTechnique(Enum):

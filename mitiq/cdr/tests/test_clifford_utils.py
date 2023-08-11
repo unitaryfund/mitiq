@@ -4,25 +4,24 @@
 # LICENSE file in the root directory of this source tree.
 
 """Tests for generating (near) Clifford circuits."""
-import pytest
-import numpy as np
-
 import cirq
+import numpy as np
+import pytest
 from cirq.circuits import Circuit
 
 from mitiq import SUPPORTED_PROGRAM_TYPES
-from mitiq.interface import convert_from_mitiq
 from mitiq.cdr.clifford_utils import (
-    is_clifford_angle,
-    is_clifford,
-    closest_clifford,
-    random_clifford,
-    angle_to_proximity,
-    angle_to_proximities,
-    probabilistic_angle_to_clifford,
-    count_non_cliffords,
     _CLIFFORD_ANGLES,
+    angle_to_proximities,
+    angle_to_proximity,
+    closest_clifford,
+    count_non_cliffords,
+    is_clifford,
+    is_clifford_angle,
+    probabilistic_angle_to_clifford,
+    random_clifford,
 )
+from mitiq.interface import convert_from_mitiq
 
 
 @pytest.mark.parametrize("circuit_type", SUPPORTED_PROGRAM_TYPES.keys())

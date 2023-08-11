@@ -7,9 +7,8 @@
 
 import functools
 
-import numpy as np
-
 import cirq
+import numpy as np
 
 from mitiq import Executor, Observable, PauliString, raw
 from mitiq.interface import mitiq_cirq

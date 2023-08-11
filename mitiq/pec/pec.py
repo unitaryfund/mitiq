@@ -5,23 +5,24 @@
 
 """High-level probabilistic error cancellation tools."""
 
+import warnings
+from functools import wraps
 from typing import (
-    Optional,
+    Any,
     Callable,
-    Union,
+    Dict,
+    List,
+    Optional,
     Sequence,
     Tuple,
-    Dict,
-    Any,
+    Union,
     cast,
-    List,
 )
-from functools import wraps
-import warnings
+
 import numpy as np
 
-from mitiq import Executor, Observable, QPROGRAM, QuantumResult
-from mitiq.pec import sample_circuit, OperationRepresentation
+from mitiq import QPROGRAM, Executor, Observable, QuantumResult
+from mitiq.pec import OperationRepresentation, sample_circuit
 
 
 class LargeSampleWarning(Warning):

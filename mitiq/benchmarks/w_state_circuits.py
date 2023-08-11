@@ -7,9 +7,9 @@
 as defined in :cite:`Cruz_2019_Efficient`."""
 
 from typing import Optional
-import numpy as np
-import cirq
 
+import cirq
+import numpy as np
 
 from mitiq import QPROGRAM
 from mitiq.interface import convert_from_mitiq
