@@ -9,7 +9,7 @@
 """Classical post-processing process of classical shadows."""
 
 from itertools import combinations
-from typing import Tuple, List, Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import cirq
 import numpy as np
@@ -19,8 +19,8 @@ import mitiq
 from mitiq.shadows.shadows_utils import (
     bitstring_to_eigenvalues,
     create_string,
-    operator_ptm_vector_rep,
     kronecker_product,
+    operator_ptm_vector_rep,
 )
 
 # Local unitaries to measure Pauli operators in the Z basis

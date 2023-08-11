@@ -5,18 +5,19 @@
 
 """Defines utility functions for classical shadows protocol."""
 
-import numpy as np
 import cirq
+import numpy as np
+
 import mitiq
 from mitiq.shadows.shadows_utils import (
-    kronecker_product,
-    operator_ptm_vector_rep,
-    eigenvalues_to_bitstring,
     bitstring_to_eigenvalues,
     create_string,
-    n_measurements_tomography_bound,
-    n_measurements_opts_expectation_bound,
+    eigenvalues_to_bitstring,
     fidelity,
+    kronecker_product,
+    n_measurements_opts_expectation_bound,
+    n_measurements_tomography_bound,
+    operator_ptm_vector_rep,
 )
 
 
