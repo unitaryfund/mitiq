@@ -43,8 +43,8 @@ def kronecker_product(matrices: List[NDArray[Any]]) -> NDArray[Any]:
 def operator_ptm_vector_rep(opt: NDArray[Any]) -> NDArray[Any]:
     r"""
     Returns the PTM vector representation of an operator.
-    :math:`\mathcal{L}(\mathcal{H}_{2^n})\ni opt\rightarrow|opt\rangle\!
-    \rangle\in \mathcal{H}_{4^n}`.
+    :math:`\mathcal{L}(\mathcal{H}_{2^n})\ni \mathtt{opt}\rightarrow
+    |\mathtt{opt}\rangle\!\rangle\in \mathcal{H}_{4^n}`.
 
     Args:
         opt: A square matrix representing an operator.
