@@ -9,19 +9,12 @@
 
 """Utilities for manipulating matrix representations of quantum channels."""
 
-from typing import List
 from copy import deepcopy
+from typing import List
+
 import numpy as np
 import numpy.typing as npt
-
-from cirq import (
-    Circuit,
-    OP_TREE,
-    H,
-    CNOT,
-    LineQubit,
-    DensityMatrixSimulator,
-)
+from cirq import CNOT, OP_TREE, Circuit, DensityMatrixSimulator, H, LineQubit
 
 
 def _max_ent_state_circuit(num_qubits: int) -> Circuit:
@@ -74,7 +67,7 @@ def _circuit_to_choi(circuit: Circuit) -> npt.NDArray[np.complex64]:
     full_circ = deepcopy(circuit)[0:0]
     full_circ += _max_ent_state_circuit(2 * num_qubits)
     full_circ += circuit
-    return simulator.simulate(full_circ).final_density_matrix  # type: ignore
+    return simulator.simulate(full_circ).final_density_matrix
 
 
 def _operation_to_choi(operation_tree: OP_TREE) -> npt.NDArray[np.complex64]:

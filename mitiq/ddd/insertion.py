@@ -4,12 +4,14 @@
 # LICENSE file in the root directory of this source tree.
 
 """Tools to determine slack windows in circuits and to insert DDD sequences."""
-from cirq import Circuit, LineQubit, synchronize_terminal_measurements, I
+from typing import Callable
+
 import numpy as np
 import numpy.typing as npt
-from typing import Callable
-from mitiq.interface import accept_qprogram_and_validate
+from cirq import Circuit, I, LineQubit, synchronize_terminal_measurements
+
 from mitiq import QPROGRAM
+from mitiq.interface import accept_qprogram_and_validate
 
 
 def _get_circuit_mask(circuit: Circuit) -> npt.NDArray[np.int64]:

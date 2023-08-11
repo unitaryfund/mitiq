@@ -4,30 +4,28 @@
 # LICENSE file in the root directory of this source tree.
 
 """Qiskit utility functions."""
-from typing import Tuple
 from functools import partial
+from typing import Optional, Tuple
+
 import numpy as np
 import numpy.typing as npt
 import qiskit
 from qiskit import QuantumCircuit
+from qiskit.providers import Backend
 from qiskit_aer import AerSimulator
-from typing import Optional
 
 # Noise simulation packages
 from qiskit_aer.noise import NoiseModel
-from qiskit_aer.noise.errors.standard_errors import (
-    depolarizing_error,
-)
-from qiskit.providers import Backend
+from qiskit_aer.noise.errors.standard_errors import depolarizing_error
 
-from mitiq import MeasurementResult, Observable, Executor
+from mitiq import Executor, MeasurementResult, Observable
 
 
 def initialized_depolarizing_noise(noise_level: float) -> NoiseModel:
     """Initializes a depolarizing noise Qiskit NoiseModel.
 
     Args:
-        noise_level: The noise strength as a float, e.g., 0.01 is 0.1%.
+        noise_level: The noise strength as a float, e.g., 0.01 is 1%.
 
     Returns:
         A Qiskit depolarizing NoiseModel.
@@ -184,7 +182,7 @@ def execute_with_shots_and_noise(
 def sample_bitstrings(
     circuit: QuantumCircuit,
     backend: Optional[Backend] = None,
-    noise_model: Optional[NoiseModel] = None,  # type: ignore
+    noise_model: Optional[NoiseModel] = None,
     shots: int = 10000,
     measure_all: bool = False,
     qubit_indices: Optional[Tuple[int]] = None,
@@ -250,7 +248,7 @@ def compute_expectation_value_on_noisy_backend(
     circuit: QuantumCircuit,
     obs: Observable,
     backend: Optional[Backend] = None,
-    noise_model: Optional[NoiseModel] = None,  # type: ignore
+    noise_model: Optional[NoiseModel] = None,
     shots: int = 10000,
     measure_all: bool = False,
     qubit_indices: Optional[Tuple[int]] = None,

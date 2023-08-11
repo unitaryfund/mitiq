@@ -4,18 +4,21 @@
 # LICENSE file in the root directory of this source tree.
 """Cirq utility functions."""
 
-from typing import Tuple
+from typing import Callable, Tuple
 
+import cirq
 import numpy as np
 import numpy.typing as npt
-import cirq
+
 from mitiq import MeasurementResult
 
 
 # Executors.
 def sample_bitstrings(
     circuit: cirq.Circuit,
-    noise_model: cirq.NOISE_MODEL_LIKE = cirq.amplitude_damp,  # type: ignore
+    noise_model_function: Callable[
+        ..., cirq.NOISE_MODEL_LIKE
+    ] = cirq.amplitude_damp,
     noise_level: Tuple[float] = (0.01,),
     sampler: cirq.Sampler = cirq.DensityMatrixSimulator(),
     shots: int = 8192,
@@ -34,7 +37,7 @@ def sample_bitstrings(
         Sampled outcome from a measurement.
     """
     if sum(noise_level) > 0:
-        circuit = circuit.with_noise(noise_model(*noise_level))  # type: ignore
+        circuit = circuit.with_noise(noise_model_function(*noise_level))
 
     result = sampler.run(circuit, repetitions=shots)
     return MeasurementResult(
@@ -50,7 +53,9 @@ def sample_bitstrings(
 
 def compute_density_matrix(
     circuit: cirq.Circuit,
-    noise_model: cirq.NOISE_MODEL_LIKE = cirq.amplitude_damp,  # type: ignore
+    noise_model_function: Callable[
+        ..., cirq.NOISE_MODEL_LIKE
+    ] = cirq.amplitude_damp,
     noise_level: Tuple[float] = (0.01,),
 ) -> npt.NDArray[np.complex64]:
     """Returns the density matrix of the quantum state after the
@@ -65,7 +70,7 @@ def compute_density_matrix(
         The final density matrix as a NumPy array.
     """
     if sum(noise_level) > 0:
-        circuit = circuit.with_noise(noise_model(*noise_level))  # type: ignore
+        circuit = circuit.with_noise(noise_model_function(*noise_level))
 
     return cirq.DensityMatrixSimulator().simulate(circuit).final_density_matrix
 
@@ -86,7 +91,7 @@ def execute_with_depolarizing_noise(
     Returns:
         The expectation value of obs as a float.
     """
-    circuit = circuit.with_noise(cirq.depolarize(p=noise))  # type: ignore
+    circuit = circuit.with_noise(cirq.depolarize(p=noise))
     simulator = cirq.DensityMatrixSimulator()
     rho = simulator.simulate(circuit).final_density_matrix
     expectation = np.real(np.trace(rho @ obs))

@@ -4,20 +4,19 @@
 # LICENSE file in the root directory of this source tree.
 
 """Functions for mapping circuits to (near) Clifford circuits."""
-from typing import List, Optional, Sequence, Union, Any, cast
-
-import numpy as np
+from typing import Any, List, Optional, Sequence, Union, cast
 
 import cirq
+import numpy as np
 from cirq.circuits import Circuit
 
-from mitiq.interface import atomic_one_to_many_converter
 from mitiq.cdr.clifford_utils import (
     angle_to_proximity,
     closest_clifford,
-    random_clifford,
     probabilistic_angle_to_clifford,
+    random_clifford,
 )
+from mitiq.interface import atomic_one_to_many_converter
 
 
 @atomic_one_to_many_converter
@@ -135,7 +134,7 @@ def _map_to_near_clifford(
     )
 
     # Replace selected operations.
-    clifford_ops: Sequence[cirq.ops.Operation] = _replace(
+    clifford_ops = _replace(
         [non_clifford_ops[i] for i in indices_of_selected_ops],
         method_replace,
         sigma_replace,
@@ -144,9 +143,7 @@ def _map_to_near_clifford(
 
     # Return sequence of (near) Clifford operations.
     return [
-        cast(List[cirq.ops.Operation], clifford_ops).pop(0)
-        if i in indices_of_selected_ops
-        else op
+        clifford_ops.pop(0) if i in indices_of_selected_ops else op
         for (i, op) in enumerate(non_clifford_ops)
     ]
 
@@ -210,7 +207,7 @@ def _replace(
     method: str = "uniform",
     sigma: float = 1.0,
     random_state: Optional[np.random.RandomState] = None,
-) -> Sequence[cirq.ops.Operation]:
+) -> List[cirq.ops.Operation]:
     """Function that takes the non-Clifford angles and replacement and
     selection specifications, returning the projected angles according to a
     specific method.

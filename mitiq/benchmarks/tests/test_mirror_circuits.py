@@ -5,13 +5,14 @@
 
 """Tests for mirror circuits."""
 
-from mitiq.benchmarks import mirror_circuits
-from mitiq import SUPPORTED_PROGRAM_TYPES
-from mitiq.utils import _equal
-from numpy import random
-import networkx as nx
 import cirq
+import networkx as nx
 import pytest
+from numpy import random
+
+from mitiq import SUPPORTED_PROGRAM_TYPES
+from mitiq.benchmarks import mirror_circuits
+from mitiq.utils import _equal
 
 paulis = mirror_circuits.paulis
 cliffords = mirror_circuits.cliffords

@@ -2,25 +2,26 @@
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
-import pytest
 import json
+
 import cirq
+import pytest
 import qiskit
 
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
-from mitiq.calibration import ZNESettings, PECSettings, Settings
+from mitiq.calibration import PECSettings, Settings, ZNESettings
 from mitiq.calibration.settings import (
-    MitigationTechnique,
     BenchmarkProblem,
+    MitigationTechnique,
     Strategy,
 )
-from mitiq.raw import execute
 from mitiq.pec import (
     execute_with_pec,
     represent_operation_with_local_depolarizing_noise,
 )
+from mitiq.raw import execute
+from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import fold_global
-from mitiq.zne.inference import RichardsonFactory, LinearFactory
 
 light_pec_settings = Settings(
     [
@@ -41,10 +42,6 @@ light_pec_settings = Settings(
             "representation_function": (
                 represent_operation_with_local_depolarizing_noise
             ),
-            "operations": [
-                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
-                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
-            ],
             "is_qubit_dependent": False,
             "noise_level": 0.001,
             "num_samples": 200,
@@ -194,14 +191,6 @@ def test_unsupported_technique_error():
         strategy.mitigation_function()
 
 
-def test_PEC_representations():
-    pec_strategy = light_pec_settings.make_strategies()[0]
-    assert len(pec_strategy.representations) > 0
-
-    zne_strategy = light_zne_settings.make_strategies()[0]
-    assert not zne_strategy.representations
-
-
 def test_ZNESettings():
     circuits = ZNESettings.make_problems()
     strategies = ZNESettings.make_strategies()
@@ -289,12 +278,10 @@ def test_to_dict():
         "representation_function": (
             represent_operation_with_local_depolarizing_noise
         ),
-        "operations": [
-            cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
-            cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
-        ],
         "is_qubit_dependent": False,
         "noise_level": 0.001,
+        "noise_bias": 0,
+        "num_samples": 200,
     }
 
     zne_strategy = light_zne_settings.make_strategies()[0]
@@ -304,3 +291,12 @@ def test_to_dict():
         "factory": "LinearFactory",
         "scale_factors": [1.0, 2.0],
     }
+
+
+def test_num_circuits_required_raw_execution():
+    undefine_strategy = Strategy(
+        id=1,
+        technique=MitigationTechnique.RAW,
+        technique_params={},
+    )
+    assert undefine_strategy.num_circuits_required() == 1

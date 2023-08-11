@@ -5,35 +5,35 @@
 
 """Tests for the Clifford data regression top-level API."""
 from functools import partial
-import pytest
 
 import cirq
 import numpy as np
+import pytest
 
-from mitiq import Executor, MeasurementResult, SUPPORTED_PROGRAM_TYPES
+from mitiq import SUPPORTED_PROGRAM_TYPES, Executor, MeasurementResult
 from mitiq.benchmarks import generate_rb_circuits
-from mitiq.calibration import (
-    Calibrator,
-    Settings,
-    execute_with_mitigation,
-)
+from mitiq.calibration import Calibrator, Settings, execute_with_mitigation
 from mitiq.calibration.calibrator import (
-    convert_to_expval_executor,
+    PEC_TABLE_HEADER_STR,
+    ZNE_TABLE_HEADER_STR,
     ExperimentResults,
     MissingResultsError,
+    convert_to_expval_executor,
 )
 from mitiq.calibration.settings import (
+    BenchmarkProblem,
+    MitigationTechnique,
     PECSettings,
     Strategy,
-    MitigationTechnique,
-    BenchmarkProblem,
+    ZNESettings,
+)
+from mitiq.interface import convert_to_mitiq
+from mitiq.pec.representations import (
+    represent_operation_with_local_biased_noise,
+    represent_operation_with_local_depolarizing_noise,
 )
 from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import fold_global
-from mitiq.interface import convert_to_mitiq
-from mitiq.pec.representations import (
-    represent_operation_with_local_depolarizing_noise,
-)
 
 light_zne_settings = Settings(
     [
@@ -74,14 +74,11 @@ light_pec_settings = Settings(
         {
             "technique": "pec",
             "representation_function": (
-                represent_operation_with_local_depolarizing_noise
+                represent_operation_with_local_biased_noise
             ),
-            "operations": [
-                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
-                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
-            ],
             "is_qubit_dependent": False,
-            "noise_level": 0.001,
+            "noise_level": 0.01,
+            "noise_bias": 0.1,
             "num_samples": 200,
         },
     ],
@@ -161,12 +158,9 @@ def non_cirq_depolarizing_execute(circuit):
 def test_ZNE_workflow():
     cal = Calibrator(damping_execute, frontend="cirq")
     cost = cal.get_cost()
-    assert cost == {"noisy_executions": 32, "ideal_executions": 0}
+    assert cost == {"noisy_executions": 8 * 3 * 4, "ideal_executions": 0}
 
     cal.run()
-    num_strategies, num_problems = cal.results.mitigated.shape
-    num_results = num_strategies * num_problems
-    assert num_results == cost["noisy_executions"]
     assert isinstance(cal.results, ExperimentResults)
     assert isinstance(cal.best_strategy(), Strategy)
 
@@ -176,12 +170,9 @@ def test_PEC_workflow():
         depolarizing_execute, frontend="cirq", settings=PECSettings
     )
     cost = cal.get_cost()
-    assert cost == {"noisy_executions": 8, "ideal_executions": 0}
+    assert cost == {"noisy_executions": 4 * 2 * 200, "ideal_executions": 0}
 
     cal.run()
-    num_strategies, num_problems = cal.results.mitigated.shape
-    num_results = num_strategies * num_problems
-    assert num_results == cost["noisy_executions"]
     assert isinstance(cal.results, ExperimentResults)
     assert isinstance(cal.best_strategy(), Strategy)
 
@@ -199,11 +190,8 @@ def test_ZNE_workflow_multi_platform(circuit_type):
         settings=light_zne_settings,
     )
     cost = cal.get_cost()
-    assert cost == {"noisy_executions": 2, "ideal_executions": 0}
+    assert cost == {"noisy_executions": 2 * 2, "ideal_executions": 0}
     cal.run()
-    num_strategies, num_problems = cal.results.mitigated.shape
-    num_results = num_strategies * num_problems
-    assert num_results == cost["noisy_executions"]
     assert isinstance(cal.results, ExperimentResults)
     assert isinstance(cal.best_strategy(), Strategy)
 
@@ -221,11 +209,8 @@ def test_PEC_workflow_multi_platform(circuit_type):
         settings=light_pec_settings,
     )
     cost = cal.get_cost()
-    assert cost == {"noisy_executions": 2, "ideal_executions": 0}
+    assert cost == {"noisy_executions": 2 * 200, "ideal_executions": 0}
     cal.run()
-    num_strategies, num_problems = cal.results.mitigated.shape
-    num_results = num_strategies * num_problems
-    assert num_results == cost["noisy_executions"]
     assert isinstance(cal.results, ExperimentResults)
     assert isinstance(cal.best_strategy(), Strategy)
 
@@ -233,7 +218,7 @@ def test_PEC_workflow_multi_platform(circuit_type):
 def test_get_cost():
     cal = Calibrator(damping_execute, frontend="cirq", settings=settings)
     cost = cal.get_cost()
-    expected_cost = 2 * 4  # circuits * num_experiments
+    expected_cost = 2 * 12  # circuits * num_experiments
     assert cost["noisy_executions"] == expected_cost
     assert cost["ideal_executions"] == 0
 
@@ -369,12 +354,76 @@ def test_ExtrapolationResults_best_strategy():
     assert er.best_strategy_id() == 4
 
 
-def test_logging(capfd):
-    cal = Calibrator(damping_execute, frontend="cirq")
-    cal.run(log=True)
+light_combined_settings1 = Settings(
+    benchmarks=light_zne_settings.benchmarks,
+    strategies=[
+        {
+            "technique": "pec",
+            "representation_function": (
+                represent_operation_with_local_depolarizing_noise
+            ),
+            "operations": [
+                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
+                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
+            ],
+            "is_qubit_dependent": False,
+            "noise_level": 0.001,
+            "num_samples": 200,
+        },
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": LinearFactory([1.0, 2.0]),
+        },
+    ],
+)
 
+light_combined_settings2 = Settings(
+    benchmarks=light_zne_settings.benchmarks,
+    strategies=[
+        {
+            "technique": "zne",
+            "scale_noise": fold_global,
+            "factory": LinearFactory([1.0, 2.0]),
+        },
+        {
+            "technique": "pec",
+            "representation_function": (
+                represent_operation_with_local_depolarizing_noise
+            ),
+            "operations": [
+                cirq.Circuit(cirq.CNOT(*cirq.LineQubit.range(2))),
+                cirq.Circuit(cirq.CZ(*cirq.LineQubit.range(2))),
+            ],
+            "is_qubit_dependent": False,
+            "noise_level": 0.001,
+            "num_samples": 200,
+        },
+    ],
+)
+
+
+@pytest.mark.parametrize(
+    "settings",
+    [
+        ZNESettings,
+        light_pec_settings,
+        light_combined_settings1,
+        light_combined_settings2,
+    ],
+)
+def test_logging(capfd, settings):
+    cal = Calibrator(damping_execute, frontend="cirq", settings=settings)
+    cal.run(log=True)
     captured = capfd.readouterr()
     assert "circuit" in captured.out
+    assert settings.get_strategy(0).technique.name in captured.out
+    if settings is ZNESettings:
+        assert ZNE_TABLE_HEADER_STR in captured.out
+    elif settings is light_pec_settings:
+        assert PEC_TABLE_HEADER_STR in captured.out
+    elif settings is [light_combined_settings1, light_combined_settings2]:
+        assert ZNE_TABLE_HEADER_STR, PEC_TABLE_HEADER_STR in captured.out
 
 
 def test_ExperimentResults_reset_data():

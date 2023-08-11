@@ -6,30 +6,28 @@
 """Defines utilities for efficiently running collections of circuits generated
 by error mitigation techniques to compute expectation values."""
 
-from collections import Counter
-import warnings
 import inspect
+import warnings
+from collections import Counter
 from typing import (
     Any,
     Callable,
-    cast,
     Iterable,
     List,
     Optional,
     Sequence,
     Tuple,
     Union,
+    cast,
 )
 
 import numpy as np
 import numpy.typing as npt
 
 from mitiq import QPROGRAM, MeasurementResult, QuantumResult
-
-from mitiq.observable.observable import Observable
 from mitiq.interface import convert_from_mitiq, convert_to_mitiq
+from mitiq.observable.observable import Observable
 from mitiq.observable.pauli import PauliString
-
 
 DensityMatrixLike = [
     np.ndarray,
@@ -209,7 +207,7 @@ class Executor:
                 f" {self._executor_return_type}."
             )
 
-        return results  # type: ignore[return-value]
+        return results
 
     def run(
         self,
@@ -289,7 +287,7 @@ class Executor:
         Args:
             to_run: Circuit(s) to run.
         """
-        result = self._executor(to_run, **kwargs)  # type: ignore
+        result = self._executor(to_run, **kwargs)
         self._calls_to_executor += 1
 
         if self.can_batch:

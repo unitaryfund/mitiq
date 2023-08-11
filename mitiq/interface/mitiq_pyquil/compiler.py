@@ -11,14 +11,12 @@ and modified to support a larger gateset (e.g. CPHASE).
 """
 
 from math import pi
-from typing import Any, cast, Union
+from typing import Any, Union, cast
 
 import numpy as np
-
-from pyquil.gates import RX, RZ, CZ, I, XY
-from pyquil.quil import Program, Qubit, QubitPlaceholder, FormalArgument
-from pyquil.quilbase import Gate, Expression
-
+from pyquil.gates import CZ, RX, RZ, XY, I
+from pyquil.quil import FormalArgument, Program, Qubit, QubitPlaceholder
+from pyquil.quilbase import Expression, Gate
 
 QubitLike = Union[Qubit, QubitPlaceholder, FormalArgument]
 AngleLike = Union[Expression, Any, complex]
@@ -207,14 +205,14 @@ def _Z(q: QubitLike) -> Program:
     return p
 
 
-def is_magic_angle(angle: AngleLike) -> bool:
+def is_magic_angle(angle: complex) -> bool:
     """
     Checks to see if an angle is 0, +/-pi/2, or +/-pi.
     """
     return bool(
-        np.isclose(np.abs(cast(float, angle)), pi / 2)
-        or np.isclose(np.abs(cast(float, angle)), pi)
-        or np.isclose(cast(float, angle), 0.0)
+        np.isclose(np.abs(angle), pi / 2)
+        or np.isclose(np.abs(angle), pi)
+        or np.isclose(angle, 0.0)
     )
 
 
@@ -257,8 +255,8 @@ def basic_compile(program: Program) -> Program:
                 angle_param = inst.params[0]
                 new_prog += _PHASE(angle_param, inst.qubits[0])
             elif inst.name == "RX":
-                angle_param = inst.params[0]
-                if is_magic_angle(inst.params[0]):
+                angle_param = cast(complex, inst.params[0])
+                if is_magic_angle(angle_param):
                     # in case dagger
                     new_prog += RX(angle_param, inst.qubits[0])
                 else:

@@ -5,23 +5,24 @@
 
 """High-level probabilistic error cancellation tools."""
 
+import warnings
+from functools import wraps
 from typing import (
-    Optional,
+    Any,
     Callable,
-    Union,
+    Dict,
+    List,
+    Optional,
     Sequence,
     Tuple,
-    Dict,
-    Any,
+    Union,
     cast,
-    List,
 )
-from functools import wraps
-import warnings
+
 import numpy as np
 
-from mitiq import Executor, Observable, QPROGRAM, QuantumResult
-from mitiq.pec import sample_circuit, OperationRepresentation
+from mitiq import QPROGRAM, Executor, Observable, QuantumResult
+from mitiq.pec import OperationRepresentation, sample_circuit
 
 
 class LargeSampleWarning(Warning):
@@ -136,10 +137,7 @@ def execute_with_pec(
     results = executor.evaluate(sampled_circuits, observable, force_run_all)
 
     # Evaluate unbiased estimators [Temme2017] [Endo2018] [Takagi2020]
-    unbiased_estimators = [
-        norm * s * val  # type: ignore[operator]
-        for s, val in zip(signs, results)
-    ]
+    unbiased_estimators = [norm * s * val for s, val in zip(signs, results)]
 
     pec_value = cast(float, np.average(unbiased_estimators))
 

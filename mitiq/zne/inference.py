@@ -4,35 +4,34 @@
 # LICENSE file in the root directory of this source tree.
 
 """Classes corresponding to different zero-noise extrapolation methods."""
+import warnings
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import (
     Any,
     Callable,
-    cast,
     Dict,
     List,
     Optional,
     Sequence,
     Tuple,
     Union,
+    cast,
 )
-import warnings
 
-from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
-from numpy.lib.polynomial import RankWarning
-from scipy.optimize import curve_fit, OptimizeWarning
 from cirq import Circuit
+from matplotlib.figure import Figure
+from numpy.lib.polynomial import RankWarning
+from scipy.optimize import OptimizeWarning, curve_fit
 
 from mitiq import QPROGRAM, QuantumResult
-from mitiq.observable import Observable
 from mitiq.executor import Executor
-from mitiq.zne.scaling import fold_gates_at_random
 from mitiq.interface import accept_any_qprogram_as_input
-
+from mitiq.observable import Observable
+from mitiq.zne.scaling import fold_gates_at_random
 
 ExtrapolationResult = Union[
     float,  # The zero-noise value.
@@ -137,7 +136,7 @@ def mitiq_curve_fit(
             # replace OptimizeWarning with ExtrapolationWarning
             if warn.category is OptimizeWarning:
                 warn.category = ExtrapolationWarning
-                warn.message = _EXTR_WARN  # type: ignore
+                warn.message = _EXTR_WARN
             # re-raise all warnings
             warnings.warn_explicit(
                 warn.message, warn.category, warn.filename, warn.lineno
@@ -186,7 +185,7 @@ def mitiq_polyfit(
         # replace RankWarning with ExtrapolationWarning
         if warn.category is RankWarning:
             warn.category = ExtrapolationWarning
-            warn.message = _EXTR_WARN  # type: ignore
+            warn.message = _EXTR_WARN
         # re-raise all warnings
         warnings.warn_explicit(
             warn.message, warn.category, warn.filename, warn.lineno
@@ -222,25 +221,23 @@ class Factory(ABC):
         self._already_reduced = False
         self._options: Dict[str, Optional[float]] = {}
 
-    def get_scale_factors(self) -> npt.NDArray[np.float64]:
+    def get_scale_factors(self) -> List[float]:
         """Returns the scale factors at which the factory has computed
         expectation values.
         """
-        return np.array(
-            [params.get("scale_factor") for params in self._instack]
-        )
+        return [params.get("scale_factor", 0.0) for params in self._instack]
 
-    def get_expectation_values(self) -> npt.NDArray[np.float64]:
+    def get_expectation_values(self) -> List[float]:
         """Returns the expectation values computed by the factory."""
-        return np.array(self._outstack)
+        return self._outstack
 
-    def get_optimal_parameters(self) -> npt.NDArray[np.float64]:
+    def get_optimal_parameters(self) -> List[float]:
         """Returns the optimal model parameters produced by the extrapolation
         fit.
         """
         if self._opt_params is None:
             raise ValueError(DATA_MISSING_ERR)
-        return np.array(self._opt_params)
+        return self._opt_params
 
     def get_parameters_covariance(self) -> npt.NDArray[np.float64]:
         """Returns the covariance matrix of the model parameters produced by
@@ -248,7 +245,7 @@ class Factory(ABC):
         """
         if self._params_cov is None:
             raise ValueError(DATA_MISSING_ERR)
-        return np.array(self._params_cov)
+        return self._params_cov
 
     def get_zero_noise_limit(self) -> float:
         """Returns the last evaluation of the zero-noise limit
@@ -575,7 +572,7 @@ class BatchedFactory(Factory, ABC):
         reshaped = np.array(res).reshape((-1, num_to_average))
 
         # Average the "num_to_average" columns
-        self._outstack = np.average(reshaped, axis=1)
+        self._outstack = np.average(reshaped, axis=1).tolist()
 
         return self
 
@@ -816,7 +813,7 @@ class PolyFactory(BatchedFactory):
         self._options = {"order": order}
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         order: int,
@@ -889,7 +886,7 @@ class RichardsonFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
@@ -957,12 +954,11 @@ class FakeNodesFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
     ) -> ExtrapolationResult:
-
         if not FakeNodesFactory._is_equally_spaced(scale_factors):
             raise ValueError("The scale factors must be equally spaced.")
 
@@ -1057,7 +1053,7 @@ class LinearFactory(BatchedFactory):
     """
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         full_output: bool = False,
@@ -1142,7 +1138,7 @@ class ExpFactory(BatchedFactory):
         }
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         asymptote: Optional[float] = None,
@@ -1263,7 +1259,7 @@ class PolyExpFactory(BatchedFactory):
         }
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         order: int,
@@ -1448,7 +1444,7 @@ class PolyExpFactory(BatchedFactory):
             scale_factors,
             zstack,
             deg=order,
-            weights=np.sqrt(np.abs(shifted_y)),  # type: ignore
+            weights=np.sqrt(np.abs(shifted_y)),
         )
         # The zero noise limit is ansatz(0)
         zne_limit = asymptote + sign * np.exp(z_coefficients[-1])
@@ -1595,7 +1591,7 @@ class AdaExpFactory(AdaptiveFactory):
         return len(self._outstack) == self._steps
 
     @staticmethod
-    def extrapolate(  # type: ignore
+    def extrapolate(
         scale_factors: Sequence[float],
         exp_values: Sequence[float],
         asymptote: Optional[float] = None,
@@ -1666,9 +1662,9 @@ class AdaExpFactory(AdaptiveFactory):
             self._opt_params,
             self._params_cov,
             self._zne_curve,
-        ) = self.extrapolate(  # type: ignore
-            cast(Sequence[float], self.get_scale_factors()),
-            cast(Sequence[float], self.get_expectation_values()),
+        ) = self.extrapolate(  # type: ignore [misc]
+            self.get_scale_factors(),
+            self.get_expectation_values(),
             asymptote=self.asymptote,
             avoid_log=self.avoid_log,
             full_output=True,

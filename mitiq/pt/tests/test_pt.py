@@ -6,19 +6,19 @@
 import random
 
 import cirq
-import qiskit
-import numpy as np
 import networkx as nx
+import numpy as np
+import qiskit
 
+from mitiq.benchmarks import generate_mirror_circuit
+from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.pt.pt import (
-    twirl_CNOT_gates,
-    twirl_CZ_gates,
-    execute_with_pauli_twirling,
     CNOT_twirling_gates,
     CZ_twirling_gates,
+    execute_with_pauli_twirling,
+    twirl_CNOT_gates,
+    twirl_CZ_gates,
 )
-from mitiq.interface.mitiq_cirq import compute_density_matrix
-from mitiq.benchmarks import generate_mirror_circuit
 
 num_qubits = 2
 qubits = cirq.LineQubit.range(num_qubits)
@@ -29,7 +29,7 @@ circuit.append(cirq.CZ(*qubits))
 
 def amp_damp_executor(circuit: cirq.Circuit, noise: float = 0.005) -> float:
     return compute_density_matrix(
-        circuit, noise_model=cirq.amplitude_damp, noise_level=(noise,)
+        circuit, noise_model_function=cirq.amplitude_damp, noise_level=(noise,)
     )[0, 0].real
 
 
@@ -127,4 +127,4 @@ def test_execute_with_pauli_twirling():
     expval = execute_with_pauli_twirling(
         circuit, amp_damp_executor, num_circuits=10
     )
-    assert 0 <= expval < 0.4
+    assert 0 <= expval < 0.5

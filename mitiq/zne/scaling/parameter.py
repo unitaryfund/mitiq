@@ -3,24 +3,26 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-from typing import Optional, Callable, List, cast
-import numpy as np
-
 import copy
+from typing import Callable, List, Optional, cast
 
-from cirq import Circuit, EigenGate, Moment
+import numpy as np
 from cirq import (
-    ZPowGate,
-    YPowGate,
-    XPowGate,
-    HPowGate,
+    Circuit,
     CXPowGate,
     CZPowGate,
+    EigenGate,
+    HPowGate,
     MeasurementGate,
+    Moment,
     Qid,
+    XPowGate,
+    YPowGate,
+    ZPowGate,
 )
-from mitiq.interface import accept_qprogram_and_validate
+
 from mitiq import QPROGRAM
+from mitiq.interface import accept_qprogram_and_validate
 
 
 class GateTypeException(Exception):

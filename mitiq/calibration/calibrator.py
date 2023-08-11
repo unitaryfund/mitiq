@@ -3,11 +3,12 @@
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
 
-from typing import Callable, Dict, Optional, Union, cast, Sequence
 import warnings
+from typing import Callable, Dict, Optional, Sequence, Union, cast
+
+import cirq
 import numpy as np
 import numpy.typing as npt
-import cirq
 
 from mitiq import (
     QPROGRAM,
@@ -17,18 +18,26 @@ from mitiq import (
     QuantumResult,
 )
 from mitiq.calibration.settings import (
-    Settings,
-    ZNESettings,
-    Strategy,
     BenchmarkProblem,
+    MitigationTechnique,
+    Settings,
+    Strategy,
+    ZNESettings,
 )
 from mitiq.interface import convert_from_mitiq
 
-TABLE_HEADER_STR = (
+ZNE_TABLE_HEADER_STR = (
     "| performance | circuit | method | extrapolation | scale factors "
     "| scale_method         |\n"
     "| ----------- | ------- | ------ | ------------- | ------------- "
     "| -------------------- |"
+)
+
+PEC_TABLE_HEADER_STR = (
+    "| performance | circuit | method "
+    "| noise level | noise bias | representation function   | \n"
+    "| ----------- | ------- | ------ | ----------- | ---------- "
+    "| ------------------------- |"
 )
 
 
@@ -181,7 +190,9 @@ class Calibrator:
             A summary of the number of circuits to be run.
         """
         num_circuits = len(self.problems)
-        num_options = len(self.settings.technique_params)
+        num_options = sum(
+            strategy.num_circuits_required() for strategy in self.strategies
+        )
 
         noisy = num_circuits * num_options
         ideal = 0  # TODO: ideal executor is currently unused
@@ -195,9 +206,7 @@ class Calibrator:
         if not self.results.is_missing_data():
             self.results.reset_data()
 
-        if log:
-            print(TABLE_HEADER_STR)
-
+        prev_technique = None
         for problem in self.problems:
             # Benchmark circuits have no measurements, so we append them.
             circuit = problem.circuit.copy()
@@ -214,6 +223,16 @@ class Calibrator:
                     mitigated_value = strategy.mitigation_function(
                         circuit, expval_executor
                     )
+                if (
+                    strategy.technique != prev_technique
+                    and strategy.technique is MitigationTechnique.ZNE
+                ):
+                    print(ZNE_TABLE_HEADER_STR)
+                elif (
+                    strategy.technique != prev_technique
+                    and strategy.technique is MitigationTechnique.PEC
+                ):
+                    print(PEC_TABLE_HEADER_STR)
                 self.results.add_result(
                     strategy,
                     problem,
@@ -222,6 +241,7 @@ class Calibrator:
                     mitigated_val=mitigated_value,
                     log=log,
                 )
+                prev_technique = strategy.technique
         self.results.ensure_full()
 
     def best_strategy(self) -> Strategy:

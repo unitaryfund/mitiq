@@ -313,9 +313,6 @@ html_favicon = "img/mitiq.ico"
 html_extra_path = ["robots.txt"]
 
 html_theme_options = {
-    "announcement": '<a href="https://unitaryhack.dev/">unitaryHACK</a> has \
-    begun, and will run until <b>Jun 13</b>! Get rewarded for contributing to \
-    open source quantum software!',
     "icon_links": [
         {
             "name": "Source Repository",
@@ -337,10 +334,12 @@ nbsphinx_thumbnails = {
     "examples/hamiltonians": "_static/vqe-cirq-pauli-sum-mitigation-plot.png",
     "examples/braket_mirror_circuit": "_static/mirror-circuits.png",
     "examples/maxcut-demo": "_static/max-cut.png",
+    "examples/layerwise-folding": "_static/layerwise.png",
     "examples/cirq-ibmq-backends": "_static/cirq-mitiq-ibmq.png",
     "examples/pennylane-ibmq-backends": "_static/zne-pennylane.png",
     "examples/ibmq-backends": "_static/ibmq-gate-map.png",
     "examples/simple-landscape-cirq": "_static/simple-landscape-cirq.png",
+    "examples/simple-landscape-braket": "_static/simple-landscape-braket.png",
     "examples/molecular_hydrogen": "_static/molecular-hydrogen-vqe.png",
     "examples/molecular_hydrogen_pennylane": "_static/mol-h2-vqe-pl.png",
     "examples/vqe-pyquil-demo": "_static/vqe-pyquil-demo.png",
@@ -356,6 +355,7 @@ nbsphinx_thumbnails = {
     "examples/ddd_on_ibmq_ghz": "_static/ddd_qiskit_ghz_plot.png",
     "examples/calibration-tutorial": "_static/calibration.png",
     "examples/combine_rem_zne": "_static/combine_rem_zne.png",
+    "examples/quantum_simulation_scars_ibmq": "_static/qmbs_ibmq.png",
     # default images if no thumbnail is specified
     "examples/*": "_static/mitiq-logo.png",
 }
