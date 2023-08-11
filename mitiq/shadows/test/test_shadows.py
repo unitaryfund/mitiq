@@ -5,8 +5,6 @@
 
 """Test classical shadow estimation process."""
 
-import pytest
-from unittest.mock import Mock, patch
 import cirq
 
 import mitiq
