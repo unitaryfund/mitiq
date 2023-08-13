@@ -39,11 +39,18 @@ Whether to run the quantum measurement or directly use the results from the prev
 
 
 ```python
-import pickle
+import zipfile,pickle,io,requests
 
 run_quantum_processing = False
 if not run_quantum_processing:
-    saved_data = pickle.load(open("saved_data-rshadows.pkl", "rb"))
+    # Fetch data obtained from a previous run of this tutorial
+    repo = "https://github.com/Min-Li/mitiq-shadows-storage/raw/main/"
+    saved_data_name = 'saved_data-rshadows'
+    url = f'{repo}/{saved_data_name}.zip'
+    response = requests.get(url)
+    zip_data = response.content
+    with zipfile.ZipFile(io.BytesIO(zip_data), 'r') as zf:
+        saved_data = pickle.loads(zf.read(f'{saved_data_name}.pkl'))
 ```
 
 The *robust shadow estimation*{cite}`chen2021robust` approach put forth in *Predicting Many Properties of a Quantum System from Very Few Measurements* {cite}`huang2020predicting` exhibits noise resilience. The inherent randomization in the protocol simplifies the noise, transforming it into a Pauli noise channel that can be characterized relatively straightforwardly. Once the noisy channel $\widehat{\mathcal{M}}$ is characterized $\widehat{\mathcal{M}}$, it is incorporated into the channel inversion $\widehat{\mathcal{M}}^{-1}$, resulting in an unbiased state estimator. The sampling error in the determination of the Pauli channel contributes to the variance of this estimator. 
