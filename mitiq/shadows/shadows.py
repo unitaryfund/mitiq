@@ -2,18 +2,9 @@
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
-"""Classical shadow estimation for quantum circuits. Based on the paper"""
+"""Classical shadow estimation for quantum circuits. """
 
-from typing import (
-    Optional,
-    Callable,
-    List,
-    Dict,
-    Any,
-    Tuple,
-    Union,
-    Mapping,
-)
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 import cirq
 import numpy as np
@@ -21,12 +12,12 @@ from numpy.typing import NDArray
 
 import mitiq
 from mitiq import MeasurementResult
-from mitiq.shadows.quantum_processing import random_pauli_measurement
 from mitiq.shadows.classical_postprocessing import (
-    shadow_state_reconstruction,
     expectation_estimation_shadow,
     get_pauli_fidelities,
+    shadow_state_reconstruction,
 )
+from mitiq.shadows.quantum_processing import random_pauli_measurement
 
 
 def pauli_twirling_calibrate(
@@ -39,24 +30,30 @@ def pauli_twirling_calibrate(
 ) -> Dict[str, complex]:
     r"""
     This function returns the dictionary of the median of means estimation
-    of Pauli fidelities: {:math:`\{'b':f_{b}\}_{b\in\{0,1\}^n}`}.
+    of Pauli fidelities: :math:`\{`"b": :math:`f_{b}\}_{b\in\{0,1\}^n}`.
+    The number of :math:`f_b` is :math:`2^n`, or :math:`2^d` if the
+    locality :math:`d` is given.
+
+    In the notation of arXiv:2011.09636, this function estimates the
+    coefficient :math:`f_b`, which are expansion coefficients of the twirled
+    channel :math:`\mathcal{M}=\sum_b f_b\Pi_b`.
 
     Args:
-        k_calibration: Number of groups of "median of means" used for
-            calibration.
+        k_calibration: Number of groups of "median of means" used to solve for
+            Pauli fidelity.
         locality: The locality of the operator, whose expectation value is
             going to be estimated by the classical shadow. e.g. if operator is
-            Ising model Hamiltonian with nearist neighbour interacting, then
+            Ising model Hamiltonian with nearist neighbour interaction, then
             locality = 2.
         zero_state_shadow_outcomes: The output of function
-            `shadow_quantum_processing` of zero calibrate state.
-        qubits: The qubits to measure, needs to spercify when the
+            :func:`shadow_quantum_processing` of zero calibrate state.
+        qubits: The qubits to measure, needs to specify when the
             `zero_state_shadow_outcomes` is None.
         executor: The function to use to do quantum measurement, must be same
-            as executor in `shadow_quantum_processing`. Needs to spercify when
+            as executor in `shadow_quantum_processing`. Needs to specify when
             the `zero_state_shadow_outcomes` is None.
         num_total_measurements_calibration: Number of shots per group of
-            "median of means" used for calibration. Needs to spercify when
+            "median of means" used for calibration. Needs to specify when
             the `zero_state_shadow_outcomes` is None.
 
     Returns:
@@ -112,10 +109,10 @@ def shadow_quantum_processing(
     Returns:
         A dictionary containing the bit strings, the Pauli strings
         `bit_strings`: Circuit qubits computational basis
-        e.g. :math:`"01..":=|0\rangle|1\rangle..`.
+        e.g. "01..":math:`:=|0\rangle|1\rangle..`.
         `pauli_strings`: The local Pauli measurement performed on each
         qubit. e.g."XY.." means perform local X-basis measurement on the
-        1st qubit, local Y-basis measurement the 2ed qubit in the circuit.
+        1st qubit, local Y-basis measurement the 2ed qubit in the circuit, etc.
     """
     if random_seed is not None:
         np.random.seed(random_seed)
@@ -157,8 +154,8 @@ def classical_post_processing(
             the expectation value of the observables.
 
     Returns:
-        If state_reconstruction is True: state tomography matrix in
-        :math:`\mathbb{M}(\mathbb{C})_{2^n}` if rshadows is False,
+        If `state_reconstruction` is True: state tomography matrix in
+        :math:`\mathbb{M}_{2^n}(\mathbb{C})` if rshadows is False,
         otherwise state tomography vector in :math:`\mathbb{C}^{4^d}`.
         If observables is given: estimated expectation values of
         observables.
@@ -180,9 +177,7 @@ def classical_post_processing(
             shadow_outcomes, rshadows, f_est=calibration_results
         )
         output["reconstructed_state"] = reconstructed_state  # type: ignore
-    elif (
-        observables is not None
-    ):  # Estimation expectation value of observables
+    elif observables is not None:
         if k_shadows is None:
             k_shadows = 1
 

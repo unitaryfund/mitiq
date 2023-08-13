@@ -13,9 +13,9 @@ from mitiq.interface.mitiq_cirq.cirq_utils import (
     sample_bitstrings as cirq_sample_bitstrings,
 )
 from mitiq.shadows.shadows import (
+    classical_post_processing,
     pauli_twirling_calibrate,
     shadow_quantum_processing,
-    classical_post_processing,
 )
 
 # define a fully entangled state

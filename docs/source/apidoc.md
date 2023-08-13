@@ -133,6 +133,8 @@ See Ref. :cite:`Czarnik_2021_Quantum` for more details on these methods.
 .. automodule:: mitiq.interface.mitiq_qiskit.qiskit_utils
    :members:
 ```
+
+
 ## Classical Shadows
 
 ### Classical Shadows (High-Level Tools)
