@@ -19,7 +19,6 @@ from mitiq.shadows.shadows import (
 )
 
 # define a fully entangled state
-# number of qubits in the circuit
 num_qubits: int = 2
 # qubits in the circuit prepared in the $|0\rangle$ state
 qubits = cirq.LineQubit.range(num_qubits)
