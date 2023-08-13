@@ -1,11 +1,11 @@
 # Third-party integration.
 qiskit~=0.44.0
 qiskit-aer~=0.12.2
-qiskit-ibm-provider~=0.6.2
+qiskit-ibm-provider~=0.6.3
 pyquil~=3.5.4
 pennylane-qiskit~=0.31.0
-pennylane~=0.30.0
-amazon-braket-sdk~=1.52.0
+pennylane~=0.31.1
+amazon-braket-sdk~=1.53.3
 
 # Unit tests, coverage, and formatting/style.
 pytest==7.1.3
@@ -14,6 +14,7 @@ pytest-cov==4.0.0
 flake8==6.0.0
 black==22.10
 mypy==1.0.0
+isort==5.12.0
 
 # Documentation and examples.
 Sphinx==5.2.3
@@ -25,6 +26,8 @@ pydata-sphinx-theme==0.11.0
 jupytext==1.14.1
 sphinx-gallery==0.10.1
 nbsphinx==0.9.1
+matplotlib==3.7.2
+pandas==2.0.3
 pyscf==2.2.1; sys_platform != 'win32'
 openfermion==1.5.1; sys_platform != 'win32'
 openfermionpyscf==0.5; sys_platform != 'win32'

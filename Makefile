@@ -9,6 +9,7 @@ check-all: check-format check-style check-types
 
 .PHONY: check-format
 check-format:
+	isort --check mitiq
 	black --check --diff mitiq
 
 .PHONY: check-style
@@ -48,6 +49,7 @@ linkcheck:
 
 .PHONY: format
 format:
+	isort mitiq
 	black mitiq
 
 .PHONY: install

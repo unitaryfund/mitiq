@@ -5,21 +5,12 @@
 
 """High-level digital dynamical decoupling (DDD) tools."""
 
-from typing import (
-    Optional,
-    Callable,
-    Union,
-    Tuple,
-    Dict,
-    Any,
-    List,
-)
+from functools import partial, wraps
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
-from functools import wraps, partial
 import numpy as np
 
-from mitiq import Executor, Observable, QPROGRAM, QuantumResult
-
+from mitiq import QPROGRAM, Executor, Observable, QuantumResult
 from mitiq.ddd.insertion import insert_ddd_sequences
 
 

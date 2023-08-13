@@ -8,15 +8,15 @@
 # LICENSE file in the root directory of this source tree.
 
 """Defines utility functions for classical shadows protocol."""
-from typing import Tuple, List, Any
+from itertools import product
+from typing import Any, List, Tuple
 
+import cirq
 import numpy as np
 from numpy.typing import NDArray
-import cirq
 from scipy.linalg import sqrtm
-import mitiq
 
-from itertools import product
+import mitiq
 
 PAULIS = [
     cirq.I._unitary_(),
@@ -43,8 +43,8 @@ def kronecker_product(matrices: List[NDArray[Any]]) -> NDArray[Any]:
 def operator_ptm_vector_rep(opt: NDArray[Any]) -> NDArray[Any]:
     r"""
     Returns the PTM vector representation of an operator.
-    :math:`\mathcal{L}(\mathcal{H}_{2^n})\ni opt\rightarrow|opt\rangle\!
-    \rangle\in \mathcal{H}_{4^n}`.
+    :math:`\mathcal{L}(\mathcal{H}_{2^n})\ni \mathtt{opt}\rightarrow
+    |\mathtt{opt}\rangle\!\rangle\in \mathcal{H}_{4^n}`.
 
     Args:
         opt: A square matrix representing an operator.

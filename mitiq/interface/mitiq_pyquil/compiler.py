@@ -11,14 +11,12 @@ and modified to support a larger gateset (e.g. CPHASE).
 """
 
 from math import pi
-from typing import Any, cast, Union
+from typing import Any, Union, cast
 
 import numpy as np
-
-from pyquil.gates import RX, RZ, CZ, I, XY
-from pyquil.quil import Program, Qubit, QubitPlaceholder, FormalArgument
-from pyquil.quilbase import Gate, Expression
-
+from pyquil.gates import CZ, RX, RZ, XY, I
+from pyquil.quil import FormalArgument, Program, Qubit, QubitPlaceholder
+from pyquil.quilbase import Expression, Gate
 
 QubitLike = Union[Qubit, QubitPlaceholder, FormalArgument]
 AngleLike = Union[Expression, Any, complex]

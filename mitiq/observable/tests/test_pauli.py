@@ -4,16 +4,15 @@
 # LICENSE file in the root directory of this source tree.
 
 from collections import Counter
+
+import cirq
+import numpy as np
 import pytest
 
-import numpy as np
-import cirq
-
-from mitiq.interface import mitiq_qiskit, mitiq_pyquil
-from mitiq.observable.pauli import PauliString, PauliStringCollection
 from mitiq import MeasurementResult
+from mitiq.interface import mitiq_pyquil, mitiq_qiskit
+from mitiq.observable.pauli import PauliString, PauliStringCollection
 from mitiq.utils import _equal
-
 
 # Basis rotations to measure Pauli X and Y.
 xrotation = cirq.SingleQubitCliffordGate.Y_nsqrt

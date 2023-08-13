@@ -6,11 +6,12 @@
 
 """Tests for QPE benchmarking circuits."""
 
-import pytest
 import cirq
-from mitiq.utils import _equal
-from mitiq.benchmarks.qpe_circuits import generate_qpe_circuit
+import pytest
+
 from mitiq import SUPPORTED_PROGRAM_TYPES
+from mitiq.benchmarks.qpe_circuits import generate_qpe_circuit
+from mitiq.utils import _equal
 
 
 def test_bad_qubit_number():

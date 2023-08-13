@@ -5,12 +5,14 @@
 
 """Functions for computing the projector for subspace expansion."""
 
-from typing import Callable, Sequence, Union, Dict, List
-from mitiq import Observable, QPROGRAM, QuantumResult, PauliString, Executor
+from typing import Callable, Dict, List, Sequence, Union
+
 import numpy as np
 import numpy.typing as npt
-from scipy.linalg import eigh
 from numpy.linalg import pinv
+from scipy.linalg import eigh
+
+from mitiq import QPROGRAM, Executor, Observable, PauliString, QuantumResult
 
 
 def get_projector(

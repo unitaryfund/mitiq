@@ -1,5 +1,74 @@
 # Changelog
 
+## Version 0.28.0
+
+### Summary
+
+#### Quantum Subspace Expansion
+
+With the main functionaly implemented, quantum subspace expansion is now available in Mitiq!
+The technique requires a sequence of check operators, a Hamiltonian, and an observable in addition to the typical circuit and executor that Mitiq needs to operate.
+```py
+from mitiq.qse import execute_with_qse
+
+execute_with_qse(circuit, executor, check_operators, code_hamiltonian, observable)
+```
+
+This feature is still in flux, and would greatly benefit from further testing.
+Do give a try, and [let us know if you have feedback](https://github.com/unitaryfund/mitiq/issues/new/)!
+More details can be found in our [API-doc](https://mitiq.readthedocs.io/en/latest/apidoc.html#module-mitiq.qse.qse).
+Congratulations to @bubakazouba for the great work here.
+
+#### PEC Calibration
+
+Last release we added support to run PEC experiments within the `calibration` module.
+This release we made two improvements:
+
+1. Calibration experiments now represent all two-qubit gates by default (previously this was just $\mathrm{C}X$ and $\mathrm{C}Z$ gates.)
+2. When running `calibrator.run(log=True)` you will now find results from your PEC pretty-printed alongside any ZNE experiments.
+
+#### Installation
+
+Our core dependencies (NumPy, Cirq, SciPy) are now less tightly specified which means easier installs for users!
+
+#### Robust Shadow Estimation
+
+@Min-Li has been hard at work bringing shadows to Mitiq.
+The `shadows` module is not quite ready for use, but you can get a sneak peak of what's to come in the Classical Shadows section of our [API-doc](https://mitiq.readthedocs.io/en/latest/apidoc.html#classical-shadows).
+
+### All changes
+
+- Fix docstring in qse.py (#1944) [@misty-w]
+- Add QSE to API-doc (#1938) [@natestemen]
+- fix asv benchmarks (#1937) [@natestemen]
+- [Classical Shadows 1] classical postprocessing (#1908) [@min-li]
+- Add Calibration logging for PEC (#1873) [@misty-w]
+- [Classical Shadows 1] utils for shadows and unit test (#1907) [@min-li]
+- Clean up types (#1825) [@natestemen]
+- Relax test condition for `test_execute_with_pauli_twirling` (#1931) [@misty-w]
+- loosen remaining core dependency versions (#1917) [@natestemen]
+- [Classical Shadows] quantum processing and test (#1906) [@min-li]
+- Make PEC calibration support all multi-qubit-gate (#1881) [@YuNariai]
+- Implements high-level functions for QSE (#1902) [@bubakazouba]
+- Temporary fix for documentation problem (#1927) [@andreamari]
+- Adding layerwise folding as tutorial to mitiq. (#1894) [@vprusso]
+- Fix docstring of initialized_depolarized_noise (#1919) [@andreamari]
+- Update broken URLs (#1912) [@min-li]
+- indicate under active development on master (#1900) [@natestemen]
+
+#### Dependency updates
+
+- Update pennylane requirement from ~=0.30.0 to ~=0.31.0 (#1888) [@dependabot]
+- Update cirq requirement from ~=1.1.0 to ~=1.2.0 (#1922) [@dependabot]
+- Update qiskit requirement from ~=0.43.3 to ~=0.44.0 (#1935) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.51.0 to ~=1.52.0 (#1933) [@dependabot]
+- Update qiskit-ibm-provider requirement from ~=0.6.1 to ~=0.6.2 (#1932) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.50.0 to ~=1.51.0 (#1928) [@dependabot]
+- Update qiskit requirement from ~=0.43.2 to ~=0.43.3 (#1925) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.49.1 to ~=1.50.0 (#1926) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.49.0 to ~=1.49.1 (#1916) [@dependabot]
+- Update amazon-braket-sdk requirement from ~=1.46.0 to ~=1.49.0 (#1915) [@dependabot]
+
 ## Version 0.27.0
 
 ### Summary

@@ -13,19 +13,16 @@ from mitiq.interface.mitiq_cirq.cirq_utils import (
     sample_bitstrings as cirq_sample_bitstrings,
 )
 from mitiq.shadows.shadows import (
+    classical_post_processing,
     pauli_twirling_calibrate,
     shadow_quantum_processing,
-    classical_post_processing,
 )
 
 # define a fully entangled state
-# number of qubits in the circuit
 num_qubits: int = 2
-# qubits in the circuit prepared in the $|0\rangle$ state
 qubits = cirq.LineQubit.range(num_qubits)
 circuit = cirq.Circuit([cirq.H(q) for q in qubits])
 circuit.append(cirq.CNOT(qubits[0], qubits[1]))
-# Define list of observables
 observables = [mitiq.PauliString("X", support=(i,)) for i in range(num_qubits)]
 
 
@@ -44,7 +41,7 @@ def test_pauli_twirling_calibrate():
 
     # Call the function with valid inputs
     result = pauli_twirling_calibrate(
-        qubits, executor, num_total_measurements_calibration=2
+        qubits=qubits, executor=executor, num_total_measurements_calibration=2
     )
 
     # Check that the result is a dictionary

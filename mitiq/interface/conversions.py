@@ -9,7 +9,7 @@ from typing import Any, Callable, Dict, Iterable, Tuple, cast
 
 from cirq import Circuit
 
-from mitiq import SUPPORTED_PROGRAM_TYPES, QPROGRAM
+from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
 
 
 class UnsupportedCircuitError(Exception):

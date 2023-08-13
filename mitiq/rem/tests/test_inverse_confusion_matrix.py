@@ -7,17 +7,18 @@
 
 from functools import reduce
 from math import isclose
+
 import numpy as np
 import pytest
 
 from mitiq import MeasurementResult
 from mitiq.rem.inverse_confusion_matrix import (
     bitstrings_to_probability_vector,
+    closest_positive_distribution,
     generate_inverse_confusion_matrix,
     generate_tensored_inverse_confusion_matrix,
     mitigate_measurements,
     sample_probability_vector,
-    closest_positive_distribution,
 )
 
 

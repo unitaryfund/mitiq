@@ -2,9 +2,9 @@
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
-"""Classical shadow estimation for quantum circuits. Based on the paper"""
+"""Classical shadow estimation for quantum circuits. """
 
-from typing import Optional, Callable, List, Dict, Any, Tuple, Union, Mapping
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 import cirq
 import numpy as np
@@ -12,49 +12,74 @@ from numpy.typing import NDArray
 
 import mitiq
 from mitiq import MeasurementResult
-from mitiq.shadows.quantum_processing import random_pauli_measurement
 from mitiq.shadows.classical_postprocessing import (
-    shadow_state_reconstruction,
     expectation_estimation_shadow,
     get_pauli_fidelities,
+    shadow_state_reconstruction,
 )
+from mitiq.shadows.quantum_processing import random_pauli_measurement
 
 
 def pauli_twirling_calibrate(
-    qubits: List[cirq.Qid],
-    executor: Callable[[cirq.Circuit], MeasurementResult],
-    num_total_measurements_calibration: int = 20000,
     k_calibration: int = 1,
     locality: Optional[int] = None,
+    zero_state_shadow_outcomes: Optional[Tuple[List[str], List[str]]] = None,
+    qubits: Optional[List[cirq.Qid]] = None,
+    executor: Optional[Callable[[cirq.Circuit], MeasurementResult]] = None,
+    num_total_measurements_calibration: Optional[int] = 20000,
 ) -> Dict[str, complex]:
     r"""
     This function returns the dictionary of the median of means estimation
-    of Pauli fidelity: {:math:`\{'b':f_{b}\}_{b\in\{0,1\}^n}`}.
+    of Pauli fidelities: :math:`\{`"b": :math:`f_{b}\}_{b\in\{0,1\}^n}`.
+    The number of :math:`f_b` is :math:`2^n`, or :math:`2^d` if the
+    locality :math:`d` is given.
+
+    In the notation of arXiv:2011.09636, this function estimates the
+    coefficient :math:`f_b`, which are expansion coefficients of the twirled
+    channel :math:`\mathcal{M}=\sum_b f_b\Pi_b`.
 
     Args:
-        qubits: The qubits to measure.
-        executor: The function to use to do quantum measurement, must be same
-            as executor in `shadow_quantum_processing`.
-        k_calibration: Number of groups of "median of means" used for
-            calibration.
-        num_total_measurements_calibration: Number of shots per group of
-            "median of means" used for calibration.
+        k_calibration: Number of groups of "median of means" used to solve for
+            Pauli fidelity.
         locality: The locality of the operator, whose expectation value is
             going to be estimated by the classical shadow. e.g. if operator is
-            Ising model Hamiltonian with nearist neighbour interacting, then
+            Ising model Hamiltonian with nearist neighbour interaction, then
             locality = 2.
+        zero_state_shadow_outcomes: The output of function
+            :func:`shadow_quantum_processing` of zero calibrate state.
+        qubits: The qubits to measure, needs to specify when the
+            `zero_state_shadow_outcomes` is None.
+        executor: The function to use to do quantum measurement, must be same
+            as executor in `shadow_quantum_processing`. Needs to specify when
+            the `zero_state_shadow_outcomes` is None.
+        num_total_measurements_calibration: Number of shots per group of
+            "median of means" used for calibration. Needs to specify when
+            the `zero_state_shadow_outcomes` is None.
+
     Returns:
         A dictionary containing the calibration outcomes.
     """
-    # calibration circuit is of same qubit number with original circuit
-    zero_circuit = cirq.Circuit()
-    # perform random Pauli measurement one the calibration circuit
-    calibration_measurement_outcomes = random_pauli_measurement(
-        zero_circuit,
-        n_total_measurements=num_total_measurements_calibration,
-        executor=executor,
-        qubits=qubits,
-    )
+    if zero_state_shadow_outcomes is None:
+        if qubits is None:
+            raise ValueError("qubits should not be None.")
+        if executor is None:
+            raise ValueError("executor should not be None.")
+        if num_total_measurements_calibration is None:
+            raise ValueError(
+                "num_total_measurements_calibration should not be None."
+            )
+
+        # calibration circuit is of same qubit number with original circuit
+        zero_circuit = cirq.Circuit()
+        # perform random Pauli measurement one the calibration circuit
+        calibration_measurement_outcomes = random_pauli_measurement(
+            zero_circuit,
+            n_total_measurements=num_total_measurements_calibration,
+            executor=executor,
+            qubits=qubits,
+        )
+    else:
+        calibration_measurement_outcomes = zero_state_shadow_outcomes
     # get the median of means estimation of Pauli fidelities
     return get_pauli_fidelities(
         calibration_measurement_outcomes, k_calibration, locality=locality
@@ -69,8 +94,13 @@ def shadow_quantum_processing(
     qubits: Optional[List[cirq.Qid]] = None,
 ) -> Tuple[List[str], List[str]]:
     r"""
-    Executes a circuit with classical shadows. This function can be used for
-    state reconstruction or expectation value estimation of observables.
+    This function returns the bit strings and Pauli strings corresponding to
+    the executor measurement outcomes for a given circuit, rotated by unitaries
+    randomly sampled from a fixed unitary ensemble :math:`\mathcal{G}`.
+
+    In the current implementation, the unitaries are sampled from the local
+    Clifford group for :math:`n` qubits, i.e.,
+    :math:`\mathcal{G} = \mathrm{Cl}_2^n`.
 
     Args:
         circuit: The circuit to execute.
@@ -79,7 +109,7 @@ def shadow_quantum_processing(
         num_total_measurements_shadow: Total number of shots for shadow
             estimation.
         random_seed: The random seed to use for the shadow measurements.
-        qubits: The qubits to measure. If None, all qubits in the circuit.
+        qubits: The qubits to measure.
 
     Returns:
         A dictionary containing the bit strings, the Pauli strings
@@ -87,7 +117,7 @@ def shadow_quantum_processing(
         e.g. "01..":math:`:=|0\rangle|1\rangle..`.
         `pauli_strings`: The local Pauli measurement performed on each
         qubit. e.g."XY.." means perform local X-basis measurement on the
-        1st qubit, local Y-basis measurement the 2ed qubit in the circuit.
+        1st qubit, local Y-basis measurement the 2ed qubit in the circuit, etc.
     """
     if random_seed is not None:
         np.random.seed(random_seed)
@@ -129,8 +159,8 @@ def classical_post_processing(
             the expectation value of the observables.
 
     Returns:
-        If state_reconstruction is True: state tomography matrix in
-        :math:`\mathbb{M}(\mathbb{C})_{2^n}` if rshadows is False,
+        If `state_reconstruction` is True: state tomography matrix in
+        :math:`\mathbb{M}_{2^n}(\mathbb{C})` if rshadows is False,
         otherwise state tomography vector in :math:`\mathbb{C}^{4^d}`.
         If observables is given: estimated expectation values of
         observables.
@@ -152,9 +182,7 @@ def classical_post_processing(
             shadow_outcomes, rshadows, f_est=calibration_results
         )
         output["reconstructed_state"] = reconstructed_state  # type: ignore
-    elif (
-        observables is not None
-    ):  # Estimation expectation value of observables
+    elif observables is not None:
         if k_shadows is None:
             k_shadows = 1
 

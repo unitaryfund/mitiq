@@ -6,19 +6,19 @@
 import random
 
 import cirq
-import qiskit
-import numpy as np
 import networkx as nx
+import numpy as np
+import qiskit
 
+from mitiq.benchmarks import generate_mirror_circuit
+from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.pt.pt import (
-    twirl_CNOT_gates,
-    twirl_CZ_gates,
-    execute_with_pauli_twirling,
     CNOT_twirling_gates,
     CZ_twirling_gates,
+    execute_with_pauli_twirling,
+    twirl_CNOT_gates,
+    twirl_CZ_gates,
 )
-from mitiq.interface.mitiq_cirq import compute_density_matrix
-from mitiq.benchmarks import generate_mirror_circuit
 
 num_qubits = 2
 qubits = cirq.LineQubit.range(num_qubits)

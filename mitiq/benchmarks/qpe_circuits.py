@@ -6,7 +6,9 @@
 """Functions to create a QPE circuit."""
 
 from typing import Optional
+
 import cirq
+
 from mitiq import QPROGRAM
 from mitiq.interface import convert_from_mitiq
 

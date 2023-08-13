@@ -2,25 +2,26 @@
 #
 # This source code is licensed under the GPL license (v3) found in the
 # LICENSE file in the root directory of this source tree.
-import pytest
 import json
+
 import cirq
+import pytest
 import qiskit
 
 from mitiq import QPROGRAM, SUPPORTED_PROGRAM_TYPES
-from mitiq.calibration import ZNESettings, PECSettings, Settings
+from mitiq.calibration import PECSettings, Settings, ZNESettings
 from mitiq.calibration.settings import (
-    MitigationTechnique,
     BenchmarkProblem,
+    MitigationTechnique,
     Strategy,
 )
-from mitiq.raw import execute
 from mitiq.pec import (
     execute_with_pec,
     represent_operation_with_local_depolarizing_noise,
 )
+from mitiq.raw import execute
+from mitiq.zne.inference import LinearFactory, RichardsonFactory
 from mitiq.zne.scaling import fold_global
-from mitiq.zne.inference import RichardsonFactory, LinearFactory
 
 light_pec_settings = Settings(
     [
