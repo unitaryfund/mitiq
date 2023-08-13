@@ -94,8 +94,13 @@ def shadow_quantum_processing(
     qubits: Optional[List[cirq.Qid]] = None,
 ) -> Tuple[List[str], List[str]]:
     r"""
-    Executes a circuit with classical shadows. This function can be used for
-    state reconstruction or expectation value estimation of observables.
+    This function returns the bit strings and Pauli strings corresponding to
+    the executor measurement outcomes for a given circuit, rotated by unitaries
+    randomly sampled from a fixed unitary ensemble :math:`\mathcal{G}`.
+
+    In the current implementation, the unitaries are sampled from the local
+    Clifford group for :math:`n` qubits, i.e.,
+    :math:`\mathcal{G} = \mathrm{Cl}_2^n`.
 
     Args:
         circuit: The circuit to execute.
