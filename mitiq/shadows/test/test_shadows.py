@@ -23,7 +23,6 @@ num_qubits: int = 2
 qubits = cirq.LineQubit.range(num_qubits)
 circuit = cirq.Circuit([cirq.H(q) for q in qubits])
 circuit.append(cirq.CNOT(qubits[0], qubits[1]))
-# Define list of observables
 observables = [mitiq.PauliString("X", support=(i,)) for i in range(num_qubits)]
 
 
