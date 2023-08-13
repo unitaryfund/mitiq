@@ -31,8 +31,8 @@ def pauli_twirling_calibrate(
     r"""
     This function returns the dictionary of the median of means estimation
     of Pauli fidelities: :math:`\{`"b": :math:`f_{b}\}_{b\in\{0,1\}^n}`.
-    The number of :math:`f_b` is :math:`2^n`, or :math:`2^d` if the
-    locality :math:`d` is given.
+    The number of :math:`f_b` is :math:`2^n`, or :math:`\sum_{i=1}^d C_n^i` if
+    the locality :math:`d` is given.
 
     In the notation of arXiv:2011.09636, this function estimates the
     coefficient :math:`f_b`, which are expansion coefficients of the twirled
@@ -123,8 +123,9 @@ def shadow_quantum_processing(
         np.random.seed(random_seed)
     r"""
     Shadow stage 1: Sample random unitary form
-    :math:`\mathcal{g}\subset U(2^n)` and perform computational
-    basis measurement
+    :math:`\mathcal{g}\subset \mathrm{U}(2^n)` and perform computational
+    basis measurement. In the current state, we have implemented
+    local Pauli measurement, i.e. :math:`\mathcal{g} = \mathrm{Cl}_2^n`.
     """
     # random Pauli measurement on the circuit
     output = random_pauli_measurement(

@@ -28,16 +28,23 @@ from mitiq import MeasurementResult
 from mitiq.interface.mitiq_cirq.cirq_utils import (
     sample_bitstrings as cirq_sample_bitstrings,
 )
-from functools import partial
+
 
 # auto reload modules when they have changed
 %load_ext autoreload
 %autoreload 2
 ```
 
-    The autoreload extension is already loaded. To reload it, use:
-      %reload_ext autoreload
+Whether to run the quantum measurement or directly use the results from the previous run. If **True**, the measurement will be run again. If **False**, the results from the previous run will be used. 
 
+
+```python
+import pickle
+
+run_quantum_processing = False
+if not run_quantum_processing:
+    saved_data = pickle.load(open("saved_data-rshadows.pkl", "rb"))
+```
 
 The *robust shadow estimation*{cite}`chen2021robust` approach put forth in *Predicting Many Properties of a Quantum System from Very Few Measurements* {cite}`huang2020predicting` exhibits noise resilience. The inherent randomization in the protocol simplifies the noise, transforming it into a Pauli noise channel that can be characterized relatively straightforwardly. Once the noisy channel $\widehat{\mathcal{M}}$ is characterized $\widehat{\mathcal{M}}$, it is incorporated into the channel inversion $\widehat{\mathcal{M}}^{-1}$, resulting in an unbiased state estimator. The sampling error in the determination of the Pauli channel contributes to the variance of this estimator. 
 
@@ -48,12 +55,14 @@ The Hamiltonian of the Ising model is given by
 \begin{equation}
 H = -J\sum_{i=0}^{n-1} Z_i Z_{i+1} -  g\sum_{i=1}^N X_i,
 \end{equation}
-We focus on the case where $J = g =1$. We use the ground state of such a system eight spins provided by 
+We focus on the case where $J = g =1$. We use the ground state of such a system eight spins provided by
 
 
 ```python
 # import groud state of 1-D Ising model w/ periodic boundary condition
-from tensorflow_quantum.datasets import tfi_chain
+# from tensorflow_quantum.datasets import tfi_chain
+from mitiq.shadows.old.spin_system import tfi_chain, xxz_chain
+
 num_qubits = 8
 qubits: List[cirq.Qid] = cirq.LineQubit.range(num_qubits)
 qbs = cirq.GridQubit.rect(num_qubits, 1)
@@ -110,18 +119,22 @@ def cirq_executor(
         sampler=sampler,
     )
     return executor
-
 ```
 
 ## 2. Pauli Twirling Calibration
 ### 2.1 PTM Representation
 The PTM (Pauli Transfer Matrix) or Liouville representation provides a vector representation for all linear operators $\mathcal{L}(\mathcal{H}_d)$ on an $n$-qubit Hilbert space $\mathcal{H}_d$ (where $d = 2^n$). This representation uses the normalized Pauli operator basis $\sigma_a=P_a/\sqrt{d}$, with $P_a$ being the standard Pauli matrices.
 
+
 ```python
-operator_ptm_vector_rep(cirq.I._unitary_()/np.sqrt(2))
+operator_ptm_vector_rep(cirq.I._unitary_() / np.sqrt(2))
 ```
 
+
+
+
     array([1.+0.j, 0.+0.j, 0.+0.j, 0.+0.j])
+
 
 
 ### 2.2 Pauli Twirling of Quantum Channel and Pauli Fidelity:
@@ -152,16 +165,27 @@ For noisy channels, the inverse channel $\widehat{\mathcal{M}}^{-1}$ can be deri
 
 
 ```python
+from functools import partial
+
 n_total_measurements_calibration = 20000
-noisy_executor = partial(cirq_executor, noise_level=(0.2,))
+if run_quantum_processing:
+    noisy_executor = partial(cirq_executor, noise_level=(0.1,))
+    zero_state_shadow_output = shadow_quantum_processing(
+        # zero circuit of 8 qubits
+        circuit=cirq.Circuit(),
+        num_total_measurements_shadow=n_total_measurements_calibration,
+        executor=noisy_executor,
+        qubits=qubits,
+    )
+else:
+    zero_state_shadow_output = saved_data["shadow_outcomes_f_plot"]
 f_est_results = pauli_twirling_calibrate(
-    qubits=qubits,
-    executor=noisy_executor,
+    zero_state_shadow_outcomes=zero_state_shadow_output,
     k_calibration=5,
-    num_total_measurements_calibration=n_total_measurements_calibration,
     locality=2,
 )
 ```
+
 
 ```python
 # sort bitstrings (b_lists' string rep) by number of 1s
@@ -181,9 +205,11 @@ for bitstring in bitstrings:
     f_theoretical[bitstring] = f_val
 ```
 
+
 ```python
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 sns.set_style("whitegrid")
 # plot estimated vs theoretical Pauli fidelitys when no errors in quantum circuit
 plt.plot(
@@ -195,7 +221,12 @@ plt.plot(
     [f_theoretical[b] for b in reordered_bitstrings], label="Noisless Channel"
 )
 plt.xlabel(r"measurement basis states $b$")
-plt.xticks(range(len(reordered_bitstrings)), reordered_bitstrings, rotation='vertical', fontsize=6)
+plt.xticks(
+    range(len(reordered_bitstrings)),
+    reordered_bitstrings,
+    rotation="vertical",
+    fontsize=6,
+)
 
 plt.ylabel("Pauli fidelity")
 plt.legend()
@@ -244,21 +275,32 @@ def compare_shadow_methods(
     k_shadows,
     locality,
     noisy_executor,
+    run_quantum_processing,
+    shadow_measurement_result=None,
+    zero_state_shadow_output=None,
 ):
-  
+    if run_quantum_processing:
+        zero_state_shadow_output = shadow_quantum_processing(
+            circuit=cirq.Circuit(),
+            num_total_measurements_shadow=n_measurements_calibration,
+            executor=noisy_executor,
+            qubits=qubits,
+        )
+
+        shadow_measurement_result = shadow_quantum_processing(
+            circuit,
+            num_total_measurements_shadow=n_measurement_shadow,
+            executor=noisy_executor,
+        )
+    else:
+        assert shadow_measurement_result is not None
+        assert zero_state_shadow_output is not None
+
     f_est = pauli_twirling_calibrate(
-        qubits=sorted(list(circuit.all_qubits())),
-        executor=noisy_executor,
-        num_total_measurements_calibration=n_measurements_calibration,
+        zero_state_shadow_outcomes=zero_state_shadow_output,
         k_calibration=k_calibration,
         locality=locality,
     )
-         
-    shadow_measurement_result = shadow_quantum_processing(
-        circuit,
-        num_total_measurements_shadow=n_measurement_shadow,
-        executor=noisy_executor)
-
     output_shadow = classical_post_processing(
         shadow_outcomes=shadow_measurement_result,
         rshadows=False,
@@ -304,7 +346,7 @@ for i, pauli_string in enumerate(ising_hamiltonian):
     expval_exact.append(exp.real)
 ```
 
-We use bit_flip channel as an example to show how to use the robust shadow estimation (RSE) in Mitiq. The bit_flip channel is a common noise model in quantum computing. It is a Pauli channel that flips the state of a qubit with probability $p$. 
+We use bit_flip channel as an example to show how to use the robust shadow estimation (RSE) in Mitiq. The bit_flip channel is a common noise model in quantum computing. It is a Pauli channel that flips the state of a qubit with probability $p$.
 
 
 ```python
@@ -321,21 +363,28 @@ for noise_level in noise_levels:
         noise_level=(noise_level,),
         noise_model_function=cirq.bit_flip,
     )
+
+    experiment_name = f"{num_qubits}qubits_{noise_model}_{noise_level}"
+    shadow_measurement_result = saved_data[experiment_name]["shadow_outcomes"]
+    zero_state_shadow_output = saved_data[experiment_name][
+        "zero_shadow_outcomes"
+    ]
+
     est_values = compare_shadow_methods(
         circuit=circuit,
         observables=ising_hamiltonian,
-        n_measurements_calibration=10000,
-        n_measurement_shadow=10000,
-        k_shadows=1,
+        n_measurements_calibration=40000,
+        n_measurement_shadow=40000,
+        k_shadows=5,
         locality=2,
-        noisy_executor = noisy_executor,
-        k_calibration=1,
+        noisy_executor=noisy_executor,
+        k_calibration=2,
+        shadow_measurement_result=shadow_measurement_result,
+        zero_state_shadow_output=zero_state_shadow_output,
     )
     standard_results.append(est_values["standard"])
     robust_results.append(est_values["robust"])
 ```
-
-                                                                      
 
 
 ```python
@@ -382,13 +431,13 @@ for i, noise_level in enumerate(noise_levels):
 
 
 ```python
-df_hamiltonian = df_energy.groupby(["noise_model", "noise_level", "method"]).sum()
+df_hamiltonian = df_energy.groupby(["noise_level", "method"]).sum()
 df_hamiltonian = df_hamiltonian.reset_index()
 noise_model = "bit_flip"
 ```
 
-    /var/folders/fj/9qx1s04j6n713s58ml36xbbm0000gn/T/ipykernel_43506/2256291526.py:1: FutureWarning: The default value of numeric_only in DataFrameGroupBy.sum is deprecated. In a future version, numeric_only will default to False. Either specify numeric_only or select only columns which should be valid for the function.
-      df_hamiltonian = df_energy.groupby(["noise_model", "noise_level", "method"]).sum()
+    /var/folders/fj/9qx1s04j6n713s58ml36xbbm0000gn/T/ipykernel_99021/1730867588.py:3: FutureWarning: The default value of numeric_only in DataFrameGroupBy.sum is deprecated. In a future version, numeric_only will default to False. Either specify numeric_only or select only columns which should be valid for the function.
+      ).sum()
 
 
 
@@ -411,7 +460,6 @@ sns.lineplot(
 plt.title(f"Hamiltonian Estimation for {noise_model} Noise")
 plt.xlabel("Noise Level")
 plt.ylabel("Energy Value")
-
 ```
 
 ![png](../img/rshadows_energy.png)
@@ -441,8 +489,6 @@ Define obersevables lists as two point correlation functions between the first q
 
 
 ```python
-from mitiq import PauliString
-
 two_pt_correlation = [
     PauliString("ZZ", support=(0, i), coeff=-1) for i in range(1, num_qubits)
 ]
@@ -466,16 +512,21 @@ with depolarizing noise set to $0.1$, we compare the unmitigated and mitigated r
 
 ```python
 noisy_executor = partial(cirq_executor, noise_level=(0.1,))
+experiment_name = f"{num_qubits}qubits_depolarize_{noise_level}"
+shadow_measurement_result = saved_data[experiment_name]["shadow_outcomes"]
+zero_state_shadow_output = saved_data[experiment_name]["zero_shadow_outcomes"]
+
 est_values = compare_shadow_methods(
-    circuit = circuit,
-    observables = two_pt_correlation,
-    n_processes = 10,
-    n_measurement_calibration = 50000,
-    n_measurement_shadow = 50000,
-    k_shadows = 5,
-    locality = 2,
-    noisy_executor = noisy_executor,
-    k_calibration = 3,
+    circuit=circuit,
+    observables=two_pt_correlation,
+    n_measurements_calibration=40000,
+    n_measurement_shadow=40000,
+    k_shadows=5,
+    locality=2,
+    noisy_executor=noisy_executor,
+    k_calibration=2,
+    shadow_measurement_result=shadow_measurement_result,
+    zero_state_shadow_output=zero_state_shadow_output,
 )
 ```
 
@@ -537,7 +588,6 @@ sns.lineplot(
 plt.title(f"Correlation Function Estimation w/ 0.3 Depolarization Noise")
 plt.xlabel(r"Correlation Function $\langle Z_0Z_i \rangle$")
 plt.ylabel("Correlation")
-
 ```
 
 ![png](../img/rshadows_2pt_func.png)
@@ -546,3 +596,5 @@ plt.ylabel("Correlation")
 ** Acknowledgements**
 
 This project contains code adapted from PennyLane's tutorial on Classical Shadows. We would like to acknowledge the original authors of the tutorial, PennyLane developers Brian Doolittle and Roeland Wiersema. The tutorial can be found at [this link](https://pennylane.ai/qml/demos/tutorial_classical_shadows).
+
+

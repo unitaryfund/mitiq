@@ -162,7 +162,3 @@ the calibration procedure, and then use the $\widetilde{\mathcal{M}}$ estimator
 as the input parameter, $\mathcal{M}\rightarrow\widetilde{\mathcal{M}}$ of the classical shadow to predict any properties of interest (referred to as the estimation procedure). 
 
 [^1]: The Pauli Transfer Matrix (PTM) representation, or Liouville representation, is initially introduced to streamline the notation. We must recognize that all linear operators $\mathcal{L}(\mathcal{H}_d)$ upon the underlying Hilbert space $\mathcal{H}_d$ of $n$-qubits, where $d = 2^n$, can possess a vector representation utilizing the $n$-qubit normalized Pauli operator basis $\sigma_a=P_a/\sqrt{d}$. Here, $P_a$ represents the conventional Pauli matrices. 
-
-
-
-
