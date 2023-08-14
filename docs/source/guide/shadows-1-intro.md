@@ -39,8 +39,6 @@ For users aiming to employ the robust shadow estimation protocol, An initial ste
            `calibration_results` = output of `pauli_twirling_calibration`
    - Outcome: Error mitigated estimation based on user-defined inputs.
 
-  
-
 Notes:
    - The calibration process is specifically designed to mitigate noise encountered during the classical shadow protocol, such as rotation and computational basis measurements. It does not address noise that occurs during state preparation.
    - Do not need to redo the calibration stage (0. `pauli_twirling_calibration`) if:
@@ -150,7 +148,6 @@ One can simply skip this stage if one just want to perform classical shadow prot
 
 Together with the imput of total calibration rounds $R$ = `num_total_measurements_calibration` and the Number of groups of "median of means" used for calibration $K$ = `k_calibration`, one can characterize the noisy quantum channel (see [rshadow tutorial for cirq](../examples/rshadows_tutorial.md) for clear explaination) by running the following code:
 
-
 ```python
 from mitiq.shadows import *
 from mitiq.interface.mitiq_cirq.cirq_utils import (
@@ -166,7 +163,6 @@ f_est = pauli_twirling_calibrate(
 )
 f_est
 ```
-
     {'000': (1+0j),
      '100': (0.2632+0j),
      '010': (0.2734+0j),
@@ -174,7 +170,6 @@ f_est
      '110': (0.0714+0j),
      '101': (0.0704+0j),
      '011': (0.0772+0j)}
-
 
 
 the varible `locality` is the maximum number of qubits that our interested operators acting on. e.g. if our interested operator is a sequence of two point correlation function $\{\langle Z_iZ_{i+1}\rangle\}_{0\leq i\leq n-1}$, then `locality` = 2. Noted here, one could also split the calibration process into two stage:
@@ -223,7 +218,6 @@ In this step, we estimate our interested object by classical shadow protocol.
 #### 2.1 Example: Operator Expectation Value Esitimation
 For example, if we want to estimate the expectation value of a sequence of two point correlation functions $\{\langle Z_iZ_{i+1}\rangle\}_{0\leq i\leq n-1}$, we will define the operators by Mitiq Paulistrings:
 
-
 ```python
 from mitiq import PauliString
 
@@ -234,10 +228,8 @@ two_pt_correlations = [
 for i in range(0, num_qubits - 1):
     print(two_pt_correlations[i]._pauli)
 ```
-
     Z(q(0))*Z(q(1))
     Z(q(1))*Z(q(2))
-
 
 One can estimation the expectation value of the observables with the previous classical shadows. One can get the estimation of expectation values without/with calibration:
 
