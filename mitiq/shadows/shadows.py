@@ -168,7 +168,7 @@ def classical_post_processing(
 
     Returns:
         If `state_reconstruction` is True: state tomography matrix in
-        :math:`\mathbb{M}_{2^n}(\mathbb{C})` if rshadows is False,
+        :math:`\mathbb{M}_{2^n}(\mathbb{C})` if use_calibration is False,
         otherwise state tomography vector in :math:`\mathbb{C}^{4^d}`.
         If observables is given: estimated expectation values of
         observables.
@@ -177,7 +177,7 @@ def classical_post_processing(
     if use_calibration:
         if calibration_results is None:
             raise ValueError(
-                "Calibration results cannot be None when rshadows"
+                "Calibration results cannot be None when use_calibration"
             )
 
     """
