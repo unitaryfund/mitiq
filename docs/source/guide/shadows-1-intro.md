@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# Utilization of classical shadows in Mitiq
+# How Do I Use Classical Shadows Estimation?
 
 
 The `mitiq.shadows` module facilitates the application of the classical shadows protocol on quantum circuits, designed for tasks like quantum state tomography or expectation value estimation. In addition this module integrates a robust shadow estimation protocol that's tailored to counteract noise. The primary objective of the classical shadow protocol is to extract information from a quantum state using repeated measurements.
@@ -218,7 +218,10 @@ print("one snapshot measurement basis = ", shadow_measurement_output[1][0])
 
 
 ### 2. Classical Post-Processing
-In this step, we estimate our interested object by classical shadow protocol. For example, if we want to estimate the expectation value of a sequence of two point correlation functions $\{\langle Z_iZ_{i+1}\rangle\}_{0\leq i\leq n-1}$, we will define the operators by Mitiq Paulistrings:
+In this step, we estimate our interested object by classical shadow protocol. 
+
+#### 2.1 Example: Operator Expectation Value Esitimation
+For example, if we want to estimate the expectation value of a sequence of two point correlation functions $\{\langle Z_iZ_{i+1}\rangle\}_{0\leq i\leq n-1}$, we will define the operators by Mitiq Paulistrings:
 
 
 ```python
@@ -286,7 +289,7 @@ print(
     Exact expectation values: 'Z(q(0))*Z(q(1))': 1.0000000000000002 'Z(q(1))*Z(q(2))': 1.0000000000000002
 
 
-3. Example: GHZ State Reconstruction¶
+#### 2.2 Example: GHZ State Reconstruction
 Let's test the shadow state reconstruction and its calibrated version on a simple example. We will use the 3-qubit GHZ state, previously defined, as an initial state. Similarly to the previous example, we will use the same circuit both to generate the shadow state and to reconstruct it. Let's calculate the Pauli fidelity $f_b$ used to characterize the noisy quantum channel $\mathcal{M}=\sum_{b\in\{0,1\}^n}f_b\Pi_b$:
 
 

@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# How to use Classical Shadow Estimation
+# What is the theory behand Classical Shadow Estimation
 
 Investigating an unknown quantum system's properties is essential in quantum computing. Quantum Tomography enables a thorough classical description of a quantum state but demands exponentially large data and an equal number of experiments. Its alternative, Shadow Tomography, requires fewer computations but presupposes the capacity to perform entangling measurements across various state copies, involving exponentially large quantum operations. This section introduces an efficient alternative that constructs an approximate classical depiction of a quantum state with minimal state measurements.
 
@@ -101,7 +101,7 @@ On the other hand, a random Pauli measurement (11) means that for each qubit, we
 The Clifford measurement requires the depth of the circuit to grow linearly with system size, which is not currently feasible for large systems, so we are going to implement the local (Pauli) measurement and integrate it into Mitiq in the current stage. However, it is worth noting that there is an intermediate step of scrambling the circuits and combining the local and global measurement {cite}`hu2023classical`. 
 
 
-## 2. Robust Shadow estimation
+## 2. Robust Shadow Estimation
 
 The robust shadow estimation approach put forth in {cite}`chen2021robust` exhibits noise resilience. The inherent randomization in the protocol simplifies the noise, transforming it into a Pauli noise channel that can be characterized relatively straightforwardly. Once the noisy channel $\widetilde{\mathcal{M}}$ is characterized, it is incorporated into the channel inversion $\widetilde{\mathcal{M}}^{-1}$, resulting in an unbiased state estimator. The sampling error in the determination of the Pauli channel contributes to the variance of this estimator. 
 
