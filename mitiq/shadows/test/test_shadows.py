@@ -55,6 +55,30 @@ def test_pauli_twirling_calibrate():
         assert isinstance(value, complex)
 
 
+def test_calibrate_with_zero_state_shadow_outcomes():
+
+    # Call shadow_quantum_processing to get shadow_outcomes
+    shadow_outcomes = (["11", "00"], ["ZZ", "XX"])
+
+    # Call the function with valid inputs
+    result = pauli_twirling_calibrate(
+        zero_state_shadow_outcomes=shadow_outcomes,
+        qubits=qubits,
+        executor=executor,
+        num_total_measurements_calibration=2,
+    )
+
+    # Check that the result is a dictionary
+    assert isinstance(result, dict)
+
+    # Check that the dictionary contains the correct number of entries
+    assert len(result) <= 2**num_qubits
+
+    # Check that all values in the dictionary are floats
+    for value in result.values():
+        assert isinstance(value, complex)
+
+
 def test_shadow_quantum_processing():
 
     # Call the function with valid inputs
@@ -99,7 +123,7 @@ def test_classical_post_processing():
     )
     result_cal = classical_post_processing(
         shadow_outcomes,
-        rshadows=True,
+        use_calibration=True,
         calibration_results=calibration_results,
         observables=observables,
         k_shadows=1,
