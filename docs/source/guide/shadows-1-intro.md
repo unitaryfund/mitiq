@@ -237,13 +237,13 @@ One can estimation the expectation value of the observables with the previous cl
 ```python
 est_corrs = classical_post_processing(
     shadow_outcomes=shadow_measurement_output,
-    rshadows=False,
+    use_calibration=False,
     observables=two_pt_correlations,
     k_shadows=1,
 )
 cal_est_corrs = classical_post_processing(
     shadow_outcomes=shadow_measurement_output,
-    rshadows=True,
+    use_calibration=True,
     calibration_results=f_est,
     observables=two_pt_correlations,
     k_shadows=1,
@@ -324,16 +324,15 @@ shadow_measurement_output = shadow_quantum_processing(
 )
 ```
 
-
 ```python
 est_corrs = classical_post_processing(
     shadow_outcomes=shadow_measurement_output,
-    rshadows=False,
+    use_calibration=False,
     state_reconstruction=True,
 )
 cal_est_corrs = classical_post_processing(
     shadow_outcomes=shadow_measurement_output,
-    rshadows=True,
+    use_calibration=True,
     calibration_results=f_est,
     state_reconstruction=True,
 )

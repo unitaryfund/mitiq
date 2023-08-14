@@ -183,7 +183,7 @@ shadow_outcomes = shadow_quantum_processing(
 # get shadow reconstruction of the density matrix
 output = classical_post_processing(
     shadow_outcomes,
-    rshadows=False,
+    use_calibration=False,
     state_reconstruction=True,
 )
 rho_shadow = output["reconstructed_state"]
@@ -489,7 +489,7 @@ for error in epsilon_grid:
     shadow_outputs = shadow_quantum_processing(test_circuits, cirq_executor, r)
     output = classical_post_processing(
         shadow_outcomes=shadow_outputs,
-        rshadows=False,
+        use_calibration=False,
         observables=list_of_paulistrings,
         k_shadows=k,
     )

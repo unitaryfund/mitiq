@@ -312,14 +312,14 @@ def compare_shadow_methods(
     )
     output_shadow = classical_post_processing(
         shadow_outcomes=shadow_measurement_result,
-        rshadows=False,
+        use_calibration=False,
         observables=observables,
         k_shadows=k_shadows,
     )
 
     output_shadow_cal = classical_post_processing(
         shadow_outcomes=shadow_measurement_result,
-        rshadows=True,
+        use_calibration=True,
         calibration_results=f_est,
         observables=observables,
         k_shadows=k_shadows,

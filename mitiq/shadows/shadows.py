@@ -139,7 +139,7 @@ def shadow_quantum_processing(
 
 def classical_post_processing(
     shadow_outcomes: Tuple[List[str], List[str]],
-    rshadows: bool = False,
+    use_calibration: bool = False,
     calibration_results: Optional[Dict[str, float]] = None,
     observables: Optional[List[mitiq.PauliString]] = None,
     k_shadows: Optional[int] = None,
@@ -151,7 +151,7 @@ def classical_post_processing(
 
     Args:
         shadow_outcomes: The output of function `shadow_quantum_processing`.
-        rshadows: Whether to use the calibration results.
+        use_calibration: Whether to use the calibration results.
         calibration_results: The output of function `pauli_twirling_calibrate`.
         observables: The set of observables to measure.
         k_shadows: Number of groups of "median of means" used for shadow
@@ -161,16 +161,16 @@ def classical_post_processing(
 
     Returns:
         If `state_reconstruction` is True: state tomography matrix in
-        :math:`\mathbb{M}_{2^n}(\mathbb{C})` if rshadows is False,
+        :math:`\mathbb{M}_{2^n}(\mathbb{C})` if use_calibration is False,
         otherwise state tomography vector in :math:`\mathbb{C}^{4^d}`.
         If observables is given: estimated expectation values of
         observables.
     """
 
-    if rshadows:
+    if use_calibration:
         if calibration_results is None:
             raise ValueError(
-                "Calibration results cannot be None when rshadows"
+                "Calibration results cannot be None when use_calibration"
             )
 
     """
@@ -180,7 +180,7 @@ def classical_post_processing(
     output: Dict[str, Union[float, NDArray[Any]]] = {}
     if state_reconstruction:
         reconstructed_state = shadow_state_reconstruction(
-            shadow_outcomes, rshadows, f_est=calibration_results
+            shadow_outcomes, use_calibration, f_est=calibration_results
         )
         output["reconstructed_state"] = reconstructed_state  # type: ignore
     elif observables is not None:
@@ -192,7 +192,7 @@ def classical_post_processing(
                 shadow_outcomes,
                 obs,
                 k_shadows=k_shadows,
-                pauli_twirling_calibration=rshadows,
+                pauli_twirling_calibration=use_calibration,
                 f_est=calibration_results,
             )
             output[str(obs)] = expectation_values
