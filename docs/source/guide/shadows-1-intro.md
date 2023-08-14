@@ -148,7 +148,7 @@ noisy_executor = partial(
 
 One can simply skip this stage if one just want to perform classical shadow protocal without calibration or the calibration data is already available from previous runs.
 
-Together with the imput of total calibration rounds $R$ = `num_total_measurements_calibration` and the Number of groups of "median of means" used for calibration $K$ = `k_calibration`, one can characterize the noisy quantum channel (see ([rshadow tutorial for cirq](../rshadows_tutorial.md)) for clear explaination) by running the following code:
+Together with the imput of total calibration rounds $R$ = `num_total_measurements_calibration` and the Number of groups of "median of means" used for calibration $K$ = `k_calibration`, one can characterize the noisy quantum channel (see [rshadow tutorial for cirq](../examples/rshadows_tutorial.md) for clear explaination) by running the following code:
 
 
 ```python
@@ -184,13 +184,13 @@ the varible `locality` is the maximum number of qubits that our interested opera
 
 02. `pauli_twirling_calibration`
    - Outcome: A dictionary of `calibration_results`.
-For more details, please refer to the see [rshadow tutorial for cirq](../rshadows_tutorial.md)
+For more details, please refer to the see [rshadow tutorial for cirq](../examples/rshadows_tutorial.md)
 
 ### 1. Quantum Processing
 In this step, we obtain classical shadow snapshots (before apply the invert channel) from the input state
 
 #### 1.1 Add Rotation Gate and Meausure the Rotated State in Computational Basis
-At present, the implementation supports random Pauli measurement. This is equivalent to randomly sampling $U$ from the local Clifford group $Cl_2^n$, followed by a $Z$-basis measurement (see ([shadow tutorial for cirq](../shadows_tutorial.md)) for clear explaination).
+At present, the implementation supports random Pauli measurement. This is equivalent to randomly sampling $U$ from the local Clifford group $Cl_2^n$, followed by a $Z$-basis measurement (see [shadow tutorial for cirq](../examples/shadows_tutorial.md) for clear explaination).
 
 #### 1.2 Get the Classical Shadows
 One can obtain the list of measurement results of local Pauli measurement in terms of bitstrings, and the related Pauli-basis measured in terms of strings by calling the `shadow_quantum_processing` function with given the total number of snapshots `num_total_measurements_shadow`:

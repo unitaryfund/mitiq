@@ -39,18 +39,15 @@ Whether to run the quantum measurement or directly use the results from the prev
 
 
 ```python
-import zipfile,pickle,io,requests
+import zipfile, pickle, io, requests
 
 run_quantum_processing = False
+repo = "https://github.com/Min-Li/mitiq-shadows-storage/raw/main/"
 if not run_quantum_processing:
-    # Fetch data obtained from a previous run of this tutorial
-    repo = "https://github.com/Min-Li/mitiq-shadows-storage/raw/main/"
-    saved_data_name = 'saved_data-rshadows'
-    url = f'{repo}/{saved_data_name}.zip'
-    response = requests.get(url)
-    zip_data = response.content
-    with zipfile.ZipFile(io.BytesIO(zip_data), 'r') as zf:
-        saved_data = pickle.loads(zf.read(f'{saved_data_name}.pkl'))
+    saved_data_name = "saved_data-rshadows"
+    zip_data = requests.get(f"{repo}/{saved_data_name}.zip").content
+    with zipfile.ZipFile(io.BytesIO(zip_data), "r") as zf:
+        saved_data = pickle.loads(zf.read(f"{saved_data_name}.pkl"))
 ```
 
 The *robust shadow estimation*{cite}`chen2021robust` approach put forth in *Predicting Many Properties of a Quantum System from Very Few Measurements* {cite}`huang2020predicting` exhibits noise resilience. The inherent randomization in the protocol simplifies the noise, transforming it into a Pauli noise channel that can be characterized relatively straightforwardly. Once the noisy channel $\widehat{\mathcal{M}}$ is characterized $\widehat{\mathcal{M}}$, it is incorporated into the channel inversion $\widehat{\mathcal{M}}^{-1}$, resulting in an unbiased state estimator. The sampling error in the determination of the Pauli channel contributes to the variance of this estimator. 
@@ -67,22 +64,31 @@ We focus on the case where $J = g =1$. We use the ground state of such a system 
 
 ```python
 # import groud state of 1-D Ising model w/ periodic boundary condition
-# from tensorflow_quantum.datasets import tfi_chain
-from mitiq.shadows.old.spin_system import tfi_chain, xxz_chain
-
+download_ising_circuits = True
 num_qubits = 8
 qubits: List[cirq.Qid] = cirq.LineQubit.range(num_qubits)
-qbs = cirq.GridQubit.rect(num_qubits, 1)
-circuits, labels, pauli_sums, addinfo = tfi_chain(qbs, "closed")
-lattice_idx = 40  # Critical point where g == 1
-g = addinfo[lattice_idx].g
 
-circuit = circuits[lattice_idx]
-qubit_map = {
-    cirq.GridQubit(i, 0): cirq.LineQubit(i) for i in range(num_qubits)
-}
+if download_ising_circuits:
+    circuit = pickle.loads(
+        requests.get(f"{repo}/1D_Ising_g=1_{num_qubits}qubits.pkl").content
+    )
+    g = 1
 
-circuit = circuit.transform_qubits(qubit_map=qubit_map)
+# or user can import from tensorflow_quantum
+else:
+    from tensorflow_quantum.datasets import tfi_chain
+
+    qbs = cirq.GridQubit.rect(num_qubits, 1)
+    circuits, labels, pauli_sums, addinfo = tfi_chain(qbs, "closed")
+    lattice_idx = 40  # Critical point where g == 1
+    g = addinfo[lattice_idx].g
+
+    circuit = circuits[lattice_idx]
+    qubit_map = {
+        cirq.GridQubit(i, 0): cirq.LineQubit(i) for i in range(num_qubits)
+    }
+
+    circuit = circuit.transform_qubits(qubit_map=qubit_map)
 ```
 
 similar with the classical shadow protocal, we define the executor to perform the computational measurement for the circuit. Here we use the simulator that adds single-qubit depolarizing noise after rotation gates and before the $Z$-basis measurement, as the noise is assumped to be gate independent, time invariant and Markovian, the noisy gate satisfies $U_{\Lambda_U}(M_z)_{\Lambda_{\mathcal{M}_Z}}\equiv U\Lambda\mathcal{M}_Z$:
@@ -136,9 +142,6 @@ The PTM (Pauli Transfer Matrix) or Liouville representation provides a vector re
 ```python
 operator_ptm_vector_rep(cirq.I._unitary_() / np.sqrt(2))
 ```
-
-
-
 
     array([1.+0.j, 0.+0.j, 0.+0.j, 0.+0.j])
 
@@ -238,7 +241,6 @@ plt.xticks(
 plt.ylabel("Pauli fidelity")
 plt.legend()
 ```
-
 ![png](../img/rshadows_compare_channels.png)
 
 
@@ -372,20 +374,26 @@ for noise_level in noise_levels:
     )
 
     experiment_name = f"{num_qubits}qubits_{noise_model}_{noise_level}"
-    shadow_measurement_result = saved_data[experiment_name]["shadow_outcomes"]
-    zero_state_shadow_output = saved_data[experiment_name][
-        "zero_shadow_outcomes"
-    ]
+    if run_quantum_processing:
+        shadow_measurement_result, zero_state_shadow_output = None, None
+    else:
+        shadow_measurement_result = saved_data[experiment_name][
+            "shadow_outcomes"
+        ]
+        zero_state_shadow_output = saved_data[experiment_name][
+            "zero_shadow_outcomes"
+        ]
 
     est_values = compare_shadow_methods(
         circuit=circuit,
         observables=ising_hamiltonian,
-        n_measurements_calibration=40000,
-        n_measurement_shadow=40000,
-        k_shadows=5,
-        locality=2,
+        n_measurements_calibration=60000,
+        n_measurement_shadow=60000,
+        k_shadows=6,
+        locality=3,
         noisy_executor=noisy_executor,
-        k_calibration=2,
+        k_calibration=10,
+        run_quantum_processing=False,
         shadow_measurement_result=shadow_measurement_result,
         zero_state_shadow_output=zero_state_shadow_output,
     )
@@ -443,10 +451,6 @@ df_hamiltonian = df_hamiltonian.reset_index()
 noise_model = "bit_flip"
 ```
 
-    /var/folders/fj/9qx1s04j6n713s58ml36xbbm0000gn/T/ipykernel_99021/1730867588.py:3: FutureWarning: The default value of numeric_only in DataFrameGroupBy.sum is deprecated. In a future version, numeric_only will default to False. Either specify numeric_only or select only columns which should be valid for the function.
-      ).sum()
-
-
 
 ```python
 # Define a color palette
@@ -469,6 +473,7 @@ plt.xlabel("Noise Level")
 plt.ylabel("Energy Value")
 ```
 
+
 ![png](../img/rshadows_energy.png)
 
 ### 3.2 Two Point Correlation Function Estimation with RShadows
@@ -480,16 +485,22 @@ Import groud state of 1-D Ising model with periodic boundary condition
 
 ```python
 num_qubits = 16
-qbs = cirq.GridQubit.rect(num_qubits, 1)
-circuits, labels, pauli_sums, addinfo = tfi_chain(qbs, "closed")
-lattice_idx = 40  # Critical point where g == 1
-g = addinfo[lattice_idx].g
-circuit = circuits[lattice_idx]
 qubits = cirq.LineQubit.range(num_qubits)
-qubit_map = {
-    cirq.GridQubit(i, 0): cirq.LineQubit(i) for i in range(num_qubits)
-}
-circuit = circuit.transform_qubits(qubit_map=qubit_map)
+if download_ising_circuits:
+    circuit = pickle.loads(
+        requests.get(f"{repo}/1D_Ising_g=1_{num_qubits}qubits.pkl").content
+    )
+    g = 1
+else:
+    qbs = cirq.GridQubit.rect(num_qubits, 1)
+    circuits, labels, pauli_sums, addinfo = tfi_chain(qbs, "closed")
+    lattice_idx = 40  # Critical point where g == 1
+    g = addinfo[lattice_idx].g
+    circuit = circuits[lattice_idx]
+    qubit_map = {
+        cirq.GridQubit(i, 0): cirq.LineQubit(i) for i in range(num_qubits)
+    }
+    circuit = circuit.transform_qubits(qubit_map=qubit_map)
 ```
 
 Define obersevables lists as two point correlation functions between the first qubit and the rest of the qubits $\{\langle Z_0 Z_i\rangle\}_{0\geq i\leq n-1}$
@@ -526,12 +537,13 @@ zero_state_shadow_output = saved_data[experiment_name]["zero_shadow_outcomes"]
 est_values = compare_shadow_methods(
     circuit=circuit,
     observables=two_pt_correlation,
-    n_measurements_calibration=40000,
-    n_measurement_shadow=40000,
+    n_measurements_calibration=50000,
+    n_measurement_shadow=50000,
     k_shadows=5,
     locality=2,
     noisy_executor=noisy_executor,
-    k_calibration=2,
+    k_calibration=5,
+    run_quantum_processing=False,
     shadow_measurement_result=shadow_measurement_result,
     zero_state_shadow_output=zero_state_shadow_output,
 )
@@ -596,12 +608,6 @@ plt.title(f"Correlation Function Estimation w/ 0.3 Depolarization Noise")
 plt.xlabel(r"Correlation Function $\langle Z_0Z_i \rangle$")
 plt.ylabel("Correlation")
 ```
-
+ 
 ![png](../img/rshadows_2pt_func.png)
     
-
-** Acknowledgements**
-
-This project contains code adapted from PennyLane's tutorial on Classical Shadows. We would like to acknowledge the original authors of the tutorial, PennyLane developers Brian Doolittle and Roeland Wiersema. The tutorial can be found at [this link](https://pennylane.ai/qml/demos/tutorial_classical_shadows).
-
-
