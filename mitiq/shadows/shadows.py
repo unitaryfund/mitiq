@@ -38,12 +38,15 @@ def pauli_twirling_calibrate(
     coefficient :math:`f_b`, which are expansion coefficients of the twirled
     channel :math:`\mathcal{M}=\sum_b f_b\Pi_b`.
 
+    In practice, the output of this function can be used as calibration data
+    for performing the classical shadows protocol in a way which is more
+    robust to noise.
     Args:
         k_calibration: Number of groups of "median of means" used to solve for
             Pauli fidelity.
         locality: The locality of the operator, whose expectation value is
             going to be estimated by the classical shadow. e.g. if operator is
-            Ising model Hamiltonian with nearist neighbour interaction, then
+            Ising model Hamiltonian with nearest neighbour interaction, then
             locality = 2.
         zero_state_shadow_outcomes: The output of function
             :func:`shadow_quantum_processing` of zero calibrate state.
@@ -101,6 +104,9 @@ def shadow_quantum_processing(
     In the current implementation, the unitaries are sampled from the local
     Clifford group for :math:`n` qubits, i.e.,
     :math:`\mathcal{G} = \mathrm{Cl}_2^n`.
+
+    In practice, the output of this functions provides the raw experimental
+    data necessary to perform the classical shadows protocol.
 
     Args:
         circuit: The circuit to execute.
