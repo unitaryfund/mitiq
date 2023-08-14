@@ -19,10 +19,10 @@ from mitiq import SUPPORTED_PROGRAM_TYPES
 from mitiq.interface import (
     UnsupportedCircuitError,
     accept_any_qprogram_as_input,
+    accept_qprogram_and_validate,
     atomic_one_to_many_converter,
     convert_from_mitiq,
     convert_to_mitiq,
-    noise_scaling_converter,
     register_mitiq_converters,
 )
 from mitiq.interface.mitiq_qiskit import from_qasm, to_qasm
@@ -64,7 +64,7 @@ circuit_types = {
 }
 
 
-@noise_scaling_converter
+@accept_qprogram_and_validate
 def scaling_function(circ: cirq.Circuit, *args, **kwargs) -> cirq.Circuit:
     return circ
 

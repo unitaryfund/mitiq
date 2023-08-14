@@ -11,7 +11,7 @@ from typing import Any, Dict, FrozenSet, List, Optional, cast
 import numpy as np
 from cirq import Circuit, InsertStrategy, Moment, has_unitary, inverse, ops
 
-from mitiq.interface import noise_scaling_converter
+from mitiq.interface import accept_qprogram_and_validate
 from mitiq.utils import (
     _append_measurements,
     _is_measurement,
@@ -153,7 +153,7 @@ def _fold_all(
             )
 
     folded = deepcopy(circuit)[:0]
-    for (i, moment) in enumerate(circuit):
+    for i, moment in enumerate(circuit):
         if i in skip_moments:
             folded.append(moment, strategy=InsertStrategy.EARLIEST)
             continue
@@ -205,7 +205,7 @@ def _get_weight_for_gate(
 
 
 # Local folding functions
-@noise_scaling_converter
+@accept_qprogram_and_validate
 def fold_all(
     circuit: Circuit,
     scale_factor: float,
@@ -266,7 +266,7 @@ def fold_all(
 
 
 # Global folding function
-@noise_scaling_converter
+@accept_qprogram_and_validate
 def fold_global(
     circuit: Circuit, scale_factor: float, **kwargs: Any
 ) -> Circuit:
@@ -307,7 +307,6 @@ def fold_global(
     num_to_fold = int(round(fraction_scale * len(operations) / 2))
 
     if num_to_fold > 0:
-
         # Create the inverse of the final partial circuit
         inverse_partial = Circuit()
         num_partial = 0
@@ -540,7 +539,7 @@ def _apply_fold_mask(
     return folded_circuit
 
 
-@noise_scaling_converter
+@accept_qprogram_and_validate
 def fold_gates_from_left(
     circuit: Circuit, scale_factor: float, **kwargs: Any
 ) -> Circuit:
@@ -625,7 +624,7 @@ def fold_gates_from_left(
     )
 
 
-@noise_scaling_converter
+@accept_qprogram_and_validate
 def fold_gates_from_right(
     circuit: Circuit, scale_factor: float, **kwargs: Any
 ) -> Circuit:
@@ -710,7 +709,7 @@ def fold_gates_from_right(
     )
 
 
-@noise_scaling_converter
+@accept_qprogram_and_validate
 def fold_gates_at_random(
     circuit: Circuit,
     scale_factor: float,
