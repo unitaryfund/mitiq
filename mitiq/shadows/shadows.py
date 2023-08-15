@@ -41,9 +41,6 @@ def pauli_twirling_calibrate(
     In practice, the output of this function can be used as calibration data
     for performing the classical shadows protocol in a way which is more
     robust to noise.
-    In practice, the output of this function can be used as calibration data
-    for performing the classical shadows protocol in a way which is more
-    robust to noise.
 
     Args:
         k_calibration: Number of groups of "median of means" used to solve for
@@ -68,11 +65,11 @@ def pauli_twirling_calibrate(
     """
     if zero_state_shadow_outcomes is None:
         if qubits is None:
-            raise ValueError("qubits should not be None.")
+            raise TypeError("qubits should not be None.")
         if executor is None:
-            raise ValueError("executor should not be None.")
+            raise TypeError("executor should not be None.")
         if num_total_measurements_calibration is None:
-            raise ValueError(
+            raise TypeError(
                 "num_total_measurements_calibration should not be None."
             )
 
@@ -132,6 +129,7 @@ def shadow_quantum_processing(
     if random_seed is not None:
         np.random.seed(random_seed)
     r"""
+    Additional information:
     Shadow stage 1: Sample random unitary form
     :math:`\mathcal{g}\subset \mathrm{U}(2^n)` and perform computational
     basis measurement. In the current state, we have implemented
@@ -184,6 +182,7 @@ def classical_post_processing(
             )
 
     """
+    Additional information:
     Shadow stage 2: Estimate the expectation value of the observables OR
     reconstruct the state
     """
