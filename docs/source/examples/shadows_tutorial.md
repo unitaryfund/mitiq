@@ -13,7 +13,12 @@ kernelspec:
 
 # Classical Shadows Protocol with Cirq
 
+**Corresponding to:** Min Li (minl2@illinois.edu)
+
 This notebook shows how to use classical shadows estimation with the Mitiq library, focused initially on local (Pauli) measurements. We show some common scenarios such as state tomography, and operator expectation value estimation. The method creates an approximate classical description of a quantum state with few measurements while effectively characterizing and mitigating noise in the following notebook `rshadow_tutorial`.
+
+
+
 
 ```python
 import cirq

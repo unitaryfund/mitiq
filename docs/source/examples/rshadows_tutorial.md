@@ -12,8 +12,9 @@ kernelspec:
 ---
 # Robust Shadow Estimation with Mitiq
 
-This notebook is a prototype of how to perform robust shadow estimation protocol with mitiq.
+**Corresponding to:** Min Li (minl2@illinois.edu)
 
+This notebook is a prototype of how to perform robust shadow estimation protocol with mitiq.
 
 ```python
 import cirq
