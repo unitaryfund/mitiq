@@ -41,6 +41,9 @@ def pauli_twirling_calibrate(
     In practice, the output of this function can be used as calibration data
     for performing the classical shadows protocol in a way which is more
     robust to noise.
+    In practice, the output of this function can be used as calibration data
+    for performing the classical shadows protocol in a way which is more
+    robust to noise.
 
     Args:
         k_calibration: Number of groups of "median of means" used to solve for
