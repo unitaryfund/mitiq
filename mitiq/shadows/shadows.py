@@ -129,6 +129,8 @@ def shadow_quantum_processing(
     if random_seed is not None:
         np.random.seed(random_seed)
     r"""
+    Additional Information:
+    
     Shadow stage 1: Sample random unitary form
     :math:`\mathcal{g}\subset \mathrm{U}(2^n)` and perform computational
     basis measurement. In the current state, we have implemented
@@ -181,6 +183,8 @@ def classical_post_processing(
             )
 
     """
+    Additional Information:
+    
     Shadow stage 2: Estimate the expectation value of the observables OR
     reconstruct the state
     """
