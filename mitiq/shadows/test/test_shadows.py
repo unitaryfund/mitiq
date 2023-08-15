@@ -54,17 +54,12 @@ def test_pauli_twirling_calibrate():
     for value in result.values():
         assert isinstance(value, complex)
 
-
-def test_calibrate_with_zero_state_shadow_outcomes():
-
     # Call shadow_quantum_processing to get shadow_outcomes
     shadow_outcomes = (["11", "00"], ["ZZ", "XX"])
 
     # Call the function with valid inputs
     result = pauli_twirling_calibrate(
         zero_state_shadow_outcomes=shadow_outcomes,
-        qubits=qubits,
-        executor=executor,
         num_total_measurements_calibration=2,
     )
 
