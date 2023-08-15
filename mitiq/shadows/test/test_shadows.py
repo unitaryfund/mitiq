@@ -63,8 +63,6 @@ def test_calibrate_with_zero_state_shadow_outcomes():
     # Call the function with valid inputs
     result = pauli_twirling_calibrate(
         zero_state_shadow_outcomes=shadow_outcomes,
-        qubits=qubits,
-        executor=executor,
         num_total_measurements_calibration=2,
     )
 
