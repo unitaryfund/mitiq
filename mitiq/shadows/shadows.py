@@ -65,11 +65,11 @@ def pauli_twirling_calibrate(
     """
     if zero_state_shadow_outcomes is None:
         if qubits is None:
-            raise ValueError("qubits should not be None.")
+            raise TypeError("qubits should not be None.")
         if executor is None:
-            raise ValueError("executor should not be None.")
+            raise TypeError("executor should not be None.")
         if num_total_measurements_calibration is None:
-            raise ValueError(
+            raise TypeError(
                 "num_total_measurements_calibration should not be None."
             )
 
