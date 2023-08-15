@@ -16,6 +16,7 @@ kernelspec:
 
 This notebook is a prototype of how to perform robust shadow estimation protocol with mitiq.
 
+
 ```python
 import cirq
 import numpy as np
@@ -36,7 +37,7 @@ from mitiq.interface.mitiq_cirq.cirq_utils import (
 %autoreload 2
 ```
 
-Whether to run the quantum measurement or directly use the results from the previous run. If **True**, the measurement will be run again. If **False**, the results from the previous run will be used. 
+Whether to run the quantum measurement or directly use the results from the previous run. If **True**, the measurement will be run again. If **False**, the results from the previous run will be used.
 
 
 ```python
@@ -144,6 +145,9 @@ The PTM (Pauli Transfer Matrix) or Liouville representation provides a vector re
 operator_ptm_vector_rep(cirq.I._unitary_() / np.sqrt(2))
 ```
 
+
+
+
     array([1.+0.j, 0.+0.j, 0.+0.j, 0.+0.j])
 
 
@@ -242,8 +246,18 @@ plt.xticks(
 plt.ylabel("Pauli fidelity")
 plt.legend()
 ```
-![png](../img/rshadows_compare_channels.png)
 
+
+
+
+    <matplotlib.legend.Legend at 0x2bce66980>
+
+
+  
+
+    
+![png](../img/rshadows_compare_channels.png)
+    
 
 ## 3. Calibration of the operator expectation value estimation
 The expectation value for a series of operators, denoted as $\{O_\iota\}_{\iota\leq M}$, has a snapshot version of expectation value estimation by random Pauli measurement $\widetilde{\mathcal{M}}=\bigotimes_{i}\widetilde{\mathcal{M}}_{P_i}$ and Pauli-twirling calibration $\widehat{\mathcal{M}}^{-1}=\sum_{b\in\{0,1\}^n}f_b^{-1}\bigotimes_{i}\Pi_{b_i\in b}$, which is given by
@@ -452,6 +466,10 @@ df_hamiltonian = df_hamiltonian.reset_index()
 noise_model = "bit_flip"
 ```
 
+    /var/folders/fj/9qx1s04j6n713s58ml36xbbm0000gn/T/ipykernel_23400/2684437156.py:1: FutureWarning: The default value of numeric_only in DataFrameGroupBy.sum is deprecated. In a future version, numeric_only will default to False. Either specify numeric_only or select only columns which should be valid for the function.
+      df_hamiltonian = df_energy.groupby(["noise_level", "method"]).sum()
+
+
 
 ```python
 # Define a color palette
@@ -474,8 +492,27 @@ plt.xlabel("Noise Level")
 plt.ylabel("Energy Value")
 ```
 
+    /var/folders/fj/9qx1s04j6n713s58ml36xbbm0000gn/T/ipykernel_23400/651525583.py:5: FutureWarning: 
+    
+    The `ci` parameter is deprecated. Use `errorbar=('ci', 95)` for the same effect.
+    
+      sns.lineplot(
 
+
+
+
+
+    Text(0, 0.5, 'Energy Value')
+
+
+
+
+    
 ![png](../img/rshadows_energy.png)
+    
+
+
+
 
 ### 3.2 Two Point Correlation Function Estimation with RShadows
 Let's estimate two point correlation fuction: $\langle Z_0 Z_i\rangle$ of a 16-spin 1D Ising model with transverse field on critical point ground state.
@@ -609,6 +646,20 @@ plt.title(f"Correlation Function Estimation w/ 0.3 Depolarization Noise")
 plt.xlabel(r"Correlation Function $\langle Z_0Z_i \rangle$")
 plt.ylabel("Correlation")
 ```
- 
+
+    /var/folders/fj/9qx1s04j6n713s58ml36xbbm0000gn/T/ipykernel_23400/499913322.py:5: FutureWarning: 
+    
+    The `ci` parameter is deprecated. Use `errorbar=('ci', 95)` for the same effect.
+    
+      sns.lineplot(
+
+
+
+
+
+    Text(0, 0.5, 'Correlation')
+
+
+    
 ![png](../img/rshadows_2pt_func.png)
     
