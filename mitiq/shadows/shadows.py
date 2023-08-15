@@ -106,7 +106,7 @@ def shadow_quantum_processing(
     Clifford group for :math:`n` qubits, i.e.,
     :math:`\mathcal{G} = \mathrm{Cl}_2^n`.
 
-    In practice, the output of this functions provides the raw experimental
+    In practice, the output of this function provides the raw experimental
     data necessary to perform the classical shadows protocol.
 
     Args:
