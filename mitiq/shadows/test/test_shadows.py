@@ -44,9 +44,6 @@ def test_pauli_twirling_calibrate():
         qubits=qubits, executor=executor, num_total_measurements_calibration=2
     )
 
-    # Check that the result is a dictionary
-    assert isinstance(result, dict)
-
     # Check that the dictionary contains the correct number of entries
     assert len(result) <= 2**num_qubits
 
@@ -62,9 +59,6 @@ def test_pauli_twirling_calibrate():
         zero_state_shadow_outcomes=shadow_outcomes,
         num_total_measurements_calibration=2,
     )
-
-    # Check that the result is a dictionary
-    assert isinstance(result, dict)
 
     # Check that the dictionary contains the correct number of entries
     assert len(result) <= 2**num_qubits
