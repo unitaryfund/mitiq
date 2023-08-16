@@ -15,13 +15,10 @@ kernelspec:
 
 **Corresponding to:** Min Li (minl2@illinois.edu)
 
-This notebook shows how to use classical shadows estimation with the Mitiq library, focused initially on local (Pauli) measurements. We show some common scenarios such as state tomography, and operator expectation value estimation. The method creates an approximate classical description of a quantum state with few measurements while effectively characterizing and mitigating noise in the following notebook `rshadow_tutorial`.
-
-
-```python
+This notebook shows how to use classical shadows estimation with the Mitiq library, focused initially on local (Pauli) measurements. We show some common scenarios such as state tomography, and operator expectation value estimation. The method creates an approximate classical description of a quantum state with few measurements while effectively characterizing and mitigating noise in the following notebook `rshadows_tutorial`.
+```{code-cell} ipython3
 import cirq
 import numpy as np
-from tqdm.notebook import tqdm
 from typing import List
 
 from mitiq.shadows.shadows import *
@@ -30,10 +27,8 @@ from mitiq import MeasurementResult
 from mitiq.interface.mitiq_cirq.cirq_utils import (
     sample_bitstrings as cirq_sample_bitstrings,
 )
-
-# auto reload modules when they have changed
-%load_ext autoreload
-%autoreload 2
+# set random seed
+np.random.seed(666)
 ```
 
 In the context of an $n$-qubit system, where $\rho$ is an unknown quantum state residing in a $2^n$-dimensional Hilbert space, the procedure of performing classical shadow involves extracting information from the state through repeated measurements. 
@@ -41,7 +36,7 @@ In the context of an $n$-qubit system, where $\rho$ is an unknown quantum state 
 ## 1. Define a test circuit
 
 
-```python
+```{code-cell} ipython3
 # number of qubits in the circuit
 num_qubits: int = 4
 # qubits in the circuit prepared in the $|0\rangle$ state
@@ -71,15 +66,6 @@ test_circuits = simple_test_circuit(params, qubits)
 print(simple_test_circuit(params, qubits))
 ```
 
-    0: ───H───Ry(-0.018π)───@───Rz(0.016π)───────────────────────────────
-                            │
-    1: ───H───Ry(0.282π)────X───@────────────Rz(-0.025π)─────────────────
-                                │
-    2: ───H───Ry(0.282π)────────X────────────@─────────────Rz(0.117π)────
-                                             │
-    3: ───H───Ry(-0.173π)────────────────────X─────────────Rz(-0.177π)───
-
-
 <script>
 MathJax.Hub.Config({
   TeX: { equationNumbers: { autoNumber: "AMS" } }
@@ -96,7 +82,7 @@ U^\dagger|\hat{b}\rangle\langle\hat{b}| U\qquad \mathrm{where} \qquad \mathrm{Pr
 If the unitary group $\mathcal{U}$ is chosen to be the local Clifford group $\mathrm{CL}(2)^n$, this equavelent to performing a random Pauli measurement on each qubit. This means that for each qubit, we randomly decide to measure one of the Pauli operators. Define the `cirq_executor` take one shot of measurement and return the measurement result.
 
 
-```python
+```{code-cell} ipython3
 def cirq_executor(
     circuit: cirq.Circuit,
 ) -> MeasurementResult:
@@ -113,21 +99,11 @@ In terms of implementation, considering that the only possible measurement to be
 In the main function, the quantum measurement process is encapsulated within the shadow_quantum_processing function. This function takes the quantum circuit and the number of shots as input. It returns the measurement results as bit strings, for example, '01...0' is equivelent to the measurement basis eigenstate: $|0\rangle|1\rangle...|0\rangle$. Additionally, it provides the measured Pauli gates in string format. For instance, 'XY...Z' signifies a local X-basis measurement on the first qubit, a local Y-basis measurement on the second qubit, and a local Z-basis measurement on the last qubit in the circuit.
 
 
-```python
+```{code-cell} ipython3
 shadow_quantum_processing(test_circuits, cirq_executor, 2)
 ```
 
-                                                      
-
-
-
-
-    (['1100', '1111'], ['XYYZ', 'XZYY'])
-
-
-
-
-```python
+```{code-cell} ipython3
 # error rate of state reconstruction epsilon < 1.
 epsilon = 1
 # number of total measurements should perform for error rate epsilon
@@ -137,15 +113,10 @@ print("n_total_measurements = {}".format(n_total_measurements))
 shadow_outcomes = shadow_quantum_processing(
     test_circuits, cirq_executor, n_total_measurements
 )
-```
-
-    n_total_measurements = 8704
+```                                                                      
 
 
-                                                                      
-
-
-```python
+```{code-cell} ipython3
 # get shadow reconstruction of the density matrix
 output = classical_post_processing(
     shadow_outcomes,
@@ -156,7 +127,7 @@ rho_shadow = output["reconstructed_state"]
 ```
 
 
-```python
+```{code-cell} ipython3
 # Compute the ideal state vector discribed by the input circuit.
 state_vector = test_circuits.final_state_vector().reshape(-1, 1)
 # Compute the density matrix.
@@ -166,7 +137,7 @@ rho_true = state_vector @ state_vector.conj().T
 We can plot the elementwise difference between the reconstructed state and the original state as a thermal diagram:
 
 
-```python
+```{code-cell} ipython3
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -214,13 +185,11 @@ cbar = fig.colorbar(
 # Show the figure with three side-by-side plots
 plt.show()
 ```
-    
-![png](../img/shadows_state_reconstruction.png)
-    
+
 Compute the fidelity and $L_2$ distance between the state reconstructed through classical shadow estimation (which is not a quantum state) and the state prepared by the circuit $\|\rho_{\mathrm{shadow}}-\rho\|_2$, with $\|\cdot\|_2:=\sqrt{\mathrm{Tr}[(\cdot)^\dagger(\cdot)]}$.
 
 
-```python
+```{code-cell} ipython3
 import pandas as pd
 import warnings
 
@@ -247,7 +216,7 @@ df = pd.DataFrame(
 )
 
 # Loop over the different number of measurements
-for n_measurement in tqdm(n_measurement_list):
+for n_measurement in n_measurement_list:
     # Repeat the experiment 3 times
     for run in range(n_runs):
         # randomly sample from the measurement outcomes, with replacement
@@ -282,7 +251,7 @@ for n_measurement in tqdm(n_measurement_list):
 
 
 
-```python
+```{code-cell} ipython3
 plt.figure()
 sns.lineplot(
     data=df,
@@ -313,12 +282,6 @@ plt.ylim(0.35, 1.0)
 plt.xlim(1000, n_total_measurements)
 ```
 
-    
-![png](../img/shadows_fidelity.png)
-    
-![png](../img/shadows_l2_distance.png)
-    
-
 ### 4.2 Use Classical Shadows to Estimate Expectation Values of Observables
 
 To estimate the expectation value of some observable, we simply replace the unknown quantum state $\rho$ with a classical shadow $\hat{\rho}$. Since classical shadows are random, this produces a random variable that yields the correct prediction in expectation:
@@ -341,7 +304,7 @@ for all $1\leq j\leq K$
  Now let's assume that our list of observables are a set of nearest nearist neighbour interactions on a 1D lattice, i.e. $O_i=P_i P_{i+1}$, where $P_i$ is the Pauli operator on the $i$-th qubit. We can use the classical shadow to estimate the expectation value of the observable $O_i$ by simply replacing the unknown quantum state $\rho$ with a classical shadow $\hat{\rho}$, which is a random variable that yields the correct prediction in expectation:
 
 
-```python
+```{code-cell} ipython3
 from mitiq import Observable, PauliString
 
 # from cirq import LineQubit
@@ -368,19 +331,7 @@ for observables in list_of_paulistrings:
 # print the type of the observables
 ```
 
-    X(q(0))*X(q(1))
-    X(q(1))*X(q(2))
-    X(q(2))*X(q(3))
-    Y(q(0))*Y(q(1))
-    Y(q(1))*Y(q(2))
-    Y(q(2))*Y(q(3))
-    Z(q(0))*Z(q(1))
-    Z(q(1))*Z(q(2))
-    Z(q(2))*Z(q(3))
-
-
-
-```python
+```{code-cell} ipython3
 r"""
 Solve for the exact expectation values with mitiq
 :math:`\langle O\rangle_{\rho} = \mathrm{Tr}(\rho O)`
@@ -440,7 +391,7 @@ The general form of the shadow norm $\|\cdot\|_{\mathrm{shadow}}$ is not clear a
  The shadow norm, in this situation, correlates with the operator ($L_2$) norm. This guarantees the accurate prediction of many local observables from only a much smaller number of measurements. We realize the bound of the shadow estimation in the function `shadow_estimation_bound`, which is called in the main function `execute_with_shadows` when *state_reconstruction =* **False**.
 
 
-```python
+```{code-cell} ipython3
 r"""
 Minimum number of snapshots N required for predicting the expectation values of the observables with error rate epsilon.
 """
@@ -477,33 +428,8 @@ for error in epsilon_grid:
     )
 ```
 
-                                                                    
 
-    510 totel number of snapshots required for error rate 1.0
-
-
-                                                                    
-
-    797 totel number of snapshots required for error rate 0.8
-
-
-                                                                      
-
-    1416 totel number of snapshots required for error rate 0.6
-
-
-                                                                      
-
-    3186 totel number of snapshots required for error rate 0.4
-
-
-                                                                        
-
-    12743 totel number of snapshots required for error rate 0.2
-
-
-
-```python
+```{code-cell} ipython3
 import matplotlib.pyplot as plt
 
 # plot bound
@@ -551,13 +477,6 @@ plt.legend()
 plt.xscale("log")
 plt.show()
 ```
-
-
-    
-![png](../img/shadows_expctation.png)
-    
-
-
 
 
 **Acknowledgements**

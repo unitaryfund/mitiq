@@ -17,7 +17,7 @@ kernelspec:
 This notebook is a prototype of how to perform robust shadow estimation protocol with mitiq.
 
 
-```python
+```{code-cell} ipython3
 import cirq
 import numpy as np
 from typing import List
@@ -30,17 +30,14 @@ from mitiq import MeasurementResult
 from mitiq.interface.mitiq_cirq.cirq_utils import (
     sample_bitstrings as cirq_sample_bitstrings,
 )
-
-
-# auto reload modules when they have changed
-%load_ext autoreload
-%autoreload 2
+# set random seed
+np.random.seed(666)
 ```
 
 Whether to run the quantum measurement or directly use the results from the previous run. If **True**, the measurement will be run again. If **False**, the results from the previous run will be used.
 
 
-```python
+```{code-cell} ipython3
 import zipfile, pickle, io, requests
 
 run_quantum_processing = False
@@ -64,7 +61,7 @@ H = -J\sum_{i=0}^{n-1} Z_i Z_{i+1} -  g\sum_{i=1}^N X_i,
 We focus on the case where $J = g =1$. We use the ground state of such a system eight spins provided by
 
 
-```python
+```{code-cell} ipython3
 # import groud state of 1-D Ising model w/ periodic boundary condition
 download_ising_circuits = True
 num_qubits = 8
@@ -96,7 +93,7 @@ else:
 similar with the classical shadow protocal, we define the executor to perform the computational measurement for the circuit. Here we use the simulator that adds single-qubit depolarizing noise after rotation gates and before the $Z$-basis measurement, as the noise is assumped to be gate independent, time invariant and Markovian, the noisy gate satisfies $U_{\Lambda_U}(M_z)_{\Lambda_{\mathcal{M}_Z}}\equiv U\Lambda\mathcal{M}_Z$:
 
 
-```python
+```{code-cell} ipython3
 def cirq_executor(
     circuit: cirq.Circuit,
     noise_model_function=cirq.depolarize,
@@ -141,15 +138,9 @@ def cirq_executor(
 The PTM (Pauli Transfer Matrix) or Liouville representation provides a vector representation for all linear operators $\mathcal{L}(\mathcal{H}_d)$ on an $n$-qubit Hilbert space $\mathcal{H}_d$ (where $d = 2^n$). This representation uses the normalized Pauli operator basis $\sigma_a=P_a/\sqrt{d}$, with $P_a$ being the standard Pauli matrices.
 
 
-```python
+```{code-cell} ipython3
 operator_ptm_vector_rep(cirq.I._unitary_() / np.sqrt(2))
 ```
-
-
-
-
-    array([1.+0.j, 0.+0.j, 0.+0.j, 0.+0.j])
-
 
 
 ### 2.2 Pauli Twirling of Quantum Channel and Pauli Fidelity:
@@ -179,7 +170,7 @@ In the ideal noise-free scenario, Pauli fidelity is:
 For noisy channels, the inverse channel $\widehat{\mathcal{M}}^{-1}$ can be derived and used for robust shadow calibration, with differences attributed to variations in Pauli fidelity.
 
 
-```python
+```{code-cell} ipython3
 from functools import partial
 
 n_total_measurements_calibration = 20000
@@ -202,7 +193,7 @@ f_est_results = pauli_twirling_calibrate(
 ```
 
 
-```python
+```{code-cell} ipython3
 # sort bitstrings (b_lists' string rep) by number of 1s
 bitstrings = np.array(sorted(list(f_est_results.keys())))
 
@@ -221,7 +212,7 @@ for bitstring in bitstrings:
 ```
 
 
-```python
+```{code-cell} ipython3
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -246,18 +237,9 @@ plt.xticks(
 plt.ylabel("Pauli fidelity")
 plt.legend()
 ```
-
-
-
-
-    <matplotlib.legend.Legend at 0x2bce66980>
-
-
-  
-
-    
+<!--     
 ![png](../img/rshadows_compare_channels.png)
-    
+     -->
 
 ## 3. Calibration of the operator expectation value estimation
 The expectation value for a series of operators, denoted as $\{O_\iota\}_{\iota\leq M}$, has a snapshot version of expectation value estimation by random Pauli measurement $\widetilde{\mathcal{M}}=\bigotimes_{i}\widetilde{\mathcal{M}}_{P_i}$ and Pauli-twirling calibration $\widehat{\mathcal{M}}^{-1}=\sum_{b\in\{0,1\}^n}f_b^{-1}\bigotimes_{i}\Pi_{b_i\in b}$, which is given by
@@ -289,7 +271,7 @@ where we have $K_2$ estimators each of which is the average of $N_2$ single-roun
 In this section, we will use the robust shadows estimation algorithm to estimate the ground state energy of the Ising model. We will use the `compare_shadow_methods` function to compare the performance of the robust shadows estimation algorithm and the classical shadows estimation algorithm. The `compare_shadow_methods` function takes the following parameters:
 
 
-```python
+```{code-cell} ipython3
 def compare_shadow_methods(
     circuit,
     observables,
@@ -345,7 +327,7 @@ def compare_shadow_methods(
 We use the groud state of 1-D Ising model with periodic boundary condition, with $J= h=1$ for a Ising model with 8 spins as an example. The Hamiltonian is given by
 
 
-```python
+```{code-cell} ipython3
 # define obersevables lists as Ising model Hamiltonian
 from mitiq import PauliString
 
@@ -360,7 +342,7 @@ ising_hamiltonian = [
 Calculate the exact expectation values of the Pauli operators for the above state:
 
 
-```python
+```{code-cell} ipython3
 state_vector = circuit.final_state_vector()
 expval_exact = []
 for i, pauli_string in enumerate(ising_hamiltonian):
@@ -373,7 +355,7 @@ for i, pauli_string in enumerate(ising_hamiltonian):
 We use bit_flip channel as an example to show how to use the robust shadow estimation (RSE) in Mitiq. The bit_flip channel is a common noise model in quantum computing. It is a Pauli channel that flips the state of a qubit with probability $p$.
 
 
-```python
+```{code-cell} ipython3
 noise_levels = np.linspace(0, 0.06, 7)
 # if noise_model is None, then the noise model is depolarizing noise
 noise_model = "bit_flip"
@@ -417,7 +399,7 @@ for noise_level in noise_levels:
 ```
 
 
-```python
+```{code-cell} ipython3
 import pandas as pd
 
 df_energy = pd.DataFrame(
@@ -460,7 +442,7 @@ for i, noise_level in enumerate(noise_levels):
 ```
 
 
-```python
+```{code-cell} ipython3
 df_hamiltonian = df_energy.groupby(["noise_level", "method"]).sum()
 df_hamiltonian = df_hamiltonian.reset_index()
 noise_model = "bit_flip"
@@ -471,7 +453,7 @@ noise_model = "bit_flip"
 
 
 
-```python
+```{code-cell} ipython3
 # Define a color palette
 palette = {"exact": "black", "robust": "red", "standard": "green"}
 
@@ -491,25 +473,10 @@ plt.title(f"Hamiltonian Estimation for {noise_model} Noise")
 plt.xlabel("Noise Level")
 plt.ylabel("Energy Value")
 ```
-
-    /var/folders/fj/9qx1s04j6n713s58ml36xbbm0000gn/T/ipykernel_23400/651525583.py:5: FutureWarning: 
-    
-    The `ci` parameter is deprecated. Use `errorbar=('ci', 95)` for the same effect.
-    
-      sns.lineplot(
-
-
-
-
-
-    Text(0, 0.5, 'Energy Value')
-
-
-
-
+<!-- 
     
 ![png](../img/rshadows_energy.png)
-    
+     -->
 
 
 
@@ -521,7 +488,7 @@ Let's estimate two point correlation fuction: $\langle Z_0 Z_i\rangle$ of a 16-s
 Import groud state of 1-D Ising model with periodic boundary condition
 
 
-```python
+```{code-cell} ipython3
 num_qubits = 16
 qubits = cirq.LineQubit.range(num_qubits)
 if download_ising_circuits:
@@ -544,7 +511,7 @@ else:
 Define obersevables lists as two point correlation functions between the first qubit and the rest of the qubits $\{\langle Z_0 Z_i\rangle\}_{0\geq i\leq n-1}$
 
 
-```python
+```{code-cell} ipython3
 two_pt_correlation = [
     PauliString("ZZ", support=(0, i), coeff=-1) for i in range(1, num_qubits)
 ]
@@ -553,7 +520,7 @@ two_pt_correlation = [
 Calculate the exact correlation function
 
 
-```python
+```{code-cell} ipython3
 expval_exact = []
 state_vector = circuit.final_state_vector()
 for i, pauli_string in enumerate(two_pt_correlation):
@@ -566,7 +533,7 @@ for i, pauli_string in enumerate(two_pt_correlation):
 with depolarizing noise set to $0.1$, we compare the unmitigated and mitigated results:
 
 
-```python
+```{code-cell} ipython3
 noisy_executor = partial(cirq_executor, noise_level=(0.1,))
 experiment_name = f"{num_qubits}qubits_depolarize_{noise_level}"
 shadow_measurement_result = saved_data[experiment_name]["shadow_outcomes"]
@@ -588,7 +555,7 @@ est_values = compare_shadow_methods(
 ```
 
 
-```python
+```{code-cell} ipython3
 df_corr = pd.DataFrame(
     columns=["method", "qubit_index", "observable", "value"]
 )
@@ -626,7 +593,7 @@ df_corr = pd.concat(
 ```
 
 
-```python
+```{code-cell} ipython3
 # Define a color palette
 palette = {"exact": "black", "robust": "red", "standard": "green"}
 
@@ -646,20 +613,7 @@ plt.title(f"Correlation Function Estimation w/ 0.3 Depolarization Noise")
 plt.xlabel(r"Correlation Function $\langle Z_0Z_i \rangle$")
 plt.ylabel("Correlation")
 ```
-
-    /var/folders/fj/9qx1s04j6n713s58ml36xbbm0000gn/T/ipykernel_23400/499913322.py:5: FutureWarning: 
-    
-    The `ci` parameter is deprecated. Use `errorbar=('ci', 95)` for the same effect.
-    
-      sns.lineplot(
-
-
-
-
-
-    Text(0, 0.5, 'Correlation')
-
-
+<!-- 
     
 ![png](../img/rshadows_2pt_func.png)
-    
+     -->
