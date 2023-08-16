@@ -47,7 +47,7 @@ def pauli_twirling_calibrate(
             Pauli fidelity.
         locality: The locality of the operator, whose expectation value is
             going to be estimated by the classical shadow. e.g. if operator is
-            Ising model Hamiltonian with nearest neighbour interaction, then
+            Ising model Hamiltonian with nearest neighbor interaction, then
             locality = 2.
         zero_state_shadow_outcomes: The output of function
             :func:`shadow_quantum_processing` of zero calibrate state.
@@ -65,12 +65,19 @@ def pauli_twirling_calibrate(
     """
     if zero_state_shadow_outcomes is None:
         if qubits is None:
-            raise TypeError("qubits should not be None.")
+            raise TypeError(
+                "qubits must be specified when"
+                "zero_state_shadow_outcomes is None."
+            )
         if executor is None:
-            raise TypeError("executor should not be None.")
+            raise TypeError(
+                "executor must be specified when"
+                "zero_state_shadow_outcomes is None."
+            )
         if num_total_measurements_calibration is None:
             raise TypeError(
-                "num_total_measurements_calibration should not be None."
+                "num_total_measurements_calibration must be"
+                "specified when zero_state_shadow_outcomes is None."
             )
 
         # calibration circuit is of same qubit number with original circuit
