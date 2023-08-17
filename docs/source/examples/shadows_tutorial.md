@@ -20,7 +20,8 @@ This notebook shows how to use classical shadows estimation with the Mitiq libra
 import cirq
 import numpy as np
 from typing import List
-
+import sys
+sys.modules.pop("tqdm", None) # distable tqdm for cleaner notebook rendering
 from mitiq.shadows.shadows import *
 from mitiq.shadows.shadows_utils import *
 from mitiq import MeasurementResult

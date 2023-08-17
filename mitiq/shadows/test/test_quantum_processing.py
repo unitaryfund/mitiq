@@ -33,7 +33,6 @@ from mitiq.shadows.quantum_processing import (
 def test_tqdm_import_available():
     # Test the case where tqdm is available
     import tqdm as tqdm_orig
-
     assert tqdm_orig is not None
     assert mitiq.shadows.quantum_processing.tqdm is not None
 
