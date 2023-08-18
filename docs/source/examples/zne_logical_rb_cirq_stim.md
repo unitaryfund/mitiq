@@ -16,7 +16,7 @@ kernelspec:
 +++
 
 This tutorial demonstrates a method of combining quantum error mitigation (QEM) and quantum error correction (QEC), with the goal of reducing the effective logical error rate of the computation. 
-While QEM techniques such as zero noise extrapolation (ZNE) and probabilistic error cancellation are typically thought of as belonging to the NISQ regime, recently it has been shown that they can also benefit applications within the fault-tolerant regime {cite} `Piveteau_2021_PRL, Suzuki_2022_PRX, Wahl_2023_arXiv_ds_zne`.
+While QEM techniques such as zero noise extrapolation (ZNE) and probabilistic error cancellation are typically thought of as belonging to the NISQ regime, recently it has been shown that they can also benefit applications within the fault-tolerant regime {cite}`Piveteau_2021_PRL, Suzuki_2022_PRX, Wahl_2023_arXiv_ds_zne`.
 In this example, we will apply ZNE with noise scaling by global (circuit-level) unitary folding on logical randomized benchmarking (RB) circuits.
 This tutorial also introduces the use of Mitiq's ZNE functions with Cirq as the frontend and the [Stim](https://github.com/quantumlib/Stim) stabilizer simulator as the backend.
 
@@ -48,7 +48,7 @@ base_shots = 10**4
 device_size = 1500
 ```
 
-Randomized benchmarking is typically performed at the physical level, but it can be applied at the logical level as shown in Ref {cite} `Combes_2017_arXiv_logical_rb`.
+Randomized benchmarking is typically performed at the physical level, but it can be applied at the logical level as shown in Ref {cite}`Combes_2017_arXiv_logical_rb`.
 The modularity of logical RB circuits allows for parallelization of circuit executions, as permitted by the size of the device and number of physical qubits required for the logical circuit.
 We use a built-in Mitiq function, `mitiq.benchmarks.generate_rb_circuits`, to generate the RB circuits,
 where the `num_cliffords` argument refers to the number of Clifford groups in the circuit, and therefore scales the depth of the circuit. 
@@ -105,10 +105,8 @@ for c in cirq_circuits:
 
 +++
 
-The noise is modeled as single-qubit $X$ and $Z$ errors, with probability $p_L$ given by an empirical formula from Ref {cite} `Fowler_2012_PRA`: 
-$$
-\mathcal{P}_L\cong 0.03 (p/p_{th})^{(d + 1)/2}
-$$
+The noise is modeled as single-qubit $X$ and $Z$ errors, with probability $p_L$ given by an empirical formula from Ref. {cite}`Fowler_2012_PRA`: 
+$$\mathcal{P}_L\cong 0.03 (p/p_{th})^{(d + 1)/2}$$.
 
 ```{code-cell} ipython3
 def gen_noise_model(p_err, p_th, distance):
