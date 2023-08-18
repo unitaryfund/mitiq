@@ -8,7 +8,7 @@ jupytext:
 kernelspec:
   display_name: Python 3.10.4 64-bit ('folded-stim-ds-zne2')
   language: python
-  name: python3104jvsc74a57bd04a345f290afe00f43a2774be77b21a3b07dbaa098faaebca73bb90c58216261c
+  name: python3
 ---
 
 # ZNE on Stim backend with Cirq: Logical randomized benchmarking circuits
