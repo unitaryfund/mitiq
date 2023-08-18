@@ -275,6 +275,8 @@ mpl.pyplot.title(
     r"""Expectation value of $A=|00\rangle\langle00|$ from RB circuits acting on logical qubits""",
     fontsize=12,
 )
+mpl.pyplot.xticks(ticks = [11, 13, 15, 17, 19, 21])
+
 mpl.pyplot.xlabel(r"Maximum code distance, $d_{i,0}$")
 mpl.pyplot.ylabel(r"Expectation value, $E$")
 
