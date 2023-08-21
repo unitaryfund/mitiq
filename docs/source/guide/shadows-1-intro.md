@@ -142,6 +142,8 @@ One can simply skip this stage if one just wants to perform the classical shadow
 By setting the total calibration rounds $R$ = `num_total_measurements_calibration` and the number of groups for the "median of means" estimation used for calibration $K$ = `k_calibration`, we can characterize the noisy quantum channel (see [this tutorial](../examples/rshadows_tutorial.md) for more details) by running the following code:
 
 ```{code-cell} ipython3
+import sys
+sys.modules["tqdm"] = None # distable tqdm for cleaner notebook rendering
 from mitiq.shadows import *
 from mitiq.interface.mitiq_cirq.cirq_utils import (
     sample_bitstrings as cirq_sample_bitstrings,
