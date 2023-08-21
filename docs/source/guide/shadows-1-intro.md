@@ -283,7 +283,7 @@ f_est
 ```
 
 
-Same as the previous case, the quantum processing of the shadow protocol is done by the following function:
+Similarly to the previous case (estimation of expectation values), for estimating the density matrix the quantum processing is done as follows.
 
 
 ```{code-cell} ipython3
