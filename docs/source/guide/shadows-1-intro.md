@@ -54,7 +54,7 @@ The classical shadow protocol aims to create an approximate classical representa
 One can use the `mitiq.shadows' module as follows.
 
 ### User-defined inputs 
-Define a quantum circuit, e.g., with the output state the GHZ state, with number of qubits $n$ = `n_qubits`, 
+Define a quantum circuit, e.g., a circuit which prepares a GHZ state with $n$ = `n_qubits` qubits, 
 
 ```{code-cell} ipython3
 import numpy as np
