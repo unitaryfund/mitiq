@@ -51,7 +51,7 @@ Notes:
 
 The classical shadow protocol aims to create an approximate classical representation of a quantum state using minimal measurements. This approach not only characterizes and mitigates noise effectively but also retains sample efficiency and demonstrates noise resilience. For more details, see the section ([What is the theory behind Classical Shadow Estimation?](shadows-5-theory.md)).
 
-One can use the mitiq.shadows following the steps below:
+One can use the `mitiq.shadows' module as follows.
 
 ### User-defined inputs 
 Define a quantum circuit, e.g., with the output state the GHZ state, with number of qubits $n$ = `n_qubits`, 
