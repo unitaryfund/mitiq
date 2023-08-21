@@ -44,8 +44,6 @@ Notes:
    - Do not need to redo the calibration stage (0. `pauli_twirling_calibration`) if:
        1. The input circuit has a consistent number of qubits.
        2. The estimated observables have the same or fewer qubit support.
-   - The current version supports local Pauli measurements. Upcoming documentation will offer guidance on estimating Renyi entropy and other quantum information metrics.
-
 
 ## Protocol Overview
 
