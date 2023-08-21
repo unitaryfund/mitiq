@@ -75,7 +75,7 @@ circuit = cirq.Circuit(
 print(circuit)
 ```
 
-Define a executor to run the circuit on a quantum computer or noisy simulator. Noted that the robust shadow calibration can only calibrate the noisy rotation and measurement channels of classical shadow protocal, so we we define an executor satisfies
+Define a executor to run the circuit on a quantum computer or noisy simulator. Note that the {\it robust shadow estimation} technique can only calibrate and mitigate the noise acting on the operations associated to the classical shadow protocol. So, in order to test the technique, we assume that the state preparation part of the circuit is noiseless. In particular, we define an executor in which:
 
 1. Noise channel added to circuit before measurement, i.e. noisy gate satisfies $U_{\Lambda_U}(M_z)_{\Lambda_{\mathcal{M}_Z}}\equiv U\Lambda\mathcal{M}_Z$.
 
