@@ -112,7 +112,6 @@ def cirq_executor(
                 )
             noisy_circuit.append(op)
         circuit = noisy_circuit
-    # circuit.append(cirq.Moment(*noise_model_function(*noise_level).on_each(*qubits)))
     executor = cirq_sample_bitstrings(
         circuit,
         noise_model_function=None,
