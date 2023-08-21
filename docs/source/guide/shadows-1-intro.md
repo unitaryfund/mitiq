@@ -330,6 +330,3 @@ print(
     f"fidelity between true state and rshadow reconstruced state {fidelity_shadow_calibrated}"
 )
 ```
-<!-- 
-    fidelity between true state and shadow reconstruced state 0.3598774999999995
-    fidelity between true state and rshadow reconstruced state 0.9994545201218017 -->

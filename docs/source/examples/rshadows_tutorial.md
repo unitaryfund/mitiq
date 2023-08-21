@@ -21,8 +21,6 @@ This notebook is a prototype of how to perform robust shadow estimation protocol
 import cirq
 import numpy as np
 from typing import List
-import sys
-sys.modules.pop("tqdm", None) # distable tqdm for cleaner notebook rendering
 from mitiq.shadows.shadows import *
 from mitiq.shadows.quantum_processing import *
 from mitiq.shadows.classical_postprocessing import *
