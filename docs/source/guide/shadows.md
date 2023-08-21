@@ -13,11 +13,11 @@ kernelspec:
 
 # Classical Shadows
 
-Classical shadows protocol aims to create an approximate classical representation
+Classical shadows protocol {cite}`huang2020predicting` aims to create an approximate classical representation
 of a quantum state using minimal measurements. The protocol is based on the idea of shadow tomography,
 which is a technique for reconstructing a quantum state from a small number of measurements.
 This approach not only characterizes and mitigates noise effectively but also retains
-sample efficiency and demonstrates noise resilience. For more details, see the section
+sample efficiency and demonstrates noise resilience {cite}`chen2021robust`. For more details, see the section
 ([Classical Shadow Protocol and its Robust Estimation](shadows-5-theory.md)).
 
  
