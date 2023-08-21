@@ -210,8 +210,7 @@ for i in range(0, num_qubits - 1):
     print(two_pt_correlations[i]._pauli)
 ```
 
-One can estimation the expectation value of the observables with the previous classical shadows. One can get the estimation of expectation values without/with calibration:
-
+The corresponding expectation values can be estimated (with and without calibration) as shown in the next code cell.
 
 ```{code-cell} ipython3
 est_corrs = classical_post_processing(
