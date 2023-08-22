@@ -65,7 +65,31 @@ jobs:
           make docs
           make doctest
           make linkcheck
-
+   
+      - name: Print error logs if they exist
+        if: failure()
+        run: |
+          if [[ -f /home/runner/work/mitiq/mitiq/docs/build/html/reports/examples/rshadows_tutorial.err.log ]]; then
+            echo "Printing rshadows_tutorial.err.log:"
+            cat /home/runner/work/mitiq/mitiq/docs/build/html/reports/examples/rshadows_tutorial.err.log
+            echo "---------------------------------------"
+          fi
+          if [[ -f /home/runner/work/mitiq/mitiq/docs/build/html/reports/examples/shadows_tutorial.err.log ]]; then
+            echo "Printing shadows_tutorial.err.log:"
+            cat /home/runner/work/mitiq/mitiq/docs/build/html/reports/examples/shadows_tutorial.err.log
+            echo "---------------------------------------"
+          fi
+          
+      - name: Upload error logs as artifacts if they exist
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: error-logs
+          path: |
+            /home/runner/work/mitiq/mitiq/docs/build/html/reports/examples/rshadows_tutorial.err.log
+            /home/runner/work/mitiq/mitiq/docs/build/html/reports/examples/shadows_tutorial.err.log
+          if-no-files-found: ignore
+          
   # This is to make sure Mitiq works without optional 3rd party packages like Qiskit, pyQuil, etc.
   # E.g., if we accidentally `import qiskit` in Mitiq where we shouldn't, this test will catch that.
   core:
