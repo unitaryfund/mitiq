@@ -9,7 +9,6 @@
 [![Repository](https://img.shields.io/badge/GitHub-5C5C5C.svg?logo=github)](https://github.com/unitaryfund/mitiq)
 [![Unitary Fund](https://img.shields.io/badge/Supported%20By-Unitary%20Fund-FFFF00.svg)](https://unitary.fund)
 [![Discord Chat](https://img.shields.io/badge/dynamic/json?color=blue&label=Discord&query=approximate_presence_count&suffix=%20online.&url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2FJqVGmpkP96%3Fwith_counts%3Dtrue)](http://discord.unitary.fund)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/unitaryfund/mitiq/master?urlpath=%2Ftree%2Fdocs%2Fsource%2Fexamples)
 
 Mitiq is a Python toolkit for implementing error mitigation techniques on
 quantum computers.
@@ -76,7 +75,6 @@ Try out the calibration module demonstrated below to help find the best paramete
 ![](docs/source/img/calibration.gif)
 
 See our [guides](https://mitiq.readthedocs.io/en/stable/guide/guide.html) and [examples](https://mitiq.readthedocs.io) for more explanation, techniques, and benchmarks.
-The examples and other notebooks can be run interactively on the cloud with [mybinder.org](https://mybinder.org/v2/gh/unitaryfund/mitiq/master?filepath=%2Fdocs%2Fsource%2Fexamples).
 
 ## Quick Tour
 

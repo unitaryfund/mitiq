@@ -58,10 +58,6 @@ If you need to install Mitiq and/or Qiskit, you can uncomment and run the follow
 # !pip install qiskit==0.39.0
 ```
 
-If you encounter problems when installing Mitiq on your local machine,
-you can try creating a new notebook in the online Binder einvironment at [`this link`](https://mybinder.org/v2/gh/unitaryfund/mitiq/0da4965f3d80b9ee7ed9e93527c7e7c09d4b2f7e
-).
-
 You can check your locally installed version of Mitiq and of the associated frontend libraries by running the next cell.
 
 ```{code-cell} ipython3

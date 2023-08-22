@@ -22,7 +22,7 @@ from cirq import (
 )
 
 from mitiq import QPROGRAM
-from mitiq.interface import noise_scaling_converter
+from mitiq.interface import accept_qprogram_and_validate
 
 
 class GateTypeException(Exception):
@@ -106,7 +106,7 @@ def compute_parameter_variance(
     return variance
 
 
-@noise_scaling_converter
+@accept_qprogram_and_validate
 def scale_parameters(
     circuit: QPROGRAM,
     scale_factor: float,

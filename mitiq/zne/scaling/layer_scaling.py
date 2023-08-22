@@ -12,12 +12,12 @@ import numpy as np
 from cirq import Moment, inverse
 
 from mitiq import QPROGRAM
-from mitiq.interface import noise_scaling_converter
+from mitiq.interface import accept_qprogram_and_validate
 from mitiq.utils import _append_measurements, _pop_measurements
 from mitiq.zne.scaling.folding import _check_foldable
 
 
-@noise_scaling_converter
+@accept_qprogram_and_validate
 def layer_folding(
     circuit: cirq.Circuit, layers_to_fold: List[int]
 ) -> cirq.Circuit:
@@ -69,7 +69,7 @@ def get_layer_folding(
         The function for folding the ith layer.
     """
 
-    @noise_scaling_converter
+    @accept_qprogram_and_validate
     def fold_ith_layer(
         circuit: cirq.Circuit, scale_factor: int
     ) -> cirq.Circuit:

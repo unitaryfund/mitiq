@@ -11,7 +11,7 @@ import numpy.typing as npt
 from cirq import Circuit, I, LineQubit, synchronize_terminal_measurements
 
 from mitiq import QPROGRAM
-from mitiq.interface import noise_scaling_converter
+from mitiq.interface import accept_qprogram_and_validate
 
 
 def _get_circuit_mask(circuit: Circuit) -> npt.NDArray[np.int64]:
@@ -105,7 +105,7 @@ def insert_ddd_sequences(
     return _insert_ddd_sequences(circuit, rule)
 
 
-@noise_scaling_converter
+@accept_qprogram_and_validate
 def _insert_ddd_sequences(
     circuit: Circuit,
     rule: Callable[[int], Circuit],

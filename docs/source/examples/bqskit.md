@@ -15,11 +15,13 @@ kernelspec:
 In this tutorial we describe how to use error mitigation capabilities from [Mitiq](https://mitiq.readthedocs.io/en/stable/) together with the compilation capabilities of [BQSKit](https://bqskit.lbl.gov/), a compiler for quantum circuits. BQSKit stands for Berkeley Quantum Synthesis Toolkit and it allows one "to compile quantum programs to efficient physical circuits for any QPU".
 
 To get started, ensure you have the requisite python packages by running the following install commands.
+
 - `pip install mitiq`
 - `pip install 'bqskit[ext]'`
 
 The main goal of this tutorial is to understand how to use `bqskit` together with `mitiq`.
 To do this, we will
+
 1. generate a random circuit,
 2. compile it with `bqskit`,
 3. use error mitigation on the compiled circuit, and
@@ -32,7 +34,6 @@ After demonstrating the use of the two packages, we can then try and understand 
 To begin we import many of the required modules and functions.
 
 ```{code-cell} ipython3
-:tags: ["skip-execution"]
 import bqskit
 from bqskit.ext import cirq_to_bqskit, bqskit_to_cirq
 import mitiq
@@ -49,7 +50,6 @@ Here we also use a random seed for reproducibility.
 The random circuit is then converted to BQSKit's custom internal representation with the `cirq_to_bqskit` function.
 
 ```{code-cell} ipython3
-:tags: ["skip-execution"]
 num_qubits = 3
 depth = 10
 density = 1
@@ -75,7 +75,6 @@ This allows for one to skip the second pass of compilation that is usually requi
 ```
 
 ```{code-cell} ipython3
-:tags: ["skip-execution"]
 compiled = bqskit.compile(bqskit_circuit)
 compiled_circuit = bqskit_to_cirq(compiled)
 
@@ -89,9 +88,11 @@ Now we mitigate them!
 ## Error Mitigation
 
 Using `mitiq`'s simplest, and easiest to use method of [Zero Noise Extrapolation](https://mitiq.readthedocs.io/en/stable/guide/zne-1-intro.html) (ZNE) we can obtain more accurate results than we would otherwise.
+
 ```{note}
 There are multiple other techniques described in our [user guide](https://mitiq.readthedocs.io/en/stable/guide/guide.html) which could be used as well.
 ```
+
 In this tutorial we assume a simple error model of depolarizing noise on two-qubit gates.
 To use this method, we need to define a function (in `mitiq` this is often referred to as an executor) which takes as input a circuit, and returns some sort of expectation value, or probability.
 We define a function `execute` which adds a tunable noise parameter, which controls the strength of the simulated noise.
@@ -103,7 +104,6 @@ Two-qubit gates *are* generally much noisier than single qubit gates, but real q
 ```
 
 ```{code-cell} ipython3
-:tags: ["skip-execution"]
 def execute(circuit, noise_level=0.05):
     noisy_circuit = cirq.Circuit()
     for op in circuit.all_operations():
@@ -124,7 +124,6 @@ def execute(circuit, noise_level=0.05):
 Since we'd like to see how compilation effects error mitigation, we first simulate the ideal and noisy values using the simulator defined above.
 
 ```{code-cell} ipython3
-:tags: ["skip-execution"]
 uncompiled_ideal_value = execute(random_circuit, noise_level=0.0)
 uncompiled_noisy_value = execute(random_circuit)
 
@@ -135,7 +134,6 @@ compiled_noisy_value = execute(compiled_circuit)
 With these values taken, we are now ready to use ZNE --- on both the random, and compiled circuit --- to obtain mitigated expectation values.
 
 ```{code-cell} ipython3
-:tags: ["skip-execution"]
 from mitiq import zne
 
 uncompiled_mitigated_result = zne.execute_with_zne(random_circuit, execute)
@@ -144,21 +142,18 @@ compiled_mitigated_result = zne.execute_with_zne(compiled_circuit, execute)
 
 Thus we have four variables which we can compare against ideal values to see how performance varies for this circuit across compilation and mitigation.
 
-|                                | compiled | mitigated |
-| ------------------------------ | -------- | --------- |
-| `uncompiled_noisy_value`       | ❌       | ❌         |
-| `uncompiled_mitigated_result`  | ❌       | ✅         |
-| `compiled_noisy_value`         | ✅       | ❌         |
-| `compiled_mitigated_result`    | ✅       | ✅         |
-
+|                               | compiled | mitigated |
+| ----------------------------- | -------- | --------- |
+| `uncompiled_noisy_value`      | ❌       | ❌        |
+| `uncompiled_mitigated_result` | ❌       | ✅        |
+| `compiled_noisy_value`        | ✅       | ❌        |
+| `compiled_mitigated_result`   | ✅       | ✅        |
 
 ## Comparison
-
 
 These data are then summarized in the following table printed below.
 
 ```{code-cell} ipython3
-:tags: ["skip-execution"]
 header = "{:<11} {:<15} {:<10}"
 entry = "{:<11}  {:<15.2f} {:<10.2f}"
 int_entry = "{:<11}  {:<15} {:<10}"
@@ -187,7 +182,7 @@ print(
 ```
 
 Hence for this particular random circuit we see that using both compilation _and_ error mitigation combine for the most accurate result.
-Note that despite using BQSKit to compile the circuit, the depth has actually increased. 
+Note that despite using BQSKit to compile the circuit, the depth has actually increased.
 This can occasionally happen when the random circuit contains gates that are harder to compile into BQSKit's default gateset.
 
 ## More random circuits
@@ -214,10 +209,7 @@ For more information check out the [`bqskit`](https://bqskit.readthedocs.io/en/l
 
 ### References
 
-BQSKit documentation: <https://bqskit.readthedocs.io/>
-
-BQSKit whitepaper: <https://dl.acm.org/doi/abs/10.1145/3503222.3507739/>
-
-Mitiq documentation: <https://mitiq.readthedocs.io/>
-
-Mitiq whitepaper: <https://quantum-journal.org/papers/q-2022-08-11-774/>
+- BQSKit documentation: <https://bqskit.readthedocs.io/>
+- BQSKit whitepaper: <https://dl.acm.org/doi/abs/10.1145/3503222.3507739/>
+- Mitiq documentation: <https://mitiq.readthedocs.io/>
+- Mitiq whitepaper: <https://quantum-journal.org/papers/q-2022-08-11-774/>
