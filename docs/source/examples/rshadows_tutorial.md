@@ -355,7 +355,7 @@ We use bit_flip channel as an example to show how to use the robust shadow estim
 
 
 ```{code-cell} ipython3
-noise_levels = np.linspace(0, 0.06, 7)
+noise_levels = np.linspace(0, 0.06, 4)
 # if noise_model is None, then the noise model is depolarizing noise
 noise_model = "bit_flip"
 
@@ -512,7 +512,7 @@ Define obersevables lists as two point correlation functions between the first q
 
 ```{code-cell} ipython3
 two_pt_correlation = [
-    PauliString("ZZ", support=(0, i), coeff=-1) for i in range(1, num_qubits)
+    PauliString("ZZ", support=(0, i), coeff=-1) for i in range(1, num_qubits, 2)
 ]
 ```
 

@@ -238,15 +238,16 @@ for n_measurement in n_measurement_list:
             rho_shadow - rho_true, ord=None, axis=None, keepdims=False
         )
         # store the results
-        df = df.append(
-            {
-                "n_measurement": n_measurement,
-                "run": run,
-                "fidelity": fidelity_val,
-                "operator_2_norm": norm_val,
-            },
+        df = pd.concat(
+            [df, pd.DataFrame({
+                "n_measurement": [n_measurement],
+                "run": [run],
+                "fidelity": [fidelity_val],
+                "operator_2_norm": [norm_val],
+            })],
             ignore_index=True,
         )
+        
 ```
 
 
