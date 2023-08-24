@@ -35,7 +35,7 @@ For users aiming to employ the robust shadow estimation protocol, An initial ste
 1. `shadow_quantum_processing`: same as above.
 
 2. `classical_post_processing`
-   - Args: `rshadow` = True, 
+   - Args: `use_calibration` = True, 
            `calibration_results` = output of `pauli_twirling_calibration`
    - Outcome: Error mitigated estimation based on user-defined inputs.
 
