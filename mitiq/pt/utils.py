@@ -69,24 +69,22 @@ def _pauli_vectorized_list(num_qubits):
 def ptm_matrix(circuit, num_qubits):
     """Find the Pauli Transfer Matrix (PTM) of a circuit."""
     superop = cirq.kraus_to_superoperator(cirq.kraus(circuit))
-    ptm_matrix = np.zeros([4**num_qubits, 4**num_qubits], dtype=complex)
     vec_pauli = _pauli_vectorized_list(num_qubits)
+    n_qubit_paulis = _get_n_qubit_paulis(num_qubits)
+    ptm_matrix = np.zeros([4**num_qubits, 4**num_qubits], dtype=complex)
 
-    for i in range(4**num_qubits):
+    for i in range(len(vec_pauli)):
         superop_on_pauli_vec = np.matmul(superop, vec_pauli[i])
         superop_on_pauli_matrix = _matrix_no_vec(
             superop_on_pauli_vec, num_qubits
         )
-        ptm_matrix_row = []
 
-        n_qubit_paulis = _get_n_qubit_paulis(num_qubits)
-        for j in range(4**num_qubits):
-            pauli_superop_pauli = np.matmul(
-                n_qubit_paulis[j], superop_on_pauli_matrix
-            )
+        ptm_matrix_row = []
+        for j in n_qubit_paulis:
+            pauli_superop_pauli = np.matmul(j, superop_on_pauli_matrix)
             ptm_matrix_row.append(
                 (0.5**num_qubits) * np.trace(pauli_superop_pauli)
             )
-
         ptm_matrix[i] = ptm_matrix_row
-        return ptm_matrix
+
+    return ptm_matrix

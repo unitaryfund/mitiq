@@ -51,9 +51,25 @@ def test_size_of_pauli_vec():
 
 def test_ptm_matrix_size():
     """Checks the output of the PTM matrix function."""
+    # one qubit circuit
     q0 = cirq.LineQubit(0)
     circuit = cirq.Circuit()
     circuit.append(cirq.Rz(rads=0.25 * np.pi)(q0))
     expected_ptm_matrix = ptm_matrix(circuit, 1)
     assert expected_ptm_matrix.shape == (4**1, 4**1)
-    assert np.isclose(expected_ptm_matrix[0, 1], 0.0, rtol=1e-05)
+    expected_array = np.array(
+        [
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 0.7071, -0.7071, 0.0],
+            [0.0, 0.7071, 0.7071, 0.0],
+            [0.0, 0.0, 0.0, 1.0],
+        ]
+    )
+    np.allclose(expected_ptm_matrix, expected_array, atol=1e-08)
+
+    # two qubit circuit
+    q1 = cirq.LineQubit(1)
+    circuit.append(cirq.Rz(rads=0.25 * np.pi)(q1))
+    expected_ptm_matrix2 = ptm_matrix(circuit, 2)
+    assert expected_ptm_matrix2.shape == (4**2, 4**2)
+    assert np.isclose(expected_ptm_matrix2[0, 1], 0.0, rtol=1e-05)
