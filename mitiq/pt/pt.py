@@ -5,8 +5,8 @@
 
 import random
 from typing import List
-import cirq
 
+import cirq
 
 from mitiq import QPROGRAM
 from mitiq.interface import accept_qprogram_and_validate
