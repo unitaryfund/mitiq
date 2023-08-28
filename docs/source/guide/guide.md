@@ -10,6 +10,7 @@ pec.md
 cdr.md
 ddd.md
 rem.md
+qse.md
 error-mitigation.md
 glossary.md
 ```
