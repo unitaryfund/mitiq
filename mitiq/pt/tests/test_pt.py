@@ -8,6 +8,7 @@ import random
 import cirq
 import networkx as nx
 import numpy as np
+import pytest
 import qiskit
 
 from mitiq.benchmarks import generate_mirror_circuit
@@ -19,6 +20,7 @@ from mitiq.pt.pt import (
     twirl_CNOT_gates,
     twirl_CZ_gates,
 )
+from mitiq.utils import _equal
 
 num_qubits = 2
 qubits = cirq.LineQubit.range(num_qubits)
@@ -127,3 +129,18 @@ def test_pauli_twirl_circuit():
     num_circuits = 10
     twirled_output = pauli_twirl_circuit(circuit, num_circuits)
     assert len(twirled_output) == num_circuits
+
+
+@pytest.mark.parametrize(
+    "twirl_func", [pauli_twirl_circuit, twirl_CNOT_gates, twirl_CZ_gates]
+)
+def test_no_CNOT_CZ_circuit(twirl_func):
+    num_qubits = 2
+    qubits = cirq.LineQubit.range(num_qubits)
+    circuit = cirq.Circuit()
+    circuit.append(cirq.X.on_each(qubits))
+    twirled_output = twirl_func(circuit, 5)
+    assert len(twirled_output) == 5
+
+    for i in range(5):
+        assert _equal(circuit, twirled_output[i])
