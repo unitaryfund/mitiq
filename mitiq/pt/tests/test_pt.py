@@ -15,7 +15,7 @@ from mitiq.interface.mitiq_cirq import compute_density_matrix
 from mitiq.pt.pt import (
     CNOT_twirling_gates,
     CZ_twirling_gates,
-    tailor_circuit_with_pauli_twirling,
+    pauli_twirl_circuit,
     twirl_CNOT_gates,
     twirl_CZ_gates,
 )
@@ -116,7 +116,7 @@ def test_twirl_CNOT_increases_layer_count():
         assert num_gates_after == num_gates_before
 
 
-def test_tailor_circuit_with_pauli_twirling():
+def test_pauli_twirl_circuit():
     num_qubits = 3
     num_layers = 20
     circuit, _ = generate_mirror_circuit(
@@ -125,5 +125,5 @@ def test_tailor_circuit_with_pauli_twirling():
         connectivity_graph=nx.complete_graph(num_qubits),
     )
     num_circuits = 10
-    twirled_output = tailor_circuit_with_pauli_twirling(circuit, num_circuits)
+    twirled_output = pauli_twirl_circuit(circuit, num_circuits)
     assert len(twirled_output) == num_circuits
