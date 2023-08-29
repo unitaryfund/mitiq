@@ -56,7 +56,7 @@ def pauli_twirl_circuit(
 ) -> List[QPROGRAM]:
     """Return the Pauli twirled versions of the input circuit.
 
-    Only the $CZ$ and $CNOT$ gates in an input circuit
+    Only the $\mathrm{CZ}$ and $\mathrm{CNOT}$ gates in an input circuit
     are Pauli twirled as specified in :cite:`saki2023hypothesis`.
 
     Args:
